@@ -42,7 +42,9 @@ def test_create_run_resource_from_none() -> None:
 
     subject = RunView()
     result = subject.as_resource(
-        run_id="run-id", created_at=created_at, create_data=create_data
+        run_id="run-id",
+        created_at=created_at,
+        create_data=create_data,
     )
 
     assert result == RunResource(
@@ -50,6 +52,7 @@ def test_create_run_resource_from_none() -> None:
         create_data=BasicRunCreateData(),
         created_at=created_at,
         actions=[],
+        is_current=True,
     )
 
 
@@ -68,6 +71,7 @@ def test_create_run_resource() -> None:
         create_data=create_data,
         created_at=created_at,
         actions=[],
+        is_current=True,
     )
 
 
@@ -88,6 +92,7 @@ def test_create_protocol_run_resource() -> None:
         create_data=create_data,
         created_at=created_at,
         actions=[],
+        is_current=True,
     )
 
 
@@ -113,11 +118,13 @@ current_time = datetime.now()
                 ),
                 created_at=current_time,
                 actions=[],
+                is_current=True,
             ),
             BasicRun(
                 id="run-id",
                 createdAt=current_time,
                 status=EngineStatus.READY_TO_RUN,
+                current=True,
                 createParams=BasicRunCreateParams(
                     labwareOffsets=[
                         LabwareOffset(
@@ -141,11 +148,13 @@ current_time = datetime.now()
                 ),
                 created_at=current_time,
                 actions=[],
+                is_current=False,
             ),
             ProtocolRun(
                 id="run-id",
                 createdAt=current_time,
                 status=EngineStatus.READY_TO_RUN,
+                current=False,
                 createParams=ProtocolRunCreateParams(protocolId="protocol-id"),
                 actions=[],
                 commands=[],
@@ -155,10 +164,7 @@ current_time = datetime.now()
         ),
     ),
 )
-def test_to_response(
-    run_resource: RunResource,
-    expected_response: Run,
-) -> None:
+def test_to_response(run_resource: RunResource, expected_response: Run) -> None:
     """It should create the correct type of run."""
     subject = RunView()
     result = subject.as_response(
@@ -178,6 +184,7 @@ def test_to_response_maps_commands() -> None:
         create_data=BasicRunCreateData(),
         created_at=datetime(year=2021, month=1, day=1),
         actions=[],
+        is_current=True,
     )
 
     command_1 = pe_commands.LoadPipette(
@@ -211,6 +218,7 @@ def test_to_response_maps_commands() -> None:
         createParams=BasicRunCreateParams(),
         createdAt=datetime(year=2021, month=1, day=1),
         status=EngineStatus.RUNNING,
+        current=True,
         actions=[],
         commands=[
             RunCommandSummary(
@@ -236,6 +244,7 @@ def test_to_response_adds_equipment() -> None:
         create_data=BasicRunCreateData(),
         created_at=datetime(year=2021, month=1, day=1),
         actions=[],
+        is_current=True,
     )
 
     labware = LoadedLabware(
@@ -265,6 +274,7 @@ def test_to_response_adds_equipment() -> None:
         createParams=BasicRunCreateParams(),
         createdAt=datetime(year=2021, month=1, day=1),
         status=EngineStatus.RUNNING,
+        current=True,
         actions=[],
         commands=[],
         pipettes=[pipette],
@@ -281,6 +291,7 @@ def test_create_action(current_time: datetime) -> None:
         create_data=BasicRunCreateData(),
         created_at=run_created_at,
         actions=[],
+        is_current=True,
     )
 
     command_data = RunActionCreateData(
@@ -306,4 +317,5 @@ def test_create_action(current_time: datetime) -> None:
         create_data=BasicRunCreateData(),
         created_at=run_created_at,
         actions=[action_result],
+        is_current=True,
     )

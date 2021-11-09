@@ -52,6 +52,7 @@ class RunView:
             created_at=created_at,
             create_data=create_data or BasicRunCreateData(),
             actions=[],
+            is_current=True,
         )
 
     @staticmethod
@@ -97,8 +98,12 @@ class RunView:
     ) -> Run:
         """Transform a run resource into its public response model.
 
-        Arguments:
+        Args:
             run: Internal resource representation of the run.
+            commands: Commands from ProtocolEngine state.
+            pipettes: Pipettes from ProtocolEngine state.
+            labware: Labware from ProtocolEngine state.
+            engine_status: Status from ProtocolEngine state.
 
         Returns:
             Run response model representing the same resource.
@@ -114,6 +119,7 @@ class RunView:
                 id=run.run_id,
                 createParams=create_data.createParams,
                 createdAt=run.created_at,
+                current=run.is_current,
                 actions=run.actions,
                 commands=command_summaries,
                 pipettes=pipettes,
@@ -126,6 +132,7 @@ class RunView:
                 id=run.run_id,
                 createParams=create_data.createParams,
                 createdAt=run.created_at,
+                current=run.is_current,
                 actions=run.actions,
                 commands=command_summaries,
                 pipettes=pipettes,

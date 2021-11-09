@@ -40,7 +40,6 @@ class RunNotFound(ErrorDetails):
     title: str = "Run Not Found"
 
 
-# TODO(mc, 2021-05-28): evaluate multi-run logic
 class RunAlreadyActive(ErrorDetails):
     """An error if one tries to create a new run while one is already active."""
 
@@ -57,6 +56,13 @@ class RunNotIdle(ErrorDetails):
         "Run is currently active. Allow the run to finish or"
         " stop it with a `stop` action before attempting to delete it."
     )
+
+
+class RunStopped(ErrorDetails):
+    """An error if one tries to modify a stopped run."""
+
+    id: Literal["RunStopped"] = "RunStopped"
+    title: str = "Run Stopped"
 
 
 @base_router.post(
@@ -96,7 +102,9 @@ async def create_run(
     """
     create_data = request_body.data if request_body is not None else None
     run = run_view.as_resource(
-        run_id=run_id, created_at=created_at, create_data=create_data
+        run_id=run_id,
+        created_at=created_at,
+        create_data=create_data,
     )
     protocol_id = None
 
@@ -104,7 +112,7 @@ async def create_run(
         protocol_id = create_data.createParams.protocolId
 
     try:
-        await engine_store.create()
+        engine_state = await engine_store.create(run_id=run_id)
 
         if protocol_id is not None:
             protocol_resource = protocol_store.get(protocol_id=protocol_id)
@@ -124,10 +132,10 @@ async def create_run(
 
     data = run_view.as_response(
         run=run,
-        commands=engine_store.engine.state_view.commands.get_all(),
-        pipettes=engine_store.engine.state_view.pipettes.get_all(),
-        labware=engine_store.engine.state_view.labware.get_all(),
-        engine_status=engine_store.engine.state_view.commands.get_status(),
+        commands=engine_state.commands.get_all(),
+        pipettes=engine_state.pipettes.get_all(),
+        labware=engine_state.labware.get_all(),
+        engine_status=engine_state.commands.get_status(),
     )
 
     return ResponseModel(data=data)
@@ -155,13 +163,14 @@ async def get_runs(
     data = []
 
     for run in run_store.get_all():
-        # TODO(mc, 2021-06-23): add multi-engine support
+        run_id = run.run_id
+        engine_state = engine_store.get_state(run_id)
         run_data = run_view.as_response(
             run=run,
-            commands=engine_store.engine.state_view.commands.get_all(),
-            pipettes=engine_store.engine.state_view.pipettes.get_all(),
-            labware=engine_store.engine.state_view.labware.get_all(),
-            engine_status=engine_store.engine.state_view.commands.get_status(),
+            commands=engine_state.commands.get_all(),
+            pipettes=engine_state.pipettes.get_all(),
+            labware=engine_state.labware.get_all(),
+            engine_status=engine_state.commands.get_status(),
         )
 
         data.append(run_data)
@@ -198,12 +207,14 @@ async def get_run(
     except RunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
+    engine_state = engine_store.get_state(run.run_id)
+
     data = run_view.as_response(
         run=run,
-        commands=engine_store.engine.state_view.commands.get_all(),
-        pipettes=engine_store.engine.state_view.pipettes.get_all(),
-        labware=engine_store.engine.state_view.labware.get_all(),
-        engine_status=engine_store.engine.state_view.commands.get_status(),
+        commands=engine_state.commands.get_all(),
+        pipettes=engine_state.pipettes.get_all(),
+        labware=engine_state.labware.get_all(),
+        engine_status=engine_state.commands.get_status(),
     )
 
     return ResponseModel(data=data)
@@ -230,10 +241,12 @@ async def remove_run_by_id(
         engine_store: ProtocolEngine storage and control.
     """
     try:
-        if not engine_store.engine.state_view.commands.get_is_stopped():
-            raise RunNotIdle().as_error(status.HTTP_409_CONFLICT)
+        engine_state = engine_store.get_state(runId)
     except EngineMissingError:
         pass
+    else:
+        if not engine_state.commands.get_is_stopped():
+            raise RunNotIdle().as_error(status.HTTP_409_CONFLICT)
 
     try:
         engine_store.clear()

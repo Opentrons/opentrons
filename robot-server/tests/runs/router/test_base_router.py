@@ -1,13 +1,17 @@
 """Tests for base /runs routes."""
 import pytest
 from datetime import datetime
-from decoy import Decoy
+from decoy import Decoy, matchers
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from httpx import AsyncClient
 
 from opentrons.types import DeckSlotName, MountType
-from opentrons.protocol_engine import commands as pe_commands, types as pe_types
+from opentrons.protocol_engine import (
+    StateView,
+    commands as pe_commands,
+    types as pe_types,
+)
 from opentrons.protocol_runner import JsonPreAnalysis
 
 from robot_server.service.task_runner import TaskRunner
@@ -74,28 +78,35 @@ async def test_create_run(
         created_at=current_time,
         create_data=BasicRunCreateData(),
         actions=[],
+        is_current=True,
     )
     expected_response = BasicRun(
         id=unique_id,
         createdAt=current_time,
         createParams=BasicRunCreateParams(),
         status=pe_types.EngineStatus.READY_TO_RUN,
+        current=True,
         actions=[],
         commands=[],
         pipettes=[],
         labware=[],
     )
 
-    decoy.when(engine_store.engine.state_view.commands.get_all()).then_return([])
-    decoy.when(engine_store.engine.state_view.pipettes.get_all()).then_return([])
-    decoy.when(engine_store.engine.state_view.labware.get_all()).then_return([])
-    decoy.when(engine_store.engine.state_view.commands.get_status()).then_return(
+    engine_state = decoy.mock(cls=StateView)
+    decoy.when(await engine_store.create(run_id=unique_id)).then_return(engine_state)
+
+    decoy.when(engine_state.commands.get_all()).then_return([])
+    decoy.when(engine_state.pipettes.get_all()).then_return([])
+    decoy.when(engine_state.labware.get_all()).then_return([])
+    decoy.when(engine_state.commands.get_status()).then_return(
         pe_types.EngineStatus.READY_TO_RUN
     )
 
     decoy.when(
         run_view.as_resource(
-            run_id=unique_id, created_at=current_time, create_data=BasicRunCreateData()
+            run_id=unique_id,
+            created_at=current_time,
+            create_data=BasicRunCreateData(),
         )
     ).then_return(run)
 
@@ -117,7 +128,6 @@ async def test_create_run(
     verify_response(response, expected_status=201, expected_data=expected_response)
 
     decoy.verify(
-        await engine_store.create(),
         task_runner.run(engine_store.runner.join),
         run_store.upsert(run=run),
     )
@@ -141,6 +151,7 @@ async def test_create_protocol_run(
             createParams=ProtocolRunCreateParams(protocolId="protocol-id")
         ),
         actions=[],
+        is_current=True,
     )
     protocol_resource = ProtocolResource(
         protocol_id="protocol-id",
@@ -152,6 +163,7 @@ async def test_create_protocol_run(
         id=unique_id,
         createdAt=current_time,
         status=pe_types.EngineStatus.READY_TO_RUN,
+        current=True,
         createParams=ProtocolRunCreateParams(protocolId="protocol-id"),
         actions=[],
         commands=[],
@@ -173,10 +185,13 @@ async def test_create_protocol_run(
         )
     ).then_return(run)
 
-    decoy.when(engine_store.engine.state_view.commands.get_all()).then_return([])
-    decoy.when(engine_store.engine.state_view.pipettes.get_all()).then_return([])
-    decoy.when(engine_store.engine.state_view.labware.get_all()).then_return([])
-    decoy.when(engine_store.engine.state_view.commands.get_status()).then_return(
+    engine_state = decoy.mock(cls=StateView)
+    decoy.when(await engine_store.create(run_id=unique_id)).then_return(engine_state)
+
+    decoy.when(engine_state.commands.get_all()).then_return([])
+    decoy.when(engine_state.pipettes.get_all()).then_return([])
+    decoy.when(engine_state.labware.get_all()).then_return([])
+    decoy.when(engine_state.commands.get_status()).then_return(
         pe_types.EngineStatus.READY_TO_RUN
     )
 
@@ -203,7 +218,6 @@ async def test_create_protocol_run(
     verify_response(response, expected_status=201, expected_data=expected_response)
 
     decoy.verify(
-        await engine_store.create(),
         engine_store.runner.load(protocol_resource),
         run_store.upsert(run=run),
     )
@@ -256,15 +270,20 @@ async def test_create_run_conflict(
         create_data=BasicRunCreateData(),
         created_at=current_time,
         actions=[],
+        is_current=True,
     )
 
     decoy.when(
         run_view.as_resource(
-            run_id=unique_id, created_at=current_time, create_data=None
+            run_id=unique_id,
+            created_at=current_time,
+            create_data=None,
         )
     ).then_return(run)
 
-    decoy.when(await engine_store.create()).then_raise(EngineConflictError("oh no"))
+    decoy.when(await engine_store.create(run_id=matchers.Anything())).then_raise(
+        EngineConflictError("oh no")
+    )
 
     response = await async_client.post("/runs")
 
@@ -290,6 +309,7 @@ def test_get_run(
         create_data=create_data,
         created_at=created_at,
         actions=[],
+        is_current=False,
     )
 
     command = pe_commands.Pause(
@@ -317,6 +337,7 @@ def test_get_run(
         createParams=BasicRunCreateParams(),
         createdAt=created_at,
         status=pe_types.EngineStatus.READY_TO_RUN,
+        current=False,
         actions=[],
         commands=[
             RunCommandSummary(
@@ -331,10 +352,13 @@ def test_get_run(
 
     decoy.when(run_store.get(run_id="run-id")).then_return(run)
 
-    decoy.when(engine_store.engine.state_view.commands.get_all()).then_return([command])
-    decoy.when(engine_store.engine.state_view.pipettes.get_all()).then_return([pipette])
-    decoy.when(engine_store.engine.state_view.labware.get_all()).then_return([labware])
-    decoy.when(engine_store.engine.state_view.commands.get_status()).then_return(
+    engine_state = decoy.mock(cls=StateView)
+
+    decoy.when(engine_store.get_state("run-id")).then_return(engine_state)
+    decoy.when(engine_state.commands.get_all()).then_return([command])
+    decoy.when(engine_state.pipettes.get_all()).then_return([pipette])
+    decoy.when(engine_state.labware.get_all()).then_return([labware])
+    decoy.when(engine_state.commands.get_status()).then_return(
         pe_types.EngineStatus.READY_TO_RUN
     )
 
@@ -393,14 +417,23 @@ def test_get_runs_not_empty(
     client: TestClient,
 ) -> None:
     """It should return a collection response when a run exists."""
-    # TODO(mc, 2021-06-23): add actual multi-run support
-    created_at_1 = datetime.now()
+    created_at_1 = datetime(year=2021, month=1, day=1)
+    created_at_2 = datetime(year=2022, month=2, day=2)
 
     run_1 = RunResource(
         run_id="unique-id-1",
         create_data=BasicRunCreateData(),
         created_at=created_at_1,
         actions=[],
+        is_current=False,
+    )
+
+    run_2 = RunResource(
+        run_id="unique-id-2",
+        create_data=BasicRunCreateData(),
+        created_at=created_at_2,
+        actions=[],
+        is_current=True,
     )
 
     response_1 = BasicRun(
@@ -408,19 +441,45 @@ def test_get_runs_not_empty(
         createParams=BasicRunCreateParams(),
         createdAt=created_at_1,
         status=pe_types.EngineStatus.SUCCEEDED,
+        current=False,
         actions=[],
         commands=[],
         pipettes=[],
         labware=[],
     )
 
-    decoy.when(run_store.get_all()).then_return([run_1])
+    response_2 = BasicRun(
+        id="unique-id-2",
+        createParams=BasicRunCreateParams(),
+        createdAt=created_at_2,
+        status=pe_types.EngineStatus.READY_TO_RUN,
+        current=True,
+        actions=[],
+        commands=[],
+        pipettes=[],
+        labware=[],
+    )
 
-    decoy.when(engine_store.engine.state_view.commands.get_all()).then_return([])
-    decoy.when(engine_store.engine.state_view.pipettes.get_all()).then_return([])
-    decoy.when(engine_store.engine.state_view.labware.get_all()).then_return([])
-    decoy.when(engine_store.engine.state_view.commands.get_status()).then_return(
+    decoy.when(run_store.get_all()).then_return([run_1, run_2])
+
+    engine_state_1 = decoy.mock(cls=StateView)
+    engine_state_2 = decoy.mock(cls=StateView)
+
+    decoy.when(engine_store.get_state("unique-id-1")).then_return(engine_state_1)
+    decoy.when(engine_store.get_state("unique-id-2")).then_return(engine_state_2)
+
+    decoy.when(engine_state_1.commands.get_all()).then_return([])
+    decoy.when(engine_state_1.pipettes.get_all()).then_return([])
+    decoy.when(engine_state_1.labware.get_all()).then_return([])
+    decoy.when(engine_state_1.commands.get_status()).then_return(
         pe_types.EngineStatus.SUCCEEDED
+    )
+
+    decoy.when(engine_state_2.commands.get_all()).then_return([])
+    decoy.when(engine_state_2.pipettes.get_all()).then_return([])
+    decoy.when(engine_state_2.labware.get_all()).then_return([])
+    decoy.when(engine_state_2.commands.get_status()).then_return(
+        pe_types.EngineStatus.READY_TO_RUN
     )
 
     decoy.when(
@@ -433,9 +492,21 @@ def test_get_runs_not_empty(
         ),
     ).then_return(response_1)
 
+    decoy.when(
+        run_view.as_response(
+            run=run_2,
+            commands=[],
+            pipettes=[],
+            labware=[],
+            engine_status=pe_types.EngineStatus.READY_TO_RUN,
+        ),
+    ).then_return(response_2)
+
     response = client.get("/runs")
 
-    verify_response(response, expected_status=200, expected_data=[response_1])
+    verify_response(
+        response, expected_status=200, expected_data=[response_1, response_2]
+    )
 
 
 def test_delete_run_by_id(
@@ -445,15 +516,15 @@ def test_delete_run_by_id(
     client: TestClient,
 ) -> None:
     """It should be able to remove a run by ID."""
-    decoy.when(engine_store.engine.state_view.commands.get_is_stopped()).then_return(
-        True
-    )
+    engine_state = decoy.mock(cls=StateView)
+    decoy.when(engine_store.get_state("run-id")).then_return(engine_state)
+    decoy.when(engine_state.commands.get_is_stopped()).then_return(True)
 
-    response = client.delete("/runs/unique-id")
+    response = client.delete("/runs/run-id")
 
     decoy.verify(
         engine_store.clear(),
-        run_store.remove(run_id="unique-id"),
+        run_store.remove(run_id="run-id"),
     )
 
     assert response.status_code == 200
@@ -469,9 +540,7 @@ def test_delete_run_with_bad_id(
     """It should 404 if the run ID does not exist."""
     key_error = RunNotFoundError(run_id="run-id")
 
-    decoy.when(engine_store.engine.state_view.commands.get_is_stopped()).then_return(
-        True
-    )
+    decoy.when(engine_store.get_state("run-id")).then_raise(EngineMissingError("oh no"))
     decoy.when(run_store.remove(run_id="run-id")).then_raise(key_error)
 
     response = client.delete("/runs/run-id")
@@ -490,9 +559,9 @@ def test_delete_active_run(
     client: TestClient,
 ) -> None:
     """It should 409 if the run is not finished."""
-    decoy.when(engine_store.engine.state_view.commands.get_is_stopped()).then_return(
-        False
-    )
+    engine_state = decoy.mock(cls=StateView)
+    decoy.when(engine_store.get_state("run-id")).then_return(engine_state)
+    decoy.when(engine_state.commands.get_is_stopped()).then_return(False)
 
     response = client.delete("/runs/run-id")
 
@@ -510,9 +579,7 @@ def test_delete_active_run_no_engine(
     client: TestClient,
 ) -> None:
     """It should no-op if no engine is present."""
-    decoy.when(engine_store.engine.state_view.commands.get_is_stopped()).then_raise(
-        EngineMissingError()
-    )
+    decoy.when(engine_store.get_state("run-id")).then_raise(EngineMissingError("oh no"))
 
     response = client.delete("/runs/run-id")
 

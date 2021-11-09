@@ -8,8 +8,8 @@ from opentrons.protocol_runner import ProtocolRunner
 
 from robot_server.runs.engine_store import (
     EngineStore,
-    EngineConflictError,
     EngineMissingError,
+    EngineConflictError,
 )
 
 
@@ -23,29 +23,31 @@ def subject(decoy: Decoy) -> EngineStore:
 
 
 async def test_create_engine(subject: EngineStore) -> None:
-    """It should create an engine."""
-    result = await subject.create()
+    """It should create an engine for a run."""
+    result = await subject.create(run_id="run-id")
 
-    assert isinstance(result.runner, ProtocolRunner)
-    assert isinstance(result.engine, ProtocolEngine)
-    assert result.engine is subject.engine
-    assert result.runner is subject.runner
+    assert isinstance(subject.runner, ProtocolRunner)
+    assert isinstance(subject.engine, ProtocolEngine)
+    assert result is subject.engine.state_view
+    assert result is subject.get_state("run-id")
 
 
-async def test_raise_if_engine_already_exists(subject: EngineStore) -> None:
+async def test_archives_state_if_engine_already_exists(subject: EngineStore) -> None:
     """It should not create more than one engine / runner pair."""
-    await subject.create()
+    state_1 = await subject.create(run_id="run-id-1")
+    await subject.runner.stop()
+    state_2 = await subject.create(run_id="run-id-2")
+
+    assert state_2 is subject.engine.state_view
+    assert state_1 is subject.get_state("run-id-1")
+
+
+async def test_cannot_create_engine_if_active(subject: EngineStore) -> None:
+    """It should not create a new engine if the existing one is active."""
+    await subject.create(run_id="run-id-1")
 
     with pytest.raises(EngineConflictError):
-        await subject.create()
-
-
-@pytest.mark.xfail(raises=NotImplementedError, strict=True)
-async def test_cannot_persist_multiple_engines(subject: EngineStore) -> None:
-    """It should protect against engine creation race conditions."""
-    # TODO(mc, 2021-06-14): figure out how to write a test that actually
-    # fails in practice when race condition is able to be hit
-    raise NotImplementedError("Test not yet implemented")
+        await subject.create(run_id="run-id-2")
 
 
 def test_raise_if_engine_does_not_exist(subject: EngineStore) -> None:
@@ -59,7 +61,7 @@ def test_raise_if_engine_does_not_exist(subject: EngineStore) -> None:
 
 async def test_clear_engine(subject: EngineStore) -> None:
     """It should clear a stored engine entry."""
-    await subject.create()
+    await subject.create(run_id="run-id")
     subject.clear()
 
     with pytest.raises(EngineMissingError):
