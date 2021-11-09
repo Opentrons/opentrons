@@ -113,7 +113,7 @@ class MoveCompletedPayload(MoveGroupRequestPayload):
 
 @dataclass
 class GetMoveStatusResponsePayload(MoveGroupRequestPayload):
-    """Read status of current move being executed"""
+    """Read status of current move being executed."""
 
     seq_id: utils.UInt8Field
     remaining_duration: utils.UInt64Field
