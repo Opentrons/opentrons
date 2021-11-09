@@ -82,8 +82,9 @@ def run(protocol_context):
     # Run Enzymatic Prep Profile
     thermocycler.close_lid()
     thermocycler.set_block_temperature(70)
-    thermocycler.set_block_temperature(32, hold_time_minutes=1)
-    thermocycler.set_block_temperature(64.5, hold_time_minutes=1)
+    # Changed from hold_time_minutes to hold_time_seconds for faster running in CI
+    thermocycler.set_block_temperature(32, hold_time_seconds=1)
+    thermocycler.set_block_temperature(64.5, hold_time_seconds=1)
     thermocycler.set_block_temperature(4)
     thermocycler.deactivate_lid()
     thermocycler.open_lid()
@@ -271,10 +272,10 @@ def run(protocol_context):
 
     COVER_TEMP = 105
     PLATE_TEMP_PRE = 4
-    PLATE_TEMP_HOLD_1 = (97, 5)  # 30)
-    PLATE_TEMP_HOLD_2 = (97, 5)  # 10)
-    PLATE_TEMP_HOLD_3 = (59.5, 5)  # 30)
-    PLATE_TEMP_HOLD_4 = (67.3, 5)  # 30)
+    PLATE_TEMP_HOLD_1 = (97, 1)  # 30)
+    PLATE_TEMP_HOLD_2 = (97, 1)  # 10)
+    PLATE_TEMP_HOLD_3 = (59.5, 1)  # 30)
+    PLATE_TEMP_HOLD_4 = (67.3, 1)  # 30)
     # PLATE_TEMP_HOLD_5 = (72, 300)
     PLATE_TEMP_POST = 4
     NUM_CYCLES = 5
