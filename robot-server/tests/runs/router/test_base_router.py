@@ -28,6 +28,9 @@ from robot_server.runs.run_models import (
     ProtocolRun,
     ProtocolRunCreateData,
     ProtocolRunCreateParams,
+    PatchLabwareOffsetsRequest,
+    LabwareOffset,
+    LabwareOffsetVector,
 )
 
 from robot_server.runs.engine_store import (
@@ -282,36 +285,58 @@ def test_patch_labware_offsets(
     engine_store: EngineStore,
     client: TestClient,
 ) -> None:
-    """It should update a run's labware offsets."""
+    """It should upsert a run with new labware offsets."""
     created_at = datetime.now()
-
-    original_create_data = BasicRunCreateData(
-        createParams=BasicRunCreateParams(
-            labwareOffsets=[]
-        )
-    )
 
     original_run = RunResource(
         run_id="run-id",
-        create_data=original_create_data,
+        create_data=BasicRunCreateData(
+            createParams=BasicRunCreateParams(labwareOffsets=[])
+        ),
         created_at=created_at,
-        actions=[]
+        actions=[],
     )
 
-    updated_labware_offsets: List[Any] = []
-
-    expected_updated_create_data = BasicRunCreateData(
-        createParams=BasicRunCreateParams(
-            labwareOffsets=updated_labware_offsets
+    updated_labware_offsets = [
+        LabwareOffset(
+            definitionUri="my-labware-definition-uri",
+            location=pe_types.DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+            offset=LabwareOffsetVector(x=1.1, y=2.2, z=3.3),
         )
-    )
+    ]
 
     expected_updated_run = RunResource(
         run_id="run-id",
-        create_data=expected_updated_create_data,
+        create_data=BasicRunCreateData(
+            createParams=BasicRunCreateParams(labwareOffsets=updated_labware_offsets)
+        ),
         created_at=created_at,
-        actions=[]
+        actions=[],
     )
+
+    patch_request = PatchLabwareOffsetsRequest(labwareOffsets=updated_labware_offsets)
+    print(patch_request.json())
+
+    decoy.when(run_store.get(run_id="run-id")).then_return(original_run)
+    decoy.when(run_store.upsert(expected_updated_run)).then_return(expected_updated_run)
+
+    response = client.patch("/runs/run-id", json=patch_request.json())
+
+    print(response.json())
+    raise NotImplementedError()
+
+    # verify_response(response, expected_status=200, expected_data=expected_updated_run)
+
+
+def test_patch_labware_offsets_with_bad_id(
+    decoy: Decoy,
+    run_view: RunView,
+    run_store: RunStore,
+    engine_store: EngineStore,
+    client: TestClient,
+) -> None:
+    """It should return an error if the client tries to PATCH a nonexistent run."""
+    raise NotImplementedError()
 
 
 def test_get_run(
