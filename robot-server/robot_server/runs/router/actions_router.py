@@ -1,7 +1,10 @@
 """Router for /runs actions endpoints."""
 from fastapi import APIRouter, Depends, status
 from datetime import datetime
+from typing import Union
 from typing_extensions import Literal
+
+from opentrons.protocol_engine.errors import ProtocolEngineStoppedError
 
 from robot_server.errors import ErrorDetails, ErrorResponse
 from robot_server.service.dependencies import get_current_time, get_unique_id
@@ -10,9 +13,9 @@ from robot_server.service.json_api import RequestModel, ResponseModel
 from ..run_store import RunStore, RunNotFoundError
 from ..run_view import RunView
 from ..action_models import RunAction, RunActionType, RunActionCreateData
-from ..engine_store import EngineStore, EngineMissingError
+from ..engine_store import EngineStore
 from ..dependencies import get_run_store, get_engine_store
-from .base_router import RunNotFound
+from .base_router import RunNotFound, RunStopped
 
 actions_router = APIRouter()
 
@@ -31,7 +34,9 @@ class RunActionNotAllowed(ErrorDetails):
     status_code=status.HTTP_201_CREATED,
     response_model=ResponseModel[RunAction],
     responses={
-        status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse[RunActionNotAllowed]},
+        status.HTTP_409_CONFLICT: {
+            "model": ErrorResponse[Union[RunActionNotAllowed, RunStopped]],
+        },
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
     },
 )
@@ -57,16 +62,22 @@ async def create_run_action(
     """
     try:
         prev_run = run_store.get(run_id=runId)
+    except RunNotFoundError as e:
+        raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
-        action, next_run = run_view.with_action(
-            run=prev_run,
-            action_id=action_id,
-            action_data=request_body.data,
-            created_at=created_at,
+    if not prev_run.is_current:
+        raise RunStopped(detail=f"Run {runId} is not the current run").as_error(
+            status.HTTP_409_CONFLICT
         )
 
-        # TODO(mc, 2021-07-06): add a dependency to verify that a given
-        # action is allowed
+    action, next_run = run_view.with_action(
+        run=prev_run,
+        action_id=action_id,
+        action_data=request_body.data,
+        created_at=created_at,
+    )
+
+    try:
         if action.actionType == RunActionType.PLAY:
             engine_store.runner.play()
         elif action.actionType == RunActionType.PAUSE:
@@ -74,10 +85,8 @@ async def create_run_action(
         if action.actionType == RunActionType.STOP:
             await engine_store.runner.stop()
 
-    except RunNotFoundError as e:
-        raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
-    except EngineMissingError as e:
-        raise RunActionNotAllowed(detail=str(e)).as_error(status.HTTP_400_BAD_REQUEST)
+    except ProtocolEngineStoppedError as e:
+        raise RunActionNotAllowed(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
 
     run_store.upsert(run=next_run)
 

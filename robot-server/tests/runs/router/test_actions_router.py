@@ -7,9 +7,10 @@ from fastapi.testclient import TestClient
 from httpx import AsyncClient
 
 from tests.helpers import verify_response
+from opentrons.protocol_engine.errors import ProtocolEngineStoppedError
 from robot_server.runs.run_models import BasicRunCreateData
 from robot_server.runs.run_view import RunView
-from robot_server.runs.engine_store import EngineStore, EngineMissingError
+from robot_server.runs.engine_store import EngineStore
 from robot_server.runs.run_store import (
     RunStore,
     RunNotFoundError,
@@ -22,7 +23,7 @@ from robot_server.runs.action_models import (
     RunActionCreateData,
 )
 
-from robot_server.runs.router.base_router import RunNotFound
+from robot_server.runs.router.base_router import RunNotFound, RunStopped
 
 from robot_server.runs.router.actions_router import (
     actions_router,
@@ -35,6 +36,7 @@ prev_run = RunResource(
     create_data=BasicRunCreateData(),
     created_at=datetime(year=2021, month=1, day=1),
     actions=[],
+    is_current=True,
 )
 
 
@@ -53,6 +55,7 @@ def setup_run_store(decoy: Decoy, run_store: RunStore) -> None:
 def test_create_play_action(
     decoy: Decoy,
     run_view: RunView,
+    run_store: RunStore,
     engine_store: EngineStore,
     unique_id: str,
     current_time: datetime,
@@ -70,6 +73,7 @@ def test_create_play_action(
         create_data=BasicRunCreateData(),
         created_at=datetime(year=2021, month=1, day=1),
         actions=[action],
+        is_current=True,
     )
 
     decoy.when(
@@ -117,12 +121,13 @@ def test_create_run_action_with_missing_id(
 def test_create_run_action_without_runner(
     decoy: Decoy,
     run_view: RunView,
+    run_store: RunStore,
     engine_store: EngineStore,
     unique_id: str,
     current_time: datetime,
     client: TestClient,
 ) -> None:
-    """It should 400 if the runner is not able to handle the action."""
+    """It should 409 if the runner is not able to handle the action."""
     actions = RunAction(
         actionType=RunActionType.PLAY,
         createdAt=current_time,
@@ -130,10 +135,11 @@ def test_create_run_action_without_runner(
     )
 
     next_run = RunResource(
-        run_id="unique-id",
+        run_id="run-id",
         create_data=BasicRunCreateData(),
         created_at=datetime(year=2021, month=1, day=1),
         actions=[actions],
+        is_current=True,
     )
 
     decoy.when(
@@ -145,7 +151,9 @@ def test_create_run_action_without_runner(
         ),
     ).then_return((actions, next_run))
 
-    decoy.when(engine_store.runner.play()).then_raise(EngineMissingError("oh no"))
+    decoy.when(engine_store.runner.play()).then_raise(
+        ProtocolEngineStoppedError("oh no")
+    )
 
     response = client.post(
         "/runs/run-id/actions",
@@ -154,14 +162,47 @@ def test_create_run_action_without_runner(
 
     verify_response(
         response,
-        expected_status=400,
+        expected_status=409,
         expected_errors=RunActionNotAllowed(detail="oh no"),
+    )
+
+
+def test_create_run_action_not_current(
+    decoy: Decoy,
+    run_view: RunView,
+    run_store: RunStore,
+    engine_store: EngineStore,
+    unique_id: str,
+    current_time: datetime,
+    client: TestClient,
+) -> None:
+    """It should 409 if the run is not current."""
+    prev_run = RunResource(
+        run_id="run-id",
+        create_data=BasicRunCreateData(),
+        created_at=datetime(year=2021, month=1, day=1),
+        actions=[],
+        is_current=False,
+    )
+
+    decoy.when(run_store.get(run_id="run-id")).then_return(prev_run)
+
+    response = client.post(
+        "/runs/run-id/actions",
+        json={"data": {"actionType": "play"}},
+    )
+
+    verify_response(
+        response,
+        expected_status=409,
+        expected_errors=RunStopped(detail="Run run-id is not the current run"),
     )
 
 
 def test_create_pause_action(
     decoy: Decoy,
     run_view: RunView,
+    run_store: RunStore,
     engine_store: EngineStore,
     unique_id: str,
     current_time: datetime,
@@ -175,10 +216,11 @@ def test_create_pause_action(
     )
 
     next_run = RunResource(
-        run_id="unique-id",
+        run_id="run-id",
         create_data=BasicRunCreateData(),
         created_at=datetime(year=2021, month=1, day=1),
         actions=[action],
+        is_current=True,
     )
 
     decoy.when(
@@ -202,6 +244,7 @@ def test_create_pause_action(
 async def test_create_stop_action(
     decoy: Decoy,
     run_view: RunView,
+    run_store: RunStore,
     engine_store: EngineStore,
     unique_id: str,
     current_time: datetime,
@@ -215,10 +258,11 @@ async def test_create_stop_action(
     )
 
     next_run = RunResource(
-        run_id="unique-id",
+        run_id="run-id",
         create_data=BasicRunCreateData(),
         created_at=datetime(year=2021, month=1, day=1),
         actions=[action],
+        is_current=True,
     )
 
     decoy.when(

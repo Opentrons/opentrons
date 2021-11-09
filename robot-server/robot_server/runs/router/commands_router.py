@@ -15,7 +15,7 @@ from robot_server.service.json_api import (
 from ..run_models import Run, RunCommandSummary
 from ..engine_store import EngineStore
 from ..dependencies import get_engine_store
-from .base_router import RunNotFound, get_run
+from .base_router import RunNotFound, RunStopped, get_run
 
 commands_router = APIRouter()
 
@@ -38,6 +38,7 @@ class CommandNotFound(ErrorDetails):
     status_code=status.HTTP_200_OK,
     response_model=ResponseModel[pe_commands.Command],
     responses={
+        status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse[RunStopped]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
     },
 )
@@ -57,6 +58,11 @@ async def post_run_command(
             `GET /runs/{runId}`. Present to ensure 404 if run
             not found.
     """
+    if not run.data.current:
+        raise RunStopped(detail=f"Run {run.data.id} is not the current run").as_error(
+            status.HTTP_400_BAD_REQUEST
+        )
+
     command = engine_store.engine.add_command(request_body.data)
     return ResponseModel[pe_commands.Command](data=command)
 
@@ -120,8 +126,9 @@ async def get_run_command(
             `GET /run/{runId}`. Present to ensure 404 if run
             not found.
     """
+    engine_state = engine_store.get_state(run.data.id)
     try:
-        command = engine_store.engine.state_view.commands.get(commandId)
+        command = engine_state.commands.get(commandId)
     except pe_errors.CommandDoesNotExistError as e:
         raise CommandNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
