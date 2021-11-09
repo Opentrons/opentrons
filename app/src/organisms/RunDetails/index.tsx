@@ -11,6 +11,8 @@ import {
   SPACING_3,
   useConditionalConfirm,
   Flex,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
 } from '@opentrons/components'
 import { Page } from '../../atoms/Page'
 import { ConfirmCancelModal } from '../../pages/Run/RunLog'
@@ -27,6 +29,7 @@ export function RunDetails(): JSX.Element | null {
     cancel: cancelExit,
   } = useConditionalConfirm(() => {}, true)
   const [commandIdIndex] = React.useState<number>(0)
+  const commandId = fixtureCommands.commands.map(command => command.id)
 
   const cancelRunButton = (
     <PrimaryBtn
@@ -52,15 +55,13 @@ export function RunDetails(): JSX.Element | null {
   return (
     <Page titleBarProps={titleBarProps}>
       {showConfirmExit ? <ConfirmCancelModal onClose={cancelExit} /> : null}
-      {fixtureCommands.commands.map(command => (
-        <Flex key={command.id}>
-          <CommandList
-            anticipated={command.id}
-            inProgress={command.id[commandIdIndex]}
-            completed={command.id[commandIdIndex - 1]}
-          />
-        </Flex>
-      ))}
+      <Flex key={commandId[commandIdIndex]}>
+        <CommandList
+          anticipated={commandId[commandIdIndex + 1]}
+          inProgress={commandId[commandIdIndex]}
+          completed={commandId[commandIdIndex - 1]}
+        />
+      </Flex>
     </Page>
   )
 }
