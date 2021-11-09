@@ -63,7 +63,7 @@ const useLpcCtaText = (command: LabwarePositionCheckCommand): string => {
   }
 }
 
-const useLoadingText = (
+export const useLoadingText = (
   loading: boolean,
   command: LabwarePositionCheckMovementCommand
 ): string | null => {
