@@ -217,6 +217,7 @@ async def test_save_position(
     ).then_return(Point(1, 1, 1))
 
     result = await handler.save_position(pipette_id="pipette-id", position_id="123")
+
     assert result == SavedPositionData(
         positionId="123", position=DeckPoint(x=1, y=1, z=1)
     )
@@ -269,10 +270,8 @@ async def test_save_position_different_cp(
         )
     ).then_return(Point(1, 1, 1))
 
-    await handler.save_position(pipette_id="pipette-id", position_id="123")
-    decoy.verify(
-        await hardware_api.gantry_position(
-            mount=Mount.LEFT,
-            critical_point=verified_cp,
-        )
+    result = await handler.save_position(pipette_id="pipette-id", position_id="123")
+
+    assert result == SavedPositionData(
+        positionId="123", position=DeckPoint(x=1, y=1, z=1)
     )

@@ -7,7 +7,6 @@ from opentrons.types import MountType
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocol_engine import ProtocolEngine, commands
 from opentrons.protocol_engine.types import PipetteName
-from opentrons.protocol_engine.commands import CommandMapper
 from opentrons.protocol_engine.execution import QueueWorker
 from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.state import StateStore
@@ -18,7 +17,7 @@ from opentrons.protocol_engine.actions import (
     PlayAction,
     PauseAction,
     StopAction,
-    UpdateCommandAction,
+    QueueCommandAction,
 )
 
 
@@ -41,12 +40,6 @@ def queue_worker(decoy: Decoy) -> QueueWorker:
 
 
 @pytest.fixture
-def command_mapper(decoy: Decoy) -> CommandMapper:
-    """Get a mock CommandMapper."""
-    return decoy.mock(cls=CommandMapper)
-
-
-@pytest.fixture
 def model_utils(decoy: Decoy) -> ModelUtils:
     """Get mock ModelUtils."""
     return decoy.mock(cls=ModelUtils)
@@ -62,7 +55,6 @@ def hardware_api(decoy: Decoy) -> HardwareAPI:
 def subject(
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
-    command_mapper: CommandMapper,
     model_utils: ModelUtils,
     queue_worker: QueueWorker,
     hardware_api: HardwareAPI,
@@ -73,15 +65,23 @@ def subject(
         state_store=state_store,
         action_dispatcher=action_dispatcher,
         queue_worker=queue_worker,
-        command_mapper=command_mapper,
         model_utils=model_utils,
     )
 
 
+def test_create_starts_queue_worker(
+    decoy: Decoy,
+    queue_worker: QueueWorker,
+    subject: ProtocolEngine,
+) -> None:
+    """It should start the queue worker upon creation."""
+    decoy.verify(queue_worker.start())
+
+
 def test_add_command(
     decoy: Decoy,
+    state_store: StateStore,
     action_dispatcher: ActionDispatcher,
-    command_mapper: CommandMapper,
     model_utils: ModelUtils,
     queue_worker: QueueWorker,
     subject: ProtocolEngine,
@@ -105,19 +105,19 @@ def test_add_command(
 
     decoy.when(model_utils.generate_id()).then_return("command-id")
     decoy.when(model_utils.get_timestamp()).then_return(created_at)
-    decoy.when(
-        command_mapper.map_request_to_command(
-            request=request,
-            command_id="command-id",
-            created_at=created_at,
-        )
-    ).then_return(queued_command)
+    decoy.when(state_store.commands.get("command-id")).then_return(queued_command)
 
     result = subject.add_command(request)
 
     assert result == queued_command
     decoy.verify(
-        action_dispatcher.dispatch(UpdateCommandAction(command=queued_command)),
+        action_dispatcher.dispatch(
+            QueueCommandAction(
+                command_id="command-id",
+                created_at=created_at,
+                request=request,
+            )
+        ),
     )
 
 
@@ -125,7 +125,6 @@ async def test_execute_command(
     decoy: Decoy,
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
-    command_mapper: CommandMapper,
     model_utils: ModelUtils,
     queue_worker: QueueWorker,
     subject: ProtocolEngine,
@@ -159,17 +158,9 @@ async def test_execute_command(
 
     decoy.when(model_utils.generate_id()).then_return("command-id")
     decoy.when(model_utils.get_timestamp()).then_return(created_at)
-
-    decoy.when(
-        command_mapper.map_request_to_command(
-            command_id="command-id",
-            created_at=created_at,
-            request=request,
-        )
-    ).then_return(queued_command)
-
-    decoy.when(state_store.commands.get(command_id="command-id")).then_return(
-        executed_command
+    decoy.when(state_store.commands.get("command-id")).then_return(
+        queued_command,
+        executed_command,
     )
 
     result = await subject.add_and_execute_command(request)
@@ -177,7 +168,13 @@ async def test_execute_command(
     assert result == executed_command
 
     decoy.verify(
-        action_dispatcher.dispatch(UpdateCommandAction(command=queued_command)),
+        action_dispatcher.dispatch(
+            QueueCommandAction(
+                command_id="command-id",
+                created_at=created_at,
+                request=request,
+            )
+        ),
         await state_store.wait_for(
             condition=state_store.commands.get_is_complete,
             command_id="command-id",

@@ -177,6 +177,7 @@ async def test_join(
     decoy.verify(await task_queue.join(), times=1)
 
 
+@pytest.mark.xfail(raises=NotImplementedError, strict=True)
 def test_load_json(
     decoy: Decoy,
     json_file_reader: JsonFileReader,
