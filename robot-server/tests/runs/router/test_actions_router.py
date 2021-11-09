@@ -7,9 +7,10 @@ from fastapi.testclient import TestClient
 from httpx import AsyncClient
 
 from tests.helpers import verify_response
+from opentrons.protocol_engine.errors import ProtocolEngineStoppedError
 from robot_server.runs.run_models import BasicRunCreateData
 from robot_server.runs.run_view import RunView
-from robot_server.runs.engine_store import EngineStore, EngineMissingError
+from robot_server.runs.engine_store import EngineStore
 from robot_server.runs.run_store import (
     RunStore,
     RunNotFoundError,
@@ -126,7 +127,7 @@ def test_create_run_action_without_runner(
     current_time: datetime,
     client: TestClient,
 ) -> None:
-    """It should 400 if the runner is not able to handle the action."""
+    """It should 409 if the runner is not able to handle the action."""
     actions = RunAction(
         actionType=RunActionType.PLAY,
         createdAt=current_time,
@@ -150,7 +151,9 @@ def test_create_run_action_without_runner(
         ),
     ).then_return((actions, next_run))
 
-    decoy.when(engine_store.runner.play()).then_raise(EngineMissingError("oh no"))
+    decoy.when(engine_store.runner.play()).then_raise(
+        ProtocolEngineStoppedError("oh no")
+    )
 
     response = client.post(
         "/runs/run-id/actions",
@@ -159,7 +162,7 @@ def test_create_run_action_without_runner(
 
     verify_response(
         response,
-        expected_status=400,
+        expected_status=409,
         expected_errors=RunActionNotAllowed(detail="oh no"),
     )
 
@@ -173,7 +176,7 @@ def test_create_run_action_not_current(
     current_time: datetime,
     client: TestClient,
 ) -> None:
-    """It should 400 if the run is not current."""
+    """It should 409 if the run is not current."""
     prev_run = RunResource(
         run_id="run-id",
         create_data=BasicRunCreateData(),
@@ -191,7 +194,7 @@ def test_create_run_action_not_current(
 
     verify_response(
         response,
-        expected_status=400,
+        expected_status=409,
         expected_errors=RunStopped(detail="Run run-id is not the current run"),
     )
 

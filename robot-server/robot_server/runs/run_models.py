@@ -41,7 +41,10 @@ class _AbstractRun(ResourceModel):
     status: RunStatus = Field(..., description="Execution status of the run")
     current: bool = Field(
         ...,
-        description="Whether this Run is currently controlling the robot",
+        description=(
+            "Whether this run is currently controlling the robot."
+            " There can be, at most, one current run."
+        ),
     )
     actions: List[RunAction] = Field(
         ...,
