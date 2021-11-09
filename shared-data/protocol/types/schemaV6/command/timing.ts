@@ -1,4 +1,5 @@
-export interface TimingCommand {
+import { CommonCommandInfo } from '.'
+export interface TimingCommand extends CommonCommandInfo {
   commandType: 'delay'
   params: DelayParams
   result?: {}

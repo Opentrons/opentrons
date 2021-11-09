@@ -21,13 +21,13 @@ class EngineStatus(str, Enum):
 
 
 class DeckSlotLocation(BaseModel):
-    """Location for labware placed in a single slot."""
+    """The location of something placed in a single deck slot."""
 
     slot: DeckSlotName
 
 
 LabwareLocation = Union[DeckSlotLocation]
-"""Union of all legal labware locations."""
+"""Union of all locations where it's legal to load a labware."""
 
 
 class WellOrigin(str, Enum):
@@ -63,6 +63,14 @@ class Dimensions:
 
 class CalibrationOffset(BaseModel):
     """Calibration offset from nomimal to actual position."""
+
+    x: float
+    y: float
+    z: float
+
+
+class DeckPoint(BaseModel):
+    """Coordinates of a point in deck space."""
 
     x: float
     y: float

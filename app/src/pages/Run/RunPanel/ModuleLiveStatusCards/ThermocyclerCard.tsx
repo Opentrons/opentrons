@@ -1,7 +1,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { Box, LabeledValue, SPACING_3 } from '@opentrons/components'
-import { getModuleDisplayName } from '@opentrons/shared-data'
+import { getModuleDisplayName, getModuleType } from '@opentrons/shared-data'
 
 import type {
   ThermocyclerModule,
@@ -127,6 +127,7 @@ export const ThermocyclerCard = ({
     currentStepIndex != null
   return (
     <StatusCard
+      moduleType={getModuleType(module.model)}
       title={getModuleDisplayName(module.model)}
       isCardExpanded={isCardExpanded}
       toggleCard={toggleCard}

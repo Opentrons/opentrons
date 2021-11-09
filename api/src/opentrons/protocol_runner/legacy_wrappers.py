@@ -3,11 +3,13 @@ import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 
-from opentrons.config import feature_flags
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.context.protocol_api.protocol_context import (
-    ProtocolContextImplementation as LegacyContextImplementation,
+    ProtocolContextImplementation as LegacyProtocolContextImplementation,
+)
+from opentrons.protocols.context.simulator.protocol_context import (
+    ProtocolContextSimulation as LegacyProtocolContextSimulation,
 )
 from opentrons.protocol_api import (
     ProtocolContext as LegacyProtocolContext,
@@ -32,10 +34,18 @@ from opentrons.protocols.types import (
 from .protocol_source import ProtocolSource
 
 
+# The earliest Python Protocol API version ("apiLevel") where the protocol's simulation
+# and execution will be handled by Protocol Engine, rather than the legacy machinery.
+#
+# Note that even when simulation and execution are handled by the legacy machinery,
+# Protocol Engine still has some involvement for analyzing the simulation and
+# monitoring the execution.
 LEGACY_PYTHON_API_VERSION_CUTOFF = APIVersion(3, 0)
 
-# TODO(mc, 2021-09-21): remove this condition, cut off before 6 always
-LEGACY_JSON_SCHEMA_VERSION_CUTOFF = 5 if feature_flags.enable_protocol_engine() else 6
+
+# The earliest JSON protocol schema version where the protocol is executed directly by
+# Protocol Engine, rather than going through Python Protocol API v2.
+LEGACY_JSON_SCHEMA_VERSION_CUTOFF = 6
 
 
 class LegacyFileReader:
@@ -58,22 +68,46 @@ class LegacyFileReader:
 class LegacyContextCreator:
     """Interface to contruct Protocol API v2 contexts."""
 
-    def __init__(self, hardware_api: HardwareAPI) -> None:
+    def __init__(
+        self,
+        hardware_api: HardwareAPI,
+        use_simulating_implementation: bool,
+    ) -> None:
+        """Prepare the LegacyContextCreator.
+
+        Args:
+            hardware_api: The interface to the hardware API that the created
+                Protocol API v2 contexts will use. Regardless of
+                ``use_simulating_implementation``, this can either be a real hardware
+                API to actually control the robot, or a simulating hardware API.
+            use_simulating_implementation: Whether the created Protocol API v2 contexts
+                should use a simulating implementation, avoiding some calls to
+                `hardware_api` for performance. See
+                `opentrons.protocols.context.simulator`.
+        """
         self._hardware_api = hardware_api
+        self._use_simulating_implementation = use_simulating_implementation
 
     def create(
         self,
         api_version: APIVersion,
     ) -> LegacyProtocolContext:
-        context_impl = LegacyContextImplementation(
-            api_version=api_version,
-            hardware=self._hardware_api,
-        )
-
-        return LegacyProtocolContext(
-            api_version=api_version,
-            implementation=context_impl,
-        )
+        """Create a Protocol API v2 context."""
+        if self._use_simulating_implementation:
+            return LegacyProtocolContext(
+                api_version=api_version,
+                implementation=LegacyProtocolContextSimulation(
+                    api_version=api_version, hardware=self._hardware_api
+                ),
+            )
+        else:
+            return LegacyProtocolContext(
+                api_version=api_version,
+                implementation=LegacyProtocolContextImplementation(
+                    api_version=api_version,
+                    hardware=self._hardware_api,
+                ),
+            )
 
 
 class LegacyExecutor:

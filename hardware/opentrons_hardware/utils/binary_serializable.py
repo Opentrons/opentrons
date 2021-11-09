@@ -63,6 +63,18 @@ class BinaryFieldBase(Generic[T]):
         return f"{self.__class__.__name__}(value={repr(self.value)})"
 
 
+class UInt64Field(BinaryFieldBase[int]):
+    """Unsigned 64 bit integer field."""
+
+    FORMAT = "Q"
+
+
+class Int64Field(BinaryFieldBase[int]):
+    """Signed 64 bit integer field."""
+
+    FORMAT = "q"
+
+
 class UInt32Field(BinaryFieldBase[int]):
     """Unsigned 32 bit integer field."""
 
@@ -135,10 +147,13 @@ class BinarySerializable:
         Returns:
             cls
         """
-        b = struct.unpack(cls._get_format_string(), data)
-        args = {v.name: v.type.build(b[i]) for i, v in enumerate(fields(cls))}
-        # Mypy is not liking constructing the derived types.
-        return cls(**args)  # type: ignore
+        try:
+            b = struct.unpack(cls._get_format_string(), data)
+            args = {v.name: v.type.build(b[i]) for i, v in enumerate(fields(cls))}
+            # Mypy is not liking constructing the derived types.
+            return cls(**args)  # type: ignore[call-arg]
+        except struct.error as e:
+            raise InvalidFieldException(str(e))
 
     @classmethod
     def _get_format_string(cls) -> str:

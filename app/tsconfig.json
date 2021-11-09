@@ -11,7 +11,16 @@
       "path": "../discovery-client"
     },
     {
+      "path": "../react-api-client"
+    },
+    {
       "path": "../shared-data"
+    },
+    {
+      "path": "../api-client"
+    },
+    {
+      "path": "../react-api-client"
     }
   ],
   "compilerOptions": {

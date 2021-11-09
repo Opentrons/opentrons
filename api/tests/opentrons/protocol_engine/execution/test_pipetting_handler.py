@@ -1,8 +1,7 @@
 """Pipetting command handler."""
 import pytest
-from dataclasses import dataclass, field
 from decoy import Decoy
-from typing import cast, Dict, Tuple
+from typing import Tuple
 
 from opentrons.types import Mount
 from opentrons.hardware_control.api import API as HardwareAPI
@@ -18,22 +17,7 @@ from opentrons.protocol_engine.state import (
 from opentrons.protocol_engine.execution.movement import MovementHandler
 from opentrons.protocol_engine.execution.pipetting import PipettingHandler
 
-
-@dataclass(frozen=True)
-class MockPipettes:
-    """Dummy pipette data to use in liquid handling collabortation tests."""
-
-    left_config: PipetteDict = field(
-        default_factory=lambda: cast(PipetteDict, {"name": "p300_single"})
-    )
-    right_config: PipetteDict = field(
-        default_factory=lambda: cast(PipetteDict, {"name": "p300_multi"})
-    )
-
-    @property
-    def by_mount(self) -> Dict[Mount, PipetteDict]:
-        """Get a mock hw.attached_instruments map."""
-        return {Mount.LEFT: self.left_config, Mount.RIGHT: self.right_config}
+from .mock_defs import MockPipettes
 
 
 @pytest.fixture

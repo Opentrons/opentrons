@@ -64,7 +64,7 @@ describe('IntroScreen', () => {
 
   beforeEach(() => {
     props = {
-      setCurrentLabwareCheckStep: jest.fn(),
+      beginLPC: jest.fn(),
     }
     when(mockRobotWorkSpace)
       .mockReturnValue(<div></div>) // this (default) empty div will be returned when RobotWorkSpace isn't called with expected props
@@ -125,14 +125,14 @@ describe('IntroScreen', () => {
     )
     getByText('Mock Section List')
   })
-  it('should call setCurrentLabwareCheckStep when the CTA button is pressed', () => {
+  it('should call beginLPC when the CTA button is pressed', () => {
     const { getByRole } = render(props)
-    expect(props.setCurrentLabwareCheckStep).not.toHaveBeenCalled()
+    expect(props.beginLPC).not.toHaveBeenCalled()
     const genericStepScreenButton = getByRole('button', {
       name: 'begin labware position check, move to Slot 2',
     })
     fireEvent.click(genericStepScreenButton)
-    expect(props.setCurrentLabwareCheckStep).toHaveBeenCalled()
+    expect(props.beginLPC).toHaveBeenCalled()
   })
   it('should should rotate through the active section', () => {
     render(props)

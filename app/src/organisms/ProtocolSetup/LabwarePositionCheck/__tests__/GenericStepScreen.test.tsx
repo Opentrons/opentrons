@@ -61,7 +61,7 @@ describe('GenericStepScreen', () => {
     props = {
       selectedStep: MOCK_LABWARE_POSITION_CHECK_STEP_TIPRACK,
       setCurrentLabwareCheckStep: () => {},
-    }
+    } as any
     when(mockLabwarePositionCheckStepDetail)
       .calledWith(
         partialComponentPropsMatcher({

@@ -3,12 +3,14 @@ import {
   FIXED_TRASH_ID,
   getIsTiprack,
   getTiprackVolume,
-  JsonProtocolFile,
+  ProtocolFile,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
-import type { FileModule } from '@opentrons/shared-data/protocol/types/schemaV4'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
-import type { LabwareToOrder, PickUpTipCommand } from '../types'
+import type { PickUpTipCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
+import type { LabwareToOrder } from '../types'
+import { getLabwareLocation } from '../../utils/getLabwareLocation'
+import { getModuleLocation } from '../../utils/getModuleLocation'
 
 export const tipRackOrderSort = (
   tiprack1: LabwareToOrder,
@@ -34,22 +36,23 @@ export const orderBySlot = (
 }
 
 export const getTiprackIdsInOrder = (
-  labware: JsonProtocolFile['labware'],
-  labwareDefinitions: Record<string, LabwareDefinition2>
+  labware: ProtocolFile<{}>['labware'],
+  labwareDefinitions: Record<string, LabwareDefinition2>,
+  commands: Command[]
 ): string[] => {
   const unorderedTipracks = reduce<typeof labware, LabwareToOrder[]>(
     labware,
     (tipracks, currentLabware, labwareId) => {
-      // @ts-expect-error v1 protocols do not definitionIds baked into the labware
       const labwareDef = labwareDefinitions[currentLabware.definitionId]
       const isTiprack = getIsTiprack(labwareDef)
+
       if (isTiprack) {
         return [
           ...tipracks,
           {
             definition: labwareDef,
             labwareId: labwareId,
-            slot: currentLabware.slot,
+            slot: getLabwareLocation(labwareId, commands),
           },
         ]
       }
@@ -67,18 +70,19 @@ export const getTiprackIdsInOrder = (
 export const getAllTipracksIdsThatPipetteUsesInOrder = (
   pipetteId: string,
   commands: Command[],
-  labware: JsonProtocolFile['labware'],
+  labware: ProtocolFile<{}>['labware'],
   labwareDefinitions: Record<string, LabwareDefinition2>
 ): string[] => {
   const pickUpTipCommandsWithPipette: PickUpTipCommand[] = commands
     .filter(
-      (command): command is PickUpTipCommand => command.command === 'pickUpTip'
+      (command): command is PickUpTipCommand =>
+        command.commandType === 'pickUpTip'
     )
-    .filter(command => command.params.pipette === pipetteId)
+    .filter(command => command.params.pipetteId === pipetteId)
 
   const tipracksVisited = pickUpTipCommandsWithPipette.reduce<string[]>(
     (visited, command) => {
-      const tiprack = command.params.labware
+      const tiprack = command.params.labwareId
       return visited.includes(tiprack) ? visited : [...visited, tiprack]
     },
     []
@@ -86,11 +90,13 @@ export const getAllTipracksIdsThatPipetteUsesInOrder = (
 
   const orderedTiprackIds = tipracksVisited
     .map<LabwareToOrder>(tiprackId => {
-      // @ts-expect-error v1 protocols do not definitionIds baked into the labware
       const labwareDefId = labware[tiprackId].definitionId
       const definition = labwareDefinitions[labwareDefId]
-      const slot = labware[tiprackId].slot
-      return { labwareId: tiprackId, definition, slot }
+      return {
+        labwareId: tiprackId,
+        definition,
+        slot: getLabwareLocation(tiprackId, commands),
+      }
     })
     .sort(tipRackOrderSort)
     .map(({ labwareId }) => labwareId)
@@ -99,25 +105,25 @@ export const getAllTipracksIdsThatPipetteUsesInOrder = (
 }
 
 export const getLabwareIdsInOrder = (
-  labware: JsonProtocolFile['labware'],
+  labware: ProtocolFile<{}>['labware'],
   labwareDefinitions: Record<string, LabwareDefinition2>,
-  modules: Record<string, FileModule>
+  modules: ProtocolFile<{}>['modules'],
+  commands: Command[]
 ): string[] => {
   const unorderedLabware = reduce<typeof labware, LabwareToOrder[]>(
     labware,
     (unorderedLabware, currentLabware, labwareId) => {
-      // @ts-expect-error v1 protocols do not definitionIds baked into the labware
       const labwareDef = labwareDefinitions[currentLabware.definitionId]
       const isTiprack = getIsTiprack(labwareDef)
+      let slot = getLabwareLocation(labwareId, commands)
       if (!isTiprack && labwareId !== FIXED_TRASH_ID) {
-        let slot = currentLabware.slot
         const isOnTopOfModule =
           modules != null &&
-          Object.keys(modules).some(
-            moduleId => moduleId === currentLabware.slot
-          )
+          Object.keys(modules).some(moduleId => moduleId === slot)
+        // labware location is a module id, we need to look up where the module is
+        const moduleId = slot
         if (isOnTopOfModule) {
-          slot = modules[slot].slot
+          slot = getModuleLocation(moduleId, commands)
         }
         return [
           ...unorderedLabware,

@@ -1,4 +1,5 @@
 """Union types of concrete command definitions."""
+
 from typing import Union
 
 from .add_labware_definition import (
@@ -19,6 +20,13 @@ from .load_labware import (
     LoadLabwareRequest,
     LoadLabwareResult,
     LoadLabwareCommandType,
+)
+
+from .load_module import (
+    LoadModule,
+    LoadModuleRequest,
+    LoadModuleResult,
+    LoadModuleCommandType,
 )
 
 from .load_pipette import (
@@ -49,6 +57,13 @@ from .pause import (
     PauseCommandType,
 )
 
+from .save_position import (
+    SavePosition,
+    SavePositionRequest,
+    SavePositionResult,
+    SavePositionCommandType,
+)
+
 from .custom import (
     Custom,
     CustomResult,
@@ -61,10 +76,12 @@ Command = Union[
     Dispense,
     DropTip,
     LoadLabware,
+    LoadModule,
     LoadPipette,
     MoveToWell,
     PickUpTip,
     Pause,
+    SavePosition,
     Custom,
 ]
 
@@ -74,10 +91,12 @@ CommandType = Union[
     DispenseCommandType,
     DropTipCommandType,
     LoadLabwareCommandType,
+    LoadModuleCommandType,
     LoadPipetteCommandType,
     MoveToWellCommandType,
     PickUpTipCommandType,
     PauseCommandType,
+    SavePositionCommandType,
     CustomCommandType,
 ]
 
@@ -87,10 +106,12 @@ CommandRequest = Union[
     DispenseRequest,
     DropTipRequest,
     LoadLabwareRequest,
+    LoadModuleRequest,
     LoadPipetteRequest,
     MoveToWellRequest,
     PickUpTipRequest,
     PauseRequest,
+    SavePositionRequest,
 ]
 
 CommandResult = Union[
@@ -99,9 +120,11 @@ CommandResult = Union[
     DispenseResult,
     DropTipResult,
     LoadLabwareResult,
+    LoadModuleResult,
     LoadPipetteResult,
     MoveToWellResult,
     PickUpTipResult,
     PauseResult,
+    SavePositionResult,
     CustomResult,
 ]

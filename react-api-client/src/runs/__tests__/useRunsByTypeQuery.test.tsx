@@ -54,9 +54,7 @@ describe('useRunsByTypeQuery hook', () => {
 
   it('should return no data if the get runs request fails', () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockGetRuns)
-      .calledWith(HOST_CONFIG, { run_type: RUN_TYPE_BASIC })
-      .mockRejectedValue('oh no')
+    when(mockGetRuns).calledWith(HOST_CONFIG).mockRejectedValue('oh no')
 
     const { result } = renderHook(
       () => useRunsByTypeQuery({ runType: RUN_TYPE_BASIC }),
@@ -66,15 +64,10 @@ describe('useRunsByTypeQuery hook', () => {
   })
 
   it('should return all runs of the given type', async () => {
-    const tipLengthCalRuns = {
-      ...RUNS_RESPONSE,
-      data: RUNS_RESPONSE.data.filter(run => run.runType === RUN_TYPE_BASIC),
-    }
-
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockGetRuns)
-      .calledWith(HOST_CONFIG, { run_type: RUN_TYPE_BASIC })
-      .mockResolvedValue({ data: tipLengthCalRuns } as Response<Runs>)
+      .calledWith(HOST_CONFIG)
+      .mockResolvedValue({ data: RUNS_RESPONSE } as Response<Runs>)
 
     const { result, waitFor } = renderHook(
       () => useRunsByTypeQuery({ runType: RUN_TYPE_BASIC }),
@@ -83,6 +76,8 @@ describe('useRunsByTypeQuery hook', () => {
 
     await waitFor(() => result.current.data != null)
 
-    expect(result.current.data).toEqual(tipLengthCalRuns)
+    expect(result.current.data).toEqual(
+      RUNS_RESPONSE.data.filter(run => run.runType === RUN_TYPE_BASIC)
+    )
   })
 })

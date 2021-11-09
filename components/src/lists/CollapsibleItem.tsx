@@ -5,10 +5,13 @@ import cx from 'classnames'
 import styles from './lists.css'
 import { Icon } from '../icons'
 
+import type { IconName } from '../icons'
 // TODO(bc, 2021-03-31): this is only used in on place
 // reconsider whether this belongs in components library
 
 export interface CollapsibleItemProps {
+  /** optional icon for title */
+  iconName?: IconName
   /** header */
   header?: string
   /** text of title */
@@ -52,7 +55,14 @@ export function CollapsibleItem(props: CollapsibleItemProps): JSX.Element {
     <div className={className}>
       <div className={titleBarClass}>
         {hasHeader && <p className={styles.header_text}>{header}</p>}
-        <h3 className={styles.title}>{props.title}</h3>
+        {props.iconName != null ? (
+          <div className={styles.icon_left_of_title_container}>
+            <Icon className={styles.icon_left_of_title} name={props.iconName} />
+            <h3 className={styles.title}>{props.title}</h3>
+          </div>
+        ) : (
+          <h3 className={styles.title}>{props.title}</h3>
+        )}
         {collapsible && (
           <div
             onClick={handleCollapseToggle}

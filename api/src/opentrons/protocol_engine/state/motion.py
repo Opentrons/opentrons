@@ -67,7 +67,6 @@ class MotionView:
             )
         ):
             critical_point = CriticalPoint.XY_CENTER
-
         return PipetteLocationData(mount=mount, critical_point=critical_point)
 
     def get_movement_waypoints(

@@ -1,29 +1,32 @@
-import findKey from 'lodash/findKey'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import type { FilePipette } from '@opentrons/shared-data/protocol/types/schemaV4'
+import type { Command, ProtocolFile } from '@opentrons/shared-data/protocol'
+import { LoadPipetteCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
-export const getPrimaryPipetteId = (pipettesById: {
-  [id: string]: FilePipette
-}): string => {
+export const getPrimaryPipetteId = (
+  pipettesById: ProtocolFile<{}>['pipettes'],
+  commands: Command[]
+): string => {
   if (Object.keys(pipettesById).length === 1) {
     return Object.keys(pipettesById)[0]
   }
-  const leftPipetteId = findKey(
-    pipettesById,
-    pipette => pipette.mount === 'left'
-  ) as string
-  const rightPipetteId = findKey(
-    pipettesById,
-    pipette => pipette.mount === 'right'
-  ) as string
-  const leftPipette = pipettesById[leftPipetteId]
-  const rightPipette = pipettesById[rightPipetteId]
 
-  if (leftPipette == null || rightPipette == null) {
+  const leftPipetteId = commands.find(
+    (command: Command): command is LoadPipetteCommand =>
+      command.commandType === 'loadPipette' && command.params.mount === 'left'
+  )?.params.pipetteId
+  const rightPipetteId = commands.find(
+    (command: Command): command is LoadPipetteCommand =>
+      command.commandType === 'loadPipette' && command.params.mount === 'right'
+  )?.params.pipetteId
+
+  if (leftPipetteId == null || rightPipetteId == null) {
     throw new Error(
       'expected to find both left pipette and right pipette but could not'
     )
   }
+
+  const leftPipette = pipettesById[leftPipetteId]
+  const rightPipette = pipettesById[rightPipetteId]
 
   const leftPipetteSpecs = getPipetteNameSpecs(leftPipette.name)
   const rightPipetteSpecs = getPipetteNameSpecs(rightPipette.name)

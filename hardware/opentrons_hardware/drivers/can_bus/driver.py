@@ -20,10 +20,13 @@ if platform.system() == "Darwin":
     from can.interfaces.pcan import basic
 
     basic.TPCANMsgMac = basic.TPCANMsg
+    basic.TPCANMsgFDMac = basic.TPCANMsgFD
     basic.TPCANTimestampMac = basic.TPCANTimestamp
+
     from can.interfaces.pcan import pcan
 
     pcan.TPCANMsgMac = pcan.TPCANMsg
+    pcan.TPCANMsgFDMac = pcan.TPCANMsgFD
     pcan.TPCANTimestampMac = pcan.TPCANTimestamp
     # end super bad monkey patch
 
@@ -65,14 +68,24 @@ class CanDriver:
         Returns:
             A CanDriver instance.
         """
-        # TODO (amit, 2021-09-29): remove hacks to support `pcan` when we don't
-        #  need it anymore.
-        #  pcan will not initialize when `fd` is True. looks like it's
-        #  this issue https://forum.peak-system.com/viewtopic.php?t=5646
-        #  Luckily we can still send `fd` messages using `pcan`.
-        fd = True if interface != "pcan" else False
+        extra_kwargs = {}
+        if interface == "pcan":
+            # Special FDCAN parameters for use of PCAN driver.
+            extra_kwargs = {
+                "f_clock_mhz": 20,
+                "nom_brp": 5,
+                "nom_tseg1": 13,
+                "nom_tseg2": 2,
+                "nom_sjw": 16,
+            }
         return CanDriver(
-            bus=Bus(channel=channel, bitrate=bitrate, interface=interface, fd=fd),
+            bus=Bus(
+                channel=channel,
+                bitrate=bitrate,
+                interface=interface,
+                fd=True,
+                **extra_kwargs
+            ),
             loop=asyncio.get_event_loop(),
         )
 
@@ -118,7 +131,6 @@ class CanDriver:
         Raises:
             ErrorFrameCanError
         """
-        ...
         m: Message = await self._reader.get_message()
         if m.is_error_frame:
             raise ErrorFrameCanError(message=repr(m))
@@ -140,6 +152,5 @@ class CanDriver:
 
         Returns:
             CanMessage
-
         """
         return await self.read()
