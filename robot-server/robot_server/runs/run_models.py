@@ -39,12 +39,15 @@ class LabwareOffset(BaseModel):
     pipette movements that use that labware as a reference point.
     """
 
+    id: str = Field(..., description="Unique labware offset record identifier.")
     definitionUri: str = Field(..., description="The URI for the labware's definition.")
     location: LabwareLocation = Field(
-        ..., description="Where the labware is located on the robot."
+        ...,
+        description="Where the labware is located on the robot.",
     )
     offset: LabwareOffsetVector = Field(
-        ..., description="The offset applied to matching labware."
+        ...,
+        description="The offset applied to matching labware.",
     )
 
 
@@ -90,12 +93,30 @@ class Run(ResourceModel):
     )
 
 
+class LabwareOffsetCreate(BaseModel):
+    """Create request data for a labware offset."""
+
+    definitionUri: str = Field(..., description="The URI for the labware's definition.")
+    location: LabwareLocation = Field(
+        ...,
+        description="Where the labware is located on the robot.",
+    )
+    offset: LabwareOffsetVector = Field(
+        ...,
+        description="The offset applied to matching labware.",
+    )
+
+
 class RunCreate(BaseModel):
     """Create request data for a new run."""
 
     protocolId: Optional[str] = Field(
         None,
         description="Protocol resource ID that this run will be using, if applicable.",
+    )
+    labwareOffsets: List[LabwareOffsetCreate] = Field(
+        default_factory=list,
+        description="Labware offsets to apply as labware are loaded.",
     )
 
 
