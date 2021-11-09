@@ -12,7 +12,6 @@ import {
   useConditionalConfirm,
   Flex,
   DIRECTION_COLUMN,
-  DIRECTION_ROW,
 } from '@opentrons/components'
 import { Page } from '../../atoms/Page'
 import { ConfirmCancelModal } from '../../pages/Run/RunLog'
@@ -55,7 +54,7 @@ export function RunDetails(): JSX.Element | null {
   return (
     <Page titleBarProps={titleBarProps}>
       {showConfirmExit ? <ConfirmCancelModal onClose={cancelExit} /> : null}
-      <Flex key={commandId[commandIdIndex]}>
+      <Flex key={commandId[commandIdIndex]} flexDirection={DIRECTION_COLUMN}>
         <CommandList
           anticipated={commandId[commandIdIndex + 1]}
           inProgress={commandId[commandIdIndex]}

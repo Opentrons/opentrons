@@ -9,7 +9,6 @@ import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   Btn,
-  DIRECTION_ROW,
   SIZE_1,
   C_MED_DARK_GRAY,
   JUSTIFY_START,
@@ -81,7 +80,6 @@ export function CommandList(props: Props): JSX.Element | null {
             >
               <Flex
                 fontSize={FONT_SIZE_CAPTION}
-                flexDirection={DIRECTION_ROW}
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
                 textTransform={TEXT_TRANSFORM_UPPERCASE}
                 color={C_MED_DARK_GRAY}
@@ -139,18 +137,16 @@ export function CommandList(props: Props): JSX.Element | null {
                 <Flex
                   key={command.id}
                   id={`RunDetails_CommandList`}
-                  flexDirection={DIRECTION_COLUMN}
                   flex={'auto'}
                   justifyContent={JUSTIFY_START}
+                  flexDirection={DIRECTION_COLUMN}
                 >
                   {legacyCommandTypeStatus === 'queued' ? (
                     <Flex padding={SPACING_1} fontSize={FONT_SIZE_CAPTION}>
                       {t('anticipated')}
                     </Flex>
                   ) : null}
-                  <Flex padding={SPACING_1} flexDirection={DIRECTION_COLUMN}>
-                    {commandWholeText}
-                  </Flex>
+                  <Flex padding={SPACING_1}>{commandWholeText}</Flex>
                   {/*   TODO: immediately CommandItem takes in v6 Commands this won't work until Command types are updated, stubbing in the legacyCommand commandWholeText for now */}
                   {/* <CommandItem
                   currentCommand={command}
