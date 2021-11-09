@@ -17,7 +17,7 @@ interface CommandRunTimeInfo {
 
 // all commands must have an id
 export interface CommonCommandInfo extends CommandRunTimeInfo {
-  id: string,
+  id: string
   result?: any // TODO: gather types for what each command's expected result should be
 }
 
