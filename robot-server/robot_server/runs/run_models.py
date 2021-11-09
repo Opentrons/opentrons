@@ -147,12 +147,7 @@ class PatchLabwareOffsetsRequest(BaseModel):
 
     labwareOffsets: List[LabwareOffset] = Field(
         ...,
-        description=(
-            "Labware offsets to replace the existing list."
-            "\n\n"
-            "You may only `PATCH` this field"
-            ' while the run\'s `status` is `"ready-to-run"`.'
-        ),
+        description="Labware offsets to replace the existing list."
     )
 
 
