@@ -1,28 +1,16 @@
-import {
-  useDeleteRunMutation,
-  useAllRunsQuery,
-  useStopRunMutation,
-} from '@opentrons/react-api-client'
+import { useStopRunMutation } from '@opentrons/react-api-client'
+import { useCurrentRunId } from './useCurrentRunId'
 
 export function useCloseProtocolRun(): () => void {
-  // TODO: IMMEDIATELY as soon as the GET /runs links.current path pointer exists
-  // exists on the robot, we should patch that value to null here
-  const { data: allRuns } = useAllRunsQuery()
+  const currentRunId = useCurrentRunId()
 
-  // const { patchCurrentRunId } = usePatchCurrentRunId()
-  const { deleteRun } = useDeleteRunMutation()
   const { stopRun } = useStopRunMutation({
     onSuccess: _data => {
-      if (allRuns != null) {
-        const runId = allRuns.data[0].id
-        deleteRun(runId)
+      if (currentRunId != null) {
+        // TODO IMMEDIATELY PATCH run with current false
       }
     },
   })
 
-  return () => {
-    if (allRuns != null && allRuns.data.length > 0) {
-      stopRun(allRuns.data[0].id)
-    }
-  }
+  return () => currentRunId && stopRun(currentRunId)
 }
