@@ -2,7 +2,7 @@
 from enum import Enum
 from datetime import datetime
 from pydantic import BaseModel, Field
-from typing import List, Union
+from typing import List, Optional, Union
 from typing_extensions import Literal
 
 from opentrons.protocol_engine import (
@@ -147,6 +147,18 @@ class ProtocolRun(_AbstractRun):
 
     runType: Literal[RunType.PROTOCOL] = RunType.PROTOCOL
     createParams: ProtocolRunCreateParams
+
+
+class RunUpdate(BaseModel):
+    """Update request data for a run."""
+
+    current: Optional[bool] = Field(
+        None,
+        description=(
+            "Whether this run is currently controlling the robot."
+            " Setting `current` to `false` will deactivate the run."
+        ),
+    )
 
 
 RunCreateData = Union[

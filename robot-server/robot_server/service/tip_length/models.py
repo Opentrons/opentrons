@@ -29,6 +29,6 @@ class TipLengthCalibration(ResponseDataModel):
     uri: str = Field(..., description="The uri of the tiprack")
 
 
-MultipleCalibrationsResponse = MultiResponseModel[TipLengthCalibration]
+MultipleCalibrationsResponse = MultiResponseModel[TipLengthCalibration, None]
 
-SingleCalibrationResponse = ResponseModel[TipLengthCalibration]
+SingleCalibrationResponse = ResponseModel[TipLengthCalibration, None]

@@ -85,7 +85,7 @@ class EngineStore:
 
         if self._runner_engine_pair is not None:
             if not self.engine.state_view.commands.get_is_stopped():
-                raise EngineConflictError("Current engine is not stopped.")
+                raise EngineConflictError("Current run is not stopped.")
 
         self._runner_engine_pair = RunnerEnginePair(runner=runner, engine=engine)
         self._engines_by_run_id[run_id] = engine
@@ -107,5 +107,14 @@ class EngineStore:
             raise EngineMissingError(f"No engine state found for run {run_id}")
 
     def clear(self) -> None:
-        """Remove the persisted ProtocolEngine, if present, no-op otherwise."""
+        """Remove the persisted ProtocolEngine, if present, no-op otherwise.
+
+        Raises:
+            EngineConflictError: The current runner/engine pair is not idle, so
+            they cannot be cleared.
+        """
+        if self._runner_engine_pair is not None:
+            if not self.engine.state_view.commands.get_is_stopped():
+                raise EngineConflictError("Current run is not stopped.")
+
         self._runner_engine_pair = None

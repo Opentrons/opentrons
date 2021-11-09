@@ -36,7 +36,7 @@ class CommandNotFound(ErrorDetails):
         "The command is placed at the back of the queue."
     ),
     status_code=status.HTTP_200_OK,
-    response_model=ResponseModel[pe_commands.Command],
+    response_model=ResponseModel[pe_commands.Command, None],
     responses={
         status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse[RunStopped]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
@@ -45,8 +45,8 @@ class CommandNotFound(ErrorDetails):
 async def post_run_command(
     request_body: RequestModel[pe_commands.CommandRequest],
     engine_store: EngineStore = Depends(get_engine_store),
-    run: ResponseModel[Run] = Depends(get_run),
-) -> ResponseModel[pe_commands.Command]:
+    run: ResponseModel[Run, None] = Depends(get_run),
+) -> ResponseModel[pe_commands.Command, None]:
     """Enqueue a protocol command.
 
     Arguments:
@@ -64,7 +64,7 @@ async def post_run_command(
         )
 
     command = engine_store.engine.add_command(request_body.data)
-    return ResponseModel[pe_commands.Command](data=command)
+    return ResponseModel(data=command, links=None)
 
 
 @commands_router.get(
@@ -77,21 +77,21 @@ async def post_run_command(
         "information available for a given command."
     ),
     status_code=status.HTTP_200_OK,
-    response_model=MultiResponseModel[RunCommandSummary],
+    response_model=MultiResponseModel[RunCommandSummary, None],
     responses={
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
     },
 )
 async def get_run_commands(
-    run: ResponseModel[Run] = Depends(get_run),
-) -> MultiResponseModel[RunCommandSummary]:
+    run: ResponseModel[Run, None] = Depends(get_run),
+) -> MultiResponseModel[RunCommandSummary, None]:
     """Get a summary of all commands in a run.
 
     Arguments:
         run: Run response model, provided by the route handler for
             `GET /runs/{runId}`
     """
-    return MultiResponseModel(data=run.data.commands)
+    return MultiResponseModel(data=run.data.commands, links=None)
 
 
 @commands_router.get(
@@ -102,7 +102,7 @@ async def get_run_commands(
         "execution information."
     ),
     status_code=status.HTTP_200_OK,
-    response_model=ResponseModel[pe_commands.Command],
+    response_model=ResponseModel[pe_commands.Command, None],
     responses={
         status.HTTP_404_NOT_FOUND: {
             "model": Union[
@@ -115,8 +115,8 @@ async def get_run_commands(
 async def get_run_command(
     commandId: str,
     engine_store: EngineStore = Depends(get_engine_store),
-    run: ResponseModel[Run] = Depends(get_run),
-) -> ResponseModel[pe_commands.Command]:
+    run: ResponseModel[Run, None] = Depends(get_run),
+) -> ResponseModel[pe_commands.Command, None]:
     """Get a specific command from a run.
 
     Arguments:
@@ -132,4 +132,4 @@ async def get_run_command(
     except pe_errors.CommandDoesNotExistError as e:
         raise CommandNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
-    return ResponseModel(data=command)
+    return ResponseModel(data=command, links=None)

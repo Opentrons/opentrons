@@ -60,7 +60,7 @@ async def test_post_run_command(decoy: Decoy, engine_store: EngineStore) -> None
     response = await post_run_command(
         request_body=RequestModel(data=command_request),
         engine_store=engine_store,
-        run=ResponseModel(data=run),
+        run=ResponseModel(data=run, links=None),
     )
 
     assert response.data == output_command
@@ -91,7 +91,7 @@ async def test_post_run_command_not_current(
         await post_run_command(
             request_body=RequestModel(data=command_request),
             engine_store=engine_store,
-            run=ResponseModel(data=run),
+            run=ResponseModel(data=run, links=None),
         )
 
     assert exc_info.value.status_code == 400
@@ -118,7 +118,7 @@ async def test_get_run_commands() -> None:
         labware=[],
     )
 
-    response = await get_run_commands(run=ResponseModel(data=run))
+    response = await get_run_commands(run=ResponseModel(data=run, links=None))
 
     assert response.data == [command_summary]
 
@@ -161,7 +161,7 @@ async def test_get_run_command_by_id(
     response = await get_run_command(
         commandId="command-id",
         engine_store=engine_store,
-        run=ResponseModel(data=run),
+        run=ResponseModel(data=run, links=None),
     )
 
     assert response.data == command
@@ -194,7 +194,7 @@ async def test_get_run_command_missing_command(
         await get_run_command(
             commandId="command-id",
             engine_store=engine_store,
-            run=ResponseModel(data=run),
+            run=ResponseModel(data=run, links=None),
         )
 
     assert exc_info.value.status_code == 404
