@@ -275,6 +275,45 @@ async def test_create_run_conflict(
     )
 
 
+def test_patch_labware_offsets(
+    decoy: Decoy,
+    run_view: RunView,
+    run_store: RunStore,
+    engine_store: EngineStore,
+    client: TestClient,
+) -> None:
+    """It should update a run's labware offsets."""
+    created_at = datetime.now()
+
+    original_create_data = BasicRunCreateData(
+        createParams=BasicRunCreateParams(
+            labwareOffsets=[]
+        )
+    )
+
+    original_run = RunResource(
+        run_id="run-id",
+        create_data=original_create_data,
+        created_at=created_at,
+        actions=[]
+    )
+
+    updated_labware_offsets: List[Any] = []
+
+    expected_updated_create_data = BasicRunCreateData(
+        createParams=BasicRunCreateParams(
+            labwareOffsets=updated_labware_offsets
+        )
+    )
+
+    expected_updated_run = RunResource(
+        run_id="run-id",
+        create_data=expected_updated_create_data,
+        created_at=created_at,
+        actions=[]
+    )
+
+
 def test_get_run(
     decoy: Decoy,
     run_view: RunView,
