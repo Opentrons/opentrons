@@ -1,8 +1,7 @@
 import * as React from 'react'
-import { UseMutateFunction, useQueryClient } from 'react-query'
-import { Protocol, Run } from '@opentrons/api-client'
-import { useHost } from '../../../../react-api-client/src/api/useHost'
+import { useQueryClient, UseMutateFunction } from 'react-query'
 import {
+  useHost,
   useCreateProtocolMutation,
   useProtocolQuery,
   useCreateRunMutation,
@@ -11,17 +10,18 @@ import {
   useAllRunsQuery,
   useStopRunMutation,
 } from '@opentrons/react-api-client'
+import type { Protocol, Run } from '@opentrons/api-client'
 
 const CONFLICTING_RECORD_STATUS_CODE = 409
 
 interface UseCurrentProtocolRun {
-  createProtocolRun: UseMutateFunction<Protocol, unknown, File[]>
-  protocolRecord?: Protocol | null
-  runRecord?: Run | null
+  createProtocolRun: UseMutateFunction<Protocol, unknown, File[], unknown>
+  protocolRecord: Protocol | null | undefined
+  runRecord: Run | null | undefined
 }
 
 export function useCurrentProtocolRun(): UseCurrentProtocolRun {
-  // TODO: IMMEDIATELY as soon as client data current run endpoint
+  // TODO: IMMEDIATELY as soon as GET /runs links.current pointer path exists
   // exists on the robot, we should query/mutate that state rather than
   // storing this runId in react state
   // const { data: currentRunId } = useCurrentRunIdQuery()
@@ -32,7 +32,6 @@ export function useCurrentProtocolRun(): UseCurrentProtocolRun {
   const { data: allRuns } = useAllRunsQuery()
   const { data: runRecord } = useRunQuery(runId, {
     onError: _data => {
-      console.log('ON ERROR')
       setRunId(null)
     },
   })

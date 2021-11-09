@@ -634,8 +634,7 @@ class PairedInstrumentContext(CommandPublisher):
         if not loc or not loc.labware.is_well:
             raise RuntimeError("No previous Well cached to perform air gap")
         target = loc.labware.as_well().top(height)
-        self._implementation.move_to(target)
-        self._implementation.aspirate(volume=c_vol, location=loc, rate=1.0)
+        self._implementation.aspirate(volume=c_vol, location=target, rate=1.0)
         return self
 
     @requires_version(2, 7)

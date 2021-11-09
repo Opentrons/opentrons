@@ -1,16 +1,16 @@
 import uniq from 'lodash/uniq'
 import { doesPipetteVisitAllTipracks } from './doesPipetteVisitAllTipracks'
 import type {
-  JsonProtocolFile,
+  ProtocolFile,
   LabwareDefinition2,
   PipetteName,
 } from '@opentrons/shared-data'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
+import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 
 export const getPipetteWorkflow = (args: {
   pipetteNames: PipetteName[]
   primaryPipetteId: string
-  labware: JsonProtocolFile['labware']
+  labware: ProtocolFile<{}>['labware']
   labwareDefinitions: Record<string, LabwareDefinition2>
   commands: Command[]
 }): 1 | 2 => {

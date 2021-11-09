@@ -1,13 +1,13 @@
 import * as React from 'react'
 import { resetAllWhenMocks, when } from 'jest-when'
-import { renderWithProviders } from '@opentrons/components'
+import { anyProps, renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/dom'
 import { i18n } from '../../../../i18n'
 import { LabwarePositionCheck } from '../index'
 import { GenericStepScreen } from '../GenericStepScreen'
 import { IntroScreen } from '../IntroScreen'
-import { useSteps } from '../hooks'
 import { SummaryScreen } from '../SummaryScreen'
+import { useSteps, useLabwarePositionCheck } from '../hooks'
 import { LabwarePositionCheckStep } from '../types'
 
 jest.mock('../GenericStepScreen')
@@ -24,6 +24,10 @@ const mockSummaryScreen = SummaryScreen as jest.MockedFunction<
 >
 
 const mockUseSteps = useSteps as jest.MockedFunction<typeof useSteps>
+
+const mockUseLabwarePositionCheck = useLabwarePositionCheck as jest.MockedFunction<
+  typeof useLabwarePositionCheck
+>
 
 const PICKUP_TIP_LABWARE_ID = 'PICKUP_TIP_LABWARE_ID'
 const PRIMARY_PIPETTE_ID = 'PRIMARY_PIPETTE_ID'
@@ -46,10 +50,10 @@ describe('LabwarePositionCheck', () => {
         {
           commands: [
             {
-              command: 'pickUpTip',
+              commandType: 'pickUpTip',
               params: {
-                pipette: PRIMARY_PIPETTE_ID,
-                labware: PICKUP_TIP_LABWARE_ID,
+                pipetteId: PRIMARY_PIPETTE_ID,
+                labwareId: PICKUP_TIP_LABWARE_ID,
               },
             },
           ],
@@ -58,9 +62,15 @@ describe('LabwarePositionCheck', () => {
           section: 'PRIMARY_PIPETTE_TIPRACKS',
         } as LabwarePositionCheckStep,
       ])
-    mockIntroScreen.mockReturnValue(null)
-    mockSummaryScreen.mockReturnValue(<div>Mock Summary Screen Component </div>)
-    mockGenericStepScreen.mockReturnValue(null)
+    when(mockUseLabwarePositionCheck)
+      .calledWith(expect.anything())
+      .mockReturnValue({} as any)
+    when(mockIntroScreen).calledWith(anyProps()).mockReturnValue(null)
+    when(mockGenericStepScreen).calledWith(anyProps()).mockReturnValue(null)
+    when(mockSummaryScreen)
+      // @ts-expect-error summary screen does not take any props, but behind the scenes react still calls it with args
+      .calledWith(anyProps())
+      .mockReturnValue(<div>Mock Summary Screen Component </div>)
   })
   afterEach(() => {
     resetAllWhenMocks()

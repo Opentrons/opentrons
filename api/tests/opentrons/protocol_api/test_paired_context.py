@@ -266,21 +266,41 @@ def test_blow_out(set_up_paired_instrument, monkeypatch, ctx):
 
 def test_air_gap(set_up_paired_instrument, monkeypatch, ctx):
     paired, _ = set_up_paired_instrument
+    lw = ctx.load_labware("corning_96_wellplate_360ul_flat", 4)
 
     hardware = ctx._implementation.get_hardware().hardware
     r_pip: Pipette = hardware._attached_instruments[Mount.RIGHT]
     l_pip: Pipette = hardware._attached_instruments[Mount.LEFT]
 
+    air_gap_loc = Point(x=14.38, y=164.74, z=19.22)
+    policy = paired._implementation._pair_policy
+
+    final_move_call = mock.call(
+        policy, air_gap_loc, critical_point=None, max_speeds={}, speed=400.0
+    )
+    move_mock = mock.Mock()
+    monkeypatch.setattr(API, "move_to", move_mock)
+
     paired.pick_up_tip()
     assert r_pip.current_volume == 0
     assert l_pip.current_volume == 0
+    # Set the location to be a well plate
+    ctx.location_cache = lw.wells()[0].bottom()
     paired.air_gap(20)
 
+    assert move_mock.call_args_list[-1] == final_move_call
+    # location cache should be the default position for air gap now.
+    assert ctx.location_cache == lw.wells()[0].top(5)
     assert "air gap" in ",".join([cmd.lower() for cmd in ctx.commands()])
+
+    move_mock.reset_mock()
 
     assert r_pip.current_volume == 20
     assert l_pip.current_volume == 20
     paired.air_gap()
+
+    # since we're already at the expected location, we shouldn't move at all.
+    move_mock.assert_not_called()
 
     assert r_pip.current_volume == 300
     assert l_pip.current_volume == 300
@@ -289,10 +309,17 @@ def test_air_gap(set_up_paired_instrument, monkeypatch, ctx):
 
     aspirate_mock = mock.Mock()
     monkeypatch.setattr(API, "aspirate", aspirate_mock)
+    move_mock.reset_mock()
+
+    assert ctx.location_cache != lw.wells()[0].top(5)
 
     paired.pick_up_tip()
+    # location cache gets reset after drop tip, so we should
+    # be moving again when an air gap gets called.
+    ctx.location_cache = lw.wells()[0].bottom()
     paired.air_gap(20)
 
+    assert move_mock.call_args_list[-1] == final_move_call
     assert aspirate_mock.call_args_list == [mock.call(paired._pair_policy, 20, 1.0)]
     aspirate_mock.reset_mock()
     paired.air_gap()

@@ -76,3 +76,18 @@ export interface RunAction {
 export interface CreateRunActionData {
   actionType: RunActionType
 }
+export interface RunCommandSummary {
+  id: string
+  commandType: string
+  status: 'queued' | 'running' | 'succeeded' | 'failed'
+}
+
+export interface Command {
+  data: RunCommandSummary
+  links?: ResourceLinks
+}
+
+export interface Commands {
+  data: RunCommandSummary[]
+  links?: ResourceLinks
+}

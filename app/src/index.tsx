@@ -6,6 +6,7 @@ import { Provider } from 'react-redux'
 import { ConnectedRouter } from 'connected-react-router'
 
 import { I18nextProvider } from 'react-i18next'
+import { ApiClientProvider } from '@opentrons/react-api-client'
 
 import { i18n } from './i18n'
 import { createLogger } from './logger'
@@ -27,9 +28,11 @@ log.info('Rendering app UI')
 ReactDom.render(
   <Provider store={store}>
     <ConnectedRouter history={history}>
-      <I18nextProvider i18n={i18n}>
-        <App />
-      </I18nextProvider>
+      <ApiClientProvider>
+        <I18nextProvider i18n={i18n}>
+          <App />
+        </I18nextProvider>
+      </ApiClientProvider>
     </ConnectedRouter>
   </Provider>,
   document.getElementById('root')

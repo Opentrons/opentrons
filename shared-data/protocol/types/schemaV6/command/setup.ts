@@ -1,38 +1,44 @@
-import { LabwareDefinition2, LabwareOffset } from '../../../../js'
+import {
+  CommonCommandInfo,
+  LabwareDefinition2,
+  LabwareOffset,
+} from '../../../../js'
+
+export interface LoadPipetteCommand extends CommonCommandInfo {
+  commandType: 'loadPipette'
+  params: LoadPipetteParams
+  result?: LoadPipetteResult
+}
+export interface LoadLabwareCommand extends CommonCommandInfo {
+  commandType: 'loadLabware'
+  params: LoadLabwareParams
+  result?: LoadLabwareResult
+}
+export interface LoadModuleCommand extends CommonCommandInfo {
+  commandType: 'loadModule'
+  params: LoadModuleParams
+  result?: LoadModuleResult
+}
+export interface LoadLiquidCommand extends CommonCommandInfo {
+  commandType: 'loadLiquid'
+  params: LoadLiquidParams
+  result?: LoadLiquidResult
+}
 
 export type SetupCommand =
-  | {
-      commandType: 'loadPipette'
-      params: LoadPipetteParams
-      result?: LoadPipetteResult
-    }
-  | {
-      commandType: 'loadLabware'
-      params: LoadLabwareParams
-      result?: LoadLabwareResult
-    }
-  | {
-      commandType: 'loadModule'
-      params: LoadModuleParams
-      result?: LoadModuleResult
-    }
-  | {
-      commandType: 'loadLiquid'
-      params: LoadLiquidParams
-      result?: LoadLiquidResult
-    }
+  | LoadPipetteCommand
+  | LoadLabwareCommand
+  | LoadModuleCommand
+  | LoadLiquidCommand
 
-type LabwareLocation =
-  | { slotName: string }
-  | { moduleId: string }
-  | { coordinates: { x: number; y: number; z: number } }
+type LabwareLocation = { slotName: string } | { moduleId: string }
 
-type ModuleLocation =
-  | { slotName: string }
-  | { coordinates: { x: number; y: number; z: number } }
+interface ModuleLocation {
+  slotName: string
+}
 interface LoadPipetteParams {
   pipetteId: string
-  mount: string | null
+  mount: 'left' | 'right'
 }
 
 interface LoadPipetteResult {

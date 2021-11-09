@@ -5,7 +5,7 @@ import {
 } from '@opentrons/react-api-client'
 
 export function useCloseProtocolRun(): () => void {
-  // TODO: IMMEDIATELY as soon as client data current run endpoint
+  // TODO: IMMEDIATELY as soon as the GET /runs links.current path pointer exists
   // exists on the robot, we should patch that value to null here
   const { data: allRuns } = useAllRunsQuery()
 

@@ -1,11 +1,12 @@
 import { doesPipetteVisitAllTipracks } from '../utils/doesPipetteVisitAllTipracks'
-import _uncastedProtocolMultipleTipracks from '@opentrons/shared-data/protocol/fixtures/5/multipleTipracks.json'
-import _uncastedProtocolOneTiprack from '@opentrons/shared-data/protocol/fixtures/5/simpleV5.json'
-import type { ProtocolFileV5 } from '@opentrons/shared-data'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
+import _uncastedProtocolMultipleTipracks from '@opentrons/shared-data/protocol/fixtures/6/multipleTipracks.json'
+import _uncastedProtocolOneTiprack from '@opentrons/shared-data/protocol/fixtures/6/oneTiprack.json'
+import type { ProtocolFile } from '@opentrons/shared-data/protocol'
+import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 
-const protocolMultipleTipracks = _uncastedProtocolMultipleTipracks as ProtocolFileV5<any>
-const protocolOneTiprack = _uncastedProtocolOneTiprack as ProtocolFileV5<any>
+// TODO: update these fixtures to be v6 protocols
+const protocolMultipleTipracks = (_uncastedProtocolMultipleTipracks as unknown) as ProtocolFile<{}>
+const protocolOneTiprack = (_uncastedProtocolOneTiprack as unknown) as ProtocolFile<{}>
 
 describe('doesPipetteVisitAllTipracks', () => {
   it('should return true when the pipette visits both tipracks', () => {

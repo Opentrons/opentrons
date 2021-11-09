@@ -69,6 +69,14 @@ class CalibrationOffset(BaseModel):
     z: float
 
 
+class DeckPoint(BaseModel):
+    """Coordinates of a point in deck space."""
+
+    x: float
+    y: float
+    z: float
+
+
 # TODO(mc, 2021-04-16): reconcile with opentrons_shared_data
 # shared-data/python/opentrons_shared_data/pipette/dev_types.py
 class PipetteName(str, Enum):

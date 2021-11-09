@@ -89,6 +89,13 @@ from .pause import (
     PauseCommandType,
 )
 
+from .save_position import (
+    SavePosition,
+    SavePositionData,
+    SavePositionRequest,
+    SavePositionResult,
+    SavePositionCommandType,
+)
 
 from .custom import (
     Custom,
@@ -165,6 +172,12 @@ __all__ = [
     "PauseRequest",
     "PauseResult",
     "PauseCommandType",
+    # save position command models
+    "SavePosition",
+    "SavePositionData",
+    "SavePositionRequest",
+    "SavePositionResult",
+    "SavePositionCommandType",
     # custom command models
     "Custom",
     "CustomData",

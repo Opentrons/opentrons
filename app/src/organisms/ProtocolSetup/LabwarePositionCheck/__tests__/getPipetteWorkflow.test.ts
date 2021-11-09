@@ -2,7 +2,7 @@ import { PipetteName } from '@opentrons/shared-data'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { getPipetteWorkflow } from '../utils/getPipetteWorkflow'
 import { doesPipetteVisitAllTipracks } from '../utils/doesPipetteVisitAllTipracks'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
+import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 
 jest.mock('../utils/doesPipetteVisitAllTipracks')
 
@@ -44,15 +44,19 @@ describe('getPipetteWorkflow', () => {
     const labware = {}
     const labwareDefinitions = {}
     const moveToWellCommand: Command = {
-      command: 'moveToWell',
+      id: '1',
+      commandType: 'moveToWell',
       params: {
-        pipette: '',
-        labware: '',
-        well: '',
-        offset: {
-          x: 0,
-          y: 0,
-          z: 0,
+        pipetteId: '',
+        labwareId: '',
+        wellName: '',
+        wellLocation: {
+          origin: 'top',
+          offset: {
+            x: 0,
+            y: 0,
+            z: 0,
+          },
         },
       },
     }
@@ -78,15 +82,19 @@ describe('getPipetteWorkflow', () => {
     const labware = {}
     const labwareDefinitions = {}
     const moveToWellCommand: Command = {
-      command: 'moveToWell',
+      id: '1',
+      commandType: 'moveToWell',
       params: {
-        pipette: '',
-        labware: '',
-        well: '',
-        offset: {
-          x: 0,
-          y: 0,
-          z: 0,
+        pipetteId: '',
+        labwareId: '',
+        wellName: '',
+        wellLocation: {
+          origin: 'top',
+          offset: {
+            x: 0,
+            y: 0,
+            z: 0,
+          },
         },
       },
     }

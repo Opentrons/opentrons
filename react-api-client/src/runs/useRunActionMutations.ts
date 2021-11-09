@@ -6,6 +6,8 @@ interface UseRunActionMutations {
   stopRun: () => void
 }
 
+// TODO (bc, 11/8/21): Play and Pause should have the same interface as stop here.
+// The hook should take no params, but the callback function should take a runId
 export function useRunActionMutations(runId: string): UseRunActionMutations {
   const { playRun } = usePlayRunMutation(runId)
 

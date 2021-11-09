@@ -21,7 +21,6 @@ export function useRunQuery(
       enabled: host !== null && runId !== null,
       ...options,
     }
-    // () => Promise.resolve(mockProtocolRunResponse),
   )
 
   return query
