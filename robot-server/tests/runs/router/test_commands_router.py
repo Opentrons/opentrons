@@ -14,11 +14,7 @@ from opentrons.protocol_engine import (
 
 from robot_server.errors import ApiError
 from robot_server.service.json_api import RequestModel, ResponseModel
-from robot_server.runs.run_models import (
-    BasicRun,
-    BasicRunCreateParams,
-    RunCommandSummary,
-)
+from robot_server.runs.run_models import Run, RunCommandSummary
 from robot_server.runs.engine_store import EngineStore
 from robot_server.runs.router.commands_router import (
     post_run_command,
@@ -33,9 +29,9 @@ async def test_post_run_command(decoy: Decoy, engine_store: EngineStore) -> None
         data=pe_commands.PauseData(message="Hello")
     )
 
-    run = BasicRun(
+    run = Run(
         id="run-id",
-        createParams=BasicRunCreateParams(),
+        protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
         status=EngineStatus.RUNNING,
         current=True,
@@ -75,9 +71,9 @@ async def test_post_run_command_not_current(
         data=pe_commands.PauseData(message="Hello")
     )
 
-    run = BasicRun(
+    run = Run(
         id="run-id",
-        createParams=BasicRunCreateParams(),
+        protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
         status=EngineStatus.RUNNING,
         current=False,
@@ -106,9 +102,9 @@ async def test_get_run_commands() -> None:
         status=CommandStatus.RUNNING,
     )
 
-    run = BasicRun(
+    run = Run(
         id="run-id",
-        createParams=BasicRunCreateParams(),
+        protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
         status=EngineStatus.RUNNING,
         current=True,
@@ -141,9 +137,9 @@ async def test_get_run_command_by_id(
         data=pe_commands.MoveToWellData(pipetteId="a", labwareId="b", wellName="c"),
     )
 
-    run = BasicRun(
+    run = Run(
         id="run-id",
-        createParams=BasicRunCreateParams(),
+        protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
         status=EngineStatus.RUNNING,
         current=True,
@@ -174,9 +170,9 @@ async def test_get_run_command_missing_command(
     """It should 404 if you attempt to get a non-existent command."""
     key_error = pe_errors.CommandDoesNotExistError("oh no")
 
-    run = BasicRun(
+    run = Run(
         id="run-id",
-        createParams=BasicRunCreateParams(),
+        protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
         status=EngineStatus.RUNNING,
         current=True,

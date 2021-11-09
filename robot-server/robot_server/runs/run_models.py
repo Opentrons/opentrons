@@ -1,9 +1,7 @@
 """Request and response models for run resources."""
-from enum import Enum
 from datetime import datetime
 from pydantic import BaseModel, Field
-from typing import List, Optional, Union
-from typing_extensions import Literal
+from typing import List, Optional
 
 from opentrons.protocol_engine import (
     CommandStatus,
@@ -17,51 +15,12 @@ from robot_server.service.json_api import ResourceModel
 from .action_models import RunAction
 
 
-class RunType(str, Enum):
-    """All available run types."""
-
-    BASIC = "basic"
-    PROTOCOL = "protocol"
-
-
 class RunCommandSummary(ResourceModel):
     """A stripped down model of a full Command for usage in a Run response."""
 
     id: str = Field(..., description="Unique command identifier.")
     commandType: CommandType = Field(..., description="Specific type of command.")
     status: CommandStatus = Field(..., description="Execution status of the command.")
-
-
-class _AbstractRun(ResourceModel):
-    """Base run resource model."""
-
-    id: str = Field(..., description="Unique run identifier.")
-    runType: RunType = Field(..., description="Specific run type.")
-    createdAt: datetime = Field(..., description="When the run was created")
-    status: RunStatus = Field(..., description="Execution status of the run")
-    current: bool = Field(
-        ...,
-        description=(
-            "Whether this run is currently controlling the robot."
-            " There can be, at most, one current run."
-        ),
-    )
-    actions: List[RunAction] = Field(
-        ...,
-        description="Client-initiated run control actions.",
-    )
-    commands: List[RunCommandSummary] = Field(
-        ...,
-        description="Protocol commands queued, running, or executed for the run.",
-    )
-    pipettes: List[LoadedPipette] = Field(
-        ...,
-        description="Pipettes that have been loaded into the run.",
-    )
-    labware: List[LoadedLabware] = Field(
-        ...,
-        description="Labware that has been loaded into the run.",
-    )
 
 
 class LabwareOffsetVector(BaseModel):
@@ -89,68 +48,59 @@ class LabwareOffset(BaseModel):
     )
 
 
-class BasicRunCreateParams(BaseModel):
-    """Creation parameters for a basic run."""
+class Run(ResourceModel):
+    """Run resource model."""
 
-    labwareOffsets: List[LabwareOffset] = Field(default_factory=list)
-
-
-class BasicRunCreateData(BaseModel):
-    """Creation request data for a basic run."""
-
-    runType: Literal[RunType.BASIC] = Field(
-        RunType.BASIC,
-        description="The run type to create.",
-    )
-    # TODO(mc, 2021-05-25): how hard would it be to rename this field to `config`?
-    createParams: BasicRunCreateParams = Field(
-        default_factory=BasicRunCreateParams,
-        description="Parameters to set run behaviors at creation time.",
-    )
-
-
-class BasicRun(_AbstractRun):
-    """A run to execute commands without a previously loaded protocol file."""
-
-    runType: Literal[RunType.BASIC] = RunType.BASIC
-
-    createParams: BasicRunCreateParams
-
-
-class ProtocolRunCreateParams(BaseModel):
-    """Creation parameters for a protocol run."""
-
-    protocolId: str = Field(
+    id: str = Field(..., description="Unique run identifier.")
+    createdAt: datetime = Field(..., description="When the run was created")
+    status: RunStatus = Field(..., description="Execution status of the run")
+    current: bool = Field(
         ...,
-        description="Unique identifier of the protocol this run will execute.",
+        description=(
+            "Whether this run is currently controlling the robot."
+            " There can be, at most, one current run."
+        ),
     )
-
-    labwareOffsets: List[LabwareOffset] = Field(default_factory=list)
-
-
-class ProtocolRunCreateData(BaseModel):
-    """Creation request data for a protocol run."""
-
-    runType: Literal[RunType.PROTOCOL] = Field(
-        RunType.PROTOCOL,
-        description="The run type to create.",
-    )
-    # TODO(mc, 2021-05-25): how hard would it be to rename this field to `config`?
-    createParams: ProtocolRunCreateParams = Field(
+    actions: List[RunAction] = Field(
         ...,
-        description="Parameters to set run behaviors at creation time.",
+        description="Client-initiated run control actions.",
+    )
+    commands: List[RunCommandSummary] = Field(
+        ...,
+        description="Protocol commands queued, running, or executed for the run.",
+    )
+    pipettes: List[LoadedPipette] = Field(
+        ...,
+        description="Pipettes that have been loaded into the run.",
+    )
+    labware: List[LoadedLabware] = Field(
+        ...,
+        description="Labware that has been loaded into the run.",
+    )
+    labwareOffsets: List[LabwareOffset] = Field(
+        default_factory=list,
+        description="Labware offsets to apply as labware are loaded.",
+    )
+    protocolId: Optional[str] = Field(
+        None,
+        description=(
+            "Protocol resource being run, if any. If not present, the run may"
+            " still be used to execute protocol commands over HTTP."
+        ),
     )
 
 
-class ProtocolRun(_AbstractRun):
-    """A run to execute commands with a previously loaded protocol file."""
+class RunCreate(BaseModel):
+    """Create request data for a new run."""
 
-    runType: Literal[RunType.PROTOCOL] = RunType.PROTOCOL
-    createParams: ProtocolRunCreateParams
+    protocolId: Optional[str] = Field(
+        None,
+        description="Protocol resource ID that this run will be using, if applicable.",
+    )
 
 
 class RunUpdate(BaseModel):
-    """Update request data for a run."""
+    """Update request data for an existing run."""
 
     current: Optional[bool] = Field(
         None,
@@ -159,14 +109,3 @@ class RunUpdate(BaseModel):
             " Setting `current` to `false` will deactivate the run."
         ),
     )
-
-
-RunCreateData = Union[
-    BasicRunCreateData,
-    ProtocolRunCreateData,
-]
-
-Run = Union[
-    BasicRun,
-    ProtocolRun,
-]

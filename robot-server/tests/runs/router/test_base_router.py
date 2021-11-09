@@ -22,17 +22,7 @@ from robot_server.protocols import (
 )
 
 from robot_server.runs.run_view import RunView
-
-from robot_server.runs.run_models import (
-    RunCommandSummary,
-    BasicRun,
-    BasicRunCreateData,
-    BasicRunCreateParams,
-    ProtocolRun,
-    ProtocolRunCreateData,
-    ProtocolRunCreateParams,
-    RunUpdate,
-)
+from robot_server.runs.run_models import RunCommandSummary, Run, RunCreate, RunUpdate
 
 from robot_server.runs.engine_store import (
     EngineStore,
@@ -66,17 +56,18 @@ async def test_create_run(
     """It should be able to create a basic run."""
     run_id = "run-id"
     run_created_at = datetime(year=2021, month=1, day=1)
-    run = RunResource(
+
+    expected_run = RunResource(
         run_id=run_id,
         created_at=run_created_at,
-        create_data=BasicRunCreateData(),
+        protocol_id=None,
         actions=[],
         is_current=True,
     )
-    expected_response = BasicRun(
+    expected_response = Run(
         id=run_id,
+        protocolId=None,
         createdAt=run_created_at,
-        createParams=BasicRunCreateParams(),
         status=pe_types.EngineStatus.READY_TO_RUN,
         current=True,
         actions=[],
@@ -96,16 +87,8 @@ async def test_create_run(
     )
 
     decoy.when(
-        run_view.as_resource(
-            run_id=run_id,
-            created_at=run_created_at,
-            create_data=BasicRunCreateData(),
-        )
-    ).then_return(run)
-
-    decoy.when(
         run_view.as_response(
-            run=run,
+            run=expected_run,
             commands=[],
             pipettes=[],
             labware=[],
@@ -114,7 +97,7 @@ async def test_create_run(
     ).then_return(expected_response)
 
     result = await create_run(
-        request_body=RequestModel(data=BasicRunCreateData()),
+        request_body=RequestModel(data=RunCreate()),
         run_view=run_view,
         run_store=run_store,
         engine_store=engine_store,
@@ -127,7 +110,7 @@ async def test_create_run(
 
     decoy.verify(
         task_runner.run(engine_store.runner.join),
-        run_store.upsert(run=run),
+        run_store.upsert(run=expected_run),
     )
 
 
@@ -140,14 +123,12 @@ async def test_create_protocol_run(
     task_runner: TaskRunner,
 ) -> None:
     """It should be able to create a protocol run."""
-    run_id = "run-id"
     run_created_at = datetime(year=2021, month=1, day=1)
+
     run = RunResource(
-        run_id=run_id,
+        run_id="run-id",
+        protocol_id="protocol-id",
         created_at=run_created_at,
-        create_data=ProtocolRunCreateData(
-            createParams=ProtocolRunCreateParams(protocolId="protocol-id")
-        ),
         actions=[],
         is_current=True,
     )
@@ -157,12 +138,12 @@ async def test_create_protocol_run(
         created_at=datetime(year=2022, month=2, day=2),
         files=[],
     )
-    expected_response = ProtocolRun(
-        id=run_id,
+    expected_response = Run(
+        id="run-id",
+        protocolId="protocol-id",
         createdAt=run_created_at,
         status=pe_types.EngineStatus.READY_TO_RUN,
         current=True,
-        createParams=ProtocolRunCreateParams(protocolId="protocol-id"),
         actions=[],
         commands=[],
         pipettes=[],
@@ -173,18 +154,8 @@ async def test_create_protocol_run(
         protocol_resource
     )
 
-    decoy.when(
-        run_view.as_resource(
-            run_id=run_id,
-            created_at=run_created_at,
-            create_data=ProtocolRunCreateData(
-                createParams=ProtocolRunCreateParams(protocolId="protocol-id")
-            ),
-        )
-    ).then_return(run)
-
     engine_state = decoy.mock(cls=StateView)
-    decoy.when(await engine_store.create(run_id=run_id)).then_return(engine_state)
+    decoy.when(await engine_store.create(run_id="run-id")).then_return(engine_state)
 
     decoy.when(engine_state.commands.get_all()).then_return([])
     decoy.when(engine_state.pipettes.get_all()).then_return([])
@@ -204,17 +175,13 @@ async def test_create_protocol_run(
     ).then_return(expected_response)
 
     result = await create_run(
-        request_body=RequestModel(
-            data=ProtocolRunCreateData(
-                createParams=ProtocolRunCreateParams(protocolId="protocol-id")
-            )
-        ),
+        request_body=RequestModel(data=RunCreate(protocolId="protocol-id")),
         run_view=run_view,
         run_store=run_store,
         engine_store=engine_store,
         protocol_store=protocol_store,
         task_runner=task_runner,
-        run_id=run_id,
+        run_id="run-id",
         created_at=run_created_at,
     )
 
@@ -238,11 +205,7 @@ async def test_create_protocol_run_missing_protocol(
 
     with pytest.raises(ApiError) as exc_info:
         await create_run(
-            request_body=RequestModel(
-                data=ProtocolRunCreateData(
-                    createParams=ProtocolRunCreateParams(protocolId="protocol-id")
-                )
-            ),
+            request_body=RequestModel(data=RunCreate(protocolId="protocol-id")),
             protocol_store=protocol_store,
         )
 
@@ -270,11 +233,11 @@ async def test_get_run(
     engine_store: EngineStore,
 ) -> None:
     """It should be able to get a run by ID."""
-    created_at = datetime.now()
-    create_data = BasicRunCreateData()
+    created_at = datetime(year=2021, month=1, day=1)
+
     run = RunResource(
         run_id="run-id",
-        create_data=create_data,
+        protocol_id=None,
         created_at=created_at,
         actions=[],
         is_current=False,
@@ -300,9 +263,9 @@ async def test_get_run(
         mount=MountType.LEFT,
     )
 
-    expected_response = BasicRun(
+    expected_response = Run(
         id="run-id",
-        createParams=BasicRunCreateParams(),
+        protocolId=None,
         createdAt=created_at,
         status=pe_types.EngineStatus.READY_TO_RUN,
         current=False,
@@ -385,7 +348,7 @@ async def test_get_runs_not_empty(
 
     run_1 = RunResource(
         run_id="unique-id-1",
-        create_data=BasicRunCreateData(),
+        protocol_id=None,
         created_at=created_at_1,
         actions=[],
         is_current=False,
@@ -393,15 +356,15 @@ async def test_get_runs_not_empty(
 
     run_2 = RunResource(
         run_id="unique-id-2",
-        create_data=BasicRunCreateData(),
+        protocol_id=None,
         created_at=created_at_2,
         actions=[],
         is_current=True,
     )
 
-    response_1 = BasicRun(
+    response_1 = Run(
         id="unique-id-1",
-        createParams=BasicRunCreateParams(),
+        protocolId=None,
         createdAt=created_at_1,
         status=pe_types.EngineStatus.SUCCEEDED,
         current=False,
@@ -411,9 +374,9 @@ async def test_get_runs_not_empty(
         labware=[],
     )
 
-    response_2 = BasicRun(
+    response_2 = Run(
         id="unique-id-2",
-        createParams=BasicRunCreateParams(),
+        protocolId=None,
         createdAt=created_at_2,
         status=pe_types.EngineStatus.READY_TO_RUN,
         current=True,
@@ -557,7 +520,7 @@ async def test_update_run_to_not_current(
     """It should update a run to no longer be current."""
     run_resource = RunResource(
         run_id="run-id",
-        create_data=BasicRunCreateData(),
+        protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1),
         actions=[],
         is_current=True,
@@ -565,15 +528,15 @@ async def test_update_run_to_not_current(
 
     updated_resource = RunResource(
         run_id="run-id",
-        create_data=BasicRunCreateData(),
+        protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1),
         actions=[],
         is_current=False,
     )
 
-    expected_response = BasicRun(
+    expected_response = Run(
         id="run-id",
-        createParams=BasicRunCreateParams(),
+        protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
         status=pe_types.EngineStatus.SUCCEEDED,
         current=False,
@@ -633,15 +596,15 @@ async def test_update_current_to_current_noop(
     """It should noop if updating the current run to current: true."""
     run_resource = RunResource(
         run_id="run-id",
-        create_data=BasicRunCreateData(),
+        protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1),
         actions=[],
         is_current=True,
     )
 
-    expected_response = BasicRun(
+    expected_response = Run(
         id="run-id",
-        createParams=BasicRunCreateParams(),
+        protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
         status=pe_types.EngineStatus.SUCCEEDED,
         current=True,
@@ -699,7 +662,7 @@ async def test_update_to_current_conflict(
     """It should 409 if attempting to update a not current run."""
     run_resource = RunResource(
         run_id="run-id",
-        create_data=BasicRunCreateData(),
+        protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1),
         actions=[],
         is_current=False,

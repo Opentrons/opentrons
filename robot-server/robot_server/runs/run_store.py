@@ -1,9 +1,8 @@
 """Runs' in-memory store."""
 from dataclasses import dataclass, replace
 from datetime import datetime
-from typing import Dict, List
+from typing import Dict, List, Optional
 
-from .run_models import RunCreateData
 from .action_models import RunAction
 
 
@@ -16,7 +15,7 @@ class RunResource:
     """
 
     run_id: str
-    create_data: RunCreateData
+    protocol_id: Optional[str]
     created_at: datetime
     actions: List[RunAction]
     is_current: bool
