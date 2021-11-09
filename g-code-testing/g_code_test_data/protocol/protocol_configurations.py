@@ -24,7 +24,7 @@ SWIFT_SMOOTHIE_SETTINGS.thermocycler.plate_temperature.degrees_per_tick = 50
 SWIFT_SMOOTHIE_SETTINGS.tempdeck.temperature.degrees_per_tick = 50
 
 
-S3_BASE: Final = "protocol"
+S3_BASE: Final = "dev/protocol"
 """Base path of files in s3."""
 
 ##################

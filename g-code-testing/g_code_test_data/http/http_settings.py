@@ -12,5 +12,5 @@ HTTP_SETTINGS = Settings(
 )
 
 
-S3_BASE: Final = "http"
+S3_BASE: Final = "dev/http"
 """Base of files in s3"""
