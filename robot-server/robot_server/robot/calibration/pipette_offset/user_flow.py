@@ -1,5 +1,4 @@
 import logging
-import json
 from typing import (
     Any,
     Awaitable,
@@ -51,7 +50,6 @@ from .state_machine import (
     PipetteOffsetWithTipLengthStateMachine,
 )
 
-from opentrons_shared_data.labware import load_definition
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
@@ -442,20 +440,9 @@ class PipetteOffsetCalibrationUserFlow:
                 cur_pt = await self.get_current_point(
                     critical_point=CriticalPoint.FRONT_NOZZLE
                 )
-
-            defn = self._tip_rack._implementation.get_definition()
-            print("DEF", json.dumps(defn))
             tiprack_hash = helpers.hash_labware_def(
                 self._tip_rack._implementation.get_definition()
             )
-            print("HASH", tiprack_hash)
-
-            direct_defn = load_definition(
-                defn["parameters"]["loadName"], defn["version"]
-            )
-            print("ALT DEF", json.dumps(direct_defn))
-            print("ALT HASH", helpers.hash_labware_def(direct_defn))
-
             offset = self._cal_ref_point - cur_pt
             modify.save_pipette_calibration(
                 offset=offset,
