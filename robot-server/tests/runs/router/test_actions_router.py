@@ -8,7 +8,7 @@ from httpx import AsyncClient
 
 from tests.helpers import verify_response
 from opentrons.protocol_engine.errors import ProtocolEngineStoppedError
-from robot_server.runs.run_models import BasicRunCreateData
+
 from robot_server.runs.run_view import RunView
 from robot_server.runs.engine_store import EngineStore
 from robot_server.runs.run_store import (
@@ -33,7 +33,7 @@ from robot_server.runs.router.actions_router import (
 
 prev_run = RunResource(
     run_id="run-id",
-    create_data=BasicRunCreateData(),
+    protocol_id=None,
     created_at=datetime(year=2021, month=1, day=1),
     actions=[],
     is_current=True,
@@ -70,7 +70,7 @@ def test_create_play_action(
 
     next_run = RunResource(
         run_id="run-id",
-        create_data=BasicRunCreateData(),
+        protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1),
         actions=[action],
         is_current=True,
@@ -136,7 +136,7 @@ def test_create_run_action_without_runner(
 
     next_run = RunResource(
         run_id="run-id",
-        create_data=BasicRunCreateData(),
+        protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1),
         actions=[actions],
         is_current=True,
@@ -179,7 +179,7 @@ def test_create_run_action_not_current(
     """It should 409 if the run is not current."""
     prev_run = RunResource(
         run_id="run-id",
-        create_data=BasicRunCreateData(),
+        protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1),
         actions=[],
         is_current=False,
@@ -217,7 +217,7 @@ def test_create_pause_action(
 
     next_run = RunResource(
         run_id="run-id",
-        create_data=BasicRunCreateData(),
+        protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1),
         actions=[action],
         is_current=True,
@@ -259,7 +259,7 @@ async def test_create_stop_action(
 
     next_run = RunResource(
         run_id="run-id",
-        create_data=BasicRunCreateData(),
+        protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1),
         actions=[action],
         is_current=True,

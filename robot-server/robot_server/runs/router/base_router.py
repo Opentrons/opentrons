@@ -26,9 +26,9 @@ from robot_server.protocols import (
     get_protocol_store,
 )
 
-from ..run_store import RunStore, RunNotFoundError
+from ..run_store import RunStore, RunResource, RunNotFoundError
 from ..run_view import RunView
-from ..run_models import Run, RunCreateData, ProtocolRunCreateData, RunUpdate
+from ..run_models import Run, RunCreate, RunUpdate
 from ..engine_store import EngineStore, EngineConflictError
 from ..dependencies import get_run_store, get_engine_store
 
@@ -88,7 +88,7 @@ class AllRunsLinks(BaseModel):
     },
 )
 async def create_run(
-    request_body: Optional[RequestModel[RunCreateData]] = None,
+    request_body: Optional[RequestModel[RunCreate]] = None,
     run_view: RunView = Depends(RunView),
     run_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
@@ -109,12 +109,10 @@ async def create_run(
         created_at: Timestamp to attach to created run.
         task_runner: Background task runner.
     """
-    create_data = request_body.data if request_body is not None else None
+    protocol_id = request_body.data.protocolId if request_body is not None else None
     protocol_resource = None
 
-    if isinstance(create_data, ProtocolRunCreateData):
-        protocol_id = create_data.createParams.protocolId
-
+    if protocol_id is not None:
         try:
             protocol_resource = protocol_store.get(protocol_id=protocol_id)
         except ProtocolNotFoundError as e:
@@ -132,10 +130,12 @@ async def create_run(
     # them in the run resource
     task_runner.run(engine_store.runner.join)
 
-    run = run_view.as_resource(
+    run = RunResource(
         run_id=run_id,
+        protocol_id=protocol_id,
         created_at=created_at,
-        create_data=create_data,
+        is_current=True,
+        actions=[],
     )
 
     run_store.upsert(run=run)
@@ -166,7 +166,7 @@ async def get_runs(
     """Get all runs.
 
     Args:
-        run_view: Run model construction interface.
+        run_view: Run model manipulation interface.
         run_store: Run storage interface.
         engine_store: ProtocolEngine storage and control.
     """
@@ -210,7 +210,7 @@ async def get_run(
 
     Args:
         runId: Run ID pulled from URL.
-        run_view: Run model construction interface.
+        run_view: Run model manipulation interface.
         run_store: Run storage interface.
         engine_store: ProtocolEngine storage and control.
     """
@@ -290,7 +290,7 @@ async def update_run(
     Args:
         runId: Run ID pulled from URL.
         request_body: Update data from request body.
-        run_view: Run model manipulation.
+        run_view: Run model manipulation interface.
         run_store: Run storage interface.
         engine_store: ProtocolEngine storage and control.
     """

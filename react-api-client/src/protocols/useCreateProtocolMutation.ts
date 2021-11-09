@@ -34,7 +34,17 @@ export function useCreateProtocolMutation(
     (protocolFiles: File[]) =>
       createProtocol(host as HostConfig, protocolFiles).then(response => {
         const protocolId = response.data.data.id
-        queryClient.setQueryData([host, 'protocols', protocolId], response.data)
+        queryClient
+          .invalidateQueries([host, 'protocols'])
+          .then(() =>
+            queryClient.setQueryData(
+              [host, 'protocols', protocolId],
+              response.data
+            )
+          )
+          .catch(e => {
+            console.error(e)
+          })
         return response.data
       }),
     options
