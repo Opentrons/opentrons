@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-import { CommandItemQueued } from '../CommandItemStyling'
+import { CommandItemQueued } from '../CommandItem'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6/command'
 
 const render = (props: React.ComponentProps<typeof CommandItemQueued>) => {
@@ -30,6 +30,7 @@ describe('CommandItemQueued', () => {
         },
         result: { volume: 10 },
       } as Command,
+      commandText: 'COMMAND_TEXT',
     }
   })
   it('renders the correct queued status', () => {

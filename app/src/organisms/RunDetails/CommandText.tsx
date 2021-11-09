@@ -8,11 +8,9 @@ import {
   SPACING_3,
 } from '@opentrons/components'
 
-const PLACEHOLDER_COMMANDS =
-  '(this is a placeholder for the actual command info)' //  TODO: immediately
-
 interface Props {
   command: Command
+  commandText: string
 }
 export function CommandText(props: Props): JSX.Element {
   return (
@@ -23,7 +21,7 @@ export function CommandText(props: Props): JSX.Element {
       flexDirection={DIRECTION_ROW}
     >
       <Flex>{props.command.commandType} </Flex>
-      <Flex marginLeft={SPACING_1}>{PLACEHOLDER_COMMANDS}</Flex>
+      <Flex marginLeft={SPACING_1}>{props.commandText}</Flex>
     </Flex>
   )
 }

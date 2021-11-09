@@ -1,7 +1,11 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { when } from 'jest-when'
+import {
+  partialComponentPropsMatcher,
+  renderWithProviders,
+} from '@opentrons/components'
 import { i18n } from '../../../i18n'
-import { CommandItemRunning } from '../CommandItemStyling'
+import { CommandItemRunning } from '../CommandItem'
 import { CommandText } from '../CommandText'
 import { CommandTimer } from '../CommandTimer'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6/command'
@@ -40,8 +44,15 @@ describe('CommandItemRunning', () => {
         },
         result: { volume: 10 },
       } as Command,
+      commandText: 'COMMAND_TEXT',
     }
-    mockCommandText.mockReturnValue(<div>Mock Command Text</div>)
+    when(mockCommandText)
+      .calledWith(
+        partialComponentPropsMatcher({
+          commandText: 'COMMAND_TEXT',
+        })
+      )
+      .mockReturnValue(<div>Mock Command Text</div>)
     mockCommandTimer.mockReturnValue(<div>Mock Command Timer</div>)
   })
   it('renders the correct running status', () => {
@@ -65,7 +76,17 @@ describe('CommandItemRunning', () => {
         result: { volume: 10 },
       } as Command,
       runStatus: 'paused',
+      commandText: 'COMMAND_TEXT',
     }
+    when(mockCommandTimer)
+      .calledWith(
+        partialComponentPropsMatcher({
+          start: '0',
+          timer: '0',
+          end: '0',
+        })
+      )
+      .mockReturnValue(<div>Mock Command Timer</div>)
     const { getByText } = render(props)
     expect(getByText('Current Step - Paused by User')).toHaveStyle(
       'backgroundColor: C_POWDER_BLUE'

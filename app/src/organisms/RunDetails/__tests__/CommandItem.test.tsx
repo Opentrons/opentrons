@@ -14,6 +14,7 @@ const PIPETTE_ID = 'PIPETTE_ID'
 const LABWARE_ID = 'LABWARE_ID'
 const WELLNAME = 'WELLNAME'
 const COMMAND_TYPE = 'touchTip'
+const COMMAND_TEXT = 'COMMAND_TEXT'
 
 describe('Run  Details Command', () => {
   let props: React.ComponentProps<typeof CommandItem>
@@ -31,6 +32,7 @@ describe('Run  Details Command', () => {
         result: { volume: 10 },
       } as Command,
       type: 'failed',
+      commandText: COMMAND_TEXT,
     }
   })
 
@@ -43,6 +45,7 @@ describe('Run  Details Command', () => {
     getByText('touchTip')
     getByText('Start')
     getByText('End')
+    getByText('COMMAND_TEXT')
   })
   it('renders the correct success status', () => {
     props = {
@@ -57,11 +60,13 @@ describe('Run  Details Command', () => {
         result: { volume: 10 },
       } as Command,
       type: 'succeeded',
+      commandText: COMMAND_TEXT,
     }
     const { getByText } = render(props)
     expect(getByText('Start')).toHaveStyle('backgroundColor: C_AQUAMARINE')
     getByText('touchTip')
     getByText('End')
+    getByText('COMMAND_TEXT')
   })
   it('renders the correct running status', () => {
     props = {
@@ -76,6 +81,7 @@ describe('Run  Details Command', () => {
         result: { volume: 10 },
       } as Command,
       type: 'running',
+      commandText: COMMAND_TEXT,
     }
     const { getByText } = render(props)
     expect(getByText('Current Step')).toHaveStyle(
@@ -84,6 +90,7 @@ describe('Run  Details Command', () => {
     getByText('touchTip')
     getByText('Start')
     getByText('End')
+    getByText('COMMAND_TEXT')
   })
   it('renders the correct running status with run paused', () => {
     props = {
@@ -99,6 +106,7 @@ describe('Run  Details Command', () => {
       } as Command,
       type: 'running',
       runStatus: 'paused',
+      commandText: COMMAND_TEXT,
     }
     const { getByText } = render(props)
     expect(getByText('Current Step - Paused by User')).toHaveStyle(
@@ -109,6 +117,7 @@ describe('Run  Details Command', () => {
     getByText('End')
     getByText('Timer')
     getByText('Pause protocol')
+    getByText('COMMAND_TEXT')
   })
   it('renders the correct queued status', () => {
     props = {
@@ -123,8 +132,10 @@ describe('Run  Details Command', () => {
         result: { volume: 10 },
       } as Command,
       type: 'queued',
+      commandText: COMMAND_TEXT,
     }
     const { getByText } = render(props)
     expect(getByText('touchTip')).toHaveStyle('backgroundColor: C_NEAR_WHITE')
+    getByText('COMMAND_TEXT')
   })
 })

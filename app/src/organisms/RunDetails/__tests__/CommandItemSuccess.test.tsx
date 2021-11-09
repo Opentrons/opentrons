@@ -1,7 +1,11 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { when } from 'jest-when'
+import {
+  partialComponentPropsMatcher,
+  renderWithProviders,
+} from '@opentrons/components'
 import { i18n } from '../../../i18n'
-import { CommandItemSuccess } from '../CommandItemStyling'
+import { CommandItemSuccess } from '../CommandItem'
 import { CommandText } from '../CommandText'
 import { CommandTimer } from '../CommandTimer'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6/command'
@@ -40,8 +44,15 @@ describe('CommandItemSuccess', () => {
         },
         result: { volume: 10 },
       } as Command,
+      commandText: 'COMMAND_TEXT',
     }
-    mockCommandText.mockReturnValue(<div>Mock Command Text</div>)
+    when(mockCommandText)
+      .calledWith(
+        partialComponentPropsMatcher({
+          commandText: 'COMMAND_TEXT',
+        })
+      )
+      .mockReturnValue(<div>Mock Command Text</div>)
     mockCommandTimer.mockReturnValue(<div>Mock Command Timer</div>)
   })
   it('renders the correct success status', () => {
@@ -50,5 +61,6 @@ describe('CommandItemSuccess', () => {
       'backgroundColor: C_AQUAMARINE'
     )
     getByText('Mock Command Timer')
+    getByText('Mock Command Text')
   })
 })
