@@ -142,6 +142,9 @@ async def create_run(
     # TODO(mc, 2021-06-23): mypy >= 0.780 broke Unions as `response_model`
     # see https://github.com/tiangolo/fastapi/issues/2279
     response_model=RunResponse,  # type: ignore[arg-type]
+    responses={
+        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
+    },
 )
 async def patch_run(
     runId: str,
