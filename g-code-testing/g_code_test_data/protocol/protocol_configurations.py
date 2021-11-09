@@ -15,8 +15,13 @@ SWIFT_SMOOTHIE_SETTINGS = Settings(
     smoothie=SmoothieSettings(
         left=PipetteSettings(model="p20_single_v2.0", id="P20SV202020070101"),
         right=PipetteSettings(model="p300_multi_v2.1", id="P20SV202020070101"),
-    )
+    ),
 )
+
+# Set up the temperature ramp.
+SWIFT_SMOOTHIE_SETTINGS.thermocycler.lid_temperature.degrees_per_tick = 50
+SWIFT_SMOOTHIE_SETTINGS.thermocycler.plate_temperature.degrees_per_tick = 50
+SWIFT_SMOOTHIE_SETTINGS.tempdeck.temperature.degrees_per_tick = 50
 
 
 S3_BASE: Final = "protocol"
@@ -59,7 +64,7 @@ TWO_MODULES = ProtocolGCodeConfirmConfig(
         smoothie=SmoothieSettings(
             left=PipetteSettings(model="p300_single_v2.1", id="P20SV202020070101"),
             right=PipetteSettings(model="p20_multi_v2.1", id="P20SV202020070101"),
-        )
+        ),
     )
 )
 

@@ -110,7 +110,8 @@ def run(protocol_context):
         p20.blow_out(well.top(-7))
         p20.drop_tip()
 
-    thermocycler.set_block_temperature(20.2, hold_time_minutes=2)
+    # Changed from hold_time_minutes to hold_time_seconds for faster running in CI
+    thermocycler.set_block_temperature(20.2, hold_time_seconds=1)
     thermocycler.set_block_temperature(4)
 
     """Ligation Purification"""
@@ -272,10 +273,10 @@ def run(protocol_context):
 
     COVER_TEMP = 105
     PLATE_TEMP_PRE = 4
-    PLATE_TEMP_HOLD_1 = (97, 2)  # 30)
-    PLATE_TEMP_HOLD_2 = (97, 2)  # 10)
-    PLATE_TEMP_HOLD_3 = (59.5, 2)  # 30)
-    PLATE_TEMP_HOLD_4 = (67.3, 2)  # 30)
+    PLATE_TEMP_HOLD_1 = (97, 1)  # 30)
+    PLATE_TEMP_HOLD_2 = (97, 1)  # 10)
+    PLATE_TEMP_HOLD_3 = (59.5, 1)  # 30)
+    PLATE_TEMP_HOLD_4 = (67.3, 1)  # 30)
     # PLATE_TEMP_HOLD_5 = (72, 300)
     PLATE_TEMP_POST = 4
     NUM_CYCLES = 5
