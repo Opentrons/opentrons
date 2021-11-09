@@ -83,8 +83,9 @@ def run(protocol_context):
     # Run Enzymatic Prep Profile
     thermocycler.close_lid()
     thermocycler.set_lid_temperature(70)
-    thermocycler.set_block_temperature(32, hold_time_minutes=1)
-    thermocycler.set_block_temperature(64.5, hold_time_minutes=1)
+    # Changed from hold_time_minutes to hold_time_seconds for faster running in CI
+    thermocycler.set_block_temperature(32, hold_time_seconds=1)
+    thermocycler.set_block_temperature(64.5, hold_time_seconds=1)
     thermocycler.set_block_temperature(4)
     thermocycler.deactivate_lid()
     thermocycler.open_lid()
