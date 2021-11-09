@@ -1,6 +1,7 @@
 export { useAllRunsQuery } from './useAllRunsQuery'
 export { useRunQuery } from './useRunQuery'
 export { useCreateRunMutation } from './useCreateRunMutation'
+export { useDeleteRunMutation } from './useDeleteRunMutation'
 export { useRunsByTypeQuery } from './useRunsByTypeQuery'
 export { useEnsureBasicRun } from './useEnsureBasicRun'
 export { usePlayRunMutation } from './usePlayRunMutation'

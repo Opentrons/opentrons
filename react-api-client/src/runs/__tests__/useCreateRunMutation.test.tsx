@@ -49,15 +49,12 @@ describe('useCreateRunMutation hook', () => {
       .calledWith(HOST_CONFIG, createRunData)
       .mockRejectedValue('oh no')
 
-    const { result, waitFor } = renderHook(
-      () => useCreateRunMutation(createRunData),
-      {
-        wrapper,
-      }
-    )
+    const { result, waitFor } = renderHook(() => useCreateRunMutation(), {
+      wrapper,
+    })
 
     expect(result.current.data).toBeUndefined()
-    result.current.createRun()
+    result.current.createRun({ runType: RUN_TYPE_BASIC })
     await waitFor(() => {
       console.log(result.current.status)
       return result.current.status !== 'loading'
@@ -71,13 +68,10 @@ describe('useCreateRunMutation hook', () => {
       .calledWith(HOST_CONFIG, createRunData)
       .mockResolvedValue({ data: mockBasicRunResponse } as Response<Run>)
 
-    const { result, waitFor } = renderHook(
-      () => useCreateRunMutation(createRunData),
-      {
-        wrapper,
-      }
-    )
-    act(() => result.current.createRun())
+    const { result, waitFor } = renderHook(() => useCreateRunMutation(), {
+      wrapper,
+    })
+    act(() => result.current.createRun(createRunData))
 
     await waitFor(() => result.current.data != null)
 
@@ -94,13 +88,10 @@ describe('useCreateRunMutation hook', () => {
       .calledWith(HOST_CONFIG, createRunData)
       .mockResolvedValue({ data: mockProtocolRunResponse } as Response<Run>)
 
-    const { result, waitFor } = renderHook(
-      () => useCreateRunMutation(createRunData),
-      {
-        wrapper,
-      }
-    )
-    act(() => result.current.createRun())
+    const { result, waitFor } = renderHook(() => useCreateRunMutation(), {
+      wrapper,
+    })
+    act(() => result.current.createRun(createRunData))
 
     await waitFor(() => result.current.data != null)
 

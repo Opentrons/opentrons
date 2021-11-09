@@ -2,7 +2,7 @@ import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider, UseQueryResult } from 'react-query'
 import { renderHook } from '@testing-library/react-hooks'
-import { RUN_TYPE_BASIC } from '@opentrons/api-client'
+import { createRun, RUN_TYPE_BASIC } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useRunsByTypeQuery } from '../useRunsByTypeQuery'
 import {
@@ -26,6 +26,8 @@ const mockUseCreateRunMutation = useCreateRunMutation as jest.MockedFunction<
 >
 const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 
+const mockCreateRun = createRun as jest.MockedFunction<typeof createRun>
+
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const RUNS_RESPONSE = [{ runType: 'basic', id: '1' }] as RunData[]
 
@@ -41,13 +43,12 @@ describe('useEnsureBasicRun hook', () => {
     wrapper = clientProvider
 
     when(mockUseCreateRunMutation)
-      .calledWith({
-        runType: RUN_TYPE_BASIC,
-      })
+      .calledWith()
       .mockReturnValue({} as UseCreateRunMutationResult)
   })
   afterEach(() => {
     resetAllWhenMocks()
+    jest.resetAllMocks()
   })
   it('should return an existing basic run if one already exists', async () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
@@ -60,12 +61,8 @@ describe('useEnsureBasicRun hook', () => {
         Error
       >)
 
-    const mockCreateRun = jest.fn()
-
     when(mockUseCreateRunMutation)
-      .calledWith({
-        runType: RUN_TYPE_BASIC,
-      })
+      .calledWith()
       .mockReturnValue({
         createRun: mockCreateRun as any,
         isLoading: false,
@@ -86,12 +83,8 @@ describe('useEnsureBasicRun hook', () => {
       })
       .mockReturnValue({ data: undefined } as UseQueryResult<RunData[], Error>)
 
-    const mockCreateRun = jest.fn()
-
     when(mockUseCreateRunMutation)
-      .calledWith({
-        runType: RUN_TYPE_BASIC,
-      })
+      .calledWith()
       .mockReturnValue({
         createRun: mockCreateRun as any,
         isLoading: false,
@@ -101,7 +94,7 @@ describe('useEnsureBasicRun hook', () => {
     renderHook(useEnsureBasicRun, {
       wrapper,
     })
-    expect(mockCreateRun).toHaveBeenCalled()
+    expect(mockCreateRun).toHaveBeenCalledWith({ runType: 'basic' })
   })
   it('should NOT try to create another basic run if one is in the process of being created', async () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
@@ -111,12 +104,8 @@ describe('useEnsureBasicRun hook', () => {
       })
       .mockReturnValue({ data: undefined } as UseQueryResult<RunData[], Error>)
 
-    const mockCreateRun = jest.fn()
-
     when(mockUseCreateRunMutation)
-      .calledWith({
-        runType: RUN_TYPE_BASIC,
-      })
+      .calledWith()
       .mockReturnValue({
         createRun: mockCreateRun as any,
         isLoading: true, // create run request is being processed
@@ -140,12 +129,8 @@ describe('useEnsureBasicRun hook', () => {
         error: 'some error getting the runs',
       } as any)
 
-    const mockCreateRun = jest.fn()
-
     when(mockUseCreateRunMutation)
-      .calledWith({
-        runType: RUN_TYPE_BASIC,
-      })
+      .calledWith()
       .mockReturnValue({
         createRun: mockCreateRun as any,
         isLoading: false,
@@ -174,9 +159,7 @@ describe('useEnsureBasicRun hook', () => {
     const mockCreateRun = jest.fn()
 
     when(mockUseCreateRunMutation)
-      .calledWith({
-        runType: RUN_TYPE_BASIC,
-      })
+      .calledWith()
       .mockReturnValue({
         createRun: mockCreateRun as any,
         isLoading: false,

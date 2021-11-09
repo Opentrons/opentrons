@@ -14,14 +14,13 @@ export function useEnsureBasicRun(): {
   } = useRunsByTypeQuery({
     runType: RUN_TYPE_BASIC,
   })
+
   const {
     createRun,
     isLoading: isCreatingRun,
     isError: isCreateRunError,
     error: createSessionError,
-  } = useCreateRunMutation({
-    runType: RUN_TYPE_BASIC,
-  })
+  } = useCreateRunMutation()
 
   useEffect(() => {
     if (
@@ -31,7 +30,9 @@ export function useEnsureBasicRun(): {
       !isCreateRunError &&
       !isGetRunError
     ) {
-      createRun()
+      createRun({
+        runType: RUN_TYPE_BASIC,
+      })
     }
   }, [
     existingBasicRuns,

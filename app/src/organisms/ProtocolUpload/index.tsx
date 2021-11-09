@@ -11,6 +11,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Page } from '../../atoms/Page'
 import { UploadInput } from './UploadInput'
 import { ProtocolSetup } from '../ProtocolSetup'
+import { useCurrentProtocolRun } from './useCurrentProtocolRun'
+import { useCloseProtocolRun } from './useCloseProtocolRun'
 import { getProtocolName, getProtocolFile } from '../../redux/protocol'
 import { loadProtocol, closeProtocol } from '../../redux/protocol/actions'
 import { ingestProtocolFile } from '../../redux/protocol/utils'
@@ -29,6 +31,13 @@ const VALIDATION_ERROR_T_MAP: { [errorKey: string]: string } = {
 export function ProtocolUpload(): JSX.Element {
   const { t } = useTranslation(['protocol_info', 'shared'])
   const dispatch = useDispatch<Dispatch>()
+  const {
+    createProtocolRun,
+    runRecord,
+    protocolRecord,
+  } = useCurrentProtocolRun()
+  const closeProtocolRun = useCloseProtocolRun()
+
   const logger = useLogger(__filename)
   const [uploadError, setUploadError] = React.useState<
     [string, ErrorObject[] | null | undefined] | null
@@ -46,6 +55,7 @@ export function ProtocolUpload(): JSX.Element {
       file,
       data => {
         dispatch(loadProtocol(file, data))
+        createProtocolRun([file])
       },
       (errorKey, errorDetails) => {
         logger.warn(errorKey)
@@ -57,6 +67,7 @@ export function ProtocolUpload(): JSX.Element {
 
   const handleCloseProtocol: React.MouseEventHandler = _event => {
     dispatch(closeProtocol())
+    closeProtocolRun()
   }
 
   const {
@@ -104,7 +115,7 @@ export function ProtocolUpload(): JSX.Element {
           width="100%"
           backgroundColor={C_NEAR_WHITE}
         >
-          {protocolFile !== null ? (
+          {runRecord != null && protocolRecord != null ? (
             <ProtocolSetup />
           ) : (
             <UploadInput onUpload={handleUpload} />
