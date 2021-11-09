@@ -1,11 +1,8 @@
 import * as React from 'react'
-import { useDispatch } from 'react-redux'
 import { AlertModal } from '@opentrons/components'
 
-import { actions as robotActions } from '../../../redux/robot'
 import { Portal } from '../../../App/portal'
-
-import type { Dispatch } from '../../../redux/types'
+import { useCancelRun } from './hooks'
 
 const HEADING = 'Are you sure you want to cancel this run?'
 const CANCEL_TEXT = 'yes, cancel run'
@@ -19,10 +16,10 @@ export function ConfirmCancelModal(
   props: ConfirmCancelModalProps
 ): JSX.Element {
   const { onClose } = props
-  const dispatch = useDispatch<Dispatch>()
+  const { useStop } = useCancelRun()
 
-  const cancel = (): void => {
-    dispatch(robotActions.cancel())
+  const Cancel = (): void => {
+    useStop()
     onClose()
   }
 
@@ -32,7 +29,7 @@ export function ConfirmCancelModal(
         heading={HEADING}
         buttons={[
           { children: BACK_TEXT, onClick: onClose },
-          { children: CANCEL_TEXT, onClick: cancel },
+          { children: CANCEL_TEXT, onClick: Cancel },
         ]}
         alertOverlay
       >

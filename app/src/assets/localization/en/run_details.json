@@ -1,4 +1,5 @@
 {
+  "cancel_run": "Cancel Run",
   "current_temperature": "Current: {{temperature}} °C",
   "module_slot_number": "Slot {{slot_number}}",
   "pause_run": "Pause Run",
