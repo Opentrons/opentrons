@@ -20,6 +20,7 @@ from .run_models import (
     ProtocolRun,
     ProtocolRunCreateData,
     RunCommandSummary,
+    RunUpdate,
 )
 
 
@@ -54,6 +55,19 @@ class RunView:
             actions=[],
             is_current=True,
         )
+
+    @staticmethod
+    def with_update(run: RunResource, update: RunUpdate) -> RunResource:
+        """Update a run resource with update request data..
+
+        Arguments:
+            run: Existing run resource.
+            update: Run update data.
+
+        Returns:
+            The updated run resource.
+        """
+        raise NotImplementedError()
 
     @staticmethod
     def with_action(
