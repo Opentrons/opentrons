@@ -39,14 +39,14 @@ def test_to_response() -> None:
         commands=[],
         pipettes=[],
         labware=[],
-        engine_status=EngineStatus.READY_TO_RUN,
+        engine_status=EngineStatus.IDLE,
     )
 
     assert result == Run(
         id="run-id",
         protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
-        status=EngineStatus.READY_TO_RUN,
+        status=EngineStatus.IDLE,
         current=True,
         actions=[],
         commands=[],

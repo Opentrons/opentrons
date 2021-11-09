@@ -8,6 +8,7 @@ disk into the runner, and the protocols are run to completion. From
 there, the ProtocolEngine state is inspected to everything was loaded
 and ran as expected.
 """
+import pytest
 from pathlib import Path
 from datetime import datetime
 from decoy import matchers
@@ -81,6 +82,7 @@ async def test_runner_with_python(python_protocol_file: Path) -> None:
     assert expected_command in commands_result
 
 
+@pytest.mark.xfail(raises=NotImplementedError, strict=True)
 async def test_runner_with_json(json_protocol_file: Path) -> None:
     """It should run a JSON protocol on the ProtocolRunner."""
     protocol_source = ProtocolSource(

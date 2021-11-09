@@ -68,7 +68,7 @@ async def test_create_run(
         id=run_id,
         protocolId=None,
         createdAt=run_created_at,
-        status=pe_types.EngineStatus.READY_TO_RUN,
+        status=pe_types.EngineStatus.IDLE,
         current=True,
         actions=[],
         commands=[],
@@ -83,7 +83,7 @@ async def test_create_run(
     decoy.when(engine_state.pipettes.get_all()).then_return([])
     decoy.when(engine_state.labware.get_all()).then_return([])
     decoy.when(engine_state.commands.get_status()).then_return(
-        pe_types.EngineStatus.READY_TO_RUN
+        pe_types.EngineStatus.IDLE
     )
 
     decoy.when(
@@ -92,7 +92,7 @@ async def test_create_run(
             commands=[],
             pipettes=[],
             labware=[],
-            engine_status=pe_types.EngineStatus.READY_TO_RUN,
+            engine_status=pe_types.EngineStatus.IDLE,
         ),
     ).then_return(expected_response)
 
@@ -142,7 +142,7 @@ async def test_create_protocol_run(
         id="run-id",
         protocolId="protocol-id",
         createdAt=run_created_at,
-        status=pe_types.EngineStatus.READY_TO_RUN,
+        status=pe_types.EngineStatus.IDLE,
         current=True,
         actions=[],
         commands=[],
@@ -161,7 +161,7 @@ async def test_create_protocol_run(
     decoy.when(engine_state.pipettes.get_all()).then_return([])
     decoy.when(engine_state.labware.get_all()).then_return([])
     decoy.when(engine_state.commands.get_status()).then_return(
-        pe_types.EngineStatus.READY_TO_RUN
+        pe_types.EngineStatus.IDLE
     )
 
     decoy.when(
@@ -170,7 +170,7 @@ async def test_create_protocol_run(
             commands=[],
             pipettes=[],
             labware=[],
-            engine_status=pe_types.EngineStatus.READY_TO_RUN,
+            engine_status=pe_types.EngineStatus.IDLE,
         ),
     ).then_return(expected_response)
 
@@ -267,7 +267,7 @@ async def test_get_run(
         id="run-id",
         protocolId=None,
         createdAt=created_at,
-        status=pe_types.EngineStatus.READY_TO_RUN,
+        status=pe_types.EngineStatus.IDLE,
         current=False,
         actions=[],
         commands=[
@@ -290,7 +290,7 @@ async def test_get_run(
     decoy.when(engine_state.pipettes.get_all()).then_return([pipette])
     decoy.when(engine_state.labware.get_all()).then_return([labware])
     decoy.when(engine_state.commands.get_status()).then_return(
-        pe_types.EngineStatus.READY_TO_RUN
+        pe_types.EngineStatus.IDLE
     )
 
     decoy.when(
@@ -299,7 +299,7 @@ async def test_get_run(
             commands=[command],
             pipettes=[pipette],
             labware=[labware],
-            engine_status=pe_types.EngineStatus.READY_TO_RUN,
+            engine_status=pe_types.EngineStatus.IDLE,
         ),
     ).then_return(expected_response)
 
@@ -378,7 +378,7 @@ async def test_get_runs_not_empty(
         id="unique-id-2",
         protocolId=None,
         createdAt=created_at_2,
-        status=pe_types.EngineStatus.READY_TO_RUN,
+        status=pe_types.EngineStatus.IDLE,
         current=True,
         actions=[],
         commands=[],
@@ -405,7 +405,7 @@ async def test_get_runs_not_empty(
     decoy.when(engine_state_2.pipettes.get_all()).then_return([])
     decoy.when(engine_state_2.labware.get_all()).then_return([])
     decoy.when(engine_state_2.commands.get_status()).then_return(
-        pe_types.EngineStatus.READY_TO_RUN
+        pe_types.EngineStatus.IDLE
     )
 
     decoy.when(
@@ -424,7 +424,7 @@ async def test_get_runs_not_empty(
             commands=[],
             pipettes=[],
             labware=[],
-            engine_status=pe_types.EngineStatus.READY_TO_RUN,
+            engine_status=pe_types.EngineStatus.IDLE,
         ),
     ).then_return(response_2)
 
