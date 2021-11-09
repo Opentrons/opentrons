@@ -1,6 +1,16 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
+  RUN_STATUS_READY_TO_RUN,
+  RUN_STATUS_RUNNING,
+  // RUN_STATUS_PAUSE_REQUESTED,
+  RUN_STATUS_PAUSED,
+  // RUN_STATUS_STOP_REQUESTED,
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_FAILED,
+  RUN_STATUS_SUCCEEDED,
+} from '@opentrons/api-client'
+import {
   Flex,
   Icon,
   PrimaryBtn,
@@ -20,18 +30,25 @@ import {
   SPACING_3,
 } from '@opentrons/components'
 
-import { useRunControls, useRunStatus } from './hooks'
+import {
+  useRunControls,
+  useRunPauseTime,
+  useRunStartTime,
+  useRunStatus,
+} from './hooks'
 import { Timer } from './Timer'
 
 export function RunTimeControl(): JSX.Element | null {
   const { t } = useTranslation('run_details')
   const runStatus = useRunStatus()
+  const startTime = useRunStartTime()
+  const pausedAt = useRunPauseTime()
 
   const { usePlay, usePause, useReset } = useRunControls()
 
   let callToAction: React.ReactNode = ''
   let action = (): void => {}
-  if (runStatus === 'ready-to-run') {
+  if (runStatus === RUN_STATUS_READY_TO_RUN) {
     callToAction = (
       <>
         <Icon name="play" size={SIZE_1} marginRight={SPACING_2} />
@@ -39,7 +56,7 @@ export function RunTimeControl(): JSX.Element | null {
       </>
     )
     action = usePlay
-  } else if (runStatus === 'running' || runStatus === 'pause-requested') {
+  } else if (runStatus === RUN_STATUS_RUNNING) {
     callToAction = (
       <>
         <Icon name="pause" size={SIZE_1} marginRight={SPACING_2} />
@@ -47,7 +64,7 @@ export function RunTimeControl(): JSX.Element | null {
       </>
     )
     action = usePause
-  } else if (runStatus === 'paused') {
+  } else if (runStatus === RUN_STATUS_PAUSED) {
     callToAction = (
       <>
         <Icon name="play" size={SIZE_1} marginRight={SPACING_2} />
@@ -55,11 +72,11 @@ export function RunTimeControl(): JSX.Element | null {
       </>
     )
     action = usePlay
-    // need status stop-requested
+    // TODO: need status stop-requested, pause-requested
   } else if (
-    runStatus === 'stopped' ||
-    runStatus === 'failed' ||
-    runStatus === 'succeeded'
+    runStatus === RUN_STATUS_STOPPED ||
+    runStatus === RUN_STATUS_FAILED ||
+    runStatus === RUN_STATUS_SUCCEEDED
   ) {
     callToAction = <Text fontSize={FONT_SIZE_DEFAULT}>{t('run_again')}</Text>
     action = useReset
@@ -75,7 +92,11 @@ export function RunTimeControl(): JSX.Element | null {
           ? t('run_status', { status: t(`status_${runStatus}`) })
           : ''}
       </Text>
-      {runStatus !== 'ready-to-run' ? <Timer /> : null}
+      {runStatus !== RUN_STATUS_READY_TO_RUN &&
+      runStatus != null &&
+      startTime != null ? (
+        <Timer startTime={startTime} pausedAt={pausedAt} />
+      ) : null}
       <PrimaryBtn
         onClick={action}
         alignSelf={ALIGN_STRETCH}

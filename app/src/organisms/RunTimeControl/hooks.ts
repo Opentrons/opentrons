@@ -1,7 +1,11 @@
 import { RunAction, RunStatus } from '@opentrons/api-client'
-import { useRunQuery, useRunActionMutations } from '@opentrons/react-api-client'
+import {
+  useAllRunsQuery,
+  useRunQuery,
+  useRunActionMutations,
+} from '@opentrons/react-api-client'
 
-import { useCurrentProtocolRun } from '../ProtocolUpload/useCurrentProtocolRun'
+// import { useCurrentProtocolRun } from '../ProtocolUpload/useCurrentProtocolRun'
 
 interface RunControls {
   usePlay: () => void
@@ -10,14 +14,14 @@ interface RunControls {
 }
 
 export function useRunControls(): RunControls {
-  const { runRecord } = useCurrentProtocolRun()
-  // hardcoded run created in postman
-  const { playRun, pauseRun } = useRunActionMutations(
-    '49247bbd-4bac-4178-887b-4f7a6fb916b3'
-  )
-  // const { playRun, pauseRun } = useRunActionMutations(
-  //   runRecord?.data.id as string
-  // )
+  // const { runRecord } = useCurrentProtocolRun()
+  // const currentRunId = runRecord?.data.id
+
+  // TODO(bh, 11-8-2021): temporarily use first run as current
+  const { data: runsData } = useAllRunsQuery()
+  const currentRunId = runsData?.data[0].id as string
+
+  const { playRun, pauseRun } = useRunActionMutations(currentRunId)
 
   const usePlay = (): void => {
     playRun()
@@ -31,11 +35,15 @@ export function useRunControls(): RunControls {
   return { usePlay, usePause, useReset }
 }
 
-export function useRunStatus(): RunStatus {
-  const { runRecord } = useCurrentProtocolRun()
+export function useRunStatus(): RunStatus | null {
+  // const { runRecord } = useCurrentProtocolRun()
+  // const currentRunId = runRecord?.data.id
 
-  // const { data } = useRunQuery(runRecord?.data.id as string)
-  const { data } = useRunQuery('49247bbd-4bac-4178-887b-4f7a6fb916b3')
+  // TODO(bh, 11-8-2021): temporarily use first run as current
+  const { data: runsData } = useAllRunsQuery()
+  const currentRunId = runsData?.data[0].id as string
+
+  const { data } = useRunQuery(currentRunId)
 
   const currentState = data?.data.status as RunStatus
 
@@ -51,17 +59,40 @@ export function useRunDisabledReason(): string | null {
 }
 
 export function useRunStartTime(): string | undefined {
-  const { runRecord } = useCurrentProtocolRun()
+  // const { runRecord } = useCurrentProtocolRun()
+  // const currentRunId = runRecord?.data.id
 
-  // hardcoded run created in postman
-  const { data } = useRunQuery('49247bbd-4bac-4178-887b-4f7a6fb916b3')
-  // const { data } = useRunQuery(runRecord?.data.id as string)
+  // TODO(bh, 11-8-2021): temporarily use first run as current
+  const { data: runsData } = useAllRunsQuery()
+  const currentRunId = runsData?.data[0].id as string
+
+  const { data } = useRunQuery(currentRunId)
 
   const actions = data?.data.actions as RunAction[]
 
-  // find first play action
-  const firstPlay = actions?.[0]
+  const firstPlay = actions?.find(action => action.actionType === 'play')
 
-  const runStart = firstPlay?.createdAt
-  return runStart
+  const runStartTime = firstPlay?.createdAt
+  return runStartTime
+}
+
+export function useRunPauseTime(): string | undefined {
+  // const { runRecord } = useCurrentProtocolRun()
+  // const currentRunId = runRecord?.data.id
+
+  // TODO(bh, 11-8-2021): temporarily use first run as current
+  const { data: runsData } = useAllRunsQuery()
+  const currentRunId = runsData?.data[0].id as string
+
+  const { data } = useRunQuery(currentRunId)
+
+  const actions = data?.data.actions as RunAction[]
+
+  const pauseActions = actions?.filter(action => action.actionType === 'pause')
+
+  const lastPause = pauseActions?.[pauseActions.length - 1]
+
+  const pausedAt = lastPause?.createdAt
+
+  return pausedAt
 }

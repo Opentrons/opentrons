@@ -2,7 +2,6 @@ import * as React from 'react'
 import { format } from 'date-fns'
 import { useTranslation } from 'react-i18next'
 
-import { RunStatus } from '@opentrons/api-client'
 import {
   useInterval,
   Text,
@@ -11,30 +10,23 @@ import {
   SPACING_3,
 } from '@opentrons/components'
 
-import { useRunStartTime, useRunStatus } from './hooks'
 import { formatInterval } from './utils'
 
-// flesh out TimerProps (to eliminate refetch)
 interface TimerProps {
   startTime: string
-  runStatus: RunStatus
-  lastEventTime: string
+  pausedAt?: string
 }
 
-export function Timer(): JSX.Element | null {
+export function Timer({ startTime, pausedAt }: TimerProps): JSX.Element {
   const { t } = useTranslation('run_details')
-
-  const startTime = useRunStartTime()
-  const [runStatus, lastEventTime] = useRunStatus()
 
   const initialNow = Date()
   const [now, setNow] = React.useState(initialNow)
-  // interval causing refetch
   useInterval(() => setNow(Date()), 500, true)
 
-  const pausedAt = runStatus === 'paused' ? lastEventTime : null
-
-  return startTime != null ? (
+  // TODO: determine/render static run time if stopped/failed/succeeded
+  const endTime = now
+  return (
     <>
       <Text css={FONT_BODY_1_DARK_SEMIBOLD} marginBottom={SPACING_3}>{`${t(
         'start_time'
@@ -43,16 +35,14 @@ export function Timer(): JSX.Element | null {
         <>
           <Text css={FONT_BODY_1_DARK_SEMIBOLD}>{`${t('paused_for')}:`}</Text>
           <Text css={FONT_HUGE_DARK_SEMIBOLD} marginBottom={SPACING_3}>
-            {formatInterval(pausedAt, now)}
+            {formatInterval(pausedAt, endTime)}
           </Text>
         </>
       ) : null}
       <Text css={FONT_BODY_1_DARK_SEMIBOLD}>{`${t('run_time')}:`}</Text>
       <Text css={FONT_HUGE_DARK_SEMIBOLD} marginBottom={SPACING_3}>
-        {pausedAt != null
-          ? formatInterval(startTime, pausedAt)
-          : formatInterval(startTime, now)}
+        {formatInterval(startTime, endTime)}
       </Text>
     </>
-  ) : null
+  )
 }

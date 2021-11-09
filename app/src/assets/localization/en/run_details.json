@@ -11,11 +11,14 @@
   "run_time": "Run Time",
   "start_run": "Start Run",
   "start_time": "Start Time",
-  "status_canceled": "Canceled",
-  "status_finished": "Finished",
-  "status_loaded": "Not started",
+  "status_failed": "Completed",
+  "status_pause-requested": "Pause requested",
   "status_paused": "Paused",
+  "status_ready-to-run": "Not started",
   "status_running": "Running",
+  "status_stop-requested": "Stop requested",
+  "status_stopped": "Canceled",
+  "status_succeeded": "Completed",
   "target_temperature": "Target: {{temperature}} °C",
   "temperature_not_available": "{{temperature_type}}: n/a"
 }

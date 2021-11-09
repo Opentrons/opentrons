@@ -3,15 +3,24 @@ export const RUN_TYPE_PROTOCOL: 'protocol' = 'protocol'
 
 export type RunType = typeof RUN_TYPE_BASIC | typeof RUN_TYPE_PROTOCOL
 
+export const RUN_STATUS_READY_TO_RUN: 'ready-to-run' = 'ready-to-run'
+export const RUN_STATUS_RUNNING: 'running' = 'running'
+export const RUN_STATUS_PAUSE_REQUESTED: 'pause-requested' = 'pause-requested'
+export const RUN_STATUS_PAUSED: 'paused' = 'paused'
+export const RUN_STATUS_STOP_REQUESTED: 'stop-requested' = 'stop-requested'
+export const RUN_STATUS_STOPPED: 'stopped' = 'stopped'
+export const RUN_STATUS_FAILED: 'failed' = 'failed'
+export const RUN_STATUS_SUCCEEDED: 'succeeded' = 'succeeded'
+
 export type RunStatus =
-  | 'ready-to-run'
-  | 'running'
-  | 'pause-requested'
-  | 'paused'
-  | 'stop-requested'
-  | 'stopped'
-  | 'failed'
-  | 'succeeded'
+  | typeof RUN_STATUS_READY_TO_RUN
+  | typeof RUN_STATUS_RUNNING
+  | typeof RUN_STATUS_PAUSE_REQUESTED
+  | typeof RUN_STATUS_PAUSED
+  | typeof RUN_STATUS_STOP_REQUESTED
+  | typeof RUN_STATUS_STOPPED
+  | typeof RUN_STATUS_FAILED
+  | typeof RUN_STATUS_SUCCEEDED
 
 export interface BasicRun {
   id: string

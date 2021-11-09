@@ -2,7 +2,6 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { Switch, Route, Redirect } from 'react-router-dom'
 import { hot } from 'react-hot-loader/root'
-import { useSelector } from 'react-redux'
 
 import {
   Flex,
