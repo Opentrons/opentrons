@@ -28,7 +28,7 @@ import type {
 export type LabwarePositionCheckUtils =
   | {
       currentCommandIndex: number
-      isLoading: boolean
+      loadingText: string | null
       isComplete: boolean
       beginLPC: () => void
       proceed: () => void
@@ -59,6 +59,40 @@ const useLpcCtaText = (command: LabwarePositionCheckCommand): string => {
     }
     case 'pickUpTip': {
       return t('confirm_position_and_pick_up_tip')
+    }
+  }
+}
+
+const useLoadingText = (
+  loading: boolean,
+  command: LabwarePositionCheckMovementCommand
+): string | null => {
+  const { protocolData } = useProtocolDetails()
+  const { t } = useTranslation('labware_position_check')
+
+  if (loading) {
+    return null
+  }
+  const commands = protocolData?.commands ?? []
+
+  const labwareId = command.params.labwareId
+  const slot = getLabwareLocation(labwareId, commands)
+
+  switch (command.commandType) {
+    case 'moveToWell': {
+      return t('moving_to_slot_title', {
+        slot,
+      })
+    }
+    case 'pickUpTip': {
+      return t('picking_up_tip_title', {
+        slot,
+      })
+    }
+    case 'dropTip': {
+      return t('returning_tip_title', {
+        slot,
+      })
     }
   }
 }
@@ -122,6 +156,7 @@ export function useLabwarePositionCheck(
   const currentCommand = LPCMovementCommands[currentCommandIndex]
   const ctaText = useLpcCtaText(currentCommand)
   const robotCommands = useAllCommandsQuery(currentRun?.data?.id).data?.data
+  const loadingText = useLoadingText(isLoading, currentCommand)
   const isComplete = currentCommandIndex === LPCMovementCommands.length
   if (error != null) return { error }
   const completedMovementCommand =
@@ -263,7 +298,7 @@ export function useLabwarePositionCheck(
 
   return {
     currentCommandIndex,
-    isLoading,
+    loadingText,
     beginLPC,
     proceed,
     jog,
