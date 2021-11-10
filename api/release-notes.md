@@ -18,6 +18,7 @@ The 4.7.0 release of the OT-2 Software fixes a handful of regressions and bugs.
 
 - Fixed an issue where pipette offset and tip length calibration would sometimes not be saved correctly.
 - Fixed issues around attach pipette behavior.
+- Fixed error reporting from the Thermocycler in the instance that the module goes into an unrecoverable state.
 
 ---
 
