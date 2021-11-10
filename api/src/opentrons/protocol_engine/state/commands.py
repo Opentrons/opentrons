@@ -52,7 +52,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             queued_command = action.request._CommandCls(
                 id=action.command_id,
                 createdAt=action.created_at,
-                data=action.request.data,  # type: ignore[arg-type]
+                params=action.request.params,  # type: ignore[arg-type]
                 status=CommandStatus.QUEUED,
             )
             commands_by_id = self._state.commands_by_id.copy()

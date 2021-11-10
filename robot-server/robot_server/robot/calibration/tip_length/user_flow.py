@@ -133,7 +133,7 @@ class TipCalibrationUserFlow:
             tipLength=self._hw_pipette.config.tip_length,
             mount=str(self._mount),
             serial=self._hw_pipette.pipette_id,
-            defaultTipracks=self._default_tipracks,
+            defaultTipracks=self._default_tipracks,  # type: ignore[arg-type]
         )
 
     def get_required_labware(self) -> List[RequiredLabware]:

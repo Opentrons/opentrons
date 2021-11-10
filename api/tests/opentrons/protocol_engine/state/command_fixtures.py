@@ -17,7 +17,7 @@ from opentrons.protocol_engine.types import (
 def create_pending_command(
     command_id: str = "command-id",
     command_type: str = "command-type",
-    data: Optional[BaseModel] = None,
+    params: Optional[BaseModel] = None,
 ) -> cmd.Command:
     """Given command data, build a pending command model."""
     return cast(
@@ -27,7 +27,7 @@ def create_pending_command(
             commandType=command_type,
             createdAt=datetime(year=2021, month=1, day=1),
             status=cmd.CommandStatus.QUEUED,
-            data=data or BaseModel(),
+            params=params or BaseModel(),
         ),
     )
 
@@ -35,7 +35,7 @@ def create_pending_command(
 def create_running_command(
     command_id: str = "command-id",
     command_type: str = "command-type",
-    data: Optional[BaseModel] = None,
+    params: Optional[BaseModel] = None,
 ) -> cmd.Command:
     """Given command data, build a running command model."""
     return cast(
@@ -45,7 +45,7 @@ def create_running_command(
             createdAt=datetime(year=2021, month=1, day=1),
             commandType=command_type,
             status=cmd.CommandStatus.RUNNING,
-            data=data or BaseModel(),
+            params=params or BaseModel(),
         ),
     )
 
@@ -53,7 +53,7 @@ def create_running_command(
 def create_failed_command(
     command_id: str = "command-id",
     command_type: str = "command-type",
-    data: Optional[BaseModel] = None,
+    params: Optional[BaseModel] = None,
 ) -> cmd.Command:
     """Given command data, build a failed command model."""
     return cast(
@@ -63,7 +63,7 @@ def create_failed_command(
             createdAt=datetime(year=2021, month=1, day=1),
             commandType=command_type,
             status=cmd.CommandStatus.FAILED,
-            data=data or BaseModel(),
+            params=params or BaseModel(),
         ),
     )
 
@@ -71,7 +71,7 @@ def create_failed_command(
 def create_completed_command(
     command_id: str = "command-id",
     command_type: str = "command-type",
-    data: Optional[BaseModel] = None,
+    params: Optional[BaseModel] = None,
     result: Optional[BaseModel] = None,
 ) -> cmd.Command:
     """Given command data and result, build a completed command model."""
@@ -82,7 +82,7 @@ def create_completed_command(
             createdAt=datetime(year=2021, month=1, day=1),
             commandType=command_type,
             status=cmd.CommandStatus.SUCCEEDED,
-            data=data or BaseModel(),
+            params=params or BaseModel(),
             result=result or BaseModel(),
         ),
     )
@@ -95,7 +95,7 @@ def create_load_labware_command(
     calibration: CalibrationOffset,
 ) -> cmd.LoadLabware:
     """Create a completed LoadLabware command."""
-    data = cmd.LoadLabwareData(
+    params = cmd.LoadLabwareParams(
         loadName=definition.parameters.loadName,
         namespace=definition.namespace,
         version=definition.version,
@@ -113,7 +113,7 @@ def create_load_labware_command(
         id="command-id",
         status=cmd.CommandStatus.SUCCEEDED,
         createdAt=datetime.now(),
-        data=data,
+        params=params,
         result=result,
     )
 
@@ -122,7 +122,7 @@ def create_add_definition_command(
     definition: LabwareDefinition,
 ) -> cmd.AddLabwareDefinition:
     """Create a completed AddLabwareDefinition command."""
-    data = cmd.AddLabwareDefinitionData(definition=definition)
+    params = cmd.AddLabwareDefinitionParams(definition=definition)
 
     result = cmd.AddLabwareDefinitionResult(
         loadName=definition.parameters.loadName,
@@ -134,7 +134,7 @@ def create_add_definition_command(
         id="command-id",
         status=cmd.CommandStatus.SUCCEEDED,
         createdAt=datetime.now(),
-        data=data,
+        params=params,
         result=result,
     )
 
@@ -145,14 +145,14 @@ def create_load_pipette_command(
     mount: MountType,
 ) -> cmd.LoadPipette:
     """Get a completed LoadPipette command."""
-    data = cmd.LoadPipetteData(pipetteName=pipette_name, mount=mount)
+    params = cmd.LoadPipetteParams(pipetteName=pipette_name, mount=mount)
     result = cmd.LoadPipetteResult(pipetteId=pipette_id)
 
     return cmd.LoadPipette(
         id="command-id",
         status=cmd.CommandStatus.SUCCEEDED,
         createdAt=datetime.now(),
-        data=data,
+        params=params,
         result=result,
     )
 
@@ -165,7 +165,7 @@ def create_aspirate_command(
     well_location: Optional[WellLocation] = None,
 ) -> cmd.Aspirate:
     """Get a completed Aspirate command."""
-    data = cmd.AspirateData(
+    params = cmd.AspirateParams(
         pipetteId=pipette_id,
         labwareId=labware_id,
         wellName=well_name,
@@ -178,7 +178,7 @@ def create_aspirate_command(
         id="command-id",
         status=cmd.CommandStatus.SUCCEEDED,
         createdAt=datetime.now(),
-        data=data,
+        params=params,
         result=result,
     )
 
@@ -191,7 +191,7 @@ def create_dispense_command(
     well_location: Optional[WellLocation] = None,
 ) -> cmd.Dispense:
     """Get a completed Dispense command."""
-    data = cmd.DispenseData(
+    params = cmd.DispenseParams(
         pipetteId=pipette_id,
         labwareId=labware_id,
         wellName=well_name,
@@ -204,7 +204,7 @@ def create_dispense_command(
         id="command-id",
         status=cmd.CommandStatus.SUCCEEDED,
         createdAt=datetime.now(),
-        data=data,
+        params=params,
         result=result,
     )
 
@@ -215,7 +215,7 @@ def create_pick_up_tip_command(
     well_name: str = "A1",
 ) -> cmd.PickUpTip:
     """Get a completed PickUpTip command."""
-    data = cmd.PickUpTipData(
+    data = cmd.PickUpTipParams(
         pipetteId=pipette_id,
         labwareId=labware_id,
         wellName=well_name,
@@ -227,7 +227,7 @@ def create_pick_up_tip_command(
         id="command-id",
         status=cmd.CommandStatus.SUCCEEDED,
         createdAt=datetime.now(),
-        data=data,
+        params=data,
         result=result,
     )
 
@@ -238,7 +238,7 @@ def create_drop_tip_command(
     well_name: str = "A1",
 ) -> cmd.DropTip:
     """Get a completed DropTip command."""
-    data = cmd.DropTipData(
+    params = cmd.DropTipParams(
         pipetteId=pipette_id,
         labwareId=labware_id,
         wellName=well_name,
@@ -250,7 +250,7 @@ def create_drop_tip_command(
         id="command-id",
         status=cmd.CommandStatus.SUCCEEDED,
         createdAt=datetime.now(),
-        data=data,
+        params=params,
         result=result,
     )
 
@@ -261,7 +261,7 @@ def create_move_to_well_command(
     well_name: str = "A1",
 ) -> cmd.MoveToWell:
     """Get a completed MoveToWell command."""
-    data = cmd.MoveToWellData(
+    params = cmd.MoveToWellParams(
         pipetteId=pipette_id,
         labwareId=labware_id,
         wellName=well_name,
@@ -273,6 +273,6 @@ def create_move_to_well_command(
         id="command-id",
         status=cmd.CommandStatus.SUCCEEDED,
         createdAt=datetime.now(),
-        data=data,
+        params=params,
         result=result,
     )

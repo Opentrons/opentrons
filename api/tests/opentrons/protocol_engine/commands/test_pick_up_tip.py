@@ -9,7 +9,7 @@ from opentrons.protocol_engine.execution import (
 )
 
 from opentrons.protocol_engine.commands.pick_up_tip import (
-    PickUpTipData,
+    PickUpTipParams,
     PickUpTipResult,
     PickUpTipImplementation,
 )
@@ -30,7 +30,7 @@ async def test_pick_up_tip_implementation(
         run_control=run_control,
     )
 
-    data = PickUpTipData(
+    data = PickUpTipParams(
         pipetteId="abc",
         labwareId="123",
         wellName="A3",

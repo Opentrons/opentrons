@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 from ..types import WellLocation
 
 
-class BasePipettingData(BaseModel):
+class BasePipettingParams(BaseModel):
     """Base class for data payloads of commands that interact with wells."""
 
     pipetteId: str = Field(
@@ -21,7 +21,7 @@ class BasePipettingData(BaseModel):
     )
 
 
-class BaseLiquidHandlingData(BasePipettingData):
+class BaseLiquidHandlingParams(BasePipettingParams):
     """Base class for data payloads of commands that handle liquid."""
 
     volume: float = Field(

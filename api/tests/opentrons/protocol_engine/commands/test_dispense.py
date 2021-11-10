@@ -11,7 +11,7 @@ from opentrons.protocol_engine.execution import (
 
 
 from opentrons.protocol_engine.commands.dispense import (
-    DispenseData,
+    DispenseParams,
     DispenseResult,
     DispenseImplementation,
 )
@@ -24,7 +24,7 @@ async def test_dispense_implementation(
     pipetting: PipettingHandler,
     run_control: RunControlHandler,
 ) -> None:
-    """A PickUpTipRequest should have an execution implementation."""
+    """A PickUpTipCreate should have an execution implementation."""
     subject = DispenseImplementation(
         equipment=equipment,
         movement=movement,
@@ -34,7 +34,7 @@ async def test_dispense_implementation(
 
     location = WellLocation(origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1))
 
-    data = DispenseData(
+    data = DispenseParams(
         pipetteId="abc",
         labwareId="123",
         wellName="A3",

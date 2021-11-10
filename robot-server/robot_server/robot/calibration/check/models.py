@@ -1,9 +1,8 @@
-from typing import Optional, List
+from typing import Any, Dict, Optional, List
 from typing_extensions import Literal
 from functools import partial
 from pydantic import BaseModel, Field
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from ..helper_classes import RequiredLabware, AttachedPipette
 
 # NOTE: this would be more accurately typed as
@@ -105,7 +104,7 @@ class SessionCreateParams(BaseModel):
         description="Whether to use a calibration block in the"
         "calibration health check flow.",
     )
-    tipRacks: List[LabwareDefinition] = Field(
+    tipRacks: List[Dict[str, Any]] = Field(
         [],
         description="A list of labware definitions to use in"
         "calibration health check",
