@@ -103,6 +103,7 @@ class TempDeck(mod_abc.AbstractModule):
     async def cleanup(self) -> None:
         """Stop the poller task."""
         await self._poller.stop_and_wait()
+        await self._driver.disconnect()
 
     @classmethod
     def name(cls) -> str:

@@ -7,13 +7,12 @@ import {
   useConditionalConfirm,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { Page } from '../../atoms/Page'
 import { UploadInput } from './UploadInput'
 import { ProtocolSetup } from '../ProtocolSetup'
 import { useCurrentProtocolRun } from './useCurrentProtocolRun'
-import { useCloseProtocolRun } from './useCloseProtocolRun'
-import { getProtocolName, getProtocolFile } from '../../redux/protocol'
+import { useCloseCurrentRun } from './useCloseCurrentRun'
 import { loadProtocol, closeProtocol } from '../../redux/protocol/actions'
 import { ingestProtocolFile } from '../../redux/protocol/utils'
 
@@ -21,7 +20,7 @@ import { ConfirmExitProtocolUploadModal } from './ConfirmExitProtocolUploadModal
 
 import { useLogger } from '../../logger'
 import type { ErrorObject } from 'ajv'
-import type { Dispatch, State } from '../../redux/types'
+import type { Dispatch } from '../../redux/types'
 
 const VALIDATION_ERROR_T_MAP: { [errorKey: string]: string } = {
   INVALID_FILE_TYPE: 'invalid_file_type',
@@ -36,14 +35,13 @@ export function ProtocolUpload(): JSX.Element {
     runRecord,
     protocolRecord,
   } = useCurrentProtocolRun()
-  const closeProtocolRun = useCloseProtocolRun()
+  const hasCurrentRun = runRecord != null && protocolRecord != null
+  const closeProtocolRun = useCloseCurrentRun()
 
   const logger = useLogger(__filename)
   const [uploadError, setUploadError] = React.useState<
     [string, ErrorObject[] | null | undefined] | null
   >(null)
-  const protocolFile = useSelector((state: State) => getProtocolFile(state))
-  const protocolName = useSelector((state: State) => getProtocolName(state))
 
   const clearError = (): void => {
     setUploadError(null)
@@ -76,20 +74,21 @@ export function ProtocolUpload(): JSX.Element {
     cancel: cancelExit,
   } = useConditionalConfirm(handleCloseProtocol, true)
 
-  const titleBarProps =
-    protocolFile !== null
-      ? {
-          title: t('protocol_title', { protocol_name: protocolName }),
-          back: {
-            onClick: confirmExit,
-            title: t('shared:close'),
-            children: t('shared:close'),
-            iconName: 'close' as const,
-          },
-        }
-      : {
-          title: t('upload_and_simulate'),
-        }
+  const titleBarProps = hasCurrentRun
+    ? {
+        title: t('protocol_title', {
+          protocol_name: protocolRecord?.data?.metadata?.protocolName ?? '',
+        }),
+        back: {
+          onClick: confirmExit,
+          title: t('shared:close'),
+          children: t('shared:close'),
+          iconName: 'close' as const,
+        },
+      }
+    : {
+        title: t('upload_and_simulate'),
+      }
 
   return (
     <>

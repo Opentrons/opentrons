@@ -31,7 +31,7 @@ def run(ctx):
 
     # Magnetic Module Testing
     magdeck.engage(height=10)
-    ctx.delay(seconds=30)
+    ctx.delay(seconds=1)
     magdeck.disengage()
     ctx.comment(f"mag status {magdeck.status}")
     magdeck.engage()

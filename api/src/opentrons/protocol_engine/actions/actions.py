@@ -3,11 +3,11 @@
 Actions can be passed to the ActionDispatcher, where they will trigger
 reactions in objects that subscribe to the pipeline, like the StateStore.
 """
-
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Optional, Union
 
-from ..commands import Command
+from ..commands import Command, CommandRequest
 
 
 @dataclass(frozen=True)
@@ -28,6 +28,15 @@ class StopAction:
 
 
 @dataclass(frozen=True)
+class QueueCommandAction:
+    """Add a command request to the queue."""
+
+    command_id: str
+    created_at: datetime
+    request: CommandRequest
+
+
+@dataclass(frozen=True)
 class UpdateCommandAction:
     """Update a given command."""
 
@@ -38,5 +47,6 @@ Action = Union[
     PlayAction,
     PauseAction,
     StopAction,
+    QueueCommandAction,
     UpdateCommandAction,
 ]

@@ -10,7 +10,7 @@ from opentrons.types import MountType, DeckSlotName
 class EngineStatus(str, Enum):
     """Current execution status of a ProtocolEngine."""
 
-    READY_TO_RUN = "ready-to-run"
+    IDLE = "idle"
     RUNNING = "running"
     PAUSE_REQUESTED = "pause-requested"
     PAUSED = "paused"

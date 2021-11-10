@@ -6,12 +6,9 @@ import {
   createCommand, // TODO: create hook for this inside react-api-client
   RunCommandSummary,
 } from '@opentrons/api-client'
-import {
-  useHost,
-  useEnsureBasicRun,
-  useAllCommandsQuery,
-} from '@opentrons/react-api-client'
+import { useHost, useAllCommandsQuery } from '@opentrons/react-api-client'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
+import { useCurrentProtocolRun } from '../../../ProtocolUpload/useCurrentProtocolRun'
 import { getLabwareLocation } from '../../utils/getLabwareLocation'
 import { getModuleLocation } from '../../utils/getModuleLocation'
 import { useLPCCommands } from './useLPCCommands'
@@ -108,11 +105,7 @@ export function useLabwarePositionCheck(
   const [error, setError] = React.useState<Error | null>(null)
   const { protocolData } = useProtocolDetails()
   const host = useHost()
-  // TODO IMMEDIATELY: no longer using basic run, get current protocol run from useCurrentProtocolRun
-  const basicRun = useEnsureBasicRun()
-  if (basicRun.error != null && error !== null) {
-    setError(basicRun.error)
-  }
+  const { runRecord: currentRun } = useCurrentProtocolRun()
   // load commands come from the protocol resource
   const loadCommands = protocolData?.commands.filter(isLoadCommand) ?? []
   // TC open lid commands come from the LPC command generator
@@ -128,7 +121,7 @@ export function useLabwarePositionCheck(
   )
   const currentCommand = LPCMovementCommands[currentCommandIndex]
   const ctaText = useLpcCtaText(currentCommand)
-  const robotCommands = useAllCommandsQuery(basicRun.data?.id).data?.data
+  const robotCommands = useAllCommandsQuery(currentRun?.data?.id).data?.data
   const isComplete = currentCommandIndex === LPCMovementCommands.length
   if (error != null) return { error }
   const completedMovementCommand =
@@ -156,7 +149,7 @@ export function useLabwarePositionCheck(
       }
       createCommand(
         host as HostConfig,
-        basicRun.data?.id as string,
+        currentRun?.data?.id as string,
         createCommandData(savePositionCommand)
       )
         .then(response => {
@@ -187,7 +180,7 @@ export function useLabwarePositionCheck(
     }
     createCommand(
       host as HostConfig,
-      basicRun.data?.id as string,
+      currentRun?.data?.id as string,
       createCommandData(savePositionCommand)
     )
       // add the saved command id so we can use it to query locations later
@@ -197,7 +190,7 @@ export function useLabwarePositionCheck(
         // execute the movement command
         return createCommand(
           host as HostConfig,
-          basicRun.data?.id as string,
+          currentRun?.data?.id as string,
           createCommandData(currentCommand)
         )
       })
@@ -220,7 +213,7 @@ export function useLabwarePositionCheck(
     prepCommands.forEach((prepCommand: Command) => {
       createCommand(
         host as HostConfig,
-        basicRun.data?.id as string,
+        currentRun?.data?.id as string,
         createCommandData(prepCommand)
       ).catch((e: Error) => {
         console.error(`error issuing command to robot: ${e.message}`)
@@ -230,7 +223,7 @@ export function useLabwarePositionCheck(
     // issue first movement command
     createCommand(
       host as HostConfig,
-      basicRun.data?.id as string,
+      currentRun?.data?.id as string,
       createCommandData(currentCommand)
     )
       .then(response => {
@@ -258,12 +251,14 @@ export function useLabwarePositionCheck(
       },
     }
 
-    createCommand(host as HostConfig, basicRun.data?.id as string, data).catch(
-      (e: Error) => {
-        setError(e)
-        console.error(`error issuing jog command: ${e.message}`)
-      }
-    )
+    createCommand(
+      host as HostConfig,
+      currentRun?.data?.id as string,
+      data
+    ).catch((e: Error) => {
+      setError(e)
+      console.error(`error issuing jog command: ${e.message}`)
+    })
   }
 
   return {

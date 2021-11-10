@@ -147,14 +147,7 @@ class ProtocolRunner:
         return ProtocolRunData(commands=commands, labware=labware, pipettes=pipettes)
 
     def _load_json(self, protocol_source: ProtocolSource) -> None:
-        protocol = self._json_file_reader.read(protocol_source)
-        commands = self._json_command_translator.translate(protocol)
-        for request in commands:
-            self._protocol_engine.add_command(request=request)
-
-        self._task_queue.set_run_func(
-            func=self._protocol_engine.wait_until_complete,
-        )
+        raise NotImplementedError("JSON schema v6 execution not yet implemented.")
 
     def _load_python(self, protocol_source: ProtocolSource) -> None:
         protocol = self._python_file_reader.read(protocol_source)

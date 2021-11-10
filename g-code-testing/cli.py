@@ -78,7 +78,7 @@ class GCodeCLI:
         else:
             text = "No difference between compared strings"
 
-            return text
+        return text
 
     def _configurations(self) -> str:
         """Get a list of runnable G-Code Configurations"""
