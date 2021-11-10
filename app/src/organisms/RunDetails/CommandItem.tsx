@@ -149,11 +149,11 @@ export function CommandItem(props: CommandItemProps): JSX.Element {
     border: ${WRAPPER_STYLE_BY_STATUS[type].border};
     padding: ${SPACING_2};
     color: ${C_DARK_GRAY};
-    flexdirection: ${DIRECTION_ROW};
+    flex-direction: ${DIRECTION_ROW};
   `
-  let commandType
+  let commandStatus
   if (type === 'running') {
-    commandType = (
+    commandStatus = (
       <CommandItemRunning
         runStatus={runStatus}
         currentCommand={currentCommand}
@@ -161,26 +161,31 @@ export function CommandItem(props: CommandItemProps): JSX.Element {
       />
     )
   } else if (type === 'failed') {
-    commandType = (
+    commandStatus = (
       <CommandItemFailed
         currentCommand={currentCommand}
         commandText={commandText}
       />
     )
   } else if (type === 'queued') {
-    commandType = (
+    commandStatus = (
       <CommandItemQueued
         currentCommand={currentCommand}
         commandText={commandText}
       />
     )
   } else if (type === 'succeeded') {
-    commandType = (
+    commandStatus = (
       <CommandItemSuccess
         currentCommand={currentCommand}
         commandText={commandText}
       />
     )
   }
-  return <Flex css={WRAPPER_STYLE}>{commandType}</Flex>
+  return (
+    <Flex flexDirection={DIRECTION_COLUMN}>
+      {' '}
+      <Flex css={WRAPPER_STYLE}>{commandStatus}</Flex>
+    </Flex>
+  )
 }

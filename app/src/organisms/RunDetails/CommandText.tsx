@@ -20,8 +20,9 @@ export function CommandText(props: Props): JSX.Element {
       alignItems={ALIGN_CENTER}
       flexDirection={DIRECTION_ROW}
     >
-      <Flex>{props.command.commandType} </Flex>
-      <Flex marginLeft={SPACING_1}>{props.commandText}</Flex>
+      <Flex marginLeft={SPACING_1} key={props.command.id}>
+        {props.commandText}
+      </Flex>
     </Flex>
   )
 }

@@ -12,13 +12,14 @@ import {
   SIZE_1,
   C_MED_DARK_GRAY,
   JUSTIFY_START,
+  Box,
 } from '@opentrons/components'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { useProtocolDetails } from './hooks'
 import { ProtocolSetupInfo } from './ProtocolSetupInfo'
-import { Status } from './CommandItem'
-import fixtureCommands from '@opentrons/app/src/organisms/RunDetails/Fixture_commands.json'
-import type { ProtocolFile } from '@opentrons/shared-data'
+import { CommandItem, Status } from './CommandItem'
+import fixtureAnalysis from '@opentrons/app/src/organisms/RunDetails/Fixture_analysis.json'
+import { ProtocolFile, schemaV6Adapter } from '@opentrons/shared-data'
 
 interface Props {
   anticipated?: string
@@ -34,12 +35,13 @@ export function CommandList(props: Props): JSX.Element | null {
   const protocolData: ProtocolFile<{}> | null = useProtocolDetails()
     .protocolData
   const runStatus = useRunStatus()
+  //  @ts-expect-error
+  const legacyCommands = schemaV6Adapter(fixtureAnalysis).commands
   if (protocolData == null) return null
-  const legacyCommands = fixtureCommands.commands
 
   return (
     <React.Fragment>
-      <Flex flexDirection={DIRECTION_COLUMN}>
+      <Box width="48rem">
         <Flex margin={SPACING_1}>
           {showProtocolSetupInfo ? (
             protocolData.commands.map(command => {
@@ -97,6 +99,7 @@ export function CommandList(props: Props): JSX.Element | null {
           color={C_MED_DARK_GRAY}
           flexDirection={DIRECTION_COLUMN}
         >
+          <Flex padding={SPACING_1}>{t('protocol_steps')}</Flex>
           <Flex>
             {legacyCommands.map(command => {
               let legacyCommandTypeStatus = 'queued' as Status
@@ -120,15 +123,12 @@ export function CommandList(props: Props): JSX.Element | null {
                     >
                       {t('comment')}
                     </Flex>
-                    <Flex>{command.data.legacyCommandText}</Flex>
+                    <Flex>{command.result}</Flex>
                   </Flex>
                 )
-              } else if (
-                command.commandType !== 'loadLabware' &&
-                'loadPipette' &&
-                'loadModule'
-              ) {
+              } else if (command.commandType === 'custom') {
                 commandWholeText = (
+                  //  @ts-expect-error
                   <Flex key={command.id}>{command.data.legacyCommandText}</Flex>
                 )
               }
@@ -139,6 +139,7 @@ export function CommandList(props: Props): JSX.Element | null {
                   id={`RunDetails_CommandList`}
                   flex={'auto'}
                   justifyContent={JUSTIFY_START}
+                  padding={SPACING_1}
                   flexDirection={DIRECTION_COLUMN}
                 >
                   {legacyCommandTypeStatus === 'queued' ? (
@@ -146,21 +147,21 @@ export function CommandList(props: Props): JSX.Element | null {
                       {t('anticipated')}
                     </Flex>
                   ) : null}
-                  <Flex padding={SPACING_1}>{commandWholeText}</Flex>
-                  {/*   TODO: immediately CommandItem takes in v6 Commands this won't work until Command types are updated, stubbing in the legacyCommand commandWholeText for now */}
-                  {/* <CommandItem
-                  currentCommand={command}
-                  type={commandType}
-                  runStatus={runStatus}
-                  commandText={commandWholeText}
-                /> */}
+                  <Flex paddingLeft={SPACING_1}>
+                    <CommandItem
+                      currentCommand={command}
+                      type={legacyCommandTypeStatus}
+                      runStatus={runStatus}
+                      commandText={commandWholeText}
+                    />
+                  </Flex>
                 </Flex>
               )
             })}
           </Flex>
           <Flex padding={SPACING_1}>{t('end_of_protocol')}</Flex>
         </Flex>
-      </Flex>
+      </Box>
     </React.Fragment>
   )
 }

@@ -37,7 +37,6 @@ describe('CommandText', () => {
   })
   it('renders correct command text', () => {
     const { getByText } = render(props)
-    getByText('touchTip')
     getByText('COMMAND_TEXT')
   })
 })

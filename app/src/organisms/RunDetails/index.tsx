@@ -11,7 +11,6 @@ import {
   SPACING_3,
   useConditionalConfirm,
   Flex,
-  DIRECTION_COLUMN,
 } from '@opentrons/components'
 import { Page } from '../../atoms/Page'
 import { ConfirmCancelModal } from '../../pages/Run/RunLog'
@@ -50,11 +49,12 @@ export function RunDetails(): JSX.Element | null {
     title: t('protocol_title', { protocol_name: displayName }),
     rightNode: cancelRunButton,
   }
-
+  console.log('command list')
   return (
     <Page titleBarProps={titleBarProps}>
       {showConfirmExit ? <ConfirmCancelModal onClose={cancelExit} /> : null}
-      <Flex key={commandId[commandIdIndex]} flexDirection={DIRECTION_COLUMN}>
+
+      <Flex key={commandId[commandIdIndex]}>
         <CommandList
           anticipated={commandId[commandIdIndex + 1]}
           inProgress={commandId[commandIdIndex]}

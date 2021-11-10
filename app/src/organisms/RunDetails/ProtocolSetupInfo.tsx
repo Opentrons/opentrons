@@ -112,7 +112,7 @@ export const ProtocolSetupInfo = (
       moduleSlots = 1
     }
 
-    SetupCommand.params.labwareId.includes('trash')
+    SetupCommand.result?.definition.metadata.displayName.includes('Trash')
       ? (SetupCommandText = undefined)
       : (SetupCommandText =
           moduleName === null ? (
@@ -143,13 +143,11 @@ export const ProtocolSetupInfo = (
             />
           ))
   }
-
   return (
     <Flex
-      flexDirection={DIRECTION_COLUMN}
       margin={SPACING_1}
-      width={'100%'}
       fontSize={FONT_SIZE_BODY_1}
+      flexDirection={DIRECTION_COLUMN}
     >
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} color={C_MED_DARK_GRAY}>
         <Text
@@ -163,14 +161,12 @@ export const ProtocolSetupInfo = (
           <Icon name="chevron-up" color={C_MED_DARK_GRAY}></Icon>
         </Btn>
       </Flex>
-      <Flex>
-        <CommandItem
-          currentCommand={SetupCommand}
-          type={type}
-          runStatus={runStatus}
-          commandText={SetupCommandText}
-        />
-      </Flex>
+      <CommandItem
+        currentCommand={SetupCommand}
+        type={type}
+        runStatus={runStatus}
+        commandText={SetupCommandText}
+      />
     </Flex>
   )
 }
