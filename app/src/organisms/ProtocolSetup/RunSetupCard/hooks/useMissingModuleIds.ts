@@ -1,10 +1,10 @@
 import { useSelector } from 'react-redux'
 import reduce from 'lodash/reduce'
-import { getAttachedModules } from '../../../redux/modules'
-import { getConnectedRobot } from '../../../redux/discovery/selectors'
-import type { State } from '../../../redux/types'
-import type { AttachedModule } from '../../../redux/modules/types'
-import { useModuleRenderInfoById } from '../hooks'
+import { getAttachedModules } from '../../../../redux/modules'
+import { getConnectedRobot } from '../../../../redux/discovery/selectors'
+import type { State } from '../../../../redux/types'
+import type { AttachedModule } from '../../../../redux/modules/types'
+import { useModuleRenderInfoById } from '../../hooks'
 
 interface ModuleMatchResults {
   missingModuleIds: string[]
