@@ -15,10 +15,3 @@
   max-height: 100%;
   overflow-y: auto;
 }
-
-.spinner_modal_icon {
-  width: 3rem;
-  margin-top: 2rem;
-  margin-bottom: 2rem;
-  color: var(--c-light-gray);
-}
