@@ -162,7 +162,12 @@ class LegacyCommandMapper:
 
         location = module_load_info.location
         if location is None:
-            if "thermocycler" in module_load_info.module_name:
+            # The list for valid names is from
+            # opentrons.protocols.geometry.module_geometry.resolve_module_model
+            if module_load_info.module_name.lower() in [
+                "thermocycler",
+                "thermocycler module",
+            ]:
                 location = 7
             else:
                 raise Exception(f"{module_load_info.module_name} requires a location.")
