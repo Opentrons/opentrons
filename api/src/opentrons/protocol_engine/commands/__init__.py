@@ -64,6 +64,14 @@ from .load_pipette import (
     LoadPipetteCommandType,
 )
 
+from .move_relative import (
+    MoveRelative,
+    MoveRelativeParams,
+    MoveRelativeCreate,
+    MoveRelativeResult,
+    MoveRelativeCommandType,
+)
+
 from .move_to_well import (
     MoveToWell,
     MoveToWellParams,
@@ -133,6 +141,12 @@ __all__ = [
     "LoadPipetteParams",
     "LoadPipetteResult",
     "LoadPipetteCommandType",
+    # move relative command models
+    "MoveRelative",
+    "MoveRelativeParams",
+    "MoveRelativeCreate",
+    "MoveRelativeResult",
+    "MoveRelativeCommandType",
     # move to well command models
     "MoveToWell",
     "MoveToWellCreate",

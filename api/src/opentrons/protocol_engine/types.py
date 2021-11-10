@@ -111,3 +111,11 @@ class LoadedLabware(BaseModel):
     loadName: str
     definitionUri: str
     location: LabwareLocation
+
+
+class MovementAxis(str, Enum):
+    """Axis on which to issue a relative movement."""
+
+    X = "x"
+    Y = "y"
+    Z = "z"
