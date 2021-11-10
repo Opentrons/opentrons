@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  RUN_STATUS_READY_TO_RUN,
+  RUN_STATUS_IDLE,
   RUN_STATUS_RUNNING,
   // RUN_STATUS_PAUSE_REQUESTED,
   RUN_STATUS_PAUSED,
@@ -48,7 +48,7 @@ export function RunTimeControl(): JSX.Element | null {
 
   let callToAction: React.ReactNode = ''
   let action = (): void => {}
-  if (runStatus === RUN_STATUS_READY_TO_RUN) {
+  if (runStatus === RUN_STATUS_IDLE) {
     callToAction = (
       <>
         <Icon name="play" size={SIZE_1} marginRight={SPACING_2} />
@@ -92,7 +92,7 @@ export function RunTimeControl(): JSX.Element | null {
           ? t('run_status', { status: t(`status_${runStatus}`) })
           : ''}
       </Text>
-      {runStatus !== RUN_STATUS_READY_TO_RUN &&
+      {runStatus !== RUN_STATUS_IDLE &&
       runStatus != null &&
       startTime != null ? (
         <Timer startTime={startTime} pausedAt={pausedAt} />

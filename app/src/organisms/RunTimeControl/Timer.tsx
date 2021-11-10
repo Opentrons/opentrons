@@ -24,7 +24,7 @@ export function Timer({ startTime, pausedAt }: TimerProps): JSX.Element {
   const [now, setNow] = React.useState(initialNow)
   useInterval(() => setNow(Date()), 500, true)
 
-  // TODO: determine/render static run time if stopped/failed/succeeded
+  // TODO: determine/render static run time if stopped/failed/succeeded?
   const endTime = now
   return (
     <>

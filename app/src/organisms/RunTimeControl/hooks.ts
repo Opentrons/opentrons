@@ -1,11 +1,14 @@
-import { RunAction, RunStatus } from '@opentrons/api-client'
-import {
-  useAllRunsQuery,
-  useRunQuery,
-  useRunActionMutations,
-} from '@opentrons/react-api-client'
+import last from 'lodash/last'
 
-// import { useCurrentProtocolRun } from '../ProtocolUpload/useCurrentProtocolRun'
+import {
+  RUN_ACTION_TYPE_PLAY,
+  RUN_ACTION_TYPE_PAUSE,
+  RunAction,
+  RunStatus,
+} from '@opentrons/api-client'
+import { useRunQuery, useRunActionMutations } from '@opentrons/react-api-client'
+
+import { useCurrentRunId } from '../ProtocolUpload/useCurrentRunId'
 
 interface RunControls {
   usePlay: () => void
@@ -14,14 +17,9 @@ interface RunControls {
 }
 
 export function useRunControls(): RunControls {
-  // const { runRecord } = useCurrentProtocolRun()
-  // const currentRunId = runRecord?.data.id
+  const currentRunId = useCurrentRunId()
 
-  // TODO(bh, 11-8-2021): temporarily use first run as current
-  const { data: runsData } = useAllRunsQuery()
-  const currentRunId = runsData?.data[0].id as string
-
-  const { playRun, pauseRun } = useRunActionMutations(currentRunId)
+  const { playRun, pauseRun } = useRunActionMutations(currentRunId as string)
 
   const usePlay = (): void => {
     playRun()
@@ -36,12 +34,7 @@ export function useRunControls(): RunControls {
 }
 
 export function useRunStatus(): RunStatus | null {
-  // const { runRecord } = useCurrentProtocolRun()
-  // const currentRunId = runRecord?.data.id
-
-  // TODO(bh, 11-8-2021): temporarily use first run as current
-  const { data: runsData } = useAllRunsQuery()
-  const currentRunId = runsData?.data[0].id as string
+  const currentRunId = useCurrentRunId()
 
   const { data } = useRunQuery(currentRunId)
 
@@ -59,39 +52,29 @@ export function useRunDisabledReason(): string | null {
 }
 
 export function useRunStartTime(): string | undefined {
-  // const { runRecord } = useCurrentProtocolRun()
-  // const currentRunId = runRecord?.data.id
-
-  // TODO(bh, 11-8-2021): temporarily use first run as current
-  const { data: runsData } = useAllRunsQuery()
-  const currentRunId = runsData?.data[0].id as string
+  const currentRunId = useCurrentRunId()
 
   const { data } = useRunQuery(currentRunId)
 
-  const actions = data?.data.actions as RunAction[]
-
-  const firstPlay = actions?.find(action => action.actionType === 'play')
-
+  const actions = data?.data?.actions as RunAction[]
+  const firstPlay = actions?.find(
+    action => action.actionType === RUN_ACTION_TYPE_PLAY
+  )
   const runStartTime = firstPlay?.createdAt
+
   return runStartTime
 }
 
 export function useRunPauseTime(): string | undefined {
-  // const { runRecord } = useCurrentProtocolRun()
-  // const currentRunId = runRecord?.data.id
-
-  // TODO(bh, 11-8-2021): temporarily use first run as current
-  const { data: runsData } = useAllRunsQuery()
-  const currentRunId = runsData?.data[0].id as string
+  const currentRunId = useCurrentRunId()
 
   const { data } = useRunQuery(currentRunId)
 
   const actions = data?.data.actions as RunAction[]
-
-  const pauseActions = actions?.filter(action => action.actionType === 'pause')
-
-  const lastPause = pauseActions?.[pauseActions.length - 1]
-
+  const pauseActions = actions?.filter(
+    action => action.actionType === RUN_ACTION_TYPE_PAUSE
+  )
+  const lastPause = last(pauseActions)
   const pausedAt = lastPause?.createdAt
 
   return pausedAt

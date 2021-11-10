@@ -14,7 +14,7 @@
   "status_failed": "Completed",
   "status_pause-requested": "Pause requested",
   "status_paused": "Paused",
-  "status_ready-to-run": "Not started",
+  "status_idle": "Not started",
   "status_running": "Running",
   "status_stop-requested": "Stop requested",
   "status_stopped": "Canceled",

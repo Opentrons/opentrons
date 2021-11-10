@@ -1,36 +1,29 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
-import { useRunStartTime, useRunStatus } from '../hooks'
 import { Timer } from '../Timer'
 
-jest.mock('../hooks')
-
-const mockUseRunStartTime = useRunStartTime as jest.MockedFunction<
-  typeof useRunStartTime
->
-const mockUseRunStatus = useRunStatus as jest.MockedFunction<
-  typeof useRunStatus
->
+const START_TIME = '2021-10-07T18:44:49.366581+00:00'
+const PAUSED_TIME = '2021-10-07T18:47:55.366581+00:00'
 
 const render = () => {
-  return renderWithProviders(<Timer />, { i18nInstance: i18n })
+  return renderWithProviders(<Timer startTime={START_TIME} />, {
+    i18nInstance: i18n,
+  })
+}
+
+const renderPaused = () => {
+  return renderWithProviders(
+    <Timer startTime={START_TIME} pausedAt={PAUSED_TIME} />,
+    {
+      i18nInstance: i18n,
+    }
+  )
 }
 
 describe('Timer', () => {
-  afterEach(() => {
-    resetAllWhenMocks()
-  })
-
   it('renders a start time', () => {
-    when(mockUseRunStartTime)
-      .calledWith()
-      .mockReturnValue('2021-10-07T18:44:49.366581+00:00')
-    when(mockUseRunStatus)
-      .calledWith()
-      .mockReturnValue(['loaded', '2021-10-07T18:44:49.366581+00:00'])
     const [{ getByText }] = render()
 
     expect(
@@ -41,18 +34,18 @@ describe('Timer', () => {
   })
 
   it('renders a run time', () => {
-    when(mockUseRunStartTime)
-      .calledWith()
-      .mockReturnValue('2021-10-07T18:44:49.366581+00:00')
-    when(mockUseRunStatus)
-      .calledWith()
-      .mockReturnValue(['running', '2021-10-07T18:44:49.366581+00:00'])
     const [{ getByText }] = render()
 
     expect(getByText('Run Time:')).toBeTruthy()
     expect(getByText(/^(\d{2}):(\d{2}):(\d{2})$/)).toBeTruthy()
   })
 
-  // renders a paused time when paused
-  // renders a run time that doesn't run when paused
+  // renders a paused time and a run time when paused
+  it('renders a paused time and a run time when paused', () => {
+    const [{ getAllByText, getByText }] = renderPaused()
+
+    expect(getByText('Run Time:')).toBeTruthy()
+    expect(getByText('Paused For:')).toBeTruthy()
+    expect(getAllByText(/^(\d{2}):(\d{2}):(\d{2})$/).length).toEqual(2)
+  })
 })

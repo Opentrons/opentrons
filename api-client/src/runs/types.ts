@@ -1,4 +1,4 @@
-export const RUN_STATUS_READY_TO_RUN: 'ready-to-run' = 'ready-to-run'
+export const RUN_STATUS_IDLE: 'idle' = 'idle'
 export const RUN_STATUS_RUNNING: 'running' = 'running'
 export const RUN_STATUS_PAUSE_REQUESTED: 'pause-requested' = 'pause-requested'
 export const RUN_STATUS_PAUSED: 'paused' = 'paused'
@@ -8,7 +8,7 @@ export const RUN_STATUS_FAILED: 'failed' = 'failed'
 export const RUN_STATUS_SUCCEEDED: 'succeeded' = 'succeeded'
 
 export type RunStatus =
-  | typeof RUN_STATUS_READY_TO_RUN
+  | typeof RUN_STATUS_IDLE
   | typeof RUN_STATUS_RUNNING
   | typeof RUN_STATUS_PAUSE_REQUESTED
   | typeof RUN_STATUS_PAUSED

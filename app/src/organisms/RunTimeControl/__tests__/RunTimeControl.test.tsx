@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import {
-  RUN_STATUS_READY_TO_RUN,
+  RUN_STATUS_IDLE,
   RUN_STATUS_RUNNING,
   RUN_STATUS_PAUSED,
   RUN_STATUS_STOPPED,
@@ -42,7 +42,7 @@ describe('RunTimeControl', () => {
         usePause: () => {},
         useReset: () => {},
       })
-    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_READY_TO_RUN)
+    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_IDLE)
     mockTimer.mockReturnValue(<div>Mock Timer</div>)
   })
 
