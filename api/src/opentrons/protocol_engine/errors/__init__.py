@@ -22,7 +22,7 @@ class UnexpectedProtocolError(ProtocolEngineError):
 
 
 class FailedToLoadPipetteError(ProtocolEngineError):
-    """An error raised when executing a LoadPipetteCreate fails.
+    """An error raised when executing a LoadPipette command fails.
 
     This failure may be caused by:
     - An incorrect pipette already attached to the mount

@@ -189,8 +189,8 @@ class JsonCommandTranslator:
         if command.params.wait is not True:
             raise NotImplementedError("Delay translation not yet implemented.")
 
-        data = pe_commands.PauseParams(message=command.params.message)
-        return pe_commands.PauseCreate(params=data)
+        params = pe_commands.PauseParams(message=command.params.message)
+        return pe_commands.PauseCreate(params=params)
 
     def _magnetic_module_engage(
         self,
