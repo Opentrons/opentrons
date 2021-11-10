@@ -38,7 +38,12 @@ from robot_server.service.session.models.command_definitions import (
     CommandDefinitionType,
 )
 from robot_server.service.session.models.common import EmptyModel, JogPosition
-from robot_server.service.json_api import ResponseModel, RequestModel, ResponseDataModel
+from robot_server.service.json_api import (
+    ResponseModel,
+    RequestModel,
+    ResponseDataModel,
+    ResourceLinks,
+)
 
 
 class LoadLabwareByDefinitionRequestData(BaseModel):
@@ -290,5 +295,5 @@ ResponseTypes = typing.Union[
 CommandRequest = RequestModel[RequestTypes]
 """The command request model."""
 
-CommandResponse = ResponseModel[ResponseTypes]
+CommandResponse = ResponseModel[ResponseTypes, ResourceLinks]
 """The command response model."""

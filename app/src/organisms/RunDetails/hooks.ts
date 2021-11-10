@@ -1,18 +1,24 @@
 import { useSelector } from 'react-redux'
-import { getProtocolData, getProtocolName } from '../../redux/protocol'
+import { getProtocolName } from '../../redux/protocol'
+import { useCurrentProtocolRun } from '../ProtocolUpload/useCurrentProtocolRun'
 
-import type { ProtocolFileV5 } from '@opentrons/shared-data'
+import { schemaV6Adapter, ProtocolFile } from '@opentrons/shared-data'
 import type { State } from '../../redux/types'
 
 interface ProtocolDetails {
   displayName: string | null
-  protocolData: ProtocolFileV5<{}> | null // TODO: IMMEDIATELY update to ProtocolFileV6 once schema is complete
+  protocolData: ProtocolFile<{}> | null
 }
 
 export function useProtocolDetails(): ProtocolDetails {
-  const protocolData = useSelector((state: State) =>
-    getProtocolData(state)
-  ) as ProtocolFileV5<{}> | null
+  let protocolData: ProtocolFile<{}> | null = null
+  const protocolAnalysis = useCurrentProtocolRun().protocolRecord?.data.analyses
+  if (protocolAnalysis != null) {
+    const lastProtocolAnalysis = protocolAnalysis[protocolAnalysis.length - 1]
+    if (lastProtocolAnalysis.status === 'completed') {
+      protocolData = schemaV6Adapter(lastProtocolAnalysis)
+    }
+  }
   const displayName = useSelector((state: State) => getProtocolName(state))
   return { displayName, protocolData }
 }

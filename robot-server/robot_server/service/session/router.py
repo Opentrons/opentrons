@@ -111,7 +111,8 @@ async def get_sessions_handler(
     """Get multiple sessions"""
     sessions = session_manager.get(session_type=session_type)
     return MultiSessionResponse(
-        data=[session.get_response_model() for session in sessions]
+        data=[session.get_response_model() for session in sessions],
+        links=None,
     )
 
 

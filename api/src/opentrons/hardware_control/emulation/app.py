@@ -1,86 +1,67 @@
 import asyncio
 import logging
-from opentrons.hardware_control.emulation.connection_handler import ConnectionHandler
-from opentrons.hardware_control.emulation.magdeck import MagDeckEmulator
+
+from opentrons.hardware_control.emulation.module_server import ModuleStatusServer
 from opentrons.hardware_control.emulation.parser import Parser
+from opentrons.hardware_control.emulation.proxy import Proxy
+from opentrons.hardware_control.emulation.run_emulator import run_emulator_server
 from opentrons.hardware_control.emulation.settings import Settings
-from opentrons.hardware_control.emulation.tempdeck import TempDeckEmulator
-from opentrons.hardware_control.emulation.thermocycler import ThermocyclerEmulator
 from opentrons.hardware_control.emulation.smoothie import SmoothieEmulator
+from opentrons.hardware_control.emulation.types import ModuleType
 
 logger = logging.getLogger(__name__)
 
 
-SMOOTHIE_PORT = 9996
-THERMOCYCLER_PORT = 9997
-TEMPDECK_PORT = 9998
-MAGDECK_PORT = 9999
+class Application:
+    """The emulator application."""
 
+    def __init__(self, settings: Settings) -> None:
+        """Constructor.
 
-class ServerManager:
-    """
-    Class to start and stop emulated smoothie and modules.
-    """
-
-    def __init__(self, settings=Settings()) -> None:
-        host = settings.host
-        self._mag_emulator = MagDeckEmulator(parser=Parser())
-        self._temp_emulator = TempDeckEmulator(parser=Parser())
-        self._therm_emulator = ThermocyclerEmulator(parser=Parser())
+        Args:
+            settings: Application settings.
+        """
+        self._settings = settings
+        self._status_server = ModuleStatusServer(settings.module_server)
         self._smoothie_emulator = SmoothieEmulator(
             parser=Parser(), settings=settings.smoothie
         )
-
-        self._mag_server = self._create_server(
-            host=host,
-            port=MAGDECK_PORT,
-            handler=ConnectionHandler(self._mag_emulator),
+        self._magdeck = Proxy(
+            ModuleType.Magnetic, self._status_server, self._settings.magdeck_proxy
         )
-        self._temp_server = self._create_server(
-            host=host,
-            port=TEMPDECK_PORT,
-            handler=ConnectionHandler(self._temp_emulator),
+        self._temperature = Proxy(
+            ModuleType.Temperature,
+            self._status_server,
+            self._settings.temperature_proxy,
         )
-        self._therm_server = self._create_server(
-            host=host,
-            port=THERMOCYCLER_PORT,
-            handler=ConnectionHandler(self._therm_emulator),
+        self._thermocycler = Proxy(
+            ModuleType.Thermocycler,
+            self._status_server,
+            self._settings.thermocycler_proxy,
         )
-        self._smoothie_server = self._create_server(
-            host=host,
-            port=SMOOTHIE_PORT,
-            handler=ConnectionHandler(self._smoothie_emulator),
+        self._heatershaker = Proxy(
+            ModuleType.Heatershaker,
+            self._status_server,
+            self._settings.heatershaker_proxy,
         )
 
-    async def run(self):
+    async def run(self) -> None:
+        """Run the application."""
         await asyncio.gather(
-            self._mag_server,
-            self._temp_server,
-            self._therm_server,
-            self._smoothie_server,
+            self._status_server.run(),
+            run_emulator_server(
+                host=self._settings.smoothie.host,
+                port=self._settings.smoothie.port,
+                emulator=self._smoothie_emulator,
+            ),
+            self._magdeck.run(),
+            self._temperature.run(),
+            self._thermocycler.run(),
+            self._heatershaker.run(),
         )
-
-    @staticmethod
-    async def _create_server(host: str, port: int, handler: ConnectionHandler) -> None:
-        """Run a server."""
-        server = await asyncio.start_server(handler, host, port)
-
-        async with server:
-            await server.serve_forever()
-
-    def reset(self):
-        self._smoothie_emulator.reset()
-        self._mag_emulator.reset()
-        self._temp_emulator.reset()
-        self._therm_emulator.reset()
-
-    def stop(self):
-        self._smoothie_server.close()
-        self._temp_server.close()
-        self._therm_server.close()
-        self._mag_server.close()
 
 
 if __name__ == "__main__":
     logging.basicConfig(format="%(asctime)s:%(message)s", level=logging.DEBUG)
-    asyncio.run(ServerManager().run())
+    s = Settings()
+    asyncio.run(Application(settings=s).run())

@@ -9,15 +9,19 @@ import { useHost } from '../api'
 
 export function useSessionsByTypeQuery(args: {
   sessionType: SessionType
-}): UseQueryResult<Sessions> {
+}): UseQueryResult<Sessions, Error> {
   const { sessionType } = args
   const host = useHost()
-  const query = useQuery(
-    ['session', host],
+  const query = useQuery<Sessions, Error>(
+    ['session', sessionType, host],
     () =>
       getSessions(host as HostConfig, {
         session_type: sessionType,
-      }).then(response => response.data),
+      })
+        .then(response => response.data)
+        .catch((e: Error) => {
+          throw e
+        }),
     { enabled: host !== null, refetchInterval: 5000 }
   )
 

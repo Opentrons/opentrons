@@ -4,28 +4,43 @@ import {
   RUN_ACTION_TYPE_STOP,
   createRunAction,
 } from '@opentrons/api-client'
-import { UseMutationResult, useMutation, UseMutateFunction } from 'react-query'
+import { useMutation } from 'react-query'
 import { useHost } from '../api'
+
+import type {
+  UseMutationResult,
+  UseMutateFunction,
+  UseMutationOptions,
+} from 'react-query'
 // TODO(bh, 10-27-2021): temp mock returns til fully wired. uncomment mutation callback body to mock
 // import { mockStopRunAction } from './__fixtures__'
 
 export type UseStopRunMutationResult = UseMutationResult<
   RunAction,
   unknown,
-  void
+  string
 > & {
-  stopRun: UseMutateFunction<RunAction>
+  stopRun: UseMutateFunction<RunAction, unknown, string>
 }
 
-export const useStopRunMutation = (runId: string): UseStopRunMutationResult => {
+export type UseStopRunMutationOptions = UseMutationOptions<
+  RunAction,
+  unknown,
+  string
+>
+
+export const useStopRunMutation = (
+  options?: UseStopRunMutationOptions
+): UseStopRunMutationResult => {
   const host = useHost()
-  const mutation = useMutation<RunAction>(
+  const mutation = useMutation<RunAction, unknown, string>(
     [host, 'runs', RUN_ACTION_TYPE_STOP],
-    () =>
+    (runId: string) =>
       createRunAction(host as HostConfig, runId, {
         actionType: RUN_ACTION_TYPE_STOP,
-      }).then(response => response.data)
+      }).then(response => response.data),
     // Promise.resolve(mockStopRunAction)
+    options
   )
   return {
     ...mutation,

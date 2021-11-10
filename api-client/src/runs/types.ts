@@ -1,8 +1,3 @@
-export const RUN_TYPE_BASIC: 'basic' = 'basic'
-export const RUN_TYPE_PROTOCOL: 'protocol' = 'protocol'
-
-export type RunType = typeof RUN_TYPE_BASIC | typeof RUN_TYPE_PROTOCOL
-
 export type RunStatus =
   | 'ready-to-run'
   | 'running'
@@ -13,33 +8,17 @@ export type RunStatus =
   | 'failed'
   | 'succeeded'
 
-export interface BasicRun {
+export interface RunData {
   id: string
-  runType: typeof RUN_TYPE_BASIC
   createdAt: string
   status: RunStatus
-  createParams?: Record<string, unknown>
   actions: RunAction[]
   // TODO(bh, 10-29-2021): types for commands, pipettes, labware
   commands: unknown[]
   pipettes: unknown[]
   labware: unknown[]
+  protocolId?: string
 }
-
-export interface ProtocolRun {
-  id: string
-  runType: typeof RUN_TYPE_PROTOCOL
-  createdAt: string
-  status: RunStatus
-  createParams: { protocolId: string }
-  actions: RunAction[]
-  // TODO(bh, 10-29-2021): types for commands, pipettes, labware
-  commands: unknown[]
-  pipettes: unknown[]
-  labware: unknown[]
-}
-
-export type RunData = BasicRun | ProtocolRun
 
 interface ResourceLink {
   href: string
@@ -75,4 +54,19 @@ export interface RunAction {
 
 export interface CreateRunActionData {
   actionType: RunActionType
+}
+export interface RunCommandSummary {
+  id: string
+  commandType: string
+  status: 'queued' | 'running' | 'succeeded' | 'failed'
+}
+
+export interface Command {
+  data: RunCommandSummary
+  links?: ResourceLinks
+}
+
+export interface Commands {
+  data: RunCommandSummary[]
+  links?: ResourceLinks
 }

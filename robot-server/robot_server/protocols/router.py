@@ -53,7 +53,7 @@ protocols_router = APIRouter()
     path="/protocols",
     summary="Upload a protocol",
     status_code=status.HTTP_201_CREATED,
-    response_model=ResponseModel[Protocol],
+    response_model=ResponseModel[Protocol, None],
     responses={
         status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse[ProtocolFileInvalid]},
     },
@@ -69,7 +69,7 @@ async def create_protocol(
     protocol_id: str = Depends(get_unique_id, use_cache=False),
     analysis_id: str = Depends(get_unique_id, use_cache=False),
     created_at: datetime = Depends(get_current_time),
-) -> ResponseModel[Protocol]:
+) -> ResponseModel[Protocol, None]:
     """Create a new protocol by uploading its files.
 
     Arguments:
@@ -139,20 +139,20 @@ async def create_protocol(
 
     # todo(mm, 2021-09-14): Do we need to close the UploadFiles in our `files` arg?
 
-    return ResponseModel(data=data)
+    return ResponseModel(data=data, links=None)
 
 
 @protocols_router.get(
     path="/protocols",
     summary="Get uploaded protocols",
     status_code=status.HTTP_200_OK,
-    response_model=MultiResponseModel[Protocol],
+    response_model=MultiResponseModel[Protocol, None],
 )
 async def get_protocols(
     response_builder: ResponseBuilder = Depends(ResponseBuilder),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
-) -> MultiResponseModel[Protocol]:
+) -> MultiResponseModel[Protocol, None]:
     """Get a list of all currently uploaded protocols.
 
     Arguments:
@@ -169,14 +169,14 @@ async def get_protocols(
         for r in protocol_resources
     ]
 
-    return MultiResponseModel(data=data)
+    return MultiResponseModel(data=data, links=None)
 
 
 @protocols_router.get(
     path="/protocols/{protocolId}",
     summary="Get an uploaded protocol",
     status_code=status.HTTP_200_OK,
-    response_model=ResponseModel[Protocol],
+    response_model=ResponseModel[Protocol, None],
     responses={
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[ProtocolNotFound]},
     },
@@ -186,7 +186,7 @@ async def get_protocol_by_id(
     response_builder: ResponseBuilder = Depends(ResponseBuilder),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
-) -> ResponseModel[Protocol]:
+) -> ResponseModel[Protocol, None]:
     """Get an uploaded protocol by ID.
 
     Arguments:
@@ -204,14 +204,14 @@ async def get_protocol_by_id(
 
     data = response_builder.build(resource=resource, analyses=analyses)
 
-    return ResponseModel(data=data)
+    return ResponseModel(data=data, links=None)
 
 
 @protocols_router.delete(
     path="/protocols/{protocolId}",
     summary="Delete an uploaded protocol",
     status_code=status.HTTP_200_OK,
-    response_model=EmptyResponseModel,
+    response_model=EmptyResponseModel[None],
     responses={
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[ProtocolNotFound]},
     },
@@ -219,7 +219,7 @@ async def get_protocol_by_id(
 async def delete_protocol_by_id(
     protocolId: str,
     protocol_store: ProtocolStore = Depends(get_protocol_store),
-) -> EmptyResponseModel:
+) -> EmptyResponseModel[None]:
     """Delete an uploaded protocol by ID.
 
     Arguments:
@@ -232,4 +232,4 @@ async def delete_protocol_by_id(
     except ProtocolNotFoundError as e:
         raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
-    return EmptyResponseModel()
+    return EmptyResponseModel(links=None)

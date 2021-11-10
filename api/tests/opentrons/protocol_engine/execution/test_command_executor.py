@@ -13,7 +13,6 @@ from opentrons.protocol_engine.actions import ActionDispatcher, UpdateCommandAct
 from opentrons.protocol_engine.commands import (
     AbstractCommandImpl,
     BaseCommand,
-    CommandMapper,
     CommandStatus,
     Command,
 )
@@ -70,12 +69,6 @@ def model_utils(decoy: Decoy) -> ModelUtils:
 
 
 @pytest.fixture
-def command_mapper(decoy: Decoy) -> CommandMapper:
-    """Get a mocked out CommandMapper."""
-    return decoy.mock(cls=CommandMapper)
-
-
-@pytest.fixture
 def subject(
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
@@ -84,7 +77,6 @@ def subject(
     pipetting: PipettingHandler,
     run_control: RunControlHandler,
     model_utils: ModelUtils,
-    command_mapper: CommandMapper,
 ) -> CommandExecutor:
     """Get a CommandExecutor test subject with its dependencies mocked out."""
     return CommandExecutor(
@@ -95,7 +87,6 @@ def subject(
         pipetting=pipetting,
         run_control=run_control,
         model_utils=model_utils,
-        command_mapper=command_mapper,
     )
 
 
@@ -121,7 +112,6 @@ async def test_execute(
     pipetting: PipettingHandler,
     run_control: RunControlHandler,
     model_utils: ModelUtils,
-    command_mapper: CommandMapper,
     subject: CommandExecutor,
 ) -> None:
     """It should be able execute a command."""
@@ -196,24 +186,6 @@ async def test_execute(
         datetime(year=2023, month=3, day=3),
     )
 
-    decoy.when(
-        command_mapper.update_command(
-            command=queued_command,
-            status=CommandStatus.RUNNING,
-            startedAt=datetime(year=2022, month=2, day=2),
-        )
-    ).then_return(running_command)
-
-    decoy.when(
-        command_mapper.update_command(
-            command=running_command,
-            status=CommandStatus.SUCCEEDED,
-            completedAt=datetime(year=2023, month=3, day=3),
-            result=command_result,
-            error=None,
-        )
-    ).then_return(completed_command)
-
     await subject.execute("command-id")
 
     decoy.verify(
@@ -231,7 +203,6 @@ async def test_execute_raises_protocol_engine_error(
     pipetting: PipettingHandler,
     run_control: RunControlHandler,
     model_utils: ModelUtils,
-    command_mapper: CommandMapper,
     subject: CommandExecutor,
 ) -> None:
     """It should be able execute a command."""
@@ -305,24 +276,6 @@ async def test_execute_raises_protocol_engine_error(
         datetime(year=2022, month=2, day=2),
         datetime(year=2023, month=3, day=3),
     )
-
-    decoy.when(
-        command_mapper.update_command(
-            command=queued_command,
-            status=CommandStatus.RUNNING,
-            startedAt=datetime(year=2022, month=2, day=2),
-        )
-    ).then_return(running_command)
-
-    decoy.when(
-        command_mapper.update_command(
-            command=running_command,
-            status=CommandStatus.FAILED,
-            completedAt=datetime(year=2023, month=3, day=3),
-            result=None,
-            error="oh no",
-        )
-    ).then_return(failed_command)
 
     await subject.execute("command-id")
 

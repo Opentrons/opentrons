@@ -68,7 +68,7 @@ test:
 
 .PHONY: test-with-emulator
 test-with-emulator:
-	$(pytest) -m 'requires_emulator' $(tests) $(test_opts)
+	$(pytest) $(tests) $(test_opts)
 
 .PHONY: lint
 lint:

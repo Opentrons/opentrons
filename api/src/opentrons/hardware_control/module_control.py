@@ -1,16 +1,16 @@
+from __future__ import annotations
 import logging
 import asyncio
-import os
 import re
 from typing import List, Tuple, Optional
 from glob import glob
 
 from opentrons.config import IS_ROBOT, IS_LINUX
-from opentrons.drivers.rpi_drivers import types
-from opentrons.hardware_control.modules import ModuleAtPort
-
-from .execution_manager import ExecutionManager
-from .types import AionotifyEvent
+from opentrons.drivers.rpi_drivers import types, usb, usb_simulator
+from opentrons.hardware_control.emulation.module_server.helpers import (
+    listen_module_connection,
+)
+from .types import AionotifyEvent, BoardRevision
 from . import modules
 
 
@@ -25,24 +25,34 @@ class AttachedModulesControl:
     USB port information and finally building a module object.
     """
 
-    def __init__(self, api):
+    def __init__(self, api, board_revision: BoardRevision) -> None:
         self._available_modules: List[modules.AbstractModule] = []
         self._api = api
+        self._usb = (
+            usb.USBBus(board_revision)
+            if not api.is_simulator and IS_ROBOT
+            else usb_simulator.USBBusSimulator(board_revision)
+        )
 
     @classmethod
-    async def build(cls, api_instance):
-        mc_instance = cls(api_instance)
+    async def build(
+        cls, api_instance, board_revision: BoardRevision
+    ) -> AttachedModulesControl:
+        mc_instance = cls(api_instance, board_revision)
         if not api_instance.is_simulator:
+            # Do an initial scan of modules.
             await mc_instance.register_modules(mc_instance.scan())
+            if not IS_ROBOT:
+                # Start task that registers emulated modules.
+                api_instance.loop.create_task(
+                    listen_module_connection(mc_instance.register_modules)
+                )
+
         return mc_instance
 
     @property
     def available_modules(self) -> List[modules.AbstractModule]:
         return self._available_modules
-
-    @property
-    def api(self):
-        return self._api
 
     async def build_module(
         self,
@@ -56,9 +66,9 @@ class AttachedModulesControl:
             port=port,
             usb_port=usb_port,
             which=model,
-            simulating=self.api.is_simulator,
+            simulating=self._api.is_simulator,
             loop=loop,
-            execution_manager=self.api._execution_manager,
+            execution_manager=self._api._execution_manager,
             sim_model=sim_model,
         )
 
@@ -107,14 +117,15 @@ class AttachedModulesControl:
 
         # destroy removed mods
         await self.unregister_modules(removed_mods_at_ports)
-        sorted_mods_at_port = self.api._backend._usb.match_virtual_ports(
-            new_mods_at_ports
-        )
+        sorted_mods_at_port = self._usb.match_virtual_ports(new_mods_at_ports)
 
         # build new mods
         for mod in sorted_mods_at_port:
             new_instance = await self.build_module(
-                port=mod.port, usb_port=mod.usb_port, model=mod.name, loop=self.api.loop
+                port=mod.port,
+                usb_port=mod.usb_port,
+                model=mod.name,
+                loop=self._api.loop,
             )
             self._available_modules.append(new_instance)
             log.info(
@@ -145,7 +156,7 @@ class AttachedModulesControl:
         for module in self.available_modules:
             if mod_type == module.name():
                 matching_modules.append(module)
-        if self.api.is_simulator:
+        if self._api.is_simulator:
             module_builder = {
                 "magdeck": modules.MagDeck.build,
                 "tempdeck": modules.TempDeck.build,
@@ -154,10 +165,10 @@ class AttachedModulesControl:
             if module_builder:
                 simulating_module = await module_builder(
                     port="",
-                    usb_port=self.api._backend._usb.find_port(""),
+                    usb_port=self._usb.find_port(""),
                     simulating=True,
-                    loop=self.api.loop,
-                    execution_manager=ExecutionManager(loop=self.api.loop),
+                    loop=self._api.loop,
+                    execution_manager=self._api._execution_manager,
                     sim_model=by_model.value,
                 )
                 simulated_module = simulating_module
@@ -180,21 +191,6 @@ class AttachedModulesControl:
             if module_at_port:
                 discovered_modules.append(module_at_port)
 
-        # Check for emulator environment variables
-        emulator_uri = os.environ.get("OT_THERMOCYCLER_EMULATOR_URI")
-        if emulator_uri:
-            discovered_modules.append(
-                ModuleAtPort(port=emulator_uri, name="thermocycler")
-            )
-
-        emulator_uri = os.environ.get("OT_TEMPERATURE_EMULATOR_URI")
-        if emulator_uri:
-            discovered_modules.append(ModuleAtPort(port=emulator_uri, name="tempdeck"))
-
-        emulator_uri = os.environ.get("OT_MAGNETIC_EMULATOR_URI")
-        if emulator_uri:
-            discovered_modules.append(ModuleAtPort(port=emulator_uri, name="magdeck"))
-
         log.debug("Discovered modules: {}".format(discovered_modules))
         return discovered_modules
 
@@ -212,14 +208,16 @@ class AttachedModulesControl:
             return modules.ModuleAtPort(port=f"/dev/{port}", name=name)
         return None
 
-    async def handle_module_appearance(self, event: AionotifyEvent):
+    async def handle_module_appearance(self, event: AionotifyEvent) -> None:
         """Only called upon availability of aionotify. Check that
         the file system has changed and either remove or add modules
         depending on the result.
 
-        :param event_name: The title of the even passed into aionotify.
-        :param event_flags: AionotifyFlags dataclass that maps flags listed from
-        the aionotify event.
+        Args:
+            event: The event passed from aionotify.
+
+        Returns:
+            None
         """
         maybe_module_at_port = self.get_module_at_port(event.name)
         new_modules = None

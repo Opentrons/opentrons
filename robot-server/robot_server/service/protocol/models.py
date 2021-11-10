@@ -11,6 +11,7 @@ from robot_server.service.json_api import (
     ResponseModel,
     ResponseDataModel,
     MultiResponseModel,
+    ResourceLinks,
 )
 
 from robot_server.service.legacy.models.control import Mount
@@ -97,6 +98,6 @@ class ProtocolResponseAttributes(ResponseDataModel):
     )
 
 
-ProtocolResponse = ResponseModel[ProtocolResponseAttributes]
+ProtocolResponse = ResponseModel[ProtocolResponseAttributes, ResourceLinks]
 
-MultiProtocolResponse = MultiResponseModel[ProtocolResponseAttributes]
+MultiProtocolResponse = MultiResponseModel[ProtocolResponseAttributes, ResourceLinks]

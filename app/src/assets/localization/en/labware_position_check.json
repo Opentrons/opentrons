@@ -29,7 +29,12 @@
   "labware_offsets_summary_location": "Location",
   "labware_offsets_summary_labware": "Labware",
   "labware_offsets_summary_offset": "Labware Offset Data",
-  "close_and_apply_offset_data": "Close and apply labware offset data",
   "no_labware_offsets": "No Labware Offsets",
+  "confirm_position_and_move": "Confirm position, move to slot {{next_slot}}",
+  "confirm_position_and_pick_up_tip": "Confirm position, pick up tip",
+  "confirm_position_and_return_tip": "Confirm position, return tip to Slot {{next_slot}}",
+  "close_and_apply_offset_data": "Close and apply labware offset data",
+  "error_modal_header": "Something went wrong",
+  "error_modal_text": "There was an error processing your request on the robot",
   "robot_in_motion": "Stand back, robot is in motion."
 }

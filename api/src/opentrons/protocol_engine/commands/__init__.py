@@ -14,7 +14,6 @@ and/or schema generation.
 """
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandRequest, CommandStatus
-from .command_mapper import CommandMapper
 from .command_unions import Command, CommandRequest, CommandResult, CommandType
 
 from .add_labware_definition import (
@@ -106,8 +105,6 @@ from .custom import (
 
 
 __all__ = [
-    # command model factory
-    "CommandMapper",
     # command type unions
     "Command",
     "CommandRequest",

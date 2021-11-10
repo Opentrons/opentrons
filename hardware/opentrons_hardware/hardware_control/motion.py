@@ -72,7 +72,7 @@ def create(
             ]
         )
 
-    # Move x
+    # Move y
     dy = deltas.get(NodeId.gantry_y, 0)
     if dy:
         move_groups.append(
