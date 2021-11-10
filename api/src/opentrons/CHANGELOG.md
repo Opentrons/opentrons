@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.7.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.6.2...v4.7.0-alpha.0) (2021-11-10)
+
+
+### Bug Fixes
+
+* **api:** 4.6.x set max speed fails ([#8437](https://github.com/Opentrons/opentrons/issues/8437)) ([5989af0](https://github.com/Opentrons/opentrons/commit/5989af08e19d78c8cfff65e6bb2bb415ed7e174b)), closes [#8436](https://github.com/Opentrons/opentrons/issues/8436)
+* **api:** Improve metadata parse error messages and fix metadata typechecking ([#8378](https://github.com/Opentrons/opentrons/issues/8378)) ([1015b14](https://github.com/Opentrons/opentrons/commit/1015b1459cd5da834f88925ce3f6b5eece4018ef)), closes [#8352](https://github.com/Opentrons/opentrons/issues/8352)
+* **api:** thermocycler error handling ([#8439](https://github.com/Opentrons/opentrons/issues/8439)) ([7dcff2f](https://github.com/Opentrons/opentrons/commit/7dcff2f7e0f5427c83738fca14c8d2dde7476740)), closes [#8393](https://github.com/Opentrons/opentrons/issues/8393)
+* **robot-server:** avoid LabwareDefinition type in cal models ([#8698](https://github.com/Opentrons/opentrons/issues/8698)) ([c3bf7ab](https://github.com/Opentrons/opentrons/commit/c3bf7ab51074e8b5e160ce5755be6e80296f1963)), closes [#8654](https://github.com/Opentrons/opentrons/issues/8654)
+* **robot-server:** ensure background tasks do not affect requests ([#8362](https://github.com/Opentrons/opentrons/issues/8362)) ([3e4bc2f](https://github.com/Opentrons/opentrons/commit/3e4bc2f504282c51622682001780f35d5f3e5312))
+
+
+### Features
+
+* **api:** Add hardware control for heater shaker ([#8435](https://github.com/Opentrons/opentrons/issues/8435)) ([1a68d66](https://github.com/Opentrons/opentrons/commit/1a68d66e9638206c2a4700ed0348f3137bc13789))
+* **api,robot-server:** upgrade fastapi and pydantic deps ([#8345](https://github.com/Opentrons/opentrons/issues/8345)) ([9cf416a](https://github.com/Opentrons/opentrons/commit/9cf416a498e77b2127a6e3e71298f9368f818d35)), closes [#8134](https://github.com/Opentrons/opentrons/issues/8134)
+* **ot3:** OT3Controller backend for hardware controller ([#8492](https://github.com/Opentrons/opentrons/issues/8492)) ([5600948](https://github.com/Opentrons/opentrons/commit/56009482a376b712384441f429c2e0d78192bdbd))
+
+
+
+
+
 
 
 **Note:** Version bump only for package @opentrons/api-server
