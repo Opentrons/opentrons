@@ -13,174 +13,185 @@ they are part of the public input / output of the engine, and need validation
 and/or schema generation.
 """
 
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandRequest, CommandStatus
-from .command_mapper import CommandMapper
-from .command_unions import Command, CommandRequest, CommandResult, CommandType
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, CommandStatus
+from .command_unions import Command, CommandCreate, CommandResult, CommandType
 
 from .add_labware_definition import (
     AddLabwareDefinition,
-    AddLabwareDefinitionData,
-    AddLabwareDefinitionRequest,
+    AddLabwareDefinitionParams,
+    AddLabwareDefinitionCreate,
     AddLabwareDefinitionResult,
     AddLabwareDefinitionCommandType,
 )
 
 from .aspirate import (
     Aspirate,
-    AspirateData,
-    AspirateRequest,
+    AspirateParams,
+    AspirateCreate,
     AspirateResult,
     AspirateCommandType,
 )
 
 from .dispense import (
     Dispense,
-    DispenseData,
-    DispenseRequest,
+    DispenseParams,
+    DispenseCreate,
     DispenseResult,
     DispenseCommandType,
 )
 
 from .drop_tip import (
     DropTip,
-    DropTipData,
-    DropTipRequest,
+    DropTipParams,
+    DropTipCreate,
     DropTipResult,
     DropTipCommandType,
 )
 
 from .load_labware import (
     LoadLabware,
-    LoadLabwareData,
-    LoadLabwareRequest,
+    LoadLabwareParams,
+    LoadLabwareCreate,
     LoadLabwareResult,
     LoadLabwareCommandType,
 )
 
 from .load_pipette import (
     LoadPipette,
-    LoadPipetteData,
-    LoadPipetteRequest,
+    LoadPipetteParams,
+    LoadPipetteCreate,
     LoadPipetteResult,
     LoadPipetteCommandType,
 )
 
+from .load_module import (
+    LoadModule,
+    LoadModuleParams,
+    LoadModuleCreate,
+    LoadModuleResult,
+    LoadModuleCommandType,
+)
+
 from .move_to_well import (
     MoveToWell,
-    MoveToWellData,
-    MoveToWellRequest,
+    MoveToWellParams,
+    MoveToWellCreate,
     MoveToWellResult,
     MoveToWellCommandType,
 )
 
 from .pick_up_tip import (
     PickUpTip,
-    PickUpTipData,
-    PickUpTipRequest,
+    PickUpTipParams,
+    PickUpTipCreate,
     PickUpTipResult,
     PickUpTipCommandType,
 )
 
 from .pause import (
     Pause,
-    PauseData,
-    PauseRequest,
+    PauseParams,
+    PauseCreate,
     PauseResult,
     PauseCommandType,
 )
 
 from .save_position import (
     SavePosition,
-    SavePositionData,
-    SavePositionRequest,
+    SavePositionParams,
+    SavePositionCreate,
     SavePositionResult,
     SavePositionCommandType,
 )
 
 from .custom import (
     Custom,
-    CustomData,
+    CustomParams,
     CustomResult,
     CustomCommandType,
 )
 
 
 __all__ = [
-    # command model factory
-    "CommandMapper",
     # command type unions
     "Command",
-    "CommandRequest",
+    "CommandCreate",
     "CommandResult",
     "CommandType",
     # base interfaces
     "AbstractCommandImpl",
     "BaseCommand",
-    "BaseCommandRequest",
+    "BaseCommandCreate",
     "CommandStatus",
     # load labware command models
     "LoadLabware",
-    "LoadLabwareRequest",
-    "LoadLabwareData",
+    "LoadLabwareCreate",
+    "LoadLabwareParams",
     "LoadLabwareResult",
     "LoadLabwareCommandType",
     # add labware definition command models
     "AddLabwareDefinition",
-    "AddLabwareDefinitionRequest",
-    "AddLabwareDefinitionData",
+    "AddLabwareDefinitionCreate",
+    "AddLabwareDefinitionParams",
     "AddLabwareDefinitionResult",
     "AddLabwareDefinitionCommandType",
     # load pipette command models
     "LoadPipette",
-    "LoadPipetteRequest",
-    "LoadPipetteData",
+    "LoadPipetteCreate",
+    "LoadPipetteParams",
     "LoadPipetteResult",
     "LoadPipetteCommandType",
+    # load module command models
+    "LoadModule",
+    "LoadModuleCreate",
+    "LoadModuleParams",
+    "LoadModuleResult",
+    "LoadModuleCommandType",
     # move to well command models
     "MoveToWell",
-    "MoveToWellRequest",
-    "MoveToWellData",
+    "MoveToWellCreate",
+    "MoveToWellParams",
     "MoveToWellResult",
     "MoveToWellCommandType",
     # pick up tip command models
     "PickUpTip",
-    "PickUpTipRequest",
-    "PickUpTipData",
+    "PickUpTipCreate",
+    "PickUpTipParams",
     "PickUpTipResult",
     "PickUpTipCommandType",
     # drop tip command models
     "DropTip",
-    "DropTipRequest",
-    "DropTipData",
+    "DropTipCreate",
+    "DropTipParams",
     "DropTipResult",
     "DropTipCommandType",
     # aspirate command models
     "Aspirate",
-    "AspirateRequest",
-    "AspirateData",
+    "AspirateCreate",
+    "AspirateParams",
     "AspirateResult",
     "AspirateCommandType",
     # dispense command models
     "Dispense",
-    "DispenseRequest",
-    "DispenseData",
+    "DispenseCreate",
+    "DispenseParams",
     "DispenseResult",
     "DispenseCommandType",
     # pause command models
     "Pause",
-    "PauseData",
-    "PauseRequest",
+    "PauseParams",
+    "PauseCreate",
     "PauseResult",
     "PauseCommandType",
     # save position command models
     "SavePosition",
-    "SavePositionData",
-    "SavePositionRequest",
+    "SavePositionParams",
+    "SavePositionCreate",
     "SavePositionResult",
     "SavePositionCommandType",
     # custom command models
     "Custom",
-    "CustomData",
+    "CustomParams",
     "CustomResult",
     "CustomCommandType",
 ]

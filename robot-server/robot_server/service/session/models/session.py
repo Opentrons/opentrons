@@ -21,6 +21,7 @@ from robot_server.service.json_api import (
     ResponseModel,
     ResponseDataModel,
     MultiResponseModel,
+    ResourceLinks,
 )
 from robot_server.service.session.models.common import EmptyModel
 from robot_server.service.session.session_types.protocol.models import (
@@ -196,5 +197,5 @@ ResponseTypes = typing.Union[
 
 # Session create and query requests/responses
 SessionCreateRequest = RequestModel[RequestTypes]
-SessionResponse = ResponseModel[ResponseTypes]
-MultiSessionResponse = MultiResponseModel[ResponseTypes]
+SessionResponse = ResponseModel[ResponseTypes, ResourceLinks]
+MultiSessionResponse = MultiResponseModel[ResponseTypes, None]

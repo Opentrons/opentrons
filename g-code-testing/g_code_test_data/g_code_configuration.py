@@ -1,4 +1,5 @@
 from typing import Callable, List, Type
+from typing_extensions import Final
 
 import pytest
 from _pytest.mark.structures import Mark
@@ -13,25 +14,18 @@ BUCKET_NAME = "g-code-comparison"
 
 
 class SharedFunctionsMixin:
-    """
-    Functions that GCodeConfirmConfig classes share
-    """
+    """Functions that GCodeConfirmConfig classes share."""
 
-    def get_configuration_path(self):
+    def get_configuration_path(self) -> str:
+        """Get the configuration file path."""
         return f'{self.driver}/{self.name}'
 
-    def get_master_file_path(self):
-        """
-        Get that path of the file in S3
-        :return: str
-        """
-        return f'{self.get_configuration_path()}.txt'
+    def get_master_file_path(self) -> str:
+        """Get that path of the file in S3."""
+        return self.s3_path
 
-    def get_master_file(self):
-        """
-        Pull file from S3 and print it's content
-        :return: str
-        """
+    def get_master_file(self) -> str:
+        """Pull file from S3 and print it's content."""
         s3 = boto3.resource("s3")
         master_file = (
             s3.Object(BUCKET_NAME, self.get_master_file_path())
@@ -42,11 +36,8 @@ class SharedFunctionsMixin:
         )
         return master_file.strip()
 
-    def upload(self):
-        """
-        Run config and upload it to S3
-        :return:
-        """
+    def upload(self) -> None:
+        """Run config and upload it to S3."""
         s3 = boto3.resource("s3")
         file_name = self.get_master_file_path()
         g_code_object = s3.Object(BUCKET_NAME, file_name)
@@ -59,7 +50,7 @@ class SharedFunctionsMixin:
         else:
             print(f'{file_name} Not Uploaded')
 
-    def add_mark(self, user_mark: Mark):
+    def add_mark(self, user_mark: Mark) -> None:
         self.marks.append(user_mark)
 
     def generate_pytest_param(self):
@@ -84,7 +75,8 @@ class ProtocolGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
     name: constr(regex=r'^[a-z0-9_]*$')
     path: str
     settings: Settings
-    driver = 'protocol'
+    s3_path: str
+    driver: str = 'protocol'
     marks: List[Mark] = [pytest.mark.g_code_confirm]
 
     class Config:
@@ -99,7 +91,8 @@ class HTTPGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
     name: constr(regex=r'^[a-z0-9_]*$')
     executable: Callable
     settings: Settings
-    driver = 'http'
+    s3_path: str
+    driver: str = 'http'
     marks: List[Mark] = [pytest.mark.g_code_confirm]
 
     class Config:
@@ -108,5 +101,3 @@ class HTTPGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
     def execute(self):
         with GCodeEngine(self.settings).run_http(self.executable) as program:
             return program.get_text_explanation(SupportedTextModes.CONCISE)
-
-

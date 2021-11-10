@@ -1,4 +1,5 @@
 """Tests for the ProtocolRunner's LegacyContextPlugin."""
+import pytest
 from decoy import matchers
 from datetime import datetime
 
@@ -11,14 +12,15 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_runner.legacy_command_mapper import (
     LegacyCommandMapper,
-    LegacyCommandData,
+    LegacyCommandParams,
 )
 from opentrons.protocol_runner.legacy_wrappers import (
     LegacyInstrumentLoadInfo,
     LegacyLabwareLoadInfo,
+    LegacyModuleLoadInfo,
 )
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons.types import DeckSlotName, Mount, MountType
+from opentrons.types import DeckLocation, DeckSlotName, Mount, MountType
 
 
 def test_map_before_command() -> None:
@@ -38,7 +40,7 @@ def test_map_before_command() -> None:
         status=pe_commands.CommandStatus.RUNNING,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
-        data=LegacyCommandData(
+        params=LegacyCommandParams(
             legacyCommandType="command.PAUSE",
             legacyCommandText="hello world",
         ),
@@ -71,7 +73,7 @@ def test_map_after_command() -> None:
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        data=LegacyCommandData(
+        params=LegacyCommandParams(
             legacyCommandType="command.PAUSE",
             legacyCommandText="hello world",
         ),
@@ -104,7 +106,7 @@ def test_map_after_with_error_command() -> None:
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        data=LegacyCommandData(
+        params=LegacyCommandParams(
             legacyCommandType="command.PAUSE",
             legacyCommandText="hello world",
         ),
@@ -150,7 +152,7 @@ def test_command_stack() -> None:
         status=pe_commands.CommandStatus.RUNNING,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
-        data=LegacyCommandData(
+        params=LegacyCommandParams(
             legacyCommandType="command.PAUSE",
             legacyCommandText="hello",
         ),
@@ -160,7 +162,7 @@ def test_command_stack() -> None:
         status=pe_commands.CommandStatus.RUNNING,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
-        data=LegacyCommandData(
+        params=LegacyCommandParams(
             legacyCommandType="command.PAUSE",
             legacyCommandText="goodbye",
         ),
@@ -171,7 +173,7 @@ def test_command_stack() -> None:
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        data=LegacyCommandData(
+        params=LegacyCommandParams(
             legacyCommandType="command.PAUSE",
             legacyCommandText="goodbye",
         ),
@@ -182,7 +184,7 @@ def test_command_stack() -> None:
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        data=LegacyCommandData(
+        params=LegacyCommandParams(
             legacyCommandType="command.PAUSE",
             legacyCommandText="hello",
         ),
@@ -204,8 +206,8 @@ def test_map_labware_load(minimal_labware_def: LabwareDefinition) -> None:
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        data=pe_commands.LoadLabwareData.construct(
-            location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+        params=pe_commands.LoadLabwareParams.construct(
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             namespace="some_namespace",
             loadName="some_load_name",
             version=123,
@@ -214,7 +216,7 @@ def test_map_labware_load(minimal_labware_def: LabwareDefinition) -> None:
         result=pe_commands.LoadLabwareResult.construct(
             labwareId=matchers.IsA(str),
             # Trusting that the exact fields within in the labware definition
-            # get passed through corectly.
+            # get passed through correctly.
             definition=matchers.Anything(),
             calibration=CalibrationOffset(x=0, y=0, z=0),
         ),
@@ -236,11 +238,43 @@ def test_map_instrument_load() -> None:
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        data=pe_commands.LoadPipetteData.construct(
+        params=pe_commands.LoadPipetteParams.construct(
             pipetteName=PipetteName.P1000_SINGLE_GEN2, mount=MountType.LEFT
         ),
         result=pe_commands.LoadPipetteResult.construct(pipetteId=matchers.IsA(str)),
     )
 
     output = LegacyCommandMapper().map_instrument_load(input)
+    assert output == expected_output
+
+
+@pytest.mark.parametrize(
+    argnames=["module_name", "location", "slot"],
+    argvalues=[
+        ["module-1", 1, DeckSlotName.SLOT_1],
+        ["Thermocycler", None, DeckSlotName.SLOT_7],
+    ],
+)
+def test_map_module_load(
+    module_name: str, location: DeckLocation, slot: DeckSlotName
+) -> None:
+    """It should correctly map a module load."""
+    input = LegacyModuleLoadInfo(
+        module_name=module_name,
+        location=location,
+        configuration="conf",
+    )
+    expected_output = pe_commands.LoadModule.construct(
+        id=matchers.IsA(str),
+        status=pe_commands.CommandStatus.SUCCEEDED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        params=pe_commands.LoadModuleParams.construct(
+            model=module_name,
+            location=DeckSlotLocation(slotName=slot),
+        ),
+        result=pe_commands.LoadModuleResult.construct(moduleId=matchers.IsA(str)),
+    )
+    output = LegacyCommandMapper().map_module_load(input)
     assert output == expected_output

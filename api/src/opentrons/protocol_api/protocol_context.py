@@ -115,6 +115,7 @@ class ProtocolContext(CommandPublisher):
 
         self._labware_load_broker = EquipmentBroker[LabwareLoadInfo]()
         self._instrument_load_broker = EquipmentBroker[InstrumentLoadInfo]()
+        self._module_load_broker = EquipmentBroker[ModuleLoadInfo]()
 
     @property
     def labware_load_broker(self) -> EquipmentBroker[LabwareLoadInfo]:
@@ -139,6 +140,16 @@ class ProtocolContext(CommandPublisher):
         Like `labware_load_broker`, but for pipettes.
         """
         return self._instrument_load_broker
+
+    @property
+    def module_load_broker(self) -> EquipmentBroker[ModuleLoadInfo]:
+        """For internal Opentrons use only.
+
+        :meta private:
+
+        Like `labware_load_broker`, but for modules.
+        """
+        return self._module_load_broker
 
     @classmethod
     def build_using(
@@ -545,6 +556,12 @@ class ProtocolContext(CommandPublisher):
             self, module.module, module.geometry, self.api_version, self._loop
         )
         self._modules.append(module_context)
+
+        self.module_load_broker.publish(
+            ModuleLoadInfo(
+                module_name=module_name, location=location, configuration=configuration
+            )
+        )
         return module_context
 
     @property  # type: ignore
@@ -835,3 +852,17 @@ class InstrumentLoadInfo:
 
     instrument_load_name: str
     mount: types.Mount
+
+
+@dataclass(frozen=True)
+class ModuleLoadInfo:
+    """For Opentrons internal use only.
+
+    :meta private:
+
+    Like `LabwareLoadInfo`, but for hardware modules.
+    """
+
+    module_name: str
+    location: Optional[types.DeckLocation]
+    configuration: Optional[str]

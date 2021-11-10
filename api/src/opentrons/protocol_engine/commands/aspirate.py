@@ -4,54 +4,54 @@ from typing import Optional, Type
 from typing_extensions import Literal
 
 
-from .pipetting_common import BaseLiquidHandlingData, BaseLiquidHandlingResult
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandRequest
+from .pipetting_common import BaseLiquidHandlingParams, BaseLiquidHandlingResult
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 AspirateCommandType = Literal["aspirate"]
 
 
-class AspirateData(BaseLiquidHandlingData):
-    """Data required to aspirate from a specific well."""
+class AspirateParams(BaseLiquidHandlingParams):
+    """Parameters required to aspirate from a specific well."""
 
     pass
 
 
 class AspirateResult(BaseLiquidHandlingResult):
-    """Result data from the execution of a AspirateRequest."""
+    """Result data from execution of an Aspirate command."""
 
     pass
 
 
-class AspirateImplementation(AbstractCommandImpl[AspirateData, AspirateResult]):
+class AspirateImplementation(AbstractCommandImpl[AspirateParams, AspirateResult]):
     """Aspirate command implementation."""
 
-    async def execute(self, data: AspirateData) -> AspirateResult:
+    async def execute(self, params: AspirateParams) -> AspirateResult:
         """Move to and aspirate from the requested well."""
         volume = await self._pipetting.aspirate(
-            pipette_id=data.pipetteId,
-            labware_id=data.labwareId,
-            well_name=data.wellName,
-            well_location=data.wellLocation,
-            volume=data.volume,
+            pipette_id=params.pipetteId,
+            labware_id=params.labwareId,
+            well_name=params.wellName,
+            well_location=params.wellLocation,
+            volume=params.volume,
         )
 
         return AspirateResult(volume=volume)
 
 
-class Aspirate(BaseCommand[AspirateData, AspirateResult]):
+class Aspirate(BaseCommand[AspirateParams, AspirateResult]):
     """Aspirate command model."""
 
     commandType: AspirateCommandType = "aspirate"
-    data: AspirateData
+    params: AspirateParams
     result: Optional[AspirateResult]
 
     _ImplementationCls: Type[AspirateImplementation] = AspirateImplementation
 
 
-class AspirateRequest(BaseCommandRequest[AspirateData]):
+class AspirateCreate(BaseCommandCreate[AspirateParams]):
     """Create aspirate command request model."""
 
     commandType: AspirateCommandType = "aspirate"
-    data: AspirateData
+    params: AspirateParams
 
     _CommandCls: Type[Aspirate] = Aspirate

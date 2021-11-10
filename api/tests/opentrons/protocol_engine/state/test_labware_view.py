@@ -21,28 +21,28 @@ from opentrons.protocol_engine.state.labware import LabwareState, LabwareView
 plate = LoadedLabware(
     id="plate-id",
     loadName="plate-load-name",
-    location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+    location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
     definitionUri="some-plate-uri",
 )
 
 reservoir = LoadedLabware(
     id="reservoir-id",
     loadName="reservoir-load-name",
-    location=DeckSlotLocation(slot=DeckSlotName.SLOT_2),
+    location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
     definitionUri="some-reservoir-uri",
 )
 
 tube_rack = LoadedLabware(
     id="tube-rack-id",
     loadName="tube-rack-load-name",
-    location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+    location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
     definitionUri="some-tube-rack-uri",
 )
 
 tip_rack = LoadedLabware(
     id="tip-rack-id",
     loadName="tip-rack-load-name",
-    location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+    location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
     definitionUri="some-tip-rack-uri",
 )
 
@@ -120,7 +120,7 @@ def test_get_labware_location() -> None:
 
     result = subject.get_location("plate-id")
 
-    assert result == DeckSlotLocation(slot=DeckSlotName.SLOT_1)
+    assert result == DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
 
 
 def test_get_has_quirk(
@@ -267,7 +267,7 @@ def test_get_labware_uri_from_definition(tip_rack_def: LabwareDefinition) -> Non
     tip_rack = LoadedLabware(
         id="tip-rack-id",
         loadName="tip-rack-load-name",
-        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         definitionUri="some-tip-rack-uri",
     )
 

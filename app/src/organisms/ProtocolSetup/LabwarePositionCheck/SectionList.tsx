@@ -94,6 +94,7 @@ export function SectionList(props: Props): JSX.Element {
                     ? C_SELECTED_DARK
                     : sectionTextColor
                 }
+                id={`sectionList_step_${index}`}
               >
                 {t(`${section.toLowerCase()}_section`, {
                   primary_mount: capitalize(primaryPipetteMount),

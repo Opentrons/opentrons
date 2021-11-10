@@ -330,19 +330,27 @@ class GetStatusSpec(NamedTuple):
 get_status_specs: List[GetStatusSpec] = [
     GetStatusSpec(
         subject=get_command_view(
-            is_running=False,
+            is_running=True,
             stop_requested=False,
             commands_by_id=[],
         ),
-        expected_status=EngineStatus.READY_TO_RUN,
+        expected_status=EngineStatus.IDLE,
     ),
     GetStatusSpec(
         subject=get_command_view(
-            is_running=False,
+            is_running=True,
             stop_requested=False,
             commands_by_id=[("command-id", create_pending_command())],
         ),
-        expected_status=EngineStatus.READY_TO_RUN,
+        expected_status=EngineStatus.RUNNING,
+    ),
+    GetStatusSpec(
+        subject=get_command_view(
+            is_running=True,
+            stop_requested=False,
+            commands_by_id=[("command-id", create_running_command())],
+        ),
+        expected_status=EngineStatus.RUNNING,
     ),
     GetStatusSpec(
         subject=get_command_view(
@@ -365,11 +373,11 @@ get_status_specs: List[GetStatusSpec] = [
     ),
     GetStatusSpec(
         subject=get_command_view(
-            is_running=True,
+            is_running=False,
             stop_requested=False,
             commands_by_id=[],
         ),
-        expected_status=EngineStatus.RUNNING,
+        expected_status=EngineStatus.PAUSED,
     ),
     GetStatusSpec(
         subject=get_command_view(
@@ -377,7 +385,7 @@ get_status_specs: List[GetStatusSpec] = [
             stop_requested=False,
             commands_by_id=[("command-id", create_failed_command())],
         ),
-        expected_status=EngineStatus.FAILED,
+        expected_status=EngineStatus.IDLE,
     ),
     GetStatusSpec(
         subject=get_command_view(
@@ -385,7 +393,7 @@ get_status_specs: List[GetStatusSpec] = [
             stop_requested=False,
             commands_by_id=[("command-id", create_failed_command())],
         ),
-        expected_status=EngineStatus.FAILED,
+        expected_status=EngineStatus.PAUSED,
     ),
     GetStatusSpec(
         subject=get_command_view(
@@ -393,7 +401,7 @@ get_status_specs: List[GetStatusSpec] = [
             stop_requested=True,
             commands_by_id=[("command-id", create_failed_command())],
         ),
-        expected_status=EngineStatus.STOPPED,
+        expected_status=EngineStatus.FAILED,
     ),
     GetStatusSpec(
         subject=get_command_view(
@@ -437,13 +445,13 @@ get_status_specs: List[GetStatusSpec] = [
 def test_get_status(subject: CommandView, expected_status: EngineStatus) -> None:
     """It should set a status according to the command queue and running flag.
 
-    1. Not running, no stop requested, only queued commands: READY_TO_RUN
-    2. Running, no stop requested, no failed commands: RUNNING
-    3. Not running, no stop requested, command still running: PAUSE_REQUESTED
-    4. Not running, no stop requested, no running commands: PAUSED
+    1. Worker running, no stop requested, no commands queued: IDLE
+    2. Worker running, no stop requested, commands queued: RUNNING
+    3. Worker not running, no stop requested, command running: PAUSE_REQUESTED
+    4. Worker not running, no stop requested, no running commands: PAUSED
     5. Stop requested, command still running: STOP_REQUESTED
     6. Stop requested, no running commands, with queued commands: STOPPED
     7. Stop requested, all commands succeeded: SUCCEEDED
-    8. No stop requested, any failed commands: FAILED
+    8. Stop requested, any failed commands: FAILED
     """
     assert subject.get_status() == expected_status

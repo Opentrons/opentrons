@@ -9,7 +9,7 @@ import type { TimingCommand } from './timing'
 // the command's identity and parameters which can be known prior to runtime
 interface CommandRunTimeInfo {
   status?: 'queued' | 'running' | 'succeeded' | 'failed'
-  error?: string
+  error?: string | null
   createdAt?: string
   startedAt?: string
   completedAt?: string
@@ -18,6 +18,7 @@ interface CommandRunTimeInfo {
 // all commands must have an id
 export interface CommonCommandInfo extends CommandRunTimeInfo {
   id: string
+  result?: any // TODO: gather types for what each command's expected result should be
 }
 
 export type Command =

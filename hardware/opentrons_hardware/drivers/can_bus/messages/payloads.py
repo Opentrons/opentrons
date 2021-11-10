@@ -109,3 +109,14 @@ class MoveCompletedPayload(MoveGroupRequestPayload):
     seq_id: utils.UInt8Field
     ack_id: utils.UInt8Field
     node_id: utils.UInt8Field
+
+
+@dataclass
+class GetMoveStatusResponsePayload(MoveGroupRequestPayload):
+    """Read status of current move being executed."""
+
+    seq_id: utils.UInt8Field
+    remaining_duration: utils.UInt64Field
+    current_position: utils.UInt64Field
+    node_id: utils.UInt8Field
+    padding: utils.UInt8Field

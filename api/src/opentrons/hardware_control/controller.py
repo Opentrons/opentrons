@@ -11,7 +11,7 @@ except (OSError, ModuleNotFoundError):
     aionotify = None
 
 from opentrons.drivers.smoothie_drivers import SmoothieDriver
-from opentrons.drivers.rpi_drivers import build_gpio_chardev, usb
+from opentrons.drivers.rpi_drivers import build_gpio_chardev
 import opentrons.config
 from opentrons.config import pipette_config
 from opentrons.config.types import RobotConfig
@@ -77,7 +77,6 @@ class Controller:
             config=self.config, gpio_chardev=self._gpio_chardev
         )
         self._cached_fw_version: Optional[str] = None
-        self._usb = usb.USBBus(self._board_revision)
         self._module_controls: Optional[AttachedModulesControl] = None
         try:
             self._event_watcher = self._build_event_watcher()

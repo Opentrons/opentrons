@@ -4,16 +4,19 @@ Contains routes dealing primarily with `Run` models.
 """
 from fastapi import APIRouter, Depends, status
 from datetime import datetime
-from typing import Optional
+from pydantic import BaseModel, Field
+from typing import Optional, Union
 from typing_extensions import Literal
 
 from robot_server.errors import ErrorDetails, ErrorResponse
 from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.service.task_runner import TaskRunner
 from robot_server.service.json_api import (
+    RequestModel,
     ResponseModel,
     EmptyResponseModel,
     MultiResponseModel,
+    ResourceLink,
 )
 
 from robot_server.protocols import (
@@ -23,11 +26,10 @@ from robot_server.protocols import (
     get_protocol_store,
 )
 
-from ..run_store import RunStore, RunNotFoundError
+from ..run_store import RunStore, RunResource, RunNotFoundError
 from ..run_view import RunView
-from ..run_models import Run, ProtocolRunCreateData
-from ..schema_models import CreateRunRequest, RunResponse
-from ..engine_store import EngineStore, EngineConflictError, EngineMissingError
+from ..run_models import Run, RunCreate, RunUpdate
+from ..engine_store import EngineStore, EngineConflictError
 from ..dependencies import get_run_store, get_engine_store
 
 base_router = APIRouter()
@@ -54,7 +56,7 @@ class RunNotIdle(ErrorDetails):
     title: str = "Run is not idle."
     detail: str = (
         "Run is currently active. Allow the run to finish or"
-        " stop it with a `stop` action before attempting to delete it."
+        " stop it with a `stop` action before attempting to modify it."
     )
 
 
@@ -65,21 +67,28 @@ class RunStopped(ErrorDetails):
     title: str = "Run Stopped"
 
 
+class AllRunsLinks(BaseModel):
+    """Links returned along with a collection of runs."""
+
+    current: Optional[ResourceLink] = Field(
+        None,
+        description="Path to the currently active run, if a run is active.",
+    )
+
+
 @base_router.post(
     path="/runs",
     summary="Create a run",
     description="Create a new run to track robot interaction.",
     status_code=status.HTTP_201_CREATED,
-    # TODO(mc, 2021-06-23): mypy >= 0.780 broke Unions as `response_model`
-    # see https://github.com/tiangolo/fastapi/issues/2279
-    response_model=RunResponse,  # type: ignore[arg-type]
+    response_model=ResponseModel[Run, None],
     responses={
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[ProtocolNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorResponse[RunAlreadyActive]},
     },
 )
 async def create_run(
-    request_body: Optional[CreateRunRequest] = None,
+    request_body: Optional[RequestModel[RunCreate]] = None,
     run_view: RunView = Depends(RunView),
     run_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
@@ -87,7 +96,7 @@ async def create_run(
     run_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
     task_runner: TaskRunner = Depends(TaskRunner),
-) -> ResponseModel[Run]:
+) -> ResponseModel[Run, None]:
     """Create a new run.
 
     Arguments:
@@ -100,33 +109,34 @@ async def create_run(
         created_at: Timestamp to attach to created run.
         task_runner: Background task runner.
     """
-    create_data = request_body.data if request_body is not None else None
-    run = run_view.as_resource(
-        run_id=run_id,
-        created_at=created_at,
-        create_data=create_data,
-    )
-    protocol_id = None
+    protocol_id = request_body.data.protocolId if request_body is not None else None
+    protocol_resource = None
 
-    if isinstance(create_data, ProtocolRunCreateData):
-        protocol_id = create_data.createParams.protocolId
+    if protocol_id is not None:
+        try:
+            protocol_resource = protocol_store.get(protocol_id=protocol_id)
+        except ProtocolNotFoundError as e:
+            raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
     try:
         engine_state = await engine_store.create(run_id=run_id)
-
-        if protocol_id is not None:
-            protocol_resource = protocol_store.get(protocol_id=protocol_id)
-            engine_store.runner.load(protocol_resource)
-
-        # TODO(mc, 2021-08-05): capture errors from `runner.join` and place
-        # them in the run resource
-        task_runner.run(engine_store.runner.join)
-
-    except ProtocolNotFoundError as e:
-        raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
-
     except EngineConflictError as e:
         raise RunAlreadyActive(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
+
+    if protocol_resource is not None:
+        engine_store.runner.load(protocol_resource)
+
+    # TODO(mc, 2021-08-05): capture errors from `runner.join` and place
+    # them in the run resource
+    task_runner.run(engine_store.runner.join)
+
+    run = RunResource(
+        run_id=run_id,
+        protocol_id=protocol_id,
+        created_at=created_at,
+        is_current=True,
+        actions=[],
+    )
 
     run_store.upsert(run=run)
 
@@ -138,7 +148,7 @@ async def create_run(
         engine_status=engine_state.commands.get_status(),
     )
 
-    return ResponseModel(data=data)
+    return ResponseModel(data=data, links=None)
 
 
 @base_router.get(
@@ -146,21 +156,22 @@ async def create_run(
     summary="Get all runs",
     description="Get a list of all active and inactive runs.",
     status_code=status.HTTP_200_OK,
-    response_model=MultiResponseModel[Run],
+    response_model=MultiResponseModel[Run, AllRunsLinks],
 )
 async def get_runs(
     run_view: RunView = Depends(RunView),
     run_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
-) -> MultiResponseModel[Run]:
+) -> MultiResponseModel[Run, AllRunsLinks]:
     """Get all runs.
 
     Args:
-        run_view: Run model construction interface.
+        run_view: Run model manipulation interface.
         run_store: Run storage interface.
         engine_store: ProtocolEngine storage and control.
     """
     data = []
+    links = AllRunsLinks()
 
     for run in run_store.get_all():
         run_id = run.run_id
@@ -175,7 +186,10 @@ async def get_runs(
 
         data.append(run_data)
 
-    return MultiResponseModel(data=data)
+        if run.is_current:
+            links.current = ResourceLink(href=f"/runs/{run.run_id}")
+
+    return MultiResponseModel(data=data, links=links)
 
 
 @base_router.get(
@@ -183,9 +197,7 @@ async def get_runs(
     summary="Get a run",
     description="Get a specific run by its unique identifier.",
     status_code=status.HTTP_200_OK,
-    # TODO(mc, 2021-06-23): mypy >= 0.780 broke Unions as `response_model`
-    # see https://github.com/tiangolo/fastapi/issues/2279
-    response_model=RunResponse,  # type: ignore[arg-type]
+    response_model=ResponseModel[Run, None],
     responses={status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]}},
 )
 async def get_run(
@@ -193,12 +205,12 @@ async def get_run(
     run_view: RunView = Depends(RunView),
     run_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
-) -> ResponseModel[Run]:
+) -> ResponseModel[Run, None]:
     """Get a run by its ID.
 
     Args:
         runId: Run ID pulled from URL.
-        run_view: Run model construction interface.
+        run_view: Run model manipulation interface.
         run_store: Run storage interface.
         engine_store: ProtocolEngine storage and control.
     """
@@ -217,7 +229,7 @@ async def get_run(
         engine_status=engine_state.commands.get_status(),
     )
 
-    return ResponseModel(data=data)
+    return ResponseModel(data=data, links=None)
 
 
 @base_router.delete(
@@ -225,14 +237,14 @@ async def get_run(
     summary="Delete a run",
     description="Delete a specific run by its unique identifier.",
     status_code=status.HTTP_200_OK,
-    response_model=EmptyResponseModel,
+    response_model=EmptyResponseModel[None],
     responses={status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]}},
 )
-async def remove_run_by_id(
+async def remove_run(
     runId: str,
     run_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
-) -> EmptyResponseModel:
+) -> EmptyResponseModel[None]:
     """Delete a run by its ID.
 
     Arguments:
@@ -241,17 +253,75 @@ async def remove_run_by_id(
         engine_store: ProtocolEngine storage and control.
     """
     try:
-        engine_state = engine_store.get_state(runId)
-    except EngineMissingError:
-        pass
-    else:
-        if not engine_state.commands.get_is_stopped():
-            raise RunNotIdle().as_error(status.HTTP_409_CONFLICT)
+        engine_store.clear()
+    except EngineConflictError:
+        raise RunNotIdle().as_error(status.HTTP_409_CONFLICT)
 
     try:
-        engine_store.clear()
         run_store.remove(run_id=runId)
     except RunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
-    return EmptyResponseModel()
+    return EmptyResponseModel(links=None)
+
+
+@base_router.patch(
+    path="/runs/{runId}",
+    summary="Update a run",
+    description="Update a specific run, returing the updated resource.",
+    status_code=status.HTTP_200_OK,
+    response_model=ResponseModel[Run, None],
+    responses={
+        status.HTTP_409_CONFLICT: {
+            "model": ErrorResponse[Union[RunStopped, RunNotIdle]]
+        },
+        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
+    },
+)
+async def update_run(
+    runId: str,
+    request_body: RequestModel[RunUpdate],
+    run_view: RunView = Depends(RunView),
+    run_store: RunStore = Depends(get_run_store),
+    engine_store: EngineStore = Depends(get_engine_store),
+) -> ResponseModel[Run, None]:
+    """Update a run by its ID.
+
+    Args:
+        runId: Run ID pulled from URL.
+        request_body: Update data from request body.
+        run_view: Run model manipulation interface.
+        run_store: Run storage interface.
+        engine_store: ProtocolEngine storage and control.
+    """
+    update = request_body.data
+
+    try:
+        run = run_store.get(run_id=runId)
+    except RunNotFoundError as e:
+        raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
+
+    if run.is_current is False:
+        raise RunStopped(detail=f"Run {runId} is not the current run").as_error(
+            status.HTTP_409_CONFLICT
+        )
+    elif update.current is False:
+        run = run_view.with_update(run=run, update=update)
+
+        try:
+            engine_store.clear()
+        except EngineConflictError:
+            raise RunNotIdle().as_error(status.HTTP_409_CONFLICT)
+
+        run_store.upsert(run)
+
+    engine_state = engine_store.get_state(run.run_id)
+    data = run_view.as_response(
+        run=run,
+        commands=engine_state.commands.get_all(),
+        pipettes=engine_state.pipettes.get_all(),
+        labware=engine_state.labware.get_all(),
+        engine_status=engine_state.commands.get_status(),
+    )
+
+    return ResponseModel(data=data, links=None)

@@ -28,5 +28,6 @@
     "rootDir": "src",
     "outDir": "lib"
   },
-  "include": ["typings", "src"]
+  "include": ["typings", "src"],
+  "exclude": ["**/*.stories.tsx"]
 }

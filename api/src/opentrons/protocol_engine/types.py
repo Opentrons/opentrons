@@ -10,7 +10,7 @@ from opentrons.types import MountType, DeckSlotName
 class EngineStatus(str, Enum):
     """Current execution status of a ProtocolEngine."""
 
-    READY_TO_RUN = "ready-to-run"
+    IDLE = "idle"
     RUNNING = "running"
     PAUSE_REQUESTED = "pause-requested"
     PAUSED = "paused"
@@ -23,7 +23,7 @@ class EngineStatus(str, Enum):
 class DeckSlotLocation(BaseModel):
     """The location of something placed in a single deck slot."""
 
-    slot: DeckSlotName
+    slotName: DeckSlotName
 
 
 LabwareLocation = Union[DeckSlotLocation]
@@ -62,7 +62,7 @@ class Dimensions:
 
 
 class CalibrationOffset(BaseModel):
-    """Calibration offset from nomimal to actual position."""
+    """Calibration offset from nominal to actual position."""
 
     x: float
     y: float

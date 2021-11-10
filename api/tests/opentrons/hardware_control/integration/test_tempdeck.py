@@ -1,17 +1,22 @@
 import asyncio
+from typing import Iterator
 
 import pytest
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control import ExecutionManager
-from opentrons.hardware_control.emulation.app import TEMPDECK_PORT
+from opentrons.hardware_control.emulation.settings import Settings
 from opentrons.hardware_control.modules import TempDeck
 
 
 @pytest.fixture
-async def tempdeck(loop: asyncio.BaseEventLoop, emulation_app) -> TempDeck:
+async def tempdeck(
+    loop: asyncio.BaseEventLoop,
+    emulator_settings: Settings,
+    emulation_app: Iterator[None],
+) -> TempDeck:
     execution_manager = ExecutionManager(loop)
     module = await TempDeck.build(
-        port=f"socket://127.0.0.1:{TEMPDECK_PORT}",
+        port=f"socket://127.0.0.1:{emulator_settings.temperature_proxy.driver_port}",
         execution_manager=execution_manager,
         usb_port=USBPort(name="", port_number=1, sub_names=[], device_path="", hub=1),
         loop=loop,
@@ -22,7 +27,7 @@ async def tempdeck(loop: asyncio.BaseEventLoop, emulation_app) -> TempDeck:
     await module.cleanup()
 
 
-def test_device_info(tempdeck) -> None:
+def test_device_info(tempdeck: TempDeck) -> None:
     """It should have the device info."""
     assert {
         "model": "temp_deck_v20",
@@ -31,7 +36,7 @@ def test_device_info(tempdeck) -> None:
     } == tempdeck.device_info
 
 
-async def test_set_temperature(tempdeck) -> None:
+async def test_set_temperature(tempdeck: TempDeck) -> None:
     """It should set the temperature and return when target is reached."""
     await tempdeck.wait_next_poll()
     assert tempdeck.live_data == {
@@ -46,7 +51,7 @@ async def test_set_temperature(tempdeck) -> None:
     }
 
 
-async def test_start_set_temperature_cool(tempdeck) -> None:
+async def test_start_set_temperature_cool(tempdeck: TempDeck) -> None:
     """It should set the temperature and return and wait for temperature."""
     await tempdeck.wait_next_poll()
     current = tempdeck.temperature
@@ -68,7 +73,7 @@ async def test_start_set_temperature_cool(tempdeck) -> None:
     }
 
 
-async def test_start_set_temperature_heat(tempdeck) -> None:
+async def test_start_set_temperature_heat(tempdeck: TempDeck) -> None:
     """It should set the temperature and return and wait for temperature."""
     await tempdeck.wait_next_poll()
     current = tempdeck.temperature
@@ -90,7 +95,7 @@ async def test_start_set_temperature_heat(tempdeck) -> None:
     }
 
 
-async def test_deactivate(tempdeck) -> None:
+async def test_deactivate(tempdeck: TempDeck) -> None:
     """It should deactivate and move to room temperature"""
     await tempdeck.deactivate()
     await tempdeck.wait_next_poll()

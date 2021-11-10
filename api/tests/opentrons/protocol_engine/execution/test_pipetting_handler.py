@@ -85,7 +85,7 @@ async def test_handle_pick_up_tip_request(
     mock_hw_pipettes: MockPipettes,
     handler: PipettingHandler,
 ) -> None:
-    """It should handle a PickUpTipRequest properly."""
+    """It should handle a PickUpTipCreate properly."""
     decoy.when(
         state_store.pipettes.get_hardware_pipette(
             pipette_id="pipette-id",
@@ -140,7 +140,7 @@ async def test_handle_drop_up_tip_request(
     mock_hw_pipettes: MockPipettes,
     handler: PipettingHandler,
 ) -> None:
-    """It should handle a DropTipRequest properly."""
+    """It should handle a DropTipCreate properly."""
     decoy.when(
         state_store.pipettes.get_hardware_pipette(
             pipette_id="pipette-id",

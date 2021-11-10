@@ -14,28 +14,24 @@ from opentrons.protocol_engine import (
 
 from robot_server.errors import ApiError
 from robot_server.service.json_api import RequestModel, ResponseModel
-from robot_server.runs.run_models import (
-    BasicRun,
-    BasicRunCreateParams,
-    RunCommandSummary,
-)
+from robot_server.runs.run_models import Run, RunCommandSummary
 from robot_server.runs.engine_store import EngineStore
 from robot_server.runs.router.commands_router import (
-    post_run_command,
+    create_run_command,
     get_run_command,
     get_run_commands,
 )
 
 
-async def test_post_run_command(decoy: Decoy, engine_store: EngineStore) -> None:
+async def test_create_run_command(decoy: Decoy, engine_store: EngineStore) -> None:
     """It should add the requested command to the ProtocolEngine and return it."""
-    command_request = pe_commands.PauseRequest(
-        data=pe_commands.PauseData(message="Hello")
+    command_request = pe_commands.PauseCreate(
+        params=pe_commands.PauseParams(message="Hello")
     )
 
-    run = BasicRun(
+    run = Run(
         id="run-id",
-        createParams=BasicRunCreateParams(),
+        protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
         status=EngineStatus.RUNNING,
         current=True,
@@ -49,7 +45,7 @@ async def test_post_run_command(decoy: Decoy, engine_store: EngineStore) -> None
         id="abc123",
         createdAt=datetime(year=2021, month=1, day=1),
         status=CommandStatus.QUEUED,
-        data=pe_commands.PauseData(message="Hello"),
+        params=pe_commands.PauseParams(message="Hello"),
         result=None,
     )
 
@@ -57,27 +53,27 @@ async def test_post_run_command(decoy: Decoy, engine_store: EngineStore) -> None
         output_command
     )
 
-    response = await post_run_command(
+    response = await create_run_command(
         request_body=RequestModel(data=command_request),
         engine_store=engine_store,
-        run=ResponseModel(data=run),
+        run=ResponseModel(data=run, links=None),
     )
 
     assert response.data == output_command
 
 
-async def test_post_run_command_not_current(
+async def test_create_run_command_not_current(
     decoy: Decoy,
     engine_store: EngineStore,
 ) -> None:
     """It should 400 if you try to add commands to non-current run."""
-    command_request = pe_commands.PauseRequest(
-        data=pe_commands.PauseData(message="Hello")
+    command_request = pe_commands.PauseCreate(
+        params=pe_commands.PauseParams(message="Hello")
     )
 
-    run = BasicRun(
+    run = Run(
         id="run-id",
-        createParams=BasicRunCreateParams(),
+        protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
         status=EngineStatus.RUNNING,
         current=False,
@@ -88,10 +84,10 @@ async def test_post_run_command_not_current(
     )
 
     with pytest.raises(ApiError) as exc_info:
-        await post_run_command(
+        await create_run_command(
             request_body=RequestModel(data=command_request),
             engine_store=engine_store,
-            run=ResponseModel(data=run),
+            run=ResponseModel(data=run, links=None),
         )
 
     assert exc_info.value.status_code == 400
@@ -106,9 +102,9 @@ async def test_get_run_commands() -> None:
         status=CommandStatus.RUNNING,
     )
 
-    run = BasicRun(
+    run = Run(
         id="run-id",
-        createParams=BasicRunCreateParams(),
+        protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
         status=EngineStatus.RUNNING,
         current=True,
@@ -118,7 +114,7 @@ async def test_get_run_commands() -> None:
         labware=[],
     )
 
-    response = await get_run_commands(run=ResponseModel(data=run))
+    response = await get_run_commands(run=ResponseModel(data=run, links=None))
 
     assert response.data == [command_summary]
 
@@ -138,12 +134,12 @@ async def test_get_run_command_by_id(
         id="command-id",
         status=CommandStatus.RUNNING,
         createdAt=datetime(year=2022, month=2, day=2),
-        data=pe_commands.MoveToWellData(pipetteId="a", labwareId="b", wellName="c"),
+        params=pe_commands.MoveToWellParams(pipetteId="a", labwareId="b", wellName="c"),
     )
 
-    run = BasicRun(
+    run = Run(
         id="run-id",
-        createParams=BasicRunCreateParams(),
+        protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
         status=EngineStatus.RUNNING,
         current=True,
@@ -161,7 +157,7 @@ async def test_get_run_command_by_id(
     response = await get_run_command(
         commandId="command-id",
         engine_store=engine_store,
-        run=ResponseModel(data=run),
+        run=ResponseModel(data=run, links=None),
     )
 
     assert response.data == command
@@ -174,9 +170,9 @@ async def test_get_run_command_missing_command(
     """It should 404 if you attempt to get a non-existent command."""
     key_error = pe_errors.CommandDoesNotExistError("oh no")
 
-    run = BasicRun(
+    run = Run(
         id="run-id",
-        createParams=BasicRunCreateParams(),
+        protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
         status=EngineStatus.RUNNING,
         current=True,
@@ -194,7 +190,7 @@ async def test_get_run_command_missing_command(
         await get_run_command(
             commandId="command-id",
             engine_store=engine_store,
-            run=ResponseModel(data=run),
+            run=ResponseModel(data=run, links=None),
         )
 
     assert exc_info.value.status_code == 404

@@ -8,6 +8,7 @@ disk into the runner, and the protocols are run to completion. From
 there, the ProtocolEngine state is inspected to everything was loaded
 and ran as expected.
 """
+import pytest
 from pathlib import Path
 from datetime import datetime
 from decoy import matchers
@@ -29,7 +30,7 @@ from opentrons.protocol_runner import (
     PythonPreAnalysis,
     create_simulating_runner,
 )
-from opentrons.protocol_runner.legacy_command_mapper import LegacyCommandData
+from opentrons.protocol_runner.legacy_command_mapper import LegacyCommandParams
 
 
 async def test_runner_with_python(python_protocol_file: Path) -> None:
@@ -56,7 +57,7 @@ async def test_runner_with_python(python_protocol_file: Path) -> None:
 
     expected_labware = LoadedLabware.construct(
         id=labware_id_captor,
-        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         loadName="opentrons_96_tiprack_300ul",
         definitionUri="opentrons/opentrons_96_tiprack_300ul/1",
     )
@@ -70,7 +71,7 @@ async def test_runner_with_python(python_protocol_file: Path) -> None:
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        data=commands.PickUpTipData(
+        params=commands.PickUpTipParams(
             pipetteId=pipette_id_captor.value,
             labwareId=labware_id_captor.value,
             wellName="A1",
@@ -81,6 +82,7 @@ async def test_runner_with_python(python_protocol_file: Path) -> None:
     assert expected_command in commands_result
 
 
+@pytest.mark.xfail(raises=NotImplementedError, strict=True)
 async def test_runner_with_json(json_protocol_file: Path) -> None:
     """It should run a JSON protocol on the ProtocolRunner."""
     protocol_source = ProtocolSource(
@@ -102,7 +104,7 @@ async def test_runner_with_json(json_protocol_file: Path) -> None:
 
     expected_labware = LoadedLabware(
         id="labware-id",
-        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         loadName="opentrons_96_tiprack_300ul",
         definitionUri="opentrons/opentrons_96_tiprack_300ul/1",
     )
@@ -116,7 +118,7 @@ async def test_runner_with_json(json_protocol_file: Path) -> None:
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        data=commands.PickUpTipData(
+        params=commands.PickUpTipParams(
             pipetteId="pipette-id",
             labwareId="labware-id",
             wellName="A1",
@@ -152,7 +154,7 @@ async def test_runner_with_legacy_python(legacy_python_protocol_file: Path) -> N
 
     expected_labware = LoadedLabware.construct(
         id=labware_id_captor,
-        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         loadName="opentrons_96_tiprack_300ul",
         definitionUri="opentrons/opentrons_96_tiprack_300ul/1",
     )
@@ -166,7 +168,7 @@ async def test_runner_with_legacy_python(legacy_python_protocol_file: Path) -> N
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        data=LegacyCommandData(
+        params=LegacyCommandParams(
             legacyCommandType="command.PICK_UP_TIP",
             legacyCommandText="Picking up tip from A1 of Opentrons 96 Tip Rack 300 µL on 1",  # noqa: E501
         ),
@@ -201,7 +203,7 @@ async def test_runner_with_legacy_json(legacy_json_protocol_file: Path) -> None:
 
     expected_labware = LoadedLabware.construct(
         id=labware_id_captor,
-        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         loadName="opentrons_96_tiprack_300ul",
         definitionUri="opentrons/opentrons_96_tiprack_300ul/1",
     )
@@ -215,7 +217,7 @@ async def test_runner_with_legacy_json(legacy_json_protocol_file: Path) -> None:
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        data=LegacyCommandData(
+        params=LegacyCommandParams(
             legacyCommandType="command.PICK_UP_TIP",
             legacyCommandText="Picking up tip from A1 of Opentrons 96 Tip Rack 300 µL on 1",  # noqa: E501
         ),
