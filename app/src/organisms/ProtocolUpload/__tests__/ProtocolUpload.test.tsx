@@ -26,7 +26,7 @@ jest.mock('../../../redux/protocol/utils')
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../../redux/calibration/selectors')
 jest.mock('../hooks/useCurrentProtocolRun')
-jest.mock('../useCloseCurrentRun')
+jest.mock('../hooks/useCloseCurrentRun')
 jest.mock('../ConfirmExitProtocolUploadModal')
 
 const getProtocolFile = protocolSelectors.getProtocolFile as jest.MockedFunction<
