@@ -68,18 +68,12 @@ export const schemaV6Adapter = (
         }
       }, {})
 
-    const commands = protocolAnalyses.commands.map(command => ({
-      ...command,
-      // @ts-expect-error delete this once the backend renames "data" to "params"
-      params: command.data,
-    }))
-
     // @ts-expect-error this is a v6 like object that does not quite match the v6 spec at the moment
     return {
       pipettes,
       labware,
       labwareDefinitions,
-      commands,
+      commands: protocolAnalyses.commands,
     }
   }
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions

@@ -1,13 +1,11 @@
-import { useSelector } from 'react-redux'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import { getProtocolData } from '../../../../redux/protocol'
+import { useProtocolDetails } from '../../../RunDetails/hooks'
 import { getPipetteMount } from '../../utils/getPipetteMount'
 import { getLabwareLocation } from '../../utils/getLabwareLocation'
 import { useSteps } from './useSteps'
 import { useSections } from './useSections'
-import type { PipetteName, ProtocolFile } from '@opentrons/shared-data'
+import type { PipetteName } from '@opentrons/shared-data'
 import type { PickUpTipCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
-import type { State } from '../../../../redux/types'
 import type { Section } from '../types'
 
 interface IntroInfo {
@@ -20,10 +18,7 @@ interface IntroInfo {
   sections: Section[]
 }
 export function useIntroInfo(): IntroInfo | null {
-  // @ts-expect-error casting to a v6 protocol, switch this to grab from react query once we make the switch
-  const protocolData: ProtocolFile<{}> = useSelector((state: State) =>
-    getProtocolData(state)
-  )
+  const { protocolData } = useProtocolDetails()
   const steps = useSteps()
   const sections = useSections()
   if (
@@ -44,6 +39,7 @@ export function useIntroInfo(): IntroInfo | null {
     pipetteId: primaryPipetteId,
     labwareId: pickUpTipLabwareId,
   } = (pickUpTipStep.commands[0] as PickUpTipCommand).params
+  console.log(pickUpTipStep.commands[0])
   const primaryPipetteName = protocolData.pipettes[primaryPipetteId].name
   const primaryPipetteMount = getPipetteMount(
     primaryPipetteId,
@@ -56,6 +52,7 @@ export function useIntroInfo(): IntroInfo | null {
       ? getPipetteNameSpecs(primaryPipetteName as PipetteName)
       : null
   const pickUpTipLabware = protocolData.labware[pickUpTipLabwareId]
+  console.log(pickUpTipLabwareId)
   // find name and slot number for tiprack used for check
   const primaryTipRackName =
     'displayName' in pickUpTipLabware ? pickUpTipLabware?.displayName : null

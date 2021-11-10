@@ -48,6 +48,7 @@ export const getOnePipettePositionCheckSteps = (args: {
   )
 
   const lastTiprackId = orderedTiprackIds[orderedTiprackIds.length - 1]
+  console.log('last tiprack id: ', lastTiprackId)
   const pickupTipFromLastTiprackStep = getPickupTipStep(
     lastTiprackId,
     primaryPipetteId,
