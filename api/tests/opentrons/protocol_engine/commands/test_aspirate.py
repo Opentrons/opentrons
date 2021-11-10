@@ -10,7 +10,7 @@ from opentrons.protocol_engine.execution import (
 )
 
 from opentrons.protocol_engine.commands.aspirate import (
-    AspirateData,
+    AspirateParams,
     AspirateResult,
     AspirateImplementation,
 )
@@ -33,7 +33,7 @@ async def test_aspirate_implementation(
 
     location = WellLocation(origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1))
 
-    data = AspirateData(
+    data = AspirateParams(
         pipetteId="abc",
         labwareId="123",
         wellName="A3",

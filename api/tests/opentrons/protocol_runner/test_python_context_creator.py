@@ -54,4 +54,4 @@ async def test_wires_protocol_context_to_engine(
         labware_id=result.labware_id
     )
 
-    assert labware_location == DeckSlotLocation(slot=DeckSlotName.SLOT_1)
+    assert labware_location == DeckSlotLocation(slotName=DeckSlotName.SLOT_1)

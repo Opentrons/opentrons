@@ -1,6 +1,6 @@
 """Message types."""
 from functools import lru_cache
-from typing import Union, Optional
+from typing import Union, Optional, Type
 
 from typing_extensions import get_args
 
@@ -31,11 +31,13 @@ MessageDefinition = Union[
     defs.ClearMoveGroupRequest,
     defs.MoveGroupCompleted,
     defs.MoveCompleted,
+    defs.GetMoveStatusRequest,
+    defs.GetMoveStatusResponse,
 ]
 
 
 @lru_cache(maxsize=None)
-def get_definition(message_id: MessageId) -> Optional[MessageDefinition]:
+def get_definition(message_id: MessageId) -> Optional[Type[MessageDefinition]]:
     """Get the message type for a message id.
 
     Args:

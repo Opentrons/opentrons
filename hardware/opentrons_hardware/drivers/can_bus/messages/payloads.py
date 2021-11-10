@@ -5,14 +5,14 @@ from opentrons_hardware import utils
 
 
 @dataclass
-class EmptyMessage(utils.BinarySerializable):
+class EmptyPayload(utils.BinarySerializable):
     """An empty payload."""
 
     pass
 
 
 @dataclass
-class DeviceInfoResponseBody(utils.BinarySerializable):
+class DeviceInfoResponsePayload(utils.BinarySerializable):
     """Device info response."""
 
     node_id: utils.UInt8Field
@@ -20,7 +20,7 @@ class DeviceInfoResponseBody(utils.BinarySerializable):
 
 
 @dataclass
-class GetStatusResponse(utils.BinarySerializable):
+class GetStatusResponsePayload(utils.BinarySerializable):
     """Get status response."""
 
     status: utils.UInt8Field
@@ -28,63 +28,58 @@ class GetStatusResponse(utils.BinarySerializable):
 
 
 @dataclass
-class MoveRequest(utils.BinarySerializable):
+class MoveRequestPayload(utils.BinarySerializable):
     """Move request."""
 
     steps: utils.UInt32Field
 
 
 @dataclass
-class GetSpeedResponse(utils.BinarySerializable):
+class GetSpeedResponsePayload(utils.BinarySerializable):
     """Get speed response."""
 
     mm_sec: utils.UInt32Field
 
 
 @dataclass
-class WriteToEEPromRequest(utils.BinarySerializable):
+class WriteToEEPromRequestPayload(utils.BinarySerializable):
     """Write to eeprom request."""
 
     serial_number: utils.UInt8Field
 
 
 @dataclass
-class ReadFromEEPromResponse(utils.BinarySerializable):
+class ReadFromEEPromResponsePayload(utils.BinarySerializable):
     """Read from ee prom response."""
 
     serial_number: utils.UInt8Field
 
 
 @dataclass
-class MoveGroupRequest(utils.BinarySerializable):
+class MoveGroupRequestPayload(utils.BinarySerializable):
     """A payload with a group id."""
 
     group_id: utils.UInt8Field
 
 
 @dataclass
-class AddToMoveGroupRequest(MoveGroupRequest):
+class AddToMoveGroupRequestPayload(MoveGroupRequestPayload):
     """Base of add to move group request to a message group."""
 
     seq_id: utils.UInt8Field
-    # TODO (al, 2021-10-2021): this should be 32 bits
-    duration: utils.UInt16Field
+    duration: utils.UInt32Field
 
 
 @dataclass
-class AddLinearMoveRequest(AddToMoveGroupRequest):
+class AddLinearMoveRequestPayload(AddToMoveGroupRequestPayload):
     """Add a linear move request to a message group."""
 
-    # TODO (al, 2021-10-2021): this should be 32 bits
-    acceleration: utils.Int16Field
-    # TODO (al, 2021-10-2021): this should be 32 bits
-    velocity: utils.Int16Field
-    # TODO (al, 2021-10-2021): this should be present and 32 bits
-    # position: utils.UInt32Field
+    acceleration: utils.Int32Field
+    velocity: utils.Int32Field
 
 
 @dataclass
-class GetMoveGroupResponse(MoveGroupRequest):
+class GetMoveGroupResponsePayload(MoveGroupRequestPayload):
     """Response to request to get a move group."""
 
     num_moves: utils.UInt8Field
@@ -93,7 +88,7 @@ class GetMoveGroupResponse(MoveGroupRequest):
 
 
 @dataclass
-class ExecuteMoveGroupRequest(MoveGroupRequest):
+class ExecuteMoveGroupRequestPayload(MoveGroupRequestPayload):
     """Start executing a move group."""
 
     start_trigger: utils.UInt8Field
@@ -101,16 +96,27 @@ class ExecuteMoveGroupRequest(MoveGroupRequest):
 
 
 @dataclass
-class MoveGroupCompleted(MoveGroupRequest):
+class MoveGroupCompletedPayload(MoveGroupRequestPayload):
     """Notification of a completed move group."""
 
     node_id: utils.UInt8Field
 
 
 @dataclass
-class MoveCompleted(MoveGroupRequest):
+class MoveCompletedPayload(MoveGroupRequestPayload):
     """Notification of a completed move group."""
 
     seq_id: utils.UInt8Field
     ack_id: utils.UInt8Field
     node_id: utils.UInt8Field
+
+
+@dataclass
+class GetMoveStatusResponsePayload(MoveGroupRequestPayload):
+    """Read status of current move being executed."""
+
+    seq_id: utils.UInt8Field
+    remaining_duration: utils.UInt64Field
+    current_position: utils.UInt64Field
+    node_id: utils.UInt8Field
+    padding: utils.UInt8Field

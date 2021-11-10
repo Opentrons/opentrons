@@ -69,6 +69,9 @@ class MagDeck(mod_abc.AbstractModule):
         self._driver = driver
         self._current_height = 0.0
 
+    async def cleanup(self) -> None:
+        await self._driver.disconnect()
+
     @classmethod
     def name(cls) -> str:
         """Get the module name."""

@@ -1,24 +1,24 @@
 import os
 import sys
-import threading
 import asyncio
-from typing import Generator, Callable
+import time
+from multiprocessing import Process
+from typing import Generator, Callable, Iterator
 from collections import namedtuple
 
 from opentrons.hardware_control.emulation.settings import Settings
+from opentrons.hardware_control.emulation.types import ModuleType
 from opentrons.protocols.parse import parse
 from opentrons.protocols.execution import execute
 from contextlib import contextmanager
 from opentrons.protocol_api import ProtocolContext
 from opentrons.config.robot_configs import build_config
-from opentrons.hardware_control.emulation.app import ServerManager
-from opentrons.hardware_control import API, ThreadManager
-from opentrons.hardware_control.emulation.app import (
-    MAGDECK_PORT,
-    TEMPDECK_PORT,
-    THERMOCYCLER_PORT,
-    SMOOTHIE_PORT,
+from opentrons.hardware_control.emulation.module_server.helpers import (
+    wait_emulators,
+    ModuleStatusClient,
 )
+from opentrons.hardware_control.emulation.scripts import run_app
+from opentrons.hardware_control import API, ThreadManager
 from g_code_parsing.g_code_program.g_code_program import (
     GCodeProgram,
 )
@@ -47,9 +47,8 @@ class GCodeEngine:
 
     URI_TEMPLATE = "socket://127.0.0.1:%s"
 
-    def __init__(self, smoothie_config: Settings) -> None:
-        self._config = smoothie_config
-        self._set_env_vars()
+    def __init__(self, emulator_settings: Settings) -> None:
+        self._config = emulator_settings
 
     @staticmethod
     def _get_loop() -> asyncio.AbstractEventLoop:
@@ -61,38 +60,52 @@ class GCodeEngine:
         asyncio.set_event_loop(_loop)
         return asyncio.get_event_loop()
 
-    @staticmethod
-    def _set_env_vars() -> None:
-        """Set URLs of where to find modules and config for smoothie"""
-        os.environ["OT_MAGNETIC_EMULATOR_URI"] = GCodeEngine.URI_TEMPLATE % MAGDECK_PORT
-        os.environ["OT_THERMOCYCLER_EMULATOR_URI"] = (
-            GCodeEngine.URI_TEMPLATE % THERMOCYCLER_PORT
-        )
-        os.environ["OT_TEMPERATURE_EMULATOR_URI"] = (
-            GCodeEngine.URI_TEMPLATE % TEMPDECK_PORT
-        )
+    @contextmanager
+    def _emulate(self) -> Iterator[ThreadManager]:
+        """Context manager that starts emulated OT-2 hardware environment. A
+        hardware controller is returned."""
+        modules = [ModuleType.Magnetic, ModuleType.Temperature, ModuleType.Thermocycler]
 
-    @staticmethod
-    def _start_emulation_app(server_manager: ServerManager) -> None:
-        """Start emulated OT-2"""
+        # Entry point for the emulator app process
+        def _run_app():
+            asyncio.run(run_app.run(self._config, modules=[m.value for m in modules]))
 
-        def runit():
-            asyncio.run(server_manager.run())
+        proc = Process(target=_run_app)
+        proc.daemon = True
+        proc.start()
 
-        t = threading.Thread(target=runit)
-        t.daemon = True
-        t.start()
+        # Entry point for process that waits for emulation to be ready.
+        async def _wait_ready() -> None:
+            c = await ModuleStatusClient.connect(
+                host="localhost", port=self._config.module_server.port
+            )
+            await wait_emulators(client=c, modules=modules, timeout=5)
+            c.close()
 
-    @staticmethod
-    def _emulate_hardware() -> ThreadManager:
-        """Created emulated smoothie"""
+        def _run_wait_ready():
+            asyncio.run(_wait_ready())
+
+        ready_proc = Process(target=_run_wait_ready)
+        ready_proc.daemon = True
+        ready_proc.start()
+        ready_proc.join()
+
+        # Hardware controller
         conf = build_config({})
         emulator = ThreadManager(
             API.build_hardware_controller,
             conf,
-            GCodeEngine.URI_TEMPLATE % SMOOTHIE_PORT,
+            GCodeEngine.URI_TEMPLATE % self._config.smoothie.port,
         )
-        return emulator
+        # Wait for modules to be present
+        while len(emulator.attached_modules) != len(modules):
+            time.sleep(0.1)
+
+        yield emulator
+
+        # Finished. Stop the emulator
+        proc.kill()
+        proc.join()
 
     @staticmethod
     def _get_protocol(file_path: str) -> Protocol:
@@ -111,20 +124,16 @@ class GCodeEngine:
         :return: GCodeProgram with all the parsed data
         """
         file_path = os.path.join(get_configuration_dir(), path)
-        server_manager = ServerManager(self._config)
-        self._start_emulation_app(server_manager)
-        protocol = self._get_protocol(file_path)
-        context = ProtocolContext(
-            implementation=ProtocolContextImplementation(
-                hardware=self._emulate_hardware()
-            ),
-            loop=self._get_loop(),
-        )
-        parsed_protocol = parse(protocol.text, protocol.filename)
-        with GCodeWatcher() as watcher:
-            execute.run_protocol(parsed_protocol, context=context)
-        yield GCodeProgram.from_g_code_watcher(watcher)
-        server_manager.stop()
+        with self._emulate() as h:
+            protocol = self._get_protocol(file_path)
+            context = ProtocolContext(
+                implementation=ProtocolContextImplementation(hardware=h),
+                loop=self._get_loop(),
+            )
+            parsed_protocol = parse(protocol.text, protocol.filename)
+            with GCodeWatcher(emulator_settings=self._config) as watcher:
+                execute.run_protocol(parsed_protocol, context=context)
+            yield GCodeProgram.from_g_code_watcher(watcher)
 
     @contextmanager
     def run_http(self, executable: Callable):
@@ -133,9 +142,7 @@ class GCodeEngine:
         :param executable: Function connected to HTTP Request to execute
         :return:
         """
-        server_manager = ServerManager(self._config)
-        self._start_emulation_app(server_manager)
-        with GCodeWatcher() as watcher:
-            asyncio.run(executable(hardware=self._emulate_hardware()))
-        yield GCodeProgram.from_g_code_watcher(watcher)
-        server_manager.stop()
+        with self._emulate() as h:
+            with GCodeWatcher(emulator_settings=self._config) as watcher:
+                asyncio.run(executable(hardware=h))
+            yield GCodeProgram.from_g_code_watcher(watcher)

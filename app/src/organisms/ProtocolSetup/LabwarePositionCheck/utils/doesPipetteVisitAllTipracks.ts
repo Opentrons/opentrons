@@ -1,23 +1,22 @@
 import reduce from 'lodash/reduce'
 import {
   getIsTiprack,
-  JsonProtocolFile,
+  ProtocolFile,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
 import { getPickUpTipCommandsWithPipette } from '../../utils/getPickUpTipCommandsWithPipette'
 import { getTipracksVisited } from '../../utils/getTipracksVisited'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
+import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 
 export const doesPipetteVisitAllTipracks = (
   pipetteId: string,
-  labware: JsonProtocolFile['labware'],
+  labware: ProtocolFile<{}>['labware'],
   labwareDefinitions: Record<string, LabwareDefinition2>,
   commands: Command[]
 ): boolean => {
   const numberOfTipracks = reduce(
     labware,
     (numberOfTipracks, currentLabware) => {
-      // @ts-expect-error v1 protocols do not definitionIds baked into the labware
       const labwareDef = labwareDefinitions[currentLabware.definitionId]
       return getIsTiprack(labwareDef) ? numberOfTipracks + 1 : numberOfTipracks
     },
@@ -32,7 +31,7 @@ export const doesPipetteVisitAllTipracks = (
   const tipracksVisited = getTipracksVisited(pickUpTipCommandsWithPipette)
 
   pickUpTipCommandsWithPipette.reduce<string[]>((visited, command) => {
-    const tiprack = command.params.labware
+    const tiprack = command.params.labwareId
     return visited.includes(tiprack) ? visited : [...visited, tiprack]
   }, [])
 

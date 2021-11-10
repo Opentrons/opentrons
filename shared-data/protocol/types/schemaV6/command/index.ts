@@ -9,23 +9,25 @@ import type { TimingCommand } from './timing'
 // the command's identity and parameters which can be known prior to runtime
 interface CommandRunTimeInfo {
   status?: 'queued' | 'running' | 'succeeded' | 'failed'
-  error?: string
+  error?: string | null
   createdAt?: string
   startedAt?: string
   completedAt?: string
 }
 
 // all commands must have an id
-interface CommonCommandInfo extends CommandRunTimeInfo {
+export interface CommonCommandInfo extends CommandRunTimeInfo {
   id: string
+  result?: any // TODO: gather types for what each command's expected result should be
 }
 
-export type Command = CommonCommandInfo &
-  (
-    | PipettingCommand // involves the pipettes plunger motor
-    | GantryCommand // movement that only effects the x,y,z position of the gantry/pipette
-    | ModuleCommand // directed at a hardware module
-    | SetupCommand // only effecting robot's equipment setup (pipettes, labware, modules, liquid), no hardware side-effects
-    | TimingCommand // effecting the timing of command execution
-    | { commandType: 'custom'; params: { [key: string]: any } } // allows for experimentation between schema versions with no expectation of system support
-  )
+export type Command =
+  | PipettingCommand // involves the pipettes plunger motor
+  | GantryCommand // movement that only effects the x,y,z position of the gantry/pipette
+  | ModuleCommand // directed at a hardware module
+  | SetupCommand // only effecting robot's equipment setup (pipettes, labware, modules, liquid), no hardware side-effects
+  | TimingCommand // effecting the timing of command execution
+  | ({
+      commandType: 'custom'
+      params: { [key: string]: any }
+    } & CommonCommandInfo) // allows for experimentation between schema versions with no expectation of system support

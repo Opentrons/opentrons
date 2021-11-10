@@ -3,7 +3,7 @@ from typing import Optional
 from opentrons.hardware_control import API as HardwareAPI
 
 from .resources import ModelUtils
-from .commands import Command, CommandRequest, CommandMapper
+from .commands import Command, CommandCreate
 from .execution import QueueWorker, create_queue_worker
 from .state import StateStore, StateView
 from .plugins import AbstractPlugin
@@ -12,7 +12,7 @@ from .actions import (
     PlayAction,
     PauseAction,
     StopAction,
-    UpdateCommandAction,
+    QueueCommandAction,
 )
 
 
@@ -24,19 +24,12 @@ class ProtocolEngine:
     of the commands themselves.
     """
 
-    _hardware_api: HardwareAPI
-    _state_store: StateStore
-    _queue_worker: QueueWorker
-    _command_mapper: CommandMapper
-    _model_utils: ModelUtils
-
     def __init__(
         self,
         hardware_api: HardwareAPI,
         state_store: StateStore,
         action_dispatcher: Optional[ActionDispatcher] = None,
         queue_worker: Optional[QueueWorker] = None,
-        command_mapper: Optional[CommandMapper] = None,
         model_utils: Optional[ModelUtils] = None,
     ) -> None:
         """Initialize a ProtocolEngine instance.
@@ -49,13 +42,14 @@ class ProtocolEngine:
         self._action_dispatcher = action_dispatcher or ActionDispatcher(
             sink=self._state_store
         )
-        self._command_mapper = command_mapper or CommandMapper()
         self._model_utils = model_utils or ModelUtils()
         self._queue_worker = queue_worker or create_queue_worker(
             hardware_api=self._hardware_api,
             state_store=self._state_store,
             action_dispatcher=self._action_dispatcher,
         )
+
+        self._queue_worker.start()
 
     @property
     def state_view(self) -> StateView:
@@ -85,7 +79,7 @@ class ProtocolEngine:
         self._state_store.commands.validate_action_allowed(action)
         self._action_dispatcher.dispatch(action)
 
-    def add_command(self, request: CommandRequest) -> Command:
+    def add_command(self, request: CommandCreate) -> Command:
         """Add a command to the `ProtocolEngine`'s queue.
 
         Arguments:
@@ -95,16 +89,17 @@ class ProtocolEngine:
         Returns:
             The full, newly queued command.
         """
-        command = self._command_mapper.map_request_to_command(
+        command_id = self._model_utils.generate_id()
+        action = QueueCommandAction(
             request=request,
-            command_id=self._model_utils.generate_id(),
+            command_id=command_id,
             created_at=self._model_utils.get_timestamp(),
         )
-        self._action_dispatcher.dispatch(UpdateCommandAction(command=command))
+        self._action_dispatcher.dispatch(action)
 
-        return command
+        return self._state_store.commands.get(command_id)
 
-    async def add_and_execute_command(self, request: CommandRequest) -> Command:
+    async def add_and_execute_command(self, request: CommandCreate) -> Command:
         """Add a command to the queue and wait for it to complete.
 
         The engine must be started by calling `play` before the command will
@@ -124,7 +119,7 @@ class ProtocolEngine:
             command_id=command.id,
         )
 
-        return self._state_store.commands.get(command_id=command.id)
+        return self._state_store.commands.get(command.id)
 
     async def halt(self) -> None:
         """Halt execution, stopping all motion and cancelling future commands.

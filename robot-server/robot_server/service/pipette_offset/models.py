@@ -50,7 +50,7 @@ class PipetteOffsetCalibration(ResponseDataModel):
     )
 
 
-MultipleCalibrationsResponse = MultiResponseModel[PipetteOffsetCalibration]
+MultipleCalibrationsResponse = MultiResponseModel[PipetteOffsetCalibration, None]
 
 
-SingleCalibrationResponse = ResponseModel[PipetteOffsetCalibration]
+SingleCalibrationResponse = ResponseModel[PipetteOffsetCalibration, None]

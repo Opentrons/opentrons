@@ -61,15 +61,12 @@ describe('useCreateProtocolMutation hook', () => {
       .calledWith(HOST_CONFIG, createProtocolData)
       .mockRejectedValue('oh no')
 
-    const { result, waitFor } = renderHook(
-      () => useCreateProtocolMutation(createProtocolData),
-      {
-        wrapper,
-      }
-    )
+    const { result, waitFor } = renderHook(() => useCreateProtocolMutation(), {
+      wrapper,
+    })
 
     expect(result.current.data).toBeUndefined()
-    result.current.createProtocol()
+    result.current.createProtocol(createProtocolData)
     await waitFor(() => {
       console.log(result.current.status)
       return result.current.status !== 'loading'
@@ -83,13 +80,10 @@ describe('useCreateProtocolMutation hook', () => {
       .calledWith(HOST_CONFIG, createProtocolData)
       .mockResolvedValue({ data: PROTOCOL_RESPONSE } as Response<Protocol>)
 
-    const { result, waitFor } = renderHook(
-      () => useCreateProtocolMutation(createProtocolData),
-      {
-        wrapper,
-      }
-    )
-    act(() => result.current.createProtocol())
+    const { result, waitFor } = renderHook(() => useCreateProtocolMutation(), {
+      wrapper,
+    })
+    act(() => result.current.createProtocol(createProtocolData))
 
     await waitFor(() => result.current.data != null)
 

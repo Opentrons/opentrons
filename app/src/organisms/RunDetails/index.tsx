@@ -56,7 +56,7 @@ export function RunDetails(): JSX.Element | null {
         {'commands' in protocolData
           ? protocolData.commands.map((command, index) => (
               <Flex key={index}>
-                <Text>{command.command}</Text>
+                <Text>{command.commandType}</Text>
               </Flex>
             ))
           : null}

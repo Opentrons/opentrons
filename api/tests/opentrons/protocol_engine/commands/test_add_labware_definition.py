@@ -10,7 +10,7 @@ from opentrons.protocol_engine.execution import (
 )
 
 from opentrons.protocol_engine.commands.add_labware_definition import (
-    AddLabwareDefinitionData,
+    AddLabwareDefinitionParams,
     AddLabwareDefinitionResult,
     AddLabwareDefinitionImplementation,
 )
@@ -32,7 +32,7 @@ async def test_add_labware_implementation(
         run_control=run_control,
     )
 
-    data = AddLabwareDefinitionData(definition=well_plate_def)
+    data = AddLabwareDefinitionParams(definition=well_plate_def)
     result = await subject.execute(data)
 
     assert result == AddLabwareDefinitionResult(

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook } from '@testing-library/react-hooks'
-import { getRun, RUN_TYPE_BASIC } from '@opentrons/api-client'
+import { getRun } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useRunQuery } from '..'
 
@@ -16,9 +16,7 @@ const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const RUN_ID = '1'
-const RUN_RESPONSE = {
-  data: { runType: RUN_TYPE_BASIC, id: RUN_ID },
-} as Run
+const RUN_RESPONSE = { data: { id: RUN_ID } } as Run
 
 describe('useRunQuery hook', () => {
   let wrapper: React.FunctionComponent<{}>

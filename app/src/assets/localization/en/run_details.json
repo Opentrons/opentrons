@@ -17,5 +17,17 @@
   "status_running": "Running",
   "target_temperature": "Target: {{temperature}} °C",
   "temperature_not_available": "{{temperature_type}}: n/a",
-  "thermocycler_error_tooltip": "Module encountered an anomaly, please contact support"
+  "thermocycler_error_tooltip": "Module encountered an anomaly, please contact support",
+  "current_step": "Current Step",
+  "anticipated_step": "Anticipated steps",
+  "start_step_time": "Start",
+  "end_step_time": "End",
+  "end_of_protocol": "End of protocol",
+  "comment_step": "Comment",
+  "pause_protocol": "Pause protocol",
+  "current_step_pause": "Current Step - Paused by User",
+  "current_step_pause_timer": "Timer",
+  "user_paused_protocol": "User paused protocol",
+  "run_canceled": "Run canceled",
+  "step_failed": "Step failed"
 }

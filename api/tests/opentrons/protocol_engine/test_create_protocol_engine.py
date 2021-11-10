@@ -30,6 +30,6 @@ async def test_create_engine_initializes_state_with_deck_geometry(
                 namespace=fixed_trash_def.namespace,
                 version=fixed_trash_def.version,
             ),
-            location=DeckSlotLocation(slot=DeckSlotName.FIXED_TRASH),
+            location=DeckSlotLocation(slotName=DeckSlotName.FIXED_TRASH),
         )
     ]
