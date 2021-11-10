@@ -13,6 +13,8 @@ from .state import State, StateView
 from .plugins import AbstractPlugin
 
 from .types import (
+    LabwareOffset,
+    LabwareOffsetCreate,
     CalibrationOffset,
     DeckSlotLocation,
     Dimensions,
@@ -41,6 +43,8 @@ __all__ = [
     "State",
     "StateView",
     # public value interfaces and models
+    "LabwareOffset",
+    "LabwareOffsetCreate",
     "CalibrationOffset",
     "DeckSlotLocation",
     "Dimensions",
