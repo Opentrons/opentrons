@@ -43,7 +43,7 @@ async def test_labware_data_gets_calibration(
 
         result = await LabwareDataProvider().get_labware_calibration(
             well_plate_def,
-            DeckSlotLocation(slot=DeckSlotName.SLOT_5),
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
         )
 
         as_type_dict = cast(dev_types.LabwareDefinition, well_plate_def.dict())

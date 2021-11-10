@@ -53,7 +53,7 @@ class DeckDataProvider:
             slot = cast(Optional[str], fixture.get("slot"))
 
             if load_name is not None and slot is not None:
-                location = DeckSlotLocation(slot=DeckSlotName.from_primitive(slot))
+                location = DeckSlotLocation(slotName=DeckSlotName.from_primitive(slot))
                 definition = await self._labware_data.get_labware_definition(
                     load_name=load_name,
                     namespace="opentrons",

@@ -54,14 +54,14 @@ class GeometryView:
     def get_labware_parent_position(self, labware_id: str) -> Point:
         """Get the position of the labware's parent slot (deck or module)."""
         labware_data = self._labware.get(labware_id)
-        slot_pos = self._labware.get_slot_position(labware_data.location.slot)
+        slot_pos = self._labware.get_slot_position(labware_data.location.slotName)
 
         return slot_pos
 
     def get_labware_origin_position(self, labware_id: str) -> Point:
         """Get the position of the labware's origin, without calibration."""
         labware_data = self._labware.get(labware_id)
-        slot_pos = self._labware.get_slot_position(labware_data.location.slot)
+        slot_pos = self._labware.get_slot_position(labware_data.location.slotName)
         origin_offset = self._labware.get_definition(labware_id).cornerOffsetFromSlot
 
         return Point(

@@ -87,12 +87,12 @@ def test_add_command(
     subject: ProtocolEngine,
 ) -> None:
     """It should add a command to the state from a request."""
-    data = commands.LoadPipetteData(
+    params = commands.LoadPipetteParams(
         mount=MountType.LEFT,
         pipetteName=PipetteName.P300_SINGLE,
     )
 
-    request = commands.LoadPipetteRequest(data=data)
+    request = commands.LoadPipetteCreate(params=params)
 
     created_at = datetime(year=2021, month=1, day=1)
 
@@ -100,7 +100,7 @@ def test_add_command(
         id="command-id",
         status=commands.CommandStatus.QUEUED,
         createdAt=created_at,
-        data=data,
+        params=params,
     )
 
     decoy.when(model_utils.generate_id()).then_return("command-id")
@@ -133,18 +133,18 @@ async def test_execute_command(
     created_at = datetime(year=2021, month=1, day=1)
     completed_at = datetime(year=2023, month=3, day=3)
 
-    data = commands.LoadPipetteData(
+    params = commands.LoadPipetteParams(
         mount=MountType.LEFT,
         pipetteName=PipetteName.P300_SINGLE,
     )
 
-    request = commands.LoadPipetteRequest(data=data)
+    request = commands.LoadPipetteCreate(params=params)
 
     queued_command = commands.LoadPipette(
         id="command-id",
         status=commands.CommandStatus.QUEUED,
         createdAt=created_at,
-        data=data,
+        params=params,
     )
 
     executed_command = commands.LoadPipette(
@@ -153,7 +153,7 @@ async def test_execute_command(
         createdAt=created_at,
         startedAt=created_at,
         completedAt=completed_at,
-        data=data,
+        params=params,
     )
 
     decoy.when(model_utils.generate_id()).then_return("command-id")

@@ -153,75 +153,75 @@ SimpleCommandResponse = SessionCommandResponse[
 """Response to :class:`~SimpleCommandRequest`"""
 
 
-LoadLabwareRequest = SessionCommandRequest[
+LoadLabwareCreate = SessionCommandRequest[
     Literal[EquipmentCommand.load_labware],
-    commands.LoadLabwareRequest,
+    commands.LoadLabwareCreate,
     commands.LoadLabwareResult,
 ]
 
 
 LoadLabwareResponse = SessionCommandResponse[
     Literal[EquipmentCommand.load_labware],
-    commands.LoadLabwareRequest,
+    commands.LoadLabwareCreate,
     commands.LoadLabwareResult,
 ]
 
 
 LoadInstrumentRequest = SessionCommandRequest[
     Literal[EquipmentCommand.load_pipette],
-    commands.LoadPipetteRequest,
+    commands.LoadPipetteCreate,
     commands.LoadPipetteResult,
 ]
 
 
 LoadInstrumentResponse = SessionCommandResponse[
     Literal[EquipmentCommand.load_pipette],
-    commands.LoadPipetteRequest,
+    commands.LoadPipetteCreate,
     commands.LoadPipetteResult,
 ]
 
 
-AspirateRequest = SessionCommandRequest[
-    Literal[PipetteCommand.aspirate], commands.AspirateRequest, commands.AspirateResult
+AspirateCreate = SessionCommandRequest[
+    Literal[PipetteCommand.aspirate], commands.AspirateCreate, commands.AspirateResult
 ]
 
 
 AspirateResponse = SessionCommandResponse[
-    Literal[PipetteCommand.aspirate], commands.AspirateRequest, commands.AspirateResult
+    Literal[PipetteCommand.aspirate], commands.AspirateCreate, commands.AspirateResult
 ]
 
 
-DispenseRequest = SessionCommandRequest[
-    Literal[PipetteCommand.dispense], commands.DispenseRequest, commands.DispenseResult
+DispenseCreate = SessionCommandRequest[
+    Literal[PipetteCommand.dispense], commands.DispenseCreate, commands.DispenseResult
 ]
 
 
 DispenseResponse = SessionCommandResponse[
-    Literal[PipetteCommand.dispense], commands.DispenseRequest, commands.DispenseResult
+    Literal[PipetteCommand.dispense], commands.DispenseCreate, commands.DispenseResult
 ]
 
 
-PickUpTipRequest = SessionCommandRequest[
+PickUpTipCreate = SessionCommandRequest[
     Literal[PipetteCommand.pick_up_tip],
-    commands.PickUpTipRequest,
+    commands.PickUpTipCreate,
     commands.PickUpTipResult,
 ]
 
 
 PickUpTipResponse = SessionCommandResponse[
     Literal[PipetteCommand.pick_up_tip],
-    commands.PickUpTipRequest,
+    commands.PickUpTipCreate,
     commands.PickUpTipResult,
 ]
 
 
-DropTipRequest = SessionCommandRequest[
-    Literal[PipetteCommand.drop_tip], commands.DropTipRequest, commands.DropTipResult
+DropTipCreate = SessionCommandRequest[
+    Literal[PipetteCommand.drop_tip], commands.DropTipCreate, commands.DropTipResult
 ]
 
 
 DropTipResponse = SessionCommandResponse[
-    Literal[PipetteCommand.drop_tip], commands.DropTipRequest, commands.DropTipResult
+    Literal[PipetteCommand.drop_tip], commands.DropTipCreate, commands.DropTipResult
 ]
 
 
@@ -265,12 +265,12 @@ SetHasCalibrationBlockResponse = SessionCommandResponse[
 
 RequestTypes = typing.Union[
     SimpleCommandRequest,
-    LoadLabwareRequest,
+    LoadLabwareCreate,
     LoadInstrumentRequest,
-    AspirateRequest,
-    DispenseRequest,
-    PickUpTipRequest,
-    DropTipRequest,
+    AspirateCreate,
+    DispenseCreate,
+    PickUpTipCreate,
+    DropTipCreate,
     JogRequest,
     SetHasCalibrationBlockRequest,
     LabwareByDefinitionRequest,

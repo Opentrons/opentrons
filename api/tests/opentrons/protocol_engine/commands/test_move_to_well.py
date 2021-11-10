@@ -9,7 +9,7 @@ from opentrons.protocol_engine.execution import (
 )
 
 from opentrons.protocol_engine.commands.move_to_well import (
-    MoveToWellData,
+    MoveToWellParams,
     MoveToWellResult,
     MoveToWellImplementation,
 )
@@ -30,7 +30,7 @@ async def test_move_to_well_implementation(
         run_control=run_control,
     )
 
-    data = MoveToWellData(
+    data = MoveToWellParams(
         pipetteId="abc",
         labwareId="123",
         wellName="A3",

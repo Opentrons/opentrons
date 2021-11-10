@@ -185,7 +185,7 @@ def test_movement_commands_update_current_well(
 ) -> None:
     """It should save the last used pipette, labware, and well for movement commands."""
     load_pipette_command = create_load_pipette_command(
-        pipette_id=command.data.pipetteId,  # type: ignore[arg-type, union-attr]
+        pipette_id=command.params.pipetteId,  # type: ignore[arg-type, union-attr]
         pipette_name=PipetteName.P300_SINGLE,
         mount=MountType.LEFT,
     )

@@ -247,14 +247,14 @@ async def test_get_run(
         id="command-id",
         status=pe_commands.CommandStatus.QUEUED,
         createdAt=datetime(year=2021, month=1, day=1),
-        data=pe_commands.PauseData(message="hello world"),
+        params=pe_commands.PauseParams(message="hello world"),
     )
 
     labware = pe_types.LoadedLabware(
         id="labware-id",
         loadName="load-name",
         definitionUri="namespace/load-name/42",
-        location=pe_types.DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+        location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
     )
 
     pipette = pe_types.LoadedPipette(

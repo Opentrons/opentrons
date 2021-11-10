@@ -7,13 +7,13 @@ from typing_extensions import Literal
 from opentrons.types import MountType
 
 from ..types import PipetteName
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandRequest
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 LoadPipetteCommandType = Literal["loadPipette"]
 
 
-class LoadPipetteData(BaseModel):
-    """Data needed to load a pipette on to a mount."""
+class LoadPipetteParams(BaseModel):
+    """Payload needed to load a pipette on to a mount."""
 
     pipetteName: PipetteName = Field(
         ...,
@@ -40,35 +40,35 @@ class LoadPipetteResult(BaseModel):
 
 
 class LoadPipetteImplementation(
-    AbstractCommandImpl[LoadPipetteData, LoadPipetteResult]
+    AbstractCommandImpl[LoadPipetteParams, LoadPipetteResult]
 ):
     """Load pipette command implementation."""
 
-    async def execute(self, data: LoadPipetteData) -> LoadPipetteResult:
+    async def execute(self, params: LoadPipetteParams) -> LoadPipetteResult:
         """Check that requested pipette is attached and assign its identifier."""
         loaded_pipette = await self._equipment.load_pipette(
-            pipette_name=data.pipetteName,
-            mount=data.mount,
-            pipette_id=data.pipetteId,
+            pipette_name=params.pipetteName,
+            mount=params.mount,
+            pipette_id=params.pipetteId,
         )
 
         return LoadPipetteResult(pipetteId=loaded_pipette.pipette_id)
 
 
-class LoadPipette(BaseCommand[LoadPipetteData, LoadPipetteResult]):
+class LoadPipette(BaseCommand[LoadPipetteParams, LoadPipetteResult]):
     """Load pipette command model."""
 
     commandType: LoadPipetteCommandType = "loadPipette"
-    data: LoadPipetteData
+    params: LoadPipetteParams
     result: Optional[LoadPipetteResult]
 
     _ImplementationCls: Type[LoadPipetteImplementation] = LoadPipetteImplementation
 
 
-class LoadPipetteRequest(BaseCommandRequest[LoadPipetteData]):
+class LoadPipetteCreate(BaseCommandCreate[LoadPipetteParams]):
     """Load pipette command creation request model."""
 
     commandType: LoadPipetteCommandType = "loadPipette"
-    data: LoadPipetteData
+    params: LoadPipetteParams
 
     _CommandCls: Type[LoadPipette] = LoadPipette

@@ -5,15 +5,15 @@ from typing_extensions import Literal
 
 from pydantic import BaseModel, Field
 
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandRequest
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 from ..types import DeckSlotLocation
 
 
 LoadModuleCommandType = Literal["loadModule"]
 
 
-class LoadModuleData(BaseModel):
-    """Data required to load a module."""
+class LoadModuleParams(BaseModel):
+    """Payload required to load a module."""
 
     # todo(mm, 2021-11-01): Use an enum instead of a str. shared-data defines the
     # possible model names.
@@ -60,28 +60,28 @@ class LoadModuleResult(BaseModel):
     )
 
 
-class LoadModuleImplementation(AbstractCommandImpl[LoadModuleData, LoadModuleResult]):
+class LoadModuleImplementation(AbstractCommandImpl[LoadModuleParams, LoadModuleResult]):
     """The implementation of the load module command."""
 
-    async def execute(self, data: LoadModuleData) -> LoadModuleResult:
+    async def execute(self, params: LoadModuleParams) -> LoadModuleResult:
         """Check that the requested module is attached and assign its identifier."""
-        raise NotImplementedError()
+        raise NotImplementedError("LoadModule command not yet implemented")
 
 
-class LoadModule(BaseCommand[LoadModuleData, LoadModuleResult]):
+class LoadModule(BaseCommand[LoadModuleParams, LoadModuleResult]):
     """The model for a load module command."""
 
     commandType: LoadModuleCommandType = "loadModule"
-    data: LoadModuleData
+    params: LoadModuleParams
     result: Optional[LoadModuleResult]
 
     _ImplementationCls: Type[LoadModuleImplementation] = LoadModuleImplementation
 
 
-class LoadModuleRequest(BaseCommandRequest[LoadModuleData]):
+class LoadModuleCreate(BaseCommandCreate[LoadModuleParams]):
     """The model for a creation request for a load module command."""
 
     commandType: LoadModuleCommandType = "loadModule"
-    data: LoadModuleData
+    params: LoadModuleParams
 
     _CommandCls: Type[LoadModule] = LoadModule
