@@ -16,5 +16,6 @@
   "status_paused": "Paused",
   "status_running": "Running",
   "target_temperature": "Target: {{temperature}} °C",
-  "temperature_not_available": "{{temperature_type}}: n/a"
+  "temperature_not_available": "{{temperature_type}}: n/a",
+  "thermocycler_error_tooltip": "Module encountered an anomaly, please contact support"
 }

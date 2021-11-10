@@ -144,7 +144,7 @@ export const TemperatureControl = ({
           paddingX={SPACING_2}
           width={'11rem'}
           onClick={handleClick}
-          disabled={module.status === 'error' ? true : disabledReason != null}
+          disabled={disabledReason != null}
           {...targetProps}
           fontSize={FONT_SIZE_BODY_1}
         >

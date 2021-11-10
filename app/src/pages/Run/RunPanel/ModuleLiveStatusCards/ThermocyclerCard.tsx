@@ -1,7 +1,9 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
 import { Box, LabeledValue, SPACING_3 } from '@opentrons/components'
 import { getModuleDisplayName, getModuleType } from '@opentrons/shared-data'
+import { useFeatureFlag } from '../../../../redux/config'
 
 import type {
   ThermocyclerModule,
@@ -119,12 +121,19 @@ export const ThermocyclerCard = ({
     totalStepCount,
     currentStepIndex,
   } = module.data
+  const { t } = useTranslation('run_details')
+  const isNewProtocolRunPanel = useFeatureFlag('preProtocolFlowWithoutRPC')
 
   const executingProfile =
     totalCycleCount != null &&
     currentCycleIndex != null &&
     totalStepCount != null &&
     currentStepIndex != null
+
+  if (module.status === 'error' && isNewProtocolRunPanel) {
+    controlDisabledReason = t('thermocycler_error_tooltip')
+  }
+
   return (
     <StatusCard
       moduleType={getModuleType(module.model)}
