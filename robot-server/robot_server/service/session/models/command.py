@@ -24,7 +24,6 @@ from typing_extensions import Literal
 from pydantic import BaseModel, Field
 from pydantic.generics import GenericModel
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons.util.helpers import utc_now
 from opentrons.protocol_engine import commands
 
@@ -47,7 +46,7 @@ from robot_server.service.json_api import (
 
 
 class LoadLabwareByDefinitionRequestData(BaseModel):
-    tiprackDefinition: typing.Optional[LabwareDefinition] = Field(
+    tiprackDefinition: typing.Optional[typing.Dict[str, typing.Any]] = Field(
         None, description="The tiprack definition to load into a user flow"
     )
 
