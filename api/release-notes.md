@@ -6,15 +6,15 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-## OT-2 Software Changes in 4.7.0
+# OT-2 Software Changes in 4.7.0
 
 The 4.7.0 release of the OT-2 Software fixes a handful of regressions and bugs.
 
-### New Features
+## New Features
 
 - This is primarily a bug fix release.
 
-### Bug Fixes
+## Bug Fixes
 
 - Fixed an issue where pipette offset and tip length calibration would sometimes not be saved correctly.
 - Fixed issues around attach pipette behavior.
