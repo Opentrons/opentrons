@@ -59,6 +59,7 @@ TWO_SINGLE_CHANNEL = ProtocolGCodeConfirmConfig(
 SET_MAX_SPEED = ProtocolGCodeConfirmConfig(
     name="set_max_speed",
     path="protocol/protocols/set_max_speed.py",
+    s3_path=f"{S3_BASE}/set_max_speed.txt",
     settings=SWIFT_SMOOTHIE_SETTINGS
 )
 
