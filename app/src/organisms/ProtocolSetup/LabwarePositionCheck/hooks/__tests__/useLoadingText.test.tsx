@@ -90,4 +90,20 @@ describe('useLoadingText', () => {
     })
     expect(result.current).toBe(`Returning tip in slot ${mockSlotNumber}`)
   })
+  it('should return null when a command is pending', () => {
+    const command: DropTipCommand = {
+      id: '1',
+      commandType: 'dropTip',
+      params: {
+        labwareId: mockLabwareId,
+        pipetteId: 'p300SingleId',
+        wellName: 'A1',
+      },
+    }
+
+    const { result } = renderHook(() => useLoadingText(true, command), {
+      wrapper,
+    })
+    expect(result.current).toBe(null)
+  })
 })
