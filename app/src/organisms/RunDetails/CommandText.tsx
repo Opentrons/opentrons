@@ -12,7 +12,7 @@ interface Props {
   command: Command
   commandText?: JSX.Element
 }
-export function CommandText(props: Props): JSX.Element {
+export function CommandText(props: Props): JSX.Element | null {
   return (
     <Flex
       marginLeft={SPACING_3}

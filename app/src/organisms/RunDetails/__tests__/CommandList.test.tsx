@@ -63,9 +63,13 @@ describe('CommandList', () => {
     const { container } = render(props)
     expect(container.firstChild).toBeNull()
   })
+  it('should render correct Protocol Setup text', () => {
+    const { getByText } = render(props)
+    getByText('Protocol Setup')
+  })
+
   it('renders Protocol Setup title expands Protocol setup when clicked and end of protocol text', () => {
     const { getAllByText, getByText } = render(props)
-    getByText('Protocol Setup')
     fireEvent.click(getByText('Protocol Setup'))
     getAllByText('Mock ProtocolSetup Info')
     getByText('End of protocol')

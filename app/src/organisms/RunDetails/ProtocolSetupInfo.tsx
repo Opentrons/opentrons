@@ -1,19 +1,12 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import {
-  Btn,
-  C_MED_DARK_GRAY,
   DIRECTION_COLUMN,
   Flex,
   FONT_SIZE_BODY_1,
-  FONT_SIZE_CAPTION,
-  Icon,
-  JUSTIFY_SPACE_BETWEEN,
-  SIZE_1,
   SPACING_1,
   Text,
   TEXT_TRANSFORM_CAPITALIZE,
-  TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
 import { getModuleDisplayName, ProtocolFile } from '@opentrons/shared-data'
 import { getProtocolPipetteTipRackCalInfo } from '../../redux/pipettes'
@@ -25,7 +18,6 @@ import { CommandItem, Status } from './CommandItem'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 
 interface ProtocolSetupInfoProps {
-  onCloseClick: () => unknown
   SetupCommand?: Command
   runStatus: string
   type: Status
@@ -148,19 +140,8 @@ export const ProtocolSetupInfo = (
       margin={SPACING_1}
       fontSize={FONT_SIZE_BODY_1}
       flexDirection={DIRECTION_COLUMN}
+      flex={'auto'}
     >
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} color={C_MED_DARK_GRAY}>
-        <Text
-          textTransform={TEXT_TRANSFORM_UPPERCASE}
-          fontSize={FONT_SIZE_CAPTION}
-          id={`RunDetails_ProtocolSetupTitle`}
-        >
-          {t('protocol_setup')}
-        </Text>
-        <Btn size={SIZE_1} onClick={props.onCloseClick}>
-          <Icon name="chevron-up" color={C_MED_DARK_GRAY}></Icon>
-        </Btn>
-      </Flex>
       <CommandItem
         currentCommand={SetupCommand}
         type={type}

@@ -182,10 +182,5 @@ export function CommandItem(props: CommandItemProps): JSX.Element {
       />
     )
   }
-  return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
-      {' '}
-      <Flex css={WRAPPER_STYLE}>{commandStatus}</Flex>
-    </Flex>
-  )
+  return <Flex css={WRAPPER_STYLE}>{commandStatus}</Flex>
 }

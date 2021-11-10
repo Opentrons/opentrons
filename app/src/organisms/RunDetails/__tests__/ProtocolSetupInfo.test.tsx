@@ -60,7 +60,7 @@ const COMMAND_TYPE_LOAD_LABWARE = {
 const COMMAND_TYPE_TRASH = {
   commandType: 'loadLabware',
   params: {
-    labwareId: 'trashId',
+    labwareId: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
     location: LABWARE_LOCATION,
   },
 } as Command
@@ -147,7 +147,6 @@ describe('ProtocolSetupInfo', () => {
   let props: React.ComponentProps<typeof ProtocolSetupInfo>
   beforeEach(() => {
     props = {
-      onCloseClick: jest.fn(),
       SetupCommand: COMMAND_TYPE_LOAD_LABWARE,
       runStatus: 'run status',
       type: TYPE,
@@ -186,10 +185,6 @@ describe('ProtocolSetupInfo', () => {
     when(mockCommandItem).mockReturnValue(<div>Mock Command Item</div>)
     mockGetConnectedRobot.mockReturnValue(mockConnectedRobot)
   })
-  it('should render correct Protocol Setup text', () => {
-    const { getByText } = render(props)
-    getByText('Protocol Setup')
-  })
 
   it('should render correct command when commandType is loadLabware', () => {
     when(mockCommandItem).mockReturnValue(
@@ -201,7 +196,6 @@ describe('ProtocolSetupInfo', () => {
 
   it('should render correct command when commandType is loadLabware on top of a module', () => {
     props = {
-      onCloseClick: jest.fn(),
       SetupCommand: COMMAND_TYPE_LOAD_LABWARE_WITH_MODULE,
       runStatus: 'run status',
       type: TYPE,
@@ -223,7 +217,6 @@ describe('ProtocolSetupInfo', () => {
   })
   it('should render correct command when commandType is loadPipette', () => {
     props = {
-      onCloseClick: jest.fn(),
       SetupCommand: COMMAND_TYPE_LOAD_PIPETTE,
       runStatus: 'run status',
       type: TYPE,
@@ -236,7 +229,6 @@ describe('ProtocolSetupInfo', () => {
   })
   it('should render correct command when commandType is loadModule', () => {
     props = {
-      onCloseClick: jest.fn(),
       SetupCommand: COMMAND_TYPE_LOAD_MODULE,
       runStatus: 'run status',
       type: TYPE,
@@ -249,7 +241,6 @@ describe('ProtocolSetupInfo', () => {
   })
   it('should render correct command when commandType is loadModule and a TC is used', () => {
     props = {
-      onCloseClick: jest.fn(),
       SetupCommand: COMMAND_TYPE_LOAD_MODULE_TC,
       runStatus: 'run status',
       type: TYPE,
@@ -293,7 +284,6 @@ describe('ProtocolSetupInfo', () => {
   })
   it('renders null if SetupCommand is undefined', () => {
     props = {
-      onCloseClick: jest.fn(),
       SetupCommand: undefined,
       runStatus: 'run status',
       type: TYPE,
@@ -303,7 +293,6 @@ describe('ProtocolSetupInfo', () => {
   })
   it('renders null if labware is a trash', () => {
     props = {
-      onCloseClick: jest.fn(),
       SetupCommand: COMMAND_TYPE_TRASH,
       runStatus: 'run status',
       type: TYPE,
@@ -313,6 +302,6 @@ describe('ProtocolSetupInfo', () => {
       displayName: 'mock display name',
     })
     const { getByText } = render(props)
-    getByText('Protocol Setup')
+    getByText('Mock Command Item')
   })
 })
