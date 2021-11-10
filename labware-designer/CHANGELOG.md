@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.7.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v4.6.2...v4.7.0-alpha.0) (2021-11-10)
+
+
+### Features
+
+* **app:** Add Labware Detail with Well Row/Column Highlighting ([#8499](https://github.com/Opentrons/opentrons/issues/8499)) ([158c0bb](https://github.com/Opentrons/opentrons/commit/158c0bbcfa9dc0a0af0acd9e5b24d76853ad913d)), closes [#8380](https://github.com/Opentrons/opentrons/issues/8380)
+
+
+
+
+
 
 
 **Note:** Version bump only for package labware-designer
