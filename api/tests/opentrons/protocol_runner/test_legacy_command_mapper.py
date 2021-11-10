@@ -264,7 +264,7 @@ def test_map_module_load() -> None:
             model="module-1",
             location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
         ),
-        result=pe_commands.LoadModuleResult.construct(moduleId=matchers.IsA(str))
+        result=pe_commands.LoadModuleResult.construct(moduleId=matchers.IsA(str)),
     )
     output = LegacyCommandMapper().map_module_load(input)
     assert output == expected_output

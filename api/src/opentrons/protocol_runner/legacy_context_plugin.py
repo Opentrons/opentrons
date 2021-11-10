@@ -147,9 +147,7 @@ class LegacyContextPlugin(AbstractPlugin):
         )
         self.dispatch(pe_actions.UpdateCommandAction(command=pe_command))
 
-    def _dispatch_module_loaded(
-            self, module_load_info: LegacyModuleLoadInfo
-    ) -> None:
+    def _dispatch_module_loaded(self, module_load_info: LegacyModuleLoadInfo) -> None:
         pe_command = self._legacy_command_mapper.map_module_load(
             module_load_info=module_load_info
         )

@@ -279,9 +279,7 @@ def test_module_load_broker_messages(
 
     handler_captor = matchers.Captor()
 
-    decoy.verify(
-        legacy_context.module_load_broker.subscribe(callback=handler_captor)
-    )
+    decoy.verify(legacy_context.module_load_broker.subscribe(callback=handler_captor))
 
     handler: Callable[[LegacyModuleLoadInfo], None] = handler_captor.value
 
@@ -296,9 +294,7 @@ def test_module_load_broker_messages(
     )
 
     decoy.when(
-        legacy_command_mapper.map_module_load(
-            module_load_info=module_load_info
-        )
+        legacy_command_mapper.map_module_load(module_load_info=module_load_info)
     ).then_return(engine_command)
 
     handler(module_load_info)

@@ -559,9 +559,7 @@ class ProtocolContext(CommandPublisher):
 
         self.module_load_broker.publish(
             ModuleLoadInfo(
-                module_name=module_name,
-                location=types.DeckSlotName.from_primitive(location),
-                configuration=configuration
+                module_name=module_name, location=location, configuration=configuration
             )
         )
         return module_context
@@ -864,6 +862,7 @@ class ModuleLoadInfo:
 
     Like `LabwareLoadInfo`, but for hardware modules.
     """
+
     module_name: str
     location: Optional[types.DeckLocation]
     configuration: Optional[str]

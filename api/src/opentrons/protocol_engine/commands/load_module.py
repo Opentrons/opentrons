@@ -2,7 +2,6 @@
 
 from typing import Optional, Type
 from typing_extensions import Literal
-
 from pydantic import BaseModel, Field
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandRequest

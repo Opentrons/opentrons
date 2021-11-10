@@ -3,7 +3,7 @@
 from collections import defaultdict
 from typing import Dict, List
 
-from opentrons.types import MountType
+from opentrons.types import MountType, DeckSlotName
 from opentrons.util.helpers import utc_now
 from opentrons.commands.types import CommandMessage as LegacyCommand
 from opentrons.protocol_engine import commands as pe_commands, types as pe_types
@@ -153,13 +153,19 @@ class LegacyCommandMapper:
         return load_pipette_command
 
     def map_module_load(
-            self,
-            module_load_info: LegacyModuleLoadInfo
+        self, module_load_info: LegacyModuleLoadInfo
     ) -> pe_commands.Command:
         """Map a legacy module load to a Protocol Engine command."""
         now = utc_now()
 
         count = self._command_count["LOAD_MODULE"]
+
+        location = module_load_info.location
+        if location is None:
+            if "thermocycler" in module_load_info.module_name:
+                location = 7
+            else:
+                raise Exception(f"{module_load_info.module_name} requires a location.")
 
         load_module_command = pe_commands.LoadModule(
             id=f"commands.LOAD_MODULE-{count}",
@@ -170,8 +176,8 @@ class LegacyCommandMapper:
             data=pe_commands.LoadModuleData(
                 model=module_load_info.module_name,
                 location=pe_types.DeckSlotLocation(
-                    slot=pe_types.DeckSlotName.from_primitive(
-                        module_load_info.location))
+                    slot=DeckSlotName.from_primitive(location)
+                ),
             ),
             result=pe_commands.LoadModuleResult(
                 moduleId=f"module-{count}",
