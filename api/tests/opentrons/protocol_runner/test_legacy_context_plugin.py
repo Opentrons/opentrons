@@ -1,5 +1,6 @@
 """Tests for the ProtocolRunner's LegacyContextPlugin."""
 import pytest
+from anyio import to_thread
 from decoy import Decoy, matchers
 from datetime import datetime
 from typing import Callable
@@ -134,7 +135,7 @@ def test_broker_subscribe_unsubscribe(
     decoy.verify(instrument_unsubscribe())
 
 
-def test_main_broker_messages(
+async def test_main_broker_messages(
     decoy: Decoy,
     legacy_context: LegacyProtocolContext,
     legacy_command_mapper: LegacyCommandMapper,
@@ -168,14 +169,14 @@ def test_main_broker_messages(
         engine_command
     )
 
-    handler(legacy_command)
+    await to_thread.run_sync(handler, legacy_command)
 
     decoy.verify(
         action_dispatcher.dispatch(pe_actions.UpdateCommandAction(engine_command))
     )
 
 
-def test_labware_load_broker_messages(
+async def test_labware_load_broker_messages(
     decoy: Decoy,
     legacy_context: LegacyProtocolContext,
     legacy_command_mapper: LegacyCommandMapper,
@@ -211,14 +212,14 @@ def test_labware_load_broker_messages(
         legacy_command_mapper.map_labware_load(labware_load_info=labware_load_info)
     ).then_return(engine_command)
 
-    handler(labware_load_info)
+    await to_thread.run_sync(handler, labware_load_info)
 
     decoy.verify(
         action_dispatcher.dispatch(pe_actions.UpdateCommandAction(engine_command))
     )
 
 
-def test_instrument_load_broker_messages(
+async def test_instrument_load_broker_messages(
     decoy: Decoy,
     legacy_context: LegacyProtocolContext,
     legacy_command_mapper: LegacyCommandMapper,
@@ -253,7 +254,7 @@ def test_instrument_load_broker_messages(
         )
     ).then_return(engine_command)
 
-    handler(instrument_load_info)
+    await to_thread.run_sync(handler, instrument_load_info)
 
     decoy.verify(
         action_dispatcher.dispatch(pe_actions.UpdateCommandAction(engine_command))

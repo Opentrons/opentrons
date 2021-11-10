@@ -15,26 +15,6 @@ from .legacy_wrappers import (
 from .legacy_command_mapper import LegacyCommandMapper
 
 
-# todo(mm, 2021-10-07): This class may cause threading bugs.
-#
-#
-# Problem 1 -- unsynchronized concurrent access to Protocol Engine state...
-#
-# The "main" thread, where FastAPI serves HTTP requests,
-# assumes exclusive access to the ProtocolEngine and its state.
-#
-# Meanwhile, the legacy ProtocolContext will be issuing command events from its
-# background thread. Our reactions to those command events will also run in the
-# background thread. But our reactions will modify Protocol Engine state, which may
-# conflict with unrelated Protocol Engine accesses from the main FastAPI thread.
-#
-#
-# Problem 2 -- unsynchronized concurrent access to legacy ProtocolContext state...
-#
-# We currently add and remove subscriptions on the legacy ProtocolContext in direct
-# reaction to receiving play and stop actions from Protocol Engine. To be correct, we
-# need to guarantee that, when we do this, the legacy ProtocolContext will be inactive.
-# It's not clear whether we currently accomplish this.
 class LegacyContextPlugin(AbstractPlugin):
     """A ProtocolEngine plugin wrapping a legacy ProtocolContext.
 
@@ -120,7 +100,7 @@ class LegacyContextPlugin(AbstractPlugin):
 
     def _dispatch_legacy_command(self, command: LegacyCommand) -> None:
         pe_command = self._legacy_command_mapper.map_command(command=command)
-        self.dispatch(pe_actions.UpdateCommandAction(command=pe_command))
+        self.dispatch_threadsafe(pe_actions.UpdateCommandAction(command=pe_command))
 
     def _dispatch_labware_loaded(
         self, labware_load_info: LegacyLabwareLoadInfo
@@ -128,7 +108,7 @@ class LegacyContextPlugin(AbstractPlugin):
         pe_command = self._legacy_command_mapper.map_labware_load(
             labware_load_info=labware_load_info
         )
-        self.dispatch(pe_actions.UpdateCommandAction(command=pe_command))
+        self.dispatch_threadsafe(pe_actions.UpdateCommandAction(command=pe_command))
 
     def _dispatch_instrument_loaded(
         self, instrument_load_info: LegacyInstrumentLoadInfo
@@ -136,4 +116,4 @@ class LegacyContextPlugin(AbstractPlugin):
         pe_command = self._legacy_command_mapper.map_instrument_load(
             instrument_load_info=instrument_load_info
         )
-        self.dispatch(pe_actions.UpdateCommandAction(command=pe_command))
+        self.dispatch_threadsafe(pe_actions.UpdateCommandAction(command=pe_command))
