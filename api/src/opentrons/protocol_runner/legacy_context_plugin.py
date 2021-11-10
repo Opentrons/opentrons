@@ -11,6 +11,7 @@ from .legacy_wrappers import (
     LegacyInstrumentLoadInfo,
     LegacyLabwareLoadInfo,
     LegacyProtocolContext,
+    LegacyModuleLoadInfo,
 )
 from .legacy_command_mapper import LegacyCommandMapper
 
@@ -76,6 +77,7 @@ class LegacyContextPlugin(AbstractPlugin):
         self._unsubscribe_from_instrument_load_broker: Optional[
             Callable[[], None]
         ] = None
+        self._unsubscribe_from_module_load_broker: Optional[Callable[[], None]] = None
 
     def handle_action(self, action: pe_actions.Action) -> None:
         """React to a ProtocolEngine action."""
@@ -106,6 +108,11 @@ class LegacyContextPlugin(AbstractPlugin):
                 callback=self._dispatch_instrument_loaded
             )
         )
+        self._unsubscribe_from_module_load_broker = (
+            self._protocol_context.module_load_broker.subscribe(
+                callback=self._dispatch_module_loaded
+            )
+        )
         self._subscriptions_are_set_up = True
 
     def _tear_down_subscriptions(self) -> None:
@@ -113,9 +120,11 @@ class LegacyContextPlugin(AbstractPlugin):
             assert self._unsubscribe_from_main_broker is not None
             assert self._unsubscribe_from_labware_load_broker is not None
             assert self._unsubscribe_from_instrument_load_broker is not None
+            assert self._unsubscribe_from_module_load_broker is not None
             self._unsubscribe_from_main_broker()
             self._unsubscribe_from_labware_load_broker()
             self._unsubscribe_from_instrument_load_broker()
+            self._unsubscribe_from_module_load_broker()
             self._subscriptions_are_set_up = False
 
     def _dispatch_legacy_command(self, command: LegacyCommand) -> None:
@@ -135,5 +144,13 @@ class LegacyContextPlugin(AbstractPlugin):
     ) -> None:
         pe_command = self._legacy_command_mapper.map_instrument_load(
             instrument_load_info=instrument_load_info
+        )
+        self.dispatch(pe_actions.UpdateCommandAction(command=pe_command))
+
+    def _dispatch_module_loaded(
+            self, module_load_info: LegacyModuleLoadInfo
+    ) -> None:
+        pe_command = self._legacy_command_mapper.map_module_load(
+            module_load_info=module_load_info
         )
         self.dispatch(pe_actions.UpdateCommandAction(command=pe_command))

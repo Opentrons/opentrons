@@ -16,6 +16,7 @@ from opentrons.protocol_runner.legacy_command_mapper import (
 from opentrons.protocol_runner.legacy_wrappers import (
     LegacyInstrumentLoadInfo,
     LegacyLabwareLoadInfo,
+    LegacyModuleLoadInfo,
 )
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons.types import DeckSlotName, Mount, MountType
@@ -243,4 +244,27 @@ def test_map_instrument_load() -> None:
     )
 
     output = LegacyCommandMapper().map_instrument_load(input)
+    assert output == expected_output
+
+
+def test_map_module_load() -> None:
+    """It should correctly map a module load."""
+    input = LegacyModuleLoadInfo(
+        module_name="module-1",
+        location=1,
+        configuration="conf",
+    )
+    expected_output = pe_commands.LoadModule.construct(
+        id=matchers.IsA(str),
+        status=pe_commands.CommandStatus.SUCCEEDED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        data=pe_commands.LoadModuleData.construct(
+            model="module-1",
+            location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+        ),
+        result=pe_commands.LoadModuleResult.construct(moduleId=matchers.IsA(str))
+    )
+    output = LegacyCommandMapper().map_module_load(input)
     assert output == expected_output

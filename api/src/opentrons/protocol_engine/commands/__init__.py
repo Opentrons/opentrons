@@ -65,6 +65,14 @@ from .load_pipette import (
     LoadPipetteCommandType,
 )
 
+from .load_module import (
+    LoadModule,
+    LoadModuleData,
+    LoadModuleRequest,
+    LoadModuleResult,
+    LoadModuleCommandType,
+)
+
 from .move_to_well import (
     MoveToWell,
     MoveToWellData,
@@ -136,6 +144,12 @@ __all__ = [
     "LoadPipetteData",
     "LoadPipetteResult",
     "LoadPipetteCommandType",
+    # load module command models
+    "LoadModule",
+    "LoadModuleRequest",
+    "LoadModuleData",
+    "LoadModuleResult",
+    "LoadModuleCommandType",
     # move to well command models
     "MoveToWell",
     "MoveToWellRequest",

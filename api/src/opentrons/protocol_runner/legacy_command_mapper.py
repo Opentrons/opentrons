@@ -12,6 +12,7 @@ from opentrons.protocols.models.labware_definition import LabwareDefinition
 from .legacy_wrappers import (
     LegacyInstrumentLoadInfo,
     LegacyLabwareLoadInfo,
+    LegacyModuleLoadInfo,
 )
 
 
@@ -150,3 +151,31 @@ class LegacyCommandMapper:
 
         self._command_count["LOAD_PIPETTE"] = count + 1
         return load_pipette_command
+
+    def map_module_load(
+            self,
+            module_load_info: LegacyModuleLoadInfo
+    ) -> pe_commands.Command:
+        """Map a legacy module load to a Protocol Engine command."""
+        now = utc_now()
+
+        count = self._command_count["LOAD_MODULE"]
+
+        load_module_command = pe_commands.LoadModule(
+            id=f"commands.LOAD_MODULE-{count}",
+            status=pe_commands.CommandStatus.SUCCEEDED,
+            createdAt=now,
+            startedAt=now,
+            completedAt=now,
+            data=pe_commands.LoadModuleData(
+                model=module_load_info.module_name,
+                location=pe_types.DeckSlotLocation(
+                    slot=pe_types.DeckSlotName.from_primitive(
+                        module_load_info.location))
+            ),
+            result=pe_commands.LoadModuleResult(
+                moduleId=f"module-{count}",
+            ),
+        )
+        self._command_count["LOAD_MODULE"] = count + 1
+        return load_module_command
