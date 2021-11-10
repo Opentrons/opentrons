@@ -65,9 +65,9 @@ async def test_driver_route_message(
     )
     await proxy_listener.wait_count(1)
     driver = await asyncio.open_connection(host="localhost", port=setting.driver_port)
-    driver[1].write(b"abc")
-    r = await emulator[0].read(3)
-    assert r == b"abc"
+    driver[1].write(b"abc\n")
+    r = await emulator[0].readline()
+    assert r == b"abc\n"
 
 
 async def test_emulator_route_message(
@@ -79,9 +79,11 @@ async def test_emulator_route_message(
     )
     await proxy_listener.wait_count(1)
     driver = await asyncio.open_connection(host="localhost", port=setting.driver_port)
-    emulator[1].write(b"abc")
-    r = await driver[0].read(3)
-    assert r == b"abc"
+
+    test_data = b"abc\n"
+    emulator[1].write(test_data)
+    r = await driver[0].readline()
+    assert r == test_data
 
 
 async def test_driver_route_message_two_connections(
@@ -97,12 +99,15 @@ async def test_driver_route_message_two_connections(
     await proxy_listener.wait_count(2)
     driver1 = await asyncio.open_connection(host="localhost", port=setting.driver_port)
     driver2 = await asyncio.open_connection(host="localhost", port=setting.driver_port)
-    driver1[1].write(b"abc")
-    driver2[1].write(b"cba")
-    r1 = await emulator1[0].read(3)
-    r2 = await emulator2[0].read(3)
-    assert r1 == b"abc"
-    assert r2 == b"cba"
+
+    test_data1 = b"abc\n"
+    test_data2 = b"cba\n"
+    driver1[1].write(test_data1)
+    driver2[1].write(test_data2)
+    r1 = await emulator1[0].readline()
+    r2 = await emulator2[0].readline()
+    assert r1 == test_data1
+    assert r2 == test_data2
 
 
 async def test_emulator_route_message_two_connections(
@@ -118,18 +123,21 @@ async def test_emulator_route_message_two_connections(
     await proxy_listener.wait_count(2)
     driver1 = await asyncio.open_connection(host="localhost", port=setting.driver_port)
     driver2 = await asyncio.open_connection(host="localhost", port=setting.driver_port)
-    emulator1[1].write(b"abc")
-    emulator2[1].write(b"cba")
-    r1 = await driver1[0].read(3)
-    r2 = await driver2[0].read(3)
-    assert r1 == b"abc"
-    assert r2 == b"cba"
+
+    test_data1 = b"abc\n"
+    test_data2 = b"cba\n"
+    emulator1[1].write(test_data1)
+    emulator2[1].write(test_data2)
+    r1 = await driver1[0].readline()
+    r2 = await driver2[0].readline()
+    assert r1 == test_data1
+    assert r2 == test_data2
 
 
 async def test_driver_and_no_emulator(subject: Proxy, setting: ProxySettings) -> None:
     """It should fail to read if no emulator."""
     driver = await asyncio.open_connection(host="localhost", port=setting.driver_port)
-    assert b"" == await driver[0].read(n=1)
+    assert b"" == await driver[0].readline()
 
 
 async def test_two_driver_and_one_emulator(
@@ -142,9 +150,11 @@ async def test_two_driver_and_one_emulator(
     await proxy_listener.wait_count(1)
     driver1 = await asyncio.open_connection(host="localhost", port=setting.driver_port)
     driver2 = await asyncio.open_connection(host="localhost", port=setting.driver_port)
-    emulator[1].write(b"abc")
-    assert b"abc" == await driver1[0].read(n=3)
-    assert b"" == await driver2[0].read(n=3)
+
+    test_data1 = b"abc\n"
+    emulator[1].write(test_data1)
+    assert test_data1 == await driver1[0].readline()
+    assert b"" == await driver2[0].readline()
 
 
 async def test_driver_reconnect(
@@ -156,14 +166,16 @@ async def test_driver_reconnect(
     )
     await proxy_listener.wait_count(1)
     driver = await asyncio.open_connection(host="localhost", port=setting.driver_port)
-    emulator[1].write(b"abc")
-    assert b"abc" == await driver[0].read(n=3)
+
+    test_data = b"abc\n"
+    emulator[1].write(test_data)
+    assert test_data == await driver[0].readline()
 
     driver[1].close()
 
     driver = await asyncio.open_connection(host="localhost", port=setting.driver_port)
-    emulator[1].write(b"abc")
-    assert b"abc" == await driver[0].read(n=3)
+    emulator[1].write(test_data)
+    assert test_data == await driver[0].readline()
 
 
 async def test_emulator_disconnects(
@@ -177,5 +189,5 @@ async def test_emulator_disconnects(
     driver = await asyncio.open_connection(host="localhost", port=setting.driver_port)
     emulator[1].close()
 
-    driver[1].write(b"123")
-    assert b"" == await driver[0].read(n=3)
+    driver[1].write(b"123\n")
+    assert b"" == await driver[0].readline()
