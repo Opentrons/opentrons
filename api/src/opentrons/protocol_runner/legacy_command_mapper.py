@@ -3,7 +3,7 @@
 from collections import defaultdict
 from typing import Dict, List
 
-from opentrons.types import MountType
+from opentrons.types import MountType, DeckSlotName
 from opentrons.util.helpers import utc_now
 from opentrons.commands.types import CommandMessage as LegacyCommand
 from opentrons.protocol_engine import commands as pe_commands, types as pe_types
@@ -12,6 +12,7 @@ from opentrons.protocols.models.labware_definition import LabwareDefinition
 from .legacy_wrappers import (
     LegacyInstrumentLoadInfo,
     LegacyLabwareLoadInfo,
+    LegacyModuleLoadInfo,
 )
 
 
@@ -152,3 +153,42 @@ class LegacyCommandMapper:
 
         self._command_count["LOAD_PIPETTE"] = count + 1
         return load_pipette_command
+
+    def map_module_load(
+        self, module_load_info: LegacyModuleLoadInfo
+    ) -> pe_commands.Command:
+        """Map a legacy module load to a Protocol Engine command."""
+        now = utc_now()
+
+        count = self._command_count["LOAD_MODULE"]
+
+        location = module_load_info.location
+        if location is None:
+            # The list for valid names is from
+            # opentrons.protocols.geometry.module_geometry.resolve_module_model
+            if module_load_info.module_name.lower() in [
+                "thermocycler",
+                "thermocycler module",
+            ]:
+                location = 7
+            else:
+                raise Exception(f"{module_load_info.module_name} requires a location.")
+
+        load_module_command = pe_commands.LoadModule(
+            id=f"commands.LOAD_MODULE-{count}",
+            status=pe_commands.CommandStatus.SUCCEEDED,
+            createdAt=now,
+            startedAt=now,
+            completedAt=now,
+            params=pe_commands.LoadModuleParams(
+                model=module_load_info.module_name,
+                location=pe_types.DeckSlotLocation(
+                    slotName=DeckSlotName.from_primitive(location)
+                ),
+            ),
+            result=pe_commands.LoadModuleResult(
+                moduleId=f"module-{count}",
+            ),
+        )
+        self._command_count["LOAD_MODULE"] = count + 1
+        return load_module_command
