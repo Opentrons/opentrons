@@ -2,33 +2,33 @@ import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { renderHook } from '@testing-library/react-hooks'
 import { useAllRunsQuery } from '@opentrons/react-api-client'
-import { useMostRecentRunId } from '../useMostRecentRunId'
+import { useCurrentRunId } from '../useCurrentRunId'
 
 jest.mock('@opentrons/react-api-client')
 
 const mockUseAllRunsQuery = useAllRunsQuery as jest.MockedFunction<typeof useAllRunsQuery>
 
-describe('useMostRecentRunId hook', () => {
+describe('useCurrentRunId hook', () => {
   afterEach(() => {
     resetAllWhenMocks()
   })
 
-  it('should return the first run if any runs exist', async () => {
+  it('should return the run id specified in the current link', async () => {
     when(mockUseAllRunsQuery)
       .calledWith()
-      .mockReturnValue({data: {data: [{id: 'some_run_id'}]}} as any)
+      .mockReturnValue({data: {links: {current: {href: '/runs/run_id'}}}} as any)
 
-    const { result, waitFor } = renderHook(useMostRecentRunId)
+    const { result, waitFor } = renderHook(useCurrentRunId)
 
-    expect(result.current).toBe('some_run_id')
+    expect(result.current).toBe('run_id')
   })
 
-  it('should return null if no runs exist', async () => {
+  it('should return null if no current run link', async () => {
     when(mockUseAllRunsQuery)
       .calledWith()
-      .mockReturnValue({data: {data: []}} as any)
+      .mockReturnValue({data: {links: {}}} as any)
 
-    const { result, waitFor } = renderHook(useMostRecentRunId)
+    const { result, waitFor } = renderHook(useCurrentRunId)
 
     expect(result.current).toBeNull()
   })
