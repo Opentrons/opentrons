@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional, Union
 
-from ..commands import Command, CommandRequest
+from ..commands import Command, CommandCreate
 
 
 @dataclass(frozen=True)
@@ -33,7 +33,7 @@ class QueueCommandAction:
 
     command_id: str
     created_at: datetime
-    request: CommandRequest
+    request: CommandCreate
 
 
 @dataclass(frozen=True)

@@ -11,7 +11,7 @@ from opentrons.protocol_engine.execution import (
 )
 
 from opentrons.protocol_engine.commands.save_position import (
-    SavePositionData,
+    SavePositionParams,
     SavePositionResult,
     SavePositionImplementation,
 )
@@ -31,7 +31,7 @@ async def test_save_position_implementation(
         pipetting=pipetting,
         run_control=run_control,
     )
-    data = SavePositionData(
+    params = SavePositionParams(
         pipetteId="abc",
         positionId="123",
     )
@@ -44,7 +44,8 @@ async def test_save_position_implementation(
         SavedPositionData(positionId="123", position=DeckPoint(x=1, y=2, z=3))
     )
 
-    result = await subject.execute(data)
+    result = await subject.execute(params)
     assert result == SavePositionResult(
-        positionId="123", position=DeckPoint(x=1, y=2, z=3)
+        positionId="123",
+        position=DeckPoint(x=1, y=2, z=3),
     )

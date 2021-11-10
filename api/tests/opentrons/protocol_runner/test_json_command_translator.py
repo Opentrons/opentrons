@@ -70,9 +70,9 @@ def test_labware(
     minimal_labware_def: LabwareDefinition,
     minimal_labware_def2: LabwareDefinition,
 ) -> None:
-    """It should emit AddLabwareDefinitionRequest and LoadLabwareRequest objects.
+    """It should emit AddLabwareDefinitionCreate and LoadLabwareCreate objects.
 
-    A LoadLabwareRequest should always come after the AddLabwareDefinitionRequest
+    A LoadLabwareCreate should always come after the AddLabwareDefinitionCreate
     that it depends on.
     """
     definition_1 = models.LabwareDefinition.parse_obj(minimal_labware_def)
@@ -98,11 +98,11 @@ def test_labware(
     # "my-load-name", and then assert that the hard-coded string "my-load-name" is
     # what's used in the output Protocol Engine command.
 
-    expected_add_definition_request_1 = pe_commands.AddLabwareDefinitionRequest(
-        data=pe_commands.AddLabwareDefinitionData(definition=definition_1)
+    expected_add_definition_request_1 = pe_commands.AddLabwareDefinitionCreate(
+        params=pe_commands.AddLabwareDefinitionParams(definition=definition_1)
     )
-    expected_load_request_1 = pe_commands.LoadLabwareRequest(
-        data=pe_commands.LoadLabwareData(
+    expected_load_request_1 = pe_commands.LoadLabwareCreate(
+        params=pe_commands.LoadLabwareParams(
             location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
             loadName=definition_1.parameters.loadName,
             namespace=definition_1.namespace,
@@ -111,11 +111,11 @@ def test_labware(
         )
     )
 
-    expected_add_definition_request_2 = pe_commands.AddLabwareDefinitionRequest(
-        data=pe_commands.AddLabwareDefinitionData(definition=definition_2)
+    expected_add_definition_request_2 = pe_commands.AddLabwareDefinitionCreate(
+        params=pe_commands.AddLabwareDefinitionParams(definition=definition_2)
     )
-    expected_load_request_2 = pe_commands.LoadLabwareRequest(
-        data=pe_commands.LoadLabwareData(
+    expected_load_request_2 = pe_commands.LoadLabwareCreate(
+        params=pe_commands.LoadLabwareParams(
             location=DeckSlotLocation(slot=DeckSlotName.SLOT_2),
             loadName=definition_2.parameters.loadName,
             namespace=definition_2.namespace,
@@ -142,22 +142,22 @@ def test_labware(
 
 
 def test_pipettes(subject: JsonCommandTranslator) -> None:
-    """It should translate pipette specs into LoadPipetteRequest objects."""
+    """It should translate pipette specs into LoadPipetteCreate objects."""
     json_pipettes = {
         "abc123": models.json_protocol.Pipettes(mount="left", name="p20_single_gen2"),
         "def456": models.json_protocol.Pipettes(mount="right", name="p300_multi"),
     }
 
-    expected_request_1 = pe_commands.LoadPipetteRequest(
-        data=pe_commands.LoadPipetteData(
+    expected_request_1 = pe_commands.LoadPipetteCreate(
+        params=pe_commands.LoadPipetteParams(
             pipetteId="abc123",
             mount=MountType.LEFT,
             pipetteName=PipetteName.P20_SINGLE_GEN2,
         )
     )
 
-    expected_request_2 = pe_commands.LoadPipetteRequest(
-        data=pe_commands.LoadPipetteData(
+    expected_request_2 = pe_commands.LoadPipetteCreate(
+        params=pe_commands.LoadPipetteParams(
             pipetteId="def456",
             mount=MountType.RIGHT,
             pipetteName=PipetteName.P300_MULTI,
@@ -173,7 +173,7 @@ def test_pipettes(subject: JsonCommandTranslator) -> None:
 
 
 def test_aspirate(subject: JsonCommandTranslator) -> None:
-    """It should translate a JSON aspirate to a Protocol Engine AspirateRequest."""
+    """It should translate a JSON aspirate to a Protocol Engine AspirateCreate."""
     input_json_command = models.json_protocol.LiquidCommand(
         command="aspirate",
         params=models.json_protocol.Params(
@@ -186,8 +186,8 @@ def test_aspirate(subject: JsonCommandTranslator) -> None:
         ),
     )
     expected_output = [
-        pe_commands.AspirateRequest(
-            data=pe_commands.AspirateData(
+        pe_commands.AspirateCreate(
+            params=pe_commands.AspirateParams(
                 pipetteId="pipette-id-abc123",
                 labwareId="labware-id-def456",
                 volume=1.23,
@@ -205,7 +205,7 @@ def test_aspirate(subject: JsonCommandTranslator) -> None:
 
 
 def test_dispense(subject: JsonCommandTranslator) -> None:
-    """It should translate a JSON dispense to a ProtocolEngine DispenseRequest."""
+    """It should translate a JSON dispense to a ProtocolEngine DispenseCreate."""
     input_json_command = models.json_protocol.LiquidCommand(
         command="dispense",
         params=models.json_protocol.Params(
@@ -218,8 +218,8 @@ def test_dispense(subject: JsonCommandTranslator) -> None:
         ),
     )
     expected_output = [
-        pe_commands.DispenseRequest(
-            data=pe_commands.DispenseData(
+        pe_commands.DispenseCreate(
+            params=pe_commands.DispenseParams(
                 pipetteId="pipette-id-abc123",
                 labwareId="labware-id-def456",
                 volume=1.23,
@@ -237,7 +237,7 @@ def test_dispense(subject: JsonCommandTranslator) -> None:
 
 
 def test_drop_tip(subject: JsonCommandTranslator) -> None:
-    """It should translate a JSON drop tip to a ProtocolEngine DropTipRequest."""
+    """It should translate a JSON drop tip to a ProtocolEngine DropTipCreate."""
     input_json_command = models.json_protocol.PickUpDropTipCommand(
         command="dropTip",
         params=models.json_protocol.PipetteAccessParams(
@@ -245,8 +245,8 @@ def test_drop_tip(subject: JsonCommandTranslator) -> None:
         ),
     )
     expected_output = [
-        pe_commands.DropTipRequest(
-            data=pe_commands.DropTipData(
+        pe_commands.DropTipCreate(
+            params=pe_commands.DropTipParams(
                 pipetteId="pipette-id-abc123",
                 labwareId="labware-id-def456",
                 wellName="A1",
@@ -259,7 +259,7 @@ def test_drop_tip(subject: JsonCommandTranslator) -> None:
 
 
 def test_pick_up_tip(subject: JsonCommandTranslator) -> None:
-    """It should translate a JSON pick up tip to a ProtocolEngine PickUpTipRequest."""
+    """It should translate a JSON pick up tip to a ProtocolEngine PickUpTipCreate."""
     input_json_command = models.json_protocol.PickUpDropTipCommand(
         command="pickUpTip",
         params=models.json_protocol.PipetteAccessParams(
@@ -267,8 +267,8 @@ def test_pick_up_tip(subject: JsonCommandTranslator) -> None:
         ),
     )
     expected_output = [
-        pe_commands.PickUpTipRequest(
-            data=pe_commands.PickUpTipData(
+        pe_commands.PickUpTipCreate(
+            params=pe_commands.PickUpTipParams(
                 pipetteId="pipette-id-abc123",
                 labwareId="labware-id-def456",
                 wellName="A1",
@@ -281,7 +281,7 @@ def test_pick_up_tip(subject: JsonCommandTranslator) -> None:
 
 
 def test_pause(subject: JsonCommandTranslator) -> None:
-    """It should translate delay with wait=True to a PauseRequest."""
+    """It should translate delay with wait=True to a PauseCreate."""
     input_command = models.json_protocol.DelayCommand(
         command="delay",
         params=models.json_protocol.DelayCommandParams(
@@ -294,5 +294,5 @@ def test_pause(subject: JsonCommandTranslator) -> None:
     result = subject.translate(input_protocol)
 
     assert result == [
-        pe_commands.PauseRequest(data=pe_commands.PauseData(message="hello world"))
+        pe_commands.PauseCreate(params=pe_commands.PauseParams(message="hello world"))
     ]

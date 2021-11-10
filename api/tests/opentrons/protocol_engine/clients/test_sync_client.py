@@ -42,8 +42,8 @@ def stubbed_load_labware_result(
     tip_rack_def: LabwareDefinition,
 ) -> commands.LoadLabwareResult:
     """Set up the protocol engine with default stubbed response for load labware."""
-    request = commands.LoadLabwareRequest(
-        data=commands.LoadLabwareData(
+    request = commands.LoadLabwareCreate(
+        params=commands.LoadLabwareParams(
             location=DeckSlotLocation(slot=DeckSlotName.SLOT_5),
             loadName="some_labware",
             namespace="opentrons",
@@ -84,8 +84,8 @@ def test_load_pipette(
     subject: SyncClient,
 ) -> None:
     """It should execute a load pipette command and return its result."""
-    request = commands.LoadPipetteRequest(
-        data=commands.LoadPipetteData(
+    request = commands.LoadPipetteCreate(
+        params=commands.LoadPipetteParams(
             pipetteName=PipetteName.P300_SINGLE,
             mount=MountType.RIGHT,
         )
@@ -109,8 +109,8 @@ def test_pick_up_tip(
     subject: SyncClient,
 ) -> None:
     """It should execute a pick up tip command."""
-    request = commands.PickUpTipRequest(
-        data=commands.PickUpTipData(pipetteId="123", labwareId="456", wellName="A2")
+    request = commands.PickUpTipCreate(
+        params=commands.PickUpTipParams(pipetteId="123", labwareId="456", wellName="A2")
     )
     response = commands.PickUpTipResult()
 
@@ -127,8 +127,8 @@ def test_drop_tip(
     subject: SyncClient,
 ) -> None:
     """It should execute a drop up tip command."""
-    request = commands.DropTipRequest(
-        data=commands.DropTipData(pipetteId="123", labwareId="456", wellName="A2")
+    request = commands.DropTipCreate(
+        params=commands.DropTipParams(pipetteId="123", labwareId="456", wellName="A2")
     )
     response = commands.DropTipResult()
 
@@ -145,8 +145,8 @@ def test_aspirate(
     subject: SyncClient,
 ) -> None:
     """It should send an AspirateCommand through the transport."""
-    request = commands.AspirateRequest(
-        data=commands.AspirateData(
+    request = commands.AspirateCreate(
+        params=commands.AspirateParams(
             pipetteId="123",
             labwareId="456",
             wellName="A2",
@@ -184,8 +184,8 @@ def test_dispense(
     subject: SyncClient,
 ) -> None:
     """It should execute a dispense command."""
-    request = commands.DispenseRequest(
-        data=commands.DispenseData(
+    request = commands.DispenseCreate(
+        params=commands.DispenseParams(
             pipetteId="123",
             labwareId="456",
             wellName="A2",
@@ -220,7 +220,7 @@ def test_pause(
     subject: SyncClient,
 ) -> None:
     """It should execute a pause command."""
-    request = commands.PauseRequest(data=commands.PauseData(message="hello world"))
+    request = commands.PauseCreate(params=commands.PauseParams(message="hello world"))
     response = commands.PauseResult()
 
     decoy.when(transport.execute_command(request=request)).then_return(response)

@@ -28,9 +28,9 @@ class SyncClient:
         namespace: str,
         version: int,
     ) -> commands.LoadLabwareResult:
-        """Execute a LoadLabwareRequest and return the result."""
-        request = commands.LoadLabwareRequest(
-            data=commands.LoadLabwareData(
+        """Execute a LoadLabwareCreate and return the result."""
+        request = commands.LoadLabwareCreate(
+            params=commands.LoadLabwareParams(
                 location=location,
                 loadName=load_name,
                 namespace=namespace,
@@ -46,9 +46,9 @@ class SyncClient:
         pipette_name: PipetteName,
         mount: MountType,
     ) -> commands.LoadPipetteResult:
-        """Execute a LoadPipetteRequest and return the result."""
-        request = commands.LoadPipetteRequest(
-            data=commands.LoadPipetteData(
+        """Execute a LoadPipetteCreate and return the result."""
+        request = commands.LoadPipetteCreate(
+            params=commands.LoadPipetteParams(
                 pipetteName=pipette_name,
                 mount=mount,
             )
@@ -63,9 +63,9 @@ class SyncClient:
         labware_id: str,
         well_name: str,
     ) -> commands.PickUpTipResult:
-        """Execute a PickUpTipRequest and return the result."""
-        request = commands.PickUpTipRequest(
-            data=commands.PickUpTipData(
+        """Execute a PickUpTipCreate and return the result."""
+        request = commands.PickUpTipCreate(
+            params=commands.PickUpTipParams(
                 pipetteId=pipette_id,
                 labwareId=labware_id,
                 wellName=well_name,
@@ -81,9 +81,9 @@ class SyncClient:
         labware_id: str,
         well_name: str,
     ) -> commands.DropTipResult:
-        """Execute a DropTipRequest and return the result."""
-        request = commands.DropTipRequest(
-            data=commands.DropTipData(
+        """Execute a DropTipCreate and return the result."""
+        request = commands.DropTipCreate(
+            params=commands.DropTipParams(
                 pipetteId=pipette_id,
                 labwareId=labware_id,
                 wellName=well_name,
@@ -100,9 +100,9 @@ class SyncClient:
         well_location: WellLocation,
         volume: float,
     ) -> commands.AspirateResult:
-        """Execute an ``AspirateRequest``, returning the result."""
-        request = commands.AspirateRequest(
-            data=commands.AspirateData(
+        """Execute an ``AspirateCreate``, returning the result."""
+        request = commands.AspirateCreate(
+            params=commands.AspirateParams(
                 pipetteId=pipette_id,
                 labwareId=labware_id,
                 wellName=well_name,
@@ -122,9 +122,9 @@ class SyncClient:
         well_location: WellLocation,
         volume: float,
     ) -> commands.DispenseResult:
-        """Execute a ``DispenseRequest``, returning the result."""
-        request = commands.DispenseRequest(
-            data=commands.DispenseData(
+        """Execute a ``DispenseCreate``, returning the result."""
+        request = commands.DispenseCreate(
+            params=commands.DispenseParams(
                 pipetteId=pipette_id,
                 labwareId=labware_id,
                 wellName=well_name,
@@ -136,7 +136,7 @@ class SyncClient:
         return cast(commands.DispenseResult, result)
 
     def pause(self, message: Optional[str]) -> commands.PauseResult:
-        """Execute a ``PauseRequest``, returning the result."""
-        request = commands.PauseRequest(data=commands.PauseData(message=message))
+        """Execute a ``PauseCreate``, returning the result."""
+        request = commands.PauseCreate(params=commands.PauseParams(message=message))
         result = self._transport.execute_command(request=request)
         return cast(commands.PauseResult, result)

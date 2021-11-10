@@ -247,7 +247,7 @@ async def test_get_run(
         id="command-id",
         status=pe_commands.CommandStatus.QUEUED,
         createdAt=datetime(year=2021, month=1, day=1),
-        data=pe_commands.PauseData(message="hello world"),
+        params=pe_commands.PauseParams(message="hello world"),
     )
 
     labware = pe_types.LoadedLabware(

@@ -12,7 +12,7 @@ from opentrons.protocol_engine.execution import (
     RunControlHandler,
 )
 from opentrons.protocol_engine.commands.load_labware import (
-    LoadLabwareData,
+    LoadLabwareParams,
     LoadLabwareResult,
     LoadLabwareImplementation,
 )
@@ -34,7 +34,7 @@ async def test_load_labware_implementation(
         run_control=run_control,
     )
 
-    data = LoadLabwareData(
+    data = LoadLabwareParams(
         location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
         loadName="some-load-name",
         namespace="opentrons-test",

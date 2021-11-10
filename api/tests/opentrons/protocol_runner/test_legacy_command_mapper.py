@@ -38,7 +38,7 @@ def test_map_before_command() -> None:
         status=pe_commands.CommandStatus.RUNNING,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
-        data=LegacyCommandData(
+        params=LegacyCommandData(
             legacyCommandType="command.PAUSE",
             legacyCommandText="hello world",
         ),
@@ -71,7 +71,7 @@ def test_map_after_command() -> None:
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        data=LegacyCommandData(
+        params=LegacyCommandData(
             legacyCommandType="command.PAUSE",
             legacyCommandText="hello world",
         ),
@@ -104,7 +104,7 @@ def test_map_after_with_error_command() -> None:
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        data=LegacyCommandData(
+        params=LegacyCommandData(
             legacyCommandType="command.PAUSE",
             legacyCommandText="hello world",
         ),
@@ -150,7 +150,7 @@ def test_command_stack() -> None:
         status=pe_commands.CommandStatus.RUNNING,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
-        data=LegacyCommandData(
+        params=LegacyCommandData(
             legacyCommandType="command.PAUSE",
             legacyCommandText="hello",
         ),
@@ -160,7 +160,7 @@ def test_command_stack() -> None:
         status=pe_commands.CommandStatus.RUNNING,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
-        data=LegacyCommandData(
+        params=LegacyCommandData(
             legacyCommandType="command.PAUSE",
             legacyCommandText="goodbye",
         ),
@@ -171,7 +171,7 @@ def test_command_stack() -> None:
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        data=LegacyCommandData(
+        params=LegacyCommandData(
             legacyCommandType="command.PAUSE",
             legacyCommandText="goodbye",
         ),
@@ -182,7 +182,7 @@ def test_command_stack() -> None:
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        data=LegacyCommandData(
+        params=LegacyCommandData(
             legacyCommandType="command.PAUSE",
             legacyCommandText="hello",
         ),
@@ -204,7 +204,7 @@ def test_map_labware_load(minimal_labware_def: LabwareDefinition) -> None:
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        data=pe_commands.LoadLabwareData.construct(
+        params=pe_commands.LoadLabwareParams.construct(
             location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
             namespace="some_namespace",
             loadName="some_load_name",
@@ -236,7 +236,7 @@ def test_map_instrument_load() -> None:
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        data=pe_commands.LoadPipetteData.construct(
+        params=pe_commands.LoadPipetteParams.construct(
             pipetteName=PipetteName.P1000_SINGLE_GEN2, mount=MountType.LEFT
         ),
         result=pe_commands.LoadPipetteResult.construct(pipetteId=matchers.IsA(str)),

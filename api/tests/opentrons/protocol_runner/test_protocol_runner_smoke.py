@@ -71,7 +71,7 @@ async def test_runner_with_python(python_protocol_file: Path) -> None:
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        data=commands.PickUpTipData(
+        params=commands.PickUpTipParams(
             pipetteId=pipette_id_captor.value,
             labwareId=labware_id_captor.value,
             wellName="A1",
@@ -118,7 +118,7 @@ async def test_runner_with_json(json_protocol_file: Path) -> None:
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        data=commands.PickUpTipData(
+        params=commands.PickUpTipParams(
             pipetteId="pipette-id",
             labwareId="labware-id",
             wellName="A1",
@@ -168,7 +168,7 @@ async def test_runner_with_legacy_python(legacy_python_protocol_file: Path) -> N
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        data=LegacyCommandData(
+        params=LegacyCommandData(
             legacyCommandType="command.PICK_UP_TIP",
             legacyCommandText="Picking up tip from A1 of Opentrons 96 Tip Rack 300 µL on 1",  # noqa: E501
         ),
@@ -217,7 +217,7 @@ async def test_runner_with_legacy_json(legacy_json_protocol_file: Path) -> None:
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        data=LegacyCommandData(
+        params=LegacyCommandData(
             legacyCommandType="command.PICK_UP_TIP",
             legacyCommandText="Picking up tip from A1 of Opentrons 96 Tip Rack 300 µL on 1",  # noqa: E501
         ),

@@ -6,13 +6,13 @@ from typing import Optional, Type
 from typing_extensions import Literal
 
 from ..types import DeckPoint
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandRequest
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 SavePositionCommandType = Literal["savePosition"]
 
 
-class SavePositionData(BaseModel):
-    """Data needed to save a pipette's current position."""
+class SavePositionParams(BaseModel):
+    """Payload needed to save a pipette's current position."""
 
     pipetteId: str = Field(
         ..., description="Unique identifier of the pipette in question."
@@ -38,34 +38,36 @@ class SavePositionResult(BaseModel):
 
 
 class SavePositionImplementation(
-    AbstractCommandImpl[SavePositionData, SavePositionResult]
+    AbstractCommandImpl[SavePositionParams, SavePositionResult]
 ):
     """Save position command implementation."""
 
-    async def execute(self, data: SavePositionData) -> SavePositionResult:
+    async def execute(self, params: SavePositionParams) -> SavePositionResult:
         """Check the requested pipette's current position."""
         result = await self._movement.save_position(
-            pipette_id=data.pipetteId, position_id=data.positionId
+            pipette_id=params.pipetteId,
+            position_id=params.positionId,
         )
         return SavePositionResult(
-            positionId=result.positionId, position=result.position
+            positionId=result.positionId,
+            position=result.position,
         )
 
 
-class SavePosition(BaseCommand[SavePositionData, SavePositionResult]):
+class SavePosition(BaseCommand[SavePositionParams, SavePositionResult]):
     """Save Position command model."""
 
     commandType: SavePositionCommandType = "savePosition"
-    data: SavePositionData
+    params: SavePositionParams
     result: Optional[SavePositionResult]
 
     _ImplementationCls: Type[SavePositionImplementation] = SavePositionImplementation
 
 
-class SavePositionRequest(BaseCommandRequest[SavePositionData]):
+class SavePositionCreate(BaseCommandCreate[SavePositionParams]):
     """Save position command creation request model."""
 
     commandType: SavePositionCommandType = "savePosition"
-    data: SavePositionData
+    params: SavePositionParams
 
     _CommandCls: Type[SavePosition] = SavePosition

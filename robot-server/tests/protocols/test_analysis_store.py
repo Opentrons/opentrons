@@ -111,7 +111,7 @@ command_analysis_specs: List[CommandAnalysisSpec] = [
                 id="pause-1",
                 status=pe_commands.CommandStatus.SUCCEEDED,
                 createdAt=datetime(year=2021, month=1, day=1),
-                data=pe_commands.PauseData(message="hello world"),
+                params=pe_commands.PauseParams(message="hello world"),
                 result=pe_commands.PauseResult(),
             )
         ],
@@ -123,7 +123,7 @@ command_analysis_specs: List[CommandAnalysisSpec] = [
                 id="pause-1",
                 status=pe_commands.CommandStatus.FAILED,
                 createdAt=datetime(year=2021, month=1, day=1),
-                data=pe_commands.PauseData(message="hello world"),
+                params=pe_commands.PauseParams(message="hello world"),
                 error="Oh no!",
             )
         ],
