@@ -6,26 +6,28 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# OT-2 Software Changes in 4.7.0
+## OT-2 Software Changes in 4.7.0
 
-## New Features
+The 4.7.0 release of the OT-2 Software fixes a handful of regressions and bugs.
+
+### New Features
 
 - This is primarily a bug fix release.
 
-## Bug Fixes
+### Bug Fixes
 
 - Fixed an issue where pipette offset and tip length calibration would sometimes not be saved correctly.
 - Fixed issues around attach pipette behavior.
 
 ---
 
-# OT-2 Software Changes in 4.6.2
+## OT-2 Software Changes in 4.6.2
 
-## New Features
+### New Features
 
 - The `opentrons_simulate` command-line application can now estimate protocol duration using the `-e` option. This feature is experimental, but very cool!
 
-## Bug Fixes
+### Bug Fixes
 
 - If a protocol is canceled mid-run while there is a tip on a pipette, the tip will be dropped prior to resetting the plunger to avoid contaminating the pipette internals with liquids.
 - Fixed a movement planning issue that could cause multi-channel pipettes to collide with the deck when changing pipettes.
@@ -33,11 +35,11 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 - Fixed a few issues with the faster protocol analysis method added in the 4.5.0 release.
 - Fixed type annotations of the `ProtocolContext` classes.
 
-## 4.6.1 to 4.6.2
+#### 4.6.1 to 4.6.2
 
 The 4.6.2 hotfix release contains a small bug fix for an issue where the OT-2's max speed settings within a protocol will be ignored.
 
-## 4.6.0 to 4.6.1
+#### 4.6.0 to 4.6.1
 
 The 4.6.1 hotfix release contains a small configuration change to fix an issue with installing the `opentrons` PyPI package on computers running Python 3.8 and later. It does not affect the software running on your OT-2.
 
