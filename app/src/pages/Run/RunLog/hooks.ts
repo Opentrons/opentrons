@@ -1,7 +1,5 @@
-import {
-  useAllRunsQuery,
-  useRunActionMutations,
-} from '@opentrons/react-api-client'
+import { useRunActionMutations } from '@opentrons/react-api-client'
+import { useCurrentRunId } from '../../../organisms/ProtocolUpload/useCurrentRunId'
 
 interface CancelRun {
   usePause: () => void
@@ -9,11 +7,9 @@ interface CancelRun {
 }
 
 export function useCancelRun(): CancelRun {
-  // TODO: use first run temporarily
-  const { data: runsData } = useAllRunsQuery()
-  const currentRunId = runsData?.data[0].id as string
+  const currentRunId = useCurrentRunId()
 
-  const { pauseRun, stopRun } = useRunActionMutations(currentRunId)
+  const { pauseRun, stopRun } = useRunActionMutations(currentRunId as string)
 
   const usePause = (): void => {
     pauseRun()
