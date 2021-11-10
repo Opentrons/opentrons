@@ -118,7 +118,7 @@ class LegacyCommandMapper:
                 definition=LabwareDefinition.parse_obj(
                     labware_load_info.labware_definition
                 ),
-                calibration=pe_types.CalibrationOffset(x=0, y=0, z=0),
+                calibration=pe_types.LabwareOffsetVector(x=0, y=0, z=0),
             ),
         )
 

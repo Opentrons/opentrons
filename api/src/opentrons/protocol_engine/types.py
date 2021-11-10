@@ -61,14 +61,6 @@ class Dimensions:
     z: float
 
 
-class CalibrationOffset(BaseModel):
-    """Calibration offset from nominal to actual position."""
-
-    x: float
-    y: float
-    z: float
-
-
 class DeckPoint(BaseModel):
     """Coordinates of a point in deck space."""
 
@@ -113,6 +105,14 @@ class LoadedLabware(BaseModel):
     location: LabwareLocation
 
 
+class LabwareOffsetVector(BaseModel):
+    """Offset, in deck coordinates from nominal to actual position."""
+
+    x: float
+    y: float
+    z: float
+
+
 class LabwareOffsetCreate(BaseModel):
     """Create request data for a labware offset."""
 
@@ -121,7 +121,7 @@ class LabwareOffsetCreate(BaseModel):
         ...,
         description="Where the labware is located on the robot.",
     )
-    offset: CalibrationOffset = Field(
+    offset: LabwareOffsetVector = Field(
         ...,
         description="The offset applied to matching labware.",
     )
@@ -141,7 +141,7 @@ class LabwareOffset(BaseModel):
         ...,
         description="Where the labware is located on the robot.",
     )
-    offset: CalibrationOffset = Field(
+    offset: LabwareOffsetVector = Field(
         ...,
         description="The offset applied to matching labware.",
     )

@@ -15,7 +15,7 @@ from .plugins import AbstractPlugin
 from .types import (
     LabwareOffset,
     LabwareOffsetCreate,
-    CalibrationOffset,
+    LabwareOffsetVector,
     DeckSlotLocation,
     Dimensions,
     EngineStatus,
@@ -45,7 +45,7 @@ __all__ = [
     # public value interfaces and models
     "LabwareOffset",
     "LabwareOffsetCreate",
-    "CalibrationOffset",
+    "LabwareOffsetVector",
     "DeckSlotLocation",
     "Dimensions",
     "EngineStatus",

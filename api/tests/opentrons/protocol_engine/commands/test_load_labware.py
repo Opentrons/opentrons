@@ -3,7 +3,7 @@ from decoy import Decoy
 
 from opentrons.types import DeckSlotName
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.protocol_engine.types import CalibrationOffset, DeckSlotLocation
+from opentrons.protocol_engine.types import LabwareOffsetVector, DeckSlotLocation
 from opentrons.protocol_engine.execution import (
     LoadedLabwareData,
     EquipmentHandler,
@@ -62,5 +62,5 @@ async def test_load_labware_implementation(
     assert result == LoadLabwareResult(
         labwareId="labware-id",
         definition=well_plate_def,
-        calibration=CalibrationOffset(x=1, y=2, z=3),
+        calibration=LabwareOffsetVector(x=1, y=2, z=3),
     )
