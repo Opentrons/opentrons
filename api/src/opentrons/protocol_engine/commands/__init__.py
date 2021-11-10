@@ -66,8 +66,8 @@ from .load_pipette import (
 
 from .load_module import (
     LoadModule,
-    LoadModuleData,
-    LoadModuleRequest,
+    LoadModuleParams,
+    LoadModuleCreate,
     LoadModuleResult,
     LoadModuleCommandType,
 )
@@ -143,8 +143,8 @@ __all__ = [
     "LoadPipetteCommandType",
     # load module command models
     "LoadModule",
-    "LoadModuleRequest",
-    "LoadModuleData",
+    "LoadModuleCreate",
+    "LoadModuleParams",
     "LoadModuleResult",
     "LoadModuleCommandType",
     # move to well command models

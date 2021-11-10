@@ -180,10 +180,10 @@ class LegacyCommandMapper:
             createdAt=now,
             startedAt=now,
             completedAt=now,
-            data=pe_commands.LoadModuleData(
+            params=pe_commands.LoadModuleParams(
                 model=module_load_info.module_name,
                 location=pe_types.DeckSlotLocation(
-                    slot=DeckSlotName.from_primitive(location)
+                    slotName=DeckSlotName.from_primitive(location)
                 ),
             ),
             result=pe_commands.LoadModuleResult(

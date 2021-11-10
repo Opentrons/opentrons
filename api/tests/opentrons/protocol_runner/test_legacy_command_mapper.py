@@ -270,9 +270,9 @@ def test_map_module_load(
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        data=pe_commands.LoadModuleData.construct(
+        params=pe_commands.LoadModuleParams.construct(
             model=module_name,
-            location=DeckSlotLocation(slot=slot),
+            location=DeckSlotLocation(slotName=slot),
         ),
         result=pe_commands.LoadModuleResult.construct(moduleId=matchers.IsA(str)),
     )

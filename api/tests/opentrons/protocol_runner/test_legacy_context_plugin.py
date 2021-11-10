@@ -284,13 +284,13 @@ def test_module_load_broker_messages(
     handler: Callable[[LegacyModuleLoadInfo], None] = handler_captor.value
 
     module_load_info = LegacyModuleLoadInfo(
-        module_name="some_module_name", location=DeckSlotName.SLOT_1, configuration=None
+        module_name="some_module_name", location=1, configuration=None
     )
     engine_command = pe_commands.Custom(
         id="command-id",
         status=pe_commands.CommandStatus.RUNNING,
         createdAt=datetime(year=2021, month=1, day=1),
-        data=pe_commands.CustomData(message="hello world"),  # type: ignore[call-arg]
+        params=pe_commands.CustomParams(message="hello"),  # type: ignore[call-arg]
     )
 
     decoy.when(
