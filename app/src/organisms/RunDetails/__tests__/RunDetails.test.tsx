@@ -42,10 +42,19 @@ describe('RunDetails', () => {
     const { getAllByText } = render()
     getAllByText('Mock Command List')
   })
-  it('renders the cancel button and is clickable', () => {
-    const { getByRole } = render()
+  it('renders the cancel button, button is clickable, and cancel modal is rendered', () => {
+    const { getByRole, getByText } = render()
     const button = getByRole('button', { name: 'Cancel Run' })
     fireEvent.click(button)
     expect(button).not.toBeNull()
+    getByText('Are you sure you want to cancel this run?')
+    getByText(
+      'Doing so will terminate this run, drop any attached tips in the trash container and home your robot.'
+    )
+    getByText(
+      'Additionally, any hardware modules used within the protocol will remain active and maintain their current states until deactivated.'
+    )
+    getByText('go back')
+    getByText('cancel run')
   })
 })

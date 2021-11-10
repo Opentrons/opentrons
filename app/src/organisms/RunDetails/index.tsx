@@ -14,9 +14,9 @@ import {
 } from '@opentrons/components'
 import { Page } from '../../atoms/Page'
 import { ConfirmCancelModal } from '../../pages/Run/RunLog'
+import fixtureCommands from '@opentrons/app/src/organisms/RunDetails/Fixture_commands.json'
 import { useProtocolDetails } from './hooks'
 import { CommandList } from './CommandList'
-import fixtureCommands from '@opentrons/app/src/organisms/RunDetails/Fixture_commands.json'
 
 export function RunDetails(): JSX.Element | null {
   const { t } = useTranslation('run_details')

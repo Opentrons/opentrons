@@ -36,7 +36,7 @@ export function CommandList(props: Props): JSX.Element | null {
   const protocolData: ProtocolFile<{}> | null = useProtocolDetails()
     .protocolData
   const runStatus = useRunStatus()
-  //  @ts-expect-error
+  //  @ts-expect-error - status property is not compatible right now
   const legacyCommands = schemaV6Adapter(fixtureAnalysis).commands
   if (protocolData == null) return null
 
@@ -152,7 +152,7 @@ export function CommandList(props: Props): JSX.Element | null {
               } else if (command.commandType === 'custom') {
                 commandWholeText = (
                   <Flex key={command.id}>
-                    {/* @ts-expect-error */}
+                    {/* @ts-expect-error  - data doesn't exit on type params, wait until command type is updated */}
                     {command.data.legacyCommandText}
                   </Flex>
                 )
