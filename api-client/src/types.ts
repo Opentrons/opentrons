@@ -28,3 +28,8 @@ export interface ErrorResponse {
   links?: ResourceLinks
   errors: ErrorDetails[]
 }
+
+export interface EmptyResponse {
+  links?: ResourceLinks
+  data: null
+}

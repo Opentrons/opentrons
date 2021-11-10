@@ -1,17 +1,22 @@
 import asyncio
+from typing import Iterator
 
 import pytest
 from opentrons import _find_smoothie_file
 from opentrons.config.robot_configs import build_config
 from opentrons.hardware_control import Controller
-from opentrons.hardware_control.emulation.app import SMOOTHIE_PORT
+from opentrons.hardware_control.emulation.settings import Settings
 from opentrons.types import Mount
 
 
 @pytest.fixture
-async def subject(loop: asyncio.BaseEventLoop, emulation_app) -> Controller:
+async def subject(
+    loop: asyncio.BaseEventLoop,
+    emulation_app: Iterator[None],
+    emulator_settings: Settings,
+) -> Controller:
     conf = build_config({})
-    port = f"socket://127.0.0.1:{SMOOTHIE_PORT}"
+    port = f"socket://127.0.0.1:{emulator_settings.smoothie.port}"
     hc = await Controller.build(config=conf)
     await hc.connect(port=port)
     yield hc

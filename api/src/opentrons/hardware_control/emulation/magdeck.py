@@ -8,21 +8,21 @@ from typing import Optional
 from opentrons.drivers.mag_deck.driver import GCODE
 from opentrons.hardware_control.emulation.parser import Parser, Command
 from .abstract_emulator import AbstractEmulator
+from .settings import MagDeckSettings
 
 logger = logging.getLogger(__name__)
-
-
-SERIAL = "magnetic_emulator"
-MODEL = "mag_deck_v20"
-VERSION = "2.0.0"
 
 
 class MagDeckEmulator(AbstractEmulator):
     """Magdeck emulator"""
 
-    def __init__(self, parser: Parser) -> None:
-        self.reset()
+    height: float = 0
+    position: float = 0
+
+    def __init__(self, parser: Parser, settings: MagDeckSettings) -> None:
+        self._settings = settings
         self._parser = parser
+        self.reset()
 
     def handle(self, line: str) -> Optional[str]:
         """Handle a line"""
@@ -30,7 +30,7 @@ class MagDeckEmulator(AbstractEmulator):
         joined = " ".join(r for r in results if r)
         return None if not joined else joined
 
-    def reset(self):
+    def reset(self) -> None:
         self.height: float = 0
         self.position: float = 0
 
@@ -50,7 +50,11 @@ class MagDeckEmulator(AbstractEmulator):
         elif command.gcode == GCODE.GET_CURRENT_POSITION:
             return f"Z:{self.position}"
         elif command.gcode == GCODE.DEVICE_INFO:
-            return f"serial:{SERIAL} model:{MODEL} version:{VERSION}"
+            return (
+                f"serial:{self._settings.serial_number} "
+                f"model:{self._settings.model} "
+                f"version:{self._settings.version}"
+            )
         elif command.gcode == GCODE.PROGRAMMING_MODE:
             pass
         return None

@@ -86,12 +86,12 @@ async def test_load_labware(
     decoy.when(
         await labware_data_provider.get_labware_calibration(
             definition=minimal_labware_def,
-            location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
         )
     ).then_return((1, 2, 3))
 
     result = await subject.load_labware(
-        location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
         load_name="load-name",
         namespace="opentrons-test",
         version=1,
@@ -129,12 +129,12 @@ async def test_load_labware_uses_provided_id(
     decoy.when(
         await labware_data_provider.get_labware_calibration(
             definition=minimal_labware_def,
-            location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
         )
     ).then_return((1, 2, 3))
 
     result = await subject.load_labware(
-        location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
         load_name="load-name",
         namespace="opentrons-test",
         version=1,
@@ -172,12 +172,12 @@ async def test_load_labware_uses_loaded_labware_def(
     decoy.when(
         await labware_data_provider.get_labware_calibration(
             definition=minimal_labware_def,
-            location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
         )
     ).then_return((1, 2, 3))
 
     result = await subject.load_labware(
-        location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
         load_name="load-name",
         namespace="opentrons-test",
         version=1,

@@ -49,7 +49,7 @@ describe('useRunActionMutations hook', () => {
       } as unknown) as UsePauseRunMutationResult)
 
     when(mockUseStopRunMutation)
-      .calledWith(RUN_ID_1)
+      .calledWith()
       .mockReturnValue(({
         stopRun: mockStopRun,
       } as unknown) as UseStopRunMutationResult)
@@ -62,5 +62,6 @@ describe('useRunActionMutations hook', () => {
     expect(mockPauseRun).toHaveBeenCalledTimes(1)
     act(() => result.current.stopRun())
     expect(mockStopRun).toHaveBeenCalledTimes(1)
+    expect(mockStopRun).toHaveBeenCalledWith(RUN_ID_1)
   })
 })

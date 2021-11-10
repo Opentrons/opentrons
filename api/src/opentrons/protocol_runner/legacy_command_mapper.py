@@ -16,7 +16,7 @@ from .legacy_wrappers import (
 )
 
 
-class LegacyCommandData(pe_commands.CustomData):
+class LegacyCommandParams(pe_commands.CustomParams):
     """Custom command data payload for mapped legacy commands."""
 
     legacyCommandType: str
@@ -62,7 +62,7 @@ class LegacyCommandMapper:
                 status=pe_commands.CommandStatus.RUNNING,
                 createdAt=now,
                 startedAt=now,
-                data=LegacyCommandData(
+                params=LegacyCommandParams(
                     legacyCommandType=command_type,
                     legacyCommandText=command_text,
                 ),
@@ -105,8 +105,10 @@ class LegacyCommandMapper:
             createdAt=now,
             startedAt=now,
             completedAt=now,
-            data=pe_commands.LoadLabwareData(
-                location=pe_types.DeckSlotLocation(slot=labware_load_info.deck_slot),
+            params=pe_commands.LoadLabwareParams(
+                location=pe_types.DeckSlotLocation(
+                    slotName=labware_load_info.deck_slot
+                ),
                 loadName=labware_load_info.labware_load_name,
                 namespace=labware_load_info.labware_namespace,
                 version=labware_load_info.labware_version,
@@ -138,7 +140,7 @@ class LegacyCommandMapper:
             createdAt=now,
             startedAt=now,
             completedAt=now,
-            data=pe_commands.LoadPipetteData(
+            params=pe_commands.LoadPipetteParams(
                 pipetteName=pe_types.PipetteName(
                     instrument_load_info.instrument_load_name
                 ),

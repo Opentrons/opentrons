@@ -1,8 +1,7 @@
 import { DELETE, request } from '../request'
 
 import type { ResponsePromise } from '../request'
-import type { HostConfig } from '../types'
-import type { EmptyResponse } from './types'
+import type { HostConfig, EmptyResponse } from '../types'
 
 export function deleteProtocol(
   config: HostConfig,

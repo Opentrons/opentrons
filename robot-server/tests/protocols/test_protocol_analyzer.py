@@ -54,14 +54,14 @@ async def test_analyze(
         id="command-id",
         status=pe_commands.CommandStatus.SUCCEEDED,
         createdAt=datetime(year=2022, month=2, day=2),
-        data=pe_commands.PauseData(message="hello world"),
+        params=pe_commands.PauseParams(message="hello world"),
     )
 
     analysis_labware = pe_types.LoadedLabware(
         id="labware-id",
         loadName="load-name",
         definitionUri="namespace/load-name/42",
-        location=pe_types.DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+        location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
     )
 
     analysis_pipette = pe_types.LoadedPipette(

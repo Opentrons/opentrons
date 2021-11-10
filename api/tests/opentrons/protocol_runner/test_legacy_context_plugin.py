@@ -161,14 +161,14 @@ def test_main_broker_messages(
     legacy_command: PauseMessage = {
         "$": "before",
         "name": "command.PAUSE",
-        "payload": {"userMessage": "hello world", "text": "hello world"},
+        "payload": {"userMessage": "hello", "text": "hello"},
         "error": None,
     }
     engine_command = pe_commands.Custom(
         id="command-id",
         status=pe_commands.CommandStatus.RUNNING,
         createdAt=datetime(year=2021, month=1, day=1),
-        data=pe_commands.CustomData(message="hello world"),  # type: ignore[call-arg]
+        params=pe_commands.CustomParams(message="hello"),  # type: ignore[call-arg]
     )
 
     decoy.when(legacy_command_mapper.map_command(command=legacy_command)).then_return(
@@ -211,7 +211,7 @@ def test_labware_load_broker_messages(
         id="command-id",
         status=pe_commands.CommandStatus.RUNNING,
         createdAt=datetime(year=2021, month=1, day=1),
-        data=pe_commands.CustomData(message="hello world"),  # type: ignore[call-arg]
+        params=pe_commands.CustomParams(message="hello"),  # type: ignore[call-arg]
     )
 
     decoy.when(
@@ -251,7 +251,7 @@ def test_instrument_load_broker_messages(
         id="command-id",
         status=pe_commands.CommandStatus.RUNNING,
         createdAt=datetime(year=2021, month=1, day=1),
-        data=pe_commands.CustomData(message="hello world"),  # type: ignore[call-arg]
+        params=pe_commands.CustomParams(message="hello"),  # type: ignore[call-arg]
     )
 
     decoy.when(

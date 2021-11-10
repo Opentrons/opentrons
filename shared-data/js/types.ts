@@ -16,6 +16,8 @@ import {
   RIGHT,
 } from './constants'
 import type { INode } from 'svgson'
+import type { Command } from '../protocol'
+import type { PipetteName } from './pipettes'
 
 // TODO Ian 2019-06-04 split this out into eg ../labware/flowTypes/labwareV1.js
 export interface WellDefinition {
@@ -353,4 +355,48 @@ export interface PipetteModelSpecs extends PipetteNameSpecs {
   tipLength: {
     value: number
   }
+}
+export interface ProtocolMetadata {
+  protocolName?: string
+  author?: string
+  description?: string | null
+  created?: number
+  lastModified?: number | null
+  category?: string | null
+  subcategory?: string | null
+  tags?: string[]
+  [key: string]: unknown
+}
+export interface PendingProtocolAnalysis {
+  id: string
+  status?: 'pending'
+}
+export interface LoadedPipette {
+  id: string
+  pipetteName: PipetteName
+  mount: 'left' | 'right'
+}
+export interface LoadedLabware {
+  id: string
+  loadName: string
+  definitionUri: string
+  location: {
+    slot: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
+  }
+}
+export interface CompletedProtocolAnalysis {
+  id: string
+  status?: 'completed'
+  result: 'ok' | 'not-ok' | 'error'
+  pipettes: LoadedPipette[]
+  labware: LoadedLabware[]
+  commands: Command[]
+  errors: string[]
+}
+export interface ProtocolResource {
+  id: string
+  createdAt: string
+  protocolType: 'json' | 'python'
+  metadata: ProtocolMetadata
+  analyses: PendingProtocolAnalysis[] | CompletedProtocolAnalysis[]
 }

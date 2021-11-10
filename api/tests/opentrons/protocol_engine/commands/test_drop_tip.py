@@ -8,7 +8,7 @@ from opentrons.protocol_engine.execution import (
 )
 
 from opentrons.protocol_engine.commands.drop_tip import (
-    DropTipData,
+    DropTipParams,
     DropTipResult,
     DropTipImplementation,
 )
@@ -29,7 +29,7 @@ async def test_drop_tip_implementation(
         run_control=run_control,
     )
 
-    data = DropTipData(
+    data = DropTipParams(
         pipetteId="abc",
         labwareId="123",
         wellName="A3",

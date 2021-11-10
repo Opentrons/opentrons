@@ -7,10 +7,11 @@ export function createProtocol(
   config: HostConfig,
   files: File[]
 ): ResponsePromise<Protocol> {
-  return request<Protocol, { files: File[] }>(
-    POST,
-    '/protocols',
-    { files },
-    config
-  )
+  const formData = new FormData()
+  // NOTE(bc, 2021-11-03): We're only expecting one file for now, because currently the
+  // api can only handle one under the "files" key, replace this with multi file capabilities
+  // during custom labware support pass
+  formData.append('files', files[0], files[0].name)
+
+  return request<Protocol, FormData>(POST, '/protocols', formData, config)
 }

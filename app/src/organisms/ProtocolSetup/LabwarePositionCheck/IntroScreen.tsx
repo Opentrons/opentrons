@@ -25,7 +25,7 @@ import { useIntroInfo, useLabwareIdsBySection } from './hooks'
 export const INTERVAL_MS = 3000
 
 export const IntroScreen = (props: {
-  setCurrentLabwareCheckStep: (stepNumber: number) => void
+  beginLPC: () => void
 }): JSX.Element | null => {
   const introInfo = useIntroInfo()
   const labwareIdsBySection = useLabwareIdsBySection()
@@ -53,6 +53,7 @@ export const IntroScreen = (props: {
         as={'h3'}
         textTransform={TEXT_TRANSFORM_UPPERCASE}
         fontWeight={FONT_WEIGHT_SEMIBOLD}
+        id={`IntroScreen_labware_position_check_overview`}
       >
         {t('labware_position_check_overview')}
       </Text>
@@ -82,7 +83,7 @@ export const IntroScreen = (props: {
             initial_labware_slot: firstStepLabwareSlot,
           })}
           backgroundColor={C_BLUE}
-          onClick={() => props.setCurrentLabwareCheckStep(0)}
+          onClick={props.beginLPC}
         >
           {t('start_position_check', {
             initial_labware_slot: firstStepLabwareSlot,

@@ -98,7 +98,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             calibrations_by_id[labware_id] = command.result.calibration
             labware_by_id[labware_id] = LoadedLabware(
                 id=labware_id,
-                location=command.data.location,
+                location=command.params.location,
                 loadName=command.result.definition.parameters.loadName,
                 definitionUri=definition_uri,
             )
@@ -117,7 +117,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 version=command.result.version,
             )
             definitions_by_uri = self._state.definitions_by_uri.copy()
-            definitions_by_uri[definition_uri] = command.data.definition
+            definitions_by_uri[definition_uri] = command.params.definition
             self._state = replace(self._state, definitions_by_uri=definitions_by_uri)
 
 

@@ -12,7 +12,7 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_runner.legacy_command_mapper import (
     LegacyCommandMapper,
-    LegacyCommandData,
+    LegacyCommandParams,
 )
 from opentrons.protocol_runner.legacy_wrappers import (
     LegacyInstrumentLoadInfo,
@@ -40,7 +40,7 @@ def test_map_before_command() -> None:
         status=pe_commands.CommandStatus.RUNNING,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
-        data=LegacyCommandData(
+        params=LegacyCommandParams(
             legacyCommandType="command.PAUSE",
             legacyCommandText="hello world",
         ),
@@ -73,7 +73,7 @@ def test_map_after_command() -> None:
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        data=LegacyCommandData(
+        params=LegacyCommandParams(
             legacyCommandType="command.PAUSE",
             legacyCommandText="hello world",
         ),
@@ -106,7 +106,7 @@ def test_map_after_with_error_command() -> None:
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        data=LegacyCommandData(
+        params=LegacyCommandParams(
             legacyCommandType="command.PAUSE",
             legacyCommandText="hello world",
         ),
@@ -152,7 +152,7 @@ def test_command_stack() -> None:
         status=pe_commands.CommandStatus.RUNNING,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
-        data=LegacyCommandData(
+        params=LegacyCommandParams(
             legacyCommandType="command.PAUSE",
             legacyCommandText="hello",
         ),
@@ -162,7 +162,7 @@ def test_command_stack() -> None:
         status=pe_commands.CommandStatus.RUNNING,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
-        data=LegacyCommandData(
+        params=LegacyCommandParams(
             legacyCommandType="command.PAUSE",
             legacyCommandText="goodbye",
         ),
@@ -173,7 +173,7 @@ def test_command_stack() -> None:
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        data=LegacyCommandData(
+        params=LegacyCommandParams(
             legacyCommandType="command.PAUSE",
             legacyCommandText="goodbye",
         ),
@@ -184,7 +184,7 @@ def test_command_stack() -> None:
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        data=LegacyCommandData(
+        params=LegacyCommandParams(
             legacyCommandType="command.PAUSE",
             legacyCommandText="hello",
         ),
@@ -206,8 +206,8 @@ def test_map_labware_load(minimal_labware_def: LabwareDefinition) -> None:
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        data=pe_commands.LoadLabwareData.construct(
-            location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+        params=pe_commands.LoadLabwareParams.construct(
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             namespace="some_namespace",
             loadName="some_load_name",
             version=123,
@@ -216,7 +216,7 @@ def test_map_labware_load(minimal_labware_def: LabwareDefinition) -> None:
         result=pe_commands.LoadLabwareResult.construct(
             labwareId=matchers.IsA(str),
             # Trusting that the exact fields within in the labware definition
-            # get passed through corectly.
+            # get passed through correctly.
             definition=matchers.Anything(),
             calibration=CalibrationOffset(x=0, y=0, z=0),
         ),
@@ -238,7 +238,7 @@ def test_map_instrument_load() -> None:
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        data=pe_commands.LoadPipetteData.construct(
+        params=pe_commands.LoadPipetteParams.construct(
             pipetteName=PipetteName.P1000_SINGLE_GEN2, mount=MountType.LEFT
         ),
         result=pe_commands.LoadPipetteResult.construct(pipetteId=matchers.IsA(str)),

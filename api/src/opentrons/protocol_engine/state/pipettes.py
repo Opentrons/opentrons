@@ -80,9 +80,9 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state = replace(
                 self._state,
                 current_well=CurrentWell(
-                    pipette_id=command.data.pipetteId,
-                    labware_id=command.data.labwareId,
-                    well_name=command.data.wellName,
+                    pipette_id=command.params.pipetteId,
+                    labware_id=command.params.labwareId,
+                    well_name=command.params.wellName,
                 ),
             )
 
@@ -93,8 +93,8 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
 
             pipettes_by_id[pipette_id] = LoadedPipette(
                 id=pipette_id,
-                pipetteName=command.data.pipetteName,
-                mount=command.data.mount,
+                pipetteName=command.params.pipetteName,
+                mount=command.params.mount,
             )
             aspirated_volume_by_id[pipette_id] = 0
 
@@ -105,7 +105,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             )
 
         elif isinstance(command.result, AspirateResult):
-            pipette_id = command.data.pipetteId
+            pipette_id = command.params.pipetteId
             aspirated_volume_by_id = self._state.aspirated_volume_by_id.copy()
 
             previous_volume = self._state.aspirated_volume_by_id[pipette_id]
@@ -118,7 +118,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             )
 
         elif isinstance(command.result, DispenseResult):
-            pipette_id = command.data.pipetteId
+            pipette_id = command.params.pipetteId
             aspirated_volume_by_id = self._state.aspirated_volume_by_id.copy()
 
             previous_volume = self._state.aspirated_volume_by_id[pipette_id]

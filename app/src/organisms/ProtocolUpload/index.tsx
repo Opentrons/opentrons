@@ -7,11 +7,12 @@ import {
   useConditionalConfirm,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { Page } from '../../atoms/Page'
 import { UploadInput } from './UploadInput'
 import { ProtocolSetup } from '../ProtocolSetup'
-import { getProtocolName, getProtocolFile } from '../../redux/protocol'
+import { useCurrentProtocolRun } from './useCurrentProtocolRun'
+import { useCloseCurrentRun } from './useCloseCurrentRun'
 import { loadProtocol, closeProtocol } from '../../redux/protocol/actions'
 import { ingestProtocolFile } from '../../redux/protocol/utils'
 
@@ -19,7 +20,7 @@ import { ConfirmExitProtocolUploadModal } from './ConfirmExitProtocolUploadModal
 
 import { useLogger } from '../../logger'
 import type { ErrorObject } from 'ajv'
-import type { Dispatch, State } from '../../redux/types'
+import type { Dispatch } from '../../redux/types'
 
 const VALIDATION_ERROR_T_MAP: { [errorKey: string]: string } = {
   INVALID_FILE_TYPE: 'invalid_file_type',
@@ -29,12 +30,18 @@ const VALIDATION_ERROR_T_MAP: { [errorKey: string]: string } = {
 export function ProtocolUpload(): JSX.Element {
   const { t } = useTranslation(['protocol_info', 'shared'])
   const dispatch = useDispatch<Dispatch>()
+  const {
+    createProtocolRun,
+    runRecord,
+    protocolRecord,
+  } = useCurrentProtocolRun()
+  const hasCurrentRun = runRecord != null && protocolRecord != null
+  const closeProtocolRun = useCloseCurrentRun()
+
   const logger = useLogger(__filename)
   const [uploadError, setUploadError] = React.useState<
     [string, ErrorObject[] | null | undefined] | null
   >(null)
-  const protocolFile = useSelector((state: State) => getProtocolFile(state))
-  const protocolName = useSelector((state: State) => getProtocolName(state))
 
   const clearError = (): void => {
     setUploadError(null)
@@ -46,6 +53,7 @@ export function ProtocolUpload(): JSX.Element {
       file,
       data => {
         dispatch(loadProtocol(file, data))
+        createProtocolRun([file])
       },
       (errorKey, errorDetails) => {
         logger.warn(errorKey)
@@ -57,6 +65,7 @@ export function ProtocolUpload(): JSX.Element {
 
   const handleCloseProtocol: React.MouseEventHandler = _event => {
     dispatch(closeProtocol())
+    closeProtocolRun()
   }
 
   const {
@@ -65,20 +74,21 @@ export function ProtocolUpload(): JSX.Element {
     cancel: cancelExit,
   } = useConditionalConfirm(handleCloseProtocol, true)
 
-  const titleBarProps =
-    protocolFile !== null
-      ? {
-          title: t('protocol_title', { protocol_name: protocolName }),
-          back: {
-            onClick: confirmExit,
-            title: t('shared:close'),
-            children: t('shared:close'),
-            iconName: 'close' as const,
-          },
-        }
-      : {
-          title: t('upload_and_simulate'),
-        }
+  const titleBarProps = hasCurrentRun
+    ? {
+        title: t('protocol_title', {
+          protocol_name: protocolRecord?.data?.metadata?.protocolName ?? '',
+        }),
+        back: {
+          onClick: confirmExit,
+          title: t('shared:close'),
+          children: t('shared:close'),
+          iconName: 'close' as const,
+        },
+      }
+    : {
+        title: t('upload_and_simulate'),
+      }
 
   return (
     <>
@@ -104,7 +114,7 @@ export function ProtocolUpload(): JSX.Element {
           width="100%"
           backgroundColor={C_NEAR_WHITE}
         >
-          {protocolFile !== null ? (
+          {runRecord != null && protocolRecord != null ? (
             <ProtocolSetup />
           ) : (
             <UploadInput onUpload={handleUpload} />
