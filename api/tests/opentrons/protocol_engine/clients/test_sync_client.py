@@ -44,7 +44,7 @@ def stubbed_load_labware_result(
     """Set up the protocol engine with default stubbed response for load labware."""
     request = commands.LoadLabwareCreate(
         params=commands.LoadLabwareParams(
-            location=DeckSlotLocation(slot=DeckSlotName.SLOT_5),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
             loadName="some_labware",
             namespace="opentrons",
             version=1,
@@ -69,7 +69,7 @@ def test_load_labware(
 ) -> None:
     """It should execute a load labware command."""
     result = subject.load_labware(
-        location=DeckSlotLocation(slot=DeckSlotName.SLOT_5),
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
         load_name="some_labware",
         namespace="opentrons",
         version=1,

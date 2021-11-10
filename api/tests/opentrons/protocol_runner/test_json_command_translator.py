@@ -103,7 +103,7 @@ def test_labware(
     )
     expected_load_request_1 = pe_commands.LoadLabwareCreate(
         params=pe_commands.LoadLabwareParams(
-            location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             loadName=definition_1.parameters.loadName,
             namespace=definition_1.namespace,
             version=definition_1.version,
@@ -116,7 +116,7 @@ def test_labware(
     )
     expected_load_request_2 = pe_commands.LoadLabwareCreate(
         params=pe_commands.LoadLabwareParams(
-            location=DeckSlotLocation(slot=DeckSlotName.SLOT_2),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
             loadName=definition_2.parameters.loadName,
             namespace=definition_2.namespace,
             version=definition_2.version,

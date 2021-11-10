@@ -74,7 +74,7 @@ class Labware:  # noqa: D101
         parent = self._engine_client.state.labware.get_location(
             labware_id=self._labware_id
         )
-        return str(parent.slot)
+        return str(parent.slotName)
 
     # TODO(mc, 2021-05-03): document removal of name setter
     @property

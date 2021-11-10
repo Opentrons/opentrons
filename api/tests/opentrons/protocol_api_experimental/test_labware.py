@@ -67,7 +67,7 @@ def test_labware_deck_slot_parent(
     """It should return a deck slot name if labware is loaded on the deck."""
     decoy.when(
         engine_client.state.labware.get_location(labware_id="labware-id")
-    ).then_return(DeckSlotLocation(slot=DeckSlotName.SLOT_5))
+    ).then_return(DeckSlotLocation(slotName=DeckSlotName.SLOT_5))
 
     assert subject.parent == "5"
 

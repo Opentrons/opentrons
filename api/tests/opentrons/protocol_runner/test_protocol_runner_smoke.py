@@ -30,7 +30,7 @@ from opentrons.protocol_runner import (
     PythonPreAnalysis,
     create_simulating_runner,
 )
-from opentrons.protocol_runner.legacy_command_mapper import LegacyCommandData
+from opentrons.protocol_runner.legacy_command_mapper import LegacyCommandParams
 
 
 async def test_runner_with_python(python_protocol_file: Path) -> None:
@@ -57,7 +57,7 @@ async def test_runner_with_python(python_protocol_file: Path) -> None:
 
     expected_labware = LoadedLabware.construct(
         id=labware_id_captor,
-        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         loadName="opentrons_96_tiprack_300ul",
         definitionUri="opentrons/opentrons_96_tiprack_300ul/1",
     )
@@ -104,7 +104,7 @@ async def test_runner_with_json(json_protocol_file: Path) -> None:
 
     expected_labware = LoadedLabware(
         id="labware-id",
-        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         loadName="opentrons_96_tiprack_300ul",
         definitionUri="opentrons/opentrons_96_tiprack_300ul/1",
     )
@@ -154,7 +154,7 @@ async def test_runner_with_legacy_python(legacy_python_protocol_file: Path) -> N
 
     expected_labware = LoadedLabware.construct(
         id=labware_id_captor,
-        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         loadName="opentrons_96_tiprack_300ul",
         definitionUri="opentrons/opentrons_96_tiprack_300ul/1",
     )
@@ -168,7 +168,7 @@ async def test_runner_with_legacy_python(legacy_python_protocol_file: Path) -> N
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        params=LegacyCommandData(
+        params=LegacyCommandParams(
             legacyCommandType="command.PICK_UP_TIP",
             legacyCommandText="Picking up tip from A1 of Opentrons 96 Tip Rack 300 µL on 1",  # noqa: E501
         ),
@@ -203,7 +203,7 @@ async def test_runner_with_legacy_json(legacy_json_protocol_file: Path) -> None:
 
     expected_labware = LoadedLabware.construct(
         id=labware_id_captor,
-        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         loadName="opentrons_96_tiprack_300ul",
         definitionUri="opentrons/opentrons_96_tiprack_300ul/1",
     )
@@ -217,7 +217,7 @@ async def test_runner_with_legacy_json(legacy_json_protocol_file: Path) -> None:
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        params=LegacyCommandData(
+        params=LegacyCommandParams(
             legacyCommandType="command.PICK_UP_TIP",
             legacyCommandText="Picking up tip from A1 of Opentrons 96 Tip Rack 300 µL on 1",  # noqa: E501
         ),

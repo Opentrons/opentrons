@@ -35,7 +35,7 @@ async def test_load_labware_implementation(
     )
 
     data = LoadLabwareParams(
-        location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
         loadName="some-load-name",
         namespace="opentrons-test",
         version=1,
@@ -43,7 +43,7 @@ async def test_load_labware_implementation(
 
     decoy.when(
         await equipment.load_labware(
-            location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
             load_name="some-load-name",
             namespace="opentrons-test",
             version=1,

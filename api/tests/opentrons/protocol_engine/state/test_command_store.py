@@ -94,7 +94,7 @@ class QueueCommandSpec(NamedTuple):
         QueueCommandSpec(
             command_request=commands.LoadLabwareCreate(
                 params=commands.LoadLabwareParams(
-                    location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+                    location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
                     loadName="load-name",
                     namespace="namespace",
                     version=42,

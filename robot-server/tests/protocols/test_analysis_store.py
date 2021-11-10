@@ -64,7 +64,7 @@ def test_add_analysis_equipment() -> None:
         id="labware-id",
         loadName="load-name",
         definitionUri="namespace/load-name/42",
-        location=pe_types.DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+        location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
     )
 
     pipette = pe_types.LoadedPipette(

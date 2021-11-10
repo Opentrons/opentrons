@@ -87,7 +87,7 @@ class JsonCommandTranslator:
         return pe_commands.LoadLabwareCreate(
             params=pe_commands.LoadLabwareParams(
                 location=DeckSlotLocation(
-                    slot=DeckSlotName.from_primitive(labware.slot)
+                    slotName=DeckSlotName.from_primitive(labware.slot)
                 ),
                 loadName=definition.parameters.loadName,
                 namespace=definition.namespace,
