@@ -1034,7 +1034,9 @@ class API(HardwareAPILike):
                 )
                 or not self._current_position
             ):
-                raise MustHomeError()
+                raise MustHomeError(
+                    "Cannot make a relative move because absolute position is unknown"
+                )
         elif not fail_on_not_homed and not self._current_position:
             await self.home()
 
