@@ -1,7 +1,5 @@
 """Wrappers for the legacy, Protocol API v2 execution pipeline."""
-import asyncio
-from concurrent.futures import ThreadPoolExecutor
-from functools import partial
+from anyio import to_thread
 
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocols.api_support.types import APIVersion
@@ -123,17 +121,10 @@ class LegacyExecutor:
         context: LegacyProtocolContext,
     ) -> None:
         """Execute a PAPIv2 protocol with a given ProtocolContext in a child thread."""
-        loop = asyncio.get_running_loop()
-
         # NOTE: this initial home is to match the previous behavior of the
         # RPC session, which called `ctx.home` before calling `run_protocol`
         await self._hardware_api.home()
-
-        with ThreadPoolExecutor(max_workers=1) as executor:
-            await loop.run_in_executor(
-                executor=executor,
-                func=partial(run_protocol, protocol=protocol, context=context),
-            )
+        await to_thread.run_sync(run_protocol, protocol, context)
 
 
 __all__ = [
