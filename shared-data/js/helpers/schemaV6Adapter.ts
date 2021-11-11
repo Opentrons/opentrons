@@ -81,6 +81,10 @@ export const schemaV6Adapter = (
             labwareId: index % 2 === 0 ? 'labware-1' : 'labware-3',
             wellName: 'A1',
           },
+          result: {
+            pipetteId: index % 2 === 0 ? 'pipette-0' : 'pipette-1',
+            labwareId: index % 2 === 0 ? 'labware-1' : 'labware-3',
+          },
         }
         return shimmedPickupTipCommand
       }

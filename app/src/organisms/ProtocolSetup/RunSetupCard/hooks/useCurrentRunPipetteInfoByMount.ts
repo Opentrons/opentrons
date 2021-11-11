@@ -20,6 +20,7 @@ import type {
   PipetteNameSpecs,
 } from '@opentrons/shared-data'
 import type { State } from '../../../../redux/types'
+import { load } from 'mime'
 
 const EMPTY_MOUNTS = { left: null, right: null }
 
@@ -62,14 +63,14 @@ export function useCurrentRunPipetteInfoByMount(): {
     (command): command is LoadPipetteCommand =>
       command.commandType === 'loadPipette'
   )
-  const tipRackCommands = commands.filter(
+  const pickUpTipCommands = commands.filter(
     (command): command is PickUpTipCommand =>
       command.commandType === 'pickUpTip'
   )
 
   return Object.entries(pipettes).reduce((acc, [pipetteId, pipette]) => {
     const loadCommand = loadPipetteCommands.find(
-      command => command.params.pipetteId == pipetteId
+      command => command.result?.pipetteId == pipetteId
     )
     if (loadCommand != null) {
       const { mount } = loadCommand.params
@@ -77,11 +78,11 @@ export function useCurrentRunPipetteInfoByMount(): {
       const pipetteSpecs = getPipetteNameSpecs(requestedPipetteName)
 
       if (pipetteSpecs != null) {
-        const tipRackDefs: LabwareDefinition2[] = tipRackCommands.reduce<
+        const tipRackDefs: LabwareDefinition2[] = pickUpTipCommands.reduce<
           LabwareDefinition2[]
         >((acc, command) => {
-          if (pipetteId === command.params.pipetteId) {
-            const tipRack = labware[command.params.labwareId]
+          if (pipetteId === command.result?.pipetteId) {
+            const tipRack = labware[command.result?.labwareId]
             const tipRackDefinition = labwareDefinitions[tipRack.definitionId]
             if (tipRackDefinition != null && !acc.includes(tipRackDefinition)) {
               return [...acc, tipRackDefinition]
