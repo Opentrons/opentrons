@@ -1014,16 +1014,30 @@ class API(HardwareAPILike):
         speed: float = None,
         max_speeds: Dict[Axis, float] = None,
         check_bounds: MotionChecks = MotionChecks.NONE,
+        fail_on_not_homed: bool = False,
     ):
         """Move the critical point of the specified mount by a specified
         displacement in a specified direction, at the specified speed.
         'speed' sets the speed of all axes to the given value. So, if multiple
-        axes are to be moved, they will do so at the same speed
+        axes are to be moved, they will do so at the same speed.
+
+        If fail_on_not_homed is True (default False), if an axis that is not
+        homed moves it will raise a MustHomeError. Otherwise, it will home the axis.
         """
-        if not self._current_position:
-            await self.home()
 
         mounts = self._mounts(mount)
+        if fail_on_not_homed:
+            if (
+                not self._homed_ok(
+                    [Axis.X, Axis.Y] + [Axis.by_mount(m) for m in mounts],
+                    self._backend.homed_flags(),
+                )
+                or not self._current_position
+            ):
+                raise MustHomeError()
+        elif not fail_on_not_homed and not self._current_position:
+            await self.home()
+
         primary_mount = mounts[0]
         secondary_mount = None
         # Even with overloads, mypy cannot accept a length check on
@@ -1916,3 +1930,10 @@ class API(HardwareAPILike):
     def clean_up(self) -> None:
         """Get the API ready to stop cleanly."""
         self._backend.clean_up()
+
+    @staticmethod
+    def _homed_ok(axes_moving: List[Axis], position: Dict[str, bool]) -> bool:
+        for axis in axes_moving:
+            if not position.get(axis.name, False):
+                return False
+        return True

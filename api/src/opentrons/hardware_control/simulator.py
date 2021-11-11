@@ -175,6 +175,9 @@ class Simulator:
     async def update_position(self) -> Dict[str, float]:
         return self._position
 
+    def homed_flags(self) -> Dict[str, bool]:
+        return self._smoothie_driver.homed_flags
+
     async def move(
         self,
         target_position: Dict[str, float],

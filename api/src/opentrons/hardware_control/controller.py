@@ -121,6 +121,9 @@ class Controller:
         await self._smoothie_driver.update_position()
         return self._smoothie_driver.position
 
+    def homed_flags(self) -> Dict[str, bool]:
+        return self._smoothie_driver.homed_flags
+
     async def move(
         self,
         target_position: Dict[str, float],

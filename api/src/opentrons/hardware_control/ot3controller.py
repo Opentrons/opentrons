@@ -52,6 +52,9 @@ class OT3Controller:
         self._gpio_dev = SimulatingGPIOCharDev("simulated")
         self._module_controls: Optional[AttachedModulesControl] = None
 
+    def homed_flags(self) -> Dict[str, bool]:
+        return {}
+
     @property
     def gpio_chardev(self) -> GPIODriverLike:
         """Get the GPIO device."""
