@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { when } from 'jest-when'
 import {
   partialComponentPropsMatcher,
   renderWithProviders,
@@ -8,7 +9,6 @@ import { CommandItem } from '../CommandItem'
 import { CommandText } from '../CommandText'
 import { CommandTimer } from '../CommandTimer'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6/command'
-import { when } from 'jest-when'
 
 jest.mock('../CommandText')
 jest.mock('../CommandTimer')
@@ -152,8 +152,9 @@ describe('Run  Details Command', () => {
       commandText: COMMAND_TEXT,
     }
     const { getByText } = render(props)
-    expect(getByText('touchTip')).toHaveStyle('backgroundColor: C_NEAR_WHITE')
-    getByText('COMMAND_TEXT')
+    expect(getByText('COMMAND_TEXT')).toHaveStyle(
+      'backgroundColor: C_NEAR_WHITE'
+    )
   })
   describe('CommandItemFailed', () => {
     beforeEach(() => {
@@ -193,7 +194,9 @@ describe('Run  Details Command', () => {
         commandText: COMMAND_TEXT,
       }
       const { getByText } = render(props)
-      expect(getByText('touchTip')).toHaveStyle('backgroundColor: C_NEAR_WHITE')
+      expect(getByText('COMMAND_TEXT')).toHaveStyle(
+        'backgroundColor: C_NEAR_WHITE'
+      )
     })
   })
   describe('CommandItemRunning', () => {

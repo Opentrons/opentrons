@@ -4,6 +4,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   FONT_SIZE_BODY_1,
+  FONT_SIZE_CAPTION,
   SPACING_1,
   Text,
   TEXT_TRANSFORM_CAPITALIZE,
@@ -37,7 +38,7 @@ export const ProtocolSetupInfo = (
   )
   if (protocolData == null) return null
   if (SetupCommand === undefined) return null
-
+  console.log('commandType', SetupCommand.commandType)
   let SetupCommandText
   if (SetupCommand.commandType === 'loadPipette') {
     const pipetteData = protocolPipetteData[SetupCommand.params.mount]
@@ -142,6 +143,9 @@ export const ProtocolSetupInfo = (
       flexDirection={DIRECTION_COLUMN}
       flex={'auto'}
     >
+      {type === 'queued' ? (
+        <Flex fontSize={FONT_SIZE_CAPTION}>{t('anticipated')}</Flex>
+      ) : null}
       <CommandItem
         currentCommand={SetupCommand}
         type={type}

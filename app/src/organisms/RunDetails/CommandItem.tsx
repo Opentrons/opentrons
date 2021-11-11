@@ -82,8 +82,9 @@ function CommandItemQueued(props: CommandItemsProps): JSX.Element {
   const { currentCommand } = props
   return (
     <Flex>
-      <Flex>{currentCommand.commandType} </Flex>
-      <Flex marginLeft={SPACING_1}>{props.commandText}</Flex>
+      <Flex marginLeft={SPACING_1} key={currentCommand.id}>
+        {props.commandText}
+      </Flex>
     </Flex>
   )
 }

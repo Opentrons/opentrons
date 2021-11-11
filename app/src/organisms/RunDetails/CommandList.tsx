@@ -79,17 +79,15 @@ export function CommandList(props: Props): JSX.Element | null {
                       id={`RunDetails_ProtocolSetup_CommandList`}
                       key={command.id}
                     >
-                      <ProtocolSetupInfo
-                        SetupCommand={
-                          command.commandType === 'loadLabware' ||
-                          command.commandType === 'loadPipette' ||
-                          command.commandType === 'loadModule'
-                            ? command
-                            : undefined
-                        }
-                        runStatus={runStatus}
-                        type={commandTypeStatus}
-                      />
+                      {command.commandType === 'loadLabware' ||
+                      command.commandType === 'loadPipette' ||
+                      command.commandType === 'loadModule' ? (
+                        <ProtocolSetupInfo
+                          SetupCommand={command}
+                          runStatus={runStatus}
+                          type={commandTypeStatus}
+                        />
+                      ) : null}
                     </Flex>
                   )
                 })}
@@ -122,7 +120,7 @@ export function CommandList(props: Props): JSX.Element | null {
           color={C_MED_DARK_GRAY}
           flexDirection={DIRECTION_COLUMN}
         >
-          <Flex padding={SPACING_1}>{t('protocol_steps')}</Flex>
+          <Flex paddingLeft={SPACING_1}>{t('protocol_steps')}</Flex>
           <Flex flexDirection={DIRECTION_COLUMN}>
             {legacyCommands.map(command => {
               let legacyCommandTypeStatus = 'queued' as Status
@@ -157,15 +155,17 @@ export function CommandList(props: Props): JSX.Element | null {
                   </Flex>
                 )
               }
-              return (
+              return command.commandType === 'custom' ? (
                 <Flex
                   key={command.id}
                   id={`RunDetails_CommandList`}
-                  justifyContent={JUSTIFY_START}
                   paddingLeft={SPACING_1}
-                  alignItems={ALIGN_CENTER}
+                  justifyContent={JUSTIFY_START}
+                  flexDirection={DIRECTION_COLUMN}
+                  flex={'auto'}
                 >
-                  {legacyCommandTypeStatus === 'queued' ? (
+                  {legacyCommandTypeStatus === 'queued' &&
+                  command.commandType === 'custom' ? (
                     <Flex fontSize={FONT_SIZE_CAPTION}>{t('anticipated')}</Flex>
                   ) : null}
                   <Flex
@@ -173,17 +173,15 @@ export function CommandList(props: Props): JSX.Element | null {
                     flexDirection={DIRECTION_COLUMN}
                     flex={'auto'}
                   >
-                    {command.commandType === 'custom' ? (
-                      <CommandItem
-                        currentCommand={command}
-                        type={legacyCommandTypeStatus}
-                        runStatus={runStatus}
-                        commandText={commandWholeText}
-                      />
-                    ) : null}
+                    <CommandItem
+                      currentCommand={command}
+                      type={legacyCommandTypeStatus}
+                      runStatus={runStatus}
+                      commandText={commandWholeText}
+                    />
                   </Flex>
                 </Flex>
-              )
+              ) : null
             })}
           </Flex>
           <Flex padding={SPACING_1}>{t('end_of_protocol')}</Flex>
