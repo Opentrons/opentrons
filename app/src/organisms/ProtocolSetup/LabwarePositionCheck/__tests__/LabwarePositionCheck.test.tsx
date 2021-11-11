@@ -7,12 +7,14 @@ import { LabwarePositionCheck } from '../index'
 import { GenericStepScreen } from '../GenericStepScreen'
 import { IntroScreen } from '../IntroScreen'
 import { SummaryScreen } from '../SummaryScreen'
+import { RobotMotionLoadingModal } from '../RobotMotionLoadingModal'
 import { useSteps, useLabwarePositionCheck } from '../hooks'
 import { LabwarePositionCheckStep } from '../types'
 
 jest.mock('../GenericStepScreen')
 jest.mock('../IntroScreen')
 jest.mock('../SummaryScreen')
+jest.mock('../RobotMotionLoadingModal')
 jest.mock('../hooks')
 
 const mockGenericStepScreen = GenericStepScreen as jest.MockedFunction<
@@ -21,6 +23,9 @@ const mockGenericStepScreen = GenericStepScreen as jest.MockedFunction<
 const mockIntroScreen = IntroScreen as jest.MockedFunction<typeof IntroScreen>
 const mockSummaryScreen = SummaryScreen as jest.MockedFunction<
   typeof SummaryScreen
+>
+const mockRobotMotionLoadingModal = RobotMotionLoadingModal as jest.MockedFunction<
+  typeof RobotMotionLoadingModal
 >
 
 const mockUseSteps = useSteps as jest.MockedFunction<typeof useSteps>
@@ -62,6 +67,14 @@ describe('LabwarePositionCheck', () => {
           section: 'PRIMARY_PIPETTE_TIPRACKS',
         } as LabwarePositionCheckStep,
       ])
+
+    mockIntroScreen.mockReturnValue(null)
+    mockSummaryScreen.mockReturnValue(<div>Mock Summary Screen Component </div>)
+    mockGenericStepScreen.mockReturnValue(null)
+    mockRobotMotionLoadingModal.mockReturnValue(
+      <div>Mock Robot Motion Loading Modal</div>
+    )
+
     when(mockUseLabwarePositionCheck)
       .calledWith(expect.anything())
       .mockReturnValue({} as any)
@@ -98,6 +111,11 @@ describe('LabwarePositionCheck', () => {
   it('renders LabwarePositionCheck with Summary Screen component', () => {
     const { getByText } = render(props)
     getByText('Mock Summary Screen Component')
+  })
+
+  it('renders LabwarePositionCheck with Robot Motion Loading Modal component', () => {
+    const { getByText } = render(props)
+    getByText('Mock Robot Motion Loading Modal')
   })
 
   // TODO: IMMEDIATELY fix this when LabwarePositionCheck/index is final and the isComplete boolean is final
