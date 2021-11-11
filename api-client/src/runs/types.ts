@@ -1,3 +1,5 @@
+import { Command as FullCommand } from '@opentrons/shared-data'
+
 export type RunStatus =
   | 'ready-to-run'
   | 'running'
@@ -14,7 +16,7 @@ export interface RunData {
   status: RunStatus
   actions: RunAction[]
   // TODO(bh, 10-29-2021): types for commands, pipettes, labware
-  commands: unknown[]
+  commands: FullCommand[]
   pipettes: unknown[]
   labware: unknown[]
   protocolId?: string

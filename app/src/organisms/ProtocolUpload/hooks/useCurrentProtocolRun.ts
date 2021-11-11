@@ -11,6 +11,8 @@ import { useCurrentRunId } from './useCurrentRunId'
 import type { UseMutateFunction } from 'react-query'
 import type { Protocol, Run } from '@opentrons/api-client'
 
+const REFETCH_INTERVAL = 1000
+
 interface UseCurrentProtocolRun {
   createProtocolRun: UseMutateFunction<Protocol, unknown, File[], unknown>
   protocolRecord?: Protocol | null
@@ -21,8 +23,9 @@ export function useCurrentProtocolRun(): UseCurrentProtocolRun {
   const host = useHost()
   const queryClient = useQueryClient()
   const currentRunId = useCurrentRunId()
-
-  const { data: runRecord } = useRunQuery(currentRunId)
+  const { data: runRecord } = useRunQuery(currentRunId, {
+    refetchInterval: REFETCH_INTERVAL,
+  })
   const { data: protocolRecord } = useProtocolQuery(
     (runRecord?.data?.protocolId as string) ?? null
   )

@@ -14,7 +14,6 @@ import {
   JUSTIFY_START,
   Text,
   FONT_SIZE_DEFAULT,
-  C_BLACK,
   SPACING_2,
   C_NEAR_WHITE,
   C_ERROR_LIGHT,
@@ -22,22 +21,15 @@ import {
   SPACING_3,
   SPACING_4,
   ALIGN_CENTER,
-  FONT_WEIGHT_BOLD,
 } from '@opentrons/components'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { useProtocolDetails } from './hooks'
+import { useCurrentProtocolRun } from '../ProtocolUpload/useCurrentProtocolRun'
 import { ProtocolSetupInfo } from './ProtocolSetupInfo'
-import { CommandItem, Status } from './CommandItem'
-import fixtureAnalysis from '@opentrons/app/src/organisms/RunDetails/Fixture_analysis.json'
-import { ProtocolFile, schemaV6Adapter } from '@opentrons/shared-data'
+import { CommandItem } from './CommandItem'
+import { ProtocolFile } from '@opentrons/shared-data'
 
-interface Props {
-  anticipated?: string
-  inProgress: string
-  completed?: string
-  isFailed: boolean
-}
-export function CommandList(props: Props): JSX.Element | null {
+export function CommandList(): JSX.Element | null {
   const { t } = useTranslation('run_details')
   const [
     showProtocolSetupInfo,
@@ -45,15 +37,55 @@ export function CommandList(props: Props): JSX.Element | null {
   ] = React.useState<boolean>(false)
   const protocolData: ProtocolFile<{}> | null = useProtocolDetails()
     .protocolData
+  const runDataCommands = useCurrentProtocolRun().runRecord?.data.commands
+
+  const currentCommandList = protocolData?.commands
+  const lastProtocolSetupIndex = currentCommandList
+    ?.map(
+      command =>
+        command.commandType === 'loadLabware' ||
+        command.commandType === 'loadPipette' ||
+        command.commandType === 'loadModule'
+    )
+    .lastIndexOf(true)
+  const protocolSetupCommandList = currentCommandList?.slice(
+    0,
+    lastProtocolSetupIndex
+  )
+  currentCommandList?.splice(0, lastProtocolSetupIndex)
+
+  React.useEffect(() => {
+    if (
+      runDataCommands != null &&
+      runDataCommands.length !== 0 &&
+      currentCommandList != null
+    ) {
+      // find first index after protocol setup and LPC commands
+      const firstRunCommandIndex = runDataCommands.findIndex(
+        command => command.id === currentCommandList[0].id
+      )
+      const runDataCommandsSlice = runDataCommands.slice(firstRunCommandIndex)
+      runDataCommandsSlice.forEach((command, index) => {
+        if (currentCommandList[index].id === command.id) {
+          currentCommandList[index] = command
+        }
+        if (
+          index <= runDataCommandsSlice.length &&
+          currentCommandList[index++].id !== runDataCommandsSlice[index++].id
+        ) {
+          currentCommandList.length = index++
+        }
+      })
+    }
+  }, [runDataCommands, currentCommandList])
   const runStatus = useRunStatus()
-  //  @ts-expect-error - status property is not compatible right now
-  const legacyCommands = schemaV6Adapter(fixtureAnalysis).commands
   if (protocolData == null) return null
 
   return (
     <React.Fragment>
       <Flex flexDirection={DIRECTION_COLUMN} flex={'auto'}>
-        {props.isFailed ? (
+        {currentCommandList?.some(command => command.status === 'failed') ===
+        true ? (
           <Flex
             padding={SPACING_2}
             flexDirection={DIRECTION_COLUMN}
@@ -100,41 +132,17 @@ export function CommandList(props: Props): JSX.Element | null {
                     <Icon name="chevron-up" color={C_MED_DARK_GRAY}></Icon>
                   </Btn>
                 </Flex>
-                {protocolData.commands.map((command, index) => {
-                  let setupCommandTypeStatus = 'queued' as Status
-                  if (command.id === props.inProgress)
-                    setupCommandTypeStatus = 'running'
-                  else if (
-                    props.anticipated != null &&
-                    command.id[index] >= props.anticipated[index]
-                  )
-                    setupCommandTypeStatus = 'queued'
-                  else if (command.id === props.completed)
-                    setupCommandTypeStatus = 'succeeded'
-                  else setupCommandTypeStatus = 'failed'
+                {protocolSetupCommandList?.map(command => {
                   return (
                     <Flex
                       id={`RunDetails_ProtocolSetup_CommandList`}
                       key={command.id}
                       flexDirection={DIRECTION_COLUMN}
                     >
-                      {props.anticipated != null &&
-                      setupCommandTypeStatus === 'queued' &&
-                      command.id[index] === props.anticipated[1] ? (
-                        <Flex fontSize={FONT_SIZE_CAPTION}>
-                          {t('anticipated')}
-                        </Flex>
-                      ) : null}
-
-                      {command.commandType === 'loadLabware' ||
-                      command.commandType === 'loadPipette' ||
-                      command.commandType === 'loadModule' ? (
-                        <ProtocolSetupInfo
-                          setupCommand={command}
-                          runStatus={runStatus}
-                          type={setupCommandTypeStatus}
-                        />
-                      ) : null}
+                      <ProtocolSetupInfo
+                        setupCommand={command}
+                        runStatus={runStatus}
+                      />
                     </Flex>
                   )
                 })}
@@ -168,27 +176,9 @@ export function CommandList(props: Props): JSX.Element | null {
           color={C_MED_DARK_GRAY}
           flexDirection={DIRECTION_COLUMN}
         >
-          <Flex
-            paddingLeft={SPACING_1}
-            fontSize={FONT_SIZE_DEFAULT}
-            fontWeight={FONT_WEIGHT_BOLD}
-            color={C_BLACK}
-          >
-            {t('protocol_steps')}
-          </Flex>
-          <Flex flexDirection={DIRECTION_COLUMN} flex={'auto'}>
-            {legacyCommands.map((command, index) => {
-              let commandTypeStatus = 'queued' as Status
-              if (command.id === props.inProgress) commandTypeStatus = 'running'
-              else if (
-                props.anticipated != null &&
-                command.id[index] >= props.anticipated[index]
-              )
-                commandTypeStatus = 'queued'
-              else if (command.id === props.completed)
-                commandTypeStatus = 'succeeded'
-              else commandTypeStatus = 'failed'
-
+          <Flex paddingLeft={SPACING_1}>{t('protocol_steps')}</Flex>
+          <Flex flexDirection={DIRECTION_COLUMN}>
+            {currentCommandList?.map((command, index) => {
               let commandWholeText
               if (command.commandType === 'delay') {
                 commandWholeText = (
@@ -221,10 +211,9 @@ export function CommandList(props: Props): JSX.Element | null {
                   flexDirection={DIRECTION_COLUMN}
                   flex={'auto'}
                 >
-                  {props.anticipated != null &&
-                  commandTypeStatus === 'queued' &&
-                  command.commandType === 'custom' &&
-                  command.id[index] === props.anticipated[1] ? (
+                  {(index === 0 && runDataCommands?.length === 0) ||
+                  (index > 0 &&
+                    currentCommandList[index - 1].status === 'running') ? (
                     <Flex fontSize={FONT_SIZE_CAPTION}>{t('anticipated')}</Flex>
                   ) : null}
                   <Flex
@@ -234,7 +223,11 @@ export function CommandList(props: Props): JSX.Element | null {
                   >
                     <CommandItem
                       currentCommand={command}
-                      type={commandTypeStatus}
+                      type={
+                        runDataCommands?.length !== 0
+                          ? command.status
+                          : 'queued'
+                      }
                       runStatus={runStatus}
                       commandText={commandWholeText}
                     />

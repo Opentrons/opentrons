@@ -13,7 +13,6 @@ import {
 } from '@opentrons/components'
 import { Page } from '../../atoms/Page'
 import { ConfirmCancelModal } from '../../pages/Run/RunLog'
-import fixtureCommands from '@opentrons/app/src/organisms/RunDetails/Fixture_commands.json'
 import { useProtocolDetails } from './hooks'
 import { CommandList } from './CommandList'
 
@@ -25,11 +24,6 @@ export function RunDetails(): JSX.Element | null {
     confirm: confirmExit,
     cancel: cancelExit,
   } = useConditionalConfirm(() => {}, true)
-  const [commandIdIndex] = React.useState<number>(0)
-  const commandIds = fixtureCommands.commands.map(command => command.id)
-  const commandStatuses = fixtureCommands.commands.map(
-    command => command.status
-  )
 
   const cancelRunButton = (
     <PrimaryBtn
@@ -54,12 +48,7 @@ export function RunDetails(): JSX.Element | null {
   return (
     <Page titleBarProps={titleBarProps}>
       {showConfirmExit ? <ConfirmCancelModal onClose={cancelExit} /> : null}
-      <CommandList
-        anticipated={commandIds[commandIdIndex + 1]}
-        inProgress={commandIds[commandIdIndex]}
-        completed={commandIds[commandIdIndex - 1]}
-        isFailed={commandStatuses[commandIdIndex] === 'failed'}
-      />
+      <CommandList />
     </Page>
   )
 }

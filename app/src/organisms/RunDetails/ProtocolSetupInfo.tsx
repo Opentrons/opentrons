@@ -15,19 +15,18 @@ import { getConnectedRobot } from '../../redux/discovery'
 import { State } from '../../redux/types'
 import { useSelector } from 'react-redux'
 import { useProtocolDetails } from './hooks'
-import { CommandItem, Status } from './CommandItem'
+import { CommandItem } from './CommandItem'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 
 interface ProtocolSetupInfoProps {
   setupCommand?: Command
   runStatus: string
-  type: Status
 }
 
 export const ProtocolSetupInfo = (
   props: ProtocolSetupInfoProps
 ): JSX.Element | null => {
-  const { setupCommand, runStatus, type } = props
+  const { setupCommand, runStatus } = props
   const { t } = useTranslation('run_details')
   const protocolData: ProtocolFile<{}> | null = useProtocolDetails()
     .protocolData
@@ -146,7 +145,7 @@ export const ProtocolSetupInfo = (
     >
       <CommandItem
         currentCommand={setupCommand}
-        type={type}
+        type={'queued'}
         runStatus={runStatus}
         commandText={SetupCommandText}
       />

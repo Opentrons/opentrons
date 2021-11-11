@@ -116,7 +116,7 @@ function CommandItemFailed(props: CommandItemsProps): JSX.Element {
 
 export interface CommandItemProps {
   currentCommand: Command
-  type: Status
+  type?: Status
   runStatus?: string
   commandText?: JSX.Element
 }
@@ -141,17 +141,17 @@ const WRAPPER_STYLE_BY_STATUS: Record<
 }
 export function CommandItem(props: CommandItemProps): JSX.Element {
   const { currentCommand, runStatus, type, commandText } = props
-
+  const commandType = type != null ? type : 'queued'
   const WRAPPER_STYLE = css`
     font-size: ${FONT_SIZE_BODY_1};
-    background-color: ${WRAPPER_STYLE_BY_STATUS[type].backgroundColor};
-    border: ${WRAPPER_STYLE_BY_STATUS[type].border};
+    background-color: ${WRAPPER_STYLE_BY_STATUS[commandType].backgroundColor};
+    border: ${WRAPPER_STYLE_BY_STATUS[commandType].border};
     padding: ${SPACING_2};
     color: ${C_DARK_GRAY};
     flex-direction: ${DIRECTION_ROW};
   `
   let commandStatus
-  if (type === 'running') {
+  if (commandType === 'running') {
     commandStatus = (
       <CommandItemRunning
         runStatus={runStatus}
@@ -159,21 +159,21 @@ export function CommandItem(props: CommandItemProps): JSX.Element {
         commandText={commandText}
       />
     )
-  } else if (type === 'failed') {
+  } else if (commandType === 'failed') {
     commandStatus = (
       <CommandItemFailed
         currentCommand={currentCommand}
         commandText={commandText}
       />
     )
-  } else if (type === 'queued') {
+  } else if (commandType === 'queued') {
     commandStatus = (
       <CommandItemQueued
         currentCommand={currentCommand}
         commandText={commandText}
       />
     )
-  } else if (type === 'succeeded') {
+  } else if (commandType === 'succeeded') {
     commandStatus = (
       <CommandItemSuccess
         currentCommand={currentCommand}
