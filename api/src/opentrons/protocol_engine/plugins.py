@@ -2,6 +2,7 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from anyio import from_thread
+from typing import List
 from typing_extensions import final
 
 from .actions import Action, ActionDispatcher, ActionHandler
@@ -50,6 +51,14 @@ class AbstractPlugin(ActionHandler, ABC):
         """
         return from_thread.run_sync(self._action_dispatcher.dispatch, action)
 
+    def setup(self) -> None:
+        """Run any necessary setup steps prior to plugin usage."""
+        ...
+
+    def teardown(self) -> None:
+        """Run any necessary teardown steps once the engine is stopped."""
+        ...
+
     @abstractmethod
     def handle_action(self, action: Action) -> None:
         """React to an action going through the pipeline.
@@ -65,7 +74,7 @@ class AbstractPlugin(ActionHandler, ABC):
         ...
 
     # NOTE: using a "protected" method allows mypy to infer the types
-    # of private propertes `_state` and `_action_dispatcher` without
+    # of private properties `_state` and `_action_dispatcher` without
     # declaring them on the class
     @final
     def _configure(
@@ -80,3 +89,31 @@ class AbstractPlugin(ActionHandler, ABC):
         """
         self._state = state
         self._action_dispatcher = action_dispatcher
+
+
+class PluginStarter:
+    """Configure, setup, and tear down engine plugins."""
+
+    def __init__(
+        self,
+        state: StateView,
+        action_dispatcher: ActionDispatcher,
+    ) -> None:
+        """Create a PluginStarter interface with access to its dependencies."""
+        self._state = state
+        self._action_dispatcher = action_dispatcher
+        self._plugins: List[AbstractPlugin] = []
+
+    def start(self, plugin: AbstractPlugin) -> None:
+        """Configure a given plugin and add it to the dispatch pipeline."""
+        plugin._configure(state=self._state, action_dispatcher=self._action_dispatcher)
+        self._plugins.append(plugin)
+        self._action_dispatcher.add_handler(plugin)
+        plugin.setup()
+
+    def stop(self) -> None:
+        """Stop any configured plugins."""
+        for p in self._plugins:
+            p.teardown()
+
+        self._plugins = []

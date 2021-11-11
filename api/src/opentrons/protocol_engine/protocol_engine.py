@@ -6,7 +6,7 @@ from .resources import ModelUtils
 from .commands import Command, CommandCreate
 from .execution import QueueWorker, create_queue_worker
 from .state import StateStore, StateView
-from .plugins import AbstractPlugin
+from .plugins import AbstractPlugin, PluginStarter
 from .actions import (
     ActionDispatcher,
     PlayAction,
@@ -29,6 +29,7 @@ class ProtocolEngine:
         hardware_api: HardwareAPI,
         state_store: StateStore,
         action_dispatcher: Optional[ActionDispatcher] = None,
+        plugin_starter: Optional[PluginStarter] = None,
         queue_worker: Optional[QueueWorker] = None,
         model_utils: Optional[ModelUtils] = None,
     ) -> None:
@@ -39,10 +40,15 @@ class ProtocolEngine:
         """
         self._hardware_api = hardware_api
         self._state_store = state_store
+        self._model_utils = model_utils or ModelUtils()
+
         self._action_dispatcher = action_dispatcher or ActionDispatcher(
             sink=self._state_store
         )
-        self._model_utils = model_utils or ModelUtils()
+        self._plugin_starter = plugin_starter or PluginStarter(
+            state=self._state_store,
+            action_dispatcher=self._action_dispatcher,
+        )
         self._queue_worker = queue_worker or create_queue_worker(
             hardware_api=self._hardware_api,
             state_store=self._state_store,
@@ -58,11 +64,7 @@ class ProtocolEngine:
 
     def add_plugin(self, plugin: AbstractPlugin) -> None:
         """Add a plugin to the engine to customize behavior."""
-        plugin._configure(
-            state=self._state_store,
-            action_dispatcher=self._action_dispatcher,
-        )
-        self._action_dispatcher.add_handler(plugin)
+        self._plugin_starter.start(plugin)
 
     def play(self) -> None:
         """Start or resume executing commands in the queue."""
@@ -160,3 +162,5 @@ class ProtocolEngine:
             await self._queue_worker.join()
         finally:
             await self._hardware_api.stop(home_after=False)
+
+        self._plugin_starter.stop()

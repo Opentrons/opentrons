@@ -3,7 +3,7 @@ import pytest
 from decoy import Decoy
 
 from opentrons.protocol_engine.state import StateView
-from opentrons.protocol_engine.plugins import AbstractPlugin
+from opentrons.protocol_engine.plugins import AbstractPlugin, PluginStarter
 from opentrons.protocol_engine.actions import ActionDispatcher, Action, PlayAction
 
 
@@ -42,3 +42,35 @@ def test_configure(
 
     assert subject.state == state_view
     decoy.verify(action_dispatcher.dispatch(action))
+
+
+def test_setup_teardown(
+    decoy: Decoy,
+    state_view: StateView,
+    action_dispatcher: ActionDispatcher,
+) -> None:
+    """The PluginStarter should setup and teardown plugins."""
+    plugin_1 = decoy.mock(cls=AbstractPlugin)
+    plugin_2 = decoy.mock(cls=AbstractPlugin)
+
+    subject = PluginStarter(state=state_view, action_dispatcher=action_dispatcher)
+
+    subject.start(plugin_1)
+    decoy.verify(
+        plugin_1._configure(state=state_view, action_dispatcher=action_dispatcher),
+        action_dispatcher.add_handler(plugin_1),
+        plugin_1.setup(),
+    )
+
+    subject.start(plugin_2)
+    decoy.verify(
+        plugin_2._configure(state=state_view, action_dispatcher=action_dispatcher),
+        action_dispatcher.add_handler(plugin_2),
+        plugin_2.setup(),
+    )
+
+    subject.stop()
+    decoy.verify(
+        plugin_1.teardown(),
+        plugin_2.teardown(),
+    )

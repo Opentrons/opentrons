@@ -1,6 +1,6 @@
 """Customize the ProtocolEngine to monitor and control legacy (APIv2) protocols."""
 from __future__ import annotations
-from typing import Callable, Optional
+from typing import Callable, Optional, NamedTuple
 
 from opentrons.commands.types import CommandMessage as LegacyCommand
 from opentrons.hardware_control import API as HardwareAPI
@@ -14,6 +14,15 @@ from .legacy_wrappers import (
     LegacyModuleLoadInfo,
 )
 from .legacy_command_mapper import LegacyCommandMapper
+
+
+class ContextUnsubscribe(NamedTuple):
+    """Unsubscribe functions for broker messages."""
+
+    command_broker: Callable[[], None]
+    labware_broker: Callable[[], None]
+    pipette_broker: Callable[[], None]
+    module_broker: Callable[[], None]
 
 
 class LegacyContextPlugin(AbstractPlugin):
@@ -45,67 +54,48 @@ class LegacyContextPlugin(AbstractPlugin):
         self._hardware_api = hardware_api
         self._protocol_context = protocol_context
         self._legacy_command_mapper = legacy_command_mapper or LegacyCommandMapper()
+        self._unsubcribe: Optional[ContextUnsubscribe] = None
 
-        # todo(mm, 2021-10-08):
-        # To simplify this class's structurally allowed state space,
-        # wrap these up in a single optional dataclass.
-        # Currently blocked by a mypy bug, fixed in github.com/python/mypy/pull/10548
-        # but fix unreleased as of mypy 0.910.
-        self._subscriptions_are_set_up: bool = False
-        self._unsubscribe_from_main_broker: Optional[Callable[[], None]] = None
-        self._unsubscribe_from_labware_load_broker: Optional[Callable[[], None]] = None
-        self._unsubscribe_from_instrument_load_broker: Optional[
-            Callable[[], None]
-        ] = None
-        self._unsubscribe_from_module_load_broker: Optional[Callable[[], None]] = None
+    def setup(self) -> None:
+        """Set up subscriptions to the context's message brokers."""
+        context = self._protocol_context
+
+        command_unsubscribe = context.broker.subscribe(
+            topic="command",
+            handler=self._dispatch_legacy_command,
+        )
+        labware_unsubscribe = context.labware_load_broker.subscribe(
+            callback=self._dispatch_labware_loaded
+        )
+        pipette_unsubscribe = context.instrument_load_broker.subscribe(
+            callback=self._dispatch_instrument_loaded
+        )
+        module_unsubscribe = context.module_load_broker.subscribe(
+            callback=self._dispatch_module_loaded
+        )
+
+        self._unsubscribe = ContextUnsubscribe(
+            command_broker=command_unsubscribe,
+            labware_broker=labware_unsubscribe,
+            pipette_broker=pipette_unsubscribe,
+            module_broker=module_unsubscribe,
+        )
+
+    def teardown(self) -> None:
+        """Unsubscribe from the context's message brokers."""
+        if self._unsubscribe:
+            for unsubscribe in self._unsubscribe:
+                unsubscribe()
+
+        self._unsubcribe = None
 
     def handle_action(self, action: pe_actions.Action) -> None:
         """React to a ProtocolEngine action."""
         if isinstance(action, pe_actions.PlayAction):
-            if not self._subscriptions_are_set_up:
-                self._set_up_subscriptions()
             self._hardware_api.resume(HardwarePauseType.PAUSE)
 
         elif isinstance(action, pe_actions.PauseAction):
             self._hardware_api.pause(HardwarePauseType.PAUSE)
-
-        elif isinstance(action, pe_actions.StopAction):
-            self._tear_down_subscriptions()
-
-    def _set_up_subscriptions(self) -> None:
-        assert not self._subscriptions_are_set_up
-        self._unsubscribe_from_main_broker = self._protocol_context.broker.subscribe(
-            topic="command",
-            handler=self._dispatch_legacy_command,
-        )
-        self._unsubscribe_from_labware_load_broker = (
-            self._protocol_context.labware_load_broker.subscribe(
-                callback=self._dispatch_labware_loaded
-            )
-        )
-        self._unsubscribe_from_instrument_load_broker = (
-            self._protocol_context.instrument_load_broker.subscribe(
-                callback=self._dispatch_instrument_loaded
-            )
-        )
-        self._unsubscribe_from_module_load_broker = (
-            self._protocol_context.module_load_broker.subscribe(
-                callback=self._dispatch_module_loaded
-            )
-        )
-        self._subscriptions_are_set_up = True
-
-    def _tear_down_subscriptions(self) -> None:
-        if self._subscriptions_are_set_up:
-            assert self._unsubscribe_from_main_broker is not None
-            assert self._unsubscribe_from_labware_load_broker is not None
-            assert self._unsubscribe_from_instrument_load_broker is not None
-            assert self._unsubscribe_from_module_load_broker is not None
-            self._unsubscribe_from_main_broker()
-            self._unsubscribe_from_labware_load_broker()
-            self._unsubscribe_from_instrument_load_broker()
-            self._unsubscribe_from_module_load_broker()
-            self._subscriptions_are_set_up = False
 
     def _dispatch_legacy_command(self, command: LegacyCommand) -> None:
         pe_command = self._legacy_command_mapper.map_command(command=command)
