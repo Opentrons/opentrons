@@ -42,8 +42,8 @@ class CommandNotFound(ErrorDetails):
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
     },
 )
-async def post_run_command(
-    request_body: RequestModel[pe_commands.CommandRequest],
+async def create_run_command(
+    request_body: RequestModel[pe_commands.CommandCreate],
     engine_store: EngineStore = Depends(get_engine_store),
     run: ResponseModel[Run, None] = Depends(get_run),
 ) -> ResponseModel[pe_commands.Command, None]:

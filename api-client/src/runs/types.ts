@@ -18,6 +18,19 @@ export interface RunData {
   pipettes: unknown[]
   labware: unknown[]
   protocolId?: string
+  labwareOffsets?: LabwareOffset[]
+}
+
+interface VectorOffset {
+  x: number
+  y: number
+  z: number
+}
+export interface LabwareOffset {
+  id: string
+  definitionUri: string
+  location: Location
+  offset: VectorOffset
 }
 
 interface ResourceLink {

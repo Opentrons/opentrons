@@ -536,7 +536,7 @@ class CheckCalibrationUserFlow:
                 rank=info_pip.rank.value,
                 mount=str(info_pip.mount),
                 serial=hw_pip.pipette_id,  # type: ignore[arg-type]
-                defaultTipracks=info_pip.default_tipracks,
+                defaultTipracks=info_pip.default_tipracks,  # type: ignore[arg-type]
             )
             for hw_pip, info_pip in zip(hw_pips, info_pips)
         ]
@@ -559,7 +559,9 @@ class CheckCalibrationUserFlow:
             rank=self.active_pipette.rank.value,
             mount=str(self.mount),
             serial=self.hw_pipette.pipette_id,  # type: ignore[arg-type]
-            defaultTipracks=self.active_pipette.default_tipracks,
+            defaultTipracks=(
+                self.active_pipette.default_tipracks  # type: ignore[arg-type]
+            ),
         )
 
     def _determine_threshold(self) -> Point:

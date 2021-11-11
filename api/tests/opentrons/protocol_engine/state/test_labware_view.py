@@ -9,7 +9,7 @@ from opentrons.types import DeckSlotName, Point
 
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
-    CalibrationOffset,
+    LabwareOffsetVector,
     DeckSlotLocation,
     Dimensions,
     LoadedLabware,
@@ -21,35 +21,35 @@ from opentrons.protocol_engine.state.labware import LabwareState, LabwareView
 plate = LoadedLabware(
     id="plate-id",
     loadName="plate-load-name",
-    location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+    location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
     definitionUri="some-plate-uri",
 )
 
 reservoir = LoadedLabware(
     id="reservoir-id",
     loadName="reservoir-load-name",
-    location=DeckSlotLocation(slot=DeckSlotName.SLOT_2),
+    location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
     definitionUri="some-reservoir-uri",
 )
 
 tube_rack = LoadedLabware(
     id="tube-rack-id",
     loadName="tube-rack-load-name",
-    location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+    location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
     definitionUri="some-tube-rack-uri",
 )
 
 tip_rack = LoadedLabware(
     id="tip-rack-id",
     loadName="tip-rack-load-name",
-    location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+    location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
     definitionUri="some-tip-rack-uri",
 )
 
 
 def get_labware_view(
     labware_by_id: Optional[Dict[str, LoadedLabware]] = None,
-    calibrations_by_id: Optional[Dict[str, CalibrationOffset]] = None,
+    calibrations_by_id: Optional[Dict[str, LabwareOffsetVector]] = None,
     definitions_by_uri: Optional[Dict[str, LabwareDefinition]] = None,
     deck_definition: Optional[DeckDefinitionV2] = None,
 ) -> LabwareView:
@@ -120,7 +120,7 @@ def test_get_labware_location() -> None:
 
     result = subject.get_location("plate-id")
 
-    assert result == DeckSlotLocation(slot=DeckSlotName.SLOT_1)
+    assert result == DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
 
 
 def test_get_has_quirk(
@@ -267,7 +267,7 @@ def test_get_labware_uri_from_definition(tip_rack_def: LabwareDefinition) -> Non
     tip_rack = LoadedLabware(
         id="tip-rack-id",
         loadName="tip-rack-load-name",
-        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         definitionUri="some-tip-rack-uri",
     )
 
@@ -368,7 +368,7 @@ def test_get_slot_position(standard_deck_def: DeckDefinitionV2) -> None:
 
 def test_get_calibration_offset() -> None:
     """It should get a labware's calibrated offset."""
-    offset = CalibrationOffset(x=1, y=2, z=3)
+    offset = LabwareOffsetVector(x=1, y=2, z=3)
     subject = get_labware_view(calibrations_by_id={"labware-id": offset})
 
     result = subject.get_calibration_offset("labware-id")

@@ -8,7 +8,7 @@ from opentrons.types import DeckSlotName
 
 from opentrons.protocol_engine.resources import DeckFixedLabware
 from opentrons.protocol_engine.types import (
-    CalibrationOffset,
+    LabwareOffsetVector,
     DeckSlotLocation,
     LoadedLabware,
 )
@@ -29,7 +29,7 @@ def subject(
         deck_fixed_labware=[
             DeckFixedLabware(
                 labware_id="fixedTrash",
-                location=DeckSlotLocation(slot=DeckSlotName.FIXED_TRASH),
+                location=DeckSlotLocation(slotName=DeckSlotName.FIXED_TRASH),
                 definition=fixed_trash_def,
             )
         ],
@@ -55,10 +55,10 @@ def test_initial_state(
                 id="fixedTrash",
                 loadName=fixed_trash_def.parameters.loadName,
                 definitionUri=expected_trash_uri,
-                location=DeckSlotLocation(slot=DeckSlotName.FIXED_TRASH),
+                location=DeckSlotLocation(slotName=DeckSlotName.FIXED_TRASH),
             )
         },
-        calibrations_by_id={"fixedTrash": CalibrationOffset(x=0, y=0, z=0)},
+        calibrations_by_id={"fixedTrash": LabwareOffsetVector(x=0, y=0, z=0)},
         definitions_by_uri={expected_trash_uri: fixed_trash_def},
     )
 
@@ -69,10 +69,10 @@ def test_handles_load_labware(
 ) -> None:
     """It should add the labware data to the state."""
     command = create_load_labware_command(
-        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         labware_id="test-labware-id",
         definition=well_plate_def,
-        calibration=CalibrationOffset(x=1, y=2, z=3),
+        calibration=LabwareOffsetVector(x=1, y=2, z=3),
     )
 
     expected_definition_uri = uri_from_details(
@@ -85,7 +85,7 @@ def test_handles_load_labware(
         id="test-labware-id",
         loadName=well_plate_def.parameters.loadName,
         definitionUri=expected_definition_uri,
-        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
     )
 
     subject.handle_action(UpdateCommandAction(command=command))
@@ -94,7 +94,7 @@ def test_handles_load_labware(
 
     assert subject.state.definitions_by_uri[expected_definition_uri] == well_plate_def
 
-    assert subject.state.calibrations_by_id["test-labware-id"] == CalibrationOffset(
+    assert subject.state.calibrations_by_id["test-labware-id"] == LabwareOffsetVector(
         x=1, y=2, z=3
     )
 

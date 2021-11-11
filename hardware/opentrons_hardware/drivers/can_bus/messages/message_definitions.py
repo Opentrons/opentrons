@@ -158,12 +158,12 @@ class ExecuteMoveGroupRequest:  # noqa: D101
 
 
 @dataclass
-class ClearMoveGroupRequest:  # noqa: D101
-    payload: payloads.MoveGroupRequestPayload
-    payload_type: Type[BinarySerializable] = payloads.MoveGroupRequestPayload
+class ClearAllMoveGroupsRequest:  # noqa: D101
+    payload: payloads.EmptyPayload
+    payload_type: Type[BinarySerializable] = payloads.EmptyPayload
     message_id: Literal[
-        MessageId.clear_move_group_request
-    ] = MessageId.clear_move_group_request
+        MessageId.clear_all_move_groups_request
+    ] = MessageId.clear_all_move_groups_request
 
 
 @dataclass

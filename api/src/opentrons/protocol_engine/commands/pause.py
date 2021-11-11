@@ -4,14 +4,14 @@ from pydantic import BaseModel, Field
 from typing import Optional, Type
 from typing_extensions import Literal
 
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandRequest
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 
 PauseCommandType = Literal["pause"]
 
 
-class PauseData(BaseModel):
-    """Data required to pause the protocol."""
+class PauseParams(BaseModel):
+    """Payload required to pause the protocol."""
 
     message: Optional[str] = Field(
         None,
@@ -25,29 +25,29 @@ class PauseResult(BaseModel):
     pass
 
 
-class PauseImplementation(AbstractCommandImpl[PauseData, PauseResult]):
+class PauseImplementation(AbstractCommandImpl[PauseParams, PauseResult]):
     """Pause command implementation."""
 
-    async def execute(self, data: PauseData) -> PauseResult:
+    async def execute(self, params: PauseParams) -> PauseResult:
         """Dispatch a PauseAction to the store to pause the protocol."""
         await self._run_control.pause()
         return PauseResult()
 
 
-class Pause(BaseCommand[PauseData, PauseResult]):
+class Pause(BaseCommand[PauseParams, PauseResult]):
     """Pause command model."""
 
     commandType: PauseCommandType = "pause"
-    data: PauseData
+    params: PauseParams
     result: Optional[PauseResult]
 
     _ImplementationCls: Type[PauseImplementation] = PauseImplementation
 
 
-class PauseRequest(BaseCommandRequest[PauseData]):
+class PauseCreate(BaseCommandCreate[PauseParams]):
     """Pause command request model."""
 
     commandType: PauseCommandType = "pause"
-    data: PauseData
+    params: PauseParams
 
     _CommandCls: Type[Pause] = Pause

@@ -23,7 +23,7 @@ class EngineStatus(str, Enum):
 class DeckSlotLocation(BaseModel):
     """The location of something placed in a single deck slot."""
 
-    slot: DeckSlotName
+    slotName: DeckSlotName
 
 
 LabwareLocation = Union[DeckSlotLocation]
@@ -55,14 +55,6 @@ class WellLocation(BaseModel):
 @dataclass(frozen=True)
 class Dimensions:
     """Dimensions of an object in deck-space."""
-
-    x: float
-    y: float
-    z: float
-
-
-class CalibrationOffset(BaseModel):
-    """Calibration offset from nomimal to actual position."""
 
     x: float
     y: float
@@ -111,3 +103,45 @@ class LoadedLabware(BaseModel):
     loadName: str
     definitionUri: str
     location: LabwareLocation
+
+
+class LabwareOffsetVector(BaseModel):
+    """Offset, in deck coordinates from nominal to actual position."""
+
+    x: float
+    y: float
+    z: float
+
+
+class LabwareOffsetCreate(BaseModel):
+    """Create request data for a labware offset."""
+
+    definitionUri: str = Field(..., description="The URI for the labware's definition.")
+    location: LabwareLocation = Field(
+        ...,
+        description="Where the labware is located on the robot.",
+    )
+    offset: LabwareOffsetVector = Field(
+        ...,
+        description="The offset applied to matching labware.",
+    )
+
+
+class LabwareOffset(BaseModel):
+    """An offset that the robot adds to a pipette's position when it moves to a labware.
+
+    During the run, if a labware is loaded whose definition URI and location
+    both match what's found here, the given offset will be added to all
+    pipette movements that use that labware as a reference point.
+    """
+
+    id: str = Field(..., description="Unique labware offset record identifier.")
+    definitionUri: str = Field(..., description="The URI for the labware's definition.")
+    location: LabwareLocation = Field(
+        ...,
+        description="Where the labware is located on the robot.",
+    )
+    offset: LabwareOffsetVector = Field(
+        ...,
+        description="The offset applied to matching labware.",
+    )

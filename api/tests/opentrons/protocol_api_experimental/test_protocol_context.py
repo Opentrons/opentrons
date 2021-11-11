@@ -5,7 +5,7 @@ from decoy import Decoy
 from opentrons_shared_data.labware import dev_types
 
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.protocol_engine import CalibrationOffset, commands
+from opentrons.protocol_engine import LabwareOffsetVector, commands
 from opentrons.protocol_engine.clients import SyncClient
 
 from opentrons.protocol_api_experimental.types import (
@@ -133,7 +133,7 @@ def test_load_labware(
     """It should use the engine to load a labware in a slot."""
     decoy.when(
         engine_client.load_labware(
-            location=DeckSlotLocation(slot=DeckSlotName.SLOT_5),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
             load_name="some_labware",
             namespace="opentrons",
             version=1,
@@ -142,7 +142,7 @@ def test_load_labware(
         commands.LoadLabwareResult(
             labwareId="abc123",
             definition=LabwareDefinition.parse_obj(minimal_labware_def),
-            calibration=CalibrationOffset(x=1, y=2, z=3),
+            calibration=LabwareOffsetVector(x=1, y=2, z=3),
         )
     )
 
@@ -165,7 +165,7 @@ def test_load_labware_default_namespace_and_version(
     """It should default namespace to "opentrons" and version to 1."""
     decoy.when(
         engine_client.load_labware(
-            location=DeckSlotLocation(slot=DeckSlotName.SLOT_5),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
             load_name="some_labware",
             namespace="opentrons",
             version=1,
@@ -174,7 +174,7 @@ def test_load_labware_default_namespace_and_version(
         commands.LoadLabwareResult(
             labwareId="abc123",
             definition=minimal_labware_def,
-            calibration=CalibrationOffset(x=1, y=2, z=3),
+            calibration=LabwareOffsetVector(x=1, y=2, z=3),
         )
     )
 

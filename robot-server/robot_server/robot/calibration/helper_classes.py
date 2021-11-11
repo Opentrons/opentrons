@@ -108,7 +108,7 @@ class AttachedPipette(BaseModel):
     )
     mount: str = Field(None, description="The mount this pipette attached to")
     serial: str = Field(None, description="The serial number of the attached pipette")
-    defaultTipracks: typing.List[LabwareDefinition] = Field(
+    defaultTipracks: typing.List[typing.Dict[str, typing.Any]] = Field(
         None, description="A list of default tipracks for this pipette"
     )
 
@@ -124,7 +124,7 @@ class RequiredLabware(BaseModel):
     namespace: str
     version: str
     isTiprack: bool
-    definition: LabwareDefinition
+    definition: typing.Dict[str, typing.Any]
 
     @classmethod
     def from_lw(cls, lw: labware.Labware, slot: typing.Optional[DeckLocation] = None):
@@ -140,7 +140,7 @@ class RequiredLabware(BaseModel):
             namespace=lw_def["namespace"],
             version=str(lw_def["version"]),
             isTiprack=lw.is_tiprack,
-            definition=lw_def,
+            definition=typing.cast(typing.Dict[str, typing.Any], lw_def),
         )
 
 

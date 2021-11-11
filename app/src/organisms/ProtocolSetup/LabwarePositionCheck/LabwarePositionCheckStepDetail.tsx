@@ -151,6 +151,7 @@ export const LabwarePositionCheckStepDetail = (
                 fontSize={FONT_SIZE_BODY_2}
                 color={C_BLUE}
                 onClick={() => setShowJogControls(true)}
+                id={`LabwarePositionCheckStepDetail_reveal_jog_controls`}
               >
                 {t('reveal_jog_controls')}
               </Link>
