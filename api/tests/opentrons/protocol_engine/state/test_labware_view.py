@@ -57,6 +57,7 @@ def get_labware_view(
     state = LabwareState(
         labware_by_id=labware_by_id or {},
         calibrations_by_id=calibrations_by_id or {},
+        labware_offsets_by_id={},  # Todo: Supply by parameter
         definitions_by_uri=definitions_by_uri or {},
         deck_definition=deck_definition or cast(DeckDefinitionV2, {"fake": True}),
     )

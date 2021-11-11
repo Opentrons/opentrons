@@ -59,6 +59,7 @@ def test_initial_state(
             )
         },
         calibrations_by_id={"fixedTrash": LabwareOffsetVector(x=0, y=0, z=0)},
+        labware_offsets_by_id={},
         definitions_by_uri={expected_trash_uri: fixed_trash_def},
     )
 

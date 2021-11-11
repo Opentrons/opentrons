@@ -113,20 +113,6 @@ class LabwareOffsetVector(BaseModel):
     z: float
 
 
-class LabwareOffsetCreate(BaseModel):
-    """Create request data for a labware offset."""
-
-    definitionUri: str = Field(..., description="The URI for the labware's definition.")
-    location: LabwareLocation = Field(
-        ...,
-        description="Where the labware is located on the robot.",
-    )
-    offset: LabwareOffsetVector = Field(
-        ...,
-        description="The offset applied to matching labware.",
-    )
-
-
 class LabwareOffset(BaseModel):
     """An offset that the robot adds to a pipette's position when it moves to a labware.
 
@@ -145,3 +131,26 @@ class LabwareOffset(BaseModel):
         ...,
         description="The offset applied to matching labware.",
     )
+
+
+class LabwareOffsetCreate(BaseModel):
+    """Create request data for a labware offset."""
+
+    definitionUri: str = Field(..., description="The URI for the labware's definition.")
+    location: LabwareLocation = Field(
+        ...,
+        description="Where the labware is located on the robot.",
+    )
+    offset: LabwareOffsetVector = Field(
+        ...,
+        description="The offset applied to matching labware.",
+    )
+
+    def to_labware_offset(self, id: str) -> LabwareOffset:
+        """Add an ID, converting the request to a fulfilled LabwareOffset."""
+        return LabwareOffset(
+            id=id,
+            definitionUri=self.definitionUri,
+            location=self.location,
+            offset=self.offset,
+        )

@@ -4,7 +4,7 @@ from __future__ import annotations
 import re
 from collections import defaultdict
 from dataclasses import dataclass, replace
-from typing import Dict, List, Sequence
+from typing import Dict, List, Optional, Sequence
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2, SlotDefV2
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
@@ -17,8 +17,14 @@ from opentrons.calibration_storage.helpers import uri_from_details
 from .. import errors
 from ..resources import DeckFixedLabware
 from ..commands import Command, LoadLabwareResult, AddLabwareDefinitionResult
-from ..types import LabwareOffsetVector, LabwareLocation, LoadedLabware, Dimensions
-from ..actions import Action, UpdateCommandAction
+from ..types import (
+    LabwareOffset,
+    LabwareOffsetVector,
+    LabwareLocation,
+    LoadedLabware,
+    Dimensions,
+)
+from ..actions import Action, UpdateCommandAction, AddLabwareOffsetAction
 from .abstract_store import HasState, HandlesActions
 
 
@@ -26,8 +32,14 @@ from .abstract_store import HasState, HandlesActions
 class LabwareState:
     """State of all loaded labware resources."""
 
-    labware_by_id: Dict[str, LoadedLabware]
+    labware_by_id: Dict[str, LoadedLabware]  # Indexed by labware ID.
+
+    # Indexed by labware ID.
+    # To do: Probably remove?
     calibrations_by_id: Dict[str, LabwareOffsetVector]
+
+    labware_offsets_by_id: Dict[str, LabwareOffset]  # Indexed by labware offset ID.
+
     definitions_by_uri: Dict[str, LabwareDefinition]
     deck_definition: DeckDefinitionV2
 
@@ -72,6 +84,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
         self._state = LabwareState(
             definitions_by_uri=definitions_by_uri,
             calibrations_by_id=calibrations_by_id,
+            labware_offsets_by_id={},
             labware_by_id=labware_by_id,
             deck_definition=deck_definition,
         )
@@ -80,6 +93,8 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
         """Modify state in reaction to an action."""
         if isinstance(action, UpdateCommandAction):
             self._handle_command(action.command)
+        elif isinstance(action, AddLabwareOffsetAction):
+            self._handle_add_labware_offset(action.labware_offset)
 
     def _handle_command(self, command: Command) -> None:
         """Modify state in reaction to a command."""
@@ -119,6 +134,23 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             definitions_by_uri = self._state.definitions_by_uri.copy()
             definitions_by_uri[definition_uri] = command.params.definition
             self._state = replace(self._state, definitions_by_uri=definitions_by_uri)
+
+    def _handle_add_labware_offset(self, labware_offset: LabwareOffset) -> None:
+        """Add a new labware offset to state.
+
+        `labware_offset.id` must not match any existing labware offset ID.
+        This protects against accidentally changing a labware offset after adding it.
+        `LoadLabwareCommand`s retain references to their corresponding labware offsets
+        and expect them to be immutable.
+        """
+        if labware_offset.id in self._state.labware_offsets_by_id:
+            raise ValueError(
+                f"Labware offset already exists with ID {labware_offset.id}."
+            )
+        else:
+            labware_offsets = self._state.labware_offsets_by_id.copy()
+            labware_offsets[labware_offset.id] = labware_offset
+            self._state = replace(self._state, labware_offsets=labware_offsets)
 
 
 class LabwareView(HasState[LabwareState]):
@@ -284,3 +316,34 @@ class LabwareView(HasState[LabwareState]):
             raise errors.LabwareDoesNotExistError(
                 f"Labware {labware_id} not found."
             ) from e
+
+    def get_labware_offset(self, labware_offset_id: str) -> LabwareOffset:
+        """Get a labware offset by the offset's unique ID."""
+        try:
+            return self._state.labware_offsets_by_id[labware_offset_id]
+        except KeyError as e:
+            raise errors.LabwareOffsetDoesNotExistError(
+                f"Labware offset {labware_offset_id} not found."
+            ) from e
+
+    def get_labware_offsets(self) -> List[LabwareOffset]:
+        """Get all labware offsets, in the order they were added."""
+        return list(self._state.labware_offsets_by_id.values())
+
+    def find_matching_labware_offset(
+        self, definition_uri: str, location: LabwareLocation
+    ) -> Optional[LabwareOffset]:
+        """Find a labware offset that applies to the given definition and location.
+
+        Returns the *most recently* added matching offset,
+        so later offsets can override earlier ones.
+
+        Returns ``None`` if no offsets match at all.
+        """
+        for candidate in reversed(list(self._state.labware_offsets_by_id.values())):
+            if (
+                candidate.definitionUri == definition_uri
+                and candidate.location == location
+            ):
+                return candidate
+        return None

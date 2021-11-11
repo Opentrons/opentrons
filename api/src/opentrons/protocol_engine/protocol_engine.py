@@ -1,9 +1,10 @@
 """ProtocolEngine class definition."""
-from typing import Optional
+from typing import List, Optional
 from opentrons.hardware_control import API as HardwareAPI
 
 from .resources import ModelUtils
 from .commands import Command, CommandCreate
+from .types import LabwareOffset, LabwareOffsetCreate
 from .execution import QueueWorker, create_queue_worker
 from .state import StateStore, StateView
 from .plugins import AbstractPlugin
@@ -13,6 +14,7 @@ from .actions import (
     PauseAction,
     StopAction,
     QueueCommandAction,
+    AddLabwareOffsetAction,
 )
 
 
@@ -160,3 +162,30 @@ class ProtocolEngine:
             await self._queue_worker.join()
         finally:
             await self._hardware_api.stop(home_after=False)
+
+    def add_labware_offset(self, request: LabwareOffsetCreate) -> LabwareOffset:
+        """Add a new labware offset, to apply to subsequent `LoadLabwareCommand`s.
+
+        Return the newly added offset.
+        """
+        labware_offset_id = self._model_utils.generate_id()
+        labware_offset = request.to_labware_offset(labware_offset_id)
+        self._action_dispatcher.dispatch(AddLabwareOffsetAction(labware_offset))
+        return self.state_view.labware.get_labware_offset(
+            labware_offset_id=labware_offset_id
+        )
+
+    def get_labware_offset(self, labware_offset_id: str) -> LabwareOffset:
+        """Return a single labware offset by its unique ID.
+
+        Raises:
+            LabwareOffsetDoesNotExistError: If the given ID does not match any
+                                            previously added offset.
+        """
+        return self.state_view.labware.get_labware_offset(
+            labware_offset_id=labware_offset_id
+        )
+
+    def get_labware_offsets(self) -> List[LabwareOffset]:
+        """Return all labware offsets, in the order they were added."""
+        return self.state_view.labware.get_labware_offsets()
