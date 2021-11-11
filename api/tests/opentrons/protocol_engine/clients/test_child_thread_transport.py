@@ -34,19 +34,19 @@ async def test_execute_command(
     subject: ChildThreadTransport,
 ) -> None:
     """It should execute a command synchronously in a child thread."""
-    cmd_data = commands.MoveToWellData(
+    cmd_data = commands.MoveToWellParams(
         pipetteId="pipette-id",
         labwareId="labware-id",
         wellName="A1",
     )
     cmd_result = commands.MoveToWellResult()
-    cmd_request = commands.MoveToWellRequest(data=cmd_data)
+    cmd_request = commands.MoveToWellCreate(params=cmd_data)
 
     decoy.when(await engine.add_and_execute_command(request=cmd_request)).then_return(
         commands.MoveToWell(
             id="cmd-id",
             status=commands.CommandStatus.SUCCEEDED,
-            data=cmd_data,
+            params=cmd_data,
             result=cmd_result,
             createdAt=datetime.now(),
         )
@@ -65,17 +65,17 @@ async def test_execute_command_failure(
     subject: ChildThreadTransport,
 ) -> None:
     """It should execute a load labware command."""
-    cmd_data = commands.MoveToWellData(
+    cmd_data = commands.MoveToWellParams(
         pipetteId="pipette-id",
         labwareId="labware-id",
         wellName="A1",
     )
-    cmd_request = commands.MoveToWellRequest(data=cmd_data)
+    cmd_request = commands.MoveToWellCreate(params=cmd_data)
 
     decoy.when(await engine.add_and_execute_command(request=cmd_request)).then_return(
         commands.MoveToWell(
             id="cmd-id",
-            data=cmd_data,
+            params=cmd_data,
             status=commands.CommandStatus.FAILED,
             error="oh no",
             createdAt=datetime.now(),

@@ -65,7 +65,7 @@ async def test_get_deck_labware_fixtures(
     assert result == [
         DeckFixedLabware(
             labware_id="fixedTrash",
-            location=DeckSlotLocation(slot=DeckSlotName.FIXED_TRASH),
+            location=DeckSlotLocation(slotName=DeckSlotName.FIXED_TRASH),
             definition=fixed_trash_def,
         )
     ]
@@ -92,7 +92,7 @@ async def test_get_deck_labware_fixtures_short_trash(
     assert result == [
         DeckFixedLabware(
             labware_id="fixedTrash",
-            location=DeckSlotLocation(slot=DeckSlotName.FIXED_TRASH),
+            location=DeckSlotLocation(slotName=DeckSlotName.FIXED_TRASH),
             definition=short_fixed_trash_def,
         )
     ]

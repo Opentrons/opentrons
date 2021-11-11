@@ -3,7 +3,7 @@ from typing import Optional
 from opentrons.hardware_control import API as HardwareAPI
 
 from .resources import ModelUtils
-from .commands import Command, CommandRequest
+from .commands import Command, CommandCreate
 from .execution import QueueWorker, create_queue_worker
 from .state import StateStore, StateView
 from .plugins import AbstractPlugin
@@ -79,7 +79,7 @@ class ProtocolEngine:
         self._state_store.commands.validate_action_allowed(action)
         self._action_dispatcher.dispatch(action)
 
-    def add_command(self, request: CommandRequest) -> Command:
+    def add_command(self, request: CommandCreate) -> Command:
         """Add a command to the `ProtocolEngine`'s queue.
 
         Arguments:
@@ -99,7 +99,7 @@ class ProtocolEngine:
 
         return self._state_store.commands.get(command_id)
 
-    async def add_and_execute_command(self, request: CommandRequest) -> Command:
+    async def add_and_execute_command(self, request: CommandCreate) -> Command:
         """Add a command to the queue and wait for it to complete.
 
         The engine must be started by calling `play` before the command will

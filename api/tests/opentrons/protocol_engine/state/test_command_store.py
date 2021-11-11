@@ -39,7 +39,7 @@ def test_initial_state() -> None:
 class QueueCommandSpec(NamedTuple):
     """Test data for the QueueCommandAction."""
 
-    command_request: commands.CommandRequest
+    command_request: commands.CommandCreate
     expected_cls: Type[commands.Command]
     created_at: datetime = datetime(year=2021, month=1, day=1)
     command_id: str = "command-id"
@@ -49,8 +49,8 @@ class QueueCommandSpec(NamedTuple):
     QueueCommandSpec._fields,
     [
         QueueCommandSpec(
-            command_request=commands.AddLabwareDefinitionRequest(
-                data=commands.AddLabwareDefinitionData.construct(
+            command_request=commands.AddLabwareDefinitionCreate(
+                params=commands.AddLabwareDefinitionParams.construct(
                     # TODO(mc, 2021-06-25): do not mock out LabwareDefinition
                     definition=cast(LabwareDefinition, {"mockDefinition": True})
                 ),
@@ -58,8 +58,8 @@ class QueueCommandSpec(NamedTuple):
             expected_cls=commands.AddLabwareDefinition,
         ),
         QueueCommandSpec(
-            command_request=commands.AspirateRequest(
-                data=commands.AspirateData(
+            command_request=commands.AspirateCreate(
+                params=commands.AspirateParams(
                     pipetteId="pipette-id",
                     labwareId="labware-id",
                     wellName="well-name",
@@ -70,8 +70,8 @@ class QueueCommandSpec(NamedTuple):
             expected_cls=commands.Aspirate,
         ),
         QueueCommandSpec(
-            command_request=commands.DispenseRequest(
-                data=commands.DispenseData(
+            command_request=commands.DispenseCreate(
+                params=commands.DispenseParams(
                     pipetteId="pipette-id",
                     labwareId="labware-id",
                     wellName="well-name",
@@ -82,8 +82,8 @@ class QueueCommandSpec(NamedTuple):
             expected_cls=commands.Dispense,
         ),
         QueueCommandSpec(
-            command_request=commands.DropTipRequest(
-                data=commands.DropTipData(
+            command_request=commands.DropTipCreate(
+                params=commands.DropTipParams(
                     pipetteId="pipette-id",
                     labwareId="labware-id",
                     wellName="well-name",
@@ -92,9 +92,9 @@ class QueueCommandSpec(NamedTuple):
             expected_cls=commands.DropTip,
         ),
         QueueCommandSpec(
-            command_request=commands.LoadLabwareRequest(
-                data=commands.LoadLabwareData(
-                    location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+            command_request=commands.LoadLabwareCreate(
+                params=commands.LoadLabwareParams(
+                    location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
                     loadName="load-name",
                     namespace="namespace",
                     version=42,
@@ -103,8 +103,8 @@ class QueueCommandSpec(NamedTuple):
             expected_cls=commands.LoadLabware,
         ),
         QueueCommandSpec(
-            command_request=commands.LoadPipetteRequest(
-                data=commands.LoadPipetteData(
+            command_request=commands.LoadPipetteCreate(
+                params=commands.LoadPipetteParams(
                     mount=MountType.LEFT,
                     pipetteName=PipetteName.P300_SINGLE,
                 ),
@@ -112,8 +112,8 @@ class QueueCommandSpec(NamedTuple):
             expected_cls=commands.LoadPipette,
         ),
         QueueCommandSpec(
-            command_request=commands.PickUpTipRequest(
-                data=commands.PickUpTipData(
+            command_request=commands.PickUpTipCreate(
+                params=commands.PickUpTipParams(
                     pipetteId="pipette-id",
                     labwareId="labware-id",
                     wellName="well-name",
@@ -122,8 +122,8 @@ class QueueCommandSpec(NamedTuple):
             expected_cls=commands.PickUpTip,
         ),
         QueueCommandSpec(
-            command_request=commands.MoveToWellRequest(
-                data=commands.MoveToWellData(
+            command_request=commands.MoveToWellCreate(
+                params=commands.MoveToWellParams(
                     pipetteId="pipette-id",
                     labwareId="labware-id",
                     wellName="well-name",
@@ -132,15 +132,15 @@ class QueueCommandSpec(NamedTuple):
             expected_cls=commands.MoveToWell,
         ),
         QueueCommandSpec(
-            command_request=commands.PauseRequest(
-                data=commands.PauseData(message="hello world"),
+            command_request=commands.PauseCreate(
+                params=commands.PauseParams(message="hello world"),
             ),
             expected_cls=commands.Pause,
         ),
     ],
 )
 def test_command_store_queues_commands(
-    command_request: commands.CommandRequest,
+    command_request: commands.CommandCreate,
     expected_cls: Type[commands.Command],
     created_at: datetime,
     command_id: str,
@@ -155,7 +155,7 @@ def test_command_store_queues_commands(
         id=command_id,
         createdAt=created_at,
         status=commands.CommandStatus.QUEUED,
-        data=command_request.data,  # type: ignore[arg-type]
+        params=command_request.params,  # type: ignore[arg-type]
     )
 
     subject = CommandStore()

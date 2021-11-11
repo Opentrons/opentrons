@@ -17,6 +17,7 @@ from opentrons.protocol_api.labware import Labware as LegacyLabware
 from opentrons.protocol_api.protocol_context import (
     InstrumentLoadInfo as LegacyInstrumentLoadInfo,
     LabwareLoadInfo as LegacyLabwareLoadInfo,
+    ModuleLoadInfo as LegacyModuleLoadInfo,
 )
 from opentrons.protocol_api.contexts import ModuleContext as LegacyModuleContext
 
@@ -64,7 +65,7 @@ class LegacyFileReader:
 
 
 class LegacyContextCreator:
-    """Interface to contruct Protocol API v2 contexts."""
+    """Interface to construct Protocol API v2 contexts."""
 
     def __init__(
         self,
@@ -138,4 +139,5 @@ __all__ = [
     "LegacyPythonProtocol",
     "LegacyLabwareLoadInfo",
     "LegacyInstrumentLoadInfo",
+    "LegacyModuleLoadInfo",
 ]

@@ -12,7 +12,7 @@ from opentrons.protocol_engine.execution import (
     RunControlHandler,
 )
 from opentrons.protocol_engine.commands.load_pipette import (
-    LoadPipetteData,
+    LoadPipetteParams,
     LoadPipetteResult,
     LoadPipetteImplementation,
 )
@@ -33,7 +33,7 @@ async def test_load_pipette_implementation(
         run_control=run_control,
     )
 
-    data = LoadPipetteData(
+    data = LoadPipetteParams(
         pipetteName=PipetteName.P300_SINGLE,
         mount=MountType.LEFT,
         pipetteId="some id",

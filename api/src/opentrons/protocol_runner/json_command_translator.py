@@ -25,9 +25,9 @@ class JsonCommandTranslator:
     def translate(
         self,
         protocol: models.JsonProtocol,
-    ) -> List[pe_commands.CommandRequest]:
+    ) -> List[pe_commands.CommandCreate]:
         """Return all Protocol Engine commands required to run the given protocol."""
-        result: List[pe_commands.CommandRequest] = []
+        result: List[pe_commands.CommandCreate] = []
 
         for pipette_id, pipette in protocol.pipettes.items():
             result.append(self._translate_load_pipette(pipette_id, pipette))
@@ -50,10 +50,10 @@ class JsonCommandTranslator:
     def _translate_command(
         self,
         command: models.json_protocol.AllCommands,
-    ) -> pe_commands.CommandRequest:
+    ) -> pe_commands.CommandCreate:
         try:
             h = self._COMMAND_TO_NAME[command.command]
-            return cast(pe_commands.CommandRequest, getattr(self, h)(command))
+            return cast(pe_commands.CommandCreate, getattr(self, h)(command))
         except KeyError:
             raise CommandTranslatorError(f"'{command.command}' is not recognized.")
         except AttributeError:
@@ -63,9 +63,9 @@ class JsonCommandTranslator:
 
     def _translate_add_labware_definition(
         self, labware_definition: models.LabwareDefinition
-    ) -> pe_commands.AddLabwareDefinitionRequest:
-        return pe_commands.AddLabwareDefinitionRequest(
-            data=pe_commands.AddLabwareDefinitionData(definition=labware_definition)
+    ) -> pe_commands.AddLabwareDefinitionCreate:
+        return pe_commands.AddLabwareDefinitionCreate(
+            params=pe_commands.AddLabwareDefinitionParams(definition=labware_definition)
         )
 
     def _translate_load_labware(
@@ -73,7 +73,7 @@ class JsonCommandTranslator:
         labware_id: str,
         labware: models.json_protocol.Labware,
         labware_definitions: Dict[str, models.LabwareDefinition],
-    ) -> pe_commands.LoadLabwareRequest:
+    ) -> pe_commands.LoadLabwareCreate:
         """Translate a JSON labware data into a LoadLabware command.
 
         Args:
@@ -84,10 +84,10 @@ class JsonCommandTranslator:
             labware_definitions: The JSON protocol's collection of labware definitions.
         """
         definition = labware_definitions[labware.definitionId]
-        return pe_commands.LoadLabwareRequest(
-            data=pe_commands.LoadLabwareData(
+        return pe_commands.LoadLabwareCreate(
+            params=pe_commands.LoadLabwareParams(
                 location=DeckSlotLocation(
-                    slot=DeckSlotName.from_primitive(labware.slot)
+                    slotName=DeckSlotName.from_primitive(labware.slot)
                 ),
                 loadName=definition.parameters.loadName,
                 namespace=definition.namespace,
@@ -100,9 +100,9 @@ class JsonCommandTranslator:
         self,
         pipette_id: str,
         pipette: models.json_protocol.Pipettes,
-    ) -> pe_commands.LoadPipetteRequest:
-        return pe_commands.LoadPipetteRequest(
-            data=pe_commands.LoadPipetteData(
+    ) -> pe_commands.LoadPipetteCreate:
+        return pe_commands.LoadPipetteCreate(
+            params=pe_commands.LoadPipetteParams(
                 pipetteName=PipetteName(pipette.name),
                 mount=MountType(pipette.mount),
                 pipetteId=pipette_id,
@@ -112,9 +112,9 @@ class JsonCommandTranslator:
     def _aspirate(
         self,
         command: models.json_protocol.LiquidCommand,
-    ) -> pe_commands.AspirateRequest:
-        return pe_commands.AspirateRequest(
-            data=pe_commands.AspirateData(
+    ) -> pe_commands.AspirateCreate:
+        return pe_commands.AspirateCreate(
+            params=pe_commands.AspirateParams(
                 pipetteId=command.params.pipette,
                 labwareId=command.params.labware,
                 wellName=command.params.well,
@@ -129,9 +129,9 @@ class JsonCommandTranslator:
     def _dispense(
         self,
         command: models.json_protocol.LiquidCommand,
-    ) -> pe_commands.DispenseRequest:
-        return pe_commands.DispenseRequest(
-            data=pe_commands.DispenseData(
+    ) -> pe_commands.DispenseCreate:
+        return pe_commands.DispenseCreate(
+            params=pe_commands.DispenseParams(
                 pipetteId=command.params.pipette,
                 labwareId=command.params.labware,
                 wellName=command.params.well,
@@ -155,9 +155,9 @@ class JsonCommandTranslator:
     def _pick_up(
         self,
         command: models.json_protocol.PickUpDropTipCommand,
-    ) -> pe_commands.PickUpTipRequest:
-        return pe_commands.PickUpTipRequest(
-            data=pe_commands.PickUpTipData(
+    ) -> pe_commands.PickUpTipCreate:
+        return pe_commands.PickUpTipCreate(
+            params=pe_commands.PickUpTipParams(
                 pipetteId=command.params.pipette,
                 labwareId=command.params.labware,
                 wellName=command.params.well,
@@ -167,9 +167,9 @@ class JsonCommandTranslator:
     def _drop_tip(
         self,
         command: models.json_protocol.PickUpDropTipCommand,
-    ) -> pe_commands.DropTipRequest:
-        return pe_commands.DropTipRequest(
-            data=pe_commands.DropTipData(
+    ) -> pe_commands.DropTipCreate:
+        return pe_commands.DropTipCreate(
+            params=pe_commands.DropTipParams(
                 pipetteId=command.params.pipette,
                 labwareId=command.params.labware,
                 wellName=command.params.well,
@@ -185,12 +185,12 @@ class JsonCommandTranslator:
     def _delay(
         self,
         command: models.json_protocol.DelayCommand,
-    ) -> pe_commands.PauseRequest:
+    ) -> pe_commands.PauseCreate:
         if command.params.wait is not True:
             raise NotImplementedError("Delay translation not yet implemented.")
 
-        data = pe_commands.PauseData(message=command.params.message)
-        return pe_commands.PauseRequest(data=data)
+        params = pe_commands.PauseParams(message=command.params.message)
+        return pe_commands.PauseCreate(params=params)
 
     def _magnetic_module_engage(
         self,

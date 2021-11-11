@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING, Generic, Optional, TypeVar
 if TYPE_CHECKING:
     from opentrons.protocol_engine import execution
 
-CommandDataT = TypeVar("CommandDataT", bound=BaseModel)
+CommandParamsT = TypeVar("CommandParamsT", bound=BaseModel)
 
 CommandResultT = TypeVar("CommandResultT", bound=BaseModel)
 
@@ -25,7 +25,7 @@ class CommandStatus(str, Enum):
     FAILED = "failed"
 
 
-class BaseCommandRequest(GenericModel, Generic[CommandDataT]):
+class BaseCommandCreate(GenericModel, Generic[CommandParamsT]):
     """Base class for command creation requests.
 
     You shouldn't use this class directly; instead, use or define
@@ -39,10 +39,10 @@ class BaseCommandRequest(GenericModel, Generic[CommandDataT]):
             "execution behavior"
         ),
     )
-    data: CommandDataT = Field(..., description="Command execution data payload")
+    params: CommandParamsT = Field(..., description="Command execution data payload")
 
 
-class BaseCommand(GenericModel, Generic[CommandDataT, CommandResultT]):
+class BaseCommand(GenericModel, Generic[CommandParamsT, CommandResultT]):
     """Base command model.
 
     You shouldn't use this class directly; instead, use or define
@@ -59,7 +59,7 @@ class BaseCommand(GenericModel, Generic[CommandDataT, CommandResultT]):
         ),
     )
     status: CommandStatus = Field(..., description="Command execution status")
-    data: CommandDataT = Field(..., description="Command execution data payload")
+    params: CommandParamsT = Field(..., description="Command execution data payload")
     result: Optional[CommandResultT] = Field(
         None,
         description="Command execution result data, if succeeded",
@@ -81,7 +81,7 @@ class BaseCommand(GenericModel, Generic[CommandDataT, CommandResultT]):
 
 class AbstractCommandImpl(
     ABC,
-    Generic[CommandDataT, CommandResultT],
+    Generic[CommandParamsT, CommandResultT],
 ):
     """Abstract command creation and execution implementation.
 
@@ -106,6 +106,6 @@ class AbstractCommandImpl(
         self._run_control = run_control
 
     @abstractmethod
-    async def execute(self, data: CommandDataT) -> CommandResultT:
+    async def execute(self, params: CommandParamsT) -> CommandResultT:
         """Execute the command, mapping data from execution into a response model."""
         ...

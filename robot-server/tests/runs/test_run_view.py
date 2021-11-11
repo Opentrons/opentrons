@@ -69,7 +69,7 @@ def test_to_response_maps_commands() -> None:
         id="command-1",
         status=CommandStatus.RUNNING,
         createdAt=datetime(year=2022, month=2, day=2),
-        data=pe_commands.LoadPipetteData(
+        params=pe_commands.LoadPipetteParams(
             mount=MountType.LEFT,
             pipetteName=PipetteName.P300_SINGLE,
         ),
@@ -79,7 +79,7 @@ def test_to_response_maps_commands() -> None:
         id="command-2",
         status=CommandStatus.QUEUED,
         createdAt=datetime(year=2023, month=3, day=3),
-        data=pe_commands.MoveToWellData(pipetteId="a", labwareId="b", wellName="c"),
+        params=pe_commands.MoveToWellParams(pipetteId="a", labwareId="b", wellName="c"),
     )
 
     subject = RunView()
@@ -129,7 +129,7 @@ def test_to_response_adds_equipment() -> None:
         id="labware-id",
         loadName="load-name",
         definitionUri="namespace/load-name/42",
-        location=DeckSlotLocation(slot=DeckSlotName.SLOT_1),
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
     )
 
     pipette = LoadedPipette(
