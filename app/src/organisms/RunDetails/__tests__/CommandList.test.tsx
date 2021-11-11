@@ -42,9 +42,10 @@ describe('CommandList', () => {
 
   beforeEach(() => {
     props = {
-      inProgress: 'pickUpTip',
-      completed: 'aspirate',
-      anticipated: 'dispense',
+      inProgress: '5abc123',
+      completed: '4abc123',
+      anticipated: '6abc123',
+      isFailed: false,
     }
     when(mockUseProtocolDetails).calledWith().mockReturnValue({
       protocolData: simpleV6Protocol,
@@ -73,9 +74,20 @@ describe('CommandList', () => {
     fireEvent.click(getByText('Protocol Setup'))
     getAllByText('Mock ProtocolSetup Info')
     getByText('End of protocol')
+    getByText('Anticipated steps')
   })
   it('renders the first non ProtocolSetup command', () => {
     const { getAllByText } = render(props)
     getAllByText('Picking up tip from A1 of Opentrons 96 Tip Rack 300 µL on 1')
+  })
+  it('renders the failed banner', () => {
+    props = {
+      inProgress: '5abc123',
+      completed: '4abc123',
+      anticipated: '6abc123',
+      isFailed: true,
+    }
+    const { getByText } = render(props)
+    getByText('Protocol run failed')
   })
 })

@@ -28,6 +28,9 @@ export function RunDetails(): JSX.Element | null {
   } = useConditionalConfirm(() => {}, true)
   const [commandIdIndex] = React.useState<number>(0)
   const commandId = fixtureCommands.commands.map(command => command.id)
+  const commandStatuses = fixtureCommands.commands.map(
+    command => command.status
+  )
 
   const cancelRunButton = (
     <PrimaryBtn
@@ -58,6 +61,7 @@ export function RunDetails(): JSX.Element | null {
           anticipated={commandId[commandIdIndex + 1]}
           inProgress={commandId[commandIdIndex]}
           completed={commandId[commandIdIndex - 1]}
+          isFailed={commandStatuses[commandIdIndex] === 'failed'}
         />
       </Flex>
     </Page>

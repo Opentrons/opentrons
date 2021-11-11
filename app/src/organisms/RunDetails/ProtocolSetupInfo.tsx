@@ -4,8 +4,8 @@ import {
   DIRECTION_COLUMN,
   Flex,
   FONT_SIZE_BODY_1,
-  FONT_SIZE_CAPTION,
   SPACING_1,
+  SPACING_2,
   Text,
   TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
@@ -99,13 +99,14 @@ export const ProtocolSetupInfo = (
     let moduleSlots = 0
     if (moduleName === null) {
       moduleSlots = 0
-    } else if (moduleName != null && moduleName.includes('Thermocycler')) {
+    } else if (moduleName?.includes('Thermocycler')) {
       moduleSlots = 4
     } else if (moduleName != null) {
       moduleSlots = 1
     }
 
-    SetupCommand.result?.definition.metadata.displayName.includes('Trash')
+    SetupCommand.result?.definition.metadata.displayName.includes('Trash') ??
+    false
       ? (SetupCommandText = undefined)
       : (SetupCommandText =
           moduleName === null ? (
@@ -138,14 +139,14 @@ export const ProtocolSetupInfo = (
   }
   return (
     <Flex
-      margin={SPACING_1}
+      paddingTop={SPACING_1}
+      paddingBottom={SPACING_1}
+      paddingLeft={SPACING_2}
+      paddingRight={SPACING_2}
       fontSize={FONT_SIZE_BODY_1}
       flexDirection={DIRECTION_COLUMN}
       flex={'auto'}
     >
-      {type === 'queued' ? (
-        <Flex fontSize={FONT_SIZE_CAPTION}>{t('anticipated')}</Flex>
-      ) : null}
       <CommandItem
         currentCommand={SetupCommand}
         type={type}

@@ -54,7 +54,7 @@ function CommandItemRunning(props: CommandItemsProps): JSX.Element {
           start={PLACEHOLDERTIMER}
           timer={PLACEHOLDERTIMER}
           end={PLACEHOLDERTIMER}
-          runStatus={'paused'}
+          runStatus={props.runStatus}
         />
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN}>

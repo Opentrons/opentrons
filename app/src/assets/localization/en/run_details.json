@@ -39,5 +39,6 @@
   "end_of_protocol": "End of protocol",
   "comment": "Comment",
   "anticipated": "Anticipated steps",
-  "protocol_steps": "Protocol steps"
+  "protocol_steps": "Protocol steps",
+  "protocol_run_failed": "Protocol run failed"
 }
