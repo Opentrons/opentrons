@@ -13,7 +13,6 @@ import {
   C_MED_DARK_GRAY,
   JUSTIFY_START,
   Text,
-  ALIGN_CENTER,
 } from '@opentrons/components'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { useProtocolDetails } from './hooks'

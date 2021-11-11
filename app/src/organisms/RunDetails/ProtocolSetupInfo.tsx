@@ -38,7 +38,7 @@ export const ProtocolSetupInfo = (
   )
   if (protocolData == null) return null
   if (SetupCommand === undefined) return null
-  console.log('commandType', SetupCommand.commandType)
+
   let SetupCommandText
   if (SetupCommand.commandType === 'loadPipette') {
     const pipetteData = protocolPipetteData[SetupCommand.params.mount]
