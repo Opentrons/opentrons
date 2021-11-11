@@ -9,6 +9,7 @@ import {
 } from '../../../../redux/pipettes'
 import { getConnectedRobotName } from '../../../../redux/robot/selectors'
 import { getTipLengthCalibrations } from '../../../../redux/calibration/tip-length'
+import { useCurrentRunPipetteInfoByMount } from './useCurrentRunPipetteInfoByMount'
 
 import type { State } from '../../../../redux/types'
 
@@ -18,13 +19,16 @@ export function useCalDataByMount(): unknown {
   const attachedPipetteCalibrations = useSelector((state: State) => getAttachedPipetteCalibrations(state, robotName))
   const tipLengthCalibration = useSelector((state: State) => getTipLengthCalibrations(state, robotName))
 
+  const currentRunPipetteInfoByMount = useCurrentRunPipetteInfoByMount()
+
     return PIPETTE_MOUNTS.reduce<Types.ProtocolPipetteTipRackCalDataByMount>(
       (result, mount) => {
-        const protocolPipetteTiprack = protocolPipetteTipracks[mount]
+        const tiprackDefsForPipette = currentRunPipetteInfoByMount[mount]?.tipRackDefs
+        const pipetteSpecs = currentRunPipetteInfoByMount[mount]?.pipetteSpecs
         const attachedPipette = attachedPipettes[mount]
         if (
-          protocolPipetteTiprack == null ||
-          protocolPipetteTiprack.pipetteSpecs == null
+          tiprackDefsForPipette == null ||
+          pipetteSpecs == null
         ) {
           result[mount] = null
         } else {
@@ -35,7 +39,7 @@ export function useCalDataByMount(): unknown {
             ? attachedPipetteCalibrations[mount].offset?.lastModified
             : null
           const tipRackCalData = new Array<Types.TipRackCalibrationData>()
-          protocolPipetteTiprack.tipRackDefs.forEach(tipRackDef => {
+          tiprackDefsForPipette.forEach(tipRackDef => {
             let lastTiprackCalDate = null
             const tipRackMatch = tipLengthCalibrations.find(
               tipRack => tipRack.uri === getLabwareDefURI(tipRackDef)
@@ -54,8 +58,7 @@ export function useCalDataByMount(): unknown {
             })
           })
           result[mount] = {
-            pipetteDisplayName:
-              protocolPipetteTiprack.pipetteSpecs?.displayName,
+            pipetteDisplayName: pipetteSpecs.displayName,
             exactPipetteMatch: protocolPipetteMatch[mount],
             pipetteCalDate: pipetteLastCalDate,
             tipRacks: tipRackCalData,

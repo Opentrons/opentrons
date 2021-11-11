@@ -1,85 +1,155 @@
-import uniq from 'lodash/uniq'
-import reduce from 'lodash/reduce'
-import { getPipetteNameSpecs, PipetteName } from '@opentrons/shared-data'
-import { PIPETTE_MOUNTS } from '../../../../redux/pipettes'
+import { useSelector } from 'react-redux'
+import { getPipetteNameSpecs, getLabwareDefURI } from '@opentrons/shared-data'
+import {
+  getAttachedPipettes,
+  getAttachedPipetteCalibrations,
+  MATCH,
+  INEXACT_MATCH,
+  INCOMPATIBLE,
+} from '../../../../redux/pipettes'
+import { getConnectedRobotName } from '../../../../redux/robot/selectors'
+import { getTipLengthCalibrations } from '../../../../redux/calibration'
 
-import type { Mount } from '../../../../redux/pipettes/types'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
-import { LoadPipetteCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
-const UNKNOWN_STATE = { left: null, right: null }
+import type { LoadPipetteCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import type { PickUpTipCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+import type { Mount, AttachedPipette } from '../../../../redux/pipettes/types'
+import type {
+  LabwareDefinition2,
+  PipetteNameSpecs,
+} from '@opentrons/shared-data'
+import type { State } from '../../../../redux/types'
 
-interface PipetteInfo {}
+const EMPTY_MOUNTS = { left: null, right: null }
+
+export interface PipetteInfo {
+  pipetteSpecs: PipetteNameSpecs
+  tipRacksForPipette: {
+    displayName: string
+    tipRackDef: LabwareDefinition2
+    lastModifiedDate: string
+  }[]
+  requestedPipetteMatch:
+    | typeof MATCH
+    | typeof INEXACT_MATCH
+    | typeof INCOMPATIBLE
+  pipetteCalDate: string
+}
 
 export function useCurrentRunPipetteInfoByMount(): {
   [mount in Mount]: PipetteInfo | null
 } {
   const { protocolData } = useProtocolDetails()
+  const robotName = useSelector((state: State) => getConnectedRobotName(state))
+  const attachedPipettes = useSelector((state: State) =>
+    getAttachedPipettes(state, robotName)
+  )
+  const attachedPipetteCalibrations = useSelector((state: State) =>
+    robotName != null
+      ? getAttachedPipetteCalibrations(state, robotName)
+      : EMPTY_MOUNTS
+  )
+  const tipLengthCalibrations = useSelector((state: State) =>
+    getTipLengthCalibrations(state, robotName)
+  )
 
   if (protocolData == null) {
-    return UNKNOWN_STATE
+    return EMPTY_MOUNTS
   }
   const { pipettes, labware, labwareDefinitions, commands } = protocolData
   const loadPipetteCommands = commands.filter(
-    (commandObject): commandObject is LoadPipetteCommand =>
-      commandObject.commandType === 'loadPipette'
+    (command): command is LoadPipetteCommand =>
+      command.commandType === 'loadPipette'
   )
-
-  const pipettesByInitialMount: {
-    [mount in Mount]: { id: string; name: PipetteName } | null
-  } = Object.entries(pipettes).reduce(
-    (acc, [pipetteId, pipette]) => {
-      const loadCommand = loadPipetteCommands.find(
-        command => command.params.pipetteId == pipetteId
-      )
-
-      return loadCommand != null
-        ? {
-            ...acc,
-            [loadCommand.params.mount]: { ...pipette, id: pipetteId },
-          }
-        : acc
-    },
-    { left: null, right: null }
-  )
-
   const tipRackCommands = commands.filter(
-    commandObject => commandObject.commandType === 'pickUpTip'
+    (command): command is PickUpTipCommand =>
+      command.commandType === 'pickUpTip'
   )
-  const protocolPipetteValues = Object.values(pipettes)
-  const protocolPipetteKeys = Object.keys(pipettes)
 
-  return PIPETTE_MOUNTS.reduce<{ [mount in Mount]: PipetteInfo | null }>(
-    (result, mount) => {
-      const pipetteOnMount = pipettesByInitialMount[mount]
-      if (pipetteOnMount != null) {
-        const index = protocolPipetteValues.indexOf(pipetteOnMount)
-        const pipetteKey = protocolPipetteKeys[index]
-        let tipRackDefs: LabwareDefinition2[] = []
-        tipRackCommands.forEach(command => {
-          if (
-            'pipette' in command.params &&
-            'labware' in command.params &&
-            pipetteKey === command.params.pipette
-          ) {
-            const tipRack = labware[command.params.labware]
+  return Object.entries(pipettes).reduce((acc, [pipetteId, pipette]) => {
+    const loadCommand = loadPipetteCommands.find(
+      command => command.params.pipetteId == pipetteId
+    )
+    if (loadCommand != null) {
+      const { mount } = loadCommand.params
+      const requestedPipetteName = pipette.name
+      const pipetteSpecs = getPipetteNameSpecs(requestedPipetteName)
+
+      if (pipetteSpecs != null) {
+        const tipRackDefs: LabwareDefinition2[] = tipRackCommands.reduce<
+          LabwareDefinition2[]
+        >((acc, command) => {
+          if (pipetteId === command.params.pipetteId) {
+            const tipRack = labware[command.params.labwareId]
             const tipRackDefinition = labwareDefinitions[tipRack.definitionId]
-            if (tipRackDefinition !== undefined) {
-              tipRackDefs.push(tipRackDefinition)
+            if (tipRackDefinition != null && !acc.includes(tipRackDefinition)) {
+              return [...acc, tipRackDefinition]
             }
           }
-          tipRackDefs = uniq(tipRackDefs)
+          return acc
+        }, [])
+
+        const attachedPipette = attachedPipettes[mount as Mount]
+        const requestedPipetteMatch = getRequestedPipetteMatch(
+          pipette.name,
+          attachedPipette
+        )
+
+        const tipRacksForPipette = tipRackDefs.map(tipRackDef => {
+          const tlcDataMatch = tipLengthCalibrations.find(
+            tlcData => tlcData.uri === getLabwareDefURI(tipRackDef)
+          )
+          const lastModifiedDate =
+            attachedPipette != null &&
+            tlcDataMatch?.pipette === attachedPipette.id &&
+            requestedPipetteMatch !== INCOMPATIBLE
+              ? tlcDataMatch.lastModified
+              : null
+
+          return {
+            displayName: tipRackDef.metadata.displayName,
+            lastModifiedDate,
+            tipRackDef,
+          }
         })
-        result[mount] = {
-          pipetteSpecs: getPipetteNameSpecs(pipetteOnMount.name),
-          tipRackDefs: tipRackDefs,
+
+        const pipetteCalDate =
+          requestedPipetteMatch !== INCOMPATIBLE
+            ? attachedPipetteCalibrations[mount]?.offset?.lastModified
+            : null
+        return {
+          ...acc,
+          [mount]: {
+            name: requestedPipetteName,
+            id: pipetteId,
+            pipetteSpecs,
+            tipRacksForPipette,
+            requestedPipetteMatch,
+            pipetteCalDate,
+          },
         }
       } else {
-        result[mount] = null
+        return acc
       }
-      return result
-    },
-    { left: null, right: null }
-  )
+    } else {
+      return acc
+    }
+  }, EMPTY_MOUNTS)
+}
+
+function getRequestedPipetteMatch(
+  requestedPipetteName: string,
+  attachedPipette: AttachedPipette | null
+): string {
+  if (
+    attachedPipette?.modelSpecs?.backCompatNames != null &&
+    attachedPipette?.modelSpecs?.backCompatNames.includes(requestedPipetteName)
+  ) {
+    return INEXACT_MATCH
+  } else if (requestedPipetteName === attachedPipette?.modelSpecs?.name) {
+    return MATCH
+  } else {
+    return INCOMPATIBLE
+  }
 }
