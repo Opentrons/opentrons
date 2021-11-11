@@ -1025,13 +1025,14 @@ class API(HardwareAPILike):
         homed moves it will raise a MustHomeError. Otherwise, it will home the axis.
         """
 
+        # TODO: Remove the fail_if_not_homed and make this the behavior all the time.
+        # Having the optional arg makes the bug stick around in existing code and we
+        # really want to fix it when we're not gearing up for a release.
         mounts = self._mounts(mount)
         if fail_on_not_homed:
+            axes_moving = [Axis.X, Axis.Y] + [Axis.by_mount(m) for m in mounts]
             if (
-                not self._homed_ok(
-                    [Axis.X, Axis.Y] + [Axis.by_mount(m) for m in mounts],
-                    self._backend.homed_flags(),
-                )
+                not self._backend.is_homed([axis.name for axis in axes_moving])
                 or not self._current_position
             ):
                 raise MustHomeError(
@@ -1932,10 +1933,3 @@ class API(HardwareAPILike):
     def clean_up(self) -> None:
         """Get the API ready to stop cleanly."""
         self._backend.clean_up()
-
-    @staticmethod
-    def _homed_ok(axes_moving: List[Axis], position: Dict[str, bool]) -> bool:
-        for axis in axes_moving:
-            if not position.get(axis.name, False):
-                return False
-        return True

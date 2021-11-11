@@ -175,8 +175,11 @@ class Simulator:
     async def update_position(self) -> Dict[str, float]:
         return self._position
 
-    def homed_flags(self) -> Dict[str, bool]:
-        return self._smoothie_driver.homed_flags
+    def is_homed(self, axes: Sequence[str]) -> bool:
+        for axis in axes:
+            if not self._smoothie_driver.homed_flags.get(axis, False):
+                return False
+        return True
 
     async def move(
         self,

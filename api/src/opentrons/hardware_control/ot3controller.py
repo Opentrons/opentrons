@@ -52,9 +52,6 @@ class OT3Controller:
         self._gpio_dev = SimulatingGPIOCharDev("simulated")
         self._module_controls: Optional[AttachedModulesControl] = None
 
-    def homed_flags(self) -> Dict[str, bool]:
-        return {}
-
     @property
     def gpio_chardev(self) -> GPIODriverLike:
         """Get the GPIO device."""
@@ -76,6 +73,9 @@ class OT3Controller:
     def module_controls(self, module_controls: AttachedModulesControl) -> None:
         """Set the module controls"""
         self._module_controls = module_controls
+
+    def is_homed(self, axes: Sequence[str]) -> bool:
+        return True
 
     async def update_position(self) -> AxisValueMap:
         """Get the current position."""
