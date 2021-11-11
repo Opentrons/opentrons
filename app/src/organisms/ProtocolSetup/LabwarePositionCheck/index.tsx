@@ -75,7 +75,10 @@ export const LabwarePositionCheck = (
     ctaText,
     currentCommandIndex,
     currentStep,
-    isComplete
+    isComplete,
+    titleText,
+    isLoading,
+    jog,
   } = labwarePositionCheckUtils
 
   return (
@@ -101,6 +104,8 @@ export const LabwarePositionCheck = (
             selectedStep={currentStep}
             ctaText={ctaText}
             proceed={proceed}
+            title={titleText}
+            jog={jog}
           />
         ) : (
           <IntroScreen beginLPC={beginLPC} />

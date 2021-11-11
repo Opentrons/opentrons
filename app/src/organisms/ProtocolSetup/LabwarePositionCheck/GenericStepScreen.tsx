@@ -11,18 +11,21 @@ import {
   SPACING_4,
   Text,
   TEXT_TRANSFORM_UPPERCASE,
+  C_BLUE,
 } from '@opentrons/components'
 import { LabwarePositionCheckStepDetail } from './LabwarePositionCheckStepDetail'
 import { SectionList } from './SectionList'
 import { useIntroInfo, useLabwareIdsBySection } from './hooks'
 import { DeckMap } from './DeckMap'
+import type { Jog } from '../../../molecules/JogControls'
 import type { LabwarePositionCheckStep } from './types'
-import { C_BLUE } from '../../../../../components/src/styles/colors'
 
 interface GenericStepScreenProps {
   selectedStep: LabwarePositionCheckStep
   ctaText: string
   proceed: () => void
+  jog: Jog
+  title: string
 }
 export const GenericStepScreen = (
   props: GenericStepScreenProps
@@ -33,7 +36,9 @@ export const GenericStepScreen = (
   if (introInfo == null) return null
   const { sections, primaryPipetteMount, secondaryPipetteMount } = introInfo
   const labwareIdsToHighlight = labwareIdsBySection[sections[sectionIndex]]
-  const currentSectionIndex = sections.findIndex(section => section === props.selectedStep.section)
+  const currentSectionIndex = sections.findIndex(
+    section => section === props.selectedStep.section
+  )
   const completedSections = sections.slice(0, currentSectionIndex)
 
   return (
@@ -45,7 +50,7 @@ export const GenericStepScreen = (
         marginBottom={SPACING_3}
         marginLeft={SPACING_3}
       >
-        {'Generic step screen'}
+        {props.title}
       </Text>
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -72,7 +77,7 @@ export const GenericStepScreen = (
           </Flex>
         </Flex>
         <Flex padding={SPACING_3}>
-          <LabwarePositionCheckStepDetail selectedStep={props.selectedStep} />
+          <LabwarePositionCheckStepDetail selectedStep={props.selectedStep} jog={props.jog} />
         </Flex>
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER} marginBottom={SPACING_4}>
