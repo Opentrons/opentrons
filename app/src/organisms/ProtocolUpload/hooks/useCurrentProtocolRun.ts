@@ -1,4 +1,4 @@
-import { useQueryClient, UseMutateFunction } from 'react-query'
+import { useQueryClient } from 'react-query'
 import {
   useHost,
   useCreateProtocolMutation,
@@ -8,6 +8,7 @@ import {
 } from '@opentrons/react-api-client'
 import { useCurrentRunId } from './useCurrentRunId'
 
+import type { UseMutateFunction } from 'react-query'
 import type { Protocol, Run } from '@opentrons/api-client'
 
 interface UseCurrentProtocolRun {
