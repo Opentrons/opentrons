@@ -9,7 +9,7 @@ import {
 } from '@opentrons/api-client'
 import { useRunQuery, useRunActionMutations } from '@opentrons/react-api-client'
 
-import { useCurrentRunId } from '../../ProtocolUpload/useCurrentRunId'
+import { useCurrentRunId } from '../../ProtocolUpload/hooks/useCurrentRunId'
 
 import {
   useRunControls,
@@ -28,7 +28,7 @@ jest.mock('@opentrons/react-api-client', () => {
 })
 */
 jest.mock('@opentrons/react-api-client')
-jest.mock('../../ProtocolUpload/useCurrentRunId')
+jest.mock('../../ProtocolUpload/hooks/useCurrentRunId')
 
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId

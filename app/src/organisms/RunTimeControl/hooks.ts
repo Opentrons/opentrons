@@ -8,7 +8,7 @@ import {
 } from '@opentrons/api-client'
 import { useRunQuery, useRunActionMutations } from '@opentrons/react-api-client'
 
-import { useCurrentRunId } from '../ProtocolUpload/useCurrentRunId'
+import { useCurrentRunId } from '../ProtocolUpload/hooks/useCurrentRunId'
 
 interface RunControls {
   usePlay: () => void
