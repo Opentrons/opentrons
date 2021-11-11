@@ -8,9 +8,9 @@ from opentrons_hardware.drivers.can_bus.messages.message_definitions import (
     AddLinearMoveRequest,
 )
 from opentrons_hardware.drivers.can_bus.messages.payloads import (
-    MoveGroupRequestPayload,
     AddLinearMoveRequestPayload,
     MoveCompletedPayload,
+    EmptyPayload,
     ExecuteMoveGroupRequestPayload,
 )
 from opentrons_hardware.hardware_control.constants import interrupts_per_sec
@@ -94,11 +94,9 @@ async def test_single_group_clear(
     """It should send a clear group command before setup."""
     subject = MoveGroupRunner(move_groups=move_group_single)
     await subject._clear_groups(can_messenger=mock_can_messenger)
-    mock_can_messenger.send.assert_called_with(
+    mock_can_messenger.send.assert_called_once_with(
         node_id=NodeId.broadcast,
-        message=md.ClearMoveGroupRequest(
-            payload=MoveGroupRequestPayload(group_id=UInt8Field(0))
-        ),
+        message=md.ClearAllMoveGroupsRequest(payload=EmptyPayload()),
     )
 
 
@@ -108,13 +106,10 @@ async def test_multi_group_clear(
     """It should send a clear group command before setup."""
     subject = MoveGroupRunner(move_groups=move_group_multiple)
     await subject._clear_groups(can_messenger=mock_can_messenger)
-    for i in range(len(move_group_multiple)):
-        mock_can_messenger.send.assert_any_call(
-            node_id=NodeId.broadcast,
-            message=md.ClearMoveGroupRequest(
-                payload=MoveGroupRequestPayload(group_id=UInt8Field(i))
-            ),
-        )
+    mock_can_messenger.send.assert_called_once_with(
+        node_id=NodeId.broadcast,
+        message=md.ClearAllMoveGroupsRequest(payload=EmptyPayload()),
+    )
 
 
 async def test_single_send_setup_commands(
