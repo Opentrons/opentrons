@@ -8,6 +8,7 @@ import {
 } from '@opentrons/api-client'
 import { useRunQuery, useRunActionMutations } from '@opentrons/react-api-client'
 
+import { useCloneRun } from '../ProtocolUpload/hooks/useCloneRun'
 import { useCurrentRunId } from '../ProtocolUpload/hooks/useCurrentRunId'
 
 interface RunControls {
@@ -21,6 +22,8 @@ export function useRunControls(): RunControls {
 
   const { playRun, pauseRun } = useRunActionMutations(currentRunId as string)
 
+  const cloneRun = useCloneRun(currentRunId as string)
+
   const usePlay = (): void => {
     playRun()
   }
@@ -28,7 +31,7 @@ export function useRunControls(): RunControls {
     pauseRun()
   }
   const useReset = (): void => {
-    console.log('TODO: wire up to protocol reset endpoint')
+    cloneRun()
   }
   return { usePlay, usePause, useReset }
 }
