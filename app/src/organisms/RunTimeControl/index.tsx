@@ -3,9 +3,7 @@ import { useTranslation } from 'react-i18next'
 import {
   RUN_STATUS_IDLE,
   RUN_STATUS_RUNNING,
-  // RUN_STATUS_PAUSE_REQUESTED,
   RUN_STATUS_PAUSED,
-  // RUN_STATUS_STOP_REQUESTED,
   RUN_STATUS_STOPPED,
   RUN_STATUS_FAILED,
   RUN_STATUS_SUCCEEDED,
@@ -64,7 +62,6 @@ export function RunTimeControl(): JSX.Element | null {
     buttonIconName = 'play'
     buttonText = t('resume_run')
     action = usePlay
-    // TODO: need status stop-requested, pause-requested
   } else if (
     runStatus === RUN_STATUS_STOPPED ||
     runStatus === RUN_STATUS_FAILED ||

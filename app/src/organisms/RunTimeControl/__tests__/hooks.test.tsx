@@ -1,6 +1,6 @@
 import { when, resetAllWhenMocks } from 'jest-when'
 import { UseQueryResult } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
+import { act, renderHook } from '@testing-library/react-hooks'
 import {
   RUN_ACTION_TYPE_PLAY,
   RUN_ACTION_TYPE_PAUSE,
@@ -9,6 +9,7 @@ import {
 } from '@opentrons/api-client'
 import { useRunQuery, useRunActionMutations } from '@opentrons/react-api-client'
 
+import { useCloneRun } from '../../ProtocolUpload/hooks/useCloneRun'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks/useCurrentRunId'
 
 import {
@@ -17,19 +18,12 @@ import {
   useRunStatus,
   useRunStartTime,
 } from '../hooks'
-/*
-jest.mock('@opentrons/react-api-client', () => {
-  return {
-    useCurrentProtocolRun: jest.fn(),
-    usePauseProtocolRun: jest.fn(),
-    usePlayProtocolRun: jest.fn(),
-    useProtocolRun: jest.fn(),
-  }
-})
-*/
+
 jest.mock('@opentrons/react-api-client')
+jest.mock('../../ProtocolUpload/hooks/useCloneRun')
 jest.mock('../../ProtocolUpload/hooks/useCurrentRunId')
 
+const mockUseCloneRun = useCloneRun as jest.MockedFunction<typeof useCloneRun>
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
 >
@@ -91,23 +85,34 @@ const mockRunningRun: RunData = {
   labware: [],
 }
 
-/*
 describe('useRunControls hook', () => {
   afterEach(() => {
     resetAllWhenMocks()
   })
-  it('returns run controls hooks associated with the current run', () => {
+  it('returns run controls hooks', () => {
+    const mockPlayRun = jest.fn()
+    const mockPauseRun = jest.fn()
+    const mockStopRun = jest.fn()
+    const mockCloneRun = jest.fn()
+
     when(mockUseCurrentRunId).calledWith().mockReturnValue('1')
-    when(mockUseRunActionMutations).calledWith('1').mockReturnValue()
+    when(mockUseRunActionMutations).calledWith('1').mockReturnValue({
+      playRun: mockPlayRun,
+      pauseRun: mockPauseRun,
+      stopRun: mockStopRun,
+    })
+    when(mockUseCloneRun).calledWith('1').mockReturnValue(mockCloneRun)
 
-    const { usePlay, usePause, useReset } = useRunControls()
+    const { result } = renderHook(useRunControls)
 
-    expect(usePlay).toBe(false)
-    expect(usePause).toBe(false)
-    expect(useReset).toBe(false)
+    act(() => result.current.usePlay())
+    expect(mockPlayRun).toHaveBeenCalledTimes(1)
+    act(() => result.current.usePause())
+    expect(mockPauseRun).toHaveBeenCalledTimes(1)
+    act(() => result.current.useReset())
+    expect(mockCloneRun).toHaveBeenCalledTimes(1)
   })
 })
-*/
 
 describe('useRunStatus hook', () => {
   afterEach(() => {

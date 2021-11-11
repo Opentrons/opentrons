@@ -57,7 +57,7 @@ describe('RunTimeControl', () => {
     expect(getByText('Run Protocol')).toBeTruthy()
   })
 
-  it('renders a run status but no timer if status ready-to-run', () => {
+  it('renders a run status but no timer if idle', () => {
     const [{ getByRole, getByText, queryByText }] = render()
 
     expect(getByText('Status: Not started')).toBeTruthy()
