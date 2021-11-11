@@ -39,7 +39,6 @@ export function useIntroInfo(): IntroInfo | null {
     pipetteId: primaryPipetteId,
     labwareId: pickUpTipLabwareId,
   } = (pickUpTipStep.commands[0] as PickUpTipCommand).params
-  console.log(pickUpTipStep.commands[0])
   const primaryPipetteName = protocolData.pipettes[primaryPipetteId].name
   const primaryPipetteMount = getPipetteMount(
     primaryPipetteId,
@@ -52,7 +51,6 @@ export function useIntroInfo(): IntroInfo | null {
       ? getPipetteNameSpecs(primaryPipetteName as PipetteName)
       : null
   const pickUpTipLabware = protocolData.labware[pickUpTipLabwareId]
-  console.log(pickUpTipLabwareId)
   // find name and slot number for tiprack used for check
   const primaryTipRackName =
     'displayName' in pickUpTipLabware ? pickUpTipLabware?.displayName : null

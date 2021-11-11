@@ -11,7 +11,6 @@ import { useProtocolDetails } from '../../../RunDetails/hooks'
 import { useCurrentProtocolRun } from '../../../ProtocolUpload/hooks'
 import { getLabwareLocation } from '../../utils/getLabwareLocation'
 import { getModuleLocation } from '../../utils/getModuleLocation'
-import { useLPCCommands } from './useLPCCommands'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { SetupCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import type {
@@ -23,7 +22,9 @@ import type {
 import type {
   LabwarePositionCheckCommand,
   LabwarePositionCheckMovementCommand,
+  LabwarePositionCheckStep,
 } from '../types'
+import { useSteps } from './useSteps'
 
 export type LabwarePositionCheckUtils =
   | {
@@ -40,9 +41,11 @@ export type LabwarePositionCheckUtils =
 const useLpcCtaText = (command: LabwarePositionCheckCommand): string => {
   const { protocolData } = useProtocolDetails()
   const { t } = useTranslation('labware_position_check')
+  if (command == null) return ''
   const commands = protocolData?.commands ?? []
   switch (command.commandType) {
     case 'dropTip':
+      return t('confirm_position_and_return_tip')
     case 'moveToWell': {
       const labwareId = command.params.labwareId
       const slot = getLabwareLocation(labwareId, commands)
@@ -102,10 +105,15 @@ const commandIsComplete = (status: RunCommandSummary['status']): boolean =>
 
 const createCommandData = (
   command: Command | LabwarePositionCheckCommand
-): { commandType: string; data: Record<string, any> } => ({
-  commandType: command.commandType,
-  data: command.params,
-})
+): { commandType: string; params: Record<string, any> } => {
+  if (command.commandType === 'loadLabware') {
+    return {
+      commandType: command.commandType,
+      params: { ...command.params, labwareId: command.result?.labwareId },
+    }
+  }
+  return { commandType: command.commandType, params: command.params }
+}
 
 const isLoadCommand = (command: Command): boolean => {
   const loadCommands: Array<SetupCommand['commandType']> = [
@@ -140,20 +148,37 @@ export function useLabwarePositionCheck(
   const { protocolData } = useProtocolDetails()
   const host = useHost()
   const { runRecord: currentRun } = useCurrentProtocolRun()
+  const LPCSteps = useSteps()
+
+  const LPCCommands = LPCSteps.reduce<LabwarePositionCheckCommand[]>(
+    (steps, currentStep) => {
+      return [...steps, ...currentStep.commands]
+    },
+    []
+  )
   // load commands come from the protocol resource
   const loadCommands = protocolData?.commands.filter(isLoadCommand) ?? []
   // TC open lid commands come from the LPC command generator
-  const TCOpenCommands = useLPCCommands().filter(isTCOpenCommand) ?? []
+  const TCOpenCommands = LPCCommands.filter(isTCOpenCommand) ?? []
   // prepCommands will be run when a user starts LPC
   const prepCommands = [...loadCommands, ...TCOpenCommands]
   // LPCMovementCommands will be run during the guided LPC flow
-  const LPCMovementCommands: LabwarePositionCheckMovementCommand[] = useLPCCommands().filter(
+  const LPCMovementCommands: LabwarePositionCheckMovementCommand[] = LPCCommands.filter(
     (
       command: LabwarePositionCheckCommand
     ): command is LabwarePositionCheckMovementCommand =>
       command.commandType !== 'thermocycler/openLid'
   )
   const currentCommand = LPCMovementCommands[currentCommandIndex]
+  const lastCommand = LPCMovementCommands[currentCommandIndex - 1]
+
+  const currentStep = LPCSteps.find(step => {
+    const matchingCommand = step.commands.find(
+      command => lastCommand != null && command.id === lastCommand.id
+    )
+    return matchingCommand
+  }) as LabwarePositionCheckStep
+
   const ctaText = useLpcCtaText(currentCommand)
   const robotCommands = useAllCommandsQuery(currentRun?.data?.id).data?.data
   const loadingText = useLoadingText(isLoading, currentCommand)
@@ -221,7 +246,9 @@ export function useLabwarePositionCheck(
       // add the saved command id so we can use it to query locations later
       .then(response => {
         const commandId = response.data.data.id
+        console.log('before')
         addSavePositionCommandData(commandId, prevCommand.params.labwareId)
+        console.log('after')
         // execute the movement command
         return createCommand(
           host as HostConfig,

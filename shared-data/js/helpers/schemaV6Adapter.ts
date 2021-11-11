@@ -1,6 +1,8 @@
+import { v4 as uuidv4 } from 'uuid'
 import { getLabwareDisplayName } from '.'
-import type { Command, ProtocolFile } from '../../protocol'
+import { PickUpTipCommand } from '../../protocol/types/schemaV6/command/pipetting'
 import type { LoadLabwareCommand } from '../../protocol/types/schemaV6/command/setup'
+import type { Command, ProtocolFile } from '../../protocol'
 import type { PipetteName } from '../pipettes'
 import type { ProtocolResource, LabwareDefinition2 } from '../types'
 // This adapter exists to resolve the interface mismatch between the PE analysis response
@@ -68,12 +70,29 @@ export const schemaV6Adapter = (
         }
       }, {})
 
+    // This is a temporary hack that should be deleted as soon as pickup tip command mapping is implemented in protocol engine
+    const commands = protocolAnalyses.commands.map((command, index) => {
+      if (command.id.includes('PICK_UP_TIP')) {
+        const shimmedPickupTipCommand: PickUpTipCommand = {
+          id: index.toString(),
+          commandType: 'pickUpTip',
+          params: {
+            pipetteId: index % 2 === 0 ? 'pipette-0' : 'pipette-1',
+            labwareId: index % 2 === 0 ? 'labware-1' : 'labware-3',
+            wellName: 'A1',
+          },
+        }
+        return shimmedPickupTipCommand
+      }
+      return command
+    })
+
     // @ts-expect-error this is a v6 like object that does not quite match the v6 spec at the moment
     return {
       pipettes,
       labware,
       labwareDefinitions,
-      commands: protocolAnalyses.commands,
+      commands,
     }
   }
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
