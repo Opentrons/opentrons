@@ -12,6 +12,7 @@ import { useSteps, useLabwarePositionCheck } from './hooks'
 import { IntroScreen } from './IntroScreen'
 import { GenericStepScreen } from './GenericStepScreen'
 import { SummaryScreen } from './SummaryScreen'
+import { RobotMotionLoadingModal } from './RobotMotionLoadingModal'
 
 import styles from '../styles.css'
 
@@ -25,6 +26,7 @@ export const LabwarePositionCheck = (
   props: LabwarePositionCheckModalProps
 ): JSX.Element | null => {
   const { t } = useTranslation(['labware_position_check', 'shared'])
+  const isLoading: boolean = true
   const steps = useSteps()
   const [currentLabwareCheckStep, setCurrentLabwareCheckStep] = React.useState<
     number | null
@@ -86,6 +88,9 @@ export const LabwarePositionCheck = (
           },
         }}
       >
+        {isLoading ? (
+          <RobotMotionLoadingModal title={'Moving to Slot 7'} />
+        ) : null}
         {isComplete ? (
           <SummaryScreen />
         ) : currentLabwareCheckStep !== null ? (

@@ -72,6 +72,13 @@ from .load_module import (
     LoadModuleCommandType,
 )
 
+from .move_relative import (
+    MoveRelative,
+    MoveRelativeParams,
+    MoveRelativeCreate,
+    MoveRelativeResult,
+    MoveRelativeCommandType,
+)
 from .move_to_well import (
     MoveToWell,
     MoveToWellParams,
@@ -147,6 +154,12 @@ __all__ = [
     "LoadModuleParams",
     "LoadModuleResult",
     "LoadModuleCommandType",
+    # move relative command models
+    "MoveRelative",
+    "MoveRelativeParams",
+    "MoveRelativeCreate",
+    "MoveRelativeResult",
+    "MoveRelativeCommandType",
     # move to well command models
     "MoveToWell",
     "MoveToWellCreate",

@@ -17,7 +17,7 @@ from opentrons.calibration_storage.helpers import uri_from_details
 from .. import errors
 from ..resources import DeckFixedLabware
 from ..commands import Command, LoadLabwareResult, AddLabwareDefinitionResult
-from ..types import CalibrationOffset, LabwareLocation, LoadedLabware, Dimensions
+from ..types import LabwareOffsetVector, LabwareLocation, LoadedLabware, Dimensions
 from ..actions import Action, UpdateCommandAction
 from .abstract_store import HasState, HandlesActions
 
@@ -27,7 +27,7 @@ class LabwareState:
     """State of all loaded labware resources."""
 
     labware_by_id: Dict[str, LoadedLabware]
-    calibrations_by_id: Dict[str, CalibrationOffset]
+    calibrations_by_id: Dict[str, LabwareOffsetVector]
     definitions_by_uri: Dict[str, LabwareDefinition]
     deck_definition: DeckDefinitionV2
 
@@ -65,7 +65,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             for fixed_labware in deck_fixed_labware
         }
         calibrations_by_id = {
-            fixed_labware.labware_id: CalibrationOffset(x=0, y=0, z=0)
+            fixed_labware.labware_id: LabwareOffsetVector(x=0, y=0, z=0)
             for fixed_labware in deck_fixed_labware
         }
 
@@ -274,7 +274,7 @@ class LabwareView(HasState[LabwareState]):
             z=dims.zDimension,
         )
 
-    def get_calibration_offset(self, labware_id: str) -> CalibrationOffset:
+    def get_calibration_offset(self, labware_id: str) -> LabwareOffsetVector:
         """Get the labware's calibration offset."""
         try:
             return self._state.calibrations_by_id[labware_id]

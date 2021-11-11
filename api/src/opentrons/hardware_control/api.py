@@ -1014,16 +1014,33 @@ class API(HardwareAPILike):
         speed: float = None,
         max_speeds: Dict[Axis, float] = None,
         check_bounds: MotionChecks = MotionChecks.NONE,
+        fail_on_not_homed: bool = False,
     ):
         """Move the critical point of the specified mount by a specified
         displacement in a specified direction, at the specified speed.
         'speed' sets the speed of all axes to the given value. So, if multiple
-        axes are to be moved, they will do so at the same speed
+        axes are to be moved, they will do so at the same speed.
+
+        If fail_on_not_homed is True (default False), if an axis that is not
+        homed moves it will raise a MustHomeError. Otherwise, it will home the axis.
         """
-        if not self._current_position:
+
+        # TODO: Remove the fail_if_not_homed and make this the behavior all the time.
+        # Having the optional arg makes the bug stick around in existing code and we
+        # really want to fix it when we're not gearing up for a release.
+        mounts = self._mounts(mount)
+        if fail_on_not_homed:
+            axes_moving = [Axis.X, Axis.Y] + [Axis.by_mount(m) for m in mounts]
+            if (
+                not self._backend.is_homed([axis.name for axis in axes_moving])
+                or not self._current_position
+            ):
+                raise MustHomeError(
+                    "Cannot make a relative move because absolute position is unknown"
+                )
+        elif not self._current_position:
             await self.home()
 
-        mounts = self._mounts(mount)
         primary_mount = mounts[0]
         secondary_mount = None
         # Even with overloads, mypy cannot accept a length check on

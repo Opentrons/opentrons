@@ -12,6 +12,7 @@ from opentrons.hardware_control.types import (
     CriticalPoint,
     OutOfBoundsMove,
     MotionChecks,
+    MustHomeError,
 )
 from opentrons.hardware_control.robot_calibration import RobotCalibration
 
@@ -404,3 +405,25 @@ async def test_move_rel_bounds(hardware_api):
         await hardware_api.move_rel(
             types.Mount.RIGHT, types.Point(0, 0, 2000), check_bounds=MotionChecks.HIGH
         )
+
+
+async def test_move_rel_homing_failures(hardware_api):
+    await hardware_api.home()
+    hardware_api._backend._smoothie_driver._homed_flags = {
+        "X": True,
+        "Y": True,
+        "Z": False,
+        "A": True,
+        "B": False,
+        "C": False,
+    }
+    # If one axis being used isn't homed, we must get an exception
+    with pytest.raises(MustHomeError):
+        await hardware_api.move_rel(
+            types.Mount.LEFT, types.Point(0, 0, 2000), fail_on_not_homed=True
+        )
+
+    # If an axis that _isn't_ being moved isn't homed, that's fine
+    await hardware_api.move_rel(
+        types.Mount.RIGHT, types.Point(0, 0, 2000), fail_on_not_homed=True
+    )
