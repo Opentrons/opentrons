@@ -12,12 +12,18 @@ from opentrons.drivers.types import MoveSplits
 class SimulatingDriver:
     def __init__(self) -> None:
         self._steps_per_mm: Dict[str, float] = {}
+        self._homed_flags: Dict[str, bool] = {}
+
+    @property
+    def homed_flags(self) -> Dict[str, bool]:
+        return self._homed_flags
 
     async def home(self, axis: str = AXES, disabled: str = DISABLE_AXES) -> None:
-        pass
+        for ax in axis:
+            self._homed_flags[axis] = True
 
     async def _smoothie_reset(self) -> None:
-        pass
+        self._homed_flags.clear()
 
     async def read_pipette_id(self, mount: str) -> Optional[str]:
         pass

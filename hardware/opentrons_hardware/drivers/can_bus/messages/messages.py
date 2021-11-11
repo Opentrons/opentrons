@@ -31,8 +31,6 @@ MessageDefinition = Union[
     defs.ClearAllMoveGroupsRequest,
     defs.MoveGroupCompleted,
     defs.MoveCompleted,
-    defs.GetMoveStatusRequest,
-    defs.GetMoveStatusResponse,
 ]
 
 
