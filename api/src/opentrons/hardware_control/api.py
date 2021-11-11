@@ -1037,7 +1037,7 @@ class API(HardwareAPILike):
                 raise MustHomeError(
                     "Cannot make a relative move because absolute position is unknown"
                 )
-        elif not fail_on_not_homed and not self._current_position:
+        elif not self._current_position:
             await self.home()
 
         primary_mount = mounts[0]
