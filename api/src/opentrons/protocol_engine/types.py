@@ -105,6 +105,14 @@ class LoadedLabware(BaseModel):
     location: LabwareLocation
 
 
+class MovementAxis(str, Enum):
+    """Axis on which to issue a relative movement."""
+
+    X = "x"
+    Y = "y"
+    Z = "z"
+
+
 class LabwareOffsetVector(BaseModel):
     """Offset, in deck coordinates from nominal to actual position."""
 
