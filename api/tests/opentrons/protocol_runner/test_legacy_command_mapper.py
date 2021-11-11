@@ -5,7 +5,7 @@ from datetime import datetime
 
 from opentrons.commands.types import PauseMessage
 from opentrons.protocol_engine import (
-    CalibrationOffset,
+    LabwareOffsetVector,
     DeckSlotLocation,
     PipetteName,
     commands as pe_commands,
@@ -218,7 +218,7 @@ def test_map_labware_load(minimal_labware_def: LabwareDefinition) -> None:
             # Trusting that the exact fields within in the labware definition
             # get passed through correctly.
             definition=matchers.Anything(),
-            calibration=CalibrationOffset(x=0, y=0, z=0),
+            calibration=LabwareOffsetVector(x=0, y=0, z=0),
         ),
     )
 
