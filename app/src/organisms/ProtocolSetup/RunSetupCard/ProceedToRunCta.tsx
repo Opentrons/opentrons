@@ -1,6 +1,5 @@
 import * as React from 'react'
 import every from 'lodash/every'
-import { useSelector } from 'react-redux'
 import { NavLink } from 'react-router-dom'
 import { useMissingModuleIds } from './hooks'
 import { useTranslation } from 'react-i18next'
@@ -12,8 +11,7 @@ import {
   JUSTIFY_CENTER,
   C_BLUE,
 } from '@opentrons/components'
-import * as Pipettes from '../../../redux/pipettes'
-import type { State } from '../../../redux/types'
+import { useCurrentRunPipetteInfoByMount } from './hooks'
 
 interface ProceedToRunProps {
   robotName: string
@@ -26,17 +24,15 @@ export const ProceedToRunCta = (
   const { t } = useTranslation('protocol_setup')
   const [targetProps, tooltipProps] = useHoverTooltip()
   const missingModuleIds = useMissingModuleIds()
-  const protocolPipetteTipRackData = useSelector((state: State) => {
-    return Pipettes.getProtocolPipetteTipRackCalInfo(state, robotName)
-  })
+  const pipetteInfoByMount = useCurrentRunPipetteInfoByMount()
   const isEverythingCalibrated = every(
-    protocolPipetteTipRackData,
-    pipCalData => {
-      if (pipCalData != null) {
+    pipetteInfoByMount,
+    pipetteInfo => {
+      if (pipetteInfo != null) {
         return (
-          pipCalData.pipetteCalDate != null &&
-          pipCalData.tipRacks.every(
-            tipRackCal => tipRackCal.lastModifiedDate != null
+          pipetteInfo.pipetteCalDate != null &&
+          pipetteInfo.tipRacksForPipette.every(
+            tipRackInfo => tipRackInfo.lastModifiedDate != null
           )
         )
       } else {
