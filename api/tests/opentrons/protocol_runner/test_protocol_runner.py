@@ -157,13 +157,14 @@ async def test_pause(
 
 async def test_stop(
     decoy: Decoy,
+    task_queue: TaskQueue,
     protocol_engine: ProtocolEngine,
     subject: ProtocolRunner,
 ) -> None:
     """It should halt a protocol run with stop."""
     await subject.stop()
 
-    decoy.verify(await protocol_engine.halt(), times=1)
+    decoy.verify(task_queue.stop(), await protocol_engine.halt())
 
 
 async def test_join(

@@ -130,6 +130,7 @@ class ProtocolEngine:
         self._action_dispatcher.dispatch(StopAction())
         self._queue_worker.cancel()
         await self._hardware_api.halt()
+        await self._hardware_api.stop(home_after=False)
 
     async def wait_until_complete(self) -> None:
         """Wait until there are no more commands to execute.

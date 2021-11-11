@@ -295,6 +295,7 @@ async def test_halt(
         action_dispatcher.dispatch(StopAction()),
         queue_worker.cancel(),
         await hardware_api.halt(),
+        await hardware_api.stop(home_after=False),
     )
 
 
