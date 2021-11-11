@@ -16,8 +16,8 @@ import * as protocolSelectors from '../../../redux/protocol/selectors'
 import * as protocolUtils from '../../../redux/protocol/utils'
 import { ConfirmExitProtocolUploadModal } from '../ConfirmExitProtocolUploadModal'
 import { mockCalibrationStatus } from '../../../redux/calibration/__fixtures__'
-import { useCurrentProtocolRun } from '../useCurrentProtocolRun'
-import { useCloseCurrentRun } from '../useCloseCurrentRun'
+import { useCurrentProtocolRun } from '../hooks/useCurrentProtocolRun'
+import { useCloseCurrentRun } from '../hooks/useCloseCurrentRun'
 import { closeProtocol } from '../../../redux/protocol/actions'
 import { ProtocolUpload } from '..'
 
@@ -25,8 +25,8 @@ jest.mock('../../../redux/protocol/selectors')
 jest.mock('../../../redux/protocol/utils')
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../../redux/calibration/selectors')
-jest.mock('../useCurrentProtocolRun')
-jest.mock('../useCloseCurrentRun')
+jest.mock('../hooks/useCurrentProtocolRun')
+jest.mock('../hooks/useCloseCurrentRun')
 jest.mock('../ConfirmExitProtocolUploadModal')
 
 const getProtocolFile = protocolSelectors.getProtocolFile as jest.MockedFunction<

@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux'
 import { getProtocolName } from '../../redux/protocol'
-import { useCurrentProtocolRun } from '../ProtocolUpload/useCurrentProtocolRun'
+import { useCurrentProtocolRun } from '../ProtocolUpload/hooks'
 
 import { schemaV6Adapter, ProtocolFile } from '@opentrons/shared-data'
 import type { State } from '../../redux/types'
