@@ -4,10 +4,14 @@ from dataclasses import dataclass
 
 from opentrons.types import Point
 from opentrons.hardware_control.api import API as HardwareAPI
-from opentrons.hardware_control.types import CriticalPoint
+from opentrons.hardware_control.types import (
+    CriticalPoint,
+    MustHomeError as HardwareMustHomeError,
+)
 
 from ..types import WellLocation, DeckPoint, MovementAxis
 from ..state import StateStore, CurrentWell
+from ..errors import MustHomeError
 from ..resources import ModelUtils
 
 
@@ -99,7 +103,14 @@ class MovementHandler:
             z=distance if axis == MovementAxis.Z else 0,
         )
 
-        await self._hardware_api.move_rel(mount=hw_mount, delta=delta)
+        try:
+            await self._hardware_api.move_rel(
+                mount=hw_mount,
+                delta=delta,
+                fail_on_not_homed=True,
+            )
+        except HardwareMustHomeError as e:
+            raise MustHomeError(str(e)) from e
 
     async def save_position(
         self,

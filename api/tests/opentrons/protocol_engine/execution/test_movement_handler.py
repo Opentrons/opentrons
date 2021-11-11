@@ -4,12 +4,21 @@ from decoy import Decoy
 from typing import NamedTuple
 
 from opentrons.types import MountType, Mount, Point
-from opentrons.hardware_control.api import API as HardwareAPI
-from opentrons.hardware_control.types import CriticalPoint
+from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control.types import (
+    CriticalPoint,
+    MustHomeError as HardwareMustHomeError,
+)
 from opentrons.motion_planning import Waypoint
 
-from opentrons.protocol_engine.types import DeckPoint, MovementAxis
-from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
+from opentrons.protocol_engine.errors import MustHomeError
+from opentrons.protocol_engine.types import (
+    DeckPoint,
+    MovementAxis,
+    WellLocation,
+    WellOrigin,
+    WellOffset,
+)
 from opentrons.protocol_engine.state import (
     StateStore,
     PipetteLocationData,
@@ -228,9 +237,7 @@ async def test_move_relative(
 ) -> None:
     """Test that move_relative triggers a relative move with the HardwareAPI."""
     decoy.when(
-        state_store.motion.get_pipette_location(
-            pipette_id="pipette-id",
-        )
+        state_store.motion.get_pipette_location(pipette_id="pipette-id")
     ).then_return(
         PipetteLocationData(
             mount=MountType.LEFT,
@@ -244,7 +251,45 @@ async def test_move_relative(
         distance=distance,
     )
 
-    decoy.verify(await hardware_api.move_rel(mount=Mount.LEFT, delta=expected_delta))
+    decoy.verify(
+        await hardware_api.move_rel(
+            mount=Mount.LEFT,
+            delta=expected_delta,
+            fail_on_not_homed=True,
+        )
+    )
+
+
+async def test_move_relative_must_home(
+    decoy: Decoy,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    subject: MovementHandler,
+) -> None:
+    """It should raise a MustHomeError if the hardware controller is not homed."""
+    decoy.when(
+        state_store.motion.get_pipette_location(pipette_id="pipette-id")
+    ).then_return(
+        PipetteLocationData(
+            mount=MountType.LEFT,
+            critical_point=CriticalPoint.XY_CENTER,
+        )
+    )
+
+    decoy.when(
+        await hardware_api.move_rel(
+            mount=Mount.LEFT,
+            delta=Point(x=0, y=0, z=42.0),
+            fail_on_not_homed=True,
+        )
+    ).then_raise(HardwareMustHomeError("oh no"))
+
+    with pytest.raises(MustHomeError):
+        await subject.move_relative(
+            pipette_id="pipette-id",
+            axis=MovementAxis.Z,
+            distance=42.0,
+        )
 
 
 async def test_save_position(
