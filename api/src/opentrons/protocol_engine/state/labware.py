@@ -138,8 +138,10 @@ class LabwareView(HasState[LabwareState]):
         """Get labware data by the labware's unique identifier."""
         try:
             return self._state.labware_by_id[labware_id]
-        except KeyError:
-            raise errors.LabwareDoesNotExistError(f"Labware {labware_id} not found.")
+        except KeyError as e:
+            raise errors.LabwareDoesNotExistError(
+                f"Labware {labware_id} not found."
+            ) from e
 
     def get_definition(self, labware_id: str) -> LabwareDefinition:
         """Get labware definition by the labware's unique identifier."""
@@ -174,10 +176,10 @@ class LabwareView(HasState[LabwareState]):
         """Get the labware definition matching loadName namespace and version."""
         try:
             return self._state.definitions_by_uri[uri]
-        except KeyError:
+        except KeyError as e:
             raise errors.LabwareDefinitionDoesNotExistError(
                 f"Labware definition for matching {uri} not found."
-            )
+            ) from e
 
     def get_location(self, labware_id: str) -> LabwareLocation:
         """Get labware location by the labware's unique identifier."""
@@ -206,10 +208,10 @@ class LabwareView(HasState[LabwareState]):
 
         try:
             return definition.wells[well_name]
-        except KeyError:
+        except KeyError as e:
             raise errors.WellDoesNotExistError(
                 f"{well_name} does not exist in {labware_id}."
-            )
+            ) from e
 
     def get_wells(self, labware_id: str) -> List[str]:
         """Get labware wells as a list of well names."""
@@ -278,5 +280,7 @@ class LabwareView(HasState[LabwareState]):
         """Get the labware's calibration offset."""
         try:
             return self._state.calibrations_by_id[labware_id]
-        except KeyError:
-            raise errors.LabwareDoesNotExistError(f"Labware {labware_id} not found.")
+        except KeyError as e:
+            raise errors.LabwareDoesNotExistError(
+                f"Labware {labware_id} not found."
+            ) from e
