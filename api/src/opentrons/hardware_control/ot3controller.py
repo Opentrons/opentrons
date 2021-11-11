@@ -10,6 +10,18 @@ from opentrons.config.types import RobotConfig
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.types import Mount
 
+try:
+    from opentrons_hardware.drivers.can_bus import CanDriver, CanMessenger
+    from opentrons_hardware.drivers.can_bus.constants import NodeId
+    from opentrons_hardware.hardware_control.motion import create
+    from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
+except ModuleNotFoundError:
+    CanDriver = None
+    CanMessenger = None
+    NodeId = None
+    create = None
+    MoveGroupRunner = None
+
 from .module_control import AttachedModulesControl
 from .types import BoardRevision, Axis
 
@@ -30,6 +42,9 @@ AxisValueMap = Dict[str, float]
 class OT3Controller:
     """OT3 Hardware Controller Backend."""
 
+    _messenger: CanMessenger
+    _position: Dict[NodeId, float]
+
     @classmethod
     async def build(cls, config: RobotConfig) -> OT3Controller:
         """Create the OT3Controller instance.
@@ -40,17 +55,20 @@ class OT3Controller:
         Returns:
             Instance.
         """
-        return cls(config)
+        driver = await CanDriver.from_env()
+        return cls(config, driver=driver)
 
-    def __init__(self, config: RobotConfig) -> None:
+    def __init__(self, config: RobotConfig, driver: CanDriver) -> None:
         """Construct.
 
         Args:
             config: Robot configuration
+            driver: The Can Driver
         """
         self._configuration = config
         self._gpio_dev = SimulatingGPIOCharDev("simulated")
         self._module_controls: Optional[AttachedModulesControl] = None
+        self._messenger = CanMessenger(driver=driver)
 
     @property
     def gpio_chardev(self) -> GPIODriverLike:
@@ -79,7 +97,16 @@ class OT3Controller:
 
     async def update_position(self) -> AxisValueMap:
         """Get the current position."""
-        return {}
+        ret: AxisValueMap = {}
+        for node, pos in self._position.items():
+            if node == NodeId.head:
+                ret['A'] = pos
+                ret['Z'] = pos
+            elif node == NodeId.gantry_x:
+                ret['X'] = pos
+            elif node == NodeId.gantry_y:
+                ret['Y'] = pos
+        return ret
 
     async def move(
         self,
@@ -99,7 +126,18 @@ class OT3Controller:
         Returns:
             None
         """
-        return None
+        target: Dict[NodeId, float] = {}
+        for axis, pos in target_position.items():
+            if axis in {'A', 'Z'}:
+                target[NodeId.head] = pos
+            elif axis == 'X':
+                target[NodeId.gantry_x] = pos
+            elif axis == 'Y':
+                target[NodeId.gantry_y] = pos
+        move_group = create(origin=self._position, target=target, speed=speed or 5000.0)
+        runner = MoveGroupRunner(move_groups=move_group)
+        await runner.run(can_messenger=self._messenger)
+        self._position = target
 
     async def home(self, axes: Optional[List[str]] = None) -> AxisValueMap:
         """Home axes.

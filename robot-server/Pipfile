@@ -48,3 +48,4 @@ idna = "==3.2"
 click = "==8.0.1"
 numpy = "==1.15.1"
 zipp = "==3.5.0"
+opentrons-hardware = {editable = true, path = "./../hardware"}

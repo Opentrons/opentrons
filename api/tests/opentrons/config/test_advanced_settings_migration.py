@@ -22,6 +22,7 @@ def default_file_settings() -> Dict[str, Optional[bool]]:
         "enableDoorSafetySwitch": None,
         "enableHttpProtocolSessions": None,
         "disableFastProtocolUpload": None,
+        "enableOT3HardwareController": None,
     }
 
 
@@ -165,6 +166,18 @@ def v11_config(v10_config):
     return r
 
 
+@pytest.fixture
+def v12_config(v11_config):
+    r = v11_config.copy()
+    r.update(
+        {
+            "_version": 12,
+            "enableOT3HardwareController": True,
+        }
+    )
+    return r
+
+
 @pytest.fixture(
     scope="session",
     params=[
@@ -181,6 +194,7 @@ def v11_config(v10_config):
         lazy_fixture("v9_config"),
         lazy_fixture("v10_config"),
         lazy_fixture("v11_config"),
+        lazy_fixture("v12_config"),
     ],
 )
 def old_settings(request):
@@ -253,4 +267,5 @@ def test_ensures_config():
         "enableDoorSafetySwitch": None,
         "enableHttpProtocolSessions": None,
         "disableFastProtocolUpload": None,
+        "enableOT3HardwareController": None,
     }

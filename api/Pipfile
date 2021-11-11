@@ -36,3 +36,4 @@ types-mock = "==4.0.1"
 types-setuptools = "==57.0.2"
 opentrons-shared-data = {editable = true, path = "../shared-data/python"}
 opentrons = {editable = true, path = "."}
+opentrons-hardware = {editable = true, path = "./../hardware"}

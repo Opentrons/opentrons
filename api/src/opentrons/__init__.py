@@ -7,6 +7,7 @@ import asyncio
 import re
 from typing import Any, List, Tuple
 
+from opentrons.config.feature_flags import enable_ot3_hardware_controller
 from opentrons.drivers.serial_communication import get_ports_by_name
 from opentrons.hardware_control import API, ThreadManager
 from opentrons.config import (
@@ -106,12 +107,18 @@ async def _create_thread_manager() -> ThreadManager:
         log.info("Initialized robot using virtual Smoothie")
         return ThreadManager(API.build_hardware_simulator)
 
-    thread_manager = ThreadManager(
-        API.build_hardware_controller,
-        threadmanager_nonblocking=True,
-        port=_get_motor_control_serial_port(),
-        firmware=_find_smoothie_file(),
-    )
+    if enable_ot3_hardware_controller():
+        thread_manager = ThreadManager(
+            API.build_ot3_controller,
+            threadmanager_nonblocking=True,
+        )
+    else:
+        thread_manager = ThreadManager(
+            API.build_hardware_controller,
+            threadmanager_nonblocking=True,
+            port=_get_motor_control_serial_port(),
+            firmware=_find_smoothie_file(),
+        )
 
     try:
         await thread_manager.managed_thread_ready_async()
@@ -127,6 +134,9 @@ async def _create_hardware_api() -> API:
 
     if use_hardware_simulator:
         return await API.build_hardware_simulator()
+
+    if enable_ot3_hardware_controller():
+        return await API.build_ot3_controller()
 
     return await API.build_hardware_controller(
         port=_get_motor_control_serial_port(),
