@@ -1,4 +1,5 @@
-import { when, resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
+import { QueryClient, QueryClientProvider } from 'react-query'
 import { act, renderHook } from '@testing-library/react-hooks'
 
 import { RUN_ID_1 } from '../__fixtures__'
@@ -27,8 +28,17 @@ const mockUseStopRunMutation = useStopRunMutation as jest.MockedFunction<
 >
 
 describe('useRunActionMutations hook', () => {
+  let wrapper: React.FunctionComponent<{}>
+
+  beforeEach(() => {
+    const queryClient = new QueryClient()
+    const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    )
+    wrapper = clientProvider
+  })
   afterEach(() => {
-    resetAllWhenMocks()
+    jest.resetAllMocks()
   })
 
   it('should return run action callbacks', async () => {
@@ -36,25 +46,21 @@ describe('useRunActionMutations hook', () => {
     const mockPauseRun = jest.fn()
     const mockStopRun = jest.fn()
 
-    when(mockUsePlayRunMutation)
-      .calledWith()
-      .mockReturnValue(({
-        playRun: mockPlayRun,
-      } as unknown) as UsePlayRunMutationResult)
+    mockUsePlayRunMutation.mockReturnValue(({
+      playRun: mockPlayRun,
+    } as unknown) as UsePlayRunMutationResult)
 
-    when(mockUsePauseRunMutation)
-      .calledWith()
-      .mockReturnValue(({
-        pauseRun: mockPauseRun,
-      } as unknown) as UsePauseRunMutationResult)
+    mockUsePauseRunMutation.mockReturnValue(({
+      pauseRun: mockPauseRun,
+    } as unknown) as UsePauseRunMutationResult)
 
-    when(mockUseStopRunMutation)
-      .calledWith()
-      .mockReturnValue(({
-        stopRun: mockStopRun,
-      } as unknown) as UseStopRunMutationResult)
+    mockUseStopRunMutation.mockReturnValue(({
+      stopRun: mockStopRun,
+    } as unknown) as UseStopRunMutationResult)
 
-    const { result } = renderHook(() => useRunActionMutations(RUN_ID_1))
+    const { result } = renderHook(() => useRunActionMutations(RUN_ID_1), {
+      wrapper,
+    })
 
     act(() => result.current.playRun())
     expect(mockPlayRun).toHaveBeenCalledTimes(1)

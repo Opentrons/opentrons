@@ -4,28 +4,45 @@ import {
   RUN_ACTION_TYPE_PLAY,
   createRunAction,
 } from '@opentrons/api-client'
-import { UseMutationResult, useMutation, UseMutateFunction } from 'react-query'
+import {
+  UseMutationResult,
+  useMutation,
+  UseMutateFunction,
+  UseMutationOptions,
+} from 'react-query'
 import { useHost } from '../api'
-// TODO(bh, 10-27-2021): temp mock returns til fully wired. uncomment mutation callback body to mock
-// import { mockPlayRunAction } from './__fixtures__'
+
+import type { AxiosError } from 'axios'
 
 export type UsePlayRunMutationResult = UseMutationResult<
   RunAction,
-  unknown,
+  AxiosError,
   string
 > & {
-  playRun: UseMutateFunction<RunAction, unknown, string>
+  playRun: UseMutateFunction<RunAction, AxiosError, string>
 }
 
-export const usePlayRunMutation = (): UsePlayRunMutationResult => {
+export type UsePlayRunMutationOptions = UseMutationOptions<
+  RunAction,
+  AxiosError,
+  string
+>
+
+export const usePlayRunMutation = (
+  options: UsePlayRunMutationOptions = {}
+): UsePlayRunMutationResult => {
   const host = useHost()
-  const mutation = useMutation<RunAction, unknown, string>(
+  const mutation = useMutation<RunAction, AxiosError, string>(
     [host, 'runs', RUN_ACTION_TYPE_PLAY],
     (runId: string) =>
       createRunAction(host as HostConfig, runId, {
         actionType: RUN_ACTION_TYPE_PLAY,
-      }).then(response => response.data)
-    // Promise.resolve(mockPlayRunAction)
+      })
+        .then(response => response.data)
+        .catch(e => {
+          throw e
+        }),
+    options
   )
   return {
     ...mutation,

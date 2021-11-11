@@ -13,6 +13,7 @@ import {
 import {
   Flex,
   Icon,
+  IconName,
   PrimaryBtn,
   Text,
   ALIGN_CENTER,
@@ -40,37 +41,28 @@ import { Timer } from './Timer'
 
 export function RunTimeControl(): JSX.Element | null {
   const { t } = useTranslation('run_details')
+
   const runStatus = useRunStatus()
   const startTime = useRunStartTime()
   const pausedAt = useRunPauseTime()
 
   const { usePlay, usePause, useReset } = useRunControls()
 
-  let callToAction: React.ReactNode = ''
   let action = (): void => {}
+  let buttonIconName: IconName | null = null
+  let buttonText: string = ''
+
   if (runStatus === RUN_STATUS_IDLE) {
-    callToAction = (
-      <>
-        <Icon name="play" size={SIZE_1} marginRight={SPACING_2} />
-        <Text fontSize={FONT_SIZE_DEFAULT}>{t('start_run')}</Text>
-      </>
-    )
+    buttonIconName = 'play'
+    buttonText = t('start_run')
     action = usePlay
   } else if (runStatus === RUN_STATUS_RUNNING) {
-    callToAction = (
-      <>
-        <Icon name="pause" size={SIZE_1} marginRight={SPACING_2} />
-        <Text fontSize={FONT_SIZE_DEFAULT}>{t('pause_run')}</Text>
-      </>
-    )
+    buttonIconName = 'pause'
+    buttonText = t('pause_run')
     action = usePause
   } else if (runStatus === RUN_STATUS_PAUSED) {
-    callToAction = (
-      <>
-        <Icon name="play" size={SIZE_1} marginRight={SPACING_2} />
-        <Text fontSize={FONT_SIZE_DEFAULT}>{t('resume_run')}</Text>
-      </>
-    )
+    buttonIconName = 'play'
+    buttonText = t('resume_run')
     action = usePlay
     // TODO: need status stop-requested, pause-requested
   } else if (
@@ -78,7 +70,8 @@ export function RunTimeControl(): JSX.Element | null {
     runStatus === RUN_STATUS_FAILED ||
     runStatus === RUN_STATUS_SUCCEEDED
   ) {
-    callToAction = <Text fontSize={FONT_SIZE_DEFAULT}>{t('run_again')}</Text>
+    buttonIconName = null
+    buttonText = t('run_again')
     action = useReset
   }
 
@@ -108,7 +101,10 @@ export function RunTimeControl(): JSX.Element | null {
         alignItems={ALIGN_CENTER}
         display={DISPLAY_FLEX}
       >
-        {callToAction}
+        {buttonIconName != null ? (
+          <Icon name={buttonIconName} size={SIZE_1} marginRight={SPACING_2} />
+        ) : null}
+        <Text fontSize={FONT_SIZE_DEFAULT}>{buttonText}</Text>
       </PrimaryBtn>
     </Flex>
   ) : null
