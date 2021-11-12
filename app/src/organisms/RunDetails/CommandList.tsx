@@ -205,7 +205,7 @@ export function CommandList(): JSX.Element | null {
               return command.commandType === 'custom' ? (
                 <Flex
                   key={command.id}
-                  id={`RunDetails_CommandList`}
+                  id={`RunDetails_CommandItem`}
                   paddingLeft={SPACING_1}
                   justifyContent={JUSTIFY_START}
                   flexDirection={DIRECTION_COLUMN}

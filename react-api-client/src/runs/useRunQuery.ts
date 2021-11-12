@@ -3,8 +3,6 @@ import { useQuery } from 'react-query'
 import { useHost } from '../api'
 
 import type { UseQueryResult, UseQueryOptions } from 'react-query'
-// TODO(bh, 10-27-2021): temp mock returns til fully wired. uncomment query callback to mock
-// import { mockProtocolRunResponse } from './__fixtures__'
 
 export function useRunQuery(
   runId: string | null,

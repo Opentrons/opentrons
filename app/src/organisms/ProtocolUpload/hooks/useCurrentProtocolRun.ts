@@ -13,7 +13,7 @@ import type { Protocol, Run } from '@opentrons/api-client'
 
 const REFETCH_INTERVAL = 1000
 
-interface UseCurrentProtocolRun {
+export interface UseCurrentProtocolRun {
   createProtocolRun: UseMutateFunction<Protocol, unknown, File[], unknown>
   protocolRecord?: Protocol | null
   runRecord?: Run | null
