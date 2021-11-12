@@ -149,7 +149,6 @@ describe('ProtocolSetupInfo', () => {
     props = {
       setupCommand: COMMAND_TYPE_LOAD_LABWARE,
       runStatus: 'run status',
-      type: TYPE,
     }
     when(mockUseProtocolDetails)
       .calledWith()
@@ -198,7 +197,6 @@ describe('ProtocolSetupInfo', () => {
     props = {
       setupCommand: COMMAND_TYPE_LOAD_LABWARE_WITH_MODULE,
       runStatus: 'run status',
-      type: TYPE,
     }
     when(mockUseProtocolDetails).calledWith().mockReturnValue({
       protocolData: simpleV6Protocol,
@@ -219,7 +217,6 @@ describe('ProtocolSetupInfo', () => {
     props = {
       setupCommand: COMMAND_TYPE_LOAD_PIPETTE,
       runStatus: 'run status',
-      type: TYPE,
     }
     when(mockCommandItem).mockReturnValue(
       <div>Load My Pipette in left Mount</div>
@@ -231,7 +228,6 @@ describe('ProtocolSetupInfo', () => {
     props = {
       setupCommand: COMMAND_TYPE_LOAD_MODULE,
       runStatus: 'run status',
-      type: TYPE,
     }
     when(mockCommandItem).mockReturnValue(
       <div>Load Temperature Module GEN2 in Slot 3</div>
@@ -243,7 +239,6 @@ describe('ProtocolSetupInfo', () => {
     props = {
       setupCommand: COMMAND_TYPE_LOAD_MODULE_TC,
       runStatus: 'run status',
-      type: TYPE,
     }
     when(mockUseProtocolDetails)
       .calledWith()
@@ -286,7 +281,6 @@ describe('ProtocolSetupInfo', () => {
     props = {
       setupCommand: undefined,
       runStatus: 'run status',
-      type: TYPE,
     }
     const { container } = render(props)
     expect(container.firstChild).toBeNull()
@@ -295,7 +289,6 @@ describe('ProtocolSetupInfo', () => {
     props = {
       setupCommand: COMMAND_TYPE_TRASH,
       runStatus: 'run status',
-      type: TYPE,
     }
     when(mockUseProtocolDetails).calledWith().mockReturnValue({
       protocolData: simpleV6Protocol,
