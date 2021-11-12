@@ -20,22 +20,21 @@ import type {
   PipetteNameSpecs,
 } from '@opentrons/shared-data'
 import type { State } from '../../../../redux/types'
-import { load } from 'mime'
 
 const EMPTY_MOUNTS = { left: null, right: null }
 
 export interface PipetteInfo {
   pipetteSpecs: PipetteNameSpecs
-  tipRacksForPipette: {
+  tipRacksForPipette: Array<{
     displayName: string
     tipRackDef: LabwareDefinition2
     lastModifiedDate: string
-  }[]
+  }>
   requestedPipetteMatch:
     | typeof MATCH
     | typeof INEXACT_MATCH
     | typeof INCOMPATIBLE
-  pipetteCalDate: string
+  pipetteCalDate: string | null
 }
 
 export function useCurrentRunPipetteInfoByMount(): {
@@ -70,7 +69,7 @@ export function useCurrentRunPipetteInfoByMount(): {
 
   return Object.entries(pipettes).reduce((acc, [pipetteId, pipette]) => {
     const loadCommand = loadPipetteCommands.find(
-      command => command.result?.pipetteId == pipetteId
+      command => command.result?.pipetteId === pipetteId
     )
     if (loadCommand != null) {
       const { mount } = loadCommand.params

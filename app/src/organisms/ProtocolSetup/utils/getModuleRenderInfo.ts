@@ -1,4 +1,3 @@
-import findKey from 'lodash/findKey'
 import reduce from 'lodash/reduce'
 import {
   DeckDefinition,
@@ -8,7 +7,6 @@ import {
   getModuleDef2,
   ProtocolFile,
 } from '@opentrons/shared-data'
-import { getLabwareLocation } from './getLabwareLocation'
 import { LoadLabwareCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import { getModuleLocation } from './getModuleLocation'
 

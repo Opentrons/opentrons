@@ -8,7 +8,7 @@ import {
   Text,
 } from '@opentrons/components'
 import { Portal } from '../../../App/portal'
-import { useSteps, useLabwarePositionCheck } from './hooks'
+import { useLabwarePositionCheck } from './hooks'
 import { IntroScreen } from './IntroScreen'
 import { GenericStepScreen } from './GenericStepScreen'
 import { SummaryScreen } from './SummaryScreen'

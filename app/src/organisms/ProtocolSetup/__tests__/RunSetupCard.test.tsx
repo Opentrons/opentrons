@@ -4,6 +4,7 @@ import { when } from 'jest-when'
 import '@testing-library/jest-dom'
 import { fireEvent } from '@testing-library/react'
 import {
+  anyProps,
   componentPropsMatcher,
   partialComponentPropsMatcher,
   renderWithProviders,
@@ -14,7 +15,7 @@ import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/test
 import { i18n } from '../../../i18n'
 import {
   mockAttachedPipette,
-  mockProtocolPipetteTipRackCalInfo,
+  mockPipetteInfo,
 } from '../../../redux/pipettes/__fixtures__'
 import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
 import * as discoverySelectors from '../../../redux/discovery/selectors'
@@ -53,7 +54,7 @@ const mockAttachedPipettes: AttachedPipettesByMount = {
 } as any
 
 const mockProtocolPipetteTipRackCalData: ProtocolPipetteTipRackCalDataByMount = {
-  left: mockProtocolPipetteTipRackCalInfo,
+  left: mockPipetteInfo,
   right: null,
 } as any
 
@@ -132,11 +133,8 @@ describe('RunSetupCard', () => {
 
     when(mockProceedToRun)
       .mockReturnValue(<div></div>)
-      .calledWith(
-        componentPropsMatcher({
-          robotName: mockConnectedRobot.name,
-        })
-      )
+      // @ts-expect-error need to provide anyProps bcuz under the hood react calls components with arguments even when they dont take props
+      .calledWith(anyProps())
       .mockReturnValue(<div>Mock Proceed To Run</div>)
   })
 

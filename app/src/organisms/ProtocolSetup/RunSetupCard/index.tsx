@@ -168,7 +168,7 @@ export function RunSetupCard(): JSX.Element | null {
         </React.Fragment>
       ))}
       <Divider marginY={SPACING_3} />
-      <ProceedToRunCta robotName={robot.name} />
+      <ProceedToRunCta />
     </Card>
   )
 }

@@ -12,11 +12,9 @@ import type { Store } from 'redux'
 import type { State } from '../../../../../redux/types'
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
-jest.mock('../../../../redux/protocol')
-jest.mock('../../hooks')
-jest.mock('../../../../redux/modules')
-jest.mock('../../../../redux/discovery/selectors')
-jest.mock('../../../../redux/types')
+jest.mock('../../../hooks')
+jest.mock('../../../../../redux/modules')
+jest.mock('../../../../../redux/discovery/selectors')
 
 const mockUseModuleRenderInfoById = useModuleRenderInfoById as jest.MockedFunction<
   typeof useModuleRenderInfoById

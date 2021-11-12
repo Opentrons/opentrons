@@ -332,7 +332,7 @@ export function useLabwarePositionCheck(
   const jog = (axis: Axis, dir: Sign, step: StepSize): void => {
     const data = {
       commandType: 'moveRelative',
-      data: {
+      params: {
         pipetteId: currentCommand.params.pipetteId,
         distance: step * dir,
         axis,
