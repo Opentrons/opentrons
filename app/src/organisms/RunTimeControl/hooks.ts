@@ -1,26 +1,57 @@
+import last from 'lodash/last'
+
+import {
+  RUN_ACTION_TYPE_PLAY,
+  RUN_ACTION_TYPE_PAUSE,
+  RunAction,
+  RunData,
+  RunStatus,
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_FAILED,
+  RUN_STATUS_SUCCEEDED,
+} from '@opentrons/api-client'
+import {
+  useCommandQuery,
+  useRunQuery,
+  useRunActionMutations,
+} from '@opentrons/react-api-client'
+
+import { useCloneRun } from '../ProtocolUpload/hooks/useCloneRun'
+import { useCurrentProtocolRun } from '../ProtocolUpload/hooks/useCurrentProtocolRun'
+import { useCurrentRunId } from '../ProtocolUpload/hooks/useCurrentRunId'
+
 interface RunControls {
-  play: () => void
-  pause: () => void
-  reset: () => void
+  usePlay: () => void
+  usePause: () => void
+  useReset: () => void
 }
 
 export function useRunControls(): RunControls {
-  const play = (): void => {
-    console.log('TODO: wire up to protocol play endpoint')
+  const currentRunId = useCurrentRunId()
+
+  const { playRun, pauseRun } = useRunActionMutations(currentRunId as string)
+
+  const cloneRun = useCloneRun(currentRunId as string)
+
+  const usePlay = (): void => {
+    playRun()
   }
-  const pause = (): void => {
-    console.log('TODO: wire up to protocol pause endpoint')
+  const usePause = (): void => {
+    pauseRun()
   }
-  const reset = (): void => {
-    console.log('TODO: wire up to protocol reset endpoint')
+  const useReset = (): void => {
+    cloneRun()
   }
-  return { play, pause, reset }
+  return { usePlay, usePause, useReset }
 }
 
-// TODO: IMMEDIATELY replace with real status enum type from server run status
-type RunStatus = 'loaded' | 'running' | 'paused' | 'finished' | 'canceled'
-export function useRunStatus(): RunStatus {
-  const runStatus = 'loaded'
+export function useRunStatus(): RunStatus | null {
+  const currentRunId = useCurrentRunId()
+
+  const { data } = useRunQuery(currentRunId, { refetchInterval: 1000 })
+
+  const runStatus = data?.data.status as RunStatus
+
   return runStatus
 }
 
@@ -30,4 +61,59 @@ export function useRunDisabledReason(): string | null {
    "required pipettes not detected", "isBlocked?"
   */
   return null
+}
+
+export function useRunStartTime(): string | undefined {
+  const currentRunId = useCurrentRunId()
+
+  const { data } = useRunQuery(currentRunId)
+
+  const actions = data?.data?.actions as RunAction[]
+  const firstPlay = actions?.find(
+    action => action.actionType === RUN_ACTION_TYPE_PLAY
+  )
+  const runStartTime = firstPlay?.createdAt
+
+  return runStartTime
+}
+
+export function useRunPauseTime(): string | undefined {
+  const currentRunId = useCurrentRunId()
+
+  const { data } = useRunQuery(currentRunId)
+
+  const actions = data?.data.actions as RunAction[]
+  const pauseActions = actions?.filter(
+    action => action.actionType === RUN_ACTION_TYPE_PAUSE
+  )
+  const lastPause = last(pauseActions)
+  const pausedAt = lastPause?.createdAt
+
+  return pausedAt
+}
+
+export function useRunCompleteTime(): string | undefined {
+  const { runRecord } = useCurrentProtocolRun()
+
+  const runData = runRecord?.data as RunData
+  const commands = runData?.commands
+  const runId = runData?.id
+  const status = runData?.status
+  const lastCommand = last(commands)
+  const lastCommandId = lastCommand?.id
+
+  const { data } = useCommandQuery(runId, lastCommandId as string)
+
+  if (
+    status !== RUN_STATUS_STOPPED &&
+    status !== RUN_STATUS_FAILED &&
+    status !== RUN_STATUS_SUCCEEDED
+  ) {
+    return
+  }
+
+  const fullLastCommand = data?.data
+  const runCompletedTime = fullLastCommand?.createdAt
+
+  return runCompletedTime
 }

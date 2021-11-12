@@ -11,7 +11,7 @@ import { useCurrentRunId } from './useCurrentRunId'
 import type { UseMutateFunction } from 'react-query'
 import type { Protocol, Run } from '@opentrons/api-client'
 
-interface UseCurrentProtocolRun {
+export interface UseCurrentProtocolRun {
   createProtocolRun: UseMutateFunction<Protocol, unknown, File[], unknown>
   protocolRecord?: Protocol | null
   runRecord?: Run | null
