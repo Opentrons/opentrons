@@ -8,7 +8,7 @@ from datetime import datetime
 from typing import Optional, Union
 
 from ..commands import Command, CommandCreate
-from ..types import LabwareOffset
+from ..types import LabwareOffsetCreate
 
 
 @dataclass(frozen=True)
@@ -48,7 +48,8 @@ class UpdateCommandAction:
 class AddLabwareOffsetAction:
     """Add a new labware offset, to apply to subsequent `LoadLabwareCommand`s."""
 
-    labware_offset: LabwareOffset
+    labware_offset_id: str
+    request: LabwareOffsetCreate
 
 
 Action = Union[

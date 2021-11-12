@@ -84,7 +84,13 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
         if isinstance(action, UpdateCommandAction):
             self._handle_command(action.command)
         elif isinstance(action, AddLabwareOffsetAction):
-            self._handle_add_labware_offset(action.labware_offset)
+            labware_offset =  LabwareOffset(
+                id=action.labware_offset_id,
+                definitionUri=action.request.definitionUri,
+                location=action.request.location,
+                offset=action.request.offset,
+            )
+            self._add_labware_offset(labware_offset)
 
     def _handle_command(self, command: Command) -> None:
         """Modify state in reaction to a command."""
@@ -130,7 +136,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 self._state, definitions_by_uri=new_definitions_by_uri
             )
 
-    def _handle_add_labware_offset(self, labware_offset: LabwareOffset) -> None:
+    def _add_labware_offset(self, labware_offset: LabwareOffset) -> None:
         """Add a new labware offset to state.
 
         `labware_offset.id` must not match any existing labware offset ID.

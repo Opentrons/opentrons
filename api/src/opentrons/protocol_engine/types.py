@@ -147,15 +147,6 @@ class LabwareOffsetCreate(BaseModel):
         description="The offset applied to matching labware.",
     )
 
-    def to_labware_offset(self, id: str) -> LabwareOffset:
-        """Add an ID, converting the request to a fulfilled LabwareOffset."""
-        return LabwareOffset(
-            id=id,
-            definitionUri=self.definitionUri,
-            location=self.location,
-            offset=self.offset,
-        )
-
 
 class LoadedLabware(BaseModel):
     """A labware that has been loaded."""
