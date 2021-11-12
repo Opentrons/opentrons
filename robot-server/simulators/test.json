@@ -1,18 +1,18 @@
 {
   "attached_instruments": {
     "right": {
-      "model": "p20_single_v2.0",
+      "model": "p300_single_v1",
       "id": "321",
       "max_volume": 300,
-      "name": "p20_single_gen2",
+      "name": "p300_single",
       "tip_length": 0,
       "channels": 1
     },
     "left": {
-      "model": "p1000_single_v2.1",
+      "model": "p10_single_v1",
       "id": "123",
       "max_volume": 10,
-      "name": "p1000_single_gen2",
+      "name": "p10_single",
       "tip_length": 0,
       "channels": 1
     }
