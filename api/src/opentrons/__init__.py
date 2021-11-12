@@ -97,6 +97,18 @@ def _get_motor_control_serial_port() -> Any:
     return port
 
 
+def should_use_ot3() -> bool:
+    """Return true if ot3 hardware controller should be used."""
+    if enable_ot3_hardware_controller():
+        try:
+            from opentrons_hardware.drivers.can_bus import CanDriver
+            return True
+        except ModuleNotFoundError:
+            log.exception("Cannot use OT3 Hardware controller.")
+            pass
+    return False
+
+
 async def _create_thread_manager() -> ThreadManager:
     """Build the hardware controller wrapped in a ThreadManager.
 
@@ -107,7 +119,7 @@ async def _create_thread_manager() -> ThreadManager:
         log.info("Initialized robot using virtual Smoothie")
         return ThreadManager(API.build_hardware_simulator)
 
-    if enable_ot3_hardware_controller():
+    if should_use_ot3():
         thread_manager = ThreadManager(
             API.build_ot3_controller,
             threadmanager_nonblocking=True,
@@ -135,7 +147,7 @@ async def _create_hardware_api() -> API:
     if use_hardware_simulator:
         return await API.build_hardware_simulator()
 
-    if enable_ot3_hardware_controller():
+    if should_use_ot3():
         return await API.build_ot3_controller()
 
     return await API.build_hardware_controller(
