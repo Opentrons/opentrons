@@ -372,7 +372,7 @@ def test_get_slot_position(standard_deck_def: DeckDefinitionV2) -> None:
     assert result == Point(x=slot_pos[0], y=slot_pos[1], z=slot_pos[2])
 
 
-def test_get_calibration_offset() -> None:
+def test_get_labware_offset_vector() -> None:
     """It should get a labware's offset vector."""
     labware_without_offset = LoadedLabware(
         id="without-offset-labware-id",
@@ -406,11 +406,11 @@ def test_get_calibration_offset() -> None:
         labware_offsets_by_id={"offset-id": offset},
     )
 
-    assert subject.get_calibration_offset(labware_with_offset.id) == offset.offset
+    assert subject.get_labware_offset_vector(labware_with_offset.id) == offset.offset
 
-    assert subject.get_calibration_offset(
+    assert subject.get_labware_offset_vector(
         labware_without_offset.id
     ) == LabwareOffsetVector(x=0, y=0, z=0)
 
     with pytest.raises(errors.LabwareDoesNotExistError):
-        subject.get_calibration_offset("wrong-labware-id")
+        subject.get_labware_offset_vector("wrong-labware-id")

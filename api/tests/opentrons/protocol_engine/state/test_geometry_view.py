@@ -108,7 +108,7 @@ def test_get_labware_highest_z(
 
     decoy.when(labware_view.get("labware-id")).then_return(labware_data)
     decoy.when(labware_view.get_definition("labware-id")).then_return(well_plate_def)
-    decoy.when(labware_view.get_calibration_offset("labware-id")).then_return(
+    decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
         calibration_offset
     )
     decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_3)).then_return(
@@ -154,10 +154,10 @@ def test_get_all_labware_highest_z(
     decoy.when(labware_view.get_definition("plate-id")).then_return(well_plate_def)
     decoy.when(labware_view.get_definition("reservoir-id")).then_return(reservoir_def)
 
-    decoy.when(labware_view.get_calibration_offset("plate-id")).then_return(
+    decoy.when(labware_view.get_labware_offset_vector("plate-id")).then_return(
         plate_offset
     )
-    decoy.when(labware_view.get_calibration_offset("reservoir-id")).then_return(
+    decoy.when(labware_view.get_labware_offset_vector("reservoir-id")).then_return(
         reservoir_offset
     )
 
@@ -195,7 +195,7 @@ def test_get_labware_position(
 
     decoy.when(labware_view.get("labware-id")).then_return(labware_data)
     decoy.when(labware_view.get_definition("labware-id")).then_return(well_plate_def)
-    decoy.when(labware_view.get_calibration_offset("labware-id")).then_return(
+    decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
         calibration_offset
     )
     decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_4)).then_return(
@@ -232,7 +232,7 @@ def test_get_well_position(
 
     decoy.when(labware_view.get("labware-id")).then_return(labware_data)
     decoy.when(labware_view.get_definition("labware-id")).then_return(well_plate_def)
-    decoy.when(labware_view.get_calibration_offset("labware-id")).then_return(
+    decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
         calibration_offset
     )
     decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_4)).then_return(
@@ -272,7 +272,7 @@ def test_get_well_position_with_top_offset(
 
     decoy.when(labware_view.get("labware-id")).then_return(labware_data)
     decoy.when(labware_view.get_definition("labware-id")).then_return(well_plate_def)
-    decoy.when(labware_view.get_calibration_offset("labware-id")).then_return(
+    decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
         calibration_offset
     )
     decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_4)).then_return(
@@ -319,7 +319,7 @@ def test_get_well_position_with_bottom_offset(
 
     decoy.when(labware_view.get("labware-id")).then_return(labware_data)
     decoy.when(labware_view.get_definition("labware-id")).then_return(well_plate_def)
-    decoy.when(labware_view.get_calibration_offset("labware-id")).then_return(
+    decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
         calibration_offset
     )
     decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_4)).then_return(

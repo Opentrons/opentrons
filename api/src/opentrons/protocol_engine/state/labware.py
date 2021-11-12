@@ -301,8 +301,7 @@ class LabwareView(HasState[LabwareState]):
             z=dims.zDimension,
         )
 
-    # Fix before merge: rename or eliminate.
-    def get_calibration_offset(self, labware_id: str) -> LabwareOffsetVector:
+    def get_labware_offset_vector(self, labware_id: str) -> LabwareOffsetVector:
         """Get the labware's calibration offset."""
         offset_id = self.get(labware_id=labware_id).offsetId
         if offset_id is None:
