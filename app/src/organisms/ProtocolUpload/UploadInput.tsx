@@ -192,7 +192,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
           onChange={onChange}
         />
       </label>
-      {/* {mostRecentRun === null ? null : ( */}
+      {mostRecentRun === null ? null : (
       <Flex flexDirection={DIRECTION_COLUMN} width={'80%'}>
         <Divider marginY={SPACING_3} />
         <Flex
@@ -292,7 +292,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
           </Flex>
         </Flex>
       </Flex>
-      {/* )} */}
+      )}
       <hr style={{ borderTop: `1px solid ${C_LIGHT_GRAY}`, width: '80%' }} />
       <Text
         role="complementary"
