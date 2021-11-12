@@ -1,11 +1,11 @@
 import pytest
 from unittest import mock
 
+
 from opentrons.hardware_control import API
 from opentrons.types import Mount, Point, Location
 from opentrons.protocol_api import paired_instrument_context as pc
 from opentrons.hardware_control.pipette import Pipette
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 
 
 @pytest.fixture

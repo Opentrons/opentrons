@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 from typing import TYPE_CHECKING, Union, Tuple, List, Optional, Dict
-from collections import OrderedDict
 
 
 from opentrons.protocols.api_support.labware_like import LabwareLike
