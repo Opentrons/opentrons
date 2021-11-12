@@ -6,7 +6,7 @@ from typing_extensions import Literal
 
 from opentrons.protocols.models import LabwareDefinition
 
-from ..types import LabwareLocation, LabwareOffsetVector
+from ..types import LabwareLocation, LabwareOffset
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 LoadLabwareCommandType = Literal["loadLabware"]
@@ -49,9 +49,13 @@ class LoadLabwareResult(BaseModel):
         ...,
         description="The full definition data for this labware.",
     )
-    calibration: LabwareOffsetVector = Field(
+    offset: Optional[LabwareOffset] = Field(
         ...,
-        description="Calibration offset data for this labware at load time.",
+        description=(
+            "Calibration offset data for this labware, decided at load time."
+            " Null means no offset was provided for this load,"
+            " so the default of (0, 0, 0) will be used."
+        ),
     )
 
 
@@ -69,12 +73,11 @@ class LoadLabwareImplementation(
             location=params.location,
             labware_id=params.labwareId,
         )
-        x_offset, y_offset, z_offset = loaded_labware.calibration
 
         return LoadLabwareResult(
             labwareId=loaded_labware.labware_id,
             definition=loaded_labware.definition,
-            calibration=LabwareOffsetVector(x=x_offset, y=y_offset, z=z_offset),
+            offset=loaded_labware.offset,
         )
 
 

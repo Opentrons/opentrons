@@ -34,10 +34,6 @@ class LabwareState:
 
     labware_by_id: Dict[str, LoadedLabware]  # Indexed by labware ID.
 
-    # Indexed by labware ID.
-    # To do: Probably remove?
-    calibrations_by_id: Dict[str, LabwareOffsetVector]
-
     labware_offsets_by_id: Dict[str, LabwareOffset]  # Indexed by labware offset ID.
 
     definitions_by_uri: Dict[str, LabwareDefinition]
@@ -73,17 +69,13 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                     namespace=fixed_labware.definition.namespace,
                     version=fixed_labware.definition.version,
                 ),
+                offsetId=None,
             )
-            for fixed_labware in deck_fixed_labware
-        }
-        calibrations_by_id = {
-            fixed_labware.labware_id: LabwareOffsetVector(x=0, y=0, z=0)
             for fixed_labware in deck_fixed_labware
         }
 
         self._state = LabwareState(
             definitions_by_uri=definitions_by_uri,
-            calibrations_by_id=calibrations_by_id,
             labware_offsets_by_id={},
             labware_by_id=labware_by_id,
             deck_definition=deck_definition,
@@ -105,24 +97,23 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 load_name=command.result.definition.parameters.loadName,
                 version=command.result.definition.version,
             )
-            labware_by_id = self._state.labware_by_id.copy()
-            calibrations_by_id = self._state.calibrations_by_id.copy()
-            definitions_by_uri = self._state.definitions_by_uri.copy()
 
-            definitions_by_uri[definition_uri] = command.result.definition
-            calibrations_by_id[labware_id] = command.result.calibration
-            labware_by_id[labware_id] = LoadedLabware(
+            new_labware_by_id = self._state.labware_by_id.copy()
+            new_labware_by_id[labware_id] = LoadedLabware(
                 id=labware_id,
                 location=command.params.location,
                 loadName=command.result.definition.parameters.loadName,
                 definitionUri=definition_uri,
+                offsetId=None,
             )
+
+            new_definitions_by_uri = self._state.definitions_by_uri.copy()
+            new_definitions_by_uri[definition_uri] = command.result.definition
 
             self._state = replace(
                 self._state,
-                labware_by_id=labware_by_id,
-                calibrations_by_id=calibrations_by_id,
-                definitions_by_uri=definitions_by_uri,
+                labware_by_id=new_labware_by_id,
+                definitions_by_uri=new_definitions_by_uri,
             )
 
         elif isinstance(command.result, AddLabwareDefinitionResult):
@@ -131,9 +122,11 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 load_name=command.result.loadName,
                 version=command.result.version,
             )
-            definitions_by_uri = self._state.definitions_by_uri.copy()
-            definitions_by_uri[definition_uri] = command.params.definition
-            self._state = replace(self._state, definitions_by_uri=definitions_by_uri)
+            new_definitions_by_uri = self._state.definitions_by_uri.copy()
+            new_definitions_by_uri[definition_uri] = command.params.definition
+            self._state = replace(
+                self._state, definitions_by_uri=new_definitions_by_uri
+            )
 
     def _handle_add_labware_offset(self, labware_offset: LabwareOffset) -> None:
         """Add a new labware offset to state.
@@ -148,9 +141,9 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 f"Labware offset already exists with ID {labware_offset.id}."
             )
         else:
-            labware_offsets = self._state.labware_offsets_by_id.copy()
-            labware_offsets[labware_offset.id] = labware_offset
-            self._state = replace(self._state, labware_offsets=labware_offsets)
+            new_labware_offsets = self._state.labware_offsets_by_id.copy()
+            new_labware_offsets[labware_offset.id] = labware_offset
+            self._state = replace(self._state, labware_offsets=new_labware_offsets)
 
 
 class LabwareView(HasState[LabwareState]):
@@ -308,14 +301,14 @@ class LabwareView(HasState[LabwareState]):
             z=dims.zDimension,
         )
 
+    # Fix before merge: rename or eliminate.
     def get_calibration_offset(self, labware_id: str) -> LabwareOffsetVector:
         """Get the labware's calibration offset."""
-        try:
-            return self._state.calibrations_by_id[labware_id]
-        except KeyError as e:
-            raise errors.LabwareDoesNotExistError(
-                f"Labware {labware_id} not found."
-            ) from e
+        offset_id = self.get(labware_id=labware_id).offsetId
+        if offset_id is None:
+            return LabwareOffsetVector(x=0, y=0, z=0)
+        else:
+            return self._state.labware_offsets_by_id[offset_id].offset
 
     def get_labware_offset(self, labware_offset_id: str) -> LabwareOffset:
         """Get a labware offset by the offset's unique ID."""
@@ -330,7 +323,7 @@ class LabwareView(HasState[LabwareState]):
         """Get all labware offsets, in the order they were added."""
         return list(self._state.labware_offsets_by_id.values())
 
-    def find_matching_labware_offset(
+    def find_applicable_labware_offset(
         self, definition_uri: str, location: LabwareLocation
     ) -> Optional[LabwareOffset]:
         """Find a labware offset that applies to the given definition and location.

@@ -2,7 +2,7 @@
 from enum import Enum
 from dataclasses import dataclass
 from pydantic import BaseModel, Field
-from typing import Union
+from typing import Optional, Union
 
 from opentrons.types import MountType, DeckSlotName
 
@@ -88,21 +88,17 @@ class PipetteName(str, Enum):
     P1000_SINGLE_GEN2 = "p1000_single_gen2"
 
 
+# todo(mm, 2021-11-11): Why are LoadedLabware and LoadedPipette defined as BaseModels?
+# I think other classes in here are BaseModels because robot-server uses them as public
+# HTTP types, often as sub-objects of other public HTTP types.
+# But for LoadedPipette and LoadedLabware, wouldn't the canonical HTTP types be
+# LoadPipetteResult and LoadLabwareResult?
 class LoadedPipette(BaseModel):
     """A pipette that has been loaded."""
 
     id: str
     pipetteName: PipetteName
     mount: MountType
-
-
-class LoadedLabware(BaseModel):
-    """A labware that has been loaded."""
-
-    id: str
-    loadName: str
-    definitionUri: str
-    location: LabwareLocation
 
 
 class LabwareOffsetVector(BaseModel):
@@ -127,6 +123,8 @@ class LabwareOffset(BaseModel):
         ...,
         description="Where the labware is located on the robot.",
     )
+    # todo(mm, 2021-11-11): Messy terminology. Is an "offset" a 3D vector, or is
+    # it this whole record, which the 3D vector is part of?
     offset: LabwareOffsetVector = Field(
         ...,
         description="The offset applied to matching labware.",
@@ -154,3 +152,14 @@ class LabwareOffsetCreate(BaseModel):
             location=self.location,
             offset=self.offset,
         )
+
+
+class LoadedLabware(BaseModel):
+    """A labware that has been loaded."""
+
+    id: str
+    loadName: str
+    definitionUri: str
+    location: LabwareLocation
+    # Field(...) to require offsetId to be provided even when None.
+    offsetId: Optional[str] = Field(...)
