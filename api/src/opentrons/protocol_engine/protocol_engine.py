@@ -165,6 +165,8 @@ class ProtocolEngine:
         finally:
             await self._hardware_api.stop(home_after=False)
 
+        self._plugin_starter.stop()
+
     def add_labware_offset(self, request: LabwareOffsetCreate) -> LabwareOffset:
         """Add a new labware offset, to apply to subsequent `LoadLabwareCommand`s.
 
