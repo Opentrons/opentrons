@@ -4,11 +4,20 @@ import {
   RUN_ACTION_TYPE_PLAY,
   RUN_ACTION_TYPE_PAUSE,
   RunAction,
+  RunData,
   RunStatus,
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_FAILED,
+  RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
-import { useRunQuery, useRunActionMutations } from '@opentrons/react-api-client'
+import {
+  useCommandQuery,
+  useRunQuery,
+  useRunActionMutations,
+} from '@opentrons/react-api-client'
 
 import { useCloneRun } from '../ProtocolUpload/hooks/useCloneRun'
+import { useCurrentProtocolRun } from '../ProtocolUpload/hooks/useCurrentProtocolRun'
 import { useCurrentRunId } from '../ProtocolUpload/hooks/useCurrentRunId'
 
 interface RunControls {
@@ -41,9 +50,9 @@ export function useRunStatus(): RunStatus | null {
 
   const { data } = useRunQuery(currentRunId)
 
-  const currentState = data?.data.status as RunStatus
+  const runStatus = data?.data.status as RunStatus
 
-  return currentState
+  return runStatus
 }
 
 export function useRunDisabledReason(): string | null {
@@ -81,4 +90,30 @@ export function useRunPauseTime(): string | undefined {
   const pausedAt = lastPause?.createdAt
 
   return pausedAt
+}
+
+export function useRunCompleteTime(): string | undefined {
+  const { runRecord } = useCurrentProtocolRun()
+
+  const runData = runRecord?.data as RunData
+  const commands = runData?.commands
+  const runId = runData?.id
+  const status = runData?.status
+  const lastCommand = last(commands)
+  const lastCommandId = lastCommand?.id
+
+  const { data } = useCommandQuery(runId, lastCommandId as string)
+
+  if (
+    status !== RUN_STATUS_STOPPED &&
+    status !== RUN_STATUS_FAILED &&
+    status !== RUN_STATUS_SUCCEEDED
+  ) {
+    return
+  }
+
+  const fullLastCommand = data?.data
+  const runCompletedTime = fullLastCommand?.createdAt
+
+  return runCompletedTime
 }

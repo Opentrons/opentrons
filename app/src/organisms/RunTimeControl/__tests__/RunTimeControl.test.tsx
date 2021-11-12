@@ -11,13 +11,21 @@ import {
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
-import { useRunControls, useRunStartTime, useRunStatus } from '../hooks'
+import {
+  useRunCompleteTime,
+  useRunControls,
+  useRunStartTime,
+  useRunStatus,
+} from '../hooks'
 import { Timer } from '../Timer'
 import { RunTimeControl } from '..'
 
 jest.mock('../hooks')
 jest.mock('../Timer')
 
+const mockUseRunCompleteTime = useRunCompleteTime as jest.MockedFunction<
+  typeof useRunCompleteTime
+>
 const mockUseRunControls = useRunControls as jest.MockedFunction<
   typeof useRunControls
 >
@@ -44,6 +52,7 @@ describe('RunTimeControl', () => {
       })
     when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_IDLE)
     mockTimer.mockReturnValue(<div>Mock Timer</div>)
+    when(mockUseRunCompleteTime).calledWith().mockReturnValue(undefined)
   })
 
   afterEach(() => {
@@ -90,6 +99,7 @@ describe('RunTimeControl', () => {
   it('renders a run status and timer if stopped', () => {
     when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_STOPPED)
     when(mockUseRunStartTime).calledWith().mockReturnValue('noon')
+    when(mockUseRunCompleteTime).calledWith().mockReturnValue('noon thirty')
 
     const [{ getByRole, getByText }] = render()
 
@@ -101,6 +111,7 @@ describe('RunTimeControl', () => {
   it('renders a run status and timer if failed', () => {
     when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_FAILED)
     when(mockUseRunStartTime).calledWith().mockReturnValue('noon')
+    when(mockUseRunCompleteTime).calledWith().mockReturnValue('noon thirty')
 
     const [{ getByRole, getByText }] = render()
 
@@ -112,6 +123,7 @@ describe('RunTimeControl', () => {
   it('renders a run status and timer if succeeded', () => {
     when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_SUCCEEDED)
     when(mockUseRunStartTime).calledWith().mockReturnValue('noon')
+    when(mockUseRunCompleteTime).calledWith().mockReturnValue('noon thirty')
 
     const [{ getByRole, getByText }] = render()
 

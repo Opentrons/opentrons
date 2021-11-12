@@ -30,6 +30,7 @@ import {
 } from '@opentrons/components'
 
 import {
+  useRunCompleteTime,
   useRunControls,
   useRunPauseTime,
   useRunStartTime,
@@ -43,6 +44,7 @@ export function RunTimeControl(): JSX.Element | null {
   const runStatus = useRunStatus()
   const startTime = useRunStartTime()
   const pausedAt = useRunPauseTime()
+  const completedAt = useRunCompleteTime()
 
   const { usePlay, usePause, useReset } = useRunControls()
 
@@ -85,7 +87,11 @@ export function RunTimeControl(): JSX.Element | null {
       {runStatus !== RUN_STATUS_IDLE &&
       runStatus != null &&
       startTime != null ? (
-        <Timer startTime={startTime} pausedAt={pausedAt} />
+        <Timer
+          startTime={startTime}
+          pausedAt={pausedAt}
+          completedAt={completedAt}
+        />
       ) : null}
       <PrimaryBtn
         onClick={action}

@@ -15,17 +15,22 @@ import { formatInterval } from './utils'
 interface TimerProps {
   startTime: string
   pausedAt?: string
+  completedAt?: string
 }
 
-export function Timer({ startTime, pausedAt }: TimerProps): JSX.Element {
+export function Timer({
+  startTime,
+  pausedAt,
+  completedAt,
+}: TimerProps): JSX.Element {
   const { t } = useTranslation('run_details')
 
   const initialNow = Date()
   const [now, setNow] = React.useState(initialNow)
   useInterval(() => setNow(Date()), 500, true)
 
-  // TODO: determine/render static run time if stopped/failed/succeeded?
-  const endTime = now
+  const endTime = completedAt ?? now
+
   return (
     <>
       <Text css={FONT_BODY_1_DARK_SEMIBOLD} marginBottom={SPACING_3}>{`${t(
