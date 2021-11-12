@@ -857,7 +857,7 @@ class API(HardwareAPILike):
         the nozzle will be returned.
         """
         if not self._current_position and not refresh:
-            raise MustHomeError
+            raise MustHomeError("Current position is unknown; please home motors.")
         async with self._motion_lock:
             if refresh:
                 self._current_position = self._deck_from_smoothie(

@@ -113,6 +113,17 @@ class MovementAxis(str, Enum):
     Z = "z"
 
 
+class MotorAxis(str, Enum):
+    """Motor axis on which to issue a home command."""
+
+    X = "x"
+    Y = "y"
+    LEFT_Z = "leftZ"
+    RIGHT_Z = "rightZ"
+    LEFT_PLUNGER = "leftPlunger"
+    RIGHT_PLUNGER = "rightPluger"
+
+
 class LabwareOffsetVector(BaseModel):
     """Offset, in deck coordinates from nominal to actual position."""
 

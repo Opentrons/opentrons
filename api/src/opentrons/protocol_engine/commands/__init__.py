@@ -72,6 +72,14 @@ from .load_module import (
     LoadModuleCommandType,
 )
 
+from .home import (
+    Home,
+    HomeParams,
+    HomeCreate,
+    HomeResult,
+    HomeCommandType,
+)
+
 from .move_relative import (
     MoveRelative,
     MoveRelativeParams,
@@ -154,6 +162,12 @@ __all__ = [
     "LoadModuleParams",
     "LoadModuleResult",
     "LoadModuleCommandType",
+    # home command models
+    "Home",
+    "HomeParams",
+    "HomeCreate",
+    "HomeResult",
+    "HomeCommandType",
     # move relative command models
     "MoveRelative",
     "MoveRelativeParams",

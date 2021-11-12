@@ -7,6 +7,7 @@ from opentrons.types import MountType, Mount, Point
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.types import (
     CriticalPoint,
+    Axis as HardwareAxis,
     MustHomeError as HardwareMustHomeError,
 )
 from opentrons.motion_planning import Waypoint
@@ -14,6 +15,7 @@ from opentrons.motion_planning import Waypoint
 from opentrons.protocol_engine.errors import MustHomeError
 from opentrons.protocol_engine.types import (
     DeckPoint,
+    MotorAxis,
     MovementAxis,
     WellLocation,
     WellOrigin,
@@ -284,7 +286,7 @@ async def test_move_relative_must_home(
         )
     ).then_raise(HardwareMustHomeError("oh no"))
 
-    with pytest.raises(MustHomeError):
+    with pytest.raises(MustHomeError, match="oh no"):
         await subject.move_relative(
             pipette_id="pipette-id",
             axis=MovementAxis.Z,
@@ -376,3 +378,66 @@ async def test_save_position_different_cp(
     assert result == SavedPositionData(
         positionId="123", position=DeckPoint(x=1, y=1, z=1)
     )
+
+
+async def test_save_position_must_home(
+    decoy: Decoy,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    subject: MovementHandler,
+) -> None:
+    """It should propogate a must home error."""
+    decoy.when(
+        state_store.motion.get_pipette_location(
+            pipette_id="pipette-id",
+        )
+    ).then_return(
+        PipetteLocationData(
+            mount=MountType.LEFT,
+            critical_point=CriticalPoint.XY_CENTER,
+        )
+    )
+
+    decoy.when(
+        await hardware_api.gantry_position(
+            mount=Mount.LEFT,
+            critical_point=CriticalPoint.XY_CENTER,
+        )
+    ).then_raise(HardwareMustHomeError("oh no"))
+
+    with pytest.raises(MustHomeError, match="oh no"):
+        await subject.save_position(pipette_id="pipette-id", position_id="123")
+
+
+async def test_home(
+    decoy: Decoy,
+    hardware_api: HardwareAPI,
+    subject: MovementHandler,
+) -> None:
+    """It should home a set of axes."""
+    await subject.home(
+        axes=[
+            MotorAxis.X,
+            MotorAxis.Y,
+            MotorAxis.LEFT_Z,
+            MotorAxis.RIGHT_Z,
+            MotorAxis.LEFT_PLUNGER,
+            MotorAxis.RIGHT_PLUNGER,
+        ]
+    )
+    decoy.verify(
+        await hardware_api.home(
+            axes=[
+                HardwareAxis.X,
+                HardwareAxis.Y,
+                HardwareAxis.Z,
+                HardwareAxis.A,
+                HardwareAxis.B,
+                HardwareAxis.C,
+            ]
+        ),
+        times=1,
+    )
+
+    await subject.home(axes=None)
+    decoy.verify(await hardware_api.home(axes=None), times=1)
