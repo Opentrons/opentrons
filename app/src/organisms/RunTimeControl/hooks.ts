@@ -48,7 +48,7 @@ export function useRunControls(): RunControls {
 export function useRunStatus(): RunStatus | null {
   const currentRunId = useCurrentRunId()
 
-  const { data } = useRunQuery(currentRunId)
+  const { data } = useRunQuery(currentRunId, { refetchInterval: 1000 })
 
   const runStatus = data?.data.status as RunStatus
 

@@ -178,7 +178,7 @@ describe('useRunStatus hook', () => {
   it('returns the run status of the current run', async () => {
     when(mockUseCurrentRunId).calledWith().mockReturnValue(RUN_ID_2)
     when(mockUseRunQuery)
-      .calledWith(RUN_ID_2)
+      .calledWith(RUN_ID_2, { refetchInterval: 1000 })
       .mockReturnValue(({
         data: { data: mockRunningRun },
       } as unknown) as UseQueryResult<Run>)
