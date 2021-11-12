@@ -18,16 +18,16 @@ import { Page } from '../../atoms/Page'
 import { useProtocolDetails } from './hooks'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { ConfirmCancelModal } from '../../pages/Run/RunLog'
-import { useCancelRun } from '../../pages/Run/RunLog/hooks'
+import { useCurrentRunControls } from '../../pages/Run/RunLog/hooks'
 
 export function RunDetails(): JSX.Element | null {
   const { t } = useTranslation('run_details')
   const { displayName, protocolData } = useProtocolDetails()
   const runStatus = useRunStatus()
-  const { usePause } = useCancelRun()
+  const { pauseRun } = useCurrentRunControls()
 
-  const StartCancelRun = (): void => {
-    usePause()
+  const cancelRunAndExit = (): void => {
+    pauseRun()
     confirmExit()
   }
 
@@ -35,12 +35,12 @@ export function RunDetails(): JSX.Element | null {
     showConfirmation: showConfirmExit,
     confirm: confirmExit,
     cancel: cancelExit,
-  } = useConditionalConfirm(StartCancelRun, true)
+  } = useConditionalConfirm(cancelRunAndExit, true)
   if (protocolData == null) return null
 
   const cancelRunButton = (
     <PrimaryBtn
-      onClick={StartCancelRun}
+      onClick={cancelRunAndExit}
       backgroundColor={C_WHITE}
       color={C_ERROR_DARK}
       borderWidth={BORDER_WIDTH_DEFAULT}

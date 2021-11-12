@@ -2,7 +2,7 @@ import * as React from 'react'
 import { AlertModal } from '@opentrons/components'
 
 import { Portal } from '../../../App/portal'
-import { useCancelRun } from './hooks'
+import { useCurrentRunControls } from './hooks'
 
 const HEADING = 'Are you sure you want to cancel this run?'
 const CANCEL_TEXT = 'yes, cancel run'
@@ -16,10 +16,10 @@ export function ConfirmCancelModal(
   props: ConfirmCancelModalProps
 ): JSX.Element {
   const { onClose } = props
-  const { useStop } = useCancelRun()
+  const { stopRun } = useCurrentRunControls()
 
-  const Cancel = (): void => {
-    useStop()
+  const cancel = (): void => {
+    stopRun()
     onClose()
   }
 
@@ -29,7 +29,7 @@ export function ConfirmCancelModal(
         heading={HEADING}
         buttons={[
           { children: BACK_TEXT, onClick: onClose },
-          { children: CANCEL_TEXT, onClick: Cancel },
+          { children: CANCEL_TEXT, onClick: cancel },
         ]}
         alertOverlay
       >

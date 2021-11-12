@@ -1,21 +1,15 @@
 import { useRunActionMutations } from '@opentrons/react-api-client'
 import { useCurrentRunId } from '../../../organisms/ProtocolUpload/useCurrentRunId'
 
-interface CancelRun {
-  usePause: () => void
-  useStop: () => void
+interface CurrentRunControls {
+  pauseRun: () => void
+  stopRun: () => void
 }
 
-export function useCancelRun(): CancelRun {
+export function useCurrentRunControls(): CurrentRunControls {
   const currentRunId = useCurrentRunId()
 
   const { pauseRun, stopRun } = useRunActionMutations(currentRunId as string)
 
-  const usePause = (): void => {
-    pauseRun()
-  }
-  const useStop = (): void => {
-    stopRun()
-  }
-  return { usePause, useStop }
+  return { pauseRun, stopRun }
 }
