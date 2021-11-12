@@ -1,14 +1,24 @@
-"""Pipetting command handler."""
+"""Pipetting command subject."""
 import pytest
 from decoy import Decoy
+from typing import NamedTuple
 
 from opentrons.types import MountType, Mount, Point
-from opentrons.hardware_control.api import API as HardwareAPI
-from opentrons.hardware_control.types import CriticalPoint
+from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control.types import (
+    CriticalPoint,
+    MustHomeError as HardwareMustHomeError,
+)
 from opentrons.motion_planning import Waypoint
 
-from opentrons.protocol_engine.types import DeckPoint
-from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
+from opentrons.protocol_engine.errors import MustHomeError
+from opentrons.protocol_engine.types import (
+    DeckPoint,
+    MovementAxis,
+    WellLocation,
+    WellOrigin,
+    WellOffset,
+)
 from opentrons.protocol_engine.state import (
     StateStore,
     PipetteLocationData,
@@ -44,7 +54,7 @@ def state_store(decoy: Decoy) -> StateStore:
 
 
 @pytest.fixture
-def handler(state_store: StateStore, hardware_api: HardwareAPI) -> MovementHandler:
+def subject(state_store: StateStore, hardware_api: HardwareAPI) -> MovementHandler:
     """Create a PipettingHandler with its dependencies mocked out."""
     return MovementHandler(state_store=state_store, hardware_api=hardware_api)
 
@@ -53,7 +63,7 @@ async def test_move_to_well(
     decoy: Decoy,
     state_store: StateStore,
     hardware_api: HardwareAPI,
-    handler: MovementHandler,
+    subject: MovementHandler,
 ) -> None:
     """Move requests should call hardware controller with movement data."""
     well_location = WellLocation(
@@ -99,7 +109,7 @@ async def test_move_to_well(
         [Waypoint(Point(1, 2, 3), CriticalPoint.XY_CENTER), Waypoint(Point(4, 5, 6))]
     )
 
-    await handler.move_to_well(
+    await subject.move_to_well(
         pipette_id="pipette-id",
         labware_id="labware-id",
         well_name="B2",
@@ -124,7 +134,7 @@ async def test_move_to_well_from_starting_location(
     decoy: Decoy,
     state_store: StateStore,
     hardware_api: HardwareAPI,
-    handler: MovementHandler,
+    subject: MovementHandler,
 ) -> None:
     """It should be able to move to a well from a start location."""
     well_location = WellLocation(
@@ -174,7 +184,7 @@ async def test_move_to_well_from_starting_location(
         )
     ).then_return([Waypoint(Point(1, 2, 3), CriticalPoint.XY_CENTER)])
 
-    await handler.move_to_well(
+    await subject.move_to_well(
         pipette_id="pipette-id",
         labware_id="labware-id",
         well_name="B2",
@@ -191,11 +201,102 @@ async def test_move_to_well_from_starting_location(
     )
 
 
+class MoveRelativeSpec(NamedTuple):
+    """Test data for move_relative."""
+
+    axis: MovementAxis
+    expected_delta: Point
+    distance: float = 42.0
+
+
+@pytest.mark.parametrize(
+    MoveRelativeSpec._fields,
+    [
+        MoveRelativeSpec(
+            axis=MovementAxis.X,
+            expected_delta=Point(x=42.0, y=0, z=0),
+        ),
+        MoveRelativeSpec(
+            axis=MovementAxis.Y,
+            expected_delta=Point(x=0, y=42.0, z=0),
+        ),
+        MoveRelativeSpec(
+            axis=MovementAxis.Z,
+            expected_delta=Point(x=0, y=0, z=42.0),
+        ),
+    ],
+)
+async def test_move_relative(
+    decoy: Decoy,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    subject: MovementHandler,
+    axis: MovementAxis,
+    expected_delta: Point,
+    distance: float,
+) -> None:
+    """Test that move_relative triggers a relative move with the HardwareAPI."""
+    decoy.when(
+        state_store.motion.get_pipette_location(pipette_id="pipette-id")
+    ).then_return(
+        PipetteLocationData(
+            mount=MountType.LEFT,
+            critical_point=CriticalPoint.XY_CENTER,
+        )
+    )
+
+    await subject.move_relative(
+        pipette_id="pipette-id",
+        axis=axis,
+        distance=distance,
+    )
+
+    decoy.verify(
+        await hardware_api.move_rel(
+            mount=Mount.LEFT,
+            delta=expected_delta,
+            fail_on_not_homed=True,
+        )
+    )
+
+
+async def test_move_relative_must_home(
+    decoy: Decoy,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    subject: MovementHandler,
+) -> None:
+    """It should raise a MustHomeError if the hardware controller is not homed."""
+    decoy.when(
+        state_store.motion.get_pipette_location(pipette_id="pipette-id")
+    ).then_return(
+        PipetteLocationData(
+            mount=MountType.LEFT,
+            critical_point=CriticalPoint.XY_CENTER,
+        )
+    )
+
+    decoy.when(
+        await hardware_api.move_rel(
+            mount=Mount.LEFT,
+            delta=Point(x=0, y=0, z=42.0),
+            fail_on_not_homed=True,
+        )
+    ).then_raise(HardwareMustHomeError("oh no"))
+
+    with pytest.raises(MustHomeError):
+        await subject.move_relative(
+            pipette_id="pipette-id",
+            axis=MovementAxis.Z,
+            distance=42.0,
+        )
+
+
 async def test_save_position(
     decoy: Decoy,
     state_store: StateStore,
     hardware_api: HardwareAPI,
-    handler: MovementHandler,
+    subject: MovementHandler,
 ) -> None:
     """Test that `save_position` fetches gantry position from hardwareAPI."""
     decoy.when(
@@ -216,7 +317,7 @@ async def test_save_position(
         )
     ).then_return(Point(1, 1, 1))
 
-    result = await handler.save_position(pipette_id="pipette-id", position_id="123")
+    result = await subject.save_position(pipette_id="pipette-id", position_id="123")
 
     assert result == SavedPositionData(
         positionId="123", position=DeckPoint(x=1, y=1, z=1)
@@ -235,7 +336,7 @@ async def test_save_position_different_cp(
     decoy: Decoy,
     state_store: StateStore,
     hardware_api: HardwareAPI,
-    handler: MovementHandler,
+    subject: MovementHandler,
     mock_hw_pipettes: MockPipettes,
     unverified_cp: CriticalPoint,
     tip_length: float,
@@ -270,7 +371,7 @@ async def test_save_position_different_cp(
         )
     ).then_return(Point(1, 1, 1))
 
-    result = await handler.save_position(pipette_id="pipette-id", position_id="123")
+    result = await subject.save_position(pipette_id="pipette-id", position_id="123")
 
     assert result == SavedPositionData(
         positionId="123", position=DeckPoint(x=1, y=1, z=1)

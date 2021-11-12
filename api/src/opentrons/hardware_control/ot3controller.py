@@ -74,6 +74,9 @@ class OT3Controller:
         """Set the module controls"""
         self._module_controls = module_controls
 
+    def is_homed(self, axes: Sequence[str]) -> bool:
+        return True
+
     async def update_position(self) -> AxisValueMap:
         """Get the current position."""
         return {}

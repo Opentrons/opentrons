@@ -301,6 +301,7 @@ class MockSendMoveCompleter:
                     payload = MoveCompletedPayload(
                         group_id=message.payload.group_id,
                         seq_id=UInt8Field(seq_id),
+                        current_position=UInt32Field(0),
                         node_id=UInt8Field(node.value),
                         ack_id=UInt8Field(0),
                     )
