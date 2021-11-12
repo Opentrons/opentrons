@@ -77,7 +77,10 @@ export const GenericStepScreen = (
           </Flex>
         </Flex>
         <Flex padding={SPACING_3}>
-          <LabwarePositionCheckStepDetail selectedStep={props.selectedStep} jog={props.jog} />
+          <LabwarePositionCheckStepDetail
+            selectedStep={props.selectedStep}
+            jog={props.jog}
+          />
         </Flex>
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER} marginBottom={SPACING_4}>

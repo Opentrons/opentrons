@@ -19,7 +19,6 @@ export const getPrimaryPipetteId = (
       command.commandType === 'loadPipette' && command.params.mount === 'right'
   )?.result?.pipetteId
 
-
   if (leftPipetteId == null || rightPipetteId == null) {
     throw new Error(
       'expected to find both left pipette and right pipette but could not'

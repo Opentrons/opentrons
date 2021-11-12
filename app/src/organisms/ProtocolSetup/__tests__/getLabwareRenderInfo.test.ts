@@ -3,7 +3,7 @@ import _standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_stan
 import { getLabwareRenderInfo } from '../utils/getLabwareRenderInfo'
 import { ProtocolFile } from '@opentrons/shared-data'
 
-const protocolWithMagTempTC = _protocolWithMagTempTC as unknown as ProtocolFile<{}>
+const protocolWithMagTempTC = (_protocolWithMagTempTC as unknown) as ProtocolFile<{}>
 const standardDeckDef = _standardDeckDef as any
 
 describe('getLabwareRenderInfo', () => {

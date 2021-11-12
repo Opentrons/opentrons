@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid'
 import { getLabwareDisplayName } from '.'
 import { PickUpTipCommand } from '../../protocol/types/schemaV6/command/pipetting'
 import type { LoadLabwareCommand } from '../../protocol/types/schemaV6/command/setup'

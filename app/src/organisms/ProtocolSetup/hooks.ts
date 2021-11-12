@@ -44,7 +44,9 @@ export function useModuleRenderInfoById(): ModuleRenderInfoById {
 
 export function useLabwareRenderInfoById(): LabwareRenderInfoById {
   const { protocolData } = useProtocolDetails()
-  return protocolData != null ? getLabwareRenderInfo(protocolData, standardDeckDef as any) : {}
+  return protocolData != null
+    ? getLabwareRenderInfo(protocolData, standardDeckDef as any)
+    : {}
 }
 
 export function usePipetteMount(

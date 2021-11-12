@@ -5,7 +5,6 @@ import '@testing-library/jest-dom'
 import { fireEvent } from '@testing-library/react'
 import {
   anyProps,
-  componentPropsMatcher,
   partialComponentPropsMatcher,
   renderWithProviders,
 } from '@opentrons/components'

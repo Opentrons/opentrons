@@ -25,7 +25,6 @@ import { PipetteCalibration } from './PipetteCalibration'
 import { TipLengthCalibration } from './TipLengthCalibration'
 import { useCurrentRunPipetteInfoByMount } from '../hooks/useCurrentRunPipetteInfoByMount'
 
-
 import type { Dispatch } from '../../../../redux/types'
 import type { ViewableRobot } from '../../../../redux/discovery/types'
 import type { ProtocolCalibrationStatus } from '../../../../redux/calibration/types'
@@ -73,15 +72,15 @@ export function RobotCalibration(props: Props): JSX.Element {
       <div>
         {PipetteConstants.PIPETTE_MOUNTS.map((mount, index) => {
           const pipetteInfo = currentRunPipetteInfoByMount[mount]
-          return pipetteInfo != null
-            ? <PipetteCalibration
-                key={index}
-                pipetteInfo={pipetteInfo}
-                index={index}
-                mount={mount}
-                robotName={robotName}
-              />
-            : null
+          return pipetteInfo != null ? (
+            <PipetteCalibration
+              key={index}
+              pipetteInfo={pipetteInfo}
+              index={index}
+              mount={mount}
+              robotName={robotName}
+            />
+          ) : null
         })}
       </div>
       <Divider marginY={SPACING_3} />

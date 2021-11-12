@@ -100,7 +100,7 @@ describe('LabwarePositionCheckStepDetail', () => {
   beforeEach(() => {
     props = {
       selectedStep: mockLabwarePositionCheckStepTipRack,
-      jog: jest.fn() as any
+      jog: jest.fn() as any,
     }
     when(mockStepDetailText)
       .calledWith(
