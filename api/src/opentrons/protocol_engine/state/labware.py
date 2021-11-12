@@ -33,9 +33,7 @@ class LabwareState:
     """State of all loaded labware resources."""
 
     labware_by_id: Dict[str, LoadedLabware]  # Indexed by labware ID.
-
     labware_offsets_by_id: Dict[str, LabwareOffset]  # Indexed by labware offset ID.
-
     definitions_by_uri: Dict[str, LabwareDefinition]
     deck_definition: DeckDefinitionV2
 
