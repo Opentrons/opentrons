@@ -115,12 +115,7 @@ async def test_load_labware(
     assert result == LoadedLabwareData(
         labware_id="unique-id",
         definition=minimal_labware_def,
-        offset=LabwareOffset(
-            id="labware-offset-id",
-            definitionUri="opentrons-test/load-name/1",
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
-            offset=LabwareOffsetVector(x=1, y=2, z=3),
-        ),
+        offsetId="labware-offset-id",
     )
 
 
@@ -161,7 +156,7 @@ async def test_load_labware_uses_provided_id(
     )
 
     assert result == LoadedLabwareData(
-        labware_id="my-labware-id", definition=minimal_labware_def, offset=None
+        labware_id="my-labware-id", definition=minimal_labware_def, offsetId=None
     )
 
 
@@ -204,7 +199,7 @@ async def test_load_labware_uses_loaded_labware_def(
     assert result == LoadedLabwareData(
         labware_id="unique-id",
         definition=minimal_labware_def,
-        offset=None,
+        offsetId=None,
     )
 
     decoy.verify(

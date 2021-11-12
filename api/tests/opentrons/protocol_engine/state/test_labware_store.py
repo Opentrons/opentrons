@@ -100,7 +100,7 @@ def test_handles_load_labware(
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         labware_id="test-labware-id",
         definition=well_plate_def,
-        offset=offset,
+        offset_id="offset-id",
     )
 
     expected_definition_uri = uri_from_details(

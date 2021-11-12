@@ -54,7 +54,7 @@ def stubbed_load_labware_result(
     result = commands.LoadLabwareResult(
         labwareId="abc123",
         definition=tip_rack_def,
-        offset=None,
+        offsetId=None,
     )
 
     decoy.when(transport.execute_command(request=request)).then_return(result)

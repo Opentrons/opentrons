@@ -3,11 +3,7 @@ from decoy import Decoy
 
 from opentrons.types import DeckSlotName
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.protocol_engine.types import (
-    LabwareOffset,
-    LabwareOffsetVector,
-    DeckSlotLocation,
-)
+from opentrons.protocol_engine.types import DeckSlotLocation
 from opentrons.protocol_engine.execution import (
     LoadedLabwareData,
     EquipmentHandler,
@@ -57,12 +53,7 @@ async def test_load_labware_implementation(
         LoadedLabwareData(
             labware_id="labware-id",
             definition=well_plate_def,
-            offset=LabwareOffset(
-                id="labware-offset-id",
-                definitionUri="opentrons-test/some-load-name/1",
-                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
-                offset=LabwareOffsetVector(x=1, y=2, z=3),
-            ),
+            offsetId="labware-offset-id",
         )
     )
 
@@ -71,10 +62,5 @@ async def test_load_labware_implementation(
     assert result == LoadLabwareResult(
         labwareId="labware-id",
         definition=well_plate_def,
-        offset=LabwareOffset(
-            id="labware-offset-id",
-            definitionUri="opentrons-test/some-load-name/1",
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
-            offset=LabwareOffsetVector(x=1, y=2, z=3),
-        ),
+        offsetId="labware-offset-id",
     )

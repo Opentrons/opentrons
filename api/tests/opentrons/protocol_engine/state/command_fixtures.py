@@ -7,7 +7,6 @@ from opentrons.types import MountType
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.types import (
-    LabwareOffset,
     PipetteName,
     WellLocation,
     LabwareLocation,
@@ -92,7 +91,7 @@ def create_load_labware_command(
     labware_id: str,
     location: LabwareLocation,
     definition: LabwareDefinition,
-    offset: Optional[LabwareOffset],
+    offset_id: Optional[str],
 ) -> cmd.LoadLabware:
     """Create a completed LoadLabware command."""
     params = cmd.LoadLabwareParams(
@@ -104,7 +103,7 @@ def create_load_labware_command(
     )
 
     result = cmd.LoadLabwareResult(
-        labwareId=labware_id, definition=definition, offset=offset
+        labwareId=labware_id, definition=definition, offsetId=offset_id
     )
 
     return cmd.LoadLabware(

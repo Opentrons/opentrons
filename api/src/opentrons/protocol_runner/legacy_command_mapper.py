@@ -120,7 +120,7 @@ class LegacyCommandMapper:
                 ),
                 # fixme(mm, 2021-11-11): Labware offsets added to the ProtocolEngine
                 # need to apply to the legacy protocol somehow, and get fed back here.
-                offset=None,
+                offsetId=None,
             ),
         )
 

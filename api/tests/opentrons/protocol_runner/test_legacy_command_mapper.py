@@ -217,7 +217,7 @@ def test_map_labware_load(minimal_labware_def: LabwareDefinition) -> None:
             # Trusting that the exact fields within in the labware definition
             # get passed through correctly.
             definition=matchers.Anything(),
-            offset=None,
+            offsetId=None,
         ),
     )
 

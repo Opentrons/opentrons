@@ -10,7 +10,7 @@ from opentrons.hardware_control.api import API as HardwareAPI
 from ..errors import FailedToLoadPipetteError, LabwareDefinitionDoesNotExistError
 from ..resources import LabwareDataProvider, ModelUtils
 from ..state import StateStore
-from ..types import LabwareLocation, LabwareOffset, PipetteName
+from ..types import LabwareLocation, PipetteName
 
 
 @dataclass(frozen=True)
@@ -19,7 +19,7 @@ class LoadedLabwareData:
 
     labware_id: str
     definition: LabwareDefinition
-    offset: Optional[LabwareOffset]
+    offsetId: Optional[str]
 
 
 @dataclass(frozen=True)
@@ -98,7 +98,7 @@ class EquipmentHandler:
         return LoadedLabwareData(
             labware_id=labware_id,
             definition=definition,
-            offset=offset,
+            offsetId=(None if offset is None else offset.id),
         )
 
     async def load_pipette(

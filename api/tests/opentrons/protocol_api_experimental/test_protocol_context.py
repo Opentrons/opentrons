@@ -142,7 +142,7 @@ def test_load_labware(
         commands.LoadLabwareResult(
             labwareId="abc123",
             definition=LabwareDefinition.parse_obj(minimal_labware_def),
-            offset=None,
+            offsetId=None,
         )
     )
 
@@ -174,7 +174,7 @@ def test_load_labware_default_namespace_and_version(
         commands.LoadLabwareResult(
             labwareId="abc123",
             definition=minimal_labware_def,
-            offset=None,
+            offsetId=None,
         )
     )
 

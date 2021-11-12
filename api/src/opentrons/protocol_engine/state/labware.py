@@ -89,11 +89,9 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
     def _handle_command(self, command: Command) -> None:
         """Modify state in reaction to a command."""
         if isinstance(command.result, LoadLabwareResult):
-            offset = command.result.offset
-
             # If the labware load refers to an offset, that offset must actually exist.
-            if offset is not None:
-                assert offset.id in self._state.labware_offsets_by_id
+            if command.result.offsetId is not None:
+                assert command.result.offsetId in self._state.labware_offsets_by_id
 
             labware_id = command.result.labwareId
             definition_uri = uri_from_details(
@@ -108,7 +106,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 location=command.params.location,
                 loadName=command.result.definition.parameters.loadName,
                 definitionUri=definition_uri,
-                offsetId=(None if offset is None else offset.id),
+                offsetId=command.result.offsetId,
             )
 
             new_definitions_by_uri = self._state.definitions_by_uri.copy()
