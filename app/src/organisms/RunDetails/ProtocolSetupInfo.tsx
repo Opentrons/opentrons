@@ -19,7 +19,7 @@ import { CommandItem, Status } from './CommandItem'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 
 interface ProtocolSetupInfoProps {
-  SetupCommand?: Command
+  setupCommand?: Command
   runStatus: string
   type: Status
 }
@@ -27,7 +27,7 @@ interface ProtocolSetupInfoProps {
 export const ProtocolSetupInfo = (
   props: ProtocolSetupInfoProps
 ): JSX.Element | null => {
-  const { SetupCommand, runStatus, type } = props
+  const { setupCommand, runStatus, type } = props
   const { t } = useTranslation('run_details')
   const protocolData: ProtocolFile<{}> | null = useProtocolDetails()
     .protocolData
@@ -37,11 +37,11 @@ export const ProtocolSetupInfo = (
     getProtocolPipetteTipRackCalInfo(state, robotName)
   )
   if (protocolData == null) return null
-  if (SetupCommand === undefined) return null
+  if (setupCommand === undefined) return null
 
   let SetupCommandText
-  if (SetupCommand.commandType === 'loadPipette') {
-    const pipetteData = protocolPipetteData[SetupCommand.params.mount]
+  if (setupCommand.commandType === 'loadPipette') {
+    const pipetteData = protocolPipetteData[setupCommand.params.mount]
     if (pipetteData == null) {
       return null
     }
@@ -52,7 +52,7 @@ export const ProtocolSetupInfo = (
         i18nKey={'load_pipette_protocol_setup'}
         values={{
           pipette_name: pipetteData.pipetteDisplayName,
-          mount_name: SetupCommand.params.mount,
+          mount_name: setupCommand.params.mount,
         }}
         components={{
           span: (
@@ -65,8 +65,8 @@ export const ProtocolSetupInfo = (
         }}
       />
     )
-  } else if (SetupCommand.commandType === 'loadModule') {
-    const moduleId = SetupCommand.params.moduleId
+  } else if (setupCommand.commandType === 'loadModule') {
+    const moduleId = setupCommand.params.moduleId
     const moduleModel = protocolData.modules[moduleId]
     const moduleSlotNumber = moduleId.includes('thermocycler') ? 4 : 1
     SetupCommandText = (
@@ -77,15 +77,15 @@ export const ProtocolSetupInfo = (
         count={moduleSlotNumber}
         values={{
           module: getModuleDisplayName(moduleModel.model),
-          slot_name: Object.values(SetupCommand.params.location)[0],
+          slot_name: Object.values(setupCommand.params.location)[0],
         }}
       />
     )
-  } else if (SetupCommand.commandType === 'loadLabware') {
+  } else if (setupCommand.commandType === 'loadLabware') {
     let moduleName: string | null = null
-    let slotNumber = Object.values(SetupCommand.params.location)[0]
-    if ('moduleId' in SetupCommand.params.location) {
-      const moduleId = SetupCommand.params.location.moduleId
+    let slotNumber = Object.values(setupCommand.params.location)[0]
+    if ('moduleId' in setupCommand.params.location) {
+      const moduleId = setupCommand.params.location.moduleId
       const moduleModel = protocolData.modules[moduleId]
       const moduleSlotNumber = protocolData.commands.find(
         command =>
@@ -105,7 +105,7 @@ export const ProtocolSetupInfo = (
       moduleSlots = 1
     }
 
-    SetupCommand.result?.definition.metadata.displayName.includes('Trash') ??
+    setupCommand.result?.definition.metadata.displayName.includes('Trash') ??
     false
       ? (SetupCommandText = undefined)
       : (SetupCommandText =
@@ -116,8 +116,8 @@ export const ProtocolSetupInfo = (
               i18nKey={'load_labware_info_protocol_setup_no_module'}
               values={{
                 labware_loadname:
-                  SetupCommand.result?.definition.metadata.displayName,
-                labware_version: SetupCommand.result?.definition.version,
+                  setupCommand.result?.definition.metadata.displayName,
+                labware_version: setupCommand.result?.definition.version,
                 slot_number: slotNumber,
               }}
             />
@@ -129,8 +129,8 @@ export const ProtocolSetupInfo = (
               count={moduleSlots}
               values={{
                 labware_loadname:
-                  SetupCommand.result?.definition.metadata.displayName,
-                labware_version: SetupCommand.result?.definition.version,
+                  setupCommand.result?.definition.metadata.displayName,
+                labware_version: setupCommand.result?.definition.version,
                 slot_number: slotNumber,
                 module_name: moduleName,
               }}
@@ -139,16 +139,13 @@ export const ProtocolSetupInfo = (
   }
   return (
     <Flex
-      paddingTop={SPACING_1}
-      paddingBottom={SPACING_1}
-      paddingLeft={SPACING_2}
-      paddingRight={SPACING_2}
+      padding={`${SPACING_1} ${SPACING_2} ${SPACING_1} ${SPACING_2}`}
       fontSize={FONT_SIZE_BODY_1}
       flexDirection={DIRECTION_COLUMN}
       flex={'auto'}
     >
       <CommandItem
-        currentCommand={SetupCommand}
+        currentCommand={setupCommand}
         type={type}
         runStatus={runStatus}
         commandText={SetupCommandText}

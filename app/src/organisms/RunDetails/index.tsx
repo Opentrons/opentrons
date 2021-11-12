@@ -10,7 +10,6 @@ import {
   SPACING_2,
   SPACING_3,
   useConditionalConfirm,
-  Flex,
 } from '@opentrons/components'
 import { Page } from '../../atoms/Page'
 import { ConfirmCancelModal } from '../../pages/Run/RunLog'
@@ -27,7 +26,7 @@ export function RunDetails(): JSX.Element | null {
     cancel: cancelExit,
   } = useConditionalConfirm(() => {}, true)
   const [commandIdIndex] = React.useState<number>(0)
-  const commandId = fixtureCommands.commands.map(command => command.id)
+  const commandIds = fixtureCommands.commands.map(command => command.id)
   const commandStatuses = fixtureCommands.commands.map(
     command => command.status
   )
@@ -55,15 +54,12 @@ export function RunDetails(): JSX.Element | null {
   return (
     <Page titleBarProps={titleBarProps}>
       {showConfirmExit ? <ConfirmCancelModal onClose={cancelExit} /> : null}
-
-      <Flex key={commandId[commandIdIndex]}>
-        <CommandList
-          anticipated={commandId[commandIdIndex + 1]}
-          inProgress={commandId[commandIdIndex]}
-          completed={commandId[commandIdIndex - 1]}
-          isFailed={commandStatuses[commandIdIndex] === 'failed'}
-        />
-      </Flex>
+      <CommandList
+        anticipated={commandIds[commandIdIndex + 1]}
+        inProgress={commandIds[commandIdIndex]}
+        completed={commandIds[commandIdIndex - 1]}
+        isFailed={commandStatuses[commandIdIndex] === 'failed'}
+      />
     </Page>
   )
 }

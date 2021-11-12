@@ -81,10 +81,8 @@ function CommandItemRunning(props: CommandItemsProps): JSX.Element {
 function CommandItemQueued(props: CommandItemsProps): JSX.Element {
   const { currentCommand } = props
   return (
-    <Flex>
-      <Flex marginLeft={SPACING_1} key={currentCommand.id}>
-        {props.commandText}
-      </Flex>
+    <Flex marginLeft={SPACING_1} key={currentCommand.id}>
+      {props.commandText}
     </Flex>
   )
 }
@@ -127,13 +125,13 @@ const WRAPPER_STYLE_BY_STATUS: Record<
   Status,
   { border: string; backgroundColor: string }
 > = {
-  queued: { border: 'no-border', backgroundColor: C_NEAR_WHITE },
+  queued: { border: 'none', backgroundColor: C_NEAR_WHITE },
   running: {
     border: `1px solid ${C_MINT}`,
     backgroundColor: C_POWDER_BLUE,
   },
   succeeded: {
-    border: 'no-border',
+    border: 'none',
     backgroundColor: C_AQUAMARINE,
   },
   failed: {

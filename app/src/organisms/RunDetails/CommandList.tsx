@@ -22,6 +22,7 @@ import {
   SPACING_3,
   SPACING_4,
   ALIGN_CENTER,
+  FONT_WEIGHT_BOLD,
 } from '@opentrons/components'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { useProtocolDetails } from './hooks'
@@ -70,7 +71,7 @@ export function CommandList(props: Props): JSX.Element | null {
                 name="information"
                 width={SPACING_4}
                 marginRight={SPACING_3}
-              ></Icon>
+              />
               {t('protocol_run_failed')}
             </Flex>
           </Flex>
@@ -129,7 +130,7 @@ export function CommandList(props: Props): JSX.Element | null {
                       command.commandType === 'loadPipette' ||
                       command.commandType === 'loadModule' ? (
                         <ProtocolSetupInfo
-                          SetupCommand={command}
+                          setupCommand={command}
                           runStatus={runStatus}
                           type={setupCommandTypeStatus}
                         />
@@ -170,9 +171,10 @@ export function CommandList(props: Props): JSX.Element | null {
           <Flex
             paddingLeft={SPACING_1}
             fontSize={FONT_SIZE_DEFAULT}
+            fontWeight={FONT_WEIGHT_BOLD}
             color={C_BLACK}
           >
-            <strong>{t('protocol_steps')}</strong>
+            {t('protocol_steps')}
           </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} flex={'auto'}>
             {legacyCommands.map((command, index) => {
@@ -226,10 +228,7 @@ export function CommandList(props: Props): JSX.Element | null {
                     <Flex fontSize={FONT_SIZE_CAPTION}>{t('anticipated')}</Flex>
                   ) : null}
                   <Flex
-                    paddingTop={SPACING_1}
-                    paddingBottom={SPACING_1}
-                    paddingLeft={SPACING_2}
-                    paddingRight={SPACING_2}
+                    padding={`${SPACING_1} ${SPACING_2} ${SPACING_1} ${SPACING_2}`}
                     flexDirection={DIRECTION_COLUMN}
                     flex={'auto'}
                   >

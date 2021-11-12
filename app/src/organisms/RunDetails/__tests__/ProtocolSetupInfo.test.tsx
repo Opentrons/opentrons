@@ -147,7 +147,7 @@ describe('ProtocolSetupInfo', () => {
   let props: React.ComponentProps<typeof ProtocolSetupInfo>
   beforeEach(() => {
     props = {
-      SetupCommand: COMMAND_TYPE_LOAD_LABWARE,
+      setupCommand: COMMAND_TYPE_LOAD_LABWARE,
       runStatus: 'run status',
       type: TYPE,
     }
@@ -196,7 +196,7 @@ describe('ProtocolSetupInfo', () => {
 
   it('should render correct command when commandType is loadLabware on top of a module', () => {
     props = {
-      SetupCommand: COMMAND_TYPE_LOAD_LABWARE_WITH_MODULE,
+      setupCommand: COMMAND_TYPE_LOAD_LABWARE_WITH_MODULE,
       runStatus: 'run status',
       type: TYPE,
     }
@@ -217,7 +217,7 @@ describe('ProtocolSetupInfo', () => {
   })
   it('should render correct command when commandType is loadPipette', () => {
     props = {
-      SetupCommand: COMMAND_TYPE_LOAD_PIPETTE,
+      setupCommand: COMMAND_TYPE_LOAD_PIPETTE,
       runStatus: 'run status',
       type: TYPE,
     }
@@ -229,7 +229,7 @@ describe('ProtocolSetupInfo', () => {
   })
   it('should render correct command when commandType is loadModule', () => {
     props = {
-      SetupCommand: COMMAND_TYPE_LOAD_MODULE,
+      setupCommand: COMMAND_TYPE_LOAD_MODULE,
       runStatus: 'run status',
       type: TYPE,
     }
@@ -241,7 +241,7 @@ describe('ProtocolSetupInfo', () => {
   })
   it('should render correct command when commandType is loadModule and a TC is used', () => {
     props = {
-      SetupCommand: COMMAND_TYPE_LOAD_MODULE_TC,
+      setupCommand: COMMAND_TYPE_LOAD_MODULE_TC,
       runStatus: 'run status',
       type: TYPE,
     }
@@ -284,7 +284,7 @@ describe('ProtocolSetupInfo', () => {
   })
   it('renders null if SetupCommand is undefined', () => {
     props = {
-      SetupCommand: undefined,
+      setupCommand: undefined,
       runStatus: 'run status',
       type: TYPE,
     }
@@ -293,7 +293,7 @@ describe('ProtocolSetupInfo', () => {
   })
   it('renders null if labware is a trash', () => {
     props = {
-      SetupCommand: COMMAND_TYPE_TRASH,
+      setupCommand: COMMAND_TYPE_TRASH,
       runStatus: 'run status',
       type: TYPE,
     }
