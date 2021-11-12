@@ -5,7 +5,7 @@ import { I18nextProvider } from 'react-i18next'
 import { getLabwareLocation } from '../../../utils/getLabwareLocation'
 import { useProtocolDetails } from '../../../../RunDetails/hooks'
 import { i18n } from '../../../../../i18n'
-import { useLoadingText } from '../useLabwarePositionCheck'
+import { useTitleText } from '../useLabwarePositionCheck'
 import type { MoveToWellCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
 import type {
   DropTipCommand,
@@ -29,7 +29,7 @@ const mockProtocolData: any = { commands: [] }
 const mockLabwareId = 'mockLabwareId'
 const mockSlotNumber = 'mockSlotNumber'
 
-describe('useLoadingText', () => {
+describe('useTitleText', () => {
   beforeEach(() => {
     when(mockUseProtocolDetails).calledWith().mockReturnValue({
       protocolData: mockProtocolData,
@@ -53,7 +53,7 @@ describe('useLoadingText', () => {
       },
     }
 
-    const { result } = renderHook(() => useLoadingText(false, command), {
+    const { result } = renderHook(() => useTitleText(true, command), {
       wrapper,
     })
     expect(result.current).toBe(`Moving to slot ${mockSlotNumber}`)
@@ -69,7 +69,7 @@ describe('useLoadingText', () => {
       },
     }
 
-    const { result } = renderHook(() => useLoadingText(false, command), {
+    const { result } = renderHook(() => useTitleText(true, command), {
       wrapper,
     })
     expect(result.current).toBe(`Picking up tip in slot ${mockSlotNumber}`)
@@ -85,25 +85,9 @@ describe('useLoadingText', () => {
       },
     }
 
-    const { result } = renderHook(() => useLoadingText(false, command), {
+    const { result } = renderHook(() => useTitleText(true, command), {
       wrapper,
     })
     expect(result.current).toBe(`Returning tip in slot ${mockSlotNumber}`)
-  })
-  it('should return null when a command is pending', () => {
-    const command: DropTipCommand = {
-      id: '1',
-      commandType: 'dropTip',
-      params: {
-        labwareId: mockLabwareId,
-        pipetteId: 'p300SingleId',
-        wellName: 'A1',
-      },
-    }
-
-    const { result } = renderHook(() => useLoadingText(true, command), {
-      wrapper,
-    })
-    expect(result.current).toBe(null)
   })
 })

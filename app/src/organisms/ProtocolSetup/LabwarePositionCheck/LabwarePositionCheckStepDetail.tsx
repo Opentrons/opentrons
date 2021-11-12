@@ -32,7 +32,7 @@ import { useProtocolDetails } from '../../RunDetails/hooks'
 import { StepDetailText } from './StepDetailText'
 import levelWithTip from '../../../assets/images/lpc_level_with_tip.svg'
 import levelWithLabware from '../../../assets/images/lpc_level_with_labware.svg'
-import { Axis, Sign, StepSize } from '../../../molecules/JogControls/types'
+import type { Jog } from '../../../molecules/JogControls/types'
 import type {
   LabwarePositionCheckCommand,
   LabwarePositionCheckMovementCommand,
@@ -42,6 +42,7 @@ import type {
 const DECK_MAP_VIEWBOX = '-30 -20 170 115'
 interface LabwarePositionCheckStepDetailProps {
   selectedStep: LabwarePositionCheckStep
+  jog: Jog
 }
 export const LabwarePositionCheckStepDetail = (
   props: LabwarePositionCheckStepDetailProps
@@ -80,9 +81,6 @@ export const LabwarePositionCheckStepDetail = (
     }),
     {}
   )
-  const jog = (axis: Axis, dir: Sign, step: StepSize): void => {
-    console.log(axis, dir, step) // TODO Immediately: wire this up to robot api call
-  }
 
   return (
     <React.Fragment>
@@ -137,7 +135,7 @@ export const LabwarePositionCheckStepDetail = (
           </Flex>
           {showJogControls ? (
             <JogControls
-              jog={jog}
+              jog={props.jog}
               stepSizes={[0.1, 1, 10]}
               planes={[HORIZONTAL_PLANE, VERTICAL_PLANE]}
               width="100%"
