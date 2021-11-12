@@ -272,9 +272,7 @@ export function useLabwarePositionCheck(
       // add the saved command id so we can use it to query locations later
       .then(response => {
         const commandId = response.data.data.id
-        console.log('before')
         addSavePositionCommandData(commandId, prevCommand.params.labwareId)
-        console.log('after')
         // execute the movement command
         return createCommand(
           host as HostConfig,

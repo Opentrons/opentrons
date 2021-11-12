@@ -45,7 +45,6 @@ export const getTiprackIdsInOrder = (
     (tipracks, currentLabware, labwareId) => {
       const labwareDef = labwareDefinitions[currentLabware.definitionId]
       const isTiprack = getIsTiprack(labwareDef)
-      console.log(labwareDef, isTiprack)
 
       if (isTiprack) {
         return [
