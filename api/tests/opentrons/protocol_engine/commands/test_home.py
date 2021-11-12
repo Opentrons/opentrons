@@ -1,4 +1,4 @@
-"""Test move relative commands."""
+"""Test home commands."""
 from decoy import Decoy
 
 from opentrons.protocol_engine.types import MotorAxis
@@ -47,7 +47,7 @@ async def test_home_all_implementation(
     pipetting: PipettingHandler,
     run_control: RunControlHandler,
 ) -> None:
-    """A Home command should have an execution implementation."""
+    """It should pass axes=None along to the movement handler."""
     subject = HomeImplementation(
         equipment=equipment,
         movement=movement,
