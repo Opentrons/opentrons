@@ -13,7 +13,7 @@ from opentrons.protocol_api import (
     ProtocolContext as LegacyProtocolContext,
     InstrumentContext as LegacyPipetteContext,
 )
-from opentrons.protocol_api.labware import Labware as LegacyLabware
+from opentrons.protocol_api.labware import Labware as LegacyLabware, Well as LegacyWell
 from opentrons.protocol_api.protocol_context import (
     InstrumentLoadInfo as LegacyInstrumentLoadInfo,
     LabwareLoadInfo as LegacyLabwareLoadInfo,
@@ -131,6 +131,7 @@ __all__ = [
     # Re-exports of main public API stuff:
     "LegacyProtocolContext",
     "LegacyLabware",
+    "LegacyWell",
     "LegacyPipetteContext",
     "LegacyModuleContext",
     # Re-exports of internal stuff:

@@ -12,7 +12,7 @@ from robot_server.service.json_api import RequestModel, ResponseModel
 
 from ..run_store import RunStore, RunNotFoundError
 from ..run_view import RunView
-from ..action_models import RunAction, RunActionType, RunActionCreateData
+from ..action_models import RunAction, RunActionType, RunActionCreate
 from ..engine_store import EngineStore
 from ..dependencies import get_run_store, get_engine_store
 from .base_router import RunNotFound, RunStopped
@@ -42,7 +42,7 @@ class RunActionNotAllowed(ErrorDetails):
 )
 async def create_run_action(
     runId: str,
-    request_body: RequestModel[RunActionCreateData],
+    request_body: RequestModel[RunActionCreate],
     run_view: RunView = Depends(RunView),
     run_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
@@ -82,7 +82,7 @@ async def create_run_action(
             engine_store.runner.play()
         elif action.actionType == RunActionType.PAUSE:
             engine_store.runner.pause()
-        if action.actionType == RunActionType.STOP:
+        elif action.actionType == RunActionType.STOP:
             await engine_store.runner.stop()
 
     except ProtocolEngineStoppedError as e:

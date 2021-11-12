@@ -11,7 +11,7 @@ from opentrons.protocol_engine import (
 )
 
 from .run_store import RunResource
-from .action_models import RunAction, RunActionCreateData
+from .action_models import RunAction, RunActionCreate
 from .run_models import Run, RunUpdate, RunCommandSummary
 
 
@@ -40,7 +40,7 @@ class RunView:
     def with_action(
         run: RunResource,
         action_id: str,
-        action_data: RunActionCreateData,
+        action_data: RunActionCreate,
         created_at: datetime,
     ) -> Tuple[RunAction, RunResource]:
         """Create a new run control action resource instance.
