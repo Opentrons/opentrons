@@ -155,5 +155,8 @@ class LoadedLabware(BaseModel):
     loadName: str
     definitionUri: str
     location: LabwareLocation
-    # Field(...) to require offsetId to be provided even when None.
+    # Field(...) to require our Python code to provide offsetId even when None, to
+    # prevent mistakes where we forget to pass it along.
+    # todo(mm, 2021-11-11): Figure out why this is showing up as a required non-nullable
+    # string in the OpenAPI spec, instead of a required nullable string.
     offsetId: Optional[str] = Field(...)
