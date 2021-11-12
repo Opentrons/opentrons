@@ -39,5 +39,6 @@
   "robot_in_motion": "Stand back, robot is in motion.",
   "moving_to_slot_title": "Moving to slot {{slot}}",
   "picking_up_tip_title": "Picking up tip in slot {{slot}}",
-  "returning_tip_title": "Returning tip in slot {{slot}}"
+  "returning_tip_title": "Returning tip in slot {{slot}}",
+  "check_labware_in_slot_title": "Check Labware {{labware_display_name}} in slot {{slot}}"
 }

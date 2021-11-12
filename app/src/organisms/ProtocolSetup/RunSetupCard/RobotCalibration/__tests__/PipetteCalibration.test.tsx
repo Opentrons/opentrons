@@ -2,7 +2,7 @@ import * as React from 'react'
 import '@testing-library/jest-dom'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
-import { mockProtocolPipetteTipRackCalInfo } from '../../../../../redux/pipettes/__fixtures__'
+import { mockPipetteInfo } from '../../../../../redux/pipettes/__fixtures__'
 import { PipetteCalibration } from '../PipetteCalibration'
 
 jest.mock('../../../../../redux/config/selectors')
@@ -10,7 +10,7 @@ jest.mock('../../../../../redux/sessions/selectors')
 
 describe('PipetteCalibration', () => {
   const render = ({
-    pipetteTipRackData = mockProtocolPipetteTipRackCalInfo,
+    pipetteInfo = mockPipetteInfo,
     index = 1,
     mount = 'left',
     robotName = 'robot name',
@@ -18,7 +18,7 @@ describe('PipetteCalibration', () => {
     return renderWithProviders(
       <PipetteCalibration
         {...{
-          pipetteTipRackData,
+          pipetteInfo,
           index,
           mount,
           robotName,
@@ -36,17 +36,17 @@ describe('PipetteCalibration', () => {
     const { getByRole } = render()
     expect(
       getByRole('heading', {
-        name: `LEFT MOUNT: ${mockProtocolPipetteTipRackCalInfo.pipetteDisplayName}`,
+        name: `LEFT MOUNT: ${mockPipetteInfo.pipetteSpecs.displayName}`,
       })
     ).toBeTruthy()
   })
 
   it('renders the calibrate now button if pipette attached but not calibrated', () => {
     const { getByText, getByRole } = render({
-      pipetteTipRackData: {
-        pipetteDisplayName: 'my pipette',
-        tipRacks: [],
-        exactPipetteMatch: 'match',
+      pipetteInfo: {
+        ...mockPipetteInfo,
+        tipRacksForPipette: [],
+        requestedPipetteMatch: 'match',
         pipetteCalDate: null,
       },
     })
@@ -55,10 +55,10 @@ describe('PipetteCalibration', () => {
   })
   it('renders the pipette mismatch info if pipette calibrated but an inexact match', () => {
     const { getByText, getByRole } = render({
-      pipetteTipRackData: {
-        pipetteDisplayName: 'my pipette',
-        tipRacks: [],
-        exactPipetteMatch: 'inexact_match',
+      pipetteInfo: {
+        ...mockPipetteInfo,
+        tipRacksForPipette: [],
+        requestedPipetteMatch: 'inexact_match',
         pipetteCalDate: 'september 3, 2020',
       },
     })

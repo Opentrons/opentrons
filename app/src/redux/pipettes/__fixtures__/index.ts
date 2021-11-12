@@ -1,11 +1,12 @@
 // mock HTTP responses for pipettes endpoints
-
-import type { PipetteSettings, ProtocolPipetteTipRackCalData } from '../types'
+import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
+import type { PipetteSettings } from '../types'
 import type {
   RobotApiResponse,
   RobotApiResponseMeta,
 } from '../../robot-api/types'
 import { mockTipRackDefinition } from '../../custom-labware/__fixtures__'
+import { PipetteInfo } from '../../../organisms/ProtocolSetup/RunSetupCard/hooks/useCurrentRunPipetteInfoByMount'
 
 export const mockRobot = { name: 'robot', ip: '127.0.0.1', port: 31950 }
 
@@ -126,11 +127,11 @@ export const mockUpdatePipetteSettingsFailure: RobotApiResponse = {
   body: { message: 'AH' },
 }
 
-export const mockProtocolPipetteTipRackCalInfo: ProtocolPipetteTipRackCalData = {
-  pipetteDisplayName: 'My Pipette',
-  exactPipetteMatch: 'match',
+export const mockPipetteInfo: PipetteInfo = {
+  pipetteSpecs: fixtureP10Single,
+  requestedPipetteMatch: 'match',
   pipetteCalDate: '2021-04-10',
-  tipRacks: [
+  tipRacksForPipette: [
     {
       displayName: 'My TipRack',
       lastModifiedDate: '2021-04-10',
