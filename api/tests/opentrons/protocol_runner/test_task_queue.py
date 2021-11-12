@@ -1,5 +1,6 @@
 """Tests for TaskQueue."""
 import asyncio
+import pytest
 from decoy import Decoy
 from opentrons.protocol_runner.task_queue import TaskQueue
 
@@ -100,3 +101,21 @@ async def test_start_runs_stuff_once(decoy: Decoy) -> None:
 
     decoy.verify(await run_func(), times=1)
     decoy.verify(await cleanup_func(error=None), times=1)
+
+
+async def test_stop(decoy: Decoy) -> None:
+    """Calling `stop` cancel and allow `join` to finish."""
+    run_func = decoy.mock(is_async=True)
+    cleanup_func = decoy.mock(is_async=True)
+
+    subject = TaskQueue()
+    subject.set_run_func(func=run_func)
+    subject.set_cleanup_func(func=cleanup_func)
+    subject.start()
+    subject.stop()
+
+    with pytest.raises(asyncio.CancelledError):
+        await subject.join()
+
+    decoy.verify(await run_func(), times=0)
+    decoy.verify(await cleanup_func(error=None), times=0)
