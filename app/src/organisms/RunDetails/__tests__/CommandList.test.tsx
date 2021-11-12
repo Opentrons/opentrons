@@ -31,22 +31,14 @@ const mockCommandItem = CommandItem as jest.MockedFunction<typeof CommandItem>
 const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolFile<{}>
 const _fixtureAnalysis = (fixtureAnalysis as unknown) as ProtocolFile<{}>
 
-const render = (props: React.ComponentProps<typeof CommandList>) => {
-  return renderWithProviders(<CommandList {...props} />, {
+const render = () => {
+  return renderWithProviders(<CommandList />, {
     i18nInstance: i18n,
   })[0]
 }
 
 describe('CommandList', () => {
-  let props: React.ComponentProps<typeof CommandList>
-
   beforeEach(() => {
-    props = {
-      inProgress: '5abc123',
-      completed: '4abc123',
-      anticipated: '6abc123',
-      isFailed: false,
-    }
     when(mockUseProtocolDetails).calledWith().mockReturnValue({
       protocolData: simpleV6Protocol,
       displayName: 'mock display name',
