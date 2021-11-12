@@ -18,7 +18,7 @@ from robot_server.runs.run_models import Run, RunUpdate, RunCommandSummary
 
 from robot_server.runs.action_models import (
     RunAction,
-    RunActionCreateData,
+    RunActionCreate,
     RunActionType,
 )
 
@@ -173,7 +173,7 @@ def test_create_action(current_time: datetime) -> None:
         is_current=True,
     )
 
-    command_data = RunActionCreateData(
+    command_data = RunActionCreate(
         actionType=RunActionType.PLAY,
     )
 
