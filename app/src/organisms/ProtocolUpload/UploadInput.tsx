@@ -30,6 +30,7 @@ import {
   FONT_SIZE_BODY_1,
   SPACING_2,
   JUSTIFY_START,
+  Btn,
 } from '@opentrons/components'
 import { css } from 'styled-components'
 import { Trans, useTranslation } from 'react-i18next'
@@ -40,10 +41,8 @@ import { getConnectedRobotName } from '../../redux/robot/selectors'
 import { Divider } from '../../atoms/structure'
 import { useRunQuery } from '@opentrons/react-api-client'
 import { useProtocolDetails } from '../RunDetails/hooks'
-import { useCloneRun } from './hooks'
 import { RerunningProtocolModal } from './RerunningProtocolModal'
-
-// REMEMBER TO GET CORRECT UPLOAD ICON- ASK EMILY
+import { useCloneRun } from './hooks'
 
 const PROTOCOL_LIBRARY_URL = 'https://protocols.opentrons.com'
 const PROTOCOL_DESIGNER_URL = 'https://designer.opentrons.com'
@@ -79,12 +78,13 @@ export interface UploadInputProps {
 
 const FILE_NAME = 'File name' //  TODO IMMEDIATELY wait for CPX to add this!
 
-export function UploadInput(props: UploadInputProps): JSX.Element {
+export function UploadInput(props: UploadInputProps): JSX.Element | null {
   const { t } = useTranslation('protocol_info')
   const mostRecentRun = useMostRecentRunId()
   const runQuery = useRunQuery(mostRecentRun)
-  const robotName = useSelector((state: State) => getConnectedRobotName(state))
   const protocolData = useProtocolDetails()
+  const robotName = useSelector((state: State) => getConnectedRobotName(state))
+  const cloneRun = useCloneRun(mostRecentRun != null ? mostRecentRun : '')
   const fileInput = React.useRef<HTMLInputElement>(null)
   const [isFileOverDropZone, setIsFileOverDropZone] = React.useState<boolean>(
     false
@@ -92,9 +92,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element {
   const [rerunningProtocolModal, setRerunningProtocolModal] = React.useState(
     false
   )
-  const fullRunTimestamp = runQuery.data?.data.createdAt
-  if (fullRunTimestamp == null) return <Text>----</Text>
-  const runTimestamp = fullRunTimestamp.split('T')
+
   const labwareOffsets = runQuery.data?.data.labwareOffsets
   const protocolName = protocolData.displayName
 
@@ -135,6 +133,17 @@ export function UploadInput(props: UploadInputProps): JSX.Element {
         ${DROP_ZONE_STYLES} ${DRAG_OVER_STYLES}
       `
     : DROP_ZONE_STYLES
+
+  const fullRunTimestamp = runQuery.data?.data.createdAt
+  const indexToSplit = fullRunTimestamp?.indexOf('T')
+  if (fullRunTimestamp == null) return null
+  const date = fullRunTimestamp?.slice(0, indexToSplit)
+  const timeAndUTC =
+    indexToSplit != null ? fullRunTimestamp?.slice(indexToSplit + 1) : ''
+  const timeToSplit = timeAndUTC.indexOf('.')
+  const time = timeAndUTC.slice(0, timeToSplit)
+
+  const UTC = timeAndUTC?.slice(timeToSplit + 7)
 
   return (
     <Flex
@@ -197,15 +206,15 @@ export function UploadInput(props: UploadInputProps): JSX.Element {
               i18nKey="robotName_last_run"
               values={{ robot_name: robotName }}
             />
-            <Link
-              role={'link'}
+            <Btn
+              as={Link}
               fontSize={FONT_SIZE_BODY_1}
               color={C_BLUE}
               onClick={() => setRerunningProtocolModal(true)}
               id={'RerunningProtocol_Modal'}
             >
               {t('rerunning_protocol_modal_title')}
-            </Link>
+            </Btn>
           </Flex>
           <Flex
             flexDirection={DIRECTION_ROW}
@@ -240,7 +249,11 @@ export function UploadInput(props: UploadInputProps): JSX.Element {
               >
                 {t('run_timestamp_title')}
               </Text>
-              <Flex css={FONT_BODY_1_DARK}>{runTimestamp}</Flex>
+              <Flex css={FONT_BODY_1_DARK} flexDirection={DIRECTION_ROW}>
+                <Flex marginRight={SPACING_1}>{date}</Flex>
+                <Flex marginRight={SPACING_1}>{time}</Flex>
+                <Flex>{UTC}</Flex>
+              </Flex>
             </Flex>
             <Flex
               flex={'auto'}
@@ -255,7 +268,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element {
                 {t('labware_offset_data_title')}
               </Text>
               <Flex css={FONT_BODY_1_DARK}>
-                {labwareOffsets != null && labwareOffsets.length == 0 ? (
+                {labwareOffsets != null && labwareOffsets.length === 0 ? (
                   <Text>{t('no_labware_offset_Data')}</Text>
                 ) : (
                   labwareOffsets != null && (
@@ -270,7 +283,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element {
             </Flex>
             <Flex>
               <SecondaryBtn
-                onClick={useCloneRun(mostRecentRun)}
+                onClick={cloneRun}
                 color={C_BLUE}
                 id={'UploadInput_runAgainButton'}
               >

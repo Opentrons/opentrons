@@ -17,7 +17,6 @@ import {
   FONT_HEADER_DARK,
   FONT_BODY_1_DARK,
   DIRECTION_ROW,
-  FONT_WEIGHT_SEMIBOLD,
   FONT_SIZE_BODY_1,
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
@@ -31,7 +30,7 @@ interface RerunningProtocolModalProps {
   onCloseClick: () => unknown
 }
 
-const UPLOAD_PROTOCOL_URL = '' //   TODO IMMEDIATELY GET ACTUAL LINK
+const UPLOAD_PROTOCOL_URL = '' //   TODO IMMEDIATELY get actual link - Emily said this url isn't created it
 
 export const RerunningProtocolModal = (
   props: RerunningProtocolModalProps

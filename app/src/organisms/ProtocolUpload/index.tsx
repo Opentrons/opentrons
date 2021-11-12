@@ -38,7 +38,7 @@ export function ProtocolUpload(): JSX.Element {
   } = useCurrentProtocolRun()
   const hasCurrentRun = runRecord != null && protocolRecord != null
   const closeProtocolRun = useCloseCurrentRun()
-   const robotName = useSelector((state: State) => getConnectedRobotName(state))
+  const robotName = useSelector((state: State) => getConnectedRobotName(state))
 
   const logger = useLogger(__filename)
   const [uploadError, setUploadError] = React.useState<
@@ -91,6 +91,7 @@ export function ProtocolUpload(): JSX.Element {
     : {
         title: (
           <Trans
+            id={'file_input'}
             t={t}
             i18nKey="upload_and_simulate"
             values={{ robot_name: robotName }}

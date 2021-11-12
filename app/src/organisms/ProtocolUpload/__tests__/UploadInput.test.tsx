@@ -1,10 +1,46 @@
 import * as React from 'react'
+import { when } from 'jest-when'
 import '@testing-library/jest-dom'
 import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
-
+import {
+  componentPropsMatcher,
+  renderWithProviders,
+} from '@opentrons/components'
 import { i18n } from '../../../i18n'
+import * as RobotSelectors from '../../../redux/robot/selectors'
+import { useProtocolDetails } from '../../RunDetails/hooks'
 import { UploadInput } from '../UploadInput'
+import { useMostRecentRunId } from '../hooks/useMostRecentRunId'
+import { useRunQuery } from '@opentrons/react-api-client'
+import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
+import { RerunningProtocolModal } from '../RerunningProtocolModal'
+import { useCloneRun } from '../hooks'
+import type { ProtocolFile } from '@opentrons/shared-data'
+
+jest.mock('../hooks/useMostRecentRunId')
+jest.mock('@opentrons/react-api-client')
+jest.mock('../../RunDetails/hooks')
+jest.mock('../../../redux/robot/selectors')
+jest.mock('../hooks')
+jest.mock('../RerunningProtocolModal')
+
+const mockUseMostRecentRunId = useMostRecentRunId as jest.MockedFunction<
+  typeof useMostRecentRunId
+>
+const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
+const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
+  typeof useProtocolDetails
+>
+const mockGetConnectedRobotName = RobotSelectors.getConnectedRobotName as jest.MockedFunction<
+  typeof RobotSelectors.getConnectedRobotName
+>
+const mockUseCloneRun = useCloneRun as jest.MockedFunction<typeof useCloneRun>
+
+const mockRerunningProtoolModal = RerunningProtocolModal as jest.MockedFunction<
+  typeof RerunningProtocolModal
+>
+
+const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolFile<{}>
 
 const render = (props: React.ComponentProps<typeof UploadInput>) => {
   return renderWithProviders(<UploadInput onUpload={props.onUpload} />, {
@@ -19,8 +55,33 @@ describe('UploadInput', () => {
     props = {
       onUpload: jest.fn(),
     }
+    mockGetConnectedRobotName.mockReturnValue('robotName')
+    mockUseMostRecentRunId.mockReturnValue('RunId')
+    when(mockUseProtocolDetails).calledWith().mockReturnValue({
+      protocolData: simpleV6Protocol,
+      displayName: 'mock display name',
+    })
+    when(mockUseRunQuery)
+      .calledWith('RunId')
+      .mockReturnValue({
+        data: {
+          data: {
+            createdAt: '2021-11-12T19:39:19.668514+00:00',
+            labwareOffsets: [{ x: 5, y: 5, z: 5 }],
+          },
+        },
+      } as any)
+    mockUseCloneRun.mockReturnValue(jest.fn())
   })
-
+  when(mockRerunningProtoolModal)
+    .calledWith(
+      componentPropsMatcher({
+        onCloseClick: expect.anything(),
+      })
+    )
+    .mockImplementation(({ onCloseClick }) => (
+      <div onClick={onCloseClick}>Mock Rerunning Protocol Modal</div>
+    ))
   afterEach(() => {
     jest.resetAllMocks()
   })
@@ -28,9 +89,6 @@ describe('UploadInput', () => {
   it('renders correct contents for empty state', () => {
     const { getByRole } = render(props)
 
-    expect(getByRole('heading')).toHaveTextContent(
-      /Open a protocol to get started/i
-    )
     expect(getByRole('button', { name: 'Choose File...' })).toBeTruthy()
     expect(
       getByRole('button', { name: 'Drag and drop protocol file here' })
@@ -39,9 +97,11 @@ describe('UploadInput', () => {
       /Don't have a protocol yet\?/i
     )
     expect(
-      getByRole('link', { name: 'Browse Our Protocol Library' })
+      getByRole('link', { name: 'Launch Opentrons Protocol library' })
     ).toBeTruthy()
-    expect(getByRole('link', { name: 'Launch Protocol Designer' })).toBeTruthy()
+    expect(
+      getByRole('link', { name: 'Launch Opentrons Protocol Designer' })
+    ).toBeTruthy()
   })
 
   it('opens file select on button click', () => {
@@ -58,4 +118,49 @@ describe('UploadInput', () => {
     fireEvent.change(input, { target: { files: ['dummyFile'] } })
     expect(props.onUpload).toHaveBeenCalledWith('dummyFile')
   })
+  it('renders empty state when no previous protocol was uploaded', () => {
+    const { getByText, getByRole } = render(props)
+    mockUseMostRecentRunId.mockReturnValue(null)
+    getByText('Launch Opentrons Protocol library')
+    getByText('Launch Opentrons Protocol Designer')
+    getByText('Drag and drop protocol file here')
+    expect(getByRole('complementary')).toHaveTextContent(
+      /Don't have a protocol yet\?/i
+    )
+  })
+  it('renders the correct latest protocol uplaoded info', () => {
+    const { getByText } = render(props)
+    getByText('robotName’s last run')
+    getByText('mock display name')
+    getByText('Protocol name')
+    getByText('Run timestamp')
+    getByText('2021-11-12')
+    getByText('19:39:19')
+    getByText('+00:00')
+    getByText('Labware Offset data')
+    getByText('1 Labware Offsets')
+    getByText('See How Rerunning a protocol works')
+    getByText('Run again')
+  })
+  it('renders No Offset data', () => {
+    when(mockUseRunQuery)
+      .calledWith('RunId')
+      .mockReturnValue({
+        data: {
+          data: {
+            createdAt: 'createdAt this time',
+            labwareOffsets: [],
+          },
+        },
+      } as any)
+    const { getByText } = render(props)
+    getByText('No Labware Offset data')
+  })
+  it('clicks on run again button', () => {
+    const { getByRole } = render(props)
+    const button = getByRole('button', { name: 'Run again' })
+    fireEvent.click(button)
+  })
+  //  TODO immediately: wait for CPX to add fileName
+  it.todo('renders file Name when protocol display name is null')
 })
