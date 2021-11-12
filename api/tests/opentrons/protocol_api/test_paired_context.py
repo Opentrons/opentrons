@@ -5,6 +5,7 @@ from opentrons.hardware_control import API
 from opentrons.types import Mount, Point, Location
 from opentrons.protocol_api import paired_instrument_context as pc
 from opentrons.hardware_control.pipette import Pipette
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 
 
 @pytest.fixture
@@ -381,3 +382,102 @@ def test_touch_tip_disabled(ctx, monkeypatch, get_labware_fixture):
     monkeypatch.setattr(API, "move_to", move_mock)
     paired.touch_tip(trough_lw["A1"])
     move_mock.assert_not_called()
+
+
+@pytest.fixture(scope="function")
+def tiprack1(ctx):
+    yield ctx.load_labware("opentrons_96_tiprack_300ul", 1)
+
+
+@pytest.fixture(scope="function")
+def tiprack2(ctx):
+    yield ctx.load_labware("opentrons_96_tiprack_300ul", 2)
+
+
+@pytest.fixture(scope="function")
+def tiprack3(ctx):
+    yield ctx.load_labware("opentrons_96_tiprack_300ul", 3)
+
+
+@pytest.fixture(scope="function")
+@pytest.mark.parametrize(
+    "tiprack1, tiprack2",
+    [pytest.lazy_fixture("tiprack1"), pytest.lazy_fixture("tiprack2")],
+)
+def tiprack_order_1(tiprack1, tiprack2):
+    yield [tiprack1, tiprack2]
+
+
+@pytest.fixture(scope="function")
+@pytest.mark.parametrize(
+    "tiprack2, tiprack3",
+    [pytest.lazy_fixture("tiprack2"), pytest.lazy_fixture("tiprack3")],
+)
+def tiprack_order_2(tiprack2, tiprack3):
+    yield [tiprack2, tiprack3]
+
+
+@pytest.fixture(scope="function")
+@pytest.mark.parametrize(
+    "tiprack1, tiprack2, tiprack3",
+    [
+        pytest.lazy_fixture("tiprack1"),
+        pytest.lazy_fixture("tiprack2"),
+        pytest.lazy_fixture("tiprack3"),
+    ],
+)
+def tiprack_order_3(tiprack1, tiprack2, tiprack3):
+    yield [tiprack1, tiprack2, tiprack3]
+
+
+@pytest.fixture(scope="function")
+@pytest.mark.parametrize("tiprack1", [pytest.lazy_fixture("tiprack1")])
+def tiprack_order_4(tiprack1):
+    yield [tiprack1]
+
+
+@pytest.fixture(scope="function")
+@pytest.mark.parametrize(
+    "tiprack1, tiprack3",
+    [pytest.lazy_fixture("tiprack1"), pytest.lazy_fixture("tiprack3")],
+)
+def tiprack_order_5(tiprack1, tiprack3):
+    yield [tiprack1, tiprack3]
+
+
+@pytest.fixture(scope="function")
+@pytest.mark.parametrize(
+    "tiprack2, tiprack3",
+    [pytest.lazy_fixture("tiprack2"), pytest.lazy_fixture("tiprack3")],
+)
+def tiprack_order_6(tiprack2, tiprack3):
+    yield [tiprack3, tiprack2]
+
+
+@pytest.mark.parametrize(
+    "right_tipracks, left_tipracks, expected_tipracks",
+    argvalues=[
+        (
+            pytest.lazy_fixture("tiprack_order_3"),
+            pytest.lazy_fixture("tiprack_order_2"),
+            pytest.lazy_fixture("tiprack_order_2"),
+        ),
+        (
+            pytest.lazy_fixture("tiprack_order_4"),
+            pytest.lazy_fixture("tiprack_order_3"),
+            pytest.lazy_fixture("tiprack_order_4"),
+        ),
+        (
+            pytest.lazy_fixture("tiprack_order_2"),
+            pytest.lazy_fixture("tiprack_order_6"),
+            pytest.lazy_fixture("tiprack_order_2"),
+        ),
+    ],
+)
+def test_tiprack_ordering(right_tipracks, left_tipracks, expected_tipracks, ctx):
+    right = ctx.load_instrument("p300_multi", Mount.RIGHT, tip_racks=right_tipracks)
+    left = ctx.load_instrument("p300_multi", Mount.LEFT, tip_racks=left_tipracks)
+
+    paired_object = right.pair_with(left)
+
+    assert paired_object.tip_racks == expected_tipracks
