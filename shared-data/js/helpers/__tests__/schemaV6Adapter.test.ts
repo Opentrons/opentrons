@@ -1,5 +1,5 @@
-import { schemaV6Adapter } from '../schemaV6Adapter'
-import type { ProtocolResource } from '../../types'
+// import { schemaV6Adapter } from '../schemaV6Adapter'
+// import type { ProtocolResource } from '../../types'
 
 describe('schema v6 adapter', () => {
   // const v6Analysis = {
