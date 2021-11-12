@@ -11,7 +11,7 @@ import { getConnectedRobot } from '../redux/discovery'
 import { useCurrentProtocolRun } from '../organisms/ProtocolUpload/hooks'
 import { NavLocation } from '../redux/nav/types'
 
-function useRunLocation(): NavLocation {
+export function useRunLocation(): NavLocation {
   const { t } = useTranslation('top_navigation')
   const robot = useSelector(getConnectedRobot)
   const pipettesMatch = useSelector(getConnectedRobotPipettesMatch)
@@ -26,7 +26,7 @@ function useRunLocation(): NavLocation {
     disabledReason = t('please_load_a_protocol')
   else if (!pipettesMatch) disabledReason = t('attached_pipettes_do_not_match')
   else if (!pipettesCalibrated) disabledReason = t('pipettes_not_calibrated')
-  else if (!deckCalOk) disabledReason = t('pipettes_not_calibrated')
+  else if (!deckCalOk) disabledReason = t('calibrate_deck_to_proceed')
 
   return {
     id: 'run',
@@ -37,7 +37,7 @@ function useRunLocation(): NavLocation {
   }
 }
 
-export function useNavLocations() {
+export function useNavLocations(): NavLocation[] {
   const isPreProtocolFlowWithoutRPC = useFeatureFlag(
     'preProtocolFlowWithoutRPC'
   )
