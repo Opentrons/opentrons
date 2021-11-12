@@ -88,11 +88,6 @@ class PipetteName(str, Enum):
     P1000_SINGLE_GEN2 = "p1000_single_gen2"
 
 
-# todo(mm, 2021-11-11): Why are LoadedLabware and LoadedPipette defined as BaseModels?
-# I think other classes in here are BaseModels because robot-server uses them as public
-# HTTP types, often as sub-objects of other public HTTP types.
-# But for LoadedPipette and LoadedLabware, wouldn't the canonical HTTP types be
-# LoadPipetteResult and LoadLabwareResult?
 class LoadedPipette(BaseModel):
     """A pipette that has been loaded."""
 
