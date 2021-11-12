@@ -1,5 +1,6 @@
 """Labware state store tests."""
 import pytest
+from datetime import datetime
 from typing import Dict, Optional, cast
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
@@ -393,6 +394,7 @@ def test_get_labware_offset_vector() -> None:
     offset_vector = LabwareOffsetVector(x=1, y=2, z=3)
     offset = LabwareOffset(
         id="offset-id",
+        createdAt=datetime(year=2021, month=1, day=2),
         definitionUri="some-labware-uri",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         offset=offset_vector,

@@ -176,8 +176,13 @@ class ProtocolEngine:
         To retrieve offsets later, see `.state_view.labware`.
         """
         labware_offset_id = self._model_utils.generate_id()
+        created_at = self._model_utils.get_timestamp()
         self._action_dispatcher.dispatch(
-            AddLabwareOffsetAction(labware_offset_id=labware_offset_id, request=request)
+            AddLabwareOffsetAction(
+                labware_offset_id=labware_offset_id,
+                created_at=created_at,
+                request=request,
+            )
         )
         return self.state_view.labware.get_labware_offset(
             labware_offset_id=labware_offset_id

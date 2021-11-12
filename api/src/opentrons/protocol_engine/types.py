@@ -1,4 +1,5 @@
 """Public protocol engine value types and models."""
+from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass
 from pydantic import BaseModel, Field
@@ -121,6 +122,7 @@ class LabwareOffset(BaseModel):
     """
 
     id: str = Field(..., description="Unique labware offset record identifier.")
+    createdAt: datetime = Field(..., description="When this labware offset was added.")
     definitionUri: str = Field(..., description="The URI for the labware's definition.")
     location: LabwareLocation = Field(
         ...,

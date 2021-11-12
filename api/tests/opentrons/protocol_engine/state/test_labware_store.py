@@ -1,6 +1,8 @@
 """Labware state store tests."""
 import pytest
 
+from datetime import datetime
+
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
 from opentrons.protocols.models import LabwareDefinition
@@ -81,13 +83,18 @@ def test_handles_add_labware_offset(
 
     resolved_offset = LabwareOffset(
         id="offset-id",
+        createdAt=datetime(year=2021, month=1, day=2),
         definitionUri="offset-definition-uri",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         offset=LabwareOffsetVector(x=1, y=2, z=3),
     )
 
     subject.handle_action(
-        AddLabwareOffsetAction(labware_offset_id="offset-id", request=request)
+        AddLabwareOffsetAction(
+            labware_offset_id="offset-id",
+            created_at=datetime(year=2021, month=1, day=2),
+            request=request,
+        )
     )
 
     assert subject.state.labware_offsets_by_id == {"offset-id": resolved_offset}
@@ -126,7 +133,11 @@ def test_handles_load_labware(
     )
 
     subject.handle_action(
-        AddLabwareOffsetAction(request=offset_request, labware_offset_id="offset-id")
+        AddLabwareOffsetAction(
+            request=offset_request,
+            labware_offset_id="offset-id",
+            created_at=datetime(year=2021, month=1, day=2),
+        )
     )
     subject.handle_action(UpdateCommandAction(command=command))
 

@@ -1,5 +1,6 @@
 """Test equipment command execution side effects."""
 import pytest
+from datetime import datetime
 from decoy import Decoy, matchers
 from opentrons.calibration_storage.helpers import uri_from_details
 
@@ -98,6 +99,7 @@ async def test_load_labware(
     ).then_return(
         LabwareOffset(
             id="labware-offset-id",
+            createdAt=datetime(year=2021, month=1, day=2),
             definitionUri="opentrons-test/load-name/1",
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
             offset=LabwareOffsetVector(x=1, y=2, z=3),

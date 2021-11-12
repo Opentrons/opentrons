@@ -49,6 +49,7 @@ class AddLabwareOffsetAction:
     """Add a new labware offset, to apply to subsequent `LoadLabwareCommand`s."""
 
     labware_offset_id: str
+    created_at: datetime
     request: LabwareOffsetCreate
 
 
