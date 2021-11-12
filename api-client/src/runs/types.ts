@@ -1,3 +1,5 @@
+import { Command as FullCommand } from '@opentrons/shared-data'
+
 export const RUN_STATUS_IDLE: 'idle' = 'idle'
 export const RUN_STATUS_RUNNING: 'running' = 'running'
 export const RUN_STATUS_PAUSE_REQUESTED: 'pause-requested' = 'pause-requested'
@@ -22,8 +24,8 @@ export interface RunData {
   createdAt: string
   status: RunStatus
   actions: RunAction[]
-  // TODO(bh, 10-29-2021): types for commands, pipettes, labware
-  commands: unknown[]
+  commands: RunCommandSummary[]
+  // TODO(bh, 11-12-2021): types for pipettes, labware
   pipettes: unknown[]
   labware: unknown[]
   protocolId?: string
@@ -91,4 +93,9 @@ export interface Command {
 export interface Commands {
   data: RunCommandSummary[]
   links?: ResourceLinks
+}
+
+export interface CommandDetail {
+  data: FullCommand
+  links: ResourceLinks | null
 }
