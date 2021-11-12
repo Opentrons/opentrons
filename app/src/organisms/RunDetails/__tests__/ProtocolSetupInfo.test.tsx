@@ -7,7 +7,7 @@ import { i18n } from '../../../i18n'
 import * as discoverySelectors from '../../../redux/discovery/selectors'
 import { ProtocolPipetteTipRackCalDataByMount } from '../../../redux/pipettes/types'
 import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
-import { mockProtocolPipetteTipRackCalInfo } from '../../../redux/pipettes/__fixtures__'
+import { mockPipetteInfo } from '../../../redux/pipettes/__fixtures__'
 import { getProtocolPipetteTipRackCalInfo } from '../../../redux/pipettes'
 import { ProtocolSetupInfo } from '../ProtocolSetupInfo'
 import { CommandItem, Status } from '../CommandItem'
@@ -133,7 +133,7 @@ const mockLabwarePositionCheckStepTipRack = {
 } as any
 
 const mockProtocolPipetteTipRackCalData: ProtocolPipetteTipRackCalDataByMount = {
-  left: mockProtocolPipetteTipRackCalInfo,
+  left: mockPipetteInfo,
   right: null,
 } as any
 

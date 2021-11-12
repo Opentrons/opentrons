@@ -24,7 +24,7 @@ import {
 } from '@opentrons/components'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { useProtocolDetails } from './hooks'
-import { useCurrentProtocolRun } from '../ProtocolUpload/useCurrentProtocolRun'
+import { useCurrentProtocolRun } from '../ProtocolUpload/hooks'
 import { ProtocolSetupInfo } from './ProtocolSetupInfo'
 import { CommandItem } from './CommandItem'
 import { ProtocolFile } from '@opentrons/shared-data'
