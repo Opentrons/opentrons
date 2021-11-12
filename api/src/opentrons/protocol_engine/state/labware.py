@@ -84,7 +84,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
         if isinstance(action, UpdateCommandAction):
             self._handle_command(action.command)
         elif isinstance(action, AddLabwareOffsetAction):
-            labware_offset =  LabwareOffset(
+            labware_offset = LabwareOffset(
                 id=action.labware_offset_id,
                 definitionUri=action.request.definitionUri,
                 location=action.request.location,
