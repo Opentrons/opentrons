@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when } from 'jest-when'
 import '@testing-library/jest-dom'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import {
   componentPropsMatcher,
   renderWithProviders,
@@ -36,7 +36,7 @@ const mockGetConnectedRobotName = RobotSelectors.getConnectedRobotName as jest.M
 >
 const mockUseCloneRun = useCloneRun as jest.MockedFunction<typeof useCloneRun>
 
-const mockRerunningProtoolModal = RerunningProtocolModal as jest.MockedFunction<
+const mockRerunningProtocolModal = RerunningProtocolModal as jest.MockedFunction<
   typeof RerunningProtocolModal
 >
 
@@ -73,7 +73,7 @@ describe('UploadInput', () => {
       } as any)
     mockUseCloneRun.mockReturnValue(jest.fn())
   })
-  when(mockRerunningProtoolModal)
+  when(mockRerunningProtocolModal)
     .calledWith(
       componentPropsMatcher({
         onCloseClick: expect.anything(),
@@ -97,7 +97,7 @@ describe('UploadInput', () => {
       /Don't have a protocol yet\?/i
     )
     expect(
-      getByRole('link', { name: 'Launch Opentrons Protocol library' })
+      getByRole('link', { name: 'Launch Opentrons Protocol Library' })
     ).toBeTruthy()
     expect(
       getByRole('link', { name: 'Launch Opentrons Protocol Designer' })
@@ -121,7 +121,7 @@ describe('UploadInput', () => {
   it('renders empty state when no previous protocol was uploaded', () => {
     const { getByText, getByRole } = render(props)
     mockUseMostRecentRunId.mockReturnValue(null)
-    getByText('Launch Opentrons Protocol library')
+    getByText('Launch Opentrons Protocol Library')
     getByText('Launch Opentrons Protocol Designer')
     getByText('Drag and drop protocol file here')
     expect(getByRole('complementary')).toHaveTextContent(
@@ -139,7 +139,7 @@ describe('UploadInput', () => {
     getByText('+00:00')
     getByText('Labware Offset data')
     getByText('1 Labware Offsets')
-    getByText('See How Rerunning a protocol works')
+    getByText('See How Rerunning a Protocol Works')
     getByText('Run again')
   })
   it('renders No Offset data', () => {
@@ -156,10 +156,44 @@ describe('UploadInput', () => {
     const { getByText } = render(props)
     getByText('No Labware Offset data')
   })
-  it('clicks on run again button', () => {
+  it('renders run again button', () => {
     const { getByRole } = render(props)
+    mockUseCloneRun.mockReturnValue(jest.fn())
     const button = getByRole('button', { name: 'Run again' })
+    expect(button).not.toBeDisabled()
     fireEvent.click(button)
+  })
+  it('renders correct link text', () => {
+    const { getByRole } = render(props)
+    getByRole('link', {
+      name: 'See How Rerunning a Protocol Works',
+    })
+    expect(screen.queryByText('Mock Rerunning Protocol Modal')).toBeNull()
+  })
+  it('renders modal when link is clicked', () => {
+    mockRerunningProtocolModal.mockReturnValue(
+      <div>Mock Rerunning Protocol Modal</div>
+    )
+    const { getByText, getByRole } = render(props)
+    const openModal = getByRole('link', {
+      name: 'See How Rerunning a Protocol Works',
+    })
+    fireEvent.click(openModal)
+    getByText('Mock Rerunning Protocol Modal')
+  })
+  it('renders null if run timestamp is null', () => {
+    when(mockUseRunQuery)
+      .calledWith('RunId')
+      .mockReturnValue({
+        data: {
+          data: {
+            createdAt: null,
+            labwareOffsets: [],
+          },
+        },
+      } as any)
+    const { container } = render(props)
+    expect(container.firstChild).toBeNull()
   })
   //  TODO immediately: wait for CPX to add fileName
   it.todo('renders file Name when protocol display name is null')

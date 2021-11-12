@@ -29,6 +29,9 @@ describe('RerunningProtocolModal', () => {
     getByText(
       'Clicking “Run Again” will take you directly to the Run tab. If you’d like to review the deck setup or run Labware Position Check before running the protocol, navigate to the Protocol tab.'
     )
+    getByText(
+      'If you recalibrate your robot, it will clear the last run from the upload page.'
+    )
   })
 
   it('should render a link to robot cal', () => {
@@ -37,7 +40,7 @@ describe('RerunningProtocolModal', () => {
       getByRole('link', {
         name: 'Learn more about Labware Offset Data',
       }).getAttribute('href')
-    ).toBe('') //   TODO IMMEDIATELY replace with actual link
+    ).toBe('#') //   TODO IMMEDIATELY replace with actual link
   })
   it('should call onCloseClick when the close button is pressed', () => {
     const { getByRole } = render(props)

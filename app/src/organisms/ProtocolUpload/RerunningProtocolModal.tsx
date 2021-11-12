@@ -30,7 +30,7 @@ interface RerunningProtocolModalProps {
   onCloseClick: () => unknown
 }
 
-const UPLOAD_PROTOCOL_URL = '' //   TODO IMMEDIATELY get actual link - Emily said this url isn't created it
+const UPLOAD_PROTOCOL_URL = '#' //   TODO IMMEDIATELY get actual link - Emily said this url isn't created it
 
 export const RerunningProtocolModal = (
   props: RerunningProtocolModalProps

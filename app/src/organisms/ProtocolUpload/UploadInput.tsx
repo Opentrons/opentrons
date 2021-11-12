@@ -30,7 +30,6 @@ import {
   FONT_SIZE_BODY_1,
   SPACING_2,
   JUSTIFY_START,
-  Btn,
 } from '@opentrons/components'
 import { css } from 'styled-components'
 import { Trans, useTranslation } from 'react-i18next'
@@ -83,8 +82,8 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
   const mostRecentRun = useMostRecentRunId()
   const runQuery = useRunQuery(mostRecentRun)
   const protocolData = useProtocolDetails()
-  const robotName = useSelector((state: State) => getConnectedRobotName(state))
   const cloneRun = useCloneRun(mostRecentRun != null ? mostRecentRun : '')
+  const robotName = useSelector((state: State) => getConnectedRobotName(state))
   const fileInput = React.useRef<HTMLInputElement>(null)
   const [isFileOverDropZone, setIsFileOverDropZone] = React.useState<boolean>(
     false
@@ -136,7 +135,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
 
   const fullRunTimestamp = runQuery.data?.data.createdAt
   const indexToSplit = fullRunTimestamp?.indexOf('T')
-  if (fullRunTimestamp == null) return null
+  if (fullRunTimestamp == null) return null //  This state should never be reached since if null, protocol empty state won't show latest protocol run data
   const date = fullRunTimestamp?.slice(0, indexToSplit)
   const timeAndUTC =
     indexToSplit != null ? fullRunTimestamp?.slice(indexToSplit + 1) : ''
@@ -193,106 +192,107 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
           onChange={onChange}
         />
       </label>
-      {mostRecentRun === null ? null : (
-        <Flex flexDirection={DIRECTION_COLUMN} width={'80%'}>
-          <Divider marginY={SPACING_3} />
-          <Flex
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
-            flex={'auto'}
-            marginBottom={SPACING_2}
+      {/* {mostRecentRun === null ? null : ( */}
+      <Flex flexDirection={DIRECTION_COLUMN} width={'80%'}>
+        <Divider marginY={SPACING_3} />
+        <Flex
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          flex={'auto'}
+          marginBottom={SPACING_2}
+        >
+          <Trans
+            t={t}
+            i18nKey="robotName_last_run"
+            values={{ robot_name: robotName }}
+          />
+          <Link
+            role={'link'}
+            fontSize={FONT_SIZE_BODY_1}
+            color={C_BLUE}
+            onClick={() => setRerunningProtocolModal(true)}
+            id={'RerunningProtocol_Modal'}
+            data-testid={'RerunningProtocol_ModalLink'}
           >
-            <Trans
-              t={t}
-              i18nKey="robotName_last_run"
-              values={{ robot_name: robotName }}
-            />
-            <Btn
-              as={Link}
-              fontSize={FONT_SIZE_BODY_1}
-              color={C_BLUE}
-              onClick={() => setRerunningProtocolModal(true)}
-              id={'RerunningProtocol_Modal'}
+            {t('rerunning_protocol_modal_title')}
+          </Link>
+        </Flex>
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          alignItems={ALIGN_CENTER}
+          marginBottom={SPACING_4}
+        >
+          <Flex
+            flex={'auto'}
+            flexDirection={DIRECTION_COLUMN}
+            justifyContent={JUSTIFY_CENTER}
+          >
+            <Text
+              marginBottom={SPACING_1}
+              color={C_MED_GRAY}
+              fontSize={FONT_SIZE_CAPTION}
             >
-              {t('rerunning_protocol_modal_title')}
-            </Btn>
+              {t('protocol_name_title')}
+            </Text>
+            <Flex css={FONT_BODY_1_DARK}>
+              {protocolName != null ? protocolName : <Text>{FILE_NAME}</Text>}
+            </Flex>
           </Flex>
           <Flex
-            flexDirection={DIRECTION_ROW}
-            alignItems={ALIGN_CENTER}
-            marginBottom={SPACING_4}
+            flex={'auto'}
+            flexDirection={DIRECTION_COLUMN}
+            justifyContent={JUSTIFY_CENTER}
           >
-            <Flex
-              flex={'auto'}
-              flexDirection={DIRECTION_COLUMN}
-              justifyContent={JUSTIFY_CENTER}
+            <Text
+              marginBottom={SPACING_1}
+              color={C_MED_GRAY}
+              fontSize={FONT_SIZE_CAPTION}
             >
-              <Text
-                marginBottom={SPACING_1}
-                color={C_MED_GRAY}
-                fontSize={FONT_SIZE_CAPTION}
-              >
-                {t('protocol_name_title')}
-              </Text>
-              <Flex css={FONT_BODY_1_DARK}>
-                {protocolName != null ? protocolName : <Text>{FILE_NAME}</Text>}
-              </Flex>
+              {t('run_timestamp_title')}
+            </Text>
+            <Flex css={FONT_BODY_1_DARK} flexDirection={DIRECTION_ROW}>
+              <Flex marginRight={SPACING_1}>{date}</Flex>
+              <Flex marginRight={SPACING_1}>{time}</Flex>
+              <Flex>{UTC}</Flex>
             </Flex>
-            <Flex
-              flex={'auto'}
-              flexDirection={DIRECTION_COLUMN}
-              justifyContent={JUSTIFY_CENTER}
+          </Flex>
+          <Flex
+            flex={'auto'}
+            flexDirection={DIRECTION_COLUMN}
+            justifyContent={JUSTIFY_CENTER}
+          >
+            <Text
+              marginBottom={SPACING_1}
+              color={C_MED_GRAY}
+              fontSize={FONT_SIZE_CAPTION}
             >
-              <Text
-                marginBottom={SPACING_1}
-                color={C_MED_GRAY}
-                fontSize={FONT_SIZE_CAPTION}
-              >
-                {t('run_timestamp_title')}
-              </Text>
-              <Flex css={FONT_BODY_1_DARK} flexDirection={DIRECTION_ROW}>
-                <Flex marginRight={SPACING_1}>{date}</Flex>
-                <Flex marginRight={SPACING_1}>{time}</Flex>
-                <Flex>{UTC}</Flex>
-              </Flex>
+              {t('labware_offset_data_title')}
+            </Text>
+            <Flex css={FONT_BODY_1_DARK}>
+              {labwareOffsets != null && labwareOffsets.length === 0 ? (
+                <Text>{t('no_labware_offset_Data')}</Text>
+              ) : (
+                labwareOffsets != null && (
+                  <Trans
+                    t={t}
+                    i18nKey="labware_offsets_info"
+                    values={{ number: labwareOffsets.length }}
+                  />
+                )
+              )}
             </Flex>
-            <Flex
-              flex={'auto'}
-              flexDirection={DIRECTION_COLUMN}
-              justifyContent={JUSTIFY_CENTER}
+          </Flex>
+          <Flex>
+            <SecondaryBtn
+              onClick={() => cloneRun}
+              color={C_BLUE}
+              id={'UploadInput_runAgainButton'}
             >
-              <Text
-                marginBottom={SPACING_1}
-                color={C_MED_GRAY}
-                fontSize={FONT_SIZE_CAPTION}
-              >
-                {t('labware_offset_data_title')}
-              </Text>
-              <Flex css={FONT_BODY_1_DARK}>
-                {labwareOffsets != null && labwareOffsets.length === 0 ? (
-                  <Text>{t('no_labware_offset_Data')}</Text>
-                ) : (
-                  labwareOffsets != null && (
-                    <Trans
-                      t={t}
-                      i18nKey="labware_offsets_info"
-                      values={{ number: labwareOffsets.length }}
-                    />
-                  )
-                )}
-              </Flex>
-            </Flex>
-            <Flex>
-              <SecondaryBtn
-                onClick={cloneRun}
-                color={C_BLUE}
-                id={'UploadInput_runAgainButton'}
-              >
-                {t('run_again_btn')}
-              </SecondaryBtn>
-            </Flex>
+              {t('run_again_btn')}
+            </SecondaryBtn>
           </Flex>
         </Flex>
-      )}
+      </Flex>
+      {/* )} */}
       <hr style={{ borderTop: `1px solid ${C_LIGHT_GRAY}`, width: '80%' }} />
       <Text
         role="complementary"
