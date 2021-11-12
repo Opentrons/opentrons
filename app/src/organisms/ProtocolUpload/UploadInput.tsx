@@ -26,6 +26,10 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   FONT_SIZE_CAPTION,
   FONT_BODY_1_DARK,
+  SecondaryBtn,
+  FONT_SIZE_BODY_1,
+  SPACING_2,
+  JUSTIFY_START,
 } from '@opentrons/components'
 import { css } from 'styled-components'
 import { Trans, useTranslation } from 'react-i18next'
@@ -37,6 +41,7 @@ import { Divider } from '../../atoms/structure'
 import { useRunQuery } from '@opentrons/react-api-client'
 import { useProtocolDetails } from '../RunDetails/hooks'
 import { useCloneRun } from './hooks'
+import { RerunningProtocolModal } from './RerunningProtocolModal'
 
 // REMEMBER TO GET CORRECT UPLOAD ICON- ASK EMILY
 
@@ -72,13 +77,14 @@ export interface UploadInputProps {
   onUpload: (file: File) => unknown
 }
 
+const FILE_NAME = 'File name' //  TODO IMMEDIATELY wait for CPX to add this!
+
 export function UploadInput(props: UploadInputProps): JSX.Element {
   const { t } = useTranslation('protocol_info')
-  // const mostRecentRun = useMostRecentRunId()
-  // const runQuery = useRunQuery(mostRecentRun)
+  const mostRecentRun = useMostRecentRunId()
+  const runQuery = useRunQuery(mostRecentRun)
   const robotName = useSelector((state: State) => getConnectedRobotName(state))
   const protocolData = useProtocolDetails()
-  // const cloneRun = useCloneRun(mostRecentRun) => void
   const fileInput = React.useRef<HTMLInputElement>(null)
   const [isFileOverDropZone, setIsFileOverDropZone] = React.useState<boolean>(
     false
@@ -86,8 +92,11 @@ export function UploadInput(props: UploadInputProps): JSX.Element {
   const [rerunningProtocolModal, setRerunningProtocolModal] = React.useState(
     false
   )
-  // const runTimestamp = runQuery.dataUpdatedAt
-  // const protocolName = protocolData.displayName
+  const fullRunTimestamp = runQuery.data?.data.createdAt
+  if (fullRunTimestamp == null) return <Text>----</Text>
+  const runTimestamp = fullRunTimestamp.split('T')
+  const labwareOffsets = runQuery.data?.data.labwareOffsets
+  const protocolName = protocolData.displayName
 
   const handleDrop: React.DragEventHandler<HTMLLabelElement> = e => {
     e.preventDefault()
@@ -134,11 +143,11 @@ export function UploadInput(props: UploadInputProps): JSX.Element {
       justifyContent={JUSTIFY_CENTER}
       alignItems={ALIGN_CENTER}
     >
-      {/* {rerunningProtocolModal && (
-          <DeckCalibrationModal
-            onCloseClick={() => setHelpModalIsOpen(false)}
-          />
-        )} */}
+      {rerunningProtocolModal && (
+        <RerunningProtocolModal
+          onCloseClick={() => setRerunningProtocolModal(false)}
+        />
+      )}
       <PrimaryBtn
         onClick={handleClick}
         marginBottom={SPACING_4}
@@ -175,10 +184,14 @@ export function UploadInput(props: UploadInputProps): JSX.Element {
           onChange={onChange}
         />
       </label>
-      {/* {mostRecentRun === null ? null : ( */}
-        <Flex>
+      {mostRecentRun === null ? null : (
+        <Flex flexDirection={DIRECTION_COLUMN} width={'80%'}>
           <Divider marginY={SPACING_3} />
-          <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} flex={'auto'}>
+          <Flex
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            flex={'auto'}
+            marginBottom={SPACING_2}
+          >
             <Trans
               t={t}
               i18nKey="robotName_last_run"
@@ -186,7 +199,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element {
             />
             <Link
               role={'link'}
-              fontSize={FONT_SIZE_BODY_2}
+              fontSize={FONT_SIZE_BODY_1}
               color={C_BLUE}
               onClick={() => setRerunningProtocolModal(true)}
               id={'RerunningProtocol_Modal'}
@@ -194,22 +207,26 @@ export function UploadInput(props: UploadInputProps): JSX.Element {
               {t('rerunning_protocol_modal_title')}
             </Link>
           </Flex>
-          <Flex flexDirection={DIRECTION_ROW}>
+          <Flex
+            flexDirection={DIRECTION_ROW}
+            alignItems={ALIGN_CENTER}
+            marginBottom={SPACING_4}
+          >
             <Flex
               flex={'auto'}
               flexDirection={DIRECTION_COLUMN}
               justifyContent={JUSTIFY_CENTER}
             >
               <Text
-                marginBottom={SPACING_3}
+                marginBottom={SPACING_1}
                 color={C_MED_GRAY}
                 fontSize={FONT_SIZE_CAPTION}
               >
-                {t('labware_offsets_summary_location')}
+                {t('protocol_name_title')}
               </Text>
-              {/* <Flex marginBottom={SPACING_3} css={FONT_BODY_1_DARK}>
-                {protocolName}
-              </Flex> */}
+              <Flex css={FONT_BODY_1_DARK}>
+                {protocolName != null ? protocolName : <Text>{FILE_NAME}</Text>}
+              </Flex>
             </Flex>
             <Flex
               flex={'auto'}
@@ -217,15 +234,13 @@ export function UploadInput(props: UploadInputProps): JSX.Element {
               justifyContent={JUSTIFY_CENTER}
             >
               <Text
-                marginBottom={SPACING_3}
+                marginBottom={SPACING_1}
                 color={C_MED_GRAY}
                 fontSize={FONT_SIZE_CAPTION}
               >
                 {t('run_timestamp_title')}
               </Text>
-              {/* <Flex marginBottom={SPACING_3} css={FONT_BODY_1_DARK}>
-                {runTimestamp}
-              </Flex> */}
+              <Flex css={FONT_BODY_1_DARK}>{runTimestamp}</Flex>
             </Flex>
             <Flex
               flex={'auto'}
@@ -233,28 +248,39 @@ export function UploadInput(props: UploadInputProps): JSX.Element {
               justifyContent={JUSTIFY_CENTER}
             >
               <Text
-                marginBottom={SPACING_3}
+                marginBottom={SPACING_1}
                 color={C_MED_GRAY}
                 fontSize={FONT_SIZE_CAPTION}
               >
                 {t('labware_offset_data_title')}
               </Text>
-              <Flex marginBottom={SPACING_3} css={FONT_BODY_1_DARK}>
-                Get offset data!
+              <Flex css={FONT_BODY_1_DARK}>
+                {labwareOffsets != null && labwareOffsets.length == 0 ? (
+                  <Text>{t('no_labware_offset_Data')}</Text>
+                ) : (
+                  labwareOffsets != null && (
+                    <Trans
+                      t={t}
+                      i18nKey="labware_offsets_info"
+                      values={{ number: labwareOffsets.length }}
+                    />
+                  )
+                )}
               </Flex>
-              <PrimaryBtn
-                onClick={handleClick}
-                marginBottom={SPACING_4}
-                backgroundColor={C_BLUE}
+            </Flex>
+            <Flex>
+              <SecondaryBtn
+                onClick={useCloneRun(mostRecentRun)}
+                color={C_BLUE}
                 id={'UploadInput_runAgainButton'}
               >
                 {t('run_again_btn')}
-              </PrimaryBtn>
+              </SecondaryBtn>
             </Flex>
           </Flex>
         </Flex>
-      {/* )} */}
-      <hr style={{ borderTop: `1px solid ${C_LIGHT_GRAY}`, width: '70%' }} />
+      )}
+      <hr style={{ borderTop: `1px solid ${C_LIGHT_GRAY}`, width: '80%' }} />
       <Text
         role="complementary"
         as="h4"
@@ -263,27 +289,29 @@ export function UploadInput(props: UploadInputProps): JSX.Element {
       >
         {t('no_protocol_yet')}
       </Text>
-      <Link
-        fontSize={FONT_SIZE_BODY_2}
-        color={C_BLUE}
-        href={PROTOCOL_LIBRARY_URL}
-        id={'UploadInput_protocolLibraryButton'}
-        rel="noopener noreferrer"
-        marginBottom={SPACING_1}
-      >
-        {t('browse_protocol_library')}
-        <Icon name={'open-in-new'} marginLeft={SPACING_1} size="10px" />
-      </Link>
-      <Link
-        fontSize={FONT_SIZE_BODY_2}
-        color={C_BLUE}
-        href={PROTOCOL_DESIGNER_URL}
-        id={'UploadInput_protocolDesignerButton'}
-        rel="noopener noreferrer"
-      >
-        {t('launch_protocol_designer')}
-        <Icon name={'open-in-new'} marginLeft={SPACING_1} size="10px" />
-      </Link>
+      <Flex justifyContent={JUSTIFY_START} flexDirection={DIRECTION_COLUMN}>
+        <Link
+          fontSize={FONT_SIZE_BODY_2}
+          color={C_BLUE}
+          href={PROTOCOL_LIBRARY_URL}
+          id={'UploadInput_protocolLibraryButton'}
+          rel="noopener noreferrer"
+          marginBottom={SPACING_1}
+        >
+          {t('browse_protocol_library')}
+          <Icon name={'open-in-new'} marginLeft={SPACING_1} size="10px" />
+        </Link>
+        <Link
+          fontSize={FONT_SIZE_BODY_2}
+          color={C_BLUE}
+          href={PROTOCOL_DESIGNER_URL}
+          id={'UploadInput_protocolDesignerButton'}
+          rel="noopener noreferrer"
+        >
+          {t('launch_protocol_designer')}
+          <Icon name={'open-in-new'} marginLeft={SPACING_1} size="10px" />
+        </Link>
+      </Flex>
     </Flex>
   )
 }
