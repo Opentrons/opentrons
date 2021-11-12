@@ -13,7 +13,10 @@ from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     LoadedLabware,
 )
-from opentrons.protocol_engine.actions import UpdateCommandAction
+from opentrons.protocol_engine.actions import (
+    AddLabwareOffsetAction,
+    UpdateCommandAction,
+)
 from opentrons.protocol_engine.state.labware import LabwareStore, LabwareState
 
 from .command_fixtures import create_load_labware_command, create_add_definition_command
@@ -65,21 +68,39 @@ def test_initial_state(
     )
 
 
+def test_handles_add_labware_offset(
+    subject: LabwareStore,
+) -> None:
+    """It should add the labware offset to the state."""
+    offset = LabwareOffset(
+        id="offset-id",
+        definitionUri="offset-definition-uri",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        offset=LabwareOffsetVector(x=1, y=2, z=3),
+    )
+
+    subject.handle_action(AddLabwareOffsetAction(labware_offset=offset))
+
+    assert subject.state.labware_offsets_by_id == {"offset-id": offset}
+
+
 def test_handles_load_labware(
     subject: LabwareStore,
     well_plate_def: LabwareDefinition,
 ) -> None:
     """It should add the labware data to the state."""
+    offset = LabwareOffset(
+        id="offset-id",
+        definitionUri="offset-definition-uri",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        offset=LabwareOffsetVector(x=1, y=2, z=3),
+    )
+
     command = create_load_labware_command(
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         labware_id="test-labware-id",
         definition=well_plate_def,
-        offset=LabwareOffset(
-            id="offset-id",
-            definitionUri="offset-definition-uri",
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-            offset=LabwareOffsetVector(x=1, y=2, z=3),
-        ),
+        offset=offset,
     )
 
     expected_definition_uri = uri_from_details(
@@ -96,6 +117,7 @@ def test_handles_load_labware(
         offsetId="offset-id",
     )
 
+    subject.handle_action(AddLabwareOffsetAction(labware_offset=offset))
     subject.handle_action(UpdateCommandAction(command=command))
 
     assert subject.state.labware_by_id["test-labware-id"] == expected_labware_data

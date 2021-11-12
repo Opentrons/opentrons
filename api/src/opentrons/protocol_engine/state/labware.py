@@ -89,6 +89,12 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
     def _handle_command(self, command: Command) -> None:
         """Modify state in reaction to a command."""
         if isinstance(command.result, LoadLabwareResult):
+            offset = command.result.offset
+
+            # If the labware load refers to an offset, that offset must actually exist.
+            if offset is not None:
+                assert offset.id in self._state.labware_offsets_by_id
+
             labware_id = command.result.labwareId
             definition_uri = uri_from_details(
                 namespace=command.result.definition.namespace,
@@ -102,7 +108,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 location=command.params.location,
                 loadName=command.result.definition.parameters.loadName,
                 definitionUri=definition_uri,
-                offsetId=None,
+                offsetId=(None if offset is None else offset.id),
             )
 
             new_definitions_by_uri = self._state.definitions_by_uri.copy()
@@ -130,18 +136,14 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
         """Add a new labware offset to state.
 
         `labware_offset.id` must not match any existing labware offset ID.
-        This protects against accidentally changing a labware offset after adding it.
         `LoadLabwareCommand`s retain references to their corresponding labware offsets
         and expect them to be immutable.
         """
-        if labware_offset.id in self._state.labware_offsets_by_id:
-            raise ValueError(
-                f"Labware offset already exists with ID {labware_offset.id}."
-            )
-        else:
-            new_labware_offsets = self._state.labware_offsets_by_id.copy()
-            new_labware_offsets[labware_offset.id] = labware_offset
-            self._state = replace(self._state, labware_offsets=new_labware_offsets)
+        assert labware_offset.id not in self._state.labware_offsets_by_id
+
+        new_labware_offsets = self._state.labware_offsets_by_id.copy()
+        new_labware_offsets[labware_offset.id] = labware_offset
+        self._state = replace(self._state, labware_offsets_by_id=new_labware_offsets)
 
 
 class LabwareView(HasState[LabwareState]):

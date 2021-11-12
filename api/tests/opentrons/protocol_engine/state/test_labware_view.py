@@ -406,7 +406,7 @@ def test_get_calibration_offset() -> None:
         labware_offsets_by_id={"offset-id": offset},
     )
 
-    assert subject.get_calibration_offset(labware_with_offset.id) == offset
+    assert subject.get_calibration_offset(labware_with_offset.id) == offset.offset
 
     assert subject.get_calibration_offset(
         labware_without_offset.id
