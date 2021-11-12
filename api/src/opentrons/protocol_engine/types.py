@@ -121,7 +121,7 @@ class MotorAxis(str, Enum):
     LEFT_Z = "leftZ"
     RIGHT_Z = "rightZ"
     LEFT_PLUNGER = "leftPlunger"
-    RIGHT_PLUNGER = "rightPluger"
+    RIGHT_PLUNGER = "rightPlunger"
 
 
 class LabwareOffsetVector(BaseModel):
