@@ -41,6 +41,7 @@ def test_get_labware_parent_position(
         loadName="b",
         definitionUri=uri_from_details(namespace="a", load_name="b", version=1),
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+        offsetId=None,
     )
     decoy.when(labware_view.get("labware-id")).then_return(labware_data)
     decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_3)).then_return(
@@ -65,6 +66,7 @@ def test_get_labware_origin_position(
         loadName="load-name",
         definitionUri="defintion-uri",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+        offsetId=None,
     )
 
     decoy.when(labware_view.get("labware-id")).then_return(labware_data)
@@ -99,6 +101,7 @@ def test_get_labware_highest_z(
         loadName="load-name",
         definitionUri="definition-uri",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+        offsetId="offset-id",
     )
     slot_pos = Point(1, 2, 3)
     calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
@@ -131,12 +134,14 @@ def test_get_all_labware_highest_z(
         loadName="plate-load-name",
         definitionUri="plate-definition-uri",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+        offsetId="plate-offset-id",
     )
     reservoir = LoadedLabware(
         id="reservoir-id",
         loadName="reservoir-load-name",
         definitionUri="reservoir-definition-uri",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        offsetId="reservoir-offset-id",
     )
 
     plate_offset = LabwareOffsetVector(x=1, y=-2, z=3)
@@ -183,6 +188,7 @@ def test_get_labware_position(
         loadName="load-name",
         definitionUri="definition-uri",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        offsetId="reservoir-offset-id",
     )
     calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
     slot_pos = Point(4, 5, 6)
@@ -218,6 +224,7 @@ def test_get_well_position(
         loadName="load-name",
         definitionUri="definition-uri",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        offsetId="offset-id",
     )
     calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
     slot_pos = Point(4, 5, 6)
@@ -257,6 +264,7 @@ def test_get_well_position_with_top_offset(
         loadName="load-name",
         definitionUri="definition-uri",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        offsetId="offset-id",
     )
     calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
     slot_pos = Point(4, 5, 6)
@@ -303,6 +311,7 @@ def test_get_well_position_with_bottom_offset(
         loadName="load-name",
         definitionUri="definition-uri",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        offsetId="offset-id",
     )
     calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
     slot_pos = Point(4, 5, 6)

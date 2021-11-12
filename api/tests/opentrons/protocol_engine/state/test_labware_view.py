@@ -9,6 +9,7 @@ from opentrons.types import DeckSlotName, Point
 
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
+    LabwareOffset,
     LabwareOffsetVector,
     DeckSlotLocation,
     Dimensions,
@@ -23,6 +24,7 @@ plate = LoadedLabware(
     loadName="plate-load-name",
     location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
     definitionUri="some-plate-uri",
+    offsetId=None,
 )
 
 reservoir = LoadedLabware(
@@ -30,6 +32,7 @@ reservoir = LoadedLabware(
     loadName="reservoir-load-name",
     location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
     definitionUri="some-reservoir-uri",
+    offsetId=None,
 )
 
 tube_rack = LoadedLabware(
@@ -37,6 +40,7 @@ tube_rack = LoadedLabware(
     loadName="tube-rack-load-name",
     location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
     definitionUri="some-tube-rack-uri",
+    offsetId=None,
 )
 
 tip_rack = LoadedLabware(
@@ -44,20 +48,20 @@ tip_rack = LoadedLabware(
     loadName="tip-rack-load-name",
     location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
     definitionUri="some-tip-rack-uri",
+    offsetId=None,
 )
 
 
 def get_labware_view(
     labware_by_id: Optional[Dict[str, LoadedLabware]] = None,
-    calibrations_by_id: Optional[Dict[str, LabwareOffsetVector]] = None,
+    labware_offsets_by_id: Optional[Dict[str, LabwareOffset]] = None,
     definitions_by_uri: Optional[Dict[str, LabwareDefinition]] = None,
     deck_definition: Optional[DeckDefinitionV2] = None,
 ) -> LabwareView:
     """Get a labware view test subject."""
     state = LabwareState(
         labware_by_id=labware_by_id or {},
-        calibrations_by_id=calibrations_by_id or {},
-        labware_offsets_by_id={},  # Todo: Supply by parameter
+        labware_offsets_by_id=labware_offsets_by_id or {},
         definitions_by_uri=definitions_by_uri or {},
         deck_definition=deck_definition or cast(DeckDefinitionV2, {"fake": True}),
     )
@@ -270,6 +274,7 @@ def test_get_labware_uri_from_definition(tip_rack_def: LabwareDefinition) -> Non
         loadName="tip-rack-load-name",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         definitionUri="some-tip-rack-uri",
+        offsetId=None,
     )
 
     subject = get_labware_view(
@@ -368,13 +373,44 @@ def test_get_slot_position(standard_deck_def: DeckDefinitionV2) -> None:
 
 
 def test_get_calibration_offset() -> None:
-    """It should get a labware's calibrated offset."""
-    offset = LabwareOffsetVector(x=1, y=2, z=3)
-    subject = get_labware_view(calibrations_by_id={"labware-id": offset})
+    """It should get a labware's offset vector."""
+    labware_without_offset = LoadedLabware(
+        id="without-offset-labware-id",
+        loadName="labware-load-name",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        definitionUri="some-labware-uri",
+        offsetId=None,
+    )
 
-    result = subject.get_calibration_offset("labware-id")
+    labware_with_offset = LoadedLabware(
+        id="with-offset-labware-id",
+        loadName="labware-load-name",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        definitionUri="some-labware-uri",
+        offsetId="offset-id",
+    )
 
-    assert result == offset
+    offset_vector = LabwareOffsetVector(x=1, y=2, z=3)
+    offset = LabwareOffset(
+        id="offset-id",
+        definitionUri="some-labware-uri",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        offset=offset_vector,
+    )
+
+    subject = get_labware_view(
+        labware_by_id={
+            labware_without_offset.id: labware_without_offset,
+            labware_with_offset.id: labware_with_offset,
+        },
+        labware_offsets_by_id={"offset-id": offset},
+    )
+
+    assert subject.get_calibration_offset(labware_with_offset.id) == offset
+
+    assert subject.get_calibration_offset(
+        labware_without_offset.id
+    ) == LabwareOffsetVector(x=0, y=0, z=0)
 
     with pytest.raises(errors.LabwareDoesNotExistError):
-        subject.get_calibration_offset("wrong-id")
+        subject.get_calibration_offset("wrong-labware-id")

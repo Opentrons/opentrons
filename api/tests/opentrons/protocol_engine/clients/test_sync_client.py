@@ -16,7 +16,6 @@ from opentrons.types import DeckSlotName, MountType
 from opentrons.protocol_engine import DeckSlotLocation, PipetteName, commands
 from opentrons.protocol_engine.clients import SyncClient, AbstractSyncTransport
 from opentrons.protocol_engine.types import (
-    LabwareOffsetVector,
     WellOrigin,
     WellOffset,
     WellLocation,
@@ -55,7 +54,7 @@ def stubbed_load_labware_result(
     result = commands.LoadLabwareResult(
         labwareId="abc123",
         definition=tip_rack_def,
-        calibration=LabwareOffsetVector(x=1, y=2, z=3),
+        offset=None,
     )
 
     decoy.when(transport.execute_command(request=request)).then_return(result)

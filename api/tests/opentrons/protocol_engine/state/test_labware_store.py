@@ -8,6 +8,7 @@ from opentrons.types import DeckSlotName
 
 from opentrons.protocol_engine.resources import DeckFixedLabware
 from opentrons.protocol_engine.types import (
+    LabwareOffset,
     LabwareOffsetVector,
     DeckSlotLocation,
     LoadedLabware,
@@ -56,9 +57,9 @@ def test_initial_state(
                 loadName=fixed_trash_def.parameters.loadName,
                 definitionUri=expected_trash_uri,
                 location=DeckSlotLocation(slotName=DeckSlotName.FIXED_TRASH),
+                offsetId=None,
             )
         },
-        calibrations_by_id={"fixedTrash": LabwareOffsetVector(x=0, y=0, z=0)},
         labware_offsets_by_id={},
         definitions_by_uri={expected_trash_uri: fixed_trash_def},
     )
@@ -73,7 +74,12 @@ def test_handles_load_labware(
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         labware_id="test-labware-id",
         definition=well_plate_def,
-        calibration=LabwareOffsetVector(x=1, y=2, z=3),
+        offset=LabwareOffset(
+            id="offset-id",
+            definitionUri="offset-definition-uri",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            offset=LabwareOffsetVector(x=1, y=2, z=3),
+        ),
     )
 
     expected_definition_uri = uri_from_details(
@@ -87,6 +93,7 @@ def test_handles_load_labware(
         loadName=well_plate_def.parameters.loadName,
         definitionUri=expected_definition_uri,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        offsetId="offset-id",
     )
 
     subject.handle_action(UpdateCommandAction(command=command))
@@ -95,16 +102,12 @@ def test_handles_load_labware(
 
     assert subject.state.definitions_by_uri[expected_definition_uri] == well_plate_def
 
-    assert subject.state.calibrations_by_id["test-labware-id"] == LabwareOffsetVector(
-        x=1, y=2, z=3
-    )
 
-
-def test_handles_add_labware_defintion(
+def test_handles_add_labware_definition(
     subject: LabwareStore,
     well_plate_def: LabwareDefinition,
 ) -> None:
-    """It should add the labware definition to the state store."""
+    """It should add the labware definition to the state."""
     command = create_add_definition_command(definition=well_plate_def)
     expected_uri = uri_from_details(
         load_name=well_plate_def.parameters.loadName,
