@@ -53,33 +53,27 @@ describe('CommandList', () => {
   })
   it('renders null if protocol data is null', () => {
     mockUseProtocolDetails.mockReturnValue({ protocolData: null } as any)
-    const { container } = render(props)
+    const { container } = render()
     expect(container.firstChild).toBeNull()
   })
   it('should render correct Protocol Setup text', () => {
-    const { getByText } = render(props)
+    const { getByText } = render()
     getByText('Protocol Setup')
   })
 
   it('renders Protocol Setup title expands Protocol setup when clicked and end of protocol text', () => {
-    const { getAllByText, getByText } = render(props)
+    const { getAllByText, getByText } = render()
     fireEvent.click(getByText('Protocol Setup'))
     getAllByText('Mock ProtocolSetup Info')
     getByText('End of protocol')
     getByText('Anticipated steps')
   })
   it('renders the first non ProtocolSetup command', () => {
-    const { getAllByText } = render(props)
+    const { getAllByText } = render()
     getAllByText('Picking up tip from A1 of Opentrons 96 Tip Rack 300 µL on 1')
   })
   it('renders the failed banner', () => {
-    props = {
-      inProgress: '5abc123',
-      completed: '4abc123',
-      anticipated: '6abc123',
-      isFailed: true,
-    }
-    const { getByText } = render(props)
+    const { getByText } = render()
     getByText('Protocol run failed')
   })
 })

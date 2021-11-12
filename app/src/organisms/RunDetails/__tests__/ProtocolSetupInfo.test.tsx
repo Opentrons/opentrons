@@ -10,7 +10,7 @@ import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
 import { mockPipetteInfo } from '../../../redux/pipettes/__fixtures__'
 import { getProtocolPipetteTipRackCalInfo } from '../../../redux/pipettes'
 import { ProtocolSetupInfo } from '../ProtocolSetupInfo'
-import { CommandItem, Status } from '../CommandItem'
+import { CommandItem } from '../CommandItem'
 import { useProtocolDetails } from '../hooks'
 import type {
   Command,
@@ -38,7 +38,6 @@ const mockCommandItem = CommandItem as jest.MockedFunction<typeof CommandItem>
 const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolFile<{}>
 
 const TEMP_ID = 'temperature_module_gen2'
-const TYPE = 'type' as Status
 const TC_ID = 'thermocycler'
 const LABWARE_LOCATION = { slotName: '3' }
 const MODULE_LOCATION = { slotName: '3' } || {
