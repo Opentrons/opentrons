@@ -30,7 +30,6 @@ from opentrons.protocol_runner import (
     PythonPreAnalysis,
     create_simulating_runner,
 )
-from opentrons.protocol_runner.legacy_command_mapper import LegacyCommandParams
 
 
 async def test_runner_with_python(python_protocol_file: Path) -> None:
@@ -162,15 +161,16 @@ async def test_runner_with_legacy_python(legacy_python_protocol_file: Path) -> N
     assert expected_pipette in pipettes_result
     assert expected_labware in labware_result
 
-    expected_command = commands.Custom.construct(
+    expected_command = commands.PickUpTip.construct(
         id=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        params=LegacyCommandParams(
-            legacyCommandType="command.PICK_UP_TIP",
-            legacyCommandText="Picking up tip from A1 of Opentrons 96 Tip Rack 300 µL on 1",  # noqa: E501
+        params=commands.PickUpTipParams(
+            pipetteId=pipette_id_captor.value,
+            labwareId=labware_id_captor.value,
+            wellName="A1",
         ),
         result=None,
     )
@@ -211,15 +211,16 @@ async def test_runner_with_legacy_json(legacy_json_protocol_file: Path) -> None:
     assert expected_pipette in pipettes_result
     assert expected_labware in labware_result
 
-    expected_command = commands.Custom.construct(
+    expected_command = commands.PickUpTip.construct(
         id=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        params=LegacyCommandParams(
-            legacyCommandType="command.PICK_UP_TIP",
-            legacyCommandText="Picking up tip from A1 of Opentrons 96 Tip Rack 300 µL on 1",  # noqa: E501
+        params=commands.PickUpTipParams(
+            pipetteId=pipette_id_captor.value,
+            labwareId=labware_id_captor.value,
+            wellName="A1",
         ),
         result=None,
     )
