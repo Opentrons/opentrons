@@ -1,11 +1,13 @@
 import reduce from 'lodash/reduce'
 import {
-  FIXED_TRASH_ID,
   getIsTiprack,
   getTiprackVolume,
   ProtocolFile,
   LabwareDefinition2,
+  getSlotHasMatingSurfaceUnitVector,
+  FIXED_TRASH_ID,
 } from '@opentrons/shared-data'
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import type { PickUpTipCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { LabwareToOrder } from '../types'
@@ -110,24 +112,47 @@ export const getLabwareIdsInOrder = (
   modules: ProtocolFile<{}>['modules'],
   commands: Command[]
 ): string[] => {
+  console.log('LABWARE: ', labware)
   const unorderedLabware = reduce<typeof labware, LabwareToOrder[]>(
     labware,
     (unorderedLabware, currentLabware, labwareId) => {
       const labwareDef = labwareDefinitions[currentLabware.definitionId]
       const isTiprack = getIsTiprack(labwareDef)
-      let slot = getLabwareLocation(labwareId, commands)
-      if (!isTiprack && labwareId !== FIXED_TRASH_ID) {
+      const labwareLocation = getLabwareLocation(labwareId, commands)
+      // skip any labware that is not a tiprack
+      if (!isTiprack) {
         const isOnTopOfModule =
           modules != null &&
-          Object.keys(modules).some(moduleId => moduleId === slot)
+          Object.keys(modules).some(moduleId => moduleId === labwareLocation)
         // labware location is a module id, we need to look up where the module is
-        const moduleId = slot
+        const moduleId = labwareLocation
         if (isOnTopOfModule) {
-          slot = getModuleLocation(moduleId, commands)
+          return [
+            ...unorderedLabware,
+            {
+              definition: labwareDef,
+              labwareId: labwareId,
+              slot: getModuleLocation(moduleId, commands),
+            },
+          ]
+        } else {
+          // if we're in a slot where we can't have labware, don't include the definition (i.e. the trash bin)
+          if (
+            !getSlotHasMatingSurfaceUnitVector(
+              standardDeckDef as any,
+              labwareLocation.toString()
+            )
+          ) {
+            return [...unorderedLabware]
+          }
         }
         return [
           ...unorderedLabware,
-          { definition: labwareDef, labwareId: labwareId, slot: slot },
+          {
+            definition: labwareDef,
+            labwareId: labwareId,
+            slot: labwareLocation,
+          },
         ]
       }
       return [...unorderedLabware]

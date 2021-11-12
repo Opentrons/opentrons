@@ -179,7 +179,20 @@ export function useLabwarePositionCheck(
     []
   )
   // load commands come from the protocol resource
-  const loadCommands = protocolData?.commands.filter(isLoadCommand) ?? []
+  const loadCommands =
+    protocolData?.commands.filter(isLoadCommand).map(command => {
+      if (command.commandType === 'loadPipette') {
+        const commandWithCommandId = {
+          ...command,
+          params: {
+            ...command.params,
+            pipetteId: command.result?.pipetteId,
+          },
+        }
+        return commandWithCommandId
+      }
+      return command
+    }) ?? []
   // TC open lid commands come from the LPC command generator
   const TCOpenCommands = LPCCommands.filter(isTCOpenCommand) ?? []
   // prepCommands will be run when a user starts LPC
@@ -205,12 +218,23 @@ export function useLabwarePositionCheck(
   const robotCommands = useAllCommandsQuery(currentRun?.data?.id).data?.data
   const titleText = useTitleText(
     isLoading,
-    currentCommand,
+    prevCommand,
     protocolData?.labware,
     protocolData?.labwareDefinitions
   )
-  const isComplete = currentCommandIndex === LPCMovementCommands.length
   if (error != null) return { error }
+
+  const isComplete = currentCommandIndex === LPCMovementCommands.length
+  const failedCommand = robotCommands?.find(
+    command => command.status === 'failed'
+  )
+  if (failedCommand != null && error == null) {
+    setError(
+      new Error(
+        `movement command with type ${failedCommand.commandType} and id ${failedCommand.id} failed on the robot`
+      )
+    )
+  }
   const completedMovementCommand =
     pendingMovementCommandData != null &&
     robotCommands?.find(
