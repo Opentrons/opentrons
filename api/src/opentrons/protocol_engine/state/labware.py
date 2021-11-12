@@ -310,7 +310,12 @@ class LabwareView(HasState[LabwareState]):
             return self._state.labware_offsets_by_id[offset_id].offset
 
     def get_labware_offset(self, labware_offset_id: str) -> LabwareOffset:
-        """Get a labware offset by the offset's unique ID."""
+        """Get a labware offset by the offset's unique ID.
+
+        Raises:
+            LabwareOffsetDoesNotExistError: If the given ID does not match any
+                                            previously added offset.
+        """
         try:
             return self._state.labware_offsets_by_id[labware_offset_id]
         except KeyError as e:
