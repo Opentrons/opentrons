@@ -130,6 +130,7 @@ def test_to_response_adds_equipment() -> None:
         loadName="load-name",
         definitionUri="namespace/load-name/42",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        offsetId=None,
     )
 
     pipette = LoadedPipette(

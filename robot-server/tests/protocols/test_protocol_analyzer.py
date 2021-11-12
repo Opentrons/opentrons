@@ -62,6 +62,7 @@ async def test_analyze(
         loadName="load-name",
         definitionUri="namespace/load-name/42",
         location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        offsetId=None,
     )
 
     analysis_pipette = pe_types.LoadedPipette(
