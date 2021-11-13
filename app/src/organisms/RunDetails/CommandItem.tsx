@@ -24,7 +24,12 @@ import {
 import { css } from 'styled-components'
 import { CommandTimer } from './CommandTimer'
 import { CommandText } from './CommandText'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6/command'
+import { RunStatus, RUN_STATUS_IDLE } from '@opentrons/api-client'
+import { useCommandQuery } from '@opentrons/react-api-client'
+import { useCurrentRunId } from '../ProtocolUpload/hooks/useCurrentRunId'
+import type { RunCommandSummary } from '@opentrons/api-client'
+
+import type { Command, CommandStatus } from '@opentrons/shared-data/protocol/types/schemaV6/command'
 
 const PLACEHOLDERTIMER = '00:00:00' //  TODO: immediately wire up the timer
 
@@ -32,7 +37,8 @@ export type Status = 'queued' | 'running' | 'succeeded' | 'failed'
 
 interface CommandItemsProps {
   runStatus?: string
-  currentCommand: Command
+  currentCommand: Command | RunCommandSummary
+
   commandText?: JSX.Element
 }
 function CommandItemRunning(props: CommandItemsProps): JSX.Element {
@@ -115,16 +121,14 @@ function CommandItemFailed(props: CommandItemsProps): JSX.Element {
 }
 
 export interface CommandItemProps {
-  currentCommand: Command
-  type?: Status
-  runStatus?: string
-  commandText?: JSX.Element
+  currentCommand: Command | RunCommandSummary
+  runStatus?: RunStatus
 }
 
-const WRAPPER_STYLE_BY_STATUS: Record<
-  Status,
+const WRAPPER_STYLE_BY_STATUS: {
+  [status in CommandStatus]:
   { border: string; backgroundColor: string }
-> = {
+} = {
   queued: { border: 'none', backgroundColor: C_NEAR_WHITE },
   running: {
     border: `1px solid ${C_MINT}`,
@@ -140,46 +144,82 @@ const WRAPPER_STYLE_BY_STATUS: Record<
   },
 }
 export function CommandItem(props: CommandItemProps): JSX.Element {
-  const { currentCommand, runStatus, type, commandText } = props
-  const commandType = type != null ? type : 'queued'
+  const { t } = useTranslation('run_details')
+  const { currentCommand, runStatus } = props
+  const commandStatus = runStatus != RUN_STATUS_IDLE && currentCommand.status != null ? currentCommand.status : 'queued'
+
+  const currentRunId = useCurrentRunId()
+  const {data: commandDetails, refetch: refetchCommandDetails } = useCommandQuery(currentRunId, currentCommand.id)
+
+  React.useEffect(()=>{
+    refetchCommandDetails()
+  },[commandStatus])
+
   const WRAPPER_STYLE = css`
     font-size: ${FONT_SIZE_BODY_1};
-    background-color: ${WRAPPER_STYLE_BY_STATUS[commandType].backgroundColor};
-    border: ${WRAPPER_STYLE_BY_STATUS[commandType].border};
+    background-color: ${WRAPPER_STYLE_BY_STATUS[commandStatus].backgroundColor};
+    border: ${WRAPPER_STYLE_BY_STATUS[commandStatus].border};
     padding: ${SPACING_2};
     color: ${C_DARK_GRAY};
     flex-direction: ${DIRECTION_ROW};
   `
-  let commandStatus
-  if (commandType === 'running') {
-    commandStatus = (
+  let commandTextNode
+  if (currentCommand.commandType === 'delay') {
+    commandTextNode = (
+      <Flex>
+        <Flex
+          textTransform={TEXT_TRANSFORM_UPPERCASE}
+          padding={SPACING_1}
+          key={currentCommand.id}
+          id={`RunDetails_CommandList`}
+        >
+          {t('comment')}
+        </Flex>
+        {commandDetails != null
+          ? <Flex>{commandDetails?.data?.result}</Flex>
+          : null
+        }
+      </Flex>
+    )
+  } else if (currentCommand.commandType === 'custom') {
+    commandTextNode = (
+      <Flex key={currentCommand.id}>
+        {/* @ts-expect-error  - data doesn't exit on type params, wait until command type is updated */}
+        {currentCommand?.params?.legacyCommandText ?? currentCommand.commandType }
+      </Flex>
+    )
+  }
+
+  let contents
+  if (commandStatus === 'running') {
+    contents = (
       <CommandItemRunning
         runStatus={runStatus}
         currentCommand={currentCommand}
-        commandText={commandText}
+        commandText={commandTextNode}
       />
     )
-  } else if (commandType === 'failed') {
-    commandStatus = (
+  } else if (commandStatus === 'failed') {
+    contents = (
       <CommandItemFailed
         currentCommand={currentCommand}
-        commandText={commandText}
+        commandText={commandTextNode}
       />
     )
-  } else if (commandType === 'queued') {
-    commandStatus = (
+  } else if (commandStatus === 'queued') {
+    contents = (
       <CommandItemQueued
         currentCommand={currentCommand}
-        commandText={commandText}
+        commandText={commandTextNode}
       />
     )
-  } else if (commandType === 'succeeded') {
-    commandStatus = (
+  } else if (commandStatus === 'succeeded') {
+    contents = (
       <CommandItemSuccess
         currentCommand={currentCommand}
-        commandText={commandText}
+        commandText={commandTextNode}
       />
     )
   }
-  return <Flex css={WRAPPER_STYLE}>{commandStatus}</Flex>
+  return <Flex css={WRAPPER_STYLE}>{contents}</Flex>
 }

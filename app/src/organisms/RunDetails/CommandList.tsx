@@ -27,7 +27,8 @@ import { useProtocolDetails } from './hooks'
 import { useCurrentProtocolRun } from '../ProtocolUpload/hooks'
 import { ProtocolSetupInfo } from './ProtocolSetupInfo'
 import { CommandItem } from './CommandItem'
-import { ProtocolFile } from '@opentrons/shared-data'
+import type { ProtocolFile, Command } from '@opentrons/shared-data'
+import type { RunCommandSummary } from '@opentrons/api-client'
 
 export function CommandList(): JSX.Element | null {
   const { t } = useTranslation('run_details')
@@ -39,9 +40,9 @@ export function CommandList(): JSX.Element | null {
     .protocolData
   const runDataCommands = useCurrentProtocolRun().runRecord?.data.commands
 
-  const currentCommandList = protocolData?.commands
+  const currentCommandList: Array<Command | RunCommandSummary> = protocolData != null ? [...protocolData?.commands] : []
   const lastProtocolSetupIndex = currentCommandList
-    ?.map(
+    .map(
       command =>
         command.commandType === 'loadLabware' ||
         command.commandType === 'loadPipette' ||
@@ -50,9 +51,9 @@ export function CommandList(): JSX.Element | null {
     .lastIndexOf(true)
   const protocolSetupCommandList = currentCommandList?.slice(
     0,
-    lastProtocolSetupIndex
+    lastProtocolSetupIndex + 1
   )
-  currentCommandList?.splice(0, lastProtocolSetupIndex)
+  currentCommandList?.splice(0, lastProtocolSetupIndex + 1)
 
   React.useEffect(() => {
     if (
@@ -71,15 +72,16 @@ export function CommandList(): JSX.Element | null {
         }
         if (
           index <= runDataCommandsSlice.length &&
-          currentCommandList[index++].id !== runDataCommandsSlice[index++].id
+          index <= currentCommandList.length &&
+          currentCommandList[index+1].id !== runDataCommandsSlice[index+1].id
         ) {
-          currentCommandList.length = index++
+          currentCommandList.length = index+1
         }
       })
     }
   }, [runDataCommands, currentCommandList])
   const runStatus = useRunStatus()
-  if (protocolData == null) return null
+  if (protocolData == null || runStatus == null) return null
 
   return (
     <React.Fragment>
@@ -179,29 +181,6 @@ export function CommandList(): JSX.Element | null {
           <Flex paddingLeft={SPACING_1}>{t('protocol_steps')}</Flex>
           <Flex flexDirection={DIRECTION_COLUMN}>
             {currentCommandList?.map((command, index) => {
-              let commandWholeText
-              if (command.commandType === 'delay') {
-                commandWholeText = (
-                  <Flex>
-                    <Flex
-                      textTransform={TEXT_TRANSFORM_UPPERCASE}
-                      padding={SPACING_1}
-                      key={command.id}
-                      id={`RunDetails_CommandList`}
-                    >
-                      {t('comment')}
-                    </Flex>
-                    <Flex>{command.result}</Flex>
-                  </Flex>
-                )
-              } else if (command.commandType === 'custom') {
-                commandWholeText = (
-                  <Flex key={command.id}>
-                    {/* @ts-expect-error  - data doesn't exit on type params, wait until command type is updated */}
-                    {command.data.legacyCommandText}
-                  </Flex>
-                )
-              }
               return command.commandType === 'custom' ? (
                 <Flex
                   key={command.id}
@@ -223,13 +202,7 @@ export function CommandList(): JSX.Element | null {
                   >
                     <CommandItem
                       currentCommand={command}
-                      type={
-                        runDataCommands?.length !== 0
-                          ? command.status
-                          : 'queued'
-                      }
                       runStatus={runStatus}
-                      commandText={commandWholeText}
                     />
                   </Flex>
                 </Flex>

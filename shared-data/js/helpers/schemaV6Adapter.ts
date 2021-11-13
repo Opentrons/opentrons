@@ -37,6 +37,15 @@ export const schemaV6Adapter = (
           command.result?.labwareId === labwareId
       )?.result.definition
 
+      console.log(
+        'PACOmmands',
+        protocolAnalyses.commands,
+        labwareId,
+        labwareDef,
+        labware,
+        labwareDef == null ? 'WTFFFFFF' : getLabwareDisplayName(labwareDef)
+      )
+
       return {
         ...acc,
         [labwareId]: {

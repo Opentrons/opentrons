@@ -7,9 +7,10 @@ import {
   SPACING_1,
   SPACING_3,
 } from '@opentrons/components'
+import type { RunCommandSummary } from '@opentrons/api-client'
 
 interface Props {
-  command: Command
+  command: Command | RunCommandSummary
   commandText?: JSX.Element
 }
 export function CommandText(props: Props): JSX.Element | null {
