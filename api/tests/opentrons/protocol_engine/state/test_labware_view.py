@@ -416,3 +416,62 @@ def test_get_labware_offset_vector() -> None:
 
     with pytest.raises(errors.LabwareDoesNotExistError):
         subject.get_labware_offset_vector("wrong-labware-id")
+
+
+def test_get_labware_offset() -> None:
+    offset_a = LabwareOffset(
+        id="id-a",
+        createdAt=datetime(year=2021, month=1, day=1),
+        definitionUri="uri-a",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        offset=LabwareOffsetVector(x=1, y=1, z=1)
+    )
+
+    offset_b = LabwareOffset(
+        id="id-b",
+        createdAt=datetime(year=2022, month=2, day=2),
+        definitionUri="uri-b",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
+        offset=LabwareOffsetVector(x=2, y=2, z=2)
+    )
+
+    subject = get_labware_view(
+        labware_offsets_by_id={"id-a": offset_a, "id-b": offset_b}
+    )
+
+    assert subject.get_labware_offset("id-a") == offset_a
+    assert subject.get_labware_offset("id-b") == offset_b
+    with pytest.raises(errors.LabwareOffsetDoesNotExistError):
+        subject.get_labware_offset("wrong-labware-offset-id")
+
+
+def test_get_labware_offsets() -> None:
+    offset_a = LabwareOffset(
+        id="id-a",
+        createdAt=datetime(year=2021, month=1, day=1),
+        definitionUri="uri-a",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        offset=LabwareOffsetVector(x=1, y=1, z=1)
+    )
+
+    offset_b = LabwareOffset(
+        id="id-b",
+        createdAt=datetime(year=2022, month=2, day=2),
+        definitionUri="uri-b",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
+        offset=LabwareOffsetVector(x=2, y=2, z=2)
+    )
+
+    empty_subject = get_labware_view()
+    assert empty_subject.get_labware_offsets() == []
+
+    filled_subject_a_before_b = get_labware_view(
+        labware_offsets_by_id={"id-a": offset_a, "id-b": offset_b}
+    )
+    assert filled_subject_a_before_b.get_labware_offsets() == [offset_a, offset_b]
+
+    filled_subject_b_before_a = get_labware_view(
+        labware_offsets_by_id={"id-b": offset_b, "id-a": offset_a}
+    )
+    assert filled_subject_b_before_a.get_labware_offsets() == [offset_b, offset_a]
+
