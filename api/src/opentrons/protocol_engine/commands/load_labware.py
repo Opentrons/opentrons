@@ -49,14 +49,12 @@ class LoadLabwareResult(BaseModel):
         ...,
         description="The full definition data for this labware.",
     )
-    # todo(mm, 2021-11-11): Figure out why this is showing up as a required non-nullable
-    # string in the OpenAPI spec, instead of a required nullable string.
     offsetId: Optional[str] = Field(
-        ...,
+        None,
         description=(
             "An ID referencing the offset applied to this labware placement,"
             " decided at load time."
-            " Null means no offset was provided for this load,"
+            " Null or undefined means no offset was provided for this load,"
             " so the default of (0, 0, 0) will be used."
         ),
     )
