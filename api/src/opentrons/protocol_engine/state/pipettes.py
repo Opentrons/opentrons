@@ -17,6 +17,7 @@ from ..commands import (
     MoveToWellResult,
     PickUpTipResult,
     DropTipResult,
+    HomeResult,
 )
 from ..actions import Action, UpdateCommandAction
 from .abstract_store import HasState, HandlesActions
@@ -85,6 +86,9 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                     well_name=command.params.wellName,
                 ),
             )
+        # TODO(mc, 2021-11-12): wipe out current_well on movement failures, too
+        elif isinstance(command.result, HomeResult):
+            self._state = replace(self._state, current_well=None)
 
         if isinstance(command.result, LoadPipetteResult):
             pipette_id = command.result.pipetteId

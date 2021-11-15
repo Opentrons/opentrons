@@ -31,7 +31,7 @@ class TaskQueue:
         self._run_func: Optional[Callable[[], Any]] = None
         self._cleanup_func: Optional[CleanupFunc] = None
         self._run_task: Optional["asyncio.Task[None]"] = None
-        self._run_started_event: asyncio.Event = asyncio.Event()
+        self._ok_to_join_event: asyncio.Event = asyncio.Event()
 
     def set_run_func(
         self,
@@ -54,14 +54,21 @@ class TaskQueue:
 
     def start(self) -> None:
         """Start running tasks in the queue."""
-        self._run_started_event.set()
+        self._ok_to_join_event.set()
 
         if self._run_task is None:
             self._run_task = asyncio.create_task(self._run())
 
+    def stop(self) -> None:
+        """Stop running tasks, allowing the queue to be joined."""
+        self._ok_to_join_event.set()
+
+        if self._run_task:
+            self._run_task.cancel()
+
     async def join(self) -> None:
         """Wait for the background run task to complete, propagating errors."""
-        await self._run_started_event.wait()
+        await self._ok_to_join_event.wait()
 
         if self._run_task:
             await self._run_task

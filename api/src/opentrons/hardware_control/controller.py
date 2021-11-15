@@ -121,6 +121,12 @@ class Controller:
         await self._smoothie_driver.update_position()
         return self._smoothie_driver.position
 
+    def is_homed(self, axes: Sequence[str]) -> bool:
+        for axis in axes:
+            if not self._smoothie_driver.homed_flags.get(axis, False):
+                return False
+        return True
+
     async def move(
         self,
         target_position: Dict[str, float],

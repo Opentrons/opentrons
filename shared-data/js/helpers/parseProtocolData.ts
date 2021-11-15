@@ -7,7 +7,11 @@ import protocolSchemaV4 from '../../protocol/schemas/4.json'
 import protocolSchemaV5 from '../../protocol/schemas/5.json'
 
 import type { ErrorObject } from 'ajv'
-import type { JsonProtocolFile, ProtocolFileV1 } from '../../protocol'
+import type {
+  JsonProtocolFile,
+  ProtocolFile,
+  ProtocolFileV1,
+} from '../../protocol'
 
 export type ProtocolParseErrorKey = 'INVALID_FILE_TYPE' | 'INVALID_JSON_FILE'
 
@@ -122,7 +126,7 @@ export function validateJsonProtocolFileContents(
   }
 }
 
-export function protocolHasModules(protocol: JsonProtocolFile): boolean {
+export function protocolHasModules(protocol: ProtocolFile<{}>): boolean {
   return 'modules' in protocol && Object.entries(protocol.modules).length > 0
 }
 

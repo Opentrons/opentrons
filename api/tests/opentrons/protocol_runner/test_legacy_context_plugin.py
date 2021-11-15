@@ -1,5 +1,6 @@
 """Tests for the ProtocolRunner's LegacyContextPlugin."""
 import pytest
+from anyio import to_thread
 from decoy import Decoy, matchers
 from datetime import datetime
 from typing import Callable
@@ -20,6 +21,7 @@ from opentrons.protocol_runner.legacy_wrappers import (
     LegacyLabwareLoadInfo,
     LegacyInstrumentLoadInfo,
     LegacyModuleLoadInfo,
+    LegacyLabwareLoadOnModuleInfo,
 )
 
 from opentrons.types import DeckSlotName, Mount
@@ -107,7 +109,7 @@ def test_broker_subscribe_unsubscribe(
     legacy_command_mapper: LegacyCommandMapper,
     subject: LegacyContextPlugin,
 ) -> None:
-    """It should subscribe to the brokers on play and unsubscribe on stop."""
+    """It should subscribe to the brokers on setup and unsubscribe on teardown."""
     main_unsubscribe: Callable[[], None] = decoy.mock()
     labware_unsubscribe: Callable[[], None] = decoy.mock()
     instrument_unsubscribe: Callable[[], None] = decoy.mock()
@@ -115,10 +117,7 @@ def test_broker_subscribe_unsubscribe(
     module_labware_unsubscribe: Callable[[], None] = decoy.mock()
 
     decoy.when(
-        legacy_context.broker.subscribe(
-            topic="command",
-            handler=matchers.Anything(),
-        )
+        legacy_context.broker.subscribe(topic="command", handler=matchers.Anything())
     ).then_return(main_unsubscribe)
 
     decoy.when(
@@ -139,17 +138,19 @@ def test_broker_subscribe_unsubscribe(
         )
     ).then_return(module_labware_unsubscribe)
 
-    subject.handle_action(pe_actions.PlayAction())
-    subject.handle_action(pe_actions.StopAction())
+    subject.setup()
+    subject.teardown()
 
-    decoy.verify(main_unsubscribe())
-    decoy.verify(labware_unsubscribe())
-    decoy.verify(instrument_unsubscribe())
-    decoy.verify(module_unsubscribe())
-    decoy.verify(module_labware_unsubscribe())
+    decoy.verify(
+        main_unsubscribe(),
+        labware_unsubscribe(),
+        instrument_unsubscribe(),
+        module_unsubscribe(),
+        module_labware_unsubscribe(),
+    )
 
 
-def test_main_broker_messages(
+async def test_main_broker_messages(
     decoy: Decoy,
     legacy_context: LegacyProtocolContext,
     legacy_command_mapper: LegacyCommandMapper,
@@ -157,6 +158,7 @@ def test_main_broker_messages(
     subject: LegacyContextPlugin,
 ) -> None:
     """It should dispatch commands from main broker messages."""
+    subject.setup()
     subject.handle_action(pe_actions.PlayAction())
 
     handler_captor = matchers.Captor()
@@ -183,14 +185,14 @@ def test_main_broker_messages(
         engine_command
     )
 
-    handler(legacy_command)
+    await to_thread.run_sync(handler, legacy_command)
 
     decoy.verify(
         action_dispatcher.dispatch(pe_actions.UpdateCommandAction(engine_command))
     )
 
 
-def test_labware_load_broker_messages(
+async def test_labware_load_broker_messages(
     decoy: Decoy,
     legacy_context: LegacyProtocolContext,
     legacy_command_mapper: LegacyCommandMapper,
@@ -199,6 +201,7 @@ def test_labware_load_broker_messages(
     minimal_labware_def: LabwareDefinitionDict,
 ) -> None:
     """It should dispatch commands from labware load broker messages."""
+    subject.setup()
     subject.handle_action(pe_actions.PlayAction())
 
     handler_captor = matchers.Captor()
@@ -226,14 +229,14 @@ def test_labware_load_broker_messages(
         legacy_command_mapper.map_labware_load(labware_load_info=labware_load_info)
     ).then_return(engine_command)
 
-    handler(labware_load_info)
+    await to_thread.run_sync(handler, labware_load_info)
 
     decoy.verify(
         action_dispatcher.dispatch(pe_actions.UpdateCommandAction(engine_command))
     )
 
 
-def test_instrument_load_broker_messages(
+async def test_instrument_load_broker_messages(
     decoy: Decoy,
     legacy_context: LegacyProtocolContext,
     legacy_command_mapper: LegacyCommandMapper,
@@ -241,6 +244,7 @@ def test_instrument_load_broker_messages(
     subject: LegacyContextPlugin,
 ) -> None:
     """It should dispatch commands from instrument load broker messages."""
+    subject.setup()
     subject.handle_action(pe_actions.PlayAction())
 
     handler_captor = matchers.Captor()
@@ -268,14 +272,14 @@ def test_instrument_load_broker_messages(
         )
     ).then_return(engine_command)
 
-    handler(instrument_load_info)
+    await to_thread.run_sync(handler, instrument_load_info)
 
     decoy.verify(
         action_dispatcher.dispatch(pe_actions.UpdateCommandAction(engine_command))
     )
 
 
-def test_module_load_broker_messages(
+async def test_module_load_broker_messages(
     decoy: Decoy,
     legacy_context: LegacyProtocolContext,
     legacy_command_mapper: LegacyCommandMapper,
@@ -283,6 +287,7 @@ def test_module_load_broker_messages(
     subject: LegacyContextPlugin,
 ) -> None:
     """It should dispatch commands from module load broker messages."""
+    subject.setup()
     subject.handle_action(pe_actions.PlayAction())
 
     handler_captor = matchers.Captor()
@@ -308,14 +313,14 @@ def test_module_load_broker_messages(
         legacy_command_mapper.map_module_load(module_load_info=module_load_info)
     ).then_return(engine_command)
 
-    handler(module_load_info)
+    await to_thread.run_sync(handler, module_load_info)
 
     decoy.verify(
         action_dispatcher.dispatch(pe_actions.UpdateCommandAction(engine_command))
     )
 
 
-def test_module_labware_load_broker_messages(
+async def test_module_labware_load_broker_messages(
     decoy: Decoy,
     legacy_context: LegacyProtocolContext,
     legacy_command_mapper: LegacyCommandMapper,
@@ -323,21 +328,23 @@ def test_module_labware_load_broker_messages(
     subject: LegacyContextPlugin,
     minimal_labware_def: LabwareDefinitionDict,
 ) -> None:
-    """It should dispatch commands from labware load broker messages."""
+    """It should dispatch commands from module labware load broker messages."""
+    subject.setup()
     subject.handle_action(pe_actions.PlayAction())
 
     handler_captor = matchers.Captor()
 
-    decoy.verify(legacy_context.labware_load_broker.subscribe(callback=handler_captor))
+    decoy.verify(
+        legacy_context.module_labware_load_broker.subscribe(callback=handler_captor))
 
-    handler: Callable[[LegacyLabwareLoadInfo], None] = handler_captor.value
+    handler: Callable[[LegacyLabwareLoadOnModuleInfo], None] = handler_captor.value
 
-    labware_load_info = LegacyLabwareLoadInfo(
+    labware_load_info = LegacyLabwareLoadOnModuleInfo(
         labware_definition=minimal_labware_def,
         labware_namespace="some_namespace",
         labware_load_name="some_load_name",
         labware_version=123,
-        deck_slot=DeckSlotName.SLOT_1,
+        moduleId="some_module_id",
     )
 
     engine_command = pe_commands.Custom(
@@ -351,7 +358,7 @@ def test_module_labware_load_broker_messages(
         legacy_command_mapper.map_labware_load(labware_load_info=labware_load_info)
     ).then_return(engine_command)
 
-    handler(labware_load_info)
+    await to_thread.run_sync(handler, labware_load_info)
 
     decoy.verify(
         action_dispatcher.dispatch(pe_actions.UpdateCommandAction(engine_command))

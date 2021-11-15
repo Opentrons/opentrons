@@ -9,7 +9,7 @@ export const getLabwareLocation = (
     (command: Command): command is LoadLabwareCommand =>
       command.commandType === 'loadLabware' &&
       command.result?.labwareId === labwareId
-  )?.params.location
+  )?.params?.location
 
   if (labwareLocation == null) {
     throw new Error(

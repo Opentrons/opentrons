@@ -10,7 +10,7 @@ from opentrons.protocol_engine.types import PipetteName
 from opentrons.protocol_engine.execution import QueueWorker
 from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.state import StateStore
-from opentrons.protocol_engine.plugins import AbstractPlugin
+from opentrons.protocol_engine.plugins import AbstractPlugin, PluginStarter
 
 from opentrons.protocol_engine.actions import (
     ActionDispatcher,
@@ -34,6 +34,12 @@ def action_dispatcher(decoy: Decoy) -> ActionDispatcher:
 
 
 @pytest.fixture
+def plugin_starter(decoy: Decoy) -> PluginStarter:
+    """Get a mock PluginStarter."""
+    return decoy.mock(cls=PluginStarter)
+
+
+@pytest.fixture
 def queue_worker(decoy: Decoy) -> QueueWorker:
     """Get a mock QueueWorker."""
     return decoy.mock(cls=QueueWorker)
@@ -53,17 +59,19 @@ def hardware_api(decoy: Decoy) -> HardwareAPI:
 
 @pytest.fixture
 def subject(
+    hardware_api: HardwareAPI,
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
-    model_utils: ModelUtils,
+    plugin_starter: PluginStarter,
     queue_worker: QueueWorker,
-    hardware_api: HardwareAPI,
+    model_utils: ModelUtils,
 ) -> ProtocolEngine:
     """Get a ProtocolEngine test subject with its dependencies stubbed out."""
     return ProtocolEngine(
         hardware_api=hardware_api,
         state_store=state_store,
         action_dispatcher=action_dispatcher,
+        plugin_starter=plugin_starter,
         queue_worker=queue_worker,
         model_utils=model_utils,
     )
@@ -215,6 +223,7 @@ def test_pause(
 async def test_stop(
     decoy: Decoy,
     action_dispatcher: ActionDispatcher,
+    plugin_starter: PluginStarter,
     queue_worker: QueueWorker,
     hardware_api: HardwareAPI,
     subject: ProtocolEngine,
@@ -226,6 +235,7 @@ async def test_stop(
         action_dispatcher.dispatch(StopAction()),
         await queue_worker.join(),
         await hardware_api.stop(home_after=False),
+        plugin_starter.stop(),
     )
 
 
@@ -295,21 +305,18 @@ async def test_halt(
         action_dispatcher.dispatch(StopAction()),
         queue_worker.cancel(),
         await hardware_api.halt(),
+        await hardware_api.stop(home_after=False),
     )
 
 
 def test_add_plugin(
     decoy: Decoy,
-    state_store: StateStore,
-    action_dispatcher: ActionDispatcher,
+    plugin_starter: PluginStarter,
     subject: ProtocolEngine,
 ) -> None:
-    """It should configure and add a plugin to the ActionDispatcher pipeline."""
+    """It should add a plugin to the PluginStarter."""
     plugin = decoy.mock(cls=AbstractPlugin)
 
     subject.add_plugin(plugin)
 
-    decoy.verify(
-        plugin._configure(state=state_store, action_dispatcher=action_dispatcher),
-        action_dispatcher.add_handler(plugin),
-    )
+    decoy.verify(plugin_starter.start(plugin))

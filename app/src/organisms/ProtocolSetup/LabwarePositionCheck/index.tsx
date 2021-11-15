@@ -8,7 +8,7 @@ import {
   Text,
 } from '@opentrons/components'
 import { Portal } from '../../../App/portal'
-import { useSteps, useLabwarePositionCheck } from './hooks'
+import { useLabwarePositionCheck } from './hooks'
 import { IntroScreen } from './IntroScreen'
 import { GenericStepScreen } from './GenericStepScreen'
 import { SummaryScreen } from './SummaryScreen'
@@ -20,17 +20,10 @@ interface LabwarePositionCheckModalProps {
   onCloseClick: () => unknown
 }
 
-const isComplete = true // TODO: replace this with isComplete boolean from useLabwarePositionCheck
-
 export const LabwarePositionCheck = (
   props: LabwarePositionCheckModalProps
 ): JSX.Element | null => {
   const { t } = useTranslation(['labware_position_check', 'shared'])
-  const isLoading: boolean = true
-  const steps = useSteps()
-  const [currentLabwareCheckStep, setCurrentLabwareCheckStep] = React.useState<
-    number | null
-  >(null)
   const [savePositionCommandData, setSavePositionCommandData] = React.useState<{
     [labwareId: string]: string[]
   }>({})
@@ -42,7 +35,10 @@ export const LabwarePositionCheck = (
   ): void => {
     setSavePositionCommandData({
       ...savePositionCommandData,
-      [labwareId]: [...savePositionCommandData[labwareId], commandId],
+      [labwareId]:
+        savePositionCommandData[labwareId] != null
+          ? [...savePositionCommandData[labwareId], commandId]
+          : [commandId],
     })
   }
   const labwarePositionCheckUtils = useLabwarePositionCheck(
@@ -73,7 +69,17 @@ export const LabwarePositionCheck = (
     )
   }
 
-  const { beginLPC, proceed, ctaText } = labwarePositionCheckUtils
+  const {
+    beginLPC,
+    proceed,
+    ctaText,
+    currentCommandIndex,
+    currentStep,
+    isComplete,
+    titleText,
+    isLoading,
+    jog,
+  } = labwarePositionCheckUtils
 
   return (
     <Portal level="top">
@@ -93,12 +99,13 @@ export const LabwarePositionCheck = (
         ) : null}
         {isComplete ? (
           <SummaryScreen />
-        ) : currentLabwareCheckStep !== null ? (
+        ) : currentCommandIndex !== 0 ? (
           <GenericStepScreen
-            setCurrentLabwareCheckStep={setCurrentLabwareCheckStep}
-            selectedStep={steps[currentLabwareCheckStep]}
+            selectedStep={currentStep}
             ctaText={ctaText}
             proceed={proceed}
+            title={titleText}
+            jog={jog}
           />
         ) : (
           <IntroScreen beginLPC={beginLPC} />

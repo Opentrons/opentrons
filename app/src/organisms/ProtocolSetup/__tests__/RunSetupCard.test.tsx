@@ -1,9 +1,10 @@
 import * as React from 'react'
+import { pick } from 'lodash'
 import { when } from 'jest-when'
 import '@testing-library/jest-dom'
 import { fireEvent } from '@testing-library/react'
 import {
-  componentPropsMatcher,
+  anyProps,
   partialComponentPropsMatcher,
   renderWithProviders,
 } from '@opentrons/components'
@@ -13,7 +14,7 @@ import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/test
 import { i18n } from '../../../i18n'
 import {
   mockAttachedPipette,
-  mockProtocolPipetteTipRackCalInfo,
+  mockPipetteInfo,
 } from '../../../redux/pipettes/__fixtures__'
 import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
 import * as discoverySelectors from '../../../redux/discovery/selectors'
@@ -23,7 +24,7 @@ import {
 } from '../../../redux/pipettes'
 import { mockCalibrationStatus } from '../../../redux/calibration/__fixtures__'
 import * as calibrationSelectors from '../../../redux/calibration/selectors'
-import * as protocolSelectors from '../../../redux/protocol/selectors'
+import { useProtocolDetails } from '../../RunDetails/hooks'
 import { RunSetupCard } from '../RunSetupCard'
 import { ModuleSetup } from '../RunSetupCard/ModuleSetup'
 import { LabwareSetup } from '../RunSetupCard/LabwareSetup'
@@ -34,12 +35,11 @@ import type {
   AttachedPipettesByMount,
   ProtocolPipetteTipRackCalDataByMount,
 } from '../../../redux/pipettes/types'
-import { pick } from 'lodash'
 
-jest.mock('../../../redux/protocol/selectors')
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../../redux/pipettes/selectors')
 jest.mock('../../../redux/calibration/selectors')
+jest.mock('../../RunDetails/hooks')
 jest.mock('../RunSetupCard/LabwareSetup')
 jest.mock('../RunSetupCard/ModuleSetup')
 jest.mock('../RunSetupCard/RobotCalibration')
@@ -53,12 +53,12 @@ const mockAttachedPipettes: AttachedPipettesByMount = {
 } as any
 
 const mockProtocolPipetteTipRackCalData: ProtocolPipetteTipRackCalDataByMount = {
-  left: mockProtocolPipetteTipRackCalInfo,
+  left: mockPipetteInfo,
   right: null,
 } as any
 
-const mockGetProtocolData = protocolSelectors.getProtocolData as jest.MockedFunction<
-  typeof protocolSelectors.getProtocolData
+const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
+  typeof useProtocolDetails
 >
 const mockLabwareSetup = LabwareSetup as jest.MockedFunction<
   typeof LabwareSetup
@@ -104,7 +104,9 @@ describe('RunSetupCard', () => {
       mockCalibrationStatus.deckCalibration.data
     )
     mockGetProtocolCalibrationComplete.mockReturnValue({ complete: true })
-    mockGetProtocolData.mockReturnValue(noModulesProtocol as any)
+    mockUseProtocolDetails.mockReturnValue({
+      protocolData: noModulesProtocol,
+    } as any)
 
     mockLabwareSetup.mockReturnValue(<div>Mock Labware Setup</div>)
 
@@ -130,11 +132,8 @@ describe('RunSetupCard', () => {
 
     when(mockProceedToRun)
       .mockReturnValue(<div></div>)
-      .calledWith(
-        componentPropsMatcher({
-          robotName: mockConnectedRobot.name,
-        })
-      )
+      // @ts-expect-error need to provide anyProps bcuz under the hood react calls components with arguments even when they dont take props
+      .calledWith(anyProps())
       .mockReturnValue(<div>Mock Proceed To Run</div>)
   })
 
@@ -167,7 +166,9 @@ describe('RunSetupCard', () => {
   })
 
   it('renders module setup and allows the user to proceed to labware setup', () => {
-    mockGetProtocolData.mockReturnValue(withModulesProtocol as any)
+    mockUseProtocolDetails.mockReturnValue({
+      protocolData: withModulesProtocol,
+    } as any)
 
     const { getByRole, getByText } = render()
     const moduleSetupHeading = getByRole('heading', { name: 'Module Setup' })
@@ -177,12 +178,16 @@ describe('RunSetupCard', () => {
     getByText('Mock Labware Setup')
   })
   it('renders null if python protocol with only metadata field', () => {
-    mockGetProtocolData.mockReturnValue({ metadata: {} as any })
+    mockUseProtocolDetails.mockReturnValue({
+      protocolData: { metadata: null },
+    } as any)
     const { container } = render()
     expect(container.firstChild).toBeNull()
   })
   it('renders correct text contents for multiple modules', () => {
-    mockGetProtocolData.mockReturnValue(withModulesProtocol as any)
+    mockUseProtocolDetails.mockReturnValue({
+      protocolData: withModulesProtocol,
+    } as any)
     const { getByRole, getByText } = render()
     expect(getByRole('heading', { name: 'Setup for Run' })).toBeTruthy()
     expect(getByRole('heading', { name: 'STEP 1' })).toBeTruthy()
@@ -206,12 +211,14 @@ describe('RunSetupCard', () => {
     ).toBeTruthy()
   })
   it('renders correct text contents for single module', () => {
-    mockGetProtocolData.mockReturnValue({
-      ...withModulesProtocol,
-      modules: pick(
-        withModulesProtocol.modules,
-        Object.keys(withModulesProtocol.modules)[0]
-      ),
+    mockUseProtocolDetails.mockReturnValue({
+      protocolData: {
+        ...withModulesProtocol,
+        modules: pick(
+          withModulesProtocol.modules,
+          Object.keys(withModulesProtocol.modules)[0]
+        ),
+      },
     } as any)
     const { getByRole, getByText } = render()
     expect(getByRole('heading', { name: 'Setup for Run' })).toBeTruthy()

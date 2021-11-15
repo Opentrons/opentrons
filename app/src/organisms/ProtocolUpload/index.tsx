@@ -51,7 +51,7 @@ export function ProtocolUpload(): JSX.Element {
     clearError()
     ingestProtocolFile(
       file,
-      data => {
+      (file, data) => {
         dispatch(loadProtocol(file, data))
         createProtocolRun([file])
       },

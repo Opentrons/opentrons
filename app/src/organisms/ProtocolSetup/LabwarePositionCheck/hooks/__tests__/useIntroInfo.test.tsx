@@ -1,11 +1,12 @@
 import * as React from 'react'
 import { when } from 'jest-when'
 import { Provider } from 'react-redux'
+import { QueryClient, QueryClientProvider } from 'react-query'
 import { createStore, Store } from 'redux'
 import { renderHook } from '@testing-library/react-hooks'
 import { getPipetteNameSpecs, PipetteName } from '@opentrons/shared-data'
-import { getProtocolData } from '../../../../../redux/protocol'
 import { getPipetteMount } from '../../../utils/getPipetteMount'
+import { useProtocolDetails } from '../../../../RunDetails/hooks'
 import * as hooks from '..'
 import { getLabwareLocation } from '../../../utils/getLabwareLocation'
 import { getLabwarePositionCheckSteps } from '../../getLabwarePositionCheckSteps'
@@ -17,6 +18,7 @@ jest.mock('../../getLabwarePositionCheckSteps')
 jest.mock('../../../../../redux/protocol')
 jest.mock('../../../utils/getPipetteMount')
 jest.mock('../../../utils/getLabwareLocation')
+jest.mock('../../../../RunDetails/hooks')
 
 const PRIMARY_PIPETTE_ID = 'PRIMARY_PIPETTE_ID'
 const PRIMARY_PIPETTE_NAME = 'PRIMARY_PIPETTE_NAME' as PipetteName
@@ -28,8 +30,8 @@ const PICKUP_TIP_LABWARE_ID = 'PICKUP_TIP_LABWARE_ID'
 const PICKUP_TIP_LABWARE_SLOT = '3'
 const PICKUP_TIP_LABWARE_DISPLAY_NAME = 'PICKUP_TIP_LABWARE_DISPLAY_NAME'
 
-const mockGetProtocolData = getProtocolData as jest.MockedFunction<
-  typeof getProtocolData
+const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
+  typeof useProtocolDetails
 >
 const mockGetPipetteNameSpecs = getPipetteNameSpecs as jest.MockedFunction<
   typeof getPipetteNameSpecs
@@ -45,6 +47,7 @@ const mockGetLabwareLocation = getLabwareLocation as jest.MockedFunction<
 >
 
 const store: Store<any> = createStore(jest.fn(), {})
+const queryClient = new QueryClient()
 
 describe('useIntroInfo', () => {
   beforeEach(() => {
@@ -76,24 +79,26 @@ describe('useIntroInfo', () => {
         ],
       },
     ])
-    mockGetProtocolData.mockReturnValue({
-      labware: {
-        [PICKUP_TIP_LABWARE_ID]: {
-          slot: PICKUP_TIP_LABWARE_SLOT,
-          displayName: PICKUP_TIP_LABWARE_DISPLAY_NAME,
+    mockUseProtocolDetails.mockReturnValue({
+      protocolData: {
+        labware: {
+          [PICKUP_TIP_LABWARE_ID]: {
+            slot: PICKUP_TIP_LABWARE_SLOT,
+            displayName: PICKUP_TIP_LABWARE_DISPLAY_NAME,
+          },
         },
+        pipettes: {
+          [PRIMARY_PIPETTE_ID]: {
+            name: PRIMARY_PIPETTE_NAME,
+            mount: 'left',
+          },
+          [SECONDARY_PIPETTE_ID]: {
+            name: SECONDARY_PIPETTE_NAME,
+            mount: 'right',
+          },
+        },
+        commands: protocolCommands,
       },
-      pipettes: {
-        [PRIMARY_PIPETTE_ID]: {
-          name: PRIMARY_PIPETTE_NAME,
-          mount: 'left',
-        },
-        [SECONDARY_PIPETTE_ID]: {
-          name: SECONDARY_PIPETTE_NAME,
-          mount: 'right',
-        },
-      },
-      commands: protocolCommands,
     } as any)
 
     when(mockGetPipetteNameSpecs)
@@ -110,7 +115,11 @@ describe('useIntroInfo', () => {
   })
   it('should gather all labware position check intro screen data', () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
-      <Provider store={store}>{children}</Provider>
+      <Provider store={store}>
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      </Provider>
     )
     const { result } = renderHook(hooks.useIntroInfo, { wrapper })
     const {

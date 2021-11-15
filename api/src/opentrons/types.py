@@ -179,26 +179,26 @@ class MountType(str, enum.Enum):
 # TODO(mc, 2020-11-09): this makes sense in shared-data or other common
 # model library
 # https://github.com/Opentrons/opentrons/pull/6943#discussion_r519029833
-class DeckSlotName(int, enum.Enum):
+class DeckSlotName(str, enum.Enum):
     """Deck slot identifiers."""
 
-    SLOT_1 = 1
-    SLOT_2 = 2
-    SLOT_3 = 3
-    SLOT_4 = 4
-    SLOT_5 = 5
-    SLOT_6 = 6
-    SLOT_7 = 7
-    SLOT_8 = 8
-    SLOT_9 = 9
-    SLOT_10 = 10
-    SLOT_11 = 11
-    FIXED_TRASH = 12
+    SLOT_1 = "1"
+    SLOT_2 = "2"
+    SLOT_3 = "3"
+    SLOT_4 = "4"
+    SLOT_5 = "5"
+    SLOT_6 = "6"
+    SLOT_7 = "7"
+    SLOT_8 = "8"
+    SLOT_9 = "9"
+    SLOT_10 = "10"
+    SLOT_11 = "11"
+    FIXED_TRASH = "12"
 
     @classmethod
     def from_primitive(cls, value: DeckLocation) -> DeckSlotName:
-        int_val = int(value)
-        return cls(int_val)
+        str_val = str(value)
+        return cls(str_val)
 
     def __str__(self):
         """Stringify to a simple integer string."""

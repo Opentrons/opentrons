@@ -4,30 +4,45 @@ import {
   RUN_ACTION_TYPE_PAUSE,
   createRunAction,
 } from '@opentrons/api-client'
-import { UseMutationResult, useMutation, UseMutateFunction } from 'react-query'
+import {
+  UseMutationResult,
+  useMutation,
+  UseMutateFunction,
+  UseMutationOptions,
+} from 'react-query'
 import { useHost } from '../api'
-// TODO(bh, 10-27-2021): temp mock returns til fully wired. uncomment mutation callback body to mock
-// import { mockPauseRunAction } from './__fixtures__'
+
+import type { AxiosError } from 'axios'
 
 export type UsePauseRunMutationResult = UseMutationResult<
   RunAction,
   unknown,
-  void
+  string
 > & {
-  pauseRun: UseMutateFunction<RunAction>
+  pauseRun: UseMutateFunction<RunAction, unknown, string>
 }
 
+export type UsePauseRunMutationOptions = UseMutationOptions<
+  RunAction,
+  AxiosError,
+  string
+>
+
 export const usePauseRunMutation = (
-  runId: string
+  options: UsePauseRunMutationOptions = {}
 ): UsePauseRunMutationResult => {
   const host = useHost()
-  const mutation = useMutation<RunAction>(
+  const mutation = useMutation<RunAction, AxiosError, string>(
     [host, 'runs', RUN_ACTION_TYPE_PAUSE],
-    () =>
+    (runId: string) =>
       createRunAction(host as HostConfig, runId, {
         actionType: RUN_ACTION_TYPE_PAUSE,
-      }).then(response => response.data)
-    // Promise.resolve(mockPauseRunAction)
+      })
+        .then(response => response.data)
+        .catch(e => {
+          throw e
+        }),
+    options
   )
   return {
     ...mutation,

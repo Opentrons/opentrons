@@ -13,11 +13,11 @@ export const getPrimaryPipetteId = (
   const leftPipetteId = commands.find(
     (command: Command): command is LoadPipetteCommand =>
       command.commandType === 'loadPipette' && command.params.mount === 'left'
-  )?.params.pipetteId
+  )?.result?.pipetteId
   const rightPipetteId = commands.find(
     (command: Command): command is LoadPipetteCommand =>
       command.commandType === 'loadPipette' && command.params.mount === 'right'
-  )?.params.pipetteId
+  )?.result?.pipetteId
 
   if (leftPipetteId == null || rightPipetteId == null) {
     throw new Error(

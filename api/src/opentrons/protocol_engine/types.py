@@ -117,6 +117,25 @@ class LoadedLabware(BaseModel):
     location: LabwareLocation
 
 
+class MovementAxis(str, Enum):
+    """Axis on which to issue a relative movement."""
+
+    X = "x"
+    Y = "y"
+    Z = "z"
+
+
+class MotorAxis(str, Enum):
+    """Motor axis on which to issue a home command."""
+
+    X = "x"
+    Y = "y"
+    LEFT_Z = "leftZ"
+    RIGHT_Z = "rightZ"
+    LEFT_PLUNGER = "leftPlunger"
+    RIGHT_PLUNGER = "rightPlunger"
+
+
 class LabwareOffsetVector(BaseModel):
     """Offset, in deck coordinates from nominal to actual position."""
 
