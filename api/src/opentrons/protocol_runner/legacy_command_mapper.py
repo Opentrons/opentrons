@@ -127,7 +127,7 @@ class LegacyCommandMapper:
         )
 
         self._command_count["LOAD_LABWARE"] = count + 1
-        if isinstance(labware_load_info, LegacyLabwareLoadInfo):
+        if isinstance(location, pe_types.DeckSlotLocation):
             # TODO: Update for labware on module
             self._labware_id_by_slot[location.slotName] = labware_id
         return load_labware_command

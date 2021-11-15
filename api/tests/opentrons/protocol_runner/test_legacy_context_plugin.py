@@ -335,7 +335,8 @@ async def test_module_labware_load_broker_messages(
     handler_captor = matchers.Captor()
 
     decoy.verify(
-        legacy_context.module_labware_load_broker.subscribe(callback=handler_captor))
+        legacy_context.module_labware_load_broker.subscribe(callback=handler_captor)
+    )
 
     handler: Callable[[LegacyLabwareLoadOnModuleInfo], None] = handler_captor.value
 
