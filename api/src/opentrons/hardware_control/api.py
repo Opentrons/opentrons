@@ -871,7 +871,7 @@ class API(HardwareAPILike):
             or not self._current_position
         ):
             raise MustHomeError(
-                "Current position of {str(mount)} pipette is unknown, please home."
+                f"Current position of {str(mount)} pipette is unknown, please home."
             )
 
         elif not self._current_position and not refresh:
