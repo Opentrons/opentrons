@@ -22,6 +22,8 @@ import { useLogger } from '../../logger'
 import type { ErrorObject } from 'ajv'
 import type { Dispatch } from '../../redux/types'
 
+import styles from './styles.css'
+
 const VALIDATION_ERROR_T_MAP: { [errorKey: string]: string } = {
   INVALID_FILE_TYPE: 'invalid_file_type',
   INVALID_JSON_FILE: 'invalid_json_file',
@@ -85,6 +87,7 @@ export function ProtocolUpload(): JSX.Element {
           children: t('shared:close'),
           iconName: 'close' as const,
         },
+        className: styles.reverse_titlebar_items,
       }
     : {
         title: t('upload_and_simulate'),
