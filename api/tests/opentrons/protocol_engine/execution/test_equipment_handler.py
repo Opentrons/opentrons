@@ -102,7 +102,7 @@ async def test_load_labware(
             createdAt=datetime(year=2021, month=1, day=2),
             definitionUri="opentrons-test/load-name/1",
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
-            offset=LabwareOffsetVector(x=1, y=2, z=3),
+            vector=LabwareOffsetVector(x=1, y=2, z=3),
         )
     )
 

@@ -96,7 +96,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 createdAt=action.created_at,
                 definitionUri=action.request.definitionUri,
                 location=action.request.location,
-                offset=action.request.offset,
+                vector=action.request.vector,
             )
             self._add_labware_offset(labware_offset)
 
@@ -319,7 +319,7 @@ class LabwareView(HasState[LabwareState]):
         if offset_id is None:
             return LabwareOffsetVector(x=0, y=0, z=0)
         else:
-            return self._state.labware_offsets_by_id[offset_id].offset
+            return self._state.labware_offsets_by_id[offset_id].vector
 
     def get_labware_offset(self, labware_offset_id: str) -> LabwareOffset:
         """Get a labware offset by the offset's unique ID.

@@ -78,7 +78,7 @@ def test_handles_add_labware_offset(
     request = LabwareOffsetCreate(
         definitionUri="offset-definition-uri",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-        offset=LabwareOffsetVector(x=1, y=2, z=3),
+        vector=LabwareOffsetVector(x=1, y=2, z=3),
     )
 
     resolved_offset = LabwareOffset(
@@ -86,7 +86,7 @@ def test_handles_add_labware_offset(
         createdAt=datetime(year=2021, month=1, day=2),
         definitionUri="offset-definition-uri",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-        offset=LabwareOffsetVector(x=1, y=2, z=3),
+        vector=LabwareOffsetVector(x=1, y=2, z=3),
     )
 
     subject.handle_action(
@@ -108,7 +108,7 @@ def test_handles_load_labware(
     offset_request = LabwareOffsetCreate(
         definitionUri="offset-definition-uri",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-        offset=LabwareOffsetVector(x=1, y=2, z=3),
+        vector=LabwareOffsetVector(x=1, y=2, z=3),
     )
 
     command = create_load_labware_command(

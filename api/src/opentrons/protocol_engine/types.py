@@ -128,9 +128,7 @@ class LabwareOffset(BaseModel):
         ...,
         description="Where the labware is located on the robot.",
     )
-    # todo(mm, 2021-11-11): Messy terminology. Is an "offset" a 3D vector, or is
-    # it this whole record, which the 3D vector is part of?
-    offset: LabwareOffsetVector = Field(
+    vector: LabwareOffsetVector = Field(
         ...,
         description="The offset applied to matching labware.",
     )
@@ -144,7 +142,7 @@ class LabwareOffsetCreate(BaseModel):
         ...,
         description="Where the labware is located on the robot.",
     )
-    offset: LabwareOffsetVector = Field(
+    vector: LabwareOffsetVector = Field(
         ...,
         description="The offset applied to matching labware.",
     )

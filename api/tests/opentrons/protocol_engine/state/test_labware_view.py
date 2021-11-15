@@ -397,7 +397,7 @@ def test_get_labware_offset_vector() -> None:
         createdAt=datetime(year=2021, month=1, day=2),
         definitionUri="some-labware-uri",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-        offset=offset_vector,
+        vector=offset_vector,
     )
 
     subject = get_labware_view(
@@ -408,7 +408,7 @@ def test_get_labware_offset_vector() -> None:
         labware_offsets_by_id={"offset-id": offset},
     )
 
-    assert subject.get_labware_offset_vector(labware_with_offset.id) == offset.offset
+    assert subject.get_labware_offset_vector(labware_with_offset.id) == offset.vector
 
     assert subject.get_labware_offset_vector(
         labware_without_offset.id
@@ -425,7 +425,7 @@ def test_get_labware_offset() -> None:
         createdAt=datetime(year=2021, month=1, day=1),
         definitionUri="uri-a",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-        offset=LabwareOffsetVector(x=1, y=1, z=1),
+        vector=LabwareOffsetVector(x=1, y=1, z=1),
     )
 
     offset_b = LabwareOffset(
@@ -433,7 +433,7 @@ def test_get_labware_offset() -> None:
         createdAt=datetime(year=2022, month=2, day=2),
         definitionUri="uri-b",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
-        offset=LabwareOffsetVector(x=2, y=2, z=2),
+        vector=LabwareOffsetVector(x=2, y=2, z=2),
     )
 
     subject = get_labware_view(
@@ -453,7 +453,7 @@ def test_get_labware_offsets() -> None:
         createdAt=datetime(year=2021, month=1, day=1),
         definitionUri="uri-a",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-        offset=LabwareOffsetVector(x=1, y=1, z=1),
+        vector=LabwareOffsetVector(x=1, y=1, z=1),
     )
 
     offset_b = LabwareOffset(
@@ -461,7 +461,7 @@ def test_get_labware_offsets() -> None:
         createdAt=datetime(year=2022, month=2, day=2),
         definitionUri="uri-b",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
-        offset=LabwareOffsetVector(x=2, y=2, z=2),
+        vector=LabwareOffsetVector(x=2, y=2, z=2),
     )
 
     empty_subject = get_labware_view()
@@ -485,7 +485,7 @@ def test_find_applicable_labware_offset() -> None:
         createdAt=datetime(year=2021, month=1, day=1),
         definitionUri="definition-uri",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-        offset=LabwareOffsetVector(x=1, y=1, z=1),
+        vector=LabwareOffsetVector(x=1, y=1, z=1),
     )
 
     # Same definitionUri and location; different id, createdAt, and offset.
@@ -494,7 +494,7 @@ def test_find_applicable_labware_offset() -> None:
         createdAt=datetime(year=2022, month=2, day=2),
         definitionUri="definition-uri",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-        offset=LabwareOffsetVector(x=2, y=2, z=2),
+        vector=LabwareOffsetVector(x=2, y=2, z=2),
     )
 
     subject = get_labware_view(

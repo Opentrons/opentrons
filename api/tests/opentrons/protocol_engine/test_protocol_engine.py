@@ -340,7 +340,7 @@ def test_add_labware_offset(
     request = LabwareOffsetCreate(
         definitionUri="definition-uri",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-        offset=LabwareOffsetVector(x=1, y=2, z=3),
+        vector=LabwareOffsetVector(x=1, y=2, z=3),
     )
 
     id = "labware-offset-id"
@@ -351,7 +351,7 @@ def test_add_labware_offset(
         createdAt=created_at,
         definitionUri=request.definitionUri,
         location=request.location,
-        offset=request.offset,
+        vector=request.vector,
     )
 
     decoy.when(model_utils.generate_id()).then_return(id)
@@ -364,7 +364,7 @@ def test_add_labware_offset(
         request=LabwareOffsetCreate(
             definitionUri="definition-uri",
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-            offset=LabwareOffsetVector(x=1, y=2, z=3),
+            vector=LabwareOffsetVector(x=1, y=2, z=3),
         )
     )
 
