@@ -32,8 +32,15 @@ from .abstract_store import HasState, HandlesActions
 class LabwareState:
     """State of all loaded labware resources."""
 
-    labware_by_id: Dict[str, LoadedLabware]  # Indexed by labware ID.
-    labware_offsets_by_id: Dict[str, LabwareOffset]  # Indexed by labware offset ID.
+    # Indexed by LoadedLabware.id.
+    # If a LoadedLabware here has a non-None offsetId,
+    # it must point to an existing element of labware_offsets_by_id.
+    labware_by_id: Dict[str, LoadedLabware]
+
+    # Indexed by LabwareOffset.id.
+    # We rely on Python 3.7+ preservation of dict insertion order.
+    labware_offsets_by_id: Dict[str, LabwareOffset]
+
     definitions_by_uri: Dict[str, LabwareDefinition]
     deck_definition: DeckDefinitionV2
 
