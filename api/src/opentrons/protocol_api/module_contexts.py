@@ -79,6 +79,17 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
         """
         mod_labware = self._geometry.add_labware(labware)
         self._ctx._implementation.get_deck().recalculate_high_z()
+
+        labware_namespace, labware_load_name, labware_version = labware.uri.split("/")
+        self._ctx.module_labware_load_broker.publish(
+            types.LabwareLoadOnModuleInfo(
+                labware_definition=labware._implementation.get_definition(),
+                labware_namespace=labware_namespace,
+                labware_load_name=labware_load_name,
+                labware_version=int(labware_version),
+                moduleId=self.engine_id,
+            )
+        )
         return mod_labware
 
     @requires_version(2, 0)
@@ -170,6 +181,15 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
         :returns: ModuleGeometry
         """
         return self._geometry
+
+    @property
+    def engine_id(self) -> str:
+        """For Opentrons internal use only.
+
+        The moduleId used in Protocol engine for this module.
+        """
+        # TODO: Is there a need to verify that the parent is a slot?
+        return f"{self._geometry.model}-Slot{self._geometry.parent}"
 
     def __repr__(self):
         return "{} at {} lw {}".format(

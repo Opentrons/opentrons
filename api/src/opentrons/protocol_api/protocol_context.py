@@ -113,12 +113,15 @@ class ProtocolContext(CommandPublisher):
         self._unsubscribe_commands: Optional[Callable[[], None]] = None
         self.clear_commands()
 
-        self._labware_load_broker = EquipmentBroker[LabwareLoadInfo]()
-        self._instrument_load_broker = EquipmentBroker[InstrumentLoadInfo]()
-        self._module_load_broker = EquipmentBroker[ModuleLoadInfo]()
+        self._labware_load_broker = EquipmentBroker[types.LabwareLoadInfo]()
+        self._instrument_load_broker = EquipmentBroker[types.InstrumentLoadInfo]()
+        self._module_load_broker = EquipmentBroker[types.ModuleLoadInfo]()
+        self._module_labware_load_broker = EquipmentBroker[
+            types.LabwareLoadOnModuleInfo
+        ]()
 
     @property
-    def labware_load_broker(self) -> EquipmentBroker[LabwareLoadInfo]:
+    def labware_load_broker(self) -> EquipmentBroker[types.LabwareLoadInfo]:
         """For internal Opentrons use only.
 
         :meta private:
@@ -132,7 +135,23 @@ class ProtocolContext(CommandPublisher):
         return self._labware_load_broker
 
     @property
-    def instrument_load_broker(self) -> EquipmentBroker[InstrumentLoadInfo]:
+    def module_labware_load_broker(
+        self,
+    ) -> EquipmentBroker[types.LabwareLoadOnModuleInfo]:
+        """For internal Opentrons use only.
+
+        :meta private:
+
+        Subscribers to this broker will be notified with information about every
+        successful labware load.
+
+        Only :py:obj:`ProtocolContext` is allowed to publish to this broker.
+        Calling code may only subscribe or unsubscribe.
+        """
+        return self._module_labware_load_broker
+
+    @property
+    def instrument_load_broker(self) -> EquipmentBroker[types.InstrumentLoadInfo]:
         """For internal Opentrons use only.
 
         :meta private:
@@ -142,7 +161,7 @@ class ProtocolContext(CommandPublisher):
         return self._instrument_load_broker
 
     @property
-    def module_load_broker(self) -> EquipmentBroker[ModuleLoadInfo]:
+    def module_load_broker(self) -> EquipmentBroker[types.ModuleLoadInfo]:
         """For internal Opentrons use only.
 
         :meta private:
@@ -382,7 +401,7 @@ class ProtocolContext(CommandPublisher):
 
         result_namespace, result_load_name, result_version = result.uri.split("/")
         self.labware_load_broker.publish(
-            LabwareLoadInfo(
+            types.LabwareLoadInfo(
                 labware_definition=result._implementation.get_definition(),
                 labware_namespace=result_namespace,
                 labware_load_name=result_load_name,
@@ -435,7 +454,7 @@ class ProtocolContext(CommandPublisher):
 
         result_namespace, result_load_name, result_version = result.uri.split("/")
         self.labware_load_broker.publish(
-            LabwareLoadInfo(
+            types.LabwareLoadInfo(
                 labware_definition=result._implementation.get_definition(),
                 labware_namespace=result_namespace,
                 labware_load_name=result_load_name,
@@ -558,8 +577,11 @@ class ProtocolContext(CommandPublisher):
         self._modules.append(module_context)
 
         self.module_load_broker.publish(
-            ModuleLoadInfo(
-                module_name=module_name, location=location, configuration=configuration
+            types.ModuleLoadInfo(
+                module_name=module_name,
+                module_id=module_context.engine_id,
+                location=location,
+                configuration=configuration,
             )
         )
         return module_context
@@ -654,7 +676,7 @@ class ProtocolContext(CommandPublisher):
         self._instruments[checked_mount] = new_instr
 
         self.instrument_load_broker.publish(
-            InstrumentLoadInfo(
+            types.InstrumentLoadInfo(
                 instrument_load_name=instrument_name,
                 mount=checked_mount,
             )
@@ -815,54 +837,3 @@ class ProtocolContext(CommandPublisher):
     def door_closed(self) -> bool:
         """Returns True if the robot door is closed"""
         return self._implementation.door_closed()
-
-
-# todo(mm, 2021-10-11): For the HTTP API to report when labware is loaded on a module,
-# this class either needs to optionally have a module attribute instead of DeckSlotName,
-# or it needs to be split into LabwareLoadedOnDeckInfo and LabwareLoadedOnModuleInfo.
-@dataclass(frozen=True)
-class LabwareLoadInfo:
-    """For Opentrons internal use only.
-
-    :meta private:
-
-    Information about a successful labware load.
-
-    This is a separate class from the main user-facing `Labware` class
-    because this is easier to construct in unit tests.
-    """
-
-    labware_definition: "LabwareDefinition"
-    # todo(mm, 2021-10-11): Namespace, load name, and version can be derived from the
-    # definition. Should they be removed from here?
-    labware_namespace: str
-    labware_load_name: str
-    labware_version: int
-    deck_slot: types.DeckSlotName
-
-
-@dataclass(frozen=True)
-class InstrumentLoadInfo:
-    """For Opentrons internal use only.
-
-    :meta private:
-
-    Like `LabwareLoadInfo`, but for instruments (pipettes).
-    """
-
-    instrument_load_name: str
-    mount: types.Mount
-
-
-@dataclass(frozen=True)
-class ModuleLoadInfo:
-    """For Opentrons internal use only.
-
-    :meta private:
-
-    Like `LabwareLoadInfo`, but for hardware modules.
-    """
-
-    module_name: str
-    location: Optional[types.DeckLocation]
-    configuration: Optional[str]

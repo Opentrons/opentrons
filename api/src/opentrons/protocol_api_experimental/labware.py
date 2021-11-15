@@ -5,7 +5,13 @@ from typing import Any, List, Dict, Optional, Union, cast
 
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from .errors import LabwareIsNotTipRackError
-from .types import DeckSlotName, LabwareParameters, Point
+from .types import (
+    DeckSlotName,
+    LabwareParameters,
+    Point,
+    DeckSlotLocation,
+    ModuleLocation,
+)
 from .well import Well
 from ..protocols.models import LabwareDefinition
 
@@ -64,7 +70,7 @@ class Labware:  # noqa: D101
 
     # TODO(mc, 2021-04-22): labware may be on a module, replace Any with Module
     @property
-    def parent(self) -> Union[DeckSlotName, Any]:
+    def parent(self) -> Union[DeckSlotName, str]:
         """The parent location of this labware.
 
         If the labware's parent is a string, that string represents a specific
@@ -74,7 +80,10 @@ class Labware:  # noqa: D101
         parent = self._engine_client.state.labware.get_location(
             labware_id=self._labware_id
         )
-        return str(parent.slotName)
+        if isinstance(parent, DeckSlotLocation):
+            return str(parent.slotName)
+        elif isinstance(parent, ModuleLocation):
+            return parent.moduleId
 
     # TODO(mc, 2021-05-03): document removal of name setter
     @property

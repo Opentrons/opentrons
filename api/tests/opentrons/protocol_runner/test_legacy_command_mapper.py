@@ -7,6 +7,7 @@ from opentrons.commands.types import PauseMessage
 from opentrons.protocol_engine import (
     LabwareOffsetVector,
     DeckSlotLocation,
+    ModuleLocation,
     PipetteName,
     commands as pe_commands,
 )
@@ -18,6 +19,7 @@ from opentrons.protocol_runner.legacy_wrappers import (
     LegacyInstrumentLoadInfo,
     LegacyLabwareLoadInfo,
     LegacyModuleLoadInfo,
+    LegacyLabwareLoadOnModuleInfo,
 )
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons.types import DeckLocation, DeckSlotName, Mount, MountType
@@ -263,6 +265,7 @@ def test_map_module_load(
         module_name=module_name,
         location=location,
         configuration="conf",
+        module_id="module-id",
     )
     expected_output = pe_commands.LoadModule.construct(
         id=matchers.IsA(str),
@@ -273,8 +276,44 @@ def test_map_module_load(
         params=pe_commands.LoadModuleParams.construct(
             model=module_name,
             location=DeckSlotLocation(slotName=slot),
+            moduleId="module-id",
         ),
         result=pe_commands.LoadModuleResult.construct(moduleId=matchers.IsA(str)),
     )
     output = LegacyCommandMapper().map_module_load(input)
+    assert output == expected_output
+
+
+def test_map_module_labware_load(minimal_labware_def: LabwareDefinition) -> None:
+    """It should correctly map a labware load on module."""
+    input = LegacyLabwareLoadOnModuleInfo(
+        labware_definition=minimal_labware_def,
+        labware_namespace="some_namespace",
+        labware_load_name="some_load_name",
+        labware_version=123,
+        moduleId="module-id",
+    )
+    expected_output = pe_commands.LoadLabware.construct(
+        id=matchers.IsA(str),
+        status=pe_commands.CommandStatus.SUCCEEDED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        params=pe_commands.LoadLabwareParams.construct(
+            location=ModuleLocation(moduleId="module-id"),
+            namespace="some_namespace",
+            loadName="some_load_name",
+            version=123,
+            labwareId=None,
+        ),
+        result=pe_commands.LoadLabwareResult.construct(
+            labwareId=matchers.IsA(str),
+            # Trusting that the exact fields within in the labware definition
+            # get passed through correctly.
+            definition=matchers.Anything(),
+            calibration=LabwareOffsetVector(x=0, y=0, z=0),
+        ),
+    )
+
+    output = LegacyCommandMapper().map_labware_load(input)
     assert output == expected_output

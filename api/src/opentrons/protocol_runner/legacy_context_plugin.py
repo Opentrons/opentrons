@@ -1,6 +1,6 @@
 """Customize the ProtocolEngine to monitor and control legacy (APIv2) protocols."""
 from __future__ import annotations
-from typing import Callable, Optional
+from typing import Callable, Optional, Union
 
 from opentrons.commands.types import CommandMessage as LegacyCommand
 from opentrons.hardware_control import API as HardwareAPI
@@ -12,6 +12,7 @@ from .legacy_wrappers import (
     LegacyLabwareLoadInfo,
     LegacyProtocolContext,
     LegacyModuleLoadInfo,
+    LegacyLabwareLoadOnModuleInfo,
 )
 from .legacy_command_mapper import LegacyCommandMapper
 
@@ -78,6 +79,9 @@ class LegacyContextPlugin(AbstractPlugin):
             Callable[[], None]
         ] = None
         self._unsubscribe_from_module_load_broker: Optional[Callable[[], None]] = None
+        self._unsubscribe_from_module_labware_load_broker: Optional[
+            Callable[[], None]
+        ] = None
 
     def handle_action(self, action: pe_actions.Action) -> None:
         """React to a ProtocolEngine action."""
@@ -113,6 +117,11 @@ class LegacyContextPlugin(AbstractPlugin):
                 callback=self._dispatch_module_loaded
             )
         )
+        self._unsubscribe_from_module_labware_load_broker = (
+            self._protocol_context.module_labware_load_broker.subscribe(
+                callback=self._dispatch_labware_loaded
+            )
+        )
         self._subscriptions_are_set_up = True
 
     def _tear_down_subscriptions(self) -> None:
@@ -121,10 +130,12 @@ class LegacyContextPlugin(AbstractPlugin):
             assert self._unsubscribe_from_labware_load_broker is not None
             assert self._unsubscribe_from_instrument_load_broker is not None
             assert self._unsubscribe_from_module_load_broker is not None
+            assert self._unsubscribe_from_module_labware_load_broker is not None
             self._unsubscribe_from_main_broker()
             self._unsubscribe_from_labware_load_broker()
             self._unsubscribe_from_instrument_load_broker()
             self._unsubscribe_from_module_load_broker()
+            self._unsubscribe_from_module_labware_load_broker()
             self._subscriptions_are_set_up = False
 
     def _dispatch_legacy_command(self, command: LegacyCommand) -> None:
@@ -132,7 +143,8 @@ class LegacyContextPlugin(AbstractPlugin):
         self.dispatch(pe_actions.UpdateCommandAction(command=pe_command))
 
     def _dispatch_labware_loaded(
-        self, labware_load_info: LegacyLabwareLoadInfo
+        self,
+        labware_load_info: Union[LegacyLabwareLoadInfo, LegacyLabwareLoadOnModuleInfo],
     ) -> None:
         pe_command = self._legacy_command_mapper.map_labware_load(
             labware_load_info=labware_load_info

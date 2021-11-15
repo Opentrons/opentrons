@@ -1,7 +1,7 @@
 """Translate events from a legacy ``ProtocolContext`` into Protocol Engine commands."""
 
 from collections import defaultdict
-from typing import Dict, List
+from typing import Dict, List, Union
 
 from opentrons.types import MountType, DeckSlotName
 from opentrons.util.helpers import utc_now
@@ -13,6 +13,7 @@ from .legacy_wrappers import (
     LegacyInstrumentLoadInfo,
     LegacyLabwareLoadInfo,
     LegacyModuleLoadInfo,
+    LegacyLabwareLoadOnModuleInfo,
 )
 
 
@@ -92,13 +93,17 @@ class LegacyCommandMapper:
 
     def map_labware_load(
         self,
-        labware_load_info: LegacyLabwareLoadInfo,
+        labware_load_info: Union[LegacyLabwareLoadInfo, LegacyLabwareLoadOnModuleInfo],
     ) -> pe_commands.Command:
         """Map a legacy labware load to a ProtocolEngine command."""
         now = utc_now()
 
         count = self._command_count["LOAD_LABWARE"]
-
+        location: pe_types.LabwareLocation
+        if isinstance(labware_load_info, LegacyLabwareLoadInfo):
+            location = pe_types.DeckSlotLocation(slotName=labware_load_info.deck_slot)
+        else:
+            location = pe_types.ModuleLocation(moduleId=labware_load_info.moduleId)
         load_labware_command = pe_commands.LoadLabware(
             id=f"commands.LOAD_LABWARE-{count}",
             status=pe_commands.CommandStatus.SUCCEEDED,
@@ -106,9 +111,7 @@ class LegacyCommandMapper:
             startedAt=now,
             completedAt=now,
             params=pe_commands.LoadLabwareParams(
-                location=pe_types.DeckSlotLocation(
-                    slotName=labware_load_info.deck_slot
-                ),
+                location=location,
                 loadName=labware_load_info.labware_load_name,
                 namespace=labware_load_info.labware_namespace,
                 version=labware_load_info.labware_version,
@@ -185,9 +188,10 @@ class LegacyCommandMapper:
                 location=pe_types.DeckSlotLocation(
                     slotName=DeckSlotName.from_primitive(location)
                 ),
+                moduleId=module_load_info.module_id,
             ),
             result=pe_commands.LoadModuleResult(
-                moduleId=f"module-{count}",
+                moduleId=module_load_info.module_id,
             ),
         )
         self._command_count["LOAD_MODULE"] = count + 1

@@ -112,6 +112,7 @@ def test_broker_subscribe_unsubscribe(
     labware_unsubscribe: Callable[[], None] = decoy.mock()
     instrument_unsubscribe: Callable[[], None] = decoy.mock()
     module_unsubscribe: Callable[[], None] = decoy.mock()
+    module_labware_unsubscribe: Callable[[], None] = decoy.mock()
 
     decoy.when(
         legacy_context.broker.subscribe(
@@ -132,6 +133,12 @@ def test_broker_subscribe_unsubscribe(
         legacy_context.module_load_broker.subscribe(callback=matchers.Anything())
     ).then_return(module_unsubscribe)
 
+    decoy.when(
+        legacy_context.module_labware_load_broker.subscribe(
+            callback=matchers.Anything()
+        )
+    ).then_return(module_labware_unsubscribe)
+
     subject.handle_action(pe_actions.PlayAction())
     subject.handle_action(pe_actions.StopAction())
 
@@ -139,6 +146,7 @@ def test_broker_subscribe_unsubscribe(
     decoy.verify(labware_unsubscribe())
     decoy.verify(instrument_unsubscribe())
     decoy.verify(module_unsubscribe())
+    decoy.verify(module_labware_unsubscribe())
 
 
 def test_main_broker_messages(
@@ -284,7 +292,10 @@ def test_module_load_broker_messages(
     handler: Callable[[LegacyModuleLoadInfo], None] = handler_captor.value
 
     module_load_info = LegacyModuleLoadInfo(
-        module_name="some_module_name", location=1, configuration=None
+        module_name="some_module_name",
+        module_id="module-id",
+        location=1,
+        configuration=None,
     )
     engine_command = pe_commands.Custom(
         id="command-id",
@@ -298,6 +309,49 @@ def test_module_load_broker_messages(
     ).then_return(engine_command)
 
     handler(module_load_info)
+
+    decoy.verify(
+        action_dispatcher.dispatch(pe_actions.UpdateCommandAction(engine_command))
+    )
+
+
+def test_module_labware_load_broker_messages(
+    decoy: Decoy,
+    legacy_context: LegacyProtocolContext,
+    legacy_command_mapper: LegacyCommandMapper,
+    action_dispatcher: pe_actions.ActionDispatcher,
+    subject: LegacyContextPlugin,
+    minimal_labware_def: LabwareDefinitionDict,
+) -> None:
+    """It should dispatch commands from labware load broker messages."""
+    subject.handle_action(pe_actions.PlayAction())
+
+    handler_captor = matchers.Captor()
+
+    decoy.verify(legacy_context.labware_load_broker.subscribe(callback=handler_captor))
+
+    handler: Callable[[LegacyLabwareLoadInfo], None] = handler_captor.value
+
+    labware_load_info = LegacyLabwareLoadInfo(
+        labware_definition=minimal_labware_def,
+        labware_namespace="some_namespace",
+        labware_load_name="some_load_name",
+        labware_version=123,
+        deck_slot=DeckSlotName.SLOT_1,
+    )
+
+    engine_command = pe_commands.Custom(
+        id="command-id",
+        status=pe_commands.CommandStatus.RUNNING,
+        createdAt=datetime(year=2021, month=1, day=1),
+        params=pe_commands.CustomParams(message="hello"),  # type: ignore[call-arg]
+    )
+
+    decoy.when(
+        legacy_command_mapper.map_labware_load(labware_load_info=labware_load_info)
+    ).then_return(engine_command)
+
+    handler(labware_load_info)
 
     decoy.verify(
         action_dispatcher.dispatch(pe_actions.UpdateCommandAction(engine_command))
