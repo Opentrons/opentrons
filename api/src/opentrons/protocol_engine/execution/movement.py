@@ -149,6 +149,7 @@ class MovementHandler:
             point = await self._hardware_api.gantry_position(
                 mount=hw_mount,
                 critical_point=pip_cp,
+                fail_on_not_homed=True,
             )
         except HardwareMustHomeError as e:
             raise MustHomeError(str(e)) from e
@@ -166,7 +167,7 @@ class MovementHandler:
         If axes is `None`, will home all motors.
         """
         hardware_axes = None
-        if axes:
+        if axes is not None:
             hardware_axes = [MOTOR_AXIS_TO_HARDWARE_AXIS[a] for a in axes]
 
         await self._hardware_api.home(axes=hardware_axes)

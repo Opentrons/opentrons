@@ -316,6 +316,7 @@ async def test_save_position(
         await hardware_api.gantry_position(
             mount=Mount.LEFT,
             critical_point=CriticalPoint.XY_CENTER,
+            fail_on_not_homed=True,
         )
     ).then_return(Point(1, 1, 1))
 
@@ -370,6 +371,7 @@ async def test_save_position_different_cp(
         await hardware_api.gantry_position(
             mount=Mount.LEFT,
             critical_point=verified_cp,
+            fail_on_not_homed=True,
         )
     ).then_return(Point(1, 1, 1))
 
@@ -402,6 +404,7 @@ async def test_save_position_must_home(
         await hardware_api.gantry_position(
             mount=Mount.LEFT,
             critical_point=CriticalPoint.XY_CENTER,
+            fail_on_not_homed=True,
         )
     ).then_raise(HardwareMustHomeError("oh no"))
 
@@ -441,3 +444,6 @@ async def test_home(
 
     await subject.home(axes=None)
     decoy.verify(await hardware_api.home(axes=None), times=1)
+
+    await subject.home(axes=[])
+    decoy.verify(await hardware_api.home(axes=[]), times=1)

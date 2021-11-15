@@ -18,7 +18,8 @@ class HomeParams(BaseModel):
         None,
         description=(
             "Axes to return to their home positions. If omitted,"
-            " will home all motors."
+            " will home all motors. Extra axes may be implicitly homed"
+            " to ensure accurate homing of the explicitly specified axes."
         ),
     )
 
