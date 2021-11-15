@@ -154,7 +154,7 @@ describe('UploadInput', () => {
     getByText('mock display name')
     getByText('Protocol name')
     getByText('Run timestamp')
-    getByText('2021-11-12 2:39:19 PM -05:00')
+    getByText('2021-11-12 7:39:19 PM +00:00')
     getByText('Labware Offset data')
     getByText('1 Labware Offsets')
     getByText('See How Rerunning a Protocol Works')
