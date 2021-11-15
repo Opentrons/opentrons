@@ -42,6 +42,7 @@ from .module_contexts import (
     TemperatureModuleContext,
     ThermocyclerContext,
 )
+from .load_info import LabwareLoadInfo, ModuleLoadInfo, InstrumentLoadInfo, LabwareLoadOnModuleInfo
 from opentrons.protocols.api_support.util import (
     AxisMaxSpeeds,
     requires_version,
@@ -112,15 +113,13 @@ class ProtocolContext(CommandPublisher):
         self._unsubscribe_commands: Optional[Callable[[], None]] = None
         self.clear_commands()
 
-        self._labware_load_broker = EquipmentBroker[types.LabwareLoadInfo]()
-        self._instrument_load_broker = EquipmentBroker[types.InstrumentLoadInfo]()
-        self._module_load_broker = EquipmentBroker[types.ModuleLoadInfo]()
-        self._module_labware_load_broker = EquipmentBroker[
-            types.LabwareLoadOnModuleInfo
-        ]()
+        self._labware_load_broker = EquipmentBroker[LabwareLoadInfo]()
+        self._instrument_load_broker = EquipmentBroker[InstrumentLoadInfo]()
+        self._module_load_broker = EquipmentBroker[ModuleLoadInfo]()
+        self._module_labware_load_broker = EquipmentBroker[LabwareLoadOnModuleInfo]()
 
     @property
-    def labware_load_broker(self) -> EquipmentBroker[types.LabwareLoadInfo]:
+    def labware_load_broker(self) -> EquipmentBroker[LabwareLoadInfo]:
         """For internal Opentrons use only.
 
         :meta private:
@@ -136,7 +135,7 @@ class ProtocolContext(CommandPublisher):
     @property
     def module_labware_load_broker(
         self,
-    ) -> EquipmentBroker[types.LabwareLoadOnModuleInfo]:
+    ) -> EquipmentBroker[LabwareLoadOnModuleInfo]:
         """For internal Opentrons use only.
 
         :meta private:
@@ -150,7 +149,7 @@ class ProtocolContext(CommandPublisher):
         return self._module_labware_load_broker
 
     @property
-    def instrument_load_broker(self) -> EquipmentBroker[types.InstrumentLoadInfo]:
+    def instrument_load_broker(self) -> EquipmentBroker[InstrumentLoadInfo]:
         """For internal Opentrons use only.
 
         :meta private:
@@ -160,7 +159,7 @@ class ProtocolContext(CommandPublisher):
         return self._instrument_load_broker
 
     @property
-    def module_load_broker(self) -> EquipmentBroker[types.ModuleLoadInfo]:
+    def module_load_broker(self) -> EquipmentBroker[ModuleLoadInfo]:
         """For internal Opentrons use only.
 
         :meta private:
@@ -400,7 +399,7 @@ class ProtocolContext(CommandPublisher):
 
         result_namespace, result_load_name, result_version = result.uri.split("/")
         self.labware_load_broker.publish(
-            types.LabwareLoadInfo(
+            LabwareLoadInfo(
                 labware_definition=result._implementation.get_definition(),
                 labware_namespace=result_namespace,
                 labware_load_name=result_load_name,
@@ -453,7 +452,7 @@ class ProtocolContext(CommandPublisher):
 
         result_namespace, result_load_name, result_version = result.uri.split("/")
         self.labware_load_broker.publish(
-            types.LabwareLoadInfo(
+            LabwareLoadInfo(
                 labware_definition=result._implementation.get_definition(),
                 labware_namespace=result_namespace,
                 labware_load_name=result_load_name,
@@ -576,7 +575,7 @@ class ProtocolContext(CommandPublisher):
         self._modules.append(module_context)
 
         self.module_load_broker.publish(
-            types.ModuleLoadInfo(
+            ModuleLoadInfo(
                 module_name=module_name,
                 module_id=module_context.engine_id,
                 location=location,
@@ -675,7 +674,7 @@ class ProtocolContext(CommandPublisher):
         self._instruments[checked_mount] = new_instr
 
         self.instrument_load_broker.publish(
-            types.InstrumentLoadInfo(
+            InstrumentLoadInfo(
                 instrument_load_name=instrument_name,
                 mount=checked_mount,
             )

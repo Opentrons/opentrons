@@ -12,6 +12,7 @@ from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support.types import APIVersion
 
 from .labware import Labware, load, load_from_definition
+from .load_info import LabwareLoadOnModuleInfo
 from opentrons.protocols.geometry.module_geometry import (
     ModuleGeometry,
     ThermocyclerGeometry,
@@ -82,7 +83,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
 
         labware_namespace, labware_load_name, labware_version = labware.uri.split("/")
         self._ctx.module_labware_load_broker.publish(
-            types.LabwareLoadOnModuleInfo(
+            LabwareLoadOnModuleInfo(
                 labware_definition=labware._implementation.get_definition(),
                 labware_namespace=labware_namespace,
                 labware_load_name=labware_load_name,

@@ -14,7 +14,7 @@ from opentrons.protocol_api import (
     InstrumentContext as LegacyPipetteContext,
 )
 from opentrons.protocol_api.labware import Labware as LegacyLabware, Well as LegacyWell
-from opentrons.types import (
+from opentrons.protocol_api.load_info import (
     InstrumentLoadInfo as LegacyInstrumentLoadInfo,
     LabwareLoadInfo as LegacyLabwareLoadInfo,
     ModuleLoadInfo as LegacyModuleLoadInfo,
