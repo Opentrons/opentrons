@@ -1,12 +1,9 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { AlertModal } from '@opentrons/components'
 
 import { Portal } from '../../../App/portal'
 import { useCurrentRunControls } from './hooks'
-
-const HEADING = 'Are you sure you want to cancel this run?'
-const CANCEL_TEXT = 'yes, cancel run'
-const BACK_TEXT = 'no, go back'
 
 export interface ConfirmCancelModalProps {
   onClose: () => unknown
@@ -17,6 +14,11 @@ export function ConfirmCancelModal(
 ): JSX.Element {
   const { onClose } = props
   const { stopRun } = useCurrentRunControls()
+  const { t } = useTranslation('run_details')
+
+  const HEADING = t('cancel_run_modal_heading')
+  const CANCEL_TEXT = t('cancel_run_modal_confirm')
+  const BACK_TEXT = t('cancel_run_modal_back')
 
   const cancel = (): void => {
     stopRun()
@@ -33,14 +35,8 @@ export function ConfirmCancelModal(
         ]}
         alertOverlay
       >
-        <p>
-          Doing so will terminate this run, drop any attached tips in the trash
-          container and home your robot.
-        </p>
-        <p>
-          Additionally, any hardware modules used within the protocol will
-          remain active and maintain their current states until deactivated.
-        </p>
+        <p>{t('cancel_run_alert_info')}</p>
+        <p>{t('cancel_run_module_info')}</p>
       </AlertModal>
     </Portal>
   )

@@ -33,5 +33,10 @@
   "current_step_pause_timer": "Timer",
   "user_paused_protocol": "User paused protocol",
   "run_canceled": "Run canceled",
-  "step_failed": "Step failed"
+  "step_failed": "Step failed",
+  "cancel_run_modal_heading": "Are you sure you want to cancel this run?",
+  "cancel_run_modal_confirm": "yes, cancel run",
+  "cancel_run_modal_back": "no, go back",
+  "cancel_run_alert_info": "Doing so will terminate this run, drop any attached tips in the trash container and home your robot.",
+  "cancel_run_module_info": "Additionally, any hardware modules used within the protocol will remain active and maintain their current states until deactivated."
 }
