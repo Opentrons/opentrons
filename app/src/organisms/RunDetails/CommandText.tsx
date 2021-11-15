@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { Command } from '@opentrons/shared-data/protocol/types/schemaV6/command'
 import {
   ALIGN_CENTER,
   DIRECTION_ROW,
@@ -7,10 +6,8 @@ import {
   SPACING_1,
   SPACING_3,
 } from '@opentrons/components'
-import type { RunCommandSummary } from '@opentrons/api-client'
 
 interface Props {
-  command: Command | RunCommandSummary
   commandText?: JSX.Element
 }
 export function CommandText(props: Props): JSX.Element | null {
@@ -21,9 +18,7 @@ export function CommandText(props: Props): JSX.Element | null {
       alignItems={ALIGN_CENTER}
       flexDirection={DIRECTION_ROW}
     >
-      <Flex marginLeft={SPACING_1} key={props.command.id}>
-        {props.commandText}
-      </Flex>
+      <Flex marginLeft={SPACING_1}>{props.commandText}</Flex>
     </Flex>
   )
 }

@@ -41,11 +41,10 @@ export type Status = 'queued' | 'running' | 'succeeded' | 'failed'
 interface CommandItemsProps {
   runStatus?: RunStatus
   currentCommand: Command | RunCommandSummary
-
   commandText?: JSX.Element
 }
 function CommandItemRunning(props: CommandItemsProps): JSX.Element {
-  const { currentCommand, runStatus } = props
+  const { runStatus } = props
   const { t } = useTranslation('run_details')
   return (
     <Flex flexDirection={DIRECTION_ROW}>
@@ -67,7 +66,7 @@ function CommandItemRunning(props: CommandItemsProps): JSX.Element {
         />
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <CommandText command={currentCommand} commandText={props.commandText} />
+        <CommandText commandText={props.commandText} />
         {runStatus === 'paused' ? (
           <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
             <Flex
@@ -97,17 +96,15 @@ function CommandItemQueued(props: CommandItemsProps): JSX.Element {
 }
 
 function CommandItemSuccess(props: CommandItemsProps): JSX.Element {
-  const { currentCommand } = props
   return (
     <Flex flexDirection={DIRECTION_ROW}>
       <CommandTimer start={PLACEHOLDERTIMER} end={PLACEHOLDERTIMER} />
-      <CommandText command={currentCommand} commandText={props.commandText} />
+      <CommandText commandText={props.commandText} />
     </Flex>
   )
 }
 
 function CommandItemFailed(props: CommandItemsProps): JSX.Element {
-  const { currentCommand } = props
   const { t } = useTranslation('run_details')
   return (
     <Flex flexDirection={DIRECTION_ROW}>
@@ -118,7 +115,7 @@ function CommandItemFailed(props: CommandItemsProps): JSX.Element {
         </Flex>
         <Flex alignItems={ALIGN_CENTER}>{t('step_failed')}</Flex>
       </Flex>
-      <CommandText command={currentCommand} commandText={props.commandText} />
+      <CommandText commandText={props.commandText} />
     </Flex>
   )
 }

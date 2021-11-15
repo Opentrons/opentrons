@@ -27,7 +27,7 @@ const PIPETTE_ID = 'PIPETTE_ID'
 const LABWARE_ID = 'LABWARE_ID'
 const WELLNAME = 'WELLNAME'
 const COMMAND_TYPE = 'touchTip'
-const COMMAND_TEXT = ('COMMAND_TEXT' as unknown) as JSX.Element
+const COMMAND_TEXT = ('Mock Command Text' as unknown) as JSX.Element
 
 describe('Run  Details Command', () => {
   let props: React.ComponentProps<typeof CommandItem>
@@ -35,24 +35,23 @@ describe('Run  Details Command', () => {
   beforeEach(() => {
     props = {
       currentCommand: {
+        id: '123',
         commandType: COMMAND_TYPE,
         params: {
           pipetteId: PIPETTE_ID,
           labwareId: LABWARE_ID,
           wellName: WELLNAME,
           wellLocation: WELL_LOCATION,
+          legacyCommandText: 'Mock Command Text',
         },
+        status: 'failed',
         result: { volume: 10 },
       } as Command,
-      type: 'failed',
-      commandText: COMMAND_TEXT,
     }
     when(mockCommandText)
-      .calledWith(
-        partialComponentPropsMatcher({
-          commandText: 'COMMAND_TEXT',
-        })
-      )
+      .calledWith({
+        commandText: COMMAND_TEXT,
+      })
       .mockReturnValue(<div>Mock Command Text</div>)
     mockCommandTimer.mockReturnValue(<div>Mock Command Timer</div>)
   })
@@ -75,10 +74,9 @@ describe('Run  Details Command', () => {
           wellName: WELLNAME,
           wellLocation: WELL_LOCATION,
         },
+        status: 'succeeded',
         result: { volume: 10 },
       } as Command,
-      type: 'succeeded',
-      commandText: COMMAND_TEXT,
     }
     const { getByText } = render(props)
     expect(getByText('Mock Command Timer')).toHaveStyle(
@@ -96,10 +94,9 @@ describe('Run  Details Command', () => {
           wellName: WELLNAME,
           wellLocation: WELL_LOCATION,
         },
+        status: 'running',
         result: { volume: 10 },
       } as Command,
-      type: 'running',
-      commandText: COMMAND_TEXT,
     }
     const { getByText } = render(props)
     expect(getByText('Current Step')).toHaveStyle(
@@ -118,11 +115,10 @@ describe('Run  Details Command', () => {
           wellName: WELLNAME,
           wellLocation: WELL_LOCATION,
         },
+        status: 'running',
         result: { volume: 10 },
       } as Command,
-      type: 'running',
       runStatus: 'paused',
-      commandText: COMMAND_TEXT,
     }
     when(mockCommandTimer)
       .calledWith(partialComponentPropsMatcher({ timer: 0 }))
@@ -146,13 +142,12 @@ describe('Run  Details Command', () => {
           wellName: WELLNAME,
           wellLocation: WELL_LOCATION,
         },
+        status: 'queued',
         result: { volume: 10 },
       } as Command,
-      type: 'queued',
-      commandText: COMMAND_TEXT,
     }
     const { getByText } = render(props)
-    expect(getByText('COMMAND_TEXT')).toHaveStyle(
+    expect(getByText('Mock Command Text')).toHaveStyle(
       'backgroundColor: C_NEAR_WHITE'
     )
   })
@@ -161,7 +156,7 @@ describe('Run  Details Command', () => {
       when(mockCommandText)
         .calledWith(
           partialComponentPropsMatcher({
-            commandText: 'COMMAND_TEXT',
+            commandText: 'Mock Command Text',
           })
         )
         .mockReturnValue(<div>Mock Command Text</div>)
@@ -188,13 +183,12 @@ describe('Run  Details Command', () => {
             wellName: WELLNAME,
             wellLocation: WELL_LOCATION,
           },
+          status: 'queued',
           result: { volume: 10 },
         } as Command,
-        type: 'queued',
-        commandText: COMMAND_TEXT,
       }
       const { getByText } = render(props)
-      expect(getByText('COMMAND_TEXT')).toHaveStyle(
+      expect(getByText('Mock Command Text')).toHaveStyle(
         'backgroundColor: C_NEAR_WHITE'
       )
     })
@@ -210,15 +204,14 @@ describe('Run  Details Command', () => {
             wellName: WELLNAME,
             wellLocation: WELL_LOCATION,
           },
+          status: 'running',
           result: { volume: 10 },
         } as Command,
-        type: 'running',
-        commandText: COMMAND_TEXT,
       }
       when(mockCommandText)
         .calledWith(
           partialComponentPropsMatcher({
-            commandText: 'COMMAND_TEXT',
+            commandText: 'Mock Command Text',
           })
         )
         .mockReturnValue(<div>Mock Command Text</div>)
@@ -242,11 +235,10 @@ describe('Run  Details Command', () => {
             wellName: WELLNAME,
             wellLocation: WELL_LOCATION,
           },
+          status: 'running',
           result: { volume: 10 },
         } as Command,
         runStatus: 'paused',
-        type: 'running',
-        commandText: COMMAND_TEXT,
       }
       when(mockCommandTimer)
         .calledWith(
@@ -277,15 +269,14 @@ describe('Run  Details Command', () => {
             wellName: WELLNAME,
             wellLocation: WELL_LOCATION,
           },
+          status: 'succeeded',
           result: { volume: 10 },
         } as Command,
-        type: 'succeeded',
-        commandText: COMMAND_TEXT,
       }
       when(mockCommandText)
         .calledWith(
           partialComponentPropsMatcher({
-            commandText: 'COMMAND_TEXT',
+            commandText: 'Mock Command Text',
           })
         )
         .mockReturnValue(<div>Mock Command Text</div>)

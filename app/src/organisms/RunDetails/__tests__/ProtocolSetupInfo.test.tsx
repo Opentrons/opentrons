@@ -147,7 +147,6 @@ describe('ProtocolSetupInfo', () => {
   beforeEach(() => {
     props = {
       setupCommand: COMMAND_TYPE_LOAD_LABWARE,
-      runStatus: 'run status',
     }
     when(mockUseProtocolDetails)
       .calledWith()
@@ -195,7 +194,6 @@ describe('ProtocolSetupInfo', () => {
   it('should render correct command when commandType is loadLabware on top of a module', () => {
     props = {
       setupCommand: COMMAND_TYPE_LOAD_LABWARE_WITH_MODULE,
-      runStatus: 'run status',
     }
     when(mockUseProtocolDetails).calledWith().mockReturnValue({
       protocolData: simpleV6Protocol,
@@ -215,7 +213,6 @@ describe('ProtocolSetupInfo', () => {
   it('should render correct command when commandType is loadPipette', () => {
     props = {
       setupCommand: COMMAND_TYPE_LOAD_PIPETTE,
-      runStatus: 'run status',
     }
     when(mockCommandItem).mockReturnValue(
       <div>Load My Pipette in left Mount</div>
@@ -226,7 +223,6 @@ describe('ProtocolSetupInfo', () => {
   it('should render correct command when commandType is loadModule', () => {
     props = {
       setupCommand: COMMAND_TYPE_LOAD_MODULE,
-      runStatus: 'run status',
     }
     when(mockCommandItem).mockReturnValue(
       <div>Load Temperature Module GEN2 in Slot 3</div>
@@ -237,7 +233,6 @@ describe('ProtocolSetupInfo', () => {
   it('should render correct command when commandType is loadModule and a TC is used', () => {
     props = {
       setupCommand: COMMAND_TYPE_LOAD_MODULE_TC,
-      runStatus: 'run status',
     }
     when(mockUseProtocolDetails)
       .calledWith()
@@ -279,7 +274,6 @@ describe('ProtocolSetupInfo', () => {
   it('renders null if SetupCommand is undefined', () => {
     props = {
       setupCommand: undefined,
-      runStatus: 'run status',
     }
     const { container } = render(props)
     expect(container.firstChild).toBeNull()
@@ -287,7 +281,6 @@ describe('ProtocolSetupInfo', () => {
   it('renders null if labware is a trash', () => {
     props = {
       setupCommand: COMMAND_TYPE_TRASH,
-      runStatus: 'run status',
     }
     when(mockUseProtocolDetails).calledWith().mockReturnValue({
       protocolData: simpleV6Protocol,
