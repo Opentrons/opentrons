@@ -188,7 +188,10 @@ export function CommandItem(props: CommandItemProps): JSX.Element {
         ) : null}
       </Flex>
     )
-  } else if (currentCommand.commandType === 'custom') {
+  } else if (
+    currentCommand.commandType === 'custom' ||
+    currentCommand.commandType === 'pickUpTip'
+  ) {
     commandTextNode = (
       <Flex key={currentCommand.id}>
         {/* @ts-expect-error  - data doesn't exit on type params, wait until command type is updated */}

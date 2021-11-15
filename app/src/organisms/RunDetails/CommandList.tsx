@@ -133,12 +133,12 @@ export function CommandList(): JSX.Element | null {
                 <Flex
                   justifyContent={JUSTIFY_SPACE_BETWEEN}
                   color={C_MED_DARK_GRAY}
+                  padding={SPACING_2}
                 >
                   <Text
                     textTransform={TEXT_TRANSFORM_UPPERCASE}
                     fontSize={FONT_SIZE_CAPTION}
                     id={`RunDetails_ProtocolSetupTitle`}
-                    paddingLeft={SPACING_2}
                   >
                     {t('protocol_setup')}
                   </Text>
@@ -152,7 +152,7 @@ export function CommandList(): JSX.Element | null {
                 <Flex
                   id={`RunDetails_ProtocolSetup_CommandList`}
                   flexDirection={DIRECTION_COLUMN}
-                  marginLeft={SPACING_2}
+                  marginLeft={SPACING_1}
                 >
                   {protocolSetupCommandList?.map(command => {
                     return (
@@ -180,7 +180,7 @@ export function CommandList(): JSX.Element | null {
                 backgroundColor={C_NEAR_WHITE}
                 marginLeft={SPACING_1}
               >
-                <Flex paddingLeft={SPACING_2}>{t('protocol_setup')}</Flex>
+                <Flex padding={SPACING_2}>{t('protocol_setup')}</Flex>
                 <Flex>
                   <Icon name={'chevron-left'} width={SIZE_1} />
                 </Flex>
@@ -196,7 +196,12 @@ export function CommandList(): JSX.Element | null {
         >
           <Flex flexDirection={DIRECTION_COLUMN}>
             {currentCommandList?.map((command, index) => {
-              return command.commandType === 'custom' ? (
+              const showAnticipatedStepsTitle =
+                (index === 0 && runDataCommands?.length === 0) ||
+                (index > 0 &&
+                  currentCommandList[index - 1].status === 'running')
+
+              return (
                 <Flex
                   key={command.id}
                   id={`RunDetails_CommandItem`}
@@ -205,11 +210,15 @@ export function CommandList(): JSX.Element | null {
                   flexDirection={DIRECTION_COLUMN}
                   flex={'auto'}
                 >
-                  {(index === 0 && runDataCommands?.length === 0) ||
-                  (index > 0 &&
-                    currentCommandList[index - 1].status === 'running') ? (
-                    <Flex fontSize={FONT_SIZE_CAPTION}>{t('anticipated')}</Flex>
-                  ) : null}
+                  {showAnticipatedStepsTitle && (
+                    <Flex
+                      fontSize={FONT_SIZE_CAPTION}
+                      marginLeft={SPACING_2}
+                      paddingBottom={SPACING_1}
+                    >
+                      {t('anticipated')}
+                    </Flex>
+                  )}
                   <Flex
                     padding={`${SPACING_1} ${SPACING_2} ${SPACING_1} ${SPACING_2}`}
                     flexDirection={DIRECTION_COLUMN}
@@ -221,7 +230,7 @@ export function CommandList(): JSX.Element | null {
                     />
                   </Flex>
                 </Flex>
-              ) : null
+              )
             })}
           </Flex>
           <Flex padding={SPACING_1}>{t('end_of_protocol')}</Flex>
