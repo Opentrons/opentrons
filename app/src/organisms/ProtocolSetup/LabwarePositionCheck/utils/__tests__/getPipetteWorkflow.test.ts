@@ -1,10 +1,10 @@
 import { PipetteName } from '@opentrons/shared-data'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { getPipetteWorkflow } from '../utils/getPipetteWorkflow'
-import { doesPipetteVisitAllTipracks } from '../utils/doesPipetteVisitAllTipracks'
+import { getPipetteWorkflow } from '../getPipetteWorkflow'
+import { doesPipetteVisitAllTipracks } from '../doesPipetteVisitAllTipracks'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 
-jest.mock('../utils/doesPipetteVisitAllTipracks')
+jest.mock('../doesPipetteVisitAllTipracks')
 
 const mockDoesPipetteVisitAllTipracks = doesPipetteVisitAllTipracks as jest.MockedFunction<
   typeof doesPipetteVisitAllTipracks

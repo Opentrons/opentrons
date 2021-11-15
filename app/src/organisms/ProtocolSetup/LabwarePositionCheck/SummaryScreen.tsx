@@ -18,12 +18,22 @@ import { useProtocolDetails } from '../../RunDetails/hooks'
 import { DeckMap } from './DeckMap'
 import { SectionList } from './SectionList'
 import { LabwareOffsetsSummary } from './LabwareOffsetsSummary'
-import { useIntroInfo } from './hooks'
+import { useIntroInfo, useLabwareOffsets, LabwareOffsets } from './hooks'
+import type { SavePositionCommandData } from './types'
+import type { ProtocolFile } from '@opentrons/shared-data'
 
-export const SummaryScreen = (): JSX.Element | null => {
+export const SummaryScreen = (props: {
+  savePositionCommandData: SavePositionCommandData
+}): JSX.Element | null => {
+  const { savePositionCommandData } = props
+  const [offsets, setLabwareOffsets] = React.useState<LabwareOffsets>([])
   const { t } = useTranslation('labware_position_check')
   const introInfo = useIntroInfo()
   const { protocolData } = useProtocolDetails()
+  useLabwareOffsets(
+    savePositionCommandData,
+    protocolData as ProtocolFile<{}>
+  ).then(offsets => setLabwareOffsets(offsets))
   if (introInfo == null) return null
   if (protocolData == null) return null
   const labwareIds = Object.keys(protocolData.labware)
@@ -52,7 +62,7 @@ export const SummaryScreen = (): JSX.Element | null => {
           <DeckMap completedLabwareIdSections={labwareIds} />
         </Flex>
         <Flex flex={'1 1 45%'}>
-          <LabwareOffsetsSummary />
+          <LabwareOffsetsSummary offsetData={offsets} />
         </Flex>
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER} marginBottom={SPACING_4}>

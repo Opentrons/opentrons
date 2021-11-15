@@ -19,11 +19,11 @@ const getIsLabwareOnTopOfTC = (
   labwareId: string,
   commands: Command[]
 ): boolean => {
-  const labwareSlot = getLabwareLocation(labwareId, commands)
+  const labwareLocation = getLabwareLocation(labwareId, commands)
   return (
-    modules != null &&
-    Object.keys(modules).some(moduleId => moduleId === labwareSlot) &&
-    getModuleType(modules[labwareSlot].model) === THERMOCYCLER_MODULE_TYPE
+    'moduleId' in labwareLocation &&
+    getModuleType(modules[labwareLocation.moduleId].model) ===
+      THERMOCYCLER_MODULE_TYPE
   )
 }
 
@@ -78,11 +78,13 @@ export const getMoveToLabwareSteps = (
     let moveToLabwareCommands: LabwarePositionCheckCommand[] = []
 
     if (isLabwareOnTopOfTC) {
+      // @ts-expect-error we know there is a moduleId key on type LabwareLocation because the labware is on top of a TC
+      const moduleId = getLabwareLocation(labwareId, commands).moduleId
       const openTCLidCommand: TCOpenLidCommand = {
         commandType: 'thermocycler/openLid',
         id: uuidv4(),
         params: {
-          moduleId: getLabwareLocation(labwareId, commands),
+          moduleId,
         },
       }
       moveToLabwareCommands = [openTCLidCommand, moveToWellCommand]

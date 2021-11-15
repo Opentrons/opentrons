@@ -1,4 +1,4 @@
-import { getPrimaryPipetteId } from '../utils/getPrimaryPipetteId'
+import { getPrimaryPipetteId } from '../getPrimaryPipetteId'
 import { ProtocolFile } from '@opentrons/shared-data'
 import { LoadPipetteCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 

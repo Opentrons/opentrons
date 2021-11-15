@@ -29,3 +29,6 @@ export interface LabwareToOrder {
   labwareId: string
   slot: string
 }
+export interface SavePositionCommandData {
+  [labwareId: string]: string[]
+}
