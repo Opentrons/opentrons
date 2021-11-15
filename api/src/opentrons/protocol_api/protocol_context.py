@@ -144,8 +144,8 @@ class ProtocolContext(CommandPublisher):
         Subscribers to this broker will be notified with information about every
         successful labware load.
 
-        Only :py:obj:`ProtocolContext` is allowed to publish to this broker.
-        Calling code may only subscribe or unsubscribe.
+        Only :py:obj:`ProtocolContext` and its members are allowed to publish to this
+        broker. Calling code may only subscribe or unsubscribe.
         """
         return self._module_labware_load_broker
 

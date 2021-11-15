@@ -70,7 +70,7 @@ class Labware:  # noqa: D101
 
     # TODO(mc, 2021-04-22): labware may be on a module, replace Any with Module
     @property
-    def parent(self) -> Union[DeckSlotName, str]:
+    def parent(self) -> Union[DeckSlotName, Any]:
         """The parent location of this labware.
 
         If the labware's parent is a string, that string represents a specific
@@ -83,7 +83,7 @@ class Labware:  # noqa: D101
         if isinstance(parent, DeckSlotLocation):
             return str(parent.slotName)
         elif isinstance(parent, ModuleLocation):
-            return parent.moduleId
+            raise NotImplementedError("Not yet implemented for labware on modules.")
 
     # TODO(mc, 2021-05-03): document removal of name setter
     @property

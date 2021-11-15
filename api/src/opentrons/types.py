@@ -214,9 +214,6 @@ class TransferTipPolicy(enum.Enum):
 DeckLocation = Union[int, str]
 
 
-# todo(mm, 2021-10-11): For the HTTP API to report when labware is loaded on a module,
-# this class either needs to optionally have a module attribute instead of DeckSlotName,
-# or it needs to be split into LabwareLoadedOnDeckInfo and LabwareLoadedOnModuleInfo.
 @dataclass(frozen=True)
 class LabwareLoadInfo:
     """For Opentrons internal use only.
@@ -244,15 +241,13 @@ class LabwareLoadOnModuleInfo:
 
     :meta private:
 
-    Information about a successful labware load.
+    Information about a successful labware load on a module.
 
-    This is a separate class from the main user-facing `Labware` class
-    because this is easier to construct in unit tests.
+    Like `LabwareLoadInfo`, but for loading labware on modules
     """
 
     labware_definition: "LabwareDefinition"
-    # todo(mm, 2021-10-11): Namespace, load name, and version can be derived from the
-    # definition. Should they be removed from here?
+    # todo(spp, 2021-11-15): same note about namespace, load name, version as above.
     labware_namespace: str
     labware_load_name: str
     labware_version: int
