@@ -475,3 +475,44 @@ def test_get_labware_offsets() -> None:
     )
     assert filled_subject_b_before_a.get_labware_offsets() == [offset_b, offset_a]
 
+
+def test_find_applicable_labware_offset() -> None:
+    offset_1 = LabwareOffset(
+        id="id-1",
+        createdAt=datetime(year=2021, month=1, day=1),
+        definitionUri="definition-uri",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        offset=LabwareOffsetVector(x=1, y=1, z=1)
+    )
+
+    # Same definitionUri and location; different id, createdAt, and offset.
+    offset_2 = LabwareOffset(
+        id="id-2",
+        createdAt=datetime(year=2022, month=2, day=2),
+        definitionUri="definition-uri",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        offset=LabwareOffsetVector(x=2, y=2, z=2)
+    )
+
+    subject = get_labware_view(
+        # Simulate offset_2 having been added after offset_1.
+        labware_offsets_by_id={"id-1": offset_1, "id-2": offset_2}
+    )
+
+    # Matching both definitionURI and location. Should return 2nd (most recent) offset.
+    assert subject.find_applicable_labware_offset(
+        definition_uri="definition-uri",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+    ) == offset_2
+
+    # Doesn't match anything, since definitionUri is different.
+    assert subject.find_applicable_labware_offset(
+        definition_uri="different-definition-uri",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+    ) == None
+
+    # Doesn't match anything, since location is different.
+    assert subject.find_applicable_labware_offset(
+        definition_uri="different-definition-uri",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2)
+    ) == None
