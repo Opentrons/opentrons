@@ -89,20 +89,6 @@ class SetupRequest:  # noqa: D101
 
 
 @dataclass
-class GetSpeedRequest:  # noqa: D101
-    payload: payloads.EmptyPayload
-    payload_type: Type[BinarySerializable] = payloads.EmptyPayload
-    message_id: Literal[MessageId.get_speed_request] = MessageId.get_speed_request
-
-
-@dataclass
-class GetSpeedResponse:  # noqa: D101
-    payload: payloads.GetSpeedResponsePayload
-    payload_type: Type[BinarySerializable] = payloads.GetSpeedResponsePayload
-    message_id: Literal[MessageId.get_speed_response] = MessageId.get_speed_response
-
-
-@dataclass
 class WriteToEEPromRequest:  # noqa: D101
     payload: payloads.WriteToEEPromRequestPayload
     payload_type: Type[BinarySerializable] = payloads.WriteToEEPromRequestPayload
@@ -178,3 +164,30 @@ class MoveCompleted:  # noqa: D101
     payload: payloads.MoveCompletedPayload
     payload_type: Type[BinarySerializable] = payloads.MoveCompletedPayload
     message_id: Literal[MessageId.move_completed] = MessageId.move_completed
+
+
+@dataclass
+class SetMotionConstraints:  # noqa: D101
+    payload: payloads.MotionConstraintsPayload
+    payload_type: Type[BinarySerializable] = payloads.MotionConstraintsPayload
+    message_id: Literal[
+        MessageId.set_motion_constraints
+    ] = MessageId.set_motion_constraints
+
+
+@dataclass
+class GetMotionConstraintsRequest:  # noqa: D101
+    payload: payloads.EmptyPayload
+    payload_type: Type[BinarySerializable] = payloads.EmptyPayload
+    message_id: Literal[
+        MessageId.get_motion_constraints_request
+    ] = MessageId.get_motion_constraints_request
+
+
+@dataclass
+class GetMotionConstraintsResponse:  # noqa: D101
+    payload: payloads.MotionConstraintsPayload
+    payload_type: Type[BinarySerializable] = payloads.MotionConstraintsPayload
+    message_id: Literal[
+        MessageId.get_motion_constraints_response
+    ] = MessageId.get_motion_constraints_response

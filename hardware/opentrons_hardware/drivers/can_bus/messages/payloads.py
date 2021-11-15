@@ -110,3 +110,13 @@ class MoveCompletedPayload(MoveGroupRequestPayload):
     current_position: utils.UInt32Field
     ack_id: utils.UInt8Field
     node_id: utils.UInt8Field
+
+
+@dataclass
+class MotionConstraintsPayload(utils.BinarySerializable):
+    """The min and max velocity and acceleration of a motion system."""
+
+    min_velocity: utils.Int32Field
+    max_velocity: utils.Int32Field
+    min_acceleration: utils.Int32Field
+    max_acceleration: utils.Int32Field

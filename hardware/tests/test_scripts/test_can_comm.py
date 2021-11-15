@@ -33,7 +33,7 @@ def test_prompt_message_without_payload(
     mock_get_input: MagicMock, mock_output: MagicMock
 ) -> None:
     """It should create a message without payload."""
-    message_id = MessageId.get_speed_request
+    message_id = MessageId.get_motion_constraints_request
     node_id = NodeId.pipette
     mock_get_input.side_effect = [
         str(list(MessageId).index(message_id)),

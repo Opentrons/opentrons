@@ -19,8 +19,6 @@ MessageDefinition = Union[
     defs.DisableMotorRequest,
     defs.MoveRequest,
     defs.SetupRequest,
-    defs.GetSpeedRequest,
-    defs.GetSpeedResponse,
     defs.WriteToEEPromRequest,
     defs.ReadFromEEPromRequest,
     defs.ReadFromEEPromResponse,
@@ -31,6 +29,9 @@ MessageDefinition = Union[
     defs.ClearAllMoveGroupsRequest,
     defs.MoveGroupCompleted,
     defs.MoveCompleted,
+    defs.SetMotionConstraints,
+    defs.GetMotionConstraintsRequest,
+    defs.GetMotionConstraintsResponse,
 ]
 
 

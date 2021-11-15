@@ -47,10 +47,6 @@ class MessageId(int, Enum):
 
     setup_request = 0x02
 
-    set_speed_request = 0x03
-
-    get_speed_request = 0x04
-    get_speed_response = 0x11
     write_eeprom = 0x2001
     read_eeprom_request = 0x2002
     read_eeprom_response = 0x2003
@@ -62,3 +58,7 @@ class MessageId(int, Enum):
     clear_all_move_groups_request = 0x19
     move_group_completed = 0x1A
     move_completed = 0x13
+
+    set_motion_constraints = 0x1001
+    get_motion_constraints_request = 0x1002
+    get_motion_constraints_response = 0x1003
