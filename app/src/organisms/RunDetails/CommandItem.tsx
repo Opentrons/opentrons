@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import {
   DIRECTION_ROW,
   Flex,
@@ -188,10 +188,20 @@ export function CommandItem(props: CommandItemProps): JSX.Element {
         ) : null}
       </Flex>
     )
-  } else if (
-    currentCommand.commandType === 'custom' ||
-    currentCommand.commandType === 'pickUpTip'
-  ) {
+  } else if (currentCommand.commandType === 'pickUpTip') {
+    commandTextNode = (
+      <Flex key={currentCommand.id}>
+        <Trans
+          t={t}
+          i18nKey={'pickup_tip'}
+          values={{
+            // @ts-expect-error  - data doesn't exit on type params, wait until command type is updated
+            location: currentCommand.params.wellName,
+          }}
+        />
+      </Flex>
+    )
+  } else if (currentCommand.commandType === 'custom') {
     commandTextNode = (
       <Flex key={currentCommand.id}>
         {/* @ts-expect-error  - data doesn't exit on type params, wait until command type is updated */}
