@@ -12,6 +12,7 @@ from .actions import (
     StopAction,
     QueueCommandAction,
     UpdateCommandAction,
+    AddLabwareOffsetAction,
 )
 
 __all__ = [
@@ -26,4 +27,5 @@ __all__ = [
     "StopAction",
     "QueueCommandAction",
     "UpdateCommandAction",
+    "AddLabwareOffsetAction",
 ]
