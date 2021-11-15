@@ -17,6 +17,7 @@ from opentrons.protocol_engine.actions import (
     PlayAction,
     PauseAction,
     StopAction,
+    StopErrorDetails,
     QueueCommandAction,
 )
 
@@ -244,15 +245,26 @@ async def test_stop_with_error(
     action_dispatcher: ActionDispatcher,
     queue_worker: QueueWorker,
     hardware_api: HardwareAPI,
+    model_utils: ModelUtils,
     subject: ProtocolEngine,
 ) -> None:
-    """It should be able to stop the engine."""
+    """It should be able to stop the engine with an error."""
     error = RuntimeError("oh no")
+    expected_error_details = StopErrorDetails(
+        error_id="error-id",
+        created_at=datetime(year=2021, month=1, day=1),
+        error=error,
+    )
+
+    decoy.when(model_utils.generate_id()).then_return("error-id")
+    decoy.when(model_utils.get_timestamp()).then_return(
+        datetime(year=2021, month=1, day=1)
+    )
 
     await subject.stop(error=error)
 
     decoy.verify(
-        action_dispatcher.dispatch(StopAction(error=error)),
+        action_dispatcher.dispatch(StopAction(error_details=expected_error_details)),
         await queue_worker.join(),
         await hardware_api.stop(home_after=False),
     )

@@ -2,19 +2,25 @@
 from __future__ import annotations
 from collections import OrderedDict
 from dataclasses import dataclass, replace
-from typing import List, Optional, Union
+from typing import List, Mapping, Optional, Union
 
 from ..actions import (
     Action,
     QueueCommandAction,
     UpdateCommandAction,
+    FailCommandAction,
     PlayAction,
     PauseAction,
     StopAction,
 )
 
 from ..commands import Command, CommandStatus
-from ..errors import CommandDoesNotExistError, ProtocolEngineStoppedError
+from ..errors import (
+    ProtocolEngineError,
+    CommandDoesNotExistError,
+    ProtocolEngineStoppedError,
+    ErrorOccurrence,
+)
 from ..types import EngineStatus
 from .abstract_store import HasState, HandlesActions
 
@@ -27,6 +33,7 @@ class CommandState:
     stop_requested: bool
     # TODO(mc, 2021-06-16): OrderedDict is mutable. Switch to Sequence + Mapping
     commands_by_id: OrderedDict[str, Command]
+    errors_by_id: Mapping[str, ErrorOccurrence]
 
 
 class CommandStore(HasState[CommandState], HandlesActions):
@@ -40,10 +47,13 @@ class CommandStore(HasState[CommandState], HandlesActions):
             is_running=True,
             stop_requested=False,
             commands_by_id=OrderedDict(),
+            errors_by_id={},
         )
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
+        errors_by_id: Mapping[str, ErrorOccurrence]
+
         if isinstance(action, QueueCommandAction):
             # TODO(mc, 2021-06-22): mypy has trouble with this automatic
             # request > command mapping, figure out how to type precisely
@@ -67,6 +77,31 @@ class CommandStore(HasState[CommandState], HandlesActions):
 
             self._state = replace(self._state, commands_by_id=commands_by_id)
 
+        elif isinstance(action, FailCommandAction):
+            commands_by_id = self._state.commands_by_id.copy()
+            errors_by_id = dict(self._state.errors_by_id)
+            prev_command = commands_by_id[action.command_id]
+            command = prev_command.copy(
+                update={
+                    "errorId": action.error_id,
+                    "completedAt": action.failed_at,
+                    "status": CommandStatus.FAILED,
+                }
+            )
+            commands_by_id.update({command.id: command})
+            errors_by_id[action.error_id] = ErrorOccurrence(
+                id=action.error_id,
+                createdAt=action.failed_at,
+                errorType=type(action.error).__name__,
+                detail=str(action.error),
+            )
+
+            self._state = replace(
+                self._state,
+                commands_by_id=commands_by_id,
+                errors_by_id=errors_by_id,
+            )
+
         elif isinstance(action, PlayAction):
             if not self._state.stop_requested:
                 self._state = replace(self._state, is_running=True)
@@ -75,10 +110,32 @@ class CommandStore(HasState[CommandState], HandlesActions):
             self._state = replace(self._state, is_running=False)
 
         elif isinstance(action, StopAction):
-            # TODO(mc, 2021-10-12): handle `StopAction(error=Something)`
-            # - add errors to command state
-            # - allow StopAction to mark an in-progress command as failed
-            self._state = replace(self._state, is_running=False, stop_requested=True)
+            # any `ProtocolEngineError`'s will be captured by `FailCommandAction`,
+            # so only capture unknown errors here
+            if action.error_details and not isinstance(
+                action.error_details.error,
+                ProtocolEngineError,
+            ):
+                errors_by_id = dict(self._state.errors_by_id)
+                error_id = action.error_details.error_id
+                created_at = action.error_details.created_at
+                error = action.error_details.error
+
+                errors_by_id[error_id] = ErrorOccurrence(
+                    id=error_id,
+                    createdAt=created_at,
+                    errorType=type(error).__name__,
+                    detail=str(error),
+                )
+            else:
+                errors_by_id = self._state.errors_by_id
+
+            self._state = replace(
+                self._state,
+                is_running=False,
+                stop_requested=True,
+                errors_by_id=errors_by_id,
+            )
 
 
 class CommandView(HasState[CommandState]):
@@ -105,6 +162,10 @@ class CommandView(HasState[CommandState]):
         ordering.
         """
         return list(self._state.commands_by_id.values())
+
+    def get_all_errors(self) -> List[ErrorOccurrence]:
+        """Get a list of all errors that have occurred."""
+        return list(self._state.errors_by_id.values())
 
     def get_next_queued(self) -> Optional[str]:
         """Return the next request in line to be executed.
@@ -199,10 +260,11 @@ class CommandView(HasState[CommandState]):
     def get_status(self) -> EngineStatus:
         """Get the current execution status of the engine."""
         all_commands = self._state.commands_by_id.values()
+        all_errors = self._state.errors_by_id.values()
         all_statuses = [c.status for c in all_commands]
 
         if self._state.stop_requested:
-            if any(s == CommandStatus.FAILED for s in all_statuses):
+            if any(all_errors):
                 return EngineStatus.FAILED
 
             if all(s == CommandStatus.SUCCEEDED for s in all_statuses):
