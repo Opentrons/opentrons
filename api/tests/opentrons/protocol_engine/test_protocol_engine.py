@@ -20,6 +20,7 @@ from opentrons.protocol_engine.plugins import AbstractPlugin, PluginStarter
 
 from opentrons.protocol_engine.actions import (
     ActionDispatcher,
+    AddLabwareOffsetAction,
     PlayAction,
     PauseAction,
     StopAction,
@@ -330,6 +331,7 @@ def test_add_plugin(
 
 def test_add_labware_offset(
     decoy: Decoy,
+    action_dispatcher: ActionDispatcher,
     model_utils: ModelUtils,
     state_store: StateStore,
     subject: ProtocolEngine,
@@ -367,3 +369,13 @@ def test_add_labware_offset(
     )
 
     assert result == expected_result
+
+    decoy.verify(
+        action_dispatcher.dispatch(
+            AddLabwareOffsetAction(
+                labware_offset_id=id,
+                created_at=created_at,
+                request=request,
+            )
+        )
+    )
