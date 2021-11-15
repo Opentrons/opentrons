@@ -38,7 +38,7 @@ import { useSelector } from 'react-redux'
 import { State } from '../../redux/types'
 import { getConnectedRobotName } from '../../redux/robot/selectors'
 import { Divider } from '../../atoms/structure'
-import { useRunQuery } from '@opentrons/react-api-client'
+import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 import { useProtocolDetails } from '../RunDetails/hooks'
 import { RerunningProtocolModal } from './RerunningProtocolModal'
 import { useCloneRun } from './hooks'
@@ -75,14 +75,19 @@ export interface UploadInputProps {
   onUpload: (file: File) => unknown
 }
 
-const FILE_NAME = 'File name' //  TODO IMMEDIATELY wait for CPX to add this!
-
 export function UploadInput(props: UploadInputProps): JSX.Element | null {
   const { t } = useTranslation('protocol_info')
-  const mostRecentRun = useMostRecentRunId()
-  const runQuery = useRunQuery(mostRecentRun)
+  const mostRecentRunId = useMostRecentRunId()
+  const runQuery = useRunQuery(mostRecentRunId)
+  const mostRecentRun = runQuery.data?.data
+  const mostRecentProtocolInfo = useProtocolQuery(
+    (mostRecentRun?.protocolId as string) ?? ''
+  )
+  const mostRecentProtocol = mostRecentProtocolInfo?.data?.data
   const protocolData = useProtocolDetails()
-  const cloneRun = useCloneRun(mostRecentRun != null ? mostRecentRun : '')
+  const cloneMostRecentRun = useCloneRun(
+    mostRecentRunId != null ? mostRecentRunId : ''
+  ) // If mostRecentRun is null, the CTA that uses cloneRun won't appear so this will never be reached
   const robotName = useSelector((state: State) => getConnectedRobotName(state))
   const fileInput = React.useRef<HTMLInputElement>(null)
   const [isFileOverDropZone, setIsFileOverDropZone] = React.useState<boolean>(
@@ -91,9 +96,15 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
   const [rerunningProtocolModal, setRerunningProtocolModal] = React.useState(
     false
   )
-
-  const labwareOffsets = runQuery.data?.data.labwareOffsets
+  const labwareOffsets = mostRecentRun?.labwareOffsets
   const protocolName = protocolData.displayName
+  const fileName =
+    mostRecentProtocol != null
+      ? mostRecentProtocol.files.find(file => file.role === 'main')?.name
+      : null
+  const fullRunTimestamp = mostRecentRun?.createdAt
+  if (fullRunTimestamp == null) return null //  This state should never be reached since if null, protocol empty state won't show latest protocol run data
+  const runTimestamp = format(parseISO(fullRunTimestamp), 'yyyy-MM-dd pp xxxxx')
 
   const handleDrop: React.DragEventHandler<HTMLLabelElement> = e => {
     e.preventDefault()
@@ -132,10 +143,6 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
         ${DROP_ZONE_STYLES} ${DRAG_OVER_STYLES}
       `
     : DROP_ZONE_STYLES
-
-  const fullRunTimestamp = runQuery.data?.data.createdAt
-  if (fullRunTimestamp == null) return null //  This state should never be reached since if null, protocol empty state won't show latest protocol run data
-  const runTimestamp = format(parseISO(fullRunTimestamp), 'yyyy-MM-dd pp xxxxx')
 
   return (
     <Flex
@@ -185,7 +192,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
           onChange={onChange}
         />
       </label>
-      {mostRecentRun === null ? null : (
+      {mostRecentRunId === null ? null : (
         <Flex flexDirection={DIRECTION_COLUMN} width={'80%'}>
           <Divider marginY={SPACING_3} />
           <Flex
@@ -227,7 +234,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
                 {t('protocol_name_title')}
               </Text>
               <Flex css={FONT_BODY_1_DARK}>
-                {protocolName != null ? protocolName : <Text>{FILE_NAME}</Text>}
+                {protocolName != null ? protocolName : fileName}
               </Flex>
             </Flex>
             <Flex
@@ -274,7 +281,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
             </Flex>
             <Flex>
               <SecondaryBtn
-                onClick={() => cloneRun}
+                onClick={cloneMostRecentRun}
                 color={C_BLUE}
                 id={'UploadInput_runAgainButton'}
               >

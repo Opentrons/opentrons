@@ -11,7 +11,7 @@ import * as RobotSelectors from '../../../redux/robot/selectors'
 import { useProtocolDetails } from '../../RunDetails/hooks'
 import { UploadInput } from '../UploadInput'
 import { useMostRecentRunId } from '../hooks/useMostRecentRunId'
-import { useRunQuery } from '@opentrons/react-api-client'
+import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
 import { RerunningProtocolModal } from '../RerunningProtocolModal'
 import { useCloneRun } from '../hooks'
@@ -35,6 +35,10 @@ const mockGetConnectedRobotName = RobotSelectors.getConnectedRobotName as jest.M
   typeof RobotSelectors.getConnectedRobotName
 >
 const mockUseCloneRun = useCloneRun as jest.MockedFunction<typeof useCloneRun>
+
+const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
+  typeof useProtocolQuery
+>
 
 const mockRerunningProtocolModal = RerunningProtocolModal as jest.MockedFunction<
   typeof RerunningProtocolModal
@@ -66,6 +70,7 @@ describe('UploadInput', () => {
       .mockReturnValue({
         data: {
           data: {
+            protocolId: 'ProtocolId',
             createdAt: '2021-11-12T19:39:19.668514+00:00',
             labwareOffsets: [{ x: 5, y: 5, z: 5 }],
           },
@@ -73,6 +78,21 @@ describe('UploadInput', () => {
       } as any)
     mockUseCloneRun.mockReturnValue(jest.fn())
   })
+  when(mockUseProtocolQuery)
+    .calledWith('ProtocolId')
+    .mockReturnValue({
+      data: {
+        data: {
+          protocolType: 'python',
+          createdAt: 'now',
+          id: 'ProtocolId',
+          metadata: {},
+          analyses: {},
+          files: [{ name: 'name', role: 'main' }],
+        },
+      },
+    } as any)
+
   when(mockRerunningProtocolModal)
     .calledWith(
       componentPropsMatcher({
@@ -193,6 +213,28 @@ describe('UploadInput', () => {
     const { container } = render(props)
     expect(container.firstChild).toBeNull()
   })
-  //  TODO immediately: wait for CPX to add fileName
-  it.todo('renders file Name when protocol display name is null')
+  it('renders file name if Protocol name is null', () => {
+    when(mockUseProtocolQuery)
+      .calledWith('ProtocolId')
+      .mockReturnValue({
+        data: {
+          data: {
+            protocolType: 'python',
+            createdAt: 'now',
+            id: 'ProtocolId',
+            metadata: {},
+            analyses: {},
+            files: [{ name: 'name', role: 'main' }],
+          },
+        },
+      } as any)
+
+    when(mockUseProtocolDetails)
+      .calledWith()
+      .mockReturnValue({
+        protocolData: { displayName: null },
+      } as any)
+    const { getByText } = render(props)
+    getByText('name')
+  })
 })
