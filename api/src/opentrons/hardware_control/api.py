@@ -839,8 +839,11 @@ class API(HardwareAPILike):
     async def current_position(
         self,
         mount: top_types.Mount,
-        critical_point: CriticalPoint = None,
+        critical_point: Optional[CriticalPoint] = None,
         refresh: bool = False,
+        # TODO(mc, 2021-11-15): combine with `refresh` for more reliable
+        # position reporting when motors are not homed
+        fail_on_not_homed: bool = False,
     ) -> Dict[Axis, float]:
         """Return the postion (in deck coords) of the critical point of the
         specified mount.
@@ -855,9 +858,24 @@ class API(HardwareAPILike):
         the next one down is returned - for instance, if there is no tip on the
         specified mount but `CriticalPoint.TIP` was specified, the position of
         the nozzle will be returned.
+
+        If `fail_on_not_homed` is `True`, this method will raise a `MustHomeError`
+        if any of the relavent axes are not homed, regardless of `refresh`.
         """
-        if not self._current_position and not refresh:
-            raise MustHomeError
+        z_ax = Axis.by_mount(mount)
+        plunger_ax = Axis.of_plunger(mount)
+        position_axes = [Axis.X, Axis.Y, z_ax, plunger_ax]
+
+        if fail_on_not_homed and (
+            not self._backend.is_homed([str(a) for a in position_axes])
+            or not self._current_position
+        ):
+            raise MustHomeError(
+                f"Current position of {str(mount)} pipette is unknown, please home."
+            )
+
+        elif not self._current_position and not refresh:
+            raise MustHomeError("Current position is unknown; please home motors.")
         async with self._motion_lock:
             if refresh:
                 self._current_position = self._deck_from_smoothie(
@@ -867,8 +885,7 @@ class API(HardwareAPILike):
                 offset = top_types.Point(0, 0, 0)
             else:
                 offset = top_types.Point(*self._config.left_mount_offset)
-            z_ax = Axis.by_mount(mount)
-            plunger_ax = Axis.of_plunger(mount)
+
             cp = self._critical_point_for(mount, critical_point)
             return {
                 Axis.X: self._current_position[Axis.X] + offset[0] + cp.x,
@@ -882,6 +899,9 @@ class API(HardwareAPILike):
         mount: top_types.Mount,
         critical_point: CriticalPoint = None,
         refresh: bool = False,
+        # TODO(mc, 2021-11-15): combine with `refresh` for more reliable
+        # position reporting when motors are not homed
+        fail_on_not_homed: bool = False,
     ) -> top_types.Point:
         """Return the position of the critical point as pertains to the gantry
 
@@ -893,8 +913,16 @@ class API(HardwareAPILike):
 
         `refresh` if set to True, update the cached position using the
         smoothie driver (see :py:meth:`current_position`).
+
+        If `fail_on_not_homed` is `True`, this method will raise a `MustHomeError`
+        if any of the relavent axes are not homed, regardless of `refresh`.
         """
-        cur_pos = await self.current_position(mount, critical_point, refresh)
+        cur_pos = await self.current_position(
+            mount,
+            critical_point,
+            refresh,
+            fail_on_not_homed,
+        )
         return top_types.Point(
             x=cur_pos[Axis.X], y=cur_pos[Axis.Y], z=cur_pos[Axis.by_mount(mount)]
         )
@@ -1025,7 +1053,7 @@ class API(HardwareAPILike):
         homed moves it will raise a MustHomeError. Otherwise, it will home the axis.
         """
 
-        # TODO: Remove the fail_if_not_homed and make this the behavior all the time.
+        # TODO: Remove the fail_on_not_homed and make this the behavior all the time.
         # Having the optional arg makes the bug stick around in existing code and we
         # really want to fix it when we're not gearing up for a release.
         mounts = self._mounts(mount)

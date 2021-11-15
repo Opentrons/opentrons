@@ -427,3 +427,39 @@ async def test_move_rel_homing_failures(hardware_api):
     await hardware_api.move_rel(
         types.Mount.RIGHT, types.Point(0, 0, 2000), fail_on_not_homed=True
     )
+
+
+async def test_current_position_homing_failures(hardware_api):
+    await hardware_api.home()
+    hardware_api._backend._smoothie_driver._homed_flags = {
+        "X": True,
+        "Y": True,
+        "Z": False,
+        "A": True,
+        "B": False,
+        "C": True,
+    }
+
+    # If one axis being used isn't homed, we must get an exception
+    with pytest.raises(MustHomeError):
+        await hardware_api.current_position(
+            mount=types.Mount.LEFT,
+            fail_on_not_homed=True,
+        )
+
+    with pytest.raises(MustHomeError):
+        await hardware_api.gantry_position(
+            mount=types.Mount.LEFT,
+            fail_on_not_homed=True,
+        )
+
+    # If an axis that _isn't_ being moved isn't homed, that's fine
+    await hardware_api.current_position(
+        mount=types.Mount.RIGHT,
+        fail_on_not_homed=True,
+    )
+
+    await hardware_api.gantry_position(
+        mount=types.Mount.RIGHT,
+        fail_on_not_homed=True,
+    )
