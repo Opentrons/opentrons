@@ -29,7 +29,10 @@ import { useCommandQuery } from '@opentrons/react-api-client'
 import { useCurrentRunId } from '../ProtocolUpload/hooks/useCurrentRunId'
 import type { RunCommandSummary } from '@opentrons/api-client'
 
-import type { Command, CommandStatus } from '@opentrons/shared-data/protocol/types/schemaV6/command'
+import type {
+  Command,
+  CommandStatus,
+} from '@opentrons/shared-data/protocol/types/schemaV6/command'
 
 const PLACEHOLDERTIMER = '00:00:00' //  TODO: immediately wire up the timer
 
@@ -126,8 +129,7 @@ export interface CommandItemProps {
 }
 
 const WRAPPER_STYLE_BY_STATUS: {
-  [status in CommandStatus]:
-  { border: string; backgroundColor: string }
+  [status in CommandStatus]: { border: string; backgroundColor: string }
 } = {
   queued: { border: 'none', backgroundColor: C_NEAR_WHITE },
   running: {
@@ -146,14 +148,20 @@ const WRAPPER_STYLE_BY_STATUS: {
 export function CommandItem(props: CommandItemProps): JSX.Element {
   const { t } = useTranslation('run_details')
   const { currentCommand, runStatus } = props
-  const commandStatus = runStatus != RUN_STATUS_IDLE && currentCommand.status != null ? currentCommand.status : 'queued'
+  const commandStatus =
+    runStatus !== RUN_STATUS_IDLE && currentCommand.status != null
+      ? currentCommand.status
+      : 'queued'
 
   const currentRunId = useCurrentRunId()
-  const {data: commandDetails, refetch: refetchCommandDetails } = useCommandQuery(currentRunId, currentCommand.id)
+  const {
+    data: commandDetails,
+    refetch: refetchCommandDetails,
+  } = useCommandQuery(currentRunId, currentCommand.id)
 
-  React.useEffect(()=>{
+  React.useEffect(() => {
     refetchCommandDetails()
-  },[commandStatus])
+  }, [commandStatus])
 
   const WRAPPER_STYLE = css`
     font-size: ${FONT_SIZE_BODY_1};
@@ -175,17 +183,17 @@ export function CommandItem(props: CommandItemProps): JSX.Element {
         >
           {t('comment')}
         </Flex>
-        {commandDetails != null
-          ? <Flex>{commandDetails?.data?.result}</Flex>
-          : null
-        }
+        {commandDetails != null ? (
+          <Flex>{commandDetails?.data?.result}</Flex>
+        ) : null}
       </Flex>
     )
   } else if (currentCommand.commandType === 'custom') {
     commandTextNode = (
       <Flex key={currentCommand.id}>
         {/* @ts-expect-error  - data doesn't exit on type params, wait until command type is updated */}
-        {currentCommand?.params?.legacyCommandText ?? currentCommand.commandType }
+        {currentCommand?.params?.legacyCommandText ??
+          currentCommand.commandType}
       </Flex>
     )
   }
