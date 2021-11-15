@@ -188,7 +188,7 @@ export function useLabwarePositionCheck(
   )
   // load commands come from the protocol resource
   const loadCommands =
-    protocolData?.commands.filter(isLoadCommand).map(command => {
+    (protocolData?.commands.filter(isLoadCommand).map(command => {
       if (command.commandType === 'loadPipette') {
         const commandWithCommandId = {
           ...command,
@@ -200,7 +200,7 @@ export function useLabwarePositionCheck(
         return commandWithCommandId
       }
       return command
-    }) as Command[] ?? []
+    }) as Command[]) ?? []
   // TC open lid commands come from the LPC command generator
   const TCOpenCommands = LPCCommands.filter(isTCOpenCommand) ?? []
   // prepCommands will be run when a user starts LPC
