@@ -134,9 +134,7 @@ describe('UploadInput', () => {
     getByText('mock display name')
     getByText('Protocol name')
     getByText('Run timestamp')
-    getByText('2021-11-12')
-    getByText('19:39:19')
-    getByText('+00:00')
+    getByText('2021-11-12 2:39:19 PM -05:00')
     getByText('Labware Offset data')
     getByText('1 Labware Offsets')
     getByText('See How Rerunning a Protocol Works')
@@ -148,7 +146,7 @@ describe('UploadInput', () => {
       .mockReturnValue({
         data: {
           data: {
-            createdAt: 'createdAt this time',
+            createdAt: '2021-11-12T19:39:19.668514+00:00',
             labwareOffsets: [],
           },
         },
