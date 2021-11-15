@@ -24,10 +24,10 @@ import {
 import { css } from 'styled-components'
 import { CommandTimer } from './CommandTimer'
 import { CommandText } from './CommandText'
-import { RunStatus, RUN_STATUS_IDLE } from '@opentrons/api-client'
+import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import { useCommandQuery } from '@opentrons/react-api-client'
 import { useCurrentRunId } from '../ProtocolUpload/hooks/useCurrentRunId'
-import type { RunCommandSummary } from '@opentrons/api-client'
+import type { RunStatus, RunCommandSummary } from '@opentrons/api-client'
 
 import type {
   Command,
@@ -39,7 +39,7 @@ const PLACEHOLDERTIMER = '00:00:00' //  TODO: immediately wire up the timer
 export type Status = 'queued' | 'running' | 'succeeded' | 'failed'
 
 interface CommandItemsProps {
-  runStatus?: string
+  runStatus?: RunStatus
   currentCommand: Command | RunCommandSummary
 
   commandText?: JSX.Element

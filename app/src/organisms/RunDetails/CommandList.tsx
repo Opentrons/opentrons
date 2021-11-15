@@ -11,6 +11,7 @@ import {
   Btn,
   SIZE_1,
   C_MED_DARK_GRAY,
+  FONT_HEADER_DARK,
   JUSTIFY_START,
   Text,
   FONT_SIZE_DEFAULT,
@@ -21,6 +22,7 @@ import {
   SPACING_3,
   SPACING_4,
   ALIGN_CENTER,
+  TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { useProtocolDetails } from './hooks'
@@ -40,7 +42,8 @@ export function CommandList(): JSX.Element | null {
     .protocolData
   const runDataCommands = useCurrentProtocolRun().runRecord?.data.commands
 
-  const currentCommandList: Array<Command | RunCommandSummary> = protocolData != null ? [...protocolData?.commands] : []
+  const currentCommandList: Array<Command | RunCommandSummary> =
+    protocolData != null ? [...protocolData?.commands] : []
   const lastProtocolSetupIndex = currentCommandList
     .map(
       command =>
@@ -73,9 +76,10 @@ export function CommandList(): JSX.Element | null {
         if (
           index <= runDataCommandsSlice.length &&
           index <= currentCommandList.length &&
-          currentCommandList[index+1].id !== runDataCommandsSlice[index+1].id
+          currentCommandList[index + 1].id !==
+            runDataCommandsSlice[index + 1].id
         ) {
-          currentCommandList.length = index+1
+          currentCommandList.length = index + 1
         }
       })
     }
@@ -110,20 +114,31 @@ export function CommandList(): JSX.Element | null {
             </Flex>
           </Flex>
         ) : null}
-
+        <Flex
+          paddingLeft={SPACING_2}
+          css={FONT_HEADER_DARK}
+          textTransform={TEXT_TRANSFORM_CAPITALIZE}
+        >
+          {t('protocol_steps')}
+        </Flex>
         <Flex margin={SPACING_1}>
           {showProtocolSetupInfo ? (
             <React.Fragment>
-              <Flex flexDirection={DIRECTION_COLUMN} flex={'auto'}>
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                flex={'auto'}
+                backgroundColor={C_NEAR_WHITE}
+                marginLeft={SPACING_2}
+              >
                 <Flex
                   justifyContent={JUSTIFY_SPACE_BETWEEN}
                   color={C_MED_DARK_GRAY}
-                  backgroundColor={C_NEAR_WHITE}
                 >
                   <Text
                     textTransform={TEXT_TRANSFORM_UPPERCASE}
                     fontSize={FONT_SIZE_CAPTION}
                     id={`RunDetails_ProtocolSetupTitle`}
+                    paddingLeft={SPACING_2}
                   >
                     {t('protocol_setup')}
                   </Text>
@@ -134,20 +149,20 @@ export function CommandList(): JSX.Element | null {
                     <Icon name="chevron-up" color={C_MED_DARK_GRAY}></Icon>
                   </Btn>
                 </Flex>
-                {protocolSetupCommandList?.map(command => {
-                  return (
-                    <Flex
-                      id={`RunDetails_ProtocolSetup_CommandList`}
-                      key={command.id}
-                      flexDirection={DIRECTION_COLUMN}
-                    >
+                <Flex
+                  id={`RunDetails_ProtocolSetup_CommandList`}
+                  flexDirection={DIRECTION_COLUMN}
+                  marginLeft={SPACING_2}
+                >
+                  {protocolSetupCommandList?.map(command => {
+                    return (
                       <ProtocolSetupInfo
-                        setupCommand={command}
-                        runStatus={runStatus}
+                        key={command.id}
+                        setupCommand={command as Command}
                       />
-                    </Flex>
-                  )
-                })}
+                    )
+                  })}
+                </Flex>
               </Flex>
             </React.Fragment>
           ) : (
@@ -163,8 +178,9 @@ export function CommandList(): JSX.Element | null {
                 textTransform={TEXT_TRANSFORM_UPPERCASE}
                 color={C_MED_DARK_GRAY}
                 backgroundColor={C_NEAR_WHITE}
+                marginLeft={SPACING_1}
               >
-                <Flex>{t('protocol_setup')}</Flex>
+                <Flex paddingLeft={SPACING_2}>{t('protocol_setup')}</Flex>
                 <Flex>
                   <Icon name={'chevron-left'} width={SIZE_1} />
                 </Flex>
@@ -178,7 +194,6 @@ export function CommandList(): JSX.Element | null {
           color={C_MED_DARK_GRAY}
           flexDirection={DIRECTION_COLUMN}
         >
-          <Flex paddingLeft={SPACING_1}>{t('protocol_steps')}</Flex>
           <Flex flexDirection={DIRECTION_COLUMN}>
             {currentCommandList?.map((command, index) => {
               return command.commandType === 'custom' ? (

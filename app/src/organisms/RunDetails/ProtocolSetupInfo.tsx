@@ -1,13 +1,10 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import {
-  DIRECTION_COLUMN,
-  Flex,
+  Box,
   FONT_SIZE_BODY_1,
   SPACING_1,
   SPACING_2,
-  Text,
-  TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
 import { getModuleDisplayName, ProtocolFile } from '@opentrons/shared-data'
 import { getProtocolPipetteTipRackCalInfo } from '../../redux/pipettes'
@@ -15,18 +12,16 @@ import { getConnectedRobot } from '../../redux/discovery'
 import { State } from '../../redux/types'
 import { useSelector } from 'react-redux'
 import { useProtocolDetails } from './hooks'
-import { CommandItem } from './CommandItem'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 
 interface ProtocolSetupInfoProps {
   setupCommand?: Command
-  runStatus: string
 }
 
 export const ProtocolSetupInfo = (
   props: ProtocolSetupInfoProps
 ): JSX.Element | null => {
-  const { setupCommand, runStatus } = props
+  const { setupCommand } = props
   const { t } = useTranslation('run_details')
   const protocolData: ProtocolFile<{}> | null = useProtocolDetails()
     .protocolData
@@ -51,16 +46,7 @@ export const ProtocolSetupInfo = (
         i18nKey={'load_pipette_protocol_setup'}
         values={{
           pipette_name: pipetteData.pipetteDisplayName,
-          mount_name: setupCommand.params.mount,
-        }}
-        components={{
-          span: (
-            <Text
-              textTransform={TEXT_TRANSFORM_CAPITALIZE}
-              marginLeft={SPACING_1}
-              marginRight={SPACING_1}
-            />
-          ),
+          mount_name: setupCommand.params.mount === 'left' ? 'Left' : 'Right',
         }}
       />
     )
@@ -137,18 +123,11 @@ export const ProtocolSetupInfo = (
           ))
   }
   return (
-    <Flex
+    <Box
       padding={`${SPACING_1} ${SPACING_2} ${SPACING_1} ${SPACING_2}`}
       fontSize={FONT_SIZE_BODY_1}
-      flexDirection={DIRECTION_COLUMN}
-      flex={'auto'}
     >
-      <CommandItem
-        currentCommand={setupCommand}
-        type={'queued'}
-        runStatus={runStatus}
-        commandText={SetupCommandText}
-      />
-    </Flex>
+      {SetupCommandText}
+    </Box>
   )
 }
