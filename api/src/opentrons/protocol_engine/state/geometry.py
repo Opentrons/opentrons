@@ -64,8 +64,7 @@ class GeometryView:
             slot_pos = self._labware.get_slot_position(labware_data.location.slotName)
             return slot_pos
         else:
-            # TODO (spp): implement correctly before merge
-            return Point(0, 0, 0)
+            raise NotImplementedError("Not implemented for labware on modules")
 
     def get_labware_origin_position(self, labware_id: str) -> Point:
         """Get the position of the labware's origin, without calibration."""
@@ -82,8 +81,7 @@ class GeometryView:
                 z=slot_pos.z + origin_offset.z,
             )
         else:
-            # TODO (spp): implement correctly before merge
-            return Point(0, 0, 0)
+            raise NotImplementedError("Not implemented for labware on modules")
 
     def get_labware_position(self, labware_id: str) -> Point:
         """Get the calibrated origin of the labware."""
