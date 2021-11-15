@@ -386,7 +386,7 @@ async def test_save_position_must_home(
     hardware_api: HardwareAPI,
     subject: MovementHandler,
 ) -> None:
-    """It should propogate a must home error."""
+    """It should propagate a must home error."""
     decoy.when(
         state_store.motion.get_pipette_location(
             pipette_id="pipette-id",
