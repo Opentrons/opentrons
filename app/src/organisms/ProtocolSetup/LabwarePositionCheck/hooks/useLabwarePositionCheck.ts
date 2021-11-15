@@ -8,11 +8,13 @@ import {
 } from '@opentrons/api-client'
 import { useHost, useAllCommandsQuery } from '@opentrons/react-api-client'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
-import { useCurrentProtocolRun } from '../../../ProtocolUpload/useCurrentProtocolRun'
+import { useCurrentProtocolRun } from '../../../ProtocolUpload/hooks'
 import { getLabwareLocation } from '../../utils/getLabwareLocation'
 import { getModuleLocation } from '../../utils/getModuleLocation'
-import { useLPCCommands } from './useLPCCommands'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
+import type {
+  Command,
+  ProtocolFile,
+} from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { SetupCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import type {
   Axis,
@@ -23,11 +25,16 @@ import type {
 import type {
   LabwarePositionCheckCommand,
   LabwarePositionCheckMovementCommand,
+  LabwarePositionCheckStep,
 } from '../types'
+import { useSteps } from './useSteps'
+import { getLabwareDisplayName } from '@opentrons/shared-data'
 
 export type LabwarePositionCheckUtils =
   | {
       currentCommandIndex: number
+      currentStep: LabwarePositionCheckStep
+      titleText: string
       isLoading: boolean
       isComplete: boolean
       beginLPC: () => void
@@ -40,9 +47,11 @@ export type LabwarePositionCheckUtils =
 const useLpcCtaText = (command: LabwarePositionCheckCommand): string => {
   const { protocolData } = useProtocolDetails()
   const { t } = useTranslation('labware_position_check')
+  if (command == null) return ''
   const commands = protocolData?.commands ?? []
   switch (command.commandType) {
     case 'dropTip':
+      return t('confirm_position_and_return_tip')
     case 'moveToWell': {
       const labwareId = command.params.labwareId
       const slot = getLabwareLocation(labwareId, commands)
@@ -63,15 +72,70 @@ const useLpcCtaText = (command: LabwarePositionCheckCommand): string => {
   }
 }
 
+export const useTitleText = (
+  loading: boolean,
+  command: LabwarePositionCheckMovementCommand,
+  labware?: ProtocolFile<{}>['labware'],
+  labwareDefinitions?: ProtocolFile<{}>['labwareDefinitions']
+): string => {
+  const { protocolData } = useProtocolDetails()
+  const { t } = useTranslation('labware_position_check')
+
+  if (command == null) {
+    return ''
+  }
+
+  const commands = protocolData?.commands ?? []
+
+  const labwareId = command.params.labwareId
+  const slot = getLabwareLocation(labwareId, commands)
+
+  if (loading) {
+    switch (command.commandType) {
+      case 'moveToWell': {
+        return t('moving_to_slot_title', {
+          slot,
+        })
+      }
+      case 'pickUpTip': {
+        return t('picking_up_tip_title', {
+          slot,
+        })
+      }
+      case 'dropTip': {
+        return t('returning_tip_title', {
+          slot,
+        })
+      }
+    }
+  } else {
+    if (labware == null || labwareDefinitions == null) return ''
+
+    const labwareDefId = labware[labwareId].definitionId
+    const labwareDisplayName = getLabwareDisplayName(
+      labwareDefinitions[labwareDefId]
+    )
+    return t('check_labware_in_slot_title', {
+      labware_display_name: labwareDisplayName,
+      slot,
+    })
+  }
+}
+
 const commandIsComplete = (status: RunCommandSummary['status']): boolean =>
   status === 'succeeded' || status === 'failed'
 
 const createCommandData = (
   command: Command | LabwarePositionCheckCommand
-): { commandType: string; data: Record<string, any> } => ({
-  commandType: command.commandType,
-  data: command.params,
-})
+): { commandType: string; params: Record<string, any> } => {
+  if (command.commandType === 'loadLabware') {
+    return {
+      commandType: command.commandType,
+      params: { ...command.params, labwareId: command.result?.labwareId },
+    }
+  }
+  return { commandType: command.commandType, params: command.params }
+}
 
 const isLoadCommand = (command: Command): boolean => {
   const loadCommands: Array<SetupCommand['commandType']> = [
@@ -106,22 +170,45 @@ export function useLabwarePositionCheck(
   const { protocolData } = useProtocolDetails()
   const host = useHost()
   const { runRecord: currentRun } = useCurrentProtocolRun()
+  const LPCSteps = useSteps()
+
+  const LPCCommands = LPCSteps.reduce<LabwarePositionCheckCommand[]>(
+    (steps, currentStep) => {
+      return [...steps, ...currentStep.commands]
+    },
+    []
+  )
   // load commands come from the protocol resource
   const loadCommands = protocolData?.commands.filter(isLoadCommand) ?? []
   // TC open lid commands come from the LPC command generator
-  const TCOpenCommands = useLPCCommands().filter(isTCOpenCommand) ?? []
+  const TCOpenCommands = LPCCommands.filter(isTCOpenCommand) ?? []
   // prepCommands will be run when a user starts LPC
   const prepCommands = [...loadCommands, ...TCOpenCommands]
   // LPCMovementCommands will be run during the guided LPC flow
-  const LPCMovementCommands: LabwarePositionCheckMovementCommand[] = useLPCCommands().filter(
+  const LPCMovementCommands: LabwarePositionCheckMovementCommand[] = LPCCommands.filter(
     (
       command: LabwarePositionCheckCommand
     ): command is LabwarePositionCheckMovementCommand =>
       command.commandType !== 'thermocycler/openLid'
   )
   const currentCommand = LPCMovementCommands[currentCommandIndex]
+  const prevCommand = LPCMovementCommands[currentCommandIndex - 1]
+
+  const currentStep = LPCSteps.find(step => {
+    const matchingCommand = step.commands.find(
+      command => prevCommand != null && command.id === prevCommand.id
+    )
+    return matchingCommand
+  }) as LabwarePositionCheckStep
+
   const ctaText = useLpcCtaText(currentCommand)
   const robotCommands = useAllCommandsQuery(currentRun?.data?.id).data?.data
+  const titleText = useTitleText(
+    isLoading,
+    currentCommand,
+    protocolData?.labware,
+    protocolData?.labwareDefinitions
+  )
   const isComplete = currentCommandIndex === LPCMovementCommands.length
   if (error != null) return { error }
   const completedMovementCommand =
@@ -170,7 +257,6 @@ export function useLabwarePositionCheck(
   }
 
   const proceed = (): void => {
-    const prevCommand = LPCMovementCommands[currentCommandIndex - 1]
     setIsLoading(true)
     // before executing the next movement command, save the current position
     const savePositionCommand: Command = {
@@ -244,7 +330,7 @@ export function useLabwarePositionCheck(
   const jog = (axis: Axis, dir: Sign, step: StepSize): void => {
     const data = {
       commandType: 'moveRelative',
-      data: {
+      params: {
         pipetteId: currentCommand.params.pipetteId,
         distance: step * dir,
         axis,
@@ -263,11 +349,13 @@ export function useLabwarePositionCheck(
 
   return {
     currentCommandIndex,
-    isLoading,
+    currentStep,
     beginLPC,
     proceed,
     jog,
     ctaText,
     isComplete,
+    titleText,
+    isLoading,
   }
 }

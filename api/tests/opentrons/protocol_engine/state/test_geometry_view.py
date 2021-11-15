@@ -11,7 +11,7 @@ from opentrons.types import Point, DeckSlotName
 
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
-    CalibrationOffset,
+    LabwareOffsetVector,
     DeckSlotLocation,
     LoadedLabware,
     WellLocation,
@@ -101,7 +101,7 @@ def test_get_labware_highest_z(
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
     )
     slot_pos = Point(1, 2, 3)
-    calibration_offset = CalibrationOffset(x=1, y=-2, z=3)
+    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
 
     decoy.when(labware_view.get("labware-id")).then_return(labware_data)
     decoy.when(labware_view.get_definition("labware-id")).then_return(well_plate_def)
@@ -139,8 +139,8 @@ def test_get_all_labware_highest_z(
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
     )
 
-    plate_offset = CalibrationOffset(x=1, y=-2, z=3)
-    reservoir_offset = CalibrationOffset(x=1, y=-2, z=3)
+    plate_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+    reservoir_offset = LabwareOffsetVector(x=1, y=-2, z=3)
 
     decoy.when(labware_view.get_all()).then_return([plate, reservoir])
     decoy.when(labware_view.get("plate-id")).then_return(plate)
@@ -184,7 +184,7 @@ def test_get_labware_position(
         definitionUri="definition-uri",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
     )
-    calibration_offset = CalibrationOffset(x=1, y=-2, z=3)
+    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
     slot_pos = Point(4, 5, 6)
 
     decoy.when(labware_view.get("labware-id")).then_return(labware_data)
@@ -219,7 +219,7 @@ def test_get_well_position(
         definitionUri="definition-uri",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
     )
-    calibration_offset = CalibrationOffset(x=1, y=-2, z=3)
+    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
     slot_pos = Point(4, 5, 6)
     well_def = well_plate_def.wells["B2"]
 
@@ -258,7 +258,7 @@ def test_get_well_position_with_top_offset(
         definitionUri="definition-uri",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
     )
-    calibration_offset = CalibrationOffset(x=1, y=-2, z=3)
+    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
     slot_pos = Point(4, 5, 6)
     well_def = well_plate_def.wells["B2"]
 
@@ -304,7 +304,7 @@ def test_get_well_position_with_bottom_offset(
         definitionUri="definition-uri",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
     )
-    calibration_offset = CalibrationOffset(x=1, y=-2, z=3)
+    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
     slot_pos = Point(4, 5, 6)
     well_def = well_plate_def.wells["B2"]
 

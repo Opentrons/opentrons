@@ -1,11 +1,17 @@
 """Movement command handling."""
 from typing import Optional
 from dataclasses import dataclass
-from opentrons.hardware_control.api import API as HardwareAPI
-from opentrons.hardware_control.types import CriticalPoint
 
-from ..types import WellLocation, DeckPoint
+from opentrons.types import Point
+from opentrons.hardware_control.api import API as HardwareAPI
+from opentrons.hardware_control.types import (
+    CriticalPoint,
+    MustHomeError as HardwareMustHomeError,
+)
+
+from ..types import WellLocation, DeckPoint, MovementAxis
 from ..state import StateStore, CurrentWell
+from ..errors import MustHomeError
 from ..resources import ModelUtils
 
 
@@ -80,8 +86,36 @@ class MovementHandler:
                 critical_point=wp.critical_point,
             )
 
+    async def move_relative(
+        self,
+        pipette_id: str,
+        axis: MovementAxis,
+        distance: float,
+    ) -> None:
+        """Move a given pipette a relative amount in millimeters."""
+        pipette_location = self._state_store.motion.get_pipette_location(
+            pipette_id=pipette_id,
+        )
+        hw_mount = pipette_location.mount.to_hw_mount()
+        delta = Point(
+            x=distance if axis == MovementAxis.X else 0,
+            y=distance if axis == MovementAxis.Y else 0,
+            z=distance if axis == MovementAxis.Z else 0,
+        )
+
+        try:
+            await self._hardware_api.move_rel(
+                mount=hw_mount,
+                delta=delta,
+                fail_on_not_homed=True,
+            )
+        except HardwareMustHomeError as e:
+            raise MustHomeError(str(e)) from e
+
     async def save_position(
-        self, pipette_id: str, position_id: Optional[str]
+        self,
+        pipette_id: str,
+        position_id: Optional[str],
     ) -> SavedPositionData:
         """Get the pipette position and save to state."""
         pipette_location = self._state_store.motion.get_pipette_location(

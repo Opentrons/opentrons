@@ -9,7 +9,7 @@ from opentrons.types import DeckSlotName, Point
 
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
-    CalibrationOffset,
+    LabwareOffsetVector,
     DeckSlotLocation,
     Dimensions,
     LoadedLabware,
@@ -49,7 +49,7 @@ tip_rack = LoadedLabware(
 
 def get_labware_view(
     labware_by_id: Optional[Dict[str, LoadedLabware]] = None,
-    calibrations_by_id: Optional[Dict[str, CalibrationOffset]] = None,
+    calibrations_by_id: Optional[Dict[str, LabwareOffsetVector]] = None,
     definitions_by_uri: Optional[Dict[str, LabwareDefinition]] = None,
     deck_definition: Optional[DeckDefinitionV2] = None,
 ) -> LabwareView:
@@ -368,7 +368,7 @@ def test_get_slot_position(standard_deck_def: DeckDefinitionV2) -> None:
 
 def test_get_calibration_offset() -> None:
     """It should get a labware's calibrated offset."""
-    offset = CalibrationOffset(x=1, y=2, z=3)
+    offset = LabwareOffsetVector(x=1, y=2, z=3)
     subject = get_labware_view(calibrations_by_id={"labware-id": offset})
 
     result = subject.get_calibration_offset("labware-id")

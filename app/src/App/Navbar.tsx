@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -11,11 +10,11 @@ import {
   BORDER_SOLID_LIGHT,
 } from '@opentrons/components'
 
-import { getNavbarLocations } from '../redux/nav'
 import { NavbarLink } from '../molecules/NavbarLink'
+import { useNavLocations } from './hooks'
 
 export function Navbar(): JSX.Element {
-  const locations = useSelector(getNavbarLocations)
+  const navLocations = useNavLocations()
 
   return (
     <Flex
@@ -24,9 +23,9 @@ export function Navbar(): JSX.Element {
       width={SIZE_3}
       borderRight={BORDER_SOLID_LIGHT}
     >
-      {locations.map((loc, i) => {
+      {navLocations.map((loc, i) => {
         // move last item to the bottom and adjust its border and padding
-        const isLast = i === locations.length - 1
+        const isLast = i === navLocations.length - 1
         const sx = isLast
           ? {
               borderTop: BORDER_SOLID_LIGHT,

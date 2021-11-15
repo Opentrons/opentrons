@@ -43,12 +43,10 @@ export interface PickUpTipCommand extends CommonCommandInfo {
   id: string
   commandType: 'pickUpTip'
   params: PipetteAccessParams
-  result?: {}
 }
 export interface DropTipCommand extends CommonCommandInfo {
   commandType: 'dropTip'
   params: PipetteAccessParams
-  result?: {}
 }
 
 type AspDispAirgapParams = FlowRateParams &

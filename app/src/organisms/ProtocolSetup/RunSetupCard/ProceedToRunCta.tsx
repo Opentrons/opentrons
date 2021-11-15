@@ -1,8 +1,7 @@
 import * as React from 'react'
 import every from 'lodash/every'
-import { useSelector } from 'react-redux'
 import { NavLink } from 'react-router-dom'
-import { useMissingModuleIds } from './hooks'
+import { useMissingModuleIds, useCurrentRunPipetteInfoByMount } from './hooks'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
@@ -12,39 +11,25 @@ import {
   JUSTIFY_CENTER,
   C_BLUE,
 } from '@opentrons/components'
-import * as Pipettes from '../../../redux/pipettes'
-import type { State } from '../../../redux/types'
 
-interface ProceedToRunProps {
-  robotName: string
-}
-
-export const ProceedToRunCta = (
-  props: ProceedToRunProps
-): JSX.Element | null => {
-  const { robotName } = props
+export const ProceedToRunCta = (): JSX.Element | null => {
   const { t } = useTranslation('protocol_setup')
   const [targetProps, tooltipProps] = useHoverTooltip()
   const missingModuleIds = useMissingModuleIds()
-  const protocolPipetteTipRackData = useSelector((state: State) => {
-    return Pipettes.getProtocolPipetteTipRackCalInfo(state, robotName)
-  })
-  const isEverythingCalibrated = every(
-    protocolPipetteTipRackData,
-    pipCalData => {
-      if (pipCalData != null) {
-        return (
-          pipCalData.pipetteCalDate != null &&
-          pipCalData.tipRacks.every(
-            tipRackCal => tipRackCal.lastModifiedDate != null
-          )
+  const pipetteInfoByMount = useCurrentRunPipetteInfoByMount()
+  const isEverythingCalibrated = every(pipetteInfoByMount, pipetteInfo => {
+    if (pipetteInfo != null) {
+      return (
+        pipetteInfo.pipetteCalDate != null &&
+        pipetteInfo.tipRacksForPipette.every(
+          tipRackInfo => tipRackInfo.lastModifiedDate != null
         )
-      } else {
-        // if no pipette requested on mount
-        return true
-      }
+      )
+    } else {
+      // if no pipette requested on mount
+      return true
     }
-  )
+  })
   const calibrationIncomplete =
     missingModuleIds.length === 0 && !isEverythingCalibrated
   const moduleSetupIncomplete =

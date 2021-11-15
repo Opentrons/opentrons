@@ -84,6 +84,7 @@ async def test_get_protocols(
         protocolType=ProtocolType.PYTHON,
         metadata=Metadata(),
         analyses=[analysis_1],
+        files=[],
     )
     protocol_2 = Protocol(
         id="123",
@@ -91,6 +92,7 @@ async def test_get_protocols(
         protocolType=ProtocolType.JSON,
         metadata=Metadata(),
         analyses=[analysis_2],
+        files=[],
     )
 
     decoy.when(protocol_store.get_all()).then_return([resource_1, resource_2])
@@ -134,6 +136,7 @@ async def test_get_protocol_by_id(
         protocolType=ProtocolType.PYTHON,
         metadata=Metadata(),
         analyses=[analysis],
+        files=[],
     )
 
     decoy.when(protocol_store.get(protocol_id="protocol-id")).then_return(resource)
@@ -203,6 +206,7 @@ async def test_create_protocol(
         protocolType=ProtocolType.JSON,
         metadata=Metadata.parse_obj(metadata_as_dict),
         analyses=[analysis],
+        files=[],
     )
 
     decoy.when(pre_analyzer.analyze([protocol_file])).then_return(pre_analysis)
