@@ -1,5 +1,5 @@
 import { useRunActionMutations } from '@opentrons/react-api-client'
-import { useCurrentRunId } from '../../../organisms/ProtocolUpload/useCurrentRunId'
+import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks/useCurrentRunId'
 
 interface CurrentRunControls {
   pauseRun: () => void
