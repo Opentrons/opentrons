@@ -3,12 +3,11 @@ import pytest
 from datetime import datetime
 from decoy import Decoy
 
-from opentrons.types import MountType
+from opentrons.types import DeckSlotName, MountType
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocol_engine import ProtocolEngine, commands
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
-    DeckSlotName,
     LabwareOffset,
     LabwareOffsetCreate,
     LabwareOffsetVector,
@@ -335,6 +334,7 @@ def test_add_labware_offset(
     state_store: StateStore,
     subject: ProtocolEngine,
 ) -> None:
+    """It should have the labware offset request resolved and added to state."""
     request = LabwareOffsetCreate(
         definitionUri="definition-uri",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),

@@ -419,12 +419,13 @@ def test_get_labware_offset_vector() -> None:
 
 
 def test_get_labware_offset() -> None:
+    """It should return the requested labware offset, if it exists."""
     offset_a = LabwareOffset(
         id="id-a",
         createdAt=datetime(year=2021, month=1, day=1),
         definitionUri="uri-a",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-        offset=LabwareOffsetVector(x=1, y=1, z=1)
+        offset=LabwareOffsetVector(x=1, y=1, z=1),
     )
 
     offset_b = LabwareOffset(
@@ -432,7 +433,7 @@ def test_get_labware_offset() -> None:
         createdAt=datetime(year=2022, month=2, day=2),
         definitionUri="uri-b",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
-        offset=LabwareOffsetVector(x=2, y=2, z=2)
+        offset=LabwareOffsetVector(x=2, y=2, z=2),
     )
 
     subject = get_labware_view(
@@ -446,12 +447,13 @@ def test_get_labware_offset() -> None:
 
 
 def test_get_labware_offsets() -> None:
+    """It should return a list of all labware offsets, in order."""
     offset_a = LabwareOffset(
         id="id-a",
         createdAt=datetime(year=2021, month=1, day=1),
         definitionUri="uri-a",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-        offset=LabwareOffsetVector(x=1, y=1, z=1)
+        offset=LabwareOffsetVector(x=1, y=1, z=1),
     )
 
     offset_b = LabwareOffset(
@@ -459,7 +461,7 @@ def test_get_labware_offsets() -> None:
         createdAt=datetime(year=2022, month=2, day=2),
         definitionUri="uri-b",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
-        offset=LabwareOffsetVector(x=2, y=2, z=2)
+        offset=LabwareOffsetVector(x=2, y=2, z=2),
     )
 
     empty_subject = get_labware_view()
@@ -477,12 +479,13 @@ def test_get_labware_offsets() -> None:
 
 
 def test_find_applicable_labware_offset() -> None:
+    """It should return the most recent offset with matching URI and location."""
     offset_1 = LabwareOffset(
         id="id-1",
         createdAt=datetime(year=2021, month=1, day=1),
         definitionUri="definition-uri",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-        offset=LabwareOffsetVector(x=1, y=1, z=1)
+        offset=LabwareOffsetVector(x=1, y=1, z=1),
     )
 
     # Same definitionUri and location; different id, createdAt, and offset.
@@ -491,7 +494,7 @@ def test_find_applicable_labware_offset() -> None:
         createdAt=datetime(year=2022, month=2, day=2),
         definitionUri="definition-uri",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-        offset=LabwareOffsetVector(x=2, y=2, z=2)
+        offset=LabwareOffsetVector(x=2, y=2, z=2),
     )
 
     subject = get_labware_view(
@@ -500,19 +503,28 @@ def test_find_applicable_labware_offset() -> None:
     )
 
     # Matching both definitionURI and location. Should return 2nd (most recent) offset.
-    assert subject.find_applicable_labware_offset(
-        definition_uri="definition-uri",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
-    ) == offset_2
+    assert (
+        subject.find_applicable_labware_offset(
+            definition_uri="definition-uri",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        )
+        == offset_2
+    )
 
     # Doesn't match anything, since definitionUri is different.
-    assert subject.find_applicable_labware_offset(
-        definition_uri="different-definition-uri",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
-    ) == None
+    assert (
+        subject.find_applicable_labware_offset(
+            definition_uri="different-definition-uri",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        )
+        is None
+    )
 
     # Doesn't match anything, since location is different.
-    assert subject.find_applicable_labware_offset(
-        definition_uri="different-definition-uri",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2)
-    ) == None
+    assert (
+        subject.find_applicable_labware_offset(
+            definition_uri="different-definition-uri",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
+        )
+        is None
+    )
