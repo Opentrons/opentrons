@@ -6,10 +6,10 @@ import { useFormatRunTimestamp, useTimeElapsedSincePause } from '../hooks'
 
 jest.mock('../hooks')
 
-const mockUseFormatRunTimestamp =  useFormatRunTimestamp as jest.MockedFunction<
+const mockUseFormatRunTimestamp = useFormatRunTimestamp as jest.MockedFunction<
   typeof useFormatRunTimestamp
 >
-const mockUseTimeElapsedSincePause =  useTimeElapsedSincePause as jest.MockedFunction<
+const mockUseTimeElapsedSincePause = useTimeElapsedSincePause as jest.MockedFunction<
   typeof useTimeElapsedSincePause
 >
 
@@ -25,7 +25,7 @@ describe('CommandTimer', () => {
   let props: React.ComponentProps<typeof CommandTimer>
 
   beforeEach(() => {
-    mockUseFormatRunTimestamp.mockReturnValue((timestamp) => timestamp)
+    mockUseFormatRunTimestamp.mockReturnValue(timestamp => timestamp)
     mockUseTimeElapsedSincePause.mockReturnValue(MOCK_ELAPSED_TIME)
   })
   it('renders correct time when runStatus is paused', () => {

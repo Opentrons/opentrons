@@ -14,16 +14,16 @@ jest.mock('../../ProtocolSetup/hooks')
 jest.mock('../../ProtocolSetup/utils/getLabwareLocation')
 jest.mock('@opentrons/shared-data/js/helpers')
 
-const mockUseProtocolDetails =  useProtocolDetails as jest.MockedFunction<
+const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
   typeof useProtocolDetails
 >
-const mockUseLabwareRenderInfoById =  useLabwareRenderInfoById as jest.MockedFunction<
+const mockUseLabwareRenderInfoById = useLabwareRenderInfoById as jest.MockedFunction<
   typeof useLabwareRenderInfoById
 >
-const mockGetLabwareDisplayName =  getLabwareDisplayName as jest.MockedFunction<
+const mockGetLabwareDisplayName = getLabwareDisplayName as jest.MockedFunction<
   typeof getLabwareDisplayName
 >
-const mockGetLabwareLocation =  getLabwareLocation as jest.MockedFunction<
+const mockGetLabwareLocation = getLabwareLocation as jest.MockedFunction<
   typeof getLabwareLocation
 >
 
@@ -36,7 +36,7 @@ const render = (props: React.ComponentProps<typeof CommandText>) => {
 const MOCK_COMMAND_DETAILS = {
   id: '123',
   commandType: 'custom',
-  params:  {},
+  params: {},
   status: 'running',
   result: {},
   startedAt: 'start timestamp',
@@ -45,7 +45,7 @@ const MOCK_COMMAND_DETAILS = {
 
 describe('CommandText', () => {
   beforeEach(() => {
-    mockUseProtocolDetails.mockReturnValue({protocolData: {} } as any)
+    mockUseProtocolDetails.mockReturnValue({ protocolData: {} } as any)
     mockUseLabwareRenderInfoById.mockReturnValue({} as any)
   })
   it('renders correct command text for custom legacy commands', () => {
@@ -53,9 +53,9 @@ describe('CommandText', () => {
       commandOrSummary: {
         ...MOCK_COMMAND_DETAILS,
         params: {
-          legacyCommandText: 'legacy command text'
-        }
-      } as Command
+          legacyCommandText: 'legacy command text',
+        },
+      } as Command,
     })
     getByText('legacy command text')
   })
@@ -71,8 +71,8 @@ describe('CommandText', () => {
       .mockReturnValue('fake_labware_location')
     mockUseLabwareRenderInfoById.mockReturnValue({
       labwareId: {
-        labwareDef: 'fake_def'
-      }
+        labwareDef: 'fake_def',
+      },
     } as any)
     const { getByText } = render({
       commandOrSummary: {
@@ -81,9 +81,11 @@ describe('CommandText', () => {
         params: {
           wellName,
           labwareId,
-        }
-      } as Command
+        },
+      } as Command,
     })
-    getByText('Picking up tip from wellName of fake_display_name in fake_labware_location')
+    getByText(
+      'Picking up tip from wellName of fake_display_name in fake_labware_location'
+    )
   })
 })
