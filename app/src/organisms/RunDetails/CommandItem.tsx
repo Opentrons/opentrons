@@ -25,7 +25,11 @@ import {
 import { css } from 'styled-components'
 import { CommandTimer } from './CommandTimer'
 import { CommandText } from './CommandText'
-import { RUN_STATUS_IDLE } from '@opentrons/api-client'
+import {
+  RUN_STATUS_IDLE,
+  RUN_STATUS_PAUSE_REQUESTED,
+  RUN_STATUS_PAUSED,
+} from '@opentrons/api-client'
 import { useCommandQuery } from '@opentrons/react-api-client'
 import { useCurrentRunId } from '../ProtocolUpload/hooks/useCurrentRunId'
 import type { RunStatus, RunCommandSummary } from '@opentrons/api-client'
@@ -118,7 +122,8 @@ function CurrentCommandLabel(props: CurrentCommandLabelProps): JSX.Element {
       textTransform={TEXT_TRANSFORM_UPPERCASE}
       fontSize={FONT_SIZE_CAPTION}
     >
-      {props.runStatus === 'paused'
+      {props.runStatus === RUN_STATUS_PAUSED ||
+      props.runStatus === RUN_STATUS_PAUSE_REQUESTED
         ? t('current_step_pause')
         : t('current_step')}
     </Text>

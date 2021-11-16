@@ -75,7 +75,7 @@ export function CommandList(): JSX.Element | null {
   let currentCommandList: Array<
     Command | RunCommandSummary
   > = postSetupAnticipatedCommands
-  if (runDataCommands != null) {
+  if (runDataCommands != null && runDataCommands.length > 0) {
     // find first index after protocol setup and LPC commands
     const firstRunCommandIndex = runDataCommands.findIndex(
       runCommand => runCommand.id === postSetupAnticipatedCommands[0].id

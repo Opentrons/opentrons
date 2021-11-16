@@ -32,6 +32,12 @@ export const ProtocolSetupInfo = (
   )
   if (protocolData == null) return null
   if (setupCommand === undefined) return null
+  if (
+    setupCommand.result?.definition?.metadata.displayName.includes('Trash') ===
+    true
+  ) {
+    return null
+  }
 
   let SetupCommandText
   if (setupCommand.commandType === 'loadPipette') {
@@ -89,38 +95,34 @@ export const ProtocolSetupInfo = (
     } else if (moduleName != null) {
       moduleSlots = 1
     }
-
-    setupCommand.result?.definition.metadata.displayName.includes('Trash') ??
-    false
-      ? (SetupCommandText = undefined)
-      : (SetupCommandText =
-          moduleName === null ? (
-            <Trans
-              t={t}
-              id={`RunDetails_LabwareSetup_NoModules`}
-              i18nKey={'load_labware_info_protocol_setup_no_module'}
-              values={{
-                labware_loadname:
-                  setupCommand.result?.definition.metadata.displayName,
-                labware_version: setupCommand.result?.definition.version,
-                slot_number: slotNumber,
-              }}
-            />
-          ) : (
-            <Trans
-              t={t}
-              id={`RunDetails_LabwareSetup_WithModules`}
-              i18nKey={'load_labware_info_protocol_setup'}
-              count={moduleSlots}
-              values={{
-                labware_loadname:
-                  setupCommand.result?.definition.metadata.displayName,
-                labware_version: setupCommand.result?.definition.version,
-                slot_number: slotNumber,
-                module_name: moduleName,
-              }}
-            />
-          ))
+    SetupCommandText =
+      moduleName === null ? (
+        <Trans
+          t={t}
+          id={`RunDetails_LabwareSetup_NoModules`}
+          i18nKey={'load_labware_info_protocol_setup_no_module'}
+          values={{
+            labware_loadname:
+              setupCommand.result?.definition.metadata.displayName,
+            labware_version: setupCommand.result?.definition.version,
+            slot_number: slotNumber,
+          }}
+        />
+      ) : (
+        <Trans
+          t={t}
+          id={`RunDetails_LabwareSetup_WithModules`}
+          i18nKey={'load_labware_info_protocol_setup'}
+          count={moduleSlots}
+          values={{
+            labware_loadname:
+              setupCommand.result?.definition.metadata.displayName,
+            labware_version: setupCommand.result?.definition.version,
+            slot_number: slotNumber,
+            module_name: moduleName,
+          }}
+        />
+      )
   }
   return (
     <Box

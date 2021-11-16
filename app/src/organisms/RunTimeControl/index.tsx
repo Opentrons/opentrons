@@ -7,6 +7,7 @@ import {
   RUN_STATUS_STOPPED,
   RUN_STATUS_FAILED,
   RUN_STATUS_SUCCEEDED,
+  RUN_STATUS_PAUSE_REQUESTED,
 } from '@opentrons/api-client'
 import {
   Flex,
@@ -60,7 +61,10 @@ export function RunTimeControl(): JSX.Element | null {
     buttonIconName = 'pause'
     buttonText = t('pause_run')
     action = usePause
-  } else if (runStatus === RUN_STATUS_PAUSED) {
+  } else if (
+    runStatus === RUN_STATUS_PAUSED ||
+    runStatus === RUN_STATUS_PAUSE_REQUESTED
+  ) {
     buttonIconName = 'play'
     buttonText = t('resume_run')
     action = usePlay

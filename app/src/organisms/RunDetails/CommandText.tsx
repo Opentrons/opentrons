@@ -4,7 +4,6 @@ import {
   ALIGN_CENTER,
   Flex,
   SPACING_1,
-  SPACING_3,
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
 import type { RunCommandSummary } from '@opentrons/api-client'
@@ -41,7 +40,7 @@ export function CommandText(props: Props): JSX.Element {
             >
               {t('comment')}
             </Flex>
-            {commandOrSummary != null ? ( commandOrSummary.result) : null}
+            {commandOrSummary != null ? commandOrSummary.result : null}
           </>
         )
         break
@@ -50,20 +49,23 @@ export function CommandText(props: Props): JSX.Element {
         const { wellName, labwareId } = commandOrSummary.params
         messageNode = (
           <Trans
-              t={t}
-              i18nKey={'pickup_tip'}
-              values={{
-                well_name: wellName,
-                labware: getLabwareDisplayName(labwareRenderInfoById[labwareId].labwareDef),
-                labware_location: getLabwareLocation(labwareId, commands),
-              }}
-            />
+            t={t}
+            i18nKey={'pickup_tip'}
+            values={{
+              well_name: wellName,
+              labware: getLabwareDisplayName(
+                labwareRenderInfoById[labwareId].labwareDef
+              ),
+              labware_location: getLabwareLocation(labwareId, commands),
+            }}
+          />
         )
         break
       }
       case 'custom': {
-        messageNode = commandOrSummary.params?.legacyCommandText ??
-            commandOrSummary.commandType
+        messageNode =
+          commandOrSummary.params?.legacyCommandText ??
+          commandOrSummary.commandType
         break
       }
       default: {
@@ -71,14 +73,14 @@ export function CommandText(props: Props): JSX.Element {
         break
       }
     }
-  } else  {
+  } else {
     // this must be a run command summary
     messageNode = commandOrSummary.commandType
   }
 
   return (
-    <Flex marginLeft={SPACING_3} alignItems={ALIGN_CENTER} >
-      <Flex marginLeft={SPACING_1}>{messageNode}</Flex>
+    <Flex alignItems={ALIGN_CENTER} marginLeft={SPACING_1}>
+      {messageNode}
     </Flex>
   )
 }
