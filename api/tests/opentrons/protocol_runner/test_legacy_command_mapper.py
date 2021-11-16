@@ -309,7 +309,7 @@ def test_map_module_labware_load(
             # Trusting that the exact fields within in the labware definition
             # get passed through correctly.
             definition=matchers.Anything(),
-            calibration=LabwareOffsetVector(x=0, y=0, z=0),
+            offsetId=None,
         ),
     )
     subject = LegacyCommandMapper()
