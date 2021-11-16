@@ -1,8 +1,17 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
+  RUN_STATUS_IDLE,
+  RUN_STATUS_RUNNING,
+  RUN_STATUS_PAUSED,
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_FAILED,
+  RUN_STATUS_SUCCEEDED,
+} from '@opentrons/api-client'
+import {
   Flex,
   Icon,
+  IconName,
   PrimaryBtn,
   Text,
   ALIGN_CENTER,
@@ -20,57 +29,70 @@ import {
   SPACING_3,
 } from '@opentrons/components'
 
-import { useRunControls, useRunStatus } from './hooks'
+import {
+  useRunCompleteTime,
+  useRunControls,
+  useRunPauseTime,
+  useRunStartTime,
+  useRunStatus,
+} from './hooks'
 import { Timer } from './Timer'
 
-export function RunTimeControl(): JSX.Element {
+export function RunTimeControl(): JSX.Element | null {
   const { t } = useTranslation('run_details')
-  const runStatus = useRunStatus()
-  const { play, pause, reset } = useRunControls()
 
-  let callToAction: React.ReactNode = ''
+  const runStatus = useRunStatus()
+  const startTime = useRunStartTime()
+  const pausedAt = useRunPauseTime()
+  const completedAt = useRunCompleteTime()
+
+  const { usePlay, usePause, useReset } = useRunControls()
+
   let action = (): void => {}
-  if (runStatus === 'loaded') {
-    callToAction = (
-      <>
-        <Icon name="play" size={SIZE_1} marginRight={SPACING_2} />
-        <Text fontSize={FONT_SIZE_DEFAULT}>{t('start_run')}</Text>
-      </>
-    )
-    action = play
-  } else if (runStatus === 'running') {
-    callToAction = (
-      <>
-        <Icon name="pause" size={SIZE_1} marginRight={SPACING_2} />
-        <Text fontSize={FONT_SIZE_DEFAULT}>{t('pause_run')}</Text>
-      </>
-    )
-    action = pause
-  } else if (runStatus === 'paused') {
-    callToAction = (
-      <>
-        <Icon name="play" size={SIZE_1} marginRight={SPACING_2} />
-        <Text fontSize={FONT_SIZE_DEFAULT}>{t('resume_run')}</Text>
-      </>
-    )
-    action = play
-  } else if (runStatus === 'finished') {
-    callToAction = <Text fontSize={FONT_SIZE_DEFAULT}>{t('run_again')}</Text>
-    action = reset
-  } else if (runStatus === 'canceled') {
-    callToAction = <Text fontSize={FONT_SIZE_DEFAULT}>{t('run_again')}</Text>
-    action = reset
+  let buttonIconName: IconName | null = null
+  let buttonText: string = ''
+
+  if (runStatus === RUN_STATUS_IDLE) {
+    buttonIconName = 'play'
+    buttonText = t('start_run')
+    action = usePlay
+  } else if (runStatus === RUN_STATUS_RUNNING) {
+    buttonIconName = 'pause'
+    buttonText = t('pause_run')
+    action = usePause
+  } else if (runStatus === RUN_STATUS_PAUSED) {
+    buttonIconName = 'play'
+    buttonText = t('resume_run')
+    action = usePlay
+  } else if (
+    runStatus === RUN_STATUS_STOPPED ||
+    runStatus === RUN_STATUS_FAILED ||
+    runStatus === RUN_STATUS_SUCCEEDED
+  ) {
+    buttonIconName = null
+    buttonText = t('run_again')
+    action = useReset
   }
 
-  return (
+  return runStatus != null ? (
     <Flex flexDirection={DIRECTION_COLUMN} margin={SPACING_2}>
       <Text css={FONT_HEADER_DARK} marginBottom={SPACING_3}>
         {t('run_protocol')}
       </Text>
       <Text css={FONT_BODY_1_DARK_SEMIBOLD} marginBottom={SPACING_3}>
-        {t('run_status', { status: t(`status_${runStatus}`) })}
+        {runStatus != null
+          ? t('run_status', { status: t(`status_${runStatus}`) })
+          : ''}
       </Text>
-      {runStatus !== 'loaded' ? <Timer /> : null}
+      {runStatus !== RUN_STATUS_IDLE &&
+      runStatus != null &&
+      startTime != null ? (
+        <Timer
+          startTime={startTime}
+          pausedAt={pausedAt}
+          completedAt={completedAt}
+        />
+      ) : null}
       <PrimaryBtn
         onClick={action}
         alignSelf={ALIGN_STRETCH}
@@ -82,8 +104,11 @@ export function RunTimeControl(): JSX.Element {
         alignItems={ALIGN_CENTER}
         display={DISPLAY_FLEX}
       >
-        {callToAction}
+        {buttonIconName != null ? (
+          <Icon name={buttonIconName} size={SIZE_1} marginRight={SPACING_2} />
+        ) : null}
+        <Text fontSize={FONT_SIZE_DEFAULT}>{buttonText}</Text>
       </PrimaryBtn>
     </Flex>
-  )
+  ) : null
 }

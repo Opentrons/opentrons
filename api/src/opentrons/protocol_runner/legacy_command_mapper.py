@@ -115,7 +115,9 @@ class LegacyCommandMapper:
                 definition=LabwareDefinition.parse_obj(
                     labware_load_info.labware_definition
                 ),
-                calibration=pe_types.LabwareOffsetVector(x=0, y=0, z=0),
+                # fixme(mm, 2021-11-11): Labware offsets added to the ProtocolEngine
+                # need to apply to the legacy protocol somehow, and get fed back here.
+                offsetId=None,
             ),
         )
 

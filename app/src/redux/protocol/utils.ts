@@ -32,7 +32,7 @@ export const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
 
 export function ingestProtocolFile(
   file: File,
-  handleSuccess: (data: ProtocolData) => unknown,
+  handleSuccess: (file: File, data: ProtocolData | null) => unknown,
   handleError?: ProtocolParseErrorHandler
 ): void {
   const reader = new FileReader()
@@ -46,7 +46,7 @@ export function ingestProtocolFile(
       : _contents
 
     const protocolData = parseProtocolData(file, contents, handleError)
-    protocolData != null && handleSuccess(protocolData)
+    handleSuccess(file, protocolData)
   }
 
   if (fileIsBinary(file)) {

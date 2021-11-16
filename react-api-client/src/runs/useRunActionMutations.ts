@@ -1,4 +1,10 @@
-import { usePlayRunMutation, usePauseRunMutation, useStopRunMutation } from '..'
+import { useQueryClient } from 'react-query'
+import {
+  useHost,
+  usePlayRunMutation,
+  usePauseRunMutation,
+  useStopRunMutation,
+} from '..'
 
 interface UseRunActionMutations {
   playRun: () => void
@@ -6,14 +12,27 @@ interface UseRunActionMutations {
   stopRun: () => void
 }
 
-// TODO (bc, 11/8/21): Play and Pause should have the same interface as stop here.
-// The hook should take no params, but the callback function should take a runId
 export function useRunActionMutations(runId: string): UseRunActionMutations {
-  const { playRun } = usePlayRunMutation(runId)
+  const host = useHost()
+  const queryClient = useQueryClient()
 
-  const { pauseRun } = usePauseRunMutation(runId)
+  const onSuccess = (): void => {
+    queryClient
+      .invalidateQueries([host, 'runs', runId])
+      .catch((e: Error) =>
+        console.error(`error invalidating run ${runId} query: ${e.message}`)
+      )
+  }
 
-  const { stopRun } = useStopRunMutation()
+  const { playRun } = usePlayRunMutation({ onSuccess })
 
-  return { playRun, pauseRun, stopRun: () => stopRun(runId) }
+  const { pauseRun } = usePauseRunMutation({ onSuccess })
+
+  const { stopRun } = useStopRunMutation({ onSuccess })
+
+  return {
+    playRun: () => playRun(runId),
+    pauseRun: () => pauseRun(runId),
+    stopRun: () => stopRun(runId),
+  }
 }

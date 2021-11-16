@@ -1,20 +1,31 @@
+import { Command as FullCommand } from '@opentrons/shared-data'
+
+export const RUN_STATUS_IDLE: 'idle' = 'idle'
+export const RUN_STATUS_RUNNING: 'running' = 'running'
+export const RUN_STATUS_PAUSE_REQUESTED: 'pause-requested' = 'pause-requested'
+export const RUN_STATUS_PAUSED: 'paused' = 'paused'
+export const RUN_STATUS_STOP_REQUESTED: 'stop-requested' = 'stop-requested'
+export const RUN_STATUS_STOPPED: 'stopped' = 'stopped'
+export const RUN_STATUS_FAILED: 'failed' = 'failed'
+export const RUN_STATUS_SUCCEEDED: 'succeeded' = 'succeeded'
+
 export type RunStatus =
-  | 'ready-to-run'
-  | 'running'
-  | 'pause-requested'
-  | 'paused'
-  | 'stop-requested'
-  | 'stopped'
-  | 'failed'
-  | 'succeeded'
+  | typeof RUN_STATUS_IDLE
+  | typeof RUN_STATUS_RUNNING
+  | typeof RUN_STATUS_PAUSE_REQUESTED
+  | typeof RUN_STATUS_PAUSED
+  | typeof RUN_STATUS_STOP_REQUESTED
+  | typeof RUN_STATUS_STOPPED
+  | typeof RUN_STATUS_FAILED
+  | typeof RUN_STATUS_SUCCEEDED
 
 export interface RunData {
   id: string
   createdAt: string
   status: RunStatus
   actions: RunAction[]
-  // TODO(bh, 10-29-2021): types for commands, pipettes, labware
-  commands: unknown[]
+  commands: RunCommandSummary[]
+  // TODO(bh, 11-12-2021): types for pipettes, labware
   pipettes: unknown[]
   labware: unknown[]
   protocolId?: string
@@ -72,7 +83,7 @@ export interface RunCommandSummary {
   id: string
   commandType: string
   status: 'queued' | 'running' | 'succeeded' | 'failed'
-  result: any
+  result?: any
 }
 
 export interface CommandData {
@@ -83,4 +94,9 @@ export interface CommandData {
 export interface CommandsData {
   data: RunCommandSummary[]
   links?: ResourceLinks
+}
+
+export interface CommandDetail {
+  data: FullCommand
+  links: ResourceLinks | null
 }

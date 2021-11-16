@@ -3,9 +3,15 @@ from typing import List
 
 from opentrons.protocol_runner import PreAnalysis, JsonPreAnalysis
 
-from .protocol_store import ProtocolResource
-from .protocol_models import Protocol, ProtocolType, Metadata
 from .analysis_models import ProtocolAnalysis
+from .protocol_store import ProtocolResource
+from .protocol_models import (
+    Protocol,
+    ProtocolType,
+    ProtocolFile,
+    ProtocolFileRole,
+    Metadata,
+)
 
 
 def _pre_analysis_to_protocol_type(pre_analysis: PreAnalysis) -> ProtocolType:
@@ -38,4 +44,10 @@ class ResponseBuilder:
             protocolType=_pre_analysis_to_protocol_type(resource.pre_analysis),
             metadata=Metadata.parse_obj(resource.pre_analysis.metadata),
             analyses=analyses,
+            files=[
+                # TODO(mc, 2021-11-12): don't report all files as main. Move
+                # role determination to PreAnalyzer
+                ProtocolFile(name=f.name, role=ProtocolFileRole.MAIN)
+                for f in resource.files
+            ],
         )

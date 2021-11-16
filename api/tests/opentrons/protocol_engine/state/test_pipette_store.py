@@ -1,5 +1,6 @@
 """Tests for pipette state changes in the protocol_engine state store."""
 import pytest
+from datetime import datetime
 
 from opentrons.types import MountType
 from opentrons.protocol_engine import commands as cmd
@@ -194,3 +195,30 @@ def test_movement_commands_update_current_well(
     subject.handle_action(UpdateCommandAction(command=command))
 
     assert subject.state.current_well == expected_location
+
+
+def test_home_clears_current_well(subject: PipetteStore) -> None:
+    """It clear the last accessed well with a home command."""
+    load_pipette_command = create_load_pipette_command(
+        pipette_id="pipette-id",
+        pipette_name=PipetteName.P300_SINGLE,
+        mount=MountType.LEFT,
+    )
+    move_command = create_move_to_well_command(
+        pipette_id="pipette-id",
+        labware_id="labware-id",
+        well_name="well-name",
+    )
+    home_command = cmd.Home(
+        id="command-id",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime(year=2021, month=1, day=1),
+        params=cmd.HomeParams(),
+        result=cmd.HomeResult(),
+    )
+
+    subject.handle_action(UpdateCommandAction(command=load_pipette_command))
+    subject.handle_action(UpdateCommandAction(command=move_command))
+    subject.handle_action(UpdateCommandAction(command=home_command))
+
+    assert subject.state.current_well is None

@@ -1,8 +1,9 @@
 """Public protocol engine value types and models."""
+from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass
 from pydantic import BaseModel, Field
-from typing import Union
+from typing import Optional, Union
 
 from opentrons.types import MountType, DeckSlotName
 
@@ -96,15 +97,6 @@ class LoadedPipette(BaseModel):
     mount: MountType
 
 
-class LoadedLabware(BaseModel):
-    """A labware that has been loaded."""
-
-    id: str
-    loadName: str
-    definitionUri: str
-    location: LabwareLocation
-
-
 class MovementAxis(str, Enum):
     """Axis on which to issue a relative movement."""
 
@@ -113,26 +105,23 @@ class MovementAxis(str, Enum):
     Z = "z"
 
 
+class MotorAxis(str, Enum):
+    """Motor axis on which to issue a home command."""
+
+    X = "x"
+    Y = "y"
+    LEFT_Z = "leftZ"
+    RIGHT_Z = "rightZ"
+    LEFT_PLUNGER = "leftPlunger"
+    RIGHT_PLUNGER = "rightPlunger"
+
+
 class LabwareOffsetVector(BaseModel):
     """Offset, in deck coordinates from nominal to actual position."""
 
     x: float
     y: float
     z: float
-
-
-class LabwareOffsetCreate(BaseModel):
-    """Create request data for a labware offset."""
-
-    definitionUri: str = Field(..., description="The URI for the labware's definition.")
-    location: LabwareLocation = Field(
-        ...,
-        description="Where the labware is located on the robot.",
-    )
-    offset: LabwareOffsetVector = Field(
-        ...,
-        description="The offset applied to matching labware.",
-    )
 
 
 class LabwareOffset(BaseModel):
@@ -144,12 +133,45 @@ class LabwareOffset(BaseModel):
     """
 
     id: str = Field(..., description="Unique labware offset record identifier.")
+    createdAt: datetime = Field(..., description="When this labware offset was added.")
     definitionUri: str = Field(..., description="The URI for the labware's definition.")
     location: LabwareLocation = Field(
         ...,
         description="Where the labware is located on the robot.",
     )
-    offset: LabwareOffsetVector = Field(
+    vector: LabwareOffsetVector = Field(
         ...,
         description="The offset applied to matching labware.",
+    )
+
+
+class LabwareOffsetCreate(BaseModel):
+    """Create request data for a labware offset."""
+
+    definitionUri: str = Field(..., description="The URI for the labware's definition.")
+    location: LabwareLocation = Field(
+        ...,
+        description="Where the labware is located on the robot.",
+    )
+    vector: LabwareOffsetVector = Field(
+        ...,
+        description="The offset applied to matching labware.",
+    )
+
+
+class LoadedLabware(BaseModel):
+    """A labware that has been loaded."""
+
+    id: str
+    loadName: str
+    definitionUri: str
+    location: LabwareLocation
+    offsetId: Optional[str] = Field(
+        None,
+        description=(
+            "An ID referencing the offset applied to this labware placement,"
+            " decided at load time."
+            " Null or undefined means no offset was provided for this load,"
+            " so the default of (0, 0, 0) will be used."
+        ),
     )

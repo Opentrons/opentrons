@@ -255,6 +255,7 @@ async def test_get_run(
         loadName="load-name",
         definitionUri="namespace/load-name/42",
         location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        offsetId=None,
     )
 
     pipette = pe_types.LoadedPipette(
