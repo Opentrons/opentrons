@@ -141,6 +141,13 @@ class BinarySerializable:
     def build(cls, data: bytes) -> BinarySerializable:
         """Create a BinarySerializable from a byte buffer.
 
+        The byte buffer must be at least enough bytes to satisfy all fields.
+
+        Extra bytes will be ignored. This is for two reasons:
+            - CANFD requires padding to round byte lengths to fixed sizes.
+            - To accommodate extracting multiple  BinarySerializable objects
+            from a stream of bytes.
+
         Args:
             data: Byte buffer
 
