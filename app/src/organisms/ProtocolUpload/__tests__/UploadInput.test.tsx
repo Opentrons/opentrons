@@ -4,6 +4,7 @@ import '@testing-library/jest-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import {
   componentPropsMatcher,
+  nestedTextMatcher,
   renderWithProviders,
 } from '@opentrons/components'
 import { i18n } from '../../../i18n'
@@ -154,7 +155,9 @@ describe('UploadInput', () => {
     getByText('mock display name')
     getByText('Protocol name')
     getByText('Run timestamp')
-    getByText('2021-11-12 7:39:19 PM +00:00')
+    //  Had to use nestedTextMatcher to avoid testing for the changing timezones
+    getByText(nestedTextMatcher('2021-11-12'))
+    getByText(nestedTextMatcher(':39:19'))
     getByText('Labware Offset data')
     getByText('1 Labware Offsets')
     getByText('See How Rerunning a Protocol Works')

@@ -105,7 +105,6 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
   const fullRunTimestamp = mostRecentRun?.createdAt
   if (fullRunTimestamp == null) return null //  This state should never be reached since if null, protocol empty state won't show latest protocol run data
   const runTimestamp = format(parseISO(fullRunTimestamp), 'yyyy-MM-dd pp xxxxx')
-  console.log(runTimestamp)
 
   const handleDrop: React.DragEventHandler<HTMLLabelElement> = e => {
     e.preventDefault()
