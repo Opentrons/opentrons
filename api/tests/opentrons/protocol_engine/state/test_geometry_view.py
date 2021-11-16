@@ -445,18 +445,28 @@ def test_get_tip_drop_location(
     subject: GeometryView,
 ) -> None:
     """It should get relative drop tip location for a pipette/labware combo."""
-    pipette_config: PipetteDict = cast(PipetteDict, {"return_tip_height": 0.7})
+    pipette_config: PipetteDict = cast(PipetteDict, {"return_tip_height": 0.5})
 
     decoy.when(labware_view.get_tip_length("tip-rack-id")).then_return(50)
+    decoy.when(
+        labware_view.add_well_locations(
+            labware_id="tip-rack-id",
+            well_name="A1",
+            well_locations=[
+                WellLocation(offset=WellOffset(x=1, y=2, z=3)),
+                WellLocation(offset=WellOffset(x=0, y=0, z=-25)),  # 0.5 * 50
+            ],
+        )
+    ).then_return(WellLocation(offset=WellOffset(x=100, y=200, z=300)))
 
     location = subject.get_tip_drop_location(
-        labware_id="tip-rack-id", pipette_config=pipette_config
+        pipette_config=pipette_config,
+        labware_id="tip-rack-id",
+        well_name="A1",
+        well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
     )
 
-    assert location == WellLocation(
-        origin=WellOrigin.TOP,
-        offset=WellOffset(x=0, y=0, z=-0.7 * 50),
-    )
+    assert location == WellLocation(offset=WellOffset(x=100, y=200, z=300))
 
 
 def test_get_tip_drop_location_with_trash(
@@ -473,10 +483,9 @@ def test_get_tip_drop_location_with_trash(
 
     location = subject.get_tip_drop_location(
         labware_id="labware-id",
+        well_name="A1",
+        well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
         pipette_config=pipette_config,
     )
 
-    assert location == WellLocation(
-        origin=WellOrigin.TOP,
-        offset=WellOffset(x=0, y=0, z=0),
-    )
+    assert location == WellLocation(offset=WellOffset(x=1, y=2, z=3))

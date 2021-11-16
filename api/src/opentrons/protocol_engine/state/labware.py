@@ -18,11 +18,14 @@ from .. import errors
 from ..resources import DeckFixedLabware
 from ..commands import Command, LoadLabwareResult, AddLabwareDefinitionResult
 from ..types import (
+    Dimensions,
     LabwareOffset,
     LabwareOffsetVector,
     LabwareLocation,
     LoadedLabware,
-    Dimensions,
+    WellLocation,
+    WellOffset,
+    WellOrigin,
 )
 from ..actions import Action, UpdateCommandAction, AddLabwareOffsetAction
 from .abstract_store import HasState, HandlesActions
@@ -278,6 +281,37 @@ class LabwareView(HasState[LabwareState]):
                 assert match, f"Well name did not match pattern {pattern}"
                 wells_by_rows[match.group(1)].append(well_name)
         return wells_by_rows
+
+    def add_well_locations(
+        self,
+        labware_id: str,
+        well_name: str,
+        well_locations: Sequence[WellLocation],
+    ) -> WellLocation:
+        """Sum up a series of WellLocations into a single WellLocation."""
+        try:
+            result = well_locations[0]
+        except IndexError:
+            result = WellLocation()
+
+        origin = result.origin
+        offset = result.offset
+        well_depth = self.get_well_definition(labware_id, well_name).depth
+
+        for loc in well_locations[1:]:
+            next_x = offset.x + loc.offset.x
+            next_y = offset.y + loc.offset.y
+
+            if origin == WellOrigin.TOP and loc.origin == WellOrigin.BOTTOM:
+                next_z = offset.z + loc.offset.z - well_depth
+            elif origin == WellOrigin.BOTTOM and loc.origin == WellOrigin.TOP:
+                next_z = offset.z + loc.offset.z + well_depth
+            else:
+                next_z = offset.z + loc.offset.z
+
+            offset = WellOffset(x=next_x, y=next_y, z=next_z)
+
+        return WellLocation(origin=origin, offset=offset)
 
     def get_tip_length(self, labware_id: str) -> float:
         """Get the tip length of a tip rack."""

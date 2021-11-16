@@ -32,6 +32,7 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, PickUpTipResu
             pipette_id=params.pipetteId,
             labware_id=params.labwareId,
             well_name=params.wellName,
+            well_location=params.wellLocation,
         )
 
         return PickUpTipResult()

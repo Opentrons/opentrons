@@ -166,8 +166,10 @@ class GeometryView:
     # 10mm above well bottom
     def get_tip_drop_location(
         self,
-        labware_id: str,
         pipette_config: PipetteDict,
+        labware_id: str,
+        well_name: str,
+        well_location: WellLocation,
     ) -> WellLocation:
         """Get tip drop location given labware and hardware pipette."""
         # return to top if labware is fixed trash
@@ -177,10 +179,15 @@ class GeometryView:
         )
 
         if is_fixed_trash:
-            return WellLocation()
+            return well_location
 
         nominal_length = self._labware.get_tip_length(labware_id)
         offset_factor = pipette_config["return_tip_height"]
-        offset = WellOffset(x=0, y=0, z=-nominal_length * offset_factor)
+        tip_offset = WellOffset(x=0, y=0, z=-nominal_length * offset_factor)
+        tip_adjusted_location = WellLocation(origin=WellOrigin.TOP, offset=tip_offset)
 
-        return WellLocation(offset=offset)
+        return self._labware.add_well_locations(
+            labware_id=labware_id,
+            well_name=well_name,
+            well_locations=[well_location, tip_adjusted_location],
+        )
