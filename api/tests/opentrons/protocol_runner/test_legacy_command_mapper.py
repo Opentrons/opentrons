@@ -1,10 +1,10 @@
 """Tests for the ProtocolRunner's LegacyContextPlugin."""
+import pytest
 from decoy import matchers
 from datetime import datetime
 
 from opentrons.commands.types import PauseMessage
 from opentrons.protocol_engine import (
-    CalibrationOffset,
     DeckSlotLocation,
     PipetteName,
     commands as pe_commands,
@@ -16,9 +16,10 @@ from opentrons.protocol_runner.legacy_command_mapper import (
 from opentrons.protocol_runner.legacy_wrappers import (
     LegacyInstrumentLoadInfo,
     LegacyLabwareLoadInfo,
+    LegacyModuleLoadInfo,
 )
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons.types import DeckSlotName, Mount, MountType
+from opentrons.types import DeckLocation, DeckSlotName, Mount, MountType
 
 
 def test_map_before_command() -> None:
@@ -216,7 +217,7 @@ def test_map_labware_load(minimal_labware_def: LabwareDefinition) -> None:
             # Trusting that the exact fields within in the labware definition
             # get passed through correctly.
             definition=matchers.Anything(),
-            calibration=CalibrationOffset(x=0, y=0, z=0),
+            offsetId=None,
         ),
     )
 
@@ -243,4 +244,36 @@ def test_map_instrument_load() -> None:
     )
 
     output = LegacyCommandMapper().map_instrument_load(input)
+    assert output == expected_output
+
+
+@pytest.mark.parametrize(
+    argnames=["module_name", "location", "slot"],
+    argvalues=[
+        ["module-1", 1, DeckSlotName.SLOT_1],
+        ["Thermocycler", None, DeckSlotName.SLOT_7],
+    ],
+)
+def test_map_module_load(
+    module_name: str, location: DeckLocation, slot: DeckSlotName
+) -> None:
+    """It should correctly map a module load."""
+    input = LegacyModuleLoadInfo(
+        module_name=module_name,
+        location=location,
+        configuration="conf",
+    )
+    expected_output = pe_commands.LoadModule.construct(
+        id=matchers.IsA(str),
+        status=pe_commands.CommandStatus.SUCCEEDED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        params=pe_commands.LoadModuleParams.construct(
+            model=module_name,
+            location=DeckSlotLocation(slotName=slot),
+        ),
+        result=pe_commands.LoadModuleResult.construct(moduleId=matchers.IsA(str)),
+    )
+    output = LegacyCommandMapper().map_module_load(input)
     assert output == expected_output

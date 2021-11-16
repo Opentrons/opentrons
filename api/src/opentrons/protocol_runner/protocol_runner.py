@@ -124,6 +124,7 @@ class ProtocolRunner:
 
     async def stop(self) -> None:
         """Stop (cancel) the run."""
+        self._task_queue.stop()
         await self._protocol_engine.halt()
 
     async def join(self) -> None:

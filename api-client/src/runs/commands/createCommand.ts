@@ -6,7 +6,7 @@ import type { Command } from '../types'
 
 export interface CreateCommandData {
   commandType: string
-  data: Record<string, any>
+  params: Record<string, any>
 }
 
 export function createCommand(

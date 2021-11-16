@@ -41,15 +41,12 @@ describe('usePauseRunMutation hook', () => {
       .calledWith(HOST_CONFIG, RUN_ID_1, createPauseRunActionData)
       .mockRejectedValue('uh oh')
 
-    const { result, waitFor } = renderHook(
-      () => usePauseRunMutation(RUN_ID_1),
-      {
-        wrapper,
-      }
-    )
+    const { result, waitFor } = renderHook(usePauseRunMutation, {
+      wrapper,
+    })
 
     expect(result.current.data).toBeUndefined()
-    result.current.pauseRun()
+    act(() => result.current.pauseRun(RUN_ID_1))
     await waitFor(() => {
       return result.current.status !== 'loading'
     })
@@ -62,13 +59,10 @@ describe('usePauseRunMutation hook', () => {
       .calledWith(HOST_CONFIG, RUN_ID_1, createPauseRunActionData)
       .mockResolvedValue({ data: mockPauseRunAction } as Response<RunAction>)
 
-    const { result, waitFor } = renderHook(
-      () => usePauseRunMutation(RUN_ID_1),
-      {
-        wrapper,
-      }
-    )
-    act(() => result.current.pauseRun())
+    const { result, waitFor } = renderHook(usePauseRunMutation, {
+      wrapper,
+    })
+    act(() => result.current.pauseRun(RUN_ID_1))
 
     await waitFor(() => result.current.data != null)
 

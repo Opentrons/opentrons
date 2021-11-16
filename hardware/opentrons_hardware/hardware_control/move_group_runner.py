@@ -8,15 +8,15 @@ from opentrons_hardware.drivers.can_bus.can_messenger import (
 )
 from opentrons_hardware.drivers.can_bus.messages import MessageDefinition
 from opentrons_hardware.drivers.can_bus.messages.message_definitions import (
-    ClearMoveGroupRequest,
+    ClearAllMoveGroupsRequest,
     AddLinearMoveRequest,
     MoveCompleted,
     ExecuteMoveGroupRequest,
 )
 from opentrons_hardware.drivers.can_bus.messages.payloads import (
-    MoveGroupRequestPayload,
     AddLinearMoveRequestPayload,
     ExecuteMoveGroupRequestPayload,
+    EmptyPayload,
 )
 from opentrons_hardware.hardware_control.constants import interrupts_per_sec
 from opentrons_hardware.hardware_control.motion import MoveGroups
@@ -49,13 +49,10 @@ class MoveGroupRunner:
 
     async def _clear_groups(self, can_messenger: CanMessenger) -> None:
         """Send commands to clear the message groups."""
-        for i, g in enumerate(self._move_groups):
-            await can_messenger.send(
-                node_id=NodeId.broadcast,
-                message=ClearMoveGroupRequest(
-                    payload=MoveGroupRequestPayload(group_id=UInt8Field(i))
-                ),
-            )
+        await can_messenger.send(
+            node_id=NodeId.broadcast,
+            message=ClearAllMoveGroupsRequest(payload=EmptyPayload()),
+        )
 
     async def _send_groups(self, can_messenger: CanMessenger) -> None:
         """Send commands to set up the message groups."""

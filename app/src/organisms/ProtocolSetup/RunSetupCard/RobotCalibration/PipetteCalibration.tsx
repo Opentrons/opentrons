@@ -26,21 +26,21 @@ import { INTENT_CALIBRATE_PIPETTE_OFFSET } from '../../../CalibrationPanels'
 import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCalibratePipetteOffset'
 import { CalibrationItem } from './CalibrationItem'
 
-import type { ProtocolPipetteTipRackCalData } from '../../../../redux/pipettes/types'
+import type { PipetteInfo } from '../hooks/useCurrentRunPipetteInfoByMount'
 
 const pipettesPageUrl = `/robots/opentrons-dev/instruments`
 const inexactPipetteSupportArticle =
   'https://support.opentrons.com/en/articles/3450143-gen2-pipette-compatibility'
 
 interface Props {
-  pipetteTipRackData: ProtocolPipetteTipRackCalData
+  pipetteInfo: PipetteInfo
   index: number
   mount: string
   robotName: string
 }
 
 export function PipetteCalibration(props: Props): JSX.Element {
-  const { pipetteTipRackData, index, mount, robotName } = props
+  const { pipetteInfo, index, mount, robotName } = props
   const { t } = useTranslation('protocol_setup')
   const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
   const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
@@ -71,11 +71,11 @@ export function PipetteCalibration(props: Props): JSX.Element {
   let button: JSX.Element | undefined
   let subText
   const attached =
-    pipetteTipRackData.exactPipetteMatch === PipetteConstants.INEXACT_MATCH ||
-    pipetteTipRackData.exactPipetteMatch === PipetteConstants.MATCH
+    pipetteInfo.requestedPipetteMatch === PipetteConstants.INEXACT_MATCH ||
+    pipetteInfo.requestedPipetteMatch === PipetteConstants.MATCH
 
   let pipetteMismatchInfo
-  if (pipetteTipRackData.exactPipetteMatch === PipetteConstants.INEXACT_MATCH) {
+  if (pipetteInfo.requestedPipetteMatch === PipetteConstants.INEXACT_MATCH) {
     pipetteMismatchInfo = (
       <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_FLEX_END}>
         <Text
@@ -102,7 +102,7 @@ export function PipetteCalibration(props: Props): JSX.Element {
     )
   }
 
-  if (pipetteTipRackData.pipetteCalDate != null && attached) {
+  if (pipetteInfo.pipetteCalDate != null && attached) {
     button = pipetteMismatchInfo
   } else if (!attached) {
     subText = t('attach_pipette_calibration')
@@ -157,11 +157,11 @@ export function PipetteCalibration(props: Props): JSX.Element {
   return (
     <CalibrationItem
       button={button}
-      calibratedDate={attached ? pipetteTipRackData.pipetteCalDate : null}
+      calibratedDate={attached ? pipetteInfo.pipetteCalDate : null}
       index={index}
       subText={subText}
       title={`${t('mount_title', { mount: mount.toUpperCase() })} ${
-        pipetteTipRackData.pipetteDisplayName
+        pipetteInfo.pipetteSpecs?.displayName
       }`}
       id={`PipetteCalibration_${mount}MountTitle`}
     />

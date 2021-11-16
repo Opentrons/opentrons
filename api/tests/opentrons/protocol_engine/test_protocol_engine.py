@@ -3,17 +3,24 @@ import pytest
 from datetime import datetime
 from decoy import Decoy
 
-from opentrons.types import MountType
+from opentrons.types import DeckSlotName, MountType
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocol_engine import ProtocolEngine, commands
-from opentrons.protocol_engine.types import PipetteName
+from opentrons.protocol_engine.types import (
+    DeckSlotLocation,
+    LabwareOffset,
+    LabwareOffsetCreate,
+    LabwareOffsetVector,
+    PipetteName,
+)
 from opentrons.protocol_engine.execution import QueueWorker
 from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.state import StateStore
-from opentrons.protocol_engine.plugins import AbstractPlugin
+from opentrons.protocol_engine.plugins import AbstractPlugin, PluginStarter
 
 from opentrons.protocol_engine.actions import (
     ActionDispatcher,
+    AddLabwareOffsetAction,
     PlayAction,
     PauseAction,
     StopAction,
@@ -31,6 +38,12 @@ def state_store(decoy: Decoy) -> StateStore:
 def action_dispatcher(decoy: Decoy) -> ActionDispatcher:
     """Get a mock ActionDispatcher."""
     return decoy.mock(cls=ActionDispatcher)
+
+
+@pytest.fixture
+def plugin_starter(decoy: Decoy) -> PluginStarter:
+    """Get a mock PluginStarter."""
+    return decoy.mock(cls=PluginStarter)
 
 
 @pytest.fixture
@@ -53,17 +66,19 @@ def hardware_api(decoy: Decoy) -> HardwareAPI:
 
 @pytest.fixture
 def subject(
+    hardware_api: HardwareAPI,
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
-    model_utils: ModelUtils,
+    plugin_starter: PluginStarter,
     queue_worker: QueueWorker,
-    hardware_api: HardwareAPI,
+    model_utils: ModelUtils,
 ) -> ProtocolEngine:
     """Get a ProtocolEngine test subject with its dependencies stubbed out."""
     return ProtocolEngine(
         hardware_api=hardware_api,
         state_store=state_store,
         action_dispatcher=action_dispatcher,
+        plugin_starter=plugin_starter,
         queue_worker=queue_worker,
         model_utils=model_utils,
     )
@@ -215,6 +230,7 @@ def test_pause(
 async def test_stop(
     decoy: Decoy,
     action_dispatcher: ActionDispatcher,
+    plugin_starter: PluginStarter,
     queue_worker: QueueWorker,
     hardware_api: HardwareAPI,
     subject: ProtocolEngine,
@@ -226,6 +242,7 @@ async def test_stop(
         action_dispatcher.dispatch(StopAction()),
         await queue_worker.join(),
         await hardware_api.stop(home_after=False),
+        plugin_starter.stop(),
     )
 
 
@@ -295,21 +312,70 @@ async def test_halt(
         action_dispatcher.dispatch(StopAction()),
         queue_worker.cancel(),
         await hardware_api.halt(),
+        await hardware_api.stop(home_after=False),
     )
 
 
 def test_add_plugin(
     decoy: Decoy,
-    state_store: StateStore,
-    action_dispatcher: ActionDispatcher,
+    plugin_starter: PluginStarter,
     subject: ProtocolEngine,
 ) -> None:
-    """It should configure and add a plugin to the ActionDispatcher pipeline."""
+    """It should add a plugin to the PluginStarter."""
     plugin = decoy.mock(cls=AbstractPlugin)
 
     subject.add_plugin(plugin)
 
+    decoy.verify(plugin_starter.start(plugin))
+
+
+def test_add_labware_offset(
+    decoy: Decoy,
+    action_dispatcher: ActionDispatcher,
+    model_utils: ModelUtils,
+    state_store: StateStore,
+    subject: ProtocolEngine,
+) -> None:
+    """It should have the labware offset request resolved and added to state."""
+    request = LabwareOffsetCreate(
+        definitionUri="definition-uri",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        vector=LabwareOffsetVector(x=1, y=2, z=3),
+    )
+
+    id = "labware-offset-id"
+    created_at = datetime(year=2021, month=11, day=15)
+
+    expected_result = LabwareOffset(
+        id=id,
+        createdAt=created_at,
+        definitionUri=request.definitionUri,
+        location=request.location,
+        vector=request.vector,
+    )
+
+    decoy.when(model_utils.generate_id()).then_return(id)
+    decoy.when(model_utils.get_timestamp()).then_return(created_at)
+    decoy.when(
+        state_store.labware.get_labware_offset(labware_offset_id=id)
+    ).then_return(expected_result)
+
+    result = subject.add_labware_offset(
+        request=LabwareOffsetCreate(
+            definitionUri="definition-uri",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            vector=LabwareOffsetVector(x=1, y=2, z=3),
+        )
+    )
+
+    assert result == expected_result
+
     decoy.verify(
-        plugin._configure(state=state_store, action_dispatcher=action_dispatcher),
-        action_dispatcher.add_handler(plugin),
+        action_dispatcher.dispatch(
+            AddLabwareOffsetAction(
+                labware_offset_id=id,
+                created_at=created_at,
+                request=request,
+            )
+        )
     )

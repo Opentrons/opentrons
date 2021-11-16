@@ -12,8 +12,6 @@ import type {
   UseMutateFunction,
   UseMutationOptions,
 } from 'react-query'
-// TODO(bh, 10-27-2021): temp mock returns til fully wired. uncomment mutation callback body to mock
-// import { mockStopRunAction } from './__fixtures__'
 
 export type UseStopRunMutationResult = UseMutationResult<
   RunAction,
@@ -39,7 +37,6 @@ export const useStopRunMutation = (
       createRunAction(host as HostConfig, runId, {
         actionType: RUN_ACTION_TYPE_STOP,
       }).then(response => response.data),
-    // Promise.resolve(mockStopRunAction)
     options
   )
   return {

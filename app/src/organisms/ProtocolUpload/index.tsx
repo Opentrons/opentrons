@@ -11,8 +11,8 @@ import { useDispatch } from 'react-redux'
 import { Page } from '../../atoms/Page'
 import { UploadInput } from './UploadInput'
 import { ProtocolSetup } from '../ProtocolSetup'
-import { useCurrentProtocolRun } from './useCurrentProtocolRun'
-import { useCloseCurrentRun } from './useCloseCurrentRun'
+import { useCurrentProtocolRun } from './hooks/useCurrentProtocolRun'
+import { useCloseCurrentRun } from './hooks/useCloseCurrentRun'
 import { loadProtocol, closeProtocol } from '../../redux/protocol/actions'
 import { ingestProtocolFile } from '../../redux/protocol/utils'
 
@@ -51,7 +51,7 @@ export function ProtocolUpload(): JSX.Element {
     clearError()
     ingestProtocolFile(
       file,
-      data => {
+      (file, data) => {
         dispatch(loadProtocol(file, data))
         createProtocolRun([file])
       },

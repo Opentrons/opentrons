@@ -28,7 +28,7 @@ describe('ingestProtocolFile', () => {
     mockReader.result = contents
     ingestProtocolFile(jsonFile, handleSuccess, handleError)
     mockReader.onload()
-    expect(handleSuccess).toHaveBeenCalledWith(withModulesProtocol)
+    expect(handleSuccess).toHaveBeenCalledWith(jsonFile, withModulesProtocol)
     expect(handleError).not.toHaveBeenCalled()
   })
   it('calls handleError if invalid json file', () => {
@@ -36,7 +36,7 @@ describe('ingestProtocolFile', () => {
     mockReader.result = ''
     ingestProtocolFile(jsonFile, handleSuccess, handleError)
     mockReader.onload()
-    expect(handleSuccess).not.toHaveBeenCalled()
+    expect(handleSuccess).toHaveBeenCalledWith(jsonFile, null)
     expect(handleError).toHaveBeenCalled()
   })
 })

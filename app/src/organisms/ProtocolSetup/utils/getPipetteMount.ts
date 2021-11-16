@@ -8,7 +8,7 @@ export const getPipetteMount = (
   const mount = commands.find(
     (command: Command): command is LoadPipetteCommand =>
       command.commandType === 'loadPipette' &&
-      command.params.pipetteId === pipetteId
+      command.result?.pipetteId === pipetteId
   )?.params.mount
 
   if (mount == null) {

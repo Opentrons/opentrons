@@ -1,4 +1,3 @@
-import findKey from 'lodash/findKey'
 import reduce from 'lodash/reduce'
 import {
   DeckDefinition,
@@ -6,8 +5,10 @@ import {
   ModuleDefinition,
   SPAN7_8_10_11_SLOT,
   getModuleDef2,
+  ProtocolFile,
 } from '@opentrons/shared-data'
-import { getProtocolData } from '../../../redux/protocol'
+import { LoadLabwareCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import { getModuleLocation } from './getModuleLocation'
 
 export interface ModuleRenderInfoById {
   [moduledId: string]: {
@@ -21,7 +22,7 @@ export interface ModuleRenderInfoById {
 }
 
 export const getModuleRenderInfo = (
-  protocolData: ReturnType<typeof getProtocolData>,
+  protocolData: ProtocolFile<{}>,
   deckDef: DeckDefinition
 ): ModuleRenderInfoById => {
   if (protocolData != null && 'modules' in protocolData) {
@@ -29,17 +30,24 @@ export const getModuleRenderInfo = (
       protocolData.modules,
       (acc, module, moduleId) => {
         const moduleDef = getModuleDef2(module.model)
-        const nestedLabwareId = findKey(
-          protocolData.labware,
-          lw => lw.slot === moduleId
-        )
+        const nestedLabwareId = protocolData.commands
+          .filter(
+            (command): command is LoadLabwareCommand =>
+              command.commandType === 'loadLabware'
+          )
+          .find(
+            (command: LoadLabwareCommand) =>
+              'moduleId' in command.params.location &&
+              command.params.location.moduleId === moduleId
+          )?.params.labwareId
+
         const nestedLabware =
           nestedLabwareId != null ? protocolData.labware[nestedLabwareId] : null
         const nestedLabwareDef =
           nestedLabware != null
             ? protocolData.labwareDefinitions[nestedLabware.definitionId]
             : null
-        let slotNumber = module.slot
+        let slotNumber = getModuleLocation(moduleId, protocolData.commands)
         // Note: this is because PD represents the slot the TC sits in as a made up slot. We want it to be rendered in slot 7
         if (slotNumber === SPAN7_8_10_11_SLOT) {
           slotNumber = '7'

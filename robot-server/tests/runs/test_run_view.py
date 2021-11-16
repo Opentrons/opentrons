@@ -18,7 +18,7 @@ from robot_server.runs.run_models import Run, RunUpdate, RunCommandSummary
 
 from robot_server.runs.action_models import (
     RunAction,
-    RunActionCreateData,
+    RunActionCreate,
     RunActionType,
 )
 
@@ -130,6 +130,7 @@ def test_to_response_adds_equipment() -> None:
         loadName="load-name",
         definitionUri="namespace/load-name/42",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        offsetId=None,
     )
 
     pipette = LoadedPipette(
@@ -172,7 +173,7 @@ def test_create_action(current_time: datetime) -> None:
         is_current=True,
     )
 
-    command_data = RunActionCreateData(
+    command_data = RunActionCreate(
         actionType=RunActionType.PLAY,
     )
 

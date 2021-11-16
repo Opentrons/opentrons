@@ -36,6 +36,15 @@ from .load_pipette import (
     LoadPipetteCommandType,
 )
 
+from .home import Home, HomeCreate, HomeResult, HomeCommandType
+
+from .move_relative import (
+    MoveRelative,
+    MoveRelativeCreate,
+    MoveRelativeResult,
+    MoveRelativeCommandType,
+)
+
 from .move_to_well import (
     MoveToWell,
     MoveToWellCreate,
@@ -78,6 +87,8 @@ Command = Union[
     LoadLabware,
     LoadModule,
     LoadPipette,
+    Home,
+    MoveRelative,
     MoveToWell,
     PickUpTip,
     Pause,
@@ -93,6 +104,8 @@ CommandType = Union[
     LoadLabwareCommandType,
     LoadModuleCommandType,
     LoadPipetteCommandType,
+    HomeCommandType,
+    MoveRelativeCommandType,
     MoveToWellCommandType,
     PickUpTipCommandType,
     PauseCommandType,
@@ -108,6 +121,8 @@ CommandCreate = Union[
     LoadLabwareCreate,
     LoadModuleCreate,
     LoadPipetteCreate,
+    HomeCreate,
+    MoveRelativeCreate,
     MoveToWellCreate,
     PickUpTipCreate,
     PauseCreate,
@@ -122,6 +137,8 @@ CommandResult = Union[
     LoadLabwareResult,
     LoadModuleResult,
     LoadPipetteResult,
+    HomeResult,
+    MoveRelativeResult,
     MoveToWellResult,
     PickUpTipResult,
     PauseResult,

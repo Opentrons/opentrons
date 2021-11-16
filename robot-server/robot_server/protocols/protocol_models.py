@@ -16,6 +16,26 @@ class ProtocolType(str, Enum):
     PYTHON = "python"
 
 
+class ProtocolFileRole(str, Enum):
+    """The purpose of a given file in a Protocol.
+
+    Args:
+        MAIN: The protocol's main file. In a JSON protocol, this is will
+            be the JSON file. In a Python protocol, this is the file
+            that exports the main `run` method.
+    """
+
+    MAIN = "main"
+
+
+class ProtocolFile(BaseModel):
+    """A file in a protocol."""
+
+    # TODO(mc, 2021-11-12): add unique ID to file resource
+    name: str = Field(..., description="The file's basename, including extension")
+    role: ProtocolFileRole = Field(..., description="The file's role in the protocol.")
+
+
 class Metadata(BaseModel):
     """Extra, nonessential information about the protocol.
 
@@ -56,6 +76,8 @@ class Protocol(ResourceModel):
             " when this protocol was *authored.*)"
         ),
     )
+
+    files: Sequence[ProtocolFile]
 
     protocolType: ProtocolType = Field(
         ...,
