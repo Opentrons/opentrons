@@ -24,7 +24,7 @@ class LabwareLoadInfo:
     labware_load_name: str
     labware_version: int
     deck_slot: DeckSlotName
-    on_module: Optional[bool] = False
+    on_module: bool = False
 
 
 @dataclass(frozen=True)
