@@ -68,20 +68,14 @@ class GeometryView:
 
     def get_labware_origin_position(self, labware_id: str) -> Point:
         """Get the position of the labware's origin, without calibration."""
-        labware_data = self._labware.get(labware_id)
-        if isinstance(labware_data.location, DeckSlotLocation):
-            slot_pos = self._labware.get_slot_position(labware_data.location.slotName)
-            origin_offset = self._labware.get_definition(
-                labware_id
-            ).cornerOffsetFromSlot
+        slot_pos = self.get_labware_parent_position(labware_id)
+        origin_offset = self._labware.get_definition(labware_id).cornerOffsetFromSlot
 
-            return Point(
-                x=slot_pos.x + origin_offset.x,
-                y=slot_pos.y + origin_offset.y,
-                z=slot_pos.z + origin_offset.z,
-            )
-        else:
-            raise NotImplementedError("Not implemented for labware on modules")
+        return Point(
+            x=slot_pos.x + origin_offset.x,
+            y=slot_pos.y + origin_offset.y,
+            z=slot_pos.z + origin_offset.z,
+        )
 
     def get_labware_position(self, labware_id: str) -> Point:
         """Get the calibrated origin of the labware."""
