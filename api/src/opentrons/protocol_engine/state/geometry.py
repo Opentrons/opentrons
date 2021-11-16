@@ -80,7 +80,7 @@ class GeometryView:
     def get_labware_position(self, labware_id: str) -> Point:
         """Get the calibrated origin of the labware."""
         origin_pos = self.get_labware_origin_position(labware_id)
-        cal_offset = self._labware.get_calibration_offset(labware_id)
+        cal_offset = self._labware.get_labware_offset_vector(labware_id)
 
         return Point(
             x=origin_pos.x + cal_offset.x,
