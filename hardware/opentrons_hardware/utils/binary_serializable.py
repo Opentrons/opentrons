@@ -148,7 +148,10 @@ class BinarySerializable:
             cls
         """
         try:
-            b = struct.unpack(cls._get_format_string(), data)
+            format_string = cls._get_format_string()
+            size = cls.get_size()
+            # ignore bytes beyond the size of message.
+            b = struct.unpack(format_string, data[:size])
             args = {v.name: v.type.build(b[i]) for i, v in enumerate(fields(cls))}
             # Mypy is not liking constructing the derived types.
             return cls(**args)  # type: ignore[call-arg]
@@ -171,6 +174,11 @@ class BinarySerializable:
             raise InvalidFieldException(f"All fields must be of type {BinaryFieldBase}")
 
         return format_string
+
+    @classmethod
+    def get_size(cls) -> int:
+        """Get the size of the serializable in bytes."""
+        return struct.calcsize(cls._get_format_string())
 
 
 class LittleEndianMixIn:
