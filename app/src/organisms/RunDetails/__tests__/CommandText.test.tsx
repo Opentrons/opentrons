@@ -1,8 +1,31 @@
 import * as React from 'react'
+import { when } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { CommandText } from '../CommandText'
+import { useProtocolDetails } from '../hooks'
+import { useLabwareRenderInfoById } from '../../ProtocolSetup/hooks'
+import { getLabwareLocation } from '../../ProtocolSetup/utils/getLabwareLocation'
+import { getLabwareDisplayName } from '@opentrons/shared-data'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6/command'
+
+jest.mock('../hooks')
+jest.mock('../../ProtocolSetup/hooks')
+jest.mock('../../ProtocolSetup/utils/getLabwareLocation')
+jest.mock('@opentrons/shared-data/js/helpers')
+
+const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
+  typeof useProtocolDetails
+>
+const mockUseLabwareRenderInfoById = useLabwareRenderInfoById as jest.MockedFunction<
+  typeof useLabwareRenderInfoById
+>
+const mockGetLabwareDisplayName = getLabwareDisplayName as jest.MockedFunction<
+  typeof getLabwareDisplayName
+>
+const mockGetLabwareLocation = getLabwareLocation as jest.MockedFunction<
+  typeof getLabwareLocation
+>
 
 const render = (props: React.ComponentProps<typeof CommandText>) => {
   return renderWithProviders(<CommandText {...props} />, {
@@ -10,34 +33,59 @@ const render = (props: React.ComponentProps<typeof CommandText>) => {
   })[0]
 }
 
-const WELL_LOCATION = { origin: 'top', offset: { x: 0, y: 0, z: 0 } }
-const PIPETTE_ID = 'PIPETTE_ID'
-const LABWARE_ID = 'LABWARE_ID'
-const WELLNAME = 'WELLNAME'
-const COMMAND_TYPE = 'touchTip'
-const COMMAND_TEXT = 'COMMAND_TEXT'
+const MOCK_COMMAND_DETAILS = {
+  id: '123',
+  commandType: 'custom',
+  params: {},
+  status: 'running',
+  result: {},
+  startedAt: 'start timestamp',
+  completedAt: 'end timestamp',
+} as Command
 
 describe('CommandText', () => {
-  let props: React.ComponentProps<typeof CommandText>
-
   beforeEach(() => {
-    props = {
-      command: {
-        commandType: COMMAND_TYPE,
-        params: {
-          pipetteId: PIPETTE_ID,
-          labwareId: LABWARE_ID,
-          wellName: WELLNAME,
-          wellLocation: WELL_LOCATION,
-        },
-        result: { volume: 10 },
-      } as Command,
-      commandText: COMMAND_TEXT,
-    }
+    mockUseProtocolDetails.mockReturnValue({ protocolData: {} } as any)
+    mockUseLabwareRenderInfoById.mockReturnValue({} as any)
   })
-  it('renders correct command text', () => {
-    const { getByText } = render(props)
-    getByText('touchTip')
-    getByText('COMMAND_TEXT')
+  it('renders correct command text for custom legacy commands', () => {
+    const { getByText } = render({
+      commandOrSummary: {
+        ...MOCK_COMMAND_DETAILS,
+        params: {
+          legacyCommandText: 'legacy command text',
+        },
+      } as Command,
+    })
+    getByText('legacy command text')
+  })
+
+  it('renders correct command text for pick up tip', () => {
+    const labwareId = 'labwareId'
+    const wellName = 'wellName'
+    when(mockGetLabwareDisplayName)
+      .calledWith('fake_def' as any)
+      .mockReturnValue('fake_display_name')
+    when(mockGetLabwareLocation)
+      .calledWith(labwareId, [])
+      .mockReturnValue('fake_labware_location')
+    mockUseLabwareRenderInfoById.mockReturnValue({
+      labwareId: {
+        labwareDef: 'fake_def',
+      },
+    } as any)
+    const { getByText } = render({
+      commandOrSummary: {
+        ...MOCK_COMMAND_DETAILS,
+        commandType: 'pickUpTip',
+        params: {
+          wellName,
+          labwareId,
+        },
+      } as Command,
+    })
+    getByText(
+      'Picking up tip from wellName of fake_display_name in fake_labware_location'
+    )
   })
 })
