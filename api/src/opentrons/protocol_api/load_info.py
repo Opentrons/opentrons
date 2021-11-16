@@ -26,25 +26,7 @@ class LabwareLoadInfo:
     labware_load_name: str
     labware_version: int
     deck_slot: DeckSlotName
-
-
-@dataclass(frozen=True)
-class LabwareLoadOnModuleInfo:
-    """For Opentrons internal use only.
-
-    :meta private:
-
-    Information about a successful labware load on a module.
-
-    Like `LabwareLoadInfo`, but for loading labware on modules
-    """
-
-    labware_definition: "LabwareDefinition"
-    # todo(spp, 2021-11-15): same note about namespace, load name, version as above.
-    labware_namespace: str
-    labware_load_name: str
-    labware_version: int
-    moduleId: str
+    on_module: Optional[bool] = False
 
 
 @dataclass(frozen=True)
@@ -70,6 +52,5 @@ class ModuleLoadInfo:
     """
 
     module_name: str
-    module_id: str
     location: Optional[DeckLocation]
     configuration: Optional[str]

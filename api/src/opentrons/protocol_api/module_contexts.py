@@ -12,7 +12,7 @@ from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support.types import APIVersion
 
 from .labware import Labware, load, load_from_definition
-from .load_info import LabwareLoadOnModuleInfo
+from .load_info import LabwareLoadInfo
 from opentrons.protocols.geometry.module_geometry import (
     ModuleGeometry,
     ThermocyclerGeometry,
@@ -82,13 +82,19 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
         self._ctx._implementation.get_deck().recalculate_high_z()
 
         labware_namespace, labware_load_name, labware_version = labware.uri.split("/")
-        self._ctx.module_labware_load_broker.publish(
-            LabwareLoadOnModuleInfo(
+        module_loc = self._geometry.parent
+        if isinstance(module_loc, (int, str)):
+            deck_slot = types.DeckSlotName.from_primitive(module_loc)
+        else:
+            raise Exception("Unexpected labware object parent")
+        self._ctx.labware_load_broker.publish(
+            LabwareLoadInfo(
                 labware_definition=labware._implementation.get_definition(),
                 labware_namespace=labware_namespace,
                 labware_load_name=labware_load_name,
                 labware_version=int(labware_version),
-                moduleId=self.engine_id,
+                deck_slot=deck_slot,
+                on_module=True,
             )
         )
         return mod_labware
@@ -182,15 +188,6 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
         :returns: ModuleGeometry
         """
         return self._geometry
-
-    @property
-    def engine_id(self) -> str:
-        """For Opentrons internal use only.
-
-        The moduleId used in Protocol engine for this module.
-        """
-        # TODO: Is there a need to verify that the parent is a slot?
-        return f"{self._geometry.model}-Slot{self._geometry.parent}"
 
     def __repr__(self):
         return "{} at {} lw {}".format(

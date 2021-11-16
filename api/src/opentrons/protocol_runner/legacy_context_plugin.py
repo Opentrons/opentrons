@@ -1,6 +1,6 @@
 """Customize the ProtocolEngine to monitor and control legacy (APIv2) protocols."""
 from __future__ import annotations
-from typing import Callable, Optional, Union, NamedTuple
+from typing import Callable, Optional, NamedTuple
 
 from opentrons.commands.types import CommandMessage as LegacyCommand
 from opentrons.hardware_control import API as HardwareAPI
@@ -12,7 +12,6 @@ from .legacy_wrappers import (
     LegacyLabwareLoadInfo,
     LegacyProtocolContext,
     LegacyModuleLoadInfo,
-    LegacyLabwareLoadOnModuleInfo,
 )
 from .legacy_command_mapper import LegacyCommandMapper
 
@@ -24,7 +23,6 @@ class ContextUnsubscribe(NamedTuple):
     labware_broker: Callable[[], None]
     pipette_broker: Callable[[], None]
     module_broker: Callable[[], None]
-    module_labware_broker: Callable[[], None]
 
 
 class LegacyContextPlugin(AbstractPlugin):
@@ -75,16 +73,12 @@ class LegacyContextPlugin(AbstractPlugin):
         module_unsubscribe = context.module_load_broker.subscribe(
             callback=self._dispatch_module_loaded
         )
-        module_labware_unsubscribe = context.module_labware_load_broker.subscribe(
-            callback=self._dispatch_labware_loaded
-        )
 
         self._unsubscribe = ContextUnsubscribe(
             command_broker=command_unsubscribe,
             labware_broker=labware_unsubscribe,
             pipette_broker=pipette_unsubscribe,
             module_broker=module_unsubscribe,
-            module_labware_broker=module_labware_unsubscribe,
         )
 
     def teardown(self) -> None:
@@ -108,8 +102,7 @@ class LegacyContextPlugin(AbstractPlugin):
         self.dispatch_threadsafe(pe_actions.UpdateCommandAction(command=pe_command))
 
     def _dispatch_labware_loaded(
-        self,
-        labware_load_info: Union[LegacyLabwareLoadInfo, LegacyLabwareLoadOnModuleInfo],
+        self, labware_load_info: LegacyLabwareLoadInfo
     ) -> None:
         pe_command = self._legacy_command_mapper.map_labware_load(
             labware_load_info=labware_load_info

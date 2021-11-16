@@ -42,7 +42,7 @@ from .module_contexts import (
     TemperatureModuleContext,
     ThermocyclerContext,
 )
-from .load_info import LabwareLoadInfo, ModuleLoadInfo, InstrumentLoadInfo, LabwareLoadOnModuleInfo
+from .load_info import LabwareLoadInfo, ModuleLoadInfo, InstrumentLoadInfo
 from opentrons.protocols.api_support.util import (
     AxisMaxSpeeds,
     requires_version,
@@ -116,7 +116,6 @@ class ProtocolContext(CommandPublisher):
         self._labware_load_broker = EquipmentBroker[LabwareLoadInfo]()
         self._instrument_load_broker = EquipmentBroker[InstrumentLoadInfo]()
         self._module_load_broker = EquipmentBroker[ModuleLoadInfo]()
-        self._module_labware_load_broker = EquipmentBroker[LabwareLoadOnModuleInfo]()
 
     @property
     def labware_load_broker(self) -> EquipmentBroker[LabwareLoadInfo]:
@@ -131,22 +130,6 @@ class ProtocolContext(CommandPublisher):
         Calling code may only subscribe or unsubscribe.
         """
         return self._labware_load_broker
-
-    @property
-    def module_labware_load_broker(
-        self,
-    ) -> EquipmentBroker[LabwareLoadOnModuleInfo]:
-        """For internal Opentrons use only.
-
-        :meta private:
-
-        Subscribers to this broker will be notified with information about every
-        successful labware load.
-
-        Only :py:obj:`ProtocolContext` and its members are allowed to publish to this
-        broker. Calling code may only subscribe or unsubscribe.
-        """
-        return self._module_labware_load_broker
 
     @property
     def instrument_load_broker(self) -> EquipmentBroker[InstrumentLoadInfo]:
@@ -577,7 +560,6 @@ class ProtocolContext(CommandPublisher):
         self.module_load_broker.publish(
             ModuleLoadInfo(
                 module_name=module_name,
-                module_id=module_context.engine_id,
                 location=location,
                 configuration=configuration,
             )
