@@ -1,3 +1,5 @@
+import last from 'lodash/last'
+import dropWhile from 'lodash/dropWhile'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
@@ -29,7 +31,7 @@ import { useProtocolDetails } from './hooks'
 import { useCurrentProtocolRun } from '../ProtocolUpload/hooks'
 import { ProtocolSetupInfo } from './ProtocolSetupInfo'
 import { CommandItem } from './CommandItem'
-import type { ProtocolFile, Command } from '@opentrons/shared-data'
+import type { ProtocolFile, Command, CommandStatus } from '@opentrons/shared-data'
 import type { RunCommandSummary } from '@opentrons/api-client'
 
 export function CommandList(): JSX.Element | null {
@@ -42,9 +44,11 @@ export function CommandList(): JSX.Element | null {
     .protocolData
   const runDataCommands = useCurrentProtocolRun().runRecord?.data.commands
 
-  const currentCommandList: Array<Command | RunCommandSummary> =
-    protocolData != null ? [...protocolData?.commands] : []
-  const lastProtocolSetupIndex = currentCommandList
+  const queuedCommands = protocolData?.commands != null
+    ? protocolData.commands.map(command => ({...command, status: 'queued' as CommandStatus })) : []
+  const allProtocolCommands: Command[] =
+      protocolData != null ? queuedCommands : []
+  const lastProtocolSetupIndex = allProtocolCommands
     .map(
       command =>
         command.commandType === 'loadLabware' ||
@@ -52,38 +56,32 @@ export function CommandList(): JSX.Element | null {
         command.commandType === 'loadModule'
     )
     .lastIndexOf(true)
-  const protocolSetupCommandList = currentCommandList?.slice(
+  const protocolSetupCommandList = allProtocolCommands.slice(
     0,
     lastProtocolSetupIndex + 1
   )
-  currentCommandList?.splice(0, lastProtocolSetupIndex + 1)
+  const postSetupAnticipatedCommands: Command[] = allProtocolCommands.slice(lastProtocolSetupIndex + 1)
 
-  React.useEffect(() => {
-    if (
-      runDataCommands != null &&
-      runDataCommands.length !== 0 &&
-      currentCommandList != null
-    ) {
-      // find first index after protocol setup and LPC commands
-      const firstRunCommandIndex = runDataCommands.findIndex(
-        command => command.id === currentCommandList[0].id
-      )
-      const runDataCommandsSlice = runDataCommands.slice(firstRunCommandIndex)
-      runDataCommandsSlice.forEach((command, index) => {
-        if (currentCommandList[index].id === command.id) {
-          currentCommandList[index] = command
-        }
-        if (
-          index <= runDataCommandsSlice.length &&
-          index <= currentCommandList.length &&
-          currentCommandList[index + 1].id !==
-            runDataCommandsSlice[index + 1].id
-        ) {
-          currentCommandList.length = index + 1
-        }
-      })
-    }
-  }, [runDataCommands, currentCommandList])
+  let currentCommandList: Array<Command | RunCommandSummary> = postSetupAnticipatedCommands
+  if (runDataCommands != null) {
+    // find first index after protocol setup and LPC commands
+    const firstRunCommandIndex = runDataCommands.findIndex(
+      runCommand => runCommand.id === postSetupAnticipatedCommands[0].id
+    )
+    const postSetupRunCommandSummaries: RunCommandSummary[] = runDataCommands.slice(firstRunCommandIndex)
+    const remainingAnticipatedCommands = dropWhile(postSetupAnticipatedCommands, anticipatedCommand => (
+      !postSetupRunCommandSummaries.some(runC => runC.id === anticipatedCommand.id)
+    ))
+
+    const isProtocolDeterministic = postSetupRunCommandSummaries.reduce((isDeterministic, command, index) => {
+      return isDeterministic && command.id === postSetupAnticipatedCommands[index].id
+    }, true)
+
+    currentCommandList = isProtocolDeterministic
+      ? [...postSetupRunCommandSummaries, ...remainingAnticipatedCommands]
+      : [...postSetupRunCommandSummaries]
+  }
+
   const runStatus = useRunStatus()
   if (protocolData == null || runStatus == null) return null
 
@@ -225,7 +223,7 @@ export function CommandList(): JSX.Element | null {
                     flex={'auto'}
                   >
                     <CommandItem
-                      currentCommand={command}
+                      commandOrSummary={command}
                       runStatus={runStatus}
                     />
                   </Flex>

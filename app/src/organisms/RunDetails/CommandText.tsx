@@ -1,24 +1,84 @@
 import * as React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
-  DIRECTION_ROW,
   Flex,
   SPACING_1,
   SPACING_3,
+  TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
+import type { RunCommandSummary } from '@opentrons/api-client'
+import { Command, getLabwareDisplayName } from '@opentrons/shared-data'
+
+import { useProtocolDetails } from './hooks'
+
+import { getLabwareLocation } from '../ProtocolSetup/utils/getLabwareLocation'
+import { useLabwareRenderInfoById } from '../ProtocolSetup/hooks'
 
 interface Props {
-  commandText?: JSX.Element
+  commandOrSummary: Command | RunCommandSummary
 }
-export function CommandText(props: Props): JSX.Element | null {
+export function CommandText(props: Props): JSX.Element {
+  const { commandOrSummary } = props
+  const { t } = useTranslation('run_details')
+  const { protocolData } = useProtocolDetails()
+  const labwareRenderInfoById = useLabwareRenderInfoById()
+
+  const commands = protocolData?.commands ?? []
+
+  let messageNode = null
+  if ('params' in commandOrSummary) {
+    // params will not exist on command summaries
+    switch (commandOrSummary.commandType) {
+      case 'delay': {
+        // TODO: IMMEDIATELY address displaying real comments
+        messageNode = (
+          <>
+            <Flex
+              textTransform={TEXT_TRANSFORM_UPPERCASE}
+              padding={SPACING_1}
+              id={`RunDetails_CommandList`}
+            >
+              {t('comment')}
+            </Flex>
+            {commandOrSummary != null ? ( commandOrSummary.result) : null}
+          </>
+        )
+        break
+      }
+      case 'pickUpTip': {
+        const { wellName, labwareId } = commandOrSummary.params
+        messageNode = (
+          <Trans
+              t={t}
+              i18nKey={'pickup_tip'}
+              values={{
+                well_name: wellName,
+                labware: getLabwareDisplayName(labwareRenderInfoById[labwareId].labwareDef),
+                labware_location: getLabwareLocation(labwareId, commands),
+              }}
+            />
+        )
+        break
+      }
+      case 'custom': {
+        messageNode = commandOrSummary.params?.legacyCommandText ??
+            commandOrSummary.commandType
+        break
+      }
+      default: {
+        messageNode = commandOrSummary.commandType
+        break
+      }
+    }
+  } else  {
+    // this must be a run command summary
+    messageNode = commandOrSummary.commandType
+  }
+
   return (
-    <Flex
-      marginLeft={SPACING_3}
-      flex={'auto'}
-      alignItems={ALIGN_CENTER}
-      flexDirection={DIRECTION_ROW}
-    >
-      <Flex marginLeft={SPACING_1}>{props.commandText}</Flex>
+    <Flex marginLeft={SPACING_3} alignItems={ALIGN_CENTER} >
+      <Flex marginLeft={SPACING_1}>{messageNode}</Flex>
     </Flex>
   )
 }

@@ -80,7 +80,7 @@ export interface CreateRunActionData {
 }
 export interface RunCommandSummary {
   id: string
-  commandType: string
+  commandType: FullCommand['commandType']
   status: 'queued' | 'running' | 'succeeded' | 'failed'
 }
 
