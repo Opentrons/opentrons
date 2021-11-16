@@ -21,7 +21,6 @@ import {
   JUSTIFY_CENTER,
   C_BLUE,
   SPACING_1,
-  C_LIGHT_GRAY,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
   FONT_SIZE_CAPTION,
@@ -87,7 +86,8 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
   const protocolData = useProtocolDetails()
   const cloneMostRecentRun = useCloneRun(
     mostRecentRunId != null ? mostRecentRunId : ''
-  ) // If mostRecentRun is null, the CTA that uses cloneRun won't appear so this will never be reached
+  )
+  //If mostRecentRun is null, the CTA that uses cloneRun won't appear so this will never be reached
   const robotName = useSelector((state: State) => getConnectedRobotName(state))
   const fileInput = React.useRef<HTMLInputElement>(null)
   const [isFileOverDropZone, setIsFileOverDropZone] = React.useState<boolean>(
@@ -105,6 +105,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
   const fullRunTimestamp = mostRecentRun?.createdAt
   if (fullRunTimestamp == null) return null //  This state should never be reached since if null, protocol empty state won't show latest protocol run data
   const runTimestamp = format(parseISO(fullRunTimestamp), 'yyyy-MM-dd pp xxxxx')
+  console.log(runTimestamp)
 
   const handleDrop: React.DragEventHandler<HTMLLabelElement> = e => {
     e.preventDefault()
@@ -289,9 +290,9 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
               </SecondaryBtn>
             </Flex>
           </Flex>
+          <Divider />
         </Flex>
       )}
-      <hr style={{ borderTop: `1px solid ${C_LIGHT_GRAY}`, width: '80%' }} />
       <Text
         role="complementary"
         as="h4"
