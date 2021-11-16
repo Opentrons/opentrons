@@ -87,7 +87,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
   const cloneMostRecentRun = useCloneRun(
     mostRecentRunId != null ? mostRecentRunId : ''
   )
-  //If mostRecentRun is null, the CTA that uses cloneRun won't appear so this will never be reached
+  //  If mostRecentRun is null, the CTA that uses cloneRun won't appear so this will never be reached
   const robotName = useSelector((state: State) => getConnectedRobotName(state))
   const fileInput = React.useRef<HTMLInputElement>(null)
   const [isFileOverDropZone, setIsFileOverDropZone] = React.useState<boolean>(
