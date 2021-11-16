@@ -33,7 +33,7 @@ S3_BASE: Final = "dev/protocol"
 
 BASIC_SMOOTHIE = ProtocolGCodeConfirmConfig(
     name='basic_smoothie',
-    path="protocol/protocols/smoothie_protocol.py",
+    path="protocol/protocols/fast/smoothie_protocol.py",
     s3_path=f"{S3_BASE}/basic_smoothie.txt",
     settings=Settings(
         smoothie=SmoothieSettings(
@@ -45,7 +45,7 @@ BASIC_SMOOTHIE = ProtocolGCodeConfirmConfig(
 
 BECKMAN = ProtocolGCodeConfirmConfig(
     name="beckman_coulter_rna_advance_viral_rna_isolation",
-    path="protocol/protocols/beckman_coulter_rna_advance_viral_rna_isolation.py",
+    path="protocol/protocols/fast/beckman_coulter_rna_advance_viral_rna_isolation.py",
     s3_path=f"{S3_BASE}/beckman_coulter_rna_advance_viral_rna_isolation.txt",
     settings=Settings(
         smoothie=SmoothieSettings(
@@ -57,7 +57,7 @@ BECKMAN = ProtocolGCodeConfirmConfig(
 
 CHERRY_PICKING = ProtocolGCodeConfirmConfig(
     name='cherrypicking',
-    path="protocol/protocols/cherrypicking.py",
+    path="protocol/protocols/fast/cherrypicking.py",
     s3_path=f"{S3_BASE}/cherrypicking.txt",
     settings=Settings(
         smoothie=SmoothieSettings(
@@ -69,7 +69,7 @@ CHERRY_PICKING = ProtocolGCodeConfirmConfig(
 
 CUSTOMIZABLE_SERIAL_DILUTION = ProtocolGCodeConfirmConfig(
     name="customizable_serial_dilution_ot2",
-    path="protocol/protocols/customizable_serial_dilution_ot2.py",
+    path="protocol/protocols/fast/customizable_serial_dilution_ot2.py",
     s3_path=f"{S3_BASE}/customizable_serial_dilution_ot2.txt",
     settings=Settings(
         smoothie=SmoothieSettings(
@@ -81,7 +81,7 @@ CUSTOMIZABLE_SERIAL_DILUTION = ProtocolGCodeConfirmConfig(
 
 TWO_SINGLE_CHANNEL = ProtocolGCodeConfirmConfig(
     name='2_single_channel',
-    path="protocol/protocols/2_single_channel_v2.py",
+    path="protocol/protocols/fast/2_single_channel_v2.py",
     s3_path=f"{S3_BASE}/2_single_channel.txt",
     settings=Settings(
         smoothie=SmoothieSettings(
@@ -93,14 +93,14 @@ TWO_SINGLE_CHANNEL = ProtocolGCodeConfirmConfig(
 
 SET_MAX_SPEED = ProtocolGCodeConfirmConfig(
     name="set_max_speed",
-    path="protocol/protocols/set_max_speed.py",
+    path="protocol/protocols/fast/set_max_speed.py",
     s3_path=f"{S3_BASE}/set_max_speed.txt",
     settings=SWIFT_SMOOTHIE_SETTINGS
 )
 
 TWO_MODULES = ProtocolGCodeConfirmConfig(
     name='2_modules',
-    path="protocol/protocols/2_modules_1s_1m_v2.py",
+    path="protocol/protocols/slow/2_modules_1s_1m_v2.py",
     s3_path=f"{S3_BASE}/2_modules.txt",
     settings=Settings(
         smoothie=SmoothieSettings(
@@ -113,7 +113,7 @@ TWO_MODULES = ProtocolGCodeConfirmConfig(
 
 OPENTRONS_LOGO = ProtocolGCodeConfirmConfig(
     name="opentrons_logo",
-    path="protocol/protocols/opentrons_logo.py",
+    path="protocol/protocols/fast/opentrons_logo.py",
     s3_path=f"{S3_BASE}/opentrons_logo.txt",
     settings=Settings(
         smoothie=SmoothieSettings(
@@ -125,7 +125,7 @@ OPENTRONS_LOGO = ProtocolGCodeConfirmConfig(
 
 OMEGA = ProtocolGCodeConfirmConfig(
     name="omega_biotek_magbind_totalpure_ngs",
-    path="protocol/protocols/omega_biotek_magbind_totalpure_ngs.py",
+    path="protocol/protocols/slow/omega_biotek_magbind_totalpure_ngs.py",
     s3_path=f"{S3_BASE}/omega_biotek_magbind_totalpure_ngs.txt",
     settings=Settings(
         smoothie=SmoothieSettings(
@@ -137,7 +137,7 @@ OMEGA = ProtocolGCodeConfirmConfig(
 
 ILLUMINA = ProtocolGCodeConfirmConfig(
     name="illumina_nextera_xt_library_prep_part1",
-    path="protocol/protocols/illumina_nextera_xt_library_prep_part1.py",
+    path="protocol/protocols/fast/illumina_nextera_xt_library_prep_part1.py",
     s3_path=f"{S3_BASE}/illumina_nextera_xt_library_prep_part1.txt",
     settings=Settings(
         smoothie=SmoothieSettings(
@@ -149,7 +149,7 @@ ILLUMINA = ProtocolGCodeConfirmConfig(
 
 PCR_PREP_PART_1 = ProtocolGCodeConfirmConfig(
     name="pcr_prep_part_1",
-    path="protocol/protocols/pcr_prep_part_1.py",
+    path="protocol/protocols/fast/pcr_prep_part_1.py",
     s3_path=f"{S3_BASE}/pcr_prep_part_1.txt",
     settings=Settings(
         smoothie=SmoothieSettings(
@@ -161,7 +161,7 @@ PCR_PREP_PART_1 = ProtocolGCodeConfirmConfig(
 
 PCR_PREP_PART_2 = ProtocolGCodeConfirmConfig(
     name="pcr_prep_part_2",
-    path="protocol/protocols/pcr_prep_part_2.py",
+    path="protocol/protocols/fast/pcr_prep_part_2.py",
     s3_path=f"{S3_BASE}/pcr_prep_part_2.txt",
     settings=Settings(
         smoothie=SmoothieSettings(
@@ -173,14 +173,14 @@ PCR_PREP_PART_2 = ProtocolGCodeConfirmConfig(
 
 SWIFT_SMOKE = ProtocolGCodeConfirmConfig(
     name='swift_smoke',
-    path="protocol/protocols/swift_smoke.py",
+    path="protocol/protocols/slow/swift_smoke.py",
     s3_path=f"{S3_BASE}/swift_smoke.txt",
     settings=SWIFT_SMOOTHIE_SETTINGS
 )
 
 SWIFT_TURBO = ProtocolGCodeConfirmConfig(
     name='swift_turbo',
-    path="protocol/protocols/swift_turbo.py",
+    path="protocol/protocols/slow/swift_turbo.py",
     s3_path=f"{S3_BASE}/swift_turbo.txt",
     settings=SWIFT_SMOOTHIE_SETTINGS
 )
