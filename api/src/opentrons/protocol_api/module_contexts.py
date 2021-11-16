@@ -83,10 +83,8 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
 
         labware_namespace, labware_load_name, labware_version = labware.uri.split("/")
         module_loc = self._geometry.parent
-        if isinstance(module_loc, (int, str)):
-            deck_slot = types.DeckSlotName.from_primitive(module_loc)
-        else:
-            raise Exception("Unexpected labware object parent")
+        assert isinstance(module_loc, (int, str)), "Unexpected labware object parent"
+        deck_slot = types.DeckSlotName.from_primitive(module_loc)
         self._ctx.labware_load_broker.publish(
             LabwareLoadInfo(
                 labware_definition=labware._implementation.get_definition(),
