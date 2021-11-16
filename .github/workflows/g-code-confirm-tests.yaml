@@ -31,6 +31,7 @@ jobs:
           '2-modules',
           'swift-smoke',
           'swift-turbo',
+          'omega',
           'fast'
         ]
     name: 'Confirm G-Code (${{ matrix.command }})'
