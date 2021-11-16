@@ -36,7 +36,6 @@ class LegacyCommandMapper:
         """Initialize the command mapper."""
         self._running_commands: Dict[str, List[pe_commands.Command]] = defaultdict(list)
         self._command_count: Dict[str, int] = defaultdict(lambda: 0)
-        # TODO (spp, 2021-11-15): Will we need to store here labware on modules too?
         self._labware_id_by_slot: Dict[DeckSlotName, str] = {}
         self._pipette_id_by_mount: Dict[MountType, str] = {}
         self._module_id_by_slot: Dict[DeckSlotName, str] = {}
@@ -130,7 +129,8 @@ class LegacyCommandMapper:
 
         self._command_count["LOAD_LABWARE"] = count + 1
         if isinstance(location, pe_types.DeckSlotLocation):
-            # TODO: Do we add labware loaded on modules to this dict?
+            # TODO (spp, 2021-11-16): Account for labware on modules when mapping legacy
+            #  pipetting commands; either in self._labware_id_by_slot or something else
             self._labware_id_by_slot[location.slotName] = labware_id
         return load_labware_command
 
@@ -173,19 +173,6 @@ class LegacyCommandMapper:
         count = self._command_count["LOAD_MODULE"]
         module_id = f"module-{count}"
 
-        location = module_load_info.location
-        if location is None:
-            # The list for valid names is from
-            # opentrons.protocols.geometry.module_geometry.resolve_module_model
-            if module_load_info.module_name.lower() in [
-                "thermocycler",
-                "thermocycler module",
-            ]:
-                location = 7
-            else:
-                raise Exception(f"{module_load_info.module_name} requires a location.")
-
-        slot_name = DeckSlotName.from_primitive(location)
         load_module_command = pe_commands.LoadModule(
             id=f"commands.LOAD_MODULE-{count}",
             status=pe_commands.CommandStatus.SUCCEEDED,
@@ -195,7 +182,7 @@ class LegacyCommandMapper:
             params=pe_commands.LoadModuleParams(
                 model=module_load_info.module_name,
                 location=pe_types.DeckSlotLocation(
-                    slotName=slot_name,
+                    slotName=module_load_info.deck_slot,
                 ),
                 moduleId=module_id,
             ),
@@ -204,7 +191,7 @@ class LegacyCommandMapper:
             ),
         )
         self._command_count["LOAD_MODULE"] = count + 1
-        self._module_id_by_slot[slot_name] = module_id
+        self._module_id_by_slot[module_load_info.deck_slot] = module_id
         return load_module_command
 
     def _build_initial_command(

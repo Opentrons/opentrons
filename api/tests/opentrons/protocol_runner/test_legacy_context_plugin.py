@@ -289,7 +289,7 @@ async def test_module_load_broker_messages(
 
     module_load_info = LegacyModuleLoadInfo(
         module_name="some_module_name",
-        location=1,
+        deck_slot=DeckSlotName.SLOT_1,
         configuration=None,
     )
     engine_command = pe_commands.Custom(

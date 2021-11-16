@@ -32,10 +32,7 @@ class ModuleLocation(BaseModel):
 
     moduleId: str = Field(
         ...,
-        description=(
-            "The ID of a loaded module,"
-            " from the result of a prior `loadModule` command."
-        ),
+        description="The ID of a loaded module from a prior `loadModule` command.",
     )
 
 

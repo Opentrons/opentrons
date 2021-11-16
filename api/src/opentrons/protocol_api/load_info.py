@@ -50,5 +50,5 @@ class ModuleLoadInfo:
     """
 
     module_name: str
-    location: Optional[DeckLocation]
+    deck_slot: DeckSlotName
     configuration: Optional[str]
