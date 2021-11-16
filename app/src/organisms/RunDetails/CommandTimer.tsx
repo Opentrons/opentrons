@@ -17,7 +17,7 @@ interface TimerProps {
   commandCompletedAt?: string
 }
 export function CommandTimer(props: TimerProps): JSX.Element | null {
-  const {commandStartedAt, commandCompletedAt} = props
+  const { commandStartedAt, commandCompletedAt } = props
   const { t } = useTranslation('run_details')
   const timeElapsedSincePause = useTimeElapsedSincePause()
   const formatRunTimestamp = useFormatRunTimestamp()
@@ -44,7 +44,11 @@ export function CommandTimer(props: TimerProps): JSX.Element | null {
       ) : null}
       <Flex>
         <Flex marginRight={SPACING_1}>{t('end_step_time')}</Flex>
-        <Flex marginLeft={SPACING_2}>{commandCompletedAt ? formatRunTimestamp(commandCompletedAt) : EMPTY_TIMESTAMP}</Flex>
+        <Flex marginLeft={SPACING_2}>
+          {commandCompletedAt
+            ? formatRunTimestamp(commandCompletedAt)
+            : EMPTY_TIMESTAMP}
+        </Flex>
       </Flex>
     </Flex>
   )

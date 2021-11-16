@@ -40,7 +40,7 @@
   "load_labware_info_protocol_setup_no_module": "Load {{labware_loadname}} v{{labware_version}} in Slot {{slot_number}}",
   "load_labware_info_protocol_setup": "Load {{labware_loadname}} v{{labware_version}} in {{module_name}} in Slot {{slot_number}}",
   "load_labware_info_protocol_setup_plural": "Load {{labware_loadname}} v{{labware_version}} in {{module_name}}",
-  "pickup_tip": "Pick up tip from {{well_name}} of {{labware}} in {{labware_location}}" ,
+  "pickup_tip": "Pick up tip from {{well_name}} of {{labware}} in {{labware_location}}",
   "end_of_protocol": "End of protocol",
   "comment": "Comment",
   "anticipated": "Anticipated steps",
