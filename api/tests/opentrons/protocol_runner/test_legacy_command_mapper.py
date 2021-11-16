@@ -1,11 +1,11 @@
 """Tests for the ProtocolRunner's LegacyContextPlugin."""
-import pytest
 from decoy import matchers
 from datetime import datetime
 
 from opentrons.commands.types import PauseMessage
 from opentrons.protocol_engine import (
     DeckSlotLocation,
+    ModuleLocation,
     PipetteName,
     commands as pe_commands,
 )
@@ -19,7 +19,7 @@ from opentrons.protocol_runner.legacy_wrappers import (
     LegacyModuleLoadInfo,
 )
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons.types import DeckLocation, DeckSlotName, Mount, MountType
+from opentrons.types import DeckSlotName, Mount, MountType
 
 
 def test_map_before_command() -> None:
@@ -220,7 +220,6 @@ def test_map_labware_load(minimal_labware_def: LabwareDefinition) -> None:
             offsetId=None,
         ),
     )
-
     output = LegacyCommandMapper().map_labware_load(input)
     assert output == expected_output
 
@@ -247,21 +246,10 @@ def test_map_instrument_load() -> None:
     assert output == expected_output
 
 
-@pytest.mark.parametrize(
-    argnames=["module_name", "location", "slot"],
-    argvalues=[
-        ["module-1", 1, DeckSlotName.SLOT_1],
-        ["Thermocycler", None, DeckSlotName.SLOT_7],
-    ],
-)
-def test_map_module_load(
-    module_name: str, location: DeckLocation, slot: DeckSlotName
-) -> None:
+def test_map_module_load() -> None:
     """It should correctly map a module load."""
     input = LegacyModuleLoadInfo(
-        module_name=module_name,
-        location=location,
-        configuration="conf",
+        module_name="module-1", deck_slot=DeckSlotName.SLOT_1, configuration="conf"
     )
     expected_output = pe_commands.LoadModule.construct(
         id=matchers.IsA(str),
@@ -270,10 +258,47 @@ def test_map_module_load(
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
         params=pe_commands.LoadModuleParams.construct(
-            model=module_name,
-            location=DeckSlotLocation(slotName=slot),
+            model="module-1",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            moduleId=matchers.IsA(str),
         ),
         result=pe_commands.LoadModuleResult.construct(moduleId=matchers.IsA(str)),
     )
     output = LegacyCommandMapper().map_module_load(input)
+    assert output == expected_output
+
+
+def test_map_module_labware_load(minimal_labware_def: LabwareDefinition) -> None:
+    """It should correctly map a labware load on module."""
+    load_input = LegacyLabwareLoadInfo(
+        labware_definition=minimal_labware_def,
+        labware_namespace="some_namespace",
+        labware_load_name="some_load_name",
+        labware_version=123,
+        deck_slot=DeckSlotName.SLOT_1,
+        on_module=True,
+    )
+
+    expected_output = pe_commands.LoadLabware.construct(
+        id=matchers.IsA(str),
+        status=pe_commands.CommandStatus.SUCCEEDED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        params=pe_commands.LoadLabwareParams.construct(
+            location=ModuleLocation(moduleId="module-123"),
+            namespace="some_namespace",
+            loadName="some_load_name",
+            version=123,
+            labwareId=None,
+        ),
+        result=pe_commands.LoadLabwareResult.construct(
+            labwareId=matchers.IsA(str),
+            definition=matchers.Anything(),
+            offsetId=None,
+        ),
+    )
+    subject = LegacyCommandMapper()
+    subject._module_id_by_slot = {DeckSlotName.SLOT_1: "module-123"}
+    output = subject.map_labware_load(load_input)
     assert output == expected_output

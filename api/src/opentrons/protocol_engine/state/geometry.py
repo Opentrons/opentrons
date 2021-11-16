@@ -7,7 +7,13 @@ from opentrons.types import Point
 from opentrons.hardware_control.dev_types import PipetteDict
 
 from .. import errors
-from ..types import LoadedLabware, WellLocation, WellOrigin, WellOffset
+from ..types import (
+    LoadedLabware,
+    WellLocation,
+    WellOrigin,
+    WellOffset,
+    DeckSlotLocation,
+)
 from .labware import LabwareView
 
 
@@ -54,14 +60,15 @@ class GeometryView:
     def get_labware_parent_position(self, labware_id: str) -> Point:
         """Get the position of the labware's parent slot (deck or module)."""
         labware_data = self._labware.get(labware_id)
-        slot_pos = self._labware.get_slot_position(labware_data.location.slotName)
-
-        return slot_pos
+        if isinstance(labware_data.location, DeckSlotLocation):
+            slot_pos = self._labware.get_slot_position(labware_data.location.slotName)
+            return slot_pos
+        else:
+            raise NotImplementedError("Not implemented for labware on modules")
 
     def get_labware_origin_position(self, labware_id: str) -> Point:
         """Get the position of the labware's origin, without calibration."""
-        labware_data = self._labware.get(labware_id)
-        slot_pos = self._labware.get_slot_position(labware_data.location.slotName)
+        slot_pos = self.get_labware_parent_position(labware_id)
         origin_offset = self._labware.get_definition(labware_id).cornerOffsetFromSlot
 
         return Point(
