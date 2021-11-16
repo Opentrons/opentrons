@@ -4,6 +4,7 @@ import {
   RUN_STATUS_IDLE,
   RUN_STATUS_RUNNING,
   RUN_STATUS_PAUSED,
+  RUN_STATUS_PAUSE_REQUESTED,
   RUN_STATUS_STOPPED,
   RUN_STATUS_FAILED,
   RUN_STATUS_SUCCEEDED,
@@ -46,9 +47,9 @@ describe('RunTimeControl', () => {
     when(mockUseRunControls)
       .calledWith()
       .mockReturnValue({
-        usePlay: () => {},
-        usePause: () => {},
-        useReset: () => {},
+        play: () => {},
+        pause: () => {},
+        reset: () => {},
       })
     when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_IDLE)
     mockTimer.mockReturnValue(<div>Mock Timer</div>)
@@ -92,6 +93,19 @@ describe('RunTimeControl', () => {
     const [{ getByRole, getByText }] = render()
 
     expect(getByText('Status: Paused')).toBeTruthy()
+    expect(getByText('Mock Timer')).toBeTruthy()
+    expect(getByRole('button', { name: 'Resume Run' })).toBeTruthy()
+  })
+
+  it('renders a run status and timer if pause-requested', () => {
+    when(mockUseRunStatus)
+      .calledWith()
+      .mockReturnValue(RUN_STATUS_PAUSE_REQUESTED)
+    when(mockUseRunStartTime).calledWith().mockReturnValue('noon')
+
+    const [{ getByRole, getByText }] = render()
+
+    expect(getByText('Status: Pause requested')).toBeTruthy()
     expect(getByText('Mock Timer')).toBeTruthy()
     expect(getByRole('button', { name: 'Resume Run' })).toBeTruthy()
   })

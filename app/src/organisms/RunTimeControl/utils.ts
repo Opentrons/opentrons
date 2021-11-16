@@ -1,5 +1,23 @@
-import { formatDuration, intervalToDuration } from 'date-fns'
+import { intervalToDuration, Duration } from 'date-fns'
 import padStart from 'lodash/padStart'
+
+/**
+ * utility to format a date-fns duration object to hh:mm:ss
+ * @param duration date-fns duration object
+ * @returns string in format hh:mm:ss, e.g. 03:15:45
+ */
+export function formatDuration(duration: Duration): string {
+  const { days, hours, minutes, seconds } = duration
+
+  // edge case: protocol runs (or is paused) for over 24 hours
+  const hoursWithDays = days != null ? days * 24 + (hours ?? 0) : hours
+
+  const paddedHours = padStart(hoursWithDays?.toString(), 2, '0')
+  const paddedMinutes = padStart(minutes?.toString(), 2, '0')
+  const paddedSeconds = padStart(seconds?.toString(), 2, '0')
+
+  return `${paddedHours}:${paddedMinutes}:${paddedSeconds}`
+}
 
 /**
  * utility to format a date interval to a hh:mm:ss duration
@@ -13,19 +31,5 @@ export function formatInterval(start: string, end: string): string {
     end: new Date(end),
   })
 
-  const formattedDuration = formatDuration(duration, {
-    format: ['hours', 'minutes', 'seconds'],
-    delimiter: ':',
-    zero: true,
-  })
-
-  const numberDuration = formattedDuration.replace(/[^0-9:]/g, '')
-
-  const numberDurationParts = numberDuration.split(':')
-
-  const paddedNumberDurationParts = numberDurationParts.map(numberDuration =>
-    padStart(numberDuration, 2, '0')
-  )
-
-  return paddedNumberDurationParts.join(':')
+  return formatDuration(duration)
 }

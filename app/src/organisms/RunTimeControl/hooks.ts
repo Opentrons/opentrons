@@ -18,37 +18,42 @@ import {
 
 import { useCloneRun } from '../ProtocolUpload/hooks/useCloneRun'
 import { useCurrentProtocolRun } from '../ProtocolUpload/hooks/useCurrentProtocolRun'
-import { useCurrentRunId } from '../ProtocolUpload/hooks/useCurrentRunId'
 
 interface RunControls {
-  usePlay: () => void
-  usePause: () => void
-  useReset: () => void
+  play: () => void
+  pause: () => void
+  reset: () => void
 }
 
 export function useRunControls(): RunControls {
-  const currentRunId = useCurrentRunId()
+  const { runRecord } = useCurrentProtocolRun()
+
+  const currentRunId = runRecord?.data?.id
 
   const { playRun, pauseRun } = useRunActionMutations(currentRunId as string)
 
   const cloneRun = useCloneRun(currentRunId as string)
 
-  const usePlay = (): void => {
+  const play = (): void => {
     playRun()
   }
-  const usePause = (): void => {
+  const pause = (): void => {
     pauseRun()
   }
-  const useReset = (): void => {
+  const reset = (): void => {
     cloneRun()
   }
-  return { usePlay, usePause, useReset }
+  return { play, pause, reset }
 }
 
 export function useRunStatus(): RunStatus | null {
-  const currentRunId = useCurrentRunId()
+  const { runRecord } = useCurrentProtocolRun()
 
-  const { data } = useRunQuery(currentRunId, { refetchInterval: 1000 })
+  const currentRunId = runRecord?.data?.id
+
+  const { data } = useRunQuery(currentRunId as string, {
+    refetchInterval: 1000,
+  })
 
   const runStatus = data?.data.status as RunStatus
 
@@ -64,9 +69,11 @@ export function useRunDisabledReason(): string | null {
 }
 
 export function useRunStartTime(): string | undefined {
-  const currentRunId = useCurrentRunId()
+  const { runRecord } = useCurrentProtocolRun()
 
-  const { data } = useRunQuery(currentRunId)
+  const currentRunId = runRecord?.data?.id
+
+  const { data } = useRunQuery(currentRunId as string)
 
   const actions = data?.data?.actions as RunAction[]
   const firstPlay = actions?.find(
@@ -77,19 +84,19 @@ export function useRunStartTime(): string | undefined {
   return runStartTime
 }
 
-export function useRunPauseTime(): string | undefined {
-  const currentRunId = useCurrentRunId()
+export function useRunPauseTime(): string | null {
+  const { runRecord } = useCurrentProtocolRun()
 
-  const { data } = useRunQuery(currentRunId)
+  const currentRunId = runRecord?.data?.id
+
+  const { data } = useRunQuery(currentRunId as string)
 
   const actions = data?.data.actions as RunAction[]
-  const pauseActions = actions?.filter(
-    action => action.actionType === RUN_ACTION_TYPE_PAUSE
-  )
-  const lastPause = last(pauseActions)
-  const pausedAt = lastPause?.createdAt
+  const lastAction = last(actions)
 
-  return pausedAt
+  return lastAction?.actionType === RUN_ACTION_TYPE_PAUSE
+    ? lastAction.createdAt
+    : null
 }
 
 export function useRunCompleteTime(): string | undefined {

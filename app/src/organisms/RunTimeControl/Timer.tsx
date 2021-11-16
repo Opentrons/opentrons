@@ -14,7 +14,7 @@ import { formatInterval } from './utils'
 
 interface TimerProps {
   startTime: string
-  pausedAt?: string
+  pausedAt: string | null
   completedAt?: string
 }
 
@@ -25,8 +25,7 @@ export function Timer({
 }: TimerProps): JSX.Element {
   const { t } = useTranslation('run_details')
 
-  const initialNow = Date()
-  const [now, setNow] = React.useState(initialNow)
+  const [now, setNow] = React.useState(Date())
   useInterval(() => setNow(Date()), 500, true)
 
   const endTime = completedAt ?? now
