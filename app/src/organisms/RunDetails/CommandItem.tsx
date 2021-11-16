@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_ROW,
   Flex,
@@ -28,7 +28,6 @@ import { CommandText } from './CommandText'
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import { useCommandQuery } from '@opentrons/react-api-client'
 import { useCurrentRunId } from '../ProtocolUpload/hooks/useCurrentRunId'
-import { useTimeElapsedSincePause } from './hooks'
 import type { RunStatus, RunCommandSummary } from '@opentrons/api-client'
 
 import type {
@@ -58,7 +57,7 @@ const WRAPPER_STYLE_BY_STATUS: {
     backgroundColor: C_ERROR_LIGHT,
   },
 }
-export function CommandItem(props: CommandItemProps): JSX.Element | null{
+export function CommandItem(props: CommandItemProps): JSX.Element | null {
   const { commandOrSummary, runStatus } = props
   const commandStatus =
     runStatus !== RUN_STATUS_IDLE && commandOrSummary.status != null
@@ -86,17 +85,20 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null{
 
   return (
     <Flex css={WRAPPER_STYLE}>
-      {commandStatus === 'running' ?  <CurrentCommandLabel runStatus={runStatus} /> : null}
+      {commandStatus === 'running' ? (
+        <CurrentCommandLabel runStatus={runStatus} />
+      ) : null}
       <Flex flexDirection={DIRECTION_ROW}>
-        {
-          ['running', 'failed', 'succeeded'].includes(commandStatus)
-            ?  <CommandTimer
-                  commandStartedAt={commandDetails?.data.startedAt}
-                  commandCompletedAt={commandDetails?.data.completedAt} />
-            : null
-        }
+        {['running', 'failed', 'succeeded'].includes(commandStatus) ? (
+          <CommandTimer
+            commandStartedAt={commandDetails?.data.startedAt}
+            commandCompletedAt={commandDetails?.data.completedAt}
+          />
+        ) : null}
         {commandStatus === 'failed' ? <CommandFailedMessage /> : null}
-        <CommandText commandOrSummary={commandDetails?.data ?? commandOrSummary} />
+        <CommandText
+          commandOrSummary={commandDetails?.data ?? commandOrSummary}
+        />
       </Flex>
     </Flex>
   )
@@ -106,7 +108,7 @@ interface CurrentCommandLabelProps {
   runStatus?: RunStatus
 }
 
-function CurrentCommandLabel(props: CurrentCommandLabelProps) {
+function CurrentCommandLabel(props: CurrentCommandLabelProps): JSX.Element {
   const { t } = useTranslation('run_details')
   return (
     <Text
@@ -116,13 +118,14 @@ function CurrentCommandLabel(props: CurrentCommandLabelProps) {
       textTransform={TEXT_TRANSFORM_UPPERCASE}
       fontSize={FONT_SIZE_CAPTION}
     >
-      {props.runStatus === 'paused' ? t('current_step_pause') : t('current_step')}
+      {props.runStatus === 'paused'
+        ? t('current_step_pause')
+        : t('current_step')}
     </Text>
   )
 }
 
-
-function CommandFailedMessage() {
+function CommandFailedMessage(): JSX.Element {
   const { t } = useTranslation('run_details')
   return (
     <Flex flexDirection={DIRECTION_ROW} color={COLOR_ERROR}>

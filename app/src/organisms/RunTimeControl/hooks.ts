@@ -120,7 +120,7 @@ export function useRunCompleteTime(): string | undefined {
   return runCompletedTime
 }
 
-export function useNow() {
+export function useNow(): string {
   const initialNow = Date()
   const [now, setNow] = React.useState(initialNow)
   useInterval(() => setNow(Date()), 500, true)

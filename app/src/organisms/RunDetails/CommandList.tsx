@@ -1,4 +1,3 @@
-import last from 'lodash/last'
 import dropWhile from 'lodash/dropWhile'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
@@ -31,7 +30,11 @@ import { useProtocolDetails } from './hooks'
 import { useCurrentProtocolRun } from '../ProtocolUpload/hooks'
 import { ProtocolSetupInfo } from './ProtocolSetupInfo'
 import { CommandItem } from './CommandItem'
-import type { ProtocolFile, Command, CommandStatus } from '@opentrons/shared-data'
+import type {
+  ProtocolFile,
+  Command,
+  CommandStatus,
+} from '@opentrons/shared-data'
 import type { RunCommandSummary } from '@opentrons/api-client'
 
 export function CommandList(): JSX.Element | null {
@@ -44,10 +47,15 @@ export function CommandList(): JSX.Element | null {
     .protocolData
   const runDataCommands = useCurrentProtocolRun().runRecord?.data.commands
 
-  const queuedCommands = protocolData?.commands != null
-    ? protocolData.commands.map(command => ({...command, status: 'queued' as CommandStatus })) : []
+  const queuedCommands =
+    protocolData?.commands != null
+      ? protocolData.commands.map(command => ({
+          ...command,
+          status: 'queued' as CommandStatus,
+        }))
+      : []
   const allProtocolCommands: Command[] =
-      protocolData != null ? queuedCommands : []
+    protocolData != null ? queuedCommands : []
   const lastProtocolSetupIndex = allProtocolCommands
     .map(
       command =>
@@ -60,22 +68,38 @@ export function CommandList(): JSX.Element | null {
     0,
     lastProtocolSetupIndex + 1
   )
-  const postSetupAnticipatedCommands: Command[] = allProtocolCommands.slice(lastProtocolSetupIndex + 1)
+  const postSetupAnticipatedCommands: Command[] = allProtocolCommands.slice(
+    lastProtocolSetupIndex + 1
+  )
 
-  let currentCommandList: Array<Command | RunCommandSummary> = postSetupAnticipatedCommands
+  let currentCommandList: Array<
+    Command | RunCommandSummary
+  > = postSetupAnticipatedCommands
   if (runDataCommands != null) {
     // find first index after protocol setup and LPC commands
     const firstRunCommandIndex = runDataCommands.findIndex(
       runCommand => runCommand.id === postSetupAnticipatedCommands[0].id
     )
-    const postSetupRunCommandSummaries: RunCommandSummary[] = runDataCommands.slice(firstRunCommandIndex)
-    const remainingAnticipatedCommands = dropWhile(postSetupAnticipatedCommands, anticipatedCommand => (
-      !postSetupRunCommandSummaries.some(runC => runC.id === anticipatedCommand.id)
-    ))
+    const postSetupRunCommandSummaries: RunCommandSummary[] = runDataCommands.slice(
+      firstRunCommandIndex
+    )
+    const remainingAnticipatedCommands = dropWhile(
+      postSetupAnticipatedCommands,
+      anticipatedCommand =>
+        !postSetupRunCommandSummaries.some(
+          runC => runC.id === anticipatedCommand.id
+        )
+    )
 
-    const isProtocolDeterministic = postSetupRunCommandSummaries.reduce((isDeterministic, command, index) => {
-      return isDeterministic && command.id === postSetupAnticipatedCommands[index].id
-    }, true)
+    const isProtocolDeterministic = postSetupRunCommandSummaries.reduce(
+      (isDeterministic, command, index) => {
+        return (
+          isDeterministic &&
+          command.id === postSetupAnticipatedCommands[index].id
+        )
+      },
+      true
+    )
 
     currentCommandList = isProtocolDeterministic
       ? [...postSetupRunCommandSummaries, ...remainingAnticipatedCommands]
