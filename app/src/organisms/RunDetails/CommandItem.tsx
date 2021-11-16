@@ -86,7 +86,6 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
     color: ${C_DARK_GRAY};
     flex-direction: ${DIRECTION_COLUMN};
   `
-
   return (
     <Flex css={WRAPPER_STYLE}>
       {commandStatus === 'running' ? (
