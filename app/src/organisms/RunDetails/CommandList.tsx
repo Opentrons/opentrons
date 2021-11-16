@@ -86,7 +86,7 @@ export function CommandList(): JSX.Element | null {
     const remainingAnticipatedCommands = dropWhile(
       postSetupAnticipatedCommands,
       anticipatedCommand =>
-        !postSetupRunCommandSummaries.some(
+        postSetupRunCommandSummaries.some(
           runC => runC.id === anticipatedCommand.id
         )
     )
