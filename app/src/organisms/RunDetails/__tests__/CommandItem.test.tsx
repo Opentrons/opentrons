@@ -18,10 +18,10 @@ const mockCommandText = CommandText as jest.MockedFunction<typeof CommandText>
 const mockCommandTimer = CommandTimer as jest.MockedFunction<
   typeof CommandTimer
 >
-const mockUseCurrentRunId =  useCurrentRunId as jest.MockedFunction<
+const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
 >
-const mockUseCommandQuery =  useCommandQuery as jest.MockedFunction<
+const mockUseCommandQuery = useCommandQuery as jest.MockedFunction<
   typeof useCommandQuery
 >
 const render = (props: React.ComponentProps<typeof CommandItem>) => {
@@ -34,14 +34,14 @@ const RUN_ID = 'run_id'
 const MOCK_COMMAND = {
   id: '123',
   commandType: 'custom',
-  params:  {},
+  params: {},
   status: 'running',
   result: {},
 } as Command
 const MOCK_COMMAND_DETAILS = {
   id: '123',
   commandType: 'custom',
-  params:  {},
+  params: {},
   status: 'running',
   result: {},
   startedAt: 'start timestamp',
@@ -51,21 +51,19 @@ describe('Run Details Command item', () => {
   beforeEach(() => {
     mockCommandText.mockReturnValue(<div>Mock Command Text</div>)
     mockCommandTimer.mockReturnValue(<div>Mock Command Timer</div>)
-    when(mockUseCurrentRunId)
-      .calledWith()
-      .mockReturnValue(RUN_ID)
+    when(mockUseCurrentRunId).calledWith().mockReturnValue(RUN_ID)
     when(mockUseCommandQuery)
       .calledWith(RUN_ID, MOCK_COMMAND.id)
       .mockReturnValue({
-        data: {data: MOCK_COMMAND_DETAILS},
-        refetch: jest.fn()
+        data: { data: MOCK_COMMAND_DETAILS },
+        refetch: jest.fn(),
       } as any)
   })
 
   it('renders the correct failed status', () => {
     const { getByText } = render({
-      commandOrSummary: {...MOCK_COMMAND, status: 'failed' },
-      runStatus: 'stopped'
+      commandOrSummary: { ...MOCK_COMMAND, status: 'failed' },
+      runStatus: 'stopped',
     })
     expect(getByText('Step failed')).toHaveStyle(
       'backgroundColor: C_ERROR_LIGHT'
@@ -75,8 +73,8 @@ describe('Run Details Command item', () => {
   })
   it('renders the correct success status', () => {
     const props = {
-      commandOrSummary: { ...MOCK_COMMAND, status: 'succeeded'},
-      runStatus: 'succeeded'
+      commandOrSummary: { ...MOCK_COMMAND, status: 'succeeded' },
+      runStatus: 'succeeded',
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
     expect(getByText('Mock Command Timer')).toHaveStyle(
@@ -87,7 +85,7 @@ describe('Run Details Command item', () => {
   it('renders the correct running status', () => {
     const props = {
       commandOrSummary: { ...MOCK_COMMAND, status: 'running' },
-      runStatus: 'running'
+      runStatus: 'running',
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
     expect(getByText('Current Step')).toHaveStyle(
@@ -108,18 +106,6 @@ describe('Run Details Command item', () => {
     )
   })
 
-  it('renders the correct running status', () => {
-    const props = {
-      commandOrSummary: { ...MOCK_COMMAND, status: 'running' },
-      runStatus: 'running',
-    } as React.ComponentProps<typeof CommandItem>
-    const { getByText } = render(props)
-    expect(getByText('Current Step')).toHaveStyle(
-      'backgroundColor: C_POWDER_BLUE'
-    )
-    getByText('Mock Command Text')
-    getByText('Mock Command Timer')
-  })
   it('renders the correct running status with run paused', () => {
     const props = {
       commandOrSummary: { ...MOCK_COMMAND, status: 'running' },
