@@ -9,6 +9,7 @@ from typing import Optional, Union
 
 from ..commands import Command, CommandCreate
 from ..errors import ProtocolEngineError
+from ..types import LabwareOffsetCreate
 
 
 @dataclass(frozen=True)
@@ -65,6 +66,15 @@ class FailCommandAction:
     error: ProtocolEngineError
 
 
+@dataclass(frozen=True)
+class AddLabwareOffsetAction:
+    """Add a new labware offset, to apply to subsequent `LoadLabwareCommand`s."""
+
+    labware_offset_id: str
+    created_at: datetime
+    request: LabwareOffsetCreate
+
+
 Action = Union[
     PlayAction,
     PauseAction,
@@ -72,4 +82,5 @@ Action = Union[
     QueueCommandAction,
     UpdateCommandAction,
     FailCommandAction,
+    AddLabwareOffsetAction,
 ]
