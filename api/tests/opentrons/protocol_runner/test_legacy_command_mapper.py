@@ -1,6 +1,5 @@
 """Tests for the ProtocolRunner's LegacyContextPlugin."""
-import pytest
-from decoy import Decoy, matchers
+from decoy import matchers
 from datetime import datetime
 
 from opentrons.commands.types import PauseMessage
@@ -20,7 +19,7 @@ from opentrons.protocol_runner.legacy_wrappers import (
     LegacyModuleLoadInfo,
 )
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons.types import DeckLocation, DeckSlotName, Mount, MountType
+from opentrons.types import DeckSlotName, Mount, MountType
 
 
 def test_map_before_command() -> None:

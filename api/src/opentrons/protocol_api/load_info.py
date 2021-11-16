@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Optional
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
-from opentrons.types import Mount, DeckSlotName, DeckLocation
+from opentrons.types import Mount, DeckSlotName
 
 
 @dataclass(frozen=True)
