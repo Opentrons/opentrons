@@ -1,4 +1,3 @@
-import * as React from 'react'
 import last from 'lodash/last'
 
 import {
@@ -16,7 +15,6 @@ import {
   useRunQuery,
   useRunActionMutations,
 } from '@opentrons/react-api-client'
-import { useInterval } from '@opentrons/components'
 
 import { useCloneRun } from '../ProtocolUpload/hooks/useCloneRun'
 import { useCurrentProtocolRun } from '../ProtocolUpload/hooks/useCurrentProtocolRun'
@@ -118,11 +116,4 @@ export function useRunCompleteTime(): string | undefined {
   const runCompletedTime = fullLastCommand?.createdAt
 
   return runCompletedTime
-}
-
-export function useNow(): string {
-  const initialNow = Date()
-  const [now, setNow] = React.useState(initialNow)
-  useInterval(() => setNow(Date()), 500, true)
-  return now
 }
