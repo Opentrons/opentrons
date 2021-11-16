@@ -1,8 +1,6 @@
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Optional
-
-if TYPE_CHECKING:
-    from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from typing import Optional
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from opentrons.types import Mount, DeckSlotName, DeckLocation
 
@@ -19,7 +17,7 @@ class LabwareLoadInfo:
     because this is easier to construct in unit tests.
     """
 
-    labware_definition: "LabwareDefinition"
+    labware_definition: LabwareDefinition
     # todo(mm, 2021-10-11): Namespace, load name, and version can be derived from the
     # definition. Should they be removed from here?
     labware_namespace: str
