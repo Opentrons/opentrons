@@ -7,6 +7,7 @@ from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control.emulation.module_server.client import (
     ModuleStatusClient,
     ModuleServerClientError,
+    ModuleServerDisconnected,
 )
 from opentrons.hardware_control.emulation.module_server.models import Message
 from opentrons.hardware_control.emulation.module_server.server import log
@@ -56,6 +57,9 @@ class ModuleListener:
             try:
                 m = await self._client.read()
                 await self.handle_message(message=m)
+            except ModuleServerDisconnected:
+                log.info("Disconnected from module server.")
+                break
             except ModuleServerClientError:
                 log.exception("Read error.")
                 break
