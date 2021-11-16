@@ -49,9 +49,6 @@ export const LabwarePositionCheck = (
     addSavePositionCommandData
   )
 
-  console.log('savePositionCommandData')
-  console.log(savePositionCommandData)
-
   if ('error' in labwarePositionCheckUtils) {
     // show the modal for 5 seconds, then unmount and restart the run
     if (!isRestartingRun) {
