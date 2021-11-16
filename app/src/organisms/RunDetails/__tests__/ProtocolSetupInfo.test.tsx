@@ -7,10 +7,8 @@ import { i18n } from '../../../i18n'
 import * as discoverySelectors from '../../../redux/discovery/selectors'
 import { ProtocolPipetteTipRackCalDataByMount } from '../../../redux/pipettes/types'
 import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
-import { mockPipetteInfo } from '../../../redux/pipettes/__fixtures__'
 import { getProtocolPipetteTipRackCalInfo } from '../../../redux/pipettes'
 import { ProtocolSetupInfo } from '../ProtocolSetupInfo'
-import { CommandItem } from '../CommandItem'
 import { useProtocolDetails } from '../hooks'
 import type {
   Command,
@@ -22,7 +20,6 @@ jest.mock('../hooks')
 jest.mock('../../../redux/pipettes/types')
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../../redux/pipettes')
-jest.mock('../CommandItem')
 
 const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
   typeof useProtocolDetails
@@ -33,7 +30,6 @@ const mockGetProtocolPipetteTiprackData = getProtocolPipetteTipRackCalInfo as je
 const mockGetConnectedRobot = discoverySelectors.getConnectedRobot as jest.MockedFunction<
   typeof discoverySelectors.getConnectedRobot
 >
-const mockCommandItem = CommandItem as jest.MockedFunction<typeof CommandItem>
 
 const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolFile<{}>
 
@@ -61,6 +57,13 @@ const COMMAND_TYPE_TRASH = {
   params: {
     labwareId: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
     location: LABWARE_LOCATION,
+  },
+  result: {
+    definition: {
+      metadata: {
+        displayName: 'Trash',
+      },
+    },
   },
 } as Command
 const LABWARE_LOCATION_WITH_MODULE = {
@@ -132,7 +135,9 @@ const mockLabwarePositionCheckStepTipRack = {
 } as any
 
 const mockProtocolPipetteTipRackCalData: ProtocolPipetteTipRackCalDataByMount = {
-  left: mockPipetteInfo,
+  left: {
+    pipetteDisplayName: 'P10 Single-Channel',
+  },
   right: null,
 } as any
 
@@ -179,14 +184,10 @@ describe('ProtocolSetupInfo', () => {
     mockGetProtocolPipetteTiprackData.mockReturnValue(
       mockProtocolPipetteTipRackCalData
     )
-    when(mockCommandItem).mockReturnValue(<div>Mock Command Item</div>)
     mockGetConnectedRobot.mockReturnValue(mockConnectedRobot)
   })
 
   it('should render correct command when commandType is loadLabware', () => {
-    when(mockCommandItem).mockReturnValue(
-      <div>Load ANSI 96 Standard Microplate v1 in Slot 3</div>
-    )
     const { getByText } = render(props)
     getByText('Load ANSI 96 Standard Microplate v1 in Slot 3')
   })
@@ -199,12 +200,6 @@ describe('ProtocolSetupInfo', () => {
       protocolData: simpleV6Protocol,
       displayName: 'mock display name',
     })
-    when(mockCommandItem).mockReturnValue(
-      <div>
-        Load ANSI 96 Standard Microplate v1 in Magnetic Module GEN2 in Slot 3
-      </div>
-    )
-
     const { getByText } = render(props)
     getByText(
       'Load ANSI 96 Standard Microplate v1 in Magnetic Module GEN2 in Slot 3'
@@ -214,19 +209,13 @@ describe('ProtocolSetupInfo', () => {
     props = {
       setupCommand: COMMAND_TYPE_LOAD_PIPETTE,
     }
-    when(mockCommandItem).mockReturnValue(
-      <div>Load My Pipette in left Mount</div>
-    )
     const { getByText } = render(props)
-    getByText(nestedTextMatcher('Load My Pipette in left Mount'))
+    getByText(nestedTextMatcher('Load P10 Single-Channel in Left Mount'))
   })
   it('should render correct command when commandType is loadModule', () => {
     props = {
       setupCommand: COMMAND_TYPE_LOAD_MODULE,
     }
-    when(mockCommandItem).mockReturnValue(
-      <div>Load Temperature Module GEN2 in Slot 3</div>
-    )
     const { getByText } = render(props)
     getByText('Load Temperature Module GEN2 in Slot 3')
   })
@@ -262,7 +251,6 @@ describe('ProtocolSetupInfo', () => {
           },
         },
       } as any)
-    when(mockCommandItem).mockReturnValue(<div>Load Thermocycler Module</div>)
     const { getByText } = render(props)
     getByText('Load Thermocycler Module')
   })
@@ -282,11 +270,7 @@ describe('ProtocolSetupInfo', () => {
     props = {
       setupCommand: COMMAND_TYPE_TRASH,
     }
-    when(mockUseProtocolDetails).calledWith().mockReturnValue({
-      protocolData: simpleV6Protocol,
-      displayName: 'mock display name',
-    })
-    const { getByText } = render(props)
-    getByText('Mock Command Item')
+    const { container } = render(props)
+    expect(container.firstChild).toBeNull()
   })
 })
