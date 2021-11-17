@@ -52,6 +52,8 @@ def create_running_command(
 def create_failed_command(
     command_id: str = "command-id",
     command_type: str = "command-type",
+    error_id: str = "error-id",
+    completed_at: datetime = datetime(year=2022, month=2, day=2),
     params: Optional[BaseModel] = None,
 ) -> cmd.Command:
     """Given command data, build a failed command model."""
@@ -63,6 +65,8 @@ def create_failed_command(
             commandType=command_type,
             status=cmd.CommandStatus.FAILED,
             params=params or BaseModel(),
+            errorId=error_id,
+            completedAt=completed_at,
         ),
     )
 

@@ -13,6 +13,7 @@ from .actions import (
     PlayAction,
     PauseAction,
     StopAction,
+    StopErrorDetails,
     QueueCommandAction,
     AddLabwareOffsetAction,
 )
@@ -159,7 +160,16 @@ class ProtocolEngine:
         Arguments:
             error: An error that caused the stop, if applicable.
         """
-        self._action_dispatcher.dispatch(StopAction(error=error))
+        if error:
+            error_details: Optional[StopErrorDetails] = StopErrorDetails(
+                error_id=self._model_utils.generate_id(),
+                created_at=self._model_utils.get_timestamp(),
+                error=error,
+            )
+        else:
+            error_details = None
+
+        self._action_dispatcher.dispatch(StopAction(error_details=error_details))
 
         try:
             await self._queue_worker.join()

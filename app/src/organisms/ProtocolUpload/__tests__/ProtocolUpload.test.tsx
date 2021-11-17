@@ -10,6 +10,7 @@ import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/test
 
 import { i18n } from '../../../i18n'
 import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
+import * as RobotSelectors from '../../../redux/robot/selectors'
 import * as calibrationSelectors from '../../../redux/calibration/selectors'
 import * as discoverySelectors from '../../../redux/discovery/selectors'
 import * as protocolSelectors from '../../../redux/protocol/selectors'
@@ -30,6 +31,7 @@ jest.mock('../../RunDetails/hooks')
 jest.mock('../hooks/useCurrentProtocolRun')
 jest.mock('../hooks/useCloseCurrentRun')
 jest.mock('../ConfirmExitProtocolUploadModal')
+jest.mock('../../../redux/robot/selectors')
 
 const getProtocolFile = protocolSelectors.getProtocolFile as jest.MockedFunction<
   typeof protocolSelectors.getProtocolFile
@@ -55,6 +57,9 @@ const mockUseCloseProtocolRun = useCloseCurrentRun as jest.MockedFunction<
 const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
   typeof useProtocolDetails
 >
+const mockGetConnectedRobotName = RobotSelectors.getConnectedRobotName as jest.MockedFunction<
+  typeof RobotSelectors.getConnectedRobotName
+>
 
 const queryClient = new QueryClient()
 
@@ -73,6 +78,7 @@ describe('ProtocolUpload', () => {
     getConnectedRobot.mockReturnValue(mockConnectedRobot)
     getCalibrationStatus.mockReturnValue(mockCalibrationStatus)
     ingestProtocolFile.mockImplementation((_f, _s, _e) => {})
+    mockGetConnectedRobotName.mockReturnValue('robotName')
     when(mockConfirmExitProtocolUploadModal)
       .calledWith(
         componentPropsMatcher({
@@ -101,9 +107,8 @@ describe('ProtocolUpload', () => {
         runRecord: null,
         createProtocolRun: jest.fn(),
       } as any)
-    const { getByRole, queryByText } = render()[0]
-
-    expect(getByRole('button', { name: 'Choose File...' })).toBeTruthy()
+    mockGetConnectedRobotName.mockReturnValue(null)
+    const { queryByText } = render()[0]
     expect(queryByText('Organization/Author')).toBeNull()
   })
   it('renders Protocol Setup if file loaded', () => {
@@ -116,7 +121,6 @@ describe('ProtocolUpload', () => {
         createProtocolRun: jest.fn(),
       } as any)
     const { queryByRole, getByText } = render()[0]
-
     expect(queryByRole('button', { name: 'Choose File...' })).toBeNull()
     expect(getByText('Organization/Author')).toBeTruthy()
   })
@@ -131,6 +135,7 @@ describe('ProtocolUpload', () => {
         createProtocolRun: jest.fn(),
       } as any)
     const { getByRole, getByText } = render()[0]
+
     fireEvent.click(getByRole('button', { name: 'close' }))
     getByText('mock confirm exit protocol upload modal')
   })
@@ -148,6 +153,7 @@ describe('ProtocolUpload', () => {
     when(mockUseCloseProtocolRun)
       .calledWith()
       .mockReturnValue(mockCloseProtocolRun)
+
     const [{ getByRole, getByText }, store] = render()
     fireEvent.click(getByRole('button', { name: 'close' }))
     const mockCloseModal = getByText('mock confirm exit protocol upload modal')
@@ -167,18 +173,7 @@ describe('ProtocolUpload', () => {
         runRecord: null,
         createProtocolRun: jest.fn(),
       } as any)
-    const { getByTestId } = render()[0]
-
-    const protocolFile = new File(
-      [JSON.stringify(withModulesProtocol)],
-      'fixture_protocol.json'
-    )
-    const input = getByTestId('file_input')
-    fireEvent.change(input, { target: { files: [protocolFile] } })
-    expect(ingestProtocolFile).toHaveBeenCalledWith(
-      protocolFile,
-      expect.any(Function),
-      expect.any(Function)
-    )
+    const { getByText } = render()[0]
+    getByText('Open a protocol to run on robotName')
   })
 })

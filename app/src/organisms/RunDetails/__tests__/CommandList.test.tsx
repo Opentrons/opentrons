@@ -3,6 +3,7 @@ import { when } from 'jest-when'
 import { fireEvent } from '@testing-library/dom'
 import { i18n } from '../../../i18n'
 import { renderWithProviders } from '@opentrons/components'
+import { AlertItem } from '@opentrons/components/src/alerts'
 import { useProtocolDetails } from '../hooks'
 import { useCurrentProtocolRun } from '../../ProtocolUpload/hooks'
 import { useRunStatus } from '../../RunTimeControl/hooks'
@@ -21,6 +22,7 @@ jest.mock('../CommandItem')
 jest.mock('../../RunTimeControl/hooks')
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('@opentrons/shared-data/js/helpers/schemaV6Adapter')
+jest.mock('@opentrons/components/src/alerts')
 
 const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
   typeof useProtocolDetails
@@ -38,6 +40,8 @@ const mockSchemaV6Adapter = schemaV6Adapter as jest.MockedFunction<
   typeof schemaV6Adapter
 >
 const mockCommandItem = CommandItem as jest.MockedFunction<typeof CommandItem>
+
+const mockAlertItem = AlertItem as jest.MockedFunction<typeof AlertItem>
 
 const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolFile<{}>
 const _fixtureAnalysis = (fixtureAnalysis as unknown) as ProtocolFile<{}>
@@ -110,5 +114,32 @@ describe('CommandList', () => {
         'Picking up tip from A1 of Opentrons 96 Tip Rack 300 µL on 1'
       ).length
     ).toEqual(1)
+  })
+  it('renders the protocol failed banner', () => {
+    mockUseRunStatus.mockReturnValue('failed')
+    mockAlertItem.mockReturnValue(<div>Protocol Run Failed</div>)
+    const { getByText } = render()
+    expect(getByText('Protocol Run Failed')).toHaveStyle(
+      'backgroundColor: Error_light'
+    )
+    expect(getByText('Protocol Run Failed')).toHaveStyle('color: Error_dark')
+  })
+  it('renders the protocol canceled banner', () => {
+    mockUseRunStatus.mockReturnValue('stop-requested')
+    mockAlertItem.mockReturnValue(<div>Protocol Run Canceled</div>)
+    const { getByText } = render()
+    expect(getByText('Protocol Run Canceled')).toHaveStyle(
+      'backgroundColor: Error_light'
+    )
+    expect(getByText('Protocol Run Canceled')).toHaveStyle('color: Error_dark')
+  })
+  it('renders the protocol completed banner', () => {
+    mockUseRunStatus.mockReturnValue('succeeded')
+    mockAlertItem.mockReturnValue(<div>Protocol Run Completed</div>)
+    const { getByText } = render()
+    expect(getByText('Protocol Run Completed')).toHaveStyle(
+      'backgroundColor: C_bg_success'
+    )
+    expect(getByText('Protocol Run Completed')).toHaveStyle('color: C_success')
   })
 })

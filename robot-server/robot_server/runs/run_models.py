@@ -7,6 +7,7 @@ from opentrons.protocol_engine import (
     CommandStatus,
     CommandType,
     EngineStatus as RunStatus,
+    ErrorOccurrence,
     LoadedPipette,
     LoadedLabware,
     LabwareOffset,
@@ -22,6 +23,10 @@ class RunCommandSummary(ResourceModel):
     id: str = Field(..., description="Unique command identifier.")
     commandType: CommandType = Field(..., description="Specific type of command.")
     status: CommandStatus = Field(..., description="Execution status of the command.")
+    errorId: Optional[str] = Field(
+        None,
+        description="Error occurrence identifier, if status is 'failed'",
+    )
 
 
 class Run(ResourceModel):
@@ -44,6 +49,10 @@ class Run(ResourceModel):
     commands: List[RunCommandSummary] = Field(
         ...,
         description="Protocol commands queued, running, or executed for the run.",
+    )
+    errors: List[ErrorOccurrence] = Field(
+        ...,
+        description="Any errors that have occurred during the run.",
     )
     pipettes: List[LoadedPipette] = Field(
         ...,

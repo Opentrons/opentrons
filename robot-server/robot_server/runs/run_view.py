@@ -1,19 +1,11 @@
 """Run response model factory."""
 from dataclasses import replace
 from datetime import datetime
-from typing import List, Tuple
-
-from opentrons.protocol_engine import (
-    Command as ProtocolEngineCommand,
-    EngineStatus,
-    LoadedLabware,
-    LoadedPipette,
-    LabwareOffset,
-)
+from typing import Tuple
 
 from .run_store import RunResource
 from .action_models import RunAction, RunActionCreate
-from .run_models import Run, RunUpdate, RunCommandSummary
+from .run_models import RunUpdate
 
 
 class RunView:
@@ -69,43 +61,3 @@ class RunView:
         )
 
         return actions, updated_run
-
-    @staticmethod
-    def as_response(
-        run: RunResource,
-        commands: List[ProtocolEngineCommand],
-        pipettes: List[LoadedPipette],
-        labware: List[LoadedLabware],
-        labware_offsets: List[LabwareOffset],
-        engine_status: EngineStatus,
-    ) -> Run:
-        """Transform a run resource into its public response model.
-
-        Args:
-            run: Internal resource representation of the run.
-            commands: Commands from ProtocolEngine state.
-            pipettes: Pipettes from ProtocolEngine state.
-            labware: Labware from ProtocolEngine state.
-            labware_offsets: Labware offsets from ProtocolEngine state.
-            engine_status: Status from ProtocolEngine state.
-
-        Returns:
-            Run response model representing the same resource.
-        """
-        command_summaries = [
-            RunCommandSummary(id=c.id, commandType=c.commandType, status=c.status)
-            for c in commands
-        ]
-
-        return Run(
-            id=run.run_id,
-            protocolId=run.protocol_id,
-            createdAt=run.created_at,
-            current=run.is_current,
-            actions=run.actions,
-            commands=command_summaries,
-            pipettes=pipettes,
-            labware=labware,
-            labwareOffsets=labware_offsets,
-            status=engine_status,
-        )

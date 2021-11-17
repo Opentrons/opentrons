@@ -8,8 +8,10 @@ from opentrons.protocol_engine import (
     ModuleLocation,
     PipetteName,
     commands as pe_commands,
+    actions as pe_actions,
 )
 from opentrons.protocol_runner.legacy_command_mapper import (
+    LegacyContextCommandError,
     LegacyCommandMapper,
     LegacyCommandParams,
 )
@@ -34,15 +36,17 @@ def test_map_before_command() -> None:
     subject = LegacyCommandMapper()
     result = subject.map_command(legacy_command)
 
-    assert result == pe_commands.Custom.construct(
-        id="command.PAUSE-0",
-        status=pe_commands.CommandStatus.RUNNING,
-        createdAt=matchers.IsA(datetime),
-        startedAt=matchers.IsA(datetime),
-        params=LegacyCommandParams(
-            legacyCommandType="command.PAUSE",
-            legacyCommandText="hello world",
-        ),
+    assert result == pe_actions.UpdateCommandAction(
+        pe_commands.Custom.construct(
+            id="command.PAUSE-0",
+            status=pe_commands.CommandStatus.RUNNING,
+            createdAt=matchers.IsA(datetime),
+            startedAt=matchers.IsA(datetime),
+            params=LegacyCommandParams(
+                legacyCommandType="command.PAUSE",
+                legacyCommandText="hello world",
+            ),
+        )
     )
 
 
@@ -66,16 +70,18 @@ def test_map_after_command() -> None:
     _ = subject.map_command(legacy_command_start)
     result = subject.map_command(legacy_command_end)
 
-    assert result == pe_commands.Custom.construct(
-        id="command.PAUSE-0",
-        status=pe_commands.CommandStatus.SUCCEEDED,
-        createdAt=matchers.IsA(datetime),
-        startedAt=matchers.IsA(datetime),
-        completedAt=matchers.IsA(datetime),
-        params=LegacyCommandParams(
-            legacyCommandType="command.PAUSE",
-            legacyCommandText="hello world",
-        ),
+    assert result == pe_actions.UpdateCommandAction(
+        pe_commands.Custom.construct(
+            id="command.PAUSE-0",
+            status=pe_commands.CommandStatus.SUCCEEDED,
+            createdAt=matchers.IsA(datetime),
+            startedAt=matchers.IsA(datetime),
+            completedAt=matchers.IsA(datetime),
+            params=LegacyCommandParams(
+                legacyCommandType="command.PAUSE",
+                legacyCommandText="hello world",
+            ),
+        )
     )
 
 
@@ -99,17 +105,14 @@ def test_map_after_with_error_command() -> None:
     _ = subject.map_command(legacy_command_start)
     result = subject.map_command(legacy_command_end)
 
-    assert result == pe_commands.Custom.construct(
-        id="command.PAUSE-0",
-        status=pe_commands.CommandStatus.FAILED,
-        createdAt=matchers.IsA(datetime),
-        startedAt=matchers.IsA(datetime),
-        completedAt=matchers.IsA(datetime),
-        params=LegacyCommandParams(
-            legacyCommandType="command.PAUSE",
-            legacyCommandText="hello world",
+    assert result == pe_actions.FailCommandAction(
+        command_id="command.PAUSE-0",
+        error_id=matchers.IsA(str),
+        failed_at=matchers.IsA(datetime),
+        error=matchers.ErrorMatching(  # type: ignore[arg-type]
+            LegacyContextCommandError,
+            match="oh no",
         ),
-        error="oh no",
     )
 
 
@@ -146,47 +149,55 @@ def test_command_stack() -> None:
     result_3 = subject.map_command(legacy_command_3)
     result_4 = subject.map_command(legacy_command_4)
 
-    assert result_1 == pe_commands.Custom.construct(
-        id="command.PAUSE-0",
-        status=pe_commands.CommandStatus.RUNNING,
-        createdAt=matchers.IsA(datetime),
-        startedAt=matchers.IsA(datetime),
-        params=LegacyCommandParams(
-            legacyCommandType="command.PAUSE",
-            legacyCommandText="hello",
-        ),
+    assert result_1 == pe_actions.UpdateCommandAction(
+        pe_commands.Custom.construct(
+            id="command.PAUSE-0",
+            status=pe_commands.CommandStatus.RUNNING,
+            createdAt=matchers.IsA(datetime),
+            startedAt=matchers.IsA(datetime),
+            params=LegacyCommandParams(
+                legacyCommandType="command.PAUSE",
+                legacyCommandText="hello",
+            ),
+        )
     )
-    assert result_2 == pe_commands.Custom.construct(
-        id="command.PAUSE-1",
-        status=pe_commands.CommandStatus.RUNNING,
-        createdAt=matchers.IsA(datetime),
-        startedAt=matchers.IsA(datetime),
-        params=LegacyCommandParams(
-            legacyCommandType="command.PAUSE",
-            legacyCommandText="goodbye",
-        ),
+    assert result_2 == pe_actions.UpdateCommandAction(
+        pe_commands.Custom.construct(
+            id="command.PAUSE-1",
+            status=pe_commands.CommandStatus.RUNNING,
+            createdAt=matchers.IsA(datetime),
+            startedAt=matchers.IsA(datetime),
+            params=LegacyCommandParams(
+                legacyCommandType="command.PAUSE",
+                legacyCommandText="goodbye",
+            ),
+        )
     )
-    assert result_3 == pe_commands.Custom.construct(
-        id="command.PAUSE-1",
-        status=pe_commands.CommandStatus.SUCCEEDED,
-        createdAt=matchers.IsA(datetime),
-        startedAt=matchers.IsA(datetime),
-        completedAt=matchers.IsA(datetime),
-        params=LegacyCommandParams(
-            legacyCommandType="command.PAUSE",
-            legacyCommandText="goodbye",
-        ),
+    assert result_3 == pe_actions.UpdateCommandAction(
+        pe_commands.Custom.construct(
+            id="command.PAUSE-1",
+            status=pe_commands.CommandStatus.SUCCEEDED,
+            createdAt=matchers.IsA(datetime),
+            startedAt=matchers.IsA(datetime),
+            completedAt=matchers.IsA(datetime),
+            params=LegacyCommandParams(
+                legacyCommandType="command.PAUSE",
+                legacyCommandText="goodbye",
+            ),
+        )
     )
-    assert result_4 == pe_commands.Custom.construct(
-        id="command.PAUSE-0",
-        status=pe_commands.CommandStatus.SUCCEEDED,
-        createdAt=matchers.IsA(datetime),
-        startedAt=matchers.IsA(datetime),
-        completedAt=matchers.IsA(datetime),
-        params=LegacyCommandParams(
-            legacyCommandType="command.PAUSE",
-            legacyCommandText="hello",
-        ),
+    assert result_4 == pe_actions.UpdateCommandAction(
+        pe_commands.Custom.construct(
+            id="command.PAUSE-0",
+            status=pe_commands.CommandStatus.SUCCEEDED,
+            createdAt=matchers.IsA(datetime),
+            startedAt=matchers.IsA(datetime),
+            completedAt=matchers.IsA(datetime),
+            params=LegacyCommandParams(
+                legacyCommandType="command.PAUSE",
+                legacyCommandText="hello",
+            ),
+        )
     )
 
 
