@@ -6,6 +6,7 @@ from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocol_engine import (
     ProtocolEngine,
     Command,
+    ErrorOccurrence,
     LoadedLabware,
     LoadedPipette,
 )
@@ -33,6 +34,7 @@ class ProtocolRunData:
     """Data from a protocol run."""
 
     commands: List[Command]
+    errors: List[ErrorOccurrence]
     labware: List[LoadedLabware]
     pipettes: List[LoadedPipette]
 
@@ -141,11 +143,12 @@ class ProtocolRunner:
         self.play()
         await self.join()
 
-        commands = self._protocol_engine.state_view.commands.get_all()
-        labware = self._protocol_engine.state_view.labware.get_all()
-        pipettes = self._protocol_engine.state_view.pipettes.get_all()
-
-        return ProtocolRunData(commands=commands, labware=labware, pipettes=pipettes)
+        return ProtocolRunData(
+            commands=self._protocol_engine.state_view.commands.get_all(),
+            errors=self._protocol_engine.state_view.commands.get_all_errors(),
+            labware=self._protocol_engine.state_view.labware.get_all(),
+            pipettes=self._protocol_engine.state_view.pipettes.get_all(),
+        )
 
     def _load_json(self, protocol_source: ProtocolSource) -> None:
         raise NotImplementedError("JSON schema v6 execution not yet implemented.")

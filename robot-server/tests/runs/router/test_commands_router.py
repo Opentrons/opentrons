@@ -37,6 +37,7 @@ async def test_create_run_command(decoy: Decoy, engine_store: EngineStore) -> No
         current=True,
         actions=[],
         commands=[],
+        errors=[],
         pipettes=[],
         labware=[],
     )
@@ -79,6 +80,7 @@ async def test_create_run_command_not_current(
         current=False,
         actions=[],
         commands=[],
+        errors=[],
         pipettes=[],
         labware=[],
     )
@@ -110,6 +112,7 @@ async def test_get_run_commands() -> None:
         current=True,
         actions=[],
         commands=[command_summary],
+        errors=[],
         pipettes=[],
         labware=[],
     )
@@ -145,6 +148,7 @@ async def test_get_run_command_by_id(
         current=True,
         actions=[],
         commands=[command_summary],
+        errors=[],
         pipettes=[],
         labware=[],
     )
@@ -178,6 +182,7 @@ async def test_get_run_command_missing_command(
         current=True,
         actions=[],
         commands=[],
+        errors=[],
         pipettes=[],
         labware=[],
     )

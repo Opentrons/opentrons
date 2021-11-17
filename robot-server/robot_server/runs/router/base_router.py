@@ -28,7 +28,7 @@ from robot_server.protocols import (
 
 from ..run_store import RunStore, RunResource, RunNotFoundError
 from ..run_view import RunView
-from ..run_models import Run, RunCreate, RunUpdate
+from ..run_models import Run, RunCreate, RunUpdate, RunCommandSummary
 from ..engine_store import EngineStore, EngineConflictError
 from ..dependencies import get_run_store, get_engine_store
 
@@ -89,7 +89,6 @@ class AllRunsLinks(BaseModel):
 )
 async def create_run(
     request_body: Optional[RequestModel[RunCreate]] = None,
-    run_view: RunView = Depends(RunView),
     run_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
@@ -101,7 +100,6 @@ async def create_run(
 
     Arguments:
         request_body: Optional request body with run creation data.
-        run_view: Run model construction interface.
         run_store: Run storage interface.
         engine_store: ProtocolEngine storage and control.
         protocol_store: Protocol resource storage.
@@ -140,12 +138,20 @@ async def create_run(
 
     run_store.upsert(run=run)
 
-    data = run_view.as_response(
-        run=run,
-        commands=engine_state.commands.get_all(),
+    data = Run(
+        id=run_id,
+        protocolId=run.protocol_id,
+        createdAt=run.created_at,
+        current=run.is_current,
+        actions=run.actions,
+        commands=[
+            RunCommandSummary(id=c.id, commandType=c.commandType, status=c.status)
+            for c in engine_state.commands.get_all()
+        ],
+        errors=[],
         pipettes=engine_state.pipettes.get_all(),
         labware=engine_state.labware.get_all(),
-        engine_status=engine_state.commands.get_status(),
+        status=engine_state.commands.get_status(),
     )
 
     return ResponseModel(data=data, links=None)
@@ -159,14 +165,12 @@ async def create_run(
     response_model=MultiResponseModel[Run, AllRunsLinks],
 )
 async def get_runs(
-    run_view: RunView = Depends(RunView),
     run_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
 ) -> MultiResponseModel[Run, AllRunsLinks]:
     """Get all runs.
 
     Args:
-        run_view: Run model manipulation interface.
         run_store: Run storage interface.
         engine_store: ProtocolEngine storage and control.
     """
@@ -176,12 +180,25 @@ async def get_runs(
     for run in run_store.get_all():
         run_id = run.run_id
         engine_state = engine_store.get_state(run_id)
-        run_data = run_view.as_response(
-            run=run,
-            commands=engine_state.commands.get_all(),
+        run_data = Run(
+            id=run_id,
+            protocolId=run.protocol_id,
+            createdAt=run.created_at,
+            current=run.is_current,
+            actions=run.actions,
+            commands=[
+                RunCommandSummary(
+                    id=c.id,
+                    commandType=c.commandType,
+                    status=c.status,
+                    errorId=c.errorId,
+                )
+                for c in engine_state.commands.get_all()
+            ],
+            errors=engine_state.commands.get_all_errors(),
             pipettes=engine_state.pipettes.get_all(),
             labware=engine_state.labware.get_all(),
-            engine_status=engine_state.commands.get_status(),
+            status=engine_state.commands.get_status(),
         )
 
         data.append(run_data)
@@ -202,7 +219,6 @@ async def get_runs(
 )
 async def get_run(
     runId: str,
-    run_view: RunView = Depends(RunView),
     run_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
 ) -> ResponseModel[Run, None]:
@@ -210,7 +226,6 @@ async def get_run(
 
     Args:
         runId: Run ID pulled from URL.
-        run_view: Run model manipulation interface.
         run_store: Run storage interface.
         engine_store: ProtocolEngine storage and control.
     """
@@ -221,12 +236,25 @@ async def get_run(
 
     engine_state = engine_store.get_state(run.run_id)
 
-    data = run_view.as_response(
-        run=run,
-        commands=engine_state.commands.get_all(),
+    data = Run(
+        id=run.run_id,
+        protocolId=run.protocol_id,
+        createdAt=run.created_at,
+        current=run.is_current,
+        actions=run.actions,
+        commands=[
+            RunCommandSummary(
+                id=c.id,
+                commandType=c.commandType,
+                status=c.status,
+                errorId=c.errorId,
+            )
+            for c in engine_state.commands.get_all()
+        ],
+        errors=engine_state.commands.get_all_errors(),
         pipettes=engine_state.pipettes.get_all(),
         labware=engine_state.labware.get_all(),
-        engine_status=engine_state.commands.get_status(),
+        status=engine_state.commands.get_status(),
     )
 
     return ResponseModel(data=data, links=None)
@@ -316,12 +344,26 @@ async def update_run(
         run_store.upsert(run)
 
     engine_state = engine_store.get_state(run.run_id)
-    data = run_view.as_response(
-        run=run,
-        commands=engine_state.commands.get_all(),
+
+    data = Run(
+        id=run.run_id,
+        protocolId=run.protocol_id,
+        createdAt=run.created_at,
+        current=run.is_current,
+        actions=run.actions,
+        commands=[
+            RunCommandSummary(
+                id=c.id,
+                commandType=c.commandType,
+                status=c.status,
+                errorId=c.errorId,
+            )
+            for c in engine_state.commands.get_all()
+        ],
+        errors=engine_state.commands.get_all_errors(),
         pipettes=engine_state.pipettes.get_all(),
         labware=engine_state.labware.get_all(),
-        engine_status=engine_state.commands.get_status(),
+        status=engine_state.commands.get_status(),
     )
 
     return ResponseModel(data=data, links=None)

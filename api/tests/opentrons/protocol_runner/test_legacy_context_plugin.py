@@ -173,7 +173,7 @@ async def test_main_broker_messages(
     )
 
     decoy.when(legacy_command_mapper.map_command(command=legacy_command)).then_return(
-        engine_command
+        pe_actions.UpdateCommandAction(engine_command)
     )
 
     await to_thread.run_sync(handler, legacy_command)
