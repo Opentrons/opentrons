@@ -47,6 +47,10 @@ export function CommandText(props: Props): JSX.Element {
       }
       case 'pickUpTip': {
         const { wellName, labwareId } = commandOrSummary.params
+        const labwareLocation = getLabwareLocation(labwareId, commands)
+        if (!('slotName' in labwareLocation)) {
+          throw new Error('expected tip rack to be in a slot')
+        }
         messageNode = (
           <Trans
             t={t}
@@ -56,7 +60,7 @@ export function CommandText(props: Props): JSX.Element {
               labware: getLabwareDisplayName(
                 labwareRenderInfoById[labwareId].labwareDef
               ),
-              labware_location: getLabwareLocation(labwareId, commands),
+              labware_location: labwareLocation.slotName,
             }}
           />
         )
