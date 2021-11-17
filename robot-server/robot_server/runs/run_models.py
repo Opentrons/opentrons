@@ -54,7 +54,7 @@ class Run(ResourceModel):
         description="Labware that has been loaded into the run.",
     )
     labwareOffsets: List[LabwareOffset] = Field(
-        default_factory=list,
+        ...,
         description="Labware offsets to apply as labware are loaded.",
     )
     protocolId: Optional[str] = Field(

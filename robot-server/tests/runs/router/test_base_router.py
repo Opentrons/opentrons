@@ -432,6 +432,7 @@ async def test_get_runs_not_empty(
         commands=[],
         pipettes=[],
         labware=[],
+        labwareOffsets=[],
     )
 
     response_2 = Run(
@@ -444,6 +445,7 @@ async def test_get_runs_not_empty(
         commands=[],
         pipettes=[],
         labware=[],
+        labwareOffsets=[],
     )
 
     decoy.when(run_store.get_all()).then_return([run_1, run_2])
@@ -608,6 +610,7 @@ async def test_update_run_to_not_current(
         commands=[],
         pipettes=[],
         labware=[],
+        labwareOffsets=[],
     )
 
     run_update = RunUpdate(current=False)
@@ -678,6 +681,7 @@ async def test_update_current_to_current_noop(
         commands=[],
         pipettes=[],
         labware=[],
+        labwareOffsets=[],
     )
 
     run_update = RunUpdate(current=True)

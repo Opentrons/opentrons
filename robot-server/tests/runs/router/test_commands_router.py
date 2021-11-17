@@ -39,6 +39,7 @@ async def test_create_run_command(decoy: Decoy, engine_store: EngineStore) -> No
         commands=[],
         pipettes=[],
         labware=[],
+        labwareOffsets=[],
     )
 
     output_command = pe_commands.Pause(
@@ -81,6 +82,7 @@ async def test_create_run_command_not_current(
         commands=[],
         pipettes=[],
         labware=[],
+        labwareOffsets=[],
     )
 
     with pytest.raises(ApiError) as exc_info:
@@ -112,6 +114,7 @@ async def test_get_run_commands() -> None:
         commands=[command_summary],
         pipettes=[],
         labware=[],
+        labwareOffsets=[],
     )
 
     response = await get_run_commands(run=ResponseModel(data=run, links=None))
@@ -147,6 +150,7 @@ async def test_get_run_command_by_id(
         commands=[command_summary],
         pipettes=[],
         labware=[],
+        labwareOffsets=[],
     )
 
     engine_state = decoy.mock(cls=StateView)
@@ -180,6 +184,7 @@ async def test_get_run_command_missing_command(
         commands=[],
         pipettes=[],
         labware=[],
+        labwareOffsets=[],
     )
 
     engine_state = decoy.mock(cls=StateView)
