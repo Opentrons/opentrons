@@ -9,6 +9,8 @@ from opentrons.protocol_engine import (
     PipetteName,
     LoadedPipette,
     LoadedLabware,
+    LabwareOffset,
+    LabwareOffsetVector,
     commands as pe_commands,
 )
 
@@ -39,6 +41,7 @@ def test_to_response() -> None:
         commands=[],
         pipettes=[],
         labware=[],
+        labware_offsets=[],
         engine_status=EngineStatus.IDLE,
     )
 
@@ -52,6 +55,7 @@ def test_to_response() -> None:
         commands=[],
         pipettes=[],
         labware=[],
+        labwareOffsets=[],
     )
 
 
@@ -88,6 +92,7 @@ def test_to_response_maps_commands() -> None:
         commands=[command_1, command_2],
         pipettes=[],
         labware=[],
+        labware_offsets=[],
         engine_status=EngineStatus.RUNNING,
     )
 
@@ -112,11 +117,12 @@ def test_to_response_maps_commands() -> None:
         ],
         pipettes=[],
         labware=[],
+        labwareOffsets=[],
     )
 
 
-def test_to_response_adds_equipment() -> None:
-    """It should add ProtocolEngine equipment to Session response model."""
+def test_to_response_adds_equipment_and_offsets() -> None:
+    """It should add ProtocolEngine equipment and offsets to Session response model."""
     run_resource = RunResource(
         run_id="run-id",
         protocol_id=None,
@@ -133,6 +139,14 @@ def test_to_response_adds_equipment() -> None:
         offsetId=None,
     )
 
+    labware_offset = LabwareOffset(
+        id="offset-id",
+        createdAt=datetime(year=2021, month=1, day=1),
+        definitionUri="namespace/load-name/42",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        vector=LabwareOffsetVector(x=1, y=2, z=3),
+    )
+
     pipette = LoadedPipette(
         id="pipette-id",
         pipetteName=PipetteName.P300_SINGLE,
@@ -145,6 +159,7 @@ def test_to_response_adds_equipment() -> None:
         commands=[],
         pipettes=[pipette],
         labware=[labware],
+        labware_offsets=[labware_offset],
         engine_status=EngineStatus.RUNNING,
     )
 
@@ -158,6 +173,7 @@ def test_to_response_adds_equipment() -> None:
         commands=[],
         pipettes=[pipette],
         labware=[labware],
+        labwareOffsets=[labware_offset],
     )
 
 

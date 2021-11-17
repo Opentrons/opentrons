@@ -8,6 +8,7 @@ from opentrons.protocol_engine import (
     EngineStatus,
     LoadedLabware,
     LoadedPipette,
+    LabwareOffset,
 )
 
 from .run_store import RunResource
@@ -75,6 +76,7 @@ class RunView:
         commands: List[ProtocolEngineCommand],
         pipettes: List[LoadedPipette],
         labware: List[LoadedLabware],
+        labware_offsets: List[LabwareOffset],
         engine_status: EngineStatus,
     ) -> Run:
         """Transform a run resource into its public response model.
@@ -84,6 +86,7 @@ class RunView:
             commands: Commands from ProtocolEngine state.
             pipettes: Pipettes from ProtocolEngine state.
             labware: Labware from ProtocolEngine state.
+            labware_offsets: Labware offsets from ProtocolEngine state.
             engine_status: Status from ProtocolEngine state.
 
         Returns:
@@ -103,5 +106,6 @@ class RunView:
             commands=command_summaries,
             pipettes=pipettes,
             labware=labware,
+            labwareOffsets=labware_offsets,
             status=engine_status,
         )

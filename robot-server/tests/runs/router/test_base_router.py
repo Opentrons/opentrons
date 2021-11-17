@@ -127,6 +127,7 @@ async def test_create_run(
             commands=[],
             pipettes=[],
             labware=[],
+            labware_offsets=RESOLVED_LABWARE_OFFSETS,
             engine_status=pe_types.EngineStatus.IDLE,
         ),
     ).then_return(expected_response)
@@ -211,6 +212,7 @@ async def test_create_protocol_run(
             commands=[],
             pipettes=[],
             labware=[],
+            labware_offsets=RESOLVED_LABWARE_OFFSETS,
             engine_status=pe_types.EngineStatus.IDLE,
         ),
     ).then_return(expected_response)
@@ -349,6 +351,7 @@ async def test_get_run(
             commands=[command],
             pipettes=[pipette],
             labware=[labware],
+            labware_offsets=RESOLVED_LABWARE_OFFSETS,
             engine_status=pe_types.EngineStatus.IDLE,
         ),
     ).then_return(expected_response)
@@ -464,6 +467,7 @@ async def test_get_runs_not_empty(
             commands=[],
             pipettes=[],
             labware=[],
+            labware_offsets=[],
             engine_status=pe_types.EngineStatus.SUCCEEDED,
         ),
     ).then_return(response_1)
@@ -474,6 +478,7 @@ async def test_get_runs_not_empty(
             commands=[],
             pipettes=[],
             labware=[],
+            labware_offsets=[],
             engine_status=pe_types.EngineStatus.IDLE,
         ),
     ).then_return(response_2)
@@ -609,6 +614,7 @@ async def test_update_run_to_not_current(
             commands=[],
             pipettes=[],
             labware=[],
+            labware_offsets=[],
             engine_status=pe_types.EngineStatus.SUCCEEDED,
         )
     ).then_return(expected_response)
@@ -677,6 +683,7 @@ async def test_update_current_to_current_noop(
             commands=[],
             pipettes=[],
             labware=[],
+            labware_offsets=[],
             engine_status=pe_types.EngineStatus.SUCCEEDED,
         )
     ).then_return(expected_response)

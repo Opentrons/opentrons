@@ -149,6 +149,7 @@ async def create_run(
         commands=engine_state.commands.get_all(),
         pipettes=engine_state.pipettes.get_all(),
         labware=engine_state.labware.get_all(),
+        labware_offsets=engine_state.labware.get_labware_offsets(),
         engine_status=engine_state.commands.get_status(),
     )
 
@@ -185,6 +186,7 @@ async def get_runs(
             commands=engine_state.commands.get_all(),
             pipettes=engine_state.pipettes.get_all(),
             labware=engine_state.labware.get_all(),
+            labware_offsets=engine_state.labware.get_labware_offsets(),
             engine_status=engine_state.commands.get_status(),
         )
 
@@ -230,6 +232,7 @@ async def get_run(
         commands=engine_state.commands.get_all(),
         pipettes=engine_state.pipettes.get_all(),
         labware=engine_state.labware.get_all(),
+        labware_offsets=engine_state.labware.get_labware_offsets(),
         engine_status=engine_state.commands.get_status(),
     )
 
@@ -325,6 +328,7 @@ async def update_run(
         commands=engine_state.commands.get_all(),
         pipettes=engine_state.pipettes.get_all(),
         labware=engine_state.labware.get_all(),
+        labware_offsets=engine_state.labware.get_labware_offsets(),
         engine_status=engine_state.commands.get_status(),
     )
 
