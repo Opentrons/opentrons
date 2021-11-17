@@ -1,4 +1,5 @@
 import reduce from 'lodash/reduce'
+import { useTranslation, TFunction } from 'react-i18next'
 import {
   getModuleDisplayName,
   getModuleType,
@@ -13,7 +14,8 @@ import type { SavePositionCommandData } from '../types'
 
 const getDisplayLocation = (
   labwareId: string,
-  protocolData: ProtocolFile<{}>
+  protocolData: ProtocolFile<{}>,
+  t: TFunction<'labware_position_check'>
 ): string => {
   let location = ''
   const labwareLocation = getLabwareLocation(labwareId, protocolData.commands)
@@ -26,15 +28,20 @@ const getDisplayLocation = (
         protocolData.modules[labwareLocation.moduleId].model
       )
     } else {
-      location = `${getModuleDisplayName(
-        protocolData.modules[labwareLocation.moduleId].model
-      )} in Deck Slot ${getModuleLocation(
-        labwareLocation.moduleId,
-        protocolData.commands
-      )}`
+      location = t('module_display_location_text', {
+        moduleName: getModuleDisplayName(
+          protocolData.modules[labwareLocation.moduleId].model
+        ),
+        slot: getModuleLocation(
+          labwareLocation.moduleId,
+          protocolData.commands
+        ),
+      })
     }
   } else {
-    location = `Deck Slot ${labwareLocation.slotName}`
+    location = t('labware_display_location_text', {
+      slot: labwareLocation.slotName,
+    })
   }
   return location
 }
@@ -52,10 +59,11 @@ export const useLabwareOffsets = (
   const offsetDataByLabwareId = useOffsetDataByLabwareId(
     savePositionCommandData
   )
+  const { t } = useTranslation('labware_position_check')
   return reduce<SavePositionCommandData, Promise<LabwareOffsets>>(
     savePositionCommandData,
     (labwareOffsets, _commandIds, labwareId) => {
-      const location = getDisplayLocation(labwareId, protocolData)
+      const location = getDisplayLocation(labwareId, protocolData, t)
       const labware = protocolData.labware[labwareId].displayName ?? ''
       const offsetData = offsetDataByLabwareId.then(result => ({
         ...result[labwareId],
