@@ -334,6 +334,7 @@ async def test_get_run(
         ],
         pipettes=[pipette],
         labware=[labware],
+        labwareOffsets=RESOLVED_LABWARE_OFFSETS,
     )
 
     decoy.when(run_store.get(run_id="run-id")).then_return(run)
