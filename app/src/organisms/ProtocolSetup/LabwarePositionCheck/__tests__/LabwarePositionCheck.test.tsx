@@ -81,7 +81,6 @@ describe('LabwarePositionCheck', () => {
     when(mockIntroScreen).calledWith(anyProps()).mockReturnValue(null)
     when(mockGenericStepScreen).calledWith(anyProps()).mockReturnValue(null)
     when(mockSummaryScreen)
-      // @ts-expect-error summary screen does not take any props, but behind the scenes react still calls it with args
       .calledWith(anyProps())
       .mockReturnValue(<div>Mock Summary Screen Component </div>)
   })

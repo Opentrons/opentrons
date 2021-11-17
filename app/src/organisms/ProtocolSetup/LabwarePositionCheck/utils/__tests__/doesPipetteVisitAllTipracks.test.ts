@@ -1,4 +1,4 @@
-import { doesPipetteVisitAllTipracks } from '../utils/doesPipetteVisitAllTipracks'
+import { doesPipetteVisitAllTipracks } from '../doesPipetteVisitAllTipracks'
 import _uncastedProtocolMultipleTipracks from '@opentrons/shared-data/protocol/fixtures/6/multipleTipracks.json'
 import _uncastedProtocolOneTiprack from '@opentrons/shared-data/protocol/fixtures/6/oneTiprack.json'
 import type { ProtocolFile } from '@opentrons/shared-data/protocol'
