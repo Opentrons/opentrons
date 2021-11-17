@@ -46,5 +46,7 @@
   "comment": "Comment",
   "anticipated": "Anticipated steps",
   "protocol_steps": "Protocol steps",
-  "protocol_run_failed": "Protocol run failed"
+  "protocol_run_failed": "Protocol run failed",
+  "protocol_run_canceled": "Protocol run canceled",
+  "protocol_run_complete": "Protocol run complete"
 }

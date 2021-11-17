@@ -16,6 +16,7 @@ from .exceptions import (
     FailedToPlanMoveError,
     MustHomeError,
     ProtocolEngineStoppedError,
+    WellOriginNotAllowedError,
 )
 
 from .error_occurrence import ErrorOccurrence
@@ -37,6 +38,7 @@ __all__ = [
     "FailedToPlanMoveError",
     "MustHomeError",
     "ProtocolEngineStoppedError",
+    "WellOriginNotAllowedError",
     # error occurrence models
     "ErrorOccurrence",
 ]

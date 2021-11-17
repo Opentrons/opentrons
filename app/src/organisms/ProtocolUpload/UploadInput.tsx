@@ -100,7 +100,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
   const protocolName = protocolData.displayName
   const fileName =
     mostRecentProtocol != null
-      ? mostRecentProtocol.files.find(file => file.role === 'main')?.name
+      ? mostRecentProtocol.files?.find(file => file.role === 'main')?.name
       : null
   const fullRunTimestamp = mostRecentRun?.createdAt
   if (fullRunTimestamp == null) return null //  This state should never be reached since if null, protocol empty state won't show latest protocol run data

@@ -10,10 +10,10 @@ from opentrons.types import DeckSlotName, Point
 
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
-    LabwareOffset,
-    LabwareOffsetVector,
     DeckSlotLocation,
     Dimensions,
+    LabwareOffset,
+    LabwareOffsetVector,
     LoadedLabware,
 )
 
