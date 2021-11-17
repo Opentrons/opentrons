@@ -6,22 +6,25 @@ from typing import NamedTuple, Type, cast
 
 from opentrons.types import MountType, DeckSlotName
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.protocol_engine import commands
+from opentrons.protocol_engine import commands, errors
 from opentrons.protocol_engine.types import DeckSlotLocation, PipetteName, WellLocation
 from opentrons.protocol_engine.state.commands import CommandState, CommandStore
 
 from opentrons.protocol_engine.actions import (
     QueueCommandAction,
     UpdateCommandAction,
+    FailCommandAction,
     PlayAction,
     PauseAction,
     StopAction,
+    StopErrorDetails,
 )
 
 from .command_fixtures import (
     create_pending_command,
     create_running_command,
     create_completed_command,
+    create_failed_command,
 )
 
 
@@ -33,6 +36,7 @@ def test_initial_state() -> None:
         is_running=True,
         stop_requested=False,
         commands_by_id=OrderedDict(),
+        errors_by_id={},
     )
 
 
@@ -200,6 +204,7 @@ def test_command_store_handles_pause_action() -> None:
         is_running=False,
         stop_requested=False,
         commands_by_id=OrderedDict(),
+        errors_by_id={},
     )
 
 
@@ -213,6 +218,7 @@ def test_command_store_handles_play_action() -> None:
         is_running=True,
         stop_requested=False,
         commands_by_id=OrderedDict(),
+        errors_by_id={},
     )
 
 
@@ -227,6 +233,7 @@ def test_command_store_handles_stop_action() -> None:
         is_running=False,
         stop_requested=True,
         commands_by_id=OrderedDict(),
+        errors_by_id={},
     )
 
 
@@ -240,4 +247,85 @@ def test_command_store_cannot_restart_after_stop() -> None:
         is_running=False,
         stop_requested=True,
         commands_by_id=OrderedDict(),
+        errors_by_id={},
+    )
+
+
+def test_command_store_ignores_known_stop_error() -> None:
+    """It not store a ProtocolEngineError that comes in with the stop action."""
+    subject = CommandStore()
+    error_details = StopErrorDetails(
+        error=errors.ProtocolEngineError("oh no"),
+        error_id="error-id",
+        created_at=datetime(year=2021, month=1, day=1),
+    )
+
+    subject.handle_action(StopAction(error_details=error_details))
+
+    assert subject.state == CommandState(
+        is_running=False,
+        stop_requested=True,
+        commands_by_id=OrderedDict(),
+        errors_by_id={},
+    )
+
+
+def test_command_store_saves_unknown_stop_error() -> None:
+    """It not store a ProtocolEngineError that comes in with the stop action."""
+    subject = CommandStore()
+
+    error_details = StopErrorDetails(
+        error=RuntimeError("oh no"),
+        error_id="error-id",
+        created_at=datetime(year=2021, month=1, day=1),
+    )
+    subject.handle_action(StopAction(error_details=error_details))
+
+    assert subject.state == CommandState(
+        is_running=False,
+        stop_requested=True,
+        commands_by_id=OrderedDict(),
+        errors_by_id={
+            "error-id": errors.ErrorOccurrence(
+                id="error-id",
+                createdAt=datetime(year=2021, month=1, day=1),
+                errorType="RuntimeError",
+                detail="oh no",
+            )
+        },
+    )
+
+
+def test_command_store_handles_command_failed() -> None:
+    """It should store an error and mark the command if it fails."""
+    command = create_running_command(command_id="command-id")
+    expected_failed_command = create_failed_command(
+        command_id="command-id",
+        error_id="error-id",
+        completed_at=datetime(year=2022, month=2, day=2),
+    )
+
+    subject = CommandStore()
+    subject.handle_action(UpdateCommandAction(command=command))
+    subject.handle_action(
+        FailCommandAction(
+            command_id="command-id",
+            error_id="error-id",
+            failed_at=datetime(year=2022, month=2, day=2),
+            error=errors.ProtocolEngineError("oh no"),
+        )
+    )
+
+    assert subject.state == CommandState(
+        is_running=True,
+        stop_requested=False,
+        commands_by_id=OrderedDict([("command-id", expected_failed_command)]),
+        errors_by_id={
+            "error-id": errors.ErrorOccurrence(
+                id="error-id",
+                errorType="ProtocolEngineError",
+                createdAt=datetime(year=2022, month=2, day=2),
+                detail="oh no",
+            )
+        },
     )

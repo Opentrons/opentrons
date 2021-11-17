@@ -6,6 +6,7 @@ import type { ProtocolResource, LabwareDefinition2 } from '../types'
 // This adapter exists to resolve the interface mismatch between the PE analysis response
 // and the protocol schema v6 interface. Much of this logic should be deleted once we resolve
 // these discrepencies on the server side
+const TRASH_ID = 'fixedTrash'
 export const schemaV6Adapter = (
   protocolAnalyses: ProtocolResource['analyses'][0]
 ): ProtocolFile<{}> => {
@@ -28,7 +29,7 @@ export const schemaV6Adapter = (
       }
     } = protocolAnalyses.labware.reduce((acc, labware) => {
       const labwareId = labware.id
-      if (labwareId === 'fixedTrash') {
+      if (labwareId === TRASH_ID) {
         return { ...acc }
       }
       const labwareDef: LabwareDefinition2 = protocolAnalyses.commands.find(

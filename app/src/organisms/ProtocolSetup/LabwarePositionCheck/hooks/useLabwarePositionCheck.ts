@@ -54,9 +54,12 @@ const useLpcCtaText = (command: LabwarePositionCheckCommand): string => {
       return t('confirm_position_and_return_tip')
     case 'moveToWell': {
       const labwareId = command.params.labwareId
-      const slot = getLabwareLocation(labwareId, commands)
+      const labwareLocation = getLabwareLocation(labwareId, commands)
       return t('confirm_position_and_move', {
-        next_slot: slot,
+        next_slot:
+          'slotName' in labwareLocation
+            ? labwareLocation.slotName
+            : getModuleLocation(labwareLocation.moduleId, commands),
       })
     }
     case 'thermocycler/openLid': {
@@ -88,7 +91,11 @@ export const useTitleText = (
   const commands = protocolData?.commands ?? []
 
   const labwareId = command.params.labwareId
-  const slot = getLabwareLocation(labwareId, commands)
+  const labwareLocation = getLabwareLocation(labwareId, commands)
+  const slot =
+    'slotName' in labwareLocation
+      ? labwareLocation.slotName
+      : getModuleLocation(labwareLocation.moduleId, commands)
 
   if (loading) {
     switch (command.commandType) {
@@ -126,7 +133,7 @@ const commandIsComplete = (status: RunCommandSummary['status']): boolean =>
   status === 'succeeded' || status === 'failed'
 
 const createCommandData = (
-  command: Command | LabwarePositionCheckCommand
+  command: Command
 ): { commandType: string; params: Record<string, any> } => {
   if (command.commandType === 'loadLabware') {
     return {
@@ -164,6 +171,7 @@ export function useLabwarePositionCheck(
     commandId: string
     pipetteId: string
     labwareId: string
+    commandType: LabwarePositionCheckMovementCommand['commandType']
   } | null>(null)
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const [error, setError] = React.useState<Error | null>(null)
@@ -179,11 +187,24 @@ export function useLabwarePositionCheck(
     []
   )
   // load commands come from the protocol resource
-  const loadCommands = protocolData?.commands.filter(isLoadCommand) ?? []
+  const loadCommands =
+    (protocolData?.commands.filter(isLoadCommand).map(command => {
+      if (command.commandType === 'loadPipette') {
+        const commandWithCommandId = {
+          ...command,
+          params: {
+            ...command.params,
+            pipetteId: command.result?.pipetteId,
+          },
+        }
+        return commandWithCommandId
+      }
+      return command
+    }) as Command[]) ?? []
   // TC open lid commands come from the LPC command generator
   const TCOpenCommands = LPCCommands.filter(isTCOpenCommand) ?? []
   // prepCommands will be run when a user starts LPC
-  const prepCommands = [...loadCommands, ...TCOpenCommands]
+  const prepCommands: Command[] = [...loadCommands, ...TCOpenCommands]
   // LPCMovementCommands will be run during the guided LPC flow
   const LPCMovementCommands: LabwarePositionCheckMovementCommand[] = LPCCommands.filter(
     (
@@ -205,12 +226,23 @@ export function useLabwarePositionCheck(
   const robotCommands = useAllCommandsQuery(currentRun?.data?.id).data?.data
   const titleText = useTitleText(
     isLoading,
-    currentCommand,
+    prevCommand,
     protocolData?.labware,
     protocolData?.labwareDefinitions
   )
-  const isComplete = currentCommandIndex === LPCMovementCommands.length
   if (error != null) return { error }
+
+  const isComplete = currentCommandIndex === LPCMovementCommands.length
+  const failedCommand = robotCommands?.find(
+    command => command.status === 'failed'
+  )
+  if (failedCommand != null && error == null) {
+    setError(
+      new Error(
+        `movement command with type ${failedCommand.commandType} and id ${failedCommand.id} failed on the robot`
+      )
+    )
+  }
   const completedMovementCommand =
     pendingMovementCommandData != null &&
     robotCommands?.find(
@@ -227,7 +259,11 @@ export function useLabwarePositionCheck(
           `movement command id ${completedMovementCommand.id} failed on the robot`
         )
       )
-    } else {
+    } // if the command was a pick up tip/drop tip, we dont need to log it's position
+    else if (
+      pendingMovementCommandData.commandType !== 'pickUpTip' &&
+      pendingMovementCommandData.commandType !== 'dropTip'
+    ) {
       // the movement command is complete, save its position for use later
       const savePositionCommand: Command = {
         commandType: 'savePosition',
@@ -251,9 +287,9 @@ export function useLabwarePositionCheck(
           setIsLoading(false)
           setError(e)
         })
-      setIsLoading(false)
-      setPendingMovementCommandData(null)
     }
+    setIsLoading(false)
+    setPendingMovementCommandData(null)
   }
 
   const proceed = (): void => {
@@ -270,9 +306,12 @@ export function useLabwarePositionCheck(
       createCommandData(savePositionCommand)
     )
       // add the saved command id so we can use it to query locations later
+      // if the previous command was a pickup tip, we have already verified that labware's position
       .then(response => {
-        const commandId = response.data.data.id
-        addSavePositionCommandData(commandId, prevCommand.params.labwareId)
+        if (prevCommand.commandType !== 'pickUpTip') {
+          const commandId = response.data.data.id
+          addSavePositionCommandData(commandId, prevCommand.params.labwareId)
+        }
         // execute the movement command
         return createCommand(
           host as HostConfig,
@@ -284,7 +323,13 @@ export function useLabwarePositionCheck(
         const commandId = response.data.data.id
         const pipetteId = currentCommand.params.pipetteId
         const labwareId: string = currentCommand.params.labwareId
-        setPendingMovementCommandData({ commandId, pipetteId, labwareId })
+        const commandType = currentCommand.commandType
+        setPendingMovementCommandData({
+          commandId,
+          pipetteId,
+          labwareId,
+          commandType,
+        })
         setCurrentCommandIndex(currentCommandIndex + 1)
       })
       .catch((e: Error) => {
@@ -296,7 +341,7 @@ export function useLabwarePositionCheck(
   const beginLPC = (): void => {
     setIsLoading(true)
     // execute prep commands
-    prepCommands.forEach((prepCommand: Command) => {
+    prepCommands.forEach(prepCommand => {
       createCommand(
         host as HostConfig,
         currentRun?.data?.id as string,
@@ -318,6 +363,7 @@ export function useLabwarePositionCheck(
           commandId,
           labwareId: currentCommand.params.labwareId,
           pipetteId: currentCommand.params.pipetteId,
+          commandType: currentCommand.commandType,
         })
         setCurrentCommandIndex(currentCommandIndex + 1)
       })

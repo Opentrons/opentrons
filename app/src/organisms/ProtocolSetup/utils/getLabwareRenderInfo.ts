@@ -1,5 +1,6 @@
-import type {
+import {
   DeckDefinition,
+  getSlotHasMatingSurfaceUnitVector,
   LabwareDefinition2,
   ProtocolFile,
 } from '@opentrons/shared-data'
@@ -27,17 +28,6 @@ const getSlotPosition = (
   }
 
   return [x, y, z]
-}
-
-const getSlotHasMatingSurfaceUnitVector = (
-  deckDef: DeckDefinition,
-  slotNumber: string
-): boolean => {
-  const matingSurfaceUnitVector = deckDef.locations.orderedSlots.find(
-    orderedSlot => orderedSlot.id === slotNumber
-  )?.matingSurfaceUnitVector
-
-  return Boolean(matingSurfaceUnitVector)
 }
 
 export interface LabwareRenderInfoById {

@@ -25,14 +25,13 @@ export interface RunData {
   status: RunStatus
   actions: RunAction[]
   commands: RunCommandSummary[]
-  // TODO(bh, 11-12-2021): types for pipettes, labware
   pipettes: unknown[]
   labware: unknown[]
   protocolId?: string
   labwareOffsets?: LabwareOffset[]
 }
 
-interface VectorOffset {
+export interface VectorOffset {
   x: number
   y: number
   z: number
@@ -81,16 +80,17 @@ export interface CreateRunActionData {
 }
 export interface RunCommandSummary {
   id: string
-  commandType: string
+  commandType: FullCommand['commandType']
   status: 'queued' | 'running' | 'succeeded' | 'failed'
+  result?: any
 }
 
-export interface Command {
+export interface CommandData {
   data: RunCommandSummary
   links?: ResourceLinks
 }
 
-export interface Commands {
+export interface CommandsData {
   data: RunCommandSummary[]
   links?: ResourceLinks
 }

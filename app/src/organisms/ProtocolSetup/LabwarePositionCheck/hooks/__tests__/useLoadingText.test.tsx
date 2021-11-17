@@ -37,7 +37,7 @@ describe('useTitleText', () => {
     })
     when(mockGetLabwareLocation)
       .calledWith(mockLabwareId, mockProtocolData.commands)
-      .mockReturnValue(mockSlotNumber)
+      .mockReturnValue({ slotName: mockSlotNumber })
   })
   it('should return the loading text for a move to well command', () => {
     const command: MoveToWellCommand = {

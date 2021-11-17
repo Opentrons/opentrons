@@ -35,7 +35,7 @@ export const GenericStepScreen = (
   const [sectionIndex] = React.useState<number>(0)
   if (introInfo == null) return null
   const { sections, primaryPipetteMount, secondaryPipetteMount } = introInfo
-  const labwareIdsToHighlight = labwareIdsBySection[sections[sectionIndex]]
+  const labwareIdsToHighlight = labwareIdsBySection[props.selectedStep.section]
   const currentSectionIndex = sections.findIndex(
     section => section === props.selectedStep.section
   )

@@ -173,7 +173,7 @@ async def test_main_broker_messages(
     )
 
     decoy.when(legacy_command_mapper.map_command(command=legacy_command)).then_return(
-        engine_command
+        pe_actions.UpdateCommandAction(engine_command)
     )
 
     await to_thread.run_sync(handler, legacy_command)
@@ -288,7 +288,9 @@ async def test_module_load_broker_messages(
     handler: Callable[[LegacyModuleLoadInfo], None] = handler_captor.value
 
     module_load_info = LegacyModuleLoadInfo(
-        module_name="some_module_name", location=1, configuration=None
+        module_name="some_module_name",
+        deck_slot=DeckSlotName.SLOT_1,
+        configuration=None,
     )
     engine_command = pe_commands.Custom(
         id="command-id",

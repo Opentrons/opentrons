@@ -17,7 +17,10 @@ const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const RUN_ID = '1'
 const COMMAND_ID = '2'
-const COMMAND_RESPONSE = { data: { id: COMMAND_ID } } as CommandDetail
+const COMMAND_RESPONSE = {
+  data: { id: COMMAND_ID } as any,
+  links: null,
+} as CommandDetail
 
 describe('useCommandQuery hook', () => {
   let wrapper: React.FunctionComponent<{}>
