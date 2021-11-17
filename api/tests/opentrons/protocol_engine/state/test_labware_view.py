@@ -1,7 +1,7 @@
 """Labware state store tests."""
 import pytest
 from datetime import datetime
-from typing import Dict, List, NamedTuple, Optional, cast
+from typing import Dict, Optional, cast
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
 from opentrons_shared_data.pipette.dev_types import LabwareUri
@@ -15,9 +15,6 @@ from opentrons.protocol_engine.types import (
     LabwareOffset,
     LabwareOffsetVector,
     LoadedLabware,
-    WellLocation,
-    WellOffset,
-    WellOrigin,
 )
 
 from opentrons.protocol_engine.state.labware import LabwareState, LabwareView
@@ -531,109 +528,3 @@ def test_find_applicable_labware_offset() -> None:
         )
         is None
     )
-
-
-class AddWellLocationsSpec(NamedTuple):
-    """Spec data for add_well_locations."""
-
-    well_locations: List[WellLocation]
-    expected: WellLocation
-
-
-@pytest.mark.parametrize(
-    AddWellLocationsSpec._fields,
-    [
-        AddWellLocationsSpec(well_locations=[], expected=WellLocation()),
-        AddWellLocationsSpec(well_locations=[WellLocation()], expected=WellLocation()),
-        AddWellLocationsSpec(
-            well_locations=[
-                WellLocation(origin=WellOrigin.BOTTOM, offset=WellOffset(x=1, y=2, z=3))
-            ],
-            expected=WellLocation(
-                origin=WellOrigin.BOTTOM,
-                offset=WellOffset(x=1, y=2, z=3),
-            ),
-        ),
-        AddWellLocationsSpec(
-            well_locations=[
-                WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=1, y=2, z=3)),
-                WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=4, y=5, z=6)),
-                WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=7, y=8, z=9)),
-            ],
-            expected=WellLocation(
-                origin=WellOrigin.TOP,
-                offset=WellOffset(x=12, y=15, z=18),
-            ),
-        ),
-        AddWellLocationsSpec(
-            well_locations=[
-                WellLocation(
-                    origin=WellOrigin.BOTTOM,
-                    offset=WellOffset(x=1, y=2, z=3),
-                ),
-                WellLocation(
-                    origin=WellOrigin.BOTTOM,
-                    offset=WellOffset(x=4, y=5, z=6),
-                ),
-                WellLocation(
-                    origin=WellOrigin.BOTTOM,
-                    offset=WellOffset(x=7, y=8, z=9),
-                ),
-            ],
-            expected=WellLocation(
-                origin=WellOrigin.BOTTOM,
-                offset=WellOffset(x=12, y=15, z=18),
-            ),
-        ),
-        AddWellLocationsSpec(
-            well_locations=[
-                WellLocation(
-                    origin=WellOrigin.TOP,
-                    offset=WellOffset(x=1, y=2, z=3),
-                ),
-                WellLocation(
-                    origin=WellOrigin.BOTTOM,
-                    offset=WellOffset(x=4, y=5, z=6),
-                ),
-            ],
-            expected=WellLocation(
-                origin=WellOrigin.TOP,
-                offset=WellOffset(x=5, y=7, z=-1.67),  # z = 3 + 6 - 10.67 (well height)
-            ),
-        ),
-        AddWellLocationsSpec(
-            well_locations=[
-                WellLocation(
-                    origin=WellOrigin.BOTTOM,
-                    offset=WellOffset(x=1, y=2, z=3),
-                ),
-                WellLocation(
-                    origin=WellOrigin.TOP,
-                    offset=WellOffset(x=4, y=5, z=6),
-                ),
-            ],
-            expected=WellLocation(
-                origin=WellOrigin.BOTTOM,
-                offset=WellOffset(x=5, y=7, z=19.67),  # z = 3 + 6 + 10.67 (well height)
-            ),
-        ),
-    ],
-)
-def test_add_well_locations(
-    well_plate_def: LabwareDefinition,
-    well_locations: List[WellLocation],
-    expected: WellLocation,
-) -> None:
-    """It should be able to combine relative well locations for a given well."""
-    subject = get_labware_view(
-        labware_by_id={"plate-id": plate},
-        definitions_by_uri={"some-plate-uri": well_plate_def},
-    )
-
-    result = subject.add_well_locations(
-        labware_id="plate-id",
-        well_name="A1",
-        well_locations=well_locations,
-    )
-
-    assert result == expected

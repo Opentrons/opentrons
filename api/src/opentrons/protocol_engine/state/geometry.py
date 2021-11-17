@@ -175,26 +175,26 @@ class GeometryView:
         self,
         pipette_config: PipetteDict,
         labware_id: str,
-        well_name: str,
         well_location: WellLocation,
     ) -> WellLocation:
         """Get tip drop location given labware and hardware pipette."""
-        # return to top if labware is fixed trash
-        is_fixed_trash = self._labware.get_has_quirk(
-            labware_id=labware_id,
-            quirk="fixedTrash",
-        )
+        if well_location.origin != WellOrigin.TOP:
+            raise errors.WellOriginNotAllowedError(
+                'Drop tip location must be relative to "top"'
+            )
 
-        if is_fixed_trash:
+        # return to top if labware is fixed trash
+        if self._labware.get_has_quirk(labware_id=labware_id, quirk="fixedTrash"):
             return well_location
 
         nominal_length = self._labware.get_tip_length(labware_id)
         offset_factor = pipette_config["return_tip_height"]
-        tip_offset = WellOffset(x=0, y=0, z=-nominal_length * offset_factor)
-        tip_adjusted_location = WellLocation(origin=WellOrigin.TOP, offset=tip_offset)
+        tip_z_offset = nominal_length * offset_factor
 
-        return self._labware.add_well_locations(
-            labware_id=labware_id,
-            well_name=well_name,
-            well_locations=[well_location, tip_adjusted_location],
+        return WellLocation(
+            offset=WellOffset(
+                x=well_location.offset.x,
+                y=well_location.offset.y,
+                z=well_location.offset.z - tip_z_offset,
+            )
         )

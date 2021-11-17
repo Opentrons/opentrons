@@ -90,7 +90,6 @@ class PipettingHandler:
         tip_drop_location = self._state_store.geometry.get_tip_drop_location(
             pipette_config=hw_pipette.config,
             labware_id=labware_id,
-            well_name=well_name,
             well_location=well_location,
         )
 

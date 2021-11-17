@@ -448,25 +448,14 @@ def test_get_tip_drop_location(
     pipette_config: PipetteDict = cast(PipetteDict, {"return_tip_height": 0.5})
 
     decoy.when(labware_view.get_tip_length("tip-rack-id")).then_return(50)
-    decoy.when(
-        labware_view.add_well_locations(
-            labware_id="tip-rack-id",
-            well_name="A1",
-            well_locations=[
-                WellLocation(offset=WellOffset(x=1, y=2, z=3)),
-                WellLocation(offset=WellOffset(x=0, y=0, z=-25)),  # 0.5 * 50
-            ],
-        )
-    ).then_return(WellLocation(offset=WellOffset(x=100, y=200, z=300)))
 
     location = subject.get_tip_drop_location(
         pipette_config=pipette_config,
         labware_id="tip-rack-id",
-        well_name="A1",
-        well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
+        well_location=WellLocation(offset=WellOffset(x=1, y=2, z=25)),
     )
 
-    assert location == WellLocation(offset=WellOffset(x=100, y=200, z=300))
+    assert location == WellLocation(offset=WellOffset(x=1, y=2, z=0))
 
 
 def test_get_tip_drop_location_with_trash(
@@ -475,7 +464,7 @@ def test_get_tip_drop_location_with_trash(
     subject: GeometryView,
 ) -> None:
     """It should get relative drop tip location for a the fixed trash."""
-    pipette_config: PipetteDict = cast(PipetteDict, {"return_tip_height": 0.7})
+    pipette_config: PipetteDict = cast(PipetteDict, {"return_tip_height": 0.5})
 
     decoy.when(
         labware_view.get_has_quirk(labware_id="labware-id", quirk="fixedTrash")
@@ -483,9 +472,24 @@ def test_get_tip_drop_location_with_trash(
 
     location = subject.get_tip_drop_location(
         labware_id="labware-id",
-        well_name="A1",
         well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
         pipette_config=pipette_config,
     )
 
     assert location == WellLocation(offset=WellOffset(x=1, y=2, z=3))
+
+
+def test_get_tip_drop_invalid_origin(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    subject: GeometryView,
+) -> None:
+    """It should raise if the given WellLocation is not WellOrigin.TOP."""
+    pipette_config: PipetteDict = cast(PipetteDict, {"return_tip_height": 0.5})
+
+    with pytest.raises(errors.WellOriginNotAllowedError):
+        subject.get_tip_drop_location(
+            labware_id="labware-id",
+            well_location=WellLocation(origin=WellOrigin.BOTTOM),
+            pipette_config=pipette_config,
+        )

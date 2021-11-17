@@ -159,7 +159,6 @@ async def test_handle_drop_up_tip_request(
         state_store.geometry.get_tip_drop_location(
             pipette_config=mock_hw_pipettes.right_config,
             labware_id="labware-id",
-            well_name="A1",
             well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
         )
     ).then_return(WellLocation(offset=WellOffset(x=4, y=5, z=6)))

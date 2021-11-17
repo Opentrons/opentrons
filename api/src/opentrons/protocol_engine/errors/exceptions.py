@@ -78,3 +78,7 @@ class MustHomeError(ProtocolEngineError):
 
 class ProtocolEngineStoppedError(ProtocolEngineError):
     """An error raised when attempting an invalid action with a stopped engine."""
+
+
+class WellOriginNotAllowedError(ProtocolEngineError):
+    """An error raised when using a disallowed origin in a relative well location."""
