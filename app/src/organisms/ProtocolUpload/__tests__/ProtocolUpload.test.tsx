@@ -135,6 +135,7 @@ describe('ProtocolUpload', () => {
         createProtocolRun: jest.fn(),
       } as any)
     const { getByRole, getByText } = render()[0]
+
     fireEvent.click(getByRole('button', { name: 'close' }))
     getByText('mock confirm exit protocol upload modal')
   })
@@ -152,6 +153,7 @@ describe('ProtocolUpload', () => {
     when(mockUseCloseProtocolRun)
       .calledWith()
       .mockReturnValue(mockCloseProtocolRun)
+
     const [{ getByRole, getByText }, store] = render()
     fireEvent.click(getByRole('button', { name: 'close' }))
     const mockCloseModal = getByText('mock confirm exit protocol upload modal')

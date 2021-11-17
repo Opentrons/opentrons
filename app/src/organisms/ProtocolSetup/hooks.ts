@@ -1,38 +1,30 @@
-import { useSelector } from 'react-redux'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
-
-import {
-  getProtocolAuthor,
-  getProtocolLastUpdated,
-  getProtocolMethod,
-  getProtocolDescription,
-} from '../../redux/protocol'
 import { useProtocolDetails } from '../RunDetails/hooks'
 import { getModuleRenderInfo } from './utils/getModuleRenderInfo'
 import { getLabwareRenderInfo } from './utils/getLabwareRenderInfo'
+import { useCurrentProtocolRun } from '../ProtocolUpload/hooks'
 
 import type { ModuleRenderInfoById } from './utils/getModuleRenderInfo'
 import type { LabwareRenderInfoById } from './utils/getLabwareRenderInfo'
-import type { State } from '../../redux/types'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { LoadPipetteCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+
 interface ProtocolMetadata {
-  author: string | null
-  lastUpdated: number | null
-  method: string | null
-  description: string | null
+  author?: string
+  lastUpdated?: number | null
+  description?: string | null
+  creationMethod?: 'json' | 'python'
 }
 
 export function useProtocolMetadata(): ProtocolMetadata {
-  const author = useSelector((state: State) => getProtocolAuthor(state))
-  const lastUpdated = useSelector((state: State) =>
-    getProtocolLastUpdated(state)
-  )
-  const method = useSelector((state: State) => getProtocolMethod(state))
-  const description = useSelector((state: State) =>
-    getProtocolDescription(state)
-  )
-  return { author, lastUpdated, method, description }
+  const currentProtocolRun = useCurrentProtocolRun()
+  const protocolMetadata = currentProtocolRun.protocolRecord?.data?.metadata
+  const creationMethod = currentProtocolRun.protocolRecord?.data?.protocolType
+  const author = protocolMetadata?.author
+  const description = protocolMetadata?.description
+  const lastUpdated = protocolMetadata?.lastModified
+
+  return { author, lastUpdated, description, creationMethod }
 }
 
 export function useModuleRenderInfoById(): ModuleRenderInfoById {
