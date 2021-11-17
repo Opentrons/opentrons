@@ -84,16 +84,16 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
   )
   const mostRecentProtocol = mostRecentProtocolInfo?.data?.data
   const protocolData = useProtocolDetails()
+  //  If mostRecentRun is null, the CTA that uses cloneRun won't appear so this will never be reached
   const cloneMostRecentRun = useCloneRun(
     mostRecentRunId != null ? mostRecentRunId : ''
   )
-  //  If mostRecentRun is null, the CTA that uses cloneRun won't appear so this will never be reached
   const robotName = useSelector((state: State) => getConnectedRobotName(state))
   const fileInput = React.useRef<HTMLInputElement>(null)
   const [isFileOverDropZone, setIsFileOverDropZone] = React.useState<boolean>(
     false
   )
-  const [rerunningProtocolModal, setRerunningProtocolModal] = React.useState(
+  const [rerunningProtocolModal, showRerunningProtocolModal] = React.useState(
     false
   )
   const labwareOffsets = mostRecentRun?.labwareOffsets
@@ -153,7 +153,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
     >
       {rerunningProtocolModal && (
         <RerunningProtocolModal
-          onCloseClick={() => setRerunningProtocolModal(false)}
+          onCloseClick={() => showRerunningProtocolModal(false)}
         />
       )}
       <PrimaryBtn
@@ -202,14 +202,14 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
           >
             <Trans
               t={t}
-              i18nKey="robotName_last_run"
+              i18nKey="robot_name_last_run"
               values={{ robot_name: robotName }}
             />
             <Link
               role={'link'}
               fontSize={FONT_SIZE_BODY_1}
               color={C_BLUE}
-              onClick={() => setRerunningProtocolModal(true)}
+              onClick={() => showRerunningProtocolModal(true)}
               id={'RerunningProtocol_Modal'}
               data-testid={'RerunningProtocol_ModalLink'}
             >
@@ -267,7 +267,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
               </Text>
               <Flex css={FONT_BODY_1_DARK}>
                 {labwareOffsets != null && labwareOffsets.length === 0 ? (
-                  <Text>{t('no_labware_offset_Data')}</Text>
+                  <Text>{t('no_labware_offset_data')}</Text>
                 ) : (
                   labwareOffsets != null && (
                     <Trans

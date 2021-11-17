@@ -35,7 +35,7 @@
   "exit_modal_go_back": "No, go back",
   "exit_modal_exit": "Yes, close now",
   "exit_modal_body": "Are you sure you want to close this protocol?",
-  "robotName_last_run": "{{robot_name}}’s last run",
+  "robot_name_last_run": "{{robot_name}}’s last run",
   "rerunning_protocol_modal_title": "See How Rerunning a Protocol Works",
   "protocol_name_title": "Protocol name",
   "run_timestamp_title": "Run timestamp",
@@ -46,5 +46,5 @@
   "rerunning_protocol_modal_header": "How Rerunning A Protocol Works",
   "rerunning_protocol_modal_body": "<block>Opentrons displays the connected robot’s last protocol run on on the Protocol Upload page. If you run again, Opentrons loads this protocol and applies Labware Offset data if any exists.</block><block>Clicking “Run Again” will take you directly to the Run tab. If you’d like to review the deck setup or run Labware Position Check before running the protocol, navigate to the Protocol tab.</block><block>If you recalibrate your robot, it will clear the last run from the upload page.</block>",
   "rerunning_protocol_modal_link": "Learn more about Labware Offset Data",
-  "no_labware_offset_Data": "No Labware Offset data"
+  "no_labware_offset_data": "No Labware Offset data"
 }

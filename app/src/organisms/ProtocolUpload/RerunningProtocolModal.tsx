@@ -69,7 +69,7 @@ export const RerunningProtocolModal = (
             color={C_BLUE}
             href={UPLOAD_PROTOCOL_URL}
             marginTop={SPACING_2}
-            id={'RerunningProtocol_ModalLink'}
+            id={'RerunningProtocolModal_Link'}
             rel="noopener noreferrer"
           >
             {t('rerunning_protocol_modal_link')}
@@ -81,7 +81,7 @@ export const RerunningProtocolModal = (
               width={SIZE_4}
               backgroundColor={C_BLUE}
               name="close"
-              id={'RobotCalModal_closeButton'}
+              id={'RerunningProtocolModal_closeButton'}
             >
               {t('shared:close')}
             </PrimaryBtn>

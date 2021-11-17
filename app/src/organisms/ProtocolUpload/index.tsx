@@ -6,7 +6,7 @@ import {
   C_NEAR_WHITE,
   useConditionalConfirm,
 } from '@opentrons/components'
-import { Trans, useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { Page } from '../../atoms/Page'
 import { UploadInput } from './UploadInput'
@@ -90,12 +90,7 @@ export function ProtocolUpload(): JSX.Element {
       }
     : {
         title: (
-          <Trans
-            id={'file_input'}
-            t={t}
-            i18nKey="upload_and_simulate"
-            values={{ robot_name: robotName }}
-          />
+          <Text>{t('upload_and_simulate', { robot_name: robotName })}</Text>
         ),
       }
 
