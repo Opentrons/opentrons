@@ -202,6 +202,9 @@ async def test_create_protocol_run(
     decoy.when(engine_state.commands.get_all()).then_return([])
     decoy.when(engine_state.pipettes.get_all()).then_return([])
     decoy.when(engine_state.labware.get_all()).then_return([])
+    decoy.when(engine_state.labware.get_labware_offsets()).then_return(
+        RESOLVED_LABWARE_OFFSETS
+    )
     decoy.when(engine_state.commands.get_status()).then_return(
         pe_types.EngineStatus.IDLE
     )
@@ -341,6 +344,9 @@ async def test_get_run(
     decoy.when(engine_state.commands.get_all()).then_return([command])
     decoy.when(engine_state.pipettes.get_all()).then_return([pipette])
     decoy.when(engine_state.labware.get_all()).then_return([labware])
+    decoy.when(engine_state.labware.get_labware_offsets()).then_return(
+        RESOLVED_LABWARE_OFFSETS
+    )
     decoy.when(engine_state.commands.get_status()).then_return(
         pe_types.EngineStatus.IDLE
     )
@@ -450,6 +456,7 @@ async def test_get_runs_not_empty(
     decoy.when(engine_state_1.commands.get_all()).then_return([])
     decoy.when(engine_state_1.pipettes.get_all()).then_return([])
     decoy.when(engine_state_1.labware.get_all()).then_return([])
+    decoy.when(engine_state_1.labware.get_labware_offsets()).then_return([])
     decoy.when(engine_state_1.commands.get_status()).then_return(
         pe_types.EngineStatus.SUCCEEDED
     )
@@ -457,6 +464,7 @@ async def test_get_runs_not_empty(
     decoy.when(engine_state_2.commands.get_all()).then_return([])
     decoy.when(engine_state_2.pipettes.get_all()).then_return([])
     decoy.when(engine_state_2.labware.get_all()).then_return([])
+    decoy.when(engine_state_2.labware.get_labware_offsets()).then_return([])
     decoy.when(engine_state_2.commands.get_status()).then_return(
         pe_types.EngineStatus.IDLE
     )
@@ -624,6 +632,7 @@ async def test_update_run_to_not_current(
     decoy.when(engine_state.commands.get_all()).then_return([])
     decoy.when(engine_state.pipettes.get_all()).then_return([])
     decoy.when(engine_state.labware.get_all()).then_return([])
+    decoy.when(engine_state.labware.get_labware_offsets()).then_return([])
     decoy.when(engine_state.commands.get_status()).then_return(
         pe_types.EngineStatus.SUCCEEDED
     )
@@ -693,6 +702,7 @@ async def test_update_current_to_current_noop(
     decoy.when(engine_state.commands.get_all()).then_return([])
     decoy.when(engine_state.pipettes.get_all()).then_return([])
     decoy.when(engine_state.labware.get_all()).then_return([])
+    decoy.when(engine_state.labware.get_labware_offsets()).then_return([])
     decoy.when(engine_state.commands.get_status()).then_return(
         pe_types.EngineStatus.SUCCEEDED
     )
