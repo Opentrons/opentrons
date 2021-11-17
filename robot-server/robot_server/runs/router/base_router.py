@@ -123,6 +123,10 @@ async def create_run(
     except EngineConflictError as e:
         raise RunAlreadyActive(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
 
+    if request_body is not None:
+        for offset_request in request_body.data.labwareOffsets:
+            engine_store.engine.add_labware_offset(offset_request)
+
     if protocol_resource is not None:
         engine_store.runner.load(protocol_resource)
 
