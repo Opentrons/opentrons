@@ -234,7 +234,7 @@ async def test_create_protocol_run(
     )
 
 
-async def test_create_protocol_run_missing_protocol(
+async def test_create_protocol_run_bad_protocol_id(
     decoy: Decoy,
     protocol_store: ProtocolStore,
 ) -> None:
