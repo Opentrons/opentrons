@@ -126,20 +126,20 @@ export const LabwareOffsetsSummary = (
                     marginBottom={SPACING_3}
                     css={FONT_BODY_1_DARK}
                   >
-                    <Text as={'span'} marginRight={SPACING_1}>
-                      <strong>X</strong>
+                    <Text as={'strong'} marginRight={SPACING_1}>
+                      X
                     </Text>
                     <Text key={x} as={'span'} marginRight={SPACING_2}>
                       {x.toPrecision(1)}
                     </Text>
-                    <Text as={'span'} marginRight={SPACING_1}>
-                      <strong>Y</strong>
+                    <Text as={'strong'} marginRight={SPACING_1}>
+                      Y
                     </Text>
                     <Text key={y} as={'span'} marginRight={SPACING_2}>
                       {y.toPrecision(1)}
                     </Text>
-                    <Text as={'span'} marginRight={SPACING_1}>
-                      <strong>Z</strong>
+                    <Text as={'strong'} marginRight={SPACING_1}>
+                      Z
                     </Text>
                     <Text key={z} as={'span'} marginRight={SPACING_2}>
                       {z.toPrecision(1)}
