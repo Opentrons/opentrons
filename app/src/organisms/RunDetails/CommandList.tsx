@@ -15,15 +15,10 @@ import {
   FONT_HEADER_DARK,
   JUSTIFY_START,
   Text,
-  FONT_SIZE_DEFAULT,
   SPACING_2,
   C_NEAR_WHITE,
-  C_ERROR_LIGHT,
-  COLOR_ERROR,
-  SPACING_3,
-  SPACING_4,
-  ALIGN_CENTER,
   TEXT_TRANSFORM_CAPITALIZE,
+  AlertItem,
 } from '@opentrons/components'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { useProtocolDetails } from './hooks'
@@ -109,31 +104,36 @@ export function CommandList(): JSX.Element | null {
   const runStatus = useRunStatus()
   if (protocolData == null || runStatus == null) return null
 
+  const isCommandFailed =
+    currentCommandList?.some(command => command.status === 'failed') === true
+  let alertItemTitle
+  if (isCommandFailed) {
+    alertItemTitle = t('protocol_run_failed')
+  }
+  if (runStatus === 'stop-requested') {
+    alertItemTitle = t('protocol_run_canceled')
+  }
+  if (runStatus === 'succeeded') {
+    alertItemTitle = t('protocol_run_complete')
+  }
+
   return (
     <React.Fragment>
       <Flex flexDirection={DIRECTION_COLUMN} flex={'auto'}>
-        {currentCommandList?.some(command => command.status === 'failed') ===
-        true ? (
+        {isCommandFailed ||
+        runStatus === 'succeeded' ||
+        runStatus === 'stop-requested' ? (
           <Flex
             padding={SPACING_2}
             flexDirection={DIRECTION_COLUMN}
             flex="auto"
           >
-            <Flex
-              color={COLOR_ERROR}
-              backgroundColor={C_ERROR_LIGHT}
-              fontSize={FONT_SIZE_DEFAULT}
-              padding={SPACING_2}
-              border={`1px solid ${COLOR_ERROR}`}
-              alignItems={ALIGN_CENTER}
-            >
-              <Icon
-                name="information"
-                width={SPACING_4}
-                marginRight={SPACING_3}
-              />
-              {t('protocol_run_failed')}
-            </Flex>
+            <AlertItem
+              type={
+                isCommandFailed || runStatus === 'failed' ? 'error' : 'success'
+              }
+              title={alertItemTitle}
+            />
           </Flex>
         ) : null}
         <Flex
