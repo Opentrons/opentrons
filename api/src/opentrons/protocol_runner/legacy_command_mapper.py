@@ -1,13 +1,18 @@
 """Translate events from a legacy ``ProtocolContext`` into Protocol Engine commands."""
 
 from collections import defaultdict
-from typing import Dict, List
 from datetime import datetime
+from typing import Dict, List, Union
 
 from opentrons.types import MountType, DeckSlotName
-from opentrons.util.helpers import utc_now
 from opentrons.commands import types as legacy_command_types
-from opentrons.protocol_engine import commands as pe_commands, types as pe_types
+from opentrons.protocol_engine import (
+    ProtocolEngineError,
+    actions as pe_actions,
+    commands as pe_commands,
+    types as pe_types,
+)
+from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocols.models.labware_definition import LabwareDefinition
 
 from .legacy_wrappers import (
@@ -26,6 +31,10 @@ class LegacyCommandParams(pe_commands.CustomParams):
     legacyCommandText: str
 
 
+class LegacyContextCommandError(ProtocolEngineError):
+    """An error returned when a PAPIv2 ProtocolContext command fails."""
+
+
 class LegacyCommandMapper:
     """Map broker commands to protocol engine commands.
 
@@ -41,8 +50,9 @@ class LegacyCommandMapper:
         self._module_id_by_slot: Dict[DeckSlotName, str] = {}
 
     def map_command(
-        self, command: legacy_command_types.CommandMessage
-    ) -> pe_commands.Command:
+        self,
+        command: legacy_command_types.CommandMessage,
+    ) -> Union[pe_actions.UpdateCommandAction, pe_actions.FailCommandAction]:
         """Map a legacy Broker command to a ProtocolEngine command.
 
         A "before" message from the Broker
@@ -59,7 +69,7 @@ class LegacyCommandMapper:
         stage = command["$"]
 
         command_id = f"{command_type}-0"
-        now = utc_now()
+        now = ModelUtils.get_timestamp()
 
         if stage == "before":
             count = self._command_count[command_type]
@@ -69,30 +79,31 @@ class LegacyCommandMapper:
             self._command_count[command_type] = count + 1
             self._running_commands[command_type].append(engine_command)
 
-            return engine_command
+            return pe_actions.UpdateCommandAction(engine_command)
 
-        else:
+        elif command_error is None:
             running_command = self._running_commands[command_type].pop()
-            completed_status = (
-                pe_commands.CommandStatus.SUCCEEDED
-                if command_error is None
-                else pe_commands.CommandStatus.FAILED
-            )
             completed_command = running_command.copy(
                 update={
-                    "status": completed_status,
+                    "status": pe_commands.CommandStatus.SUCCEEDED,
                     "completedAt": now,
-                    "error": str(command_error) if command_error is not None else None,
                 }
             )
+            return pe_actions.UpdateCommandAction(completed_command)
 
-            return completed_command
+        else:
+            return pe_actions.FailCommandAction(
+                command_id=command_id,
+                error_id=ModelUtils.generate_id(),
+                failed_at=now,
+                error=LegacyContextCommandError(str(command_error)),
+            )
 
     def map_labware_load(
         self, labware_load_info: LegacyLabwareLoadInfo
     ) -> pe_commands.Command:
         """Map a legacy labware load to a ProtocolEngine command."""
-        now = utc_now()
+        now = ModelUtils.get_timestamp()
         count = self._command_count["LOAD_LABWARE"]
         slot = labware_load_info.deck_slot
         location: pe_types.LabwareLocation
@@ -139,7 +150,7 @@ class LegacyCommandMapper:
         instrument_load_info: LegacyInstrumentLoadInfo,
     ) -> pe_commands.Command:
         """Map a legacy instrument (pipette) load to a ProtocolEngine command."""
-        now = utc_now()
+        now = ModelUtils.get_timestamp()
         count = self._command_count["LOAD_PIPETTE"]
         command_id = f"commands.LOAD_PIPETTE-{count}"
         pipette_id = f"pipette-{count}"
@@ -168,7 +179,7 @@ class LegacyCommandMapper:
         self, module_load_info: LegacyModuleLoadInfo
     ) -> pe_commands.Command:
         """Map a legacy module load to a Protocol Engine command."""
-        now = utc_now()
+        now = ModelUtils.get_timestamp()
 
         count = self._command_count["LOAD_MODULE"]
         module_id = f"module-{count}"

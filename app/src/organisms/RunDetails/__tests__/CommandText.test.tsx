@@ -68,7 +68,7 @@ describe('CommandText', () => {
       .mockReturnValue('fake_display_name')
     when(mockGetLabwareLocation)
       .calledWith(labwareId, [])
-      .mockReturnValue('fake_labware_location')
+      .mockReturnValue({ slotName: 'fake_labware_location' })
     mockUseLabwareRenderInfoById.mockReturnValue({
       labwareId: {
         labwareDef: 'fake_def',

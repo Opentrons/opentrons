@@ -4,7 +4,7 @@ import { i18n } from '../../../../i18n'
 import { LabwareOffsetsSummary } from '../LabwareOffsetsSummary'
 
 const render = () => {
-  return renderWithProviders(<LabwareOffsetsSummary />, {
+  return renderWithProviders(<LabwareOffsetsSummary offsetData={[]} />, {
     i18nInstance: i18n,
   })[0]
 }

@@ -2,7 +2,8 @@
 import pytest
 from collections import OrderedDict
 from contextlib import nullcontext as does_not_raise
-from typing import List, NamedTuple, Optional, Sequence, Tuple, Type, Union
+from datetime import datetime
+from typing import List, Mapping, NamedTuple, Optional, Sequence, Tuple, Type, Union
 
 from opentrons.protocol_engine import EngineStatus, commands as cmd, errors
 from opentrons.protocol_engine.state.commands import CommandState, CommandView
@@ -20,12 +21,14 @@ def get_command_view(
     is_running: bool = False,
     stop_requested: bool = False,
     commands_by_id: Sequence[Tuple[str, cmd.Command]] = (),
+    errors_by_id: Optional[Mapping[str, errors.ErrorOccurrence]] = None,
 ) -> CommandView:
     """Get a command view test subject."""
     state = CommandState(
         is_running=is_running,
         stop_requested=stop_requested,
         commands_by_id=OrderedDict(commands_by_id),
+        errors_by_id=errors_by_id or {},
     )
 
     return CommandView(state=state)
@@ -320,6 +323,30 @@ def test_validate_action_allowed(
         subject.validate_action_allowed(action)
 
 
+def test_get_errors() -> None:
+    """It should be able to pull all ErrorOccurrences from the store."""
+    error_1 = errors.ErrorOccurrence(
+        id="error-1",
+        createdAt=datetime(year=2021, month=1, day=1),
+        errorType="ReallyBadError",
+        detail="things could not get worse",
+    )
+    error_2 = errors.ErrorOccurrence(
+        id="error-2",
+        createdAt=datetime(year=2022, month=2, day=2),
+        errorType="EvenWorseError",
+        detail="things got worse",
+    )
+
+    subject = get_command_view(
+        stop_requested=False,
+        commands_by_id=(),
+        errors_by_id={"error-1": error_1, "error-2": error_2},
+    )
+
+    assert subject.get_all_errors() == [error_1, error_2]
+
+
 class GetStatusSpec(NamedTuple):
     """Spec data for get_status tests."""
 
@@ -399,7 +426,14 @@ get_status_specs: List[GetStatusSpec] = [
         subject=get_command_view(
             is_running=False,
             stop_requested=True,
-            commands_by_id=[("command-id", create_failed_command())],
+            errors_by_id={
+                "error-id": errors.ErrorOccurrence(
+                    id="error-id",
+                    createdAt=datetime(year=2021, month=1, day=1),
+                    errorType="BadError",
+                    detail="oh no",
+                )
+            },
         ),
         expected_status=EngineStatus.FAILED,
     ),
@@ -452,6 +486,6 @@ def test_get_status(subject: CommandView, expected_status: EngineStatus) -> None
     5. Stop requested, command still running: STOP_REQUESTED
     6. Stop requested, no running commands, with queued commands: STOPPED
     7. Stop requested, all commands succeeded: SUCCEEDED
-    8. Stop requested, any failed commands: FAILED
+    8. Stop requested, any errors: FAILED
     """
     assert subject.get_status() == expected_status

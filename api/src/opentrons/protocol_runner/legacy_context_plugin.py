@@ -98,8 +98,8 @@ class LegacyContextPlugin(AbstractPlugin):
             self._hardware_api.pause(HardwarePauseType.PAUSE)
 
     def _dispatch_legacy_command(self, command: LegacyCommand) -> None:
-        pe_command = self._legacy_command_mapper.map_command(command=command)
-        self.dispatch_threadsafe(pe_actions.UpdateCommandAction(command=pe_command))
+        pe_action = self._legacy_command_mapper.map_command(command=command)
+        self.dispatch_threadsafe(pe_action)
 
     def _dispatch_labware_loaded(
         self, labware_load_info: LegacyLabwareLoadInfo

@@ -31,7 +31,7 @@ export interface RunData {
   labwareOffsets?: LabwareOffset[]
 }
 
-interface VectorOffset {
+export interface VectorOffset {
   x: number
   y: number
   z: number
@@ -82,14 +82,15 @@ export interface RunCommandSummary {
   id: string
   commandType: FullCommand['commandType']
   status: 'queued' | 'running' | 'succeeded' | 'failed'
+  result?: any
 }
 
-export interface Command {
+export interface CommandData {
   data: RunCommandSummary
   links?: ResourceLinks
 }
 
-export interface Commands {
+export interface CommandsData {
   data: RunCommandSummary[]
   links?: ResourceLinks
 }

@@ -7,7 +7,7 @@ import { SectionList } from '../SectionList'
 import { DeckMap } from '../DeckMap'
 import { SummaryScreen } from '../SummaryScreen'
 import { LabwareOffsetsSummary } from '../LabwareOffsetsSummary'
-import { useIntroInfo } from '../hooks'
+import { useIntroInfo, useLabwareOffsets } from '../hooks'
 import { Section } from '../types'
 
 jest.mock('../SectionList')
@@ -29,6 +29,9 @@ const mockDeckmap = DeckMap as jest.MockedFunction<typeof DeckMap>
 const mockLabwareOffsetsSummary = LabwareOffsetsSummary as jest.MockedFunction<
   typeof LabwareOffsetsSummary
 >
+const mockUseLabwareOffsets = useLabwareOffsets as jest.MockedFunction<
+  typeof useLabwareOffsets
+>
 
 const MOCK_SECTIONS = ['PRIMARY_PIPETTE_TIPRACKS' as Section]
 const LABWARE_DEF_ID = 'LABWARE_DEF_ID'
@@ -39,9 +42,14 @@ const LABWARE_DEF = {
 }
 
 const render = () => {
-  return renderWithProviders(<SummaryScreen />, {
-    i18nInstance: i18n,
-  })[0]
+  return renderWithProviders(
+    <SummaryScreen
+      savePositionCommandData={{ someLabwareIf: ['commandId1', 'commandId2'] }}
+    />,
+    {
+      i18nInstance: i18n,
+    }
+  )[0]
 }
 
 describe('SummaryScreen', () => {
@@ -51,14 +59,12 @@ describe('SummaryScreen', () => {
     mockLabwareOffsetsSummary.mockReturnValue(
       <div>Mock Labware Offsets Summary </div>
     )
+    mockUseLabwareOffsets.mockResolvedValue([])
 
     when(mockUseIntroInfo).calledWith().mockReturnValue({
-      primaryTipRackSlot: '1',
-      primaryTipRackName: 'Opentrons 96 Filter Tip Rack 200 µL',
       primaryPipetteMount: 'left',
       secondaryPipetteMount: '',
-      numberOfTips: 1,
-      firstStepLabwareSlot: '2',
+      firstTiprackSlot: '2',
       sections: MOCK_SECTIONS,
     })
 
