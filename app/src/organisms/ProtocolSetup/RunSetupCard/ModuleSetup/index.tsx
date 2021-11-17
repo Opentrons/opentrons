@@ -30,6 +30,7 @@ import { useModuleRenderInfoById } from '../../hooks'
 import styles from '../../styles.css'
 
 import type { State, Dispatch } from '../../../../redux/types'
+import { getModulesByProtocolLoadOrder } from '@opentrons/app/src/redux/robot/selectors'
 
 const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
@@ -67,6 +68,13 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
   const attachedModules = useSelector((state: State) =>
     getAttachedModules(state, robotName)
   )
+  const modulesByProtocolLoadOrder = useSelector((state: State) =>
+    getModulesByProtocolLoadOrder(state)
+  )
+  const protocolLoadOrderModels = modulesByProtocolLoadOrder.map(
+    ({ model }) => model
+  )
+  console.log(protocolLoadOrderModels)
 
   const moduleModels = map(
     moduleRenderInfoById,
@@ -119,6 +127,7 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
                 const attachedModuleMatch = attachedModules.find(
                   attachedModule => model === attachedModule.model
                 )
+                const duplicateModule = hasADuplicateModule ? protocolLoadOrderModels : null
                 return (
                   <React.Fragment key={`LabwareSetup_Module_${model}_${x}${y}`}>
                     <Module
