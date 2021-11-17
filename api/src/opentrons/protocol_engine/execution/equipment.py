@@ -1,6 +1,6 @@
 """Equipment command side-effect logic."""
 from dataclasses import dataclass
-from typing import Tuple, Optional
+from typing import Optional
 
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
@@ -19,7 +19,7 @@ class LoadedLabwareData:
 
     labware_id: str
     definition: LabwareDefinition
-    calibration: Tuple[float, float, float]
+    offsetId: Optional[str]
 
 
 @dataclass(frozen=True)
@@ -71,17 +71,19 @@ class EquipmentHandler:
         Returns:
             A LoadedLabwareData object.
         """
-        labware_id = labware_id if labware_id else self._model_utils.generate_id()
+        labware_id = (
+            labware_id if labware_id is not None else self._model_utils.generate_id()
+        )
+
+        definition_uri = uri_from_details(
+            load_name=load_name,
+            namespace=namespace,
+            version=version,
+        )
 
         try:
             # Try to use existing definition in state.
-            definition = self._state_store.labware.get_definition_by_uri(
-                uri_from_details(
-                    load_name=load_name,
-                    namespace=namespace,
-                    version=version,
-                )
-            )
+            definition = self._state_store.labware.get_definition_by_uri(definition_uri)
         except LabwareDefinitionDoesNotExistError:
             definition = await self._labware_data_provider.get_labware_definition(
                 load_name=load_name,
@@ -89,15 +91,14 @@ class EquipmentHandler:
                 version=version,
             )
 
-        calibration = await self._labware_data_provider.get_labware_calibration(
-            definition=definition,
-            location=location,
+        offset = self._state_store.labware.find_applicable_labware_offset(
+            definition_uri=definition_uri, location=location
         )
 
         return LoadedLabwareData(
             labware_id=labware_id,
             definition=definition,
-            calibration=calibration,
+            offsetId=(None if offset is None else offset.id),
         )
 
     async def load_pipette(

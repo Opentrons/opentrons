@@ -1,13 +1,10 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
   PrimaryBtn,
-  Text,
   BORDER_WIDTH_DEFAULT,
   C_BLUE,
   C_WHITE,
-  DIRECTION_COLUMN,
   FONT_WEIGHT_SEMIBOLD,
   LINE_HEIGHT_SOLID,
   SPACING_2,
@@ -15,18 +12,18 @@ import {
   useConditionalConfirm,
 } from '@opentrons/components'
 import { Page } from '../../atoms/Page'
-import { useProtocolDetails } from './hooks'
 import { ConfirmCancelModal } from '../../pages/Run/RunLog'
+import { useProtocolDetails } from './hooks'
+import { CommandList } from './CommandList'
 
 export function RunDetails(): JSX.Element | null {
   const { t } = useTranslation('run_details')
-  const { displayName, protocolData } = useProtocolDetails()
+  const { displayName } = useProtocolDetails()
   const {
     showConfirmation: showConfirmExit,
     confirm: confirmExit,
     cancel: cancelExit,
   } = useConditionalConfirm(() => {}, true)
-  if (protocolData == null) return null
 
   const cancelRunButton = (
     <PrimaryBtn
@@ -40,7 +37,7 @@ export function RunDetails(): JSX.Element | null {
       paddingRight={SPACING_2}
       paddingLeft={SPACING_2}
     >
-      Cancel Run
+      {t('cancel_run')}
     </PrimaryBtn>
   )
 
@@ -48,19 +45,10 @@ export function RunDetails(): JSX.Element | null {
     title: t('protocol_title', { protocol_name: displayName }),
     rightNode: cancelRunButton,
   }
-
   return (
     <Page titleBarProps={titleBarProps}>
       {showConfirmExit ? <ConfirmCancelModal onClose={cancelExit} /> : null}
-      <Flex flexDirection={DIRECTION_COLUMN}>
-        {'commands' in protocolData
-          ? protocolData.commands.map((command, index) => (
-              <Flex key={index}>
-                <Text>{command.commandType}</Text>
-              </Flex>
-            ))
-          : null}
-      </Flex>
+      <CommandList />
     </Page>
   )
 }

@@ -51,7 +51,12 @@ def subject() -> TestClass:
     )
 
 
-def test_serialize_length(subject: TestClass) -> None:
+def test_get_size(subject: TestClass) -> None:
+    """It should return the data size in bytes."""
+    assert subject.get_size() == 30
+
+
+def test_get_length(subject: TestClass) -> None:
     """It should serialize with correct data length in bytes."""
     assert len(subject.serialize()) == 30
 
@@ -72,6 +77,21 @@ def test_deserialize() -> None:
         ull=utils.UInt64Field(7),
         ll=utils.Int64Field(8),
     )
+
+
+def test_deserialize_ignore_extra(subject: TestClass) -> None:
+    """It should ignore extra bytes when deserializing."""
+    data = subject.serialize()
+    data += b"123212521"
+    new = TestClass.build(data)
+    assert new == subject
+
+
+def test_deserialize_not_enough_data(subject: TestClass) -> None:
+    """It should ignore extra bytes when deserializing."""
+    data = b"123212521"
+    with pytest.raises(utils.InvalidFieldException):
+        TestClass.build(data)
 
 
 def test_serdes(subject: TestClass) -> None:

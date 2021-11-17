@@ -46,6 +46,12 @@ class LabwareDefinitionDoesNotExistError(ProtocolEngineError):
     """An error raised when referencing a labware definition that does not exist."""
 
 
+class LabwareOffsetDoesNotExistError(ProtocolEngineError):
+    """An error raised when referencing a labware offset that does not exist."""
+
+    pass
+
+
 class LabwareIsNotTipRackError(ProtocolEngineError):
     """An error raised when trying to use a regular labware as a tip rack."""
 

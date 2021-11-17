@@ -25,7 +25,6 @@ export interface RunData {
   status: RunStatus
   actions: RunAction[]
   commands: RunCommandSummary[]
-  // TODO(bh, 11-12-2021): types for pipettes, labware
   pipettes: unknown[]
   labware: unknown[]
   protocolId?: string
@@ -81,7 +80,7 @@ export interface CreateRunActionData {
 }
 export interface RunCommandSummary {
   id: string
-  commandType: string
+  commandType: FullCommand['commandType']
   status: 'queued' | 'running' | 'succeeded' | 'failed'
 }
 

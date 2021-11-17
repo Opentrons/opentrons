@@ -1,8 +1,8 @@
 """Translate events from a legacy ``ProtocolContext`` into Protocol Engine commands."""
 
 from collections import defaultdict
-from datetime import datetime
 from typing import Dict, List
+from datetime import datetime
 
 from opentrons.types import MountType, DeckSlotName
 from opentrons.util.helpers import utc_now
@@ -38,6 +38,7 @@ class LegacyCommandMapper:
         self._command_count: Dict[str, int] = defaultdict(lambda: 0)
         self._labware_id_by_slot: Dict[DeckSlotName, str] = {}
         self._pipette_id_by_mount: Dict[MountType, str] = {}
+        self._module_id_by_slot: Dict[DeckSlotName, str] = {}
 
     def map_command(
         self, command: legacy_command_types.CommandMessage
@@ -88,15 +89,20 @@ class LegacyCommandMapper:
             return completed_command
 
     def map_labware_load(
-        self,
-        labware_load_info: LegacyLabwareLoadInfo,
+        self, labware_load_info: LegacyLabwareLoadInfo
     ) -> pe_commands.Command:
         """Map a legacy labware load to a ProtocolEngine command."""
         now = utc_now()
         count = self._command_count["LOAD_LABWARE"]
+        slot = labware_load_info.deck_slot
+        location: pe_types.LabwareLocation
+        if labware_load_info.on_module:
+            location = pe_types.ModuleLocation(moduleId=self._module_id_by_slot[slot])
+        else:
+            location = pe_types.DeckSlotLocation(slotName=slot)
+
         command_id = f"commands.LOAD_LABWARE-{count}"
         labware_id = f"labware-{count}"
-        slot_name = labware_load_info.deck_slot
 
         load_labware_command = pe_commands.LoadLabware(
             id=command_id,
@@ -105,7 +111,7 @@ class LegacyCommandMapper:
             startedAt=now,
             completedAt=now,
             params=pe_commands.LoadLabwareParams(
-                location=pe_types.DeckSlotLocation(slotName=slot_name),
+                location=location,
                 loadName=labware_load_info.labware_load_name,
                 namespace=labware_load_info.labware_namespace,
                 version=labware_load_info.labware_version,
@@ -115,12 +121,17 @@ class LegacyCommandMapper:
                 definition=LabwareDefinition.parse_obj(
                     labware_load_info.labware_definition
                 ),
-                calibration=pe_types.LabwareOffsetVector(x=0, y=0, z=0),
+                # fixme(mm, 2021-11-11): Labware offsets added to the ProtocolEngine
+                # need to apply to the legacy protocol somehow, and get fed back here.
+                offsetId=None,
             ),
         )
 
         self._command_count["LOAD_LABWARE"] = count + 1
-        self._labware_id_by_slot[slot_name] = labware_id
+        if isinstance(location, pe_types.DeckSlotLocation):
+            # TODO (spp, 2021-11-16): Account for labware on modules when mapping legacy
+            #  pipetting commands; either in self._labware_id_by_slot or something else
+            self._labware_id_by_slot[location.slotName] = labware_id
         return load_labware_command
 
     def map_instrument_load(
@@ -160,18 +171,7 @@ class LegacyCommandMapper:
         now = utc_now()
 
         count = self._command_count["LOAD_MODULE"]
-
-        location = module_load_info.location
-        if location is None:
-            # The list for valid names is from
-            # opentrons.protocols.geometry.module_geometry.resolve_module_model
-            if module_load_info.module_name.lower() in [
-                "thermocycler",
-                "thermocycler module",
-            ]:
-                location = 7
-            else:
-                raise Exception(f"{module_load_info.module_name} requires a location.")
+        module_id = f"module-{count}"
 
         load_module_command = pe_commands.LoadModule(
             id=f"commands.LOAD_MODULE-{count}",
@@ -182,14 +182,16 @@ class LegacyCommandMapper:
             params=pe_commands.LoadModuleParams(
                 model=module_load_info.module_name,
                 location=pe_types.DeckSlotLocation(
-                    slotName=DeckSlotName.from_primitive(location)
+                    slotName=module_load_info.deck_slot,
                 ),
+                moduleId=module_id,
             ),
             result=pe_commands.LoadModuleResult(
-                moduleId=f"module-{count}",
+                moduleId=module_id,
             ),
         )
         self._command_count["LOAD_MODULE"] = count + 1
+        self._module_id_by_slot[module_load_info.deck_slot] = module_id
         return load_module_command
 
     def _build_initial_command(
