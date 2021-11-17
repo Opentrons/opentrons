@@ -46,7 +46,8 @@ export const LabwarePositionCheck = (
     })
   }
   const labwarePositionCheckUtils = useLabwarePositionCheck(
-    addSavePositionCommandData
+    addSavePositionCommandData,
+    savePositionCommandData
   )
 
   if ('error' in labwarePositionCheckUtils) {

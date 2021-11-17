@@ -76,7 +76,7 @@ describe('LabwarePositionCheck', () => {
     )
 
     when(mockUseLabwarePositionCheck)
-      .calledWith(expect.anything())
+      .calledWith(expect.anything(), expect.anything())
       .mockReturnValue({} as any)
     when(mockIntroScreen).calledWith(anyProps()).mockReturnValue(null)
     when(mockGenericStepScreen).calledWith(anyProps()).mockReturnValue(null)

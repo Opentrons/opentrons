@@ -42,11 +42,11 @@ export interface TouchTipCommand extends CommonCommandInfo {
 export interface PickUpTipCommand extends CommonCommandInfo {
   id: string
   commandType: 'pickUpTip'
-  params: PipetteAccessParams
+  params: PipetteAccessParams & WellLocationParam
 }
 export interface DropTipCommand extends CommonCommandInfo {
   commandType: 'dropTip'
-  params: PipetteAccessParams
+  params: PipetteAccessParams & WellLocationParam
 }
 
 type AspDispAirgapParams = FlowRateParams &
@@ -71,13 +71,13 @@ interface VolumeParams {
 }
 
 interface WellLocationParam {
-  wellLocation: {
-    origin: 'top' | 'bottom'
-    offset: {
+  wellLocation?: {
+    origin?: 'top' | 'bottom'
+    offset?: {
       // mm
-      x: number
-      y: number
-      z: number
+      x?: number
+      y?: number
+      z?: number
     }
   }
 }
