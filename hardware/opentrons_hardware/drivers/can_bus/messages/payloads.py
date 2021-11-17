@@ -6,6 +6,8 @@ from opentrons_hardware import utils
 
 @dataclass
 class ResponsePayload(utils.BinarySerializable):
+    """A response payload."""
+
     node_id: utils.UInt8Field
 
 
