@@ -75,12 +75,9 @@ describe('GenericStepScreen', () => {
     mockUseLabwareIdsBySection.mockReturnValue({})
 
     when(mockUseIntroInfo).calledWith().mockReturnValue({
-      primaryTipRackSlot: '1',
-      primaryTipRackName: 'Opentrons 96 Filter Tip Rack 200 µL',
       primaryPipetteMount: 'left',
       secondaryPipetteMount: '',
-      numberOfTips: 1,
-      firstStepLabwareSlot: '2',
+      firstTiprackSlot: '2',
       sections: MOCK_SECTIONS,
     })
   })

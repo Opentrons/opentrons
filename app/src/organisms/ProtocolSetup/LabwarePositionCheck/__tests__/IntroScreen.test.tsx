@@ -97,12 +97,9 @@ describe('IntroScreen', () => {
     when(mockUseModuleRenderInfoById).calledWith().mockReturnValue({})
 
     when(mockUseIntroInfo).calledWith().mockReturnValue({
-      primaryTipRackSlot: '1',
-      primaryTipRackName: 'Opentrons 96 Tip Rack 300 µL',
       primaryPipetteMount: 'left',
       secondaryPipetteMount: '',
-      numberOfTips: 1,
-      firstStepLabwareSlot: '2',
+      firstTiprackSlot: '2',
       sections: MOCK_SECTIONS,
     })
     mockSectionList.mockReturnValue(<div>Mock Section List</div>)

@@ -8,6 +8,7 @@ import {
   Text,
 } from '@opentrons/components'
 import { Portal } from '../../../App/portal'
+import { useRestartRun } from '../../ProtocolUpload/hooks/useRestartRun'
 import { useLabwarePositionCheck } from './hooks'
 import { IntroScreen } from './IntroScreen'
 import { GenericStepScreen } from './GenericStepScreen'
@@ -15,18 +16,21 @@ import { SummaryScreen } from './SummaryScreen'
 import { RobotMotionLoadingModal } from './RobotMotionLoadingModal'
 
 import styles from '../styles.css'
+import type { SavePositionCommandData } from './types'
 
 interface LabwarePositionCheckModalProps {
   onCloseClick: () => unknown
 }
-
 export const LabwarePositionCheck = (
   props: LabwarePositionCheckModalProps
 ): JSX.Element | null => {
   const { t } = useTranslation(['labware_position_check', 'shared'])
-  const [savePositionCommandData, setSavePositionCommandData] = React.useState<{
-    [labwareId: string]: string[]
-  }>({})
+  const restartRun = useRestartRun()
+  const [
+    savePositionCommandData,
+    setSavePositionCommandData,
+  ] = React.useState<SavePositionCommandData>({})
+  const [isRestartingRun, setIsRestartingRun] = React.useState<boolean>(false)
 
   // at the end of LPC, each labwareId will have 2 associated save position command ids which will be used to calculate the labware offsets
   const addSavePositionCommandData = (
@@ -46,6 +50,11 @@ export const LabwarePositionCheck = (
   )
 
   if ('error' in labwarePositionCheckUtils) {
+    // show the modal for 5 seconds, then unmount and restart the run
+    if (!isRestartingRun) {
+      setTimeout(() => restartRun(), 5000)
+      !isRestartingRun && setIsRestartingRun(true)
+    }
     const { error } = labwarePositionCheckUtils
     return (
       <Portal level="top">
@@ -94,11 +103,9 @@ export const LabwarePositionCheck = (
           },
         }}
       >
-        {isLoading ? (
-          <RobotMotionLoadingModal title={'Moving to Slot 7'} />
-        ) : null}
+        {isLoading ? <RobotMotionLoadingModal title={titleText} /> : null}
         {isComplete ? (
-          <SummaryScreen />
+          <SummaryScreen savePositionCommandData={savePositionCommandData} />
         ) : currentCommandIndex !== 0 ? (
           <GenericStepScreen
             selectedStep={currentStep}

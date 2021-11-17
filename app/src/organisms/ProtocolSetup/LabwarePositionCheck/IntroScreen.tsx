@@ -40,7 +40,7 @@ export const IntroScreen = (props: {
   const {
     primaryPipetteMount,
     secondaryPipetteMount,
-    firstStepLabwareSlot,
+    firstTiprackSlot,
     sections,
   } = introInfo
 
@@ -80,13 +80,13 @@ export const IntroScreen = (props: {
       <Flex justifyContent={JUSTIFY_CENTER} marginBottom={SPACING_4}>
         <PrimaryBtn
           title={t('start_position_check', {
-            initial_labware_slot: firstStepLabwareSlot,
+            initial_labware_slot: firstTiprackSlot,
           })}
           backgroundColor={C_BLUE}
           onClick={props.beginLPC}
         >
           {t('start_position_check', {
-            initial_labware_slot: firstStepLabwareSlot,
+            initial_labware_slot: firstTiprackSlot,
           })}
         </PrimaryBtn>
       </Flex>
