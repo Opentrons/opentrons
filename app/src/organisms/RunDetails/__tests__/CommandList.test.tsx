@@ -116,20 +116,7 @@ describe('CommandList', () => {
     ).toEqual(1)
   })
   it('renders the protocol failed banner', () => {
-    mockUseCurrentProtocolRun.mockReturnValue({
-      runRecord: {
-        // @ts-expect-error not a full match of RunData type
-        data: {
-          commands: [
-            {
-              commandType: 'loadPipette',
-              id: 'commands.LOAD_PIPETTE-0',
-              status: 'failed',
-            },
-          ],
-        },
-      },
-    })
+    mockUseRunStatus.mockReturnValue('failed')
     mockAlertItem.mockReturnValue(<div>Protocol Run Failed</div>)
     const { getByText } = render()
     expect(getByText('Protocol Run Failed')).toHaveStyle(

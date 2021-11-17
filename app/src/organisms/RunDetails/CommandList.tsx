@@ -19,6 +19,7 @@ import {
   C_NEAR_WHITE,
   TEXT_TRANSFORM_CAPITALIZE,
   AlertItem,
+  Box,
 } from '@opentrons/components'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { useProtocolDetails } from './hooks'
@@ -104,10 +105,8 @@ export function CommandList(): JSX.Element | null {
   const runStatus = useRunStatus()
   if (protocolData == null || runStatus == null) return null
 
-  const isCommandFailed =
-    currentCommandList?.some(command => command.status === 'failed') === true
   let alertItemTitle
-  if (isCommandFailed) {
+  if (runStatus === 'failed') {
     alertItemTitle = t('protocol_run_failed')
   }
   if (runStatus === 'stop-requested') {
@@ -120,21 +119,19 @@ export function CommandList(): JSX.Element | null {
   return (
     <React.Fragment>
       <Flex flexDirection={DIRECTION_COLUMN} flex={'auto'}>
-        {isCommandFailed ||
+        {runStatus === 'failed' ||
         runStatus === 'succeeded' ||
         runStatus === 'stop-requested' ? (
-          <Flex
-            padding={SPACING_2}
-            flexDirection={DIRECTION_COLUMN}
-            flex="auto"
-          >
+          <Box padding={SPACING_2}>
             <AlertItem
               type={
-                isCommandFailed || runStatus === 'failed' ? 'error' : 'success'
+                runStatus === 'stop-requested' || runStatus === 'failed'
+                  ? 'error'
+                  : 'success'
               }
               title={alertItemTitle}
             />
-          </Flex>
+          </Box>
         ) : null}
         <Flex
           paddingLeft={SPACING_2}
