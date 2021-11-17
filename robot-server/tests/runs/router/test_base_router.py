@@ -46,6 +46,37 @@ from robot_server.runs.router.base_router import (
 )
 
 
+LABWARE_OFFSET_REQUESTS = [
+    pe_types.LabwareOffsetCreate(
+        definitionUri="namespace_1/load_name_1/123",
+        location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
+    ),
+    pe_types.LabwareOffsetCreate(
+        definitionUri="namespace_2/load_name_2/123",
+        location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
+        vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
+    ),
+]
+
+RESOLVED_LABWARE_OFFSETS = [
+    pe_types.LabwareOffset(
+        id="labware-offset-1-id",
+        createdAt=datetime(year=2021, month=1, day=1),
+        definitionUri="namespace_1/load_name_1/1",
+        location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
+    ),
+    pe_types.LabwareOffset(
+        id="labware-offset-2-id",
+        createdAt=datetime(year=2021, month=1, day=1),
+        definitionUri="namespace_2/load_name_2/2",
+        location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
+        vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
+    ),
+]
+
+
 async def test_create_run(
     decoy: Decoy,
     task_runner: TaskRunner,
@@ -56,35 +87,6 @@ async def test_create_run(
     """It should be able to create a basic run."""
     run_id = "run-id"
     run_created_at = datetime(year=2021, month=1, day=1)
-
-    labware_offset_requests = [
-        pe_types.LabwareOffsetCreate(
-            definitionUri="namespace_1/load_name_1/123",
-            location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-            vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
-        ),
-        pe_types.LabwareOffsetCreate(
-            definitionUri="namespace_2/load_name_2/123",
-            location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
-            vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
-        ),
-    ]
-    resolved_labware_offsets = [
-        pe_types.LabwareOffset(
-            id="labware-offset-1-id",
-            createdAt=datetime(year=2021, month=1, day=1),
-            definitionUri="namespace_1/load_name_1/1",
-            location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-            vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
-        ),
-        pe_types.LabwareOffset(
-            id="labware-offset-2-id",
-            createdAt=datetime(year=2021, month=1, day=1),
-            definitionUri="namespace_2/load_name_2/2",
-            location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
-            vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
-        ),
-    ]
 
     expected_run = RunResource(
         run_id=run_id,
@@ -103,7 +105,7 @@ async def test_create_run(
         commands=[],
         pipettes=[],
         labware=[],
-        labwareOffsets=resolved_labware_offsets,
+        labwareOffsets=RESOLVED_LABWARE_OFFSETS,
     )
 
     engine_state = decoy.mock(cls=StateView)
@@ -113,7 +115,7 @@ async def test_create_run(
     decoy.when(engine_state.pipettes.get_all()).then_return([])
     decoy.when(engine_state.labware.get_all()).then_return([])
     decoy.when(engine_state.labware.get_labware_offsets()).then_return(
-        resolved_labware_offsets
+        RESOLVED_LABWARE_OFFSETS
     )
     decoy.when(engine_state.commands.get_status()).then_return(
         pe_types.EngineStatus.IDLE
@@ -131,7 +133,7 @@ async def test_create_run(
 
     result = await create_run(
         request_body=RequestModel(
-            data=RunCreate(labwareOffsets=labware_offset_requests)
+            data=RunCreate(labwareOffsets=LABWARE_OFFSET_REQUESTS)
         ),
         run_view=run_view,
         run_store=run_store,
@@ -146,7 +148,7 @@ async def test_create_run(
     decoy.verify(
         # It should have added each requested labware offset to the engine,
         # in the exact order they appear in the request.
-        *[engine_store.engine.add_labware_offset(r) for r in labware_offset_requests],
+        *[engine_store.engine.add_labware_offset(r) for r in LABWARE_OFFSET_REQUESTS],
         task_runner.run(engine_store.runner.join),
         run_store.upsert(run=expected_run),
     )
@@ -162,35 +164,6 @@ async def test_create_protocol_run(
 ) -> None:
     """It should be able to create a protocol run."""
     run_created_at = datetime(year=2021, month=1, day=1)
-
-    labware_offset_requests = [
-        pe_types.LabwareOffsetCreate(
-            definitionUri="namespace_1/load_name_1/123",
-            location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-            vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
-        ),
-        pe_types.LabwareOffsetCreate(
-            definitionUri="namespace_2/load_name_2/123",
-            location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
-            vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
-        ),
-    ]
-    resolved_labware_offsets = [
-        pe_types.LabwareOffset(
-            id="labware-offset-1-id",
-            createdAt=datetime(year=2021, month=1, day=1),
-            definitionUri="namespace_1/load_name_1/1",
-            location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-            vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
-        ),
-        pe_types.LabwareOffset(
-            id="labware-offset-2-id",
-            createdAt=datetime(year=2021, month=1, day=1),
-            definitionUri="namespace_2/load_name_2/2",
-            location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
-            vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
-        ),
-    ]
 
     run = RunResource(
         run_id="run-id",
@@ -215,7 +188,7 @@ async def test_create_protocol_run(
         commands=[],
         pipettes=[],
         labware=[],
-        labwareOffsets=resolved_labware_offsets,
+        labwareOffsets=RESOLVED_LABWARE_OFFSETS,
     )
 
     decoy.when(protocol_store.get(protocol_id="protocol-id")).then_return(
@@ -246,7 +219,7 @@ async def test_create_protocol_run(
         request_body=RequestModel(
             data=RunCreate(
                 protocolId="protocol-id",
-                labwareOffsets=labware_offset_requests,
+                labwareOffsets=LABWARE_OFFSET_REQUESTS,
             )
         ),
         run_view=run_view,
@@ -263,7 +236,7 @@ async def test_create_protocol_run(
     decoy.verify(
         # It should have added each requested labware offset to the engine,
         # in the exact order they appear in the request.
-        *[engine_store.engine.add_labware_offset(r) for r in labware_offset_requests],
+        *[engine_store.engine.add_labware_offset(r) for r in LABWARE_OFFSET_REQUESTS],
         engine_store.runner.load(protocol_resource),
         task_runner.run(engine_store.runner.join),
         run_store.upsert(run=run),
