@@ -146,9 +146,7 @@ async def test_create_run(
     decoy.verify(
         # It should have added each requested labware offset to the engine,
         # in the exact order they appear in the request.
-        *[engine_store.engine.add_labware_offset(r) for r in labware_offset_requests]
-    )
-    decoy.verify(
+        *[engine_store.engine.add_labware_offset(r) for r in labware_offset_requests],
         task_runner.run(engine_store.runner.join),
         run_store.upsert(run=expected_run),
     )
@@ -265,10 +263,7 @@ async def test_create_protocol_run(
     decoy.verify(
         # It should have added each requested labware offset to the engine,
         # in the exact order they appear in the request.
-        *[engine_store.engine.add_labware_offset(r) for r in labware_offset_requests]
-    )
-
-    decoy.verify(
+        *[engine_store.engine.add_labware_offset(r) for r in labware_offset_requests],
         engine_store.runner.load(protocol_resource),
         task_runner.run(engine_store.runner.join),
         run_store.upsert(run=run),
