@@ -18,8 +18,8 @@ interface ProtocolMetadata {
 
 export function useProtocolMetadata(): ProtocolMetadata {
   const currentProtocolRun = useCurrentProtocolRun()
-  const protocolMetadata = currentProtocolRun.protocolRecord?.data.metadata
-  const creationMethod = currentProtocolRun.protocolRecord?.data.protocolType
+  const protocolMetadata = currentProtocolRun.protocolRecord?.data?.metadata
+  const creationMethod = currentProtocolRun.protocolRecord?.data?.protocolType
   const author = protocolMetadata?.author
   const description = protocolMetadata?.description
   const lastUpdated = protocolMetadata?.lastModified

@@ -86,13 +86,6 @@ describe('ProtocolUpload', () => {
     when(mockUseProtocolDetails)
       .calledWith()
       .mockReturnValue({} as any)
-    when(mockUseCurrentProtocolRun)
-      .calledWith()
-      .mockReturnValue({
-        protocolRecord: { data: { analyses: [] } },
-        runRecord: {},
-        createProtocolRun: jest.fn(),
-      } as any)
   })
 
   afterEach(() => {
@@ -115,6 +108,13 @@ describe('ProtocolUpload', () => {
   })
   it('renders Protocol Setup if file loaded', () => {
     getProtocolFile.mockReturnValue(withModulesProtocol as any)
+    when(mockUseCurrentProtocolRun)
+      .calledWith()
+      .mockReturnValue({
+        protocolRecord: { data: { analyses: [] } },
+        runRecord: {},
+        createProtocolRun: jest.fn(),
+      } as any)
     const { queryByRole, getByText } = render()[0]
 
     expect(queryByRole('button', { name: 'Choose File...' })).toBeNull()
@@ -123,17 +123,33 @@ describe('ProtocolUpload', () => {
 
   it('opens up the confirm close protocol modal when clicked', () => {
     getProtocolFile.mockReturnValue(withModulesProtocol as any)
+    when(mockUseCurrentProtocolRun)
+      .calledWith()
+      .mockReturnValue({
+        protocolRecord: {},
+        runRecord: {},
+        createProtocolRun: jest.fn(),
+      } as any)
     const { getByRole, getByText } = render()[0]
+
     fireEvent.click(getByRole('button', { name: 'close' }))
     getByText('mock confirm exit protocol upload modal')
   })
 
   it('closes the confirm close protocol modal when Yes, close now is clicked', () => {
     getProtocolFile.mockReturnValue(withModulesProtocol as any)
+    when(mockUseCurrentProtocolRun)
+      .calledWith()
+      .mockReturnValue({
+        protocolRecord: {},
+        runRecord: {},
+        createProtocolRun: jest.fn(),
+      } as any)
     const mockCloseProtocolRun = jest.fn()
     when(mockUseCloseProtocolRun)
       .calledWith()
       .mockReturnValue(mockCloseProtocolRun)
+
     const [{ getByRole, getByText }, store] = render()
     fireEvent.click(getByRole('button', { name: 'close' }))
     const mockCloseModal = getByText('mock confirm exit protocol upload modal')
