@@ -168,8 +168,8 @@ class ClearAllMoveGroupsRequest:  # noqa: D101
 
 @dataclass
 class MoveGroupCompleted:  # noqa: D101
-    payload: payloads.MoveGroupCompletedPayload
-    payload_type: Type[BinarySerializable] = payloads.MoveGroupCompletedPayload
+    payload: payloads.MoveGroupResponsePayload
+    payload_type: Type[BinarySerializable] = payloads.MoveGroupResponsePayload
     message_id: Literal[MessageId.move_group_completed] = MessageId.move_group_completed
 
 

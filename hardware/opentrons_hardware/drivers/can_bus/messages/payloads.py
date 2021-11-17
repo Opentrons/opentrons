@@ -5,6 +5,11 @@ from opentrons_hardware import utils
 
 
 @dataclass
+class ResponsePayload(utils.BinarySerializable):
+    node_id: utils.UInt8Field
+
+
+@dataclass
 class EmptyPayload(utils.BinarySerializable):
     """An empty payload."""
 
@@ -12,15 +17,14 @@ class EmptyPayload(utils.BinarySerializable):
 
 
 @dataclass
-class DeviceInfoResponsePayload(utils.BinarySerializable):
+class DeviceInfoResponsePayload(ResponsePayload):
     """Device info response."""
 
-    node_id: utils.UInt8Field
     version: utils.UInt32Field
 
 
 @dataclass
-class GetStatusResponsePayload(utils.BinarySerializable):
+class GetStatusResponsePayload(ResponsePayload):
     """Get status response."""
 
     status: utils.UInt8Field
@@ -35,7 +39,7 @@ class MoveRequestPayload(utils.BinarySerializable):
 
 
 @dataclass
-class GetSpeedResponsePayload(utils.BinarySerializable):
+class GetSpeedResponsePayload(ResponsePayload):
     """Get speed response."""
 
     mm_sec: utils.UInt32Field
@@ -49,7 +53,7 @@ class WriteToEEPromRequestPayload(utils.BinarySerializable):
 
 
 @dataclass
-class ReadFromEEPromResponsePayload(utils.BinarySerializable):
+class ReadFromEEPromResponsePayload(ResponsePayload):
     """Read from ee prom response."""
 
     serial_number: utils.UInt8Field
@@ -58,6 +62,13 @@ class ReadFromEEPromResponsePayload(utils.BinarySerializable):
 @dataclass
 class MoveGroupRequestPayload(utils.BinarySerializable):
     """A payload with a group id."""
+
+    group_id: utils.UInt8Field
+
+
+@dataclass
+class MoveGroupResponsePayload(ResponsePayload):
+    """A response payload with a group id."""
 
     group_id: utils.UInt8Field
 
@@ -79,12 +90,11 @@ class AddLinearMoveRequestPayload(AddToMoveGroupRequestPayload):
 
 
 @dataclass
-class GetMoveGroupResponsePayload(MoveGroupRequestPayload):
+class GetMoveGroupResponsePayload(MoveGroupResponsePayload):
     """Response to request to get a move group."""
 
     num_moves: utils.UInt8Field
     total_duration: utils.UInt32Field
-    node_id: utils.UInt8Field
 
 
 @dataclass
@@ -96,17 +106,9 @@ class ExecuteMoveGroupRequestPayload(MoveGroupRequestPayload):
 
 
 @dataclass
-class MoveGroupCompletedPayload(MoveGroupRequestPayload):
-    """Notification of a completed move group."""
-
-    node_id: utils.UInt8Field
-
-
-@dataclass
-class MoveCompletedPayload(MoveGroupRequestPayload):
+class MoveCompletedPayload(MoveGroupResponsePayload):
     """Notification of a completed move group."""
 
     seq_id: utils.UInt8Field
     current_position: utils.UInt32Field
     ack_id: utils.UInt8Field
-    node_id: utils.UInt8Field
