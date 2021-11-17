@@ -15,6 +15,7 @@ import { useCurrentProtocolRun } from '../../../ProtocolUpload/hooks'
 import { getLabwareLocation } from '../../utils/getLabwareLocation'
 import { getModuleLocation } from '../../utils/getModuleLocation'
 import { useSteps } from './useSteps'
+import { getModuleInitialLoadInfo } from '../../utils/getModuleInitialLoadInfo'
 import type {
   Command,
   ProtocolFile,
@@ -64,12 +65,14 @@ const useLpcCtaText = (command: LabwarePositionCheckCommand): string => {
         next_slot:
           'slotName' in labwareLocation
             ? labwareLocation.slotName
-            : getModuleLocation(labwareLocation.moduleId, commands),
+            : getModuleInitialLoadInfo(labwareLocation.moduleId, commands)
+                .location.slotName,
       })
     }
     case 'thermocycler/openLid': {
       const moduleId = command.params.moduleId
-      const slot = getModuleLocation(moduleId, commands)
+      const slot = getModuleInitialLoadInfo(moduleId, commands).location
+        .slotName
       return t('confirm_position_and_move', {
         next_slot: slot,
       })
@@ -100,7 +103,8 @@ export const useTitleText = (
   const slot =
     'slotName' in labwareLocation
       ? labwareLocation.slotName
-      : getModuleLocation(labwareLocation.moduleId, commands)
+      : getModuleInitialLoadInfo(labwareLocation.moduleId, commands).location
+          .slotName
 
   if (loading) {
     switch (command.commandType) {

@@ -8,7 +8,8 @@ import {
   ProtocolFile,
 } from '@opentrons/shared-data'
 import { LoadLabwareCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-import { getModuleLocation } from './getModuleLocation'
+import { getModuleInitialLoadInfo } from './getModuleInitialLoadInfo'
+import { AttachedModule } from '../../../redux/modules/types'
 
 export interface ModuleRenderInfoById {
   [moduledId: string]: {
@@ -18,12 +19,14 @@ export interface ModuleRenderInfoById {
     moduleDef: ModuleDefinition
     nestedLabwareDef: LabwareDefinition2 | null
     nestedLabwareId: string | null
+    protocolLoadOrder: number
   }
 }
 
 export const getModuleRenderInfo = (
   protocolData: ProtocolFile<{}>,
-  deckDef: DeckDefinition
+  deckDef: DeckDefinition,
+  attachedModules: AttachedModule[]
 ): ModuleRenderInfoById => {
   if (protocolData != null && 'modules' in protocolData) {
     return reduce(
@@ -47,17 +50,22 @@ export const getModuleRenderInfo = (
           nestedLabware != null
             ? protocolData.labwareDefinitions[nestedLabware.definitionId]
             : null
-        let slotNumber = getModuleLocation(moduleId, protocolData.commands)
+        const moduleInitialLoadInfo = getModuleInitialLoadInfo(
+          moduleId,
+          protocolData.commands
+        )
+        let slotName = moduleInitialLoadInfo.location.slotName
+        const { protocolLoadOrder } = moduleInitialLoadInfo
         // Note: this is because PD represents the slot the TC sits in as a made up slot. We want it to be rendered in slot 7
-        if (slotNumber === SPAN7_8_10_11_SLOT) {
-          slotNumber = '7'
+        if (slotName === SPAN7_8_10_11_SLOT) {
+          slotName = '7'
         }
         const slotPosition = deckDef.locations.orderedSlots.find(
-          slot => slot.id === slotNumber
+          slot => slot.id === slotName
         )?.position
         if (slotPosition == null) {
           console.error(
-            `expected to find a slot position for slot ${slotNumber} in the standard OT-2 deck definition, but could not`
+            `expected to find a slot position for slot ${slotName} in the standard OT-2 deck definition, but could not`
           )
           return {
             ...acc,
@@ -68,13 +76,22 @@ export const getModuleRenderInfo = (
               moduleDef,
               nestedLabwareDef,
               nestedLabwareId,
+              protocolLoadOrder,
             },
           }
         }
         const [x, y, z] = slotPosition
         return {
           ...acc,
-          [moduleId]: { x, y, z, moduleDef, nestedLabwareDef, nestedLabwareId },
+          [moduleId]: {
+            x,
+            y,
+            z,
+            moduleDef,
+            nestedLabwareDef,
+            nestedLabwareId,
+            protocolLoadOrder,
+          },
         }
       },
       {}
