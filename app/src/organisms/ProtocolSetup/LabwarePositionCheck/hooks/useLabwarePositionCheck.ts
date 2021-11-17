@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { v4 as uuidv4 } from 'uuid'
 import {
@@ -11,6 +12,9 @@ import { useProtocolDetails } from '../../../RunDetails/hooks'
 import { useCurrentProtocolRun } from '../../../ProtocolUpload/hooks'
 import { getLabwareLocation } from '../../utils/getLabwareLocation'
 import { getModuleLocation } from '../../utils/getModuleLocation'
+import { sendModuleCommand } from '../../../../redux/modules'
+import { getConnectedRobotName } from '../../../../redux/robot/selectors'
+
 import type {
   Command,
   ProtocolFile,
@@ -179,6 +183,8 @@ export function useLabwarePositionCheck(
   const host = useHost()
   const { runRecord: currentRun } = useCurrentProtocolRun()
   const LPCSteps = useSteps()
+  const dispatch = useDispatch()
+  const robotName = useSelector(getConnectedRobotName)
 
   const LPCCommands = LPCSteps.reduce<LabwarePositionCheckCommand[]>(
     (steps, currentStep) => {
@@ -342,14 +348,26 @@ export function useLabwarePositionCheck(
     setIsLoading(true)
     // execute prep commands
     prepCommands.forEach(prepCommand => {
-      createCommand(
-        host as HostConfig,
-        currentRun?.data?.id as string,
-        createCommandData(prepCommand)
-      ).catch((e: Error) => {
-        console.error(`error issuing command to robot: ${e.message}`)
-        setError(e)
-      })
+      // 11/18/21 intercept TCOpenLidCommand and use legacy modules endpoint
+      // delete this once PE supports themocycler open lid command
+      if (prepCommand.commandType === 'thermocycler/openLid') {
+        dispatch(
+          sendModuleCommand(
+            robotName as string,
+            prepCommand.result?.moduleId,
+            'open'
+          )
+        )
+      } else {
+        createCommand(
+          host as HostConfig,
+          currentRun?.data?.id as string,
+          createCommandData(prepCommand)
+        ).catch((e: Error) => {
+          console.error(`error issuing command to robot: ${e.message}`)
+          setError(e)
+        })
+      }
     })
     // issue first movement command
     createCommand(
