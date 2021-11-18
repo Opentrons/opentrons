@@ -20,7 +20,6 @@ import {
   mockThermocycler as mockThermocyclerFixture,
   mockMagneticModule as mockMagneticModuleFixture,
 } from '../../../../../redux/modules/__fixtures__/index'
-import * as robotSelectors from '@opentrons/app/src/redux/robot/selectors'
 import { getAttachedModules } from '../../../../../redux/modules'
 import { useModuleRenderInfoById } from '../../../hooks'
 import { useMissingModuleIds } from '../../hooks'
@@ -29,7 +28,6 @@ import { ModuleSetup } from '..'
 import { ModuleInfo } from '../ModuleInfo'
 import { ApiSessionModule } from '@opentrons/app/src/redux/robot'
 
-jest.mock('@opentrons/app/src/redux/robot/selectors')
 jest.mock('../../../../../redux/modules')
 jest.mock('../ModuleInfo')
 jest.mock('../../hooks')
@@ -67,9 +65,6 @@ const mockRobotWorkSpace = RobotWorkSpace as jest.MockedFunction<
 >
 const mockUseModuleRenderInfoById = useModuleRenderInfoById as jest.MockedFunction<
   typeof useModuleRenderInfoById
->
-const mockGetModulesByProtocolLoadOrder = robotSelectors.getModulesByProtocolLoadOrder as jest.MockedFunction<
-  typeof robotSelectors.getModulesByProtocolLoadOrder
 >
 
 const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
@@ -127,20 +122,6 @@ const mockTCModule = {
   twoDimensionalRendering: { children: [] },
 }
 
-const mockMagneticModule1 = {
-  model: 'magneticModuleV1' as ApiSessionModule['model'],
-  _id: 123,
-  protocolLoadOrder: 0,
-  slot: '5' as ApiSessionModule['slot'],
-}
-
-const mockMagneticModule2 = {
-  model: 'magneticModuleV1' as ApiSessionModule['model'],
-  _id: 456,
-  protocolLoadOrder: 1,
-  slot: '3' as ApiSessionModule['slot'],
-}
-
 describe('ModuleSetup', () => {
   let props: React.ComponentProps<typeof ModuleSetup>
   beforeEach(() => {
@@ -148,10 +129,6 @@ describe('ModuleSetup', () => {
       robotName: MOCK_ROBOT_NAME,
       expandLabwareSetupStep: () => {},
     }
-    mockGetModulesByProtocolLoadOrder.mockReturnValue([
-      mockMagneticModule1,
-      mockMagneticModule2,
-    ])
 
     when(mockInferModuleOrientationFromXCoordinate)
       .calledWith(expect.anything())
@@ -212,6 +189,7 @@ describe('ModuleSetup', () => {
           moduleDef: mockMagneticModule as any,
           nestedLabwareDef: null,
           nestedLabwareId: null,
+          protocolLoadOrder: 1,
         },
         [mockMagneticModule.moduleId]: {
           x: MOCK_MAGNETIC_MODULE_COORDS[0],
@@ -220,6 +198,7 @@ describe('ModuleSetup', () => {
           moduleDef: mockMagneticModule as any,
           nestedLabwareDef: null,
           nestedLabwareId: null,
+          protocolLoadOrder: 0,
         },
       })
 
@@ -249,6 +228,8 @@ describe('ModuleSetup', () => {
           moduleDef: mockMagneticModule as any,
           nestedLabwareDef: null,
           nestedLabwareId: null,
+          protocolLoadOrder: 0,
+
         },
         [mockTCModule.moduleId]: {
           x: MOCK_TC_COORDS[0],
@@ -257,6 +238,8 @@ describe('ModuleSetup', () => {
           moduleDef: mockTCModule,
           nestedLabwareDef: null,
           nestedLabwareId: null,
+          protocolLoadOrder: 1,
+
         },
       })
 
@@ -303,6 +286,8 @@ describe('ModuleSetup', () => {
           moduleDef: mockMagneticModule as any,
           nestedLabwareDef: null,
           nestedLabwareId: null,
+          protocolLoadOrder: 1,
+
         },
         [mockTCModule.moduleId]: {
           x: MOCK_TC_COORDS[0],
@@ -311,6 +296,8 @@ describe('ModuleSetup', () => {
           moduleDef: mockTCModule,
           nestedLabwareDef: null,
           nestedLabwareId: null,
+          protocolLoadOrder: 0,
+
         },
       })
     when(mockGetAttachedModules)

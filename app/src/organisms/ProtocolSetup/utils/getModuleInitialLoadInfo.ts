@@ -25,7 +25,7 @@ export const getModuleInitialLoadInfo = (
     )
   }
 
-  const loadOrder = commands
+  const protocolLoadOrder = commands
     .slice(0, moduleLoadIndex)
     .reduce(
       (moduleLoadCount, command) =>
