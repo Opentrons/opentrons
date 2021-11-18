@@ -25,6 +25,7 @@ export interface RunData {
   status: RunStatus
   actions: RunAction[]
   commands: RunCommandSummary[]
+  errors: Error[]
   pipettes: unknown[]
   labware: unknown[]
   protocolId?: string
@@ -45,7 +46,7 @@ export interface LabwareOffset {
 
 interface ResourceLink {
   href: string
-  meta?: Partial<{ [key: string]: string | null | undefined }>
+  meta?: Partial<{ [key: string]: string | null | undefined }> | null
 }
 
 type ResourceLinks = Record<string, ResourceLink | string | null | undefined>
@@ -98,4 +99,11 @@ export interface CommandsData {
 export interface CommandDetail {
   data: FullCommand
   links: ResourceLinks | null
+}
+
+export interface Error {
+  id: string
+  errorType: string
+  createdAt: string
+  detail: string
 }

@@ -5,11 +5,14 @@ import {
   CommandDetail,
   RUN_ACTION_TYPE_PLAY,
   RUN_ACTION_TYPE_PAUSE,
+  RUN_ACTION_TYPE_STOP,
   Run,
   RunData,
   RUN_STATUS_PAUSED,
   RUN_STATUS_RUNNING,
   RUN_STATUS_SUCCEEDED,
+  RUN_STATUS_FAILED,
+  RUN_STATUS_STOPPED,
 } from '@opentrons/api-client'
 import {
   useCommandQuery,
@@ -22,7 +25,6 @@ import {
   useCurrentProtocolRun,
   UseCurrentProtocolRun,
 } from '../../ProtocolUpload/hooks/useCurrentProtocolRun'
-import { useCurrentRunId } from '../../ProtocolUpload/hooks/useCurrentRunId'
 
 import {
   useRunCompleteTime,
@@ -35,14 +37,10 @@ import {
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../ProtocolUpload/hooks/useCloneRun')
 jest.mock('../../ProtocolUpload/hooks/useCurrentProtocolRun')
-jest.mock('../../ProtocolUpload/hooks/useCurrentRunId')
 
 const mockUseCloneRun = useCloneRun as jest.MockedFunction<typeof useCloneRun>
 const mockUseCurrentProtocolRun = useCurrentProtocolRun as jest.MockedFunction<
   typeof useCurrentProtocolRun
->
-const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
-  typeof useCurrentRunId
 >
 const mockUseCommandQuery = useCommandQuery as jest.MockedFunction<
   typeof useCommandQuery
@@ -75,6 +73,7 @@ const mockPausedRun: RunData = {
     },
   ],
   commands: [],
+  errors: [],
   pipettes: [],
   labware: [],
 }
@@ -102,11 +101,80 @@ const mockRunningRun: RunData = {
     },
   ],
   commands: [],
+  errors: [],
   pipettes: [],
   labware: [],
 }
 
-const mockCompletedRun: RunData = {
+const mockFailedRun: RunData = {
+  id: RUN_ID_2,
+  createdAt: '2021-10-07T18:44:49.366581+00:00',
+  status: RUN_STATUS_FAILED,
+  protocolId: PROTOCOL_ID,
+  actions: [
+    {
+      id: '1',
+      createdAt: '2021-10-25T12:54:53.366581+00:00',
+      actionType: RUN_ACTION_TYPE_PLAY,
+    },
+    {
+      id: '2',
+      createdAt: '2021-10-25T13:23:31.366581+00:00',
+      actionType: RUN_ACTION_TYPE_PAUSE,
+    },
+    {
+      id: '3',
+      createdAt: '2021-10-25T13:26:42.366581+00:00',
+      actionType: RUN_ACTION_TYPE_PLAY,
+    },
+  ],
+  commands: [{ id: COMMAND_ID, commandType: 'custom', status: 'succeeded' }],
+  errors: [
+    {
+      id: '5',
+      errorType: 'RuntimeError',
+      createdAt: 'noon forty-five',
+      detail: 'this run failed',
+    },
+  ],
+  pipettes: [],
+  labware: [],
+}
+
+const mockStoppedRun: RunData = {
+  id: RUN_ID_2,
+  createdAt: '2021-10-07T18:44:49.366581+00:00',
+  status: RUN_STATUS_STOPPED,
+  protocolId: PROTOCOL_ID,
+  actions: [
+    {
+      id: '1',
+      createdAt: '2021-10-25T12:54:53.366581+00:00',
+      actionType: RUN_ACTION_TYPE_PLAY,
+    },
+    {
+      id: '2',
+      createdAt: '2021-10-25T13:23:31.366581+00:00',
+      actionType: RUN_ACTION_TYPE_PAUSE,
+    },
+    {
+      id: '3',
+      createdAt: '2021-10-25T13:26:42.366581+00:00',
+      actionType: RUN_ACTION_TYPE_PLAY,
+    },
+    {
+      id: '4',
+      createdAt: '2021-10-25T13:58:22.366581+00:00',
+      actionType: RUN_ACTION_TYPE_STOP,
+    },
+  ],
+  commands: [{ id: COMMAND_ID, commandType: 'custom', status: 'succeeded' }],
+  errors: [],
+  pipettes: [],
+  labware: [],
+}
+
+const mockSucceededRun: RunData = {
   id: RUN_ID_2,
   createdAt: '2021-10-07T18:44:49.366581+00:00',
   status: RUN_STATUS_SUCCEEDED,
@@ -129,6 +197,7 @@ const mockCompletedRun: RunData = {
     },
   ],
   commands: [{ id: COMMAND_ID, commandType: 'custom', status: 'succeeded' }],
+  errors: [],
   pipettes: [],
   labware: [],
 }
@@ -151,7 +220,11 @@ describe('useRunControls hook', () => {
     const mockStopRun = jest.fn()
     const mockCloneRun = jest.fn()
 
-    when(mockUseCurrentRunId).calledWith().mockReturnValue('1')
+    when(mockUseCurrentProtocolRun)
+      .calledWith()
+      .mockReturnValue({
+        runRecord: { data: mockPausedRun },
+      } as UseCurrentProtocolRun)
     when(mockUseRunActionMutations).calledWith('1').mockReturnValue({
       playRun: mockPlayRun,
       pauseRun: mockPauseRun,
@@ -161,11 +234,11 @@ describe('useRunControls hook', () => {
 
     const { result } = renderHook(useRunControls)
 
-    act(() => result.current.usePlay())
+    act(() => result.current.play())
     expect(mockPlayRun).toHaveBeenCalledTimes(1)
-    act(() => result.current.usePause())
+    act(() => result.current.pause())
     expect(mockPauseRun).toHaveBeenCalledTimes(1)
-    act(() => result.current.useReset())
+    act(() => result.current.reset())
     expect(mockCloneRun).toHaveBeenCalledTimes(1)
   })
 })
@@ -176,7 +249,11 @@ describe('useRunStatus hook', () => {
   })
 
   it('returns the run status of the current run', async () => {
-    when(mockUseCurrentRunId).calledWith().mockReturnValue(RUN_ID_2)
+    when(mockUseCurrentProtocolRun)
+      .calledWith()
+      .mockReturnValue({
+        runRecord: { data: mockRunningRun },
+      } as UseCurrentProtocolRun)
     when(mockUseRunQuery)
       .calledWith(RUN_ID_2, { refetchInterval: 1000 })
       .mockReturnValue(({
@@ -194,7 +271,11 @@ describe('useRunStartTime hook', () => {
   })
 
   it('returns the start time of the current run', async () => {
-    when(mockUseCurrentRunId).calledWith().mockReturnValue(RUN_ID_2)
+    when(mockUseCurrentProtocolRun)
+      .calledWith()
+      .mockReturnValue({
+        runRecord: { data: mockRunningRun },
+      } as UseCurrentProtocolRun)
     when(mockUseRunQuery)
       .calledWith(RUN_ID_2)
       .mockReturnValue(({
@@ -211,8 +292,28 @@ describe('useRunPauseTime hook', () => {
     resetAllWhenMocks()
   })
 
-  it('returns the pause time of the current run', async () => {
-    when(mockUseCurrentRunId).calledWith().mockReturnValue(RUN_ID_1)
+  it('returns null when pause is not the last action', async () => {
+    when(mockUseCurrentProtocolRun)
+      .calledWith()
+      .mockReturnValue({
+        runRecord: { data: mockRunningRun },
+      } as UseCurrentProtocolRun)
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID_2)
+      .mockReturnValue(({
+        data: { data: mockRunningRun },
+      } as unknown) as UseQueryResult<Run>)
+
+    const { result } = renderHook(useRunPauseTime)
+    expect(result.current).toBe(null)
+  })
+
+  it('returns the pause time of the current run when pause is the last action', async () => {
+    when(mockUseCurrentProtocolRun)
+      .calledWith()
+      .mockReturnValue({
+        runRecord: { data: mockPausedRun },
+      } as UseCurrentProtocolRun)
     when(mockUseRunQuery)
       .calledWith(RUN_ID_1)
       .mockReturnValue(({
@@ -229,11 +330,11 @@ describe('useRunCompleteTime hook', () => {
     resetAllWhenMocks()
   })
 
-  it('returns the complete time of the current run', async () => {
+  it('returns the complete time of a successful current run', async () => {
     when(mockUseCurrentProtocolRun)
       .calledWith()
       .mockReturnValue({
-        runRecord: { data: mockCompletedRun },
+        runRecord: { data: mockSucceededRun },
       } as UseCurrentProtocolRun)
     when(mockUseCommandQuery)
       .calledWith(RUN_ID_2, COMMAND_ID)
@@ -243,5 +344,37 @@ describe('useRunCompleteTime hook', () => {
 
     const { result } = renderHook(useRunCompleteTime)
     expect(result.current).toBe('noon thirty')
+  })
+
+  it('returns the complete time of a failed current run', async () => {
+    when(mockUseCurrentProtocolRun)
+      .calledWith()
+      .mockReturnValue({
+        runRecord: { data: mockFailedRun },
+      } as UseCurrentProtocolRun)
+    when(mockUseCommandQuery)
+      .calledWith(RUN_ID_2, COMMAND_ID)
+      .mockReturnValue({
+        data: mockCommand,
+      } as UseQueryResult<CommandDetail, Error>)
+
+    const { result } = renderHook(useRunCompleteTime)
+    expect(result.current).toBe('noon forty-five')
+  })
+
+  it('returns the complete time of a stopped current run', async () => {
+    when(mockUseCurrentProtocolRun)
+      .calledWith()
+      .mockReturnValue({
+        runRecord: { data: mockStoppedRun },
+      } as UseCurrentProtocolRun)
+    when(mockUseCommandQuery)
+      .calledWith(RUN_ID_2, COMMAND_ID)
+      .mockReturnValue({
+        data: mockCommand,
+      } as UseQueryResult<CommandDetail, Error>)
+
+    const { result } = renderHook(useRunCompleteTime)
+    expect(result.current).toBe('2021-10-25T13:58:22.366581+00:00')
   })
 })
