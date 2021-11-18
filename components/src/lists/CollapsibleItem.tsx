@@ -13,7 +13,7 @@ import type { IconName } from '../icons'
 export interface CollapsibleItemProps {
   /** optional icon for title */
   iconName?: IconName
-  statusNode?: React.ReactNode
+  status?: string
   /** header */
   header?: string
   /** text of title */
@@ -61,13 +61,13 @@ export function CollapsibleItem(props: CollapsibleItemProps): JSX.Element {
     <div className={className}>
       <div
         className={
-          props.statusNode === 'error' ? titleBarErrorClass : titleBarClass
+          props.status === 'error' ? titleBarErrorClass : titleBarClass
         }
       >
         {hasHeader && <p className={styles.header_text}>{header}</p>}
         {props.iconName != null ? (
           <div className={styles.icon_left_of_title_container}>
-            {props.statusNode === 'error' ? (
+            {props.status === 'error' ? (
               <Icon
                 className={styles.icon_left_of_title}
                 color={COLOR_ERROR}

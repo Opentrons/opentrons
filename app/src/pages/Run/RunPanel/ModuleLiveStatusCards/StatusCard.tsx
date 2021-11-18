@@ -33,7 +33,7 @@ export function StatusCard(props: Props): JSX.Element {
   return isNewProtocolRunPanel ? (
     <CollapsibleItem
       iconName={iconNameByModuleType[props.moduleType]}
-      statusNode={props.moduleStatus}
+      status={props.moduleStatus}
       className={styles.status_card}
       onCollapseToggle={props.toggleCard}
       header={
