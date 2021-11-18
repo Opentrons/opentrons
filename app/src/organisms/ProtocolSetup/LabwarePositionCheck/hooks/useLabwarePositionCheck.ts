@@ -329,6 +329,12 @@ export function useLabwarePositionCheck(
           response.data.data.id
         )
         // need to also diff with the first save position result before the user issued any jogs
+
+        // if this is the first labware that we are checking, no offsets need to be applied
+        if (savePositionCommandData[currentCommand.params.labwareId] == null) {
+          const positions = Promise.resolve([IDENTITY_OFFSET, IDENTITY_OFFSET])
+          return positions
+        }
         const initialSavePositionCommandId =
           savePositionCommandData[currentCommand.params.labwareId][0]
         const initialSavePositionCommand = getCommand(
@@ -336,21 +342,20 @@ export function useLabwarePositionCheck(
           currentRun?.data?.id as string,
           initialSavePositionCommandId
         )
-
+        const offsetFromPrevMovementCommand: Promise<VectorOffset> = prevSavePositionCommand.then(
+          response => {
+            return response.data.data.result.position
+          }
+        )
+        const offsetFromInitialSavePositionCommand: Promise<VectorOffset> = initialSavePositionCommand.then(
+          response => {
+            return response.data.data.result.position
+          }
+        )
         const positions = Promise.all([
-          prevSavePositionCommand,
-          initialSavePositionCommand,
-        ]).then(([prevSaveCommandResponse, initialSaveCommandResponse]) => {
-          const offsetFromPrevMovementCommand: VectorOffset =
-            prevSaveCommandResponse.data.data.result.position
-          const offsetFromInitialSavePositionCommand: VectorOffset =
-            initialSaveCommandResponse.data.data.result.position
-          return [
-            offsetFromPrevMovementCommand,
-            offsetFromInitialSavePositionCommand,
-          ]
-        })
-
+          offsetFromPrevMovementCommand,
+          offsetFromInitialSavePositionCommand,
+        ])
         return positions
       })
       .then(
