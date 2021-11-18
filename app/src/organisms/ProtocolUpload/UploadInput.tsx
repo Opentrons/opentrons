@@ -247,7 +247,10 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
                 {t('run_timestamp_title')}
               </Text>
               <Flex css={FONT_BODY_1_DARK} flexDirection={DIRECTION_ROW}>
-                {format(parseISO(mostRecentRun.createdAt), 'yyyy-MM-dd pp xxxxx')}
+                {format(
+                  parseISO(mostRecentRun.createdAt),
+                  'yyyy-MM-dd pp xxxxx'
+                )}
               </Flex>
             </Flex>
             <Flex
