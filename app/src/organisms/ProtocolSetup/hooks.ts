@@ -1,10 +1,27 @@
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
-import { useProtocolDetails } from '../RunDetails/hooks'
-import { getModuleRenderInfo } from './utils/getModuleRenderInfo'
-import { getLabwareRenderInfo } from './utils/getLabwareRenderInfo'
-import { useCurrentProtocolRun } from '../ProtocolUpload/hooks'
+<<<<<<< HEAD
+=======
+import { checkModuleCompatibility } from '@opentrons/shared-data'
 
-import type { ModuleRenderInfoById } from './utils/getModuleRenderInfo'
+import {
+  getProtocolAuthor,
+  getProtocolLastUpdated,
+  getProtocolMethod,
+  getProtocolDescription,
+} from '../../redux/protocol'
+>>>>>>> ab3785c08 (refactor(app): match protocol modules to usb ports via load order)
+import { useProtocolDetails } from '../RunDetails/hooks'
+import { getProtocolModulesInfo } from './utils/getProtocolModulesInfo'
+import { getLabwareRenderInfo } from './utils/getLabwareRenderInfo'
+<<<<<<< HEAD
+import { useCurrentProtocolRun } from '../ProtocolUpload/hooks'
+=======
+import { getAttachedModules } from '../../redux/modules'
+import { getConnectedRobotName } from '../../redux/robot/selectors'
+import { AttachedModule } from '../../redux/modules/types'
+>>>>>>> ab3785c08 (refactor(app): match protocol modules to usb ports via load order)
+
+import type { ProtocolModuleInfo } from './utils/getProtocolModulesInfo'
 import type { LabwareRenderInfoById } from './utils/getLabwareRenderInfo'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { LoadPipetteCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
@@ -27,11 +44,57 @@ export function useProtocolMetadata(): ProtocolMetadata {
   return { author, lastUpdated, description, creationMethod }
 }
 
-export function useModuleRenderInfoById(): ModuleRenderInfoById {
+interface ModuleRenderInfo extends ProtocolModuleInfo {
+  attachedModuleMatch: AttachedModule | null
+}
+export function useModuleRenderInfoById(): {
+  [moduleId: string]: ModuleRenderInfo
+} {
   const { protocolData } = useProtocolDetails()
-  return protocolData != null
-    ? getModuleRenderInfo(protocolData, standardDeckDef as any)
-    : {}
+  const robotName = useSelector((state: State) => getConnectedRobotName(state))
+  const attachedModules = useSelector((state: State) =>
+    getAttachedModules(state, robotName)
+  )
+  if (protocolData == null) return {}
+
+  const protocolModulesInfo = getProtocolModulesInfo(
+    protocolData,
+    standardDeckDef as any
+  )
+  const protocolModulesInfoInLoadOrder = protocolModulesInfo.sort(
+    (modA, modB) => modA.protocolLoadOrder - modB.protocolLoadOrder
+  )
+  let matchedAmod: AttachedModule[] = []
+  const allModuleRenderInfo = protocolModulesInfoInLoadOrder.map(
+    protocolMod => {
+      const compatibleAttachedModule =
+        attachedModules.find(
+          attachedMod =>
+            checkModuleCompatibility(
+              attachedMod.model,
+              protocolMod.moduleDef.model
+            ) && !matchedAmod.find(m => m === attachedMod)
+        ) ?? null
+      if (compatibleAttachedModule !== null) {
+        matchedAmod = [...matchedAmod, compatibleAttachedModule]
+        return {
+          ...protocolMod,
+          attachedModuleMatch: compatibleAttachedModule,
+        }
+      }
+      return {
+        ...protocolMod,
+        attachedModuleMatch: null,
+      }
+    }
+  )
+  return allModuleRenderInfo.reduce(
+    (acc, moduleInfo) => ({
+      ...acc,
+      [moduleInfo.moduleId]: moduleInfo,
+    }),
+    {}
+  )
 }
 
 export function useLabwareRenderInfoById(): LabwareRenderInfoById {

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import map from 'lodash/map'
 import {
@@ -23,14 +23,13 @@ import {
 import { inferModuleOrientationFromXCoordinate } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { useMissingModuleIds } from '../hooks'
-import { fetchModules, getAttachedModules } from '../../../../redux/modules'
+import { fetchModules } from '../../../../redux/modules'
 import { ModuleInfo } from './ModuleInfo'
 import { MultipleModulesModal } from './MultipleModulesModal'
 import { useModuleRenderInfoById } from '../../hooks'
 import styles from '../../styles.css'
 
-import type { State, Dispatch } from '../../../../redux/types'
-import { getModulesByProtocolLoadOrder } from '@opentrons/app/src/redux/robot/selectors'
+import type { Dispatch } from '../../../../redux/types'
 
 const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
@@ -65,16 +64,6 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
     robotName === null ? POLL_MODULE_INTERVAL_MS : null,
     true
   )
-  const attachedModules = useSelector((state: State) =>
-    getAttachedModules(state, robotName)
-  )
-  const modulesByProtocolLoadOrder = useSelector((state: State) =>
-    getModulesByProtocolLoadOrder(state)
-  )
-  const protocolLoadOrderModels = modulesByProtocolLoadOrder.map(
-    ({ model }) => model
-  )
-  console.log(protocolLoadOrderModels)
 
   const moduleModels = map(
     moduleRenderInfoById,
@@ -122,12 +111,8 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
         >
           {() => (
             <>
-              {map(moduleRenderInfoById, ({ x, y, moduleDef }) => {
+              {map(moduleRenderInfoById, ({ x, y, moduleDef, attachedModuleMatch}) => {
                 const { model } = moduleDef
-                const attachedModuleMatch = attachedModules.find(
-                  attachedModule => model === attachedModule.model
-                )
-                const duplicateModule = hasADuplicateModule ? protocolLoadOrderModels : null
                 return (
                   <React.Fragment key={`LabwareSetup_Module_${model}_${x}${y}`}>
                     <Module
@@ -139,8 +124,8 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
                       <ModuleInfo
                         moduleModel={model}
                         isAttached={attachedModuleMatch != null}
-                        usbPort={attachedModuleMatch?.usbPort.port}
-                        hubPort={attachedModuleMatch?.usbPort.hub}
+                        usbPort={attachedModuleMatch?.usbPort.port ?? null}
+                        hubPort={attachedModuleMatch?.usbPort.hub ?? null}
                       />
                     </Module>
                   </React.Fragment>

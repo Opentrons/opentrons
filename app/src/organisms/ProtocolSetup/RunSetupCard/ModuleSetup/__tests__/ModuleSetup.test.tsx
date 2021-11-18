@@ -85,6 +85,7 @@ const render = (props: React.ComponentProps<typeof ModuleSetup>) => {
 
 const STUBBED_ORIENTATION_VALUE = 'left'
 const MOCK_MAGNETIC_MODULE_COORDS = [10, 20, 0]
+const MOCK_SECOND_MAGNETIC_MODULE_COORDS = [100, 200, 0]
 const MOCK_TC_COORDS = [20, 30, 0]
 const MOCK_ROBOT_NAME = 'ot-dev'
 
@@ -183,6 +184,7 @@ describe('ModuleSetup', () => {
       .calledWith()
       .mockReturnValue({
         [mockMagneticModule.moduleId]: {
+          moduleId: mockMagneticModule.moduleId,
           x: MOCK_MAGNETIC_MODULE_COORDS[0],
           y: MOCK_MAGNETIC_MODULE_COORDS[1],
           z: MOCK_MAGNETIC_MODULE_COORDS[2],
@@ -190,8 +192,10 @@ describe('ModuleSetup', () => {
           nestedLabwareDef: null,
           nestedLabwareId: null,
           protocolLoadOrder: 1,
+          attachedModuleMatch: null
         },
         [mockMagneticModule.moduleId]: {
+          moduleId: mockMagneticModule.moduleId,
           x: MOCK_MAGNETIC_MODULE_COORDS[0],
           y: MOCK_MAGNETIC_MODULE_COORDS[1],
           z: MOCK_MAGNETIC_MODULE_COORDS[2],
@@ -199,6 +203,7 @@ describe('ModuleSetup', () => {
           nestedLabwareDef: null,
           nestedLabwareId: null,
           protocolLoadOrder: 0,
+          attachedModuleMatch: null
         },
       })
 
@@ -207,8 +212,8 @@ describe('ModuleSetup', () => {
         partialComponentPropsMatcher({
           moduleModel: mockMagneticModule.model,
           isAttached: false,
-          usbPort: undefined,
-          hubPort: undefined,
+          usbPort: null,
+          hubPort: null,
         })
       )
       .mockReturnValue(<div>mock module info {mockMagneticModule.model}</div>)
@@ -222,6 +227,7 @@ describe('ModuleSetup', () => {
       .calledWith()
       .mockReturnValue({
         [mockMagneticModule.moduleId]: {
+          moduleId: mockMagneticModule.moduleId,
           x: MOCK_MAGNETIC_MODULE_COORDS[0],
           y: MOCK_MAGNETIC_MODULE_COORDS[1],
           z: MOCK_MAGNETIC_MODULE_COORDS[2],
@@ -229,9 +235,10 @@ describe('ModuleSetup', () => {
           nestedLabwareDef: null,
           nestedLabwareId: null,
           protocolLoadOrder: 0,
-
+          attachedModuleMatch: null
         },
         [mockTCModule.moduleId]: {
+          moduleId: mockTCModule.moduleId,
           x: MOCK_TC_COORDS[0],
           y: MOCK_TC_COORDS[1],
           z: MOCK_TC_COORDS[2],
@@ -239,7 +246,7 @@ describe('ModuleSetup', () => {
           nestedLabwareDef: null,
           nestedLabwareId: null,
           protocolLoadOrder: 1,
-
+          attachedModuleMatch: null
         },
       })
 
@@ -248,8 +255,8 @@ describe('ModuleSetup', () => {
         partialComponentPropsMatcher({
           moduleModel: mockMagneticModule.model,
           isAttached: false,
-          usbPort: undefined,
-          hubPort: undefined,
+          usbPort: null,
+          hubPort: null,
         })
       )
       .mockReturnValue(<div>mock module info {mockMagneticModule.model}</div>)
@@ -259,8 +266,8 @@ describe('ModuleSetup', () => {
         partialComponentPropsMatcher({
           moduleModel: mockTCModule.model,
           isAttached: false,
-          usbPort: undefined,
-          hubPort: undefined,
+          usbPort: null,
+          hubPort: null,
         })
       )
       .mockReturnValue(<div>mock module info {mockTCModule.model} </div>)
@@ -280,6 +287,7 @@ describe('ModuleSetup', () => {
       .calledWith()
       .mockReturnValue({
         [mockMagneticModule.moduleId]: {
+          moduleId: mockMagneticModule.moduleId,
           x: MOCK_MAGNETIC_MODULE_COORDS[0],
           y: MOCK_MAGNETIC_MODULE_COORDS[1],
           z: MOCK_MAGNETIC_MODULE_COORDS[2],
@@ -287,9 +295,13 @@ describe('ModuleSetup', () => {
           nestedLabwareDef: null,
           nestedLabwareId: null,
           protocolLoadOrder: 1,
-
+          attachedModuleMatch: {
+            ...mockMagneticModuleFixture,
+            model: mockMagneticModule.model,
+          } as any
         },
         [mockTCModule.moduleId]: {
+          moduleId: mockTCModule.moduleId,
           x: MOCK_TC_COORDS[0],
           y: MOCK_TC_COORDS[1],
           z: MOCK_TC_COORDS[2],
@@ -297,18 +309,9 @@ describe('ModuleSetup', () => {
           nestedLabwareDef: null,
           nestedLabwareId: null,
           protocolLoadOrder: 0,
-
+          attachedModuleMatch: { ...mockThermocyclerFixture, model: mockTCModule.model } as any
         },
       })
-    when(mockGetAttachedModules)
-      .calledWith(undefined as any, MOCK_ROBOT_NAME)
-      .mockReturnValue([
-        {
-          ...mockMagneticModuleFixture,
-          model: mockMagneticModule.model,
-        } as any,
-        { ...mockThermocyclerFixture, model: mockTCModule.model } as any,
-      ])
 
     when(mockModuleInfo)
       .calledWith(
@@ -337,5 +340,74 @@ describe('ModuleSetup', () => {
     const button = getByRole('button', { name: 'Proceed to Labware Setup' })
     expect(button).not.toBeDisabled()
   })
-  it.todo('renders Moam with the correct module in the correct slot')
+  it('renders Moam with the correct module in the correct slot', () => {
+    mockUseMissingModuleIds.mockReturnValue([])
+
+    const dupModId = `${mockMagneticModule.moduleId}duplicate`
+    const dupModPort = 10
+    const dupModHub = 2
+    when(mockUseModuleRenderInfoById)
+      .calledWith()
+      .mockReturnValue({
+        [mockMagneticModule.moduleId]: {
+          moduleId: mockMagneticModule.moduleId,
+          x: MOCK_MAGNETIC_MODULE_COORDS[0],
+          y: MOCK_MAGNETIC_MODULE_COORDS[1],
+          z: MOCK_MAGNETIC_MODULE_COORDS[2],
+          moduleDef: mockMagneticModule as any,
+          nestedLabwareDef: null,
+          nestedLabwareId: null,
+          protocolLoadOrder: 1,
+          attachedModuleMatch: {
+            ...mockMagneticModuleFixture,
+            model: mockMagneticModule.model,
+          } as any
+        },
+        [dupModId]: {
+          moduleId: dupModId,
+          x: MOCK_SECOND_MAGNETIC_MODULE_COORDS[0],
+          y: MOCK_SECOND_MAGNETIC_MODULE_COORDS[1],
+          z: MOCK_SECOND_MAGNETIC_MODULE_COORDS[2],
+          moduleDef: mockMagneticModule as any,
+          nestedLabwareDef: null,
+          nestedLabwareId: null,
+          protocolLoadOrder: 0,
+          attachedModuleMatch: {
+            ...mockMagneticModuleFixture,
+            model: mockMagneticModule.model,
+            usbPort:{
+              port: dupModPort,
+              hub: dupModHub,
+            }
+          } as any
+        },
+      })
+
+    when(mockModuleInfo)
+      .calledWith(
+        componentPropsMatcher({
+          moduleModel: mockMagneticModule.model,
+          isAttached: true,
+          usbPort: mockMagneticModuleFixture.usbPort.port,
+          hubPort: mockMagneticModuleFixture.usbPort.hub,
+        })
+      )
+      .mockReturnValue(<div>mock module info {mockMagneticModule.model} </div>)
+
+    when(mockModuleInfo)
+      .calledWith(
+        componentPropsMatcher({
+          moduleModel: mockMagneticModule.model,
+          isAttached: true,
+          usbPort: dupModPort,
+          hubPort: dupModHub
+        })
+      )
+      .mockReturnValue(<div>mock module info {mockTCModule.model} </div>)
+
+    const { getByText, getByRole } = render(props)
+    getByText('mock module info magneticModuleV2')
+    const button = getByRole('button', { name: 'Proceed to Labware Setup' })
+    expect(button).not.toBeDisabled()
+  })
 })

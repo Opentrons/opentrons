@@ -43,7 +43,7 @@ jest.mock('../../RunDetails/hooks')
 jest.mock('../RunSetupCard/LabwareSetup')
 jest.mock('../RunSetupCard/ModuleSetup')
 jest.mock('../RunSetupCard/RobotCalibration')
-jest.mock('../utils/getModuleRenderInfo')
+jest.mock('../utils/getProtocolModulesInfo')
 jest.mock('../RunSetupCard/ProceedToRunCta')
 jest.mock('../utils/getLabwareRenderInfo')
 

@@ -8,7 +8,6 @@ interface ModuleInitialLoadInfo {
   location: ModuleLocation
   protocolLoadOrder: number
 }
-// Note: this can either return a slotName or a moduleId as per schema v6
 export const getModuleInitialLoadInfo = (
   moduleId: string,
   commands: Command[]
@@ -18,6 +17,8 @@ export const getModuleInitialLoadInfo = (
       command.commandType === 'loadModule' &&
       command.params.moduleId === moduleId
   )
+  ;('3e039550-3412-11eb-ad93-ed232a2337cf:temperatureModuleType2')
+  ;('3e0283e0-3412-11eb-ad93-ed232a2337cf:temperatureModuleType2')
 
   if (moduleLoadIndex === -1) {
     throw new Error(
