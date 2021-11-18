@@ -43,7 +43,7 @@
   "check_labware_in_slot_title": "Check Labware {{labware_display_name}} in slot {{slot}}",
   "module_display_location_text": "{{moduleName}} in Deck Slot {{slot}}",
   "labware_display_location_text": "Deck Slot {{slot}}",
-  "labware_deleted_warning": "Once you begin Labware Position Check, previously created Labware Offsets will be discarded.",
+  "labware_offsets_deleted_warning": "Once you begin Labware Position Check, previously created Labware Offsets will be discarded.",
   "exit_screen_title": "Exit before completing Labware Position Check?",
   "exit_screen_subtitle": "If you exit now, all labware offsets will be discarded. This cannot be undone.",
   "exit_screen_go_back": "Go back to labware position check",

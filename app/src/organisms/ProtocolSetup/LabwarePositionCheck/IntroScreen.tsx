@@ -65,7 +65,7 @@ export const IntroScreen = (props: {
           block: <Text fontSize={FONT_SIZE_BODY_2} marginBottom={SPACING_2} />,
         }}
       ></Trans>
-      <AlertItem type="warning" title={t('labware_deleted_warning')} />
+      <AlertItem type="warning" title={t('labware_offsets_deleted_warning')} />
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
         <Flex marginLeft={SPACING_6}>
           <SectionList
