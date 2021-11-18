@@ -72,12 +72,15 @@ describe('useMissingModuleIds', () => {
       .calledWith()
       .mockReturnValue({
         [moduleId]: {
+          moduleId: moduleId,
           x: 0,
           y: 0,
           z: 0,
           moduleDef: mockMagneticModuleDef as any,
           nestedLabwareDef: null,
           nestedLabwareId: null,
+          protocolLoadOrder: 0,
+          attachedModuleMatch: null,
         },
       })
 
