@@ -282,7 +282,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
                 color={C_BLUE}
                 id={'UploadInput_runAgainButton'}
               >
-                {t('run_again_btn')}
+                {t('run_again')}
               </SecondaryBtn>
             </Flex>
           </Flex>

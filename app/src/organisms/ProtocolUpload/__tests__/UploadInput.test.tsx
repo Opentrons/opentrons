@@ -202,19 +202,15 @@ describe('UploadInput', () => {
     fireEvent.click(openModal)
     getByText('Mock Rerunning Protocol Modal')
   })
-  it('renders null if run timestamp is null', () => {
+  it('renders null if run is null', () => {
     when(mockUseRunQuery)
       .calledWith('RunId')
       .mockReturnValue({
-        data: {
-          data: {
-            createdAt: null,
-            labwareOffsets: [],
-          },
-        },
+        data: null,
       } as any)
-    const { container } = render(props)
-    expect(container.firstChild).toBeNull()
+
+    const { queryByText } = render(props)
+    expect(queryByText('Run Again')).toBeNull()
   })
   it('renders file name if Protocol name is null', () => {
     when(mockUseProtocolQuery)
