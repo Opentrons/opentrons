@@ -12,7 +12,6 @@ import {
   C_BLUE,
   TEXT_TRANSFORM_UPPERCASE,
   FONT_WEIGHT_SEMIBOLD,
-  ALIGN_CENTER,
   JUSTIFY_SPACE_EVENLY,
 } from '@opentrons/components'
 import styles from '../styles.css'
@@ -41,12 +40,7 @@ export const ExitPreventionModal = (
       <Text marginBottom={SPACING_4} marginLeft={SPACING_3}>
         {t('exit_screen_subtitle')}
       </Text>
-      <Flex
-        padding={SPACING_2}
-        justifyContent={JUSTIFY_SPACE_EVENLY}
-        alignItems={ALIGN_CENTER}
-        width="100%"
-      >
+      <Flex padding={SPACING_2} justifyContent={JUSTIFY_SPACE_EVENLY}>
         <SecondaryBtn onClick={props.onGoBack} color={C_BLUE}>
           {t('exit_screen_go_back')}
         </SecondaryBtn>
