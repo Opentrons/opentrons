@@ -92,8 +92,21 @@ export const LabwarePositionCheck = (
     jog,
   } = labwarePositionCheckUtils
 
-  return (
-    <Portal level="top">
+  let modalContent: JSX.Element
+  if (isLoading) {
+    modalContent = <RobotMotionLoadingModal title={titleText} />
+  } else if (exitAttempt) {
+    modalContent = (
+      <ExitPreventionModal
+        onGoBack={() => setExitAttempt(false)}
+        onConfirmExit={() => {
+          setExitAttempt(false)
+          props.onCloseClick()
+        }}
+      />
+    )
+  } else {
+    modalContent = (
       <ModalPage
         contentsClassName={styles.modal_contents}
         titleBar={{
@@ -105,16 +118,6 @@ export const LabwarePositionCheck = (
           },
         }}
       >
-        {isLoading ? <RobotMotionLoadingModal title={titleText} /> : null}
-        {exitAttempt ? (
-          <ExitPreventionModal
-            onGoBack={() => setExitAttempt(false)}
-            onConfirmExit={() => {
-              setExitAttempt(false)
-              props.onCloseClick()
-            }}
-          />
-        ) : null}
         {isComplete ? (
           <SummaryScreen savePositionCommandData={savePositionCommandData} />
         ) : currentCommandIndex !== 0 ? (
@@ -129,6 +132,7 @@ export const LabwarePositionCheck = (
           <IntroScreen beginLPC={beginLPC} />
         )}
       </ModalPage>
-    </Portal>
-  )
+    )
+  }
+  return <Portal level="top">{modalContent}</Portal>
 }
