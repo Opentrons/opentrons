@@ -69,6 +69,7 @@ class OT3Controller:
         self._gpio_dev = SimulatingGPIOCharDev("simulated")
         self._module_controls: Optional[AttachedModulesControl] = None
         self._messenger = CanMessenger(driver=driver)
+        self._messenger.start()
         self._position = {
             NodeId.head: 0,
             NodeId.gantry_x: 0,
