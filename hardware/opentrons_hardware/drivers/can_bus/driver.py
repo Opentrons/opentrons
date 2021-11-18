@@ -38,7 +38,7 @@ class CanDriver:
 
     DEFAULT_CAN_NETWORK = "can0"
     DEFAULT_CAN_INTERFACE = "socketcan"
-    DEFAULT_CAN_BITRATE = 0
+    DEFAULT_CAN_BITRATE = 250000
 
     def __init__(self, bus: Bus, loop: asyncio.AbstractEventLoop) -> None:
         """Constructor.
