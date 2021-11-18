@@ -20,18 +20,19 @@ const feedbackFormLink =
   'https://docs.google.com/forms/d/e/1FAIpQLSd6oSV82IfgzSi5t_FP6n_pB_Y8wPGmAgFHsiiFho9qhxr-UQ/viewform'
 
 export function ProtocolSetup(): JSX.Element {
-  const { t } = useTranslation('protocol_setup')
-  const [dismissed, setDismissed] = React.useState(false)
+  const { t } = useTranslation('protocol_info')
+  const [checkToastDismissed, setCheckToastDismissed] = React.useState(false)
+
   return (
     <>
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        padding={`${SPACING_1} ${SPACING_2} ${SPACING_1} ${SPACING_2}`}
+        padding={`${SPACING_1} ${SPACING_2}`}
       >
-        {!dismissed && (
+        {!checkToastDismissed && (
           <AlertItem
             type="success"
-            onCloseClick={() => setDismissed(true)}
+            onCloseClick={() => setCheckToastDismissed(true)}
             title={t('labware_positon_check_complete_toast', {
               num_offsets: 2, //  TODO wire up num_offsets!
             })}
