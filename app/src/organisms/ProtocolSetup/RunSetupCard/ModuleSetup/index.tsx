@@ -12,14 +12,10 @@ import {
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
   FONT_SIZE_BODY_1,
-  JUSTIFY_CENTER,
   C_BLUE,
-  C_NEAR_WHITE,
-  SPACING_4,
   useInterval,
   Tooltip,
   useHoverTooltip,
-  SIZE_5,
   ALIGN_CENTER,
 } from '@opentrons/components'
 import { inferModuleOrientationFromXCoordinate } from '@opentrons/shared-data'
