@@ -69,6 +69,11 @@ class OT3Controller:
         self._gpio_dev = SimulatingGPIOCharDev("simulated")
         self._module_controls: Optional[AttachedModulesControl] = None
         self._messenger = CanMessenger(driver=driver)
+        self._position = {
+            NodeId.head: 0,
+            NodeId.gantry_x: 0,
+            NodeId.gantry_y: 0,
+        }
 
     @property
     def gpio_chardev(self) -> GPIODriverLike:
@@ -106,6 +111,7 @@ class OT3Controller:
                 ret['X'] = pos
             elif node == NodeId.gantry_y:
                 ret['Y'] = pos
+        log.info(f"update_position: {ret}")
         return ret
 
     async def move(
@@ -126,6 +132,7 @@ class OT3Controller:
         Returns:
             None
         """
+        log.info(f"move: {target_position}")
         target: Dict[NodeId, float] = {}
         for axis, pos in target_position.items():
             if axis in {'A', 'Z'}:

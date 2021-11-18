@@ -1,6 +1,6 @@
 """The can bus transport."""
 from __future__ import annotations
-
+import logging
 import asyncio
 import platform
 from typing import Optional
@@ -10,6 +10,8 @@ from can import Notifier, Bus, AsyncBufferedReader, Message, util
 from .arbitration_id import ArbitrationId
 from .message import CanMessage
 from .errors import ErrorFrameCanError
+
+log = logging.getLogger(__name__)
 
 
 if platform.system() == "Darwin":
@@ -68,6 +70,7 @@ class CanDriver:
         Returns:
             A CanDriver instance.
         """
+        log.info(f"CAN connect: {interface}-{channel}-{bitrate}")
         extra_kwargs = {}
         if interface == "pcan":
             # Special FDCAN parameters for use of PCAN driver.
