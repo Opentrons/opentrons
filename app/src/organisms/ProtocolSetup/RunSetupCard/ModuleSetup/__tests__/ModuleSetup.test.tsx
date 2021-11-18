@@ -26,7 +26,6 @@ import { useMissingModuleIds } from '../../hooks'
 import { MultipleModulesModal } from '../MultipleModulesModal'
 import { ModuleSetup } from '..'
 import { ModuleInfo } from '../ModuleInfo'
-import { ApiSessionModule } from '@opentrons/app/src/redux/robot'
 
 jest.mock('../../../../../redux/modules')
 jest.mock('../ModuleInfo')

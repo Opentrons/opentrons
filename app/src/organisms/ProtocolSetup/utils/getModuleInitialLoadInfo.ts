@@ -17,8 +17,6 @@ export const getModuleInitialLoadInfo = (
       command.commandType === 'loadModule' &&
       command.params.moduleId === moduleId
   )
-  ;('3e039550-3412-11eb-ad93-ed232a2337cf:temperatureModuleType2')
-  ;('3e0283e0-3412-11eb-ad93-ed232a2337cf:temperatureModuleType2')
 
   if (moduleLoadIndex === -1) {
     throw new Error(
