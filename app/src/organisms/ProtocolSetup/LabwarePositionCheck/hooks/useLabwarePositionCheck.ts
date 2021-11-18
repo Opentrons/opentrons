@@ -14,6 +14,7 @@ import { getLabwareLocation } from '../../utils/getLabwareLocation'
 import { getModuleLocation } from '../../utils/getModuleLocation'
 import { sendModuleCommand } from '../../../../redux/modules'
 import { getConnectedRobotName } from '../../../../redux/robot/selectors'
+import { getAttachedModulesForConnectedRobot } from '../../../../redux/modules/selectors'
 
 import type {
   Command,
@@ -32,7 +33,10 @@ import type {
   LabwarePositionCheckStep,
 } from '../types'
 import { useSteps } from './useSteps'
-import { getLabwareDisplayName } from '@opentrons/shared-data'
+import {
+  getLabwareDisplayName,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 
 export type LabwarePositionCheckUtils =
   | {
@@ -185,6 +189,7 @@ export function useLabwarePositionCheck(
   const LPCSteps = useSteps()
   const dispatch = useDispatch()
   const robotName = useSelector(getConnectedRobotName)
+  const attachedModules = useSelector(getAttachedModulesForConnectedRobot)
 
   const LPCCommands = LPCSteps.reduce<LabwarePositionCheckCommand[]>(
     (steps, currentStep) => {
@@ -351,13 +356,15 @@ export function useLabwarePositionCheck(
       // 11/18/21 intercept TCOpenLidCommand and use legacy modules endpoint
       // delete this once PE supports themocycler open lid command
       if (prepCommand.commandType === 'thermocycler/openLid') {
-        dispatch(
-          sendModuleCommand(
-            robotName as string,
-            prepCommand.result?.moduleId,
-            'open'
+        const serial = attachedModules.find(
+          module => module.type === THERMOCYCLER_MODULE_TYPE
+        )?.serial
+        if (serial == null) {
+          throw new Error(
+            'Expected to be able to find thermocycler serial number, but could not.'
           )
-        )
+        }
+        dispatch(sendModuleCommand(robotName as string, serial, 'open'))
       } else {
         createCommand(
           host as HostConfig,
