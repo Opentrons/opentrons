@@ -156,6 +156,7 @@ async def create_run(
         pipettes=engine_state.pipettes.get_all(),
         labware=engine_state.labware.get_all(),
         labwareOffsets=engine_state.labware.get_labware_offsets(),
+        status=engine_state.commands.get_status(),
     )
 
     return ResponseModel(data=data, links=None)
@@ -203,6 +204,7 @@ async def get_runs(
             pipettes=engine_state.pipettes.get_all(),
             labware=engine_state.labware.get_all(),
             labwareOffsets=engine_state.labware.get_labware_offsets(),
+            status=engine_state.commands.get_status(),
         )
 
         data.append(run_data)
@@ -259,6 +261,7 @@ async def get_run(
         pipettes=engine_state.pipettes.get_all(),
         labware=engine_state.labware.get_all(),
         labwareOffsets=engine_state.labware.get_labware_offsets(),
+        status=engine_state.commands.get_status(),
     )
 
     return ResponseModel(data=data, links=None)
@@ -368,6 +371,7 @@ async def update_run(
         pipettes=engine_state.pipettes.get_all(),
         labware=engine_state.labware.get_all(),
         labwareOffsets=engine_state.labware.get_labware_offsets(),
+        status=engine_state.commands.get_status(),
     )
 
     return ResponseModel(data=data, links=None)

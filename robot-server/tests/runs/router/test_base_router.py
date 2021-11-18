@@ -394,6 +394,7 @@ async def test_get_run_with_errors(
         ],
         pipettes=[],
         labware=[],
+        labwareOffsets=[],
     )
 
     decoy.when(run_store.get(run_id="run-id")).then_return(run)
@@ -405,6 +406,7 @@ async def test_get_run_with_errors(
     decoy.when(engine_state.commands.get_all_errors()).then_return([error_1, error_2])
     decoy.when(engine_state.pipettes.get_all()).then_return([])
     decoy.when(engine_state.labware.get_all()).then_return([])
+    decoy.when(engine_state.labware.get_labware_offsets()).then_return([])
     decoy.when(engine_state.commands.get_status()).then_return(
         pe_types.EngineStatus.FAILED
     )
