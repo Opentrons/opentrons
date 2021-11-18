@@ -301,6 +301,7 @@ export function useLabwarePositionCheck(
     setPendingMovementCommandData(null)
   }
 
+  // (sa 11-18-2021): refactor this function after beta release
   const proceed = (): void => {
     setIsLoading(true)
     // before executing the next movement command, save the current position
@@ -323,18 +324,20 @@ export function useLabwarePositionCheck(
         }
         // later in the promise chain we may need to incorporate in flight offsets into
         // pickup tip/drop tip commands, so we need to prepare those offset vectors
+
+        // if this is the first labware that we are checking, no in flight offsets have been applied
+        // return identity offsets and move on, they will no get used
+        if (savePositionCommandData[currentCommand.params.labwareId] == null) {
+          const positions = Promise.resolve([IDENTITY_OFFSET, IDENTITY_OFFSET])
+          return positions
+        }
+
         const prevSavePositionCommand = getCommand(
           host as HostConfig,
           currentRun?.data?.id as string,
           response.data.data.id
         )
-        // need to also diff with the first save position result before the user issued any jogs
 
-        // if this is the first labware that we are checking, no offsets need to be applied
-        if (savePositionCommandData[currentCommand.params.labwareId] == null) {
-          const positions = Promise.resolve([IDENTITY_OFFSET, IDENTITY_OFFSET])
-          return positions
-        }
         const initialSavePositionCommandId =
           savePositionCommandData[currentCommand.params.labwareId][0]
         const initialSavePositionCommand = getCommand(
