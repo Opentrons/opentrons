@@ -189,7 +189,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
           onChange={onChange}
         />
       </label>
-      {mostRecentRunId === null ? null : (
+      {mostRecentRun == null ? null : (
         <Flex flexDirection={DIRECTION_COLUMN} width={'80%'}>
           <Divider marginY={SPACING_3} />
           <Flex
@@ -247,7 +247,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
                 {t('run_timestamp_title')}
               </Text>
               <Flex css={FONT_BODY_1_DARK} flexDirection={DIRECTION_ROW}>
-                {format(parseISO(mostRecentRun?.createdAt), 'yyyy-MM-dd pp xxxxx')}
+                {format(parseISO(mostRecentRun.createdAt), 'yyyy-MM-dd pp xxxxx')}
               </Flex>
             </Flex>
             <Flex
