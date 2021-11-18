@@ -345,7 +345,7 @@ export function useLabwarePositionCheck(
           currentRun?.data?.id as string,
           initialSavePositionCommandId
         )
-        const offsetFromPrevMovementCommand: Promise<VectorOffset> = prevSavePositionCommand.then(
+        const offsetFromPrevSavePositionCommand: Promise<VectorOffset> = prevSavePositionCommand.then(
           response => {
             return response.data.data.result.position
           }
@@ -356,14 +356,14 @@ export function useLabwarePositionCheck(
           }
         )
         const positions = Promise.all([
-          offsetFromPrevMovementCommand,
+          offsetFromPrevSavePositionCommand,
           offsetFromInitialSavePositionCommand,
         ])
         return positions
       })
       .then(
         ([
-          offsetFromPrevMovementCommand,
+          offsetFromPrevSavePositionCommand,
           offsetFromInitialSavePositionCommand,
         ]) => {
           // if the next command to execute is a pick up tip, we need to make sure
@@ -378,7 +378,7 @@ export function useLabwarePositionCheck(
               x: secondX,
               y: secondY,
               z: secondZ,
-            } = offsetFromPrevMovementCommand
+            } = offsetFromPrevSavePositionCommand
             const offset = {
               x: secondX - firstX,
               y: secondY - firstY,
