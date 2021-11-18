@@ -14,6 +14,7 @@ import { IntroScreen } from './IntroScreen'
 import { GenericStepScreen } from './GenericStepScreen'
 import { SummaryScreen } from './SummaryScreen'
 import { RobotMotionLoadingModal } from './RobotMotionLoadingModal'
+import { ExitPreventionModal } from './ExitPreventionModal'
 
 import styles from '../styles.css'
 import type { SavePositionCommandData } from './types'
@@ -31,6 +32,7 @@ export const LabwarePositionCheck = (
     setSavePositionCommandData,
   ] = React.useState<SavePositionCommandData>({})
   const [isRestartingRun, setIsRestartingRun] = React.useState<boolean>(false)
+  const [exitAttempt, setExitAttempt] = React.useState(false)
 
   // at the end of LPC, each labwareId will have 2 associated save position command ids which will be used to calculate the labware offsets
   const addSavePositionCommandData = (
@@ -97,13 +99,22 @@ export const LabwarePositionCheck = (
         titleBar={{
           title: t('labware_position_check_title'),
           back: {
-            onClick: props.onCloseClick,
+            onClick: () => setExitAttempt(true),
             title: t('shared:exit'),
             children: t('shared:exit'),
           },
         }}
       >
         {isLoading ? <RobotMotionLoadingModal title={titleText} /> : null}
+        {exitAttempt ? (
+          <ExitPreventionModal
+            onGoBack={() => setExitAttempt(false)}
+            onConfirmExit={() => {
+              setExitAttempt(false)
+              props.onCloseClick()
+            }}
+          />
+        ) : null}
         {isComplete ? (
           <SummaryScreen savePositionCommandData={savePositionCommandData} />
         ) : currentCommandIndex !== 0 ? (
