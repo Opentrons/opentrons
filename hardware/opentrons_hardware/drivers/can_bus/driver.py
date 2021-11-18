@@ -34,7 +34,7 @@ if platform.system() == "Darwin":
 class CanDriver:
     """The can driver."""
 
-    DEFAULT_CAN_NETWORK = "vcan0"
+    DEFAULT_CAN_NETWORK = "can0"
     DEFAULT_CAN_INTERFACE = "socketcan"
     DEFAULT_CAN_BITRATE = 0
 
