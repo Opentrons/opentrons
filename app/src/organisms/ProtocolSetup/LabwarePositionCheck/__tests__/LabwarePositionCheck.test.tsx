@@ -8,6 +8,7 @@ import { GenericStepScreen } from '../GenericStepScreen'
 import { IntroScreen } from '../IntroScreen'
 import { SummaryScreen } from '../SummaryScreen'
 import { RobotMotionLoadingModal } from '../RobotMotionLoadingModal'
+import { ExitPreventionModal } from '../ExitPreventionModal'
 import { useSteps, useLabwarePositionCheck } from '../hooks'
 import { LabwarePositionCheckStep } from '../types'
 
@@ -15,6 +16,7 @@ jest.mock('../GenericStepScreen')
 jest.mock('../IntroScreen')
 jest.mock('../SummaryScreen')
 jest.mock('../RobotMotionLoadingModal')
+jest.mock('../ExitPreventionModal')
 jest.mock('../hooks')
 
 const mockGenericStepScreen = GenericStepScreen as jest.MockedFunction<
@@ -26,6 +28,9 @@ const mockSummaryScreen = SummaryScreen as jest.MockedFunction<
 >
 const mockRobotMotionLoadingModal = RobotMotionLoadingModal as jest.MockedFunction<
   typeof RobotMotionLoadingModal
+>
+const mockExitPreventionModal = ExitPreventionModal as jest.MockedFunction<
+  typeof ExitPreventionModal
 >
 
 const mockUseSteps = useSteps as jest.MockedFunction<typeof useSteps>
@@ -83,6 +88,9 @@ describe('LabwarePositionCheck', () => {
     when(mockSummaryScreen)
       .calledWith(anyProps())
       .mockReturnValue(<div>Mock Summary Screen Component </div>)
+    when(mockExitPreventionModal)
+      .calledWith(anyProps())
+      .mockReturnValue(<div>Mock Exit Prevention Modal</div>)
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -97,14 +105,15 @@ describe('LabwarePositionCheck', () => {
       name: 'exit',
     })
   })
-  it('renders LabwarePositionCheck header and exit button is pressed', () => {
-    const { getByRole } = render(props)
+  it('prevention modal opens when exit button is pressed', () => {
+    const { getByRole, getByText } = render(props)
     expect(props.onCloseClick).not.toHaveBeenCalled()
     const exitButton = getByRole('button', {
       name: 'exit',
     })
     fireEvent.click(exitButton)
-    expect(props.onCloseClick).toHaveBeenCalled()
+    expect(mockExitPreventionModal).toHaveBeenCalled()
+    getByText('Mock Exit Prevention Modal')
   })
   // TODO: fix after wiring up
   it.todo('renders LabwarePositionCheck with Summary Screen component')
