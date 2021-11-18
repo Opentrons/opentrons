@@ -93,6 +93,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
                 labware_version=int(labware_version),
                 deck_slot=deck_slot,
                 on_module=True,
+                pe_labware_offset_id=None,  # FIX BEFORE MERGE
             )
         )
         return mod_labware

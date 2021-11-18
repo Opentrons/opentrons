@@ -132,9 +132,7 @@ class LegacyCommandMapper:
                 definition=LabwareDefinition.parse_obj(
                     labware_load_info.labware_definition
                 ),
-                # fixme(mm, 2021-11-11): Labware offsets added to the ProtocolEngine
-                # need to apply to the legacy protocol somehow, and get fed back here.
-                offsetId=None,
+                offsetId=labware_load_info.pe_labware_offset_id,
             ),
         )
 

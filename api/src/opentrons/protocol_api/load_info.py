@@ -23,13 +23,24 @@ class LabwareLoadInfo:
     """
 
     labware_definition: LabwareDefinition
+
     # todo(mm, 2021-10-11): Namespace, load name, and version can be derived from the
     # definition. Should they be removed from here?
     labware_namespace: str
     labware_load_name: str
     labware_version: int
+
+    # If on_module is True, deck_slot is the slot occupied by the module that the
+    # labware is on.
     deck_slot: DeckSlotName
-    on_module: bool = False
+    on_module: bool
+
+    # The ID of the Protocol Engine labware offset that applied to this labware load,
+    # if there was one.
+    #
+    # todo(mm, 2021-11-18): APIv2 internals should not have to know about Protocol
+    # Engine ideas of labware offsets.
+    pe_labware_offset_id: Optional[str]
 
 
 @dataclass(frozen=True)

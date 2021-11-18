@@ -388,6 +388,8 @@ class ProtocolContext(CommandPublisher):
                 labware_load_name=result_load_name,
                 labware_version=int(result_version),
                 deck_slot=types.DeckSlotName.from_primitive(location),
+                on_module=False,
+                pe_labware_offset_id=None,  # FIX BEFORE MERGE.
             )
         )
 
@@ -441,6 +443,8 @@ class ProtocolContext(CommandPublisher):
                 labware_load_name=result_load_name,
                 labware_version=int(result_version),
                 deck_slot=types.DeckSlotName.from_primitive(location),
+                on_module=False,
+                pe_labware_offset_id=None,  # FIX BEFORE MERGE.
             )
         )
 
