@@ -102,8 +102,12 @@ class OT3Controller:
 
     async def update_position(self) -> AxisValueMap:
         """Get the current position."""
-        ret: AxisValueMap = {}
-        for node, pos in self._position.items():
+        return self._axis_convert(self._position)
+
+    @staticmethod
+    def _axis_convert(position: Dict[NodeId, float]) -> AxisValueMap:
+        ret: AxisValueMap = {"A": 0, "B": 0, "C": 0, "X": 0, "Y": 0, "Z": 0}
+        for node, pos in position.items():
             if node == NodeId.head:
                 ret['A'] = pos
                 ret['Z'] = pos
@@ -155,7 +159,12 @@ class OT3Controller:
         Returns:
             Homed position.
         """
-        return {}
+        self._position = {
+            NodeId.head: 0,
+            NodeId.gantry_x: 0,
+            NodeId.gantry_y: 0,
+        }
+        return self._axis_convert(self._position)
 
     async def fast_home(self, axes: Sequence[str], margin: float) -> AxisValueMap:
         """Fast home axes.
@@ -167,7 +176,12 @@ class OT3Controller:
         Returns:
             New position.
         """
-        return {}
+        self._position = {
+            NodeId.head: 0,
+            NodeId.gantry_x: 0,
+            NodeId.gantry_y: 0,
+        }
+        return self._axis_convert(self._position)
 
     async def get_attached_instruments(
         self, expected: Dict[Mount, PipetteName]
@@ -205,7 +219,9 @@ class OT3Controller:
     @property
     def axis_bounds(self) -> Dict[Axis, Tuple[float, float]]:
         """Get the axis bounds."""
-        return {}
+        # TODO (AL, 2021-11-18): The bounds need to be defined
+        phony_bounds = (0, 10000)
+        return {Axis.A: phony_bounds, Axis.B: phony_bounds, Axis.C: phony_bounds, Axis.X: phony_bounds, Axis.Y: phony_bounds, Axis.Z: phony_bounds}
 
     @property
     def fw_version(self) -> Optional[str]:
