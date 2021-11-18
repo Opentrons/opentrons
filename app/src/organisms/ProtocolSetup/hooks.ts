@@ -1,25 +1,14 @@
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
-<<<<<<< HEAD
-=======
 import { checkModuleCompatibility } from '@opentrons/shared-data'
-
-import {
-  getProtocolAuthor,
-  getProtocolLastUpdated,
-  getProtocolMethod,
-  getProtocolDescription,
-} from '../../redux/protocol'
->>>>>>> ab3785c08 (refactor(app): match protocol modules to usb ports via load order)
 import { useProtocolDetails } from '../RunDetails/hooks'
+import { useSelector } from 'react-redux'
+import { State } from '../../redux/types'
 import { getProtocolModulesInfo } from './utils/getProtocolModulesInfo'
 import { getLabwareRenderInfo } from './utils/getLabwareRenderInfo'
-<<<<<<< HEAD
-import { useCurrentProtocolRun } from '../ProtocolUpload/hooks'
-=======
 import { getAttachedModules } from '../../redux/modules'
 import { getConnectedRobotName } from '../../redux/robot/selectors'
 import { AttachedModule } from '../../redux/modules/types'
->>>>>>> ab3785c08 (refactor(app): match protocol modules to usb ports via load order)
+import { useCurrentProtocolRun } from '../ProtocolUpload/hooks'
 
 import type { ProtocolModuleInfo } from './utils/getProtocolModulesInfo'
 import type { LabwareRenderInfoById } from './utils/getLabwareRenderInfo'
