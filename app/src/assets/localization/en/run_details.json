@@ -19,7 +19,6 @@
   "status_stop-requested": "Stop requested",
   "status_stopped": "Canceled",
   "status_succeeded": "Completed",
-  "stop_requested": "Stop requested",
   "target_temperature": "Target: {{temperature}} °C",
   "temperature_not_available": "{{temperature_type}}: n/a",
   "current_step": "Current Step",

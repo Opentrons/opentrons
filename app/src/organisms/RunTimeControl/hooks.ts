@@ -99,28 +99,34 @@ export function useRunPauseTime(): string | null {
     : null
 }
 
-export function useRunCompleteTime(): string | undefined {
+export function useRunCompleteTime(): string | null {
   const { runRecord } = useCurrentProtocolRun()
 
   const runData = runRecord?.data as RunData
-  const commands = runData?.commands
   const runId = runData?.id
-  const status = runData?.status
-  const lastCommand = last(commands)
-  const lastCommandId = lastCommand?.id
+  const runStatus = runData?.status
 
-  const { data } = useCommandQuery(runId, lastCommandId as string)
+  const lastCommandId = last(runData?.commands)?.id
 
-  if (
-    status !== RUN_STATUS_STOPPED &&
-    status !== RUN_STATUS_FAILED &&
-    status !== RUN_STATUS_SUCCEEDED
-  ) {
-    return
+  const { data: commandData } = useCommandQuery(runId, lastCommandId as string)
+
+  const lastActionAt = last(runData?.actions)?.createdAt
+  const lastErrorAt = last(runData?.errors)?.createdAt
+  const lastCommandAt = commandData?.data?.createdAt
+
+  let runCompletedTime = null
+
+  if (runStatus === RUN_STATUS_STOPPED) {
+    runCompletedTime = lastActionAt ?? null
   }
 
-  const fullLastCommand = data?.data
-  const runCompletedTime = fullLastCommand?.createdAt
+  if (runStatus === RUN_STATUS_FAILED) {
+    runCompletedTime = lastErrorAt ?? null
+  }
+
+  if (runStatus === RUN_STATUS_SUCCEEDED) {
+    runCompletedTime = lastCommandAt ?? null
+  }
 
   return runCompletedTime
 }

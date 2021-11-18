@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
+  RunStatus,
   RUN_STATUS_IDLE,
   RUN_STATUS_RUNNING,
   RUN_STATUS_PAUSE_REQUESTED,
@@ -48,49 +49,52 @@ export function RunTimeControl(): JSX.Element | null {
   const pausedAt = useRunPauseTime()
   const completedAt = useRunCompleteTime()
 
+  // display an idle status as 'running' in the UI after a run has started
+  const adjustedRunStatus: RunStatus | null =
+    runStatus === RUN_STATUS_IDLE && startTime != null
+      ? RUN_STATUS_RUNNING
+      : runStatus
+
   const { play, pause, reset } = useRunControls()
 
   let handleButtonClick = (): void => {}
   let buttonIconName: IconName | null = null
   let buttonText: string = ''
 
-  if (runStatus === RUN_STATUS_IDLE) {
+  if (adjustedRunStatus === RUN_STATUS_IDLE) {
     buttonIconName = 'play'
     buttonText = t('start_run')
     handleButtonClick = play
-  } else if (runStatus === RUN_STATUS_RUNNING) {
+  } else if (adjustedRunStatus === RUN_STATUS_RUNNING) {
     buttonIconName = 'pause'
     buttonText = t('pause_run')
     handleButtonClick = pause
   } else if (
-    runStatus === RUN_STATUS_PAUSED ||
-    runStatus === RUN_STATUS_PAUSE_REQUESTED
+    adjustedRunStatus === RUN_STATUS_PAUSED ||
+    adjustedRunStatus === RUN_STATUS_PAUSE_REQUESTED
   ) {
     buttonIconName = 'play'
     buttonText = t('resume_run')
     handleButtonClick = play
-  } else if (runStatus === RUN_STATUS_STOP_REQUESTED) {
-    buttonIconName = null
-    buttonText = t('stop_requested')
-    handleButtonClick = (): void => {}
   } else if (
-    runStatus === RUN_STATUS_STOPPED ||
-    runStatus === RUN_STATUS_FAILED ||
-    runStatus === RUN_STATUS_SUCCEEDED
+    adjustedRunStatus === RUN_STATUS_STOP_REQUESTED ||
+    adjustedRunStatus === RUN_STATUS_STOPPED ||
+    adjustedRunStatus === RUN_STATUS_FAILED ||
+    adjustedRunStatus === RUN_STATUS_SUCCEEDED
   ) {
     buttonIconName = null
     buttonText = t('run_again')
     handleButtonClick = reset
   }
 
-  return runStatus != null ? (
+  return adjustedRunStatus != null ? (
     <Flex flexDirection={DIRECTION_COLUMN} margin={SPACING_2}>
       <Text css={FONT_HEADER_DARK} marginBottom={SPACING_3}>
         {t('run_protocol')}
       </Text>
       <Text css={FONT_BODY_1_DARK_SEMIBOLD} marginBottom={SPACING_3}>
-        {runStatus != null
-          ? t('run_status', { status: t(`status_${runStatus}`) })
+        {adjustedRunStatus != null
+          ? t('run_status', { status: t(`status_${adjustedRunStatus}`) })
           : ''}
       </Text>
       {startTime != null ? (

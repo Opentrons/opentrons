@@ -15,7 +15,7 @@ import { formatInterval } from './utils'
 interface TimerProps {
   startTime: string
   pausedAt: string | null
-  completedAt?: string
+  completedAt: string | null
 }
 
 export function Timer({

@@ -9,14 +9,17 @@ const PAUSED_TIME = '2021-10-07T18:47:55.366581+00:00'
 const COMPLETED_TIME = '2021-10-07T18:58:59.366581+00:00'
 
 const render = () => {
-  return renderWithProviders(<Timer startTime={START_TIME} pausedAt={null} />, {
-    i18nInstance: i18n,
-  })
+  return renderWithProviders(
+    <Timer startTime={START_TIME} pausedAt={null} completedAt={null} />,
+    {
+      i18nInstance: i18n,
+    }
+  )
 }
 
 const renderPaused = () => {
   return renderWithProviders(
-    <Timer startTime={START_TIME} pausedAt={PAUSED_TIME} />,
+    <Timer startTime={START_TIME} pausedAt={PAUSED_TIME} completedAt={null} />,
     {
       i18nInstance: i18n,
     }
