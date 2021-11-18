@@ -71,10 +71,12 @@ export function CollapsibleStep({
         <Icon size={SIZE_1} name={expanded ? 'minus' : 'plus'} />
       </Flex>
       <Box
-        maxHeight={expanded ? "100vh" : "0vh"}
-        transition={expanded ? "max-height 500ms ease-in" : "max-height 500ms ease-out"}
+        maxHeight={expanded ? '100vh' : '0vh'}
+        transition={
+          expanded ? 'max-height 500ms ease-in' : 'max-height 500ms ease-out'
+        }
         overflow="hidden"
-        >
+      >
         {children}
       </Box>
     </Flex>

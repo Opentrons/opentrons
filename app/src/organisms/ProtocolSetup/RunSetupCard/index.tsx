@@ -52,26 +52,33 @@ export function RunSetupCard(): JSX.Element | null {
   const [expandedStepKey, setExpandedStepKey] = React.useState<StepKey | null>(
     null
   )
-  const [stepsKeysInOrder, setStepKeysInOrder] = React.useState<StepKey[]>(
-    [ROBOT_CALIBRATION_STEP_KEY, LABWARE_SETUP_KEY]
-  )
+  const [stepsKeysInOrder, setStepKeysInOrder] = React.useState<StepKey[]>([
+    ROBOT_CALIBRATION_STEP_KEY,
+    LABWARE_SETUP_KEY,
+  ])
   React.useEffect(() => {
     if (protocolData != null && protocolHasModules(protocolData)) {
-      setStepKeysInOrder([ ROBOT_CALIBRATION_STEP_KEY, MODULE_SETUP_KEY, LABWARE_SETUP_KEY ])
+      setStepKeysInOrder([
+        ROBOT_CALIBRATION_STEP_KEY,
+        MODULE_SETUP_KEY,
+        LABWARE_SETUP_KEY,
+      ])
     }
     let initialExpandedStepKey: StepKey = ROBOT_CALIBRATION_STEP_KEY
     if (calibrationStatus.complete) {
-      initialExpandedStepKey = stepsKeysInOrder[stepsKeysInOrder.findIndex(v => v === ROBOT_CALIBRATION_STEP_KEY) + 1]
+      initialExpandedStepKey =
+        stepsKeysInOrder[
+          stepsKeysInOrder.findIndex(v => v === ROBOT_CALIBRATION_STEP_KEY) + 1
+        ]
     }
-    const initialExpandTimer = setTimeout(() => setExpandedStepKey(initialExpandedStepKey), INITIAL_EXPAND_DELAY_MS);
-    return () => clearTimeout(initialExpandTimer);
+    const initialExpandTimer = setTimeout(
+      () => setExpandedStepKey(initialExpandedStepKey),
+      INITIAL_EXPAND_DELAY_MS
+    )
+    return () => clearTimeout(initialExpandTimer)
   }, [Boolean(protocolData)])
 
-  if (
-    protocolData == null ||
-    robot == null
-  )
-    return null
+  if (protocolData == null || robot == null) return null
 
   const StepDetailMap: Record<
     StepKey,
@@ -81,7 +88,13 @@ export function RunSetupCard(): JSX.Element | null {
       stepInternals: (
         <RobotCalibration
           robot={robot}
-          nextStep={stepsKeysInOrder[stepsKeysInOrder.findIndex(v => v === ROBOT_CALIBRATION_STEP_KEY) + 1]}
+          nextStep={
+            stepsKeysInOrder[
+              stepsKeysInOrder.findIndex(
+                v => v === ROBOT_CALIBRATION_STEP_KEY
+              ) + 1
+            ]
+          }
           expandStep={nextStep => setExpandedStepKey(nextStep)}
           calibrationStatus={calibrationStatus}
         />
