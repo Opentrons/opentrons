@@ -29,6 +29,7 @@ class PipettingHandler:
         pipette_id: str,
         labware_id: str,
         well_name: str,
+        well_location: WellLocation,
     ) -> None:
         """Pick up a tip at the specified "well"."""
         # get mount and config data from state and hardware controller
@@ -49,6 +50,7 @@ class PipettingHandler:
             pipette_id=pipette_id,
             labware_id=labware_id,
             well_name=well_name,
+            well_location=well_location,
         )
 
         # perform the tip pickup routine
@@ -75,6 +77,7 @@ class PipettingHandler:
         pipette_id: str,
         labware_id: str,
         well_name: str,
+        well_location: WellLocation,
     ) -> None:
         """Drop a tip at the specified "well"."""
         # get mount and config data from state and hardware controller
@@ -83,10 +86,11 @@ class PipettingHandler:
             attached_pipettes=self._hardware_api.attached_instruments,
         )
 
-        # get the tip drop location
-        well_location = self._state_store.geometry.get_tip_drop_location(
-            labware_id=labware_id,
+        # get the adjusted tip drop location
+        tip_drop_location = self._state_store.geometry.get_tip_drop_location(
             pipette_config=hw_pipette.config,
+            labware_id=labware_id,
+            well_location=well_location,
         )
 
         # move the pipette to tip drop location
@@ -94,7 +98,7 @@ class PipettingHandler:
             pipette_id=pipette_id,
             labware_id=labware_id,
             well_name=well_name,
-            well_location=well_location,
+            well_location=tip_drop_location,
         )
 
         # perform the tip drop routine

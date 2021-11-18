@@ -6,7 +6,7 @@ import {
   useCreateRunMutation,
 } from '@opentrons/react-api-client'
 
-export function useCloneRun(runId: string): () => void {
+export function useCloneRun(runId: string | null): () => void {
   const host = useHost()
   const queryClient = useQueryClient()
   const { data: runRecord } = useRunQuery(runId)

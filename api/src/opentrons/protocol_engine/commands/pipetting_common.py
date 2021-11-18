@@ -19,6 +19,10 @@ class BasePipettingParams(BaseModel):
         ...,
         description="Name of well to use in labware.",
     )
+    wellLocation: WellLocation = Field(
+        default_factory=WellLocation,
+        description="Relative well location at which to perform the operation",
+    )
 
 
 class BaseLiquidHandlingParams(BasePipettingParams):
@@ -29,10 +33,6 @@ class BaseLiquidHandlingParams(BasePipettingParams):
         description="Amount of liquid in uL. Must be greater than 0 and less "
         "than a pipette-specific maximum volume.",
         gt=0,
-    )
-    wellLocation: WellLocation = Field(
-        ...,
-        description="Relative well location at which to perform the operation",
     )
 
     # todo(mm, 2021-03-26): This class or one of its subclasses should have a
