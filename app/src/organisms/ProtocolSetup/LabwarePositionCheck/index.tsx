@@ -6,6 +6,7 @@ import {
   ModalPage,
   SPACING_2,
   Text,
+  useConditionalConfirm,
 } from '@opentrons/components'
 import { Portal } from '../../../App/portal'
 import { useRestartRun } from '../../ProtocolUpload/hooks/useRestartRun'
@@ -14,6 +15,7 @@ import { IntroScreen } from './IntroScreen'
 import { GenericStepScreen } from './GenericStepScreen'
 import { SummaryScreen } from './SummaryScreen'
 import { RobotMotionLoadingModal } from './RobotMotionLoadingModal'
+import { ExitPreventionModal } from './ExitPreventionModal'
 
 import styles from '../styles.css'
 import type { SavePositionCommandData } from './types'
@@ -31,6 +33,12 @@ export const LabwarePositionCheck = (
     setSavePositionCommandData,
   ] = React.useState<SavePositionCommandData>({})
   const [isRestartingRun, setIsRestartingRun] = React.useState<boolean>(false)
+
+  const {
+    confirm: confirmExitLPC,
+    showConfirmation,
+    cancel: cancelExitLPC,
+  } = useConditionalConfirm(props.onCloseClick, true)
 
   // at the end of LPC, each labwareId will have 2 associated save position command ids which will be used to calculate the labware offsets
   const addSavePositionCommandData = (
@@ -91,20 +99,29 @@ export const LabwarePositionCheck = (
     jog,
   } = labwarePositionCheckUtils
 
-  return (
-    <Portal level="top">
+  let modalContent: JSX.Element
+  if (isLoading) {
+    modalContent = <RobotMotionLoadingModal title={titleText} />
+  } else if (showConfirmation) {
+    modalContent = (
+      <ExitPreventionModal
+        onGoBack={cancelExitLPC}
+        onConfirmExit={confirmExitLPC}
+      />
+    )
+  } else {
+    modalContent = (
       <ModalPage
         contentsClassName={styles.modal_contents}
         titleBar={{
           title: t('labware_position_check_title'),
           back: {
-            onClick: props.onCloseClick,
+            onClick: confirmExitLPC,
             title: t('shared:exit'),
             children: t('shared:exit'),
           },
         }}
       >
-        {isLoading ? <RobotMotionLoadingModal title={titleText} /> : null}
         {isComplete ? (
           <SummaryScreen savePositionCommandData={savePositionCommandData} />
         ) : currentCommandIndex !== 0 ? (
@@ -119,6 +136,7 @@ export const LabwarePositionCheck = (
           <IntroScreen beginLPC={beginLPC} />
         )}
       </ModalPage>
-    </Portal>
-  )
+    )
+  }
+  return <Portal level="top">{modalContent}</Portal>
 }
