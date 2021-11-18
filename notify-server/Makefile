@@ -20,6 +20,11 @@ SRC_PATH = notify_server
 # used to create the wheel.
 wheel_file = dist/$(call python_get_wheelname,notify-server,notify_server,$(BUILD_NUMBER))
 
+# Find the version of the sdist from package.json using a helper script. We
+# use python here so we can use the same version normalization that will be
+# used to create the sdist.
+sdist_file = dist/$(call python_get_sdistname,notify-server,notify_server)
+
 
 # These variables can be overriden when make is invoked to customize the
 # behavior of pytest. For instance,
@@ -60,13 +65,23 @@ clean:
 teardown:
 	$(pipenv) --rm
 
-dist/notify_server-%-py2.py3-none-any.whl: setup.py $(ot_sources)
+$(wheel_file): setup.py $(ot_sources)
 	$(clean_cmd)
 	$(python) setup.py $(wheel_opts) bdist_wheel --universal
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
+.PHONY: wheel
 wheel: $(wheel_file)
+
+$(sdist_file): setup.py $(ot_sources)
+	$(clean_cmd)
+	$(python) setup.py sdist
+	$(SHX) rm -rf build
+	$(SHX) ls dist
+
+.PHONY: sdist
+sdist: $(sdist_file)
 
 .PHONY: test
 test:
@@ -75,7 +90,12 @@ test:
 .PHONY: lint
 lint: $(ot_py_sources)
 	$(python) -m mypy $(SRC_PATH) $(tests)
+	$(python) -m black --check notify_server tests setup.py
 	$(python) -m flake8 $(SRC_PATH) $(tests)
+
+.PHONY: format
+format:
+	$(python) -m black notify_server tests setup.py
 
 .PHONY: dev
 dev: export OT_NOTIFY_SERVER_PRODUCTION := 0
@@ -91,6 +111,12 @@ push: wheel
 	$(call push-python-package,$(host),$(br_ssh_key),$(ssh_opts),$(wheel_file))
 	$(call push-systemd-unit,$(host),$(br_ssh_key),$(ssh_opts),./opentrons-notify-server.service)
 	$(call restart-service,$(host),$(br_ssh_key),$(ssh_opts),opentrons-notify-server)
+
+
+.PHONY: push-no-restart-ot3
+push-no-restart-ot3: sdist
+	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),"/opt/opentrons-robot-server","notify_server")
+
 
 .PHONY: install-key
 install-key:

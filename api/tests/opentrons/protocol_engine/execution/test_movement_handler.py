@@ -1,15 +1,38 @@
-"""Pipetting command handler."""
+"""Pipetting command subject."""
 import pytest
 from decoy import Decoy
+from typing import NamedTuple
 
 from opentrons.types import MountType, Mount, Point
-from opentrons.hardware_control.api import API as HardwareAPI
-from opentrons.hardware_control.types import CriticalPoint
+from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control.types import (
+    CriticalPoint,
+    Axis as HardwareAxis,
+    MustHomeError as HardwareMustHomeError,
+)
 from opentrons.motion_planning import Waypoint
 
-from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
-from opentrons.protocol_engine.state import StateStore, PipetteLocationData, CurrentWell
-from opentrons.protocol_engine.execution.movement import MovementHandler
+from opentrons.protocol_engine.errors import MustHomeError
+from opentrons.protocol_engine.types import (
+    DeckPoint,
+    MotorAxis,
+    MovementAxis,
+    WellLocation,
+    WellOrigin,
+    WellOffset,
+)
+from opentrons.protocol_engine.state import (
+    StateStore,
+    PipetteLocationData,
+    CurrentWell,
+    HardwarePipette,
+)
+from opentrons.protocol_engine.execution.movement import (
+    MovementHandler,
+    SavedPositionData,
+)
+
+from .mock_defs import MockPipettes
 
 
 @pytest.fixture
@@ -19,13 +42,21 @@ def hardware_api(decoy: Decoy) -> HardwareAPI:
 
 
 @pytest.fixture
+def mock_hw_pipettes(hardware_api: HardwareAPI) -> MockPipettes:
+    """Get mock pipette configs and attach them to the mock HW controller."""
+    mock_hw_pipettes = MockPipettes()
+    hardware_api.attached_instruments = mock_hw_pipettes.by_mount  # type: ignore[misc]
+    return mock_hw_pipettes
+
+
+@pytest.fixture
 def state_store(decoy: Decoy) -> StateStore:
     """Get a mock in the shape of a StateStore."""
     return decoy.mock(cls=StateStore)
 
 
 @pytest.fixture
-def handler(state_store: StateStore, hardware_api: HardwareAPI) -> MovementHandler:
+def subject(state_store: StateStore, hardware_api: HardwareAPI) -> MovementHandler:
     """Create a PipettingHandler with its dependencies mocked out."""
     return MovementHandler(state_store=state_store, hardware_api=hardware_api)
 
@@ -34,7 +65,7 @@ async def test_move_to_well(
     decoy: Decoy,
     state_store: StateStore,
     hardware_api: HardwareAPI,
-    handler: MovementHandler,
+    subject: MovementHandler,
 ) -> None:
     """Move requests should call hardware controller with movement data."""
     well_location = WellLocation(
@@ -80,7 +111,7 @@ async def test_move_to_well(
         [Waypoint(Point(1, 2, 3), CriticalPoint.XY_CENTER), Waypoint(Point(4, 5, 6))]
     )
 
-    await handler.move_to_well(
+    await subject.move_to_well(
         pipette_id="pipette-id",
         labware_id="labware-id",
         well_name="B2",
@@ -105,7 +136,7 @@ async def test_move_to_well_from_starting_location(
     decoy: Decoy,
     state_store: StateStore,
     hardware_api: HardwareAPI,
-    handler: MovementHandler,
+    subject: MovementHandler,
 ) -> None:
     """It should be able to move to a well from a start location."""
     well_location = WellLocation(
@@ -155,7 +186,7 @@ async def test_move_to_well_from_starting_location(
         )
     ).then_return([Waypoint(Point(1, 2, 3), CriticalPoint.XY_CENTER)])
 
-    await handler.move_to_well(
+    await subject.move_to_well(
         pipette_id="pipette-id",
         labware_id="labware-id",
         well_name="B2",
@@ -170,3 +201,249 @@ async def test_move_to_well_from_starting_location(
             critical_point=CriticalPoint.XY_CENTER,
         ),
     )
+
+
+class MoveRelativeSpec(NamedTuple):
+    """Test data for move_relative."""
+
+    axis: MovementAxis
+    expected_delta: Point
+    distance: float = 42.0
+
+
+@pytest.mark.parametrize(
+    MoveRelativeSpec._fields,
+    [
+        MoveRelativeSpec(
+            axis=MovementAxis.X,
+            expected_delta=Point(x=42.0, y=0, z=0),
+        ),
+        MoveRelativeSpec(
+            axis=MovementAxis.Y,
+            expected_delta=Point(x=0, y=42.0, z=0),
+        ),
+        MoveRelativeSpec(
+            axis=MovementAxis.Z,
+            expected_delta=Point(x=0, y=0, z=42.0),
+        ),
+    ],
+)
+async def test_move_relative(
+    decoy: Decoy,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    subject: MovementHandler,
+    axis: MovementAxis,
+    expected_delta: Point,
+    distance: float,
+) -> None:
+    """Test that move_relative triggers a relative move with the HardwareAPI."""
+    decoy.when(
+        state_store.motion.get_pipette_location(pipette_id="pipette-id")
+    ).then_return(
+        PipetteLocationData(
+            mount=MountType.LEFT,
+            critical_point=CriticalPoint.XY_CENTER,
+        )
+    )
+
+    await subject.move_relative(
+        pipette_id="pipette-id",
+        axis=axis,
+        distance=distance,
+    )
+
+    decoy.verify(
+        await hardware_api.move_rel(
+            mount=Mount.LEFT,
+            delta=expected_delta,
+            fail_on_not_homed=True,
+        )
+    )
+
+
+async def test_move_relative_must_home(
+    decoy: Decoy,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    subject: MovementHandler,
+) -> None:
+    """It should raise a MustHomeError if the hardware controller is not homed."""
+    decoy.when(
+        state_store.motion.get_pipette_location(pipette_id="pipette-id")
+    ).then_return(
+        PipetteLocationData(
+            mount=MountType.LEFT,
+            critical_point=CriticalPoint.XY_CENTER,
+        )
+    )
+
+    decoy.when(
+        await hardware_api.move_rel(
+            mount=Mount.LEFT,
+            delta=Point(x=0, y=0, z=42.0),
+            fail_on_not_homed=True,
+        )
+    ).then_raise(HardwareMustHomeError("oh no"))
+
+    with pytest.raises(MustHomeError, match="oh no"):
+        await subject.move_relative(
+            pipette_id="pipette-id",
+            axis=MovementAxis.Z,
+            distance=42.0,
+        )
+
+
+async def test_save_position(
+    decoy: Decoy,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    subject: MovementHandler,
+) -> None:
+    """Test that `save_position` fetches gantry position from hardwareAPI."""
+    decoy.when(
+        state_store.motion.get_pipette_location(
+            pipette_id="pipette-id",
+        )
+    ).then_return(
+        PipetteLocationData(
+            mount=MountType.LEFT,
+            critical_point=CriticalPoint.XY_CENTER,
+        )
+    )
+
+    decoy.when(
+        await hardware_api.gantry_position(
+            mount=Mount.LEFT,
+            critical_point=CriticalPoint.XY_CENTER,
+            fail_on_not_homed=True,
+        )
+    ).then_return(Point(1, 1, 1))
+
+    result = await subject.save_position(pipette_id="pipette-id", position_id="123")
+
+    assert result == SavedPositionData(
+        positionId="123", position=DeckPoint(x=1, y=1, z=1)
+    )
+
+
+@pytest.mark.parametrize(
+    argnames=["unverified_cp", "tip_length", "verified_cp"],
+    argvalues=[
+        [None, 0, CriticalPoint.NOZZLE],
+        [None, 999, CriticalPoint.TIP],
+        [CriticalPoint.XY_CENTER, 999, CriticalPoint.XY_CENTER],
+    ],
+)
+async def test_save_position_different_cp(
+    decoy: Decoy,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    subject: MovementHandler,
+    mock_hw_pipettes: MockPipettes,
+    unverified_cp: CriticalPoint,
+    tip_length: float,
+    verified_cp: CriticalPoint,
+) -> None:
+    """Test that `save_position` selects correct critical point."""
+    decoy.when(
+        state_store.motion.get_pipette_location(
+            pipette_id="pipette-id",
+        )
+    ).then_return(
+        PipetteLocationData(
+            mount=MountType.LEFT,
+            critical_point=unverified_cp,
+        )
+    )
+
+    mock_hw_pipettes.left_config.update({"tip_length": tip_length})
+
+    decoy.when(
+        state_store.pipettes.get_hardware_pipette(
+            pipette_id="pipette-id",
+            attached_pipettes=mock_hw_pipettes.by_mount,
+        )
+    ).then_return(
+        HardwarePipette(mount=Mount.LEFT, config=mock_hw_pipettes.left_config)
+    )
+    decoy.when(
+        await hardware_api.gantry_position(
+            mount=Mount.LEFT,
+            critical_point=verified_cp,
+            fail_on_not_homed=True,
+        )
+    ).then_return(Point(1, 1, 1))
+
+    result = await subject.save_position(pipette_id="pipette-id", position_id="123")
+
+    assert result == SavedPositionData(
+        positionId="123", position=DeckPoint(x=1, y=1, z=1)
+    )
+
+
+async def test_save_position_must_home(
+    decoy: Decoy,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    subject: MovementHandler,
+) -> None:
+    """It should propagate a must home error."""
+    decoy.when(
+        state_store.motion.get_pipette_location(
+            pipette_id="pipette-id",
+        )
+    ).then_return(
+        PipetteLocationData(
+            mount=MountType.LEFT,
+            critical_point=CriticalPoint.XY_CENTER,
+        )
+    )
+
+    decoy.when(
+        await hardware_api.gantry_position(
+            mount=Mount.LEFT,
+            critical_point=CriticalPoint.XY_CENTER,
+            fail_on_not_homed=True,
+        )
+    ).then_raise(HardwareMustHomeError("oh no"))
+
+    with pytest.raises(MustHomeError, match="oh no"):
+        await subject.save_position(pipette_id="pipette-id", position_id="123")
+
+
+async def test_home(
+    decoy: Decoy,
+    hardware_api: HardwareAPI,
+    subject: MovementHandler,
+) -> None:
+    """It should home a set of axes."""
+    await subject.home(
+        axes=[
+            MotorAxis.X,
+            MotorAxis.Y,
+            MotorAxis.LEFT_Z,
+            MotorAxis.RIGHT_Z,
+            MotorAxis.LEFT_PLUNGER,
+            MotorAxis.RIGHT_PLUNGER,
+        ]
+    )
+    decoy.verify(
+        await hardware_api.home(
+            axes=[
+                HardwareAxis.X,
+                HardwareAxis.Y,
+                HardwareAxis.Z,
+                HardwareAxis.A,
+                HardwareAxis.B,
+                HardwareAxis.C,
+            ]
+        ),
+        times=1,
+    )
+
+    await subject.home(axes=None)
+    decoy.verify(await hardware_api.home(axes=None), times=1)
+
+    await subject.home(axes=[])
+    decoy.verify(await hardware_api.home(axes=[]), times=1)

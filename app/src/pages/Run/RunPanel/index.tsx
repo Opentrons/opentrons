@@ -1,19 +1,18 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { useTranslation } from 'react-i18next'
+import { SidePanel, SidePanelGroup } from '@opentrons/components'
 
+import { RunTimeControl } from '../../../organisms/RunTimeControl'
+import { useFeatureFlag } from '../../../redux/config'
+import { getMissingModules } from '../../../redux/modules'
 import {
   actions as robotActions,
   selectors as robotSelectors,
 } from '../../../redux/robot'
-import { getMissingModules } from '../../../redux/modules'
 
-import { SidePanel, SidePanelGroup } from '@opentrons/components'
 import { RunTimer } from './RunTimer'
 import { RunControls } from './RunControls'
 import { ModuleLiveStatusCards } from './ModuleLiveStatusCards'
-import { useFeatureFlag } from '../../../redux/config'
-import { RunTimeControl } from '../../../organisms/RunTimeControl'
 
 import type { MapDispatchToProps } from 'react-redux'
 import type { State } from '../../../redux/types'
@@ -56,11 +55,10 @@ const mapDispatchToProps: MapDispatchToProps<DP, {}> = dispatch => ({
 })
 
 export function RunPanelComponent(props: Props): JSX.Element {
-  const { t } = useTranslation('run_details')
   const isNewProtocolRunPanel = useFeatureFlag('preProtocolFlowWithoutRPC')
 
   return isNewProtocolRunPanel ? (
-    <SidePanel title={t('run_protocol')}>
+    <SidePanel>
       <RunTimeControl />
       <ModuleLiveStatusCards />
     </SidePanel>

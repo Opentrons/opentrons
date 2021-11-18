@@ -138,3 +138,13 @@ async def upload_via_bossa(
         log.error(f"Error given: {stderr.decode()}")
         return False, res
     return False, ""
+
+
+async def upload_via_dfu(
+    port: str, firmware_file: str, kwargs: Dict[str, Any]
+) -> Tuple[bool, str]:
+    """Run a TBD firmware upload command for heater/shaker.
+
+    Returns tuple of success boolean and message from bootloader
+    """
+    return False, ""

@@ -10,6 +10,13 @@ SHX := npx shx
 # used to create the wheel.
 wheel_file = dist/$(call python_get_wheelname,hardware,opentrons_hardware,$(BUILD_NUMBER))
 
+
+# Find the version of the sdist from package.json using a helper script. We
+# use python here so we can use the same version normalization that will be
+# used to create the sdist.
+sdist_file = dist/$(call python_get_sdistname,hardware,opentrons_hardware)
+
+
 # These variables can be overriden when make is invoked to customize the
 # behavior of pytest. For instance,
 # make test tests=tests/opentrons/tools/test_pipette_memory.py would run only the
@@ -62,13 +69,21 @@ dist/opentrons_hardware-%-py2.py3-none-any.whl: setup.py $(ot_sources)
 
 wheel: $(wheel_file)
 
+$(sdist_file): setup.py $(ot_sources)
+	$(clean_cmd)
+	$(python) setup.py sdist
+	$(SHX) rm -rf build
+	$(SHX) ls dist
+
+sdist: $(sdist_file)
+
 .PHONY: test
 test:
 	$(pytest) -m 'not requires_emulator' $(tests) $(test_opts)
 
 .PHONY: test-with-emulator
 test-with-emulator:
-	$(pytest) -m 'requires_emulator' $(tests) $(test_opts)
+	$(pytest) $(tests) $(test_opts)
 
 .PHONY: lint
 lint:
@@ -93,6 +108,16 @@ push-no-restart: wheel
 .PHONY: push
 push: push-no-restart
 	$(call restart-service,$(host),$(br_ssh_key),$(ssh_opts),"jupyter-notebook opentrons-robot-server")
+
+
+.PHONY: push-no-restart-ot3
+push-no-restart-ot3: $(sdist_file)
+	echo $(sdist_file)
+	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,"opentrons_hardware")
+
+.PHONY: push-ot3
+push-ot3: push-no-restart-ot3
+	$(call restart-server,$(host),,$(ssh_opts),"opentrons-robot-server")
 
 
 # Launch the emulator application.

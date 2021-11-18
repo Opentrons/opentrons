@@ -3,10 +3,10 @@ import asyncio
 import contextlib
 import logging
 from typing import (
+    Callable,
     Dict,
     Iterator,
     List,
-    Callable,
     Optional,
     Tuple,
     Union,
@@ -15,9 +15,10 @@ from typing import (
 )
 from collections import OrderedDict
 
+from opentrons import types
+from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import SynchronousAdapter, ThreadManager
 from opentrons.hardware_control.modules.types import ModuleType
-from opentrons import types
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
 from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support.types import APIVersion
@@ -41,6 +42,7 @@ from .module_contexts import (
     TemperatureModuleContext,
     ThermocyclerContext,
 )
+from .load_info import LabwareLoadInfo, ModuleLoadInfo, InstrumentLoadInfo
 from opentrons.protocols.api_support.util import (
     AxisMaxSpeeds,
     requires_version,
@@ -110,6 +112,44 @@ class ProtocolContext(CommandPublisher):
         self._commands: List[str] = []
         self._unsubscribe_commands: Optional[Callable[[], None]] = None
         self.clear_commands()
+
+        self._labware_load_broker = EquipmentBroker[LabwareLoadInfo]()
+        self._instrument_load_broker = EquipmentBroker[InstrumentLoadInfo]()
+        self._module_load_broker = EquipmentBroker[ModuleLoadInfo]()
+
+    @property
+    def labware_load_broker(self) -> EquipmentBroker[LabwareLoadInfo]:
+        """For internal Opentrons use only.
+
+        :meta private:
+
+        Subscribers to this broker will be notified with information about every
+        successful labware load.
+
+        Only :py:obj:`ProtocolContext` is allowed to publish to this broker.
+        Calling code may only subscribe or unsubscribe.
+        """
+        return self._labware_load_broker
+
+    @property
+    def instrument_load_broker(self) -> EquipmentBroker[InstrumentLoadInfo]:
+        """For internal Opentrons use only.
+
+        :meta private:
+
+        Like `labware_load_broker`, but for pipettes.
+        """
+        return self._instrument_load_broker
+
+    @property
+    def module_load_broker(self) -> EquipmentBroker[ModuleLoadInfo]:
+        """For internal Opentrons use only.
+
+        :meta private:
+
+        Like `labware_load_broker`, but for modules.
+        """
+        return self._module_load_broker
 
     @classmethod
     def build_using(
@@ -338,7 +378,20 @@ class ProtocolContext(CommandPublisher):
         implementation = self._implementation.load_labware_from_definition(
             labware_def=labware_def, location=location, label=label
         )
-        return Labware(implementation=implementation)
+        result = Labware(implementation=implementation)
+
+        result_namespace, result_load_name, result_version = result.uri.split("/")
+        self.labware_load_broker.publish(
+            LabwareLoadInfo(
+                labware_definition=result._implementation.get_definition(),
+                labware_namespace=result_namespace,
+                labware_load_name=result_load_name,
+                labware_version=int(result_version),
+                deck_slot=types.DeckSlotName.from_primitive(location),
+            )
+        )
+
+        return result
 
     @requires_version(2, 0)
     def load_labware(
@@ -378,7 +431,20 @@ class ProtocolContext(CommandPublisher):
             namespace=namespace,
             version=version,
         )
-        return Labware(implementation=implementation)
+        result = Labware(implementation=implementation)
+
+        result_namespace, result_load_name, result_version = result.uri.split("/")
+        self.labware_load_broker.publish(
+            LabwareLoadInfo(
+                labware_definition=result._implementation.get_definition(),
+                labware_namespace=result_namespace,
+                labware_load_name=result_load_name,
+                labware_version=int(result_version),
+                deck_slot=types.DeckSlotName.from_primitive(location),
+            )
+        )
+
+        return result
 
     @requires_version(2, 0)
     def load_labware_by_name(
@@ -490,6 +556,16 @@ class ProtocolContext(CommandPublisher):
             self, module.module, module.geometry, self.api_version, self._loop
         )
         self._modules.append(module_context)
+        module_loc = module.geometry.parent
+        assert isinstance(module_loc, (int, str)), "Unexpected labware object parent"
+        deck_slot = types.DeckSlotName.from_primitive(module_loc)
+        self.module_load_broker.publish(
+            ModuleLoadInfo(
+                module_name=module_name,
+                deck_slot=deck_slot,
+                configuration=configuration,
+            )
+        )
         return module_context
 
     @property  # type: ignore
@@ -580,6 +656,14 @@ class ProtocolContext(CommandPublisher):
             tip_racks=tip_racks,
         )
         self._instruments[checked_mount] = new_instr
+
+        self.instrument_load_broker.publish(
+            InstrumentLoadInfo(
+                instrument_load_name=instrument_name,
+                mount=checked_mount,
+            )
+        )
+
         return new_instr
 
     @property  # type: ignore

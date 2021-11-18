@@ -7,14 +7,14 @@ metadata = {
     "source": "Opentrons Repository",
 }
 
-p200rack = containers.load("tiprack-200ul", "5", "tiprack")
+p200rack = containers.load("tiprack-200ul", "5", "tiprack")  # type: ignore
 
 # create a p200 pipette on robot axis B
-p300 = instruments.P300_Single(mount="right", tip_racks=[p200rack])
+p300 = instruments.P300_Single(mount="right", tip_racks=[p200rack])  # type: ignore
 
 p300.pick_up_tip()
 
-conts = [containers.load("96-PCR-flat", slot) for slot in ("8", "11")]
+conts = [containers.load("96-PCR-flat", slot) for slot in ("8", "11")]  # type: ignore
 
 # Uncomment these to test precision
 # p300.move_to(robot.deck['11'])

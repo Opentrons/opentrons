@@ -20,7 +20,13 @@ from opentrons.commands import protocol_commands
         [1.0001, 0, 1.0001, 0, "Delaying for 0 minutes and 1.0 seconds"],
     ],
 )
-def test_delay(seconds, minutes, expected_seconds, expected_minutes, expected_text):
+def test_delay(
+    seconds: int,
+    minutes: int,
+    expected_seconds: int,
+    expected_minutes: int,
+    expected_text: str,
+) -> None:
     command = protocol_commands.delay(seconds, minutes)
     name = command["name"]
     payload = command["payload"]
@@ -31,7 +37,7 @@ def test_delay(seconds, minutes, expected_seconds, expected_minutes, expected_te
     assert payload["text"] == expected_text
 
 
-def test_delay_with_message():
+def test_delay_with_message() -> None:
     """It should allow a message to be appended to the delay text."""
     command = protocol_commands.delay(seconds=1, minutes=1, msg="Waiting...")
 

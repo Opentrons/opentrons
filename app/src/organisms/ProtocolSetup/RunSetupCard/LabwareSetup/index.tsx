@@ -18,6 +18,9 @@ import {
   C_BLUE,
   C_DARK_GRAY,
   C_NEAR_WHITE,
+  DIRECTION_ROW,
+  Box,
+  FONT_WEIGHT_SEMIBOLD,
 } from '@opentrons/components'
 import {
   inferModuleOrientationFromXCoordinate,
@@ -25,12 +28,12 @@ import {
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { LabwarePositionCheck } from '../../LabwarePositionCheck'
-import { LabwareInfoOverlay } from './LabwareInfoOverlay'
-import { LabwareSetupModal } from './LabwareSetupModal'
-import { getModuleTypesThatRequireExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
-import { ExtraAttentionWarning } from './ExtraAttentionWarning'
 import styles from '../../styles.css'
 import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../../hooks'
+import { LabwareInfoOverlay } from './LabwareInfoOverlay'
+import { LabwareOffsetModal } from './LabwareOffsetModal'
+import { getModuleTypesThatRequireExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
+import { ExtraAttentionWarning } from './ExtraAttentionWarning'
 
 const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
@@ -67,7 +70,7 @@ export const LabwareSetup = (): JSX.Element | null => {
   return (
     <React.Fragment>
       {showLabwareHelpModal && (
-        <LabwareSetupModal
+        <LabwareOffsetModal
           onCloseClick={() => setShowLabwareHelpModal(false)}
         />
       )}
@@ -138,22 +141,42 @@ export const LabwareSetup = (): JSX.Element | null => {
             )
           }}
         </RobotWorkSpace>
-        <Text as={'h4'} marginLeft={SPACING_3}>
-          Labware Position Check
-        </Text>
-        <Text color={C_DARK_GRAY} margin={SPACING_3}>
-          {t('labware_position_check_text')}
-        </Text>
-        <Flex justifyContent={JUSTIFY_CENTER}>
-          <SecondaryBtn
-            title={t('check_labware_positions')}
-            marginRight={SPACING_3}
-            onClick={() => setShowLabwarePositionCheckModal(true)}
-            color={C_BLUE}
-            id={'LabwareSetup_checkLabwarePositionsButton'}
-          >
-            {t('check_labware_positions')}
-          </SecondaryBtn>
+        <Flex flexDirection={DIRECTION_ROW}>
+          <Box flexDirection={DIRECTION_COLUMN} width="65%">
+            <Text
+              color={C_DARK_GRAY}
+              fontWeight={FONT_WEIGHT_SEMIBOLD}
+              marginLeft={SPACING_3}
+            >
+              {t('lpc_and_offset_data_title')}
+            </Text>
+            <Text color={C_DARK_GRAY} margin={SPACING_3}>
+              {t('labware_position_check_text')}
+            </Text>
+          </Box>
+          <Flex flexDirection={DIRECTION_COLUMN}>
+            <Btn
+              as={Link}
+              fontSize={FONT_SIZE_BODY_1}
+              color={C_BLUE}
+              alignSelf={ALIGN_FLEX_END}
+              onClick={() => setShowLabwareHelpModal(true)}
+              data-test={'LabwareSetup_helpLink'}
+              marginBottom={SPACING_3}
+            >
+              {t('labware_help_link_title')}
+            </Btn>
+            <Flex justifyContent={JUSTIFY_CENTER}>
+              <SecondaryBtn
+                title={t('run_labware_position_check')}
+                onClick={() => setShowLabwarePositionCheckModal(true)}
+                color={C_BLUE}
+                id={'LabwareSetup_checkLabwarePositionsButton'}
+              >
+                {t('run_labware_position_check')}
+              </SecondaryBtn>
+            </Flex>
+          </Flex>
         </Flex>
       </Flex>
     </React.Fragment>

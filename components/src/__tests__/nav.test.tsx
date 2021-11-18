@@ -13,4 +13,10 @@ describe('SidePanel', () => {
     expect(heading).toBeDefined()
     expect(heading.children).toEqual(['title'])
   })
+
+  it('renders sidebar without title', () => {
+    const headings = Renderer.create(<SidePanel />).root.findAllByType('h2')
+
+    expect(headings).toHaveLength(0)
+  })
 })

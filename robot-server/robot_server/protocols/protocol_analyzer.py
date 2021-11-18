@@ -1,6 +1,4 @@
 """Protocol analysis module."""
-from typing import List
-from opentrons.protocol_engine import Command, LoadedLabware, LoadedPipette
 from opentrons.protocol_runner import ProtocolRunner
 
 from .protocol_store import ProtocolResource
@@ -25,23 +23,12 @@ class ProtocolAnalyzer:
         analysis_id: str,
     ) -> None:
         """Analyze a given protocol, storing the analysis when complete."""
-        commands: List[Command] = []
-        labware: List[LoadedLabware] = []
-        pipettes: List[LoadedPipette] = []
-        errors: List[Exception] = []
-
-        try:
-            result = await self._protocol_runner.run(protocol_resource)
-            commands = result.commands
-            labware = result.labware
-            pipettes = result.pipettes
-        except Exception as e:
-            errors = [e]
+        result = await self._protocol_runner.run(protocol_resource)
 
         self._analysis_store.update(
             analysis_id=analysis_id,
-            commands=commands,
-            labware=labware,
-            pipettes=pipettes,
-            errors=errors,
+            commands=result.commands,
+            labware=result.labware,
+            pipettes=result.pipettes,
+            errors=result.errors,
         )

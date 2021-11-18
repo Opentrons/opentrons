@@ -1,6 +1,6 @@
 """Message types."""
 from functools import lru_cache
-from typing import Union, Optional
+from typing import Union, Optional, Type
 
 from typing_extensions import get_args
 
@@ -15,6 +15,8 @@ MessageDefinition = Union[
     defs.StopRequest,
     defs.GetStatusRequest,
     defs.GetStatusResponse,
+    defs.EnableMotorRequest,
+    defs.DisableMotorRequest,
     defs.MoveRequest,
     defs.SetupRequest,
     defs.GetSpeedRequest,
@@ -22,11 +24,17 @@ MessageDefinition = Union[
     defs.WriteToEEPromRequest,
     defs.ReadFromEEPromRequest,
     defs.ReadFromEEPromResponse,
+    defs.AddLinearMoveRequest,
+    defs.GetMoveGroupRequest,
+    defs.GetMoveGroupResponse,
+    defs.ExecuteMoveGroupRequest,
+    defs.ClearAllMoveGroupsRequest,
+    defs.MoveCompleted,
 ]
 
 
 @lru_cache(maxsize=None)
-def get_definition(message_id: MessageId) -> Optional[MessageDefinition]:
+def get_definition(message_id: MessageId) -> Optional[Type[MessageDefinition]]:
     """Get the message type for a message id.
 
     Args:
@@ -39,6 +47,6 @@ def get_definition(message_id: MessageId) -> Optional[MessageDefinition]:
     for i in get_args(MessageDefinition):
         if i.message_id == message_id:
             # get args returns Tuple[Any...]
-            return i  # type: ignore
+            return i  # type: ignore[no-any-return]
 
     return None

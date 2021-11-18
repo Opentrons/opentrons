@@ -2,11 +2,12 @@ import assert from 'assert'
 import uniq from 'lodash/uniq'
 
 import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
-import type { LabwareDefinition2 } from '../types'
+import type { DeckDefinition, LabwareDefinition2 } from '../types'
 
 export { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 export { getWellTotalVolume } from './getWellTotalVolume'
 export { wellIsRect } from './wellIsRect'
+export { schemaV6Adapter } from './schemaV6Adapter'
 
 export * from './parseProtocolData'
 export * from './volume'
@@ -169,4 +170,15 @@ export const getWellsDepth = (
   }
 
   return offsets[0]
+}
+
+export const getSlotHasMatingSurfaceUnitVector = (
+  deckDef: DeckDefinition,
+  slotNumber: string
+): boolean => {
+  const matingSurfaceUnitVector = deckDef.locations.orderedSlots.find(
+    orderedSlot => orderedSlot.id === slotNumber
+  )?.matingSurfaceUnitVector
+
+  return Boolean(matingSurfaceUnitVector)
 }

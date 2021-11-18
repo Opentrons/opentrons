@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { StaticRouter, Route } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from 'react-query'
 import { mountWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
@@ -53,6 +54,8 @@ const getCalibrationStatus = calibrationSelectors.getCalibrationStatus as jest.M
   typeof calibrationSelectors.getCalibrationStatus
 >
 
+const queryClient = new QueryClient()
+
 describe('Upload page', () => {
   const render = () => {
     return mountWithProviders<
@@ -60,11 +63,13 @@ describe('Upload page', () => {
       State,
       Action
     >(
-      <StaticRouter location="/upload/file-info" context={{}}>
-        <Route path="/upload">
-          <Upload />
-        </Route>
-      </StaticRouter>,
+      <QueryClientProvider client={queryClient}>
+        <StaticRouter location="/upload/file-info" context={{}}>
+          <Route path="/upload">
+            <Upload />
+          </Route>
+        </StaticRouter>
+      </QueryClientProvider>,
       { i18n }
     )
   }
@@ -97,7 +102,7 @@ describe('Upload page', () => {
     expect(wrapper.find('ProtocolUpload').exists()).toBe(false)
   })
 
-  it('renders http upload page if feature flag is set', () => {
+  it('renders http upload page if feature flag is set and protocol + run data exists', () => {
     getFeatureFlags.mockReturnValue({
       allPipetteConfig: false,
       enableBundleUpload: false,

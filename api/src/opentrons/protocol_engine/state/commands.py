@@ -2,11 +2,25 @@
 from __future__ import annotations
 from collections import OrderedDict
 from dataclasses import dataclass, replace
-from typing import List, Optional, Union
+from typing import List, Mapping, Optional, Union
 
-from ..actions import Action, UpdateCommandAction, PlayAction, PauseAction, StopAction
+from ..actions import (
+    Action,
+    QueueCommandAction,
+    UpdateCommandAction,
+    FailCommandAction,
+    PlayAction,
+    PauseAction,
+    StopAction,
+)
+
 from ..commands import Command, CommandStatus
-from ..errors import CommandDoesNotExistError, ProtocolEngineStoppedError
+from ..errors import (
+    ProtocolEngineError,
+    CommandDoesNotExistError,
+    ProtocolEngineStoppedError,
+    ErrorOccurrence,
+)
 from ..types import EngineStatus
 from .abstract_store import HasState, HandlesActions
 
@@ -19,6 +33,7 @@ class CommandState:
     stop_requested: bool
     # TODO(mc, 2021-06-16): OrderedDict is mutable. Switch to Sequence + Mapping
     commands_by_id: OrderedDict[str, Command]
+    errors_by_id: Mapping[str, ErrorOccurrence]
 
 
 class CommandStore(HasState[CommandState], HandlesActions):
@@ -29,19 +44,63 @@ class CommandStore(HasState[CommandState], HandlesActions):
     def __init__(self) -> None:
         """Initialize a CommandStore and its state."""
         self._state = CommandState(
-            is_running=False,
+            is_running=True,
             stop_requested=False,
             commands_by_id=OrderedDict(),
+            errors_by_id={},
         )
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
-        if isinstance(action, UpdateCommandAction):
+        errors_by_id: Mapping[str, ErrorOccurrence]
+
+        if isinstance(action, QueueCommandAction):
+            # TODO(mc, 2021-06-22): mypy has trouble with this automatic
+            # request > command mapping, figure out how to type precisely
+            # (or wait for a future mypy version that can figure it out).
+            # For now, unit tests cover mapping every request type
+            queued_command = action.request._CommandCls(
+                id=action.command_id,
+                createdAt=action.created_at,
+                params=action.request.params,  # type: ignore[arg-type]
+                status=CommandStatus.QUEUED,
+            )
+            commands_by_id = self._state.commands_by_id.copy()
+            commands_by_id.update({queued_command.id: queued_command})
+
+            self._state = replace(self._state, commands_by_id=commands_by_id)
+
+        elif isinstance(action, UpdateCommandAction):
             command = action.command
             commands_by_id = self._state.commands_by_id.copy()
             commands_by_id.update({command.id: command})
 
             self._state = replace(self._state, commands_by_id=commands_by_id)
+
+        elif isinstance(action, FailCommandAction):
+            commands_by_id = self._state.commands_by_id.copy()
+            errors_by_id = dict(self._state.errors_by_id)
+            prev_command = commands_by_id[action.command_id]
+            command = prev_command.copy(
+                update={
+                    "errorId": action.error_id,
+                    "completedAt": action.failed_at,
+                    "status": CommandStatus.FAILED,
+                }
+            )
+            commands_by_id.update({command.id: command})
+            errors_by_id[action.error_id] = ErrorOccurrence(
+                id=action.error_id,
+                createdAt=action.failed_at,
+                errorType=type(action.error).__name__,
+                detail=str(action.error),
+            )
+
+            self._state = replace(
+                self._state,
+                commands_by_id=commands_by_id,
+                errors_by_id=errors_by_id,
+            )
 
         elif isinstance(action, PlayAction):
             if not self._state.stop_requested:
@@ -51,7 +110,32 @@ class CommandStore(HasState[CommandState], HandlesActions):
             self._state = replace(self._state, is_running=False)
 
         elif isinstance(action, StopAction):
-            self._state = replace(self._state, is_running=False, stop_requested=True)
+            # any `ProtocolEngineError`'s will be captured by `FailCommandAction`,
+            # so only capture unknown errors here
+            if action.error_details and not isinstance(
+                action.error_details.error,
+                ProtocolEngineError,
+            ):
+                errors_by_id = dict(self._state.errors_by_id)
+                error_id = action.error_details.error_id
+                created_at = action.error_details.created_at
+                error = action.error_details.error
+
+                errors_by_id[error_id] = ErrorOccurrence(
+                    id=error_id,
+                    createdAt=created_at,
+                    errorType=type(error).__name__,
+                    detail=str(error),
+                )
+            else:
+                errors_by_id = self._state.errors_by_id
+
+            self._state = replace(
+                self._state,
+                is_running=False,
+                stop_requested=True,
+                errors_by_id=errors_by_id,
+            )
 
 
 class CommandView(HasState[CommandState]):
@@ -78,6 +162,10 @@ class CommandView(HasState[CommandState]):
         ordering.
         """
         return list(self._state.commands_by_id.values())
+
+    def get_all_errors(self) -> List[ErrorOccurrence]:
+        """Get a list of all errors that have occurred."""
+        return list(self._state.errors_by_id.values())
 
     def get_next_queued(self) -> Optional[str]:
         """Return the next request in line to be executed.
@@ -172,9 +260,13 @@ class CommandView(HasState[CommandState]):
     def get_status(self) -> EngineStatus:
         """Get the current execution status of the engine."""
         all_commands = self._state.commands_by_id.values()
+        all_errors = self._state.errors_by_id.values()
         all_statuses = [c.status for c in all_commands]
 
         if self._state.stop_requested:
+            if any(all_errors):
+                return EngineStatus.FAILED
+
             if all(s == CommandStatus.SUCCEEDED for s in all_statuses):
                 return EngineStatus.SUCCEEDED
 
@@ -184,18 +276,19 @@ class CommandView(HasState[CommandState]):
             else:
                 return EngineStatus.STOPPED
 
-        elif any(s == CommandStatus.FAILED for s in all_statuses):
-            return EngineStatus.FAILED
+        elif self._state.is_running:
+            any_running = any(s == CommandStatus.RUNNING for s in all_statuses)
+            any_queued = any(s == CommandStatus.QUEUED for s in all_statuses)
 
-        elif not self._state.is_running:
-            if all(s == CommandStatus.QUEUED for s in all_statuses):
-                return EngineStatus.READY_TO_RUN
+            if any_running or any_queued:
+                return EngineStatus.RUNNING
 
-            elif any(s == CommandStatus.RUNNING for s in all_statuses):
+            else:
+                return EngineStatus.IDLE
+
+        else:
+            if any(s == CommandStatus.RUNNING for s in all_statuses):
                 return EngineStatus.PAUSE_REQUESTED
 
             else:
                 return EngineStatus.PAUSED
-
-        else:
-            return EngineStatus.RUNNING

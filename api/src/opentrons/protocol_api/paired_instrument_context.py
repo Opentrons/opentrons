@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Union, Tuple, List, Optional, Dict
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons import types, hardware_control as hc
 from opentrons.commands import paired_commands as cmds
-from opentrons.commands.publisher import CommandPublisher, publish_paired, publish
+from opentrons.commands.publisher import CommandPublisher, publish, publish_context
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.context.paired_instrument import AbstractPairedInstrument
 
@@ -252,16 +252,16 @@ class PairedInstrumentContext(CommandPublisher):
 
         instruments = list(self._instruments.values())
         targets = [target, secondary_target]
-        publish_paired(
-            self.broker, cmds.paired_pick_up_tip, "before", None, instruments, targets
-        )
-        self._implementation.pick_up_tip(
-            target, secondary_target, tiprack, presses, increment, tip_length
-        )
-        self._last_tip_picked_up_from = target
-        publish_paired(
-            self.broker, cmds.paired_pick_up_tip, "after", self, instruments, targets
-        )
+
+        with publish_context(
+            broker=self.broker,
+            command=cmds.paired_pick_up_tip(instruments=instruments, locations=targets),
+        ):
+            self._implementation.pick_up_tip(
+                target, secondary_target, tiprack, presses, increment, tip_length
+            )
+            self._last_tip_picked_up_from = target
+
         return self
 
     @requires_version(2, 7)
@@ -299,7 +299,7 @@ class PairedInstrumentContext(CommandPublisher):
         :type location: :py:class:`.types.Location` or :py:class:`.Well` or
                         None
         :param home_after: Whether to home the plunger after dropping the tip
-                           (defaults to ``True``). The plungeer must home after
+                           (defaults to ``True``). The plunger must home after
                            dropping tips because the ejector shroud that pops
                            the tip off the end of the pipette is driven by the
                            plunger motor, and may skip steps when dropping the
@@ -307,7 +307,7 @@ class PairedInstrumentContext(CommandPublisher):
 
         :returns: This instance
 
-        :raises TyepError: If a location is not relative to a well.
+        :raises TypeError: If a location is not relative to a well.
         """
         is_trash = False
         tiprack = None
@@ -350,13 +350,13 @@ class PairedInstrumentContext(CommandPublisher):
             ]
         else:
             targets = [target]
-        publish_paired(
-            self.broker, cmds.paired_drop_tip, "before", None, instruments, targets
-        )
-        self._implementation.drop_tip(target, home_after)
-        publish_paired(
-            self.broker, cmds.paired_drop_tip, "after", self, instruments, targets
-        )
+
+        with publish_context(
+            broker=self.broker,
+            command=cmds.paired_drop_tip(instruments=instruments, locations=targets),
+        ):
+            self._implementation.drop_tip(target, home_after)
+
         self._last_tip_picked_up_from = None
         return self
 
@@ -364,7 +364,7 @@ class PairedInstrumentContext(CommandPublisher):
     def aspirate(
         self,
         volume: Optional[float] = None,
-        location: Union[types.Location, Well] = None,
+        location: Optional[Union[types.Location, Well]] = None,
         rate: float = 1.0,
     ) -> PairedInstrumentContext:
         """
@@ -448,35 +448,26 @@ class PairedInstrumentContext(CommandPublisher):
         if checked_location.labware.is_well:
             well = checked_location.labware.as_well()
             labware = well.parent
-            locations = [checked_location, self._get_secondary_target(labware, well)]
+            locations: List[Union[types.Location, Well]] = [
+                checked_location,
+                self._get_secondary_target(labware, well),
+            ]
         else:
             locations = [checked_location]
 
-        publish_paired(
-            self.broker,
-            cmds.paired_aspirate,
-            "before",
-            None,
-            instruments,
-            c_vol,
-            locations,
-            rate,
-        )
+        with publish_context(
+            broker=self.broker,
+            command=cmds.paired_aspirate(
+                instruments=instruments,
+                volume=c_vol,
+                locations=locations,
+                rate=rate,
+            ),
+        ):
+            self._implementation.aspirate(
+                volume=c_vol, location=checked_location, rate=rate
+            )
 
-        self._implementation.aspirate(
-            volume=c_vol, location=checked_location, rate=rate
-        )
-
-        publish_paired(
-            self.broker,
-            cmds.paired_aspirate,
-            "after",
-            self,
-            instruments,
-            c_vol,
-            locations,
-            rate,
-        )
         return self
 
     @requires_version(2, 7)
@@ -576,31 +567,19 @@ class PairedInstrumentContext(CommandPublisher):
         else:
             locations = [checked_location]
 
-        publish_paired(
-            self.broker,
-            cmds.paired_dispense,
-            "before",
-            None,
-            instruments,
-            c_vol,
-            locations,
-            rate,
-        )
+        with publish_context(
+            broker=self.broker,
+            command=cmds.paired_dispense(
+                instruments=instruments,
+                volume=c_vol,
+                locations=locations,
+                rate=rate,
+            ),
+        ):
+            self._implementation.dispense(
+                volume=c_vol, location=checked_location, rate=rate
+            )
 
-        self._implementation.dispense(
-            volume=c_vol, location=checked_location, rate=rate
-        )
-
-        publish_paired(
-            self.broker,
-            cmds.paired_dispense,
-            "after",
-            self,
-            instruments,
-            c_vol,
-            locations,
-            rate,
-        )
         return self
 
     @publish(command=cmds.air_gap)
@@ -655,8 +634,7 @@ class PairedInstrumentContext(CommandPublisher):
         if not loc or not loc.labware.is_well:
             raise RuntimeError("No previous Well cached to perform air gap")
         target = loc.labware.as_well().top(height)
-        self._implementation.move_to(target)
-        self._implementation.aspirate(volume=c_vol, location=loc, rate=1.0)
+        self._implementation.aspirate(volume=c_vol, location=target, rate=1.0)
         return self
 
     @requires_version(2, 7)
@@ -712,13 +690,13 @@ class PairedInstrumentContext(CommandPublisher):
             locations = self._get_locations(loc)
 
         instruments = list(self._instruments.values())
-        publish_paired(
-            self.broker, cmds.paired_blow_out, "before", None, instruments, locations
-        )
-        self._implementation.blow_out(loc)
-        publish_paired(
-            self.broker, cmds.paired_blow_out, "after", self, instruments, locations
-        )
+
+        with publish_context(
+            broker=self.broker,
+            command=cmds.paired_blow_out(instruments=instruments, locations=locations),
+        ):
+            self._implementation.blow_out(loc)
+
         return self
 
     @requires_version(2, 7)
@@ -780,32 +758,23 @@ class PairedInstrumentContext(CommandPublisher):
         locations: Optional[List] = None
         if location:
             locations = self._get_locations(location)
-        publish_paired(
-            self.broker,
-            cmds.paired_mix,
-            "before",
-            None,
-            instruments,
-            locations,
-            repetitions,
-            c_vol,
-        )
-        self.aspirate(volume, location, rate)
-        while repetitions - 1 > 0:
+
+        with publish_context(
+            broker=self.broker,
+            command=cmds.paired_mix(
+                instruments=instruments,
+                locations=locations,
+                repetitions=repetitions,
+                volume=c_vol,
+            ),
+        ):
+            self.aspirate(volume, location, rate)
+            while repetitions - 1 > 0:
+                self.dispense(volume, rate=rate)
+                self.aspirate(volume, rate=rate)
+                repetitions -= 1
             self.dispense(volume, rate=rate)
-            self.aspirate(volume, rate=rate)
-            repetitions -= 1
-        self.dispense(volume, rate=rate)
-        publish_paired(
-            self.broker,
-            cmds.paired_mix,
-            "after",
-            self,
-            instruments,
-            locations,
-            repetitions,
-            c_vol,
-        )
+
         return self
 
     @requires_version(2, 7)
@@ -893,13 +862,14 @@ class PairedInstrumentContext(CommandPublisher):
                 self._get_secondary_target(location.parent, location),
             ]
 
-        publish_paired(
-            self.broker, cmds.paired_touch_tip, "before", None, instruments, locations
-        )
-        self._implementation.touch_tip(well.as_well(), radius, v_offset, checked_speed)
-        publish_paired(
-            self.broker, cmds.paired_touch_tip, "after", self, instruments, locations
-        )
+        with publish_context(
+            broker=self.broker,
+            command=cmds.paired_touch_tip(instruments=instruments, locations=locations),
+        ):
+            self._implementation.touch_tip(
+                well.as_well(), radius, v_offset, checked_speed
+            )
+
         return self
 
     @publish(command=cmds.return_tip)
@@ -948,17 +918,24 @@ class PairedInstrumentContext(CommandPublisher):
                       :py:attr:`.ProtocolContext.max_speeds`.
         """
         instruments = list(self._instruments.values())
-        locations: Optional[List] = None
+        locations: Optional[List[Union[types.Location, Well]]] = None
+
+        # TODO(mc, 2021-10-19): `location` is typed as non-optional, how would
+        # this condition ever be falsey?
         if location:
             locations = self._get_locations(location)
 
-        publish_paired(
-            self.broker, cmds.paired_move_to, "before", None, instruments, locations
-        )
-        self._implementation.move_to(location, force_direct, minimum_z_height, speed)
-        publish_paired(
-            self.broker, cmds.paired_move_to, "after", None, instruments, locations
-        )
+        with publish_context(
+            broker=self.broker,
+            command=cmds.paired_move_to(
+                instruments=instruments,
+                locations=locations,  # type: ignore[arg-type]
+            ),
+        ):
+            self._implementation.move_to(
+                location, force_direct, minimum_z_height, speed
+            )
+
         return self
 
     def _next_available_tip(self) -> Tuple[Labware, Well]:

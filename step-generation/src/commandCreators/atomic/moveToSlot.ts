@@ -2,7 +2,7 @@ import * as errorCreators from '../../errorCreators'
 import { isValidSlot } from '../../utils/isValidSlot'
 import type { MoveToSlotParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 import type { CommandCreator, CommandCreatorError } from '../../types'
-import { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
+import { Command } from '@opentrons/shared-data/protocol/types/schemaV5Addendum'
 export const moveToSlot: CommandCreator<MoveToSlotParams> = (
   args,
   invariantContext,

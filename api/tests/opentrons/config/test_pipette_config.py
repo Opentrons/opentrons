@@ -1,6 +1,6 @@
 import json
 from unittest.mock import patch
-from numpy import isclose  # type: ignore[import]
+from numpy import isclose
 from typing import Any, Dict, Iterator
 
 import pytest

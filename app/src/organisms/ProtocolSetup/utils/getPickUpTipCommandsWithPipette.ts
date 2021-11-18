@@ -1,5 +1,5 @@
-import { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
-import { PickUpTipCommand } from '../LabwarePositionCheck/types'
+import { PickUpTipCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+import { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 
 export const getPickUpTipCommandsWithPipette = (
   commands: Command[],
@@ -7,6 +7,7 @@ export const getPickUpTipCommandsWithPipette = (
 ): PickUpTipCommand[] =>
   commands
     .filter(
-      (command): command is PickUpTipCommand => command.command === 'pickUpTip'
+      (command): command is PickUpTipCommand =>
+        command.commandType === 'pickUpTip'
     )
-    .filter(command => command.params.pipette === pipetteId)
+    .filter(command => command.params.pipetteId === pipetteId)

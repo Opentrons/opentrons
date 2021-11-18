@@ -1,52 +1,76 @@
 """Union types of concrete command definitions."""
+
 from typing import Union
 
 from .add_labware_definition import (
     AddLabwareDefinition,
-    AddLabwareDefinitionRequest,
+    AddLabwareDefinitionCreate,
     AddLabwareDefinitionResult,
     AddLabwareDefinitionCommandType,
 )
 
-from .aspirate import Aspirate, AspirateRequest, AspirateResult, AspirateCommandType
+from .aspirate import Aspirate, AspirateCreate, AspirateResult, AspirateCommandType
 
-from .dispense import Dispense, DispenseRequest, DispenseResult, DispenseCommandType
+from .dispense import Dispense, DispenseCreate, DispenseResult, DispenseCommandType
 
-from .drop_tip import DropTip, DropTipRequest, DropTipResult, DropTipCommandType
+from .drop_tip import DropTip, DropTipCreate, DropTipResult, DropTipCommandType
 
 from .load_labware import (
     LoadLabware,
-    LoadLabwareRequest,
+    LoadLabwareCreate,
     LoadLabwareResult,
     LoadLabwareCommandType,
 )
 
+from .load_module import (
+    LoadModule,
+    LoadModuleCreate,
+    LoadModuleResult,
+    LoadModuleCommandType,
+)
+
 from .load_pipette import (
     LoadPipette,
-    LoadPipetteRequest,
+    LoadPipetteCreate,
     LoadPipetteResult,
     LoadPipetteCommandType,
 )
 
+from .home import Home, HomeCreate, HomeResult, HomeCommandType
+
+from .move_relative import (
+    MoveRelative,
+    MoveRelativeCreate,
+    MoveRelativeResult,
+    MoveRelativeCommandType,
+)
+
 from .move_to_well import (
     MoveToWell,
-    MoveToWellRequest,
+    MoveToWellCreate,
     MoveToWellResult,
     MoveToWellCommandType,
 )
 
 from .pick_up_tip import (
     PickUpTip,
-    PickUpTipRequest,
+    PickUpTipCreate,
     PickUpTipResult,
     PickUpTipCommandType,
 )
 
 from .pause import (
     Pause,
-    PauseRequest,
+    PauseCreate,
     PauseResult,
     PauseCommandType,
+)
+
+from .save_position import (
+    SavePosition,
+    SavePositionCreate,
+    SavePositionResult,
+    SavePositionCommandType,
 )
 
 from .custom import (
@@ -61,10 +85,14 @@ Command = Union[
     Dispense,
     DropTip,
     LoadLabware,
+    LoadModule,
     LoadPipette,
+    Home,
+    MoveRelative,
     MoveToWell,
     PickUpTip,
     Pause,
+    SavePosition,
     Custom,
 ]
 
@@ -74,23 +102,31 @@ CommandType = Union[
     DispenseCommandType,
     DropTipCommandType,
     LoadLabwareCommandType,
+    LoadModuleCommandType,
     LoadPipetteCommandType,
+    HomeCommandType,
+    MoveRelativeCommandType,
     MoveToWellCommandType,
     PickUpTipCommandType,
     PauseCommandType,
+    SavePositionCommandType,
     CustomCommandType,
 ]
 
-CommandRequest = Union[
-    AddLabwareDefinitionRequest,
-    AspirateRequest,
-    DispenseRequest,
-    DropTipRequest,
-    LoadLabwareRequest,
-    LoadPipetteRequest,
-    MoveToWellRequest,
-    PickUpTipRequest,
-    PauseRequest,
+CommandCreate = Union[
+    AddLabwareDefinitionCreate,
+    AspirateCreate,
+    DispenseCreate,
+    DropTipCreate,
+    LoadLabwareCreate,
+    LoadModuleCreate,
+    LoadPipetteCreate,
+    HomeCreate,
+    MoveRelativeCreate,
+    MoveToWellCreate,
+    PickUpTipCreate,
+    PauseCreate,
+    SavePositionCreate,
 ]
 
 CommandResult = Union[
@@ -99,9 +135,13 @@ CommandResult = Union[
     DispenseResult,
     DropTipResult,
     LoadLabwareResult,
+    LoadModuleResult,
     LoadPipetteResult,
+    HomeResult,
+    MoveRelativeResult,
     MoveToWellResult,
     PickUpTipResult,
     PauseResult,
+    SavePositionResult,
     CustomResult,
 ]

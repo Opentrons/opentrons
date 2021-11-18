@@ -1,5 +1,5 @@
 from datetime import timedelta
-
+from typing import Optional
 from . import types as command_types
 
 
@@ -9,7 +9,7 @@ def comment(msg: str) -> command_types.CommentCommand:
 
 
 def delay(
-    seconds: float, minutes: float, msg: str = None
+    seconds: float, minutes: float, msg: Optional[str] = None
 ) -> command_types.DelayCommand:
     td = timedelta(minutes=minutes, seconds=seconds)
     actual_min, actual_sec = divmod(td.total_seconds(), 60)
@@ -27,7 +27,7 @@ def delay(
     }
 
 
-def pause(msg: str = None) -> command_types.PauseCommand:
+def pause(msg: Optional[str] = None) -> command_types.PauseCommand:
     text = "Pausing robot operation"
     if msg:
         text = text + ": {}".format(msg)

@@ -1,8 +1,7 @@
 """Pipetting command handler."""
 import pytest
-from dataclasses import dataclass, field
 from decoy import Decoy
-from typing import cast, Dict, Tuple
+from typing import Tuple
 
 from opentrons.types import Mount
 from opentrons.hardware_control.api import API as HardwareAPI
@@ -18,22 +17,7 @@ from opentrons.protocol_engine.state import (
 from opentrons.protocol_engine.execution.movement import MovementHandler
 from opentrons.protocol_engine.execution.pipetting import PipettingHandler
 
-
-@dataclass(frozen=True)
-class MockPipettes:
-    """Dummy pipette data to use in liquid handling collabortation tests."""
-
-    left_config: PipetteDict = field(
-        default_factory=lambda: cast(PipetteDict, {"name": "p300_single"})
-    )
-    right_config: PipetteDict = field(
-        default_factory=lambda: cast(PipetteDict, {"name": "p300_multi"})
-    )
-
-    @property
-    def by_mount(self) -> Dict[Mount, PipetteDict]:
-        """Get a mock hw.attached_instruments map."""
-        return {Mount.LEFT: self.left_config, Mount.RIGHT: self.right_config}
+from .mock_defs import MockPipettes
 
 
 @pytest.fixture
@@ -101,7 +85,7 @@ async def test_handle_pick_up_tip_request(
     mock_hw_pipettes: MockPipettes,
     handler: PipettingHandler,
 ) -> None:
-    """It should handle a PickUpTipRequest properly."""
+    """It should handle a PickUpTipCreate properly."""
     decoy.when(
         state_store.pipettes.get_hardware_pipette(
             pipette_id="pipette-id",
@@ -129,6 +113,7 @@ async def test_handle_pick_up_tip_request(
         pipette_id="pipette-id",
         labware_id="labware-id",
         well_name="B2",
+        well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
     )
 
     decoy.verify(
@@ -136,6 +121,7 @@ async def test_handle_pick_up_tip_request(
             pipette_id="pipette-id",
             labware_id="labware-id",
             well_name="B2",
+            well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
         ),
         await hardware_api.pick_up_tip(
             mount=Mount.LEFT,
@@ -156,7 +142,7 @@ async def test_handle_drop_up_tip_request(
     mock_hw_pipettes: MockPipettes,
     handler: PipettingHandler,
 ) -> None:
-    """It should handle a DropTipRequest properly."""
+    """It should handle a DropTipCreate properly."""
     decoy.when(
         state_store.pipettes.get_hardware_pipette(
             pipette_id="pipette-id",
@@ -171,15 +157,17 @@ async def test_handle_drop_up_tip_request(
 
     decoy.when(
         state_store.geometry.get_tip_drop_location(
-            labware_id="labware-id",
             pipette_config=mock_hw_pipettes.right_config,
+            labware_id="labware-id",
+            well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
         )
-    ).then_return(WellLocation(offset=WellOffset(x=0, y=0, z=10)))
+    ).then_return(WellLocation(offset=WellOffset(x=4, y=5, z=6)))
 
     await handler.drop_tip(
         pipette_id="pipette-id",
         labware_id="labware-id",
         well_name="A1",
+        well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
     )
 
     decoy.verify(
@@ -187,7 +175,7 @@ async def test_handle_drop_up_tip_request(
             pipette_id="pipette-id",
             labware_id="labware-id",
             well_name="A1",
-            well_location=WellLocation(offset=WellOffset(x=0, y=0, z=10)),
+            well_location=WellLocation(offset=WellOffset(x=4, y=5, z=6)),
         ),
         await hardware_api.drop_tip(mount=Mount.RIGHT, home_after=True),
     )

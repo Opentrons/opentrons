@@ -4,11 +4,14 @@ Any type definitions required for the algorithms
 module should be put in this file.
 """
 
-from typing import TypeVar, Generic, List
+from typing import TypeVar, Generic, List, Union
 from dataclasses import dataclass
 
 
-VertexName = TypeVar("VertexName")
+NameBinding = Union[int, str, bytes, float]
+"""The acceptable types for VertexName. Must support less than."""
+
+VertexName = TypeVar("VertexName", bound=NameBinding)
 
 
 @dataclass(frozen=True)
@@ -32,6 +35,3 @@ class GenericNode(Generic[VertexName]):
         the list here.
         """
         return hash((self.name, *self.sub_names))
-
-
-VertexLike = TypeVar("VertexLike", bound=GenericNode)

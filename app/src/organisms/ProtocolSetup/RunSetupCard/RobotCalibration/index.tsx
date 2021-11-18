@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   Text,
@@ -23,7 +23,9 @@ import { DeckCalibration } from './DeckCalibration'
 import { CalibrationItem } from './CalibrationItem'
 import { PipetteCalibration } from './PipetteCalibration'
 import { TipLengthCalibration } from './TipLengthCalibration'
-import type { Dispatch, State } from '../../../../redux/types'
+import { useCurrentRunPipetteInfoByMount } from '../hooks/useCurrentRunPipetteInfoByMount'
+
+import type { Dispatch } from '../../../../redux/types'
 import type { ViewableRobot } from '../../../../redux/discovery/types'
 import type { ProtocolCalibrationStatus } from '../../../../redux/calibration/types'
 
@@ -53,9 +55,7 @@ export function RobotCalibration(props: Props): JSX.Element {
     robotName && dispatch(TipLength.fetchTipLengthCalibrations(robotName))
   }, [dispatch, robotName, status])
 
-  const protocolPipetteTipRackData = useSelector((state: State) => {
-    return Pipettes.getProtocolPipetteTipRackCalInfo(state, robotName)
-  })
+  const currentRunPipetteInfoByMount = useCurrentRunPipetteInfoByMount()
 
   return (
     <>
@@ -71,20 +71,16 @@ export function RobotCalibration(props: Props): JSX.Element {
       </Text>
       <div>
         {PipetteConstants.PIPETTE_MOUNTS.map((mount, index) => {
-          const pipetteTipRackData = protocolPipetteTipRackData[mount]
-          if (pipetteTipRackData == null) {
-            return null
-          } else {
-            return (
-              <PipetteCalibration
-                key={index}
-                pipetteTipRackData={pipetteTipRackData}
-                index={index}
-                mount={mount}
-                robotName={robotName}
-              />
-            )
-          }
+          const pipetteInfo = currentRunPipetteInfoByMount[mount]
+          return pipetteInfo != null ? (
+            <PipetteCalibration
+              key={index}
+              pipetteInfo={pipetteInfo}
+              index={index}
+              mount={mount}
+              robotName={robotName}
+            />
+          ) : null
         })}
       </div>
       <Divider marginY={SPACING_3} />
@@ -97,8 +93,8 @@ export function RobotCalibration(props: Props): JSX.Element {
       </Text>
       <div>
         {PipetteConstants.PIPETTE_MOUNTS.map(mount => {
-          const pipetteTipRackData = protocolPipetteTipRackData[mount]
-          if (pipetteTipRackData == null) {
+          const pipetteInfo = currentRunPipetteInfoByMount[mount]
+          if (pipetteInfo == null) {
             return null
           } else {
             return (
@@ -108,20 +104,20 @@ export function RobotCalibration(props: Props): JSX.Element {
                   paddingY={SPACING_2}
                   fontWeight={FONT_WEIGHT_SEMIBOLD}
                 >
-                  {pipetteTipRackData.pipetteDisplayName}
+                  {pipetteInfo.pipetteSpecs?.displayName}
                 </Text>
-                {pipetteTipRackData.tipRacks.map((tipRack, index) => (
+                {pipetteInfo.tipRacksForPipette.map((tipRackInfo, index) => (
                   <CalibrationItem
                     key={index}
-                    calibratedDate={tipRack.lastModifiedDate}
+                    calibratedDate={tipRackInfo.lastModifiedDate}
                     index={index}
-                    title={tipRack.displayName}
+                    title={tipRackInfo.displayName}
                     button={
                       <TipLengthCalibration
                         mount={mount}
                         robotName={robotName}
-                        hasCalibrated={tipRack.lastModifiedDate !== null}
-                        tipRackDefinition={tipRack.tipRackDef}
+                        hasCalibrated={tipRackInfo.lastModifiedDate !== null}
+                        tipRackDefinition={tipRackInfo.tipRackDef}
                         isExtendedPipOffset={false}
                       />
                     }

@@ -8,7 +8,7 @@ from opentrons.config import IS_ROBOT, ROBOT_FIRMWARE_DIR
 from opentrons.hardware_control.util import use_or_initialize_loop
 from opentrons.drivers.rpi_drivers.types import USBPort
 from ..execution_manager import ExecutionManager
-from .types import BundledFirmware, UploadFunction, InterruptCallback, LiveData
+from .types import BundledFirmware, UploadFunction, LiveData
 
 mod_log = logging.getLogger(__name__)
 
@@ -23,7 +23,6 @@ class AbstractModule(abc.ABC):
         port: str,
         usb_port: USBPort,
         execution_manager: ExecutionManager,
-        interrupt_callback: InterruptCallback = None,
         simulating: bool = False,
         loop: asyncio.AbstractEventLoop = None,
         sim_model: str = None,

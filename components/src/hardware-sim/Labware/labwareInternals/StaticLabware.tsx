@@ -2,7 +2,6 @@
 import assert from 'assert'
 import * as React from 'react'
 import flatMap from 'lodash/flatMap'
-import cx from 'classnames'
 
 import { LabwareOutline } from './LabwareOutline'
 import { Well } from './Well'
@@ -34,24 +33,13 @@ const TipDecoration = React.memo(function TipDecoration(props: {
   return null
 })
 
-function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
+export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
   const { isTiprack } = props.definition.parameters
 
   return (
     <g>
       <g className={styles.labware_detail_group}>
         <LabwareOutline definition={props.definition} />
-        <rect
-          x={1}
-          y={1}
-          strokeWidth={1}
-          width={props.definition.dimensions.xDimension - 2}
-          height={props.definition.dimensions.yDimension - 2}
-          rx={6}
-          className={cx(styles.labware_outline, {
-            [styles.tiprack_outline]: isTiprack,
-          })}
-        />
       </g>
       <g>
         {flatMap(

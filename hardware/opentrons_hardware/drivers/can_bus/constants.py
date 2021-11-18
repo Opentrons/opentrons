@@ -8,7 +8,9 @@ class NodeId(int, Enum):
     broadcast = 0x00
     host = 0x10
     pipette = 0x20
-    gantry = 0x40
+    gantry_x = 0x30
+    gantry_y = 0x40
+    head = 0x50
 
 
 class FunctionCode(int, Enum):
@@ -38,6 +40,9 @@ class MessageId(int, Enum):
     get_status_request = 0x01
     get_status_response = 0x05
 
+    enable_motor_request = 0x06
+    disable_motor_request = 0x07
+
     move_request = 0x10
 
     setup_request = 0x02
@@ -49,3 +54,10 @@ class MessageId(int, Enum):
     write_eeprom = 0x2001
     read_eeprom_request = 0x2002
     read_eeprom_response = 0x2003
+
+    add_move_request = 0x15
+    get_move_group_request = 0x16
+    get_move_group_response = 0x17
+    execute_move_group_request = 0x18
+    clear_all_move_groups_request = 0x19
+    move_completed = 0x13

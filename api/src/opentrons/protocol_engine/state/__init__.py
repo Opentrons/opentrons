@@ -6,7 +6,7 @@ from .labware import LabwareState, LabwareView
 from .pipettes import PipetteState, PipetteView, HardwarePipette, CurrentWell
 from .geometry import GeometryView, TipGeometry
 from .motion import MotionView, PipetteLocationData
-
+from .configs import EngineConfigs
 
 __all__ = [
     # top level state value and interfaces
@@ -30,4 +30,5 @@ __all__ = [
     # computed motion state
     "MotionView",
     "PipetteLocationData",
+    "EngineConfigs",
 ]

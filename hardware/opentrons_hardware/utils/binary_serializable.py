@@ -5,10 +5,6 @@ import struct
 from dataclasses import dataclass, fields, astuple
 from typing import TypeVar, Generic
 
-from typing_extensions import Final
-
-format_string_attribute: Final = "__struct_format_string__"
-
 
 class BinarySerializableException(BaseException):
     """Exception."""
@@ -65,6 +61,18 @@ class BinaryFieldBase(Generic[T]):
     def __repr__(self) -> str:
         """Representation string."""
         return f"{self.__class__.__name__}(value={repr(self.value)})"
+
+
+class UInt64Field(BinaryFieldBase[int]):
+    """Unsigned 64 bit integer field."""
+
+    FORMAT = "Q"
+
+
+class Int64Field(BinaryFieldBase[int]):
+    """Signed 64 bit integer field."""
+
+    FORMAT = "q"
 
 
 class UInt32Field(BinaryFieldBase[int]):
@@ -133,16 +141,29 @@ class BinarySerializable:
     def build(cls, data: bytes) -> BinarySerializable:
         """Create a BinarySerializable from a byte buffer.
 
+        The byte buffer must be at least enough bytes to satisfy all fields.
+
+        Extra bytes will be ignored. This is for two reasons:
+            - CANFD requires padding to round byte lengths to fixed sizes.
+            - To accommodate extracting multiple  BinarySerializable objects
+            from a stream of bytes.
+
         Args:
             data: Byte buffer
 
         Returns:
             cls
         """
-        b = struct.unpack(cls._get_format_string(), data)
-        args = {v.name: v.type.build(b[i]) for i, v in enumerate(fields(cls))}
-        # Mypy is not liking constructing the derived types.
-        return cls(**args)  # type: ignore
+        try:
+            format_string = cls._get_format_string()
+            size = cls.get_size()
+            # ignore bytes beyond the size of message.
+            b = struct.unpack(format_string, data[:size])
+            args = {v.name: v.type.build(b[i]) for i, v in enumerate(fields(cls))}
+            # Mypy is not liking constructing the derived types.
+            return cls(**args)  # type: ignore[call-arg]
+        except struct.error as e:
+            raise InvalidFieldException(str(e))
 
     @classmethod
     def _get_format_string(cls) -> str:
@@ -151,21 +172,20 @@ class BinarySerializable:
         Returns:
             a string
         """
-        format_string: str = getattr(cls, format_string_attribute, None)
-        if format_string is None:
-            dataclass_fields = fields(cls)
-            try:
-                format_string = (
-                    f"{cls.ENDIAN}{''.join(v.type.FORMAT for v in dataclass_fields)}"
-                )
-            except AttributeError:
-                raise InvalidFieldException(
-                    f"All fields must be of type {BinaryFieldBase}"
-                )
+        dataclass_fields = fields(cls)
+        try:
+            format_string = (
+                f"{cls.ENDIAN}{''.join(v.type.FORMAT for v in dataclass_fields)}"
+            )
+        except AttributeError:
+            raise InvalidFieldException(f"All fields must be of type {BinaryFieldBase}")
 
-            # Cache it on the cls.
-            setattr(cls, format_string_attribute, format_string)
         return format_string
+
+    @classmethod
+    def get_size(cls) -> int:
+        """Get the size of the serializable in bytes."""
+        return struct.calcsize(cls._get_format_string())
 
 
 class LittleEndianMixIn:

@@ -1,9 +1,37 @@
 """Movement command handling."""
-from typing import Optional
-from opentrons.hardware_control.api import API as HardwareAPI
+from typing import Dict, Optional, Sequence
+from dataclasses import dataclass
 
-from ..types import WellLocation
+from opentrons.types import Point
+from opentrons.hardware_control.api import API as HardwareAPI
+from opentrons.hardware_control.types import (
+    CriticalPoint,
+    Axis as HardwareAxis,
+    MustHomeError as HardwareMustHomeError,
+)
+
+from ..types import WellLocation, DeckPoint, MovementAxis, MotorAxis
 from ..state import StateStore, CurrentWell
+from ..errors import MustHomeError
+from ..resources import ModelUtils
+
+
+MOTOR_AXIS_TO_HARDWARE_AXIS: Dict[MotorAxis, HardwareAxis] = {
+    MotorAxis.X: HardwareAxis.X,
+    MotorAxis.Y: HardwareAxis.Y,
+    MotorAxis.LEFT_Z: HardwareAxis.Z,
+    MotorAxis.RIGHT_Z: HardwareAxis.A,
+    MotorAxis.LEFT_PLUNGER: HardwareAxis.B,
+    MotorAxis.RIGHT_PLUNGER: HardwareAxis.C,
+}
+
+
+@dataclass(frozen=True)
+class SavedPositionData:
+    """The result of a save position procedure."""
+
+    positionId: str
+    position: DeckPoint
 
 
 class MovementHandler:
@@ -11,15 +39,18 @@ class MovementHandler:
 
     _state_store: StateStore
     _hardware_api: HardwareAPI
+    _model_utils: ModelUtils
 
     def __init__(
         self,
         state_store: StateStore,
         hardware_api: HardwareAPI,
+        model_utils: Optional[ModelUtils] = None,
     ) -> None:
         """Initialize a MovementHandler instance."""
         self._state_store = state_store
         self._hardware_api = hardware_api
+        self._model_utils = model_utils or ModelUtils()
 
     async def move_to_well(
         self,
@@ -65,3 +96,78 @@ class MovementHandler:
                 abs_position=wp.position,
                 critical_point=wp.critical_point,
             )
+
+    async def move_relative(
+        self,
+        pipette_id: str,
+        axis: MovementAxis,
+        distance: float,
+    ) -> None:
+        """Move a given pipette a relative amount in millimeters."""
+        pipette_location = self._state_store.motion.get_pipette_location(
+            pipette_id=pipette_id,
+        )
+        hw_mount = pipette_location.mount.to_hw_mount()
+        delta = Point(
+            x=distance if axis == MovementAxis.X else 0,
+            y=distance if axis == MovementAxis.Y else 0,
+            z=distance if axis == MovementAxis.Z else 0,
+        )
+
+        try:
+            await self._hardware_api.move_rel(
+                mount=hw_mount,
+                delta=delta,
+                fail_on_not_homed=True,
+            )
+        except HardwareMustHomeError as e:
+            raise MustHomeError(str(e)) from e
+
+    async def save_position(
+        self,
+        pipette_id: str,
+        position_id: Optional[str],
+    ) -> SavedPositionData:
+        """Get the pipette position and save to state."""
+        pipette_location = self._state_store.motion.get_pipette_location(
+            pipette_id=pipette_id,
+        )
+
+        hw_mount = pipette_location.mount.to_hw_mount()
+        pip_cp = pipette_location.critical_point
+        if pip_cp is None:
+            hw_pipette = self._state_store.pipettes.get_hardware_pipette(
+                pipette_id=pipette_id,
+                attached_pipettes=self._hardware_api.attached_instruments,
+            )
+            if hw_pipette.config.get("tip_length"):
+                pip_cp = CriticalPoint.TIP
+            else:
+                pip_cp = CriticalPoint.NOZZLE
+
+        try:
+            point = await self._hardware_api.gantry_position(
+                mount=hw_mount,
+                critical_point=pip_cp,
+                fail_on_not_homed=True,
+            )
+        except HardwareMustHomeError as e:
+            raise MustHomeError(str(e)) from e
+
+        position_id = position_id or self._model_utils.generate_id()
+
+        return SavedPositionData(
+            positionId=position_id,
+            position=DeckPoint(x=point.x, y=point.y, z=point.z),
+        )
+
+    async def home(self, axes: Optional[Sequence[MotorAxis]]) -> None:
+        """Send the requested axes to their "home" positions.
+
+        If axes is `None`, will home all motors.
+        """
+        hardware_axes = None
+        if axes is not None:
+            hardware_axes = [MOTOR_AXIS_TO_HARDWARE_AXIS[a] for a in axes]
+
+        await self._hardware_api.home(axes=hardware_axes)

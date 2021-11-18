@@ -28,6 +28,8 @@ class TestClass(utils.BinarySerializable):
     s: utils.Int16Field
     ul: utils.UInt32Field
     l: utils.Int32Field
+    ull: utils.UInt64Field
+    ll: utils.Int64Field
 
 
 @pytest.fixture
@@ -43,17 +45,28 @@ def subject() -> TestClass:
         # 4 bytes each
         ul=utils.UInt32Field(32),
         l=utils.Int32Field(-32),
+        # 8 bytes each
+        ull=utils.UInt64Field(32),
+        ll=utils.Int64Field(-32),
     )
 
 
-def test_serialize_length(subject: TestClass) -> None:
+def test_get_size(subject: TestClass) -> None:
+    """It should return the data size in bytes."""
+    assert subject.get_size() == 30
+
+
+def test_get_length(subject: TestClass) -> None:
     """It should serialize with correct data length in bytes."""
-    assert len(subject.serialize()) == 14
+    assert len(subject.serialize()) == 30
 
 
 def test_deserialize() -> None:
     """It should deserialize data correctly."""
-    data = b"\x01\x02\x00\x03\x00\x04\x00\x00\x00\x05\x00\x00\x00\x06"
+    data = (
+        b"\x01\x02\x00\x03\x00\x04\x00\x00\x00\x05\x00\x00\x00\x06"
+        b"\x00\x00\x00\x00\x00\x00\x00\x07\x00\x00\x00\x00\x00\x00\x00\x08"
+    )
     assert TestClass.build(data) == TestClass(
         ub=utils.UInt8Field(1),
         b=utils.Int8Field(2),
@@ -61,7 +74,24 @@ def test_deserialize() -> None:
         s=utils.Int16Field(4),
         ul=utils.UInt32Field(5),
         l=utils.Int32Field(6),
+        ull=utils.UInt64Field(7),
+        ll=utils.Int64Field(8),
     )
+
+
+def test_deserialize_ignore_extra(subject: TestClass) -> None:
+    """It should ignore extra bytes when deserializing."""
+    data = subject.serialize()
+    data += b"123212521"
+    new = TestClass.build(data)
+    assert new == subject
+
+
+def test_deserialize_not_enough_data(subject: TestClass) -> None:
+    """It should ignore extra bytes when deserializing."""
+    data = b"123212521"
+    with pytest.raises(utils.InvalidFieldException):
+        TestClass.build(data)
 
 
 def test_serdes(subject: TestClass) -> None:

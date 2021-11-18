@@ -30,7 +30,6 @@ class MagDeck(mod_abc.AbstractModule):
         port: str,
         usb_port: USBPort,
         execution_manager: ExecutionManager,
-        interrupt_callback: types.InterruptCallback = None,
         simulating=False,
         loop: asyncio.AbstractEventLoop = None,
         sim_model: str = None,
@@ -69,6 +68,9 @@ class MagDeck(mod_abc.AbstractModule):
         self._device_info = device_info
         self._driver = driver
         self._current_height = 0.0
+
+    async def cleanup(self) -> None:
+        await self._driver.disconnect()
 
     @classmethod
     def name(cls) -> str:

@@ -19,7 +19,7 @@ from .command import BaseCommand, AbstractCommandImpl
 CustomCommandType = Literal["custom"]
 
 
-class CustomData(BaseModel):
+class CustomParams(BaseModel):
     """Payload used by a custom command."""
 
     class Config:
@@ -37,21 +37,21 @@ class CustomResult(BaseModel):
         extra = Extra.allow
 
 
-class CustomImplementation(AbstractCommandImpl[CustomData, CustomResult]):
+class CustomImplementation(AbstractCommandImpl[CustomParams, CustomResult]):
     """Aspirate command implementation."""
 
     # TODO(mc, 2021-09-24): figure out how a plugin can specify a custom command
     # implementation. For now, raise so we remember not to allow this to happen.
-    async def execute(self, data: CustomData) -> CustomResult:
+    async def execute(self, params: CustomParams) -> CustomResult:
         """A custom command cannot be executed directly."""
         raise NotImplementedError("Custom commands cannot be executed directly.")
 
 
-class Custom(BaseCommand[CustomData, CustomResult]):
+class Custom(BaseCommand[CustomParams, CustomResult]):
     """Custom command model."""
 
     commandType: CustomCommandType = "custom"
-    data: CustomData
+    params: CustomParams
     result: Optional[CustomResult]
 
     _ImplementationCls: Type[CustomImplementation] = CustomImplementation

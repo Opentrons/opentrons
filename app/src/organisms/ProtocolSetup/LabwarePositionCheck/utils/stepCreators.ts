@@ -1,22 +1,29 @@
+import { v4 as uuidv4 } from 'uuid'
 import {
+  Command,
   getModuleType,
-  JsonProtocolFile,
+  ProtocolFile,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import type { FileModule } from '@opentrons/shared-data/protocol/types/schemaV4'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
-import type { LabwarePositionCheckStep, Section } from '../types'
+import { getLabwareLocation } from '../../utils/getLabwareLocation'
+import type {
+  LabwarePositionCheckCommand,
+  LabwarePositionCheckStep,
+  Section,
+} from '../types'
+import type { TCOpenLidCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import type { MoveToWellCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
 
 const getIsLabwareOnTopOfTC = (
-  modules: Record<string, FileModule>,
-  labware: JsonProtocolFile['labware'],
-  labwareId: string
+  modules: ProtocolFile<{}>['modules'],
+  labwareId: string,
+  commands: Command[]
 ): boolean => {
-  const labwareSlot = labware[labwareId].slot
+  const labwareLocation = getLabwareLocation(labwareId, commands)
   return (
-    modules != null &&
-    Object.keys(modules).some(moduleId => moduleId === labwareSlot) &&
-    getModuleType(modules[labwareSlot].model) === THERMOCYCLER_MODULE_TYPE
+    'moduleId' in labwareLocation &&
+    getModuleType(modules[labwareLocation.moduleId].model) ===
+      THERMOCYCLER_MODULE_TYPE
   )
 }
 
@@ -28,11 +35,13 @@ export const getMoveToTiprackSteps = (
   labwareIds.map(labwareId => {
     const commands = [
       {
-        command: 'moveToWell' as const,
+        commandType: 'moveToWell' as const,
+        id: uuidv4(),
         params: {
-          pipette: pipetteId,
-          labware: labwareId,
-          well: 'A1',
+          pipetteId: pipetteId,
+          labwareId: labwareId,
+          wellName: 'A1',
+          wellLocation: { origin: 'top' as const },
         },
       },
     ]
@@ -41,46 +50,52 @@ export const getMoveToTiprackSteps = (
   })
 
 export const getMoveToLabwareSteps = (
-  labware: JsonProtocolFile['labware'],
-  modules: Record<string, FileModule>,
+  labware: ProtocolFile<{}>['labware'],
+  modules: ProtocolFile<{}>['modules'],
   labwareIds: string[],
   pipetteId: string,
-  section: Section
+  section: Section,
+  commands: Command[]
 ): LabwarePositionCheckStep[] =>
   labwareIds.map(labwareId => {
-    const moveToWellCommand: Command = {
-      command: 'moveToWell' as const,
+    const moveToWellCommand: MoveToWellCommand = {
+      commandType: 'moveToWell' as const,
+      id: uuidv4(),
       params: {
-        pipette: pipetteId,
-        labware: labwareId,
-        well: 'A1',
+        pipetteId: pipetteId,
+        labwareId: labwareId,
+        wellName: 'A1',
+        wellLocation: { origin: 'top' as const },
       },
     }
 
     const isLabwareOnTopOfTC = getIsLabwareOnTopOfTC(
       modules,
-      labware,
-      labwareId
+      labwareId,
+      commands
     )
 
-    let commands: Command[] = []
+    let moveToLabwareCommands: LabwarePositionCheckCommand[] = []
 
     if (isLabwareOnTopOfTC) {
-      const openTCLidCommand: Command = {
-        command: 'thermocycler/openLid',
+      // @ts-expect-error we know there is a moduleId key on type LabwareLocation because the labware is on top of a TC
+      const moduleId = getLabwareLocation(labwareId, commands).moduleId
+      const openTCLidCommand: TCOpenLidCommand = {
+        commandType: 'thermocycler/openLid',
+        id: uuidv4(),
         params: {
-          module: labware[labwareId].slot,
+          moduleId,
         },
       }
-      commands = [openTCLidCommand, moveToWellCommand]
+      moveToLabwareCommands = [openTCLidCommand, moveToWellCommand]
     } else {
-      commands = [moveToWellCommand]
+      moveToLabwareCommands = [moveToWellCommand]
     }
 
     return {
       section,
       labwareId,
-      commands,
+      commands: moveToLabwareCommands,
     }
   })
 
@@ -93,11 +108,12 @@ export const getPickupTipStep = (
   section,
   commands: [
     {
-      command: 'pickUpTip',
+      commandType: 'pickUpTip',
+      id: uuidv4(),
       params: {
-        pipette: pipetteId,
-        labware: tiprackId,
-        well: 'A1',
+        pipetteId,
+        labwareId: tiprackId,
+        wellName: 'A1',
       },
     },
   ],
@@ -112,11 +128,12 @@ export const getDropTipStep = (
   section,
   commands: [
     {
-      command: 'dropTip',
+      commandType: 'dropTip',
+      id: uuidv4(),
       params: {
-        pipette: pipetteId,
-        labware: tiprackId,
-        well: 'A1',
+        pipetteId: pipetteId,
+        labwareId: tiprackId,
+        wellName: 'A1',
       },
     },
   ],

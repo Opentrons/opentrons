@@ -6,13 +6,14 @@ from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocol_engine import (
     ProtocolEngine,
     Command,
+    ErrorOccurrence,
     LoadedLabware,
     LoadedPipette,
 )
 
 from .protocol_source import ProtocolSource
 from .pre_analysis import JsonPreAnalysis, PythonPreAnalysis
-from .task_queue import TaskQueue, TaskQueuePhase
+from .task_queue import TaskQueue
 from .json_file_reader import JsonFileReader
 from .json_command_translator import JsonCommandTranslator
 from .python_file_reader import PythonFileReader
@@ -33,6 +34,7 @@ class ProtocolRunData:
     """Data from a protocol run."""
 
     commands: List[Command]
+    errors: List[ErrorOccurrence]
     labware: List[LoadedLabware]
     pipettes: List[LoadedPipette]
 
@@ -76,7 +78,8 @@ class ProtocolRunner:
         self._python_executor = python_executor or PythonExecutor()
         self._legacy_file_reader = legacy_file_reader or LegacyFileReader()
         self._legacy_context_creator = legacy_context_creator or LegacyContextCreator(
-            hardware_api=hardware_api
+            hardware_api=hardware_api,
+            use_simulating_implementation=False,
         )
         self._legacy_executor = legacy_executor or LegacyExecutor(
             hardware_api=hardware_api
@@ -108,18 +111,14 @@ class ProtocolRunner:
 
         # ensure the engine is stopped gracefully once the
         # protocol file stops issuing commands
-        self._task_queue.add(
-            phase=TaskQueuePhase.CLEANUP,
+        self._task_queue.set_cleanup_func(
             func=self._protocol_engine.stop,
-            wait_until_complete=True,
         )
 
     def play(self) -> None:
         """Start or resume the run."""
         self._protocol_engine.play()
-
-        if not self._task_queue.is_started():
-            self._task_queue.start()
+        self._task_queue.start()
 
     def pause(self) -> None:
         """Pause the run."""
@@ -127,6 +126,7 @@ class ProtocolRunner:
 
     async def stop(self) -> None:
         """Stop (cancel) the run."""
+        self._task_queue.stop()
         await self._protocol_engine.halt()
 
     async def join(self) -> None:
@@ -143,23 +143,20 @@ class ProtocolRunner:
         self.play()
         await self.join()
 
-        commands = self._protocol_engine.state_view.commands.get_all()
-        labware = self._protocol_engine.state_view.labware.get_all()
-        pipettes = self._protocol_engine.state_view.pipettes.get_all()
-
-        return ProtocolRunData(commands=commands, labware=labware, pipettes=pipettes)
+        return ProtocolRunData(
+            commands=self._protocol_engine.state_view.commands.get_all(),
+            errors=self._protocol_engine.state_view.commands.get_all_errors(),
+            labware=self._protocol_engine.state_view.labware.get_all(),
+            pipettes=self._protocol_engine.state_view.pipettes.get_all(),
+        )
 
     def _load_json(self, protocol_source: ProtocolSource) -> None:
-        protocol = self._json_file_reader.read(protocol_source)
-        commands = self._json_command_translator.translate(protocol)
-        for request in commands:
-            self._protocol_engine.add_command(request=request)
+        raise NotImplementedError("JSON schema v6 execution not yet implemented.")
 
     def _load_python(self, protocol_source: ProtocolSource) -> None:
         protocol = self._python_file_reader.read(protocol_source)
         context = self._python_context_creator.create(self._protocol_engine)
-        self._task_queue.add(
-            phase=TaskQueuePhase.RUN,
+        self._task_queue.set_run_func(
             func=self._python_executor.execute,
             protocol=protocol,
             context=context,
@@ -179,8 +176,7 @@ class ProtocolRunner:
             )
         )
 
-        self._task_queue.add(
-            phase=TaskQueuePhase.RUN,
+        self._task_queue.set_run_func(
             func=self._legacy_executor.execute,
             protocol=protocol,
             context=context,

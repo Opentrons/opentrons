@@ -10,7 +10,9 @@ from opentrons_hardware.drivers.can_bus import (
     ArbitrationId,
     ArbitrationIdParts,
 )
-from opentrons_hardware.drivers.can_bus.messages.payloads import DeviceInfoResponseBody
+from opentrons_hardware.drivers.can_bus.messages.payloads import (
+    DeviceInfoResponsePayload,
+)
 from opentrons_hardware.scripts import can_comm
 from opentrons_hardware.drivers.can_bus.constants import MessageId, NodeId
 
@@ -32,7 +34,7 @@ def test_prompt_message_without_payload(
 ) -> None:
     """It should create a message without payload."""
     message_id = MessageId.get_speed_request
-    node_id = NodeId.gantry
+    node_id = NodeId.pipette
     mock_get_input.side_effect = [
         str(list(MessageId).index(message_id)),
         str(list(NodeId).index(node_id)),
@@ -99,7 +101,7 @@ def test_prompt_payload_bad_input(
     """It should raise on bad input."""
     mock_get_input.side_effect = user_input
     with pytest.raises(can_comm.InvalidInput):
-        can_comm.prompt_payload(DeviceInfoResponseBody, mock_get_input)
+        can_comm.prompt_payload(DeviceInfoResponsePayload, mock_get_input)
 
 
 def test_prompt_message_bad_input(

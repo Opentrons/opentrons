@@ -8,6 +8,7 @@ from typing import Optional
 from opentrons.drivers.thermocycler.driver import GCODE
 from opentrons.drivers.types import ThermocyclerLidStatus
 from opentrons.hardware_control.emulation.parser import Parser, Command
+from opentrons.hardware_control.emulation.settings import ThermocyclerSettings
 
 from .abstract_emulator import AbstractEmulator
 from .simulations import Temperature, TemperatureWithHold
@@ -16,17 +17,19 @@ from . import util
 logger = logging.getLogger(__name__)
 
 
-SERIAL = "thermocycler_emulator"
-MODEL = "v02"
-VERSION = "v1.1.0"
-
-
 class ThermocyclerEmulator(AbstractEmulator):
     """Thermocycler emulator"""
 
-    def __init__(self, parser: Parser) -> None:
-        self.reset()
+    _lid_temperature: Temperature
+    _plate_temperature: TemperatureWithHold
+    lid_status: ThermocyclerLidStatus
+    plate_volume: util.OptionalValue[float]
+    plate_ramp_rate: util.OptionalValue[float]
+
+    def __init__(self, parser: Parser, settings: ThermocyclerSettings) -> None:
         self._parser = parser
+        self._settings = settings
+        self.reset()
 
     def handle(self, line: str) -> Optional[str]:
         """Handle a line"""
@@ -35,9 +38,13 @@ class ThermocyclerEmulator(AbstractEmulator):
         return None if not joined else joined
 
     def reset(self):
-        self._lid_temperate = Temperature(per_tick=2, current=util.TEMPERATURE_ROOM)
-        self._plate_temperate = TemperatureWithHold(
-            per_tick=2, current=util.TEMPERATURE_ROOM
+        self._lid_temperature = Temperature(
+            per_tick=self._settings.lid_temperature.degrees_per_tick,
+            current=self._settings.lid_temperature.starting,
+        )
+        self._plate_temperature = TemperatureWithHold(
+            per_tick=self._settings.plate_temperature.degrees_per_tick,
+            current=self._settings.plate_temperature.starting,
         )
         self.lid_status = ThermocyclerLidStatus.OPEN
         self.plate_volume = util.OptionalValue[float]()
@@ -61,14 +68,14 @@ class ThermocyclerEmulator(AbstractEmulator):
             assert isinstance(
                 temperature, float
             ), f"invalid temperature '{temperature}'"
-            self._lid_temperate.set_target(temperature)
+            self._lid_temperature.set_target(temperature)
         elif command.gcode == GCODE.GET_LID_TEMP:
             res = (
-                f"T:{util.OptionalValue(self._lid_temperate.target)} "
-                f"C:{self._lid_temperate.current} "
+                f"T:{util.OptionalValue(self._lid_temperature.target)} "
+                f"C:{self._lid_temperature.current} "
                 f"H:none Total_H:none"
             )
-            self._lid_temperate.tick()
+            self._lid_temperature.tick()
             return res
         elif command.gcode == GCODE.EDIT_PID_PARAMS:
             pass
@@ -76,18 +83,20 @@ class ThermocyclerEmulator(AbstractEmulator):
             for prefix, value in command.params.items():
                 assert isinstance(value, float), f"invalid value '{value}'"
                 if prefix == "S":
-                    self._plate_temperate.set_target(value)
+                    self._plate_temperature.set_target(value)
                 elif prefix == "V":
                     self.plate_volume.val = value
                 elif prefix == "H":
-                    self._plate_temperate.set_hold(value)
+                    self._plate_temperature.set_hold(value)
         elif command.gcode == GCODE.GET_PLATE_TEMP:
-            plate_target = util.OptionalValue(self._plate_temperate.target)
-            plate_current = self._plate_temperate.current
+            plate_target = util.OptionalValue(self._plate_temperature.target)
+            plate_current = self._plate_temperature.current
             plate_time_remaining = util.OptionalValue(
-                self._plate_temperate.time_remaining
+                self._plate_temperature.time_remaining
             )
-            plate_total_hold_time = util.OptionalValue(self._plate_temperate.total_hold)
+            plate_total_hold_time = util.OptionalValue(
+                self._plate_temperature.total_hold
+            )
 
             res = (
                 f"T:{plate_target} "
@@ -95,19 +104,23 @@ class ThermocyclerEmulator(AbstractEmulator):
                 f"H:{plate_time_remaining} "
                 f"Total_H:{plate_total_hold_time} "
             )
-            self._plate_temperate.tick()
+            self._plate_temperature.tick()
             return res
         elif command.gcode == GCODE.SET_RAMP_RATE:
             self.plate_ramp_rate.val = command.params["S"]
         elif command.gcode == GCODE.DEACTIVATE_ALL:
-            self._plate_temperate.deactivate(temperature=util.TEMPERATURE_ROOM)
-            self._lid_temperate.deactivate(temperature=util.TEMPERATURE_ROOM)
+            self._plate_temperature.deactivate(temperature=util.TEMPERATURE_ROOM)
+            self._lid_temperature.deactivate(temperature=util.TEMPERATURE_ROOM)
         elif command.gcode == GCODE.DEACTIVATE_LID:
-            self._lid_temperate.deactivate(temperature=util.TEMPERATURE_ROOM)
+            self._lid_temperature.deactivate(temperature=util.TEMPERATURE_ROOM)
         elif command.gcode == GCODE.DEACTIVATE_BLOCK:
-            self._plate_temperate.deactivate(temperature=util.TEMPERATURE_ROOM)
+            self._plate_temperature.deactivate(temperature=util.TEMPERATURE_ROOM)
         elif command.gcode == GCODE.DEVICE_INFO:
-            return f"serial:{SERIAL} model:{MODEL} version:{VERSION}"
+            return (
+                f"serial:{self._settings.serial_number} "
+                f"model:{self._settings.model} "
+                f"version:{self._settings.version}"
+            )
         return None
 
     @staticmethod

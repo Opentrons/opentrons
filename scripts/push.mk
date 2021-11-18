@@ -4,7 +4,7 @@ find_robot=$(shell yarn run -s discovery find -i 169.254)
 default_ssh_key := ~/.ssh/robot_key
 default_ssh_opts := -o stricthostkeychecking=no -o userknownhostsfile=/dev/null
 
-# push-command: execute a push to the robot of a particular python
+# push-python-package: execute a push to the robot of a particular python
 # package.
 #
 # argument 1 is the host to push to
@@ -19,6 +19,27 @@ ssh -i $(2) $(3) root@$(1) \
 mount -o remount,rw / &&\
 cd /usr/lib/python3.7/site-packages &&\
 unzip -o /data/$(notdir $(4)) && cleanup || cleanup"
+endef
+
+# push-python-sdist: push an sdist to an ot3
+# argument 1 is the host to push to
+# argument 2 is the identity key to use, if any
+# argument 3 is any further ssh options, quoted
+# argument 4 is the path to the sdist locally
+# argument 5 is the path to go to on the remote side
+# argument 6 is the python package name
+# argument 7 is an additional subdir if necessary in the sdist
+define push-python-sdist
+scp $(if $(2),"-i $(2)") $(3) $(4) root@$(1):/var/$(notdir $(4))
+ssh $(if $(2),"-i $(2)") $(3) root@$(1) \
+"function cleanup () { rm -f /var/$(notdir $(4)) ; rm -rf /var/$(notdir $(4))-unzip; } ; \
+ mkdir -p /var/$(notdir $(4))-unzip ; \
+ cd /var/$(notdir $(4))-unzip && tar xf ../$(notdir $(4)) ; \
+ rm -rf $(5)/$(6) $(5)/$(6)*.egg-info ; \
+ mv /var/$(notdir $(4))-unzip/$(basename $(basename $(notdir $(4))))/$(if $(7),$(7)/)$(6) $(5)/ ; \
+ mv /var/$(notdir $(4))-unzip/$(basename $(basename $(notdir $(4))))/$(if $(7),$(7)/)$(6)*.egg-info $(5)/$(basename $(basename $(notdir $(4)))).egg-info ; \
+ cleanup \
+ "
 endef
 
 # restart-service: ssh to a robot and restart one of its systemd units

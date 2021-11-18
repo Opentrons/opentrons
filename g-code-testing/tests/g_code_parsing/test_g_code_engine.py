@@ -13,7 +13,6 @@ from opentrons.hardware_control.emulation.settings import (
 from g_code_parsing.utils import get_configuration_dir
 
 CONFIG = Settings(
-    host="0.0.0.0",
     smoothie=SmoothieSettings(
         left=PipetteSettings(model="p20_single_v2.0", id="P20SV202020070101"),
         right=PipetteSettings(model="p20_single_v2.0", id="P20SV202020070101"),

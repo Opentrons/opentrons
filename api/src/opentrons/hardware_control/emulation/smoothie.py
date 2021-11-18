@@ -24,9 +24,33 @@ class SmoothieEmulator(AbstractEmulator):
     WRITE_INSTRUMENT_RE = re.compile(r"(?P<mount>[LR])\s*(?P<value>[a-f0-9]+)")
     INSTRUMENT_AND_MODEL_STRING_LENGTH = 64
 
+    _version_string: str
+    _pos: Dict[str, float]
+    _home_status: Dict[str, bool]
+    _speed: float
+    _pipette_model: Dict[str, str]
+    _pipette_id: Dict[str, str]
+
     def __init__(self, parser: Parser, settings: SmoothieSettings) -> None:
+        """Constructor.
+
+        Args:
+            parser: GCODE Parser.
+            settings: emulator settings.
+        """
         self._parser = parser
         self._settings = settings
+        self._gcode_to_function_mapping = {
+            GCODE.HOMING_STATUS.value: self._get_homing_status,
+            GCODE.CURRENT_POSITION.value: self._get_current_position,
+            GCODE.VERSION.value: self._get_version,
+            GCODE.READ_INSTRUMENT_ID.value: self._get_pipette_id,
+            GCODE.READ_INSTRUMENT_MODEL.value: self._get_pipette_model,
+            GCODE.WRITE_INSTRUMENT_ID.value: self._set_pipette_id,
+            GCODE.WRITE_INSTRUMENT_MODEL.value: self._set_pipette_model,
+            GCODE.MOVE.value: self._move_gantry,
+            GCODE.HOME.value: self._home_gantry,
+        }
         self.reset()
 
     def handle(self, line: str) -> Optional[str]:
@@ -35,7 +59,7 @@ class SmoothieEmulator(AbstractEmulator):
         joined = " ".join(r for r in results if r)
         return None if not joined else joined
 
-    def reset(self):
+    def reset(self) -> None:
         _, fw_version = _find_smoothie_file()
         self._version_string = (
             f"Build version: {fw_version}, Build date: CURRENT, "
@@ -71,19 +95,7 @@ class SmoothieEmulator(AbstractEmulator):
             ),
         }
 
-        self._gcode_to_function_mapping = {
-            GCODE.HOMING_STATUS.value: self._get_homing_status,
-            GCODE.CURRENT_POSITION.value: self._get_current_position,
-            GCODE.VERSION.value: self._get_version,
-            GCODE.READ_INSTRUMENT_ID.value: self._get_pipette_id,
-            GCODE.READ_INSTRUMENT_MODEL.value: self._get_pipette_model,
-            GCODE.WRITE_INSTRUMENT_ID.value: self._set_pipette_id,
-            GCODE.WRITE_INSTRUMENT_MODEL.value: self._set_pipette_model,
-            GCODE.MOVE.value: self._move_gantry,
-            GCODE.HOME.value: self._home_gantry,
-        }
-
-    def get_current_position(self):
+    def get_current_position(self) -> Dict[str, float]:
         return self._pos
 
     def _get_homing_status(self, command: Command) -> str:

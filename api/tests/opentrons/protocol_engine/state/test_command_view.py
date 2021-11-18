@@ -2,7 +2,8 @@
 import pytest
 from collections import OrderedDict
 from contextlib import nullcontext as does_not_raise
-from typing import List, NamedTuple, Optional, Sequence, Tuple, Type, Union
+from datetime import datetime
+from typing import List, Mapping, NamedTuple, Optional, Sequence, Tuple, Type, Union
 
 from opentrons.protocol_engine import EngineStatus, commands as cmd, errors
 from opentrons.protocol_engine.state.commands import CommandState, CommandView
@@ -20,12 +21,14 @@ def get_command_view(
     is_running: bool = False,
     stop_requested: bool = False,
     commands_by_id: Sequence[Tuple[str, cmd.Command]] = (),
+    errors_by_id: Optional[Mapping[str, errors.ErrorOccurrence]] = None,
 ) -> CommandView:
     """Get a command view test subject."""
     state = CommandState(
         is_running=is_running,
         stop_requested=stop_requested,
         commands_by_id=OrderedDict(commands_by_id),
+        errors_by_id=errors_by_id or {},
     )
 
     return CommandView(state=state)
@@ -320,6 +323,30 @@ def test_validate_action_allowed(
         subject.validate_action_allowed(action)
 
 
+def test_get_errors() -> None:
+    """It should be able to pull all ErrorOccurrences from the store."""
+    error_1 = errors.ErrorOccurrence(
+        id="error-1",
+        createdAt=datetime(year=2021, month=1, day=1),
+        errorType="ReallyBadError",
+        detail="things could not get worse",
+    )
+    error_2 = errors.ErrorOccurrence(
+        id="error-2",
+        createdAt=datetime(year=2022, month=2, day=2),
+        errorType="EvenWorseError",
+        detail="things got worse",
+    )
+
+    subject = get_command_view(
+        stop_requested=False,
+        commands_by_id=(),
+        errors_by_id={"error-1": error_1, "error-2": error_2},
+    )
+
+    assert subject.get_all_errors() == [error_1, error_2]
+
+
 class GetStatusSpec(NamedTuple):
     """Spec data for get_status tests."""
 
@@ -330,19 +357,27 @@ class GetStatusSpec(NamedTuple):
 get_status_specs: List[GetStatusSpec] = [
     GetStatusSpec(
         subject=get_command_view(
-            is_running=False,
+            is_running=True,
             stop_requested=False,
             commands_by_id=[],
         ),
-        expected_status=EngineStatus.READY_TO_RUN,
+        expected_status=EngineStatus.IDLE,
     ),
     GetStatusSpec(
         subject=get_command_view(
-            is_running=False,
+            is_running=True,
             stop_requested=False,
             commands_by_id=[("command-id", create_pending_command())],
         ),
-        expected_status=EngineStatus.READY_TO_RUN,
+        expected_status=EngineStatus.RUNNING,
+    ),
+    GetStatusSpec(
+        subject=get_command_view(
+            is_running=True,
+            stop_requested=False,
+            commands_by_id=[("command-id", create_running_command())],
+        ),
+        expected_status=EngineStatus.RUNNING,
     ),
     GetStatusSpec(
         subject=get_command_view(
@@ -365,11 +400,11 @@ get_status_specs: List[GetStatusSpec] = [
     ),
     GetStatusSpec(
         subject=get_command_view(
-            is_running=True,
+            is_running=False,
             stop_requested=False,
             commands_by_id=[],
         ),
-        expected_status=EngineStatus.RUNNING,
+        expected_status=EngineStatus.PAUSED,
     ),
     GetStatusSpec(
         subject=get_command_view(
@@ -377,7 +412,7 @@ get_status_specs: List[GetStatusSpec] = [
             stop_requested=False,
             commands_by_id=[("command-id", create_failed_command())],
         ),
-        expected_status=EngineStatus.FAILED,
+        expected_status=EngineStatus.IDLE,
     ),
     GetStatusSpec(
         subject=get_command_view(
@@ -385,15 +420,22 @@ get_status_specs: List[GetStatusSpec] = [
             stop_requested=False,
             commands_by_id=[("command-id", create_failed_command())],
         ),
-        expected_status=EngineStatus.FAILED,
+        expected_status=EngineStatus.PAUSED,
     ),
     GetStatusSpec(
         subject=get_command_view(
             is_running=False,
             stop_requested=True,
-            commands_by_id=[("command-id", create_failed_command())],
+            errors_by_id={
+                "error-id": errors.ErrorOccurrence(
+                    id="error-id",
+                    createdAt=datetime(year=2021, month=1, day=1),
+                    errorType="BadError",
+                    detail="oh no",
+                )
+            },
         ),
-        expected_status=EngineStatus.STOPPED,
+        expected_status=EngineStatus.FAILED,
     ),
     GetStatusSpec(
         subject=get_command_view(
@@ -437,13 +479,13 @@ get_status_specs: List[GetStatusSpec] = [
 def test_get_status(subject: CommandView, expected_status: EngineStatus) -> None:
     """It should set a status according to the command queue and running flag.
 
-    1. Not running, no stop requested, only queued commands: READY_TO_RUN
-    2. Running, no stop requested, no failed commands: RUNNING
-    3. Not running, no stop requested, command still running: PAUSE_REQUESTED
-    4. Not running, no stop requested, no running commands: PAUSED
+    1. Worker running, no stop requested, no commands queued: IDLE
+    2. Worker running, no stop requested, commands queued: RUNNING
+    3. Worker not running, no stop requested, command running: PAUSE_REQUESTED
+    4. Worker not running, no stop requested, no running commands: PAUSED
     5. Stop requested, command still running: STOP_REQUESTED
     6. Stop requested, no running commands, with queued commands: STOPPED
     7. Stop requested, all commands succeeded: SUCCEEDED
-    8. No stop requested, any failed commands: FAILED
+    8. Stop requested, any errors: FAILED
     """
     assert subject.get_status() == expected_status

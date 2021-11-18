@@ -2,6 +2,7 @@ import * as React from 'react'
 import '@testing-library/jest-dom'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { StaticRouter } from 'react-router-dom'
+import { screen } from '@testing-library/react'
 import {
   renderWithProviders,
   partialComponentPropsMatcher,
@@ -10,20 +11,21 @@ import {
 } from '@opentrons/components'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { i18n } from '../../../../../i18n'
-import { ModuleSetup } from '..'
-import { ModuleInfo } from '../ModuleInfo'
 import {
   inferModuleOrientationFromXCoordinate,
   ModuleModel,
   ModuleType,
 } from '@opentrons/shared-data'
-import { getAttachedModules } from '../../../../../redux/modules'
-import { useMissingModuleIds } from '../../hooks'
 import {
   mockThermocycler as mockThermocyclerFixture,
   mockMagneticModule as mockMagneticModuleFixture,
 } from '../../../../../redux/modules/__fixtures__/index'
+import { getAttachedModules } from '../../../../../redux/modules'
 import { useModuleRenderInfoById } from '../../../hooks'
+import { useMissingModuleIds } from '../../hooks'
+import { MultipleModulesModal } from '../MultipleModulesModal'
+import { ModuleSetup } from '..'
+import { ModuleInfo } from '../ModuleInfo'
 
 jest.mock('../../../../../redux/modules')
 jest.mock('../ModuleInfo')
@@ -44,6 +46,9 @@ jest.mock('@opentrons/shared-data', () => {
     inferModuleOrientationFromXCoordinate: jest.fn(),
   }
 })
+const mockMultipleModulesModal = MultipleModulesModal as jest.MockedFunction<
+  typeof MultipleModulesModal
+>
 const mockUseMissingModuleIds = useMissingModuleIds as jest.MockedFunction<
   typeof useMissingModuleIds
 >
@@ -163,6 +168,52 @@ describe('ModuleSetup', () => {
     render(props)
     expect(mockModuleInfo).not.toHaveBeenCalled()
   })
+  it('should render a deck WITH MoaM along with the MoaM link', () => {
+    when(mockMultipleModulesModal)
+      .calledWith(
+        componentPropsMatcher({
+          onCloseClick: expect.anything(),
+        })
+      )
+      .mockImplementation(({ onCloseClick }) => (
+        <div onClick={onCloseClick}>mock Moam modal</div>
+      ))
+    when(mockUseModuleRenderInfoById)
+      .calledWith()
+      .mockReturnValue({
+        [mockMagneticModule.moduleId]: {
+          x: MOCK_MAGNETIC_MODULE_COORDS[0],
+          y: MOCK_MAGNETIC_MODULE_COORDS[1],
+          z: MOCK_MAGNETIC_MODULE_COORDS[2],
+          moduleDef: mockMagneticModule as any,
+          nestedLabwareDef: null,
+          nestedLabwareId: null,
+        },
+        [mockMagneticModule.moduleId]: {
+          x: MOCK_MAGNETIC_MODULE_COORDS[0],
+          y: MOCK_MAGNETIC_MODULE_COORDS[1],
+          z: MOCK_MAGNETIC_MODULE_COORDS[2],
+          moduleDef: mockMagneticModule as any,
+          nestedLabwareDef: null,
+          nestedLabwareId: null,
+        },
+      })
+
+    when(mockModuleInfo)
+      .calledWith(
+        partialComponentPropsMatcher({
+          moduleModel: mockMagneticModule.model,
+          isAttached: false,
+          usbPort: undefined,
+          hubPort: undefined,
+        })
+      )
+      .mockReturnValue(<div>mock module info {mockMagneticModule.model}</div>)
+
+    const { getByText } = render(props)
+    getByText('mock module info magneticModuleV2')
+    expect(screen.queryByText('mock Moam modal')).toBeNull()
+  })
   it('should render a deck WITH modules with CTA disabled if the protocol requests modules and they are not all attached to the robot', () => {
     when(mockUseModuleRenderInfoById)
       .calledWith()
@@ -173,6 +224,7 @@ describe('ModuleSetup', () => {
           z: MOCK_MAGNETIC_MODULE_COORDS[2],
           moduleDef: mockMagneticModule as any,
           nestedLabwareDef: null,
+          nestedLabwareId: null,
         },
         [mockTCModule.moduleId]: {
           x: MOCK_TC_COORDS[0],
@@ -180,6 +232,7 @@ describe('ModuleSetup', () => {
           z: MOCK_TC_COORDS[2],
           moduleDef: mockTCModule,
           nestedLabwareDef: null,
+          nestedLabwareId: null,
         },
       })
 
@@ -225,6 +278,7 @@ describe('ModuleSetup', () => {
           z: MOCK_MAGNETIC_MODULE_COORDS[2],
           moduleDef: mockMagneticModule as any,
           nestedLabwareDef: null,
+          nestedLabwareId: null,
         },
         [mockTCModule.moduleId]: {
           x: MOCK_TC_COORDS[0],
@@ -232,6 +286,7 @@ describe('ModuleSetup', () => {
           z: MOCK_TC_COORDS[2],
           moduleDef: mockTCModule,
           nestedLabwareDef: null,
+          nestedLabwareId: null,
         },
       })
     when(mockGetAttachedModules)

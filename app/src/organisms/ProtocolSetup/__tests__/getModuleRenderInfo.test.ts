@@ -1,9 +1,9 @@
-import _protocolWithMagTempTC from '@opentrons/shared-data/protocol/fixtures/4/transferSettings.json'
+import _protocolWithMagTempTC from '@opentrons/shared-data/protocol/fixtures/6/transferSettings.json'
 import _standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { getModuleRenderInfo } from '../utils/getModuleRenderInfo'
-import { getModuleDef2, JsonProtocolFile } from '@opentrons/shared-data'
+import { getModuleDef2, ProtocolFile } from '@opentrons/shared-data'
 
-const protocolWithMagTempTC = _protocolWithMagTempTC as JsonProtocolFile
+const protocolWithMagTempTC = (_protocolWithMagTempTC as unknown) as ProtocolFile<{}>
 const standardDeckDef = _standardDeckDef as any
 
 describe('getModuleRenderInfo', () => {
@@ -40,6 +40,7 @@ describe('getModuleRenderInfo', () => {
             _protocolWithMagTempTC.labware[MAG_LW_ID]
               .definitionId as keyof typeof _protocolWithMagTempTC.labwareDefinitions
           ],
+        nestedLabwareId: MAG_LW_ID,
       },
       [TEMP_MOD_ID]: {
         x: SLOT_3_COORDS[0],
@@ -51,6 +52,7 @@ describe('getModuleRenderInfo', () => {
             _protocolWithMagTempTC.labware[TEMP_LW_ID]
               .definitionId as keyof typeof _protocolWithMagTempTC.labwareDefinitions
           ],
+        nestedLabwareId: TEMP_LW_ID,
       },
       [TC_ID]: {
         x: SLOT_7_COORDS[0],
@@ -62,6 +64,7 @@ describe('getModuleRenderInfo', () => {
             _protocolWithMagTempTC.labware[TC_LW_ID]
               .definitionId as keyof typeof _protocolWithMagTempTC.labwareDefinitions
           ],
+        nestedLabwareId: TC_LW_ID,
       },
     }
 

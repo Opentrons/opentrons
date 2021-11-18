@@ -1,5 +1,6 @@
 """Test equipment command execution side effects."""
 import pytest
+from datetime import datetime
 from decoy import Decoy, matchers
 from opentrons.calibration_storage.helpers import uri_from_details
 
@@ -9,7 +10,14 @@ from opentrons.protocols.models import LabwareDefinition
 
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.errors import LabwareDefinitionDoesNotExistError
-from opentrons.protocol_engine.types import DeckSlotLocation, PipetteName, LoadedPipette
+from opentrons.protocol_engine.types import (
+    DeckSlotLocation,
+    PipetteName,
+    LoadedPipette,
+    LabwareOffset,
+    LabwareOffsetVector,
+)
+
 from opentrons.protocol_engine.state import StateStore
 from opentrons.protocol_engine.resources import ModelUtils, LabwareDataProvider
 
@@ -68,7 +76,7 @@ async def test_load_labware(
     minimal_labware_def: LabwareDefinition,
     subject: EquipmentHandler,
 ) -> None:
-    """It should load labware definition and calibration data and generate an ID."""
+    """It should load labware definition and offset data and generate an ID."""
     decoy.when(model_utils.generate_id()).then_return("unique-id")
 
     decoy.when(state_store.labware.get_definition_by_uri(matchers.IsA(str))).then_raise(
@@ -84,14 +92,22 @@ async def test_load_labware(
     ).then_return(minimal_labware_def)
 
     decoy.when(
-        await labware_data_provider.get_labware_calibration(
-            definition=minimal_labware_def,
-            location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
+        state_store.labware.find_applicable_labware_offset(
+            definition_uri="opentrons-test/load-name/1",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
         )
-    ).then_return((1, 2, 3))
+    ).then_return(
+        LabwareOffset(
+            id="labware-offset-id",
+            createdAt=datetime(year=2021, month=1, day=2),
+            definitionUri="opentrons-test/load-name/1",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+            vector=LabwareOffsetVector(x=1, y=2, z=3),
+        )
+    )
 
     result = await subject.load_labware(
-        location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
         load_name="load-name",
         namespace="opentrons-test",
         version=1,
@@ -101,7 +117,7 @@ async def test_load_labware(
     assert result == LoadedLabwareData(
         labware_id="unique-id",
         definition=minimal_labware_def,
-        calibration=(1, 2, 3),
+        offsetId="labware-offset-id",
     )
 
 
@@ -127,14 +143,14 @@ async def test_load_labware_uses_provided_id(
     ).then_return(minimal_labware_def)
 
     decoy.when(
-        await labware_data_provider.get_labware_calibration(
-            definition=minimal_labware_def,
-            location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
+        state_store.labware.find_applicable_labware_offset(
+            definition_uri="opentrons-test/load-name/1",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
         )
-    ).then_return((1, 2, 3))
+    ).then_return(None)
 
     result = await subject.load_labware(
-        location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
         load_name="load-name",
         namespace="opentrons-test",
         version=1,
@@ -142,9 +158,7 @@ async def test_load_labware_uses_provided_id(
     )
 
     assert result == LoadedLabwareData(
-        labware_id="my-labware-id",
-        definition=minimal_labware_def,
-        calibration=(1, 2, 3),
+        labware_id="my-labware-id", definition=minimal_labware_def, offsetId=None
     )
 
 
@@ -170,14 +184,14 @@ async def test_load_labware_uses_loaded_labware_def(
     )
 
     decoy.when(
-        await labware_data_provider.get_labware_calibration(
-            definition=minimal_labware_def,
-            location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
+        state_store.labware.find_applicable_labware_offset(
+            definition_uri="opentrons-test/load-name/1",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
         )
-    ).then_return((1, 2, 3))
+    ).then_return(None)
 
     result = await subject.load_labware(
-        location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
         load_name="load-name",
         namespace="opentrons-test",
         version=1,
@@ -187,7 +201,7 @@ async def test_load_labware_uses_loaded_labware_def(
     assert result == LoadedLabwareData(
         labware_id="unique-id",
         definition=minimal_labware_def,
-        calibration=(1, 2, 3),
+        offsetId=None,
     )
 
     decoy.verify(

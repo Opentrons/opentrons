@@ -19,17 +19,16 @@ import {
   COLOR_WARNING,
 } from '@opentrons/components'
 import { protocolHasModules } from '@opentrons/shared-data'
-import { getProtocolData } from '../../../redux/protocol'
 import { Divider } from '../../../atoms/structure'
+import { getConnectedRobot } from '../../../redux/discovery/selectors'
+import { getProtocolCalibrationComplete } from '../../../redux/calibration/selectors'
+import { useProtocolDetails } from '../../RunDetails/hooks'
 import { CollapsibleStep } from './CollapsibleStep'
 import { ProceedToRunCta } from './ProceedToRunCta'
 import { LabwareSetup } from './LabwareSetup'
 import { ModuleSetup } from './ModuleSetup'
 import { RobotCalibration } from './RobotCalibration'
-import type { JsonProtocolFile } from '@opentrons/shared-data'
 import type { State } from '../../../redux/types'
-import { getConnectedRobot } from '../../../redux/discovery/selectors'
-import { getProtocolCalibrationComplete } from '../../../redux/calibration/selectors'
 
 const ROBOT_CALIBRATION_STEP_KEY = 'robot_calibration_step' as const
 const MODULE_SETUP_KEY = 'module_setup_step' as const
@@ -44,7 +43,7 @@ export type StepKey =
 
 export function RunSetupCard(): JSX.Element | null {
   const { t } = useTranslation('protocol_setup')
-  const protocolData = useSelector((state: State) => getProtocolData(state))
+  const { protocolData } = useProtocolDetails()
   const robot = useSelector((state: State) => getConnectedRobot(state))
   const robotName = robot?.name != null ? robot?.name : ''
   const calibrationStatus = useSelector((state: State) => {
@@ -131,7 +130,6 @@ export function RunSetupCard(): JSX.Element | null {
             expanded={stepKey === expandedStepKey}
             label={t('step', { index: index + 1 })}
             title={t(`${stepKey}_title`)}
-            id={`RunSetupCard_${stepKey}`}
             description={StepDetailMap[stepKey].description}
             toggleExpanded={() =>
               stepKey === expandedStepKey
@@ -175,7 +173,7 @@ export function RunSetupCard(): JSX.Element | null {
         </React.Fragment>
       ))}
       <Divider marginY={SPACING_3} />
-      <ProceedToRunCta robotName={robot.name} />
+      <ProceedToRunCta />
     </Card>
   )
 }

@@ -1,8 +1,9 @@
 """Public protocol engine value types and models."""
+from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass
 from pydantic import BaseModel, Field
-from typing import Union
+from typing import Optional, Union
 
 from opentrons.types import MountType, DeckSlotName
 
@@ -10,7 +11,7 @@ from opentrons.types import MountType, DeckSlotName
 class EngineStatus(str, Enum):
     """Current execution status of a ProtocolEngine."""
 
-    READY_TO_RUN = "ready-to-run"
+    IDLE = "idle"
     RUNNING = "running"
     PAUSE_REQUESTED = "pause-requested"
     PAUSED = "paused"
@@ -21,13 +22,22 @@ class EngineStatus(str, Enum):
 
 
 class DeckSlotLocation(BaseModel):
-    """Location for labware placed in a single slot."""
+    """The location of something placed in a single deck slot."""
 
-    slot: DeckSlotName
+    slotName: DeckSlotName
 
 
-LabwareLocation = Union[DeckSlotLocation]
-"""Union of all legal labware locations."""
+class ModuleLocation(BaseModel):
+    """The location of something placed atop a hardware module."""
+
+    moduleId: str = Field(
+        ...,
+        description="The ID of a loaded module from a prior `loadModule` command.",
+    )
+
+
+LabwareLocation = Union[DeckSlotLocation, ModuleLocation]
+"""Union of all locations where it's legal to load a labware."""
 
 
 class WellOrigin(str, Enum):
@@ -61,8 +71,8 @@ class Dimensions:
     z: float
 
 
-class CalibrationOffset(BaseModel):
-    """Calibration offset from nomimal to actual position."""
+class DeckPoint(BaseModel):
+    """Coordinates of a point in deck space."""
 
     x: float
     y: float
@@ -96,6 +106,68 @@ class LoadedPipette(BaseModel):
     mount: MountType
 
 
+class MovementAxis(str, Enum):
+    """Axis on which to issue a relative movement."""
+
+    X = "x"
+    Y = "y"
+    Z = "z"
+
+
+class MotorAxis(str, Enum):
+    """Motor axis on which to issue a home command."""
+
+    X = "x"
+    Y = "y"
+    LEFT_Z = "leftZ"
+    RIGHT_Z = "rightZ"
+    LEFT_PLUNGER = "leftPlunger"
+    RIGHT_PLUNGER = "rightPlunger"
+
+
+class LabwareOffsetVector(BaseModel):
+    """Offset, in deck coordinates from nominal to actual position."""
+
+    x: float
+    y: float
+    z: float
+
+
+class LabwareOffset(BaseModel):
+    """An offset that the robot adds to a pipette's position when it moves to a labware.
+
+    During the run, if a labware is loaded whose definition URI and location
+    both match what's found here, the given offset will be added to all
+    pipette movements that use that labware as a reference point.
+    """
+
+    id: str = Field(..., description="Unique labware offset record identifier.")
+    createdAt: datetime = Field(..., description="When this labware offset was added.")
+    definitionUri: str = Field(..., description="The URI for the labware's definition.")
+    location: LabwareLocation = Field(
+        ...,
+        description="Where the labware is located on the robot.",
+    )
+    vector: LabwareOffsetVector = Field(
+        ...,
+        description="The offset applied to matching labware.",
+    )
+
+
+class LabwareOffsetCreate(BaseModel):
+    """Create request data for a labware offset."""
+
+    definitionUri: str = Field(..., description="The URI for the labware's definition.")
+    location: LabwareLocation = Field(
+        ...,
+        description="Where the labware is located on the robot.",
+    )
+    vector: LabwareOffsetVector = Field(
+        ...,
+        description="The offset applied to matching labware.",
+    )
+
+
 class LoadedLabware(BaseModel):
     """A labware that has been loaded."""
 
@@ -103,3 +175,12 @@ class LoadedLabware(BaseModel):
     loadName: str
     definitionUri: str
     location: LabwareLocation
+    offsetId: Optional[str] = Field(
+        None,
+        description=(
+            "An ID referencing the offset applied to this labware placement,"
+            " decided at load time."
+            " Null or undefined means no offset was provided for this load,"
+            " so the default of (0, 0, 0) will be used."
+        ),
+    )

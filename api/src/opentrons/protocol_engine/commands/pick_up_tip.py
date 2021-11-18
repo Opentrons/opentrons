@@ -4,15 +4,15 @@ from pydantic import BaseModel
 from typing import Optional, Type
 from typing_extensions import Literal
 
-from .pipetting_common import BasePipettingData
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandRequest
+from .pipetting_common import BasePipettingParams
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 
 PickUpTipCommandType = Literal["pickUpTip"]
 
 
-class PickUpTipData(BasePipettingData):
-    """Data needed to move a pipette to a specific well."""
+class PickUpTipParams(BasePipettingParams):
+    """Payload needed to move a pipette to a specific well."""
 
     pass
 
@@ -23,34 +23,35 @@ class PickUpTipResult(BaseModel):
     pass
 
 
-class PickUpTipImplementation(AbstractCommandImpl[PickUpTipData, PickUpTipResult]):
+class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, PickUpTipResult]):
     """Pick up tip command implementation."""
 
-    async def execute(self, data: PickUpTipData) -> PickUpTipResult:
+    async def execute(self, params: PickUpTipParams) -> PickUpTipResult:
         """Move to and pick up a tip using the requested pipette."""
         await self._pipetting.pick_up_tip(
-            pipette_id=data.pipetteId,
-            labware_id=data.labwareId,
-            well_name=data.wellName,
+            pipette_id=params.pipetteId,
+            labware_id=params.labwareId,
+            well_name=params.wellName,
+            well_location=params.wellLocation,
         )
 
         return PickUpTipResult()
 
 
-class PickUpTip(BaseCommand[PickUpTipData, PickUpTipResult]):
+class PickUpTip(BaseCommand[PickUpTipParams, PickUpTipResult]):
     """Pick up tip command model."""
 
     commandType: PickUpTipCommandType = "pickUpTip"
-    data: PickUpTipData
+    params: PickUpTipParams
     result: Optional[PickUpTipResult]
 
     _ImplementationCls: Type[PickUpTipImplementation] = PickUpTipImplementation
 
 
-class PickUpTipRequest(BaseCommandRequest[PickUpTipData]):
+class PickUpTipCreate(BaseCommandCreate[PickUpTipParams]):
     """Pick up tip command creation request model."""
 
     commandType: PickUpTipCommandType = "pickUpTip"
-    data: PickUpTipData
+    params: PickUpTipParams
 
     _CommandCls: Type[PickUpTip] = PickUpTip
