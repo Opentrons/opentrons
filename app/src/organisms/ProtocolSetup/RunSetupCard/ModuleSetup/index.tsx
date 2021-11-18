@@ -111,26 +111,31 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
         >
           {() => (
             <>
-              {map(moduleRenderInfoById, ({ x, y, moduleDef, attachedModuleMatch}) => {
-                const { model } = moduleDef
-                return (
-                  <React.Fragment key={`LabwareSetup_Module_${model}_${x}${y}`}>
-                    <Module
-                      x={x}
-                      y={y}
-                      orientation={inferModuleOrientationFromXCoordinate(x)}
-                      def={moduleDef}
+              {map(
+                moduleRenderInfoById,
+                ({ x, y, moduleDef, attachedModuleMatch }) => {
+                  const { model } = moduleDef
+                  return (
+                    <React.Fragment
+                      key={`LabwareSetup_Module_${model}_${x}${y}`}
                     >
-                      <ModuleInfo
-                        moduleModel={model}
-                        isAttached={attachedModuleMatch != null}
-                        usbPort={attachedModuleMatch?.usbPort.port ?? null}
-                        hubPort={attachedModuleMatch?.usbPort.hub ?? null}
-                      />
-                    </Module>
-                  </React.Fragment>
-                )
-              })}
+                      <Module
+                        x={x}
+                        y={y}
+                        orientation={inferModuleOrientationFromXCoordinate(x)}
+                        def={moduleDef}
+                      >
+                        <ModuleInfo
+                          moduleModel={model}
+                          isAttached={attachedModuleMatch != null}
+                          usbPort={attachedModuleMatch?.usbPort.port ?? null}
+                          hubPort={attachedModuleMatch?.usbPort.hub ?? null}
+                        />
+                      </Module>
+                    </React.Fragment>
+                  )
+                }
+              )}
             </>
           )}
         </RobotWorkSpace>

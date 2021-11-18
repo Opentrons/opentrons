@@ -191,7 +191,7 @@ describe('ModuleSetup', () => {
           nestedLabwareDef: null,
           nestedLabwareId: null,
           protocolLoadOrder: 1,
-          attachedModuleMatch: null
+          attachedModuleMatch: null,
         },
         [mockMagneticModule.moduleId]: {
           moduleId: mockMagneticModule.moduleId,
@@ -202,7 +202,7 @@ describe('ModuleSetup', () => {
           nestedLabwareDef: null,
           nestedLabwareId: null,
           protocolLoadOrder: 0,
-          attachedModuleMatch: null
+          attachedModuleMatch: null,
         },
       })
 
@@ -234,7 +234,7 @@ describe('ModuleSetup', () => {
           nestedLabwareDef: null,
           nestedLabwareId: null,
           protocolLoadOrder: 0,
-          attachedModuleMatch: null
+          attachedModuleMatch: null,
         },
         [mockTCModule.moduleId]: {
           moduleId: mockTCModule.moduleId,
@@ -245,7 +245,7 @@ describe('ModuleSetup', () => {
           nestedLabwareDef: null,
           nestedLabwareId: null,
           protocolLoadOrder: 1,
-          attachedModuleMatch: null
+          attachedModuleMatch: null,
         },
       })
 
@@ -297,7 +297,7 @@ describe('ModuleSetup', () => {
           attachedModuleMatch: {
             ...mockMagneticModuleFixture,
             model: mockMagneticModule.model,
-          } as any
+          } as any,
         },
         [mockTCModule.moduleId]: {
           moduleId: mockTCModule.moduleId,
@@ -308,7 +308,10 @@ describe('ModuleSetup', () => {
           nestedLabwareDef: null,
           nestedLabwareId: null,
           protocolLoadOrder: 0,
-          attachedModuleMatch: { ...mockThermocyclerFixture, model: mockTCModule.model } as any
+          attachedModuleMatch: {
+            ...mockThermocyclerFixture,
+            model: mockTCModule.model,
+          } as any,
         },
       })
 
@@ -360,7 +363,7 @@ describe('ModuleSetup', () => {
           attachedModuleMatch: {
             ...mockMagneticModuleFixture,
             model: mockMagneticModule.model,
-          } as any
+          } as any,
         },
         [dupModId]: {
           moduleId: dupModId,
@@ -374,11 +377,11 @@ describe('ModuleSetup', () => {
           attachedModuleMatch: {
             ...mockMagneticModuleFixture,
             model: mockMagneticModule.model,
-            usbPort:{
+            usbPort: {
               port: dupModPort,
               hub: dupModHub,
-            }
-          } as any
+            },
+          } as any,
         },
       })
 
@@ -399,7 +402,7 @@ describe('ModuleSetup', () => {
           moduleModel: mockMagneticModule.model,
           isAttached: true,
           usbPort: dupModPort,
-          hubPort: dupModHub
+          hubPort: dupModHub,
         })
       )
       .mockReturnValue(<div>mock module info {mockTCModule.model} </div>)
