@@ -51,6 +51,7 @@
   "recalibrate": "Recalibrate",
   "required_pipettes_title": "Required Pipettes",
   "required_tip_racks_title": "Required Tip Length Calibrations",
+  "attach_pipette_tip_length_calibration": "Attach pipette to see tip length calibration information",
   "robot_calibration_step_description": "Review required pipettes and tip length calibrations for this protocol.",
   "robot_calibration_step_title": "Robot Calibration",
   "setup_for_run": "Setup for Run",

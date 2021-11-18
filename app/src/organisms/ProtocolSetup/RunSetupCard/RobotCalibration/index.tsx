@@ -106,23 +106,30 @@ export function RobotCalibration(props: Props): JSX.Element {
                 >
                   {pipetteInfo.pipetteSpecs?.displayName}
                 </Text>
-                {pipetteInfo.tipRacksForPipette.map((tipRackInfo, index) => (
-                  <CalibrationItem
-                    key={index}
-                    calibratedDate={tipRackInfo.lastModifiedDate}
-                    index={index}
-                    title={tipRackInfo.displayName}
-                    button={
-                      <TipLengthCalibration
-                        mount={mount}
-                        robotName={robotName}
-                        hasCalibrated={tipRackInfo.lastModifiedDate !== null}
-                        tipRackDefinition={tipRackInfo.tipRackDef}
-                        isExtendedPipOffset={false}
-                      />
-                    }
-                  />
-                ))}
+                {pipetteInfo.tipRacksForPipette.map((tipRackInfo, index) => {
+                  return (
+                    <CalibrationItem
+                      key={index}
+                      calibratedDate={tipRackInfo.lastModifiedDate}
+                      index={index}
+                      title={tipRackInfo.displayName}
+                      subText={
+                        pipetteInfo.requestedPipetteMatch === 'incompatible'
+                          ? t('attach_pipette_tip_length_calibration')
+                          : undefined
+                      }
+                      button={
+                        <TipLengthCalibration
+                          mount={mount}
+                          robotName={robotName}
+                          hasCalibrated={tipRackInfo.lastModifiedDate !== null}
+                          tipRackDefinition={tipRackInfo.tipRackDef}
+                          isExtendedPipOffset={false}
+                        />
+                      }
+                    />
+                  )
+                })}
               </div>
             )
           }
