@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import {
   PrimaryBtn,
   BORDER_WIDTH_DEFAULT,
@@ -52,7 +53,7 @@ export function RunDetails(): JSX.Element | null {
   )
 
   const titleBarProps =
-    runStatus === 'running'
+    runStatus === RUN_STATUS_RUNNING
       ? {
           title: t('protocol_title', { protocol_name: displayName }),
           rightNode: cancelRunButton,
