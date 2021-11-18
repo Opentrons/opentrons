@@ -3,18 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [4.7.0-alpha.1](https://github.com/opentrons/opentrons/compare/v4.7.0-alpha.0...v4.7.0-alpha.1) (2021-11-12)
-
-
-### Bug Fixes
-
-* **api:** fix pipette twinning tip rack sorting ([#8741](https://github.com/opentrons/opentrons/issues/8741)) ([da3a0f0](https://github.com/opentrons/opentrons/commit/da3a0f0b668d1cb17e142399d0febd900c1bc453))
-
-
-
-
-
-# [4.7.0-alpha.0](https://github.com/opentrons/opentrons/compare/v4.6.2...v4.7.0-alpha.0) (2021-11-10)
+# [4.7.0](https://github.com/opentrons/opentrons/compare/v4.6.2...v4.7.0) (2021-11-18)
 
 
 ### Bug Fixes
