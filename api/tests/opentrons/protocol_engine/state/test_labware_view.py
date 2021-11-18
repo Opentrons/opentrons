@@ -1,5 +1,6 @@
 """Labware state store tests."""
 import pytest
+from datetime import datetime
 from typing import Dict, Optional, cast
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
@@ -9,9 +10,10 @@ from opentrons.types import DeckSlotName, Point
 
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
-    LabwareOffsetVector,
     DeckSlotLocation,
     Dimensions,
+    LabwareOffset,
+    LabwareOffsetVector,
     LoadedLabware,
 )
 
@@ -23,6 +25,7 @@ plate = LoadedLabware(
     loadName="plate-load-name",
     location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
     definitionUri="some-plate-uri",
+    offsetId=None,
 )
 
 reservoir = LoadedLabware(
@@ -30,6 +33,7 @@ reservoir = LoadedLabware(
     loadName="reservoir-load-name",
     location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
     definitionUri="some-reservoir-uri",
+    offsetId=None,
 )
 
 tube_rack = LoadedLabware(
@@ -37,6 +41,7 @@ tube_rack = LoadedLabware(
     loadName="tube-rack-load-name",
     location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
     definitionUri="some-tube-rack-uri",
+    offsetId=None,
 )
 
 tip_rack = LoadedLabware(
@@ -44,19 +49,20 @@ tip_rack = LoadedLabware(
     loadName="tip-rack-load-name",
     location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
     definitionUri="some-tip-rack-uri",
+    offsetId=None,
 )
 
 
 def get_labware_view(
     labware_by_id: Optional[Dict[str, LoadedLabware]] = None,
-    calibrations_by_id: Optional[Dict[str, LabwareOffsetVector]] = None,
+    labware_offsets_by_id: Optional[Dict[str, LabwareOffset]] = None,
     definitions_by_uri: Optional[Dict[str, LabwareDefinition]] = None,
     deck_definition: Optional[DeckDefinitionV2] = None,
 ) -> LabwareView:
     """Get a labware view test subject."""
     state = LabwareState(
         labware_by_id=labware_by_id or {},
-        calibrations_by_id=calibrations_by_id or {},
+        labware_offsets_by_id=labware_offsets_by_id or {},
         definitions_by_uri=definitions_by_uri or {},
         deck_definition=deck_definition or cast(DeckDefinitionV2, {"fake": True}),
     )
@@ -269,6 +275,7 @@ def test_get_labware_uri_from_definition(tip_rack_def: LabwareDefinition) -> Non
         loadName="tip-rack-load-name",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         definitionUri="some-tip-rack-uri",
+        offsetId=None,
     )
 
     subject = get_labware_view(
@@ -366,14 +373,158 @@ def test_get_slot_position(standard_deck_def: DeckDefinitionV2) -> None:
     assert result == Point(x=slot_pos[0], y=slot_pos[1], z=slot_pos[2])
 
 
-def test_get_calibration_offset() -> None:
-    """It should get a labware's calibrated offset."""
-    offset = LabwareOffsetVector(x=1, y=2, z=3)
-    subject = get_labware_view(calibrations_by_id={"labware-id": offset})
+def test_get_labware_offset_vector() -> None:
+    """It should get a labware's offset vector."""
+    labware_without_offset = LoadedLabware(
+        id="without-offset-labware-id",
+        loadName="labware-load-name",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        definitionUri="some-labware-uri",
+        offsetId=None,
+    )
 
-    result = subject.get_calibration_offset("labware-id")
+    labware_with_offset = LoadedLabware(
+        id="with-offset-labware-id",
+        loadName="labware-load-name",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        definitionUri="some-labware-uri",
+        offsetId="offset-id",
+    )
 
-    assert result == offset
+    offset_vector = LabwareOffsetVector(x=1, y=2, z=3)
+    offset = LabwareOffset(
+        id="offset-id",
+        createdAt=datetime(year=2021, month=1, day=2),
+        definitionUri="some-labware-uri",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        vector=offset_vector,
+    )
+
+    subject = get_labware_view(
+        labware_by_id={
+            labware_without_offset.id: labware_without_offset,
+            labware_with_offset.id: labware_with_offset,
+        },
+        labware_offsets_by_id={"offset-id": offset},
+    )
+
+    assert subject.get_labware_offset_vector(labware_with_offset.id) == offset.vector
+
+    assert subject.get_labware_offset_vector(
+        labware_without_offset.id
+    ) == LabwareOffsetVector(x=0, y=0, z=0)
 
     with pytest.raises(errors.LabwareDoesNotExistError):
-        subject.get_calibration_offset("wrong-id")
+        subject.get_labware_offset_vector("wrong-labware-id")
+
+
+def test_get_labware_offset() -> None:
+    """It should return the requested labware offset, if it exists."""
+    offset_a = LabwareOffset(
+        id="id-a",
+        createdAt=datetime(year=2021, month=1, day=1),
+        definitionUri="uri-a",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        vector=LabwareOffsetVector(x=1, y=1, z=1),
+    )
+
+    offset_b = LabwareOffset(
+        id="id-b",
+        createdAt=datetime(year=2022, month=2, day=2),
+        definitionUri="uri-b",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
+        vector=LabwareOffsetVector(x=2, y=2, z=2),
+    )
+
+    subject = get_labware_view(
+        labware_offsets_by_id={"id-a": offset_a, "id-b": offset_b}
+    )
+
+    assert subject.get_labware_offset("id-a") == offset_a
+    assert subject.get_labware_offset("id-b") == offset_b
+    with pytest.raises(errors.LabwareOffsetDoesNotExistError):
+        subject.get_labware_offset("wrong-labware-offset-id")
+
+
+def test_get_labware_offsets() -> None:
+    """It should return a list of all labware offsets, in order."""
+    offset_a = LabwareOffset(
+        id="id-a",
+        createdAt=datetime(year=2021, month=1, day=1),
+        definitionUri="uri-a",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        vector=LabwareOffsetVector(x=1, y=1, z=1),
+    )
+
+    offset_b = LabwareOffset(
+        id="id-b",
+        createdAt=datetime(year=2022, month=2, day=2),
+        definitionUri="uri-b",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
+        vector=LabwareOffsetVector(x=2, y=2, z=2),
+    )
+
+    empty_subject = get_labware_view()
+    assert empty_subject.get_labware_offsets() == []
+
+    filled_subject_a_before_b = get_labware_view(
+        labware_offsets_by_id={"id-a": offset_a, "id-b": offset_b}
+    )
+    assert filled_subject_a_before_b.get_labware_offsets() == [offset_a, offset_b]
+
+    filled_subject_b_before_a = get_labware_view(
+        labware_offsets_by_id={"id-b": offset_b, "id-a": offset_a}
+    )
+    assert filled_subject_b_before_a.get_labware_offsets() == [offset_b, offset_a]
+
+
+def test_find_applicable_labware_offset() -> None:
+    """It should return the most recent offset with matching URI and location."""
+    offset_1 = LabwareOffset(
+        id="id-1",
+        createdAt=datetime(year=2021, month=1, day=1),
+        definitionUri="definition-uri",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        vector=LabwareOffsetVector(x=1, y=1, z=1),
+    )
+
+    # Same definitionUri and location; different id, createdAt, and offset.
+    offset_2 = LabwareOffset(
+        id="id-2",
+        createdAt=datetime(year=2022, month=2, day=2),
+        definitionUri="definition-uri",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        vector=LabwareOffsetVector(x=2, y=2, z=2),
+    )
+
+    subject = get_labware_view(
+        # Simulate offset_2 having been added after offset_1.
+        labware_offsets_by_id={"id-1": offset_1, "id-2": offset_2}
+    )
+
+    # Matching both definitionURI and location. Should return 2nd (most recent) offset.
+    assert (
+        subject.find_applicable_labware_offset(
+            definition_uri="definition-uri",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        )
+        == offset_2
+    )
+
+    # Doesn't match anything, since definitionUri is different.
+    assert (
+        subject.find_applicable_labware_offset(
+            definition_uri="different-definition-uri",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        )
+        is None
+    )
+
+    # Doesn't match anything, since location is different.
+    assert (
+        subject.find_applicable_labware_offset(
+            definition_uri="different-definition-uri",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
+        )
+        is None
+    )

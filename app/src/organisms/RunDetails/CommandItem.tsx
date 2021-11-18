@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_ROW,
   Flex,
+  Text,
   C_DARK_GRAY,
   COLOR_ERROR,
   FONT_SIZE_BODY_1,
@@ -24,115 +25,35 @@ import {
 import { css } from 'styled-components'
 import { CommandTimer } from './CommandTimer'
 import { CommandText } from './CommandText'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6/command'
+import {
+  RUN_STATUS_IDLE,
+  RUN_STATUS_PAUSE_REQUESTED,
+  RUN_STATUS_PAUSED,
+} from '@opentrons/api-client'
+import { useCommandQuery } from '@opentrons/react-api-client'
+import { useCurrentRunId } from '../ProtocolUpload/hooks/useCurrentRunId'
+import type { RunStatus, RunCommandSummary } from '@opentrons/api-client'
 
-const PLACEHOLDERTIMER = '00:00:00' //  TODO: immediately wire up the timer
-
-export type Status = 'queued' | 'running' | 'succeeded' | 'failed'
-
-interface CommandItemsProps {
-  runStatus?: string
-  currentCommand: Command
-  commandText: string
-}
-export function CommandItemRunning(props: CommandItemsProps): JSX.Element {
-  const { currentCommand, runStatus } = props
-  const { t } = useTranslation('run_details')
-  return (
-    <Flex flexDirection={DIRECTION_ROW}>
-      <Flex flexDirection={DIRECTION_COLUMN}>
-        <Flex
-          fontWeight={FONT_WEIGHT_BOLD}
-          marginBottom={SPACING_1}
-          marginTop={SPACING_1}
-          textTransform={TEXT_TRANSFORM_UPPERCASE}
-          fontSize={FONT_SIZE_CAPTION}
-        >
-          {runStatus === 'paused' ? t('current_step_pause') : t('current_step')}
-        </Flex>
-        <CommandTimer
-          start={PLACEHOLDERTIMER}
-          timer={PLACEHOLDERTIMER}
-          end={PLACEHOLDERTIMER}
-          runStatus={'paused'}
-        />
-      </Flex>
-      <Flex flexDirection={DIRECTION_COLUMN}>
-        <CommandText command={currentCommand} commandText={props.commandText} />
-        {runStatus === 'paused' ? (
-          <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-            <Flex
-              marginTop={SPACING_1}
-              marginBottom={SPACING_1}
-              marginRight={SPACING_1}
-              marginLeft={SPACING_3}
-              width={SPACING_3}
-            >
-              <Icon name="pause" />
-            </Flex>
-            <Flex>{t('pause_protocol')}</Flex>
-          </Flex>
-        ) : null}
-      </Flex>
-    </Flex>
-  )
-}
-
-export function CommandItemQueued(props: CommandItemsProps): JSX.Element {
-  const { currentCommand } = props
-  return (
-    <Flex>
-      <Flex>{currentCommand.commandType} </Flex>
-      <Flex marginLeft={SPACING_1}>{props.commandText}</Flex>
-    </Flex>
-  )
-}
-
-export function CommandItemSuccess(props: CommandItemsProps): JSX.Element {
-  const { currentCommand } = props
-  return (
-    <Flex flexDirection={DIRECTION_ROW}>
-      <CommandTimer start={PLACEHOLDERTIMER} end={PLACEHOLDERTIMER} />
-      <CommandText command={currentCommand} commandText={props.commandText} />
-    </Flex>
-  )
-}
-
-export function CommandItemFailed(props: CommandItemsProps): JSX.Element {
-  const { currentCommand } = props
-  const { t } = useTranslation('run_details')
-  return (
-    <Flex flexDirection={DIRECTION_ROW}>
-      <CommandTimer start={PLACEHOLDERTIMER} end={PLACEHOLDERTIMER} />
-      <Flex flexDirection={DIRECTION_ROW} color={COLOR_ERROR}>
-        <Flex margin={SPACING_1} width={SPACING_3}>
-          <Icon name="information" />
-        </Flex>
-        <Flex alignItems={ALIGN_CENTER}>{t('step_failed')}</Flex>
-      </Flex>
-      <CommandText command={currentCommand} commandText={props.commandText} />
-    </Flex>
-  )
-}
+import type {
+  Command,
+  CommandStatus,
+} from '@opentrons/shared-data/protocol/types/schemaV6/command'
 
 export interface CommandItemProps {
-  currentCommand: Command
-  type: Status
-  runStatus?: string
-  commandText: string
+  commandOrSummary: Command | RunCommandSummary
+  runStatus?: RunStatus
 }
 
-const WRAPPER_STYLE_BY_STATUS: Record<
-  Status,
-  { border: string; backgroundColor: string }
-> = {
-  queued: { border: '', backgroundColor: C_NEAR_WHITE },
+const WRAPPER_STYLE_BY_STATUS: {
+  [status in CommandStatus]: { border: string; backgroundColor: string }
+} = {
+  queued: { border: 'none', backgroundColor: C_NEAR_WHITE },
   running: {
     border: `1px solid ${C_MINT}`,
     backgroundColor: C_POWDER_BLUE,
   },
   succeeded: {
-    border: '',
+    border: 'none',
     backgroundColor: C_AQUAMARINE,
   },
   failed: {
@@ -140,47 +61,82 @@ const WRAPPER_STYLE_BY_STATUS: Record<
     backgroundColor: C_ERROR_LIGHT,
   },
 }
-export function CommandItem(props: CommandItemProps): JSX.Element {
-  const { currentCommand, runStatus, type, commandText } = props
+export function CommandItem(props: CommandItemProps): JSX.Element | null {
+  const { commandOrSummary, runStatus } = props
+  const commandStatus =
+    runStatus !== RUN_STATUS_IDLE && commandOrSummary.status != null
+      ? commandOrSummary.status
+      : 'queued'
+
+  const currentRunId = useCurrentRunId()
+  const {
+    data: commandDetails,
+    refetch: refetchCommandDetails,
+  } = useCommandQuery(currentRunId, commandOrSummary.id)
+
+  React.useEffect(() => {
+    refetchCommandDetails()
+  }, [commandStatus])
 
   const WRAPPER_STYLE = css`
     font-size: ${FONT_SIZE_BODY_1};
-    background-color: ${WRAPPER_STYLE_BY_STATUS[type].backgroundColor};
-    border: ${WRAPPER_STYLE_BY_STATUS[type].border};
+    background-color: ${WRAPPER_STYLE_BY_STATUS[commandStatus].backgroundColor};
+    border: ${WRAPPER_STYLE_BY_STATUS[commandStatus].border};
     padding: ${SPACING_2};
     color: ${C_DARK_GRAY};
-    flexdirection: ${DIRECTION_ROW};
+    flex-direction: ${DIRECTION_COLUMN};
   `
-  let commandType
-  if (type === 'running') {
-    commandType = (
-      <CommandItemRunning
-        runStatus={runStatus}
-        currentCommand={currentCommand}
-        commandText={commandText}
-      />
-    )
-  } else if (type === 'failed') {
-    commandType = (
-      <CommandItemFailed
-        currentCommand={currentCommand}
-        commandText={commandText}
-      />
-    )
-  } else if (type === 'queued') {
-    commandType = (
-      <CommandItemQueued
-        currentCommand={currentCommand}
-        commandText={commandText}
-      />
-    )
-  } else if (type === 'succeeded') {
-    commandType = (
-      <CommandItemSuccess
-        currentCommand={currentCommand}
-        commandText={commandText}
-      />
-    )
-  }
-  return <Flex css={WRAPPER_STYLE}>{commandType}</Flex>
+  return (
+    <Flex css={WRAPPER_STYLE}>
+      {commandStatus === 'running' ? (
+        <CurrentCommandLabel runStatus={runStatus} />
+      ) : null}
+      <Flex flexDirection={DIRECTION_ROW}>
+        {['running', 'failed', 'succeeded'].includes(commandStatus) ? (
+          <CommandTimer
+            commandStartedAt={commandDetails?.data.startedAt}
+            commandCompletedAt={commandDetails?.data.completedAt}
+          />
+        ) : null}
+        {commandStatus === 'failed' ? <CommandFailedMessage /> : null}
+        <CommandText
+          commandOrSummary={commandDetails?.data ?? commandOrSummary}
+        />
+      </Flex>
+    </Flex>
+  )
+}
+
+interface CurrentCommandLabelProps {
+  runStatus?: RunStatus
+}
+
+function CurrentCommandLabel(props: CurrentCommandLabelProps): JSX.Element {
+  const { t } = useTranslation('run_details')
+  return (
+    <Text
+      fontWeight={FONT_WEIGHT_BOLD}
+      marginBottom={SPACING_1}
+      marginTop={SPACING_1}
+      textTransform={TEXT_TRANSFORM_UPPERCASE}
+      fontSize={FONT_SIZE_CAPTION}
+    >
+      {props.runStatus === RUN_STATUS_PAUSED ||
+      props.runStatus === RUN_STATUS_PAUSE_REQUESTED
+        ? t('current_step_pause')
+        : t('current_step')}
+    </Text>
+  )
+}
+
+function CommandFailedMessage(): JSX.Element {
+  const { t } = useTranslation('run_details')
+  return (
+    <Flex flexDirection={DIRECTION_ROW} color={COLOR_ERROR}>
+      <Flex margin={SPACING_1} width={SPACING_3}>
+        <Icon name="information" />
+      </Flex>
+      <Flex alignItems={ALIGN_CENTER}>{t('step_failed')}</Flex>
+    </Flex>
+  )
 }

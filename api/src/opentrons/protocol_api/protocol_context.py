@@ -1,7 +1,6 @@
 from __future__ import annotations
 import asyncio
 import contextlib
-from dataclasses import dataclass
 import logging
 from typing import (
     Callable,
@@ -43,6 +42,7 @@ from .module_contexts import (
     TemperatureModuleContext,
     ThermocyclerContext,
 )
+from .load_info import LabwareLoadInfo, ModuleLoadInfo, InstrumentLoadInfo
 from opentrons.protocols.api_support.util import (
     AxisMaxSpeeds,
     requires_version,
@@ -556,10 +556,14 @@ class ProtocolContext(CommandPublisher):
             self, module.module, module.geometry, self.api_version, self._loop
         )
         self._modules.append(module_context)
-
+        module_loc = module.geometry.parent
+        assert isinstance(module_loc, (int, str)), "Unexpected labware object parent"
+        deck_slot = types.DeckSlotName.from_primitive(module_loc)
         self.module_load_broker.publish(
             ModuleLoadInfo(
-                module_name=module_name, location=location, configuration=configuration
+                module_name=module_name,
+                deck_slot=deck_slot,
+                configuration=configuration,
             )
         )
         return module_context
@@ -815,54 +819,3 @@ class ProtocolContext(CommandPublisher):
     def door_closed(self) -> bool:
         """Returns True if the robot door is closed"""
         return self._implementation.door_closed()
-
-
-# todo(mm, 2021-10-11): For the HTTP API to report when labware is loaded on a module,
-# this class either needs to optionally have a module attribute instead of DeckSlotName,
-# or it needs to be split into LabwareLoadedOnDeckInfo and LabwareLoadedOnModuleInfo.
-@dataclass(frozen=True)
-class LabwareLoadInfo:
-    """For Opentrons internal use only.
-
-    :meta private:
-
-    Information about a successful labware load.
-
-    This is a separate class from the main user-facing `Labware` class
-    because this is easier to construct in unit tests.
-    """
-
-    labware_definition: "LabwareDefinition"
-    # todo(mm, 2021-10-11): Namespace, load name, and version can be derived from the
-    # definition. Should they be removed from here?
-    labware_namespace: str
-    labware_load_name: str
-    labware_version: int
-    deck_slot: types.DeckSlotName
-
-
-@dataclass(frozen=True)
-class InstrumentLoadInfo:
-    """For Opentrons internal use only.
-
-    :meta private:
-
-    Like `LabwareLoadInfo`, but for instruments (pipettes).
-    """
-
-    instrument_load_name: str
-    mount: types.Mount
-
-
-@dataclass(frozen=True)
-class ModuleLoadInfo:
-    """For Opentrons internal use only.
-
-    :meta private:
-
-    Like `LabwareLoadInfo`, but for hardware modules.
-    """
-
-    module_name: str
-    location: Optional[types.DeckLocation]
-    configuration: Optional[str]

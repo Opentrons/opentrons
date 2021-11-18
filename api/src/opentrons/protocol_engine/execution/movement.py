@@ -1,18 +1,29 @@
 """Movement command handling."""
-from typing import Optional
+from typing import Dict, Optional, Sequence
 from dataclasses import dataclass
 
 from opentrons.types import Point
 from opentrons.hardware_control.api import API as HardwareAPI
 from opentrons.hardware_control.types import (
     CriticalPoint,
+    Axis as HardwareAxis,
     MustHomeError as HardwareMustHomeError,
 )
 
-from ..types import WellLocation, DeckPoint, MovementAxis
+from ..types import WellLocation, DeckPoint, MovementAxis, MotorAxis
 from ..state import StateStore, CurrentWell
 from ..errors import MustHomeError
 from ..resources import ModelUtils
+
+
+MOTOR_AXIS_TO_HARDWARE_AXIS: Dict[MotorAxis, HardwareAxis] = {
+    MotorAxis.X: HardwareAxis.X,
+    MotorAxis.Y: HardwareAxis.Y,
+    MotorAxis.LEFT_Z: HardwareAxis.Z,
+    MotorAxis.RIGHT_Z: HardwareAxis.A,
+    MotorAxis.LEFT_PLUNGER: HardwareAxis.B,
+    MotorAxis.RIGHT_PLUNGER: HardwareAxis.C,
+}
 
 
 @dataclass(frozen=True)
@@ -134,11 +145,14 @@ class MovementHandler:
             else:
                 pip_cp = CriticalPoint.NOZZLE
 
-        # TODO (spp, 2021-11-3): Handle MustHomeError case
-        point = await self._hardware_api.gantry_position(
-            mount=hw_mount,
-            critical_point=pip_cp,
-        )
+        try:
+            point = await self._hardware_api.gantry_position(
+                mount=hw_mount,
+                critical_point=pip_cp,
+                fail_on_not_homed=True,
+            )
+        except HardwareMustHomeError as e:
+            raise MustHomeError(str(e)) from e
 
         position_id = position_id or self._model_utils.generate_id()
 
@@ -146,3 +160,14 @@ class MovementHandler:
             positionId=position_id,
             position=DeckPoint(x=point.x, y=point.y, z=point.z),
         )
+
+    async def home(self, axes: Optional[Sequence[MotorAxis]]) -> None:
+        """Send the requested axes to their "home" positions.
+
+        If axes is `None`, will home all motors.
+        """
+        hardware_axes = None
+        if axes is not None:
+            hardware_axes = [MOTOR_AXIS_TO_HARDWARE_AXIS[a] for a in axes]
+
+        await self._hardware_api.home(axes=hardware_axes)

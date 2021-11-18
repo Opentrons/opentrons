@@ -4,6 +4,7 @@ from opentrons.hardware_control import API as HardwareAPI
 
 from .resources import ModelUtils
 from .commands import Command, CommandCreate
+from .types import LabwareOffset, LabwareOffsetCreate
 from .execution import QueueWorker, create_queue_worker
 from .state import StateStore, StateView
 from .plugins import AbstractPlugin, PluginStarter
@@ -12,7 +13,9 @@ from .actions import (
     PlayAction,
     PauseAction,
     StopAction,
+    StopErrorDetails,
     QueueCommandAction,
+    AddLabwareOffsetAction,
 )
 
 
@@ -157,7 +160,16 @@ class ProtocolEngine:
         Arguments:
             error: An error that caused the stop, if applicable.
         """
-        self._action_dispatcher.dispatch(StopAction(error=error))
+        if error:
+            error_details: Optional[StopErrorDetails] = StopErrorDetails(
+                error_id=self._model_utils.generate_id(),
+                created_at=self._model_utils.get_timestamp(),
+                error=error,
+            )
+        else:
+            error_details = None
+
+        self._action_dispatcher.dispatch(StopAction(error_details=error_details))
 
         try:
             await self._queue_worker.join()
@@ -165,3 +177,23 @@ class ProtocolEngine:
             await self._hardware_api.stop(home_after=False)
 
         self._plugin_starter.stop()
+
+    def add_labware_offset(self, request: LabwareOffsetCreate) -> LabwareOffset:
+        """Add a new labware offset and return it.
+
+        The added offset will apply to subsequent `LoadLabwareCommand`s.
+
+        To retrieve offsets later, see `.state_view.labware`.
+        """
+        labware_offset_id = self._model_utils.generate_id()
+        created_at = self._model_utils.get_timestamp()
+        self._action_dispatcher.dispatch(
+            AddLabwareOffsetAction(
+                labware_offset_id=labware_offset_id,
+                created_at=created_at,
+                request=request,
+            )
+        )
+        return self.state_view.labware.get_labware_offset(
+            labware_offset_id=labware_offset_id
+        )

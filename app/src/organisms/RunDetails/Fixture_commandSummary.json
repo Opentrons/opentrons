@@ -1,0 +1,80 @@
+{
+  "createProtocolRun": null,
+  "protocolRecord": null,
+  "runRecord": {
+    "data": {
+      "commands": [
+        {
+          "commandType": "loadPipette",
+          "id": "commands.LOAD_PIPETTE-0",
+          "status": "succeeded"
+        },
+        {
+          "commandType": "loadLabware",
+          "id": "commands.LOAD_LABWARE-0",
+          "status": "succeeded"
+        },
+        {
+          "id": "commands.LOAD_LABWARE-1",
+          "commandType": "loadLabware",
+          "status": "succeeded"
+        },
+        {
+          "id": "commands.LOAD_LABWARE-2",
+          "commandType": "loadLabware",
+          "status": "succeeded"
+        },
+        {
+          "id": "commands.LOAD_LABWARE-3",
+          "commandType": "loadLabware",
+          "status": "succeeded"
+        },
+        {
+          "id": "command.PICK_UP_TIP-0",
+          "commandType": "custom",
+          "status": "succeeded"
+        },
+        {
+          "id": "command.ASPIRATE-0",
+          "commandType": "custom",
+          "status": "succeeded"
+        },
+        {
+          "id": "command.DISPENSE-0",
+          "commandType": "custom",
+          "status": "failed"
+        },
+        {
+          "id": "command.DROP_TIP-0",
+          "commandType": "custom",
+          "status": "succeeded"
+        },
+        {
+          "id": "command.PAUSE-0",
+          "commandType": "custom",
+          "status": "succeeded"
+        },
+        {
+          "id": "command.PICK_UP_TIP-1",
+          "commandType": "custom",
+          "status": "running"
+        },
+        {
+          "id": "command.ASPIRATE-2",
+          "commandType": "custom",
+          "status": "anticipated"
+        },
+        {
+          "id": "command.DISPENSE-1",
+          "commandType": "custom",
+          "status": "anticipated"
+        },
+        {
+          "id": "command.DROP_TIP-1",
+          "commandType": "custom",
+          "status": "anticipated"
+        }
+      ]
+    }
+  }
+}

@@ -77,12 +77,15 @@ async def test_execute_command_failure(
             id="cmd-id",
             params=cmd_data,
             status=commands.CommandStatus.FAILED,
-            error="oh no",
+            errorId="error-id",
             createdAt=datetime.now(),
         )
     )
 
     task = partial(subject.execute_command, request=cmd_request)
 
-    with pytest.raises(ProtocolEngineError, match="oh no"):
+    with pytest.raises(
+        ProtocolEngineError,
+        match='Command "cmd-id" failed due to error "error-id"',
+    ):
         await loop.run_in_executor(None, task)

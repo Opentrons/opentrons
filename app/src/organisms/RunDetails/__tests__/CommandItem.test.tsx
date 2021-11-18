@@ -1,141 +1,121 @@
 import * as React from 'react'
+import { when } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { CommandItem } from '../CommandItem'
+import { CommandText } from '../CommandText'
+import { CommandTimer } from '../CommandTimer'
+import { useCommandQuery } from '@opentrons/react-api-client'
+import { useCurrentRunId } from '../../ProtocolUpload/hooks/useCurrentRunId'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6/command'
 
+jest.mock('../CommandText')
+jest.mock('../CommandTimer')
+jest.mock('../../ProtocolUpload/hooks/useCurrentRunId')
+jest.mock('@opentrons/react-api-client')
+
+const mockCommandText = CommandText as jest.MockedFunction<typeof CommandText>
+const mockCommandTimer = CommandTimer as jest.MockedFunction<
+  typeof CommandTimer
+>
+const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
+  typeof useCurrentRunId
+>
+const mockUseCommandQuery = useCommandQuery as jest.MockedFunction<
+  typeof useCommandQuery
+>
 const render = (props: React.ComponentProps<typeof CommandItem>) => {
   return renderWithProviders(<CommandItem {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
-const WELL_LOCATION = { origin: 'top', offset: { x: 0, y: 0, z: 0 } }
-const PIPETTE_ID = 'PIPETTE_ID'
-const LABWARE_ID = 'LABWARE_ID'
-const WELLNAME = 'WELLNAME'
-const COMMAND_TYPE = 'touchTip'
-const COMMAND_TEXT = 'COMMAND_TEXT'
+const RUN_ID = 'run_id'
 
-describe('Run  Details Command', () => {
-  let props: React.ComponentProps<typeof CommandItem>
-
+const MOCK_COMMAND = {
+  id: '123',
+  commandType: 'custom',
+  params: {},
+  status: 'running',
+  result: {},
+} as Command
+const MOCK_COMMAND_DETAILS = {
+  id: '123',
+  commandType: 'custom',
+  params: {},
+  status: 'running',
+  result: {},
+  startedAt: 'start timestamp',
+  completedAt: 'end timestamp',
+} as Command
+describe('Run Details Command item', () => {
   beforeEach(() => {
-    props = {
-      currentCommand: {
-        commandType: COMMAND_TYPE,
-        params: {
-          pipetteId: PIPETTE_ID,
-          labwareId: LABWARE_ID,
-          wellName: WELLNAME,
-          wellLocation: WELL_LOCATION,
-        },
-        result: { volume: 10 },
-      } as Command,
-      type: 'failed',
-      commandText: COMMAND_TEXT,
-    }
+    mockCommandText.mockReturnValue(<div>Mock Command Text</div>)
+    mockCommandTimer.mockReturnValue(<div>Mock Command Timer</div>)
+    when(mockUseCurrentRunId).calledWith().mockReturnValue(RUN_ID)
+    when(mockUseCommandQuery)
+      .calledWith(RUN_ID, MOCK_COMMAND.id)
+      .mockReturnValue({
+        data: { data: MOCK_COMMAND_DETAILS },
+        refetch: jest.fn(),
+      } as any)
   })
 
   it('renders the correct failed status', () => {
-    const { getByText } = render(props)
+    const { getByText } = render({
+      commandOrSummary: { ...MOCK_COMMAND, status: 'failed' },
+      runStatus: 'stopped',
+    })
     expect(getByText('Step failed')).toHaveStyle(
       'backgroundColor: C_ERROR_LIGHT'
     )
-    getByText('Step failed')
-    getByText('touchTip')
-    getByText('Start')
-    getByText('End')
-    getByText('COMMAND_TEXT')
+    getByText('Mock Command Text')
+    getByText('Mock Command Timer')
   })
   it('renders the correct success status', () => {
-    props = {
-      currentCommand: {
-        commandType: COMMAND_TYPE,
-        params: {
-          pipetteId: PIPETTE_ID,
-          labwareId: LABWARE_ID,
-          wellName: WELLNAME,
-          wellLocation: WELL_LOCATION,
-        },
-        result: { volume: 10 },
-      } as Command,
-      type: 'succeeded',
-      commandText: COMMAND_TEXT,
-    }
+    const props = {
+      commandOrSummary: { ...MOCK_COMMAND, status: 'succeeded' },
+      runStatus: 'succeeded',
+    } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
-    expect(getByText('Start')).toHaveStyle('backgroundColor: C_AQUAMARINE')
-    getByText('touchTip')
-    getByText('End')
-    getByText('COMMAND_TEXT')
+    expect(getByText('Mock Command Timer')).toHaveStyle(
+      'backgroundColor: C_AQUAMARINE'
+    )
+    getByText('Mock Command Text')
   })
   it('renders the correct running status', () => {
-    props = {
-      currentCommand: {
-        commandType: COMMAND_TYPE,
-        params: {
-          pipetteId: PIPETTE_ID,
-          labwareId: LABWARE_ID,
-          wellName: WELLNAME,
-          wellLocation: WELL_LOCATION,
-        },
-        result: { volume: 10 },
-      } as Command,
-      type: 'running',
-      commandText: COMMAND_TEXT,
-    }
+    const props = {
+      commandOrSummary: { ...MOCK_COMMAND, status: 'running' },
+      runStatus: 'running',
+    } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
     expect(getByText('Current Step')).toHaveStyle(
       'backgroundColor: C_POWDER_BLUE'
     )
-    getByText('touchTip')
-    getByText('Start')
-    getByText('End')
-    getByText('COMMAND_TEXT')
+    getByText('Mock Command Timer')
+    getByText('Mock Command Text')
   })
+
+  it('renders the correct queued status', () => {
+    const props = {
+      commandOrSummary: { ...MOCK_COMMAND, status: 'queued' },
+      runStatus: 'running',
+    } as React.ComponentProps<typeof CommandItem>
+    const { getByText } = render(props)
+    expect(getByText('Mock Command Text')).toHaveStyle(
+      'backgroundColor: C_NEAR_WHITE'
+    )
+  })
+
   it('renders the correct running status with run paused', () => {
-    props = {
-      currentCommand: {
-        commandType: COMMAND_TYPE,
-        params: {
-          pipetteId: PIPETTE_ID,
-          labwareId: LABWARE_ID,
-          wellName: WELLNAME,
-          wellLocation: WELL_LOCATION,
-        },
-        result: { volume: 10 },
-      } as Command,
-      type: 'running',
+    const props = {
+      commandOrSummary: { ...MOCK_COMMAND, status: 'running' },
       runStatus: 'paused',
-      commandText: COMMAND_TEXT,
-    }
+    } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
     expect(getByText('Current Step - Paused by User')).toHaveStyle(
       'backgroundColor: C_POWDER_BLUE'
     )
-    getByText('touchTip')
-    getByText('Start')
-    getByText('End')
-    getByText('Timer')
-    getByText('Pause protocol')
-    getByText('COMMAND_TEXT')
-  })
-  it('renders the correct queued status', () => {
-    props = {
-      currentCommand: {
-        commandType: COMMAND_TYPE,
-        params: {
-          pipetteId: PIPETTE_ID,
-          labwareId: LABWARE_ID,
-          wellName: WELLNAME,
-          wellLocation: WELL_LOCATION,
-        },
-        result: { volume: 10 },
-      } as Command,
-      type: 'queued',
-      commandText: COMMAND_TEXT,
-    }
-    const { getByText } = render(props)
-    expect(getByText('touchTip')).toHaveStyle('backgroundColor: C_NEAR_WHITE')
-    getByText('COMMAND_TEXT')
+    getByText('Mock Command Text')
+    getByText('Mock Command Timer')
   })
 })

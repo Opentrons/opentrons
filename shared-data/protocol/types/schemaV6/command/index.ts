@@ -7,8 +7,10 @@ import type { TimingCommand } from './timing'
 // NOTE: these key/value pairs will only be present on commands at analysis/run time
 // they pertain only to the actual execution status of a command on hardware, as opposed to
 // the command's identity and parameters which can be known prior to runtime
+
+export type CommandStatus = 'queued' | 'running' | 'succeeded' | 'failed'
 interface CommandRunTimeInfo {
-  status?: 'queued' | 'running' | 'succeeded' | 'failed'
+  status?: CommandStatus
   error?: string | null
   createdAt?: string
   startedAt?: string
