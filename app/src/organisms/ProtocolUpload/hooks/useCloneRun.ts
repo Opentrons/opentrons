@@ -28,5 +28,5 @@ export function useCloneRun(runId: string | null): () => void {
     },
   })
 
-  return () => stopThenCloneRun(runId)
+  return () => runId != null && stopThenCloneRun(runId)
 }
