@@ -107,6 +107,8 @@ export function RobotCalibration(props: Props): JSX.Element {
                   {pipetteInfo.pipetteSpecs?.displayName}
                 </Text>
                 {pipetteInfo.tipRacksForPipette.map((tipRackInfo, index) => {
+                  const pipetteNotAttached =
+                    pipetteInfo.requestedPipetteMatch === 'incompatible'
                   return (
                     <CalibrationItem
                       key={index}
@@ -114,13 +116,14 @@ export function RobotCalibration(props: Props): JSX.Element {
                       index={index}
                       title={tipRackInfo.displayName}
                       subText={
-                        pipetteInfo.requestedPipetteMatch === 'incompatible'
+                        pipetteNotAttached
                           ? t('attach_pipette_tip_length_calibration')
                           : undefined
                       }
                       button={
                         <TipLengthCalibration
                           mount={mount}
+                          disabled={pipetteNotAttached}
                           robotName={robotName}
                           hasCalibrated={tipRackInfo.lastModifiedDate !== null}
                           tipRackDefinition={tipRackInfo.tipRackDef}

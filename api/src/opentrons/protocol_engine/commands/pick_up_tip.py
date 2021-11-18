@@ -1,6 +1,6 @@
 """Pick up tip command request, result, and implementation models."""
 from __future__ import annotations
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional, Type
 from typing_extensions import Literal
 
@@ -19,6 +19,14 @@ class PickUpTipParams(BasePipettingParams):
 
 class PickUpTipResult(BaseModel):
     """Result data from the execution of a PickUpTip."""
+    labwareId: str = Field(
+        ...,
+        description="An ID to reference the labware that this pick up tip command targets.",
+    )
+    pipetteId: str = Field(
+        ...,
+        description="An ID to reference the pipette that performs the pick up tip command.",
+    )
 
     pass
 
