@@ -6,6 +6,7 @@ import {
   ModalPage,
   SPACING_2,
   Text,
+  useConditionalConfirm,
 } from '@opentrons/components'
 import { Portal } from '../../../App/portal'
 import { useRestartRun } from '../../ProtocolUpload/hooks/useRestartRun'
@@ -32,7 +33,12 @@ export const LabwarePositionCheck = (
     setSavePositionCommandData,
   ] = React.useState<SavePositionCommandData>({})
   const [isRestartingRun, setIsRestartingRun] = React.useState<boolean>(false)
-  const [exitAttempt, setExitAttempt] = React.useState(false)
+
+  const {
+    confirm: confirmExitLPC,
+    showConfirmation,
+    cancel: cancelExitLPC,
+  } = useConditionalConfirm(props.onCloseClick, true)
 
   // at the end of LPC, each labwareId will have 2 associated save position command ids which will be used to calculate the labware offsets
   const addSavePositionCommandData = (
@@ -95,14 +101,11 @@ export const LabwarePositionCheck = (
   let modalContent: JSX.Element
   if (isLoading) {
     modalContent = <RobotMotionLoadingModal title={titleText} />
-  } else if (exitAttempt) {
+  } else if (showConfirmation) {
     modalContent = (
       <ExitPreventionModal
-        onGoBack={() => setExitAttempt(false)}
-        onConfirmExit={() => {
-          setExitAttempt(false)
-          props.onCloseClick()
-        }}
+        onGoBack={cancelExitLPC}
+        onConfirmExit={confirmExitLPC}
       />
     )
   } else {
@@ -112,7 +115,7 @@ export const LabwarePositionCheck = (
         titleBar={{
           title: t('labware_position_check_title'),
           back: {
-            onClick: () => setExitAttempt(true),
+            onClick: confirmExitLPC,
             title: t('shared:exit'),
             children: t('shared:exit'),
           },
