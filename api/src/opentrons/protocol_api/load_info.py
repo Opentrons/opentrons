@@ -1,3 +1,10 @@
+"""Types for an APIv2 protocol to report its activity.
+
+This module is not part of the public Python Protocol API.
+It's only for internal Opentrons use.
+"""
+
+
 from dataclasses import dataclass
 from typing import Optional
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
@@ -7,11 +14,9 @@ from opentrons.types import Mount, DeckSlotName
 
 @dataclass(frozen=True)
 class LabwareLoadInfo:
-    """For Opentrons internal use only.
+    """Information about a successful labware load.
 
     :meta private:
-
-    Information about a successful labware load.
 
     This is a separate class from the main user-facing `Labware` class
     because this is easier to construct in unit tests.
@@ -29,11 +34,9 @@ class LabwareLoadInfo:
 
 @dataclass(frozen=True)
 class InstrumentLoadInfo:
-    """For Opentrons internal use only.
+    """Like `LabwareLoadInfo`, but for instruments (pipettes).
 
     :meta private:
-
-    Like `LabwareLoadInfo`, but for instruments (pipettes).
     """
 
     instrument_load_name: str
@@ -42,11 +45,9 @@ class InstrumentLoadInfo:
 
 @dataclass(frozen=True)
 class ModuleLoadInfo:
-    """For Opentrons internal use only.
+    """Like `LabwareLoadInfo`, but for hardware modules.
 
     :meta private:
-
-    Like `LabwareLoadInfo`, but for hardware modules.
     """
 
     module_name: str
