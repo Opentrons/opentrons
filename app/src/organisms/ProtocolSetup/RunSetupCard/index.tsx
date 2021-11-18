@@ -56,7 +56,7 @@ export function RunSetupCard(): JSX.Element | null {
     [ROBOT_CALIBRATION_STEP_KEY, LABWARE_SETUP_KEY]
   )
   React.useEffect(() => {
-    if (protocolHasModules(protocolData as JsonProtocolFile)) {
+    if (protocolData != null && protocolHasModules(protocolData)) {
       setStepKeysInOrder([ ROBOT_CALIBRATION_STEP_KEY, MODULE_SETUP_KEY, LABWARE_SETUP_KEY ])
     }
     let initialExpandedStepKey: StepKey = ROBOT_CALIBRATION_STEP_KEY
@@ -65,12 +65,11 @@ export function RunSetupCard(): JSX.Element | null {
     }
     const initialExpandTimer = setTimeout(() => setExpandedStepKey(initialExpandedStepKey), INITIAL_EXPAND_DELAY_MS);
     return () => clearTimeout(initialExpandTimer);
-  }, [protocolData])
+  }, [Boolean(protocolData)])
 
   if (
     protocolData == null ||
-    robot == null ||
-    ('metadata' in protocolData && Object.keys(protocolData).length === 1)
+    robot == null
   )
     return null
 
