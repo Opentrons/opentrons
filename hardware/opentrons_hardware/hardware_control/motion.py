@@ -81,7 +81,7 @@ def create(
                     NodeId.gantry_y: MoveGroupSingleAxisStep(
                         distance_mm=dy,
                         velocity_mm_sec=speed if dy > 0 else -speed,
-                        duration_sec=abs(dx) / speed,
+                        duration_sec=abs(dy) / speed,
                     )
                 }
             ]
