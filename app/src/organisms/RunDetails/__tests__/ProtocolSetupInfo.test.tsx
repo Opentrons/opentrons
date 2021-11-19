@@ -4,10 +4,7 @@ import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
 import { i18n } from '../../../i18n'
-import {
-  useCurrentRunPipetteInfoByMount,
-  PipetteInfo,
-} from '../../ProtocolSetup/RunSetupCard/hooks'
+import { useCurrentRunPipetteInfoByMount } from '../../ProtocolSetup/RunSetupCard/hooks'
 import { ProtocolSetupInfo } from '../ProtocolSetupInfo'
 import { useProtocolDetails } from '../hooks'
 import type {
@@ -129,15 +126,14 @@ const mockLabwarePositionCheckStepTipRack = {
   ],
 } as any
 
-const mockPipetteInfo: PipetteInfo = {
+const mockPipetteInfo = {
   requestedPipetteMatch: 'incompatible',
   pipetteCalDate: null,
-  // @ts-expect-error partial type match
   pipetteSpecs: {
     displayName: 'P10 Single-Channel',
   },
   tipRacksForPipette: [],
-}
+} as any
 
 const mockPipetteInfoByMount = {
   left: mockPipetteInfo,

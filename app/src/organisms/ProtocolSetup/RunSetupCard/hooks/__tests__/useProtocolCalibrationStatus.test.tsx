@@ -68,7 +68,6 @@ describe('useProtocolCalibrationStatus hook', () => {
       left: {
         requestedPipetteMatch: 'incompatible',
         pipetteCalDate: null,
-        // @ts-expect-error partial type match
         pipetteSpecs: {
           displayName: 'pipette 1',
         },
@@ -81,7 +80,7 @@ describe('useProtocolCalibrationStatus hook', () => {
         ],
       },
       right: null,
-    })
+    } as any)
     const { result } = renderHook(useProtocolCalibrationStatus, { wrapper })
     expect(result.current).toMatchObject({
       complete: false,
@@ -96,7 +95,6 @@ describe('useProtocolCalibrationStatus hook', () => {
       left: {
         requestedPipetteMatch: 'match',
         pipetteCalDate: null,
-        // @ts-expect-error partial type match
         pipetteSpecs: {
           displayName: 'pipette 1',
         },
@@ -109,7 +107,7 @@ describe('useProtocolCalibrationStatus hook', () => {
         ],
       },
       right: null,
-    })
+    } as any)
     const { result } = renderHook(useProtocolCalibrationStatus, { wrapper })
     expect(result.current).toMatchObject({
       complete: false,
@@ -124,21 +122,19 @@ describe('useProtocolCalibrationStatus hook', () => {
       left: {
         requestedPipetteMatch: 'match',
         pipetteCalDate: '2020-08-30T10:02',
-        // @ts-expect-error partial type match
         pipetteSpecs: {
           displayName: 'pipette 1',
         },
         tipRacksForPipette: [
           {
             displayName: 'Mock TipRack Definition',
-            // @ts-expect-error incorrect type
             lastModifiedDate: null,
             tipRackDef: mockTipRackDefinition,
           },
         ],
       },
       right: null,
-    })
+    } as any)
     const { result } = renderHook(useProtocolCalibrationStatus, { wrapper })
     expect(result.current).toMatchObject({
       complete: false,
@@ -153,7 +149,6 @@ describe('useProtocolCalibrationStatus hook', () => {
       left: {
         requestedPipetteMatch: 'match',
         pipetteCalDate: '2020-08-30T10:02',
-        // @ts-expect-error partial type match
         pipetteSpecs: {
           displayName: 'pipette 1',
         },
@@ -166,7 +161,7 @@ describe('useProtocolCalibrationStatus hook', () => {
         ],
       },
       right: null,
-    })
+    } as any)
     const { result } = renderHook(useProtocolCalibrationStatus, { wrapper })
     expect(result.current).toMatchObject({
       complete: true,
