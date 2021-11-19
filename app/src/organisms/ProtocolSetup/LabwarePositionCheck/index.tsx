@@ -126,6 +126,8 @@ export const LabwarePositionCheck = (
     )
   } else if (isComplete) {
     modalContent = (
+      // TODO: all of the following cases have the same modal page wrapper, we can DRY
+      // this up by creating one wrapper and pass in children
       <ModalPage
         contentsClassName={styles.modal_contents}
         titleBar={{
