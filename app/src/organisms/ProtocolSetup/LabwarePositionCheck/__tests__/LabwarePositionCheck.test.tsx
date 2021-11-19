@@ -9,6 +9,7 @@ import { IntroScreen } from '../IntroScreen'
 import { SummaryScreen } from '../SummaryScreen'
 import { RobotMotionLoadingModal } from '../RobotMotionLoadingModal'
 import { ConfirmPickUpTipModal } from '../ConfirmPickUpTipModal'
+import { ExitPreventionModal } from '../ExitPreventionModal'
 import { useSteps, useLabwarePositionCheck } from '../hooks'
 import type { LabwarePositionCheckStep } from '../types'
 
@@ -17,6 +18,7 @@ jest.mock('../IntroScreen')
 jest.mock('../SummaryScreen')
 jest.mock('../RobotMotionLoadingModal')
 jest.mock('../ConfirmPickUpTipModal')
+jest.mock('../ExitPreventionModal')
 jest.mock('../hooks')
 
 const mockGenericStepScreen = GenericStepScreen as jest.MockedFunction<
@@ -32,6 +34,10 @@ const mockRobotMotionLoadingModal = RobotMotionLoadingModal as jest.MockedFuncti
 const mockConfirmPickUpTipModal = ConfirmPickUpTipModal as jest.MockedFunction<
   typeof ConfirmPickUpTipModal
 >
+const mockExitPreventionModal = ExitPreventionModal as jest.MockedFunction<
+  typeof ExitPreventionModal
+>
+
 const mockUseSteps = useSteps as jest.MockedFunction<typeof useSteps>
 
 const mockUseLabwarePositionCheck = useLabwarePositionCheck as jest.MockedFunction<
@@ -90,6 +96,10 @@ describe('LabwarePositionCheck', () => {
     when(mockConfirmPickUpTipModal)
       .calledWith(anyProps())
       .mockReturnValue(<div>Mock Confirm Pick Up Tip Modal</div>)
+      .mockReturnValue(<div>Mock Summary Screen Component </div>)
+    when(mockExitPreventionModal)
+      .calledWith(anyProps())
+      .mockReturnValue(<div>Mock Exit Prevention Modal</div>)
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -104,14 +114,15 @@ describe('LabwarePositionCheck', () => {
       name: 'exit',
     })
   })
-  it('renders LabwarePositionCheck header and exit button is pressed', () => {
-    const { getByRole } = render(props)
+  it('prevention modal opens when exit button is pressed', () => {
+    const { getByRole, getByText } = render(props)
     expect(props.onCloseClick).not.toHaveBeenCalled()
     const exitButton = getByRole('button', {
       name: 'exit',
     })
     fireEvent.click(exitButton)
-    expect(props.onCloseClick).toHaveBeenCalled()
+    expect(mockExitPreventionModal).toHaveBeenCalled()
+    getByText('Mock Exit Prevention Modal')
   })
   it('renders the loading screen', () => {
     mockUseLabwarePositionCheck.mockReturnValue({ isLoading: true } as any)

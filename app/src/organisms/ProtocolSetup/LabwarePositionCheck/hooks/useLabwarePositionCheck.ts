@@ -249,7 +249,8 @@ export function useLabwarePositionCheck(
   if (
     prevCommand != null &&
     prevCommand.commandType === 'pickUpTip' &&
-    !isLoading
+    !isLoading &&
+    !showPickUpTipConfirmationModal
   ) {
     setShowPickUpTipConfirmationModal(true)
   }
@@ -486,6 +487,7 @@ export function useLabwarePositionCheck(
 
   const onUnsuccessfulPickUpTip = (): void => {
     setIsLoading(true)
+    setShowPickUpTipConfirmationModal(false)
     // drop the tip  back where it was before
     const commandType: DropTipCommand['commandType'] = 'dropTip'
     const pipetteId = prevCommand.params.pipetteId
@@ -505,6 +507,16 @@ export function useLabwarePositionCheck(
       currentRun?.data?.id as string,
       createCommandData(dropTipCommand)
     )
+      .then(() => {
+        const moveBackToWellCommand =
+          LPCMovementCommands[currentCommandIndex - 2]
+        const moveBackToWell = createCommand(
+          host as HostConfig,
+          currentRun?.data?.id as string,
+          createCommandData(moveBackToWellCommand)
+        )
+        return moveBackToWell
+      })
       .then(response => {
         const commandId = response.data.data.id
         setPendingMovementCommandData({
@@ -516,6 +528,7 @@ export function useLabwarePositionCheck(
         // decrement current command index so that the state resets
         setCurrentCommandIndex(currentCommandIndex - 1)
       })
+
       .catch((e: Error) => {
         console.error(`error issuing drop tip command: ${e.message}`)
       })

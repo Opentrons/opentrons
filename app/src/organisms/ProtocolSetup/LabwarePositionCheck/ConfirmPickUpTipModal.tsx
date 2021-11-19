@@ -1,6 +1,6 @@
 import { AlertModal } from '@opentrons/components'
 import * as React from 'react'
-
+import styles from './styles.css'
 interface Props {
   title: string
   confirmText: string
@@ -15,7 +15,11 @@ export const ConfirmPickUpTipModal = (props: Props): JSX.Element => {
       heading={props.title}
       buttons={[
         { children: props.denyText, onClick: props.onDeny },
-        { children: props.confirmText, onClick: props.onConfirm },
+        {
+          children: props.confirmText,
+          onClick: props.onConfirm,
+          className: styles.confirm_pickup_tip_button,
+        },
       ]}
       alertOverlay
     >

@@ -6,6 +6,7 @@ import {
   ModalPage,
   SPACING_2,
   Text,
+  useConditionalConfirm,
 } from '@opentrons/components'
 import { Portal } from '../../../App/portal'
 import { useRestartRun } from '../../ProtocolUpload/hooks/useRestartRun'
@@ -15,6 +16,7 @@ import { GenericStepScreen } from './GenericStepScreen'
 import { SummaryScreen } from './SummaryScreen'
 import { RobotMotionLoadingModal } from './RobotMotionLoadingModal'
 import { ConfirmPickUpTipModal } from './ConfirmPickUpTipModal'
+import { ExitPreventionModal } from './ExitPreventionModal'
 
 import styles from '../styles.css'
 import type { SavePositionCommandData } from './types'
@@ -33,6 +35,12 @@ export const LabwarePositionCheck = (
   ] = React.useState<SavePositionCommandData>({})
   const [isRestartingRun, setIsRestartingRun] = React.useState<boolean>(false)
 
+  const {
+    confirm: confirmExitLPC,
+    showConfirmation,
+    cancel: cancelExitLPC,
+  } = useConditionalConfirm(props.onCloseClick, true)
+
   // at the end of LPC, each labwareId will have 2 associated save position command ids which will be used to calculate the labware offsets
   const addSavePositionCommandData = (
     commandId: string,
@@ -42,7 +50,7 @@ export const LabwarePositionCheck = (
       ...savePositionCommandData,
       [labwareId]:
         savePositionCommandData[labwareId] != null
-          ? [...savePositionCommandData[labwareId], commandId]
+          ? [savePositionCommandData[labwareId][0], commandId]
           : [commandId],
     })
   }
@@ -94,11 +102,18 @@ export const LabwarePositionCheck = (
     jog,
   } = labwarePositionCheckUtils
 
-  let LPCInnerComponent: React.ReactNode = null
+  let modalContent: JSX.Element
   if (isLoading) {
-    LPCInnerComponent = <RobotMotionLoadingModal title={titleText} />
+    modalContent = <RobotMotionLoadingModal title={titleText} />
+  } else if (showConfirmation) {
+    modalContent = (
+      <ExitPreventionModal
+        onGoBack={cancelExitLPC}
+        onConfirmExit={confirmExitLPC}
+      />
+    )
   } else if (showPickUpTipConfirmationModal) {
-    LPCInnerComponent = (
+    modalContent = (
       <ConfirmPickUpTipModal
         title={t('confirm_pick_up_tip_modal_title')}
         denyText={t('confirm_pick_up_tip_modal_try_again_text')}
@@ -108,38 +123,59 @@ export const LabwarePositionCheck = (
       />
     )
   } else if (isComplete) {
-    LPCInnerComponent = (
-      <SummaryScreen savePositionCommandData={savePositionCommandData} />
-    )
-  } else if (currentCommandIndex !== 0) {
-    LPCInnerComponent = (
-      <GenericStepScreen
-        selectedStep={currentStep}
-        ctaText={ctaText}
-        proceed={proceed}
-        title={titleText}
-        jog={jog}
-      />
-    )
-  } else {
-    LPCInnerComponent = <IntroScreen beginLPC={beginLPC} />
-  }
-
-  return (
-    <Portal level="top">
+    modalContent = (
       <ModalPage
         contentsClassName={styles.modal_contents}
         titleBar={{
           title: t('labware_position_check_title'),
           back: {
-            onClick: props.onCloseClick,
+            onClick: confirmExitLPC,
             title: t('shared:exit'),
             children: t('shared:exit'),
           },
         }}
       >
-        {LPCInnerComponent}
+        <SummaryScreen savePositionCommandData={savePositionCommandData} />
       </ModalPage>
-    </Portal>
-  )
+    )
+  } else if (currentCommandIndex !== 0) {
+    modalContent = (
+      <ModalPage
+        contentsClassName={styles.modal_contents}
+        titleBar={{
+          title: t('labware_position_check_title'),
+          back: {
+            onClick: confirmExitLPC,
+            title: t('shared:exit'),
+            children: t('shared:exit'),
+          },
+        }}
+      >
+        <GenericStepScreen
+          selectedStep={currentStep}
+          ctaText={ctaText}
+          proceed={proceed}
+          title={titleText}
+          jog={jog}
+        />
+      </ModalPage>
+    )
+  } else {
+    modalContent = (
+      <ModalPage
+        contentsClassName={styles.modal_contents}
+        titleBar={{
+          title: t('labware_position_check_title'),
+          back: {
+            onClick: confirmExitLPC,
+            title: t('shared:exit'),
+            children: t('shared:exit'),
+          },
+        }}
+      >
+        <IntroScreen beginLPC={beginLPC} />
+      </ModalPage>
+    )
+  }
+  return <Portal level="top">{modalContent}</Portal>
 }
