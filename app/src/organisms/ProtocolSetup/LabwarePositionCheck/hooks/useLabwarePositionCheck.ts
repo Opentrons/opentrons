@@ -13,7 +13,6 @@ import { useHost, useAllCommandsQuery } from '@opentrons/react-api-client'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
 import { useCurrentProtocolRun } from '../../../ProtocolUpload/hooks'
 import { getLabwareLocation } from '../../utils/getLabwareLocation'
-import { getModuleLocation } from '../../utils/getModuleLocation'
 import { useSteps } from './useSteps'
 import { getModuleInitialLoadInfo } from '../../utils/getModuleInitialLoadInfo'
 import type {
