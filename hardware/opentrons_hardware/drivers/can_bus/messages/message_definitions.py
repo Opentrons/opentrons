@@ -193,8 +193,8 @@ class ReadMotorDriverRequest:  # noqa: D101
 
 @dataclass
 class ReadMotorDriverResponse:  # noqa: D101
-    payload: payloads.MotorDriverRegisterDataPayload
-    payload_type: Type[BinarySerializable] = payloads.MotorDriverRegisterDataPayload
+    payload: payloads.ReadMotorDriverRegisterResponsePayload
+    payload_type: Type[BinarySerializable] = payloads.ReadMotorDriverRegisterResponsePayload
     message_id: Literal[
         MessageId.read_motor_driver_register_response
     ] = MessageId.read_motor_driver_register_response

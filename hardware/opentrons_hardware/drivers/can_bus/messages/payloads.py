@@ -118,13 +118,21 @@ class MoveCompletedPayload(MoveGroupResponsePayload):
 
 @dataclass
 class MotorDriverRegisterPayload(utils.BinarySerializable):
-    """A payload with a motor driver register address."""
+    """Read motor driver register request payload."""
 
     reg_addr: utils.UInt8Field
 
 
 @dataclass
 class MotorDriverRegisterDataPayload(MotorDriverRegisterPayload):
-    """A motor driver register data payload."""
+    """Write motor driver register request payload."""
 
+    data: utils.UInt32Field
+
+
+@dataclass
+class ReadMotorDriverRegisterResponsePayload(ResponsePayload):
+    """Read motor driver register response payload."""
+
+    reg_addr: utils.UInt8Field
     data: utils.UInt32Field
