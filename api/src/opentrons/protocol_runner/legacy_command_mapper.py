@@ -238,10 +238,6 @@ class LegacyCommandMapper:
                     labwareId=labware_id,
                     wellName=well_name,
                 ),
-                result=pe_commands.PickUpTipResult(
-                    pipetteId=pipette_id,
-                    labwareId=labware_id,
-                ),
             )
 
         else:
