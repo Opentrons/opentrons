@@ -3,8 +3,8 @@ import * as React from 'react'
 
 interface Props {
   title: string
-  confirmText: string,
-  denyText: string,
+  confirmText: string
+  denyText: string
   onConfirm: () => void
   onDeny: () => void
 }
@@ -14,8 +14,8 @@ export const ConfirmPickUpTipModal = (props: Props): JSX.Element => {
     <AlertModal
       heading={props.title}
       buttons={[
-        { children: 'cancel', onClick: props.onDeny },
-        { children: 'continue', onClick: props.onConfirm },
+        { children: props.denyText, onClick: props.onDeny },
+        { children: props.confirmText, onClick: props.onConfirm },
       ]}
       alertOverlay
     >
