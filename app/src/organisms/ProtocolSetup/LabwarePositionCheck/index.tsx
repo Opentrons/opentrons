@@ -50,7 +50,9 @@ export const LabwarePositionCheck = (
       ...savePositionCommandData,
       [labwareId]:
         savePositionCommandData[labwareId] != null
-          ? [savePositionCommandData[labwareId][0], commandId]
+          ? // if there are already two command ids, overwrite the second one with the new one coming in
+            // this is used when there is an unsuccessful pick up tip, and additional pick up tip attempts occur
+            [savePositionCommandData[labwareId][0], commandId]
           : [commandId],
     })
   }

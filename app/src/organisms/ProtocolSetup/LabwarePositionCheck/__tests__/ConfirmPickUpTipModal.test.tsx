@@ -32,7 +32,11 @@ describe('ConfirmPickUpTipModal', () => {
           heading: title,
           buttons: [
             { children: denyText, onClick: onDeny },
-            { children: confirmText, onClick: onConfirm },
+            {
+              children: confirmText,
+              onClick: onConfirm,
+              className: expect.anything(),
+            },
           ],
         })
       )
@@ -43,6 +47,7 @@ describe('ConfirmPickUpTipModal', () => {
     jest.restoreAllMocks()
   })
   it('should render an alert modal with the correct props', () => {
+    // mockAlertModal.mockImplementation(args => console.log(args))
     const { getByText } = render(
       <ConfirmPickUpTipModal
         title={title}

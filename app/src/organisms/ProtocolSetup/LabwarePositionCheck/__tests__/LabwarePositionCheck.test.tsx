@@ -96,7 +96,6 @@ describe('LabwarePositionCheck', () => {
     when(mockConfirmPickUpTipModal)
       .calledWith(anyProps())
       .mockReturnValue(<div>Mock Confirm Pick Up Tip Modal</div>)
-      .mockReturnValue(<div>Mock Summary Screen Component </div>)
     when(mockExitPreventionModal)
       .calledWith(anyProps())
       .mockReturnValue(<div>Mock Exit Prevention Modal</div>)

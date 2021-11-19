@@ -27,7 +27,6 @@ export const LabwareOffsetsSummary = (
 ): JSX.Element | null => {
   const { offsetData } = props
   const { t } = useTranslation('labware_position_check')
-  console.log(offsetData)
   return (
     <React.Fragment>
       <Flex

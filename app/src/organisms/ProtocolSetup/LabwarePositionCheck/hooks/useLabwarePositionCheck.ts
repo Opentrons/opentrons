@@ -509,6 +509,7 @@ export function useLabwarePositionCheck(
     )
       .then(() => {
         const moveBackToWellCommand =
+          // the last command was a pick up tip, the one before that was a move to well
           LPCMovementCommands[currentCommandIndex - 2]
         const moveBackToWell = createCommand(
           host as HostConfig,
