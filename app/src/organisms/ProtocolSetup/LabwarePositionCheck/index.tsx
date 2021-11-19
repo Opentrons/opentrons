@@ -6,6 +6,7 @@ import {
   ModalPage,
   SPACING_2,
   Text,
+  useConditionalConfirm,
 } from '@opentrons/components'
 import { Portal } from '../../../App/portal'
 import { useRestartRun } from '../../ProtocolUpload/hooks/useRestartRun'
@@ -14,6 +15,8 @@ import { IntroScreen } from './IntroScreen'
 import { GenericStepScreen } from './GenericStepScreen'
 import { SummaryScreen } from './SummaryScreen'
 import { RobotMotionLoadingModal } from './RobotMotionLoadingModal'
+import { ConfirmPickUpTipModal } from './ConfirmPickUpTipModal'
+import { ExitPreventionModal } from './ExitPreventionModal'
 
 import styles from '../styles.css'
 import type { SavePositionCommandData } from './types'
@@ -32,6 +35,12 @@ export const LabwarePositionCheck = (
   ] = React.useState<SavePositionCommandData>({})
   const [isRestartingRun, setIsRestartingRun] = React.useState<boolean>(false)
 
+  const {
+    confirm: confirmExitLPC,
+    showConfirmation,
+    cancel: cancelExitLPC,
+  } = useConditionalConfirm(props.onCloseClick, true)
+
   // at the end of LPC, each labwareId will have 2 associated save position command ids which will be used to calculate the labware offsets
   const addSavePositionCommandData = (
     commandId: string,
@@ -41,7 +50,9 @@ export const LabwarePositionCheck = (
       ...savePositionCommandData,
       [labwareId]:
         savePositionCommandData[labwareId] != null
-          ? [...savePositionCommandData[labwareId], commandId]
+          ? // if there are already two command ids, overwrite the second one with the new one coming in
+            // this is used when there is an unsuccessful pick up tip, and additional pick up tip attempts occur
+            [savePositionCommandData[labwareId][0], commandId]
           : [commandId],
     })
   }
@@ -85,40 +96,90 @@ export const LabwarePositionCheck = (
     ctaText,
     currentCommandIndex,
     currentStep,
+    showPickUpTipConfirmationModal,
+    onUnsuccessfulPickUpTip,
     isComplete,
     titleText,
     isLoading,
     jog,
   } = labwarePositionCheckUtils
 
-  return (
-    <Portal level="top">
+  let modalContent: JSX.Element
+  if (isLoading) {
+    modalContent = <RobotMotionLoadingModal title={titleText} />
+  } else if (showConfirmation) {
+    modalContent = (
+      <ExitPreventionModal
+        onGoBack={cancelExitLPC}
+        onConfirmExit={confirmExitLPC}
+      />
+    )
+  } else if (showPickUpTipConfirmationModal) {
+    modalContent = (
+      <ConfirmPickUpTipModal
+        title={t('confirm_pick_up_tip_modal_title')}
+        denyText={t('confirm_pick_up_tip_modal_try_again_text')}
+        confirmText={ctaText}
+        onConfirm={proceed}
+        onDeny={onUnsuccessfulPickUpTip}
+      />
+    )
+  } else if (isComplete) {
+    modalContent = (
+      // TODO: all of the following cases have the same modal page wrapper, we can DRY
+      // this up by creating one wrapper and pass in children
       <ModalPage
         contentsClassName={styles.modal_contents}
         titleBar={{
           title: t('labware_position_check_title'),
           back: {
-            onClick: props.onCloseClick,
+            onClick: confirmExitLPC,
             title: t('shared:exit'),
             children: t('shared:exit'),
           },
         }}
       >
-        {isLoading ? <RobotMotionLoadingModal title={titleText} /> : null}
-        {isComplete ? (
-          <SummaryScreen savePositionCommandData={savePositionCommandData} />
-        ) : currentCommandIndex !== 0 ? (
-          <GenericStepScreen
-            selectedStep={currentStep}
-            ctaText={ctaText}
-            proceed={proceed}
-            title={titleText}
-            jog={jog}
-          />
-        ) : (
-          <IntroScreen beginLPC={beginLPC} />
-        )}
+        <SummaryScreen savePositionCommandData={savePositionCommandData} />
       </ModalPage>
-    </Portal>
-  )
+    )
+  } else if (currentCommandIndex !== 0) {
+    modalContent = (
+      <ModalPage
+        contentsClassName={styles.modal_contents}
+        titleBar={{
+          title: t('labware_position_check_title'),
+          back: {
+            onClick: confirmExitLPC,
+            title: t('shared:exit'),
+            children: t('shared:exit'),
+          },
+        }}
+      >
+        <GenericStepScreen
+          selectedStep={currentStep}
+          ctaText={ctaText}
+          proceed={proceed}
+          title={titleText}
+          jog={jog}
+        />
+      </ModalPage>
+    )
+  } else {
+    modalContent = (
+      <ModalPage
+        contentsClassName={styles.modal_contents}
+        titleBar={{
+          title: t('labware_position_check_title'),
+          back: {
+            onClick: confirmExitLPC,
+            title: t('shared:exit'),
+            children: t('shared:exit'),
+          },
+        }}
+      >
+        <IntroScreen beginLPC={beginLPC} />
+      </ModalPage>
+    )
+  }
+  return <Portal level="top">{modalContent}</Portal>
 }

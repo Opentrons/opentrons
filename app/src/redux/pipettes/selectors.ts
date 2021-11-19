@@ -40,7 +40,7 @@ export const getAttachedPipettes: (
   robotName: string | null
 ) => Types.AttachedPipettesByMount = createSelector(
   (state: State, robotName: string | null) =>
-    robotName ? state.pipettes[robotName]?.attachedByMount : null,
+    robotName ? state?.pipettes[robotName]?.attachedByMount : null,
   attachedByMount => {
     return Constants.PIPETTE_MOUNTS.reduce<Types.AttachedPipettesByMount>(
       (result, mount) => {

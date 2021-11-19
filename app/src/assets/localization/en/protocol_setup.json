@@ -51,6 +51,7 @@
   "recalibrate": "Recalibrate",
   "required_pipettes_title": "Required Pipettes",
   "required_tip_racks_title": "Required Tip Length Calibrations",
+  "attach_pipette_tip_length_calibration": "Attach pipette to see tip length calibration information",
   "robot_calibration_step_description": "Review required pipettes and tip length calibrations for this protocol.",
   "robot_calibration_step_title": "Robot Calibration",
   "setup_for_run": "Setup for Run",
@@ -78,5 +79,7 @@
   "calibration_ready": "Calibration ready",
   "run_disabled_modules_not_connected": "Make sure all modules are connected before proceeding to run",
   "run_disabled_calibration_not_complete": "Make sure robot calibration is complete before proceeding to run",
-  "run_disabled_modules_and_calibration_not_complete": "Make sure robot calibration is complete and all modules are connected before proceeding to run"
+  "run_disabled_modules_and_calibration_not_complete": "Make sure robot calibration is complete and all modules are connected before proceeding to run",
+  "protocol_upload_revamp_feedback": "Have feedback about this experience?",
+  "feedback_form_link": "Let us know!"
 }

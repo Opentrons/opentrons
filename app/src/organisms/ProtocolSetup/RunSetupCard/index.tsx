@@ -21,7 +21,7 @@ import {
 import { protocolHasModules } from '@opentrons/shared-data'
 import { Divider } from '../../../atoms/structure'
 import { getConnectedRobot } from '../../../redux/discovery/selectors'
-import { getProtocolCalibrationComplete } from '../../../redux/calibration/selectors'
+import { useProtocolCalibrationStatus } from '../RunSetupCard/hooks/useProtocolCalibrationStatus'
 import { useProtocolDetails } from '../../RunDetails/hooks'
 import { CollapsibleStep } from './CollapsibleStep'
 import { ProceedToRunCta } from './ProceedToRunCta'
@@ -45,10 +45,8 @@ export function RunSetupCard(): JSX.Element | null {
   const { t } = useTranslation('protocol_setup')
   const { protocolData } = useProtocolDetails()
   const robot = useSelector((state: State) => getConnectedRobot(state))
-  const robotName = robot?.name != null ? robot?.name : ''
-  const calibrationStatus = useSelector((state: State) => {
-    return getProtocolCalibrationComplete(state, robotName)
-  })
+  const calibrationStatus = useProtocolCalibrationStatus()
+
   const [expandedStepKey, setExpandedStepKey] = React.useState<StepKey | null>(
     null
   )
