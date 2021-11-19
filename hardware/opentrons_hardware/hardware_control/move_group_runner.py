@@ -12,6 +12,9 @@ from opentrons_hardware.drivers.can_bus.messages.message_definitions import (
     AddLinearMoveRequest,
     MoveCompleted,
     ExecuteMoveGroupRequest,
+    SetupRequest,
+    EnableMotorRequest,
+    DisableMotorRequest,
 )
 from opentrons_hardware.drivers.can_bus.messages.payloads import (
     AddLinearMoveRequestPayload,
@@ -43,9 +46,17 @@ class MoveGroupRunner:
         Args:
             can_messenger: a can messenger
         """
+        if not self._move_groups:
+            log.debug("No moves. Nothing to do.")
+            return
+
         await self._clear_groups(can_messenger)
         await self._send_groups(can_messenger)
-        await self._move(can_messenger)
+        await self._setup_motors(can_messenger)
+        try:
+            await self._move(can_messenger)
+        finally:
+            await self._teardown_motors(can_messenger)
 
     async def _clear_groups(self, can_messenger: CanMessenger) -> None:
         """Send commands to clear the message groups."""
@@ -84,6 +95,24 @@ class MoveGroupRunner:
             await scheduler.run(can_messenger)
         finally:
             can_messenger.remove_listener(scheduler)
+
+    async def _setup_motors(self, can_messenger: CanMessenger) -> None:
+        """Set up the motors for motion."""
+        await can_messenger.send(
+            node_id=NodeId.broadcast,
+            message=SetupRequest(payload=EmptyPayload()),
+        )
+        await can_messenger.send(
+            node_id=NodeId.broadcast,
+            message=EnableMotorRequest(payload=EmptyPayload()),
+        )
+
+    async def _teardown_motors(self, can_messenger: CanMessenger) -> None:
+        """Tear down motors after motion."""
+        await can_messenger.send(
+            node_id=NodeId.broadcast,
+            message=DisableMotorRequest(payload=EmptyPayload()),
+        )
 
 
 class MoveScheduler(MessageListener):

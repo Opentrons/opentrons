@@ -87,7 +87,7 @@ class CanDriver:
                 bitrate=bitrate,
                 interface=interface,
                 fd=True,
-                **extra_kwargs
+                **extra_kwargs,
             ),
             loop=asyncio.get_event_loop(),
         )
