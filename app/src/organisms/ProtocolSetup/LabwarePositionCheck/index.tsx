@@ -14,6 +14,7 @@ import { IntroScreen } from './IntroScreen'
 import { GenericStepScreen } from './GenericStepScreen'
 import { SummaryScreen } from './SummaryScreen'
 import { RobotMotionLoadingModal } from './RobotMotionLoadingModal'
+import { ConfirmPickUpTipModal } from './ConfirmPickUpTipModal'
 
 import styles from '../styles.css'
 import type { SavePositionCommandData } from './types'
@@ -85,11 +86,44 @@ export const LabwarePositionCheck = (
     ctaText,
     currentCommandIndex,
     currentStep,
+    showPickUpTipConfirmationModal,
+    onUnsuccessfulPickUpTip,
     isComplete,
     titleText,
     isLoading,
     jog,
   } = labwarePositionCheckUtils
+
+  let LPCInnerComponent: React.ReactNode = null
+  if (isLoading) {
+    LPCInnerComponent = <RobotMotionLoadingModal title={titleText} />
+  } else if (showPickUpTipConfirmationModal) {
+    LPCInnerComponent = (
+      <ConfirmPickUpTipModal
+        title={t('confirm_pick_up_tip_modal_title')}
+        denyText={t('confirm_pick_up_tip_modal_try_again_text')}
+        confirmText={ctaText}
+        onConfirm={proceed}
+        onDeny={onUnsuccessfulPickUpTip}
+      />
+    )
+  } else if (isComplete) {
+    LPCInnerComponent = (
+      <SummaryScreen savePositionCommandData={savePositionCommandData} />
+    )
+  } else if (currentCommandIndex !== 0) {
+    LPCInnerComponent = (
+      <GenericStepScreen
+        selectedStep={currentStep}
+        ctaText={ctaText}
+        proceed={proceed}
+        title={titleText}
+        jog={jog}
+      />
+    )
+  } else {
+    LPCInnerComponent = <IntroScreen beginLPC={beginLPC} />
+  }
 
   return (
     <Portal level="top">
@@ -104,20 +138,7 @@ export const LabwarePositionCheck = (
           },
         }}
       >
-        {isLoading ? <RobotMotionLoadingModal title={titleText} /> : null}
-        {isComplete ? (
-          <SummaryScreen savePositionCommandData={savePositionCommandData} />
-        ) : currentCommandIndex !== 0 ? (
-          <GenericStepScreen
-            selectedStep={currentStep}
-            ctaText={ctaText}
-            proceed={proceed}
-            title={titleText}
-            jog={jog}
-          />
-        ) : (
-          <IntroScreen beginLPC={beginLPC} />
-        )}
+        {LPCInnerComponent}
       </ModalPage>
     </Portal>
   )
