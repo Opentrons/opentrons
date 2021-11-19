@@ -7,10 +7,7 @@ import {
   SPACING_2,
 } from '@opentrons/components'
 import { getModuleDisplayName, ProtocolFile } from '@opentrons/shared-data'
-import { getProtocolPipetteTipRackCalInfo } from '../../redux/pipettes'
-import { getConnectedRobot } from '../../redux/discovery'
-import { State } from '../../redux/types'
-import { useSelector } from 'react-redux'
+import { useCurrentRunPipetteInfoByMount } from '../ProtocolSetup/RunSetupCard/hooks'
 import { useProtocolDetails } from './hooks'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 
@@ -25,11 +22,8 @@ export const ProtocolSetupInfo = (
   const { t } = useTranslation('run_details')
   const protocolData: ProtocolFile<{}> | null = useProtocolDetails()
     .protocolData
-  const robot = useSelector((state: State) => getConnectedRobot(state))
-  const robotName = robot?.name != null ? robot?.name : ''
-  const protocolPipetteData = useSelector((state: State) =>
-    getProtocolPipetteTipRackCalInfo(state, robotName)
-  )
+
+  const protocolPipetteData = useCurrentRunPipetteInfoByMount()
   if (protocolData == null) return null
   if (setupCommand === undefined) return null
   if (
@@ -51,7 +45,7 @@ export const ProtocolSetupInfo = (
         id={`RunDetails_PipetteSetup`}
         i18nKey={'load_pipette_protocol_setup'}
         values={{
-          pipette_name: pipetteData.pipetteDisplayName,
+          pipette_name: pipetteData.pipetteSpecs.displayName,
           mount_name: setupCommand.params.mount === 'left' ? 'Left' : 'Right',
         }}
       />
