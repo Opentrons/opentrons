@@ -62,3 +62,7 @@ class MessageId(int, Enum):
     clear_all_move_groups_request = 0x19
     move_group_completed = 0x1A
     move_completed = 0x13
+
+    write_motor_driver_register_request = 0x30
+    read_motor_driver_register_request = 0x31
+    read_motor_driver_register_response = 0x32

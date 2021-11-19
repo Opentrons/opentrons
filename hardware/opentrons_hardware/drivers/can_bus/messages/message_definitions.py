@@ -178,3 +178,30 @@ class MoveCompleted:  # noqa: D101
     payload: payloads.MoveCompletedPayload
     payload_type: Type[BinarySerializable] = payloads.MoveCompletedPayload
     message_id: Literal[MessageId.move_completed] = MessageId.move_completed
+
+
+@dataclass
+class WriteMotorDriverRegister:  # noqa: D101
+    payload: payloads.MotorDriverRegisterDataPayload
+    payload_type: Type[BinarySerializable] = payloads.MotorDriverRegisterDataPayload
+    message_id: Literal[
+        MessageId.write_motor_driver_register_request
+    ] = MessageId.write_motor_driver_register_request
+
+
+@dataclass
+class ReadMotorDriverRequest:  # noqa: D101
+    payload: payloads.MotorDriverRegisterPayload
+    payload_type: Type[BinarySerializable] = payloads.MotorDriverRegisterPayload
+    message_id: Literal[
+        MessageId.read_motor_driver_register_request
+    ] = MessageId.read_motor_driver_register_request
+
+
+@dataclass
+class ReadMotorDriverResponse:  # noqa: D101
+    payload: payloads.MotorDriverRegisterDataPayload
+    payload_type: Type[BinarySerializable] = payloads.MotorDriverRegisterDataPayload
+    message_id: Literal[
+        MessageId.read_motor_driver_register_response
+    ] = MessageId.read_motor_driver_register_response

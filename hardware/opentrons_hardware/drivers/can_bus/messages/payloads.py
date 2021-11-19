@@ -110,3 +110,17 @@ class MoveCompletedPayload(MoveGroupRequestPayload):
     current_position: utils.UInt32Field
     ack_id: utils.UInt8Field
     node_id: utils.UInt8Field
+
+
+@dataclass
+class MotorDriverRegisterPayload(utils.BinarySerializable):
+    """A payload with a motor driver register address."""
+
+    reg_addr: utils.UInt8Field
+
+
+@dataclass
+class MotorDriverRegisterDataPayload(MotorDriverRegisterPayload):
+    """A motor driver register data payload."""
+
+    data: utils.UInt32Field
