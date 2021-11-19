@@ -5,7 +5,8 @@ from typing import Optional
 from ..state import StateStore
 from ..resources import ModelUtils
 from ..commands import CommandStatus
-from ..actions import ActionDispatcher, UpdateCommandAction
+from ..actions import ActionDispatcher, UpdateCommandAction, FailCommandAction
+from ..errors import ProtocolEngineError, UnexpectedProtocolError
 from .equipment import EquipmentHandler
 from .movement import MovementHandler
 from .pipetting import PipettingHandler
@@ -65,33 +66,35 @@ class CommandExecutor:
 
         self._action_dispatcher.dispatch(UpdateCommandAction(command=running_command))
 
-        result = None
-        error = None
         try:
             log.debug(
                 f"Executing {command.id}, {command.commandType}, {command.params}"
             )
             result = await command_impl.execute(command.params)  # type: ignore[arg-type]  # noqa: E501
-            completed_status = CommandStatus.SUCCEEDED
-        except Exception as e:
-            log.warn(
-                f"Execution of {command.id} failed",
-                exc_info=e,
+
+        except Exception as error:
+            log.warn(f"Execution of {command.id} failed", exc_info=error)
+
+            if not isinstance(error, ProtocolEngineError):
+                error = UnexpectedProtocolError(error)
+
+            self._action_dispatcher.dispatch(
+                FailCommandAction(
+                    error=error,
+                    command_id=command_id,
+                    error_id=self._model_utils.generate_id(),
+                    failed_at=self._model_utils.get_timestamp(),
+                )
             )
-            # TODO(mc, 2021-06-22): differentiate between `ProtocolEngineError`s
-            # and unexpected errors when the Command model is ready to accept
-            # structured error details
-            error = str(e)
-            completed_status = CommandStatus.FAILED
 
-        completed_at = self._model_utils.get_timestamp()
-        completed_command = running_command.copy(
-            update={
-                "result": result,
-                "error": error,
-                "status": completed_status,
-                "completedAt": completed_at,
-            }
-        )
-
-        self._action_dispatcher.dispatch(UpdateCommandAction(command=completed_command))
+        else:
+            completed_command = running_command.copy(
+                update={
+                    "result": result,
+                    "status": CommandStatus.SUCCEEDED,
+                    "completedAt": self._model_utils.get_timestamp(),
+                }
+            )
+            self._action_dispatcher.dispatch(
+                UpdateCommandAction(command=completed_command)
+            )

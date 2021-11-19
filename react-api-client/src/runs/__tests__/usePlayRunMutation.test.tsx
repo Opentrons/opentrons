@@ -41,12 +41,12 @@ describe('usePlayRunMutation hook', () => {
       .calledWith(HOST_CONFIG, RUN_ID_1, createPlayRunActionData)
       .mockRejectedValue('oh no')
 
-    const { result, waitFor } = renderHook(() => usePlayRunMutation(RUN_ID_1), {
+    const { result, waitFor } = renderHook(usePlayRunMutation, {
       wrapper,
     })
 
     expect(result.current.data).toBeUndefined()
-    result.current.playRun()
+    act(() => result.current.playRun(RUN_ID_1))
     await waitFor(() => {
       return result.current.status !== 'loading'
     })
@@ -59,10 +59,10 @@ describe('usePlayRunMutation hook', () => {
       .calledWith(HOST_CONFIG, RUN_ID_1, createPlayRunActionData)
       .mockResolvedValue({ data: mockPlayRunAction } as Response<RunAction>)
 
-    const { result, waitFor } = renderHook(() => usePlayRunMutation(RUN_ID_1), {
+    const { result, waitFor } = renderHook(usePlayRunMutation, {
       wrapper,
     })
-    act(() => result.current.playRun())
+    act(() => result.current.playRun(RUN_ID_1))
 
     await waitFor(() => result.current.data != null)
 

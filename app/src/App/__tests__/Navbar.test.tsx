@@ -9,18 +9,17 @@ import {
   FLEX_NONE,
   SIZE_3,
 } from '@opentrons/components'
-import * as Nav from '../../redux/nav'
 import { Navbar } from '../Navbar'
 import { NavbarLink } from '../../molecules/NavbarLink'
+import { useNavLocations } from '../hooks'
 
-import type { State } from '../../redux/types'
 import type { NavLocation } from '../../redux/nav/types'
 
 jest.mock('react-router-dom', () => ({ NavLink: 'a' }))
-jest.mock('../../redux/nav/selectors')
+jest.mock('../hooks')
 
-const getNavbarLocations = Nav.getNavbarLocations as jest.MockedFunction<
-  typeof Nav.getNavbarLocations
+const mockUseNavLocation = useNavLocations as jest.MockedFunction<
+  typeof useNavLocations
 >
 
 const LOCATIONS: NavLocation[] = [
@@ -44,10 +43,7 @@ describe('Navbar component', () => {
   }
 
   beforeEach(() => {
-    getNavbarLocations.mockImplementation((state: State): NavLocation[] => {
-      expect(state).toEqual({ mockState: true })
-      return LOCATIONS
-    })
+    mockUseNavLocation.mockReturnValue(LOCATIONS)
   })
 
   afterEach(() => {

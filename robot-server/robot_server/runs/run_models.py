@@ -7,9 +7,11 @@ from opentrons.protocol_engine import (
     CommandStatus,
     CommandType,
     EngineStatus as RunStatus,
-    LabwareLocation,
+    ErrorOccurrence,
     LoadedPipette,
     LoadedLabware,
+    LabwareOffset,
+    LabwareOffsetCreate,
 )
 from robot_server.service.json_api import ResourceModel
 from .action_models import RunAction
@@ -21,33 +23,9 @@ class RunCommandSummary(ResourceModel):
     id: str = Field(..., description="Unique command identifier.")
     commandType: CommandType = Field(..., description="Specific type of command.")
     status: CommandStatus = Field(..., description="Execution status of the command.")
-
-
-class LabwareOffsetVector(BaseModel):
-    """An offset to apply to labware, in deck coordinates."""
-
-    x: float
-    y: float
-    z: float
-
-
-class LabwareOffset(BaseModel):
-    """An offset that the robot adds to a pipette's position when it moves to a labware.
-
-    During the run, if a labware is loaded whose definition URI and location
-    both match what's found here, the given offset will be added to all
-    pipette movements that use that labware as a reference point.
-    """
-
-    id: str = Field(..., description="Unique labware offset record identifier.")
-    definitionUri: str = Field(..., description="The URI for the labware's definition.")
-    location: LabwareLocation = Field(
-        ...,
-        description="Where the labware is located on the robot.",
-    )
-    offset: LabwareOffsetVector = Field(
-        ...,
-        description="The offset applied to matching labware.",
+    errorId: Optional[str] = Field(
+        None,
+        description="Error occurrence identifier, if status is 'failed'",
     )
 
 
@@ -72,6 +50,10 @@ class Run(ResourceModel):
         ...,
         description="Protocol commands queued, running, or executed for the run.",
     )
+    errors: List[ErrorOccurrence] = Field(
+        ...,
+        description="Any errors that have occurred during the run.",
+    )
     pipettes: List[LoadedPipette] = Field(
         ...,
         description="Pipettes that have been loaded into the run.",
@@ -90,20 +72,6 @@ class Run(ResourceModel):
             "Protocol resource being run, if any. If not present, the run may"
             " still be used to execute protocol commands over HTTP."
         ),
-    )
-
-
-class LabwareOffsetCreate(BaseModel):
-    """Create request data for a labware offset."""
-
-    definitionUri: str = Field(..., description="The URI for the labware's definition.")
-    location: LabwareLocation = Field(
-        ...,
-        description="Where the labware is located on the robot.",
-    )
-    offset: LabwareOffsetVector = Field(
-        ...,
-        description="The offset applied to matching labware.",
     )
 
 

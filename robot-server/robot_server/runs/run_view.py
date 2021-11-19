@@ -1,18 +1,11 @@
 """Run response model factory."""
 from dataclasses import replace
 from datetime import datetime
-from typing import List, Tuple
-
-from opentrons.protocol_engine import (
-    Command as ProtocolEngineCommand,
-    EngineStatus,
-    LoadedLabware,
-    LoadedPipette,
-)
+from typing import Tuple
 
 from .run_store import RunResource
-from .action_models import RunAction, RunActionCreateData
-from .run_models import Run, RunUpdate, RunCommandSummary
+from .action_models import RunAction, RunActionCreate
+from .run_models import RunUpdate
 
 
 class RunView:
@@ -40,7 +33,7 @@ class RunView:
     def with_action(
         run: RunResource,
         action_id: str,
-        action_data: RunActionCreateData,
+        action_data: RunActionCreate,
         created_at: datetime,
     ) -> Tuple[RunAction, RunResource]:
         """Create a new run control action resource instance.
@@ -68,40 +61,3 @@ class RunView:
         )
 
         return actions, updated_run
-
-    @staticmethod
-    def as_response(
-        run: RunResource,
-        commands: List[ProtocolEngineCommand],
-        pipettes: List[LoadedPipette],
-        labware: List[LoadedLabware],
-        engine_status: EngineStatus,
-    ) -> Run:
-        """Transform a run resource into its public response model.
-
-        Args:
-            run: Internal resource representation of the run.
-            commands: Commands from ProtocolEngine state.
-            pipettes: Pipettes from ProtocolEngine state.
-            labware: Labware from ProtocolEngine state.
-            engine_status: Status from ProtocolEngine state.
-
-        Returns:
-            Run response model representing the same resource.
-        """
-        command_summaries = [
-            RunCommandSummary(id=c.id, commandType=c.commandType, status=c.status)
-            for c in commands
-        ]
-
-        return Run(
-            id=run.run_id,
-            protocolId=run.protocol_id,
-            createdAt=run.created_at,
-            current=run.is_current,
-            actions=run.actions,
-            commands=command_summaries,
-            pipettes=pipettes,
-            labware=labware,
-            status=engine_status,
-        )

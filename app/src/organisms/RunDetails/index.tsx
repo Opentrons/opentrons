@@ -1,13 +1,11 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import {
-  Flex,
   PrimaryBtn,
-  Text,
   BORDER_WIDTH_DEFAULT,
-  C_BLUE,
+  C_ERROR_DARK,
   C_WHITE,
-  DIRECTION_COLUMN,
   FONT_WEIGHT_SEMIBOLD,
   LINE_HEIGHT_SOLID,
   SPACING_2,
@@ -16,23 +14,33 @@ import {
 } from '@opentrons/components'
 import { Page } from '../../atoms/Page'
 import { useProtocolDetails } from './hooks'
+import { useRunStatus } from '../RunTimeControl/hooks'
 import { ConfirmCancelModal } from '../../pages/Run/RunLog'
+import { useCurrentRunControls } from '../../pages/Run/RunLog/hooks'
+import { CommandList } from './CommandList'
 
 export function RunDetails(): JSX.Element | null {
   const { t } = useTranslation('run_details')
-  const { displayName, protocolData } = useProtocolDetails()
+  const { displayName } = useProtocolDetails()
+  const runStatus = useRunStatus()
+  const { pauseRun } = useCurrentRunControls()
+
+  const cancelRunAndExit = (): void => {
+    pauseRun()
+    confirmExit()
+  }
+
   const {
     showConfirmation: showConfirmExit,
     confirm: confirmExit,
     cancel: cancelExit,
-  } = useConditionalConfirm(() => {}, true)
-  if (protocolData == null) return null
+  } = useConditionalConfirm(cancelRunAndExit, true)
 
   const cancelRunButton = (
     <PrimaryBtn
-      onClick={confirmExit}
+      onClick={cancelRunAndExit}
       backgroundColor={C_WHITE}
-      color={C_BLUE}
+      color={C_ERROR_DARK}
       borderWidth={BORDER_WIDTH_DEFAULT}
       lineHeight={LINE_HEIGHT_SOLID}
       fontWeight={FONT_WEIGHT_SEMIBOLD}
@@ -40,27 +48,24 @@ export function RunDetails(): JSX.Element | null {
       paddingRight={SPACING_2}
       paddingLeft={SPACING_2}
     >
-      Cancel Run
+      {t('cancel_run')}
     </PrimaryBtn>
   )
 
-  const titleBarProps = {
-    title: t('protocol_title', { protocol_name: displayName }),
-    rightNode: cancelRunButton,
-  }
+  const titleBarProps =
+    runStatus === RUN_STATUS_RUNNING
+      ? {
+          title: t('protocol_title', { protocol_name: displayName }),
+          rightNode: cancelRunButton,
+        }
+      : {
+          title: t('protocol_title', { protocol_name: displayName }),
+        }
 
   return (
     <Page titleBarProps={titleBarProps}>
       {showConfirmExit ? <ConfirmCancelModal onClose={cancelExit} /> : null}
-      <Flex flexDirection={DIRECTION_COLUMN}>
-        {'commands' in protocolData
-          ? protocolData.commands.map((command, index) => (
-              <Flex key={index}>
-                <Text>{command.commandType}</Text>
-              </Flex>
-            ))
-          : null}
-      </Flex>
+      <CommandList />
     </Page>
   )
 }

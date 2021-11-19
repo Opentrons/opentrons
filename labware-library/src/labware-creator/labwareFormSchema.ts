@@ -321,6 +321,7 @@ export const labwareFormSchema: Yup.Schema<ProcessedLabwareFields> = labwareForm
 
     return {
       ...currentValue,
+      brand,
       loadName,
       displayName,
     }

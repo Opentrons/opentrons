@@ -28,7 +28,7 @@ from opentrons_hardware.drivers.can_bus.messages.payloads import (
     MoveCompletedPayload,
     MoveGroupRequestPayload,
 )
-from opentrons_hardware.utils import UInt8Field
+from opentrons_hardware.utils import UInt8Field, UInt32Field
 
 
 @pytest.fixture
@@ -62,8 +62,9 @@ def subject(mock_driver: AsyncMock) -> CanMessenger:
                 payload=MoveCompletedPayload(
                     group_id=UInt8Field(1),
                     seq_id=UInt8Field(2),
-                    ack_id=UInt8Field(3),
-                    node_id=UInt8Field(4),
+                    current_position=UInt32Field(3),
+                    ack_id=UInt8Field(4),
+                    node_id=UInt8Field(5),
                 )
             ),
         ],

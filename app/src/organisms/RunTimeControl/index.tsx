@@ -1,8 +1,20 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
+  RunStatus,
+  RUN_STATUS_IDLE,
+  RUN_STATUS_RUNNING,
+  RUN_STATUS_PAUSE_REQUESTED,
+  RUN_STATUS_PAUSED,
+  RUN_STATUS_STOP_REQUESTED,
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_FAILED,
+  RUN_STATUS_SUCCEEDED,
+} from '@opentrons/api-client'
+import {
   Flex,
   Icon,
+  IconName,
   PrimaryBtn,
   Text,
   ALIGN_CENTER,
@@ -20,59 +32,80 @@ import {
   SPACING_3,
 } from '@opentrons/components'
 
-import { useRunControls, useRunStatus } from './hooks'
+import {
+  useRunCompleteTime,
+  useRunControls,
+  useRunPauseTime,
+  useRunStartTime,
+  useRunStatus,
+} from './hooks'
 import { Timer } from './Timer'
 
-export function RunTimeControl(): JSX.Element {
+export function RunTimeControl(): JSX.Element | null {
   const { t } = useTranslation('run_details')
+
   const runStatus = useRunStatus()
+  const startTime = useRunStartTime()
+  const pausedAt = useRunPauseTime()
+  const completedAt = useRunCompleteTime()
+
+  // display an idle status as 'running' in the UI after a run has started
+  const adjustedRunStatus: RunStatus | null =
+    runStatus === RUN_STATUS_IDLE && startTime != null
+      ? RUN_STATUS_RUNNING
+      : runStatus
+
   const { play, pause, reset } = useRunControls()
 
-  let callToAction: React.ReactNode = ''
-  let action = (): void => {}
-  if (runStatus === 'loaded') {
-    callToAction = (
-      <>
-        <Icon name="play" size={SIZE_1} marginRight={SPACING_2} />
-        <Text fontSize={FONT_SIZE_DEFAULT}>{t('start_run')}</Text>
-      </>
-    )
-    action = play
-  } else if (runStatus === 'running') {
-    callToAction = (
-      <>
-        <Icon name="pause" size={SIZE_1} marginRight={SPACING_2} />
-        <Text fontSize={FONT_SIZE_DEFAULT}>{t('pause_run')}</Text>
-      </>
-    )
-    action = pause
-  } else if (runStatus === 'paused') {
-    callToAction = (
-      <>
-        <Icon name="play" size={SIZE_1} marginRight={SPACING_2} />
-        <Text fontSize={FONT_SIZE_DEFAULT}>{t('resume_run')}</Text>
-      </>
-    )
-    action = play
-  } else if (runStatus === 'finished') {
-    callToAction = <Text fontSize={FONT_SIZE_DEFAULT}>{t('run_again')}</Text>
-    action = reset
-  } else if (runStatus === 'canceled') {
-    callToAction = <Text fontSize={FONT_SIZE_DEFAULT}>{t('run_again')}</Text>
-    action = reset
+  let handleButtonClick = (): void => {}
+  let buttonIconName: IconName | null = null
+  let buttonText: string = ''
+
+  if (adjustedRunStatus === RUN_STATUS_IDLE) {
+    buttonIconName = 'play'
+    buttonText = t('start_run')
+    handleButtonClick = play
+  } else if (adjustedRunStatus === RUN_STATUS_RUNNING) {
+    buttonIconName = 'pause'
+    buttonText = t('pause_run')
+    handleButtonClick = pause
+  } else if (
+    adjustedRunStatus === RUN_STATUS_PAUSED ||
+    adjustedRunStatus === RUN_STATUS_PAUSE_REQUESTED
+  ) {
+    buttonIconName = 'play'
+    buttonText = t('resume_run')
+    handleButtonClick = play
+  } else if (
+    adjustedRunStatus === RUN_STATUS_STOP_REQUESTED ||
+    adjustedRunStatus === RUN_STATUS_STOPPED ||
+    adjustedRunStatus === RUN_STATUS_FAILED ||
+    adjustedRunStatus === RUN_STATUS_SUCCEEDED
+  ) {
+    buttonIconName = null
+    buttonText = t('run_again')
+    handleButtonClick = reset
   }
 
-  return (
+  return adjustedRunStatus != null ? (
     <Flex flexDirection={DIRECTION_COLUMN} margin={SPACING_2}>
       <Text css={FONT_HEADER_DARK} marginBottom={SPACING_3}>
         {t('run_protocol')}
       </Text>
       <Text css={FONT_BODY_1_DARK_SEMIBOLD} marginBottom={SPACING_3}>
-        {t('run_status', { status: t(`status_${runStatus}`) })}
+        {adjustedRunStatus != null
+          ? t('run_status', { status: t(`status_${adjustedRunStatus}`) })
+          : ''}
       </Text>
-      {runStatus !== 'loaded' ? <Timer /> : null}
+      {startTime != null ? (
+        <Timer
+          startTime={startTime}
+          pausedAt={pausedAt}
+          completedAt={completedAt}
+        />
+      ) : null}
       <PrimaryBtn
-        onClick={action}
+        onClick={handleButtonClick}
         alignSelf={ALIGN_STRETCH}
         backgroundColor={C_BLUE}
         borderRadius={BORDER_RADIUS_1}
@@ -82,8 +115,11 @@ export function RunTimeControl(): JSX.Element {
         alignItems={ALIGN_CENTER}
         display={DISPLAY_FLEX}
       >
-        {callToAction}
+        {buttonIconName != null ? (
+          <Icon name={buttonIconName} size={SIZE_1} marginRight={SPACING_2} />
+        ) : null}
+        <Text fontSize={FONT_SIZE_DEFAULT}>{buttonText}</Text>
       </PrimaryBtn>
     </Flex>
-  )
+  ) : null
 }

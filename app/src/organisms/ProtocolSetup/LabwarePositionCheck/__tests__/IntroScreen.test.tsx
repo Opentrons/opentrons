@@ -97,12 +97,9 @@ describe('IntroScreen', () => {
     when(mockUseModuleRenderInfoById).calledWith().mockReturnValue({})
 
     when(mockUseIntroInfo).calledWith().mockReturnValue({
-      primaryTipRackSlot: '1',
-      primaryTipRackName: 'Opentrons 96 Tip Rack 300 µL',
       primaryPipetteMount: 'left',
       secondaryPipetteMount: '',
-      numberOfTips: 1,
-      firstStepLabwareSlot: '2',
+      firstTiprackSlot: '2',
       sections: MOCK_SECTIONS,
     })
     mockSectionList.mockReturnValue(<div>Mock Section List</div>)
@@ -122,6 +119,9 @@ describe('IntroScreen', () => {
     )
     getByText(
       'When you check a labware, the OT-2’s pipette nozzle or attached tip will stop at the center of the A1 well. If the pipette nozzle or tip is not centered, you can reveal the OT-2’s jog controls to make an adjustment. This Labware Offset will be applied to the entire labware. Offset data is measured to the nearest 1/10th mm and can be made in the X, Y and/or Z directions.'
+    )
+    getByText(
+      'Once you begin Labware Position Check, previously created Labware Offsets will be discarded.'
     )
     getByText('Mock Section List')
   })

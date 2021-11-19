@@ -1,28 +1,52 @@
+import { Command as FullCommand } from '@opentrons/shared-data'
+
+export const RUN_STATUS_IDLE: 'idle' = 'idle'
+export const RUN_STATUS_RUNNING: 'running' = 'running'
+export const RUN_STATUS_PAUSE_REQUESTED: 'pause-requested' = 'pause-requested'
+export const RUN_STATUS_PAUSED: 'paused' = 'paused'
+export const RUN_STATUS_STOP_REQUESTED: 'stop-requested' = 'stop-requested'
+export const RUN_STATUS_STOPPED: 'stopped' = 'stopped'
+export const RUN_STATUS_FAILED: 'failed' = 'failed'
+export const RUN_STATUS_SUCCEEDED: 'succeeded' = 'succeeded'
+
 export type RunStatus =
-  | 'ready-to-run'
-  | 'running'
-  | 'pause-requested'
-  | 'paused'
-  | 'stop-requested'
-  | 'stopped'
-  | 'failed'
-  | 'succeeded'
+  | typeof RUN_STATUS_IDLE
+  | typeof RUN_STATUS_RUNNING
+  | typeof RUN_STATUS_PAUSE_REQUESTED
+  | typeof RUN_STATUS_PAUSED
+  | typeof RUN_STATUS_STOP_REQUESTED
+  | typeof RUN_STATUS_STOPPED
+  | typeof RUN_STATUS_FAILED
+  | typeof RUN_STATUS_SUCCEEDED
 
 export interface RunData {
   id: string
   createdAt: string
   status: RunStatus
   actions: RunAction[]
-  // TODO(bh, 10-29-2021): types for commands, pipettes, labware
-  commands: unknown[]
+  commands: RunCommandSummary[]
+  errors: Error[]
   pipettes: unknown[]
   labware: unknown[]
   protocolId?: string
+  labwareOffsets?: LabwareOffset[]
+}
+
+export interface VectorOffset {
+  x: number
+  y: number
+  z: number
+}
+export interface LabwareOffset {
+  id: string
+  definitionUri: string
+  location: Location
+  offset: VectorOffset
 }
 
 interface ResourceLink {
   href: string
-  meta?: Partial<{ [key: string]: string | null | undefined }>
+  meta?: Partial<{ [key: string]: string | null | undefined }> | null
 }
 
 type ResourceLinks = Record<string, ResourceLink | string | null | undefined>
@@ -57,16 +81,29 @@ export interface CreateRunActionData {
 }
 export interface RunCommandSummary {
   id: string
-  commandType: string
+  commandType: FullCommand['commandType']
   status: 'queued' | 'running' | 'succeeded' | 'failed'
+  result?: any
 }
 
-export interface Command {
+export interface CommandData {
   data: RunCommandSummary
   links?: ResourceLinks
 }
 
-export interface Commands {
+export interface CommandsData {
   data: RunCommandSummary[]
   links?: ResourceLinks
+}
+
+export interface CommandDetail {
+  data: FullCommand
+  links: ResourceLinks | null
+}
+
+export interface Error {
+  id: string
+  errorType: string
+  createdAt: string
+  detail: string
 }

@@ -12,6 +12,7 @@ from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support.types import APIVersion
 
 from .labware import Labware, load, load_from_definition
+from .load_info import LabwareLoadInfo
 from opentrons.protocols.geometry.module_geometry import (
     ModuleGeometry,
     ThermocyclerGeometry,
@@ -79,6 +80,21 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
         """
         mod_labware = self._geometry.add_labware(labware)
         self._ctx._implementation.get_deck().recalculate_high_z()
+
+        labware_namespace, labware_load_name, labware_version = labware.uri.split("/")
+        module_loc = self._geometry.parent
+        assert isinstance(module_loc, (int, str)), "Unexpected labware object parent"
+        deck_slot = types.DeckSlotName.from_primitive(module_loc)
+        self._ctx.labware_load_broker.publish(
+            LabwareLoadInfo(
+                labware_definition=labware._implementation.get_definition(),
+                labware_namespace=labware_namespace,
+                labware_load_name=labware_load_name,
+                labware_version=int(labware_version),
+                deck_slot=deck_slot,
+                on_module=True,
+            )
+        )
         return mod_labware
 
     @requires_version(2, 0)

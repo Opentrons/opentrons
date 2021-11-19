@@ -1,14 +1,18 @@
 """Smoke tests for the CommandExecutor class."""
 import pytest
 from datetime import datetime
-from decoy import Decoy
+from decoy import Decoy, matchers
 from pydantic import BaseModel
-from typing import Optional, Type, cast
+from typing import Any, Optional, Type, cast
 
-from opentrons.protocol_engine.errors import ProtocolEngineError
+from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.state import StateStore
-from opentrons.protocol_engine.actions import ActionDispatcher, UpdateCommandAction
+from opentrons.protocol_engine.actions import (
+    ActionDispatcher,
+    UpdateCommandAction,
+    FailCommandAction,
+)
 
 from opentrons.protocol_engine.commands import (
     AbstractCommandImpl,
@@ -194,6 +198,19 @@ async def test_execute(
     )
 
 
+@pytest.mark.parametrize(
+    ["command_error", "expected_error"],
+    [
+        (
+            errors.ProtocolEngineError("oh no"),
+            matchers.ErrorMatching(errors.ProtocolEngineError, match="oh no"),
+        ),
+        (
+            RuntimeError("oh no"),
+            matchers.ErrorMatching(errors.UnexpectedProtocolError, match="oh no"),
+        ),
+    ],
+)
 async def test_execute_raises_protocol_engine_error(
     decoy: Decoy,
     state_store: StateStore,
@@ -204,8 +221,10 @@ async def test_execute_raises_protocol_engine_error(
     run_control: RunControlHandler,
     model_utils: ModelUtils,
     subject: CommandExecutor,
+    command_error: Exception,
+    expected_error: Any,
 ) -> None:
-    """It should be able execute a command."""
+    """It should handle an error occuring during execution."""
     TestCommandImplCls = decoy.mock(func=_TestCommandImpl)
     command_impl = decoy.mock(cls=_TestCommandImpl)
 
@@ -219,7 +238,6 @@ async def test_execute_raises_protocol_engine_error(
             return TestCommandImplCls
 
     command_params = _TestCommandParams()
-    command_error = ProtocolEngineError("oh no")
 
     queued_command = cast(
         Command,
@@ -242,19 +260,6 @@ async def test_execute_raises_protocol_engine_error(
         ),
     )
 
-    failed_command = cast(
-        Command,
-        _TestCommand(
-            id="command-id",
-            createdAt=datetime(year=2021, month=1, day=1),
-            startedAt=datetime(year=2022, month=2, day=2),
-            completedAt=datetime(year=2023, month=3, day=3),
-            status=CommandStatus.FAILED,
-            params=command_params,
-            error="oh no",
-        ),
-    )
-
     decoy.when(state_store.commands.get(command_id="command-id")).then_return(
         queued_command
     )
@@ -272,6 +277,7 @@ async def test_execute_raises_protocol_engine_error(
 
     decoy.when(await command_impl.execute(command_params)).then_raise(command_error)
 
+    decoy.when(model_utils.generate_id()).then_return("error-id")
     decoy.when(model_utils.get_timestamp()).then_return(
         datetime(year=2022, month=2, day=2),
         datetime(year=2023, month=3, day=3),
@@ -281,5 +287,12 @@ async def test_execute_raises_protocol_engine_error(
 
     decoy.verify(
         action_dispatcher.dispatch(UpdateCommandAction(command=running_command)),
-        action_dispatcher.dispatch(UpdateCommandAction(command=failed_command)),
+        action_dispatcher.dispatch(
+            FailCommandAction(
+                command_id="command-id",
+                error_id="error-id",
+                failed_at=datetime(year=2023, month=3, day=3),
+                error=expected_error,
+            )
+        ),
     )

@@ -158,19 +158,12 @@ class ExecuteMoveGroupRequest:  # noqa: D101
 
 
 @dataclass
-class ClearMoveGroupRequest:  # noqa: D101
-    payload: payloads.MoveGroupRequestPayload
-    payload_type: Type[BinarySerializable] = payloads.MoveGroupRequestPayload
+class ClearAllMoveGroupsRequest:  # noqa: D101
+    payload: payloads.EmptyPayload
+    payload_type: Type[BinarySerializable] = payloads.EmptyPayload
     message_id: Literal[
-        MessageId.clear_move_group_request
-    ] = MessageId.clear_move_group_request
-
-
-@dataclass
-class MoveGroupCompleted:  # noqa: D101
-    payload: payloads.MoveGroupCompletedPayload
-    payload_type: Type[BinarySerializable] = payloads.MoveGroupCompletedPayload
-    message_id: Literal[MessageId.move_group_completed] = MessageId.move_group_completed
+        MessageId.clear_all_move_groups_request
+    ] = MessageId.clear_all_move_groups_request
 
 
 @dataclass
@@ -178,21 +171,3 @@ class MoveCompleted:  # noqa: D101
     payload: payloads.MoveCompletedPayload
     payload_type: Type[BinarySerializable] = payloads.MoveCompletedPayload
     message_id: Literal[MessageId.move_completed] = MessageId.move_completed
-
-
-@dataclass
-class GetMoveStatusRequest:  # noqa: D101
-    payload: payloads.EmptyPayload
-    payload_type: Type[BinarySerializable] = payloads.EmptyPayload
-    message_id: Literal[
-        MessageId.get_move_status_request
-    ] = MessageId.get_move_status_request
-
-
-@dataclass
-class GetMoveStatusResponse:  # noqa: D101
-    payload: payloads.GetMoveStatusResponsePayload
-    payload_type: Type[BinarySerializable] = payloads.GetMoveStatusResponsePayload
-    message_id: Literal[
-        MessageId.get_move_status_response
-    ] = MessageId.get_move_status_response

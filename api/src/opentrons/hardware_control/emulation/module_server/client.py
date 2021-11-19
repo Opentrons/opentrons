@@ -11,6 +11,10 @@ class ModuleServerClientError(Exception):
     pass
 
 
+class ModuleServerDisconnected(ModuleServerClientError):
+    pass
+
+
 class ModuleStatusClient:
     """A module server client."""
 
@@ -64,8 +68,10 @@ class ModuleStatusClient:
             b = await self._reader.readuntil(MessageDelimiter)
             m: Message = Message.parse_raw(b)
             return m
-        except (IncompleteReadError, LimitOverrunError) as e:
+        except LimitOverrunError as e:
             raise ModuleServerClientError(str(e))
+        except IncompleteReadError:
+            raise ModuleServerDisconnected()
 
     def close(self) -> None:
         """Close the client."""

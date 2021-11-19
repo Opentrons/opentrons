@@ -1,4 +1,4 @@
-import { getPrimaryPipetteId } from '../utils/getPrimaryPipetteId'
+import { getPrimaryPipetteId } from '../getPrimaryPipetteId'
 import { ProtocolFile } from '@opentrons/shared-data'
 import { LoadPipetteCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
@@ -59,6 +59,9 @@ describe('getPrimaryPipetteId', () => {
           pipetteId: 'p10SingleId',
           mount: 'left',
         },
+        result: {
+          pipetteId: 'p10SingleId',
+        },
       },
       {
         id: '1',
@@ -66,6 +69,9 @@ describe('getPrimaryPipetteId', () => {
         params: {
           pipetteId: 'p10MultiId',
           mount: 'right',
+        },
+        result: {
+          pipetteId: 'p10MultiId',
         },
       },
     ]
@@ -97,6 +103,9 @@ describe('getPrimaryPipetteId', () => {
           pipetteId: 'p10SingleId',
           mount: 'left',
         },
+        result: {
+          pipetteId: 'p10SingleId',
+        },
       },
       {
         id: '1',
@@ -104,6 +113,9 @@ describe('getPrimaryPipetteId', () => {
         params: {
           pipetteId: 'p50MultiId',
           mount: 'right',
+        },
+        result: {
+          pipetteId: 'p50MultiId',
         },
       },
     ]
@@ -136,6 +148,9 @@ describe('getPrimaryPipetteId', () => {
           pipetteId: 'p300SingleId',
           mount: 'left',
         },
+        result: {
+          pipetteId: 'p300SingleId',
+        },
       },
       {
         id: '1',
@@ -143,6 +158,9 @@ describe('getPrimaryPipetteId', () => {
         params: {
           pipetteId: 'p300SingleGen2Id',
           mount: 'right',
+        },
+        result: {
+          pipetteId: 'p300SingleGen2Id',
         },
       },
     ]
@@ -176,6 +194,9 @@ describe('getPrimaryPipetteId', () => {
           pipetteId: 'p300SingleLeftId',
           mount: 'left',
         },
+        result: {
+          pipetteId: 'p300SingleLeftId',
+        },
       },
       {
         id: '1',
@@ -183,6 +204,9 @@ describe('getPrimaryPipetteId', () => {
         params: {
           pipetteId: 'p300SingleRightId',
           mount: 'right',
+        },
+        result: {
+          pipetteId: 'p300SingleRightId',
         },
       },
     ]

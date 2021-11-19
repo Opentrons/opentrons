@@ -5,7 +5,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import * as PipetteOffset from '../../../../../redux/calibration/pipette-offset'
 import * as TipLength from '../../../../../redux/calibration/tip-length'
-import { mockProtocolPipetteTipRackCalInfo } from '../../../../../redux/pipettes/__fixtures__'
+import { mockPipetteInfo } from '../../../../../redux/pipettes/__fixtures__'
 import * as Pipettes from '../../../../../redux/pipettes'
 import { CONNECTABLE } from '../../../../../redux/discovery'
 import { RobotCalibration } from '../index'
@@ -19,9 +19,10 @@ jest.mock('../../../../../redux/calibration/selectors')
 jest.mock('../../../../../redux/calibration/tip-length/selectors')
 jest.mock('../../../../../redux/calibration/pipette-offset/selectors')
 jest.mock('../../../../../redux/sessions/selectors')
+jest.mock('../../../../../redux/protocol')
 
 const mockProtocolPipetteTipRackCalData: ProtocolPipetteTipRackCalDataByMount = {
-  left: mockProtocolPipetteTipRackCalInfo,
+  left: mockPipetteInfo,
   right: null,
 } as any
 const mockRobot: ViewableRobot = {
@@ -86,13 +87,13 @@ describe('RobotCalibration', () => {
   })
 
   it('renders all text titles and button', () => {
-    const { getByRole } = render()[0]
+    const { getByRole, getAllByRole } = render()[0]
     expect(getByRole('heading', { name: 'Required Pipettes' })).toBeTruthy()
     expect(
       getByRole('heading', { name: 'Required Tip Length Calibrations' })
     ).toBeTruthy()
     expect(
-      getByRole('heading', {
+      getAllByRole('heading', {
         name: mockProtocolPipetteTipRackCalData.left?.pipetteDisplayName,
       })
     ).toBeTruthy()

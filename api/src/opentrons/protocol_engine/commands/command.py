@@ -64,10 +64,9 @@ class BaseCommand(GenericModel, Generic[CommandParamsT, CommandResultT]):
         None,
         description="Command execution result data, if succeeded",
     )
-    # TODO(mc, 2021-06-08): model ProtocolEngine errors
-    error: Optional[str] = Field(
+    errorId: Optional[str] = Field(
         None,
-        description="Command execution failure, if failed",
+        description="Reference to error occurrence, if execution failed",
     )
     startedAt: Optional[datetime] = Field(
         None,

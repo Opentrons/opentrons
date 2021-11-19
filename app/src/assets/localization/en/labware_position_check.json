@@ -35,5 +35,17 @@
   "confirm_position_and_return_tip": "Confirm position, return tip to Slot {{next_slot}}",
   "close_and_apply_offset_data": "Close and apply labware offset data",
   "error_modal_header": "Something went wrong",
-  "error_modal_text": "There was an error processing your request on the robot"
+  "error_modal_text": "There was an error processing your request on the robot",
+  "robot_in_motion": "Stand back, robot is in motion.",
+  "moving_to_slot_title": "Moving to slot {{slot}}",
+  "picking_up_tip_title": "Picking up tip in slot {{slot}}",
+  "returning_tip_title": "Returning tip in slot {{slot}}",
+  "check_labware_in_slot_title": "Check Labware {{labware_display_name}} in slot {{slot}}",
+  "module_display_location_text": "{{moduleName}} in Deck Slot {{slot}}",
+  "labware_display_location_text": "Deck Slot {{slot}}",
+  "labware_offsets_deleted_warning": "Once you begin Labware Position Check, previously created Labware Offsets will be discarded.",
+  "exit_screen_title": "Exit before completing Labware Position Check?",
+  "exit_screen_subtitle": "If you exit now, all labware offsets will be discarded. This cannot be undone.",
+  "exit_screen_go_back": "Go back to labware position check",
+  "exit_screen_confirm_exit": "Exit and discard all labware offsets"
 }

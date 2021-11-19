@@ -1,7 +1,5 @@
 """Wrappers for the legacy, Protocol API v2 execution pipeline."""
-import asyncio
-from concurrent.futures import ThreadPoolExecutor
-from functools import partial
+from anyio import to_thread
 
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocols.api_support.types import APIVersion
@@ -15,13 +13,13 @@ from opentrons.protocol_api import (
     ProtocolContext as LegacyProtocolContext,
     InstrumentContext as LegacyPipetteContext,
 )
-from opentrons.protocol_api.labware import Labware as LegacyLabware
-from opentrons.protocol_api.protocol_context import (
+from opentrons.protocol_api.labware import Labware as LegacyLabware, Well as LegacyWell
+from opentrons.protocol_api.load_info import (
     InstrumentLoadInfo as LegacyInstrumentLoadInfo,
     LabwareLoadInfo as LegacyLabwareLoadInfo,
+    ModuleLoadInfo as LegacyModuleLoadInfo,
 )
 from opentrons.protocol_api.contexts import ModuleContext as LegacyModuleContext
-
 
 from opentrons.protocols.parse import parse
 from opentrons.protocols.execution.execute import run_protocol
@@ -66,7 +64,7 @@ class LegacyFileReader:
 
 
 class LegacyContextCreator:
-    """Interface to contruct Protocol API v2 contexts."""
+    """Interface to construct Protocol API v2 contexts."""
 
     def __init__(
         self,
@@ -122,23 +120,17 @@ class LegacyExecutor:
         context: LegacyProtocolContext,
     ) -> None:
         """Execute a PAPIv2 protocol with a given ProtocolContext in a child thread."""
-        loop = asyncio.get_running_loop()
-
         # NOTE: this initial home is to match the previous behavior of the
         # RPC session, which called `ctx.home` before calling `run_protocol`
         await self._hardware_api.home()
-
-        with ThreadPoolExecutor(max_workers=1) as executor:
-            await loop.run_in_executor(
-                executor=executor,
-                func=partial(run_protocol, protocol=protocol, context=context),
-            )
+        await to_thread.run_sync(run_protocol, protocol, context)
 
 
 __all__ = [
     # Re-exports of main public API stuff:
     "LegacyProtocolContext",
     "LegacyLabware",
+    "LegacyWell",
     "LegacyPipetteContext",
     "LegacyModuleContext",
     # Re-exports of internal stuff:
@@ -147,4 +139,5 @@ __all__ = [
     "LegacyPythonProtocol",
     "LegacyLabwareLoadInfo",
     "LegacyInstrumentLoadInfo",
+    "LegacyModuleLoadInfo",
 ]

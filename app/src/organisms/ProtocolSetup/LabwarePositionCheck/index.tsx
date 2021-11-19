@@ -6,32 +6,39 @@ import {
   ModalPage,
   SPACING_2,
   Text,
+  useConditionalConfirm,
 } from '@opentrons/components'
 import { Portal } from '../../../App/portal'
-import { useSteps, useLabwarePositionCheck } from './hooks'
+import { useRestartRun } from '../../ProtocolUpload/hooks/useRestartRun'
+import { useLabwarePositionCheck } from './hooks'
 import { IntroScreen } from './IntroScreen'
 import { GenericStepScreen } from './GenericStepScreen'
 import { SummaryScreen } from './SummaryScreen'
+import { RobotMotionLoadingModal } from './RobotMotionLoadingModal'
+import { ExitPreventionModal } from './ExitPreventionModal'
 
 import styles from '../styles.css'
+import type { SavePositionCommandData } from './types'
 
 interface LabwarePositionCheckModalProps {
   onCloseClick: () => unknown
 }
-
-const isComplete = true // TODO: replace this with isComplete boolean from useLabwarePositionCheck
-
 export const LabwarePositionCheck = (
   props: LabwarePositionCheckModalProps
 ): JSX.Element | null => {
   const { t } = useTranslation(['labware_position_check', 'shared'])
-  const steps = useSteps()
-  const [currentLabwareCheckStep, setCurrentLabwareCheckStep] = React.useState<
-    number | null
-  >(null)
-  const [savePositionCommandData, setSavePositionCommandData] = React.useState<{
-    [labwareId: string]: string[]
-  }>({})
+  const restartRun = useRestartRun()
+  const [
+    savePositionCommandData,
+    setSavePositionCommandData,
+  ] = React.useState<SavePositionCommandData>({})
+  const [isRestartingRun, setIsRestartingRun] = React.useState<boolean>(false)
+
+  const {
+    confirm: confirmExitLPC,
+    showConfirmation,
+    cancel: cancelExitLPC,
+  } = useConditionalConfirm(props.onCloseClick, true)
 
   // at the end of LPC, each labwareId will have 2 associated save position command ids which will be used to calculate the labware offsets
   const addSavePositionCommandData = (
@@ -40,14 +47,23 @@ export const LabwarePositionCheck = (
   ): void => {
     setSavePositionCommandData({
       ...savePositionCommandData,
-      [labwareId]: [...savePositionCommandData[labwareId], commandId],
+      [labwareId]:
+        savePositionCommandData[labwareId] != null
+          ? [...savePositionCommandData[labwareId], commandId]
+          : [commandId],
     })
   }
   const labwarePositionCheckUtils = useLabwarePositionCheck(
-    addSavePositionCommandData
+    addSavePositionCommandData,
+    savePositionCommandData
   )
 
   if ('error' in labwarePositionCheckUtils) {
+    // show the modal for 5 seconds, then unmount and restart the run
+    if (!isRestartingRun) {
+      setTimeout(() => restartRun(), 5000)
+      !isRestartingRun && setIsRestartingRun(true)
+    }
     const { error } = labwarePositionCheckUtils
     return (
       <Portal level="top">
@@ -71,34 +87,56 @@ export const LabwarePositionCheck = (
     )
   }
 
-  const { beginLPC, proceed, ctaText } = labwarePositionCheckUtils
+  const {
+    beginLPC,
+    proceed,
+    ctaText,
+    currentCommandIndex,
+    currentStep,
+    isComplete,
+    titleText,
+    isLoading,
+    jog,
+  } = labwarePositionCheckUtils
 
-  return (
-    <Portal level="top">
+  let modalContent: JSX.Element
+  if (isLoading) {
+    modalContent = <RobotMotionLoadingModal title={titleText} />
+  } else if (showConfirmation) {
+    modalContent = (
+      <ExitPreventionModal
+        onGoBack={cancelExitLPC}
+        onConfirmExit={confirmExitLPC}
+      />
+    )
+  } else {
+    modalContent = (
       <ModalPage
         contentsClassName={styles.modal_contents}
         titleBar={{
           title: t('labware_position_check_title'),
           back: {
-            onClick: props.onCloseClick,
+            onClick: confirmExitLPC,
             title: t('shared:exit'),
             children: t('shared:exit'),
           },
         }}
       >
         {isComplete ? (
-          <SummaryScreen />
-        ) : currentLabwareCheckStep !== null ? (
+          <SummaryScreen savePositionCommandData={savePositionCommandData} />
+        ) : currentCommandIndex !== 0 ? (
           <GenericStepScreen
-            setCurrentLabwareCheckStep={setCurrentLabwareCheckStep}
-            selectedStep={steps[currentLabwareCheckStep]}
+            selectedStep={currentStep}
             ctaText={ctaText}
             proceed={proceed}
+            title={titleText}
+            jog={jog}
           />
         ) : (
           <IntroScreen beginLPC={beginLPC} />
         )}
       </ModalPage>
-    </Portal>
-  )
+    )
+  }
+  return <Portal level="top">{modalContent}</Portal>
 }

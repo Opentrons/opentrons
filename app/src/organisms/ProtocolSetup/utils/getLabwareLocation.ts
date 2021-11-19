@@ -1,15 +1,18 @@
 import type { Command } from '@opentrons/shared-data'
-import type { LoadLabwareCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import type {
+  LoadLabwareCommand,
+  LabwareLocation,
+} from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
 export const getLabwareLocation = (
   labwareId: string,
   commands: Command[]
-): string => {
+): LabwareLocation => {
   const labwareLocation = commands.find(
     (command: Command): command is LoadLabwareCommand =>
       command.commandType === 'loadLabware' &&
       command.result?.labwareId === labwareId
-  )?.params.location
+  )?.params?.location
 
   if (labwareLocation == null) {
     throw new Error(
@@ -17,7 +20,5 @@ export const getLabwareLocation = (
     )
   }
 
-  return 'slotName' in labwareLocation
-    ? labwareLocation.slotName
-    : labwareLocation.moduleId
+  return labwareLocation
 }

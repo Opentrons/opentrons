@@ -12,8 +12,6 @@ import { UPGRADE, getBuildrootUpdateAvailable } from '../buildroot'
 import { getAvailableShellUpdate } from '../shell'
 import { getU2EWindowsDriverStatus, OUTDATED } from '../system-info'
 import { getDeckCalibrationStatus, DECK_CAL_STATUS_OK } from '../calibration'
-import { getFeatureFlags } from '../config'
-import { getProtocolData } from '../protocol'
 
 import type { State } from '../types'
 import type { NavLocation } from './types'
@@ -46,7 +44,7 @@ const DRIVER_UPDATE_AVAILABLE = 'A driver update is available'
 const ROBOT_UPDATE_AVAILABLE = 'A robot software update is available'
 const ROBOT_CALIBRATION_RECOMMENDED = 'Robot calibration recommended'
 
-const getConnectedRobotPipettesMatch = (state: State): boolean => {
+export const getConnectedRobotPipettesMatch = (state: State): boolean => {
   const connectedRobot = getConnectedRobot(state)
 
   return connectedRobot
@@ -54,7 +52,7 @@ const getConnectedRobotPipettesMatch = (state: State): boolean => {
     : false
 }
 
-const getConnectedRobotPipettesCalibrated = (state: State): boolean => {
+export const getConnectedRobotPipettesCalibrated = (state: State): boolean => {
   const connectedRobot = getConnectedRobot(state)
 
   return connectedRobot
@@ -71,7 +69,7 @@ const getConnectedRobotUpdateAvailable = (state: State): boolean => {
   return robotUpdateType === UPGRADE
 }
 
-const getDeckCalibrationOk = (state: State): boolean => {
+export const getDeckCalibrationOk = (state: State): boolean => {
   const connectedRobot = getConnectedRobot(state)
   const deckCalStatus = connectedRobot
     ? getDeckCalibrationStatus(state, connectedRobot.name)
@@ -98,7 +96,7 @@ const getRobotCalibrationOk = (state: State): boolean => {
   return deckCalOk
 }
 
-export const getRunDisabledReasonRPC: (
+export const getRunDisabledReason: (
   state: State
 ) => string | null = createSelector(
   getConnectedRobot,
@@ -115,38 +113,6 @@ export const getRunDisabledReasonRPC: (
     if (!pipettesCalibrated) return PIPETTES_NOT_CALIBRATED
     if (!deckCalOk) return CALIBRATE_DECK_TO_PROCEED
     return null
-  }
-)
-
-export const getRunDisabledReasonNoRPC: (
-  state: State
-) => string | null = createSelector(
-  getConnectedRobot,
-  getProtocolData,
-  getConnectedRobotPipettesMatch,
-  getConnectedRobotPipettesCalibrated,
-  getDeckCalibrationOk,
-  (robot, protocolData, pipettesMatch, pipettesCalibrated, deckCalOk) => {
-    if (!robot) return PLEASE_CONNECT_TO_A_ROBOT
-    if (!protocolData) return PLEASE_LOAD_A_PROTOCOL
-    if (!pipettesMatch) return ATTACHED_PIPETTES_DO_NOT_MATCH
-    if (!pipettesCalibrated) return PIPETTES_NOT_CALIBRATED
-    if (!deckCalOk) return CALIBRATE_DECK_TO_PROCEED
-    return null
-  }
-)
-
-export const getRunDisabledReason: (
-  state: State
-) => string | null = createSelector(
-  getRunDisabledReasonRPC,
-  getRunDisabledReasonNoRPC,
-  getFeatureFlags,
-  (disabledReasonRPC, disabledReasonNoRPC, featureFlags) => {
-    if (Boolean(featureFlags.preProtocolFlowWithoutRPC)) {
-      return disabledReasonNoRPC
-    }
-    return disabledReasonRPC
   }
 )
 
@@ -256,12 +222,7 @@ export const getNavbarLocations: (
   getCalibrateLocation,
   getRunLocation,
   getMoreLocation,
-  getFeatureFlags,
-  (robots, upload, calibrate, run, more, ff) => {
-    if (Boolean(ff.preProtocolFlowWithoutRPC)) {
-      return [robots, upload, run, more]
-    } else {
-      return [robots, upload, calibrate, run, more]
-    }
+  (robots, upload, calibrate, run, more) => {
+    return [robots, upload, calibrate, run, more]
   }
 )

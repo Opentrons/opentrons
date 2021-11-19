@@ -113,6 +113,7 @@ async def test_handle_pick_up_tip_request(
         pipette_id="pipette-id",
         labware_id="labware-id",
         well_name="B2",
+        well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
     )
 
     decoy.verify(
@@ -120,6 +121,7 @@ async def test_handle_pick_up_tip_request(
             pipette_id="pipette-id",
             labware_id="labware-id",
             well_name="B2",
+            well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
         ),
         await hardware_api.pick_up_tip(
             mount=Mount.LEFT,
@@ -155,15 +157,17 @@ async def test_handle_drop_up_tip_request(
 
     decoy.when(
         state_store.geometry.get_tip_drop_location(
-            labware_id="labware-id",
             pipette_config=mock_hw_pipettes.right_config,
+            labware_id="labware-id",
+            well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
         )
-    ).then_return(WellLocation(offset=WellOffset(x=0, y=0, z=10)))
+    ).then_return(WellLocation(offset=WellOffset(x=4, y=5, z=6)))
 
     await handler.drop_tip(
         pipette_id="pipette-id",
         labware_id="labware-id",
         well_name="A1",
+        well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
     )
 
     decoy.verify(
@@ -171,7 +175,7 @@ async def test_handle_drop_up_tip_request(
             pipette_id="pipette-id",
             labware_id="labware-id",
             well_name="A1",
-            well_location=WellLocation(offset=WellOffset(x=0, y=0, z=10)),
+            well_location=WellLocation(offset=WellOffset(x=4, y=5, z=6)),
         ),
         await hardware_api.drop_tip(mount=Mount.RIGHT, home_after=True),
     )

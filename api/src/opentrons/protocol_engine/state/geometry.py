@@ -7,7 +7,13 @@ from opentrons.types import Point
 from opentrons.hardware_control.dev_types import PipetteDict
 
 from .. import errors
-from ..types import LoadedLabware, WellLocation, WellOrigin, WellOffset
+from ..types import (
+    LoadedLabware,
+    WellLocation,
+    WellOrigin,
+    WellOffset,
+    DeckSlotLocation,
+)
 from .labware import LabwareView
 
 
@@ -54,14 +60,15 @@ class GeometryView:
     def get_labware_parent_position(self, labware_id: str) -> Point:
         """Get the position of the labware's parent slot (deck or module)."""
         labware_data = self._labware.get(labware_id)
-        slot_pos = self._labware.get_slot_position(labware_data.location.slotName)
-
-        return slot_pos
+        if isinstance(labware_data.location, DeckSlotLocation):
+            slot_pos = self._labware.get_slot_position(labware_data.location.slotName)
+            return slot_pos
+        else:
+            raise NotImplementedError("Not implemented for labware on modules")
 
     def get_labware_origin_position(self, labware_id: str) -> Point:
         """Get the position of the labware's origin, without calibration."""
-        labware_data = self._labware.get(labware_id)
-        slot_pos = self._labware.get_slot_position(labware_data.location.slotName)
+        slot_pos = self.get_labware_parent_position(labware_id)
         origin_offset = self._labware.get_definition(labware_id).cornerOffsetFromSlot
 
         return Point(
@@ -73,7 +80,7 @@ class GeometryView:
     def get_labware_position(self, labware_id: str) -> Point:
         """Get the calibrated origin of the labware."""
         origin_pos = self.get_labware_origin_position(labware_id)
-        cal_offset = self._labware.get_calibration_offset(labware_id)
+        cal_offset = self._labware.get_labware_offset_vector(labware_id)
 
         return Point(
             x=origin_pos.x + cal_offset.x,
@@ -166,21 +173,28 @@ class GeometryView:
     # 10mm above well bottom
     def get_tip_drop_location(
         self,
-        labware_id: str,
         pipette_config: PipetteDict,
+        labware_id: str,
+        well_location: WellLocation,
     ) -> WellLocation:
         """Get tip drop location given labware and hardware pipette."""
-        # return to top if labware is fixed trash
-        is_fixed_trash = self._labware.get_has_quirk(
-            labware_id=labware_id,
-            quirk="fixedTrash",
-        )
+        if well_location.origin != WellOrigin.TOP:
+            raise errors.WellOriginNotAllowedError(
+                'Drop tip location must be relative to "top"'
+            )
 
-        if is_fixed_trash:
-            return WellLocation()
+        # return to top if labware is fixed trash
+        if self._labware.get_has_quirk(labware_id=labware_id, quirk="fixedTrash"):
+            return well_location
 
         nominal_length = self._labware.get_tip_length(labware_id)
         offset_factor = pipette_config["return_tip_height"]
-        offset = WellOffset(x=0, y=0, z=-nominal_length * offset_factor)
+        tip_z_offset = nominal_length * offset_factor
 
-        return WellLocation(offset=offset)
+        return WellLocation(
+            offset=WellOffset(
+                x=well_location.offset.x,
+                y=well_location.offset.y,
+                z=well_location.offset.z - tip_z_offset,
+            )
+        )

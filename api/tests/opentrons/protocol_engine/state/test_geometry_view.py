@@ -11,7 +11,7 @@ from opentrons.types import Point, DeckSlotName
 
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
-    CalibrationOffset,
+    LabwareOffsetVector,
     DeckSlotLocation,
     LoadedLabware,
     WellLocation,
@@ -41,6 +41,7 @@ def test_get_labware_parent_position(
         loadName="b",
         definitionUri=uri_from_details(namespace="a", load_name="b", version=1),
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+        offsetId=None,
     )
     decoy.when(labware_view.get("labware-id")).then_return(labware_data)
     decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_3)).then_return(
@@ -65,6 +66,7 @@ def test_get_labware_origin_position(
         loadName="load-name",
         definitionUri="defintion-uri",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+        offsetId=None,
     )
 
     decoy.when(labware_view.get("labware-id")).then_return(labware_data)
@@ -99,13 +101,14 @@ def test_get_labware_highest_z(
         loadName="load-name",
         definitionUri="definition-uri",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+        offsetId="offset-id",
     )
     slot_pos = Point(1, 2, 3)
-    calibration_offset = CalibrationOffset(x=1, y=-2, z=3)
+    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
 
     decoy.when(labware_view.get("labware-id")).then_return(labware_data)
     decoy.when(labware_view.get_definition("labware-id")).then_return(well_plate_def)
-    decoy.when(labware_view.get_calibration_offset("labware-id")).then_return(
+    decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
         calibration_offset
     )
     decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_3)).then_return(
@@ -131,16 +134,18 @@ def test_get_all_labware_highest_z(
         loadName="plate-load-name",
         definitionUri="plate-definition-uri",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+        offsetId="plate-offset-id",
     )
     reservoir = LoadedLabware(
         id="reservoir-id",
         loadName="reservoir-load-name",
         definitionUri="reservoir-definition-uri",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        offsetId="reservoir-offset-id",
     )
 
-    plate_offset = CalibrationOffset(x=1, y=-2, z=3)
-    reservoir_offset = CalibrationOffset(x=1, y=-2, z=3)
+    plate_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+    reservoir_offset = LabwareOffsetVector(x=1, y=-2, z=3)
 
     decoy.when(labware_view.get_all()).then_return([plate, reservoir])
     decoy.when(labware_view.get("plate-id")).then_return(plate)
@@ -149,10 +154,10 @@ def test_get_all_labware_highest_z(
     decoy.when(labware_view.get_definition("plate-id")).then_return(well_plate_def)
     decoy.when(labware_view.get_definition("reservoir-id")).then_return(reservoir_def)
 
-    decoy.when(labware_view.get_calibration_offset("plate-id")).then_return(
+    decoy.when(labware_view.get_labware_offset_vector("plate-id")).then_return(
         plate_offset
     )
-    decoy.when(labware_view.get_calibration_offset("reservoir-id")).then_return(
+    decoy.when(labware_view.get_labware_offset_vector("reservoir-id")).then_return(
         reservoir_offset
     )
 
@@ -183,13 +188,14 @@ def test_get_labware_position(
         loadName="load-name",
         definitionUri="definition-uri",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        offsetId="reservoir-offset-id",
     )
-    calibration_offset = CalibrationOffset(x=1, y=-2, z=3)
+    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
     slot_pos = Point(4, 5, 6)
 
     decoy.when(labware_view.get("labware-id")).then_return(labware_data)
     decoy.when(labware_view.get_definition("labware-id")).then_return(well_plate_def)
-    decoy.when(labware_view.get_calibration_offset("labware-id")).then_return(
+    decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
         calibration_offset
     )
     decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_4)).then_return(
@@ -218,14 +224,15 @@ def test_get_well_position(
         loadName="load-name",
         definitionUri="definition-uri",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        offsetId="offset-id",
     )
-    calibration_offset = CalibrationOffset(x=1, y=-2, z=3)
+    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
     slot_pos = Point(4, 5, 6)
     well_def = well_plate_def.wells["B2"]
 
     decoy.when(labware_view.get("labware-id")).then_return(labware_data)
     decoy.when(labware_view.get_definition("labware-id")).then_return(well_plate_def)
-    decoy.when(labware_view.get_calibration_offset("labware-id")).then_return(
+    decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
         calibration_offset
     )
     decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_4)).then_return(
@@ -257,14 +264,15 @@ def test_get_well_position_with_top_offset(
         loadName="load-name",
         definitionUri="definition-uri",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        offsetId="offset-id",
     )
-    calibration_offset = CalibrationOffset(x=1, y=-2, z=3)
+    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
     slot_pos = Point(4, 5, 6)
     well_def = well_plate_def.wells["B2"]
 
     decoy.when(labware_view.get("labware-id")).then_return(labware_data)
     decoy.when(labware_view.get_definition("labware-id")).then_return(well_plate_def)
-    decoy.when(labware_view.get_calibration_offset("labware-id")).then_return(
+    decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
         calibration_offset
     )
     decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_4)).then_return(
@@ -303,14 +311,15 @@ def test_get_well_position_with_bottom_offset(
         loadName="load-name",
         definitionUri="definition-uri",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        offsetId="offset-id",
     )
-    calibration_offset = CalibrationOffset(x=1, y=-2, z=3)
+    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
     slot_pos = Point(4, 5, 6)
     well_def = well_plate_def.wells["B2"]
 
     decoy.when(labware_view.get("labware-id")).then_return(labware_data)
     decoy.when(labware_view.get_definition("labware-id")).then_return(well_plate_def)
-    decoy.when(labware_view.get_calibration_offset("labware-id")).then_return(
+    decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
         calibration_offset
     )
     decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_4)).then_return(
@@ -436,18 +445,17 @@ def test_get_tip_drop_location(
     subject: GeometryView,
 ) -> None:
     """It should get relative drop tip location for a pipette/labware combo."""
-    pipette_config: PipetteDict = cast(PipetteDict, {"return_tip_height": 0.7})
+    pipette_config: PipetteDict = cast(PipetteDict, {"return_tip_height": 0.5})
 
     decoy.when(labware_view.get_tip_length("tip-rack-id")).then_return(50)
 
     location = subject.get_tip_drop_location(
-        labware_id="tip-rack-id", pipette_config=pipette_config
+        pipette_config=pipette_config,
+        labware_id="tip-rack-id",
+        well_location=WellLocation(offset=WellOffset(x=1, y=2, z=25)),
     )
 
-    assert location == WellLocation(
-        origin=WellOrigin.TOP,
-        offset=WellOffset(x=0, y=0, z=-0.7 * 50),
-    )
+    assert location == WellLocation(offset=WellOffset(x=1, y=2, z=0))
 
 
 def test_get_tip_drop_location_with_trash(
@@ -456,7 +464,7 @@ def test_get_tip_drop_location_with_trash(
     subject: GeometryView,
 ) -> None:
     """It should get relative drop tip location for a the fixed trash."""
-    pipette_config: PipetteDict = cast(PipetteDict, {"return_tip_height": 0.7})
+    pipette_config: PipetteDict = cast(PipetteDict, {"return_tip_height": 0.5})
 
     decoy.when(
         labware_view.get_has_quirk(labware_id="labware-id", quirk="fixedTrash")
@@ -464,10 +472,24 @@ def test_get_tip_drop_location_with_trash(
 
     location = subject.get_tip_drop_location(
         labware_id="labware-id",
+        well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
         pipette_config=pipette_config,
     )
 
-    assert location == WellLocation(
-        origin=WellOrigin.TOP,
-        offset=WellOffset(x=0, y=0, z=0),
-    )
+    assert location == WellLocation(offset=WellOffset(x=1, y=2, z=3))
+
+
+def test_get_tip_drop_invalid_origin(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    subject: GeometryView,
+) -> None:
+    """It should raise if the given WellLocation is not WellOrigin.TOP."""
+    pipette_config: PipetteDict = cast(PipetteDict, {"return_tip_height": 0.5})
+
+    with pytest.raises(errors.WellOriginNotAllowedError):
+        subject.get_tip_drop_location(
+            labware_id="labware-id",
+            well_location=WellLocation(origin=WellOrigin.BOTTOM),
+            pipette_config=pipette_config,
+        )
