@@ -24,6 +24,7 @@ import {
 } from '../../../redux/pipettes'
 import { mockCalibrationStatus } from '../../../redux/calibration/__fixtures__'
 import * as calibrationSelectors from '../../../redux/calibration/selectors'
+import { useProtocolCalibrationStatus } from '../RunSetupCard/hooks/useProtocolCalibrationStatus'
 import { useProtocolDetails } from '../../RunDetails/hooks'
 import { RunSetupCard } from '../RunSetupCard'
 import { ModuleSetup } from '../RunSetupCard/ModuleSetup'
@@ -39,6 +40,7 @@ import type {
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../../redux/pipettes/selectors')
 jest.mock('../../../redux/calibration/selectors')
+jest.mock('../RunSetupCard/hooks/useProtocolCalibrationStatus')
 jest.mock('../../RunDetails/hooks')
 jest.mock('../RunSetupCard/LabwareSetup')
 jest.mock('../RunSetupCard/ModuleSetup')
@@ -85,8 +87,8 @@ const mockGetDeckCalData = calibrationSelectors.getDeckCalibrationData as jest.M
   typeof calibrationSelectors.getDeckCalibrationData
 >
 
-const mockGetProtocolCalibrationComplete = calibrationSelectors.getProtocolCalibrationComplete as jest.MockedFunction<
-  typeof calibrationSelectors.getProtocolCalibrationComplete
+const mockUseProtocolCalibrationStatus = useProtocolCalibrationStatus as jest.MockedFunction<
+  typeof useProtocolCalibrationStatus
 >
 
 const render = () => {
@@ -103,7 +105,7 @@ describe('RunSetupCard', () => {
     mockGetDeckCalData.mockReturnValue(
       mockCalibrationStatus.deckCalibration.data
     )
-    mockGetProtocolCalibrationComplete.mockReturnValue({ complete: true })
+    mockUseProtocolCalibrationStatus.mockReturnValue({ complete: true })
     mockUseProtocolDetails.mockReturnValue({
       protocolData: noModulesProtocol,
     } as any)
@@ -149,7 +151,7 @@ describe('RunSetupCard', () => {
       })
     })
     it('renders calibration needed when robot cal not complete', () => {
-      mockGetProtocolCalibrationComplete.mockReturnValue({ complete: false })
+      mockUseProtocolCalibrationStatus.mockReturnValue({ complete: false })
       const { getByText } = render()
       getByText('Calibration needed')
     })

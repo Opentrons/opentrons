@@ -5,9 +5,11 @@ import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_
 import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
 import { i18n } from '../../../i18n'
 import * as discoverySelectors from '../../../redux/discovery/selectors'
-import { ProtocolPipetteTipRackCalDataByMount } from '../../../redux/pipettes/types'
 import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
-import { getProtocolPipetteTipRackCalInfo } from '../../../redux/pipettes'
+import {
+  useCurrentRunPipetteInfoByMount,
+  PipetteInfo,
+} from '../../ProtocolSetup/RunSetupCard/hooks'
 import { ProtocolSetupInfo } from '../ProtocolSetupInfo'
 import { useProtocolDetails } from '../hooks'
 import type {
@@ -17,15 +19,14 @@ import type {
 } from '@opentrons/shared-data'
 
 jest.mock('../hooks')
-jest.mock('../../../redux/pipettes/types')
+jest.mock('../../ProtocolSetup/RunSetupCard/hooks')
 jest.mock('../../../redux/discovery/selectors')
-jest.mock('../../../redux/pipettes')
 
 const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
   typeof useProtocolDetails
 >
-const mockGetProtocolPipetteTiprackData = getProtocolPipetteTipRackCalInfo as jest.MockedFunction<
-  typeof getProtocolPipetteTipRackCalInfo
+const mockUseCurrentRunPipetteInfoByMount = useCurrentRunPipetteInfoByMount as jest.MockedFunction<
+  typeof useCurrentRunPipetteInfoByMount
 >
 const mockGetConnectedRobot = discoverySelectors.getConnectedRobot as jest.MockedFunction<
   typeof discoverySelectors.getConnectedRobot
@@ -134,10 +135,18 @@ const mockLabwarePositionCheckStepTipRack = {
   ],
 } as any
 
-const mockProtocolPipetteTipRackCalData: ProtocolPipetteTipRackCalDataByMount = {
-  left: {
-    pipetteDisplayName: 'P10 Single-Channel',
+const mockPipetteInfo: PipetteInfo = {
+  requestedPipetteMatch: 'incompatible',
+  pipetteCalDate: null,
+  // @ts-expect-error partial type match
+  pipetteSpecs: {
+    displayName: 'P10 Single-Channel',
   },
+  tipRacksForPipette: [],
+}
+
+const mockPipetteInfoByMount = {
+  left: mockPipetteInfo,
   right: null,
 } as any
 
@@ -181,9 +190,7 @@ describe('ProtocolSetupInfo', () => {
           },
         },
       } as any)
-    mockGetProtocolPipetteTiprackData.mockReturnValue(
-      mockProtocolPipetteTipRackCalData
-    )
+    mockUseCurrentRunPipetteInfoByMount.mockReturnValue(mockPipetteInfoByMount)
     mockGetConnectedRobot.mockReturnValue(mockConnectedRobot)
   })
 
