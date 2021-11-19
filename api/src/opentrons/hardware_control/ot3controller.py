@@ -16,11 +16,7 @@ try:
     from opentrons_hardware.hardware_control.motion import create
     from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
 except ModuleNotFoundError:
-    CanDriver = None
-    CanMessenger = None
-    NodeId = None
-    create = None
-    MoveGroupRunner = None
+    pass
 
 from .module_control import AttachedModulesControl
 from .types import BoardRevision, Axis
@@ -110,12 +106,12 @@ class OT3Controller:
         ret: AxisValueMap = {"A": 0, "B": 0, "C": 0, "X": 0, "Y": 0, "Z": 0}
         for node, pos in position.items():
             if node == NodeId.head:
-                ret['A'] = pos
-                ret['Z'] = pos
+                ret["A"] = pos
+                ret["Z"] = pos
             elif node == NodeId.gantry_x:
-                ret['X'] = pos
+                ret["X"] = pos
             elif node == NodeId.gantry_y:
-                ret['Y'] = pos
+                ret["Y"] = pos
         log.info(f"update_position: {ret}")
         return ret
 
@@ -140,11 +136,11 @@ class OT3Controller:
         log.info(f"move: {target_position}")
         target: Dict[NodeId, float] = {}
         for axis, pos in target_position.items():
-            if axis in {'A', 'Z'}:
+            if axis in {"A", "Z"}:
                 target[NodeId.head] = pos
-            elif axis == 'X':
+            elif axis == "X":
                 target[NodeId.gantry_x] = pos
-            elif axis == 'Y':
+            elif axis == "Y":
                 target[NodeId.gantry_y] = pos
         move_group = create(origin=self._position, target=target, speed=speed or 5000.0)
         runner = MoveGroupRunner(move_groups=move_group)
@@ -222,7 +218,14 @@ class OT3Controller:
         """Get the axis bounds."""
         # TODO (AL, 2021-11-18): The bounds need to be defined
         phony_bounds = (0, 10000)
-        return {Axis.A: phony_bounds, Axis.B: phony_bounds, Axis.C: phony_bounds, Axis.X: phony_bounds, Axis.Y: phony_bounds, Axis.Z: phony_bounds}
+        return {
+            Axis.A: phony_bounds,
+            Axis.B: phony_bounds,
+            Axis.C: phony_bounds,
+            Axis.X: phony_bounds,
+            Axis.Y: phony_bounds,
+            Axis.Z: phony_bounds,
+        }
 
     @property
     def fw_version(self) -> Optional[str]:
