@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.7.0](https://github.com/Opentrons/opentrons/compare/v4.6.2...v4.7.0) (2021-11-18)
+
+
+### Bug Fixes
+
+* **robot-server:** avoid LabwareDefinition type in cal models ([#8698](https://github.com/Opentrons/opentrons/issues/8698)) ([c3bf7ab](https://github.com/Opentrons/opentrons/commit/c3bf7ab51074e8b5e160ce5755be6e80296f1963)), closes [#8654](https://github.com/Opentrons/opentrons/issues/8654)
+* **robot-server:** ensure background tasks do not affect requests ([#8362](https://github.com/Opentrons/opentrons/issues/8362)) ([3e4bc2f](https://github.com/Opentrons/opentrons/commit/3e4bc2f504282c51622682001780f35d5f3e5312))
+
+
+### Features
+
+* **api,robot-server:** upgrade fastapi and pydantic deps ([#8345](https://github.com/Opentrons/opentrons/issues/8345)) ([9cf416a](https://github.com/Opentrons/opentrons/commit/9cf416a498e77b2127a6e3e71298f9368f818d35)), closes [#8134](https://github.com/Opentrons/opentrons/issues/8134)
+* **robot-server:** allow a run and a legacy session to exist simultaneously ([#8615](https://github.com/Opentrons/opentrons/issues/8615)) ([b470946](https://github.com/Opentrons/opentrons/commit/b4709462df09479a2c4f8160561046e5cd588e3b))
+
+
+### Reverts
+
+* **robot-server:** revert attach pipette code back to using the mount ([#8699](https://github.com/Opentrons/opentrons/issues/8699)) ([dc9f9a8](https://github.com/Opentrons/opentrons/commit/dc9f9a8df5cd92b8efe0dceae0415dc7240682a3))
+
+
+
+
+
 
 
 **Note:** Version bump only for package @opentrons/robot-server
