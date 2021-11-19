@@ -1,4 +1,4 @@
-""" Constants for the buildroot implementation to avoid circular deps """
+""" Constants to avoid circular deps """
 
 APP_VARIABLE_PREFIX = "com.opentrons.otupdate.buildroot."
 #: Prefix for variables in the aiohttp.web.Application dictlike

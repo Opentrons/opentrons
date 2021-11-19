@@ -1,12 +1,14 @@
-import asyncio
+import collections
 import os
-import re
 import json
-import sys
+import re
 import subprocess
+from unittest import mock
 import zipfile
 
 import pytest
+
+from otupdate import buildroot
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
@@ -90,16 +92,6 @@ def extracted_update_file(request, tmpdir):
 
 
 @pytest.fixture
-def loop():
-    if sys.platform == "win32":
-        _loop = asyncio.ProactorEventLoop()
-    else:
-        _loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(_loop)
-    return asyncio.get_event_loop()
-
-
-@pytest.fixture
 def testing_cert():
     """Path to the testing public cert"""
     return os.path.join(HERE, "ot-update-server-unit-tests.crt")
@@ -126,6 +118,28 @@ def otupdate_config(request, tmpdir, testing_cert):
         if request.node.get_closest_marker("bad_cert_path"):
             conf.update({"update_cert_path": "asodhafjasda"})
         else:
-            conf.update({"update_cert_path": testing_cert})
+            conf.update(
+                {
+                    "update_cert_path": os.path.join(
+                        HERE, "ot-update-server-unit-tests.crt"
+                    )
+                }
+            )
     json.dump(conf, open(path, "w"))
     return path
+
+
+# This can be used to replace file_actions.RootPartitions elements as long
+# as the callee doesn’t actually do identity checking
+FakeRootPartElem = collections.namedtuple("FakeRootPartElem", ("name", "value"))
+
+
+@pytest.fixture
+def testing_partition(monkeypatch, tmpdir):
+    partfile = os.path.join(tmpdir, "fake-partition")
+    find_unused = mock.Mock()
+    monkeypatch.setattr(buildroot.file_actions, "_find_unused_partition", find_unused)
+    find_unused.return_value = FakeRootPartElem(
+        "TWO", buildroot.file_actions.Partition(2, partfile)
+    )
+    return partfile

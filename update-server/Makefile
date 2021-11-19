@@ -52,8 +52,13 @@ test:
 
 .PHONY: lint
 lint:
+	$(python) -m black --check ./otupdate ./tests
 	$(python) -m flake8 otupdate tests
 	$(python) -m mypy otupdate
+
+.PHONY: format
+format:
+	$(python) -m black otupdate tests
 
 .PHONY: wheel
 wheel: clean
