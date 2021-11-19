@@ -15,6 +15,11 @@ try:
     from opentrons_hardware.drivers.can_bus.constants import NodeId
     from opentrons_hardware.hardware_control.motion import create
     from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
+    from opentrons_hardware.drivers.can_bus.messages.message_definitions import (
+        SetupRequest,
+        EnableMotorRequest,
+    )
+    from opentrons_hardware.drivers.can_bus.messages.payloads import EmptyPayload
 except ModuleNotFoundError:
     pass
 
@@ -71,6 +76,17 @@ class OT3Controller:
             NodeId.gantry_x: 0,
             NodeId.gantry_y: 0,
         }
+
+    async def setup_motors(self) -> None:
+        """Set up the motors."""
+        await self._messenger.send(
+            node_id=NodeId.broadcast,
+            message=SetupRequest(payload=EmptyPayload()),
+        )
+        await self._messenger.send(
+            node_id=NodeId.broadcast,
+            message=EnableMotorRequest(payload=EmptyPayload()),
+        )
 
     @property
     def gpio_chardev(self) -> GPIODriverLike:
@@ -133,7 +149,7 @@ class OT3Controller:
         Returns:
             None
         """
-        log.info(f"move: {target_position}")
+        log.debug(f"move: {target_position}")
         target: Dict[NodeId, float] = {}
         for axis, pos in target_position.items():
             if axis in {"A", "Z"}:

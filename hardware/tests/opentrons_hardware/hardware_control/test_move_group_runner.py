@@ -275,38 +275,6 @@ async def test_multi_send_setup_commands(
     )
 
 
-async def test_setup_motors(
-    mock_can_messenger: AsyncMock, move_group_multiple: MoveGroups
-) -> None:
-    """It should set the motors for movement."""
-    subject = MoveGroupRunner(move_groups=move_group_multiple)
-    await subject._setup_motors(can_messenger=mock_can_messenger)
-    mock_can_messenger.send.assert_has_calls(
-        [
-            call(
-                node_id=NodeId.broadcast,
-                message=md.SetupRequest(payload=EmptyPayload()),
-            ),
-            call(
-                node_id=NodeId.broadcast,
-                message=md.EnableMotorRequest(payload=EmptyPayload()),
-            ),
-        ]
-    )
-
-
-async def test_teardown_motors(
-    mock_can_messenger: AsyncMock, move_group_multiple: MoveGroups
-) -> None:
-    """It should tear down the motors after movement."""
-    subject = MoveGroupRunner(move_groups=move_group_multiple)
-    await subject._teardown_motors(can_messenger=mock_can_messenger)
-    mock_can_messenger.send.assert_called_once_with(
-        node_id=NodeId.broadcast,
-        message=md.DisableMotorRequest(payload=EmptyPayload()),
-    )
-
-
 async def test_move() -> None:
     """It should register to listen for messages."""
     subject = MoveGroupRunner(move_groups=[])
