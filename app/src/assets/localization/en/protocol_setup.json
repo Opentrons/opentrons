@@ -78,5 +78,6 @@
   "calibration_ready": "Calibration ready",
   "run_disabled_modules_not_connected": "Make sure all modules are connected before proceeding to run",
   "run_disabled_calibration_not_complete": "Make sure robot calibration is complete before proceeding to run",
-  "run_disabled_modules_and_calibration_not_complete": "Make sure robot calibration is complete and all modules are connected before proceeding to run"
+  "run_disabled_modules_and_calibration_not_complete": "Make sure robot calibration is complete and all modules are connected before proceeding to run",
+  "loading_protocol_details": "Loading details..."
 }
