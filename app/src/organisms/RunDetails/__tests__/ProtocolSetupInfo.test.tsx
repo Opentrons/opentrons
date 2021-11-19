@@ -4,8 +4,6 @@ import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
 import { i18n } from '../../../i18n'
-import * as discoverySelectors from '../../../redux/discovery/selectors'
-import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
 import {
   useCurrentRunPipetteInfoByMount,
   PipetteInfo,
@@ -20,16 +18,12 @@ import type {
 
 jest.mock('../hooks')
 jest.mock('../../ProtocolSetup/RunSetupCard/hooks')
-jest.mock('../../../redux/discovery/selectors')
 
 const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
   typeof useProtocolDetails
 >
 const mockUseCurrentRunPipetteInfoByMount = useCurrentRunPipetteInfoByMount as jest.MockedFunction<
   typeof useCurrentRunPipetteInfoByMount
->
-const mockGetConnectedRobot = discoverySelectors.getConnectedRobot as jest.MockedFunction<
-  typeof discoverySelectors.getConnectedRobot
 >
 
 const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolFile<{}>
@@ -191,7 +185,6 @@ describe('ProtocolSetupInfo', () => {
         },
       } as any)
     mockUseCurrentRunPipetteInfoByMount.mockReturnValue(mockPipetteInfoByMount)
-    mockGetConnectedRobot.mockReturnValue(mockConnectedRobot)
   })
 
   it('should render correct command when commandType is loadLabware', () => {
