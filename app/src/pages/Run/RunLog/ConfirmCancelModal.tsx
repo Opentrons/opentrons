@@ -16,10 +16,6 @@ export function ConfirmCancelModal(
   const { stopRun } = useCurrentRunControls()
   const { t } = useTranslation('run_details')
 
-  const HEADING = t('cancel_run_modal_heading')
-  const CANCEL_TEXT = t('cancel_run_modal_confirm')
-  const BACK_TEXT = t('cancel_run_modal_back')
-
   const cancel = (): void => {
     stopRun()
     onClose()
@@ -28,10 +24,10 @@ export function ConfirmCancelModal(
   return (
     <Portal>
       <AlertModal
-        heading={HEADING}
+        heading={t('cancel_run_modal_heading')}
         buttons={[
-          { children: BACK_TEXT, onClick: onClose },
-          { children: CANCEL_TEXT, onClick: cancel },
+          { children: t('cancel_run_modal_confirm'), onClick: onClose },
+          { children: t('cancel_run_modal_back'), onClick: cancel },
         ]}
         alertOverlay
       >
