@@ -2,6 +2,7 @@ import * as React from 'react'
 import '@testing-library/jest-dom'
 import { fireEvent } from '@testing-library/dom'
 import { renderWithProviders } from '@opentrons/components'
+import { i18n } from '../../../i18n'
 import { RunSetupCard } from '../RunSetupCard'
 import { MetadataCard } from '../MetadataCard'
 import { LabwareOffsetSuccessToast } from '../LabwareOffsetSuccessToast'
@@ -23,7 +24,9 @@ const mockLabwareOffsetSuccessToast = LabwareOffsetSuccessToast as jest.MockedFu
 
 describe('ProtocolSetup', () => {
   const render = () => {
-    return renderWithProviders(<ProtocolSetup />)[0]
+    return renderWithProviders(<ProtocolSetup />, {
+      i18nInstance: i18n,
+    })[0]
   }
 
   beforeEach(() => {
