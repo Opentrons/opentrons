@@ -1,6 +1,7 @@
 """Protocol engine state management."""
 from __future__ import annotations
 
+from copy import copy as shallow_copy
 from dataclasses import dataclass
 from functools import partial
 from typing import Any, Callable, List, Optional, Sequence, TypeVar
@@ -71,6 +72,15 @@ class StateView(HasState[State]):
     def get_configs(self) -> EngineConfigs:
         """Get Protocol Engine configurations."""
         return self._configs
+
+    def snapshot(self) -> StateView:
+        """Return an immutable, thread-safe snapshot of this `StateView`.
+
+        Normally, the `StateView` returned by `ProtocolEngine.state_view`
+        will automatically update as things happen on the originating `ProtocolEngine`.
+        Using `ProtocolEngine.state_view.snapshot()` instead avoids that.
+        """
+        return shallow_copy(self)
 
 
 class StateStore(StateView, ActionHandler):
