@@ -1,4 +1,5 @@
 import type { CommonCommandInfo } from '.'
+import type { MotorAxis } from '../../../../js/types'
 export interface MoveToSlotCommand extends CommonCommandInfo {
   commandType: 'moveToSlot'
   params: MoveToSlotParams
@@ -88,5 +89,5 @@ interface SavePositionParams {
 }
 
 interface HomeParams {
-  axes?: string
+  axes?: MotorAxis
 }

@@ -226,9 +226,9 @@ export function useLabwarePositionCheck(
   }
   // prepCommands will be run when a user starts LPC
   const prepCommands: Command[] = [
-    homeCommand,
     ...loadCommands,
     ...TCOpenCommands,
+    homeCommand,
   ]
   // LPCMovementCommands will be run during the guided LPC flow
   const LPCMovementCommands: LabwarePositionCheckMovementCommand[] = LPCCommands.filter(
