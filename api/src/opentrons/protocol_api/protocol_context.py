@@ -387,6 +387,9 @@ class ProtocolContext(CommandPublisher):
                           as in the run log and the calibration view in the
                           Opentrons app.
         """
+        # todo(mm, 2021-11-22): The duplication between here and load_labware()
+        # is getting bad.
+
         implementation = self._implementation.load_labware_from_definition(
             labware_def=labware_def, location=location, label=label
         )
@@ -446,6 +449,9 @@ class ProtocolContext(CommandPublisher):
         :param int version: The version of the labware definition. If
             unspecified, will use version 1.
         """
+        # todo(mm, 2021-11-22): The duplication between here and
+        # load_labware_from_definition() is getting bad.
+
         implementation = self._implementation.load_labware(
             load_name=load_name,
             location=location,
