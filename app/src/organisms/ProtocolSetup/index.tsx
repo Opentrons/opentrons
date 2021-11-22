@@ -20,7 +20,6 @@ import { LabwareOffsetSuccessToast } from './LabwareOffsetSuccessToast'
 
 export function ProtocolSetup(): JSX.Element {
   const { t } = useTranslation(['protocol_upload'])
-
   const [showLPCSuccessToast, setShowLPCSuccessToast] = React.useState(true)
 
   return (
