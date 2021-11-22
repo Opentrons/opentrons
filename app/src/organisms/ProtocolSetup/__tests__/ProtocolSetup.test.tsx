@@ -1,16 +1,15 @@
 import * as React from 'react'
 import '@testing-library/jest-dom'
+import { fireEvent } from '@testing-library/dom'
 import { renderWithProviders } from '@opentrons/components'
-import { AlertItem } from '@opentrons/components/src/alerts'
-import { i18n } from '../../../i18n'
 import { RunSetupCard } from '../RunSetupCard'
 import { MetadataCard } from '../MetadataCard'
+import { LabwareOffsetSuccessToast } from '../LabwareOffsetSuccessToast'
 import { ProtocolSetup } from '..'
-import { fireEvent } from '@testing-library/dom'
 
 jest.mock('../MetadataCard')
 jest.mock('../RunSetupCard')
-jest.mock('@opentrons/components/src/alerts')
+jest.mock('../LabwareOffsetSuccessToast')
 
 const mockMetadataCard = MetadataCard as jest.MockedFunction<
   typeof MetadataCard
@@ -18,21 +17,21 @@ const mockMetadataCard = MetadataCard as jest.MockedFunction<
 const mockRunSetupCard = RunSetupCard as jest.MockedFunction<
   typeof RunSetupCard
 >
-const mockAlertItem = AlertItem as jest.MockedFunction<typeof AlertItem>
+const mockLabwareOffsetSuccessToast = LabwareOffsetSuccessToast as jest.MockedFunction<
+  typeof LabwareOffsetSuccessToast
+>
 
 describe('ProtocolSetup', () => {
   const render = () => {
-    return renderWithProviders(<ProtocolSetup />, { i18nInstance: i18n })[0]
+    return renderWithProviders(<ProtocolSetup />)[0]
   }
 
   beforeEach(() => {
     mockMetadataCard.mockReturnValue(<div>Mock MetadataCard</div>)
     mockRunSetupCard.mockReturnValue(<div>Mock ReunSetupCard</div>)
-    mockAlertItem.mockReturnValue(<div>Mock AlertItem</div>)
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
+    mockLabwareOffsetSuccessToast.mockReturnValue(
+      <div>Mock LabwareOffsetSuccessToast</div>
+    )
   })
 
   it('renders metadata and run setup card', () => {
@@ -42,7 +41,7 @@ describe('ProtocolSetup', () => {
   })
   it('renders LPC success toast and is clickable', () => {
     const { getByText } = render()
-    const successToast = getByText('Mock AlertItem')
+    const successToast = getByText('Mock LabwareOffsetSuccessToast')
     fireEvent.click(successToast)
   })
 })

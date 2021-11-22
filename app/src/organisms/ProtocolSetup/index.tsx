@@ -9,36 +9,27 @@ import {
   Flex,
   Text,
   Link,
-  AlertItem,
   SPACING_1,
-  SPACING_2,
 } from '@opentrons/components'
 import { RunSetupCard } from './RunSetupCard'
 import { MetadataCard } from './MetadataCard'
 
 const feedbackFormLink =
   'https://docs.google.com/forms/d/e/1FAIpQLSd6oSV82IfgzSi5t_FP6n_pB_Y8wPGmAgFHsiiFho9qhxr-UQ/viewform'
+import { LabwareOffsetSuccessToast } from './LabwareOffsetSuccessToast'
 
 export function ProtocolSetup(): JSX.Element {
-  const { t } = useTranslation('protocol_info')
-  const [checkToastDismissed, setCheckToastDismissed] = React.useState(false)
+  const { t } = useTranslation(['protocol_upload'])
+
+  const [showLPCSuccessToast, setShowLPCSuccessToast] = React.useState(true)
 
   return (
     <>
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        padding={`${SPACING_1} ${SPACING_2}`}
-      >
-        {!checkToastDismissed && (
-          <AlertItem
-            type="success"
-            onCloseClick={() => setCheckToastDismissed(true)}
-            title={t('labware_positon_check_complete_toast', {
-              num_offsets: 2, //  TODO wire up num_offsets!
-            })}
-          />
-        )}
-      </Flex>
+      {showLPCSuccessToast && (
+        <LabwareOffsetSuccessToast
+          onCloseClick={() => setShowLPCSuccessToast(false)}
+        />
+      )}
       <Flex
         flexDirection={DIRECTION_COLUMN}
         alignItems={ALIGN_CENTER}
