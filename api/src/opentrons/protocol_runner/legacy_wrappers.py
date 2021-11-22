@@ -20,6 +20,11 @@ from opentrons.protocol_api.load_info import (
     ModuleLoadInfo as LegacyModuleLoadInfo,
 )
 from opentrons.protocol_api.contexts import ModuleContext as LegacyModuleContext
+from opentrons.protocol_api.labware_offset_provider import (
+    ProvidedLabwareOffset as LegacyProvidedLabwareOffset,
+    AbstractLabwareOffsetProvider as LegacyAbstractLabwareOffsetProvider,
+    NullLabwareOffsetProvider as LegacyNullLabwareOffsetProvider,
+)
 
 from opentrons.protocols.parse import parse
 from opentrons.protocols.execution.execute import run_protocol
@@ -29,6 +34,9 @@ from opentrons.protocols.types import (
     PythonProtocol as LegacyPythonProtocol,
 )
 
+from opentrons.protocol_engine.state import LabwareView
+
+from .legacy_labware_offset_provider import LegacyLabwareOffsetProvider
 from .protocol_source import ProtocolSource
 
 
@@ -69,6 +77,10 @@ class LegacyContextCreator:
     def __init__(
         self,
         hardware_api: HardwareAPI,
+        # TODO BEFORE MERGE:
+        # Should this constructor take a LabwareView, or a LegacyLabwareOffsetProvider?
+        # Should this even be in the constructor, or should it be in create()?
+        labware_view: LabwareView,
         use_simulating_implementation: bool,
     ) -> None:
         """Prepare the LegacyContextCreator.
@@ -85,6 +97,7 @@ class LegacyContextCreator:
         """
         self._hardware_api = hardware_api
         self._use_simulating_implementation = use_simulating_implementation
+        self._labware_view = labware_view
 
     def create(
         self,
@@ -94,6 +107,9 @@ class LegacyContextCreator:
         if self._use_simulating_implementation:
             return LegacyProtocolContext(
                 api_version=api_version,
+                labware_offset_provider=LegacyLabwareOffsetProvider(
+                    labware_view=self._labware_view
+                ),
                 implementation=LegacyProtocolContextSimulation(
                     api_version=api_version, hardware=self._hardware_api
                 ),
@@ -101,6 +117,9 @@ class LegacyContextCreator:
         else:
             return LegacyProtocolContext(
                 api_version=api_version,
+                labware_offset_provider=LegacyLabwareOffsetProvider(
+                    labware_view=self._labware_view
+                ),
                 implementation=LegacyProtocolContextImplementation(
                     api_version=api_version,
                     hardware=self._hardware_api,
@@ -140,4 +159,7 @@ __all__ = [
     "LegacyLabwareLoadInfo",
     "LegacyInstrumentLoadInfo",
     "LegacyModuleLoadInfo",
+    "LegacyProvidedLabwareOffset",
+    "LegacyAbstractLabwareOffsetProvider",
+    "LegacyNullLabwareOffsetProvider",
 ]

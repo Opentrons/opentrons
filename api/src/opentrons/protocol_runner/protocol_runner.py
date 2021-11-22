@@ -79,6 +79,7 @@ class ProtocolRunner:
         self._legacy_file_reader = legacy_file_reader or LegacyFileReader()
         self._legacy_context_creator = legacy_context_creator or LegacyContextCreator(
             hardware_api=hardware_api,
+            labware_view=protocol_engine.state_view.labware,
             use_simulating_implementation=False,
         )
         self._legacy_executor = legacy_executor or LegacyExecutor(
