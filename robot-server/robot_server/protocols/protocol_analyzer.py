@@ -23,7 +23,7 @@ class ProtocolAnalyzer:
         analysis_id: str,
     ) -> None:
         """Analyze a given protocol, storing the analysis when complete."""
-        result = await self._protocol_runner.run(protocol_resource)
+        result = await self._protocol_runner.run(protocol_resource.source)
 
         self._analysis_store.update(
             analysis_id=analysis_id,

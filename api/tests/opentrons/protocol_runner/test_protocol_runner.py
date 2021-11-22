@@ -1,6 +1,7 @@
 """Tests for the ProtocolRunner class."""
 import pytest
 from decoy import Decoy, matchers
+from pathlib import Path
 from typing import List, cast
 
 from opentrons_shared_data.protocol.dev_types import JsonProtocol as JsonProtocolDict
@@ -10,9 +11,12 @@ from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.models import JsonProtocol
 from opentrons.protocol_api_experimental import ProtocolContext
 from opentrons.protocol_engine import ProtocolEngine, commands as pe_commands
+from opentrons.protocol_reader import (
+    ProtocolSource,
+    JsonProtocolConfig,
+    PythonProtocolConfig,
+)
 from opentrons.protocol_runner import ProtocolRunner
-from opentrons.protocol_runner.protocol_source import ProtocolSource
-from opentrons.protocol_runner.pre_analysis import JsonPreAnalysis, PythonPreAnalysis
 from opentrons.protocol_runner.task_queue import TaskQueue
 from opentrons.protocol_runner.json_file_reader import JsonFileReader
 from opentrons.protocol_runner.json_command_translator import JsonCommandTranslator
@@ -189,8 +193,11 @@ def test_load_json(
 ) -> None:
     """It should load a JSON protocol file."""
     json_protocol_source = ProtocolSource(
+        directory=Path("/dev/null"),
+        main_file=Path("/dev/null/abc.json"),
         files=[],
-        pre_analysis=JsonPreAnalysis(metadata={}, schema_version=6),
+        metadata={},
+        config=JsonProtocolConfig(schema_version=6),
     )
 
     json_protocol = JsonProtocol.construct()  # type: ignore[call-arg]
@@ -232,8 +239,11 @@ def test_load_python(
 ) -> None:
     """It should load a Python protocol file."""
     python_protocol_source = ProtocolSource(
+        directory=Path("/dev/null"),
+        main_file=Path("/dev/null/abc.py"),
         files=[],
-        pre_analysis=PythonPreAnalysis(metadata={}, api_version=APIVersion(3, 0)),
+        metadata={},
+        config=PythonProtocolConfig(api_version=APIVersion(3, 0)),
     )
 
     python_protocol = decoy.mock(cls=PythonProtocol)
@@ -269,8 +279,11 @@ def test_load_legacy_python(
 ) -> None:
     """It should load a legacy context-based Python protocol."""
     legacy_protocol_source = ProtocolSource(
+        directory=Path("/dev/null"),
+        main_file=Path("/dev/null/abc.py"),
         files=[],
-        pre_analysis=PythonPreAnalysis(metadata={}, api_version=APIVersion(2, 11)),
+        metadata={},
+        config=PythonProtocolConfig(api_version=APIVersion(2, 11)),
     )
 
     legacy_protocol = LegacyPythonProtocol(
@@ -318,8 +331,11 @@ def test_load_legacy_json(
 ) -> None:
     """It should load a legacy context-based Python protocol."""
     legacy_protocol_source = ProtocolSource(
+        directory=Path("/dev/null"),
+        main_file=Path("/dev/null/abc.json"),
         files=[],
-        pre_analysis=JsonPreAnalysis(metadata={}, schema_version=5),
+        metadata={},
+        config=JsonProtocolConfig(schema_version=5),
     )
 
     legacy_protocol = LegacyJsonProtocol(

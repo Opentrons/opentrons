@@ -134,7 +134,7 @@ async def create_run(
             engine_store.engine.add_labware_offset(offset_request)
 
     if protocol_resource is not None:
-        engine_store.runner.load(protocol_resource)
+        engine_store.runner.load(protocol_resource.source)
 
     # TODO(mc, 2021-08-05): capture errors from `runner.join` and place
     # them in the run resource
@@ -386,7 +386,7 @@ async def add_labware_offset(
 @base_router.patch(
     path="/runs/{runId}",
     summary="Update a run",
-    description="Update a specific run, returing the updated resource.",
+    description="Update a specific run, returning the updated resource.",
     status_code=status.HTTP_200_OK,
     response_model=SimpleResponseModel[Run],
     response_model_exclude_none=True,

@@ -15,7 +15,7 @@ from opentrons.protocols.models.json_protocol import (
     Robot as JsonProtocolRobot,
 )
 
-from opentrons.protocol_runner.pre_analysis import (
+from opentrons.protocol_reader.pre_analysis import (
     PreAnalyzer,
     InputFile,
     JsonPreAnalysis,
