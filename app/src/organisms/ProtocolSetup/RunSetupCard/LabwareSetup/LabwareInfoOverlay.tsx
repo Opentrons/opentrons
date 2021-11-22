@@ -1,5 +1,6 @@
 import * as React from 'react'
 import isEqual from 'lodash/isEqual'
+import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
   getLabwareDisplayName,
@@ -17,7 +18,7 @@ import {
   DISPLAY_FLEX,
   DIRECTION_COLUMN,
   JUSTIFY_FLEX_END,
-  FONT_SIZE_TINY,
+  FONT_SIZE_CAPTION,
 } from '@opentrons/components'
 import { useCurrentProtocolRun } from '../../../ProtocolUpload/hooks'
 import { useLabwareDefinitionUri } from '../../hooks'
@@ -28,6 +29,14 @@ interface LabwareInfoProps {
   labwareId: string
 }
 
+const labwareDisplayNameStyle = css`
+  overflow: hidden;
+  white-space: initial;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+`
 const LabwareInfo = (props: LabwareInfoProps): JSX.Element => {
   const { displayName, labwareId } = props
   const { t } = useTranslation('protocol_setup')
@@ -51,15 +60,18 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element => {
       flexDirection={'column'}
       backgroundColor={OVERLAY_BLACK_90}
       borderRadius={`0 0 0.4rem 0.4rem`}
-      fontSize={FONT_SIZE_TINY}
+      fontSize={FONT_SIZE_CAPTION}
       color={C_WHITE}
     >
-      <Text margin={SPACING_1}>{displayName}</Text>
+      <Text margin={SPACING_1} css={labwareDisplayNameStyle}>
+        {displayName}
+      </Text>
       {labwareOffset != null && (
         <>
           <Text
             marginX={SPACING_1}
             fontWeight={FONT_WEIGHT_SEMIBOLD}
+            fontSize="8px"
             textTransform={'uppercase'}
           >
             {t('offset_title')}
