@@ -25,6 +25,8 @@ import {
   COLOR_WARNING,
   C_LIGHT_GRAY,
   C_DARK_GRAY,
+  JUSTIFY_CENTER,
+  DIRECTION_COLUMN,
 } from '@opentrons/components'
 import { protocolHasModules } from '@opentrons/shared-data'
 import { Divider } from '../../../atoms/structure'
@@ -152,30 +154,7 @@ export function RunSetupCard(): JSX.Element | null {
         {t('setup_for_run')}
       </Text>
       {isLoading ? (
-        <>
-          <Flex justifyContent={ALIGN_CENTER}>
-            <Icon
-              name="ot-spinner"
-              width={SPACING_5}
-              marginTop={SPACING_4}
-              marginBottom={SPACING_4}
-              color={C_LIGHT_GRAY}
-              spin
-            />
-          </Flex>
-          <Flex justifyContent={ALIGN_CENTER}>
-            <Text
-              justifyContent={JUSTIFY_SPACE_BETWEEN}
-              as={'h3'}
-              color={C_DARK_GRAY}
-              marginBottom={SPACING_5}
-              fontWeight={FONT_WEIGHT_REGULAR}
-              fontSize={FONT_SIZE_BODY_2}
-            >
-              {t('loading_protocol_details')}
-            </Text>
-          </Flex>
-        </>
+        <RunSetupLoader />
       ) : (
         <>
           {stepsKeysInOrder.map((stepKey, index) => (
@@ -234,5 +213,37 @@ export function RunSetupCard(): JSX.Element | null {
         </>
       )}
     </Card>
+  )
+}
+
+function RunSetupLoader(): JSX.Element | null {
+  const { t } = useTranslation('protocol_setup')
+  return (
+    <>
+      <Flex
+        justifyContent={JUSTIFY_CENTER}
+        flexDirection={DIRECTION_COLUMN}
+        alignItems={ALIGN_CENTER}
+      >
+        <Icon
+          name="ot-spinner"
+          width={SPACING_5}
+          marginTop={SPACING_4}
+          marginBottom={SPACING_4}
+          color={C_LIGHT_GRAY}
+          spin
+        />
+        <Text
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          as={'h3'}
+          color={C_DARK_GRAY}
+          marginBottom={SPACING_5}
+          fontWeight={FONT_WEIGHT_REGULAR}
+          fontSize={FONT_SIZE_BODY_2}
+        >
+          {t('loading_protocol_details')}
+        </Text>
+      </Flex>
+    </>
   )
 }
