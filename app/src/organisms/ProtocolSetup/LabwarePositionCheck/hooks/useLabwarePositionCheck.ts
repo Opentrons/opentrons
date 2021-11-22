@@ -219,8 +219,17 @@ export function useLabwarePositionCheck(
     }) as Command[]) ?? []
   // TC open lid commands come from the LPC command generator
   const TCOpenCommands = LPCCommands.filter(isTCOpenCommand) ?? []
+  const homeCommand: Command = {
+    commandType: 'home',
+    id: uuidv4(),
+    params: {},
+  }
   // prepCommands will be run when a user starts LPC
-  const prepCommands: Command[] = [...loadCommands, ...TCOpenCommands]
+  const prepCommands: Command[] = [
+    homeCommand,
+    ...loadCommands,
+    ...TCOpenCommands,
+  ]
   // LPCMovementCommands will be run during the guided LPC flow
   const LPCMovementCommands: LabwarePositionCheckMovementCommand[] = LPCCommands.filter(
     (
