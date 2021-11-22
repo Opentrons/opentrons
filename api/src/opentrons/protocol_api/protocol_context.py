@@ -556,14 +556,17 @@ class ProtocolContext(CommandPublisher):
             self, module.module, module.geometry, self.api_version, self._loop
         )
         self._modules.append(module_context)
+
         module_loc = module.geometry.parent
         assert isinstance(module_loc, (int, str)), "Unexpected labware object parent"
         deck_slot = types.DeckSlotName.from_primitive(module_loc)
+        module_serial = module.module.device_info.get('serial') if module.module else None
         self.module_load_broker.publish(
             ModuleLoadInfo(
-                module_name=module_name,
+                module_model=module.geometry.model,
                 deck_slot=deck_slot,
                 configuration=configuration,
+                module_serial=module_serial,
             )
         )
         return module_context

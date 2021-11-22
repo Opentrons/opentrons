@@ -7,6 +7,7 @@ from opentrons.protocol_engine import (
     DeckSlotLocation,
     ModuleLocation,
     PipetteName,
+    ModuleModels,
     commands as pe_commands,
     actions as pe_actions,
 )
@@ -19,6 +20,7 @@ from opentrons.protocol_runner.legacy_wrappers import (
     LegacyInstrumentLoadInfo,
     LegacyLabwareLoadInfo,
     LegacyModuleLoadInfo,
+    LegacyMagneticModuleModel,
 )
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons.types import DeckSlotName, Mount, MountType
@@ -260,7 +262,10 @@ def test_map_instrument_load() -> None:
 def test_map_module_load() -> None:
     """It should correctly map a module load."""
     input = LegacyModuleLoadInfo(
-        module_name="module-1", deck_slot=DeckSlotName.SLOT_1, configuration="conf"
+        module_model=LegacyMagneticModuleModel.MAGNETIC_V2,
+        deck_slot=DeckSlotName.SLOT_1,
+        configuration="conf",
+        module_serial="module-serial"
     )
     expected_output = pe_commands.LoadModule.construct(
         id=matchers.IsA(str),
@@ -269,11 +274,14 @@ def test_map_module_load() -> None:
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
         params=pe_commands.LoadModuleParams.construct(
-            model="module-1",
+            model=ModuleModels.MAGNETIC_MODULE_V2,
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             moduleId=matchers.IsA(str),
         ),
-        result=pe_commands.LoadModuleResult.construct(moduleId=matchers.IsA(str)),
+        result=pe_commands.LoadModuleResult.construct(
+            moduleId=matchers.IsA(str),
+            moduleSerial="module-serial"
+        ),
     )
     output = LegacyCommandMapper().map_module_load(input)
     assert output == expected_output

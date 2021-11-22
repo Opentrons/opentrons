@@ -21,6 +21,10 @@ from .legacy_wrappers import (
     LegacyModuleLoadInfo,
     LegacyPipetteContext,
     LegacyWell,
+    LegacyModuleModel,
+    LegacyMagneticModuleModel,
+    LegacyTemperatureModuleModel,
+    LegacyThermocyclerModuleModel,
 )
 
 
@@ -33,6 +37,15 @@ class LegacyCommandParams(pe_commands.CustomParams):
 
 class LegacyContextCommandError(ProtocolEngineError):
     """An error returned when a PAPIv2 ProtocolContext command fails."""
+
+
+LEGACY_TO_PE_MODULE: Dict[LegacyModuleModel, pe_types.ModuleModels] = {
+    LegacyMagneticModuleModel.MAGNETIC_V1: pe_types.ModuleModels.MAGNETIC_MODULE_V1,
+    LegacyMagneticModuleModel.MAGNETIC_V2: pe_types.ModuleModels.MAGNETIC_MODULE_V2,
+    LegacyTemperatureModuleModel.TEMPERATURE_V1: pe_types.ModuleModels.TEMPERATURE_MODULE_V1,
+    LegacyTemperatureModuleModel.TEMPERATURE_V2: pe_types.ModuleModels.TEMPERATURE_MODULE_V2,
+    LegacyThermocyclerModuleModel.THERMOCYCLER_V1: pe_types.ModuleModels.THERMOCYCLER_MODULE_V1,
+}
 
 
 class LegacyCommandMapper:
@@ -183,7 +196,7 @@ class LegacyCommandMapper:
 
         count = self._command_count["LOAD_MODULE"]
         module_id = f"module-{count}"
-
+        module_model = LEGACY_TO_PE_MODULE[module_load_info.module_model]
         load_module_command = pe_commands.LoadModule(
             id=f"commands.LOAD_MODULE-{count}",
             status=pe_commands.CommandStatus.SUCCEEDED,
@@ -191,7 +204,7 @@ class LegacyCommandMapper:
             startedAt=now,
             completedAt=now,
             params=pe_commands.LoadModuleParams(
-                model=module_load_info.module_name,
+                model=module_model,
                 location=pe_types.DeckSlotLocation(
                     slotName=module_load_info.deck_slot,
                 ),
@@ -199,6 +212,7 @@ class LegacyCommandMapper:
             ),
             result=pe_commands.LoadModuleResult(
                 moduleId=module_id,
+                moduleSerial=module_load_info.module_serial,
             ),
         )
         self._command_count["LOAD_MODULE"] = count + 1

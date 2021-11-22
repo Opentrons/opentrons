@@ -2,6 +2,12 @@
 from anyio import to_thread
 
 from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control.modules.types import (
+    ModuleModel as LegacyModuleModel,
+    TemperatureModuleModel as LegacyTemperatureModuleModel,
+    MagneticModuleModel as LegacyMagneticModuleModel,
+    ThermocyclerModuleModel as LegacyThermocyclerModuleModel
+)
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.context.protocol_api.protocol_context import (
     ProtocolContextImplementation as LegacyProtocolContextImplementation,
@@ -140,4 +146,8 @@ __all__ = [
     "LegacyLabwareLoadInfo",
     "LegacyInstrumentLoadInfo",
     "LegacyModuleLoadInfo",
+    "LegacyModuleModel",
+    "LegacyMagneticModuleModel",
+    "LegacyTemperatureModuleModel",
+    "LegacyThermocyclerModuleModel",
 ]
