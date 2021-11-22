@@ -1,23 +1,22 @@
 """Methods for saving and retrieving protocol files."""
 from dataclasses import dataclass
 from datetime import datetime
-from fastapi import UploadFile
 from logging import getLogger
 from pathlib import Path
-from typing import Dict, List, Sequence, Union
+from typing import Dict, List
 
-from opentrons.protocol_runner import ProtocolSource
-from opentrons.protocol_runner.pre_analysis import JsonPreAnalysis, PythonPreAnalysis
+from opentrons.protocol_reader import ProtocolSource
 
 log = getLogger(__name__)
 
 
 @dataclass(frozen=True)
-class ProtocolResource(ProtocolSource):
+class ProtocolResource:
     """An entry in the protocol store, used to construct response models."""
 
     protocol_id: str
     created_at: datetime
+    source: ProtocolSource
 
 
 class ProtocolNotFoundError(KeyError):
@@ -26,15 +25,6 @@ class ProtocolNotFoundError(KeyError):
     def __init__(self, protocol_id: str) -> None:
         """Initialize the error message from the missing ID."""
         super().__init__(f"Protocol {protocol_id} was not found.")
-
-
-class ProtocolFileInvalidError(ValueError):
-    """Error raised when a given source file is invalid.
-
-    May be caused by an empty filename.
-    """
-
-    pass
 
 
 class ProtocolStore:
@@ -52,47 +42,9 @@ class ProtocolStore:
         self._directory = directory
         self._protocols_by_id: Dict[str, ProtocolResource] = {}
 
-    async def create(
-        self,
-        protocol_id: str,
-        created_at: datetime,
-        files: Sequence[UploadFile],
-        pre_analysis: Union[JsonPreAnalysis, PythonPreAnalysis],
-    ) -> ProtocolResource:
-        """Add a protocol to the store.
-
-        Raises:
-            ProtocolFileInvalidError
-        """
-        protocol_dir = self._get_protocol_dir(protocol_id)
-        # TODO(mc, 2021-06-02): check for protocol collision
-        protocol_dir.mkdir(parents=True)
-        saved_files: List[Path] = []
-
-        for index, upload_file in enumerate(files):
-            if upload_file.filename == "":
-                raise ProtocolFileInvalidError(f"File {index} is missing a filename")
-
-            contents = await upload_file.read()
-            file_path = protocol_dir / upload_file.filename
-
-            if isinstance(contents, str):
-                file_path.write_text(contents, "utf-8")
-            else:
-                file_path.write_bytes(contents)
-
-            saved_files.append(file_path)
-
-        entry = ProtocolResource(
-            protocol_id=protocol_id,
-            pre_analysis=pre_analysis,
-            created_at=created_at,
-            files=saved_files,
-        )
-
-        self._protocols_by_id[protocol_id] = entry
-
-        return entry
+    def upsert(self, resource: ProtocolResource) -> None:
+        """Upsert a protocol resource into the store."""
+        self._protocols_by_id[resource.protocol_id] = resource
 
     def get(self, protocol_id: str) -> ProtocolResource:
         """Get a single protocol by ID."""
@@ -113,9 +65,10 @@ class ProtocolStore:
             raise ProtocolNotFoundError(protocol_id) from e
 
         try:
-            for file_path in entry.files:
-                file_path.unlink()
-            self._get_protocol_dir(protocol_id).rmdir()
+            protocol_dir = entry.source.directory
+            for file_path in entry.source.files:
+                (protocol_dir / file_path.name).unlink()
+            protocol_dir.rmdir()
         except Exception as e:
             log.warning(
                 f"Unable to delete all files for protocol {protocol_id}",
@@ -123,6 +76,3 @@ class ProtocolStore:
             )
 
         return entry
-
-    def _get_protocol_dir(self, protocol_id: str) -> Path:
-        return self._directory / protocol_id
