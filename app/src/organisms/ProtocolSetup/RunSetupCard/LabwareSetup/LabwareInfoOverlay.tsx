@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
   getLabwareDisplayName,
@@ -16,12 +17,20 @@ import {
   DISPLAY_FLEX,
   DIRECTION_COLUMN,
   JUSTIFY_FLEX_END,
-  FONT_SIZE_TINY,
+  FONT_SIZE_CAPTION,
 } from '@opentrons/components'
 interface LabwareInfoProps {
   displayName: string
 }
 
+const labwareDisplayNameStyle = css`
+  overflow: hidden;
+  white-space: initial;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+`
 const FAKE_OFFSET_DATA = { x: 1.2, y: 2.3, z: 4.4 } // TODO IMMEDIATELY: replace with real data when available
 // Also, if offset data does not exist for a piece of labware, the offseet data should not be rendered at all
 const LabwareInfo = (props: LabwareInfoProps): JSX.Element => {
@@ -32,13 +41,16 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element => {
       flexDirection={'column'}
       backgroundColor={OVERLAY_BLACK_90}
       borderRadius={`0 0 0.4rem 0.4rem`}
-      fontSize={FONT_SIZE_TINY}
+      fontSize={FONT_SIZE_CAPTION}
       color={C_WHITE}
     >
-      <Text margin={SPACING_1}>{displayName}</Text>
+      <Text margin={SPACING_1} css={labwareDisplayNameStyle}>
+        {displayName}
+      </Text>
       <Text
         marginX={SPACING_1}
         fontWeight={FONT_WEIGHT_SEMIBOLD}
+        fontSize="8px"
         textTransform={'uppercase'}
       >
         {t('offset_title')}
