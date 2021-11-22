@@ -33,6 +33,7 @@ from opentrons.protocol_api import ProtocolContext
 from opentrons.types import Mount, Location, Point
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.module.dev_types import ModuleDefinitionV2
 
 Session = namedtuple("Session", ["server", "socket", "token", "call"])
 
@@ -647,3 +648,29 @@ def min_lw(min_lw_impl) -> Labware:
 @pytest.fixture
 def min_lw2(min_lw2_impl) -> Labware:
     return Labware(implementation=min_lw2_impl)
+
+
+@pytest.fixture
+def minimal_module_def() -> ModuleDefinitionV2:
+    return {
+        "$otSharedSchema": "module/schemas/2",
+        "moduleType": "temperatureModuleType",
+        "model": "temperatureModuleV1",
+        "labwareOffset": {
+            "x": -0.15,
+            "y": -0.15,
+            "z": 80.09
+        },
+        "dimensions": {
+            "bareOverallHeight": 84,
+            "overLabwareHeight": 0
+        },
+        "calibrationPoint": {
+            "x": 12.0,
+            "y": 8.75
+        },
+        "displayName": "Sample Module",
+        "quirks": [],
+        "slotTransforms": {},
+        "compatibleWith": ["temperatureModuleV2"]
+    }

@@ -3,10 +3,17 @@ import pytest
 from datetime import datetime
 from decoy import Decoy, matchers
 from opentrons.calibration_storage.helpers import uri_from_details
+from opentrons_shared_data.module.dev_types import ModuleDefinitionV2
 
 from opentrons.types import Mount as HwMount, MountType, DeckSlotName
 from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
+
 from opentrons.protocols.models import LabwareDefinition
+from opentrons.protocols.geometry.module_geometry import (
+    resolve_module_type,
+    module_model_from_string
+)
 
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.errors import LabwareDefinitionDoesNotExistError
@@ -16,11 +23,15 @@ from opentrons.protocol_engine.types import (
     LoadedPipette,
     LabwareOffset,
     LabwareOffsetVector,
+    ModuleModels,
 )
 
 from opentrons.protocol_engine.state import StateStore
-from opentrons.protocol_engine.resources import ModelUtils, LabwareDataProvider
-
+from opentrons.protocol_engine.resources import (
+    ModelUtils,
+    LabwareDataProvider,
+    ModuleDataProvider
+)
 from opentrons.protocol_engine.execution.equipment import (
     EquipmentHandler,
     LoadedLabwareData,
@@ -50,6 +61,12 @@ def model_utils(decoy: Decoy) -> ModelUtils:
 def labware_data_provider(decoy: Decoy) -> LabwareDataProvider:
     """Get a mocked out LabwareDataProvider instance."""
     return decoy.mock(cls=LabwareDataProvider)
+
+
+@pytest.fixture
+def module_data_provider(decoy: Decoy) -> ModuleDataProvider:
+    """Get a mocked out ModuleDataProvider instance."""
+    return decoy.mock(cls=ModuleDataProvider)
 
 
 @pytest.fixture
@@ -248,7 +265,7 @@ async def test_load_pipette_uses_provided_id(subject: EquipmentHandler) -> None:
     assert result == LoadedPipetteData(pipette_id="my-pipette-id")
 
 
-async def test_load_pipette_checks_checks_existence_with_already_loaded(
+async def test_load_pipette_checks_existence_with_already_loaded(
     decoy: Decoy,
     model_utils: ModelUtils,
     state_store: StateStore,
@@ -311,3 +328,35 @@ async def test_load_pipette_raises_if_pipette_not_attached(
             mount=MountType.LEFT,
             pipette_id=None,
         )
+
+
+async def test_load_module(
+    decoy: Decoy,
+    model_utils: ModelUtils,
+    state_store: StateStore,
+    module_data_provider: ModuleDataProvider,
+    minimal_module_def: ModuleDefinitionV2,
+    subject: EquipmentHandler,
+    hardware_api: HardwareAPI,
+) -> None:
+    """It should load labware definition and offset data and generate an ID."""
+    decoy.when(model_utils.generate_id()).then_return("unique-id")
+    # decoy.when(module_model_from_string(ModuleModels.TEMPERATURE_MODULE_V1.value)
+    #            ).then_return(ModuleModel.TEMPERATURE_V1)
+    decoy.when(
+        await module_data_provider.get_module_definition(
+            model=ModuleModels.TEMPERATURE_MODULE_V1
+        )
+    ).then_return(minimal_module_def)
+
+    await subject.load_module(
+        model=ModuleModels.TEMPERATURE_MODULE_V1,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        module_id=None,
+    )
+
+    decoy.verify(
+        await hardware_api.find_modules(
+            ModuleModel.TEMPERATURE_V1, ModuleType.TEMPERATURE
+        )
+    )

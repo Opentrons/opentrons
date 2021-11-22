@@ -62,6 +62,10 @@ class PipetteDoesNotExistError(ProtocolEngineError):
     """An error raised when referencing a pipette that does not exist."""
 
 
+class ModuleDoesNotExistError(ProtocolEngineError):
+    """And error raised when referencing a module that does not exist."""
+
+
 class SlotDoesNotExistError(ProtocolEngineError):
     """An error raised when referencing a deck slot that does not exist."""
 

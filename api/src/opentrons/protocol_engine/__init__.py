@@ -27,6 +27,7 @@ from .types import (
     WellLocation,
     WellOrigin,
     WellOffset,
+    ModuleModels,
 )
 
 __all__ = [
@@ -59,6 +60,7 @@ __all__ = [
     "WellLocation",
     "WellOrigin",
     "WellOffset",
+    "ModuleModels",
     # plugins
     "AbstractPlugin",
 ]

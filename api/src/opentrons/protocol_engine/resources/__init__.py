@@ -6,6 +6,7 @@ as needed. Some classes may contain solely static methods.
 from .model_utils import ModelUtils
 from .deck_data_provider import DeckDataProvider, DeckFixedLabware
 from .labware_data_provider import LabwareDataProvider
+from .module_data_provider import ModuleDataProvider
 
 
 __all__ = [
@@ -13,4 +14,5 @@ __all__ = [
     "LabwareDataProvider",
     "DeckDataProvider",
     "DeckFixedLabware",
+    "ModuleDataProvider",
 ]
