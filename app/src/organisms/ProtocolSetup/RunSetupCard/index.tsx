@@ -74,7 +74,7 @@ export function RunSetupCard(): JSX.Element | null {
       INITIAL_EXPAND_DELAY_MS
     )
     return () => clearTimeout(initialExpandTimer)
-  }, [Boolean(protocolData)])
+  }, [Boolean(protocolData), protocolData?.commands])
 
   if (protocolData == null || robot == null) return null
 

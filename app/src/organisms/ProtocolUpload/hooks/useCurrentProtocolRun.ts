@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { useQueryClient } from 'react-query'
 import {
   useHost,
@@ -26,9 +27,16 @@ export function useCurrentProtocolRun(): UseCurrentProtocolRun {
   const { data: runRecord } = useRunQuery(currentRunId, {
     refetchInterval: REFETCH_INTERVAL,
   })
-  const { data: protocolRecord } = useProtocolQuery(
+  const { data: protocolRecord, refetch: refetchProtocol } = useProtocolQuery(
     (runRecord?.data?.protocolId as string) ?? null
   )
+
+  React.useEffect(() => {
+    if (protocolRecord?.data.analyses.length === 0) {
+      const intervalId = setInterval(refetchProtocol, REFETCH_INTERVAL)
+      return () => clearInterval(intervalId)
+    }
+  }, [protocolRecord?.data.analyses])
 
   const { createRun } = useCreateRunMutation({
     onSuccess: () => {
