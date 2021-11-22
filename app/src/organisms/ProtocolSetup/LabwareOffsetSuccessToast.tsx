@@ -17,7 +17,8 @@ export function LabwareOffsetSuccessToast(
 ): JSX.Element {
   const { t } = useTranslation('protocol_info')
   const currentProtocolRun = useCurrentProtocolRun()
-  const labwareOffsets = currentProtocolRun.runRecord?.data.labwareOffsets
+  const currentRunData = currentProtocolRun.runRecord?.data
+  const labwareOffsets = currentRunData?.labwareOffsets
 
   return (
     <Flex
