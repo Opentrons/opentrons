@@ -11,12 +11,12 @@ import {
   Link,
   SPACING_1,
 } from '@opentrons/components'
+import { LabwareOffsetSuccessToast } from './LabwareOffsetSuccessToast'
 import { RunSetupCard } from './RunSetupCard'
 import { MetadataCard } from './MetadataCard'
 
 const feedbackFormLink =
   'https://docs.google.com/forms/d/e/1FAIpQLSd6oSV82IfgzSi5t_FP6n_pB_Y8wPGmAgFHsiiFho9qhxr-UQ/viewform'
-import { LabwareOffsetSuccessToast } from './LabwareOffsetSuccessToast'
 
 export function ProtocolSetup(): JSX.Element {
   const { t } = useTranslation(['protocol_upload'])
