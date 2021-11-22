@@ -102,7 +102,7 @@ export const LabwareSetup = (): JSX.Element | null => {
               <React.Fragment>
                 {map(
                   moduleRenderInfoById,
-                  ({ x, y, moduleDef, nestedLabwareDef }) => (
+                  ({ x, y, moduleDef, nestedLabwareDef, nestedLabwareId }) => (
                     <Module
                       key={`LabwareSetup_Module_${moduleDef.model}_${x}${y}`}
                       x={x}
@@ -120,24 +120,33 @@ export const LabwareSetup = (): JSX.Element | null => {
                           key={`LabwareSetup_Labware_${nestedLabwareDef.metadata.displayName}_${x}${y}`}
                         >
                           <LabwareRender definition={nestedLabwareDef} />
-                          <LabwareInfoOverlay definition={nestedLabwareDef} />
+                          <LabwareInfoOverlay
+                            definition={nestedLabwareDef}
+                            labwareId={nestedLabwareId}
+                          />
                         </React.Fragment>
                       ) : null}
                     </Module>
                   )
                 )}
-                {map(labwareRenderInfoById, ({ x, y, labwareDef }) => {
-                  return (
-                    <React.Fragment
-                      key={`LabwareSetup_Labware_${labwareDef.metadata.displayName}_${x}${y}`}
-                    >
-                      <g transform={`translate(${x},${y})`}>
-                        <LabwareRender definition={labwareDef} />
-                        <LabwareInfoOverlay definition={labwareDef} />
-                      </g>
-                    </React.Fragment>
-                  )
-                })}
+                {map(
+                  labwareRenderInfoById,
+                  ({ x, y, labwareDef }, labwareId) => {
+                    return (
+                      <React.Fragment
+                        key={`LabwareSetup_Labware_${labwareDef.metadata.displayName}_${x}${y}`}
+                      >
+                        <g transform={`translate(${x},${y})`}>
+                          <LabwareRender definition={labwareDef} />
+                          <LabwareInfoOverlay
+                            definition={labwareDef}
+                            labwareId={labwareId}
+                          />
+                        </g>
+                      </React.Fragment>
+                    )
+                  }
+                )}
               </React.Fragment>
             )
           }}
