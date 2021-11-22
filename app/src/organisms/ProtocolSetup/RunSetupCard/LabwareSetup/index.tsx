@@ -17,7 +17,6 @@ import {
   SPACING_3,
   C_BLUE,
   C_DARK_GRAY,
-  C_NEAR_WHITE,
   DIRECTION_ROW,
   Box,
   FONT_WEIGHT_SEMIBOLD,
@@ -79,12 +78,7 @@ export const LabwareSetup = (): JSX.Element | null => {
           onCloseClick={() => setShowLabwarePositionCheckModal(false)}
         />
       )}
-      <Flex
-        flex="1"
-        backgroundColor={C_NEAR_WHITE}
-        borderRadius="6px"
-        flexDirection={DIRECTION_COLUMN}
-      >
+      <Flex flex="1" maxHeight="85vh" flexDirection={DIRECTION_COLUMN}>
         {moduleTypesThatRequireExtraAttention.length > 0 && (
           <ExtraAttentionWarning
             moduleTypes={moduleTypesThatRequireExtraAttention}

@@ -27,7 +27,6 @@ export const LabwareOffsetsSummary = (
 ): JSX.Element | null => {
   const { offsetData } = props
   const { t } = useTranslation('labware_position_check')
-
   return (
     <React.Fragment>
       <Flex
@@ -130,19 +129,19 @@ export const LabwareOffsetsSummary = (
                       X
                     </Text>
                     <Text key={x} as={'span'} marginRight={SPACING_2}>
-                      {x.toPrecision(1)}
+                      {x.toFixed(2)}
                     </Text>
                     <Text as={'strong'} marginRight={SPACING_1}>
                       Y
                     </Text>
                     <Text key={y} as={'span'} marginRight={SPACING_2}>
-                      {y.toPrecision(1)}
+                      {y.toFixed(2)}
                     </Text>
                     <Text as={'strong'} marginRight={SPACING_1}>
                       Z
                     </Text>
                     <Text key={z} as={'span'} marginRight={SPACING_2}>
-                      {z.toPrecision(1)}
+                      {z.toFixed(2)}
                     </Text>
                   </Flex>
                 )

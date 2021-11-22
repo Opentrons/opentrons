@@ -29,7 +29,7 @@ import {
 import { protocolHasModules } from '@opentrons/shared-data'
 import { Divider } from '../../../atoms/structure'
 import { getConnectedRobot } from '../../../redux/discovery/selectors'
-import { getProtocolCalibrationComplete } from '../../../redux/calibration/selectors'
+import { useProtocolCalibrationStatus } from '../RunSetupCard/hooks/useProtocolCalibrationStatus'
 import { useProtocolDetails } from '../../RunDetails/hooks'
 import { CollapsibleStep } from './CollapsibleStep'
 import { ProceedToRunCta } from './ProceedToRunCta'
@@ -42,6 +42,8 @@ const ROBOT_CALIBRATION_STEP_KEY = 'robot_calibration_step' as const
 const MODULE_SETUP_KEY = 'module_setup_step' as const
 const LABWARE_SETUP_KEY = 'labware_setup_step' as const
 
+const INITIAL_EXPAND_DELAY_MS = 700
+
 export type StepKey =
   | typeof ROBOT_CALIBRATION_STEP_KEY
   | typeof MODULE_SETUP_KEY
@@ -51,13 +53,16 @@ export function RunSetupCard(): JSX.Element | null {
   const { t } = useTranslation('protocol_setup')
   const { protocolData } = useProtocolDetails()
   const robot = useSelector((state: State) => getConnectedRobot(state))
-  const robotName = robot?.name != null ? robot?.name : ''
-  const calibrationStatus = useSelector((state: State) => {
-    return getProtocolCalibrationComplete(state, robotName)
-  })
+  const calibrationStatus = useProtocolCalibrationStatus()
+
   const [expandedStepKey, setExpandedStepKey] = React.useState<StepKey | null>(
     null
   )
+  const [stepsKeysInOrder, setStepKeysInOrder] = React.useState<StepKey[]>([
+    ROBOT_CALIBRATION_STEP_KEY,
+    LABWARE_SETUP_KEY,
+  ])
+
   const [isLoading, setIsLoading] = React.useState<Boolean>(true)
 
   // Set loader to false once protocolData contains data and is not null
@@ -67,23 +72,29 @@ export function RunSetupCard(): JSX.Element | null {
     }
   }, [protocolData])
 
-  if (
-    protocolData == null ||
-    robot == null ||
-    ('metadata' in protocolData && Object.keys(protocolData).length === 1)
-  )
-    return null
+  React.useEffect(() => {
+    if (protocolData != null && protocolHasModules(protocolData)) {
+      setStepKeysInOrder([
+        ROBOT_CALIBRATION_STEP_KEY,
+        MODULE_SETUP_KEY,
+        LABWARE_SETUP_KEY,
+      ])
+    }
+    let initialExpandedStepKey: StepKey = ROBOT_CALIBRATION_STEP_KEY
+    if (calibrationStatus.complete) {
+      initialExpandedStepKey =
+        stepsKeysInOrder[
+          stepsKeysInOrder.findIndex(v => v === ROBOT_CALIBRATION_STEP_KEY) + 1
+        ]
+    }
+    const initialExpandTimer = setTimeout(
+      () => setExpandedStepKey(initialExpandedStepKey),
+      INITIAL_EXPAND_DELAY_MS
+    )
+    return () => clearTimeout(initialExpandTimer)
+  }, [Boolean(protocolData)])
 
-  let stepsKeysInOrder: StepKey[] = [ROBOT_CALIBRATION_STEP_KEY]
-  if (protocolHasModules(protocolData)) {
-    stepsKeysInOrder = [
-      ...stepsKeysInOrder,
-      MODULE_SETUP_KEY,
-      LABWARE_SETUP_KEY,
-    ]
-  } else {
-    stepsKeysInOrder = [...stepsKeysInOrder, LABWARE_SETUP_KEY]
-  }
+  if (protocolData == null || robot == null) return null
 
   const StepDetailMap: Record<
     StepKey,
@@ -93,7 +104,13 @@ export function RunSetupCard(): JSX.Element | null {
       stepInternals: (
         <RobotCalibration
           robot={robot}
-          nextStep={stepsKeysInOrder[1]}
+          nextStep={
+            stepsKeysInOrder[
+              stepsKeysInOrder.findIndex(
+                v => v === ROBOT_CALIBRATION_STEP_KEY
+              ) + 1
+            ]
+          }
           expandStep={nextStep => setExpandedStepKey(nextStep)}
           calibrationStatus={calibrationStatus}
         />

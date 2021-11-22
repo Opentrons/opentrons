@@ -121,6 +121,10 @@ async def create_run(
     except EngineConflictError as e:
         raise RunAlreadyActive(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
 
+    if request_body is not None:
+        for offset_request in request_body.data.labwareOffsets:
+            engine_store.engine.add_labware_offset(offset_request)
+
     if protocol_resource is not None:
         engine_store.runner.load(protocol_resource)
 
@@ -151,6 +155,7 @@ async def create_run(
         errors=[],
         pipettes=engine_state.pipettes.get_all(),
         labware=engine_state.labware.get_all(),
+        labwareOffsets=engine_state.labware.get_labware_offsets(),
         status=engine_state.commands.get_status(),
     )
 
@@ -198,6 +203,7 @@ async def get_runs(
             errors=engine_state.commands.get_all_errors(),
             pipettes=engine_state.pipettes.get_all(),
             labware=engine_state.labware.get_all(),
+            labwareOffsets=engine_state.labware.get_labware_offsets(),
             status=engine_state.commands.get_status(),
         )
 
@@ -254,6 +260,7 @@ async def get_run(
         errors=engine_state.commands.get_all_errors(),
         pipettes=engine_state.pipettes.get_all(),
         labware=engine_state.labware.get_all(),
+        labwareOffsets=engine_state.labware.get_labware_offsets(),
         status=engine_state.commands.get_status(),
     )
 
@@ -363,6 +370,7 @@ async def update_run(
         errors=engine_state.commands.get_all_errors(),
         pipettes=engine_state.pipettes.get_all(),
         labware=engine_state.labware.get_all(),
+        labwareOffsets=engine_state.labware.get_labware_offsets(),
         status=engine_state.commands.get_status(),
     )
 
