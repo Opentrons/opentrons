@@ -158,6 +158,10 @@ class LabwareOffsetCreate(BaseModel):
     """Create request data for a labware offset."""
 
     definitionUri: str = Field(..., description="The URI for the labware's definition.")
+    # todo(mm, 2021-11-22): It's currently wrong for this to take a LabwareLocation.
+    # LabwareLocation assumes you can know the ID of the module you're loading on,
+    # which isn't currently possible before the loadModule is executed. Change this
+    # field to take something with a module model string, instead of a module ID.
     location: LabwareLocation = Field(
         ...,
         description="Where the labware is located on the robot.",

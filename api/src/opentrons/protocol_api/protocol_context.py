@@ -91,8 +91,7 @@ class ProtocolContext(CommandPublisher):
         """Build a :py:class:`.ProtocolContext`.
 
         :param labware_offset_provider: Where this protocol context and its child
-                                        module contexts will get labware offsets from,
-                                        when labware is loaded on them.
+                                        module contexts will get labware offsets from.
         :param loop: An event loop to use. If not specified, this ctor will
                      (eventually) call :py:meth:`asyncio.get_event_loop`.
         :param broker: An optional command broker to link to. If not
@@ -397,12 +396,13 @@ class ProtocolContext(CommandPublisher):
 
         result_namespace, result_load_name, result_version = result.uri.split("/")
 
-        delta, pe_labware_offset_id = self._labware_offset_provider.find(
+        provided_labware_offset = self._labware_offset_provider.find(
+            labware_definition_uri=result.uri,
+            module_model=None,
             deck_slot=types.DeckSlotName.from_primitive(location),
-            definition_uri=result.uri,
         )
 
-        result.set_calibration(delta=delta)
+        result.set_calibration(delta=provided_labware_offset.delta)
 
         self.labware_load_broker.publish(
             LabwareLoadInfo(
@@ -412,7 +412,7 @@ class ProtocolContext(CommandPublisher):
                 labware_version=int(result_version),
                 deck_slot=types.DeckSlotName.from_primitive(location),
                 on_module=False,
-                pe_labware_offset_id=pe_labware_offset_id,
+                pe_labware_offset_id=provided_labware_offset.protocol_engine_id,
             )
         )
 
@@ -463,12 +463,13 @@ class ProtocolContext(CommandPublisher):
 
         result_namespace, result_load_name, result_version = result.uri.split("/")
 
-        delta, pe_labware_offset_id = self._labware_offset_provider.find(
+        provided_labware_offset = self._labware_offset_provider.find(
+            labware_definition_uri=result.uri,
+            module_model=None,
             deck_slot=types.DeckSlotName.from_primitive(location),
-            definition_uri=result.uri,
         )
 
-        result.set_calibration(delta=delta)
+        result.set_calibration(delta=provided_labware_offset.delta)
 
         self.labware_load_broker.publish(
             LabwareLoadInfo(
@@ -478,7 +479,7 @@ class ProtocolContext(CommandPublisher):
                 labware_version=int(result_version),
                 deck_slot=types.DeckSlotName.from_primitive(location),
                 on_module=False,
-                pe_labware_offset_id=pe_labware_offset_id,
+                pe_labware_offset_id=provided_labware_offset.protocol_engine_id,
             )
         )
 
