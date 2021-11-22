@@ -42,6 +42,10 @@ from .module_contexts import (
     TemperatureModuleContext,
     ThermocyclerContext,
 )
+from .labware_offset_provider import (
+    AbstractLabwareOffsetProvider,
+    NullLabwareOffsetProvider,
+)
 from .load_info import LabwareLoadInfo, ModuleLoadInfo, InstrumentLoadInfo
 from opentrons.protocols.api_support.util import (
     AxisMaxSpeeds,
@@ -79,12 +83,16 @@ class ProtocolContext(CommandPublisher):
     def __init__(
         self,
         implementation: AbstractProtocol,
-        loop: asyncio.AbstractEventLoop = None,
+        labware_offset_provider: Optional[AbstractLabwareOffsetProvider] = None,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
         broker=None,
         api_version: Optional[APIVersion] = None,
     ) -> None:
         """Build a :py:class:`.ProtocolContext`.
 
+        :param labware_offset_provider: Where this protocol context and its child
+                                        module contexts will get labware offsets from,
+                                        when labware is loaded on them.
         :param loop: An event loop to use. If not specified, this ctor will
                      (eventually) call :py:meth:`asyncio.get_event_loop`.
         :param broker: An optional command broker to link to. If not
@@ -95,6 +103,10 @@ class ProtocolContext(CommandPublisher):
         super().__init__(broker)
 
         self._implementation = implementation
+
+        self._labware_offset_provider = (
+            labware_offset_provider or NullLabwareOffsetProvider()
+        )
 
         self._api_version = api_version or MAX_SUPPORTED_VERSION
         if self._api_version > MAX_SUPPORTED_VERSION:
@@ -381,6 +393,14 @@ class ProtocolContext(CommandPublisher):
         result = Labware(implementation=implementation)
 
         result_namespace, result_load_name, result_version = result.uri.split("/")
+
+        delta, pe_labware_offset_id = self._labware_offset_provider.find(
+            deck_slot=types.DeckSlotName.from_primitive(location),
+            definition_uri=result.uri,
+        )
+
+        result.set_calibration(delta=delta)
+
         self.labware_load_broker.publish(
             LabwareLoadInfo(
                 labware_definition=result._implementation.get_definition(),
@@ -389,7 +409,7 @@ class ProtocolContext(CommandPublisher):
                 labware_version=int(result_version),
                 deck_slot=types.DeckSlotName.from_primitive(location),
                 on_module=False,
-                pe_labware_offset_id=None,  # FIX BEFORE MERGE.
+                pe_labware_offset_id=pe_labware_offset_id,
             )
         )
 
@@ -436,6 +456,14 @@ class ProtocolContext(CommandPublisher):
         result = Labware(implementation=implementation)
 
         result_namespace, result_load_name, result_version = result.uri.split("/")
+
+        delta, pe_labware_offset_id = self._labware_offset_provider.find(
+            deck_slot=types.DeckSlotName.from_primitive(location),
+            definition_uri=result.uri,
+        )
+
+        result.set_calibration(delta=delta)
+
         self.labware_load_broker.publish(
             LabwareLoadInfo(
                 labware_definition=result._implementation.get_definition(),
@@ -444,7 +472,7 @@ class ProtocolContext(CommandPublisher):
                 labware_version=int(result_version),
                 deck_slot=types.DeckSlotName.from_primitive(location),
                 on_module=False,
-                pe_labware_offset_id=None,  # FIX BEFORE MERGE.
+                pe_labware_offset_id=pe_labware_offset_id,
             )
         )
 
