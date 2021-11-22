@@ -77,7 +77,7 @@ describe('useMissingModuleIds', () => {
           z: 0,
           moduleDef: mockMagneticModuleDef as any,
           nestedLabwareDef: null,
-          nestedLabwareId: null,
+          nestedLabwareId: '',
         },
       })
 
