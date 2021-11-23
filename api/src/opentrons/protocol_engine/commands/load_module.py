@@ -14,8 +14,6 @@ LoadModuleCommandType = Literal["loadModule"]
 class LoadModuleParams(BaseModel):
     """Payload required to load a module."""
 
-    # todo(mm, 2021-11-01): Use an enum instead of a str. shared-data defines the
-    # possible model names.
     model: ModuleModels = Field(
         ...,
         example="magneticModuleV1",

@@ -42,9 +42,9 @@ class LegacyContextCommandError(ProtocolEngineError):
 LEGACY_TO_PE_MODULE: Dict[LegacyModuleModel, pe_types.ModuleModels] = {
     LegacyMagneticModuleModel.MAGNETIC_V1: pe_types.ModuleModels.MAGNETIC_MODULE_V1,
     LegacyMagneticModuleModel.MAGNETIC_V2: pe_types.ModuleModels.MAGNETIC_MODULE_V2,
-    LegacyTemperatureModuleModel.TEMPERATURE_V1: pe_types.ModuleModels.TEMPERATURE_MODULE_V1,   # noqa: E501
-    LegacyTemperatureModuleModel.TEMPERATURE_V2: pe_types.ModuleModels.TEMPERATURE_MODULE_V2,   # noqa: E501
-    LegacyThermocyclerModuleModel.THERMOCYCLER_V1: pe_types.ModuleModels.THERMOCYCLER_MODULE_V1,    # noqa: E501
+    LegacyTemperatureModuleModel.TEMPERATURE_V1: pe_types.ModuleModels.TEMPERATURE_MODULE_V1,  # noqa: E501
+    LegacyTemperatureModuleModel.TEMPERATURE_V2: pe_types.ModuleModels.TEMPERATURE_MODULE_V2,  # noqa: E501
+    LegacyThermocyclerModuleModel.THERMOCYCLER_V1: pe_types.ModuleModels.THERMOCYCLER_MODULE_V1,  # noqa: E501
 }
 
 
