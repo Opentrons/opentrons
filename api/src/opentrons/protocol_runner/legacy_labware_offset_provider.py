@@ -7,7 +7,7 @@ from typing import Optional
 
 from opentrons.types import DeckSlotName, Point
 
-from opentrons.protocol_engine import DeckSlotLocation
+from opentrons.protocol_engine import LabwareOffsetLocation
 from opentrons.protocol_engine.state import LabwareView
 from opentrons.protocol_api.labware_offset_provider import (
     ProvidedLabwareOffset as LegacyProvidedLabwareOffset,
@@ -37,7 +37,7 @@ class LegacyLabwareOffsetProvider(AbstractLegacyLabwareOffsetProvider):
             )
         offset = self._labware_view.find_applicable_labware_offset(
             definition_uri=labware_definition_uri,
-            location=DeckSlotLocation(slotName=deck_slot),
+            location=LabwareOffsetLocation(slotName=deck_slot),
         )
         if offset is None:
             return LegacyProvidedLabwareOffset(

@@ -14,6 +14,7 @@ from opentrons.protocol_engine.types import (
     Dimensions,
     LabwareOffset,
     LabwareOffsetVector,
+    LabwareOffsetLocation,
     LoadedLabware,
 )
 
@@ -396,7 +397,7 @@ def test_get_labware_offset_vector() -> None:
         id="offset-id",
         createdAt=datetime(year=2021, month=1, day=2),
         definitionUri="some-labware-uri",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
         vector=offset_vector,
     )
 
@@ -424,7 +425,7 @@ def test_get_labware_offset() -> None:
         id="id-a",
         createdAt=datetime(year=2021, month=1, day=1),
         definitionUri="uri-a",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
         vector=LabwareOffsetVector(x=1, y=1, z=1),
     )
 
@@ -432,7 +433,7 @@ def test_get_labware_offset() -> None:
         id="id-b",
         createdAt=datetime(year=2022, month=2, day=2),
         definitionUri="uri-b",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
+        location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_2),
         vector=LabwareOffsetVector(x=2, y=2, z=2),
     )
 
@@ -452,7 +453,7 @@ def test_get_labware_offsets() -> None:
         id="id-a",
         createdAt=datetime(year=2021, month=1, day=1),
         definitionUri="uri-a",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
         vector=LabwareOffsetVector(x=1, y=1, z=1),
     )
 
@@ -460,7 +461,7 @@ def test_get_labware_offsets() -> None:
         id="id-b",
         createdAt=datetime(year=2022, month=2, day=2),
         definitionUri="uri-b",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
+        location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_2),
         vector=LabwareOffsetVector(x=2, y=2, z=2),
     )
 
@@ -484,7 +485,7 @@ def test_find_applicable_labware_offset() -> None:
         id="id-1",
         createdAt=datetime(year=2021, month=1, day=1),
         definitionUri="definition-uri",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
         vector=LabwareOffsetVector(x=1, y=1, z=1),
     )
 
@@ -493,29 +494,51 @@ def test_find_applicable_labware_offset() -> None:
         id="id-2",
         createdAt=datetime(year=2022, month=2, day=2),
         definitionUri="definition-uri",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
         vector=LabwareOffsetVector(x=2, y=2, z=2),
+    )
+
+    offset_3 = LabwareOffset(
+        id="id-3",
+        createdAt=datetime(year=2023, month=3, day=3),
+        definitionUri="on-module-definition-uri",
+        location=LabwareOffsetLocation(
+            slotName=DeckSlotName.SLOT_1,
+            moduleModel="tempdeck",
+        ),
+        vector=LabwareOffsetVector(x=3, y=3, z=3),
     )
 
     subject = get_labware_view(
         # Simulate offset_2 having been added after offset_1.
-        labware_offsets_by_id={"id-1": offset_1, "id-2": offset_2}
+        labware_offsets_by_id={"id-1": offset_1, "id-2": offset_2, "id-3": offset_3}
     )
 
     # Matching both definitionURI and location. Should return 2nd (most recent) offset.
     assert (
         subject.find_applicable_labware_offset(
             definition_uri="definition-uri",
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
         )
         == offset_2
+    )
+
+    assert (
+        subject.find_applicable_labware_offset(
+            definition_uri="on-module-definition-uri",
+            location=LabwareOffsetLocation(
+                slotName=DeckSlotName.SLOT_1,
+                moduleModel="tempdeck",
+            ),
+        )
+        == offset_3
     )
 
     # Doesn't match anything, since definitionUri is different.
     assert (
         subject.find_applicable_labware_offset(
             definition_uri="different-definition-uri",
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
         )
         is None
     )
@@ -524,7 +547,7 @@ def test_find_applicable_labware_offset() -> None:
     assert (
         subject.find_applicable_labware_offset(
             definition_uri="different-definition-uri",
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
+            location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_2),
         )
         is None
     )
