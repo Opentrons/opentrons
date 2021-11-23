@@ -4,16 +4,16 @@ import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
 import type { LabwareOffset, Run } from './types'
 
-export interface CreateLabwareOffsetData {
+export interface CreateLabwareOffsetsData {
   labwareOffsets: LabwareOffset[]
 }
 
-export function createLabwareOffset(
+export function createLabwareOffsets(
   config: HostConfig,
   runId: string,
-  data: CreateLabwareOffsetData
+  data: CreateLabwareOffsetsData
 ): ResponsePromise<Run> {
-  return request<Run, { data: CreateLabwareOffsetData }>(
+  return request<Run, { data: CreateLabwareOffsetsData }>(
     POST,
     `/runs/${runId}`,
     { data },

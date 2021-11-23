@@ -33,6 +33,8 @@ import { LabwareInfoOverlay } from './LabwareInfoOverlay'
 import { LabwareOffsetModal } from './LabwareOffsetModal'
 import { getModuleTypesThatRequireExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
 import { ExtraAttentionWarning } from './ExtraAttentionWarning'
+import { LabwareOffsetSuccessToast } from '../../LabwareOffsetSuccessToast'
+import { Portal } from '../../../../App/portal'
 
 const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
@@ -79,6 +81,7 @@ export const LabwareSetup = (): JSX.Element | null => {
         />
       )}
       <Flex flex="1" maxHeight="85vh" flexDirection={DIRECTION_COLUMN}>
+      <LabwareOffsetSuccessToast />
         {moduleTypesThatRequireExtraAttention.length > 0 && (
           <ExtraAttentionWarning
             moduleTypes={moduleTypesThatRequireExtraAttention}

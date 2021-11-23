@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid'
 import {
   HostConfig,
   createCommand, // TODO: create hook for this inside react-api-client
-  createLabwareOffset, // TODO: create hook for this inside react-api-client
+  createLabwareOffsets, // TODO: create hook for this inside react-api-client
   RunCommandSummary,
   getCommand,
   VectorOffset,
@@ -37,6 +37,7 @@ import type {
   SavePositionCommandData,
 } from '../types'
 import { getLabwareDefinitionUri } from '../../utils/getLabwareDefinitionUri'
+import { useCreateLabwareOffsetsMutation } from '../../../../../../react-api-client/src/runs/useCreateLabwareOffsetsMutation'
 
 export type LabwarePositionCheckUtils =
   | {
@@ -196,6 +197,7 @@ export function useLabwarePositionCheck(
     IDENTITY_OFFSET
   )
   const { protocolData } = useProtocolDetails()
+  const { createLabwareOffsets } = useCreateLabwareOffsetsMutation()
   const host = useHost()
   const { runRecord: currentRun } = useCurrentProtocolRun()
   const LPCSteps = useSteps()
@@ -476,11 +478,9 @@ export function useLabwarePositionCheck(
       []
     )
 
-    createLabwareOffset(host as HostConfig, currentRun?.data?.id as string, {
-      labwareOffsets: identityLabwareOffsets,
-    }).catch((e: Error) => {
-      console.error(`error posting identity offsets to robot: ${e.message}`)
-      setError(e)
+    createLabwareOffsets({
+      runId: currentRun?.data.id as string,
+      data: { labwareOffsets: identityLabwareOffsets },
     })
 
     // execute prep commands
