@@ -40,16 +40,16 @@ describe('useCreateCommandMutation hook', () => {
       .calledWith(HOST_CONFIG, RUN_ID_1, mockAnonLoadCommand)
       .mockResolvedValue({ data: 'something' } as any)
 
-    const { result, waitFor } = renderHook(
-      () => useCreateCommandMutation(),
-      {
-        wrapper,
-      }
-    )
+    const { result, waitFor } = renderHook(() => useCreateCommandMutation(), {
+      wrapper,
+    })
 
     expect(result.current.data).toBeUndefined()
     act(() => {
-      result.current.createCommand({runId: RUN_ID_1, command: mockAnonLoadCommand})
+      result.current.createCommand({
+        runId: RUN_ID_1,
+        command: mockAnonLoadCommand,
+      })
     })
     await waitFor(() => {
       return result.current.data != null

@@ -81,7 +81,6 @@ export const LabwareSetup = (): JSX.Element | null => {
         />
       )}
       <Flex flex="1" maxHeight="85vh" flexDirection={DIRECTION_COLUMN}>
-      <LabwareOffsetSuccessToast />
         {moduleTypesThatRequireExtraAttention.length > 0 && (
           <ExtraAttentionWarning
             moduleTypes={moduleTypesThatRequireExtraAttention}

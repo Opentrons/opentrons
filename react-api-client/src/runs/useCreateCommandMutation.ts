@@ -1,13 +1,16 @@
 import { useMutation, useQueryClient } from 'react-query'
 import { createCommand } from '@opentrons/api-client'
 import { useHost } from '../api'
-import type { HostConfig, EmptyResponse } from '@opentrons/api-client'
 import type {
   UseMutationResult,
   UseMutationOptions,
-  UseMutateFunction,
+  UseMutateAsyncFunction,
 } from 'react-query'
-import type { AnonymousCommand, CommandData } from '@opentrons/api-client'
+import type {
+  AnonymousCommand,
+  CommandData,
+  HostConfig,
+} from '@opentrons/api-client'
 
 interface CreateCommandParams {
   runId: string
@@ -19,7 +22,11 @@ export type UseCreateCommandMutationResult = UseMutationResult<
   unknown,
   CreateCommandParams
 > & {
-  createCommand: UseMutateFunction<CommandData, unknown, CreateCommandParams>
+  createCommand: UseMutateAsyncFunction<
+    CommandData,
+    unknown,
+    CreateCommandParams
+  >
 }
 
 export type UseCreateCommandMutationOptions = UseMutationOptions<
@@ -35,7 +42,6 @@ export function useCreateCommandMutation(): UseCreateCommandMutationResult {
   const mutation = useMutation<CommandData, unknown, CreateCommandParams>(
     ({ runId, command }) =>
       createCommand(host as HostConfig, runId, command).then(response => {
-        queryClient.removeQueries([host, 'runs', runId])
         queryClient
           .invalidateQueries([host, 'runs'])
           .catch((e: Error) =>
@@ -47,6 +53,6 @@ export function useCreateCommandMutation(): UseCreateCommandMutationResult {
 
   return {
     ...mutation,
-    createCommand: mutation.mutate,
+    createCommand: mutation.mutateAsync,
   }
 }
