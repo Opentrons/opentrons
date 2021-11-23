@@ -2,7 +2,7 @@ import * as React from 'react'
 import '@testing-library/jest-dom'
 import { fireEvent } from '@testing-library/dom'
 import { when } from 'jest-when'
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders, anyProps } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { AlertItem } from '@opentrons/components/src/alerts'
 import { LabwareOffsetSuccessToast } from '../LabwareOffsetSuccessToast'
@@ -107,7 +107,9 @@ describe(' LabwareOffsetSuccessToast', () => {
 
   beforeEach(() => {
     props = { onCloseClick: jest.fn() }
-    mockAlertItem.mockReturnValue(<div>No Labware Offsets created</div>)
+    when(mockAlertItem)
+      .calledWith(anyProps())
+      .mockReturnValue(<div>No Labware Offsets created</div>)
     when(mockUseCurrentProtocolRun)
       .calledWith()
       .mockReturnValue({
@@ -129,16 +131,17 @@ describe(' LabwareOffsetSuccessToast', () => {
   })
   it('renders LPC success toast and is clickable with 1 offset', () => {
     mockAlertItem.mockReturnValue(<div>1 Labware Offsets created</div>)
+    const { getByText, getByTestId } = render(props)
     when(mockUseCurrentProtocolRun)
       .calledWith()
       .mockReturnValue({
         runRecord: { data: mock1OffsetsRun },
       } as UseCurrentProtocolRun)
-    const { getByText } = render(props)
     expect(getByText('1 Labware Offsets created')).toHaveStyle(
       'backgroundColor: c-success'
     )
     const successToast = getByText('1 Labware Offsets created')
     fireEvent.click(successToast)
+    expect(successToast).toBeTruthy()
   })
 })

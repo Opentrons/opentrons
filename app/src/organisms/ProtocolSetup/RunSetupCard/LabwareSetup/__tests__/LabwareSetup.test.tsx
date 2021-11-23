@@ -8,6 +8,7 @@ import {
   LabwareRender,
   RobotWorkSpace,
   Module,
+  anyProps,
 } from '@opentrons/components'
 import {
   inferModuleOrientationFromXCoordinate,
@@ -149,12 +150,8 @@ describe('LabwareSetup', () => {
         <div onClick={onCloseClick}>mock LabwareOffsetModal </div>
       ))
     when(mockLabwareOffsetSuccessToast)
-      .calledWith(
-        componentPropsMatcher({
-          onCloseClick: expect.anything(),
-        })
-      )
-      .mockReturnValue(<div>mock LabwareOffsetSuccessToast </div>)
+      .calledWith(anyProps())
+      .mockReturnValue(<div>mock Labware Success Toast</div>)
 
     when(mockLabwareRender)
       .mockReturnValue(<div></div>) // this (default) empty div will be returned when LabwareRender isn't called with expected labware definition
@@ -353,16 +350,16 @@ describe('LabwareSetup', () => {
     const { getByText } = render()
     getByText('mock extra attention warning with magnetic module and TC')
   })
-  it('should render LPC success toast when apply LPC offsets button is clicked', () => {
+  it('should render close LPC', () => {
     expect(screen.queryByText('mock LabwareOffsetSuccessToast')).toBeNull()
-    when(mockLabwarePostionCheck)
-      .calledWith(
-        partialComponentPropsMatcher({
-          onLabwarePositionCheckComplete: expect.anything(),
-        })
-      )
-      .mockImplementation(({ onLabwarePositionCheckComplete }) => (
-        <div onClick={onLabwarePositionCheckComplete}></div>
-      ))
+    const { getByText, getByRole } = render()
+    const button = getByRole('button', {
+      name: 'run labware position check',
+    })
+    fireEvent.click(button)
+    const LPC = getByText('mock Labware Position Check')
+
+    fireEvent.click(LPC)
+    expect(screen.queryByText('mock Labware Position CHeck')).toBeNull()
   })
 })
