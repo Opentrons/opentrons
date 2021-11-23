@@ -21,9 +21,9 @@ import {
   FONT_SIZE_CAPTION,
 } from '@opentrons/components'
 import { useCurrentProtocolRun } from '../../../ProtocolUpload/hooks'
-import { useLabwareDefinitionUri } from '../../hooks'
 import { getLabwareLocation } from '../../utils/getLabwareLocation'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
+import { getLabwareDefinitionUri } from '../../utils/getLabwareDefinitionUri'
 interface LabwareInfoProps {
   displayName: string
   labwareId: string
@@ -41,7 +41,10 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element => {
   const { displayName, labwareId } = props
   const { t } = useTranslation('protocol_setup')
   const { protocolData } = useProtocolDetails()
-  const labwareDefinitionUri = useLabwareDefinitionUri(labwareId)
+  const labwareDefinitionUri = getLabwareDefinitionUri(
+    labwareId,
+    protocolData?.labware
+  )
   const { runRecord } = useCurrentProtocolRun()
   const labwareLocation = getLabwareLocation(
     labwareId,

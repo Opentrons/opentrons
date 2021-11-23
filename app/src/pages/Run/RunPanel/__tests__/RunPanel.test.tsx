@@ -8,12 +8,11 @@ import {
 
 import { i18n } from '../../../../i18n'
 
-import { useFeatureFlag } from '../../../../redux/config'
 import { RunTimeControl } from '../../../../organisms/RunTimeControl'
 import { RunTimer } from '../RunTimer'
 import { RunControls } from '../RunControls'
 import { ModuleLiveStatusCards } from '../ModuleLiveStatusCards'
-import { RunPanelComponent } from '../'
+import { RunPanel } from '../'
 
 jest.mock('../RunTimer')
 jest.mock('../RunControls')
@@ -25,26 +24,9 @@ const mockRunTimer = RunTimer as jest.Mock
 const mockRunControls = RunControls as jest.MockedFunction<typeof RunControls>
 const mockModuleLiveStatusCards = ModuleLiveStatusCards as jest.Mock
 const mockRunTimeControl = RunTimeControl as jest.Mock
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
->
 
 const render = () => {
-  return renderWithProviders(
-    <RunPanelComponent
-      disabled={true}
-      modulesReady={true}
-      isReadyToRun={true}
-      isPaused={true}
-      isRunning={true}
-      isBlocked={true}
-      onRunClick={() => {}}
-      onPauseClick={() => {}}
-      onResumeClick={() => {}}
-      onResetClick={() => {}}
-    />,
-    { i18nInstance: i18n }
-  )[0]
+  return renderWithProviders(<RunPanel />, { i18nInstance: i18n })[0]
 }
 
 describe('RunSetupCard', () => {
@@ -67,21 +49,7 @@ describe('RunSetupCard', () => {
     jest.resetAllMocks()
   })
 
-  it('renders legacy run panel components when usePreProtocolWithoutRPC ff is not set', () => {
-    when(mockUseFeatureFlag)
-      .calledWith('preProtocolFlowWithoutRPC')
-      .mockReturnValue(false)
-    const { getByText } = render()
-    getByText('Mock Run Timer')
-    getByText('Mock Run Controls')
-    getByText('Mock Module Live Status Cards')
-    expect(mockRunTimeControl).not.toHaveBeenCalled()
-  })
-
-  it('renders new run panel components when usePreProtocolWithoutRPC ff is set', () => {
-    when(mockUseFeatureFlag)
-      .calledWith('preProtocolFlowWithoutRPC')
-      .mockReturnValue(true)
+  it('renders run panel components', () => {
     const { getByText } = render()
     getByText('Mock Run Time Control')
     getByText('Mock Module Live Status Cards')

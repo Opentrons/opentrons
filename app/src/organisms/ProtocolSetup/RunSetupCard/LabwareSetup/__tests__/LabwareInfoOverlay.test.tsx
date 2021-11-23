@@ -3,6 +3,7 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import {
   getLabwareDisplayName,
   LabwareDefinition2,
+  ProtocolFile,
 } from '@opentrons/shared-data'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
@@ -11,12 +12,12 @@ import { useCurrentProtocolRun } from '../../../../ProtocolUpload/hooks'
 import { useProtocolDetails } from '../../../../RunDetails/hooks'
 import { getLabwareLocation } from '../../../utils/getLabwareLocation'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
-import { useLabwareDefinitionUri } from '../../../hooks'
+import { getLabwareDefinitionUri } from '../../../utils/getLabwareDefinitionUri'
 
 jest.mock('../../../../ProtocolUpload/hooks')
 jest.mock('../../../utils/getLabwareLocation')
 jest.mock('../../../../RunDetails/hooks')
-jest.mock('../../../hooks')
+jest.mock('../../../utils/getLabwareDefinitionUri')
 
 jest.mock('@opentrons/shared-data', () => {
   const actualSharedData = jest.requireActual('@opentrons/shared-data')
@@ -49,8 +50,8 @@ const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
 const mockGetLabwareLocation = getLabwareLocation as jest.MockedFunction<
   typeof getLabwareLocation
 >
-const mockUseLabwareDefinitionUri = useLabwareDefinitionUri as jest.MockedFunction<
-  typeof useLabwareDefinitionUri
+const mockGetLabwareDefinitionUri = getLabwareDefinitionUri as jest.MockedFunction<
+  typeof getLabwareDefinitionUri
 >
 const MOCK_LABWARE_ID = 'some_labware_id'
 const MOCK_LABWARE_DEFINITION_ID = 'some_labware_definition_id'
@@ -60,10 +61,16 @@ const MOCK_LABWARE_OFFSET = { x: 1, y: 2, z: 3 }
 
 describe('LabwareInfoOverlay', () => {
   let props: React.ComponentProps<typeof LabwareInfoOverlay>
+  let labware: ProtocolFile<{}>['labware']
   beforeEach(() => {
     props = {
       definition: fixture_tiprack_300_ul as LabwareDefinition2,
       labwareId: MOCK_LABWARE_ID,
+    }
+    labware = {
+      [MOCK_LABWARE_ID]: {
+        definitionId: MOCK_LABWARE_DEFINITION_ID,
+      },
     }
     when(mockGetLabwareDisplayName)
       .calledWith(props.definition)
@@ -74,11 +81,7 @@ describe('LabwareInfoOverlay', () => {
       .mockReturnValue({
         protocolData: {
           commands: [],
-          labware: {
-            [MOCK_LABWARE_ID]: {
-              definitionId: MOCK_LABWARE_DEFINITION_ID,
-            },
-          },
+          labware,
         },
       } as any)
 
@@ -90,8 +93,8 @@ describe('LabwareInfoOverlay', () => {
       .calledWith(MOCK_LABWARE_ID, [])
       .mockReturnValue({ slotName: MOCK_SLOT_NAME })
 
-    when(mockUseLabwareDefinitionUri)
-      .calledWith(MOCK_LABWARE_ID)
+    when(mockGetLabwareDefinitionUri)
+      .calledWith(MOCK_LABWARE_ID, labware)
       .mockReturnValue(MOCK_LABWARE_DEFINITION_URI)
   })
   afterEach(() => {
