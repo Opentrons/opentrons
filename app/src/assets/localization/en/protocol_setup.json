@@ -3,7 +3,7 @@
   "proceed_to_run": "Proceed to Run",
   "example": "Example",
   "extra_attention_warning_title": "Secure labware and modules before proceeding to run",
-  "labware_setup_step_description": "Position full tipracks and labware as shown in the deck map.",
+  "labware_setup_step_description": "Position full tip racks and labware in the deck slots as shown in the deck map.",
   "labware_setup_step_title": "Labware Setup",
   "labware_help_link_title": "See How Labware Offsets Work",
   "how_offset_data_works_title": "How Offset Data Works",
@@ -51,6 +51,7 @@
   "recalibrate": "Recalibrate",
   "required_pipettes_title": "Required Pipettes",
   "required_tip_racks_title": "Required Tip Length Calibrations",
+  "attach_pipette_tip_length_calibration": "Attach pipette to see tip length calibration information",
   "robot_calibration_step_description": "Review required pipettes and tip length calibrations for this protocol.",
   "robot_calibration_step_title": "Robot Calibration",
   "setup_for_run": "Setup for Run",
@@ -78,5 +79,8 @@
   "calibration_ready": "Calibration ready",
   "run_disabled_modules_not_connected": "Make sure all modules are connected before proceeding to run",
   "run_disabled_calibration_not_complete": "Make sure robot calibration is complete before proceeding to run",
-  "run_disabled_modules_and_calibration_not_complete": "Make sure robot calibration is complete and all modules are connected before proceeding to run"
+  "run_disabled_modules_and_calibration_not_complete": "Make sure robot calibration is complete and all modules are connected before proceeding to run",
+  "loading_protocol_details": "Loading details...",
+  "protocol_upload_revamp_feedback": "Have feedback about this experience?",
+  "feedback_form_link": "Let us know!"
 }

@@ -159,7 +159,9 @@ describe('LabwareSetup', () => {
 
     when(mockLabwareInfoOverlay)
       .mockReturnValue(<div></div>) // this (default) empty div will be returned when LabwareInfoOverlay isn't called with expected props
-      .calledWith(componentPropsMatcher({ definition: fixture_tiprack_300_ul }))
+      .calledWith(
+        partialComponentPropsMatcher({ definition: fixture_tiprack_300_ul })
+      )
       .mockReturnValue(
         <div>
           mock labware info overlay of{' '}
@@ -277,7 +279,7 @@ describe('LabwareSetup', () => {
           nestedLabwareDef: null,
           nestedLabwareId: null,
         },
-      })
+      } as any)
 
     when(mockModule)
       .calledWith(

@@ -24,6 +24,7 @@ from ..types import (
     LabwareLocation,
     PipetteName,
     DeckSlotLocation,
+    LabwareOffsetLocation,
     ModuleModels,
     ModuleDefinition,
 )
@@ -119,8 +120,19 @@ class EquipmentHandler:
                 version=version,
             )
 
+        if isinstance(location, DeckSlotLocation):
+            slot_name = location.slotName
+            module_model = None
+        else:
+            # TODO(mc, 2021-11-23): https://github.com/Opentrons/opentrons/issues/8242
+            raise NotImplementedError("Loading labware on modules not yet implemented")
+
         offset = self._state_store.labware.find_applicable_labware_offset(
-            definition_uri=definition_uri, location=location
+            definition_uri=definition_uri,
+            location=LabwareOffsetLocation(
+                slotName=slot_name,
+                moduleModel=module_model,
+            ),
         )
 
         return LoadedLabwareData(

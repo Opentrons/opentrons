@@ -30,10 +30,11 @@ export const SummaryScreen = (props: {
   const { t } = useTranslation('labware_position_check')
   const introInfo = useIntroInfo()
   const { protocolData } = useProtocolDetails()
-  useLabwareOffsets(
-    savePositionCommandData,
-    protocolData as ProtocolFile<{}>
-  ).then(offsets => setLabwareOffsets(offsets))
+  useLabwareOffsets(savePositionCommandData, protocolData as ProtocolFile<{}>)
+    .then(offsets => setLabwareOffsets(offsets))
+    .catch((e: Error) =>
+      console.error(`error getting labware offsetsL ${e.message}`)
+    )
   if (introInfo == null) return null
   if (protocolData == null) return null
   const labwareIds = Object.keys(protocolData.labware)

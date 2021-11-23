@@ -50,6 +50,7 @@ export interface TipLengthCalibrationProps {
   mount: Mount
   tipRackDefinition: LabwareDefinition2
   isExtendedPipOffset: boolean
+  disabled: boolean
 }
 
 // tip length calibration commands for which the full page spinner should not appear
@@ -63,6 +64,7 @@ export function TipLengthCalibration({
   mount,
   tipRackDefinition,
   isExtendedPipOffset,
+  disabled,
 }: TipLengthCalibrationProps): JSX.Element {
   const createRequestId = React.useRef<string | null>(null)
   const trackedRequestId = React.useRef<string | null>(null)
@@ -203,6 +205,7 @@ export function TipLengthCalibration({
           backgroundColor={C_BLUE}
           onClick={() => handleStart()}
           id={'TipRackCalibration_calibrateTipRackButton'}
+          disabled={disabled}
         >
           {t('calibrate_now_cta')}
         </PrimaryBtn>

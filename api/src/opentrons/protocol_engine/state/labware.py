@@ -21,6 +21,7 @@ from ..types import (
     Dimensions,
     LabwareOffset,
     LabwareOffsetVector,
+    LabwareOffsetLocation,
     LabwareLocation,
     LoadedLabware,
 )
@@ -340,7 +341,9 @@ class LabwareView(HasState[LabwareState]):
         return list(self._state.labware_offsets_by_id.values())
 
     def find_applicable_labware_offset(
-        self, definition_uri: str, location: LabwareLocation
+        self,
+        definition_uri: str,
+        location: LabwareOffsetLocation,
     ) -> Optional[LabwareOffset]:
         """Find a labware offset that applies to the given definition and location.
 

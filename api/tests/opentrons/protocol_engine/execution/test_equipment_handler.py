@@ -22,6 +22,7 @@ from opentrons.protocol_engine.types import (
     LoadedPipette,
     LabwareOffset,
     LabwareOffsetVector,
+    LabwareOffsetLocation,
     ModuleModels,
     ModuleDefinition,
 )
@@ -129,14 +130,14 @@ async def test_load_labware(
     decoy.when(
         state_store.labware.find_applicable_labware_offset(
             definition_uri="opentrons-test/load-name/1",
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+            location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_3),
         )
     ).then_return(
         LabwareOffset(
             id="labware-offset-id",
             createdAt=datetime(year=2021, month=1, day=2),
             definitionUri="opentrons-test/load-name/1",
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+            location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_3),
             vector=LabwareOffsetVector(x=1, y=2, z=3),
         )
     )
@@ -180,7 +181,7 @@ async def test_load_labware_uses_provided_id(
     decoy.when(
         state_store.labware.find_applicable_labware_offset(
             definition_uri="opentrons-test/load-name/1",
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+            location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_3),
         )
     ).then_return(None)
 
@@ -221,7 +222,7 @@ async def test_load_labware_uses_loaded_labware_def(
     decoy.when(
         state_store.labware.find_applicable_labware_offset(
             definition_uri="opentrons-test/load-name/1",
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+            location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_3),
         )
     ).then_return(None)
 

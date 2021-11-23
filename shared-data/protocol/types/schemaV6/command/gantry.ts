@@ -1,4 +1,5 @@
 import type { CommonCommandInfo } from '.'
+import type { MotorAxis } from '../../../../js/types'
 export interface MoveToSlotCommand extends CommonCommandInfo {
   commandType: 'moveToSlot'
   params: MoveToSlotParams
@@ -24,12 +25,18 @@ export interface SavePositionCommand extends CommonCommandInfo {
   params: SavePositionParams
   result?: {}
 }
+export interface HomeCommand extends CommonCommandInfo {
+  commandType: 'home'
+  params: HomeParams
+  result?: {}
+}
 export type GantryCommand =
   | MoveToSlotCommand
   | MoveToWellCommand
   | MoveToCoordinatesCommand
   | MoveRelativeCommand
   | SavePositionCommand
+  | HomeCommand
 
 interface MoveToSlotParams {
   pipetteId: string
@@ -79,4 +86,8 @@ interface MoveRelativeParams {
 interface SavePositionParams {
   pipetteId: string // pipette to use in measurement
   positionId?: string // position ID, auto-assigned if left blank
+}
+
+interface HomeParams {
+  axes?: MotorAxis
 }

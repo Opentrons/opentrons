@@ -11,41 +11,41 @@ import {
 import noModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/simpleV4.json'
 import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/testModulesProtocol.json'
 
-import { i18n } from '../../../i18n'
+import { i18n } from '../../../../i18n'
 import {
   mockAttachedPipette,
   mockPipetteInfo,
-} from '../../../redux/pipettes/__fixtures__'
-import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
-import * as discoverySelectors from '../../../redux/discovery/selectors'
+} from '../../../../redux/pipettes/__fixtures__'
+import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
+import * as discoverySelectors from '../../../../redux/discovery/selectors'
 import {
   getAttachedPipettes,
   getProtocolPipetteTipRackCalInfo,
-} from '../../../redux/pipettes'
-import { mockCalibrationStatus } from '../../../redux/calibration/__fixtures__'
-import * as calibrationSelectors from '../../../redux/calibration/selectors'
-import { useProtocolDetails } from '../../RunDetails/hooks'
-import { RunSetupCard } from '../RunSetupCard'
-import { ModuleSetup } from '../RunSetupCard/ModuleSetup'
-import { LabwareSetup } from '../RunSetupCard/LabwareSetup'
-import { RobotCalibration } from '../RunSetupCard/RobotCalibration'
-import { ProceedToRunCta } from '../RunSetupCard/ProceedToRunCta'
+} from '../../../../redux/pipettes'
+import { mockCalibrationStatus } from '../../../../redux/calibration/__fixtures__'
+import * as calibrationSelectors from '../../../../redux/calibration/selectors'
+import { useProtocolCalibrationStatus } from '../../RunSetupCard/hooks/useProtocolCalibrationStatus'
+import { useProtocolDetails } from '../../../RunDetails/hooks'
+import { RunSetupCard } from '../../RunSetupCard'
+import { ModuleSetup } from '../../RunSetupCard/ModuleSetup'
+import { LabwareSetup } from '../../RunSetupCard/LabwareSetup'
+import { RobotCalibration } from '../../RunSetupCard/RobotCalibration'
+import { ProceedToRunCta } from '../../RunSetupCard/ProceedToRunCta'
 
 import type {
   AttachedPipettesByMount,
   ProtocolPipetteTipRackCalDataByMount,
-} from '../../../redux/pipettes/types'
+} from '../../../../redux/pipettes/types'
 
-jest.mock('../../../redux/discovery/selectors')
-jest.mock('../../../redux/pipettes/selectors')
-jest.mock('../../../redux/calibration/selectors')
-jest.mock('../../RunDetails/hooks')
-jest.mock('../RunSetupCard/LabwareSetup')
-jest.mock('../RunSetupCard/ModuleSetup')
-jest.mock('../RunSetupCard/RobotCalibration')
-jest.mock('../utils/getModuleRenderInfo')
-jest.mock('../RunSetupCard/ProceedToRunCta')
-jest.mock('../utils/getLabwareRenderInfo')
+jest.mock('../../../../redux/discovery/selectors')
+jest.mock('../../../../redux/pipettes/selectors')
+jest.mock('../../../../redux/calibration/selectors')
+jest.mock('../../RunSetupCard/hooks/useProtocolCalibrationStatus')
+jest.mock('../../../RunDetails/hooks')
+jest.mock('../../RunSetupCard/LabwareSetup')
+jest.mock('../../RunSetupCard/ModuleSetup')
+jest.mock('../../RunSetupCard/RobotCalibration')
+jest.mock('../../RunSetupCard/ProceedToRunCta')
 
 const mockAttachedPipettes: AttachedPipettesByMount = {
   left: mockAttachedPipette,
@@ -85,8 +85,8 @@ const mockGetDeckCalData = calibrationSelectors.getDeckCalibrationData as jest.M
   typeof calibrationSelectors.getDeckCalibrationData
 >
 
-const mockGetProtocolCalibrationComplete = calibrationSelectors.getProtocolCalibrationComplete as jest.MockedFunction<
-  typeof calibrationSelectors.getProtocolCalibrationComplete
+const mockUseProtocolCalibrationStatus = useProtocolCalibrationStatus as jest.MockedFunction<
+  typeof useProtocolCalibrationStatus
 >
 
 const render = () => {
@@ -103,7 +103,7 @@ describe('RunSetupCard', () => {
     mockGetDeckCalData.mockReturnValue(
       mockCalibrationStatus.deckCalibration.data
     )
-    mockGetProtocolCalibrationComplete.mockReturnValue({ complete: true })
+    mockUseProtocolCalibrationStatus.mockReturnValue({ complete: true })
     mockUseProtocolDetails.mockReturnValue({
       protocolData: noModulesProtocol,
     } as any)
@@ -149,7 +149,7 @@ describe('RunSetupCard', () => {
       })
     })
     it('renders calibration needed when robot cal not complete', () => {
-      mockGetProtocolCalibrationComplete.mockReturnValue({ complete: false })
+      mockUseProtocolCalibrationStatus.mockReturnValue({ complete: false })
       const { getByText } = render()
       getByText('Calibration needed')
     })
@@ -177,13 +177,6 @@ describe('RunSetupCard', () => {
     fireEvent.click(moduleSetup)
     getByText('Mock Labware Setup')
   })
-  it('renders null if python protocol with only metadata field', () => {
-    mockUseProtocolDetails.mockReturnValue({
-      protocolData: { metadata: null },
-    } as any)
-    const { container } = render()
-    expect(container.firstChild).toBeNull()
-  })
   it('renders correct text contents for multiple modules', () => {
     mockUseProtocolDetails.mockReturnValue({
       protocolData: withModulesProtocol,
@@ -200,7 +193,9 @@ describe('RunSetupCard', () => {
     expect(getByRole('heading', { name: 'STEP 2' })).toBeTruthy()
     expect(getByRole('heading', { name: 'Labware Setup' })).toBeTruthy()
     expect(
-      getByText('Position full tipracks and labware as shown in the deck map.')
+      getByText(
+        'Position full tip racks and labware in the deck slots as shown in the deck map.'
+      )
     ).toBeTruthy()
     expect(getByRole('heading', { name: 'STEP 3' })).toBeTruthy()
     expect(getByRole('heading', { name: 'Module Setup' })).toBeTruthy()
@@ -230,19 +225,21 @@ describe('RunSetupCard', () => {
       )
     ).toBeTruthy()
     expect(getByRole('heading', { name: 'STEP 2' })).toBeTruthy()
-    expect(getByRole('heading', { name: 'Labware Setup' })).toBeTruthy()
-    expect(
-      getByText('Position full tipracks and labware as shown in the deck map.')
-    ).toBeTruthy()
-    expect(getByRole('heading', { name: 'STEP 3' })).toBeTruthy()
     expect(getByRole('heading', { name: 'Module Setup' })).toBeTruthy()
     expect(
       getByText(
         'Plug in and turn on the required module via the OT-2 USB Port. Place the module as shown in the deck map.'
       )
     ).toBeTruthy()
+    expect(getByRole('heading', { name: 'STEP 3' })).toBeTruthy()
+    expect(getByRole('heading', { name: 'Labware Setup' })).toBeTruthy()
+    expect(
+      getByText(
+        'Position full tip racks and labware in the deck slots as shown in the deck map.'
+      )
+    ).toBeTruthy()
   })
-  it('renders robot calibration heading, skips module setup, renders labware setup heading, and allows the user to proceed to run', () => {
+  it('if no modules renders robot calibration heading, skips module setup, renders labware setup heading, and allows the user to proceed to run', () => {
     const { getByRole, getByText } = render()
     getByRole('heading', {
       name: 'Robot Calibration',

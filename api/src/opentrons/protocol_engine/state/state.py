@@ -198,12 +198,10 @@ class StateStore(StateView, ActionHandler):
 
     def _update_state_views(self) -> None:
         """Update state view interfaces to use latest underlying values."""
-        state = state = self._get_next_state()
-
-        self._state = state
-        self._commands._state = state.commands
-        self._labware._state = state.labware
-        self._pipettes._state = state.pipettes
-        self._modules._state = state.modules
-
+        next_state = self._get_next_state()
+        self._state = next_state
+        self._commands._state = next_state.commands
+        self._labware._state = next_state.labware
+        self._pipettes._state = next_state.pipettes
+        self._modules._state = next_state.modules
         self._change_notifier.notify()

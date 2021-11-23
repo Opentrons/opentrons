@@ -221,6 +221,8 @@ def test_map_labware_load(minimal_labware_def: LabwareDefinition) -> None:
         labware_load_name="some_load_name",
         labware_version=123,
         deck_slot=DeckSlotName.SLOT_1,
+        on_module=False,
+        offset_id="labware-offset-id-123",
     )
     expected_output = pe_commands.LoadLabware.construct(
         id=matchers.IsA(str),
@@ -240,7 +242,7 @@ def test_map_labware_load(minimal_labware_def: LabwareDefinition) -> None:
             # Trusting that the exact fields within in the labware definition
             # get passed through correctly.
             definition=matchers.Anything(),
-            offsetId=None,
+            offsetId="labware-offset-id-123",
         ),
     )
     output = LegacyCommandMapper().map_labware_load(input)
@@ -317,6 +319,7 @@ def test_map_module_labware_load(minimal_labware_def: LabwareDefinition) -> None
         labware_version=123,
         deck_slot=DeckSlotName.SLOT_1,
         on_module=True,
+        offset_id="labware-offset-id-123",
     )
 
     expected_output = pe_commands.LoadLabware.construct(
@@ -335,7 +338,7 @@ def test_map_module_labware_load(minimal_labware_def: LabwareDefinition) -> None
         result=pe_commands.LoadLabwareResult.construct(
             labwareId=matchers.IsA(str),
             definition=matchers.Anything(),
-            offsetId=None,
+            offsetId="labware-offset-id-123",
         ),
     )
     subject = LegacyCommandMapper()

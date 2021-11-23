@@ -80,13 +80,13 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
   const runQuery = useRunQuery(mostRecentRunId)
   const mostRecentRun = runQuery.data?.data
   const mostRecentProtocolInfo = useProtocolQuery(
-    (mostRecentRun?.protocolId as string) ?? ''
+    (mostRecentRun?.protocolId as string) ?? null
   )
   const mostRecentProtocol = mostRecentProtocolInfo?.data?.data
   const protocolData = useProtocolDetails()
   //  If mostRecentRun is null, the CTA that uses cloneRun won't appear so this will never be reached
   const cloneMostRecentRun = useCloneRun(
-    mostRecentRunId != null ? mostRecentRunId : ''
+    mostRecentRunId != null ? mostRecentRunId : null
   )
   const robotName = useSelector((state: State) => getConnectedRobotName(state))
   const fileInput = React.useRef<HTMLInputElement>(null)
@@ -98,13 +98,10 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
   )
   const labwareOffsets = mostRecentRun?.labwareOffsets
   const protocolName = protocolData.displayName
-  const fileName =
-    mostRecentProtocol != null
-      ? mostRecentProtocol.files?.find(file => file.role === 'main')?.name
+  const mostRecentRunFileName =
+    mostRecentProtocol != null && mostRecentProtocol.files != null
+      ? mostRecentProtocol.files.find(file => file.role === 'main')?.name
       : null
-  const fullRunTimestamp = mostRecentRun?.createdAt
-  if (fullRunTimestamp == null) return null //  This state should never be reached since if null, protocol empty state won't show latest protocol run data
-  const runTimestamp = format(parseISO(fullRunTimestamp), 'yyyy-MM-dd pp xxxxx')
 
   const handleDrop: React.DragEventHandler<HTMLLabelElement> = e => {
     e.preventDefault()
@@ -192,7 +189,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
           onChange={onChange}
         />
       </label>
-      {mostRecentRunId === null ? null : (
+      {mostRecentRun == null ? null : (
         <Flex flexDirection={DIRECTION_COLUMN} width={'80%'}>
           <Divider marginY={SPACING_3} />
           <Flex
@@ -234,7 +231,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
                 {t('protocol_name_title')}
               </Text>
               <Flex css={FONT_BODY_1_DARK}>
-                {protocolName != null ? protocolName : fileName}
+                {protocolName != null ? protocolName : mostRecentRunFileName}
               </Flex>
             </Flex>
             <Flex
@@ -250,7 +247,10 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
                 {t('run_timestamp_title')}
               </Text>
               <Flex css={FONT_BODY_1_DARK} flexDirection={DIRECTION_ROW}>
-                {runTimestamp}
+                {format(
+                  parseISO(mostRecentRun.createdAt),
+                  'yyyy-MM-dd pp xxxxx'
+                )}
               </Flex>
             </Flex>
             <Flex
@@ -285,7 +285,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
                 color={C_BLUE}
                 id={'UploadInput_runAgainButton'}
               >
-                {t('run_again_btn')}
+                {t('run_again')}
               </SecondaryBtn>
             </Flex>
           </Flex>
