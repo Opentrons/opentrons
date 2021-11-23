@@ -122,4 +122,9 @@ describe('ProtocolSetup', () => {
       'Protocol run canceled. Recalibrating Tip Length calibrations and Labware Position Check is not available.'
     expect(queryByText(bannerText)).toBeTruthy()
   })
+  it('renders feedback link', () => {
+    const { getByText, getByRole } = render()
+    getByText('Have feedback about this experience?')
+    expect(getByRole('link', { name: 'Let us know!' })).toBeTruthy()
+  })
 })

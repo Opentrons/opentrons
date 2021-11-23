@@ -133,6 +133,19 @@ class LabwareOffsetVector(BaseModel):
     z: float
 
 
+class LabwareOffsetLocation(BaseModel):
+    """Parameters describing when a given offset may apply to a given labware load."""
+
+    slotName: DeckSlotName = Field(
+        ...,
+        description="The deck slot the offset applies to",
+    )
+    moduleModel: Optional[str] = Field(
+        None,
+        description="The module model the labware will be loaded onto, if applicable",
+    )
+
+
 class LabwareOffset(BaseModel):
     """An offset that the robot adds to a pipette's position when it moves to a labware.
 
@@ -144,7 +157,7 @@ class LabwareOffset(BaseModel):
     id: str = Field(..., description="Unique labware offset record identifier.")
     createdAt: datetime = Field(..., description="When this labware offset was added.")
     definitionUri: str = Field(..., description="The URI for the labware's definition.")
-    location: LabwareLocation = Field(
+    location: LabwareOffsetLocation = Field(
         ...,
         description="Where the labware is located on the robot.",
     )
@@ -158,7 +171,7 @@ class LabwareOffsetCreate(BaseModel):
     """Create request data for a labware offset."""
 
     definitionUri: str = Field(..., description="The URI for the labware's definition.")
-    location: LabwareLocation = Field(
+    location: LabwareOffsetLocation = Field(
         ...,
         description="Where the labware is located on the robot.",
     )

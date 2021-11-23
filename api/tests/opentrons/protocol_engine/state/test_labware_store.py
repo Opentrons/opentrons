@@ -13,6 +13,7 @@ from opentrons.protocol_engine.types import (
     LabwareOffset,
     LabwareOffsetCreate,
     LabwareOffsetVector,
+    LabwareOffsetLocation,
     DeckSlotLocation,
     LoadedLabware,
 )
@@ -77,7 +78,7 @@ def test_handles_add_labware_offset(
     """It should add the labware offset to the state and add the ID."""
     request = LabwareOffsetCreate(
         definitionUri="offset-definition-uri",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
         vector=LabwareOffsetVector(x=1, y=2, z=3),
     )
 
@@ -85,7 +86,7 @@ def test_handles_add_labware_offset(
         id="offset-id",
         createdAt=datetime(year=2021, month=1, day=2),
         definitionUri="offset-definition-uri",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
         vector=LabwareOffsetVector(x=1, y=2, z=3),
     )
 
@@ -107,7 +108,7 @@ def test_handles_load_labware(
     """It should add the labware data to the state."""
     offset_request = LabwareOffsetCreate(
         definitionUri="offset-definition-uri",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
         vector=LabwareOffsetVector(x=1, y=2, z=3),
     )
 
