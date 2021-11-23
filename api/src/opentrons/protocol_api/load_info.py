@@ -1,10 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons_shared_data.module.dev_types import (
-    ModuleDefinitionV1,
-    ModuleDefinitionV2
-)
+
 from opentrons.hardware_control.modules.types import ModuleModel
 from opentrons.types import Mount, DeckSlotName
 
@@ -56,5 +53,4 @@ class ModuleLoadInfo:
     module_model: ModuleModel
     deck_slot: DeckSlotName
     configuration: Optional[str]
-    definition: ModuleDefinitionV2
-    module_serial: str = None
+    module_serial: Optional[str]

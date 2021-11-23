@@ -10,10 +10,9 @@ class ModuleDataProvider:
     """Module data provider."""
 
     @staticmethod
-    def get_module_definition(
-        model: ModuleModels
-    ) -> ModuleDefinition:
+    def get_module_definition(model: ModuleModels) -> ModuleDefinition:
         """Get the module definition."""
         legacy_model = module_model_from_string(model.value)
         return ModuleDefinition.parse_obj(
-            _load_v2_module_def(module_model=legacy_model))
+            _load_v2_module_def(module_model=legacy_model)
+        )

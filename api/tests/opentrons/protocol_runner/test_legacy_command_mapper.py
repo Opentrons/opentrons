@@ -1,5 +1,6 @@
 """Tests for the ProtocolRunner's LegacyContextPlugin."""
-from decoy import matchers
+import pytest
+from decoy import matchers, Decoy
 from datetime import datetime
 
 from opentrons.commands.types import PauseMessage
@@ -12,6 +13,7 @@ from opentrons.protocol_engine import (
     commands as pe_commands,
     actions as pe_actions,
 )
+from opentrons.protocol_engine.resources.module_data_provider import ModuleDataProvider
 from opentrons.protocol_runner.legacy_command_mapper import (
     LegacyContextCommandError,
     LegacyCommandMapper,
@@ -26,6 +28,12 @@ from opentrons.protocol_runner.legacy_wrappers import (
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV2
 from opentrons.types import DeckSlotName, Mount, MountType
+
+
+@pytest.fixture
+def module_data_provider(decoy: Decoy) -> ModuleDataProvider:
+    """Mock module definition fetcher."""
+    return decoy.mock(cls=ModuleDataProvider)
 
 
 def test_map_before_command() -> None:
@@ -262,7 +270,9 @@ def test_map_instrument_load() -> None:
 
 
 def test_map_module_load(
-    minimal_module_def: ModuleDefinitionV2
+    decoy: Decoy,
+    minimal_module_def: ModuleDefinitionV2,
+    module_data_provider: ModuleDataProvider,
 ) -> None:
     """It should correctly map a module load."""
     test_definition = ModuleDefinition.parse_obj(minimal_module_def)
@@ -271,8 +281,10 @@ def test_map_module_load(
         deck_slot=DeckSlotName.SLOT_1,
         configuration="conf",
         module_serial="module-serial",
-        definition=minimal_module_def
     )
+    decoy.when(
+        module_data_provider.get_module_definition(ModuleModels.MAGNETIC_MODULE_V2)
+    ).then_return(test_definition)
     expected_output = pe_commands.LoadModule.construct(
         id=matchers.IsA(str),
         status=pe_commands.CommandStatus.SUCCEEDED,
@@ -287,10 +299,12 @@ def test_map_module_load(
         result=pe_commands.LoadModuleResult.construct(
             moduleId=matchers.IsA(str),
             moduleSerial="module-serial",
-            definition=test_definition
+            definition=test_definition,
         ),
     )
-    output = LegacyCommandMapper().map_module_load(input)
+    output = LegacyCommandMapper(
+        module_data_provider=module_data_provider
+    ).map_module_load(input)
     assert output == expected_output
 
 

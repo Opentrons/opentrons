@@ -118,7 +118,7 @@ class StateStore(StateView, ActionHandler):
             self._command_store,
             self._pipette_store,
             self._labware_store,
-            self._module_store
+            self._module_store,
         ]
         self._configs = configs
         self._change_notifier = change_notifier or ChangeNotifier()

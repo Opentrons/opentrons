@@ -7,7 +7,7 @@ from .equipment import (
     EquipmentHandler,
     LoadedLabwareData,
     LoadedPipetteData,
-    LoadedModuleData
+    LoadedModuleData,
 )
 from .movement import MovementHandler, SavedPositionData
 from .pipetting import PipettingHandler
@@ -20,6 +20,7 @@ __all__ = [
     "EquipmentHandler",
     "LoadedLabwareData",
     "LoadedPipetteData",
+    "LoadedModuleData",
     "MovementHandler",
     "SavedPositionData",
     "PipettingHandler",

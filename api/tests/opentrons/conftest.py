@@ -656,21 +656,11 @@ def minimal_module_def() -> ModuleDefinitionV2:
         "$otSharedSchema": "module/schemas/2",
         "moduleType": "temperatureModuleType",
         "model": "temperatureModuleV1",
-        "labwareOffset": {
-            "x": -0.15,
-            "y": -0.15,
-            "z": 80.09
-        },
-        "dimensions": {
-            "bareOverallHeight": 84,
-            "overLabwareHeight": 0
-        },
-        "calibrationPoint": {
-            "x": 12.0,
-            "y": 8.75
-        },
+        "labwareOffset": {"x": -0.15, "y": -0.15, "z": 80.09},
+        "dimensions": {"bareOverallHeight": 84, "overLabwareHeight": 0},
+        "calibrationPoint": {"x": 12.0, "y": 8.75},
         "displayName": "Sample Module",
         "quirks": [],
         "slotTransforms": {},
-        "compatibleWith": ["temperatureModuleV2"]
+        "compatibleWith": ["temperatureModuleV2"],
     }

@@ -17,6 +17,7 @@ class HardwareModule:
 @dataclass(frozen=True)
 class ModuleState:
     """Basic module data state and getter methods."""
+
     modules_by_id: Dict[str, LoadedModule]
     definition_by_model: Dict[ModuleModels, ModuleDefinition]
 
@@ -28,10 +29,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
 
     def __init__(self) -> None:
         """Initialize a ModuleStore and its state."""
-        self._state = ModuleState(
-            modules_by_id={},
-            definition_by_model={}
-        )
+        self._state = ModuleState(modules_by_id={}, definition_by_model={})
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
@@ -47,7 +45,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 model=command.params.model,
                 location=command.params.location,
                 serial=command.result.moduleSerial,
-                definition=command.result.definition
+                definition=command.result.definition,
             )
 
             new_definition_by_model = self._state.definition_by_model.copy()
@@ -83,14 +81,11 @@ class ModuleView(HasState[ModuleState]):
             mod_list.append(mod)
         return mod_list
 
-    def get_definition_by_id(self, module_id) -> ModuleDefinition:
+    def get_definition_by_id(self, module_id: str) -> ModuleDefinition:
         """Module definition by ID."""
         return self.get(module_id).definition
 
-    def get_definition_by_model(
-            self,
-            model: ModuleModels
-    ) -> ModuleDefinition:
+    def get_definition_by_model(self, model: ModuleModels) -> ModuleDefinition:
         """Return module definition by model."""
         try:
             return self._state.definition_by_model[model]
@@ -99,8 +94,9 @@ class ModuleView(HasState[ModuleState]):
                 f"Module definition for matching {model} not found."
             ) from e
 
-    def get_by_serial(self, serial: str) -> LoadedModule:
+    def get_by_serial(self, serial: str) -> Optional[LoadedModule]:
         """Get a loaded module by its serial number."""
         for mod in self.get_all():
             if mod.serial == serial:
                 return mod
+        return None

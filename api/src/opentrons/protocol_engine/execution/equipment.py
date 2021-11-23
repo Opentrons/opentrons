@@ -6,7 +6,7 @@ from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocols.geometry.module_geometry import (
     resolve_module_type,
-    module_model_from_string
+    module_model_from_string,
 )
 from opentrons.types import MountType
 from opentrons.hardware_control.api import API as HardwareAPI
@@ -25,7 +25,7 @@ from ..types import (
     PipetteName,
     DeckSlotLocation,
     ModuleModels,
-    ModuleDefinition
+    ModuleDefinition,
 )
 
 
@@ -48,6 +48,7 @@ class LoadedPipetteData:
 @dataclass(frozen=True)
 class LoadedModuleData:
     """The result of a load module procedure."""
+
     module_id: str
     module_serial: Optional[str]
     definition: ModuleDefinition
@@ -166,10 +167,7 @@ class EquipmentHandler:
         return LoadedPipetteData(pipette_id=pipette_id)
 
     async def load_module(
-        self,
-        model: ModuleModels,
-        location: DeckSlotLocation,
-        module_id: Optional[str]
+        self, model: ModuleModels, location: DeckSlotLocation, module_id: Optional[str]
     ) -> LoadedModuleData:
         """Ensure the required module is attached.
 
@@ -195,7 +193,7 @@ class EquipmentHandler:
 
         return LoadedModuleData(
             module_id=module_id,
-            module_serial=attached_mod_instance.device_info.get('serial'),
+            module_serial=attached_mod_instance.device_info.get("serial"),
             definition=definition,
         )
 
@@ -205,15 +203,16 @@ class EquipmentHandler:
 
         try:
             available, simulating = await self._hardware_api.find_modules(
-                by_model=hw_model, resolved_type=model_type)
+                by_model=hw_model, resolved_type=model_type
+            )
         except TypeError as e:
-            raise RuntimeError(f"Could not fetch modules attached") from e
+            raise RuntimeError("Could not fetch modules attached") from e
 
         for mod in available:
             # TODO (spp, 2021-11-22: make this accept compatible module models)
             if mod.model() == model.value:
                 if not self._state_store.modules.get_by_serial(
-                        mod.device_info['serial']
+                    mod.device_info["serial"]
                 ):
                     return mod
 

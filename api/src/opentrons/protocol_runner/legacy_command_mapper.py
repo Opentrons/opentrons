@@ -2,7 +2,7 @@
 
 from collections import defaultdict
 from datetime import datetime
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Optional
 
 from opentrons.types import MountType, DeckSlotName
 from opentrons.commands import types as legacy_command_types
@@ -12,9 +12,8 @@ from opentrons.protocol_engine import (
     commands as pe_commands,
     types as pe_types,
 )
-from opentrons.protocol_engine.resources import ModelUtils
+from opentrons.protocol_engine.resources import ModelUtils, ModuleDataProvider
 from opentrons.protocols.models.labware_definition import LabwareDefinition
-from opentrons_shared_data.module.dev_types import ModuleDefinitionV1
 
 from .legacy_wrappers import (
     LegacyInstrumentLoadInfo,
@@ -43,9 +42,9 @@ class LegacyContextCommandError(ProtocolEngineError):
 LEGACY_TO_PE_MODULE: Dict[LegacyModuleModel, pe_types.ModuleModels] = {
     LegacyMagneticModuleModel.MAGNETIC_V1: pe_types.ModuleModels.MAGNETIC_MODULE_V1,
     LegacyMagneticModuleModel.MAGNETIC_V2: pe_types.ModuleModels.MAGNETIC_MODULE_V2,
-    LegacyTemperatureModuleModel.TEMPERATURE_V1: pe_types.ModuleModels.TEMPERATURE_MODULE_V1,
-    LegacyTemperatureModuleModel.TEMPERATURE_V2: pe_types.ModuleModels.TEMPERATURE_MODULE_V2,
-    LegacyThermocyclerModuleModel.THERMOCYCLER_V1: pe_types.ModuleModels.THERMOCYCLER_MODULE_V1,
+    LegacyTemperatureModuleModel.TEMPERATURE_V1: pe_types.ModuleModels.TEMPERATURE_MODULE_V1,   # noqa: E501
+    LegacyTemperatureModuleModel.TEMPERATURE_V2: pe_types.ModuleModels.TEMPERATURE_MODULE_V2,   # noqa: E501
+    LegacyThermocyclerModuleModel.THERMOCYCLER_V1: pe_types.ModuleModels.THERMOCYCLER_MODULE_V1,    # noqa: E501
 }
 
 
@@ -55,13 +54,19 @@ class LegacyCommandMapper:
     Each protocol should use its own instance of this class.
     """
 
-    def __init__(self) -> None:
+    def __init__(
+        self, module_data_provider: Optional[ModuleDataProvider] = None
+    ) -> None:
         """Initialize the command mapper."""
         self._running_commands: Dict[str, List[pe_commands.Command]] = defaultdict(list)
         self._command_count: Dict[str, int] = defaultdict(lambda: 0)
         self._labware_id_by_slot: Dict[DeckSlotName, str] = {}
         self._pipette_id_by_mount: Dict[MountType, str] = {}
         self._module_id_by_slot: Dict[DeckSlotName, str] = {}
+        self._module_data_provider = module_data_provider or ModuleDataProvider()
+        self._module_definition_by_model: Dict[
+            pe_types.ModuleModels, pe_types.ModuleDefinition
+        ] = {}
 
     def map_command(
         self,
@@ -190,8 +195,7 @@ class LegacyCommandMapper:
         return load_pipette_command
 
     def map_module_load(
-        self,
-        module_load_info: LegacyModuleLoadInfo
+        self, module_load_info: LegacyModuleLoadInfo
     ) -> pe_commands.Command:
         """Map a legacy module load to a Protocol Engine command."""
         now = ModelUtils.get_timestamp()
@@ -199,9 +203,13 @@ class LegacyCommandMapper:
         count = self._command_count["LOAD_MODULE"]
         module_id = f"module-{count}"
         module_model = LEGACY_TO_PE_MODULE[module_load_info.module_model]
-        definition = pe_types.ModuleDefinition.parse_obj(
-            module_load_info.definition
-        )
+
+        # This will fetch a V2 definition that's supported on PAPI v2.3+
+        # We will need to make sure that execution using PE is gated to PAPI v2.3+
+        definition = self._module_definition_by_model.get(
+            module_model
+        ) or self._module_data_provider.get_module_definition(module_model)
+
         load_module_command = pe_commands.LoadModule(
             id=f"commands.LOAD_MODULE-{count}",
             status=pe_commands.CommandStatus.SUCCEEDED,
@@ -224,6 +232,7 @@ class LegacyCommandMapper:
         )
         self._command_count["LOAD_MODULE"] = count + 1
         self._module_id_by_slot[module_load_info.deck_slot] = module_id
+        self._module_definition_by_model[module_model] = definition
         return load_module_command
 
     def _build_initial_command(
