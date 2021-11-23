@@ -4,8 +4,9 @@ from typing import Optional, Type
 from typing_extensions import Literal
 from pydantic import BaseModel, Field
 
+from opentrons_shared_data.module.dev_types import ModuleDefinitionV2
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
-from ..types import DeckSlotLocation, ModuleModels
+from ..types import DeckSlotLocation, ModuleModels, ModuleDefinition
 
 
 LoadModuleCommandType = Literal["loadModule"]
@@ -58,6 +59,10 @@ class LoadModuleResult(BaseModel):
         description="An ID to reference this module in subsequent commands."
     )
 
+    definition: ModuleDefinition = Field(
+        description="The definition of this module."
+    )
+
     moduleSerial: Optional[str] = Field(
         None,
         description="Hardware serial number of the module, if connected."
@@ -75,7 +80,8 @@ class LoadModuleImplementation(AbstractCommandImpl[LoadModuleParams, LoadModuleR
             module_id=params.moduleId,
         )
         return LoadModuleResult(moduleId=loaded_module.module_id,
-                                moduleSerial=loaded_module.module_serial)
+                                moduleSerial=loaded_module.module_serial,
+                                definition=loaded_module.definition)
 
 
 class LoadModule(BaseCommand[LoadModuleParams, LoadModuleResult]):

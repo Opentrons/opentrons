@@ -7,8 +7,8 @@ from opentrons_shared_data.module.dev_types import ModuleDefinitionV2
 
 from opentrons.types import Mount as HwMount, MountType, DeckSlotName
 from opentrons.hardware_control import API as HardwareAPI
-from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
-
+from opentrons.hardware_control.modules.types import TemperatureModuleModel, ModuleType
+from opentrons.hardware_control.modules import TempDeck
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocols.geometry.module_geometry import (
     resolve_module_type,
@@ -24,6 +24,7 @@ from opentrons.protocol_engine.types import (
     LabwareOffset,
     LabwareOffsetVector,
     ModuleModels,
+    ModuleDefinition,
 )
 
 from opentrons.protocol_engine.state import StateStore
@@ -330,14 +331,16 @@ async def test_load_pipette_raises_if_pipette_not_attached(
         )
 
 
+# TODO (spp, 2021-11-22): Fix this test
 async def test_load_module(
     decoy: Decoy,
     model_utils: ModelUtils,
     state_store: StateStore,
     module_data_provider: ModuleDataProvider,
-    minimal_module_def: ModuleDefinitionV2,
+    tempdeck_v1_def: ModuleDefinition,
     subject: EquipmentHandler,
     hardware_api: HardwareAPI,
+    loop=None,
 ) -> None:
     """It should load labware definition and offset data and generate an ID."""
     decoy.when(model_utils.generate_id()).then_return("unique-id")
@@ -345,10 +348,23 @@ async def test_load_module(
     #            ).then_return(ModuleModel.TEMPERATURE_V1)
     decoy.when(
         await module_data_provider.get_module_definition(
-            model=ModuleModels.TEMPERATURE_MODULE_V1
+            model=ModuleModels.TEMPERATURE_MODULE_V1,
         )
-    ).then_return(minimal_module_def)
+    ).then_return(tempdeck_v1_def)
 
+    # This doesn't seem to be working correctly
+    decoy.when(
+        await hardware_api.find_modules(
+            by_model=TemperatureModuleModel.TEMPERATURE_V1,
+            resolved_type=ModuleType.TEMPERATURE
+        )
+    ).then_return(([], TempDeck.build(
+        port="",
+        usb_port="/dev",
+        simulating=True,
+        execution_manager=hardware_api._execution_manager,
+        sim_model="temperatureModel")
+    ))
     await subject.load_module(
         model=ModuleModels.TEMPERATURE_MODULE_V1,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
@@ -357,6 +373,6 @@ async def test_load_module(
 
     decoy.verify(
         await hardware_api.find_modules(
-            ModuleModel.TEMPERATURE_V1, ModuleType.TEMPERATURE
+            TemperatureModuleModel.TEMPERATURE_V1, ModuleType.TEMPERATURE
         )
     )

@@ -2,7 +2,7 @@
 from dataclasses import dataclass, replace
 from typing import Dict, List, Mapping
 
-from ..types import LoadedModule, ModuleModels
+from ..types import LoadedModule, ModuleModels, ModuleDefinition
 from .. import errors
 from ..commands import Command, LoadModuleResult
 from ..actions import Action, UpdateCommandAction
@@ -42,7 +42,8 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 id=module_id,
                 model=command.params.model,
                 location=command.params.location,
-                serial=command.result.moduleSerial
+                serial=command.result.moduleSerial,
+                definition=command.result.definition
             )
 
             self._state = replace(
@@ -87,6 +88,10 @@ class ModuleView(HasState[ModuleState]):
             return "magneticModuleType"
         elif model == ModuleModels.THERMOCYCLER_MODULE_V1:
             return "thermocyclerModuleType"
+
+    def get_definition(self, module_id) -> ModuleDefinition:
+        """Module definition by ID."""
+        return self.get(module_id).definition
 
     def get_hardware_module(
             self,

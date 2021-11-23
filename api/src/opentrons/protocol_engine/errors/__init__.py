@@ -18,6 +18,7 @@ from .exceptions import (
     MustHomeError,
     ProtocolEngineStoppedError,
     WellOriginNotAllowedError,
+    NoAttachedModuleFound,
 )
 
 from .error_occurrence import ErrorOccurrence
@@ -41,6 +42,7 @@ __all__ = [
     "MustHomeError",
     "ProtocolEngineStoppedError",
     "WellOriginNotAllowedError",
+    "NoAttachedModuleFound",
     # error occurrence models
     "ErrorOccurrence",
 ]

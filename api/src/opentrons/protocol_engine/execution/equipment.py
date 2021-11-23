@@ -12,7 +12,11 @@ from opentrons.protocols.geometry.module_geometry import (
 from opentrons.types import MountType
 from opentrons.hardware_control.api import API as HardwareAPI
 
-from ..errors import FailedToLoadPipetteError, LabwareDefinitionDoesNotExistError
+from ..errors import (
+    FailedToLoadPipetteError,
+    LabwareDefinitionDoesNotExistError,
+    NoAttachedModuleFound
+)
 from ..resources import LabwareDataProvider, ModuleDataProvider, ModelUtils
 from ..state import StateStore
 from ..types import LabwareLocation, PipetteName, DeckSlotLocation, ModuleModels
@@ -175,8 +179,8 @@ class EquipmentHandler:
         try:
             available, simulating = await self._hardware_api.find_modules(
                 hw_model, model_type)
-        except:
-            raise Exception("Unexpected error fetching modules attached.")
+        except TypeError as e:
+            raise RuntimeError(f"Could not fetch modules attached: {e}")
 
         module_id = module_id or self._model_utils.generate_id()
 
@@ -190,8 +194,11 @@ class EquipmentHandler:
                     hc_mod_instance = mod
                     break
 
-        if simulating and not hc_mod_instance:
-            hc_mod_instance = simulating
+        if not hc_mod_instance:
+            if simulating:
+                hc_mod_instance = simulating
+            else:
+                raise NoAttachedModuleFound("Requested module not found.")
         return LoadedModuleData(
             module_id=module_id,
             module_serial=hc_mod_instance.device_info.get('serial'),

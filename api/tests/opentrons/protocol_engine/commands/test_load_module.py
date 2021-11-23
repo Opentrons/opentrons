@@ -1,7 +1,13 @@
 """Test load module command."""
 from decoy import Decoy
 
-from opentrons.protocol_engine.types import DeckSlotLocation, DeckSlotName, ModuleModels
+from opentrons_shared_data.module.dev_types import ModuleDefinitionV2
+from opentrons.protocol_engine.types import (
+    DeckSlotLocation,
+    DeckSlotName,
+    ModuleModels,
+    ModuleDefinition,
+)
 from opentrons.protocol_engine.execution import (
     EquipmentHandler,
     MovementHandler,
@@ -23,6 +29,7 @@ async def test_load_module_implementation(
         movement: MovementHandler,
         pipetting: PipettingHandler,
         run_control: RunControlHandler,
+        tempdeck_v1_def: ModuleDefinition
 ) -> None:
     """A loadModule command should have an execution implementation."""
     subject = LoadModuleImplementation(
@@ -44,7 +51,11 @@ async def test_load_module_implementation(
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             module_id="some-id",
         )
-    ).then_return(LoadedModuleData(module_id="module-id", module_serial="mod-serial"))
+    ).then_return(LoadedModuleData(module_id="module-id",
+                                   module_serial="mod-serial",
+                                   definition=tempdeck_v1_def))
 
     result = await subject.execute(data)
-    assert result == LoadModuleResult(moduleId="module-id", moduleSerial="mod-serial")
+    assert result == LoadModuleResult(moduleId="module-id",
+                                      moduleSerial="mod-serial",
+                                      definition=tempdeck_v1_def)

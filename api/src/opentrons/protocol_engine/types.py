@@ -3,9 +3,10 @@ from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass
 from pydantic import BaseModel, Field
-from typing import Optional, Union
+from typing import Optional, Union, List, Dict
 from typing_extensions import Literal
 
+from opentrons_shared_data.module.dev_types import ModuleDefinitionV2
 from opentrons.types import MountType, DeckSlotName
 
 
@@ -192,6 +193,7 @@ class LoadedModule(BaseModel):
     id: str
     model: str
     location: DeckSlotLocation
+    definition: ModuleDefinitionV2
     serial: Optional[str]
 
 
@@ -202,3 +204,49 @@ class ModuleModels(str, Enum):
     MAGNETIC_MODULE_V1 = "magneticModuleV1"
     MAGNETIC_MODULE_V2 = "magneticModuleV2"
     THERMOCYCLER_MODULE_V1 = "thermocyclerModuleV1"
+
+
+class ModuleDimensions(BaseModel):
+    bareOverallHeight: float
+    overLabwareHeight: float
+
+
+class ModuleCalibrationPoint(BaseModel):
+    x: float
+    y: float
+
+
+class ModuleDefinition(BaseModel):
+    otSharedSchema: str = Field(
+        "module/schemas/2",
+        description="The current schema."
+    )
+    moduleType: str = Field(
+        ...,
+        description="Module type (Temperature/ Magnetic/ Thermocycler)"
+    )
+    model: str = Field(
+        ...,
+        description="Model name of the module"
+    )
+    labwareOffset: LabwareOffsetVector = Field(
+        ...,
+        description="Labware offset in x, y, z."
+    )
+    dimensions: ModuleDimensions = Field(
+        ...,
+        description="Module dimension"
+    )
+    calibrationPoint: ModuleCalibrationPoint = Field(
+        ...,
+        description="Calibration point of module."
+    )
+    displayName: str = Field(..., description="Display name.")
+    quirks: List = Field(..., description="Module quirks")
+    slotTransforms: Dict = Field(
+        ...,
+        description="Dictionary of transforms for each slot.")
+    compatibleWith: List = Field(
+        ...,
+        description="List of module models this model is compatible with."
+    )

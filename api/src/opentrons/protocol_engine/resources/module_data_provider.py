@@ -4,7 +4,7 @@ from opentrons.protocols.geometry.module_geometry import (
     _load_v2_module_def,
     module_model_from_string,
 )
-from ..types import ModuleModels
+from ..types import ModuleModels, ModuleDefinition
 
 
 class ModuleDataProvider:
@@ -13,8 +13,9 @@ class ModuleDataProvider:
     @staticmethod
     async def get_module_definition(
         model: ModuleModels
-    ) -> ModuleDefinitionV2:
+    ) -> ModuleDefinition:
         """Get the module definition."""
         legacy_model = module_model_from_string(model.value)
         # legacy_module_type = resolve_module_type(legacy_model)
-        return _load_v2_module_def(module_model=legacy_model)
+        return ModuleDefinition.parse_obj(
+            _load_v2_module_def(module_model=legacy_model))
