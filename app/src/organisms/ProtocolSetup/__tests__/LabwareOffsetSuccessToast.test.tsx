@@ -15,6 +15,7 @@ import {
   RUN_ACTION_TYPE_PAUSE,
   RUN_ACTION_TYPE_PLAY,
   RUN_STATUS_SUCCEEDED,
+  LabwareOffset,
 } from '@opentrons/api-client'
 
 jest.mock('@opentrons/components/src/alerts')
@@ -57,16 +58,16 @@ const mockNoOffsetsRun: RunData = {
   pipettes: [],
   labware: [],
 }
-const mock2OffsetsRun: RunData = {
+const mock1OffsetsRun: RunData = {
   id: RUN_ID_2,
   createdAt: '2021-10-07T18:44:49.366581+00:00',
   labwareOffsets: [
-    {
+    ({
       id: 'id',
       definitionUri: 'definitionUri',
-      location: location,
+      location: 'a location',
       offset: { x: 1, y: 1, z: 1 },
-    },
+    } as unknown) as LabwareOffset,
   ],
   status: RUN_STATUS_SUCCEEDED,
   protocolId: PROTOCOL_ID,
@@ -120,18 +121,24 @@ describe(' LabwareOffsetSuccessToast', () => {
 
   it('renders LPC success toast and is clickable with 0 offsets', () => {
     const { getByText } = render(props)
+    expect(getByText('No Labware Offsets created')).toHaveStyle(
+      'backgroundColor: c-bg-success'
+    )
     const successToast = getByText('No Labware Offsets created')
     fireEvent.click(successToast)
   })
-  it('renders LPC success toast and is clickable with 2 offsets', () => {
-    mockAlertItem.mockReturnValue(<div>2 Labware Offsets created</div>)
+  it('renders LPC success toast and is clickable with 1 offset', () => {
+    mockAlertItem.mockReturnValue(<div>1 Labware Offsets created</div>)
     when(mockUseCurrentProtocolRun)
       .calledWith()
       .mockReturnValue({
-        runRecord: { data: mock2OffsetsRun },
+        runRecord: { data: mock1OffsetsRun },
       } as UseCurrentProtocolRun)
     const { getByText } = render(props)
-    const successToast = getByText('2 Labware Offsets created')
+    expect(getByText('1 Labware Offsets created')).toHaveStyle(
+      'backgroundColor: c-success'
+    )
+    const successToast = getByText('1 Labware Offsets created')
     fireEvent.click(successToast)
   })
 })
