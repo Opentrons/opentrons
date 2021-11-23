@@ -47,7 +47,10 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
     """
 
     def __init__(
-        self, ctx: ProtocolContext, geometry: GeometryType, at_version: APIVersion
+        self,
+        ctx: ProtocolContext,
+        geometry: GeometryType,
+        at_version: APIVersion,
     ) -> None:
         """Build the ModuleContext.
 
@@ -79,12 +82,21 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
         :returns: The properly-linked labware object
         """
         mod_labware = self._geometry.add_labware(labware)
-        self._ctx._implementation.get_deck().recalculate_high_z()
-
         labware_namespace, labware_load_name, labware_version = labware.uri.split("/")
         module_loc = self._geometry.parent
+
         assert isinstance(module_loc, (int, str)), "Unexpected labware object parent"
         deck_slot = types.DeckSlotName.from_primitive(module_loc)
+
+        provided_offset = self._ctx._labware_offset_provider.find(
+            labware_definition_uri=labware.uri,
+            module_model=str(self.geometry.model),
+            deck_slot=deck_slot,
+        )
+
+        labware.set_calibration(provided_offset.delta)
+        self._ctx._implementation.get_deck().recalculate_high_z()
+
         self._ctx.labware_load_broker.publish(
             LabwareLoadInfo(
                 labware_definition=labware._implementation.get_definition(),
@@ -93,7 +105,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
                 labware_version=int(labware_version),
                 deck_slot=deck_slot,
                 on_module=True,
-                offset_id=None,  # FIX BEFORE MERGE
+                offset_id=provided_offset.offset_id,
             )
         )
         return mod_labware

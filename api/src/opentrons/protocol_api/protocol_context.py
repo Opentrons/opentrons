@@ -592,7 +592,11 @@ class ProtocolContext(CommandPublisher):
         }[module.type]
 
         module_context = mod_class(
-            self, module.module, module.geometry, self.api_version, self._loop
+            ctx=self,
+            hw_module=module.module,
+            geometry=module.geometry,
+            at_version=self.api_version,
+            loop=self._loop,
         )
         self._modules.append(module_context)
         module_loc = module.geometry.parent
