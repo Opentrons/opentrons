@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { StaticRouter } from 'react-router-dom'
+import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import {
   renderWithProviders,
   componentPropsMatcher,
@@ -19,6 +20,7 @@ import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fi
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '../../../../../i18n'
+import { useRunStatus } from '../../../../RunTimeControl/hooks'
 import { LabwarePositionCheck } from '../../../LabwarePositionCheck'
 import {
   useModuleRenderInfoById,
@@ -38,6 +40,7 @@ jest.mock('../LabwareInfoOverlay')
 jest.mock('../ExtraAttentionWarning')
 jest.mock('../../../hooks')
 jest.mock('../utils/getModuleTypesThatRequireExtraAttention')
+jest.mock('../../../../RunTimeControl/hooks')
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
   return {
@@ -86,6 +89,9 @@ const mockUseModuleRenderInfoById = useModuleRenderInfoById as jest.MockedFuncti
 >
 const mockLabwarePostionCheck = LabwarePositionCheck as jest.MockedFunction<
   typeof LabwarePositionCheck
+>
+const mockUseRunStatus = useRunStatus as jest.MockedFunction<
+  typeof useRunStatus
 >
 
 const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
@@ -190,6 +196,7 @@ describe('LabwareSetup', () => {
     mockLabwarePostionCheck.mockReturnValue(
       <div>mock Labware Position Check</div>
     )
+    mockUseRunStatus.mockReturnValue(RUN_STATUS_IDLE)
   })
 
   afterEach(() => {
@@ -322,6 +329,15 @@ describe('LabwareSetup', () => {
     })
     fireEvent.click(button)
     getByText('mock Labware Position Check')
+  })
+  it('should render a disabled button when a run has been started', () => {
+    mockUseRunStatus.mockReturnValue(RUN_STATUS_RUNNING)
+    const { getByRole, queryByText } = render()
+    const button = getByRole('button', {
+      name: 'run labware position check',
+    })
+    fireEvent.click(button)
+    expect(queryByText('mock Labware Position Check')).toBeNull()
   })
   it('should render the extra attention warning when there are modules/labware that need extra attention', () => {
     when(mockGetModuleTypesThatRequireExtraAttention)

@@ -76,15 +76,6 @@ describe('RunTimeControl', () => {
     expect(getByRole('button', { name: 'Start Run' })).toBeTruthy()
   })
 
-  it('renders a "Running" run status and timer if idle and run started', () => {
-    when(mockUseRunStartTime).calledWith().mockReturnValue('noon')
-    const [{ getByRole, getByText, queryByText }] = render()
-
-    expect(getByText('Status: Running')).toBeTruthy()
-    expect(queryByText('Mock Timer')).toBeTruthy()
-    expect(getByRole('button', { name: 'Pause Run' })).toBeTruthy()
-  })
-
   it('renders a run status and timer if running', () => {
     when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_RUNNING)
     when(mockUseRunStartTime).calledWith().mockReturnValue('noon')
