@@ -9,7 +9,6 @@ import {
 
 import { i18n } from '../../../i18n'
 
-import { useFeatureFlag } from '../../../redux/config'
 import { RunDetails } from '../../../organisms/RunDetails'
 import { Run } from '../'
 
@@ -20,12 +19,8 @@ jest.mock('../../../organisms/RunDetails')
 jest.mock('../../../organisms/SessionHeader', () => ({
   SessionHeader: () => <div>Mock Session Header</div>,
 }))
-jest.mock('../RunLog', () => ({ RunLog: () => <div>Mock Run Log</div> }))
 
 const mockRunDetails = RunDetails as any
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
->
 
 const render = () => {
   return renderWithProviders(
@@ -47,19 +42,7 @@ describe('Run Page', () => {
     jest.resetAllMocks()
   })
 
-  it('renders legacy run page when usePreProtocolWithoutRPC ff is not set', () => {
-    when(mockUseFeatureFlag)
-      .calledWith('preProtocolFlowWithoutRPC')
-      .mockReturnValue(false)
-    const { getByText } = render()
-    getByText('Mock Run Log')
-    expect(mockRunDetails).not.toHaveBeenCalled()
-  })
-
-  it('renders new run page when usePreProtocolWithoutRPC ff is set', () => {
-    when(mockUseFeatureFlag)
-      .calledWith('preProtocolFlowWithoutRPC')
-      .mockReturnValue(true)
+  it('renders run page', () => {
     const { getByText } = render()
     getByText('Mock Run Details')
   })
