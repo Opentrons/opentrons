@@ -960,7 +960,7 @@ def test_tip_length_for(ctx, monkeypatch):
     instr = ctx.load_instrument("p20_single_gen2", "left")
     tiprack = ctx.load_labware("geb_96_tiprack_10ul", "1")
     assert instr._tip_length_for(tiprack) == (
-            tiprack._implementation.get_definition_by_id()["parameters"]["tipLength"]
+            tiprack._implementation.get_definition()["parameters"]["tipLength"]
             - instr.hw_pipette["tip_overlap"]["opentrons/geb_96_tiprack_10ul/1"]
     )
 
@@ -982,7 +982,7 @@ def test_tip_length_for_caldata(ctx, monkeypatch):
     assert instr._tip_length_for(tiprack) == 2
     mock_tip_length.side_effect = cs_types.TipLengthCalNotFound
     assert instr._tip_length_for(tiprack) == (
-            tiprack._implementation.get_definition_by_id()["parameters"]["tipLength"]
+            tiprack._implementation.get_definition()["parameters"]["tipLength"]
             - instr.hw_pipette["tip_overlap"]["opentrons/geb_96_tiprack_10ul/1"]
     )
 
@@ -994,7 +994,7 @@ def test_tip_length_for_load_caldata(ctx):
     fake_tip_length = 31
 
     test_data = modify.create_tip_length_data(
-        tiprack._implementation.get_definition_by_id(), fake_tip_length
+        tiprack._implementation.get_definition(), fake_tip_length
     )
     modify.save_tip_length_calibration(pip_id, test_data)
 
