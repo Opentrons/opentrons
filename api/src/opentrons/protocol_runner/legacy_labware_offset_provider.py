@@ -28,7 +28,7 @@ class LegacyLabwareOffsetProvider(AbstractLegacyLabwareOffsetProvider):
         module_model: Optional[str],
         deck_slot: DeckSlotName,
     ) -> LegacyProvidedLabwareOffset:
-        """TODO BEFORE MERGE: docstring."""
+        """Look up an offset in ProtocolEngine state and return it, if one exists."""
         if module_model is not None:
             # TODO(mc, 2021-11-23): https://github.com/Opentrons/opentrons/issues/8242
             raise NotImplementedError(
