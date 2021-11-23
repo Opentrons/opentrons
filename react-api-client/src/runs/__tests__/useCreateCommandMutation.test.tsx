@@ -34,7 +34,7 @@ describe('useCreateCommandMutation hook', () => {
     resetAllWhenMocks()
   })
 
-  it('should dismiss the current run when callback is called', async () => {
+  it('should issue the given command to the given run when callback is called', async () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockCreateCommand)
       .calledWith(HOST_CONFIG, RUN_ID_1, mockAnonLoadCommand)

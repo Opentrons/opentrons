@@ -55,8 +55,6 @@ describe('useCreateCommandMutation hook', () => {
       .calledWith(HOST_CONFIG, RUN_ID, createLabwareOffsetsData)
       .mockResolvedValue({ data: 'created offsets!' } as any)
 
-    // mockCreateLabwareOffsets.mockImplementation((...args) => console.log(args))
-
     const { result, waitFor } = renderHook(useCreateLabwareOffsetsMutation, {
       wrapper,
     })
