@@ -52,7 +52,6 @@ export const AppComponent = (): JSX.Element => {
         <Switch>
           <Route path="/robots/:name?" component={ConnectPanel} />
           <Route path="/more" component={MorePanel} />
-          <Route path="/upload" />
           <Route path="/calibrate" component={CalibratePanel} />
           <Route path="/run" component={RunPanel} />
         </Switch>

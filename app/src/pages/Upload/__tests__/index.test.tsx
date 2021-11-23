@@ -95,7 +95,7 @@ describe('Upload page', () => {
     jest.resetAllMocks()
   })
 
-  it('renders http upload page if feature flag is set and protocol + run data exists', () => {
+  it('renders http upload page and if protocol + run data exists', () => {
     getFeatureFlags.mockReturnValue({
       allPipetteConfig: false,
       enableBundleUpload: false,
