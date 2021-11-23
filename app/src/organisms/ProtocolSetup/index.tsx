@@ -42,11 +42,7 @@ export function ProtocolSetup(): JSX.Element {
           color={C_DARK_GRAY}
         >
           {t('protocol_upload_revamp_feedback')}
-          <Link
-            href={feedbackFormLink}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <Link href={feedbackFormLink} external>
             {' '}
             {t('feedback_form_link')}
           </Link>

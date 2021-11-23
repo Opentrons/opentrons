@@ -93,8 +93,6 @@ export function PipetteCalibration(props: Props): JSX.Element {
             color={C_BLUE}
             marginRight={SPACING_3}
             id={'PipetteCalibration_pipetteMismatchHelpLink'}
-            target="_blank"
-            rel="noopener noreferrer"
           >
             {t('pipette_compat_help')}
             <Icon name={'open-in-new'} marginLeft={SPACING_1} size="10px" />

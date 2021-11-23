@@ -71,8 +71,7 @@ export const RerunningProtocolModal = (
             href={UPLOAD_PROTOCOL_URL}
             marginTop={SPACING_2}
             id={'RerunningProtocolModal_Link'}
-            rel="noopener noreferrer"
-            target="_blank"
+            external
           >
             {t('rerunning_protocol_modal_link')}
             <Icon name={'open-in-new'} marginLeft={SPACING_1} size="10px" />

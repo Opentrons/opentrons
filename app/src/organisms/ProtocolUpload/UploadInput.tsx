@@ -306,9 +306,8 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
           color={C_BLUE}
           href={PROTOCOL_LIBRARY_URL}
           id={'UploadInput_protocolLibraryButton'}
-          rel="noopener noreferrer"
-          target="_blank"
           marginBottom={SPACING_1}
+          external
         >
           {t('browse_protocol_library')}
           <Icon name={'open-in-new'} marginLeft={SPACING_1} size="10px" />
@@ -318,8 +317,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
           color={C_BLUE}
           href={PROTOCOL_DESIGNER_URL}
           id={'UploadInput_protocolDesignerButton'}
-          rel="noopener noreferrer"
-          target="_blank"
+          external
         >
           {t('launch_protocol_designer')}
           <Icon name={'open-in-new'} marginLeft={SPACING_1} size="10px" />
