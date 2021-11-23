@@ -14,7 +14,9 @@ import {
   Text,
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
+import { useCreateLabwareOffsetsMutation } from '@opentrons/react-api-client'
 import { useProtocolDetails } from '../../RunDetails/hooks'
+import { useCurrentProtocolRun } from '../../ProtocolUpload/hooks'
 import { DeckMap } from './DeckMap'
 import { SectionList } from './SectionList'
 import { LabwareOffsetsSummary } from './LabwareOffsetsSummary'
@@ -26,7 +28,7 @@ export const SummaryScreen = (props: {
   savePositionCommandData: SavePositionCommandData
 }): JSX.Element | null => {
   const { savePositionCommandData } = props
-  const [offsets, setLabwareOffsets] = React.useState<LabwareOffsets>([])
+  const [labwareOffsets, setLabwareOffsets] = React.useState<LabwareOffsets>([])
   const { t } = useTranslation('labware_position_check')
   const introInfo = useIntroInfo()
   const { protocolData } = useProtocolDetails()
@@ -35,10 +37,29 @@ export const SummaryScreen = (props: {
     .catch((e: Error) =>
       console.error(`error getting labware offsetsL ${e.message}`)
     )
+  const { createLabwareOffsets } = useCreateLabwareOffsetsMutation()
+  const { runRecord } = useCurrentProtocolRun()
   if (introInfo == null) return null
   if (protocolData == null) return null
   const labwareIds = Object.keys(protocolData.labware)
   const { sections, primaryPipetteMount, secondaryPipetteMount } = introInfo
+
+  const applyLabwareOffsets = (): void => {
+    if (labwareOffsets.length > 0) {
+      createLabwareOffsets({
+        runId: runRecord?.data.id as string,
+        data: {
+          labwareOffsets: labwareOffsets.map(offsetRecord => ({
+            definitionUri: offsetRecord.labwareDefinitionUri,
+            location: offsetRecord.labwareLocation,
+            offset: offsetRecord.offsetData,
+          })),
+        },
+      })
+    } else {
+      console.error('no labware offset data found')
+    }
+  }
 
   return (
     <Flex margin={SPACING_3} flexDirection={DIRECTION_COLUMN}>
@@ -63,13 +84,14 @@ export const SummaryScreen = (props: {
           <DeckMap completedLabwareIdSections={labwareIds} />
         </Flex>
         <Flex flex={'1 1 45%'}>
-          <LabwareOffsetsSummary offsetData={offsets} />
+          <LabwareOffsetsSummary offsetData={labwareOffsets} />
         </Flex>
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER} marginBottom={SPACING_4}>
         <PrimaryBtn
           title={t('close_and_apply_offset_data')}
-          backgroundColor={C_BLUE} // TODO immediately: hook up CTA
+          backgroundColor={C_BLUE}
+          onClick={applyLabwareOffsets}
         >
           {t('close_and_apply_offset_data')}
         </PrimaryBtn>
