@@ -2,7 +2,6 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from opentrons_shared_data.module.dev_types import ModuleDefinitionV2
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocols.geometry.module_geometry import (
@@ -21,7 +20,13 @@ from ..errors import (
 )
 from ..resources import LabwareDataProvider, ModuleDataProvider, ModelUtils
 from ..state import StateStore
-from ..types import LabwareLocation, PipetteName, DeckSlotLocation, ModuleModels
+from ..types import (
+    LabwareLocation,
+    PipetteName,
+    DeckSlotLocation,
+    ModuleModels,
+    ModuleDefinition
+)
 
 
 @dataclass(frozen=True)
@@ -45,7 +50,7 @@ class LoadedModuleData:
     """The result of a load module procedure."""
     module_id: str
     module_serial: Optional[str]
-    definition: ModuleDefinitionV2
+    definition: ModuleDefinition
 
 
 class EquipmentHandler:
@@ -177,6 +182,7 @@ class EquipmentHandler:
         Returns:
             A LoadedModuleData object
         """
+        definition: ModuleDefinition
         try:
             # Try to use existing definition in state.
             definition = self._state_store.modules.get_definition_by_model(model)
@@ -185,7 +191,7 @@ class EquipmentHandler:
 
         module_id = module_id or self._model_utils.generate_id()
 
-        attached_mod_instance = self._get_hardware_module(model)
+        attached_mod_instance = await self._get_hardware_module(model)
 
         return LoadedModuleData(
             module_id=module_id,

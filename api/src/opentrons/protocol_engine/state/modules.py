@@ -87,7 +87,7 @@ class ModuleView(HasState[ModuleState]):
     def get_definition_by_model(
             self,
             model: ModuleModels
-    ) -> Optional[ModuleDefinition]:
+    ) -> ModuleDefinition:
         """Return module definition by model."""
         try:
             return self._state.definition_by_model[model]
