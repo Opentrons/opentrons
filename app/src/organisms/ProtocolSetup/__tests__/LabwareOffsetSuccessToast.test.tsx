@@ -118,12 +118,12 @@ describe(' LabwareOffsetSuccessToast', () => {
     jest.resetAllMocks()
   })
 
-  it('renders LPC success toast and is clickable', () => {
+  it('renders LPC success toast and is clickable with 0 offsets', () => {
     const { getByText } = render(props)
     const successToast = getByText('No Labware Offsets created')
     fireEvent.click(successToast)
   })
-  it('renders LPC success toast and is clickable', () => {
+  it('renders LPC success toast and is clickable with 2 offsets', () => {
     mockAlertItem.mockReturnValue(<div>2 Labware Offsets created</div>)
     when(mockUseCurrentProtocolRun)
       .calledWith()

@@ -23,6 +23,7 @@ import type { SavePositionCommandData } from './types'
 
 interface LabwarePositionCheckModalProps {
   onCloseClick: () => unknown
+  onLabwarePositionCheckComplete: () => void
 }
 export const LabwarePositionCheck = (
   props: LabwarePositionCheckModalProps
@@ -34,7 +35,6 @@ export const LabwarePositionCheck = (
     setSavePositionCommandData,
   ] = React.useState<SavePositionCommandData>({})
   const [isRestartingRun, setIsRestartingRun] = React.useState<boolean>(false)
-
   const {
     confirm: confirmExitLPC,
     showConfirmation,
@@ -139,7 +139,11 @@ export const LabwarePositionCheck = (
           },
         }}
       >
-        <SummaryScreen savePositionCommandData={savePositionCommandData}/>
+        <SummaryScreen
+          savePositionCommandData={savePositionCommandData}
+          onLabwarePositionCheckComplete={props.onLabwarePositionCheckComplete}
+          onCloseClick={props.onCloseClick}
+        />
       </ModalPage>
     )
   } else if (currentCommandIndex !== 0) {

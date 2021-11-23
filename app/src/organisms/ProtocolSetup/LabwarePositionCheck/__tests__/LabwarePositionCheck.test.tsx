@@ -58,6 +58,7 @@ describe('LabwarePositionCheck', () => {
   beforeEach(() => {
     props = {
       onCloseClick: jest.fn(),
+      onLabwarePositionCheckComplete: jest.fn(),
     }
     when(mockUseSteps)
       .calledWith()

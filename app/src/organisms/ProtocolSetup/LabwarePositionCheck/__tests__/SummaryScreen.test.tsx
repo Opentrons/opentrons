@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { when } from 'jest-when'
+import { fireEvent } from '@testing-library/dom'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
@@ -9,15 +10,12 @@ import { SummaryScreen } from '../SummaryScreen'
 import { LabwareOffsetsSummary } from '../LabwareOffsetsSummary'
 import { useIntroInfo, useLabwareOffsets } from '../hooks'
 import { Section } from '../types'
-import { LabwareOffsetSuccessToast } from '../../LabwareOffsetSuccessToast'
-import { fireEvent, getByText, screen } from '@testing-library/dom'
 
 jest.mock('../SectionList')
 jest.mock('../hooks')
 jest.mock('../DeckMap')
 jest.mock('../../../RunDetails/hooks')
 jest.mock('../LabwareOffsetsSummary')
-jest.mock('../../LabwareOffsetSuccessToast')
 
 const mockSectionList = SectionList as jest.MockedFunction<typeof SectionList>
 const mockUseIntroInfo = useIntroInfo as jest.MockedFunction<
@@ -26,7 +24,6 @@ const mockUseIntroInfo = useIntroInfo as jest.MockedFunction<
 const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
   typeof useProtocolDetails
 >
-
 const mockDeckmap = DeckMap as jest.MockedFunction<typeof DeckMap>
 
 const mockLabwareOffsetsSummary = LabwareOffsetsSummary as jest.MockedFunction<
@@ -34,9 +31,6 @@ const mockLabwareOffsetsSummary = LabwareOffsetsSummary as jest.MockedFunction<
 >
 const mockUseLabwareOffsets = useLabwareOffsets as jest.MockedFunction<
   typeof useLabwareOffsets
->
-const mockLabwareOffsetsSuccessToast = LabwareOffsetSuccessToast as jest.MockedFunction<
-  typeof LabwareOffsetSuccessToast
 >
 
 const MOCK_SECTIONS = ['PRIMARY_PIPETTE_TIPRACKS' as Section]
@@ -51,6 +45,8 @@ const render = () => {
   return renderWithProviders(
     <SummaryScreen
       savePositionCommandData={{ someLabwareIf: ['commandId1', 'commandId2'] }}
+      onLabwarePositionCheckComplete={jest.fn()}
+      onCloseClick={jest.fn()}
     />,
     {
       i18nInstance: i18n,
@@ -62,9 +58,6 @@ describe('SummaryScreen', () => {
   beforeEach(() => {
     mockSectionList.mockReturnValue(<div>Mock SectionList</div>)
     mockDeckmap.mockReturnValue(<div>Mock DeckMap</div>)
-    mockLabwareOffsetsSuccessToast.mockReturnValue(
-      <div>Mock LabwareOffsetSuccessToast</div>
-    )
     mockLabwareOffsetsSummary.mockReturnValue(
       <div>Mock Labware Offsets Summary </div>
     )
@@ -107,13 +100,11 @@ describe('SummaryScreen', () => {
     getByText('Mock Labware Offsets Summary')
     getByText('Labware Position Check Complete')
   })
-  it('renders button and clicks it', () => {
+  it('renders apply offset button and clicks it', () => {
     const { getByRole } = render()
-    expect(screen.queryByText('Mock LabwareOffsetSuccessToast')).toBeNull()
     const button = getByRole('button', {
       name: 'Close and apply labware offset data',
     })
     fireEvent.click(button)
-    expect(screen.queryByText('Mock LabwareOffsetSuccessToast')).not.toBeNull()
   })
 })

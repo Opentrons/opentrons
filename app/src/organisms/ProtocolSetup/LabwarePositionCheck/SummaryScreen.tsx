@@ -23,10 +23,11 @@ import { LabwareOffsetsSummary } from './LabwareOffsetsSummary'
 import { useIntroInfo, useLabwareOffsets, LabwareOffsets } from './hooks'
 import type { SavePositionCommandData } from './types'
 import type { ProtocolFile } from '@opentrons/shared-data'
-import { LabwareOffsetSuccessToast } from '../LabwareOffsetSuccessToast'
 
 export const SummaryScreen = (props: {
   savePositionCommandData: SavePositionCommandData
+  onLabwarePositionCheckComplete: () => void
+  onCloseClick: () => unknown
 }): JSX.Element | null => {
   const { savePositionCommandData } = props
   const [labwareOffsets, setLabwareOffsets] = React.useState<LabwareOffsets>([])
@@ -40,7 +41,6 @@ export const SummaryScreen = (props: {
     )
   const { createLabwareOffsets } = useCreateLabwareOffsetsMutation()
   const { runRecord } = useCurrentProtocolRun()
-  const [showLPCSuccessToast, setShowLPCSuccessToast] = React.useState(true)
 
   if (introInfo == null) return null
   if (protocolData == null) return null
@@ -94,15 +94,12 @@ export const SummaryScreen = (props: {
         <PrimaryBtn
           title={t('close_and_apply_offset_data')}
           backgroundColor={C_BLUE}
-          onClick={applyLabwareOffsets}
-          onClick={() =>
-            showLPCSuccessToast && (
-              <LabwareOffsetSuccessToast
-                onCloseClick={() => setShowLPCSuccessToast(false)}
-              />
-            )
-          }
           id={'Lpc_summaryScreen_applyOffsetButton'}
+          onClick={() => {
+            props.onLabwarePositionCheckComplete()
+            props.onCloseClick()
+            applyLabwareOffsets
+          }}
         >
           {t('close_and_apply_offset_data')}
         </PrimaryBtn>

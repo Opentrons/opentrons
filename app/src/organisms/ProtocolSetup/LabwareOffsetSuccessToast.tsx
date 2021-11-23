@@ -7,8 +7,8 @@ import {
   SPACING_2,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
-import { useCurrentProtocolRun } from '../ProtocolUpload/hooks'
 import { Portal } from '../../App/portal'
+import { useCurrentProtocolRun } from '../ProtocolUpload/hooks'
 
 interface LabwareOffsetSuccessToastProps {
   onCloseClick: () => unknown
@@ -22,7 +22,7 @@ export function LabwareOffsetSuccessToast(
   const labwareOffsets = currentRunData?.labwareOffsets
 
   return (
-    <Portal level="top">
+    <Portal level="page">
       <Flex
         flexDirection={DIRECTION_COLUMN}
         padding={`${SPACING_1} ${SPACING_2}`}
