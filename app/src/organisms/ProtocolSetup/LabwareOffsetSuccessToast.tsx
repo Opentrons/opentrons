@@ -8,6 +8,7 @@ import {
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import { useCurrentProtocolRun } from '../ProtocolUpload/hooks'
+import { Portal } from '../../App/portal'
 
 interface LabwareOffsetSuccessToastProps {
   onCloseClick: () => unknown
@@ -21,17 +22,22 @@ export function LabwareOffsetSuccessToast(
   const labwareOffsets = currentRunData?.labwareOffsets
 
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      padding={`${SPACING_1} ${SPACING_2}`}
-    >
-      <AlertItem
-        type="success"
-        onCloseClick={() => props.onCloseClick}
-        title={t('labware_positon_check_complete_toast', {
-          num_offsets: labwareOffsets?.length,
-        })}
-      />
-    </Flex>
+    <Portal level="top">
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        padding={`${SPACING_1} ${SPACING_2}`}
+      >
+        <AlertItem
+          type="success"
+          onCloseClick={() => props.onCloseClick}
+          title={t('labware_positon_check_complete_toast', {
+            num_offsets:
+              labwareOffsets?.length === 0
+                ? t('no_labware_offsets')
+                : labwareOffsets?.length,
+          })}
+        />
+      </Flex>
+    </Portal>
   )
 }

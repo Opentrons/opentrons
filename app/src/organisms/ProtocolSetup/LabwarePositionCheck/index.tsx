@@ -139,7 +139,7 @@ export const LabwarePositionCheck = (
           },
         }}
       >
-        <SummaryScreen savePositionCommandData={savePositionCommandData} />
+        <SummaryScreen savePositionCommandData={savePositionCommandData}/>
       </ModalPage>
     )
   } else if (currentCommandIndex !== 0) {
