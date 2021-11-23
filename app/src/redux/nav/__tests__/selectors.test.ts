@@ -129,7 +129,6 @@ describe('nav selectors', () => {
     mockGetFeatureFlags.mockReturnValue({
       allPipetteConfig: false,
       enableBundleUpload: false,
-      preProtocolFlowWithoutRPC: false,
     })
     mockGetConnectedRobot.mockReturnValue(null)
     mockGetProtocolData.mockReturnValue(null)
