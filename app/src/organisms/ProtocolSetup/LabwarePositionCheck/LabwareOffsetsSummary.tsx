@@ -58,7 +58,7 @@ export const LabwareOffsetsSummary = (
             >
               {t('labware_offsets_summary_location')}
             </Text>
-            {offsetData.map(({ location }) => {
+            {offsetData.map(({ displayLocation: location }) => {
               return (
                 <Flex
                   key={location}
@@ -83,7 +83,7 @@ export const LabwareOffsetsSummary = (
             >
               {t('labware_offsets_summary_labware')}
             </Text>
-            {offsetData.map(({ labware }, index) => {
+            {offsetData.map(({ displayName: labware }, index) => {
               return (
                 <Flex
                   key={index}
