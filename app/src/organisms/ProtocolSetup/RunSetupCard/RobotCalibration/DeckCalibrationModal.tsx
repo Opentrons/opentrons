@@ -61,6 +61,7 @@ export const DeckCalibrationModal = (
             href={robotCalHelpArticle}
             id={'RobotCalModal_helpArticleLink'}
             rel="noopener noreferrer"
+            target="_blank"
           >
             {t('learn_more_about_robot_cal_link')}
             <Icon name={'open-in-new'} marginLeft={SPACING_1} size="10px" />

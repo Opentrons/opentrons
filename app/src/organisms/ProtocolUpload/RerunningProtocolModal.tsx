@@ -72,6 +72,7 @@ export const RerunningProtocolModal = (
             marginTop={SPACING_2}
             id={'RerunningProtocolModal_Link'}
             rel="noopener noreferrer"
+            target="_blank"
           >
             {t('rerunning_protocol_modal_link')}
             <Icon name={'open-in-new'} marginLeft={SPACING_1} size="10px" />
