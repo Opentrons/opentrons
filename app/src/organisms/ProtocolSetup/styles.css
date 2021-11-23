@@ -7,7 +7,6 @@
 .modal {
   display: flex;
   align-items: flex-start;
-  flex-direction: 'column';
   z-index: 100;
 }
 
