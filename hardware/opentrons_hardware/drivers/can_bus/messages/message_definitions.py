@@ -45,13 +45,6 @@ class StopRequest:  # noqa: D101
 
 
 @dataclass
-class GetStatusRequest:  # noqa: D101
-    payload: payloads.EmptyPayload
-    payload_type: Type[BinarySerializable] = payloads.EmptyPayload
-    message_id: Literal[MessageId.get_status_request] = MessageId.get_status_request
-
-
-@dataclass
 class EnableMotorRequest:  # noqa: D101
     payload: payloads.EmptyPayload
     payload_type: Type[BinarySerializable] = payloads.EmptyPayload
@@ -65,20 +58,6 @@ class DisableMotorRequest:  # noqa: D101
     message_id: Literal[
         MessageId.disable_motor_request
     ] = MessageId.disable_motor_request
-
-
-@dataclass
-class GetStatusResponse:  # noqa: D101
-    payload: payloads.GetStatusResponsePayload
-    payload_type: Type[BinarySerializable] = payloads.GetStatusResponsePayload
-    message_id: Literal[MessageId.get_status_response] = MessageId.get_status_response
-
-
-@dataclass
-class MoveRequest:  # noqa: D101
-    payload: payloads.MoveRequestPayload
-    payload_type: Type[BinarySerializable] = payloads.MoveRequestPayload
-    message_id: Literal[MessageId.move_request] = MessageId.move_request
 
 
 @dataclass
