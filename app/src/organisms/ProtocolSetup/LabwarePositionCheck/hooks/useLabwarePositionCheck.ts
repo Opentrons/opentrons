@@ -9,7 +9,6 @@ import {
   RunCommandSummary,
   getCommand,
   VectorOffset,
-  CreateLabwareOffsetData,
   LabwareOffset,
 } from '@opentrons/api-client'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
