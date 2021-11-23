@@ -7,7 +7,6 @@ import {
   actions as RobotActions,
   selectors as RobotSelectors,
 } from '../../../redux/robot'
-import { useFeatureFlag } from '../../../redux/config'
 import { getBuildrootUpdateAvailable, UPGRADE } from '../../../redux/buildroot'
 import { CONNECTABLE } from '../../../redux/discovery'
 import { RobotListItem } from './RobotListItem'
@@ -35,11 +34,8 @@ export function RobotItemComponent(props: RobotItemProps): JSX.Element {
     (state: State) => RobotSelectors.getConnectRequest(state).inProgress
   )
   const dispatch = useDispatch<Dispatch>()
-  const isUploadWithoutRPC = useFeatureFlag('preProtocolFlowWithoutRPC')
 
-  const connect = isUploadWithoutRPC
-    ? RobotActions.connect
-    : RobotActions.legacyConnect
+  const connect = RobotActions.connect
 
   const handleToggleConnect = (): void => {
     if (!connectInProgress) {
