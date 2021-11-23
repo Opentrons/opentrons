@@ -23,7 +23,6 @@ import { Run } from '../pages/Run'
 import { More } from '../pages/More'
 
 import { ConnectPanel } from '../pages/Robots/ConnectPanel'
-import { UploadPanel } from '../pages/Upload/UploadPanel'
 import { CalibratePanel } from '../pages/Calibrate/CalibratePanel'
 import { RunPanel } from '../pages/Run/RunPanel'
 import { MorePanel } from '../pages/More/MorePanel'
@@ -53,7 +52,7 @@ export const AppComponent = (): JSX.Element => {
         <Switch>
           <Route path="/robots/:name?" component={ConnectPanel} />
           <Route path="/more" component={MorePanel} />
-          <Route path="/upload" component={UploadPanel} />
+          <Route path="/upload" />
           <Route path="/calibrate" component={CalibratePanel} />
           <Route path="/run" component={RunPanel} />
         </Switch>

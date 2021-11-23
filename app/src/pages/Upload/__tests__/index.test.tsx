@@ -79,7 +79,6 @@ describe('Upload page', () => {
     getFeatureFlags.mockReturnValue({
       allPipetteConfig: false,
       enableBundleUpload: false,
-      preProtocolFlowWithoutRPC: false,
     })
 
     getSessionLoadInProgress.mockReturnValue(false)
@@ -96,17 +95,10 @@ describe('Upload page', () => {
     jest.resetAllMocks()
   })
 
-  it('renders legacy RPC upload page if feature flag not set', () => {
-    const { wrapper } = render()
-    expect(wrapper.find('FileInfo').exists()).toBe(true)
-    expect(wrapper.find('ProtocolUpload').exists()).toBe(false)
-  })
-
   it('renders http upload page if feature flag is set and protocol + run data exists', () => {
     getFeatureFlags.mockReturnValue({
       allPipetteConfig: false,
       enableBundleUpload: false,
-      preProtocolFlowWithoutRPC: true,
     })
     const { wrapper } = render()
     expect(wrapper.find('FileInfo').exists()).toBe(false)
