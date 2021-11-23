@@ -8,15 +8,25 @@ import {
   Icon,
   SPACING_2,
   SPACING_3,
+  SPACING_4,
+  SPACING_5,
   SPACING_7,
   SIZE_1,
   DIRECTION_ROW,
   ALIGN_START,
+  ALIGN_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
+  FONT_WEIGHT_REGULAR,
+  FONT_SIZE_BODY_2,
   FONT_WEIGHT_SEMIBOLD,
   FONT_SIZE_BODY_1,
   C_WHITE,
   COLOR_SUCCESS,
   COLOR_WARNING,
+  C_LIGHT_GRAY,
+  C_DARK_GRAY,
+  JUSTIFY_CENTER,
+  DIRECTION_COLUMN,
 } from '@opentrons/components'
 import { protocolHasModules } from '@opentrons/shared-data'
 import { Divider } from '../../../atoms/structure'
@@ -54,6 +64,16 @@ export function RunSetupCard(): JSX.Element | null {
     ROBOT_CALIBRATION_STEP_KEY,
     LABWARE_SETUP_KEY,
   ])
+
+  const [isLoading, setIsLoading] = React.useState<Boolean>(true)
+
+  // Set loader to false once protocolData contains data and is not null
+  React.useEffect(() => {
+    if (protocolData != null) {
+      setIsLoading(false)
+    }
+  }, [protocolData])
+
   React.useEffect(() => {
     if (protocolData != null && protocolHasModules(protocolData)) {
       setStepKeysInOrder([
@@ -133,57 +153,97 @@ export function RunSetupCard(): JSX.Element | null {
       >
         {t('setup_for_run')}
       </Text>
-      {stepsKeysInOrder.map((stepKey, index) => (
-        <React.Fragment key={stepKey}>
+      {isLoading ? (
+        <RunSetupLoader />
+      ) : (
+        <>
+          {stepsKeysInOrder.map((stepKey, index) => (
+            <React.Fragment key={stepKey}>
+              <Divider marginY={SPACING_3} />
+              <CollapsibleStep
+                expanded={stepKey === expandedStepKey}
+                label={t('step', { index: index + 1 })}
+                title={t(`${stepKey}_title`)}
+                description={StepDetailMap[stepKey].description}
+                toggleExpanded={() =>
+                  stepKey === expandedStepKey
+                    ? setExpandedStepKey(null)
+                    : setExpandedStepKey(stepKey)
+                }
+                rightAlignedNode={
+                  stepKey === ROBOT_CALIBRATION_STEP_KEY ? (
+                    <Flex
+                      flexDirection={DIRECTION_ROW}
+                      alignItems={ALIGN_START}
+                      marginLeft={SPACING_7}
+                    >
+                      <Icon
+                        size={SIZE_1}
+                        color={
+                          calibrationStatus.complete
+                            ? COLOR_SUCCESS
+                            : COLOR_WARNING
+                        }
+                        marginRight={SPACING_2}
+                        name={
+                          calibrationStatus.complete
+                            ? 'check-circle'
+                            : 'alert-circle'
+                        }
+                        id={'RunSetupCard_calibrationIcon'}
+                      />
+                      <Text
+                        fontSize={FONT_SIZE_BODY_1}
+                        id={'RunSetupCard_calibrationText'}
+                      >
+                        {calibrationStatus.complete
+                          ? t('calibration_ready')
+                          : t('calibration_needed')}
+                      </Text>
+                    </Flex>
+                  ) : null
+                }
+              >
+                {StepDetailMap[stepKey].stepInternals}
+              </CollapsibleStep>
+            </React.Fragment>
+          ))}
           <Divider marginY={SPACING_3} />
-          <CollapsibleStep
-            expanded={stepKey === expandedStepKey}
-            label={t('step', { index: index + 1 })}
-            title={t(`${stepKey}_title`)}
-            description={StepDetailMap[stepKey].description}
-            toggleExpanded={() =>
-              stepKey === expandedStepKey
-                ? setExpandedStepKey(null)
-                : setExpandedStepKey(stepKey)
-            }
-            rightAlignedNode={
-              stepKey === ROBOT_CALIBRATION_STEP_KEY ? (
-                <Flex
-                  flexDirection={DIRECTION_ROW}
-                  alignItems={ALIGN_START}
-                  marginLeft={SPACING_7}
-                >
-                  <Icon
-                    size={SIZE_1}
-                    color={
-                      calibrationStatus.complete ? COLOR_SUCCESS : COLOR_WARNING
-                    }
-                    marginRight={SPACING_2}
-                    name={
-                      calibrationStatus.complete
-                        ? 'check-circle'
-                        : 'alert-circle'
-                    }
-                    id={'RunSetupCard_calibrationIcon'}
-                  />
-                  <Text
-                    fontSize={FONT_SIZE_BODY_1}
-                    id={'RunSetupCard_calibrationText'}
-                  >
-                    {calibrationStatus.complete
-                      ? t('calibration_ready')
-                      : t('calibration_needed')}
-                  </Text>
-                </Flex>
-              ) : null
-            }
-          >
-            {StepDetailMap[stepKey].stepInternals}
-          </CollapsibleStep>
-        </React.Fragment>
-      ))}
-      <Divider marginY={SPACING_3} />
-      <ProceedToRunCta />
+          <ProceedToRunCta />
+        </>
+      )}
     </Card>
+  )
+}
+
+function RunSetupLoader(): JSX.Element | null {
+  const { t } = useTranslation('protocol_setup')
+  return (
+    <>
+      <Flex
+        justifyContent={JUSTIFY_CENTER}
+        flexDirection={DIRECTION_COLUMN}
+        alignItems={ALIGN_CENTER}
+      >
+        <Icon
+          name="ot-spinner"
+          width={SPACING_5}
+          marginTop={SPACING_4}
+          marginBottom={SPACING_4}
+          color={C_LIGHT_GRAY}
+          spin
+        />
+        <Text
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          as={'h3'}
+          color={C_DARK_GRAY}
+          marginBottom={SPACING_5}
+          fontWeight={FONT_WEIGHT_REGULAR}
+          fontSize={FONT_SIZE_BODY_2}
+        >
+          {t('loading_protocol_details')}
+        </Text>
+      </Flex>
+    </>
   )
 }
