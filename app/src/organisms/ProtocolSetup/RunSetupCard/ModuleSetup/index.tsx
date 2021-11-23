@@ -12,13 +12,11 @@ import {
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
   FONT_SIZE_BODY_1,
-  JUSTIFY_CENTER,
   C_BLUE,
-  C_NEAR_WHITE,
-  SPACING_4,
   useInterval,
   Tooltip,
   useHoverTooltip,
+  ALIGN_CENTER,
 } from '@opentrons/components'
 import { inferModuleOrientationFromXCoordinate } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
@@ -81,81 +79,74 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
       : null
 
   return (
-    <React.Fragment>
+    <Flex flex="1" maxHeight="80vh" flexDirection={DIRECTION_COLUMN}>
       {showMultipleModulesModal && (
         <MultipleModulesModal
           onCloseClick={() => setShowMultipleModulesModal(false)}
         />
       )}
-      <Flex
-        flex="1"
-        backgroundColor={C_NEAR_WHITE}
-        borderRadius="6px"
-        flexDirection={DIRECTION_COLUMN}
+      {hasADuplicateModule ? (
+        <Btn
+          as={Link}
+          fontSize={FONT_SIZE_BODY_1}
+          color={C_BLUE}
+          alignSelf={ALIGN_FLEX_END}
+          onClick={() => setShowMultipleModulesModal(true)}
+          data-test={'LabwareSetup_helpLink'}
+        >
+          {t('multiple_modules_help_link_title')}
+        </Btn>
+      ) : null}
+      <RobotWorkSpace
+        deckDef={standardDeckDef as any}
+        viewBox={DECK_VIEW_BOX}
+        className={styles.deck_map}
+        deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
+        id={'ModuleSetup_deckMap'}
       >
-        {hasADuplicateModule ? (
-          <Btn
-            as={Link}
-            fontSize={FONT_SIZE_BODY_1}
-            color={C_BLUE}
-            alignSelf={ALIGN_FLEX_END}
-            onClick={() => setShowMultipleModulesModal(true)}
-            data-test={'LabwareSetup_helpLink'}
-          >
-            {t('multiple_modules_help_link_title')}
-          </Btn>
-        ) : null}
-        <RobotWorkSpace
-          deckDef={standardDeckDef as any}
-          viewBox={DECK_VIEW_BOX}
-          className={styles.deck_map}
-          deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
-          id={'ModuleSetup_deckMap'}
-        >
-          {() => (
-            <>
-              {map(moduleRenderInfoById, ({ x, y, moduleDef }) => {
-                const { model } = moduleDef
-                const attachedModuleMatch = attachedModules.find(
-                  attachedModule => model === attachedModule.model
-                )
-                return (
-                  <React.Fragment key={`LabwareSetup_Module_${model}_${x}${y}`}>
-                    <Module
-                      x={x}
-                      y={y}
-                      orientation={inferModuleOrientationFromXCoordinate(x)}
-                      def={moduleDef}
-                    >
-                      <ModuleInfo
-                        moduleModel={model}
-                        isAttached={attachedModuleMatch != null}
-                        usbPort={attachedModuleMatch?.usbPort.port}
-                        hubPort={attachedModuleMatch?.usbPort.hub}
-                      />
-                    </Module>
-                  </React.Fragment>
-                )
-              })}
-            </>
-          )}
-        </RobotWorkSpace>
-      </Flex>
-      <Flex justifyContent={JUSTIFY_CENTER} margin={SPACING_4}>
-        <PrimaryBtn
-          title={t('proceed_to_labware_setup_step')}
-          disabled={proceedToLabwareDisabledReason != null}
-          onClick={expandLabwareSetupStep}
-          backgroundColor={C_BLUE}
-          id={'ModuleSetup_proceedToLabwareSetup'}
-          {...targetProps}
-        >
-          {t('proceed_to_labware_setup_step')}
-        </PrimaryBtn>
-        {proceedToLabwareDisabledReason != null && (
-          <Tooltip {...tooltipProps}>{proceedToLabwareDisabledReason}</Tooltip>
+        {() => (
+          <>
+            {map(moduleRenderInfoById, ({ x, y, moduleDef }) => {
+              const { model } = moduleDef
+              const attachedModuleMatch = attachedModules.find(
+                attachedModule => model === attachedModule.model
+              )
+              return (
+                <React.Fragment key={`LabwareSetup_Module_${model}_${x}${y}`}>
+                  <Module
+                    x={x}
+                    y={y}
+                    orientation={inferModuleOrientationFromXCoordinate(x)}
+                    def={moduleDef}
+                  >
+                    <ModuleInfo
+                      moduleModel={model}
+                      isAttached={attachedModuleMatch != null}
+                      usbPort={attachedModuleMatch?.usbPort.port}
+                      hubPort={attachedModuleMatch?.usbPort.hub}
+                    />
+                  </Module>
+                </React.Fragment>
+              )
+            })}
+          </>
         )}
-      </Flex>
-    </React.Fragment>
+      </RobotWorkSpace>
+      <PrimaryBtn
+        title={t('proceed_to_labware_setup_step')}
+        disabled={proceedToLabwareDisabledReason != null}
+        onClick={expandLabwareSetupStep}
+        backgroundColor={C_BLUE}
+        id={'ModuleSetup_proceedToLabwareSetup'}
+        width="18rem"
+        alignSelf={ALIGN_CENTER}
+        {...targetProps}
+      >
+        {t('proceed_to_labware_setup_step')}
+      </PrimaryBtn>
+      {proceedToLabwareDisabledReason != null && (
+        <Tooltip {...tooltipProps}>{proceedToLabwareDisabledReason}</Tooltip>
+      )}
+    </Flex>
   )
 }
