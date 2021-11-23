@@ -50,12 +50,12 @@ from robot_server.runs.router.base_router import (
 LABWARE_OFFSET_REQUESTS = [
     pe_types.LabwareOffsetCreate(
         definitionUri="namespace_1/load_name_1/123",
-        location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        location=pe_types.LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
         vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
     ),
     pe_types.LabwareOffsetCreate(
         definitionUri="namespace_2/load_name_2/123",
-        location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
+        location=pe_types.LabwareOffsetLocation(slotName=DeckSlotName.SLOT_2),
         vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
     ),
 ]
@@ -65,14 +65,14 @@ RESOLVED_LABWARE_OFFSETS = [
         id="labware-offset-1-id",
         createdAt=datetime(year=2021, month=1, day=1),
         definitionUri="namespace_1/load_name_1/1",
-        location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        location=pe_types.LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
         vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
     ),
     pe_types.LabwareOffset(
         id="labware-offset-2-id",
         createdAt=datetime(year=2021, month=1, day=1),
         definitionUri="namespace_2/load_name_2/2",
-        location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
+        location=pe_types.LabwareOffsetLocation(slotName=DeckSlotName.SLOT_2),
         vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
     ),
 ]

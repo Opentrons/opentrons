@@ -1,12 +1,7 @@
 import logging
 from typing import Dict
 
-from opentrons.protocols.labware.definition import (
-    IndexFileInformation,
-    get_labware_definition,
-)
-
-from opentrons.calibration_storage import get
+from opentrons.protocols.labware.definition import get_labware_definition
 from opentrons.protocols.context.labware import AbstractLabware
 from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
 from opentrons.types import Location
@@ -17,7 +12,9 @@ MODULE_LOG = logging.getLogger(__name__)
 
 
 def load_from_definition(
-    definition: LabwareDefinition, parent: Location, label: str = None
+    definition: LabwareDefinition,
+    parent: Location,
+    label: str = None,
 ) -> AbstractLabware:
     """
     Return a labware object constructed from a provided labware definition dict
@@ -34,15 +31,7 @@ def load_from_definition(
     :param str label: An optional label that will override the labware's
                       display name from its definition
     """
-    labware = LabwareImplementation(definition=definition, parent=parent, label=label)
-    index_info = IndexFileInformation.from_labware(labware)
-    offset = get.get_labware_calibration(
-        definition=index_info.definition,
-        lookup_path=index_info.path,
-        parent=index_info.parent,
-    )
-    labware.set_calibration(offset)
-    return labware
+    return LabwareImplementation(definition=definition, parent=parent, label=label)
 
 
 def load(
