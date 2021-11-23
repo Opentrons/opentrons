@@ -210,7 +210,7 @@ def test_map_labware_load(minimal_labware_def: LabwareDefinition) -> None:
         labware_version=123,
         deck_slot=DeckSlotName.SLOT_1,
         on_module=False,
-        pe_labware_offset_id="labware-offset-id-123",
+        offset_id="labware-offset-id-123",
     )
     expected_output = pe_commands.LoadLabware.construct(
         id=matchers.IsA(str),
@@ -290,7 +290,7 @@ def test_map_module_labware_load(minimal_labware_def: LabwareDefinition) -> None
         labware_version=123,
         deck_slot=DeckSlotName.SLOT_1,
         on_module=True,
-        pe_labware_offset_id="labware-offset-id-123",
+        offset_id="labware-offset-id-123",
     )
 
     expected_output = pe_commands.LoadLabware.construct(

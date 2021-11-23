@@ -7,19 +7,18 @@ from opentrons.types import DeckSlotName, Point
 
 @dataclass
 class ProvidedLabwareOffset:
+    """A labware offset provided externally.
+
+    Parameters:
+        delta: The positional adjustment that should apply to all movements
+            to this labware. Measured in deck coordinates, from the nominal
+            position to the adjusted position.
+        offset_id: An ID referencing the relevant external offset resource.
+            `None` means no matching offset.
+    """
+
     delta: Point
-    """The positional adjustment that should apply to all movements to this labware.
-
-    Measured in deck coordinates, from the nominal position to the adjusted position.
-    """
-
-    protocol_engine_id: Optional[str]
-    """An ID referencing the relevant Protocol Engine labware offset resource.
-
-    `None` means Protocol Engine had no matching offset.
-    """
-    # todo(mm, 2021-11-18): APIv2 internals should not have to know about
-    # Protocol Engine ideas of labware offsets.
+    offset_id: Optional[str]
 
 
 class AbstractLabwareOffsetProvider(ABC):
@@ -46,6 +45,7 @@ class AbstractLabwareOffsetProvider(ABC):
             deck_slot: The deck slot that the labware occupies. Or, if the labware is
                        atop a module, the deck slot that the module occupies.
         """
+        ...
 
 
 class NullLabwareOffsetProvider(AbstractLabwareOffsetProvider):
@@ -57,4 +57,4 @@ class NullLabwareOffsetProvider(AbstractLabwareOffsetProvider):
         module_model: Optional[str],
         deck_slot: DeckSlotName,
     ) -> ProvidedLabwareOffset:
-        return ProvidedLabwareOffset(delta=Point(0, 0, 0), protocol_engine_id=None)
+        return ProvidedLabwareOffset(delta=Point(0, 0, 0), offset_id=None)

@@ -1,14 +1,12 @@
 """Tests for the top-level StateStore/StateView."""
-from datetime import datetime
 from typing import Callable, Optional
 
 import pytest
 from decoy import Decoy
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
-from opentrons.protocol_engine.state import State, StateStore, StateView
-from opentrons.protocol_engine.actions import PlayAction, QueueCommandAction
-from opentrons.protocol_engine.commands import HomeCreate, HomeParams
+from opentrons.protocol_engine.state import State, StateStore
+from opentrons.protocol_engine.actions import PlayAction
 from opentrons.protocol_engine.state.change_notifier import ChangeNotifier
 
 
@@ -28,28 +26,6 @@ def subject(
         deck_fixed_labware=[],
         change_notifier=change_notifier,
     )
-
-
-def test_state_view_snapshot(subject: StateStore) -> None:
-    """The snapshot shouldn't change when the store it was created from changes."""
-    subject_as_view: StateView = subject
-
-    snapshot_before = subject_as_view.snapshot()
-    print(snapshot_before.commands)
-    subject.handle_action(
-        QueueCommandAction(
-            command_id="command-id",
-            created_at=datetime(year=2021, month=11, day=22),
-            request=HomeCreate(params=HomeParams()),
-        )
-    )
-    snapshot_after = subject_as_view.snapshot()
-
-    assert snapshot_before is not snapshot_after
-    print(snapshot_before.commands)
-    print(snapshot_after.commands)
-    assert snapshot_before.commands.get_all() == []
-    assert snapshot_after.commands.get_all() != []
 
 
 def test_has_state(subject: StateStore) -> None:

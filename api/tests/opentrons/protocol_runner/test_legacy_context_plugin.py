@@ -208,7 +208,7 @@ async def test_labware_load_broker_messages(
         labware_version=123,
         deck_slot=DeckSlotName.SLOT_1,
         on_module=False,
-        pe_labware_offset_id=None,
+        offset_id=None,
     )
 
     engine_command = pe_commands.Custom(

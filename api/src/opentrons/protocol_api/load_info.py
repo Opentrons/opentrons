@@ -35,12 +35,9 @@ class LabwareLoadInfo:
     deck_slot: DeckSlotName
     on_module: bool
 
-    # The ID of the Protocol Engine labware offset that applied to this labware load,
+    # The ID of the labware offset resource that applied to this labware load,
     # if there was one.
-    #
-    # todo(mm, 2021-11-18): APIv2 internals should not have to know about
-    # Protocol Engine ideas of labware offsets.
-    pe_labware_offset_id: Optional[str]
+    offset_id: Optional[str]
 
 
 @dataclass(frozen=True)

@@ -1,5 +1,7 @@
-"""TODO BEFORE MERGE: docstring."""
-
+"""Interfaces to provide ProtocolEngine labware offsets to PAPIv2 protocols."""
+# TODO(mc, 2021-11-23): this module is missing tests. They would have
+# informed the proper shape / dependency model for this unit, so this may
+# change as tests are added.
 
 from typing import Optional
 
@@ -7,19 +9,17 @@ from opentrons.types import DeckSlotName, Point
 
 from opentrons.protocol_engine import DeckSlotLocation
 from opentrons.protocol_engine.state import LabwareView
-
-from .legacy_wrappers import (
-    LegacyAbstractLabwareOffsetProvider,
-    LegacyProvidedLabwareOffset,
+from opentrons.protocol_api.labware_offset_provider import (
+    ProvidedLabwareOffset as LegacyProvidedLabwareOffset,
+    AbstractLabwareOffsetProvider as AbstractLegacyLabwareOffsetProvider,
 )
 
 
-class LegacyLabwareOffsetProvider(LegacyAbstractLabwareOffsetProvider):
+class LegacyLabwareOffsetProvider(AbstractLegacyLabwareOffsetProvider):
     """Provides a `ProtocolEngine`'s labware offsets."""
 
     def __init__(self, labware_view: LabwareView) -> None:
-        """TODO BEFORE MERGE: docstring."""
-        # TODO before merge: Work out view thread safety, or leave a todo
+        """Initialize an offset provider with access to ProtocolEngine state."""
         self._labware_view = labware_view
 
     def find(
@@ -30,7 +30,7 @@ class LegacyLabwareOffsetProvider(LegacyAbstractLabwareOffsetProvider):
     ) -> LegacyProvidedLabwareOffset:
         """TODO BEFORE MERGE: docstring."""
         if module_model is not None:
-            # TODO BEFORE MERGE: Ideally fix in this PR
+            # TODO(mc, 2021-11-23): https://github.com/Opentrons/opentrons/issues/8242
             raise NotImplementedError(
                 "Loading offsets for labware loaded atop modules"
                 " is not currently supported."
@@ -42,10 +42,16 @@ class LegacyLabwareOffsetProvider(LegacyAbstractLabwareOffsetProvider):
         if offset is None:
             return LegacyProvidedLabwareOffset(
                 delta=Point(x=0, y=0, z=0),
-                protocol_engine_id=None,
+                offset_id=None,
             )
         else:
             return LegacyProvidedLabwareOffset(
                 delta=Point(x=offset.vector.x, y=offset.vector.y, z=offset.vector.z),
-                protocol_engine_id=offset.id,
+                offset_id=offset.id,
             )
+
+
+__all__ = [
+    "LegacyLabwareOffsetProvider",
+    "LegacyProvidedLabwareOffset",
+]

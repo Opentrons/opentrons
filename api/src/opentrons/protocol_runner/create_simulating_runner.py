@@ -4,7 +4,9 @@ from opentrons.config import feature_flags
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocol_engine import create_protocol_engine
 from opentrons.protocol_engine.state import EngineConfigs
-from .legacy_wrappers import LegacyContextCreator, LegacyNullLabwareOffsetProvider
+
+from .legacy_wrappers import LegacyContextCreator
+from .legacy_labware_offset_provider import LegacyLabwareOffsetProvider
 from .protocol_runner import ProtocolRunner
 
 
@@ -42,13 +44,13 @@ async def create_simulating_runner() -> ProtocolRunner:
         configs=EngineConfigs(ignore_pause=True),
     )
 
+    offset_provider = LegacyLabwareOffsetProvider(
+        labware_view=protocol_engine.state_view.labware,
+    )
+
     simulating_legacy_context_creator = LegacyContextCreator(
         hardware_api=simulating_hardware_api,
-        # TODO BEFORE MERGE:
-        # Uhh wait this might be wrong actually, or at least unnecessary.
-        # If LegacyContextCreator took a LabwareOffsetProvider instead of constructing
-        # one itself, we could provide a NullLabwareOffsetProvider here.
-        labware_view=protocol_engine.state_view.labware,
+        labware_offset_provider=offset_provider,
         use_simulating_implementation=use_simulating_implementation,
     )
 

@@ -412,7 +412,7 @@ class ProtocolContext(CommandPublisher):
                 labware_version=int(result_version),
                 deck_slot=types.DeckSlotName.from_primitive(location),
                 on_module=False,
-                pe_labware_offset_id=provided_labware_offset.protocol_engine_id,
+                offset_id=provided_labware_offset.offset_id,
             )
         )
 
@@ -479,7 +479,7 @@ class ProtocolContext(CommandPublisher):
                 labware_version=int(result_version),
                 deck_slot=types.DeckSlotName.from_primitive(location),
                 on_module=False,
-                pe_labware_offset_id=provided_labware_offset.protocol_engine_id,
+                offset_id=provided_labware_offset.offset_id,
             )
         )
 

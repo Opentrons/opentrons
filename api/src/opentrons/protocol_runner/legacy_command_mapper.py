@@ -132,7 +132,7 @@ class LegacyCommandMapper:
                 definition=LabwareDefinition.parse_obj(
                     labware_load_info.labware_definition
                 ),
-                offsetId=labware_load_info.pe_labware_offset_id,
+                offsetId=labware_load_info.offset_id,
             ),
         )
 
