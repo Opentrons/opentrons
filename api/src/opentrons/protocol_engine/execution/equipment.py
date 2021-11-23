@@ -187,7 +187,7 @@ class EquipmentHandler:
             # Try to use existing definition in state.
             definition = self._state_store.modules.get_definition_by_model(model)
         except ModuleDefinitionDoesNotExistError:
-            definition = self._module_data_provider.get_module_definition(model=model)
+            definition = self._module_data_provider.get_module_definition(model)
 
         module_id = module_id or self._model_utils.generate_id()
 

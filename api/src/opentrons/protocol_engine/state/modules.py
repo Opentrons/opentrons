@@ -28,7 +28,10 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
 
     def __init__(self) -> None:
         """Initialize a ModuleStore and its state."""
-        self._state = ModuleState(modules_by_id={})
+        self._state = ModuleState(
+            modules_by_id={},
+            definition_by_model={}
+        )
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""

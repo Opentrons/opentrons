@@ -11,7 +11,10 @@ from opentrons.hardware_control.modules import TempDeck
 from opentrons.protocols.models import LabwareDefinition
 
 from opentrons.protocol_engine import errors
-from opentrons.protocol_engine.errors import LabwareDefinitionDoesNotExistError
+from opentrons.protocol_engine.errors import (
+    LabwareDefinitionDoesNotExistError,
+    ModuleDefinitionDoesNotExistError
+)
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     PipetteName,
@@ -343,8 +346,6 @@ async def test_load_pipette_raises_if_pipette_not_attached(
         )
 
 
-# TODO (spp, 2021-11-23): Fix this test
-@pytest.mark.xfail
 async def test_load_module(
     decoy: Decoy,
     model_utils: ModelUtils,
@@ -357,15 +358,23 @@ async def test_load_module(
     loop=None,
 ) -> None:
     """It should load a module, returning its ID, serial & definition in result."""
-    decoy.mock(func=subject._get_hardware_module)
     decoy.when(model_utils.generate_id()).then_return("unique-id")
+    decoy.when(state_store.modules.get_definition_by_model(
+        ModuleModels.TEMPERATURE_MODULE_V1)
+        ).then_raise(ModuleDefinitionDoesNotExistError("oh no"))
+
     decoy.when(module_data_provider.get_module_definition(
-        model=ModuleModels.TEMPERATURE_MODULE_V1
-        )
+        ModuleModels.TEMPERATURE_MODULE_V1)
     ).then_return(tempdeck_v1_def)
+
+    # TODO before merge: How to mock out _get_hardware_module instead?
     decoy.when(
-        await subject._get_hardware_module(ModuleModels.TEMPERATURE_MODULE_V1)
-    ).then_return(simulating_module_fixture)
+        await hardware_api.find_modules(
+            by_model=TemperatureModuleModel.TEMPERATURE_V1,
+            resolved_type=ModuleType.TEMPERATURE
+        )
+    ).then_return(([], simulating_module_fixture))
+
     expected_output = LoadedModuleData(
         module_id="unique-id",
         module_serial=simulating_module_fixture.device_info['serial'],
@@ -386,6 +395,7 @@ async def test_get_hardware_module(
         simulating_module_fixture: TempDeck
 ):
     """It should fetch the matching module instance from attached modules."""
+    # TODO (spp, 2021-11-23): Add tests for fetching a match from available modules
     decoy.when(
         await hardware_api.find_modules(
             by_model=TemperatureModuleModel.TEMPERATURE_V1,
@@ -395,5 +405,3 @@ async def test_get_hardware_module(
 
     assert await subject._get_hardware_module(
         ModuleModels.TEMPERATURE_MODULE_V1) == simulating_module_fixture
-
-# TODO (spp, 2021-11-23): Add tests for loading multiples of a module
