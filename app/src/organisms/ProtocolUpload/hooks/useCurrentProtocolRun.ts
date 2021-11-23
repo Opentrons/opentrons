@@ -33,7 +33,7 @@ export function useCurrentProtocolRun(): UseCurrentProtocolRun {
 
   React.useEffect(() => {
     if (protocolRecord?.data.analyses.length === 0) {
-      const intervalId = setInterval(() => {
+      const intervalId = setInterval(function () {
         refetchProtocol()
       }, REFETCH_INTERVAL)
 
