@@ -1,12 +1,16 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import reduce from 'lodash/reduce'
 import { v4 as uuidv4 } from 'uuid'
 import {
   HostConfig,
   createCommand, // TODO: create hook for this inside react-api-client
+  createLabwareOffset, // TODO: create hook for this inside react-api-client
   RunCommandSummary,
   getCommand,
   VectorOffset,
+  CreateLabwareOffsetData,
+  LabwareOffset,
 } from '@opentrons/api-client'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { useHost, useAllCommandsQuery } from '@opentrons/react-api-client'
@@ -33,6 +37,7 @@ import type {
   LabwarePositionCheckStep,
   SavePositionCommandData,
 } from '../types'
+import { getLabwareDefinitionUri } from '../../utils/getLabwareDefinitionUri'
 
 export type LabwarePositionCheckUtils =
   | {
@@ -452,6 +457,33 @@ export function useLabwarePositionCheck(
 
   const beginLPC = (): void => {
     setIsLoading(true)
+    // first clear all previous labware offsets for each labware
+    const identityLabwareOffsets: LabwareOffset[] = reduce<
+      ProtocolFile<{}>['labware'],
+      LabwareOffset[]
+    >(
+      protocolData?.labware,
+      (acc, _, labwareId) => {
+        const identityOffset = {
+          definitionUri: getLabwareDefinitionUri(
+            labwareId,
+            protocolData?.labware
+          ),
+          location: getLabwareLocation(labwareId, protocolData?.commands ?? []),
+          offset: IDENTITY_OFFSET,
+        }
+        return [...acc, identityOffset]
+      },
+      []
+    )
+
+    createLabwareOffset(host as HostConfig, currentRun?.data?.id as string, {
+      labwareOffsets: identityLabwareOffsets,
+    }).catch((e: Error) => {
+      console.error(`error posting identity offsets to robot: ${e.message}`)
+      setError(e)
+    })
+
     // execute prep commands
     prepCommands.forEach(prepCommand => {
       createCommand(

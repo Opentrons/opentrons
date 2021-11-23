@@ -2,13 +2,7 @@ import { POST, request } from '../request'
 
 import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
-import type { Run } from './types'
-
-interface LabwareOffset {
-  definitionUri: string
-  location: { slot: string }
-  vector: { x: number; y: number; z: number }
-}
+import type { LabwareOffset, Run } from './types'
 
 export interface CreateLabwareOffsetData {
   labwareOffsets: LabwareOffset[]

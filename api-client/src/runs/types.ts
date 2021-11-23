@@ -39,7 +39,6 @@ export interface VectorOffset {
   z: number
 }
 export interface LabwareOffset {
-  id: string
   definitionUri: string
   location: LabwareLocation
   offset: VectorOffset

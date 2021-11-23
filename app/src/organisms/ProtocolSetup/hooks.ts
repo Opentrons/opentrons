@@ -53,17 +53,3 @@ export function usePipetteMount(
     )?.params.mount ?? null
   )
 }
-
-// NOTE: this hook should be deleted once we have a better identifier to look up labware offsets
-// for now, this mapper will just strip the "id" out of labwareDefinitionIds so consumers don't need to worry
-// about the concept of labwareDefinitionIds vs labwareDefinitionUris
-export function useLabwareDefinitionUri(labwareId: string): string {
-  const { protocolData } = useProtocolDetails()
-  const labwareDefinitionId = protocolData?.labware[labwareId].definitionId
-  if (labwareDefinitionId == null) {
-    throw new Error(
-      'expected to be able to find labware definition id for labware, but could not'
-    )
-  }
-  return labwareDefinitionId.substring(0, labwareDefinitionId.length - 3)
-}
