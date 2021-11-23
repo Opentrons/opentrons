@@ -47,4 +47,9 @@ describe('ProtocolSetup', () => {
     const successToast = getByText('Mock LabwareOffsetSuccessToast')
     fireEvent.click(successToast)
   })
+  it('renders feedback link', () => {
+    const { getByText, getByRole } = render()
+    getByText('Have feedback about this experience?')
+    expect(getByRole('link', { name: 'Let us know!' })).toBeTruthy()
+  })
 })
