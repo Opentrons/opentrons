@@ -406,3 +406,12 @@ export interface ProtocolResource {
   analyses: PendingProtocolAnalysis[] | CompletedProtocolAnalysis[]
   files: ResourceFile[]
 }
+
+export interface MotorAxis {
+  X: 'x'
+  Y: 'y'
+  LEFT_Z: 'leftZ'
+  RIGHT_Z: 'rightZ'
+  LEFT_PLUNGER: 'leftPlunger'
+  RIGHT_PLUNGER: 'rightPlunger'
+}
