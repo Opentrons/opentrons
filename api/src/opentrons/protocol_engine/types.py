@@ -4,9 +4,7 @@ from enum import Enum
 from dataclasses import dataclass
 from pydantic import BaseModel, Field
 from typing import Optional, Union, List, Dict
-from typing_extensions import Literal
 
-from opentrons_shared_data.module.dev_types import ModuleDefinitionV2
 from opentrons.types import MountType, DeckSlotName
 
 
@@ -188,15 +186,6 @@ class LoadedLabware(BaseModel):
     )
 
 
-class LoadedModule(BaseModel):
-    """A module that has been loaded."""
-    id: str
-    model: str
-    location: DeckSlotLocation
-    definition: ModuleDefinitionV2
-    serial: Optional[str]
-
-
 class ModuleModels(str, Enum):
     """All available modules' models."""
     TEMPERATURE_MODULE_V1 = "temperatureModuleV1"
@@ -250,3 +239,12 @@ class ModuleDefinition(BaseModel):
         ...,
         description="List of module models this model is compatible with."
     )
+
+
+class LoadedModule(BaseModel):
+    """A module that has been loaded."""
+    id: str
+    model: str
+    location: DeckSlotLocation
+    definition: ModuleDefinition
+    serial: Optional[str]

@@ -90,3 +90,7 @@ class WellOriginNotAllowedError(ProtocolEngineError):
 
 class NoAttachedModuleFound(ProtocolEngineError):
     """An error raised when no simulating or real modules are found attached."""
+
+
+class ModuleDefinitionDoesNotExistError(ProtocolEngineError):
+    """An error raised when referencing a module definition that does not exist."""

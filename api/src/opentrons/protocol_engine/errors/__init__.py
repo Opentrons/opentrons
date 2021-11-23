@@ -19,6 +19,7 @@ from .exceptions import (
     ProtocolEngineStoppedError,
     WellOriginNotAllowedError,
     NoAttachedModuleFound,
+    ModuleDefinitionDoesNotExistError,
 )
 
 from .error_occurrence import ErrorOccurrence
@@ -43,6 +44,7 @@ __all__ = [
     "ProtocolEngineStoppedError",
     "WellOriginNotAllowedError",
     "NoAttachedModuleFound",
+    "ModuleDefinitionDoesNotExistError",
     # error occurrence models
     "ErrorOccurrence",
 ]

@@ -1,6 +1,6 @@
 """Basic modules data state and store."""
 from dataclasses import dataclass, replace
-from typing import Dict, List, Mapping
+from typing import Dict, List, Optional
 
 from ..types import LoadedModule, ModuleModels, ModuleDefinition
 from .. import errors
@@ -18,6 +18,7 @@ class HardwareModule:
 class ModuleState:
     """Basic module data state and getter methods."""
     modules_by_id: Dict[str, LoadedModule]
+    definition_by_model: Dict[ModuleModels, ModuleDefinition]
 
 
 class ModuleStore(HasState[ModuleState], HandlesActions):
@@ -46,9 +47,13 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 definition=command.result.definition
             )
 
+            new_definition_by_model = self._state.definition_by_model.copy()
+            new_definition_by_model[command.params.model] = command.result.definition
+
             self._state = replace(
                 self._state,
-                modules_by_id=new_module_by_id
+                modules_by_id=new_module_by_id,
+                definition_by_model=new_definition_by_model,
             )
 
 
@@ -75,30 +80,21 @@ class ModuleView(HasState[ModuleState]):
             mod_list.append(mod)
         return mod_list
 
-    def get_module_type(self, module_id) -> str:
-        """Get module type."""
-        # TODO (spp): maybe just use ModuleType from hardware control?
-        module = self._state.modules_by_id[module_id]
-        model = module.model
-        if model in (ModuleModels.TEMPERATURE_MODULE_V1,
-                     ModuleModels.TEMPERATURE_MODULE_V2):
-            return "temperatureModuleType"
-        elif model in (ModuleModels.MAGNETIC_MODULE_V1,
-                       ModuleModels.MAGNETIC_MODULE_V2):
-            return "magneticModuleType"
-        elif model == ModuleModels.THERMOCYCLER_MODULE_V1:
-            return "thermocyclerModuleType"
-
-    def get_definition(self, module_id) -> ModuleDefinition:
+    def get_definition_by_id(self, module_id) -> ModuleDefinition:
         """Module definition by ID."""
         return self.get(module_id).definition
 
-    def get_hardware_module(
+    def get_definition_by_model(
             self,
-            module_id: str,
-            attached_modules
-    ):
-        """Get a module's device info by ID."""
+            model: ModuleModels
+    ) -> Optional[ModuleDefinition]:
+        """Return module definition by model."""
+        try:
+            return self._state.definition_by_model[model]
+        except KeyError as e:
+            raise errors.ModuleDefinitionDoesNotExistError(
+                f"Module definition for matching {model} not found."
+            ) from e
 
     def get_by_serial(self, serial: str) -> LoadedModule:
         """Get a loaded module by its serial number."""

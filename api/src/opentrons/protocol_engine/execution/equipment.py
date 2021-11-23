@@ -11,11 +11,13 @@ from opentrons.protocols.geometry.module_geometry import (
 )
 from opentrons.types import MountType
 from opentrons.hardware_control.api import API as HardwareAPI
+from opentrons.hardware_control.modules.mod_abc import AbstractModule
 
 from ..errors import (
     FailedToLoadPipetteError,
     LabwareDefinitionDoesNotExistError,
-    NoAttachedModuleFound
+    NoAttachedModuleFound,
+    ModuleDefinitionDoesNotExistError,
 )
 from ..resources import LabwareDataProvider, ModuleDataProvider, ModelUtils
 from ..state import StateStore
@@ -52,6 +54,7 @@ class EquipmentHandler:
     _hardware_api: HardwareAPI
     _state_store: StateStore
     _labware_data_provider: LabwareDataProvider
+    _module_data_provider: ModuleDataProvider
     _model_utils: ModelUtils
 
     def __init__(
@@ -59,13 +62,14 @@ class EquipmentHandler:
         hardware_api: HardwareAPI,
         state_store: StateStore,
         labware_data_provider: Optional[LabwareDataProvider] = None,
+        module_data_provider: Optional[ModuleDataProvider] = None,
         model_utils: Optional[ModelUtils] = None,
     ) -> None:
         """Initialize an EquipmentHandler instance."""
         self._hardware_api = hardware_api
         self._state_store = state_store
         self._labware_data_provider = labware_data_provider or LabwareDataProvider()
-        self._module_data_provider = ModuleDataProvider()
+        self._module_data_provider = module_data_provider or ModuleDataProvider()
         self._model_utils = model_utils or ModelUtils()
 
     async def load_labware(
@@ -173,34 +177,41 @@ class EquipmentHandler:
         Returns:
             A LoadedModuleData object
         """
-        hw_model = module_model_from_string(model.value)
-        model_type = resolve_module_type(hw_model)
-        definition = await self._module_data_provider.get_module_definition(model)
         try:
-            available, simulating = await self._hardware_api.find_modules(
-                hw_model, model_type)
-        except TypeError as e:
-            raise RuntimeError(f"Could not fetch modules attached: {e}")
+            # Try to use existing definition in state.
+            definition = self._state_store.modules.get_definition_by_model(model)
+        except ModuleDefinitionDoesNotExistError:
+            definition = self._module_data_provider.get_module_definition(model=model)
 
         module_id = module_id or self._model_utils.generate_id()
 
-        hc_mod_instance = None
+        attached_mod_instance = self._get_hardware_module(model)
+
+        return LoadedModuleData(
+            module_id=module_id,
+            module_serial=attached_mod_instance.device_info.get('serial'),
+            definition=definition,
+        )
+
+    async def _get_hardware_module(self, model: ModuleModels) -> AbstractModule:
+        hw_model = module_model_from_string(model.value)
+        model_type = resolve_module_type(hw_model)
+
+        try:
+            available, simulating = await self._hardware_api.find_modules(
+                by_model=hw_model, resolved_type=model_type)
+        except TypeError as e:
+            raise RuntimeError(f"Could not fetch modules attached") from e
+
         for mod in available:
             # TODO (spp, 2021-11-22: make this accept compatible module models)
             if mod.model() == model.value:
                 if not self._state_store.modules.get_by_serial(
                         mod.device_info['serial']
                 ):
-                    hc_mod_instance = mod
-                    break
+                    return mod
 
-        if not hc_mod_instance:
-            if simulating:
-                hc_mod_instance = simulating
-            else:
-                raise NoAttachedModuleFound("Requested module not found.")
-        return LoadedModuleData(
-            module_id=module_id,
-            module_serial=hc_mod_instance.device_info.get('serial'),
-            definition=definition,
-        )
+        if simulating:
+            return simulating
+        else:
+            raise NoAttachedModuleFound("Requested module not found.")
