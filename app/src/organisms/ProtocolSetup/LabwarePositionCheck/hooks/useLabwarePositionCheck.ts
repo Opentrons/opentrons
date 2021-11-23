@@ -1,19 +1,27 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import reduce from 'lodash/reduce'
 import { v4 as uuidv4 } from 'uuid'
 import {
   HostConfig,
-  createCommand, // TODO: create hook for this inside react-api-client
   RunCommandSummary,
   getCommand,
   VectorOffset,
+  LabwareOffset,
+  AnonymousCommand,
 } from '@opentrons/api-client'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
-import { useHost, useAllCommandsQuery } from '@opentrons/react-api-client'
+import {
+  useHost,
+  useAllCommandsQuery,
+  useCreateLabwareOffsetsMutation,
+  useCreateCommandMutation,
+} from '@opentrons/react-api-client'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
 import { useCurrentProtocolRun } from '../../../ProtocolUpload/hooks'
 import { getLabwareLocation } from '../../utils/getLabwareLocation'
 import { getModuleLocation } from '../../utils/getModuleLocation'
+import { getLabwareDefinitionUri } from '../../utils/getLabwareDefinitionUri'
 import { useSteps } from './useSteps'
 import type {
   Command,
@@ -140,9 +148,7 @@ export const useTitleText = (
 const commandIsComplete = (status: RunCommandSummary['status']): boolean =>
   status === 'succeeded' || status === 'failed'
 
-const createCommandData = (
-  command: Command
-): { commandType: string; params: Record<string, any> } => {
+const createCommandData = (command: Command): AnonymousCommand => {
   if (command.commandType === 'loadLabware') {
     return {
       commandType: command.commandType,
@@ -192,6 +198,8 @@ export function useLabwarePositionCheck(
     IDENTITY_OFFSET
   )
   const { protocolData } = useProtocolDetails()
+  const { createLabwareOffsets } = useCreateLabwareOffsetsMutation()
+  const { createCommand } = useCreateCommandMutation()
   const host = useHost()
   const { runRecord: currentRun } = useCurrentProtocolRun()
   const LPCSteps = useSteps()
@@ -303,13 +311,12 @@ export function useLabwarePositionCheck(
         id: uuidv4(),
         params: { pipetteId: pendingMovementCommandData.pipetteId },
       }
-      createCommand(
-        host as HostConfig,
-        currentRun?.data?.id as string,
-        createCommandData(savePositionCommand)
-      )
+      createCommand({
+        runId: currentRun?.data?.id as string,
+        command: createCommandData(savePositionCommand),
+      })
         .then(response => {
-          const commandId = response.data.data.id
+          const commandId = response.data.id
           addSavePositionCommandData(
             commandId,
             pendingMovementCommandData.labwareId
@@ -335,16 +342,16 @@ export function useLabwarePositionCheck(
       id: uuidv4(),
       params: { pipetteId: prevCommand.params.pipetteId },
     }
-    createCommand(
-      host as HostConfig,
-      currentRun?.data?.id as string,
-      createCommandData(savePositionCommand)
-    )
+
+    createCommand({
+      runId: currentRun?.data?.id as string,
+      command: createCommandData(savePositionCommand),
+    })
       // add the saved command id so we can use it to query locations later
       // if the previous command was a pickup tip, we have already verified that labware's position
       .then(response => {
         if (prevCommand.commandType !== 'pickUpTip') {
-          const commandId = response.data.data.id
+          const commandId = response.data.id
           addSavePositionCommandData(commandId, prevCommand.params.labwareId)
         }
         // later in the promise chain we may need to incorporate in flight offsets into
@@ -360,7 +367,7 @@ export function useLabwarePositionCheck(
         const prevSavePositionCommand = getCommand(
           host as HostConfig,
           currentRun?.data?.id as string,
-          response.data.data.id
+          response.data.id
         )
 
         const initialSavePositionCommandId =
@@ -433,15 +440,14 @@ export function useLabwarePositionCheck(
             currentCommand.params.wellLocation = wellLocation
           }
           // execute the movement command
-          return createCommand(
-            host as HostConfig,
-            currentRun?.data?.id as string,
-            createCommandData(currentCommand)
-          )
+          return createCommand({
+            runId: currentRun?.data?.id as string,
+            command: createCommandData(currentCommand),
+          })
         }
       )
       .then(response => {
-        const commandId = response.data.data.id
+        const commandId = response.data.id
         const pipetteId = currentCommand.params.pipetteId
         const labwareId: string = currentCommand.params.labwareId
         const commandType = currentCommand.commandType
@@ -461,25 +467,48 @@ export function useLabwarePositionCheck(
 
   const beginLPC = (): void => {
     setIsLoading(true)
+    // first clear all previous labware offsets for each labware
+    const identityLabwareOffsets: LabwareOffset[] = reduce<
+      ProtocolFile<{}>['labware'],
+      LabwareOffset[]
+    >(
+      protocolData?.labware,
+      (acc, _, labwareId) => {
+        const identityOffset = {
+          definitionUri: getLabwareDefinitionUri(
+            labwareId,
+            protocolData?.labware
+          ),
+          location: getLabwareLocation(labwareId, protocolData?.commands ?? []),
+          offset: IDENTITY_OFFSET,
+        }
+        return [...acc, identityOffset]
+      },
+      []
+    )
+
+    createLabwareOffsets({
+      runId: currentRun?.data.id as string,
+      data: { labwareOffsets: identityLabwareOffsets },
+    })
+
     // execute prep commands
     prepCommands.forEach(prepCommand => {
-      createCommand(
-        host as HostConfig,
-        currentRun?.data?.id as string,
-        createCommandData(prepCommand)
-      ).catch((e: Error) => {
+      createCommand({
+        runId: currentRun?.data?.id as string,
+        command: createCommandData(prepCommand),
+      }).catch((e: Error) => {
         console.error(`error issuing command to robot: ${e.message}`)
         setError(e)
       })
     })
     // issue first movement command
-    createCommand(
-      host as HostConfig,
-      currentRun?.data?.id as string,
-      createCommandData(currentCommand)
-    )
+    createCommand({
+      runId: currentRun?.data?.id as string,
+      command: createCommandData(currentCommand),
+    })
       .then(response => {
-        const commandId = response.data.data.id
+        const commandId = response.data.id
         setPendingMovementCommandData({
           commandId,
           labwareId: currentCommand.params.labwareId,
@@ -511,24 +540,22 @@ export function useLabwarePositionCheck(
         wellName,
       },
     }
-    createCommand(
-      host as HostConfig,
-      currentRun?.data?.id as string,
-      createCommandData(dropTipCommand)
-    )
+    createCommand({
+      runId: currentRun?.data?.id as string,
+      command: createCommandData(dropTipCommand),
+    })
       .then(() => {
         const moveBackToWellCommand =
           // the last command was a pick up tip, the one before that was a move to well
           LPCMovementCommands[currentCommandIndex - 2]
-        const moveBackToWell = createCommand(
-          host as HostConfig,
-          currentRun?.data?.id as string,
-          createCommandData(moveBackToWellCommand)
-        )
+        const moveBackToWell = createCommand({
+          runId: currentRun?.data?.id as string,
+          command: createCommandData(moveBackToWellCommand),
+        })
         return moveBackToWell
       })
       .then(response => {
-        const commandId = response.data.data.id
+        const commandId = response.data.id
         setPendingMovementCommandData({
           commandId,
           pipetteId,
@@ -545,7 +572,7 @@ export function useLabwarePositionCheck(
   }
 
   const jog = (axis: Axis, dir: Sign, step: StepSize): void => {
-    const data = {
+    const moveRelCommand: AnonymousCommand = {
       commandType: 'moveRelative',
       params: {
         pipetteId: currentCommand.params.pipetteId,
@@ -554,11 +581,10 @@ export function useLabwarePositionCheck(
       },
     }
 
-    createCommand(
-      host as HostConfig,
-      currentRun?.data?.id as string,
-      data
-    ).catch((e: Error) => {
+    createCommand({
+      runId: currentRun?.data?.id as string,
+      command: moveRelCommand,
+    }).catch((e: Error) => {
       setError(e)
       console.error(`error issuing jog command: ${e.message}`)
     })
