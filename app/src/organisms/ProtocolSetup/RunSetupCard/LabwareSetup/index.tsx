@@ -33,8 +33,6 @@ import { LabwareInfoOverlay } from './LabwareInfoOverlay'
 import { LabwareOffsetModal } from './LabwareOffsetModal'
 import { getModuleTypesThatRequireExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
 import { ExtraAttentionWarning } from './ExtraAttentionWarning'
-import { LabwareOffsetSuccessToast } from '../../LabwareOffsetSuccessToast'
-import { Portal } from '../../../../App/portal'
 
 const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
