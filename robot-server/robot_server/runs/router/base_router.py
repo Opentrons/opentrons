@@ -310,7 +310,13 @@ async def remove_run(
 @base_router.post(
     path="/runs/{runId}/labware_offsets",
     summary="Add a labware offset to a run",
-    description=("Add a labware offset to an existing run, returning the updated run."),
+    description=(
+        "Add a labware offset to an existing run, returning the updated run."
+        "\n\n"
+        "There is no matching `GET /runs/{runId}/labware_offsets` endpoint."
+        " To read the list of labware offsets currently on the run,"
+        " see the run's `labwareOffsets` field."
+    ),
     status_code=status.HTTP_201_CREATED,
     response_model=ResponseModel[Run, None],
     responses={
