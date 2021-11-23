@@ -42,7 +42,7 @@ describe('Run Page', () => {
     jest.resetAllMocks()
   })
 
-  it('renders new run page when usePreProtocolWithoutRPC ff is set', () => {
+  it('renders run page', () => {
     const { getByText } = render()
     getByText('Mock Run Details')
   })

@@ -49,7 +49,7 @@ describe('RunSetupCard', () => {
     jest.resetAllMocks()
   })
 
-  it('renders new run panel components when usePreProtocolWithoutRPC ff is set', () => {
+  it('renders run panel components', () => {
     const { getByText } = render()
     getByText('Mock Run Time Control')
     getByText('Mock Module Live Status Cards')
