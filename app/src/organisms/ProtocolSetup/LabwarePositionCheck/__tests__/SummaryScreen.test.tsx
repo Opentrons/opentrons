@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { when } from 'jest-when'
-import { fireEvent, getByText } from '@testing-library/dom'
+import { fireEvent } from '@testing-library/dom'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { useProtocolDetails } from '../../../RunDetails/hooks'

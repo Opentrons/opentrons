@@ -131,7 +131,7 @@ describe(' LabwareOffsetSuccessToast', () => {
   })
   it('renders LPC success toast and is clickable with 1 offset', () => {
     mockAlertItem.mockReturnValue(<div>1 Labware Offsets created</div>)
-    const { getByText, getByTestId } = render(props)
+    const { getByText } = render(props)
     when(mockUseCurrentProtocolRun)
       .calledWith()
       .mockReturnValue({
