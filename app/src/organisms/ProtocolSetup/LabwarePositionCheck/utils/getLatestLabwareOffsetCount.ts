@@ -25,13 +25,12 @@ export const getLatestLabwareOffsetCount = (
     const id = `${definitionUri}_${locationKey}`
     if (
       !uniqueLabwareInstances.has(id) &&
-      !isEqual(vector, IDENTITY_OFFSET) &&
-      !isEqual(location, TRASH_LOCATION)
+      !isEqual(location, TRASH_LOCATION) &&
+      !isEqual(IDENTITY_OFFSET, vector)
     ) {
       count = count + 1
+      uniqueLabwareInstances.add(id)
     }
-    uniqueLabwareInstances.add(id)
   })
-
   return count
 }
