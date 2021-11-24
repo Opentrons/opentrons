@@ -1,16 +1,15 @@
-// CollapsibleItem component
+// CollapsibleModuleItem component
 import * as React from 'react'
 import cx from 'classnames'
 
 import styles from './lists.css'
-import { Icon } from '../icons'
-import { COLOR_ERROR } from '../styles/colors'
+import { Icon, COLOR_ERROR } from '@opentrons/components'
 
-import type { IconName } from '../icons'
+import type { IconName } from '@opentrons/components'
 // TODO(bc, 2021-03-31): this is only used in on place
 // reconsider whether this belongs in components library
 
-export interface CollapsibleItemProps {
+export interface CollapsibleModuleItemProps {
   /** optional icon for title */
   iconName?: IconName
   status?: string
@@ -31,7 +30,9 @@ export interface CollapsibleItemProps {
 /**
  * A list item with title, and collapsible children.
  */
-export function CollapsibleItem(props: CollapsibleItemProps): JSX.Element {
+export function CollapsibleModuleItem(
+  props: CollapsibleModuleItemProps
+): JSX.Element {
   const { onCollapseToggle, header } = props
   const collapsible = onCollapseToggle != null
   const hasHeader = header != null
