@@ -140,6 +140,7 @@ class LabwareOffsetLocation(BaseModel):
         ...,
         description="The deck slot the offset applies to",
     )
+    # todo: enum
     moduleModel: Optional[str] = Field(
         None,
         description="The module model the labware will be loaded onto, if applicable",

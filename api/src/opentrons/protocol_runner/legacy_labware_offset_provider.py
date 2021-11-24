@@ -25,19 +25,16 @@ class LegacyLabwareOffsetProvider(AbstractLegacyLabwareOffsetProvider):
     def find(
         self,
         labware_definition_uri: str,
-        module_model: Optional[str],
+        module_model: Optional[str],  # todo: enum
         deck_slot: DeckSlotName,
     ) -> LegacyProvidedLabwareOffset:
         """Look up an offset in ProtocolEngine state and return it, if one exists."""
-        if module_model is not None:
-            # TODO(mc, 2021-11-23): https://github.com/Opentrons/opentrons/issues/8242
-            raise NotImplementedError(
-                "Loading offsets for labware loaded atop modules"
-                " is not currently supported."
-            )
         offset = self._labware_view.find_applicable_labware_offset(
             definition_uri=labware_definition_uri,
-            location=LabwareOffsetLocation(slotName=deck_slot),
+            location=LabwareOffsetLocation(
+                slotName=deck_slot,
+                moduleModel=module_model
+            ),
         )
         if offset is None:
             return LegacyProvidedLabwareOffset(
