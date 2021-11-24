@@ -13,8 +13,10 @@ from ..types import (
     WellOrigin,
     WellOffset,
     DeckSlotLocation,
+    ModuleLocation,
 )
 from .labware import LabwareView
+from .modules import ModuleView
 
 
 DEFAULT_TIP_DROP_HEIGHT_FACTOR = 0.5
@@ -37,17 +39,25 @@ class GeometryView:
     """Geometry computed state getters."""
 
     _labware: LabwareView
+    _modules: ModuleView
 
-    def __init__(self, labware_view: LabwareView) -> None:
+    def __init__(
+            self,
+            labware_view: LabwareView,
+            modules_view: ModuleView
+    ) -> None:
         """Initialize a GeometryView instance."""
         self._labware = labware_view
+        self._modules = modules_view
 
+    # TODO: need updating for labware on modules?
     def get_labware_highest_z(self, labware_id: str) -> float:
         """Get the highest Z-point of a labware."""
         labware_data = self._labware.get(labware_id)
 
         return self._get_highest_z_from_labware_data(labware_data)
 
+    # TODO: need updating for labware on modules?
     def get_all_labware_highest_z(self) -> float:
         """Get the highest Z-point across all labware."""
         return max(
@@ -63,8 +73,9 @@ class GeometryView:
         if isinstance(labware_data.location, DeckSlotLocation):
             slot_pos = self._labware.get_slot_position(labware_data.location.slotName)
             return slot_pos
-        else:
-            raise NotImplementedError("Not implemented for labware on modules")
+        elif isinstance(labware_data.location, ModuleLocation):
+            pos = self._modules.get_module_offset(labware_data.location.moduleId)
+            return Point(x=pos.x, y=pos.y, z=pos.z)
 
     def get_labware_origin_position(self, labware_id: str) -> Point:
         """Get the position of the labware's origin, without calibration."""

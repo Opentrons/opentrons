@@ -141,6 +141,7 @@ class ModuleDimensions(BaseModel):
 
     bareOverallHeight: float
     overLabwareHeight: float
+    lidHeight: Optional[float]
 
 
 class ModuleCalibrationPoint(BaseModel):

@@ -117,3 +117,32 @@ def test_get_module_by_serial(tempdeck_v1_def: ModuleDefinition) -> None:
     )
     subject = get_module_view(modules_by_id={"module-1": module1, "module-2": module2})
     assert subject.get_by_serial("serial-2") == module2
+
+
+def test_get_location(tempdeck_v1_def: ModuleDefinition) -> None:
+    """It should return the deck slot location of the module."""
+    module_id = "unique-id"
+    module = LoadedModule(
+        id=module_id,
+        model="model-1",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
+        serial="serial-1",
+        definition=tempdeck_v1_def,
+    )
+    subject = get_module_view(modules_by_id={module_id: module})
+    assert subject.get_location(module_id=module_id) == DeckSlotLocation(
+        slotName=DeckSlotName.SLOT_2)
+
+
+def test_get_dimensions(tempdeck_v1_def: ModuleDefinition) -> None:
+    """It should return the dimensions of the specified module."""
+    module_id = "unique-id"
+    module = LoadedModule(
+        id=module_id,
+        model="model-1",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
+        serial="serial-1",
+        definition=tempdeck_v1_def,
+    )
+    subject = get_module_view(modules_by_id={module_id: module})
+    assert subject.get_dimensions(module_id=module_id) == tempdeck_v1_def.dimensions
