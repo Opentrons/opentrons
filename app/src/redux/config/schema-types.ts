@@ -6,10 +6,7 @@ export type UpdateChannel = 'latest' | 'beta' | 'alpha'
 
 export type DiscoveryCandidates = string | string[]
 
-export type DevInternalFlag =
-  | 'allPipetteConfig'
-  | 'enableBundleUpload'
-  | 'preProtocolFlowWithoutRPC'
+export type DevInternalFlag = 'allPipetteConfig' | 'enableBundleUpload'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
 
