@@ -14,6 +14,9 @@ class ModuleState:
     """Basic module data state and getter methods."""
 
     modules_by_id: Dict[str, LoadedModule]
+
+    # TODO (spp, 2021-11-24): remove definition_by_model and
+    #  unconditionally fetch definitions from ModuleDataProvider
     definition_by_model: Dict[ModuleModels, ModuleDefinition]
 
 
