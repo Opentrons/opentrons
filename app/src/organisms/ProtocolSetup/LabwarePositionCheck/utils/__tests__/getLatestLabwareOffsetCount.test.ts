@@ -12,7 +12,7 @@ describe('getLatestLabwareOffsetCount', () => {
       {
         definitionUri: 'some_definitionUri',
         location: { slotName: '1' },
-        vector: { x: 0, y: 0, z: 0 },
+        vector: { x: 1, y: 0, z: 0 },
       },
     ]
     expect(getLatestLabwareOffsetCount(labwareOffsets)).toBe(1)
@@ -91,5 +91,30 @@ describe('getLatestLabwareOffsetCount', () => {
       },
     ]
     expect(getLatestLabwareOffsetCount(labwareOffsets)).toBe(1)
+  })
+  it('should return only new offsets when the pervious entries were identity offsts', () => {
+    const labwareOffsets: LabwareOffset[] = [
+      {
+        definitionUri: 'some_definitionUri',
+        location: { slotName: '3' },
+        vector: { x: 0, y: 0, z: 0 },
+      },
+      {
+        definitionUri: 'another_definitionUri',
+        location: { moduleId: 'some_module' },
+        vector: { x: 0, y: 0, z: 0 },
+      },
+      {
+        definitionUri: 'some_definitionUri',
+        location: { slotName: '3' },
+        vector: { x: 1, y: 0, z: 0 },
+      },
+      {
+        definitionUri: 'another_definitionUri',
+        location: { moduleId: 'some_module' },
+        vector: { x: 1, y: 0, z: 0 },
+      },
+    ]
+    expect(getLatestLabwareOffsetCount(labwareOffsets)).toBe(2)
   })
 })
