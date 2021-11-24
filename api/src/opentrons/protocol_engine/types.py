@@ -3,7 +3,7 @@ from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass
 from pydantic import BaseModel, Field
-from typing import Optional, Union
+from typing import Optional, Union, List, Dict, Any
 
 from opentrons.types import MountType, DeckSlotName
 
@@ -197,3 +197,62 @@ class LoadedLabware(BaseModel):
             " so the default of (0, 0, 0) will be used."
         ),
     )
+
+
+class ModuleModels(str, Enum):
+    """All available modules' models."""
+
+    TEMPERATURE_MODULE_V1 = "temperatureModuleV1"
+    TEMPERATURE_MODULE_V2 = "temperatureModuleV2"
+    MAGNETIC_MODULE_V1 = "magneticModuleV1"
+    MAGNETIC_MODULE_V2 = "magneticModuleV2"
+    THERMOCYCLER_MODULE_V1 = "thermocyclerModuleV1"
+
+
+class ModuleDimensions(BaseModel):
+    """Dimension type for modules."""
+
+    bareOverallHeight: float
+    overLabwareHeight: float
+
+
+class ModuleCalibrationPoint(BaseModel):
+    """Calibration Point type for module definition."""
+
+    x: float
+    y: float
+
+
+class ModuleDefinition(BaseModel):
+    """Module definition class."""
+
+    otSharedSchema: str = Field("module/schemas/2", description="The current schema.")
+    moduleType: str = Field(
+        ..., description="Module type (Temperature/ Magnetic/ Thermocycler)"
+    )
+    model: str = Field(..., description="Model name of the module")
+    labwareOffset: LabwareOffsetVector = Field(
+        ..., description="Labware offset in x, y, z."
+    )
+    dimensions: ModuleDimensions = Field(..., description="Module dimension")
+    calibrationPoint: ModuleCalibrationPoint = Field(
+        ..., description="Calibration point of module."
+    )
+    displayName: str = Field(..., description="Display name.")
+    quirks: List[str] = Field(..., description="Module quirks")
+    slotTransforms: Dict[str, Any] = Field(
+        ..., description="Dictionary of transforms for each slot."
+    )
+    compatibleWith: List[str] = Field(
+        ..., description="List of module models this model is compatible with."
+    )
+
+
+class LoadedModule(BaseModel):
+    """A module that has been loaded."""
+
+    id: str
+    model: str
+    location: DeckSlotLocation
+    definition: ModuleDefinition
+    serial: Optional[str]

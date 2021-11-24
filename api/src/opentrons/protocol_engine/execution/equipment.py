@@ -4,17 +4,29 @@ from typing import Optional
 
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
+from opentrons.protocols.geometry.module_geometry import (
+    resolve_module_type,
+    module_model_from_string,
+)
 from opentrons.types import MountType
 from opentrons.hardware_control.api import API as HardwareAPI
+from opentrons.hardware_control.modules.mod_abc import AbstractModule
 
-from ..errors import FailedToLoadPipetteError, LabwareDefinitionDoesNotExistError
-from ..resources import LabwareDataProvider, ModelUtils
+from ..errors import (
+    FailedToLoadPipetteError,
+    LabwareDefinitionDoesNotExistError,
+    ModuleNotAttachedError,
+    ModuleDefinitionDoesNotExistError,
+)
+from ..resources import LabwareDataProvider, ModuleDataProvider, ModelUtils
 from ..state import StateStore
 from ..types import (
-    DeckSlotLocation,
     LabwareLocation,
-    LabwareOffsetLocation,
     PipetteName,
+    DeckSlotLocation,
+    LabwareOffsetLocation,
+    ModuleModels,
+    ModuleDefinition,
 )
 
 
@@ -34,12 +46,22 @@ class LoadedPipetteData:
     pipette_id: str
 
 
+@dataclass(frozen=True)
+class LoadedModuleData:
+    """The result of a load module procedure."""
+
+    module_id: str
+    module_serial: Optional[str]
+    definition: ModuleDefinition
+
+
 class EquipmentHandler:
     """Implementation logic for labware, pipette, and module loading."""
 
     _hardware_api: HardwareAPI
     _state_store: StateStore
     _labware_data_provider: LabwareDataProvider
+    _module_data_provider: ModuleDataProvider
     _model_utils: ModelUtils
 
     def __init__(
@@ -47,12 +69,14 @@ class EquipmentHandler:
         hardware_api: HardwareAPI,
         state_store: StateStore,
         labware_data_provider: Optional[LabwareDataProvider] = None,
+        module_data_provider: Optional[ModuleDataProvider] = None,
         model_utils: Optional[ModelUtils] = None,
     ) -> None:
         """Initialize an EquipmentHandler instance."""
         self._hardware_api = hardware_api
         self._state_store = state_store
         self._labware_data_provider = labware_data_provider or LabwareDataProvider()
+        self._module_data_provider = module_data_provider or ModuleDataProvider()
         self._model_utils = model_utils or ModelUtils()
 
     async def load_labware(
@@ -153,3 +177,58 @@ class EquipmentHandler:
         pipette_id = pipette_id or self._model_utils.generate_id()
 
         return LoadedPipetteData(pipette_id=pipette_id)
+
+    async def load_module(
+        self, model: ModuleModels, location: DeckSlotLocation, module_id: Optional[str]
+    ) -> LoadedModuleData:
+        """Ensure the required module is attached.
+
+        Args:
+            model: The model name of the module.
+            location: The deck location of the module
+            module_id: Optional ID assigned to the module.
+                       If None, an ID will be generated.
+
+        Returns:
+            A LoadedModuleData object
+        """
+        definition: ModuleDefinition
+        try:
+            # Try to use existing definition in state.
+            definition = self._state_store.modules.get_definition_by_model(model)
+        except ModuleDefinitionDoesNotExistError:
+            definition = self._module_data_provider.get_module_definition(model)
+
+        module_id = module_id or self._model_utils.generate_id()
+
+        attached_mod_instance = await self._get_hardware_module(model)
+
+        return LoadedModuleData(
+            module_id=module_id,
+            module_serial=attached_mod_instance.device_info.get("serial"),
+            definition=definition,
+        )
+
+    async def _get_hardware_module(self, model: ModuleModels) -> AbstractModule:
+        hw_model = module_model_from_string(model.value)
+        model_type = resolve_module_type(hw_model)
+
+        try:
+            available, simulating = await self._hardware_api.find_modules(
+                by_model=hw_model, resolved_type=model_type
+            )
+        except TypeError as e:
+            raise ModuleNotAttachedError("Could not fetch modules attached") from e
+
+        for mod in available:
+            # TODO (spp, 2021-11-22: make this accept compatible module models)
+            if mod.model() == model.value:
+                if not self._state_store.modules.get_by_serial(
+                    mod.device_info["serial"]
+                ):
+                    return mod
+
+        if simulating:
+            return simulating
+        else:
+            raise ModuleNotAttachedError("Requested module not found.")
