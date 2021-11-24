@@ -57,6 +57,8 @@ export const SummaryScreen = (props: {
             location: labwareOffset.labwareLocation,
             vector: labwareOffset.vector,
           },
+        }).catch((e: Error) => {
+          console.error(`error clearing labware offsets: ${e.message}`)
         })
       })
     } else {

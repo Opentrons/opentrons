@@ -491,6 +491,9 @@ export function useLabwarePositionCheck(
       createLabwareOffset({
         runId: currentRun?.data.id as string,
         data: identityOffsetEntry,
+      }).catch((e: Error) => {
+        console.error(`error clearing labware offsets: ${e.message}`)
+        setError(e)
       })
     })
 
