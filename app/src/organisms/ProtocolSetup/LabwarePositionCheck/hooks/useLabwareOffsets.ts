@@ -54,7 +54,7 @@ export type LabwareOffsets = Array<{
   labwareDefinitionUri: string
   displayLocation: string
   displayName: string
-  offsetData: VectorOffset
+  vector: VectorOffset
 }>
 
 export const useLabwareOffsets = (
@@ -78,11 +78,11 @@ export const useLabwareOffsets = (
         protocolData.labware
       )
       const displayName = protocolData.labware[labwareId].displayName ?? ''
-      const offsetData = offsetDataByLabwareId.then(result => ({
+      const vectorPromise = offsetDataByLabwareId.then(result => ({
         ...result[labwareId],
       }))
       return labwareOffsets.then(labwareOffsets =>
-        offsetData.then(offsetData => [
+        vectorPromise.then(vector => [
           ...labwareOffsets,
           {
             labwareId,
@@ -90,7 +90,7 @@ export const useLabwareOffsets = (
             labwareDefinitionUri,
             displayLocation,
             displayName,
-            offsetData,
+            vector,
           },
         ])
       )

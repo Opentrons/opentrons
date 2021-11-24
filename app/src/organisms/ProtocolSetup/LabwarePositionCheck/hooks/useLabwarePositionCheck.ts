@@ -14,7 +14,7 @@ import { getLabwareDisplayName } from '@opentrons/shared-data'
 import {
   useHost,
   useAllCommandsQuery,
-  useCreateLabwareOffsetsMutation,
+  useCreateLabwareOffsetMutation,
   useCreateCommandMutation,
 } from '@opentrons/react-api-client'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
@@ -198,7 +198,7 @@ export function useLabwarePositionCheck(
     IDENTITY_OFFSET
   )
   const { protocolData } = useProtocolDetails()
-  const { createLabwareOffsets } = useCreateLabwareOffsetsMutation()
+  const { createLabwareOffset } = useCreateLabwareOffsetMutation()
   const { createCommand } = useCreateCommandMutation()
   const host = useHost()
   const { runRecord: currentRun } = useCurrentProtocolRun()
@@ -480,16 +480,18 @@ export function useLabwarePositionCheck(
             protocolData?.labware
           ),
           location: getLabwareLocation(labwareId, protocolData?.commands ?? []),
-          offset: IDENTITY_OFFSET,
+          vector: IDENTITY_OFFSET,
         }
         return [...acc, identityOffset]
       },
       []
     )
 
-    createLabwareOffsets({
-      runId: currentRun?.data.id as string,
-      data: { labwareOffsets: identityLabwareOffsets },
+    identityLabwareOffsets.forEach(identityOffsetEntry => {
+      createLabwareOffset({
+        runId: currentRun?.data.id as string,
+        data: identityOffsetEntry,
+      })
     })
 
     // execute prep commands

@@ -14,7 +14,7 @@ import {
   Text,
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
-import { useCreateLabwareOffsetsMutation } from '@opentrons/react-api-client'
+import { useCreateLabwareOffsetMutation } from '@opentrons/react-api-client'
 import { useProtocolDetails } from '../../RunDetails/hooks'
 import { useCurrentProtocolRun } from '../../ProtocolUpload/hooks'
 import { DeckMap } from './DeckMap'
@@ -37,7 +37,7 @@ export const SummaryScreen = (props: {
     .catch((e: Error) =>
       console.error(`error getting labware offsetsL ${e.message}`)
     )
-  const { createLabwareOffsets } = useCreateLabwareOffsetsMutation()
+  const { createLabwareOffset } = useCreateLabwareOffsetMutation()
   const { runRecord } = useCurrentProtocolRun()
   if (introInfo == null) return null
   if (protocolData == null) return null
@@ -46,15 +46,15 @@ export const SummaryScreen = (props: {
 
   const applyLabwareOffsets = (): void => {
     if (labwareOffsets.length > 0) {
-      createLabwareOffsets({
-        runId: runRecord?.data.id as string,
-        data: {
-          labwareOffsets: labwareOffsets.map(offsetRecord => ({
-            definitionUri: offsetRecord.labwareDefinitionUri,
-            location: offsetRecord.labwareLocation,
-            offset: offsetRecord.offsetData,
-          })),
-        },
+      labwareOffsets.forEach(labwareOffset => {
+        createLabwareOffset({
+          runId: runRecord?.data.id as string,
+          data: {
+            definitionUri: labwareOffset.labwareDefinitionUri,
+            location: labwareOffset.labwareLocation,
+            vector: labwareOffset.vector,
+          },
+        })
       })
     } else {
       console.error('no labware offset data found')
