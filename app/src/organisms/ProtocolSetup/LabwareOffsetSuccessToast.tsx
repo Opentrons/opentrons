@@ -9,6 +9,7 @@ import {
 import { useTranslation } from 'react-i18next'
 import { Portal } from '../../App/portal'
 import { useCurrentProtocolRun } from '../ProtocolUpload/hooks'
+import { getLatestLabwareOffsetCount } from './LabwarePositionCheck/utils/getLatestLabwareOffsetCount'
 
 interface LabwareOffsetSuccessToastProps {
   onCloseClick: () => unknown
@@ -19,7 +20,9 @@ export function LabwareOffsetSuccessToast(
   const { t } = useTranslation('protocol_info')
   const currentProtocolRun = useCurrentProtocolRun()
   const currentRunData = currentProtocolRun.runRecord?.data
-  const labwareOffsets = currentRunData?.labwareOffsets
+  const labwareOffsetCount = getLatestLabwareOffsetCount(
+    currentRunData?.labwareOffsets ?? []
+  )
 
   return (
     <Portal level="page">
@@ -32,9 +35,9 @@ export function LabwareOffsetSuccessToast(
           onCloseClick={() => props.onCloseClick}
           title={t('labware_positon_check_complete_toast', {
             num_offsets:
-              labwareOffsets?.length === 0
+              labwareOffsetCount === 0
                 ? t('no_labware_offsets')
-                : labwareOffsets?.length,
+                : labwareOffsetCount,
           })}
         />
       </Flex>
