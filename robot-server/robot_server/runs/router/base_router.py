@@ -8,6 +8,8 @@ from pydantic import BaseModel, Field
 from typing import Optional, Union
 from typing_extensions import Literal
 
+from opentrons.protocol_engine import LabwareOffsetCreate
+
 from robot_server.errors import ErrorDetails, ErrorResponse
 from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.service.task_runner import TaskRunner
@@ -28,7 +30,12 @@ from robot_server.protocols import (
 
 from ..run_store import RunStore, RunResource, RunNotFoundError
 from ..run_view import RunView
-from ..run_models import Run, RunCreate, RunUpdate, RunCommandSummary
+from ..run_models import (
+    Run,
+    RunCreate,
+    RunUpdate,
+    RunCommandSummary,
+)
 from ..engine_store import EngineStore, EngineConflictError
 from ..dependencies import get_run_store, get_engine_store
 
@@ -300,6 +307,77 @@ async def remove_run(
     return EmptyResponseModel(links=None)
 
 
+@base_router.post(
+    path="/runs/{runId}/labware_offsets",
+    summary="Add a labware offset to a run",
+    description=(
+        "Add a labware offset to an existing run, returning the updated run."
+        "\n\n"
+        "There is no matching `GET /runs/{runId}/labware_offsets` endpoint."
+        " To read the list of labware offsets currently on the run,"
+        " see the run's `labwareOffsets` field."
+    ),
+    status_code=status.HTTP_201_CREATED,
+    response_model=ResponseModel[Run, None],
+    responses={
+        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
+        status.HTTP_409_CONFLICT: {
+            "model": ErrorResponse[Union[RunStopped, RunNotIdle]]
+        },
+    },
+)
+async def add_labware_offset(
+    runId: str,
+    request_body: RequestModel[LabwareOffsetCreate],
+    run_store: RunStore = Depends(get_run_store),
+    engine_store: EngineStore = Depends(get_engine_store),
+) -> ResponseModel[Run, None]:
+    """Add a labware offset to a run.
+
+    Args:
+        runId: Run ID pulled from URL.
+        request_body: New labware offset request data from request body.
+        run_store: Run storage interface.
+        engine_store: Engine storage interface.
+    """
+    try:
+        run = run_store.get(run_id=runId)
+    except RunNotFoundError as e:
+        raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
+
+    if run.is_current is False:
+        raise RunStopped(detail=f"Run {runId} is not the current run").as_error(
+            status.HTTP_409_CONFLICT
+        )
+
+    engine_store.engine.add_labware_offset(request_body.data)
+
+    engine_state = engine_store.get_state(run.run_id)
+    data = Run(
+        id=run.run_id,
+        protocolId=run.protocol_id,
+        createdAt=run.created_at,
+        current=run.is_current,
+        actions=run.actions,
+        commands=[
+            RunCommandSummary(
+                id=c.id,
+                commandType=c.commandType,
+                status=c.status,
+                errorId=c.errorId,
+            )
+            for c in engine_state.commands.get_all()
+        ],
+        errors=engine_state.commands.get_all_errors(),
+        pipettes=engine_state.pipettes.get_all(),
+        labware=engine_state.labware.get_all(),
+        labwareOffsets=engine_state.labware.get_labware_offsets(),
+        status=engine_state.commands.get_status(),
+    )
+
+    return ResponseModel(data=data, links=None)
+
+
 @base_router.patch(
     path="/runs/{runId}",
     summary="Update a run",
@@ -307,10 +385,10 @@ async def remove_run(
     status_code=status.HTTP_200_OK,
     response_model=ResponseModel[Run, None],
     responses={
+        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
         status.HTTP_409_CONFLICT: {
             "model": ErrorResponse[Union[RunStopped, RunNotIdle]]
         },
-        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
     },
 )
 async def update_run(
