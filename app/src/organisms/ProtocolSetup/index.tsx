@@ -53,9 +53,7 @@ export function ProtocolSetup(): JSX.Element {
     )}`
   } else if (runStatus === RUN_STATUS_SUCCEEDED) {
     alertType = 'success'
-    alertTitle = `${t('protocol_run_complete')} ${t(
-      'recalibrating_not_available'
-    )}`
+    alertTitle = `${t('protocol_run_complete')} ${t('protocol_can_be_closed')}`
   } else if (runStatus === RUN_STATUS_FAILED) {
     alertType = 'error'
     alertTitle = `${t('protocol_run_failed')} ${t(
@@ -78,16 +76,18 @@ export function ProtocolSetup(): JSX.Element {
           onCloseClick={() => setShowLPCSuccessToast(false)}
         />
       )}
+      {alertType != null ? (
+        // <Box paddingTop={SPACING_2} paddingBottom={SPACING_3} width="100%">
+        // <Box padding={`${SPACING_3} ${SPACING_2}`} width="100%">
+        <Box padding={SPACING_2} width="100%">
+          <AlertItem type={alertType} title={alertTitle} />
+        </Box>
+      ) : null}
       <Flex
         flexDirection={DIRECTION_COLUMN}
         alignItems={ALIGN_CENTER}
         padding={`${SPACING_1} ${SPACING_3} ${SPACING_3} ${SPACING_3}`}
       >
-        {alertType != null ? (
-          <Box paddingTop={SPACING_2} paddingBottom={SPACING_3} width="100%">
-            <AlertItem type={alertType} title={alertTitle} />
-          </Box>
-        ) : null}
         <MetadataCard />
         <RunSetupCard />
         <Text

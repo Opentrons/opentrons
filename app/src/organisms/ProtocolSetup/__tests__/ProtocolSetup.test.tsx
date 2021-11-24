@@ -97,8 +97,7 @@ describe('ProtocolSetup', () => {
   it('renders a protocol run complete banner when run is complete', () => {
     mockUseRunStatus.mockReturnValue(RUN_STATUS_SUCCEEDED)
     const { queryByText } = render()
-    const bannerText =
-      'Protocol run complete. Recalibrating Tip Length calibrations and Labware Position Check is not available.'
+    const bannerText = 'Protocol run complete. This protocol can now be closed.'
     expect(queryByText(bannerText)).toBeTruthy()
   })
   it('renders a protocol run failed banner when run is failed', () => {
