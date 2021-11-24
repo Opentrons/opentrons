@@ -98,7 +98,7 @@ export const SummaryScreen = (props: {
           onClick={() => {
             props.onLabwarePositionCheckComplete()
             props.onCloseClick()
-            applyLabwareOffsets
+            applyLabwareOffsets()
           }}
         >
           {t('close_and_apply_offset_data')}
