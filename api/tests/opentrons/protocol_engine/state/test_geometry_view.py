@@ -167,6 +167,46 @@ def test_get_labware_highest_z(
     assert highest_z == (well_plate_def.dimensions.zDimension + 3 + 3)
 
 
+def test_get_module_labware_highest_z(
+    decoy: Decoy,
+    standard_deck_def: DeckDefinitionV2,
+    well_plate_def: LabwareDefinition,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    subject: GeometryView,
+) -> None:
+    """It should get the absolute location of a labware's highest Z point."""
+    labware_data = LoadedLabware(
+        id="labware-id",
+        loadName="load-name",
+        definitionUri="definition-uri",
+        location=ModuleLocation(moduleId="module-id"),
+        offsetId="offset-id",
+    )
+    slot_pos = Point(1, 2, 3)
+    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+
+    decoy.when(labware_view.get("labware-id")).then_return(labware_data)
+    decoy.when(labware_view.get_definition("labware-id")).then_return(well_plate_def)
+    decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
+        calibration_offset
+    )
+    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_3)).then_return(
+        slot_pos
+    )
+    decoy.when(module_view.get_location("module-id")).then_return(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
+    )
+    decoy.when(module_view.get_module_offset("module-id")).then_return(
+        LabwareOffsetVector(x=4, y=5, z=6)
+    )
+    decoy.when(module_view.get_height_over_labware("module-id")).then_return(0.5)
+
+    highest_z = subject.get_labware_highest_z("labware-id")
+
+    assert highest_z == (well_plate_def.dimensions.zDimension + 3 + 3 + 6 + 0.5)
+
+
 def test_get_all_labware_highest_z(
     decoy: Decoy,
     standard_deck_def: DeckDefinitionV2,

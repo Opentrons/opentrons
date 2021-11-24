@@ -13,6 +13,7 @@ from ..types import (
     WellOrigin,
     WellOffset,
     DeckSlotLocation,
+    ModuleLocation,
 )
 from .labware import LabwareView
 from .modules import ModuleView
@@ -132,8 +133,11 @@ class GeometryView:
         labware_pos = self.get_labware_position(lw_data.id)
         definition = self._labware.get_definition(lw_data.id)
         z_dim = definition.dimensions.zDimension
-
-        return labware_pos.z + z_dim
+        height_over_labware: float = 0
+        if isinstance(lw_data.location, ModuleLocation):
+            module_id = lw_data.location.moduleId
+            height_over_labware = self._modules.get_height_over_labware(module_id)
+        return labware_pos.z + z_dim + height_over_labware
 
     # TODO(mc, 2020-11-12): reconcile with existing protocol logic and include
     # data from tip-length calibration once v4.0.0 is in `edge`
