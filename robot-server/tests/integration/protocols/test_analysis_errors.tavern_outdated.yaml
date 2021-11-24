@@ -1,10 +1,6 @@
 ---
 test_name: Upload invalid json protocol
 marks:
-  - parametrize:
-      key: feature_flag
-      vals:
-        - enableHttpProtocolSessions
   - usefixtures:
       - run_server
 stages:
