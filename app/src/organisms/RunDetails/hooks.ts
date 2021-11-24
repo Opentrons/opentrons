@@ -52,7 +52,6 @@ export function useProtocolDetails(): ProtocolDetails {
       protocolData = schemaV6Adapter(lastProtocolAnalysis)
     }
   }
-  // TODO immediately replace with metadata from protocol record
   const displayName = protocolRecord?.data.metadata.protocolName ?? null
   return { displayName, protocolData }
 }
