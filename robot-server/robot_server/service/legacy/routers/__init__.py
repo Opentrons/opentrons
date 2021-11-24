@@ -12,7 +12,6 @@ from . import (
     motors,
     camera,
     logs,
-    rpc,
 )
 
 legacy_routes = APIRouter()
@@ -70,12 +69,6 @@ legacy_routes.include_router(
     router=logs.router,
     tags=["Logs"],
     dependencies=[Depends(set_version_response_headers)],
-)
-
-# RPC websocket route is exempt from version header requirements
-legacy_routes.include_router(
-    router=rpc.router,
-    tags=["RPC"],
 )
 
 __all__ = ["legacy_routes"]
