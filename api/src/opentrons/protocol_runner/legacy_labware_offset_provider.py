@@ -6,13 +6,13 @@
 from typing import Optional
 
 from opentrons.types import DeckSlotName, Point
-
-from opentrons.protocol_engine import LabwareOffsetLocation
-from opentrons.protocol_engine.state import LabwareView
 from opentrons.protocol_api.labware_offset_provider import (
     ProvidedLabwareOffset as LegacyProvidedLabwareOffset,
     AbstractLabwareOffsetProvider as AbstractLegacyLabwareOffsetProvider,
 )
+
+from opentrons.protocol_engine import LabwareOffsetLocation, ModuleModels
+from opentrons.protocol_engine.state import LabwareView
 
 
 class LegacyLabwareOffsetProvider(AbstractLegacyLabwareOffsetProvider):
@@ -25,7 +25,7 @@ class LegacyLabwareOffsetProvider(AbstractLegacyLabwareOffsetProvider):
     def find(
         self,
         labware_definition_uri: str,
-        module_model: Optional[str],  # todo: enum
+        module_model: Optional[str],
         deck_slot: DeckSlotName,
     ) -> LegacyProvidedLabwareOffset:
         """Look up an offset in ProtocolEngine state and return it, if one exists."""
@@ -33,7 +33,9 @@ class LegacyLabwareOffsetProvider(AbstractLegacyLabwareOffsetProvider):
             definition_uri=labware_definition_uri,
             location=LabwareOffsetLocation(
                 slotName=deck_slot,
-                moduleModel=module_model
+                moduleModel=(
+                    None if module_model is None else ModuleModels[module_model]
+                ),
             ),
         )
         if offset is None:

@@ -1,4 +1,7 @@
 """Public protocol engine value types and models."""
+
+from __future__ import annotations
+
 from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass
@@ -140,8 +143,7 @@ class LabwareOffsetLocation(BaseModel):
         ...,
         description="The deck slot the offset applies to",
     )
-    # todo: enum
-    moduleModel: Optional[str] = Field(
+    moduleModel: Optional[ModuleModels] = Field(
         None,
         description="The module model the labware will be loaded onto, if applicable",
     )
