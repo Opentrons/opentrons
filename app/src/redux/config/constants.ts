@@ -5,7 +5,6 @@ export const CONFIG_VERSION_LATEST: 1 = 1
 export const DEV_INTERNAL_FLAGS: DevInternalFlag[] = [
   'allPipetteConfig',
   'enableBundleUpload',
-  'preProtocolFlowWithoutRPC',
 ]
 
 // action type constants

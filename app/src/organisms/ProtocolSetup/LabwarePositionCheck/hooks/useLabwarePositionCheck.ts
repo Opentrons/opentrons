@@ -24,12 +24,12 @@ import {
 import { useProtocolDetails } from '../../../RunDetails/hooks'
 import { useCurrentProtocolRun } from '../../../ProtocolUpload/hooks'
 import { getLabwareLocation } from '../../utils/getLabwareLocation'
-import { getModuleLocation } from '../../utils/getModuleLocation'
 import { sendModuleCommand } from '../../../../redux/modules'
 import { getConnectedRobotName } from '../../../../redux/robot/selectors'
 import { getAttachedModulesForConnectedRobot } from '../../../../redux/modules/selectors'
 import { getLabwareDefinitionUri } from '../../utils/getLabwareDefinitionUri'
 import { useSteps } from './useSteps'
+import { getModuleInitialLoadInfo } from '../../utils/getModuleInitialLoadInfo'
 import type {
   Command,
   ProtocolFile,
@@ -82,12 +82,14 @@ const useLpcCtaText = (command: LabwarePositionCheckCommand): string => {
         next_slot:
           'slotName' in labwareLocation
             ? labwareLocation.slotName
-            : getModuleLocation(labwareLocation.moduleId, commands),
+            : getModuleInitialLoadInfo(labwareLocation.moduleId, commands)
+                .location.slotName,
       })
     }
     case 'thermocycler/openLid': {
       const moduleId = command.params.moduleId
-      const slot = getModuleLocation(moduleId, commands)
+      const slot = getModuleInitialLoadInfo(moduleId, commands).location
+        .slotName
       return t('confirm_position_and_move', {
         next_slot: slot,
       })
@@ -118,7 +120,8 @@ export const useTitleText = (
   const slot =
     'slotName' in labwareLocation
       ? labwareLocation.slotName
-      : getModuleLocation(labwareLocation.moduleId, commands)
+      : getModuleInitialLoadInfo(labwareLocation.moduleId, commands).location
+          .slotName
 
   if (loading) {
     switch (command.commandType) {

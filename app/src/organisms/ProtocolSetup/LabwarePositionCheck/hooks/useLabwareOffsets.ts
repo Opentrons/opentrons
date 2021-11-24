@@ -7,7 +7,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { getLabwareLocation } from '../../utils/getLabwareLocation'
-import { getModuleLocation } from '../../utils/getModuleLocation'
+import { getModuleInitialLoadInfo } from '../../utils/getModuleInitialLoadInfo'
 import { getLabwareDefinitionUri } from '../../utils/getLabwareDefinitionUri'
 import { useOffsetDataByLabwareId } from '../../../ProtocolUpload/hooks/useOffsetData'
 import type { VectorOffset } from '@opentrons/api-client'
@@ -34,10 +34,10 @@ const getDisplayLocation = (
         moduleName: getModuleDisplayName(
           protocolData.modules[labwareLocation.moduleId].model
         ),
-        slot: getModuleLocation(
+        slot: getModuleInitialLoadInfo(
           labwareLocation.moduleId,
           protocolData.commands
-        ),
+        ).location.slotName,
       })
     }
   } else {
