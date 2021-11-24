@@ -39,8 +39,8 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
     def _handle_command(self, command: Command) -> None:
         if isinstance(command.result, LoadModuleResult):
             module_id = command.result.moduleId
-            new_module_by_id = self._state.modules_by_id.copy()
-            new_module_by_id[module_id] = LoadedModule(
+            new_modules_by_id = self._state.modules_by_id.copy()
+            new_modules_by_id[module_id] = LoadedModule(
                 id=module_id,
                 model=command.params.model,
                 location=command.params.location,
@@ -53,7 +53,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
 
             self._state = replace(
                 self._state,
-                modules_by_id=new_module_by_id,
+                modules_by_id=new_modules_by_id,
                 definition_by_model=new_definition_by_model,
             )
 

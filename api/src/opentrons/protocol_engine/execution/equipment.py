@@ -15,7 +15,7 @@ from opentrons.hardware_control.modules.mod_abc import AbstractModule
 from ..errors import (
     FailedToLoadPipetteError,
     LabwareDefinitionDoesNotExistError,
-    NoAttachedModuleFound,
+    ModuleNotAttachedError,
     ModuleDefinitionDoesNotExistError,
 )
 from ..resources import LabwareDataProvider, ModuleDataProvider, ModelUtils
@@ -218,7 +218,7 @@ class EquipmentHandler:
                 by_model=hw_model, resolved_type=model_type
             )
         except TypeError as e:
-            raise RuntimeError("Could not fetch modules attached") from e
+            raise ModuleNotAttachedError("Could not fetch modules attached") from e
 
         for mod in available:
             # TODO (spp, 2021-11-22: make this accept compatible module models)
@@ -231,4 +231,4 @@ class EquipmentHandler:
         if simulating:
             return simulating
         else:
-            raise NoAttachedModuleFound("Requested module not found.")
+            raise ModuleNotAttachedError("Requested module not found.")

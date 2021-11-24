@@ -202,8 +202,11 @@ class LegacyCommandMapper:
         module_id = f"module-{count}"
         module_model = LEGACY_TO_PE_MODULE[module_load_info.module_model]
 
-        # This will fetch a V2 definition that's supported on PAPI v2.3+
-        # We will need to make sure that execution using PE is gated to PAPI v2.3+
+        # This will fetch a V2 definition only. PAPI < v2.3 use V1 definitions.
+        # When running a < v2.3 protocol, there will be a mismatch of definitions used
+        # during analysis+LPC (V2) and protocol execution (V1).
+        # But this shouldn't result in any problems since V2 and V1 definitions
+        # have similar info, with V2 having additional info fields.
         definition = self._module_definition_by_model.get(
             module_model
         ) or self._module_data_provider.get_module_definition(module_model)
@@ -224,7 +227,6 @@ class LegacyCommandMapper:
             result=pe_commands.LoadModuleResult(
                 moduleId=module_id,
                 moduleSerial=module_load_info.module_serial,
-                # TODO: Do we need to verify definition V2 vs V1?
                 definition=definition,
             ),
         )

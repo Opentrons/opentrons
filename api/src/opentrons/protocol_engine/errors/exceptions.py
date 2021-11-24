@@ -88,7 +88,7 @@ class WellOriginNotAllowedError(ProtocolEngineError):
     """An error raised when using a disallowed origin in a relative well location."""
 
 
-class NoAttachedModuleFound(ProtocolEngineError):
+class ModuleNotAttachedError(ProtocolEngineError):
     """An error raised when no simulating or real modules are found attached."""
 
 

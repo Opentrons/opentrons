@@ -349,6 +349,8 @@ async def test_load_pipette_raises_if_pipette_not_attached(
         )
 
 
+# TODO (spp, 2021-11-24): So many mocks or the possible need to mock out
+#  an internal method of subject is code smell.
 async def test_load_module(
     decoy: Decoy,
     model_utils: ModelUtils,
@@ -369,7 +371,6 @@ async def test_load_module(
         module_data_provider.get_module_definition(ModuleModels.TEMPERATURE_MODULE_V1)
     ).then_return(tempdeck_v1_def)
 
-    # TODO before merge: How to mock out _get_hardware_module instead?
     decoy.when(
         await hardware_api.find_modules(
             by_model=TemperatureModuleModel.TEMPERATURE_V1,
@@ -390,6 +391,7 @@ async def test_load_module(
     assert result == expected_output
 
 
+# TODO (spp, 2021-11-23): Add tests for fetching a match from available modules
 async def test_get_hardware_module(
     decoy: Decoy,
     subject: EquipmentHandler,
@@ -397,7 +399,6 @@ async def test_get_hardware_module(
     simulating_module_fixture: TempDeck,
 ) -> None:
     """It should fetch the matching module instance from attached modules."""
-    # TODO (spp, 2021-11-23): Add tests for fetching a match from available modules
     decoy.when(
         await hardware_api.find_modules(
             by_model=TemperatureModuleModel.TEMPERATURE_V1,
