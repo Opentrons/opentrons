@@ -16,6 +16,7 @@ from .types import (
     LabwareOffset,
     LabwareOffsetCreate,
     LabwareOffsetVector,
+    LabwareOffsetLocation,
     DeckSlotLocation,
     ModuleLocation,
     Dimensions,
@@ -27,6 +28,8 @@ from .types import (
     WellLocation,
     WellOrigin,
     WellOffset,
+    ModuleModels,
+    ModuleDefinition,
 )
 
 __all__ = [
@@ -48,6 +51,7 @@ __all__ = [
     "LabwareOffset",
     "LabwareOffsetCreate",
     "LabwareOffsetVector",
+    "LabwareOffsetLocation",
     "DeckSlotLocation",
     "ModuleLocation",
     "Dimensions",
@@ -59,6 +63,8 @@ __all__ = [
     "WellLocation",
     "WellOrigin",
     "WellOffset",
+    "ModuleModels",
+    "ModuleDefinition",
     # plugins
     "AbstractPlugin",
 ]

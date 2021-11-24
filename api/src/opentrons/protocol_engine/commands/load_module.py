@@ -5,7 +5,7 @@ from typing_extensions import Literal
 from pydantic import BaseModel, Field
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
-from ..types import DeckSlotLocation
+from ..types import DeckSlotLocation, ModuleModels, ModuleDefinition
 
 
 LoadModuleCommandType = Literal["loadModule"]
@@ -14,9 +14,7 @@ LoadModuleCommandType = Literal["loadModule"]
 class LoadModuleParams(BaseModel):
     """Payload required to load a module."""
 
-    # todo(mm, 2021-11-01): Use an enum instead of a str. shared-data defines the
-    # possible model names.
-    model: str = Field(
+    model: ModuleModels = Field(
         ...,
         example="magneticModuleV1",
         description=(
@@ -58,13 +56,30 @@ class LoadModuleResult(BaseModel):
         description="An ID to reference this module in subsequent commands."
     )
 
+    # TODO (spp, 2021-11-24): Evaluate if this needs to be in the result
+    definition: ModuleDefinition = Field(description="The definition of this module.")
+
+    # TODO (spp, 2021-11-24): Remove optional
+    moduleSerial: Optional[str] = Field(
+        None, description="Hardware serial number of the module, if connected."
+    )
+
 
 class LoadModuleImplementation(AbstractCommandImpl[LoadModuleParams, LoadModuleResult]):
     """The implementation of the load module command."""
 
     async def execute(self, params: LoadModuleParams) -> LoadModuleResult:
         """Check that the requested module is attached and assign its identifier."""
-        raise NotImplementedError("LoadModule command not yet implemented")
+        loaded_module = await self._equipment.load_module(
+            model=params.model,
+            location=params.location,
+            module_id=params.moduleId,
+        )
+        return LoadModuleResult(
+            moduleId=loaded_module.module_id,
+            moduleSerial=loaded_module.module_serial,
+            definition=loaded_module.definition,
+        )
 
 
 class LoadModule(BaseCommand[LoadModuleParams, LoadModuleResult]):

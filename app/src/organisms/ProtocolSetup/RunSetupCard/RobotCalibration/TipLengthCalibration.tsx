@@ -1,13 +1,22 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   useConditionalConfirm,
   SpinnerModalPage,
   PrimaryBtn,
   Link,
+  Box,
+  Text,
+  Tooltip,
+  useHoverTooltip,
   C_BLUE,
+  C_DISABLED,
+  SIZE_5,
   TEXT_DECORATION_UNDERLINE,
+  TEXT_ALIGN_CENTER,
+  TOOLTIP_LEFT,
   FONT_BODY_2_DARK,
 } from '@opentrons/components'
 import * as RobotApi from '../../../../redux/robot-api'
@@ -30,6 +39,7 @@ import {
   tipLengthCalibrationStarted,
   pipetteOffsetCalibrationStarted,
 } from '../../../../redux/analytics'
+import { useRunStatus } from '../../../RunTimeControl/hooks'
 
 import type { State } from '../../../../redux/types'
 import type {
@@ -50,6 +60,7 @@ export interface TipLengthCalibrationProps {
   mount: Mount
   tipRackDefinition: LabwareDefinition2
   isExtendedPipOffset: boolean
+  disabled: boolean
 }
 
 // tip length calibration commands for which the full page spinner should not appear
@@ -63,6 +74,7 @@ export function TipLengthCalibration({
   mount,
   tipRackDefinition,
   isExtendedPipOffset,
+  disabled,
 }: TipLengthCalibrationProps): JSX.Element {
   const createRequestId = React.useRef<string | null>(null)
   const trackedRequestId = React.useRef<string | null>(null)
@@ -187,22 +199,47 @@ export function TipLengthCalibration({
     hasCalibrated
   )
 
+  const runStatus = useRunStatus()
+  const disableRecalibrate = runStatus != null && runStatus !== RUN_STATUS_IDLE
+
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_LEFT,
+  })
+
+  const recalibrateLink = disableRecalibrate ? (
+    <>
+      <Text color={C_DISABLED} {...targetProps}>
+        {t('recalibrate')}
+      </Text>
+      <Tooltip {...tooltipProps}>
+        {
+          <Box width={SIZE_5} textAlign={TEXT_ALIGN_CENTER}>
+            {t('recalibrating_tip_length_not_available')}
+          </Box>
+        }
+      </Tooltip>
+    </>
+  ) : (
+    <Link
+      onClick={() => confirm(true)}
+      textDecoration={TEXT_DECORATION_UNDERLINE}
+      css={FONT_BODY_2_DARK}
+      id={'TipRackCalibration_recalibrateTipRackLink'}
+    >
+      {t('recalibrate')}
+    </Link>
+  )
+
   return (
     <>
       {hasCalibrated ? (
-        <Link
-          onClick={() => confirm(true)}
-          textDecoration={TEXT_DECORATION_UNDERLINE}
-          css={FONT_BODY_2_DARK}
-          id={'TipRackCalibration_recalibrateTipRackLink'}
-        >
-          {t('recalibrate')}
-        </Link>
+        recalibrateLink
       ) : (
         <PrimaryBtn
           backgroundColor={C_BLUE}
           onClick={() => handleStart()}
           id={'TipRackCalibration_calibrateTipRackButton'}
+          disabled={disabled}
         >
           {t('calibrate_now_cta')}
         </PrimaryBtn>

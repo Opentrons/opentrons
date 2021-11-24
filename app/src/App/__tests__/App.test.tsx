@@ -10,7 +10,6 @@ import { Run } from '../../pages/Run'
 import { More } from '../../pages/More'
 
 import { ConnectPanel } from '../../pages/Robots/ConnectPanel'
-import { UploadPanel } from '../../pages/Upload/UploadPanel'
 import { CalibratePanel } from '../../pages/Calibrate/CalibratePanel'
 import { RunPanel } from '../../pages/Run/RunPanel'
 import { MorePanel } from '../../pages/More/MorePanel'
@@ -26,9 +25,6 @@ jest.mock('../../pages/Run', () => ({ Run: () => <></> }))
 jest.mock('../../pages/More', () => ({ More: () => <></> }))
 jest.mock('../../pages/Robots/ConnectPanel', () => ({
   ConnectPanel: () => <></>,
-}))
-jest.mock('../../pages/Upload/UploadPanel', () => ({
-  UploadPanel: () => <></>,
 }))
 jest.mock('../../pages/Calibrate/CalibratePanel', () => ({
   CalibratePanel: () => <></>,
@@ -74,7 +70,6 @@ describe('top level App component', () => {
   it('should render an Upload page on /upload', () => {
     const { wrapper } = render('/upload')
     expect(wrapper.exists(Upload)).toBe(true)
-    expect(wrapper.exists(UploadPanel)).toBe(true)
   })
 
   it('should render a Calibrate page on /calibrate', () => {

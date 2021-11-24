@@ -62,6 +62,10 @@ class PipetteDoesNotExistError(ProtocolEngineError):
     """An error raised when referencing a pipette that does not exist."""
 
 
+class ModuleDoesNotExistError(ProtocolEngineError):
+    """And error raised when referencing a module that does not exist."""
+
+
 class SlotDoesNotExistError(ProtocolEngineError):
     """An error raised when referencing a deck slot that does not exist."""
 
@@ -82,3 +86,11 @@ class ProtocolEngineStoppedError(ProtocolEngineError):
 
 class WellOriginNotAllowedError(ProtocolEngineError):
     """An error raised when using a disallowed origin in a relative well location."""
+
+
+class ModuleNotAttachedError(ProtocolEngineError):
+    """An error raised when no simulating or real modules are found attached."""
+
+
+class ModuleDefinitionDoesNotExistError(ProtocolEngineError):
+    """An error raised when referencing a module definition that does not exist."""

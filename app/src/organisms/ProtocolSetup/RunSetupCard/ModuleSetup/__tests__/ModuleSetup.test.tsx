@@ -204,7 +204,7 @@ describe('ModuleSetup', () => {
           protocolLoadOrder: 0,
           attachedModuleMatch: null,
         },
-      })
+      } as any)
 
     when(mockModuleInfo)
       .calledWith(
@@ -247,7 +247,7 @@ describe('ModuleSetup', () => {
           protocolLoadOrder: 1,
           attachedModuleMatch: null,
         },
-      })
+      } as any)
 
     when(mockModuleInfo)
       .calledWith(

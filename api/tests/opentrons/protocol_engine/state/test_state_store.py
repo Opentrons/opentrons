@@ -1,10 +1,11 @@
-"""Tests for the top-level StateStore."""
-import pytest
-from decoy import Decoy
+"""Tests for the top-level StateStore/StateView."""
 from typing import Callable, Optional
 
+import pytest
+from decoy import Decoy
+
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
-from opentrons.protocol_engine.state import StateStore, State
+from opentrons.protocol_engine.state import State, StateStore
 from opentrons.protocol_engine.actions import PlayAction
 from opentrons.protocol_engine.state.change_notifier import ChangeNotifier
 

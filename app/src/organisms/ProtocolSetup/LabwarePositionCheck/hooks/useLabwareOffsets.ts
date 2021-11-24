@@ -8,9 +8,11 @@ import {
 } from '@opentrons/shared-data'
 import { getLabwareLocation } from '../../utils/getLabwareLocation'
 import { getModuleInitialLoadInfo } from '../../utils/getModuleInitialLoadInfo'
+import { getLabwareDefinitionUri } from '../../utils/getLabwareDefinitionUri'
 import { useOffsetDataByLabwareId } from '../../../ProtocolUpload/hooks/useOffsetData'
 import type { VectorOffset } from '@opentrons/api-client'
 import type { SavePositionCommandData } from '../types'
+import type { LabwareLocation } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
 const getDisplayLocation = (
   labwareId: string,
@@ -47,8 +49,11 @@ const getDisplayLocation = (
 }
 
 export type LabwareOffsets = Array<{
-  location: string
-  labware: string
+  labwareId: string
+  labwareLocation: LabwareLocation
+  labwareDefinitionUri: string
+  displayLocation: string
+  displayName: string
   offsetData: VectorOffset
 }>
 
@@ -63,15 +68,30 @@ export const useLabwareOffsets = (
   return reduce<SavePositionCommandData, Promise<LabwareOffsets>>(
     savePositionCommandData,
     (labwareOffsets, _commandIds, labwareId) => {
-      const location = getDisplayLocation(labwareId, protocolData, t)
-      const labware = protocolData.labware[labwareId].displayName ?? ''
+      const displayLocation = getDisplayLocation(labwareId, protocolData, t)
+      const labwareLocation = getLabwareLocation(
+        labwareId,
+        protocolData.commands
+      )
+      const labwareDefinitionUri = getLabwareDefinitionUri(
+        labwareId,
+        protocolData.labware
+      )
+      const displayName = protocolData.labware[labwareId].displayName ?? ''
       const offsetData = offsetDataByLabwareId.then(result => ({
         ...result[labwareId],
       }))
       return labwareOffsets.then(labwareOffsets =>
         offsetData.then(offsetData => [
           ...labwareOffsets,
-          { location, labware, offsetData },
+          {
+            labwareId,
+            labwareLocation,
+            labwareDefinitionUri,
+            displayLocation,
+            displayName,
+            offsetData,
+          },
         ])
       )
     },
