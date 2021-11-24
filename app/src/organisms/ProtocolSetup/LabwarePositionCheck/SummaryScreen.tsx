@@ -96,9 +96,9 @@ export const SummaryScreen = (props: {
           backgroundColor={C_BLUE}
           id={'Lpc_summaryScreen_applyOffsetButton'}
           onClick={() => {
+            applyLabwareOffsets()
             props.onLabwarePositionCheckComplete()
             props.onCloseClick()
-            applyLabwareOffsets()
           }}
         >
           {t('close_and_apply_offset_data')}
