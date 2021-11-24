@@ -124,8 +124,9 @@ class EquipmentHandler:
             slot_name = location.slotName
             module_model = None
         else:
-            # TODO(mc, 2021-11-23): https://github.com/Opentrons/opentrons/issues/8242
-            raise NotImplementedError("Loading labware on modules not yet implemented")
+            module = self._state_store.modules.get(location.moduleId)
+            slot_name = module.location.slotName
+            module_model = module.model
 
         offset = self._state_store.labware.find_applicable_labware_offset(
             definition_uri=definition_uri,
