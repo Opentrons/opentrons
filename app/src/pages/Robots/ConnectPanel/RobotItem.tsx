@@ -35,11 +35,11 @@ export function RobotItemComponent(props: RobotItemProps): JSX.Element {
   )
   const dispatch = useDispatch<Dispatch>()
 
-  const connect = RobotActions.connect
-
   const handleToggleConnect = (): void => {
     if (!connectInProgress) {
-      const action = isConnected ? RobotActions.disconnect() : connect(name)
+      const action = isConnected
+        ? RobotActions.disconnect()
+        : RobotActions.connect(name)
 
       dispatch(action)
     }

@@ -47,13 +47,11 @@ export function StatusCard(props: Props): JSX.Element {
     status = sessionStatus
   }
 
-  const connect = robotActions.connect
-
   const handleClick: React.MouseEventHandler = () => {
     if (connected) {
       dispatch(robotActions.disconnect())
     } else {
-      dispatch(connect(robot.name))
+      dispatch(robotActions.connect(robot.name))
     }
   }
 
