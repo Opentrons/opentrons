@@ -713,7 +713,7 @@ def get_labware_definition(
         If unspecified, will search 'opentrons' then 'custom_beta'
     :param int version: The version of the labware definition. If unspecified,
         will use version 1.
-    :param bundled_defs: A bundle of labware definitions to exlusively use for
+    :param bundled_defs: A bundle of labware definitions to exclusively use for
         finding labware definitions, if specified
     :param extra_defs: An extra set of definitions (in addition to the system
         definitions) in which to search

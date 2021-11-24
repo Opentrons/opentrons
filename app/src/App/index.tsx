@@ -23,7 +23,6 @@ import { Run } from '../pages/Run'
 import { More } from '../pages/More'
 
 import { ConnectPanel } from '../pages/Robots/ConnectPanel'
-import { UploadPanel } from '../pages/Upload/UploadPanel'
 import { CalibratePanel } from '../pages/Calibrate/CalibratePanel'
 import { RunPanel } from '../pages/Run/RunPanel'
 import { MorePanel } from '../pages/More/MorePanel'
@@ -53,11 +52,12 @@ export const AppComponent = (): JSX.Element => {
         <Switch>
           <Route path="/robots/:name?" component={ConnectPanel} />
           <Route path="/more" component={MorePanel} />
-          <Route path="/upload" component={UploadPanel} />
           <Route path="/calibrate" component={CalibratePanel} />
           <Route path="/run" component={RunPanel} />
         </Switch>
+        <TopPortalRoot />
         <Box position={POSITION_RELATIVE} width="100%" height="100%">
+          <ModalPortalRoot />
           <Switch>
             <Route path="/robots/:name?">
               <Robots />
@@ -76,10 +76,8 @@ export const AppComponent = (): JSX.Element => {
             </Route>
             <Redirect exact from="/" to="/robots" />
           </Switch>
-          <ModalPortalRoot />
           <Alerts />
         </Box>
-        <TopPortalRoot />
       </Flex>
     </ApiHostProvider>
   )

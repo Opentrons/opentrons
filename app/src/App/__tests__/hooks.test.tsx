@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { when } from 'jest-when'
 import { renderHook } from '@testing-library/react-hooks'
 import { createStore } from 'redux'
 import { I18nextProvider } from 'react-i18next'
@@ -12,7 +11,6 @@ import {
   getConnectedRobotPipettesCalibrated,
   getDeckCalibrationOk,
 } from '../../redux/nav'
-import { useFeatureFlag } from '../../redux/config'
 import { getConnectedRobot } from '../../redux/discovery'
 import { useNavLocations, useRunLocation } from '../hooks'
 import { useCurrentProtocolRun } from '../../organisms/ProtocolUpload/hooks'
@@ -42,9 +40,6 @@ const mockGetNavbarLocations = getNavbarLocations as jest.MockedFunction<
 >
 const mockUseCurrentProtocolRun = useCurrentProtocolRun as jest.MockedFunction<
   typeof useCurrentProtocolRun
->
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
 >
 
 describe('useRunLocation', () => {
@@ -111,7 +106,7 @@ describe('useRunLocation', () => {
   })
 
   describe('useNavLocations', () => {
-    it('should return the 4 nav items when PUR enabled', () => {
+    it('should return the 4 nav items', () => {
       mockGetConnectedRobot.mockReturnValue({} as any)
       mockGetConnectedRobotPipettesMatch.mockReturnValue(true)
       mockGetConnectedRobotPipettesCalibrated.mockReturnValue(true)
@@ -121,27 +116,8 @@ describe('useRunLocation', () => {
         protocolRecord: {},
         runRecord: {},
       } as any)
-      when(mockUseFeatureFlag)
-        .calledWith('preProtocolFlowWithoutRPC')
-        .mockReturnValue(true)
       const { result } = renderHook(useNavLocations, { wrapper })
       expect(result.current.length).toBe(4)
-    })
-    it('should return the 5 nav items when PUR feature flag is not set', () => {
-      mockGetConnectedRobot.mockReturnValue({} as any)
-      mockGetConnectedRobotPipettesMatch.mockReturnValue(true)
-      mockGetConnectedRobotPipettesCalibrated.mockReturnValue(true)
-      mockGetDeckCalibrationOk.mockReturnValue(true)
-      mockGetNavbarLocations.mockReturnValue([0, 1, 2, 3, 4] as any)
-      mockUseCurrentProtocolRun.mockReturnValue({
-        protocolRecord: {},
-        runRecord: {},
-      } as any)
-      when(mockUseFeatureFlag)
-        .calledWith('preProtocolFlowWithoutRPC')
-        .mockReturnValue(false)
-      const { result } = renderHook(useNavLocations, { wrapper })
-      expect(result.current.length).toBe(5)
     })
   })
 })

@@ -26,8 +26,8 @@ export function ConfirmCancelModal(
       <AlertModal
         heading={t('cancel_run_modal_heading')}
         buttons={[
-          { children: t('cancel_run_modal_confirm'), onClick: onClose },
-          { children: t('cancel_run_modal_back'), onClick: cancel },
+          { children: t('cancel_run_modal_back'), onClick: onClose },
+          { children: t('cancel_run_modal_confirm'), onClick: cancel },
         ]}
         alertOverlay
       >

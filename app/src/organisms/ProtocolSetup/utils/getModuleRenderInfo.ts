@@ -17,7 +17,7 @@ export interface ModuleRenderInfoById {
     z: number
     moduleDef: ModuleDefinition
     nestedLabwareDef: LabwareDefinition2 | null
-    nestedLabwareId: string | null
+    nestedLabwareId: string
   }
 }
 
@@ -39,7 +39,7 @@ export const getModuleRenderInfo = (
             (command: LoadLabwareCommand) =>
               'moduleId' in command.params.location &&
               command.params.location.moduleId === moduleId
-          )?.params.labwareId
+          )?.params.labwareId as string
 
         const nestedLabware =
           nestedLabwareId != null ? protocolData.labware[nestedLabwareId] : null

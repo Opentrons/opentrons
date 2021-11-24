@@ -7,10 +7,10 @@ from opentrons.types import DeckSlotName, MountType
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocol_engine import ProtocolEngine, commands
 from opentrons.protocol_engine.types import (
-    DeckSlotLocation,
     LabwareOffset,
     LabwareOffsetCreate,
     LabwareOffsetVector,
+    LabwareOffsetLocation,
     PipetteName,
 )
 from opentrons.protocol_engine.execution import QueueWorker
@@ -351,7 +351,7 @@ def test_add_labware_offset(
     """It should have the labware offset request resolved and added to state."""
     request = LabwareOffsetCreate(
         definitionUri="definition-uri",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
         vector=LabwareOffsetVector(x=1, y=2, z=3),
     )
 
@@ -375,7 +375,7 @@ def test_add_labware_offset(
     result = subject.add_labware_offset(
         request=LabwareOffsetCreate(
             definitionUri="definition-uri",
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
             vector=LabwareOffsetVector(x=1, y=2, z=3),
         )
     )

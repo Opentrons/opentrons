@@ -20,6 +20,7 @@ from .python_file_reader import PythonFileReader
 from .python_context_creator import PythonContextCreator
 from .python_executor import PythonExecutor
 from .legacy_context_plugin import LegacyContextPlugin
+from .legacy_labware_offset_provider import LegacyLabwareOffsetProvider
 from .legacy_wrappers import (
     LEGACY_PYTHON_API_VERSION_CUTOFF,
     LEGACY_JSON_SCHEMA_VERSION_CUTOFF,
@@ -79,6 +80,9 @@ class ProtocolRunner:
         self._legacy_file_reader = legacy_file_reader or LegacyFileReader()
         self._legacy_context_creator = legacy_context_creator or LegacyContextCreator(
             hardware_api=hardware_api,
+            labware_offset_provider=LegacyLabwareOffsetProvider(
+                labware_view=protocol_engine.state_view.labware,
+            ),
             use_simulating_implementation=False,
         )
         self._legacy_executor = legacy_executor or LegacyExecutor(

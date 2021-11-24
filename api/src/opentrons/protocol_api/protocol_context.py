@@ -42,6 +42,10 @@ from .module_contexts import (
     TemperatureModuleContext,
     ThermocyclerContext,
 )
+from .labware_offset_provider import (
+    AbstractLabwareOffsetProvider,
+    NullLabwareOffsetProvider,
+)
 from .load_info import LabwareLoadInfo, ModuleLoadInfo, InstrumentLoadInfo
 from opentrons.protocols.api_support.util import (
     AxisMaxSpeeds,
@@ -79,12 +83,15 @@ class ProtocolContext(CommandPublisher):
     def __init__(
         self,
         implementation: AbstractProtocol,
-        loop: asyncio.AbstractEventLoop = None,
+        labware_offset_provider: Optional[AbstractLabwareOffsetProvider] = None,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
         broker=None,
         api_version: Optional[APIVersion] = None,
     ) -> None:
         """Build a :py:class:`.ProtocolContext`.
 
+        :param labware_offset_provider: Where this protocol context and its child
+                                        module contexts will get labware offsets from.
         :param loop: An event loop to use. If not specified, this ctor will
                      (eventually) call :py:meth:`asyncio.get_event_loop`.
         :param broker: An optional command broker to link to. If not
@@ -95,6 +102,10 @@ class ProtocolContext(CommandPublisher):
         super().__init__(broker)
 
         self._implementation = implementation
+
+        self._labware_offset_provider = (
+            labware_offset_provider or NullLabwareOffsetProvider()
+        )
 
         self._api_version = api_version or MAX_SUPPORTED_VERSION
         if self._api_version > MAX_SUPPORTED_VERSION:
@@ -375,12 +386,24 @@ class ProtocolContext(CommandPublisher):
                           as in the run log and the calibration view in the
                           Opentrons app.
         """
+        # todo(mm, 2021-11-22): The duplication between here and load_labware()
+        # is getting bad.
+
         implementation = self._implementation.load_labware_from_definition(
             labware_def=labware_def, location=location, label=label
         )
         result = Labware(implementation=implementation)
 
         result_namespace, result_load_name, result_version = result.uri.split("/")
+
+        provided_labware_offset = self._labware_offset_provider.find(
+            labware_definition_uri=result.uri,
+            module_model=None,
+            deck_slot=types.DeckSlotName.from_primitive(location),
+        )
+
+        result.set_calibration(delta=provided_labware_offset.delta)
+
         self.labware_load_broker.publish(
             LabwareLoadInfo(
                 labware_definition=result._implementation.get_definition(),
@@ -388,6 +411,8 @@ class ProtocolContext(CommandPublisher):
                 labware_load_name=result_load_name,
                 labware_version=int(result_version),
                 deck_slot=types.DeckSlotName.from_primitive(location),
+                on_module=False,
+                offset_id=provided_labware_offset.offset_id,
             )
         )
 
@@ -424,6 +449,9 @@ class ProtocolContext(CommandPublisher):
         :param int version: The version of the labware definition. If
             unspecified, will use version 1.
         """
+        # todo(mm, 2021-11-22): The duplication between here and
+        # load_labware_from_definition() is getting bad.
+
         implementation = self._implementation.load_labware(
             load_name=load_name,
             location=location,
@@ -434,6 +462,15 @@ class ProtocolContext(CommandPublisher):
         result = Labware(implementation=implementation)
 
         result_namespace, result_load_name, result_version = result.uri.split("/")
+
+        provided_labware_offset = self._labware_offset_provider.find(
+            labware_definition_uri=result.uri,
+            module_model=None,
+            deck_slot=types.DeckSlotName.from_primitive(location),
+        )
+
+        result.set_calibration(delta=provided_labware_offset.delta)
+
         self.labware_load_broker.publish(
             LabwareLoadInfo(
                 labware_definition=result._implementation.get_definition(),
@@ -441,6 +478,8 @@ class ProtocolContext(CommandPublisher):
                 labware_load_name=result_load_name,
                 labware_version=int(result_version),
                 deck_slot=types.DeckSlotName.from_primitive(location),
+                on_module=False,
+                offset_id=provided_labware_offset.offset_id,
             )
         )
 
@@ -553,17 +592,28 @@ class ProtocolContext(CommandPublisher):
         }[module.type]
 
         module_context = mod_class(
-            self, module.module, module.geometry, self.api_version, self._loop
+            ctx=self,
+            hw_module=module.module,
+            geometry=module.geometry,
+            at_version=self.api_version,
+            loop=self._loop,
         )
         self._modules.append(module_context)
+
+        # ===== Protocol Engine stuff ====
         module_loc = module.geometry.parent
         assert isinstance(module_loc, (int, str)), "Unexpected labware object parent"
         deck_slot = types.DeckSlotName.from_primitive(module_loc)
+        module_serial = (
+            module.module.device_info.get("serial") if module.module else None
+        )
+
         self.module_load_broker.publish(
             ModuleLoadInfo(
-                module_name=module_name,
+                module_model=module.geometry.model,
                 deck_slot=deck_slot,
                 configuration=configuration,
+                module_serial=module_serial,
             )
         )
         return module_context

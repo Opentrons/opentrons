@@ -80,8 +80,8 @@ export function useCurrentRunPipetteInfoByMount(): {
         const tipRackDefs: LabwareDefinition2[] = pickUpTipCommands.reduce<
           LabwareDefinition2[]
         >((acc, command) => {
-          if (pipetteId === command.result?.pipetteId) {
-            const tipRack = labware[command.result?.labwareId]
+          if (pipetteId === command.params?.pipetteId) {
+            const tipRack = labware[command.params?.labwareId]
             const tipRackDefinition = labwareDefinitions[tipRack.definitionId]
             if (tipRackDefinition != null && !acc.includes(tipRackDefinition)) {
               return [...acc, tipRackDefinition]

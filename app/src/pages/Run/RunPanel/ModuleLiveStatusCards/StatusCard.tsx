@@ -2,7 +2,6 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styles from './styles.css'
 import { IconName } from '@opentrons/components'
-import { useFeatureFlag } from '../../../../redux/config'
 import { CollapsibleModuleItem } from './CollapsibleModuleItem'
 
 interface Props {
@@ -28,25 +27,12 @@ const iconNameByModuleType: Record<string, IconName> = {
 }
 
 export function StatusCard(props: Props): JSX.Element {
-  const isNewProtocolRunPanel = useFeatureFlag('preProtocolFlowWithoutRPC')
   const { t } = useTranslation('run_details')
 
-  return isNewProtocolRunPanel ? (
+  return (
     <CollapsibleModuleItem
       iconName={iconNameByModuleType[props.moduleType]}
       status={props.moduleStatus}
-      className={styles.status_card}
-      onCollapseToggle={props.toggleCard}
-      header={
-        props.header && t('module_slot_number', { slot_number: props.header })
-      }
-      title={props.title}
-      collapsed={!props.isCardExpanded}
-    >
-      {props.children}
-    </CollapsibleModuleItem>
-  ) : (
-    <CollapsibleModuleItem
       className={styles.status_card}
       onCollapseToggle={props.toggleCard}
       header={

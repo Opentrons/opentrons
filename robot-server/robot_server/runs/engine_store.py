@@ -74,7 +74,7 @@ class EngineStore:
             run_id: The run resource the engine is assigned to.
 
         Returns:
-            The created and stored ProtocolRunner / ProtocolEngine pair.
+            The state view for the new ProtocolEngine.
 
         Raises:
             EngineConflictError: The current runner/engine pair is not idle, so

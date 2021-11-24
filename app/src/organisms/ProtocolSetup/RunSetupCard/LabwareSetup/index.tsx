@@ -1,6 +1,7 @@
 import * as React from 'react'
 import map from 'lodash/map'
 import { useTranslation } from 'react-i18next'
+import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   Btn,
   Flex,
@@ -10,14 +11,18 @@ import {
   RobotWorkSpace,
   SecondaryBtn,
   Text,
+  Tooltip,
+  useHoverTooltip,
+  TEXT_ALIGN_CENTER,
+  TOOLTIP_LEFT,
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
   FONT_SIZE_BODY_1,
   JUSTIFY_CENTER,
+  SIZE_5,
   SPACING_3,
   C_BLUE,
   C_DARK_GRAY,
-  C_NEAR_WHITE,
   DIRECTION_ROW,
   Box,
   FONT_WEIGHT_SEMIBOLD,
@@ -27,6 +32,8 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
+
+import { useRunStatus } from '../../../RunTimeControl/hooks'
 import { LabwarePositionCheck } from '../../LabwarePositionCheck'
 import styles from '../../styles.css'
 import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../../hooks'
@@ -34,6 +41,7 @@ import { LabwareInfoOverlay } from './LabwareInfoOverlay'
 import { LabwareOffsetModal } from './LabwareOffsetModal'
 import { getModuleTypesThatRequireExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
 import { ExtraAttentionWarning } from './ExtraAttentionWarning'
+import { LabwareOffsetSuccessToast } from '../../LabwareOffsetSuccessToast'
 
 const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
@@ -50,6 +58,12 @@ const DECK_MAP_VIEWBOX = '-80 -40 550 500'
 export const LabwareSetup = (): JSX.Element | null => {
   const moduleRenderInfoById = useModuleRenderInfoById()
   const labwareRenderInfoById = useLabwareRenderInfoById()
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_LEFT,
+  })
+  const runStatus = useRunStatus()
+  const disableLabwarePositionCheck =
+    runStatus != null && runStatus !== RUN_STATUS_IDLE
   const { t } = useTranslation('protocol_setup')
   const [
     showLabwareHelpModal,
@@ -67,8 +81,15 @@ export const LabwareSetup = (): JSX.Element | null => {
     showLabwarePositionCheckModal,
     setShowLabwarePositionCheckModal,
   ] = React.useState<boolean>(false)
+  const [showLPCSuccessToast, setShowLPCSuccessToast] = React.useState(false)
+
   return (
     <React.Fragment>
+      {showLPCSuccessToast && (
+        <LabwareOffsetSuccessToast
+          onCloseClick={() => setShowLPCSuccessToast(false)}
+        />
+      )}
       {showLabwareHelpModal && (
         <LabwareOffsetModal
           onCloseClick={() => setShowLabwareHelpModal(false)}
@@ -77,14 +98,10 @@ export const LabwareSetup = (): JSX.Element | null => {
       {showLabwarePositionCheckModal && (
         <LabwarePositionCheck
           onCloseClick={() => setShowLabwarePositionCheckModal(false)}
+          onLabwarePositionCheckComplete={() => setShowLPCSuccessToast(true)}
         />
       )}
-      <Flex
-        flex="1"
-        backgroundColor={C_NEAR_WHITE}
-        borderRadius="6px"
-        flexDirection={DIRECTION_COLUMN}
-      >
+      <Flex flex="1" maxHeight="85vh" flexDirection={DIRECTION_COLUMN}>
         {moduleTypesThatRequireExtraAttention.length > 0 && (
           <ExtraAttentionWarning
             moduleTypes={moduleTypesThatRequireExtraAttention}
@@ -102,7 +119,7 @@ export const LabwareSetup = (): JSX.Element | null => {
               <React.Fragment>
                 {map(
                   moduleRenderInfoById,
-                  ({ x, y, moduleDef, nestedLabwareDef }) => (
+                  ({ x, y, moduleDef, nestedLabwareDef, nestedLabwareId }) => (
                     <Module
                       key={`LabwareSetup_Module_${moduleDef.model}_${x}${y}`}
                       x={x}
@@ -120,24 +137,33 @@ export const LabwareSetup = (): JSX.Element | null => {
                           key={`LabwareSetup_Labware_${nestedLabwareDef.metadata.displayName}_${x}${y}`}
                         >
                           <LabwareRender definition={nestedLabwareDef} />
-                          <LabwareInfoOverlay definition={nestedLabwareDef} />
+                          <LabwareInfoOverlay
+                            definition={nestedLabwareDef}
+                            labwareId={nestedLabwareId}
+                          />
                         </React.Fragment>
                       ) : null}
                     </Module>
                   )
                 )}
-                {map(labwareRenderInfoById, ({ x, y, labwareDef }) => {
-                  return (
-                    <React.Fragment
-                      key={`LabwareSetup_Labware_${labwareDef.metadata.displayName}_${x}${y}`}
-                    >
-                      <g transform={`translate(${x},${y})`}>
-                        <LabwareRender definition={labwareDef} />
-                        <LabwareInfoOverlay definition={labwareDef} />
-                      </g>
-                    </React.Fragment>
-                  )
-                })}
+                {map(
+                  labwareRenderInfoById,
+                  ({ x, y, labwareDef }, labwareId) => {
+                    return (
+                      <React.Fragment
+                        key={`LabwareSetup_Labware_${labwareDef.metadata.displayName}_${x}${y}`}
+                      >
+                        <g transform={`translate(${x},${y})`}>
+                          <LabwareRender definition={labwareDef} />
+                          <LabwareInfoOverlay
+                            definition={labwareDef}
+                            labwareId={labwareId}
+                          />
+                        </g>
+                      </React.Fragment>
+                    )
+                  }
+                )}
               </React.Fragment>
             )
           }}
@@ -173,9 +199,20 @@ export const LabwareSetup = (): JSX.Element | null => {
                 onClick={() => setShowLabwarePositionCheckModal(true)}
                 color={C_BLUE}
                 id={'LabwareSetup_checkLabwarePositionsButton'}
+                {...targetProps}
+                disabled={disableLabwarePositionCheck}
               >
                 {t('run_labware_position_check')}
               </SecondaryBtn>
+              {disableLabwarePositionCheck ? (
+                <Tooltip {...tooltipProps}>
+                  {
+                    <Box width={SIZE_5} textAlign={TEXT_ALIGN_CENTER}>
+                      {t('labware_position_check_not_available')}
+                    </Box>
+                  }
+                </Tooltip>
+              ) : null}
             </Flex>
           </Flex>
         </Flex>

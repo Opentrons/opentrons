@@ -1,4 +1,5 @@
-import { Command as FullCommand } from '@opentrons/shared-data'
+import type { Command as FullCommand } from '@opentrons/shared-data'
+import type { LabwareLocation } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
 export const RUN_STATUS_IDLE: 'idle' = 'idle'
 export const RUN_STATUS_RUNNING: 'running' = 'running'
@@ -38,9 +39,8 @@ export interface VectorOffset {
   z: number
 }
 export interface LabwareOffset {
-  id: string
   definitionUri: string
-  location: Location
+  location: LabwareLocation
   offset: VectorOffset
 }
 

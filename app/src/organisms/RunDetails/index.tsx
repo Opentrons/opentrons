@@ -1,6 +1,10 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
+import {
+  RunStatus,
+  RUN_STATUS_IDLE,
+  RUN_STATUS_RUNNING,
+} from '@opentrons/api-client'
 import {
   PrimaryBtn,
   BORDER_WIDTH_DEFAULT,
@@ -14,7 +18,7 @@ import {
 } from '@opentrons/components'
 import { Page } from '../../atoms/Page'
 import { useProtocolDetails } from './hooks'
-import { useRunStatus } from '../RunTimeControl/hooks'
+import { useRunStatus, useRunStartTime } from '../RunTimeControl/hooks'
 import { ConfirmCancelModal } from '../../pages/Run/RunLog'
 import { useCurrentRunControls } from '../../pages/Run/RunLog/hooks'
 import { CommandList } from './CommandList'
@@ -23,6 +27,14 @@ export function RunDetails(): JSX.Element | null {
   const { t } = useTranslation('run_details')
   const { displayName } = useProtocolDetails()
   const runStatus = useRunStatus()
+  const startTime = useRunStartTime()
+
+  // display an idle status as 'running' in the UI after a run has started
+  const adjustedRunStatus: RunStatus | null =
+    runStatus === RUN_STATUS_IDLE && startTime != null
+      ? RUN_STATUS_RUNNING
+      : runStatus
+
   const { pauseRun } = useCurrentRunControls()
 
   const cancelRunAndExit = (): void => {
@@ -53,7 +65,7 @@ export function RunDetails(): JSX.Element | null {
   )
 
   const titleBarProps =
-    runStatus === RUN_STATUS_RUNNING
+    adjustedRunStatus === RUN_STATUS_RUNNING
       ? {
           title: t('protocol_title', { protocol_name: displayName }),
           rightNode: cancelRunButton,
