@@ -350,16 +350,26 @@ describe('LabwareSetup', () => {
     const { getByText } = render()
     getByText('mock extra attention warning with magnetic module and TC')
   })
-  it('should render close LPC', () => {
+  it('should render Labware Offset Success toast when LPC is closed', () => {
+    const { getByRole, getByText } = render()
     expect(screen.queryByText('mock LabwareOffsetSuccessToast')).toBeNull()
-    const { getByText, getByRole } = render()
     const button = getByRole('button', {
       name: 'run labware position check',
     })
     fireEvent.click(button)
     const LPC = getByText('mock Labware Position Check')
-
     fireEvent.click(LPC)
-    expect(screen.queryByText('mock Labware Position CHeck')).toBeNull()
+    when(mockLabwarePostionCheck)
+      .calledWith(
+        componentPropsMatcher({
+          onLabwarePositionCheckComplete: expect.anything(),
+        })
+      )
+      .mockImplementation(({ onLabwarePositionCheckComplete }) => (
+        <div onClick={onLabwarePositionCheckComplete}>
+          mock LabwarePositionCheck
+        </div>
+      ))
+    expect(screen.queryByText('mock LabwarePositionCheck')).toBeNull()
   })
 })

@@ -1,8 +1,12 @@
 import * as React from 'react'
 import '@testing-library/jest-dom'
-import { fireEvent } from '@testing-library/dom'
+import { fireEvent, screen } from '@testing-library/dom'
 import { when } from 'jest-when'
-import { renderWithProviders, anyProps } from '@opentrons/components'
+import {
+  renderWithProviders,
+  anyProps,
+  partialComponentPropsMatcher,
+} from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { AlertItem } from '@opentrons/components/src/alerts'
 import { LabwareOffsetSuccessToast } from '../LabwareOffsetSuccessToast'
@@ -129,19 +133,27 @@ describe(' LabwareOffsetSuccessToast', () => {
     const successToast = getByText('No Labware Offsets created')
     fireEvent.click(successToast)
   })
-  it('renders LPC success toast and is clickable with 1 offset', () => {
+  it('renders LPC success toast and closes succcess toast where run has 1 offset', () => {
     mockAlertItem.mockReturnValue(<div>1 Labware Offsets created</div>)
-    const { getByText } = render(props)
     when(mockUseCurrentProtocolRun)
       .calledWith()
       .mockReturnValue({
         runRecord: { data: mock1OffsetsRun },
       } as UseCurrentProtocolRun)
+    const { getByText } = render(props)
     expect(getByText('1 Labware Offsets created')).toHaveStyle(
       'backgroundColor: c-success'
     )
-    const successToast = getByText('1 Labware Offsets created')
-    fireEvent.click(successToast)
-    expect(successToast).toBeTruthy()
+    fireEvent.click(getByText('1 Labware Offsets created'))
+    when(mockAlertItem)
+      .calledWith(
+        partialComponentPropsMatcher({
+          onCloseClick: expect.anything(),
+        })
+      )
+      .mockImplementation(({ onCloseClick }) => (
+        <div onClick={onCloseClick}>mock LPC text </div>
+      ))
+    expect(screen.queryByText('mock LPC text')).toBeNull()
   })
 })
