@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { when } from 'jest-when'
+import { fireEvent } from '@testing-library/dom'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
@@ -23,7 +24,6 @@ const mockUseIntroInfo = useIntroInfo as jest.MockedFunction<
 const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
   typeof useProtocolDetails
 >
-
 const mockDeckmap = DeckMap as jest.MockedFunction<typeof DeckMap>
 
 const mockLabwareOffsetsSummary = LabwareOffsetsSummary as jest.MockedFunction<
@@ -41,19 +41,21 @@ const LABWARE_DEF = {
   ordering: [['A1', 'A2']],
 }
 
-const render = () => {
-  return renderWithProviders(
-    <SummaryScreen
-      savePositionCommandData={{ someLabwareIf: ['commandId1', 'commandId2'] }}
-    />,
-    {
-      i18nInstance: i18n,
-    }
-  )[0]
+const render = (props: React.ComponentProps<typeof SummaryScreen>) => {
+  return renderWithProviders(<SummaryScreen {...props} />, {
+    i18nInstance: i18n,
+  })[0]
 }
 
 describe('SummaryScreen', () => {
+  let props: React.ComponentProps<typeof SummaryScreen>
+
   beforeEach(() => {
+    props = {
+      savePositionCommandData: { someLabwareIf: ['commandId1', 'commandId2'] },
+      onLabwarePositionCheckComplete: jest.fn(),
+      onCloseClick: jest.fn(),
+    }
     mockSectionList.mockReturnValue(<div>Mock SectionList</div>)
     mockDeckmap.mockReturnValue(<div>Mock DeckMap</div>)
     mockLabwareOffsetsSummary.mockReturnValue(
@@ -92,14 +94,21 @@ describe('SummaryScreen', () => {
       } as any)
   })
   it('renders Summary Screen with all components and header', () => {
-    const { getByText } = render()
+    const { getByText } = render(props)
     getByText('Mock SectionList')
     getByText('Mock DeckMap')
     getByText('Mock Labware Offsets Summary')
     getByText('Labware Position Check Complete')
   })
-  it('renders button and clicks it', () => {
-    const { getByRole } = render()
-    getByRole('button', { name: 'Close and apply labware offset data' })
+  it('renders apply offset button and clicks it', () => {
+    const { getByRole } = render(props)
+    expect(props.onCloseClick).not.toHaveBeenCalled()
+    expect(props.onLabwarePositionCheckComplete).not.toHaveBeenCalled()
+    const button = getByRole('button', {
+      name: 'Close and apply labware offset data',
+    })
+    fireEvent.click(button)
+    expect(props.onCloseClick).toHaveBeenCalled()
+    expect(props.onLabwarePositionCheckComplete).toHaveBeenCalled()
   })
 })

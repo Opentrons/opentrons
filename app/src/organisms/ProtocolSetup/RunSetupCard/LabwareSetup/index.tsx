@@ -33,6 +33,7 @@ import { LabwareInfoOverlay } from './LabwareInfoOverlay'
 import { LabwareOffsetModal } from './LabwareOffsetModal'
 import { getModuleTypesThatRequireExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
 import { ExtraAttentionWarning } from './ExtraAttentionWarning'
+import { LabwareOffsetSuccessToast } from '../../LabwareOffsetSuccessToast'
 
 const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
@@ -66,8 +67,15 @@ export const LabwareSetup = (): JSX.Element | null => {
     showLabwarePositionCheckModal,
     setShowLabwarePositionCheckModal,
   ] = React.useState<boolean>(false)
+  const [showLPCSuccessToast, setShowLPCSuccessToast] = React.useState(false)
+
   return (
     <React.Fragment>
+      {showLPCSuccessToast && (
+        <LabwareOffsetSuccessToast
+          onCloseClick={() => setShowLPCSuccessToast(false)}
+        />
+      )}
       {showLabwareHelpModal && (
         <LabwareOffsetModal
           onCloseClick={() => setShowLabwareHelpModal(false)}
@@ -76,6 +84,7 @@ export const LabwareSetup = (): JSX.Element | null => {
       {showLabwarePositionCheckModal && (
         <LabwarePositionCheck
           onCloseClick={() => setShowLabwarePositionCheckModal(false)}
+          onLabwarePositionCheckComplete={() => setShowLPCSuccessToast(true)}
         />
       )}
       <Flex flex="1" maxHeight="85vh" flexDirection={DIRECTION_COLUMN}>
