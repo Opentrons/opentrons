@@ -1,6 +1,5 @@
 import * as React from 'react'
 import '@testing-library/jest-dom'
-import { fireEvent } from '@testing-library/dom'
 import {
   RUN_STATUS_IDLE,
   RUN_STATUS_RUNNING,
@@ -16,13 +15,11 @@ import { i18n } from '../../../i18n'
 import { useRunStatus } from '../../RunTimeControl/hooks'
 import { RunSetupCard } from '../RunSetupCard'
 import { MetadataCard } from '../MetadataCard'
-import { LabwareOffsetSuccessToast } from '../LabwareOffsetSuccessToast'
 import { ProtocolSetup } from '..'
 
 jest.mock('../../RunTimeControl/hooks')
 jest.mock('../MetadataCard')
 jest.mock('../RunSetupCard')
-jest.mock('../LabwareOffsetSuccessToast')
 
 const mockUseRunStatus = useRunStatus as jest.MockedFunction<
   typeof useRunStatus
@@ -32,9 +29,6 @@ const mockMetadataCard = MetadataCard as jest.MockedFunction<
 >
 const mockRunSetupCard = RunSetupCard as jest.MockedFunction<
   typeof RunSetupCard
->
-const mockLabwareOffsetSuccessToast = LabwareOffsetSuccessToast as jest.MockedFunction<
-  typeof LabwareOffsetSuccessToast
 >
 
 describe('ProtocolSetup', () => {
@@ -48,9 +42,6 @@ describe('ProtocolSetup', () => {
     mockUseRunStatus.mockReturnValue(RUN_STATUS_IDLE)
     mockMetadataCard.mockReturnValue(<div>Mock MetadataCard</div>)
     mockRunSetupCard.mockReturnValue(<div>Mock ReunSetupCard</div>)
-    mockLabwareOffsetSuccessToast.mockReturnValue(
-      <div>Mock LabwareOffsetSuccessToast</div>
-    )
   })
 
   afterEach(() => {
@@ -61,11 +52,6 @@ describe('ProtocolSetup', () => {
     const { getByText } = render()
     getByText('Mock MetadataCard')
     getByText('Mock ReunSetupCard')
-  })
-  it('renders LPC success toast and is clickable', () => {
-    const { getByText } = render()
-    const successToast = getByText('Mock LabwareOffsetSuccessToast')
-    fireEvent.click(successToast)
   })
   it('does not render a protocol run banner when run is unstarted', () => {
     const { queryByText } = render()

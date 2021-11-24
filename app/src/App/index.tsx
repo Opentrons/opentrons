@@ -55,7 +55,9 @@ export const AppComponent = (): JSX.Element => {
           <Route path="/calibrate" component={CalibratePanel} />
           <Route path="/run" component={RunPanel} />
         </Switch>
+        <TopPortalRoot />
         <Box position={POSITION_RELATIVE} width="100%" height="100%">
+          <ModalPortalRoot />
           <Switch>
             <Route path="/robots/:name?">
               <Robots />
@@ -74,10 +76,8 @@ export const AppComponent = (): JSX.Element => {
             </Route>
             <Redirect exact from="/" to="/robots" />
           </Switch>
-          <ModalPortalRoot />
           <Alerts />
         </Box>
-        <TopPortalRoot />
       </Flex>
     </ApiHostProvider>
   )

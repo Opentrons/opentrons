@@ -9,6 +9,7 @@ import {
   LabwareRender,
   RobotWorkSpace,
   Module,
+  anyProps,
 } from '@opentrons/components'
 import {
   inferModuleOrientationFromXCoordinate,
@@ -21,6 +22,7 @@ import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_stand
 import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '../../../../../i18n'
 import { useRunStatus } from '../../../../RunTimeControl/hooks'
+import { LabwareOffsetSuccessToast } from '../../../LabwareOffsetSuccessToast'
 import { LabwarePositionCheck } from '../../../LabwarePositionCheck'
 import {
   useModuleRenderInfoById,
@@ -41,6 +43,7 @@ jest.mock('../ExtraAttentionWarning')
 jest.mock('../../../hooks')
 jest.mock('../utils/getModuleTypesThatRequireExtraAttention')
 jest.mock('../../../../RunTimeControl/hooks')
+jest.mock('../../../LabwareOffsetSuccessToast')
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
   return {
@@ -92,6 +95,9 @@ const mockLabwarePostionCheck = LabwarePositionCheck as jest.MockedFunction<
 >
 const mockUseRunStatus = useRunStatus as jest.MockedFunction<
   typeof useRunStatus
+>
+const mockLabwareOffsetSuccessToast = LabwareOffsetSuccessToast as jest.MockedFunction<
+  typeof LabwareOffsetSuccessToast
 >
 
 const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
@@ -149,6 +155,9 @@ describe('LabwareSetup', () => {
       .mockImplementation(({ onCloseClick }) => (
         <div onClick={onCloseClick}>mock LabwareOffsetModal </div>
       ))
+    when(mockLabwareOffsetSuccessToast)
+      .calledWith(anyProps())
+      .mockReturnValue(<div>mock Labware Success Toast</div>)
 
     when(mockLabwareRender)
       .mockReturnValue(<div></div>) // this (default) empty div will be returned when LabwareRender isn't called with expected labware definition
@@ -356,5 +365,27 @@ describe('LabwareSetup', () => {
 
     const { getByText } = render()
     getByText('mock extra attention warning with magnetic module and TC')
+  })
+  it('should render Labware Offset Success toast when LPC is closed', () => {
+    const { getByRole, getByText } = render()
+    expect(screen.queryByText('mock LabwareOffsetSuccessToast')).toBeNull()
+    const button = getByRole('button', {
+      name: 'run labware position check',
+    })
+    fireEvent.click(button)
+    const LPC = getByText('mock Labware Position Check')
+    fireEvent.click(LPC)
+    when(mockLabwarePostionCheck)
+      .calledWith(
+        componentPropsMatcher({
+          onLabwarePositionCheckComplete: expect.anything(),
+        })
+      )
+      .mockImplementation(({ onLabwarePositionCheckComplete }) => (
+        <div onClick={onLabwarePositionCheckComplete}>
+          mock LabwarePositionCheck
+        </div>
+      ))
+    expect(screen.queryByText('mock LabwarePositionCheck')).toBeNull()
   })
 })

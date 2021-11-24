@@ -26,7 +26,6 @@ import {
 } from '@opentrons/components'
 
 import { useRunStatus } from '../RunTimeControl/hooks'
-import { LabwareOffsetSuccessToast } from './LabwareOffsetSuccessToast'
 import { RunSetupCard } from './RunSetupCard'
 import { MetadataCard } from './MetadataCard'
 
@@ -35,7 +34,6 @@ const feedbackFormLink =
 
 export function ProtocolSetup(): JSX.Element {
   const { t } = useTranslation(['protocol_setup'])
-  const [showLPCSuccessToast, setShowLPCSuccessToast] = React.useState(true)
 
   const runStatus = useRunStatus()
 
@@ -71,14 +69,7 @@ export function ProtocolSetup(): JSX.Element {
 
   return (
     <>
-      {showLPCSuccessToast && (
-        <LabwareOffsetSuccessToast
-          onCloseClick={() => setShowLPCSuccessToast(false)}
-        />
-      )}
       {alertType != null ? (
-        // <Box paddingTop={SPACING_2} paddingBottom={SPACING_3} width="100%">
-        // <Box padding={`${SPACING_3} ${SPACING_2}`} width="100%">
         <Box padding={SPACING_2} width="100%">
           <AlertItem type={alertType} title={alertTitle} />
         </Box>
