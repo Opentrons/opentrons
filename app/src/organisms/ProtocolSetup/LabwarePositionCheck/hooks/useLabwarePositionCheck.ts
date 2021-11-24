@@ -10,7 +10,7 @@ import {
   LabwareOffset,
   AnonymousCommand,
 } from '@opentrons/api-client'
-import { getLabwareDisplayName } from '@opentrons/shared-data'
+import { getLabwareDisplayName, IDENTITY_VECTOR } from '@opentrons/shared-data'
 import {
   useHost,
   useAllCommandsQuery,
@@ -57,8 +57,6 @@ export type LabwarePositionCheckUtils =
       ctaText: string
     }
   | { error: Error }
-
-const IDENTITY_OFFSET = { x: 0, y: 0, z: 0 }
 
 const useLpcCtaText = (command: LabwarePositionCheckCommand): string => {
   const { protocolData } = useProtocolDetails()
@@ -195,7 +193,7 @@ export function useLabwarePositionCheck(
     setShowPickUpTipConfirmationModal,
   ] = React.useState<boolean>(false)
   const [dropTipOffset, setDropTipOffset] = React.useState<VectorOffset>(
-    IDENTITY_OFFSET
+    IDENTITY_VECTOR
   )
   const { protocolData } = useProtocolDetails()
   const { createLabwareOffset } = useCreateLabwareOffsetMutation()
@@ -360,7 +358,7 @@ export function useLabwarePositionCheck(
         // if this is the first labware that we are checking, no in flight offsets have been applied
         // return identity offsets and move on, they will no get used
         if (savePositionCommandData[currentCommand.params.labwareId] == null) {
-          const positions = Promise.resolve([IDENTITY_OFFSET, IDENTITY_OFFSET])
+          const positions = Promise.resolve([IDENTITY_VECTOR, IDENTITY_VECTOR])
           return positions
         }
 
@@ -480,7 +478,7 @@ export function useLabwarePositionCheck(
             protocolData?.labware
           ),
           location: getLabwareLocation(labwareId, protocolData?.commands ?? []),
-          vector: IDENTITY_OFFSET,
+          vector: IDENTITY_VECTOR,
         }
         return [...acc, identityOffset]
       },

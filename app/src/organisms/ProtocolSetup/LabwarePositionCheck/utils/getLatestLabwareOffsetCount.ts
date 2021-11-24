@@ -1,7 +1,7 @@
 import isEqual from 'lodash/isEqual'
+import { IDENTITY_VECTOR } from '@opentrons/shared-data'
 import type { LabwareOffset } from '@opentrons/api-client'
 
-const IDENTITY_OFFSET = { x: 0, y: 0, z: 0 }
 const TRASH_LOCATION = { slotName: '12' }
 
 export const getLatestLabwareOffsetCount = (
@@ -19,7 +19,7 @@ export const getLatestLabwareOffsetCount = (
       if (
         !uniqueLabwareInstances.has(id) &&
         !isEqual(location, TRASH_LOCATION) &&
-        !isEqual(vector, IDENTITY_OFFSET)
+        !isEqual(vector, IDENTITY_VECTOR)
       ) {
         return uniqueLabwareInstances.add(id)
       }
