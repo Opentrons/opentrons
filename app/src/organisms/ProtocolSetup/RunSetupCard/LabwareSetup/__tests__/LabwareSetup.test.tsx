@@ -280,20 +280,26 @@ describe('LabwareSetup', () => {
       .calledWith()
       .mockReturnValue({
         [mockMagneticModule.moduleId]: {
+          moduleId: mockMagneticModule.moduleId,
           x: MOCK_MAGNETIC_MODULE_COORDS[0],
           y: MOCK_MAGNETIC_MODULE_COORDS[1],
           z: MOCK_MAGNETIC_MODULE_COORDS[2],
           moduleDef: mockMagneticModule as any,
           nestedLabwareDef: null,
           nestedLabwareId: null,
+          protocolLoadOrder: 0,
+          attachedModuleMatch: null,
         },
         [mockTCModule.moduleId]: {
+          moduleId: mockTCModule.moduleId,
           x: MOCK_TC_COORDS[0],
           y: MOCK_TC_COORDS[1],
           z: MOCK_TC_COORDS[2],
           moduleDef: mockTCModule,
           nestedLabwareDef: null,
           nestedLabwareId: null,
+          protocolLoadOrder: 1,
+          attachedModuleMatch: null,
         },
       } as any)
 

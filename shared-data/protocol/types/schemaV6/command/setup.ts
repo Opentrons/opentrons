@@ -33,7 +33,7 @@ export type SetupCommand =
 
 export type LabwareLocation = { slotName: string } | { moduleId: string }
 
-interface ModuleLocation {
+export interface ModuleLocation {
   slotName: string
 }
 interface LoadPipetteParams {
