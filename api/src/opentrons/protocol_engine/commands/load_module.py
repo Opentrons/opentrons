@@ -56,8 +56,10 @@ class LoadModuleResult(BaseModel):
         description="An ID to reference this module in subsequent commands."
     )
 
+    # TODO (spp, 2021-11-24): Evaluate if this needs to be in the result
     definition: ModuleDefinition = Field(description="The definition of this module.")
 
+    # TODO (spp, 2021-11-24): Remove optional
     moduleSerial: Optional[str] = Field(
         None, description="Hardware serial number of the module, if connected."
     )

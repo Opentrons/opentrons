@@ -10,11 +10,6 @@ from .abstract_store import HasState, HandlesActions
 
 
 @dataclass(frozen=True)
-class HardwareModule:
-    """Hardware module data."""
-
-
-@dataclass(frozen=True)
 class ModuleState:
     """Basic module data state and getter methods."""
 
