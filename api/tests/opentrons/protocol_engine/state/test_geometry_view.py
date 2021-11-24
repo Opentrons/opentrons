@@ -19,13 +19,26 @@ from opentrons.protocol_engine.types import (
     WellOffset,
 )
 from opentrons.protocol_engine.state.labware import LabwareView
+from opentrons.protocol_engine.state.modules import ModuleView
 from opentrons.protocol_engine.state.geometry import GeometryView
 
 
 @pytest.fixture
-def subject(labware_view: LabwareView) -> GeometryView:
+def labware_view(decoy: Decoy) -> LabwareView:
+    """Get a mock in the shape of a LabwareView."""
+    return decoy.mock(cls=LabwareView)
+
+
+@pytest.fixture
+def module_view(decoy: Decoy) -> ModuleView:
+    """Get a mock in the shape of a ModuleView."""
+    return decoy.mock(cls=ModuleView)
+
+
+@pytest.fixture
+def subject(labware_view: LabwareView, module_view: ModuleView) -> GeometryView:
     """Get a GeometryView with its store dependencies mocked out."""
-    return GeometryView(labware_view=labware_view)
+    return GeometryView(labware_view=labware_view, module_view=module_view)
 
 
 def test_get_labware_parent_position(

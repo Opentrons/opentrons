@@ -34,7 +34,7 @@ class LegacyLabwareOffsetProvider(AbstractLegacyLabwareOffsetProvider):
             location=LabwareOffsetLocation(
                 slotName=deck_slot,
                 moduleModel=(
-                    None if module_model is None else ModuleModels[module_model]
+                    None if module_model is None else ModuleModels(module_model)
                 ),
             ),
         )

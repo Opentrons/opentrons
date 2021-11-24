@@ -126,6 +126,7 @@ class MotorAxis(str, Enum):
     RIGHT_PLUNGER = "rightPlunger"
 
 
+# TODO(mc, 2021-11-24): s/ModuleModels/ModuleModel/
 class ModuleModels(str, Enum):
     """All available modules' models."""
 
@@ -188,9 +189,10 @@ class LoadedModule(BaseModel):
     """A module that has been loaded."""
 
     id: str
-    model: str
+    model: ModuleModels
     location: DeckSlotLocation
     definition: ModuleDefinition
+    # TODO(mc, 2021-11-24): make serial non-optional
     serial: Optional[str]
 
 

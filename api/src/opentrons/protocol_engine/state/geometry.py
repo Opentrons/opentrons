@@ -38,17 +38,10 @@ class TipGeometry:
 class GeometryView:
     """Geometry computed state getters."""
 
-    _labware: LabwareView
-    _modules: ModuleView
-
-    def __init__(
-            self,
-            labware_view: LabwareView,
-            modules_view: ModuleView
-    ) -> None:
+    def __init__(self, labware_view: LabwareView, module_view: ModuleView) -> None:
         """Initialize a GeometryView instance."""
         self._labware = labware_view
-        self._modules = modules_view
+        self._modules = module_view
 
     # TODO: need updating for labware on modules?
     def get_labware_highest_z(self, labware_id: str) -> float:

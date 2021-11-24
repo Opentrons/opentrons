@@ -271,7 +271,7 @@ async def test_load_labware_on_module(
     decoy.when(state_store.modules.get("module-id")).then_return(
         LoadedModule(
             id="module-id",
-            model="module-model",
+            model=ModuleModels.THERMOCYCLER_MODULE_V1,
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
             serial="module-serial",
             definition=tempdeck_v1_def,
@@ -283,7 +283,7 @@ async def test_load_labware_on_module(
             definition_uri="opentrons-test/load-name/1",
             location=LabwareOffsetLocation(
                 slotName=DeckSlotName.SLOT_3,
-                moduleModel="module-model",
+                moduleModel=ModuleModels.THERMOCYCLER_MODULE_V1,
             ),
         )
     ).then_return(
@@ -293,7 +293,7 @@ async def test_load_labware_on_module(
             definitionUri="opentrons-test/load-name/1",
             location=LabwareOffsetLocation(
                 slotName=DeckSlotName.SLOT_3,
-                moduleModel="module-model",
+                moduleModel=ModuleModels.THERMOCYCLER_MODULE_V1,
             ),
             vector=LabwareOffsetVector(x=1, y=2, z=3),
         )

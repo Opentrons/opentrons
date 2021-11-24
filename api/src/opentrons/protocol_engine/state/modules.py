@@ -119,17 +119,17 @@ class ModuleView(HasState[ModuleState]):
         """Get the module's offset vector computed with slot transform."""
         definition = self.get_definition_by_id(module_id)
         slot = self.get_location(module_id).slotName.value
-        pre_transform = array((definition.labwareOffset.x,
-                               definition.labwareOffset.y,
-                               1))
-        xforms_ser = definition.slotTransforms.get(
-            "ot2_standard", {}).get(
-            slot, {"labwareOffset": [[1, 0, 0], [0, 1, 0], [0, 0, 1]]})
+        pre_transform = array(
+            (definition.labwareOffset.x, definition.labwareOffset.y, 1)
+        )
+        xforms_ser = definition.slotTransforms.get("ot2_standard", {}).get(
+            slot, {"labwareOffset": [[1, 0, 0], [0, 1, 0], [0, 0, 1]]}
+        )
         xforms_ser = xforms_ser["labwareOffset"]
 
         # Apply the slot transform, if any
         xform = array(xforms_ser)
-        xformed = dot(xform, pre_transform)
+        xformed = dot(xform, pre_transform)  # type: ignore[no-untyped-call]
         return LabwareOffsetVector(x=xformed[0], y=xformed[1], z=xformed[2])
 
     def get_overall_height(self, module_id: str) -> float:
@@ -143,13 +143,21 @@ class ModuleView(HasState[ModuleState]):
     def get_lid_height(self, module_id: str) -> float:
         """Get lid height if module is thermocycler."""
         definition = self.get_definition_by_id(module_id)
-        if definition.moduleType == "thermocyclerModuleType":
+
+        if (
+            definition.moduleType == "thermocyclerModuleType"
+            and hasattr(definition.dimensions, "lidHeight")
+            and definition.dimensions.lidHeight is not None
+        ):
             return definition.dimensions.lidHeight
         else:
-            raise Exception("Given module doesn't have a lid.")
+            raise errors.ModuleIsNotThermocyclerError(
+                f"Cannot get lid height of {definition.moduleType}"
+            )
 
     def get_module_by_location(
-            self, deck_location: DeckSlotLocation) -> Optional[LoadedModule]:
+        self, deck_location: DeckSlotLocation
+    ) -> Optional[LoadedModule]:
         """Get the module loaded in the given slot."""
         for mod in self.get_all():
             if mod.location == deck_location:

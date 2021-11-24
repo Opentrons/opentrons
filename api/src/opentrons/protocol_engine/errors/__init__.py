@@ -20,6 +20,7 @@ from .exceptions import (
     WellOriginNotAllowedError,
     ModuleNotAttachedError,
     ModuleDefinitionDoesNotExistError,
+    ModuleIsNotThermocyclerError,
 )
 
 from .error_occurrence import ErrorOccurrence
@@ -45,6 +46,7 @@ __all__ = [
     "WellOriginNotAllowedError",
     "ModuleNotAttachedError",
     "ModuleDefinitionDoesNotExistError",
+    "ModuleIsNotThermocyclerError",
     # error occurrence models
     "ErrorOccurrence",
 ]
