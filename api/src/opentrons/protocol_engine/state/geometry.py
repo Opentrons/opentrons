@@ -13,7 +13,6 @@ from ..types import (
     WellOrigin,
     WellOffset,
     DeckSlotLocation,
-    ModuleLocation,
 )
 from .labware import LabwareView
 from .modules import ModuleView
@@ -43,14 +42,12 @@ class GeometryView:
         self._labware = labware_view
         self._modules = module_view
 
-    # TODO: need updating for labware on modules?
     def get_labware_highest_z(self, labware_id: str) -> float:
         """Get the highest Z-point of a labware."""
         labware_data = self._labware.get(labware_id)
 
         return self._get_highest_z_from_labware_data(labware_data)
 
-    # TODO: need updating for labware on modules?
     def get_all_labware_highest_z(self) -> float:
         """Get the highest Z-point across all labware."""
         return max(
@@ -63,12 +60,25 @@ class GeometryView:
     def get_labware_parent_position(self, labware_id: str) -> Point:
         """Get the position of the labware's parent slot (deck or module)."""
         labware_data = self._labware.get(labware_id)
+        module_id: Optional[str] = None
+
         if isinstance(labware_data.location, DeckSlotLocation):
-            slot_pos = self._labware.get_slot_position(labware_data.location.slotName)
+            slot_name = labware_data.location.slotName
+        else:
+            module_id = labware_data.location.moduleId
+            slot_name = self._modules.get_location(module_id).slotName
+
+        slot_pos = self._labware.get_slot_position(slot_name)
+
+        if module_id is None:
             return slot_pos
-        elif isinstance(labware_data.location, ModuleLocation):
-            pos = self._modules.get_module_offset(labware_data.location.moduleId)
-            return Point(x=pos.x, y=pos.y, z=pos.z)
+        else:
+            module_offset = self._modules.get_module_offset(module_id)
+            return Point(
+                x=slot_pos.x + module_offset.x,
+                y=slot_pos.y + module_offset.y,
+                z=slot_pos.z + module_offset.z,
+            )
 
     def get_labware_origin_position(self, labware_id: str) -> Point:
         """Get the position of the labware's origin, without calibration."""

@@ -13,6 +13,7 @@ from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
     LabwareOffsetVector,
     DeckSlotLocation,
+    ModuleLocation,
     LoadedLabware,
     WellLocation,
     WellOrigin,
@@ -64,6 +65,39 @@ def test_get_labware_parent_position(
     result = subject.get_labware_parent_position("labware-id")
 
     assert result == Point(1, 2, 3)
+
+
+def test_get_labware_parent_position_on_module(
+    decoy: Decoy,
+    standard_deck_def: DeckDefinitionV2,
+    well_plate_def: LabwareDefinition,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    subject: GeometryView,
+) -> None:
+    """It should return a module position for labware on a module."""
+    labware_data = LoadedLabware(
+        id="labware-id",
+        loadName="b",
+        definitionUri=uri_from_details(namespace="a", load_name="b", version=1),
+        location=ModuleLocation(moduleId="module-id"),
+        offsetId=None,
+    )
+
+    decoy.when(labware_view.get("labware-id")).then_return(labware_data)
+    decoy.when(module_view.get_location("module-id")).then_return(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
+    )
+    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_3)).then_return(
+        Point(1, 2, 3)
+    )
+    decoy.when(module_view.get_module_offset("module-id")).then_return(
+        LabwareOffsetVector(x=4, y=5, z=6)
+    )
+
+    result = subject.get_labware_parent_position("labware-id")
+
+    assert result == Point(5, 7, 9)
 
 
 def test_get_labware_origin_position(
