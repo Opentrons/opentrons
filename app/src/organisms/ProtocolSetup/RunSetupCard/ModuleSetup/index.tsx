@@ -108,9 +108,7 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
               ({ x, y, moduleDef, attachedModuleMatch }) => {
                 const { model } = moduleDef
                 return (
-                  <React.Fragment
-                    key={`LabwareSetup_Module_${model}_${x}${y}`}
-                  >
+                  <React.Fragment key={`LabwareSetup_Module_${model}_${x}${y}`}>
                     <Module
                       x={x}
                       y={y}
@@ -132,14 +130,14 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
         )}
       </RobotWorkSpace>
       <PrimaryBtn
-          title={t('proceed_to_labware_setup_step')}
-          disabled={proceedToLabwareDisabledReason != null}
-          onClick={expandLabwareSetupStep}
-          backgroundColor={C_BLUE}
-          id={'ModuleSetup_proceedToLabwareSetup'}
-          width="18rem"
-          alignSelf={ALIGN_CENTER}
-          {...targetProps}
+        title={t('proceed_to_labware_setup_step')}
+        disabled={proceedToLabwareDisabledReason != null}
+        onClick={expandLabwareSetupStep}
+        backgroundColor={C_BLUE}
+        id={'ModuleSetup_proceedToLabwareSetup'}
+        width="18rem"
+        alignSelf={ALIGN_CENTER}
+        {...targetProps}
       >
         {t('proceed_to_labware_setup_step')}
       </PrimaryBtn>
