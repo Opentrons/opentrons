@@ -3,11 +3,12 @@ import { useTranslation } from 'react-i18next'
 import {
   RUN_STATUS_IDLE,
   RUN_STATUS_RUNNING,
+  RUN_STATUS_PAUSE_REQUESTED,
   RUN_STATUS_PAUSED,
+  RUN_STATUS_STOP_REQUESTED,
   RUN_STATUS_STOPPED,
   RUN_STATUS_FAILED,
   RUN_STATUS_SUCCEEDED,
-  RUN_STATUS_PAUSE_REQUESTED,
 } from '@opentrons/api-client'
 import {
   Flex,
@@ -47,35 +48,36 @@ export function RunTimeControl(): JSX.Element | null {
   const pausedAt = useRunPauseTime()
   const completedAt = useRunCompleteTime()
 
-  const { usePlay, usePause, useReset } = useRunControls()
+  const { play, pause, reset } = useRunControls()
 
-  let action = (): void => {}
+  let handleButtonClick = (): void => {}
   let buttonIconName: IconName | null = null
   let buttonText: string = ''
 
   if (runStatus === RUN_STATUS_IDLE) {
     buttonIconName = 'play'
     buttonText = t('start_run')
-    action = usePlay
+    handleButtonClick = play
   } else if (runStatus === RUN_STATUS_RUNNING) {
     buttonIconName = 'pause'
     buttonText = t('pause_run')
-    action = usePause
+    handleButtonClick = pause
   } else if (
     runStatus === RUN_STATUS_PAUSED ||
     runStatus === RUN_STATUS_PAUSE_REQUESTED
   ) {
     buttonIconName = 'play'
     buttonText = t('resume_run')
-    action = usePlay
+    handleButtonClick = play
   } else if (
+    runStatus === RUN_STATUS_STOP_REQUESTED ||
     runStatus === RUN_STATUS_STOPPED ||
     runStatus === RUN_STATUS_FAILED ||
     runStatus === RUN_STATUS_SUCCEEDED
   ) {
     buttonIconName = null
     buttonText = t('run_again')
-    action = useReset
+    handleButtonClick = reset
   }
 
   return runStatus != null ? (
@@ -88,9 +90,7 @@ export function RunTimeControl(): JSX.Element | null {
           ? t('run_status', { status: t(`status_${runStatus}`) })
           : ''}
       </Text>
-      {runStatus !== RUN_STATUS_IDLE &&
-      runStatus != null &&
-      startTime != null ? (
+      {startTime != null ? (
         <Timer
           startTime={startTime}
           pausedAt={pausedAt}
@@ -98,7 +98,7 @@ export function RunTimeControl(): JSX.Element | null {
         />
       ) : null}
       <PrimaryBtn
-        onClick={action}
+        onClick={handleButtonClick}
         alignSelf={ALIGN_STRETCH}
         backgroundColor={C_BLUE}
         borderRadius={BORDER_RADIUS_1}

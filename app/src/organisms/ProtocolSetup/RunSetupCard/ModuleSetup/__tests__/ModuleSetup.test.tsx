@@ -197,7 +197,7 @@ describe('ModuleSetup', () => {
           nestedLabwareDef: null,
           nestedLabwareId: null,
         },
-      })
+      } as any)
 
     when(mockModuleInfo)
       .calledWith(
@@ -234,7 +234,7 @@ describe('ModuleSetup', () => {
           nestedLabwareDef: null,
           nestedLabwareId: null,
         },
-      })
+      } as any)
 
     when(mockModuleInfo)
       .calledWith(
@@ -288,7 +288,7 @@ describe('ModuleSetup', () => {
           nestedLabwareDef: null,
           nestedLabwareId: null,
         },
-      })
+      } as any)
     when(mockGetAttachedModules)
       .calledWith(undefined as any, MOCK_ROBOT_NAME)
       .mockReturnValue([

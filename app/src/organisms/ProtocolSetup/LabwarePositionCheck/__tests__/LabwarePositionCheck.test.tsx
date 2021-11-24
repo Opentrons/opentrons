@@ -8,13 +8,17 @@ import { GenericStepScreen } from '../GenericStepScreen'
 import { IntroScreen } from '../IntroScreen'
 import { SummaryScreen } from '../SummaryScreen'
 import { RobotMotionLoadingModal } from '../RobotMotionLoadingModal'
+import { ConfirmPickUpTipModal } from '../ConfirmPickUpTipModal'
+import { ExitPreventionModal } from '../ExitPreventionModal'
 import { useSteps, useLabwarePositionCheck } from '../hooks'
-import { LabwarePositionCheckStep } from '../types'
+import type { LabwarePositionCheckStep } from '../types'
 
 jest.mock('../GenericStepScreen')
 jest.mock('../IntroScreen')
 jest.mock('../SummaryScreen')
 jest.mock('../RobotMotionLoadingModal')
+jest.mock('../ConfirmPickUpTipModal')
+jest.mock('../ExitPreventionModal')
 jest.mock('../hooks')
 
 const mockGenericStepScreen = GenericStepScreen as jest.MockedFunction<
@@ -26,6 +30,12 @@ const mockSummaryScreen = SummaryScreen as jest.MockedFunction<
 >
 const mockRobotMotionLoadingModal = RobotMotionLoadingModal as jest.MockedFunction<
   typeof RobotMotionLoadingModal
+>
+const mockConfirmPickUpTipModal = ConfirmPickUpTipModal as jest.MockedFunction<
+  typeof ConfirmPickUpTipModal
+>
+const mockExitPreventionModal = ExitPreventionModal as jest.MockedFunction<
+  typeof ExitPreventionModal
 >
 
 const mockUseSteps = useSteps as jest.MockedFunction<typeof useSteps>
@@ -48,6 +58,7 @@ describe('LabwarePositionCheck', () => {
   beforeEach(() => {
     props = {
       onCloseClick: jest.fn(),
+      onLabwarePositionCheckComplete: jest.fn(),
     }
     when(mockUseSteps)
       .calledWith()
@@ -68,21 +79,27 @@ describe('LabwarePositionCheck', () => {
         } as LabwarePositionCheckStep,
       ])
 
-    mockIntroScreen.mockReturnValue(null)
-    mockSummaryScreen.mockReturnValue(<div>Mock Summary Screen Component </div>)
-    mockGenericStepScreen.mockReturnValue(null)
-    mockRobotMotionLoadingModal.mockReturnValue(
-      <div>Mock Robot Motion Loading Modal</div>
-    )
-
     when(mockUseLabwarePositionCheck)
-      .calledWith(expect.anything())
+      .calledWith(expect.anything(), expect.anything())
       .mockReturnValue({} as any)
-    when(mockIntroScreen).calledWith(anyProps()).mockReturnValue(null)
-    when(mockGenericStepScreen).calledWith(anyProps()).mockReturnValue(null)
+    when(mockIntroScreen)
+      .calledWith(anyProps())
+      .mockReturnValue(<div>Mock Intro Screen</div>)
+    when(mockGenericStepScreen)
+      .calledWith(anyProps())
+      .mockReturnValue(<div>Mock Generic Step Screen</div>)
     when(mockSummaryScreen)
       .calledWith(anyProps())
-      .mockReturnValue(<div>Mock Summary Screen Component </div>)
+      .mockReturnValue(<div>Mock Summary Screen</div>)
+    when(mockRobotMotionLoadingModal)
+      .calledWith(anyProps())
+      .mockReturnValue(<div>Mock Robot Motion Loading Modal</div>)
+    when(mockConfirmPickUpTipModal)
+      .calledWith(anyProps())
+      .mockReturnValue(<div>Mock Confirm Pick Up Tip Modal</div>)
+    when(mockExitPreventionModal)
+      .calledWith(anyProps())
+      .mockReturnValue(<div>Mock Exit Prevention Modal</div>)
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -97,22 +114,47 @@ describe('LabwarePositionCheck', () => {
       name: 'exit',
     })
   })
-  it('renders LabwarePositionCheck header and exit button is pressed', () => {
-    const { getByRole } = render(props)
+  it('prevention modal opens when exit button is pressed', () => {
+    const { getByRole, getByText } = render(props)
     expect(props.onCloseClick).not.toHaveBeenCalled()
     const exitButton = getByRole('button', {
       name: 'exit',
     })
     fireEvent.click(exitButton)
-    expect(props.onCloseClick).toHaveBeenCalled()
+    expect(mockExitPreventionModal).toHaveBeenCalled()
+    getByText('Mock Exit Prevention Modal')
   })
-  // TODO: fix after wiring up
-  it.todo('renders LabwarePositionCheck with Summary Screen component')
-  // TODO: fix after wiring up
-  it.todo(
-    'renders LabwarePositionCheck with Robot Motion Loading Modal component'
-  )
-
-  // TODO: IMMEDIATELY fix this when LabwarePositionCheck/index is final and the isComplete boolean is final
-  it.todo('renders LabwarePositionCheck with IntroScreen component')
+  it('renders the loading screen', () => {
+    mockUseLabwarePositionCheck.mockReturnValue({ isLoading: true } as any)
+    const { getByText } = render(props)
+    getByText('Mock Robot Motion Loading Modal')
+  })
+  it('renders the pick up tip confirmation modal', () => {
+    mockUseLabwarePositionCheck.mockReturnValue({
+      showPickUpTipConfirmationModal: true,
+    } as any)
+    const { getByText } = render(props)
+    getByText('Mock Confirm Pick Up Tip Modal')
+  })
+  it('renders the summary screen', () => {
+    mockUseLabwarePositionCheck.mockReturnValue({
+      isComplete: true,
+    } as any)
+    const { getByText } = render(props)
+    getByText('Mock Summary Screen')
+  })
+  it('renders the generic step screen', () => {
+    mockUseLabwarePositionCheck.mockReturnValue({
+      currentCommandIndex: 1,
+    } as any)
+    const { getByText } = render(props)
+    getByText('Mock Generic Step Screen')
+  })
+  it('renders the into screen', () => {
+    mockUseLabwarePositionCheck.mockReturnValue({
+      currentCommandIndex: 0,
+    } as any)
+    const { getByText } = render(props)
+    getByText('Mock Intro Screen')
+  })
 })

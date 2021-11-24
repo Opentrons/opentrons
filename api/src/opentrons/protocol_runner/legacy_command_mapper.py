@@ -2,7 +2,7 @@
 
 from collections import defaultdict
 from datetime import datetime
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Optional
 
 from opentrons.types import MountType, DeckSlotName
 from opentrons.commands import types as legacy_command_types
@@ -12,7 +12,7 @@ from opentrons.protocol_engine import (
     commands as pe_commands,
     types as pe_types,
 )
-from opentrons.protocol_engine.resources import ModelUtils
+from opentrons.protocol_engine.resources import ModelUtils, ModuleDataProvider
 from opentrons.protocols.models.labware_definition import LabwareDefinition
 
 from .legacy_wrappers import (
@@ -21,6 +21,10 @@ from .legacy_wrappers import (
     LegacyModuleLoadInfo,
     LegacyPipetteContext,
     LegacyWell,
+    LegacyModuleModel,
+    LegacyMagneticModuleModel,
+    LegacyTemperatureModuleModel,
+    LegacyThermocyclerModuleModel,
 )
 
 
@@ -35,19 +39,34 @@ class LegacyContextCommandError(ProtocolEngineError):
     """An error returned when a PAPIv2 ProtocolContext command fails."""
 
 
+LEGACY_TO_PE_MODULE: Dict[LegacyModuleModel, pe_types.ModuleModels] = {
+    LegacyMagneticModuleModel.MAGNETIC_V1: pe_types.ModuleModels.MAGNETIC_MODULE_V1,
+    LegacyMagneticModuleModel.MAGNETIC_V2: pe_types.ModuleModels.MAGNETIC_MODULE_V2,
+    LegacyTemperatureModuleModel.TEMPERATURE_V1: pe_types.ModuleModels.TEMPERATURE_MODULE_V1,  # noqa: E501
+    LegacyTemperatureModuleModel.TEMPERATURE_V2: pe_types.ModuleModels.TEMPERATURE_MODULE_V2,  # noqa: E501
+    LegacyThermocyclerModuleModel.THERMOCYCLER_V1: pe_types.ModuleModels.THERMOCYCLER_MODULE_V1,  # noqa: E501
+}
+
+
 class LegacyCommandMapper:
     """Map broker commands to protocol engine commands.
 
     Each protocol should use its own instance of this class.
     """
 
-    def __init__(self) -> None:
+    def __init__(
+        self, module_data_provider: Optional[ModuleDataProvider] = None
+    ) -> None:
         """Initialize the command mapper."""
         self._running_commands: Dict[str, List[pe_commands.Command]] = defaultdict(list)
         self._command_count: Dict[str, int] = defaultdict(lambda: 0)
         self._labware_id_by_slot: Dict[DeckSlotName, str] = {}
         self._pipette_id_by_mount: Dict[MountType, str] = {}
         self._module_id_by_slot: Dict[DeckSlotName, str] = {}
+        self._module_data_provider = module_data_provider or ModuleDataProvider()
+        self._module_definition_by_model: Dict[
+            pe_types.ModuleModels, pe_types.ModuleDefinition
+        ] = {}
 
     def map_command(
         self,
@@ -132,9 +151,7 @@ class LegacyCommandMapper:
                 definition=LabwareDefinition.parse_obj(
                     labware_load_info.labware_definition
                 ),
-                # fixme(mm, 2021-11-11): Labware offsets added to the ProtocolEngine
-                # need to apply to the legacy protocol somehow, and get fed back here.
-                offsetId=None,
+                offsetId=labware_load_info.offset_id,
             ),
         )
 
@@ -183,6 +200,16 @@ class LegacyCommandMapper:
 
         count = self._command_count["LOAD_MODULE"]
         module_id = f"module-{count}"
+        module_model = LEGACY_TO_PE_MODULE[module_load_info.module_model]
+
+        # This will fetch a V2 definition only. PAPI < v2.3 use V1 definitions.
+        # When running a < v2.3 protocol, there will be a mismatch of definitions used
+        # during analysis+LPC (V2) and protocol execution (V1).
+        # But this shouldn't result in any problems since V2 and V1 definitions
+        # have similar info, with V2 having additional info fields.
+        definition = self._module_definition_by_model.get(
+            module_model
+        ) or self._module_data_provider.get_module_definition(module_model)
 
         load_module_command = pe_commands.LoadModule(
             id=f"commands.LOAD_MODULE-{count}",
@@ -191,7 +218,7 @@ class LegacyCommandMapper:
             startedAt=now,
             completedAt=now,
             params=pe_commands.LoadModuleParams(
-                model=module_load_info.module_name,
+                model=module_model,
                 location=pe_types.DeckSlotLocation(
                     slotName=module_load_info.deck_slot,
                 ),
@@ -199,10 +226,13 @@ class LegacyCommandMapper:
             ),
             result=pe_commands.LoadModuleResult(
                 moduleId=module_id,
+                moduleSerial=module_load_info.module_serial,
+                definition=definition,
             ),
         )
         self._command_count["LOAD_MODULE"] = count + 1
         self._module_id_by_slot[module_load_info.deck_slot] = module_id
+        self._module_definition_by_model[module_model] = definition
         return load_module_command
 
     def _build_initial_command(

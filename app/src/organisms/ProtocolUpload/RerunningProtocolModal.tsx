@@ -30,7 +30,8 @@ interface RerunningProtocolModalProps {
   onCloseClick: () => unknown
 }
 
-const UPLOAD_PROTOCOL_URL = '#' //   TODO IMMEDIATELY get actual link - Emily said this url isn't created it
+const UPLOAD_PROTOCOL_URL =
+  'http://support.opentrons.com/en/articles/5742955-how-labware-offsets-work-on-the-ot-2'
 
 export const RerunningProtocolModal = (
   props: RerunningProtocolModalProps
@@ -70,7 +71,7 @@ export const RerunningProtocolModal = (
             href={UPLOAD_PROTOCOL_URL}
             marginTop={SPACING_2}
             id={'RerunningProtocolModal_Link'}
-            rel="noopener noreferrer"
+            external
           >
             {t('rerunning_protocol_modal_link')}
             <Icon name={'open-in-new'} marginLeft={SPACING_1} size="10px" />

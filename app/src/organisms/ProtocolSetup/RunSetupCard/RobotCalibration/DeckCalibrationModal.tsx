@@ -60,7 +60,7 @@ export const DeckCalibrationModal = (
             color={C_BLUE}
             href={robotCalHelpArticle}
             id={'RobotCalModal_helpArticleLink'}
-            rel="noopener noreferrer"
+            external
           >
             {t('learn_more_about_robot_cal_link')}
             <Icon name={'open-in-new'} marginLeft={SPACING_1} size="10px" />

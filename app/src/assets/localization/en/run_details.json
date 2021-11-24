@@ -1,4 +1,5 @@
 {
+  "cancel_run": "Cancel Run",
   "current_temperature": "Current: {{temperature}} °C",
   "module_slot_number": "Slot {{slot_number}}",
   "pause_run": "Pause Run",
@@ -32,8 +33,12 @@
   "user_paused_protocol": "User paused protocol",
   "run_canceled": "Run canceled",
   "step_failed": "Step failed",
+  "cancel_run_modal_heading": "Are you sure you want to cancel this run?",
+  "cancel_run_modal_confirm": "yes, cancel run",
+  "cancel_run_modal_back": "no, go back",
+  "cancel_run_alert_info": "Doing so will terminate this run, drop any attached tips in the trash container and home your robot.",
+  "cancel_run_module_info": "Additionally, any hardware modules used within the protocol will remain active and maintain their current states until deactivated.",
   "protocol_setup": "Protocol Setup",
-  "cancel_run": "Cancel Run",
   "load_pipette_protocol_setup": "Load {{pipette_name}} in {{mount_name}} Mount",
   "load_modules_protocol_setup": "Load {{module}} in Slot {{slot_name}}",
   "load_modules_protocol_setup_plural": "Load {{module}}",
@@ -45,5 +50,7 @@
   "comment": "Comment",
   "anticipated": "Anticipated steps",
   "protocol_steps": "Protocol steps",
-  "protocol_run_failed": "Protocol run failed"
+  "protocol_run_failed": "Protocol run failed",
+  "protocol_run_canceled": "Protocol run canceled",
+  "protocol_run_complete": "Protocol run complete"
 }

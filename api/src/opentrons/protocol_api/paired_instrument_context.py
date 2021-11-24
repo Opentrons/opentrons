@@ -63,9 +63,12 @@ class PairedInstrumentContext(CommandPublisher):
         }
         self._api_version = api_version
         self._log = log_parent.getChild(repr(self))
-        self._tip_racks = list(
-            set(primary_instrument.tip_racks) & set(secondary_instrument.tip_racks)
-        )
+
+        self._tip_racks = [
+            tr
+            for tr in primary_instrument.tip_racks
+            if tr in secondary_instrument.tip_racks
+        ]
         self._pair_policy = pair_policy
 
         self._starting_tip: Union[Well, None] = None
@@ -249,7 +252,6 @@ class PairedInstrumentContext(CommandPublisher):
         secondary_target = self._get_secondary_target(tiprack, target)
         primary_pipette = self._instruments[self._pair_policy.primary]
         tip_length = primary_pipette._tip_length_for(tiprack)
-
         instruments = list(self._instruments.values())
         targets = [target, secondary_target]
 

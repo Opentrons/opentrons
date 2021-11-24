@@ -1,13 +1,26 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import reduce from 'lodash/reduce'
 import { v4 as uuidv4 } from 'uuid'
 import {
   HostConfig,
-  createCommand, // TODO: create hook for this inside react-api-client
   RunCommandSummary,
+  getCommand,
+  VectorOffset,
+  LabwareOffset,
+  AnonymousCommand,
 } from '@opentrons/api-client'
-import { useHost, useAllCommandsQuery } from '@opentrons/react-api-client'
+import {
+  getLabwareDisplayName,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
+import {
+  useHost,
+  useAllCommandsQuery,
+  useCreateLabwareOffsetsMutation,
+  useCreateCommandMutation,
+} from '@opentrons/react-api-client'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
 import { useCurrentProtocolRun } from '../../../ProtocolUpload/hooks'
 import { getLabwareLocation } from '../../utils/getLabwareLocation'
@@ -15,12 +28,14 @@ import { getModuleLocation } from '../../utils/getModuleLocation'
 import { sendModuleCommand } from '../../../../redux/modules'
 import { getConnectedRobotName } from '../../../../redux/robot/selectors'
 import { getAttachedModulesForConnectedRobot } from '../../../../redux/modules/selectors'
-
+import { getLabwareDefinitionUri } from '../../utils/getLabwareDefinitionUri'
+import { useSteps } from './useSteps'
 import type {
   Command,
   ProtocolFile,
 } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { SetupCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import type { DropTipCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import type {
   Axis,
   Jog,
@@ -31,12 +46,8 @@ import type {
   LabwarePositionCheckCommand,
   LabwarePositionCheckMovementCommand,
   LabwarePositionCheckStep,
+  SavePositionCommandData,
 } from '../types'
-import { useSteps } from './useSteps'
-import {
-  getLabwareDisplayName,
-  THERMOCYCLER_MODULE_TYPE,
-} from '@opentrons/shared-data'
 
 export type LabwarePositionCheckUtils =
   | {
@@ -44,13 +55,17 @@ export type LabwarePositionCheckUtils =
       currentStep: LabwarePositionCheckStep
       titleText: string
       isLoading: boolean
+      showPickUpTipConfirmationModal: boolean
       isComplete: boolean
       beginLPC: () => void
       proceed: () => void
+      onUnsuccessfulPickUpTip: () => void
       jog: Jog
       ctaText: string
     }
   | { error: Error }
+
+const IDENTITY_OFFSET = { x: 0, y: 0, z: 0 }
 
 const useLpcCtaText = (command: LabwarePositionCheckCommand): string => {
   const { protocolData } = useProtocolDetails()
@@ -140,9 +155,7 @@ export const useTitleText = (
 const commandIsComplete = (status: RunCommandSummary['status']): boolean =>
   status === 'succeeded' || status === 'failed'
 
-const createCommandData = (
-  command: Command
-): { commandType: string; params: Record<string, any> } => {
+const createCommandData = (command: Command): AnonymousCommand => {
   if (command.commandType === 'loadLabware') {
     return {
       commandType: command.commandType,
@@ -167,7 +180,8 @@ const isTCOpenCommand = (command: Command): boolean =>
   command.commandType === 'thermocycler/openLid'
 
 export function useLabwarePositionCheck(
-  addSavePositionCommandData: (commandId: string, labwareId: string) => void
+  addSavePositionCommandData: (commandId: string, labwareId: string) => void,
+  savePositionCommandData: SavePositionCommandData
 ): LabwarePositionCheckUtils {
   const [currentCommandIndex, setCurrentCommandIndex] = React.useState<number>(
     0
@@ -183,7 +197,16 @@ export function useLabwarePositionCheck(
   } | null>(null)
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const [error, setError] = React.useState<Error | null>(null)
+  const [
+    showPickUpTipConfirmationModal,
+    setShowPickUpTipConfirmationModal,
+  ] = React.useState<boolean>(false)
+  const [dropTipOffset, setDropTipOffset] = React.useState<VectorOffset>(
+    IDENTITY_OFFSET
+  )
   const { protocolData } = useProtocolDetails()
+  const { createLabwareOffsets } = useCreateLabwareOffsetsMutation()
+  const { createCommand } = useCreateCommandMutation()
   const host = useHost()
   const { runRecord: currentRun } = useCurrentProtocolRun()
   const LPCSteps = useSteps()
@@ -214,8 +237,17 @@ export function useLabwarePositionCheck(
     }) as Command[]) ?? []
   // TC open lid commands come from the LPC command generator
   const TCOpenCommands = LPCCommands.filter(isTCOpenCommand) ?? []
+  const homeCommand: Command = {
+    commandType: 'home',
+    id: uuidv4(),
+    params: {},
+  }
   // prepCommands will be run when a user starts LPC
-  const prepCommands: Command[] = [...loadCommands, ...TCOpenCommands]
+  const prepCommands: Command[] = [
+    ...loadCommands,
+    ...TCOpenCommands,
+    homeCommand,
+  ]
   // LPCMovementCommands will be run during the guided LPC flow
   const LPCMovementCommands: LabwarePositionCheckMovementCommand[] = LPCCommands.filter(
     (
@@ -241,6 +273,14 @@ export function useLabwarePositionCheck(
     protocolData?.labware,
     protocolData?.labwareDefinitions
   )
+  if (
+    prevCommand != null &&
+    prevCommand.commandType === 'pickUpTip' &&
+    !isLoading &&
+    !showPickUpTipConfirmationModal
+  ) {
+    setShowPickUpTipConfirmationModal(true)
+  }
   if (error != null) return { error }
 
   const isComplete = currentCommandIndex === LPCMovementCommands.length
@@ -281,13 +321,12 @@ export function useLabwarePositionCheck(
         id: uuidv4(),
         params: { pipetteId: pendingMovementCommandData.pipetteId },
       }
-      createCommand(
-        host as HostConfig,
-        currentRun?.data?.id as string,
-        createCommandData(savePositionCommand)
-      )
+      createCommand({
+        runId: currentRun?.data?.id as string,
+        command: createCommandData(savePositionCommand),
+      })
         .then(response => {
-          const commandId = response.data.data.id
+          const commandId = response.data.id
           addSavePositionCommandData(
             commandId,
             pendingMovementCommandData.labwareId
@@ -303,35 +342,122 @@ export function useLabwarePositionCheck(
     setPendingMovementCommandData(null)
   }
 
+  // (sa 11-18-2021): refactor this function after beta release
   const proceed = (): void => {
     setIsLoading(true)
+    setShowPickUpTipConfirmationModal(false)
     // before executing the next movement command, save the current position
     const savePositionCommand: Command = {
       commandType: 'savePosition',
       id: uuidv4(),
       params: { pipetteId: prevCommand.params.pipetteId },
     }
-    createCommand(
-      host as HostConfig,
-      currentRun?.data?.id as string,
-      createCommandData(savePositionCommand)
-    )
+
+    createCommand({
+      runId: currentRun?.data?.id as string,
+      command: createCommandData(savePositionCommand),
+    })
       // add the saved command id so we can use it to query locations later
       // if the previous command was a pickup tip, we have already verified that labware's position
       .then(response => {
         if (prevCommand.commandType !== 'pickUpTip') {
-          const commandId = response.data.data.id
+          const commandId = response.data.id
           addSavePositionCommandData(commandId, prevCommand.params.labwareId)
         }
-        // execute the movement command
-        return createCommand(
+        // later in the promise chain we may need to incorporate in flight offsets into
+        // pickup tip/drop tip commands, so we need to prepare those offset vectors
+
+        // if this is the first labware that we are checking, no in flight offsets have been applied
+        // return identity offsets and move on, they will no get used
+        if (savePositionCommandData[currentCommand.params.labwareId] == null) {
+          const positions = Promise.resolve([IDENTITY_OFFSET, IDENTITY_OFFSET])
+          return positions
+        }
+
+        const prevSavePositionCommand = getCommand(
           host as HostConfig,
           currentRun?.data?.id as string,
-          createCommandData(currentCommand)
+          response.data.id
         )
+
+        const initialSavePositionCommandId =
+          savePositionCommandData[currentCommand.params.labwareId][0]
+        const initialSavePositionCommand = getCommand(
+          host as HostConfig,
+          currentRun?.data?.id as string,
+          initialSavePositionCommandId
+        )
+        const offsetFromPrevSavePositionCommand: Promise<VectorOffset> = prevSavePositionCommand.then(
+          response => {
+            return response.data.data.result.position
+          }
+        )
+        const offsetFromInitialSavePositionCommand: Promise<VectorOffset> = initialSavePositionCommand.then(
+          response => {
+            return response.data.data.result.position
+          }
+        )
+        const positions = Promise.all([
+          offsetFromPrevSavePositionCommand,
+          offsetFromInitialSavePositionCommand,
+        ])
+        return positions
       })
+      .then(
+        ([
+          offsetFromPrevSavePositionCommand,
+          offsetFromInitialSavePositionCommand,
+        ]) => {
+          // if the next command to execute is a pick up tip, we need to make sure
+          // we pick up from the offset the user specified
+          if (currentCommand.commandType === 'pickUpTip') {
+            const {
+              x: firstX,
+              y: firstY,
+              z: firstZ,
+            } = offsetFromInitialSavePositionCommand
+            const {
+              x: secondX,
+              y: secondY,
+              z: secondZ,
+            } = offsetFromPrevSavePositionCommand
+            const offset = {
+              x: secondX - firstX,
+              y: secondY - firstY,
+              z: secondZ - firstZ,
+            }
+
+            // save the offset to be used later by dropTip
+            setDropTipOffset(offset)
+
+            const wellLocation =
+              currentCommand.params.wellLocation != null
+                ? {
+                    ...currentCommand.params.wellLocation,
+                    offset,
+                  }
+                : { offset }
+            currentCommand.params.wellLocation = wellLocation
+          } else if (currentCommand.commandType === 'dropTip') {
+            // apply in flight offsets to the drop tip command
+            const wellLocation =
+              currentCommand.params.wellLocation != null
+                ? {
+                    ...currentCommand.params.wellLocation,
+                    offset: dropTipOffset,
+                  }
+                : { offset: dropTipOffset }
+            currentCommand.params.wellLocation = wellLocation
+          }
+          // execute the movement command
+          return createCommand({
+            runId: currentRun?.data?.id as string,
+            command: createCommandData(currentCommand),
+          })
+        }
+      )
       .then(response => {
-        const commandId = response.data.data.id
+        const commandId = response.data.id
         const pipetteId = currentCommand.params.pipetteId
         const labwareId: string = currentCommand.params.labwareId
         const commandType = currentCommand.commandType
@@ -351,6 +477,31 @@ export function useLabwarePositionCheck(
 
   const beginLPC = (): void => {
     setIsLoading(true)
+    // first clear all previous labware offsets for each labware
+    const identityLabwareOffsets: LabwareOffset[] = reduce<
+      ProtocolFile<{}>['labware'],
+      LabwareOffset[]
+    >(
+      protocolData?.labware,
+      (acc, _, labwareId) => {
+        const identityOffset = {
+          definitionUri: getLabwareDefinitionUri(
+            labwareId,
+            protocolData?.labware
+          ),
+          location: getLabwareLocation(labwareId, protocolData?.commands ?? []),
+          offset: IDENTITY_OFFSET,
+        }
+        return [...acc, identityOffset]
+      },
+      []
+    )
+
+    createLabwareOffsets({
+      runId: currentRun?.data.id as string,
+      data: { labwareOffsets: identityLabwareOffsets },
+    })
+
     // execute prep commands
     prepCommands.forEach(prepCommand => {
       // 11/18/21 intercept TCOpenLidCommand and use legacy modules endpoint
@@ -366,24 +517,22 @@ export function useLabwarePositionCheck(
         }
         dispatch(sendModuleCommand(robotName as string, serial, 'open'))
       } else {
-        createCommand(
-          host as HostConfig,
-          currentRun?.data?.id as string,
-          createCommandData(prepCommand)
-        ).catch((e: Error) => {
+        createCommand({
+          runId: currentRun?.data?.id as string,
+          command: createCommandData(prepCommand),
+        }).catch((e: Error) => {
           console.error(`error issuing command to robot: ${e.message}`)
           setError(e)
         })
       }
     })
     // issue first movement command
-    createCommand(
-      host as HostConfig,
-      currentRun?.data?.id as string,
-      createCommandData(currentCommand)
-    )
+    createCommand({
+      runId: currentRun?.data?.id as string,
+      command: createCommandData(currentCommand),
+    })
       .then(response => {
-        const commandId = response.data.data.id
+        const commandId = response.data.id
         setPendingMovementCommandData({
           commandId,
           labwareId: currentCommand.params.labwareId,
@@ -398,8 +547,56 @@ export function useLabwarePositionCheck(
       })
   }
 
+  const onUnsuccessfulPickUpTip = (): void => {
+    setIsLoading(true)
+    setShowPickUpTipConfirmationModal(false)
+    // drop the tip  back where it was before
+    const commandType: DropTipCommand['commandType'] = 'dropTip'
+    const pipetteId = prevCommand.params.pipetteId
+    const labwareId = prevCommand.params.labwareId
+    const wellName = prevCommand.params.wellName
+    const dropTipCommand: DropTipCommand = {
+      commandType,
+      id: uuidv4(),
+      params: {
+        pipetteId,
+        labwareId,
+        wellName,
+      },
+    }
+    createCommand({
+      runId: currentRun?.data?.id as string,
+      command: createCommandData(dropTipCommand),
+    })
+      .then(() => {
+        const moveBackToWellCommand =
+          // the last command was a pick up tip, the one before that was a move to well
+          LPCMovementCommands[currentCommandIndex - 2]
+        const moveBackToWell = createCommand({
+          runId: currentRun?.data?.id as string,
+          command: createCommandData(moveBackToWellCommand),
+        })
+        return moveBackToWell
+      })
+      .then(response => {
+        const commandId = response.data.id
+        setPendingMovementCommandData({
+          commandId,
+          pipetteId,
+          labwareId,
+          commandType,
+        })
+        // decrement current command index so that the state resets
+        setCurrentCommandIndex(currentCommandIndex - 1)
+      })
+
+      .catch((e: Error) => {
+        console.error(`error issuing drop tip command: ${e.message}`)
+      })
+  }
+
   const jog = (axis: Axis, dir: Sign, step: StepSize): void => {
-    const data = {
+    const moveRelCommand: AnonymousCommand = {
       commandType: 'moveRelative',
       params: {
         pipetteId: currentCommand.params.pipetteId,
@@ -408,11 +605,10 @@ export function useLabwarePositionCheck(
       },
     }
 
-    createCommand(
-      host as HostConfig,
-      currentRun?.data?.id as string,
-      data
-    ).catch((e: Error) => {
+    createCommand({
+      runId: currentRun?.data?.id as string,
+      command: moveRelCommand,
+    }).catch((e: Error) => {
       setError(e)
       console.error(`error issuing jog command: ${e.message}`)
     })
@@ -424,9 +620,11 @@ export function useLabwarePositionCheck(
     beginLPC,
     proceed,
     jog,
+    onUnsuccessfulPickUpTip,
     ctaText,
     isComplete,
     titleText,
     isLoading,
+    showPickUpTipConfirmationModal,
   }
 }
