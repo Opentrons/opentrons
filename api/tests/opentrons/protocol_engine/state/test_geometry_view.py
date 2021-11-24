@@ -338,6 +338,53 @@ def test_get_well_position(
     )
 
 
+def test_get_module_labware_well_position(
+        decoy: Decoy,
+        well_plate_def: LabwareDefinition,
+        standard_deck_def: DeckDefinitionV2,
+        labware_view: LabwareView,
+        module_view: ModuleView,
+        subject: GeometryView,
+) -> None:
+    """It should be able to get the position of a well top in a labware on module."""
+    labware_data = LoadedLabware(
+        id="labware-id",
+        loadName="load-name",
+        definitionUri="definition-uri",
+        location=ModuleLocation(moduleId="module-id"),
+        offsetId="offset-id",
+    )
+    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+    slot_pos = Point(4, 5, 6)
+    well_def = well_plate_def.wells["B2"]
+
+    decoy.when(labware_view.get("labware-id")).then_return(labware_data)
+    decoy.when(labware_view.get_definition("labware-id")).then_return(well_plate_def)
+    decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
+        calibration_offset
+    )
+    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_4)).then_return(
+        slot_pos
+    )
+    decoy.when(labware_view.get_well_definition("labware-id", "B2")).then_return(
+        well_def
+    )
+    decoy.when(module_view.get_location("module-id")).then_return(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_4)
+    )
+    decoy.when(module_view.get_module_offset("module-id")).then_return(
+        LabwareOffsetVector(x=4, y=5, z=6)
+    )
+
+    result = subject.get_well_position("labware-id", "B2")
+
+    assert result == Point(
+        x=slot_pos[0] + 1 + well_def.x + 4,
+        y=slot_pos[1] - 2 + well_def.y + 5,
+        z=slot_pos[2] + 3 + well_def.z + well_def.depth + 6,
+    )
+
+
 def test_get_well_position_with_top_offset(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,

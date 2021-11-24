@@ -130,7 +130,9 @@ class ModuleView(HasState[ModuleState]):
         # Apply the slot transform, if any
         xform = array(xforms_ser)
         xformed = dot(xform, pre_transform)  # type: ignore[no-untyped-call]
-        return LabwareOffsetVector(x=xformed[0], y=xformed[1], z=xformed[2])
+        return LabwareOffsetVector(x=xformed[0],
+                                   y=xformed[1],
+                                   z=definition.labwareOffset.z)
 
     def get_overall_height(self, module_id: str) -> float:
         """Get the height of the module."""
