@@ -58,7 +58,7 @@ export const SummaryScreen = (props: {
             vector: labwareOffset.vector,
           },
         }).catch((e: Error) => {
-          console.error(`error clearing labware offsets: ${e.message}`)
+          console.error(`error applying labware offsets: ${e.message}`)
         })
       })
     } else {
