@@ -339,12 +339,12 @@ def test_get_well_position(
 
 
 def test_get_module_labware_well_position(
-        decoy: Decoy,
-        well_plate_def: LabwareDefinition,
-        standard_deck_def: DeckDefinitionV2,
-        labware_view: LabwareView,
-        module_view: ModuleView,
-        subject: GeometryView,
+    decoy: Decoy,
+    well_plate_def: LabwareDefinition,
+    standard_deck_def: DeckDefinitionV2,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    subject: GeometryView,
 ) -> None:
     """It should be able to get the position of a well top in a labware on module."""
     labware_data = LoadedLabware(
