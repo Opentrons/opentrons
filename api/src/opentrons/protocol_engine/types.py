@@ -214,6 +214,7 @@ class ModuleDimensions(BaseModel):
 
     bareOverallHeight: float
     overLabwareHeight: float
+    lidHeight: Optional[float]
 
 
 class ModuleCalibrationPoint(BaseModel):
@@ -221,6 +222,10 @@ class ModuleCalibrationPoint(BaseModel):
 
     x: float
     y: float
+
+
+class ModuleSlotTransform(BaseModel):
+    """Affine transform offset types for modules."""
 
 
 class ModuleDefinition(BaseModel):
