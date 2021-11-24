@@ -14,6 +14,7 @@ import {
   ModuleModel,
   ModuleType,
 } from '@opentrons/shared-data'
+import { mockMagneticModule as mockMagneticModuleFixture } from '@opentrons/app/src/redux/modules/__fixtures__/index'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { useLabwareRenderInfoById, useModuleRenderInfoById } from '../../hooks'
@@ -128,12 +129,18 @@ describe('LPC DeckMap', () => {
       .calledWith()
       .mockReturnValue({
         [mockMagneticModule.moduleId]: {
+          moduleId: mockMagneticModule.moduleId,
           x: MOCK_MAGNETIC_MODULE_COORDS[0],
           y: MOCK_MAGNETIC_MODULE_COORDS[1],
           z: MOCK_MAGNETIC_MODULE_COORDS[2],
           moduleDef: mockMagneticModule as any,
           nestedLabwareDef: fixture_tiprack_300_ul as LabwareDefinition2,
           nestedLabwareId: ANOTHER_LABWARE_ID_TO_HIGHLIGHT,
+          protocolLoadOrder: 1,
+          attachedModuleMatch: {
+            ...mockMagneticModuleFixture,
+            model: mockMagneticModule.model,
+          } as any,
         },
       })
   })
