@@ -1,12 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import { useSelector } from 'react-redux'
 import last from 'lodash/last'
-import { getProtocolName } from '../../redux/protocol'
 import { useCurrentProtocolRun } from '../ProtocolUpload/hooks'
-
 import { schemaV6Adapter, ProtocolFile } from '@opentrons/shared-data'
 import { formatInterval } from '../RunTimeControl/utils'
-import type { State } from '../../redux/types'
 
 interface ProtocolDetails {
   displayName: string | null
@@ -48,7 +44,8 @@ function useNow(): string {
 
 export function useProtocolDetails(): ProtocolDetails {
   let protocolData: ProtocolFile<{}> | null = null
-  const protocolAnalysis = useCurrentProtocolRun().protocolRecord?.data.analyses
+  const { protocolRecord } = useCurrentProtocolRun()
+  const protocolAnalysis = protocolRecord?.data.analyses
   if (protocolAnalysis != null) {
     const lastProtocolAnalysis = protocolAnalysis[protocolAnalysis.length - 1]
     if (lastProtocolAnalysis.status === 'completed') {
@@ -56,7 +53,7 @@ export function useProtocolDetails(): ProtocolDetails {
     }
   }
   // TODO immediately replace with metadata from protocol record
-  const displayName = useSelector((state: State) => getProtocolName(state))
+  const displayName = protocolRecord?.data.metadata.protocolName ?? null
   return { displayName, protocolData }
 }
 
