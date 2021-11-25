@@ -36,7 +36,7 @@ def test_get_module_data(tempdeck_v1_def: ModuleDefinition) -> None:
     """It should get module data from state by ID."""
     module_data = LoadedModule(
         id="module-id",
-        model="model-1",
+        model=ModuleModels.THERMOCYCLER_MODULE_V1,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         serial="module-serial",
         definition=tempdeck_v1_def,
@@ -50,14 +50,14 @@ def test_get_all_modules(tempdeck_v1_def: ModuleDefinition) -> None:
     """It should return all modules in state."""
     module1 = LoadedModule(
         id="module-1",
-        model="model-1",
+        model=ModuleModels.TEMPERATURE_MODULE_V1,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         serial="serial-1",
         definition=tempdeck_v1_def,
     )
     module2 = LoadedModule(
         id="module-2",
-        model="model-2",
+        model=ModuleModels.MAGNETIC_MODULE_V1,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
         serial="serial-2",
         definition=tempdeck_v1_def,
@@ -70,7 +70,7 @@ def test_get_definition_by_id(tempdeck_v1_def: ModuleDefinition) -> None:
     """It should return a loaded module's definition by ID."""
     module_data = LoadedModule(
         id="module-id",
-        model="model-1",
+        model=ModuleModels.TEMPERATURE_MODULE_V2,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         serial="module-serial",
         definition=tempdeck_v1_def,
@@ -103,17 +103,47 @@ def test_get_module_by_serial(tempdeck_v1_def: ModuleDefinition) -> None:
     """It should get a particular loaded module for a given module serial number."""
     module1 = LoadedModule(
         id="module-1",
-        model="model-1",
+        model=ModuleModels.TEMPERATURE_MODULE_V2,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         serial="serial-1",
         definition=tempdeck_v1_def,
     )
     module2 = LoadedModule(
         id="module-2",
-        model="model-2",
+        model=ModuleModels.MAGNETIC_MODULE_V2,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
         serial="serial-2",
         definition=tempdeck_v1_def,
     )
     subject = get_module_view(modules_by_id={"module-1": module1, "module-2": module2})
     assert subject.get_by_serial("serial-2") == module2
+
+
+def test_get_location(tempdeck_v1_def: ModuleDefinition) -> None:
+    """It should return the deck slot location of the module."""
+    module_id = "unique-id"
+    module = LoadedModule(
+        id=module_id,
+        model=ModuleModels.MAGNETIC_MODULE_V2,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
+        serial="serial-1",
+        definition=tempdeck_v1_def,
+    )
+    subject = get_module_view(modules_by_id={module_id: module})
+    assert subject.get_location(module_id=module_id) == DeckSlotLocation(
+        slotName=DeckSlotName.SLOT_2
+    )
+
+
+def test_get_dimensions(tempdeck_v1_def: ModuleDefinition) -> None:
+    """It should return the dimensions of the specified module."""
+    module_id = "unique-id"
+    module = LoadedModule(
+        id=module_id,
+        model=ModuleModels.MAGNETIC_MODULE_V2,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
+        serial="serial-1",
+        definition=tempdeck_v1_def,
+    )
+    subject = get_module_view(modules_by_id={module_id: module})
+    assert subject.get_dimensions(module_id=module_id) == tempdeck_v1_def.dimensions

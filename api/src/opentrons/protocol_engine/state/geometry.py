@@ -13,8 +13,10 @@ from ..types import (
     WellOrigin,
     WellOffset,
     DeckSlotLocation,
+    ModuleLocation,
 )
 from .labware import LabwareView
+from .modules import ModuleView
 
 
 DEFAULT_TIP_DROP_HEIGHT_FACTOR = 0.5
@@ -36,11 +38,10 @@ class TipGeometry:
 class GeometryView:
     """Geometry computed state getters."""
 
-    _labware: LabwareView
-
-    def __init__(self, labware_view: LabwareView) -> None:
+    def __init__(self, labware_view: LabwareView, module_view: ModuleView) -> None:
         """Initialize a GeometryView instance."""
         self._labware = labware_view
+        self._modules = module_view
 
     def get_labware_highest_z(self, labware_id: str) -> float:
         """Get the highest Z-point of a labware."""
@@ -60,11 +61,25 @@ class GeometryView:
     def get_labware_parent_position(self, labware_id: str) -> Point:
         """Get the position of the labware's parent slot (deck or module)."""
         labware_data = self._labware.get(labware_id)
+        module_id: Optional[str] = None
+
         if isinstance(labware_data.location, DeckSlotLocation):
-            slot_pos = self._labware.get_slot_position(labware_data.location.slotName)
+            slot_name = labware_data.location.slotName
+        else:
+            module_id = labware_data.location.moduleId
+            slot_name = self._modules.get_location(module_id).slotName
+
+        slot_pos = self._labware.get_slot_position(slot_name)
+
+        if module_id is None:
             return slot_pos
         else:
-            raise NotImplementedError("Not implemented for labware on modules")
+            module_offset = self._modules.get_module_offset(module_id)
+            return Point(
+                x=slot_pos.x + module_offset.x,
+                y=slot_pos.y + module_offset.y,
+                z=slot_pos.z + module_offset.z,
+            )
 
     def get_labware_origin_position(self, labware_id: str) -> Point:
         """Get the position of the labware's origin, without calibration."""
@@ -118,8 +133,11 @@ class GeometryView:
         labware_pos = self.get_labware_position(lw_data.id)
         definition = self._labware.get_definition(lw_data.id)
         z_dim = definition.dimensions.zDimension
-
-        return labware_pos.z + z_dim
+        height_over_labware: float = 0
+        if isinstance(lw_data.location, ModuleLocation):
+            module_id = lw_data.location.moduleId
+            height_over_labware = self._modules.get_height_over_labware(module_id)
+        return labware_pos.z + z_dim + height_over_labware
 
     # TODO(mc, 2020-11-12): reconcile with existing protocol logic and include
     # data from tip-length calibration once v4.0.0 is in `edge`

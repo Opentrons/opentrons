@@ -29,10 +29,6 @@ class PipetteLocationData:
 class MotionView:
     """Complete motion planning state and getter methods."""
 
-    _labware: LabwareView
-    _pipette: PipetteView
-    _geometry: GeometryView
-
     def __init__(
         self,
         labware_view: LabwareView,

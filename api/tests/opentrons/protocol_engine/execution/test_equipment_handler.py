@@ -18,8 +18,10 @@ from opentrons.protocol_engine.errors import (
 )
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
+    ModuleLocation,
     PipetteName,
     LoadedPipette,
+    LoadedModule,
     LabwareOffset,
     LabwareOffsetVector,
     LabwareOffsetLocation,
@@ -247,6 +249,68 @@ async def test_load_labware_uses_loaded_labware_def(
             version=1,
         ),
         times=0,
+    )
+
+
+async def test_load_labware_on_module(
+    decoy: Decoy,
+    model_utils: ModelUtils,
+    state_store: StateStore,
+    labware_data_provider: LabwareDataProvider,
+    minimal_labware_def: LabwareDefinition,
+    tempdeck_v1_def: ModuleDefinition,
+    subject: EquipmentHandler,
+) -> None:
+    """It should load labware definition and offset data and generate an ID."""
+    decoy.when(model_utils.generate_id()).then_return("unique-id")
+
+    decoy.when(
+        state_store.labware.get_definition_by_uri(matchers.IsA(str))
+    ).then_return(minimal_labware_def)
+
+    decoy.when(state_store.modules.get("module-id")).then_return(
+        LoadedModule(
+            id="module-id",
+            model=ModuleModels.THERMOCYCLER_MODULE_V1,
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+            serial="module-serial",
+            definition=tempdeck_v1_def,
+        )
+    )
+
+    decoy.when(
+        state_store.labware.find_applicable_labware_offset(
+            definition_uri="opentrons-test/load-name/1",
+            location=LabwareOffsetLocation(
+                slotName=DeckSlotName.SLOT_3,
+                moduleModel=ModuleModels.THERMOCYCLER_MODULE_V1,
+            ),
+        )
+    ).then_return(
+        LabwareOffset(
+            id="labware-offset-id",
+            createdAt=datetime(year=2021, month=1, day=2),
+            definitionUri="opentrons-test/load-name/1",
+            location=LabwareOffsetLocation(
+                slotName=DeckSlotName.SLOT_3,
+                moduleModel=ModuleModels.THERMOCYCLER_MODULE_V1,
+            ),
+            vector=LabwareOffsetVector(x=1, y=2, z=3),
+        )
+    )
+
+    result = await subject.load_labware(
+        location=ModuleLocation(moduleId="module-id"),
+        load_name="load-name",
+        namespace="opentrons-test",
+        version=1,
+        labware_id=None,
+    )
+
+    assert result == LoadedLabwareData(
+        labware_id="unique-id",
+        definition=minimal_labware_def,
+        offsetId="labware-offset-id",
     )
 
 

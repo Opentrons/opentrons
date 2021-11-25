@@ -13,19 +13,33 @@ from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
     LabwareOffsetVector,
     DeckSlotLocation,
+    ModuleLocation,
     LoadedLabware,
     WellLocation,
     WellOrigin,
     WellOffset,
 )
 from opentrons.protocol_engine.state.labware import LabwareView
+from opentrons.protocol_engine.state.modules import ModuleView
 from opentrons.protocol_engine.state.geometry import GeometryView
 
 
 @pytest.fixture
-def subject(labware_view: LabwareView) -> GeometryView:
+def labware_view(decoy: Decoy) -> LabwareView:
+    """Get a mock in the shape of a LabwareView."""
+    return decoy.mock(cls=LabwareView)
+
+
+@pytest.fixture
+def module_view(decoy: Decoy) -> ModuleView:
+    """Get a mock in the shape of a ModuleView."""
+    return decoy.mock(cls=ModuleView)
+
+
+@pytest.fixture
+def subject(labware_view: LabwareView, module_view: ModuleView) -> GeometryView:
     """Get a GeometryView with its store dependencies mocked out."""
-    return GeometryView(labware_view=labware_view)
+    return GeometryView(labware_view=labware_view, module_view=module_view)
 
 
 def test_get_labware_parent_position(
@@ -51,6 +65,39 @@ def test_get_labware_parent_position(
     result = subject.get_labware_parent_position("labware-id")
 
     assert result == Point(1, 2, 3)
+
+
+def test_get_labware_parent_position_on_module(
+    decoy: Decoy,
+    standard_deck_def: DeckDefinitionV2,
+    well_plate_def: LabwareDefinition,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    subject: GeometryView,
+) -> None:
+    """It should return a module position for labware on a module."""
+    labware_data = LoadedLabware(
+        id="labware-id",
+        loadName="b",
+        definitionUri=uri_from_details(namespace="a", load_name="b", version=1),
+        location=ModuleLocation(moduleId="module-id"),
+        offsetId=None,
+    )
+
+    decoy.when(labware_view.get("labware-id")).then_return(labware_data)
+    decoy.when(module_view.get_location("module-id")).then_return(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
+    )
+    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_3)).then_return(
+        Point(1, 2, 3)
+    )
+    decoy.when(module_view.get_module_offset("module-id")).then_return(
+        LabwareOffsetVector(x=4, y=5, z=6)
+    )
+
+    result = subject.get_labware_parent_position("labware-id")
+
+    assert result == Point(5, 7, 9)
 
 
 def test_get_labware_origin_position(
@@ -118,6 +165,46 @@ def test_get_labware_highest_z(
     highest_z = subject.get_labware_highest_z("labware-id")
 
     assert highest_z == (well_plate_def.dimensions.zDimension + 3 + 3)
+
+
+def test_get_module_labware_highest_z(
+    decoy: Decoy,
+    standard_deck_def: DeckDefinitionV2,
+    well_plate_def: LabwareDefinition,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    subject: GeometryView,
+) -> None:
+    """It should get the absolute location of a labware's highest Z point."""
+    labware_data = LoadedLabware(
+        id="labware-id",
+        loadName="load-name",
+        definitionUri="definition-uri",
+        location=ModuleLocation(moduleId="module-id"),
+        offsetId="offset-id",
+    )
+    slot_pos = Point(1, 2, 3)
+    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+
+    decoy.when(labware_view.get("labware-id")).then_return(labware_data)
+    decoy.when(labware_view.get_definition("labware-id")).then_return(well_plate_def)
+    decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
+        calibration_offset
+    )
+    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_3)).then_return(
+        slot_pos
+    )
+    decoy.when(module_view.get_location("module-id")).then_return(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
+    )
+    decoy.when(module_view.get_module_offset("module-id")).then_return(
+        LabwareOffsetVector(x=4, y=5, z=6)
+    )
+    decoy.when(module_view.get_height_over_labware("module-id")).then_return(0.5)
+
+    highest_z = subject.get_labware_highest_z("labware-id")
+
+    assert highest_z == (well_plate_def.dimensions.zDimension + 3 + 3 + 6 + 0.5)
 
 
 def test_get_all_labware_highest_z(
@@ -248,6 +335,53 @@ def test_get_well_position(
         x=slot_pos[0] + 1 + well_def.x,
         y=slot_pos[1] - 2 + well_def.y,
         z=slot_pos[2] + 3 + well_def.z + well_def.depth,
+    )
+
+
+def test_get_module_labware_well_position(
+    decoy: Decoy,
+    well_plate_def: LabwareDefinition,
+    standard_deck_def: DeckDefinitionV2,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    subject: GeometryView,
+) -> None:
+    """It should be able to get the position of a well top in a labware on module."""
+    labware_data = LoadedLabware(
+        id="labware-id",
+        loadName="load-name",
+        definitionUri="definition-uri",
+        location=ModuleLocation(moduleId="module-id"),
+        offsetId="offset-id",
+    )
+    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+    slot_pos = Point(4, 5, 6)
+    well_def = well_plate_def.wells["B2"]
+
+    decoy.when(labware_view.get("labware-id")).then_return(labware_data)
+    decoy.when(labware_view.get_definition("labware-id")).then_return(well_plate_def)
+    decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
+        calibration_offset
+    )
+    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_4)).then_return(
+        slot_pos
+    )
+    decoy.when(labware_view.get_well_definition("labware-id", "B2")).then_return(
+        well_def
+    )
+    decoy.when(module_view.get_location("module-id")).then_return(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_4)
+    )
+    decoy.when(module_view.get_module_offset("module-id")).then_return(
+        LabwareOffsetVector(x=4, y=5, z=6)
+    )
+
+    result = subject.get_well_position("labware-id", "B2")
+
+    assert result == Point(
+        x=slot_pos[0] + 1 + well_def.x + 4,
+        y=slot_pos[1] - 2 + well_def.y + 5,
+        z=slot_pos[2] + 3 + well_def.z + well_def.depth + 6,
     )
 
 
