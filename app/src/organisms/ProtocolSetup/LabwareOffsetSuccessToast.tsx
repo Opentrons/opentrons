@@ -32,13 +32,14 @@ export function LabwareOffsetSuccessToast(
       >
         <AlertItem
           type="success"
-          onCloseClick={() => props.onCloseClick}
-          title={t('labware_positon_check_complete_toast', {
-            num_offsets:
-              labwareOffsetCount === 0
-                ? t('no_labware_offsets')
-                : labwareOffsetCount,
-          })}
+          onCloseClick={props.onCloseClick}
+          title={
+            labwareOffsetCount === 0
+              ? t('labware_positon_check_complete_toast_no_offsets')
+              : t('labware_positon_check_complete_toast_with_offsets', {
+                  count: labwareOffsetCount,
+                })
+          }
         />
       </Flex>
     </Portal>
