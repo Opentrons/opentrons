@@ -1,11 +1,9 @@
 import reduce from 'lodash/reduce'
+import { IDENTITY_VECTOR } from '@opentrons/shared-data'
 import { useHost } from '@opentrons/react-api-client'
 import { HostConfig, getCommand, VectorOffset } from '@opentrons/api-client'
 import { useCurrentRunId } from './useCurrentRunId'
 import type { SavePositionCommandData } from '../../ProtocolSetup/LabwarePositionCheck/types'
-
-const IDENTITY_OFFSET = { x: 0, y: 0, z: 0 }
-
 interface LabwareOffsetData {
   [labwareId: string]: VectorOffset
 }
@@ -62,7 +60,7 @@ export function useOffsetDataByLabwareId(
         })
         .catch((e: Error) => {
           console.error(`error calculating labware offset: ${e.message}`)
-          return { [labwareId]: IDENTITY_OFFSET }
+          return { [labwareId]: IDENTITY_VECTOR }
         })
 
       return acc.then(offsetData => {

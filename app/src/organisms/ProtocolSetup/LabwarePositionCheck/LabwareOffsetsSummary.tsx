@@ -109,7 +109,7 @@ export const LabwareOffsetsSummary = (
               {t('labware_offsets_summary_offset')}
             </Text>
             {offsetData
-              .map(({ offsetData }) => offsetData)
+              .map(({ vector }) => vector)
               .map(({ x, y, z }, index) => {
                 return x === 0 && y === 0 && z === 0 ? (
                   <Flex

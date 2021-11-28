@@ -52,11 +52,11 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element => {
   )
 
   const labwareOffsets = runRecord?.data.labwareOffsets
-  const labwareOffset = labwareOffsets?.find(
+  const vector = labwareOffsets?.find(
     offsetRecord =>
       offsetRecord.definitionUri === labwareDefinitionUri &&
       isEqual(offsetRecord.location, labwareLocation)
-  )?.offset
+  )?.vector
 
   return (
     <Box
@@ -69,7 +69,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element => {
       <Text margin={SPACING_1} css={labwareDisplayNameStyle}>
         {displayName}
       </Text>
-      {labwareOffset != null && (
+      {vector != null && (
         <>
           <Text
             marginX={SPACING_1}
@@ -92,7 +92,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element => {
               fontWeight={FONT_WEIGHT_REGULAR}
               marginRight={'0.35rem'}
             >
-              {labwareOffset.x.toFixed(1)}
+              {vector.x.toFixed(1)}
             </Text>
             <Text
               as={'span'}
@@ -106,7 +106,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element => {
               fontWeight={FONT_WEIGHT_REGULAR}
               marginRight={'0.35rem'}
             >
-              {labwareOffset.y.toFixed(1)}
+              {vector.y.toFixed(1)}
             </Text>
             <Text
               as={'span'}
@@ -120,7 +120,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element => {
               fontWeight={FONT_WEIGHT_REGULAR}
               marginRight={'0.35rem'}
             >
-              {labwareOffset.z.toFixed(1)}
+              {vector.z.toFixed(1)}
             </Text>
           </Box>
         </>
