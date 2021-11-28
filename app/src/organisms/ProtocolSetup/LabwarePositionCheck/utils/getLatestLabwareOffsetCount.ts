@@ -4,6 +4,10 @@ import type { LabwareOffset } from '@opentrons/api-client'
 
 const TRASH_LOCATION = { slotName: '12' }
 
+// this util counts all "relevant" labware offsets that a user would care about
+// i.e. filters out all identity offsets that are applied at the beginning of
+// LPC, previous labware offsets that are no longer relevant, and offsets that
+// were applied to the trash
 export const getLatestLabwareOffsetCount = (
   labwareOffsets: LabwareOffset[]
 ): number => {
