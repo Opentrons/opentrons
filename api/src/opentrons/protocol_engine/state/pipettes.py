@@ -42,7 +42,7 @@ class CurrentWell:
 
 @dataclass(frozen=True)
 class PipetteState:
-    """Basic labware data state and getter methods."""
+    """Basic pipette data state and getter methods."""
 
     pipettes_by_id: Dict[str, LoadedPipette]
     aspirated_volume_by_id: Dict[str, float]

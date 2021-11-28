@@ -1,6 +1,7 @@
 import * as React from 'react'
 import map from 'lodash/map'
 import { useTranslation } from 'react-i18next'
+import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   Btn,
   Flex,
@@ -10,10 +11,15 @@ import {
   RobotWorkSpace,
   SecondaryBtn,
   Text,
+  Tooltip,
+  useHoverTooltip,
+  TEXT_ALIGN_CENTER,
+  TOOLTIP_LEFT,
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
   FONT_SIZE_BODY_1,
   JUSTIFY_CENTER,
+  SIZE_5,
   SPACING_3,
   C_BLUE,
   C_DARK_GRAY,
@@ -26,6 +32,8 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
+
+import { useRunStatus } from '../../../RunTimeControl/hooks'
 import { LabwarePositionCheck } from '../../LabwarePositionCheck'
 import styles from '../../styles.css'
 import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../../hooks'
@@ -50,6 +58,12 @@ const DECK_MAP_VIEWBOX = '-80 -40 550 500'
 export const LabwareSetup = (): JSX.Element | null => {
   const moduleRenderInfoById = useModuleRenderInfoById()
   const labwareRenderInfoById = useLabwareRenderInfoById()
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_LEFT,
+  })
+  const runStatus = useRunStatus()
+  const disableLabwarePositionCheck =
+    runStatus != null && runStatus !== RUN_STATUS_IDLE
   const { t } = useTranslation('protocol_setup')
   const [
     showLabwareHelpModal,
@@ -118,7 +132,7 @@ export const LabwareSetup = (): JSX.Element | null => {
                           : {}
                       }
                     >
-                      {nestedLabwareDef != null ? (
+                      {nestedLabwareDef != null && nestedLabwareId != null ? (
                         <React.Fragment
                           key={`LabwareSetup_Labware_${nestedLabwareDef.metadata.displayName}_${x}${y}`}
                         >
@@ -185,9 +199,20 @@ export const LabwareSetup = (): JSX.Element | null => {
                 onClick={() => setShowLabwarePositionCheckModal(true)}
                 color={C_BLUE}
                 id={'LabwareSetup_checkLabwarePositionsButton'}
+                {...targetProps}
+                disabled={disableLabwarePositionCheck}
               >
                 {t('run_labware_position_check')}
               </SecondaryBtn>
+              {disableLabwarePositionCheck ? (
+                <Tooltip {...tooltipProps}>
+                  {
+                    <Box width={SIZE_5} textAlign={TEXT_ALIGN_CENTER}>
+                      {t('labware_position_check_not_available')}
+                    </Box>
+                  }
+                </Tooltip>
+              ) : null}
             </Flex>
           </Flex>
         </Flex>

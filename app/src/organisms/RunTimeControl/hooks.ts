@@ -6,6 +6,8 @@ import {
   RunAction,
   RunData,
   RunStatus,
+  RUN_STATUS_IDLE,
+  RUN_STATUS_RUNNING,
   RUN_STATUS_STOPPED,
   RUN_STATUS_FAILED,
   RUN_STATUS_SUCCEEDED,
@@ -57,7 +59,19 @@ export function useRunStatus(): RunStatus | null {
 
   const runStatus = data?.data.status as RunStatus
 
-  return runStatus
+  const actions = data?.data?.actions as RunAction[]
+  const firstPlay = actions?.find(
+    action => action.actionType === RUN_ACTION_TYPE_PLAY
+  )
+  const runStartTime = firstPlay?.createdAt
+
+  // display an idle status as 'running' in the UI after a run has started
+  const adjustedRunStatus: RunStatus | null =
+    runStatus === RUN_STATUS_IDLE && runStartTime != null
+      ? RUN_STATUS_RUNNING
+      : runStatus
+
+  return adjustedRunStatus
 }
 
 export function useRunDisabledReason(): string | null {

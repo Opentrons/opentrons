@@ -6,7 +6,6 @@ import {
   getConnectedRobotPipettesCalibrated,
   getDeckCalibrationOk,
 } from '../redux/nav'
-import { useFeatureFlag } from '../redux/config'
 import { getConnectedRobot } from '../redux/discovery'
 import { useCurrentProtocolRun } from '../organisms/ProtocolUpload/hooks'
 import { NavLocation } from '../redux/nav/types'
@@ -38,17 +37,11 @@ export function useRunLocation(): NavLocation {
 }
 
 export function useNavLocations(): NavLocation[] {
-  const isPreProtocolFlowWithoutRPC = useFeatureFlag(
-    'preProtocolFlowWithoutRPC'
-  )
-  const [robots, upload, calibrate, legacyRun, more] = useSelector(
-    getNavbarLocations
-  )
+  const [robots, upload, more] = useSelector(getNavbarLocations)
 
   const runLocation = useRunLocation()
 
-  const legacyLocations = [robots, upload, calibrate, legacyRun, more]
   const navLocations = [robots, upload, runLocation, more]
 
-  return isPreProtocolFlowWithoutRPC ? navLocations : legacyLocations
+  return navLocations
 }

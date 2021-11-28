@@ -16,6 +16,7 @@ from opentrons.protocol_engine.types import (
     LabwareOffsetVector,
     LabwareOffsetLocation,
     LoadedLabware,
+    ModuleModels,
 )
 
 from opentrons.protocol_engine.state.labware import LabwareState, LabwareView
@@ -504,7 +505,7 @@ def test_find_applicable_labware_offset() -> None:
         definitionUri="on-module-definition-uri",
         location=LabwareOffsetLocation(
             slotName=DeckSlotName.SLOT_1,
-            moduleModel="tempdeck",
+            moduleModel=ModuleModels.TEMPERATURE_MODULE_V1,
         ),
         vector=LabwareOffsetVector(x=3, y=3, z=3),
     )
@@ -528,7 +529,7 @@ def test_find_applicable_labware_offset() -> None:
             definition_uri="on-module-definition-uri",
             location=LabwareOffsetLocation(
                 slotName=DeckSlotName.SLOT_1,
-                moduleModel="tempdeck",
+                moduleModel=ModuleModels.TEMPERATURE_MODULE_V1,
             ),
         )
         == offset_3

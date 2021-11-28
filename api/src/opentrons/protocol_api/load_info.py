@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from typing import Optional
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
+from opentrons.hardware_control.modules.types import ModuleModel
 from opentrons.types import Mount, DeckSlotName
 
 
@@ -58,6 +59,7 @@ class ModuleLoadInfo:
     :meta private:
     """
 
-    module_name: str
+    module_model: ModuleModel
     deck_slot: DeckSlotName
     configuration: Optional[str]
+    module_serial: Optional[str]

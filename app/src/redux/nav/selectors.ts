@@ -219,10 +219,8 @@ export const getNavbarLocations: (
 ) => NavLocation[] = createSelector(
   getRobotsLocation,
   getUploadLocation,
-  getCalibrateLocation,
-  getRunLocation,
   getMoreLocation,
-  (robots, upload, calibrate, run, more) => {
-    return [robots, upload, calibrate, run, more]
+  (robots, upload, more) => {
+    return [robots, upload, more]
   }
 )
