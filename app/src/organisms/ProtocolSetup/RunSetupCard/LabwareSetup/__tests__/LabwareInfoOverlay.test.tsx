@@ -57,7 +57,7 @@ const MOCK_LABWARE_ID = 'some_labware_id'
 const MOCK_LABWARE_DEFINITION_ID = 'some_labware_definition_id'
 const MOCK_LABWARE_DEFINITION_URI = 'some_labware_definition_uri'
 const MOCK_SLOT_NAME = '4'
-const MOCK_LABWARE_OFFSET = { x: 1, y: 2, z: 3 }
+const MOCK_LABWARE_VECTOR = { x: 1, y: 2, z: 3 }
 
 describe('LabwareInfoOverlay', () => {
   let props: React.ComponentProps<typeof LabwareInfoOverlay>
@@ -123,7 +123,7 @@ describe('LabwareInfoOverlay', () => {
                 id: '1',
                 definitionUri: MOCK_LABWARE_DEFINITION_URI,
                 location: { slotName: MOCK_SLOT_NAME },
-                offset: MOCK_LABWARE_OFFSET,
+                vector: MOCK_LABWARE_VECTOR,
               },
             ],
           },

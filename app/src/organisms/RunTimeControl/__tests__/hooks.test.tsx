@@ -8,6 +8,7 @@ import {
   RUN_ACTION_TYPE_STOP,
   Run,
   RunData,
+  RUN_STATUS_IDLE,
   RUN_STATUS_PAUSED,
   RUN_STATUS_RUNNING,
   RUN_STATUS_SUCCEEDED,
@@ -202,6 +203,46 @@ const mockSucceededRun: RunData = {
   labware: [],
 }
 
+const mockIdleUnstartedRun: RunData = {
+  id: RUN_ID_2,
+  createdAt: '2021-10-07T18:44:49.366581+00:00',
+  status: RUN_STATUS_IDLE,
+  protocolId: PROTOCOL_ID,
+  actions: [],
+  commands: [],
+  errors: [],
+  pipettes: [],
+  labware: [],
+}
+
+const mockIdleStartedRun: RunData = {
+  id: RUN_ID_2,
+  createdAt: '2021-10-07T18:44:49.366581+00:00',
+  status: RUN_STATUS_IDLE,
+  protocolId: PROTOCOL_ID,
+  actions: [
+    {
+      id: '1',
+      createdAt: '2021-10-25T12:54:53.366581+00:00',
+      actionType: RUN_ACTION_TYPE_PLAY,
+    },
+    {
+      id: '2',
+      createdAt: '2021-10-25T13:23:31.366581+00:00',
+      actionType: RUN_ACTION_TYPE_PAUSE,
+    },
+    {
+      id: '3',
+      createdAt: '2021-10-25T13:26:42.366581+00:00',
+      actionType: RUN_ACTION_TYPE_PLAY,
+    },
+  ],
+  commands: [{ id: COMMAND_ID, commandType: 'custom', status: 'succeeded' }],
+  errors: [],
+  pipettes: [],
+  labware: [],
+}
+
 const mockCommand = {
   data: {
     id: COMMAND_ID,
@@ -258,6 +299,38 @@ describe('useRunStatus hook', () => {
       .calledWith(RUN_ID_2, { refetchInterval: 1000 })
       .mockReturnValue(({
         data: { data: mockRunningRun },
+      } as unknown) as UseQueryResult<Run>)
+
+    const { result } = renderHook(useRunStatus)
+    expect(result.current).toBe('running')
+  })
+
+  it('returns a "idle" run status if idle and run unstarted', () => {
+    when(mockUseCurrentProtocolRun)
+      .calledWith()
+      .mockReturnValue({
+        runRecord: { data: mockIdleUnstartedRun },
+      } as UseCurrentProtocolRun)
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID_2, { refetchInterval: 1000 })
+      .mockReturnValue(({
+        data: { data: mockIdleUnstartedRun },
+      } as unknown) as UseQueryResult<Run>)
+
+    const { result } = renderHook(useRunStatus)
+    expect(result.current).toBe('idle')
+  })
+
+  it('returns a "running" run status if idle and run started', () => {
+    when(mockUseCurrentProtocolRun)
+      .calledWith()
+      .mockReturnValue({
+        runRecord: { data: mockIdleStartedRun },
+      } as UseCurrentProtocolRun)
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID_2, { refetchInterval: 1000 })
+      .mockReturnValue(({
+        data: { data: mockIdleStartedRun },
       } as unknown) as UseQueryResult<Run>)
 
     const { result } = renderHook(useRunStatus)

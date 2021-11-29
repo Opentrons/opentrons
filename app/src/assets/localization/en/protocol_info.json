@@ -47,6 +47,7 @@
   "rerunning_protocol_modal_body": "<block>Opentrons displays the connected robot’s last protocol run on on the Protocol Upload page. If you run again, Opentrons loads this protocol and applies Labware Offset data if any exists.</block><block>Clicking “Run Again” will take you directly to the Run tab. If you’d like to review the deck setup or run Labware Position Check before running the protocol, navigate to the Protocol tab.</block><block>If you recalibrate your robot, it will clear the last run from the upload page.</block>",
   "rerunning_protocol_modal_link": "Learn more about Labware Offset Data",
   "no_labware_offset_data": "No Labware Offset data",
-  "labware_positon_check_complete_toast": "Labware Position Check complete. {{num_offsets}} Labware Offsets created.",
-  "no_labware_offsets": "No"
+  "labware_positon_check_complete_toast_no_offsets": "Labware Position Check complete. No Labware Offsets created.",
+  "labware_positon_check_complete_toast_with_offsets": "Labware Position Check complete. {{count}} Labware Offset created.",
+  "labware_positon_check_complete_toast_with_offsets_plural": "Labware Position Check complete. {{count}} Labware Offsets created."
 }

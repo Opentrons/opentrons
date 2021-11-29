@@ -14,6 +14,7 @@ from .change_notifier import ChangeNotifier
 from .commands import CommandState, CommandStore, CommandView
 from .labware import LabwareState, LabwareStore, LabwareView
 from .pipettes import PipetteState, PipetteStore, PipetteView
+from .modules import ModuleState, ModuleStore, ModuleView
 from .geometry import GeometryView
 from .motion import MotionView
 from .configs import EngineConfigs
@@ -29,6 +30,7 @@ class State:
     commands: CommandState
     labware: LabwareState
     pipettes: PipetteState
+    modules: ModuleState
 
 
 class StateView(HasState[State]):
@@ -38,6 +40,7 @@ class StateView(HasState[State]):
     _commands: CommandView
     _labware: LabwareView
     _pipettes: PipetteView
+    _modules: ModuleView
     _geometry: GeometryView
     _motion: MotionView
     _configs: EngineConfigs
@@ -56,6 +59,11 @@ class StateView(HasState[State]):
     def pipettes(self) -> PipetteView:
         """Get state view selectors for pipette state."""
         return self._pipettes
+
+    @property
+    def modules(self) -> ModuleView:
+        """Get state view selectors for hardware module state."""
+        return self._modules
 
     @property
     def geometry(self) -> GeometryView:
@@ -104,11 +112,13 @@ class StateStore(StateView, ActionHandler):
             deck_fixed_labware=deck_fixed_labware,
             deck_definition=deck_definition,
         )
+        self._module_store = ModuleStore()
 
         self._substores: List[HandlesActions] = [
             self._command_store,
             self._pipette_store,
             self._labware_store,
+            self._module_store,
         ]
         self._configs = configs
         self._change_notifier = change_notifier or ChangeNotifier()
@@ -164,6 +174,7 @@ class StateStore(StateView, ActionHandler):
             commands=self._command_store.state,
             labware=self._labware_store.state,
             pipettes=self._pipette_store.state,
+            modules=self._module_store.state,
         )
 
     def _initialize_state(self) -> None:
@@ -175,9 +186,13 @@ class StateStore(StateView, ActionHandler):
         self._commands = CommandView(state.commands)
         self._labware = LabwareView(state.labware)
         self._pipettes = PipetteView(state.pipettes)
+        self._modules = ModuleView(state.modules)
 
         # Derived states
-        self._geometry = GeometryView(labware_view=self._labware)
+        self._geometry = GeometryView(
+            labware_view=self._labware,
+            module_view=self._modules,
+        )
         self._motion = MotionView(
             labware_view=self._labware,
             pipette_view=self._pipettes,
@@ -187,10 +202,9 @@ class StateStore(StateView, ActionHandler):
     def _update_state_views(self) -> None:
         """Update state view interfaces to use latest underlying values."""
         next_state = self._get_next_state()
-
         self._state = next_state
         self._commands._state = next_state.commands
         self._labware._state = next_state.labware
         self._pipettes._state = next_state.pipettes
-
+        self._modules._state = next_state.modules
         self._change_notifier.notify()

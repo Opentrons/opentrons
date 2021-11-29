@@ -1,5 +1,6 @@
 """Tests for the ProtocolRunner's LegacyContextPlugin."""
-from decoy import matchers
+import pytest
+from decoy import matchers, Decoy
 from datetime import datetime
 
 from opentrons.commands.types import PauseMessage
@@ -7,9 +8,12 @@ from opentrons.protocol_engine import (
     DeckSlotLocation,
     ModuleLocation,
     PipetteName,
+    ModuleModels,
+    ModuleDefinition,
     commands as pe_commands,
     actions as pe_actions,
 )
+from opentrons.protocol_engine.resources.module_data_provider import ModuleDataProvider
 from opentrons.protocol_runner.legacy_command_mapper import (
     LegacyContextCommandError,
     LegacyCommandMapper,
@@ -19,9 +23,17 @@ from opentrons.protocol_runner.legacy_wrappers import (
     LegacyInstrumentLoadInfo,
     LegacyLabwareLoadInfo,
     LegacyModuleLoadInfo,
+    LegacyMagneticModuleModel,
 )
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.module.dev_types import ModuleDefinitionV2
 from opentrons.types import DeckSlotName, Mount, MountType
+
+
+@pytest.fixture
+def module_data_provider(decoy: Decoy) -> ModuleDataProvider:
+    """Mock module definition fetcher."""
+    return decoy.mock(cls=ModuleDataProvider)
 
 
 def test_map_before_command() -> None:
@@ -259,11 +271,22 @@ def test_map_instrument_load() -> None:
     assert output == expected_output
 
 
-def test_map_module_load() -> None:
+def test_map_module_load(
+    decoy: Decoy,
+    minimal_module_def: ModuleDefinitionV2,
+    module_data_provider: ModuleDataProvider,
+) -> None:
     """It should correctly map a module load."""
+    test_definition = ModuleDefinition.parse_obj(minimal_module_def)
     input = LegacyModuleLoadInfo(
-        module_name="module-1", deck_slot=DeckSlotName.SLOT_1, configuration="conf"
+        module_model=LegacyMagneticModuleModel.MAGNETIC_V2,
+        deck_slot=DeckSlotName.SLOT_1,
+        configuration="conf",
+        module_serial="module-serial",
     )
+    decoy.when(
+        module_data_provider.get_module_definition(ModuleModels.MAGNETIC_MODULE_V2)
+    ).then_return(test_definition)
     expected_output = pe_commands.LoadModule.construct(
         id=matchers.IsA(str),
         status=pe_commands.CommandStatus.SUCCEEDED,
@@ -271,13 +294,19 @@ def test_map_module_load() -> None:
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
         params=pe_commands.LoadModuleParams.construct(
-            model="module-1",
+            model=ModuleModels.MAGNETIC_MODULE_V2,
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             moduleId=matchers.IsA(str),
         ),
-        result=pe_commands.LoadModuleResult.construct(moduleId=matchers.IsA(str)),
+        result=pe_commands.LoadModuleResult.construct(
+            moduleId=matchers.IsA(str),
+            moduleSerial="module-serial",
+            definition=test_definition,
+        ),
     )
-    output = LegacyCommandMapper().map_module_load(input)
+    output = LegacyCommandMapper(
+        module_data_provider=module_data_provider
+    ).map_module_load(input)
     assert output == expected_output
 
 

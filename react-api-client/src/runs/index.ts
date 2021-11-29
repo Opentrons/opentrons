@@ -10,7 +10,7 @@ export { useStopRunMutation } from './useStopRunMutation'
 export { useRunActionMutations } from './useRunActionMutations'
 export { useAllCommandsQuery } from './useAllCommandsQuery'
 export { useCommandQuery } from './useCommandQuery'
-export * from './useCreateLabwareOffsetsMutation'
+export * from './useCreateLabwareOffsetMutation'
 
 export type { UsePlayRunMutationResult } from './usePlayRunMutation'
 export type { UsePauseRunMutationResult } from './usePauseRunMutation'

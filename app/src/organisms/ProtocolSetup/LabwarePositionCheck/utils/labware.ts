@@ -11,7 +11,7 @@ import type { PickUpTipCommand } from '@opentrons/shared-data/protocol/types/sch
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { LabwareToOrder } from '../types'
 import { getLabwareLocation } from '../../utils/getLabwareLocation'
-import { getModuleLocation } from '../../utils/getModuleLocation'
+import { getModuleInitialLoadInfo } from '../../utils/getModuleInitialLoadInfo'
 
 export const tipRackOrderSort = (
   tiprack1: LabwareToOrder,
@@ -133,7 +133,8 @@ export const getLabwareIdsInOrder = (
             {
               definition: labwareDef,
               labwareId: labwareId,
-              slot: getModuleLocation(labwareLocation.moduleId, commands),
+              slot: getModuleInitialLoadInfo(labwareLocation.moduleId, commands)
+                .location.slotName,
             },
           ]
         } else {

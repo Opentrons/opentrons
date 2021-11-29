@@ -1,4 +1,5 @@
 import * as React from 'react'
+import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_START,
@@ -14,7 +15,8 @@ import {
   Text,
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
-import { useCreateLabwareOffsetsMutation } from '@opentrons/react-api-client'
+import { IDENTITY_VECTOR } from '@opentrons/shared-data'
+import { useCreateLabwareOffsetMutation } from '@opentrons/react-api-client'
 import { useProtocolDetails } from '../../RunDetails/hooks'
 import { useCurrentProtocolRun } from '../../ProtocolUpload/hooks'
 import { DeckMap } from './DeckMap'
@@ -39,7 +41,7 @@ export const SummaryScreen = (props: {
     .catch((e: Error) =>
       console.error(`error getting labware offsetsL ${e.message}`)
     )
-  const { createLabwareOffsets } = useCreateLabwareOffsetsMutation()
+  const { createLabwareOffset } = useCreateLabwareOffsetMutation()
   const { runRecord } = useCurrentProtocolRun()
 
   if (introInfo == null) return null
@@ -49,15 +51,19 @@ export const SummaryScreen = (props: {
 
   const applyLabwareOffsets = (): void => {
     if (labwareOffsets.length > 0) {
-      createLabwareOffsets({
-        runId: runRecord?.data.id as string,
-        data: {
-          labwareOffsets: labwareOffsets.map(offsetRecord => ({
-            definitionUri: offsetRecord.labwareDefinitionUri,
-            location: offsetRecord.labwareLocation,
-            offset: offsetRecord.offsetData,
-          })),
-        },
+      labwareOffsets.forEach(labwareOffset => {
+        if (!isEqual(labwareOffset.vector, IDENTITY_VECTOR)) {
+          createLabwareOffset({
+            runId: runRecord?.data.id as string,
+            data: {
+              definitionUri: labwareOffset.labwareDefinitionUri,
+              location: labwareOffset.labwareLocation,
+              vector: labwareOffset.vector,
+            },
+          }).catch((e: Error) => {
+            console.error(`error applying labware offsets: ${e.message}`)
+          })
+        }
       })
     } else {
       console.error('no labware offset data found')
@@ -96,9 +102,9 @@ export const SummaryScreen = (props: {
           backgroundColor={C_BLUE}
           id={'Lpc_summaryScreen_applyOffsetButton'}
           onClick={() => {
+            applyLabwareOffsets()
             props.onLabwarePositionCheckComplete()
             props.onCloseClick()
-            applyLabwareOffsets()
           }}
         >
           {t('close_and_apply_offset_data')}

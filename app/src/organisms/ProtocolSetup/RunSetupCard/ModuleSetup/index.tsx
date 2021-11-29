@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import map from 'lodash/map'
 import {
@@ -21,13 +21,13 @@ import {
 import { inferModuleOrientationFromXCoordinate } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { useMissingModuleIds } from '../hooks'
-import { fetchModules, getAttachedModules } from '../../../../redux/modules'
+import { fetchModules } from '../../../../redux/modules'
 import { ModuleInfo } from './ModuleInfo'
 import { MultipleModulesModal } from './MultipleModulesModal'
 import { useModuleRenderInfoById } from '../../hooks'
 import styles from '../../styles.css'
 
-import type { State, Dispatch } from '../../../../redux/types'
+import type { Dispatch } from '../../../../redux/types'
 
 const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
@@ -61,9 +61,6 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
     () => dispatch(fetchModules(robotName)),
     robotName === null ? POLL_MODULE_INTERVAL_MS : null,
     true
-  )
-  const attachedModules = useSelector((state: State) =>
-    getAttachedModules(state, robotName)
   )
 
   const moduleModels = map(
@@ -106,29 +103,29 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
       >
         {() => (
           <>
-            {map(moduleRenderInfoById, ({ x, y, moduleDef }) => {
-              const { model } = moduleDef
-              const attachedModuleMatch = attachedModules.find(
-                attachedModule => model === attachedModule.model
-              )
-              return (
-                <React.Fragment key={`LabwareSetup_Module_${model}_${x}${y}`}>
-                  <Module
-                    x={x}
-                    y={y}
-                    orientation={inferModuleOrientationFromXCoordinate(x)}
-                    def={moduleDef}
-                  >
-                    <ModuleInfo
-                      moduleModel={model}
-                      isAttached={attachedModuleMatch != null}
-                      usbPort={attachedModuleMatch?.usbPort.port}
-                      hubPort={attachedModuleMatch?.usbPort.hub}
-                    />
-                  </Module>
-                </React.Fragment>
-              )
-            })}
+            {map(
+              moduleRenderInfoById,
+              ({ x, y, moduleDef, attachedModuleMatch }) => {
+                const { model } = moduleDef
+                return (
+                  <React.Fragment key={`LabwareSetup_Module_${model}_${x}${y}`}>
+                    <Module
+                      x={x}
+                      y={y}
+                      orientation={inferModuleOrientationFromXCoordinate(x)}
+                      def={moduleDef}
+                    >
+                      <ModuleInfo
+                        moduleModel={model}
+                        isAttached={attachedModuleMatch != null}
+                        usbPort={attachedModuleMatch?.usbPort.port ?? null}
+                        hubPort={attachedModuleMatch?.usbPort.hub ?? null}
+                      />
+                    </Module>
+                  </React.Fragment>
+                )
+              }
+            )}
           </>
         )}
       </RobotWorkSpace>

@@ -7,7 +7,7 @@ export { createCommand } from './commands/createCommand'
 export { getCommand } from './commands/getCommand'
 export { getCommands } from './commands/getCommands'
 export { createRunAction } from './createRunAction'
-export * from './createLabwareOffsets'
+export * from './createLabwareOffset'
 
 export * from './types'
 export * from './commands/types'

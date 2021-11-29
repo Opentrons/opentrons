@@ -26,7 +26,9 @@ class AbstractLabwareOffsetProvider(ABC):
     def find(
         self,
         labware_definition_uri: str,
-        # todo(mm, 2021-11-22): Use an enum, not a str, for the module model.
+        # todo(mm, 2021-11-22): When there's a good module model enum that's usable
+        # by both Protocol Engine and the legacy Python Protocol API, use that here
+        # instead of an unconstrained str.
         module_model: Optional[str],
         deck_slot: DeckSlotName,
     ) -> ProvidedLabwareOffset:

@@ -12,11 +12,15 @@ from .exceptions import (
     LabwareIsNotTipRackError,
     WellDoesNotExistError,
     PipetteDoesNotExistError,
+    ModuleDoesNotExistError,
     SlotDoesNotExistError,
     FailedToPlanMoveError,
     MustHomeError,
     ProtocolEngineStoppedError,
     WellOriginNotAllowedError,
+    ModuleNotAttachedError,
+    ModuleDefinitionDoesNotExistError,
+    ModuleIsNotThermocyclerError,
 )
 
 from .error_occurrence import ErrorOccurrence
@@ -34,11 +38,15 @@ __all__ = [
     "LabwareIsNotTipRackError",
     "WellDoesNotExistError",
     "PipetteDoesNotExistError",
+    "ModuleDoesNotExistError",
     "SlotDoesNotExistError",
     "FailedToPlanMoveError",
     "MustHomeError",
     "ProtocolEngineStoppedError",
     "WellOriginNotAllowedError",
+    "ModuleNotAttachedError",
+    "ModuleDefinitionDoesNotExistError",
+    "ModuleIsNotThermocyclerError",
     # error occurrence models
     "ErrorOccurrence",
 ]

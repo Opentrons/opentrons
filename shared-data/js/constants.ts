@@ -75,3 +75,5 @@ export const MODULE_TYPES = [
 ]
 
 export const GEN_ONE_MULTI_PIPETTES = ['p10_multi', 'p50_multi', 'p300_multi']
+
+export const IDENTITY_VECTOR = { x: 0, y: 0, z: 0 }
