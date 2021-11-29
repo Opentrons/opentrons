@@ -54,6 +54,7 @@ protocols_router = APIRouter()
     summary="Upload a protocol",
     status_code=status.HTTP_201_CREATED,
     response_model=ResponseModel[Protocol, None],
+    response_model_exclude_none=True,
     responses={
         status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse[ProtocolFileInvalid]},
     },
@@ -147,6 +148,7 @@ async def create_protocol(
     summary="Get uploaded protocols",
     status_code=status.HTTP_200_OK,
     response_model=MultiResponseModel[Protocol, None],
+    response_model_exclude_none=True,
 )
 async def get_protocols(
     response_builder: ResponseBuilder = Depends(ResponseBuilder),
@@ -177,6 +179,7 @@ async def get_protocols(
     summary="Get an uploaded protocol",
     status_code=status.HTTP_200_OK,
     response_model=ResponseModel[Protocol, None],
+    response_model_exclude_none=True,
     responses={
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[ProtocolNotFound]},
     },
@@ -212,6 +215,7 @@ async def get_protocol_by_id(
     summary="Delete an uploaded protocol",
     status_code=status.HTTP_200_OK,
     response_model=EmptyResponseModel[None],
+    response_model_exclude_none=True,
     responses={
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[ProtocolNotFound]},
     },

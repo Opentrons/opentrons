@@ -89,6 +89,7 @@ class AllRunsLinks(BaseModel):
     description="Create a new run to track robot interaction.",
     status_code=status.HTTP_201_CREATED,
     response_model=ResponseModel[Run, None],
+    response_model_exclude_none=True,
     responses={
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[ProtocolNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorResponse[RunAlreadyActive]},
@@ -175,6 +176,7 @@ async def create_run(
     description="Get a list of all active and inactive runs.",
     status_code=status.HTTP_200_OK,
     response_model=MultiResponseModel[Run, AllRunsLinks],
+    response_model_exclude_none=True,
 )
 async def get_runs(
     run_store: RunStore = Depends(get_run_store),
@@ -228,6 +230,7 @@ async def get_runs(
     description="Get a specific run by its unique identifier.",
     status_code=status.HTTP_200_OK,
     response_model=ResponseModel[Run, None],
+    response_model_exclude_none=True,
     responses={status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]}},
 )
 async def get_run(
@@ -280,6 +283,7 @@ async def get_run(
     description="Delete a specific run by its unique identifier.",
     status_code=status.HTTP_200_OK,
     response_model=EmptyResponseModel[None],
+    response_model_exclude_none=True,
     responses={status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]}},
 )
 async def remove_run(
@@ -319,6 +323,7 @@ async def remove_run(
     ),
     status_code=status.HTTP_201_CREATED,
     response_model=ResponseModel[Run, None],
+    response_model_exclude_none=True,
     responses={
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
         status.HTTP_409_CONFLICT: {
@@ -384,6 +389,7 @@ async def add_labware_offset(
     description="Update a specific run, returing the updated resource.",
     status_code=status.HTTP_200_OK,
     response_model=ResponseModel[Run, None],
+    response_model_exclude_none=True,
     responses={
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
         status.HTTP_409_CONFLICT: {

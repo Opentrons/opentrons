@@ -33,6 +33,7 @@ class RunActionNotAllowed(ErrorDetails):
     description=("Provide an action in order to control execution of the run."),
     status_code=status.HTTP_201_CREATED,
     response_model=ResponseModel[RunAction, None],
+    response_model_exclude_none=True,
     responses={
         status.HTTP_409_CONFLICT: {
             "model": ErrorResponse[Union[RunActionNotAllowed, RunStopped]],

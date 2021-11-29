@@ -37,6 +37,7 @@ class CommandNotFound(ErrorDetails):
     ),
     status_code=status.HTTP_200_OK,
     response_model=ResponseModel[pe_commands.Command, None],
+    response_model_exclude_none=True,
     responses={
         status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse[RunStopped]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
@@ -78,6 +79,7 @@ async def create_run_command(
     ),
     status_code=status.HTTP_200_OK,
     response_model=MultiResponseModel[RunCommandSummary, None],
+    response_model_exclude_none=True,
     responses={
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
     },
@@ -103,6 +105,7 @@ async def get_run_commands(
     ),
     status_code=status.HTTP_200_OK,
     response_model=ResponseModel[pe_commands.Command, None],
+    response_model_exclude_none=True,
     responses={
         status.HTTP_404_NOT_FOUND: {
             "model": Union[
