@@ -22,9 +22,11 @@ class ProtocolFileRole(str, Enum):
         MAIN: The protocol's main file. In a JSON protocol, this is will
             be the JSON file. In a Python protocol, this is the file
             that exports the main `run` method.
+        DATA: Catch-all role for non-Python and non-protocol-JSON files.
     """
 
     MAIN = "main"
+    DATA = "data"
 
 
 @dataclass(frozen=True)
@@ -70,6 +72,10 @@ ProtocolConfig = Union[JsonProtocolConfig, PythonProtocolConfig]
 """Union of all protocol execution configurations."""
 
 
+Metadata = Dict[str, Any]
+"""Arbitraty metadata set by a protocol."""
+
+
 @dataclass(frozen=True)
 class ProtocolSource:
     """A value object representing a protocol and its files on disk.
@@ -83,5 +89,5 @@ class ProtocolSource:
     directory: Path
     main_file: Path
     files: List[ProtocolSourceFile]
-    metadata: Dict[str, Any]
+    metadata: Metadata
     config: ProtocolConfig

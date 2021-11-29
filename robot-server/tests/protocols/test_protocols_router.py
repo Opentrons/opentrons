@@ -238,9 +238,12 @@ async def test_create_protocol(
 
     analysis = PendingAnalysis(id="analysis-id")
 
-    decoy.when(await protocol_reader.read(files=[protocol_file.file])).then_return(
-        protocol_source
-    )
+    decoy.when(
+        await protocol_reader.read(
+            name="protocol-id",
+            files=[protocol_file],
+        )
+    ).then_return(protocol_source)
 
     decoy.when(
         analysis_store.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
@@ -282,12 +285,18 @@ async def test_create_protocol_not_readable(
     protocol_reader: ProtocolReader,
 ) -> None:
     """It should 400 if the protocol is rejected by the pre-analyzer."""
-    decoy.when(await protocol_reader.read(files=matchers.Anything())).then_raise(
-        ProtocolFilesInvalidError("oh no")
-    )
+    decoy.when(
+        await protocol_reader.read(
+            name=matchers.Anything(),
+            files=matchers.Anything(),
+        )
+    ).then_raise(ProtocolFilesInvalidError("oh no"))
 
     with pytest.raises(ApiError) as exc_info:
-        await create_protocol(files=[], protocol_reader=protocol_reader)
+        await create_protocol(
+            files=[],
+            protocol_reader=protocol_reader,
+        )
 
     assert exc_info.value.status_code == 422
     assert exc_info.value.content["errors"][0]["detail"] == "oh no"

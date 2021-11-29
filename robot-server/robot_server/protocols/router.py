@@ -15,11 +15,16 @@ from robot_server.service.json_api import (
     SimpleEmptyResponseModel,
 )
 
-from .dependencies import get_protocol_store, get_analysis_store, get_protocol_analyzer
 from .protocol_models import Protocol, ProtocolFile, Metadata
 from .protocol_analyzer import ProtocolAnalyzer
 from .analysis_store import AnalysisStore
 from .protocol_store import ProtocolStore, ProtocolResource, ProtocolNotFoundError
+from .dependencies import (
+    get_protocol_reader,
+    get_protocol_store,
+    get_analysis_store,
+    get_protocol_analyzer,
+)
 
 
 class ProtocolNotFound(ErrorDetails):
@@ -55,7 +60,7 @@ async def create_protocol(
     files: List[UploadFile] = File(...),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
-    protocol_reader: ProtocolReader = Depends(ProtocolReader),
+    protocol_reader: ProtocolReader = Depends(get_protocol_reader),
     protocol_analyzer: ProtocolAnalyzer = Depends(get_protocol_analyzer),
     task_runner: TaskRunner = Depends(TaskRunner),
     protocol_id: str = Depends(get_unique_id, use_cache=False),
@@ -76,7 +81,10 @@ async def create_protocol(
         created_at: Timestamp to attach to the new resource.
     """
     try:
-        source = await protocol_reader.read(files=[f.file for f in files])
+        source = await protocol_reader.read(
+            name=protocol_id,
+            files=files,
+        )
     except ProtocolFilesInvalidError as e:
         raise ProtocolFilesInvalid(detail=str(e)).as_error(
             status.HTTP_422_UNPROCESSABLE_ENTITY
