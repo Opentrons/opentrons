@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
 import { Box, LabeledValue, SPACING_3 } from '@opentrons/components'
 import { getModuleDisplayName, getModuleType } from '@opentrons/shared-data'
-import { useFeatureFlag } from '../../../../redux/config'
 
 import type {
   ThermocyclerModule,
@@ -96,7 +95,6 @@ interface Props {
     command: ModuleCommand,
     args?: unknown[]
   ) => unknown
-  slot: string
   controlDisabledReason: string | null
   isCardExpanded: boolean
   toggleCard: () => unknown
@@ -108,7 +106,6 @@ export const ThermocyclerCard = ({
   controlDisabledReason,
   isCardExpanded,
   toggleCard,
-  slot,
 }: Props): JSX.Element => {
   const {
     currentTemp,
@@ -122,7 +119,6 @@ export const ThermocyclerCard = ({
     currentStepIndex,
   } = module.data
   const { t } = useTranslation('run_details')
-  const isNewProtocolRunPanel = useFeatureFlag('preProtocolFlowWithoutRPC')
 
   const executingProfile =
     totalCycleCount != null &&
@@ -130,7 +126,7 @@ export const ThermocyclerCard = ({
     totalStepCount != null &&
     currentStepIndex != null
 
-  if (module.status === 'error' && isNewProtocolRunPanel) {
+  if (module.status === 'error') {
     controlDisabledReason = t('thermocycler_error_tooltip')
   }
 
