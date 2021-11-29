@@ -387,11 +387,7 @@ describe('LabwareSetup', () => {
           onLabwarePositionCheckComplete: expect.anything(),
         })
       )
-      .mockImplementation(({ onLabwarePositionCheckComplete }) => (
-        <div onClick={onLabwarePositionCheckComplete}>
-          mock LabwarePositionCheck
-        </div>
-      ))
+      .mockReturnValue(<div>mock LabwarePositionCheck</div>)
     expect(screen.queryByText('mock LabwarePositionCheck')).toBeNull()
   })
 })

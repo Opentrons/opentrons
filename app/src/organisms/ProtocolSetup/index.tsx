@@ -13,7 +13,6 @@ import {
   DIRECTION_COLUMN,
   SPACING_2,
   SPACING_3,
-  ALIGN_CENTER,
   FONT_SIZE_BODY_2,
   C_DARK_GRAY,
   AlertItem,
@@ -28,11 +27,14 @@ import {
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { RunSetupCard } from './RunSetupCard'
 import { MetadataCard } from './MetadataCard'
+import { LPCSuccessToastContext } from './hooks'
+import { LabwareOffsetSuccessToast } from './LabwareOffsetSuccessToast'
 
 const feedbackFormLink =
   'https://docs.google.com/forms/d/e/1FAIpQLSd6oSV82IfgzSi5t_FP6n_pB_Y8wPGmAgFHsiiFho9qhxr-UQ/viewform'
 
 export function ProtocolSetup(): JSX.Element {
+  const [showLPCSuccessToast, setShowLPCSuccessToast] = React.useState(false)
   const { t } = useTranslation(['protocol_setup'])
 
   const runStatus = useRunStatus()
@@ -76,11 +78,21 @@ export function ProtocolSetup(): JSX.Element {
       ) : null}
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        alignItems={ALIGN_CENTER}
         padding={`${SPACING_1} ${SPACING_3} ${SPACING_3} ${SPACING_3}`}
       >
+        {showLPCSuccessToast && (
+          <LabwareOffsetSuccessToast
+            onCloseClick={() => setShowLPCSuccessToast(false)}
+          />
+        )}
         <MetadataCard />
-        <RunSetupCard />
+        <LPCSuccessToastContext.Provider
+          value={{
+            setShowLPCSuccessToast: () => setShowLPCSuccessToast(true),
+          }}
+        >
+          <RunSetupCard />
+        </LPCSuccessToastContext.Provider>
         <Text
           fontSize={FONT_SIZE_BODY_2}
           paddingTop={SPACING_3}
