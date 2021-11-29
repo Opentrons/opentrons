@@ -19,6 +19,7 @@ import { IDENTITY_VECTOR } from '@opentrons/shared-data'
 import { useCreateLabwareOffsetMutation } from '@opentrons/react-api-client'
 import { useProtocolDetails } from '../../RunDetails/hooks'
 import { useCurrentProtocolRun } from '../../ProtocolUpload/hooks'
+import { useLPCSuccessToast } from '../hooks'
 import { DeckMap } from './DeckMap'
 import { SectionList } from './SectionList'
 import { LabwareOffsetsSummary } from './LabwareOffsetsSummary'
@@ -28,7 +29,6 @@ import type { ProtocolFile } from '@opentrons/shared-data'
 
 export const SummaryScreen = (props: {
   savePositionCommandData: SavePositionCommandData
-  onLabwarePositionCheckComplete: () => void
   onCloseClick: () => unknown
 }): JSX.Element | null => {
   const { savePositionCommandData } = props
@@ -43,6 +43,7 @@ export const SummaryScreen = (props: {
     )
   const { createLabwareOffset } = useCreateLabwareOffsetMutation()
   const { runRecord } = useCurrentProtocolRun()
+  const { setShowLPCSuccessToast } = useLPCSuccessToast()
 
   if (introInfo == null) return null
   if (protocolData == null) return null
@@ -103,7 +104,7 @@ export const SummaryScreen = (props: {
           id={'Lpc_summaryScreen_applyOffsetButton'}
           onClick={() => {
             applyLabwareOffsets()
-            props.onLabwarePositionCheckComplete()
+            setShowLPCSuccessToast(true)
             props.onCloseClick()
           }}
         >

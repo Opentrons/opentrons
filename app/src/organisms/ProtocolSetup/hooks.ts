@@ -1,3 +1,4 @@
+import { useContext, createContext } from 'react'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { checkModuleCompatibility } from '@opentrons/shared-data'
 import { useProtocolDetails } from '../RunDetails/hooks'
@@ -104,4 +105,16 @@ export function usePipetteMount(
         command.params.pipetteId === pipetteId
     )?.params.mount ?? null
   )
+}
+
+// this context is used to trigger an LPC success toast render from an LPC component lower in the tree
+export const LPCSuccessToastContext = createContext<{
+  setShowLPCSuccessToast: (val: boolean) => void
+}>({ setShowLPCSuccessToast: () => null })
+
+export function useLPCSuccessToast(): {
+  setShowLPCSuccessToast: (val: boolean) => void
+} {
+  const { setShowLPCSuccessToast } = useContext(LPCSuccessToastContext)
+  return { setShowLPCSuccessToast }
 }

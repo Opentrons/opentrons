@@ -23,7 +23,6 @@ import type { SavePositionCommandData } from './types'
 
 interface LabwarePositionCheckModalProps {
   onCloseClick: () => unknown
-  onLabwarePositionCheckComplete: () => void
 }
 export const LabwarePositionCheck = (
   props: LabwarePositionCheckModalProps
@@ -141,7 +140,6 @@ export const LabwarePositionCheck = (
       >
         <SummaryScreen
           savePositionCommandData={savePositionCommandData}
-          onLabwarePositionCheckComplete={props.onLabwarePositionCheckComplete}
           onCloseClick={props.onCloseClick}
         />
       </ModalPage>
