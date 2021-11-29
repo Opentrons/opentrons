@@ -1,7 +1,6 @@
 import * as React from 'react'
-import every from 'lodash/every'
 import { NavLink } from 'react-router-dom'
-import { useMissingModuleIds, useCurrentRunPipetteInfoByMount } from './hooks'
+import { useMissingModuleIds, useProtocolCalibrationStatus } from './hooks'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
@@ -16,20 +15,7 @@ export const ProceedToRunCta = (): JSX.Element | null => {
   const { t } = useTranslation('protocol_setup')
   const [targetProps, tooltipProps] = useHoverTooltip()
   const missingModuleIds = useMissingModuleIds()
-  const pipetteInfoByMount = useCurrentRunPipetteInfoByMount()
-  const isEverythingCalibrated = every(pipetteInfoByMount, pipetteInfo => {
-    if (pipetteInfo != null) {
-      return (
-        pipetteInfo.pipetteCalDate != null &&
-        pipetteInfo.tipRacksForPipette.every(
-          tipRackInfo => tipRackInfo.lastModifiedDate != null
-        )
-      )
-    } else {
-      // if no pipette requested on mount
-      return true
-    }
-  })
+  const isEverythingCalibrated = useProtocolCalibrationStatus().complete
   const calibrationIncomplete =
     missingModuleIds.length === 0 && !isEverythingCalibrated
   const moduleSetupIncomplete =
