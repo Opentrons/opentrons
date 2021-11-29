@@ -17,6 +17,7 @@ from ..types import (
     DeckSlotLocation,
     LabwareLocation,
     ModuleLocation,
+    ModuleModel,
 )
 from .labware import LabwareView
 from .pipettes import PipetteView, CurrentWell
@@ -115,6 +116,7 @@ class MotionView:
             well_location,
         )
         dest_cp = CriticalPoint.XY_CENTER if center_dest else None
+        extra_waypoints = []
 
         if (
             location is not None
@@ -127,16 +129,17 @@ class MotionView:
                 else MoveType.DIRECT
             )
             min_travel_z = self._geometry.get_labware_highest_z(labware_id)
+            if self._should_dodge_thermocycler(
+                    from_loc=self._labware.get_location(location.labware_id),
+                    to_loc=self._labware.get_location(labware_id)):
+                slot_5_center = self._labware.get_slot_position(
+                    slot=DeckSlotName.SLOT_5)
+                extra_waypoints = [(slot_5_center.x, slot_5_center.y)]
         else:
             move_type = MoveType.GENERAL_ARC
             min_travel_z = self._geometry.get_all_labware_highest_z()
-
-        extra_waypoints = []
-        from_loc = self._labware.get_location(location.labware_id)
-        to_loc = self._labware.get_location(labware_id)
-        if self._should_dodge_thermocycler(from_loc=from_loc, to_loc=to_loc):
-            slot_5_center = self._labware.get_slot_position(slot=DeckSlotName.SLOT_5)
-            extra_waypoints = [(slot_5_center.x, slot_5_center.y)]
+            # TODO (spp, 11-29-2021): Should log some kind of warning that pipettes
+            #  could crash onto the thermocycler
 
         try:
             # TODO(mc, 2021-01-08): inject `get_waypoints` via constructor
@@ -170,7 +173,8 @@ class MotionView:
                 slot_name = self._module.get_location(location.moduleId).slotName
             return slot_name
 
-        if any(self._module.get_all()):
+        if ModuleModel.THERMOCYCLER_MODULE_V1 in [mod.model
+                                                  for mod in self._module.get_all()]:
             transit = (get_slot_name(from_loc).value, get_slot_name(to_loc).value)
             if transit in BAD_PAIRS:
                 return True
