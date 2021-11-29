@@ -335,6 +335,7 @@ export function useLabwarePositionCheck(
       .then(response => {
         if (prevCommand.commandType !== 'pickUpTip') {
           const commandId = response.data.id
+          console.log('add spcd second', prevCommand.params.labwareId)
           addSavePositionCommandData(commandId, prevCommand.params.labwareId)
         }
         // later in the promise chain we may need to incorporate in flight offsets into
@@ -445,6 +446,7 @@ export function useLabwarePositionCheck(
             command: createCommandData(savePositionCommand),
           }).then(response => {
             const commandId = response.data.id
+            console.log('add spcd first', currentCommand.params.labwareId)
             addSavePositionCommandData(
               commandId,
               currentCommand.params.labwareId
@@ -524,6 +526,19 @@ export function useLabwarePositionCheck(
         const commandId = response.data.id
         setPendingMovementCommandData({
           commandId,
+        })
+        const savePositionCommand: SavePositionCommand = {
+          commandType: 'savePosition',
+          id: uuidv4(),
+          params: { pipetteId: currentCommand.params.pipetteId },
+        }
+        createCommand({
+          runId: currentRun?.data?.id as string,
+          command: createCommandData(savePositionCommand),
+        }).then(response => {
+          const commandId = response.data.id
+          console.log('add spcd begin', currentCommand.params.labwareId)
+          addSavePositionCommandData(commandId, currentCommand.params.labwareId)
         })
         setCurrentCommandIndex(currentCommandIndex + 1)
       })
