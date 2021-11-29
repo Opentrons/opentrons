@@ -330,12 +330,9 @@ export function useLabwarePositionCheck(
       runId: currentRun?.data?.id as string,
       command: createCommandData(savePositionCommand),
     })
-      // add the saved command id so we can use it to query locations later
-      // if the previous command was a pickup tip, we have already verified that labware's position
       .then(response => {
-        if (prevCommand.commandType !== 'pickUpTip') {
+        if (prevCommand.commandType === 'moveToWell') {
           const commandId = response.data.id
-          console.log('add spcd second', prevCommand.params.labwareId)
           addSavePositionCommandData(commandId, prevCommand.params.labwareId)
         }
         // later in the promise chain we may need to incorporate in flight offsets into
@@ -446,7 +443,6 @@ export function useLabwarePositionCheck(
             command: createCommandData(savePositionCommand),
           }).then(response => {
             const commandId = response.data.id
-            console.log('add spcd first', currentCommand.params.labwareId)
             addSavePositionCommandData(
               commandId,
               currentCommand.params.labwareId
@@ -537,7 +533,6 @@ export function useLabwarePositionCheck(
           command: createCommandData(savePositionCommand),
         }).then(response => {
           const commandId = response.data.id
-          console.log('add spcd begin', currentCommand.params.labwareId)
           addSavePositionCommandData(commandId, currentCommand.params.labwareId)
         })
         setCurrentCommandIndex(currentCommandIndex + 1)

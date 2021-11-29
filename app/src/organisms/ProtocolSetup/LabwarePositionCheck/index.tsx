@@ -19,7 +19,6 @@ import { ConfirmPickUpTipModal } from './ConfirmPickUpTipModal'
 import { ExitPreventionModal } from './ExitPreventionModal'
 
 import styles from '../styles.css'
-import type { SavePositionCommandData } from './types'
 
 interface LabwarePositionCheckModalProps {
   onCloseClick: () => unknown
@@ -30,18 +29,28 @@ export const LabwarePositionCheck = (
 ): JSX.Element | null => {
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const restartRun = useRestartRun()
-  const [savePositionCommandData, savePositionCommandDataDispatch] = React.useReducer((state: {[labwareId: string]: string[]}, action: {labwareId: string, commandId: string}) => {
-    const {labwareId, commandId} = action
-    const nextCommandList = state[labwareId] != null
-        ? // if there are already two command ids, overwrite the second one with the new one coming in
-          // this is used when there is an unsuccessful pick up tip, and additional pick up tip attempts occur
-          [state[labwareId][0], commandId]
-        : [commandId]
-    return {
-      ...state,
-      [labwareId]: nextCommandList
-    }
-  }, {})
+  const [
+    savePositionCommandData,
+    savePositionCommandDataDispatch,
+  ] = React.useReducer(
+    (
+      state: { [labwareId: string]: string[] },
+      action: { labwareId: string; commandId: string }
+    ) => {
+      const { labwareId, commandId } = action
+      const nextCommandList =
+        state[labwareId] != null
+          ? // if there are already two command ids, overwrite the second one with the new one coming in
+            // this is used when there is an unsuccessful pick up tip, and additional pick up tip attempts occur
+            [state[labwareId][0], commandId]
+          : [commandId]
+      return {
+        ...state,
+        [labwareId]: nextCommandList,
+      }
+    },
+    {}
+  )
   const [isRestartingRun, setIsRestartingRun] = React.useState<boolean>(false)
   const {
     confirm: confirmExitLPC,
@@ -54,8 +63,7 @@ export const LabwarePositionCheck = (
     commandId: string,
     labwareId: string
   ): void => {
-    console.log('save positionc ommand data ' , savePositionCommandData, labwareId, commandId)
-    savePositionCommandDataDispatch({labwareId, commandId})
+    savePositionCommandDataDispatch({ labwareId, commandId })
   }
   const labwarePositionCheckUtils = useLabwarePositionCheck(
     addSavePositionCommandData,
