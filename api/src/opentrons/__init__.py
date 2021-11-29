@@ -5,7 +5,7 @@ from pathlib import Path
 import logging
 import asyncio
 import re
-from typing import Any, List, Tuple, cast
+from typing import Any, List, Tuple
 
 from opentrons.drivers.serial_communication import get_ports_by_name
 from opentrons.hardware_control import API, ThreadManager
@@ -144,13 +144,7 @@ async def initialize() -> API:
     log.info(f"API server version: {__version__}")
     log.info(f"Robot Name: {name()}")
 
-    use_thread_manager = ff.enable_protocol_engine() is False
-
-    if use_thread_manager:
-        thread_manager = await _create_thread_manager()
-        hardware = cast(API, thread_manager)
-    else:
-        hardware = await _create_hardware_api()
+    hardware = await _create_hardware_api()
 
     async def _blink() -> None:
         while True:
