@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from typing import List, Optional
 
-from opentrons.types import MountType, Point
+from opentrons.types import MountType, Point, DeckSlotName
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.motion_planning import (
     MoveType,
@@ -12,10 +12,34 @@ from opentrons.motion_planning import (
 )
 
 from .. import errors
-from ..types import WellLocation
+from ..types import (
+    WellLocation,
+    DeckSlotLocation,
+    LabwareLocation,
+    ModuleLocation,
+)
 from .labware import LabwareView
 from .pipettes import PipetteView, CurrentWell
 from .geometry import GeometryView
+from .modules import ModuleView
+
+
+BAD_PAIRS = [
+    ("1", "12"),
+    ("12", "1"),
+    ("4", "12"),
+    ("12", "4"),
+    ("4", "9"),
+    ("9", "4"),
+    ("4", "8"),
+    ("8", "4"),
+    ("1", "8"),
+    ("8", "1"),
+    ("4", "11"),
+    ("11", "4"),
+    ("1", "11"),
+    ("11", "1"),
+]
 
 
 @dataclass(frozen=True)
@@ -34,11 +58,13 @@ class MotionView:
         labware_view: LabwareView,
         pipette_view: PipetteView,
         geometry_view: GeometryView,
+        module_view: ModuleView,
     ) -> None:
         """Initialize a MotionState instance."""
         self._labware = labware_view
         self._pipettes = pipette_view
         self._geometry = geometry_view
+        self._module = module_view
 
     def get_pipette_location(
         self,
@@ -105,6 +131,13 @@ class MotionView:
             move_type = MoveType.GENERAL_ARC
             min_travel_z = self._geometry.get_all_labware_highest_z()
 
+        extra_waypoints = []
+        from_loc = self._labware.get_location(location.labware_id)
+        to_loc = self._labware.get_location(labware_id)
+        if self._should_dodge_thermocycler(from_loc=from_loc, to_loc=to_loc):
+            slot_5_center = self._labware.get_slot_position(slot=DeckSlotName.SLOT_5)
+            extra_waypoints = [(slot_5_center.x, slot_5_center.y)]
+
         try:
             # TODO(mc, 2021-01-08): inject `get_waypoints` via constructor
             return get_waypoints(
@@ -115,7 +148,30 @@ class MotionView:
                 dest_cp=dest_cp,
                 min_travel_z=min_travel_z,
                 max_travel_z=max_travel_z,
-                xy_waypoints=[],
+                xy_waypoints=extra_waypoints,
             )
         except MotionPlanningError as error:
             raise errors.FailedToPlanMoveError(str(error))
+
+    def _should_dodge_thermocycler(
+        self, from_loc: LabwareLocation, to_loc: LabwareLocation
+    ) -> bool:
+        """
+        Decide if the requested path would cross the thermocycler, if installed.
+
+        Returns True if we need to dodge, False otherwise
+        """
+
+        def get_slot_name(location: LabwareLocation) -> DeckSlotName:
+            slot_name: DeckSlotName
+            if isinstance(location, DeckSlotLocation):
+                slot_name = location.slotName
+            else:
+                slot_name = self._module.get_location(location.moduleId).slotName
+            return slot_name
+
+        if any(self._module.get_all()):
+            transit = (get_slot_name(from_loc).value, get_slot_name(to_loc).value)
+            if transit in BAD_PAIRS:
+                return True
+        return False

@@ -197,6 +197,7 @@ class StateStore(StateView, ActionHandler):
             labware_view=self._labware,
             pipette_view=self._pipettes,
             geometry_view=self._geometry,
+            module_view=self._modules,
         )
 
     def _update_state_views(self) -> None:

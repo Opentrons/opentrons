@@ -21,6 +21,13 @@ from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.pipettes import PipetteView, CurrentWell
 from opentrons.protocol_engine.state.geometry import GeometryView
 from opentrons.protocol_engine.state.motion import MotionView
+from opentrons.protocol_engine.state.modules import ModuleView
+
+
+@pytest.fixture
+def module_view(decoy: Decoy) -> ModuleView:
+    """Get a mock in the shape of a GeometryView."""
+    return decoy.mock(cls=ModuleView)
 
 
 @pytest.fixture
@@ -28,12 +35,14 @@ def subject(
     labware_view: LabwareView,
     pipette_view: PipetteView,
     geometry_view: GeometryView,
+    module_view: ModuleView,
 ) -> MotionView:
     """Get a MotionView with its dependencies mocked out."""
     return MotionView(
         labware_view=labware_view,
         pipette_view=pipette_view,
         geometry_view=geometry_view,
+        module_view=module_view,
     )
 
 
