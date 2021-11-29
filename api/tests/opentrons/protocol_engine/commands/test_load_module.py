@@ -4,7 +4,7 @@ from decoy import Decoy
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
-    ModuleModels,
+    ModuleModel,
     ModuleDefinition,
 )
 from opentrons.protocol_engine.execution import (
@@ -39,14 +39,14 @@ async def test_load_module_implementation(
     )
 
     data = LoadModuleParams(
-        model=ModuleModels.TEMPERATURE_MODULE_V1,
+        model=ModuleModel.TEMPERATURE_MODULE_V1,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         moduleId="some-id",
     )
 
     decoy.when(
         await equipment.load_module(
-            model=ModuleModels.TEMPERATURE_MODULE_V1,
+            model=ModuleModel.TEMPERATURE_MODULE_V1,
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             module_id="some-id",
         )

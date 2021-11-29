@@ -11,7 +11,7 @@ from opentrons.protocol_engine import (
     LabwareOffset,
     LabwareOffsetVector,
     LabwareOffsetLocation,
-    ModuleModels,
+    ModuleModel,
 )
 from opentrons.protocol_engine.state import LabwareView
 from opentrons.protocol_runner.legacy_labware_offset_provider import (
@@ -41,7 +41,7 @@ def test_find_something(
             definition_uri="some_namespace/some_load_name/123",
             location=LabwareOffsetLocation(
                 slotName=DeckSlotName.SLOT_1,
-                moduleModel=ModuleModels.TEMPERATURE_MODULE_V1,
+                moduleModel=ModuleModel.TEMPERATURE_MODULE_V1,
             ),
         )
     ).then_return(
@@ -76,7 +76,7 @@ def test_find_nothing(
         definition_uri="some_namespace/some_load_name/123",
         location=LabwareOffsetLocation(
             slotName=DeckSlotName.SLOT_1,
-            moduleModel=ModuleModels.TEMPERATURE_MODULE_V1,
+            moduleModel=ModuleModel.TEMPERATURE_MODULE_V1,
         ),
     )
 

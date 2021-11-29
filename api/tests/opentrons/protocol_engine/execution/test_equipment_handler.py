@@ -25,7 +25,7 @@ from opentrons.protocol_engine.types import (
     LabwareOffset,
     LabwareOffsetVector,
     LabwareOffsetLocation,
-    ModuleModels,
+    ModuleModel,
     ModuleDefinition,
 )
 
@@ -271,7 +271,7 @@ async def test_load_labware_on_module(
     decoy.when(state_store.modules.get("module-id")).then_return(
         LoadedModule(
             id="module-id",
-            model=ModuleModels.THERMOCYCLER_MODULE_V1,
+            model=ModuleModel.THERMOCYCLER_MODULE_V1,
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
             serial="module-serial",
             definition=tempdeck_v1_def,
@@ -283,7 +283,7 @@ async def test_load_labware_on_module(
             definition_uri="opentrons-test/load-name/1",
             location=LabwareOffsetLocation(
                 slotName=DeckSlotName.SLOT_3,
-                moduleModel=ModuleModels.THERMOCYCLER_MODULE_V1,
+                moduleModel=ModuleModel.THERMOCYCLER_MODULE_V1,
             ),
         )
     ).then_return(
@@ -293,7 +293,7 @@ async def test_load_labware_on_module(
             definitionUri="opentrons-test/load-name/1",
             location=LabwareOffsetLocation(
                 slotName=DeckSlotName.SLOT_3,
-                moduleModel=ModuleModels.THERMOCYCLER_MODULE_V1,
+                moduleModel=ModuleModel.THERMOCYCLER_MODULE_V1,
             ),
             vector=LabwareOffsetVector(x=1, y=2, z=3),
         )
@@ -428,11 +428,11 @@ async def test_load_module(
     """It should load a module, returning its ID, serial & definition in result."""
     decoy.when(model_utils.generate_id()).then_return("unique-id")
     decoy.when(
-        state_store.modules.get_definition_by_model(ModuleModels.TEMPERATURE_MODULE_V1)
+        state_store.modules.get_definition_by_model(ModuleModel.TEMPERATURE_MODULE_V1)
     ).then_raise(ModuleDefinitionDoesNotExistError("oh no"))
 
     decoy.when(
-        module_data_provider.get_module_definition(ModuleModels.TEMPERATURE_MODULE_V1)
+        module_data_provider.get_module_definition(ModuleModel.TEMPERATURE_MODULE_V1)
     ).then_return(tempdeck_v1_def)
 
     decoy.when(
@@ -448,7 +448,7 @@ async def test_load_module(
         definition=tempdeck_v1_def,
     )
     result = await subject.load_module(
-        model=ModuleModels.TEMPERATURE_MODULE_V1,
+        model=ModuleModel.TEMPERATURE_MODULE_V1,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         module_id=None,
     )
@@ -471,6 +471,6 @@ async def test_get_hardware_module(
     ).then_return(([], simulating_module_fixture))
 
     assert (
-        await subject._get_hardware_module(ModuleModels.TEMPERATURE_MODULE_V1)
+        await subject._get_hardware_module(ModuleModel.TEMPERATURE_MODULE_V1)
         == simulating_module_fixture
     )

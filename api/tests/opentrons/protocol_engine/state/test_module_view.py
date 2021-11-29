@@ -8,14 +8,14 @@ from opentrons.protocol_engine.types import (
     LoadedModule,
     DeckSlotLocation,
     ModuleDefinition,
-    ModuleModels,
+    ModuleModel,
 )
 from opentrons.protocol_engine.state.modules import ModuleView, ModuleState
 
 
 def get_module_view(
     modules_by_id: Optional[Dict[str, LoadedModule]] = None,
-    definition_by_model: Optional[Dict[ModuleModels, ModuleDefinition]] = None,
+    definition_by_model: Optional[Dict[ModuleModel, ModuleDefinition]] = None,
 ) -> ModuleView:
     """Get a module view test subject with the specified state."""
     state = ModuleState(
@@ -36,7 +36,7 @@ def test_get_module_data(tempdeck_v1_def: ModuleDefinition) -> None:
     """It should get module data from state by ID."""
     module_data = LoadedModule(
         id="module-id",
-        model=ModuleModels.THERMOCYCLER_MODULE_V1,
+        model=ModuleModel.THERMOCYCLER_MODULE_V1,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         serial="module-serial",
         definition=tempdeck_v1_def,
@@ -50,14 +50,14 @@ def test_get_all_modules(tempdeck_v1_def: ModuleDefinition) -> None:
     """It should return all modules in state."""
     module1 = LoadedModule(
         id="module-1",
-        model=ModuleModels.TEMPERATURE_MODULE_V1,
+        model=ModuleModel.TEMPERATURE_MODULE_V1,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         serial="serial-1",
         definition=tempdeck_v1_def,
     )
     module2 = LoadedModule(
         id="module-2",
-        model=ModuleModels.MAGNETIC_MODULE_V1,
+        model=ModuleModel.MAGNETIC_MODULE_V1,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
         serial="serial-2",
         definition=tempdeck_v1_def,
@@ -70,7 +70,7 @@ def test_get_definition_by_id(tempdeck_v1_def: ModuleDefinition) -> None:
     """It should return a loaded module's definition by ID."""
     module_data = LoadedModule(
         id="module-id",
-        model=ModuleModels.TEMPERATURE_MODULE_V2,
+        model=ModuleModel.TEMPERATURE_MODULE_V2,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         serial="module-serial",
         definition=tempdeck_v1_def,
@@ -82,10 +82,10 @@ def test_get_definition_by_id(tempdeck_v1_def: ModuleDefinition) -> None:
 def test_get_definition_by_model(tempdeck_v1_def: ModuleDefinition) -> None:
     """It should return the cached definition of a specific module model."""
     subject = get_module_view(
-        definition_by_model={ModuleModels.TEMPERATURE_MODULE_V1: tempdeck_v1_def}
+        definition_by_model={ModuleModel.TEMPERATURE_MODULE_V1: tempdeck_v1_def}
     )
     assert (
-        subject.get_definition_by_model(ModuleModels.TEMPERATURE_MODULE_V1)
+        subject.get_definition_by_model(ModuleModel.TEMPERATURE_MODULE_V1)
         == tempdeck_v1_def
     )
 
@@ -93,24 +93,24 @@ def test_get_definition_by_model(tempdeck_v1_def: ModuleDefinition) -> None:
 def test_raise_error_if_no_definition(tempdeck_v1_def: ModuleDefinition) -> None:
     """It should raise if definition for given model not found."""
     subject = get_module_view(
-        definition_by_model={ModuleModels.TEMPERATURE_MODULE_V1: tempdeck_v1_def}
+        definition_by_model={ModuleModel.TEMPERATURE_MODULE_V1: tempdeck_v1_def}
     )
     with pytest.raises(errors.ModuleDefinitionDoesNotExistError):
-        subject.get_definition_by_model(ModuleModels.MAGNETIC_MODULE_V2)
+        subject.get_definition_by_model(ModuleModel.MAGNETIC_MODULE_V2)
 
 
 def test_get_module_by_serial(tempdeck_v1_def: ModuleDefinition) -> None:
     """It should get a particular loaded module for a given module serial number."""
     module1 = LoadedModule(
         id="module-1",
-        model=ModuleModels.TEMPERATURE_MODULE_V2,
+        model=ModuleModel.TEMPERATURE_MODULE_V2,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         serial="serial-1",
         definition=tempdeck_v1_def,
     )
     module2 = LoadedModule(
         id="module-2",
-        model=ModuleModels.MAGNETIC_MODULE_V2,
+        model=ModuleModel.MAGNETIC_MODULE_V2,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
         serial="serial-2",
         definition=tempdeck_v1_def,
@@ -124,7 +124,7 @@ def test_get_location(tempdeck_v1_def: ModuleDefinition) -> None:
     module_id = "unique-id"
     module = LoadedModule(
         id=module_id,
-        model=ModuleModels.MAGNETIC_MODULE_V2,
+        model=ModuleModel.MAGNETIC_MODULE_V2,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
         serial="serial-1",
         definition=tempdeck_v1_def,
@@ -140,7 +140,7 @@ def test_get_dimensions(tempdeck_v1_def: ModuleDefinition) -> None:
     module_id = "unique-id"
     module = LoadedModule(
         id=module_id,
-        model=ModuleModels.MAGNETIC_MODULE_V2,
+        model=ModuleModel.MAGNETIC_MODULE_V2,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
         serial="serial-1",
         definition=tempdeck_v1_def,

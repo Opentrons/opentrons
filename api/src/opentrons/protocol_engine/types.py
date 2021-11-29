@@ -126,8 +126,7 @@ class MotorAxis(str, Enum):
     RIGHT_PLUNGER = "rightPlunger"
 
 
-# TODO(mc, 2021-11-24): s/ModuleModels/ModuleModel/
-class ModuleModels(str, Enum):
+class ModuleModel(str, Enum):
     """All available modules' models."""
 
     TEMPERATURE_MODULE_V1 = "temperatureModuleV1"
@@ -189,7 +188,7 @@ class LoadedModule(BaseModel):
     """A module that has been loaded."""
 
     id: str
-    model: ModuleModels
+    model: ModuleModel
     location: DeckSlotLocation
     definition: ModuleDefinition
     # TODO(mc, 2021-11-24): make serial non-optional
@@ -203,7 +202,7 @@ class LabwareOffsetLocation(BaseModel):
         ...,
         description="The deck slot the offset applies to",
     )
-    moduleModel: Optional[ModuleModels] = Field(
+    moduleModel: Optional[ModuleModel] = Field(
         None,
         description="The module model the labware will be loaded onto, if applicable",
     )

@@ -39,12 +39,12 @@ class LegacyContextCommandError(ProtocolEngineError):
     """An error returned when a PAPIv2 ProtocolContext command fails."""
 
 
-LEGACY_TO_PE_MODULE: Dict[LegacyModuleModel, pe_types.ModuleModels] = {
-    LegacyMagneticModuleModel.MAGNETIC_V1: pe_types.ModuleModels.MAGNETIC_MODULE_V1,
-    LegacyMagneticModuleModel.MAGNETIC_V2: pe_types.ModuleModels.MAGNETIC_MODULE_V2,
-    LegacyTemperatureModuleModel.TEMPERATURE_V1: pe_types.ModuleModels.TEMPERATURE_MODULE_V1,  # noqa: E501
-    LegacyTemperatureModuleModel.TEMPERATURE_V2: pe_types.ModuleModels.TEMPERATURE_MODULE_V2,  # noqa: E501
-    LegacyThermocyclerModuleModel.THERMOCYCLER_V1: pe_types.ModuleModels.THERMOCYCLER_MODULE_V1,  # noqa: E501
+LEGACY_TO_PE_MODULE: Dict[LegacyModuleModel, pe_types.ModuleModel] = {
+    LegacyMagneticModuleModel.MAGNETIC_V1: pe_types.ModuleModel.MAGNETIC_MODULE_V1,
+    LegacyMagneticModuleModel.MAGNETIC_V2: pe_types.ModuleModel.MAGNETIC_MODULE_V2,
+    LegacyTemperatureModuleModel.TEMPERATURE_V1: pe_types.ModuleModel.TEMPERATURE_MODULE_V1,  # noqa: E501
+    LegacyTemperatureModuleModel.TEMPERATURE_V2: pe_types.ModuleModel.TEMPERATURE_MODULE_V2,  # noqa: E501
+    LegacyThermocyclerModuleModel.THERMOCYCLER_V1: pe_types.ModuleModel.THERMOCYCLER_MODULE_V1,  # noqa: E501
 }
 
 
@@ -65,7 +65,7 @@ class LegacyCommandMapper:
         self._module_id_by_slot: Dict[DeckSlotName, str] = {}
         self._module_data_provider = module_data_provider or ModuleDataProvider()
         self._module_definition_by_model: Dict[
-            pe_types.ModuleModels, pe_types.ModuleDefinition
+            pe_types.ModuleModel, pe_types.ModuleDefinition
         ] = {}
 
     def map_command(
