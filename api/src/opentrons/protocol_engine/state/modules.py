@@ -5,7 +5,7 @@ from numpy import array, dot
 
 from ..types import (
     LoadedModule,
-    ModuleModels,
+    ModuleModel,
     ModuleDefinition,
     DeckSlotLocation,
     ModuleDimensions,
@@ -25,7 +25,7 @@ class ModuleState:
 
     # TODO (spp, 2021-11-24): remove definition_by_model and
     #  unconditionally fetch definitions from ModuleDataProvider
-    definition_by_model: Dict[ModuleModels, ModuleDefinition]
+    definition_by_model: Dict[ModuleModel, ModuleDefinition]
 
 
 class ModuleStore(HasState[ModuleState], HandlesActions):
@@ -95,7 +95,7 @@ class ModuleView(HasState[ModuleState]):
         """Module definition by ID."""
         return self.get(module_id).definition
 
-    def get_definition_by_model(self, model: ModuleModels) -> ModuleDefinition:
+    def get_definition_by_model(self, model: ModuleModel) -> ModuleDefinition:
         """Return module definition by model."""
         try:
             return self._state.definition_by_model[model]

@@ -5,7 +5,7 @@ from typing_extensions import Literal
 from pydantic import BaseModel, Field
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
-from ..types import DeckSlotLocation, ModuleModels, ModuleDefinition
+from ..types import DeckSlotLocation, ModuleModel, ModuleDefinition
 
 
 LoadModuleCommandType = Literal["loadModule"]
@@ -14,9 +14,8 @@ LoadModuleCommandType = Literal["loadModule"]
 class LoadModuleParams(BaseModel):
     """Payload required to load a module."""
 
-    model: ModuleModels = Field(
+    model: ModuleModel = Field(
         ...,
-        example="magneticModuleV1",
         description=(
             "The model name of the module to load."
             "\n\n"

@@ -11,7 +11,7 @@ from opentrons.protocol_api.labware_offset_provider import (
     AbstractLabwareOffsetProvider as AbstractLegacyLabwareOffsetProvider,
 )
 
-from opentrons.protocol_engine import LabwareOffsetLocation, ModuleModels
+from opentrons.protocol_engine import LabwareOffsetLocation, ModuleModel
 from opentrons.protocol_engine.state import LabwareView
 
 
@@ -34,7 +34,7 @@ class LegacyLabwareOffsetProvider(AbstractLegacyLabwareOffsetProvider):
             location=LabwareOffsetLocation(
                 slotName=deck_slot,
                 moduleModel=(
-                    None if module_model is None else ModuleModels(module_model)
+                    None if module_model is None else ModuleModel(module_model)
                 ),
             ),
         )

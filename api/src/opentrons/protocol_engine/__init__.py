@@ -28,7 +28,7 @@ from .types import (
     WellLocation,
     WellOrigin,
     WellOffset,
-    ModuleModels,
+    ModuleModel,
     ModuleDefinition,
 )
 
@@ -63,7 +63,7 @@ __all__ = [
     "WellLocation",
     "WellOrigin",
     "WellOffset",
-    "ModuleModels",
+    "ModuleModel",
     "ModuleDefinition",
     # plugins
     "AbstractPlugin",
