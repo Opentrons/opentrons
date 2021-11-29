@@ -1,41 +1,7 @@
-@import '..';
+@import '@opentrons/components';
 
-:root {
-  --list-padding-large: 1rem;
-  --list-padding-small: 0.75rem;
-
-  --list-disabled: {
-    color: var(--c-font-disabled);
-    outline-color: #eee;
-    fill: var(--c-font-disabled);
-    background-color: transparent;
-  }
-}
-
-.clickable {
-  @apply --clickable;
-}
-
-.disabled {
-  background-color: transparent;
-
-  & * {
-    @apply --list-disabled;
-  }
-}
-
-.panel_group,
-.titled_list,
-.list_item {
+.titled_list {
   background-color: white;
-}
-
-.panel_group {
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.33);
-}
-
-.hover_border {
-  outline: var(--bd-width-default) solid var(--c-highlight);
 }
 
 .header_text {
@@ -87,14 +53,6 @@
   text-transform: uppercase;
 }
 
-.title_enabled {
-  color: var(--c-font-dark);
-}
-
-.title_disabled {
-  color: var(--c-font-disabled);
-}
-
 .title_bar_icon {
   color: var(--c-font-dark);
   height: 1.5rem;
@@ -125,49 +83,4 @@
   &:hover {
     background-color: color-mod(var(--c-black) alpha(5%));
   }
-}
-
-.list {
-  list-style-type: none;
-  padding-left: 0;
-  margin: 0;
-}
-
-.list_item {
-  @apply --font-body-1-dark;
-
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  width: 100%;
-  line-height: 1.25;
-  margin: 0;
-  padding: var(--list-padding-small);
-
-  &:hover {
-    background-color: var(--c-bg-hover);
-  }
-
-  &.active {
-    background-color: var(--c-bg-selected);
-  }
-}
-
-a.list_item {
-  text-decoration: none;
-}
-
-.list_alert {
-  @apply --font-body-1-dark;
-
-  width: 100%;
-  padding: var(--list-padding-small);
-  background-color: var(--c-bg-light);
-  font-style: italic;
-}
-
-.item_icon {
-  flex: none;
-  height: calc(1.25 * var(--fs-body-1));
-  margin-right: 0.5rem;
 }
