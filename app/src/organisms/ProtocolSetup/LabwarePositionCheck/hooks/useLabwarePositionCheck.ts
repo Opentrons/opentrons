@@ -37,6 +37,7 @@ import type {
 } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { SetupCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import type { DropTipCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+import type { SavePositionCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
 import type {
   Axis,
   Jog,
@@ -193,9 +194,6 @@ export function useLabwarePositionCheck(
     setPendingMovementCommandData,
   ] = React.useState<{
     commandId: string
-    pipetteId: string
-    labwareId: string
-    commandType: LabwarePositionCheckMovementCommand['commandType']
   } | null>(null)
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const [error, setError] = React.useState<Error | null>(null)
@@ -312,33 +310,6 @@ export function useLabwarePositionCheck(
           `movement command id ${completedMovementCommand.id} failed on the robot`
         )
       )
-    } // if the command was a pick up tip/drop tip, we dont need to log it's position
-    else if (
-      pendingMovementCommandData.commandType !== 'pickUpTip' &&
-      pendingMovementCommandData.commandType !== 'dropTip'
-    ) {
-      // the movement command is complete, save its position for use later
-      const savePositionCommand: Command = {
-        commandType: 'savePosition',
-        id: uuidv4(),
-        params: { pipetteId: pendingMovementCommandData.pipetteId },
-      }
-      createCommand({
-        runId: currentRun?.data?.id as string,
-        command: createCommandData(savePositionCommand),
-      })
-        .then(response => {
-          const commandId = response.data.id
-          addSavePositionCommandData(
-            commandId,
-            pendingMovementCommandData.labwareId
-          )
-        })
-        .catch((e: Error) => {
-          console.error(`error issuing command to robot: ${e.message}`)
-          setIsLoading(false)
-          setError(e)
-        })
     }
     setIsLoading(false)
     setPendingMovementCommandData(null)
@@ -459,16 +430,27 @@ export function useLabwarePositionCheck(
         }
       )
       .then(response => {
-        const commandId = response.data.id
-        const pipetteId = currentCommand.params.pipetteId
-        const labwareId: string = currentCommand.params.labwareId
-        const commandType = currentCommand.commandType
         setPendingMovementCommandData({
-          commandId,
-          pipetteId,
-          labwareId,
-          commandType,
+          commandId: response.data.id,
         })
+        // if the command is a movement command, save it's location after it completes
+        if (currentCommand.commandType === 'moveToWell') {
+          const savePositionCommand: SavePositionCommand = {
+            commandType: 'savePosition',
+            id: uuidv4(),
+            params: { pipetteId: currentCommand.params.pipetteId },
+          }
+          createCommand({
+            runId: currentRun?.data?.id as string,
+            command: createCommandData(savePositionCommand),
+          }).then(response => {
+            const commandId = response.data.id
+            addSavePositionCommandData(
+              commandId,
+              currentCommand.params.labwareId
+            )
+          })
+        }
         setCurrentCommandIndex(currentCommandIndex + 1)
       })
       .catch((e: Error) => {
@@ -542,9 +524,6 @@ export function useLabwarePositionCheck(
         const commandId = response.data.id
         setPendingMovementCommandData({
           commandId,
-          labwareId: currentCommand.params.labwareId,
-          pipetteId: currentCommand.params.pipetteId,
-          commandType: currentCommand.commandType,
         })
         setCurrentCommandIndex(currentCommandIndex + 1)
       })
@@ -589,9 +568,6 @@ export function useLabwarePositionCheck(
         const commandId = response.data.id
         setPendingMovementCommandData({
           commandId,
-          pipetteId,
-          labwareId,
-          commandType,
         })
         // decrement current command index so that the state resets
         setCurrentCommandIndex(currentCommandIndex - 1)
