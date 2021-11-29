@@ -104,7 +104,7 @@ export const SummaryScreen = (props: {
           id={'Lpc_summaryScreen_applyOffsetButton'}
           onClick={() => {
             applyLabwareOffsets()
-            setShowLPCSuccessToast(true)
+            setShowLPCSuccessToast()
             props.onCloseClick()
           }}
         >

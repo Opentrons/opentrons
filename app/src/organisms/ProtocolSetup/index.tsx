@@ -88,7 +88,7 @@ export function ProtocolSetup(): JSX.Element {
         <MetadataCard />
         <LPCSuccessToastContext.Provider
           value={{
-            setShowLPCSuccessToast,
+            setShowLPCSuccessToast: () => setShowLPCSuccessToast(true),
           }}
         >
           <RunSetupCard />
