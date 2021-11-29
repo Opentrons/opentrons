@@ -22,5 +22,12 @@
   "success_banner": "{{robot}} successfully connected",
   "title": "connectivity",
   "wired": "wired",
-  "wireless": "wireless"
+  "wireless": "wireless",
+  "unresponsive_title": "Unable to establish connection with robot",
+  "health_status_ok": "responding to requests",
+  "health_status_not_ok": "not responding correctly to requests",
+  "health_status_unreachable": "unreachable",
+  "server_message": "<block>Your OT-2's API server is {{status}} at IP address {{ip}}.</block><block>We recommend the following troubleshooting steps:</block><ol><li>Power-cycle your robot</li><li>If power-cycling does not work, please update your robot's software  <br />(Note: your robot's update server is still responding and should accept an update.)</li></ol>",
+  "no_server_message": "<block>This OT-2 has been seen recently, but it is currently {{status}} at IP address {{ip}}.</block><block>We recommend power-cycling your robot.</block>",
+  "last_resort": "If your robot remains unresponsive, please reach out to our Support team."
 }

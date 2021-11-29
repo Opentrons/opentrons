@@ -4,7 +4,7 @@ from contextlib import contextmanager
 from typing import Any, Callable, Iterator, Optional, TypeVar, cast
 
 from opentrons.broker import Broker
-from opentrons.config import feature_flags
+
 from .types import (
     COMMAND as COMMAND_TOPIC,
     Command as CommandPayload,
@@ -103,16 +103,14 @@ def publish_context(broker: Broker, command: CommandPayload) -> Iterator[None]:
     """Publish messages before and after the `with` block has run.
 
     If an `error` is raised in the `with` block, it will be published in the "after"
-    message (if the ProtocolEngine is enabled) and re-raised.
+    message and re-raised.
     """
-    capture_errors = feature_flags.enable_protocol_engine()
-
     _do_publish(broker=broker, command=command, when="before")
+
     try:
         yield
     except Exception as error:
-        if capture_errors:
-            _do_publish(broker=broker, command=command, when="after", error=error)
+        _do_publish(broker=broker, command=command, when="after", error=error)
         raise
     else:
         _do_publish(broker=broker, command=command, when="after")

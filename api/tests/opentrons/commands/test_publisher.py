@@ -3,8 +3,7 @@ from __future__ import annotations
 
 import pytest
 from decoy import Decoy, matchers
-from typing import Any, Dict, AsyncIterator, cast
-from opentrons.config import advanced_settings
+from typing import Any, Dict, cast
 from opentrons.broker import Broker
 from opentrons.commands.types import Command as CommandDict
 from opentrons.commands.publisher import CommandPublisher, publish, publish_context
@@ -14,22 +13,6 @@ from opentrons.commands.publisher import CommandPublisher, publish, publish_cont
 def broker(decoy: Decoy) -> Broker:
     """Return a mocked out Broker."""
     return decoy.mock(cls=Broker)
-
-
-@pytest.fixture
-def engine_is_enabled() -> bool:
-    return True
-
-
-@pytest.fixture
-async def enable_protocol_engine(engine_is_enabled: bool) -> AsyncIterator[None]:
-    """Temporarily set the enableProtocolEngine feature flag."""
-    prev_setting = advanced_settings.get_adv_setting("enableProtocolEngine")
-    prev_value = prev_setting.value if prev_setting is not None else False
-
-    await advanced_settings.set_adv_setting("enableProtocolEngine", engine_is_enabled)
-    yield
-    await advanced_settings.set_adv_setting("enableProtocolEngine", prev_value)
 
 
 def test_publish_decorator(decoy: Decoy, broker: Broker) -> None:
@@ -114,11 +97,7 @@ def test_publish_decorator_with_arg_defaults(decoy: Decoy, broker: Broker) -> No
     )
 
 
-def test_publish_decorator_with_error(
-    decoy: Decoy,
-    broker: Broker,
-    enable_protocol_engine: None,
-) -> None:
+def test_publish_decorator_with_error(decoy: Decoy, broker: Broker) -> None:
     """It should capture an exception and place it in the "after" message."""
 
     def _get_command_payload(foo: str, bar: int) -> Dict[str, Any]:
@@ -153,33 +132,6 @@ def test_publish_decorator_with_error(
                 "error": matchers.IsA(RuntimeError),
             },
         ),
-    )
-
-
-@pytest.mark.parametrize("engine_is_enabled", [False])
-def test_publish_decorator_with_error_no_engine(
-    decoy: Decoy,
-    broker: Broker,
-    enable_protocol_engine: None,
-) -> None:
-    """It should not capture errors if engine FF is off."""
-
-    def _get_command_payload(foo: str, bar: int) -> Dict[str, Any]:
-        return {"name": "some_command", "payload": {"foo": foo, "bar": bar}}
-
-    class _Subject(CommandPublisher):
-        @publish(command=_get_command_payload)  # type: ignore[arg-type]
-        def act(self, foo: str, bar: int) -> None:
-            raise RuntimeError("oh no")
-
-    subject = _Subject(broker=broker)
-
-    with pytest.raises(RuntimeError, match="oh no"):
-        subject.act("hello", 42)
-
-    decoy.verify(
-        broker.publish(topic="command", message=matchers.DictMatching({"$": "after"})),
-        times=0,
     )
 
 
@@ -264,11 +216,7 @@ def test_publish_context(decoy: Decoy, broker: Broker) -> None:
     )
 
 
-def test_publish_context_with_error(
-    decoy: Decoy,
-    broker: Broker,
-    enable_protocol_engine: None,
-) -> None:
+def test_publish_context_with_error(decoy: Decoy, broker: Broker) -> None:
     command = cast(
         CommandDict,
         {"name": "some_command", "payload": {"foo": "hello", "bar": 42}},
@@ -300,29 +248,4 @@ def test_publish_context_with_error(
                 "error": matchers.IsA(RuntimeError),
             },
         ),
-    )
-
-
-@pytest.mark.parametrize("engine_is_enabled", [False])
-def test_publish_context_with_error_no_engine(
-    decoy: Decoy,
-    broker: Broker,
-    enable_protocol_engine: None,
-) -> None:
-    """It should not capture errors if the engine FF is off."""
-    command = cast(
-        CommandDict,
-        {"name": "some_command", "payload": {"foo": "hello", "bar": 42}},
-    )
-
-    def _published_func(foo: str, bar: int) -> None:
-        raise RuntimeError("oh no")
-
-    with pytest.raises(RuntimeError, match="oh no"):
-        with publish_context(broker=broker, command=command):
-            _published_func("hello", 42)
-
-    decoy.verify(
-        broker.publish(topic="command", message=matchers.DictMatching({"$": "after"})),
-        times=0,
     )
