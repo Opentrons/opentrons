@@ -17,7 +17,7 @@ describe('getLatestLabwareOffsetCount', () => {
     ]
     expect(getLatestLabwareOffsetCount(labwareOffsets)).toBe(1)
   })
-  it('should return 2 when there is two offset records with different labware', () => {
+  it('should return 2 when there are two offset records with different labware', () => {
     const labwareOffsets: LabwareOffset[] = [
       {
         definitionUri: 'some_definitionUri',
@@ -77,7 +77,7 @@ describe('getLatestLabwareOffsetCount', () => {
     ]
     expect(getLatestLabwareOffsetCount(labwareOffsets)).toBe(0)
   })
-  it('should not count offset to the trash', () => {
+  it('should not count offsets to the trash', () => {
     const labwareOffsets: LabwareOffset[] = [
       {
         definitionUri: 'fixedTrash',
@@ -92,7 +92,7 @@ describe('getLatestLabwareOffsetCount', () => {
     ]
     expect(getLatestLabwareOffsetCount(labwareOffsets)).toBe(1)
   })
-  it('should return only new offsets when the pervious entries were identity offsts', () => {
+  it('should return only new offsets when the previous entries were identity offsets', () => {
     const labwareOffsets: LabwareOffset[] = [
       {
         definitionUri: 'some_definitionUri',
