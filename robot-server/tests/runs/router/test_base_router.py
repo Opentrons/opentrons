@@ -13,8 +13,14 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_runner import JsonPreAnalysis
 
 from robot_server.errors import ApiError
-from robot_server.service.json_api import RequestModel, ResponseModel, ResourceLink
 from robot_server.service.task_runner import TaskRunner
+from robot_server.service.json_api import (
+    RequestModel,
+    SimpleResponseModel,
+    SimpleEmptyResponseModel,
+    ResourceLink,
+)
+
 
 from robot_server.protocols import (
     ProtocolStore,
@@ -546,7 +552,7 @@ async def test_delete_run_by_id(
         run_store.remove(run_id="run-id"),
     )
 
-    assert result.data is None
+    assert result == SimpleEmptyResponseModel()
 
 
 async def test_delete_run_with_bad_id(
@@ -658,7 +664,7 @@ async def test_add_labware_offset(
     )
     decoy.verify(engine_store.engine.add_labware_offset(labware_offset_request))
 
-    assert response == ResponseModel(data=expected_response, links=None)
+    assert response == SimpleResponseModel(data=expected_response)
 
 
 async def test_update_run_to_not_current(
@@ -725,7 +731,7 @@ async def test_update_run_to_not_current(
         engine_store=engine_store,
     )
 
-    assert result == ResponseModel(data=expected_response, links=None)
+    assert result == SimpleResponseModel(data=expected_response)
     decoy.verify(
         engine_store.clear(),
         run_store.upsert(updated_resource),
@@ -788,7 +794,7 @@ async def test_update_current_to_current_noop(
         engine_store=engine_store,
     )
 
-    assert result == ResponseModel(data=expected_response, links=None)
+    assert result == SimpleResponseModel(data=expected_response)
     decoy.verify(run_store.upsert(run_resource), times=0)
     decoy.verify(engine_store.clear(), times=0)
 

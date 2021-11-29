@@ -13,7 +13,7 @@ from opentrons.protocol_engine import (
 )
 
 from robot_server.errors import ApiError
-from robot_server.service.json_api import RequestModel, ResponseModel
+from robot_server.service.json_api import RequestModel, SimpleResponseModel
 from robot_server.runs.run_models import Run, RunCommandSummary
 from robot_server.runs.engine_store import EngineStore
 from robot_server.runs.router.commands_router import (
@@ -58,7 +58,7 @@ async def test_create_run_command(decoy: Decoy, engine_store: EngineStore) -> No
     response = await create_run_command(
         request_body=RequestModel(data=command_request),
         engine_store=engine_store,
-        run=ResponseModel(data=run, links=None),
+        run=SimpleResponseModel(data=run),
     )
 
     assert response.data == output_command
@@ -91,7 +91,7 @@ async def test_create_run_command_not_current(
         await create_run_command(
             request_body=RequestModel(data=command_request),
             engine_store=engine_store,
-            run=ResponseModel(data=run, links=None),
+            run=SimpleResponseModel(data=run),
         )
 
     assert exc_info.value.status_code == 400
@@ -120,7 +120,7 @@ async def test_get_run_commands() -> None:
         labwareOffsets=[],
     )
 
-    response = await get_run_commands(run=ResponseModel(data=run, links=None))
+    response = await get_run_commands(run=SimpleResponseModel(data=run))
 
     assert response.data == [command_summary]
 
@@ -165,7 +165,7 @@ async def test_get_run_command_by_id(
     response = await get_run_command(
         commandId="command-id",
         engine_store=engine_store,
-        run=ResponseModel(data=run, links=None),
+        run=SimpleResponseModel(data=run),
     )
 
     assert response.data == command
@@ -200,7 +200,7 @@ async def test_get_run_command_missing_command(
         await get_run_command(
             commandId="command-id",
             engine_store=engine_store,
-            run=ResponseModel(data=run, links=None),
+            run=SimpleResponseModel(data=run),
         )
 
     assert exc_info.value.status_code == 404
