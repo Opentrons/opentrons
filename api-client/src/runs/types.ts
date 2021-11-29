@@ -42,6 +42,7 @@ export interface LabwareOffset {
   definitionUri: string
   location: LabwareLocation
   vector: VectorOffset
+  createdAt: string
 }
 
 interface ResourceLink {

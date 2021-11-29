@@ -1,11 +1,9 @@
 import * as React from 'react'
+import uniqBy from 'lodash/uniqBy'
 import isEqual from 'lodash/isEqual'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
-import {
-  getLabwareDisplayName,
-  LabwareDefinition2,
-} from '@opentrons/shared-data'
+import { getLabwareDisplayName, IDENTITY_VECTOR } from '@opentrons/shared-data'
 import {
   Box,
   RobotCoordsForeignDiv,
@@ -24,6 +22,9 @@ import { useCurrentProtocolRun } from '../../../ProtocolUpload/hooks'
 import { getLabwareLocation } from '../../utils/getLabwareLocation'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
 import { getLabwareDefinitionUri } from '../../utils/getLabwareDefinitionUri'
+
+import type { LabwareOffset } from '@opentrons/api-client'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 interface LabwareInfoProps {
   displayName: string
   labwareId: string
@@ -51,11 +52,21 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element => {
     protocolData?.commands ?? []
   )
 
-  const labwareOffsets = runRecord?.data.labwareOffsets
+  const labwareOffsets = runRecord?.data.labwareOffsets ?? []
+  const mostRecentLabwareOffsets = uniqBy<LabwareOffset>(labwareOffsets.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()), offset => {
+    const locationKey = 'slotName' in offset.location ? offset.location?.slotName : offset.location.moduleId
+    return  `${offset.definitionUri}_${locationKey}`
+  })
+
   const vector = labwareOffsets?.find(
     offsetRecord =>
       offsetRecord.definitionUri === labwareDefinitionUri &&
-      isEqual(offsetRecord.location, labwareLocation)
+      'slotName' in offsetRecord.location &&
+      'slotName' in labwareLocation &&
+      offsetRecord.location?.slotName === labwareLocation?.slotName &&
+      // @ts-expect-error moduleModel is currently being returned from analysis instead of moduleId
+      protocolData.modules[offsetRecord.location?.moduleId]?.model === labwareLocation.moduleModel &&
+      !isEqual(offsetRecord.vector, IDENTITY_VECTOR)
   )?.vector
 
   return (
