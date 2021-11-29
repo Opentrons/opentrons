@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { when } from 'jest-when'
+import { act } from 'react-dom/test-utils'
 import { fireEvent } from '@testing-library/dom'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
@@ -10,11 +11,13 @@ import { SummaryScreen } from '../SummaryScreen'
 import { LabwareOffsetsSummary } from '../LabwareOffsetsSummary'
 import { useIntroInfo, useLabwareOffsets } from '../hooks'
 import { Section } from '../types'
+import { useLPCSuccessToast } from '../../hooks'
 
+jest.mock('../../../RunDetails/hooks')
+jest.mock('../../hooks')
 jest.mock('../SectionList')
 jest.mock('../hooks')
 jest.mock('../DeckMap')
-jest.mock('../../../RunDetails/hooks')
 jest.mock('../LabwareOffsetsSummary')
 
 const mockSectionList = SectionList as jest.MockedFunction<typeof SectionList>
@@ -31,6 +34,9 @@ const mockLabwareOffsetsSummary = LabwareOffsetsSummary as jest.MockedFunction<
 >
 const mockUseLabwareOffsets = useLabwareOffsets as jest.MockedFunction<
   typeof useLabwareOffsets
+>
+const mockUseLPCSuccessToast = useLPCSuccessToast as jest.MockedFunction<
+  typeof useLPCSuccessToast
 >
 
 const MOCK_SECTIONS = ['PRIMARY_PIPETTE_TIPRACKS' as Section]
@@ -53,7 +59,6 @@ describe('SummaryScreen', () => {
   beforeEach(() => {
     props = {
       savePositionCommandData: { someLabwareIf: ['commandId1', 'commandId2'] },
-      onLabwarePositionCheckComplete: jest.fn(),
       onCloseClick: jest.fn(),
     }
     mockSectionList.mockReturnValue(<div>Mock SectionList</div>)
@@ -92,6 +97,9 @@ describe('SummaryScreen', () => {
           },
         },
       } as any)
+    when(mockUseLPCSuccessToast)
+      .calledWith()
+      .mockReturnValue({ setShowLPCSuccessToast: () => null })
   })
   it('renders Summary Screen with all components and header', () => {
     const { getByText } = render(props)
@@ -101,14 +109,20 @@ describe('SummaryScreen', () => {
     getByText('Labware Position Check Complete')
   })
   it('renders apply offset button and clicks it', () => {
+    const mockSetShowLPCSuccessToast = jest.fn()
+    when(mockUseLPCSuccessToast)
+      .calledWith()
+      .mockReturnValue({ setShowLPCSuccessToast: mockSetShowLPCSuccessToast })
     const { getByRole } = render(props)
     expect(props.onCloseClick).not.toHaveBeenCalled()
-    expect(props.onLabwarePositionCheckComplete).not.toHaveBeenCalled()
+    expect(mockSetShowLPCSuccessToast).not.toHaveBeenCalled()
     const button = getByRole('button', {
       name: 'Close and apply labware offset data',
     })
-    fireEvent.click(button)
+    act(() => {
+      fireEvent.click(button)
+    })
     expect(props.onCloseClick).toHaveBeenCalled()
-    expect(props.onLabwarePositionCheckComplete).toHaveBeenCalled()
+    expect(mockSetShowLPCSuccessToast).toHaveBeenCalled()
   })
 })
