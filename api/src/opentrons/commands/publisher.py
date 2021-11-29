@@ -103,7 +103,7 @@ def publish_context(broker: Broker, command: CommandPayload) -> Iterator[None]:
     """Publish messages before and after the `with` block has run.
 
     If an `error` is raised in the `with` block, it will be published in the "after"
-    message (if the ProtocolEngine is enabled) and re-raised.
+    message and re-raised.
     """
     _do_publish(broker=broker, command=command, when="before")
 
