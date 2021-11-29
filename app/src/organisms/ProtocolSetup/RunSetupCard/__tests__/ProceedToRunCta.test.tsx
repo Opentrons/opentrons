@@ -5,8 +5,6 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import * as hooks from '../hooks'
 import { ProceedToRunCta } from '../ProceedToRunCta'
-import { mockPipetteInfo } from '../../../../redux/pipettes/__fixtures__'
-
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
   return {
@@ -20,8 +18,8 @@ jest.mock('../hooks')
 const mockUseMissingModuleIds = hooks.useMissingModuleIds as jest.MockedFunction<
   typeof hooks.useMissingModuleIds
 >
-const mockUseCurrentRunPipetteInfoByMount = hooks.useCurrentRunPipetteInfoByMount as jest.MockedFunction<
-  typeof hooks.useCurrentRunPipetteInfoByMount
+const mockUseProtocolCalibrationStatus = hooks.useProtocolCalibrationStatus as jest.MockedFunction<
+  typeof hooks.useProtocolCalibrationStatus
 >
 
 const render = () => {
@@ -36,9 +34,8 @@ const render = () => {
 }
 describe('ProceedToRunCta', () => {
   beforeEach(() => {
-    mockUseCurrentRunPipetteInfoByMount.mockReturnValue({
-      left: mockPipetteInfo,
-      right: null,
+    mockUseProtocolCalibrationStatus.mockReturnValue({
+      complete: true,
     })
   })
 
@@ -58,9 +55,8 @@ describe('ProceedToRunCta', () => {
   })
   it('should be disabled with modules not connected and calibration not completed tooltip if missing cal and moduleIds', async () => {
     mockUseMissingModuleIds.mockReturnValue(['temperatureModuleV1'])
-    mockUseCurrentRunPipetteInfoByMount.mockReturnValue({
-      left: { ...mockPipetteInfo, pipetteCalDate: null },
-      right: null,
+    mockUseProtocolCalibrationStatus.mockReturnValue({
+      complete: false,
     } as any)
     const { getByRole, getByText } = render()
     const button = getByRole('button', { name: 'Proceed to Run' })
@@ -71,9 +67,8 @@ describe('ProceedToRunCta', () => {
   })
   it('should be disabled with calibration not complete tooltip', async () => {
     mockUseMissingModuleIds.mockReturnValue([])
-    mockUseCurrentRunPipetteInfoByMount.mockReturnValue({
-      left: { ...mockPipetteInfo, pipetteCalDate: null },
-      right: null,
+    mockUseProtocolCalibrationStatus.mockReturnValue({
+      complete: false,
     } as any)
     const { getByRole, getByText } = render()
     const button = getByRole('button', { name: 'Proceed to Run' })

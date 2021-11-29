@@ -16,6 +16,8 @@ import {
   IconName,
   PrimaryBtn,
   Text,
+  Tooltip,
+  useHoverTooltip,
   ALIGN_CENTER,
   ALIGN_STRETCH,
   BORDER_RADIUS_1,
@@ -30,7 +32,10 @@ import {
   SPACING_2,
   SPACING_3,
 } from '@opentrons/components'
-
+import {
+  useMissingModuleIds,
+  useProtocolCalibrationStatus,
+} from '../ProtocolSetup/RunSetupCard/hooks'
 import {
   useRunCompleteTime,
   useRunControls,
@@ -42,7 +47,10 @@ import { Timer } from './Timer'
 
 export function RunTimeControl(): JSX.Element | null {
   const { t } = useTranslation('run_details')
-
+  const missingModuleIds = useMissingModuleIds()
+  const isEverythingCalibrated = useProtocolCalibrationStatus().complete
+  const disableRunCta = !isEverythingCalibrated || missingModuleIds.length > 0
+  const [targetProps, tooltipProps] = useHoverTooltip()
   const runStatus = useRunStatus()
   const startTime = useRunStartTime()
   const pausedAt = useRunPauseTime()
@@ -107,12 +115,17 @@ export function RunTimeControl(): JSX.Element | null {
         justifyContent={JUSTIFY_CENTER}
         alignItems={ALIGN_CENTER}
         display={DISPLAY_FLEX}
+        disabled={disableRunCta}
+        {...targetProps}
       >
         {buttonIconName != null ? (
           <Icon name={buttonIconName} size={SIZE_1} marginRight={SPACING_2} />
         ) : null}
         <Text fontSize={FONT_SIZE_DEFAULT}>{buttonText}</Text>
       </PrimaryBtn>
+      {disableRunCta && (
+        <Tooltip {...tooltipProps}>{t('run_cta_disabled')}</Tooltip>
+      )}
     </Flex>
   ) : null
 }
