@@ -592,7 +592,7 @@ export function useLabwarePositionCheck(
     const moveRelCommand: AnonymousCommand = {
       commandType: 'moveRelative',
       params: {
-        pipetteId: currentCommand.params.pipetteId,
+        pipetteId: prevCommand.params.pipetteId,
         distance: step * dir,
         axis,
       },
