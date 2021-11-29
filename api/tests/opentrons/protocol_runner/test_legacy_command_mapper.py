@@ -8,7 +8,7 @@ from opentrons.protocol_engine import (
     DeckSlotLocation,
     ModuleLocation,
     PipetteName,
-    ModuleModels,
+    ModuleModel,
     ModuleDefinition,
     commands as pe_commands,
     actions as pe_actions,
@@ -285,7 +285,7 @@ def test_map_module_load(
         module_serial="module-serial",
     )
     decoy.when(
-        module_data_provider.get_module_definition(ModuleModels.MAGNETIC_MODULE_V2)
+        module_data_provider.get_module_definition(ModuleModel.MAGNETIC_MODULE_V2)
     ).then_return(test_definition)
     expected_output = pe_commands.LoadModule.construct(
         id=matchers.IsA(str),
@@ -294,7 +294,7 @@ def test_map_module_load(
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
         params=pe_commands.LoadModuleParams.construct(
-            model=ModuleModels.MAGNETIC_MODULE_V2,
+            model=ModuleModel.MAGNETIC_MODULE_V2,
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             moduleId=matchers.IsA(str),
         ),

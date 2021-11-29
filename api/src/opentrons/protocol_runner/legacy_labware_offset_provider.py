@@ -6,13 +6,13 @@
 from typing import Optional
 
 from opentrons.types import DeckSlotName, Point
-
-from opentrons.protocol_engine import LabwareOffsetLocation
-from opentrons.protocol_engine.state import LabwareView
 from opentrons.protocol_api.labware_offset_provider import (
     ProvidedLabwareOffset as LegacyProvidedLabwareOffset,
     AbstractLabwareOffsetProvider as AbstractLegacyLabwareOffsetProvider,
 )
+
+from opentrons.protocol_engine import LabwareOffsetLocation, ModuleModel
+from opentrons.protocol_engine.state import LabwareView
 
 
 class LegacyLabwareOffsetProvider(AbstractLegacyLabwareOffsetProvider):
@@ -29,15 +29,14 @@ class LegacyLabwareOffsetProvider(AbstractLegacyLabwareOffsetProvider):
         deck_slot: DeckSlotName,
     ) -> LegacyProvidedLabwareOffset:
         """Look up an offset in ProtocolEngine state and return it, if one exists."""
-        if module_model is not None:
-            # TODO(mc, 2021-11-23): https://github.com/Opentrons/opentrons/issues/8242
-            raise NotImplementedError(
-                "Loading offsets for labware loaded atop modules"
-                " is not currently supported."
-            )
         offset = self._labware_view.find_applicable_labware_offset(
             definition_uri=labware_definition_uri,
-            location=LabwareOffsetLocation(slotName=deck_slot),
+            location=LabwareOffsetLocation(
+                slotName=deck_slot,
+                moduleModel=(
+                    None if module_model is None else ModuleModel(module_model)
+                ),
+            ),
         )
         if offset is None:
             return LegacyProvidedLabwareOffset(

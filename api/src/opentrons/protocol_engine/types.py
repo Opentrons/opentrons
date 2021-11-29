@@ -1,4 +1,5 @@
 """Public protocol engine value types and models."""
+
 from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass
@@ -125,12 +126,73 @@ class MotorAxis(str, Enum):
     RIGHT_PLUNGER = "rightPlunger"
 
 
+class ModuleModel(str, Enum):
+    """All available modules' models."""
+
+    TEMPERATURE_MODULE_V1 = "temperatureModuleV1"
+    TEMPERATURE_MODULE_V2 = "temperatureModuleV2"
+    MAGNETIC_MODULE_V1 = "magneticModuleV1"
+    MAGNETIC_MODULE_V2 = "magneticModuleV2"
+    THERMOCYCLER_MODULE_V1 = "thermocyclerModuleV1"
+
+
+class ModuleDimensions(BaseModel):
+    """Dimension type for modules."""
+
+    bareOverallHeight: float
+    overLabwareHeight: float
+    lidHeight: Optional[float]
+
+
+class ModuleCalibrationPoint(BaseModel):
+    """Calibration Point type for module definition."""
+
+    x: float
+    y: float
+
+
 class LabwareOffsetVector(BaseModel):
     """Offset, in deck coordinates from nominal to actual position."""
 
     x: float
     y: float
     z: float
+
+
+class ModuleDefinition(BaseModel):
+    """Module definition class."""
+
+    otSharedSchema: str = Field("module/schemas/2", description="The current schema.")
+    moduleType: str = Field(
+        ..., description="Module type (Temperature/ Magnetic/ Thermocycler)"
+    )
+    model: str = Field(..., description="Model name of the module")
+    labwareOffset: LabwareOffsetVector = Field(
+        ..., description="Labware offset in x, y, z."
+    )
+    dimensions: ModuleDimensions = Field(..., description="Module dimension")
+    calibrationPoint: ModuleCalibrationPoint = Field(
+        ..., description="Calibration point of module."
+    )
+    displayName: str = Field(..., description="Display name.")
+    quirks: List[str] = Field(..., description="Module quirks")
+    slotTransforms: Dict[str, Any] = Field(
+        ..., description="Dictionary of transforms for each slot."
+    )
+    compatibleWith: List[str] = Field(
+        ..., description="List of module models this model is compatible with."
+    )
+
+
+class LoadedModule(BaseModel):
+    """A module that has been loaded."""
+
+    id: str
+    model: ModuleModel
+    location: DeckSlotLocation
+    definition: ModuleDefinition
+    # TODO(mc, 2021-11-24): make serial non-optional
+    serial: Optional[str]
 
 
 class LabwareOffsetLocation(BaseModel):
@@ -140,7 +202,7 @@ class LabwareOffsetLocation(BaseModel):
         ...,
         description="The deck slot the offset applies to",
     )
-    moduleModel: Optional[str] = Field(
+    moduleModel: Optional[ModuleModel] = Field(
         None,
         description="The module model the labware will be loaded onto, if applicable",
     )
@@ -197,62 +259,3 @@ class LoadedLabware(BaseModel):
             " so the default of (0, 0, 0) will be used."
         ),
     )
-
-
-class ModuleModels(str, Enum):
-    """All available modules' models."""
-
-    TEMPERATURE_MODULE_V1 = "temperatureModuleV1"
-    TEMPERATURE_MODULE_V2 = "temperatureModuleV2"
-    MAGNETIC_MODULE_V1 = "magneticModuleV1"
-    MAGNETIC_MODULE_V2 = "magneticModuleV2"
-    THERMOCYCLER_MODULE_V1 = "thermocyclerModuleV1"
-
-
-class ModuleDimensions(BaseModel):
-    """Dimension type for modules."""
-
-    bareOverallHeight: float
-    overLabwareHeight: float
-
-
-class ModuleCalibrationPoint(BaseModel):
-    """Calibration Point type for module definition."""
-
-    x: float
-    y: float
-
-
-class ModuleDefinition(BaseModel):
-    """Module definition class."""
-
-    otSharedSchema: str = Field("module/schemas/2", description="The current schema.")
-    moduleType: str = Field(
-        ..., description="Module type (Temperature/ Magnetic/ Thermocycler)"
-    )
-    model: str = Field(..., description="Model name of the module")
-    labwareOffset: LabwareOffsetVector = Field(
-        ..., description="Labware offset in x, y, z."
-    )
-    dimensions: ModuleDimensions = Field(..., description="Module dimension")
-    calibrationPoint: ModuleCalibrationPoint = Field(
-        ..., description="Calibration point of module."
-    )
-    displayName: str = Field(..., description="Display name.")
-    quirks: List[str] = Field(..., description="Module quirks")
-    slotTransforms: Dict[str, Any] = Field(
-        ..., description="Dictionary of transforms for each slot."
-    )
-    compatibleWith: List[str] = Field(
-        ..., description="List of module models this model is compatible with."
-    )
-
-
-class LoadedModule(BaseModel):
-    """A module that has been loaded."""
-
-    id: str
-    model: str
-    location: DeckSlotLocation
-    definition: ModuleDefinition
-    serial: Optional[str]

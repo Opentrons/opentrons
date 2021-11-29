@@ -2,21 +2,19 @@ import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { act, renderHook } from '@testing-library/react-hooks'
-import { createLabwareOffsets } from '@opentrons/api-client'
+import { createLabwareOffset, LabwareOffset } from '@opentrons/api-client'
 import { useHost } from '../../api'
 
-import { useCreateLabwareOffsetsMutation } from '../useCreateLabwareOffsetsMutation'
-
+import { useCreateLabwareOffsetMutation } from '../useCreateLabwareOffsetMutation'
 import type { HostConfig } from '@opentrons/api-client'
-import type { CreateLabwareOffsetsData } from '@opentrons/api-client/src/runs/createLabwareOffsets'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')
 
 const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 
-const mockCreateLabwareOffsets = createLabwareOffsets as jest.MockedFunction<
-  typeof createLabwareOffsets
+const mockCreateLabwareOffset = createLabwareOffset as jest.MockedFunction<
+  typeof createLabwareOffset
 >
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
@@ -27,7 +25,7 @@ const OFFSET = { x: 1, y: 2, z: 3 }
 
 describe('useCreateCommandMutation hook', () => {
   let wrapper: React.FunctionComponent<{}>
-  let createLabwareOffsetsData: CreateLabwareOffsetsData
+  let labwareOffset: LabwareOffset
 
   beforeEach(() => {
     const queryClient = new QueryClient()
@@ -35,14 +33,10 @@ describe('useCreateCommandMutation hook', () => {
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
     wrapper = clientProvider
-    createLabwareOffsetsData = {
-      labwareOffsets: [
-        {
-          definitionUri: DEFINITION_URI,
-          location: LABWARE_LOCATION,
-          offset: OFFSET,
-        },
-      ],
+    labwareOffset = {
+      definitionUri: DEFINITION_URI,
+      location: LABWARE_LOCATION,
+      vector: OFFSET,
     }
   })
   afterEach(() => {
@@ -51,19 +45,19 @@ describe('useCreateCommandMutation hook', () => {
 
   it('should create labware offsets when callback is called', async () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockCreateLabwareOffsets)
-      .calledWith(HOST_CONFIG, RUN_ID, createLabwareOffsetsData)
+    when(mockCreateLabwareOffset)
+      .calledWith(HOST_CONFIG, RUN_ID, labwareOffset)
       .mockResolvedValue({ data: 'created offsets!' } as any)
 
-    const { result, waitFor } = renderHook(useCreateLabwareOffsetsMutation, {
+    const { result, waitFor } = renderHook(useCreateLabwareOffsetMutation, {
       wrapper,
     })
 
     expect(result.current.data).toBeUndefined()
     act(() => {
-      result.current.createLabwareOffsets({
+      result.current.createLabwareOffset({
         runId: RUN_ID,
-        data: createLabwareOffsetsData,
+        data: labwareOffset,
       })
     })
     await waitFor(() => {

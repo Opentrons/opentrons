@@ -25,7 +25,7 @@ from ..types import (
     PipetteName,
     DeckSlotLocation,
     LabwareOffsetLocation,
-    ModuleModels,
+    ModuleModel,
     ModuleDefinition,
 )
 
@@ -124,8 +124,9 @@ class EquipmentHandler:
             slot_name = location.slotName
             module_model = None
         else:
-            # TODO(mc, 2021-11-23): https://github.com/Opentrons/opentrons/issues/8242
-            raise NotImplementedError("Loading labware on modules not yet implemented")
+            module = self._state_store.modules.get(location.moduleId)
+            slot_name = module.location.slotName
+            module_model = module.model
 
         offset = self._state_store.labware.find_applicable_labware_offset(
             definition_uri=definition_uri,
@@ -179,7 +180,7 @@ class EquipmentHandler:
         return LoadedPipetteData(pipette_id=pipette_id)
 
     async def load_module(
-        self, model: ModuleModels, location: DeckSlotLocation, module_id: Optional[str]
+        self, model: ModuleModel, location: DeckSlotLocation, module_id: Optional[str]
     ) -> LoadedModuleData:
         """Ensure the required module is attached.
 
@@ -209,7 +210,7 @@ class EquipmentHandler:
             definition=definition,
         )
 
-    async def _get_hardware_module(self, model: ModuleModels) -> AbstractModule:
+    async def _get_hardware_module(self, model: ModuleModel) -> AbstractModule:
         hw_model = module_model_from_string(model.value)
         model_type = resolve_module_type(hw_model)
 

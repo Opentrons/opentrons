@@ -11,7 +11,6 @@ from .errors import exception_handlers
 from .hardware import initialize_hardware, cleanup_hardware
 from .service import initialize_logging
 from .service.dependencies import get_protocol_manager
-from .service.legacy.rpc import cleanup_rpc_server
 
 log = logging.getLogger(__name__)
 
@@ -56,7 +55,6 @@ async def on_shutdown() -> None:
     protocol_manager.remove_all()
 
     shutdown_results = await asyncio.gather(
-        cleanup_rpc_server(app.state),
         cleanup_hardware(app.state),
         return_exceptions=True,
     )

@@ -94,3 +94,7 @@ class ModuleNotAttachedError(ProtocolEngineError):
 
 class ModuleDefinitionDoesNotExistError(ProtocolEngineError):
     """An error raised when referencing a module definition that does not exist."""
+
+
+class ModuleIsNotThermocyclerError(ProtocolEngineError):
+    """An error raised when performing thermocycler actions with a non-thermocycler."""

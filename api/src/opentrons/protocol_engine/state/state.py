@@ -189,7 +189,10 @@ class StateStore(StateView, ActionHandler):
         self._modules = ModuleView(state.modules)
 
         # Derived states
-        self._geometry = GeometryView(labware_view=self._labware)
+        self._geometry = GeometryView(
+            labware_view=self._labware,
+            module_view=self._modules,
+        )
         self._motion = MotionView(
             labware_view=self._labware,
             pipette_view=self._pipettes,
