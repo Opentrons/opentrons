@@ -2,7 +2,6 @@
 from dataclasses import dataclass
 from datetime import datetime
 from logging import getLogger
-from pathlib import Path
 from typing import Dict, List
 
 from opentrons.protocol_reader import ProtocolSource
@@ -30,16 +29,8 @@ class ProtocolNotFoundError(KeyError):
 class ProtocolStore:
     """Methods for storing and retrieving protocol files."""
 
-    def __init__(self, directory: Path) -> None:
-        """Initialize the ProtocolStore.
-
-        Arguments:
-            directory: Directory in which to place created files.
-
-            pre_analyzer: Called to extract basic info from protocols when they are
-            `create()`ed.
-        """
-        self._directory = directory
+    def __init__(self) -> None:
+        """Initialize the ProtocolStore."""
         self._protocols_by_id: Dict[str, ProtocolResource] = {}
 
     def upsert(self, resource: ProtocolResource) -> None:

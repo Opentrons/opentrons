@@ -20,9 +20,9 @@ from robot_server.protocols.protocol_store import (
 
 
 @pytest.fixture
-def subject(tmp_path: Path) -> ProtocolStore:
+def subject() -> ProtocolStore:
     """Get a ProtocolStore test subject."""
-    return ProtocolStore(directory=tmp_path)
+    return ProtocolStore()
 
 
 async def test_upsert_and_get_protocol(tmp_path: Path, subject: ProtocolStore) -> None:
@@ -45,10 +45,7 @@ async def test_upsert_and_get_protocol(tmp_path: Path, subject: ProtocolStore) -
     assert result == protocol_resource
 
 
-async def test_get_missing_protocol_raises(
-    tmp_path: Path,
-    subject: ProtocolStore,
-) -> None:
+async def test_get_missing_protocol_raises(subject: ProtocolStore) -> None:
     """It should raise an error when protocol not found."""
     with pytest.raises(ProtocolNotFoundError, match="protocol-id"):
         subject.get("protocol-id")
