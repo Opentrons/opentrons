@@ -34,7 +34,7 @@ const feedbackFormLink =
   'https://docs.google.com/forms/d/e/1FAIpQLSd6oSV82IfgzSi5t_FP6n_pB_Y8wPGmAgFHsiiFho9qhxr-UQ/viewform'
 
 export function ProtocolSetup(): JSX.Element {
-  const [showLPCSuccessToast, setShowLPCSuccessToast] = React.useState(true)
+  const [showLPCSuccessToast, setShowLPCSuccessToast] = React.useState(false)
   const { t } = useTranslation(['protocol_setup'])
 
   const runStatus = useRunStatus()
