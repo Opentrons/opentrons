@@ -4,7 +4,7 @@ from __future__ import annotations
 # and are only relevant for static typechecking. this file should only
 # be imported if typing.TYPE_CHECKING is True
 import asyncio
-from typing import Optional, Dict, Union
+from typing import Optional, Dict, List, Union
 
 from typing_extensions import Protocol, TypedDict, Literal
 
@@ -45,6 +45,7 @@ ONE_CHANNEL = Literal[1]
 class PipetteDict(TypedDict):
     name: PipetteName
     model: PipetteModel
+    back_compat_names: List[PipetteName]
     pipette_id: str
     display_name: str
     min_volume: float
