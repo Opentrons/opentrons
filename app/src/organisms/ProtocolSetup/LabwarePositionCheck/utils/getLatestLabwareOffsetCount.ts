@@ -14,7 +14,8 @@ export const getLatestLabwareOffsetCount = (
   // labware offsets are in order of creation, we want to use the most recent ones
   const orderedLabwareOffsets = labwareOffsets
     .slice()
-    .sort((a, b) => a.date - b.date)
+    // @ts-expect-error sort allows subtraction of dates
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
 
   const filteredLabwareOffsets = uniqBy(
     orderedLabwareOffsets,
