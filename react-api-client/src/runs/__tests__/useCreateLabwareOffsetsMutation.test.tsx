@@ -6,7 +6,7 @@ import { createLabwareOffset } from '@opentrons/api-client'
 import { useHost } from '../../api'
 
 import { useCreateLabwareOffsetMutation } from '../useCreateLabwareOffsetMutation'
-import type { HostConfig, LabwareOffsetCreateData  } from '@opentrons/api-client'
+import type { HostConfig, LabwareOffsetCreateData } from '@opentrons/api-client'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')
