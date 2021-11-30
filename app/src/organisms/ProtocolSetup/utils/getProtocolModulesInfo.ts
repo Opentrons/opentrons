@@ -44,7 +44,7 @@ export const getProtocolModulesInfo = (
               (command: LoadLabwareCommand) =>
                 'moduleId' in command.params.location &&
                 command.params.location.moduleId === moduleId
-            )?.params.labwareId ?? null
+            )?.result?.labwareId ?? null
 
         const nestedLabware =
           nestedLabwareId != null ? protocolData.labware[nestedLabwareId] : null
