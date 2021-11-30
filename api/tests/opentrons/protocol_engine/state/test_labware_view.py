@@ -375,6 +375,21 @@ def test_get_slot_position(standard_deck_def: DeckDefinitionV2) -> None:
     assert result == Point(x=slot_pos[0], y=slot_pos[1], z=slot_pos[2])
 
 
+def test_get_slot_center_position(standard_deck_def: DeckDefinitionV2) -> None:
+    """It should get the absoluation location of a deck slot's center."""
+    subject = get_labware_view(deck_definition=standard_deck_def)
+
+    slot_def = standard_deck_def["locations"]["orderedSlots"][1]
+    slot_pos = slot_def["position"]
+    expected_center = Point(
+        x=slot_pos[0] + slot_def["boundingBox"]["xDimension"] / 2,
+        y=slot_pos[1] + slot_def["boundingBox"]["yDimension"] / 2,
+        z=slot_pos[2] + slot_def["boundingBox"]["zDimension"] / 2,
+    )
+    result = subject.get_slot_center_position(DeckSlotName.SLOT_2)
+    assert result == expected_center
+
+
 def test_get_labware_offset_vector() -> None:
     """It should get a labware's offset vector."""
     labware_without_offset = LoadedLabware(

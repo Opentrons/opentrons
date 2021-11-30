@@ -325,9 +325,9 @@ def test_get_movement_waypoints(
 
     if spec.should_dodge_thermocycler:
         decoy.when(
-            labware_view.get_slot_position(slot=DeckSlotName.SLOT_5)
+            labware_view.get_slot_center_position(slot=DeckSlotName.SLOT_5)
         ).then_return(
-            Point(x=spec.extra_waypoints[0][0], y=spec.extra_waypoints[0][1], z=0)
+            Point(x=spec.extra_waypoints[0][0], y=spec.extra_waypoints[0][1], z=123)
         )
 
     result = subject.get_movement_waypoints(

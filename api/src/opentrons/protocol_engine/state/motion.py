@@ -109,7 +109,7 @@ class MotionView:
                 if self._geometry.should_dodge_thermocycler(
                     from_labware_id=location.labware_id, to_labware_id=labware_id
                 ):
-                    slot_5_center = self._labware.get_slot_position(
+                    slot_5_center = self._labware.get_slot_center_position(
                         slot=DeckSlotName.SLOT_5
                     )
                     extra_waypoints = [(slot_5_center.x, slot_5_center.y)]
