@@ -4,6 +4,8 @@ import {
   RunStatus,
   RUN_STATUS_IDLE,
   RUN_STATUS_RUNNING,
+  RUN_STATUS_PAUSED,
+  RUN_STATUS_PAUSE_REQUESTED,
 } from '@opentrons/api-client'
 import {
   PrimaryBtn,
@@ -65,7 +67,9 @@ export function RunDetails(): JSX.Element | null {
   )
 
   const titleBarProps =
-    adjustedRunStatus === RUN_STATUS_RUNNING
+    adjustedRunStatus === RUN_STATUS_RUNNING ||
+    adjustedRunStatus === RUN_STATUS_PAUSED ||
+    adjustedRunStatus === RUN_STATUS_PAUSE_REQUESTED
       ? {
           title: t('protocol_title', { protocol_name: displayName }),
           rightNode: cancelRunButton,
