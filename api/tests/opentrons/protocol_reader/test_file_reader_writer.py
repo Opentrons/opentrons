@@ -1,12 +1,13 @@
 """Tests for opentrons.protocol_reader.file_reader_writer.FileReaderWriter."""
 import io
+import pytest
 from pathlib import Path
 from decoy import matchers
 
 from opentrons_shared_data import load_shared_data
 from opentrons.protocols.models import JsonProtocol, LabwareDefinition
 from opentrons.protocol_reader.input_file import InputFile, BufferedFile
-from opentrons.protocol_reader.file_reader_writer import FileReaderWriter
+from opentrons.protocol_reader.file_reader_writer import FileReaderWriter, FileReadError
 
 
 SIMPLE_V5_JSON_PROTOCOL = load_shared_data("protocol/fixtures/5/simpleV5.json")
@@ -41,6 +42,16 @@ async def test_read_json() -> None:
             data={"hello": "world"},
         ),
     ]
+
+
+async def test_read_invalid_json() -> None:
+    """It should raise if JSON file is invalid."""
+    file_1 = InputFile(filename="hello.json", file=io.BytesIO(b'{"hello"}'))
+
+    subject = FileReaderWriter()
+
+    with pytest.raises(FileReadError, match="could not be parsed"):
+        await subject.read([file_1])
 
 
 async def test_read_opentrons_json() -> None:

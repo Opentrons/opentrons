@@ -52,18 +52,10 @@ class RoleAnalyzer:
             main_file = python_files[0]
 
         elif len(python_files) > 1:
-            init_files = [f for f in files if f.name == "__init__.py"]
-
-            if len(init_files) == 0:
-                raise RoleAnalysisError(
-                    "If protocol contains multiple Python files, "
-                    " the main file must be named __init__.py."
-                )
-
-            if len(init_files) > 1:
-                raise RoleAnalysisError("Multiple __init__.py files provided.")
-
-            main_file = init_files[0]
+            # TODO(mc, 2021-11-30): add multi-python-file support
+            raise RoleAnalysisError(
+                "Protocols containing multiple Python files are not yet supported."
+            )
 
         elif len(json_files) > 1:
             raise RoleAnalysisError("A JSON protocol must consist of a single file.")
