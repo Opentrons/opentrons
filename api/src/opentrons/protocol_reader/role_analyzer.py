@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import List, Sequence
 
 from .protocol_source import ProtocolFileRole
-from .input_reader import BufferedFile
+from .input_file import BufferedFile
 
 
 @dataclass(frozen=True)
