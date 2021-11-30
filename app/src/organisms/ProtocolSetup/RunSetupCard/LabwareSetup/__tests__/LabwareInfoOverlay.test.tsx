@@ -82,6 +82,7 @@ describe('LabwareInfoOverlay', () => {
         protocolData: {
           commands: [],
           labware,
+          modules: [],
         },
       } as any)
 

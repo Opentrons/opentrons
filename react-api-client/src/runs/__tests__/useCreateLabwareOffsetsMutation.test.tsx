@@ -2,11 +2,11 @@ import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { act, renderHook } from '@testing-library/react-hooks'
-import { createLabwareOffset, LabwareOffset } from '@opentrons/api-client'
+import { createLabwareOffset } from '@opentrons/api-client'
 import { useHost } from '../../api'
 
 import { useCreateLabwareOffsetMutation } from '../useCreateLabwareOffsetMutation'
-import type { HostConfig } from '@opentrons/api-client'
+import type { HostConfig, LabwareOffsetCreateData } from '@opentrons/api-client'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')
@@ -25,7 +25,7 @@ const OFFSET = { x: 1, y: 2, z: 3 }
 
 describe('useCreateCommandMutation hook', () => {
   let wrapper: React.FunctionComponent<{}>
-  let labwareOffset: LabwareOffset
+  let labwareOffset: LabwareOffsetCreateData
 
   beforeEach(() => {
     const queryClient = new QueryClient()

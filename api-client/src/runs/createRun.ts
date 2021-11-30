@@ -2,11 +2,11 @@ import { POST, request } from '../request'
 
 import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
-import type { Run, LabwareOffset } from './types'
+import type { Run, LabwareOffsetCreateData } from './types'
 
 export interface CreateRunData {
   protocolId?: string
-  labwareOffsets?: LabwareOffset[]
+  labwareOffsets?: LabwareOffsetCreateData[]
 }
 
 export function createRun(
