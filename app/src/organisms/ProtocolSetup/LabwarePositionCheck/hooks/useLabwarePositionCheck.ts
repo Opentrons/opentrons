@@ -3,14 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import reduce from 'lodash/reduce'
 import { v4 as uuidv4 } from 'uuid'
-import {
-  HostConfig,
-  RunCommandSummary,
-  getCommand,
-  VectorOffset,
-  LabwareOffset,
-  AnonymousCommand,
-} from '@opentrons/api-client'
+import { getCommand } from '@opentrons/api-client'
 import {
   getLabwareDisplayName,
   IDENTITY_VECTOR,
@@ -31,6 +24,13 @@ import { getAttachedModulesForConnectedRobot } from '../../../../redux/modules/s
 import { getLabwareDefinitionUri } from '../../utils/getLabwareDefinitionUri'
 import { useSteps } from './useSteps'
 import { getModuleInitialLoadInfo } from '../../utils/getModuleInitialLoadInfo'
+import type {
+  HostConfig,
+  RunCommandSummary,
+  VectorOffset,
+  LabwareOffsetCreateData,
+  AnonymousCommand,
+} from '@opentrons/api-client'
 import type {
   Command,
   ProtocolFile,
@@ -460,9 +460,9 @@ export function useLabwarePositionCheck(
   const beginLPC = (): void => {
     setIsLoading(true)
     // first clear all previous labware offsets for each labware
-    const identityLabwareOffsets: LabwareOffset[] = reduce<
+    const identityLabwareOffsets: LabwareOffsetCreateData[] = reduce<
       ProtocolFile<{}>['labware'],
-      LabwareOffset[]
+      LabwareOffsetCreateData[]
     >(
       protocolData?.labware,
       (acc, _, labwareId) => {

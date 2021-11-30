@@ -1,4 +1,5 @@
 import { useSelector } from 'react-redux'
+import last from 'lodash/last'
 import { getPipetteNameSpecs, getLabwareDefURI } from '@opentrons/shared-data'
 import {
   getAttachedPipettes,
@@ -97,13 +98,17 @@ export function useCurrentRunPipetteInfoByMount(): {
         )
 
         const tipRacksForPipette = tipRackDefs.map(tipRackDef => {
-          const tlcDataMatch = tipLengthCalibrations.find(
-            tlcData => tlcData.uri === getLabwareDefURI(tipRackDef)
+          const tlcDataMatch = last(
+            tipLengthCalibrations.filter(
+              tlcData =>
+                tlcData.uri === getLabwareDefURI(tipRackDef) &&
+                attachedPipette != null &&
+                tlcData.pipette === attachedPipette.id
+            )
           )
+
           const lastModifiedDate =
-            attachedPipette != null &&
-            tlcDataMatch?.pipette === attachedPipette.id &&
-            requestedPipetteMatch !== INCOMPATIBLE
+            tlcDataMatch != null && requestedPipetteMatch !== INCOMPATIBLE
               ? tlcDataMatch.lastModified
               : null
 

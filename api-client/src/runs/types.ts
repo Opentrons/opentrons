@@ -39,6 +39,8 @@ export interface VectorOffset {
   z: number
 }
 export interface LabwareOffset {
+  id: string
+  createdAt: string
   definitionUri: string
   location: LabwareLocation
   vector: VectorOffset
@@ -84,6 +86,12 @@ export interface RunCommandSummary {
   commandType: FullCommand['commandType']
   status: 'queued' | 'running' | 'succeeded' | 'failed'
   result?: any
+}
+
+export interface LabwareOffsetCreateData {
+  definitionUri: string
+  location: LabwareLocation
+  vector: VectorOffset
 }
 
 export interface CommandData {

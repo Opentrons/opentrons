@@ -22,6 +22,7 @@
   "status_succeeded": "Completed",
   "target_temperature": "Target: {{temperature}} °C",
   "temperature_not_available": "{{temperature_type}}: n/a",
+  "thermocycler_error_tooltip": "Module encountered an anomaly, please contact support",
   "current_step": "Current Step",
   "anticipated_step": "Anticipated steps",
   "start_step_time": "Start",

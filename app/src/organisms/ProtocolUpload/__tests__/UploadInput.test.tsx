@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { when } from 'jest-when'
+import { when, resetAllWhenMocks } from 'jest-when'
 import '@testing-library/jest-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import {
@@ -7,16 +7,18 @@ import {
   nestedTextMatcher,
   renderWithProviders,
 } from '@opentrons/components'
+import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
 import { i18n } from '../../../i18n'
 import * as RobotSelectors from '../../../redux/robot/selectors'
 import { useProtocolDetails } from '../../RunDetails/hooks'
+import { getLatestLabwareOffsetCount } from '../../ProtocolSetup/LabwarePositionCheck/utils/getLatestLabwareOffsetCount'
 import { UploadInput } from '../UploadInput'
 import { useMostRecentRunId } from '../hooks/useMostRecentRunId'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
-import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
 import { RerunningProtocolModal } from '../RerunningProtocolModal'
 import { useCloneRun } from '../hooks'
 import type { ProtocolFile } from '@opentrons/shared-data'
+import type { LabwareOffset } from '@opentrons/api-client'
 
 jest.mock('../hooks/useMostRecentRunId')
 jest.mock('@opentrons/react-api-client')
@@ -24,6 +26,9 @@ jest.mock('../../RunDetails/hooks')
 jest.mock('../../../redux/robot/selectors')
 jest.mock('../hooks')
 jest.mock('../RerunningProtocolModal')
+jest.mock(
+  '../../ProtocolSetup/LabwarePositionCheck/utils/getLatestLabwareOffsetCount'
+)
 
 const mockUseMostRecentRunId = useMostRecentRunId as jest.MockedFunction<
   typeof useMostRecentRunId
@@ -36,13 +41,14 @@ const mockGetConnectedRobotName = RobotSelectors.getConnectedRobotName as jest.M
   typeof RobotSelectors.getConnectedRobotName
 >
 const mockUseCloneRun = useCloneRun as jest.MockedFunction<typeof useCloneRun>
-
 const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
   typeof useProtocolQuery
 >
-
 const mockRerunningProtocolModal = RerunningProtocolModal as jest.MockedFunction<
   typeof RerunningProtocolModal
+>
+const mockGetLatestLabwareOffsetCount = getLatestLabwareOffsetCount as jest.MockedFunction<
+  typeof getLatestLabwareOffsetCount
 >
 
 const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolFile<{}>
@@ -55,11 +61,21 @@ const render = (props: React.ComponentProps<typeof UploadInput>) => {
 
 describe('UploadInput', () => {
   let props = {} as React.ComponentProps<typeof UploadInput>
+  let mockOffsets: LabwareOffset[]
 
   beforeEach(() => {
     props = {
       onUpload: jest.fn(),
     }
+    mockOffsets = [
+      {
+        id: 'someId',
+        createdAt: 'someTimestamp',
+        definitionUri: 'mockUri',
+        location: { slotName: '3' },
+        vector: { x: 5, y: 5, z: 5 },
+      },
+    ]
     mockGetConnectedRobotName.mockReturnValue('robotName')
     mockUseMostRecentRunId.mockReturnValue('RunId')
     when(mockUseProtocolDetails).calledWith().mockReturnValue({
@@ -73,38 +89,44 @@ describe('UploadInput', () => {
           data: {
             protocolId: 'ProtocolId',
             createdAt: '2021-11-12T19:39:19.668514+00:00',
-            labwareOffsets: [{ x: 5, y: 5, z: 5 }],
+            labwareOffsets: mockOffsets,
           },
         },
       } as any)
     mockUseCloneRun.mockReturnValue(jest.fn())
-  })
-  when(mockUseProtocolQuery)
-    .calledWith('ProtocolId')
-    .mockReturnValue({
-      data: {
+    when(mockUseProtocolQuery)
+      .calledWith('ProtocolId')
+      .mockReturnValue({
         data: {
-          protocolType: 'python',
-          createdAt: 'now',
-          id: 'ProtocolId',
-          metadata: {},
-          analyses: {},
-          files: [{ name: 'name', role: 'main' }],
+          data: {
+            protocolType: 'python',
+            createdAt: 'now',
+            id: 'ProtocolId',
+            metadata: {},
+            analyses: {},
+            files: [{ name: 'name', role: 'main' }],
+          },
         },
-      },
-    } as any)
+      } as any)
 
-  when(mockRerunningProtocolModal)
-    .calledWith(
-      componentPropsMatcher({
-        onCloseClick: expect.anything(),
-      })
-    )
-    .mockImplementation(({ onCloseClick }) => (
-      <div onClick={onCloseClick}>Mock Rerunning Protocol Modal</div>
-    ))
+    when(mockRerunningProtocolModal)
+      .calledWith(
+        componentPropsMatcher({
+          onCloseClick: expect.anything(),
+        })
+      )
+      .mockImplementation(({ onCloseClick }) => (
+        <div onClick={onCloseClick}>Mock Rerunning Protocol Modal</div>
+      ))
+
+    when(mockGetLatestLabwareOffsetCount)
+      .calledWith(mockOffsets)
+      .mockReturnValue(0)
+  })
+
   afterEach(() => {
-    jest.resetAllMocks()
+    resetAllWhenMocks()
+    jest.restoreAllMocks()
   })
 
   it('renders correct contents for empty state', () => {
@@ -150,6 +172,9 @@ describe('UploadInput', () => {
     )
   })
   it('renders the correct latest protocol uplaoded info', () => {
+    when(mockGetLatestLabwareOffsetCount)
+      .calledWith(mockOffsets)
+      .mockReturnValue(1)
     const { getByText } = render(props)
     getByText('robotName’s last run')
     getByText('mock display name')
@@ -174,6 +199,7 @@ describe('UploadInput', () => {
           },
         },
       } as any)
+    when(mockGetLatestLabwareOffsetCount).calledWith([]).mockReturnValue(0)
     const { getByText } = render(props)
     getByText('No Labware Offset data')
   })
