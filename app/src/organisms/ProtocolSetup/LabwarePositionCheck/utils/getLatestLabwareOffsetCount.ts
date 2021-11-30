@@ -29,18 +29,18 @@ export const getLatestLabwareOffsetCount = (
     }
   )
 
-  const uniqueOffsetCount = filteredLabwareOffsets.reduce<
-    LabwareOffset[],
-    number
-  >((acc: number, offset: LabwareOffset) => {
-    const vector = offset.vector
-    if (
-      !isEqual(location, TRASH_LOCATION) &&
-      !isEqual(vector, IDENTITY_VECTOR)
-    ) {
-      return acc + 1
-    }
-    return acc
-  }, 0)
+  const uniqueOffsetCount = filteredLabwareOffsets.reduce<number>(
+    (acc: number, offset: LabwareOffset) => {
+      const vector = offset.vector
+      if (
+        !isEqual(location, TRASH_LOCATION) &&
+        !isEqual(vector, IDENTITY_VECTOR)
+      ) {
+        return acc + 1
+      }
+      return acc
+    },
+    0
+  )
   return uniqueOffsetCount
 }
