@@ -7,7 +7,7 @@ from opentrons.config.advanced_settings import _migrate, _ensure
 
 @pytest.fixture
 def migrated_file_version() -> int:
-    return 11
+    return 12
 
 
 @pytest.fixture
