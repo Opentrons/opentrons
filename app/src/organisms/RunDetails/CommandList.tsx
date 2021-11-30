@@ -45,7 +45,9 @@ export function CommandList(): JSX.Element | null {
   const { runRecord } = useCurrentProtocolRun()
   const runStatus = useRunStatus()
   const runDataCommands = runRecord?.data.commands
-  const firstPlayTimestamp = runRecord?.data.actions.find(action => action.actionType === 'play')?.createdAt
+  const firstPlayTimestamp = runRecord?.data.actions.find(
+    action => action.actionType === 'play'
+  )?.createdAt
 
   const analysisCommandsWithStatus =
     protocolData?.commands != null
@@ -56,31 +58,42 @@ export function CommandList(): JSX.Element | null {
       : []
   const allProtocolCommands: Command[] =
     protocolData != null ? analysisCommandsWithStatus : []
-  const lastProtocolSetupCommand = last(allProtocolCommands
-    .filter(
-      command =>
-        ['loadLabware' ,'loadPipette', 'loadModule'].includes(command.commandType)
-    )) ?? null
-  const lastProtocolSetupIndex = allProtocolCommands.findIndex(command => command.id === lastProtocolSetupCommand?.id)
+  const lastProtocolSetupCommand =
+    last(
+      allProtocolCommands.filter(command =>
+        ['loadLabware', 'loadPipette', 'loadModule'].includes(
+          command.commandType
+        )
+      )
+    ) ?? null
+  const lastProtocolSetupIndex = allProtocolCommands.findIndex(
+    command => command.id === lastProtocolSetupCommand?.id
+  )
 
-  const protocolSetupCommandList = lastProtocolSetupCommand != null
-    ? allProtocolCommands.slice(0, lastProtocolSetupIndex + 1)
-    : []
-  const postSetupAnticipatedCommands: Command[] = lastProtocolSetupCommand != null
-    ? allProtocolCommands.slice(lastProtocolSetupIndex + 1)
-    : allProtocolCommands
-
+  const protocolSetupCommandList =
+    lastProtocolSetupCommand != null
+      ? allProtocolCommands.slice(0, lastProtocolSetupIndex + 1)
+      : []
+  const postSetupAnticipatedCommands: Command[] =
+    lastProtocolSetupCommand != null
+      ? allProtocolCommands.slice(lastProtocolSetupIndex + 1)
+      : allProtocolCommands
 
   let currentCommandList: Array<
     Command | RunCommandSummary
   > = postSetupAnticipatedCommands
-  if (runDataCommands != null && runDataCommands.length > 0 && firstPlayTimestamp != null) {
-    const firstPostPlayRunCommandIndex = runDataCommands.findIndex(command => (
-      command.id === postSetupAnticipatedCommands[0]?.id
-    ))
-    const postPlayRunCommands = firstPostPlayRunCommandIndex >= 0
-      ? runDataCommands.slice(firstPostPlayRunCommandIndex)
-      : []
+  if (
+    runDataCommands != null &&
+    runDataCommands.length > 0 &&
+    firstPlayTimestamp != null
+  ) {
+    const firstPostPlayRunCommandIndex = runDataCommands.findIndex(
+      command => command.id === postSetupAnticipatedCommands[0]?.id
+    )
+    const postPlayRunCommands =
+      firstPostPlayRunCommandIndex >= 0
+        ? runDataCommands.slice(firstPostPlayRunCommandIndex)
+        : []
 
     console.log('PP ', postPlayRunCommands[0])
     // const postPlayRunCommands = runDataCommands.filter(command => (
@@ -91,9 +104,7 @@ export function CommandList(): JSX.Element | null {
     const remainingAnticipatedCommands = dropWhile(
       postSetupAnticipatedCommands,
       anticipatedCommand =>
-        runDataCommands.some(
-          runC => runC.id === anticipatedCommand.id
-        )
+        runDataCommands.some(runC => runC.id === anticipatedCommand.id)
     )
 
     const isProtocolDeterministic = postPlayRunCommands.reduce(
