@@ -648,7 +648,7 @@ def test_thermocycler_dodging(
     decoy: Decoy,
     labware_view: LabwareView,
     module_view: ModuleView,
-    minimal_module_def: ModuleDefinition,
+    tempdeck_v1_def: ModuleDefinition,
     subject: GeometryView,
     from_slot: DeckSlotName,
     to_slot: DeckSlotName,
@@ -681,7 +681,7 @@ def test_thermocycler_dodging(
                 id="module-1",
                 model=ModuleModel.THERMOCYCLER_MODULE_V1,
                 location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
-                definition=minimal_module_def,
+                definition=tempdeck_v1_def,
             )
         ]
     )
