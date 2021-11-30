@@ -11,23 +11,22 @@ from opentrons.protocol_reader import (
     ProtocolSourceFile,
     ProtocolFileRole,
     PythonProtocolConfig,
-    InputFile,
 )
 
-from opentrons.protocol_reader.input_reader import InputReader, BufferedFile
+from opentrons.protocol_reader.input_file import InputFile, BufferedFile
+from opentrons.protocol_reader.file_reader_writer import FileReaderWriter
 from opentrons.protocol_reader.role_analyzer import (
     RoleAnalyzer,
     RoleAnalysis,
     RoleAnalyzedFile,
 )
 from opentrons.protocol_reader.config_analyzer import ConfigAnalyzer, ConfigAnalysis
-from opentrons.protocol_reader.file_writer import FileWriter
 
 
 @pytest.fixture
-def input_reader(decoy: Decoy) -> InputReader:
-    """Get a mocked out InputReader."""
-    return decoy.mock(cls=InputReader)
+def file_reader_writer(decoy: Decoy) -> FileReaderWriter:
+    """Get a mocked out FileReaderWriter."""
+    return decoy.mock(cls=FileReaderWriter)
 
 
 @pytest.fixture
@@ -43,36 +42,27 @@ def config_analyzer(decoy: Decoy) -> ConfigAnalyzer:
 
 
 @pytest.fixture
-def file_writer(decoy: Decoy) -> FileWriter:
-    """Get a mocked out FileWriter."""
-    return decoy.mock(cls=FileWriter)
-
-
-@pytest.fixture
 def subject(
     tmp_path: Path,
-    input_reader: InputReader,
+    file_reader_writer: FileReaderWriter,
     role_analyzer: RoleAnalyzer,
     config_analyzer: ConfigAnalyzer,
-    file_writer: FileWriter,
 ) -> ProtocolReader:
     """Create a ProtocolReader test subject."""
     return ProtocolReader(
         directory=tmp_path,
-        input_reader=input_reader,
+        file_reader_writer=file_reader_writer,
         role_analyzer=role_analyzer,
         config_analyzer=config_analyzer,
-        file_writer=file_writer,
     )
 
 
 async def test_read_file(
     decoy: Decoy,
     tmp_path: Path,
-    input_reader: InputReader,
+    file_reader_writer: FileReaderWriter,
     role_analyzer: RoleAnalyzer,
     config_analyzer: ConfigAnalyzer,
-    file_writer: FileWriter,
     subject: ProtocolReader,
 ) -> None:
     """It should read a single file protocol source."""
@@ -80,11 +70,11 @@ async def test_read_file(
         filename="protocol.py",
         file=io.BytesIO(b"# hello world"),
     )
-    buffered_file = BufferedFile(name="protocol.py", contents="# hello world")
+    buffered_file = BufferedFile(name="protocol.py", contents=b"# hello world")
     analyzed_file = RoleAnalyzedFile(
         role=ProtocolFileRole.MAIN,
         name="protocol.py",
-        contents="# hello world",
+        contents=b"# hello world",
     )
     analyzed_roles = RoleAnalysis(main_file=analyzed_file, other_files=[])
     analyzed_config = ConfigAnalysis(
@@ -92,7 +82,7 @@ async def test_read_file(
         config=PythonProtocolConfig(api_version=APIVersion(123, 456)),
     )
 
-    decoy.when(await input_reader.read([input_file])).then_return([buffered_file])
+    decoy.when(await file_reader_writer.read([input_file])).then_return([buffered_file])
     decoy.when(role_analyzer.analyze([buffered_file])).then_return(analyzed_roles)
     decoy.when(config_analyzer.analyze(analyzed_file)).then_return(analyzed_config)
 
@@ -107,7 +97,7 @@ async def test_read_file(
     )
 
     decoy.verify(
-        await file_writer.write(
+        await file_reader_writer.write(
             directory=tmp_path / "protocol-name",
             files=[analyzed_file],
         )
@@ -117,10 +107,9 @@ async def test_read_file(
 async def test_read_files(
     decoy: Decoy,
     tmp_path: Path,
-    input_reader: InputReader,
+    file_reader_writer: FileReaderWriter,
     role_analyzer: RoleAnalyzer,
     config_analyzer: ConfigAnalyzer,
-    file_writer: FileWriter,
     subject: ProtocolReader,
 ) -> None:
     """It should read a single file protocol source."""
@@ -132,18 +121,18 @@ async def test_read_files(
         filename="data.csv",
         file=io.BytesIO(b",,,"),
     )
-    main_buffered_file = BufferedFile(name="protocol.py", contents="# hello world")
-    data_buffered_file = BufferedFile(name="data.csv", contents=",,,")
+    main_buffered_file = BufferedFile(name="protocol.py", contents=b"# hello world")
+    data_buffered_file = BufferedFile(name="data.csv", contents=b",,,")
 
     main_analyzed_file = RoleAnalyzedFile(
         role=ProtocolFileRole.MAIN,
         name="protocol.py",
-        contents="# hello world",
+        contents=b"# hello world",
     )
     data_analyzed_file = RoleAnalyzedFile(
         role=ProtocolFileRole.DATA,
         name="data.csv",
-        contents=",,,",
+        contents=b",,,",
     )
 
     analyzed_roles = RoleAnalysis(
@@ -156,9 +145,9 @@ async def test_read_files(
         config=PythonProtocolConfig(api_version=APIVersion(123, 456)),
     )
 
-    decoy.when(await input_reader.read([main_input_file, data_input_file])).then_return(
-        [main_buffered_file, data_buffered_file]
-    )
+    decoy.when(
+        await file_reader_writer.read([main_input_file, data_input_file])
+    ).then_return([main_buffered_file, data_buffered_file])
     decoy.when(
         role_analyzer.analyze([main_buffered_file, data_buffered_file])
     ).then_return(analyzed_roles)
@@ -181,7 +170,7 @@ async def test_read_files(
     )
 
     decoy.verify(
-        await file_writer.write(
+        await file_reader_writer.write(
             directory=tmp_path / "protocol-name",
             files=[main_analyzed_file, data_analyzed_file],
         )

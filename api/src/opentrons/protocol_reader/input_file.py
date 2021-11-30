@@ -23,3 +23,11 @@ class InputFile(AbstractInputFile):
 
     filename: str
     file: IO[bytes]
+
+
+@dataclass(frozen=True)
+class BufferedFile:
+    """A file that has been read into memory."""
+
+    name: str
+    contents: bytes
