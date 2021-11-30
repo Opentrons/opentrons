@@ -89,7 +89,7 @@ class ModuleView(HasState[ModuleState]):
 
     def get_location(self, module_id: str) -> DeckSlotLocation:
         """Get the slot location of the given module."""
-        return self._state.modules_by_id[module_id].location
+        return self.get(module_id=module_id).location
 
     def get_model(self, module_id: str) -> ModuleModel:
         """Get the model name of the given module."""
@@ -129,7 +129,7 @@ class ModuleView(HasState[ModuleState]):
 
     def get_dimensions(self, module_id: str) -> ModuleDimensions:
         """Get the specified module's dimensions."""
-        return self._state.modules_by_id[module_id].definition.dimensions
+        return self.get(module_id).definition.dimensions
 
     def get_module_offset(self, module_id: str) -> LabwareOffsetVector:
         """Get the module's offset vector computed with slot transform."""
