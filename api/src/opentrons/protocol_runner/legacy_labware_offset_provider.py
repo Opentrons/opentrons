@@ -1,7 +1,4 @@
 """Interfaces to provide ProtocolEngine labware offsets to PAPIv2 protocols."""
-# TODO(mc, 2021-11-23): this module is missing tests. They would have
-# informed the proper shape / dependency model for this unit, so this may
-# change as tests are added.
 
 from typing import Optional
 
