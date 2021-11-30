@@ -70,11 +70,16 @@ async def test_read_file(
         filename="protocol.py",
         file=io.BytesIO(b"# hello world"),
     )
-    buffered_file = BufferedFile(name="protocol.py", contents=b"# hello world")
+    buffered_file = BufferedFile(
+        name="protocol.py",
+        contents=b"# hello world",
+        data=None,
+    )
     analyzed_file = RoleAnalyzedFile(
         role=ProtocolFileRole.MAIN,
         name="protocol.py",
         contents=b"# hello world",
+        data=None,
     )
     analyzed_roles = RoleAnalysis(main_file=analyzed_file, other_files=[])
     analyzed_config = ConfigAnalysis(
@@ -121,18 +126,24 @@ async def test_read_files(
         filename="data.csv",
         file=io.BytesIO(b",,,"),
     )
-    main_buffered_file = BufferedFile(name="protocol.py", contents=b"# hello world")
-    data_buffered_file = BufferedFile(name="data.csv", contents=b",,,")
+    main_buffered_file = BufferedFile(
+        name="protocol.py",
+        contents=b"# hello world",
+        data=None,
+    )
+    data_buffered_file = BufferedFile(name="data.csv", contents=b",,,", data=None)
 
     main_analyzed_file = RoleAnalyzedFile(
         role=ProtocolFileRole.MAIN,
         name="protocol.py",
         contents=b"# hello world",
+        data=None,
     )
     data_analyzed_file = RoleAnalyzedFile(
         role=ProtocolFileRole.DATA,
         name="data.csv",
         contents=b",,,",
+        data=None,
     )
 
     analyzed_roles = RoleAnalysis(

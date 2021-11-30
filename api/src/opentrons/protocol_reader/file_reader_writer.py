@@ -1,9 +1,14 @@
 """Input file reading."""
 from anyio import Path as AsyncPath, create_task_group, wrap_file
 from pathlib import Path
+from pydantic import ValidationError, parse_raw_as
 from typing import List, Optional, Sequence
 
-from .input_file import AbstractInputFile, BufferedFile
+from .input_file import AbstractInputFile, BufferedFile, BufferedFileData
+
+
+class FileReadError(Exception):
+    """An error raised if input files cannot be read."""
 
 
 class FileReaderWriter:
@@ -17,8 +22,24 @@ class FileReaderWriter:
         async def _read_file(input_file: AbstractInputFile, index: int) -> None:
             async with wrap_file(input_file.file) as f:
                 contents = await f.read()
-                buffered = BufferedFile(name=input_file.filename, contents=contents)
-                results[index] = buffered
+                data: Optional[BufferedFileData] = None
+
+                if input_file.filename.endswith(".json"):
+                    try:
+                        data = parse_raw_as(
+                            BufferedFileData,  # type: ignore[arg-type]
+                            contents,
+                        )
+                    except ValidationError as e:
+                        raise FileReadError(
+                            f"JSON file {input_file.filename} could not be parsed."
+                        ) from e
+
+                results[index] = BufferedFile(
+                    name=input_file.filename,
+                    contents=contents,
+                    data=data,
+                )
 
         async with create_task_group() as tg:
             for index, input_file in enumerate(files):

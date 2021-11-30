@@ -22,10 +22,14 @@ class ProtocolFileRole(str, Enum):
         MAIN: The protocol's main file. In a JSON protocol, this is will
             be the JSON file. In a Python protocol, this is the file
             that exports the main `run` method.
+        PYTHON_SUPPORT: An extra Python file that is not the protocol's
+            entry point.
         DATA: Catch-all role for non-Python and non-protocol-JSON files.
     """
 
     MAIN = "main"
+    PYTHON_SUPPORT = "pythonSupport"
+    LABWARE_DEFINITION = "labwareDefinition"
     DATA = "data"
 
 
