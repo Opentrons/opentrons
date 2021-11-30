@@ -67,28 +67,6 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
     ),
     RoleAnalyzerSpec(
         files=[
-            BufferedFile(name="lib.py", contents=b"", data=None),
-            BufferedFile(name="__init__.py", contents=b"", data=None),
-        ],
-        expected=RoleAnalysis(
-            main_file=RoleAnalyzedFile(
-                name="__init__.py",
-                contents=b"",
-                data=None,
-                role=ProtocolFileRole.MAIN,
-            ),
-            other_files=[
-                RoleAnalyzedFile(
-                    name="lib.py",
-                    contents=b"",
-                    data=None,
-                    role=ProtocolFileRole.PYTHON_SUPPORT,
-                )
-            ],
-        ),
-    ),
-    RoleAnalyzerSpec(
-        files=[
             BufferedFile(
                 name="protocol.json",
                 contents=b"",
@@ -166,14 +144,7 @@ ROLE_ANALYZER_ERROR_SPECS: List[RoleAnalyzerErrorSpec] = [
             BufferedFile(name="foo.py", contents=b"", data=None),
             BufferedFile(name="bar.py", contents=b"", data=None),
         ],
-        expected_message="main file must be named __init__.py.",
-    ),
-    RoleAnalyzerErrorSpec(
-        files=[
-            BufferedFile(name="__init__.py", contents=b"", data=None),
-            BufferedFile(name="__init__.py", contents=b"", data=None),
-        ],
-        expected_message="Multiple __init__.py files provided.",
+        expected_message="multiple Python files are not yet supported.",
     ),
     RoleAnalyzerErrorSpec(
         files=[

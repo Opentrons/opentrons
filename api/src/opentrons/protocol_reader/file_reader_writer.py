@@ -1,4 +1,5 @@
 """Input file reading."""
+from json import JSONDecodeError
 from anyio import Path as AsyncPath, create_task_group, wrap_file
 from pathlib import Path
 from pydantic import ValidationError, parse_raw_as
@@ -30,7 +31,7 @@ class FileReaderWriter:
                             BufferedFileData,  # type: ignore[arg-type]
                             contents,
                         )
-                    except ValidationError as e:
+                    except (JSONDecodeError, ValidationError) as e:
                         raise FileReadError(
                             f"JSON file {input_file.filename} could not be parsed."
                         ) from e
