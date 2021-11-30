@@ -1,7 +1,6 @@
 """Geometry state getters."""
 from dataclasses import dataclass
-from typing import Optional
-
+from typing import Optional, NamedTuple
 
 from opentrons.types import Point, DeckSlotName
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -20,22 +19,29 @@ from .labware import LabwareView
 from .modules import ModuleView
 
 
+class SlotTransit(NamedTuple):
+    """Class defining starting and ending slots in a pipette movement."""
+
+    start: DeckSlotName
+    end: DeckSlotName
+
+
 DEFAULT_TIP_DROP_HEIGHT_FACTOR = 0.5
-BAD_PAIRS = [
-    ("1", "12"),
-    ("12", "1"),
-    ("4", "12"),
-    ("12", "4"),
-    ("4", "9"),
-    ("9", "4"),
-    ("4", "8"),
-    ("8", "4"),
-    ("1", "8"),
-    ("8", "1"),
-    ("4", "11"),
-    ("11", "4"),
-    ("1", "11"),
-    ("11", "1"),
+THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = [
+    SlotTransit(start=DeckSlotName.SLOT_1, end=DeckSlotName.FIXED_TRASH),
+    SlotTransit(start=DeckSlotName.FIXED_TRASH, end=DeckSlotName.SLOT_1),
+    SlotTransit(start=DeckSlotName.SLOT_4, end=DeckSlotName.FIXED_TRASH),
+    SlotTransit(start=DeckSlotName.FIXED_TRASH, end=DeckSlotName.SLOT_4),
+    SlotTransit(start=DeckSlotName.SLOT_4, end=DeckSlotName.SLOT_9),
+    SlotTransit(start=DeckSlotName.SLOT_9, end=DeckSlotName.SLOT_4),
+    SlotTransit(start=DeckSlotName.SLOT_4, end=DeckSlotName.SLOT_8),
+    SlotTransit(start=DeckSlotName.SLOT_8, end=DeckSlotName.SLOT_4),
+    SlotTransit(start=DeckSlotName.SLOT_1, end=DeckSlotName.SLOT_8),
+    SlotTransit(start=DeckSlotName.SLOT_8, end=DeckSlotName.SLOT_1),
+    SlotTransit(start=DeckSlotName.SLOT_4, end=DeckSlotName.SLOT_11),
+    SlotTransit(start=DeckSlotName.SLOT_11, end=DeckSlotName.SLOT_4),
+    SlotTransit(start=DeckSlotName.SLOT_1, end=DeckSlotName.SLOT_11),
+    SlotTransit(start=DeckSlotName.SLOT_11, end=DeckSlotName.SLOT_1),
 ]
 
 
@@ -243,23 +249,24 @@ class GeometryView:
         from_labware = self._labware.get(from_labware_id)
         to_labware = self._labware.get(to_labware_id)
 
-        def get_slot_name(labware: LoadedLabware) -> DeckSlotName:
-            slot_name: DeckSlotName
-
-            if isinstance(labware.location, DeckSlotLocation):
-                slot_name = labware.location.slotName
-            else:
-                module_id = labware.location.moduleId
-                slot_name = self._modules.get_location(module_id).slotName
-            return slot_name
-
         if self._modules.get_all() and ModuleModel.THERMOCYCLER_MODULE_V1 in [
             mod.model for mod in self._modules.get_all()
         ]:
             transit = (
-                get_slot_name(from_labware).value,
-                get_slot_name(to_labware).value,
+                self.get_ancestor_slot_name(from_labware),
+                self.get_ancestor_slot_name(to_labware),
             )
-            if transit in BAD_PAIRS:
+            if transit in THERMOCYCLER_SLOT_TRANSITS_TO_DODGE:
                 return True
         return False
+
+    def get_ancestor_slot_name(self, labware: LoadedLabware) -> DeckSlotName:
+        """Get the slot name of the labware or the module that the labware is on."""
+        slot_name: DeckSlotName
+
+        if isinstance(labware.location, DeckSlotLocation):
+            slot_name = labware.location.slotName
+        else:
+            module_id = labware.location.moduleId
+            slot_name = self._modules.get_location(module_id).slotName
+        return slot_name

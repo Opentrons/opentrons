@@ -24,7 +24,10 @@ from opentrons.protocol_engine.types import (
 )
 from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.modules import ModuleView
-from opentrons.protocol_engine.state.geometry import GeometryView
+from opentrons.protocol_engine.state.geometry import (
+    GeometryView,
+    THERMOCYCLER_SLOT_TRANSITS_TO_DODGE as dodge_slots,
+)
 
 
 @pytest.fixture
@@ -632,13 +635,24 @@ def test_get_tip_drop_invalid_origin(
         )
 
 
-# TODO (spp, 2021-11-29): parametrize this test
+@pytest.mark.parametrize(
+    argnames="from_slot, to_slot, should_dodge",
+    argvalues=[
+        [dodge_slots[0].start, dodge_slots[0].end, True],
+        [dodge_slots[2].start, dodge_slots[2].end, True],
+        [dodge_slots[5].start, dodge_slots[5].end, True],
+        [DeckSlotName.SLOT_2, DeckSlotName.SLOT_4, False],
+    ],
+)
 def test_thermocycler_dodging(
     decoy: Decoy,
     labware_view: LabwareView,
     module_view: ModuleView,
     minimal_module_def: ModuleDefinition,
     subject: GeometryView,
+    from_slot: DeckSlotName,
+    to_slot: DeckSlotName,
+    should_dodge: bool,
 ) -> None:
     """It should specify if thermocycler dodging is needed.
 
@@ -650,7 +664,7 @@ def test_thermocycler_dodging(
             id="from-id",
             loadName="labware-1",
             definitionUri="some-uri",
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+            location=DeckSlotLocation(slotName=from_slot),
         )
     )
     decoy.when(labware_view.get("to-id")).then_return(
@@ -658,7 +672,7 @@ def test_thermocycler_dodging(
             id="to-id",
             loadName="labware-2",
             definitionUri="some-uri",
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_9),
+            location=DeckSlotLocation(slotName=to_slot),
         )
     )
     decoy.when(module_view.get_all()).then_return(
@@ -675,5 +689,5 @@ def test_thermocycler_dodging(
         subject.should_dodge_thermocycler(
             from_labware_id="from-id", to_labware_id="to-id"
         )
-        is True
+        is should_dodge
     )
