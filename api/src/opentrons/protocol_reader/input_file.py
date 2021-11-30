@@ -1,7 +1,9 @@
 """Input file value objects."""
 from dataclasses import dataclass
-from typing import IO
+from typing import Any, Dict, IO, Optional, Union
 from typing_extensions import Protocol as InterfaceShape
+
+from opentrons.protocols.models import JsonProtocol, LabwareDefinition
 
 
 class AbstractInputFile(InterfaceShape):
@@ -25,9 +27,17 @@ class InputFile(AbstractInputFile):
     file: IO[bytes]
 
 
+BufferedFileData = Union[
+    JsonProtocol,
+    LabwareDefinition,
+    Dict[str, Any],
+]
+
+
 @dataclass(frozen=True)
 class BufferedFile:
     """A file that has been read into memory."""
 
     name: str
     contents: bytes
+    data: Optional[BufferedFileData]
