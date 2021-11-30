@@ -45,6 +45,7 @@ describe('getProtocolModulesInfo', () => {
           ],
         nestedLabwareId: MAG_LW_ID,
         protocolLoadOrder: 0,
+        slotName: '1',
       },
       {
         moduleId: TEMP_MOD_ID,
@@ -59,6 +60,7 @@ describe('getProtocolModulesInfo', () => {
           ],
         nestedLabwareId: TEMP_LW_ID,
         protocolLoadOrder: 1,
+        slotName: '3',
       },
       {
         moduleId: TC_ID,
@@ -73,6 +75,7 @@ describe('getProtocolModulesInfo', () => {
           ],
         nestedLabwareId: TC_LW_ID,
         protocolLoadOrder: 2,
+        slotName: '7',
       },
     ]
 
@@ -116,6 +119,7 @@ describe('getProtocolModulesInfo', () => {
           ],
         nestedLabwareId: MAG_LW_ID,
         protocolLoadOrder: 0,
+        slotName: '1',
       },
       {
         moduleId: TEMP_MOD_ONE_ID,
@@ -130,6 +134,7 @@ describe('getProtocolModulesInfo', () => {
           ],
         nestedLabwareId: TEMP_ONE_LW_ID,
         protocolLoadOrder: 1,
+        slotName: '3',
       },
       {
         moduleId: TEMP_MOD_TWO_ID,
@@ -144,6 +149,7 @@ describe('getProtocolModulesInfo', () => {
           ],
         nestedLabwareId: TEMP_TWO_LW_ID,
         protocolLoadOrder: 2,
+        slotName: '7',
       },
     ]
 
