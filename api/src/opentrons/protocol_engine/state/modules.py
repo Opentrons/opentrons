@@ -91,6 +91,22 @@ class ModuleView(HasState[ModuleState]):
         """Get the slot location of the given module."""
         return self._state.modules_by_id[module_id].location
 
+    def get_model(self, module_id: str) -> ModuleModel:
+        """Get the model name of the given module."""
+        return self.get(module_id=module_id).model
+
+    def get_serial(self, module_id: str) -> str:
+        """Get the hardware serial number of the given module.
+
+        If the underlying hardware API is simulating, this will be a dummy value
+        provided by the hardware API.
+        """
+        loaded_module = self.get(module_id=module_id)
+        # As far as we know, None can never actually happen. See todo in
+        # protocol_engine.types.LoadedModule.
+        assert loaded_module.serial is not None
+        return loaded_module.serial
+
     def get_definition_by_id(self, module_id: str) -> ModuleDefinition:
         """Module definition by ID."""
         return self.get(module_id).definition

@@ -5,18 +5,24 @@ from typing import NamedTuple
 
 from opentrons.types import MountType, Mount, Point
 from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control.modules import (
+    Thermocycler as HardwareThermocycler,
+)
 from opentrons.hardware_control.types import (
     CriticalPoint,
     Axis as HardwareAxis,
     MustHomeError as HardwareMustHomeError,
 )
+from opentrons.drivers.types import ThermocyclerLidStatus
 from opentrons.motion_planning import Waypoint
 
-from opentrons.protocol_engine.errors import MustHomeError
+from opentrons.protocol_engine.errors import MustHomeError, ThermocyclerNotOpenError
 from opentrons.protocol_engine.types import (
     DeckPoint,
     MotorAxis,
     MovementAxis,
+    ModuleLocation,
+    ModuleModel,
     WellLocation,
     WellOrigin,
     WellOffset,
@@ -201,6 +207,39 @@ async def test_move_to_well_from_starting_location(
             critical_point=CriticalPoint.XY_CENTER,
         ),
     )
+
+
+# FIX BEFORE MERGE: Parametrize this.
+async def test_move_to_well_raises_if_thermocycler_not_open(
+    decoy: Decoy,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    subject: MovementHandler,
+) -> None:
+    """It should raise if the destination labware is in a non-open Thermocycler."""
+    decoy.when(state_store.labware.get_location(labware_id="labware-id")).then_return(
+        ModuleLocation(moduleId="module-id")
+    )
+
+    decoy.when(state_store.modules.get_model(module_id="module-id")).then_return(
+        ModuleModel.THERMOCYCLER_MODULE_V1,
+    )
+    decoy.when(state_store.modules.get_serial(module_id="module-id")).then_return(
+        "module-serial"
+    )
+
+    thermocycler = decoy.mock(cls=HardwareThermocycler)
+    # FIX BEFORE MERGE: How do we stub properties in Decoy?
+    decoy.when(thermocycler.device_info).then_return({"serial": "module-serial"})
+    decoy.when(thermocycler.lid_status).then_return(ThermocyclerLidStatus.IN_BETWEEN)
+    decoy.when(hardware_api.attached_modules).then_return([thermocycler])
+
+    with pytest.raises(ThermocyclerNotOpenError):
+        await subject.move_to_well(
+            pipette_id="pipette-id",
+            labware_id="labware-id",
+            well_name="A1",
+        )
 
 
 class MoveRelativeSpec(NamedTuple):

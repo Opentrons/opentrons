@@ -14,9 +14,16 @@ from opentrons.hardware_control.types import (
 )
 from opentrons.drivers.types import ThermocyclerLidStatus
 
-from ..types import ModuleLocation, WellLocation, DeckPoint, MovementAxis, MotorAxis
+from ..types import (
+    ModuleLocation,
+    ModuleModel,
+    WellLocation,
+    DeckPoint,
+    MovementAxis,
+    MotorAxis,
+)
 from ..state import StateStore, CurrentWell
-from ..errors import MustHomeError, ModuleDoesNotExistError, ThermocyclerNotOpenError
+from ..errors import MustHomeError, ThermocyclerNotOpenError
 from ..resources import ModelUtils
 
 
@@ -196,15 +203,15 @@ class MovementHandler:
         labware_location = self._state_store.labware.get_location(labware_id=labware_id)
         if isinstance(labware_location, ModuleLocation):
             module_id = labware_location.moduleId
-            module_info_in_state = self._state_store.modules.get(module_id=module_id)
-            if module_info_in_state is None:
-                raise ModuleDoesNotExistError(f'Module ID "{module_id}" not found.')
-            else:
-                # As far as we know, None can never actually happen. See todo in
-                # protocol_engine.types.LoadedModule.
-                assert module_info_in_state.serial is not None
+            if (
+                self._state_store.modules.get_model(module_id=module_id)
+                == ModuleModel.THERMOCYCLER_MODULE_V1
+            ):
+                thermocycler_serial = self._state_store.modules.get_serial(
+                    module_id=module_id
+                )
                 thermocycler = self._find_thermocycler_by_serial(
-                    module_info_in_state.serial
+                    serial_number=thermocycler_serial
                 )
                 lid_status = thermocycler.lid_status
                 if lid_status is None:
@@ -215,6 +222,8 @@ class MovementHandler:
                     return ThermocyclerLidStatus.UNKNOWN
                 else:
                     return thermocycler.lid_status
+            else:
+                return None
         else:
             return None
 
@@ -228,6 +237,7 @@ class MovementHandler:
             ):
                 return attached_module
 
-        # Todo: Better error. This can happen if the module was disconnected
+        # FIX BEFORE MERGE:
+        # Better error. This can happen if the module was disconnected
         # between load and now, I think.
         assert False
