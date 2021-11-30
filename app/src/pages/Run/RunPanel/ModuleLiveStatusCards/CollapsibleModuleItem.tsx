@@ -6,8 +6,6 @@ import styles from './lists.css'
 import { Icon, COLOR_ERROR } from '@opentrons/components'
 
 import type { IconName } from '@opentrons/components'
-// TODO(bc, 2021-03-31): this is only used in on place
-// reconsider whether this belongs in components library
 
 export interface CollapsibleModuleItemProps {
   /** optional icon for title */
