@@ -95,12 +95,6 @@ export function CommandList(): JSX.Element | null {
         ? runDataCommands.slice(firstPostPlayRunCommandIndex)
         : []
 
-    console.log('PP ', postPlayRunCommands[0])
-    // const postPlayRunCommands = runDataCommands.filter(command => (
-    //   'createdAt' in command &&
-    //   command?.createdAt != null &&
-    //   new Date(command?.createdAt) < new Date(firstPlayTimestamp)
-    // ))
     const remainingAnticipatedCommands = dropWhile(
       postSetupAnticipatedCommands,
       anticipatedCommand =>
@@ -121,7 +115,6 @@ export function CommandList(): JSX.Element | null {
       ? [...postPlayRunCommands, ...remainingAnticipatedCommands]
       : [...postPlayRunCommands]
   }
-  console.log(currentCommandList[0], postSetupAnticipatedCommands[0])
 
   if (protocolData == null || runStatus == null) return null
 
