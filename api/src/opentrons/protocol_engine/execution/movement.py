@@ -3,16 +3,20 @@ from typing import Dict, Optional, Sequence
 from dataclasses import dataclass
 
 from opentrons.types import Point
-from opentrons.hardware_control.api import API as HardwareAPI
+from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control.modules import (
+    Thermocycler as HardwareThermocycler,
+)
 from opentrons.hardware_control.types import (
     CriticalPoint,
     Axis as HardwareAxis,
     MustHomeError as HardwareMustHomeError,
 )
+from opentrons.drivers.types import ThermocyclerLidStatus
 
-from ..types import WellLocation, DeckPoint, MovementAxis, MotorAxis
+from ..types import ModuleLocation, WellLocation, DeckPoint, MovementAxis, MotorAxis
 from ..state import StateStore, CurrentWell
-from ..errors import MustHomeError
+from ..errors import MustHomeError, ModuleDoesNotExistError, ThermocyclerNotOpenError
 from ..resources import ModelUtils
 
 
@@ -61,12 +65,13 @@ class MovementHandler:
         current_well: Optional[CurrentWell] = None,
     ) -> None:
         """Move to a specific well."""
+        self._raise_if_labware_in_non_open_thermocycler(labware_id=labware_id)
+
         # get the pipette's mount and current critical point, if applicable
         pipette_location = self._state_store.motion.get_pipette_location(
             pipette_id=pipette_id,
             current_well=current_well,
         )
-
         hw_mount = pipette_location.mount.to_hw_mount()
         origin_cp = pipette_location.critical_point
 
@@ -171,3 +176,58 @@ class MovementHandler:
             hardware_axes = [MOTOR_AXIS_TO_HARDWARE_AXIS[a] for a in axes]
 
         await self._hardware_api.home(axes=hardware_axes)
+
+    def _raise_if_labware_in_non_open_thermocycler(self, labware_id: str) -> None:
+        lid_status = self._get_parent_thermocycler_lid_status(labware_id=labware_id)
+        if lid_status is not None and lid_status != ThermocyclerLidStatus.OPEN:
+            raise ThermocyclerNotOpenError(
+                f"Thermocycler must be open when moving to labware inside it,"
+                f' but Thermocycler is currently "{lid_status}".'
+            )
+
+    def _get_parent_thermocycler_lid_status(
+        self,
+        labware_id: str,
+    ) -> Optional[ThermocyclerLidStatus]:
+        """Return the current lid status of the Thermocycler containing the labware.
+
+        If the labware wasn't loaded on a Thermocycler, return None.
+        """
+        labware_location = self._state_store.labware.get_location(labware_id=labware_id)
+        if isinstance(labware_location, ModuleLocation):
+            module_id = labware_location.moduleId
+            module_info_in_state = self._state_store.modules.get(module_id=module_id)
+            if module_info_in_state is None:
+                raise ModuleDoesNotExistError(f'Module ID "{module_id}" not found.')
+            else:
+                # As far as we know, None can never actually happen. See todo in
+                # protocol_engine.types.LoadedModule.
+                assert module_info_in_state.serial is not None
+                thermocycler = self._find_thermocycler_by_serial(
+                    module_info_in_state.serial
+                )
+                lid_status = thermocycler.lid_status
+                if lid_status is None:
+                    # todo(mm, 2021-11-30): thermocycler.lid_status can be None, but
+                    # it's unclear what that means. We change it to UNKNOWN to avoid
+                    # conflicting with our returning of None meaning
+                    # "not in a Thermocycler.""
+                    return ThermocyclerLidStatus.UNKNOWN
+                else:
+                    return thermocycler.lid_status
+        else:
+            return None
+
+    def _find_thermocycler_by_serial(self, serial_number: str) -> HardwareThermocycler:
+        for attached_module in self._hardware_api.attached_modules:
+            # Different module types have different keys under .device_info.
+            # Thermocyclers should always have .device_info["serial"].
+            if (
+                isinstance(attached_module, HardwareThermocycler)
+                and attached_module.device_info["serial"] == serial_number
+            ):
+                return attached_module
+
+        # Todo: Better error. This can happen if the module was disconnected
+        # between load and now, I think.
+        assert False
