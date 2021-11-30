@@ -43,6 +43,7 @@ export function CommandList(): JSX.Element | null {
   const protocolData: ProtocolFile<{}> | null = useProtocolDetails()
     .protocolData
   const { runRecord } = useCurrentProtocolRun()
+  const runStatus = useRunStatus()
   const runDataCommands = runRecord?.data.commands
   const firstPlayTimestamp = runRecord?.data.actions.find(action => action.actionType === 'play')?.createdAt
 
@@ -58,31 +59,30 @@ export function CommandList(): JSX.Element | null {
   const lastProtocolSetupCommand = last(allProtocolCommands
     .filter(
       command =>
-        !['loadLabware' ,'loadPipette', 'loadModule'].includes(command.commandType)
+        ['loadLabware' ,'loadPipette', 'loadModule'].includes(command.commandType)
     )) ?? null
   const lastProtocolSetupIndex = allProtocolCommands.findIndex(command => command.id === lastProtocolSetupCommand?.id)
 
   const protocolSetupCommandList = lastProtocolSetupCommand != null
-    ? allProtocolCommands.slice(
-      0,
-      lastProtocolSetupIndex + 1
-    )
+    ? allProtocolCommands.slice(0, lastProtocolSetupIndex + 1)
     : []
   const postSetupAnticipatedCommands: Command[] = lastProtocolSetupCommand != null
-    ? allProtocolCommands.slice(
-      lastProtocolSetupIndex + 1
-    )
+    ? allProtocolCommands.slice(lastProtocolSetupIndex + 1)
     : allProtocolCommands
 
 
   let currentCommandList: Array<
     Command | RunCommandSummary
   > = postSetupAnticipatedCommands
-  if (runDataCommands != null && runDataCommands.length > 0) {
-
-    const postPlayRunCommands = runDataCommands.slice(runDataCommands.findIndex(command => (
+  if (runDataCommands != null && runDataCommands.length > 0 && firstPlayTimestamp != null) {
+    const firstPostPlayRunCommandIndex = runDataCommands.findIndex(command => (
       command.id === postSetupAnticipatedCommands[0]?.id
-    )))
+    ))
+    const postPlayRunCommands = firstPostPlayRunCommandIndex >= 0
+      ? runDataCommands.slice(firstPostPlayRunCommandIndex)
+      : []
+
+    console.log('PP ', postPlayRunCommands[0])
     // const postPlayRunCommands = runDataCommands.filter(command => (
     //   'createdAt' in command &&
     //   command?.createdAt != null &&
@@ -110,8 +110,8 @@ export function CommandList(): JSX.Element | null {
       ? [...postPlayRunCommands, ...remainingAnticipatedCommands]
       : [...postPlayRunCommands]
   }
+  console.log(currentCommandList[0], postSetupAnticipatedCommands[0])
 
-  const runStatus = useRunStatus()
   if (protocolData == null || runStatus == null) return null
 
   let alertItemTitle
