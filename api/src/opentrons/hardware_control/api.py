@@ -532,6 +532,7 @@ class API(HardwareAPILike):
                 "default_aspirate_flow_rates",
                 "default_blow_out_flow_rates",
                 "default_dispense_flow_rates",
+                "back_compat_names",
             ]
 
             instr_dict = instr.as_dict()
