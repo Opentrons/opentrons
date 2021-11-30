@@ -17,11 +17,12 @@ class LoadModuleParams(BaseModel):
     model: ModuleModel = Field(
         ...,
         description=(
-            "The model name of the module to load."
+            "The exact model name of the module to load."
             "\n\n"
-            "If a different version of this module is physically connected,"
-            " the load will succeed"
-            " if it's deemed compatible with the version you requested."
+            "In the future,"
+            " this command may change so that the load will succeed"
+            " if the physically attached module is merely compatible"
+            " with the version you requested."
         ),
     )
 

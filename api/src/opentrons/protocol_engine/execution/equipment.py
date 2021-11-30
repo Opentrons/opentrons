@@ -222,7 +222,8 @@ class EquipmentHandler:
             raise ModuleNotAttachedError("Could not fetch modules attached") from e
 
         for mod in available:
-            # TODO (spp, 2021-11-22: make this accept compatible module models)
+            # TODO (spp, 2021-11-22): make this accept compatible module models
+            # and update LoadModule command docs accordingly
             if mod.model() == model.value:
                 if not self._state_store.modules.get_by_serial(
                     mod.device_info["serial"]
