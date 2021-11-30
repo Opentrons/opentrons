@@ -18,7 +18,7 @@ export function useCloneRun(runId: string | null): () => void {
         )
     },
   })
-  const cloneRun = () => {
+  const cloneRun = (): void => {
     if (runRecord != null) {
       const { protocolId, labwareOffsets } = runRecord.data
       createRun({ protocolId, labwareOffsets })
