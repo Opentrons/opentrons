@@ -63,8 +63,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element => {
       'slotName' in offsetRecord.location &&
       'slotName' in labwareLocation &&
       offsetRecord.location?.slotName === labwareLocation?.slotName &&
-      // @ts-expect-error moduleModel is currently being returned from analysis instead of moduleId
-      protocolData.modules[offsetRecord.location?.moduleId]?.model === labwareLocation.moduleModel &&
+      isEqual(offsetRecord.location, labwareLocation) &&
       !isEqual(offsetRecord.vector, IDENTITY_VECTOR)
   )?.vector
 
