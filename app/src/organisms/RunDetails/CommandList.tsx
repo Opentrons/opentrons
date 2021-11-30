@@ -1,4 +1,5 @@
 import dropWhile from 'lodash/dropWhile'
+import last from 'lodash/last'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
@@ -41,9 +42,14 @@ export function CommandList(): JSX.Element | null {
   ] = React.useState<boolean>(false)
   const protocolData: ProtocolFile<{}> | null = useProtocolDetails()
     .protocolData
-  const runDataCommands = useCurrentProtocolRun().runRecord?.data.commands
+  const { runRecord } = useCurrentProtocolRun()
+  const runStatus = useRunStatus()
+  const runDataCommands = runRecord?.data.commands
+  const firstPlayTimestamp = runRecord?.data.actions.find(
+    action => action.actionType === 'play'
+  )?.createdAt
 
-  const queuedCommands =
+  const analysisCommandsWithStatus =
     protocolData?.commands != null
       ? protocolData.commands.map(command => ({
           ...command,
@@ -51,58 +57,65 @@ export function CommandList(): JSX.Element | null {
         }))
       : []
   const allProtocolCommands: Command[] =
-    protocolData != null ? queuedCommands : []
-  const lastProtocolSetupIndex = allProtocolCommands
-    .map(
-      command =>
-        command.commandType === 'loadLabware' ||
-        command.commandType === 'loadPipette' ||
-        command.commandType === 'loadModule'
-    )
-    .lastIndexOf(true)
-  const protocolSetupCommandList = allProtocolCommands.slice(
-    0,
-    lastProtocolSetupIndex + 1
+    protocolData != null ? analysisCommandsWithStatus : []
+  const lastProtocolSetupCommand =
+    last(
+      allProtocolCommands.filter(command =>
+        ['loadLabware', 'loadPipette', 'loadModule'].includes(
+          command.commandType
+        )
+      )
+    ) ?? null
+  const lastProtocolSetupIndex = allProtocolCommands.findIndex(
+    command => command.id === lastProtocolSetupCommand?.id
   )
-  const postSetupAnticipatedCommands: Command[] = allProtocolCommands.slice(
-    lastProtocolSetupIndex + 1
-  )
+
+  const protocolSetupCommandList =
+    lastProtocolSetupCommand != null
+      ? allProtocolCommands.slice(0, lastProtocolSetupIndex + 1)
+      : []
+  const postSetupAnticipatedCommands: Command[] =
+    lastProtocolSetupCommand != null
+      ? allProtocolCommands.slice(lastProtocolSetupIndex + 1)
+      : allProtocolCommands
 
   let currentCommandList: Array<
     Command | RunCommandSummary
   > = postSetupAnticipatedCommands
-  if (runDataCommands != null && runDataCommands.length > 0) {
-    // find first index after protocol setup and LPC commands
-    const firstRunCommandIndex = runDataCommands.findIndex(
-      runCommand => runCommand.id === postSetupAnticipatedCommands[0].id
+  if (
+    runDataCommands != null &&
+    runDataCommands.length > 0 &&
+    firstPlayTimestamp != null
+  ) {
+    const firstPostPlayRunCommandIndex = runDataCommands.findIndex(
+      command => command.id === postSetupAnticipatedCommands[0]?.id
     )
-    const postSetupRunCommandSummaries: RunCommandSummary[] = runDataCommands.slice(
-      firstRunCommandIndex
-    )
+    const postPlayRunCommands =
+      firstPostPlayRunCommandIndex >= 0
+        ? runDataCommands.slice(firstPostPlayRunCommandIndex)
+        : []
+
     const remainingAnticipatedCommands = dropWhile(
       postSetupAnticipatedCommands,
       anticipatedCommand =>
-        postSetupRunCommandSummaries.some(
-          runC => runC.id === anticipatedCommand.id
-        )
+        runDataCommands.some(runC => runC.id === anticipatedCommand.id)
     )
 
-    const isProtocolDeterministic = postSetupRunCommandSummaries.reduce(
+    const isProtocolDeterministic = postPlayRunCommands.reduce(
       (isDeterministic, command, index) => {
         return (
           isDeterministic &&
-          command.id === postSetupAnticipatedCommands[index].id
+          command.id === postSetupAnticipatedCommands[index]?.id
         )
       },
       true
     )
 
     currentCommandList = isProtocolDeterministic
-      ? [...postSetupRunCommandSummaries, ...remainingAnticipatedCommands]
-      : [...postSetupRunCommandSummaries]
+      ? [...postPlayRunCommands, ...remainingAnticipatedCommands]
+      : [...postPlayRunCommands]
   }
 
-  const runStatus = useRunStatus()
   if (protocolData == null || runStatus == null) return null
 
   let alertItemTitle
