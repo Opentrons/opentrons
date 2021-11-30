@@ -21,8 +21,8 @@ export const ModuleLiveStatusCards = (): JSX.Element | null => {
   const controlDisabledReason = useSelector(getModuleControlsDisabled)
   const [expandedCard, setExpandedCard] = React.useState(
     isEmpty(moduleInfoById)
-      ? Object.entries(moduleInfoById)[0][1].attachedModuleMatch?.serial
-      : ''
+      ? ''
+      : Object.entries(moduleInfoById)[0][1].attachedModuleMatch?.serial
   )
   const prevModuleCountRef = React.useRef<number>(
     Object.keys(moduleInfoById).length
