@@ -18,6 +18,9 @@ from opentrons.protocol_engine.types import (
     WellLocation,
     WellOrigin,
     WellOffset,
+    LoadedModule,
+    ModuleModel,
+    ModuleDefinition,
 )
 from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.modules import ModuleView
@@ -627,3 +630,50 @@ def test_get_tip_drop_invalid_origin(
             well_location=WellLocation(origin=WellOrigin.BOTTOM),
             pipette_config=pipette_config,
         )
+
+
+# TODO (spp, 2021-11-29): parametrize this test
+def test_thermocycler_dodging(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    minimal_module_def: ModuleDefinition,
+    subject: GeometryView,
+) -> None:
+    """It should specify if thermocycler dodging is needed.
+
+    It should return True if thermocycler exists and movement is between bad pairs of
+    slot locations.
+    """
+    decoy.when(labware_view.get("from-id")).then_return(
+        LoadedLabware(
+            id="from-id",
+            loadName="labware-1",
+            definitionUri="some-uri",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        )
+    )
+    decoy.when(labware_view.get("to-id")).then_return(
+        LoadedLabware(
+            id="to-id",
+            loadName="labware-2",
+            definitionUri="some-uri",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_9),
+        )
+    )
+    decoy.when(module_view.get_all()).then_return(
+        [
+            LoadedModule(
+                id="module-1",
+                model=ModuleModel.THERMOCYCLER_MODULE_V1,
+                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+                definition=minimal_module_def,
+            )
+        ]
+    )
+    assert (
+        subject.should_dodge_thermocycler(
+            from_labware_id="from-id", to_labware_id="to-id"
+        )
+        is True
+    )

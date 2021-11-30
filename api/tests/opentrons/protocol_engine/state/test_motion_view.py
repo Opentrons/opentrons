@@ -2,9 +2,9 @@
 import pytest
 from decoy import Decoy
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Optional, Sequence, Tuple
 
-from opentrons.types import Point, MountType
+from opentrons.types import Point, MountType, DeckSlotName
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.motion_planning import MoveType, get_waypoints
 
@@ -21,13 +21,6 @@ from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.pipettes import PipetteView, CurrentWell
 from opentrons.protocol_engine.state.geometry import GeometryView
 from opentrons.protocol_engine.state.motion import MotionView
-from opentrons.protocol_engine.state.modules import ModuleView
-
-
-@pytest.fixture
-def module_view(decoy: Decoy) -> ModuleView:
-    """Get a mock in the shape of a GeometryView."""
-    return decoy.mock(cls=ModuleView)
 
 
 @pytest.fixture
@@ -35,14 +28,12 @@ def subject(
     labware_view: LabwareView,
     pipette_view: PipetteView,
     geometry_view: GeometryView,
-    module_view: ModuleView,
 ) -> MotionView:
     """Get a MotionView with its dependencies mocked out."""
     return MotionView(
         labware_view=labware_view,
         pipette_view=pipette_view,
         geometry_view=geometry_view,
-        module_view=module_view,
     )
 
 
@@ -197,6 +188,8 @@ class WaypointSpec:
     labware_z: Optional[float] = None
     all_labware_z: Optional[float] = None
     max_travel_z: float = 50
+    should_dodge_thermocycler: bool = False
+    extra_waypoints: Sequence[Tuple[float, float]] = ()
 
 
 # TODO(mc, 2021-01-14): these tests probably need to be rethought; this fixture
@@ -265,6 +258,18 @@ class WaypointSpec:
             ),
             expected_move_type=MoveType.GENERAL_ARC,
         ),
+        WaypointSpec(
+            name="General arc with extra waypoints to dodge thermocycler",
+            location=CurrentWell(
+                pipette_id="pipette-id",
+                labware_id="other-labware-id",
+                well_name="A1",
+            ),
+            all_labware_z=20,
+            should_dodge_thermocycler=True,
+            expected_move_type=MoveType.GENERAL_ARC,
+            extra_waypoints=[(123, 456)],
+        )
         # TODO(mc, 2021-01-08): add test for override current location
     ],
 )
@@ -311,6 +316,20 @@ def test_get_movement_waypoints(
 
     decoy.when(pipette_view.get_current_well()).then_return(spec.location)
 
+    if spec.location:
+        decoy.when(
+            geometry_view.should_dodge_thermocycler(
+                from_labware_id=spec.location.labware_id, to_labware_id=spec.labware_id
+            )
+        ).then_return(spec.should_dodge_thermocycler)
+
+    if spec.should_dodge_thermocycler:
+        decoy.when(
+            labware_view.get_slot_position(slot=DeckSlotName.SLOT_5)
+        ).then_return(
+            Point(x=spec.extra_waypoints[0][0], y=spec.extra_waypoints[0][1], z=0)
+        )
+
     result = subject.get_movement_waypoints(
         pipette_id=spec.pipette_id,
         labware_id=spec.labware_id,
@@ -329,7 +348,7 @@ def test_get_movement_waypoints(
         min_travel_z=min_travel_z,
         dest=spec.dest,
         dest_cp=spec.expected_dest_cp,
-        xy_waypoints=[],
+        xy_waypoints=spec.extra_waypoints,
     )
 
     assert result == expected

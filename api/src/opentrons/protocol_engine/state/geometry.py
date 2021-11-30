@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 
-from opentrons.types import Point
+from opentrons.types import Point, DeckSlotName
 from opentrons.hardware_control.dev_types import PipetteDict
 
 from .. import errors
@@ -14,16 +14,32 @@ from ..types import (
     WellOffset,
     DeckSlotLocation,
     ModuleLocation,
+    ModuleModel,
 )
 from .labware import LabwareView
 from .modules import ModuleView
 
 
 DEFAULT_TIP_DROP_HEIGHT_FACTOR = 0.5
+BAD_PAIRS = [
+    ("1", "12"),
+    ("12", "1"),
+    ("4", "12"),
+    ("12", "4"),
+    ("4", "9"),
+    ("9", "4"),
+    ("4", "8"),
+    ("8", "4"),
+    ("1", "8"),
+    ("8", "1"),
+    ("4", "11"),
+    ("11", "4"),
+    ("1", "11"),
+    ("11", "1"),
+]
+
 
 # TODO(mc, 2020-11-12): reconcile this data structure with WellGeometry
-
-
 @dataclass(frozen=True)
 class TipGeometry:
     """Tip geometry data."""
@@ -216,3 +232,34 @@ class GeometryView:
                 z=well_location.offset.z - tip_z_offset,
             )
         )
+
+    def should_dodge_thermocycler(
+        self, from_labware_id: str, to_labware_id: str
+    ) -> bool:
+        """Decide if the requested path would cross the thermocycler, if installed.
+
+        Returns True if we need to dodge, False otherwise.
+        """
+        from_labware = self._labware.get(from_labware_id)
+        to_labware = self._labware.get(to_labware_id)
+
+        def get_slot_name(labware: LoadedLabware) -> DeckSlotName:
+            slot_name: DeckSlotName
+
+            if isinstance(labware.location, DeckSlotLocation):
+                slot_name = labware.location.slotName
+            else:
+                module_id = labware.location.moduleId
+                slot_name = self._modules.get_location(module_id).slotName
+            return slot_name
+
+        if self._modules.get_all() and ModuleModel.THERMOCYCLER_MODULE_V1 in [
+            mod.model for mod in self._modules.get_all()
+        ]:
+            transit = (
+                get_slot_name(from_labware).value,
+                get_slot_name(to_labware).value,
+            )
+            if transit in BAD_PAIRS:
+                return True
+        return False
