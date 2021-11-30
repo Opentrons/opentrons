@@ -26,21 +26,6 @@ class DeviceInfoResponsePayload(ResponsePayload):
 
 
 @dataclass
-class GetStatusResponsePayload(ResponsePayload):
-    """Get status response."""
-
-    status: utils.UInt8Field
-    data: utils.UInt32Field
-
-
-@dataclass
-class MoveRequestPayload(utils.BinarySerializable):
-    """Move request."""
-
-    steps: utils.UInt32Field
-
-
-@dataclass
 class GetSpeedResponsePayload(ResponsePayload):
     """Get speed response."""
 
