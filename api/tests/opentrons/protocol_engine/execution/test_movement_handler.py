@@ -228,11 +228,12 @@ async def test_move_to_well_raises_if_thermocycler_not_open(
         "module-serial"
     )
 
+    # These "type: ignore[misc]" comments let us assign to read-only properties,
+    # necessary to work around Decoy not being able to stub properties.
     thermocycler = decoy.mock(cls=HardwareThermocycler)
-    # FIX BEFORE MERGE: How do we stub properties in Decoy?
-    decoy.when(thermocycler.device_info).then_return({"serial": "module-serial"})
-    decoy.when(thermocycler.lid_status).then_return(ThermocyclerLidStatus.IN_BETWEEN)
-    decoy.when(hardware_api.attached_modules).then_return([thermocycler])
+    thermocycler.device_info = {"serial": "module-serial"}  # type: ignore[misc]
+    thermocycler.lid_status = ThermocyclerLidStatus.IN_BETWEEN  # type: ignore[misc]
+    hardware_api.attached_modules = [thermocycler]  # type: ignore[misc]
 
     with pytest.raises(ThermocyclerNotOpenError):
         await subject.move_to_well(
