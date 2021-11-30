@@ -22,6 +22,7 @@
   "status_succeeded": "Completed",
   "target_temperature": "Target: {{temperature}} °C",
   "temperature_not_available": "{{temperature_type}}: n/a",
+  "thermocycler_error_tooltip": "Module encountered an anomaly, please contact support",
   "current_step": "Current Step",
   "anticipated_step": "Anticipated steps",
   "start_step_time": "Start",
@@ -52,5 +53,6 @@
   "protocol_steps": "Protocol steps",
   "protocol_run_failed": "Protocol run failed",
   "protocol_run_canceled": "Protocol run canceled",
-  "protocol_run_complete": "Protocol run complete"
+  "protocol_run_complete": "Protocol run complete",
+  "run_cta_disabled": "Complete required steps on Protocol tab before starting the run"
 }

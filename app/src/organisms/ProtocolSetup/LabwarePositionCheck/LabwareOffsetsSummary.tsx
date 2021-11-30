@@ -86,7 +86,7 @@ export const LabwareOffsetsSummary = (
             {offsetData.map(({ displayName: labware }, index) => {
               return (
                 <Flex
-                  key={index}
+                  key={`${labware}_${index}`}
                   marginBottom={SPACING_3}
                   css={FONT_BODY_1_DARK}
                 >
@@ -128,19 +128,19 @@ export const LabwareOffsetsSummary = (
                     <Text as={'strong'} marginRight={SPACING_1}>
                       X
                     </Text>
-                    <Text key={x} as={'span'} marginRight={SPACING_2}>
+                    <Text as={'span'} marginRight={SPACING_2}>
                       {x.toFixed(2)}
                     </Text>
                     <Text as={'strong'} marginRight={SPACING_1}>
                       Y
                     </Text>
-                    <Text key={y} as={'span'} marginRight={SPACING_2}>
+                    <Text as={'span'} marginRight={SPACING_2}>
                       {y.toFixed(2)}
                     </Text>
                     <Text as={'strong'} marginRight={SPACING_1}>
                       Z
                     </Text>
-                    <Text key={z} as={'span'} marginRight={SPACING_2}>
+                    <Text as={'span'} marginRight={SPACING_2}>
                       {z.toFixed(2)}
                     </Text>
                   </Flex>

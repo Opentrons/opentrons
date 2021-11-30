@@ -298,6 +298,7 @@ describe('ModuleSetup', () => {
             ...mockMagneticModuleFixture,
             model: mockMagneticModule.model,
           } as any,
+          slotName: '1',
         },
         [mockTCModule.moduleId]: {
           moduleId: mockTCModule.moduleId,
@@ -312,6 +313,7 @@ describe('ModuleSetup', () => {
             ...mockThermocyclerFixture,
             model: mockTCModule.model,
           } as any,
+          slotName: '7',
         },
       })
 
@@ -364,6 +366,7 @@ describe('ModuleSetup', () => {
             ...mockMagneticModuleFixture,
             model: mockMagneticModule.model,
           } as any,
+          slotName: '1',
         },
         [dupModId]: {
           moduleId: dupModId,
@@ -382,6 +385,7 @@ describe('ModuleSetup', () => {
               hub: dupModHub,
             },
           } as any,
+          slotName: '3',
         },
       })
 

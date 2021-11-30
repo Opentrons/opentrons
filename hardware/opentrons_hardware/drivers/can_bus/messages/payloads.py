@@ -26,21 +26,6 @@ class DeviceInfoResponsePayload(ResponsePayload):
 
 
 @dataclass
-class GetStatusResponsePayload(ResponsePayload):
-    """Get status response."""
-
-    status: utils.UInt8Field
-    data: utils.UInt32Field
-
-
-@dataclass
-class MoveRequestPayload(utils.BinarySerializable):
-    """Move request."""
-
-    steps: utils.UInt32Field
-
-
-@dataclass
 class GetSpeedResponsePayload(ResponsePayload):
     """Get speed response."""
 
@@ -114,3 +99,25 @@ class MoveCompletedPayload(MoveGroupResponsePayload):
     seq_id: utils.UInt8Field
     current_position: utils.UInt32Field
     ack_id: utils.UInt8Field
+
+
+@dataclass
+class MotorDriverRegisterPayload(utils.BinarySerializable):
+    """Read motor driver register request payload."""
+
+    reg_addr: utils.UInt8Field
+
+
+@dataclass
+class MotorDriverRegisterDataPayload(MotorDriverRegisterPayload):
+    """Write motor driver register request payload."""
+
+    data: utils.UInt32Field
+
+
+@dataclass
+class ReadMotorDriverRegisterResponsePayload(ResponsePayload):
+    """Read motor driver register response payload."""
+
+    reg_addr: utils.UInt8Field
+    data: utils.UInt32Field

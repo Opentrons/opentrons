@@ -10,9 +10,9 @@ from robot_server.errors import ErrorDetails, ErrorResponse
 from robot_server.service.task_runner import TaskRunner
 from robot_server.service.dependencies import get_unique_id, get_current_time
 from robot_server.service.json_api import (
-    ResponseModel,
-    MultiResponseModel,
-    EmptyResponseModel,
+    SimpleResponseModel,
+    SimpleMultiResponseModel,
+    SimpleEmptyResponseModel,
 )
 
 from .dependencies import (
@@ -53,7 +53,8 @@ protocols_router = APIRouter()
     path="/protocols",
     summary="Upload a protocol",
     status_code=status.HTTP_201_CREATED,
-    response_model=ResponseModel[Protocol, None],
+    response_model=SimpleResponseModel[Protocol],
+    response_model_exclude_none=True,
     responses={
         status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse[ProtocolFileInvalid]},
     },
@@ -69,7 +70,7 @@ async def create_protocol(
     protocol_id: str = Depends(get_unique_id, use_cache=False),
     analysis_id: str = Depends(get_unique_id, use_cache=False),
     created_at: datetime = Depends(get_current_time),
-) -> ResponseModel[Protocol, None]:
+) -> SimpleResponseModel[Protocol]:
     """Create a new protocol by uploading its files.
 
     Arguments:
@@ -139,20 +140,21 @@ async def create_protocol(
 
     # todo(mm, 2021-09-14): Do we need to close the UploadFiles in our `files` arg?
 
-    return ResponseModel(data=data, links=None)
+    return SimpleResponseModel(data=data)
 
 
 @protocols_router.get(
     path="/protocols",
     summary="Get uploaded protocols",
     status_code=status.HTTP_200_OK,
-    response_model=MultiResponseModel[Protocol, None],
+    response_model=SimpleMultiResponseModel[Protocol],
+    response_model_exclude_none=True,
 )
 async def get_protocols(
     response_builder: ResponseBuilder = Depends(ResponseBuilder),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
-) -> MultiResponseModel[Protocol, None]:
+) -> SimpleMultiResponseModel[Protocol]:
     """Get a list of all currently uploaded protocols.
 
     Arguments:
@@ -169,14 +171,15 @@ async def get_protocols(
         for r in protocol_resources
     ]
 
-    return MultiResponseModel(data=data, links=None)
+    return SimpleMultiResponseModel(data=data)
 
 
 @protocols_router.get(
     path="/protocols/{protocolId}",
     summary="Get an uploaded protocol",
     status_code=status.HTTP_200_OK,
-    response_model=ResponseModel[Protocol, None],
+    response_model=SimpleResponseModel[Protocol],
+    response_model_exclude_none=True,
     responses={
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[ProtocolNotFound]},
     },
@@ -186,7 +189,7 @@ async def get_protocol_by_id(
     response_builder: ResponseBuilder = Depends(ResponseBuilder),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
-) -> ResponseModel[Protocol, None]:
+) -> SimpleResponseModel[Protocol]:
     """Get an uploaded protocol by ID.
 
     Arguments:
@@ -204,14 +207,15 @@ async def get_protocol_by_id(
 
     data = response_builder.build(resource=resource, analyses=analyses)
 
-    return ResponseModel(data=data, links=None)
+    return SimpleResponseModel(data=data)
 
 
 @protocols_router.delete(
     path="/protocols/{protocolId}",
     summary="Delete an uploaded protocol",
     status_code=status.HTTP_200_OK,
-    response_model=EmptyResponseModel[None],
+    response_model=SimpleEmptyResponseModel,
+    response_model_exclude_none=True,
     responses={
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[ProtocolNotFound]},
     },
@@ -219,7 +223,7 @@ async def get_protocol_by_id(
 async def delete_protocol_by_id(
     protocolId: str,
     protocol_store: ProtocolStore = Depends(get_protocol_store),
-) -> EmptyResponseModel[None]:
+) -> SimpleEmptyResponseModel:
     """Delete an uploaded protocol by ID.
 
     Arguments:
@@ -232,4 +236,4 @@ async def delete_protocol_by_id(
     except ProtocolNotFoundError as e:
         raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
-    return EmptyResponseModel(links=None)
+    return SimpleEmptyResponseModel()

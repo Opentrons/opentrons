@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
 import { Box, LabeledValue, SPACING_3 } from '@opentrons/components'
 import { getModuleDisplayName, getModuleType } from '@opentrons/shared-data'
@@ -94,7 +95,6 @@ interface Props {
     command: ModuleCommand,
     args?: unknown[]
   ) => unknown
-  slot: string
   controlDisabledReason: string | null
   isCardExpanded: boolean
   toggleCard: () => unknown
@@ -106,7 +106,6 @@ export const ThermocyclerCard = ({
   controlDisabledReason,
   isCardExpanded,
   toggleCard,
-  slot,
 }: Props): JSX.Element => {
   const {
     currentTemp,
@@ -119,15 +118,22 @@ export const ThermocyclerCard = ({
     totalStepCount,
     currentStepIndex,
   } = module.data
+  const { t } = useTranslation('run_details')
 
   const executingProfile =
     totalCycleCount != null &&
     currentCycleIndex != null &&
     totalStepCount != null &&
     currentStepIndex != null
+
+  if (module.status === 'error') {
+    controlDisabledReason = t('thermocycler_error_tooltip')
+  }
+
   return (
     <StatusCard
       moduleType={getModuleType(module.model)}
+      moduleStatus={module.status}
       title={getModuleDisplayName(module.model)}
       isCardExpanded={isCardExpanded}
       toggleCard={toggleCard}

@@ -19,11 +19,9 @@ import { ConfirmPickUpTipModal } from './ConfirmPickUpTipModal'
 import { ExitPreventionModal } from './ExitPreventionModal'
 
 import styles from '../styles.css'
-import type { SavePositionCommandData } from './types'
 
 interface LabwarePositionCheckModalProps {
   onCloseClick: () => unknown
-  onLabwarePositionCheckComplete: () => void
 }
 export const LabwarePositionCheck = (
   props: LabwarePositionCheckModalProps
@@ -32,8 +30,26 @@ export const LabwarePositionCheck = (
   const restartRun = useRestartRun()
   const [
     savePositionCommandData,
-    setSavePositionCommandData,
-  ] = React.useState<SavePositionCommandData>({})
+    savePositionCommandDataDispatch,
+  ] = React.useReducer(
+    (
+      state: { [labwareId: string]: string[] },
+      action: { labwareId: string; commandId: string }
+    ) => {
+      const { labwareId, commandId } = action
+      const nextCommandList =
+        state[labwareId] != null
+          ? // if there are already two command ids, overwrite the second one with the new one coming in
+            // this is used when there is an unsuccessful pick up tip, and additional pick up tip attempts occur
+            [state[labwareId][0], commandId]
+          : [commandId]
+      return {
+        ...state,
+        [labwareId]: nextCommandList,
+      }
+    },
+    {}
+  )
   const [isRestartingRun, setIsRestartingRun] = React.useState<boolean>(false)
   const {
     confirm: confirmExitLPC,
@@ -46,15 +62,7 @@ export const LabwarePositionCheck = (
     commandId: string,
     labwareId: string
   ): void => {
-    setSavePositionCommandData({
-      ...savePositionCommandData,
-      [labwareId]:
-        savePositionCommandData[labwareId] != null
-          ? // if there are already two command ids, overwrite the second one with the new one coming in
-            // this is used when there is an unsuccessful pick up tip, and additional pick up tip attempts occur
-            [savePositionCommandData[labwareId][0], commandId]
-          : [commandId],
-    })
+    savePositionCommandDataDispatch({ labwareId, commandId })
   }
   const labwarePositionCheckUtils = useLabwarePositionCheck(
     addSavePositionCommandData,
@@ -141,7 +149,6 @@ export const LabwarePositionCheck = (
       >
         <SummaryScreen
           savePositionCommandData={savePositionCommandData}
-          onLabwarePositionCheckComplete={props.onLabwarePositionCheckComplete}
           onCloseClick={props.onCloseClick}
         />
       </ModalPage>
