@@ -53,12 +53,11 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element => {
   )
 
   const labwareOffsets = runRecord?.data.labwareOffsets ?? []
-  const mostRecentLabwareOffsets = uniqBy<LabwareOffset>(labwareOffsets.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()), offset => {
+  const mostRecentLabwareOffsets = uniqBy<LabwareOffset>(labwareOffsets.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()), offset => {
     const locationKey = 'slotName' in offset.location ? offset.location?.slotName : offset.location.moduleId
     return  `${offset.definitionUri}_${locationKey}`
   })
-
-  const vector = labwareOffsets?.find(
+  const vector = mostRecentLabwareOffsets?.find(
     offsetRecord =>
       offsetRecord.definitionUri === labwareDefinitionUri &&
       'slotName' in offsetRecord.location &&
