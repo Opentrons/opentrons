@@ -37,6 +37,7 @@ describe('useCreateCommandMutation hook', () => {
       definitionUri: DEFINITION_URI,
       location: LABWARE_LOCATION,
       vector: OFFSET,
+      createdAt: 'fake_timestamp'
     }
   })
   afterEach(() => {
