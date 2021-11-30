@@ -135,6 +135,34 @@ def test_get_location(tempdeck_v1_def: ModuleDefinition) -> None:
     )
 
 
+def test_get_model(tempdeck_v1_def: ModuleDefinition) -> None:
+    """It should return the model of the loaded module."""
+    module_id = "unique-id"
+    module = LoadedModule(
+        id=module_id,
+        model=ModuleModel.MAGNETIC_MODULE_V2,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
+        serial="serial-1",
+        definition=tempdeck_v1_def,
+    )
+    subject = get_module_view(modules_by_id={module_id: module})
+    assert subject.get_model(module_id=module_id) == ModuleModel.MAGNETIC_MODULE_V2
+
+
+def test_get_serial(tempdeck_v1_def: ModuleDefinition) -> None:
+    """It should return the serial number of the loaded module."""
+    module_id = "unique-id"
+    module = LoadedModule(
+        id=module_id,
+        model=ModuleModel.MAGNETIC_MODULE_V2,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
+        serial="serial-1",
+        definition=tempdeck_v1_def,
+    )
+    subject = get_module_view(modules_by_id={module_id: module})
+    assert subject.get_serial(module_id=module_id) == "serial-1"
+
+
 def test_get_dimensions(tempdeck_v1_def: ModuleDefinition) -> None:
     """It should return the dimensions of the specified module."""
     module_id = "unique-id"
