@@ -27,6 +27,9 @@ MessageDefinition = Union[
     defs.ExecuteMoveGroupRequest,
     defs.ClearAllMoveGroupsRequest,
     defs.MoveCompleted,
+    defs.WriteMotorDriverRegister,
+    defs.ReadMotorDriverRequest,
+    defs.ReadMotorDriverResponse,
 ]
 
 
