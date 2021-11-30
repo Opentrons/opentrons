@@ -26,6 +26,12 @@ export function useCloneRun(runId: string | null): () => void {
         createRun({ protocolId, labwareOffsets })
       }
     },
+    onError: (error: AxiosError) => {
+      if (runRecord != null) {
+        const { protocolId, labwareOffsets } = runRecord.data
+        createRun({ protocolId, labwareOffsets })
+      }
+    },
   })
 
   return () => runId != null && stopThenCloneRun(runId)
