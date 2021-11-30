@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.0.0-beta.0](https://github.com/Opentrons/opentrons/compare/v4.7.0...v5.0.0-beta.0) (2021-11-30)
+
+
+### Bug Fixes
+
+* **labware-library:** Default opentrons tuberack inserts to brand opentrons ([#8644](https://github.com/Opentrons/opentrons/issues/8644)) ([1f0d8c0](https://github.com/Opentrons/opentrons/commit/1f0d8c0537e4b72d3313e2de5bc5bbbe897574a3)), closes [#8248](https://github.com/Opentrons/opentrons/issues/8248)
+
+
+
+
+
 # [4.7.0](https://github.com/Opentrons/opentrons/compare/v4.6.2...v4.7.0) (2021-11-18)
 
 

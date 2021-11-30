@@ -6,15 +6,29 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# Opentrons App Changes in 4.7.0
+# Opentrons App Changes in 5.0.0
 
-The 4.7.0 release is primarily focused on bug fixes on the robot software side. You shouldn't notice any big changes with this upgrade.
+The 5.0.0 release reshapes the way a user uploads and sets up protocols to run on the robot.
 
 ## New Features
 
-None in the Opentrons App.
+- TODO
 
 ## Bug Fixes
+
+- TODO
+
+---
+
+## Opentrons App Changes in 4.7.0
+
+The 4.7.0 release is primarily focused on bug fixes on the robot software side. You shouldn't notice any big changes with this upgrade.
+
+### New Features
+
+None in the Opentrons App.
+
+### Bug Fixes
 
 None in the Opentrons App.
 

@@ -1,4 +1,4 @@
-For more details about this release, please see the full [technical change
+**For** more details about this release, please see the full [technical change
 log][]. For a list of currently known issues, please see the [Opentrons issue tracker][].
 
 [technical change log]: https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md
@@ -6,15 +6,29 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# OT-2 Software Changes in 4.7.0
+# OT-2 Software Changes in 5.0.0
 
-The 4.7.0 release of the OT-2 Software fixes a handful of regressions and bugs.
+The 5.0.0 release of the OT-2 Software transitions to a new mechanism for ingesting and running protocols.
 
 ## New Features
 
-- This is primarily a bug fix release.
+- TODO
 
 ## Bug Fixes
+
+- TODO
+
+---
+
+## OT-2 Software Changes in 4.7.0
+
+The 4.7.0 release of the OT-2 Software fixes a handful of regressions and bugs.
+
+### New Features
+
+- This is primarily a bug fix release.
+
+### Bug Fixes
 
 - Fixed an issue where pipette offset and tip length calibration would sometimes not be saved correctly.
 - Fixed issues around attach pipette behavior.
