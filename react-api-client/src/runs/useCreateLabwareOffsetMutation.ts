@@ -1,12 +1,15 @@
 import { useMutation, useQueryClient } from 'react-query'
-import { createLabwareOffset, LabwareOffset } from '@opentrons/api-client'
+import {
+  createLabwareOffset,
+  LabwareOffsetCreateData,
+} from '@opentrons/api-client'
 import { useHost } from '../api'
 import type { HostConfig, Run } from '@opentrons/api-client'
 import type { UseMutationResult, UseMutateAsyncFunction } from 'react-query'
 
 interface CreateLabwareOffsetParams {
   runId: string
-  data: LabwareOffset
+  data: LabwareOffsetCreateData
 }
 
 export type UseCreateLabwareofMutationResult = UseMutationResult<
