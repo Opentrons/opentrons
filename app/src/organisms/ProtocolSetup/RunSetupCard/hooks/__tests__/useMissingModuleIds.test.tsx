@@ -81,6 +81,7 @@ describe('useMissingModuleIds', () => {
           nestedLabwareId: null,
           protocolLoadOrder: 0,
           attachedModuleMatch: null,
+          slotName: '1',
         },
       })
 

@@ -10,6 +10,7 @@ describe('getLatestLabwareOffsetCount', () => {
   it('should return 1 when there is one offset record', () => {
     const labwareOffsets: LabwareOffset[] = [
       {
+        createdAt: '2021-11-29',
         definitionUri: 'some_definitionUri',
         location: { slotName: '1' },
         vector: { x: 1, y: 0, z: 0 },
@@ -20,11 +21,13 @@ describe('getLatestLabwareOffsetCount', () => {
   it('should return 2 when there are two offset records with different labware', () => {
     const labwareOffsets: LabwareOffset[] = [
       {
+        createdAt: '2021-11-29',
         definitionUri: 'some_definitionUri',
         location: { slotName: '1' },
         vector: { x: 1, y: 0, z: 0 },
       },
       {
+        createdAt: '2021-11-29',
         definitionUri: 'another_definitionUri',
         location: { slotName: '2' },
         vector: { x: 1, y: 2, z: 3 },
@@ -35,11 +38,13 @@ describe('getLatestLabwareOffsetCount', () => {
   it('should return 1 when there are two offset records with the same labware and slot', () => {
     const labwareOffsets: LabwareOffset[] = [
       {
+        createdAt: '2021-11-29',
         definitionUri: 'some_definitionUri',
         location: { slotName: '1' },
         vector: { x: 1, y: 0, z: 0 },
       },
       {
+        createdAt: '2021-11-30',
         definitionUri: 'some_definitionUri',
         location: { slotName: '1' },
         vector: { x: 1, y: 2, z: 3 },
@@ -50,11 +55,13 @@ describe('getLatestLabwareOffsetCount', () => {
   it('should return 1 when there are two offset records with the same labware and module id', () => {
     const labwareOffsets: LabwareOffset[] = [
       {
+        createdAt: '2021-11-30',
         definitionUri: 'some_definitionUri',
         location: { moduleId: 'some_module' },
         vector: { x: 1, y: 0, z: 0 },
       },
       {
+        createdAt: '2021-11-29',
         definitionUri: 'some_definitionUri',
         location: { moduleId: 'some_module' },
         vector: { x: 1, y: 2, z: 3 },
@@ -65,11 +72,13 @@ describe('getLatestLabwareOffsetCount', () => {
   it('should return 0 when all offsets are identity offsets', () => {
     const labwareOffsets: LabwareOffset[] = [
       {
+        createdAt: '2021-11-29',
         definitionUri: 'some_definitionUri',
         location: { moduleId: 'some_module' },
         vector: { x: 0, y: 0, z: 0 },
       },
       {
+        createdAt: '2021-11-29',
         definitionUri: 'some_definitionUri',
         location: { moduleId: 'some_module' },
         vector: { x: 0, y: 0, z: 0 },
@@ -80,11 +89,13 @@ describe('getLatestLabwareOffsetCount', () => {
   it('should not count offsets to the trash', () => {
     const labwareOffsets: LabwareOffset[] = [
       {
+        createdAt: '2021-11-29',
         definitionUri: 'fixedTrash',
         location: { slotName: '12' },
         vector: { x: 0, y: 0, z: 0 },
       },
       {
+        createdAt: '2021-11-29',
         definitionUri: 'some_definitionUri',
         location: { moduleId: 'some_module' },
         vector: { x: 1, y: 0, z: 0 },
@@ -95,26 +106,59 @@ describe('getLatestLabwareOffsetCount', () => {
   it('should return only new offsets when the previous entries were identity offsets', () => {
     const labwareOffsets: LabwareOffset[] = [
       {
+        createdAt: '2021-11-29',
         definitionUri: 'some_definitionUri',
         location: { slotName: '3' },
         vector: { x: 0, y: 0, z: 0 },
       },
       {
-        definitionUri: 'another_definitionUri',
-        location: { moduleId: 'some_module' },
-        vector: { x: 0, y: 0, z: 0 },
-      },
-      {
+        createdAt: '2021-11-30',
         definitionUri: 'some_definitionUri',
         location: { slotName: '3' },
         vector: { x: 1, y: 0, z: 0 },
       },
       {
+        createdAt: '2021-11-29',
+        definitionUri: 'another_definitionUri',
+        location: { moduleId: 'some_module' },
+        vector: { x: 0, y: 0, z: 0 },
+      },
+      {
+        createdAt: '2021-11-30',
         definitionUri: 'another_definitionUri',
         location: { moduleId: 'some_module' },
         vector: { x: 1, y: 0, z: 0 },
       },
     ]
     expect(getLatestLabwareOffsetCount(labwareOffsets)).toBe(2)
+  })
+  it('should return only zero offsets when the newest entries are identity offsets', () => {
+    const labwareOffsets: LabwareOffset[] = [
+      {
+        createdAt: '2021-12-29',
+        definitionUri: 'some_definitionUri',
+        location: { slotName: '3' },
+        vector: { x: 0, y: 0, z: 0 },
+      },
+      {
+        createdAt: '2021-11-30',
+        definitionUri: 'some_definitionUri',
+        location: { slotName: '3' },
+        vector: { x: 1, y: 0, z: 0 },
+      },
+      {
+        createdAt: '2021-12-29',
+        definitionUri: 'another_definitionUri',
+        location: { moduleId: 'some_module' },
+        vector: { x: 0, y: 0, z: 0 },
+      },
+      {
+        createdAt: '2021-11-30',
+        definitionUri: 'another_definitionUri',
+        location: { moduleId: 'some_module' },
+        vector: { x: 1, y: 0, z: 0 },
+      },
+    ]
+    expect(getLatestLabwareOffsetCount(labwareOffsets)).toBe(0)
   })
 })

@@ -1,6 +1,6 @@
 """Tests for pipette state accessors in the protocol_engine state store."""
 import pytest
-from typing import cast, Dict, Optional
+from typing import cast, Dict, List, Optional
 
 from opentrons.types import MountType, Mount as HwMount
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -27,6 +27,22 @@ def get_pipette_view(
     )
 
     return PipetteView(state=state)
+
+
+def create_pipette_config(
+    name: str,
+    back_compat_names: Optional[List[str]] = None,
+    ready_to_aspirate: bool = False,
+) -> PipetteDict:
+    """Create a fake but valid (enough) PipetteDict object."""
+    return cast(
+        PipetteDict,
+        {
+            "name": name,
+            "back_compat_names": back_compat_names or [],
+            "ready_to_aspirate": ready_to_aspirate,
+        },
+    )
 
 
 def test_initial_pipette_data_by_id() -> None:
@@ -64,7 +80,7 @@ def test_get_pipette_data() -> None:
 
 def test_get_hardware_pipette() -> None:
     """It maps a pipette ID to a config given the HC's attached pipettes."""
-    pipette_config = cast(PipetteDict, {"name": "p300_single"})
+    pipette_config = create_pipette_config("p300_single")
     attached_pipettes: Dict[HwMount, Optional[PipetteDict]] = {
         HwMount.LEFT: pipette_config,
         HwMount.RIGHT: None,
@@ -99,13 +115,16 @@ def test_get_hardware_pipette() -> None:
         )
 
 
-def test_get_hardware_pipette_raises_with_name_mismatch() -> None:
+def test_get_hardware_pipette_with_back_compat() -> None:
     """It maps a pipette ID to a config given the HC's attached pipettes.
 
-    In this test, the hardware config specs "p300_single_gen2", but the
-    loaded pipette name in state is "p300_single," which does not match.
+    In this test, the hardware config specs "p300_single_gen2", and the
+    loaded pipette name in state is "p300_single," which is is allowed.
     """
-    pipette_config = cast(PipetteDict, {"name": "p300_single_gen2"})
+    pipette_config = create_pipette_config(
+        "p300_single_gen2",
+        back_compat_names=["p300_single"],
+    )
     attached_pipettes: Dict[HwMount, Optional[PipetteDict]] = {
         HwMount.LEFT: pipette_config,
         HwMount.RIGHT: None,
@@ -117,6 +136,36 @@ def test_get_hardware_pipette_raises_with_name_mismatch() -> None:
                 id="pipette-id",
                 mount=MountType.LEFT,
                 pipetteName=PipetteName.P300_SINGLE,
+            ),
+        }
+    )
+
+    result = subject.get_hardware_pipette(
+        pipette_id="pipette-id",
+        attached_pipettes=attached_pipettes,
+    )
+
+    assert result == HardwarePipette(mount=HwMount.LEFT, config=pipette_config)
+
+
+def test_get_hardware_pipette_raises_with_name_mismatch() -> None:
+    """It maps a pipette ID to a config given the HC's attached pipettes.
+
+    In this test, the hardware config specs "p300_single_gen2", but the
+    loaded pipette name in state is "p10_single," which does not match.
+    """
+    pipette_config = create_pipette_config("p300_single_gen2")
+    attached_pipettes: Dict[HwMount, Optional[PipetteDict]] = {
+        HwMount.LEFT: pipette_config,
+        HwMount.RIGHT: None,
+    }
+
+    subject = get_pipette_view(
+        pipettes_by_id={
+            "pipette-id": LoadedPipette(
+                id="pipette-id",
+                mount=MountType.LEFT,
+                pipetteName=PipetteName.P10_SINGLE,
             ),
         }
     )
@@ -145,7 +194,7 @@ def test_get_pipette_volume() -> None:
 
 def test_pipette_is_ready_to_aspirate_if_has_volume() -> None:
     """Pipette should be ready to aspirate if it's already got volume."""
-    pipette_config = cast(PipetteDict, {"ready_to_aspirate": False})
+    pipette_config = create_pipette_config("p300_single", ready_to_aspirate=False)
 
     subject = get_pipette_view(
         pipettes_by_id={
@@ -167,7 +216,7 @@ def test_pipette_is_ready_to_aspirate_if_has_volume() -> None:
 
 def test_pipette_is_ready_to_aspirate_if_no_volume_and_hc_says_ready() -> None:
     """Pipette should be ready to aspirate if HC says it is."""
-    pipette_config = cast(PipetteDict, {"ready_to_aspirate": True})
+    pipette_config = create_pipette_config("p300_single", ready_to_aspirate=True)
 
     subject = get_pipette_view(
         pipettes_by_id={
@@ -190,7 +239,7 @@ def test_pipette_is_ready_to_aspirate_if_no_volume_and_hc_says_ready() -> None:
 
 def test_pipette_not_ready_to_aspirate() -> None:
     """Pipette should not be ready to aspirate if HC says so and it has no volume."""
-    pipette_config = cast(PipetteDict, {"ready_to_aspirate": False})
+    pipette_config = create_pipette_config("p300_single", ready_to_aspirate=False)
 
     subject = get_pipette_view(
         pipettes_by_id={

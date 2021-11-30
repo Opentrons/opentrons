@@ -141,6 +141,7 @@ describe('LPC DeckMap', () => {
             ...mockMagneticModuleFixture,
             model: mockMagneticModule.model,
           } as any,
+          slotName: '1',
         },
       })
   })
