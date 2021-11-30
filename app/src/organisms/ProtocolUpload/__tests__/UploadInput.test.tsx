@@ -18,7 +18,7 @@ import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 import { RerunningProtocolModal } from '../RerunningProtocolModal'
 import { useCloneRun } from '../hooks'
 import type { ProtocolFile } from '@opentrons/shared-data'
-import type { LabwareOffset, VectorOffset } from '@opentrons/api-client'
+import type { LabwareOffset } from '@opentrons/api-client'
 
 jest.mock('../hooks/useMostRecentRunId')
 jest.mock('@opentrons/react-api-client')
