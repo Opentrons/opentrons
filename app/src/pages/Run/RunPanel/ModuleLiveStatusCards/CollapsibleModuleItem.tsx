@@ -1,17 +1,16 @@
-// CollapsibleItem component
+// CollapsibleModuleItem component
 import * as React from 'react'
 import cx from 'classnames'
 
 import styles from './lists.css'
-import { Icon } from '../icons'
+import { Icon, COLOR_ERROR } from '@opentrons/components'
 
-import type { IconName } from '../icons'
-// TODO(bc, 2021-03-31): this is only used in on place
-// reconsider whether this belongs in components library
+import type { IconName } from '@opentrons/components'
 
-export interface CollapsibleItemProps {
+export interface CollapsibleModuleItemProps {
   /** optional icon for title */
   iconName?: IconName
+  status?: string
   /** header */
   header?: string
   /** text of title */
@@ -29,7 +28,9 @@ export interface CollapsibleItemProps {
 /**
  * A list item with title, and collapsible children.
  */
-export function CollapsibleItem(props: CollapsibleItemProps): JSX.Element {
+export function CollapsibleModuleItem(
+  props: CollapsibleModuleItemProps
+): JSX.Element {
   const { onCollapseToggle, header } = props
   const collapsible = onCollapseToggle != null
   const hasHeader = header != null
@@ -50,13 +51,28 @@ export function CollapsibleItem(props: CollapsibleItemProps): JSX.Element {
   })
 
   const titleBarClass = cx(styles.title_bar, styles.clickable)
+  const titleBarErrorClass = cx(
+    styles.titled_list_title_bar,
+    styles.title_bar_error
+  )
 
   return (
     <div className={className}>
-      <div className={titleBarClass}>
+      <div
+        className={
+          props.status === 'error' ? titleBarErrorClass : titleBarClass
+        }
+      >
         {hasHeader && <p className={styles.header_text}>{header}</p>}
         {props.iconName != null ? (
           <div className={styles.icon_left_of_title_container}>
+            {props.status === 'error' ? (
+              <Icon
+                className={styles.icon_left_of_title}
+                color={COLOR_ERROR}
+                name="alert-circle"
+              />
+            ) : null}
             <Icon className={styles.icon_left_of_title} name={props.iconName} />
             <h3 className={styles.title}>{props.title}</h3>
           </div>

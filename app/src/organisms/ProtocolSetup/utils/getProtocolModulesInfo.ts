@@ -19,6 +19,7 @@ export interface ProtocolModuleInfo {
   nestedLabwareDef: LabwareDefinition2 | null
   nestedLabwareId: string | null
   protocolLoadOrder: number
+  slotName: string
 }
 
 export const getProtocolModulesInfo = (
@@ -80,6 +81,7 @@ export const getProtocolModulesInfo = (
             nestedLabwareDef,
             nestedLabwareId,
             protocolLoadOrder,
+            slotName,
           },
         ]
       },
