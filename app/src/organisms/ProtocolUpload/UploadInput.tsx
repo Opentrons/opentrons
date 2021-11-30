@@ -1,5 +1,8 @@
 import * as React from 'react'
 import { format, parseISO } from 'date-fns'
+import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
+import { Trans, useTranslation } from 'react-i18next'
 import {
   Icon,
   Text,
@@ -30,17 +33,15 @@ import {
   SPACING_2,
   JUSTIFY_START,
 } from '@opentrons/components'
-import { css } from 'styled-components'
-import { Trans, useTranslation } from 'react-i18next'
-import { useMostRecentRunId } from './hooks/useMostRecentRunId'
-import { useSelector } from 'react-redux'
-import { State } from '../../redux/types'
+import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
+import { getLatestLabwareOffsetCount } from '../ProtocolSetup/LabwarePositionCheck/utils/getLatestLabwareOffsetCount'
+import { useProtocolDetails } from '../RunDetails/hooks'
 import { getConnectedRobotName } from '../../redux/robot/selectors'
 import { Divider } from '../../atoms/structure'
-import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
-import { useProtocolDetails } from '../RunDetails/hooks'
+import { useMostRecentRunId } from './hooks/useMostRecentRunId'
 import { RerunningProtocolModal } from './RerunningProtocolModal'
 import { useCloneRun } from './hooks'
+import type { State } from '../../redux/types'
 
 const PROTOCOL_LIBRARY_URL = 'https://protocols.opentrons.com'
 const PROTOCOL_DESIGNER_URL = 'https://designer.opentrons.com'
@@ -140,6 +141,8 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
         ${DROP_ZONE_STYLES} ${DRAG_OVER_STYLES}
       `
     : DROP_ZONE_STYLES
+
+  const labwareOffsetCount = getLatestLabwareOffsetCount(labwareOffsets ?? [])
 
   return (
     <Flex
@@ -266,16 +269,14 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
                 {t('labware_offset_data_title')}
               </Text>
               <Flex css={FONT_BODY_1_DARK}>
-                {labwareOffsets != null && labwareOffsets.length === 0 ? (
+                {labwareOffsetCount === 0 ? (
                   <Text>{t('no_labware_offset_data')}</Text>
                 ) : (
-                  labwareOffsets != null && (
-                    <Trans
-                      t={t}
-                      i18nKey="labware_offsets_info"
-                      values={{ number: labwareOffsets.length }}
-                    />
-                  )
+                  <Trans
+                    t={t}
+                    i18nKey="labware_offsets_info"
+                    values={{ number: labwareOffsetCount }}
+                  />
                 )}
               </Flex>
             </Flex>
