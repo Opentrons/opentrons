@@ -1,6 +1,6 @@
 """Geometry state getters."""
 from dataclasses import dataclass
-from typing import Optional, NamedTuple
+from typing import Optional
 
 from opentrons.types import Point, DeckSlotName
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -13,36 +13,12 @@ from ..types import (
     WellOffset,
     DeckSlotLocation,
     ModuleLocation,
-    ModuleModel,
 )
 from .labware import LabwareView
 from .modules import ModuleView
 
 
-class SlotTransit(NamedTuple):
-    """Class defining starting and ending slots in a pipette movement."""
-
-    start: DeckSlotName
-    end: DeckSlotName
-
-
 DEFAULT_TIP_DROP_HEIGHT_FACTOR = 0.5
-THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = [
-    SlotTransit(start=DeckSlotName.SLOT_1, end=DeckSlotName.FIXED_TRASH),
-    SlotTransit(start=DeckSlotName.FIXED_TRASH, end=DeckSlotName.SLOT_1),
-    SlotTransit(start=DeckSlotName.SLOT_4, end=DeckSlotName.FIXED_TRASH),
-    SlotTransit(start=DeckSlotName.FIXED_TRASH, end=DeckSlotName.SLOT_4),
-    SlotTransit(start=DeckSlotName.SLOT_4, end=DeckSlotName.SLOT_9),
-    SlotTransit(start=DeckSlotName.SLOT_9, end=DeckSlotName.SLOT_4),
-    SlotTransit(start=DeckSlotName.SLOT_4, end=DeckSlotName.SLOT_8),
-    SlotTransit(start=DeckSlotName.SLOT_8, end=DeckSlotName.SLOT_4),
-    SlotTransit(start=DeckSlotName.SLOT_1, end=DeckSlotName.SLOT_8),
-    SlotTransit(start=DeckSlotName.SLOT_8, end=DeckSlotName.SLOT_1),
-    SlotTransit(start=DeckSlotName.SLOT_4, end=DeckSlotName.SLOT_11),
-    SlotTransit(start=DeckSlotName.SLOT_11, end=DeckSlotName.SLOT_4),
-    SlotTransit(start=DeckSlotName.SLOT_1, end=DeckSlotName.SLOT_11),
-    SlotTransit(start=DeckSlotName.SLOT_11, end=DeckSlotName.SLOT_1),
-]
 
 
 # TODO(mc, 2020-11-12): reconcile this data structure with WellGeometry
@@ -239,29 +215,9 @@ class GeometryView:
             )
         )
 
-    def should_dodge_thermocycler(
-        self, from_labware_id: str, to_labware_id: str
-    ) -> bool:
-        """Decide if the requested path would cross the thermocycler, if installed.
-
-        Returns True if we need to dodge, False otherwise.
-        """
-        from_labware = self._labware.get(from_labware_id)
-        to_labware = self._labware.get(to_labware_id)
-
-        if self._modules.get_all() and ModuleModel.THERMOCYCLER_MODULE_V1 in [
-            mod.model for mod in self._modules.get_all()
-        ]:
-            transit = (
-                self.get_ancestor_slot_name(from_labware),
-                self.get_ancestor_slot_name(to_labware),
-            )
-            if transit in THERMOCYCLER_SLOT_TRANSITS_TO_DODGE:
-                return True
-        return False
-
-    def get_ancestor_slot_name(self, labware: LoadedLabware) -> DeckSlotName:
+    def get_ancestor_slot_name(self, labware_id: str) -> DeckSlotName:
         """Get the slot name of the labware or the module that the labware is on."""
+        labware = self._labware.get(labware_id)
         slot_name: DeckSlotName
 
         if isinstance(labware.location, DeckSlotLocation):

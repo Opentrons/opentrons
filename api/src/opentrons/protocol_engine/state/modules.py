@@ -1,8 +1,9 @@
 """Basic modules data state and store."""
 from dataclasses import dataclass, replace
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, NamedTuple
 from numpy import array, dot
 
+from opentrons.types import DeckSlotName
 from ..types import (
     LoadedModule,
     ModuleModel,
@@ -15,6 +16,31 @@ from .. import errors
 from ..commands import Command, LoadModuleResult
 from ..actions import Action, UpdateCommandAction
 from .abstract_store import HasState, HandlesActions
+
+
+class SlotTransit(NamedTuple):
+    """Class defining starting and ending slots in a pipette movement."""
+
+    start: DeckSlotName
+    end: DeckSlotName
+
+
+THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = [
+    SlotTransit(start=DeckSlotName.SLOT_1, end=DeckSlotName.FIXED_TRASH),
+    SlotTransit(start=DeckSlotName.FIXED_TRASH, end=DeckSlotName.SLOT_1),
+    SlotTransit(start=DeckSlotName.SLOT_4, end=DeckSlotName.FIXED_TRASH),
+    SlotTransit(start=DeckSlotName.FIXED_TRASH, end=DeckSlotName.SLOT_4),
+    SlotTransit(start=DeckSlotName.SLOT_4, end=DeckSlotName.SLOT_9),
+    SlotTransit(start=DeckSlotName.SLOT_9, end=DeckSlotName.SLOT_4),
+    SlotTransit(start=DeckSlotName.SLOT_4, end=DeckSlotName.SLOT_8),
+    SlotTransit(start=DeckSlotName.SLOT_8, end=DeckSlotName.SLOT_4),
+    SlotTransit(start=DeckSlotName.SLOT_1, end=DeckSlotName.SLOT_8),
+    SlotTransit(start=DeckSlotName.SLOT_8, end=DeckSlotName.SLOT_1),
+    SlotTransit(start=DeckSlotName.SLOT_4, end=DeckSlotName.SLOT_11),
+    SlotTransit(start=DeckSlotName.SLOT_11, end=DeckSlotName.SLOT_4),
+    SlotTransit(start=DeckSlotName.SLOT_1, end=DeckSlotName.SLOT_11),
+    SlotTransit(start=DeckSlotName.SLOT_11, end=DeckSlotName.SLOT_1),
+]
 
 
 @dataclass(frozen=True)
@@ -165,3 +191,19 @@ class ModuleView(HasState[ModuleState]):
             if mod.location == deck_location:
                 return mod
         return None
+
+    def should_dodge_thermocycler(
+        self, from_slot: DeckSlotName, to_slot: DeckSlotName
+    ) -> bool:
+        """Decide if the requested path would cross the thermocycler, if installed.
+
+        Returns True if we need to dodge, False otherwise.
+        """
+        all_mods = self.get_all()
+        if all_mods and ModuleModel.THERMOCYCLER_MODULE_V1 in [
+            mod.model for mod in all_mods
+        ]:
+            transit = (from_slot, to_slot)
+            if transit in THERMOCYCLER_SLOT_TRANSITS_TO_DODGE:
+                return True
+        return False

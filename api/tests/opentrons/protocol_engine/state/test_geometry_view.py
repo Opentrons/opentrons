@@ -18,16 +18,10 @@ from opentrons.protocol_engine.types import (
     WellLocation,
     WellOrigin,
     WellOffset,
-    LoadedModule,
-    ModuleModel,
-    ModuleDefinition,
 )
 from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.modules import ModuleView
-from opentrons.protocol_engine.state.geometry import (
-    GeometryView,
-    THERMOCYCLER_SLOT_TRANSITS_TO_DODGE as dodge_slots,
-)
+from opentrons.protocol_engine.state.geometry import GeometryView
 
 
 @pytest.fixture
@@ -635,59 +629,32 @@ def test_get_tip_drop_invalid_origin(
         )
 
 
-@pytest.mark.parametrize(
-    argnames="from_slot, to_slot, should_dodge",
-    argvalues=[
-        [dodge_slots[0].start, dodge_slots[0].end, True],
-        [dodge_slots[2].start, dodge_slots[2].end, True],
-        [dodge_slots[5].start, dodge_slots[5].end, True],
-        [DeckSlotName.SLOT_2, DeckSlotName.SLOT_4, False],
-    ],
-)
-def test_thermocycler_dodging(
+def test_get_ancestor_slot_name(
     decoy: Decoy,
     labware_view: LabwareView,
     module_view: ModuleView,
-    tempdeck_v1_def: ModuleDefinition,
     subject: GeometryView,
-    from_slot: DeckSlotName,
-    to_slot: DeckSlotName,
-    should_dodge: bool,
 ) -> None:
-    """It should specify if thermocycler dodging is needed.
+    """It should get name of ancestor slot of labware."""
+    decoy.when(labware_view.get("labware-1")).then_return(
+        LoadedLabware(
+            id="labware-1",
+            loadName="load-name",
+            definitionUri="1234",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        )
+    )
+    assert subject.get_ancestor_slot_name("labware-1") == DeckSlotName.SLOT_4
 
-    It should return True if thermocycler exists and movement is between bad pairs of
-    slot locations.
-    """
-    decoy.when(labware_view.get("from-id")).then_return(
+    decoy.when(labware_view.get("labware-2")).then_return(
         LoadedLabware(
-            id="from-id",
-            loadName="labware-1",
-            definitionUri="some-uri",
-            location=DeckSlotLocation(slotName=from_slot),
+            id="labware-2",
+            loadName="load-name",
+            definitionUri="4567",
+            location=ModuleLocation(moduleId="4321"),
         )
     )
-    decoy.when(labware_view.get("to-id")).then_return(
-        LoadedLabware(
-            id="to-id",
-            loadName="labware-2",
-            definitionUri="some-uri",
-            location=DeckSlotLocation(slotName=to_slot),
-        )
+    decoy.when(module_view.get_location("4321")).then_return(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
     )
-    decoy.when(module_view.get_all()).then_return(
-        [
-            LoadedModule(
-                id="module-1",
-                model=ModuleModel.THERMOCYCLER_MODULE_V1,
-                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
-                definition=tempdeck_v1_def,
-            )
-        ]
-    )
-    assert (
-        subject.should_dodge_thermocycler(
-            from_labware_id="from-id", to_labware_id="to-id"
-        )
-        is should_dodge
-    )
+    assert subject.get_ancestor_slot_name("labware-2") == DeckSlotName.SLOT_1

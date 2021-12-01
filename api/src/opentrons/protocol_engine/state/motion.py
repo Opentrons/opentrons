@@ -16,6 +16,7 @@ from ..types import WellLocation
 from .labware import LabwareView
 from .pipettes import PipetteView, CurrentWell
 from .geometry import GeometryView
+from .modules import ModuleView
 
 
 @dataclass(frozen=True)
@@ -34,11 +35,13 @@ class MotionView:
         labware_view: LabwareView,
         pipette_view: PipetteView,
         geometry_view: GeometryView,
+        module_view: ModuleView,
     ) -> None:
         """Initialize a MotionState instance."""
         self._labware = labware_view
         self._pipettes = pipette_view
         self._geometry = geometry_view
+        self._module = module_view
 
     def get_pipette_location(
         self,
@@ -106,8 +109,11 @@ class MotionView:
             move_type = MoveType.GENERAL_ARC
             min_travel_z = self._geometry.get_all_labware_highest_z()
             if location is not None:
-                if self._geometry.should_dodge_thermocycler(
-                    from_labware_id=location.labware_id, to_labware_id=labware_id
+                if self._module.should_dodge_thermocycler(
+                    from_slot=self._geometry.get_ancestor_slot_name(
+                        location.labware_id
+                    ),
+                    to_slot=self._geometry.get_ancestor_slot_name(labware_id),
                 ):
                     slot_5_center = self._labware.get_slot_center_position(
                         slot=DeckSlotName.SLOT_5

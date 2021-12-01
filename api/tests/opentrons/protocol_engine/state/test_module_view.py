@@ -10,7 +10,11 @@ from opentrons.protocol_engine.types import (
     ModuleDefinition,
     ModuleModel,
 )
-from opentrons.protocol_engine.state.modules import ModuleView, ModuleState
+from opentrons.protocol_engine.state.modules import (
+    ModuleView,
+    ModuleState,
+    THERMOCYCLER_SLOT_TRANSITS_TO_DODGE as DODGE_SLOTS,
+)
 
 
 def get_module_view(
@@ -147,3 +151,38 @@ def test_get_dimensions(tempdeck_v1_def: ModuleDefinition) -> None:
     )
     subject = get_module_view(modules_by_id={module_id: module})
     assert subject.get_dimensions(module_id=module_id) == tempdeck_v1_def.dimensions
+
+
+@pytest.mark.parametrize(
+    argnames="from_slot, to_slot, should_dodge",
+    argvalues=[
+        [DODGE_SLOTS[0].start, DODGE_SLOTS[0].end, True],
+        [DODGE_SLOTS[2].start, DODGE_SLOTS[2].end, True],
+        [DODGE_SLOTS[5].start, DODGE_SLOTS[5].end, True],
+        [DeckSlotName.SLOT_2, DeckSlotName.SLOT_4, False],
+    ],
+)
+def test_thermocycler_dodging(
+    tempdeck_v1_def: ModuleDefinition,
+    from_slot: DeckSlotName,
+    to_slot: DeckSlotName,
+    should_dodge: bool,
+) -> None:
+    """It should specify if thermocycler dodging is needed.
+
+    It should return True if thermocycler exists and movement is between bad pairs of
+    slot locations.
+    """
+    module_data = LoadedModule(
+        id="module-id",
+        model=ModuleModel.THERMOCYCLER_MODULE_V1,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        serial="module-serial",
+        definition=tempdeck_v1_def,
+    )
+
+    subject = get_module_view(modules_by_id={"module-id": module_data})
+    assert (
+        subject.should_dodge_thermocycler(from_slot=from_slot, to_slot=to_slot)
+        is should_dodge
+    )
