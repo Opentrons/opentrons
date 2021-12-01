@@ -1,7 +1,9 @@
 """Pipetting command subject."""
+from typing import Any, ContextManager, NamedTuple, Optional
+from contextlib import nullcontext as does_not_raise
+
 import pytest
 from decoy import Decoy
-from typing import NamedTuple
 
 from opentrons.types import MountType, Mount, Point
 from opentrons.hardware_control import API as HardwareAPI
@@ -209,8 +211,39 @@ async def test_move_to_well_from_starting_location(
     )
 
 
-# FIX BEFORE MERGE: Parametrize this.
+class RaiseIfThermocyclerNotOpenSpec(NamedTuple):
+    """Parametrization data for test_move_to_well_raises_if_thermocycler_not_open()."""
+
+    # Optional to match current signature of Thermocycler.lid_status.
+    # Should change to non-Optional if/when that becomes non-optional.
+    lid_status: Optional[ThermocyclerLidStatus]
+    expected_raise_cm: ContextManager[Any]
+
+
+@pytest.mark.parametrize(
+    RaiseIfThermocyclerNotOpenSpec._fields,
+    [
+        RaiseIfThermocyclerNotOpenSpec(
+            lid_status=ThermocyclerLidStatus.CLOSED,
+            expected_raise_cm=pytest.raises(ThermocyclerNotOpenError),
+        ),
+        RaiseIfThermocyclerNotOpenSpec(
+            lid_status=ThermocyclerLidStatus.IN_BETWEEN,
+            expected_raise_cm=pytest.raises(ThermocyclerNotOpenError),
+        ),
+        RaiseIfThermocyclerNotOpenSpec(
+            lid_status=None,
+            expected_raise_cm=pytest.raises(ThermocyclerNotOpenError),
+        ),
+        RaiseIfThermocyclerNotOpenSpec(
+            lid_status=ThermocyclerLidStatus.OPEN,
+            expected_raise_cm=does_not_raise(),
+        ),
+    ],
+)
 async def test_move_to_well_raises_if_thermocycler_not_open(
+    lid_status: Optional[ThermocyclerLidStatus],
+    expected_raise_cm: ContextManager[Any],
     decoy: Decoy,
     state_store: StateStore,
     hardware_api: HardwareAPI,
@@ -232,10 +265,10 @@ async def test_move_to_well_raises_if_thermocycler_not_open(
     # necessary to work around Decoy not being able to stub properties.
     thermocycler = decoy.mock(cls=HardwareThermocycler)
     thermocycler.device_info = {"serial": "module-serial"}  # type: ignore[misc]
-    thermocycler.lid_status = ThermocyclerLidStatus.IN_BETWEEN  # type: ignore[misc]
+    thermocycler.lid_status = lid_status  # type: ignore[misc]
     hardware_api.attached_modules = [thermocycler]  # type: ignore[misc]
 
-    with pytest.raises(ThermocyclerNotOpenError):
+    with expected_raise_cm:
         await subject.move_to_well(
             pipette_id="pipette-id",
             labware_id="labware-id",
