@@ -7,8 +7,13 @@ from typing import Any, ContextManager, NamedTuple, Optional
 import pytest
 from decoy import Decoy
 
+from opentrons.types import DeckSlotName
 from opentrons.protocol_engine.state import StateStore
-from opentrons.protocol_engine.types import ModuleLocation, ModuleModel
+from opentrons.protocol_engine.types import (
+    DeckSlotLocation,
+    ModuleLocation,
+    ModuleModel,
+)
 from opentrons.protocol_engine.errors import ThermocyclerNotOpenError
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.modules import Thermocycler as HardwareThermocycler
@@ -73,7 +78,7 @@ class RaiseIfThermocyclerNotOpenSpec(NamedTuple):
         ),
     ],
 )
-def test_raises_if_thermocycler_not_open(
+def test_raises_depending_on_thermocycler_lid_status(
     lid_status: Optional[ThermocyclerLidStatus],
     expected_raise_cm: ContextManager[Any],
     subject: ThermocyclerMovementFlagger,
@@ -81,7 +86,7 @@ def test_raises_if_thermocycler_not_open(
     hardware_api: HardwareAPI,
     decoy: Decoy,
 ) -> None:
-    """It should raise if the destination labware is in a non-open Thermocycler."""
+    """When on a Thermocycler, it should raise if the lid isn't open."""
     decoy.when(state_store.labware.get_location(labware_id="labware-id")).then_return(
         ModuleLocation(moduleId="module-id")
     )
@@ -106,13 +111,13 @@ def test_raises_if_thermocycler_not_open(
         )
 
 
-def test_raises_if_hardware_thermocycler_has_gone_missing(
+def test_raises_if_hardware_module_has_gone_missing(
     subject: ThermocyclerMovementFlagger,
     state_store: StateStore,
     hardware_api: HardwareAPI,
     decoy: Decoy,
 ) -> None:
-    """It should raise if the hardware Thermocycler can't be found by its serial no."""
+    """It should raise if the hardware module can't be found by its serial no."""
     decoy.when(state_store.labware.get_location(labware_id="labware-id")).then_return(
         ModuleLocation(moduleId="module-id")
     )
@@ -132,3 +137,32 @@ def test_raises_if_hardware_thermocycler_has_gone_missing(
         subject.raise_if_labware_in_non_open_thermocycler(
             labware_id="labware-id",
         )
+
+
+def test_passes_if_labware_on_non_thermocycler_module(
+    subject: ThermocyclerMovementFlagger,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    decoy: Decoy,
+) -> None:
+    """It shouldn't raise if the labware is on a module other than a Thermocycler."""
+    decoy.when(state_store.labware.get_location(labware_id="labware-id")).then_return(
+        ModuleLocation(moduleId="module-id")
+    )
+    decoy.when(state_store.modules.get_model(module_id="module-id")).then_return(
+        ModuleModel.MAGNETIC_MODULE_V1,
+    )
+    subject.raise_if_labware_in_non_open_thermocycler("labware-id")
+
+
+def test_passes_if_labware_not_on_any_module(
+    subject: ThermocyclerMovementFlagger,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    decoy: Decoy,
+) -> None:
+    """It shouldn't raise if the labware isn't on a module."""
+    decoy.when(state_store.labware.get_location(labware_id="labware-id")).then_return(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+    )
+    subject.raise_if_labware_in_non_open_thermocycler("labware-id")
