@@ -376,7 +376,7 @@ def test_get_slot_position(standard_deck_def: DeckDefinitionV2) -> None:
 
 
 def test_get_slot_center_position(standard_deck_def: DeckDefinitionV2) -> None:
-    """It should get the absoluation location of a deck slot's center."""
+    """It should get the absolute location of a deck slot's center."""
     subject = get_labware_view(deck_definition=standard_deck_def)
 
     slot_def = standard_deck_def["locations"]["orderedSlots"][1]
