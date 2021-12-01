@@ -38,6 +38,7 @@ from opentrons.protocol_engine.state import (
 from opentrons.protocol_engine.execution.movement import (
     MovementHandler,
     SavedPositionData,
+    ThermocyclerMovementFlagger,
 )
 
 from .mock_defs import MockPipettes
@@ -241,15 +242,19 @@ class RaiseIfThermocyclerNotOpenSpec(NamedTuple):
         ),
     ],
 )
-async def test_move_to_well_raises_if_thermocycler_not_open(
+def test_raises_if_thermocycler_not_open(
     lid_status: Optional[ThermocyclerLidStatus],
     expected_raise_cm: ContextManager[Any],
     decoy: Decoy,
     state_store: StateStore,
     hardware_api: HardwareAPI,
-    subject: MovementHandler,
 ) -> None:
     """It should raise if the destination labware is in a non-open Thermocycler."""
+    subject = ThermocyclerMovementFlagger(
+        state_store=state_store,
+        hardware_api=hardware_api,
+    )
+
     decoy.when(state_store.labware.get_location(labware_id="labware-id")).then_return(
         ModuleLocation(moduleId="module-id")
     )
@@ -269,10 +274,8 @@ async def test_move_to_well_raises_if_thermocycler_not_open(
     hardware_api.attached_modules = [thermocycler]  # type: ignore[misc]
 
     with expected_raise_cm:
-        await subject.move_to_well(
-            pipette_id="pipette-id",
+        subject.raise_if_labware_in_non_open_thermocycler(
             labware_id="labware-id",
-            well_name="A1",
         )
 
 
