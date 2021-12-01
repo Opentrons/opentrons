@@ -1,4 +1,6 @@
 """Movement command handling."""
+from __future__ import annotations
+
 from typing import Dict, Optional, Sequence
 from dataclasses import dataclass
 
@@ -57,11 +59,18 @@ class MovementHandler:
         state_store: StateStore,
         hardware_api: HardwareAPI,
         model_utils: Optional[ModelUtils] = None,
+        thermocycler_movement_flagger: Optional[ThermocyclerMovementFlagger] = None,
     ) -> None:
         """Initialize a MovementHandler instance."""
         self._state_store = state_store
         self._hardware_api = hardware_api
         self._model_utils = model_utils or ModelUtils()
+        self._thermocycler_movement_flagger = (
+            thermocycler_movement_flagger
+            or ThermocyclerMovementFlagger(
+                state_store=self._state_store, hardware_api=self._hardware_api
+            )
+        )
 
     async def move_to_well(
         self,
@@ -72,7 +81,9 @@ class MovementHandler:
         current_well: Optional[CurrentWell] = None,
     ) -> None:
         """Move to a specific well."""
-        self._raise_if_labware_in_non_open_thermocycler(labware_id=labware_id)
+        self._thermocycler_movement_flagger.raise_if_labware_in_non_open_thermocycler(
+            labware_id=labware_id
+        )
 
         # get the pipette's mount and current critical point, if applicable
         pipette_location = self._state_store.motion.get_pipette_location(
@@ -184,7 +195,34 @@ class MovementHandler:
 
         await self._hardware_api.home(axes=hardware_axes)
 
-    def _raise_if_labware_in_non_open_thermocycler(self, labware_id: str) -> None:
+
+class ThermocyclerMovementFlagger:
+    """Flags unsafe movements to a Thermocycler Module.
+
+    This is only for use in MovementHandler.
+    It's a separate class for independent testability.
+    """
+
+    def __init__(self, state_store: StateStore, hardware_api: HardwareAPI) -> None:
+        """Initialize the ThermocyclerMovementFlagger.
+
+        Args:
+            state_store: The Protocol Engine state store interface. Used to figure out
+                         which Thermocycler a labware is in, if any.
+            hardware_api: The underlying hardware interface. Used to query
+                          Thermocyclers' current lid states.
+        """
+        self._state_store = state_store
+        self._hardware_api = hardware_api
+
+    def raise_if_labware_in_non_open_thermocycler(self, labware_id: str) -> None:
+        """Raise if the given labware is inside a Thermocycler whose lid isn't open.
+
+        Otherwise, no-op.
+
+        Raises:
+            ThermocyclerNotOpenError
+        """
         lid_status = self._get_parent_thermocycler_lid_status(labware_id=labware_id)
         if lid_status is not None and lid_status != ThermocyclerLidStatus.OPEN:
             raise ThermocyclerNotOpenError(
@@ -216,9 +254,9 @@ class MovementHandler:
                 lid_status = thermocycler.lid_status
                 if lid_status is None:
                     # todo(mm, 2021-11-30): thermocycler.lid_status can be None, but
-                    # it's unclear what that means. We change it to UNKNOWN to avoid
-                    # conflicting with our returning of None meaning
-                    # "not in a Thermocycler.""
+                    # it's unclear what that means. We change it to UNKNOWN here
+                    # to avoid conflicting with our returning of None normally meaning
+                    # "not in a Thermocycler."
                     return ThermocyclerLidStatus.UNKNOWN
                 else:
                     return thermocycler.lid_status
