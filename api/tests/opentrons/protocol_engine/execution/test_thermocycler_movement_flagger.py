@@ -19,6 +19,18 @@ from opentrons.protocol_engine.execution.thermocycler_movement_flagger import (
 )
 
 
+@pytest.fixture
+def hardware_api(decoy: Decoy) -> HardwareAPI:
+    """Get a mock in the shape of a HardwareAPI."""
+    return decoy.mock(cls=HardwareAPI)
+
+
+@pytest.fixture
+def state_store(decoy: Decoy) -> StateStore:
+    """Get a mock in the shape of a StateStore."""
+    return decoy.mock(cls=StateStore)
+
+
 class RaiseIfThermocyclerNotOpenSpec(NamedTuple):
     """Parametrization data for test_move_to_well_raises_if_thermocycler_not_open()."""
 
