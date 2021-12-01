@@ -223,12 +223,16 @@ class ThermocyclerMovementFlagger:
         Raises:
             ThermocyclerNotOpenError
         """
-        lid_status = self._get_parent_thermocycler_lid_status(labware_id=labware_id)
-        if lid_status is not None and lid_status != ThermocyclerLidStatus.OPEN:
-            raise ThermocyclerNotOpenError(
-                f"Thermocycler must be open when moving to labware inside it,"
-                f' but Thermocycler is currently "{lid_status}".'
-            )
+        try:
+            lid_status = self._get_parent_thermocycler_lid_status(labware_id=labware_id)
+        except self._NotInAThermocyclerError:
+            pass
+        else:
+            if lid_status != ThermocyclerLidStatus.OPEN:
+                raise ThermocyclerNotOpenError(
+                    f"Thermocycler must be open when moving to labware inside it,"
+                    f' but Thermocycler is currently "{lid_status}".'
+                )
 
     def _get_parent_thermocycler_lid_status(
         self,
@@ -236,7 +240,11 @@ class ThermocyclerMovementFlagger:
     ) -> Optional[ThermocyclerLidStatus]:
         """Return the current lid status of the Thermocycler containing the labware.
 
-        If the labware wasn't loaded on a Thermocycler, return None.
+        Raises:
+            NotInAThermocyclerError: If the labware isn't contained in a Thermocycler.
+                                     We need to raise an exception to signal this
+                                     instead of returning None because None is already
+                                     a possible Thermocycler lid status.
         """
         labware_location = self._state_store.labware.get_location(labware_id=labware_id)
         if isinstance(labware_location, ModuleLocation):
@@ -251,19 +259,13 @@ class ThermocyclerMovementFlagger:
                 thermocycler = self._find_thermocycler_by_serial(
                     serial_number=thermocycler_serial
                 )
-                lid_status = thermocycler.lid_status
-                if lid_status is None:
-                    # todo(mm, 2021-11-30): thermocycler.lid_status can be None, but
-                    # it's unclear what that means. We change it to UNKNOWN here
-                    # to avoid conflicting with our returning of None normally meaning
-                    # "not in a Thermocycler."
-                    return ThermocyclerLidStatus.UNKNOWN
-                else:
-                    return thermocycler.lid_status
+                return thermocycler.lid_status
             else:
-                return None
+                # The labware is in a module, but it's not a Thermocycler.
+                raise self._NotInAThermocyclerError()
         else:
-            return None
+            # The labware isn't in any module.
+            raise self._NotInAThermocyclerError()
 
     def _find_thermocycler_by_serial(self, serial_number: str) -> HardwareThermocycler:
         for attached_module in self._hardware_api.attached_modules:
@@ -279,3 +281,6 @@ class ThermocyclerMovementFlagger:
         # Better error. This can happen if the module was disconnected
         # between load and now, I think.
         assert False
+
+    class _NotInAThermocyclerError(Exception):
+        pass
