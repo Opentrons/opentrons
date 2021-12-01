@@ -39,49 +39,20 @@ def create(
     """
     # Raise KeyError if axis is missing from origin
     deltas = {ax: target[ax] - origin[ax] for ax in target.keys()}
+    # head (as opposed to head_l and head_r) is not an acceptable target for motion
+    deltas.pop(NodeId.head, None)
 
     move_groups = []
-
-    # First move head
-    dza = deltas.get(NodeId.head, 0)
-    if dza:
+    for axis_node, axis_delta in deltas.items():
+        if not axis_delta:
+            continue
         move_groups.append(
             [
                 {
-                    NodeId.head: MoveGroupSingleAxisStep(
-                        distance_mm=dza,
-                        velocity_mm_sec=speed if dza > 0 else -speed,
-                        duration_sec=abs(dza) / speed,
-                    )
-                }
-            ]
-        )
-
-    # Move x
-    dx = deltas.get(NodeId.gantry_x, 0)
-    if dx:
-        move_groups.append(
-            [
-                {
-                    NodeId.gantry_x: MoveGroupSingleAxisStep(
-                        distance_mm=dx,
-                        velocity_mm_sec=speed if dx > 0 else -speed,
-                        duration_sec=abs(dx) / speed,
-                    )
-                }
-            ]
-        )
-
-    # Move y
-    dy = deltas.get(NodeId.gantry_y, 0)
-    if dy:
-        move_groups.append(
-            [
-                {
-                    NodeId.gantry_y: MoveGroupSingleAxisStep(
-                        distance_mm=dy,
-                        velocity_mm_sec=speed if dy > 0 else -speed,
-                        duration_sec=abs(dy) / speed,
+                    axis_node: MoveGroupSingleAxisStep(
+                        distance_mm=axis_delta,
+                        velocity_mm_sec=speed if axis_delta > 0 else -speed,
+                        duration_sec=abs(axis_delta) / speed,
                     )
                 }
             ]

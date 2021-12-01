@@ -8,7 +8,7 @@ def test_create_just_head() -> None:
     expected = [
         [
             {
-                NodeId.head: MoveGroupSingleAxisStep(
+                NodeId.head_l: MoveGroupSingleAxisStep(
                     distance_mm=-2, velocity_mm_sec=-0.25, duration_sec=8
                 ),
             }
@@ -16,8 +16,8 @@ def test_create_just_head() -> None:
     ]
     assert (
         create(
-            origin={NodeId.head: 4},
-            target={NodeId.head: 2},
+            origin={NodeId.head_l: 4},
+            target={NodeId.head_l: 2},
             speed=0.25,
         )
         == expected
@@ -57,7 +57,7 @@ def test_create_all() -> None:
     expected = [
         [
             {
-                NodeId.head: MoveGroupSingleAxisStep(
+                NodeId.head_l: MoveGroupSingleAxisStep(
                     distance_mm=4, velocity_mm_sec=0.05, duration_sec=80
                 ),
             }
@@ -79,8 +79,8 @@ def test_create_all() -> None:
     ]
     assert (
         create(
-            origin={NodeId.head: 0, NodeId.gantry_x: 0, NodeId.gantry_y: 0},
-            target={NodeId.head: 4, NodeId.gantry_x: 2, NodeId.gantry_y: 2},
+            origin={NodeId.head_l: 0, NodeId.gantry_x: 0, NodeId.gantry_y: 0},
+            target={NodeId.head_l: 4, NodeId.gantry_x: 2, NodeId.gantry_y: 2},
             speed=0.05,
         )
         == expected
