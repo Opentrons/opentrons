@@ -24,6 +24,7 @@ export const bootIntercom = (props: IntercomPayload): void => {
     const iprops = {
       ...props,
       user_id: userId,
+      hide_default_launcher: true,
     }
     log.debug('Booting intercom', props)
     global.Intercom(Constants.INTERCOM_BOOT, iprops)
@@ -35,6 +36,7 @@ export const updateIntercomProfile = (props: IntercomPayload): void => {
     const iprops = {
       ...props,
       user_id: userId,
+      hide_default_launcher: true,
     }
     log.debug('Updating intercom profile', props)
     global.Intercom(Constants.INTERCOM_UPDATE, iprops)
