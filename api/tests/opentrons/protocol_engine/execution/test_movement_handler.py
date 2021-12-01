@@ -31,6 +31,9 @@ from opentrons.protocol_engine.execution.movement import (
     MovementHandler,
     SavedPositionData,
 )
+from opentrons.protocol_engine.execution.thermocycler_movement_flagger import (
+    ThermocyclerMovementFlagger,
+)
 
 from .mock_defs import MockPipettes
 
@@ -56,15 +59,30 @@ def state_store(decoy: Decoy) -> StateStore:
 
 
 @pytest.fixture
-def subject(state_store: StateStore, hardware_api: HardwareAPI) -> MovementHandler:
+def thermocycler_movement_flagger(decoy: Decoy) -> ThermocyclerMovementFlagger:
+    """Get a mock in the shape of a ThermocyclerMovementFlagger."""
+    return decoy.mock(cls=ThermocyclerMovementFlagger)
+
+
+@pytest.fixture
+def subject(
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    thermocycler_movement_flagger: ThermocyclerMovementFlagger,
+) -> MovementHandler:
     """Create a PipettingHandler with its dependencies mocked out."""
-    return MovementHandler(state_store=state_store, hardware_api=hardware_api)
+    return MovementHandler(
+        state_store=state_store,
+        hardware_api=hardware_api,
+        thermocycler_movement_flagger=thermocycler_movement_flagger,
+    )
 
 
 async def test_move_to_well(
     decoy: Decoy,
     state_store: StateStore,
     hardware_api: HardwareAPI,
+    thermocycler_movement_flagger: ThermocyclerMovementFlagger,
     subject: MovementHandler,
 ) -> None:
     """Move requests should call hardware controller with movement data."""
@@ -119,6 +137,9 @@ async def test_move_to_well(
     )
 
     decoy.verify(
+        thermocycler_movement_flagger.raise_if_labware_in_non_open_thermocycler(
+            labware_id="labware-id"
+        ),
         await hardware_api.move_to(
             mount=Mount.LEFT,
             abs_position=Point(1, 2, 3),
@@ -136,6 +157,7 @@ async def test_move_to_well_from_starting_location(
     decoy: Decoy,
     state_store: StateStore,
     hardware_api: HardwareAPI,
+    thermocycler_movement_flagger: ThermocyclerMovementFlagger,
     subject: MovementHandler,
 ) -> None:
     """It should be able to move to a well from a start location."""
@@ -195,6 +217,9 @@ async def test_move_to_well_from_starting_location(
     )
 
     decoy.verify(
+        thermocycler_movement_flagger.raise_if_labware_in_non_open_thermocycler(
+            labware_id="labware-id"
+        ),
         await hardware_api.move_to(
             mount=Mount.RIGHT,
             abs_position=Point(1, 2, 3),
