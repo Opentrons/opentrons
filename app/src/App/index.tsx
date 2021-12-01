@@ -38,7 +38,7 @@ export const AppComponent = (): JSX.Element => {
   const connectedRobot = useSelector((state: State) => getConnectedRobot(state))
 
   return (
-    <ApiHostProvider hostname={connectedRobot != null ? connectedRobot.ip : ''}>
+    <ApiHostProvider hostname={connectedRobot?.ip ?? null}>
       <GlobalStyle />
       <Flex
         position={POSITION_FIXED}
