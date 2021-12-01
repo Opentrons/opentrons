@@ -43,6 +43,11 @@ class ThermocyclerMovementFlagger:
         """
         try:
             lid_status = self._get_parent_thermocycler_lid_status(labware_id=labware_id)
+        except self._HardwareThermocyclerMissingError as e:
+            raise ThermocyclerNotOpenError(
+                "Thermocycler must be open when moving to labware inside it,"
+                " but can't confirm Thermocycler's current status."
+            ) from e
         except self._NotInAThermocyclerError:
             pass
         else:
@@ -52,6 +57,8 @@ class ThermocyclerMovementFlagger:
                     f' but Thermocycler is currently "{lid_status}".'
                 )
 
+    # todo(mm, 2021-12-01): Return non-Optional when the hardware API no longer has
+    # None as a possible lid status and we no longer need to pass that along.
     def _get_parent_thermocycler_lid_status(
         self,
         labware_id: str,
@@ -59,10 +66,14 @@ class ThermocyclerMovementFlagger:
         """Return the current lid status of the Thermocycler containing the labware.
 
         Raises:
-            NotInAThermocyclerError: If the labware isn't contained in a Thermocycler.
-                                     We need to raise an exception to signal this
-                                     instead of returning None because None is already
-                                     a possible Thermocycler lid status.
+            _NotInAThermocyclerError: If the labware isn't contained in a Thermocycler.
+                We need to raise an exception to signal this instead of returning None
+                because None is already a possible Thermocycler lid status.
+            _HardwareThermocyclerMissingError: If the labware is in a Thermocycler, but
+                we can't find that Thermocycler in the hardware API, so we can't fetch
+                its current lid status. It's unclear if this can happen in practice...
+                maybe if the module disconnects between when it was loaded into
+                Protocol Engine and when this function is called?
         """
         labware_location = self._state_store.labware.get_location(labware_id=labware_id)
         if isinstance(labware_location, ModuleLocation):
@@ -74,10 +85,18 @@ class ThermocyclerMovementFlagger:
                 thermocycler_serial = self._state_store.modules.get_serial(
                     module_id=module_id
                 )
+
                 thermocycler = self._find_thermocycler_by_serial(
                     serial_number=thermocycler_serial
                 )
-                return thermocycler.lid_status
+
+                if thermocycler is not None:
+                    return thermocycler.lid_status
+                else:
+                    raise self._HardwareThermocyclerMissingError(
+                        f"No Thermocycler found"
+                        f' with serial number "{thermocycler_serial}".'
+                    )
             else:
                 # The labware is in a module, but it's not a Thermocycler.
                 raise self._NotInAThermocyclerError()
@@ -85,7 +104,9 @@ class ThermocyclerMovementFlagger:
             # The labware isn't in any module.
             raise self._NotInAThermocyclerError()
 
-    def _find_thermocycler_by_serial(self, serial_number: str) -> HardwareThermocycler:
+    def _find_thermocycler_by_serial(
+        self, serial_number: str
+    ) -> Optional[HardwareThermocycler]:
         for attached_module in self._hardware_api.attached_modules:
             # Different module types have different keys under .device_info.
             # Thermocyclers should always have .device_info["serial"].
@@ -94,11 +115,10 @@ class ThermocyclerMovementFlagger:
                 and attached_module.device_info["serial"] == serial_number
             ):
                 return attached_module
-
-        # FIX BEFORE MERGE:
-        # Better error. This can happen if the module was disconnected
-        # between load and now, I think.
-        assert False
+        return None
 
     class _NotInAThermocyclerError(Exception):
+        pass
+
+    class _HardwareThermocyclerMissingError(Exception):
         pass

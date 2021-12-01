@@ -31,6 +31,18 @@ def state_store(decoy: Decoy) -> StateStore:
     return decoy.mock(cls=StateStore)
 
 
+@pytest.fixture
+def subject(
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+) -> ThermocyclerMovementFlagger:
+    """Return a movement flagger initialized with mocked-out dependencies."""
+    return ThermocyclerMovementFlagger(
+        state_store=state_store,
+        hardware_api=hardware_api,
+    )
+
+
 class RaiseIfThermocyclerNotOpenSpec(NamedTuple):
     """Parametrization data for test_move_to_well_raises_if_thermocycler_not_open()."""
 
@@ -64,16 +76,12 @@ class RaiseIfThermocyclerNotOpenSpec(NamedTuple):
 def test_raises_if_thermocycler_not_open(
     lid_status: Optional[ThermocyclerLidStatus],
     expected_raise_cm: ContextManager[Any],
-    decoy: Decoy,
+    subject: ThermocyclerMovementFlagger,
     state_store: StateStore,
     hardware_api: HardwareAPI,
+    decoy: Decoy,
 ) -> None:
     """It should raise if the destination labware is in a non-open Thermocycler."""
-    subject = ThermocyclerMovementFlagger(
-        state_store=state_store,
-        hardware_api=hardware_api,
-    )
-
     decoy.when(state_store.labware.get_location(labware_id="labware-id")).then_return(
         ModuleLocation(moduleId="module-id")
     )
@@ -93,6 +101,34 @@ def test_raises_if_thermocycler_not_open(
     hardware_api.attached_modules = [thermocycler]  # type: ignore[misc]
 
     with expected_raise_cm:
+        subject.raise_if_labware_in_non_open_thermocycler(
+            labware_id="labware-id",
+        )
+
+
+def test_raises_if_hardware_thermocycler_has_gone_missing(
+    subject: ThermocyclerMovementFlagger,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    decoy: Decoy,
+) -> None:
+    """It should raise if the hardware Thermocycler can't be found by its serial no."""
+    decoy.when(state_store.labware.get_location(labware_id="labware-id")).then_return(
+        ModuleLocation(moduleId="module-id")
+    )
+
+    decoy.when(state_store.modules.get_model(module_id="module-id")).then_return(
+        ModuleModel.THERMOCYCLER_MODULE_V1,
+    )
+    decoy.when(state_store.modules.get_serial(module_id="module-id")).then_return(
+        "module-serial"
+    )
+
+    # This "type: ignore[misc]" lets us assign to the read-only property,
+    # necessary to work around Decoy not being able to stub properties.
+    hardware_api.attached_modules = []  # type: ignore[misc]
+
+    with pytest.raises(ThermocyclerNotOpenError):
         subject.raise_if_labware_in_non_open_thermocycler(
             labware_id="labware-id",
         )
