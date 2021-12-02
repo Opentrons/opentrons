@@ -53,9 +53,12 @@ def subject(
     )
 
 
-class RaiseIfThermocyclerNotOpenSpec(NamedTuple):
-    """Parametrization data for test_move_to_well_raises_if_thermocycler_not_open()."""
+class LidStatusAndRaiseSpec(NamedTuple):
+    """Test parametrization data.
 
+    A Thermocycler lid status, and what we expect the subject to raise when it finds
+    that the Thermocycler has that lid status.
+    """
     # Optional to match current signature of Thermocycler.lid_status.
     # Should change to non-Optional if/when that becomes non-optional.
     lid_status: Optional[ThermocyclerLidStatus]
@@ -63,21 +66,21 @@ class RaiseIfThermocyclerNotOpenSpec(NamedTuple):
 
 
 @pytest.mark.parametrize(
-    RaiseIfThermocyclerNotOpenSpec._fields,
+    LidStatusAndRaiseSpec._fields,
     [
-        RaiseIfThermocyclerNotOpenSpec(
+        LidStatusAndRaiseSpec(
             lid_status=ThermocyclerLidStatus.CLOSED,
             expected_raise_cm=pytest.raises(ThermocyclerNotOpenError),
         ),
-        RaiseIfThermocyclerNotOpenSpec(
+        LidStatusAndRaiseSpec(
             lid_status=ThermocyclerLidStatus.IN_BETWEEN,
             expected_raise_cm=pytest.raises(ThermocyclerNotOpenError),
         ),
-        RaiseIfThermocyclerNotOpenSpec(
+        LidStatusAndRaiseSpec(
             lid_status=None,
             expected_raise_cm=pytest.raises(ThermocyclerNotOpenError),
         ),
-        RaiseIfThermocyclerNotOpenSpec(
+        LidStatusAndRaiseSpec(
             lid_status=ThermocyclerLidStatus.OPEN,
             expected_raise_cm=does_not_raise(),
         ),
