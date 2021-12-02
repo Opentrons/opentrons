@@ -27,7 +27,6 @@ import {
   Box,
   FONT_WEIGHT_SEMIBOLD,
   C_NEAR_WHITE,
-  SPACING_1,
 } from '@opentrons/components'
 import {
   inferModuleOrientationFromXCoordinate,
