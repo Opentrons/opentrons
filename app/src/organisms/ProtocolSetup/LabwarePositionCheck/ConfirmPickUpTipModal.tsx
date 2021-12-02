@@ -14,7 +14,11 @@ export const ConfirmPickUpTipModal = (props: Props): JSX.Element => {
     <AlertModal
       heading={props.title}
       buttons={[
-        { children: props.denyText, onClick: props.onDeny },
+        {
+          children: props.denyText,
+          onClick: props.onDeny,
+          className: styles.deny_pickup_tip_button,
+        },
         {
           children: props.confirmText,
           onClick: props.onConfirm,
