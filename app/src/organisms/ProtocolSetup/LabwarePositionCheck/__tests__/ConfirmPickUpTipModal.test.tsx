@@ -31,7 +31,11 @@ describe('ConfirmPickUpTipModal', () => {
         partialComponentPropsMatcher({
           heading: title,
           buttons: [
-            { children: denyText, onClick: onDeny },
+            {
+              children: denyText,
+              onClick: onDeny,
+              className: expect.anything(),
+            },
             {
               children: confirmText,
               onClick: onConfirm,

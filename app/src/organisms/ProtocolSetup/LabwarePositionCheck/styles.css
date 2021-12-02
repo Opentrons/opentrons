@@ -3,6 +3,7 @@
   background-color: var(--c-blue);
   color: var(--c-white);
 }
+
 .deny_pickup_tip_button {
   color: var(--c-blue);
   border-color: var(--c-blue);
