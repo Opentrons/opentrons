@@ -5,19 +5,14 @@ from typing import Dict, Optional, Sequence
 from dataclasses import dataclass
 
 from opentrons.types import Point
-from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control.api import API as HardwareAPI
 from opentrons.hardware_control.types import (
     CriticalPoint,
     Axis as HardwareAxis,
     MustHomeError as HardwareMustHomeError,
 )
 
-from ..types import (
-    WellLocation,
-    DeckPoint,
-    MovementAxis,
-    MotorAxis,
-)
+from ..types import WellLocation, DeckPoint, MovementAxis, MotorAxis
 from ..state import StateStore, CurrentWell
 from ..errors import MustHomeError
 from ..resources import ModelUtils
