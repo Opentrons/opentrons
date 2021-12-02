@@ -71,11 +71,7 @@ class OT3Controller:
         self._module_controls: Optional[AttachedModulesControl] = None
         self._messenger = CanMessenger(driver=driver)
         self._messenger.start()
-        self._position = {
-            NodeId.head: 0,
-            NodeId.gantry_x: 0,
-            NodeId.gantry_y: 0,
-        }
+        self._position = self._get_home_position()
 
     async def setup_motors(self) -> None:
         """Set up the motors."""
@@ -121,8 +117,9 @@ class OT3Controller:
     def _axis_convert(position: Dict[NodeId, float]) -> AxisValueMap:
         ret: AxisValueMap = {"A": 0, "B": 0, "C": 0, "X": 0, "Y": 0, "Z": 0}
         for node, pos in position.items():
-            if node == NodeId.head:
+            if node == NodeId.head_l:
                 ret["A"] = pos
+            elif node == NodeId.head_r:
                 ret["Z"] = pos
             elif node == NodeId.gantry_x:
                 ret["X"] = pos
@@ -149,15 +146,19 @@ class OT3Controller:
         Returns:
             None
         """
-        log.debug(f"move: {target_position}")
+        log.info(f"move: {target_position}")
         target: Dict[NodeId, float] = {}
         for axis, pos in target_position.items():
-            if axis in {"A", "Z"}:
-                target[NodeId.head] = pos
+            if axis == "A":
+                target[NodeId.head_l] = pos
+            elif axis == "Z":
+                target[NodeId.head_r] = pos
             elif axis == "X":
                 target[NodeId.gantry_x] = pos
             elif axis == "Y":
                 target[NodeId.gantry_y] = pos
+
+        log.info(f"move targets: {target}")
         move_group = create(origin=self._position, target=target, speed=speed or 5000.0)
         runner = MoveGroupRunner(move_groups=move_group)
         await runner.run(can_messenger=self._messenger)
@@ -172,11 +173,7 @@ class OT3Controller:
         Returns:
             Homed position.
         """
-        self._position = {
-            NodeId.head: 0,
-            NodeId.gantry_x: 0,
-            NodeId.gantry_y: 0,
-        }
+        self._position = self._get_home_position()
         return self._axis_convert(self._position)
 
     async def fast_home(self, axes: Sequence[str], margin: float) -> AxisValueMap:
@@ -189,11 +186,7 @@ class OT3Controller:
         Returns:
             New position.
         """
-        self._position = {
-            NodeId.head: 0,
-            NodeId.gantry_x: 0,
-            NodeId.gantry_y: 0,
-        }
+        self._position = self._get_home_position()
         return self._axis_convert(self._position)
 
     async def get_attached_instruments(
@@ -299,3 +292,12 @@ class OT3Controller:
     ) -> None:
         """Configure a mount."""
         return None
+
+    @staticmethod
+    def _get_home_position() -> Dict[NodeId, float]:
+        return {
+            NodeId.head_l: 0,
+            NodeId.head_r: 0,
+            NodeId.gantry_x: 0,
+            NodeId.gantry_y: 0,
+        }
