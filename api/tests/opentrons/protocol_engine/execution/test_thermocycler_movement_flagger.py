@@ -59,6 +59,7 @@ class LidStatusAndRaiseSpec(NamedTuple):
     A Thermocycler lid status, and what we expect the subject to raise when it finds
     that the Thermocycler has that lid status.
     """
+
     # Optional to match current signature of Thermocycler.lid_status.
     # Should change to non-Optional if/when that becomes non-optional.
     lid_status: Optional[ThermocyclerLidStatus]
