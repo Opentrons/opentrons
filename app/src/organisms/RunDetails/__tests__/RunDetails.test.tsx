@@ -1,7 +1,7 @@
 import * as React from 'react'
 import '@testing-library/jest-dom'
 import { fireEvent } from '@testing-library/dom'
-import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
+import { RUN_STATUS_RUNNING, RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
 import { when } from 'jest-when'
 import { RunDetails } from '..'
@@ -41,14 +41,17 @@ describe('RunDetails', () => {
     })
     when(mockCommandList).mockReturnValue(<div>Mock Command List</div>)
   })
+
   it('renders protocol title', () => {
     const { getByText } = render()
     getByText('Protocol - mock display name')
   })
+
   it('renders run detail command component', () => {
     const { getAllByText } = render()
     getAllByText('Mock Command List')
   })
+
   it('renders the cancel button, button is clickable, and cancel modal is rendered', () => {
     when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_RUNNING)
     const { getByRole, getByText } = render()
@@ -68,5 +71,18 @@ describe('RunDetails', () => {
     ).toBeTruthy()
     expect(getByText('no, go back')).toBeTruthy()
     expect(getByText('yes, cancel run')).toBeTruthy()
+  })
+
+  it('renders the protocol close button, button is clickable, and confirm close protocol modal is rendered', () => {
+    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_SUCCEEDED)
+    const { getByRole, getByText } = render()
+    const button = getByRole('button', { name: 'close' })
+    fireEvent.click(button)
+    expect(button).toBeTruthy()
+    expect(
+      getByText('Are you sure you want to close this protocol?')
+    ).toBeTruthy()
+    expect(getByText('No, go back')).toBeTruthy()
+    expect(getByText('Yes, close now')).toBeTruthy()
   })
 })
