@@ -5,6 +5,7 @@ import asyncio
 from contextlib import contextmanager
 import logging
 from typing import Dict, List, Optional, Tuple, TYPE_CHECKING, Sequence, Generator
+from typing_extensions import Final
 
 from opentrons.config.types import RobotConfig
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
@@ -40,6 +41,14 @@ log = logging.getLogger(__name__)
 AxisValueMap = Dict[str, float]
 
 
+HOME_POSITION: Final[Dict[NodeId, float]] = {
+    NodeId.head_l: 0,
+    NodeId.head_r: 0,
+    NodeId.gantry_x: 0,
+    NodeId.gantry_y: 0,
+}
+
+
 class OT3Controller:
     """OT3 Hardware Controller Backend."""
 
@@ -71,11 +80,7 @@ class OT3Controller:
         self._module_controls: Optional[AttachedModulesControl] = None
         self._messenger = CanMessenger(driver=driver)
         self._messenger.start()
-        self._position = {
-            NodeId.head: 0,
-            NodeId.gantry_x: 0,
-            NodeId.gantry_y: 0,
-        }
+        self._position = HOME_POSITION.copy()
 
     async def setup_motors(self) -> None:
         """Set up the motors."""
@@ -121,8 +126,9 @@ class OT3Controller:
     def _axis_convert(position: Dict[NodeId, float]) -> AxisValueMap:
         ret: AxisValueMap = {"A": 0, "B": 0, "C": 0, "X": 0, "Y": 0, "Z": 0}
         for node, pos in position.items():
-            if node == NodeId.head:
+            if node == NodeId.head_l:
                 ret["A"] = pos
+            if node == NodeId.head_r:
                 ret["Z"] = pos
             elif node == NodeId.gantry_x:
                 ret["X"] = pos
@@ -152,8 +158,10 @@ class OT3Controller:
         log.debug(f"move: {target_position}")
         target: Dict[NodeId, float] = {}
         for axis, pos in target_position.items():
-            if axis in {"A", "Z"}:
-                target[NodeId.head] = pos
+            if axis == "A":
+                target[NodeId.head_l] = pos
+            elif axis == "Z":
+                target[NodeId.head_r] = pos
             elif axis == "X":
                 target[NodeId.gantry_x] = pos
             elif axis == "Y":
@@ -172,11 +180,7 @@ class OT3Controller:
         Returns:
             Homed position.
         """
-        self._position = {
-            NodeId.head: 0,
-            NodeId.gantry_x: 0,
-            NodeId.gantry_y: 0,
-        }
+        self._position = HOME_POSITION.copy()
         return self._axis_convert(self._position)
 
     async def fast_home(self, axes: Sequence[str], margin: float) -> AxisValueMap:
@@ -189,11 +193,7 @@ class OT3Controller:
         Returns:
             New position.
         """
-        self._position = {
-            NodeId.head: 0,
-            NodeId.gantry_x: 0,
-            NodeId.gantry_y: 0,
-        }
+        self._position = HOME_POSITION.copy()
         return self._axis_convert(self._position)
 
     async def get_attached_instruments(
