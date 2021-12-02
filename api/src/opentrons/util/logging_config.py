@@ -95,6 +95,10 @@ def _buildroot_config(level_value: int) -> Dict[str, Any]:
                 "handlers": ["api"],
                 "level": level_value,
             },
+            "opentrons_hardware": {
+                "handlers": ["api"],
+                "level": level_value,
+            },
             "__main__": {"handlers": ["api"], "level": level_value},
         },
     }

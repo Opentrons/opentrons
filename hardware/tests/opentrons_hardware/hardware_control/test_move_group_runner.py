@@ -88,6 +88,13 @@ def move_group_multiple() -> MoveGroups:
     ]
 
 
+async def test_no_groups_do_nothing(mock_can_messenger: AsyncMock) -> None:
+    """It should not send any commands if there are no moves."""
+    subject = MoveGroupRunner(move_groups=[])
+    await subject.run(mock_can_messenger)
+    mock_can_messenger.send.assert_not_called()
+
+
 async def test_single_group_clear(
     mock_can_messenger: AsyncMock, move_group_single: MoveGroups
 ) -> None:

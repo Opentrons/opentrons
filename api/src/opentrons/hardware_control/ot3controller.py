@@ -10,6 +10,19 @@ from opentrons.config.types import RobotConfig
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.types import Mount
 
+try:
+    from opentrons_hardware.drivers.can_bus import CanDriver, CanMessenger
+    from opentrons_hardware.drivers.can_bus.constants import NodeId
+    from opentrons_hardware.hardware_control.motion import create
+    from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
+    from opentrons_hardware.drivers.can_bus.messages.message_definitions import (
+        SetupRequest,
+        EnableMotorRequest,
+    )
+    from opentrons_hardware.drivers.can_bus.messages.payloads import EmptyPayload
+except ModuleNotFoundError:
+    pass
+
 from .module_control import AttachedModulesControl
 from .types import BoardRevision, Axis
 
@@ -30,6 +43,9 @@ AxisValueMap = Dict[str, float]
 class OT3Controller:
     """OT3 Hardware Controller Backend."""
 
+    _messenger: CanMessenger
+    _position: Dict[NodeId, float]
+
     @classmethod
     async def build(cls, config: RobotConfig) -> OT3Controller:
         """Create the OT3Controller instance.
@@ -40,17 +56,37 @@ class OT3Controller:
         Returns:
             Instance.
         """
-        return cls(config)
+        driver = await CanDriver.from_env()
+        return cls(config, driver=driver)
 
-    def __init__(self, config: RobotConfig) -> None:
+    def __init__(self, config: RobotConfig, driver: CanDriver) -> None:
         """Construct.
 
         Args:
             config: Robot configuration
+            driver: The Can Driver
         """
         self._configuration = config
         self._gpio_dev = SimulatingGPIOCharDev("simulated")
         self._module_controls: Optional[AttachedModulesControl] = None
+        self._messenger = CanMessenger(driver=driver)
+        self._messenger.start()
+        self._position = {
+            NodeId.head: 0,
+            NodeId.gantry_x: 0,
+            NodeId.gantry_y: 0,
+        }
+
+    async def setup_motors(self) -> None:
+        """Set up the motors."""
+        await self._messenger.send(
+            node_id=NodeId.broadcast,
+            message=SetupRequest(payload=EmptyPayload()),
+        )
+        await self._messenger.send(
+            node_id=NodeId.broadcast,
+            message=EnableMotorRequest(payload=EmptyPayload()),
+        )
 
     @property
     def gpio_chardev(self) -> GPIODriverLike:
@@ -79,7 +115,21 @@ class OT3Controller:
 
     async def update_position(self) -> AxisValueMap:
         """Get the current position."""
-        return {}
+        return self._axis_convert(self._position)
+
+    @staticmethod
+    def _axis_convert(position: Dict[NodeId, float]) -> AxisValueMap:
+        ret: AxisValueMap = {"A": 0, "B": 0, "C": 0, "X": 0, "Y": 0, "Z": 0}
+        for node, pos in position.items():
+            if node == NodeId.head:
+                ret["A"] = pos
+                ret["Z"] = pos
+            elif node == NodeId.gantry_x:
+                ret["X"] = pos
+            elif node == NodeId.gantry_y:
+                ret["Y"] = pos
+        log.info(f"update_position: {ret}")
+        return ret
 
     async def move(
         self,
@@ -99,7 +149,19 @@ class OT3Controller:
         Returns:
             None
         """
-        return None
+        log.debug(f"move: {target_position}")
+        target: Dict[NodeId, float] = {}
+        for axis, pos in target_position.items():
+            if axis in {"A", "Z"}:
+                target[NodeId.head] = pos
+            elif axis == "X":
+                target[NodeId.gantry_x] = pos
+            elif axis == "Y":
+                target[NodeId.gantry_y] = pos
+        move_group = create(origin=self._position, target=target, speed=speed or 5000.0)
+        runner = MoveGroupRunner(move_groups=move_group)
+        await runner.run(can_messenger=self._messenger)
+        self._position = target
 
     async def home(self, axes: Optional[List[str]] = None) -> AxisValueMap:
         """Home axes.
@@ -110,7 +172,12 @@ class OT3Controller:
         Returns:
             Homed position.
         """
-        return {}
+        self._position = {
+            NodeId.head: 0,
+            NodeId.gantry_x: 0,
+            NodeId.gantry_y: 0,
+        }
+        return self._axis_convert(self._position)
 
     async def fast_home(self, axes: Sequence[str], margin: float) -> AxisValueMap:
         """Fast home axes.
@@ -122,7 +189,12 @@ class OT3Controller:
         Returns:
             New position.
         """
-        return {}
+        self._position = {
+            NodeId.head: 0,
+            NodeId.gantry_x: 0,
+            NodeId.gantry_y: 0,
+        }
+        return self._axis_convert(self._position)
 
     async def get_attached_instruments(
         self, expected: Dict[Mount, PipetteName]
@@ -160,7 +232,16 @@ class OT3Controller:
     @property
     def axis_bounds(self) -> Dict[Axis, Tuple[float, float]]:
         """Get the axis bounds."""
-        return {}
+        # TODO (AL, 2021-11-18): The bounds need to be defined
+        phony_bounds = (0, 10000)
+        return {
+            Axis.A: phony_bounds,
+            Axis.B: phony_bounds,
+            Axis.C: phony_bounds,
+            Axis.X: phony_bounds,
+            Axis.Y: phony_bounds,
+            Axis.Z: phony_bounds,
+        }
 
     @property
     def fw_version(self) -> Optional[str]:

@@ -6,7 +6,7 @@ from fastapi import Depends, status
 from typing import Callable, Union
 from typing_extensions import Literal
 
-from opentrons import initialize as initialize_api
+from opentrons import initialize as initialize_api, should_use_ot3
 from opentrons.config import IS_ROBOT, ARCHITECTURE, SystemArchitecture
 from opentrons.util.helpers import utc_now
 from opentrons.hardware_control import API as HardwareAPI
@@ -115,7 +115,7 @@ async def _initialize_hardware_api(app_state: AppState) -> None:
         simulator_config = app_settings.simulator_configuration_file_path
         systemd_available = IS_ROBOT and ARCHITECTURE != SystemArchitecture.HOST
 
-        if systemd_available:
+        if systemd_available and not should_use_ot3():
             # During boot, opentrons-gpio-setup.service will be blinking the
             # front button light. Kill it here and wait for it to exit so it releases
             # that GPIO line. Otherwise, our hardware initialization would get a
