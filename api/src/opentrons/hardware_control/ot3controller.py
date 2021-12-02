@@ -128,7 +128,7 @@ class OT3Controller:
         for node, pos in position.items():
             if node == NodeId.head_l:
                 ret["A"] = pos
-            if node == NodeId.head_r:
+            elif node == NodeId.head_r:
                 ret["Z"] = pos
             elif node == NodeId.gantry_x:
                 ret["X"] = pos
@@ -155,7 +155,7 @@ class OT3Controller:
         Returns:
             None
         """
-        log.debug(f"move: {target_position}")
+        log.info(f"move: {target_position}")
         target: Dict[NodeId, float] = {}
         for axis, pos in target_position.items():
             if axis == "A":
@@ -166,6 +166,8 @@ class OT3Controller:
                 target[NodeId.gantry_x] = pos
             elif axis == "Y":
                 target[NodeId.gantry_y] = pos
+
+        log.info(f"move targets: {target}")
         move_group = create(origin=self._position, target=target, speed=speed or 5000.0)
         runner = MoveGroupRunner(move_groups=move_group)
         await runner.run(can_messenger=self._messenger)
