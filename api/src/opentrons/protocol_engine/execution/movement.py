@@ -60,7 +60,7 @@ class MovementHandler:
         self._state_store = state_store
         self._hardware_api = hardware_api
         self._model_utils = model_utils or ModelUtils()
-        self._thermocycler_movement_flagger = (
+        self._tc_movement_flagger = (
             thermocycler_movement_flagger
             or ThermocyclerMovementFlagger(
                 state_store=self._state_store, hardware_api=self._hardware_api
@@ -76,7 +76,7 @@ class MovementHandler:
         current_well: Optional[CurrentWell] = None,
     ) -> None:
         """Move to a specific well."""
-        self._thermocycler_movement_flagger.raise_if_labware_in_non_open_thermocycler(
+        await self._tc_movement_flagger.raise_if_labware_in_non_open_thermocycler(
             labware_id=labware_id
         )
 

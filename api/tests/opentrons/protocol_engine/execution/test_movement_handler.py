@@ -137,7 +137,7 @@ async def test_move_to_well(
     )
 
     decoy.verify(
-        thermocycler_movement_flagger.raise_if_labware_in_non_open_thermocycler(
+        await thermocycler_movement_flagger.raise_if_labware_in_non_open_thermocycler(
             labware_id="labware-id"
         ),
         await hardware_api.move_to(
@@ -217,7 +217,7 @@ async def test_move_to_well_from_starting_location(
     )
 
     decoy.verify(
-        thermocycler_movement_flagger.raise_if_labware_in_non_open_thermocycler(
+        await thermocycler_movement_flagger.raise_if_labware_in_non_open_thermocycler(
             labware_id="labware-id"
         ),
         await hardware_api.move_to(
