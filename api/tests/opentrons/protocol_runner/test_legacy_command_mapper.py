@@ -121,7 +121,7 @@ def test_map_after_with_error_command() -> None:
         command_id="command.PAUSE-0",
         error_id=matchers.IsA(str),
         failed_at=matchers.IsA(datetime),
-        error=matchers.ErrorMatching(  # type: ignore[arg-type]
+        error=matchers.ErrorMatching(
             LegacyContextCommandError,
             match="oh no",
         ),
