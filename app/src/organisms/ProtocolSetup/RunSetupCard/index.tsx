@@ -144,7 +144,7 @@ export function RunSetupCard(): JSX.Element | null {
       >
         {t('setup_for_run')}
       </Text>
-      {protocolData != null ? (
+      {protocolData == null ? (
         <RunSetupLoader />
       ) : (
         <>
