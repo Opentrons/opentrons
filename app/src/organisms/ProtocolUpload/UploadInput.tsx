@@ -19,7 +19,6 @@ import {
   Link,
   DIRECTION_COLUMN,
   ALIGN_CENTER,
-  C_SELECTED_DARK,
   C_WHITE,
   JUSTIFY_CENTER,
   C_BLUE,
@@ -62,7 +61,7 @@ const DROP_ZONE_STYLES = css`
   background-color: ${C_WHITE};
 `
 const DRAG_OVER_STYLES = css`
-  background-color: ${C_SELECTED_DARK};
+  background-color: ${C_BLUE};
   color: ${C_WHITE};
 `
 
