@@ -65,15 +65,6 @@ export function RunSetupCard(): JSX.Element | null {
     LABWARE_SETUP_KEY,
   ])
 
-  const [isLoading, setIsLoading] = React.useState<Boolean>(true)
-
-  // Set loader to false once protocolData contains data and is not null
-  React.useEffect(() => {
-    if (protocolData != null) {
-      setIsLoading(false)
-    }
-  }, [protocolData])
-
   React.useEffect(() => {
     if (protocolData != null && protocolHasModules(protocolData)) {
       setStepKeysInOrder([
@@ -96,7 +87,7 @@ export function RunSetupCard(): JSX.Element | null {
     return () => clearTimeout(initialExpandTimer)
   }, [Boolean(protocolData), protocolData?.commands])
 
-  if (protocolData == null || robot == null) return null
+  if (robot == null) return null
 
   const StepDetailMap: Record<
     StepKey,
@@ -128,7 +119,7 @@ export function RunSetupCard(): JSX.Element | null {
       ),
       description: t(`${MODULE_SETUP_KEY}_description`, {
         count:
-          'modules' in protocolData
+          protocolData != null && 'modules' in protocolData
             ? Object.keys(protocolData.modules).length
             : 0,
       }),
@@ -153,7 +144,7 @@ export function RunSetupCard(): JSX.Element | null {
       >
         {t('setup_for_run')}
       </Text>
-      {isLoading ? (
+      {protocolData != null ? (
         <RunSetupLoader />
       ) : (
         <>
