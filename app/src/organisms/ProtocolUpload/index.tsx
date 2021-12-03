@@ -39,7 +39,7 @@ export function ProtocolUpload(): JSX.Element {
     protocolRecord,
   } = useCurrentProtocolRun()
   const hasCurrentRun = runRecord != null && protocolRecord != null
-  const closeProtocolRun = useCloseCurrentRun()
+  const {closeCurrentRun, isClosingCurrentRun} = useCloseCurrentRun()
   const robotName = useSelector((state: State) => getConnectedRobotName(state))
 
   const logger = useLogger(__filename)
@@ -69,7 +69,7 @@ export function ProtocolUpload(): JSX.Element {
 
   const handleCloseProtocol: React.MouseEventHandler = _event => {
     dispatch(closeProtocol())
-    closeProtocolRun()
+    closeCurrentRun()
   }
 
   const {
@@ -121,7 +121,7 @@ export function ProtocolUpload(): JSX.Element {
           width="100%"
           backgroundColor={C_NEAR_WHITE}
         >
-          {runRecord != null && protocolRecord != null ? (
+          {!isClosingCurrentRun && runRecord != null && protocolRecord != null ? (
             <ProtocolSetup />
           ) : (
             <UploadInput onUpload={handleUpload} />

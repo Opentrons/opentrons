@@ -20,17 +20,25 @@ const isStoppedState = (status: RunStatus): boolean => {
   return false
 }
 
-export function useCloseCurrentRun(): (
-  options?: UseDismissCurrentRunMutationOptions
-) => void {
+type CloseCallback = (options?: UseDismissCurrentRunMutationOptions) => void
+
+export function useCloseCurrentRun(): {
+  closeCurrentRun: CloseCallback
+  isClosingCurrentRun: boolean
+} {
   const currentRunId = useCurrentRunId()
-  const { dismissCurrentRun } = useDismissCurrentRunMutation()
+  const {
+    dismissCurrentRun,
+    isLoading: isDismissing,
+  } = useDismissCurrentRunMutation()
   const { runRecord } = useCurrentProtocolRun()
 
   const { stopRun } = useStopRunMutation()
   const { deleteRun } = useDeleteRunMutation()
 
-  return (options: UseDismissCurrentRunMutationOptions = {}) => {
+  const closeCurrentRun = (
+    options: UseDismissCurrentRunMutationOptions = {}
+  ) => {
     if (currentRunId != null) {
       const status = runRecord?.data.status
       if (isStoppedState(status as RunStatus)) {
@@ -54,4 +62,5 @@ export function useCloseCurrentRun(): (
       }
     }
   }
+  return { closeCurrentRun, isClosingCurrentRun: isDismissing }
 }
