@@ -1,50 +1,35 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { render } from '@testing-library/react'
-import { AlertModal, partialComponentPropsMatcher } from '@opentrons/components'
+import { resetAllWhenMocks } from 'jest-when'
+import { BaseModal, renderWithProviders } from '@opentrons/components'
 import { ConfirmPickUpTipModal } from '../ConfirmPickUpTipModal'
+import { i18n } from '../../../../i18n'
 
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
   return {
     ...actualComponents,
-    AlertModal: jest.fn(() => <div></div>),
+    BaseModal: jest.fn(() => <div></div>),
   }
 })
 
-const mockAlertModal = AlertModal as jest.MockedFunction<typeof AlertModal>
+const mockBaseModal = BaseModal as jest.MockedFunction<typeof BaseModal>
+
+const render = (props: React.ComponentProps<typeof ConfirmPickUpTipModal>) => {
+  return renderWithProviders(<ConfirmPickUpTipModal {...props} />, {
+    i18nInstance: i18n,
+  })[0]
+}
 
 describe('ConfirmPickUpTipModal', () => {
-  let title: string
-  let denyText: string
-  let confirmText: string
-  let onDeny: () => void
-  let onConfirm: () => void
+  let props: React.ComponentProps<typeof ConfirmPickUpTipModal>
+
   beforeEach(() => {
-    title = 'mock title'
-    denyText = 'mock deny text'
-    confirmText = 'mock confirm text'
-    onDeny = jest.fn()
-    onConfirm = jest.fn()
-    when(mockAlertModal)
-      .calledWith(
-        partialComponentPropsMatcher({
-          heading: title,
-          buttons: [
-            {
-              children: denyText,
-              onClick: onDeny,
-              className: expect.anything(),
-            },
-            {
-              children: confirmText,
-              onClick: onConfirm,
-              className: expect.anything(),
-            },
-          ],
-        })
-      )
-      .mockReturnValue(<div>mock alert item</div>)
+    props = {
+      onConfirm: jest.fn(),
+      onDeny: jest.fn(),
+      confirmText: 'confirm text',
+    }
+    mockBaseModal.mockReturnValue(<div>mock alert item</div>)
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -52,15 +37,7 @@ describe('ConfirmPickUpTipModal', () => {
   })
   it('should render an alert modal with the correct props', () => {
     // mockAlertModal.mockImplementation(args => console.log(args))
-    const { getByText } = render(
-      <ConfirmPickUpTipModal
-        title={title}
-        denyText={denyText}
-        confirmText={confirmText}
-        onDeny={onDeny}
-        onConfirm={onConfirm}
-      />
-    )
+    const { getByText } = render(props)
     getByText('mock alert item')
   })
 })
