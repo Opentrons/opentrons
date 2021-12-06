@@ -7,7 +7,7 @@ import {
   Icon,
   Text,
   Flex,
-  PrimaryBtn,
+  AppPrimaryBtn,
   FONT_SIZE_BODY_2,
   FONT_WEIGHT_REGULAR,
   SPACING_3,
@@ -155,14 +155,13 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
           onCloseClick={() => showRerunningProtocolModal(false)}
         />
       )}
-      <PrimaryBtn
+      <AppPrimaryBtn
         onClick={handleClick}
         marginBottom={SPACING_4}
-        backgroundColor={C_BLUE}
         id={'UploadInput_protocolUploadButton'}
       >
         {t('choose_file')}
-      </PrimaryBtn>
+      </AppPrimaryBtn>
 
       <label
         data-testid="file_drop_zone"

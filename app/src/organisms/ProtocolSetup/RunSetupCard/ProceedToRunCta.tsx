@@ -4,11 +4,10 @@ import { useMissingModuleIds, useProtocolCalibrationStatus } from './hooks'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
-  PrimaryBtn,
+  AppPrimaryBtn,
   Tooltip,
   useHoverTooltip,
   JUSTIFY_CENTER,
-  C_BLUE,
 } from '@opentrons/components'
 
 export const ProceedToRunCta = (): JSX.Element | null => {
@@ -38,18 +37,17 @@ export const ProceedToRunCta = (): JSX.Element | null => {
   const linkProps = proceedToRunDisabledReason != null ? {} : { to: '/run' }
   return (
     <Flex justifyContent={JUSTIFY_CENTER}>
-      <PrimaryBtn
+      <AppPrimaryBtn
         role="button"
         title={t('proceed_to_run')}
         disabled={proceedToRunDisabledReason != null}
         as={LinkComponent}
-        backgroundColor={C_BLUE}
         id={'LabwareSetup_proceedToRunButton'}
         {...linkProps}
         {...targetProps}
       >
         {t('proceed_to_run')}
-      </PrimaryBtn>
+      </AppPrimaryBtn>
       {proceedToRunDisabledReason != null && (
         <Tooltip {...tooltipProps}>{proceedToRunDisabledReason}</Tooltip>
       )}

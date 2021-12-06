@@ -5,7 +5,7 @@ import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   useConditionalConfirm,
   SpinnerModalPage,
-  PrimaryBtn,
+  AppPrimaryBtn,
   Link,
   Box,
   Text,
@@ -235,14 +235,13 @@ export function TipLengthCalibration({
       {hasCalibrated ? (
         recalibrateLink
       ) : (
-        <PrimaryBtn
-          backgroundColor={C_BLUE}
+        <AppPrimaryBtn
           onClick={() => handleStart()}
           id={'TipRackCalibration_calibrateTipRackButton'}
           disabled={disabled}
         >
           {t('calibrate_now_cta')}
-        </PrimaryBtn>
+        </AppPrimaryBtn>
       )}
       {showConfirmation && (
         <Portal>

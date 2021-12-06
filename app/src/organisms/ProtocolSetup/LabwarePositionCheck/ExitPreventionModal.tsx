@@ -4,12 +4,11 @@ import {
   Flex,
   Modal,
   Text,
-  PrimaryBtn,
-  SecondaryBtn,
+  AppPrimaryBtn,
+  AppSecondaryBtn,
   SPACING_2,
   SPACING_3,
   SPACING_4,
-  C_BLUE,
   TEXT_TRANSFORM_UPPERCASE,
   FONT_WEIGHT_SEMIBOLD,
   JUSTIFY_SPACE_EVENLY,
@@ -41,12 +40,12 @@ export const ExitPreventionModal = (
         {t('exit_screen_subtitle')}
       </Text>
       <Flex padding={SPACING_2} justifyContent={JUSTIFY_SPACE_EVENLY}>
-        <SecondaryBtn onClick={props.onGoBack} color={C_BLUE}>
+        <AppSecondaryBtn onClick={props.onGoBack}>
           {t('exit_screen_go_back')}
-        </SecondaryBtn>
-        <PrimaryBtn onClick={props.onConfirmExit} backgroundColor={C_BLUE}>
+        </AppSecondaryBtn>
+        <AppPrimaryBtn onClick={props.onConfirmExit}>
           {t('exit_screen_confirm_exit')}
-        </PrimaryBtn>
+        </AppPrimaryBtn>
       </Flex>
     </Modal>
   )
