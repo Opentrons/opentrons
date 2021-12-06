@@ -15,7 +15,6 @@ export type UseCreateProtocolMutationResult = UseMutationResult<
   File[]
 > & {
   createProtocol: UseMutateFunction<Protocol, unknown, File[]>
-  isLoading: boolean
 }
 
 export type UseCreateProtocolMutationOptions = UseMutationOptions<
@@ -53,6 +52,5 @@ export function useCreateProtocolMutation(
   return {
     ...mutation,
     createProtocol: mutation.mutate,
-    isLoading: mutation.isLoading,
   }
 }

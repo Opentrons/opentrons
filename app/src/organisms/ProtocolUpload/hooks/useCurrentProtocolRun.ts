@@ -18,7 +18,7 @@ export interface UseCurrentProtocolRun {
   createProtocolRun: UseMutateFunction<Protocol, unknown, File[], unknown>
   protocolRecord?: Protocol | null
   runRecord?: Run | null
-  isLoading?: boolean
+  isCreatingProtocolRun?: boolean
 }
 
 export function useCurrentProtocolRun(): UseCurrentProtocolRun {
@@ -53,7 +53,7 @@ export function useCurrentProtocolRun(): UseCurrentProtocolRun {
   })
   const {
     createProtocol: createProtocolRun,
-    isLoading,
+    isLoading: isCreatingProtocolRun,
   } = useCreateProtocolMutation({
     onSuccess: data => {
       createRun({ protocolId: data.data.id })
@@ -64,6 +64,6 @@ export function useCurrentProtocolRun(): UseCurrentProtocolRun {
     createProtocolRun,
     protocolRecord,
     runRecord,
-    isLoading,
+    isCreatingProtocolRun,
   }
 }

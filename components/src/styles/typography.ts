@@ -6,6 +6,7 @@ import type { FlattenSimpleInterpolation } from 'styled-components'
 
 // font size values
 export const FONT_SIZE_HUGE = '3rem'
+export const FONT_SIZE_BIG = '1.5rem'
 export const FONT_SIZE_HEADER = '1.125rem'
 export const FONT_SIZE_DEFAULT = '1rem'
 export const FONT_SIZE_BODY_2 = '0.875rem'
