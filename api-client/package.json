@@ -2,7 +2,7 @@
   "private": true,
   "name": "@opentrons/api-client",
   "description": "Opentrons robot API client for Node.js and the browser",
-  "version": "0.0.0",
+  "version": "5.0.0-beta.0",
   "license": "Apache-2.0",
   "main": "dist/api-client.js",
   "module": "dist/api-client.mjs",
@@ -13,7 +13,7 @@
     "./dist/api-client.mjs": "./dist/api-client.browser.mjs"
   },
   "dependencies": {
-    "@opentrons/shared-data": "4.6.2",
+    "@opentrons/shared-data": "5.0.0-beta.0",
     "axios": "^0.21.1",
     "react-query": "3.12.0"
   }

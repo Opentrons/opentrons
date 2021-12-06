@@ -5,6 +5,7 @@ import {
   Text,
   Flex,
   Box,
+  AlertItem,
   useInterval,
   TEXT_TRANSFORM_UPPERCASE,
   FONT_WEIGHT_SEMIBOLD,
@@ -18,6 +19,8 @@ import {
   FONT_SIZE_BODY_2,
   SPACING_6,
 } from '@opentrons/components'
+import { useCurrentProtocolRun } from '../../ProtocolUpload/hooks'
+import { getLatestLabwareOffsetCount } from '../LabwarePositionCheck/utils/getLatestLabwareOffsetCount'
 import { SectionList } from './SectionList'
 import { DeckMap } from './DeckMap'
 import { useIntroInfo, useLabwareIdsBySection } from './hooks'
@@ -31,6 +34,12 @@ export const IntroScreen = (props: {
   const labwareIdsBySection = useLabwareIdsBySection()
   const { t } = useTranslation(['labware_position_check', 'shared'])
 
+  const currentProtocolRun = useCurrentProtocolRun()
+  const currentRunData = currentProtocolRun.runRecord?.data
+  const labwareOffsetCount = getLatestLabwareOffsetCount(
+    currentRunData?.labwareOffsets ?? []
+  )
+
   const [sectionIndex, setSectionIndex] = React.useState<number>(0)
   const rotateSectionIndex = (): void =>
     setSectionIndex((sectionIndex + 1) % sections.length)
@@ -40,7 +49,7 @@ export const IntroScreen = (props: {
   const {
     primaryPipetteMount,
     secondaryPipetteMount,
-    firstStepLabwareSlot,
+    firstTiprackSlot,
     sections,
   } = introInfo
 
@@ -64,6 +73,12 @@ export const IntroScreen = (props: {
           block: <Text fontSize={FONT_SIZE_BODY_2} marginBottom={SPACING_2} />,
         }}
       ></Trans>
+      {labwareOffsetCount !== 0 && (
+        <AlertItem
+          type="warning"
+          title={t('labware_offsets_deleted_warning')}
+        />
+      )}
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
         <Flex marginLeft={SPACING_6}>
           <SectionList
@@ -80,13 +95,13 @@ export const IntroScreen = (props: {
       <Flex justifyContent={JUSTIFY_CENTER} marginBottom={SPACING_4}>
         <PrimaryBtn
           title={t('start_position_check', {
-            initial_labware_slot: firstStepLabwareSlot,
+            initial_labware_slot: firstTiprackSlot,
           })}
           backgroundColor={C_BLUE}
           onClick={props.beginLPC}
         >
           {t('start_position_check', {
-            initial_labware_slot: firstStepLabwareSlot,
+            initial_labware_slot: firstTiprackSlot,
           })}
         </PrimaryBtn>
       </Flex>

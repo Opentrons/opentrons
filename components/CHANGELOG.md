@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.0.0-beta.0](https://github.com/Opentrons/opentrons/compare/v4.7.0...v5.0.0-beta.0) (2021-11-30)
+
+
+### Features
+
+* **app:** added thermocycler error state status ([#8643](https://github.com/Opentrons/opentrons/issues/8643)) ([02544ae](https://github.com/Opentrons/opentrons/commit/02544ae2502335658e36e903450809416ee2e68b))
+* **app:** wire up cancel run ([#8721](https://github.com/Opentrons/opentrons/issues/8721)) ([6450edb](https://github.com/Opentrons/opentrons/commit/6450edb0421f1c2484c292f8583602d8f6fd13b8)), closes [#8543](https://github.com/Opentrons/opentrons/issues/8543)
+* **app:** wire up protocol resource + LPC ([#8722](https://github.com/Opentrons/opentrons/issues/8722)) ([c463e0a](https://github.com/Opentrons/opentrons/commit/c463e0a22ebccf410d67c6b18fe3c50b8a4a8d03)), closes [#8553](https://github.com/Opentrons/opentrons/issues/8553)
+
+
+
+
+
+# [4.7.0](https://github.com/Opentrons/opentrons/compare/v4.6.2...v4.7.0) (2021-11-18)
+
+### Bug Fixes
+
+* **components:** fix deck story in storybook ([#8446](https://github.com/Opentrons/opentrons/issues/8446)) ([fe5d6d6](https://github.com/Opentrons/opentrons/commit/fe5d6d64ad97f36c2bf80eb154f99323988cd488)), closes [#8445](https://github.com/Opentrons/opentrons/issues/8445)
+
+
+### Features
+
+* **app:** add dynamic section + labware highlighting to LPC intro screen ([#8506](https://github.com/Opentrons/opentrons/issues/8506)) ([6da1eca](https://github.com/Opentrons/opentrons/commit/6da1ecaf7977341b7b290a1a2efee51175b1ceee)), closes [#8467](https://github.com/Opentrons/opentrons/issues/8467)
+* **app:** Add Labware Detail with Well Row/Column Highlighting ([#8499](https://github.com/Opentrons/opentrons/issues/8499)) ([158c0bb](https://github.com/Opentrons/opentrons/commit/158c0bbcfa9dc0a0af0acd9e5b24d76853ad913d)), closes [#8380](https://github.com/Opentrons/opentrons/issues/8380)
+* **app:** labware position check generic screen dynamic text ([#8451](https://github.com/Opentrons/opentrons/issues/8451)) ([7f141dd](https://github.com/Opentrons/opentrons/commit/7f141ddadba79b464395abd6c04e85b46ac2811e))
+* **app:** Robot Cal Accordion Step ([#8333](https://github.com/Opentrons/opentrons/issues/8333)) ([78e413a](https://github.com/Opentrons/opentrons/commit/78e413a47da32004dee32ddf8b05835cd19b9268))
+* **app:** Run Details Individual command styling ([#8612](https://github.com/Opentrons/opentrons/issues/8612)) ([bb0715b](https://github.com/Opentrons/opentrons/commit/bb0715b4040834ee8b21e4eaf3b6c420ae88d079)), closes [#8480](https://github.com/Opentrons/opentrons/issues/8480)
+* **components:** add pipette render component ([#8414](https://github.com/Opentrons/opentrons/issues/8414)) ([8c008c4](https://github.com/Opentrons/opentrons/commit/8c008c41ce4dc093770343f8edac18cc69ca4c51)), closes [#8379](https://github.com/Opentrons/opentrons/issues/8379)
+
+
+
+
+
 
 
 **Note:** Version bump only for package @opentrons/components

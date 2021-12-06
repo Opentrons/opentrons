@@ -98,7 +98,7 @@ class ModuleGeometry(DeckItem):
         Note that modules do not currently have a concept of calibration apart
         from calibration of labware on top of the module. The practical result
         of this is that if the module parent :py:class:`.Location` is
-        incorrect, then acorrect calibration of one labware on the deck would
+        incorrect, then a correct calibration of one labware on the deck would
         be incorrect on the module, and vice-versa. Currently, the way around
         this would be to correct the :py:class:`.Location` so that the
         calibrated labware is targeted accurately in both positions.
@@ -212,7 +212,7 @@ class ThermocyclerGeometry(ModuleGeometry):
         Note that modules do not currently have a concept of calibration apart
         from calibration of labware on top of the module. The practical result
         of this is that if the module parent :py:class:`.Location` is
-        incorrect, then acorrect calibration of one labware on the deck would
+        incorrect, then a correct calibration of one labware on the deck would
         be incorrect on the module, and vice-versa. Currently, the way around
         this would be to correct the :py:class:`.Location` so that the
         calibrated labware is targeted accurately in both positions.

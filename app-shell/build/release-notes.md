@@ -1,4 +1,4 @@
-**For** more details about this release, please see the full [technical change
+For more details about this release, please see the full [technical change
 log][]. For a list of currently known issues, please see the [Opentrons issue tracker][].
 
 [technical change log]: https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md
@@ -6,23 +6,51 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# Opentrons App Changes in 4.6.2
+# Opentrons App Changes in 5.0.0
 
-The 4.6.2 release is primarily focused on bug fixes on the robot software side and behind the scenes changes in the app for future work. You shouldn't notice any big changes with this upgrade.
+The 5.0.0 release reshapes the way a user uploads and sets up protocols to run on the robot.
 
 ## New Features
 
-None in the Opentrons App.
+- TODO
 
 ## Bug Fixes
 
+- TODO
+
+---
+
+## Opentrons App Changes in 4.7.0
+
+The 4.7.0 release is primarily focused on bug fixes on the robot software side. You shouldn't notice any big changes with this upgrade.
+
+### New Features
+
 None in the Opentrons App.
 
-## 4.6.1 to 4.6.2
+### Bug Fixes
+
+None in the Opentrons App.
+
+---
+
+## Opentrons App Changes in 4.6.2
+
+The 4.6.2 release is primarily focused on bug fixes on the robot software side and behind the scenes changes in the app for future work. You shouldn't notice any big changes with this upgrade.
+
+### New Features
+
+None in the Opentrons App.
+
+### Bug Fixes
+
+None in the Opentrons App.
+
+#### 4.6.1 to 4.6.2
 
 The 4.6.2 hotfix release contains a small bug fix for an issue where the OT-2's max speed settings within a protocol will be ignored. It does not affect the software running in the Opentrons App.
 
-## 4.6.0 to 4.6.1
+#### 4.6.0 to 4.6.1
 
 The 4.6.1 hotfix release contains a small configuration change to fix an issue with installing the `opentrons` PyPI package on computers running Python 3.8 and later. It does not affect the software running in the Opentrons App.
 

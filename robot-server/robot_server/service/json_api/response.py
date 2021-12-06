@@ -1,5 +1,4 @@
 from typing import Generic, List, TypeVar
-from typing_extensions import Literal
 from pydantic import Field, BaseModel
 from pydantic.generics import GenericModel
 
@@ -24,27 +23,42 @@ ResponseDataT = TypeVar("ResponseDataT", bound=BaseModel)
 ResponseLinksT = TypeVar("ResponseLinksT")
 
 
-DESCRIPTION_DATA = "the document’s primary data"
+DESCRIPTION_DATA = "The document’s primary data"
 
-DESCRIPTION_LINKS = "a links object related to the primary data."
+DESCRIPTION_LINKS = "A links object related to the primary data."
+
+
+class SimpleResponseModel(GenericModel, Generic[ResponseDataT]):
+    """A response that returns a sinle resource."""
+
+    data: ResponseDataT = Field(..., description=DESCRIPTION_DATA)
 
 
 class ResponseModel(GenericModel, Generic[ResponseDataT, ResponseLinksT]):
-    """A response that returns a single resource."""
+    """A response that returns a single resource and stateful links."""
 
     data: ResponseDataT = Field(..., description=DESCRIPTION_DATA)
     links: ResponseLinksT = Field(..., description=DESCRIPTION_LINKS)
 
 
-class EmptyResponseModel(GenericModel, Generic[ResponseLinksT]):
-    """A response that returns no data."""
+class SimpleEmptyResponseModel(BaseModel):
+    """A response that returns no data and no links."""
 
-    data: Literal[None] = Field(None, description=DESCRIPTION_DATA)
+
+class EmptyResponseModel(GenericModel, Generic[ResponseLinksT]):
+    """A response that returns no data except stateful links."""
+
     links: ResponseLinksT = Field(..., description=DESCRIPTION_LINKS)
 
 
-class MultiResponseModel(GenericModel, Generic[ResponseDataT, ResponseLinksT]):
+class SimpleMultiResponseModel(GenericModel, Generic[ResponseDataT]):
     """A response that returns multiple resources."""
+
+    data: List[ResponseDataT] = Field(..., description=DESCRIPTION_DATA)
+
+
+class MultiResponseModel(GenericModel, Generic[ResponseDataT, ResponseLinksT]):
+    """A response that returns multiple resources and stateful links."""
 
     data: List[ResponseDataT] = Field(..., description=DESCRIPTION_DATA)
     links: ResponseLinksT = Field(..., description=DESCRIPTION_LINKS)

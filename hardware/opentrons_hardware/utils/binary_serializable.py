@@ -141,6 +141,13 @@ class BinarySerializable:
     def build(cls, data: bytes) -> BinarySerializable:
         """Create a BinarySerializable from a byte buffer.
 
+        The byte buffer must be at least enough bytes to satisfy all fields.
+
+        Extra bytes will be ignored. This is for two reasons:
+            - CANFD requires padding to round byte lengths to fixed sizes.
+            - To accommodate extracting multiple  BinarySerializable objects
+            from a stream of bytes.
+
         Args:
             data: Byte buffer
 
@@ -148,7 +155,10 @@ class BinarySerializable:
             cls
         """
         try:
-            b = struct.unpack(cls._get_format_string(), data)
+            format_string = cls._get_format_string()
+            size = cls.get_size()
+            # ignore bytes beyond the size of message.
+            b = struct.unpack(format_string, data[:size])
             args = {v.name: v.type.build(b[i]) for i, v in enumerate(fields(cls))}
             # Mypy is not liking constructing the derived types.
             return cls(**args)  # type: ignore[call-arg]
@@ -171,6 +181,11 @@ class BinarySerializable:
             raise InvalidFieldException(f"All fields must be of type {BinaryFieldBase}")
 
         return format_string
+
+    @classmethod
+    def get_size(cls) -> int:
+        """Get the size of the serializable in bytes."""
+        return struct.calcsize(cls._get_format_string())
 
 
 class LittleEndianMixIn:

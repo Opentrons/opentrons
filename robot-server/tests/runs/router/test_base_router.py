@@ -6,14 +6,21 @@ from decoy import Decoy, matchers
 from opentrons.types import DeckSlotName, MountType
 from opentrons.protocol_engine import (
     StateView,
+    ErrorOccurrence,
     commands as pe_commands,
     types as pe_types,
 )
 from opentrons.protocol_runner import JsonPreAnalysis
 
 from robot_server.errors import ApiError
-from robot_server.service.json_api import RequestModel, ResponseModel, ResourceLink
 from robot_server.service.task_runner import TaskRunner
+from robot_server.service.json_api import (
+    RequestModel,
+    SimpleResponseModel,
+    SimpleEmptyResponseModel,
+    ResourceLink,
+)
+
 
 from robot_server.protocols import (
     ProtocolStore,
@@ -42,14 +49,45 @@ from robot_server.runs.router.base_router import (
     get_run,
     get_runs,
     remove_run,
+    add_labware_offset,
     update_run,
 )
+
+
+LABWARE_OFFSET_REQUESTS = [
+    pe_types.LabwareOffsetCreate(
+        definitionUri="namespace_1/load_name_1/123",
+        location=pe_types.LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
+        vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
+    ),
+    pe_types.LabwareOffsetCreate(
+        definitionUri="namespace_2/load_name_2/123",
+        location=pe_types.LabwareOffsetLocation(slotName=DeckSlotName.SLOT_2),
+        vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
+    ),
+]
+
+RESOLVED_LABWARE_OFFSETS = [
+    pe_types.LabwareOffset(
+        id="labware-offset-1-id",
+        createdAt=datetime(year=2021, month=1, day=1),
+        definitionUri="namespace_1/load_name_1/1",
+        location=pe_types.LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
+        vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
+    ),
+    pe_types.LabwareOffset(
+        id="labware-offset-2-id",
+        createdAt=datetime(year=2021, month=1, day=1),
+        definitionUri="namespace_2/load_name_2/2",
+        location=pe_types.LabwareOffsetLocation(slotName=DeckSlotName.SLOT_2),
+        vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
+    ),
+]
 
 
 async def test_create_run(
     decoy: Decoy,
     task_runner: TaskRunner,
-    run_view: RunView,
     run_store: RunStore,
     engine_store: EngineStore,
 ) -> None:
@@ -72,8 +110,10 @@ async def test_create_run(
         current=True,
         actions=[],
         commands=[],
+        errors=[],
         pipettes=[],
         labware=[],
+        labwareOffsets=RESOLVED_LABWARE_OFFSETS,
     )
 
     engine_state = decoy.mock(cls=StateView)
@@ -82,23 +122,17 @@ async def test_create_run(
     decoy.when(engine_state.commands.get_all()).then_return([])
     decoy.when(engine_state.pipettes.get_all()).then_return([])
     decoy.when(engine_state.labware.get_all()).then_return([])
+    decoy.when(engine_state.labware.get_labware_offsets()).then_return(
+        RESOLVED_LABWARE_OFFSETS
+    )
     decoy.when(engine_state.commands.get_status()).then_return(
         pe_types.EngineStatus.IDLE
     )
 
-    decoy.when(
-        run_view.as_response(
-            run=expected_run,
-            commands=[],
-            pipettes=[],
-            labware=[],
-            engine_status=pe_types.EngineStatus.IDLE,
-        ),
-    ).then_return(expected_response)
-
     result = await create_run(
-        request_body=RequestModel(data=RunCreate()),
-        run_view=run_view,
+        request_body=RequestModel(
+            data=RunCreate(labwareOffsets=LABWARE_OFFSET_REQUESTS)
+        ),
         run_store=run_store,
         engine_store=engine_store,
         task_runner=task_runner,
@@ -109,6 +143,9 @@ async def test_create_run(
     assert result.data == expected_response
 
     decoy.verify(
+        # It should have added each requested labware offset to the engine,
+        # in the exact order they appear in the request.
+        *[engine_store.engine.add_labware_offset(r) for r in LABWARE_OFFSET_REQUESTS],
         task_runner.run(engine_store.runner.join),
         run_store.upsert(run=expected_run),
     )
@@ -146,8 +183,10 @@ async def test_create_protocol_run(
         current=True,
         actions=[],
         commands=[],
+        errors=[],
         pipettes=[],
         labware=[],
+        labwareOffsets=RESOLVED_LABWARE_OFFSETS,
     )
 
     decoy.when(protocol_store.get(protocol_id="protocol-id")).then_return(
@@ -160,23 +199,20 @@ async def test_create_protocol_run(
     decoy.when(engine_state.commands.get_all()).then_return([])
     decoy.when(engine_state.pipettes.get_all()).then_return([])
     decoy.when(engine_state.labware.get_all()).then_return([])
+    decoy.when(engine_state.labware.get_labware_offsets()).then_return(
+        RESOLVED_LABWARE_OFFSETS
+    )
     decoy.when(engine_state.commands.get_status()).then_return(
         pe_types.EngineStatus.IDLE
     )
 
-    decoy.when(
-        run_view.as_response(
-            run=run,
-            commands=[],
-            pipettes=[],
-            labware=[],
-            engine_status=pe_types.EngineStatus.IDLE,
-        ),
-    ).then_return(expected_response)
-
     result = await create_run(
-        request_body=RequestModel(data=RunCreate(protocolId="protocol-id")),
-        run_view=run_view,
+        request_body=RequestModel(
+            data=RunCreate(
+                protocolId="protocol-id",
+                labwareOffsets=LABWARE_OFFSET_REQUESTS,
+            )
+        ),
         run_store=run_store,
         engine_store=engine_store,
         protocol_store=protocol_store,
@@ -188,13 +224,16 @@ async def test_create_protocol_run(
     assert result.data == expected_response
 
     decoy.verify(
+        # It should have added each requested labware offset to the engine,
+        # in the exact order they appear in the request.
+        *[engine_store.engine.add_labware_offset(r) for r in LABWARE_OFFSET_REQUESTS],
         engine_store.runner.load(protocol_resource),
         task_runner.run(engine_store.runner.join),
         run_store.upsert(run=run),
     )
 
 
-async def test_create_protocol_run_missing_protocol(
+async def test_create_protocol_run_bad_protocol_id(
     decoy: Decoy,
     protocol_store: ProtocolStore,
 ) -> None:
@@ -228,7 +267,6 @@ async def test_create_run_conflict(decoy: Decoy, engine_store: EngineStore) -> N
 
 async def test_get_run(
     decoy: Decoy,
-    run_view: RunView,
     run_store: RunStore,
     engine_store: EngineStore,
 ) -> None:
@@ -255,6 +293,7 @@ async def test_get_run(
         loadName="load-name",
         definitionUri="namespace/load-name/42",
         location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        offsetId=None,
     )
 
     pipette = pe_types.LoadedPipette(
@@ -270,6 +309,7 @@ async def test_get_run(
         status=pe_types.EngineStatus.IDLE,
         current=False,
         actions=[],
+        errors=[],
         commands=[
             RunCommandSummary(
                 id=command.id,
@@ -279,6 +319,7 @@ async def test_get_run(
         ],
         pipettes=[pipette],
         labware=[labware],
+        labwareOffsets=RESOLVED_LABWARE_OFFSETS,
     )
 
     decoy.when(run_store.get(run_id="run-id")).then_return(run)
@@ -287,25 +328,98 @@ async def test_get_run(
 
     decoy.when(engine_store.get_state("run-id")).then_return(engine_state)
     decoy.when(engine_state.commands.get_all()).then_return([command])
+    decoy.when(engine_state.commands.get_all_errors()).then_return([])
     decoy.when(engine_state.pipettes.get_all()).then_return([pipette])
     decoy.when(engine_state.labware.get_all()).then_return([labware])
+    decoy.when(engine_state.labware.get_labware_offsets()).then_return(
+        RESOLVED_LABWARE_OFFSETS
+    )
     decoy.when(engine_state.commands.get_status()).then_return(
         pe_types.EngineStatus.IDLE
     )
 
-    decoy.when(
-        run_view.as_response(
-            run=run,
-            commands=[command],
-            pipettes=[pipette],
-            labware=[labware],
-            engine_status=pe_types.EngineStatus.IDLE,
-        ),
-    ).then_return(expected_response)
+    result = await get_run(
+        runId="run-id",
+        run_store=run_store,
+        engine_store=engine_store,
+    )
+
+    assert result.data == expected_response
+
+
+async def test_get_run_with_errors(
+    decoy: Decoy,
+    run_store: RunStore,
+    engine_store: EngineStore,
+) -> None:
+    """It should be able to get a run by ID that has errors."""
+    run = RunResource(
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1),
+        actions=[],
+        is_current=False,
+    )
+
+    command = pe_commands.Pause(
+        id="command-id",
+        status=pe_commands.CommandStatus.FAILED,
+        createdAt=datetime(year=2022, month=2, day=2),
+        params=pe_commands.PauseParams(message="hello world"),
+        errorId="error-1",
+    )
+
+    error_1 = ErrorOccurrence(
+        id="error-1",
+        createdAt=datetime(year=2023, month=3, day=3),
+        errorType="SomethingBad",
+        detail="oh no",
+    )
+
+    error_2 = ErrorOccurrence(
+        id="error-2",
+        createdAt=datetime(year=2024, month=4, day=4),
+        errorType="SomethingWorse",
+        detail="oh no no",
+    )
+
+    expected_response = Run(
+        id="run-id",
+        protocolId=None,
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=pe_types.EngineStatus.FAILED,
+        current=False,
+        actions=[],
+        errors=[error_1, error_2],
+        commands=[
+            RunCommandSummary(
+                id=command.id,
+                commandType=command.commandType,
+                status=command.status,
+                errorId="error-1",
+            ),
+        ],
+        pipettes=[],
+        labware=[],
+        labwareOffsets=[],
+    )
+
+    decoy.when(run_store.get(run_id="run-id")).then_return(run)
+
+    engine_state = decoy.mock(cls=StateView)
+
+    decoy.when(engine_store.get_state("run-id")).then_return(engine_state)
+    decoy.when(engine_state.commands.get_all()).then_return([command])
+    decoy.when(engine_state.commands.get_all_errors()).then_return([error_1, error_2])
+    decoy.when(engine_state.pipettes.get_all()).then_return([])
+    decoy.when(engine_state.labware.get_all()).then_return([])
+    decoy.when(engine_state.labware.get_labware_offsets()).then_return([])
+    decoy.when(engine_state.commands.get_status()).then_return(
+        pe_types.EngineStatus.FAILED
+    )
 
     result = await get_run(
         runId="run-id",
-        run_view=run_view,
         run_store=run_store,
         engine_store=engine_store,
     )
@@ -338,7 +452,6 @@ async def test_get_runs_empty(decoy: Decoy, run_store: RunStore) -> None:
 
 async def test_get_runs_not_empty(
     decoy: Decoy,
-    run_view: RunView,
     run_store: RunStore,
     engine_store: EngineStore,
 ) -> None:
@@ -370,8 +483,10 @@ async def test_get_runs_not_empty(
         current=False,
         actions=[],
         commands=[],
+        errors=[],
         pipettes=[],
         labware=[],
+        labwareOffsets=[],
     )
 
     response_2 = Run(
@@ -382,8 +497,10 @@ async def test_get_runs_not_empty(
         current=True,
         actions=[],
         commands=[],
+        errors=[],
         pipettes=[],
         labware=[],
+        labwareOffsets=[],
     )
 
     decoy.when(run_store.get_all()).then_return([run_1, run_2])
@@ -395,42 +512,24 @@ async def test_get_runs_not_empty(
     decoy.when(engine_store.get_state("unique-id-2")).then_return(engine_state_2)
 
     decoy.when(engine_state_1.commands.get_all()).then_return([])
+    decoy.when(engine_state_1.commands.get_all_errors()).then_return([])
     decoy.when(engine_state_1.pipettes.get_all()).then_return([])
     decoy.when(engine_state_1.labware.get_all()).then_return([])
+    decoy.when(engine_state_1.labware.get_labware_offsets()).then_return([])
     decoy.when(engine_state_1.commands.get_status()).then_return(
         pe_types.EngineStatus.SUCCEEDED
     )
 
     decoy.when(engine_state_2.commands.get_all()).then_return([])
+    decoy.when(engine_state_2.commands.get_all_errors()).then_return([])
     decoy.when(engine_state_2.pipettes.get_all()).then_return([])
     decoy.when(engine_state_2.labware.get_all()).then_return([])
+    decoy.when(engine_state_2.labware.get_labware_offsets()).then_return([])
     decoy.when(engine_state_2.commands.get_status()).then_return(
         pe_types.EngineStatus.IDLE
     )
 
-    decoy.when(
-        run_view.as_response(
-            run=run_1,
-            commands=[],
-            pipettes=[],
-            labware=[],
-            engine_status=pe_types.EngineStatus.SUCCEEDED,
-        ),
-    ).then_return(response_1)
-
-    decoy.when(
-        run_view.as_response(
-            run=run_2,
-            commands=[],
-            pipettes=[],
-            labware=[],
-            engine_status=pe_types.EngineStatus.IDLE,
-        ),
-    ).then_return(response_2)
-
-    result = await get_runs(
-        run_view=run_view, run_store=run_store, engine_store=engine_store
-    )
+    result = await get_runs(run_store=run_store, engine_store=engine_store)
 
     assert result.data == [response_1, response_2]
     assert result.links == AllRunsLinks(current=ResourceLink(href="/runs/unique-id-2"))
@@ -453,7 +552,7 @@ async def test_delete_run_by_id(
         run_store.remove(run_id="run-id"),
     )
 
-    assert result.data is None
+    assert result == SimpleEmptyResponseModel()
 
 
 async def test_delete_run_with_bad_id(
@@ -511,6 +610,63 @@ async def test_delete_active_run_no_engine(
     )
 
 
+async def test_add_labware_offset(
+    decoy: Decoy,
+    engine_store: EngineStore,
+    run_store: RunStore,
+) -> None:
+    """It should add the labware offset to the engine, assuming the run is current."""
+    labware_offset_request = LABWARE_OFFSET_REQUESTS[0]
+
+    run_resource = RunResource(
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1),
+        actions=[],
+        is_current=True,
+    )
+
+    expected_response = Run(
+        id="run-id",
+        protocolId=None,
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=pe_types.EngineStatus.SUCCEEDED,
+        current=True,
+        actions=[],
+        commands=[],
+        errors=[],
+        pipettes=[],
+        labware=[],
+        labwareOffsets=[],
+    )
+
+    decoy.when(run_store.get(run_id="run-id")).then_return(run_resource)
+
+    engine_state = decoy.mock(cls=StateView)
+    decoy.when(engine_store.get_state("run-id")).then_return(engine_state)
+
+    decoy.when(engine_state.commands.get_all()).then_return([])
+    decoy.when(engine_state.commands.get_all_errors()).then_return([])
+    decoy.when(engine_state.pipettes.get_all()).then_return([])
+    decoy.when(engine_state.labware.get_all()).then_return([])
+    # Tests for run POST and GET should already cover passing the engine's labware
+    # offsets to the client when .get_labware_offsets() returns a non-empty list.
+    decoy.when(engine_state.labware.get_labware_offsets()).then_return([])
+    decoy.when(engine_state.commands.get_status()).then_return(
+        pe_types.EngineStatus.SUCCEEDED
+    )
+
+    response = await add_labware_offset(
+        runId="run-id",
+        request_body=RequestModel(data=labware_offset_request),
+        engine_store=engine_store,
+        run_store=run_store,
+    )
+    decoy.verify(engine_store.engine.add_labware_offset(labware_offset_request))
+
+    assert response == SimpleResponseModel(data=expected_response)
+
+
 async def test_update_run_to_not_current(
     decoy: Decoy,
     engine_store: EngineStore,
@@ -542,8 +698,10 @@ async def test_update_run_to_not_current(
         current=False,
         actions=[],
         commands=[],
+        errors=[],
         pipettes=[],
         labware=[],
+        labwareOffsets=[],
     )
 
     run_update = RunUpdate(current=False)
@@ -553,21 +711,14 @@ async def test_update_run_to_not_current(
     decoy.when(run_view.with_update(run=run_resource, update=run_update)).then_return(
         updated_resource
     )
-    decoy.when(
-        run_view.as_response(
-            run=updated_resource,
-            commands=[],
-            pipettes=[],
-            labware=[],
-            engine_status=pe_types.EngineStatus.SUCCEEDED,
-        )
-    ).then_return(expected_response)
 
     engine_state = decoy.mock(cls=StateView)
     decoy.when(engine_store.get_state("run-id")).then_return(engine_state)
     decoy.when(engine_state.commands.get_all()).then_return([])
+    decoy.when(engine_state.commands.get_all_errors()).then_return([])
     decoy.when(engine_state.pipettes.get_all()).then_return([])
     decoy.when(engine_state.labware.get_all()).then_return([])
+    decoy.when(engine_state.labware.get_labware_offsets()).then_return([])
     decoy.when(engine_state.commands.get_status()).then_return(
         pe_types.EngineStatus.SUCCEEDED
     )
@@ -580,7 +731,7 @@ async def test_update_run_to_not_current(
         engine_store=engine_store,
     )
 
-    assert result == ResponseModel(data=expected_response, links=None)
+    assert result == SimpleResponseModel(data=expected_response)
     decoy.verify(
         engine_store.clear(),
         run_store.upsert(updated_resource),
@@ -610,8 +761,10 @@ async def test_update_current_to_current_noop(
         current=True,
         actions=[],
         commands=[],
+        errors=[],
         pipettes=[],
         labware=[],
+        labwareOffsets=[],
     )
 
     run_update = RunUpdate(current=True)
@@ -621,21 +774,14 @@ async def test_update_current_to_current_noop(
     decoy.when(run_view.with_update(run=run_resource, update=run_update)).then_return(
         run_resource
     )
-    decoy.when(
-        run_view.as_response(
-            run=run_resource,
-            commands=[],
-            pipettes=[],
-            labware=[],
-            engine_status=pe_types.EngineStatus.SUCCEEDED,
-        )
-    ).then_return(expected_response)
 
     engine_state = decoy.mock(cls=StateView)
     decoy.when(engine_store.get_state("run-id")).then_return(engine_state)
     decoy.when(engine_state.commands.get_all()).then_return([])
+    decoy.when(engine_state.commands.get_all_errors()).then_return([])
     decoy.when(engine_state.pipettes.get_all()).then_return([])
     decoy.when(engine_state.labware.get_all()).then_return([])
+    decoy.when(engine_state.labware.get_labware_offsets()).then_return([])
     decoy.when(engine_state.commands.get_status()).then_return(
         pe_types.EngineStatus.SUCCEEDED
     )
@@ -648,7 +794,7 @@ async def test_update_current_to_current_noop(
         engine_store=engine_store,
     )
 
-    assert result == ResponseModel(data=expected_response, links=None)
+    assert result == SimpleResponseModel(data=expected_response)
     decoy.verify(run_store.upsert(run_resource), times=0)
     decoy.verify(engine_store.clear(), times=0)
 
@@ -657,7 +803,6 @@ async def test_update_to_current_conflict(
     decoy: Decoy,
     engine_store: EngineStore,
     run_store: RunStore,
-    run_view: RunView,
 ) -> None:
     """It should 409 if attempting to update a not current run."""
     run_resource = RunResource(
@@ -677,7 +822,6 @@ async def test_update_to_current_conflict(
             runId="run-id",
             request_body=RequestModel(data=run_update),
             run_store=run_store,
-            run_view=run_view,
             engine_store=engine_store,
         )
 

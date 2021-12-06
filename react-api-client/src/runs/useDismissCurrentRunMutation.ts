@@ -22,9 +22,7 @@ export type UseDismissCurrentRunMutationOptions = UseMutationOptions<
   string
 >
 
-export function useDismissCurrentRunMutation(
-  options: UseDismissCurrentRunMutationOptions = {}
-): UseDismissCurrentRunMutationResult {
+export function useDismissCurrentRunMutation(): UseDismissCurrentRunMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
 
@@ -38,8 +36,7 @@ export function useDismissCurrentRunMutation(
             console.error(`error invalidating runs query: ${e.message}`)
           )
         return response.data
-      }),
-    options
+      })
   )
 
   return {

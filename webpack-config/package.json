@@ -1,6 +1,6 @@
 {
   "name": "@opentrons/webpack-config",
-  "version": "4.6.2",
+  "version": "5.0.0-beta.0",
   "description": "Shareable pieces of webpack configuration",
   "main": "index.js",
   "repository": {

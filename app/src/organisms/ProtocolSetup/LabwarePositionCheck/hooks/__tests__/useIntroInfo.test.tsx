@@ -111,7 +111,7 @@ describe('useIntroInfo', () => {
 
     when(mockGetLabwareLocation)
       .calledWith(PICKUP_TIP_LABWARE_ID, protocolCommands)
-      .mockReturnValue(PICKUP_TIP_LABWARE_SLOT)
+      .mockReturnValue({ slotName: PICKUP_TIP_LABWARE_SLOT })
   })
   it('should gather all labware position check intro screen data', () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
@@ -123,18 +123,12 @@ describe('useIntroInfo', () => {
     )
     const { result } = renderHook(hooks.useIntroInfo, { wrapper })
     const {
-      primaryTipRackSlot,
-      primaryTipRackName,
       primaryPipetteMount,
       secondaryPipetteMount,
-      numberOfTips,
-      firstStepLabwareSlot,
+      firstTiprackSlot,
     } = result.current as any
-    expect(primaryTipRackSlot).toBe(PICKUP_TIP_LABWARE_SLOT)
-    expect(primaryTipRackName).toBe(PICKUP_TIP_LABWARE_DISPLAY_NAME)
     expect(primaryPipetteMount).toBe('left')
     expect(secondaryPipetteMount).toBe('right')
-    expect(numberOfTips).toBe(8)
-    expect(firstStepLabwareSlot).toBe(PICKUP_TIP_LABWARE_SLOT)
+    expect(firstTiprackSlot).toBe(PICKUP_TIP_LABWARE_SLOT)
   })
 })

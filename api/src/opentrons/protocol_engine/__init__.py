@@ -7,7 +7,7 @@ protocol state and side-effects like robot movements.
 
 from .create_protocol_engine import create_protocol_engine
 from .protocol_engine import ProtocolEngine
-from .errors import ProtocolEngineError
+from .errors import ProtocolEngineError, ErrorOccurrence
 from .commands import Command, CommandCreate, CommandStatus, CommandType
 from .state import State, StateView
 from .plugins import AbstractPlugin
@@ -16,7 +16,9 @@ from .types import (
     LabwareOffset,
     LabwareOffsetCreate,
     LabwareOffsetVector,
+    LabwareOffsetLocation,
     DeckSlotLocation,
+    ModuleLocation,
     Dimensions,
     EngineStatus,
     LabwareLocation,
@@ -26,6 +28,8 @@ from .types import (
     WellLocation,
     WellOrigin,
     WellOffset,
+    ModuleModel,
+    ModuleDefinition,
 )
 
 __all__ = [
@@ -34,6 +38,7 @@ __all__ = [
     "ProtocolEngine",
     # error types
     "ProtocolEngineError",
+    "ErrorOccurrence",
     # top level command unions and values
     "Command",
     "CommandCreate",
@@ -46,7 +51,9 @@ __all__ = [
     "LabwareOffset",
     "LabwareOffsetCreate",
     "LabwareOffsetVector",
+    "LabwareOffsetLocation",
     "DeckSlotLocation",
+    "ModuleLocation",
     "Dimensions",
     "EngineStatus",
     "LabwareLocation",
@@ -56,6 +63,8 @@ __all__ = [
     "WellLocation",
     "WellOrigin",
     "WellOffset",
+    "ModuleModel",
+    "ModuleDefinition",
     # plugins
     "AbstractPlugin",
 ]

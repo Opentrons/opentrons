@@ -3,7 +3,12 @@
 from .create_queue_worker import create_queue_worker
 from .command_executor import CommandExecutor
 from .queue_worker import QueueWorker
-from .equipment import EquipmentHandler, LoadedLabwareData, LoadedPipetteData
+from .equipment import (
+    EquipmentHandler,
+    LoadedLabwareData,
+    LoadedPipetteData,
+    LoadedModuleData,
+)
 from .movement import MovementHandler, SavedPositionData
 from .pipetting import PipettingHandler
 from .run_control import RunControlHandler
@@ -15,6 +20,7 @@ __all__ = [
     "EquipmentHandler",
     "LoadedLabwareData",
     "LoadedPipetteData",
+    "LoadedModuleData",
     "MovementHandler",
     "SavedPositionData",
     "PipettingHandler",

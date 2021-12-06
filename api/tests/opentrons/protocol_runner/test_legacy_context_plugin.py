@@ -21,6 +21,7 @@ from opentrons.protocol_runner.legacy_wrappers import (
     LegacyLabwareLoadInfo,
     LegacyInstrumentLoadInfo,
     LegacyModuleLoadInfo,
+    LegacyMagneticModuleModel,
 )
 
 from opentrons.types import DeckSlotName, Mount
@@ -173,7 +174,7 @@ async def test_main_broker_messages(
     )
 
     decoy.when(legacy_command_mapper.map_command(command=legacy_command)).then_return(
-        engine_command
+        pe_actions.UpdateCommandAction(engine_command)
     )
 
     await to_thread.run_sync(handler, legacy_command)
@@ -207,6 +208,8 @@ async def test_labware_load_broker_messages(
         labware_load_name="some_load_name",
         labware_version=123,
         deck_slot=DeckSlotName.SLOT_1,
+        on_module=False,
+        offset_id=None,
     )
 
     engine_command = pe_commands.Custom(
@@ -288,7 +291,10 @@ async def test_module_load_broker_messages(
     handler: Callable[[LegacyModuleLoadInfo], None] = handler_captor.value
 
     module_load_info = LegacyModuleLoadInfo(
-        module_name="some_module_name", location=1, configuration=None
+        module_model=LegacyMagneticModuleModel.MAGNETIC_V2,
+        deck_slot=DeckSlotName.SLOT_1,
+        configuration=None,
+        module_serial=None,
     )
     engine_command = pe_commands.Custom(
         id="command-id",

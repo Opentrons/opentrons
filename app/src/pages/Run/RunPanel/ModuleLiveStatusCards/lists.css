@@ -1,0 +1,86 @@
+@import '@opentrons/components';
+
+.titled_list {
+  background-color: white;
+}
+
+.header_text {
+  text-transform: uppercase;
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  color: var(--c-font-disabled);
+}
+
+/*
+  TODO(IL, 2021-07-30): when consumers of this class are migrated to CSS-in-JS, keep in mind
+  the meaning of .title_bar is vague, it is widely used by several unrelated components.
+  Also, it's almost the same as .titled_list_title_bar -- they are the same
+  except for flex-related rules.
+*/
+.title_bar {
+  position: relative;
+  display: flex;
+  text-decoration: none;
+  padding: var(--list-padding-large) var(--list-padding-small);
+  flex-direction: column;
+}
+
+/* Specifically for TitledList */
+.titled_list_title_bar {
+  position: relative;
+  display: flex;
+  text-decoration: none;
+  padding: var(--list-padding-large) var(--list-padding-small);
+  flex-direction: row;
+  align-items: center;
+}
+
+.titled_list_selected {
+  & .title_bar {
+    background-color: var(--c-bg-selected);
+
+    & * {
+      color: var(--c-selected-dark);
+      font-weight: var(--fw-semibold);
+    }
+  }
+}
+
+.title {
+  font-size: var(--fs-body-2);
+  font-weight: var(--fw-regular);
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.title_bar_icon {
+  color: var(--c-font-dark);
+  height: 1.5rem;
+}
+
+.title_bar_error {
+  background-color: var(--c-error-light);
+}
+
+.icon_left_of_title {
+  margin-right: 0.5rem;
+  height: 1.2rem;
+}
+
+.icon_left_of_title_container {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.title_bar_carat {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  padding: calc(var(--list-padding-small) - var(--bd-width-default));
+  padding-top: 1rem;
+
+  &:hover {
+    background-color: color-mod(var(--c-black) alpha(5%));
+  }
+}

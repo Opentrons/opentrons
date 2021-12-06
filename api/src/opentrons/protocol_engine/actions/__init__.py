@@ -12,6 +12,9 @@ from .actions import (
     StopAction,
     QueueCommandAction,
     UpdateCommandAction,
+    FailCommandAction,
+    AddLabwareOffsetAction,
+    StopErrorDetails,
 )
 
 __all__ = [
@@ -26,4 +29,8 @@ __all__ = [
     "StopAction",
     "QueueCommandAction",
     "UpdateCommandAction",
+    "FailCommandAction",
+    "AddLabwareOffsetAction",
+    # action payload values
+    "StopErrorDetails",
 ]

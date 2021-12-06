@@ -1,4 +1,5 @@
 import { useSelector } from 'react-redux'
+import last from 'lodash/last'
 import { getPipetteNameSpecs, getLabwareDefURI } from '@opentrons/shared-data'
 import {
   getAttachedPipettes,
@@ -80,8 +81,8 @@ export function useCurrentRunPipetteInfoByMount(): {
         const tipRackDefs: LabwareDefinition2[] = pickUpTipCommands.reduce<
           LabwareDefinition2[]
         >((acc, command) => {
-          if (pipetteId === command.result?.pipetteId) {
-            const tipRack = labware[command.result?.labwareId]
+          if (pipetteId === command.params?.pipetteId) {
+            const tipRack = labware[command.params?.labwareId]
             const tipRackDefinition = labwareDefinitions[tipRack.definitionId]
             if (tipRackDefinition != null && !acc.includes(tipRackDefinition)) {
               return [...acc, tipRackDefinition]
@@ -97,13 +98,17 @@ export function useCurrentRunPipetteInfoByMount(): {
         )
 
         const tipRacksForPipette = tipRackDefs.map(tipRackDef => {
-          const tlcDataMatch = tipLengthCalibrations.find(
-            tlcData => tlcData.uri === getLabwareDefURI(tipRackDef)
+          const tlcDataMatch = last(
+            tipLengthCalibrations.filter(
+              tlcData =>
+                tlcData.uri === getLabwareDefURI(tipRackDef) &&
+                attachedPipette != null &&
+                tlcData.pipette === attachedPipette.id
+            )
           )
+
           const lastModifiedDate =
-            attachedPipette != null &&
-            tlcDataMatch?.pipette === attachedPipette.id &&
-            requestedPipetteMatch !== INCOMPATIBLE
+            tlcDataMatch != null && requestedPipetteMatch !== INCOMPATIBLE
               ? tlcDataMatch.lastModified
               : null
 

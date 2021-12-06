@@ -7,7 +7,7 @@ from opentrons.config.advanced_settings import _migrate, _ensure
 
 @pytest.fixture
 def migrated_file_version() -> int:
-    return 10
+    return 12
 
 
 @pytest.fixture
@@ -21,8 +21,8 @@ def default_file_settings() -> Dict[str, Optional[bool]]:
         "disableLogAggregation": None,
         "enableDoorSafetySwitch": None,
         "enableHttpProtocolSessions": None,
-        "enableProtocolEngine": None,
         "disableFastProtocolUpload": None,
+        "enableOT3HardwareController": None,
     }
 
 
@@ -158,6 +158,26 @@ def v10_config(v9_config):
     return r
 
 
+@pytest.fixture
+def v11_config(v10_config):
+    r = v10_config.copy()
+    r.pop("enableProtocolEngine")
+    r.update({"_version": 11})
+    return r
+
+
+@pytest.fixture
+def v12_config(v11_config):
+    r = v11_config.copy()
+    r.update(
+        {
+            "_version": 12,
+            "enableOT3HardwareController": True,
+        }
+    )
+    return r
+
+
 @pytest.fixture(
     scope="session",
     params=[
@@ -173,6 +193,8 @@ def v10_config(v9_config):
         lazy_fixture("v8_config"),
         lazy_fixture("v9_config"),
         lazy_fixture("v10_config"),
+        lazy_fixture("v11_config"),
+        lazy_fixture("v12_config"),
     ],
 )
 def old_settings(request):
@@ -244,6 +266,6 @@ def test_ensures_config():
         "disableLogAggregation": True,
         "enableDoorSafetySwitch": None,
         "enableHttpProtocolSessions": None,
-        "enableProtocolEngine": None,
         "disableFastProtocolUpload": None,
+        "enableOT3HardwareController": None,
     }

@@ -1,9 +1,12 @@
 import * as React from 'react'
+import '@testing-library/jest-dom'
 import { when, resetAllWhenMocks } from 'jest-when'
 import {
   RUN_STATUS_IDLE,
   RUN_STATUS_RUNNING,
   RUN_STATUS_PAUSED,
+  RUN_STATUS_PAUSE_REQUESTED,
+  RUN_STATUS_STOP_REQUESTED,
   RUN_STATUS_STOPPED,
   RUN_STATUS_FAILED,
   RUN_STATUS_SUCCEEDED,
@@ -11,6 +14,10 @@ import {
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
+import {
+  useMissingModuleIds,
+  useProtocolCalibrationStatus,
+} from '../../ProtocolSetup/RunSetupCard/hooks'
 import {
   useRunCompleteTime,
   useRunControls,
@@ -20,8 +27,16 @@ import {
 import { Timer } from '../Timer'
 import { RunTimeControl } from '..'
 
+jest.mock('@opentrons/components', () => {
+  const actualComponents = jest.requireActual('@opentrons/components')
+  return {
+    ...actualComponents,
+    Tooltip: jest.fn(({ children }) => <div>{children}</div>),
+  }
+})
 jest.mock('../hooks')
 jest.mock('../Timer')
+jest.mock('../../ProtocolSetup/RunSetupCard/hooks')
 
 const mockUseRunCompleteTime = useRunCompleteTime as jest.MockedFunction<
   typeof useRunCompleteTime
@@ -37,6 +52,13 @@ const mockUseRunStatus = useRunStatus as jest.MockedFunction<
 >
 const mockTimer = Timer as jest.MockedFunction<typeof Timer>
 
+const mockUseMissingModuleIds = useMissingModuleIds as jest.MockedFunction<
+  typeof useMissingModuleIds
+>
+const mockUseProtocolCalibrationStatus = useProtocolCalibrationStatus as jest.MockedFunction<
+  typeof useProtocolCalibrationStatus
+>
+
 const render = () => {
   return renderWithProviders(<RunTimeControl />, { i18nInstance: i18n })
 }
@@ -46,18 +68,20 @@ describe('RunTimeControl', () => {
     when(mockUseRunControls)
       .calledWith()
       .mockReturnValue({
-        usePlay: () => {},
-        usePause: () => {},
-        useReset: () => {},
+        play: () => {},
+        pause: () => {},
+        reset: () => {},
       })
     when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_IDLE)
     mockTimer.mockReturnValue(<div>Mock Timer</div>)
-    when(mockUseRunCompleteTime).calledWith().mockReturnValue(undefined)
+    when(mockUseRunCompleteTime).calledWith().mockReturnValue(null)
+    mockUseProtocolCalibrationStatus.mockReturnValue({
+      complete: true,
+    })
+    mockUseMissingModuleIds.mockReturnValue([])
   })
-
   afterEach(() => {
     resetAllWhenMocks()
-    jest.resetAllMocks()
   })
 
   it('renders a header', () => {
@@ -66,14 +90,29 @@ describe('RunTimeControl', () => {
     expect(getByText('Run Protocol')).toBeTruthy()
   })
 
-  it('renders a run status but no timer if idle', () => {
+  it('renders a run status but no timer if idle and run unstarted', () => {
     const [{ getByRole, getByText, queryByText }] = render()
 
     expect(getByText('Status: Not started')).toBeTruthy()
     expect(queryByText('Mock Timer')).toBeNull()
     expect(getByRole('button', { name: 'Start Run' })).toBeTruthy()
   })
-
+  it('should render disabled button with tooltip if calibration is incomplete', () => {
+    mockUseProtocolCalibrationStatus.mockReturnValue({
+      complete: false,
+    } as any)
+    const [{ getByRole, getByText }] = render()
+    const button = getByRole('button', { name: 'Start Run' })
+    expect(button).toBeDisabled()
+    getByText('Complete required steps on Protocol tab before starting the run')
+  })
+  it('should render disabled button with tooltip if a module is missing', () => {
+    mockUseMissingModuleIds.mockReturnValue(['temperatureModuleV1'])
+    const [{ getByRole, getByText }] = render()
+    const button = getByRole('button', { name: 'Start Run' })
+    expect(button).toBeDisabled()
+    getByText('Complete required steps on Protocol tab before starting the run')
+  })
   it('renders a run status and timer if running', () => {
     when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_RUNNING)
     when(mockUseRunStartTime).calledWith().mockReturnValue('noon')
@@ -94,6 +133,31 @@ describe('RunTimeControl', () => {
     expect(getByText('Status: Paused')).toBeTruthy()
     expect(getByText('Mock Timer')).toBeTruthy()
     expect(getByRole('button', { name: 'Resume Run' })).toBeTruthy()
+  })
+
+  it('renders a run status and timer if pause-requested', () => {
+    when(mockUseRunStatus)
+      .calledWith()
+      .mockReturnValue(RUN_STATUS_PAUSE_REQUESTED)
+    when(mockUseRunStartTime).calledWith().mockReturnValue('noon')
+
+    const [{ getByRole, getByText }] = render()
+
+    expect(getByText('Status: Pause requested')).toBeTruthy()
+    expect(getByText('Mock Timer')).toBeTruthy()
+    expect(getByRole('button', { name: 'Resume Run' })).toBeTruthy()
+  })
+
+  it('renders a run status and timer if stop-requested', () => {
+    when(mockUseRunStatus)
+      .calledWith()
+      .mockReturnValue(RUN_STATUS_STOP_REQUESTED)
+    when(mockUseRunStartTime).calledWith().mockReturnValue('noon')
+    const [{ getByRole, getByText, queryByText }] = render()
+
+    expect(getByText('Status: Stop requested')).toBeTruthy()
+    expect(queryByText('Mock Timer')).toBeTruthy()
+    expect(getByRole('button', { name: 'Run Again' })).toBeTruthy()
   })
 
   it('renders a run status and timer if stopped', () => {

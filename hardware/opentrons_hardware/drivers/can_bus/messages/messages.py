@@ -13,11 +13,8 @@ MessageDefinition = Union[
     defs.DeviceInfoRequest,
     defs.DeviceInfoResponse,
     defs.StopRequest,
-    defs.GetStatusRequest,
-    defs.GetStatusResponse,
     defs.EnableMotorRequest,
     defs.DisableMotorRequest,
-    defs.MoveRequest,
     defs.SetupRequest,
     defs.WriteToEEPromRequest,
     defs.ReadFromEEPromRequest,
@@ -27,11 +24,13 @@ MessageDefinition = Union[
     defs.GetMoveGroupResponse,
     defs.ExecuteMoveGroupRequest,
     defs.ClearAllMoveGroupsRequest,
-    defs.MoveGroupCompleted,
     defs.MoveCompleted,
     defs.SetMotionConstraints,
     defs.GetMotionConstraintsRequest,
     defs.GetMotionConstraintsResponse,
+    defs.WriteMotorDriverRegister,
+    defs.ReadMotorDriverRequest,
+    defs.ReadMotorDriverResponse,
 ]
 
 

@@ -2,6 +2,12 @@
 from anyio import to_thread
 
 from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control.modules.types import (
+    ModuleModel as LegacyModuleModel,
+    TemperatureModuleModel as LegacyTemperatureModuleModel,
+    MagneticModuleModel as LegacyMagneticModuleModel,
+    ThermocyclerModuleModel as LegacyThermocyclerModuleModel,
+)
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.context.protocol_api.protocol_context import (
     ProtocolContextImplementation as LegacyProtocolContextImplementation,
@@ -14,7 +20,7 @@ from opentrons.protocol_api import (
     InstrumentContext as LegacyPipetteContext,
 )
 from opentrons.protocol_api.labware import Labware as LegacyLabware, Well as LegacyWell
-from opentrons.protocol_api.protocol_context import (
+from opentrons.protocol_api.load_info import (
     InstrumentLoadInfo as LegacyInstrumentLoadInfo,
     LabwareLoadInfo as LegacyLabwareLoadInfo,
     ModuleLoadInfo as LegacyModuleLoadInfo,
@@ -31,7 +37,7 @@ from opentrons.protocols.types import (
 )
 
 from .protocol_source import ProtocolSource
-
+from .legacy_labware_offset_provider import LegacyLabwareOffsetProvider
 
 # The earliest Python Protocol API version ("apiLevel") where the protocol's simulation
 # and execution will be handled by Protocol Engine, rather than the legacy machinery.
@@ -70,6 +76,7 @@ class LegacyContextCreator:
     def __init__(
         self,
         hardware_api: HardwareAPI,
+        labware_offset_provider: LegacyLabwareOffsetProvider,
         use_simulating_implementation: bool,
     ) -> None:
         """Prepare the LegacyContextCreator.
@@ -79,6 +86,7 @@ class LegacyContextCreator:
                 Protocol API v2 contexts will use. Regardless of
                 ``use_simulating_implementation``, this can either be a real hardware
                 API to actually control the robot, or a simulating hardware API.
+            labware_offset_provider: Interface for the context to load labware offsets.
             use_simulating_implementation: Whether the created Protocol API v2 contexts
                 should use a simulating implementation, avoiding some calls to
                 `hardware_api` for performance. See
@@ -86,6 +94,7 @@ class LegacyContextCreator:
         """
         self._hardware_api = hardware_api
         self._use_simulating_implementation = use_simulating_implementation
+        self._labware_offset_provider = labware_offset_provider
 
     def create(
         self,
@@ -95,13 +104,16 @@ class LegacyContextCreator:
         if self._use_simulating_implementation:
             return LegacyProtocolContext(
                 api_version=api_version,
+                labware_offset_provider=self._labware_offset_provider,
                 implementation=LegacyProtocolContextSimulation(
-                    api_version=api_version, hardware=self._hardware_api
+                    api_version=api_version,
+                    hardware=self._hardware_api,
                 ),
             )
         else:
             return LegacyProtocolContext(
                 api_version=api_version,
+                labware_offset_provider=self._labware_offset_provider,
                 implementation=LegacyProtocolContextImplementation(
                     api_version=api_version,
                     hardware=self._hardware_api,
@@ -141,4 +153,8 @@ __all__ = [
     "LegacyLabwareLoadInfo",
     "LegacyInstrumentLoadInfo",
     "LegacyModuleLoadInfo",
+    "LegacyModuleModel",
+    "LegacyMagneticModuleModel",
+    "LegacyTemperatureModuleModel",
+    "LegacyThermocyclerModuleModel",
 ]

@@ -4,17 +4,17 @@ import { HostConfig } from '@opentrons/api-client'
 export const ApiHostContext = React.createContext<HostConfig | null>(null)
 
 export interface ApiHostProviderProps {
-  hostname: string
+  hostname: string | null
   port?: number | null
   children?: React.ReactNode
 }
 
 export function ApiHostProvider(props: ApiHostProviderProps): JSX.Element {
   const { hostname, port = null, children } = props
-  const hostConfig = React.useMemo<HostConfig>(() => ({ hostname, port }), [
-    hostname,
-    port,
-  ])
+  const hostConfig = React.useMemo<HostConfig | null>(
+    () => (hostname !== null ? { hostname, port } : null),
+    [hostname, port]
+  )
 
   return (
     <ApiHostContext.Provider value={hostConfig}>

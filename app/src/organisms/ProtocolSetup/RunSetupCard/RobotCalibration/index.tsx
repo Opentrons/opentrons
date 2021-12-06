@@ -106,23 +106,33 @@ export function RobotCalibration(props: Props): JSX.Element {
                 >
                   {pipetteInfo.pipetteSpecs?.displayName}
                 </Text>
-                {pipetteInfo.tipRacksForPipette.map((tipRackInfo, index) => (
-                  <CalibrationItem
-                    key={index}
-                    calibratedDate={tipRackInfo.lastModifiedDate}
-                    index={index}
-                    title={tipRackInfo.displayName}
-                    button={
-                      <TipLengthCalibration
-                        mount={mount}
-                        robotName={robotName}
-                        hasCalibrated={tipRackInfo.lastModifiedDate !== null}
-                        tipRackDefinition={tipRackInfo.tipRackDef}
-                        isExtendedPipOffset={false}
-                      />
-                    }
-                  />
-                ))}
+                {pipetteInfo.tipRacksForPipette.map((tipRackInfo, index) => {
+                  const pipetteNotAttached =
+                    pipetteInfo.requestedPipetteMatch === 'incompatible'
+                  return (
+                    <CalibrationItem
+                      key={index}
+                      calibratedDate={tipRackInfo.lastModifiedDate}
+                      index={index}
+                      title={tipRackInfo.displayName}
+                      subText={
+                        pipetteNotAttached
+                          ? t('attach_pipette_tip_length_calibration')
+                          : undefined
+                      }
+                      button={
+                        <TipLengthCalibration
+                          mount={mount}
+                          disabled={pipetteNotAttached}
+                          robotName={robotName}
+                          hasCalibrated={tipRackInfo.lastModifiedDate !== null}
+                          tipRackDefinition={tipRackInfo.tipRackDef}
+                          isExtendedPipOffset={false}
+                        />
+                      }
+                    />
+                  )
+                })}
               </div>
             )
           }

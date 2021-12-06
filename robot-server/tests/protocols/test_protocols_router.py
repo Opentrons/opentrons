@@ -14,6 +14,7 @@ from opentrons.protocol_runner.pre_analysis import (
 )
 
 from robot_server.errors import ApiError
+from robot_server.service.json_api import SimpleEmptyResponseModel
 from robot_server.service.task_runner import TaskRunner
 from robot_server.protocols.protocol_models import Metadata, Protocol, ProtocolType
 from robot_server.protocols.analysis_store import AnalysisStore
@@ -313,7 +314,7 @@ async def test_delete_protocol_by_id(
 
     decoy.verify(protocol_store.remove(protocol_id="protocol-id"))
 
-    assert result.data is None
+    assert result == SimpleEmptyResponseModel()
 
 
 async def test_delete_protocol_not_found(

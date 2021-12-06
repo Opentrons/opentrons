@@ -4,7 +4,6 @@ import {
   C_NEAR_WHITE,
   SPACING_2,
   JUSTIFY_CENTER,
-  SPACING_4,
   Flex,
   RobotWorkSpace,
   LabwareRender,
@@ -87,7 +86,6 @@ export const LabwarePositionCheckStepDetail = (
       <Flex
         padding={'0.75rem'}
         justifyContent={JUSTIFY_CENTER}
-        marginTop={SPACING_4}
         boxShadow="1px 1px 1px rgba(0, 0, 0, 0.25)"
         borderRadius="4px"
         backgroundColor={C_NEAR_WHITE}

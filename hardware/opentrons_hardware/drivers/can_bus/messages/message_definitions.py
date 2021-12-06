@@ -45,13 +45,6 @@ class StopRequest:  # noqa: D101
 
 
 @dataclass
-class GetStatusRequest:  # noqa: D101
-    payload: payloads.EmptyPayload
-    payload_type: Type[BinarySerializable] = payloads.EmptyPayload
-    message_id: Literal[MessageId.get_status_request] = MessageId.get_status_request
-
-
-@dataclass
 class EnableMotorRequest:  # noqa: D101
     payload: payloads.EmptyPayload
     payload_type: Type[BinarySerializable] = payloads.EmptyPayload
@@ -65,20 +58,6 @@ class DisableMotorRequest:  # noqa: D101
     message_id: Literal[
         MessageId.disable_motor_request
     ] = MessageId.disable_motor_request
-
-
-@dataclass
-class GetStatusResponse:  # noqa: D101
-    payload: payloads.GetStatusResponsePayload
-    payload_type: Type[BinarySerializable] = payloads.GetStatusResponsePayload
-    message_id: Literal[MessageId.get_status_response] = MessageId.get_status_response
-
-
-@dataclass
-class MoveRequest:  # noqa: D101
-    payload: payloads.MoveRequestPayload
-    payload_type: Type[BinarySerializable] = payloads.MoveRequestPayload
-    message_id: Literal[MessageId.move_request] = MessageId.move_request
 
 
 @dataclass
@@ -136,8 +115,8 @@ class GetMoveGroupResponse:  # noqa: D101
 
 @dataclass
 class ExecuteMoveGroupRequest:  # noqa: D101
-    payload: payloads.MoveGroupRequestPayload
-    payload_type: Type[BinarySerializable] = payloads.MoveGroupRequestPayload
+    payload: payloads.ExecuteMoveGroupRequestPayload
+    payload_type: Type[BinarySerializable] = payloads.ExecuteMoveGroupRequestPayload
     message_id: Literal[
         MessageId.execute_move_group_request
     ] = MessageId.execute_move_group_request
@@ -150,13 +129,6 @@ class ClearAllMoveGroupsRequest:  # noqa: D101
     message_id: Literal[
         MessageId.clear_all_move_groups_request
     ] = MessageId.clear_all_move_groups_request
-
-
-@dataclass
-class MoveGroupCompleted:  # noqa: D101
-    payload: payloads.MoveGroupCompletedPayload
-    payload_type: Type[BinarySerializable] = payloads.MoveGroupCompletedPayload
-    message_id: Literal[MessageId.move_group_completed] = MessageId.move_group_completed
 
 
 @dataclass
@@ -191,3 +163,33 @@ class GetMotionConstraintsResponse:  # noqa: D101
     message_id: Literal[
         MessageId.get_motion_constraints_response
     ] = MessageId.get_motion_constraints_response
+
+
+@dataclass
+class WriteMotorDriverRegister:  # noqa: D101
+    payload: payloads.MotorDriverRegisterDataPayload
+    payload_type: Type[BinarySerializable] = payloads.MotorDriverRegisterDataPayload
+    message_id: Literal[
+        MessageId.write_motor_driver_register_request
+    ] = MessageId.write_motor_driver_register_request
+
+
+@dataclass
+class ReadMotorDriverRequest:  # noqa: D101
+    payload: payloads.MotorDriverRegisterPayload
+    payload_type: Type[BinarySerializable] = payloads.MotorDriverRegisterPayload
+    message_id: Literal[
+        MessageId.read_motor_driver_register_request
+    ] = MessageId.read_motor_driver_register_request
+
+
+@dataclass
+class ReadMotorDriverResponse:  # noqa: D101
+    payload: payloads.ReadMotorDriverRegisterResponsePayload
+    payload_type: Type[
+        BinarySerializable
+    ] = payloads.ReadMotorDriverRegisterResponsePayload
+    message_id: Literal[
+        MessageId.read_motor_driver_register_response
+    ] = MessageId.read_motor_driver_register_response
+

@@ -28,6 +28,7 @@ export const mockPausedRun: RunData = {
     },
   ],
   commands: [],
+  errors: [],
   pipettes: [],
   labware: [],
 }
@@ -55,6 +56,7 @@ export const mockRunningRun: RunData = {
     },
   ],
   commands: [],
+  errors: [],
   pipettes: [],
   labware: [],
 }
@@ -65,6 +67,5 @@ export const mockRunResponse: Run = {
 
 export const mockRunsResponse: Runs = {
   data: [mockRunningRun, mockPausedRun],
-  // TODO(bh, 2021-10-27): flesh out what 'current' looks like once api settles
-  links: { current: '1' },
+  links: { current: { href: 'runs/1', meta: null } },
 }

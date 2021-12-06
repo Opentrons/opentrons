@@ -1,12 +1,13 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styles from './styles.css'
-import { CollapsibleItem, IconName } from '@opentrons/components'
-import { useFeatureFlag } from '../../../../redux/config'
+import { IconName } from '@opentrons/components'
+import { CollapsibleModuleItem } from './CollapsibleModuleItem'
 
 interface Props {
   /** The type of module */
   moduleType?: string | any
+  moduleStatus?: string
   /** Slot number the module is in */
   header?: string
   /** Title for the card */
@@ -26,12 +27,12 @@ const iconNameByModuleType: Record<string, IconName> = {
 }
 
 export function StatusCard(props: Props): JSX.Element {
-  const isNewProtocolRunPanel = useFeatureFlag('preProtocolFlowWithoutRPC')
   const { t } = useTranslation('run_details')
 
-  return isNewProtocolRunPanel ? (
-    <CollapsibleItem
+  return (
+    <CollapsibleModuleItem
       iconName={iconNameByModuleType[props.moduleType]}
+      status={props.moduleStatus}
       className={styles.status_card}
       onCollapseToggle={props.toggleCard}
       header={
@@ -41,18 +42,6 @@ export function StatusCard(props: Props): JSX.Element {
       collapsed={!props.isCardExpanded}
     >
       {props.children}
-    </CollapsibleItem>
-  ) : (
-    <CollapsibleItem
-      className={styles.status_card}
-      onCollapseToggle={props.toggleCard}
-      header={
-        props.header && t('module_slot_number', { slot_number: props.header })
-      }
-      title={props.title}
-      collapsed={!props.isCardExpanded}
-    >
-      {props.children}
-    </CollapsibleItem>
+    </CollapsibleModuleItem>
   )
 }

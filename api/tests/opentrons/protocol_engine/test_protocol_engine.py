@@ -3,10 +3,16 @@ import pytest
 from datetime import datetime
 from decoy import Decoy
 
-from opentrons.types import MountType
+from opentrons.types import DeckSlotName, MountType
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocol_engine import ProtocolEngine, commands
-from opentrons.protocol_engine.types import PipetteName
+from opentrons.protocol_engine.types import (
+    LabwareOffset,
+    LabwareOffsetCreate,
+    LabwareOffsetVector,
+    LabwareOffsetLocation,
+    PipetteName,
+)
 from opentrons.protocol_engine.execution import QueueWorker
 from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.state import StateStore
@@ -14,9 +20,11 @@ from opentrons.protocol_engine.plugins import AbstractPlugin, PluginStarter
 
 from opentrons.protocol_engine.actions import (
     ActionDispatcher,
+    AddLabwareOffsetAction,
     PlayAction,
     PauseAction,
     StopAction,
+    StopErrorDetails,
     QueueCommandAction,
 )
 
@@ -244,15 +252,26 @@ async def test_stop_with_error(
     action_dispatcher: ActionDispatcher,
     queue_worker: QueueWorker,
     hardware_api: HardwareAPI,
+    model_utils: ModelUtils,
     subject: ProtocolEngine,
 ) -> None:
-    """It should be able to stop the engine."""
+    """It should be able to stop the engine with an error."""
     error = RuntimeError("oh no")
+    expected_error_details = StopErrorDetails(
+        error_id="error-id",
+        created_at=datetime(year=2021, month=1, day=1),
+        error=error,
+    )
+
+    decoy.when(model_utils.generate_id()).then_return("error-id")
+    decoy.when(model_utils.get_timestamp()).then_return(
+        datetime(year=2021, month=1, day=1)
+    )
 
     await subject.stop(error=error)
 
     decoy.verify(
-        action_dispatcher.dispatch(StopAction(error=error)),
+        action_dispatcher.dispatch(StopAction(error_details=expected_error_details)),
         await queue_worker.join(),
         await hardware_api.stop(home_after=False),
     )
@@ -320,3 +339,55 @@ def test_add_plugin(
     subject.add_plugin(plugin)
 
     decoy.verify(plugin_starter.start(plugin))
+
+
+def test_add_labware_offset(
+    decoy: Decoy,
+    action_dispatcher: ActionDispatcher,
+    model_utils: ModelUtils,
+    state_store: StateStore,
+    subject: ProtocolEngine,
+) -> None:
+    """It should have the labware offset request resolved and added to state."""
+    request = LabwareOffsetCreate(
+        definitionUri="definition-uri",
+        location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
+        vector=LabwareOffsetVector(x=1, y=2, z=3),
+    )
+
+    id = "labware-offset-id"
+    created_at = datetime(year=2021, month=11, day=15)
+
+    expected_result = LabwareOffset(
+        id=id,
+        createdAt=created_at,
+        definitionUri=request.definitionUri,
+        location=request.location,
+        vector=request.vector,
+    )
+
+    decoy.when(model_utils.generate_id()).then_return(id)
+    decoy.when(model_utils.get_timestamp()).then_return(created_at)
+    decoy.when(
+        state_store.labware.get_labware_offset(labware_offset_id=id)
+    ).then_return(expected_result)
+
+    result = subject.add_labware_offset(
+        request=LabwareOffsetCreate(
+            definitionUri="definition-uri",
+            location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
+            vector=LabwareOffsetVector(x=1, y=2, z=3),
+        )
+    )
+
+    assert result == expected_result
+
+    decoy.verify(
+        action_dispatcher.dispatch(
+            AddLabwareOffsetAction(
+                labware_offset_id=id,
+                created_at=created_at,
+                request=request,
+            )
+        )
+    )

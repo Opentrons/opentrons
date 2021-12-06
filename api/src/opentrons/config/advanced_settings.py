@@ -166,19 +166,20 @@ settings = [
     ),
     SettingDefinition(
         _id="enableHttpProtocolSessions",
-        title="Enable experimental HTTP protocol sessions",
-        description="Do not activate this unless you are a developer. "
-        "Activating this will disable protocol running from the "
-        "Opentrons application.",
+        title="Enable deprecated experimental HTTP protocol upload",
+        description=(
+            "This setting is deprecated and exists only for backwards compatibility."
+            " If you have been using this setting, we recommend you disable it and"
+            " transition to using the standard HTTP API added in version 5."
+        ),
         restart_required=True,
     ),
     SettingDefinition(
-        _id="enableProtocolEngine",
-        title="Enable experimental protocol engine",
+        _id="enableOT3HardwareController",
+        title="Enable experimental OT3 hardware controller",
         description=(
             "Do not enable. This is an Opentrons-internal setting to test "
-            "new protocol execution logic. This feature is not yet complete; "
-            "your protocols will break if you enable this setting."
+            "new hardware."
         ),
         restart_required=True,
     ),
@@ -404,6 +405,26 @@ def _migrate9to10(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate10to11(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 11 of the feature flags file.
+
+    - Removes deprecated enableProtocolEngine option
+    """
+    removals = ["enableProtocolEngine"]
+    newmap = {k: v for k, v in previous.items() if k not in removals}
+    return newmap
+
+
+def _migrate11to12(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 12 of the feature flags file.
+
+    - Adds the enableOT3HardwareController config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["enableOT3HardwareController"] = None
+    return newmap
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -415,6 +436,8 @@ _MIGRATIONS = [
     _migrate7to8,
     _migrate8to9,
     _migrate9to10,
+    _migrate10to11,
+    _migrate11to12,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

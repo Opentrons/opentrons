@@ -17,43 +17,16 @@ import {
   TEXT_TRANSFORM_UPPERCASE,
   SPACING_2,
 } from '@opentrons/components'
+import type { LabwareOffsets } from './hooks/useLabwareOffsets'
 
-const getOffsetDataInfo = (): Array<{
-  location: string
-  labware: string
-  offsetData: { x: number; y: number; z: number }
-}> => [
-  {
-    location: 'Temperature Module',
-    labware: 'Opentrons 96 100mL Tiprack',
-    offsetData: { x: 1.1, y: 2.1, z: 3.1 },
-  },
-  {
-    location: 'Deck Slot 3',
-    labware: 'Opentrons 96 Tip Rack 20µL',
-    offsetData: { x: 0.0, y: -1.2, z: 1.1 },
-  },
-  {
-    location: 'Deck Slot 5',
-    labware: 'Opentrons Mixed Tube Rack',
-    offsetData: { x: 5.1, y: 2.2, z: 3.1 },
-  },
-  {
-    location: 'Deck Slot 6',
-    labware: 'Opentrons Mixed Tube Rack',
-    offsetData: { x: 0.0, y: 0.0, z: 0.0 },
-  },
-  {
-    location: 'Thermocycler',
-    labware: 'Opentrons Mixed Tube Rack',
-    offsetData: { x: 0.0, y: 0.0, z: 0.0 },
-  },
-]
-
-export const LabwareOffsetsSummary = (): JSX.Element | null => {
+interface LabwareOffsetSummary {
+  offsetData: LabwareOffsets
+}
+export const LabwareOffsetsSummary = (
+  props: LabwareOffsetSummary
+): JSX.Element | null => {
+  const { offsetData } = props
   const { t } = useTranslation('labware_position_check')
-  const offsetData = getOffsetDataInfo().map(({ offsetData }) => offsetData)
-
   return (
     <React.Fragment>
       <Flex
@@ -85,7 +58,7 @@ export const LabwareOffsetsSummary = (): JSX.Element | null => {
             >
               {t('labware_offsets_summary_location')}
             </Text>
-            {getOffsetDataInfo().map(({ location }) => {
+            {offsetData.map(({ displayLocation: location }) => {
               return (
                 <Flex
                   key={location}
@@ -110,10 +83,10 @@ export const LabwareOffsetsSummary = (): JSX.Element | null => {
             >
               {t('labware_offsets_summary_labware')}
             </Text>
-            {getOffsetDataInfo().map(({ labware }, index) => {
+            {offsetData.map(({ displayName: labware }, index) => {
               return (
                 <Flex
-                  key={index}
+                  key={`${labware}_${index}`}
                   marginBottom={SPACING_3}
                   css={FONT_BODY_1_DARK}
                 >
@@ -135,42 +108,44 @@ export const LabwareOffsetsSummary = (): JSX.Element | null => {
             >
               {t('labware_offsets_summary_offset')}
             </Text>
-            {offsetData.map(({ x, y, z }, index) => {
-              return x === 0 && y === 0 && z === 0 ? (
-                <Flex
-                  key={index}
-                  marginBottom={SPACING_3}
-                  css={FONT_BODY_1_DARK}
-                >
-                  {t('no_labware_offsets')}
-                </Flex>
-              ) : (
-                <Flex
-                  key={index}
-                  marginBottom={SPACING_3}
-                  css={FONT_BODY_1_DARK}
-                >
-                  <Text as={'span'} marginRight={SPACING_1}>
-                    <strong>X</strong>
-                  </Text>
-                  <Text key={x} as={'span'} marginRight={SPACING_2}>
-                    {x}
-                  </Text>
-                  <Text as={'span'} marginRight={SPACING_1}>
-                    <strong>Y</strong>
-                  </Text>
-                  <Text key={y} as={'span'} marginRight={SPACING_2}>
-                    {y}
-                  </Text>
-                  <Text as={'span'} marginRight={SPACING_1}>
-                    <strong>Z</strong>
-                  </Text>
-                  <Text key={z} as={'span'} marginRight={SPACING_2}>
-                    {z}
-                  </Text>
-                </Flex>
-              )
-            })}
+            {offsetData
+              .map(({ vector }) => vector)
+              .map(({ x, y, z }, index) => {
+                return x === 0 && y === 0 && z === 0 ? (
+                  <Flex
+                    key={index}
+                    marginBottom={SPACING_3}
+                    css={FONT_BODY_1_DARK}
+                  >
+                    {t('no_labware_offsets')}
+                  </Flex>
+                ) : (
+                  <Flex
+                    key={index}
+                    marginBottom={SPACING_3}
+                    css={FONT_BODY_1_DARK}
+                  >
+                    <Text as={'strong'} marginRight={SPACING_1}>
+                      X
+                    </Text>
+                    <Text as={'span'} marginRight={SPACING_2}>
+                      {x.toFixed(2)}
+                    </Text>
+                    <Text as={'strong'} marginRight={SPACING_1}>
+                      Y
+                    </Text>
+                    <Text as={'span'} marginRight={SPACING_2}>
+                      {y.toFixed(2)}
+                    </Text>
+                    <Text as={'strong'} marginRight={SPACING_1}>
+                      Z
+                    </Text>
+                    <Text as={'span'} marginRight={SPACING_2}>
+                      {z.toFixed(2)}
+                    </Text>
+                  </Flex>
+                )
+              })}
           </Flex>
         </Flex>
       </Flex>

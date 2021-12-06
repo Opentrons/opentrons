@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { StaticRouter } from 'react-router-dom'
+import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import {
   renderWithProviders,
   componentPropsMatcher,
@@ -8,6 +9,7 @@ import {
   LabwareRender,
   RobotWorkSpace,
   Module,
+  anyProps,
 } from '@opentrons/components'
 import {
   inferModuleOrientationFromXCoordinate,
@@ -19,6 +21,8 @@ import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fi
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '../../../../../i18n'
+import { useRunStatus } from '../../../../RunTimeControl/hooks'
+import { LabwareOffsetSuccessToast } from '../../../LabwareOffsetSuccessToast'
 import { LabwarePositionCheck } from '../../../LabwarePositionCheck'
 import {
   useModuleRenderInfoById,
@@ -38,6 +42,8 @@ jest.mock('../LabwareInfoOverlay')
 jest.mock('../ExtraAttentionWarning')
 jest.mock('../../../hooks')
 jest.mock('../utils/getModuleTypesThatRequireExtraAttention')
+jest.mock('../../../../RunTimeControl/hooks')
+jest.mock('../../../LabwareOffsetSuccessToast')
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
   return {
@@ -86,6 +92,12 @@ const mockUseModuleRenderInfoById = useModuleRenderInfoById as jest.MockedFuncti
 >
 const mockLabwarePostionCheck = LabwarePositionCheck as jest.MockedFunction<
   typeof LabwarePositionCheck
+>
+const mockUseRunStatus = useRunStatus as jest.MockedFunction<
+  typeof useRunStatus
+>
+const mockLabwareOffsetSuccessToast = LabwareOffsetSuccessToast as jest.MockedFunction<
+  typeof LabwareOffsetSuccessToast
 >
 
 const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
@@ -143,6 +155,9 @@ describe('LabwareSetup', () => {
       .mockImplementation(({ onCloseClick }) => (
         <div onClick={onCloseClick}>mock LabwareOffsetModal </div>
       ))
+    when(mockLabwareOffsetSuccessToast)
+      .calledWith(anyProps())
+      .mockReturnValue(<div>mock Labware Success Toast</div>)
 
     when(mockLabwareRender)
       .mockReturnValue(<div></div>) // this (default) empty div will be returned when LabwareRender isn't called with expected labware definition
@@ -159,7 +174,9 @@ describe('LabwareSetup', () => {
 
     when(mockLabwareInfoOverlay)
       .mockReturnValue(<div></div>) // this (default) empty div will be returned when LabwareInfoOverlay isn't called with expected props
-      .calledWith(componentPropsMatcher({ definition: fixture_tiprack_300_ul }))
+      .calledWith(
+        partialComponentPropsMatcher({ definition: fixture_tiprack_300_ul })
+      )
       .mockReturnValue(
         <div>
           mock labware info overlay of{' '}
@@ -188,6 +205,7 @@ describe('LabwareSetup', () => {
     mockLabwarePostionCheck.mockReturnValue(
       <div>mock Labware Position Check</div>
     )
+    mockUseRunStatus.mockReturnValue(RUN_STATUS_IDLE)
   })
 
   afterEach(() => {
@@ -262,22 +280,28 @@ describe('LabwareSetup', () => {
       .calledWith()
       .mockReturnValue({
         [mockMagneticModule.moduleId]: {
+          moduleId: mockMagneticModule.moduleId,
           x: MOCK_MAGNETIC_MODULE_COORDS[0],
           y: MOCK_MAGNETIC_MODULE_COORDS[1],
           z: MOCK_MAGNETIC_MODULE_COORDS[2],
           moduleDef: mockMagneticModule as any,
           nestedLabwareDef: null,
           nestedLabwareId: null,
+          protocolLoadOrder: 0,
+          attachedModuleMatch: null,
         },
         [mockTCModule.moduleId]: {
+          moduleId: mockTCModule.moduleId,
           x: MOCK_TC_COORDS[0],
           y: MOCK_TC_COORDS[1],
           z: MOCK_TC_COORDS[2],
           moduleDef: mockTCModule,
           nestedLabwareDef: null,
           nestedLabwareId: null,
+          protocolLoadOrder: 1,
+          attachedModuleMatch: null,
         },
-      })
+      } as any)
 
     when(mockModule)
       .calledWith(
@@ -321,6 +345,15 @@ describe('LabwareSetup', () => {
     fireEvent.click(button)
     getByText('mock Labware Position Check')
   })
+  it('should render a disabled button when a run has been started', () => {
+    mockUseRunStatus.mockReturnValue(RUN_STATUS_RUNNING)
+    const { getByRole, queryByText } = render()
+    const button = getByRole('button', {
+      name: 'run labware position check',
+    })
+    fireEvent.click(button)
+    expect(queryByText('mock Labware Position Check')).toBeNull()
+  })
   it('should render the extra attention warning when there are modules/labware that need extra attention', () => {
     when(mockGetModuleTypesThatRequireExtraAttention)
       .calledWith([])
@@ -338,5 +371,23 @@ describe('LabwareSetup', () => {
 
     const { getByText } = render()
     getByText('mock extra attention warning with magnetic module and TC')
+  })
+  it('should render Labware Offset Success toast when LPC is closed', () => {
+    const { getByRole, getByText } = render()
+    expect(screen.queryByText('mock LabwareOffsetSuccessToast')).toBeNull()
+    const button = getByRole('button', {
+      name: 'run labware position check',
+    })
+    fireEvent.click(button)
+    const LPC = getByText('mock Labware Position Check')
+    fireEvent.click(LPC)
+    when(mockLabwarePostionCheck)
+      .calledWith(
+        componentPropsMatcher({
+          onLabwarePositionCheckComplete: expect.anything(),
+        })
+      )
+      .mockReturnValue(<div>mock LabwarePositionCheck</div>)
+    expect(screen.queryByText('mock LabwarePositionCheck')).toBeNull()
   })
 })

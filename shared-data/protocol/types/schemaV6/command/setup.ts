@@ -31,9 +31,9 @@ export type SetupCommand =
   | LoadModuleCommand
   | LoadLiquidCommand
 
-type LabwareLocation = { slotName: string } | { moduleId: string }
+export type LabwareLocation = { slotName: string } | { moduleId: string }
 
-interface ModuleLocation {
+export interface ModuleLocation {
   slotName: string
 }
 interface LoadPipetteParams {

@@ -393,10 +393,20 @@ export interface CompletedProtocolAnalysis {
   commands: Command[]
   errors: string[]
 }
+
+export interface ResourceFile {
+  name: string
+  role: string
+}
 export interface ProtocolResource {
   id: string
   createdAt: string
   protocolType: 'json' | 'python'
   metadata: ProtocolMetadata
   analyses: PendingProtocolAnalysis[] | CompletedProtocolAnalysis[]
+  files: ResourceFile[]
 }
+
+export type MotorAxis = Array<
+  'x' | 'y' | 'leftZ' | 'rightZ' | 'leftPlunger' | 'rightPlunger'
+>

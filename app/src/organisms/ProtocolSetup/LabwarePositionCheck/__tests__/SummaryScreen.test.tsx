@@ -1,5 +1,7 @@
 import * as React from 'react'
 import { when } from 'jest-when'
+import { act } from 'react-dom/test-utils'
+import { fireEvent } from '@testing-library/dom'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
@@ -7,13 +9,15 @@ import { SectionList } from '../SectionList'
 import { DeckMap } from '../DeckMap'
 import { SummaryScreen } from '../SummaryScreen'
 import { LabwareOffsetsSummary } from '../LabwareOffsetsSummary'
-import { useIntroInfo } from '../hooks'
+import { useIntroInfo, useLabwareOffsets } from '../hooks'
 import { Section } from '../types'
+import { useLPCSuccessToast } from '../../hooks'
 
+jest.mock('../../../RunDetails/hooks')
+jest.mock('../../hooks')
 jest.mock('../SectionList')
 jest.mock('../hooks')
 jest.mock('../DeckMap')
-jest.mock('../../../RunDetails/hooks')
 jest.mock('../LabwareOffsetsSummary')
 
 const mockSectionList = SectionList as jest.MockedFunction<typeof SectionList>
@@ -23,11 +27,16 @@ const mockUseIntroInfo = useIntroInfo as jest.MockedFunction<
 const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
   typeof useProtocolDetails
 >
-
 const mockDeckmap = DeckMap as jest.MockedFunction<typeof DeckMap>
 
 const mockLabwareOffsetsSummary = LabwareOffsetsSummary as jest.MockedFunction<
   typeof LabwareOffsetsSummary
+>
+const mockUseLabwareOffsets = useLabwareOffsets as jest.MockedFunction<
+  typeof useLabwareOffsets
+>
+const mockUseLPCSuccessToast = useLPCSuccessToast as jest.MockedFunction<
+  typeof useLPCSuccessToast
 >
 
 const MOCK_SECTIONS = ['PRIMARY_PIPETTE_TIPRACKS' as Section]
@@ -38,27 +47,31 @@ const LABWARE_DEF = {
   ordering: [['A1', 'A2']],
 }
 
-const render = () => {
-  return renderWithProviders(<SummaryScreen />, {
+const render = (props: React.ComponentProps<typeof SummaryScreen>) => {
+  return renderWithProviders(<SummaryScreen {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
 describe('SummaryScreen', () => {
+  let props: React.ComponentProps<typeof SummaryScreen>
+
   beforeEach(() => {
+    props = {
+      savePositionCommandData: { someLabwareIf: ['commandId1', 'commandId2'] },
+      onCloseClick: jest.fn(),
+    }
     mockSectionList.mockReturnValue(<div>Mock SectionList</div>)
     mockDeckmap.mockReturnValue(<div>Mock DeckMap</div>)
     mockLabwareOffsetsSummary.mockReturnValue(
       <div>Mock Labware Offsets Summary </div>
     )
+    mockUseLabwareOffsets.mockResolvedValue([])
 
     when(mockUseIntroInfo).calledWith().mockReturnValue({
-      primaryTipRackSlot: '1',
-      primaryTipRackName: 'Opentrons 96 Filter Tip Rack 200 µL',
       primaryPipetteMount: 'left',
       secondaryPipetteMount: '',
-      numberOfTips: 1,
-      firstStepLabwareSlot: '2',
+      firstTiprackSlot: '2',
       sections: MOCK_SECTIONS,
     })
 
@@ -84,16 +97,32 @@ describe('SummaryScreen', () => {
           },
         },
       } as any)
+    when(mockUseLPCSuccessToast)
+      .calledWith()
+      .mockReturnValue({ setShowLPCSuccessToast: () => null })
   })
   it('renders Summary Screen with all components and header', () => {
-    const { getByText } = render()
+    const { getByText } = render(props)
     getByText('Mock SectionList')
     getByText('Mock DeckMap')
     getByText('Mock Labware Offsets Summary')
     getByText('Labware Position Check Complete')
   })
-  it('renders button and clicks it', () => {
-    const { getByRole } = render()
-    getByRole('button', { name: 'Close and apply labware offset data' })
+  it('renders apply offset button and clicks it', () => {
+    const mockSetShowLPCSuccessToast = jest.fn()
+    when(mockUseLPCSuccessToast)
+      .calledWith()
+      .mockReturnValue({ setShowLPCSuccessToast: mockSetShowLPCSuccessToast })
+    const { getByRole } = render(props)
+    expect(props.onCloseClick).not.toHaveBeenCalled()
+    expect(mockSetShowLPCSuccessToast).not.toHaveBeenCalled()
+    const button = getByRole('button', {
+      name: 'Close and apply labware offset data',
+    })
+    act(() => {
+      fireEvent.click(button)
+    })
+    expect(props.onCloseClick).toHaveBeenCalled()
+    expect(mockSetShowLPCSuccessToast).toHaveBeenCalled()
   })
 })

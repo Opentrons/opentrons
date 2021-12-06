@@ -1,17 +1,16 @@
 import * as React from 'react'
 import {
-  ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
   FONT_WEIGHT_SEMIBOLD,
   JUSTIFY_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
   PrimaryBtn,
   SPACING_3,
   SPACING_4,
   Text,
   TEXT_TRANSFORM_UPPERCASE,
   C_BLUE,
+  ALIGN_FLEX_START,
 } from '@opentrons/components'
 import { LabwarePositionCheckStepDetail } from './LabwarePositionCheckStepDetail'
 import { SectionList } from './SectionList'
@@ -35,7 +34,7 @@ export const GenericStepScreen = (
   const [sectionIndex] = React.useState<number>(0)
   if (introInfo == null) return null
   const { sections, primaryPipetteMount, secondaryPipetteMount } = introInfo
-  const labwareIdsToHighlight = labwareIdsBySection[sections[sectionIndex]]
+  const labwareIdsToHighlight = labwareIdsBySection[props.selectedStep.section]
   const currentSectionIndex = sections.findIndex(
     section => section === props.selectedStep.section
   )
@@ -52,12 +51,8 @@ export const GenericStepScreen = (
       >
         {props.title}
       </Text>
-      <Flex
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        alignItems={ALIGN_CENTER}
-        margin={SPACING_3}
-      >
-        <Flex flexDirection={DIRECTION_COLUMN}>
+      <Flex alignItems={ALIGN_FLEX_START} padding={SPACING_3}>
+        <Flex flexDirection={DIRECTION_COLUMN} paddingTop={SPACING_3}>
           <Flex marginLeft={SPACING_4}>
             <SectionList
               primaryPipetteMount={primaryPipetteMount}

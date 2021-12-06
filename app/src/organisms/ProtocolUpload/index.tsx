@@ -7,7 +7,7 @@ import {
   useConditionalConfirm,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Page } from '../../atoms/Page'
 import { UploadInput } from './UploadInput'
 import { ProtocolSetup } from '../ProtocolSetup'
@@ -15,12 +15,15 @@ import { useCurrentProtocolRun } from './hooks/useCurrentProtocolRun'
 import { useCloseCurrentRun } from './hooks/useCloseCurrentRun'
 import { loadProtocol, closeProtocol } from '../../redux/protocol/actions'
 import { ingestProtocolFile } from '../../redux/protocol/utils'
+import { getConnectedRobotName } from '../../redux/robot/selectors'
 
 import { ConfirmExitProtocolUploadModal } from './ConfirmExitProtocolUploadModal'
 
 import { useLogger } from '../../logger'
 import type { ErrorObject } from 'ajv'
-import type { Dispatch } from '../../redux/types'
+import type { Dispatch, State } from '../../redux/types'
+
+import styles from './styles.css'
 
 const VALIDATION_ERROR_T_MAP: { [errorKey: string]: string } = {
   INVALID_FILE_TYPE: 'invalid_file_type',
@@ -37,6 +40,7 @@ export function ProtocolUpload(): JSX.Element {
   } = useCurrentProtocolRun()
   const hasCurrentRun = runRecord != null && protocolRecord != null
   const closeProtocolRun = useCloseCurrentRun()
+  const robotName = useSelector((state: State) => getConnectedRobotName(state))
 
   const logger = useLogger(__filename)
   const [uploadError, setUploadError] = React.useState<
@@ -85,9 +89,12 @@ export function ProtocolUpload(): JSX.Element {
           children: t('shared:close'),
           iconName: 'close' as const,
         },
+        className: styles.reverse_titlebar_items,
       }
     : {
-        title: t('upload_and_simulate'),
+        title: (
+          <Text>{t('upload_and_simulate', { robot_name: robotName })}</Text>
+        ),
       }
 
   return (

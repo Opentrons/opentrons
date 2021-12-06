@@ -27,9 +27,9 @@ import {
 
 export interface ModuleInfoProps {
   moduleModel: ModuleModel
-  usbPort?: number | null
-  hubPort?: number | null
   isAttached: boolean
+  usbPort: number | null
+  hubPort: number | null
 }
 
 export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {

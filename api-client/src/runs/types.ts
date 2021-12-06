@@ -1,4 +1,5 @@
-import { Command as FullCommand } from '@opentrons/shared-data'
+import type { Command as FullCommand } from '@opentrons/shared-data'
+import type { LabwareLocation } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
 export const RUN_STATUS_IDLE: 'idle' = 'idle'
 export const RUN_STATUS_RUNNING: 'running' = 'running'
@@ -25,28 +26,29 @@ export interface RunData {
   status: RunStatus
   actions: RunAction[]
   commands: RunCommandSummary[]
-  // TODO(bh, 11-12-2021): types for pipettes, labware
+  errors: Error[]
   pipettes: unknown[]
   labware: unknown[]
   protocolId?: string
   labwareOffsets?: LabwareOffset[]
 }
 
-interface VectorOffset {
+export interface VectorOffset {
   x: number
   y: number
   z: number
 }
 export interface LabwareOffset {
   id: string
+  createdAt: string
   definitionUri: string
-  location: Location
-  offset: VectorOffset
+  location: LabwareLocation
+  vector: VectorOffset
 }
 
 interface ResourceLink {
   href: string
-  meta?: Partial<{ [key: string]: string | null | undefined }>
+  meta?: Partial<{ [key: string]: string | null | undefined }> | null
 }
 
 type ResourceLinks = Record<string, ResourceLink | string | null | undefined>
@@ -81,16 +83,23 @@ export interface CreateRunActionData {
 }
 export interface RunCommandSummary {
   id: string
-  commandType: string
+  commandType: FullCommand['commandType']
   status: 'queued' | 'running' | 'succeeded' | 'failed'
+  result?: any
 }
 
-export interface Command {
+export interface LabwareOffsetCreateData {
+  definitionUri: string
+  location: LabwareLocation
+  vector: VectorOffset
+}
+
+export interface CommandData {
   data: RunCommandSummary
   links?: ResourceLinks
 }
 
-export interface Commands {
+export interface CommandsData {
   data: RunCommandSummary[]
   links?: ResourceLinks
 }
@@ -98,4 +107,11 @@ export interface Commands {
 export interface CommandDetail {
   data: FullCommand
   links: ResourceLinks | null
+}
+
+export interface Error {
+  id: string
+  errorType: string
+  createdAt: string
+  detail: string
 }

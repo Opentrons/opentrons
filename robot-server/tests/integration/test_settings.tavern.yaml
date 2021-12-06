@@ -56,14 +56,14 @@ stages:
             value: !anything
           - id: enableHttpProtocolSessions
             old_id: Null
-            title: Enable experimental HTTP protocol sessions
-            description: !re_search 'Activating this will disable protocol running from the Opentrons application'
+            title: Enable deprecated experimental HTTP protocol upload
+            description: !re_search 'This setting is deprecated'
             restart_required: true
             value: !anything
-          - id: enableProtocolEngine
+          - id: enableOT3HardwareController
             old_id: Null
-            title: Enable experimental protocol engine
-            description: !re_search 'Opentrons-internal setting to test new protocol execution logic'
+            title: Enable experimental OT3 hardware controller
+            description: !re_search 'Opentrons-internal setting to test new hardware'
             restart_required: true
             value: !anything
         links: !anydict
@@ -85,7 +85,6 @@ marks:
         - enableDoorSafetySwitch
         - disableFastProtocolUpload
         - enableHttpProtocolSessions
-        - enableProtocolEngine
   - parametrize:
       key: value
       vals:
