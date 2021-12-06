@@ -36,12 +36,10 @@ import { CommandList } from './CommandList'
 import type { Dispatch } from '../../redux/types'
 
 import styles from '../ProtocolUpload/styles.css'
-import { useCurrentProtocolRun } from '../ProtocolUpload/hooks'
 
 export function RunDetails(): JSX.Element | null {
   const { t } = useTranslation(['run_details', 'shared'])
-  const { displayName } = useProtocolDetails()
-  const { protocolRecord } = useCurrentProtocolRun()
+  const { displayName, protocolData } = useProtocolDetails()
   const runStatus = useRunStatus()
   const startTime = useRunStartTime()
   const dispatch = useDispatch<Dispatch>()
@@ -77,7 +75,7 @@ export function RunDetails(): JSX.Element | null {
     cancel: cancelCloseExit,
   } = useConditionalConfirm(handleCloseProtocol, true)
 
-  if (protocolRecord?.data === undefined) {
+  if (protocolData === null) {
     return <Redirect to="/upload" />
   }
 
