@@ -90,30 +90,37 @@ export function RunDetails(): JSX.Element | null {
     </PrimaryBtn>
   )
 
-  const titleBarProps =
+  let titleBarProps
+
+  if (
     adjustedRunStatus === RUN_STATUS_RUNNING ||
     adjustedRunStatus === RUN_STATUS_PAUSED ||
     adjustedRunStatus === RUN_STATUS_PAUSE_REQUESTED
-      ? {
-          title: t('protocol_title', { protocol_name: displayName }),
-          rightNode: cancelRunButton,
-        }
-      : adjustedRunStatus === RUN_STATUS_SUCCEEDED ||
-        adjustedRunStatus === RUN_STATUS_STOPPED ||
-        adjustedRunStatus === RUN_STATUS_FAILED
-      ? {
-          title: t('protocol_title', { protocol_name: displayName }),
-          back: {
-            onClick: confirmCloseExit,
-            title: t('shared:close'),
-            children: t('shared:close'),
-            iconName: 'close' as const,
-          },
-          className: styles.reverse_titlebar_items,
-        }
-      : {
-          title: t('protocol_title', { protocol_name: displayName }),
-        }
+  ) {
+    titleBarProps = {
+      title: t('protocol_title', { protocol_name: displayName }),
+      rightNode: cancelRunButton,
+    }
+  } else if (
+    adjustedRunStatus === RUN_STATUS_SUCCEEDED ||
+    adjustedRunStatus === RUN_STATUS_STOPPED ||
+    adjustedRunStatus === RUN_STATUS_FAILED
+  ) {
+    titleBarProps = {
+      title: t('protocol_title', { protocol_name: displayName }),
+      back: {
+        onClick: confirmCloseExit,
+        title: t('shared:close'),
+        children: t('shared:close'),
+        iconName: 'close' as const,
+      },
+      className: styles.reverse_titlebar_items,
+    }
+  } else {
+    titleBarProps = {
+      title: t('protocol_title', { protocol_name: displayName }),
+    }
+  }
 
   return (
     <>

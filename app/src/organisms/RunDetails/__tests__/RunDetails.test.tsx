@@ -1,7 +1,12 @@
 import * as React from 'react'
 import '@testing-library/jest-dom'
 import { fireEvent } from '@testing-library/dom'
-import { RUN_STATUS_RUNNING, RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
+import {
+  RUN_STATUS_RUNNING,
+  RUN_STATUS_SUCCEEDED,
+  RUN_STATUS_FAILED,
+  RUN_STATUS_STOPPED,
+} from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
 import { when } from 'jest-when'
 import { RunDetails } from '..'
@@ -73,8 +78,34 @@ describe('RunDetails', () => {
     expect(getByText('yes, cancel run')).toBeTruthy()
   })
 
-  it('renders the protocol close button, button is clickable, and confirm close protocol modal is rendered', () => {
+  it('renders the protocol close button, button is clickable, and confirm close protocol modal is rendered when status is succeeded', () => {
     when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_SUCCEEDED)
+    const { getByRole, getByText } = render()
+    const button = getByRole('button', { name: 'close' })
+    fireEvent.click(button)
+    expect(button).toBeTruthy()
+    expect(
+      getByText('Are you sure you want to close this protocol?')
+    ).toBeTruthy()
+    expect(getByText('No, go back')).toBeTruthy()
+    expect(getByText('Yes, close now')).toBeTruthy()
+  })
+
+  it('renders the protocol close button, button is clickable, and confirm close protocol modal is rendered when status is failed', () => {
+    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_FAILED)
+    const { getByRole, getByText } = render()
+    const button = getByRole('button', { name: 'close' })
+    fireEvent.click(button)
+    expect(button).toBeTruthy()
+    expect(
+      getByText('Are you sure you want to close this protocol?')
+    ).toBeTruthy()
+    expect(getByText('No, go back')).toBeTruthy()
+    expect(getByText('Yes, close now')).toBeTruthy()
+  })
+
+  it('renders the protocol close button, button is clickable, and confirm close protocol modal is rendered when status is stopped', () => {
+    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_STOPPED)
     const { getByRole, getByText } = render()
     const button = getByRole('button', { name: 'close' })
     fireEvent.click(button)
