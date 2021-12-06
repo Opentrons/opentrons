@@ -50,6 +50,11 @@ class FinishAction:
 
 
 @dataclass(frozen=True)
+class HardwareStoppedAction:
+    """An action dispatched after hardware has successfully been stopped."""
+
+
+@dataclass(frozen=True)
 class QueueCommandAction:
     """Add a command request to the queue."""
 
@@ -91,6 +96,7 @@ Action = Union[
     PauseAction,
     StopAction,
     FinishAction,
+    HardwareStoppedAction,
     QueueCommandAction,
     UpdateCommandAction,
     FailCommandAction,

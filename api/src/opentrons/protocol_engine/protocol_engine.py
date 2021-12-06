@@ -17,6 +17,7 @@ from .actions import (
     FinishErrorDetails,
     QueueCommandAction,
     AddLabwareOffsetAction,
+    HardwareStoppedAction,
 )
 
 
@@ -136,6 +137,7 @@ class ProtocolEngine:
         self._queue_worker.cancel()
         await self._hardware_api.halt()
         await self._hardware_api.stop(home_after=False)
+        self._action_dispatcher.dispatch(HardwareStoppedAction())
 
     async def wait_until_complete(self) -> None:
         """Wait until there are no more commands to execute.
@@ -176,6 +178,7 @@ class ProtocolEngine:
         finally:
             await self._hardware_api.stop(home_after=False)
 
+        self._action_dispatcher.dispatch(HardwareStoppedAction())
         self._plugin_starter.stop()
 
     def add_labware_offset(self, request: LabwareOffsetCreate) -> LabwareOffset:

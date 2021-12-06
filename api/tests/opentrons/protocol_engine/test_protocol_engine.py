@@ -27,6 +27,7 @@ from opentrons.protocol_engine.actions import (
     FinishAction,
     FinishErrorDetails,
     QueueCommandAction,
+    HardwareStoppedAction,
 )
 
 
@@ -244,6 +245,7 @@ async def test_finish(
         action_dispatcher.dispatch(FinishAction()),
         await queue_worker.join(),
         await hardware_api.stop(home_after=False),
+        action_dispatcher.dispatch(HardwareStoppedAction()),
         plugin_starter.stop(),
     )
 
@@ -275,6 +277,7 @@ async def test_finish_with_error(
         action_dispatcher.dispatch(FinishAction(error_details=expected_error_details)),
         await queue_worker.join(),
         await hardware_api.stop(home_after=False),
+        action_dispatcher.dispatch(HardwareStoppedAction()),
     )
 
 
@@ -326,6 +329,7 @@ async def test_stop(
         queue_worker.cancel(),
         await hardware_api.halt(),
         await hardware_api.stop(home_after=False),
+        action_dispatcher.dispatch(HardwareStoppedAction()),
     )
 
 

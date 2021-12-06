@@ -19,6 +19,7 @@ from opentrons.protocol_engine.actions import (
     FinishAction,
     FinishErrorDetails,
     StopAction,
+    HardwareStoppedAction,
 )
 
 from .command_fixtures import (
@@ -36,6 +37,7 @@ def test_initial_state() -> None:
     assert subject.state == CommandState(
         is_running=True,
         is_gracefully_finished=False,
+        is_hardware_stopped=False,
         stop_requested=False,
         commands_by_id=OrderedDict(),
         errors_by_id={},
@@ -205,6 +207,7 @@ def test_command_store_handles_pause_action() -> None:
     assert subject.state == CommandState(
         is_running=False,
         is_gracefully_finished=False,
+        is_hardware_stopped=False,
         stop_requested=False,
         commands_by_id=OrderedDict(),
         errors_by_id={},
@@ -220,6 +223,7 @@ def test_command_store_handles_play_action() -> None:
     assert subject.state == CommandState(
         is_running=True,
         is_gracefully_finished=False,
+        is_hardware_stopped=False,
         stop_requested=False,
         commands_by_id=OrderedDict(),
         errors_by_id={},
@@ -236,6 +240,7 @@ def test_command_store_handles_finish_action() -> None:
     assert subject.state == CommandState(
         is_running=False,
         is_gracefully_finished=True,
+        is_hardware_stopped=False,
         stop_requested=True,
         commands_by_id=OrderedDict(),
         errors_by_id={},
@@ -252,6 +257,7 @@ def test_command_store_handles_stop_action() -> None:
     assert subject.state == CommandState(
         is_running=False,
         is_gracefully_finished=False,
+        is_hardware_stopped=False,
         stop_requested=True,
         commands_by_id=OrderedDict(),
         errors_by_id={},
@@ -267,6 +273,7 @@ def test_command_store_cannot_restart_after_stop_requested() -> None:
     assert subject.state == CommandState(
         is_running=False,
         is_gracefully_finished=True,
+        is_hardware_stopped=False,
         stop_requested=True,
         commands_by_id=OrderedDict(),
         errors_by_id={},
@@ -287,6 +294,7 @@ def test_command_store_ignores_known_finish_error() -> None:
     assert subject.state == CommandState(
         is_running=False,
         is_gracefully_finished=True,
+        is_hardware_stopped=False,
         stop_requested=True,
         commands_by_id=OrderedDict(),
         errors_by_id={},
@@ -307,6 +315,7 @@ def test_command_store_saves_unknown_finish_error() -> None:
     assert subject.state == CommandState(
         is_running=False,
         is_gracefully_finished=True,
+        is_hardware_stopped=False,
         stop_requested=True,
         commands_by_id=OrderedDict(),
         errors_by_id={
@@ -331,6 +340,7 @@ def test_command_store_ignores_stop_after_graceful_finish() -> None:
     assert subject.state == CommandState(
         is_running=False,
         is_gracefully_finished=True,
+        is_hardware_stopped=False,
         stop_requested=True,
         commands_by_id=OrderedDict(),
         errors_by_id={},
@@ -348,6 +358,7 @@ def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
     assert subject.state == CommandState(
         is_running=False,
         is_gracefully_finished=False,
+        is_hardware_stopped=False,
         stop_requested=True,
         commands_by_id=OrderedDict(),
         errors_by_id={},
@@ -377,6 +388,7 @@ def test_command_store_handles_command_failed() -> None:
     assert subject.state == CommandState(
         is_running=True,
         is_gracefully_finished=False,
+        is_hardware_stopped=False,
         stop_requested=False,
         commands_by_id=OrderedDict([("command-id", expected_failed_command)]),
         errors_by_id={
@@ -387,4 +399,19 @@ def test_command_store_handles_command_failed() -> None:
                 detail="oh no",
             )
         },
+    )
+
+
+def test_handles_hardware_stopped() -> None:
+    """It should mark the hardware as stopped on HardwareStoppedAction."""
+    subject = CommandStore()
+    subject.handle_action(HardwareStoppedAction())
+
+    assert subject.state == CommandState(
+        is_running=False,
+        is_gracefully_finished=False,
+        is_hardware_stopped=True,
+        stop_requested=True,
+        commands_by_id=OrderedDict(),
+        errors_by_id={},
     )

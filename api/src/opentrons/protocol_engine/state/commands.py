@@ -13,6 +13,7 @@ from ..actions import (
     PauseAction,
     StopAction,
     FinishAction,
+    HardwareStoppedAction,
 )
 
 from ..commands import Command, CommandStatus
@@ -32,6 +33,7 @@ class CommandState:
 
     is_running: bool
     is_gracefully_finished: bool
+    is_hardware_stopped: bool
     stop_requested: bool
     # TODO(mc, 2021-06-16): OrderedDict is mutable. Switch to Sequence + Mapping
     commands_by_id: OrderedDict[str, Command]
@@ -48,6 +50,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
         self._state = CommandState(
             is_running=True,
             is_gracefully_finished=False,
+            is_hardware_stopped=False,
             stop_requested=False,
             commands_by_id=OrderedDict(),
             errors_by_id={},
@@ -150,6 +153,14 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     stop_requested=True,
                     errors_by_id=errors_by_id,
                 )
+
+        elif isinstance(action, HardwareStoppedAction):
+            self._state = replace(
+                self._state,
+                is_running=False,
+                is_hardware_stopped=True,
+                stop_requested=True,
+            )
 
 
 class CommandView(HasState[CommandState]):
@@ -278,13 +289,18 @@ class CommandView(HasState[CommandState]):
         all_statuses = [c.status for c in all_commands]
 
         if self._state.is_gracefully_finished:
-            if any(all_errors):
+            if not self._state.is_hardware_stopped:
+                return EngineStatus.RUNNING
+            elif any(all_errors):
                 return EngineStatus.FAILED
             else:
                 return EngineStatus.SUCCEEDED
 
         elif self._state.stop_requested:
-            return EngineStatus.STOPPED
+            if not self._state.is_hardware_stopped:
+                return EngineStatus.STOP_REQUESTED
+            else:
+                return EngineStatus.STOPPED
 
         elif self._state.is_running:
             any_running = any(s == CommandStatus.RUNNING for s in all_statuses)

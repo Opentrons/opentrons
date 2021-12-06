@@ -20,6 +20,7 @@ from .command_fixtures import (
 def get_command_view(
     is_running: bool = False,
     is_gracefully_finished: bool = False,
+    is_hardware_stopped: bool = False,
     stop_requested: bool = False,
     commands_by_id: Sequence[Tuple[str, cmd.Command]] = (),
     errors_by_id: Optional[Mapping[str, errors.ErrorOccurrence]] = None,
@@ -28,6 +29,7 @@ def get_command_view(
     state = CommandState(
         is_running=is_running,
         is_gracefully_finished=is_gracefully_finished,
+        is_hardware_stopped=is_hardware_stopped,
         stop_requested=stop_requested,
         commands_by_id=OrderedDict(commands_by_id),
         errors_by_id=errors_by_id or {},
@@ -387,6 +389,16 @@ get_status_specs: List[GetStatusSpec] = [
     GetStatusSpec(
         subject=get_command_view(
             is_running=False,
+            is_gracefully_finished=True,
+            is_hardware_stopped=False,
+            stop_requested=True,
+            commands_by_id=[],
+        ),
+        expected_status=EngineStatus.RUNNING,
+    ),
+    GetStatusSpec(
+        subject=get_command_view(
+            is_running=False,
             is_gracefully_finished=False,
             stop_requested=False,
             commands_by_id=[("command-id", create_running_command())],
@@ -435,6 +447,7 @@ get_status_specs: List[GetStatusSpec] = [
         subject=get_command_view(
             is_running=False,
             is_gracefully_finished=True,
+            is_hardware_stopped=True,
             stop_requested=True,
             errors_by_id={
                 "error-id": errors.ErrorOccurrence(
@@ -451,6 +464,7 @@ get_status_specs: List[GetStatusSpec] = [
         subject=get_command_view(
             is_running=False,
             is_gracefully_finished=True,
+            is_hardware_stopped=True,
             stop_requested=True,
             commands_by_id=[],
         ),
@@ -460,6 +474,7 @@ get_status_specs: List[GetStatusSpec] = [
         subject=get_command_view(
             is_running=False,
             is_gracefully_finished=True,
+            is_hardware_stopped=True,
             stop_requested=True,
             commands_by_id=[("command-id", create_completed_command())],
         ),
@@ -469,20 +484,19 @@ get_status_specs: List[GetStatusSpec] = [
         subject=get_command_view(
             is_running=False,
             is_gracefully_finished=False,
+            is_hardware_stopped=False,
             stop_requested=True,
-            commands_by_id=[("command-id", create_running_command())],
+            commands_by_id=[],
         ),
-        expected_status=EngineStatus.STOPPED,
+        expected_status=EngineStatus.STOP_REQUESTED,
     ),
     GetStatusSpec(
         subject=get_command_view(
             is_running=False,
             is_gracefully_finished=False,
+            is_hardware_stopped=True,
             stop_requested=True,
-            commands_by_id=[
-                ("command-id", create_completed_command()),
-                ("command-id", create_pending_command()),
-            ],
+            commands_by_id=[],
         ),
         expected_status=EngineStatus.STOPPED,
     ),
