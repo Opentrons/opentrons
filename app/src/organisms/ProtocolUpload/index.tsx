@@ -38,7 +38,7 @@ export function ProtocolUpload(): JSX.Element {
     runRecord,
     protocolRecord,
   } = useCurrentProtocolRun()
-  const {closeCurrentRun, isClosingCurrentRun} = useCloseCurrentRun()
+  const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   const hasCurrentRun = runRecord != null && protocolRecord != null
   const robotName = useSelector((state: State) => getConnectedRobotName(state))
 
@@ -78,24 +78,25 @@ export function ProtocolUpload(): JSX.Element {
     cancel: cancelExit,
   } = useConditionalConfirm(handleCloseProtocol, true)
 
-  const titleBarProps = !isClosingCurrentRun && hasCurrentRun
-    ? {
-        title: t('protocol_title', {
-          protocol_name: protocolRecord?.data?.metadata?.protocolName ?? '',
-        }),
-        back: {
-          onClick: confirmExit,
-          title: t('shared:close'),
-          children: t('shared:close'),
-          iconName: 'close' as const,
-        },
-        className: styles.reverse_titlebar_items,
-      }
-    : {
-        title: (
-          <Text>{t('upload_and_simulate', { robot_name: robotName })}</Text>
-        ),
-      }
+  const titleBarProps =
+    !isClosingCurrentRun && hasCurrentRun
+      ? {
+          title: t('protocol_title', {
+            protocol_name: protocolRecord?.data?.metadata?.protocolName ?? '',
+          }),
+          back: {
+            onClick: confirmExit,
+            title: t('shared:close'),
+            children: t('shared:close'),
+            iconName: 'close' as const,
+          },
+          className: styles.reverse_titlebar_items,
+        }
+      : {
+          title: (
+            <Text>{t('upload_and_simulate', { robot_name: robotName })}</Text>
+          ),
+        }
 
   return (
     <>

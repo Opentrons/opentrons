@@ -94,7 +94,10 @@ describe('ProtocolUpload', () => {
       .mockReturnValue({} as any)
     when(mockUseCloseProtocolRun)
       .calledWith()
-      .mockReturnValue({closeCurrentRun: jest.fn(), isClosingCurrentRun: false})
+      .mockReturnValue({
+        closeCurrentRun: jest.fn(),
+        isClosingCurrentRun: false,
+      })
   })
 
   afterEach(() => {
@@ -155,7 +158,10 @@ describe('ProtocolUpload', () => {
     const mockCloseCurrentRun = jest.fn()
     when(mockUseCloseProtocolRun)
       .calledWith()
-      .mockReturnValue({closeCurrentRun: mockCloseCurrentRun, isClosingCurrentRun: false})
+      .mockReturnValue({
+        closeCurrentRun: mockCloseCurrentRun,
+        isClosingCurrentRun: false,
+      })
 
     const [{ getByRole, getByText }, store] = render()
     fireEvent.click(getByRole('button', { name: 'close' }))
@@ -192,7 +198,10 @@ describe('ProtocolUpload', () => {
     const mockCloseCurrentRun = jest.fn()
     when(mockUseCloseProtocolRun)
       .calledWith()
-      .mockReturnValue({closeCurrentRun: mockCloseCurrentRun, isClosingCurrentRun: true})
+      .mockReturnValue({
+        closeCurrentRun: mockCloseCurrentRun,
+        isClosingCurrentRun: true,
+      })
 
     const [{ getByText }] = render()
     getByText('Open a protocol to run on robotName')
