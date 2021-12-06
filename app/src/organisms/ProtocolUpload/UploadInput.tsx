@@ -27,7 +27,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   FONT_SIZE_CAPTION,
   FONT_BODY_1_DARK,
-  SecondaryBtn,
+  AppSecondaryBtn,
   FONT_SIZE_BODY_1,
   SPACING_2,
   JUSTIFY_START,
@@ -279,13 +279,12 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
               </Flex>
             </Flex>
             <Flex>
-              <SecondaryBtn
+              <AppSecondaryBtn
                 onClick={cloneMostRecentRun}
-                color={C_BLUE}
                 id={'UploadInput_runAgainButton'}
               >
                 {t('run_again')}
-              </SecondaryBtn>
+              </AppSecondaryBtn>
             </Flex>
           </Flex>
           <Divider />
