@@ -69,6 +69,8 @@ describe('UploadInput', () => {
     }
     mockOffsets = [
       {
+        id: 'someId',
+        createdAt: 'someTimestamp',
         definitionUri: 'mockUri',
         location: { slotName: '3' },
         vector: { x: 5, y: 5, z: 5 },

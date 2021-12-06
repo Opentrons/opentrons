@@ -480,6 +480,35 @@
           },
 
           {
+            "description": "Home",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": { "enum": ["home"] },
+              "params": {
+                "type": "object",
+                "properties": {
+                  "axes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "x",
+                        "y",
+                        "leftZ",
+                        "rightZ",
+                        "leftPlunger",
+                        "rightPlunger"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+
+          {
             "description": "Delay Protocol Execution",
             "type": "object",
             "required": ["id", "commandType", "params"],

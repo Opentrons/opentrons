@@ -2,7 +2,6 @@ import { useQueryClient } from 'react-query'
 import {
   useHost,
   useRunQuery,
-  useStopRunMutation,
   useCreateRunMutation,
 } from '@opentrons/react-api-client'
 
@@ -19,14 +18,12 @@ export function useCloneRun(runId: string | null): () => void {
         )
     },
   })
-  const { stopRun: stopThenCloneRun } = useStopRunMutation({
-    onSuccess: _data => {
-      if (runRecord != null) {
-        const { protocolId, labwareOffsets } = runRecord.data
-        createRun({ protocolId, labwareOffsets })
-      }
-    },
-  })
+  const cloneRun = (): void => {
+    if (runRecord != null) {
+      const { protocolId, labwareOffsets } = runRecord.data
+      createRun({ protocolId, labwareOffsets })
+    }
+  }
 
-  return () => runId != null && stopThenCloneRun(runId)
+  return cloneRun
 }

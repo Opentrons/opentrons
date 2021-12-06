@@ -37,6 +37,8 @@ describe('LabwareOffsetSuccessToast', () => {
     props = { onCloseClick: jest.fn() }
     mockOffsets = [
       {
+        id: 'someId',
+        createdAt: 'someTimestamp',
         definitionUri: 'some_def_uri',
         location: { slotName: '4' },
         vector: { x: 1, y: 1, z: 1 },

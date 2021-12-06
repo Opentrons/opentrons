@@ -58,7 +58,7 @@ class CanMessenger:
             )
         )
         data = message.payload.serialize()
-        log.debug(
+        log.info(
             f"Sending -->\n\tarbitration_id: {arbitration_id},\n\t"
             f"payload: {message.payload}"
         )
@@ -101,7 +101,7 @@ class CanMessenger:
             if message_definition:
                 try:
                     build = message_definition.payload_type.build(message.data)
-                    log.debug(
+                    log.info(
                         f"Received <--\n\tarbitration_id: {message.arbitration_id},\n\t"
                         f"payload: {build}"
                     )

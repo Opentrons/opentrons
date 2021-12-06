@@ -282,6 +282,7 @@ class API(HardwareAPILike):
         checked_loop = use_or_initialize_loop(loop)
         checked_config = config or robot_configs.load()
         backend = await OT3Controller.build(checked_config)
+        await backend.setup_motors()
         return cls(backend, loop=checked_loop, config=checked_config)
 
     def __repr__(self):

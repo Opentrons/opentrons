@@ -65,6 +65,7 @@ describe('CommandList', () => {
         // @ts-expect-error not a full match of RunData type
         data: {
           commands: [],
+          actions: [],
         },
       },
     })
@@ -105,7 +106,7 @@ describe('CommandList', () => {
       ).length
     ).toEqual(17)
   })
-  it('renders only the first step if the current run info is present and has not updated', () => {
+  it('renders only anticipated steps if the current run info is present and has not updated', () => {
     // @ts-expect-error not a full match of RunData type
     mockUseCurrentProtocolRun.mockReturnValue(fixtureCommandSummary)
     const { getAllByText } = render()
@@ -113,7 +114,7 @@ describe('CommandList', () => {
       getAllByText(
         'Picking up tip from A1 of Opentrons 96 Tip Rack 300 µL on 1'
       ).length
-    ).toEqual(1)
+    ).toEqual(17)
   })
   it('renders the protocol failed banner', () => {
     mockUseRunStatus.mockReturnValue('failed')
