@@ -76,7 +76,7 @@ async def test_cleanup_gets_run_error(decoy: Decoy) -> None:
 
 
 async def test_cleanup_does_not_run_if_cancelled(decoy: Decoy) -> None:
-    """It should not run "cleanup" func is task is cancelled."""
+    """It should not run cleanup func if task is cancelled."""
     run_func = decoy.mock(is_async=True)
     cleanup_func = decoy.mock(is_async=True)
     error = asyncio.CancelledError()
