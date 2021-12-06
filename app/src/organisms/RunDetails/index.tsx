@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
+import { Redirect } from 'react-router-dom'
 import {
   RunStatus,
   RUN_STATUS_IDLE,
@@ -35,10 +36,12 @@ import { CommandList } from './CommandList'
 import type { Dispatch } from '../../redux/types'
 
 import styles from '../ProtocolUpload/styles.css'
+import { useCurrentProtocolRun } from '../ProtocolUpload/hooks'
 
 export function RunDetails(): JSX.Element | null {
   const { t } = useTranslation(['run_details', 'shared'])
   const { displayName } = useProtocolDetails()
+  const { protocolRecord } = useCurrentProtocolRun()
   const runStatus = useRunStatus()
   const startTime = useRunStartTime()
   const dispatch = useDispatch<Dispatch>()
@@ -73,6 +76,10 @@ export function RunDetails(): JSX.Element | null {
     confirm: confirmCloseExit,
     cancel: cancelCloseExit,
   } = useConditionalConfirm(handleCloseProtocol, true)
+
+  if (protocolRecord?.data === undefined) {
+    return <Redirect to="/upload" />
+  }
 
   const cancelRunButton = (
     <PrimaryBtn
