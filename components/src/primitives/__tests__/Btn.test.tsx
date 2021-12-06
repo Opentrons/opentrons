@@ -160,23 +160,13 @@ describe('Btn primitive component', () => {
       expect(wrapper).toHaveStyleRule('background-color', '#006fff', {
         modifier: ':focus',
       })
-      expect(wrapper).toHaveStyleRule('font-weight', '800', {
-        modifier: ':focus',
-      })
-
       // hover
       expect(wrapper).toHaveStyleRule('background-color', '#006fff', {
-        modifier: ':focus',
-      })
-      expect(wrapper).toHaveStyleRule('font-weight', '800', {
         modifier: ':focus',
       })
 
       // active
       expect(wrapper).toHaveStyleRule('background-color', '#004aaa', {
-        modifier: ':active',
-      })
-      expect(wrapper).toHaveStyleRule('font-weight', '800', {
         modifier: ':active',
       })
 
@@ -205,23 +195,14 @@ describe('Btn primitive component', () => {
       expect(wrapper).toHaveStyleRule('color', '#006fff', {
         modifier: ':focus',
       })
-      expect(wrapper).toHaveStyleRule('font-weight', '800', {
-        modifier: ':focus',
-      })
 
       // hover
       expect(wrapper).toHaveStyleRule('color', '#006fff', {
         modifier: ':focus',
       })
-      expect(wrapper).toHaveStyleRule('font-weight', '800', {
-        modifier: ':focus',
-      })
 
       // active
       expect(wrapper).toHaveStyleRule('color', '#004aaa', {
-        modifier: ':active',
-      })
-      expect(wrapper).toHaveStyleRule('font-weight', '800', {
         modifier: ':active',
       })
 
@@ -250,23 +231,14 @@ describe('Btn primitive component', () => {
       expect(wrapper).toHaveStyleRule('background-color', '#ac0505', {
         modifier: ':focus',
       })
-      expect(wrapper).toHaveStyleRule('font-weight', '800', {
-        modifier: ':focus',
-      })
 
       // hover
       expect(wrapper).toHaveStyleRule('background-color', '#ac0505', {
         modifier: ':focus',
       })
-      expect(wrapper).toHaveStyleRule('font-weight', '800', {
-        modifier: ':focus',
-      })
 
       // active
       expect(wrapper).toHaveStyleRule('background-color', '#ffc0c0', {
-        modifier: ':active',
-      })
-      expect(wrapper).toHaveStyleRule('font-weight', '800', {
         modifier: ':active',
       })
 
@@ -295,23 +267,14 @@ describe('Btn primitive component', () => {
       expect(wrapper).toHaveStyleRule('color', '#ac0505', {
         modifier: ':focus',
       })
-      expect(wrapper).toHaveStyleRule('font-weight', '800', {
-        modifier: ':focus',
-      })
 
       // hover
       expect(wrapper).toHaveStyleRule('color', '#ac0505', {
         modifier: ':focus',
       })
-      expect(wrapper).toHaveStyleRule('font-weight', '800', {
-        modifier: ':focus',
-      })
 
       // active
       expect(wrapper).toHaveStyleRule('color', '#ffc0c0', {
-        modifier: ':active',
-      })
-      expect(wrapper).toHaveStyleRule('font-weight', '800', {
         modifier: ':active',
       })
 

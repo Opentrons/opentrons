@@ -123,17 +123,14 @@ export const SecondaryBtn: BtnComponent = styled(Btn)`
 export const AppPrimaryBtn: BtnComponent = styled(PrimaryBtn)`
   background-color: ${Styles.C_BLUE};
   color: ${Styles.C_WHITE};
-  font-weight: ${Styles.FONT_WEIGHT_SEMIBOLD};
 
   &:hover,
   &:focus {
     background-color: ${Styles.C_BLUE};
-    font-weight: ${Styles.FONT_WEIGHT_BOLD};
     box-shadow: 0px 3px 6px 0px rgba(0, 0, 0, 0.23);
   }
 
   &:active {
-    font-weight: ${Styles.FONT_WEIGHT_BOLD};
     background-color: #004aaa;
     box-shadow: none;
   }
@@ -141,6 +138,7 @@ export const AppPrimaryBtn: BtnComponent = styled(PrimaryBtn)`
   &:disabled,
   &.disabled {
     background-color: ${Styles.C_FONT_DISABLED};
+    color: ${Styles.C_WHITE};
     box-shadow: none;
   }
 
@@ -155,11 +153,9 @@ export const AppPrimaryBtn: BtnComponent = styled(PrimaryBtn)`
 export const AppSecondaryBtn: BtnComponent = styled(SecondaryBtn)`
   background-color: ${Styles.C_WHITE};
   color: ${Styles.C_BLUE};
-  font-weight: ${Styles.FONT_WEIGHT_SEMIBOLD};
 
   &:hover,
   &:focus {
-    font-weight: ${Styles.FONT_WEIGHT_BOLD};
     border-width: '2px';
     background-color: ${Styles.C_WHITE};
     color: ${Styles.C_BLUE};
@@ -167,7 +163,6 @@ export const AppSecondaryBtn: BtnComponent = styled(SecondaryBtn)`
   }
 
   &:active {
-    font-weight: ${Styles.FONT_WEIGHT_BOLD};
     border-width: '2px';
     background-color: ${Styles.C_WHITE};
     color: ${Styles.C_BLUE};
@@ -177,7 +172,6 @@ export const AppSecondaryBtn: BtnComponent = styled(SecondaryBtn)`
 
   &:disabled,
   &.disabled {
-    font-weight: ${Styles.FONT_WEIGHT_BOLD};
     border-width: '2px';
     background-color: ${Styles.C_WHITE};
     color: ${Styles.C_FONT_DISABLED};
