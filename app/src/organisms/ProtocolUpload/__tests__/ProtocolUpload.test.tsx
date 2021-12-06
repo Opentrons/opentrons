@@ -92,6 +92,9 @@ describe('ProtocolUpload', () => {
     when(mockUseProtocolDetails)
       .calledWith()
       .mockReturnValue({} as any)
+    when(mockUseCloseProtocolRun)
+      .calledWith()
+      .mockReturnValue({closeCurrentRun: jest.fn(), isClosingCurrentRun: false})
   })
 
   afterEach(() => {
@@ -191,7 +194,7 @@ describe('ProtocolUpload', () => {
       .calledWith()
       .mockReturnValue({closeCurrentRun: mockCloseCurrentRun, isClosingCurrentRun: true})
 
-    const [{getByText }] = render()
+    const [{ getByText }] = render()
     getByText('Open a protocol to run on robotName')
   })
 })

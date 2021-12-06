@@ -38,8 +38,8 @@ export function ProtocolUpload(): JSX.Element {
     runRecord,
     protocolRecord,
   } = useCurrentProtocolRun()
-  const hasCurrentRun = runRecord != null && protocolRecord != null
   const {closeCurrentRun, isClosingCurrentRun} = useCloseCurrentRun()
+  const hasCurrentRun = runRecord != null && protocolRecord != null
   const robotName = useSelector((state: State) => getConnectedRobotName(state))
 
   const logger = useLogger(__filename)
@@ -78,7 +78,7 @@ export function ProtocolUpload(): JSX.Element {
     cancel: cancelExit,
   } = useConditionalConfirm(handleCloseProtocol, true)
 
-  const titleBarProps = hasCurrentRun
+  const titleBarProps = !isClosingCurrentRun && hasCurrentRun
     ? {
         title: t('protocol_title', {
           protocol_name: protocolRecord?.data?.metadata?.protocolName ?? '',
@@ -121,7 +121,7 @@ export function ProtocolUpload(): JSX.Element {
           width="100%"
           backgroundColor={C_NEAR_WHITE}
         >
-          {!isClosingCurrentRun && runRecord != null && protocolRecord != null ? (
+          {!isClosingCurrentRun && hasCurrentRun ? (
             <ProtocolSetup />
           ) : (
             <UploadInput onUpload={handleUpload} />

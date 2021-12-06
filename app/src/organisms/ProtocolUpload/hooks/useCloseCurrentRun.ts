@@ -38,7 +38,7 @@ export function useCloseCurrentRun(): {
 
   const closeCurrentRun = (
     options: UseDismissCurrentRunMutationOptions = {}
-  ) => {
+  ): void => {
     if (currentRunId != null) {
       const status = runRecord?.data.status
       if (isStoppedState(status as RunStatus)) {
