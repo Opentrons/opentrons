@@ -100,7 +100,7 @@ class MoveCompletedPayload(MoveGroupResponsePayload):
     current_position: utils.UInt32Field
     ack_id: utils.UInt8Field
 
-      
+
 @dataclass
 class MotionConstraintsPayload(utils.BinarySerializable):
     """The min and max velocity and acceleration of a motion system."""
@@ -116,13 +116,14 @@ class MotionConstraintsResponsePayload(MotionConstraintsPayload):
     """The min and max velocity and acceleration of a motion system."""
 
     node_id: utils.UInt8Field
-      
-      
+
+
 @dataclass
 class MotorDriverRegisterPayload(utils.BinarySerializable):
     """Read motor driver register request payload."""
+
     reg_addr: utils.UInt8Field
-      
+
 
 @dataclass
 class MotorDriverRegisterDataPayload(MotorDriverRegisterPayload):

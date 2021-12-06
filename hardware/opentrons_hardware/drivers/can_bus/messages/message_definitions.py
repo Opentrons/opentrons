@@ -192,4 +192,3 @@ class ReadMotorDriverResponse:  # noqa: D101
     message_id: Literal[
         MessageId.read_motor_driver_register_response
     ] = MessageId.read_motor_driver_register_response
-
