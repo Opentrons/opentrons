@@ -29,7 +29,7 @@ exports[`modals AlertModal renders correctly 1`] = `
       >
         <svg
           aria-hidden="true"
-          className="sc-fzozJi c0 alert_modal_icon"
+          className="sc-fznyAO c0 alert_modal_icon"
           fill="currentColor"
           version="1.1"
           viewBox="0 0 24 24"
@@ -189,7 +189,7 @@ exports[`modals ModalPage renders correctly 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="sc-fzozJi c1 icon"
+        className="sc-fznyAO c1 icon"
         fill="currentColor"
         version="1.1"
         viewBox="0 0 24 24"
@@ -256,7 +256,7 @@ exports[`modals SpinnerModalPage renders correctly 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="sc-fzozJi c0 icon"
+        className="sc-fznyAO c0 icon"
         fill="currentColor"
         version="1.1"
         viewBox="0 0 24 24"
@@ -296,7 +296,7 @@ exports[`modals SpinnerModalPage renders correctly 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="sc-fzozJi c0 spinner_modal_icon spin"
+        className="sc-fznyAO c0 spinner_modal_icon spin"
         fill="currentColor"
         version="1.1"
         viewBox="0 0 512 512"
