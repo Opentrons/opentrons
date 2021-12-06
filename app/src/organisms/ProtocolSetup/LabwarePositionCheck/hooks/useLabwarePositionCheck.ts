@@ -22,8 +22,9 @@ import { sendModuleCommand } from '../../../../redux/modules'
 import { getConnectedRobotName } from '../../../../redux/robot/selectors'
 import { getAttachedModulesForConnectedRobot } from '../../../../redux/modules/selectors'
 import { getLabwareDefinitionUri } from '../../utils/getLabwareDefinitionUri'
-import { useSteps } from './useSteps'
 import { getModuleInitialLoadInfo } from '../../utils/getModuleInitialLoadInfo'
+import { getLabwareOffsetLocation } from '../../utils/getLabwareOffsetLocation'
+import { useSteps } from './useSteps'
 import type {
   HostConfig,
   RunCommandSummary,
@@ -441,13 +442,18 @@ export function useLabwarePositionCheck(
           createCommand({
             runId: currentRun?.data?.id as string,
             command: createCommandData(savePositionCommand),
-          }).then(response => {
-            const commandId = response.data.id
-            addSavePositionCommandData(
-              commandId,
-              currentCommand.params.labwareId
-            )
           })
+            .then(response => {
+              const commandId = response.data.id
+              addSavePositionCommandData(
+                commandId,
+                currentCommand.params.labwareId
+              )
+            })
+            .catch((e: Error) => {
+              console.error(`error saving position: ${e.message}`)
+              setError(e)
+            })
         }
         setCurrentCommandIndex(currentCommandIndex + 1)
       })
@@ -471,7 +477,11 @@ export function useLabwarePositionCheck(
             labwareId,
             protocolData?.labware
           ),
-          location: getLabwareLocation(labwareId, protocolData?.commands ?? []),
+          location: getLabwareOffsetLocation(
+            labwareId,
+            protocolData?.commands ?? [],
+            protocolData?.modules ?? {}
+          ),
           vector: IDENTITY_VECTOR,
         }
         return [...acc, identityOffset]
