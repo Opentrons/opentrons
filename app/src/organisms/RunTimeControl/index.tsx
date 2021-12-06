@@ -14,14 +14,13 @@ import {
   Flex,
   Icon,
   IconName,
-  PrimaryBtn,
+  AppPrimaryBtn,
   Text,
   Tooltip,
   useHoverTooltip,
   ALIGN_CENTER,
   ALIGN_STRETCH,
   BORDER_RADIUS_1,
-  C_BLUE,
   DIRECTION_COLUMN,
   DISPLAY_FLEX,
   FONT_BODY_1_DARK_SEMIBOLD,
@@ -105,10 +104,9 @@ export function RunTimeControl(): JSX.Element | null {
           completedAt={completedAt}
         />
       ) : null}
-      <PrimaryBtn
+      <AppPrimaryBtn
         onClick={handleButtonClick}
         alignSelf={ALIGN_STRETCH}
-        backgroundColor={C_BLUE}
         borderRadius={BORDER_RADIUS_1}
         paddingTop={SPACING_2}
         paddingBottom={SPACING_2}
@@ -122,7 +120,7 @@ export function RunTimeControl(): JSX.Element | null {
           <Icon name={buttonIconName} size={SIZE_1} marginRight={SPACING_2} />
         ) : null}
         <Text fontSize={FONT_SIZE_DEFAULT}>{buttonText}</Text>
-      </PrimaryBtn>
+      </AppPrimaryBtn>
       {disableRunCta && (
         <Tooltip {...tooltipProps}>{t('run_cta_disabled')}</Tooltip>
       )}

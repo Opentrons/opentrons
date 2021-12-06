@@ -8,11 +8,7 @@ import {
   RUN_STATUS_PAUSE_REQUESTED,
 } from '@opentrons/api-client'
 import {
-  PrimaryBtn,
-  BORDER_WIDTH_DEFAULT,
-  C_ERROR_DARK,
-  C_WHITE,
-  FONT_WEIGHT_SEMIBOLD,
+  AppAlertPrimaryBtn,
   LINE_HEIGHT_SOLID,
   SPACING_2,
   SPACING_3,
@@ -51,19 +47,15 @@ export function RunDetails(): JSX.Element | null {
   } = useConditionalConfirm(cancelRunAndExit, true)
 
   const cancelRunButton = (
-    <PrimaryBtn
+    <AppAlertPrimaryBtn
       onClick={cancelRunAndExit}
-      backgroundColor={C_WHITE}
-      color={C_ERROR_DARK}
-      borderWidth={BORDER_WIDTH_DEFAULT}
       lineHeight={LINE_HEIGHT_SOLID}
-      fontWeight={FONT_WEIGHT_SEMIBOLD}
       marginX={SPACING_3}
       paddingRight={SPACING_2}
       paddingLeft={SPACING_2}
     >
       {t('cancel_run')}
-    </PrimaryBtn>
+    </AppAlertPrimaryBtn>
   )
 
   const titleBarProps =
