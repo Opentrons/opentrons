@@ -20,7 +20,7 @@ async def protocol_engine(hardware: HardwareAPI) -> AsyncIterable[ProtocolEngine
     engine = await create_protocol_engine(hardware_api=hardware)
     engine.play()
     yield engine
-    await engine.stop()
+    await engine.finish()
 
 
 async def test_creates_protocol_context(protocol_engine: ProtocolEngine) -> None:

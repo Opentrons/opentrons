@@ -12,6 +12,7 @@ from ..actions import (
     PlayAction,
     PauseAction,
     StopAction,
+    FinishAction,
 )
 
 from ..commands import Command, CommandStatus
@@ -30,6 +31,7 @@ class CommandState:
     """State of all protocol engine command resources."""
 
     is_running: bool
+    is_gracefully_finished: bool
     stop_requested: bool
     # TODO(mc, 2021-06-16): OrderedDict is mutable. Switch to Sequence + Mapping
     commands_by_id: OrderedDict[str, Command]
@@ -45,12 +47,13 @@ class CommandStore(HasState[CommandState], HandlesActions):
         """Initialize a CommandStore and its state."""
         self._state = CommandState(
             is_running=True,
+            is_gracefully_finished=False,
             stop_requested=False,
             commands_by_id=OrderedDict(),
             errors_by_id={},
         )
 
-    def handle_action(self, action: Action) -> None:
+    def handle_action(self, action: Action) -> None:  # noqa: C901
         """Modify state in reaction to an action."""
         errors_by_id: Mapping[str, ErrorOccurrence]
 
@@ -110,32 +113,43 @@ class CommandStore(HasState[CommandState], HandlesActions):
             self._state = replace(self._state, is_running=False)
 
         elif isinstance(action, StopAction):
-            # any `ProtocolEngineError`'s will be captured by `FailCommandAction`,
-            # so only capture unknown errors here
-            if action.error_details and not isinstance(
-                action.error_details.error,
-                ProtocolEngineError,
-            ):
-                errors_by_id = dict(self._state.errors_by_id)
-                error_id = action.error_details.error_id
-                created_at = action.error_details.created_at
-                error = action.error_details.error
-
-                errors_by_id[error_id] = ErrorOccurrence(
-                    id=error_id,
-                    createdAt=created_at,
-                    errorType=type(error).__name__,
-                    detail=str(error),
+            if not self._state.stop_requested:
+                self._state = replace(
+                    self._state,
+                    is_running=False,
+                    is_gracefully_finished=False,
+                    stop_requested=True,
                 )
-            else:
-                errors_by_id = self._state.errors_by_id
 
-            self._state = replace(
-                self._state,
-                is_running=False,
-                stop_requested=True,
-                errors_by_id=errors_by_id,
-            )
+        elif isinstance(action, FinishAction):
+            if not self._state.stop_requested:
+                # any `ProtocolEngineError`'s will be captured by `FailCommandAction`,
+                # so only capture unknown errors here
+                if action.error_details and not isinstance(
+                    action.error_details.error,
+                    ProtocolEngineError,
+                ):
+                    errors_by_id = dict(self._state.errors_by_id)
+                    error_id = action.error_details.error_id
+                    created_at = action.error_details.created_at
+                    error = action.error_details.error
+
+                    errors_by_id[error_id] = ErrorOccurrence(
+                        id=error_id,
+                        createdAt=created_at,
+                        errorType=type(error).__name__,
+                        detail=str(error),
+                    )
+                else:
+                    errors_by_id = self._state.errors_by_id
+
+                self._state = replace(
+                    self._state,
+                    is_running=False,
+                    is_gracefully_finished=True,
+                    stop_requested=True,
+                    errors_by_id=errors_by_id,
+                )
 
 
 class CommandView(HasState[CommandState]):
@@ -263,18 +277,14 @@ class CommandView(HasState[CommandState]):
         all_errors = self._state.errors_by_id.values()
         all_statuses = [c.status for c in all_commands]
 
-        if self._state.stop_requested:
+        if self._state.is_gracefully_finished:
             if any(all_errors):
                 return EngineStatus.FAILED
-
-            if all(s == CommandStatus.SUCCEEDED for s in all_statuses):
+            else:
                 return EngineStatus.SUCCEEDED
 
-            elif any(s == CommandStatus.RUNNING for s in all_statuses):
-                return EngineStatus.STOP_REQUESTED
-
-            else:
-                return EngineStatus.STOPPED
+        elif self._state.stop_requested:
+            return EngineStatus.STOPPED
 
         elif self._state.is_running:
             any_running = any(s == CommandStatus.RUNNING for s in all_statuses)
@@ -287,8 +297,4 @@ class CommandView(HasState[CommandState]):
                 return EngineStatus.IDLE
 
         else:
-            if any(s == CommandStatus.RUNNING for s in all_statuses):
-                return EngineStatus.PAUSE_REQUESTED
-
-            else:
-                return EngineStatus.PAUSED
+            return EngineStatus.PAUSED

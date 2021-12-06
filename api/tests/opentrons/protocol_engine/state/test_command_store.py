@@ -16,8 +16,9 @@ from opentrons.protocol_engine.actions import (
     FailCommandAction,
     PlayAction,
     PauseAction,
+    FinishAction,
+    FinishErrorDetails,
     StopAction,
-    StopErrorDetails,
 )
 
 from .command_fixtures import (
@@ -34,6 +35,7 @@ def test_initial_state() -> None:
 
     assert subject.state == CommandState(
         is_running=True,
+        is_gracefully_finished=False,
         stop_requested=False,
         commands_by_id=OrderedDict(),
         errors_by_id={},
@@ -202,6 +204,7 @@ def test_command_store_handles_pause_action() -> None:
 
     assert subject.state == CommandState(
         is_running=False,
+        is_gracefully_finished=False,
         stop_requested=False,
         commands_by_id=OrderedDict(),
         errors_by_id={},
@@ -216,14 +219,31 @@ def test_command_store_handles_play_action() -> None:
 
     assert subject.state == CommandState(
         is_running=True,
+        is_gracefully_finished=False,
         stop_requested=False,
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
 
 
+def test_command_store_handles_finish_action() -> None:
+    """It should clear the running flag and set the done flag on FinishAction."""
+    subject = CommandStore()
+
+    subject.handle_action(PlayAction())
+    subject.handle_action(FinishAction())
+
+    assert subject.state == CommandState(
+        is_running=False,
+        is_gracefully_finished=True,
+        stop_requested=True,
+        commands_by_id=OrderedDict(),
+        errors_by_id={},
+    )
+
+
 def test_command_store_handles_stop_action() -> None:
-    """It should clear the running flag and set the done flag on stop."""
+    """It should mark the engine as non-gracefully stopped on StopAction."""
     subject = CommandStore()
 
     subject.handle_action(PlayAction())
@@ -231,58 +251,62 @@ def test_command_store_handles_stop_action() -> None:
 
     assert subject.state == CommandState(
         is_running=False,
+        is_gracefully_finished=False,
         stop_requested=True,
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
 
 
-def test_command_store_cannot_restart_after_stop() -> None:
+def test_command_store_cannot_restart_after_stop_requested() -> None:
     """It should reject a play action after a stop action."""
     subject = CommandStore()
-    subject.handle_action(StopAction())
+    subject.handle_action(FinishAction())
     subject.handle_action(PlayAction())
 
     assert subject.state == CommandState(
         is_running=False,
+        is_gracefully_finished=True,
         stop_requested=True,
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
 
 
-def test_command_store_ignores_known_stop_error() -> None:
+def test_command_store_ignores_known_finish_error() -> None:
     """It not store a ProtocolEngineError that comes in with the stop action."""
     subject = CommandStore()
-    error_details = StopErrorDetails(
+    error_details = FinishErrorDetails(
         error=errors.ProtocolEngineError("oh no"),
         error_id="error-id",
         created_at=datetime(year=2021, month=1, day=1),
     )
 
-    subject.handle_action(StopAction(error_details=error_details))
+    subject.handle_action(FinishAction(error_details=error_details))
 
     assert subject.state == CommandState(
         is_running=False,
+        is_gracefully_finished=True,
         stop_requested=True,
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
 
 
-def test_command_store_saves_unknown_stop_error() -> None:
+def test_command_store_saves_unknown_finish_error() -> None:
     """It not store a ProtocolEngineError that comes in with the stop action."""
     subject = CommandStore()
 
-    error_details = StopErrorDetails(
+    error_details = FinishErrorDetails(
         error=RuntimeError("oh no"),
         error_id="error-id",
         created_at=datetime(year=2021, month=1, day=1),
     )
-    subject.handle_action(StopAction(error_details=error_details))
+    subject.handle_action(FinishAction(error_details=error_details))
 
     assert subject.state == CommandState(
         is_running=False,
+        is_gracefully_finished=True,
         stop_requested=True,
         commands_by_id=OrderedDict(),
         errors_by_id={
@@ -293,6 +317,40 @@ def test_command_store_saves_unknown_stop_error() -> None:
                 detail="oh no",
             )
         },
+    )
+
+
+def test_command_store_ignores_stop_after_graceful_finish() -> None:
+    """It should no-op on stop if already gracefully finished."""
+    subject = CommandStore()
+
+    subject.handle_action(PlayAction())
+    subject.handle_action(FinishAction())
+    subject.handle_action(StopAction())
+
+    assert subject.state == CommandState(
+        is_running=False,
+        is_gracefully_finished=True,
+        stop_requested=True,
+        commands_by_id=OrderedDict(),
+        errors_by_id={},
+    )
+
+
+def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
+    """It should no-op on finish if already ungracefully stopped."""
+    subject = CommandStore()
+
+    subject.handle_action(PlayAction())
+    subject.handle_action(StopAction())
+    subject.handle_action(FinishAction())
+
+    assert subject.state == CommandState(
+        is_running=False,
+        is_gracefully_finished=False,
+        stop_requested=True,
+        commands_by_id=OrderedDict(),
+        errors_by_id={},
     )
 
 
@@ -318,6 +376,7 @@ def test_command_store_handles_command_failed() -> None:
 
     assert subject.state == CommandState(
         is_running=True,
+        is_gracefully_finished=False,
         stop_requested=False,
         commands_by_id=OrderedDict([("command-id", expected_failed_command)]),
         errors_by_id={
