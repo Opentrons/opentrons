@@ -5,6 +5,10 @@ import {
   Btn,
   PrimaryBtn,
   SecondaryBtn,
+  AppPrimaryBtn,
+  AppSecondaryBtn,
+  AppAlertSecondaryBtn,
+  AppAlertPrimaryBtn,
   LightSecondaryBtn,
   TertiaryBtn,
   BUTTON_TYPE_SUBMIT,
@@ -133,6 +137,186 @@ describe('Btn primitive component', () => {
         modifier: ':disabled',
       })
       expect(wrapper).toHaveStyleRule('color', '#9b9b9b', {
+        modifier: ':disabled',
+      })
+    })
+
+    it('should render an app primary button variant', () => {
+      const wrapper = shallow(<AppPrimaryBtn />)
+
+      expect(wrapper).toHaveStyleRule('background-color', '#006fff')
+      expect(wrapper).toHaveStyleRule('border-radius', '2px')
+      expect(wrapper).toHaveStyleRule('color', '#ffffff')
+      expect(wrapper).toHaveStyleRule('font-size', '0.875rem')
+      expect(wrapper).toHaveStyleRule('font-weight', '600')
+      expect(wrapper).toHaveStyleRule('line-height', '1.4')
+      expect(wrapper).toHaveStyleRule('padding-left', '2rem')
+      expect(wrapper).toHaveStyleRule('padding-right', '2rem')
+      expect(wrapper).toHaveStyleRule('padding-top', '0.5rem')
+      expect(wrapper).toHaveStyleRule('padding-bottom', '0.5rem')
+      expect(wrapper).toHaveStyleRule('text-transform', 'uppercase')
+
+      // focus
+      expect(wrapper).toHaveStyleRule('background-color', '#006fff', {
+        modifier: ':focus',
+      })
+      expect(wrapper).toHaveStyleRule('font-weight', '800', {
+        modifier: ':focus',
+      })
+
+      // hover
+      expect(wrapper).toHaveStyleRule('background-color', '#006fff', {
+        modifier: ':focus',
+      })
+      expect(wrapper).toHaveStyleRule('font-weight', '800', {
+        modifier: ':focus',
+      })
+
+      // active
+      expect(wrapper).toHaveStyleRule('background-color', '#004aaa', {
+        modifier: ':active',
+      })
+      expect(wrapper).toHaveStyleRule('font-weight', '800', {
+        modifier: ':active',
+      })
+
+      // disabled
+      expect(wrapper).toHaveStyleRule('background-color', '#9c9c9c', {
+        modifier: ':disabled',
+      })
+    })
+
+    it('should render an app secondary button variant', () => {
+      const wrapper = shallow(<AppSecondaryBtn />)
+
+      expect(wrapper).toHaveStyleRule('color', '#006fff')
+      expect(wrapper).toHaveStyleRule('border-radius', '2px')
+      expect(wrapper).toHaveStyleRule('background-color', '#ffffff')
+      expect(wrapper).toHaveStyleRule('font-size', '0.875rem')
+      expect(wrapper).toHaveStyleRule('font-weight', '600')
+      expect(wrapper).toHaveStyleRule('line-height', '1.4')
+      expect(wrapper).toHaveStyleRule('padding-left', '2rem')
+      expect(wrapper).toHaveStyleRule('padding-right', '2rem')
+      expect(wrapper).toHaveStyleRule('padding-top', '0.5rem')
+      expect(wrapper).toHaveStyleRule('padding-bottom', '0.5rem')
+      expect(wrapper).toHaveStyleRule('text-transform', 'uppercase')
+
+      // focus
+      expect(wrapper).toHaveStyleRule('color', '#006fff', {
+        modifier: ':focus',
+      })
+      expect(wrapper).toHaveStyleRule('font-weight', '800', {
+        modifier: ':focus',
+      })
+
+      // hover
+      expect(wrapper).toHaveStyleRule('color', '#006fff', {
+        modifier: ':focus',
+      })
+      expect(wrapper).toHaveStyleRule('font-weight', '800', {
+        modifier: ':focus',
+      })
+
+      // active
+      expect(wrapper).toHaveStyleRule('color', '#004aaa', {
+        modifier: ':active',
+      })
+      expect(wrapper).toHaveStyleRule('font-weight', '800', {
+        modifier: ':active',
+      })
+
+      // disabled
+      expect(wrapper).toHaveStyleRule('color', '#9c9c9c', {
+        modifier: ':disabled',
+      })
+    })
+
+    it('should render an app alert primary button variant', () => {
+      const wrapper = shallow(<AppAlertPrimaryBtn />)
+
+      expect(wrapper).toHaveStyleRule('background-color', '#ac0505')
+      expect(wrapper).toHaveStyleRule('border-radius', '2px')
+      expect(wrapper).toHaveStyleRule('color', '#ffffff')
+      expect(wrapper).toHaveStyleRule('font-size', '0.875rem')
+      expect(wrapper).toHaveStyleRule('font-weight', '600')
+      expect(wrapper).toHaveStyleRule('line-height', '1.4')
+      expect(wrapper).toHaveStyleRule('padding-left', '2rem')
+      expect(wrapper).toHaveStyleRule('padding-right', '2rem')
+      expect(wrapper).toHaveStyleRule('padding-top', '0.5rem')
+      expect(wrapper).toHaveStyleRule('padding-bottom', '0.5rem')
+      expect(wrapper).toHaveStyleRule('text-transform', 'uppercase')
+
+      // focus
+      expect(wrapper).toHaveStyleRule('background-color', '#ac0505', {
+        modifier: ':focus',
+      })
+      expect(wrapper).toHaveStyleRule('font-weight', '800', {
+        modifier: ':focus',
+      })
+
+      // hover
+      expect(wrapper).toHaveStyleRule('background-color', '#ac0505', {
+        modifier: ':focus',
+      })
+      expect(wrapper).toHaveStyleRule('font-weight', '800', {
+        modifier: ':focus',
+      })
+
+      // active
+      expect(wrapper).toHaveStyleRule('background-color', '#ffc0c0', {
+        modifier: ':active',
+      })
+      expect(wrapper).toHaveStyleRule('font-weight', '800', {
+        modifier: ':active',
+      })
+
+      // disabled
+      expect(wrapper).toHaveStyleRule('background-color', '#9c9c9c', {
+        modifier: ':disabled',
+      })
+    })
+
+    it('should render an app alert secondary button variant', () => {
+      const wrapper = shallow(<AppAlertSecondaryBtn />)
+
+      expect(wrapper).toHaveStyleRule('color', '#ac0505')
+      expect(wrapper).toHaveStyleRule('border-radius', '2px')
+      expect(wrapper).toHaveStyleRule('background-color', '#ffffff')
+      expect(wrapper).toHaveStyleRule('font-size', '0.875rem')
+      expect(wrapper).toHaveStyleRule('font-weight', '600')
+      expect(wrapper).toHaveStyleRule('line-height', '1.4')
+      expect(wrapper).toHaveStyleRule('padding-left', '2rem')
+      expect(wrapper).toHaveStyleRule('padding-right', '2rem')
+      expect(wrapper).toHaveStyleRule('padding-top', '0.5rem')
+      expect(wrapper).toHaveStyleRule('padding-bottom', '0.5rem')
+      expect(wrapper).toHaveStyleRule('text-transform', 'uppercase')
+
+      // focus
+      expect(wrapper).toHaveStyleRule('color', '#ac0505', {
+        modifier: ':focus',
+      })
+      expect(wrapper).toHaveStyleRule('font-weight', '800', {
+        modifier: ':focus',
+      })
+
+      // hover
+      expect(wrapper).toHaveStyleRule('color', '#ac0505', {
+        modifier: ':focus',
+      })
+      expect(wrapper).toHaveStyleRule('font-weight', '800', {
+        modifier: ':focus',
+      })
+
+      // active
+      expect(wrapper).toHaveStyleRule('color', '#ffc0c0', {
+        modifier: ':active',
+      })
+      expect(wrapper).toHaveStyleRule('font-weight', '800', {
+        modifier: ':active',
+      })
+
+      // disabled
+      expect(wrapper).toHaveStyleRule('color', '#9c9c9c', {
         modifier: ':disabled',
       })
     })

@@ -116,6 +116,117 @@ export const SecondaryBtn: BtnComponent = styled(Btn)`
 `
 
 /**
+ * New primary button variant used in app
+ *
+ * @component
+ */
+export const AppPrimaryBtn: BtnComponent = styled(PrimaryBtn)`
+  background-color: ${Styles.C_BLUE};
+  color: ${Styles.C_WHITE};
+  font-weight: ${Styles.FONT_WEIGHT_SEMIBOLD};
+
+  &:hover,
+  &:focus {
+    background-color: ${Styles.C_BLUE};
+    font-weight: ${Styles.FONT_WEIGHT_BOLD};
+    box-shadow: 0px 3px 6px 0px rgba(0, 0, 0, 0.23);
+  }
+
+  &:active {
+    font-weight: ${Styles.FONT_WEIGHT_BOLD};
+    background-color: #004aaa;
+    box-shadow: none;
+  }
+
+  &:disabled,
+  &.disabled {
+    background-color: ${Styles.C_FONT_DISABLED};
+    box-shadow: none;
+  }
+
+  ${styleProps}
+`
+
+/**
+ * New secondary button variant used in app
+ *
+ * @component
+ */
+export const AppSecondaryBtn: BtnComponent = styled(SecondaryBtn)`
+  background-color: ${Styles.C_WHITE};
+  color: ${Styles.C_BLUE};
+  font-weight: ${Styles.FONT_WEIGHT_SEMIBOLD};
+
+  &:hover,
+  &:focus {
+    font-weight: ${Styles.FONT_WEIGHT_BOLD};
+    border-width: '2px';
+    background-color: ${Styles.C_WHITE};
+    color: ${Styles.C_BLUE};
+    box-shadow: 0px 3px 6px 0px rgba(0, 0, 0, 0.23);
+  }
+
+  &:active {
+    font-weight: ${Styles.FONT_WEIGHT_BOLD};
+    border-width: '2px';
+    background-color: ${Styles.C_WHITE};
+    color: ${Styles.C_BLUE};
+    color: #004aaa;
+    box-shadow: none;
+  }
+
+  &:disabled,
+  &.disabled {
+    font-weight: ${Styles.FONT_WEIGHT_BOLD};
+    border-width: '2px';
+    background-color: ${Styles.C_WHITE};
+    color: ${Styles.C_FONT_DISABLED};
+    box-shadow: none;
+  }
+
+  ${styleProps}
+`
+/**
+ * Red primary button variant used in app
+ *
+ * @component
+ */
+export const AppAlertPrimaryBtn: BtnComponent = styled(AppPrimaryBtn)`
+  background-color: ${Styles.C_ERROR_DARK};
+
+  &:hover,
+  &:focus {
+    background-color: ${Styles.C_ERROR_DARK};
+  }
+
+  &:active {
+    background-color: ${Styles.C_ERROR_LIGHT};
+  }
+
+  ${styleProps}
+`
+
+/**
+ * Red secondary button variant used in app
+ *
+ * @component
+ */
+export const AppAlertSecondaryBtn: BtnComponent = styled(AppSecondaryBtn)`
+  color: ${Styles.C_ERROR_DARK};
+
+  &:hover,
+  &:focus {
+    color: ${Styles.C_ERROR_DARK};
+  }
+
+  &:active {
+    color: ${Styles.C_ERROR_LIGHT};
+  }
+
+  ${styleProps}
+`
+
+/**
  * Light secondary button variant
  *
  * @component
