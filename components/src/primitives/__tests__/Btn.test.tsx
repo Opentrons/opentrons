@@ -5,10 +5,10 @@ import {
   Btn,
   PrimaryBtn,
   SecondaryBtn,
-  AppPrimaryBtn,
-  AppSecondaryBtn,
-  AppAlertSecondaryBtn,
-  AppAlertPrimaryBtn,
+  NewPrimaryBtn,
+  NewSecondaryBtn,
+  NewAlertSecondaryBtn,
+  NewAlertPrimaryBtn,
   LightSecondaryBtn,
   TertiaryBtn,
   BUTTON_TYPE_SUBMIT,
@@ -142,7 +142,7 @@ describe('Btn primitive component', () => {
     })
 
     it('should render an app primary button variant', () => {
-      const wrapper = shallow(<AppPrimaryBtn />)
+      const wrapper = shallow(<NewPrimaryBtn />)
 
       expect(wrapper).toHaveStyleRule('background-color', '#006fff')
       expect(wrapper).toHaveStyleRule('border-radius', '2px')
@@ -177,7 +177,7 @@ describe('Btn primitive component', () => {
     })
 
     it('should render an app secondary button variant', () => {
-      const wrapper = shallow(<AppSecondaryBtn />)
+      const wrapper = shallow(<NewSecondaryBtn />)
 
       expect(wrapper).toHaveStyleRule('color', '#006fff')
       expect(wrapper).toHaveStyleRule('border-radius', '2px')
@@ -213,7 +213,7 @@ describe('Btn primitive component', () => {
     })
 
     it('should render an app alert primary button variant', () => {
-      const wrapper = shallow(<AppAlertPrimaryBtn />)
+      const wrapper = shallow(<NewAlertPrimaryBtn />)
 
       expect(wrapper).toHaveStyleRule('background-color', '#ac0505')
       expect(wrapper).toHaveStyleRule('border-radius', '2px')
@@ -249,7 +249,7 @@ describe('Btn primitive component', () => {
     })
 
     it('should render an app alert secondary button variant', () => {
-      const wrapper = shallow(<AppAlertSecondaryBtn />)
+      const wrapper = shallow(<NewAlertSecondaryBtn />)
 
       expect(wrapper).toHaveStyleRule('color', '#ac0505')
       expect(wrapper).toHaveStyleRule('border-radius', '2px')

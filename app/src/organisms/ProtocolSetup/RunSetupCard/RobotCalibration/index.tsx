@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   Text,
-  AppPrimaryBtn,
+  NewPrimaryBtn,
   useHoverTooltip,
   Tooltip,
   SPACING_2,
@@ -139,14 +139,14 @@ export function RobotCalibration(props: Props): JSX.Element {
       </div>
       <Divider marginY={SPACING_3} />
       <Box textAlign={ALIGN_CENTER}>
-        <AppPrimaryBtn
+        <NewPrimaryBtn
           disabled={!calibrationStatus.complete}
           onClick={() => expandStep(nextStep)}
           {...targetProps}
           id={'RobotCalStep_proceedButton'}
         >
           {t(nextStepButtonKey)}
-        </AppPrimaryBtn>
+        </NewPrimaryBtn>
         {calibrationStatus.reason !== undefined && (
           <Tooltip {...tooltipProps}>{t(calibrationStatus.reason)}</Tooltip>
         )}

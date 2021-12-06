@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import {
-  AppPrimaryBtn,
+  NewPrimaryBtn,
   Text,
   Flex,
   Box,
@@ -92,7 +92,7 @@ export const IntroScreen = (props: {
         </Box>
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER} marginBottom={SPACING_4}>
-        <AppPrimaryBtn
+        <NewPrimaryBtn
           title={t('start_position_check', {
             initial_labware_slot: firstTiprackSlot,
           })}
@@ -101,7 +101,7 @@ export const IntroScreen = (props: {
           {t('start_position_check', {
             initial_labware_slot: firstTiprackSlot,
           })}
-        </AppPrimaryBtn>
+        </NewPrimaryBtn>
       </Flex>
     </Box>
   )

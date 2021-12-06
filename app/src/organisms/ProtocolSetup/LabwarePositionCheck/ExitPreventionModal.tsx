@@ -4,8 +4,8 @@ import {
   Flex,
   Modal,
   Text,
-  AppPrimaryBtn,
-  AppSecondaryBtn,
+  NewPrimaryBtn,
+  NewSecondaryBtn,
   SPACING_2,
   SPACING_3,
   SPACING_4,
@@ -40,12 +40,12 @@ export const ExitPreventionModal = (
         {t('exit_screen_subtitle')}
       </Text>
       <Flex padding={SPACING_2} justifyContent={JUSTIFY_SPACE_EVENLY}>
-        <AppSecondaryBtn onClick={props.onGoBack}>
+        <NewSecondaryBtn onClick={props.onGoBack}>
           {t('exit_screen_go_back')}
-        </AppSecondaryBtn>
-        <AppPrimaryBtn onClick={props.onConfirmExit}>
+        </NewSecondaryBtn>
+        <NewPrimaryBtn onClick={props.onConfirmExit}>
           {t('exit_screen_confirm_exit')}
-        </AppPrimaryBtn>
+        </NewPrimaryBtn>
       </Flex>
     </Modal>
   )

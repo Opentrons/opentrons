@@ -7,7 +7,7 @@ import {
   Box,
   Icon,
   BaseModal,
-  AppPrimaryBtn,
+  NewPrimaryBtn,
   SPACING_3,
   SPACING_4,
   SIZE_1,
@@ -77,14 +77,14 @@ export const RerunningProtocolModal = (
             <Icon name={'open-in-new'} marginLeft={SPACING_1} size="10px" />
           </Link>
           <Box textAlign={ALIGN_CENTER} marginTop={SPACING_4}>
-            <AppPrimaryBtn
+            <NewPrimaryBtn
               onClick={props.onCloseClick}
               width={SIZE_4}
               name="close"
               id={'RerunningProtocolModal_closeButton'}
             >
               {t('shared:close')}
-            </AppPrimaryBtn>
+            </NewPrimaryBtn>
           </Box>
         </Flex>
       </BaseModal>

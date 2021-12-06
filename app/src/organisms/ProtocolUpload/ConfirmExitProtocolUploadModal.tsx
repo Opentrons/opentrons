@@ -2,8 +2,8 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   AlertModal,
-  AppSecondaryBtn,
-  AppPrimaryBtn,
+  NewSecondaryBtn,
+  NewPrimaryBtn,
   SPACING_3,
 } from '@opentrons/components'
 
@@ -22,16 +22,16 @@ export function ConfirmExitProtocolUploadModal(
       buttons={[
         {
           Component: () => (
-            <AppSecondaryBtn onClick={props.back}>
+            <NewSecondaryBtn onClick={props.back}>
               {t('exit_modal_go_back')}
-            </AppSecondaryBtn>
+            </NewSecondaryBtn>
           ),
         },
         {
           Component: () => (
-            <AppPrimaryBtn onClick={props.exit} marginLeft={SPACING_3}>
+            <NewPrimaryBtn onClick={props.exit} marginLeft={SPACING_3}>
               {t('exit_modal_exit')}
-            </AppPrimaryBtn>
+            </NewPrimaryBtn>
           ),
         },
       ]}

@@ -7,7 +7,7 @@ import {
   Icon,
   Text,
   Flex,
-  AppPrimaryBtn,
+  NewPrimaryBtn,
   FONT_SIZE_BODY_2,
   FONT_WEIGHT_REGULAR,
   SPACING_3,
@@ -27,7 +27,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   FONT_SIZE_CAPTION,
   FONT_BODY_1_DARK,
-  AppSecondaryBtn,
+  NewSecondaryBtn,
   FONT_SIZE_BODY_1,
   SPACING_2,
   JUSTIFY_START,
@@ -155,13 +155,13 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
           onCloseClick={() => showRerunningProtocolModal(false)}
         />
       )}
-      <AppPrimaryBtn
+      <NewPrimaryBtn
         onClick={handleClick}
         marginBottom={SPACING_4}
         id={'UploadInput_protocolUploadButton'}
       >
         {t('choose_file')}
-      </AppPrimaryBtn>
+      </NewPrimaryBtn>
 
       <label
         data-testid="file_drop_zone"
@@ -279,12 +279,12 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
               </Flex>
             </Flex>
             <Flex>
-              <AppSecondaryBtn
+              <NewSecondaryBtn
                 onClick={cloneMostRecentRun}
                 id={'UploadInput_runAgainButton'}
               >
                 {t('run_again')}
-              </AppSecondaryBtn>
+              </NewSecondaryBtn>
             </Flex>
           </Flex>
           <Divider />

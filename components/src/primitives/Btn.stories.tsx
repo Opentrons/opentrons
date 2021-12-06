@@ -2,10 +2,10 @@ import * as React from 'react'
 import {
   PrimaryBtn,
   SecondaryBtn,
-  AppPrimaryBtn,
-  AppSecondaryBtn,
-  AppAlertPrimaryBtn,
-  AppAlertSecondaryBtn,
+  NewPrimaryBtn,
+  NewSecondaryBtn,
+  NewAlertPrimaryBtn,
+  NewAlertSecondaryBtn,
   LightSecondaryBtn,
   TertiaryBtn,
 } from './Btn'
@@ -37,8 +37,8 @@ Secondary.args = {
 }
 
 const AppPrimaryTemlate: Story<
-  React.ComponentProps<typeof AppPrimaryBtn>
-> = args => <AppPrimaryBtn {...args} />
+  React.ComponentProps<typeof NewPrimaryBtn>
+> = args => <NewPrimaryBtn {...args} />
 export const AppPrimary = AppPrimaryTemlate.bind({})
 AppPrimary.args = {
   children: 'Confirm and Proceed',
@@ -46,8 +46,8 @@ AppPrimary.args = {
 }
 
 const AppSecondaryTemlate: Story<
-  React.ComponentProps<typeof AppSecondaryBtn>
-> = args => <AppSecondaryBtn {...args} />
+  React.ComponentProps<typeof NewSecondaryBtn>
+> = args => <NewSecondaryBtn {...args} />
 export const AppSecondary = AppSecondaryTemlate.bind({})
 AppSecondary.args = {
   children: 'Confirm and Proceed',
@@ -55,8 +55,8 @@ AppSecondary.args = {
 }
 
 const AppAlertPrimaryTemlate: Story<
-  React.ComponentProps<typeof AppAlertPrimaryBtn>
-> = args => <AppAlertPrimaryBtn {...args} />
+  React.ComponentProps<typeof NewAlertPrimaryBtn>
+> = args => <NewAlertPrimaryBtn {...args} />
 export const AppAlertPrimary = AppAlertPrimaryTemlate.bind({})
 AppAlertPrimary.args = {
   children: 'Cancel',
@@ -64,8 +64,8 @@ AppAlertPrimary.args = {
 }
 
 const AppAlertSecondaryTemlate: Story<
-  React.ComponentProps<typeof AppAlertSecondaryBtn>
-> = args => <AppAlertSecondaryBtn {...args} />
+  React.ComponentProps<typeof NewAlertSecondaryBtn>
+> = args => <NewAlertSecondaryBtn {...args} />
 export const AppAlertSecondary = AppAlertSecondaryTemlate.bind({})
 AppAlertSecondary.args = {
   children: 'Cancel',

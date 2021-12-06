@@ -4,7 +4,7 @@ import {
   Flex,
   FONT_WEIGHT_SEMIBOLD,
   JUSTIFY_CENTER,
-  AppPrimaryBtn,
+  NewPrimaryBtn,
   SPACING_3,
   SPACING_4,
   Text,
@@ -78,7 +78,7 @@ export const GenericStepScreen = (
         </Flex>
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER} marginBottom={SPACING_4}>
-        <AppPrimaryBtn onClick={props.proceed}>{props.ctaText}</AppPrimaryBtn>
+        <NewPrimaryBtn onClick={props.proceed}>{props.ctaText}</NewPrimaryBtn>
       </Flex>
     </Flex>
   )

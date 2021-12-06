@@ -8,7 +8,7 @@ import {
   RUN_STATUS_PAUSE_REQUESTED,
 } from '@opentrons/api-client'
 import {
-  AppAlertPrimaryBtn,
+  NewAlertPrimaryBtn,
   LINE_HEIGHT_SOLID,
   SPACING_2,
   SPACING_3,
@@ -47,7 +47,7 @@ export function RunDetails(): JSX.Element | null {
   } = useConditionalConfirm(cancelRunAndExit, true)
 
   const cancelRunButton = (
-    <AppAlertPrimaryBtn
+    <NewAlertPrimaryBtn
       onClick={cancelRunAndExit}
       lineHeight={LINE_HEIGHT_SOLID}
       marginX={SPACING_3}
@@ -55,7 +55,7 @@ export function RunDetails(): JSX.Element | null {
       paddingLeft={SPACING_2}
     >
       {t('cancel_run')}
-    </AppAlertPrimaryBtn>
+    </NewAlertPrimaryBtn>
   )
 
   const titleBarProps =

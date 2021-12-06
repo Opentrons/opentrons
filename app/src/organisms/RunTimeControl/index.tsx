@@ -14,7 +14,7 @@ import {
   Flex,
   Icon,
   IconName,
-  AppPrimaryBtn,
+  NewPrimaryBtn,
   Text,
   Tooltip,
   useHoverTooltip,
@@ -104,7 +104,7 @@ export function RunTimeControl(): JSX.Element | null {
           completedAt={completedAt}
         />
       ) : null}
-      <AppPrimaryBtn
+      <NewPrimaryBtn
         onClick={handleButtonClick}
         alignSelf={ALIGN_STRETCH}
         borderRadius={BORDER_RADIUS_1}
@@ -120,7 +120,7 @@ export function RunTimeControl(): JSX.Element | null {
           <Icon name={buttonIconName} size={SIZE_1} marginRight={SPACING_2} />
         ) : null}
         <Text fontSize={FONT_SIZE_DEFAULT}>{buttonText}</Text>
-      </AppPrimaryBtn>
+      </NewPrimaryBtn>
       {disableRunCta && (
         <Tooltip {...tooltipProps}>{t('run_cta_disabled')}</Tooltip>
       )}

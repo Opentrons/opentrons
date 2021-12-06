@@ -8,7 +8,7 @@ import {
   FONT_WEIGHT_SEMIBOLD,
   JUSTIFY_CENTER,
   JUSTIFY_START,
-  AppPrimaryBtn,
+  NewPrimaryBtn,
   SPACING_3,
   SPACING_4,
   Text,
@@ -97,7 +97,7 @@ export const SummaryScreen = (props: {
         </Flex>
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER} marginBottom={SPACING_4}>
-        <AppPrimaryBtn
+        <NewPrimaryBtn
           title={t('close_and_apply_offset_data')}
           id={'Lpc_summaryScreen_applyOffsetButton'}
           onClick={() => {
@@ -107,7 +107,7 @@ export const SummaryScreen = (props: {
           }}
         >
           {t('close_and_apply_offset_data')}
-        </AppPrimaryBtn>
+        </NewPrimaryBtn>
       </Flex>
     </Flex>
   )

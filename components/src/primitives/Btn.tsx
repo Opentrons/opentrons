@@ -120,7 +120,7 @@ export const SecondaryBtn: BtnComponent = styled(Btn)`
  *
  * @component
  */
-export const AppPrimaryBtn: BtnComponent = styled(PrimaryBtn)`
+export const NewPrimaryBtn: BtnComponent = styled(PrimaryBtn)`
   background-color: ${Styles.C_BLUE};
   color: ${Styles.C_WHITE};
 
@@ -150,7 +150,7 @@ export const AppPrimaryBtn: BtnComponent = styled(PrimaryBtn)`
  *
  * @component
  */
-export const AppSecondaryBtn: BtnComponent = styled(SecondaryBtn)`
+export const NewSecondaryBtn: BtnComponent = styled(SecondaryBtn)`
   background-color: ${Styles.C_WHITE};
   color: ${Styles.C_BLUE};
 
@@ -185,7 +185,7 @@ export const AppSecondaryBtn: BtnComponent = styled(SecondaryBtn)`
  *
  * @component
  */
-export const AppAlertPrimaryBtn: BtnComponent = styled(AppPrimaryBtn)`
+export const NewAlertPrimaryBtn: BtnComponent = styled(NewPrimaryBtn)`
   background-color: ${Styles.C_ERROR_DARK};
 
   &:hover,
@@ -205,7 +205,7 @@ export const AppAlertPrimaryBtn: BtnComponent = styled(AppPrimaryBtn)`
  *
  * @component
  */
-export const AppAlertSecondaryBtn: BtnComponent = styled(AppSecondaryBtn)`
+export const NewAlertSecondaryBtn: BtnComponent = styled(NewSecondaryBtn)`
   color: ${Styles.C_ERROR_DARK};
 
   &:hover,

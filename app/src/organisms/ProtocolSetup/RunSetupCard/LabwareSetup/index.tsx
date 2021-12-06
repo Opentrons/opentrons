@@ -9,7 +9,7 @@ import {
   Link,
   Module,
   RobotWorkSpace,
-  AppSecondaryBtn,
+  NewSecondaryBtn,
   Text,
   Tooltip,
   useHoverTooltip,
@@ -189,7 +189,7 @@ export const LabwareSetup = (): JSX.Element | null => {
               {t('labware_help_link_title')}
             </Btn>
             <Flex justifyContent={JUSTIFY_CENTER}>
-              <AppSecondaryBtn
+              <NewSecondaryBtn
                 title={t('run_labware_position_check')}
                 onClick={() => setShowLabwarePositionCheckModal(true)}
                 id={'LabwareSetup_checkLabwarePositionsButton'}
@@ -197,7 +197,7 @@ export const LabwareSetup = (): JSX.Element | null => {
                 disabled={disableLabwarePositionCheck}
               >
                 {t('run_labware_position_check')}
-              </AppSecondaryBtn>
+              </NewSecondaryBtn>
               {disableLabwarePositionCheck ? (
                 <Tooltip {...tooltipProps}>
                   {

@@ -6,7 +6,7 @@ import {
   Text,
   Flex,
   Link,
-  AppPrimaryBtn,
+  NewPrimaryBtn,
   SPACING_3,
   ALIGN_CENTER,
   DIRECTION_ROW,
@@ -115,13 +115,13 @@ export function PipetteCalibration(props: Props): JSX.Element {
         >
           {t('pipette_missing')}
         </Text>
-        <AppPrimaryBtn
+        <NewPrimaryBtn
           as={RRDLink}
           to={pipettesPageUrl}
           id={'PipetteCalibration_attachPipetteButton'}
         >
           {t('attach_pipette_cta')}
-        </AppPrimaryBtn>
+        </NewPrimaryBtn>
       </Flex>
     )
   } else {
@@ -129,13 +129,13 @@ export function PipetteCalibration(props: Props): JSX.Element {
       <>
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
           {pipetteMismatchInfo}
-          <AppPrimaryBtn
+          <NewPrimaryBtn
             backgroundColor={C_BLUE}
             onClick={() => startPipetteOffsetCalibrationBlockModal(null)}
             id={'PipetteCalibration_calibratePipetteButton'}
           >
             {t('calibrate_now_cta')}
-          </AppPrimaryBtn>
+          </NewPrimaryBtn>
         </Flex>
         {PipetteOffsetCalibrationWizard}
         {showCalBlockModal && (

@@ -13,7 +13,7 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   Modal,
-  AppPrimaryBtn,
+  NewPrimaryBtn,
   SIZE_2,
   SIZE_4,
   SPACING_1,
@@ -208,9 +208,9 @@ export const LabwarePositionCheckStepDetailModal = (
             </Flex>
           </Flex>
           <Flex justifyContent={JUSTIFY_CENTER} marginTop={SPACING_5}>
-            <AppPrimaryBtn onClick={props.onCloseClick} width={SIZE_4}>
+            <NewPrimaryBtn onClick={props.onCloseClick} width={SIZE_4}>
               {t('shared:close')}
-            </AppPrimaryBtn>
+            </NewPrimaryBtn>
           </Flex>
         </Flex>
       </Modal>

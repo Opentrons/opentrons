@@ -4,7 +4,7 @@ import { useMissingModuleIds, useProtocolCalibrationStatus } from './hooks'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
-  AppPrimaryBtn,
+  NewPrimaryBtn,
   Tooltip,
   useHoverTooltip,
   JUSTIFY_CENTER,
@@ -37,7 +37,7 @@ export const ProceedToRunCta = (): JSX.Element | null => {
   const linkProps = proceedToRunDisabledReason != null ? {} : { to: '/run' }
   return (
     <Flex justifyContent={JUSTIFY_CENTER}>
-      <AppPrimaryBtn
+      <NewPrimaryBtn
         role="button"
         title={t('proceed_to_run')}
         disabled={proceedToRunDisabledReason != null}
@@ -47,7 +47,7 @@ export const ProceedToRunCta = (): JSX.Element | null => {
         {...targetProps}
       >
         {t('proceed_to_run')}
-      </AppPrimaryBtn>
+      </NewPrimaryBtn>
       {proceedToRunDisabledReason != null && (
         <Tooltip {...tooltipProps}>{proceedToRunDisabledReason}</Tooltip>
       )}

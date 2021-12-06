@@ -6,7 +6,7 @@ import {
   Icon,
   Btn,
   Modal,
-  AppPrimaryBtn,
+  NewPrimaryBtn,
   Text,
   C_BLUE,
   C_MED_DARK_GRAY,
@@ -89,13 +89,13 @@ export const MultipleModulesModal = (
           <img src={multipleModuleHelp} />
         </Flex>
         <Flex justifyContent={JUSTIFY_CENTER}>
-          <AppPrimaryBtn
+          <NewPrimaryBtn
             onClick={props.onCloseClick}
             width={SIZE_4}
             marginTop={SPACING_3}
           >
             {t('shared:close')}
-          </AppPrimaryBtn>
+          </NewPrimaryBtn>
         </Flex>
       </Modal>
     </Portal>
