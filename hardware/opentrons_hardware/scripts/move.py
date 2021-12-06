@@ -5,13 +5,15 @@ import logging
 from logging.config import dictConfig
 from typing import Optional
 
-from opentrons_hardware.drivers.can_bus import CanDriver, NodeId
+from opentrons_hardware.drivers.can_bus import CanDriver
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
-from opentrons_hardware.drivers.can_bus.messages.message_definitions import (
+from opentrons_ot3_firmware.constants import NodeId
+
+from opentrons_ot3_firmware.messages.message_definitions import (
     SetupRequest,
     EnableMotorRequest,
 )
-from opentrons_hardware.drivers.can_bus.messages.payloads import EmptyPayload
+from opentrons_ot3_firmware.messages.payloads import EmptyPayload
 from opentrons_hardware.hardware_control.motion import MoveGroupSingleAxisStep
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
 from opentrons_hardware.scripts.can_args import add_can_args
