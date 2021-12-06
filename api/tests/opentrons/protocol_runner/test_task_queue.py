@@ -75,6 +75,25 @@ async def test_cleanup_gets_run_error(decoy: Decoy) -> None:
     decoy.verify(await cleanup_func(error=error))
 
 
+async def test_cleanup_does_not_run_if_cancelled(decoy: Decoy) -> None:
+    """It should not run "cleanup" func is task is cancelled."""
+    run_func = decoy.mock(is_async=True)
+    cleanup_func = decoy.mock(is_async=True)
+    error = asyncio.CancelledError()
+
+    decoy.when(await run_func()).then_raise(error)
+
+    subject = TaskQueue()
+    subject.set_run_func(func=run_func)
+    subject.set_cleanup_func(func=cleanup_func)
+    subject.start()
+
+    with pytest.raises(asyncio.CancelledError):
+        await subject.join()
+
+    decoy.verify(await cleanup_func(error=error), times=0)
+
+
 async def test_join_waits_for_start() -> None:
     """It should wait until the queue is started when join is called."""
     subject = TaskQueue()
