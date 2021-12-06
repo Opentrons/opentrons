@@ -9,7 +9,6 @@ import {
   Modal,
   AppPrimaryBtn,
   Text,
-  C_BLUE,
   C_MED_DARK_GRAY,
   FONT_SIZE_BODY_2,
   FONT_WEIGHT_REGULAR,

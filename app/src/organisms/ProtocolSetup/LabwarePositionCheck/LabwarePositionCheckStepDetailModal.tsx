@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import {
   Box,
   Btn,
-  C_BLUE,
   C_LIGHT_GRAY,
   C_MED_DARK_GRAY,
   C_NEAR_WHITE,

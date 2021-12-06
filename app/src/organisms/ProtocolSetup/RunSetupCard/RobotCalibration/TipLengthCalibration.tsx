@@ -11,7 +11,6 @@ import {
   Text,
   Tooltip,
   useHoverTooltip,
-  C_BLUE,
   C_DISABLED,
   SIZE_5,
   TEXT_DECORATION_UNDERLINE,
