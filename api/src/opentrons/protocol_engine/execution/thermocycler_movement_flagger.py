@@ -128,10 +128,7 @@ class ThermocyclerMovementFlagger:
             available_modules
             if simulating_module is None
             else
-            # todo(mm, 2021-12-01): It's unclear what it means if available_modules is
-            # non-empty AND simulating_module is non-None. Is concatenating them like
-            # this correct?
-            available_modules + [simulating_module]
+            [simulating_module]
         )
 
         for module in modules_to_check:
