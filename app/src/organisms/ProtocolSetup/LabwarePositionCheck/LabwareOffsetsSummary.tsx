@@ -31,33 +31,31 @@ interface LabwareOffsetSummary {
 const OffsetDataLoader = (): JSX.Element | null => {
   const { t } = useTranslation('protocol_setup')
   return (
-    <>
-      <Flex
-        justifyContent={JUSTIFY_CENTER}
-        flexDirection={DIRECTION_COLUMN}
-        alignItems={ALIGN_CENTER}
+    <Flex
+      justifyContent={JUSTIFY_CENTER}
+      flexDirection={DIRECTION_COLUMN}
+      alignItems={ALIGN_CENTER}
+    >
+      <Text
+        as={'h3'}
+        color={C_DARK_GRAY}
+        marginTop={SPACING_4}
+        fontWeight={FONT_WEIGHT_SEMIBOLD}
+        fontSize={FONT_SIZE_BODY_2}
+        textTransform={TEXT_TRANSFORM_UPPERCASE}
       >
-        <Text
-          as={'h3'}
-          color={C_DARK_GRAY}
-          marginTop={SPACING_4}
-          fontWeight={FONT_WEIGHT_SEMIBOLD}
-          fontSize={FONT_SIZE_BODY_2}
-          textTransform={TEXT_TRANSFORM_UPPERCASE}
-        >
-          {t('loading_labware_offsets')}
-        </Text>
-        <Icon
-          name="ot-spinner"
-          id={`LabwareOffsetsSummary_loadingSpinner`}
-          width={SPACING_5}
-          marginTop={SPACING_4}
-          marginBottom={SPACING_4}
-          color={C_MED_GRAY}
-          spin
-        />
-      </Flex>
-    </>
+        {t('loading_labware_offsets')}
+      </Text>
+      <Icon
+        name="ot-spinner"
+        id={`LabwareOffsetsSummary_loadingSpinner`}
+        width={SPACING_5}
+        marginTop={SPACING_4}
+        marginBottom={SPACING_4}
+        color={C_MED_GRAY}
+        spin
+      />
+    </Flex>
   )
 }
 
