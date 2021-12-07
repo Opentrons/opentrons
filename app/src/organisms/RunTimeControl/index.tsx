@@ -64,8 +64,6 @@ export function RunTimeControl(): JSX.Element | null {
     isResetRunLoading,
   } = useRunControls()
 
-  console.log('runStatus', runStatus)
-
   const [isRunActionLoading, setIsRunActionLoading] = React.useState(false)
   const [lastRunAction, setLastRunAction] = React.useState<
     'play' | 'pause' | 'reset' | null
