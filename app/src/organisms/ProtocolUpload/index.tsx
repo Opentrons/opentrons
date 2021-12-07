@@ -3,8 +3,20 @@ import {
   AlertItem,
   Text,
   Box,
+  Icon,
+  Flex,
   C_NEAR_WHITE,
   useConditionalConfirm,
+  SPACING_5,
+  JUSTIFY_CENTER,
+  DIRECTION_COLUMN,
+  ALIGN_CENTER,
+  FONT_WEIGHT_REGULAR,
+  C_DARK_GRAY,
+  SPACING_6,
+  TEXT_TRANSFORM_UPPERCASE,
+  FONT_SIZE_BIG,
+  SPACING_7,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
@@ -37,6 +49,7 @@ export function ProtocolUpload(): JSX.Element {
     createProtocolRun,
     runRecord,
     protocolRecord,
+    isCreatingProtocolRun,
   } = useCurrentProtocolRun()
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   const hasCurrentRun = runRecord != null && protocolRecord != null
@@ -98,6 +111,13 @@ export function ProtocolUpload(): JSX.Element {
           ),
         }
 
+  const pageContents =
+    !isClosingCurrentRun && hasCurrentRun ? (
+      <ProtocolSetup />
+    ) : (
+      <UploadInput onUpload={handleUpload} />
+    )
+
   return (
     <>
       {showConfirmExit && (
@@ -122,13 +142,43 @@ export function ProtocolUpload(): JSX.Element {
           width="100%"
           backgroundColor={C_NEAR_WHITE}
         >
-          {!isClosingCurrentRun && hasCurrentRun ? (
-            <ProtocolSetup />
-          ) : (
-            <UploadInput onUpload={handleUpload} />
-          )}
+          {isCreatingProtocolRun ? <ProtocolLoader /> : pageContents}
         </Box>
       </Page>
     </>
+  )
+}
+
+function ProtocolLoader(): JSX.Element | null {
+  const { t } = useTranslation('protocol_info')
+  const robotName = useSelector((state: State) => getConnectedRobotName(state))
+  return (
+    <Flex
+      justifyContent={JUSTIFY_CENTER}
+      flexDirection={DIRECTION_COLUMN}
+      alignItems={ALIGN_CENTER}
+    >
+      <Text
+        textAlign={ALIGN_CENTER}
+        as={'h3'}
+        maxWidth={SPACING_7}
+        textTransform={TEXT_TRANSFORM_UPPERCASE}
+        marginTop={SPACING_6}
+        color={C_DARK_GRAY}
+        fontWeight={FONT_WEIGHT_REGULAR}
+        fontSize={FONT_SIZE_BIG}
+      >
+        {t('protocol_loading', {
+          robot_name: robotName,
+        })}
+      </Text>
+      <Icon
+        name="ot-spinner"
+        width={SPACING_5}
+        marginTop={SPACING_5}
+        color={C_DARK_GRAY}
+        spin
+      />
+    </Flex>
   )
 }
