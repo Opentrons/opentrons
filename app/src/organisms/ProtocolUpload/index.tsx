@@ -68,7 +68,6 @@ export function ProtocolUpload(): JSX.Element {
   }
 
   const handleCloseProtocol: React.MouseEventHandler = _event => {
-    dispatch(closeProtocol())
     closeProtocolRun()
   }
 
