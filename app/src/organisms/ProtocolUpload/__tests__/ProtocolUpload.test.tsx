@@ -20,7 +20,6 @@ import { ConfirmExitProtocolUploadModal } from '../ConfirmExitProtocolUploadModa
 import { mockCalibrationStatus } from '../../../redux/calibration/__fixtures__'
 import { useCurrentProtocolRun } from '../hooks/useCurrentProtocolRun'
 import { useCloseCurrentRun } from '../hooks/useCloseCurrentRun'
-import { closeProtocol } from '../../../redux/protocol/actions'
 import { ProtocolUpload } from '..'
 
 jest.mock('../../../redux/protocol/selectors')
@@ -159,14 +158,13 @@ describe('ProtocolUpload', () => {
       isClosingCurrentRun: false,
     })
 
-    const [{ getByRole, getByText }, store] = render()
+    const [{ getByRole, getByText }] = render()
     fireEvent.click(getByRole('button', { name: 'close' }))
     const mockCloseModal = getByText('mock confirm exit protocol upload modal')
     fireEvent.click(mockCloseModal)
     expect(
       screen.queryByText('mock confirm exit protocol upload modal')
     ).toBeNull()
-    expect(store.dispatch).toHaveBeenCalledWith(closeProtocol())
     expect(mockCloseCurrentRun).toHaveBeenCalled()
   })
 
