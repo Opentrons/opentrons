@@ -72,9 +72,9 @@ export function useCloseCurrentRun(): {
   ])
 
   const analysisNotOk =
-    protocolRecord != null &&
-    'result' in protocolRecord.data?.analyses[0] &&
-    protocolRecord.data?.analyses[0]?.result === 'not-ok'
+    protocolRecord?.data?.analyses[0] != null &&
+    'result' in protocolRecord.data.analyses[0] &&
+    protocolRecord.data.analyses[0].result === 'not-ok'
 
   return {
     closeCurrentRun: closeCurrentRunCallback,

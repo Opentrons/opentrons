@@ -15,14 +15,14 @@ import { i18n } from '../../../i18n'
 import { CommandList } from '../CommandList'
 import { useProtocolDetails } from '../hooks'
 import { useRunStatus } from '../../RunTimeControl/hooks'
-import { useCurrentProtocolRun } from '../../ProtocolUpload/hooks/useCurrentProtocolRun'
+import { useCloseCurrentRun } from '../../ProtocolUpload/hooks/useCloseCurrentRun'
 import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
 import type { ProtocolFile } from '@opentrons/shared-data'
 
 jest.mock('../hooks')
 jest.mock('../CommandList')
 jest.mock('../../RunTimeControl/hooks')
-jest.mock('../../ProtocolUpload/hooks/useCurrentProtocolRun')
+jest.mock('../../ProtocolUpload/hooks/useCloseCurrentRun')
 
 const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
   typeof useProtocolDetails
@@ -33,8 +33,8 @@ const mockUseRunStatus = useRunStatus as jest.MockedFunction<
   typeof useRunStatus
 >
 
-const mockUseCurrentProtocolRun = useCurrentProtocolRun as jest.MockedFunction<
-  typeof useCurrentProtocolRun
+const mockUseCloseCurrentRun = useCloseCurrentRun as jest.MockedFunction<
+  typeof useCloseCurrentRun
 >
 
 const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolFile<{}>
@@ -57,12 +57,11 @@ describe('RunDetails', () => {
       displayName: 'mock display name',
     })
     when(mockCommandList).mockReturnValue(<div>Mock Command List</div>)
-    when(mockUseCurrentProtocolRun)
+    when(mockUseCloseCurrentRun)
       .calledWith()
       .mockReturnValue({
-        protocolRecord: { data: { analyses: [] } },
-        runRecord: {},
-        createProtocolRun: jest.fn(),
+        isProtocolRunLoaded: false,
+        closeCurrentRun: jest.fn(),
       } as any)
   })
 
