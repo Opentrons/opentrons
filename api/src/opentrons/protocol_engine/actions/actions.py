@@ -23,8 +23,16 @@ class PauseAction:
 
 
 @dataclass(frozen=True)
-class StopErrorDetails:
-    """Error details for the payload of a StopAction."""
+class StopAction:
+    """Stop the current engine execution.
+
+    After a StopAction, the engine status will be marked as stopped.
+    """
+
+
+@dataclass(frozen=True)
+class FinishErrorDetails:
+    """Error details for the payload of a FinishAction."""
 
     error: Exception
     error_id: str
@@ -32,10 +40,18 @@ class StopErrorDetails:
 
 
 @dataclass(frozen=True)
-class StopAction:
-    """Stop processing commands in the engine, marking the engine status as done."""
+class FinishAction:
+    """Gracefully stop processing commands in the engine.
 
-    error_details: Optional[StopErrorDetails] = None
+    After a FinishAction, the engine status will be marked as succeeded or failed.
+    """
+
+    error_details: Optional[FinishErrorDetails] = None
+
+
+@dataclass(frozen=True)
+class HardwareStoppedAction:
+    """An action dispatched after hardware has successfully been stopped."""
 
 
 @dataclass(frozen=True)
@@ -79,6 +95,8 @@ Action = Union[
     PlayAction,
     PauseAction,
     StopAction,
+    FinishAction,
+    HardwareStoppedAction,
     QueueCommandAction,
     UpdateCommandAction,
     FailCommandAction,
