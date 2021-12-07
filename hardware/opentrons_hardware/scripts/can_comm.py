@@ -7,7 +7,6 @@ from enum import Enum
 from logging.config import dictConfig
 from typing import Type, Sequence, Callable, cast
 
-from opentrons_hardware.drivers.can_bus import CanDriver
 from opentrons_ot3_firmware.constants import (
     MessageId,
     NodeId,

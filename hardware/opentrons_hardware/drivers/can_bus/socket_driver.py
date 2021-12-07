@@ -6,7 +6,7 @@ import asyncio
 from typing import List
 
 from . import ArbitrationId
-from .message import CanMessage
+from opentrons_ot3_firmware import CanMessage
 from .abstract_driver import AbstractCanDriver
 
 

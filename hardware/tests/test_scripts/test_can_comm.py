@@ -11,7 +11,6 @@ from opentrons_ot3_firmware.message import (
 from opentrons_ot3_firmware.arbitration_id import (
     ArbitrationId,
     ArbitrationIdParts,
-
 )
 from opentrons_ot3_firmware.messages.payloads import (
     DeviceInfoResponsePayload,
