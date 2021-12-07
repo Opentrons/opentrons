@@ -36,6 +36,7 @@ import type { ErrorObject } from 'ajv'
 import type { Dispatch, State } from '../../redux/types'
 
 import styles from './styles.css'
+import { protocol } from 'electron/main'
 
 const VALIDATION_ERROR_T_MAP: { [errorKey: string]: string } = {
   INVALID_FILE_TYPE: 'invalid_file_type',
@@ -65,7 +66,12 @@ export function ProtocolUpload(): JSX.Element {
   }
 
   React.useEffect(() => {
-    if (protocolRecord?.data?.analyses[0]?.result === 'not-ok') {
+    if (
+      protocolRecord != null &&
+      'result' in protocolRecord?.data?.analyses[0] &&
+      protocolRecord?.data?.analyses[0]?.result === 'not-ok'
+    ) {
+      console.log(protocolRecord?.data.analyses[0].errors[0])
       setUploadError([
         VALIDATION_ERROR_T_MAP.ANALYSIS_ERROR,
         protocolRecord?.data.analyses[0].errors[0].detail as string,

@@ -384,6 +384,13 @@ export interface LoadedLabware {
     slot: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
   }
 }
+interface AnalysisError {
+  id: string
+  detail: string
+  errorType: string
+  createdAt: string
+}
+
 export interface CompletedProtocolAnalysis {
   id: string
   status?: 'completed'
@@ -391,7 +398,7 @@ export interface CompletedProtocolAnalysis {
   pipettes: LoadedPipette[]
   labware: LoadedLabware[]
   commands: Command[]
-  errors: string[]
+  errors: AnalysisError[]
 }
 
 export interface ResourceFile {

@@ -70,13 +70,18 @@ export function useCloseCurrentRun(): {
     stopRun,
     currentRunId,
   ])
-  console.log(protocolRecord.data.analyses[0])
+
+  const analysisNotOk =
+    protocolRecord != null &&
+    'result' in protocolRecord.data?.analyses[0] &&
+    protocolRecord.data?.analyses[0]?.result === 'not-ok'
+
   return {
     closeCurrentRun: closeCurrentRunCallback,
     isProtocolRunLoaded:
       !isDismissing &&
       runRecord != null &&
       protocolRecord != null &&
-      protocolRecord.data.analyses[0].result !== 'not-ok',
+      !analysisNotOk,
   }
 }
