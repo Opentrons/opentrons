@@ -36,6 +36,7 @@ async def test_upsert_and_get_protocol(tmp_path: Path, subject: ProtocolStore) -
             config=JsonProtocolConfig(schema_version=123),
             files=[],
             metadata={},
+            labware=[],
         ),
     )
 
@@ -65,6 +66,7 @@ async def test_get_all_protocols(tmp_path: Path, subject: ProtocolStore) -> None
             config=PythonProtocolConfig(api_version=APIVersion(1234, 5678)),
             files=[],
             metadata={},
+            labware=[],
         ),
     )
     resource_2 = ProtocolResource(
@@ -76,6 +78,7 @@ async def test_get_all_protocols(tmp_path: Path, subject: ProtocolStore) -> None
             config=JsonProtocolConfig(schema_version=1234),
             files=[],
             metadata={},
+            labware=[],
         ),
     )
 
@@ -102,6 +105,7 @@ async def test_remove_protocol(tmp_path: Path, subject: ProtocolStore) -> None:
             config=JsonProtocolConfig(schema_version=123),
             files=[ProtocolSourceFile(name=main_file.name, role=ProtocolFileRole.MAIN)],
             metadata={},
+            labware=[],
         ),
     )
 
