@@ -1,3 +1,4 @@
+import * as React from 'react'
 import {
   useStopRunMutation,
   useDismissCurrentRunMutation,
@@ -24,14 +25,14 @@ type CloseCallback = (options?: UseDismissCurrentRunMutationOptions) => void
 
 export function useCloseCurrentRun(): {
   closeCurrentRun: CloseCallback
-  isClosingCurrentRun: boolean
+  isProtocolRunLoaded: boolean
 } {
   const currentRunId = useCurrentRunId()
   const {
     dismissCurrentRun,
     isLoading: isDismissing,
   } = useDismissCurrentRunMutation()
-  const { runRecord } = useCurrentProtocolRun()
+  const { protocolRecord, runRecord } = useCurrentProtocolRun()
 
   const { stopRun } = useStopRunMutation()
   const { deleteRun } = useDeleteRunMutation()
@@ -62,5 +63,20 @@ export function useCloseCurrentRun(): {
       }
     }
   }
-  return { closeCurrentRun, isClosingCurrentRun: isDismissing }
+  const closeCurrentRunCallback = React.useCallback(closeCurrentRun, [
+    deleteRun,
+    dismissCurrentRun,
+    runRecord,
+    stopRun,
+    currentRunId,
+  ])
+  console.log(protocolRecord.data.analyses[0])
+  return {
+    closeCurrentRun: closeCurrentRunCallback,
+    isProtocolRunLoaded:
+      !isDismissing &&
+      runRecord != null &&
+      protocolRecord != null &&
+      protocolRecord.data.analyses[0].result !== 'not-ok',
+  }
 }

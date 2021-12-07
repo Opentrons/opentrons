@@ -40,6 +40,7 @@ import styles from './styles.css'
 const VALIDATION_ERROR_T_MAP: { [errorKey: string]: string } = {
   INVALID_FILE_TYPE: 'invalid_file_type',
   INVALID_JSON_FILE: 'invalid_json_file',
+  ANALYSIS_ERROR: 'analysis_error',
 }
 
 export function ProtocolUpload(): JSX.Element {
@@ -47,22 +48,36 @@ export function ProtocolUpload(): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   const {
     createProtocolRun,
-    runRecord,
     protocolRecord,
     isCreatingProtocolRun,
   } = useCurrentProtocolRun()
-  const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
-  const hasCurrentRun = runRecord != null && protocolRecord != null
+
+  const { closeCurrentRun, isProtocolRunLoaded } = useCloseCurrentRun()
   const robotName = useSelector((state: State) => getConnectedRobotName(state))
 
   const logger = useLogger(__filename)
   const [uploadError, setUploadError] = React.useState<
-    [string, ErrorObject[] | null | undefined] | null
+    [string, ErrorObject[] | string | null | undefined] | null
   >(null)
 
   const clearError = (): void => {
     setUploadError(null)
   }
+
+  React.useEffect(() => {
+    if (protocolRecord?.data?.analyses[0]?.result === 'not-ok') {
+      setUploadError([
+        VALIDATION_ERROR_T_MAP.ANALYSIS_ERROR,
+        protocolRecord?.data.analyses[0].errors[0].detail as string,
+      ])
+    }
+  }, [protocolRecord])
+
+  React.useEffect(() => {
+    if (uploadError != null) {
+      closeCurrentRun()
+    }
+  }, [uploadError])
 
   const handleUpload = (file: File): void => {
     clearError()
@@ -90,32 +105,30 @@ export function ProtocolUpload(): JSX.Element {
     cancel: cancelExit,
   } = useConditionalConfirm(handleCloseProtocol, true)
 
-  const titleBarProps =
-    !isClosingCurrentRun && hasCurrentRun
-      ? {
-          title: t('protocol_title', {
-            protocol_name: protocolRecord?.data?.metadata?.protocolName ?? '',
-          }),
-          back: {
-            onClick: confirmExit,
-            title: t('shared:close'),
-            children: t('shared:close'),
-            iconName: 'close' as const,
-          },
-          className: styles.reverse_titlebar_items,
-        }
-      : {
-          title: (
-            <Text>{t('upload_and_simulate', { robot_name: robotName })}</Text>
-          ),
-        }
+  const titleBarProps = isProtocolRunLoaded
+    ? {
+        title: t('protocol_title', {
+          protocol_name: protocolRecord?.data?.metadata?.protocolName ?? '',
+        }),
+        back: {
+          onClick: confirmExit,
+          title: t('shared:close'),
+          children: t('shared:close'),
+          iconName: 'close' as const,
+        },
+        className: styles.reverse_titlebar_items,
+      }
+    : {
+        title: (
+          <Text>{t('upload_and_simulate', { robot_name: robotName })}</Text>
+        ),
+      }
 
-  const pageContents =
-    !isClosingCurrentRun && hasCurrentRun ? (
-      <ProtocolSetup />
-    ) : (
-      <UploadInput onUpload={handleUpload} />
-    )
+  const pageContents = isProtocolRunLoaded ? (
+    <ProtocolSetup />
+  ) : (
+    <UploadInput onUpload={handleUpload} />
+  )
 
   return (
     <>
@@ -130,10 +143,14 @@ export function ProtocolUpload(): JSX.Element {
             title={t('protocol_upload_failed')}
           >
             {t(VALIDATION_ERROR_T_MAP[uploadError[0]])}
-            {uploadError[1] != null &&
+            {typeof uploadError[1] === 'string' ? (
+              <Text>{uploadError[1]}</Text>
+            ) : (
+              uploadError[1] != null &&
               uploadError[1].map((errorObject, i) => (
                 <Text key={i}>{JSON.stringify(errorObject)}</Text>
-              ))}
+              ))
+            )}
           </AlertItem>
         )}
         <Box
