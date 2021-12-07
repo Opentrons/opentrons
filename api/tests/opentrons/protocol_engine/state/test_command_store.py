@@ -35,10 +35,10 @@ def test_initial_state() -> None:
     subject = CommandStore()
 
     assert subject.state == CommandState(
-        is_running=True,
-        is_gracefully_finished=False,
+        is_running_queue=True,
+        should_report_result=False,
         is_hardware_stopped=False,
-        stop_requested=False,
+        should_stop=False,
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -205,10 +205,10 @@ def test_command_store_handles_pause_action() -> None:
     subject.handle_action(PauseAction())
 
     assert subject.state == CommandState(
-        is_running=False,
-        is_gracefully_finished=False,
+        is_running_queue=False,
+        should_report_result=False,
         is_hardware_stopped=False,
-        stop_requested=False,
+        should_stop=False,
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -221,10 +221,10 @@ def test_command_store_handles_play_action() -> None:
     subject.handle_action(PlayAction())
 
     assert subject.state == CommandState(
-        is_running=True,
-        is_gracefully_finished=False,
+        is_running_queue=True,
+        should_report_result=False,
         is_hardware_stopped=False,
-        stop_requested=False,
+        should_stop=False,
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -238,10 +238,10 @@ def test_command_store_handles_finish_action() -> None:
     subject.handle_action(FinishAction())
 
     assert subject.state == CommandState(
-        is_running=False,
-        is_gracefully_finished=True,
+        is_running_queue=False,
+        should_report_result=True,
         is_hardware_stopped=False,
-        stop_requested=True,
+        should_stop=True,
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -255,26 +255,26 @@ def test_command_store_handles_stop_action() -> None:
     subject.handle_action(StopAction())
 
     assert subject.state == CommandState(
-        is_running=False,
-        is_gracefully_finished=False,
+        is_running_queue=False,
+        should_report_result=False,
         is_hardware_stopped=False,
-        stop_requested=True,
+        should_stop=True,
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
 
 
-def test_command_store_cannot_restart_after_stop_requested() -> None:
+def test_command_store_cannot_restart_after_should_stop() -> None:
     """It should reject a play action after a stop action."""
     subject = CommandStore()
     subject.handle_action(FinishAction())
     subject.handle_action(PlayAction())
 
     assert subject.state == CommandState(
-        is_running=False,
-        is_gracefully_finished=True,
+        is_running_queue=False,
+        should_report_result=True,
         is_hardware_stopped=False,
-        stop_requested=True,
+        should_stop=True,
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -292,10 +292,10 @@ def test_command_store_ignores_known_finish_error() -> None:
     subject.handle_action(FinishAction(error_details=error_details))
 
     assert subject.state == CommandState(
-        is_running=False,
-        is_gracefully_finished=True,
+        is_running_queue=False,
+        should_report_result=True,
         is_hardware_stopped=False,
-        stop_requested=True,
+        should_stop=True,
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -313,10 +313,10 @@ def test_command_store_saves_unknown_finish_error() -> None:
     subject.handle_action(FinishAction(error_details=error_details))
 
     assert subject.state == CommandState(
-        is_running=False,
-        is_gracefully_finished=True,
+        is_running_queue=False,
+        should_report_result=True,
         is_hardware_stopped=False,
-        stop_requested=True,
+        should_stop=True,
         commands_by_id=OrderedDict(),
         errors_by_id={
             "error-id": errors.ErrorOccurrence(
@@ -338,10 +338,10 @@ def test_command_store_ignores_stop_after_graceful_finish() -> None:
     subject.handle_action(StopAction())
 
     assert subject.state == CommandState(
-        is_running=False,
-        is_gracefully_finished=True,
+        is_running_queue=False,
+        should_report_result=True,
         is_hardware_stopped=False,
-        stop_requested=True,
+        should_stop=True,
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -356,10 +356,10 @@ def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
     subject.handle_action(FinishAction())
 
     assert subject.state == CommandState(
-        is_running=False,
-        is_gracefully_finished=False,
+        is_running_queue=False,
+        should_report_result=False,
         is_hardware_stopped=False,
-        stop_requested=True,
+        should_stop=True,
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -386,10 +386,10 @@ def test_command_store_handles_command_failed() -> None:
     )
 
     assert subject.state == CommandState(
-        is_running=True,
-        is_gracefully_finished=False,
+        is_running_queue=True,
+        should_report_result=False,
         is_hardware_stopped=False,
-        stop_requested=False,
+        should_stop=False,
         commands_by_id=OrderedDict([("command-id", expected_failed_command)]),
         errors_by_id={
             "error-id": errors.ErrorOccurrence(
@@ -408,10 +408,10 @@ def test_handles_hardware_stopped() -> None:
     subject.handle_action(HardwareStoppedAction())
 
     assert subject.state == CommandState(
-        is_running=False,
-        is_gracefully_finished=False,
+        is_running_queue=False,
+        should_report_result=False,
         is_hardware_stopped=True,
-        stop_requested=True,
+        should_stop=True,
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )

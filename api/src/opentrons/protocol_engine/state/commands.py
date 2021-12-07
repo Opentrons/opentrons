@@ -29,12 +29,28 @@ from .abstract_store import HasState, HandlesActions
 
 @dataclass(frozen=True)
 class CommandState:
-    """State of all protocol engine command resources."""
+    """State of all protocol engine command resources.
 
-    is_running: bool
-    is_gracefully_finished: bool
+    Attributes:
+        is_running_queue: Whether the engine is currently pulling new
+            commands off the queue to execute. A command may still be
+            executing, and the robot may still be in motion, even if False.
+        is_hardware_stopped: Whether the engine's hardware has ceased
+            motion. Once set, this flag cannot be unset.
+        should_stop: Whether a graceful finish or an ungraceful stop has
+            been requested. Once set, this flag cannot be unset.
+        should_report_result: Whether the engine should report a success or
+            failure status once stopped. If unset, the engine will simply
+            report "stopped." Once set, this flag cannot be unset.
+        commands_by_id: All command resources, in insertion order, mapped
+            by their unique IDs.
+        errors_by_id: All error occurrences, mapped by their unique IDs.
+    """
+
+    is_running_queue: bool
     is_hardware_stopped: bool
-    stop_requested: bool
+    should_stop: bool
+    should_report_result: bool
     # TODO(mc, 2021-06-16): OrderedDict is mutable. Switch to Sequence + Mapping
     commands_by_id: OrderedDict[str, Command]
     errors_by_id: Mapping[str, ErrorOccurrence]
@@ -48,10 +64,10 @@ class CommandStore(HasState[CommandState], HandlesActions):
     def __init__(self) -> None:
         """Initialize a CommandStore and its state."""
         self._state = CommandState(
-            is_running=True,
-            is_gracefully_finished=False,
+            is_running_queue=True,
             is_hardware_stopped=False,
-            stop_requested=False,
+            should_stop=False,
+            should_report_result=False,
             commands_by_id=OrderedDict(),
             errors_by_id={},
         )
@@ -109,23 +125,23 @@ class CommandStore(HasState[CommandState], HandlesActions):
             )
 
         elif isinstance(action, PlayAction):
-            if not self._state.stop_requested:
-                self._state = replace(self._state, is_running=True)
+            if not self._state.should_stop:
+                self._state = replace(self._state, is_running_queue=True)
 
         elif isinstance(action, PauseAction):
-            self._state = replace(self._state, is_running=False)
+            self._state = replace(self._state, is_running_queue=False)
 
         elif isinstance(action, StopAction):
-            if not self._state.stop_requested:
+            if not self._state.should_stop:
                 self._state = replace(
                     self._state,
-                    is_running=False,
-                    is_gracefully_finished=False,
-                    stop_requested=True,
+                    is_running_queue=False,
+                    should_report_result=False,
+                    should_stop=True,
                 )
 
         elif isinstance(action, FinishAction):
-            if not self._state.stop_requested:
+            if not self._state.should_stop:
                 # any `ProtocolEngineError`'s will be captured by `FailCommandAction`,
                 # so only capture unknown errors here
                 if action.error_details and not isinstance(
@@ -148,18 +164,18 @@ class CommandStore(HasState[CommandState], HandlesActions):
 
                 self._state = replace(
                     self._state,
-                    is_running=False,
-                    is_gracefully_finished=True,
-                    stop_requested=True,
+                    is_running_queue=False,
+                    should_report_result=True,
+                    should_stop=True,
                     errors_by_id=errors_by_id,
                 )
 
         elif isinstance(action, HardwareStoppedAction):
             self._state = replace(
                 self._state,
-                is_running=False,
+                is_running_queue=False,
                 is_hardware_stopped=True,
-                stop_requested=True,
+                should_stop=True,
             )
 
 
@@ -201,10 +217,10 @@ class CommandView(HasState[CommandState]):
         Raises:
             EngineStoppedError:
         """
-        if self._state.stop_requested:
+        if self._state.should_stop:
             raise ProtocolEngineStoppedError("Engine was stopped")
 
-        if not self._state.is_running:
+        if not self._state.is_running_queue:
             return None
 
         for command_id, command in self._state.commands_by_id.items():
@@ -217,7 +233,7 @@ class CommandView(HasState[CommandState]):
 
     def get_is_running(self) -> bool:
         """Get whether the engine is running and queued commands should be executed."""
-        return self._state.is_running
+        return self._state.is_running_queue
 
     def get_is_complete(self, command_id: str) -> bool:
         """Get whether a given command is completed.
@@ -261,15 +277,16 @@ class CommandView(HasState[CommandState]):
 
         A command may still be executing while the engine is stopping.
         """
-        return self._state.stop_requested
+        return self._state.should_stop
 
     def get_is_stopped(self) -> bool:
         """Get whether an engine stop has completed."""
-        return self._state.stop_requested and not any(
+        return self._state.should_stop and not any(
             c.status == CommandStatus.RUNNING
             for c in self._state.commands_by_id.values()
         )
 
+    # TODO(mc, 2021-12-07): reject adding commands to a stopped engine
     def validate_action_allowed(self, action: Union[PlayAction, PauseAction]) -> None:
         """Validate if a PlayAction or PauseAction is allowed, raising if not.
 
@@ -278,7 +295,7 @@ class CommandView(HasState[CommandState]):
         Raises:
             ProtocolEngineStoppedError: the engine has been stopped.
         """
-        if self._state.stop_requested:
+        if self._state.should_stop:
             action_desc = "play" if isinstance(action, PlayAction) else "pause"
             raise ProtocolEngineStoppedError(f"Cannot {action_desc} a stopped engine.")
 
@@ -288,7 +305,7 @@ class CommandView(HasState[CommandState]):
         all_errors = self._state.errors_by_id.values()
         all_statuses = [c.status for c in all_commands]
 
-        if self._state.is_gracefully_finished:
+        if self._state.should_report_result:
             if not self._state.is_hardware_stopped:
                 return EngineStatus.RUNNING
             elif any(all_errors):
@@ -296,13 +313,13 @@ class CommandView(HasState[CommandState]):
             else:
                 return EngineStatus.SUCCEEDED
 
-        elif self._state.stop_requested:
+        elif self._state.should_stop:
             if not self._state.is_hardware_stopped:
                 return EngineStatus.STOP_REQUESTED
             else:
                 return EngineStatus.STOPPED
 
-        elif self._state.is_running:
+        elif self._state.is_running_queue:
             any_running = any(s == CommandStatus.RUNNING for s in all_statuses)
             any_queued = any(s == CommandStatus.QUEUED for s in all_statuses)
 
