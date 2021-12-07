@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import {
   Box,
   Btn,
-  C_BLUE,
   C_LIGHT_GRAY,
   C_MED_DARK_GRAY,
   C_NEAR_WHITE,
@@ -13,7 +12,7 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   Modal,
-  PrimaryBtn,
+  NewPrimaryBtn,
   SIZE_2,
   SIZE_4,
   SPACING_1,
@@ -193,13 +192,9 @@ export const LabwarePositionCheckStepDetailModal = (
             </Box>
           </Flex>
           <Flex justifyContent={JUSTIFY_CENTER} marginTop={SPACING_5}>
-            <PrimaryBtn
-              onClick={props.onCloseClick}
-              width={SIZE_4}
-              backgroundColor={C_BLUE}
-            >
+            <NewPrimaryBtn onClick={props.onCloseClick} width={SIZE_4}>
               {t('shared:close')}
-            </PrimaryBtn>
+            </NewPrimaryBtn>
           </Flex>
         </Flex>
       </Modal>

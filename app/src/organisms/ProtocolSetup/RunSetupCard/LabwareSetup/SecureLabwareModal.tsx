@@ -7,9 +7,8 @@ import {
   Icon,
   Flex,
   Modal,
-  PrimaryBtn,
+  NewPrimaryBtn,
   Text,
-  C_BLUE,
   C_MED_DARK_GRAY,
   FONT_SIZE_BODY_2,
   FONT_WEIGHT_REGULAR,
@@ -101,13 +100,9 @@ export const SecureLabwareModal = (
             marginTop={SPACING_5}
             marginBottom={SPACING_3}
           >
-            <PrimaryBtn
-              onClick={props.onCloseClick}
-              width={SIZE_4}
-              backgroundColor={C_BLUE}
-            >
+            <NewPrimaryBtn onClick={props.onCloseClick} width={SIZE_4}>
               {t('shared:close')}
-            </PrimaryBtn>
+            </NewPrimaryBtn>
           </Flex>
         </Box>
       </Modal>

@@ -7,7 +7,7 @@ import {
   Btn,
   Link,
   Module,
-  PrimaryBtn,
+  NewPrimaryBtn,
   RobotWorkSpace,
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
@@ -129,18 +129,17 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
           </>
         )}
       </RobotWorkSpace>
-      <PrimaryBtn
+      <NewPrimaryBtn
         title={t('proceed_to_labware_setup_step')}
         disabled={proceedToLabwareDisabledReason != null}
         onClick={expandLabwareSetupStep}
-        backgroundColor={C_BLUE}
         id={'ModuleSetup_proceedToLabwareSetup'}
         width="18rem"
         alignSelf={ALIGN_CENTER}
         {...targetProps}
       >
         {t('proceed_to_labware_setup_step')}
-      </PrimaryBtn>
+      </NewPrimaryBtn>
       {proceedToLabwareDisabledReason != null && (
         <Tooltip {...tooltipProps}>{proceedToLabwareDisabledReason}</Tooltip>
       )}

@@ -7,7 +7,7 @@ import {
   Icon,
   Link,
   Modal,
-  PrimaryBtn,
+  NewPrimaryBtn,
   Text,
   C_BLUE,
   C_MED_DARK_GRAY,
@@ -125,14 +125,13 @@ export const LabwareOffsetModal = (
             }}
           />
           <Flex justifyContent={JUSTIFY_CENTER} marginBottom={SPACING_3}>
-            <PrimaryBtn
+            <NewPrimaryBtn
               onClick={props.onCloseClick}
               width={SIZE_4}
-              backgroundColor={C_BLUE}
               id={'LabwareSetupModal_closeButton'}
             >
               {t('shared:close')}
-            </PrimaryBtn>
+            </NewPrimaryBtn>
           </Flex>
         </Box>
       </Modal>
