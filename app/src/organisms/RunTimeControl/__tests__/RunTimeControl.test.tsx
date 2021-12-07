@@ -71,6 +71,9 @@ describe('RunTimeControl', () => {
         play: () => {},
         pause: () => {},
         reset: () => {},
+        isPlayRunActionLoading: false,
+        isPauseRunActionLoading: false,
+        isResetRunLoading: false,
       })
     when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_IDLE)
     mockTimer.mockReturnValue(<div>Mock Timer</div>)

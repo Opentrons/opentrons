@@ -7,7 +7,7 @@ export function useRestartRun(): () => void {
   const mostRecentRunId = useMostRecentRunId()
   const closeCurrentRun = useCloseCurrentRun()
   const { deleteRun } = useDeleteRunMutation()
-  const cloneRun = useCloneRun(mostRecentRunId as string)
+  const { cloneRun } = useCloneRun(mostRecentRunId as string)
 
   return () => {
     if (mostRecentRunId != null) {
