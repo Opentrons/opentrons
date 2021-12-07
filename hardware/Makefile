@@ -100,6 +100,10 @@ format:
 dev:
 	echo "Nothing here yet"
 
+.PHONY: opentrons_ot3_firmware_dist
+opentrons_ot3_firmware_dist: Pipfile.lock
+	mkdir -p dist
+	$(python) ../scripts/bundle_installed_package.py opentrons_ot3_firmware dist
 
 .PHONY: push-no-restart
 push-no-restart: wheel
@@ -109,11 +113,11 @@ push-no-restart: wheel
 push: push-no-restart
 	$(call restart-service,$(host),$(br_ssh_key),$(ssh_opts),"jupyter-notebook opentrons-robot-server")
 
-
 .PHONY: push-no-restart-ot3
-push-no-restart-ot3: $(sdist_file)
-	echo $(sdist_file)
+push-no-restart-ot3: $(sdist_file) Pipfile.lock
+	echo $(sdist_file) $(wildcard dist/opentrons_ot3_firmware-*.tar.gz)
 	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,"opentrons_hardware")
+	$(call push-python-sdist,$(host),,$(ssh_opts),$(wildcard dist/opentrons_ot3_firmware-*.tar.gz),/opt/opentrons-robot-server,"opentrons_ot3_firmware")
 
 .PHONY: push-ot3
 push-ot3: push-no-restart-ot3

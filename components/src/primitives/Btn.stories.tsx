@@ -1,5 +1,14 @@
 import * as React from 'react'
-import { PrimaryBtn, SecondaryBtn, LightSecondaryBtn, TertiaryBtn } from './Btn'
+import {
+  PrimaryBtn,
+  SecondaryBtn,
+  NewPrimaryBtn,
+  NewSecondaryBtn,
+  NewAlertPrimaryBtn,
+  NewAlertSecondaryBtn,
+  LightSecondaryBtn,
+  TertiaryBtn,
+} from './Btn'
 import { Box } from './Box'
 
 import type { Story, Meta } from '@storybook/react'
@@ -25,6 +34,42 @@ export const Secondary = SecondaryTemplate.bind({})
 Secondary.args = {
   children: 'Cancel',
   title: 'secondary button title',
+}
+
+const AppPrimaryTemlate: Story<
+  React.ComponentProps<typeof NewPrimaryBtn>
+> = args => <NewPrimaryBtn {...args} />
+export const AppPrimary = AppPrimaryTemlate.bind({})
+AppPrimary.args = {
+  children: 'Confirm and Proceed',
+  title: 'app primary button title',
+}
+
+const AppSecondaryTemlate: Story<
+  React.ComponentProps<typeof NewSecondaryBtn>
+> = args => <NewSecondaryBtn {...args} />
+export const AppSecondary = AppSecondaryTemlate.bind({})
+AppSecondary.args = {
+  children: 'Confirm and Proceed',
+  title: 'app secondary button title',
+}
+
+const AppAlertPrimaryTemlate: Story<
+  React.ComponentProps<typeof NewAlertPrimaryBtn>
+> = args => <NewAlertPrimaryBtn {...args} />
+export const AppAlertPrimary = AppAlertPrimaryTemlate.bind({})
+AppAlertPrimary.args = {
+  children: 'Cancel',
+  title: 'app alert primary button title',
+}
+
+const AppAlertSecondaryTemlate: Story<
+  React.ComponentProps<typeof NewAlertSecondaryBtn>
+> = args => <NewAlertSecondaryBtn {...args} />
+export const AppAlertSecondary = AppAlertSecondaryTemlate.bind({})
+AppAlertSecondary.args = {
+  children: 'Cancel',
+  title: 'app alert secondary button title',
 }
 
 const LightSecondaryTemplate: Story<

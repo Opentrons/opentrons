@@ -5,19 +5,22 @@ import logging
 
 from opentrons_hardware.drivers.can_bus import (
     CanDriver,
-    NodeId,
+
+)
+from opentrons_ot3_firmware.arbitration_id import (
     ArbitrationId,
     ArbitrationIdParts,
-    CanMessage,
-    MessageId,
+
 )
+from opentrons_ot3_firmware.message import CanMessage
+from opentrons_ot3_firmware.constants import NodeId, MessageId
 from abc import ABC, abstractmethod
 
-from opentrons_hardware.drivers.can_bus.messages.messages import (
+from opentrons_ot3_firmware.messages.messages import (
     MessageDefinition,
     get_definition,
 )
-from opentrons_hardware.utils import BinarySerializableException
+from opentrons_ot3_firmware.utils import BinarySerializableException
 
 log = logging.getLogger(__name__)
 

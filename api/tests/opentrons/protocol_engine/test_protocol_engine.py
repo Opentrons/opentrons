@@ -24,8 +24,10 @@ from opentrons.protocol_engine.actions import (
     PlayAction,
     PauseAction,
     StopAction,
-    StopErrorDetails,
+    FinishAction,
+    FinishErrorDetails,
     QueueCommandAction,
+    HardwareStoppedAction,
 )
 
 
@@ -228,7 +230,7 @@ def test_pause(
     )
 
 
-async def test_stop(
+async def test_finish(
     decoy: Decoy,
     action_dispatcher: ActionDispatcher,
     plugin_starter: PluginStarter,
@@ -236,18 +238,19 @@ async def test_stop(
     hardware_api: HardwareAPI,
     subject: ProtocolEngine,
 ) -> None:
-    """It should be able to stop the engine."""
-    await subject.stop()
+    """It should be able to gracefully tell the engine it's done."""
+    await subject.finish()
 
     decoy.verify(
-        action_dispatcher.dispatch(StopAction()),
+        action_dispatcher.dispatch(FinishAction()),
         await queue_worker.join(),
         await hardware_api.stop(home_after=False),
+        action_dispatcher.dispatch(HardwareStoppedAction()),
         plugin_starter.stop(),
     )
 
 
-async def test_stop_with_error(
+async def test_finish_with_error(
     decoy: Decoy,
     action_dispatcher: ActionDispatcher,
     queue_worker: QueueWorker,
@@ -255,9 +258,9 @@ async def test_stop_with_error(
     model_utils: ModelUtils,
     subject: ProtocolEngine,
 ) -> None:
-    """It should be able to stop the engine with an error."""
+    """It should be able to tell the engine it's finished because of an error."""
     error = RuntimeError("oh no")
-    expected_error_details = StopErrorDetails(
+    expected_error_details = FinishErrorDetails(
         error_id="error-id",
         created_at=datetime(year=2021, month=1, day=1),
         error=error,
@@ -268,16 +271,17 @@ async def test_stop_with_error(
         datetime(year=2021, month=1, day=1)
     )
 
-    await subject.stop(error=error)
+    await subject.finish(error=error)
 
     decoy.verify(
-        action_dispatcher.dispatch(StopAction(error_details=expected_error_details)),
+        action_dispatcher.dispatch(FinishAction(error_details=expected_error_details)),
         await queue_worker.join(),
         await hardware_api.stop(home_after=False),
+        action_dispatcher.dispatch(HardwareStoppedAction()),
     )
 
 
-async def test_stop_stops_hardware_if_queue_worker_join_fails(
+async def test_finish_stops_hardware_if_queue_worker_join_fails(
     decoy: Decoy,
     queue_worker: QueueWorker,
     hardware_api: HardwareAPI,
@@ -289,7 +293,7 @@ async def test_stop_stops_hardware_if_queue_worker_join_fails(
     ).then_raise(RuntimeError("oh no"))
 
     with pytest.raises(RuntimeError, match="oh no"):
-        await subject.stop()
+        await subject.finish()
 
     decoy.verify(
         await hardware_api.stop(home_after=False),
@@ -310,21 +314,22 @@ async def test_wait_until_complete(
     )
 
 
-async def test_halt(
+async def test_stop(
     decoy: Decoy,
     action_dispatcher: ActionDispatcher,
     queue_worker: QueueWorker,
     hardware_api: HardwareAPI,
     subject: ProtocolEngine,
 ) -> None:
-    """It should be able to halt the engine."""
-    await subject.halt()
+    """It should be able to stop the engine."""
+    await subject.stop()
 
     decoy.verify(
         action_dispatcher.dispatch(StopAction()),
         queue_worker.cancel(),
         await hardware_api.halt(),
         await hardware_api.stop(home_after=False),
+        action_dispatcher.dispatch(HardwareStoppedAction()),
     )
 
 
