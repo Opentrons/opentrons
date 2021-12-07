@@ -85,30 +85,31 @@ class ThermocyclerMovementFlagger:
                 maybe if the module disconnects between when it was loaded into
                 Protocol Engine and when this function is called?
         """
+        module_id = self._get_parent_module_id(labware_id=labware_id)
+        if module_id is None:
+            return None  # Labware not on a module.
+
+        module_model = self._state_store.modules.get_model(module_id=module_id)
+        if module_model != PEModuleModel.THERMOCYCLER_MODULE_V1:
+            return None  # Labware on a module, but not a Thermocycler.
+
+        thermocycler_serial = self._state_store.modules.get_serial(module_id=module_id)
+        thermocycler = await self._find_thermocycler_by_serial(
+            serial_number=thermocycler_serial
+        )
+        if thermocycler is None:
+            raise self._HardwareThermocyclerMissingError(
+                f"No Thermocycler found" f' with serial number "{thermocycler_serial}".'
+            )
+
+        return thermocycler
+
+    def _get_parent_module_id(self, labware_id: str) -> Optional[str]:
         labware_location = self._state_store.labware.get_location(labware_id=labware_id)
         if isinstance(labware_location, ModuleLocation):
-            module_id = labware_location.moduleId
-            if (
-                self._state_store.modules.get_model(module_id=module_id)
-                == PEModuleModel.THERMOCYCLER_MODULE_V1
-            ):
-                thermocycler_serial = self._state_store.modules.get_serial(
-                    module_id=module_id
-                )
-
-                thermocycler = await self._find_thermocycler_by_serial(
-                    serial_number=thermocycler_serial
-                )
-
-                if thermocycler is not None:
-                    return thermocycler
-                else:
-                    raise self._HardwareThermocyclerMissingError(
-                        f"No Thermocycler found"
-                        f' with serial number "{thermocycler_serial}".'
-                    )
-        # Either the labware isn't in a module, or it is but it's not a Thermocycler.
-        return None
+            return labware_location.moduleId
+        else:
+            return None
 
     async def _find_thermocycler_by_serial(
         self, serial_number: str
