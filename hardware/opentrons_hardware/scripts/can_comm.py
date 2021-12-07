@@ -5,23 +5,22 @@ import logging
 import argparse
 from enum import Enum
 from logging.config import dictConfig
-from typing import Type, Sequence, Optional, Callable, cast
+from typing import Type, Sequence, Callable, cast
 
-from opentrons_hardware.drivers.can_bus import (
-    CanDriver,
-)
+from opentrons_hardware.drivers.can_bus import CanDriver
 from opentrons_ot3_firmware.constants import (
     MessageId,
     NodeId,
-        FunctionCode,
+    FunctionCode,
 )
 from opentrons_ot3_firmware.message import CanMessage
 from opentrons_ot3_firmware.arbitration_id import (
     ArbitrationId,
     ArbitrationIdParts,
 )
+from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_ot3_firmware.messages.messages import get_definition
-from opentrons_hardware.scripts.can_args import add_can_args
+from opentrons_hardware.scripts.can_args import add_can_args, build_driver
 from opentrons_ot3_firmware.utils import BinarySerializable, BinarySerializableException
 
 log = logging.getLogger(__name__)
@@ -37,7 +36,7 @@ class InvalidInput(Exception):
     pass
 
 
-async def listen_task(can_driver: CanDriver) -> None:
+async def listen_task(can_driver: AbstractCanDriver) -> None:
     """A task that listens for can messages.
 
     Args:
@@ -159,7 +158,7 @@ def prompt_message(get_user_input: GetInputFunc, output_func: OutputFunc) -> Can
     return can_message
 
 
-async def ui_task(can_driver: CanDriver) -> None:
+async def ui_task(can_driver: AbstractCanDriver) -> None:
     """UI task to create and send messages.
 
     Args:
@@ -178,12 +177,9 @@ async def ui_task(can_driver: CanDriver) -> None:
             print(str(e))
 
 
-async def run(interface: str, bitrate: int, channel: Optional[str] = None) -> None:
+async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
-    log.info(f"Connecting to {interface} {bitrate} {channel}")
-    driver = await CanDriver.build(
-        bitrate=bitrate, interface=interface, channel=channel
-    )
+    driver = await build_driver(args)
 
     loop = asyncio.get_event_loop()
     fut = asyncio.gather(
@@ -233,7 +229,7 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    asyncio.run(run(args.interface, args.bitrate, args.channel))
+    asyncio.run(run(args))
 
 
 if __name__ == "__main__":
