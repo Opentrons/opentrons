@@ -23,7 +23,9 @@ export const getLatestLabwareOffsetCount = (
       const location = offset.location
       const definitionUri = offset.definitionUri
       const locationKey =
-        'slotName' in location ? location.slotName : location.moduleId
+        location.moduleModel != null
+          ? `${location.moduleModel}_${location.slotName}`
+          : location.slotName
       // key by definition uri AND location, because labware offsets are tied to a combo of both of these attributes
       return `${definitionUri}_${locationKey}`
     }

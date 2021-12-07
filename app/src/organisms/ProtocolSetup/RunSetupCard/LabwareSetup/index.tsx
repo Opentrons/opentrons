@@ -26,6 +26,7 @@ import {
   DIRECTION_ROW,
   Box,
   FONT_WEIGHT_SEMIBOLD,
+  C_NEAR_WHITE,
 } from '@opentrons/components'
 import {
   inferModuleOrientationFromXCoordinate,
@@ -160,12 +161,13 @@ export const LabwareSetup = (): JSX.Element | null => {
             )
           }}
         </RobotWorkSpace>
-        <Flex flexDirection={DIRECTION_ROW}>
+        <Flex flexDirection={DIRECTION_ROW} backgroundColor={C_NEAR_WHITE}>
           <Box flexDirection={DIRECTION_COLUMN} width="65%">
             <Text
               color={C_DARK_GRAY}
               fontWeight={FONT_WEIGHT_SEMIBOLD}
               marginLeft={SPACING_3}
+              marginTop={SPACING_3}
             >
               {t('lpc_and_offset_data_title')}
             </Text>
@@ -181,6 +183,7 @@ export const LabwareSetup = (): JSX.Element | null => {
               alignSelf={ALIGN_FLEX_END}
               onClick={() => setShowLabwareHelpModal(true)}
               data-test={'LabwareSetup_helpLink'}
+              marginTop={SPACING_3}
               marginBottom={SPACING_3}
             >
               {t('labware_help_link_title')}

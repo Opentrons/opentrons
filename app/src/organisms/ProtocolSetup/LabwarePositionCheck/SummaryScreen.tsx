@@ -58,7 +58,7 @@ export const SummaryScreen = (props: {
             runId: runRecord?.data.id as string,
             data: {
               definitionUri: labwareOffset.labwareDefinitionUri,
-              location: labwareOffset.labwareLocation,
+              location: labwareOffset.labwareOffsetLocation,
               vector: labwareOffset.vector,
             },
           }).catch((e: Error) => {
