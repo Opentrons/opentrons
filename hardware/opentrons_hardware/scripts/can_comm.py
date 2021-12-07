@@ -9,20 +9,16 @@ from typing import Type, Sequence, Optional, Callable, cast
 
 from opentrons_hardware.drivers.can_bus import (
     CanDriver,
-)
-from opentrons_ot3_firmware.constants import (
     MessageId,
     NodeId,
-        FunctionCode,
-)
-from opentrons_ot3_firmware.message import CanMessage
-from opentrons_ot3_firmware.arbitration_id import (
+    CanMessage,
     ArbitrationId,
     ArbitrationIdParts,
+    FunctionCode,
 )
-from opentrons_ot3_firmware.messages.messages import get_definition
+from opentrons_hardware.drivers.can_bus.messages.messages import get_definition
 from opentrons_hardware.scripts.can_args import add_can_args
-from opentrons_ot3_firmware.utils import BinarySerializable, BinarySerializableException
+from opentrons_hardware.utils import BinarySerializable, BinarySerializableException
 
 log = logging.getLogger(__name__)
 

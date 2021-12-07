@@ -2,12 +2,12 @@
 import pytest
 from mock import AsyncMock, call, MagicMock
 
-from opentrons_ot3_firmware.constants import NodeId
+from opentrons_hardware.drivers.can_bus import NodeId
 from opentrons_hardware.drivers.can_bus.can_messenger import MessageListener
-from opentrons_ot3_firmware.messages.message_definitions import (
+from opentrons_hardware.drivers.can_bus.messages.message_definitions import (
     AddLinearMoveRequest,
 )
-from opentrons_ot3_firmware.messages.payloads import (
+from opentrons_hardware.drivers.can_bus.messages.payloads import (
     AddLinearMoveRequestPayload,
     MoveCompletedPayload,
     EmptyPayload,
@@ -22,11 +22,11 @@ from opentrons_hardware.hardware_control.move_group_runner import (
     MoveGroupRunner,
     MoveScheduler,
 )
-from opentrons_ot3_firmware.messages import (
+from opentrons_hardware.drivers.can_bus.messages import (
     message_definitions as md,
     MessageDefinition,
 )
-from opentrons_ot3_firmware.utils import UInt8Field, Int32Field, UInt32Field
+from opentrons_hardware.utils import UInt8Field, Int32Field, UInt32Field
 
 
 @pytest.fixture

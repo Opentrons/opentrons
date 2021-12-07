@@ -6,33 +6,29 @@ from asyncio import Queue
 import pytest
 from mock import AsyncMock, Mock
 
-from opentrons_ot3_firmware.constants import (
+from opentrons_hardware.drivers.can_bus import (
     NodeId,
-
-    MessageId,
-)
-
-from opentrons_ot3_firmware.message import CanMessage
-from opentrons_ot3_firmware.arbitration_id import (
+    CanMessage,
     ArbitrationId,
     ArbitrationIdParts,
+    MessageId,
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
     MessageListener,
 )
-from opentrons_ot3_firmware.messages import MessageDefinition
-from opentrons_ot3_firmware.messages.message_definitions import (
+from opentrons_hardware.drivers.can_bus.messages import MessageDefinition
+from opentrons_hardware.drivers.can_bus.messages.message_definitions import (
     HeartbeatRequest,
     MoveCompleted,
     GetMoveGroupRequest,
 )
-from opentrons_ot3_firmware.messages.payloads import (
+from opentrons_hardware.drivers.can_bus.messages.payloads import (
     EmptyPayload,
     MoveCompletedPayload,
     MoveGroupRequestPayload,
 )
-from opentrons_ot3_firmware.utils import UInt8Field, UInt32Field
+from opentrons_hardware.utils import UInt8Field, UInt32Field
 
 
 @pytest.fixture
