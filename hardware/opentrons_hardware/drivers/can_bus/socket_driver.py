@@ -80,12 +80,13 @@ class ConnectionHandler:
         while True:
             header = await reader.read(8)
             arbitration_id, length = struct.unpack(">LL", header)
+
             if length > 0:
                 data = await reader.read(length)
             else:
                 data = b""
             self._queue.put_nowait(
-                CanMessage(arbitration_id=ArbitrationId(arbitration_id), data=data)
+                CanMessage(arbitration_id=ArbitrationId(id=arbitration_id), data=data)
             )
 
     def send(self, message: CanMessage) -> None:
