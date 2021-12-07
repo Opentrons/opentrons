@@ -205,7 +205,7 @@ describe('UploadInput', () => {
   })
   it('renders run again button', () => {
     const { getByRole } = render(props)
-    // mockUseCloneRun.mockReturnValue(jest.fn())
+    mockUseCloneRun.mockReturnValue({ cloneRun: jest.fn(), isLoading: false })
     const button = getByRole('button', { name: 'Run again' })
     expect(button).not.toBeDisabled()
     fireEvent.click(button)

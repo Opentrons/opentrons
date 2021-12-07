@@ -135,6 +135,11 @@ export function RunTimeControl(): JSX.Element | null {
     handleButtonClick = reset
   }
 
+  const buttonIcon =
+    buttonIconName != null ? (
+      <Icon name={buttonIconName} size={SIZE_1} marginRight={SPACING_2} />
+    ) : null
+
   return runStatus != null ? (
     <Flex flexDirection={DIRECTION_COLUMN} margin={SPACING_2}>
       <Text css={FONT_HEADER_DARK} marginBottom={SPACING_3}>
@@ -166,9 +171,9 @@ export function RunTimeControl(): JSX.Element | null {
       >
         {isRunActionLoading ? (
           <Icon name="ot-spinner" size={SIZE_1} marginRight={SPACING_2} spin />
-        ) : buttonIconName != null ? (
-          <Icon name={buttonIconName} size={SIZE_1} marginRight={SPACING_2} />
-        ) : null}
+        ) : (
+          buttonIcon
+        )}
         <Text fontSize={FONT_SIZE_DEFAULT}>{buttonText}</Text>
       </NewPrimaryBtn>
       {disableRunCta && (
