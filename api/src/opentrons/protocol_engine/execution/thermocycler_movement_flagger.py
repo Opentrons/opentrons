@@ -48,38 +48,40 @@ class ThermocyclerMovementFlagger:
             ThermocyclerNotOpenError
         """
         try:
-            lid_status = await self._get_parent_thermocycler_lid_status(
+            thermocycler = await self._find_containing_thermocycler(
                 labware_id=labware_id
             )
+
         except self._HardwareThermocyclerMissingError as e:
             raise ThermocyclerNotOpenError(
                 "Thermocycler must be open when moving to labware inside it,"
                 " but can't confirm Thermocycler's current status."
             ) from e
-        except self._NotInAThermocyclerError:
-            pass
-        else:
+
+        if thermocycler is not None:
+            lid_status = thermocycler.lid_status
             if lid_status != ThermocyclerLidStatus.OPEN:
                 raise ThermocyclerNotOpenError(
                     f"Thermocycler must be open when moving to labware inside it,"
                     f' but Thermocycler is currently "{lid_status}".'
                 )
 
-    # todo(mm, 2021-12-01): Return non-Optional when the hardware API no longer has
-    # None as a possible lid status and we no longer need to pass that along.
-    async def _get_parent_thermocycler_lid_status(
+    async def _find_containing_thermocycler(
         self,
         labware_id: str,
-    ) -> Optional[ThermocyclerLidStatus]:
-        """Return the current lid status of the Thermocycler containing the labware.
+    ) -> Optional[HardwareThermocycler]:
+        """Find the hardware Thermocycler containing the given labware.
+
+        Returns:
+            If the labware was loaded into a Thermocycler,
+            the interface to control that Thermocycler's hardware.
+            Otherwise, None.
 
         Raises:
-            _NotInAThermocyclerError: If the labware isn't contained in a Thermocycler.
-                We need to raise an exception to signal this instead of returning None
-                because None is already a possible Thermocycler lid status.
-            _HardwareThermocyclerMissingError: If the labware is in a Thermocycler, but
-                we can't find that Thermocycler in the hardware API, so we can't fetch
-                its current lid status. It's unclear if this can happen in practice...
+            _HardwareThermocyclerMissingError: If the labware was loaded into a
+                Thermocycler, but we can't find that Thermocycler in the hardware API,
+                so we can't fetch its current lid status.
+                It's unclear if this can happen in practice...
                 maybe if the module disconnects between when it was loaded into
                 Protocol Engine and when this function is called?
         """
@@ -99,22 +101,23 @@ class ThermocyclerMovementFlagger:
                 )
 
                 if thermocycler is not None:
-                    return thermocycler.lid_status
+                    return thermocycler
                 else:
                     raise self._HardwareThermocyclerMissingError(
                         f"No Thermocycler found"
                         f' with serial number "{thermocycler_serial}".'
                     )
-            else:
-                # The labware is in a module, but it's not a Thermocycler.
-                raise self._NotInAThermocyclerError()
-        else:
-            # The labware isn't in any module.
-            raise self._NotInAThermocyclerError()
+        # Either the labware isn't in a module, or it is but it's not a Thermocycler.
+        return None
 
     async def _find_thermocycler_by_serial(
         self, serial_number: str
     ) -> Optional[HardwareThermocycler]:
+        """Find the hardware Thermocycler with the given serial number.
+
+        Returns:
+            The matching hardware Thermocycler, or None if none was found.
+        """
         available_modules, simulating_module = await self._hardware_api.find_modules(
             by_model=OpentronsThermocyclerModuleModel.THERMOCYCLER_V1,
             # Hard-coding instead of using
@@ -125,10 +128,7 @@ class ThermocyclerMovementFlagger:
         )
 
         modules_to_check: List[AbstractHardwareModule] = (
-            available_modules
-            if simulating_module is None
-            else
-            [simulating_module]
+            available_modules if simulating_module is None else [simulating_module]
         )
 
         for module in modules_to_check:
@@ -140,9 +140,6 @@ class ThermocyclerMovementFlagger:
             ):
                 return module
         return None
-
-    class _NotInAThermocyclerError(Exception):
-        pass
 
     class _HardwareThermocyclerMissingError(Exception):
         pass
