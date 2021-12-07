@@ -1,11 +1,15 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { Redirect } from 'react-router-dom'
 import {
   RunStatus,
   RUN_STATUS_IDLE,
   RUN_STATUS_RUNNING,
   RUN_STATUS_PAUSED,
   RUN_STATUS_PAUSE_REQUESTED,
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_FAILED,
+  RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
 import {
   NewAlertPrimaryBtn,
@@ -18,14 +22,21 @@ import { Page } from '../../atoms/Page'
 import { useProtocolDetails } from './hooks'
 import { useRunStatus, useRunStartTime } from '../RunTimeControl/hooks'
 import { ConfirmCancelModal } from '../../pages/Run/RunLog'
+import { ConfirmExitProtocolUploadModal } from '../ProtocolUpload/ConfirmExitProtocolUploadModal'
+import { useCloseCurrentRun } from '../ProtocolUpload/hooks/useCloseCurrentRun'
+import { useCurrentProtocolRun } from '../ProtocolUpload/hooks'
 import { useCurrentRunControls } from '../../pages/Run/RunLog/hooks'
 import { CommandList } from './CommandList'
 
+import styles from '../ProtocolUpload/styles.css'
+
 export function RunDetails(): JSX.Element | null {
-  const { t } = useTranslation('run_details')
+  const { t } = useTranslation(['run_details', 'shared'])
   const { displayName } = useProtocolDetails()
+  const { protocolRecord, runRecord } = useCurrentProtocolRun()
   const runStatus = useRunStatus()
   const startTime = useRunStartTime()
+  const { closeCurrentRun } = useCloseCurrentRun()
 
   // display an idle status as 'running' in the UI after a run has started
   const adjustedRunStatus: RunStatus | null =
@@ -46,6 +57,20 @@ export function RunDetails(): JSX.Element | null {
     cancel: cancelExit,
   } = useConditionalConfirm(cancelRunAndExit, true)
 
+  const handleCloseProtocol: React.MouseEventHandler = _event => {
+    closeCurrentRun()
+  }
+
+  const {
+    showConfirmation: showCloseConfirmExit,
+    confirm: confirmCloseExit,
+    cancel: cancelCloseExit,
+  } = useConditionalConfirm(handleCloseProtocol, true)
+
+  if (protocolRecord == null || runRecord == null) {
+    return <Redirect to="/upload" />
+  }
+
   const cancelRunButton = (
     <NewAlertPrimaryBtn
       onClick={cancelRunAndExit}
@@ -58,22 +83,50 @@ export function RunDetails(): JSX.Element | null {
     </NewAlertPrimaryBtn>
   )
 
-  const titleBarProps =
+  let titleBarProps
+
+  if (
     adjustedRunStatus === RUN_STATUS_RUNNING ||
     adjustedRunStatus === RUN_STATUS_PAUSED ||
     adjustedRunStatus === RUN_STATUS_PAUSE_REQUESTED
-      ? {
-          title: t('protocol_title', { protocol_name: displayName }),
-          rightNode: cancelRunButton,
-        }
-      : {
-          title: t('protocol_title', { protocol_name: displayName }),
-        }
+  ) {
+    titleBarProps = {
+      title: t('protocol_title', { protocol_name: displayName }),
+      rightNode: cancelRunButton,
+    }
+  } else if (
+    adjustedRunStatus === RUN_STATUS_SUCCEEDED ||
+    adjustedRunStatus === RUN_STATUS_STOPPED ||
+    adjustedRunStatus === RUN_STATUS_FAILED
+  ) {
+    titleBarProps = {
+      title: t('protocol_title', { protocol_name: displayName }),
+      back: {
+        onClick: confirmCloseExit,
+        title: t('shared:close'),
+        children: t('shared:close'),
+        iconName: 'close' as const,
+      },
+      className: styles.reverse_titlebar_items,
+    }
+  } else {
+    titleBarProps = {
+      title: t('protocol_title', { protocol_name: displayName }),
+    }
+  }
 
   return (
-    <Page titleBarProps={titleBarProps}>
-      {showConfirmExit ? <ConfirmCancelModal onClose={cancelExit} /> : null}
-      <CommandList />
-    </Page>
+    <>
+      {showCloseConfirmExit && (
+        <ConfirmExitProtocolUploadModal
+          exit={confirmCloseExit}
+          back={cancelCloseExit}
+        />
+      )}
+      <Page titleBarProps={titleBarProps}>
+        {showConfirmExit ? <ConfirmCancelModal onClose={cancelExit} /> : null}
+        <CommandList />
+      </Page>
+    </>
   )
 }

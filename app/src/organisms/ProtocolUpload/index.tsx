@@ -25,7 +25,7 @@ import { UploadInput } from './UploadInput'
 import { ProtocolSetup } from '../ProtocolSetup'
 import { useCurrentProtocolRun } from './hooks/useCurrentProtocolRun'
 import { useCloseCurrentRun } from './hooks/useCloseCurrentRun'
-import { loadProtocol, closeProtocol } from '../../redux/protocol/actions'
+import { loadProtocol } from '../../redux/protocol/actions'
 import { ingestProtocolFile } from '../../redux/protocol/utils'
 import { getConnectedRobotName } from '../../redux/robot/selectors'
 
@@ -81,7 +81,6 @@ export function ProtocolUpload(): JSX.Element {
   }
 
   const handleCloseProtocol: React.MouseEventHandler = _event => {
-    dispatch(closeProtocol())
     closeCurrentRun()
   }
 
