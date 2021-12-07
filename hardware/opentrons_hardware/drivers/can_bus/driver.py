@@ -7,8 +7,8 @@ from typing import Optional
 
 from can import Notifier, Bus, AsyncBufferedReader, Message, util
 
-from .arbitration_id import ArbitrationId
-from .message import CanMessage
+from opentrons_ot3_firmware.arbitration_id import ArbitrationId
+from opentrons_ot3_firmware.message import CanMessage
 from .errors import ErrorFrameCanError
 
 log = logging.getLogger(__name__)

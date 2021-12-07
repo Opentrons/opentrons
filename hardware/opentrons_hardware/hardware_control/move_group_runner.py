@@ -1,26 +1,26 @@
 """Class that schedules motion on can bus."""
 import asyncio
 import logging
-from opentrons_hardware.drivers.can_bus import NodeId
+from opentrons_ot3_firmware.constants import NodeId
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
     MessageListener,
 )
-from opentrons_hardware.drivers.can_bus.messages import MessageDefinition
-from opentrons_hardware.drivers.can_bus.messages.message_definitions import (
+from opentrons_ot3_firmware.messages import MessageDefinition
+from opentrons_ot3_firmware.messages.message_definitions import (
     ClearAllMoveGroupsRequest,
     AddLinearMoveRequest,
     MoveCompleted,
     ExecuteMoveGroupRequest,
 )
-from opentrons_hardware.drivers.can_bus.messages.payloads import (
+from opentrons_ot3_firmware.messages.payloads import (
     AddLinearMoveRequestPayload,
     ExecuteMoveGroupRequestPayload,
     EmptyPayload,
 )
-from opentrons_hardware.hardware_control.constants import interrupts_per_sec
+from .constants import interrupts_per_sec
 from opentrons_hardware.hardware_control.motion import MoveGroups
-from opentrons_hardware.utils import UInt8Field, UInt32Field, Int32Field
+from opentrons_ot3_firmware.utils import UInt8Field, UInt32Field, Int32Field
 
 
 log = logging.getLogger(__name__)

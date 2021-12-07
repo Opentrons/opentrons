@@ -5,16 +5,19 @@ from mock import MagicMock
 
 import pytest
 
-from opentrons_hardware.drivers.can_bus import (
+from opentrons_ot3_firmware.message import (
     CanMessage,
+)
+from opentrons_ot3_firmware.arbitration_id import (
     ArbitrationId,
     ArbitrationIdParts,
+
 )
-from opentrons_hardware.drivers.can_bus.messages.payloads import (
+from opentrons_ot3_firmware.messages.payloads import (
     DeviceInfoResponsePayload,
 )
 from opentrons_hardware.scripts import can_comm
-from opentrons_hardware.drivers.can_bus.constants import MessageId, NodeId
+from opentrons_ot3_firmware.constants import MessageId, NodeId
 
 
 @pytest.fixture
@@ -33,7 +36,7 @@ def test_prompt_message_without_payload(
     mock_get_input: MagicMock, mock_output: MagicMock
 ) -> None:
     """It should create a message without payload."""
-    message_id = MessageId.get_speed_request
+    message_id = MessageId.get_status_request
     node_id = NodeId.pipette
     mock_get_input.side_effect = [
         str(list(MessageId).index(message_id)),
