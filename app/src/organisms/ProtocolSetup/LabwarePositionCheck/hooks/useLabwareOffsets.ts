@@ -7,12 +7,12 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { getLabwareLocation } from '../../utils/getLabwareLocation'
+import { getLabwareOffsetLocation } from '../../utils/getLabwareOffsetLocation'
 import { getModuleInitialLoadInfo } from '../../utils/getModuleInitialLoadInfo'
 import { getLabwareDefinitionUri } from '../../utils/getLabwareDefinitionUri'
 import { useOffsetDataByLabwareId } from '../../../ProtocolUpload/hooks/useOffsetData'
-import type { VectorOffset } from '@opentrons/api-client'
+import type { LabwareOffsetLocation, VectorOffset } from '@opentrons/api-client'
 import type { SavePositionCommandData } from '../types'
-import type { LabwareLocation } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
 const getDisplayLocation = (
   labwareId: string,
@@ -50,7 +50,7 @@ const getDisplayLocation = (
 
 export type LabwareOffsets = Array<{
   labwareId: string
-  labwareLocation: LabwareLocation
+  labwareOffsetLocation: LabwareOffsetLocation
   labwareDefinitionUri: string
   displayLocation: string
   displayName: string
@@ -69,9 +69,10 @@ export const useLabwareOffsets = (
     savePositionCommandData,
     (labwareOffsets, _commandIds, labwareId) => {
       const displayLocation = getDisplayLocation(labwareId, protocolData, t)
-      const labwareLocation = getLabwareLocation(
+      const labwareOffsetLocation = getLabwareOffsetLocation(
         labwareId,
-        protocolData.commands
+        protocolData.commands,
+        protocolData.modules
       )
       const labwareDefinitionUri = getLabwareDefinitionUri(
         labwareId,
@@ -86,7 +87,7 @@ export const useLabwareOffsets = (
           ...labwareOffsets,
           {
             labwareId,
-            labwareLocation,
+            labwareOffsetLocation,
             labwareDefinitionUri,
             displayLocation,
             displayName,
