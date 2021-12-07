@@ -12,8 +12,7 @@ import pytest
 from datetime import datetime
 from decoy import matchers
 
-from opentrons.types import MountType
-from opentrons.protocol_api_experimental import DeckSlotName
+from opentrons.types import MountType, DeckSlotName
 
 from opentrons.protocol_engine import (
     DeckSlotLocation,

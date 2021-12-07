@@ -1,25 +1,43 @@
 """Input file role analysis."""
-from dataclasses import dataclass
-from typing import Sequence
+from dataclasses import dataclass, field
+from typing import List, Optional, Sequence
+from typing_extensions import Literal
 
-from opentrons.protocols.models import JsonProtocol
+from opentrons.protocols.models import JsonProtocol, LabwareDefinition
 from .protocol_source import ProtocolFileRole
-from .input_file import BufferedFile
+from .file_reader_writer import BufferedFile
 
 
 @dataclass(frozen=True)
-class RoleAnalyzedFile(BufferedFile):
+class RoleAnalysisFile(BufferedFile):
     """A buffered file with its role analyzed."""
 
     role: ProtocolFileRole
 
 
-# TODO(mc, 2021-12-07): add support for other files, like labware definitions
+@dataclass(frozen=True)
+class MainFile(RoleAnalysisFile):
+    """A protocol's main file, either Python or JSON."""
+
+    data: Optional[JsonProtocol] = None
+    role: Literal[ProtocolFileRole.MAIN] = ProtocolFileRole.MAIN
+
+
+@dataclass(frozen=True)
+class LabwareFile(RoleAnalysisFile):
+    """A custom labware file."""
+
+    data: LabwareDefinition
+    role: Literal[ProtocolFileRole.LABWARE] = ProtocolFileRole.LABWARE
+
+
+# TODO(mc, 2021-12-07): add support for python support files and data files
 @dataclass(frozen=True)
 class RoleAnalysis:
     """Role analysis results."""
 
-    main_file: RoleAnalyzedFile
+    main_file: MainFile
+    labware_files: List[LabwareFile] = field(default_factory=list)
 
 
 class RoleAnalysisError(ValueError):
@@ -35,24 +53,36 @@ class RoleAnalyzer:
         if len(files) == 0:
             raise RoleAnalysisError("No files were provided.")
 
-        # TODO(mc, 2021-12-07): support multifile protocols
-        if len(files) > 1:
-            raise NotImplementedError("Multi-file protocols not yet supported.")
+        main_file_candidates = []
+        labware_files = []
 
-        main_file = files[0]
+        for f in files:
+            if f.name.endswith(".py") or isinstance(f.data, JsonProtocol):
+                data = f.data if isinstance(f.data, JsonProtocol) else None
+                main_file_candidates.append(
+                    MainFile(name=f.name, contents=f.contents, data=data)
+                )
 
-        # TODO(mc, 2021-12-07): cover both clauses in this if statement with tests
-        # when `data` can be more types than just JsonProtocol
-        if not main_file.name.endswith(".py") and not isinstance(
-            main_file.data, JsonProtocol
-        ):
-            raise RoleAnalysisError(f'"{main_file.name}" is not a valid protocol file.')
+            elif isinstance(f.data, LabwareDefinition):
+                labware_files.append(
+                    LabwareFile(name=f.name, contents=f.contents, data=f.data)
+                )
 
-        return RoleAnalysis(
-            main_file=RoleAnalyzedFile(
-                name=main_file.name,
-                contents=main_file.contents,
-                data=main_file.data,
-                role=ProtocolFileRole.MAIN,
+        if len(main_file_candidates) == 0:
+            if len(files) == 1:
+                raise RoleAnalysisError(
+                    f'"{files[0].name}" is not a valid protocol file.'
+                )
+            else:
+                file_list = ", ".join(f'"{f.name}"' for f in files)
+                raise RoleAnalysisError(f"No valid protocol file found in {file_list}.")
+
+        elif len(main_file_candidates) > 1:
+            file_list = ", ".join(f'"{f.name}"' for f in main_file_candidates)
+            raise RoleAnalysisError(
+                f"Could not pick single main file from {file_list}."
             )
-        )
+        else:
+            main_file = main_file_candidates[0]
+
+        return RoleAnalysis(main_file=main_file, labware_files=labware_files)

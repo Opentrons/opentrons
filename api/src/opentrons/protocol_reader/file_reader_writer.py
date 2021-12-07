@@ -1,11 +1,27 @@
 """Input file reading."""
 from json import JSONDecodeError
 from anyio import Path as AsyncPath, create_task_group, wrap_file
+from dataclasses import dataclass
 from pathlib import Path
 from pydantic import ValidationError, parse_raw_as
-from typing import List, Optional, Sequence
+from typing import List, Optional, Sequence, Union
 
-from .input_file import AbstractInputFile, BufferedFile, BufferedJsonFileData
+from opentrons.protocols.models import JsonProtocol, LabwareDefinition
+
+from .input_file import AbstractInputFile
+
+
+# TODO(mc, 2021-12-07): add support for arbitrary JSON data files
+BufferedJsonFileData = Union[JsonProtocol, LabwareDefinition]
+
+
+@dataclass(frozen=True)
+class BufferedFile:
+    """A file that has been read into memory."""
+
+    name: str
+    contents: bytes
+    data: Optional[BufferedJsonFileData]
 
 
 class FileReadError(Exception):
@@ -27,7 +43,7 @@ class FileReaderWriter:
 
                 if input_file.filename.endswith(".json"):
                     try:
-                        data = parse_raw_as(BufferedJsonFileData, contents)
+                        data = parse_raw_as(BufferedJsonFileData, contents)  # type: ignore[arg-type]  # noqa: E501
                     except (JSONDecodeError, ValidationError) as e:
                         raise FileReadError(
                             f"JSON file {input_file.filename} could not be parsed."

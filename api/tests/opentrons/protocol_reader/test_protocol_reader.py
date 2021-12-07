@@ -5,6 +5,8 @@ from decoy import Decoy
 from pathlib import Path
 
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.models import LabwareDefinition
+
 from opentrons.protocol_reader import (
     ProtocolReader,
     ProtocolSource,
@@ -14,12 +16,17 @@ from opentrons.protocol_reader import (
     ProtocolFilesInvalidError,
 )
 
-from opentrons.protocol_reader.input_file import InputFile, BufferedFile
-from opentrons.protocol_reader.file_reader_writer import FileReaderWriter, FileReadError
+from opentrons.protocol_reader.input_file import InputFile
+from opentrons.protocol_reader.file_reader_writer import (
+    FileReaderWriter,
+    FileReadError,
+    BufferedFile,
+)
 from opentrons.protocol_reader.role_analyzer import (
     RoleAnalyzer,
     RoleAnalysis,
-    RoleAnalyzedFile,
+    MainFile,
+    LabwareFile,
     RoleAnalysisError,
 )
 from opentrons.protocol_reader.config_analyzer import (
@@ -81,13 +88,10 @@ async def test_read_files(
         contents=b"# hello world",
         data=None,
     )
-    analyzed_file = RoleAnalyzedFile(
-        role=ProtocolFileRole.MAIN,
-        name="protocol.py",
-        contents=b"# hello world",
-        data=None,
-    )
-    analyzed_roles = RoleAnalysis(main_file=analyzed_file)
+    main_file = MainFile(name="protocol.py", contents=b"# hello world")
+    labware_data = LabwareDefinition.construct()  # type: ignore[call-arg]
+    labware_file = LabwareFile(name="labware.json", contents=b"", data=labware_data)
+    analyzed_roles = RoleAnalysis(main_file=main_file, labware_files=[labware_file])
     analyzed_config = ConfigAnalysis(
         metadata={"hey": "there"},
         config=PythonProtocolConfig(api_version=APIVersion(123, 456)),
@@ -95,22 +99,26 @@ async def test_read_files(
 
     decoy.when(await file_reader_writer.read([input_file])).then_return([buffered_file])
     decoy.when(role_analyzer.analyze([buffered_file])).then_return(analyzed_roles)
-    decoy.when(config_analyzer.analyze(analyzed_file)).then_return(analyzed_config)
+    decoy.when(config_analyzer.analyze(main_file)).then_return(analyzed_config)
 
     result = await subject.read(name="protocol-name", files=[input_file])
 
     assert result == ProtocolSource(
         directory=tmp_path / "protocol-name",
         main_file=tmp_path / "protocol-name" / "protocol.py",
-        files=[ProtocolSourceFile(name="protocol.py", role=ProtocolFileRole.MAIN)],
+        files=[
+            ProtocolSourceFile(name="protocol.py", role=ProtocolFileRole.MAIN),
+            ProtocolSourceFile(name="labware.json", role=ProtocolFileRole.LABWARE),
+        ],
         metadata={"hey": "there"},
         config=PythonProtocolConfig(api_version=APIVersion(123, 456)),
+        labware=[labware_data],
     )
 
     decoy.verify(
         await file_reader_writer.write(
             directory=tmp_path / "protocol-name",
-            files=[analyzed_file],
+            files=[main_file, labware_file],
         )
     )
 
@@ -180,17 +188,15 @@ async def test_config_error(
         contents=b"# hello world",
         data=None,
     )
-    analyzed_file = RoleAnalyzedFile(
-        role=ProtocolFileRole.MAIN,
+    main_file = MainFile(
         name="protocol.py",
         contents=b"# hello world",
-        data=None,
     )
-    analyzed_roles = RoleAnalysis(main_file=analyzed_file)
+    analyzed_roles = RoleAnalysis(main_file=main_file)
 
     decoy.when(await file_reader_writer.read([input_file])).then_return([buffered_file])
     decoy.when(role_analyzer.analyze([buffered_file])).then_return(analyzed_roles)
-    decoy.when(config_analyzer.analyze(analyzed_file)).then_raise(
+    decoy.when(config_analyzer.analyze(main_file)).then_raise(
         ConfigAnalysisError("oh no")
     )
 

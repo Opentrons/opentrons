@@ -1,5 +1,12 @@
 """Wrappers for the legacy, Protocol API v2 execution pipeline."""
 from anyio import to_thread
+from typing import List, cast
+
+from opentrons_shared_data.labware.dev_types import (
+    LabwareDefinition as LegacyLabwareDefinition,
+)
+
+from opentrons.calibration_storage.helpers import uri_from_details
 
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.modules.types import (
@@ -15,6 +22,9 @@ from opentrons.protocols.context.protocol_api.protocol_context import (
 from opentrons.protocols.context.simulator.protocol_context import (
     ProtocolContextSimulation as LegacyProtocolContextSimulation,
 )
+
+from opentrons.protocols.models import LabwareDefinition
+
 from opentrons.protocol_api import (
     ProtocolContext as LegacyProtocolContext,
     InstrumentContext as LegacyPipetteContext,
@@ -76,7 +86,6 @@ class LegacyContextCreator:
         self,
         hardware_api: HardwareAPI,
         labware_offset_provider: LegacyLabwareOffsetProvider,
-        use_simulating_implementation: bool,
     ) -> None:
         """Prepare the LegacyContextCreator.
 
@@ -86,38 +95,61 @@ class LegacyContextCreator:
                 ``use_simulating_implementation``, this can either be a real hardware
                 API to actually control the robot, or a simulating hardware API.
             labware_offset_provider: Interface for the context to load labware offsets.
-            use_simulating_implementation: Whether the created Protocol API v2 contexts
-                should use a simulating implementation, avoiding some calls to
-                `hardware_api` for performance. See
-                `opentrons.protocols.context.simulator`.
         """
         self._hardware_api = hardware_api
-        self._use_simulating_implementation = use_simulating_implementation
         self._labware_offset_provider = labware_offset_provider
 
     def create(
         self,
         api_version: APIVersion,
+        labware: List[LabwareDefinition],
     ) -> LegacyProtocolContext:
         """Create a Protocol API v2 context."""
-        if self._use_simulating_implementation:
-            return LegacyProtocolContext(
+        return LegacyProtocolContext(
+            api_version=api_version,
+            labware_offset_provider=self._labware_offset_provider,
+            implementation=LegacyProtocolContextImplementation(
                 api_version=api_version,
-                labware_offset_provider=self._labware_offset_provider,
-                implementation=LegacyProtocolContextSimulation(
-                    api_version=api_version,
-                    hardware=self._hardware_api,
-                ),
-            )
-        else:
-            return LegacyProtocolContext(
+                hardware=self._hardware_api,
+                extra_labware={
+                    uri_from_details(
+                        namespace=lw.namespace,
+                        load_name=lw.parameters.loadName,
+                        version=lw.version,
+                    ): cast(LegacyLabwareDefinition, lw.dict(exclude_none=True))
+                    for lw in labware
+                },
+            ),
+        )
+
+
+class LegacySimulatingContextCreator(LegacyContextCreator):
+    def create(
+        self,
+        api_version: APIVersion,
+        labware: List[LabwareDefinition],
+    ) -> LegacyProtocolContext:
+        """Create a simulating Protocol API v2 context.
+
+        Avoids some calls to the hardware API for performance.
+        See `opentrons.protocols.context.simulator`.
+        """
+        return LegacyProtocolContext(
+            api_version=api_version,
+            labware_offset_provider=self._labware_offset_provider,
+            implementation=LegacyProtocolContextSimulation(
                 api_version=api_version,
-                labware_offset_provider=self._labware_offset_provider,
-                implementation=LegacyProtocolContextImplementation(
-                    api_version=api_version,
-                    hardware=self._hardware_api,
-                ),
-            )
+                hardware=self._hardware_api,
+                extra_labware={
+                    uri_from_details(
+                        namespace=lw.namespace,
+                        load_name=lw.parameters.loadName,
+                        version=lw.version,
+                    ): cast(LegacyLabwareDefinition, lw.dict(exclude_none=True))
+                    for lw in labware
+                },
+            ),
+        )
 
 
 class LegacyExecutor:

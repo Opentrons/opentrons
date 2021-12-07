@@ -86,7 +86,6 @@ class ProtocolRunner:
             labware_offset_provider=LegacyLabwareOffsetProvider(
                 labware_view=protocol_engine.state_view.labware,
             ),
-            use_simulating_implementation=False,
         )
         self._legacy_executor = legacy_executor or LegacyExecutor(
             hardware_api=hardware_api
@@ -172,7 +171,10 @@ class ProtocolRunner:
         protocol_source: ProtocolSource,
     ) -> None:
         protocol = self._legacy_file_reader.read(protocol_source)
-        context = self._legacy_context_creator.create(protocol.api_level)
+        context = self._legacy_context_creator.create(
+            api_version=protocol.api_level,
+            labware=protocol_source.labware,
+        )
 
         self._protocol_engine.add_plugin(
             LegacyContextPlugin(
