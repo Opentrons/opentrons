@@ -3,9 +3,9 @@ from pathlib import Path
 from typing import Optional, Sequence
 
 from .input_file import AbstractInputFile
-from .file_reader_writer import FileReaderWriter
-from .role_analyzer import RoleAnalyzer
-from .config_analyzer import ConfigAnalyzer
+from .file_reader_writer import FileReaderWriter, FileReadError
+from .role_analyzer import RoleAnalyzer, RoleAnalysisError
+from .config_analyzer import ConfigAnalyzer, ConfigAnalysisError
 from .protocol_source import ProtocolSource, ProtocolSourceFile
 
 
@@ -56,10 +56,15 @@ class ProtocolReader:
                 could not be validated as a protocol.
         """
         directory = self._directory / name
-        buffered_files = await self._file_reader_writer.read(files)
-        role_analysis = self._role_analyzer.analyze(buffered_files)
-        config_analysis = self._config_analyzer.analyze(role_analysis.main_file)
-        all_files = [role_analysis.main_file] + role_analysis.other_files
+        try:
+            buffered_files = await self._file_reader_writer.read(files)
+            role_analysis = self._role_analyzer.analyze(buffered_files)
+            config_analysis = self._config_analyzer.analyze(role_analysis.main_file)
+        except (FileReadError, RoleAnalysisError, ConfigAnalysisError) as e:
+            raise ProtocolFilesInvalidError(str(e))
+
+        # TODO(mc, 2021-12-07): add support for other files, like labware definitions
+        all_files = [role_analysis.main_file]
 
         await self._file_reader_writer.write(directory=directory, files=all_files)
 

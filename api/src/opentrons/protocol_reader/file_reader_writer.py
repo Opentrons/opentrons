@@ -5,7 +5,7 @@ from pathlib import Path
 from pydantic import ValidationError, parse_raw_as
 from typing import List, Optional, Sequence
 
-from .input_file import AbstractInputFile, BufferedFile, BufferedFileData
+from .input_file import AbstractInputFile, BufferedFile, BufferedJsonFileData
 
 
 class FileReadError(Exception):
@@ -23,14 +23,11 @@ class FileReaderWriter:
         async def _read_file(input_file: AbstractInputFile, index: int) -> None:
             async with wrap_file(input_file.file) as f:
                 contents = await f.read()
-                data: Optional[BufferedFileData] = None
+                data: Optional[BufferedJsonFileData] = None
 
                 if input_file.filename.endswith(".json"):
                     try:
-                        data = parse_raw_as(
-                            BufferedFileData,  # type: ignore[arg-type]
-                            contents,
-                        )
+                        data = parse_raw_as(BufferedJsonFileData, contents)
                     except (JSONDecodeError, ValidationError) as e:
                         raise FileReadError(
                             f"JSON file {input_file.filename} could not be parsed."

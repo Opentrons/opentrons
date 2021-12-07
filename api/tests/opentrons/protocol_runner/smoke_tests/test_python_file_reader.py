@@ -1,24 +1,22 @@
 """Tests for the Python protocol reading."""
-from pathlib import Path
 from inspect import Signature, Parameter, signature
 
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api_experimental import ProtocolContext
-from opentrons.protocol_reader import ProtocolSource, PythonProtocolConfig
+from opentrons.protocol_reader import ProtocolReader, InputFile
 from opentrons.protocol_runner.python_file_reader import PythonFileReader
 
 
-def test_read_gets_run_method(python_protocol_file: Path) -> None:
+async def test_read_gets_run_method(
+    protocol_reader: ProtocolReader,
+    python_protocol_file: InputFile,
+) -> None:
     """It should pull the run method out of the Python file."""
-    subject = PythonFileReader()
-    protocol_source = ProtocolSource(
-        directory=python_protocol_file.parent,
-        main_file=python_protocol_file,
-        files=[],
-        metadata={},
-        config=PythonProtocolConfig(api_version=APIVersion(3, 0)),
+    protocol_source = await protocol_reader.read(
+        name="test_protocol",
+        files=[python_protocol_file],
     )
 
+    subject = PythonFileReader()
     result = subject.read(protocol_source)
 
     assert signature(result.run) == Signature(

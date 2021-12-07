@@ -2,7 +2,7 @@
 import pytest
 from typing import List, NamedTuple
 
-from opentrons.protocols.models import JsonProtocol, LabwareDefinition
+from opentrons.protocols.models import JsonProtocol
 from opentrons.protocol_reader import ProtocolFileRole
 from opentrons.protocol_reader.input_file import BufferedFile
 
@@ -40,29 +40,6 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
                 data=None,
                 role=ProtocolFileRole.MAIN,
             ),
-            other_files=[],
-        ),
-    ),
-    RoleAnalyzerSpec(
-        files=[
-            BufferedFile(name="data.csv", contents=b"", data=None),
-            BufferedFile(name="protocol.py", contents=b"", data=None),
-        ],
-        expected=RoleAnalysis(
-            main_file=RoleAnalyzedFile(
-                name="protocol.py",
-                contents=b"",
-                data=None,
-                role=ProtocolFileRole.MAIN,
-            ),
-            other_files=[
-                RoleAnalyzedFile(
-                    name="data.csv",
-                    contents=b"",
-                    data=None,
-                    role=ProtocolFileRole.DATA,
-                )
-            ],
         ),
     ),
     RoleAnalyzerSpec(
@@ -80,55 +57,6 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
                 data=JsonProtocol.construct(),  # type: ignore[call-arg]
                 role=ProtocolFileRole.MAIN,
             ),
-            other_files=[],
-        ),
-    ),
-    RoleAnalyzerSpec(
-        files=[
-            BufferedFile(
-                name="fixture_96_plate.json",
-                contents=b"",
-                data=LabwareDefinition.construct(),  # type: ignore[call-arg]
-            ),
-            BufferedFile(name="protocol.py", contents=b"", data=None),
-        ],
-        expected=RoleAnalysis(
-            main_file=RoleAnalyzedFile(
-                name="protocol.py",
-                contents=b"",
-                data=None,
-                role=ProtocolFileRole.MAIN,
-            ),
-            other_files=[
-                RoleAnalyzedFile(
-                    name="fixture_96_plate.json",
-                    contents=b"",
-                    data=LabwareDefinition.construct(),  # type: ignore[call-arg]
-                    role=ProtocolFileRole.LABWARE_DEFINITION,
-                )
-            ],
-        ),
-    ),
-    RoleAnalyzerSpec(
-        files=[
-            BufferedFile(name="whatever.json", contents=b"", data={"hello": "world"}),
-            BufferedFile(name="protocol.py", contents=b"", data=None),
-        ],
-        expected=RoleAnalysis(
-            main_file=RoleAnalyzedFile(
-                name="protocol.py",
-                contents=b"",
-                data=None,
-                role=ProtocolFileRole.MAIN,
-            ),
-            other_files=[
-                RoleAnalyzedFile(
-                    name="whatever.json",
-                    contents=b"",
-                    data={"hello": "world"},
-                    role=ProtocolFileRole.DATA,
-                )
-            ],
         ),
     ),
 ]
@@ -140,51 +68,8 @@ ROLE_ANALYZER_ERROR_SPECS: List[RoleAnalyzerErrorSpec] = [
         expected_message="No files were provided.",
     ),
     RoleAnalyzerErrorSpec(
-        files=[
-            BufferedFile(name="foo.py", contents=b"", data=None),
-            BufferedFile(name="bar.py", contents=b"", data=None),
-        ],
-        expected_message="multiple Python files are not yet supported.",
-    ),
-    RoleAnalyzerErrorSpec(
-        files=[
-            BufferedFile(
-                name="fixture_96_plate.json",
-                contents=b"",
-                data=LabwareDefinition.construct(),  # type: ignore[call-arg]
-            ),
-        ],
-        expected_message="fixture_96_plate.json is not a valid protocol file",
-    ),
-    RoleAnalyzerErrorSpec(
-        files=[
-            BufferedFile(
-                name="protocol.json",
-                contents=b"",
-                data=JsonProtocol.construct(),  # type: ignore[call-arg]
-            ),
-            BufferedFile(
-                name="fixture_96_plate.json",
-                contents=b"",
-                data=LabwareDefinition.construct(),  # type: ignore[call-arg]
-            ),
-        ],
-        expected_message="JSON protocol must consist of a single file.",
-    ),
-    RoleAnalyzerErrorSpec(
-        files=[
-            BufferedFile(
-                name="data.csv",
-                contents=b"",
-                data=None,
-            ),
-            BufferedFile(
-                name="more-data.csv",
-                contents=b"",
-                data=None,
-            ),
-        ],
-        expected_message="No valid main protocol file found.",
+        files=[BufferedFile(name="foo.txt", contents=b"", data=None)],
+        expected_message='"foo.txt" is not a valid protocol file.',
     ),
 ]
 

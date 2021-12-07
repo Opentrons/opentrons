@@ -28,9 +28,6 @@ class ProtocolFileRole(str, Enum):
     """
 
     MAIN = "main"
-    PYTHON_SUPPORT = "pythonSupport"
-    LABWARE_DEFINITION = "labwareDefinition"
-    DATA = "data"
 
 
 @dataclass(frozen=True)
