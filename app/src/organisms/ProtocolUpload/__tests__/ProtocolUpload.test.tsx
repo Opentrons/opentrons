@@ -20,7 +20,6 @@ import { ConfirmExitProtocolUploadModal } from '../ConfirmExitProtocolUploadModa
 import { mockCalibrationStatus } from '../../../redux/calibration/__fixtures__'
 import { useCurrentProtocolRun } from '../hooks/useCurrentProtocolRun'
 import { useCloseCurrentRun } from '../hooks/useCloseCurrentRun'
-import { closeProtocol } from '../../../redux/protocol/actions'
 import { ProtocolUpload } from '..'
 
 jest.mock('../../../redux/protocol/selectors')
@@ -92,6 +91,10 @@ describe('ProtocolUpload', () => {
     when(mockUseProtocolDetails)
       .calledWith()
       .mockReturnValue({} as any)
+    when(mockUseCloseProtocolRun).calledWith().mockReturnValue({
+      closeCurrentRun: jest.fn(),
+      isClosingCurrentRun: false,
+    })
   })
 
   afterEach(() => {
@@ -149,20 +152,20 @@ describe('ProtocolUpload', () => {
         runRecord: {},
         createProtocolRun: jest.fn(),
       } as any)
-    const mockCloseProtocolRun = jest.fn()
-    when(mockUseCloseProtocolRun)
-      .calledWith()
-      .mockReturnValue(mockCloseProtocolRun)
+    const mockCloseCurrentRun = jest.fn()
+    when(mockUseCloseProtocolRun).calledWith().mockReturnValue({
+      closeCurrentRun: mockCloseCurrentRun,
+      isClosingCurrentRun: false,
+    })
 
-    const [{ getByRole, getByText }, store] = render()
+    const [{ getByRole, getByText }] = render()
     fireEvent.click(getByRole('button', { name: 'close' }))
     const mockCloseModal = getByText('mock confirm exit protocol upload modal')
     fireEvent.click(mockCloseModal)
     expect(
       screen.queryByText('mock confirm exit protocol upload modal')
     ).toBeNull()
-    expect(store.dispatch).toHaveBeenCalledWith(closeProtocol())
-    expect(mockCloseProtocolRun).toHaveBeenCalled()
+    expect(mockCloseCurrentRun).toHaveBeenCalled()
   })
 
   it('calls ingest protocol if handleUpload', () => {
@@ -174,6 +177,25 @@ describe('ProtocolUpload', () => {
         createProtocolRun: jest.fn(),
       } as any)
     const { getByText } = render()[0]
+    getByText('Open a protocol to run on robotName')
+  })
+
+  it('renders empty state input if the current run is being closed', () => {
+    getProtocolFile.mockReturnValue(withModulesProtocol as any)
+    when(mockUseCurrentProtocolRun)
+      .calledWith()
+      .mockReturnValue({
+        protocolRecord: {},
+        runRecord: {},
+        createProtocolRun: jest.fn(),
+      } as any)
+    const mockCloseCurrentRun = jest.fn()
+    when(mockUseCloseProtocolRun).calledWith().mockReturnValue({
+      closeCurrentRun: mockCloseCurrentRun,
+      isClosingCurrentRun: true,
+    })
+
+    const [{ getByText }] = render()
     getByText('Open a protocol to run on robotName')
   })
 })

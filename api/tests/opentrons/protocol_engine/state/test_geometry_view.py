@@ -627,3 +627,34 @@ def test_get_tip_drop_invalid_origin(
             well_location=WellLocation(origin=WellOrigin.BOTTOM),
             pipette_config=pipette_config,
         )
+
+
+def test_get_ancestor_slot_name(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    subject: GeometryView,
+) -> None:
+    """It should get name of ancestor slot of labware."""
+    decoy.when(labware_view.get("labware-1")).then_return(
+        LoadedLabware(
+            id="labware-1",
+            loadName="load-name",
+            definitionUri="1234",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        )
+    )
+    assert subject.get_ancestor_slot_name("labware-1") == DeckSlotName.SLOT_4
+
+    decoy.when(labware_view.get("labware-2")).then_return(
+        LoadedLabware(
+            id="labware-2",
+            loadName="load-name",
+            definitionUri="4567",
+            location=ModuleLocation(moduleId="4321"),
+        )
+    )
+    decoy.when(module_view.get_location("4321")).then_return(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+    )
+    assert subject.get_ancestor_slot_name("labware-2") == DeckSlotName.SLOT_1
