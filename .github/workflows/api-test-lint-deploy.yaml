@@ -7,16 +7,18 @@ on:
   # Most of the time, we run on pull requests, which lets us handle external PRs
   pull_request:
     paths:
-      - 'api/**'
+      - 'api/**/*'
       - 'Makefile'
-      - 'shared-data/*/**'
+      - 'shared-data/**/*'
       - '!shared-data/js/**'
+      - 'hardware/**/*'
   push:
     paths:
       - 'api/**'
       - 'Makefile'
-      - 'shared-data/*/**'
-      - '!shared-data/js/**'
+      - 'shared-data/**/*'
+      - '!shared-data/js/**/*'
+      - 'hardware/**/*'
       - '.github/workflows/api-test-lint-deploy.yaml'
       - '.github/actions/python/**/*'
       - '.github/workflows/utils.js'
