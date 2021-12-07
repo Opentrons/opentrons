@@ -2,7 +2,8 @@
 import pytest
 import asyncio
 from typing import AsyncGenerator
-from opentrons_hardware.drivers.can_bus import CanDriver, ArbitrationId, CanMessage
+from opentrons_hardware.drivers.can_bus import CanDriver, CanMessage
+from opentrons_ot3_firmware.arbitration_id import ArbitrationId
 
 
 @pytest.fixture
