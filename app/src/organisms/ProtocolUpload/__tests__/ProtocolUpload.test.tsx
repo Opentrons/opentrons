@@ -93,7 +93,7 @@ describe('ProtocolUpload', () => {
       .mockReturnValue({} as any)
     when(mockUseCloseProtocolRun).calledWith().mockReturnValue({
       closeCurrentRun: jest.fn(),
-      isClosingCurrentRun: false,
+      isProtocolRunLoaded: true,
     })
   })
 
@@ -110,6 +110,10 @@ describe('ProtocolUpload', () => {
         runRecord: null,
         createProtocolRun: jest.fn(),
       } as any)
+    when(mockUseCloseProtocolRun).calledWith().mockReturnValue({
+      closeCurrentRun: jest.fn(),
+      isProtocolRunLoaded: false,
+    })
     mockGetConnectedRobotName.mockReturnValue(null)
     const { queryByText } = render()[0]
     expect(queryByText('Organization/Author')).toBeNull()
@@ -155,7 +159,7 @@ describe('ProtocolUpload', () => {
     const mockCloseCurrentRun = jest.fn()
     when(mockUseCloseProtocolRun).calledWith().mockReturnValue({
       closeCurrentRun: mockCloseCurrentRun,
-      isClosingCurrentRun: false,
+      isProtocolRunLoaded: true,
     })
 
     const [{ getByRole, getByText }] = render()
@@ -176,11 +180,16 @@ describe('ProtocolUpload', () => {
         runRecord: null,
         createProtocolRun: jest.fn(),
       } as any)
+    when(mockUseCloseProtocolRun).calledWith().mockReturnValue({
+      closeCurrentRun: jest.fn(),
+      isProtocolRunLoaded: false,
+    })
+
     const { getByText } = render()[0]
     getByText('Open a protocol to run on robotName')
   })
 
-  it('renders empty state input if the current run is being closed', () => {
+  it('renders empty state input if the current run is being closed or has a not-ok status', () => {
     getProtocolFile.mockReturnValue(withModulesProtocol as any)
     when(mockUseCurrentProtocolRun)
       .calledWith()
@@ -192,10 +201,42 @@ describe('ProtocolUpload', () => {
     const mockCloseCurrentRun = jest.fn()
     when(mockUseCloseProtocolRun).calledWith().mockReturnValue({
       closeCurrentRun: mockCloseCurrentRun,
-      isClosingCurrentRun: true,
+      isProtocolRunLoaded: false,
     })
 
     const [{ getByText }] = render()
     getByText('Open a protocol to run on robotName')
+  })
+
+  it('renders an error if protocol has a not-ok result', () => {
+    getProtocolFile.mockReturnValue(withModulesProtocol as any)
+    when(mockUseCurrentProtocolRun)
+      .calledWith()
+      .mockReturnValue({
+        protocolRecord: {
+          data: {
+            analyses: [
+              {
+                result: 'not-ok',
+                errors: [
+                  {
+                    detail: 'FAKE ERROR',
+                  },
+                ],
+              },
+            ],
+          },
+        },
+        runRecord: {},
+        createProtocolRun: jest.fn(),
+      } as any)
+    const mockCloseCurrentRun = jest.fn()
+    when(mockUseCloseProtocolRun).calledWith().mockReturnValue({
+      closeCurrentRun: mockCloseCurrentRun,
+      isProtocolRunLoaded: false,
+    })
+
+    const [{ getByText }] = render()
+    getByText('FAKE ERROR')
   })
 })
