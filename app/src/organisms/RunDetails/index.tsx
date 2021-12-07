@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
 import { Redirect } from 'react-router-dom'
 import {
   RunStatus,
@@ -26,10 +25,7 @@ import { ConfirmCancelModal } from '../../pages/Run/RunLog'
 import { ConfirmExitProtocolUploadModal } from '../ProtocolUpload/ConfirmExitProtocolUploadModal'
 import { useCloseCurrentRun } from '../ProtocolUpload/hooks/useCloseCurrentRun'
 import { useCurrentRunControls } from '../../pages/Run/RunLog/hooks'
-import { closeProtocol } from '../../redux/protocol/actions'
 import { CommandList } from './CommandList'
-
-import type { Dispatch } from '../../redux/types'
 
 import styles from '../ProtocolUpload/styles.css'
 
@@ -38,8 +34,7 @@ export function RunDetails(): JSX.Element | null {
   const { displayName, protocolData } = useProtocolDetails()
   const runStatus = useRunStatus()
   const startTime = useRunStartTime()
-  const dispatch = useDispatch<Dispatch>()
-  const closeProtocolRun = useCloseCurrentRun()
+  const { closeCurrentRun } = useCloseCurrentRun()
 
   // display an idle status as 'running' in the UI after a run has started
   const adjustedRunStatus: RunStatus | null =
@@ -61,8 +56,7 @@ export function RunDetails(): JSX.Element | null {
   } = useConditionalConfirm(cancelRunAndExit, true)
 
   const handleCloseProtocol: React.MouseEventHandler = _event => {
-    dispatch(closeProtocol())
-    closeProtocolRun()
+    closeCurrentRun()
   }
 
   const {
