@@ -10,6 +10,9 @@ interface UseRunActionMutations {
   playRun: () => void
   pauseRun: () => void
   stopRun: () => void
+  isPlayRunActionLoading: boolean
+  isPauseRunActionLoading: boolean
+  isStopRunActionLoading: boolean
 }
 
 export function useRunActionMutations(runId: string): UseRunActionMutations {
@@ -24,15 +27,24 @@ export function useRunActionMutations(runId: string): UseRunActionMutations {
       )
   }
 
-  const { playRun } = usePlayRunMutation({ onSuccess })
+  const { playRun, isLoading: isPlayRunActionLoading } = usePlayRunMutation({
+    onSuccess,
+  })
 
-  const { pauseRun } = usePauseRunMutation({ onSuccess })
+  const { pauseRun, isLoading: isPauseRunActionLoading } = usePauseRunMutation({
+    onSuccess,
+  })
 
-  const { stopRun } = useStopRunMutation({ onSuccess })
+  const { stopRun, isLoading: isStopRunActionLoading } = useStopRunMutation({
+    onSuccess,
+  })
 
   return {
     playRun: () => playRun(runId),
     pauseRun: () => pauseRun(runId),
     stopRun: () => stopRun(runId),
+    isPlayRunActionLoading,
+    isPauseRunActionLoading,
+    isStopRunActionLoading,
   }
 }

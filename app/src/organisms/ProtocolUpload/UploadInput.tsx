@@ -85,7 +85,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
   const mostRecentProtocol = mostRecentProtocolInfo?.data?.data
   const protocolData = useProtocolDetails()
   //  If mostRecentRun is null, the CTA that uses cloneRun won't appear so this will never be reached
-  const cloneMostRecentRun = useCloneRun(
+  const { cloneRun } = useCloneRun(
     mostRecentRunId != null ? mostRecentRunId : null
   )
   const robotName = useSelector((state: State) => getConnectedRobotName(state))
@@ -280,7 +280,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
             </Flex>
             <Flex>
               <NewSecondaryBtn
-                onClick={cloneMostRecentRun}
+                onClick={cloneRun}
                 id={'UploadInput_runAgainButton'}
               >
                 {t('run_again')}

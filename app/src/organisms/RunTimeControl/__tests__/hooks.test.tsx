@@ -270,8 +270,13 @@ describe('useRunControls hook', () => {
       playRun: mockPlayRun,
       pauseRun: mockPauseRun,
       stopRun: mockStopRun,
+      isPlayRunActionLoading: false,
+      isPauseRunActionLoading: false,
+      isStopRunActionLoading: false,
     })
-    when(mockUseCloneRun).calledWith('1').mockReturnValue(mockCloneRun)
+    when(mockUseCloneRun)
+      .calledWith('1')
+      .mockReturnValue({ cloneRun: mockCloneRun, isLoading: false })
 
     const { result } = renderHook(useRunControls)
 
