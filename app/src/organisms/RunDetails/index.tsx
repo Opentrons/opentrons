@@ -24,6 +24,7 @@ import { useRunStatus, useRunStartTime } from '../RunTimeControl/hooks'
 import { ConfirmCancelModal } from '../../pages/Run/RunLog'
 import { ConfirmExitProtocolUploadModal } from '../ProtocolUpload/ConfirmExitProtocolUploadModal'
 import { useCloseCurrentRun } from '../ProtocolUpload/hooks/useCloseCurrentRun'
+import { useCurrentProtocolRun } from '../ProtocolUpload/hooks'
 import { useCurrentRunControls } from '../../pages/Run/RunLog/hooks'
 import { CommandList } from './CommandList'
 
@@ -31,7 +32,8 @@ import styles from '../ProtocolUpload/styles.css'
 
 export function RunDetails(): JSX.Element | null {
   const { t } = useTranslation(['run_details', 'shared'])
-  const { displayName, protocolData } = useProtocolDetails()
+  const { displayName } = useProtocolDetails()
+  const { protocolRecord, runRecord } = useCurrentProtocolRun()
   const runStatus = useRunStatus()
   const startTime = useRunStartTime()
   const { closeCurrentRun } = useCloseCurrentRun()
@@ -65,7 +67,7 @@ export function RunDetails(): JSX.Element | null {
     cancel: cancelCloseExit,
   } = useConditionalConfirm(handleCloseProtocol, true)
 
-  if (protocolData === null) {
+  if (protocolRecord == null || runRecord == null) {
     return <Redirect to="/upload" />
   }
 

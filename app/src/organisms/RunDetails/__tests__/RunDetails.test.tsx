@@ -1,6 +1,7 @@
 import * as React from 'react'
 import '@testing-library/jest-dom'
 import { fireEvent } from '@testing-library/dom'
+import { StaticRouter } from 'react-router-dom'
 import {
   RUN_STATUS_RUNNING,
   RUN_STATUS_SUCCEEDED,
@@ -14,12 +15,14 @@ import { i18n } from '../../../i18n'
 import { CommandList } from '../CommandList'
 import { useProtocolDetails } from '../hooks'
 import { useRunStatus } from '../../RunTimeControl/hooks'
+import { useCurrentProtocolRun } from '../../ProtocolUpload/hooks/useCurrentProtocolRun'
 import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
 import type { ProtocolFile } from '@opentrons/shared-data'
 
 jest.mock('../hooks')
 jest.mock('../CommandList')
 jest.mock('../../RunTimeControl/hooks')
+jest.mock('../../ProtocolUpload/hooks/useCurrentProtocolRun')
 
 const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
   typeof useProtocolDetails
@@ -30,12 +33,21 @@ const mockUseRunStatus = useRunStatus as jest.MockedFunction<
   typeof useRunStatus
 >
 
+const mockUseCurrentProtocolRun = useCurrentProtocolRun as jest.MockedFunction<
+  typeof useCurrentProtocolRun
+>
+
 const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolFile<{}>
 
 const render = () => {
-  return renderWithProviders(<RunDetails />, {
-    i18nInstance: i18n,
-  })[0]
+  return renderWithProviders(
+    <StaticRouter>
+      <RunDetails />
+    </StaticRouter>,
+    {
+      i18nInstance: i18n,
+    }
+  )[0]
 }
 
 describe('RunDetails', () => {
@@ -45,6 +57,13 @@ describe('RunDetails', () => {
       displayName: 'mock display name',
     })
     when(mockCommandList).mockReturnValue(<div>Mock Command List</div>)
+    when(mockUseCurrentProtocolRun)
+      .calledWith()
+      .mockReturnValue({
+        protocolRecord: { data: { analyses: [] } },
+        runRecord: {},
+        createProtocolRun: jest.fn(),
+      } as any)
   })
 
   it('renders protocol title', () => {
