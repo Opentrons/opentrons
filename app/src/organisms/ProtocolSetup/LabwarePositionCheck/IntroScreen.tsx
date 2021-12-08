@@ -14,7 +14,6 @@ import {
   ALIGN_CENTER,
   SPACING_2,
   SPACING_3,
-  SPACING_4,
   FONT_SIZE_BODY_2,
   SPACING_6,
 } from '@opentrons/components'
