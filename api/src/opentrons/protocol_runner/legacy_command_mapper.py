@@ -2,7 +2,7 @@
 
 from collections import defaultdict
 from datetime import datetime
-from typing import Dict, List, Union, Optional
+from typing import Dict, Union, Optional
 
 from opentrons.types import MountType, DeckSlotName
 from opentrons.commands import types as legacy_command_types
@@ -58,15 +58,22 @@ class LegacyCommandMapper:
         self, module_data_provider: Optional[ModuleDataProvider] = None
     ) -> None:
         """Initialize the command mapper."""
-        self._running_commands: Dict[str, List[pe_commands.Command]] = defaultdict(list)
+        # commands keyed by broker message ID
+        self._commands_by_broker_id: Dict[str, pe_commands.Command] = {}
+
+        # running count of each legacy command type, to construct IDs
         self._command_count: Dict[str, int] = defaultdict(lambda: 0)
+
+        # equipment IDs by phyiscal location
         self._labware_id_by_slot: Dict[DeckSlotName, str] = {}
         self._pipette_id_by_mount: Dict[MountType, str] = {}
         self._module_id_by_slot: Dict[DeckSlotName, str] = {}
-        self._module_data_provider = module_data_provider or ModuleDataProvider()
+
+        # module definition state and provider depedency
         self._module_definition_by_model: Dict[
             pe_types.ModuleModel, pe_types.ModuleDefinition
         ] = {}
+        self._module_data_provider = module_data_provider or ModuleDataProvider()
 
     def map_command(
         self,
@@ -85,6 +92,7 @@ class LegacyCommandMapper:
         """
         command_type = command["name"]
         command_error = command["error"]
+        broker_id = command["id"]
         stage = command["$"]
 
         command_id = f"{command_type}-0"
@@ -96,27 +104,29 @@ class LegacyCommandMapper:
             engine_command = self._build_initial_command(command, command_id, now)
 
             self._command_count[command_type] = count + 1
-            self._running_commands[command_type].append(engine_command)
+            self._commands_by_broker_id[broker_id] = engine_command
 
             return pe_actions.UpdateCommandAction(engine_command)
 
-        elif command_error is None:
-            running_command = self._running_commands[command_type].pop()
-            completed_command = running_command.copy(
-                update={
-                    "status": pe_commands.CommandStatus.SUCCEEDED,
-                    "completedAt": now,
-                }
-            )
-            return pe_actions.UpdateCommandAction(completed_command)
+        elif stage == "after":
+            running_command = self._commands_by_broker_id[broker_id]
 
-        else:
-            return pe_actions.FailCommandAction(
-                command_id=command_id,
-                error_id=ModelUtils.generate_id(),
-                failed_at=now,
-                error=LegacyContextCommandError(str(command_error)),
-            )
+            if command_error is None:
+                completed_command = running_command.copy(
+                    update={
+                        "status": pe_commands.CommandStatus.SUCCEEDED,
+                        "completedAt": now,
+                    }
+                )
+                return pe_actions.UpdateCommandAction(completed_command)
+
+            else:
+                return pe_actions.FailCommandAction(
+                    command_id=running_command.id,
+                    error_id=ModelUtils.generate_id(),
+                    failed_at=now,
+                    error=LegacyContextCommandError(str(command_error)),
+                )
 
     def map_labware_load(
         self, labware_load_info: LegacyLabwareLoadInfo
