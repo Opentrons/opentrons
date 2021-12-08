@@ -50,6 +50,17 @@ export const getValidCustomLabware: (
   labware.filter((f): f is ValidLabwareFile => f.type === VALID_LABWARE_FILE)
 )
 
+export const getValidCustomLabwareFiles: (
+  state: State
+) => File[] = createSelector(getValidCustomLabware, labware => {
+  const labwareFiles = labware.map(lw => {
+    console.log('labware', lw)
+    const jsonDefinition = JSON.stringify(lw.definition)
+    return new File([jsonDefinition], lw.filename)
+  })
+  return labwareFiles
+})
+
 export const getAddLabwareFailure: (
   state: State
 ) => {
