@@ -8,7 +8,6 @@ from mock import AsyncMock, Mock
 
 from opentrons_ot3_firmware.constants import (
     NodeId,
-
     MessageId,
 )
 
