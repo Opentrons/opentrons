@@ -65,7 +65,7 @@ export function RunDetails(): JSX.Element | null {
     cancel: cancelCloseExit,
   } = useConditionalConfirm(handleCloseProtocol, true)
 
-  if (isProtocolRunLoaded) {
+  if (!isProtocolRunLoaded) {
     return <Redirect to="/upload" />
   }
 
