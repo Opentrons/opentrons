@@ -56,9 +56,7 @@ export function ProtocolSetup(): JSX.Element {
     alertTitle = `${t('protocol_run_complete')} ${t('protocol_can_be_closed')}`
   } else if (runStatus === RUN_STATUS_FAILED) {
     alertType = 'error'
-    alertTitle = `${t('protocol_run_failed')} ${t(
-      'recalibrating_not_available'
-    )}`
+    alertTitle = `${t('protocol_run_failed')} `
   } else if (
     runStatus === RUN_STATUS_STOPPED ||
     runStatus === RUN_STATUS_STOP_REQUESTED
