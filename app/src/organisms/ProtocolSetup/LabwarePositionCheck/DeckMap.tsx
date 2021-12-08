@@ -17,7 +17,7 @@ import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_stand
 import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../hooks'
 import styles from '../styles.css'
 
-const DECK_MAP_VIEWBOX = '-80 -100 550 560'
+const DECK_MAP_VIEWBOX = '-80 -20 550 460'
 const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
   'fixedBase',
@@ -103,9 +103,9 @@ export const DeckMap = (props: DeckMapProps): JSX.Element | null => {
                             <circle
                               cx="0"
                               cy="0"
-                              r={260}
+                              r={230}
                               fill={C_WHITE}
-                              transform={`translate(270,265)`}
+                              transform={`translate(273,235)`}
                               data-testid={`DeckMap_module_${nestedLabwareId}_whiteBackground`}
                             />
                             <Icon
@@ -148,9 +148,9 @@ export const DeckMap = (props: DeckMapProps): JSX.Element | null => {
                       <circle
                         cx="0"
                         cy="0"
-                        r={260}
+                        r={230}
                         fill={C_WHITE}
-                        transform={`translate(270,265)`}
+                        transform={`translate(273,235)`}
                         data-testid={`DeckMap_${labwareId}_whiteBackground`}
                       />
                       <Icon
