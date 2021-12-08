@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import {
   Flex,
   Icon,
-  Modal,
   Text,
   SPACING_2,
   SPACING_3,
@@ -20,7 +19,6 @@ import {
   FONT_SIZE_DEFAULT,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
-import styles from '../styles.css'
 
 interface RobotMotionLoadingModalProps {
   title: string
@@ -32,7 +30,7 @@ export const RobotMotionLoadingModal = (
   const { t } = useTranslation('labware_position_check')
 
   return (
-    <Modal className={styles.modal} contentsClassName={styles.modal_contents}>
+    <>
       <Text
         as={'h3'}
         marginBottom={SPACING_3}
@@ -74,6 +72,6 @@ export const RobotMotionLoadingModal = (
           </Text>
         </Flex>
       </Flex>
-    </Modal>
+    </>
   )
 }
