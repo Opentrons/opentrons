@@ -281,10 +281,7 @@ class CommandView(HasState[CommandState]):
 
     def get_is_stopped(self) -> bool:
         """Get whether an engine stop has completed."""
-        return self._state.should_stop and not any(
-            c.status == CommandStatus.RUNNING
-            for c in self._state.commands_by_id.values()
-        )
+        return self._state.is_hardware_stopped
 
     # TODO(mc, 2021-12-07): reject adding commands to a stopped engine
     def validate_action_allowed(self, action: Union[PlayAction, PauseAction]) -> None:
