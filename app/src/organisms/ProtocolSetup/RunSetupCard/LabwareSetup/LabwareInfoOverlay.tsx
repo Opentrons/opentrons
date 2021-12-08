@@ -60,9 +60,9 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element => {
     ),
     offset => {
       const locationKey =
-        'slotName' in offset.location
-          ? offset.location?.slotName
-          : offset.location.moduleId
+        offset.location.moduleModel != null
+          ? `${offset.location.moduleModel}_${offset.location.slotName}`
+          : offset.location.slotName
       return `${offset.definitionUri}_${locationKey}`
     }
   )

@@ -20,7 +20,6 @@ import { ConfirmExitProtocolUploadModal } from '../ConfirmExitProtocolUploadModa
 import { mockCalibrationStatus } from '../../../redux/calibration/__fixtures__'
 import { useCurrentProtocolRun } from '../hooks/useCurrentProtocolRun'
 import { useCloseCurrentRun } from '../hooks/useCloseCurrentRun'
-import { closeProtocol } from '../../../redux/protocol/actions'
 import { ProtocolUpload } from '..'
 
 jest.mock('../../../redux/protocol/selectors')
@@ -92,6 +91,10 @@ describe('ProtocolUpload', () => {
     when(mockUseProtocolDetails)
       .calledWith()
       .mockReturnValue({} as any)
+    when(mockUseCloseProtocolRun).calledWith().mockReturnValue({
+      closeCurrentRun: jest.fn(),
+      isProtocolRunLoaded: true,
+    })
   })
 
   afterEach(() => {
@@ -107,6 +110,10 @@ describe('ProtocolUpload', () => {
         runRecord: null,
         createProtocolRun: jest.fn(),
       } as any)
+    when(mockUseCloseProtocolRun).calledWith().mockReturnValue({
+      closeCurrentRun: jest.fn(),
+      isProtocolRunLoaded: false,
+    })
     mockGetConnectedRobotName.mockReturnValue(null)
     const { queryByText } = render()[0]
     expect(queryByText('Organization/Author')).toBeNull()
@@ -149,20 +156,20 @@ describe('ProtocolUpload', () => {
         runRecord: {},
         createProtocolRun: jest.fn(),
       } as any)
-    const mockCloseProtocolRun = jest.fn()
-    when(mockUseCloseProtocolRun)
-      .calledWith()
-      .mockReturnValue(mockCloseProtocolRun)
+    const mockCloseCurrentRun = jest.fn()
+    when(mockUseCloseProtocolRun).calledWith().mockReturnValue({
+      closeCurrentRun: mockCloseCurrentRun,
+      isProtocolRunLoaded: true,
+    })
 
-    const [{ getByRole, getByText }, store] = render()
+    const [{ getByRole, getByText }] = render()
     fireEvent.click(getByRole('button', { name: 'close' }))
     const mockCloseModal = getByText('mock confirm exit protocol upload modal')
     fireEvent.click(mockCloseModal)
     expect(
       screen.queryByText('mock confirm exit protocol upload modal')
     ).toBeNull()
-    expect(store.dispatch).toHaveBeenCalledWith(closeProtocol())
-    expect(mockCloseProtocolRun).toHaveBeenCalled()
+    expect(mockCloseCurrentRun).toHaveBeenCalled()
   })
 
   it('calls ingest protocol if handleUpload', () => {
@@ -173,7 +180,63 @@ describe('ProtocolUpload', () => {
         runRecord: null,
         createProtocolRun: jest.fn(),
       } as any)
+    when(mockUseCloseProtocolRun).calledWith().mockReturnValue({
+      closeCurrentRun: jest.fn(),
+      isProtocolRunLoaded: false,
+    })
+
     const { getByText } = render()[0]
     getByText('Open a protocol to run on robotName')
+  })
+
+  it('renders empty state input if the current run is being closed or has a not-ok status', () => {
+    getProtocolFile.mockReturnValue(withModulesProtocol as any)
+    when(mockUseCurrentProtocolRun)
+      .calledWith()
+      .mockReturnValue({
+        protocolRecord: {},
+        runRecord: {},
+        createProtocolRun: jest.fn(),
+      } as any)
+    const mockCloseCurrentRun = jest.fn()
+    when(mockUseCloseProtocolRun).calledWith().mockReturnValue({
+      closeCurrentRun: mockCloseCurrentRun,
+      isProtocolRunLoaded: false,
+    })
+
+    const [{ getByText }] = render()
+    getByText('Open a protocol to run on robotName')
+  })
+
+  it('renders an error if protocol has a not-ok result', () => {
+    getProtocolFile.mockReturnValue(withModulesProtocol as any)
+    when(mockUseCurrentProtocolRun)
+      .calledWith()
+      .mockReturnValue({
+        protocolRecord: {
+          data: {
+            analyses: [
+              {
+                result: 'not-ok',
+                errors: [
+                  {
+                    detail: 'FAKE ERROR',
+                  },
+                ],
+              },
+            ],
+          },
+        },
+        runRecord: {},
+        createProtocolRun: jest.fn(),
+      } as any)
+    const mockCloseCurrentRun = jest.fn()
+    when(mockUseCloseProtocolRun).calledWith().mockReturnValue({
+      closeCurrentRun: mockCloseCurrentRun,
+      isProtocolRunLoaded: false,
+    })
+
+    const [{ getByText }] = render()
+    getByText('FAKE ERROR')
   })
 })

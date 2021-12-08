@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import {
-  PrimaryBtn,
+  NewPrimaryBtn,
   Text,
   Flex,
   Box,
@@ -12,7 +12,6 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_CENTER,
   ALIGN_CENTER,
-  C_BLUE,
   SPACING_2,
   SPACING_3,
   SPACING_4,
@@ -93,17 +92,16 @@ export const IntroScreen = (props: {
         </Box>
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER} marginBottom={SPACING_4}>
-        <PrimaryBtn
+        <NewPrimaryBtn
           title={t('start_position_check', {
             initial_labware_slot: firstTiprackSlot,
           })}
-          backgroundColor={C_BLUE}
           onClick={props.beginLPC}
         >
           {t('start_position_check', {
             initial_labware_slot: firstTiprackSlot,
           })}
-        </PrimaryBtn>
+        </NewPrimaryBtn>
       </Flex>
     </Box>
   )

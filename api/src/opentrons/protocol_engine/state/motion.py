@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from typing import List, Optional
 
-from opentrons.types import MountType, Point
+from opentrons.types import MountType, Point, DeckSlotName
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.motion_planning import (
     MoveType,
@@ -16,6 +16,7 @@ from ..types import WellLocation
 from .labware import LabwareView
 from .pipettes import PipetteView, CurrentWell
 from .geometry import GeometryView
+from .modules import ModuleView
 
 
 @dataclass(frozen=True)
@@ -34,11 +35,13 @@ class MotionView:
         labware_view: LabwareView,
         pipette_view: PipetteView,
         geometry_view: GeometryView,
+        module_view: ModuleView,
     ) -> None:
         """Initialize a MotionState instance."""
         self._labware = labware_view
         self._pipettes = pipette_view
         self._geometry = geometry_view
+        self._module = module_view
 
     def get_pipette_location(
         self,
@@ -89,6 +92,7 @@ class MotionView:
             well_location,
         )
         dest_cp = CriticalPoint.XY_CENTER if center_dest else None
+        extra_waypoints = []
 
         if (
             location is not None
@@ -104,6 +108,19 @@ class MotionView:
         else:
             move_type = MoveType.GENERAL_ARC
             min_travel_z = self._geometry.get_all_labware_highest_z()
+            if location is not None:
+                if self._module.should_dodge_thermocycler(
+                    from_slot=self._geometry.get_ancestor_slot_name(
+                        location.labware_id
+                    ),
+                    to_slot=self._geometry.get_ancestor_slot_name(labware_id),
+                ):
+                    slot_5_center = self._labware.get_slot_center_position(
+                        slot=DeckSlotName.SLOT_5
+                    )
+                    extra_waypoints = [(slot_5_center.x, slot_5_center.y)]
+            # TODO (spp, 11-29-2021): Should log some kind of warning that pipettes
+            #  could crash onto the thermocycler if current well is not known.
 
         try:
             # TODO(mc, 2021-01-08): inject `get_waypoints` via constructor
@@ -115,7 +132,7 @@ class MotionView:
                 dest_cp=dest_cp,
                 min_travel_z=min_travel_z,
                 max_travel_z=max_travel_z,
-                xy_waypoints=[],
+                xy_waypoints=extra_waypoints,
             )
         except MotionPlanningError as error:
             raise errors.FailedToPlanMoveError(str(error))

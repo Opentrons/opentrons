@@ -1,8 +1,7 @@
 """Command execution module."""
 
-from .create_queue_worker import create_queue_worker
 from .command_executor import CommandExecutor
-from .queue_worker import QueueWorker
+from .create_queue_worker import create_queue_worker
 from .equipment import (
     EquipmentHandler,
     LoadedLabwareData,
@@ -11,12 +10,15 @@ from .equipment import (
 )
 from .movement import MovementHandler, SavedPositionData
 from .pipetting import PipettingHandler
+from .queue_worker import QueueWorker
 from .run_control import RunControlHandler
+
+# .thermocycler_movement_flagger omitted from package's public interface.
 
 
 __all__ = [
     "CommandExecutor",
-    "QueueWorker",
+    "create_queue_worker",
     "EquipmentHandler",
     "LoadedLabwareData",
     "LoadedPipetteData",
@@ -24,7 +26,6 @@ __all__ = [
     "MovementHandler",
     "SavedPositionData",
     "PipettingHandler",
-    "RunControlHandler",
     "QueueWorker",
-    "create_queue_worker",
+    "RunControlHandler",
 ]

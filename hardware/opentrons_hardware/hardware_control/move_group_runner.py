@@ -43,6 +43,10 @@ class MoveGroupRunner:
         Args:
             can_messenger: a can messenger
         """
+        if not self._move_groups:
+            log.debug("No moves. Nothing to do.")
+            return
+
         await self._clear_groups(can_messenger)
         await self._send_groups(can_messenger)
         await self._move(can_messenger)

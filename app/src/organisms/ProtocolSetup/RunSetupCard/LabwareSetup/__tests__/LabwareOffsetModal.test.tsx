@@ -64,7 +64,9 @@ describe('LabwareOffsetModal', () => {
       getByRole('link', {
         name: 'Learn more about Labware Offset Data',
       }).getAttribute('href')
-    ).toBe('#') // replace when we have an actual link
+    ).toBe(
+      'http://support.opentrons.com/en/articles/5742955-how-labware-offsets-work-on-the-ot-2'
+    )
   })
   it('should call onCloseClick when the close button is pressed', () => {
     const { getByRole } = render(props)

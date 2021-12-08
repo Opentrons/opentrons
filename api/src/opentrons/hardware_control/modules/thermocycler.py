@@ -364,8 +364,10 @@ class Thermocycler(mod_abc.AbstractModule):
             else None
         )
 
+    # todo(mm, 2021-11-29): Instead of being Optional, should this return
+    # ThermocyclerLidStatus.UNKNOWN when self._listener.state is None?
     @property
-    def lid_status(self) -> Optional[str]:
+    def lid_status(self) -> Optional[ThermocyclerLidStatus]:
         return self._listener.state.lid_status if self._listener.state else None
 
     @property

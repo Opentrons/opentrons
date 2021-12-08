@@ -18,6 +18,7 @@ export interface UseCurrentProtocolRun {
   createProtocolRun: UseMutateFunction<Protocol, unknown, File[], unknown>
   protocolRecord?: Protocol | null
   runRecord?: Run | null
+  isCreatingProtocolRun?: boolean
 }
 
 export function useCurrentProtocolRun(): UseCurrentProtocolRun {
@@ -27,8 +28,14 @@ export function useCurrentProtocolRun(): UseCurrentProtocolRun {
   const { data: runRecord } = useRunQuery(currentRunId, {
     refetchInterval: REFETCH_INTERVAL,
   })
+  const [isInitializing, setIsInitializing] = React.useState(false)
   const { data: protocolRecord, refetch: refetchProtocol } = useProtocolQuery(
-    (runRecord?.data?.protocolId as string) ?? null
+    (runRecord?.data?.protocolId as string) ?? null,
+    {
+      onSuccess: () => {
+        if (isInitializing) setIsInitializing(false)
+      },
+    }
   )
 
   React.useEffect(() => {
@@ -41,8 +48,9 @@ export function useCurrentProtocolRun(): UseCurrentProtocolRun {
     }
   }, [protocolRecord?.data.analyses])
 
-  const { createRun } = useCreateRunMutation({
+  const { createRun, isLoading: isCreatingRun } = useCreateRunMutation({
     onSuccess: () => {
+      setIsInitializing(true)
       queryClient
         .invalidateQueries([host, 'runs'])
         .catch((e: Error) =>
@@ -50,7 +58,10 @@ export function useCurrentProtocolRun(): UseCurrentProtocolRun {
         )
     },
   })
-  const { createProtocol: createProtocolRun } = useCreateProtocolMutation({
+  const {
+    createProtocol: createProtocolRun,
+    isLoading: isCreatingProtocol,
+  } = useCreateProtocolMutation({
     onSuccess: data => {
       createRun({ protocolId: data.data.id })
     },
@@ -60,5 +71,7 @@ export function useCurrentProtocolRun(): UseCurrentProtocolRun {
     createProtocolRun,
     protocolRecord,
     runRecord,
+    isCreatingProtocolRun:
+      isCreatingProtocol || isCreatingRun || isInitializing,
   }
 }

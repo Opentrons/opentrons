@@ -7,7 +7,7 @@ import {
   Icon,
   Text,
   Flex,
-  PrimaryBtn,
+  NewPrimaryBtn,
   FONT_SIZE_BODY_2,
   FONT_WEIGHT_REGULAR,
   SPACING_3,
@@ -19,7 +19,6 @@ import {
   Link,
   DIRECTION_COLUMN,
   ALIGN_CENTER,
-  C_SELECTED_DARK,
   C_WHITE,
   JUSTIFY_CENTER,
   C_BLUE,
@@ -28,7 +27,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   FONT_SIZE_CAPTION,
   FONT_BODY_1_DARK,
-  SecondaryBtn,
+  NewSecondaryBtn,
   FONT_SIZE_BODY_1,
   SPACING_2,
   JUSTIFY_START,
@@ -62,7 +61,7 @@ const DROP_ZONE_STYLES = css`
   background-color: ${C_WHITE};
 `
 const DRAG_OVER_STYLES = css`
-  background-color: ${C_SELECTED_DARK};
+  background-color: ${C_BLUE};
   color: ${C_WHITE};
 `
 
@@ -86,7 +85,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
   const mostRecentProtocol = mostRecentProtocolInfo?.data?.data
   const protocolData = useProtocolDetails()
   //  If mostRecentRun is null, the CTA that uses cloneRun won't appear so this will never be reached
-  const cloneMostRecentRun = useCloneRun(
+  const { cloneRun } = useCloneRun(
     mostRecentRunId != null ? mostRecentRunId : null
   )
   const robotName = useSelector((state: State) => getConnectedRobotName(state))
@@ -156,14 +155,13 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
           onCloseClick={() => showRerunningProtocolModal(false)}
         />
       )}
-      <PrimaryBtn
+      <NewPrimaryBtn
         onClick={handleClick}
         marginBottom={SPACING_4}
-        backgroundColor={C_BLUE}
         id={'UploadInput_protocolUploadButton'}
       >
         {t('choose_file')}
-      </PrimaryBtn>
+      </NewPrimaryBtn>
 
       <label
         data-testid="file_drop_zone"
@@ -281,13 +279,12 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
               </Flex>
             </Flex>
             <Flex>
-              <SecondaryBtn
-                onClick={cloneMostRecentRun}
-                color={C_BLUE}
+              <NewSecondaryBtn
+                onClick={cloneRun}
                 id={'UploadInput_runAgainButton'}
               >
                 {t('run_again')}
-              </SecondaryBtn>
+              </NewSecondaryBtn>
             </Flex>
           </Flex>
           <Divider />

@@ -11,6 +11,8 @@ class NodeId(int, Enum):
     gantry_x = 0x30
     gantry_y = 0x40
     head = 0x50
+    head_l = 0x51
+    head_r = 0x52
 
 
 class FunctionCode(int, Enum):

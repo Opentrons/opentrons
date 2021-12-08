@@ -79,14 +79,17 @@ class TaskQueue:
         try:
             if self._run_func is not None:
                 await self._run_func()
+        except asyncio.CancelledError:
+            log.debug("Run task was cancelled")
+            raise
         except Exception as e:
             log.debug(
                 "Exception raised during protocol run",
                 exc_info=error,
             )
             error = e
-        finally:
-            if self._cleanup_func is not None:
-                await self._cleanup_func(error=error)
-            elif error:
-                raise error
+
+        if self._cleanup_func is not None:
+            await self._cleanup_func(error=error)
+        elif error:
+            raise error

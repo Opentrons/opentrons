@@ -1,17 +1,15 @@
 import * as React from 'react'
 import {
-  ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
   FONT_WEIGHT_SEMIBOLD,
   JUSTIFY_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
-  PrimaryBtn,
+  NewPrimaryBtn,
   SPACING_3,
   SPACING_4,
   Text,
   TEXT_TRANSFORM_UPPERCASE,
-  C_BLUE,
+  ALIGN_FLEX_START,
 } from '@opentrons/components'
 import { LabwarePositionCheckStepDetail } from './LabwarePositionCheckStepDetail'
 import { SectionList } from './SectionList'
@@ -52,12 +50,8 @@ export const GenericStepScreen = (
       >
         {props.title}
       </Text>
-      <Flex
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        alignItems={ALIGN_CENTER}
-        margin={SPACING_3}
-      >
-        <Flex flexDirection={DIRECTION_COLUMN}>
+      <Flex alignItems={ALIGN_FLEX_START} padding={SPACING_3}>
+        <Flex flexDirection={DIRECTION_COLUMN} paddingTop={SPACING_3}>
           <Flex marginLeft={SPACING_4}>
             <SectionList
               primaryPipetteMount={primaryPipetteMount}
@@ -84,9 +78,7 @@ export const GenericStepScreen = (
         </Flex>
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER} marginBottom={SPACING_4}>
-        <PrimaryBtn backgroundColor={C_BLUE} onClick={props.proceed}>
-          {props.ctaText}
-        </PrimaryBtn>
+        <NewPrimaryBtn onClick={props.proceed}>{props.ctaText}</NewPrimaryBtn>
       </Flex>
     </Flex>
   )

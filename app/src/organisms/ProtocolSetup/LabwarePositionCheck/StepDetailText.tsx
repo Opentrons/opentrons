@@ -56,6 +56,7 @@ export const StepDetailText = (
           values={{ labware_name: displayName, tiprack_name: displayName }}
           components={{
             bold: <strong />,
+            italic: <i />,
           }}
         />
         <Btn

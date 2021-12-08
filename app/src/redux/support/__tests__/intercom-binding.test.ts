@@ -79,6 +79,7 @@ describe('calling the intercom js api', () => {
     expect(intercom).toHaveBeenCalledWith('boot', {
       user_id: 'dummy-user',
       some: 'prop',
+      hide_default_launcher: true,
     })
   })
 
@@ -92,6 +93,7 @@ describe('calling the intercom js api', () => {
       some: 'value',
       other: 'value',
       user_id: 'dummy',
+      hide_default_launcher: true,
     })
   })
 
@@ -101,6 +103,7 @@ describe('calling the intercom js api', () => {
       some: 'value',
       other: 'value',
       user_id: 'dummy',
+      hide_default_launcher: true,
     })
   })
 

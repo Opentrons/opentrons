@@ -2,8 +2,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
-
-from opentrons.types import Point
+from opentrons.types import Point, DeckSlotName
 from opentrons.hardware_control.dev_types import PipetteDict
 
 from .. import errors
@@ -21,9 +20,8 @@ from .modules import ModuleView
 
 DEFAULT_TIP_DROP_HEIGHT_FACTOR = 0.5
 
+
 # TODO(mc, 2020-11-12): reconcile this data structure with WellGeometry
-
-
 @dataclass(frozen=True)
 class TipGeometry:
     """Tip geometry data."""
@@ -216,3 +214,15 @@ class GeometryView:
                 z=well_location.offset.z - tip_z_offset,
             )
         )
+
+    def get_ancestor_slot_name(self, labware_id: str) -> DeckSlotName:
+        """Get the slot name of the labware or the module that the labware is on."""
+        labware = self._labware.get(labware_id)
+        slot_name: DeckSlotName
+
+        if isinstance(labware.location, DeckSlotLocation):
+            slot_name = labware.location.slotName
+        else:
+            module_id = labware.location.moduleId
+            slot_name = self._modules.get_location(module_id).slotName
+        return slot_name

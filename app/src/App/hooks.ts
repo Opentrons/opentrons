@@ -7,7 +7,7 @@ import {
   getDeckCalibrationOk,
 } from '../redux/nav'
 import { getConnectedRobot } from '../redux/discovery'
-import { useCurrentProtocolRun } from '../organisms/ProtocolUpload/hooks'
+import { useCloseCurrentRun } from '../organisms/ProtocolUpload/hooks'
 import { NavLocation } from '../redux/nav/types'
 
 export function useRunLocation(): NavLocation {
@@ -17,12 +17,11 @@ export function useRunLocation(): NavLocation {
   const pipettesCalibrated = useSelector(getConnectedRobotPipettesCalibrated)
   const deckCalOk = useSelector(getDeckCalibrationOk)
 
-  const { protocolRecord, runRecord } = useCurrentProtocolRun()
+  const { isProtocolRunLoaded } = useCloseCurrentRun()
 
   let disabledReason = null
   if (!robot) disabledReason = t('please_connect_to_a_robot')
-  else if (protocolRecord == null || runRecord == null)
-    disabledReason = t('please_load_a_protocol')
+  else if (!isProtocolRunLoaded) disabledReason = t('please_load_a_protocol')
   else if (!pipettesMatch) disabledReason = t('attached_pipettes_do_not_match')
   else if (!pipettesCalibrated) disabledReason = t('pipettes_not_calibrated')
   else if (!deckCalOk) disabledReason = t('calibrate_deck_to_proceed')
