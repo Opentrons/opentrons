@@ -319,7 +319,7 @@ def test_command_store_saves_unknown_finish_error() -> None:
         should_stop=True,
         commands_by_id=OrderedDict(),
         errors_by_id={
-            "error-id": errors.ErrorOccurrence(
+            "error-id": errors.ErrorOccurrence.construct(
                 id="error-id",
                 createdAt=datetime(year=2021, month=1, day=1),
                 errorType="RuntimeError",
@@ -392,7 +392,7 @@ def test_command_store_handles_command_failed() -> None:
         should_stop=False,
         commands_by_id=OrderedDict([("command-id", expected_failed_command)]),
         errors_by_id={
-            "error-id": errors.ErrorOccurrence(
+            "error-id": errors.ErrorOccurrence.construct(
                 id="error-id",
                 errorType="ProtocolEngineError",
                 createdAt=datetime(year=2022, month=2, day=2),

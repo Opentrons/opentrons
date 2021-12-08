@@ -111,7 +111,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 }
             )
             commands_by_id.update({command.id: command})
-            errors_by_id[action.error_id] = ErrorOccurrence(
+            errors_by_id[action.error_id] = ErrorOccurrence.construct(
                 id=action.error_id,
                 createdAt=action.failed_at,
                 errorType=type(action.error).__name__,
@@ -153,7 +153,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     created_at = action.error_details.created_at
                     error = action.error_details.error
 
-                    errors_by_id[error_id] = ErrorOccurrence(
+                    errors_by_id[error_id] = ErrorOccurrence.construct(
                         id=error_id,
                         createdAt=created_at,
                         errorType=type(error).__name__,

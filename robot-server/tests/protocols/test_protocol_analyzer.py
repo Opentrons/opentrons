@@ -61,7 +61,7 @@ async def test_analyze(
         params=pe_commands.PauseParams(message="hello world"),
     )
 
-    analysis_error = pe_errors.ErrorOccurrence(
+    analysis_error = pe_errors.ErrorOccurrence.construct(
         id="error-id",
         createdAt=datetime(year=2023, month=3, day=3),
         errorType="BadError",

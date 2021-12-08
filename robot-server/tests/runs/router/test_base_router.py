@@ -369,14 +369,14 @@ async def test_get_run_with_errors(
         errorId="error-1",
     )
 
-    error_1 = ErrorOccurrence(
+    error_1 = ErrorOccurrence.construct(
         id="error-1",
         createdAt=datetime(year=2023, month=3, day=3),
         errorType="SomethingBad",
         detail="oh no",
     )
 
-    error_2 = ErrorOccurrence(
+    error_2 = ErrorOccurrence.construct(
         id="error-2",
         createdAt=datetime(year=2024, month=4, day=4),
         errorType="SomethingWorse",
