@@ -1,7 +1,6 @@
 """Response models for protocol analysis."""
 # TODO(mc, 2021-08-25): add modules to simulation result
 from enum import Enum
-from pydantic import BaseModel, Field
 from typing import List, Union
 from typing_extensions import Literal
 
@@ -11,6 +10,7 @@ from opentrons.protocol_engine import (
     LoadedLabware,
     LoadedPipette,
 )
+from robot_server.base_model import BaseModel, Field
 
 
 class AnalysisStatus(str, Enum):

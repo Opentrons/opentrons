@@ -308,13 +308,13 @@ def test_validate_action_allowed(
 
 def test_get_errors() -> None:
     """It should be able to pull all ErrorOccurrences from the store."""
-    error_1 = errors.ErrorOccurrence.construct(
+    error_1 = errors.ErrorOccurrence(
         id="error-1",
         createdAt=datetime(year=2021, month=1, day=1),
         errorType="ReallyBadError",
         detail="things could not get worse",
     )
-    error_2 = errors.ErrorOccurrence.construct(
+    error_2 = errors.ErrorOccurrence(
         id="error-2",
         createdAt=datetime(year=2022, month=2, day=2),
         errorType="EvenWorseError",
@@ -429,7 +429,7 @@ get_status_specs: List[GetStatusSpec] = [
             is_hardware_stopped=True,
             should_stop=True,
             errors_by_id={
-                "error-id": errors.ErrorOccurrence.construct(
+                "error-id": errors.ErrorOccurrence(
                     id="error-id",
                     createdAt=datetime(year=2021, month=1, day=1),
                     errorType="BadError",

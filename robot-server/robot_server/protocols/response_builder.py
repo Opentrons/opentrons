@@ -38,7 +38,7 @@ class ResponseBuilder:
         Returns:
             Protocol model representing the resource.
         """
-        return Protocol(
+        return Protocol.construct(
             id=resource.protocol_id,
             createdAt=resource.created_at,
             protocolType=_pre_analysis_to_protocol_type(resource.pre_analysis),
@@ -47,7 +47,7 @@ class ResponseBuilder:
             files=[
                 # TODO(mc, 2021-11-12): don't report all files as main. Move
                 # role determination to PreAnalyzer
-                ProtocolFile(name=f.name, role=ProtocolFileRole.MAIN)
+                ProtocolFile.construct(name=f.name, role=ProtocolFileRole.MAIN)
                 for f in resource.files
             ],
         )

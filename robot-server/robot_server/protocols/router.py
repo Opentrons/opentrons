@@ -53,9 +53,8 @@ protocols_router = APIRouter()
     path="/protocols",
     summary="Upload a protocol",
     status_code=status.HTTP_201_CREATED,
-    response_model=SimpleResponseModel[Protocol],
-    response_model_exclude_none=True,
     responses={
+        status.HTTP_201_CREATED: {"model": SimpleResponseModel[Protocol]},
         status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse[ProtocolFileInvalid]},
     },
 )
@@ -140,15 +139,14 @@ async def create_protocol(
 
     # todo(mm, 2021-09-14): Do we need to close the UploadFiles in our `files` arg?
 
-    return SimpleResponseModel(data=data)
+    return SimpleResponseModel.construct(data=data)
 
 
 @protocols_router.get(
     path="/protocols",
     summary="Get uploaded protocols",
     status_code=status.HTTP_200_OK,
-    response_model=SimpleMultiResponseModel[Protocol],
-    response_model_exclude_none=True,
+    responses={status.HTTP_200_OK: {"model": SimpleMultiResponseModel[Protocol]}},
 )
 async def get_protocols(
     response_builder: ResponseBuilder = Depends(ResponseBuilder),
@@ -171,16 +169,15 @@ async def get_protocols(
         for r in protocol_resources
     ]
 
-    return SimpleMultiResponseModel(data=data)
+    return SimpleMultiResponseModel.construct(data=data)
 
 
 @protocols_router.get(
     path="/protocols/{protocolId}",
     summary="Get an uploaded protocol",
     status_code=status.HTTP_200_OK,
-    response_model=SimpleResponseModel[Protocol],
-    response_model_exclude_none=True,
     responses={
+        status.HTTP_200_OK: {"model": SimpleResponseModel[Protocol]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[ProtocolNotFound]},
     },
 )
@@ -207,16 +204,15 @@ async def get_protocol_by_id(
 
     data = response_builder.build(resource=resource, analyses=analyses)
 
-    return SimpleResponseModel(data=data)
+    return SimpleResponseModel.construct(data=data)
 
 
 @protocols_router.delete(
     path="/protocols/{protocolId}",
     summary="Delete an uploaded protocol",
     status_code=status.HTTP_200_OK,
-    response_model=SimpleEmptyResponseModel,
-    response_model_exclude_none=True,
     responses={
+        status.HTTP_200_OK: {"model": SimpleEmptyResponseModel},
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[ProtocolNotFound]},
     },
 )

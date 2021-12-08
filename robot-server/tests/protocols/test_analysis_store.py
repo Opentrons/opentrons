@@ -99,7 +99,7 @@ command_analysis_specs: List[CommandAnalysisSpec] = [
     CommandAnalysisSpec(
         commands=[],
         errors=[
-            pe_errors.ErrorOccurrence.construct(
+            pe_errors.ErrorOccurrence(
                 id="error-id",
                 createdAt=datetime(year=2021, month=1, day=1),
                 errorType="BadError",
