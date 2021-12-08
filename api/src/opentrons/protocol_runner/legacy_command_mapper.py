@@ -92,10 +92,11 @@ class LegacyCommandMapper:
         """
         command_type = command["name"]
         command_error = command["error"]
-        broker_id = command["id"]
         stage = command["$"]
+        # TODO(mc, 2021-12-08): use message ID as command ID directly once
+        # https://github.com/Opentrons/opentrons/issues/8986 is resolved
+        broker_id = command["id"]
 
-        command_id = f"{command_type}-0"
         now = ModelUtils.get_timestamp()
 
         if stage == "before":
