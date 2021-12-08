@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.0.0-beta.1](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.0...v5.0.0-beta.1) (2021-12-07)
+
+
+### Bug Fixes
+
+* **app:** display error and close run if protocol analysis is not-ok ([#9007](https://github.com/Opentrons/opentrons/issues/9007)) ([a4bf3b5](https://github.com/Opentrons/opentrons/commit/a4bf3b5458949cc8abed2f32de0f54b635d28ee1)), closes [#8984](https://github.com/Opentrons/opentrons/issues/8984)
+
+
+### Features
+
+* **shared-data:** add home command to proocol schema ([#8947](https://github.com/Opentrons/opentrons/issues/8947)) ([79e0ab9](https://github.com/Opentrons/opentrons/commit/79e0ab936dff72b221fd428039e110695d801212)), closes [#8892](https://github.com/Opentrons/opentrons/issues/8892)
+
+
+
+
+
 # [5.0.0-beta.0](https://github.com/Opentrons/opentrons/compare/v4.7.0...v5.0.0-beta.0) (2021-11-30)
 
 
