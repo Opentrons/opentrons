@@ -40,12 +40,30 @@ class ThermocyclerMovementFlagger:
         self._hardware_api = hardware_api
 
     async def raise_if_labware_in_non_open_thermocycler(self, labware_id: str) -> None:
-        """Raise if the given labware is inside a Thermocycler whose lid isn't open.
+        """Flag unsafe movements to a Thermocycler.
 
-        Otherwise, no-op.
+        If the given labware is in a Thermocycler, and that Thermocycler's lid isn't
+        currently open according to the hardware API, raises ThermocyclerNotOpenError.
 
-        Raises:
-            ThermocyclerNotOpenError
+        Otherwise, no-ops.
+
+        Warning:
+            Various limitations with our hardware API and Thermocycler firmware mean
+            this method can't detect every case where the Thermocycler lid is non-open.
+
+            1. While the lid is in transit, the Thermocycler doesn't respond to status
+               polls.
+            2. The Thermocycler doesn't report when the user presses its physical
+               lid open button; we have to wait for the next poll to find out, which
+               can be tens of seconds because of (1).
+            3. Nothing protects the Thermocycler hardware controller from being accessed
+               concurrently by multiple tasks.
+               And updating the Thermocycler state from one task doesn't guarantee that
+               that update will be immediately visible from a different task.
+               So, for example, if a legacy module control HTTP endpoint starts closing
+               the Thermocycler, and then a Protocol Engine task quickly polls the
+               Thermocycler through this method, this method may see the lid as open
+               even though it's in transit.
         """
         try:
             thermocycler = await self._find_containing_thermocycler(
