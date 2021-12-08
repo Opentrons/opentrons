@@ -2,7 +2,6 @@ import logging
 from typing import Dict, Awaitable, Callable, Any, Set, List, Optional
 
 from opentrons.types import Mount, Point, Location
-from opentrons.config import feature_flags as ff
 from opentrons.hardware_control import ThreadManager, CriticalPoint, Pipette
 from opentrons.protocol_api import labware
 from opentrons.protocols.geometry.deck import Deck

@@ -15,7 +15,6 @@ from opentrons.calibration_storage.types import (
     TipLengthCalNotFound,
     PipetteOffsetByPipetteMount,
 )
-from opentrons.config import feature_flags as ff
 from opentrons.hardware_control import (
     ThreadManager,
     CriticalPoint,

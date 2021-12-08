@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Dict, Set, TYPE_CHECKING
 from dataclasses import dataclass
 from opentrons.types import Point, Mount
-from opentrons.config.feature_flags import enable_ot3_hardware_controller
 
 if TYPE_CHECKING:
     from typing_extensions import Final

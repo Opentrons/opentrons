@@ -18,7 +18,6 @@ from opentrons.hardware_control import (
 )
 from opentrons.protocol_api import labware
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
-from opentrons.config import feature_flags as ff
 from opentrons.protocols.geometry.deck import Deck
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
