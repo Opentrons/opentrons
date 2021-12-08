@@ -89,8 +89,7 @@ describe('ProtocolSetup', () => {
   it('renders a protocol run failed banner when run is failed', () => {
     mockUseRunStatus.mockReturnValue(RUN_STATUS_FAILED)
     const { queryByText } = render()
-    const bannerText =
-      'Protocol run failed. Recalibrating Tip Length calibrations and Labware Position Check is not available.'
+    const bannerText = 'Protocol run failed.'
     expect(queryByText(bannerText)).toBeTruthy()
   })
   it('renders a protocol run canceled banner when a run stop is requested', () => {
