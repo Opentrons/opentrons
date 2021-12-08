@@ -88,9 +88,8 @@ class AllRunsLinks(BaseModel):
     summary="Create a run",
     description="Create a new run to track robot interaction.",
     status_code=status.HTTP_201_CREATED,
-    response_model=SimpleResponseModel[Run],
-    response_model_exclude_none=True,
     responses={
+        status.HTTP_201_CREATED: {"model": SimpleResponseModel[Run]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[ProtocolNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorResponse[RunAlreadyActive]},
     },
@@ -169,7 +168,7 @@ async def create_run(
         status=engine_state.commands.get_status(),
     )
 
-    return SimpleResponseModel(data=data)
+    return SimpleResponseModel.construct(data=data)
 
 
 @base_router.get(
@@ -177,8 +176,9 @@ async def create_run(
     summary="Get all runs",
     description="Get a list of all active and inactive runs.",
     status_code=status.HTTP_200_OK,
-    response_model=MultiResponseModel[Run, AllRunsLinks],
-    response_model_exclude_none=True,
+    responses={
+        status.HTTP_200_OK: {"model": MultiResponseModel[Run, AllRunsLinks]},
+    },
 )
 async def get_runs(
     run_store: RunStore = Depends(get_run_store),
@@ -221,9 +221,9 @@ async def get_runs(
         data.append(run_data)
 
         if run.is_current:
-            links.current = ResourceLink(href=f"/runs/{run.run_id}")
+            links.current = ResourceLink.construct(href=f"/runs/{run.run_id}")
 
-    return MultiResponseModel(data=data, links=links)
+    return MultiResponseModel.construct(data=data, links=links)
 
 
 @base_router.get(
@@ -231,9 +231,10 @@ async def get_runs(
     summary="Get a run",
     description="Get a specific run by its unique identifier.",
     status_code=status.HTTP_200_OK,
-    response_model=SimpleResponseModel[Run],
-    response_model_exclude_none=True,
-    responses={status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]}},
+    responses={
+        status.HTTP_200_OK: {"model": SimpleResponseModel[Run]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
+    },
 )
 async def get_run(
     runId: str,
@@ -276,7 +277,7 @@ async def get_run(
         status=engine_state.commands.get_status(),
     )
 
-    return SimpleResponseModel(data=data)
+    return SimpleResponseModel.construct(data=data)
 
 
 @base_router.delete(
@@ -284,9 +285,10 @@ async def get_run(
     summary="Delete a run",
     description="Delete a specific run by its unique identifier.",
     status_code=status.HTTP_200_OK,
-    response_model=SimpleEmptyResponseModel,
-    response_model_exclude_none=True,
-    responses={status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]}},
+    responses={
+        status.HTTP_200_OK: {"model": SimpleEmptyResponseModel},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
+    },
 )
 async def remove_run(
     runId: str,
@@ -324,9 +326,8 @@ async def remove_run(
         " see the run's `labwareOffsets` field."
     ),
     status_code=status.HTTP_201_CREATED,
-    response_model=SimpleResponseModel[Run],
-    response_model_exclude_none=True,
     responses={
+        status.HTTP_201_CREATED: {"model": SimpleResponseModel[Run]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
         status.HTTP_409_CONFLICT: {
             "model": ErrorResponse[Union[RunStopped, RunNotIdle]]
@@ -382,7 +383,7 @@ async def add_labware_offset(
         status=engine_state.commands.get_status(),
     )
 
-    return SimpleResponseModel(data=data)
+    return SimpleResponseModel.construct(data=data)
 
 
 @base_router.patch(
@@ -390,9 +391,8 @@ async def add_labware_offset(
     summary="Update a run",
     description="Update a specific run, returing the updated resource.",
     status_code=status.HTTP_200_OK,
-    response_model=SimpleResponseModel[Run],
-    response_model_exclude_none=True,
     responses={
+        status.HTTP_200_OK: {"model": SimpleResponseModel[Run]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
         status.HTTP_409_CONFLICT: {
             "model": ErrorResponse[Union[RunStopped, RunNotIdle]]
@@ -460,4 +460,4 @@ async def update_run(
         status=engine_state.commands.get_status(),
     )
 
-    return SimpleResponseModel(data=data)
+    return SimpleResponseModel.construct(data=data)

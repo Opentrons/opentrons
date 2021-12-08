@@ -30,11 +30,10 @@ class RunActionNotAllowed(ErrorDetails):
 @actions_router.post(
     path="/runs/{runId}/actions",
     summary="Issue a control action to the run",
-    description=("Provide an action in order to control execution of the run."),
+    description="Provide an action in order to control execution of the run.",
     status_code=status.HTTP_201_CREATED,
-    response_model=SimpleResponseModel[RunAction],
-    response_model_exclude_none=True,
     responses={
+        status.HTTP_201_CREATED: {"model": SimpleResponseModel[RunAction]},
         status.HTTP_409_CONFLICT: {
             "model": ErrorResponse[Union[RunActionNotAllowed, RunStopped]],
         },
@@ -91,4 +90,4 @@ async def create_run_action(
 
     run_store.upsert(run=next_run)
 
-    return SimpleResponseModel(data=action)
+    return SimpleResponseModel.construct(data=action)

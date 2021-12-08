@@ -13,7 +13,7 @@ class BaseModel(PydanticBaseModel):
     This model has the following behaviors / configuration:
 
     - Mutation is disallowed
-    - `None` values are excluded when serialize to dicts/JSON
+    - `None` values are excluded when serializing to dicts/JSON
     """
 
     def dict(self, *args: Any, **kwargs: Any) -> Dict[str, Any]:

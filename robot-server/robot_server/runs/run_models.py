@@ -1,6 +1,5 @@
 """Request and response models for run resources."""
 from datetime import datetime
-from pydantic import BaseModel, Field
 from typing import List, Optional
 
 from opentrons.protocol_engine import (
@@ -13,6 +12,7 @@ from opentrons.protocol_engine import (
     LabwareOffset,
     LabwareOffsetCreate,
 )
+from robot_server.base_model import BaseModel, Field
 from robot_server.service.json_api import ResourceModel
 from .action_models import RunAction
 

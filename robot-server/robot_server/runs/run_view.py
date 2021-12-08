@@ -49,7 +49,7 @@ class RunView:
             updated copy of the passed in RunResource.
 
         """
-        actions = RunAction(
+        actions = RunAction.construct(
             id=action_id,
             createdAt=created_at,
             actionType=action_data.actionType,

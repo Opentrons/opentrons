@@ -36,9 +36,8 @@ class CommandNotFound(ErrorDetails):
         "The command is placed at the back of the queue."
     ),
     status_code=status.HTTP_200_OK,
-    response_model=SimpleResponseModel[pe_commands.Command],
-    response_model_exclude_none=True,
     responses={
+        status.HTTP_200_OK: {"model": SimpleResponseModel[pe_commands.Command]},
         status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse[RunStopped]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
     },
@@ -65,7 +64,7 @@ async def create_run_command(
         )
 
     command = engine_store.engine.add_command(request_body.data)
-    return SimpleResponseModel(data=command)
+    return SimpleResponseModel.construct(data=command)
 
 
 @commands_router.get(
@@ -78,9 +77,8 @@ async def create_run_command(
         "information available for a given command."
     ),
     status_code=status.HTTP_200_OK,
-    response_model=SimpleMultiResponseModel[RunCommandSummary],
-    response_model_exclude_none=True,
     responses={
+        status.HTTP_200_OK: {"model": SimpleMultiResponseModel[RunCommandSummary]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
     },
 )
@@ -93,7 +91,7 @@ async def get_run_commands(
         run: Run response model, provided by the route handler for
             `GET /runs/{runId}`
     """
-    return SimpleMultiResponseModel(data=run.data.commands)
+    return SimpleMultiResponseModel.construct(data=run.data.commands)
 
 
 @commands_router.get(
@@ -104,9 +102,8 @@ async def get_run_commands(
         "execution information."
     ),
     status_code=status.HTTP_200_OK,
-    response_model=SimpleResponseModel[pe_commands.Command],
-    response_model_exclude_none=True,
     responses={
+        status.HTTP_200_OK: {"model": SimpleResponseModel[pe_commands.Command]},
         status.HTTP_404_NOT_FOUND: {
             "model": Union[
                 ErrorResponse[RunNotFound],
