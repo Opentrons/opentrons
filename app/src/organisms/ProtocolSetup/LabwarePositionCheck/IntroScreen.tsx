@@ -87,11 +87,11 @@ export const IntroScreen = (props: {
             secondaryPipetteMount={secondaryPipetteMount}
           />
         </Flex>
-        <Box width="60%" padding={SPACING_3}>
+        <Box width="60%" padding={SPACING_2}>
           <DeckMap labwareIdsToHighlight={labwareIdsToHighlight} />
         </Box>
       </Flex>
-      <Flex justifyContent={JUSTIFY_CENTER} marginBottom={SPACING_4}>
+      <Flex justifyContent={JUSTIFY_CENTER} marginBottom={SPACING_3}>
         <NewPrimaryBtn
           title={t('start_position_check', {
             initial_labware_slot: firstTiprackSlot,
