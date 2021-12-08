@@ -29,6 +29,8 @@ import { RunSetupCard } from './RunSetupCard'
 import { MetadataCard } from './MetadataCard'
 import { LPCSuccessToastContext } from './hooks'
 import { LabwareOffsetSuccessToast } from './LabwareOffsetSuccessToast'
+import { CalibrationFailedToast } from './CalibrationFailedToast'
+import { useProtocolCalibrationStatus } from './RunSetupCard/hooks'
 
 const feedbackFormLink =
   'https://docs.google.com/forms/d/e/1FAIpQLSd6oSV82IfgzSi5t_FP6n_pB_Y8wPGmAgFHsiiFho9qhxr-UQ/viewform'
@@ -36,7 +38,7 @@ const feedbackFormLink =
 export function ProtocolSetup(): JSX.Element {
   const [showLPCSuccessToast, setShowLPCSuccessToast] = React.useState(false)
   const { t } = useTranslation(['protocol_setup'])
-
+  const calibrationStatus = useProtocolCalibrationStatus()
   const runStatus = useRunStatus()
 
   let alertType: AlertType | null = null
@@ -85,6 +87,11 @@ export function ProtocolSetup(): JSX.Element {
             onCloseClick={() => setShowLPCSuccessToast(false)}
           />
         )}
+        {(calibrationStatus.complete === false &&
+          calibrationStatus.reason === 'calibrate_pipette_failure_reason') ||
+          (calibrationStatus.reason === 'calibrate_tiprack_failure_reason' && (
+            <CalibrationFailedToast calibrationStatus={calibrationStatus} />
+          ))}
         <MetadataCard />
         <LPCSuccessToastContext.Provider
           value={{

@@ -13,6 +13,7 @@ import {
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { useRunStatus } from '../../RunTimeControl/hooks'
+import { useProtocolCalibrationStatus } from '../RunSetupCard/hooks'
 import { RunSetupCard } from '../RunSetupCard'
 import { MetadataCard } from '../MetadataCard'
 import { ProtocolSetup } from '..'
@@ -20,6 +21,7 @@ import { ProtocolSetup } from '..'
 jest.mock('../../RunTimeControl/hooks')
 jest.mock('../MetadataCard')
 jest.mock('../RunSetupCard')
+jest.mock('../RunSetupCard/hooks')
 
 const mockUseRunStatus = useRunStatus as jest.MockedFunction<
   typeof useRunStatus
@@ -29,6 +31,9 @@ const mockMetadataCard = MetadataCard as jest.MockedFunction<
 >
 const mockRunSetupCard = RunSetupCard as jest.MockedFunction<
   typeof RunSetupCard
+>
+const mockUseProtocolCalibrationStatus = useProtocolCalibrationStatus as jest.MockedFunction<
+  typeof useProtocolCalibrationStatus
 >
 
 describe('ProtocolSetup', () => {
@@ -42,6 +47,9 @@ describe('ProtocolSetup', () => {
     mockUseRunStatus.mockReturnValue(RUN_STATUS_IDLE)
     mockMetadataCard.mockReturnValue(<div>Mock MetadataCard</div>)
     mockRunSetupCard.mockReturnValue(<div>Mock ReunSetupCard</div>)
+    mockUseProtocolCalibrationStatus.mockReturnValue({
+      complete: true,
+    })
   })
 
   afterEach(() => {
@@ -111,5 +119,15 @@ describe('ProtocolSetup', () => {
     const { getByText, getByRole } = render()
     getByText('Have feedback about this experience?')
     expect(getByRole('link', { name: 'Let us know!' })).toBeTruthy()
+  })
+  it('renders a failed calibration status banner when protocol calibration status is false with a TLC or POC failed reason', () => {
+    mockUseProtocolCalibrationStatus.mockReturnValue({
+      complete: false,
+      reason: 'calibrate_tiprack_failure_reason',
+    })
+    const { queryByText } = render()
+    const bannerText =
+      'Tip Length Calibration failed. calibrate_tiprack_failure_reason Contact Opentrons Support if the issue persists.'
+    expect(queryByText(bannerText)).toBeTruthy()
   })
 })
