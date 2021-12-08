@@ -150,7 +150,7 @@ async def create_run(
 
     run_store.upsert(run=run)
 
-    data = Run(
+    data = Run.construct(
         id=run_id,
         protocolId=run.protocol_id,
         createdAt=run.created_at,
@@ -194,7 +194,7 @@ async def get_runs(
     for run in run_store.get_all():
         run_id = run.run_id
         engine_state = engine_store.get_state(run_id)
-        run_data = Run(
+        run_data = Run.construct(
             id=run_id,
             protocolId=run.protocol_id,
             createdAt=run.created_at,
@@ -252,7 +252,7 @@ async def get_run(
 
     engine_state = engine_store.get_state(run.run_id)
 
-    data = Run(
+    data = Run.construct(
         id=run.run_id,
         protocolId=run.protocol_id,
         createdAt=run.created_at,
@@ -358,7 +358,7 @@ async def add_labware_offset(
     engine_store.engine.add_labware_offset(request_body.data)
 
     engine_state = engine_store.get_state(run.run_id)
-    data = Run(
+    data = Run.construct(
         id=run.run_id,
         protocolId=run.protocol_id,
         createdAt=run.created_at,
@@ -436,7 +436,7 @@ async def update_run(
 
     engine_state = engine_store.get_state(run.run_id)
 
-    data = Run(
+    data = Run.construct(
         id=run.run_id,
         protocolId=run.protocol_id,
         createdAt=run.created_at,

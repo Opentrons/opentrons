@@ -29,7 +29,7 @@ async def test_create_run_command(decoy: Decoy, engine_store: EngineStore) -> No
         params=pe_commands.PauseParams(message="Hello")
     )
 
-    run = Run(
+    run = Run.construct(
         id="run-id",
         protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
@@ -73,7 +73,7 @@ async def test_create_run_command_not_current(
         params=pe_commands.PauseParams(message="Hello")
     )
 
-    run = Run(
+    run = Run.construct(
         id="run-id",
         protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
@@ -106,7 +106,7 @@ async def test_get_run_commands() -> None:
         status=CommandStatus.RUNNING,
     )
 
-    run = Run(
+    run = Run.construct(
         id="run-id",
         protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
@@ -143,7 +143,7 @@ async def test_get_run_command_by_id(
         params=pe_commands.MoveToWellParams(pipetteId="a", labwareId="b", wellName="c"),
     )
 
-    run = Run(
+    run = Run.construct(
         id="run-id",
         protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
@@ -178,7 +178,7 @@ async def test_get_run_command_missing_command(
     """It should 404 if you attempt to get a non-existent command."""
     key_error = pe_errors.CommandDoesNotExistError("oh no")
 
-    run = Run(
+    run = Run.construct(
         id="run-id",
         protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
