@@ -244,31 +244,10 @@ def test_get_should_stop() -> None:
 
 def test_get_is_stopped() -> None:
     """It should return true if stop requested and no command running."""
-    completed_command = create_completed_command(command_id="command-id-1")
-    running_command = create_running_command(command_id="command-id-2")
-    pending_command = create_pending_command(command_id="command-id-3")
-    failed_command = create_failed_command(command_id="command-id-4")
-
-    subject = get_command_view(
-        should_stop=False,
-        commands_by_id=(),
-    )
+    subject = get_command_view(is_hardware_stopped=False)
     assert subject.get_is_stopped() is False
 
-    subject = get_command_view(
-        should_stop=True,
-        commands_by_id=[("command-id-2", running_command)],
-    )
-    assert subject.get_is_stopped() is False
-
-    subject = get_command_view(
-        should_stop=True,
-        commands_by_id=[
-            ("command-id-1", completed_command),
-            ("command-id-3", pending_command),
-            ("command-id-4", failed_command),
-        ],
-    )
+    subject = get_command_view(is_hardware_stopped=True)
     assert subject.get_is_stopped() is True
 
 
