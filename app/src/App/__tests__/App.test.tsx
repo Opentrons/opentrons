@@ -118,6 +118,12 @@ describe('top level App component', () => {
     expect(wrapper.exists(ConnectPanel)).toBe(true)
   })
 
+  it('should redirect to /more from /app-settings', () => {
+    const { wrapper } = render('/app-settings')
+    expect(wrapper.exists(More)).toBe(true)
+    expect(wrapper.exists(MorePanel)).toBe(true)
+  })
+
   it('should render app-wide Alerts', () => {
     const { wrapper } = render()
     expect(wrapper.exists(Alerts)).toBe(true)
