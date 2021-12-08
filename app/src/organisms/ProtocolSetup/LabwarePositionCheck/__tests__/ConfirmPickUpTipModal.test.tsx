@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { resetAllWhenMocks } from 'jest-when'
-import { BaseModal, renderWithProviders } from '@opentrons/components'
+import { ModalPage, renderWithProviders } from '@opentrons/components'
 import { ConfirmPickUpTipModal } from '../ConfirmPickUpTipModal'
 import { i18n } from '../../../../i18n'
 
@@ -8,16 +8,25 @@ jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
   return {
     ...actualComponents,
-    BaseModal: jest.fn(() => <div></div>),
+    ModalPage: jest.fn(() => <div></div>),
   }
 })
 
-const mockBaseModal = BaseModal as jest.MockedFunction<typeof BaseModal>
+const mockModalPage = ModalPage as jest.MockedFunction<typeof ModalPage>
 
 const render = (props: React.ComponentProps<typeof ConfirmPickUpTipModal>) => {
-  return renderWithProviders(<ConfirmPickUpTipModal {...props} />, {
-    i18nInstance: i18n,
-  })[0]
+  return renderWithProviders(
+    <ModalPage
+      titleBar={{
+        title: 'modal page title',
+      }}
+    >
+      <ConfirmPickUpTipModal {...props} />
+    </ModalPage>,
+    {
+      i18nInstance: i18n,
+    }
+  )[0]
 }
 
 describe('ConfirmPickUpTipModal', () => {
@@ -29,7 +38,7 @@ describe('ConfirmPickUpTipModal', () => {
       onDeny: jest.fn(),
       confirmText: 'confirm text',
     }
-    mockBaseModal.mockReturnValue(<div>mock alert item</div>)
+    mockModalPage.mockReturnValue(<div>mock alert item</div>)
   })
   afterEach(() => {
     resetAllWhenMocks()

@@ -112,8 +112,8 @@ class Robot:
         -------
         ``True`` for success, ``False`` for failure.
 
-        Note
-        ----
+        Notes
+        -----
         If you wish to connect to the robot without using the OT App, you will
         need to use this function.
 

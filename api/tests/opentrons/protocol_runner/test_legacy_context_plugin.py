@@ -162,6 +162,7 @@ async def test_main_broker_messages(
 
     legacy_command: PauseMessage = {
         "$": "before",
+        "id": "message-id",
         "name": "command.PAUSE",
         "payload": {"userMessage": "hello", "text": "hello"},
         "error": None,

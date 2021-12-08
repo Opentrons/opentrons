@@ -410,7 +410,7 @@ export interface ProtocolResource {
   createdAt: string
   protocolType: 'json' | 'python'
   metadata: ProtocolMetadata
-  analyses: PendingProtocolAnalysis[] | CompletedProtocolAnalysis[]
+  analyses: Array<PendingProtocolAnalysis | CompletedProtocolAnalysis>
   files: ResourceFile[]
 }
 

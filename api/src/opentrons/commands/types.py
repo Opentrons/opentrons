@@ -572,7 +572,7 @@ MessageSequenceId = Union[Literal["before"], Literal["after"]]
 
 CommandMessageFields = TypedDict(
     "CommandMessageFields",
-    {"$": MessageSequenceId, "error": Optional[Exception]},
+    {"$": MessageSequenceId, "id": str, "error": Optional[Exception]},
 )
 
 

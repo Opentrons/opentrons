@@ -12,14 +12,14 @@ from opentrons.types import Mount
 
 try:
     from opentrons_hardware.drivers.can_bus import CanDriver, CanMessenger
-    from opentrons_hardware.drivers.can_bus.constants import NodeId
     from opentrons_hardware.hardware_control.motion import create
     from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
-    from opentrons_hardware.drivers.can_bus.messages.message_definitions import (
+    from opentrons_ot3_firmware.constants import NodeId
+    from opentrons_ot3_firmware.messages.message_definitions import (
         SetupRequest,
         EnableMotorRequest,
     )
-    from opentrons_hardware.drivers.can_bus.messages.payloads import EmptyPayload
+    from opentrons_ot3_firmware.messages.payloads import EmptyPayload
 except ModuleNotFoundError:
     pass
 

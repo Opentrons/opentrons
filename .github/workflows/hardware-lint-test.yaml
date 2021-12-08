@@ -32,21 +32,6 @@ jobs:
     timeout-minutes: 20
     runs-on: 'ubuntu-20.04'
     steps:
-      - name: Setup SocketCan
-        run: |
-          sudo apt-get update
-          sudo apt-get install linux-modules-extra-$(uname -r)
-          sudo modprobe vcan
-
-      - name: Checkout firmware repo
-        uses: actions/checkout@v2
-
-      - name: Run OT-3 Emulator
-        uses: Opentrons/opentrons-emulation@v1.2
-        with:
-          ot3-firmware-commit-id: latest
-          modules-commit-id: latest
-
       - name: Checkout opentrons repo
         uses: 'actions/checkout@v2'
 
@@ -78,3 +63,22 @@ jobs:
         with:
           files: ./hardware/coverage.xml
           flags: hardware 
+  integration:
+    name: 'hardware package integration tests'
+    timeout-minutes: 20
+    runs-on: 'ubuntu-20.04'
+    steps:
+      - name: Setup SocketCan
+        run: |
+          sudo apt-get update
+          sudo apt-get install linux-modules-extra-$(uname -r)
+          sudo modprobe vcan
+
+      - name: Checkout firmware repo
+        uses: actions/checkout@v2
+
+      - name: Run OT-3 Emulator
+        uses: Opentrons/opentrons-emulation@v1.2
+        with:
+          ot3-firmware-commit-id: latest
+          modules-commit-id: latest
