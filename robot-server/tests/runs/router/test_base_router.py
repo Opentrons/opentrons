@@ -311,7 +311,7 @@ async def test_get_run(
         actions=[],
         errors=[],
         commands=[
-            RunCommandSummary(
+            RunCommandSummary.construct(
                 id=command.id,
                 commandType=command.commandType,
                 status=command.status,
@@ -392,7 +392,7 @@ async def test_get_run_with_errors(
         actions=[],
         errors=[error_1, error_2],
         commands=[
-            RunCommandSummary(
+            RunCommandSummary.construct(
                 id=command.id,
                 commandType=command.commandType,
                 status=command.status,

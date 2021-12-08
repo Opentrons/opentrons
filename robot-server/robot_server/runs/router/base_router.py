@@ -157,7 +157,9 @@ async def create_run(
         current=run.is_current,
         actions=run.actions,
         commands=[
-            RunCommandSummary(id=c.id, commandType=c.commandType, status=c.status)
+            RunCommandSummary.construct(
+                id=c.id, commandType=c.commandType, status=c.status
+            )
             for c in engine_state.commands.get_all()
         ],
         errors=[],
@@ -201,7 +203,7 @@ async def get_runs(
             current=run.is_current,
             actions=run.actions,
             commands=[
-                RunCommandSummary(
+                RunCommandSummary.construct(
                     id=c.id,
                     commandType=c.commandType,
                     status=c.status,
@@ -259,7 +261,7 @@ async def get_run(
         current=run.is_current,
         actions=run.actions,
         commands=[
-            RunCommandSummary(
+            RunCommandSummary.construct(
                 id=c.id,
                 commandType=c.commandType,
                 status=c.status,
@@ -365,7 +367,7 @@ async def add_labware_offset(
         current=run.is_current,
         actions=run.actions,
         commands=[
-            RunCommandSummary(
+            RunCommandSummary.construct(
                 id=c.id,
                 commandType=c.commandType,
                 status=c.status,
@@ -443,7 +445,7 @@ async def update_run(
         current=run.is_current,
         actions=run.actions,
         commands=[
-            RunCommandSummary(
+            RunCommandSummary.construct(
                 id=c.id,
                 commandType=c.commandType,
                 status=c.status,

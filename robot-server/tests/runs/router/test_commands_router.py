@@ -100,7 +100,7 @@ async def test_create_run_command_not_current(
 
 async def test_get_run_commands() -> None:
     """It should return a list of all commands in a run."""
-    command_summary = RunCommandSummary(
+    command_summary = RunCommandSummary.construct(
         id="command-id",
         commandType="moveToWell",
         status=CommandStatus.RUNNING,
@@ -130,7 +130,7 @@ async def test_get_run_command_by_id(
     engine_store: EngineStore,
 ) -> None:
     """It should return full details about a command by ID."""
-    command_summary = RunCommandSummary(
+    command_summary = RunCommandSummary.construct(
         id="command-id",
         commandType="moveToWell",
         status=CommandStatus.RUNNING,
