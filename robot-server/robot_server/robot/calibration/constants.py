@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Dict, Set, TYPE_CHECKING
 from dataclasses import dataclass
 from opentrons.types import Point, Mount
+from opentrons.config.feature_flags import enable_ot3_hardware_controller
 
 if TYPE_CHECKING:
     from typing_extensions import Final
@@ -60,9 +61,6 @@ TIP_RACK_LOOKUP_BY_MAX_VOL: Dict[str, LabwareLookUp] = {
         load_name=TIPRACK_1000, alternatives={TIPRACK_1000, FILTERTIPRACK_1000}
     ),
 }
-
-SHORT_TRASH_DECK = "ot2_short_trash"
-STANDARD_DECK = "ot2_standard"
 
 POINT_ONE_ID: Final = "1BLC"
 POINT_TWO_ID: Final = "3BRC"

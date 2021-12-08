@@ -34,8 +34,6 @@ from robot_server.service.session.models.command_definitions import (
     DeckCalibrationCommand,
 )
 from robot_server.robot.calibration.constants import (
-    SHORT_TRASH_DECK,
-    STANDARD_DECK,
     MOVE_TO_DECK_SAFETY_BUFFER,
     MOVE_TO_TIP_RACK_SAFETY_BUFFER,
     POINT_ONE_ID,
@@ -86,8 +84,7 @@ class DeckCalibrationUserFlow:
         self._hw_pipette, self._mount = self._select_target_pipette()
         self._default_tipracks = self._get_default_tipracks()
 
-        deck_load_name = SHORT_TRASH_DECK if ff.short_fixed_trash() else STANDARD_DECK
-        self._deck = Deck(load_name=deck_load_name)
+        self._deck = Deck()
         self._tip_rack = self._get_tip_rack_lw()
         self._deck[TIP_RACK_SLOT] = self._tip_rack
 

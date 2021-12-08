@@ -24,8 +24,6 @@ from opentrons.protocols.geometry.deck import Deck
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from robot_server.robot.calibration.constants import (
-    SHORT_TRASH_DECK,
-    STANDARD_DECK,
     MOVE_TO_DECK_SAFETY_BUFFER,
     MOVE_TO_TIP_RACK_SAFETY_BUFFER,
     JOG_TO_DECK_SLOT,
@@ -104,8 +102,7 @@ class CheckCalibrationUserFlow:
             first=ComparisonStatePerCalibration(),
             second=ComparisonStatePerCalibration(),
         )
-        deck_load_name = SHORT_TRASH_DECK if ff.short_fixed_trash() else STANDARD_DECK
-        self._deck = Deck(load_name=deck_load_name)
+        self._deck = Deck()
         self._filtered_hw_pips = self._filter_hw_pips()
         (
             self._deck_calibration,

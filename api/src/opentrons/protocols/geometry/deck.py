@@ -5,7 +5,7 @@ from typing import Optional, List, Dict, TYPE_CHECKING
 
 from opentrons import types
 from opentrons.protocol_api.labware import load as load_lw, Labware
-from opentrons.protocols.api_support.constants import STANDARD_DECK
+from opentrons.protocols.api_support.constants import deck_type
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.hardware_control.modules.types import ModuleType
@@ -42,7 +42,7 @@ class CalibrationPosition:
 
 
 class Deck(UserDict):
-    def __init__(self, load_name: str = STANDARD_DECK) -> None:
+    def __init__(self, load_name: str = "") -> None:
         super().__init__()
         row_offset = 90.5
         col_offset = 132.5
@@ -53,6 +53,8 @@ class Deck(UserDict):
             for idx in range(12)
         }
         self._highest_z = 0.0
+        if not load_name:
+            load_name = deck_type()
         self._definition = load_deck(load_name, 2)
         self._load_fixtures()
 

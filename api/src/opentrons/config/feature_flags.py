@@ -35,5 +35,4 @@ def disable_fast_protocol_upload() -> bool:
 
 def enable_ot3_hardware_controller() -> bool:
     """Get whether to use the ot3 hardware controller."""
-
     return advs.get_setting_with_env_overload("enableOT3HardwareController")

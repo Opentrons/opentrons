@@ -7,7 +7,7 @@ from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName
-from opentrons.protocols.api_support.constants import STANDARD_DECK, SHORT_TRASH_DECK
+from opentrons.protocols.api_support.constants import deck_type
 
 from ..types import DeckSlotLocation
 from .labware_data_provider import LabwareDataProvider
@@ -37,8 +37,7 @@ class DeckDataProvider:
     @staticmethod
     async def get_deck_definition(short_fixed_trash: bool = False) -> DeckDefinitionV2:
         """Get a labware definition given the labware's identification."""
-        deck_load_name = SHORT_TRASH_DECK if short_fixed_trash else STANDARD_DECK
-        return load_deck(deck_load_name, 2)
+        return load_deck(deck_type(short_fixed_trash), 2)
 
     async def get_deck_fixed_labware(
         self,
