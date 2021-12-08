@@ -3,8 +3,20 @@ import {
   AlertItem,
   Text,
   Box,
+  Icon,
+  Flex,
   C_NEAR_WHITE,
   useConditionalConfirm,
+  SPACING_5,
+  JUSTIFY_CENTER,
+  DIRECTION_COLUMN,
+  ALIGN_CENTER,
+  FONT_WEIGHT_REGULAR,
+  C_DARK_GRAY,
+  SPACING_6,
+  TEXT_TRANSFORM_UPPERCASE,
+  FONT_SIZE_BIG,
+  SPACING_7,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
@@ -13,7 +25,7 @@ import { UploadInput } from './UploadInput'
 import { ProtocolSetup } from '../ProtocolSetup'
 import { useCurrentProtocolRun } from './hooks/useCurrentProtocolRun'
 import { useCloseCurrentRun } from './hooks/useCloseCurrentRun'
-import { loadProtocol, closeProtocol } from '../../redux/protocol/actions'
+import { loadProtocol } from '../../redux/protocol/actions'
 import { ingestProtocolFile } from '../../redux/protocol/utils'
 import { getConnectedRobotName } from '../../redux/robot/selectors'
 
@@ -28,6 +40,7 @@ import styles from './styles.css'
 const VALIDATION_ERROR_T_MAP: { [errorKey: string]: string } = {
   INVALID_FILE_TYPE: 'invalid_file_type',
   INVALID_JSON_FILE: 'invalid_json_file',
+  ANALYSIS_ERROR: 'analysis_error',
 }
 
 export function ProtocolUpload(): JSX.Element {
@@ -35,21 +48,40 @@ export function ProtocolUpload(): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   const {
     createProtocolRun,
-    runRecord,
     protocolRecord,
+    isCreatingProtocolRun,
   } = useCurrentProtocolRun()
-  const hasCurrentRun = runRecord != null && protocolRecord != null
-  const closeProtocolRun = useCloseCurrentRun()
+
+  const { closeCurrentRun, isProtocolRunLoaded } = useCloseCurrentRun()
   const robotName = useSelector((state: State) => getConnectedRobotName(state))
 
   const logger = useLogger(__filename)
   const [uploadError, setUploadError] = React.useState<
-    [string, ErrorObject[] | null | undefined] | null
+    [string, ErrorObject[] | string | null | undefined] | null
   >(null)
 
   const clearError = (): void => {
     setUploadError(null)
   }
+
+  React.useEffect(() => {
+    if (
+      protocolRecord?.data?.analyses[0] != null &&
+      'result' in protocolRecord.data.analyses[0] &&
+      protocolRecord.data.analyses[0].result === 'not-ok'
+    ) {
+      setUploadError([
+        VALIDATION_ERROR_T_MAP.ANALYSIS_ERROR,
+        protocolRecord?.data.analyses[0].errors[0].detail as string,
+      ])
+    }
+  }, [protocolRecord])
+
+  React.useEffect(() => {
+    if (uploadError != null) {
+      closeCurrentRun()
+    }
+  }, [uploadError])
 
   const handleUpload = (file: File): void => {
     clearError()
@@ -68,8 +100,7 @@ export function ProtocolUpload(): JSX.Element {
   }
 
   const handleCloseProtocol: React.MouseEventHandler = _event => {
-    dispatch(closeProtocol())
-    closeProtocolRun()
+    closeCurrentRun()
   }
 
   const {
@@ -78,7 +109,7 @@ export function ProtocolUpload(): JSX.Element {
     cancel: cancelExit,
   } = useConditionalConfirm(handleCloseProtocol, true)
 
-  const titleBarProps = hasCurrentRun
+  const titleBarProps = isProtocolRunLoaded
     ? {
         title: t('protocol_title', {
           protocol_name: protocolRecord?.data?.metadata?.protocolName ?? '',
@@ -97,6 +128,12 @@ export function ProtocolUpload(): JSX.Element {
         ),
       }
 
+  const pageContents = isProtocolRunLoaded ? (
+    <ProtocolSetup />
+  ) : (
+    <UploadInput onUpload={handleUpload} />
+  )
+
   return (
     <>
       {showConfirmExit && (
@@ -110,10 +147,14 @@ export function ProtocolUpload(): JSX.Element {
             title={t('protocol_upload_failed')}
           >
             {t(VALIDATION_ERROR_T_MAP[uploadError[0]])}
-            {uploadError[1] != null &&
+            {typeof uploadError[1] === 'string' ? (
+              <Text>{uploadError[1]}</Text>
+            ) : (
+              uploadError[1] != null &&
               uploadError[1].map((errorObject, i) => (
                 <Text key={i}>{JSON.stringify(errorObject)}</Text>
-              ))}
+              ))
+            )}
           </AlertItem>
         )}
         <Box
@@ -121,13 +162,43 @@ export function ProtocolUpload(): JSX.Element {
           width="100%"
           backgroundColor={C_NEAR_WHITE}
         >
-          {runRecord != null && protocolRecord != null ? (
-            <ProtocolSetup />
-          ) : (
-            <UploadInput onUpload={handleUpload} />
-          )}
+          {isCreatingProtocolRun ? <ProtocolLoader /> : pageContents}
         </Box>
       </Page>
     </>
+  )
+}
+
+function ProtocolLoader(): JSX.Element | null {
+  const { t } = useTranslation('protocol_info')
+  const robotName = useSelector((state: State) => getConnectedRobotName(state))
+  return (
+    <Flex
+      justifyContent={JUSTIFY_CENTER}
+      flexDirection={DIRECTION_COLUMN}
+      alignItems={ALIGN_CENTER}
+    >
+      <Text
+        textAlign={ALIGN_CENTER}
+        as={'h3'}
+        maxWidth={SPACING_7}
+        textTransform={TEXT_TRANSFORM_UPPERCASE}
+        marginTop={SPACING_6}
+        color={C_DARK_GRAY}
+        fontWeight={FONT_WEIGHT_REGULAR}
+        fontSize={FONT_SIZE_BIG}
+      >
+        {t('protocol_loading', {
+          robot_name: robotName,
+        })}
+      </Text>
+      <Icon
+        name="ot-spinner"
+        width={SPACING_5}
+        marginTop={SPACING_5}
+        color={C_DARK_GRAY}
+        spin
+      />
+    </Flex>
   )
 }

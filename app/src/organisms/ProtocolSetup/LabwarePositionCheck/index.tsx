@@ -125,8 +125,6 @@ export const LabwarePositionCheck = (
   } else if (showPickUpTipConfirmationModal) {
     modalContent = (
       <ConfirmPickUpTipModal
-        title={t('confirm_pick_up_tip_modal_title')}
-        denyText={t('confirm_pick_up_tip_modal_try_again_text')}
         confirmText={ctaText}
         onConfirm={proceed}
         onDeny={onUnsuccessfulPickUpTip}

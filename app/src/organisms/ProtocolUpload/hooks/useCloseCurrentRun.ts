@@ -1,3 +1,4 @@
+import * as React from 'react'
 import {
   useStopRunMutation,
   useDismissCurrentRunMutation,
@@ -20,17 +21,25 @@ const isStoppedState = (status: RunStatus): boolean => {
   return false
 }
 
-export function useCloseCurrentRun(): (
-  options?: UseDismissCurrentRunMutationOptions
-) => void {
+type CloseCallback = (options?: UseDismissCurrentRunMutationOptions) => void
+
+export function useCloseCurrentRun(): {
+  closeCurrentRun: CloseCallback
+  isProtocolRunLoaded: boolean
+} {
   const currentRunId = useCurrentRunId()
-  const { dismissCurrentRun } = useDismissCurrentRunMutation()
-  const { runRecord } = useCurrentProtocolRun()
+  const {
+    dismissCurrentRun,
+    isLoading: isDismissing,
+  } = useDismissCurrentRunMutation()
+  const { protocolRecord, runRecord } = useCurrentProtocolRun()
 
   const { stopRun } = useStopRunMutation()
   const { deleteRun } = useDeleteRunMutation()
 
-  return (options: UseDismissCurrentRunMutationOptions = {}) => {
+  const closeCurrentRun = (
+    options: UseDismissCurrentRunMutationOptions = {}
+  ): void => {
     if (currentRunId != null) {
       const status = runRecord?.data.status
       if (isStoppedState(status as RunStatus)) {
@@ -53,5 +62,26 @@ export function useCloseCurrentRun(): (
         })
       }
     }
+  }
+  const closeCurrentRunCallback = React.useCallback(closeCurrentRun, [
+    deleteRun,
+    dismissCurrentRun,
+    runRecord,
+    stopRun,
+    currentRunId,
+  ])
+
+  const analysisNotOk =
+    protocolRecord?.data?.analyses[0] != null &&
+    'result' in protocolRecord.data.analyses[0] &&
+    protocolRecord.data.analyses[0].result === 'not-ok'
+
+  return {
+    closeCurrentRun: closeCurrentRunCallback,
+    isProtocolRunLoaded:
+      !isDismissing &&
+      runRecord != null &&
+      protocolRecord != null &&
+      !analysisNotOk,
   }
 }

@@ -71,6 +71,9 @@ describe('RunTimeControl', () => {
         play: () => {},
         pause: () => {},
         reset: () => {},
+        isPlayRunActionLoading: false,
+        isPauseRunActionLoading: false,
+        isResetRunLoading: false,
       })
     when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_IDLE)
     mockTimer.mockReturnValue(<div>Mock Timer</div>)
@@ -113,6 +116,54 @@ describe('RunTimeControl', () => {
     expect(button).toBeDisabled()
     getByText('Complete required steps on Protocol tab before starting the run')
   })
+  it('should render disabled button if play run action is loading', () => {
+    when(mockUseRunControls)
+      .calledWith()
+      .mockReturnValue({
+        play: () => {},
+        pause: () => {},
+        reset: () => {},
+        isPlayRunActionLoading: true,
+        isPauseRunActionLoading: false,
+        isResetRunLoading: false,
+      })
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Start Run' })
+    expect(button).toBeDisabled()
+  })
+  it('should render disabled button if pause run action is loading', () => {
+    when(mockUseRunControls)
+      .calledWith()
+      .mockReturnValue({
+        play: () => {},
+        pause: () => {},
+        reset: () => {},
+        isPlayRunActionLoading: false,
+        isPauseRunActionLoading: true,
+        isResetRunLoading: false,
+      })
+    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_RUNNING)
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Pause Run' })
+    expect(button).toBeDisabled()
+  })
+  it('should render disabled button if reset run action is loading', () => {
+    when(mockUseRunControls)
+      .calledWith()
+      .mockReturnValue({
+        play: () => {},
+        pause: () => {},
+        reset: () => {},
+        isPlayRunActionLoading: false,
+        isPauseRunActionLoading: false,
+        isResetRunLoading: true,
+      })
+    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_SUCCEEDED)
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Run Again' })
+    expect(button).toBeDisabled()
+  })
+
   it('renders a run status and timer if running', () => {
     when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_RUNNING)
     when(mockUseRunStartTime).calledWith().mockReturnValue('noon')

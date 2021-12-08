@@ -13,9 +13,11 @@ from .actions import (
     PlayAction,
     PauseAction,
     StopAction,
-    StopErrorDetails,
+    FinishAction,
+    FinishErrorDetails,
     QueueCommandAction,
     AddLabwareOffsetAction,
+    HardwareStoppedAction,
 )
 
 
@@ -126,16 +128,16 @@ class ProtocolEngine:
 
         return self._state_store.commands.get(command.id)
 
-    async def halt(self) -> None:
-        """Halt execution, stopping all motion and cancelling future commands.
+    async def stop(self) -> None:
+        """Stop execution immediately, halting all motion and cancelling future commands.
 
-        You should call `stop` after calling `halt` for cleanup and to allow
-        the engine to settle and recover.
+        After an engine has been `stop`'ed, it cannot be restarted.
         """
         self._action_dispatcher.dispatch(StopAction())
         self._queue_worker.cancel()
         await self._hardware_api.halt()
         await self._hardware_api.stop(home_after=False)
+        self._action_dispatcher.dispatch(HardwareStoppedAction())
 
     async def wait_until_complete(self) -> None:
         """Wait until there are no more commands to execute.
@@ -146,11 +148,11 @@ class ProtocolEngine:
             condition=self._state_store.commands.get_all_complete
         )
 
-    async def stop(self, error: Optional[Exception] = None) -> None:
-        """Gracefully stop the ProtocolEngine, waiting for it to become idle.
+    async def finish(self, error: Optional[Exception] = None) -> None:
+        """Gracefully finish using the ProtocolEngine, waiting for it to become idle.
 
         The engine will finish executing its current command (if any),
-        and then shut down. After an engine has been `stop`'ed, it cannot
+        and then shut down. After an engine has been `finished`'ed, it cannot
         be restarted.
 
         This method should not raise, but if any exceptions happen during
@@ -161,7 +163,7 @@ class ProtocolEngine:
             error: An error that caused the stop, if applicable.
         """
         if error:
-            error_details: Optional[StopErrorDetails] = StopErrorDetails(
+            error_details: Optional[FinishErrorDetails] = FinishErrorDetails(
                 error_id=self._model_utils.generate_id(),
                 created_at=self._model_utils.get_timestamp(),
                 error=error,
@@ -169,13 +171,14 @@ class ProtocolEngine:
         else:
             error_details = None
 
-        self._action_dispatcher.dispatch(StopAction(error_details=error_details))
+        self._action_dispatcher.dispatch(FinishAction(error_details=error_details))
 
         try:
             await self._queue_worker.join()
         finally:
             await self._hardware_api.stop(home_after=False)
 
+        self._action_dispatcher.dispatch(HardwareStoppedAction())
         self._plugin_starter.stop()
 
     def add_labware_offset(self, request: LabwareOffsetCreate) -> LabwareOffset:

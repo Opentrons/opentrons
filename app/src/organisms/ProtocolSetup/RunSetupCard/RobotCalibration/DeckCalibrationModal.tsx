@@ -7,7 +7,7 @@ import {
   Box,
   Icon,
   BaseModal,
-  PrimaryBtn,
+  NewPrimaryBtn,
   SPACING_3,
   SPACING_4,
   SIZE_1,
@@ -126,15 +126,14 @@ export const DeckCalibrationModal = (
             </Flex>
           </Text>
           <Box textAlign={ALIGN_CENTER} marginTop={SPACING_4}>
-            <PrimaryBtn
+            <NewPrimaryBtn
               onClick={props.onCloseClick}
               width={SIZE_4}
-              backgroundColor={C_BLUE}
               name="close"
               id={'RobotCalModal_closeButton'}
             >
               {t('shared:close')}
-            </PrimaryBtn>
+            </NewPrimaryBtn>
           </Box>
         </Box>
       </BaseModal>

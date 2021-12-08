@@ -59,7 +59,7 @@ describe('useCloneRun hook', () => {
     } as any)
 
     const { result } = renderHook(() => useCloneRun(RUN_ID), { wrapper })
-    result.current && result.current()
+    result.current && result.current.cloneRun()
     expect(mockCreateRun).toHaveBeenCalledWith({
       protocolId: 'protocolId',
       labwareOffsets: 'someOffset',

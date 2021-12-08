@@ -116,6 +116,111 @@ export const SecondaryBtn: BtnComponent = styled(Btn)`
 `
 
 /**
+ * New primary button variant used in app
+ *
+ * @component
+ */
+export const NewPrimaryBtn: BtnComponent = styled(PrimaryBtn)`
+  background-color: ${Styles.C_BLUE};
+  color: ${Styles.C_WHITE};
+
+  &:hover,
+  &:focus {
+    background-color: ${Styles.C_BLUE};
+    box-shadow: 0px 3px 6px 0px rgba(0, 0, 0, 0.23);
+  }
+
+  &:active {
+    background-color: #004aaa;
+    box-shadow: none;
+  }
+
+  &:disabled,
+  &.disabled {
+    background-color: ${Styles.C_FONT_DISABLED};
+    color: ${Styles.C_WHITE};
+    box-shadow: none;
+  }
+
+  ${styleProps}
+`
+
+/**
+ * New secondary button variant used in app
+ *
+ * @component
+ */
+export const NewSecondaryBtn: BtnComponent = styled(SecondaryBtn)`
+  background-color: ${Styles.C_WHITE};
+  color: ${Styles.C_BLUE};
+
+  &:hover,
+  &:focus {
+    border-width: '2px';
+    background-color: ${Styles.C_WHITE};
+    color: ${Styles.C_BLUE};
+    box-shadow: 0px 3px 6px 0px rgba(0, 0, 0, 0.23);
+  }
+
+  &:active {
+    border-width: '2px';
+    background-color: ${Styles.C_WHITE};
+    color: ${Styles.C_BLUE};
+    color: #004aaa;
+    box-shadow: none;
+  }
+
+  &:disabled,
+  &.disabled {
+    border-width: '2px';
+    background-color: ${Styles.C_WHITE};
+    color: ${Styles.C_FONT_DISABLED};
+    box-shadow: none;
+  }
+
+  ${styleProps}
+`
+/**
+ * Red primary button variant used in app
+ *
+ * @component
+ */
+export const NewAlertPrimaryBtn: BtnComponent = styled(NewPrimaryBtn)`
+  background-color: ${Styles.C_ERROR_DARK};
+
+  &:hover,
+  &:focus {
+    background-color: ${Styles.C_ERROR_DARK};
+  }
+
+  &:active {
+    background-color: ${Styles.C_ERROR_LIGHT};
+  }
+
+  ${styleProps}
+`
+
+/**
+ * Red secondary button variant used in app
+ *
+ * @component
+ */
+export const NewAlertSecondaryBtn: BtnComponent = styled(NewSecondaryBtn)`
+  color: ${Styles.C_ERROR_DARK};
+
+  &:hover,
+  &:focus {
+    color: ${Styles.C_ERROR_DARK};
+  }
+
+  &:active {
+    color: ${Styles.C_ERROR_LIGHT};
+  }
+
+  ${styleProps}
+`
+
+/**
  * Light secondary button variant
  *
  * @component
