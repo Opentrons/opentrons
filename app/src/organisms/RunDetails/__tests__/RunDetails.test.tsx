@@ -1,7 +1,7 @@
 import * as React from 'react'
 import '@testing-library/jest-dom'
 import { fireEvent } from '@testing-library/dom'
-import { StaticRouter } from 'react-router-dom'
+import { Route, BrowserRouter } from 'react-router-dom'
 import {
   RUN_STATUS_RUNNING,
   RUN_STATUS_SUCCEEDED,
@@ -9,7 +9,7 @@ import {
   RUN_STATUS_STOPPED,
 } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
-import { when } from 'jest-when'
+import { resetAllWhenMocks, when } from 'jest-when'
 import { RunDetails } from '..'
 import { i18n } from '../../../i18n'
 import { CommandList } from '../CommandList'
@@ -41,9 +41,10 @@ const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolFile<
 
 const render = () => {
   return renderWithProviders(
-    <StaticRouter>
+    <BrowserRouter>
       <RunDetails />
-    </StaticRouter>,
+      <Route path="/upload">Upload page</Route>
+    </BrowserRouter>,
     {
       i18nInstance: i18n,
     }
@@ -60,9 +61,13 @@ describe('RunDetails', () => {
     when(mockUseCloseCurrentRun)
       .calledWith()
       .mockReturnValue({
-        isProtocolRunLoaded: false,
+        isProtocolRunLoaded: true,
         closeCurrentRun: jest.fn(),
       } as any)
+  })
+
+  afterEach(() => {
+    resetAllWhenMocks()
   })
 
   it('renders protocol title', () => {
@@ -133,5 +138,16 @@ describe('RunDetails', () => {
     ).toBeTruthy()
     expect(getByText('No, go back')).toBeTruthy()
     expect(getByText('Yes, close now')).toBeTruthy()
+  })
+
+  it('redirects to /upload if protocol run is not loaded', () => {
+    when(mockUseCloseCurrentRun)
+      .calledWith()
+      .mockReturnValue({
+        isProtocolRunLoaded: false,
+        closeCurrentRun: jest.fn(),
+      } as any)
+    const { getByText } = render()
+    expect(getByText('Upload page')).toBeTruthy()
   })
 })
