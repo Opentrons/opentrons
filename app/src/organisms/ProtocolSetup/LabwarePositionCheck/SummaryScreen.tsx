@@ -3,13 +3,12 @@ import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_START,
-  C_BLUE,
   DIRECTION_COLUMN,
   Flex,
   FONT_WEIGHT_SEMIBOLD,
   JUSTIFY_CENTER,
   JUSTIFY_START,
-  PrimaryBtn,
+  NewPrimaryBtn,
   SPACING_3,
   SPACING_4,
   Text,
@@ -98,9 +97,8 @@ export const SummaryScreen = (props: {
         </Flex>
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER} marginBottom={SPACING_4}>
-        <PrimaryBtn
+        <NewPrimaryBtn
           title={t('close_and_apply_offset_data')}
-          backgroundColor={C_BLUE}
           id={'Lpc_summaryScreen_applyOffsetButton'}
           onClick={() => {
             applyLabwareOffsets()
@@ -109,7 +107,7 @@ export const SummaryScreen = (props: {
           }}
         >
           {t('close_and_apply_offset_data')}
-        </PrimaryBtn>
+        </NewPrimaryBtn>
       </Flex>
     </Flex>
   )

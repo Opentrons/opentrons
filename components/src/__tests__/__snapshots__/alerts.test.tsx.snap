@@ -17,7 +17,7 @@ exports[`alerts success alert renders correctly 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="sc-fzozJi c0 icon"
+      className="sc-fznyAO c0 icon"
       fill="currentColor"
       version="1.1"
       viewBox="0 0 24 24"
@@ -54,7 +54,7 @@ exports[`alerts warning alert onCloseClick renders correctly 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="sc-fzozJi c0 icon"
+      className="sc-fznyAO c0 icon"
       fill="currentColor"
       version="1.1"
       viewBox="0 0 24 24"
@@ -77,7 +77,7 @@ exports[`alerts warning alert onCloseClick renders correctly 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="sc-fzozJi c0"
+        className="sc-fznyAO c0"
         fill="currentColor"
         version="1.1"
         viewBox="0 0 24 24"
@@ -110,7 +110,7 @@ exports[`alerts warning alert renders correctly 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="sc-fzozJi c0 icon"
+      className="sc-fznyAO c0 icon"
       fill="currentColor"
       version="1.1"
       viewBox="0 0 24 24"
@@ -147,7 +147,7 @@ exports[`alerts warning alert with message body renders correctly 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="sc-fzozJi c0 icon"
+      className="sc-fznyAO c0 icon"
       fill="currentColor"
       version="1.1"
       viewBox="0 0 24 24"
@@ -170,7 +170,7 @@ exports[`alerts warning alert with message body renders correctly 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="sc-fzozJi c0"
+        className="sc-fznyAO c0"
         fill="currentColor"
         version="1.1"
         viewBox="0 0 24 24"

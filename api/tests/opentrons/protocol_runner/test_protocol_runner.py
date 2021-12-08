@@ -168,7 +168,7 @@ async def test_stop(
     """It should halt a protocol run with stop."""
     await subject.stop()
 
-    decoy.verify(task_queue.stop(), await protocol_engine.halt())
+    decoy.verify(task_queue.stop(), await protocol_engine.stop())
 
 
 async def test_join(
@@ -224,7 +224,7 @@ def test_load_json(
             )
         ),
         task_queue.set_run_func(func=protocol_engine.wait_until_complete),
-        task_queue.set_cleanup_func(func=protocol_engine.stop),
+        task_queue.set_cleanup_func(func=protocol_engine.finish),
     )
 
 
@@ -264,7 +264,7 @@ def test_load_python(
             protocol=python_protocol,
             context=protocol_context,
         ),
-        task_queue.set_cleanup_func(func=protocol_engine.stop),
+        task_queue.set_cleanup_func(func=protocol_engine.finish),
     )
 
 
@@ -316,7 +316,7 @@ def test_load_legacy_python(
             protocol=legacy_protocol,
             context=legacy_context,
         ),
-        task_queue.set_cleanup_func(func=protocol_engine.stop),
+        task_queue.set_cleanup_func(func=protocol_engine.finish),
     )
 
 
@@ -365,5 +365,5 @@ def test_load_legacy_json(
             protocol=legacy_protocol,
             context=legacy_context,
         ),
-        task_queue.set_cleanup_func(func=protocol_engine.stop),
+        task_queue.set_cleanup_func(func=protocol_engine.finish),
     )

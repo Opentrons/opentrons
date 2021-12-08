@@ -118,7 +118,7 @@ class ProtocolRunner:
 
         # ensure the engine is stopped gracefully once the
         # protocol file stops issuing commands
-        self._task_queue.set_cleanup_func(func=self._protocol_engine.stop)
+        self._task_queue.set_cleanup_func(self._protocol_engine.finish)
 
     def play(self) -> None:
         """Start or resume the run."""
@@ -132,7 +132,7 @@ class ProtocolRunner:
     async def stop(self) -> None:
         """Stop (cancel) the run."""
         self._task_queue.stop()
-        await self._protocol_engine.halt()
+        await self._protocol_engine.stop()
 
     async def join(self) -> None:
         """Wait for the run to complete, propagating any errors.

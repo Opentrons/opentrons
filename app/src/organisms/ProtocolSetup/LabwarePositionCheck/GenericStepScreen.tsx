@@ -4,12 +4,11 @@ import {
   Flex,
   FONT_WEIGHT_SEMIBOLD,
   JUSTIFY_CENTER,
-  PrimaryBtn,
+  NewPrimaryBtn,
   SPACING_3,
   SPACING_4,
   Text,
   TEXT_TRANSFORM_UPPERCASE,
-  C_BLUE,
   ALIGN_FLEX_START,
 } from '@opentrons/components'
 import { LabwarePositionCheckStepDetail } from './LabwarePositionCheckStepDetail'
@@ -79,9 +78,7 @@ export const GenericStepScreen = (
         </Flex>
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER} marginBottom={SPACING_4}>
-        <PrimaryBtn backgroundColor={C_BLUE} onClick={props.proceed}>
-          {props.ctaText}
-        </PrimaryBtn>
+        <NewPrimaryBtn onClick={props.proceed}>{props.ctaText}</NewPrimaryBtn>
       </Flex>
     </Flex>
   )

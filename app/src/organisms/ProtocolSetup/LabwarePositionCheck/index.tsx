@@ -114,7 +114,21 @@ export const LabwarePositionCheck = (
 
   let modalContent: JSX.Element
   if (isLoading) {
-    modalContent = <RobotMotionLoadingModal title={titleText} />
+    modalContent = (
+      <ModalPage
+        contentsClassName={styles.modal_contents}
+        titleBar={{
+          title: t('labware_position_check_title'),
+          back: {
+            onClick: confirmExitLPC,
+            title: t('shared:exit'),
+            children: t('shared:exit'),
+          },
+        }}
+      >
+        <RobotMotionLoadingModal title={titleText} />
+      </ModalPage>
+    )
   } else if (showConfirmation) {
     modalContent = (
       <ExitPreventionModal
@@ -124,13 +138,23 @@ export const LabwarePositionCheck = (
     )
   } else if (showPickUpTipConfirmationModal) {
     modalContent = (
-      <ConfirmPickUpTipModal
-        title={t('confirm_pick_up_tip_modal_title')}
-        denyText={t('confirm_pick_up_tip_modal_try_again_text')}
-        confirmText={ctaText}
-        onConfirm={proceed}
-        onDeny={onUnsuccessfulPickUpTip}
-      />
+      <ModalPage
+        contentsClassName={styles.modal_contents}
+        titleBar={{
+          title: t('labware_position_check_title'),
+          back: {
+            onClick: confirmExitLPC,
+            title: t('shared:exit'),
+            children: t('shared:exit'),
+          },
+        }}
+      >
+        <ConfirmPickUpTipModal
+          confirmText={ctaText}
+          onConfirm={proceed}
+          onDeny={onUnsuccessfulPickUpTip}
+        />
+      </ModalPage>
     )
   } else if (isComplete) {
     modalContent = (

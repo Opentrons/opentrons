@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { when } from 'jest-when'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { act } from 'react-dom/test-utils'
 import { fireEvent } from '@testing-library/dom'
 import { renderWithProviders } from '@opentrons/components'
@@ -100,6 +100,10 @@ describe('SummaryScreen', () => {
     when(mockUseLPCSuccessToast)
       .calledWith()
       .mockReturnValue({ setShowLPCSuccessToast: () => null })
+  })
+  afterEach(() => {
+    resetAllWhenMocks()
+    jest.restoreAllMocks()
   })
   it('renders Summary Screen with all components and header', () => {
     const { getByText } = render(props)

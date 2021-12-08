@@ -17,7 +17,7 @@ exports[`ListItem Disabled Side Panel Group renders correctly 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="sc-fzozJi c0 title_bar_icon"
+      className="sc-fznyAO c0 title_bar_icon"
       fill="currentColor"
       version="1.1"
       viewBox="0 0 24 24"
@@ -55,7 +55,7 @@ exports[`ListItem Side Panel Group renders correctly 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="sc-fzozJi c0 title_bar_icon"
+      className="sc-fznyAO c0 title_bar_icon"
       fill="currentColor"
       version="1.1"
       viewBox="0 0 24 24"
@@ -90,7 +90,7 @@ exports[`ListItem renders ListItem with icon correctly 1`] = `
 >
   <svg
     aria-hidden="true"
-    className="sc-fzozJi c0 item_icon"
+    className="sc-fznyAO c0 item_icon"
     fill="currentColor"
     version="1.1"
     viewBox="0 0 24 24"
@@ -168,7 +168,7 @@ exports[`TitledList renders TitledList with optional icon correctly 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="sc-fzozJi c0 title_bar_icon icon_left_of_title"
+      className="sc-fznyAO c0 title_bar_icon icon_left_of_title"
       fill="currentColor"
       version="1.1"
       viewBox="0 0 24 24"
@@ -230,7 +230,7 @@ exports[`TitledList renders collapsed TitledList correctly 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="sc-fzozJi c0 title_bar_icon"
+        className="sc-fznyAO c0 title_bar_icon"
         fill="currentColor"
         version="1.1"
         viewBox="0 0 24 24"
@@ -272,7 +272,7 @@ exports[`TitledList renders expanded TitledList correctly 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="sc-fzozJi c0 title_bar_icon"
+        className="sc-fznyAO c0 title_bar_icon"
         fill="currentColor"
         version="1.1"
         viewBox="0 0 24 24"
