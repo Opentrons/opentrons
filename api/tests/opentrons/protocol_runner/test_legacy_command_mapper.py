@@ -40,6 +40,7 @@ def test_map_before_command() -> None:
     """It should map a "before" message to a running command."""
     legacy_command: PauseMessage = {
         "$": "before",
+        "id": "message-id",
         "name": "command.PAUSE",
         "payload": {"userMessage": "hello world", "text": "hello world"},
         "error": None,
@@ -66,12 +67,14 @@ def test_map_after_command() -> None:
     """It should map an "after" message to a succeeded command."""
     legacy_command_start: PauseMessage = {
         "$": "before",
+        "id": "message-id",
         "name": "command.PAUSE",
         "payload": {"userMessage": "hello world", "text": "hello world"},
         "error": None,
     }
     legacy_command_end: PauseMessage = {
         "$": "after",
+        "id": "message-id",
         "name": "command.PAUSE",
         "payload": {"userMessage": "hello world", "text": "hello world"},
         "error": None,
@@ -101,12 +104,14 @@ def test_map_after_with_error_command() -> None:
     """It should map an "after" message to a failed command."""
     legacy_command_start: PauseMessage = {
         "$": "before",
+        "id": "message-id",
         "name": "command.PAUSE",
         "error": None,
         "payload": {"userMessage": "hello world", "text": "hello world"},
     }
     legacy_command_end: PauseMessage = {
         "$": "after",
+        "id": "message-id",
         "name": "command.PAUSE",
         "error": RuntimeError("oh no"),
         "payload": {"userMessage": "hello world", "text": "hello world"},
@@ -129,30 +134,34 @@ def test_map_after_with_error_command() -> None:
 
 
 def test_command_stack() -> None:
-    """It should maintain a command stack to map IDs."""
+    """It should use messages ID and command ordering to create command IDs."""
     legacy_command_1: PauseMessage = {
         "$": "before",
+        "id": "message-id-1",
         "name": "command.PAUSE",
         "payload": {"userMessage": "hello", "text": "hello"},
         "error": None,
     }
     legacy_command_2: PauseMessage = {
         "$": "before",
+        "id": "message-id-2",
         "name": "command.PAUSE",
         "payload": {"userMessage": "goodbye", "text": "goodbye"},
         "error": None,
     }
     legacy_command_3: PauseMessage = {
         "$": "after",
+        "id": "message-id-1",
         "name": "command.PAUSE",
-        "payload": {"userMessage": "hello world", "text": "goodbye"},
+        "payload": {"userMessage": "hello", "text": "hello"},
         "error": None,
     }
     legacy_command_4: PauseMessage = {
         "$": "after",
+        "id": "message-id-2",
         "name": "command.PAUSE",
-        "payload": {"userMessage": "hello world", "text": "hello"},
-        "error": None,
+        "payload": {"userMessage": "goodbye", "text": "goodbye"},
+        "error": RuntimeError("oh no"),
     }
 
     subject = LegacyCommandMapper()
@@ -187,19 +196,6 @@ def test_command_stack() -> None:
     )
     assert result_3 == pe_actions.UpdateCommandAction(
         pe_commands.Custom.construct(
-            id="command.PAUSE-1",
-            status=pe_commands.CommandStatus.SUCCEEDED,
-            createdAt=matchers.IsA(datetime),
-            startedAt=matchers.IsA(datetime),
-            completedAt=matchers.IsA(datetime),
-            params=LegacyCommandParams(
-                legacyCommandType="command.PAUSE",
-                legacyCommandText="goodbye",
-            ),
-        )
-    )
-    assert result_4 == pe_actions.UpdateCommandAction(
-        pe_commands.Custom.construct(
             id="command.PAUSE-0",
             status=pe_commands.CommandStatus.SUCCEEDED,
             createdAt=matchers.IsA(datetime),
@@ -210,6 +206,12 @@ def test_command_stack() -> None:
                 legacyCommandText="hello",
             ),
         )
+    )
+    assert result_4 == pe_actions.FailCommandAction(
+        command_id="command.PAUSE-1",
+        error_id=matchers.IsA(str),
+        failed_at=matchers.IsA(datetime),
+        error=matchers.ErrorMatching(LegacyContextCommandError, "oh no"),
     )
 
 

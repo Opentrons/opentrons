@@ -33,11 +33,15 @@ def test_publish_decorator(decoy: Decoy, broker: Broker) -> None:
     subject = _Subject(broker=broker)
     subject.act("hello", 42)
 
+    before_message_id = matchers.Captor()
+    after_message_id = matchers.Captor()
+
     decoy.verify(
         broker.publish(
             topic="command",
             message={
                 "$": "before",
+                "id": before_message_id,
                 "name": "some_command",
                 "payload": {"foo": "hello", "bar": 42},
                 "error": None,
@@ -48,12 +52,15 @@ def test_publish_decorator(decoy: Decoy, broker: Broker) -> None:
             topic="command",
             message={
                 "$": "after",
+                "id": after_message_id,
                 "name": "some_command",
                 "payload": {"foo": "hello", "bar": 42},
                 "error": None,
             },
         ),
     )
+
+    assert before_message_id.value == after_message_id.value
 
 
 def test_publish_decorator_with_arg_defaults(decoy: Decoy, broker: Broker) -> None:
@@ -79,6 +86,7 @@ def test_publish_decorator_with_arg_defaults(decoy: Decoy, broker: Broker) -> No
             topic="command",
             message={
                 "$": "before",
+                "id": matchers.IsA(str),
                 "name": "some_command",
                 "payload": {"foo": "hello", "bar": 42},
                 "error": None,
@@ -89,6 +97,7 @@ def test_publish_decorator_with_arg_defaults(decoy: Decoy, broker: Broker) -> No
             topic="command",
             message={
                 "$": "after",
+                "id": matchers.IsA(str),
                 "name": "some_command",
                 "payload": {"foo": "hello", "bar": 42},
                 "error": None,
@@ -113,11 +122,15 @@ def test_publish_decorator_with_error(decoy: Decoy, broker: Broker) -> None:
     with pytest.raises(RuntimeError, match="oh no"):
         subject.act("hello", 42)
 
+    before_message_id = matchers.Captor()
+    after_message_id = matchers.Captor()
+
     decoy.verify(
         broker.publish(
             topic="command",
             message={
                 "$": "before",
+                "id": before_message_id,
                 "name": "some_command",
                 "payload": {"foo": "hello", "bar": 42},
                 "error": None,
@@ -127,12 +140,15 @@ def test_publish_decorator_with_error(decoy: Decoy, broker: Broker) -> None:
             topic="command",
             message={
                 "$": "after",
+                "id": after_message_id,
                 "name": "some_command",
                 "payload": {"foo": "hello", "bar": 42},
                 "error": matchers.IsA(RuntimeError),
             },
         ),
     )
+
+    assert before_message_id.value == after_message_id.value
 
 
 def test_publish_decorator_remaps_instrument(decoy: Decoy, broker: Broker) -> None:
@@ -161,6 +177,7 @@ def test_publish_decorator_remaps_instrument(decoy: Decoy, broker: Broker) -> No
             topic="command",
             message={
                 "$": "before",
+                "id": matchers.IsA(str),
                 "name": "some_command",
                 "payload": {"foo": "hello", "bar": 42},
                 "error": None,
@@ -171,6 +188,7 @@ def test_publish_decorator_remaps_instrument(decoy: Decoy, broker: Broker) -> No
             topic="command",
             message={
                 "$": "after",
+                "id": matchers.IsA(str),
                 "name": "some_command",
                 "payload": {"foo": "hello", "bar": 42},
                 "error": None,
@@ -193,11 +211,15 @@ def test_publish_context(decoy: Decoy, broker: Broker) -> None:
     with publish_context(broker=broker, command=command):
         _published_func("hello", 42)
 
+    before_message_id = matchers.Captor()
+    after_message_id = matchers.Captor()
+
     decoy.verify(
         broker.publish(
             topic="command",
             message={
                 "$": "before",
+                "id": before_message_id,
                 "name": "some_command",
                 "payload": {"foo": "hello", "bar": 42},
                 "error": None,
@@ -208,12 +230,15 @@ def test_publish_context(decoy: Decoy, broker: Broker) -> None:
             topic="command",
             message={
                 "$": "after",
+                "id": after_message_id,
                 "name": "some_command",
                 "payload": {"foo": "hello", "bar": 42},
                 "error": None,
             },
         ),
     )
+
+    assert before_message_id.value == after_message_id.value
 
 
 def test_publish_context_with_error(decoy: Decoy, broker: Broker) -> None:
@@ -229,11 +254,15 @@ def test_publish_context_with_error(decoy: Decoy, broker: Broker) -> None:
         with publish_context(broker=broker, command=command):
             _published_func("hello", 42)
 
+    before_message_id = matchers.Captor()
+    after_message_id = matchers.Captor()
+
     decoy.verify(
         broker.publish(
             topic="command",
             message={
                 "$": "before",
+                "id": before_message_id,
                 "name": "some_command",
                 "payload": {"foo": "hello", "bar": 42},
                 "error": None,
@@ -243,9 +272,12 @@ def test_publish_context_with_error(decoy: Decoy, broker: Broker) -> None:
             topic="command",
             message={
                 "$": "after",
+                "id": after_message_id,
                 "name": "some_command",
                 "payload": {"foo": "hello", "bar": 42},
                 "error": matchers.IsA(RuntimeError),
             },
         ),
     )
+
+    assert before_message_id.value == after_message_id.value
