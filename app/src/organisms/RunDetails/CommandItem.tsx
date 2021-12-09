@@ -21,6 +21,7 @@ import {
   SPACING_1,
   SPACING_3,
   TEXT_TRANSFORM_UPPERCASE,
+  C_MED_DARK_GRAY,
 } from '@opentrons/components'
 import { css } from 'styled-components'
 import { CommandTimer } from './CommandTimer'
@@ -63,6 +64,7 @@ const WRAPPER_STYLE_BY_STATUS: {
 }
 export function CommandItem(props: CommandItemProps): JSX.Element | null {
   const { commandOrSummary, runStatus } = props
+  const { t } = useTranslation('run_details')
   const commandStatus =
     runStatus !== RUN_STATUS_IDLE && commandOrSummary.status != null
       ? commandOrSummary.status
@@ -91,6 +93,19 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
       {commandStatus === 'running' ? (
         <CurrentCommandLabel runStatus={runStatus} />
       ) : null}
+      {commandStatus === 'failed' ? <CommandFailedMessage /> : null}
+      {commandDetails?.data.id.includes('COMMENT') ||
+      commandOrSummary.id.includes('COMMENT') ? (
+        <Flex
+          textTransform={TEXT_TRANSFORM_UPPERCASE}
+          fontSize={FONT_SIZE_CAPTION}
+          color={C_MED_DARK_GRAY}
+          marginBottom={SPACING_1}
+          marginLeft={SPACING_1}
+        >
+          {t('comment_step')}{' '}
+        </Flex>
+      ) : null}
       <Flex flexDirection={DIRECTION_ROW}>
         {['running', 'failed', 'succeeded'].includes(commandStatus) ? (
           <CommandTimer
@@ -98,7 +113,6 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
             commandCompletedAt={commandDetails?.data.completedAt}
           />
         ) : null}
-        {commandStatus === 'failed' ? <CommandFailedMessage /> : null}
         <CommandText
           commandOrSummary={commandDetails?.data ?? commandOrSummary}
         />
