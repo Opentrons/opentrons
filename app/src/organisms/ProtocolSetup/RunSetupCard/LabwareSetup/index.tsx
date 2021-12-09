@@ -64,11 +64,7 @@ export const LabwareSetup = (): JSX.Element | null => {
     placement: TOOLTIP_LEFT,
   })
   const runStatus = useRunStatus()
-  const disableLabwarePositionCheck =
-    runStatus != null && runStatus !== RUN_STATUS_IDLE
   const { protocolData } = useProtocolDetails()
-  const disableLabwarePositionCheckEmptyProtocols =
-    isEmpty(protocolData?.pipettes) && isEmpty(protocolData?.labware)
   const { t } = useTranslation('protocol_setup')
   const [
     showLabwareHelpModal,
@@ -86,6 +82,17 @@ export const LabwareSetup = (): JSX.Element | null => {
     showLabwarePositionCheckModal,
     setShowLabwarePositionCheckModal,
   ] = React.useState<boolean>(false)
+
+  let lpcDisabledReason: string | null = null
+
+  if (runStatus != null && runStatus !== RUN_STATUS_IDLE) {
+    lpcDisabledReason = t('labware_position_check_not_available')
+  } else if (
+    isEmpty(protocolData?.pipettes) ||
+    isEmpty(protocolData?.labware)
+  ) {
+    lpcDisabledReason = t('labware_position_check_not_available_empty_protocol')
+  }
 
   return (
     <React.Fragment>
@@ -199,30 +206,12 @@ export const LabwareSetup = (): JSX.Element | null => {
                 onClick={() => setShowLabwarePositionCheckModal(true)}
                 id={'LabwareSetup_checkLabwarePositionsButton'}
                 {...targetProps}
-                disabled={
-                  disableLabwarePositionCheck ||
-                  disableLabwarePositionCheckEmptyProtocols
-                }
+                disabled={lpcDisabledReason !== null}
               >
                 {t('run_labware_position_check')}
               </NewSecondaryBtn>
-              {disableLabwarePositionCheck ? (
-                <Tooltip {...tooltipProps}>
-                  {
-                    <Box width={SIZE_5} textAlign={TEXT_ALIGN_CENTER}>
-                      {t('labware_position_check_not_available')}
-                    </Box>
-                  }
-                </Tooltip>
-              ) : null}
-              {disableLabwarePositionCheckEmptyProtocols ? (
-                <Tooltip {...tooltipProps}>
-                  {
-                    <Box width={SIZE_5} textAlign={TEXT_ALIGN_CENTER}>
-                      {t('labware_position_check_not_available_empty_protocol')}
-                    </Box>
-                  }
-                </Tooltip>
+              {lpcDisabledReason !== null ? (
+                <Tooltip {...tooltipProps}>{lpcDisabledReason}</Tooltip>
               ) : null}
             </Flex>
           </Flex>
