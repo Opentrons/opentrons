@@ -106,7 +106,7 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
           marginBottom={SPACING_1}
           marginLeft={SPACING_1}
         >
-          {t('comment_step')}{' '}
+          {t('comment_step')}
         </Flex>
       ) : null}
       <Flex flexDirection={DIRECTION_ROW}>
