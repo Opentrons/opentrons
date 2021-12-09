@@ -75,8 +75,17 @@ ProtocolConfig = Union[JsonProtocolConfig, PythonProtocolConfig]
 """Union of all protocol execution configurations."""
 
 
+# TODO(mc, 2021-12-09): Dict[str, Any] is an overly-permissive approximation
+# due to mypy's lack of easy recursive types. Find a more accurate type
 Metadata = Dict[str, Any]
-"""Arbitrary metadata set by a protocol."""
+"""A protocol's metadata (non-essential info, like author and title).
+
+Robot software may not change how it executes a protocol based on
+metadata (excepting a Python protocol's API version, which is in
+metadata due to a historical implementation detail).
+
+Metadata must be a simple JSON-serializable dictionary.
+"""
 
 
 @dataclass(frozen=True)
@@ -89,6 +98,8 @@ class ProtocolSource:
         files: Descriptions of all files that make up the protocol.
         metadata: Arbitrary metadata specified by the protocols.
         config: Protocol execution configuration.
+        labware_definitions: Labware definitions provided by separate
+            labware files or the main JSON protocol file, if present.
     """
 
     directory: Path
@@ -96,4 +107,4 @@ class ProtocolSource:
     files: List[ProtocolSourceFile]
     metadata: Metadata
     config: ProtocolConfig
-    labware: List[LabwareDefinition]
+    labware_definitions: List[LabwareDefinition]

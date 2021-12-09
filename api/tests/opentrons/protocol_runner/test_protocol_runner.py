@@ -34,6 +34,7 @@ from opentrons.protocol_runner.legacy_wrappers import (
     LegacyPythonProtocol,
     LegacyJsonProtocol,
     LegacyProtocolContext,
+    LegacyLabwareDefinition,
 )
 
 
@@ -198,7 +199,7 @@ def test_load_json(
         files=[],
         metadata={},
         config=JsonProtocolConfig(schema_version=6),
-        labware=[],
+        labware_definitions=[],
     )
 
     json_protocol = JsonProtocol.construct()  # type: ignore[call-arg]
@@ -245,7 +246,7 @@ def test_load_python(
         files=[],
         metadata={},
         config=PythonProtocolConfig(api_version=APIVersion(3, 0)),
-        labware=[],
+        labware_definitions=[],
     )
 
     python_protocol = decoy.mock(cls=PythonProtocol)
@@ -280,7 +281,7 @@ def test_load_legacy_python(
     subject: ProtocolRunner,
 ) -> None:
     """It should load a legacy context-based Python protocol."""
-    custom_labware = LabwareDefinition.construct()  # type: ignore[call-arg]
+    labware_definition = LabwareDefinition.construct()  # type: ignore[call-arg]
 
     legacy_protocol_source = ProtocolSource(
         directory=Path("/dev/null"),
@@ -288,8 +289,10 @@ def test_load_legacy_python(
         files=[],
         metadata={},
         config=PythonProtocolConfig(api_version=APIVersion(2, 11)),
-        labware=[custom_labware],
+        labware_definitions=[labware_definition],
     )
+
+    extra_labware = {"definition-uri": cast(LegacyLabwareDefinition, {})}
 
     legacy_protocol = LegacyPythonProtocol(
         text="",
@@ -300,7 +303,7 @@ def test_load_legacy_python(
         bundled_labware=None,
         bundled_data=None,
         bundled_python=None,
-        extra_labware=None,
+        extra_labware=extra_labware,
     )
 
     legacy_context = decoy.mock(cls=LegacyProtocolContext)
@@ -308,16 +311,14 @@ def test_load_legacy_python(
     decoy.when(legacy_file_reader.read(legacy_protocol_source)).then_return(
         legacy_protocol
     )
-    decoy.when(
-        legacy_context_creator.create(
-            api_version=APIVersion(2, 11),
-            labware=[custom_labware],
-        )
-    ).then_return(legacy_context)
+    decoy.when(legacy_context_creator.create(legacy_protocol)).then_return(
+        legacy_context
+    )
 
     subject.load(legacy_protocol_source)
 
     decoy.verify(
+        protocol_engine.add_labware_definition(labware_definition),
         protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)),
         task_queue.set_run_func(
             func=legacy_executor.execute,
@@ -338,13 +339,15 @@ def test_load_legacy_json(
     subject: ProtocolRunner,
 ) -> None:
     """It should load a legacy context-based JSON protocol."""
+    labware_definition = LabwareDefinition.construct()  # type: ignore[call-arg]
+
     legacy_protocol_source = ProtocolSource(
         directory=Path("/dev/null"),
         main_file=Path("/dev/null/abc.json"),
         files=[],
         metadata={},
         config=JsonProtocolConfig(schema_version=5),
-        labware=[],
+        labware_definitions=[labware_definition],
     )
 
     legacy_protocol = LegacyJsonProtocol(
@@ -361,13 +364,14 @@ def test_load_legacy_json(
     decoy.when(legacy_file_reader.read(legacy_protocol_source)).then_return(
         legacy_protocol
     )
-    decoy.when(
-        legacy_context_creator.create(api_version=APIVersion(2, 11), labware=[])
-    ).then_return(legacy_context)
+    decoy.when(legacy_context_creator.create(legacy_protocol)).then_return(
+        legacy_context
+    )
 
     subject.load(legacy_protocol_source)
 
     decoy.verify(
+        protocol_engine.add_labware_definition(labware_definition),
         protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)),
         task_queue.set_run_func(
             func=legacy_executor.execute,

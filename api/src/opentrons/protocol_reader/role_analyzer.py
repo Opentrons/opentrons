@@ -1,5 +1,5 @@
 """Input file role analysis."""
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import List, Optional, Sequence
 from typing_extensions import Literal
 
@@ -37,7 +37,8 @@ class RoleAnalysis:
     """Role analysis results."""
 
     main_file: MainFile
-    labware_files: List[LabwareFile] = field(default_factory=list)
+    labware_files: List[LabwareFile]
+    labware_definitions: List[LabwareDefinition]
 
 
 class RoleAnalysisError(ValueError):
@@ -85,4 +86,15 @@ class RoleAnalyzer:
         else:
             main_file = main_file_candidates[0]
 
-        return RoleAnalysis(main_file=main_file, labware_files=labware_files)
+        # ignore extra custom labware files for JSON protocols
+        if isinstance(main_file.data, JsonProtocol):
+            labware_files = []
+            labware_definitions = list(main_file.data.labwareDefinitions.values())
+        else:
+            labware_definitions = [f.data for f in labware_files]
+
+        return RoleAnalysis(
+            main_file=main_file,
+            labware_files=labware_files,
+            labware_definitions=labware_definitions,
+        )

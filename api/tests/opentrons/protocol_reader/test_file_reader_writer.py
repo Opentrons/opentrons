@@ -57,15 +57,25 @@ async def test_read_opentrons_json() -> None:
     assert isinstance(result[1].data, LabwareDefinition)
 
 
-# TODO(mc, 2021-12-07): add support for LabwareDefinition and
-# arbitrary JSON data files
+# TODO(mc, 2021-12-07): add support arbitrary JSON data files
 async def test_read_opentrons_json_bad_parse() -> None:
-    """It should error if a JSON file cannnot be parsed as a JSON protocol."""
+    """It should error if a .json file cannot be parsed as a JSON."""
+    in_file = InputFile(filename="hello.json", file=io.BytesIO(b"{oh: no}"))
+
+    subject = FileReaderWriter()
+
+    with pytest.raises(FileReadError, match="not valid JSON"):
+        await subject.read([in_file])
+
+
+# TODO(mc, 2021-12-07): add support arbitrary JSON data files
+async def test_read_opentrons_json_bad_validate() -> None:
+    """It should error if a JSON file cannot be parsed as a JSON protocol."""
     in_file = InputFile(filename="hello.json", file=io.BytesIO(b'{"oh": "no"}'))
 
     subject = FileReaderWriter()
 
-    with pytest.raises(FileReadError):
+    with pytest.raises(FileReadError, match="known Opentrons format"):
         await subject.read([in_file])
 
 

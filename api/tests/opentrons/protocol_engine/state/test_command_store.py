@@ -2,10 +2,9 @@
 import pytest
 from collections import OrderedDict
 from datetime import datetime
-from typing import NamedTuple, Type, cast
+from typing import NamedTuple, Type
 
 from opentrons.types import MountType, DeckSlotName
-from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine import commands, errors
 from opentrons.protocol_engine.types import DeckSlotLocation, PipetteName, WellLocation
 from opentrons.protocol_engine.state.commands import CommandState, CommandStore
@@ -56,15 +55,6 @@ class QueueCommandSpec(NamedTuple):
 @pytest.mark.parametrize(
     QueueCommandSpec._fields,
     [
-        QueueCommandSpec(
-            command_request=commands.AddLabwareDefinitionCreate(
-                params=commands.AddLabwareDefinitionParams.construct(
-                    # TODO(mc, 2021-06-25): do not mock out LabwareDefinition
-                    definition=cast(LabwareDefinition, {"mockDefinition": True})
-                ),
-            ),
-            expected_cls=commands.AddLabwareDefinition,
-        ),
         QueueCommandSpec(
             command_request=commands.AspirateCreate(
                 params=commands.AspirateParams(

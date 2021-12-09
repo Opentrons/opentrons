@@ -19,11 +19,12 @@ from opentrons.protocol_engine.types import (
 )
 from opentrons.protocol_engine.actions import (
     AddLabwareOffsetAction,
+    AddLabwareDefinitionAction,
     UpdateCommandAction,
 )
 from opentrons.protocol_engine.state.labware import LabwareStore, LabwareState
 
-from .command_fixtures import create_load_labware_command, create_add_definition_command
+from .command_fixtures import create_load_labware_command
 
 
 @pytest.fixture
@@ -152,13 +153,49 @@ def test_handles_add_labware_definition(
     well_plate_def: LabwareDefinition,
 ) -> None:
     """It should add the labware definition to the state."""
-    command = create_add_definition_command(definition=well_plate_def)
     expected_uri = uri_from_details(
         load_name=well_plate_def.parameters.loadName,
         namespace=well_plate_def.namespace,
         version=well_plate_def.version,
     )
 
-    subject.handle_action(UpdateCommandAction(command=command))
+    subject.handle_action(AddLabwareDefinitionAction(definition=well_plate_def))
 
     assert subject.state.definitions_by_uri[expected_uri] == well_plate_def
+
+
+def test_only_one_trash_labware(
+    subject: LabwareStore,
+    well_plate_def: LabwareDefinition,
+) -> None:
+    """It should ensure there is only ever one trash labware loaded."""
+    command = create_load_labware_command(
+        location=DeckSlotLocation(slotName=DeckSlotName.FIXED_TRASH),
+        labware_id="test-labware-id",
+        definition=well_plate_def,
+        offset_id=None,
+    )
+
+    expected_definition_uri = uri_from_details(
+        load_name=well_plate_def.parameters.loadName,
+        namespace=well_plate_def.namespace,
+        version=well_plate_def.version,
+    )
+
+    expected_labware_data = LoadedLabware(
+        id="test-labware-id",
+        loadName=well_plate_def.parameters.loadName,
+        definitionUri=expected_definition_uri,
+        location=DeckSlotLocation(slotName=DeckSlotName.FIXED_TRASH),
+        offsetId=None,
+    )
+
+    subject.handle_action(UpdateCommandAction(command=command))
+
+    trash_labware = [
+        lw
+        for lw in subject.state.labware_by_id.values()
+        if lw.location == DeckSlotLocation(slotName=DeckSlotName.FIXED_TRASH)
+    ]
+
+    assert trash_labware == [expected_labware_data]

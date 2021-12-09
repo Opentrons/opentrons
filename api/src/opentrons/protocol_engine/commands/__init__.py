@@ -16,14 +16,6 @@ and/or schema generation.
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, CommandStatus
 from .command_unions import Command, CommandCreate, CommandResult, CommandType
 
-from .add_labware_definition import (
-    AddLabwareDefinition,
-    AddLabwareDefinitionParams,
-    AddLabwareDefinitionCreate,
-    AddLabwareDefinitionResult,
-    AddLabwareDefinitionCommandType,
-)
-
 from .aspirate import (
     Aspirate,
     AspirateParams,
@@ -144,12 +136,6 @@ __all__ = [
     "LoadLabwareParams",
     "LoadLabwareResult",
     "LoadLabwareCommandType",
-    # add labware definition command models
-    "AddLabwareDefinition",
-    "AddLabwareDefinitionCreate",
-    "AddLabwareDefinitionParams",
-    "AddLabwareDefinitionResult",
-    "AddLabwareDefinitionCommandType",
     # load pipette command models
     "LoadPipette",
     "LoadPipetteCreate",

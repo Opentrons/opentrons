@@ -16,6 +16,7 @@ from .actions import (
     UpdateCommandAction,
     FailCommandAction,
     AddLabwareOffsetAction,
+    AddLabwareDefinitionAction,
     FinishErrorDetails,
 )
 
@@ -35,6 +36,7 @@ __all__ = [
     "UpdateCommandAction",
     "FailCommandAction",
     "AddLabwareOffsetAction",
+    "AddLabwareDefinitionAction",
     # action payload values
     "FinishErrorDetails",
 ]

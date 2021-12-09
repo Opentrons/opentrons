@@ -1,5 +1,6 @@
 """Tests for opentrons.protocol_reader.role_analyzer.RoleAnalyzer."""
 import pytest
+from decoy import matchers
 from typing import List, NamedTuple
 
 from opentrons.protocols.models import JsonProtocol, LabwareDefinition
@@ -35,6 +36,8 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
         ],
         expected=RoleAnalysis(
             main_file=MainFile(name="protocol.py", contents=b""),
+            labware_files=[],
+            labware_definitions=[],
         ),
     ),
     RoleAnalyzerSpec(
@@ -42,15 +45,25 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
             BufferedFile(
                 name="protocol.json",
                 contents=b"",
-                data=JsonProtocol.construct(),  # type: ignore[call-arg]
+                data=JsonProtocol.construct(  # type: ignore[call-arg]
+                    labwareDefinitions={
+                        "uri": LabwareDefinition.construct()  # type: ignore[call-arg]
+                    },
+                ),
             ),
         ],
         expected=RoleAnalysis(
             main_file=MainFile(
                 name="protocol.json",
                 contents=b"",
-                data=JsonProtocol.construct(),  # type: ignore[call-arg]
+                data=JsonProtocol.construct(  # type: ignore[call-arg]
+                    labwareDefinitions=matchers.Anything()
+                ),
             ),
+            labware_files=[],
+            labware_definitions=[
+                LabwareDefinition.construct()  # type: ignore[call-arg]
+            ],
         ),
     ),
     RoleAnalyzerSpec(
@@ -70,6 +83,42 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
                     contents=b"",
                     data=LabwareDefinition.construct(),  # type: ignore[call-arg]
                 )
+            ],
+            labware_definitions=[
+                LabwareDefinition.construct(),  # type: ignore[call-arg]
+            ],
+        ),
+    ),
+    RoleAnalyzerSpec(
+        files=[
+            BufferedFile(
+                name="protocol.json",
+                contents=b"",
+                data=JsonProtocol.construct(  # type: ignore[call-arg]
+                    labwareDefinitions={
+                        "uri": LabwareDefinition.construct(  # type: ignore[call-arg]
+                            version=1
+                        )
+                    },
+                ),
+            ),
+            BufferedFile(
+                name="labware.json",
+                contents=b"",
+                data=LabwareDefinition.construct(version=2),  # type: ignore[call-arg]
+            ),
+        ],
+        expected=RoleAnalysis(
+            main_file=MainFile(
+                name="protocol.json",
+                contents=b"",
+                data=JsonProtocol.construct(  # type: ignore[call-arg]
+                    labwareDefinitions=matchers.Anything()
+                ),
+            ),
+            labware_files=[],
+            labware_definitions=[
+                LabwareDefinition.construct(version=1)  # type: ignore[call-arg]
             ],
         ),
     ),

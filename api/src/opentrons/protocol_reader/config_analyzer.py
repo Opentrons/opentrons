@@ -49,7 +49,7 @@ def _analyze_python(main_file: RoleAnalysisFile) -> ConfigAnalysis:  # noqa: C90
         # don't truly want the protocol to inherit our own __future__ features.
         module_ast = ast.parse(source=main_file.contents, filename=main_file.name)
     except (SyntaxError, ValueError) as e:
-        # parse_python() raises SyntaxError for most errors,
+        # ast.parse() raises SyntaxError for most errors,
         # but ValueError if the source contains null bytes.
         raise ConfigAnalysisError(f"Unable to parse {main_file.name}.") from e
 

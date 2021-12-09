@@ -98,9 +98,6 @@ def test_labware(
     # "my-load-name", and then assert that the hard-coded string "my-load-name" is
     # what's used in the output Protocol Engine command.
 
-    expected_add_definition_request_1 = pe_commands.AddLabwareDefinitionCreate(
-        params=pe_commands.AddLabwareDefinitionParams(definition=definition_1)
-    )
     expected_load_request_1 = pe_commands.LoadLabwareCreate(
         params=pe_commands.LoadLabwareParams(
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
@@ -111,9 +108,6 @@ def test_labware(
         )
     )
 
-    expected_add_definition_request_2 = pe_commands.AddLabwareDefinitionCreate(
-        params=pe_commands.AddLabwareDefinitionParams(definition=definition_2)
-    )
     expected_load_request_2 = pe_commands.LoadLabwareCreate(
         params=pe_commands.LoadLabwareParams(
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
@@ -129,16 +123,11 @@ def test_labware(
     )
 
     _assert_appear_in_order(
-        elements=[expected_add_definition_request_1, expected_load_request_1],
+        elements=[expected_load_request_1, expected_load_request_2],
         source=result,
     )
 
-    _assert_appear_in_order(
-        elements=[expected_add_definition_request_2, expected_load_request_2],
-        source=result,
-    )
-
-    assert len(result) == 4
+    assert len(result) == 2
 
 
 def test_pipettes(subject: JsonCommandTranslator) -> None:

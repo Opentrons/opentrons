@@ -91,7 +91,11 @@ async def test_read_files(
     main_file = MainFile(name="protocol.py", contents=b"# hello world")
     labware_data = LabwareDefinition.construct()  # type: ignore[call-arg]
     labware_file = LabwareFile(name="labware.json", contents=b"", data=labware_data)
-    analyzed_roles = RoleAnalysis(main_file=main_file, labware_files=[labware_file])
+    analyzed_roles = RoleAnalysis(
+        main_file=main_file,
+        labware_files=[labware_file],
+        labware_definitions=[labware_data],
+    )
     analyzed_config = ConfigAnalysis(
         metadata={"hey": "there"},
         config=PythonProtocolConfig(api_version=APIVersion(123, 456)),
@@ -112,7 +116,7 @@ async def test_read_files(
         ],
         metadata={"hey": "there"},
         config=PythonProtocolConfig(api_version=APIVersion(123, 456)),
-        labware=[labware_data],
+        labware_definitions=[labware_data],
     )
 
     decoy.verify(
@@ -192,7 +196,11 @@ async def test_config_error(
         name="protocol.py",
         contents=b"# hello world",
     )
-    analyzed_roles = RoleAnalysis(main_file=main_file)
+    analyzed_roles = RoleAnalysis(
+        main_file=main_file,
+        labware_files=[],
+        labware_definitions=[],
+    )
 
     decoy.when(await file_reader_writer.read([input_file])).then_return([buffered_file])
     decoy.when(role_analyzer.analyze([buffered_file])).then_return(analyzed_roles)

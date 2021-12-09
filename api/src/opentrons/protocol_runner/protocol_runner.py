@@ -99,6 +99,9 @@ class ProtocolRunner:
         """
         config = protocol_source.config
 
+        for definition in protocol_source.labware_definitions:
+            self._protocol_engine.add_labware_definition(definition)
+
         if isinstance(config, JsonProtocolConfig):
             schema_version = config.schema_version
 
@@ -171,10 +174,7 @@ class ProtocolRunner:
         protocol_source: ProtocolSource,
     ) -> None:
         protocol = self._legacy_file_reader.read(protocol_source)
-        context = self._legacy_context_creator.create(
-            api_version=protocol.api_level,
-            labware=protocol_source.labware,
-        )
+        context = self._legacy_context_creator.create(protocol)
 
         self._protocol_engine.add_plugin(
             LegacyContextPlugin(

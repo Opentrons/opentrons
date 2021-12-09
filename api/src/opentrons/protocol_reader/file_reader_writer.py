@@ -15,6 +15,9 @@ from .input_file import AbstractInputFile
 BufferedJsonFileData = Union[JsonProtocol, LabwareDefinition]
 
 
+# TODO(mc, 2021-12-07): re-evaluate if JSON parsing (and this `data` field)
+# are really conceptually appropriate for this unit. The answer is likely
+# "no", especially if we need to make perf. improvements to parsing
 @dataclass(frozen=True)
 class BufferedFile:
     """A file that has been read into memory."""
@@ -33,7 +36,7 @@ class FileReaderWriter:
 
     @staticmethod
     async def read(files: Sequence[AbstractInputFile]) -> List[BufferedFile]:
-        """Read a set of input files into memeory."""
+        """Read a set of input files into memory."""
         results: List[Optional[BufferedFile]] = [None for f in files]
 
         async def _read_file(input_file: AbstractInputFile, index: int) -> None:
@@ -44,9 +47,17 @@ class FileReaderWriter:
                 if input_file.filename.endswith(".json"):
                     try:
                         data = parse_raw_as(BufferedJsonFileData, contents)  # type: ignore[arg-type]  # noqa: E501
-                    except (JSONDecodeError, ValidationError) as e:
+
+                    # unlike other Pydantic functions/methods, `parse_raw_as` can
+                    # raise both JSONDecodeError and ValidationError separately
+                    except JSONDecodeError as e:
                         raise FileReadError(
-                            f"JSON file {input_file.filename} could not be parsed."
+                            f"{input_file.filename} is not valid JSON."
+                        ) from e
+                    except ValidationError as e:
+                        raise FileReadError(
+                            f"JSON file {input_file.filename} did not"
+                            " match a known Opentrons format."
                         ) from e
 
                 results[index] = BufferedFile(

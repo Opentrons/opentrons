@@ -1,6 +1,6 @@
 """Wrappers for the legacy, Protocol API v2 execution pipeline."""
 from anyio import to_thread
-from typing import List, cast
+from typing import cast
 
 from opentrons_shared_data.labware.dev_types import (
     LabwareDefinition as LegacyLabwareDefinition,
@@ -22,8 +22,6 @@ from opentrons.protocols.context.protocol_api.protocol_context import (
 from opentrons.protocols.context.simulator.protocol_context import (
     ProtocolContextSimulation as LegacyProtocolContextSimulation,
 )
-
-from opentrons.protocols.models import LabwareDefinition
 
 from opentrons.protocol_api import (
     ProtocolContext as LegacyProtocolContext,
@@ -76,6 +74,14 @@ class LegacyFileReader:
         return parse(
             protocol_file=protocol_contents,
             filename=protocol_file_path.name,
+            extra_labware={
+                uri_from_details(
+                    namespace=lw.namespace,
+                    load_name=lw.parameters.loadName,
+                    version=lw.version,
+                ): cast(LegacyLabwareDefinition, lw.dict(exclude_none=True))
+                for lw in protocol_source.labware_definitions
+            },
         )
 
 
@@ -99,55 +105,47 @@ class LegacyContextCreator:
         self._hardware_api = hardware_api
         self._labware_offset_provider = labware_offset_provider
 
-    def create(
-        self,
-        api_version: APIVersion,
-        labware: List[LabwareDefinition],
-    ) -> LegacyProtocolContext:
+    def create(self, protocol: LegacyProtocol) -> LegacyProtocolContext:
         """Create a Protocol API v2 context."""
+        api_version = protocol.api_level
+        extra_labware = (
+            protocol.extra_labware
+            if isinstance(protocol, LegacyPythonProtocol)
+            else None
+        )
+
         return LegacyProtocolContext(
             api_version=api_version,
             labware_offset_provider=self._labware_offset_provider,
             implementation=LegacyProtocolContextImplementation(
-                api_version=api_version,
                 hardware=self._hardware_api,
-                extra_labware={
-                    uri_from_details(
-                        namespace=lw.namespace,
-                        load_name=lw.parameters.loadName,
-                        version=lw.version,
-                    ): cast(LegacyLabwareDefinition, lw.dict(exclude_none=True))
-                    for lw in labware
-                },
+                api_version=api_version,
+                extra_labware=extra_labware,
             ),
         )
 
 
 class LegacySimulatingContextCreator(LegacyContextCreator):
-    def create(
-        self,
-        api_version: APIVersion,
-        labware: List[LabwareDefinition],
-    ) -> LegacyProtocolContext:
+    def create(self, protocol: LegacyProtocol) -> LegacyProtocolContext:
         """Create a simulating Protocol API v2 context.
 
         Avoids some calls to the hardware API for performance.
         See `opentrons.protocols.context.simulator`.
         """
+        api_version = protocol.api_level
+        extra_labware = (
+            protocol.extra_labware
+            if isinstance(protocol, LegacyPythonProtocol)
+            else None
+        )
+
         return LegacyProtocolContext(
             api_version=api_version,
             labware_offset_provider=self._labware_offset_provider,
             implementation=LegacyProtocolContextSimulation(
-                api_version=api_version,
                 hardware=self._hardware_api,
-                extra_labware={
-                    uri_from_details(
-                        namespace=lw.namespace,
-                        load_name=lw.parameters.loadName,
-                        version=lw.version,
-                    ): cast(LegacyLabwareDefinition, lw.dict(exclude_none=True))
-                    for lw in labware
-                },
+                api_version=api_version,
+                extra_labware=extra_labware,
             ),
         )
 
@@ -188,4 +186,6 @@ __all__ = [
     "LegacyMagneticModuleModel",
     "LegacyTemperatureModuleModel",
     "LegacyThermocyclerModuleModel",
+    # legacy typed dicts
+    "LegacyLabwareDefinition",
 ]
