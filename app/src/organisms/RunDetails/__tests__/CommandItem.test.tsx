@@ -41,7 +41,7 @@ const MOCK_COMMAND = {
 const MOCK_COMMENT_COMMAND = {
   id: 'COMMENT',
   commandType: 'custom',
-  params: {},
+  params: { legacyCommand: 'command.COMMENT' },
   status: 'running',
   result: {},
 } as Command
@@ -57,7 +57,7 @@ const MOCK_COMMAND_DETAILS = {
 const MOCK_COMMAND_DETAILS_COMMENT = {
   id: 'COMMENT',
   commandType: 'custom',
-  params: {},
+  params: { legacyCommand: 'command.COMMENT' },
   status: 'running',
   result: {},
   startedAt: 'start timestamp',
