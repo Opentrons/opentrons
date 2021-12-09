@@ -16,7 +16,7 @@ class ProtocolType(str, Enum):
     PYTHON = "python"
 
 
-# TODO(mc, 2021-12-07): add custom labware, data, and python support roles
+# TODO(mc, 2021-12-07): add data and python support roles
 class ProtocolFileRole(str, Enum):
     """The purpose of a given file in a protocol.
 
