@@ -4,11 +4,12 @@ from __future__ import annotations
 import asyncio
 from contextlib import contextmanager
 import logging
-from typing import Dict, List, Optional, Tuple, TYPE_CHECKING, Sequence, Generator
+from typing import Dict, List, Optional, Tuple, TYPE_CHECKING, Sequence, Generator, cast
 
 from opentrons.config.types import RobotConfig
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.types import Mount
+from opentrons.config import pipette_config
 
 try:
     from opentrons_hardware.drivers.can_bus import CanDriver, CanMessenger
@@ -27,7 +28,7 @@ from .module_control import AttachedModulesControl
 from .types import BoardRevision, Axis
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.pipette.dev_types import PipetteName
+    from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
     from .dev_types import (
         AttachedInstruments,
         InstrumentHardwareConfigs,
@@ -38,6 +39,11 @@ log = logging.getLogger(__name__)
 
 
 AxisValueMap = Dict[str, float]
+
+
+_FIXED_PIPETTE_ID: str = "P1KSV3120211118A01"
+_FIXED_PIPETTE_NAME: PipetteName = "p1000_single_gen3"
+_FIXED_PIPETTE_MODEL: PipetteModel = cast("PipetteModel", "p1000_single_v3.0")
 
 
 class OT3Controller:
@@ -200,7 +206,15 @@ class OT3Controller:
         Returns:
             A map of mount to pipette name.
         """
-        return {}
+        if expected.get(Mount.LEFT) and expected.get(Mount.LEFT) != _FIXED_PIPETTE_NAME:
+            raise RuntimeError(f"only support {_FIXED_PIIPETTE_NAME}  right now")
+
+        return {
+            Mount.LEFT: {
+                "config": pipette_config.load(_FIXED_PIPETTE_MODEL, _FIXED_PIPETTE_ID),
+                "id": _FIXED_PIPETTE_ID,
+            }
+        }
 
     def set_active_current(self, axis_currents: Dict[Axis, float]) -> None:
         """Set the active current.
