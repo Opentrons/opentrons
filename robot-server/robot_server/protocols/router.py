@@ -10,9 +10,9 @@ from robot_server.errors import ErrorDetails, ErrorResponse
 from robot_server.service.task_runner import TaskRunner
 from robot_server.service.dependencies import get_unique_id, get_current_time
 from robot_server.service.json_api import (
-    SimpleResponseModel,
-    SimpleMultiResponseModel,
-    SimpleEmptyResponseModel,
+    SimpleResponse,
+    SimpleMultiResponse,
+    SimpleEmptyResponse,
 )
 
 from .dependencies import (
@@ -54,7 +54,7 @@ protocols_router = APIRouter()
     summary="Upload a protocol",
     status_code=status.HTTP_201_CREATED,
     responses={
-        status.HTTP_201_CREATED: {"model": SimpleResponseModel[Protocol]},
+        status.HTTP_201_CREATED: {"model": SimpleResponse[Protocol]},
         status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse[ProtocolFileInvalid]},
     },
 )
@@ -69,7 +69,7 @@ async def create_protocol(
     protocol_id: str = Depends(get_unique_id, use_cache=False),
     analysis_id: str = Depends(get_unique_id, use_cache=False),
     created_at: datetime = Depends(get_current_time),
-) -> SimpleResponseModel[Protocol]:
+) -> SimpleResponse[Protocol]:
     """Create a new protocol by uploading its files.
 
     Arguments:
@@ -139,20 +139,20 @@ async def create_protocol(
 
     # todo(mm, 2021-09-14): Do we need to close the UploadFiles in our `files` arg?
 
-    return SimpleResponseModel.construct(data=data)
+    return SimpleResponse.construct(data=data)
 
 
 @protocols_router.get(
     path="/protocols",
     summary="Get uploaded protocols",
     status_code=status.HTTP_200_OK,
-    responses={status.HTTP_200_OK: {"model": SimpleMultiResponseModel[Protocol]}},
+    responses={status.HTTP_200_OK: {"model": SimpleMultiResponse[Protocol]}},
 )
 async def get_protocols(
     response_builder: ResponseBuilder = Depends(ResponseBuilder),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
-) -> SimpleMultiResponseModel[Protocol]:
+) -> SimpleMultiResponse[Protocol]:
     """Get a list of all currently uploaded protocols.
 
     Arguments:
@@ -169,7 +169,7 @@ async def get_protocols(
         for r in protocol_resources
     ]
 
-    return SimpleMultiResponseModel.construct(data=data)
+    return SimpleMultiResponse.construct(data=data)
 
 
 @protocols_router.get(
@@ -177,7 +177,7 @@ async def get_protocols(
     summary="Get an uploaded protocol",
     status_code=status.HTTP_200_OK,
     responses={
-        status.HTTP_200_OK: {"model": SimpleResponseModel[Protocol]},
+        status.HTTP_200_OK: {"model": SimpleResponse[Protocol]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[ProtocolNotFound]},
     },
 )
@@ -186,7 +186,7 @@ async def get_protocol_by_id(
     response_builder: ResponseBuilder = Depends(ResponseBuilder),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
-) -> SimpleResponseModel[Protocol]:
+) -> SimpleResponse[Protocol]:
     """Get an uploaded protocol by ID.
 
     Arguments:
@@ -204,7 +204,7 @@ async def get_protocol_by_id(
 
     data = response_builder.build(resource=resource, analyses=analyses)
 
-    return SimpleResponseModel.construct(data=data)
+    return SimpleResponse.construct(data=data)
 
 
 @protocols_router.delete(
@@ -212,14 +212,14 @@ async def get_protocol_by_id(
     summary="Delete an uploaded protocol",
     status_code=status.HTTP_200_OK,
     responses={
-        status.HTTP_200_OK: {"model": SimpleEmptyResponseModel},
+        status.HTTP_200_OK: {"model": SimpleEmptyResponse},
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[ProtocolNotFound]},
     },
 )
 async def delete_protocol_by_id(
     protocolId: str,
     protocol_store: ProtocolStore = Depends(get_protocol_store),
-) -> SimpleEmptyResponseModel:
+) -> SimpleEmptyResponse:
     """Delete an uploaded protocol by ID.
 
     Arguments:
@@ -232,4 +232,4 @@ async def delete_protocol_by_id(
     except ProtocolNotFoundError as e:
         raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
-    return SimpleEmptyResponseModel()
+    return SimpleEmptyResponse()

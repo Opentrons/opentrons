@@ -1,8 +1,8 @@
 """Request and response models for controlling runs with actions."""
 from datetime import datetime
 from enum import Enum
+from pydantic import BaseModel, Field
 
-from robot_server.base_model import BaseModel, Field
 from robot_server.service.json_api import ResourceModel
 
 

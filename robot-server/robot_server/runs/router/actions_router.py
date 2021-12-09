@@ -8,7 +8,7 @@ from opentrons.protocol_engine.errors import ProtocolEngineStoppedError
 
 from robot_server.errors import ErrorDetails, ErrorResponse
 from robot_server.service.dependencies import get_current_time, get_unique_id
-from robot_server.service.json_api import RequestModel, SimpleResponseModel
+from robot_server.service.json_api import RequestModel, SimpleResponse
 
 from ..run_store import RunStore, RunNotFoundError
 from ..run_view import RunView
@@ -33,7 +33,7 @@ class RunActionNotAllowed(ErrorDetails):
     description="Provide an action in order to control execution of the run.",
     status_code=status.HTTP_201_CREATED,
     responses={
-        status.HTTP_201_CREATED: {"model": SimpleResponseModel[RunAction]},
+        status.HTTP_201_CREATED: {"model": SimpleResponse[RunAction]},
         status.HTTP_409_CONFLICT: {
             "model": ErrorResponse[Union[RunActionNotAllowed, RunStopped]],
         },
@@ -48,7 +48,7 @@ async def create_run_action(
     engine_store: EngineStore = Depends(get_engine_store),
     action_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
-) -> SimpleResponseModel[RunAction]:
+) -> SimpleResponse[RunAction]:
     """Create a run control action.
 
     Arguments:
@@ -90,4 +90,4 @@ async def create_run_action(
 
     run_store.upsert(run=next_run)
 
-    return SimpleResponseModel.construct(data=action)
+    return SimpleResponse.construct(data=action)

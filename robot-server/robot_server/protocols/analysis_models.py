@@ -1,6 +1,7 @@
 """Response models for protocol analysis."""
 # TODO(mc, 2021-08-25): add modules to simulation result
 from enum import Enum
+from pydantic import BaseModel, Field
 from typing import List, Union
 from typing_extensions import Literal
 
@@ -10,7 +11,6 @@ from opentrons.protocol_engine import (
     LoadedLabware,
     LoadedPipette,
 )
-from robot_server.base_model import BaseModel, Field
 
 
 class AnalysisStatus(str, Enum):
@@ -36,7 +36,7 @@ class AnalysisResult(str, Enum):
 
 
 class AnalysisSummary(BaseModel):
-    """Base model for an analyis of a protocol."""
+    """Base model for an analysis of a protocol."""
 
     id: str = Field(..., description="Unique identifier of this analysis resource")
     status: AnalysisStatus = Field(..., description="Status of the analysis")
@@ -51,7 +51,7 @@ class PendingAnalysis(AnalysisSummary):
 class CompletedAnalysis(AnalysisSummary):
     """A completed protocol run analysis.
 
-    This analyis provides three pieces of information:
+    This analysis provides three pieces of information:
 
     - A smoke test on whether the run is expected to succeed, given available data.
     - The equipment (labware, pipettes, modules) that the protocol will use.

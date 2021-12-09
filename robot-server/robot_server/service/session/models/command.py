@@ -38,10 +38,9 @@ from robot_server.service.session.models.command_definitions import (
 )
 from robot_server.service.session.models.common import EmptyModel, JogPosition
 from robot_server.service.json_api import (
-    ResponseModel,
+    DeprecatedResponseModel,
     RequestModel,
     ResponseDataModel,
-    ResourceLinks,
 )
 
 
@@ -294,5 +293,5 @@ ResponseTypes = typing.Union[
 CommandRequest = RequestModel[RequestTypes]
 """The command request model."""
 
-CommandResponse = ResponseModel[ResponseTypes, ResourceLinks]
+CommandResponse = DeprecatedResponseModel[ResponseTypes]
 """The command response model."""

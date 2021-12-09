@@ -16,8 +16,8 @@ from robot_server.errors import ApiError
 from robot_server.service.task_runner import TaskRunner
 from robot_server.service.json_api import (
     RequestModel,
-    SimpleResponseModel,
-    SimpleEmptyResponseModel,
+    SimpleResponse,
+    SimpleEmptyResponse,
     ResourceLink,
 )
 
@@ -552,7 +552,7 @@ async def test_delete_run_by_id(
         run_store.remove(run_id="run-id"),
     )
 
-    assert result == SimpleEmptyResponseModel()
+    assert result == SimpleEmptyResponse()
 
 
 async def test_delete_run_with_bad_id(
@@ -664,7 +664,7 @@ async def test_add_labware_offset(
     )
     decoy.verify(engine_store.engine.add_labware_offset(labware_offset_request))
 
-    assert response == SimpleResponseModel(data=expected_response)
+    assert response == SimpleResponse(data=expected_response)
 
 
 async def test_update_run_to_not_current(
@@ -731,7 +731,7 @@ async def test_update_run_to_not_current(
         engine_store=engine_store,
     )
 
-    assert result == SimpleResponseModel(data=expected_response)
+    assert result == SimpleResponse(data=expected_response)
     decoy.verify(
         engine_store.clear(),
         run_store.upsert(updated_resource),
@@ -794,7 +794,7 @@ async def test_update_current_to_current_noop(
         engine_store=engine_store,
     )
 
-    assert result == SimpleResponseModel(data=expected_response)
+    assert result == SimpleResponse(data=expected_response)
     decoy.verify(run_store.upsert(run_resource), times=0)
     decoy.verify(engine_store.clear(), times=0)
 
