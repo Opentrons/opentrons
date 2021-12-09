@@ -1,4 +1,6 @@
 """Router for /runs actions endpoints."""
+import logging
+
 from fastapi import APIRouter, Depends, status
 from datetime import datetime
 from typing import Union
@@ -17,6 +19,8 @@ from ..engine_store import EngineStore
 from ..dependencies import get_run_store, get_engine_store
 from .base_router import RunNotFound, RunStopped
 
+
+log = logging.getLogger(__name__)
 actions_router = APIRouter()
 
 
@@ -30,7 +34,7 @@ class RunActionNotAllowed(ErrorDetails):
 @actions_router.post(
     path="/runs/{runId}/actions",
     summary="Issue a control action to the run",
-    description=("Provide an action in order to control execution of the run."),
+    description="Provide an action in order to control execution of the run.",
     status_code=status.HTTP_201_CREATED,
     response_model=SimpleResponseModel[RunAction],
     response_model_exclude_none=True,
@@ -80,10 +84,13 @@ async def create_run_action(
 
     try:
         if action.actionType == RunActionType.PLAY:
+            log.info(f'Playing run "{runId}".')
             engine_store.runner.play()
         elif action.actionType == RunActionType.PAUSE:
+            log.info(f'Pausing run "{runId}".')
             engine_store.runner.pause()
         elif action.actionType == RunActionType.STOP:
+            log.info(f'Stopping run "{runId}".')
             await engine_store.runner.stop()
 
     except ProtocolEngineStoppedError as e:
