@@ -88,8 +88,7 @@ export function ProtocolUpload(): JSX.Element {
   }, [uploadError])
 
   const handleUpload = (file: File): void => {
-    const protocolFiles = [file]
-    customLabwareFiles.forEach(labwareFile => protocolFiles.push(labwareFile))
+    const protocolFiles = [file, ...customLabwareFiles]
     clearError()
     ingestProtocolFile(
       file,
