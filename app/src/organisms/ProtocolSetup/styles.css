@@ -15,3 +15,10 @@
   max-height: 100%;
   overflow-y: auto;
 }
+
+.sticky_alert {
+  position: fixed;
+  top: 3rem;
+  width: 89.5%;
+  z-index: 100;
+}

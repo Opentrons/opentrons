@@ -83,12 +83,12 @@ export function ProtocolSetup(): JSX.Element {
             onCloseClick={() => setShowLPCSuccessToast(false)}
           />
         )}
-        <MetadataCard />
         <LPCSuccessToastContext.Provider
           value={{
             setShowLPCSuccessToast: () => setShowLPCSuccessToast(true),
           }}
         >
+          <MetadataCard />
           <RunSetupCard />
         </LPCSuccessToastContext.Provider>
         <Text
