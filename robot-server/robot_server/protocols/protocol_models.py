@@ -2,7 +2,7 @@
 from __future__ import annotations
 from enum import Enum
 from datetime import datetime
-from pydantic import BaseModel, Field, Extra
+from pydantic import BaseModel, Extra, Field
 from typing import Sequence
 
 from robot_server.service.json_api import ResourceModel
