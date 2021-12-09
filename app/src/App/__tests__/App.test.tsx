@@ -55,7 +55,9 @@ describe('top level App component', () => {
   }
 
   beforeEach(() => {
-    when(mockUseFeatureFlag).calledWith('nextGenApp').mockReturnValue(false)
+    when(mockUseFeatureFlag)
+      .calledWith('hierarchyReorganization')
+      .mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -129,13 +131,15 @@ describe('top level App component', () => {
     expect(wrapper.exists(Alerts)).toBe(true)
   })
 
-  it('should not render the Next Gen App when the Next Gen App feature flag is off', () => {
+  it('should not render the Next Gen App when the Hierarchy Reorganization feature flag is off', () => {
     const { wrapper } = render()
     expect(wrapper.exists(NextGenApp)).toBe(false)
   })
 
-  it('should render the Next Gen App when the Next Gen App feature flag is on', () => {
-    when(mockUseFeatureFlag).calledWith('nextGenApp').mockReturnValue(true)
+  it('should render the Next Gen App when the Hierarchy Reorganization feature flag is on', () => {
+    when(mockUseFeatureFlag)
+      .calledWith('hierarchyReorganization')
+      .mockReturnValue(true)
 
     const { wrapper } = render()
     expect(wrapper.exists(NextGenApp)).toBe(true)

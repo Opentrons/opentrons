@@ -9,7 +9,7 @@ export type DiscoveryCandidates = string | string[]
 export type DevInternalFlag =
   | 'allPipetteConfig'
   | 'enableBundleUpload'
-  | 'nextGenApp'
+  | 'hierarchyReorganization'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
 

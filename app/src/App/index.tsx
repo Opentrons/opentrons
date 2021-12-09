@@ -38,7 +38,7 @@ const stopEvent = (event: React.MouseEvent): void => event.preventDefault()
 
 export const AppComponent = (): JSX.Element => {
   const connectedRobot = useSelector((state: State) => getConnectedRobot(state))
-  const isNextGenApp = useFeatureFlag('nextGenApp')
+  const isNextGenApp = useFeatureFlag('hierarchyReorganization')
 
   return (
     <ApiHostProvider hostname={connectedRobot?.ip ?? null}>
