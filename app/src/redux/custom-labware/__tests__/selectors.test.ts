@@ -104,6 +104,36 @@ describe('custom labware selectors', () => {
         { ...Fixtures.mockValidLabware, filename: 'foo.json' },
       ],
     },
+
+    {
+      name: 'getValidCustomLabwareFiles',
+      selector: selectors.getValidCustomLabwareFiles,
+      state: {
+        labware: {
+          addFailureFile: null,
+          addFailureMessage: null,
+          listFailureMessage: null,
+          filenames: [
+            Fixtures.mockValidLabware.filename,
+            Fixtures.mockInvalidLabware.filename,
+            'foo.json',
+          ],
+          filesByName: {
+            [Fixtures.mockValidLabware.filename]: Fixtures.mockValidLabware,
+            [Fixtures.mockInvalidLabware.filename]: Fixtures.mockInvalidLabware,
+            'foo.json': {
+              ...Fixtures.mockValidLabware,
+              filename: 'foo.json',
+            } as ValidLabwareFile,
+          },
+        },
+      } as any,
+      expected: expect.arrayContaining([
+        Fixtures.mockValidLabwareFile,
+        Fixtures.mockValidLabwareFile,
+      ]),
+    },
+
     {
       name: 'getAddLabwareFailure',
       selector: selectors.getAddLabwareFailure,

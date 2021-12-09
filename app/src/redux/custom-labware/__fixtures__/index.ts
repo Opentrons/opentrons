@@ -38,6 +38,11 @@ export const mockValidLabware: Types.ValidLabwareFile = {
   },
 }
 
+export const mockValidLabwareFile: File = new File(
+  [JSON.stringify(mockValidLabware.definition)],
+  mockValidLabware.filename
+)
+
 export const mockInvalidLabware: Types.InvalidLabwareFile = {
   type: 'INVALID_LABWARE_FILE',
   filename: 'b.json',
