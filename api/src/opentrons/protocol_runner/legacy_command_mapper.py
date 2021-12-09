@@ -127,7 +127,9 @@ class LegacyCommandMapper:
         slot = labware_load_info.deck_slot
         location: pe_types.LabwareLocation
         if labware_load_info.on_module:
-            location = pe_types.ModuleLocation.construct(moduleId=self._module_id_by_slot[slot])
+            location = pe_types.ModuleLocation.construct(
+                moduleId=self._module_id_by_slot[slot]
+            )
         else:
             location = pe_types.DeckSlotLocation.construct(slotName=slot)
 
