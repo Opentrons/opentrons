@@ -3,6 +3,11 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 from opentrons.hardware_control import API as HardwareAPI
+from opentrons.protocol_reader import (
+    ProtocolSource,
+    PythonProtocolConfig,
+    JsonProtocolConfig,
+)
 from opentrons.protocol_engine import (
     ProtocolEngine,
     Command,
@@ -11,8 +16,6 @@ from opentrons.protocol_engine import (
     LoadedPipette,
 )
 
-from .protocol_source import ProtocolSource
-from .pre_analysis import JsonPreAnalysis, PythonPreAnalysis
 from .task_queue import TaskQueue
 from .json_file_reader import JsonFileReader
 from .json_command_translator import JsonCommandTranslator
@@ -95,18 +98,18 @@ class ProtocolRunner:
         Calling this method is only necessary if the runner will be used
         to control the run of a file-based protocol.
         """
-        pre_analysis = protocol_source.pre_analysis
+        config = protocol_source.config
 
-        if isinstance(pre_analysis, JsonPreAnalysis):
-            schema_version = pre_analysis.schema_version
+        if isinstance(config, JsonProtocolConfig):
+            schema_version = config.schema_version
 
             if schema_version >= LEGACY_JSON_SCHEMA_VERSION_CUTOFF:
                 self._load_json(protocol_source)
             else:
                 self._load_legacy(protocol_source)
 
-        elif isinstance(pre_analysis, PythonPreAnalysis):
-            api_version = pre_analysis.api_version
+        elif isinstance(config, PythonProtocolConfig):
+            api_version = config.api_version
 
             if api_version >= LEGACY_PYTHON_API_VERSION_CUTOFF:
                 self._load_python(protocol_source)
