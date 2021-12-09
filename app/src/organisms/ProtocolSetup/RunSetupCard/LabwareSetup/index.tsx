@@ -1,5 +1,6 @@
 import * as React from 'react'
 import map from 'lodash/map'
+import isEmpty from 'lodash/isEmpty'
 import { useTranslation } from 'react-i18next'
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
@@ -38,6 +39,7 @@ import { useRunStatus } from '../../../RunTimeControl/hooks'
 import { LabwarePositionCheck } from '../../LabwarePositionCheck'
 import styles from '../../styles.css'
 import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../../hooks'
+import { useProtocolDetails } from '../../../RunDetails/hooks'
 import { LabwareInfoOverlay } from './LabwareInfoOverlay'
 import { LabwareOffsetModal } from './LabwareOffsetModal'
 import { getModuleTypesThatRequireExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
@@ -64,6 +66,9 @@ export const LabwareSetup = (): JSX.Element | null => {
   const runStatus = useRunStatus()
   const disableLabwarePositionCheck =
     runStatus != null && runStatus !== RUN_STATUS_IDLE
+  const { protocolData } = useProtocolDetails()
+  const disableLabwarePositionCheckEmptyProtocols =
+    isEmpty(protocolData?.pipettes) && isEmpty(protocolData?.labware)
   const { t } = useTranslation('protocol_setup')
   const [
     showLabwareHelpModal,
@@ -194,7 +199,10 @@ export const LabwareSetup = (): JSX.Element | null => {
                 onClick={() => setShowLabwarePositionCheckModal(true)}
                 id={'LabwareSetup_checkLabwarePositionsButton'}
                 {...targetProps}
-                disabled={disableLabwarePositionCheck}
+                disabled={
+                  disableLabwarePositionCheck ||
+                  disableLabwarePositionCheckEmptyProtocols
+                }
               >
                 {t('run_labware_position_check')}
               </NewSecondaryBtn>
@@ -203,6 +211,15 @@ export const LabwareSetup = (): JSX.Element | null => {
                   {
                     <Box width={SIZE_5} textAlign={TEXT_ALIGN_CENTER}>
                       {t('labware_position_check_not_available')}
+                    </Box>
+                  }
+                </Tooltip>
+              ) : null}
+              {disableLabwarePositionCheckEmptyProtocols ? (
+                <Tooltip {...tooltipProps}>
+                  {
+                    <Box width={SIZE_5} textAlign={TEXT_ALIGN_CENTER}>
+                      {t('labware_position_check_not_available_empty_protocol')}
                     </Box>
                   }
                 </Tooltip>

@@ -22,6 +22,7 @@ import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_stand
 import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '../../../../../i18n'
 import { useRunStatus } from '../../../../RunTimeControl/hooks'
+import { useProtocolDetails } from '../../../../RunDetails/hooks'
 import { LabwareOffsetSuccessToast } from '../../../LabwareOffsetSuccessToast'
 import { LabwarePositionCheck } from '../../../LabwarePositionCheck'
 import {
@@ -43,6 +44,7 @@ jest.mock('../ExtraAttentionWarning')
 jest.mock('../../../hooks')
 jest.mock('../utils/getModuleTypesThatRequireExtraAttention')
 jest.mock('../../../../RunTimeControl/hooks')
+jest.mock('../../../../RunDetails/hooks')
 jest.mock('../../../LabwareOffsetSuccessToast')
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
@@ -99,6 +101,9 @@ const mockUseRunStatus = useRunStatus as jest.MockedFunction<
 const mockLabwareOffsetSuccessToast = LabwareOffsetSuccessToast as jest.MockedFunction<
   typeof LabwareOffsetSuccessToast
 >
+const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
+  typeof useProtocolDetails
+>
 
 const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
   (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
@@ -135,6 +140,28 @@ const mockTCModule = {
   model: 'thermocyclerModuleV1' as ModuleModel,
   type: 'thermocyclerModuleType' as ModuleType,
 }
+
+const PICKUP_TIP_LABWARE_ID = 'PICKUP_TIP_LABWARE_ID'
+const PRIMARY_PIPETTE_ID = 'PRIMARY_PIPETTE_ID'
+const PRIMARY_PIPETTE_NAME = 'PRIMARY_PIPETTE_NAME'
+const LABWARE_DEF_ID = 'LABWARE_DEF_ID'
+const LABWARE_DEF = {
+  ordering: [['A1', 'A2']],
+}
+const mockLabwarePositionCheckStepTipRack = {
+  labwareId:
+    '1d57fc10-67ad-11ea-9f8b-3b50068bd62d:opentrons/opentrons_96_filtertiprack_200ul/1',
+  section: '',
+  commands: [
+    {
+      commandType: 'pickUpTip',
+      params: {
+        pipetteId: PRIMARY_PIPETTE_ID,
+        labwareId: PICKUP_TIP_LABWARE_ID,
+      },
+    },
+  ],
+} as any
 
 describe('LabwareSetup', () => {
   beforeEach(() => {
@@ -206,6 +233,28 @@ describe('LabwareSetup', () => {
       <div>mock Labware Position Check</div>
     )
     mockUseRunStatus.mockReturnValue(RUN_STATUS_IDLE)
+    when(mockUseProtocolDetails)
+      .calledWith()
+      .mockReturnValue({
+        protocolData: {
+          labware: {
+            [mockLabwarePositionCheckStepTipRack.labwareId]: {
+              slot: '1',
+              displayName: 'someDislpayName',
+              definitionId: LABWARE_DEF_ID,
+            },
+          },
+          labwareDefinitions: {
+            [LABWARE_DEF_ID]: LABWARE_DEF,
+          },
+          pipettes: {
+            [PRIMARY_PIPETTE_ID]: {
+              name: PRIMARY_PIPETTE_NAME,
+              mount: 'left',
+            },
+          },
+        },
+      } as any)
   })
 
   afterEach(() => {
@@ -389,5 +438,16 @@ describe('LabwareSetup', () => {
       )
       .mockReturnValue(<div>mock LabwarePositionCheck</div>)
     expect(screen.queryByText('mock LabwarePositionCheck')).toBeNull()
+  })
+  it('should render a disabled button when a protocol without a pipette AND without a labware is uploaded', () => {
+    mockUseProtocolDetails.mockReturnValue({
+      protocolData: { labware: {}, pipettes: {} },
+    } as any)
+    const { getByRole, queryByText } = render()
+    const button = getByRole('button', {
+      name: 'run labware position check',
+    })
+    fireEvent.click(button)
+    expect(queryByText('mock Labware Position Check')).toBeNull()
   })
 })
