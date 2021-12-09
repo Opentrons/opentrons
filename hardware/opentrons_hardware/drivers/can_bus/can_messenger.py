@@ -5,12 +5,10 @@ import logging
 
 from opentrons_hardware.drivers.can_bus import (
     CanDriver,
-
 )
 from opentrons_ot3_firmware.arbitration_id import (
     ArbitrationId,
     ArbitrationIdParts,
-
 )
 from opentrons_ot3_firmware.message import CanMessage
 from opentrons_ot3_firmware.constants import NodeId, MessageId

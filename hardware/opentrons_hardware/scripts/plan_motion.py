@@ -26,14 +26,28 @@ LOG_CONFIG = {
 }
 
 
-
-
 def main() -> None:
-    constraints : SystemConstraints = {
-        Axis.X: Constraints(max_acceleration=10, max_speed_discont=15, max_direction_change_speed_discont=500),
-        Axis.Y: Constraints(max_acceleration=10, max_speed_discont=15, max_direction_change_speed_discont=500),
-        Axis.Z: Constraints(max_acceleration=100, max_speed_discont=100, max_direction_change_speed_discont=500),
-        Axis.A: Constraints(max_acceleration=100, max_speed_discont=100, max_direction_change_speed_discont=500),
+    constraints: SystemConstraints = {
+        Axis.X: AxisConstraints(
+            max_acceleration=10,
+            max_speed_discont=15,
+            max_direction_change_speed_discont=500,
+        ),
+        Axis.Y: AxisConstraints(
+            max_acceleration=10,
+            max_speed_discont=15,
+            max_direction_change_speed_discont=500,
+        ),
+        Axis.Z: AxisConstraints(
+            max_acceleration=100,
+            max_speed_discont=100,
+            max_direction_change_speed_discont=500,
+        ),
+        Axis.A: AxisConstraints(
+            max_acceleration=100,
+            max_speed_discont=100,
+            max_direction_change_speed_discont=500,
+        ),
     }
 
     target_list = [

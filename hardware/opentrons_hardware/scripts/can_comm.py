@@ -13,7 +13,7 @@ from opentrons_hardware.drivers.can_bus import (
 from opentrons_ot3_firmware.constants import (
     MessageId,
     NodeId,
-        FunctionCode,
+    FunctionCode,
 )
 from opentrons_ot3_firmware.message import CanMessage
 from opentrons_ot3_firmware.arbitration_id import (

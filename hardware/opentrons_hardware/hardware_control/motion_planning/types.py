@@ -1,7 +1,10 @@
 import enum
 import dataclasses
 import math
-from typing import Dict, List, NamedTuple, Tuple
+import numpy as np
+import numpy.typing as npt
+from typing import Dict, Iterator, List, NamedTuple, Tuple
+
 
 class Axis(enum.Enum):
     X = 0
@@ -20,17 +23,26 @@ class Coordinates(NamedTuple):
     Z: float
     A: float
 
+    @classmethod
+    def from_iter(cls, iter: Iterator[float]) -> "Coordinates":
+        return cls(*iter)
+
+    def vectorize(self) -> npt.NDArray[np.float64]:
+        return np.array(self)
+
 
 @dataclasses.dataclass
 class Block:
     distance: float
     initial_speed: float
     acceleration: float
-        
+
     @property
     def final_speed(self) -> float:
-        return math.sqrt(self.initial_speed**2 + self.acceleration * self.distance * 2)
-    
+        return math.sqrt(
+            self.initial_speed ** 2 + self.acceleration * self.distance * 2
+        )
+
     @property
     def time(self) -> float:
         if self.acceleration:
@@ -45,7 +57,7 @@ class Move:
     distance: float
     max_speed: float
     blocks: Tuple[Block, Block, Block]
-        
+
     @property
     def initial_speed(self) -> float:
         for block in self.blocks:
@@ -53,16 +65,16 @@ class Move:
                 continue
             return block.initial_speed
         return 0
-    
+
     @property
     def final_speed(self) -> float:
         for block in reversed(self.blocks):
             if block.distance == 0:
                 continue
         return block.final_speed
-    
+
     @property
-    def nonzero_blocks(self):
+    def nonzero_blocks(self) -> int:
         return len([b for b in self.blocks if b.time])
 
 
@@ -84,5 +96,6 @@ class AxisConstraints:
     max_acceleration: float
     max_speed_discont: float
     max_direction_change_speed_discont: float
+
 
 SystemConstraints = Dict[Axis, AxisConstraints]
