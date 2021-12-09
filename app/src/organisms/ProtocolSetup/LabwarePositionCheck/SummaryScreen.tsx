@@ -10,6 +10,7 @@ import {
   JUSTIFY_START,
   NewPrimaryBtn,
   SPACING_3,
+  SPACING_2,
   SPACING_4,
   Text,
   TEXT_TRANSFORM_UPPERCASE,
@@ -83,14 +84,17 @@ export const SummaryScreen = (props: {
       </Text>
       <Flex justifyContent={JUSTIFY_START} alignItems={ALIGN_START}>
         <Flex flex={'1 1 10%'} flexDirection={DIRECTION_COLUMN}>
-          <SectionList
-            primaryPipetteMount={primaryPipetteMount}
-            secondaryPipetteMount={secondaryPipetteMount}
-            sections={sections}
-            completedSections={sections}
-          />
-
-          <DeckMap completedLabwareIdSections={labwareIds} />
+          <Flex paddingLeft={SPACING_4}>
+            <SectionList
+              primaryPipetteMount={primaryPipetteMount}
+              secondaryPipetteMount={secondaryPipetteMount}
+              sections={sections}
+              completedSections={sections}
+            />
+          </Flex>
+          <Flex paddingTop={SPACING_2}>
+            <DeckMap completedLabwareIdSections={labwareIds} />
+          </Flex>
         </Flex>
         <Flex flex={'1 1 45%'}>
           <LabwareOffsetsSummary offsetData={labwareOffsets} />

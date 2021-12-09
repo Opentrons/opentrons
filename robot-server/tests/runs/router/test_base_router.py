@@ -2,6 +2,7 @@
 import pytest
 from datetime import datetime
 from decoy import Decoy, matchers
+from pathlib import Path
 
 from opentrons.types import DeckSlotName, MountType
 from opentrons.protocol_engine import (
@@ -10,7 +11,7 @@ from opentrons.protocol_engine import (
     commands as pe_commands,
     types as pe_types,
 )
-from opentrons.protocol_runner import JsonPreAnalysis
+from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
 
 from robot_server.errors import ApiError
 from robot_server.service.task_runner import TaskRunner
@@ -171,9 +172,14 @@ async def test_create_protocol_run(
     )
     protocol_resource = ProtocolResource(
         protocol_id="protocol-id",
-        pre_analysis=JsonPreAnalysis(schema_version=123, metadata={}),
         created_at=datetime(year=2022, month=2, day=2),
-        files=[],
+        source=ProtocolSource(
+            directory=Path("/dev/null"),
+            main_file=Path("/dev/null/abc.json"),
+            config=JsonProtocolConfig(schema_version=123),
+            files=[],
+            metadata={},
+        ),
     )
     expected_response = Run(
         id="run-id",
@@ -227,7 +233,7 @@ async def test_create_protocol_run(
         # It should have added each requested labware offset to the engine,
         # in the exact order they appear in the request.
         *[engine_store.engine.add_labware_offset(r) for r in LABWARE_OFFSET_REQUESTS],
-        engine_store.runner.load(protocol_resource),
+        engine_store.runner.load(protocol_resource.source),
         task_runner.run(engine_store.runner.join),
         run_store.upsert(run=run),
     )

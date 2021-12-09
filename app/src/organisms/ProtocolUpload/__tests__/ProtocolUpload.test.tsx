@@ -14,6 +14,7 @@ import * as RobotSelectors from '../../../redux/robot/selectors'
 import * as calibrationSelectors from '../../../redux/calibration/selectors'
 import * as discoverySelectors from '../../../redux/discovery/selectors'
 import * as protocolSelectors from '../../../redux/protocol/selectors'
+import * as customLabwareSelectors from '../../../redux/custom-labware/selectors'
 import * as protocolUtils from '../../../redux/protocol/utils'
 import { useProtocolDetails } from '../../RunDetails/hooks'
 import { ConfirmExitProtocolUploadModal } from '../ConfirmExitProtocolUploadModal'
@@ -26,6 +27,7 @@ jest.mock('../../../redux/protocol/selectors')
 jest.mock('../../../redux/protocol/utils')
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../../redux/calibration/selectors')
+jest.mock('../../../redux/custom-labware/selectors')
 jest.mock('../../RunDetails/hooks')
 jest.mock('../hooks/useCurrentProtocolRun')
 jest.mock('../hooks/useCloseCurrentRun')
@@ -59,6 +61,9 @@ const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
 const mockGetConnectedRobotName = RobotSelectors.getConnectedRobotName as jest.MockedFunction<
   typeof RobotSelectors.getConnectedRobotName
 >
+const mockGetValidCustomLabwareFiles = customLabwareSelectors.getValidCustomLabwareFiles as jest.MockedFunction<
+  typeof customLabwareSelectors.getValidCustomLabwareFiles
+>
 
 const queryClient = new QueryClient()
 
@@ -78,6 +83,7 @@ describe('ProtocolUpload', () => {
     getCalibrationStatus.mockReturnValue(mockCalibrationStatus)
     ingestProtocolFile.mockImplementation((_f, _s, _e) => {})
     mockGetConnectedRobotName.mockReturnValue('robotName')
+    mockGetValidCustomLabwareFiles.mockReturnValue({} as any)
     when(mockConfirmExitProtocolUploadModal)
       .calledWith(
         componentPropsMatcher({
@@ -96,7 +102,6 @@ describe('ProtocolUpload', () => {
       isProtocolRunLoaded: true,
     })
   })
-
   afterEach(() => {
     resetAllWhenMocks()
     jest.resetAllMocks()

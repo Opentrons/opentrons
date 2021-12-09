@@ -61,7 +61,7 @@ export const GenericStepScreen = (
               completedSections={completedSections}
             />
           </Flex>
-          <Flex justifyContent={JUSTIFY_CENTER}>
+          <Flex justifyContent={JUSTIFY_CENTER} paddingTop={SPACING_3}>
             <DeckMap
               labwareIdsToHighlight={labwareIdsToHighlight}
               completedLabwareIdSections={
