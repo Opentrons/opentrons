@@ -91,12 +91,12 @@ class ConnectionHandler:
 
     def send(self, message: CanMessage) -> None:
         """Send message to all connections."""
-        if message.data:
-            data = struct.pack(
-                ">LLp", message.arbitration_id.id, len(message.data), message.data
-            )
-        else:
-            data = struct.pack(">LL", message.arbitration_id.id, len(message.data))
+        data = struct.pack(
+            f">LL{len(message.data)}s",
+            message.arbitration_id.id,
+            len(message.data),
+            message.data,
+        )
         for w in self._writers:
             w.write(data)
 
