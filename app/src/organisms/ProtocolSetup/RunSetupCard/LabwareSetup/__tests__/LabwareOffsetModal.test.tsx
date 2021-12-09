@@ -29,7 +29,7 @@ describe('LabwareOffsetModal', () => {
       'The OT-2 provides two types of positional adjustments. The first type is robot calibration: Deck calibration, Tip Length calibration and Pipette Offset calibration. These calibrations ensure the OT-2 moves to the expected positions on the deck. It is essential to have good robot calibration before creating any labware offsets and running protocols.'
     )
     getByText(
-      'Opentrons offers a second type of positional adjustment, a Labware Offset. Labware Offsets are intended to account for small, real-world variances in the overall position of the labware on an OT-2’s deck. A Labware Offset is unique to a specific combination of the following: labware, module (if present), deck slot, protocol and OT-2.'
+      'Opentrons offers a second type of positional adjustment, a Labware Offset. Labware Offsets are intended to account for small, real-world variances in the overall position of the labware on an OT-2’s deck. A Labware Offset is unique to a specific combination of the following during a run: labware, module (if present), deck slot, protocol and OT-2.'
     )
     getByRole('heading', {
       name: 'Creating Labware Offset Data During Labware Position Check',
