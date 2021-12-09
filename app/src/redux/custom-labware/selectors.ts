@@ -54,7 +54,6 @@ export const getValidCustomLabwareFiles: (
   state: State
 ) => File[] = createSelector(getValidCustomLabware, labware => {
   const labwareFiles = labware.map(lw => {
-    console.log('labware', lw)
     const jsonDefinition = JSON.stringify(lw.definition)
     return new File([jsonDefinition], lw.filename)
   })
