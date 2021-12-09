@@ -69,13 +69,14 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
     runStatus !== RUN_STATUS_IDLE && commandOrSummary.status != null
       ? commandOrSummary.status
       : 'queued'
-
   const currentRunId = useCurrentRunId()
   const {
     data: commandDetails,
     refetch: refetchCommandDetails,
   } = useCommandQuery(currentRunId, commandOrSummary.id)
-
+  const isComment =
+    commandDetails?.data.id.includes('COMMENT') ||
+    commandOrSummary.id.includes('COMMENT')
   React.useEffect(() => {
     refetchCommandDetails()
   }, [commandStatus])
@@ -94,8 +95,7 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
         <CurrentCommandLabel runStatus={runStatus} />
       ) : null}
       {commandStatus === 'failed' ? <CommandFailedMessage /> : null}
-      {commandDetails?.data.id.includes('COMMENT') ||
-      commandOrSummary.id.includes('COMMENT') ? (
+      {isComment ? (
         <Flex
           textTransform={TEXT_TRANSFORM_UPPERCASE}
           fontSize={FONT_SIZE_CAPTION}
@@ -107,7 +107,8 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
         </Flex>
       ) : null}
       <Flex flexDirection={DIRECTION_ROW}>
-        {['running', 'failed', 'succeeded'].includes(commandStatus) ? (
+        {['running', 'failed', 'succeeded'].includes(commandStatus) &&
+        !isComment ? (
           <CommandTimer
             commandStartedAt={commandDetails?.data.startedAt}
             commandCompletedAt={commandDetails?.data.completedAt}

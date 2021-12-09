@@ -149,6 +149,5 @@ describe('Run Details Command item', () => {
     const { getByText } = render(props)
     expect(getByText('Comment')).toHaveStyle('backgroundColor: C_NEAR_WHITE')
     getByText('Mock Command Text')
-    getByText('Mock Command Timer')
   })
 })
