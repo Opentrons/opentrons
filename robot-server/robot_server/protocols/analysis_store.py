@@ -26,7 +26,7 @@ class AnalysisStore:
 
     def add_pending(self, protocol_id: str, analysis_id: str) -> List[ProtocolAnalysis]:
         """Add a pending analysis to the store."""
-        self._analyses_by_id[analysis_id] = PendingAnalysis(id=analysis_id)
+        self._analyses_by_id[analysis_id] = PendingAnalysis.construct(id=analysis_id)
 
         ids_for_protocol = self._analysis_ids_by_protocol.get(protocol_id, set())
         ids_for_protocol.add(analysis_id)
@@ -48,7 +48,7 @@ class AnalysisStore:
         else:
             result = AnalysisResult.OK
 
-        self._analyses_by_id[analysis_id] = CompletedAnalysis(
+        self._analyses_by_id[analysis_id] = CompletedAnalysis.construct(
             id=analysis_id,
             result=result,
             commands=commands,

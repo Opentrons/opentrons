@@ -36,7 +36,7 @@ class AnalysisResult(str, Enum):
 
 
 class AnalysisSummary(BaseModel):
-    """Base model for an analyis of a protocol."""
+    """Base model for an analysis of a protocol."""
 
     id: str = Field(..., description="Unique identifier of this analysis resource")
     status: AnalysisStatus = Field(..., description="Status of the analysis")
@@ -51,7 +51,7 @@ class PendingAnalysis(AnalysisSummary):
 class CompletedAnalysis(AnalysisSummary):
     """A completed protocol run analysis.
 
-    This analyis provides three pieces of information:
+    This analysis provides three pieces of information:
 
     - A smoke test on whether the run is expected to succeed, given available data.
     - The equipment (labware, pipettes, modules) that the protocol will use.

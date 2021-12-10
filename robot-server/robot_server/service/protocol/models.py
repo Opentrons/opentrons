@@ -8,10 +8,9 @@ from pydantic import BaseModel, Field
 
 from opentrons.hardware_control.dev_types import ONE_CHANNEL, EIGHT_CHANNELS
 from robot_server.service.json_api import (
-    ResponseModel,
+    DeprecatedResponseModel,
     ResponseDataModel,
-    MultiResponseModel,
-    ResourceLinks,
+    DeprecatedMultiResponseModel,
 )
 
 from robot_server.service.legacy.models.control import Mount
@@ -98,6 +97,6 @@ class ProtocolResponseAttributes(ResponseDataModel):
     )
 
 
-ProtocolResponse = ResponseModel[ProtocolResponseAttributes, ResourceLinks]
+ProtocolResponse = DeprecatedResponseModel[ProtocolResponseAttributes]
 
-MultiProtocolResponse = MultiResponseModel[ProtocolResponseAttributes, ResourceLinks]
+MultiProtocolResponse = DeprecatedMultiResponseModel[ProtocolResponseAttributes]

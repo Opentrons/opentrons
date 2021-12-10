@@ -81,7 +81,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             # request > command mapping, figure out how to type precisely
             # (or wait for a future mypy version that can figure it out).
             # For now, unit tests cover mapping every request type
-            queued_command = action.request._CommandCls(
+            queued_command = action.request._CommandCls.construct(
                 id=action.command_id,
                 createdAt=action.created_at,
                 params=action.request.params,  # type: ignore[arg-type]
@@ -111,7 +111,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 }
             )
             commands_by_id.update({command.id: command})
-            errors_by_id[action.error_id] = ErrorOccurrence(
+            errors_by_id[action.error_id] = ErrorOccurrence.construct(
                 id=action.error_id,
                 createdAt=action.failed_at,
                 errorType=type(action.error).__name__,
@@ -153,7 +153,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     created_at = action.error_details.created_at
                     error = action.error_details.error
 
-                    errors_by_id[error_id] = ErrorOccurrence(
+                    errors_by_id[error_id] = ErrorOccurrence.construct(
                         id=error_id,
                         createdAt=created_at,
                         errorType=type(error).__name__,
