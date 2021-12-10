@@ -137,12 +137,6 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             )
 
             new_labware_by_id = self._state.labware_by_id.copy()
-
-            if command.params.location == _TRASH_LOCATION:
-                for target_id, target in self._state.labware_by_id.items():
-                    if target.location == _TRASH_LOCATION:
-                        del new_labware_by_id[target_id]
-
             new_labware_by_id[labware_id] = LoadedLabware(
                 id=labware_id,
                 location=command.params.location,

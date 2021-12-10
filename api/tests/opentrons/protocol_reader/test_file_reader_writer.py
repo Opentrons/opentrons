@@ -57,7 +57,16 @@ async def test_read_opentrons_json() -> None:
     assert isinstance(result[1].data, LabwareDefinition)
 
 
-# TODO(mc, 2021-12-07): add support arbitrary JSON data files
+async def test_read_missing_filename() -> None:
+    """It should error if a file has no filename."""
+    in_file = InputFile(filename="", file=io.BytesIO(b""))
+
+    subject = FileReaderWriter()
+
+    with pytest.raises(FileReadError, match="missing a name"):
+        await subject.read([in_file])
+
+
 async def test_read_opentrons_json_bad_parse() -> None:
     """It should error if a .json file cannot be parsed as a JSON."""
     in_file = InputFile(filename="hello.json", file=io.BytesIO(b"{oh: no}"))
@@ -70,7 +79,7 @@ async def test_read_opentrons_json_bad_parse() -> None:
 
 # TODO(mc, 2021-12-07): add support arbitrary JSON data files
 async def test_read_opentrons_json_bad_validate() -> None:
-    """It should error if a JSON file cannot be parsed as a JSON protocol."""
+    """It should error if a JSON file cannot be validated into a known model."""
     in_file = InputFile(filename="hello.json", file=io.BytesIO(b'{"oh": "no"}'))
 
     subject = FileReaderWriter()

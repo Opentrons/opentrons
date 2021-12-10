@@ -40,6 +40,9 @@ class FileReaderWriter:
         results: List[Optional[BufferedFile]] = [None for f in files]
 
         async def _read_file(input_file: AbstractInputFile, index: int) -> None:
+            if not input_file.filename:
+                raise FileReadError("File was missing a name")
+
             async with wrap_file(input_file.file) as f:
                 contents = await f.read()
                 data: Optional[BufferedJsonFileData] = None
