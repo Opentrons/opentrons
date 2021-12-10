@@ -6,13 +6,37 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# Opentrons App Changes in 5.0.0
+# Opentrons App Changes in 5.0.0-beta
 
-The 5.0.0 release reshapes the way a user uploads and sets up protocols to run on the robot.
+Welcome to the beta release of v5.0.0 release of the Opentrons App! After you update your app, please be sure to update any OT-2's you will be using with this beta.
 
-## Bug Fixes
+The 5.0.0 release reshapes the way you upload and set up protocols to run on your OT-2. We're very excited for you to try this new experience out, and we appreciate your feedback (and patience) as you use this new software.
 
-- Hey Beta testers! Version 5.0.0-beta.2 includes a couple of fixes including a bug in version 5.0.0-beta.1 that prevented users from proceeding to the run tab
+This is beta software! You may experience unexpected crashes or missing features not detailed here. Please see the [beta forum][] for more details and to leave feedback.
+
+[beta forum]: https://community.opentrons.com/c/beta/pe-beta/9
+
+## New Features
+
+- A completely revamped protocol upload experience that will walk you through setting up your OT-2 for the run
+- A new way to check the positioning of your labware prior to a run, where you can apply offsets to each labware individually
+- Quick and easy re-running of your last used protocol
+
+### Bug Fixes
+
+Keep an eye on this space as we release new versions of the beta. See the [issue tracker][] for a full list of issues resolved by the v5 release.
+
+[issue tracker]: https://github.com/Opentrons/opentrons/labels/fixed-in-v5
+
+## Known Issues
+
+This beta is a work in progress! We'll be addressing the following features and issues in upcoming releases of 5.0.0.
+
+- Your last run protocol will not be saved through robot reboots
+- You may experience various performance issues and freezes
+- The OT-2 will not drop any tips if a protocol is canceled
+- The OT-2 will not pause if the front door is opened during a run
+- You may not be able to re-run a protocol using a thermocycler without re-uploading the protocol
 
 ---
 

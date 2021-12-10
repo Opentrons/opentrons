@@ -6,13 +6,35 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# OT-2 Software Changes in 5.0.0
+# OT-2 Software Changes in 5.0.0-beta
 
-The 5.0.0 release of the OT-2 Software transitions to a new mechanism for ingesting and running protocols.
+Welcome to the beta release of v5.0.0 release of the OT-2 software!
 
-## New Features
+In conjunction with changes on the app-side, the 5.0.0 release reshapes the way your OT-2 ingests and run protocols. We're very excited for you to try this new experience out, and we appreciate your feedback (and patience) as you use this new software.
 
-- - Hey Beta testers! There are no api differences in version 5.0.0-beta.2 as compared to version 5.0.0-beta.1
+This is beta software! You may experience unexpected crashes or missing features not detailed here. Please see the [beta forum][] for more details and to leave feedback.
+
+[beta forum]: https://community.opentrons.com/c/beta/pe-beta/9
+
+### New Features
+
+- The OT-2 software has a completely new API for uploading protocol files and reporting run results
+
+## Bug Fixes
+
+Keep an eye on this space as we release new versions of the beta. See the [issue tracker][] for a full list of issues resolved by the v5 release.
+
+[issue tracker]: https://github.com/Opentrons/opentrons/labels/fixed-in-v5
+
+## Known Issues
+
+This beta is a work in progress! We'll be addressing the following features and issues in upcoming releases of 5.0.0.
+
+- Your last run protocol will not be saved through robot reboots
+- You may experience various performance issues and freezes
+- The OT-2 will not drop any tips if a protocol is canceled
+- The OT-2 will not pause if the front door is opened during a run
+- You may not be able to re-run a protocol using a thermocycler without re-uploading the protocol
 
 ---
 

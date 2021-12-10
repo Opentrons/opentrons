@@ -10,7 +10,7 @@
   "name": "@opentrons/step-generation",
   "productName": "Opentrons Step Generation",
   "private": true,
-  "version": "5.0.0-beta.2",
+  "version": "5.0.0-beta.3",
   "description": "Step generation",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -20,7 +20,7 @@
   "homepage": "https://github.com/Opentrons/opentrons",
   "license": "Apache-2.0",
   "dependencies": {
-    "@opentrons/shared-data": "5.0.0-beta.2",
+    "@opentrons/shared-data": "5.0.0-beta.3",
     "core-js": "3.2.1",
     "immer": "5.1.0",
     "lodash": "4.17.15"
