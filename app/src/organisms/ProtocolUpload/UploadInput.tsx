@@ -31,6 +31,7 @@ import {
   FONT_SIZE_BODY_1,
   SPACING_2,
   JUSTIFY_START,
+  TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 import { getLatestLabwareOffsetCount } from '../ProtocolSetup/LabwarePositionCheck/utils/getLatestLabwareOffsetCount'
@@ -40,6 +41,7 @@ import { Divider } from '../../atoms/structure'
 import { useMostRecentRunId } from './hooks/useMostRecentRunId'
 import { RerunningProtocolModal } from './RerunningProtocolModal'
 import { useCloneRun } from './hooks'
+import { getMostRecentRunStatus } from './getMostRecentRunStatus'
 import type { State } from '../../redux/types'
 
 const PROTOCOL_LIBRARY_URL = 'https://protocols.opentrons.com'
@@ -101,6 +103,10 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
   const mostRecentRunFileName =
     mostRecentProtocol != null && mostRecentProtocol.files != null
       ? mostRecentProtocol.files.find(file => file.role === 'main')?.name
+      : null
+  const mostRecentRunStatus =
+    mostRecentProtocol != null && mostRecentRun?.status != null
+      ? getMostRecentRunStatus(mostRecentRun)
       : null
 
   const handleDrop: React.DragEventHandler<HTMLLabelElement> = e => {
@@ -233,6 +239,24 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
               </Text>
               <Flex css={FONT_BODY_1_DARK}>
                 {protocolName != null ? protocolName : mostRecentRunFileName}
+              </Flex>
+            </Flex>
+            <Flex
+              flex={'auto'}
+              flexDirection={DIRECTION_COLUMN}
+              justifyContent={JUSTIFY_CENTER}
+            >
+              <Text
+                marginBottom={SPACING_1}
+                color={C_MED_GRAY}
+                fontSize={FONT_SIZE_CAPTION}
+              >
+                {'Run status'}
+              </Text>
+              <Flex css={FONT_BODY_1_DARK}>
+                <Text textTransform={TEXT_TRANSFORM_CAPITALIZE}>
+                  {mostRecentRunStatus}
+                </Text>
               </Flex>
             </Flex>
             <Flex
