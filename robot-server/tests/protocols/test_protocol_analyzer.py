@@ -58,7 +58,7 @@ async def test_analyze(
             config=JsonProtocolConfig(schema_version=123),
             files=[],
             metadata={},
-            labware=[],
+            labware_definitions=[],
         ),
     )
 

@@ -104,7 +104,7 @@ async def test_get_protocols(
             config=PythonProtocolConfig(api_version=APIVersion(1234, 5678)),
             files=[],
             metadata={},
-            labware=[],
+            labware_definitions=[],
         ),
     )
     resource_2 = ProtocolResource(
@@ -116,7 +116,7 @@ async def test_get_protocols(
             config=JsonProtocolConfig(schema_version=1234),
             files=[],
             metadata={},
-            labware=[],
+            labware_definitions=[],
         ),
     )
 
@@ -167,7 +167,7 @@ async def test_get_protocol_by_id(
             config=PythonProtocolConfig(api_version=APIVersion(1234, 5678)),
             files=[],
             metadata={},
-            labware=[],
+            labware_definitions=[],
         ),
     )
 
@@ -231,7 +231,7 @@ async def test_create_protocol(
         files=[ProtocolSourceFile(name="foo.json", role=ProtocolFileRole.MAIN)],
         metadata={"this_is_fake_metadata": True},
         config=JsonProtocolConfig(schema_version=123),
-        labware=[],
+        labware_definitions=[],
     )
 
     protocol_resource = ProtocolResource(

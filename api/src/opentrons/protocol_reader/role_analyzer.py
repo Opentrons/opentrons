@@ -86,7 +86,8 @@ class RoleAnalyzer:
         else:
             main_file = main_file_candidates[0]
 
-        # ignore extra custom labware files for JSON protocols
+        # ignore extra custom labware files for JSON protocols, while
+        # maintaining a reference to the protocol's labware
         if isinstance(main_file.data, JsonProtocol):
             labware_files = []
             labware_definitions = list(main_file.data.labwareDefinitions.values())

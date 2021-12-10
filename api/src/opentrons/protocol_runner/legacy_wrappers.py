@@ -88,6 +88,8 @@ class LegacyFileReader:
 class LegacyContextCreator:
     """Interface to construct Protocol API v2 contexts."""
 
+    _ContextImplementation = LegacyProtocolContextImplementation
+
     def __init__(
         self,
         hardware_api: HardwareAPI,
@@ -117,7 +119,7 @@ class LegacyContextCreator:
         return LegacyProtocolContext(
             api_version=api_version,
             labware_offset_provider=self._labware_offset_provider,
-            implementation=LegacyProtocolContextImplementation(
+            implementation=self._ContextImplementation(
                 hardware=self._hardware_api,
                 api_version=api_version,
                 extra_labware=extra_labware,
@@ -126,28 +128,13 @@ class LegacyContextCreator:
 
 
 class LegacySimulatingContextCreator(LegacyContextCreator):
-    def create(self, protocol: LegacyProtocol) -> LegacyProtocolContext:
-        """Create a simulating Protocol API v2 context.
+    """Interface to construct PAPIv2 contexts using simlulating implementations.
 
-        Avoids some calls to the hardware API for performance.
-        See `opentrons.protocols.context.simulator`.
-        """
-        api_version = protocol.api_level
-        extra_labware = (
-            protocol.extra_labware
-            if isinstance(protocol, LegacyPythonProtocol)
-            else None
-        )
+    Avoids some calls to the hardware API for performance.
+    See `opentrons.protocols.context.simulator`.
+    """
 
-        return LegacyProtocolContext(
-            api_version=api_version,
-            labware_offset_provider=self._labware_offset_provider,
-            implementation=LegacyProtocolContextSimulation(
-                hardware=self._hardware_api,
-                api_version=api_version,
-                extra_labware=extra_labware,
-            ),
-        )
+    _ContextImplementation = LegacyProtocolContextSimulation
 
 
 class LegacyExecutor:
