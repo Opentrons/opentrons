@@ -14,6 +14,7 @@ def check_health_response(response: Response) -> None:
         "board_revision": "2.1",
         "logs": ["/logs/serial.log", "/logs/api.log", "/logs/server.log"],
         "system_version": config.OT_SYSTEM_VERSION,
+        "robot_model": "OT-2 Standard",
         "minimum_protocol_api_version": minimum_version,
         "maximum_protocol_api_version": maximum_version,
         "links": {

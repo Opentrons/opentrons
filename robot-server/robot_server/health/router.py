@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, status
 
 from opentrons import __version__, config, protocol_api
 from opentrons.hardware_control import API as HardwareAPI
+from opentrons.config.feature_flags import enable_ot3_hardware_controller
 
 from robot_server.hardware import get_hardware
 from robot_server.service.legacy.models import V1BasicResponse
@@ -43,6 +44,7 @@ async def get_health(hardware: HardwareAPI = Depends(get_hardware)) -> Health:
         system_version=config.OT_SYSTEM_VERSION,
         maximum_protocol_api_version=list(protocol_api.MAX_SUPPORTED_VERSION),
         minimum_protocol_api_version=list(protocol_api.MIN_SUPPORTED_VERSION),
+        robot_model='OT-3 Standard' if enable_ot3_hardware_controller() else 'OT-2 Standard',
         links=HealthLinks(
             apiLog="/logs/api.log",
             serialLog="/logs/serial.log",
