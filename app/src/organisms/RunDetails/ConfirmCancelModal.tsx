@@ -7,8 +7,8 @@ import {
   SPACING_3,
 } from '@opentrons/components'
 
-import { Portal } from '../../../App/portal'
-import { useCurrentRunControls } from './hooks'
+import { Portal } from '../../App/portal'
+import { useRunControls } from '../RunTimeControl/hooks'
 
 export interface ConfirmCancelModalProps {
   onClose: () => unknown
@@ -18,11 +18,11 @@ export function ConfirmCancelModal(
   props: ConfirmCancelModalProps
 ): JSX.Element {
   const { onClose } = props
-  const { stopRun } = useCurrentRunControls()
+  const { stop } = useRunControls()
   const { t } = useTranslation('run_details')
 
   const cancel = (): void => {
-    stopRun()
+    stop()
     onClose()
   }
 

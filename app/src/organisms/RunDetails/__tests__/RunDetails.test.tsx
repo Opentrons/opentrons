@@ -14,7 +14,7 @@ import { RunDetails } from '..'
 import { i18n } from '../../../i18n'
 import { CommandList } from '../CommandList'
 import { useProtocolDetails } from '../hooks'
-import { useRunStatus } from '../../RunTimeControl/hooks'
+import { useRunStatus, useRunControls } from '../../RunTimeControl/hooks'
 import { useCloseCurrentRun } from '../../ProtocolUpload/hooks/useCloseCurrentRun'
 import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
 import type { ProtocolFile } from '@opentrons/shared-data'
@@ -32,7 +32,9 @@ const mockCommandList = CommandList as jest.MockedFunction<typeof CommandList>
 const mockUseRunStatus = useRunStatus as jest.MockedFunction<
   typeof useRunStatus
 >
-
+const mockUseRunControls = useRunControls as jest.MockedFunction<
+  typeof useRunControls
+>
 const mockUseCloseCurrentRun = useCloseCurrentRun as jest.MockedFunction<
   typeof useCloseCurrentRun
 >
@@ -64,6 +66,19 @@ describe('RunDetails', () => {
         isProtocolRunLoaded: true,
         closeCurrentRun: jest.fn(),
       } as any)
+
+    when(mockUseRunControls)
+      .calledWith()
+      .mockReturnValue({
+        play: jest.fn(),
+        pause: jest.fn(),
+        stop: jest.fn(),
+        reset: jest.fn(),
+        isPlayRunActionLoading: false,
+        isPauseRunActionLoading: false,
+        isStopRunActionLoading: false,
+        isResetRunLoading: false,
+      })
   })
 
   afterEach(() => {

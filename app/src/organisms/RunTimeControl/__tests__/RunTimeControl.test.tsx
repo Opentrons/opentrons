@@ -70,9 +70,11 @@ describe('RunTimeControl', () => {
       .mockReturnValue({
         play: () => {},
         pause: () => {},
+        stop: () => {},
         reset: () => {},
         isPlayRunActionLoading: false,
         isPauseRunActionLoading: false,
+        isStopRunActionLoading: false,
         isResetRunLoading: false,
       })
     when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_IDLE)
@@ -122,9 +124,11 @@ describe('RunTimeControl', () => {
       .mockReturnValue({
         play: () => {},
         pause: () => {},
+        stop: () => {},
         reset: () => {},
         isPlayRunActionLoading: true,
         isPauseRunActionLoading: false,
+        isStopRunActionLoading: false,
         isResetRunLoading: false,
       })
     const [{ getByRole }] = render()
@@ -137,9 +141,11 @@ describe('RunTimeControl', () => {
       .mockReturnValue({
         play: () => {},
         pause: () => {},
+        stop: () => {},
         reset: () => {},
         isPlayRunActionLoading: false,
         isPauseRunActionLoading: true,
+        isStopRunActionLoading: false,
         isResetRunLoading: false,
       })
     when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_RUNNING)
@@ -153,9 +159,11 @@ describe('RunTimeControl', () => {
       .mockReturnValue({
         play: () => {},
         pause: () => {},
+        stop: () => {},
         reset: () => {},
         isPlayRunActionLoading: false,
         isPauseRunActionLoading: false,
+        isStopRunActionLoading: false,
         isResetRunLoading: true,
       })
     when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_SUCCEEDED)

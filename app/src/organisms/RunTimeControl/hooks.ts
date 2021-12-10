@@ -24,9 +24,11 @@ import { useCurrentProtocolRun } from '../ProtocolUpload/hooks/useCurrentProtoco
 interface RunControls {
   play: () => void
   pause: () => void
+  stop: () => void
   reset: () => void
   isPlayRunActionLoading: boolean
   isPauseRunActionLoading: boolean
+  isStopRunActionLoading: boolean
   isResetRunLoading: boolean
 }
 
@@ -38,8 +40,10 @@ export function useRunControls(): RunControls {
   const {
     playRun,
     pauseRun,
+    stopRun,
     isPlayRunActionLoading,
     isPauseRunActionLoading,
+    isStopRunActionLoading,
   } = useRunActionMutations(currentRunId as string)
 
   const { cloneRun, isLoading: isResetRunLoading } = useCloneRun(
@@ -58,9 +62,11 @@ export function useRunControls(): RunControls {
   return {
     play,
     pause,
+    stop,
     reset,
     isPlayRunActionLoading,
     isPauseRunActionLoading,
+    isStopRunActionLoading,
     isResetRunLoading,
   }
 }
