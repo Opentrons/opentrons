@@ -73,7 +73,7 @@ def find_initial_speed(
             log.debug("started from 0, using max speed dc")
             axis_speed_limit = axis_constraints.max_speed_discont / axis_component
 
-        elif np.sign(prev_move.unit_vector[axis.value]) == np.sign(axis_component):
+        elif prev_move.unit_vector[axis.value] * axis_component > 0:
             # If we're moving the same direction as the previous move we have a chance to remain going nice
             # and fast. We should try and start at its final speed, or - if its final speed is under the
             # discontinuity speed - the discontinuity speed
@@ -90,7 +90,7 @@ def find_initial_speed(
                 f"from prev final {previous_axis_final_speed} and dc {axis_constraints.max_speed_discont}"
             )
 
-        elif np.sign(prev_move.unit_vector[axis.value]) != np.sign(axis_component):
+        elif prev_move.unit_vector[axis.value] * axis_component < 0:
             # If we are changing directions, we should start at our direction-change discontinuity speed
             axis_speed_limit = abs(
                 axis_constraints.max_direction_change_speed_discont / axis_component
@@ -100,8 +100,7 @@ def find_initial_speed(
         else:
             assert False, "planning initial speed failed"
 
-        if axis_speed_limit / initial_speed < 1:
-            initial_speed = axis_speed_limit
+        initial_speed = min(axis_speed_limit, initial_speed)
 
     log.debug(f"Initial speed: {initial_speed}")
     return initial_speed
@@ -134,7 +133,7 @@ def find_final_speed(
             log.debug("stopping, using max speed dc")
             axis_speed_limit = axis_constraints.max_speed_discont / axis_component
 
-        elif np.sign(next_move.unit_vector[axis.value]) == np.sign(axis_component):
+        elif next_move.unit_vector[axis.value] * axis_component > 0:
             # if we're continuing in the same direction, then we should try to go as fast as we can. the
             # subsequent move is going to try to make its initial speed match ours if possible, so we should
             # use the larger of its initial speed or the discontinuity
@@ -150,7 +149,7 @@ def find_final_speed(
                 f"same dir, using axis speed {axis_speed_limit} from next move {next_initial_speed}"
             )
 
-        elif np.sign(next_move.unit_vector[axis.value]) != np.sign(axis_component):
+        elif next_move.unit_vector[axis.value] * axis_component < 0:
             # if we're changing direction, then we should be good neighbors and prepare ourselves
             log.debug("changed direction")
             axis_speed_limit = abs(
@@ -158,8 +157,9 @@ def find_final_speed(
             )
         else:
             assert False, "planning final speed failed"
-        if axis_speed_limit / final_speed < 1:
-            final_speed = axis_speed_limit
+
+        final_speed = min(axis_speed_limit, final_speed)
+
     log.debug(f"Final speed: {final_speed}")
     return final_speed
 
