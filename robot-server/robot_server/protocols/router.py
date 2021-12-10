@@ -1,5 +1,7 @@
 """Router for /protocols endpoints."""
+import logging
 from datetime import datetime
+
 from fastapi import APIRouter, Depends, File, UploadFile, status
 from typing import List
 from typing_extensions import Literal
@@ -25,6 +27,9 @@ from .dependencies import (
     get_analysis_store,
     get_protocol_analyzer,
 )
+
+
+log = logging.getLogger(__name__)
 
 
 class ProtocolNotFound(ErrorDetails):
@@ -117,6 +122,9 @@ async def create_protocol(
         files=[ProtocolFile(name=f.name, role=f.role) for f in source.files],
     )
 
+    log.info(
+        f'Created protocol "{protocol_id}"' f' and started analysis "{analysis_id}".'
+    )
     return SimpleResponseModel(data=data)
 
 
