@@ -1,7 +1,6 @@
 import {
   RunData,
   RUN_STATUS_STOPPED,
-  RUN_STATUS_SUCCEEDED,
   RUN_ACTION_TYPE_PLAY,
 } from '@opentrons/api-client'
 
