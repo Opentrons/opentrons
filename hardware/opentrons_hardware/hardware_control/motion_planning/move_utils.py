@@ -62,11 +62,13 @@ def find_initial_speed(
         axis_component = move.unit_vector[axis.value]
         axis_constraints = constraints[axis]
 
-        if not axis_component or not prev_move:
+        if not axis_component:
             log.debug(f"Skip {axis} because it is not moving")
             continue
 
-        elif (not prev_move.unit_vector[axis.value]) or prev_move.final_speed == 0:
+        elif (
+            not prev_move or not prev_move.unit_vector[axis.value]
+        ) or prev_move.final_speed == 0:
             # If we're previously stopped, we can use our maximum speed discontinuity to start
             log.debug("started from 0, using max speed dc")
             axis_speed_limit = axis_constraints.max_speed_discont / axis_component
@@ -76,13 +78,13 @@ def find_initial_speed(
             # and fast. We should try and start at its final speed, or - if its final speed is under the
             # discontinuity speed - the discontinuity speed
 
-            previous_axis_final_speed = (
+            previous_axis_final_speed = abs(
                 prev_move.final_speed * prev_move.unit_vector[axis.value]
             )
             axis_initial_limit = max(
                 previous_axis_final_speed, axis_constraints.max_speed_discont
             )
-            axis_speed_limit = axis_initial_limit / axis_component
+            axis_speed_limit = abs(axis_initial_limit / axis_component)
             log.debug(
                 f"starting from same-dir, using {initial_speed} "
                 f"from prev final {previous_axis_final_speed} and dc {axis_constraints.max_speed_discont}"
@@ -90,7 +92,7 @@ def find_initial_speed(
 
         elif np.sign(prev_move.unit_vector[axis.value]) != np.sign(axis_component):
             # If we are changing directions, we should start at our direction-change discontinuity speed
-            axis_speed_limit = (
+            axis_speed_limit = abs(
                 axis_constraints.max_direction_change_speed_discont / axis_component
             )
             log.debug("changed direction, using change discont")
@@ -136,13 +138,13 @@ def find_final_speed(
             # if we're continuing in the same direction, then we should try to go as fast as we can. the
             # subsequent move is going to try to make its initial speed match ours if possible, so we should
             # use the larger of its initial speed or the discontinuity
-            next_initial_speed = (
+            next_initial_speed = abs(
                 next_move.initial_speed * next_move.unit_vector[axis.value]
             )
             axis_initial_limit = max(
                 axis_constraints.max_speed_discont, next_initial_speed
             )
-            axis_speed_limit = axis_initial_limit / axis_component
+            axis_speed_limit = abs(axis_initial_limit / axis_component)
 
             log.debug(
                 f"same dir, using axis speed {axis_speed_limit} from next move {next_initial_speed}"
@@ -151,7 +153,7 @@ def find_final_speed(
         elif np.sign(next_move.unit_vector[axis.value]) != np.sign(axis_component):
             # if we're changing direction, then we should be good neighbors and prepare ourselves
             log.debug("changed direction")
-            axis_speed_limit = (
+            axis_speed_limit = abs(
                 axis_constraints.max_direction_change_speed_discont / axis_component
             )
         else:
@@ -169,28 +171,32 @@ def achievable_final(
     # allowed, and if not return the biggest one that is
     log = logging.getLogger("achievable_final")
 
-    assert initial_speed <= move.max_speed, "check preconstraints for initial speed"
-    assert final_speed <= move.max_speed, "check preconstraints for final speed"
+    # assert initial_speed <= move.max_speed, "check preconstraints for initial speed"
+    # assert final_speed <= move.max_speed, "check preconstraints for final speed"
 
-    ## TODO: element wise comparison for both initial_speed & final_Speed
-    #     if initial_speed <= constraints.max_speed_discont and final_speed <= constraints.max_speed_discont:
-    #         # this will work fine - the entire thing is underneath the discontinuity speed and we can jump
-    #         # around however
-    #         return final_speed
+    # try:
+    #     for axis in Axis.get_all_axes():
+    #         axis_limit = constraints[axis].max_speed_discont
+    #         assert initial_speed * move.unit_vector[axis.value] <= axis_limit
+    #         assert final_speed * move.unit_vector[axis.value] <= axis_limit
+    #     log.debug(f"Final speed {final_speed} is achievable")
+    #     return final_speed
+    # except AssertionError:
+    #     pass
 
-    # The maximum amount of delta-speed we can achieve in the distance we have with the maximum acceleration we have.
-    # the formula is v_f ^ 2 = v_0 ^ 2 + 2*a*d; for pure allowable change in velocity we consider v_0 = 0
-    achievable_final_speed = final_speed
-    initial_speed_vectors = np.multiply(initial_speed, move.unit_vector)
+    # # The maximum amount of delta-speed we can achieve in the distance we have with the maximum acceleration we have.
+    # # the formula is v_f ^ 2 = v_0 ^ 2 + 2*a*d; for pure allowable change in velocity we consider v_0 = 0
+    # achievable_final_speed = final_speed
+    # initial_speed_vectors = np.multiply(initial_speed, move.unit_vector)
 
-    max_acceleration_vector = [
+    max_acceleration = [
         constraints[axis].max_acceleration for axis in Axis.get_all_axes()
     ]
 
-    acceleration = np.dot(max_acceleration_vector, move.unit_vector)  # type: ignore[no-untyped-call]
+    acceleration = np.dot(  # type: ignore[no-untyped-call]
+        np.multiply(max_acceleration, move.unit_vector), move.unit_vector
+    )
     acceleration = math.copysign(acceleration, final_speed - initial_speed)
-
-    ## TODO: doublecheck the acceleration elementwise is  == max_acceleration_vector
 
     max_achievable_final_speed_sq = (
         initial_speed ** 2 + 2 * acceleration * move.distance
