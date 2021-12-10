@@ -12,7 +12,7 @@ export const getMostRecentRunStatus = (mostRecentRun: RunData) => {
     } else {
       return 'not started'
     }
-  } else if (mostRecentRun.status === RUN_STATUS_SUCCEEDED) {
+  } else {
     return 'complete'
   }
 }
