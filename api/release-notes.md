@@ -12,11 +12,7 @@ The 5.0.0 release of the OT-2 Software transitions to a new mechanism for ingest
 
 ## New Features
 
-- TODO
-
-## Bug Fixes
-
-- TODO
+- - Hey Beta testers! There are no api differences in version 5.0.0-beta.2 as compared to version 5.0.0-beta.1
 
 ---
 

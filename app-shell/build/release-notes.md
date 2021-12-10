@@ -10,13 +10,9 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 The 5.0.0 release reshapes the way a user uploads and sets up protocols to run on the robot.
 
-## New Features
-
-- TODO
-
 ## Bug Fixes
 
-- TODO
+- Hey Beta testers! Version 5.0.0-beta.2 includes a couple of fixes including a bug in version 5.0.0-beta.1 that prevented users from proceeding to the run tab
 
 ---
 

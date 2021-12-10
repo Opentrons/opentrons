@@ -36,8 +36,9 @@ from opentrons.protocols.types import (
     PythonProtocol as LegacyPythonProtocol,
 )
 
-from .protocol_source import ProtocolSource
+from opentrons.protocol_reader import ProtocolSource
 from .legacy_labware_offset_provider import LegacyLabwareOffsetProvider
+
 
 # The earliest Python Protocol API version ("apiLevel") where the protocol's simulation
 # and execution will be handled by Protocol Engine, rather than the legacy machinery.
@@ -59,9 +60,7 @@ class LegacyFileReader:
     @staticmethod
     def read(protocol_source: ProtocolSource) -> LegacyProtocol:
         """Read a PAPIv2 protocol into a datastructure."""
-        # TODO(mc, 2021-09-17): access the "main file" in a more
-        # explicit way than the first entry in the files list
-        protocol_file_path = protocol_source.files[0]
+        protocol_file_path = protocol_source.main_file
         protocol_contents = protocol_file_path.read_text()
 
         return parse(

@@ -2,6 +2,7 @@
 import pytest
 from decoy import Decoy
 from datetime import datetime
+from pathlib import Path
 
 from opentrons.types import MountType, DeckSlotName
 from opentrons.protocol_engine import (
@@ -9,7 +10,8 @@ from opentrons.protocol_engine import (
     errors as pe_errors,
     types as pe_types,
 )
-from opentrons.protocol_runner import ProtocolRunner, ProtocolRunData, JsonPreAnalysis
+from opentrons.protocol_runner import ProtocolRunner, ProtocolRunData
+from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
 
 from robot_server.protocols.analysis_store import AnalysisStore
 from robot_server.protocols.protocol_store import ProtocolResource
@@ -46,12 +48,17 @@ async def test_analyze(
     analysis_store: AnalysisStore,
     subject: ProtocolAnalyzer,
 ) -> None:
-    """It should be able to analyize a protocol."""
+    """It should be able to analyze a protocol."""
     protocol_resource = ProtocolResource(
         protocol_id="protocol-id",
-        pre_analysis=JsonPreAnalysis(schema_version=123, metadata={}),
         created_at=datetime(year=2021, month=1, day=1),
-        files=[],
+        source=ProtocolSource(
+            directory=Path("/dev/null"),
+            main_file=Path("/dev/null/abc.json"),
+            config=JsonProtocolConfig(schema_version=123),
+            files=[],
+            metadata={},
+        ),
     )
 
     analysis_command = pe_commands.Pause(
@@ -82,7 +89,7 @@ async def test_analyze(
         mount=MountType.LEFT,
     )
 
-    decoy.when(await protocol_runner.run(protocol_resource)).then_return(
+    decoy.when(await protocol_runner.run(protocol_resource.source)).then_return(
         ProtocolRunData(
             commands=[analysis_command],
             errors=[analysis_error],

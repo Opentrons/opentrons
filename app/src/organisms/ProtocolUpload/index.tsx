@@ -28,6 +28,7 @@ import { useCloseCurrentRun } from './hooks/useCloseCurrentRun'
 import { loadProtocol } from '../../redux/protocol/actions'
 import { ingestProtocolFile } from '../../redux/protocol/utils'
 import { getConnectedRobotName } from '../../redux/robot/selectors'
+import { getValidCustomLabwareFiles } from '../../redux/custom-labware/selectors'
 
 import { ConfirmExitProtocolUploadModal } from './ConfirmExitProtocolUploadModal'
 
@@ -54,6 +55,9 @@ export function ProtocolUpload(): JSX.Element {
 
   const { closeCurrentRun, isProtocolRunLoaded } = useCloseCurrentRun()
   const robotName = useSelector((state: State) => getConnectedRobotName(state))
+  const customLabwareFiles = useSelector((state: State) =>
+    getValidCustomLabwareFiles(state)
+  )
 
   const logger = useLogger(__filename)
   const [uploadError, setUploadError] = React.useState<
@@ -84,12 +88,13 @@ export function ProtocolUpload(): JSX.Element {
   }, [uploadError])
 
   const handleUpload = (file: File): void => {
+    const protocolFiles = [file, ...customLabwareFiles]
     clearError()
     ingestProtocolFile(
       file,
       (file, data) => {
         dispatch(loadProtocol(file, data))
-        createProtocolRun([file])
+        createProtocolRun(protocolFiles)
       },
       (errorKey, errorDetails) => {
         logger.warn(errorKey)

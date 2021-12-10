@@ -11,11 +11,8 @@ from decoy import matchers
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_engine import commands
-from opentrons.protocol_runner import (
-    ProtocolSource,
-    PythonPreAnalysis,
-    create_simulating_runner,
-)
+from opentrons.protocol_reader import ProtocolSource, PythonProtocolConfig
+from opentrons.protocol_runner import create_simulating_runner
 
 
 PICK_UP_TIP_PROTOCOL = textwrap.dedent(
@@ -69,8 +66,11 @@ def pick_up_tip_protocol_file(tmp_path: Path) -> Path:
 async def test_legacy_pick_up_tip(pick_up_tip_protocol_file: Path) -> None:
     """It should map legacy pick up tip commands."""
     protocol_source = ProtocolSource(
-        files=[pick_up_tip_protocol_file],
-        pre_analysis=PythonPreAnalysis(metadata={}, api_version=APIVersion(2, 11)),
+        directory=pick_up_tip_protocol_file.parent,
+        main_file=pick_up_tip_protocol_file,
+        config=PythonProtocolConfig(api_version=APIVersion(2, 11)),
+        files=[],
+        metadata={},
     )
 
     subject = await create_simulating_runner()
