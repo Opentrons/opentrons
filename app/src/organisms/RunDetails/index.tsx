@@ -19,6 +19,7 @@ import {
   useConditionalConfirm,
 } from '@opentrons/components'
 import { Page } from '../../atoms/Page'
+import { Portal } from '../../App/portal'
 import { useProtocolDetails } from './hooks'
 import { useRunStatus, useRunStartTime } from '../RunTimeControl/hooks'
 import { ConfirmCancelModal } from '../../pages/Run/RunLog'
@@ -28,7 +29,6 @@ import { useCurrentRunControls } from '../../pages/Run/RunLog/hooks'
 import { CommandList } from './CommandList'
 
 import styles from '../ProtocolUpload/styles.css'
-import { Portal } from '../../App/portal'
 
 export function RunDetails(): JSX.Element | null {
   const { t } = useTranslation(['run_details', 'shared'])
