@@ -153,7 +153,7 @@ async def create_run(
     )
 
     run_store.upsert(run=run)
-    log.info(f'Created run "{run_id}".')
+    log.info(f'Created protocol run "{run_id}" from protocol "{protocol_id}".')
 
     data = Run(
         id=run_id,
