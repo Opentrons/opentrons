@@ -10,9 +10,13 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 The 5.0.0 release of the OT-2 Software transitions to a new mechanism for ingesting and running protocols.
 
-## New Features
+### New Features
 
-- - Hey Beta testers! There are no api differences in version 5.0.0-beta.2 as compared to version 5.0.0-beta.1
+- TODO
+
+### Bug Fixes
+
+- TODO
 
 ---
 
