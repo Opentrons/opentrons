@@ -12,6 +12,7 @@ from .actions import (
     ActionDispatcher,
     PlayAction,
     PauseAction,
+    PauseSource,
     StopAction,
     FinishAction,
     FinishErrorDetails,
@@ -82,7 +83,7 @@ class ProtocolEngine:
 
     def pause(self) -> None:
         """Pause executing commands in the queue."""
-        action = PauseAction()
+        action = PauseAction(source=PauseSource.CLIENT)
         self._state_store.commands.validate_action_allowed(action)
         self._action_dispatcher.dispatch(action)
 

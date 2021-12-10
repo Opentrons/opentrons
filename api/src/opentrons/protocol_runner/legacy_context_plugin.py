@@ -94,7 +94,10 @@ class LegacyContextPlugin(AbstractPlugin):
         if isinstance(action, pe_actions.PlayAction):
             self._hardware_api.resume(HardwarePauseType.PAUSE)
 
-        elif isinstance(action, pe_actions.PauseAction):
+        elif (
+            isinstance(action, pe_actions.PauseAction)
+            and action.source == pe_actions.PauseSource.CLIENT
+        ):
             self._hardware_api.pause(HardwarePauseType.PAUSE)
 
     def _dispatch_legacy_command(self, command: LegacyCommand) -> None:

@@ -23,6 +23,7 @@ from opentrons.protocol_engine.actions import (
     AddLabwareOffsetAction,
     PlayAction,
     PauseAction,
+    PauseSource,
     StopAction,
     FinishAction,
     FinishErrorDetails,
@@ -222,11 +223,13 @@ def test_pause(
     subject: ProtocolEngine,
 ) -> None:
     """It should be able to pause executing queued commands."""
+    expected_action = PauseAction(source=PauseSource.CLIENT)
+
     subject.pause()
 
     decoy.verify(
-        state_store.commands.validate_action_allowed(PauseAction()),
-        action_dispatcher.dispatch(PauseAction()),
+        state_store.commands.validate_action_allowed(expected_action),
+        action_dispatcher.dispatch(expected_action),
     )
 
 

@@ -16,6 +16,7 @@ from opentrons.protocol_engine.actions import (
     FailCommandAction,
     PlayAction,
     PauseAction,
+    PauseSource,
     FinishAction,
     FinishErrorDetails,
     StopAction,
@@ -199,10 +200,11 @@ def test_command_store_preserves_handle_order() -> None:
     )
 
 
-def test_command_store_handles_pause_action() -> None:
+@pytest.mark.parametrize("pause_source", PauseSource)
+def test_command_store_handles_pause_action(pause_source: PauseSource) -> None:
     """It should clear the running flag on pause."""
     subject = CommandStore()
-    subject.handle_action(PauseAction())
+    subject.handle_action(PauseAction(source=pause_source))
 
     assert subject.state == CommandState(
         is_running_queue=False,
@@ -214,10 +216,11 @@ def test_command_store_handles_pause_action() -> None:
     )
 
 
-def test_command_store_handles_play_action() -> None:
+@pytest.mark.parametrize("pause_source", PauseSource)
+def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
     """It should set the running flag on play."""
     subject = CommandStore()
-    subject.handle_action(PauseAction())
+    subject.handle_action(PauseAction(source=pause_source))
     subject.handle_action(PlayAction())
 
     assert subject.state == CommandState(

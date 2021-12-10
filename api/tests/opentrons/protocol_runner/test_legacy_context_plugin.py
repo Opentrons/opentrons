@@ -97,10 +97,13 @@ def test_pause_action(
     subject: LegacyContextPlugin,
 ) -> None:
     """It should pause the hardware controller upon a pause action."""
-    action = pe_actions.PauseAction()
-    subject.handle_action(action)
+    subject.handle_action(
+        pe_actions.PauseAction(source=pe_actions.PauseSource.PROTOCOL)
+    )
+    decoy.verify(hardware_api.pause(PauseType.PAUSE), times=0)
 
-    decoy.verify(hardware_api.pause(PauseType.PAUSE))
+    subject.handle_action(pe_actions.PauseAction(source=pe_actions.PauseSource.CLIENT))
+    decoy.verify(hardware_api.pause(PauseType.PAUSE), times=1)
 
 
 def test_broker_subscribe_unsubscribe(
