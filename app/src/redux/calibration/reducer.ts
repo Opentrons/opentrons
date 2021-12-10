@@ -1,5 +1,4 @@
 import * as Constants from './constants'
-import * as labware from './labware'
 import * as pipetteOffset from './pipette-offset'
 import * as tipLength from './tip-length'
 
@@ -11,7 +10,6 @@ const INITIAL_STATE: CalibrationState = {}
 
 const INITIAL_PER_ROBOT_STATE: PerRobotCalibrationState = {
   calibrationStatus: null,
-  labwareCalibrations: null,
   pipetteOffsetCalibrations: null,
   tipLengthCalibrations: null,
 }
@@ -26,13 +24,6 @@ export const calibrationReducer: Reducer<CalibrationState, Action> = (
       const robotState = state[robotName] ?? INITIAL_PER_ROBOT_STATE
 
       return { ...state, [robotName]: { ...robotState, calibrationStatus } }
-    }
-
-    case labware.FETCH_LABWARE_CALIBRATIONS_SUCCESS: {
-      const { robotName, labwareCalibrations } = action.payload
-      const robotState = state[robotName] ?? INITIAL_PER_ROBOT_STATE
-
-      return { ...state, [robotName]: { ...robotState, labwareCalibrations } }
     }
 
     case pipetteOffset.FETCH_PIPETTE_OFFSET_CALIBRATIONS_SUCCESS: {
