@@ -1,18 +1,26 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { AlertModal } from '@opentrons/components'
+import { AlertModal, SecondaryBtn, SPACING_3 } from '@opentrons/components'
 
 import { Portal } from '../../../App/portal'
 import { useCurrentRunControls } from './hooks'
 
 export interface ConfirmCancelModalProps {
   onClose: () => unknown
+  secondaryBtnColor?: string
+  primaryBtnColor?: string
+  primaryBtnColorText?: string
 }
 
 export function ConfirmCancelModal(
   props: ConfirmCancelModalProps
 ): JSX.Element {
-  const { onClose } = props
+  const {
+    onClose,
+    secondaryBtnColor,
+    primaryBtnColor,
+    primaryBtnColorText,
+  } = props
   const { stopRun } = useCurrentRunControls()
   const { t } = useTranslation('run_details')
 
@@ -26,8 +34,25 @@ export function ConfirmCancelModal(
       <AlertModal
         heading={t('cancel_run_modal_heading')}
         buttons={[
-          { children: t('cancel_run_modal_back'), onClick: onClose },
-          { children: t('cancel_run_modal_confirm'), onClick: cancel },
+          {
+            Component: () => (
+              <SecondaryBtn onClick={onClose} color={secondaryBtnColor}>
+                {t('cancel_run_modal_back')}
+              </SecondaryBtn>
+            ),
+          },
+          {
+            Component: () => (
+              <SecondaryBtn
+                onClick={cancel}
+                marginLeft={SPACING_3}
+                backgroundColor={primaryBtnColor}
+                color={primaryBtnColorText}
+              >
+                {t('cancel_run_modal_confirm')}
+              </SecondaryBtn>
+            ),
+          },
         ]}
         alertOverlay
       >

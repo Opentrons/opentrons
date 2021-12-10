@@ -7,9 +7,6 @@ import {
   RUN_STATUS_RUNNING,
   RUN_STATUS_PAUSED,
   RUN_STATUS_PAUSE_REQUESTED,
-  RUN_STATUS_STOPPED,
-  RUN_STATUS_FAILED,
-  RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
 import {
   NewAlertPrimaryBtn,
@@ -17,6 +14,8 @@ import {
   SPACING_2,
   SPACING_3,
   useConditionalConfirm,
+  C_BLUE,
+  C_WHITE,
 } from '@opentrons/components'
 import { Page } from '../../atoms/Page'
 import { Portal } from '../../App/portal'
@@ -93,11 +92,7 @@ export function RunDetails(): JSX.Element | null {
       title: t('protocol_title', { protocol_name: displayName }),
       rightNode: cancelRunButton,
     }
-  } else if (
-    adjustedRunStatus === RUN_STATUS_SUCCEEDED ||
-    adjustedRunStatus === RUN_STATUS_STOPPED ||
-    adjustedRunStatus === RUN_STATUS_FAILED
-  ) {
+  } else {
     titleBarProps = {
       title: t('protocol_title', { protocol_name: displayName }),
       back: {
@@ -107,10 +102,6 @@ export function RunDetails(): JSX.Element | null {
         iconName: 'close' as const,
       },
       className: styles.reverse_titlebar_items,
-    }
-  } else {
-    titleBarProps = {
-      title: t('protocol_title', { protocol_name: displayName }),
     }
   }
 
@@ -125,7 +116,14 @@ export function RunDetails(): JSX.Element | null {
         </Portal>
       )}
       <Page titleBarProps={titleBarProps}>
-        {showConfirmExit ? <ConfirmCancelModal onClose={cancelExit} /> : null}
+        {showConfirmExit ? (
+          <ConfirmCancelModal
+            onClose={cancelExit}
+            secondaryBtnColor={C_BLUE}
+            primaryBtnColor={C_BLUE}
+            primaryBtnColorText={C_WHITE}
+          />
+        ) : null}
         <CommandList />
       </Page>
     </>
