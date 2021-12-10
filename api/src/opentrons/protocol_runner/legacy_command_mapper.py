@@ -2,7 +2,7 @@
 
 from collections import defaultdict
 from datetime import datetime
-from typing import Dict, Union, Optional
+from typing import Dict, List, Optional
 
 from opentrons.types import MountType, DeckSlotName
 from opentrons.commands import types as legacy_command_types
@@ -78,7 +78,7 @@ class LegacyCommandMapper:
     def map_command(
         self,
         command: legacy_command_types.CommandMessage,
-    ) -> Union[pe_actions.UpdateCommandAction, pe_actions.FailCommandAction]:
+    ) -> List[pe_actions.Action]:
         """Map a legacy Broker command to a ProtocolEngine command.
 
         A "before" message from the Broker
@@ -96,8 +96,9 @@ class LegacyCommandMapper:
         # TODO(mc, 2021-12-08): use message ID as command ID directly once
         # https://github.com/Opentrons/opentrons/issues/8986 is resolved
         broker_id = command["id"]
-
         now = ModelUtils.get_timestamp()
+
+        results: List[pe_actions.Action] = []
 
         if stage == "before":
             count = self._command_count[command_type]
@@ -107,7 +108,7 @@ class LegacyCommandMapper:
             self._command_count[command_type] = count + 1
             self._commands_by_broker_id[broker_id] = engine_command
 
-            return pe_actions.UpdateCommandAction(engine_command)
+            results.append(pe_actions.UpdateCommandAction(engine_command))
 
         elif stage == "after":
             running_command = self._commands_by_broker_id[broker_id]
@@ -119,15 +120,24 @@ class LegacyCommandMapper:
                         "completedAt": now,
                     }
                 )
-                return pe_actions.UpdateCommandAction(completed_command)
+                results.append(pe_actions.UpdateCommandAction(completed_command))
+
+                if isinstance(completed_command, pe_commands.Pause):
+                    results.append(
+                        pe_actions.PauseAction(source=pe_actions.PauseSource.PROTOCOL)
+                    )
 
             else:
-                return pe_actions.FailCommandAction(
-                    command_id=running_command.id,
-                    error_id=ModelUtils.generate_id(),
-                    failed_at=now,
-                    error=LegacyContextCommandError(str(command_error)),
+                results.append(
+                    pe_actions.FailCommandAction(
+                        command_id=running_command.id,
+                        error_id=ModelUtils.generate_id(),
+                        failed_at=now,
+                        error=LegacyContextCommandError(str(command_error)),
+                    )
                 )
+
+        return results
 
     def map_labware_load(
         self, labware_load_info: LegacyLabwareLoadInfo
@@ -280,6 +290,17 @@ class LegacyCommandMapper:
                     pipetteId=pipette_id,
                     labwareId=labware_id,
                     wellName=well_name,
+                ),
+            )
+
+        elif command["name"] == legacy_command_types.PAUSE:
+            engine_command = pe_commands.Pause.construct(
+                id=command_id,
+                status=pe_commands.CommandStatus.RUNNING,
+                createdAt=now,
+                startedAt=now,
+                params=pe_commands.PauseParams.construct(
+                    message=command["payload"]["userMessage"],
                 ),
             )
 

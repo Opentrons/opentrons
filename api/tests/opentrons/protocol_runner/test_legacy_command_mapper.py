@@ -3,7 +3,7 @@ import pytest
 from decoy import matchers, Decoy
 from datetime import datetime
 
-from opentrons.commands.types import PauseMessage
+from opentrons.commands.types import CommentMessage, PauseMessage
 from opentrons.protocol_engine import (
     DeckSlotLocation,
     ModuleLocation,
@@ -38,45 +38,47 @@ def module_data_provider(decoy: Decoy) -> ModuleDataProvider:
 
 def test_map_before_command() -> None:
     """It should map a "before" message to a running command."""
-    legacy_command: PauseMessage = {
+    legacy_command: CommentMessage = {
         "$": "before",
         "id": "message-id",
-        "name": "command.PAUSE",
-        "payload": {"userMessage": "hello world", "text": "hello world"},
+        "name": "command.COMMENT",
+        "payload": {"text": "hello world"},
         "error": None,
     }
 
     subject = LegacyCommandMapper()
     result = subject.map_command(legacy_command)
 
-    assert result == pe_actions.UpdateCommandAction(
-        pe_commands.Custom.construct(
-            id="command.PAUSE-0",
-            status=pe_commands.CommandStatus.RUNNING,
-            createdAt=matchers.IsA(datetime),
-            startedAt=matchers.IsA(datetime),
-            params=LegacyCommandParams(
-                legacyCommandType="command.PAUSE",
-                legacyCommandText="hello world",
-            ),
+    assert result == [
+        pe_actions.UpdateCommandAction(
+            pe_commands.Custom.construct(
+                id="command.COMMENT-0",
+                status=pe_commands.CommandStatus.RUNNING,
+                createdAt=matchers.IsA(datetime),
+                startedAt=matchers.IsA(datetime),
+                params=LegacyCommandParams(
+                    legacyCommandType="command.COMMENT",
+                    legacyCommandText="hello world",
+                ),
+            )
         )
-    )
+    ]
 
 
 def test_map_after_command() -> None:
     """It should map an "after" message to a succeeded command."""
-    legacy_command_start: PauseMessage = {
+    legacy_command_start: CommentMessage = {
         "$": "before",
         "id": "message-id",
-        "name": "command.PAUSE",
-        "payload": {"userMessage": "hello world", "text": "hello world"},
+        "name": "command.COMMENT",
+        "payload": {"text": "hello world"},
         "error": None,
     }
-    legacy_command_end: PauseMessage = {
+    legacy_command_end: CommentMessage = {
         "$": "after",
         "id": "message-id",
-        "name": "command.PAUSE",
-        "payload": {"userMessage": "hello world", "text": "hello world"},
+        "name": "command.COMMENT",
+        "payload": {"text": "hello world"},
         "error": None,
     }
 
@@ -85,36 +87,38 @@ def test_map_after_command() -> None:
     _ = subject.map_command(legacy_command_start)
     result = subject.map_command(legacy_command_end)
 
-    assert result == pe_actions.UpdateCommandAction(
-        pe_commands.Custom.construct(
-            id="command.PAUSE-0",
-            status=pe_commands.CommandStatus.SUCCEEDED,
-            createdAt=matchers.IsA(datetime),
-            startedAt=matchers.IsA(datetime),
-            completedAt=matchers.IsA(datetime),
-            params=LegacyCommandParams(
-                legacyCommandType="command.PAUSE",
-                legacyCommandText="hello world",
-            ),
+    assert result == [
+        pe_actions.UpdateCommandAction(
+            pe_commands.Custom.construct(
+                id="command.COMMENT-0",
+                status=pe_commands.CommandStatus.SUCCEEDED,
+                createdAt=matchers.IsA(datetime),
+                startedAt=matchers.IsA(datetime),
+                completedAt=matchers.IsA(datetime),
+                params=LegacyCommandParams(
+                    legacyCommandType="command.COMMENT",
+                    legacyCommandText="hello world",
+                ),
+            )
         )
-    )
+    ]
 
 
 def test_map_after_with_error_command() -> None:
     """It should map an "after" message to a failed command."""
-    legacy_command_start: PauseMessage = {
+    legacy_command_start: CommentMessage = {
         "$": "before",
         "id": "message-id",
-        "name": "command.PAUSE",
+        "name": "command.COMMENT",
         "error": None,
-        "payload": {"userMessage": "hello world", "text": "hello world"},
+        "payload": {"text": "hello world"},
     }
-    legacy_command_end: PauseMessage = {
+    legacy_command_end: CommentMessage = {
         "$": "after",
         "id": "message-id",
-        "name": "command.PAUSE",
+        "name": "command.COMMENT",
         "error": RuntimeError("oh no"),
-        "payload": {"userMessage": "hello world", "text": "hello world"},
+        "payload": {"text": "hello world"},
     }
 
     subject = LegacyCommandMapper()
@@ -122,97 +126,103 @@ def test_map_after_with_error_command() -> None:
     _ = subject.map_command(legacy_command_start)
     result = subject.map_command(legacy_command_end)
 
-    assert result == pe_actions.FailCommandAction(
-        command_id="command.PAUSE-0",
-        error_id=matchers.IsA(str),
-        failed_at=matchers.IsA(datetime),
-        error=matchers.ErrorMatching(
-            LegacyContextCommandError,
-            match="oh no",
-        ),
-    )
+    assert result == [
+        pe_actions.FailCommandAction(
+            command_id="command.COMMENT-0",
+            error_id=matchers.IsA(str),
+            failed_at=matchers.IsA(datetime),
+            error=matchers.ErrorMatching(
+                LegacyContextCommandError,
+                match="oh no",
+            ),
+        )
+    ]
 
 
 def test_command_stack() -> None:
     """It should use messages ID and command ordering to create command IDs."""
-    legacy_command_1: PauseMessage = {
+    legacy_command_1: CommentMessage = {
         "$": "before",
         "id": "message-id-1",
-        "name": "command.PAUSE",
-        "payload": {"userMessage": "hello", "text": "hello"},
+        "name": "command.COMMENT",
+        "payload": {"text": "hello"},
         "error": None,
     }
-    legacy_command_2: PauseMessage = {
+    legacy_command_2: CommentMessage = {
         "$": "before",
         "id": "message-id-2",
-        "name": "command.PAUSE",
-        "payload": {"userMessage": "goodbye", "text": "goodbye"},
+        "name": "command.COMMENT",
+        "payload": {"text": "goodbye"},
         "error": None,
     }
-    legacy_command_3: PauseMessage = {
+    legacy_command_3: CommentMessage = {
         "$": "after",
         "id": "message-id-1",
-        "name": "command.PAUSE",
-        "payload": {"userMessage": "hello", "text": "hello"},
+        "name": "command.COMMENT",
+        "payload": {"text": "hello"},
         "error": None,
     }
-    legacy_command_4: PauseMessage = {
+    legacy_command_4: CommentMessage = {
         "$": "after",
         "id": "message-id-2",
-        "name": "command.PAUSE",
-        "payload": {"userMessage": "goodbye", "text": "goodbye"},
+        "name": "command.COMMENT",
+        "payload": {"text": "goodbye"},
         "error": RuntimeError("oh no"),
     }
 
     subject = LegacyCommandMapper()
-    result_1 = subject.map_command(legacy_command_1)
-    result_2 = subject.map_command(legacy_command_2)
-    result_3 = subject.map_command(legacy_command_3)
-    result_4 = subject.map_command(legacy_command_4)
+    result = [
+        *subject.map_command(legacy_command_1),
+        *subject.map_command(legacy_command_2),
+        *subject.map_command(legacy_command_3),
+        *subject.map_command(legacy_command_4),
+    ]
 
-    assert result_1 == pe_actions.UpdateCommandAction(
-        pe_commands.Custom.construct(
-            id="command.PAUSE-0",
-            status=pe_commands.CommandStatus.RUNNING,
-            createdAt=matchers.IsA(datetime),
-            startedAt=matchers.IsA(datetime),
-            params=LegacyCommandParams(
-                legacyCommandType="command.PAUSE",
-                legacyCommandText="hello",
-            ),
-        )
-    )
-    assert result_2 == pe_actions.UpdateCommandAction(
-        pe_commands.Custom.construct(
-            id="command.PAUSE-1",
-            status=pe_commands.CommandStatus.RUNNING,
-            createdAt=matchers.IsA(datetime),
-            startedAt=matchers.IsA(datetime),
-            params=LegacyCommandParams(
-                legacyCommandType="command.PAUSE",
-                legacyCommandText="goodbye",
-            ),
-        )
-    )
-    assert result_3 == pe_actions.UpdateCommandAction(
-        pe_commands.Custom.construct(
-            id="command.PAUSE-0",
-            status=pe_commands.CommandStatus.SUCCEEDED,
-            createdAt=matchers.IsA(datetime),
-            startedAt=matchers.IsA(datetime),
-            completedAt=matchers.IsA(datetime),
-            params=LegacyCommandParams(
-                legacyCommandType="command.PAUSE",
-                legacyCommandText="hello",
-            ),
-        )
-    )
-    assert result_4 == pe_actions.FailCommandAction(
-        command_id="command.PAUSE-1",
-        error_id=matchers.IsA(str),
-        failed_at=matchers.IsA(datetime),
-        error=matchers.ErrorMatching(LegacyContextCommandError, "oh no"),
-    )
+    assert result == [
+        pe_actions.UpdateCommandAction(
+            pe_commands.Custom.construct(
+                id="command.COMMENT-0",
+                status=pe_commands.CommandStatus.RUNNING,
+                createdAt=matchers.IsA(datetime),
+                startedAt=matchers.IsA(datetime),
+                params=LegacyCommandParams(
+                    legacyCommandType="command.COMMENT",
+                    legacyCommandText="hello",
+                ),
+            )
+        ),
+        pe_actions.UpdateCommandAction(
+            pe_commands.Custom.construct(
+                id="command.COMMENT-1",
+                status=pe_commands.CommandStatus.RUNNING,
+                createdAt=matchers.IsA(datetime),
+                startedAt=matchers.IsA(datetime),
+                params=LegacyCommandParams(
+                    legacyCommandType="command.COMMENT",
+                    legacyCommandText="goodbye",
+                ),
+            )
+        ),
+        pe_actions.UpdateCommandAction(
+            pe_commands.Custom.construct(
+                id="command.COMMENT-0",
+                status=pe_commands.CommandStatus.SUCCEEDED,
+                createdAt=matchers.IsA(datetime),
+                startedAt=matchers.IsA(datetime),
+                completedAt=matchers.IsA(datetime),
+                params=LegacyCommandParams(
+                    legacyCommandType="command.COMMENT",
+                    legacyCommandText="hello",
+                ),
+            )
+        ),
+        pe_actions.FailCommandAction(
+            command_id="command.COMMENT-1",
+            error_id=matchers.IsA(str),
+            failed_at=matchers.IsA(datetime),
+            error=matchers.ErrorMatching(LegacyContextCommandError, "oh no"),
+        ),
+    ]
 
 
 def test_map_labware_load(minimal_labware_def: LabwareDefinition) -> None:
@@ -347,3 +357,50 @@ def test_map_module_labware_load(minimal_labware_def: LabwareDefinition) -> None
     subject._module_id_by_slot = {DeckSlotName.SLOT_1: "module-123"}
     output = subject.map_labware_load(load_input)
     assert output == expected_output
+
+
+def test_map_pause() -> None:
+    """It should map an "command.PAUSE" message."""
+    legacy_command_start: PauseMessage = {
+        "$": "before",
+        "id": "message-id",
+        "name": "command.PAUSE",
+        "payload": {"userMessage": "hello world", "text": "hello world"},
+        "error": None,
+    }
+    legacy_command_end: PauseMessage = {
+        "$": "after",
+        "id": "message-id",
+        "name": "command.PAUSE",
+        "payload": {"userMessage": "hello world", "text": "hello world"},
+        "error": None,
+    }
+
+    subject = LegacyCommandMapper()
+    result = [
+        *subject.map_command(legacy_command_start),
+        *subject.map_command(legacy_command_end),
+    ]
+
+    assert result == [
+        pe_actions.UpdateCommandAction(
+            pe_commands.Pause.construct(
+                id="command.PAUSE-0",
+                status=pe_commands.CommandStatus.RUNNING,
+                createdAt=matchers.IsA(datetime),
+                startedAt=matchers.IsA(datetime),
+                params=pe_commands.PauseParams(message="hello world"),
+            )
+        ),
+        pe_actions.UpdateCommandAction(
+            pe_commands.Pause.construct(
+                id="command.PAUSE-0",
+                status=pe_commands.CommandStatus.SUCCEEDED,
+                createdAt=matchers.IsA(datetime),
+                startedAt=matchers.IsA(datetime),
+                completedAt=matchers.IsA(datetime),
+                params=pe_commands.PauseParams(message="hello world"),
+            )
+        ),
+        pe_actions.PauseAction(source=pe_actions.PauseSource.PROTOCOL),
+    ]
