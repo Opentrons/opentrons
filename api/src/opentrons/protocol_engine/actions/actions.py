@@ -8,6 +8,8 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional, Union
 
+from opentrons.protocols.models import LabwareDefinition
+
 from ..commands import Command, CommandCreate
 from ..errors import ProtocolEngineError
 from ..types import LabwareOffsetCreate
@@ -99,11 +101,18 @@ class FailCommandAction:
 
 @dataclass(frozen=True)
 class AddLabwareOffsetAction:
-    """Add a new labware offset, to apply to subsequent `LoadLabwareCommand`s."""
+    """Add a labware offset, to apply to subsequent `LoadLabwareCommand`s."""
 
     labware_offset_id: str
     created_at: datetime
     request: LabwareOffsetCreate
+
+
+@dataclass(frozen=True)
+class AddLabwareDefinitionAction:
+    """Add a labware definition, to apply to subsequent `LoadLabwareCommand`s."""
+
+    definition: LabwareDefinition
 
 
 Action = Union[
@@ -116,4 +125,5 @@ Action = Union[
     UpdateCommandAction,
     FailCommandAction,
     AddLabwareOffsetAction,
+    AddLabwareDefinitionAction,
 ]

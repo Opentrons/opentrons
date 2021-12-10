@@ -61,7 +61,7 @@ function might look like this:
 def run(ctx):
     ctx.comment('hello, world')
 
-This function is called by the robot when the robot executes the protol.
+This function is called by the robot when the robot executes the protocol.
 This function is not present in the current protocol and must be added.
 """
 

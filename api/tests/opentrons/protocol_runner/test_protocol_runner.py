@@ -8,7 +8,7 @@ from opentrons_shared_data.protocol.dev_types import JsonProtocol as JsonProtoco
 from opentrons.hardware_control import API as HardwareAPI
 
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.models import JsonProtocol
+from opentrons.protocols.models import JsonProtocol, LabwareDefinition
 from opentrons.protocol_api_experimental import ProtocolContext
 from opentrons.protocol_engine import ProtocolEngine, commands as pe_commands
 from opentrons.protocol_reader import (
@@ -34,6 +34,7 @@ from opentrons.protocol_runner.legacy_wrappers import (
     LegacyPythonProtocol,
     LegacyJsonProtocol,
     LegacyProtocolContext,
+    LegacyLabwareDefinition,
 )
 
 
@@ -198,6 +199,7 @@ def test_load_json(
         files=[],
         metadata={},
         config=JsonProtocolConfig(schema_version=6),
+        labware_definitions=[],
     )
 
     json_protocol = JsonProtocol.construct()  # type: ignore[call-arg]
@@ -244,6 +246,7 @@ def test_load_python(
         files=[],
         metadata={},
         config=PythonProtocolConfig(api_version=APIVersion(3, 0)),
+        labware_definitions=[],
     )
 
     python_protocol = decoy.mock(cls=PythonProtocol)
@@ -278,13 +281,18 @@ def test_load_legacy_python(
     subject: ProtocolRunner,
 ) -> None:
     """It should load a legacy context-based Python protocol."""
+    labware_definition = LabwareDefinition.construct()  # type: ignore[call-arg]
+
     legacy_protocol_source = ProtocolSource(
         directory=Path("/dev/null"),
         main_file=Path("/dev/null/abc.py"),
         files=[],
         metadata={},
         config=PythonProtocolConfig(api_version=APIVersion(2, 11)),
+        labware_definitions=[labware_definition],
     )
+
+    extra_labware = {"definition-uri": cast(LegacyLabwareDefinition, {})}
 
     legacy_protocol = LegacyPythonProtocol(
         text="",
@@ -295,7 +303,7 @@ def test_load_legacy_python(
         bundled_labware=None,
         bundled_data=None,
         bundled_python=None,
-        extra_labware=None,
+        extra_labware=extra_labware,
     )
 
     legacy_context = decoy.mock(cls=LegacyProtocolContext)
@@ -303,13 +311,14 @@ def test_load_legacy_python(
     decoy.when(legacy_file_reader.read(legacy_protocol_source)).then_return(
         legacy_protocol
     )
-    decoy.when(legacy_context_creator.create(APIVersion(2, 11))).then_return(
+    decoy.when(legacy_context_creator.create(legacy_protocol)).then_return(
         legacy_context
     )
 
     subject.load(legacy_protocol_source)
 
     decoy.verify(
+        protocol_engine.add_labware_definition(labware_definition),
         protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)),
         task_queue.set_run_func(
             func=legacy_executor.execute,
@@ -329,13 +338,16 @@ def test_load_legacy_json(
     protocol_engine: ProtocolEngine,
     subject: ProtocolRunner,
 ) -> None:
-    """It should load a legacy context-based Python protocol."""
+    """It should load a legacy context-based JSON protocol."""
+    labware_definition = LabwareDefinition.construct()  # type: ignore[call-arg]
+
     legacy_protocol_source = ProtocolSource(
         directory=Path("/dev/null"),
         main_file=Path("/dev/null/abc.json"),
         files=[],
         metadata={},
         config=JsonProtocolConfig(schema_version=5),
+        labware_definitions=[labware_definition],
     )
 
     legacy_protocol = LegacyJsonProtocol(
@@ -352,13 +364,14 @@ def test_load_legacy_json(
     decoy.when(legacy_file_reader.read(legacy_protocol_source)).then_return(
         legacy_protocol
     )
-    decoy.when(legacy_context_creator.create(APIVersion(2, 11))).then_return(
+    decoy.when(legacy_context_creator.create(legacy_protocol)).then_return(
         legacy_context
     )
 
     subject.load(legacy_protocol_source)
 
     decoy.verify(
+        protocol_engine.add_labware_definition(labware_definition),
         protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)),
         task_queue.set_run_func(
             func=legacy_executor.execute,

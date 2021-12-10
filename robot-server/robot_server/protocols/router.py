@@ -1,5 +1,6 @@
 """Router for /protocols endpoints."""
 import logging
+import textwrap
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, File, UploadFile, status
@@ -52,6 +53,14 @@ protocols_router = APIRouter()
 @protocols_router.post(
     path="/protocols",
     summary="Upload a protocol",
+    description=textwrap.dedent(
+        """
+        Upload a protocol to your device. You may include the following files:
+
+        - A single Python protocol file and 0 or more custom labware JSON files
+        - A single JSON protocol file (any additional labware files will be ignored)
+        """
+    ),
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_201_CREATED: {"model": SimpleResponse[Protocol]},

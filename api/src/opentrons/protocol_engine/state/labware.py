@@ -16,8 +16,9 @@ from opentrons.calibration_storage.helpers import uri_from_details
 
 from .. import errors
 from ..resources import DeckFixedLabware
-from ..commands import Command, LoadLabwareResult, AddLabwareDefinitionResult
+from ..commands import Command, LoadLabwareResult
 from ..types import (
+    DeckSlotLocation,
     Dimensions,
     LabwareOffset,
     LabwareOffsetVector,
@@ -25,8 +26,16 @@ from ..types import (
     LabwareLocation,
     LoadedLabware,
 )
-from ..actions import Action, UpdateCommandAction, AddLabwareOffsetAction
+from ..actions import (
+    Action,
+    UpdateCommandAction,
+    AddLabwareOffsetAction,
+    AddLabwareDefinitionAction,
+)
 from .abstract_store import HasState, HandlesActions
+
+
+_TRASH_LOCATION = DeckSlotLocation(slotName=DeckSlotName.FIXED_TRASH)
 
 
 @dataclass(frozen=True)
@@ -91,6 +100,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
         """Modify state in reaction to an action."""
         if isinstance(action, UpdateCommandAction):
             self._handle_command(action.command)
+
         elif isinstance(action, AddLabwareOffsetAction):
             labware_offset = LabwareOffset(
                 id=action.labware_offset_id,
@@ -100,6 +110,17 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 vector=action.request.vector,
             )
             self._add_labware_offset(labware_offset)
+
+        elif isinstance(action, AddLabwareDefinitionAction):
+            uri = uri_from_details(
+                namespace=action.definition.namespace,
+                load_name=action.definition.parameters.loadName,
+                version=action.definition.version,
+            )
+            definitions_by_uri = self._state.definitions_by_uri.copy()
+            definitions_by_uri[uri] = action.definition
+
+            self._state = replace(self._state, definitions_by_uri=definitions_by_uri)
 
     def _handle_command(self, command: Command) -> None:
         """Modify state in reaction to a command."""
@@ -131,18 +152,6 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 self._state,
                 labware_by_id=new_labware_by_id,
                 definitions_by_uri=new_definitions_by_uri,
-            )
-
-        elif isinstance(command.result, AddLabwareDefinitionResult):
-            definition_uri = uri_from_details(
-                namespace=command.result.namespace,
-                load_name=command.result.loadName,
-                version=command.result.version,
-            )
-            new_definitions_by_uri = self._state.definitions_by_uri.copy()
-            new_definitions_by_uri[definition_uri] = command.params.definition
-            self._state = replace(
-                self._state, definitions_by_uri=new_definitions_by_uri
             )
 
     def _add_labware_offset(self, labware_offset: LabwareOffset) -> None:

@@ -19,6 +19,7 @@ import {
   useConditionalConfirm,
 } from '@opentrons/components'
 import { Page } from '../../atoms/Page'
+import { Portal } from '../../App/portal'
 import { useProtocolDetails } from './hooks'
 import { useRunStatus, useRunStartTime } from '../RunTimeControl/hooks'
 import { ConfirmCancelModal } from '../../pages/Run/RunLog'
@@ -116,10 +117,12 @@ export function RunDetails(): JSX.Element | null {
   return (
     <>
       {showCloseConfirmExit && (
-        <ConfirmExitProtocolUploadModal
-          exit={confirmCloseExit}
-          back={cancelCloseExit}
-        />
+        <Portal level="top">
+          <ConfirmExitProtocolUploadModal
+            exit={confirmCloseExit}
+            back={cancelCloseExit}
+          />
+        </Portal>
       )}
       <Page titleBarProps={titleBarProps}>
         {showConfirmExit ? <ConfirmCancelModal onClose={cancelExit} /> : null}

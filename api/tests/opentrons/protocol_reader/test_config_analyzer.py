@@ -12,7 +12,7 @@ from opentrons.protocol_reader import (
     PythonProtocolConfig,
     JsonProtocolConfig,
 )
-from opentrons.protocol_reader.role_analyzer import RoleAnalyzedFile
+from opentrons.protocol_reader.role_analyzer import RoleAnalysisFile
 
 from opentrons.protocol_reader.config_analyzer import (
     ConfigAnalyzer,
@@ -24,20 +24,22 @@ from opentrons.protocol_reader.config_analyzer import (
 class ConfigAnalyzerSpec(NamedTuple):
     """Spec data for a RoleAnalyzer test."""
 
-    main_file: RoleAnalyzedFile
+    main_file: RoleAnalysisFile
     expected: ConfigAnalysis
 
 
 class ConfigAnalyzerErrorSpec(NamedTuple):
     """Spec data for a RoleAnalyzer test."""
 
-    main_file: RoleAnalyzedFile
+    main_file: RoleAnalysisFile
     expected_message: str
 
 
+# TODO(mc, 2021-11-30): add JSON v6 spec when JsonProtocol model
+# supports parsing schema v6
 CONFIG_ANALYZER_SPECS: List[ConfigAnalyzerSpec] = [
     ConfigAnalyzerSpec(
-        main_file=RoleAnalyzedFile(
+        main_file=RoleAnalysisFile(
             name="protocol.py",
             data=None,
             role=ProtocolFileRole.MAIN,
@@ -55,30 +57,8 @@ CONFIG_ANALYZER_SPECS: List[ConfigAnalyzerSpec] = [
             config=PythonProtocolConfig(api_version=APIVersion(123, 456)),
         ),
     ),
-    # TODO(mc, 2021-11-30): uncomment this spec when JsonProtocol model
-    # supports JSON Schema v6
-    # ConfigAnalyzerSpec(
-    #     main_file=RoleAnalyzedFile(
-    #         name="protocol.json",
-    #         role=ProtocolFileRole.MAIN,
-    #         contents=b"",
-    #         data=JsonProtocol.parse_raw(
-    #             load_shared_data("protocol/fixtures/6/simpleV6.json")
-    #         ),
-    #     ),
-    #     expected=ConfigAnalysis(
-    #         metadata={
-    #             "protocolName": "Simple test protocol",
-    #             "author": "engineering <engineering@opentrons.com>",
-    #             "description": "A short test protocol",
-    #             "created": 1223131231,
-    #             "tags": ["unitTest"],
-    #         },
-    #         config=JsonProtocolConfig(schema_version=6),
-    #     ),
-    # ),
     ConfigAnalyzerSpec(
-        main_file=RoleAnalyzedFile(
+        main_file=RoleAnalysisFile(
             name="protocol.json",
             role=ProtocolFileRole.MAIN,
             contents=b"",
@@ -98,7 +78,7 @@ CONFIG_ANALYZER_SPECS: List[ConfigAnalyzerSpec] = [
         ),
     ),
     ConfigAnalyzerSpec(
-        main_file=RoleAnalyzedFile(
+        main_file=RoleAnalysisFile(
             name="protocol.json",
             role=ProtocolFileRole.MAIN,
             contents=b"",
@@ -118,7 +98,7 @@ CONFIG_ANALYZER_SPECS: List[ConfigAnalyzerSpec] = [
         ),
     ),
     ConfigAnalyzerSpec(
-        main_file=RoleAnalyzedFile(
+        main_file=RoleAnalysisFile(
             name="protocol.json",
             role=ProtocolFileRole.MAIN,
             contents=b"",
@@ -145,7 +125,7 @@ CONFIG_ANALYZER_SPECS: List[ConfigAnalyzerSpec] = [
 # Decide where this logic should canonically live, and deduplicate.
 CONFIG_ANALYZER_ERROR_SPECS: List[ConfigAnalyzerErrorSpec] = [
     ConfigAnalyzerErrorSpec(
-        main_file=RoleAnalyzedFile(
+        main_file=RoleAnalysisFile(
             name="protocol.py",
             data=None,
             role=ProtocolFileRole.MAIN,
@@ -163,7 +143,7 @@ CONFIG_ANALYZER_ERROR_SPECS: List[ConfigAnalyzerErrorSpec] = [
         expected_message="Unable to parse",
     ),
     ConfigAnalyzerErrorSpec(
-        main_file=RoleAnalyzedFile(
+        main_file=RoleAnalysisFile(
             name="protocol.py",
             data=None,
             role=ProtocolFileRole.MAIN,
@@ -176,7 +156,7 @@ CONFIG_ANALYZER_ERROR_SPECS: List[ConfigAnalyzerErrorSpec] = [
         expected_message="metadata.apiLevel missing",
     ),
     ConfigAnalyzerErrorSpec(
-        main_file=RoleAnalyzedFile(
+        main_file=RoleAnalysisFile(
             name="protocol.py",
             data=None,
             role=ProtocolFileRole.MAIN,
@@ -190,7 +170,7 @@ CONFIG_ANALYZER_ERROR_SPECS: List[ConfigAnalyzerErrorSpec] = [
         expected_message="metadata.apiLevel missing",
     ),
     ConfigAnalyzerErrorSpec(
-        main_file=RoleAnalyzedFile(
+        main_file=RoleAnalysisFile(
             name="protocol.py",
             data=None,
             role=ProtocolFileRole.MAIN,
@@ -204,7 +184,7 @@ CONFIG_ANALYZER_ERROR_SPECS: List[ConfigAnalyzerErrorSpec] = [
         expected_message="metadata.apiLevel missing",
     ),
     ConfigAnalyzerErrorSpec(
-        main_file=RoleAnalyzedFile(
+        main_file=RoleAnalysisFile(
             name="protocol.py",
             data=None,
             role=ProtocolFileRole.MAIN,
@@ -218,7 +198,7 @@ CONFIG_ANALYZER_ERROR_SPECS: List[ConfigAnalyzerErrorSpec] = [
         expected_message="Unable to extract metadata from protocol.py",
     ),
     ConfigAnalyzerErrorSpec(
-        main_file=RoleAnalyzedFile(
+        main_file=RoleAnalysisFile(
             name="protocol.py",
             data=None,
             role=ProtocolFileRole.MAIN,
@@ -235,7 +215,7 @@ CONFIG_ANALYZER_ERROR_SPECS: List[ConfigAnalyzerErrorSpec] = [
         expected_message="Unable to extract metadata from protocol.py",
     ),
     ConfigAnalyzerErrorSpec(
-        main_file=RoleAnalyzedFile(
+        main_file=RoleAnalysisFile(
             name="protocol.py",
             data=None,
             role=ProtocolFileRole.MAIN,
@@ -252,7 +232,7 @@ CONFIG_ANALYZER_ERROR_SPECS: List[ConfigAnalyzerErrorSpec] = [
 
 
 @pytest.mark.parametrize(ConfigAnalyzerSpec._fields, CONFIG_ANALYZER_SPECS)
-def test_role_analyzer(main_file: RoleAnalyzedFile, expected: ConfigAnalysis) -> None:
+def test_role_analyzer(main_file: RoleAnalysisFile, expected: ConfigAnalysis) -> None:
     """It should analyze a main file for config properly."""
     subject = ConfigAnalyzer()
     result = subject.analyze(main_file)
@@ -262,7 +242,7 @@ def test_role_analyzer(main_file: RoleAnalyzedFile, expected: ConfigAnalysis) ->
 
 @pytest.mark.parametrize(ConfigAnalyzerErrorSpec._fields, CONFIG_ANALYZER_ERROR_SPECS)
 def test_role_analyzer_error(
-    main_file: RoleAnalyzedFile,
+    main_file: RoleAnalysisFile,
     expected_message: str,
 ) -> None:
     """It should raise errors on invalid main file input."""

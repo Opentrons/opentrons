@@ -1,6 +1,8 @@
 """ProtocolEngine class definition."""
 from typing import Optional
+
 from opentrons.hardware_control import API as HardwareAPI
+from opentrons.protocols.models import LabwareDefinition
 
 from .resources import ModelUtils
 from .commands import Command, CommandCreate
@@ -18,6 +20,7 @@ from .actions import (
     FinishErrorDetails,
     QueueCommandAction,
     AddLabwareOffsetAction,
+    AddLabwareDefinitionAction,
     HardwareStoppedAction,
 )
 
@@ -200,4 +203,10 @@ class ProtocolEngine:
         )
         return self.state_view.labware.get_labware_offset(
             labware_offset_id=labware_offset_id
+        )
+
+    def add_labware_definition(self, definition: LabwareDefinition) -> None:
+        """Add a labware definition to the state for subsequent labware loads."""
+        self._action_dispatcher.dispatch(
+            AddLabwareDefinitionAction(definition=definition)
         )
