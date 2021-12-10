@@ -6,12 +6,10 @@ import { AppComponent } from '..'
 
 import { Robots } from '../../pages/Robots'
 import { Upload } from '../../pages/Upload'
-import { Calibrate } from '../../pages/Calibrate'
 import { Run } from '../../pages/Run'
 import { More } from '../../pages/More'
 
 import { ConnectPanel } from '../../pages/Robots/ConnectPanel'
-import { CalibratePanel } from '../../pages/Calibrate/CalibratePanel'
 import { RunPanel } from '../../pages/Run/RunPanel'
 import { MorePanel } from '../../pages/More/MorePanel'
 
@@ -24,14 +22,10 @@ import { Alerts } from '../../organisms/Alerts'
 
 jest.mock('../../pages/Robots', () => ({ Robots: () => <></> }))
 jest.mock('../../pages/Upload', () => ({ Upload: () => <></> }))
-jest.mock('../../pages/Calibrate', () => ({ Calibrate: () => <></> }))
 jest.mock('../../pages/Run', () => ({ Run: () => <></> }))
 jest.mock('../../pages/More', () => ({ More: () => <></> }))
 jest.mock('../../pages/Robots/ConnectPanel', () => ({
   ConnectPanel: () => <></>,
-}))
-jest.mock('../../pages/Calibrate/CalibratePanel', () => ({
-  CalibratePanel: () => <></>,
 }))
 jest.mock('../../pages/Run/RunPanel', () => ({ RunPanel: () => <></> }))
 jest.mock('../../pages/More/MorePanel', () => ({ MorePanel: () => <></> }))
@@ -90,12 +84,6 @@ describe('top level App component', () => {
   it('should render an Upload page on /upload', () => {
     const { wrapper } = render('/upload')
     expect(wrapper.exists(Upload)).toBe(true)
-  })
-
-  it('should render a Calibrate page on /calibrate', () => {
-    const { wrapper } = render('/calibrate')
-    expect(wrapper.exists(Calibrate)).toBe(true)
-    expect(wrapper.exists(CalibratePanel)).toBe(true)
   })
 
   it('should render a Run page on /run', () => {

@@ -19,12 +19,10 @@ import { Alerts } from '../organisms/Alerts'
 
 import { Robots } from '../pages/Robots'
 import { Upload } from '../pages/Upload'
-import { Calibrate } from '../pages/Calibrate'
 import { Run } from '../pages/Run'
 import { More } from '../pages/More'
 
 import { ConnectPanel } from '../pages/Robots/ConnectPanel'
-import { CalibratePanel } from '../pages/Calibrate/CalibratePanel'
 import { RunPanel } from '../pages/Run/RunPanel'
 import { MorePanel } from '../pages/More/MorePanel'
 
@@ -59,7 +57,6 @@ export const AppComponent = (): JSX.Element => {
             <Switch>
               <Route path="/robots/:name?" component={ConnectPanel} />
               <Route path="/more" component={MorePanel} />
-              <Route path="/calibrate" component={CalibratePanel} />
               <Route path="/run" component={RunPanel} />
             </Switch>
             <TopPortalRoot />
@@ -74,9 +71,6 @@ export const AppComponent = (): JSX.Element => {
                 </Route>
                 <Route path="/upload">
                   <Upload />
-                </Route>
-                <Route path="/calibrate">
-                  <Calibrate />
                 </Route>
                 <Route path="/run">
                   <Run />
