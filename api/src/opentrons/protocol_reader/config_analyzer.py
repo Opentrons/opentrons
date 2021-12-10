@@ -8,7 +8,7 @@ from opentrons.protocols.parse import extract_metadata as extract_python_metadat
 from opentrons.protocols.models import JsonProtocol
 
 from .protocol_source import Metadata, PythonProtocolConfig, JsonProtocolConfig
-from .role_analyzer import RoleAnalyzedFile
+from .role_analyzer import RoleAnalysisFile
 
 
 @dataclass(frozen=True)
@@ -27,7 +27,7 @@ class ConfigAnalyzer:
     """Input file config analysis interface."""
 
     @staticmethod
-    def analyze(main_file: RoleAnalyzedFile) -> ConfigAnalysis:
+    def analyze(main_file: RoleAnalysisFile) -> ConfigAnalysis:
         """Analyze the main file of a protocol to identify its config and metadata."""
         if isinstance(main_file.data, JsonProtocol):
             return ConfigAnalysis(
@@ -40,7 +40,7 @@ class ConfigAnalyzer:
 
 
 # todo(mm, 2021-09-13): Deduplicate with opentrons.protocols.parse.
-def _analyze_python(main_file: RoleAnalyzedFile) -> ConfigAnalysis:  # noqa: C901
+def _analyze_python(main_file: RoleAnalysisFile) -> ConfigAnalysis:  # noqa: C901
     assert main_file.name.endswith(".py"), "Expected main_file to be Python"
 
     try:
@@ -49,7 +49,7 @@ def _analyze_python(main_file: RoleAnalyzedFile) -> ConfigAnalysis:  # noqa: C90
         # don't truly want the protocol to inherit our own __future__ features.
         module_ast = ast.parse(source=main_file.contents, filename=main_file.name)
     except (SyntaxError, ValueError) as e:
-        # parse_python() raises SyntaxError for most errors,
+        # ast.parse() raises SyntaxError for most errors,
         # but ValueError if the source contains null bytes.
         raise ConfigAnalysisError(f"Unable to parse {main_file.name}.") from e
 

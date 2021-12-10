@@ -5,13 +5,17 @@ from pathlib import Path
 from decoy import matchers
 
 from opentrons_shared_data import load_shared_data
-from opentrons.protocols.models import JsonProtocol
-from opentrons.protocol_reader.input_file import InputFile, BufferedFile
-from opentrons.protocol_reader.file_reader_writer import FileReaderWriter, FileReadError
+from opentrons.protocols.models import JsonProtocol, LabwareDefinition
+from opentrons.protocol_reader.input_file import InputFile
+from opentrons.protocol_reader.file_reader_writer import (
+    FileReaderWriter,
+    FileReadError,
+    BufferedFile,
+)
 
 
 SIMPLE_V5_JSON_PROTOCOL = load_shared_data("protocol/fixtures/5/simpleV5.json")
-SIMPLE_CUSTOM_LABWARE = load_shared_data("labware/fixtures/2/fixture_96_plate.json")
+SIMPLE_LABWARE_DEF = load_shared_data("labware/fixtures/2/fixture_96_plate.json")
 
 
 async def test_read() -> None:
@@ -29,11 +33,12 @@ async def test_read() -> None:
 
 
 async def test_read_opentrons_json() -> None:
-    """It should read and parse Opentrons JSON protocol file-likes."""
-    in_file = InputFile(filename="hello.json", file=io.BytesIO(SIMPLE_V5_JSON_PROTOCOL))
+    """It should read and parse Opentrons JSON protocol/labware file-likes."""
+    file_1 = InputFile(filename="hello.json", file=io.BytesIO(SIMPLE_V5_JSON_PROTOCOL))
+    file_2 = InputFile(filename="world.json", file=io.BytesIO(SIMPLE_LABWARE_DEF))
 
     subject = FileReaderWriter()
-    result = await subject.read([in_file])
+    result = await subject.read([file_1, file_2])
 
     assert result == [
         BufferedFile(
@@ -41,20 +46,45 @@ async def test_read_opentrons_json() -> None:
             contents=SIMPLE_V5_JSON_PROTOCOL,
             data=matchers.Anything(),
         ),
+        BufferedFile(
+            name="world.json",
+            contents=SIMPLE_LABWARE_DEF,
+            data=matchers.Anything(),
+        ),
     ]
 
     assert isinstance(result[0].data, JsonProtocol)
+    assert isinstance(result[1].data, LabwareDefinition)
 
 
-# TODO(mc, 2021-12-07): add support for LabwareDefinition and
-# arbitrary JSON data files
+async def test_read_missing_filename() -> None:
+    """It should error if a file has no filename."""
+    in_file = InputFile(filename="", file=io.BytesIO(b""))
+
+    subject = FileReaderWriter()
+
+    with pytest.raises(FileReadError, match="missing a name"):
+        await subject.read([in_file])
+
+
 async def test_read_opentrons_json_bad_parse() -> None:
-    """It should error if a JSON file cannnot be parsed as a JSON protocol."""
+    """It should error if a .json file cannot be parsed as a JSON."""
+    in_file = InputFile(filename="hello.json", file=io.BytesIO(b"{oh: no}"))
+
+    subject = FileReaderWriter()
+
+    with pytest.raises(FileReadError, match="not valid JSON"):
+        await subject.read([in_file])
+
+
+# TODO(mc, 2021-12-07): add support arbitrary JSON data files
+async def test_read_opentrons_json_bad_validate() -> None:
+    """It should error if a JSON file cannot be validated into a known model."""
     in_file = InputFile(filename="hello.json", file=io.BytesIO(b'{"oh": "no"}'))
 
     subject = FileReaderWriter()
 
-    with pytest.raises(FileReadError):
+    with pytest.raises(FileReadError, match="known Opentrons format"):
         await subject.read([in_file])
 
 

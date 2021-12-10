@@ -86,7 +86,6 @@ class ProtocolRunner:
             labware_offset_provider=LegacyLabwareOffsetProvider(
                 labware_view=protocol_engine.state_view.labware,
             ),
-            use_simulating_implementation=False,
         )
         self._legacy_executor = legacy_executor or LegacyExecutor(
             hardware_api=hardware_api
@@ -99,6 +98,9 @@ class ProtocolRunner:
         to control the run of a file-based protocol.
         """
         config = protocol_source.config
+
+        for definition in protocol_source.labware_definitions:
+            self._protocol_engine.add_labware_definition(definition)
 
         if isinstance(config, JsonProtocolConfig):
             schema_version = config.schema_version
@@ -172,7 +174,7 @@ class ProtocolRunner:
         protocol_source: ProtocolSource,
     ) -> None:
         protocol = self._legacy_file_reader.read(protocol_source)
-        context = self._legacy_context_creator.create(protocol.api_level)
+        context = self._legacy_context_creator.create(protocol)
 
         self._protocol_engine.add_plugin(
             LegacyContextPlugin(

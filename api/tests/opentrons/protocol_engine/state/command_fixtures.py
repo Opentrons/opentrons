@@ -119,27 +119,6 @@ def create_load_labware_command(
     )
 
 
-def create_add_definition_command(
-    definition: LabwareDefinition,
-) -> cmd.AddLabwareDefinition:
-    """Create a completed AddLabwareDefinition command."""
-    params = cmd.AddLabwareDefinitionParams(definition=definition)
-
-    result = cmd.AddLabwareDefinitionResult(
-        loadName=definition.parameters.loadName,
-        namespace=definition.namespace,
-        version=definition.version,
-    )
-
-    return cmd.AddLabwareDefinition(
-        id="command-id",
-        status=cmd.CommandStatus.SUCCEEDED,
-        createdAt=datetime.now(),
-        params=params,
-        result=result,
-    )
-
-
 def create_load_pipette_command(
     pipette_id: str,
     pipette_name: PipetteName,

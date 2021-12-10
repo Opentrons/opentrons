@@ -1,10 +1,10 @@
 """Read relevant protocol information from a set of files."""
 from pathlib import Path
-from typing import Optional, Sequence
+from typing import List, Optional, Sequence
 
 from .input_file import AbstractInputFile
 from .file_reader_writer import FileReaderWriter, FileReadError
-from .role_analyzer import RoleAnalyzer, RoleAnalysisError
+from .role_analyzer import RoleAnalyzer, RoleAnalysisFile, RoleAnalysisError
 from .config_analyzer import ConfigAnalyzer, ConfigAnalysisError
 from .protocol_source import ProtocolSource, ProtocolSourceFile
 
@@ -63,9 +63,14 @@ class ProtocolReader:
         except (FileReadError, RoleAnalysisError, ConfigAnalysisError) as e:
             raise ProtocolFilesInvalidError(str(e))
 
-        # TODO(mc, 2021-12-07): add support for other files, like labware definitions
-        all_files = [role_analysis.main_file]
+        # TODO(mc, 2021-12-07): add support for other files, like arbitrary data files
+        all_files: List[RoleAnalysisFile] = [
+            role_analysis.main_file,
+            *role_analysis.labware_files,
+        ]
 
+        # TODO(mc, 2021-12-09): writing to disk is inappropriate for future
+        # use cases where files are already on disk, like the opentrons CLI
         await self._file_reader_writer.write(directory=directory, files=all_files)
 
         return ProtocolSource(
@@ -74,4 +79,5 @@ class ProtocolReader:
             config=config_analysis.config,
             metadata=config_analysis.metadata,
             files=[ProtocolSourceFile(name=f.name, role=f.role) for f in all_files],
+            labware_definitions=role_analysis.labware_definitions,
         )

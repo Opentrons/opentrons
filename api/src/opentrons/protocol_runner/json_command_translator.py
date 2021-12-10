@@ -32,9 +32,6 @@ class JsonCommandTranslator:
         for pipette_id, pipette in protocol.pipettes.items():
             result.append(self._translate_load_pipette(pipette_id, pipette))
 
-        for definition_id, definition in protocol.labwareDefinitions.items():
-            result.append(self._translate_add_labware_definition(definition))
-
         for labware_id, labware in protocol.labware.items():
             result.append(
                 self._translate_load_labware(
@@ -60,13 +57,6 @@ class JsonCommandTranslator:
             raise CommandTranslatorError(
                 f"Cannot find handler for '{command.command}'."
             )
-
-    def _translate_add_labware_definition(
-        self, labware_definition: models.LabwareDefinition
-    ) -> pe_commands.AddLabwareDefinitionCreate:
-        return pe_commands.AddLabwareDefinitionCreate(
-            params=pe_commands.AddLabwareDefinitionParams(definition=labware_definition)
-        )
 
     def _translate_load_labware(
         self,

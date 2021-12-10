@@ -5,6 +5,8 @@ from decoy import Decoy
 
 from opentrons.types import DeckSlotName, MountType
 from opentrons.hardware_control import API as HardwareAPI
+from opentrons.protocols.models import LabwareDefinition
+
 from opentrons.protocol_engine import ProtocolEngine, commands
 from opentrons.protocol_engine.types import (
     LabwareOffset,
@@ -21,6 +23,7 @@ from opentrons.protocol_engine.plugins import AbstractPlugin, PluginStarter
 from opentrons.protocol_engine.actions import (
     ActionDispatcher,
     AddLabwareOffsetAction,
+    AddLabwareDefinitionAction,
     PlayAction,
     PauseAction,
     StopAction,
@@ -394,5 +397,21 @@ def test_add_labware_offset(
                 created_at=created_at,
                 request=request,
             )
+        )
+    )
+
+
+def test_add_labware_definition(
+    decoy: Decoy,
+    action_dispatcher: ActionDispatcher,
+    subject: ProtocolEngine,
+    well_plate_def: LabwareDefinition,
+) -> None:
+    """It should dispatch an AddLabwareDefinition action."""
+    subject.add_labware_definition(well_plate_def)
+
+    decoy.verify(
+        action_dispatcher.dispatch(
+            AddLabwareDefinitionAction(definition=well_plate_def)
         )
     )

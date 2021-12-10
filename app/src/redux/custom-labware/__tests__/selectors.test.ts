@@ -87,53 +87,26 @@ describe('custom labware selectors', () => {
           filenames: [
             Fixtures.mockValidLabware.filename,
             Fixtures.mockInvalidLabware.filename,
-            'foo.json',
+            '/full/path/to/labware/foo.json',
           ],
           filesByName: {
             [Fixtures.mockValidLabware.filename]: Fixtures.mockValidLabware,
             [Fixtures.mockInvalidLabware.filename]: Fixtures.mockInvalidLabware,
-            'foo.json': {
+            '/full/path/to/labware/foo.json': {
               ...Fixtures.mockValidLabware,
-              filename: 'foo.json',
+              filename: '/full/path/to/labware/foo.json',
             } as ValidLabwareFile,
           },
         },
       } as any,
       expected: [
         Fixtures.mockValidLabware,
-        { ...Fixtures.mockValidLabware, filename: 'foo.json' },
+        {
+          ...Fixtures.mockValidLabware,
+          filename: '/full/path/to/labware/foo.json',
+        },
       ],
     },
-
-    {
-      name: 'getValidCustomLabwareFiles',
-      selector: selectors.getValidCustomLabwareFiles,
-      state: {
-        labware: {
-          addFailureFile: null,
-          addFailureMessage: null,
-          listFailureMessage: null,
-          filenames: [
-            Fixtures.mockValidLabware.filename,
-            Fixtures.mockInvalidLabware.filename,
-            'foo.json',
-          ],
-          filesByName: {
-            [Fixtures.mockValidLabware.filename]: Fixtures.mockValidLabware,
-            [Fixtures.mockInvalidLabware.filename]: Fixtures.mockInvalidLabware,
-            'foo.json': {
-              ...Fixtures.mockValidLabware,
-              filename: 'foo.json',
-            } as ValidLabwareFile,
-          },
-        },
-      } as any,
-      expected: expect.arrayContaining([
-        Fixtures.mockValidLabwareFile,
-        Fixtures.mockValidLabwareFile,
-      ]),
-    },
-
     {
       name: 'getAddLabwareFailure',
       selector: selectors.getAddLabwareFailure,
@@ -178,6 +151,38 @@ describe('custom labware selectors', () => {
 
   SPECS.forEach(spec => {
     const { name, selector, state, expected } = spec
-    it(name, () => expect(selector(state)).toEqual(expected))
+    it(`should handle ${name}`, () => expect(selector(state)).toEqual(expected))
+  })
+
+  it('should map custom labware to File blobs for upload', () => {
+    const state = {
+      labware: {
+        addFailureFile: null,
+        addFailureMessage: null,
+        listFailureMessage: null,
+        filenames: [
+          Fixtures.mockValidLabware.filename,
+          Fixtures.mockInvalidLabware.filename,
+          '/full/path/to/labware/foo.json',
+        ],
+        filesByName: {
+          [Fixtures.mockValidLabware.filename]: Fixtures.mockValidLabware,
+          [Fixtures.mockInvalidLabware.filename]: Fixtures.mockInvalidLabware,
+          '/full/path/to/labware/foo.json': {
+            ...Fixtures.mockValidLabware,
+            filename: '/full/path/to/labware/foo.json',
+          } as ValidLabwareFile,
+        },
+      },
+    } as any
+
+    const result = selectors.getValidCustomLabwareFiles(state)
+
+    expect(result[0].name).toBe('a.json')
+    expect(result[1].name).toBe('foo.json')
+
+    // TODO(mc, 2021-12-10): jest's Blob polyfill does not contain contents, so
+    // we can't test the files were created properly here in this test. Keep an
+    // eye on https://github.com/jsdom/jsdom/issues/2555
   })
 })

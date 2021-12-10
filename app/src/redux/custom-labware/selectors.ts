@@ -1,4 +1,5 @@
 // custom labware selectors
+import { basename } from 'path'
 import { createSelector } from 'reselect'
 import sortBy from 'lodash/sortBy'
 
@@ -55,7 +56,7 @@ export const getValidCustomLabwareFiles: (
 ) => File[] = createSelector(getValidCustomLabware, labware => {
   const labwareFiles = labware.map(lw => {
     const jsonDefinition = JSON.stringify(lw.definition)
-    return new File([jsonDefinition], lw.filename)
+    return new File([jsonDefinition], basename(lw.filename))
   })
   return labwareFiles
 })

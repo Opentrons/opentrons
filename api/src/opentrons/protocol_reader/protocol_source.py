@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Union
 from typing_extensions import Literal
 
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.models import LabwareDefinition
 
 
 class ProtocolType(str, Enum):
@@ -15,6 +16,7 @@ class ProtocolType(str, Enum):
     PYTHON = "python"
 
 
+# TODO(mc, 2021-12-07): add data and python support roles
 class ProtocolFileRole(str, Enum):
     """The purpose of a given file in a protocol.
 
@@ -22,12 +24,12 @@ class ProtocolFileRole(str, Enum):
         MAIN: The protocol's main file. In a JSON protocol, this is will
             be the JSON file. In a Python protocol, this is the file
             that exports the main `run` method.
-        PYTHON_SUPPORT: An extra Python file that is not the protocol's
-            entry point.
-        DATA: Catch-all role for non-Python and non-protocol-JSON files.
+        LABWARE: A labware definition file, loadable by a
+            Python file in the same protocol.
     """
 
     MAIN = "main"
+    LABWARE = "labware"
 
 
 @dataclass(frozen=True)
@@ -73,8 +75,17 @@ ProtocolConfig = Union[JsonProtocolConfig, PythonProtocolConfig]
 """Union of all protocol execution configurations."""
 
 
+# TODO(mc, 2021-12-09): Dict[str, Any] is an overly-permissive approximation
+# due to mypy's lack of easy recursive types. Find a more accurate type
 Metadata = Dict[str, Any]
-"""Arbitraty metadata set by a protocol."""
+"""A protocol's metadata (non-essential info, like author and title).
+
+Robot software may not change how it executes a protocol based on
+metadata (excepting a Python protocol's API version, which is in
+metadata due to a historical implementation detail).
+
+Metadata must be a simple JSON-serializable dictionary.
+"""
 
 
 @dataclass(frozen=True)
@@ -82,9 +93,13 @@ class ProtocolSource:
     """A value object representing a protocol and its files on disk.
 
     Attributes:
-        path: The directory location of the protocol on disk.
-        files: The protocol's files.
-
+        directory: The directory location of the protocol on disk.
+        main_file: The location of the protocol's main file on disk.
+        files: Descriptions of all files that make up the protocol.
+        metadata: Arbitrary metadata specified by the protocols.
+        config: Protocol execution configuration.
+        labware_definitions: Labware definitions provided by separate
+            labware files or the main JSON protocol file, if present.
     """
 
     directory: Path
@@ -92,3 +107,4 @@ class ProtocolSource:
     files: List[ProtocolSourceFile]
     metadata: Metadata
     config: ProtocolConfig
+    labware_definitions: List[LabwareDefinition]

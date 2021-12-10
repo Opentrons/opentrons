@@ -2,13 +2,6 @@
 
 from typing import Union
 
-from .add_labware_definition import (
-    AddLabwareDefinition,
-    AddLabwareDefinitionCreate,
-    AddLabwareDefinitionResult,
-    AddLabwareDefinitionCommandType,
-)
-
 from .aspirate import Aspirate, AspirateCreate, AspirateResult, AspirateCommandType
 
 from .dispense import Dispense, DispenseCreate, DispenseResult, DispenseCommandType
@@ -80,7 +73,6 @@ from .custom import (
 )
 
 Command = Union[
-    AddLabwareDefinition,
     Aspirate,
     Dispense,
     DropTip,
@@ -97,7 +89,6 @@ Command = Union[
 ]
 
 CommandType = Union[
-    AddLabwareDefinitionCommandType,
     AspirateCommandType,
     DispenseCommandType,
     DropTipCommandType,
@@ -114,7 +105,6 @@ CommandType = Union[
 ]
 
 CommandCreate = Union[
-    AddLabwareDefinitionCreate,
     AspirateCreate,
     DispenseCreate,
     DropTipCreate,
@@ -130,7 +120,6 @@ CommandCreate = Union[
 ]
 
 CommandResult = Union[
-    AddLabwareDefinitionResult,
     AspirateResult,
     DispenseResult,
     DropTipResult,
