@@ -1,8 +1,13 @@
 """Protocol analysis module."""
+import logging
+
 from opentrons.protocol_runner import ProtocolRunner
 
 from .protocol_store import ProtocolResource
 from .analysis_store import AnalysisStore
+
+
+log = logging.getLogger(__name__)
 
 
 class ProtocolAnalyzer:
@@ -24,6 +29,8 @@ class ProtocolAnalyzer:
     ) -> None:
         """Analyze a given protocol, storing the analysis when complete."""
         result = await self._protocol_runner.run(protocol_resource.source)
+
+        log.info(f'Completed analysis "{analysis_id}".')
 
         self._analysis_store.update(
             analysis_id=analysis_id,

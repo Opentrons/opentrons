@@ -2,11 +2,13 @@
 
 Contains routes dealing primarily with `Run` models.
 """
-from fastapi import APIRouter, Depends, status
+import logging
 from datetime import datetime
-from pydantic import BaseModel, Field
 from typing import Optional, Union
 from typing_extensions import Literal
+
+from fastapi import APIRouter, Depends, status
+from pydantic import BaseModel, Field
 
 from opentrons.protocol_engine import LabwareOffsetCreate
 
@@ -39,6 +41,8 @@ from ..run_models import (
 from ..engine_store import EngineStore, EngineConflictError
 from ..dependencies import get_run_store, get_engine_store
 
+
+log = logging.getLogger(__name__)
 base_router = APIRouter()
 
 
@@ -148,6 +152,7 @@ async def create_run(
     )
 
     run_store.upsert(run=run)
+    log.info(f'Created protocol run "{run_id}" from protocol "{protocol_id}".')
 
     data = Run.construct(
         id=run_id,
@@ -358,7 +363,8 @@ async def add_labware_offset(
             status.HTTP_409_CONFLICT
         )
 
-    engine_store.engine.add_labware_offset(request_body.data)
+    added_offset = engine_store.engine.add_labware_offset(request_body.data)
+    log.info(f'Added labware offset "{added_offset.id}"' f' to run "{runId}".')
 
     engine_state = engine_store.get_state(run.run_id)
     data = Run.construct(
@@ -435,6 +441,7 @@ async def update_run(
             raise RunNotIdle().as_error(status.HTTP_409_CONFLICT)
 
         run_store.upsert(run)
+        log.info(f'Marked run "{runId}" as not current.')
 
     engine_state = engine_store.get_state(run.run_id)
 
