@@ -321,9 +321,7 @@ def blended(constraints: SystemConstraints, first: Move, second: Move) -> bool:
         initial_speed = abs(
             second.blocks[0].initial_speed * second.unit_vector[axis.value]
         )
-        if np.sign(first.unit_vector[axis.value]) == np.sign(
-            second.unit_vector[axis.value]
-        ):
+        if first.unit_vector[axis.value] * second.unit_vector[axis.value] > 0:
             # if they're in the same direction, we can check that either the junction
             # speeds exactly match, or that they're both under the discontinuity limit
             if final_speed <= constraints[axis].max_speed_discont:
