@@ -7,7 +7,7 @@ from typing import List, Mapping, NamedTuple, Optional, Sequence, Tuple, Type, U
 
 from opentrons.protocol_engine import EngineStatus, commands as cmd, errors
 from opentrons.protocol_engine.state.commands import CommandState, CommandView
-from opentrons.protocol_engine.actions import PlayAction, PauseAction
+from opentrons.protocol_engine.actions import PlayAction, PauseAction, PauseSource
 
 from .command_fixtures import (
     create_pending_command,
@@ -277,17 +277,17 @@ action_allowed_specs: List[ActionAllowedSpec] = [
     ),
     ActionAllowedSpec(
         subject=get_command_view(should_stop=False, is_running_queue=False),
-        action=PauseAction(),
+        action=PauseAction(source=PauseSource.CLIENT),
         expected_error=None,
     ),
     ActionAllowedSpec(
         subject=get_command_view(should_stop=False, is_running_queue=True),
-        action=PauseAction(),
+        action=PauseAction(source=PauseSource.CLIENT),
         expected_error=None,
     ),
     ActionAllowedSpec(
         subject=get_command_view(should_stop=True, is_running_queue=False),
-        action=PauseAction(),
+        action=PauseAction(source=PauseSource.CLIENT),
         expected_error=errors.ProtocolEngineStoppedError,
     ),
 ]

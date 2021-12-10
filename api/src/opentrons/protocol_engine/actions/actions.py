@@ -5,6 +5,7 @@ reactions in objects that subscribe to the pipeline, like the StateStore.
 """
 from dataclasses import dataclass
 from datetime import datetime
+from enum import Enum
 from typing import Optional, Union
 
 from opentrons.protocols.models import LabwareDefinition
@@ -19,9 +20,23 @@ class PlayAction:
     """Start or resume processing commands in the engine."""
 
 
+class PauseSource(str, Enum):
+    """The source of a PauseAction.
+
+    Attributes:
+        CLIENT: the pause came externally, from the engine client.
+        PROTOCOL: the pause came from the protocol itself.
+    """
+
+    CLIENT = "client"
+    PROTOCOL = "protocol"
+
+
 @dataclass(frozen=True)
 class PauseAction:
     """Pause processing commands in the engine."""
+
+    source: PauseSource
 
 
 @dataclass(frozen=True)
