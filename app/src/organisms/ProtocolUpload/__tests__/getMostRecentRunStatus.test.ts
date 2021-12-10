@@ -7,7 +7,12 @@ import {
   RUN_ACTION_TYPE_STOP,
 } from '@opentrons/api-client'
 
-import { getMostRecentRunStatus } from '../getMostRecentRunStatus'
+import {
+  getMostRecentRunStatus,
+  MOST_RECENT_RUN_STATUS_CANCELED,
+  MOST_RECENT_RUN_STATUS_COMPLETE,
+  MOST_RECENT_RUN_STATUS_NOT_STARTED,
+} from '../getMostRecentRunStatus'
 
 const mockCompletedRun: RunData = {
   id: '1',
@@ -85,12 +90,18 @@ const mockCanceledRun: RunData = {
 
 describe('getMostRecentRunStatus', () => {
   it('should return a COMPLETE status is a recent run was completed', () => {
-    expect(getMostRecentRunStatus(mockCompletedRun)).toBe('complete')
+    expect(getMostRecentRunStatus(mockCompletedRun)).toBe(
+      MOST_RECENT_RUN_STATUS_COMPLETE
+    )
   })
   it('should return a NOT STARTED status if a recent run was closed before starting', () => {
-    expect(getMostRecentRunStatus(mockNotStartedRun)).toBe('not started')
+    expect(getMostRecentRunStatus(mockNotStartedRun)).toBe(
+      MOST_RECENT_RUN_STATUS_NOT_STARTED
+    )
   })
   it('should return a CANCELED status if a recent run was canceled', () => {
-    expect(getMostRecentRunStatus(mockCanceledRun)).toBe('canceled')
+    expect(getMostRecentRunStatus(mockCanceledRun)).toBe(
+      MOST_RECENT_RUN_STATUS_CANCELED
+    )
   })
 })

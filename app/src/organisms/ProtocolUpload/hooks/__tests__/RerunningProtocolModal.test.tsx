@@ -30,7 +30,7 @@ describe('RerunningProtocolModal', () => {
       'Clicking “Run Again” will take you directly to the Run tab. If you’d like to review the deck setup or run Labware Position Check before running the protocol, navigate to the Protocol tab.'
     )
     getByText(
-      'If you recalibrate your robot, it will clear the last run from the upload page.'
+      'If you recalibrate your robot, it will clear the last run from the upload page. A run can have the following statuses:'
     )
   })
 
