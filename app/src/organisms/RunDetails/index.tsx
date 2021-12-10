@@ -28,6 +28,7 @@ import { useCurrentRunControls } from '../../pages/Run/RunLog/hooks'
 import { CommandList } from './CommandList'
 
 import styles from '../ProtocolUpload/styles.css'
+import { Portal } from '../../App/portal'
 
 export function RunDetails(): JSX.Element | null {
   const { t } = useTranslation(['run_details', 'shared'])
@@ -116,10 +117,12 @@ export function RunDetails(): JSX.Element | null {
   return (
     <>
       {showCloseConfirmExit && (
-        <ConfirmExitProtocolUploadModal
-          exit={confirmCloseExit}
-          back={cancelCloseExit}
-        />
+        <Portal level="top">
+          <ConfirmExitProtocolUploadModal
+            exit={confirmCloseExit}
+            back={cancelCloseExit}
+          />
+        </Portal>
       )}
       <Page titleBarProps={titleBarProps}>
         {showConfirmExit ? <ConfirmCancelModal onClose={cancelExit} /> : null}
