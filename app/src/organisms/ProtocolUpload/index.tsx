@@ -17,8 +17,10 @@ import {
   TEXT_TRANSFORM_UPPERCASE,
   FONT_SIZE_BIG,
   SPACING_8,
-  C_BLUE,
-  C_WHITE,
+  NewAlertPrimaryBtn,
+  LINE_HEIGHT_SOLID,
+  SPACING_3,
+  SPACING_2,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
@@ -134,29 +136,48 @@ export function ProtocolUpload(): JSX.Element {
     cancel: cancelModalExit,
   } = useConditionalConfirm(cancelRunAndExit, true)
 
-  const titleBarProps = isProtocolRunLoaded
-    ? {
-        title: t('protocol_title', {
-          protocol_name: protocolRecord?.data?.metadata?.protocolName ?? '',
-        }),
-        back: {
-          onClick:
-            runStatus === RUN_STATUS_RUNNING ||
-            runStatus === RUN_STATUS_PAUSED ||
-            runStatus === RUN_STATUS_PAUSE_REQUESTED
-              ? confirmCancelModalExit
-              : confirmExit,
-          title: t('shared:close'),
-          children: t('shared:close'),
-          iconName: 'close' as const,
-        },
-        className: styles.reverse_titlebar_items,
-      }
-    : {
-        title: (
-          <Text>{t('upload_and_simulate', { robot_name: robotName })}</Text>
-        ),
-      }
+  const cancelRunButton = (
+    <NewAlertPrimaryBtn
+      onClick={confirmCancelModalExit}
+      lineHeight={LINE_HEIGHT_SOLID}
+      marginX={SPACING_3}
+      paddingRight={SPACING_2}
+      paddingLeft={SPACING_2}
+    >
+      {t('cancel_run')}
+    </NewAlertPrimaryBtn>
+  )
+  const isRunInMotion =
+    runStatus === RUN_STATUS_RUNNING ||
+    runStatus === RUN_STATUS_PAUSED ||
+    runStatus === RUN_STATUS_PAUSE_REQUESTED
+
+  let titleBarProps
+  if (isProtocolRunLoaded && !isRunInMotion) {
+    titleBarProps = {
+      title: t('protocol_title', {
+        protocol_name: protocolRecord?.data?.metadata?.protocolName ?? '',
+      }),
+      back: {
+        onClick: confirmExit,
+        title: t('shared:close'),
+        children: t('shared:close'),
+        iconName: 'close' as const,
+      },
+      className: styles.reverse_titlebar_items,
+    }
+  } else if (isRunInMotion) {
+    titleBarProps = {
+      title: t('protocol_title', {
+        protocol_name: protocolRecord?.data?.metadata?.protocolName ?? '',
+      }),
+      rightNode: cancelRunButton,
+    }
+  } else {
+    titleBarProps = {
+      title: <Text>{t('upload_and_simulate', { robot_name: robotName })}</Text>,
+    }
+  }
 
   const pageContents = isProtocolRunLoaded ? (
     <ProtocolSetup />
@@ -169,14 +190,7 @@ export function ProtocolUpload(): JSX.Element {
       {showConfirmExit && (
         <ConfirmExitProtocolUploadModal exit={confirmExit} back={cancelExit} />
       )}
-      {showConfirmModalExit && (
-        <ConfirmCancelModal
-          onClose={cancelModalExit}
-          secondaryBtnColor={C_BLUE}
-          primaryBtnColor={C_BLUE}
-          primaryBtnColorText={C_WHITE}
-        />
-      )}
+      {showConfirmModalExit && <ConfirmCancelModal onClose={cancelModalExit} />}
       <Page titleBarProps={titleBarProps}>
         {uploadError != null && (
           <AlertItem

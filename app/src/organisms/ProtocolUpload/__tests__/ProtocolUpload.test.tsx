@@ -238,7 +238,7 @@ describe('ProtocolUpload', () => {
       <div>mock confirm cancel modal</div>
     )
     const [{ getByRole }] = render()
-    const button = getByRole('button', { name: 'close' })
+    const button = getByRole('button', { name: 'Cancel Run' })
     fireEvent.click(button)
     expect(screen.queryByText('mock confirm cancel modal')).not.toBeNull()
   })

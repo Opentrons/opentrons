@@ -14,8 +14,6 @@ import {
   SPACING_2,
   SPACING_3,
   useConditionalConfirm,
-  C_BLUE,
-  C_WHITE,
 } from '@opentrons/components'
 import { Page } from '../../atoms/Page'
 import { Portal } from '../../App/portal'
@@ -116,14 +114,7 @@ export function RunDetails(): JSX.Element | null {
         </Portal>
       )}
       <Page titleBarProps={titleBarProps}>
-        {showConfirmExit ? (
-          <ConfirmCancelModal
-            onClose={cancelExit}
-            secondaryBtnColor={C_BLUE}
-            primaryBtnColor={C_BLUE}
-            primaryBtnColorText={C_WHITE}
-          />
-        ) : null}
+        {showConfirmExit ? <ConfirmCancelModal onClose={cancelExit} /> : null}
         <CommandList />
       </Page>
     </>
