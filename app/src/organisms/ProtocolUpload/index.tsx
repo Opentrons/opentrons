@@ -16,7 +16,7 @@ import {
   SPACING_6,
   TEXT_TRANSFORM_UPPERCASE,
   FONT_SIZE_BIG,
-  SPACING_7,
+  SPACING_8,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
@@ -186,7 +186,7 @@ function ProtocolLoader(): JSX.Element | null {
       <Text
         textAlign={ALIGN_CENTER}
         as={'h3'}
-        maxWidth={SPACING_7}
+        maxWidth={SPACING_8}
         textTransform={TEXT_TRANSFORM_UPPERCASE}
         marginTop={SPACING_6}
         color={C_DARK_GRAY}
