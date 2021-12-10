@@ -138,26 +138,28 @@ class LegacyCommandMapper:
         slot = labware_load_info.deck_slot
         location: pe_types.LabwareLocation
         if labware_load_info.on_module:
-            location = pe_types.ModuleLocation(moduleId=self._module_id_by_slot[slot])
+            location = pe_types.ModuleLocation.construct(
+                moduleId=self._module_id_by_slot[slot]
+            )
         else:
-            location = pe_types.DeckSlotLocation(slotName=slot)
+            location = pe_types.DeckSlotLocation.construct(slotName=slot)
 
         command_id = f"commands.LOAD_LABWARE-{count}"
         labware_id = f"labware-{count}"
 
-        load_labware_command = pe_commands.LoadLabware(
+        load_labware_command = pe_commands.LoadLabware.construct(
             id=command_id,
             status=pe_commands.CommandStatus.SUCCEEDED,
             createdAt=now,
             startedAt=now,
             completedAt=now,
-            params=pe_commands.LoadLabwareParams(
+            params=pe_commands.LoadLabwareParams.construct(
                 location=location,
                 loadName=labware_load_info.labware_load_name,
                 namespace=labware_load_info.labware_namespace,
                 version=labware_load_info.labware_version,
             ),
-            result=pe_commands.LoadLabwareResult(
+            result=pe_commands.LoadLabwareResult.construct(
                 labwareId=labware_id,
                 definition=LabwareDefinition.parse_obj(
                     labware_load_info.labware_definition
@@ -184,19 +186,19 @@ class LegacyCommandMapper:
         pipette_id = f"pipette-{count}"
         mount = MountType(str(instrument_load_info.mount).lower())
 
-        load_pipette_command = pe_commands.LoadPipette(
+        load_pipette_command = pe_commands.LoadPipette.construct(
             id=command_id,
             status=pe_commands.CommandStatus.SUCCEEDED,
             createdAt=now,
             startedAt=now,
             completedAt=now,
-            params=pe_commands.LoadPipetteParams(
+            params=pe_commands.LoadPipetteParams.construct(
                 pipetteName=pe_types.PipetteName(
                     instrument_load_info.instrument_load_name
                 ),
                 mount=mount,
             ),
-            result=pe_commands.LoadPipetteResult(pipetteId=pipette_id),
+            result=pe_commands.LoadPipetteResult.construct(pipetteId=pipette_id),
         )
 
         self._command_count["LOAD_PIPETTE"] = count + 1
@@ -222,20 +224,20 @@ class LegacyCommandMapper:
             module_model
         ) or self._module_data_provider.get_module_definition(module_model)
 
-        load_module_command = pe_commands.LoadModule(
+        load_module_command = pe_commands.LoadModule.construct(
             id=f"commands.LOAD_MODULE-{count}",
             status=pe_commands.CommandStatus.SUCCEEDED,
             createdAt=now,
             startedAt=now,
             completedAt=now,
-            params=pe_commands.LoadModuleParams(
+            params=pe_commands.LoadModuleParams.construct(
                 model=module_model,
                 location=pe_types.DeckSlotLocation(
                     slotName=module_load_info.deck_slot,
                 ),
                 moduleId=module_id,
             ),
-            result=pe_commands.LoadModuleResult(
+            result=pe_commands.LoadModuleResult.construct(
                 moduleId=module_id,
                 moduleSerial=module_load_info.module_serial,
                 definition=definition,
@@ -269,12 +271,12 @@ class LegacyCommandMapper:
             labware_id = self._labware_id_by_slot[slot]
             pipette_id = self._pipette_id_by_mount[mount]
 
-            engine_command = pe_commands.PickUpTip(
+            engine_command = pe_commands.PickUpTip.construct(
                 id=command_id,
                 status=pe_commands.CommandStatus.RUNNING,
                 createdAt=now,
                 startedAt=now,
-                params=pe_commands.PickUpTipParams(
+                params=pe_commands.PickUpTipParams.construct(
                     pipetteId=pipette_id,
                     labwareId=labware_id,
                     wellName=well_name,
@@ -282,12 +284,12 @@ class LegacyCommandMapper:
             )
 
         else:
-            engine_command = pe_commands.Custom(
+            engine_command = pe_commands.Custom.construct(
                 id=command_id,
                 status=pe_commands.CommandStatus.RUNNING,
                 createdAt=now,
                 startedAt=now,
-                params=LegacyCommandParams(
+                params=LegacyCommandParams.construct(
                     legacyCommandType=command["name"],
                     legacyCommandText=command["payload"]["text"],
                 ),

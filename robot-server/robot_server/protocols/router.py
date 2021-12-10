@@ -1,6 +1,8 @@
 """Router for /protocols endpoints."""
+import logging
 import textwrap
 from datetime import datetime
+
 from fastapi import APIRouter, Depends, File, UploadFile, status
 from typing import List
 from typing_extensions import Literal
@@ -11,9 +13,9 @@ from robot_server.errors import ErrorDetails, ErrorResponse
 from robot_server.service.task_runner import TaskRunner
 from robot_server.service.dependencies import get_unique_id, get_current_time
 from robot_server.service.json_api import (
-    SimpleResponseModel,
-    SimpleMultiResponseModel,
-    SimpleEmptyResponseModel,
+    SimpleResponse,
+    SimpleMultiResponse,
+    SimpleEmptyResponse,
 )
 
 from .protocol_models import Protocol, ProtocolFile, Metadata
@@ -26,6 +28,9 @@ from .dependencies import (
     get_analysis_store,
     get_protocol_analyzer,
 )
+
+
+log = logging.getLogger(__name__)
 
 
 class ProtocolNotFound(ErrorDetails):
@@ -57,9 +62,8 @@ protocols_router = APIRouter()
         """
     ),
     status_code=status.HTTP_201_CREATED,
-    response_model=SimpleResponseModel[Protocol],
-    response_model_exclude_none=True,
     responses={
+        status.HTTP_201_CREATED: {"model": SimpleResponse[Protocol]},
         status.HTTP_422_UNPROCESSABLE_ENTITY: {
             "model": ErrorResponse[ProtocolFilesInvalid]
         },
@@ -75,7 +79,7 @@ async def create_protocol(
     protocol_id: str = Depends(get_unique_id, use_cache=False),
     analysis_id: str = Depends(get_unique_id, use_cache=False),
     created_at: datetime = Depends(get_current_time),
-) -> SimpleResponseModel[Protocol]:
+) -> SimpleResponse[Protocol]:
     """Create a new protocol by uploading its files.
 
     Arguments:
@@ -126,20 +130,22 @@ async def create_protocol(
         files=[ProtocolFile(name=f.name, role=f.role) for f in source.files],
     )
 
-    return SimpleResponseModel(data=data)
+    log.info(
+        f'Created protocol "{protocol_id}"' f' and started analysis "{analysis_id}".'
+    )
+    return SimpleResponse.construct(data=data)
 
 
 @protocols_router.get(
     path="/protocols",
     summary="Get uploaded protocols",
     status_code=status.HTTP_200_OK,
-    response_model=SimpleMultiResponseModel[Protocol],
-    response_model_exclude_none=True,
+    responses={status.HTTP_200_OK: {"model": SimpleMultiResponse[Protocol]}},
 )
 async def get_protocols(
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
-) -> SimpleMultiResponseModel[Protocol]:
+) -> SimpleMultiResponse[Protocol]:
     """Get a list of all currently uploaded protocols.
 
     Args:
@@ -159,16 +165,15 @@ async def get_protocols(
         for r in protocol_resources
     ]
 
-    return SimpleMultiResponseModel(data=data)
+    return SimpleMultiResponse.construct(data=data)
 
 
 @protocols_router.get(
     path="/protocols/{protocolId}",
     summary="Get an uploaded protocol",
     status_code=status.HTTP_200_OK,
-    response_model=SimpleResponseModel[Protocol],
-    response_model_exclude_none=True,
     responses={
+        status.HTTP_200_OK: {"model": SimpleResponse[Protocol]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[ProtocolNotFound]},
     },
 )
@@ -176,7 +181,7 @@ async def get_protocol_by_id(
     protocolId: str,
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
-) -> SimpleResponseModel[Protocol]:
+) -> SimpleResponse[Protocol]:
     """Get an uploaded protocol by ID.
 
     Args:
@@ -200,23 +205,22 @@ async def get_protocol_by_id(
         files=[ProtocolFile(name=f.name, role=f.role) for f in resource.source.files],
     )
 
-    return SimpleResponseModel(data=data)
+    return SimpleResponse.construct(data=data)
 
 
 @protocols_router.delete(
     path="/protocols/{protocolId}",
     summary="Delete an uploaded protocol",
     status_code=status.HTTP_200_OK,
-    response_model=SimpleEmptyResponseModel,
-    response_model_exclude_none=True,
     responses={
+        status.HTTP_200_OK: {"model": SimpleEmptyResponse},
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[ProtocolNotFound]},
     },
 )
 async def delete_protocol_by_id(
     protocolId: str,
     protocol_store: ProtocolStore = Depends(get_protocol_store),
-) -> SimpleEmptyResponseModel:
+) -> SimpleEmptyResponse:
     """Delete an uploaded protocol by ID.
 
     Arguments:
@@ -229,4 +233,4 @@ async def delete_protocol_by_id(
     except ProtocolNotFoundError as e:
         raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
-    return SimpleEmptyResponseModel()
+    return SimpleEmptyResponse()

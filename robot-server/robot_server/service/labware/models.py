@@ -5,9 +5,9 @@ from functools import partial
 from pydantic import BaseModel, Field
 
 from robot_server.service.json_api import (
-    ResponseModel,
+    DeprecatedResponseModel,
     ResponseDataModel,
-    MultiResponseModel,
+    DeprecatedMultiResponseModel,
 )
 
 # NOTE: this would be more accurately typed as
@@ -114,6 +114,6 @@ class LabwareCalibration(ResponseDataModel):
         }
 
 
-MultipleCalibrationsResponse = MultiResponseModel[LabwareCalibration, None]
+MultipleCalibrationsResponse = DeprecatedMultiResponseModel[LabwareCalibration]
 
-SingleCalibrationResponse = ResponseModel[LabwareCalibration, None]
+SingleCalibrationResponse = DeprecatedResponseModel[LabwareCalibration]

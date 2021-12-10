@@ -12,6 +12,7 @@ import {
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
+import { useFeatureFlag } from '../redux/config'
 import { getConnectedRobot } from '../redux/discovery'
 import { GlobalStyle } from '../atoms/GlobalStyle'
 import { Alerts } from '../organisms/Alerts'
@@ -28,6 +29,7 @@ import { RunPanel } from '../pages/Run/RunPanel'
 import { MorePanel } from '../pages/More/MorePanel'
 
 import { Navbar } from './Navbar'
+import { NextGenApp } from './NextGenApp'
 import { PortalRoot as ModalPortalRoot, TopPortalRoot } from './portal'
 
 import type { State } from '../redux/types'
@@ -36,6 +38,7 @@ const stopEvent = (event: React.MouseEvent): void => event.preventDefault()
 
 export const AppComponent = (): JSX.Element => {
   const connectedRobot = useSelector((state: State) => getConnectedRobot(state))
+  const isNextGenApp = useFeatureFlag('hierarchyReorganization')
 
   return (
     <ApiHostProvider hostname={connectedRobot?.ip ?? null}>
@@ -48,36 +51,44 @@ export const AppComponent = (): JSX.Element => {
         onDragOver={stopEvent}
         onDrop={stopEvent}
       >
-        <Navbar />
-        <Switch>
-          <Route path="/robots/:name?" component={ConnectPanel} />
-          <Route path="/more" component={MorePanel} />
-          <Route path="/calibrate" component={CalibratePanel} />
-          <Route path="/run" component={RunPanel} />
-        </Switch>
-        <TopPortalRoot />
-        <Box position={POSITION_RELATIVE} width="100%" height="100%">
-          <ModalPortalRoot />
-          <Switch>
-            <Route path="/robots/:name?">
-              <Robots />
-            </Route>
-            <Route path="/more">
-              <More />
-            </Route>
-            <Route path="/upload">
-              <Upload />
-            </Route>
-            <Route path="/calibrate">
-              <Calibrate />
-            </Route>
-            <Route path="/run">
-              <Run />
-            </Route>
-            <Redirect exact from="/" to="/robots" />
-          </Switch>
-          <Alerts />
-        </Box>
+        {isNextGenApp ? (
+          <NextGenApp />
+        ) : (
+          <>
+            <Navbar />
+            <Switch>
+              <Route path="/robots/:name?" component={ConnectPanel} />
+              <Route path="/more" component={MorePanel} />
+              <Route path="/calibrate" component={CalibratePanel} />
+              <Route path="/run" component={RunPanel} />
+            </Switch>
+            <TopPortalRoot />
+            <Box position={POSITION_RELATIVE} width="100%" height="100%">
+              <ModalPortalRoot />
+              <Switch>
+                <Route path="/robots/:name?">
+                  <Robots />
+                </Route>
+                <Route path="/more">
+                  <More />
+                </Route>
+                <Route path="/upload">
+                  <Upload />
+                </Route>
+                <Route path="/calibrate">
+                  <Calibrate />
+                </Route>
+                <Route path="/run">
+                  <Run />
+                </Route>
+                <Redirect exact from="/" to="/robots" />
+                {/* redirect after next gen app feature flag toggle */}
+                <Redirect exact from="/app-settings" to="/more" />
+              </Switch>
+              <Alerts />
+            </Box>
+          </>
+        )}
       </Flex>
     </ApiHostProvider>
   )

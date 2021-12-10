@@ -17,8 +17,8 @@ from robot_server.errors import ApiError
 from robot_server.service.task_runner import TaskRunner
 from robot_server.service.json_api import (
     RequestModel,
-    SimpleResponseModel,
-    SimpleEmptyResponseModel,
+    SimpleResponse,
+    SimpleEmptyResponse,
     ResourceLink,
 )
 
@@ -103,7 +103,7 @@ async def test_create_run(
         actions=[],
         is_current=True,
     )
-    expected_response = Run(
+    expected_response = Run.construct(
         id=run_id,
         protocolId=None,
         createdAt=run_created_at,
@@ -182,7 +182,7 @@ async def test_create_protocol_run(
             labware_definitions=[],
         ),
     )
-    expected_response = Run(
+    expected_response = Run.construct(
         id="run-id",
         protocolId="protocol-id",
         createdAt=run_created_at,
@@ -309,7 +309,7 @@ async def test_get_run(
         mount=MountType.LEFT,
     )
 
-    expected_response = Run(
+    expected_response = Run.construct(
         id="run-id",
         protocolId=None,
         createdAt=created_at,
@@ -318,7 +318,7 @@ async def test_get_run(
         actions=[],
         errors=[],
         commands=[
-            RunCommandSummary(
+            RunCommandSummary.construct(
                 id=command.id,
                 commandType=command.commandType,
                 status=command.status,
@@ -390,7 +390,7 @@ async def test_get_run_with_errors(
         detail="oh no no",
     )
 
-    expected_response = Run(
+    expected_response = Run.construct(
         id="run-id",
         protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
@@ -399,7 +399,7 @@ async def test_get_run_with_errors(
         actions=[],
         errors=[error_1, error_2],
         commands=[
-            RunCommandSummary(
+            RunCommandSummary.construct(
                 id=command.id,
                 commandType=command.commandType,
                 status=command.status,
@@ -482,7 +482,7 @@ async def test_get_runs_not_empty(
         is_current=True,
     )
 
-    response_1 = Run(
+    response_1 = Run.construct(
         id="unique-id-1",
         protocolId=None,
         createdAt=created_at_1,
@@ -496,7 +496,7 @@ async def test_get_runs_not_empty(
         labwareOffsets=[],
     )
 
-    response_2 = Run(
+    response_2 = Run.construct(
         id="unique-id-2",
         protocolId=None,
         createdAt=created_at_2,
@@ -559,7 +559,7 @@ async def test_delete_run_by_id(
         run_store.remove(run_id="run-id"),
     )
 
-    assert result == SimpleEmptyResponseModel()
+    assert result == SimpleEmptyResponse()
 
 
 async def test_delete_run_with_bad_id(
@@ -633,7 +633,7 @@ async def test_add_labware_offset(
         is_current=True,
     )
 
-    expected_response = Run(
+    expected_response = Run.construct(
         id="run-id",
         protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
@@ -656,6 +656,17 @@ async def test_add_labware_offset(
     decoy.when(engine_state.commands.get_all_errors()).then_return([])
     decoy.when(engine_state.pipettes.get_all()).then_return([])
     decoy.when(engine_state.labware.get_all()).then_return([])
+    decoy.when(
+        engine_store.engine.add_labware_offset(labware_offset_request)
+    ).then_return(
+        pe_types.LabwareOffset(
+            id="labware-offset-id",
+            createdAt=datetime(year=2021, month=1, day=1),
+            definitionUri="labware-definition-uri",
+            location=pe_types.LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
+            vector=pe_types.LabwareOffsetVector(x=0, y=0, z=0),
+        )
+    )
     # Tests for run POST and GET should already cover passing the engine's labware
     # offsets to the client when .get_labware_offsets() returns a non-empty list.
     decoy.when(engine_state.labware.get_labware_offsets()).then_return([])
@@ -669,9 +680,8 @@ async def test_add_labware_offset(
         engine_store=engine_store,
         run_store=run_store,
     )
-    decoy.verify(engine_store.engine.add_labware_offset(labware_offset_request))
 
-    assert response == SimpleResponseModel(data=expected_response)
+    assert response == SimpleResponse(data=expected_response)
 
 
 async def test_update_run_to_not_current(
@@ -697,7 +707,7 @@ async def test_update_run_to_not_current(
         is_current=False,
     )
 
-    expected_response = Run(
+    expected_response = Run.construct(
         id="run-id",
         protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
@@ -738,7 +748,7 @@ async def test_update_run_to_not_current(
         engine_store=engine_store,
     )
 
-    assert result == SimpleResponseModel(data=expected_response)
+    assert result == SimpleResponse(data=expected_response)
     decoy.verify(
         engine_store.clear(),
         run_store.upsert(updated_resource),
@@ -760,7 +770,7 @@ async def test_update_current_to_current_noop(
         is_current=True,
     )
 
-    expected_response = Run(
+    expected_response = Run.construct(
         id="run-id",
         protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
@@ -801,7 +811,7 @@ async def test_update_current_to_current_noop(
         engine_store=engine_store,
     )
 
-    assert result == SimpleResponseModel(data=expected_response)
+    assert result == SimpleResponse(data=expected_response)
     decoy.verify(run_store.upsert(run_resource), times=0)
     decoy.verify(engine_store.clear(), times=0)
 

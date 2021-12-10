@@ -1,4 +1,6 @@
 """Router for /runs actions endpoints."""
+import logging
+
 from fastapi import APIRouter, Depends, status
 from datetime import datetime
 from typing import Union
@@ -8,7 +10,7 @@ from opentrons.protocol_engine.errors import ProtocolEngineStoppedError
 
 from robot_server.errors import ErrorDetails, ErrorResponse
 from robot_server.service.dependencies import get_current_time, get_unique_id
-from robot_server.service.json_api import RequestModel, SimpleResponseModel
+from robot_server.service.json_api import RequestModel, SimpleResponse
 
 from ..run_store import RunStore, RunNotFoundError
 from ..run_view import RunView
@@ -17,6 +19,8 @@ from ..engine_store import EngineStore
 from ..dependencies import get_run_store, get_engine_store
 from .base_router import RunNotFound, RunStopped
 
+
+log = logging.getLogger(__name__)
 actions_router = APIRouter()
 
 
@@ -30,11 +34,10 @@ class RunActionNotAllowed(ErrorDetails):
 @actions_router.post(
     path="/runs/{runId}/actions",
     summary="Issue a control action to the run",
-    description=("Provide an action in order to control execution of the run."),
+    description="Provide an action in order to control execution of the run.",
     status_code=status.HTTP_201_CREATED,
-    response_model=SimpleResponseModel[RunAction],
-    response_model_exclude_none=True,
     responses={
+        status.HTTP_201_CREATED: {"model": SimpleResponse[RunAction]},
         status.HTTP_409_CONFLICT: {
             "model": ErrorResponse[Union[RunActionNotAllowed, RunStopped]],
         },
@@ -49,7 +52,7 @@ async def create_run_action(
     engine_store: EngineStore = Depends(get_engine_store),
     action_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
-) -> SimpleResponseModel[RunAction]:
+) -> SimpleResponse[RunAction]:
     """Create a run control action.
 
     Arguments:
@@ -80,10 +83,13 @@ async def create_run_action(
 
     try:
         if action.actionType == RunActionType.PLAY:
+            log.info(f'Playing run "{runId}".')
             engine_store.runner.play()
         elif action.actionType == RunActionType.PAUSE:
+            log.info(f'Pausing run "{runId}".')
             engine_store.runner.pause()
         elif action.actionType == RunActionType.STOP:
+            log.info(f'Stopping run "{runId}".')
             await engine_store.runner.stop()
 
     except ProtocolEngineStoppedError as e:
@@ -91,4 +97,4 @@ async def create_run_action(
 
     run_store.upsert(run=next_run)
 
-    return SimpleResponseModel(data=action)
+    return SimpleResponse.construct(data=action)
