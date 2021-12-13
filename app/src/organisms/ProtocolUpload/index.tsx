@@ -17,9 +17,18 @@ import {
   TEXT_TRANSFORM_UPPERCASE,
   FONT_SIZE_BIG,
   SPACING_8,
+  NewAlertPrimaryBtn,
+  LINE_HEIGHT_SOLID,
+  SPACING_3,
+  SPACING_2,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+import {
+  RUN_STATUS_RUNNING,
+  RUN_STATUS_PAUSED,
+  RUN_STATUS_PAUSE_REQUESTED,
+} from '@opentrons/api-client'
 import { Page } from '../../atoms/Page'
 import { UploadInput } from './UploadInput'
 import { ProtocolSetup } from '../ProtocolSetup'
@@ -29,6 +38,9 @@ import { loadProtocol } from '../../redux/protocol/actions'
 import { ingestProtocolFile } from '../../redux/protocol/utils'
 import { getConnectedRobotName } from '../../redux/robot/selectors'
 import { getValidCustomLabwareFiles } from '../../redux/custom-labware/selectors'
+import { ConfirmCancelModal } from '../../pages/Run/RunLog'
+import { useRunStatus } from '../RunTimeControl/hooks'
+import { useCurrentRunControls } from '../../pages/Run/RunLog/hooks'
 
 import { ConfirmExitProtocolUploadModal } from './ConfirmExitProtocolUploadModal'
 
@@ -52,7 +64,7 @@ export function ProtocolUpload(): JSX.Element {
     protocolRecord,
     isCreatingProtocolRun,
   } = useCurrentProtocolRun()
-
+  const runStatus = useRunStatus()
   const { closeCurrentRun, isProtocolRunLoaded } = useCloseCurrentRun()
   const robotName = useSelector((state: State) => getConnectedRobotName(state))
   const customLabwareFiles = useSelector((state: State) =>
@@ -103,7 +115,12 @@ export function ProtocolUpload(): JSX.Element {
       }
     )
   }
+  const { pauseRun } = useCurrentRunControls()
 
+  const cancelRunAndExit = (): void => {
+    pauseRun()
+    confirmExit()
+  }
   const handleCloseProtocol: React.MouseEventHandler = _event => {
     closeCurrentRun()
   }
@@ -113,25 +130,54 @@ export function ProtocolUpload(): JSX.Element {
     confirm: confirmExit,
     cancel: cancelExit,
   } = useConditionalConfirm(handleCloseProtocol, true)
+  const {
+    showConfirmation: showConfirmModalExit,
+    confirm: confirmCancelModalExit,
+    cancel: cancelModalExit,
+  } = useConditionalConfirm(cancelRunAndExit, true)
 
-  const titleBarProps = isProtocolRunLoaded
-    ? {
-        title: t('protocol_title', {
-          protocol_name: protocolRecord?.data?.metadata?.protocolName ?? '',
-        }),
-        back: {
-          onClick: confirmExit,
-          title: t('shared:close'),
-          children: t('shared:close'),
-          iconName: 'close' as const,
-        },
-        className: styles.reverse_titlebar_items,
-      }
-    : {
-        title: (
-          <Text>{t('upload_and_simulate', { robot_name: robotName })}</Text>
-        ),
-      }
+  const cancelRunButton = (
+    <NewAlertPrimaryBtn
+      onClick={confirmCancelModalExit}
+      lineHeight={LINE_HEIGHT_SOLID}
+      marginX={SPACING_3}
+      paddingRight={SPACING_2}
+      paddingLeft={SPACING_2}
+    >
+      {t('cancel_run')}
+    </NewAlertPrimaryBtn>
+  )
+  const isRunInMotion =
+    runStatus === RUN_STATUS_RUNNING ||
+    runStatus === RUN_STATUS_PAUSED ||
+    runStatus === RUN_STATUS_PAUSE_REQUESTED
+
+  let titleBarProps
+  if (isProtocolRunLoaded && !isRunInMotion) {
+    titleBarProps = {
+      title: t('protocol_title', {
+        protocol_name: protocolRecord?.data?.metadata?.protocolName ?? '',
+      }),
+      back: {
+        onClick: confirmExit,
+        title: t('shared:close'),
+        children: t('shared:close'),
+        iconName: 'close' as const,
+      },
+      className: styles.reverse_titlebar_items,
+    }
+  } else if (isRunInMotion) {
+    titleBarProps = {
+      title: t('protocol_title', {
+        protocol_name: protocolRecord?.data?.metadata?.protocolName ?? '',
+      }),
+      rightNode: cancelRunButton,
+    }
+  } else {
+    titleBarProps = {
+      title: <Text>{t('upload_and_simulate', { robot_name: robotName })}</Text>,
+    }
+  }
 
   const pageContents = isProtocolRunLoaded ? (
     <ProtocolSetup />
@@ -144,6 +190,7 @@ export function ProtocolUpload(): JSX.Element {
       {showConfirmExit && (
         <ConfirmExitProtocolUploadModal exit={confirmExit} back={cancelExit} />
       )}
+      {showConfirmModalExit && <ConfirmCancelModal onClose={cancelModalExit} />}
       <Page titleBarProps={titleBarProps}>
         {uploadError != null && (
           <AlertItem
@@ -162,6 +209,7 @@ export function ProtocolUpload(): JSX.Element {
             )}
           </AlertItem>
         )}
+
         <Box
           height="calc(100vh - 3rem)"
           width="100%"

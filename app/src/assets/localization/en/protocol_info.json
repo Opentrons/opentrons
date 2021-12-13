@@ -50,5 +50,6 @@
   "labware_positon_check_complete_toast_no_offsets": "Labware Position Check complete. No Labware Offsets created.",
   "labware_positon_check_complete_toast_with_offsets": "Labware Position Check complete. {{count}} Labware Offset created.",
   "labware_positon_check_complete_toast_with_offsets_plural": "Labware Position Check complete. {{count}} Labware Offsets created.",
-  "protocol_loading": "Opening Protocol On {{robot_name}}"
+  "protocol_loading": "Opening Protocol On {{robot_name}}",
+  "cancel_run": "Cancel Run"
 }
