@@ -76,6 +76,7 @@ class QueueCommandAction:
     """Add a command request to the queue."""
 
     command_id: str
+    command_key: str
     created_at: datetime
     request: CommandCreate
 

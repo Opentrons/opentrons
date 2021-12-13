@@ -13,8 +13,9 @@ from opentrons.protocol_engine.types import (
 )
 
 
-def create_pending_command(
+def create_queued_command(
     command_id: str = "command-id",
+    command_key: str = "command-key",
     command_type: str = "command-type",
     params: Optional[BaseModel] = None,
 ) -> cmd.Command:
@@ -23,6 +24,7 @@ def create_pending_command(
         cmd.Command,
         cmd.BaseCommand(
             id=command_id,
+            key=command_key,
             commandType=command_type,
             createdAt=datetime(year=2021, month=1, day=1),
             status=cmd.CommandStatus.QUEUED,
@@ -33,6 +35,7 @@ def create_pending_command(
 
 def create_running_command(
     command_id: str = "command-id",
+    command_key: str = "command-key",
     command_type: str = "command-type",
     params: Optional[BaseModel] = None,
 ) -> cmd.Command:
@@ -41,6 +44,7 @@ def create_running_command(
         cmd.Command,
         cmd.BaseCommand(
             id=command_id,
+            key=command_key,
             createdAt=datetime(year=2021, month=1, day=1),
             commandType=command_type,
             status=cmd.CommandStatus.RUNNING,
@@ -51,6 +55,7 @@ def create_running_command(
 
 def create_failed_command(
     command_id: str = "command-id",
+    command_key: str = "command-key",
     command_type: str = "command-type",
     error_id: str = "error-id",
     completed_at: datetime = datetime(year=2022, month=2, day=2),
@@ -61,6 +66,7 @@ def create_failed_command(
         cmd.Command,
         cmd.BaseCommand(
             id=command_id,
+            key=command_key,
             createdAt=datetime(year=2021, month=1, day=1),
             commandType=command_type,
             status=cmd.CommandStatus.FAILED,
@@ -71,8 +77,9 @@ def create_failed_command(
     )
 
 
-def create_completed_command(
+def create_succeeded_command(
     command_id: str = "command-id",
+    command_key: str = "command-key",
     command_type: str = "command-type",
     params: Optional[BaseModel] = None,
     result: Optional[BaseModel] = None,
@@ -82,6 +89,7 @@ def create_completed_command(
         cmd.Command,
         cmd.BaseCommand(
             id=command_id,
+            key=command_key,
             createdAt=datetime(year=2021, month=1, day=1),
             commandType=command_type,
             status=cmd.CommandStatus.SUCCEEDED,
@@ -112,6 +120,7 @@ def create_load_labware_command(
 
     return cmd.LoadLabware(
         id="command-id",
+        key="command-key",
         status=cmd.CommandStatus.SUCCEEDED,
         createdAt=datetime.now(),
         params=params,
@@ -130,6 +139,7 @@ def create_load_pipette_command(
 
     return cmd.LoadPipette(
         id="command-id",
+        key="command-key",
         status=cmd.CommandStatus.SUCCEEDED,
         createdAt=datetime.now(),
         params=params,
@@ -156,6 +166,7 @@ def create_aspirate_command(
 
     return cmd.Aspirate(
         id="command-id",
+        key="command-key",
         status=cmd.CommandStatus.SUCCEEDED,
         createdAt=datetime.now(),
         params=params,
@@ -182,6 +193,7 @@ def create_dispense_command(
 
     return cmd.Dispense(
         id="command-id",
+        key="command-key",
         status=cmd.CommandStatus.SUCCEEDED,
         createdAt=datetime.now(),
         params=params,
@@ -205,6 +217,7 @@ def create_pick_up_tip_command(
 
     return cmd.PickUpTip(
         id="command-id",
+        key="command-key",
         status=cmd.CommandStatus.SUCCEEDED,
         createdAt=datetime.now(),
         params=data,
@@ -228,6 +241,7 @@ def create_drop_tip_command(
 
     return cmd.DropTip(
         id="command-id",
+        key="command-key",
         status=cmd.CommandStatus.SUCCEEDED,
         createdAt=datetime.now(),
         params=params,
@@ -251,6 +265,7 @@ def create_move_to_well_command(
 
     return cmd.MoveToWell(
         id="command-id",
+        key="command-key",
         status=cmd.CommandStatus.SUCCEEDED,
         createdAt=datetime.now(),
         params=params,

@@ -64,6 +64,7 @@ async def test_analyze(
 
     analysis_command = pe_commands.Pause(
         id="command-id",
+        key="command-key",
         status=pe_commands.CommandStatus.SUCCEEDED,
         createdAt=datetime(year=2022, month=2, day=2),
         params=pe_commands.PauseParams(message="hello world"),

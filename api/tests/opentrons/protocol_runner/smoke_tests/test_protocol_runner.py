@@ -70,6 +70,7 @@ async def test_runner_with_python(
 
     expected_command = commands.PickUpTip.construct(
         id=matchers.IsA(str),
+        key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
@@ -124,6 +125,7 @@ async def test_runner_with_json(
 
     expected_command = commands.PickUpTip.construct(
         id=matchers.IsA(str),
+        key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
@@ -180,6 +182,7 @@ async def test_runner_with_legacy_python(
 
     expected_command = commands.PickUpTip.construct(
         id=matchers.IsA(str),
+        key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
@@ -236,6 +239,7 @@ async def test_runner_with_legacy_json(
 
     expected_command = commands.PickUpTip.construct(
         id=matchers.IsA(str),
+        key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),

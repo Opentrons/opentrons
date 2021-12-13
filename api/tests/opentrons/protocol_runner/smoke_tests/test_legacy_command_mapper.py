@@ -83,6 +83,7 @@ async def test_legacy_pick_up_tip(
 
     assert commands_result[0] == commands.LoadLabware.construct(
         id=matchers.IsA(str),
+        key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
@@ -93,6 +94,7 @@ async def test_legacy_pick_up_tip(
 
     assert commands_result[1] == commands.LoadLabware.construct(
         id=matchers.IsA(str),
+        key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
@@ -103,6 +105,7 @@ async def test_legacy_pick_up_tip(
 
     assert commands_result[2] == commands.LoadPipette.construct(
         id=matchers.IsA(str),
+        key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
@@ -113,6 +116,7 @@ async def test_legacy_pick_up_tip(
 
     assert commands_result[3] == commands.LoadPipette.construct(
         id=matchers.IsA(str),
+        key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
@@ -130,6 +134,7 @@ async def test_legacy_pick_up_tip(
 
     assert commands_result[4] == commands.PickUpTip.construct(
         id=matchers.IsA(str),
+        key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
@@ -143,6 +148,7 @@ async def test_legacy_pick_up_tip(
 
     assert commands_result[5] == commands.PickUpTip.construct(
         id=matchers.IsA(str),
+        key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
@@ -158,6 +164,7 @@ async def test_legacy_pick_up_tip(
 
     assert commands_result[7] == commands.PickUpTip.construct(
         id=matchers.IsA(str),
+        key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),

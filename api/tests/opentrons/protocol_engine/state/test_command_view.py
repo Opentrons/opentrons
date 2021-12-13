@@ -10,10 +10,10 @@ from opentrons.protocol_engine.state.commands import CommandState, CommandView
 from opentrons.protocol_engine.actions import PlayAction, PauseAction, PauseSource
 
 from .command_fixtures import (
-    create_pending_command,
+    create_queued_command,
     create_running_command,
     create_failed_command,
-    create_completed_command,
+    create_succeeded_command,
 )
 
 
@@ -40,7 +40,7 @@ def get_command_view(
 
 def test_get_by_id() -> None:
     """It should get a command by ID from state."""
-    command = create_completed_command(command_id="command-id")
+    command = create_succeeded_command(command_id="command-id")
     subject = get_command_view(commands_by_id=[("command-id", command)])
 
     assert subject.get("command-id") == command
@@ -48,7 +48,7 @@ def test_get_by_id() -> None:
 
 def test_get_command_bad_id() -> None:
     """It should raise if a requested command ID isn't in state."""
-    command = create_completed_command(command_id="command-id")
+    command = create_succeeded_command(command_id="command-id")
     subject = get_command_view(commands_by_id=[("command-id", command)])
 
     with pytest.raises(errors.CommandDoesNotExistError):
@@ -57,9 +57,9 @@ def test_get_command_bad_id() -> None:
 
 def test_get_all() -> None:
     """It should get all the commands from the state."""
-    command_1 = create_completed_command(command_id="command-id-1")
+    command_1 = create_succeeded_command(command_id="command-id-1")
     command_2 = create_running_command(command_id="command-id-2")
-    command_3 = create_pending_command(command_id="command-id-3")
+    command_3 = create_queued_command(command_id="command-id-3")
 
     subject = get_command_view(
         commands_by_id=[
@@ -74,9 +74,9 @@ def test_get_all() -> None:
 
 def test_get_next_queued_returns_first_pending() -> None:
     """It should return the first command that's pending."""
-    pending_command = create_pending_command()
+    pending_command = create_queued_command()
     running_command = create_running_command()
-    completed_command = create_completed_command()
+    completed_command = create_succeeded_command()
 
     subject = get_command_view(
         is_running_queue=True,
@@ -94,7 +94,7 @@ def test_get_next_queued_returns_first_pending() -> None:
 def test_get_next_queued_returns_none_when_no_pending() -> None:
     """It should return None if there are no pending commands to return."""
     running_command = create_running_command(command_id="command-id-1")
-    completed_command = create_completed_command(command_id="command-id-2")
+    completed_command = create_succeeded_command(command_id="command-id-2")
 
     subject = get_command_view(is_running_queue=True)
 
@@ -113,7 +113,7 @@ def test_get_next_queued_returns_none_when_no_pending() -> None:
 
 def test_get_next_queued_returns_none_if_not_running() -> None:
     """It should return None if the engine is not running."""
-    pending_command = create_pending_command()
+    pending_command = create_queued_command()
 
     subject = get_command_view(
         is_running_queue=False,
@@ -127,9 +127,9 @@ def test_get_next_queued_returns_none_if_not_running() -> None:
 def test_get_next_queued_raises_when_earlier_command_failed() -> None:
     """It should raise if any prior-added command is failed."""
     running_command = create_running_command(command_id="command-id-1")
-    completed_command = create_completed_command(command_id="command-id-2")
+    completed_command = create_succeeded_command(command_id="command-id-2")
     failed_command = create_failed_command(command_id="command-id-3")
-    pending_command = create_pending_command(command_id="command-id-4")
+    pending_command = create_queued_command(command_id="command-id-4")
 
     subject = get_command_view(
         is_running_queue=True,
@@ -164,9 +164,9 @@ def test_get_is_running_queue() -> None:
 
 def test_get_is_complete() -> None:
     """It should be able to tell if a command is complete."""
-    completed_command = create_completed_command(command_id="command-id-1")
+    completed_command = create_succeeded_command(command_id="command-id-1")
     running_command = create_running_command(command_id="command-id-2")
-    pending_command = create_pending_command(command_id="command-id-3")
+    pending_command = create_queued_command(command_id="command-id-3")
 
     subject = get_command_view(
         commands_by_id=[
@@ -184,7 +184,7 @@ def test_get_is_complete() -> None:
 def test_get_is_complete_with_failed_command() -> None:
     """It should return true if a given command will never be executed."""
     failed_command = create_failed_command(command_id="command-id-1")
-    pending_command = create_pending_command(command_id="command-id-2")
+    pending_command = create_queued_command(command_id="command-id-2")
 
     subject = get_command_view(
         commands_by_id=[
@@ -199,9 +199,9 @@ def test_get_is_complete_with_failed_command() -> None:
 
 def test_get_all_complete() -> None:
     """It should return true if all commands completed or any failed."""
-    completed_command = create_completed_command(command_id="command-id-1")
+    completed_command = create_succeeded_command(command_id="command-id-1")
     running_command = create_running_command(command_id="command-id-2")
-    pending_command = create_pending_command(command_id="command-id-3")
+    pending_command = create_queued_command(command_id="command-id-3")
     failed_command = create_failed_command(command_id="command-id-4")
 
     subject = get_command_view(
@@ -352,7 +352,7 @@ get_status_specs: List[GetStatusSpec] = [
             is_running_queue=True,
             should_report_result=False,
             should_stop=False,
-            commands_by_id=[("command-id", create_pending_command())],
+            commands_by_id=[("command-id", create_queued_command())],
         ),
         expected_status=EngineStatus.RUNNING,
     ),
@@ -389,8 +389,8 @@ get_status_specs: List[GetStatusSpec] = [
             is_running_queue=False,
             should_stop=False,
             commands_by_id=[
-                ("command-id-1", create_completed_command()),
-                ("command-id-2", create_pending_command()),
+                ("command-id-1", create_succeeded_command()),
+                ("command-id-2", create_queued_command()),
             ],
         ),
         expected_status=EngineStatus.PAUSED,
@@ -455,7 +455,7 @@ get_status_specs: List[GetStatusSpec] = [
             should_report_result=True,
             is_hardware_stopped=True,
             should_stop=True,
-            commands_by_id=[("command-id", create_completed_command())],
+            commands_by_id=[("command-id", create_succeeded_command())],
         ),
         expected_status=EngineStatus.SUCCEEDED,
     ),

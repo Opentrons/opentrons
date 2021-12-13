@@ -172,6 +172,7 @@ async def test_main_broker_messages(
     }
     engine_command = pe_commands.Custom(
         id="command-id",
+        key="command-key",
         status=pe_commands.CommandStatus.RUNNING,
         createdAt=datetime(year=2021, month=1, day=1),
         params=pe_commands.CustomParams(message="hello"),  # type: ignore[call-arg]
@@ -218,6 +219,7 @@ async def test_labware_load_broker_messages(
 
     engine_command = pe_commands.Custom(
         id="command-id",
+        key="command-key",
         status=pe_commands.CommandStatus.RUNNING,
         createdAt=datetime(year=2021, month=1, day=1),
         params=pe_commands.CustomParams(message="hello"),  # type: ignore[call-arg]
@@ -259,6 +261,7 @@ async def test_instrument_load_broker_messages(
 
     engine_command = pe_commands.Custom(
         id="command-id",
+        key="command-key",
         status=pe_commands.CommandStatus.RUNNING,
         createdAt=datetime(year=2021, month=1, day=1),
         params=pe_commands.CustomParams(message="hello"),  # type: ignore[call-arg]
@@ -302,6 +305,7 @@ async def test_module_load_broker_messages(
     )
     engine_command = pe_commands.Custom(
         id="command-id",
+        key="command-key",
         status=pe_commands.CommandStatus.RUNNING,
         createdAt=datetime(year=2021, month=1, day=1),
         params=pe_commands.CustomParams(message="hello"),  # type: ignore[call-arg]

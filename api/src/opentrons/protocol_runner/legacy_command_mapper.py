@@ -159,6 +159,7 @@ class LegacyCommandMapper:
 
         load_labware_command = pe_commands.LoadLabware.construct(
             id=command_id,
+            key=command_id,
             status=pe_commands.CommandStatus.SUCCEEDED,
             createdAt=now,
             startedAt=now,
@@ -198,6 +199,7 @@ class LegacyCommandMapper:
 
         load_pipette_command = pe_commands.LoadPipette.construct(
             id=command_id,
+            key=command_id,
             status=pe_commands.CommandStatus.SUCCEEDED,
             createdAt=now,
             startedAt=now,
@@ -222,6 +224,7 @@ class LegacyCommandMapper:
         now = ModelUtils.get_timestamp()
 
         count = self._command_count["LOAD_MODULE"]
+        command_id = f"commands.LOAD_MODULE-{count}"
         module_id = f"module-{count}"
         module_model = LEGACY_TO_PE_MODULE[module_load_info.module_model]
 
@@ -235,7 +238,8 @@ class LegacyCommandMapper:
         ) or self._module_data_provider.get_module_definition(module_model)
 
         load_module_command = pe_commands.LoadModule.construct(
-            id=f"commands.LOAD_MODULE-{count}",
+            id=command_id,
+            key=command_id,
             status=pe_commands.CommandStatus.SUCCEEDED,
             createdAt=now,
             startedAt=now,
@@ -283,6 +287,7 @@ class LegacyCommandMapper:
 
             engine_command = pe_commands.PickUpTip.construct(
                 id=command_id,
+                key=command_id,
                 status=pe_commands.CommandStatus.RUNNING,
                 createdAt=now,
                 startedAt=now,
@@ -296,6 +301,7 @@ class LegacyCommandMapper:
         elif command["name"] == legacy_command_types.PAUSE:
             engine_command = pe_commands.Pause.construct(
                 id=command_id,
+                key=command_id,
                 status=pe_commands.CommandStatus.RUNNING,
                 createdAt=now,
                 startedAt=now,
@@ -307,6 +313,7 @@ class LegacyCommandMapper:
         else:
             engine_command = pe_commands.Custom.construct(
                 id=command_id,
+                key=command_id,
                 status=pe_commands.CommandStatus.RUNNING,
                 createdAt=now,
                 startedAt=now,

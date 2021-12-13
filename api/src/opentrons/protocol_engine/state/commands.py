@@ -83,6 +83,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             # For now, unit tests cover mapping every request type
             queued_command = action.request._CommandCls.construct(
                 id=action.command_id,
+                key=action.command_key,
                 createdAt=action.created_at,
                 params=action.request.params,  # type: ignore[arg-type]
                 status=CommandStatus.QUEUED,

@@ -290,6 +290,7 @@ async def test_get_run(
 
     command = pe_commands.Pause(
         id="command-id",
+        key="command-key",
         status=pe_commands.CommandStatus.QUEUED,
         createdAt=datetime(year=2021, month=1, day=1),
         params=pe_commands.PauseParams(message="hello world"),
@@ -370,6 +371,7 @@ async def test_get_run_with_errors(
 
     command = pe_commands.Pause(
         id="command-id",
+        key="command-key",
         status=pe_commands.CommandStatus.FAILED,
         createdAt=datetime(year=2022, month=2, day=2),
         params=pe_commands.PauseParams(message="hello world"),
