@@ -43,6 +43,16 @@ const MOCK_COMMAND_DETAILS = {
   completedAt: 'end timestamp',
 } as Command
 
+const MOCK_PAUSE_COMMAND = {
+  id: '1234',
+  commandType: 'pause',
+  params: { message: 'THIS IS THE PAUSE MESSAGE' },
+  status: 'running',
+  result: {},
+  startedAt: 'start timestamp',
+  completedAt: 'end timestamp',
+}
+
 describe('CommandText', () => {
   beforeEach(() => {
     mockUseProtocolDetails.mockReturnValue({ protocolData: {} } as any)
@@ -58,6 +68,14 @@ describe('CommandText', () => {
       } as Command,
     })
     getByText('legacy command text')
+  })
+  it('renders correct command text for pause commands', () => {
+    const { getByText } = render({
+      commandOrSummary: {
+        ...MOCK_PAUSE_COMMAND,
+      } as Command,
+    })
+    getByText('THIS IS THE PAUSE MESSAGE')
   })
 
   it('renders correct command text for pick up tip', () => {

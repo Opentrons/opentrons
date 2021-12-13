@@ -104,7 +104,7 @@ describe('CommandList', () => {
       getAllByText(
         'Picking up tip from A1 of Opentrons 96 Tip Rack 300 µL on 1'
       ).length
-    ).toEqual(17)
+    ).toEqual(26)
   })
   it('renders only anticipated steps if the current run info is present and has not updated', () => {
     // @ts-expect-error not a full match of RunData type
@@ -114,7 +114,7 @@ describe('CommandList', () => {
       getAllByText(
         'Picking up tip from A1 of Opentrons 96 Tip Rack 300 µL on 1'
       ).length
-    ).toEqual(17)
+    ).toEqual(26)
   })
   it('renders the protocol failed banner', () => {
     mockUseRunStatus.mockReturnValue('failed')
