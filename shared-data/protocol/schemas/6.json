@@ -1108,7 +1108,25 @@
               }
             }
           },
-
+          {
+            "description": "Pause: This command pauses the run.",
+            "type": "object",
+            "required": ["id", "commandType"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": {
+                "enum": ["pause"]
+              },
+              "params": {
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "description": "Optional message the user can set for their pause command"
+                  }
+                }
+              }
+            }
+          },
           {
             "description": "Custom: This command is meant to allow non-canonical commands to be included in the commands list.",
             "type": "object",

@@ -67,10 +67,9 @@ export function CommandText(props: Props): JSX.Element {
         )
         break
       }
-      case 'custom': {
+      case 'pause': {
         messageNode =
-          commandOrSummary.params?.legacyCommandText ??
-          commandOrSummary.commandType
+          commandOrSummary.params?.message ?? commandOrSummary.commandType
         break
       }
       case 'loadLabware': {
@@ -83,6 +82,12 @@ export function CommandText(props: Props): JSX.Element {
       }
       case 'loadModule': {
         messageNode = <ProtocolSetupInfo setupCommand={commandOrSummary} />
+        break
+      }
+      case 'custom': {
+        messageNode =
+          commandOrSummary.params?.legacyCommandText ??
+          commandOrSummary.commandType
         break
       }
       default: {
