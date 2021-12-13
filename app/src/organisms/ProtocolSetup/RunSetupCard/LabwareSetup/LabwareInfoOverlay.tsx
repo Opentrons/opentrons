@@ -38,15 +38,20 @@ const labwareDisplayNameStyle = css`
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 `
-const LabwareInfo = (props: LabwareInfoProps): JSX.Element => {
+const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
   const { displayName, labwareId } = props
   const { t } = useTranslation('protocol_setup')
   const { protocolData } = useProtocolDetails()
+  const { runRecord } = useCurrentProtocolRun()
+
+  if (protocolData == null) {
+    return null
+  }
+
   const labwareDefinitionUri = getLabwareDefinitionUri(
     labwareId,
     protocolData?.labware
   )
-  const { runRecord } = useCurrentProtocolRun()
   const labwareLocation = getLabwareLocation(
     labwareId,
     protocolData?.commands ?? []
