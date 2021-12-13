@@ -11,18 +11,19 @@ stages:
     response:
       status_code: 200
       json:
-        - id: bootScripts
-          name: Boot Scripts
-          description: Clear custom boot scripts
-        - id: deckCalibration
-          name: Deck Calibration
-          description: !re_search 'Clear deck calibration'
-        - id: pipetteOffsetCalibrations
-          name: Pipette Offset Calibrations
-          description: !re_search 'Clear pipette offset calibrations'
-        - id: tipLengthCalibrations
-          name: Tip Length Calibrations
-          description: !re_search 'Clear tip length calibrations'
+        options:
+          - id: bootScripts
+            name: Boot Scripts
+            description: Clear custom boot scripts
+          - id: deckCalibration
+            name: Deck Calibration
+            description: !re_search 'Clear deck calibration'
+          - id: pipetteOffsetCalibrations
+            name: Pipette Offset Calibrations
+            description: !re_search 'Clear pipette offset calibrations'
+          - id: tipLengthCalibrations
+            name: Tip Length Calibrations
+            description: !re_search 'Clear tip length calibrations'
 ---
 test_name: POST Reset bootScripts option
 marks:
