@@ -16,7 +16,7 @@ export function useRunQuery(
         response => response.data
       ),
     {
-      enabled: host !== null && runId !== null,
+      enabled: host !== null && runId != null,
       ...options,
     }
   )

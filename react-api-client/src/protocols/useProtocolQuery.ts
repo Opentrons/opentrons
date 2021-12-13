@@ -16,7 +16,7 @@ export function useProtocolQuery(
     ...options,
     enabled:
       host !== null &&
-      protocolId !== null &&
+      protocolId != null &&
       (enablePolling == null || enablePolling),
     refetchInterval:
       enablePolling != null
