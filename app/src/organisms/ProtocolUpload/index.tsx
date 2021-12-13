@@ -17,10 +17,11 @@ import {
   TEXT_TRANSFORM_UPPERCASE,
   FONT_SIZE_BIG,
   SPACING_8,
-  NewAlertPrimaryBtn,
   LINE_HEIGHT_SOLID,
   SPACING_3,
   SPACING_2,
+  NewSecondaryBtn,
+  C_ERROR_DARK,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
@@ -137,15 +138,16 @@ export function ProtocolUpload(): JSX.Element {
   } = useConditionalConfirm(cancelRunAndExit, true)
 
   const cancelRunButton = (
-    <NewAlertPrimaryBtn
+    <NewSecondaryBtn
       onClick={confirmCancelModalExit}
       lineHeight={LINE_HEIGHT_SOLID}
       marginX={SPACING_3}
       paddingRight={SPACING_2}
       paddingLeft={SPACING_2}
+      color={C_ERROR_DARK}
     >
       {t('cancel_run')}
-    </NewAlertPrimaryBtn>
+    </NewSecondaryBtn>
   )
   const isRunInMotion =
     runStatus === RUN_STATUS_RUNNING ||
