@@ -44,7 +44,9 @@ async def get_health(hardware: HardwareAPI = Depends(get_hardware)) -> Health:
         system_version=config.OT_SYSTEM_VERSION,
         maximum_protocol_api_version=list(protocol_api.MAX_SUPPORTED_VERSION),
         minimum_protocol_api_version=list(protocol_api.MIN_SUPPORTED_VERSION),
-        robot_model='OT-3 Standard' if enable_ot3_hardware_controller() else 'OT-2 Standard',
+        robot_model="OT-3 Standard"
+        if enable_ot3_hardware_controller()
+        else "OT-2 Standard",
         links=HealthLinks(
             apiLog="/logs/api.log",
             serialLog="/logs/serial.log",

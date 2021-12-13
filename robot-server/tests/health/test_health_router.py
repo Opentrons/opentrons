@@ -20,7 +20,7 @@ def test_get_health(api_client: TestClient, hardware: MagicMock) -> None:
         "system_version": "0.0.0",
         "minimum_protocol_api_version": list(MIN_SUPPORTED_VERSION),
         "maximum_protocol_api_version": list(MAX_SUPPORTED_VERSION),
-        'robot_model': 'OT-2 Standard',
+        "robot_model": "OT-2 Standard",
         "links": {
             "apiLog": "/logs/api.log",
             "serialLog": "/logs/serial.log",
