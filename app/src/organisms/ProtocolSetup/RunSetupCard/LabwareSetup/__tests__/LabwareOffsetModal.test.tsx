@@ -18,7 +18,9 @@ describe('LabwareOffsetModal', () => {
 
   it('should render the correct header', () => {
     const { getByRole } = render(props)
-    expect(getByRole('heading', { name: 'How Offset Data Works' })).toBeTruthy()
+    expect(
+      getByRole('heading', { name: 'How Labware Offsets Work' })
+    ).toBeTruthy()
   })
   it('should render the correct body', () => {
     const { getByRole, getByText } = render(props)
