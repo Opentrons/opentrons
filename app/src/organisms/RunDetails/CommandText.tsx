@@ -72,14 +72,8 @@ export function CommandText(props: Props): JSX.Element {
           commandOrSummary.params?.message ?? commandOrSummary.commandType
         break
       }
-      case 'loadLabware': {
-        messageNode = <ProtocolSetupInfo setupCommand={commandOrSummary} />
-        break
-      }
-      case 'loadPipette': {
-        messageNode = <ProtocolSetupInfo setupCommand={commandOrSummary} />
-        break
-      }
+      case 'loadLabware':
+      case 'loadPipette':
       case 'loadModule': {
         messageNode = <ProtocolSetupInfo setupCommand={commandOrSummary} />
         break
