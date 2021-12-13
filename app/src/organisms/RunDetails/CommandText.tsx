@@ -73,11 +73,6 @@ export function CommandText(props: Props): JSX.Element {
           commandOrSummary.commandType
         break
       }
-      case 'pause': {
-        messageNode =
-          commandOrSummary.params?.message ?? commandOrSummary.commandType
-        break
-      }
       case 'loadLabware': {
         messageNode = <ProtocolSetupInfo setupCommand={commandOrSummary} />
         break
