@@ -8,6 +8,7 @@ import {
 } from '@opentrons/components'
 import type { RunCommandSummary } from '@opentrons/api-client'
 import { Command, getLabwareDisplayName } from '@opentrons/shared-data'
+import { ProtocolSetupInfo } from './ProtocolSetupInfo'
 
 import { useProtocolDetails } from './hooks'
 
@@ -70,6 +71,23 @@ export function CommandText(props: Props): JSX.Element {
         messageNode =
           commandOrSummary.params?.legacyCommandText ??
           commandOrSummary.commandType
+        break
+      }
+      case 'pause': {
+        messageNode =
+          commandOrSummary.params?.message ?? commandOrSummary.commandType
+        break
+      }
+      case 'loadLabware': {
+        messageNode = <ProtocolSetupInfo setupCommand={commandOrSummary} />
+        break
+      }
+      case 'loadPipette': {
+        messageNode = <ProtocolSetupInfo setupCommand={commandOrSummary} />
+        break
+      }
+      case 'loadModule': {
+        messageNode = <ProtocolSetupInfo setupCommand={commandOrSummary} />
         break
       }
       default: {
