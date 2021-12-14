@@ -41,7 +41,7 @@ import { Divider } from '../../atoms/structure'
 import { useMostRecentRunId } from './hooks/useMostRecentRunId'
 import { RerunningProtocolModal } from './RerunningProtocolModal'
 import { useCloneRun } from './hooks'
-import { getMostRecentRunStatus } from './getMostRecentRunStatus'
+import { getRunDisplayStatus } from './getRunDisplayStatus'
 import type { State } from '../../redux/types'
 
 const PROTOCOL_LIBRARY_URL = 'https://protocols.opentrons.com'
@@ -106,7 +106,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
       : null
   const mostRecentRunStatus =
     mostRecentProtocol != null && mostRecentRun?.status != null
-      ? getMostRecentRunStatus(mostRecentRun)
+      ? getRunDisplayStatus(mostRecentRun)
       : null
 
   const handleDrop: React.DragEventHandler<HTMLLabelElement> = e => {
