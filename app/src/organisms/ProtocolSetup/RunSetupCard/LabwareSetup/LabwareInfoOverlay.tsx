@@ -38,15 +38,21 @@ const labwareDisplayNameStyle = css`
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 `
-const LabwareInfo = (props: LabwareInfoProps): JSX.Element => {
+const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
   const { displayName, labwareId } = props
   const { t } = useTranslation('protocol_setup')
   const { protocolData } = useProtocolDetails()
+  const { runRecord } = useCurrentProtocolRun()
+  // protocolData should never be null as we don't render the `ProtocolSetup` unless we have an analysis
+  // but we're experiencing a zombie children issue, see https://github.com/Opentrons/opentrons/pull/9091
+  if (protocolData == null) {
+    return null
+  }
+
   const labwareDefinitionUri = getLabwareDefinitionUri(
     labwareId,
     protocolData?.labware
   )
-  const { runRecord } = useCurrentProtocolRun()
   const labwareLocation = getLabwareLocation(
     labwareId,
     protocolData?.commands ?? []

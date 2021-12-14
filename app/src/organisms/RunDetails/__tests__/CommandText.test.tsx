@@ -70,7 +70,9 @@ const MOCK_LOAD_COMMAND = {
 
 describe('CommandText', () => {
   beforeEach(() => {
-    mockUseProtocolDetails.mockReturnValue({ protocolData: {} } as any)
+    mockUseProtocolDetails.mockReturnValue({
+      protocolData: { commands: [] },
+    } as any)
     mockUseLabwareRenderInfoById.mockReturnValue({} as any)
     mockProtocolSetupInfo.mockReturnValue(<div>Mock Protocol Setup Step</div>)
   })
