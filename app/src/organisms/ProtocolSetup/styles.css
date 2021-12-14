@@ -17,8 +17,7 @@
 }
 
 .sticky_alert {
-  position: fixed;
+  position: sticky;
   top: 3rem;
-  width: 89.5%;
   z-index: 100;
 }
