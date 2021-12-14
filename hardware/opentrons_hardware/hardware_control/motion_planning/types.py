@@ -48,6 +48,8 @@ class Block:
         if self.acceleration:
             return (self.final_speed - self.initial_speed) / self.acceleration
         else:
+            if not self.initial_speed:
+                return 0
             return self.distance / self.initial_speed
 
 

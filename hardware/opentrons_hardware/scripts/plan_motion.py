@@ -54,8 +54,11 @@ def main() -> None:
         MoveTarget(Coordinates(10, 0, 0, 0), 300),
         MoveTarget(Coordinates(10, 5, 0, 0), 300),
         MoveTarget(Coordinates(10, 0, 30, 0), 300),
+        MoveTarget(Coordinates(10, 0, 0, 60), 50),
     ]
-    manager = move_manager.MoveManager(constraints=constraints, target_list=target_list)
+
+    origin = Coordinates(0, 0, 0, 0)
+    manager = move_manager.MoveManager(constraints=constraints, origin=origin, target_list=target_list)
     manager.plan_motion()
 
 

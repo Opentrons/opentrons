@@ -90,12 +90,13 @@ class MoveManager:
                     f"{sum(list(m.nonzero_blocks for m in self._blend_log[i]))} "
                     f"non-zero blocks after {i+1} iteration(s)"
                 )
+                print(self._blend_log)
                 return True, self._blend_log
             else:
                 self._blend_log[i] = self._add_dummy_start_end_to_moves(
                     self._blend_log[i]
                 )
                 to_blend = self._blend_log[i]
-
+        print(self._blend_log[-2])
         log.error("Could not converge!")
         return False, self._blend_log
