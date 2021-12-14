@@ -74,10 +74,20 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
     data: commandDetails,
     refetch: refetchCommandDetails,
   } = useCommandQuery(currentRunId, commandOrSummary.id)
-  const isComment =
+
+  let isComment = false
+  if (
+    'params' in commandOrSummary &&
+    'legacyCommandType' in commandOrSummary.params
+  ) {
+    isComment = commandOrSummary.params.legacyCommandType === 'command.COMMENT'
+  } else if (
     commandDetails?.data.commandType === 'custom' &&
-    'legacyCommandType' in commandDetails.data.params &&
-    commandDetails.data.params.legacyCommandType === 'command.COMMENT'
+    'legacyCommandType' in commandDetails?.data.params
+  ) {
+    isComment =
+      commandDetails.data.params.legacyCommandType === 'command.COMMENT'
+  }
 
   React.useEffect(() => {
     refetchCommandDetails()

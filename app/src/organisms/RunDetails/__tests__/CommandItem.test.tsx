@@ -41,8 +41,8 @@ const MOCK_COMMAND = {
 const MOCK_COMMENT_COMMAND = {
   id: 'COMMENT',
   commandType: 'custom',
-  params: { legacyCommand: 'command.COMMENT' },
-  status: 'running',
+  params: { legacyCommandType: 'command.COMMENT' },
+  status: 'queued',
   result: {},
 } as Command
 const MOCK_COMMAND_DETAILS = {
@@ -57,8 +57,8 @@ const MOCK_COMMAND_DETAILS = {
 const MOCK_COMMAND_DETAILS_COMMENT = {
   id: 'COMMENT',
   commandType: 'custom',
-  params: { legacyCommand: 'command.COMMENT' },
-  status: 'running',
+  params: { legacyCommandType: 'command.COMMENT' },
+  status: 'queued',
   result: {},
   startedAt: 'start timestamp',
   completedAt: 'end timestamp',
@@ -143,7 +143,7 @@ describe('Run Details Command item', () => {
         refetch: jest.fn(),
       } as any)
     const props = {
-      commandOrSummary: { ...MOCK_COMMENT_COMMAND, status: 'running' },
+      commandOrSummary: { ...MOCK_COMMENT_COMMAND, status: 'queued' },
       runStatus: 'running',
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
