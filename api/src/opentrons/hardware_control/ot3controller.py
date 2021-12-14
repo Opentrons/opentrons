@@ -16,7 +16,6 @@ try:
 except (OSError, ModuleNotFoundError):
     aionotify = None
 
-
 try:
     from opentrons_hardware.drivers.can_bus import CanDriver, CanMessenger
     from opentrons_hardware.hardware_control.motion import create
@@ -46,10 +45,11 @@ log = logging.getLogger(__name__)
 
 AxisValueMap = Dict[str, float]
 
-
 _FIXED_PIPETTE_ID: str = "P1KSV3120211118A01"
 _FIXED_PIPETTE_NAME: PipetteName = "p1000_single_gen3"
 _FIXED_PIPETTE_MODEL: PipetteModel = cast("PipetteModel", "p1000_single_v3.0")
+
+HEAD_AXIS_ORIGIN: float = 220
 
 
 class OT3Controller:
@@ -87,12 +87,69 @@ class OT3Controller:
         try:
             self._event_watcher = self._build_event_watcher()
         except AttributeError:
-            MODULE_LOG.warning(
+            log.warning(
                 "Failed to initiate aionotify, cannot watch modules "
                 "or door, likely because not running on linux"
             )
 
+    # TODO: These staticmethods exist to defer uses of NodeId to inside
+    # method bodies, which won't be evaluated until called. This is needed
+    # because the robot server doesn't have opentrons_ot3_firmware as a dep
+    # which is where they're defined, and therefore you can't have references
+    # to NodeId that are interpreted at import time because then the robot
+    # server tests fail when importing hardware controller. This is obviously
+    # terrible and needs to be fixed.
+    @staticmethod
+    def _axis_nodes() -> List["NodeId"]:
+        return [
+            NodeId.gantry_x,
+            NodeId.gantry_y,
+            NodeId.head_l,
+            NodeId.head_r,
+            NodeId.pipette,
+        ]
 
+    @staticmethod
+    def _node_axes() -> List[str]:
+        return ["X", "Y", "Z", "A", "B"]
+
+    @staticmethod
+    def _axis_to_node(axis: str) -> "NodeId":
+        anm = {
+            "X": NodeId.gantry_x,
+            "Y": NodeId.gantry_y,
+            "Z": NodeId.head_l,
+            "A": NodeId.head_r,
+            "B": NodeId.pipette,
+        }
+        return anm[axis]
+
+    @staticmethod
+    def _node_to_axis(node: "NodeId") -> str:
+        nam = {
+            NodeId.gantry_x: "X",
+            NodeId.gantry_y: "Y",
+            NodeId.head_l: "Z",
+            NodeId.head_r: "A",
+            NodeId.pipette: "B",
+        }
+        return nam[node]
+
+    @staticmethod
+    def _node_is_axis(node: "NodeId") -> bool:
+        try:
+            OT3Controller._node_to_axis(node)
+            return True
+        except KeyError:
+            return False
+
+    @staticmethod
+    def _axis_is_node(axis: str) -> bool:
+        try:
+            OT3Controller._axis_to_node(axis)
+            return True
+        except KeyError:
+            return False
 
     async def setup_motors(self) -> None:
         """Set up the motors."""
@@ -138,14 +195,14 @@ class OT3Controller:
     def _axis_convert(position: Dict[NodeId, float]) -> AxisValueMap:
         ret: AxisValueMap = {"A": 0, "B": 0, "C": 0, "X": 0, "Y": 0, "Z": 0}
         for node, pos in position.items():
-            if node == NodeId.head_l:
-                ret["A"] = pos
-            elif node == NodeId.head_r:
-                ret["Z"] = pos
-            elif node == NodeId.gantry_x:
-                ret["X"] = pos
-            elif node == NodeId.gantry_y:
-                ret["Y"] = pos
+            # we need to make robot config apply to z or in some other way
+            # reflect the sense of the axis direction
+            if node == NodeId.head_r:
+                ret["A"] = HEAD_AXIS_ORIGIN - pos
+            elif node == NodeId.head_l:
+                ret["Z"] = HEAD_AXIS_ORIGIN - pos
+            elif OT3Controller._node_is_axis(node):
+                ret[OT3Controller._node_to_axis(node)] = pos
         log.info(f"update_position: {ret}")
         return ret
 
@@ -171,19 +228,17 @@ class OT3Controller:
         target: Dict[NodeId, float] = {}
         for axis, pos in target_position.items():
             if axis == "A":
-                target[NodeId.head_l] = pos
+                target[NodeId.head_r] = HEAD_AXIS_ORIGIN - pos
             elif axis == "Z":
-                target[NodeId.head_r] = pos
-            elif axis == "X":
-                target[NodeId.gantry_x] = pos
-            elif axis == "Y":
-                target[NodeId.gantry_y] = pos
+                target[NodeId.head_l] = HEAD_AXIS_ORIGIN - pos
+            elif self._axis_is_node(axis):
+                target[self._axis_to_node(axis)] = pos
 
         log.info(f"move targets: {target}")
         move_group = create(origin=self._position, target=target, speed=speed or 5000.0)
         runner = MoveGroupRunner(move_groups=move_group)
         await runner.run(can_messenger=self._messenger)
-        self._position = target
+        self._position.update(target)
 
     async def home(self, axes: Optional[List[str]] = None) -> AxisValueMap:
         """Home axes.
@@ -194,7 +249,10 @@ class OT3Controller:
         Returns:
             Homed position.
         """
-        self._position = self._get_home_position()
+        checked_axes = axes or self._node_axes()
+        home_pos = self._get_home_position()
+        target_pos = {ax: home_pos[self._axis_to_node(ax)] for ax in checked_axes}
+        self.move(target_pos)
         return self._axis_convert(self._position)
 
     async def fast_home(self, axes: Sequence[str], margin: float) -> AxisValueMap:
@@ -207,7 +265,11 @@ class OT3Controller:
         Returns:
             New position.
         """
-        self._position = self._get_home_position()
+        home_pos = self._get_home_position()
+        target_pos = {ax: home_pos[self._axis_to_node(ax)] for ax in axes}
+        if not target_pos:
+            return self._axis_convert(self._position)
+        self.move(target_pos)
         return self._axis_convert(self._position)
 
     async def get_attached_instruments(
@@ -222,7 +284,7 @@ class OT3Controller:
             A map of mount to pipette name.
         """
         if expected.get(Mount.LEFT) and expected.get(Mount.LEFT) != _FIXED_PIPETTE_NAME:
-            raise RuntimeError(f"only support {_FIXED_PIIPETTE_NAME}  right now")
+            raise RuntimeError(f"only support {_FIXED_PIPETTE_NAME}  right now")
 
         return {
             Mount.LEFT: {
@@ -261,7 +323,7 @@ class OT3Controller:
         try:
             event = await self._event_watcher.get_event()
         except asyncio.IncompleteReadError:
-            MODULE_LOG.debug("incomplete read error when quitting watcher")
+            log.debug("incomplete read error when quitting watcher")
             return
         if event is not None:
             if "ot_module" in event.name:
@@ -365,4 +427,5 @@ class OT3Controller:
             NodeId.head_r: 0,
             NodeId.gantry_x: 0,
             NodeId.gantry_y: 0,
+            NodeId.pipette: 0,
         }
