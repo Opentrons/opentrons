@@ -120,7 +120,7 @@ export const ProtocolSetupInfo = (
   }
   return (
     <Box
-      padding={`${SPACING_1} ${SPACING_2} ${SPACING_1} ${SPACING_2}`}
+      padding={`${SPACING_1} ${SPACING_2} ${SPACING_1} 0`}
       fontSize={FONT_SIZE_BODY_1}
     >
       {SetupCommandText}

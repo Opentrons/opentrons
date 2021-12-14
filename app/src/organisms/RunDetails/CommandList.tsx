@@ -1,5 +1,4 @@
 import dropWhile from 'lodash/dropWhile'
-import last from 'lodash/last'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
@@ -58,26 +57,20 @@ export function CommandList(): JSX.Element | null {
       : []
   const allProtocolCommands: Command[] =
     protocolData != null ? analysisCommandsWithStatus : []
-  const lastProtocolSetupCommand =
-    last(
-      allProtocolCommands.filter(command =>
-        ['loadLabware', 'loadPipette', 'loadModule'].includes(
-          command.commandType
-        )
-      )
-    ) ?? null
-  const lastProtocolSetupIndex = allProtocolCommands.findIndex(
-    command => command.id === lastProtocolSetupCommand?.id
-  )
 
-  const protocolSetupCommandList =
-    lastProtocolSetupCommand != null
-      ? allProtocolCommands.slice(0, lastProtocolSetupIndex + 1)
-      : []
-  const postSetupAnticipatedCommands: Command[] =
-    lastProtocolSetupCommand != null
-      ? allProtocolCommands.slice(lastProtocolSetupIndex + 1)
-      : allProtocolCommands
+  const firstNonSetupIndex = allProtocolCommands.findIndex(
+    command =>
+      command.commandType !== 'loadLabware' &&
+      command.commandType !== 'loadPipette' &&
+      command.commandType !== 'loadModule'
+  )
+  const protocolSetupCommandList = allProtocolCommands.slice(
+    0,
+    firstNonSetupIndex
+  )
+  const postSetupAnticipatedCommands: Command[] = allProtocolCommands.slice(
+    firstNonSetupIndex
+  )
 
   let currentCommandList: Array<
     Command | RunCommandSummary
@@ -185,6 +178,7 @@ export function CommandList(): JSX.Element | null {
                   id={`RunDetails_ProtocolSetup_CommandList`}
                   flexDirection={DIRECTION_COLUMN}
                   marginLeft={SPACING_1}
+                  paddingLeft={SPACING_2}
                 >
                   {protocolSetupCommandList?.map(command => {
                     return (

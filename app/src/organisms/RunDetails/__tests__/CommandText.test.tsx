@@ -7,11 +7,13 @@ import { useProtocolDetails } from '../hooks'
 import { useLabwareRenderInfoById } from '../../ProtocolSetup/hooks'
 import { getLabwareLocation } from '../../ProtocolSetup/utils/getLabwareLocation'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
+import { ProtocolSetupInfo } from './../ProtocolSetupInfo'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6/command'
 
 jest.mock('../hooks')
 jest.mock('../../ProtocolSetup/hooks')
 jest.mock('../../ProtocolSetup/utils/getLabwareLocation')
+jest.mock('./../ProtocolSetupInfo')
 jest.mock('@opentrons/shared-data/js/helpers')
 
 const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
@@ -25,6 +27,9 @@ const mockGetLabwareDisplayName = getLabwareDisplayName as jest.MockedFunction<
 >
 const mockGetLabwareLocation = getLabwareLocation as jest.MockedFunction<
   typeof getLabwareLocation
+>
+const mockProtocolSetupInfo = ProtocolSetupInfo as jest.MockedFunction<
+  typeof ProtocolSetupInfo
 >
 
 const render = (props: React.ComponentProps<typeof CommandText>) => {
@@ -43,10 +48,31 @@ const MOCK_COMMAND_DETAILS = {
   completedAt: 'end timestamp',
 } as Command
 
+const MOCK_PAUSE_COMMAND = {
+  id: '1234',
+  commandType: 'pause',
+  params: { message: 'THIS IS THE PAUSE MESSAGE' },
+  status: 'running',
+  result: {},
+  startedAt: 'start timestamp',
+  completedAt: 'end timestamp',
+}
+
+const MOCK_LOAD_COMMAND = {
+  id: '1234',
+  commandType: 'loadModule',
+  params: {},
+  status: 'running',
+  result: {},
+  startedAt: 'start timestamp',
+  completedAt: 'end timestamp',
+}
+
 describe('CommandText', () => {
   beforeEach(() => {
     mockUseProtocolDetails.mockReturnValue({ protocolData: {} } as any)
     mockUseLabwareRenderInfoById.mockReturnValue({} as any)
+    mockProtocolSetupInfo.mockReturnValue(<div>Mock Protocol Setup Step</div>)
   })
   it('renders correct command text for custom legacy commands', () => {
     const { getByText } = render({
@@ -58,6 +84,22 @@ describe('CommandText', () => {
       } as Command,
     })
     getByText('legacy command text')
+  })
+  it('renders correct command text for pause commands', () => {
+    const { getByText } = render({
+      commandOrSummary: {
+        ...MOCK_PAUSE_COMMAND,
+      } as Command,
+    })
+    getByText('THIS IS THE PAUSE MESSAGE')
+  })
+  it('renders correct command text for load commands', () => {
+    const { getByText } = render({
+      commandOrSummary: {
+        ...MOCK_LOAD_COMMAND,
+      } as Command,
+    })
+    getByText('Mock Protocol Setup Step')
   })
 
   it('renders correct command text for pick up tip', () => {

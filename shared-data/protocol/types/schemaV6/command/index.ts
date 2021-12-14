@@ -2,7 +2,7 @@ import type { PipettingCommand } from './pipetting'
 import type { GantryCommand } from './gantry'
 import type { ModuleCommand } from './module'
 import type { SetupCommand } from './setup'
-import type { TimingCommand } from './timing'
+import type { TimingCommand, PauseCommand } from './timing'
 
 // NOTE: these key/value pairs will only be present on commands at analysis/run time
 // they pertain only to the actual execution status of a command on hardware, as opposed to
@@ -29,6 +29,7 @@ export type Command =
   | ModuleCommand // directed at a hardware module
   | SetupCommand // only effecting robot's equipment setup (pipettes, labware, modules, liquid), no hardware side-effects
   | TimingCommand // effecting the timing of command execution
+  | PauseCommand // effecting the timing of command execution
   | ({
       commandType: 'custom'
       params: { [key: string]: any }
