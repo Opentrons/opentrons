@@ -45,7 +45,9 @@ const MOCK_COMMAND_DETAILS = {
 
 describe('CommandText', () => {
   beforeEach(() => {
-    mockUseProtocolDetails.mockReturnValue({ protocolData: {} } as any)
+    mockUseProtocolDetails.mockReturnValue({
+      protocolData: { commands: [] },
+    } as any)
     mockUseLabwareRenderInfoById.mockReturnValue({} as any)
   })
   it('renders correct command text for custom legacy commands', () => {

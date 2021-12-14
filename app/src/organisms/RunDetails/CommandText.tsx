@@ -13,7 +13,6 @@ import { useProtocolDetails } from './hooks'
 
 import { getLabwareLocation } from '../ProtocolSetup/utils/getLabwareLocation'
 import { useLabwareRenderInfoById } from '../ProtocolSetup/hooks'
-import protocolData from '../../../../notify-server/.mypy_cache/3.7/opentrons/protocols/context/protocol.data.json'
 
 interface Props {
   commandOrSummary: Command | RunCommandSummary
@@ -45,6 +44,8 @@ export function CommandText(props: Props): JSX.Element | null {
         break
       }
       case 'pickUpTip': {
+        // protocolData should never be null as we don't render the `RunDetails` unless we have an analysis
+        // but we're experiencing a zombie children issue, see https://github.com/Opentrons/opentrons/pull/9091
         if (protocolData == null) {
           return null
         }

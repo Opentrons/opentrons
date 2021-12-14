@@ -43,7 +43,8 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
   const { t } = useTranslation('protocol_setup')
   const { protocolData } = useProtocolDetails()
   const { runRecord } = useCurrentProtocolRun()
-
+  // protocolData should never be null as we don't render the `ProtocolSetup` unless we have an analysis
+  // but we're experiencing a zombie children issue, see https://github.com/Opentrons/opentrons/pull/9091
   if (protocolData == null) {
     return null
   }
