@@ -195,21 +195,27 @@ export function ProtocolUpload(): JSX.Element {
       {showConfirmModalExit && <ConfirmCancelModal onClose={cancelModalExit} />}
       <Page titleBarProps={titleBarProps}>
         {uploadError != null && (
-          <AlertItem
-            type="warning"
-            onCloseClick={clearError}
-            title={t('protocol_upload_failed')}
+          <Flex
+            position="absolute"
+            flexDirection={DIRECTION_COLUMN}
+            width="100%"
           >
-            {t(VALIDATION_ERROR_T_MAP[uploadError[0]])}
-            {typeof uploadError[1] === 'string' ? (
-              <Text>{uploadError[1]}</Text>
-            ) : (
-              uploadError[1] != null &&
-              uploadError[1].map((errorObject, i) => (
-                <Text key={i}>{JSON.stringify(errorObject)}</Text>
-              ))
-            )}
-          </AlertItem>
+            <AlertItem
+              type="warning"
+              onCloseClick={clearError}
+              title={t('protocol_upload_failed')}
+            >
+              {t(VALIDATION_ERROR_T_MAP[uploadError[0]])}
+              {typeof uploadError[1] === 'string' ? (
+                <Text>{uploadError[1]}</Text>
+              ) : (
+                uploadError[1] != null &&
+                uploadError[1].map((errorObject, i) => (
+                  <Text key={i}>{JSON.stringify(errorObject)}</Text>
+                ))
+              )}
+            </AlertItem>
+          </Flex>
         )}
 
         <Box
