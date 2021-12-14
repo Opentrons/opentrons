@@ -1444,6 +1444,14 @@
       }
     },
     {
+      "commandType": "pause",
+      "id": "18abc123",
+      "params": {
+        "message": "pause command"
+      }
+    },
+
+    {
       "commandType": "moveToCoordinates",
       "id": "16abc123",
       "params": {
