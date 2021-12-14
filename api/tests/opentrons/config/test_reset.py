@@ -10,18 +10,6 @@ def mock_reset_boot_scripts():
 
 
 @pytest.fixture
-def mock_reset_labware_calibration():
-    with patch("opentrons.config.reset.reset_labware_calibration") as m:
-        yield m
-
-
-@pytest.fixture
-def mock_labware():
-    with patch("opentrons.config.reset.delete") as m:
-        yield m
-
-
-@pytest.fixture
 def mock_reset_pipette_offset():
     with patch("opentrons.config.reset.reset_pipette_offset") as m:
         yield m
@@ -47,13 +35,11 @@ def mock_cal_storage_delete():
 
 def test_reset_empty_set(
     mock_reset_boot_scripts,
-    mock_reset_labware_calibration,
     mock_reset_pipette_offset,
     mock_reset_deck_calibration,
     mock_reset_tip_length_calibrations,
 ):
     reset.reset(set())
-    mock_reset_labware_calibration.assert_not_called()
     mock_reset_boot_scripts.assert_not_called()
     mock_reset_pipette_offset.assert_not_called()
     mock_reset_deck_calibration.assert_not_called()
@@ -62,7 +48,6 @@ def test_reset_empty_set(
 
 def test_reset_all_set(
     mock_reset_boot_scripts,
-    mock_reset_labware_calibration,
     mock_reset_pipette_offset,
     mock_reset_deck_calibration,
     mock_reset_tip_length_calibrations,
@@ -70,23 +55,15 @@ def test_reset_all_set(
     reset.reset(
         {
             reset.ResetOptionId.boot_scripts,
-            reset.ResetOptionId.labware_calibration,
             reset.ResetOptionId.deck_calibration,
             reset.ResetOptionId.pipette_offset,
             reset.ResetOptionId.tip_length_calibrations,
         }
     )
-    mock_reset_labware_calibration.assert_called_once()
     mock_reset_boot_scripts.assert_called_once()
     mock_reset_pipette_offset.assert_called_once()
     mock_reset_deck_calibration.assert_called_once()
     mock_reset_tip_length_calibrations.assert_called_once()
-
-
-def test_labware_calibration_reset(mock_labware):
-    reset.reset_labware_calibration()
-    # Check side effecting function calls
-    mock_labware.clear_calibrations.assert_called_once()
 
 
 def test_deck_calibration_reset(mock_cal_storage_delete):
