@@ -38,11 +38,27 @@ const MOCK_COMMAND = {
   status: 'running',
   result: {},
 } as Command
+const MOCK_COMMENT_COMMAND = {
+  id: 'COMMENT',
+  commandType: 'custom',
+  params: { legacyCommandType: 'command.COMMENT' },
+  status: 'queued',
+  result: {},
+} as Command
 const MOCK_COMMAND_DETAILS = {
   id: '123',
   commandType: 'custom',
   params: {},
   status: 'running',
+  result: {},
+  startedAt: 'start timestamp',
+  completedAt: 'end timestamp',
+} as Command
+const MOCK_COMMAND_DETAILS_COMMENT = {
+  id: 'COMMENT',
+  commandType: 'custom',
+  params: { legacyCommandType: 'command.COMMENT' },
+  status: 'queued',
   result: {},
   startedAt: 'start timestamp',
   completedAt: 'end timestamp',
@@ -117,5 +133,21 @@ describe('Run Details Command item', () => {
     )
     getByText('Mock Command Text')
     getByText('Mock Command Timer')
+  })
+
+  it('renders the comment text when the command is a comment', () => {
+    when(mockUseCommandQuery)
+      .calledWith(RUN_ID, MOCK_COMMENT_COMMAND.id)
+      .mockReturnValue({
+        data: { data: MOCK_COMMAND_DETAILS_COMMENT },
+        refetch: jest.fn(),
+      } as any)
+    const props = {
+      commandOrSummary: { ...MOCK_COMMENT_COMMAND, status: 'queued' },
+      runStatus: 'running',
+    } as React.ComponentProps<typeof CommandItem>
+    const { getByText } = render(props)
+    expect(getByText('Comment')).toHaveStyle('backgroundColor: C_NEAR_WHITE')
+    getByText('Mock Command Text')
   })
 })
