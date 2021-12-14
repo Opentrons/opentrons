@@ -87,6 +87,7 @@ command_analysis_specs: List[CommandAnalysisSpec] = [
         commands=[
             pe_commands.Pause(
                 id="pause-1",
+                key="command-key",
                 status=pe_commands.CommandStatus.SUCCEEDED,
                 createdAt=datetime(year=2021, month=1, day=1),
                 params=pe_commands.PauseParams(message="hello world"),

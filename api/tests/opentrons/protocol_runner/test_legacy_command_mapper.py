@@ -53,6 +53,7 @@ def test_map_before_command() -> None:
         pe_actions.UpdateCommandAction(
             pe_commands.Custom.construct(
                 id="command.COMMENT-0",
+                key="command.COMMENT-0",
                 status=pe_commands.CommandStatus.RUNNING,
                 createdAt=matchers.IsA(datetime),
                 startedAt=matchers.IsA(datetime),
@@ -91,6 +92,7 @@ def test_map_after_command() -> None:
         pe_actions.UpdateCommandAction(
             pe_commands.Custom.construct(
                 id="command.COMMENT-0",
+                key="command.COMMENT-0",
                 status=pe_commands.CommandStatus.SUCCEEDED,
                 createdAt=matchers.IsA(datetime),
                 startedAt=matchers.IsA(datetime),
@@ -182,6 +184,7 @@ def test_command_stack() -> None:
         pe_actions.UpdateCommandAction(
             pe_commands.Custom.construct(
                 id="command.COMMENT-0",
+                key="command.COMMENT-0",
                 status=pe_commands.CommandStatus.RUNNING,
                 createdAt=matchers.IsA(datetime),
                 startedAt=matchers.IsA(datetime),
@@ -194,6 +197,7 @@ def test_command_stack() -> None:
         pe_actions.UpdateCommandAction(
             pe_commands.Custom.construct(
                 id="command.COMMENT-1",
+                key="command.COMMENT-1",
                 status=pe_commands.CommandStatus.RUNNING,
                 createdAt=matchers.IsA(datetime),
                 startedAt=matchers.IsA(datetime),
@@ -206,6 +210,7 @@ def test_command_stack() -> None:
         pe_actions.UpdateCommandAction(
             pe_commands.Custom.construct(
                 id="command.COMMENT-0",
+                key="command.COMMENT-0",
                 status=pe_commands.CommandStatus.SUCCEEDED,
                 createdAt=matchers.IsA(datetime),
                 startedAt=matchers.IsA(datetime),
@@ -238,6 +243,7 @@ def test_map_labware_load(minimal_labware_def: LabwareDefinition) -> None:
     )
     expected_output = pe_commands.LoadLabware.construct(
         id=matchers.IsA(str),
+        key=matchers.IsA(str),
         status=pe_commands.CommandStatus.SUCCEEDED,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
@@ -269,6 +275,7 @@ def test_map_instrument_load() -> None:
     )
     expected_output = pe_commands.LoadPipette.construct(
         id=matchers.IsA(str),
+        key=matchers.IsA(str),
         status=pe_commands.CommandStatus.SUCCEEDED,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
@@ -301,6 +308,7 @@ def test_map_module_load(
     ).then_return(test_definition)
     expected_output = pe_commands.LoadModule.construct(
         id=matchers.IsA(str),
+        key=matchers.IsA(str),
         status=pe_commands.CommandStatus.SUCCEEDED,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
@@ -336,6 +344,7 @@ def test_map_module_labware_load(minimal_labware_def: LabwareDefinition) -> None
 
     expected_output = pe_commands.LoadLabware.construct(
         id=matchers.IsA(str),
+        key=matchers.IsA(str),
         status=pe_commands.CommandStatus.SUCCEEDED,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
@@ -386,6 +395,7 @@ def test_map_pause() -> None:
         pe_actions.UpdateCommandAction(
             pe_commands.Pause.construct(
                 id="command.PAUSE-0",
+                key="command.PAUSE-0",
                 status=pe_commands.CommandStatus.RUNNING,
                 createdAt=matchers.IsA(datetime),
                 startedAt=matchers.IsA(datetime),
@@ -395,6 +405,7 @@ def test_map_pause() -> None:
         pe_actions.UpdateCommandAction(
             pe_commands.Pause.construct(
                 id="command.PAUSE-0",
+                key="command.PAUSE-0",
                 status=pe_commands.CommandStatus.SUCCEEDED,
                 createdAt=matchers.IsA(datetime),
                 startedAt=matchers.IsA(datetime),

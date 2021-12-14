@@ -138,6 +138,7 @@ async def test_execute(
         Command,
         _TestCommand(
             id="command-id",
+            key="command-key",
             createdAt=datetime(year=2021, month=1, day=1),
             status=CommandStatus.QUEUED,
             params=command_params,
@@ -148,6 +149,7 @@ async def test_execute(
         Command,
         _TestCommand(
             id="command-id",
+            key="command-key",
             createdAt=datetime(year=2021, month=1, day=1),
             startedAt=datetime(year=2022, month=2, day=2),
             status=CommandStatus.RUNNING,
@@ -159,6 +161,7 @@ async def test_execute(
         Command,
         _TestCommand(
             id="command-id",
+            key="command-key",
             createdAt=datetime(year=2021, month=1, day=1),
             startedAt=datetime(year=2022, month=2, day=2),
             completedAt=datetime(year=2023, month=3, day=3),
@@ -243,6 +246,7 @@ async def test_execute_raises_protocol_engine_error(
         Command,
         _TestCommand(
             id="command-id",
+            key="command-key",
             createdAt=datetime(year=2021, month=1, day=1),
             status=CommandStatus.QUEUED,
             params=command_params,
@@ -253,6 +257,7 @@ async def test_execute_raises_protocol_engine_error(
         Command,
         _TestCommand(
             id="command-id",
+            key="command-key",
             createdAt=datetime(year=2021, month=1, day=1),
             startedAt=datetime(year=2022, month=2, day=2),
             status=CommandStatus.RUNNING,

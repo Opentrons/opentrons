@@ -49,13 +49,26 @@ class BaseCommand(GenericModel, Generic[CommandParamsT, CommandResultT]):
     your own subclass per specific command type.
     """
 
-    id: str = Field(..., description="Unique identifier for a particular command")
+    id: str = Field(
+        ...,
+        description="Unique identifier of this particular command instance",
+    )
     createdAt: datetime = Field(..., description="Command creation timestamp")
     commandType: str = Field(
         ...,
         description=(
             "Specific command type that determines data requirements and "
             "execution behavior"
+        ),
+    )
+    key: str = Field(
+        ...,
+        description=(
+            "An identifier representing this command as a step in a protocol."
+            " A command's `key` will be unique within a given run, but stable"
+            " across all runs that perform the same exact procedure. Thus,"
+            " `key` be used to compare/match commands across multiple runs"
+            " of the same protocol."
         ),
     )
     status: CommandStatus = Field(..., description="Command execution status")

@@ -23,9 +23,9 @@ from opentrons.protocol_engine.actions import (
 )
 
 from .command_fixtures import (
-    create_pending_command,
+    create_queued_command,
     create_running_command,
-    create_completed_command,
+    create_succeeded_command,
     create_failed_command,
 )
 
@@ -51,6 +51,7 @@ class QueueCommandSpec(NamedTuple):
     expected_cls: Type[commands.Command]
     created_at: datetime = datetime(year=2021, month=1, day=1)
     command_id: str = "command-id"
+    command_key: str = "command-key"
 
 
 @pytest.mark.parametrize(
@@ -143,15 +144,18 @@ def test_command_store_queues_commands(
     expected_cls: Type[commands.Command],
     created_at: datetime,
     command_id: str,
+    command_key: str,
 ) -> None:
     """It should add a command to the store."""
     action = QueueCommandAction(
         request=command_request,
         created_at=created_at,
         command_id=command_id,
+        command_key=command_key,
     )
     expected_command = expected_cls(
         id=command_id,
+        key=command_key,
         createdAt=created_at,
         status=commands.CommandStatus.QUEUED,
         params=command_request.params,  # type: ignore[arg-type]
@@ -166,9 +170,9 @@ def test_command_store_queues_commands(
 def test_command_store_preserves_handle_order() -> None:
     """It should store commands in the order they are handled."""
     # Any arbitrary 3 commands that compare non-equal (!=) to each other.
-    command_a = create_pending_command(command_id="command-id-1")
+    command_a = create_queued_command(command_id="command-id-1")
     command_b = create_running_command(command_id="command-id-2")
-    command_c = create_completed_command(command_id="command-id-1")
+    command_c = create_succeeded_command(command_id="command-id-1")
 
     subject = CommandStore()
     subject.handle_action(UpdateCommandAction(command=command_a))

@@ -45,6 +45,7 @@ async def test_create_run_command(decoy: Decoy, engine_store: EngineStore) -> No
 
     output_command = pe_commands.Pause(
         id="abc123",
+        key="command-key",
         createdAt=datetime(year=2021, month=1, day=1),
         status=CommandStatus.QUEUED,
         params=pe_commands.PauseParams(message="Hello"),
@@ -138,6 +139,7 @@ async def test_get_run_command_by_id(
 
     command = pe_commands.MoveToWell(
         id="command-id",
+        key="command-key",
         status=CommandStatus.RUNNING,
         createdAt=datetime(year=2022, month=2, day=2),
         params=pe_commands.MoveToWellParams(pipetteId="a", labwareId="b", wellName="c"),

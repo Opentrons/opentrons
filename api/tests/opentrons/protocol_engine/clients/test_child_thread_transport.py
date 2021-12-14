@@ -45,6 +45,7 @@ async def test_execute_command(
     decoy.when(await engine.add_and_execute_command(request=cmd_request)).then_return(
         commands.MoveToWell(
             id="cmd-id",
+            key="cmd-key",
             status=commands.CommandStatus.SUCCEEDED,
             params=cmd_data,
             result=cmd_result,
@@ -75,6 +76,7 @@ async def test_execute_command_failure(
     decoy.when(await engine.add_and_execute_command(request=cmd_request)).then_return(
         commands.MoveToWell(
             id="cmd-id",
+            key="cmd-key",
             params=cmd_data,
             status=commands.CommandStatus.FAILED,
             errorId="error-id",

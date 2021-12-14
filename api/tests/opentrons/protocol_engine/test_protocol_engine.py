@@ -120,6 +120,7 @@ def test_add_command(
 
     queued_command = commands.LoadPipette(
         id="command-id",
+        key="command-key",
         status=commands.CommandStatus.QUEUED,
         createdAt=created_at,
         params=params,
@@ -136,6 +137,7 @@ def test_add_command(
         action_dispatcher.dispatch(
             QueueCommandAction(
                 command_id="command-id",
+                command_key="command-id",
                 created_at=created_at,
                 request=request,
             )
@@ -164,6 +166,7 @@ async def test_execute_command(
 
     queued_command = commands.LoadPipette(
         id="command-id",
+        key="command-key",
         status=commands.CommandStatus.QUEUED,
         createdAt=created_at,
         params=params,
@@ -171,6 +174,7 @@ async def test_execute_command(
 
     executed_command = commands.LoadPipette(
         id="command-id",
+        key="command-key",
         status=commands.CommandStatus.SUCCEEDED,
         createdAt=created_at,
         startedAt=created_at,
@@ -193,6 +197,7 @@ async def test_execute_command(
         action_dispatcher.dispatch(
             QueueCommandAction(
                 command_id="command-id",
+                command_key="command-id",
                 created_at=created_at,
                 request=request,
             )
