@@ -46,6 +46,14 @@ const PRIMARY_PIPETTE_NAME = 'PRIMARY_PIPETTE_NAME'
 const LABWARE_DEF = {
   ordering: [['A1', 'A2']],
 }
+const MOCK_LABWARE_OFFSETS = {
+  labwareId: 'id',
+  LabwareOffsetLocation: { slotName: 'slot' },
+  labwareDefinitionUri: 'uri',
+  displayLocation: 'location',
+  displayName: 'name',
+  vestor: { x: 0, y: 0, z: 0 },
+} as any
 
 const render = (props: React.ComponentProps<typeof SummaryScreen>) => {
   return renderWithProviders(<SummaryScreen {...props} />, {
@@ -60,6 +68,9 @@ describe('SummaryScreen', () => {
     props = {
       savePositionCommandData: { someLabwareIf: ['commandId1', 'commandId2'] },
       onCloseClick: jest.fn(),
+      applyLabwareOffsets: jest.fn(),
+      setLabwareOffsets: jest.fn(),
+      labwareOffsets: MOCK_LABWARE_OFFSETS,
     }
     mockSectionList.mockReturnValue(<div>Mock SectionList</div>)
     mockDeckmap.mockReturnValue(<div>Mock DeckMap</div>)
@@ -112,7 +123,7 @@ describe('SummaryScreen', () => {
     getByText('Mock Labware Offsets Summary')
     getByText('Labware Position Check Complete')
   })
-  it('renders apply offset button and clicks it', () => {
+  it('renders apply offset button and clicks it and applies labwareOffsets, renders success toast, and closes modal', () => {
     const mockSetShowLPCSuccessToast = jest.fn()
     when(mockUseLPCSuccessToast)
       .calledWith()
@@ -128,5 +139,6 @@ describe('SummaryScreen', () => {
     })
     expect(props.onCloseClick).toHaveBeenCalled()
     expect(mockSetShowLPCSuccessToast).toHaveBeenCalled()
+    expect(props.applyLabwareOffsets).toHaveBeenCalled()
   })
 })

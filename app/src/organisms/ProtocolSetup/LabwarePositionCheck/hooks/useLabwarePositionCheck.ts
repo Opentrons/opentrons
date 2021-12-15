@@ -35,10 +35,7 @@ import type {
   LabwareOffsetCreateData,
   AnonymousCommand,
 } from '@opentrons/api-client'
-import type {
-  Command,
-  ProtocolFile,
-} from '@opentrons/shared-data/protocol/types/schemaV6'
+import type { Command, ProtocolFile } from '@opentrons/shared-data'
 import type { SetupCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import type { DropTipCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import type {
@@ -57,7 +54,7 @@ import type {
   LabwarePositionCheckStep,
   SavePositionCommandData,
 } from '../types'
-import { LabwareOffsets, useLabwareOffsets } from './useLabwareOffsets'
+import { LabwareOffsets } from './useLabwareOffsets'
 
 export type LabwarePositionCheckUtils =
   | {
@@ -72,8 +69,9 @@ export type LabwarePositionCheckUtils =
       onUnsuccessfulPickUpTip: () => void
       jog: Jog
       ctaText: string
-      applyLabwareOffsets: () => void
       labwareOffsets: LabwareOffsets
+      applyLabwareOffsets: () => void
+      setLabwareOffsets: (active: LabwareOffsets) => void
     }
   | { error: Error }
 
@@ -199,13 +197,6 @@ export function useLabwarePositionCheck(
   const [currentCommandIndex, setCurrentCommandIndex] = React.useState<number>(
     0
   )
-  const { protocolData } = useProtocolDetails()
-  const [labwareOffsets, setLabwareOffsets] = React.useState<LabwareOffsets>([])
-  useLabwareOffsets(savePositionCommandData, protocolData as ProtocolFile<{}>)
-    .then(offsets => setLabwareOffsets(offsets))
-    .catch((e: Error) =>
-      console.error(`error getting labware offsetsL ${e.message}`)
-    )
   const [
     pendingMovementCommandData,
     setPendingMovementCommandData,
@@ -233,6 +224,8 @@ export function useLabwarePositionCheck(
   const dispatch = useDispatch()
   const robotName = useSelector(getConnectedRobotName)
   const attachedModules = useSelector(getAttachedModulesForConnectedRobot)
+  const { protocolData } = useProtocolDetails()
+  const [labwareOffsets, setLabwareOffsets] = React.useState<LabwareOffsets>([])
 
   const LPCCommands = LPCSteps.reduce<LabwarePositionCheckCommand[]>(
     (commands, currentStep) => {
@@ -670,7 +663,6 @@ export function useLabwarePositionCheck(
         console.error(`error issuing jog command: ${e.message}`)
       })
   }
-
   const applyLabwareOffsets = (): void => {
     if (labwareOffsets.length > 0) {
       labwareOffsets.forEach(labwareOffset => {
@@ -704,7 +696,8 @@ export function useLabwarePositionCheck(
     titleText,
     isLoading,
     showPickUpTipConfirmationModal,
-    applyLabwareOffsets,
     labwareOffsets,
+    applyLabwareOffsets,
+    setLabwareOffsets,
   }
 }
