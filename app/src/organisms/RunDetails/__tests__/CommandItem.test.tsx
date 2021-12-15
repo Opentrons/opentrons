@@ -63,6 +63,22 @@ const MOCK_COMMAND_DETAILS_COMMENT = {
   startedAt: 'start timestamp',
   completedAt: 'end timestamp',
 } as Command
+const MOCK_PAUSE_COMMAND = {
+  id: 'PAUSE',
+  commandType: 'pause',
+  params: {},
+  status: 'queued',
+  result: {},
+} as Command
+const MOCK_COMMAND_DETAILS_PAUSE = {
+  id: 'PAUSE',
+  commandType: 'pause',
+  params: {},
+  status: 'queued',
+  result: {},
+  startedAt: 'start timestamp',
+  completedAt: 'end timestamp',
+} as Command
 describe('Run Details Command item', () => {
   beforeEach(() => {
     mockCommandText.mockReturnValue(<div>Mock Command Text</div>)
@@ -149,5 +165,21 @@ describe('Run Details Command item', () => {
     const { getByText } = render(props)
     expect(getByText('Comment')).toHaveStyle('backgroundColor: C_NEAR_WHITE')
     getByText('Mock Command Text')
+  })
+  it('renders the pause text when the command is a pause', () => {
+    when(mockUseCommandQuery)
+      .calledWith(RUN_ID, MOCK_PAUSE_COMMAND.id)
+      .mockReturnValue({
+        data: { data: MOCK_COMMAND_DETAILS_PAUSE },
+        refetch: jest.fn(),
+      } as any)
+    const props = {
+      commandOrSummary: { ...MOCK_PAUSE_COMMAND, status: 'queued' },
+      runStatus: 'paused',
+    } as React.ComponentProps<typeof CommandItem>
+    const { getByText } = render(props)
+    expect(getByText('Pause protocol')).toHaveStyle(
+      'backgroundColor: C_NEAR_WHITE'
+    )
   })
 })
