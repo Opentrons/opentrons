@@ -14,7 +14,6 @@ def migrated_file_version() -> int:
 def default_file_settings() -> Dict[str, Optional[bool]]:
     return {
         "shortFixedTrash": None,
-        "calibrateToBottom": None,
         "deckCalibrationDots": None,
         "disableHomeOnBoot": None,
         "useOldAspirationFunctions": None,
@@ -35,7 +34,6 @@ def empty_settings():
 def version_less():
     return {
         "shortFixedTrash": True,
-        "calibrateToBottom": True,
         "deckCalibrationDots": True,
         "disableHomeOnBoot": True,
         "useOldAspirationFunctions": True,
@@ -47,7 +45,6 @@ def v1_config():
     return {
         "_version": 1,
         "shortFixedTrash": True,
-        "calibrateToBottom": True,
         "deckCalibrationDots": True,
         "disableHomeOnBoot": True,
         "useProtocolApi2": None,
@@ -231,7 +228,6 @@ def test_migrates_versionless_old_config(migrated_file_version, default_file_set
     expected.update(
         {
             "shortFixedTrash": None,
-            "calibrateToBottom": None,
             "deckCalibrationDots": True,
             "disableHomeOnBoot": None,
         }
@@ -259,7 +255,6 @@ def test_ensures_config():
     ) == {
         "_version": 3,
         "shortFixedTrash": False,
-        "calibrateToBottom": None,
         "deckCalibrationDots": None,
         "disableHomeOnBoot": None,
         "useOldAspirationFunctions": None,
