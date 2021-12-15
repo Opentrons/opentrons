@@ -7,7 +7,7 @@ stages:
   - name: Settings GET request returns correct info
     request:
       method: GET
-      url: '{host:s}:{port:d}/settings'test_
+      url: '{host:s}:{port:d}/settings'
     response:
       status_code: 200
       json:
