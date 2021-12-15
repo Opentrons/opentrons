@@ -117,13 +117,6 @@ settings = [
         description="Trash box is 55mm tall (rather than the 77mm default)",
     ),
     SettingDefinition(
-        _id="calibrateToBottom",
-        old_id="calibrate-to-bottom",
-        title="Calibrate to bottom",
-        description="Calibrate using the bottom-center of well A1 for each"
-        " labware (rather than the top-center)",
-    ),
-    SettingDefinition(
         _id="deckCalibrationDots",
         old_id="dots-deck-type",
         title="Deck calibration to dots",

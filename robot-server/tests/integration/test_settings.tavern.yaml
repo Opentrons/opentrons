@@ -7,7 +7,7 @@ stages:
   - name: Settings GET request returns correct info
     request:
       method: GET
-      url: '{host:s}:{port:d}/settings'
+      url: '{host:s}:{port:d}/settings'test_
     response:
       status_code: 200
       json:
@@ -16,12 +16,6 @@ stages:
             old_id: short-fixed-trash
             title: Short (55mm) fixed trash
             description: !re_search 'Trash box is 55mm tall'
-            restart_required: false
-            value: !anything
-          - id: calibrateToBottom
-            old_id: calibrate-to-bottom
-            title: Calibrate to bottom
-            description: !re_search 'Calibrate using the bottom-center'
             restart_required: false
             value: !anything
           - id: deckCalibrationDots
@@ -78,7 +72,6 @@ marks:
       key: id
       vals:
         - shortFixedTrash
-        - calibrateToBottom
         - deckCalibrationDots
         - disableHomeOnBoot
         - useOldAspirationFunctions
@@ -116,7 +109,6 @@ marks:
       key: id
       vals:
         - shortFixedTrash
-        - calibrateToBottom
         - deckCalibrationDots
         - disableHomeOnBoot
         - useOldAspirationFunctions
