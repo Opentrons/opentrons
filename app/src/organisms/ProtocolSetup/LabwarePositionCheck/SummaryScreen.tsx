@@ -1,5 +1,4 @@
 import * as React from 'react'
-import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_START,
@@ -15,63 +14,27 @@ import {
   Text,
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
-import { IDENTITY_VECTOR } from '@opentrons/shared-data'
-import { useCreateLabwareOffsetMutation } from '@opentrons/react-api-client'
 import { useProtocolDetails } from '../../RunDetails/hooks'
-import { useCurrentProtocolRun } from '../../ProtocolUpload/hooks'
 import { useLPCSuccessToast } from '../hooks'
 import { DeckMap } from './DeckMap'
 import { SectionList } from './SectionList'
 import { LabwareOffsetsSummary } from './LabwareOffsetsSummary'
-import { useIntroInfo, useLabwareOffsets, LabwareOffsets } from './hooks'
-import type { SavePositionCommandData } from './types'
-import type { ProtocolFile } from '@opentrons/shared-data'
+import { useIntroInfo, LabwareOffsets } from './hooks'
 
 export const SummaryScreen = (props: {
-  savePositionCommandData: SavePositionCommandData
+  labwareOffsets: LabwareOffsets
+  applyLabwareOffsets: () => void
   onCloseClick: () => unknown
 }): JSX.Element | null => {
-  const { savePositionCommandData } = props
-  const [labwareOffsets, setLabwareOffsets] = React.useState<LabwareOffsets>([])
+  const { labwareOffsets, applyLabwareOffsets } = props
   const { t } = useTranslation('labware_position_check')
   const introInfo = useIntroInfo()
   const { protocolData } = useProtocolDetails()
-  useLabwareOffsets(savePositionCommandData, protocolData as ProtocolFile<{}>)
-    .then(offsets => {
-      labwareOffsets.length === 0 && setLabwareOffsets(offsets)
-    })
-    .catch((e: Error) =>
-      console.error(`error getting labware offsetsL ${e.message}`)
-    )
-  const { createLabwareOffset } = useCreateLabwareOffsetMutation()
-  const { runRecord } = useCurrentProtocolRun()
   const { setShowLPCSuccessToast } = useLPCSuccessToast()
-
   if (introInfo == null) return null
   if (protocolData == null) return null
   const labwareIds = Object.keys(protocolData.labware)
   const { sections, primaryPipetteMount, secondaryPipetteMount } = introInfo
-
-  const applyLabwareOffsets = (): void => {
-    if (labwareOffsets.length > 0) {
-      labwareOffsets.forEach(labwareOffset => {
-        if (!isEqual(labwareOffset.vector, IDENTITY_VECTOR)) {
-          createLabwareOffset({
-            runId: runRecord?.data.id as string,
-            data: {
-              definitionUri: labwareOffset.labwareDefinitionUri,
-              location: labwareOffset.labwareOffsetLocation,
-              vector: labwareOffset.vector,
-            },
-          }).catch((e: Error) => {
-            console.error(`error applying labware offsets: ${e.message}`)
-          })
-        }
-      })
-    } else {
-      console.error('no labware offset data found')
-    }
-  }
 
   return (
     <Flex margin={SPACING_3} flexDirection={DIRECTION_COLUMN}>

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import isEqual from 'lodash/isEqual'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import reduce from 'lodash/reduce'
@@ -56,6 +57,7 @@ import type {
   LabwarePositionCheckStep,
   SavePositionCommandData,
 } from '../types'
+import { LabwareOffsets, useLabwareOffsets } from './useLabwareOffsets'
 
 export type LabwarePositionCheckUtils =
   | {
@@ -70,6 +72,8 @@ export type LabwarePositionCheckUtils =
       onUnsuccessfulPickUpTip: () => void
       jog: Jog
       ctaText: string
+      applyLabwareOffsets: () => void
+      labwareOffsets: LabwareOffsets
     }
   | { error: Error }
 
@@ -195,6 +199,13 @@ export function useLabwarePositionCheck(
   const [currentCommandIndex, setCurrentCommandIndex] = React.useState<number>(
     0
   )
+  const { protocolData } = useProtocolDetails()
+  const [labwareOffsets, setLabwareOffsets] = React.useState<LabwareOffsets>([])
+  useLabwareOffsets(savePositionCommandData, protocolData as ProtocolFile<{}>)
+    .then(offsets => setLabwareOffsets(offsets))
+    .catch((e: Error) =>
+      console.error(`error getting labware offsetsL ${e.message}`)
+    )
   const [
     pendingMovementCommandData,
     setPendingMovementCommandData,
@@ -214,7 +225,6 @@ export function useLabwarePositionCheck(
   const [dropTipOffset, setDropTipOffset] = React.useState<VectorOffset>(
     IDENTITY_VECTOR
   )
-  const { protocolData } = useProtocolDetails()
   const { createLabwareOffset } = useCreateLabwareOffsetMutation()
   const { createCommand } = useCreateCommandMutation()
   const host = useHost()
@@ -661,6 +671,27 @@ export function useLabwarePositionCheck(
       })
   }
 
+  const applyLabwareOffsets = (): void => {
+    if (labwareOffsets.length > 0) {
+      labwareOffsets.forEach(labwareOffset => {
+        if (!isEqual(labwareOffset.vector, IDENTITY_VECTOR)) {
+          createLabwareOffset({
+            runId: currentRun?.data.id as string,
+            data: {
+              definitionUri: labwareOffset.labwareDefinitionUri,
+              location: labwareOffset.labwareOffsetLocation,
+              vector: labwareOffset.vector,
+            },
+          }).catch((e: Error) => {
+            console.error(`error applying labware offsets: ${e.message}`)
+          })
+        }
+      })
+    } else {
+      console.error('no labware offset data found')
+    }
+  }
+
   return {
     currentCommandIndex,
     currentStep,
@@ -673,5 +704,7 @@ export function useLabwarePositionCheck(
     titleText,
     isLoading,
     showPickUpTipConfirmationModal,
+    applyLabwareOffsets,
+    labwareOffsets,
   }
 }
