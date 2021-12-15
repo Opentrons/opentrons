@@ -26,6 +26,7 @@ import {
   Box,
   FONT_WEIGHT_SEMIBOLD,
   C_NEAR_WHITE,
+  SPACING_7,
 } from '@opentrons/components'
 import {
   inferModuleOrientationFromXCoordinate,
@@ -42,6 +43,7 @@ import { LabwareInfoOverlay } from './LabwareInfoOverlay'
 import { LabwareOffsetModal } from './LabwareOffsetModal'
 import { getModuleTypesThatRequireExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
 import { ExtraAttentionWarning } from './ExtraAttentionWarning'
+import { useMissingModuleIds, useProtocolCalibrationStatus } from '../hooks'
 
 const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
@@ -58,6 +60,8 @@ const DECK_MAP_VIEWBOX = '-80 -40 550 500'
 export const LabwareSetup = (): JSX.Element | null => {
   const moduleRenderInfoById = useModuleRenderInfoById()
   const labwareRenderInfoById = useLabwareRenderInfoById()
+  const missingModuleIds = useMissingModuleIds()
+  const isEverythingCalibrated = useProtocolCalibrationStatus().complete
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_LEFT,
   })
@@ -80,10 +84,22 @@ export const LabwareSetup = (): JSX.Element | null => {
     showLabwarePositionCheckModal,
     setShowLabwarePositionCheckModal,
   ] = React.useState<boolean>(false)
+  const calibrationIncomplete =
+    missingModuleIds.length === 0 && !isEverythingCalibrated
+  const moduleSetupIncomplete =
+    missingModuleIds.length > 0 && isEverythingCalibrated
+  const moduleAndCalibrationIncomplete =
+    missingModuleIds.length > 0 && !isEverythingCalibrated
 
   let lpcDisabledReason: string | null = null
 
-  if (runStatus != null && runStatus !== RUN_STATUS_IDLE) {
+  if (moduleAndCalibrationIncomplete) {
+    lpcDisabledReason = t('lpc_disabled_modules_and_calibration_not_complete')
+  } else if (calibrationIncomplete) {
+    lpcDisabledReason = t('lpc_disabled_calibration_not_complete')
+  } else if (moduleSetupIncomplete) {
+    lpcDisabledReason = t('lpc_disabled_modules_not_connected"')
+  } else if (runStatus != null && runStatus !== RUN_STATUS_IDLE) {
     lpcDisabledReason = t('labware_position_check_not_available')
   } else if (
     isEmpty(protocolData?.pipettes) ||
@@ -209,7 +225,9 @@ export const LabwareSetup = (): JSX.Element | null => {
                 {t('run_labware_position_check')}
               </NewSecondaryBtn>
               {lpcDisabledReason !== null ? (
-                <Tooltip {...tooltipProps}>{lpcDisabledReason}</Tooltip>
+                <Tooltip maxWidth={SPACING_7} {...tooltipProps}>
+                  {lpcDisabledReason}
+                </Tooltip>
               ) : null}
             </Flex>
           </Flex>
