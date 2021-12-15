@@ -27,8 +27,9 @@ export const ProtocolSetupInfo = (
   if (protocolData == null) return null
   if (setupCommand === undefined) return null
   if (
-    setupCommand.result?.definition?.metadata.displayName.includes('Trash') ===
-    true
+    setupCommand.result?.definition?.metadata?.displayName?.includes(
+      'Trash'
+    ) === true
   ) {
     return null
   }
