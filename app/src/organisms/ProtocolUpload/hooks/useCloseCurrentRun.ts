@@ -28,11 +28,11 @@ export function useCloseCurrentRun(): {
   isProtocolRunLoaded: boolean
 } {
   const currentRunId = useCurrentRunId()
+  const { protocolRecord, runRecord } = useCurrentProtocolRun()
   const {
     dismissCurrentRun,
     isLoading: isDismissing,
-  } = useDismissCurrentRunMutation()
-  const { protocolRecord, runRecord } = useCurrentProtocolRun()
+  } = useDismissCurrentRunMutation(protocolRecord?.data.id)
 
   const { stopRun } = useStopRunMutation()
   const { deleteRun } = useDeleteRunMutation()

@@ -2,8 +2,6 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Redirect } from 'react-router-dom'
 import {
-  RunStatus,
-  RUN_STATUS_IDLE,
   RUN_STATUS_RUNNING,
   RUN_STATUS_PAUSED,
   RUN_STATUS_PAUSE_REQUESTED,
@@ -19,10 +17,13 @@ import {
 import { Page } from '../../atoms/Page'
 import { Portal } from '../../App/portal'
 import { useProtocolDetails } from './hooks'
-import { useRunStatus, useRunStartTime } from '../RunTimeControl/hooks'
+import { useRunStatus } from '../RunTimeControl/hooks'
 import { ConfirmCancelModal } from '../../pages/Run/RunLog'
 import { ConfirmExitProtocolUploadModal } from '../ProtocolUpload/ConfirmExitProtocolUploadModal'
-import { useCloseCurrentRun } from '../ProtocolUpload/hooks/useCloseCurrentRun'
+import {
+  useCloseCurrentRun,
+  useCurrentProtocolRun,
+} from '../ProtocolUpload/hooks'
 import { useCurrentRunControls } from '../../pages/Run/RunLog/hooks'
 import { CommandList } from './CommandList'
 
@@ -32,14 +33,8 @@ export function RunDetails(): JSX.Element | null {
   const { t } = useTranslation(['run_details', 'shared'])
   const { displayName } = useProtocolDetails()
   const runStatus = useRunStatus()
-  const startTime = useRunStartTime()
-  const { closeCurrentRun, isProtocolRunLoaded } = useCloseCurrentRun()
-
-  // display an idle status as 'running' in the UI after a run has started
-  const adjustedRunStatus: RunStatus | null =
-    runStatus === RUN_STATUS_IDLE && startTime != null
-      ? RUN_STATUS_RUNNING
-      : runStatus
+  const { closeCurrentRun } = useCloseCurrentRun()
+  const { protocolRecord, runRecord } = useCurrentProtocolRun()
 
   const { pauseRun } = useCurrentRunControls()
 
@@ -48,23 +43,18 @@ export function RunDetails(): JSX.Element | null {
     confirmExit()
   }
 
+  const [
+    showConfirmExitProtocolUploadModal,
+    setShowConfirmExitProtocolUploadModal,
+  ] = React.useState(false)
+
   const {
-    showConfirmation: showConfirmExit,
+    showConfirmation: showConfirmCancelModal,
     confirm: confirmExit,
     cancel: cancelExit,
   } = useConditionalConfirm(cancelRunAndExit, true)
 
-  const handleCloseProtocol: React.MouseEventHandler = _event => {
-    closeCurrentRun()
-  }
-
-  const {
-    showConfirmation: showCloseConfirmExit,
-    confirm: confirmCloseExit,
-    cancel: cancelCloseExit,
-  } = useConditionalConfirm(handleCloseProtocol, true)
-
-  if (!isProtocolRunLoaded) {
+  if (protocolRecord == null && runRecord == null) {
     return <Redirect to="/upload" />
   }
 
@@ -84,9 +74,9 @@ export function RunDetails(): JSX.Element | null {
   let titleBarProps
 
   if (
-    adjustedRunStatus === RUN_STATUS_RUNNING ||
-    adjustedRunStatus === RUN_STATUS_PAUSED ||
-    adjustedRunStatus === RUN_STATUS_PAUSE_REQUESTED
+    runStatus === RUN_STATUS_RUNNING ||
+    runStatus === RUN_STATUS_PAUSED ||
+    runStatus === RUN_STATUS_PAUSE_REQUESTED
   ) {
     titleBarProps = {
       title: t('protocol_title', { protocol_name: displayName }),
@@ -96,7 +86,7 @@ export function RunDetails(): JSX.Element | null {
     titleBarProps = {
       title: t('protocol_title', { protocol_name: displayName }),
       back: {
-        onClick: confirmCloseExit,
+        onClick: () => setShowConfirmExitProtocolUploadModal(true),
         title: t('shared:close'),
         children: t('shared:close'),
         iconName: 'close' as const,
@@ -107,16 +97,18 @@ export function RunDetails(): JSX.Element | null {
 
   return (
     <>
-      {showCloseConfirmExit && (
+      {showConfirmExitProtocolUploadModal && (
         <Portal level="top">
           <ConfirmExitProtocolUploadModal
-            exit={confirmCloseExit}
-            back={cancelCloseExit}
+            exit={closeCurrentRun}
+            back={() => setShowConfirmExitProtocolUploadModal(false)}
           />
         </Portal>
       )}
       <Page titleBarProps={titleBarProps}>
-        {showConfirmExit ? <ConfirmCancelModal onClose={cancelExit} /> : null}
+        {showConfirmCancelModal ? (
+          <ConfirmCancelModal onClose={cancelExit} />
+        ) : null}
         <CommandList />
       </Page>
     </>

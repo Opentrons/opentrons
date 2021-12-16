@@ -35,6 +35,7 @@
   "exit_modal_go_back": "No, go back",
   "exit_modal_exit": "Yes, close now",
   "exit_modal_body": "Are you sure you want to close this protocol?",
+  "exit_modal_closing": "Closing...",
   "robot_name_last_run": "{{robot_name}}’s last run",
   "rerunning_protocol_modal_title": "See How Rerunning a Protocol Works",
   "protocol_name_title": "Protocol name",

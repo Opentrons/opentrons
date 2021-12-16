@@ -22,21 +22,27 @@ export type UseDismissCurrentRunMutationOptions = UseMutationOptions<
   string
 >
 
-export function useDismissCurrentRunMutation(): UseDismissCurrentRunMutationResult {
+export function useDismissCurrentRunMutation(
+  protocolId?: string
+): UseDismissCurrentRunMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
 
-  const mutation = useMutation<EmptyResponse, unknown, string>(
-    (runId: string) =>
-      dismissCurrentRun(host as HostConfig, runId).then(response => {
-        queryClient.removeQueries([host, 'runs', runId])
-        queryClient
-          .invalidateQueries([host, 'runs'])
-          .catch((e: Error) =>
-            console.error(`error invalidating runs query: ${e.message}`)
-          )
-        return response.data
-      })
+  const mutation = useMutation<EmptyResponse, unknown, string>(runId =>
+    dismissCurrentRun(host as HostConfig, runId).then(response => {
+      queryClient.removeQueries([host, 'runs'])
+
+      if (protocolId != null) {
+        queryClient.removeQueries([host, 'protocols', protocolId])
+      }
+
+      queryClient
+        .invalidateQueries([host, 'runs'])
+        .catch((e: Error) =>
+          console.error(`error invalidating runs query: ${e.message}`)
+        )
+      return response.data
+    })
   )
 
   return {

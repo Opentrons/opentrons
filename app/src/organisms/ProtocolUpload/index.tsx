@@ -120,19 +120,16 @@ export function ProtocolUpload(): JSX.Element {
 
   const cancelRunAndExit = (): void => {
     pauseRun()
-    confirmExit()
-  }
-  const handleCloseProtocol: React.MouseEventHandler = _event => {
-    closeCurrentRun()
+    confirmCancelModalExit()
   }
 
+  const [
+    showConfirmExitProtocolUploadModal,
+    setShowConfirmExitProtocolUploadModal,
+  ] = React.useState(false)
+
   const {
-    showConfirmation: showConfirmExit,
-    confirm: confirmExit,
-    cancel: cancelExit,
-  } = useConditionalConfirm(handleCloseProtocol, true)
-  const {
-    showConfirmation: showConfirmModalExit,
+    showConfirmation: showConfirmCancelModal,
     confirm: confirmCancelModalExit,
     cancel: cancelModalExit,
   } = useConditionalConfirm(cancelRunAndExit, true)
@@ -161,7 +158,7 @@ export function ProtocolUpload(): JSX.Element {
         protocol_name: protocolRecord?.data?.metadata?.protocolName ?? '',
       }),
       back: {
-        onClick: confirmExit,
+        onClick: () => setShowConfirmExitProtocolUploadModal(true),
         title: t('shared:close'),
         children: t('shared:close'),
         iconName: 'close' as const,
@@ -189,10 +186,15 @@ export function ProtocolUpload(): JSX.Element {
 
   return (
     <>
-      {showConfirmExit && (
-        <ConfirmExitProtocolUploadModal exit={confirmExit} back={cancelExit} />
+      {showConfirmExitProtocolUploadModal && (
+        <ConfirmExitProtocolUploadModal
+          exit={closeCurrentRun}
+          back={() => setShowConfirmExitProtocolUploadModal(false)}
+        />
       )}
-      {showConfirmModalExit && <ConfirmCancelModal onClose={cancelModalExit} />}
+      {showConfirmCancelModal && (
+        <ConfirmCancelModal onClose={cancelModalExit} />
+      )}
       <Page titleBarProps={titleBarProps}>
         {uploadError != null && (
           <Flex
