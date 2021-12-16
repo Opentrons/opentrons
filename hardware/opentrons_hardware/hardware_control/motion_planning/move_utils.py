@@ -171,7 +171,6 @@ def achievable_final(
     # allowed
     log = logging.getLogger("achievable_final")
 
-    print(f'Before achievable: {final_speed}')
     for axis in Axis.get_all_axes():
         axis_component = move.unit_vector[axis.value]
         if axis_component:
@@ -206,37 +205,42 @@ def build_blocks(
     #         "check preconstraints for delta-v"
 
     constraint_max_speed = max_speed
-    max_acceleration_vector = [
+    max_acc = np.array([
         constraints[axis].max_acceleration for axis in Axis.get_all_axes()
-    ]
-    max_acceleration_scale = np.dot(max_acceleration_vector, unit_vector)  # type: ignore[no-untyped-call]
+    ])
+    acc_v = np.linalg.norm(max_acc) * unit_vector.vectorize()
 
+    for a_i, max_acc_i in zip(acc_v, max_acc):
+        if abs(a_i) > max_acc_i:
+            acc_v *= max_acc_i / a_i
+    max_acceleration = np.linalg.norm(acc_v)
+    
     initial_speed_sq = initial_speed ** 2
     final_speed_sq = final_speed ** 2
 
     max_achievable_speed = math.sqrt(
         0.5
-        * (2 * max_acceleration_scale * distance + initial_speed_sq + final_speed_sq)
+        * (2 * max_acceleration * distance + initial_speed_sq + final_speed_sq)
     )
     max_speed = min(max_achievable_speed, max_speed)
     max_speed_sq = max_speed ** 2
 
     log.debug(
-        f"build blocks: {initial_speed}mm/s to {final_speed}mm/s in {distance}mm "
-        f"with {max_acceleration_scale}mm/s2 max a "
-        f"gives {max_achievable_speed}mm/s limited to {max_speed}mm/s"
+        f"build blocks: {initial_speed} mm/s to {final_speed} mm/s in {distance} mm "
+        f"with {max_acceleration} mm/s2 max a "
+        f"gives {max_achievable_speed} mm/s limited to {max_speed} mm/s"
     )
 
     first = Block(
         initial_speed=initial_speed,
-        acceleration=max_acceleration_scale,
-        distance=abs(max_speed_sq - initial_speed_sq) / (2 * max_acceleration_scale),
+        acceleration=max_acceleration,
+        distance=abs(max_speed_sq - initial_speed_sq) / (2 * max_acceleration),
     )
 
     final = Block(
         initial_speed=first.final_speed,
-        acceleration=-max_acceleration_scale,
-        distance=abs(max_speed_sq - final_speed_sq) / (2 * max_acceleration_scale),
+        acceleration=-max_acceleration,
+        distance=abs(max_speed_sq - final_speed_sq) / (2 * max_acceleration),
     )
 
     if max_achievable_speed > constraint_max_speed:
@@ -264,12 +268,10 @@ def build_move(
 
     initial_speed = find_initial_speed(constraints, move, prev_move)
     final_speed = find_final_speed(constraints, move, next_move)
-    print(f"final_speed: {final_speed}")
 
     # We cannot possibly change speed by more than we can accelerate, unfortunately, which is the other
     # reason this is iterative
     final_speed = achievable_final(constraints, move, initial_speed, final_speed)
-    print(f"final achievable speed: {final_speed}")
 
     m = Move(
         move.unit_vector,
