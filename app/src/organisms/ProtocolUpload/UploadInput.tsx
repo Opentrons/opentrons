@@ -31,6 +31,7 @@ import {
   FONT_SIZE_BODY_1,
   SPACING_2,
   JUSTIFY_START,
+  TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 import { getLatestLabwareOffsetCount } from '../ProtocolSetup/LabwarePositionCheck/utils/getLatestLabwareOffsetCount'
@@ -40,6 +41,7 @@ import { Divider } from '../../atoms/structure'
 import { useMostRecentRunId } from './hooks/useMostRecentRunId'
 import { RerunningProtocolModal } from './RerunningProtocolModal'
 import { useCloneRun } from './hooks'
+import { getRunDisplayStatus } from './getRunDisplayStatus'
 import type { State } from '../../redux/types'
 
 const PROTOCOL_LIBRARY_URL = 'https://protocols.opentrons.com'
@@ -85,7 +87,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
   const mostRecentProtocol = mostRecentProtocolInfo?.data?.data
   const protocolData = useProtocolDetails()
   //  If mostRecentRun is null, the CTA that uses cloneRun won't appear so this will never be reached
-  const cloneMostRecentRun = useCloneRun(
+  const { cloneRun } = useCloneRun(
     mostRecentRunId != null ? mostRecentRunId : null
   )
   const robotName = useSelector((state: State) => getConnectedRobotName(state))
@@ -101,6 +103,10 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
   const mostRecentRunFileName =
     mostRecentProtocol != null && mostRecentProtocol.files != null
       ? mostRecentProtocol.files.find(file => file.role === 'main')?.name
+      : null
+  const mostRecentRunStatus =
+    mostRecentProtocol != null && mostRecentRun?.status != null
+      ? getRunDisplayStatus(mostRecentRun)
       : null
 
   const handleDrop: React.DragEventHandler<HTMLLabelElement> = e => {
@@ -245,6 +251,24 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
                 color={C_MED_GRAY}
                 fontSize={FONT_SIZE_CAPTION}
               >
+                {'Run status'}
+              </Text>
+              <Flex css={FONT_BODY_1_DARK}>
+                <Text textTransform={TEXT_TRANSFORM_CAPITALIZE}>
+                  {mostRecentRunStatus}
+                </Text>
+              </Flex>
+            </Flex>
+            <Flex
+              flex={'auto'}
+              flexDirection={DIRECTION_COLUMN}
+              justifyContent={JUSTIFY_CENTER}
+            >
+              <Text
+                marginBottom={SPACING_1}
+                color={C_MED_GRAY}
+                fontSize={FONT_SIZE_CAPTION}
+              >
                 {t('run_timestamp_title')}
               </Text>
               <Flex css={FONT_BODY_1_DARK} flexDirection={DIRECTION_ROW}>
@@ -280,7 +304,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
             </Flex>
             <Flex>
               <NewSecondaryBtn
-                onClick={cloneMostRecentRun}
+                onClick={cloneRun}
                 id={'UploadInput_runAgainButton'}
               >
                 {t('run_again')}

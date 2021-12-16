@@ -1,18 +1,25 @@
 """Integration tests for the JsonFileReader interface."""
+import pytest
 from decoy import matchers
-from pathlib import Path
 
-from opentrons.protocol_runner.protocol_source import ProtocolSource
-from opentrons.protocol_runner.pre_analysis import JsonPreAnalysis
-from opentrons.protocol_runner.json_file_reader import JsonFileReader
 from opentrons.protocols.models import json_protocol
+from opentrons.protocol_reader import (
+    ProtocolReader,
+    InputFile,
+    ProtocolFilesInvalidError,
+)
+from opentrons.protocol_runner.json_file_reader import JsonFileReader
 
 
-def test_reads_file(json_protocol_file: Path) -> None:
+@pytest.mark.xfail(strict=True, raises=ProtocolFilesInvalidError)
+async def test_reads_file(
+    protocol_reader: ProtocolReader,
+    json_protocol_file: InputFile,
+) -> None:
     """It should read a JSON file into a JsonProtocol model."""
-    protocol_source = ProtocolSource(
+    protocol_source = await protocol_reader.read(
+        name="test_protocol",
         files=[json_protocol_file],
-        pre_analysis=JsonPreAnalysis(metadata={}, schema_version=3),
     )
 
     subject = JsonFileReader()

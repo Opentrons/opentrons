@@ -1,6 +1,11 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { AlertModal } from '@opentrons/components'
+import {
+  AlertModal,
+  NewPrimaryBtn,
+  NewSecondaryBtn,
+  SPACING_3,
+} from '@opentrons/components'
 
 import { Portal } from '../../../App/portal'
 import { useCurrentRunControls } from './hooks'
@@ -26,8 +31,20 @@ export function ConfirmCancelModal(
       <AlertModal
         heading={t('cancel_run_modal_heading')}
         buttons={[
-          { children: t('cancel_run_modal_back'), onClick: onClose },
-          { children: t('cancel_run_modal_confirm'), onClick: cancel },
+          {
+            Component: () => (
+              <NewSecondaryBtn onClick={onClose}>
+                {t('cancel_run_modal_back')}
+              </NewSecondaryBtn>
+            ),
+          },
+          {
+            Component: () => (
+              <NewPrimaryBtn onClick={cancel} marginLeft={SPACING_3}>
+                {t('cancel_run_modal_confirm')}
+              </NewPrimaryBtn>
+            ),
+          },
         ]}
         alertOverlay
       >

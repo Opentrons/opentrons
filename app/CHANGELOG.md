@@ -3,6 +3,66 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.0.0-beta.4](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.3...v5.0.0-beta.4) (2021-12-14)
+
+
+### Bug Fixes
+
+* **app:** prevent white screen when restarting and closing protocols ([#9091](https://github.com/Opentrons/opentrons/issues/9091)) ([391f606](https://github.com/Opentrons/opentrons/commit/391f606a740ad19ff3962bd7e9709b321f4d5def)), closes [#9082](https://github.com/Opentrons/opentrons/issues/9082) [#9083](https://github.com/Opentrons/opentrons/issues/9083)
+* **app, shared-data:** splice out first set of setup commands from run log only ([#9086](https://github.com/Opentrons/opentrons/issues/9086)) ([a86d9f7](https://github.com/Opentrons/opentrons/commit/a86d9f7d1b607aef3436a2ddcaa45042dfaf28b5)), closes [#9011](https://github.com/Opentrons/opentrons/issues/9011)
+
+
+### Features
+
+* **app:** add Comment text above comment commands in run details ([#9054](https://github.com/Opentrons/opentrons/issues/9054)) ([8c5d71f](https://github.com/Opentrons/opentrons/commit/8c5d71f2eb3c8262c556748424e1c390c06f4668)), closes [#9040](https://github.com/Opentrons/opentrons/issues/9040)
+
+
+
+
+
+# [5.0.0-beta.3](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.2...v5.0.0-beta.3) (2021-12-10)
+
+
+### Features
+
+* **app, api-client:** add custom labware support ([#9044](https://github.com/Opentrons/opentrons/issues/9044)) ([9cbff27](https://github.com/Opentrons/opentrons/commit/9cbff274e5989ae6434032052a9875606ab249b3)), closes [#9026](https://github.com/Opentrons/opentrons/issues/9026)
+
+
+
+
+
+# [5.0.0-beta.2](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.1...v5.0.0-beta.2) (2021-12-08)
+
+
+### Bug Fixes
+
+* **app:** flip run details redirect check for loaded run ([#9023](https://github.com/Opentrons/opentrons/issues/9023)) ([ba5b901](https://github.com/Opentrons/opentrons/commit/ba5b901454c8c8bb5678edd8cc1af52d5a9f48b3))
+
+
+
+
+
+# [5.0.0-beta.1](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.0...v5.0.0-beta.1) (2021-12-07)
+
+
+### Bug Fixes
+
+* **app:** display error and close run if protocol analysis is not-ok ([#9007](https://github.com/Opentrons/opentrons/issues/9007)) ([a4bf3b5](https://github.com/Opentrons/opentrons/commit/a4bf3b5458949cc8abed2f32de0f54b635d28ee1)), closes [#8984](https://github.com/Opentrons/opentrons/issues/8984)
+* **app:** show empty protocol upload page if current run is being dimissed ([#8983](https://github.com/Opentrons/opentrons/issues/8983)) ([b50f414](https://github.com/Opentrons/opentrons/commit/b50f4147ab049123ef6f9bc72ffc558772960993)), closes [#8953](https://github.com/Opentrons/opentrons/issues/8953)
+* **app:** show protocol setup loading state after protocol record creation ([#8982](https://github.com/Opentrons/opentrons/issues/8982)) ([be485fe](https://github.com/Opentrons/opentrons/commit/be485fed08bc3ef6abf6bb0048d2822ac55455ae))
+
+
+### Features
+
+* **app:** add Labware Offset Link in LPC ([#8967](https://github.com/Opentrons/opentrons/issues/8967)) ([ba6a9a1](https://github.com/Opentrons/opentrons/commit/ba6a9a14443cf543ecbae063eda285a191b6fee5)), closes [#8963](https://github.com/Opentrons/opentrons/issues/8963)
+* **app:** add loader to LPC summary screen ([#9006](https://github.com/Opentrons/opentrons/issues/9006)) ([e9c1312](https://github.com/Opentrons/opentrons/commit/e9c13124f5e7d1950228547566ff63f0d9c6a180)), closes [#9001](https://github.com/Opentrons/opentrons/issues/9001)
+* **app:** confirm pick up tip button style ([#8968](https://github.com/Opentrons/opentrons/issues/8968)) ([b61ef1d](https://github.com/Opentrons/opentrons/commit/b61ef1d0822496dfb052a34c39df342e87899110)), closes [#8961](https://github.com/Opentrons/opentrons/issues/8961)
+* **app:** use module model when applying labware offsets ([#8992](https://github.com/Opentrons/opentrons/issues/8992)) ([eaea065](https://github.com/Opentrons/opentrons/commit/eaea0656710d8734168cd4ad84b08043783f50c0))
+
+
+
+
+
 # [5.0.0-beta.0](https://github.com/Opentrons/opentrons/compare/v4.7.0...v5.0.0-beta.0) (2021-11-30)
 
 

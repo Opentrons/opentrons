@@ -3,6 +3,11 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 from opentrons.hardware_control import API as HardwareAPI
+from opentrons.protocol_reader import (
+    ProtocolSource,
+    PythonProtocolConfig,
+    JsonProtocolConfig,
+)
 from opentrons.protocol_engine import (
     ProtocolEngine,
     Command,
@@ -11,8 +16,6 @@ from opentrons.protocol_engine import (
     LoadedPipette,
 )
 
-from .protocol_source import ProtocolSource
-from .pre_analysis import JsonPreAnalysis, PythonPreAnalysis
 from .task_queue import TaskQueue
 from .json_file_reader import JsonFileReader
 from .json_command_translator import JsonCommandTranslator
@@ -83,7 +86,6 @@ class ProtocolRunner:
             labware_offset_provider=LegacyLabwareOffsetProvider(
                 labware_view=protocol_engine.state_view.labware,
             ),
-            use_simulating_implementation=False,
         )
         self._legacy_executor = legacy_executor or LegacyExecutor(
             hardware_api=hardware_api
@@ -95,18 +97,21 @@ class ProtocolRunner:
         Calling this method is only necessary if the runner will be used
         to control the run of a file-based protocol.
         """
-        pre_analysis = protocol_source.pre_analysis
+        config = protocol_source.config
 
-        if isinstance(pre_analysis, JsonPreAnalysis):
-            schema_version = pre_analysis.schema_version
+        for definition in protocol_source.labware_definitions:
+            self._protocol_engine.add_labware_definition(definition)
+
+        if isinstance(config, JsonProtocolConfig):
+            schema_version = config.schema_version
 
             if schema_version >= LEGACY_JSON_SCHEMA_VERSION_CUTOFF:
                 self._load_json(protocol_source)
             else:
                 self._load_legacy(protocol_source)
 
-        elif isinstance(pre_analysis, PythonPreAnalysis):
-            api_version = pre_analysis.api_version
+        elif isinstance(config, PythonProtocolConfig):
+            api_version = config.api_version
 
             if api_version >= LEGACY_PYTHON_API_VERSION_CUTOFF:
                 self._load_python(protocol_source)
@@ -115,9 +120,7 @@ class ProtocolRunner:
 
         # ensure the engine is stopped gracefully once the
         # protocol file stops issuing commands
-        self._task_queue.set_cleanup_func(
-            func=self._protocol_engine.stop,
-        )
+        self._task_queue.set_cleanup_func(self._protocol_engine.finish)
 
     def play(self) -> None:
         """Start or resume the run."""
@@ -131,7 +134,7 @@ class ProtocolRunner:
     async def stop(self) -> None:
         """Stop (cancel) the run."""
         self._task_queue.stop()
-        await self._protocol_engine.halt()
+        await self._protocol_engine.stop()
 
     async def join(self) -> None:
         """Wait for the run to complete, propagating any errors.
@@ -171,7 +174,7 @@ class ProtocolRunner:
         protocol_source: ProtocolSource,
     ) -> None:
         protocol = self._legacy_file_reader.read(protocol_source)
-        context = self._legacy_context_creator.create(protocol.api_level)
+        context = self._legacy_context_creator.create(protocol)
 
         self._protocol_engine.add_plugin(
             LegacyContextPlugin(

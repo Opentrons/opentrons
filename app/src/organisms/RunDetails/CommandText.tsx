@@ -8,6 +8,7 @@ import {
 } from '@opentrons/components'
 import type { RunCommandSummary } from '@opentrons/api-client'
 import { Command, getLabwareDisplayName } from '@opentrons/shared-data'
+import { ProtocolSetupInfo } from './ProtocolSetupInfo'
 
 import { useProtocolDetails } from './hooks'
 
@@ -17,13 +18,11 @@ import { useLabwareRenderInfoById } from '../ProtocolSetup/hooks'
 interface Props {
   commandOrSummary: Command | RunCommandSummary
 }
-export function CommandText(props: Props): JSX.Element {
+export function CommandText(props: Props): JSX.Element | null {
   const { commandOrSummary } = props
   const { t } = useTranslation('run_details')
   const { protocolData } = useProtocolDetails()
   const labwareRenderInfoById = useLabwareRenderInfoById()
-
-  const commands = protocolData?.commands ?? []
 
   let messageNode = null
   if ('params' in commandOrSummary) {
@@ -46,8 +45,16 @@ export function CommandText(props: Props): JSX.Element {
         break
       }
       case 'pickUpTip': {
+        // protocolData should never be null as we don't render the `RunDetails` unless we have an analysis
+        // but we're experiencing a zombie children issue, see https://github.com/Opentrons/opentrons/pull/9091
+        if (protocolData == null) {
+          return null
+        }
         const { wellName, labwareId } = commandOrSummary.params
-        const labwareLocation = getLabwareLocation(labwareId, commands)
+        const labwareLocation = getLabwareLocation(
+          labwareId,
+          protocolData.commands
+        )
         if (!('slotName' in labwareLocation)) {
           throw new Error('expected tip rack to be in a slot')
         }
@@ -64,6 +71,17 @@ export function CommandText(props: Props): JSX.Element {
             }}
           />
         )
+        break
+      }
+      case 'pause': {
+        messageNode =
+          commandOrSummary.params?.message ?? commandOrSummary.commandType
+        break
+      }
+      case 'loadLabware':
+      case 'loadPipette':
+      case 'loadModule': {
+        messageNode = <ProtocolSetupInfo setupCommand={commandOrSummary} />
         break
       }
       case 'custom': {

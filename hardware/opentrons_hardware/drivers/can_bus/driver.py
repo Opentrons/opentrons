@@ -10,6 +10,7 @@ from can import Notifier, Bus, AsyncBufferedReader, Message, util
 from opentrons_ot3_firmware.arbitration_id import ArbitrationId
 from opentrons_ot3_firmware.message import CanMessage
 from .errors import ErrorFrameCanError
+from .abstract_driver import AbstractCanDriver
 
 log = logging.getLogger(__name__)
 
@@ -33,7 +34,7 @@ if platform.system() == "Darwin":
     # end super bad monkey patch
 
 
-class CanDriver:
+class CanDriver(AbstractCanDriver):
     """The can driver."""
 
     DEFAULT_CAN_NETWORK = "can0"
@@ -141,19 +142,3 @@ class CanDriver:
         return CanMessage(
             arbitration_id=ArbitrationId(id=m.arbitration_id), data=m.data
         )
-
-    def __aiter__(self) -> CanDriver:
-        """Enter iterator.
-
-        Returns:
-            CanDriver
-        """
-        return self
-
-    async def __anext__(self) -> CanMessage:
-        """Async next.
-
-        Returns:
-            CanMessage
-        """
-        return await self.read()

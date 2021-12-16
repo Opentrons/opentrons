@@ -19,11 +19,12 @@ from opentrons.protocol_engine.types import (
 )
 from opentrons.protocol_engine.actions import (
     AddLabwareOffsetAction,
+    AddLabwareDefinitionAction,
     UpdateCommandAction,
 )
 from opentrons.protocol_engine.state.labware import LabwareStore, LabwareState
 
-from .command_fixtures import create_load_labware_command, create_add_definition_command
+from .command_fixtures import create_load_labware_command
 
 
 @pytest.fixture
@@ -152,13 +153,12 @@ def test_handles_add_labware_definition(
     well_plate_def: LabwareDefinition,
 ) -> None:
     """It should add the labware definition to the state."""
-    command = create_add_definition_command(definition=well_plate_def)
     expected_uri = uri_from_details(
         load_name=well_plate_def.parameters.loadName,
         namespace=well_plate_def.namespace,
         version=well_plate_def.version,
     )
 
-    subject.handle_action(UpdateCommandAction(command=command))
+    subject.handle_action(AddLabwareDefinitionAction(definition=well_plate_def))
 
     assert subject.state.definitions_by_uri[expected_uri] == well_plate_def

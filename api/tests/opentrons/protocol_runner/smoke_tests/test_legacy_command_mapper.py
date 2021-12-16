@@ -3,19 +3,15 @@
 Legacy ProtocolContext objects are prohibitively difficult to instansiate
 and mock in an isolated unit test environment.
 """
+import io
 import pytest
 import textwrap
 from datetime import datetime
-from pathlib import Path
 from decoy import matchers
 
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_engine import commands
-from opentrons.protocol_runner import (
-    ProtocolSource,
-    PythonPreAnalysis,
-    create_simulating_runner,
-)
+from opentrons.protocol_reader import ProtocolReader, InputFile
+from opentrons.protocol_runner import create_simulating_runner
 
 
 PICK_UP_TIP_PROTOCOL = textwrap.dedent(
@@ -55,22 +51,23 @@ PICK_UP_TIP_PROTOCOL = textwrap.dedent(
         pipette_left.drop_tip()
         pipette_left.pick_up_tip()
     """
-)
+).encode()
 
 
 @pytest.fixture
-def pick_up_tip_protocol_file(tmp_path: Path) -> Path:
+def pick_up_tip_protocol_file() -> InputFile:
     """Put the pick up tip mapping test protocol on disk."""
-    file_path = tmp_path / "protocol-name.py"
-    file_path.write_text(PICK_UP_TIP_PROTOCOL)
-    return file_path
+    return InputFile(filename="protocol-name.py", file=io.BytesIO(PICK_UP_TIP_PROTOCOL))
 
 
-async def test_legacy_pick_up_tip(pick_up_tip_protocol_file: Path) -> None:
+async def test_legacy_pick_up_tip(
+    protocol_reader: ProtocolReader,
+    pick_up_tip_protocol_file: InputFile,
+) -> None:
     """It should map legacy pick up tip commands."""
-    protocol_source = ProtocolSource(
+    protocol_source = await protocol_reader.read(
+        name="test_protocol",
         files=[pick_up_tip_protocol_file],
-        pre_analysis=PythonPreAnalysis(metadata={}, api_version=APIVersion(2, 11)),
     )
 
     subject = await create_simulating_runner()
@@ -86,6 +83,7 @@ async def test_legacy_pick_up_tip(pick_up_tip_protocol_file: Path) -> None:
 
     assert commands_result[0] == commands.LoadLabware.construct(
         id=matchers.IsA(str),
+        key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
@@ -96,6 +94,7 @@ async def test_legacy_pick_up_tip(pick_up_tip_protocol_file: Path) -> None:
 
     assert commands_result[1] == commands.LoadLabware.construct(
         id=matchers.IsA(str),
+        key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
@@ -106,6 +105,7 @@ async def test_legacy_pick_up_tip(pick_up_tip_protocol_file: Path) -> None:
 
     assert commands_result[2] == commands.LoadPipette.construct(
         id=matchers.IsA(str),
+        key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
@@ -116,6 +116,7 @@ async def test_legacy_pick_up_tip(pick_up_tip_protocol_file: Path) -> None:
 
     assert commands_result[3] == commands.LoadPipette.construct(
         id=matchers.IsA(str),
+        key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
@@ -133,6 +134,7 @@ async def test_legacy_pick_up_tip(pick_up_tip_protocol_file: Path) -> None:
 
     assert commands_result[4] == commands.PickUpTip.construct(
         id=matchers.IsA(str),
+        key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
@@ -146,6 +148,7 @@ async def test_legacy_pick_up_tip(pick_up_tip_protocol_file: Path) -> None:
 
     assert commands_result[5] == commands.PickUpTip.construct(
         id=matchers.IsA(str),
+        key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
@@ -161,6 +164,7 @@ async def test_legacy_pick_up_tip(pick_up_tip_protocol_file: Path) -> None:
 
     assert commands_result[7] == commands.PickUpTip.construct(
         id=matchers.IsA(str),
+        key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),

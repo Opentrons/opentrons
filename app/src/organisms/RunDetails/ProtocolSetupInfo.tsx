@@ -27,8 +27,9 @@ export const ProtocolSetupInfo = (
   if (protocolData == null) return null
   if (setupCommand === undefined) return null
   if (
-    setupCommand.result?.definition?.metadata.displayName.includes('Trash') ===
-    true
+    setupCommand.result?.definition?.metadata?.displayName?.includes(
+      'Trash'
+    ) === true
   ) {
     return null
   }
@@ -120,7 +121,7 @@ export const ProtocolSetupInfo = (
   }
   return (
     <Box
-      padding={`${SPACING_1} ${SPACING_2} ${SPACING_1} ${SPACING_2}`}
+      padding={`${SPACING_1} ${SPACING_2} ${SPACING_1} 0`}
       fontSize={FONT_SIZE_BODY_1}
     >
       {SetupCommandText}

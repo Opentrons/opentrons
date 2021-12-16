@@ -1,31 +1,15 @@
 """Protocol file models."""
-from __future__ import annotations
-from enum import Enum
 from datetime import datetime
 from pydantic import BaseModel, Extra, Field
 from typing import Sequence
 
+from opentrons.protocol_reader import (
+    ProtocolType as ProtocolType,
+    ProtocolFileRole as ProtocolFileRole,
+)
+
 from robot_server.service.json_api import ResourceModel
 from .analysis_models import ProtocolAnalysis
-
-
-class ProtocolType(str, Enum):
-    """Type of protocol, JSON or Python."""
-
-    JSON = "json"
-    PYTHON = "python"
-
-
-class ProtocolFileRole(str, Enum):
-    """The purpose of a given file in a Protocol.
-
-    Args:
-        MAIN: The protocol's main file. In a JSON protocol, this is will
-            be the JSON file. In a Python protocol, this is the file
-            that exports the main `run` method.
-    """
-
-    MAIN = "main"
 
 
 class ProtocolFile(BaseModel):

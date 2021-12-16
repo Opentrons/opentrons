@@ -63,6 +63,7 @@ export const RerunningProtocolModal = (
             i18nKey={`rerunning_protocol_modal_body`}
             components={{
               block: <Text css={FONT_BODY_1_DARK} marginTop={SPACING_1} />,
+              list: <li />,
             }}
           />
           <Link

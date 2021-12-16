@@ -16,10 +16,20 @@ import {
   SPACING_6,
   TEXT_TRANSFORM_UPPERCASE,
   FONT_SIZE_BIG,
-  SPACING_7,
+  SPACING_8,
+  LINE_HEIGHT_SOLID,
+  SPACING_3,
+  SPACING_2,
+  NewSecondaryBtn,
+  C_ERROR_DARK,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+import {
+  RUN_STATUS_RUNNING,
+  RUN_STATUS_PAUSED,
+  RUN_STATUS_PAUSE_REQUESTED,
+} from '@opentrons/api-client'
 import { Page } from '../../atoms/Page'
 import { UploadInput } from './UploadInput'
 import { ProtocolSetup } from '../ProtocolSetup'
@@ -28,6 +38,10 @@ import { useCloseCurrentRun } from './hooks/useCloseCurrentRun'
 import { loadProtocol } from '../../redux/protocol/actions'
 import { ingestProtocolFile } from '../../redux/protocol/utils'
 import { getConnectedRobotName } from '../../redux/robot/selectors'
+import { getValidCustomLabwareFiles } from '../../redux/custom-labware/selectors'
+import { ConfirmCancelModal } from '../../pages/Run/RunLog'
+import { useRunStatus } from '../RunTimeControl/hooks'
+import { useCurrentRunControls } from '../../pages/Run/RunLog/hooks'
 
 import { ConfirmExitProtocolUploadModal } from './ConfirmExitProtocolUploadModal'
 
@@ -40,6 +54,7 @@ import styles from './styles.css'
 const VALIDATION_ERROR_T_MAP: { [errorKey: string]: string } = {
   INVALID_FILE_TYPE: 'invalid_file_type',
   INVALID_JSON_FILE: 'invalid_json_file',
+  ANALYSIS_ERROR: 'analysis_error',
 }
 
 export function ProtocolUpload(): JSX.Element {
@@ -47,30 +62,52 @@ export function ProtocolUpload(): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   const {
     createProtocolRun,
-    runRecord,
     protocolRecord,
     isCreatingProtocolRun,
   } = useCurrentProtocolRun()
-  const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
-  const hasCurrentRun = runRecord != null && protocolRecord != null
+  const runStatus = useRunStatus()
+  const { closeCurrentRun, isProtocolRunLoaded } = useCloseCurrentRun()
   const robotName = useSelector((state: State) => getConnectedRobotName(state))
+  const customLabwareFiles = useSelector((state: State) =>
+    getValidCustomLabwareFiles(state)
+  )
 
   const logger = useLogger(__filename)
   const [uploadError, setUploadError] = React.useState<
-    [string, ErrorObject[] | null | undefined] | null
+    [string, ErrorObject[] | string | null | undefined] | null
   >(null)
 
   const clearError = (): void => {
     setUploadError(null)
   }
 
+  React.useEffect(() => {
+    if (
+      protocolRecord?.data?.analyses[0] != null &&
+      'result' in protocolRecord.data.analyses[0] &&
+      protocolRecord.data.analyses[0].result === 'not-ok'
+    ) {
+      setUploadError([
+        VALIDATION_ERROR_T_MAP.ANALYSIS_ERROR,
+        protocolRecord?.data.analyses[0].errors[0].detail as string,
+      ])
+    }
+  }, [protocolRecord])
+
+  React.useEffect(() => {
+    if (uploadError != null) {
+      closeCurrentRun()
+    }
+  }, [uploadError])
+
   const handleUpload = (file: File): void => {
+    const protocolFiles = [file, ...customLabwareFiles]
     clearError()
     ingestProtocolFile(
       file,
       (file, data) => {
         dispatch(loadProtocol(file, data))
-        createProtocolRun([file])
+        createProtocolRun(protocolFiles)
       },
       (errorKey, errorDetails) => {
         logger.warn(errorKey)
@@ -79,7 +116,12 @@ export function ProtocolUpload(): JSX.Element {
       }
     )
   }
+  const { pauseRun } = useCurrentRunControls()
 
+  const cancelRunAndExit = (): void => {
+    pauseRun()
+    confirmExit()
+  }
   const handleCloseProtocol: React.MouseEventHandler = _event => {
     closeCurrentRun()
   }
@@ -89,53 +131,93 @@ export function ProtocolUpload(): JSX.Element {
     confirm: confirmExit,
     cancel: cancelExit,
   } = useConditionalConfirm(handleCloseProtocol, true)
+  const {
+    showConfirmation: showConfirmModalExit,
+    confirm: confirmCancelModalExit,
+    cancel: cancelModalExit,
+  } = useConditionalConfirm(cancelRunAndExit, true)
 
-  const titleBarProps =
-    !isClosingCurrentRun && hasCurrentRun
-      ? {
-          title: t('protocol_title', {
-            protocol_name: protocolRecord?.data?.metadata?.protocolName ?? '',
-          }),
-          back: {
-            onClick: confirmExit,
-            title: t('shared:close'),
-            children: t('shared:close'),
-            iconName: 'close' as const,
-          },
-          className: styles.reverse_titlebar_items,
-        }
-      : {
-          title: (
-            <Text>{t('upload_and_simulate', { robot_name: robotName })}</Text>
-          ),
-        }
+  const cancelRunButton = (
+    <NewSecondaryBtn
+      onClick={confirmCancelModalExit}
+      lineHeight={LINE_HEIGHT_SOLID}
+      marginX={SPACING_3}
+      paddingRight={SPACING_2}
+      paddingLeft={SPACING_2}
+      color={C_ERROR_DARK}
+    >
+      {t('cancel_run')}
+    </NewSecondaryBtn>
+  )
+  const isRunInMotion =
+    runStatus === RUN_STATUS_RUNNING ||
+    runStatus === RUN_STATUS_PAUSED ||
+    runStatus === RUN_STATUS_PAUSE_REQUESTED
 
-  const pageContents =
-    !isClosingCurrentRun && hasCurrentRun ? (
-      <ProtocolSetup />
-    ) : (
-      <UploadInput onUpload={handleUpload} />
-    )
+  let titleBarProps
+  if (isProtocolRunLoaded && !isRunInMotion) {
+    titleBarProps = {
+      title: t('protocol_title', {
+        protocol_name: protocolRecord?.data?.metadata?.protocolName ?? '',
+      }),
+      back: {
+        onClick: confirmExit,
+        title: t('shared:close'),
+        children: t('shared:close'),
+        iconName: 'close' as const,
+      },
+      className: styles.reverse_titlebar_items,
+    }
+  } else if (isRunInMotion) {
+    titleBarProps = {
+      title: t('protocol_title', {
+        protocol_name: protocolRecord?.data?.metadata?.protocolName ?? '',
+      }),
+      rightNode: cancelRunButton,
+    }
+  } else {
+    titleBarProps = {
+      title: <Text>{t('upload_and_simulate', { robot_name: robotName })}</Text>,
+    }
+  }
+
+  const pageContents = isProtocolRunLoaded ? (
+    <ProtocolSetup />
+  ) : (
+    <UploadInput onUpload={handleUpload} />
+  )
 
   return (
     <>
       {showConfirmExit && (
         <ConfirmExitProtocolUploadModal exit={confirmExit} back={cancelExit} />
       )}
+      {showConfirmModalExit && <ConfirmCancelModal onClose={cancelModalExit} />}
       <Page titleBarProps={titleBarProps}>
         {uploadError != null && (
-          <AlertItem
-            type="warning"
-            onCloseClick={clearError}
-            title={t('protocol_upload_failed')}
+          <Flex
+            position="absolute"
+            flexDirection={DIRECTION_COLUMN}
+            width="100%"
           >
-            {t(VALIDATION_ERROR_T_MAP[uploadError[0]])}
-            {uploadError[1] != null &&
-              uploadError[1].map((errorObject, i) => (
-                <Text key={i}>{JSON.stringify(errorObject)}</Text>
-              ))}
-          </AlertItem>
+            <AlertItem
+              type="warning"
+              onCloseClick={clearError}
+              title={t('protocol_upload_failed')}
+            >
+              {t(VALIDATION_ERROR_T_MAP[uploadError[0]])}
+              {typeof uploadError[1] === 'string' ? (
+                <Text>{uploadError[1]}</Text>
+              ) : (
+                uploadError[1] != null &&
+                uploadError[1].map((errorObject, i) => (
+                  <Text key={i}>{JSON.stringify(errorObject)}</Text>
+                ))
+              )}
+            </AlertItem>
+          </Flex>
         )}
+
         <Box
           height="calc(100vh - 3rem)"
           width="100%"
@@ -160,7 +242,7 @@ function ProtocolLoader(): JSX.Element | null {
       <Text
         textAlign={ALIGN_CENTER}
         as={'h3'}
-        maxWidth={SPACING_7}
+        maxWidth={SPACING_8}
         textTransform={TEXT_TRANSFORM_UPPERCASE}
         marginTop={SPACING_6}
         color={C_DARK_GRAY}

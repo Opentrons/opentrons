@@ -1,7 +1,7 @@
 """Run control command side-effect logic."""
 
 from ..state import StateStore
-from ..actions import ActionDispatcher, PauseAction
+from ..actions import ActionDispatcher, PauseAction, PauseSource
 
 
 class RunControlHandler:
@@ -21,7 +21,7 @@ class RunControlHandler:
     async def pause(self) -> None:
         """Issue a PauseAction to the store, pausing the run."""
         if not self._state_store.get_configs().ignore_pause:
-            self._action_dispatcher.dispatch(PauseAction())
+            self._action_dispatcher.dispatch(PauseAction(source=PauseSource.PROTOCOL))
             await self._state_store.wait_for(
                 condition=self._state_store.commands.get_is_running
             )

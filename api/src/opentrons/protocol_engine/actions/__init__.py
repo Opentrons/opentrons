@@ -10,11 +10,15 @@ from .actions import (
     PlayAction,
     PauseAction,
     StopAction,
+    FinishAction,
+    HardwareStoppedAction,
     QueueCommandAction,
     UpdateCommandAction,
     FailCommandAction,
     AddLabwareOffsetAction,
-    StopErrorDetails,
+    PauseSource,
+    AddLabwareDefinitionAction,
+    FinishErrorDetails,
 )
 
 __all__ = [
@@ -27,10 +31,14 @@ __all__ = [
     "PlayAction",
     "PauseAction",
     "StopAction",
+    "FinishAction",
+    "HardwareStoppedAction",
     "QueueCommandAction",
     "UpdateCommandAction",
     "FailCommandAction",
     "AddLabwareOffsetAction",
+    "AddLabwareDefinitionAction",
     # action payload values
-    "StopErrorDetails",
+    "PauseSource",
+    "FinishErrorDetails",
 ]

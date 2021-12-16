@@ -13,7 +13,7 @@ from opentrons.protocol_engine import (
 )
 
 from robot_server.errors import ApiError
-from robot_server.service.json_api import RequestModel, SimpleResponseModel
+from robot_server.service.json_api import RequestModel, SimpleResponse
 from robot_server.runs.run_models import Run, RunCommandSummary
 from robot_server.runs.engine_store import EngineStore
 from robot_server.runs.router.commands_router import (
@@ -29,7 +29,7 @@ async def test_create_run_command(decoy: Decoy, engine_store: EngineStore) -> No
         params=pe_commands.PauseParams(message="Hello")
     )
 
-    run = Run(
+    run = Run.construct(
         id="run-id",
         protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
@@ -45,6 +45,7 @@ async def test_create_run_command(decoy: Decoy, engine_store: EngineStore) -> No
 
     output_command = pe_commands.Pause(
         id="abc123",
+        key="command-key",
         createdAt=datetime(year=2021, month=1, day=1),
         status=CommandStatus.QUEUED,
         params=pe_commands.PauseParams(message="Hello"),
@@ -58,7 +59,7 @@ async def test_create_run_command(decoy: Decoy, engine_store: EngineStore) -> No
     response = await create_run_command(
         request_body=RequestModel(data=command_request),
         engine_store=engine_store,
-        run=SimpleResponseModel(data=run),
+        run=SimpleResponse(data=run),
     )
 
     assert response.data == output_command
@@ -73,7 +74,7 @@ async def test_create_run_command_not_current(
         params=pe_commands.PauseParams(message="Hello")
     )
 
-    run = Run(
+    run = Run.construct(
         id="run-id",
         protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
@@ -91,7 +92,7 @@ async def test_create_run_command_not_current(
         await create_run_command(
             request_body=RequestModel(data=command_request),
             engine_store=engine_store,
-            run=SimpleResponseModel(data=run),
+            run=SimpleResponse(data=run),
         )
 
     assert exc_info.value.status_code == 400
@@ -100,13 +101,13 @@ async def test_create_run_command_not_current(
 
 async def test_get_run_commands() -> None:
     """It should return a list of all commands in a run."""
-    command_summary = RunCommandSummary(
+    command_summary = RunCommandSummary.construct(
         id="command-id",
         commandType="moveToWell",
         status=CommandStatus.RUNNING,
     )
 
-    run = Run(
+    run = Run.construct(
         id="run-id",
         protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
@@ -120,7 +121,7 @@ async def test_get_run_commands() -> None:
         labwareOffsets=[],
     )
 
-    response = await get_run_commands(run=SimpleResponseModel(data=run))
+    response = await get_run_commands(run=SimpleResponse(data=run))
 
     assert response.data == [command_summary]
 
@@ -130,7 +131,7 @@ async def test_get_run_command_by_id(
     engine_store: EngineStore,
 ) -> None:
     """It should return full details about a command by ID."""
-    command_summary = RunCommandSummary(
+    command_summary = RunCommandSummary.construct(
         id="command-id",
         commandType="moveToWell",
         status=CommandStatus.RUNNING,
@@ -138,12 +139,13 @@ async def test_get_run_command_by_id(
 
     command = pe_commands.MoveToWell(
         id="command-id",
+        key="command-key",
         status=CommandStatus.RUNNING,
         createdAt=datetime(year=2022, month=2, day=2),
         params=pe_commands.MoveToWellParams(pipetteId="a", labwareId="b", wellName="c"),
     )
 
-    run = Run(
+    run = Run.construct(
         id="run-id",
         protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
@@ -165,7 +167,7 @@ async def test_get_run_command_by_id(
     response = await get_run_command(
         commandId="command-id",
         engine_store=engine_store,
-        run=SimpleResponseModel(data=run),
+        run=SimpleResponse(data=run),
     )
 
     assert response.data == command
@@ -178,7 +180,7 @@ async def test_get_run_command_missing_command(
     """It should 404 if you attempt to get a non-existent command."""
     key_error = pe_errors.CommandDoesNotExistError("oh no")
 
-    run = Run(
+    run = Run.construct(
         id="run-id",
         protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
@@ -200,7 +202,7 @@ async def test_get_run_command_missing_command(
         await get_run_command(
             commandId="command-id",
             engine_store=engine_store,
-            run=SimpleResponseModel(data=run),
+            run=SimpleResponse(data=run),
         )
 
     assert exc_info.value.status_code == 404

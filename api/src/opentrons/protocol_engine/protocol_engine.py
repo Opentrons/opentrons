@@ -1,6 +1,8 @@
 """ProtocolEngine class definition."""
 from typing import Optional
+
 from opentrons.hardware_control import API as HardwareAPI
+from opentrons.protocols.models import LabwareDefinition
 
 from .resources import ModelUtils
 from .commands import Command, CommandCreate
@@ -12,10 +14,14 @@ from .actions import (
     ActionDispatcher,
     PlayAction,
     PauseAction,
+    PauseSource,
     StopAction,
-    StopErrorDetails,
+    FinishAction,
+    FinishErrorDetails,
     QueueCommandAction,
     AddLabwareOffsetAction,
+    AddLabwareDefinitionAction,
+    HardwareStoppedAction,
 )
 
 
@@ -80,7 +86,7 @@ class ProtocolEngine:
 
     def pause(self) -> None:
         """Pause executing commands in the queue."""
-        action = PauseAction()
+        action = PauseAction(source=PauseSource.CLIENT)
         self._state_store.commands.validate_action_allowed(action)
         self._action_dispatcher.dispatch(action)
 
@@ -98,6 +104,9 @@ class ProtocolEngine:
         action = QueueCommandAction(
             request=request,
             command_id=command_id,
+            # TODO(mc, 2021-12-13): generate a command key from params and state
+            # https://github.com/Opentrons/opentrons/issues/8986
+            command_key=command_id,
             created_at=self._model_utils.get_timestamp(),
         )
         self._action_dispatcher.dispatch(action)
@@ -126,16 +135,16 @@ class ProtocolEngine:
 
         return self._state_store.commands.get(command.id)
 
-    async def halt(self) -> None:
-        """Halt execution, stopping all motion and cancelling future commands.
+    async def stop(self) -> None:
+        """Stop execution immediately, halting all motion and cancelling future commands.
 
-        You should call `stop` after calling `halt` for cleanup and to allow
-        the engine to settle and recover.
+        After an engine has been `stop`'ed, it cannot be restarted.
         """
         self._action_dispatcher.dispatch(StopAction())
         self._queue_worker.cancel()
         await self._hardware_api.halt()
         await self._hardware_api.stop(home_after=False)
+        self._action_dispatcher.dispatch(HardwareStoppedAction())
 
     async def wait_until_complete(self) -> None:
         """Wait until there are no more commands to execute.
@@ -146,11 +155,11 @@ class ProtocolEngine:
             condition=self._state_store.commands.get_all_complete
         )
 
-    async def stop(self, error: Optional[Exception] = None) -> None:
-        """Gracefully stop the ProtocolEngine, waiting for it to become idle.
+    async def finish(self, error: Optional[Exception] = None) -> None:
+        """Gracefully finish using the ProtocolEngine, waiting for it to become idle.
 
         The engine will finish executing its current command (if any),
-        and then shut down. After an engine has been `stop`'ed, it cannot
+        and then shut down. After an engine has been `finished`'ed, it cannot
         be restarted.
 
         This method should not raise, but if any exceptions happen during
@@ -161,7 +170,7 @@ class ProtocolEngine:
             error: An error that caused the stop, if applicable.
         """
         if error:
-            error_details: Optional[StopErrorDetails] = StopErrorDetails(
+            error_details: Optional[FinishErrorDetails] = FinishErrorDetails(
                 error_id=self._model_utils.generate_id(),
                 created_at=self._model_utils.get_timestamp(),
                 error=error,
@@ -169,13 +178,14 @@ class ProtocolEngine:
         else:
             error_details = None
 
-        self._action_dispatcher.dispatch(StopAction(error_details=error_details))
+        self._action_dispatcher.dispatch(FinishAction(error_details=error_details))
 
         try:
             await self._queue_worker.join()
         finally:
             await self._hardware_api.stop(home_after=False)
 
+        self._action_dispatcher.dispatch(HardwareStoppedAction())
         self._plugin_starter.stop()
 
     def add_labware_offset(self, request: LabwareOffsetCreate) -> LabwareOffset:
@@ -196,4 +206,10 @@ class ProtocolEngine:
         )
         return self.state_view.labware.get_labware_offset(
             labware_offset_id=labware_offset_id
+        )
+
+    def add_labware_definition(self, definition: LabwareDefinition) -> None:
+        """Add a labware definition to the state for subsequent labware loads."""
+        self._action_dispatcher.dispatch(
+            AddLabwareDefinitionAction(definition=definition)
         )

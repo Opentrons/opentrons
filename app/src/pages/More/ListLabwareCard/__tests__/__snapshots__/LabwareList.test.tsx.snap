@@ -102,22 +102,22 @@ exports[`LabwareList component renders 3`] = `
             "version": 1,
             "wells": Object {},
           },
-          "filename": "a.json",
+          "filename": "/full/path/to/labware/a.json",
           "modified": 1,
           "type": "VALID_LABWARE_FILE",
         }
       }
-      key="a.json"
+      key="/full/path/to/labware/a.json"
     />
     <LabwareItem
       file={
         Object {
-          "filename": "b.json",
+          "filename": "/full/path/to/labware/b.json",
           "modified": 2,
           "type": "INVALID_LABWARE_FILE",
         }
       }
-      key="b.json"
+      key="/full/path/to/labware/b.json"
     />
     <LabwareItem
       file={
@@ -154,12 +154,12 @@ exports[`LabwareList component renders 3`] = `
             "version": 1,
             "wells": Object {},
           },
-          "filename": "c.json",
+          "filename": "/full/path/to/labware/c.json",
           "modified": 3,
           "type": "OPENTRONS_LABWARE_FILE",
         }
       }
-      key="c.json"
+      key="/full/path/to/labware/c.json"
     />
     <LabwareItem
       file={
@@ -196,12 +196,12 @@ exports[`LabwareList component renders 3`] = `
             "version": 1,
             "wells": Object {},
           },
-          "filename": "d.json",
+          "filename": "/full/path/to/labware/d.json",
           "modified": 4,
           "type": "DUPLICATE_LABWARE_FILE",
         }
       }
-      key="d.json"
+      key="/full/path/to/labware/d.json"
     />
   </ul>
 </div>

@@ -214,7 +214,6 @@ def test_available_resets(api_client):
             [
                 "deckCalibration",
                 "pipetteOffsetCalibrations",
-                "labwareCalibration",
                 "bootScripts",
                 "tipLengthCalibrations",
             ]
@@ -237,7 +236,6 @@ def mock_reset():
         # None true
         [
             {
-                "labwareCalibration": False,
                 "deckCalibration": False,
                 "bootScripts": False,
                 "pipetteOffsetCalibrations": False,
@@ -248,21 +246,18 @@ def mock_reset():
         # All set
         [
             {
-                "labwareCalibration": True,
                 "bootScripts": True,
                 "pipetteOffsetCalibrations": True,
                 "tipLengthCalibrations": True,
                 "deckCalibration": True,
             },
             {
-                ResetOptionId.labware_calibration,
                 ResetOptionId.boot_scripts,
                 ResetOptionId.deck_calibration,
                 ResetOptionId.pipette_offset,
                 ResetOptionId.tip_length_calibrations,
             },
         ],
-        [{"labwareCalibration": True}, {ResetOptionId.labware_calibration}],
         [{"bootScripts": True}, {ResetOptionId.boot_scripts}],
         [{"pipetteOffsetCalibrations": True}, {ResetOptionId.pipette_offset}],
         [{"tipLengthCalibrations": True}, {ResetOptionId.tip_length_calibrations}],

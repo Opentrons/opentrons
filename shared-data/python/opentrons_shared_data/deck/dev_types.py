@@ -16,13 +16,16 @@ DeckSchemaVersion1 = Literal[1]
 DeckSchema = NewType('DeckSchema', Dict[str, Any])
 
 
+RobotModel = Union[Literal['OT-2 Standard'], Literal['OT-3 Standard']]
+
+
 class Metadata(TypedDict, total=False):
     displayName: str
     tags: List[str]
 
 
 class Robot(TypedDict):
-    model: Literal['OT-2 Standard']
+    model: RobotModel
 
 
 class BoundingBox(TypedDict):

@@ -1,9 +1,9 @@
 """Run control side-effect handler."""
 import pytest
-from decoy import Decoy
+from decoy import Decoy, matchers
 
 from opentrons.protocol_engine.state import StateStore
-from opentrons.protocol_engine.actions import ActionDispatcher, PauseAction
+from opentrons.protocol_engine.actions import ActionDispatcher, PauseAction, PauseSource
 from opentrons.protocol_engine.execution.run_control import RunControlHandler
 from opentrons.protocol_engine.state import EngineConfigs
 
@@ -42,7 +42,7 @@ async def test_pause(
     decoy.when(state_store.get_configs()).then_return(EngineConfigs(ignore_pause=False))
     await subject.pause()
     decoy.verify(
-        action_dispatcher.dispatch(PauseAction()),
+        action_dispatcher.dispatch(PauseAction(source=PauseSource.PROTOCOL)),
         await state_store.wait_for(condition=state_store.commands.get_is_running),
     )
 
@@ -56,4 +56,7 @@ async def test_pause_analysis(
     """It should no op during a protocol analysis."""
     decoy.when(state_store.get_configs()).then_return(EngineConfigs(ignore_pause=True))
     await subject.pause()
-    decoy.verify(action_dispatcher.dispatch(PauseAction()), times=0)
+    decoy.verify(
+        action_dispatcher.dispatch(PauseAction(source=matchers.Anything())),
+        times=0,
+    )

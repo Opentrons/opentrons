@@ -4,8 +4,8 @@ import { useMostRecentRunId } from './useMostRecentRunId'
 
 export function useRestartRun(): () => void {
   const mostRecentRunId = useMostRecentRunId()
+  const { cloneRun } = useCloneRun(mostRecentRunId as string)
   const { closeCurrentRun } = useCloseCurrentRun()
-  const cloneRun = useCloneRun(mostRecentRunId as string)
 
   return () => {
     if (mostRecentRunId != null) {

@@ -98,3 +98,7 @@ class ModuleDefinitionDoesNotExistError(ProtocolEngineError):
 
 class ModuleIsNotThermocyclerError(ProtocolEngineError):
     """An error raised when performing thermocycler actions with a non-thermocycler."""
+
+
+class ThermocyclerNotOpenError(ProtocolEngineError):
+    """An error raised when trying to move to labware that's covered inside a TC."""

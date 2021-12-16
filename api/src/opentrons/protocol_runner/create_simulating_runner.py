@@ -5,7 +5,7 @@ from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocol_engine import create_protocol_engine
 from opentrons.protocol_engine.state import EngineConfigs
 
-from .legacy_wrappers import LegacyContextCreator
+from .legacy_wrappers import LegacySimulatingContextCreator
 from .legacy_labware_offset_provider import LegacyLabwareOffsetProvider
 from .protocol_runner import ProtocolRunner
 
@@ -34,7 +34,6 @@ async def create_simulating_runner() -> ProtocolRunner:
         ```
     """
     simulating_hardware_api = await HardwareAPI.build_hardware_simulator()
-    use_simulating_implementation = not feature_flags.disable_fast_protocol_upload()
 
     # TODO(mc, 2021-08-25): move initial home to protocol engine
     await simulating_hardware_api.home()
@@ -48,10 +47,13 @@ async def create_simulating_runner() -> ProtocolRunner:
         labware_view=protocol_engine.state_view.labware,
     )
 
-    simulating_legacy_context_creator = LegacyContextCreator(
-        hardware_api=simulating_hardware_api,
-        labware_offset_provider=offset_provider,
-        use_simulating_implementation=use_simulating_implementation,
+    simulating_legacy_context_creator = (
+        LegacySimulatingContextCreator(
+            hardware_api=simulating_hardware_api,
+            labware_offset_provider=offset_provider,
+        )
+        if not feature_flags.disable_fast_protocol_upload()
+        else None
     )
 
     return ProtocolRunner(

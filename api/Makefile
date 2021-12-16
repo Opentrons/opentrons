@@ -112,7 +112,7 @@ format:
 	$(python) -m black src tests setup.py
 
 docs/build/html/v%: docs/v%
-	$(sphinx_build) -b html -d docs/build/doctrees -n $< $@
+	$(sphinx_build_allow_warnings) -b html -d docs/build/doctrees -n $< $@
 # sphinx wont automatically do this because it's only in a template
 	$(SHX) cp docs/img/lightbulb.jpg $@/_images/
 
@@ -122,7 +122,7 @@ docs/build/html/hardware: docs/hardware src/opentrons/hardware_control
 	$(SHX) cp docs/img/lightbulb.jpg $@/_images/
 
 docs/build/pdf/OpentronsPythonAPIV%.pdf: docs/v%
-	$(sphinx_build) -b latex -d docs/build/doctrees $< $(@D)
+	$(sphinx_build_allow_warnings) -b latex -d docs/build/doctrees $< $(@D)
 	$(MAKE) -C $(@D) all-pdf $(if $(CI),>/dev/null,|| $(SHX) echo "latex build failed (pdflatex not installed?)")
 	$(SHX) ls $(@D)/*.pdf $(if $(CI),,|| $(SHX) echo "no pdf produced")
 

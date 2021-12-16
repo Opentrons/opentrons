@@ -21,6 +21,7 @@ from .exceptions import (
     ModuleNotAttachedError,
     ModuleDefinitionDoesNotExistError,
     ModuleIsNotThermocyclerError,
+    ThermocyclerNotOpenError,
 )
 
 from .error_occurrence import ErrorOccurrence
@@ -47,6 +48,7 @@ __all__ = [
     "ModuleNotAttachedError",
     "ModuleDefinitionDoesNotExistError",
     "ModuleIsNotThermocyclerError",
+    "ThermocyclerNotOpenError",
     # error occurrence models
     "ErrorOccurrence",
 ]

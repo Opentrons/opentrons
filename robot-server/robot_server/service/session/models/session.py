@@ -18,10 +18,9 @@ from robot_server.robot.calibration.pipette_offset.models import (
 from robot_server.robot.calibration.tip_length.models import TipCalibrationSessionStatus
 from robot_server.service.json_api import (
     RequestModel,
-    ResponseModel,
+    DeprecatedResponseModel,
     ResponseDataModel,
-    MultiResponseModel,
-    ResourceLinks,
+    DeprecatedMultiResponseModel,
 )
 from robot_server.service.session.models.common import EmptyModel
 from robot_server.service.session.session_types.protocol.models import (
@@ -197,5 +196,5 @@ ResponseTypes = typing.Union[
 
 # Session create and query requests/responses
 SessionCreateRequest = RequestModel[RequestTypes]
-SessionResponse = ResponseModel[ResponseTypes, ResourceLinks]
-MultiSessionResponse = MultiResponseModel[ResponseTypes, None]
+SessionResponse = DeprecatedResponseModel[ResponseTypes]
+MultiSessionResponse = DeprecatedMultiResponseModel[ResponseTypes]

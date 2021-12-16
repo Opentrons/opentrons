@@ -21,6 +21,7 @@ import {
   SPACING_1,
   SPACING_3,
   TEXT_TRANSFORM_UPPERCASE,
+  C_MED_DARK_GRAY,
 } from '@opentrons/components'
 import { css } from 'styled-components'
 import { CommandTimer } from './CommandTimer'
@@ -63,16 +64,32 @@ const WRAPPER_STYLE_BY_STATUS: {
 }
 export function CommandItem(props: CommandItemProps): JSX.Element | null {
   const { commandOrSummary, runStatus } = props
+  const { t } = useTranslation('run_details')
   const commandStatus =
     runStatus !== RUN_STATUS_IDLE && commandOrSummary.status != null
       ? commandOrSummary.status
       : 'queued'
-
   const currentRunId = useCurrentRunId()
   const {
     data: commandDetails,
     refetch: refetchCommandDetails,
   } = useCommandQuery(currentRunId, commandOrSummary.id)
+
+  let isComment = false
+  if (
+    'params' in commandOrSummary &&
+    'legacyCommandType' in commandOrSummary.params
+  ) {
+    isComment = commandOrSummary.params.legacyCommandType === 'command.COMMENT'
+  } else if (
+    commandDetails?.data.commandType === 'custom' &&
+    'legacyCommandType' in commandDetails?.data.params
+  ) {
+    isComment =
+      commandDetails.data.params.legacyCommandType === 'command.COMMENT'
+  }
+
+  const isPause = commandOrSummary.commandType === 'pause'
 
   React.useEffect(() => {
     refetchCommandDetails()
@@ -91,14 +108,43 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
       {commandStatus === 'running' ? (
         <CurrentCommandLabel runStatus={runStatus} />
       ) : null}
+      {commandStatus === 'failed' ? <CommandFailedMessage /> : null}
+      {isComment ? (
+        <Flex
+          textTransform={TEXT_TRANSFORM_UPPERCASE}
+          fontSize={FONT_SIZE_CAPTION}
+          color={C_MED_DARK_GRAY}
+          marginBottom={SPACING_1}
+          marginLeft={SPACING_1}
+        >
+          {t('comment_step')}
+        </Flex>
+      ) : null}
+      {isPause ? (
+        <Flex
+          textTransform={TEXT_TRANSFORM_UPPERCASE}
+          fontSize={FONT_SIZE_CAPTION}
+          color={C_MED_DARK_GRAY}
+          marginBottom={SPACING_1}
+          marginLeft={SPACING_1}
+        >
+          <Icon
+            name="pause"
+            width={SPACING_3}
+            paddingRight={SPACING_2}
+            color={C_DARK_GRAY}
+          />
+          {t('pause_protocol')}
+        </Flex>
+      ) : null}
       <Flex flexDirection={DIRECTION_ROW}>
-        {['running', 'failed', 'succeeded'].includes(commandStatus) ? (
+        {['running', 'failed', 'succeeded'].includes(commandStatus) &&
+        !isComment ? (
           <CommandTimer
             commandStartedAt={commandDetails?.data.startedAt}
             commandCompletedAt={commandDetails?.data.completedAt}
           />
         ) : null}
-        {commandStatus === 'failed' ? <CommandFailedMessage /> : null}
         <CommandText
           commandOrSummary={commandDetails?.data ?? commandOrSummary}
         />

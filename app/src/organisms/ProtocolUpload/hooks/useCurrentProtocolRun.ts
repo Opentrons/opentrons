@@ -1,4 +1,5 @@
 import * as React from 'react'
+import last from 'lodash/last'
 import { useQueryClient } from 'react-query'
 import {
   useHost,
@@ -29,24 +30,35 @@ export function useCurrentProtocolRun(): UseCurrentProtocolRun {
     refetchInterval: REFETCH_INTERVAL,
   })
   const [isInitializing, setIsInitializing] = React.useState(false)
-  const { data: protocolRecord, refetch: refetchProtocol } = useProtocolQuery(
+  const enableProtocolPolling = React.useRef<boolean>(
+    runRecord?.data.protocolId != null
+  )
+  const { data: protocolRecord } = useProtocolQuery(
     (runRecord?.data?.protocolId as string) ?? null,
     {
       onSuccess: () => {
         if (isInitializing) setIsInitializing(false)
       },
-    }
+    },
+    enableProtocolPolling.current
   )
 
-  React.useEffect(() => {
-    if (protocolRecord?.data.analyses.length === 0) {
-      const intervalId = setInterval(function () {
-        refetchProtocol()
-      }, REFETCH_INTERVAL)
+  const mostRecentAnalysis = last(protocolRecord?.data.analyses) ?? null
 
-      return () => clearInterval(intervalId)
+  React.useEffect(() => {
+    if (
+      mostRecentAnalysis?.status === 'completed' &&
+      enableProtocolPolling.current
+    ) {
+      enableProtocolPolling.current = false
+    } else if (
+      runRecord?.data.protocolId != null &&
+      !enableProtocolPolling.current &&
+      mostRecentAnalysis?.status !== 'completed'
+    ) {
+      enableProtocolPolling.current = true
     }
-  }, [protocolRecord?.data.analyses])
+  }, [mostRecentAnalysis?.status, runRecord?.data.protocolId])
 
   const { createRun, isLoading: isCreatingRun } = useCreateRunMutation({
     onSuccess: () => {

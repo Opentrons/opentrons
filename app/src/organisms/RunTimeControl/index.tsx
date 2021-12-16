@@ -55,7 +55,55 @@ export function RunTimeControl(): JSX.Element | null {
   const pausedAt = useRunPauseTime()
   const completedAt = useRunCompleteTime()
 
-  const { play, pause, reset } = useRunControls()
+  const {
+    play,
+    pause,
+    reset,
+    isPlayRunActionLoading,
+    isPauseRunActionLoading,
+    isResetRunLoading,
+  } = useRunControls()
+
+  const [isRunActionLoading, setIsRunActionLoading] = React.useState(false)
+  const [lastRunAction, setLastRunAction] = React.useState<
+    'play' | 'pause' | 'reset' | null
+  >(null)
+
+  React.useEffect(() => {
+    if (isPlayRunActionLoading) {
+      setIsRunActionLoading(true)
+      setLastRunAction('play')
+    } else if (isPauseRunActionLoading) {
+      setIsRunActionLoading(true)
+      setLastRunAction('pause')
+    } else if (isResetRunLoading) {
+      setIsRunActionLoading(true)
+      setLastRunAction('reset')
+    }
+
+    if (isRunActionLoading) {
+      if (lastRunAction === 'play' && runStatus === RUN_STATUS_RUNNING) {
+        setIsRunActionLoading(false)
+      }
+      if (
+        lastRunAction === 'pause' &&
+        (runStatus === RUN_STATUS_PAUSED ||
+          runStatus === RUN_STATUS_PAUSE_REQUESTED)
+      ) {
+        setIsRunActionLoading(false)
+      }
+      if (lastRunAction === 'reset' && runStatus === RUN_STATUS_IDLE) {
+        setIsRunActionLoading(false)
+      }
+    }
+  }, [
+    isPlayRunActionLoading,
+    isPauseRunActionLoading,
+    isResetRunLoading,
+    isRunActionLoading,
+    lastRunAction,
+    runStatus,
+  ])
 
   let handleButtonClick = (): void => {}
   let buttonIconName: IconName | null = null
@@ -87,6 +135,11 @@ export function RunTimeControl(): JSX.Element | null {
     handleButtonClick = reset
   }
 
+  const buttonIcon =
+    buttonIconName != null ? (
+      <Icon name={buttonIconName} size={SIZE_1} marginRight={SPACING_2} />
+    ) : null
+
   return runStatus != null ? (
     <Flex flexDirection={DIRECTION_COLUMN} margin={SPACING_2}>
       <Text css={FONT_HEADER_DARK} marginBottom={SPACING_3}>
@@ -113,12 +166,14 @@ export function RunTimeControl(): JSX.Element | null {
         justifyContent={JUSTIFY_CENTER}
         alignItems={ALIGN_CENTER}
         display={DISPLAY_FLEX}
-        disabled={disableRunCta}
+        disabled={disableRunCta || isRunActionLoading}
         {...targetProps}
       >
-        {buttonIconName != null ? (
-          <Icon name={buttonIconName} size={SIZE_1} marginRight={SPACING_2} />
-        ) : null}
+        {isRunActionLoading ? (
+          <Icon name="ot-spinner" size={SIZE_1} marginRight={SPACING_2} spin />
+        ) : (
+          buttonIcon
+        )}
         <Text fontSize={FONT_SIZE_DEFAULT}>{buttonText}</Text>
       </NewPrimaryBtn>
       {disableRunCta && (

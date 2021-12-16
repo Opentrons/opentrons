@@ -25,6 +25,9 @@ interface RunControls {
   play: () => void
   pause: () => void
   reset: () => void
+  isPlayRunActionLoading: boolean
+  isPauseRunActionLoading: boolean
+  isResetRunLoading: boolean
 }
 
 export function useRunControls(): RunControls {
@@ -32,9 +35,16 @@ export function useRunControls(): RunControls {
 
   const currentRunId = runRecord?.data?.id
 
-  const { playRun, pauseRun } = useRunActionMutations(currentRunId as string)
+  const {
+    playRun,
+    pauseRun,
+    isPlayRunActionLoading,
+    isPauseRunActionLoading,
+  } = useRunActionMutations(currentRunId as string)
 
-  const cloneRun = useCloneRun(currentRunId as string)
+  const { cloneRun, isLoading: isResetRunLoading } = useCloneRun(
+    currentRunId as string
+  )
 
   const play = (): void => {
     playRun()
@@ -45,7 +55,14 @@ export function useRunControls(): RunControls {
   const reset = (): void => {
     cloneRun()
   }
-  return { play, pause, reset }
+  return {
+    play,
+    pause,
+    reset,
+    isPlayRunActionLoading,
+    isPauseRunActionLoading,
+    isResetRunLoading,
+  }
 }
 
 export function useRunStatus(): RunStatus | null {

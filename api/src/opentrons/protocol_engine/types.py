@@ -14,7 +14,6 @@ class EngineStatus(str, Enum):
 
     IDLE = "idle"
     RUNNING = "running"
-    PAUSE_REQUESTED = "pause-requested"
     PAUSED = "paused"
     STOP_REQUESTED = "stop-requested"
     STOPPED = "stopped"
@@ -191,7 +190,8 @@ class LoadedModule(BaseModel):
     model: ModuleModel
     location: DeckSlotLocation
     definition: ModuleDefinition
-    # TODO(mc, 2021-11-24): make serial non-optional
+    # TODO(mc, 2021-11-24): make serial non-optional, here and in internal state.
+    # Our hardware backend always provides a module serial, even when it's simulated.
     serial: Optional[str]
 
 

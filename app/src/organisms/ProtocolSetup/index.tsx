@@ -22,6 +22,7 @@ import {
   Text,
   Link,
   SPACING_1,
+  C_NEAR_WHITE,
 } from '@opentrons/components'
 
 import { useRunStatus } from '../RunTimeControl/hooks'
@@ -56,9 +57,7 @@ export function ProtocolSetup(): JSX.Element {
     alertTitle = `${t('protocol_run_complete')} ${t('protocol_can_be_closed')}`
   } else if (runStatus === RUN_STATUS_FAILED) {
     alertType = 'error'
-    alertTitle = `${t('protocol_run_failed')} ${t(
-      'recalibrating_not_available'
-    )}`
+    alertTitle = `${t('protocol_run_failed')} `
   } else if (
     runStatus === RUN_STATUS_STOPPED ||
     runStatus === RUN_STATUS_STOP_REQUESTED
@@ -77,6 +76,7 @@ export function ProtocolSetup(): JSX.Element {
         </Box>
       ) : null}
       <Flex
+        backgroundColor={C_NEAR_WHITE}
         flexDirection={DIRECTION_COLUMN}
         padding={`${SPACING_1} ${SPACING_3} ${SPACING_3} ${SPACING_3}`}
       >
