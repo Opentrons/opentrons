@@ -175,10 +175,18 @@ def achievable_final(
         axis_component = move.unit_vector[axis.value]
         if axis_component:
             axis_max_acc = constraints[axis].max_acceleration
-            # using the equation v_f^2  = v_i^2 + 2as 
-            max_axis_final_velocity_sq = (initial_speed * axis_component) ** 2 + 2 * axis_max_acc * move.distance
+            # using the equation v_f^2  = v_i^2 + 2as
+            max_axis_final_velocity_sq = (
+                initial_speed * axis_component
+            ) ** 2 + 2 * axis_max_acc * move.distance
             # max_axis_final_velocity_sq = 2 * axis_max_acc * move.distance
-            max_axis_final_velocity = math.copysign(math.sqrt(max_axis_final_velocity_sq) / axis_component, final_speed - initial_speed) + initial_speed
+            max_axis_final_velocity = (
+                math.copysign(
+                    math.sqrt(max_axis_final_velocity_sq) / axis_component,
+                    final_speed - initial_speed,
+                )
+                + initial_speed
+            )
             # max_axis_final_velocity = math.copysign(max_axis_final_velocity, final_speed - initial_speed)
             final_speed = min(max_axis_final_velocity, final_speed, key=abs)
 
@@ -205,22 +213,21 @@ def build_blocks(
     #         "check preconstraints for delta-v"
 
     constraint_max_speed = max_speed
-    max_acc = np.array([
-        constraints[axis].max_acceleration for axis in Axis.get_all_axes()
-    ])
-    acc_v = np.linalg.norm(max_acc) * unit_vector.vectorize()
+    max_acc = np.array(
+        [constraints[axis].max_acceleration for axis in Axis.get_all_axes()]
+    )
+    acc_v = np.linalg.norm(max_acc) * unit_vector.vectorize()  # type: ignore[no-untyped-call]
 
     for a_i, max_acc_i in zip(acc_v, max_acc):
         if abs(a_i) > max_acc_i:
             acc_v *= max_acc_i / a_i
-    max_acceleration = np.linalg.norm(acc_v)
-    
+    max_acceleration = np.linalg.norm(acc_v)  # type: ignore[no-untyped-call]
+
     initial_speed_sq = initial_speed ** 2
     final_speed_sq = final_speed ** 2
 
     max_achievable_speed = math.sqrt(
-        0.5
-        * (2 * max_acceleration * distance + initial_speed_sq + final_speed_sq)
+        0.5 * (2 * max_acceleration * distance + initial_speed_sq + final_speed_sq)
     )
     max_speed = min(max_achievable_speed, max_speed)
     max_speed_sq = max_speed ** 2
