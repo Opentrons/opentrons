@@ -179,6 +179,7 @@ describe('UploadInput', () => {
     getByText('robotName’s last run')
     getByText('mock display name')
     getByText('Protocol name')
+    getByText('Run status')
     getByText('Run timestamp')
     //  Had to use nestedTextMatcher to avoid testing for the changing timezones
     getByText(nestedTextMatcher('2021-11-12'))
