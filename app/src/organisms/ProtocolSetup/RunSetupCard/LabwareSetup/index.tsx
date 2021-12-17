@@ -3,6 +3,7 @@ import map from 'lodash/map'
 import isEmpty from 'lodash/isEmpty'
 import { useTranslation } from 'react-i18next'
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
+import { useSteps } from '../../LabwarePositionCheck/hooks/useSteps'
 import {
   Btn,
   Flex,
@@ -72,6 +73,7 @@ export const LabwareSetup = (): JSX.Element | null => {
     showLabwareHelpModal,
     setShowLabwareHelpModal,
   ] = React.useState<boolean>(false)
+  const steps = useSteps() ?? []
 
   const moduleModels = map(
     moduleRenderInfoById,
@@ -106,6 +108,8 @@ export const LabwareSetup = (): JSX.Element | null => {
     isEmpty(protocolData?.labware)
   ) {
     lpcDisabledReason = t('labware_position_check_not_available_empty_protocol')
+  } else if (steps[0]?.labwareId == null) {
+    lpcDisabledReason = t('lpc_disabled_no_tipracks_loaded')
   }
 
   return (
