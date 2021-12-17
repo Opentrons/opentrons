@@ -1,15 +1,24 @@
+"""Utils for motion planning."""
 import math
 import numpy as np
 import numpy.typing as npt
 import logging
-from typing import Dict, Iterator, List, Optional, Tuple
+from typing import Iterator, List, Optional, Tuple
 
-from opentrons_hardware.hardware_control.motion_planning.types import *
+from opentrons_hardware.hardware_control.motion_planning.types import (
+    Block,
+    Coordinates,
+    Move,
+    MoveTarget,
+    Axis,
+    SystemConstraints,
+)
 
 log = logging.getLogger(__name__)
 
 
 def create_dummy_move() -> Move:
+    """Create a move without real data."""
     return Move(
         unit_vector=Coordinates(0, 0, 0, 0),
         distance=0,
@@ -25,6 +34,7 @@ def create_dummy_move() -> Move:
 def get_unit_vector(
     initial: Coordinates, target: Coordinates
 ) -> Tuple[Coordinates, float]:
+    """Get the unit vector and the distance the two coordinates."""
     displacement: npt.NDArray[np.float64] = target.vectorize() - initial.vectorize()
     distance = np.linalg.norm(displacement)  # type: ignore[no-untyped-call]
     unit_vector = Coordinates.from_iter(displacement / distance)
@@ -32,7 +42,7 @@ def get_unit_vector(
 
 
 def targets_to_moves(initial: Coordinates, targets: List[MoveTarget]) -> Iterator[Move]:
-    """Transform a list of MoveTargets into a list of Moves"""
+    """Transform a list of MoveTargets into a list of Moves."""
     for target in targets:
         unit_vector, distance = get_unit_vector(initial, target.position)
         m = Move(
@@ -53,6 +63,7 @@ def targets_to_moves(initial: Coordinates, targets: List[MoveTarget]) -> Iterato
 def find_initial_speed(
     constraints: SystemConstraints, move: Move, prev_move: Optional[Move]
 ) -> float:
+    """Get a move's initial speed."""
     # Figure out how fast we can be going when we start
     initial_speed: float = move.max_speed
 
@@ -69,14 +80,15 @@ def find_initial_speed(
         elif (
             not prev_move or not prev_move.unit_vector[axis.value]
         ) or prev_move.final_speed == 0:
-            # If we're previously stopped, we can use our maximum speed discontinuity to start
+            # If we're previously stopped, we can use maximum speed
+            # discontinuity to start
             log.debug("started from 0, using max speed dc")
             axis_speed_limit = axis_constraints.max_speed_discont / axis_component
 
         elif prev_move.unit_vector[axis.value] * axis_component > 0:
-            # If we're moving the same direction as the previous move we have a chance to remain going nice
-            # and fast. We should try and start at its final speed, or - if its final speed is under the
-            # discontinuity speed - the discontinuity speed
+            # If we're moving the same direction as the previous move we have a
+            # chance to remain going nice and fast. We should try and start at
+            # its final speed, or - if its final speed is under the discontinuity speed
 
             previous_axis_final_speed = abs(
                 prev_move.final_speed * prev_move.unit_vector[axis.value]
@@ -87,11 +99,13 @@ def find_initial_speed(
             axis_speed_limit = abs(axis_initial_limit / axis_component)
             log.debug(
                 f"starting from same-dir, using {initial_speed} "
-                f"from prev final {previous_axis_final_speed} and dc {axis_constraints.max_speed_discont}"
+                f"from prev final {previous_axis_final_speed} and dc "
+                f"{axis_constraints.max_speed_discont}"
             )
 
         elif prev_move.unit_vector[axis.value] * axis_component < 0:
-            # If we are changing directions, we should start at our direction-change discontinuity speed
+            # If we are changing directions, we should start at our direction-change
+            # discontinuity speed
             axis_speed_limit = abs(
                 axis_constraints.max_direction_change_speed_discont / axis_component
             )
@@ -111,6 +125,7 @@ def find_final_speed(
     move: Move,
     next_move: Optional[Move],
 ) -> float:
+    """Get a move's final speed."""
     # Figure out how fast we can be going when we stop
     final_speed: float = move.max_speed
     log = logging.getLogger("find_final_speed")
@@ -134,9 +149,10 @@ def find_final_speed(
             axis_speed_limit = axis_constraints.max_speed_discont / axis_component
 
         elif next_move.unit_vector[axis.value] * axis_component > 0:
-            # if we're continuing in the same direction, then we should try to go as fast as we can. the
-            # subsequent move is going to try to make its initial speed match ours if possible, so we should
-            # use the larger of its initial speed or the discontinuity
+            # If we're continuing in the same direction, then we should try to go as
+            # fast as we can. The subsequent move is going to try to make its initial
+            # speed match ours if possible, so we should use the larger of its initial
+            # speed or the discontinuity
             next_initial_speed = abs(
                 next_move.initial_speed * next_move.unit_vector[axis.value]
             )
@@ -146,11 +162,12 @@ def find_final_speed(
             axis_speed_limit = abs(axis_initial_limit / axis_component)
 
             log.debug(
-                f"same dir, using axis speed {axis_speed_limit} from next move {next_initial_speed}"
+                f"same dir, using axis speed {axis_speed_limit} from next move"
+                f"{next_initial_speed}"
             )
 
         elif next_move.unit_vector[axis.value] * axis_component < 0:
-            # if we're changing direction, then we should be good neighbors and prepare ourselves
+            # if we're changing direction, then we should prepare ourselves
             log.debug("changed direction")
             axis_speed_limit = abs(
                 axis_constraints.max_direction_change_speed_discont / axis_component
@@ -165,11 +182,14 @@ def find_final_speed(
 
 
 def achievable_final(
-    constraints: SystemConstraints, move: Move, initial_speed: float, final_speed: float
+    constraints: SystemConstraints,
+    move: Move,
+    initial_speed: float,
+    final_speed: float,
 ) -> float:
-    # Figure out whether this final speed is in fact achievable from the initial speed in the distance
-    # allowed
-    log = logging.getLogger("achievable_final")
+    """Make sure the calculated final speed is achievable."""
+    # Figure out whether this final speed is in fact achievable from the initial speed
+    # in the distance allowed
 
     for axis in Axis.get_all_axes():
         axis_component = move.unit_vector[axis.value]
@@ -187,7 +207,6 @@ def achievable_final(
                 )
                 + initial_speed
             )
-            # max_axis_final_velocity = math.copysign(max_axis_final_velocity, final_speed - initial_speed)
             final_speed = min(max_axis_final_velocity, final_speed, key=abs)
 
     return final_speed
@@ -201,22 +220,25 @@ def build_blocks(
     max_speed: float,
     constraints: SystemConstraints,
 ) -> Tuple[Block, Block, Block]:
-    # build the blocks of a move that will be the fastest way to execute a move of specified displacement if we
-    # - never exceed our maximum speed
-    # - have at most one constant acceleration phase from our initial speed
-    # - have at most one constant deceleration phase to meet our final speed
-    # - have at most one 0 acceleration coast phase at our max speed
+    """Build blocks for a move.
+
+    Build the blocks of a move that will be the fastest way to execute a move of
+    specified displacement if we
+    - never exceed our maximum speed
+    - have at most one constant acceleration phase from our initial speed
+    - have at most one constant deceleration phase to meet our final speed
+    - have at most one 0 acceleration coast phase at our max speed
+    """
     log = logging.getLogger("build_blocks")
     assert initial_speed <= max_speed, "check preconstraints for initial speed"
     assert final_speed <= max_speed, "check preconstraints for final speed"
-    #     assert abs(final_speed - initial_speed) < math.sqrt(distance * constraints.max_acceleration * 2), \
-    #         "check preconstraints for delta-v"
 
     constraint_max_speed = max_speed
     max_acc = np.array(
         [constraints[axis].max_acceleration for axis in Axis.get_all_axes()]
     )
-    acc_v = np.linalg.norm(max_acc) * unit_vector.vectorize()  # type: ignore[no-untyped-call]
+    max_acc_magnitude = np.linalg.norm(max_acc)  # type: ignore[no-untyped-call]
+    acc_v = max_acc_magnitude * unit_vector.vectorize()
 
     for a_i, max_acc_i in zip(acc_v, max_acc):
         if abs(a_i) > max_acc_i:
@@ -252,9 +274,10 @@ def build_blocks(
 
     if max_achievable_speed > constraint_max_speed:
         # we'll have a coast phase!
-        assert (
-            distance - first.distance - final.distance > 0
-        ), f"bad coast phase detection: total {distance}, first {first.distance}, final {final.distance} "
+        assert distance - first.distance - final.distance > 0, (
+            f"bad coast phase detection: total {distance}, first {first.distance}, "
+            f"final {final.distance} "
+        )
         coast = Block(
             initial_speed=final.initial_speed,
             acceleration=0,
@@ -272,12 +295,9 @@ def build_move(
     next_move: Optional[Move],
     constraints: SystemConstraints,
 ) -> Move:
-
+    """Build a move."""
     initial_speed = find_initial_speed(constraints, move, prev_move)
     final_speed = find_final_speed(constraints, move, next_move)
-
-    # We cannot possibly change speed by more than we can accelerate, unfortunately, which is the other
-    # reason this is iterative
     final_speed = achievable_final(constraints, move, initial_speed, final_speed)
 
     m = Move(
@@ -298,6 +318,7 @@ def build_move(
 
 
 def blended(constraints: SystemConstraints, first: Move, second: Move) -> bool:
+    """Check if the moves are blended."""
     # have these actually had their blocks built?
     if sum(b.distance for b in first.blocks) != first.distance:
         return False
@@ -318,18 +339,19 @@ def blended(constraints: SystemConstraints, first: Move, second: Move) -> bool:
             else:
                 return initial_speed == final_speed
         else:
-            # if they're in different directions, then the junction has to be at or under
-            # the speed change discontinuity
+            # if they're in different directions, then the junction has to be at or
+            # under the speed change discontinuity
             return (
                 final_speed <= constraints[axis].max_direction_change_speed_discont
                 and initial_speed
                 <= constraints[axis].max_direction_change_speed_discont
             )
-    log.debug(f"Not blending")
+    log.debug("Not blending")
     return False
 
 
 def all_blended(constraints: SystemConstraints, moves: List[Move]) -> bool:
+    """Check if the moves in the list are all blended."""
     moveiter = iter(moves)
     prev = next(moveiter)
     while True:

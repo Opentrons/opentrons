@@ -1,3 +1,4 @@
+"""Move manager."""
 import logging
 from typing import List, Optional, Tuple
 
@@ -13,6 +14,8 @@ log = logging.getLogger(__name__)
 
 
 class MoveManager:
+    """A manager that handles a list of moves for the hardware control system."""
+
     def __init__(
         self,
         constraints: SystemConstraints,
@@ -20,6 +23,14 @@ class MoveManager:
         target_list: List[MoveTarget] = [],
         move_list: List[Move] = [],
     ) -> None:
+        """Constructor.
+
+        Args:
+            constraints: system contraints
+            origin: the coordinates for the beginning of the moves
+            target_list: a list of targets for the system to move to
+            move_list: a list of moves
+        """
         self._constraints = constraints
         self._origin = origin
         self._targets = target_list
@@ -27,27 +38,34 @@ class MoveManager:
         self._blend_log: List[List[Move]] = []
 
     def _clear_moves(self) -> None:
+        """Empty the move list."""
         self._moves = []
 
     def _clear_targets(self) -> None:
+        """Empty the target list."""
         self._targets = []
 
     def _clear_blend_log(self) -> None:
+        """Empty the blend log."""
         self._blend_log = []
 
     def reset(self) -> None:
+        """Reset the move manager."""
         self._origin = None
         self._clear_moves()
         self._clear_targets()
+        self._clear_blend_log()
 
     def set_origin(self, origin: Coordinates) -> None:
+        """Set an origin for the moves."""
         self._origin = origin
 
     def add_targets(self, target_list: List[MoveTarget]) -> None:
+        """Append targets to target list."""
         self._targets.extend(target_list)
 
     def _get_initial_moves_from_targets(self) -> List[Move]:
-        """Create a list of moves from the target list for blending"""
+        """Create a list of moves from the target list for blending."""
         if not self._origin:
             raise ValueError("Cannot create moves without an origin")
         if not self._targets:
@@ -56,11 +74,13 @@ class MoveManager:
         return self._add_dummy_start_end_to_moves(initial_moves)
 
     def _add_dummy_start_end_to_moves(self, move_list: List[Move]) -> List[Move]:
+        """Append dummy moves to the start and the end of the move list."""
         start_move = move_utils.create_dummy_move()
         end_move = move_utils.create_dummy_move()
         return [start_move] + move_list + [end_move]
 
     def plan_motion(self, iteration_limit: int = 10) -> Tuple[bool, List[List[Move]]]:
+        """Create and blend moves from targets."""
         self._clear_blend_log()
         to_blend = self._get_initial_moves_from_targets()
         assert to_blend, "Check target list"

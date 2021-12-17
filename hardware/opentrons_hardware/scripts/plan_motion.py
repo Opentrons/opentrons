@@ -1,6 +1,15 @@
-from opentrons_hardware.hardware_control.motion_planning import move_manager, move_utils
-from opentrons_hardware.hardware_control.motion_planning.types import *
+"""A simple script to create a motion plan."""
 import logging
+
+from opentrons_hardware.hardware_control.motion_planning import move_manager
+from opentrons_hardware.hardware_control.motion_planning.types import (
+    Axis,
+    AxisConstraints,
+    SystemConstraints,
+    MoveTarget,
+    Coordinates,
+)
+
 
 log = logging.getLogger(__name__)
 
@@ -27,6 +36,7 @@ LOG_CONFIG = {
 
 
 def main() -> None:
+    """Entry point."""
     constraints: SystemConstraints = {
         Axis.X: AxisConstraints(
             max_acceleration=10000,

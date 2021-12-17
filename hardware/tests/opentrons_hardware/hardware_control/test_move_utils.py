@@ -2,13 +2,19 @@
 import pytest
 
 from opentrons_hardware.hardware_control.motion_planning.move_utils import (
-    get_unit_vector,
     find_initial_speed,
     find_final_speed,
     targets_to_moves,
-    create_dummy_move,
 )
-from opentrons_hardware.hardware_control.motion_planning.types import *
+from opentrons_hardware.hardware_control.motion_planning.types import (
+    Axis,
+    AxisConstraints,
+    Block,
+    Coordinates,
+    Move,
+    MoveTarget,
+    SystemConstraints,
+)
 
 
 CONSTRAINTS: SystemConstraints = {
@@ -59,6 +65,7 @@ SIMPLE_BACKWARD_MOVE = Move(
 
 
 def test_convert_targets_to_moves() -> None:
+    """It should convert a list of move targets into a list of moves."""
     targets = [
         MoveTarget(Coordinates(10, 0, 0, 0), 1),
         MoveTarget(Coordinates(10, 20, 0, 0), 2),
@@ -115,13 +122,21 @@ def test_convert_targets_to_moves() -> None:
 @pytest.mark.parametrize(
     argnames=["origin", "unit_vector", "max_speed", "expected"],
     argvalues=[
-        ## previous move is not moving, use the smaller value of move max speed and axis max speed discont
+        # previous move is not moving, use the smaller of move max speed and axis max
+        # speed discontinuity
         [None, [1, 0, 0, 0], 5, 5],
         [None, [1, 0, 0, 0], 200, CONSTRAINTS[Axis.X].max_speed_discont],
-        ## previous move is moving in same direction as current move, use the smaller value of move max speed and axis max speed discont
+        # previous move is moving in same direction as current move, use the smaller
+        # of move max speed and axis max speed discontinuity
         [SIMPLE_FORWARD_MOVE, [1, 0, 0, 0], 5, 5],
-        [SIMPLE_FORWARD_MOVE, [1, 0, 0, 0], 200, CONSTRAINTS[Axis.X].max_speed_discont],
-        ## previous move is moving in opposite direction, use the smaller value of move max speed and axis max dir change speed discont
+        [
+            SIMPLE_FORWARD_MOVE,
+            [1, 0, 0, 0],
+            200,
+            CONSTRAINTS[Axis.X].max_speed_discont,
+        ],
+        # previous move is moving in opposite direction, use the smaller of move max
+        # speed and axis max dir change speed discontinuity
         [
             SIMPLE_FORWARD_MOVE,
             [-1, 0, 0, 0],
@@ -134,6 +149,7 @@ def test_convert_targets_to_moves() -> None:
 def test_initial_speed(
     origin: Move, unit_vector: Coordinates, max_speed: float, expected: float
 ) -> None:
+    """It should find the correct initial speed of the move."""
     move = Move(
         unit_vector=Coordinates(*unit_vector),
         distance=100,
@@ -150,13 +166,16 @@ def test_initial_speed(
 @pytest.mark.parametrize(
     argnames=["next_move", "unit_vector", "max_speed", "expected"],
     argvalues=[
-        ## next move is not moving, use the smaller value of move max speed and axis max speed discont
+        # next move is not moving, use the smaller of move max speed and axis max
+        # speed discontinuity
         [None, [1, 0, 0, 0], 5, 5],
         [None, [1, 0, 0, 0], 200, CONSTRAINTS[Axis.X].max_speed_discont],
-        ## next move is moving in same direction as current move, use the smaller value of move max speed and axis max speed discont
+        # next move is moving in same direction as current move, use the smaller
+        # of move max speed and axis max speed discontinuity
         [SIMPLE_FORWARD_MOVE, [1, 0, 0, 0], 5, 5],
         [SIMPLE_FORWARD_MOVE, [1, 0, 0, 0], 200, CONSTRAINTS[Axis.X].max_speed_discont],
-        ## next move is moving in opposite direction, use the smaller value of move max speed and axis max dir change speed discont
+        # next move is moving in opposite direction, use the smaller of move max
+        # speed and axis max direction change speed discontinuity
         [
             SIMPLE_FORWARD_MOVE,
             [-1, 0, 0, 0],
@@ -169,6 +188,7 @@ def test_initial_speed(
 def test_final_speed(
     next_move: Move, unit_vector: Coordinates, max_speed: float, expected: float
 ) -> None:
+    """It should find the correct final speed of the move."""
     move = Move(
         unit_vector=Coordinates(*unit_vector),
         distance=100,
