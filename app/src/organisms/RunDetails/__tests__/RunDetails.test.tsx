@@ -16,6 +16,7 @@ import { CommandList } from '../CommandList'
 import { useProtocolDetails } from '../hooks'
 import { useRunStatus } from '../../RunTimeControl/hooks'
 import { useCloseCurrentRun } from '../../ProtocolUpload/hooks/useCloseCurrentRun'
+import { useCurrentProtocolRun } from '../../ProtocolUpload/hooks/useCurrentProtocolRun'
 import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
 import type { ProtocolFile } from '@opentrons/shared-data'
 
@@ -23,6 +24,7 @@ jest.mock('../hooks')
 jest.mock('../CommandList')
 jest.mock('../../RunTimeControl/hooks')
 jest.mock('../../ProtocolUpload/hooks/useCloseCurrentRun')
+jest.mock('../../ProtocolUpload/hooks/useCurrentProtocolRun')
 
 const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
   typeof useProtocolDetails
@@ -35,6 +37,10 @@ const mockUseRunStatus = useRunStatus as jest.MockedFunction<
 
 const mockUseCloseCurrentRun = useCloseCurrentRun as jest.MockedFunction<
   typeof useCloseCurrentRun
+>
+
+const mockUseCurrentProtocolRun = useCurrentProtocolRun as jest.MockedFunction<
+  typeof useCurrentProtocolRun
 >
 
 const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolFile<{}>
@@ -63,6 +69,12 @@ describe('RunDetails', () => {
       .mockReturnValue({
         isProtocolRunLoaded: true,
         closeCurrentRun: jest.fn(),
+      } as any)
+    when(mockUseCurrentProtocolRun)
+      .calledWith()
+      .mockReturnValue({
+        protocolRecord: {},
+        runRecord: {},
       } as any)
   })
 
@@ -141,11 +153,11 @@ describe('RunDetails', () => {
   })
 
   it('redirects to /upload if protocol run is not loaded', () => {
-    when(mockUseCloseCurrentRun)
+    when(mockUseCurrentProtocolRun)
       .calledWith()
       .mockReturnValue({
-        isProtocolRunLoaded: false,
-        closeCurrentRun: jest.fn(),
+        protocolRecord: null,
+        runRecord: null,
       } as any)
     const { getByText } = render()
     expect(getByText('Upload page')).toBeTruthy()

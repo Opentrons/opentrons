@@ -164,31 +164,6 @@ describe('ProtocolUpload', () => {
     getByText('mock confirm exit protocol upload modal')
   })
 
-  it('closes the confirm close protocol modal when Yes, close now is clicked', () => {
-    getProtocolFile.mockReturnValue(withModulesProtocol as any)
-    when(mockUseCurrentProtocolRun)
-      .calledWith()
-      .mockReturnValue({
-        protocolRecord: {},
-        runRecord: {},
-        createProtocolRun: jest.fn(),
-      } as any)
-    const mockCloseCurrentRun = jest.fn()
-    when(mockUseCloseProtocolRun).calledWith().mockReturnValue({
-      closeCurrentRun: mockCloseCurrentRun,
-      isProtocolRunLoaded: true,
-    })
-
-    const [{ getByRole, getByText }] = render()
-    fireEvent.click(getByRole('button', { name: 'close' }))
-    const mockCloseModal = getByText('mock confirm exit protocol upload modal')
-    fireEvent.click(mockCloseModal)
-    expect(
-      screen.queryByText('mock confirm exit protocol upload modal')
-    ).toBeNull()
-    expect(mockCloseCurrentRun).toHaveBeenCalled()
-  })
-
   it('calls ingest protocol if handleUpload', () => {
     when(mockUseCurrentProtocolRun)
       .calledWith()
