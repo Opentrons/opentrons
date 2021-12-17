@@ -1573,7 +1573,7 @@ class API(HardwareControlAPI):
         self, instr: Pipette, ul: float, action: "UlPerMmAction"
     ) -> float:
         mm = ul / instr.ul_per_mm(ul, action)
-        position = mm + instr.config.bottom
+        position = instr.config.bottom - mm
         return round(position, 6)
 
     def _plunger_speed(
@@ -1984,7 +1984,10 @@ class API(HardwareControlAPI):
         cp = self._critical_point_for(mount, critical_point)
 
         max_height = pip.config.home_position - self._config.z_retract_distance + cp.z
-
+        self._log.debug(
+            f"GIMH[{mount}]: pip {pip} home {pip.config.home_position} "
+            "- zrd {self._config.z_retract_distance} + cp.z {cp.z} = max {max_height}"
+        )
         return max_height
 
     def clean_up(self) -> None:
