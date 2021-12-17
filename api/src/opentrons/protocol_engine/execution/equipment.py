@@ -214,12 +214,9 @@ class EquipmentHandler:
         hw_model = module_model_from_string(model.value)
         model_type = resolve_module_type(hw_model)
 
-        try:
-            available, simulating = await self._hardware_api.find_modules(
-                by_model=hw_model, resolved_type=model_type
-            )
-        except TypeError as e:
-            raise ModuleNotAttachedError("Could not fetch modules attached") from e
+        available, simulating = await self._hardware_api.find_modules(
+            by_model=hw_model, resolved_type=model_type
+        )
 
         for mod in available:
             # TODO (spp, 2021-11-22): make this accept compatible module models
