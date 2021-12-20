@@ -21,7 +21,7 @@ const render = (path = '/') => {
 
 describe('NextGenApp', () => {
   it('renders an AppSettings component', () => {
-    const [{ getByText }] = render('/app-settings')
+    const [{ getByText }] = render('/app-settings/feature-flags')
     expect(getByText('Mock AppSettings')).toBeTruthy()
   })
 
@@ -31,6 +31,10 @@ describe('NextGenApp', () => {
   })
 
   it('renders an AppSettings component from /more', () => {
+    const [{ getByText }] = render('/more')
+    expect(getByText('Mock AppSettings')).toBeTruthy()
+  })
+  it('renders a nav bar with a protocols from /more', () => {
     const [{ getByText }] = render('/more')
     expect(getByText('Mock AppSettings')).toBeTruthy()
   })
