@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 import {
-  Command,
+  CommandCreateData,
   getModuleType,
   ProtocolFile,
   THERMOCYCLER_MODULE_TYPE,
@@ -17,7 +17,7 @@ import type { MoveToWellCommand } from '@opentrons/shared-data/protocol/types/sc
 const getIsLabwareOnTopOfTC = (
   modules: ProtocolFile<{}>['modules'],
   labwareId: string,
-  commands: Command[]
+  commands: CommandCreateData[]
 ): boolean => {
   const labwareLocation = getLabwareLocation(labwareId, commands)
   return (
@@ -55,7 +55,7 @@ export const getMoveToLabwareSteps = (
   labwareIds: string[],
   pipetteId: string,
   section: Section,
-  commands: Command[]
+  commands: CommandCreateData[]
 ): LabwarePositionCheckStep[] =>
   labwareIds.map(labwareId => {
     const moveToWellCommand: MoveToWellCommand = {
