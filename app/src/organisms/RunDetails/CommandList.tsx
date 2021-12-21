@@ -89,7 +89,7 @@ export function CommandList(): JSX.Element | null {
     firstPlayTimestamp != null
   ) {
     const firstPostPlayRunCommandIndex = runDataCommands.findIndex(
-      command => command.id === postSetupAnticipatedCommands[0]?.id
+      command => command.key === postSetupAnticipatedCommands[0]?.key
     )
     const postPlayRunCommands =
       firstPostPlayRunCommandIndex >= 0
@@ -108,7 +108,7 @@ export function CommandList(): JSX.Element | null {
     const remainingAnticipatedCommands = dropWhile(
       postSetupAnticipatedCommands,
       anticipatedCommand =>
-        runDataCommands.some(runC => runC.id === anticipatedCommand.id)
+        runDataCommands.some(runC => runC.key === anticipatedCommand.key)
     ).map(remainingAnticipatedCommand => ({
       analysisCommand: remainingAnticipatedCommand,
       runCommandSummary: null,
@@ -118,8 +118,8 @@ export function CommandList(): JSX.Element | null {
       (isDeterministic, command, index) => {
         return (
           isDeterministic &&
-          command.runCommandSummary.id ===
-            postSetupAnticipatedCommands[index]?.id
+          command.runCommandSummary.key ===
+            postSetupAnticipatedCommands[index]?.key
         )
       },
       true
