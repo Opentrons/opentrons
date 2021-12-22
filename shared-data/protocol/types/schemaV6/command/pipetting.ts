@@ -1,4 +1,4 @@
-import { CommonCommandInfo, CommonCreateCommandInfo } from '.'
+import { CommonCommandInfo } from '.'
 export type PipettingCommand =
   | AspirateCommand
   | DispenseCommand
@@ -18,83 +18,68 @@ export type PipettingCreateCommand =
   | PickUpTipCreateCommand
   | DropTipCreateCommand
 
-export interface AspirateCommand extends CommonCommandInfo {
+export interface AspirateCreateCommand extends CommonCommandInfo {
   commandType: 'aspirate'
   params: AspDispAirgapParams
   result?: BasicLiquidHandlingResult
 }
-export interface AspirateCreateCommand extends CommonCreateCommandInfo {
-  commandType: 'aspirate'
-  params: AspDispAirgapParams
-  result?: BasicLiquidHandlingResult
+export interface AspirateCommand extends AspirateCreateCommand {
+  key: string
 }
-export interface DispenseCommand extends CommonCommandInfo {
+export interface DispenseCreateCommand extends CommonCommandInfo {
   commandType: 'dispense'
   params: AspDispAirgapParams
   result?: BasicLiquidHandlingResult
 }
-export interface DispenseCreateCommand extends CommonCreateCommandInfo {
-  commandType: 'dispense'
-  params: AspDispAirgapParams
-  result?: BasicLiquidHandlingResult
+export interface DispenseCommand extends DispenseCreateCommand {
+  key: string
 }
-export interface AspirateAirGapCommand extends CommonCommandInfo {
+export interface AspirateAirGapCreateCommand extends CommonCommandInfo {
   commandType: 'aspirateAirGap'
   params: AspDispAirgapParams
   result?: BasicLiquidHandlingResult
 }
-export interface AspirateAirGapCreateCommand extends CommonCreateCommandInfo {
-  commandType: 'aspirateAirGap'
-  params: AspDispAirgapParams
-  result?: BasicLiquidHandlingResult
+export interface AspirateAirGapCommand extends AspirateAirGapCreateCommand {
+  key: string
 }
-export interface DispenseAirGapCommand extends CommonCommandInfo {
+export interface DispenseAirGapCreateCommand extends CommonCommandInfo {
   commandType: 'dispenseAirGap'
   params: AspDispAirgapParams
   result?: BasicLiquidHandlingResult
 }
-export interface DispenseAirGapCreateCommand extends CommonCreateCommandInfo {
-  commandType: 'dispenseAirGap'
-  params: AspDispAirgapParams
-  result?: BasicLiquidHandlingResult
+export interface DispenseAirGapCommand extends DispenseAirGapCreateCommand {
+  key: string
 }
-export interface BlowoutCommand extends CommonCommandInfo {
+export interface BlowoutCreateCommand extends CommonCommandInfo {
   commandType: 'blowout'
   params: BlowoutParams
   result?: BasicLiquidHandlingResult
 }
-export interface BlowoutCreateCommand extends CommonCreateCommandInfo {
-  commandType: 'blowout'
-  params: BlowoutParams
-  result?: BasicLiquidHandlingResult
+export interface BlowoutCommand extends BlowoutCreateCommand {
+  key: string
 }
-export interface TouchTipCommand extends CommonCommandInfo {
+export interface TouchTipCreateCommand extends CommonCommandInfo {
   commandType: 'touchTip'
   params: TouchTipParams
   result?: BasicLiquidHandlingResult
 }
-export interface TouchTipCreateCommand extends CommonCreateCommandInfo {
-  commandType: 'touchTip'
-  params: TouchTipParams
-  result?: BasicLiquidHandlingResult
+export interface TouchTipCommand extends TouchTipCreateCommand {
+  key: string
 }
-export interface PickUpTipCommand extends CommonCommandInfo {
+export interface PickUpTipCreateCommand extends CommonCommandInfo {
   id: string
   commandType: 'pickUpTip'
   params: PipetteAccessParams & WellLocationParam
 }
-export interface PickUpTipCreateCommand extends CommonCreateCommandInfo {
-  id: string
-  commandType: 'pickUpTip'
-  params: PipetteAccessParams & WellLocationParam
+export interface PickUpTipCommand extends PickUpTipCreateCommand {
+  key: string
 }
-export interface DropTipCommand extends CommonCommandInfo {
+export interface DropTipCreateCommand extends CommonCommandInfo {
   commandType: 'dropTip'
   params: PipetteAccessParams & WellLocationParam
 }
-export interface DropTipCreateCommand extends CommonCreateCommandInfo {
-  commandType: 'dropTip'
-  params: PipetteAccessParams & WellLocationParam
+export interface DropTipCommand extends DropTipCreateCommand {
+  key: string
 }
 
 type AspDispAirgapParams = FlowRateParams &

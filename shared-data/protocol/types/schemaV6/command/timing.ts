@@ -1,13 +1,11 @@
-import { CommonCommandInfo, CommonCreateCommandInfo } from '.'
-export interface TimingCommand extends CommonCommandInfo {
+import { CommonCommandInfo } from '.'
+export interface TimingCreateCommand extends CommonCommandInfo {
   commandType: 'delay'
   params: DelayParams
   result?: {}
 }
-export interface TimingCreateCommand extends CommonCreateCommandInfo {
-  commandType: 'delay'
-  params: DelayParams
-  result?: {}
+export interface TimingCommand extends TimingCreateCommand {
+  key: string
 }
 
 interface DelayParams {
@@ -15,13 +13,12 @@ interface DelayParams {
   message?: string
 }
 
-export interface PauseCommand extends CommonCommandInfo {
+export interface PauseCreateCommand extends CommonCommandInfo {
   commandType: 'pause'
   params: PauseParams
 }
-export interface PauseCreateCommand extends CommonCreateCommandInfo {
-  commandType: 'pause'
-  params: PauseParams
+export interface PauseCommand extends PauseCreateCommand {
+  key: string
 }
 
 interface PauseParams {

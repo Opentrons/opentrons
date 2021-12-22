@@ -1,49 +1,40 @@
 import {
   CommonCommandInfo,
-  CommonCreateCommandInfo,
   LabwareDefinition2,
   LabwareOffset,
 } from '../../../../js'
 
-export interface LoadPipetteCommand extends CommonCommandInfo {
+export interface LoadPipetteCreateCommand extends CommonCommandInfo {
   commandType: 'loadPipette'
   params: LoadPipetteParams
   result?: LoadPipetteResult
 }
-export interface LoadPipetteCreateCommand extends CommonCreateCommandInfo {
-  commandType: 'loadPipette'
-  params: LoadPipetteParams
-  result?: LoadPipetteResult
+export interface LoadPipetteCommand extends LoadPipetteCreateCommand {
+  key: string
 }
-export interface LoadLabwareCommand extends CommonCommandInfo {
+export interface LoadLabwareCreateCommand extends CommonCommandInfo {
   commandType: 'loadLabware'
   params: LoadLabwareParams
   result?: LoadLabwareResult
 }
-export interface LoadLabwareCreateCommand extends CommonCreateCommandInfo {
-  commandType: 'loadLabware'
-  params: LoadLabwareParams
-  result?: LoadLabwareResult
+export interface LoadLabwareCommand extends LoadLabwareCreateCommand {
+  key: string
 }
-export interface LoadModuleCommand extends CommonCommandInfo {
+export interface LoadModuleCreateCommand extends CommonCommandInfo {
   commandType: 'loadModule'
   params: LoadModuleParams
   result?: LoadModuleResult
 }
-export interface LoadModuleCreateCommand extends CommonCreateCommandInfo {
-  commandType: 'loadModule'
-  params: LoadModuleParams
-  result?: LoadModuleResult
+export interface LoadModuleCommand extends LoadModuleCreateCommand {
+  key: string
 }
-export interface LoadLiquidCommand extends CommonCommandInfo {
+export interface LoadLiquidCreateCommand extends CommonCommandInfo {
   commandType: 'loadLiquid'
   params: LoadLiquidParams
   result?: LoadLiquidResult
 }
-export interface LoadLiquidCreateCommand extends CommonCreateCommandInfo {
-  commandType: 'loadLiquid'
-  params: LoadLiquidParams
-  result?: LoadLiquidResult
+export interface LoadLiquidCommand extends LoadLiquidCreateCommand {
+  key: string
 }
 
 export type SetupCommand =

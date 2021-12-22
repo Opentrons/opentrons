@@ -1,65 +1,54 @@
-import type { CommonCommandInfo, CommonCreateCommandInfo } from '.'
+import type { CommonCommandInfo } from '.'
 import type { MotorAxis } from '../../../../js/types'
-export interface MoveToSlotCommand extends CommonCommandInfo {
+
+export interface MoveToSlotCreateCommand extends CommonCommandInfo {
   commandType: 'moveToSlot'
   params: MoveToSlotParams
   result?: {}
 }
-export interface MoveToSlotCreateCommand extends CommonCreateCommandInfo {
-  commandType: 'moveToSlot'
-  params: MoveToSlotParams
-  result?: {}
+export interface MoveToSlotCommand extends MoveToSlotCreateCommand {
+  key: string
 }
-export interface MoveToWellCommand extends CommonCommandInfo {
+export interface MoveToWellCreateCommand extends CommonCommandInfo {
   commandType: 'moveToWell'
   params: MoveToWellParams
   result?: {}
 }
-export interface MoveToWellCreateCommand extends CommonCreateCommandInfo {
-  commandType: 'moveToWell'
-  params: MoveToWellParams
-  result?: {}
+export interface MoveToWellCommand extends MoveToWellCreateCommand {
+  key: string
 }
-export interface MoveToCoordinatesCommand extends CommonCommandInfo {
+export interface MoveToCoordinatesCreateCommand extends CommonCommandInfo {
   commandType: 'moveToCoordinates'
   params: MoveToCoordinatesParams
   result?: {}
 }
-export interface MoveToCoordinatesCreateCommand
-  extends CommonCreateCommandInfo {
-  commandType: 'moveToCoordinates'
-  params: MoveToCoordinatesParams
-  result?: {}
+export interface MoveToCoordinatesCommand
+  extends MoveToCoordinatesCreateCommand {
+  key: string
 }
-export interface MoveRelativeCommand extends CommonCommandInfo {
+export interface MoveRelativeCreateCommand extends CommonCommandInfo {
   commandType: 'moveRelative'
   params: MoveRelativeParams
   result?: {}
 }
-export interface MoveRelativeCreateCommand extends CommonCreateCommandInfo {
-  commandType: 'moveRelative'
-  params: MoveRelativeParams
-  result?: {}
+export interface MoveRelativeCommand extends MoveRelativeCreateCommand {
+  key: string
 }
-export interface SavePositionCommand extends CommonCommandInfo {
+export interface SavePositionCreateCommand extends CommonCommandInfo {
   commandType: 'savePosition'
   params: SavePositionParams
   result?: {}
 }
-export interface SavePositionCreateCommand extends CommonCreateCommandInfo {
-  commandType: 'savePosition'
-  params: SavePositionParams
-  result?: {}
+export interface SavePositionCommand extends SavePositionCreateCommand {
+  key: string
 }
-export interface HomeCommand extends CommonCommandInfo {
+export interface HomeCreateCommand extends CommonCommandInfo {
   commandType: 'home'
   params: HomeParams
   result?: {}
 }
-export interface HomeCreateCommand extends CommonCreateCommandInfo {
-  commandType: 'home'
-  params: HomeParams
-  result?: {}
+export interface HomeCommand extends HomeCreateCommand {
+  key: string
 }
 export type GantryCommand =
   | MoveToSlotCommand

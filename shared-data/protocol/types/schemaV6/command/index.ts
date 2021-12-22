@@ -23,15 +23,9 @@ interface CommandRunTimeInfo {
 }
 
 // all commands must have an id
-export interface CommonCreateCommandInfo extends CommandRunTimeInfo {
-  id: string
-  result?: any // TODO: gather types for what each command's expected result should be
-}
-
 export interface CommonCommandInfo extends CommandRunTimeInfo {
   id: string
-  key: string
-  result?: any
+  result?: any // TODO: gather types for what each command's expected result should be
 }
 
 export type CommandCreateData =
@@ -44,7 +38,7 @@ export type CommandCreateData =
   | ({
       commandType: 'custom'
       params: { [key: string]: any }
-    } & CommonCreateCommandInfo) // allows for experimentation between schema versions with no expectation of system support
+    } & CommonCommandInfo) // allows for experimentation between schema versions with no expectation of system support
 
 // commands will be required to have a key, but will not be created with one
 export type Command =
