@@ -16,18 +16,18 @@ import { getLabwareLocation } from '../ProtocolSetup/utils/getLabwareLocation'
 import { useLabwareRenderInfoById } from '../ProtocolSetup/hooks'
 
 interface Props {
-  commandOrSummary: Command | RunCommandSummary
+  commandDetailsOrSummary: Command | RunCommandSummary
 }
 export function CommandText(props: Props): JSX.Element | null {
-  const { commandOrSummary } = props
+  const { commandDetailsOrSummary } = props
   const { t } = useTranslation('run_details')
   const { protocolData } = useProtocolDetails()
   const labwareRenderInfoById = useLabwareRenderInfoById()
 
   let messageNode = null
-  if ('params' in commandOrSummary) {
+  if ('params' in commandDetailsOrSummary) {
     // params will not exist on command summaries
-    switch (commandOrSummary.commandType) {
+    switch (commandDetailsOrSummary.commandType) {
       case 'delay': {
         // TODO: IMMEDIATELY address displaying real comments
         messageNode = (
@@ -39,7 +39,7 @@ export function CommandText(props: Props): JSX.Element | null {
             >
               {t('comment')}
             </Flex>
-            {commandOrSummary != null ? commandOrSummary.result : null}
+            {commandDetailsOrSummary != null ? commandDetailsOrSummary.result : null}
           </>
         )
         break
@@ -50,7 +50,7 @@ export function CommandText(props: Props): JSX.Element | null {
         if (protocolData == null) {
           return null
         }
-        const { wellName, labwareId } = commandOrSummary.params
+        const { wellName, labwareId } = commandDetailsOrSummary.params
         const labwareLocation = getLabwareLocation(
           labwareId,
           protocolData.commands
@@ -75,29 +75,29 @@ export function CommandText(props: Props): JSX.Element | null {
       }
       case 'pause': {
         messageNode =
-          commandOrSummary.params?.message ?? commandOrSummary.commandType
+          commandDetailsOrSummary.params?.message ?? commandDetailsOrSummary.commandType
         break
       }
       case 'loadLabware':
       case 'loadPipette':
       case 'loadModule': {
-        messageNode = <ProtocolSetupInfo setupCommand={commandOrSummary} />
+        messageNode = <ProtocolSetupInfo setupCommand={commandDetailsOrSummary} />
         break
       }
       case 'custom': {
         messageNode =
-          commandOrSummary.params?.legacyCommandText ??
-          commandOrSummary.commandType
+          commandDetailsOrSummary.params?.legacyCommandText ??
+          commandDetailsOrSummary.commandType
         break
       }
       default: {
-        messageNode = commandOrSummary.commandType
+        messageNode = commandDetailsOrSummary.commandType
         break
       }
     }
   } else {
     // this must be a run command summary
-    messageNode = commandOrSummary.commandType
+    messageNode = commandDetailsOrSummary.commandType
   }
 
   return (

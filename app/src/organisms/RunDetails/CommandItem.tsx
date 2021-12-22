@@ -146,7 +146,7 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
           />
         ) : null}
         <CommandText
-          commandOrSummary={commandDetails?.data ?? commandOrSummary}
+          commandDetailsOrSummary={commandDetails?.data ?? commandOrSummary}
         />
       </Flex>
     </Flex>
