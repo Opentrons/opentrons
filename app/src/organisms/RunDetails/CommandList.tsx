@@ -256,7 +256,7 @@ export function CommandList(): JSX.Element | null {
                     <CommandItem
                       commandOrSummary={command}
                       runStatus={runStatus}
-                      commandDetail={commandDetailsById[command.id]}
+                      commandDetails={commandDetailsById[command.id]}
                     />
                   </Flex>
                 </Flex>
