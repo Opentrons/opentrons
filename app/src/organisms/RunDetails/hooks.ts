@@ -131,7 +131,7 @@ export function useCommandDetailsById(): CommandDetailsById {
     },
     new Set()
   )
-  // consider chunking network requests the event that there are a large amount of network requests to make
+  // consider chunking network requests in the event that there are a large amount of network requests to make
   commandIdsToFetch.forEach(commandId => {
     getCommand(host, currentRunId, commandId)
       .then(response =>
