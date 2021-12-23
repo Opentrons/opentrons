@@ -86,7 +86,7 @@ export function useFormatRunTimestamp(): (timestamp: string) => string | null {
     return formatInterval(firstPlayAction.createdAt, timestamp)
   }
 }
-const REFETCH_INTERVAL = 1000
+export const REFETCH_INTERVAL = 1000
 interface CommandDetailsById {
   [commandId: string]: CommandDetail
 }
