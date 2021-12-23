@@ -22,7 +22,7 @@ import {
   Box,
 } from '@opentrons/components'
 import { useRunStatus } from '../RunTimeControl/hooks'
-import { useProtocolDetails } from './hooks'
+import { useCommandDetailsById, useProtocolDetails } from './hooks'
 import { useCurrentProtocolRun } from '../ProtocolUpload/hooks'
 import { ProtocolSetupInfo } from './ProtocolSetupInfo'
 import { CommandItem } from './CommandItem'
@@ -43,6 +43,7 @@ export function CommandList(): JSX.Element | null {
     .protocolData
   const { runRecord } = useCurrentProtocolRun()
   const runStatus = useRunStatus()
+  const commandDetailsById = useCommandDetailsById()
   const runDataCommands = runRecord?.data.commands
   const firstPlayTimestamp = runRecord?.data.actions.find(
     action => action.actionType === 'play'
@@ -255,6 +256,7 @@ export function CommandList(): JSX.Element | null {
                     <CommandItem
                       commandOrSummary={command}
                       runStatus={runStatus}
+                      commandDetail={commandDetailsById[command.id]}
                     />
                   </Flex>
                 </Flex>

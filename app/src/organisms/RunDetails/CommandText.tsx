@@ -39,7 +39,9 @@ export function CommandText(props: Props): JSX.Element | null {
             >
               {t('comment')}
             </Flex>
-            {commandDetailsOrSummary != null ? commandDetailsOrSummary.result : null}
+            {commandDetailsOrSummary != null
+              ? commandDetailsOrSummary.result
+              : null}
           </>
         )
         break
@@ -75,13 +77,16 @@ export function CommandText(props: Props): JSX.Element | null {
       }
       case 'pause': {
         messageNode =
-          commandDetailsOrSummary.params?.message ?? commandDetailsOrSummary.commandType
+          commandDetailsOrSummary.params?.message ??
+          commandDetailsOrSummary.commandType
         break
       }
       case 'loadLabware':
       case 'loadPipette':
       case 'loadModule': {
-        messageNode = <ProtocolSetupInfo setupCommand={commandDetailsOrSummary} />
+        messageNode = (
+          <ProtocolSetupInfo setupCommand={commandDetailsOrSummary} />
+        )
         break
       }
       case 'custom': {

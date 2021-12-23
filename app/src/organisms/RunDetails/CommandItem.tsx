@@ -33,7 +33,11 @@ import {
 } from '@opentrons/api-client'
 import { useCommandQuery } from '@opentrons/react-api-client'
 import { useCurrentRunId } from '../ProtocolUpload/hooks/useCurrentRunId'
-import type { RunStatus, RunCommandSummary } from '@opentrons/api-client'
+import type {
+  CommandDetail,
+  RunStatus,
+  RunCommandSummary,
+} from '@opentrons/api-client'
 
 import type {
   Command,
@@ -43,6 +47,7 @@ import type {
 export interface CommandItemProps {
   commandOrSummary: Command | RunCommandSummary
   runStatus?: RunStatus
+  commandDetail?: CommandDetail
 }
 
 const WRAPPER_STYLE_BY_STATUS: {
