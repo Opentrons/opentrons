@@ -40,4 +40,8 @@ describe('NextGenApp', () => {
     const [{ getByText }] = render('/more')
     expect(getByText('Mock AppSettings')).toBeTruthy()
   })
+  it('renders a nav bar with a protocols from /more', () => {
+    const [{ getByText }] = render('/more')
+    expect(getByText('Mock AppSettings')).toBeTruthy()
+  })
 })
