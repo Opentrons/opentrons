@@ -42,7 +42,7 @@ class CommandState:
         should_report_result: Whether the engine should report a success or
             failure status once stopped. If unset, the engine will simply
             report "stopped." Once set, this flag cannot be unset.
-        queued_command_ids: The IDs commands with execution pending in FIFO order.
+        queued_command_ids: The IDs of queued commands in FIFO order.
         commands_by_id: All command resources, in insertion order, mapped
             by their unique IDs.
         errors_by_id: All error occurrences, mapped by their unique IDs.
@@ -210,7 +210,7 @@ class CommandView(HasState[CommandState]):
         if not self._state.is_running_queue:
             return None
 
-        if len(self._state.queued_command_ids) >= 1:
+        if len(self._state.queued_command_ids) > 0:
             return self._state.queued_command_ids[0]
 
         return None
