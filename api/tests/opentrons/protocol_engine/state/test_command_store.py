@@ -1,6 +1,6 @@
 """Tests for the command lifecycle state."""
 import pytest
-from collections import OrderedDict
+from collections import OrderedDict, deque
 from datetime import datetime
 from typing import NamedTuple, Type
 
@@ -39,6 +39,7 @@ def test_initial_state() -> None:
         should_report_result=False,
         is_hardware_stopped=False,
         should_stop=False,
+        queued_command_ids=deque(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -165,6 +166,43 @@ def test_command_store_queues_commands(
     subject.handle_action(action)
 
     assert subject.state.commands_by_id == OrderedDict({"command-id": expected_command})
+    assert subject.state.queued_command_ids == deque(["command-id"])
+
+
+def test_command_queue_and_unqueue() -> None:
+    """It should queue on QueueCommandAction and unqueue on UpdateCommandAction."""
+    queue_1 = QueueCommandAction(
+        request=commands.PauseCreate(params=commands.PauseParams()),
+        created_at=datetime(year=2021, month=1, day=1),
+        command_id="command-id-1",
+        command_key="command-key-1",
+    )
+    queue_2 = QueueCommandAction(
+        request=commands.PauseCreate(params=commands.PauseParams()),
+        created_at=datetime(year=2022, month=2, day=2),
+        command_id="command-id-2",
+        command_key="command-key-2",
+    )
+    update_1 = UpdateCommandAction(
+        command=create_running_command(command_id="command-id-1"),
+    )
+    update_2 = UpdateCommandAction(
+        command=create_running_command(command_id="command-id-2"),
+    )
+
+    subject = CommandStore()
+
+    subject.handle_action(queue_1)
+    assert subject.state.queued_command_ids == deque(["command-id-1"])
+
+    subject.handle_action(queue_2)
+    assert subject.state.queued_command_ids == deque(["command-id-1", "command-id-2"])
+
+    subject.handle_action(update_1)
+    assert subject.state.queued_command_ids == deque(["command-id-2"])
+
+    subject.handle_action(update_2)
+    assert subject.state.queued_command_ids == deque()
 
 
 def test_command_store_preserves_handle_order() -> None:
@@ -205,6 +243,7 @@ def test_command_store_handles_pause_action(pause_source: PauseSource) -> None:
         should_report_result=False,
         is_hardware_stopped=False,
         should_stop=False,
+        queued_command_ids=deque(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -222,6 +261,7 @@ def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
         should_report_result=False,
         is_hardware_stopped=False,
         should_stop=False,
+        queued_command_ids=deque(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -239,6 +279,7 @@ def test_command_store_handles_finish_action() -> None:
         should_report_result=True,
         is_hardware_stopped=False,
         should_stop=True,
+        queued_command_ids=deque(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -256,6 +297,7 @@ def test_command_store_handles_stop_action() -> None:
         should_report_result=False,
         is_hardware_stopped=False,
         should_stop=True,
+        queued_command_ids=deque(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -272,6 +314,7 @@ def test_command_store_cannot_restart_after_should_stop() -> None:
         should_report_result=True,
         is_hardware_stopped=False,
         should_stop=True,
+        queued_command_ids=deque(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -293,6 +336,7 @@ def test_command_store_ignores_known_finish_error() -> None:
         should_report_result=True,
         is_hardware_stopped=False,
         should_stop=True,
+        queued_command_ids=deque(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -314,6 +358,7 @@ def test_command_store_saves_unknown_finish_error() -> None:
         should_report_result=True,
         is_hardware_stopped=False,
         should_stop=True,
+        queued_command_ids=deque(),
         commands_by_id=OrderedDict(),
         errors_by_id={
             "error-id": errors.ErrorOccurrence(
@@ -339,6 +384,7 @@ def test_command_store_ignores_stop_after_graceful_finish() -> None:
         should_report_result=True,
         is_hardware_stopped=False,
         should_stop=True,
+        queued_command_ids=deque(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -357,6 +403,7 @@ def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
         should_report_result=False,
         is_hardware_stopped=False,
         should_stop=True,
+        queued_command_ids=deque(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )
@@ -387,6 +434,7 @@ def test_command_store_handles_command_failed() -> None:
         should_report_result=False,
         is_hardware_stopped=False,
         should_stop=False,
+        queued_command_ids=deque(),
         commands_by_id=OrderedDict([("command-id", expected_failed_command)]),
         errors_by_id={
             "error-id": errors.ErrorOccurrence(
@@ -409,6 +457,7 @@ def test_handles_hardware_stopped() -> None:
         should_report_result=False,
         is_hardware_stopped=True,
         should_stop=True,
+        queued_command_ids=deque(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
     )

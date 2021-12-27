@@ -1,8 +1,8 @@
 """Protocol engine commands sub-state."""
 from __future__ import annotations
-from collections import OrderedDict
-from dataclasses import dataclass, replace
-from typing import List, Mapping, Optional, Union
+from collections import OrderedDict, deque
+from dataclasses import dataclass
+from typing import Deque, Dict, List, Mapping, Optional, Union
 
 from ..actions import (
     Action,
@@ -27,7 +27,7 @@ from ..types import EngineStatus
 from .abstract_store import HasState, HandlesActions
 
 
-@dataclass(frozen=True)
+@dataclass
 class CommandState:
     """State of all protocol engine command resources.
 
@@ -42,6 +42,7 @@ class CommandState:
         should_report_result: Whether the engine should report a success or
             failure status once stopped. If unset, the engine will simply
             report "stopped." Once set, this flag cannot be unset.
+        queued_command_ids: The IDs commands with execution pending in FIFO order.
         commands_by_id: All command resources, in insertion order, mapped
             by their unique IDs.
         errors_by_id: All error occurrences, mapped by their unique IDs.
@@ -51,9 +52,9 @@ class CommandState:
     is_hardware_stopped: bool
     should_stop: bool
     should_report_result: bool
-    # TODO(mc, 2021-06-16): OrderedDict is mutable. Switch to Sequence + Mapping
+    queued_command_ids: Deque[str]
     commands_by_id: OrderedDict[str, Command]
-    errors_by_id: Mapping[str, ErrorOccurrence]
+    errors_by_id: Dict[str, ErrorOccurrence]
 
 
 class CommandStore(HasState[CommandState], HandlesActions):
@@ -68,6 +69,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             is_hardware_stopped=False,
             should_stop=False,
             should_report_result=False,
+            queued_command_ids=deque(),
             commands_by_id=OrderedDict(),
             errors_by_id={},
         )
@@ -88,22 +90,23 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 params=action.request.params,  # type: ignore[arg-type]
                 status=CommandStatus.QUEUED,
             )
-            commands_by_id = self._state.commands_by_id.copy()
-            commands_by_id.update({queued_command.id: queued_command})
 
-            self._state = replace(self._state, commands_by_id=commands_by_id)
+            self._state.commands_by_id[queued_command.id] = queued_command
+            self._state.queued_command_ids.append(queued_command.id)
 
         elif isinstance(action, UpdateCommandAction):
             command = action.command
-            commands_by_id = self._state.commands_by_id.copy()
-            commands_by_id.update({command.id: command})
 
-            self._state = replace(self._state, commands_by_id=commands_by_id)
+            self._state.commands_by_id[command.id] = command
+
+            if (
+                len(self._state.queued_command_ids) > 0
+                and self._state.queued_command_ids[0] == command.id
+            ):
+                self._state.queued_command_ids.popleft()
 
         elif isinstance(action, FailCommandAction):
-            commands_by_id = self._state.commands_by_id.copy()
-            errors_by_id = dict(self._state.errors_by_id)
-            prev_command = commands_by_id[action.command_id]
+            prev_command = self._state.commands_by_id[action.command_id]
             command = prev_command.copy(
                 update={
                     "errorId": action.error_id,
@@ -111,73 +114,56 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     "status": CommandStatus.FAILED,
                 }
             )
-            commands_by_id.update({command.id: command})
-            errors_by_id[action.error_id] = ErrorOccurrence.construct(
+            error_occurrence = ErrorOccurrence.construct(
                 id=action.error_id,
                 createdAt=action.failed_at,
                 errorType=type(action.error).__name__,
                 detail=str(action.error),
             )
 
-            self._state = replace(
-                self._state,
-                commands_by_id=commands_by_id,
-                errors_by_id=errors_by_id,
-            )
+            self._state.commands_by_id[command.id] = command
+            self._state.errors_by_id[action.error_id] = error_occurrence
 
         elif isinstance(action, PlayAction):
             if not self._state.should_stop:
-                self._state = replace(self._state, is_running_queue=True)
+                self._state.is_running_queue = True
 
         elif isinstance(action, PauseAction):
-            self._state = replace(self._state, is_running_queue=False)
+            self._state.is_running_queue = False
 
         elif isinstance(action, StopAction):
             if not self._state.should_stop:
-                self._state = replace(
-                    self._state,
-                    is_running_queue=False,
-                    should_report_result=False,
-                    should_stop=True,
-                )
+                self._state.is_running_queue = False
+                self._state.should_report_result = False
+                self._state.should_stop = True
 
         elif isinstance(action, FinishAction):
             if not self._state.should_stop:
+                self._state.is_running_queue = False
+                self._state.should_report_result = True
+                self._state.should_stop = True
+
                 # any `ProtocolEngineError`'s will be captured by `FailCommandAction`,
                 # so only capture unknown errors here
                 if action.error_details and not isinstance(
                     action.error_details.error,
                     ProtocolEngineError,
                 ):
-                    errors_by_id = dict(self._state.errors_by_id)
                     error_id = action.error_details.error_id
                     created_at = action.error_details.created_at
                     error = action.error_details.error
 
-                    errors_by_id[error_id] = ErrorOccurrence.construct(
+                    self._state.errors_by_id[error_id] = ErrorOccurrence.construct(
                         id=error_id,
                         createdAt=created_at,
                         errorType=type(error).__name__,
                         detail=str(error),
                     )
-                else:
-                    errors_by_id = self._state.errors_by_id
-
-                self._state = replace(
-                    self._state,
-                    is_running_queue=False,
-                    should_report_result=True,
-                    should_stop=True,
-                    errors_by_id=errors_by_id,
-                )
 
         elif isinstance(action, HardwareStoppedAction):
-            self._state = replace(
-                self._state,
-                is_running_queue=False,
-                is_hardware_stopped=True,
-                should_stop=True,
-            )
+            self._state.is_running_queue = False
+            self._state.is_hardware_stopped = True
+            self._state.should_stop = True
 
 
 class CommandView(HasState[CommandState]):
@@ -224,11 +210,8 @@ class CommandView(HasState[CommandState]):
         if not self._state.is_running_queue:
             return None
 
-        for command_id, command in self._state.commands_by_id.items():
-            if command.status == CommandStatus.FAILED:
-                raise ProtocolEngineStoppedError("Previous command failed.")
-            elif command.status == CommandStatus.QUEUED:
-                return command_id
+        if len(self._state.queued_command_ids) >= 1:
+            return self._state.queued_command_ids[0]
 
         return None
 

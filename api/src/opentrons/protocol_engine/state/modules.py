@@ -1,5 +1,5 @@
 """Basic modules data state and store."""
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from typing import Dict, List, Optional, NamedTuple
 from numpy import array, dot
 
@@ -43,7 +43,7 @@ THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = [
 ]
 
 
-@dataclass(frozen=True)
+@dataclass
 class ModuleState:
     """Basic module data state and getter methods."""
 
@@ -71,8 +71,8 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
     def _handle_command(self, command: Command) -> None:
         if isinstance(command.result, LoadModuleResult):
             module_id = command.result.moduleId
-            new_modules_by_id = self._state.modules_by_id.copy()
-            new_modules_by_id[module_id] = LoadedModule(
+
+            self._state.modules_by_id[module_id] = LoadedModule(
                 id=module_id,
                 model=command.params.model,
                 location=command.params.location,
@@ -80,14 +80,9 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 definition=command.result.definition,
             )
 
-            new_definition_by_model = self._state.definition_by_model.copy()
-            new_definition_by_model[command.params.model] = command.result.definition
-
-            self._state = replace(
-                self._state,
-                modules_by_id=new_modules_by_id,
-                definition_by_model=new_definition_by_model,
-            )
+            self._state.definition_by_model[
+                command.params.model
+            ] = command.result.definition
 
 
 class ModuleView(HasState[ModuleState]):

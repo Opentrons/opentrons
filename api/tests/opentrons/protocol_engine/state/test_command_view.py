@@ -1,9 +1,9 @@
 """Labware state store tests."""
 import pytest
-from collections import OrderedDict
+from collections import OrderedDict, deque
 from contextlib import nullcontext as does_not_raise
 from datetime import datetime
-from typing import List, Mapping, NamedTuple, Optional, Sequence, Tuple, Type, Union
+from typing import Dict, List, NamedTuple, Optional, Sequence, Tuple, Type, Union
 
 from opentrons.protocol_engine import EngineStatus, commands as cmd, errors
 from opentrons.protocol_engine.state.commands import CommandState, CommandView
@@ -22,8 +22,9 @@ def get_command_view(
     should_report_result: bool = False,
     is_hardware_stopped: bool = False,
     should_stop: bool = False,
+    queued_command_ids: Sequence[str] = (),
     commands_by_id: Sequence[Tuple[str, cmd.Command]] = (),
-    errors_by_id: Optional[Mapping[str, errors.ErrorOccurrence]] = None,
+    errors_by_id: Optional[Dict[str, errors.ErrorOccurrence]] = None,
 ) -> CommandView:
     """Get a command view test subject."""
     state = CommandState(
@@ -31,6 +32,7 @@ def get_command_view(
         should_report_result=should_report_result,
         is_hardware_stopped=is_hardware_stopped,
         should_stop=should_stop,
+        queued_command_ids=deque(queued_command_ids),
         commands_by_id=OrderedDict(commands_by_id),
         errors_by_id=errors_by_id or {},
     )
@@ -73,76 +75,31 @@ def test_get_all() -> None:
 
 
 def test_get_next_queued_returns_first_pending() -> None:
-    """It should return the first command that's pending."""
-    pending_command = create_queued_command()
-    running_command = create_running_command()
-    completed_command = create_succeeded_command()
-
+    """It should return the next queued command ID."""
     subject = get_command_view(
         is_running_queue=True,
-        commands_by_id=[
-            ("command-id-1", running_command),
-            ("command-id-2", completed_command),
-            ("command-id-3", pending_command),
-            ("command-id-4", pending_command),
-        ],
+        queued_command_ids=["command-id-1", "command-id-2"],
     )
 
-    assert subject.get_next_queued() == "command-id-3"
+    assert subject.get_next_queued() == "command-id-1"
 
 
 def test_get_next_queued_returns_none_when_no_pending() -> None:
-    """It should return None if there are no pending commands to return."""
-    running_command = create_running_command(command_id="command-id-1")
-    completed_command = create_succeeded_command(command_id="command-id-2")
-
-    subject = get_command_view(is_running_queue=True)
-
-    assert subject.get_next_queued() is None
-
-    subject = get_command_view(
-        is_running_queue=True,
-        commands_by_id=[
-            ("command-id-1", running_command),
-            ("command-id-2", completed_command),
-        ],
-    )
+    """It should return None if there are no queued commands."""
+    subject = get_command_view(is_running_queue=True, queued_command_ids=[])
 
     assert subject.get_next_queued() is None
 
 
 def test_get_next_queued_returns_none_if_not_running() -> None:
     """It should return None if the engine is not running."""
-    pending_command = create_queued_command()
-
     subject = get_command_view(
         is_running_queue=False,
-        commands_by_id=[("command-id", pending_command)],
+        queued_command_ids=["command-id-1", "command-id-2"],
     )
     result = subject.get_next_queued()
 
     assert result is None
-
-
-def test_get_next_queued_raises_when_earlier_command_failed() -> None:
-    """It should raise if any prior-added command is failed."""
-    running_command = create_running_command(command_id="command-id-1")
-    completed_command = create_succeeded_command(command_id="command-id-2")
-    failed_command = create_failed_command(command_id="command-id-3")
-    pending_command = create_queued_command(command_id="command-id-4")
-
-    subject = get_command_view(
-        is_running_queue=True,
-        commands_by_id=[
-            ("command-id-1", running_command),
-            ("command-id-2", completed_command),
-            ("command-id-3", failed_command),
-            ("command-id-4", pending_command),
-        ],
-    )
-
-    with pytest.raises(errors.ProtocolEngineStoppedError):
-        subject.get_next_queued()
 
 
 def test_get_next_queued_raises_if_stopped() -> None:
