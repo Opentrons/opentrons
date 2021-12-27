@@ -18,12 +18,14 @@ def get_pipette_view(
     pipettes_by_id: Optional[Dict[str, LoadedPipette]] = None,
     aspirated_volume_by_id: Optional[Dict[str, float]] = None,
     current_well: Optional[CurrentWell] = None,
+    attached_tip_labware_by_id: Optional[Dict[str, Optional[str]]] = None,
 ) -> PipetteView:
     """Get a pipette view test subject with the specified state."""
     state = PipetteState(
         pipettes_by_id=pipettes_by_id or {},
         aspirated_volume_by_id=aspirated_volume_by_id or {},
         current_well=current_well,
+        attached_tip_labware_by_id=attached_tip_labware_by_id,
     )
 
     return PipetteView(state=state)
@@ -258,3 +260,31 @@ def test_pipette_not_ready_to_aspirate() -> None:
     )
 
     assert result is False
+
+
+# def test_get_have_attached_tips() -> None:
+#     """It should determine whether any attached pipettes have a tip attached."""
+#     pipette_data = LoadedPipette(
+#         id="pipette-id",
+#         pipetteName=PipetteName.P300_SINGLE,
+#         mount=MountType.LEFT,
+#     )
+#
+#     subject = get_pipette_view(
+#         pipettes_by_id={"pipette-id": pipette_data},
+#     )
+#
+#     assert subject.get_have_attached_tips() is False
+#
+#     subject = get_pipette_view(
+#         pipettes_by_id={"pipette-id": pipette_data},
+#         attached_tip_labware_by_id={"pipette-id": "tiprack-id"}
+#     )
+#
+#     assert subject.get_have_attached_tips() is True
+#
+
+def test_get_attached_tip_labware_id() -> None:
+    """It should return the labware id of the pipette's attached tip, if any."""
+    subject = get_pipette_view(attached_tip_labware_by_id={"pipette-id": "tiprack-id"})
+    assert subject.get_attached_tip_labware_id(pipette_id="pipette-id") == "tiprack-id"

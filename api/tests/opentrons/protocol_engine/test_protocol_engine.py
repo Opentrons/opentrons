@@ -1,10 +1,12 @@
 """Tests for the ProtocolEngine class."""
 import pytest
 from datetime import datetime
-from decoy import Decoy
+from decoy import Decoy, matchers
+from opentrons.protocol_engine.commands import DropTipCreate, DropTipParams
 
-from opentrons.types import DeckSlotName, MountType
+from opentrons.types import DeckSlotName, MountType, Mount
 from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control.types import Axis as HwAxis
 from opentrons.protocols.models import LabwareDefinition
 
 from opentrons.protocol_engine import ProtocolEngine, commands
@@ -14,6 +16,7 @@ from opentrons.protocol_engine.types import (
     LabwareOffsetVector,
     LabwareOffsetLocation,
     PipetteName,
+    LoadedPipette,
 )
 from opentrons.protocol_engine.execution import QueueWorker
 from opentrons.protocol_engine.resources import ModelUtils
@@ -207,6 +210,56 @@ async def test_execute_command(
             command_id="command-id",
         ),
     )
+
+
+# async def test_drop_tip_on_cancel(
+#         decoy: Decoy,
+#         hardware_api: HardwareAPI,
+#         queue_worker: QueueWorker,
+#         state_store: StateStore,
+#         subject: ProtocolEngine,
+# ) -> None:
+#     """It should dispatch a drop tip command if tip attached."""
+#     created_at = datetime(year=2021, month=1, day=1)
+#     completed_at = datetime(year=2023, month=3, day=3)
+#     decoy.when(state_store.pipettes.get_attached_tip_labware_by_id()).then_return(
+#         {"pipette-id": "tiprack-id"}
+#     )
+#     decoy.when(state_store.pipettes.get("pipette-id")).then_return(
+#         LoadedPipette(
+#             id="pipette-id",
+#             pipetteName=PipetteName.P300_SINGLE,
+#             mount=MountType.LEFT,
+#         )
+#     )
+#     decoy.when(state_store.labware.get_tip_length("tiprack-id")).then_return(100)
+#     drop_tip_cmd = DropTipCreate(params=DropTipParams(
+#         pipetteId="pipette-id",
+#         labwareId="fixedTrash",
+#         wellName="A1",
+#     ))
+#
+#     decoy.when(model_utils.generate_id()).then_return("command-id")
+#     decoy.when(model_utils.get_timestamp()).then_return(created_at)
+#
+#     await subject.drop_tip_on_cancel()
+#
+#     decoy.verify(
+#         await hardware_api.home(axes=[HwAxis.X, HwAxis.Y, HwAxis.Z, HwAxis.A]),
+#         await hardware_api.add_tip(mount=Mount.LEFT, tip_length=100),
+#         action_dispatcher.dispatch(
+#             QueueCommandAction(
+#                 command_id="command-id",
+#                 command_key="command-id",
+#                 created_at=created_at,
+#                 request=request,
+#             )
+#         ),
+#     )
+
+
+def test_add_command_and_execute_immediately() -> None:
+    """It should add command to queue and execute unconditionally."""
 
 
 def test_play(

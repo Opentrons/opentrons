@@ -73,3 +73,10 @@ class QueueWorker:
             )
 
             await self._command_executor.execute(command_id=command_id)
+
+    async def execute_immediately(self, command_id: str) -> None:
+        """Execute a command immediately.
+        NOTE: Only if worker task doesn't exist and engine has stopped.
+        """
+        if self._state_store.commands.get_is_stopped():
+            await self._command_executor.execute(command_id=command_id)

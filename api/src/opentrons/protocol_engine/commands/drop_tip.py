@@ -27,6 +27,7 @@ class DropTipImplementation(AbstractCommandImpl[DropTipParams, DropTipResult]):
 
     async def execute(self, params: DropTipParams) -> DropTipResult:
         """Move to and drop a tip using the requested pipette."""
+        print("@@@@@@ executing drop tip @@@@@@@")
         await self._pipetting.drop_tip(
             pipette_id=params.pipetteId,
             labware_id=params.labwareId,

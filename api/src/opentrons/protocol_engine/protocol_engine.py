@@ -1,12 +1,24 @@
 """ProtocolEngine class definition."""
 from typing import Optional
 
-from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control import (
+    API as HardwareAPI,
+    types as hardware_types,
+)
+
 from opentrons.protocols.models import LabwareDefinition
+from opentrons.types import Mount
 
 from .resources import ModelUtils
-from .commands import Command, CommandCreate
-from .types import LabwareOffset, LabwareOffsetCreate
+from .commands import (
+    Command,
+    CommandCreate,
+    DropTipCreate,
+    DropTipParams,
+    HomeCreate,
+    HomeParams,
+)
+from .types import LabwareOffset, LabwareOffsetCreate, MotorAxis
 from .execution import QueueWorker, create_queue_worker
 from .state import StateStore, StateView
 from .plugins import AbstractPlugin, PluginStarter
@@ -110,7 +122,6 @@ class ProtocolEngine:
             created_at=self._model_utils.get_timestamp(),
         )
         self._action_dispatcher.dispatch(action)
-
         return self._state_store.commands.get(command_id)
 
     async def add_and_execute_command(self, request: CommandCreate) -> Command:
@@ -127,12 +138,10 @@ class ProtocolEngine:
             The completed command, whether it succeeded or failed.
         """
         command = self.add_command(request)
-
         await self._state_store.wait_for(
             condition=self._state_store.commands.get_is_complete,
             command_id=command.id,
         )
-
         return self._state_store.commands.get(command.id)
 
     async def stop(self) -> None:
@@ -145,6 +154,43 @@ class ProtocolEngine:
         await self._hardware_api.halt()
         await self._hardware_api.stop(home_after=False)
         self._action_dispatcher.dispatch(HardwareStoppedAction())
+
+    # TODO: Have this command set a `postRunExecution` flag
+    async def home_gantry_axes(self) -> None:
+        """Home gantry axes.
+
+        NOTE: Only use for post-protocol homing.
+        """
+        home_command = HomeCreate(
+            params=HomeParams(axes=[MotorAxis.X, MotorAxis.Y,
+                                    MotorAxis.LEFT_Z, MotorAxis.RIGHT_Z])
+        )
+        await self.add_command_and_execute_immediately(home_command)
+
+    # TODO: Have this command set a `postRunExecution` flag
+    async def drop_tip_on_cancel(self) -> None:
+        """Drop currently attached tip, if any, into trash after a run cancel."""
+        tipracks_for_pipettes = self.state_view.pipettes.get_attached_tip_labware_by_id()
+        if not tipracks_for_pipettes:
+            return
+
+        for pip_id, tiprack_id in tipracks_for_pipettes.items():
+            mount = self.state_view.pipettes.get(pip_id).mount
+            await self._hardware_api.add_tip(
+                mount=mount.to_hw_mount(),
+                tip_length=self.state_view.labware.get_tip_length(tiprack_id)
+            )
+            drop_tip_command = DropTipCreate(
+                params=DropTipParams(pipetteId=pip_id,
+                                     labwareId="fixedTrash",
+                                     wellName="A1")
+                )
+            await self.add_command_and_execute_immediately(drop_tip_command)
+
+    async def add_command_and_execute_immediately(self, command: CommandCreate) -> None:
+        """Add command to queue but execute immediately."""
+        command_res = self.add_command(command)
+        await self._queue_worker.execute_immediately(command_id=command_res.id)
 
     async def wait_until_complete(self) -> None:
         """Wait until there are no more commands to execute.

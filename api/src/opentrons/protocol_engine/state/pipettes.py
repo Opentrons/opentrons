@@ -18,6 +18,8 @@ from ..commands import (
     PickUpTipResult,
     DropTipResult,
     HomeResult,
+    PickUpTip,
+    CommandStatus,
 )
 from ..actions import Action, UpdateCommandAction
 from .abstract_store import HasState, HandlesActions
@@ -47,6 +49,7 @@ class PipetteState:
     pipettes_by_id: Dict[str, LoadedPipette]
     aspirated_volume_by_id: Dict[str, float]
     current_well: Optional[CurrentWell]
+    attached_tip_labware_by_id: Optional[Dict[str, Optional[str]]]
 
 
 class PipetteStore(HasState[PipetteState], HandlesActions):
@@ -60,6 +63,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             pipettes_by_id={},
             aspirated_volume_by_id={},
             current_well=None,
+            attached_tip_labware_by_id={},
         )
 
     def handle_action(self, action: Action) -> None:
@@ -132,6 +136,22 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state = replace(
                 self._state,
                 aspirated_volume_by_id=aspirated_volume_by_id,
+            )
+        elif isinstance(command.result, PickUpTipResult):
+            pipette_id = command.params.pipetteId
+            attached_tip_labware_by_id = self._state.attached_tip_labware_by_id.copy()
+            attached_tip_labware_by_id[pipette_id] = command.params.labwareId
+            self._state = replace(
+                self._state,
+                attached_tip_labware_by_id=attached_tip_labware_by_id
+            )
+        elif isinstance(command.result, DropTipResult):
+            pipette_id = command.params.pipetteId
+            attached_tip_labware_by_id = self._state.attached_tip_labware_by_id.copy()
+            attached_tip_labware_by_id.pop(pipette_id)
+            self._state = replace(
+                self._state,
+                attached_tip_labware_by_id=attached_tip_labware_by_id
             )
 
 
@@ -212,3 +232,27 @@ class PipetteView(HasState[PipetteState]):
             self.get_aspirated_volume(pipette_id) > 0
             or pipette_config["ready_to_aspirate"]
         )
+
+    # def get_have_attached_tips(self) -> bool:
+    #     """Get whether a given pipette has a tip attached."""
+    #     pipettes = []
+    #     for mount in [MountType.LEFT, MountType.RIGHT]:
+    #         pip = self.get_by_mount(mount)
+    #         if pip:
+    #             pipettes.append(pip)
+    #     pipette_ids = [pip.id for pip in pipettes]
+    #     if not self._state.attached_tip_labware_by_id:
+    #         return False
+    #     return any([self._state.attached_tip_labware_by_id.get(pip_id)
+    #                 for pip_id in pipette_ids])
+
+    def get_attached_tip_labware_id(self, pipette_id: str) -> str:
+        """Get the tiprack labware id of the attached tip."""
+        tipracks_by_pip_id = self.get_attached_tip_labware_by_id()
+        if not tipracks_by_pip_id:
+            raise errors.PipetteTipInfoNotFoundError
+        return tipracks_by_pip_id.get(pipette_id)
+
+    def get_attached_tip_labware_by_id(self) -> Optional[Dict[str, Optional[str]]]:
+        """Get the tiprack ids of attached tip by pipette ids."""
+        return self._state.attached_tip_labware_by_id

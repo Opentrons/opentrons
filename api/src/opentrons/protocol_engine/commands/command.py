@@ -89,6 +89,10 @@ class BaseCommand(GenericModel, Generic[CommandParamsT, CommandResultT]):
         None,
         description="Command execution completed timestamp, if completed",
     )
+    postRunExecution: Optional[bool] = Field(
+        False,
+        description="Whether this command was executed after a run was stopped."
+    )
 
 
 class AbstractCommandImpl(

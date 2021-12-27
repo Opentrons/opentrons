@@ -112,14 +112,31 @@ class LegacyCommandMapper:
 
         elif stage == "after":
             running_command = self._commands_by_broker_id[broker_id]
-
+            completed_command: pe_commands.Command
             if command_error is None:
-                completed_command = running_command.copy(
-                    update={
-                        "status": pe_commands.CommandStatus.SUCCEEDED,
-                        "completedAt": now,
-                    }
-                )
+                if isinstance(running_command, pe_commands.PickUpTip):
+                    completed_command = running_command.copy(
+                        update={
+                            "result": pe_commands.PickUpTipResult.construct(),
+                            "status": pe_commands.CommandStatus.SUCCEEDED,
+                            "completedAt": now,
+                        }
+                    )
+                elif isinstance(running_command, pe_commands.DropTip):
+                    completed_command = running_command.copy(
+                        update={
+                            "result": pe_commands.DropTipResult.construct(),
+                            "status": pe_commands.CommandStatus.SUCCEEDED,
+                            "completedAt": now,
+                        }
+                    )
+                else:
+                    completed_command = running_command.copy(
+                        update={
+                            "status": pe_commands.CommandStatus.SUCCEEDED,
+                            "completedAt": now,
+                        }
+                    )
                 results.append(pe_actions.UpdateCommandAction(completed_command))
 
                 if isinstance(completed_command, pe_commands.Pause):
@@ -271,7 +288,8 @@ class LegacyCommandMapper:
         engine_command: pe_commands.Command
 
         if (
-            command["name"] == legacy_command_types.PICK_UP_TIP
+            (command["name"] == legacy_command_types.PICK_UP_TIP or
+             command["name"] == legacy_command_types.DROP_TIP)
             and "instrument" in command["payload"]
             and "location" in command["payload"]
             and isinstance(command["payload"]["location"], LegacyWell)  # type: ignore  # noqa: E501
@@ -285,18 +303,32 @@ class LegacyCommandMapper:
             labware_id = self._labware_id_by_slot[slot]
             pipette_id = self._pipette_id_by_mount[mount]
 
-            engine_command = pe_commands.PickUpTip.construct(
-                id=command_id,
-                key=command_id,
-                status=pe_commands.CommandStatus.RUNNING,
-                createdAt=now,
-                startedAt=now,
-                params=pe_commands.PickUpTipParams.construct(
-                    pipetteId=pipette_id,
-                    labwareId=labware_id,
-                    wellName=well_name,
-                ),
-            )
+            if command["name"] == legacy_command_types.PICK_UP_TIP:
+                engine_command = pe_commands.PickUpTip.construct(
+                    id=command_id,
+                    key=command_id,
+                    status=pe_commands.CommandStatus.RUNNING,
+                    createdAt=now,
+                    startedAt=now,
+                    params=pe_commands.PickUpTipParams.construct(
+                        pipetteId=pipette_id,
+                        labwareId=labware_id,
+                        wellName=well_name,
+                    ),
+                )
+            else:
+                engine_command = pe_commands.DropTip.construct(
+                    id=command_id,
+                    key=command_id,
+                    status=pe_commands.CommandStatus.RUNNING,
+                    createdAt=now,
+                    startedAt=now,
+                    params=pe_commands.DropTipParams.construct(
+                        pipetteId=pipette_id,
+                        labwareId=labware_id,
+                        wellName=well_name,
+                    ),
+                )
 
         elif command["name"] == legacy_command_types.PAUSE:
             engine_command = pe_commands.Pause.construct(
