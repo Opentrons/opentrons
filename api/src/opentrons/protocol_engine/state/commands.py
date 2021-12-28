@@ -105,14 +105,6 @@ class CommandStore(HasState[CommandState], HandlesActions):
             self._state.queued_command_ids.pop(command.id, None)
 
         elif isinstance(action, FailCommandAction):
-            prev_command = self._state.commands_by_id[action.command_id]
-            command = prev_command.copy(
-                update={
-                    "errorId": action.error_id,
-                    "completedAt": action.failed_at,
-                    "status": CommandStatus.FAILED,
-                }
-            )
             error_occurrence = ErrorOccurrence.construct(
                 id=action.error_id,
                 createdAt=action.failed_at,
@@ -120,9 +112,23 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 detail=str(action.error),
             )
 
-            self._state.commands_by_id[command.id] = command
+            command_ids_to_fail = [
+                action.command_id,
+                *[i for i in self._state.queued_command_ids.keys()],
+            ]
+
+            for command_id in command_ids_to_fail:
+                prev_command = self._state.commands_by_id[command_id]
+                self._state.commands_by_id[command_id] = prev_command.copy(
+                    update={
+                        "errorId": action.error_id,
+                        "completedAt": action.failed_at,
+                        "status": CommandStatus.FAILED,
+                    }
+                )
+
             self._state.errors_by_id[action.error_id] = error_occurrence
-            self._state.queued_command_ids.pop(command.id, None)
+            self._state.queued_command_ids.clear()
 
         elif isinstance(action, PlayAction):
             if not self._state.should_stop:
@@ -216,6 +222,9 @@ class CommandView(HasState[CommandState]):
         """Get whether the engine is running and queued commands should be executed."""
         return self._state.is_running_queue
 
+    # TODO(mc, 2021-12-28): the method needs to be re-implemented prior to PAPIv3 prod
+    # - It is O(n) in the worst case, and should be O(1)
+    # - The "True if prior failure" logic is faulty as of #9170
     def get_is_complete(self, command_id: str) -> bool:
         """Get whether a given command is completed.
 
@@ -238,6 +247,9 @@ class CommandView(HasState[CommandState]):
 
         return False
 
+    # TODO(mc, 2021-12-28): the method needs to be re-implemented prior to PAPIv3 prod
+    # - It is O(n) in the worst case, and should be O(1)
+    # - The "True if prior failure" logic is faulty as of #9170
     def get_all_complete(self) -> bool:
         """Get whether all commands have completed.
 
@@ -277,6 +289,9 @@ class CommandView(HasState[CommandState]):
             action_desc = "play" if isinstance(action, PlayAction) else "pause"
             raise ProtocolEngineStoppedError(f"Cannot {action_desc} a stopped engine.")
 
+    # TODO(mc, 2021-12-28): reject adding commands to a stopped engine
+    # TODO(mc, 2021-12-28): this method is O(n) in the worst case, which could
+    # cause drastic performance issues. Refactor state / selector to be O(1)
     def get_status(self) -> EngineStatus:
         """Get the current execution status of the engine."""
         all_commands = self._state.commands_by_id.values()
