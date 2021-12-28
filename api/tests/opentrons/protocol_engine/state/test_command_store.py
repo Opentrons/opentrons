@@ -15,6 +15,7 @@ from opentrons.protocol_engine.state.commands import (
 )
 
 from opentrons.protocol_engine.actions import (
+    Action,
     QueueCommandAction,
     UpdateCommandAction,
     FailCommandAction,
@@ -176,7 +177,7 @@ def test_command_store_queues_commands(
 
 
 def test_command_queue_and_unqueue() -> None:
-    """It should queue on QueueCommandAction and unqueue on UpdateCommandAction."""
+    """It should queue on QueueCommandAction and dequeue on UpdateCommandAction."""
     queue_1 = QueueCommandAction(
         request=commands.PauseCreate(params=commands.PauseParams()),
         created_at=datetime(year=2021, month=1, day=1),
@@ -211,6 +212,44 @@ def test_command_queue_and_unqueue() -> None:
 
     subject.handle_action(update_1)
     assert subject.state.queued_command_ids == OrderedDict([])
+
+
+@pytest.mark.parametrize(
+    "completed_update",
+    [
+        UpdateCommandAction(
+            command=create_succeeded_command(command_id="command-id-1"),
+        ),
+        FailCommandAction(
+            command_id="command-id-1",
+            error_id="error-id",
+            failed_at=datetime(year=2023, month=3, day=3),
+            error=errors.ProtocolEngineError("oh no"),
+        ),
+    ],
+)
+def test_running_command_id(completed_update: Action) -> None:
+    """It should update the running command ID with UpdateCommandAction."""
+    queue = QueueCommandAction(
+        request=commands.PauseCreate(params=commands.PauseParams()),
+        created_at=datetime(year=2021, month=1, day=1),
+        command_id="command-id-1",
+        command_key="command-key-1",
+    )
+    running_update = UpdateCommandAction(
+        command=create_running_command(command_id="command-id-1"),
+    )
+
+    subject = CommandStore()
+
+    subject.handle_action(queue)
+    assert subject.state.running_command_id is None
+
+    subject.handle_action(running_update)
+    assert subject.state.running_command_id == "command-id-1"
+
+    subject.handle_action(completed_update)
+    assert subject.state.running_command_id is None
 
 
 def test_command_failure_clears_queue() -> None:

@@ -125,6 +125,11 @@ class CommandStore(HasState[CommandState], HandlesActions):
             self._state.commands_by_id[command.id] = command
             self._state.queued_command_ids.pop(command.id, None)
 
+            if command.status == CommandStatus.RUNNING:
+                self._state.running_command_id = command.id
+            elif self._state.running_command_id == command.id:
+                self._state.running_command_id = None
+
         elif isinstance(action, FailCommandAction):
             error_occurrence = ErrorOccurrence.construct(
                 id=action.error_id,
@@ -147,6 +152,9 @@ class CommandStore(HasState[CommandState], HandlesActions):
                         "status": CommandStatus.FAILED,
                     }
                 )
+
+            if self._state.running_command_id == command_id:
+                self._state.running_command_id = None
 
             self._state.errors_by_id[action.error_id] = error_occurrence
             self._state.queued_command_ids.clear()
