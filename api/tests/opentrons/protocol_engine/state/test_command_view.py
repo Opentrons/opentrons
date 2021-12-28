@@ -1,6 +1,6 @@
 """Labware state store tests."""
 import pytest
-from collections import OrderedDict, deque
+from collections import OrderedDict
 from contextlib import nullcontext as does_not_raise
 from datetime import datetime
 from typing import Dict, List, NamedTuple, Optional, Sequence, Tuple, Type, Union
@@ -32,7 +32,7 @@ def get_command_view(
         should_report_result=should_report_result,
         is_hardware_stopped=is_hardware_stopped,
         should_stop=should_stop,
-        queued_command_ids=deque(queued_command_ids),
+        queued_command_ids=OrderedDict((i, True) for i in queued_command_ids),
         commands_by_id=OrderedDict(commands_by_id),
         errors_by_id=errors_by_id or {},
     )

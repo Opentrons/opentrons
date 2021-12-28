@@ -1,9 +1,9 @@
 """Protocol engine commands sub-state."""
 from __future__ import annotations
-from collections import OrderedDict, deque
+from collections import OrderedDict
 from dataclasses import dataclass
-from typing import Deque, Dict, List, Mapping, Optional, Union
-
+from typing import Dict, List, Mapping, Optional, Union
+from typing_extensions import Literal
 from ..actions import (
     Action,
     QueueCommandAction,
@@ -43,6 +43,7 @@ class CommandState:
             failure status once stopped. If unset, the engine will simply
             report "stopped." Once set, this flag cannot be unset.
         queued_command_ids: The IDs of queued commands in FIFO order.
+            Implemented as an OrderedDict to behave like an ordered set.
         commands_by_id: All command resources, in insertion order, mapped
             by their unique IDs.
         errors_by_id: All error occurrences, mapped by their unique IDs.
@@ -52,7 +53,7 @@ class CommandState:
     is_hardware_stopped: bool
     should_stop: bool
     should_report_result: bool
-    queued_command_ids: Deque[str]
+    queued_command_ids: OrderedDict[str, Literal[True]]
     commands_by_id: OrderedDict[str, Command]
     errors_by_id: Dict[str, ErrorOccurrence]
 
@@ -69,7 +70,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             is_hardware_stopped=False,
             should_stop=False,
             should_report_result=False,
-            queued_command_ids=deque(),
+            queued_command_ids=OrderedDict(),
             commands_by_id=OrderedDict(),
             errors_by_id={},
         )
@@ -92,18 +93,16 @@ class CommandStore(HasState[CommandState], HandlesActions):
             )
 
             self._state.commands_by_id[queued_command.id] = queued_command
-            self._state.queued_command_ids.append(queued_command.id)
+            self._state.queued_command_ids[queued_command.id] = True
 
+        # TODO(mc, 2021-12-28): replace "UpdateCommandAction" with explicit
+        # state change actions (e.g. RunCommandAction, SucceedCommandAction)
+        # to make a command's queue transition logic easier to follow
         elif isinstance(action, UpdateCommandAction):
             command = action.command
 
             self._state.commands_by_id[command.id] = command
-
-            if (
-                len(self._state.queued_command_ids) > 0
-                and self._state.queued_command_ids[0] == command.id
-            ):
-                self._state.queued_command_ids.popleft()
+            self._state.queued_command_ids.pop(command.id, None)
 
         elif isinstance(action, FailCommandAction):
             prev_command = self._state.commands_by_id[action.command_id]
@@ -123,6 +122,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
 
             self._state.commands_by_id[command.id] = command
             self._state.errors_by_id[action.error_id] = error_occurrence
+            self._state.queued_command_ids.pop(command.id, None)
 
         elif isinstance(action, PlayAction):
             if not self._state.should_stop:
@@ -210,10 +210,7 @@ class CommandView(HasState[CommandState]):
         if not self._state.is_running_queue:
             return None
 
-        if len(self._state.queued_command_ids) > 0:
-            return self._state.queued_command_ids[0]
-
-        return None
+        return next(iter(self._state.queued_command_ids.keys()), None)
 
     def get_is_running(self) -> bool:
         """Get whether the engine is running and queued commands should be executed."""
