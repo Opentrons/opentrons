@@ -74,7 +74,7 @@ def test_get_all() -> None:
     assert subject.get_all() == [command_1, command_2, command_3]
 
 
-def test_get_next_queued_returns_first_pending() -> None:
+def test_get_next_queued_returns_first_queued() -> None:
     """It should return the next queued command ID."""
     subject = get_command_view(
         is_running_queue=True,
