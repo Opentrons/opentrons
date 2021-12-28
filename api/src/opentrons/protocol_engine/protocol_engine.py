@@ -128,7 +128,6 @@ class ProtocolEngine:
         """
         command = self.add_command(request)
 
-        # TODO(mc, 2021-12-28): this logic isn't correct, see TODO in CommandView
         await self._state_store.wait_for(
             condition=self._state_store.commands.get_is_complete,
             command_id=command.id,

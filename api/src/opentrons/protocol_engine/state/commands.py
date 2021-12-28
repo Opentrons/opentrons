@@ -298,7 +298,6 @@ class CommandView(HasState[CommandState]):
             action_desc = "play" if isinstance(action, PlayAction) else "pause"
             raise ProtocolEngineStoppedError(f"Cannot {action_desc} a stopped engine.")
 
-    # TODO(mc, 2021-12-28): reject adding commands to a stopped engine
     def get_status(self) -> EngineStatus:
         """Get the current execution status of the engine."""
         if self._state.should_report_result:
