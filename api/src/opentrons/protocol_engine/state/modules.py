@@ -54,6 +54,8 @@ class ModuleState:
     definition_by_model: Dict[ModuleModel, ModuleDefinition]
 
 
+# TODO(mc, 2021-12-28): ModuleStore is entirely untested. See
+# https://github.com/Opentrons/opentrons/issues/8914
 class ModuleStore(HasState[ModuleState], HandlesActions):
     """Module state container."""
 
