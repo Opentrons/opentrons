@@ -11,6 +11,7 @@ from opentrons.protocol_engine.types import DeckSlotLocation, PipetteName, WellL
 from opentrons.protocol_engine.state.commands import (
     CommandState,
     CommandStore,
+    RunResult,
     QueueStatus,
 )
 
@@ -42,9 +43,8 @@ def test_initial_state() -> None:
 
     assert subject.state == CommandState(
         queue_status=QueueStatus.IMPLICITLY_ACTIVE,
-        should_report_result=False,
         is_hardware_stopped=False,
-        should_stop=False,
+        run_result=None,
         running_command_id=None,
         queued_command_ids=OrderedDict(),
         commands_by_id=OrderedDict(),
@@ -341,9 +341,8 @@ def test_command_store_handles_pause_action(pause_source: PauseSource) -> None:
 
     assert subject.state == CommandState(
         queue_status=QueueStatus.INACTIVE,
-        should_report_result=False,
+        run_result=None,
         is_hardware_stopped=False,
-        should_stop=False,
         running_command_id=None,
         queued_command_ids=OrderedDict(),
         commands_by_id=OrderedDict(),
@@ -360,9 +359,8 @@ def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
 
     assert subject.state == CommandState(
         queue_status=QueueStatus.ACTIVE,
-        should_report_result=False,
+        run_result=None,
         is_hardware_stopped=False,
-        should_stop=False,
         running_command_id=None,
         queued_command_ids=OrderedDict(),
         commands_by_id=OrderedDict(),
@@ -371,7 +369,7 @@ def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
 
 
 def test_command_store_handles_finish_action() -> None:
-    """It should clear the running flag and set the done flag on FinishAction."""
+    """It should change to a succeeded state with FinishAction."""
     subject = CommandStore()
 
     subject.handle_action(PlayAction())
@@ -379,9 +377,8 @@ def test_command_store_handles_finish_action() -> None:
 
     assert subject.state == CommandState(
         queue_status=QueueStatus.INACTIVE,
-        should_report_result=True,
+        run_result=RunResult.SUCCEEDED,
         is_hardware_stopped=False,
-        should_stop=True,
         running_command_id=None,
         queued_command_ids=OrderedDict(),
         commands_by_id=OrderedDict(),
@@ -398,9 +395,8 @@ def test_command_store_handles_stop_action() -> None:
 
     assert subject.state == CommandState(
         queue_status=QueueStatus.INACTIVE,
-        should_report_result=False,
+        run_result=RunResult.STOPPED,
         is_hardware_stopped=False,
-        should_stop=True,
         running_command_id=None,
         queued_command_ids=OrderedDict(),
         commands_by_id=OrderedDict(),
@@ -409,16 +405,15 @@ def test_command_store_handles_stop_action() -> None:
 
 
 def test_command_store_cannot_restart_after_should_stop() -> None:
-    """It should reject a play action after a stop action."""
+    """It should reject a play action after finish."""
     subject = CommandStore()
     subject.handle_action(FinishAction())
     subject.handle_action(PlayAction())
 
     assert subject.state == CommandState(
         queue_status=QueueStatus.INACTIVE,
-        should_report_result=True,
+        run_result=RunResult.SUCCEEDED,
         is_hardware_stopped=False,
-        should_stop=True,
         running_command_id=None,
         queued_command_ids=OrderedDict(),
         commands_by_id=OrderedDict(),
@@ -439,9 +434,8 @@ def test_command_store_ignores_known_finish_error() -> None:
 
     assert subject.state == CommandState(
         queue_status=QueueStatus.INACTIVE,
-        should_report_result=True,
+        run_result=RunResult.FAILED,
         is_hardware_stopped=False,
-        should_stop=True,
         running_command_id=None,
         queued_command_ids=OrderedDict(),
         commands_by_id=OrderedDict(),
@@ -462,9 +456,8 @@ def test_command_store_saves_unknown_finish_error() -> None:
 
     assert subject.state == CommandState(
         queue_status=QueueStatus.INACTIVE,
-        should_report_result=True,
+        run_result=RunResult.FAILED,
         is_hardware_stopped=False,
-        should_stop=True,
         running_command_id=None,
         queued_command_ids=OrderedDict(),
         commands_by_id=OrderedDict(),
@@ -489,9 +482,8 @@ def test_command_store_ignores_stop_after_graceful_finish() -> None:
 
     assert subject.state == CommandState(
         queue_status=QueueStatus.INACTIVE,
-        should_report_result=True,
+        run_result=RunResult.SUCCEEDED,
         is_hardware_stopped=False,
-        should_stop=True,
         running_command_id=None,
         queued_command_ids=OrderedDict(),
         commands_by_id=OrderedDict(),
@@ -509,9 +501,8 @@ def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
 
     assert subject.state == CommandState(
         queue_status=QueueStatus.INACTIVE,
-        should_report_result=False,
+        run_result=RunResult.STOPPED,
         is_hardware_stopped=False,
-        should_stop=True,
         running_command_id=None,
         queued_command_ids=OrderedDict(),
         commands_by_id=OrderedDict(),
@@ -541,9 +532,8 @@ def test_command_store_handles_command_failed() -> None:
 
     assert subject.state == CommandState(
         queue_status=QueueStatus.IMPLICITLY_ACTIVE,
-        should_report_result=False,
+        run_result=None,
         is_hardware_stopped=False,
-        should_stop=False,
         running_command_id=None,
         queued_command_ids=OrderedDict(),
         commands_by_id=OrderedDict([("command-id", expected_failed_command)]),
@@ -565,9 +555,8 @@ def test_handles_hardware_stopped() -> None:
 
     assert subject.state == CommandState(
         queue_status=QueueStatus.INACTIVE,
-        should_report_result=False,
+        run_result=RunResult.STOPPED,
         is_hardware_stopped=True,
-        should_stop=True,
         running_command_id=None,
         queued_command_ids=OrderedDict(),
         commands_by_id=OrderedDict(),

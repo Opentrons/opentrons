@@ -45,6 +45,14 @@ class QueueStatus(str, Enum):
     INACTIVE = "inactive"
 
 
+class RunResult(str, Enum):
+    """Result of the run."""
+
+    SUCCEEDED = "succeeded"
+    FAILED = "failed"
+    STOPPED = "stopped"
+
+
 @dataclass
 class CommandState:
     """State of all protocol engine command resources.
@@ -55,11 +63,8 @@ class CommandState:
             executing, and the robot may still be in motion, even if INACTIVE.
         is_hardware_stopped: Whether the engine's hardware has ceased
             motion. Once set, this flag cannot be unset.
-        should_stop: Whether a graceful finish or an ungraceful stop has
-            been requested. Once set, this flag cannot be unset.
-        should_report_result: Whether the engine should report a success or
-            failure status once stopped. If unset, the engine will simply
-            report "stopped." Once set, this flag cannot be unset.
+        run_result: Whether the run is done and succeeded, failed, or stopped.
+            Once set, this status cannot be unset.
         running_command_id: The ID of the currently running command, if any.
         queued_command_ids: The IDs of queued commands in FIFO order.
             Implemented as an OrderedDict to behave like an ordered set.
@@ -70,8 +75,7 @@ class CommandState:
 
     queue_status: QueueStatus
     is_hardware_stopped: bool
-    should_stop: bool
-    should_report_result: bool
+    run_result: Optional[RunResult]
     running_command_id: Optional[str]
     queued_command_ids: OrderedDict[str, Literal[True]]
     commands_by_id: OrderedDict[str, Command]
@@ -88,8 +92,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
         self._state = CommandState(
             queue_status=QueueStatus.IMPLICITLY_ACTIVE,
             is_hardware_stopped=False,
-            should_stop=False,
-            should_report_result=False,
+            run_result=None,
             running_command_id=None,
             queued_command_ids=OrderedDict(),
             commands_by_id=OrderedDict(),
@@ -160,23 +163,25 @@ class CommandStore(HasState[CommandState], HandlesActions):
             self._state.queued_command_ids.clear()
 
         elif isinstance(action, PlayAction):
-            if not self._state.should_stop:
+            if not self._state.run_result:
                 self._state.queue_status = QueueStatus.ACTIVE
 
         elif isinstance(action, PauseAction):
             self._state.queue_status = QueueStatus.INACTIVE
 
         elif isinstance(action, StopAction):
-            if not self._state.should_stop:
+            if not self._state.run_result:
                 self._state.queue_status = QueueStatus.INACTIVE
-                self._state.should_report_result = False
-                self._state.should_stop = True
+                self._state.run_result = RunResult.STOPPED
 
         elif isinstance(action, FinishAction):
-            if not self._state.should_stop:
+            if not self._state.run_result:
                 self._state.queue_status = QueueStatus.INACTIVE
-                self._state.should_report_result = True
-                self._state.should_stop = True
+                self._state.run_result = (
+                    RunResult.SUCCEEDED
+                    if not action.error_details
+                    else RunResult.FAILED
+                )
 
                 # any `ProtocolEngineError`'s will be captured by `FailCommandAction`,
                 # so only capture unknown errors here
@@ -197,8 +202,8 @@ class CommandStore(HasState[CommandState], HandlesActions):
 
         elif isinstance(action, HardwareStoppedAction):
             self._state.queue_status = QueueStatus.INACTIVE
+            self._state.run_result = self._state.run_result or RunResult.STOPPED
             self._state.is_hardware_stopped = True
-            self._state.should_stop = True
 
 
 class CommandView(HasState[CommandState]):
@@ -239,7 +244,7 @@ class CommandView(HasState[CommandState]):
         Raises:
             EngineStoppedError:
         """
-        if self._state.should_stop:
+        if self._state.run_result:
             raise ProtocolEngineStoppedError("Engine was stopped")
 
         if self._state.queue_status == QueueStatus.INACTIVE:
@@ -287,7 +292,7 @@ class CommandView(HasState[CommandState]):
 
         A command may still be executing while the engine is stopping.
         """
-        return self._state.should_stop
+        return self._state.run_result is not None
 
     def get_is_stopped(self) -> bool:
         """Get whether an engine stop has completed."""
@@ -302,23 +307,23 @@ class CommandView(HasState[CommandState]):
         Raises:
             ProtocolEngineStoppedError: the engine has been stopped.
         """
-        if self._state.should_stop:
+        if self._state.run_result:
             action_desc = "play" if isinstance(action, PlayAction) else "pause"
             raise ProtocolEngineStoppedError(f"Cannot {action_desc} a stopped engine.")
 
     def get_status(self) -> EngineStatus:
         """Get the current execution status of the engine."""
-        if self._state.should_report_result:
+        if self._state.run_result:
             if not self._state.is_hardware_stopped:
-                return EngineStatus.RUNNING
-            elif len(self._state.errors_by_id) > 0:
+                return (
+                    EngineStatus.STOP_REQUESTED
+                    if self._state.run_result == RunResult.STOPPED
+                    else EngineStatus.FINISHING
+                )
+            elif self._state.run_result == RunResult.FAILED:
                 return EngineStatus.FAILED
-            else:
+            elif self._state.run_result == RunResult.SUCCEEDED:
                 return EngineStatus.SUCCEEDED
-
-        elif self._state.should_stop:
-            if not self._state.is_hardware_stopped:
-                return EngineStatus.STOP_REQUESTED
             else:
                 return EngineStatus.STOPPED
 
