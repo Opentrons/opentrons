@@ -1,6 +1,7 @@
 """Protocol engine commands sub-state."""
 from __future__ import annotations
 from collections import OrderedDict
+from enum import Enum
 from dataclasses import dataclass
 from typing import Dict, List, Mapping, Optional, Union
 from typing_extensions import Literal
@@ -27,14 +28,31 @@ from ..types import EngineStatus
 from .abstract_store import HasState, HandlesActions
 
 
+class QueueStatus(str, Enum):
+    """Execution status of the command queue.
+
+    Properties:
+        IMPLICITLY_ACTIVE: The queue has been created, and the engine
+            should pull commands off the queue to execute, but the queue
+            has not yet been told explicitly to run.
+        ACTIVE: The queue is running due to an explicit PlayAction.
+        INACTIVE: New commands should not be pulled off the queue, though
+            the latest command may be running if it was already processed.
+    """
+
+    IMPLICITLY_ACTIVE = "implicitly-active"
+    ACTIVE = "active"
+    INACTIVE = "inactive"
+
+
 @dataclass
 class CommandState:
     """State of all protocol engine command resources.
 
     Attributes:
-        is_running_queue: Whether the engine is currently pulling new
+        queue_status: Whether the engine is currently pulling new
             commands off the queue to execute. A command may still be
-            executing, and the robot may still be in motion, even if False.
+            executing, and the robot may still be in motion, even if INACTIVE.
         is_hardware_stopped: Whether the engine's hardware has ceased
             motion. Once set, this flag cannot be unset.
         should_stop: Whether a graceful finish or an ungraceful stop has
@@ -42,6 +60,7 @@ class CommandState:
         should_report_result: Whether the engine should report a success or
             failure status once stopped. If unset, the engine will simply
             report "stopped." Once set, this flag cannot be unset.
+        running_command_id: The ID of the currently running command, if any.
         queued_command_ids: The IDs of queued commands in FIFO order.
             Implemented as an OrderedDict to behave like an ordered set.
         commands_by_id: All command resources, in insertion order, mapped
@@ -49,10 +68,11 @@ class CommandState:
         errors_by_id: All error occurrences, mapped by their unique IDs.
     """
 
-    is_running_queue: bool
+    queue_status: QueueStatus
     is_hardware_stopped: bool
     should_stop: bool
     should_report_result: bool
+    running_command_id: Optional[str]
     queued_command_ids: OrderedDict[str, Literal[True]]
     commands_by_id: OrderedDict[str, Command]
     errors_by_id: Dict[str, ErrorOccurrence]
@@ -66,10 +86,11 @@ class CommandStore(HasState[CommandState], HandlesActions):
     def __init__(self) -> None:
         """Initialize a CommandStore and its state."""
         self._state = CommandState(
-            is_running_queue=True,
+            queue_status=QueueStatus.IMPLICITLY_ACTIVE,
             is_hardware_stopped=False,
             should_stop=False,
             should_report_result=False,
+            running_command_id=None,
             queued_command_ids=OrderedDict(),
             commands_by_id=OrderedDict(),
             errors_by_id={},
@@ -132,20 +153,20 @@ class CommandStore(HasState[CommandState], HandlesActions):
 
         elif isinstance(action, PlayAction):
             if not self._state.should_stop:
-                self._state.is_running_queue = True
+                self._state.queue_status = QueueStatus.ACTIVE
 
         elif isinstance(action, PauseAction):
-            self._state.is_running_queue = False
+            self._state.queue_status = QueueStatus.INACTIVE
 
         elif isinstance(action, StopAction):
             if not self._state.should_stop:
-                self._state.is_running_queue = False
+                self._state.queue_status = QueueStatus.INACTIVE
                 self._state.should_report_result = False
                 self._state.should_stop = True
 
         elif isinstance(action, FinishAction):
             if not self._state.should_stop:
-                self._state.is_running_queue = False
+                self._state.queue_status = QueueStatus.INACTIVE
                 self._state.should_report_result = True
                 self._state.should_stop = True
 
@@ -167,7 +188,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     )
 
         elif isinstance(action, HardwareStoppedAction):
-            self._state.is_running_queue = False
+            self._state.queue_status = QueueStatus.INACTIVE
             self._state.is_hardware_stopped = True
             self._state.should_stop = True
 
@@ -213,18 +234,19 @@ class CommandView(HasState[CommandState]):
         if self._state.should_stop:
             raise ProtocolEngineStoppedError("Engine was stopped")
 
-        if not self._state.is_running_queue:
+        if self._state.queue_status == QueueStatus.INACTIVE:
             return None
 
         return next(iter(self._state.queued_command_ids.keys()), None)
 
     def get_is_running(self) -> bool:
         """Get whether the engine is running and queued commands should be executed."""
-        return self._state.is_running_queue
+        queue_status = self._state.queue_status
+        return (
+            queue_status == QueueStatus.IMPLICITLY_ACTIVE
+            or queue_status == QueueStatus.ACTIVE
+        )
 
-    # TODO(mc, 2021-12-28): the method needs to be re-implemented prior to PAPIv3 prod
-    # - It is O(n) in the worst case, and should be O(1)
-    # - The "True if prior failure" logic is faulty as of #9170
     def get_is_complete(self, command_id: str) -> bool:
         """Get whether a given command is completed.
 
@@ -232,38 +254,25 @@ class CommandView(HasState[CommandState]):
 
         - Its status is CommandStatus.SUCCEEDED
         - Its status is CommandStatus.FAILED
-        - A command earlier in the queue has a status of CommandStatus.FAILED
-             - In this case, the command in question will never run
 
         Arguments:
             command_id: Command to check.
         """
-        for search_id, search_command in self._state.commands_by_id.items():
-            search_status = search_command.status
-            is_failed = search_status == CommandStatus.FAILED
+        status = self.get(command_id).status
 
-            if search_id == command_id or is_failed:
-                return search_status == CommandStatus.SUCCEEDED or is_failed
-
-        return False
+        return status == CommandStatus.SUCCEEDED or status == CommandStatus.FAILED
 
     # TODO(mc, 2021-12-28): the method needs to be re-implemented prior to PAPIv3 prod
-    # - It is O(n) in the worst case, and should be O(1)
-    # - The "True if prior failure" logic is faulty as of #9170
+    # Implementation should take care to remain O(1)
     def get_all_complete(self) -> bool:
         """Get whether all commands have completed.
 
         All commands have "completed" if one of the following is true:
 
-        - All commands have a status of CommandStatus.SUCCEEDED
-        - Any command has a status of CommandStatus.FAILED
+        - The hardware has been stopped
+        - There are no queued nor running commands
         """
-        for command in self._state.commands_by_id.values():
-            if command.status == CommandStatus.FAILED:
-                return True
-            elif command.status != CommandStatus.SUCCEEDED:
-                return False
-        return True
+        raise NotImplementedError("CommandView.get_all_complete not yet implemented")
 
     def get_stop_requested(self) -> bool:
         """Get whether an engine stop has been requested.
@@ -290,18 +299,12 @@ class CommandView(HasState[CommandState]):
             raise ProtocolEngineStoppedError(f"Cannot {action_desc} a stopped engine.")
 
     # TODO(mc, 2021-12-28): reject adding commands to a stopped engine
-    # TODO(mc, 2021-12-28): this method is O(n) in the worst case, which could
-    # cause drastic performance issues. Refactor state / selector to be O(1)
     def get_status(self) -> EngineStatus:
         """Get the current execution status of the engine."""
-        all_commands = self._state.commands_by_id.values()
-        all_errors = self._state.errors_by_id.values()
-        all_statuses = [c.status for c in all_commands]
-
         if self._state.should_report_result:
             if not self._state.is_hardware_stopped:
                 return EngineStatus.RUNNING
-            elif any(all_errors):
+            elif len(self._state.errors_by_id) > 0:
                 return EngineStatus.FAILED
             else:
                 return EngineStatus.SUCCEEDED
@@ -312,15 +315,18 @@ class CommandView(HasState[CommandState]):
             else:
                 return EngineStatus.STOPPED
 
-        elif self._state.is_running_queue:
-            any_running = any(s == CommandStatus.RUNNING for s in all_statuses)
-            any_queued = any(s == CommandStatus.QUEUED for s in all_statuses)
+        elif self._state.queue_status == QueueStatus.ACTIVE:
+            return EngineStatus.RUNNING
+
+        elif self._state.queue_status == QueueStatus.INACTIVE:
+            return EngineStatus.PAUSED
+
+        else:
+            any_running = self._state.running_command_id is not None
+            any_queued = len(self._state.queued_command_ids) > 0
 
             if any_running or any_queued:
                 return EngineStatus.RUNNING
 
             else:
                 return EngineStatus.IDLE
-
-        else:
-            return EngineStatus.PAUSED

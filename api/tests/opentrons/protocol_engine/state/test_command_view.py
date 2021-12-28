@@ -6,8 +6,13 @@ from datetime import datetime
 from typing import Dict, List, NamedTuple, Optional, Sequence, Tuple, Type, Union
 
 from opentrons.protocol_engine import EngineStatus, commands as cmd, errors
-from opentrons.protocol_engine.state.commands import CommandState, CommandView
 from opentrons.protocol_engine.actions import PlayAction, PauseAction, PauseSource
+
+from opentrons.protocol_engine.state.commands import (
+    CommandState,
+    CommandView,
+    QueueStatus,
+)
 
 from .command_fixtures import (
     create_queued_command,
@@ -18,20 +23,22 @@ from .command_fixtures import (
 
 
 def get_command_view(
-    is_running_queue: bool = False,
+    queue_status: QueueStatus = QueueStatus.IMPLICITLY_ACTIVE,
     should_report_result: bool = False,
     is_hardware_stopped: bool = False,
     should_stop: bool = False,
+    running_command_id: Optional[str] = None,
     queued_command_ids: Sequence[str] = (),
     commands_by_id: Sequence[Tuple[str, cmd.Command]] = (),
     errors_by_id: Optional[Dict[str, errors.ErrorOccurrence]] = None,
 ) -> CommandView:
     """Get a command view test subject."""
     state = CommandState(
-        is_running_queue=is_running_queue,
+        queue_status=queue_status,
         should_report_result=should_report_result,
         is_hardware_stopped=is_hardware_stopped,
         should_stop=should_stop,
+        running_command_id=running_command_id,
         queued_command_ids=OrderedDict((i, True) for i in queued_command_ids),
         commands_by_id=OrderedDict(commands_by_id),
         errors_by_id=errors_by_id or {},
@@ -74,10 +81,13 @@ def test_get_all() -> None:
     assert subject.get_all() == [command_1, command_2, command_3]
 
 
-def test_get_next_queued_returns_first_queued() -> None:
+@pytest.mark.parametrize(
+    "queue_status", [QueueStatus.IMPLICITLY_ACTIVE, QueueStatus.ACTIVE]
+)
+def test_get_next_queued_returns_first_queued(queue_status: QueueStatus) -> None:
     """It should return the next queued command ID."""
     subject = get_command_view(
-        is_running_queue=True,
+        queue_status=queue_status,
         queued_command_ids=["command-id-1", "command-id-2"],
     )
 
@@ -86,7 +96,10 @@ def test_get_next_queued_returns_first_queued() -> None:
 
 def test_get_next_queued_returns_none_when_no_pending() -> None:
     """It should return None if there are no queued commands."""
-    subject = get_command_view(is_running_queue=True, queued_command_ids=[])
+    subject = get_command_view(
+        queue_status=QueueStatus.ACTIVE,
+        queued_command_ids=[],
+    )
 
     assert subject.get_next_queued() is None
 
@@ -94,7 +107,7 @@ def test_get_next_queued_returns_none_when_no_pending() -> None:
 def test_get_next_queued_returns_none_if_not_running() -> None:
     """It should return None if the engine is not running."""
     subject = get_command_view(
-        is_running_queue=False,
+        queue_status=QueueStatus.INACTIVE,
         queued_command_ids=["command-id-1", "command-id-2"],
     )
     result = subject.get_next_queued()
@@ -112,81 +125,60 @@ def test_get_next_queued_raises_if_stopped() -> None:
 
 def test_get_is_running_queue() -> None:
     """It should be able to get if the engine is running."""
-    subject = get_command_view(is_running_queue=False)
+    subject = get_command_view(queue_status=QueueStatus.INACTIVE)
     assert subject.get_is_running() is False
 
-    subject = get_command_view(is_running_queue=True)
+    subject = get_command_view(queue_status=QueueStatus.ACTIVE)
+    assert subject.get_is_running() is True
+
+    subject = get_command_view(queue_status=QueueStatus.IMPLICITLY_ACTIVE)
     assert subject.get_is_running() is True
 
 
 def test_get_is_complete() -> None:
     """It should be able to tell if a command is complete."""
     completed_command = create_succeeded_command(command_id="command-id-1")
-    running_command = create_running_command(command_id="command-id-2")
-    pending_command = create_queued_command(command_id="command-id-3")
+    failed_command = create_failed_command(command_id="command-id-2")
+    running_command = create_running_command(command_id="command-id-3")
+    pending_command = create_queued_command(command_id="command-id-4")
 
     subject = get_command_view(
         commands_by_id=[
             ("command-id-1", completed_command),
-            ("command-id-2", running_command),
-            ("command-id-3", pending_command),
-        ]
-    )
-
-    assert subject.get_is_complete("command-id-1") is True
-    assert subject.get_is_complete("command-id-2") is False
-    assert subject.get_is_complete("command-id-3") is False
-
-
-def test_get_is_complete_with_failed_command() -> None:
-    """It should return true if a given command will never be executed."""
-    failed_command = create_failed_command(command_id="command-id-1")
-    pending_command = create_queued_command(command_id="command-id-2")
-
-    subject = get_command_view(
-        commands_by_id=[
-            ("command-id-1", failed_command),
-            ("command-id-2", pending_command),
+            ("command-id-2", failed_command),
+            ("command-id-3", running_command),
+            ("command-id-4", pending_command),
         ]
     )
 
     assert subject.get_is_complete("command-id-1") is True
     assert subject.get_is_complete("command-id-2") is True
+    assert subject.get_is_complete("command-id-3") is False
+    assert subject.get_is_complete("command-id-4") is False
 
 
+@pytest.mark.xfail(strict=True, raises=NotImplementedError)
 def test_get_all_complete() -> None:
     """It should return true if all commands completed or any failed."""
-    completed_command = create_succeeded_command(command_id="command-id-1")
     running_command = create_running_command(command_id="command-id-2")
-    pending_command = create_queued_command(command_id="command-id-3")
-    failed_command = create_failed_command(command_id="command-id-4")
 
-    subject = get_command_view(
-        commands_by_id=[
-            ("command-id-4", failed_command),
-            ("command-id-3", pending_command),
-        ],
-    )
-
+    subject = get_command_view(queued_command_ids=[])
     assert subject.get_all_complete() is True
 
-    subject = get_command_view(
-        commands_by_id=[
-            ("command-id-1", completed_command),
-            ("command-id-2", running_command),
-            ("command-id-3", pending_command),
-        ],
-    )
-
+    subject = get_command_view(queued_command_ids=["command-id-1"])
     assert subject.get_all_complete() is False
 
     subject = get_command_view(
-        commands_by_id=[
-            ("command-id-1", completed_command),
-            ("command-id-2", completed_command),
-        ],
+        queued_command_ids=[],
+        commands_by_id=[("command-id-1", running_command)],
     )
+    assert subject.get_all_complete() is False
 
+    subject = get_command_view(
+        queued_command_ids=[],
+        is_hardware_stopped=True,
+        commands_by_id=[("command-id-1", running_command)],
+    )
     assert subject.get_all_complete() is True
 
 
@@ -218,32 +210,22 @@ class ActionAllowedSpec(NamedTuple):
 
 action_allowed_specs: List[ActionAllowedSpec] = [
     ActionAllowedSpec(
-        subject=get_command_view(should_stop=False, is_running_queue=False),
+        subject=get_command_view(should_stop=False),
         action=PlayAction(),
         expected_error=None,
     ),
     ActionAllowedSpec(
-        subject=get_command_view(should_stop=False, is_running_queue=True),
-        action=PlayAction(),
-        expected_error=None,
-    ),
-    ActionAllowedSpec(
-        subject=get_command_view(should_stop=True, is_running_queue=False),
+        subject=get_command_view(should_stop=True),
         action=PlayAction(),
         expected_error=errors.ProtocolEngineStoppedError,
     ),
     ActionAllowedSpec(
-        subject=get_command_view(should_stop=False, is_running_queue=False),
+        subject=get_command_view(should_stop=False),
         action=PauseAction(source=PauseSource.CLIENT),
         expected_error=None,
     ),
     ActionAllowedSpec(
-        subject=get_command_view(should_stop=False, is_running_queue=True),
-        action=PauseAction(source=PauseSource.CLIENT),
-        expected_error=None,
-    ),
-    ActionAllowedSpec(
-        subject=get_command_view(should_stop=True, is_running_queue=False),
+        subject=get_command_view(should_stop=True),
         action=PauseAction(source=PauseSource.CLIENT),
         expected_error=errors.ProtocolEngineStoppedError,
     ),
@@ -297,34 +279,47 @@ class GetStatusSpec(NamedTuple):
 get_status_specs: List[GetStatusSpec] = [
     GetStatusSpec(
         subject=get_command_view(
-            is_running_queue=True,
+            queue_status=QueueStatus.IMPLICITLY_ACTIVE,
             should_report_result=False,
             should_stop=False,
-            commands_by_id=[],
+            running_command_id=None,
+            queued_command_ids=[],
         ),
         expected_status=EngineStatus.IDLE,
     ),
     GetStatusSpec(
         subject=get_command_view(
-            is_running_queue=True,
+            queue_status=QueueStatus.ACTIVE,
             should_report_result=False,
             should_stop=False,
-            commands_by_id=[("command-id", create_queued_command())],
+            running_command_id=None,
+            queued_command_ids=[],
         ),
         expected_status=EngineStatus.RUNNING,
     ),
     GetStatusSpec(
         subject=get_command_view(
-            is_running_queue=True,
+            queue_status=QueueStatus.IMPLICITLY_ACTIVE,
             should_report_result=False,
             should_stop=False,
-            commands_by_id=[("command-id", create_running_command())],
+            running_command_id="command-id",
+            queued_command_ids=[],
         ),
         expected_status=EngineStatus.RUNNING,
     ),
     GetStatusSpec(
         subject=get_command_view(
-            is_running_queue=False,
+            queue_status=QueueStatus.IMPLICITLY_ACTIVE,
+            should_report_result=False,
+            should_stop=False,
+            running_command_id=None,
+            queued_command_ids=["command-id"],
+        ),
+        expected_status=EngineStatus.RUNNING,
+    ),
+    GetStatusSpec(
+        subject=get_command_view(
+            queue_status=QueueStatus.INACTIVE,
             should_report_result=True,
             is_hardware_stopped=False,
             should_stop=True,
@@ -334,54 +329,35 @@ get_status_specs: List[GetStatusSpec] = [
     ),
     GetStatusSpec(
         subject=get_command_view(
-            is_running_queue=False,
+            queue_status=QueueStatus.INACTIVE,
             should_report_result=False,
             should_stop=False,
-            commands_by_id=[("command-id", create_running_command())],
+            running_command_id="command-id",
         ),
         expected_status=EngineStatus.PAUSED,
     ),
     GetStatusSpec(
         subject=get_command_view(
-            is_running_queue=False,
+            queue_status=QueueStatus.INACTIVE,
             should_stop=False,
-            commands_by_id=[
-                ("command-id-1", create_succeeded_command()),
-                ("command-id-2", create_queued_command()),
-            ],
+            running_command_id=None,
+            queued_command_ids=["command-id"],
         ),
         expected_status=EngineStatus.PAUSED,
     ),
     GetStatusSpec(
         subject=get_command_view(
-            is_running_queue=False,
+            queue_status=QueueStatus.INACTIVE,
             should_report_result=False,
             should_stop=False,
-            commands_by_id=[],
+            running_command_id=None,
+            queued_command_ids=[],
         ),
         expected_status=EngineStatus.PAUSED,
     ),
     GetStatusSpec(
         subject=get_command_view(
-            is_running_queue=True,
-            should_report_result=False,
-            should_stop=False,
-            commands_by_id=[("command-id", create_failed_command())],
-        ),
-        expected_status=EngineStatus.IDLE,
-    ),
-    GetStatusSpec(
-        subject=get_command_view(
-            is_running_queue=False,
-            should_report_result=False,
-            should_stop=False,
-            commands_by_id=[("command-id", create_failed_command())],
-        ),
-        expected_status=EngineStatus.PAUSED,
-    ),
-    GetStatusSpec(
-        subject=get_command_view(
-            is_running_queue=False,
+            queue_status=QueueStatus.INACTIVE,
             should_report_result=True,
             is_hardware_stopped=True,
             should_stop=True,
@@ -398,7 +374,7 @@ get_status_specs: List[GetStatusSpec] = [
     ),
     GetStatusSpec(
         subject=get_command_view(
-            is_running_queue=False,
+            queue_status=QueueStatus.INACTIVE,
             should_report_result=True,
             is_hardware_stopped=True,
             should_stop=True,
@@ -408,17 +384,7 @@ get_status_specs: List[GetStatusSpec] = [
     ),
     GetStatusSpec(
         subject=get_command_view(
-            is_running_queue=False,
-            should_report_result=True,
-            is_hardware_stopped=True,
-            should_stop=True,
-            commands_by_id=[("command-id", create_succeeded_command())],
-        ),
-        expected_status=EngineStatus.SUCCEEDED,
-    ),
-    GetStatusSpec(
-        subject=get_command_view(
-            is_running_queue=False,
+            queue_status=QueueStatus.INACTIVE,
             should_report_result=False,
             is_hardware_stopped=False,
             should_stop=True,
@@ -428,7 +394,7 @@ get_status_specs: List[GetStatusSpec] = [
     ),
     GetStatusSpec(
         subject=get_command_view(
-            is_running_queue=False,
+            queue_status=QueueStatus.INACTIVE,
             should_report_result=False,
             is_hardware_stopped=True,
             should_stop=True,
@@ -441,15 +407,5 @@ get_status_specs: List[GetStatusSpec] = [
 
 @pytest.mark.parametrize(GetStatusSpec._fields, get_status_specs)
 def test_get_status(subject: CommandView, expected_status: EngineStatus) -> None:
-    """It should set a status according to the command queue and running flag.
-
-    1. Worker running, no stop requested, no commands queued: IDLE
-    2. Worker running, no stop requested, commands queued: RUNNING
-    3. Worker not running, no stop requested, command running: PAUSE_REQUESTED
-    4. Worker not running, no stop requested, no running commands: PAUSED
-    5. Stop requested, command still running: STOP_REQUESTED
-    6. Stop requested, no running commands, with queued commands: STOPPED
-    7. Stop requested, all commands succeeded: SUCCEEDED
-    8. Stop requested, any errors: FAILED
-    """
+    """It should set a status according to the command queue and running flag."""
     assert subject.get_status() == expected_status

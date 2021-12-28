@@ -7,7 +7,12 @@ from typing import NamedTuple, Type
 from opentrons.types import MountType, DeckSlotName
 from opentrons.protocol_engine import commands, errors
 from opentrons.protocol_engine.types import DeckSlotLocation, PipetteName, WellLocation
-from opentrons.protocol_engine.state.commands import CommandState, CommandStore
+
+from opentrons.protocol_engine.state.commands import (
+    CommandState,
+    CommandStore,
+    QueueStatus,
+)
 
 from opentrons.protocol_engine.actions import (
     QueueCommandAction,
@@ -35,10 +40,11 @@ def test_initial_state() -> None:
     subject = CommandStore()
 
     assert subject.state == CommandState(
-        is_running_queue=True,
+        queue_status=QueueStatus.IMPLICITLY_ACTIVE,
         should_report_result=False,
         is_hardware_stopped=False,
         should_stop=False,
+        running_command_id=None,
         queued_command_ids=OrderedDict(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
@@ -295,10 +301,11 @@ def test_command_store_handles_pause_action(pause_source: PauseSource) -> None:
     subject.handle_action(PauseAction(source=pause_source))
 
     assert subject.state == CommandState(
-        is_running_queue=False,
+        queue_status=QueueStatus.INACTIVE,
         should_report_result=False,
         is_hardware_stopped=False,
         should_stop=False,
+        running_command_id=None,
         queued_command_ids=OrderedDict(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
@@ -313,10 +320,11 @@ def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
     subject.handle_action(PlayAction())
 
     assert subject.state == CommandState(
-        is_running_queue=True,
+        queue_status=QueueStatus.ACTIVE,
         should_report_result=False,
         is_hardware_stopped=False,
         should_stop=False,
+        running_command_id=None,
         queued_command_ids=OrderedDict(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
@@ -331,10 +339,11 @@ def test_command_store_handles_finish_action() -> None:
     subject.handle_action(FinishAction())
 
     assert subject.state == CommandState(
-        is_running_queue=False,
+        queue_status=QueueStatus.INACTIVE,
         should_report_result=True,
         is_hardware_stopped=False,
         should_stop=True,
+        running_command_id=None,
         queued_command_ids=OrderedDict(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
@@ -349,10 +358,11 @@ def test_command_store_handles_stop_action() -> None:
     subject.handle_action(StopAction())
 
     assert subject.state == CommandState(
-        is_running_queue=False,
+        queue_status=QueueStatus.INACTIVE,
         should_report_result=False,
         is_hardware_stopped=False,
         should_stop=True,
+        running_command_id=None,
         queued_command_ids=OrderedDict(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
@@ -366,10 +376,11 @@ def test_command_store_cannot_restart_after_should_stop() -> None:
     subject.handle_action(PlayAction())
 
     assert subject.state == CommandState(
-        is_running_queue=False,
+        queue_status=QueueStatus.INACTIVE,
         should_report_result=True,
         is_hardware_stopped=False,
         should_stop=True,
+        running_command_id=None,
         queued_command_ids=OrderedDict(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
@@ -388,10 +399,11 @@ def test_command_store_ignores_known_finish_error() -> None:
     subject.handle_action(FinishAction(error_details=error_details))
 
     assert subject.state == CommandState(
-        is_running_queue=False,
+        queue_status=QueueStatus.INACTIVE,
         should_report_result=True,
         is_hardware_stopped=False,
         should_stop=True,
+        running_command_id=None,
         queued_command_ids=OrderedDict(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
@@ -410,10 +422,11 @@ def test_command_store_saves_unknown_finish_error() -> None:
     subject.handle_action(FinishAction(error_details=error_details))
 
     assert subject.state == CommandState(
-        is_running_queue=False,
+        queue_status=QueueStatus.INACTIVE,
         should_report_result=True,
         is_hardware_stopped=False,
         should_stop=True,
+        running_command_id=None,
         queued_command_ids=OrderedDict(),
         commands_by_id=OrderedDict(),
         errors_by_id={
@@ -436,10 +449,11 @@ def test_command_store_ignores_stop_after_graceful_finish() -> None:
     subject.handle_action(StopAction())
 
     assert subject.state == CommandState(
-        is_running_queue=False,
+        queue_status=QueueStatus.INACTIVE,
         should_report_result=True,
         is_hardware_stopped=False,
         should_stop=True,
+        running_command_id=None,
         queued_command_ids=OrderedDict(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
@@ -455,10 +469,11 @@ def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
     subject.handle_action(FinishAction())
 
     assert subject.state == CommandState(
-        is_running_queue=False,
+        queue_status=QueueStatus.INACTIVE,
         should_report_result=False,
         is_hardware_stopped=False,
         should_stop=True,
+        running_command_id=None,
         queued_command_ids=OrderedDict(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
@@ -486,10 +501,11 @@ def test_command_store_handles_command_failed() -> None:
     )
 
     assert subject.state == CommandState(
-        is_running_queue=True,
+        queue_status=QueueStatus.IMPLICITLY_ACTIVE,
         should_report_result=False,
         is_hardware_stopped=False,
         should_stop=False,
+        running_command_id=None,
         queued_command_ids=OrderedDict(),
         commands_by_id=OrderedDict([("command-id", expected_failed_command)]),
         errors_by_id={
@@ -509,10 +525,11 @@ def test_handles_hardware_stopped() -> None:
     subject.handle_action(HardwareStoppedAction())
 
     assert subject.state == CommandState(
-        is_running_queue=False,
+        queue_status=QueueStatus.INACTIVE,
         should_report_result=False,
         is_hardware_stopped=True,
         should_stop=True,
+        running_command_id=None,
         queued_command_ids=OrderedDict(),
         commands_by_id=OrderedDict(),
         errors_by_id={},

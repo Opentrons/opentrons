@@ -147,9 +147,7 @@ class ProtocolEngine:
         await self._hardware_api.stop(home_after=False)
         self._action_dispatcher.dispatch(HardwareStoppedAction())
 
-    # TODO(mc, 2021-12-27): if called, this causes state updates to become
-    # O(n^2) on command list length. This method is only "used" by JSON v6
-    # execution so will need refactoring to bring that into prod
+    # TODO(mc, 2021-12-27): commands.get_all_complete not yet implemented
     async def wait_until_complete(self) -> None:
         """Wait until there are no more commands to execute.
 
