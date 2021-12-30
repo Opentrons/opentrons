@@ -253,7 +253,7 @@ def test_running_command_id(completed_update: Action) -> None:
 
 
 def test_command_failure_clears_queue() -> None:
-    """It should queue on QueueCommandAction and unqueue on UpdateCommandAction."""
+    """It should clear the command queue on command failure."""
     queue_1 = QueueCommandAction(
         request=commands.PauseCreate(params=commands.PauseParams()),
         created_at=datetime(year=2021, month=1, day=1),

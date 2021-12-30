@@ -156,7 +156,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     }
                 )
 
-            if self._state.running_command_id == command_id:
+            if self._state.running_command_id == action.command_id:
                 self._state.running_command_id = None
 
             self._state.errors_by_id[action.error_id] = error_occurrence
