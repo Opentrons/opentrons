@@ -262,28 +262,6 @@ def test_pipette_not_ready_to_aspirate() -> None:
     assert result is False
 
 
-# def test_get_have_attached_tips() -> None:
-#     """It should determine whether any attached pipettes have a tip attached."""
-#     pipette_data = LoadedPipette(
-#         id="pipette-id",
-#         pipetteName=PipetteName.P300_SINGLE,
-#         mount=MountType.LEFT,
-#     )
-#
-#     subject = get_pipette_view(
-#         pipettes_by_id={"pipette-id": pipette_data},
-#     )
-#
-#     assert subject.get_have_attached_tips() is False
-#
-#     subject = get_pipette_view(
-#         pipettes_by_id={"pipette-id": pipette_data},
-#         attached_tip_labware_by_id={"pipette-id": "tiprack-id"}
-#     )
-#
-#     assert subject.get_have_attached_tips() is True
-#
-
 def test_get_attached_tip_labware_id() -> None:
     """It should return the labware id of the pipette's attached tip, if any."""
     subject = get_pipette_view(attached_tip_labware_by_id={"pipette-id": "tiprack-id"})

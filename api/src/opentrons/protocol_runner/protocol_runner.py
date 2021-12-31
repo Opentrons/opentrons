@@ -135,8 +135,6 @@ class ProtocolRunner:
         """Stop (cancel) the run."""
         self._task_queue.stop()
         await self._protocol_engine.stop()
-        await self._protocol_engine.home_gantry_axes()
-        await self._protocol_engine.drop_tip_on_cancel()
 
     async def join(self) -> None:
         """Wait for the run to complete, propagating any errors.

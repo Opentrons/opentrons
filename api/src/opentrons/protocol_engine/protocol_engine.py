@@ -1,25 +1,17 @@
 """ProtocolEngine class definition."""
 from typing import Optional
 
-from opentrons.hardware_control import (
-    API as HardwareAPI,
-    types as hardware_types,
-)
+from opentrons.hardware_control import API as HardwareAPI
 
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.types import Mount
 
 from .resources import ModelUtils
 from .commands import (
     Command,
     CommandCreate,
-    DropTipCreate,
-    DropTipParams,
-    HomeCreate,
-    HomeParams,
 )
-from .types import LabwareOffset, LabwareOffsetCreate, MotorAxis
-from .execution import QueueWorker, create_queue_worker
+from .types import LabwareOffset, LabwareOffsetCreate
+from .execution import QueueWorker, create_queue_worker, HardwareStopper
 from .state import StateStore, StateView
 from .plugins import AbstractPlugin, PluginStarter
 from .actions import (
@@ -53,13 +45,13 @@ class ProtocolEngine:
         plugin_starter: Optional[PluginStarter] = None,
         queue_worker: Optional[QueueWorker] = None,
         model_utils: Optional[ModelUtils] = None,
+        hardware_stopper: Optional[HardwareStopper] = None,
     ) -> None:
         """Initialize a ProtocolEngine instance.
 
         This constructor does not inject provider implementations. Prefer the
         ProtocolEngine.create factory classmethod.
         """
-        self._hardware_api = hardware_api
         self._state_store = state_store
         self._model_utils = model_utils or ModelUtils()
 
@@ -71,11 +63,14 @@ class ProtocolEngine:
             action_dispatcher=self._action_dispatcher,
         )
         self._queue_worker = queue_worker or create_queue_worker(
-            hardware_api=self._hardware_api,
+            hardware_api=hardware_api,
             state_store=self._state_store,
             action_dispatcher=self._action_dispatcher,
         )
-
+        self._hardware_stopper = hardware_stopper or HardwareStopper(
+            hardware_api=hardware_api,
+            state_store=state_store
+        )
         self._queue_worker.start()
 
     @property
@@ -151,41 +146,8 @@ class ProtocolEngine:
         """
         self._action_dispatcher.dispatch(StopAction())
         self._queue_worker.cancel()
-        await self._hardware_api.halt()
-        await self._hardware_api.stop(home_after=False)
+        await self._hardware_stopper.execute_complete_stop()
         self._action_dispatcher.dispatch(HardwareStoppedAction())
-
-    # TODO: Have this command set a `postRunExecution` flag
-    async def home_gantry_axes(self) -> None:
-        """Home gantry axes.
-
-        NOTE: Only use for post-protocol homing.
-        """
-        home_command = HomeCreate(
-            params=HomeParams(axes=[MotorAxis.X, MotorAxis.Y,
-                                    MotorAxis.LEFT_Z, MotorAxis.RIGHT_Z])
-        )
-        await self.add_command_and_execute_immediately(home_command)
-
-    # TODO: Have this command set a `postRunExecution` flag
-    async def drop_tip_on_cancel(self) -> None:
-        """Drop currently attached tip, if any, into trash after a run cancel."""
-        tipracks_for_pipettes = self.state_view.pipettes.get_attached_tip_labware_by_id()
-        if not tipracks_for_pipettes:
-            return
-
-        for pip_id, tiprack_id in tipracks_for_pipettes.items():
-            mount = self.state_view.pipettes.get(pip_id).mount
-            await self._hardware_api.add_tip(
-                mount=mount.to_hw_mount(),
-                tip_length=self.state_view.labware.get_tip_length(tiprack_id)
-            )
-            drop_tip_command = DropTipCreate(
-                params=DropTipParams(pipetteId=pip_id,
-                                     labwareId="fixedTrash",
-                                     wellName="A1")
-                )
-            await self.add_command_and_execute_immediately(drop_tip_command)
 
     async def add_command_and_execute_immediately(self, command: CommandCreate) -> None:
         """Add command to queue but execute immediately."""
@@ -229,7 +191,7 @@ class ProtocolEngine:
         try:
             await self._queue_worker.join()
         finally:
-            await self._hardware_api.stop(home_after=False)
+            await self._hardware_stopper.simple_stop()
 
         self._action_dispatcher.dispatch(HardwareStoppedAction())
         self._plugin_starter.stop()

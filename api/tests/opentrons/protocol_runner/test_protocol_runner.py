@@ -170,8 +170,7 @@ async def test_stop(
     await subject.stop()
 
     decoy.verify(task_queue.stop(),
-                 await protocol_engine.stop(),
-                 await protocol_engine.drop_tip_on_cancel())
+                 await protocol_engine.stop(),)
 
 
 async def test_join(

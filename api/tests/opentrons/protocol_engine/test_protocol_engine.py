@@ -1,12 +1,10 @@
 """Tests for the ProtocolEngine class."""
 import pytest
 from datetime import datetime
-from decoy import Decoy, matchers
-from opentrons.protocol_engine.commands import DropTipCreate, DropTipParams
+from decoy import Decoy
 
-from opentrons.types import DeckSlotName, MountType, Mount
+from opentrons.types import DeckSlotName, MountType
 from opentrons.hardware_control import API as HardwareAPI
-from opentrons.hardware_control.types import Axis as HwAxis
 from opentrons.protocols.models import LabwareDefinition
 
 from opentrons.protocol_engine import ProtocolEngine, commands
@@ -16,9 +14,8 @@ from opentrons.protocol_engine.types import (
     LabwareOffsetVector,
     LabwareOffsetLocation,
     PipetteName,
-    LoadedPipette,
 )
-from opentrons.protocol_engine.execution import QueueWorker
+from opentrons.protocol_engine.execution import QueueWorker, HardwareStopper
 from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.state import StateStore
 from opentrons.protocol_engine.plugins import AbstractPlugin, PluginStarter
@@ -75,6 +72,12 @@ def hardware_api(decoy: Decoy) -> HardwareAPI:
 
 
 @pytest.fixture
+def hardware_stopper(decoy: Decoy) -> HardwareStopper:
+    """Get a mock HardwareStopper."""
+    return decoy.mock(cls=HardwareStopper)
+
+
+@pytest.fixture
 def subject(
     hardware_api: HardwareAPI,
     state_store: StateStore,
@@ -82,6 +85,7 @@ def subject(
     plugin_starter: PluginStarter,
     queue_worker: QueueWorker,
     model_utils: ModelUtils,
+    hardware_stopper: HardwareStopper,
 ) -> ProtocolEngine:
     """Get a ProtocolEngine test subject with its dependencies stubbed out."""
     return ProtocolEngine(
@@ -91,6 +95,7 @@ def subject(
         plugin_starter=plugin_starter,
         queue_worker=queue_worker,
         model_utils=model_utils,
+        hardware_stopper=hardware_stopper,
     )
 
 
@@ -212,56 +217,6 @@ async def test_execute_command(
     )
 
 
-# async def test_drop_tip_on_cancel(
-#         decoy: Decoy,
-#         hardware_api: HardwareAPI,
-#         queue_worker: QueueWorker,
-#         state_store: StateStore,
-#         subject: ProtocolEngine,
-# ) -> None:
-#     """It should dispatch a drop tip command if tip attached."""
-#     created_at = datetime(year=2021, month=1, day=1)
-#     completed_at = datetime(year=2023, month=3, day=3)
-#     decoy.when(state_store.pipettes.get_attached_tip_labware_by_id()).then_return(
-#         {"pipette-id": "tiprack-id"}
-#     )
-#     decoy.when(state_store.pipettes.get("pipette-id")).then_return(
-#         LoadedPipette(
-#             id="pipette-id",
-#             pipetteName=PipetteName.P300_SINGLE,
-#             mount=MountType.LEFT,
-#         )
-#     )
-#     decoy.when(state_store.labware.get_tip_length("tiprack-id")).then_return(100)
-#     drop_tip_cmd = DropTipCreate(params=DropTipParams(
-#         pipetteId="pipette-id",
-#         labwareId="fixedTrash",
-#         wellName="A1",
-#     ))
-#
-#     decoy.when(model_utils.generate_id()).then_return("command-id")
-#     decoy.when(model_utils.get_timestamp()).then_return(created_at)
-#
-#     await subject.drop_tip_on_cancel()
-#
-#     decoy.verify(
-#         await hardware_api.home(axes=[HwAxis.X, HwAxis.Y, HwAxis.Z, HwAxis.A]),
-#         await hardware_api.add_tip(mount=Mount.LEFT, tip_length=100),
-#         action_dispatcher.dispatch(
-#             QueueCommandAction(
-#                 command_id="command-id",
-#                 command_key="command-id",
-#                 created_at=created_at,
-#                 request=request,
-#             )
-#         ),
-#     )
-
-
-def test_add_command_and_execute_immediately() -> None:
-    """It should add command to queue and execute unconditionally."""
-
-
 def test_play(
     decoy: Decoy,
     state_store: StateStore,
@@ -301,6 +256,7 @@ async def test_finish(
     queue_worker: QueueWorker,
     hardware_api: HardwareAPI,
     subject: ProtocolEngine,
+    hardware_stopper: HardwareStopper,
 ) -> None:
     """It should be able to gracefully tell the engine it's done."""
     await subject.finish()
@@ -308,7 +264,7 @@ async def test_finish(
     decoy.verify(
         action_dispatcher.dispatch(FinishAction()),
         await queue_worker.join(),
-        await hardware_api.stop(home_after=False),
+        await hardware_stopper.simple_stop(),
         action_dispatcher.dispatch(HardwareStoppedAction()),
         plugin_starter.stop(),
     )
@@ -321,6 +277,7 @@ async def test_finish_with_error(
     hardware_api: HardwareAPI,
     model_utils: ModelUtils,
     subject: ProtocolEngine,
+    hardware_stopper: HardwareStopper,
 ) -> None:
     """It should be able to tell the engine it's finished because of an error."""
     error = RuntimeError("oh no")
@@ -340,7 +297,7 @@ async def test_finish_with_error(
     decoy.verify(
         action_dispatcher.dispatch(FinishAction(error_details=expected_error_details)),
         await queue_worker.join(),
-        await hardware_api.stop(home_after=False),
+        await hardware_stopper.simple_stop(),
         action_dispatcher.dispatch(HardwareStoppedAction()),
     )
 
@@ -350,6 +307,7 @@ async def test_finish_stops_hardware_if_queue_worker_join_fails(
     queue_worker: QueueWorker,
     hardware_api: HardwareAPI,
     subject: ProtocolEngine,
+    hardware_stopper: HardwareStopper,
 ) -> None:
     """It should be able to stop the engine."""
     decoy.when(
@@ -360,7 +318,7 @@ async def test_finish_stops_hardware_if_queue_worker_join_fails(
         await subject.finish()
 
     decoy.verify(
-        await hardware_api.stop(home_after=False),
+        await hardware_stopper.simple_stop(),
         times=1,
     )
 
@@ -384,6 +342,7 @@ async def test_stop(
     queue_worker: QueueWorker,
     hardware_api: HardwareAPI,
     subject: ProtocolEngine,
+    hardware_stopper: HardwareStopper,
 ) -> None:
     """It should be able to stop the engine."""
     await subject.stop()
@@ -391,8 +350,7 @@ async def test_stop(
     decoy.verify(
         action_dispatcher.dispatch(StopAction()),
         queue_worker.cancel(),
-        await hardware_api.halt(),
-        await hardware_api.stop(home_after=False),
+        await hardware_stopper.execute_complete_stop(),
         action_dispatcher.dispatch(HardwareStoppedAction()),
     )
 

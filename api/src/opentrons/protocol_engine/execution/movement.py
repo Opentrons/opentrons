@@ -179,7 +179,6 @@ class MovementHandler:
 
         If axes is `None`, will home all motors.
         """
-        print("###### Homing gantry ########")
         hardware_axes = None
         if axes is not None:
             hardware_axes = [MOTOR_AXIS_TO_HARDWARE_AXIS[a] for a in axes]

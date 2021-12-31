@@ -18,8 +18,6 @@ from ..commands import (
     PickUpTipResult,
     DropTipResult,
     HomeResult,
-    PickUpTip,
-    CommandStatus,
 )
 from ..actions import Action, UpdateCommandAction
 from .abstract_store import HasState, HandlesActions
@@ -232,19 +230,6 @@ class PipetteView(HasState[PipetteState]):
             self.get_aspirated_volume(pipette_id) > 0
             or pipette_config["ready_to_aspirate"]
         )
-
-    # def get_have_attached_tips(self) -> bool:
-    #     """Get whether a given pipette has a tip attached."""
-    #     pipettes = []
-    #     for mount in [MountType.LEFT, MountType.RIGHT]:
-    #         pip = self.get_by_mount(mount)
-    #         if pip:
-    #             pipettes.append(pip)
-    #     pipette_ids = [pip.id for pip in pipettes]
-    #     if not self._state.attached_tip_labware_by_id:
-    #         return False
-    #     return any([self._state.attached_tip_labware_by_id.get(pip_id)
-    #                 for pip_id in pipette_ids])
 
     def get_attached_tip_labware_id(self, pipette_id: str) -> str:
         """Get the tiprack labware id of the attached tip."""
