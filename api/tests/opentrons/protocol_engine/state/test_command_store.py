@@ -16,7 +16,6 @@ from opentrons.protocol_engine.state.commands import (
 )
 
 from opentrons.protocol_engine.actions import (
-    Action,
     QueueCommandAction,
     UpdateCommandAction,
     FailCommandAction,
