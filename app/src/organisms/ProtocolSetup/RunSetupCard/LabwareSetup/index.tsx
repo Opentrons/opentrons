@@ -100,7 +100,7 @@ export const LabwareSetup = (): JSX.Element | null => {
       }
     }
   }
-  console.log(protocolData)
+
   let lpcDisabledReason: string | null = null
 
   if (moduleAndCalibrationIncomplete) {
