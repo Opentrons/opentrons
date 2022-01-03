@@ -22,6 +22,7 @@ import {
   Text,
   Link,
   SPACING_1,
+  C_NEAR_WHITE,
 } from '@opentrons/components'
 
 import { useRunStatus } from '../RunTimeControl/hooks'
@@ -75,20 +76,21 @@ export function ProtocolSetup(): JSX.Element {
         </Box>
       ) : null}
       <Flex
+        backgroundColor={C_NEAR_WHITE}
         flexDirection={DIRECTION_COLUMN}
         padding={`${SPACING_1} ${SPACING_3} ${SPACING_3} ${SPACING_3}`}
       >
-        {showLPCSuccessToast && (
-          <LabwareOffsetSuccessToast
-            onCloseClick={() => setShowLPCSuccessToast(false)}
-          />
-        )}
-        <MetadataCard />
         <LPCSuccessToastContext.Provider
           value={{
             setShowLPCSuccessToast: () => setShowLPCSuccessToast(true),
           }}
         >
+          {showLPCSuccessToast && (
+            <LabwareOffsetSuccessToast
+              onCloseClick={() => setShowLPCSuccessToast(false)}
+            />
+          )}
+          <MetadataCard />
           <RunSetupCard />
         </LPCSuccessToastContext.Provider>
         <Text

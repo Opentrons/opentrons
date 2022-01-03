@@ -54,7 +54,7 @@ class LegacyContextPlugin(AbstractPlugin):
         self._hardware_api = hardware_api
         self._protocol_context = protocol_context
         self._legacy_command_mapper = legacy_command_mapper or LegacyCommandMapper()
-        self._unsubcribe: Optional[ContextUnsubscribe] = None
+        self._unsubscribe: Optional[ContextUnsubscribe] = None
 
     def setup(self) -> None:
         """Set up subscriptions to the context's message brokers."""

@@ -29,12 +29,14 @@ import {
   useModuleRenderInfoById,
   useLabwareRenderInfoById,
 } from '../../../hooks'
+import * as hooks from '../../hooks'
 import { LabwareSetup } from '..'
 import { LabwareOffsetModal } from '../LabwareOffsetModal'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { ExtraAttentionWarning } from '../ExtraAttentionWarning'
 import { getModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 
+jest.mock('../../hooks')
 jest.mock('../../../../../redux/modules')
 jest.mock('../../../../../redux/pipettes/selectors')
 jest.mock('../LabwareOffsetModal')
@@ -104,7 +106,12 @@ const mockLabwareOffsetSuccessToast = LabwareOffsetSuccessToast as jest.MockedFu
 const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
   typeof useProtocolDetails
 >
-
+const mockUseMissingModuleIds = hooks.useMissingModuleIds as jest.MockedFunction<
+  typeof hooks.useMissingModuleIds
+>
+const mockUseProtocolCalibrationStatus = hooks.useProtocolCalibrationStatus as jest.MockedFunction<
+  typeof hooks.useProtocolCalibrationStatus
+>
 const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
   (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
   {}
@@ -232,6 +239,11 @@ describe('LabwareSetup', () => {
     mockLabwarePostionCheck.mockReturnValue(
       <div>mock Labware Position Check</div>
     )
+    mockUseMissingModuleIds.mockReturnValue([])
+
+    mockUseProtocolCalibrationStatus.mockReturnValue({
+      complete: true,
+    })
     mockUseRunStatus.mockReturnValue(RUN_STATUS_IDLE)
     when(mockUseProtocolDetails)
       .calledWith()
@@ -443,6 +455,38 @@ describe('LabwareSetup', () => {
     mockUseProtocolDetails.mockReturnValue({
       protocolData: { labware: {}, pipettes: {} },
     } as any)
+    const { getByRole, queryByText } = render()
+    const button = getByRole('button', {
+      name: 'run labware position check',
+    })
+    fireEvent.click(button)
+    expect(queryByText('mock Labware Position Check')).toBeNull()
+  })
+  it('should render a disabled button when robot calibration is incomplete', () => {
+    mockUseProtocolCalibrationStatus.mockReturnValue({
+      complete: false,
+    })
+    const { getByRole, queryByText } = render()
+    const button = getByRole('button', {
+      name: 'run labware position check',
+    })
+    fireEvent.click(button)
+    expect(queryByText('mock Labware Position Check')).toBeNull()
+  })
+  it('should render a disabled button when modules are not connected', () => {
+    mockUseMissingModuleIds.mockReturnValue(['temperatureModuleV1'])
+    const { getByRole, queryByText } = render()
+    const button = getByRole('button', {
+      name: 'run labware position check',
+    })
+    fireEvent.click(button)
+    expect(queryByText('mock Labware Position Check')).toBeNull()
+  })
+  it('should render a disabled button when modules are not connected and robot calibration is incomplete', () => {
+    mockUseProtocolCalibrationStatus.mockReturnValue({
+      complete: false,
+    })
+    mockUseMissingModuleIds.mockReturnValue(['temperatureModuleV1'])
     const { getByRole, queryByText } = render()
     const button = getByRole('button', {
       name: 'run labware position check',

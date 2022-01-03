@@ -120,8 +120,8 @@ describe('top level App component', () => {
     expect(wrapper.exists(ConnectPanel)).toBe(true)
   })
 
-  it('should redirect to /more from /app-settings', () => {
-    const { wrapper } = render('/app-settings')
+  it('should redirect to /more from /app-settings/feature-flags', () => {
+    const { wrapper } = render('/app-settings/feature-flags')
     expect(wrapper.exists(More)).toBe(true)
     expect(wrapper.exists(MorePanel)).toBe(true)
   })

@@ -89,6 +89,8 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
       commandDetails.data.params.legacyCommandType === 'command.COMMENT'
   }
 
+  const isPause = commandOrSummary.commandType === 'pause'
+
   React.useEffect(() => {
     refetchCommandDetails()
   }, [commandStatus])
@@ -116,6 +118,23 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
           marginLeft={SPACING_1}
         >
           {t('comment_step')}
+        </Flex>
+      ) : null}
+      {isPause ? (
+        <Flex
+          textTransform={TEXT_TRANSFORM_UPPERCASE}
+          fontSize={FONT_SIZE_CAPTION}
+          color={C_MED_DARK_GRAY}
+          marginBottom={SPACING_1}
+          marginLeft={SPACING_1}
+        >
+          <Icon
+            name="pause"
+            width={SPACING_3}
+            paddingRight={SPACING_2}
+            color={C_DARK_GRAY}
+          />
+          {t('pause_protocol')}
         </Flex>
       ) : null}
       <Flex flexDirection={DIRECTION_ROW}>

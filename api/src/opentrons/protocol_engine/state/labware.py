@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import re
 from collections import defaultdict
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2, SlotDefV2
@@ -38,7 +38,7 @@ from .abstract_store import HasState, HandlesActions
 _TRASH_LOCATION = DeckSlotLocation(slotName=DeckSlotName.FIXED_TRASH)
 
 
-@dataclass(frozen=True)
+@dataclass
 class LabwareState:
     """State of all loaded labware resources."""
 
@@ -117,10 +117,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 load_name=action.definition.parameters.loadName,
                 version=action.definition.version,
             )
-            definitions_by_uri = self._state.definitions_by_uri.copy()
-            definitions_by_uri[uri] = action.definition
-
-            self._state = replace(self._state, definitions_by_uri=definitions_by_uri)
+            self._state.definitions_by_uri[uri] = action.definition
 
     def _handle_command(self, command: Command) -> None:
         """Modify state in reaction to a command."""
@@ -136,8 +133,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 version=command.result.definition.version,
             )
 
-            new_labware_by_id = self._state.labware_by_id.copy()
-            new_labware_by_id[labware_id] = LoadedLabware(
+            self._state.labware_by_id[labware_id] = LoadedLabware(
                 id=labware_id,
                 location=command.params.location,
                 loadName=command.result.definition.parameters.loadName,
@@ -145,14 +141,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 offsetId=command.result.offsetId,
             )
 
-            new_definitions_by_uri = self._state.definitions_by_uri.copy()
-            new_definitions_by_uri[definition_uri] = command.result.definition
-
-            self._state = replace(
-                self._state,
-                labware_by_id=new_labware_by_id,
-                definitions_by_uri=new_definitions_by_uri,
-            )
+            self._state.definitions_by_uri[definition_uri] = command.result.definition
 
     def _add_labware_offset(self, labware_offset: LabwareOffset) -> None:
         """Add a new labware offset to state.
@@ -163,9 +152,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
         """
         assert labware_offset.id not in self._state.labware_offsets_by_id
 
-        new_labware_offsets = self._state.labware_offsets_by_id.copy()
-        new_labware_offsets[labware_offset.id] = labware_offset
-        self._state = replace(self._state, labware_offsets_by_id=new_labware_offsets)
+        self._state.labware_offsets_by_id[labware_offset.id] = labware_offset
 
 
 class LabwareView(HasState[LabwareState]):
