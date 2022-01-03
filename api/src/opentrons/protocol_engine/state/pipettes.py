@@ -47,7 +47,7 @@ class PipetteState:
     pipettes_by_id: Dict[str, LoadedPipette]
     aspirated_volume_by_id: Dict[str, float]
     current_well: Optional[CurrentWell]
-    attached_tip_labware_by_id: Optional[Dict[str, Optional[str]]]
+    attached_tip_labware_by_id: Dict[str, str]
 
 
 class PipetteStore(HasState[PipetteState], HandlesActions):
@@ -140,17 +140,17 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             attached_tip_labware_by_id = self._state.attached_tip_labware_by_id.copy()
             attached_tip_labware_by_id[pipette_id] = command.params.labwareId
             self._state = replace(
-                self._state,
-                attached_tip_labware_by_id=attached_tip_labware_by_id
+                self._state, attached_tip_labware_by_id=attached_tip_labware_by_id
             )
         elif isinstance(command.result, DropTipResult):
             pipette_id = command.params.pipetteId
             attached_tip_labware_by_id = self._state.attached_tip_labware_by_id.copy()
-            attached_tip_labware_by_id.pop(pipette_id)
-            self._state = replace(
-                self._state,
-                attached_tip_labware_by_id=attached_tip_labware_by_id
-            )
+            if attached_tip_labware_by_id.get(pipette_id):
+                attached_tip_labware_by_id.pop(pipette_id)
+                self._state = replace(
+                    self._state, attached_tip_labware_by_id=attached_tip_labware_by_id
+                )
+            # TODO (spp): If no pipette-id, log warning instead of no-oping?
 
 
 class PipetteView(HasState[PipetteState]):
@@ -234,10 +234,11 @@ class PipetteView(HasState[PipetteState]):
     def get_attached_tip_labware_id(self, pipette_id: str) -> str:
         """Get the tiprack labware id of the attached tip."""
         tipracks_by_pip_id = self.get_attached_tip_labware_by_id()
-        if not tipracks_by_pip_id:
-            raise errors.PipetteTipInfoNotFoundError
-        return tipracks_by_pip_id.get(pipette_id)
+        labware_id = tipracks_by_pip_id.get(pipette_id)
+        if labware_id:
+            return labware_id
+        raise errors.PipetteTipInfoNotFoundError
 
-    def get_attached_tip_labware_by_id(self) -> Optional[Dict[str, Optional[str]]]:
+    def get_attached_tip_labware_by_id(self) -> Dict[str, str]:
         """Get the tiprack ids of attached tip by pipette ids."""
         return self._state.attached_tip_labware_by_id

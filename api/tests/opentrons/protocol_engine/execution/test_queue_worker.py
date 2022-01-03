@@ -136,5 +136,3 @@ async def test_engine_stopped_exception_breaks_loop_gracefully(
 
     subject.start()
     await subject.join()
-
-

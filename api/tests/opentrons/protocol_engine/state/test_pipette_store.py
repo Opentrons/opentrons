@@ -36,7 +36,7 @@ def test_sets_initial_state(subject: PipetteStore) -> None:
         pipettes_by_id={},
         aspirated_volume_by_id={},
         current_well=None,
-        has_tip_by_id={},
+        attached_tip_labware_by_id={},
     )
 
 
@@ -249,9 +249,11 @@ def test_tip_commands_update_has_tip(subject: PipetteStore) -> None:
     subject.handle_action(UpdateCommandAction(command=load_pipette_command))
     subject.handle_action(UpdateCommandAction(command=pick_up_tip_command))
 
-    assert subject.state.attached_tip_labware_by_id[
-               pipette_id] == "pick-up-tip-labware-id"
+    assert (
+        subject.state.attached_tip_labware_by_id.get(pipette_id)
+        == "pick-up-tip-labware-id"
+    )
 
     subject.handle_action(UpdateCommandAction(command=drop_tip_command))
 
-    assert subject.state.attached_tip_labware_by_id[pipette_id] is None
+    assert not subject.state.attached_tip_labware_by_id

@@ -1,8 +1,6 @@
 """Post-protocol hardware stopper."""
 from typing import Optional
-from opentrons.hardware_control import (
-    API as HardwareAPI
-)
+from opentrons.hardware_control import API as HardwareAPI
 from ..state import StateStore
 from ..types import MotorAxis, WellLocation
 
@@ -11,12 +9,13 @@ from .pipetting import PipettingHandler
 
 
 class HardwareStopper:
-    def __init__(self,
-                 hardware_api: HardwareAPI,
-                 state_store: StateStore,
-                 movement: Optional[MovementHandler] = None,
-                 pipetting: Optional[PipettingHandler] = None,
-                 ) -> None:
+    def __init__(
+        self,
+        hardware_api: HardwareAPI,
+        state_store: StateStore,
+        movement: Optional[MovementHandler] = None,
+        pipetting: Optional[PipettingHandler] = None,
+    ) -> None:
         """Hardware stopper initializer."""
         self._hardware_api = hardware_api
         self._state_store = state_store
@@ -41,26 +40,32 @@ class HardwareStopper:
             mount = self._state_store.pipettes.get(pip_id).mount
             await self._hardware_api.add_tip(
                 mount=mount.to_hw_mount(),
-                tip_length=self._state_store.labware.get_tip_length(tiprack_id)
+                tip_length=self._state_store.labware.get_tip_length(tiprack_id),
             )
             # TODO: Add ability to drop tip onto custom trash as well.
-            await self._pipetting_handler.drop_tip(pipette_id=pip_id,
-                                                   labware_id="fixedTrash",
-                                                   well_name="A1",
-                                                   well_location=WellLocation())
+            await self._pipetting_handler.drop_tip(
+                pipette_id=pip_id,
+                labware_id="fixedTrash",
+                well_name="A1",
+                well_location=WellLocation(),
+            )
 
+    # TODO: With this change it will probably become more important to remove the
+    #  stop request sent by the client when 'closing' the protocol as it will perform
+    #  an unnecessary home otherwise
     async def execute_complete_stop(self) -> None:
         """Run the sequence to stop hardware, drop tip and home."""
         await self._hardware_api.halt()
         await self._hardware_api.stop(home_after=False)
-        await self._movement_handler.home(axes=[MotorAxis.X, MotorAxis.Y,
-                                                MotorAxis.LEFT_Z, MotorAxis.RIGHT_Z])
-        # TODO: This will also do a drop tip after a normal protocol run ends.
-        #  Check with UX if this is acceptable. It allows us to home the plunger axes
-        #  safely.
+        await self._movement_handler.home(
+            axes=[MotorAxis.X, MotorAxis.Y, MotorAxis.LEFT_Z, MotorAxis.RIGHT_Z]
+        )
         await self._drop_tip()
         await self._hardware_api.stop(home_after=True)
 
+    # TODO: This gets called during the protocol finish cleanup. So it will just home
+    #  all axes without a drop tip. This is consistent with the current end-of-protocol
+    #  behavior. Check with both teams if it's acceptable.
     async def simple_stop(self) -> None:
         """Only issue hardware api stop."""
         await self._hardware_api.stop(home_after=True)

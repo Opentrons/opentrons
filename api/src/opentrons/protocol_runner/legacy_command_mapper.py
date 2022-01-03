@@ -4,7 +4,7 @@ from collections import defaultdict
 from datetime import datetime
 from typing import Dict, List, Optional
 
-from opentrons.types import MountType, DeckSlotName
+from opentrons.types import MountType, DeckSlotName, Location
 from opentrons.commands import types as legacy_command_types
 from opentrons.protocol_engine import (
     ProtocolEngineError,
@@ -65,7 +65,9 @@ class LegacyCommandMapper:
         self._command_count: Dict[str, int] = defaultdict(lambda: 0)
 
         # equipment IDs by phyiscal location
-        self._labware_id_by_slot: Dict[DeckSlotName, str] = {}
+        self._labware_id_by_slot: Dict[DeckSlotName, str] = {
+            DeckSlotName.FIXED_TRASH: "fixedTrash"
+        }
         self._pipette_id_by_mount: Dict[MountType, str] = {}
         self._module_id_by_slot: Dict[DeckSlotName, str] = {}
 
@@ -286,50 +288,66 @@ class LegacyCommandMapper:
         now: datetime,
     ) -> pe_commands.Command:
         engine_command: pe_commands.Command
-
+        well: LegacyWell
+        # TODO: Check if there is a bug here. A pickUpTip can have a
+        #  non-LegacyWell location type in payload
         if (
-            (command["name"] == legacy_command_types.PICK_UP_TIP or
-             command["name"] == legacy_command_types.DROP_TIP)
+            command["name"] == legacy_command_types.PICK_UP_TIP
             and "instrument" in command["payload"]
             and "location" in command["payload"]
             and isinstance(command["payload"]["location"], LegacyWell)  # type: ignore  # noqa: E501
         ):
             pipette: LegacyPipetteContext = command["payload"]["instrument"]  # type: ignore  # noqa: E501
-            well: LegacyWell = command["payload"]["location"]  # type: ignore  # noqa: E501
+            well = command["payload"]["location"]  # type: ignore  # noqa: E501
             mount = MountType(pipette.mount)
             slot = DeckSlotName.from_primitive(well.parent.parent)  # type: ignore[arg-type] # noqa: E501
             well_name = well.well_name
-
             labware_id = self._labware_id_by_slot[slot]
             pipette_id = self._pipette_id_by_mount[mount]
 
-            if command["name"] == legacy_command_types.PICK_UP_TIP:
-                engine_command = pe_commands.PickUpTip.construct(
-                    id=command_id,
-                    key=command_id,
-                    status=pe_commands.CommandStatus.RUNNING,
-                    createdAt=now,
-                    startedAt=now,
-                    params=pe_commands.PickUpTipParams.construct(
-                        pipetteId=pipette_id,
-                        labwareId=labware_id,
-                        wellName=well_name,
-                    ),
-                )
+            engine_command = pe_commands.PickUpTip.construct(
+                id=command_id,
+                key=command_id,
+                status=pe_commands.CommandStatus.RUNNING,
+                createdAt=now,
+                startedAt=now,
+                params=pe_commands.PickUpTipParams.construct(
+                    pipetteId=pipette_id,
+                    labwareId=labware_id,
+                    wellName=well_name,
+                ),
+            )
+        elif (
+            command["name"] == legacy_command_types.DROP_TIP
+            and "instrument" in command["payload"]
+            and "location" in command["payload"]
+        ):
+            pipette: LegacyPipetteContext = command["payload"]["instrument"]  # type: ignore  # noqa: E501
+            # TODO (spp): How to handle PairedPipette locations?
+            location = command["payload"].get("location")
+            if isinstance(location, LegacyWell):
+                well = location
+            elif isinstance(location, Location):
+                well = location.labware.as_well()
             else:
-                engine_command = pe_commands.DropTip.construct(
-                    id=command_id,
-                    key=command_id,
-                    status=pe_commands.CommandStatus.RUNNING,
-                    createdAt=now,
-                    startedAt=now,
-                    params=pe_commands.DropTipParams.construct(
-                        pipetteId=pipette_id,
-                        labwareId=labware_id,
-                        wellName=well_name,
-                    ),
-                )
-
+                raise Exception("Unknown Droptip location.")
+            mount = MountType(pipette.mount)
+            slot = DeckSlotName.from_primitive(well.parent.parent)  # type: ignore[arg-type] # noqa: E501
+            well_name = well.well_name
+            labware_id = self._labware_id_by_slot[slot]
+            pipette_id = self._pipette_id_by_mount[mount]
+            engine_command = pe_commands.DropTip.construct(
+                id=command_id,
+                key=command_id,
+                status=pe_commands.CommandStatus.RUNNING,
+                createdAt=now,
+                startedAt=now,
+                params=pe_commands.DropTipParams.construct(
+                    pipetteId=pipette_id,
+                    labwareId=labware_id,
+                    wellName=well_name,
+                ),
+            )
         elif command["name"] == legacy_command_types.PAUSE:
             engine_command = pe_commands.Pause.construct(
                 id=command_id,
@@ -341,7 +359,6 @@ class LegacyCommandMapper:
                     message=command["payload"]["userMessage"],
                 ),
             )
-
         else:
             engine_command = pe_commands.Custom.construct(
                 id=command_id,

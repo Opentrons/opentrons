@@ -50,6 +50,9 @@ PICK_UP_TIP_PROTOCOL = textwrap.dedent(
 
         pipette_left.drop_tip()
         pipette_left.pick_up_tip()
+        pipette_left.drop_tip(
+            location=tip_rack_1.wells_by_name()["A1"]
+        )
     """
 ).encode()
 
@@ -79,7 +82,7 @@ async def test_legacy_pick_up_tip(
     pipette_left_result_captor = matchers.Captor()
     pipette_right_result_captor = matchers.Captor()
 
-    assert len(commands_result) == 8
+    assert len(commands_result) == 9
 
     assert commands_result[0] == commands.LoadLabware.construct(
         id=matchers.IsA(str),
@@ -144,6 +147,7 @@ async def test_legacy_pick_up_tip(
             labwareId=tiprack_1_id,
             wellName="A1",
         ),
+        result=commands.PickUpTipResult(),
     )
 
     assert commands_result[5] == commands.PickUpTip.construct(
@@ -158,9 +162,24 @@ async def test_legacy_pick_up_tip(
             labwareId=tiprack_2_id,
             wellName="A2",
         ),
+        result=commands.PickUpTipResult(),
     )
 
     # skip checking drop tip command at index 6
+    assert commands_result[6] == commands.DropTip.construct(
+        id=matchers.IsA(str),
+        key=matchers.IsA(str),
+        status=commands.CommandStatus.SUCCEEDED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        params=commands.DropTipParams(
+            pipetteId=pipette_left_id,
+            labwareId="fixedTrash",
+            wellName="A1",
+        ),
+        result=commands.DropTipResult(),
+    )
 
     assert commands_result[7] == commands.PickUpTip.construct(
         id=matchers.IsA(str),
@@ -174,4 +193,20 @@ async def test_legacy_pick_up_tip(
             labwareId=tiprack_1_id,
             wellName="B1",
         ),
+        result=commands.PickUpTipResult(),
+    )
+
+    assert commands_result[8] == commands.DropTip.construct(
+        id=matchers.IsA(str),
+        key=matchers.IsA(str),
+        status=commands.CommandStatus.SUCCEEDED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        params=commands.DropTipParams(
+            pipetteId=pipette_left_id,
+            labwareId=tiprack_1_id,
+            wellName="A1",
+        ),
+        result=commands.DropTipResult(),
     )

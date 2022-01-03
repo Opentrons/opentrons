@@ -40,31 +40,32 @@ def pipetting(decoy: Decoy) -> PipettingHandler:
 
 @pytest.fixture
 def subject(
-        hardware_api: HardwareAPI,
-        state_store: StateStore,
-        movement: MovementHandler,
-        pipetting: PipettingHandler,
+    hardware_api: HardwareAPI,
+    state_store: StateStore,
+    movement: MovementHandler,
+    pipetting: PipettingHandler,
 ) -> HardwareStopper:
     """Get a HardwareStopper test subject with its dependencies mocked out."""
     return HardwareStopper(
         hardware_api=hardware_api,
         state_store=state_store,
         movement=movement,
-        pipetting=pipetting
+        pipetting=pipetting,
     )
 
 
 async def test_hardware_stopping_sequence(
-        decoy: Decoy,
-        subject: HardwareStopper,
-        state_store: StateStore,
-        hardware_api: HardwareAPI,
-        movement: MovementHandler,
-        pipetting: PipettingHandler,
+    decoy: Decoy,
+    subject: HardwareStopper,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    movement: MovementHandler,
+    pipetting: PipettingHandler,
 ) -> None:
     """It should stop the hardware, home the robot and perform drop tip if required."""
     decoy.when(state_store.pipettes.get_attached_tip_labware_by_id()).then_return(
-        {"pipette-id": "tiprack-id"})
+        {"pipette-id": "tiprack-id"}
+    )
     decoy.when(state_store.pipettes.get("pipette-id")).then_return(
         LoadedPipette(
             id="pipette-id",
@@ -77,29 +78,33 @@ async def test_hardware_stopping_sequence(
     decoy.verify(
         await hardware_api.halt(),
         await hardware_api.stop(home_after=False),
-        await movement.home(axes=[MotorAxis.X, MotorAxis.Y,
-                                  MotorAxis.LEFT_Z, MotorAxis.RIGHT_Z]),
+        await movement.home(
+            axes=[MotorAxis.X, MotorAxis.Y, MotorAxis.LEFT_Z, MotorAxis.RIGHT_Z]
+        ),
         await hardware_api.add_tip(mount=Mount.LEFT, tip_length=100),
-        await pipetting.drop_tip(pipette_id="pipette-id",
-                                 labware_id="fixedTrash",
-                                 well_name="A1",
-                                 well_location=WellLocation()),
-        await hardware_api.stop(home_after=True)
+        await pipetting.drop_tip(
+            pipette_id="pipette-id",
+            labware_id="fixedTrash",
+            well_name="A1",
+            well_location=WellLocation(),
+        ),
+        await hardware_api.stop(home_after=True),
     )
 
 
 async def test_hardware_stopping_sequence_without_pitpette_tips(
-        decoy: Decoy,
-        subject: HardwareStopper,
-        hardware_api: HardwareAPI,
-        movement: MovementHandler,
+    decoy: Decoy,
+    subject: HardwareStopper,
+    hardware_api: HardwareAPI,
+    movement: MovementHandler,
 ) -> None:
     """Don't drop tip when there aren't any tips attached to pipettes."""
     await subject.execute_complete_stop()
     decoy.verify(
         await hardware_api.halt(),
         await hardware_api.stop(home_after=False),
-        await movement.home(axes=[MotorAxis.X, MotorAxis.Y,
-                                  MotorAxis.LEFT_Z, MotorAxis.RIGHT_Z]),
-        await hardware_api.stop(home_after=True)
+        await movement.home(
+            axes=[MotorAxis.X, MotorAxis.Y, MotorAxis.LEFT_Z, MotorAxis.RIGHT_Z]
+        ),
+        await hardware_api.stop(home_after=True),
     )
