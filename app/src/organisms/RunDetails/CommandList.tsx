@@ -108,14 +108,14 @@ export function CommandList(): JSX.Element | null {
       ? [...postPlayRunCommands, ...remainingAnticipatedCommands]
       : [...postPlayRunCommands]
   }
-
+  console.log(runStatus)
   if (protocolData == null || runStatus == null) return null
 
   let alertItemTitle
   if (runStatus === 'failed') {
     alertItemTitle = t('protocol_run_failed')
   }
-  if (runStatus === 'stop-requested') {
+  if (runStatus === 'stop-requested' || runStatus === 'stopped') {
     alertItemTitle = t('protocol_run_canceled')
   }
   if (runStatus === 'succeeded') {
@@ -127,11 +127,14 @@ export function CommandList(): JSX.Element | null {
       <Flex flexDirection={DIRECTION_COLUMN} flex={'auto'}>
         {runStatus === 'failed' ||
         runStatus === 'succeeded' ||
-        runStatus === 'stop-requested' ? (
+        runStatus === 'stop-requested' ||
+        runStatus === 'stopped' ? (
           <Box padding={SPACING_2}>
             <AlertItem
               type={
-                runStatus === 'stop-requested' || runStatus === 'failed'
+                runStatus === 'stop-requested' ||
+                runStatus === 'failed' ||
+                runStatus === 'stopped'
                   ? 'error'
                   : 'success'
               }
