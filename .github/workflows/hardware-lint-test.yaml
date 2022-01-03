@@ -20,6 +20,7 @@ on:
     paths:
       - 'Makefile'
       - 'hardware/**'
+      - '.github/workflows/hardware-test-lint.yaml'
   workflow_dispatch:
 
 defaults:
