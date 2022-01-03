@@ -9,7 +9,7 @@ on:
     paths:
       - 'Makefile'
       - 'hardware/**'
-      - '.github/workflows/hardware-test-lint.yaml'
+      - '.github/workflows/hardware-lint-test.yaml'
       - '.github/actions/python/**'
     branches-ignore: # ignore any release-related thing (handled elsewhere)
       - 'release'
