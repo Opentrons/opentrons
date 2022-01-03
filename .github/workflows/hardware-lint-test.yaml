@@ -20,7 +20,6 @@ on:
     paths:
       - 'Makefile'
       - 'hardware/**'
-      - '.github/workflows/hardware-test-lint.yaml'
   workflow_dispatch:
 
 defaults:
@@ -51,6 +50,18 @@ jobs:
         with:
           project: 'hardware'
 
+      - name: Setup SocketCan
+        run: |
+          sudo apt-get update
+          sudo apt-get install linux-modules-extra-$(uname -r)
+          sudo modprobe vcan
+
+      - name: Run OT-3 Emulator
+        uses: Opentrons/opentrons-emulation@v1.3
+        with:
+          ot3-firmware-commit-id: latest
+          modules-commit-id: latest
+
       - name: Lint
         run: make -C hardware lint
 
@@ -64,22 +75,23 @@ jobs:
         with:
           files: ./hardware/coverage.xml
           flags: hardware
-  integration:
-    name: 'hardware package integration tests'
-    timeout-minutes: 20
-    runs-on: 'ubuntu-20.04'
-    steps:
-      - name: Setup SocketCan
-        run: |
-          sudo apt-get update
-          sudo apt-get install linux-modules-extra-$(uname -r)
-          sudo modprobe vcan
 
-      - name: Checkout firmware repo
-        uses: actions/checkout@v2
-
-      - name: Run OT-3 Emulator
-        uses: Opentrons/opentrons-emulation@v1.3
-        with:
-          ot3-firmware-commit-id: latest
-          modules-commit-id: latest
+#  integration:
+#    name: 'hardware package integration tests'
+#    timeout-minutes: 20
+#    runs-on: 'ubuntu-20.04'
+#    steps:
+#      - name: Setup SocketCan
+#        run: |
+#          sudo apt-get update
+#          sudo apt-get install linux-modules-extra-$(uname -r)
+#          sudo modprobe vcan
+#
+#      - name: Checkout firmware repo
+#        uses: actions/checkout@v2
+#
+#      - name: Run OT-3 Emulator
+#        uses: Opentrons/opentrons-emulation@v1.3
+#        with:
+#          ot3-firmware-commit-id: latest
+#          modules-commit-id: latest
