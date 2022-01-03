@@ -97,8 +97,10 @@ async def test_hardware_stopping_sequence_without_pitpette_tips(
     subject: HardwareStopper,
     hardware_api: HardwareAPI,
     movement: MovementHandler,
+    state_store: StateStore,
 ) -> None:
     """Don't drop tip when there aren't any tips attached to pipettes."""
+    decoy.when(state_store.pipettes.get_attached_tip_labware_by_id()).then_return({})
     await subject.execute_complete_stop()
     decoy.verify(
         await hardware_api.halt(),
