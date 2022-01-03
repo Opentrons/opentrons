@@ -108,7 +108,7 @@ export function CommandList(): JSX.Element | null {
       ? [...postPlayRunCommands, ...remainingAnticipatedCommands]
       : [...postPlayRunCommands]
   }
-  console.log(runStatus)
+
   if (protocolData == null || runStatus == null) return null
 
   let alertItemTitle
