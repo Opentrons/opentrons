@@ -148,11 +148,6 @@ class ProtocolEngine:
         await self._hardware_stopper.execute_complete_stop()
         self._action_dispatcher.dispatch(HardwareStoppedAction())
 
-    async def add_command_and_execute_immediately(self, command: CommandCreate) -> None:
-        """Add command to queue but execute immediately."""
-        command_res = self.add_command(command)
-        await self._queue_worker.execute_immediately(command_id=command_res.id)
-
     async def wait_until_complete(self) -> None:
         """Wait until there are no more commands to execute.
 

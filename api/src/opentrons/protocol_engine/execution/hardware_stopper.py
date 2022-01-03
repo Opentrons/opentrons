@@ -9,6 +9,8 @@ from .pipetting import PipettingHandler
 
 
 class HardwareStopper:
+    """Class to implement hardware stopping."""
+
     def __init__(
         self,
         hardware_api: HardwareAPI,

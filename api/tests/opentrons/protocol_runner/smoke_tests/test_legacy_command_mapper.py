@@ -165,7 +165,6 @@ async def test_legacy_pick_up_tip(
         result=commands.PickUpTipResult(),
     )
 
-    # skip checking drop tip command at index 6
     assert commands_result[6] == commands.DropTip.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),

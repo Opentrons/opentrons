@@ -3,7 +3,7 @@ import pytest
 from decoy import matchers, Decoy
 from datetime import datetime
 
-from opentrons.commands.types import CommentMessage, PauseMessage, PickUpTipMessage
+from opentrons.commands.types import CommentMessage, PauseMessage
 from opentrons.protocol_engine import (
     DeckSlotLocation,
     ModuleLocation,
