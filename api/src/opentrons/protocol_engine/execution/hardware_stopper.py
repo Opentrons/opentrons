@@ -35,8 +35,6 @@ class HardwareStopper:
     async def _drop_tip(self) -> None:
         """Drop currently attached tip, if any, into trash after a run cancel."""
         attached_tip_racks = self._state_store.pipettes.get_attached_tip_labware_by_id()
-        if not attached_tip_racks:
-            return
 
         for pip_id, tiprack_id in attached_tip_racks.items():
             mount = self._state_store.pipettes.get(pip_id).mount
@@ -52,9 +50,6 @@ class HardwareStopper:
                 well_location=WellLocation(),
             )
 
-    # TODO: With this change it will probably become more important to remove the
-    #  stop request sent by the client when 'closing' the protocol as it will perform
-    #  an unnecessary home otherwise
     async def execute_complete_stop(self) -> None:
         """Run the sequence to stop hardware, drop tip and home."""
         await self._hardware_api.halt()
@@ -65,9 +60,6 @@ class HardwareStopper:
         await self._drop_tip()
         await self._hardware_api.stop(home_after=True)
 
-    # TODO: This gets called during the protocol finish cleanup. So it will just home
-    #  all axes without a drop tip. This is consistent with the current end-of-protocol
-    #  behavior. Check with both teams if it's acceptable.
     async def simple_stop(self) -> None:
         """Only issue hardware api stop."""
         await self._hardware_api.stop(home_after=True)
