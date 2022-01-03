@@ -214,22 +214,8 @@ def test_command_queue_and_unqueue() -> None:
     assert subject.state.queued_command_ids == OrderedDict([])
 
 
-@pytest.mark.parametrize(
-    "completed_update",
-    [
-        UpdateCommandAction(
-            command=create_succeeded_command(command_id="command-id-1"),
-        ),
-        FailCommandAction(
-            command_id="command-id-1",
-            error_id="error-id",
-            failed_at=datetime(year=2023, month=3, day=3),
-            error=errors.ProtocolEngineError("oh no"),
-        ),
-    ],
-)
-def test_running_command_id(completed_update: Action) -> None:
-    """It should update the running command ID with UpdateCommandAction."""
+def test_running_command_id() -> None:
+    """It should update the running command ID through a command's lifecycle."""
     queue = QueueCommandAction(
         request=commands.PauseCreate(params=commands.PauseParams()),
         created_at=datetime(year=2021, month=1, day=1),
@@ -238,6 +224,9 @@ def test_running_command_id(completed_update: Action) -> None:
     )
     running_update = UpdateCommandAction(
         command=create_running_command(command_id="command-id-1"),
+    )
+    completed_update = UpdateCommandAction(
+        command=create_succeeded_command(command_id="command-id-1"),
     )
 
     subject = CommandStore()
@@ -262,11 +251,21 @@ def test_command_failure_clears_queue() -> None:
     )
     queue_2 = QueueCommandAction(
         request=commands.PauseCreate(params=commands.PauseParams()),
-        created_at=datetime(year=2022, month=2, day=2),
+        created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-2",
         command_key="command-key-2",
     )
-    fail = FailCommandAction(
+    running_1 = UpdateCommandAction(
+        command=commands.Pause(
+            id="command-id-1",
+            key="command-key-1",
+            createdAt=datetime(year=2021, month=1, day=1),
+            startedAt=datetime(year=2022, month=2, day=2),
+            params=commands.PauseParams(),
+            status=commands.CommandStatus.RUNNING,
+        )
+    )
+    fail_1 = FailCommandAction(
         command_id="command-id-1",
         error_id="error-id",
         failed_at=datetime(year=2023, month=3, day=3),
@@ -278,6 +277,7 @@ def test_command_failure_clears_queue() -> None:
         key="command-key-1",
         errorId="error-id",
         createdAt=datetime(year=2021, month=1, day=1),
+        startedAt=datetime(year=2022, month=2, day=2),
         completedAt=datetime(year=2023, month=3, day=3),
         params=commands.PauseParams(),
         status=commands.CommandStatus.FAILED,
@@ -286,7 +286,7 @@ def test_command_failure_clears_queue() -> None:
         id="command-id-2",
         key="command-key-2",
         errorId="error-id",
-        createdAt=datetime(year=2022, month=2, day=2),
+        createdAt=datetime(year=2021, month=1, day=1),
         completedAt=datetime(year=2023, month=3, day=3),
         params=commands.PauseParams(),
         status=commands.CommandStatus.FAILED,
@@ -296,7 +296,10 @@ def test_command_failure_clears_queue() -> None:
 
     subject.handle_action(queue_1)
     subject.handle_action(queue_2)
-    subject.handle_action(fail)
+    subject.handle_action(running_1)
+    subject.handle_action(fail_1)
+
+    assert subject.state.running_command_id is None
     assert subject.state.queued_command_ids == OrderedDict([])
     assert subject.state.commands_by_id == OrderedDict(
         [
