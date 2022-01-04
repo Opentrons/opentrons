@@ -3,7 +3,6 @@ from __future__ import annotations
 import logging
 import struct
 import asyncio
-from typing import List
 
 from . import ArbitrationId
 from opentrons_ot3_firmware import CanMessage
@@ -19,87 +18,53 @@ class SocketDriver(AbstractCanDriver):
     _server: asyncio.AbstractServer
 
     def __init__(
-        self, server: asyncio.AbstractServer, connection_handler: ConnectionHandler
+        self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter
     ) -> None:
         """Constructor.
 
         Args:
-            server: the server
-            connection_handler: the connection handler
+            reader: Reader
+            writer: Writer
         """
-        self._server = server
-        self._connection_handler = connection_handler
+        self._reader = reader
+        self._writer = writer
 
     @classmethod
-    async def build(cls, port: int) -> SocketDriver:
+    async def build(cls, host: str, port: int) -> SocketDriver:
         """Create a socket driver.
 
         Args:
+            host: The host to connect to.
             port: The port to listen on.
 
         Returns:
             A new instance.
         """
-        log.info(f"Listening on {port}")
-        connection_handler = ConnectionHandler()
-        server = await asyncio.start_server(connection_handler, port=port)
-        return SocketDriver(server, connection_handler)
+        log.info(f"Connecting to on {host}:{port}")
+        reader, writer = await asyncio.open_connection(host=host, port=port)
+        return SocketDriver(reader, writer)
 
     async def send(self, message: CanMessage) -> None:
         """Send a message."""
-        self._connection_handler.send(message)
-
-    async def read(self) -> CanMessage:
-        """Read a message."""
-        return await self._connection_handler.read()
-
-    def shutdown(self) -> None:
-        """Shutdown the driver."""
-        self._server.close()
-
-
-class ConnectionHandler:
-    """The class that manages client connections."""
-
-    _writers: List[asyncio.StreamWriter]
-    _queue: asyncio.Queue[CanMessage]
-
-    def __init__(self) -> None:
-        """Constructor."""
-        self._writers = []
-        self._queue = asyncio.Queue()
-
-    async def __call__(
-        self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter
-    ) -> None:
-        """Server accept connection callback."""
-        log.info("Handling new connection")
-
-        self._writers.append(writer)
-
-        while True:
-            header = await reader.read(8)
-            arbitration_id, length = struct.unpack(">LL", header)
-
-            if length > 0:
-                data = await reader.read(length)
-            else:
-                data = b""
-            self._queue.put_nowait(
-                CanMessage(arbitration_id=ArbitrationId(id=arbitration_id), data=data)
-            )
-
-    def send(self, message: CanMessage) -> None:
-        """Send message to all connections."""
         data = struct.pack(
             f">LL{len(message.data)}s",
             message.arbitration_id.id,
             len(message.data),
             message.data,
         )
-        for w in self._writers:
-            w.write(data)
+        self._writer.write(data)
 
     async def read(self) -> CanMessage:
         """Read a message."""
-        return await self._queue.get()
+        header = await self._reader.read(8)
+        arbitration_id, length = struct.unpack(">LL", header)
+
+        if length > 0:
+            data = await self._reader.read(length)
+        else:
+            data = b""
+        return CanMessage(arbitration_id=ArbitrationId(id=arbitration_id), data=data)
+
+    def shutdown(self) -> None:
+        """Close the driver."""
+        self._writer.close()
