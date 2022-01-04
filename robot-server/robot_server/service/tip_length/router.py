@@ -51,7 +51,8 @@ async def get_all_tip_length_calibrations(
 
     if not all_calibrations:
         return tl_models.MultipleCalibrationsResponse(
-            data=[_format_calibration(cal) for cal in all_calibrations]
+            data=[_format_calibration(cal) for cal in all_calibrations],
+            links=None,
         )
 
     if tiprack_hash:
@@ -68,7 +69,7 @@ async def get_all_tip_length_calibrations(
         )
 
     calibrations = [_format_calibration(cal) for cal in all_calibrations]
-    return tl_models.MultipleCalibrationsResponse(data=calibrations)
+    return tl_models.MultipleCalibrationsResponse(data=calibrations, links=None)
 
 
 @router.delete(

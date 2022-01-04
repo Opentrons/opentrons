@@ -1,6 +1,7 @@
 import pytest
 from unittest import mock
 
+
 from opentrons.hardware_control import API
 from opentrons.types import Mount, Point, Location
 from opentrons.protocol_api import paired_instrument_context as pc
@@ -266,21 +267,41 @@ def test_blow_out(set_up_paired_instrument, monkeypatch, ctx):
 
 def test_air_gap(set_up_paired_instrument, monkeypatch, ctx):
     paired, _ = set_up_paired_instrument
+    lw = ctx.load_labware("corning_96_wellplate_360ul_flat", 4)
 
     hardware = ctx._implementation.get_hardware().hardware
     r_pip: Pipette = hardware._attached_instruments[Mount.RIGHT]
     l_pip: Pipette = hardware._attached_instruments[Mount.LEFT]
 
+    air_gap_loc = Point(x=14.38, y=164.74, z=19.22)
+    policy = paired._implementation._pair_policy
+
+    final_move_call = mock.call(
+        policy, air_gap_loc, critical_point=None, max_speeds={}, speed=400.0
+    )
+    move_mock = mock.Mock()
+    monkeypatch.setattr(API, "move_to", move_mock)
+
     paired.pick_up_tip()
     assert r_pip.current_volume == 0
     assert l_pip.current_volume == 0
+    # Set the location to be a well plate
+    ctx.location_cache = lw.wells()[0].bottom()
     paired.air_gap(20)
 
+    assert move_mock.call_args_list[-1] == final_move_call
+    # location cache should be the default position for air gap now.
+    assert ctx.location_cache == lw.wells()[0].top(5)
     assert "air gap" in ",".join([cmd.lower() for cmd in ctx.commands()])
+
+    move_mock.reset_mock()
 
     assert r_pip.current_volume == 20
     assert l_pip.current_volume == 20
     paired.air_gap()
+
+    # since we're already at the expected location, we shouldn't move at all.
+    move_mock.assert_not_called()
 
     assert r_pip.current_volume == 300
     assert l_pip.current_volume == 300
@@ -289,10 +310,17 @@ def test_air_gap(set_up_paired_instrument, monkeypatch, ctx):
 
     aspirate_mock = mock.Mock()
     monkeypatch.setattr(API, "aspirate", aspirate_mock)
+    move_mock.reset_mock()
+
+    assert ctx.location_cache != lw.wells()[0].top(5)
 
     paired.pick_up_tip()
+    # location cache gets reset after drop tip, so we should
+    # be moving again when an air gap gets called.
+    ctx.location_cache = lw.wells()[0].bottom()
     paired.air_gap(20)
 
+    assert move_mock.call_args_list[-1] == final_move_call
     assert aspirate_mock.call_args_list == [mock.call(paired._pair_policy, 20, 1.0)]
     aspirate_mock.reset_mock()
     paired.air_gap()
@@ -354,3 +382,102 @@ def test_touch_tip_disabled(ctx, monkeypatch, get_labware_fixture):
     monkeypatch.setattr(API, "move_to", move_mock)
     paired.touch_tip(trough_lw["A1"])
     move_mock.assert_not_called()
+
+
+@pytest.fixture(scope="function")
+def tiprack1(ctx):
+    yield ctx.load_labware("opentrons_96_tiprack_300ul", 1)
+
+
+@pytest.fixture(scope="function")
+def tiprack2(ctx):
+    yield ctx.load_labware("opentrons_96_tiprack_300ul", 2)
+
+
+@pytest.fixture(scope="function")
+def tiprack3(ctx):
+    yield ctx.load_labware("opentrons_96_tiprack_300ul", 3)
+
+
+@pytest.fixture(scope="function")
+@pytest.mark.parametrize(
+    "tiprack1, tiprack2",
+    [pytest.lazy_fixture("tiprack1"), pytest.lazy_fixture("tiprack2")],
+)
+def tiprack_order_1(tiprack1, tiprack2):
+    yield [tiprack1, tiprack2]
+
+
+@pytest.fixture(scope="function")
+@pytest.mark.parametrize(
+    "tiprack2, tiprack3",
+    [pytest.lazy_fixture("tiprack2"), pytest.lazy_fixture("tiprack3")],
+)
+def tiprack_order_2(tiprack2, tiprack3):
+    yield [tiprack2, tiprack3]
+
+
+@pytest.fixture(scope="function")
+@pytest.mark.parametrize(
+    "tiprack1, tiprack2, tiprack3",
+    [
+        pytest.lazy_fixture("tiprack1"),
+        pytest.lazy_fixture("tiprack2"),
+        pytest.lazy_fixture("tiprack3"),
+    ],
+)
+def tiprack_order_3(tiprack1, tiprack2, tiprack3):
+    yield [tiprack1, tiprack2, tiprack3]
+
+
+@pytest.fixture(scope="function")
+@pytest.mark.parametrize("tiprack1", [pytest.lazy_fixture("tiprack1")])
+def tiprack_order_4(tiprack1):
+    yield [tiprack1]
+
+
+@pytest.fixture(scope="function")
+@pytest.mark.parametrize(
+    "tiprack1, tiprack3",
+    [pytest.lazy_fixture("tiprack1"), pytest.lazy_fixture("tiprack3")],
+)
+def tiprack_order_5(tiprack1, tiprack3):
+    yield [tiprack1, tiprack3]
+
+
+@pytest.fixture(scope="function")
+@pytest.mark.parametrize(
+    "tiprack2, tiprack3",
+    [pytest.lazy_fixture("tiprack2"), pytest.lazy_fixture("tiprack3")],
+)
+def tiprack_order_6(tiprack2, tiprack3):
+    yield [tiprack3, tiprack2]
+
+
+@pytest.mark.parametrize(
+    "right_tipracks, left_tipracks, expected_tipracks",
+    argvalues=[
+        (
+            pytest.lazy_fixture("tiprack_order_3"),
+            pytest.lazy_fixture("tiprack_order_2"),
+            pytest.lazy_fixture("tiprack_order_2"),
+        ),
+        (
+            pytest.lazy_fixture("tiprack_order_4"),
+            pytest.lazy_fixture("tiprack_order_3"),
+            pytest.lazy_fixture("tiprack_order_4"),
+        ),
+        (
+            pytest.lazy_fixture("tiprack_order_2"),
+            pytest.lazy_fixture("tiprack_order_6"),
+            pytest.lazy_fixture("tiprack_order_2"),
+        ),
+    ],
+)
+def test_tiprack_ordering(right_tipracks, left_tipracks, expected_tipracks, ctx):
+    right = ctx.load_instrument("p300_multi", Mount.RIGHT, tip_racks=right_tipracks)
+    left = ctx.load_instrument("p300_multi", Mount.LEFT, tip_racks=left_tipracks)
+
+    paired_object = right.pair_with(left)
+
+    assert paired_object.tip_racks == expected_tipracks

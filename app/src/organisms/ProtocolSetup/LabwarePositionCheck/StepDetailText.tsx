@@ -56,6 +56,7 @@ export const StepDetailText = (
           values={{ labware_name: displayName, tiprack_name: displayName }}
           components={{
             bold: <strong />,
+            italic: <i />,
           }}
         />
         <Btn
@@ -63,6 +64,7 @@ export const StepDetailText = (
           color={C_BLUE}
           marginLeft="0.1rem"
           onClick={() => setLabwarePositionCheckStepDetailModal(true)}
+          id={`StepDetailText_link`}
         >
           {t('labware_step_detail_link')}
         </Btn>

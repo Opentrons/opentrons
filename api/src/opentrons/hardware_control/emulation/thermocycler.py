@@ -8,17 +8,13 @@ from typing import Optional
 from opentrons.drivers.thermocycler.driver import GCODE
 from opentrons.drivers.types import ThermocyclerLidStatus
 from opentrons.hardware_control.emulation.parser import Parser, Command
+from opentrons.hardware_control.emulation.settings import ThermocyclerSettings
 
 from .abstract_emulator import AbstractEmulator
 from .simulations import Temperature, TemperatureWithHold
 from . import util
 
 logger = logging.getLogger(__name__)
-
-
-SERIAL = "thermocycler_emulator"
-MODEL = "v02"
-VERSION = "v1.1.0"
 
 
 class ThermocyclerEmulator(AbstractEmulator):
@@ -30,9 +26,10 @@ class ThermocyclerEmulator(AbstractEmulator):
     plate_volume: util.OptionalValue[float]
     plate_ramp_rate: util.OptionalValue[float]
 
-    def __init__(self, parser: Parser) -> None:
-        self.reset()
+    def __init__(self, parser: Parser, settings: ThermocyclerSettings) -> None:
         self._parser = parser
+        self._settings = settings
+        self.reset()
 
     def handle(self, line: str) -> Optional[str]:
         """Handle a line"""
@@ -41,9 +38,13 @@ class ThermocyclerEmulator(AbstractEmulator):
         return None if not joined else joined
 
     def reset(self):
-        self._lid_temperature = Temperature(per_tick=2, current=util.TEMPERATURE_ROOM)
+        self._lid_temperature = Temperature(
+            per_tick=self._settings.lid_temperature.degrees_per_tick,
+            current=self._settings.lid_temperature.starting,
+        )
         self._plate_temperature = TemperatureWithHold(
-            per_tick=2, current=util.TEMPERATURE_ROOM
+            per_tick=self._settings.plate_temperature.degrees_per_tick,
+            current=self._settings.plate_temperature.starting,
         )
         self.lid_status = ThermocyclerLidStatus.OPEN
         self.plate_volume = util.OptionalValue[float]()
@@ -115,7 +116,11 @@ class ThermocyclerEmulator(AbstractEmulator):
         elif command.gcode == GCODE.DEACTIVATE_BLOCK:
             self._plate_temperature.deactivate(temperature=util.TEMPERATURE_ROOM)
         elif command.gcode == GCODE.DEVICE_INFO:
-            return f"serial:{SERIAL} model:{MODEL} version:{VERSION}"
+            return (
+                f"serial:{self._settings.serial_number} "
+                f"model:{self._settings.model} "
+                f"version:{self._settings.version}"
+            )
         return None
 
     @staticmethod

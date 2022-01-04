@@ -6,53 +6,24 @@ marks:
 stages:
   - name: Reset Options GET request returns correct option
     request:
-      url: "{host:s}:{port:d}/settings/reset/options"
+      url: '{host:s}:{port:d}/settings/reset/options'
       method: GET
     response:
       status_code: 200
       json:
         options:
-        - id: labwareCalibration
-          name: Labware Calibration
-          description: !re_search "Clear labware calibration"
-        - id: bootScripts
-          name: Boot Scripts
-          description: Clear custom boot scripts
-        - id: deckCalibration
-          name: Deck Calibration
-          description: !re_search "Clear deck calibration"
-        - id: pipetteOffsetCalibrations
-          name: Pipette Offset Calibrations
-          description: !re_search "Clear pipette offset calibrations"
-        - id: tipLengthCalibrations
-          name: Tip Length Calibrations
-          description: !re_search "Clear tip length calibrations"
----
-test_name: POST Reset labwareCalibration option
-marks:
-  - usefixtures:
-      - run_server
-stages:
-  - name: POST Reset labwareCalibration true
-    request:
-      url: "{host:s}:{port:d}/settings/reset"
-      method: POST
-      json:
-        labwareCalibration: true
-    response:
-      status_code: 200
-      json:
-        message: "Options 'labware_calibration' were reset"
-  - name: POST Reset labwareCalibration false
-    request:
-      url: "{host:s}:{port:d}/settings/reset"
-      method: POST
-      json:
-        labwareCalibration: false
-    response:
-      status_code: 200
-      json:
-        message: "Nothing to do"
+          - id: bootScripts
+            name: Boot Scripts
+            description: Clear custom boot scripts
+          - id: deckCalibration
+            name: Deck Calibration
+            description: !re_search 'Clear deck calibration'
+          - id: pipetteOffsetCalibrations
+            name: Pipette Offset Calibrations
+            description: !re_search 'Clear pipette offset calibrations'
+          - id: tipLengthCalibrations
+            name: Tip Length Calibrations
+            description: !re_search 'Clear tip length calibrations'
 ---
 test_name: POST Reset bootScripts option
 marks:
@@ -61,7 +32,7 @@ marks:
 stages:
   - name: POST Reset bootScripts true
     request:
-      url: "{host:s}:{port:d}/settings/reset"
+      url: '{host:s}:{port:d}/settings/reset'
       method: POST
       json:
         bootScripts: true
@@ -71,14 +42,14 @@ stages:
         message: "Options 'boot_scripts' were reset"
   - name: POST Reset bootScripts false
     request:
-      url: "{host:s}:{port:d}/settings/reset"
+      url: '{host:s}:{port:d}/settings/reset'
       method: POST
       json:
         bootScripts: false
     response:
       status_code: 200
       json:
-        message: "Nothing to do"
+        message: 'Nothing to do'
 ---
 test_name: POST Reset deck calibration option
 marks:
@@ -87,7 +58,7 @@ marks:
 stages:
   - name: POST Reset deckCalibration true
     request:
-      url: "{host:s}:{port:d}/settings/reset"
+      url: '{host:s}:{port:d}/settings/reset'
       method: POST
       json:
         deckCalibration: true
@@ -97,14 +68,14 @@ stages:
         message: "Options 'deck_calibration' were reset"
   - name: POST Reset deckCalibration false
     request:
-      url: "{host:s}:{port:d}/settings/reset"
+      url: '{host:s}:{port:d}/settings/reset'
       method: POST
       json:
         deckCalibration: false
     response:
       status_code: 200
       json:
-        message: "Nothing to do"
+        message: 'Nothing to do'
 ---
 test_name: POST Reset pipette offset calibrations option
 marks:
@@ -113,7 +84,7 @@ marks:
 stages:
   - name: POST Reset pipetteOffsetCalibrations true
     request:
-      url: "{host:s}:{port:d}/settings/reset"
+      url: '{host:s}:{port:d}/settings/reset'
       method: POST
       json:
         pipetteOffsetCalibrations: true
@@ -123,14 +94,14 @@ stages:
         message: "Options 'pipette_offset' were reset"
   - name: POST Reset pipetteOffsetCalibrations false
     request:
-      url: "{host:s}:{port:d}/settings/reset"
+      url: '{host:s}:{port:d}/settings/reset'
       method: POST
       json:
         pipetteOffsetCalibrations: false
     response:
       status_code: 200
       json:
-        message: "Nothing to do"
+        message: 'Nothing to do'
 ---
 test_name: POST Reset non existant option
 marks:
@@ -139,11 +110,11 @@ marks:
 stages:
   - name: POST Reset non existant option
     request:
-      url: "{host:s}:{port:d}/settings/reset"
+      url: '{host:s}:{port:d}/settings/reset'
       method: POST
       json:
         doesNotExist: true
     response:
       status_code: 422
       json:
-        message: !re_search "value is not a valid enumeration member"
+        message: !re_search 'value is not a valid enumeration member'

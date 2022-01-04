@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 from ..types import WellLocation
 
 
-class BasePipettingData(BaseModel):
+class BasePipettingParams(BaseModel):
     """Base class for data payloads of commands that interact with wells."""
 
     pipetteId: str = Field(
@@ -19,9 +19,13 @@ class BasePipettingData(BaseModel):
         ...,
         description="Name of well to use in labware.",
     )
+    wellLocation: WellLocation = Field(
+        default_factory=WellLocation,
+        description="Relative well location at which to perform the operation",
+    )
 
 
-class BaseLiquidHandlingData(BasePipettingData):
+class BaseLiquidHandlingParams(BasePipettingParams):
     """Base class for data payloads of commands that handle liquid."""
 
     volume: float = Field(
@@ -29,10 +33,6 @@ class BaseLiquidHandlingData(BasePipettingData):
         description="Amount of liquid in uL. Must be greater than 0 and less "
         "than a pipette-specific maximum volume.",
         gt=0,
-    )
-    wellLocation: WellLocation = Field(
-        ...,
-        description="Relative well location at which to perform the operation",
     )
 
     # todo(mm, 2021-03-26): This class or one of its subclasses should have a

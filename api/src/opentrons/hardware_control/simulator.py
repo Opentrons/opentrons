@@ -14,7 +14,6 @@ from opentrons.config.types import RobotConfig
 from opentrons.drivers.smoothie_drivers import SimulatingDriver
 
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
-from opentrons.drivers.rpi_drivers import usb_simulator
 
 from . import modules
 from .types import BoardRevision, Axis
@@ -154,7 +153,6 @@ class Simulator:
         self._log = MODULE_LOG.getChild(repr(self))
         self._strict_attached = bool(strict_attached_instruments)
         self._board_revision = BoardRevision.OG
-        self._usb = usb_simulator.USBBusSimulator(self._board_revision)
         # TODO (lc 05-12-2021) In a follow-up refactor that pulls the execution
         # manager responsbility into the controller/backend itself as opposed
         # to the hardware api controller.
@@ -176,6 +174,12 @@ class Simulator:
 
     async def update_position(self) -> Dict[str, float]:
         return self._position
+
+    def is_homed(self, axes: Sequence[str]) -> bool:
+        for axis in axes:
+            if not self._smoothie_driver.homed_flags.get(axis, False):
+                return False
+        return True
 
     async def move(
         self,

@@ -1,7 +1,9 @@
 """Application routes."""
 from fastapi import APIRouter, Depends, status
 
-from opentrons.config.feature_flags import enable_protocol_engine
+from opentrons.config.feature_flags import (
+    enable_http_protocol_sessions as enable_deprecated_protocol_uploads,
+)
 
 from .constants import V1_TAG
 from .errors import LegacyErrorResponse
@@ -42,33 +44,30 @@ router.include_router(
     },
 )
 
+router.include_router(
+    router=runs_router,
+    tags=["Run Management"],
+    dependencies=[Depends(check_version_header)],
+)
 
-if enable_protocol_engine():
+if enable_deprecated_protocol_uploads():
     router.include_router(
-        router=runs_router,
-        tags=["Run Management"],
+        router=deprecated_protocol_router,
+        tags=["Protocol Management"],
         dependencies=[Depends(check_version_header)],
     )
-
+else:
     router.include_router(
         router=protocols_router,
         tags=["Protocol Management"],
         dependencies=[Depends(check_version_header)],
     )
 
-else:
-    router.include_router(
-        router=deprecated_session_router,
-        tags=["Session Management"],
-        dependencies=[Depends(check_version_header)],
-    )
-
-    router.include_router(
-        router=deprecated_protocol_router,
-        tags=["Protocol Management"],
-        dependencies=[Depends(check_version_header)],
-    )
-
+router.include_router(
+    router=deprecated_session_router,
+    tags=["Session Management"],
+    dependencies=[Depends(check_version_header)],
+)
 
 router.include_router(
     router=labware_router,

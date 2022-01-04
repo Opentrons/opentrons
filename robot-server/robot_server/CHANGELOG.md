@@ -3,6 +3,92 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.0.0-beta.5](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.4...v5.0.0-beta.5) (2021-12-23)
+
+**Note:** Version bump only for package @opentrons/robot-server
+
+
+
+
+
+# [5.0.0-beta.4](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.3...v5.0.0-beta.4) (2021-12-14)
+
+
+### Features
+
+* **robot-server:** Expose robot model in health ([#9072](https://github.com/Opentrons/opentrons/issues/9072)) ([8e052fc](https://github.com/Opentrons/opentrons/commit/8e052fcbb11c7338df4725ac7257c37fc5dd77fb))
+
+
+
+
+
+# [5.0.0-beta.3](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.2...v5.0.0-beta.3) (2021-12-10)
+
+**Note:** Version bump only for package @opentrons/robot-server
+
+
+
+
+
+# [5.0.0-beta.2](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.1...v5.0.0-beta.2) (2021-12-08)
+
+**Note:** Version bump only for package @opentrons/robot-server
+
+
+
+
+
+# [5.0.0-beta.1](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.0...v5.0.0-beta.1) (2021-12-07)
+
+
+### Features
+
+* **ot3:** ot3 hardware controller move ([#8738](https://github.com/Opentrons/opentrons/issues/8738)) ([883db3a](https://github.com/Opentrons/opentrons/commit/883db3a96ca9c6a48bd4ccee16e221fe03154361)), closes [#8946](https://github.com/Opentrons/opentrons/issues/8946)
+
+
+
+
+
+# [5.0.0-beta.0](https://github.com/Opentrons/opentrons/compare/v4.7.0...v5.0.0-beta.0) (2021-11-30)
+
+
+### Features
+
+* **robot-server:** enable /runs and /protocols endpoints by default ([#8913](https://github.com/Opentrons/opentrons/issues/8913)) ([aa3549f](https://github.com/Opentrons/opentrons/commit/aa3549fad49383243f9ad2ccc291d15e8fd50725)), closes [#8155](https://github.com/Opentrons/opentrons/issues/8155)
+
+
+### BREAKING CHANGES
+
+* **robot-server:** The RPC WebSocket endpoint has been removed. The /protocols endpoints have been
+heavily reworked.
+
+
+
+
+
+# [4.7.0](https://github.com/Opentrons/opentrons/compare/v4.6.2...v4.7.0) (2021-11-18)
+
+
+### Bug Fixes
+
+* **robot-server:** avoid LabwareDefinition type in cal models ([#8698](https://github.com/Opentrons/opentrons/issues/8698)) ([c3bf7ab](https://github.com/Opentrons/opentrons/commit/c3bf7ab51074e8b5e160ce5755be6e80296f1963)), closes [#8654](https://github.com/Opentrons/opentrons/issues/8654)
+* **robot-server:** ensure background tasks do not affect requests ([#8362](https://github.com/Opentrons/opentrons/issues/8362)) ([3e4bc2f](https://github.com/Opentrons/opentrons/commit/3e4bc2f504282c51622682001780f35d5f3e5312))
+
+
+### Features
+
+* **api,robot-server:** upgrade fastapi and pydantic deps ([#8345](https://github.com/Opentrons/opentrons/issues/8345)) ([9cf416a](https://github.com/Opentrons/opentrons/commit/9cf416a498e77b2127a6e3e71298f9368f818d35)), closes [#8134](https://github.com/Opentrons/opentrons/issues/8134)
+* **robot-server:** allow a run and a legacy session to exist simultaneously ([#8615](https://github.com/Opentrons/opentrons/issues/8615)) ([b470946](https://github.com/Opentrons/opentrons/commit/b4709462df09479a2c4f8160561046e5cd588e3b))
+
+
+### Reverts
+
+* **robot-server:** revert attach pipette code back to using the mount ([#8699](https://github.com/Opentrons/opentrons/issues/8699)) ([dc9f9a8](https://github.com/Opentrons/opentrons/commit/dc9f9a8df5cd92b8efe0dceae0415dc7240682a3))
+
+
+
+
+
 
 
 **Note:** Version bump only for package @opentrons/robot-server

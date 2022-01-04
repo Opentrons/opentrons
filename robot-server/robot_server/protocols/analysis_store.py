@@ -1,9 +1,9 @@
 """Protocol analysis storage."""
-from typing import Dict, List, Set, Sequence
+from typing import Dict, List, Set
 
 from opentrons.protocol_engine import (
     Command,
-    CommandStatus,
+    ErrorOccurrence,
     LoadedPipette,
     LoadedLabware,
 )
@@ -26,7 +26,7 @@ class AnalysisStore:
 
     def add_pending(self, protocol_id: str, analysis_id: str) -> List[ProtocolAnalysis]:
         """Add a pending analysis to the store."""
-        self._analyses_by_id[analysis_id] = PendingAnalysis(id=analysis_id)
+        self._analyses_by_id[analysis_id] = PendingAnalysis.construct(id=analysis_id)
 
         ids_for_protocol = self._analysis_ids_by_protocol.get(protocol_id, set())
         ids_for_protocol.add(analysis_id)
@@ -37,29 +37,24 @@ class AnalysisStore:
     def update(
         self,
         analysis_id: str,
-        commands: Sequence[Command],
-        labware: Sequence[LoadedLabware],
-        pipettes: Sequence[LoadedPipette],
-        errors: Sequence[Exception],
+        commands: List[Command],
+        labware: List[LoadedLabware],
+        pipettes: List[LoadedPipette],
+        errors: List[ErrorOccurrence],
     ) -> None:
         """Update analysis results in the store."""
-        # TODO(mc, 2021-08-25): return error details objects, not strings
-        error_messages = [str(e) for e in errors]
-
-        if len(error_messages) > 0:
-            result = AnalysisResult.ERROR
-        elif any(c.status == CommandStatus.FAILED for c in commands):
+        if len(errors) > 0:
             result = AnalysisResult.NOT_OK
         else:
             result = AnalysisResult.OK
 
-        self._analyses_by_id[analysis_id] = CompletedAnalysis(
+        self._analyses_by_id[analysis_id] = CompletedAnalysis.construct(
             id=analysis_id,
             result=result,
-            commands=list(commands),
-            labware=list(labware),
-            pipettes=list(pipettes),
-            errors=error_messages,
+            commands=commands,
+            labware=labware,
+            pipettes=pipettes,
+            errors=errors,
         )
 
     def get_by_protocol(self, protocol_id: str) -> List[ProtocolAnalysis]:

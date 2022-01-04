@@ -5,7 +5,12 @@ from pydantic import BaseModel, Field
 from typing import List, Union
 from typing_extensions import Literal
 
-from opentrons.protocol_engine import Command, LoadedLabware, LoadedPipette
+from opentrons.protocol_engine import (
+    Command,
+    ErrorOccurrence,
+    LoadedLabware,
+    LoadedPipette,
+)
 
 
 class AnalysisStatus(str, Enum):
@@ -22,20 +27,16 @@ class AnalysisResult(str, Enum):
 
     Properties:
         OK: No problems were found during protocol analysis.
-        NOT_OK: Problems were found with the logic of the protocol itself.
-            Inspect `analysis.commands` for commands that did not succeed.
-        ERROR: An error prevented the analysis from determining a conclusive
-            result, most likely due to a bug in the protocol's Python source
-            (for example, a syntax error). Inspect `analysis.errors`.
+        NOT_OK: Problems were found during protocol analysis. Inspect
+            `analysis.errors` for error occurrences.
     """
 
     OK = "ok"
     NOT_OK = "not-ok"
-    ERROR = "error"
 
 
 class AnalysisSummary(BaseModel):
-    """Base model for an analyis of a protocol."""
+    """Base model for an analysis of a protocol."""
 
     id: str = Field(..., description="Unique identifier of this analysis resource")
     status: AnalysisStatus = Field(..., description="Status of the analysis")
@@ -50,7 +51,7 @@ class PendingAnalysis(AnalysisSummary):
 class CompletedAnalysis(AnalysisSummary):
     """A completed protocol run analysis.
 
-    This analyis provides three pieces of information:
+    This analysis provides three pieces of information:
 
     - A smoke test on whether the run is expected to succeed, given available data.
     - The equipment (labware, pipettes, modules) that the protocol will use.
@@ -85,12 +86,9 @@ class CompletedAnalysis(AnalysisSummary):
         ...,
         description="The protocol commands the run is expected to produce",
     )
-    # TODO(mc, 2021-09-01): replace string with error details object. Details
-    # object should try to distinguish between engine errors, Python execution
-    # errors, and unexpected errors due to Opentrons-sourced bugs
-    errors: List[str] = Field(
+    errors: List[ErrorOccurrence] = Field(
         ...,
-        description="Any problems that prevented a conclusive analysis",
+        description="Any errors the protocol run produced",
     )
 
 

@@ -130,6 +130,7 @@ class Thermocycler(mod_abc.AbstractModule):
     async def cleanup(self) -> None:
         """Stop the poller task."""
         await self._poller.stop_and_wait()
+        await self._driver.disconnect()
 
     @classmethod
     def name(cls) -> str:
@@ -363,8 +364,10 @@ class Thermocycler(mod_abc.AbstractModule):
             else None
         )
 
+    # todo(mm, 2021-11-29): Instead of being Optional, should this return
+    # ThermocyclerLidStatus.UNKNOWN when self._listener.state is None?
     @property
-    def lid_status(self) -> Optional[str]:
+    def lid_status(self) -> Optional[ThermocyclerLidStatus]:
         return self._listener.state.lid_status if self._listener.state else None
 
     @property

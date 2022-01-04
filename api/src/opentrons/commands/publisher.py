@@ -2,9 +2,10 @@ import functools
 import inspect
 from contextlib import contextmanager
 from typing import Any, Callable, Iterator, Optional, TypeVar, cast
+from uuid import uuid4
 
 from opentrons.broker import Broker
-from opentrons.config import feature_flags
+
 from .types import (
     COMMAND as COMMAND_TOPIC,
     Command as CommandPayload,
@@ -103,19 +104,24 @@ def publish_context(broker: Broker, command: CommandPayload) -> Iterator[None]:
     """Publish messages before and after the `with` block has run.
 
     If an `error` is raised in the `with` block, it will be published in the "after"
-    message (if the ProtocolEngine is enabled) and re-raised.
+    message and re-raised.
     """
-    capture_errors = feature_flags.enable_protocol_engine()
+    message_id = str(uuid4())
+    _do_publish(broker=broker, message_id=message_id, command=command, when="before")
 
-    _do_publish(broker=broker, command=command, when="before")
     try:
         yield
     except Exception as error:
-        if capture_errors:
-            _do_publish(broker=broker, command=command, when="after", error=error)
+        _do_publish(
+            broker=broker,
+            message_id=message_id,
+            command=command,
+            when="after",
+            error=error,
+        )
         raise
     else:
-        _do_publish(broker=broker, command=command, when="after")
+        _do_publish(broker=broker, message_id=message_id, command=command, when="after")
 
 
 @functools.lru_cache(maxsize=None)
@@ -126,6 +132,7 @@ def _inspect_signature(func: Callable[..., Any]) -> inspect.Signature:
 
 def _do_publish(
     broker: Broker,
+    message_id: str,
     command: CommandPayload,
     when: MessageSequenceId,
     error: Optional[Exception] = None,
@@ -135,6 +142,7 @@ def _do_publish(
     payload = command["payload"]
     message: CommandMessage = {  # type: ignore[assignment, misc]
         "$": when,
+        "id": message_id,
         "name": name,
         "payload": payload,
         "error": error,

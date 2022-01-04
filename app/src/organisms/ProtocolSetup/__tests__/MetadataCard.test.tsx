@@ -21,7 +21,7 @@ describe('MetadataCard', () => {
     useProtocolMetadata.mockReturnValue({
       author: 'Anne McLaren',
       lastUpdated: 1624916984418, // epoch time for UTC-4 "Jun 28, 2021, 5:49:44 PM"
-      method: 'custom protocol creator application',
+      creationMethod: 'json',
       description: 'this describes the protocol',
     })
   })
@@ -39,13 +39,14 @@ describe('MetadataCard', () => {
       /Jun 2[89], 2021, [1-9]?[1-9]:[1-9]9:44 PM/i
     ) // loose check to compensate for different TZ's
     expect(getByText('Creation Method').nextElementSibling).toHaveTextContent(
-      /custom protocol creator application/i
+      /json/i
     )
     expect(getByText('Description').nextElementSibling).toHaveTextContent(
       /this describes the protocol/i
     )
-    expect(
-      getByText('Estimated Run Time').nextElementSibling
-    ).toHaveTextContent(/-/i)
+    // TODO: add estimated run time back in when ready
+    // expect(
+    //   getByText('Estimated Run Time').nextElementSibling
+    // ).toHaveTextContent(/-/i)
   })
 })

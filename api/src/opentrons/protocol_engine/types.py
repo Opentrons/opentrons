@@ -1,8 +1,10 @@
 """Public protocol engine value types and models."""
+
+from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass
 from pydantic import BaseModel, Field
-from typing import Union
+from typing import Optional, Union, List, Dict, Any
 
 from opentrons.types import MountType, DeckSlotName
 
@@ -10,24 +12,33 @@ from opentrons.types import MountType, DeckSlotName
 class EngineStatus(str, Enum):
     """Current execution status of a ProtocolEngine."""
 
-    READY_TO_RUN = "ready-to-run"
+    IDLE = "idle"
     RUNNING = "running"
-    PAUSE_REQUESTED = "pause-requested"
     PAUSED = "paused"
     STOP_REQUESTED = "stop-requested"
     STOPPED = "stopped"
+    FINISHING = "finishing"
     FAILED = "failed"
     SUCCEEDED = "succeeded"
 
 
 class DeckSlotLocation(BaseModel):
-    """Location for labware placed in a single slot."""
+    """The location of something placed in a single deck slot."""
 
-    slot: DeckSlotName
+    slotName: DeckSlotName
 
 
-LabwareLocation = Union[DeckSlotLocation]
-"""Union of all legal labware locations."""
+class ModuleLocation(BaseModel):
+    """The location of something placed atop a hardware module."""
+
+    moduleId: str = Field(
+        ...,
+        description="The ID of a loaded module from a prior `loadModule` command.",
+    )
+
+
+LabwareLocation = Union[DeckSlotLocation, ModuleLocation]
+"""Union of all locations where it's legal to load a labware."""
 
 
 class WellOrigin(str, Enum):
@@ -61,8 +72,8 @@ class Dimensions:
     z: float
 
 
-class CalibrationOffset(BaseModel):
-    """Calibration offset from nomimal to actual position."""
+class DeckPoint(BaseModel):
+    """Coordinates of a point in deck space."""
 
     x: float
     y: float
@@ -96,6 +107,143 @@ class LoadedPipette(BaseModel):
     mount: MountType
 
 
+class MovementAxis(str, Enum):
+    """Axis on which to issue a relative movement."""
+
+    X = "x"
+    Y = "y"
+    Z = "z"
+
+
+class MotorAxis(str, Enum):
+    """Motor axis on which to issue a home command."""
+
+    X = "x"
+    Y = "y"
+    LEFT_Z = "leftZ"
+    RIGHT_Z = "rightZ"
+    LEFT_PLUNGER = "leftPlunger"
+    RIGHT_PLUNGER = "rightPlunger"
+
+
+class ModuleModel(str, Enum):
+    """All available modules' models."""
+
+    TEMPERATURE_MODULE_V1 = "temperatureModuleV1"
+    TEMPERATURE_MODULE_V2 = "temperatureModuleV2"
+    MAGNETIC_MODULE_V1 = "magneticModuleV1"
+    MAGNETIC_MODULE_V2 = "magneticModuleV2"
+    THERMOCYCLER_MODULE_V1 = "thermocyclerModuleV1"
+
+
+class ModuleDimensions(BaseModel):
+    """Dimension type for modules."""
+
+    bareOverallHeight: float
+    overLabwareHeight: float
+    lidHeight: Optional[float]
+
+
+class ModuleCalibrationPoint(BaseModel):
+    """Calibration Point type for module definition."""
+
+    x: float
+    y: float
+
+
+class LabwareOffsetVector(BaseModel):
+    """Offset, in deck coordinates from nominal to actual position."""
+
+    x: float
+    y: float
+    z: float
+
+
+class ModuleDefinition(BaseModel):
+    """Module definition class."""
+
+    otSharedSchema: str = Field("module/schemas/2", description="The current schema.")
+    moduleType: str = Field(
+        ..., description="Module type (Temperature/ Magnetic/ Thermocycler)"
+    )
+    model: str = Field(..., description="Model name of the module")
+    labwareOffset: LabwareOffsetVector = Field(
+        ..., description="Labware offset in x, y, z."
+    )
+    dimensions: ModuleDimensions = Field(..., description="Module dimension")
+    calibrationPoint: ModuleCalibrationPoint = Field(
+        ..., description="Calibration point of module."
+    )
+    displayName: str = Field(..., description="Display name.")
+    quirks: List[str] = Field(..., description="Module quirks")
+    slotTransforms: Dict[str, Any] = Field(
+        ..., description="Dictionary of transforms for each slot."
+    )
+    compatibleWith: List[str] = Field(
+        ..., description="List of module models this model is compatible with."
+    )
+
+
+class LoadedModule(BaseModel):
+    """A module that has been loaded."""
+
+    id: str
+    model: ModuleModel
+    location: DeckSlotLocation
+    definition: ModuleDefinition
+    # TODO(mc, 2021-11-24): make serial non-optional, here and in internal state.
+    # Our hardware backend always provides a module serial, even when it's simulated.
+    serial: Optional[str]
+
+
+class LabwareOffsetLocation(BaseModel):
+    """Parameters describing when a given offset may apply to a given labware load."""
+
+    slotName: DeckSlotName = Field(
+        ...,
+        description="The deck slot the offset applies to",
+    )
+    moduleModel: Optional[ModuleModel] = Field(
+        None,
+        description="The module model the labware will be loaded onto, if applicable",
+    )
+
+
+class LabwareOffset(BaseModel):
+    """An offset that the robot adds to a pipette's position when it moves to a labware.
+
+    During the run, if a labware is loaded whose definition URI and location
+    both match what's found here, the given offset will be added to all
+    pipette movements that use that labware as a reference point.
+    """
+
+    id: str = Field(..., description="Unique labware offset record identifier.")
+    createdAt: datetime = Field(..., description="When this labware offset was added.")
+    definitionUri: str = Field(..., description="The URI for the labware's definition.")
+    location: LabwareOffsetLocation = Field(
+        ...,
+        description="Where the labware is located on the robot.",
+    )
+    vector: LabwareOffsetVector = Field(
+        ...,
+        description="The offset applied to matching labware.",
+    )
+
+
+class LabwareOffsetCreate(BaseModel):
+    """Create request data for a labware offset."""
+
+    definitionUri: str = Field(..., description="The URI for the labware's definition.")
+    location: LabwareOffsetLocation = Field(
+        ...,
+        description="Where the labware is located on the robot.",
+    )
+    vector: LabwareOffsetVector = Field(
+        ...,
+        description="The offset applied to matching labware.",
+    )
+
+
 class LoadedLabware(BaseModel):
     """A labware that has been loaded."""
 
@@ -103,3 +251,12 @@ class LoadedLabware(BaseModel):
     loadName: str
     definitionUri: str
     location: LabwareLocation
+    offsetId: Optional[str] = Field(
+        None,
+        description=(
+            "An ID referencing the offset applied to this labware placement,"
+            " decided at load time."
+            " Null or undefined means no offset was provided for this load,"
+            " so the default of (0, 0, 0) will be used."
+        ),
+    )

@@ -1,19 +1,22 @@
 """Smoke tests for the CommandExecutor class."""
 import pytest
 from datetime import datetime
-from decoy import Decoy
+from decoy import Decoy, matchers
 from pydantic import BaseModel
-from typing import Optional, Type, cast
+from typing import Any, Optional, Type, cast
 
-from opentrons.protocol_engine.errors import ProtocolEngineError
+from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.state import StateStore
-from opentrons.protocol_engine.actions import ActionDispatcher, UpdateCommandAction
+from opentrons.protocol_engine.actions import (
+    ActionDispatcher,
+    UpdateCommandAction,
+    FailCommandAction,
+)
 
 from opentrons.protocol_engine.commands import (
     AbstractCommandImpl,
     BaseCommand,
-    CommandMapper,
     CommandStatus,
     Command,
 )
@@ -70,12 +73,6 @@ def model_utils(decoy: Decoy) -> ModelUtils:
 
 
 @pytest.fixture
-def command_mapper(decoy: Decoy) -> CommandMapper:
-    """Get a mocked out CommandMapper."""
-    return decoy.mock(cls=CommandMapper)
-
-
-@pytest.fixture
 def subject(
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
@@ -84,7 +81,6 @@ def subject(
     pipetting: PipettingHandler,
     run_control: RunControlHandler,
     model_utils: ModelUtils,
-    command_mapper: CommandMapper,
 ) -> CommandExecutor:
     """Get a CommandExecutor test subject with its dependencies mocked out."""
     return CommandExecutor(
@@ -95,11 +91,10 @@ def subject(
         pipetting=pipetting,
         run_control=run_control,
         model_utils=model_utils,
-        command_mapper=command_mapper,
     )
 
 
-class _TestCommandData(BaseModel):
+class _TestCommandParams(BaseModel):
     foo: str = "foo"
 
 
@@ -107,8 +102,8 @@ class _TestCommandResult(BaseModel):
     bar: str = "bar"
 
 
-class _TestCommandImpl(AbstractCommandImpl[_TestCommandData, _TestCommandResult]):
-    async def execute(self, data: _TestCommandData) -> _TestCommandResult:
+class _TestCommandImpl(AbstractCommandImpl[_TestCommandParams, _TestCommandResult]):
+    async def execute(self, params: _TestCommandParams) -> _TestCommandResult:
         raise NotImplementedError()
 
 
@@ -121,32 +116,32 @@ async def test_execute(
     pipetting: PipettingHandler,
     run_control: RunControlHandler,
     model_utils: ModelUtils,
-    command_mapper: CommandMapper,
     subject: CommandExecutor,
 ) -> None:
     """It should be able execute a command."""
     TestCommandImplCls = decoy.mock(func=_TestCommandImpl)
     command_impl = decoy.mock(cls=_TestCommandImpl)
 
-    class _TestCommand(BaseCommand[_TestCommandData, _TestCommandResult]):
+    class _TestCommand(BaseCommand[_TestCommandParams, _TestCommandResult]):
         commandType: str = "testCommand"
-        data: _TestCommandData
+        params: _TestCommandParams
         result: Optional[_TestCommandResult]
 
         @property
         def _ImplementationCls(self) -> Type[_TestCommandImpl]:
             return TestCommandImplCls
 
-    command_data = _TestCommandData()
+    command_params = _TestCommandParams()
     command_result = _TestCommandResult()
 
     queued_command = cast(
         Command,
         _TestCommand(
             id="command-id",
+            key="command-key",
             createdAt=datetime(year=2021, month=1, day=1),
             status=CommandStatus.QUEUED,
-            data=command_data,
+            params=command_params,
         ),
     )
 
@@ -154,10 +149,11 @@ async def test_execute(
         Command,
         _TestCommand(
             id="command-id",
+            key="command-key",
             createdAt=datetime(year=2021, month=1, day=1),
             startedAt=datetime(year=2022, month=2, day=2),
             status=CommandStatus.RUNNING,
-            data=command_data,
+            params=command_params,
         ),
     )
 
@@ -165,11 +161,12 @@ async def test_execute(
         Command,
         _TestCommand(
             id="command-id",
+            key="command-key",
             createdAt=datetime(year=2021, month=1, day=1),
             startedAt=datetime(year=2022, month=2, day=2),
             completedAt=datetime(year=2023, month=3, day=3),
             status=CommandStatus.SUCCEEDED,
-            data=command_data,
+            params=command_params,
             result=command_result,
         ),
     )
@@ -189,30 +186,12 @@ async def test_execute(
         command_impl  # type: ignore[arg-type]
     )
 
-    decoy.when(await command_impl.execute(command_data)).then_return(command_result)
+    decoy.when(await command_impl.execute(command_params)).then_return(command_result)
 
     decoy.when(model_utils.get_timestamp()).then_return(
         datetime(year=2022, month=2, day=2),
         datetime(year=2023, month=3, day=3),
     )
-
-    decoy.when(
-        command_mapper.update_command(
-            command=queued_command,
-            status=CommandStatus.RUNNING,
-            startedAt=datetime(year=2022, month=2, day=2),
-        )
-    ).then_return(running_command)
-
-    decoy.when(
-        command_mapper.update_command(
-            command=running_command,
-            status=CommandStatus.SUCCEEDED,
-            completedAt=datetime(year=2023, month=3, day=3),
-            result=command_result,
-            error=None,
-        )
-    ).then_return(completed_command)
 
     await subject.execute("command-id")
 
@@ -222,6 +201,19 @@ async def test_execute(
     )
 
 
+@pytest.mark.parametrize(
+    ["command_error", "expected_error"],
+    [
+        (
+            errors.ProtocolEngineError("oh no"),
+            matchers.ErrorMatching(errors.ProtocolEngineError, match="oh no"),
+        ),
+        (
+            RuntimeError("oh no"),
+            matchers.ErrorMatching(errors.UnexpectedProtocolError, match="oh no"),
+        ),
+    ],
+)
 async def test_execute_raises_protocol_engine_error(
     decoy: Decoy,
     state_store: StateStore,
@@ -231,32 +223,33 @@ async def test_execute_raises_protocol_engine_error(
     pipetting: PipettingHandler,
     run_control: RunControlHandler,
     model_utils: ModelUtils,
-    command_mapper: CommandMapper,
     subject: CommandExecutor,
+    command_error: Exception,
+    expected_error: Any,
 ) -> None:
-    """It should be able execute a command."""
+    """It should handle an error occuring during execution."""
     TestCommandImplCls = decoy.mock(func=_TestCommandImpl)
     command_impl = decoy.mock(cls=_TestCommandImpl)
 
-    class _TestCommand(BaseCommand[_TestCommandData, _TestCommandResult]):
+    class _TestCommand(BaseCommand[_TestCommandParams, _TestCommandResult]):
         commandType: str = "testCommand"
-        data: _TestCommandData
+        params: _TestCommandParams
         result: Optional[_TestCommandResult]
 
         @property
         def _ImplementationCls(self) -> Type[_TestCommandImpl]:
             return TestCommandImplCls
 
-    command_data = _TestCommandData()
-    command_error = ProtocolEngineError("oh no")
+    command_params = _TestCommandParams()
 
     queued_command = cast(
         Command,
         _TestCommand(
             id="command-id",
+            key="command-key",
             createdAt=datetime(year=2021, month=1, day=1),
             status=CommandStatus.QUEUED,
-            data=command_data,
+            params=command_params,
         ),
     )
 
@@ -264,23 +257,11 @@ async def test_execute_raises_protocol_engine_error(
         Command,
         _TestCommand(
             id="command-id",
+            key="command-key",
             createdAt=datetime(year=2021, month=1, day=1),
             startedAt=datetime(year=2022, month=2, day=2),
             status=CommandStatus.RUNNING,
-            data=command_data,
-        ),
-    )
-
-    failed_command = cast(
-        Command,
-        _TestCommand(
-            id="command-id",
-            createdAt=datetime(year=2021, month=1, day=1),
-            startedAt=datetime(year=2022, month=2, day=2),
-            completedAt=datetime(year=2023, month=3, day=3),
-            status=CommandStatus.FAILED,
-            data=command_data,
-            error="oh no",
+            params=command_params,
         ),
     )
 
@@ -299,34 +280,24 @@ async def test_execute_raises_protocol_engine_error(
         command_impl  # type: ignore[arg-type]
     )
 
-    decoy.when(await command_impl.execute(command_data)).then_raise(command_error)
+    decoy.when(await command_impl.execute(command_params)).then_raise(command_error)
 
+    decoy.when(model_utils.generate_id()).then_return("error-id")
     decoy.when(model_utils.get_timestamp()).then_return(
         datetime(year=2022, month=2, day=2),
         datetime(year=2023, month=3, day=3),
     )
 
-    decoy.when(
-        command_mapper.update_command(
-            command=queued_command,
-            status=CommandStatus.RUNNING,
-            startedAt=datetime(year=2022, month=2, day=2),
-        )
-    ).then_return(running_command)
-
-    decoy.when(
-        command_mapper.update_command(
-            command=running_command,
-            status=CommandStatus.FAILED,
-            completedAt=datetime(year=2023, month=3, day=3),
-            result=None,
-            error="oh no",
-        )
-    ).then_return(failed_command)
-
     await subject.execute("command-id")
 
     decoy.verify(
         action_dispatcher.dispatch(UpdateCommandAction(command=running_command)),
-        action_dispatcher.dispatch(UpdateCommandAction(command=failed_command)),
+        action_dispatcher.dispatch(
+            FailCommandAction(
+                command_id="command-id",
+                error_id="error-id",
+                failed_at=datetime(year=2023, month=3, day=3),
+                error=expected_error,
+            )
+        ),
     )

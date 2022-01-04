@@ -1,14 +1,17 @@
 import reduce from 'lodash/reduce'
 import {
-  FIXED_TRASH_ID,
   getIsTiprack,
   getTiprackVolume,
-  JsonProtocolFile,
+  ProtocolFile,
   LabwareDefinition2,
+  getSlotHasMatingSurfaceUnitVector,
 } from '@opentrons/shared-data'
-import type { FileModule } from '@opentrons/shared-data/protocol/types/schemaV4'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
-import type { LabwareToOrder, PickUpTipCommand } from '../types'
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
+import type { PickUpTipCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
+import type { LabwareToOrder } from '../types'
+import { getLabwareLocation } from '../../utils/getLabwareLocation'
+import { getModuleInitialLoadInfo } from '../../utils/getModuleInitialLoadInfo'
 
 export const tipRackOrderSort = (
   tiprack1: LabwareToOrder,
@@ -34,22 +37,27 @@ export const orderBySlot = (
 }
 
 export const getTiprackIdsInOrder = (
-  labware: JsonProtocolFile['labware'],
-  labwareDefinitions: Record<string, LabwareDefinition2>
+  labware: ProtocolFile<{}>['labware'],
+  labwareDefinitions: Record<string, LabwareDefinition2>,
+  commands: Command[]
 ): string[] => {
   const unorderedTipracks = reduce<typeof labware, LabwareToOrder[]>(
     labware,
     (tipracks, currentLabware, labwareId) => {
-      // @ts-expect-error v1 protocols do not definitionIds baked into the labware
       const labwareDef = labwareDefinitions[currentLabware.definitionId]
       const isTiprack = getIsTiprack(labwareDef)
       if (isTiprack) {
+        const labwareLocation = getLabwareLocation(labwareId, commands)
+        if (!('slotName' in labwareLocation)) {
+          throw new Error('expected tiprack location to be a slot')
+        }
+
         return [
           ...tipracks,
           {
             definition: labwareDef,
             labwareId: labwareId,
-            slot: currentLabware.slot,
+            slot: labwareLocation.slotName,
           },
         ]
       }
@@ -67,18 +75,19 @@ export const getTiprackIdsInOrder = (
 export const getAllTipracksIdsThatPipetteUsesInOrder = (
   pipetteId: string,
   commands: Command[],
-  labware: JsonProtocolFile['labware'],
+  labware: ProtocolFile<{}>['labware'],
   labwareDefinitions: Record<string, LabwareDefinition2>
 ): string[] => {
   const pickUpTipCommandsWithPipette: PickUpTipCommand[] = commands
     .filter(
-      (command): command is PickUpTipCommand => command.command === 'pickUpTip'
+      (command): command is PickUpTipCommand =>
+        command.commandType === 'pickUpTip'
     )
-    .filter(command => command.params.pipette === pipetteId)
+    .filter(command => command.params.pipetteId === pipetteId)
 
   const tipracksVisited = pickUpTipCommandsWithPipette.reduce<string[]>(
     (visited, command) => {
-      const tiprack = command.params.labware
+      const tiprack = command.params.labwareId
       return visited.includes(tiprack) ? visited : [...visited, tiprack]
     },
     []
@@ -86,11 +95,17 @@ export const getAllTipracksIdsThatPipetteUsesInOrder = (
 
   const orderedTiprackIds = tipracksVisited
     .map<LabwareToOrder>(tiprackId => {
-      // @ts-expect-error v1 protocols do not definitionIds baked into the labware
       const labwareDefId = labware[tiprackId].definitionId
       const definition = labwareDefinitions[labwareDefId]
-      const slot = labware[tiprackId].slot
-      return { labwareId: tiprackId, definition, slot }
+      const tiprackLocation = getLabwareLocation(tiprackId, commands)
+      if (!('slotName' in tiprackLocation)) {
+        throw new Error('expected tiprack location to be a slot')
+      }
+      return {
+        labwareId: tiprackId,
+        definition,
+        slot: tiprackLocation.slotName,
+      }
     })
     .sort(tipRackOrderSort)
     .map(({ labwareId }) => labwareId)
@@ -99,29 +114,47 @@ export const getAllTipracksIdsThatPipetteUsesInOrder = (
 }
 
 export const getLabwareIdsInOrder = (
-  labware: JsonProtocolFile['labware'],
+  labware: ProtocolFile<{}>['labware'],
   labwareDefinitions: Record<string, LabwareDefinition2>,
-  modules: Record<string, FileModule>
+  modules: ProtocolFile<{}>['modules'],
+  commands: Command[]
 ): string[] => {
   const unorderedLabware = reduce<typeof labware, LabwareToOrder[]>(
     labware,
     (unorderedLabware, currentLabware, labwareId) => {
-      // @ts-expect-error v1 protocols do not definitionIds baked into the labware
       const labwareDef = labwareDefinitions[currentLabware.definitionId]
       const isTiprack = getIsTiprack(labwareDef)
-      if (!isTiprack && labwareId !== FIXED_TRASH_ID) {
-        let slot = currentLabware.slot
-        const isOnTopOfModule =
-          modules != null &&
-          Object.keys(modules).some(
-            moduleId => moduleId === currentLabware.slot
-          )
-        if (isOnTopOfModule) {
-          slot = modules[slot].slot
+      const labwareLocation = getLabwareLocation(labwareId, commands)
+      // skip any labware that is not a tiprack
+      if (!isTiprack) {
+        if ('moduleId' in labwareLocation) {
+          return [
+            ...unorderedLabware,
+            {
+              definition: labwareDef,
+              labwareId: labwareId,
+              slot: getModuleInitialLoadInfo(labwareLocation.moduleId, commands)
+                .location.slotName,
+            },
+          ]
+        } else {
+          // if we're in a slot where we can't have labware, don't include the definition (i.e. the trash bin)
+          if (
+            !getSlotHasMatingSurfaceUnitVector(
+              standardDeckDef as any,
+              labwareLocation.slotName.toString()
+            )
+          ) {
+            return [...unorderedLabware]
+          }
         }
         return [
           ...unorderedLabware,
-          { definition: labwareDef, labwareId: labwareId, slot: slot },
+          {
+            definition: labwareDef,
+            labwareId: labwareId,
+            slot: labwareLocation.slotName,
+          },
         ]
       }
       return [...unorderedLabware]

@@ -1,9 +1,8 @@
 """Runs' in-memory store."""
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime
-from typing import Dict, List
+from typing import Dict, List, Optional
 
-from .run_models import RunCreateData
 from .action_models import RunAction
 
 
@@ -16,9 +15,10 @@ class RunResource:
     """
 
     run_id: str
-    create_data: RunCreateData
+    protocol_id: Optional[str]
     created_at: datetime
     actions: List[RunAction]
+    is_current: bool
 
 
 class RunNotFoundError(ValueError):
@@ -46,6 +46,11 @@ class RunStore:
         Returns:
             The resource that was added to the store.
         """
+        if run.is_current is True:
+            for target_id, target in self._runs_by_id.items():
+                if target.is_current and target_id != run.run_id:
+                    self._runs_by_id[target_id] = replace(target, is_current=False)
+
         self._runs_by_id[run.run_id] = run
 
         return run

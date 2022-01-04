@@ -1,4 +1,5 @@
 import * as React from 'react'
+import isEmpty from 'lodash/isEmpty'
 import { useSelector } from 'react-redux'
 
 import {
@@ -6,51 +7,58 @@ import {
   TEMPERATURE_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   useSendModuleCommand,
-  getMatchedModules,
   getModuleControlsDisabled,
 } from '../../../../redux/modules'
 
 import { TempDeckCard } from './TempDeckCard'
 import { MagDeckCard } from './MagDeckCard'
 import { ThermocyclerCard } from './ThermocyclerCard'
+import { useModuleRenderInfoById } from '../../../../organisms/ProtocolSetup/hooks'
 
 export const ModuleLiveStatusCards = (): JSX.Element | null => {
-  const matchedModules = useSelector(getMatchedModules)
+  const moduleInfoById = useModuleRenderInfoById()
   const sendModuleCommand = useSendModuleCommand()
   const controlDisabledReason = useSelector(getModuleControlsDisabled)
   const [expandedCard, setExpandedCard] = React.useState(
-    matchedModules.length > 0 ? matchedModules[0].module.serial : ''
+    isEmpty(moduleInfoById)
+      ? ''
+      : Object.entries(moduleInfoById)[0][1].attachedModuleMatch?.serial
   )
-  const prevModuleCountRef = React.useRef<number>(matchedModules.length)
+  const prevModuleCountRef = React.useRef<number>(
+    Object.keys(moduleInfoById).length
+  )
   React.useEffect(() => {
-    if (prevModuleCountRef.current === 0 && matchedModules.length > 0) {
-      setExpandedCard(matchedModules[0].module.serial)
+    if (prevModuleCountRef.current === 0 && !isEmpty(moduleInfoById)) {
+      setExpandedCard(
+        Object.entries(moduleInfoById)[0][1].attachedModuleMatch?.serial
+      )
     }
-    prevModuleCountRef.current = matchedModules.length
-  }, [matchedModules])
+    prevModuleCountRef.current = Object.keys(moduleInfoById).length
+  }, [moduleInfoById])
 
   const makeToggleCard = (serial: string) => () => {
     setExpandedCard(serial === expandedCard ? '' : serial)
   }
+  if (isEmpty(moduleInfoById)) return null
 
-  if (matchedModules.length === 0) return null
-
-  const moduleList = matchedModules
-    .slice()
-    .sort((a, b) => Number(a.slot) - Number(b.slot))
+  const moduleList = Object.entries(moduleInfoById)
 
   return (
     <>
-      {moduleList.map((m, index) => {
-        switch (m.module.type) {
+      {moduleList.map(([, moduleInfo]) => {
+        switch (moduleInfo.attachedModuleMatch?.type) {
           case TEMPERATURE_MODULE_TYPE:
             return (
               <TempDeckCard
-                key={m.module.serial}
-                module={m.module}
-                slot={m.slot}
-                toggleCard={makeToggleCard(m.module.serial)}
-                isCardExpanded={expandedCard === m.module.serial}
+                key={moduleInfo.attachedModuleMatch?.serial}
+                module={moduleInfo.attachedModuleMatch}
+                slot={moduleInfo.slotName}
+                toggleCard={makeToggleCard(
+                  moduleInfo.attachedModuleMatch?.serial
+                )}
+                isCardExpanded={
+                  expandedCard === moduleInfo.attachedModuleMatch?.serial
+                }
                 sendModuleCommand={sendModuleCommand}
                 controlDisabledReason={controlDisabledReason}
               />
@@ -58,11 +66,14 @@ export const ModuleLiveStatusCards = (): JSX.Element | null => {
           case THERMOCYCLER_MODULE_TYPE:
             return (
               <ThermocyclerCard
-                key={m.module.serial}
-                module={m.module}
-                slot={m.slot}
-                toggleCard={makeToggleCard(m.module.serial)}
-                isCardExpanded={expandedCard === m.module.serial}
+                key={moduleInfo.attachedModuleMatch?.serial}
+                module={moduleInfo.attachedModuleMatch}
+                toggleCard={makeToggleCard(
+                  moduleInfo.attachedModuleMatch?.serial
+                )}
+                isCardExpanded={
+                  expandedCard === moduleInfo.attachedModuleMatch?.serial
+                }
                 sendModuleCommand={sendModuleCommand}
                 controlDisabledReason={controlDisabledReason}
               />
@@ -70,11 +81,15 @@ export const ModuleLiveStatusCards = (): JSX.Element | null => {
           case MAGNETIC_MODULE_TYPE:
             return (
               <MagDeckCard
-                key={m.module.serial}
-                module={m.module}
-                slot={m.slot}
-                toggleCard={makeToggleCard(m.module.serial)}
-                isCardExpanded={expandedCard === m.module.serial}
+                key={moduleInfo.attachedModuleMatch?.serial}
+                module={moduleInfo.attachedModuleMatch}
+                slot={moduleInfo.slotName}
+                toggleCard={makeToggleCard(
+                  moduleInfo.attachedModuleMatch?.serial
+                )}
+                isCardExpanded={
+                  expandedCard === moduleInfo.attachedModuleMatch?.serial
+                }
                 sendModuleCommand={sendModuleCommand}
                 controlDisabledReason={controlDisabledReason}
               />

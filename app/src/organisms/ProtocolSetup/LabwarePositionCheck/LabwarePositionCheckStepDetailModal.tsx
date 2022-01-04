@@ -3,18 +3,16 @@ import { useTranslation } from 'react-i18next'
 import {
   Box,
   Btn,
-  C_BLUE,
   C_LIGHT_GRAY,
   C_MED_DARK_GRAY,
   C_NEAR_WHITE,
-  DIRECTION_ROW,
   Flex,
   FONT_WEIGHT_SEMIBOLD,
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   Modal,
-  PrimaryBtn,
+  NewPrimaryBtn,
   SIZE_2,
   SIZE_4,
   SPACING_1,
@@ -24,18 +22,25 @@ import {
   SPACING_5,
   Text,
   TEXT_TRANSFORM_UPPERCASE,
+  POSITION_RELATIVE,
+  POSITION_ABSOLUTE,
+  C_DARK_GRAY,
 } from '@opentrons/components'
 import { Portal } from '../../../App/portal'
-import labwarePositionCheckModalImage1 from '../../../assets/images/labware_position_check_modal_nozzle_image_1.svg'
-import labwarePositionCheckModalImage2 from '../../../assets/images/labware_position_check_modal_nozzle_image2.svg'
-import labwarePositionCheckModalImage3 from '../../../assets/images/labware_position_check_modal_nozzle_or_tip_image1.svg'
-import labwarePositionCheckModalImage4 from '../../../assets/images/labware_position_check_modal_nozzle_or_tip_image2.svg'
-import labwarePositionCheckModalImage5 from '../../../assets/images/labware_position_check_modal_nozzle_or_tip_image3.svg'
 import styles from '../styles.css'
 
 interface LabwarePositionCheckStepDetailModalProps {
   onCloseClick: () => unknown
 }
+
+const POSITION_IMGS = {
+  modalNozzle1: require('../../../assets/images/lpc_modal_nozzle_1.jpg'),
+  modalNozzle2: require('../../../assets/images/lpc_modal_nozzle_not_centered_1.jpg'),
+  modalNozzle3: require('../../../assets/images/lpc_modal_nozzle_2.jpg'),
+  modalNozzle4: require('../../../assets/images/lpc_modal_nozzle_not_centered_2.jpg'),
+  modalNozzle5: require('../../../assets/images/lpc_modal_nozzle_paper.jpg'),
+}
+
 export const LabwarePositionCheckStepDetailModal = (
   props: LabwarePositionCheckStepDetailModalProps
 ): JSX.Element => {
@@ -43,14 +48,13 @@ export const LabwarePositionCheckStepDetailModal = (
   return (
     <Portal level="top">
       <Modal className={styles.modal} contentsClassName={styles.modal_contents}>
-        <Flex flexDirection={'column'}>
+        <Flex flexDirection={'column'} margin={`${SPACING_1} ${SPACING_3}`}>
           <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
             <Text
               as={'h3'}
               marginBottom={SPACING_3}
               textTransform={TEXT_TRANSFORM_UPPERCASE}
               fontWeight={FONT_WEIGHT_SEMIBOLD}
-              marginLeft={SPACING_3}
             >
               {t('labware_step_detail_modal_heading')}
             </Text>
@@ -62,160 +66,141 @@ export const LabwarePositionCheckStepDetailModal = (
             as={'h4'}
             fontWeight={FONT_WEIGHT_SEMIBOLD}
             marginBottom={SPACING_3}
-            marginLeft={SPACING_3}
           >
             {t('labware_step_detail_modal_nozzle')}
           </Text>
-          <Flex
-            justifyContent={JUSTIFY_CENTER}
-            marginLeft={SPACING_3}
-            marginRight={SPACING_3}
-          >
+          <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
             <Box
-              style={{
-                backgroundImage: `url(${labwarePositionCheckModalImage1})`,
-              }}
+              position={POSITION_RELATIVE}
+              width="50%"
               marginRight={SPACING_1}
             >
+              <img src={POSITION_IMGS.modalNozzle1} width="100%" />
               <Text
-                color={C_NEAR_WHITE}
                 as={'h5'}
-                fontWeight={FONT_WEIGHT_SEMIBOLD}
-                marginTop={SPACING_2}
+                position={POSITION_ABSOLUTE}
+                top={SPACING_2}
                 marginLeft={SPACING_3}
                 marginRight={SPACING_4}
+                color={C_NEAR_WHITE}
+                fontWeight={FONT_WEIGHT_SEMIBOLD}
               >
                 {t('labware_step_detail_modal_nozzle_image_1_text')}
               </Text>
             </Box>
             <Box
-              style={{
-                backgroundImage: `url(${labwarePositionCheckModalImage2})`,
-              }}
+              position={POSITION_RELATIVE}
+              width="50%"
               marginLeft={SPACING_1}
             >
-              <Box height="18rem">
-                <Text
-                  color={C_NEAR_WHITE}
-                  as={'h5'}
-                  fontWeight={FONT_WEIGHT_SEMIBOLD}
-                  marginTop={SPACING_2}
-                  marginLeft={SPACING_3}
-                  marginRight={SPACING_4}
-                >
-                  {t('labware_step_detail_modal_nozzle_image_2_text')}
-                </Text>
-                <Text
-                  color={'#ff5b5b'}
-                  as={'h5'}
-                  fontWeight={FONT_WEIGHT_SEMIBOLD}
-                  marginTop={'4.5rem'}
-                  marginLeft={'8.5rem'}
-                >
-                  {t('labware_step_detail_modal_nozzle_image_2_nozzle_text')}
-                </Text>
-              </Box>
+              <img src={POSITION_IMGS.modalNozzle2} width="100%" />
+
+              <Text
+                position={POSITION_ABSOLUTE}
+                top={SPACING_2}
+                marginLeft={SPACING_3}
+                color={C_NEAR_WHITE}
+                as={'h5'}
+                fontWeight={FONT_WEIGHT_SEMIBOLD}
+              >
+                {t('labware_step_detail_modal_nozzle_image_2_text')}
+              </Text>
+              <Text
+                as={'h5'}
+                position={POSITION_ABSOLUTE}
+                top="35%"
+                left="40%"
+                color={'#ff5b5b'}
+                fontWeight={FONT_WEIGHT_SEMIBOLD}
+              >
+                {t('labware_step_detail_modal_nozzle_image_2_nozzle_text')}
+              </Text>
             </Box>
           </Flex>
           <Text
             as={'h4'}
-            fontWeight={FONT_WEIGHT_SEMIBOLD}
+            marginTop={SPACING_3}
             marginBottom={SPACING_3}
-            marginLeft={SPACING_3}
+            fontWeight={FONT_WEIGHT_SEMIBOLD}
           >
             {t('labware_step_detail_modal_nozzle_or_tip')}
           </Text>
-          <Flex justifyContent={JUSTIFY_CENTER}>
+          <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
             <Box
-              style={{
-                backgroundImage: `url(${labwarePositionCheckModalImage3})`,
-              }}
-              height="15.5rem"
-              width="15rem"
+              position={POSITION_RELATIVE}
+              flex="1 1 31%"
               marginRight={SPACING_1}
             >
+              <img src={POSITION_IMGS.modalNozzle3} width="100%" />
               <Text
-                color={C_NEAR_WHITE}
                 as={'h5'}
-                fontWeight={FONT_WEIGHT_SEMIBOLD}
-                marginTop={SPACING_2}
+                position={POSITION_ABSOLUTE}
+                top={SPACING_2}
                 marginLeft={SPACING_3}
-                marginRight={SPACING_4}
+                fontWeight={FONT_WEIGHT_SEMIBOLD}
+                color={C_NEAR_WHITE}
               >
                 {t('labware_step_detail_modal_nozzle_or_tip_image_1_text')}
               </Text>
             </Box>
             <Box
-              style={{
-                backgroundImage: `url(${labwarePositionCheckModalImage4})`,
-                backgroundRepeat: 'no-repeat',
-              }}
-              height="15.5rem"
-              width="15rem"
+              position={POSITION_RELATIVE}
+              flex="1 1 31%"
               marginRight={SPACING_1}
               marginLeft={SPACING_1}
             >
+              <img src={POSITION_IMGS.modalNozzle4} width="100%" />
               <Text
-                color={C_NEAR_WHITE}
                 as={'h5'}
-                fontWeight={FONT_WEIGHT_SEMIBOLD}
-                marginTop={SPACING_2}
+                position={POSITION_ABSOLUTE}
+                top={SPACING_2}
                 marginLeft={SPACING_3}
+                color={C_NEAR_WHITE}
+                fontWeight={FONT_WEIGHT_SEMIBOLD}
               >
                 {t('labware_step_detail_modal_nozzle_or_tip_image_2_text')}
               </Text>
               <Text
-                color={'#ff5b5b'}
                 as={'h5'}
-                fontWeight={FONT_WEIGHT_SEMIBOLD}
-                marginTop={'1.7rem'}
+                position={POSITION_ABSOLUTE}
+                top="25%"
                 marginLeft={'6.7rem'}
+                color={'#ff5b5b'}
+                fontWeight={FONT_WEIGHT_SEMIBOLD}
               >
                 {t(
                   'labware_step_detail_modal_nozzle_or_tip_image_2_nozzle_text'
                 )}
               </Text>
             </Box>
-            <Flex
-              flext-direction={DIRECTION_ROW}
-              justifyContent={JUSTIFY_CENTER}
+
+            <Box
+              position={POSITION_RELATIVE}
+              flex="1 1 31%"
+              marginLeft={SPACING_1}
             >
+              <img src={POSITION_IMGS.modalNozzle5} width="100%" />
               <Box
-                style={{
-                  backgroundImage: `url(${labwarePositionCheckModalImage5})`,
-                  backgroundRepeat: 'no-repeat',
-                }}
-                height="15.5rem"
-                marginLeft={SPACING_1}
+                position={POSITION_ABSOLUTE}
+                bottom="0.3rem"
+                backgroundColor={C_LIGHT_GRAY}
               >
-                <Box
-                  backgroundColor={C_LIGHT_GRAY}
-                  width="14rem"
-                  height="4.4rem"
+                <Text
+                  as={'h6'}
+                  margin={SPACING_2}
+                  padding={SPACING_1}
+                  fontWeight={FONT_WEIGHT_SEMIBOLD}
+                  color={C_DARK_GRAY}
                 >
-                  <Text
-                    as={'h6'}
-                    fontWeight={FONT_WEIGHT_SEMIBOLD}
-                    color={'#4a4a4a'}
-                    paddingTop={SPACING_1}
-                    paddingLeft={SPACING_1}
-                    marginTop={'11.18rem'}
-                    marginLeft={SPACING_2}
-                  >
-                    {t('labware_step_detail_modal_nozzle_or_tip_image_3_text')}
-                  </Text>
-                </Box>
+                  {t('labware_step_detail_modal_nozzle_or_tip_image_3_text')}
+                </Text>
               </Box>
-            </Flex>
+            </Box>
           </Flex>
           <Flex justifyContent={JUSTIFY_CENTER} marginTop={SPACING_5}>
-            <PrimaryBtn
-              onClick={props.onCloseClick}
-              width={SIZE_4}
-              backgroundColor={C_BLUE}
-            >
+            <NewPrimaryBtn onClick={props.onCloseClick} width={SIZE_4}>
               {t('shared:close')}
-            </PrimaryBtn>
+            </NewPrimaryBtn>
           </Flex>
         </Flex>
       </Modal>

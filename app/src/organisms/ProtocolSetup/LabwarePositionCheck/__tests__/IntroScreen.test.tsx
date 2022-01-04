@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/dom'
 import { when, resetAllWhenMocks } from 'jest-when'
 import {
   RobotWorkSpace,
@@ -11,15 +12,23 @@ import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_stand
 import { LabwareDefinition2 } from '@opentrons/shared-data'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../../hooks'
+import {
+  UseCurrentProtocolRun,
+  useCurrentProtocolRun,
+} from '../../../ProtocolUpload/hooks'
+import { getLatestLabwareOffsetCount } from '../../LabwarePositionCheck/utils/getLatestLabwareOffsetCount'
 import { SectionList } from '../SectionList'
 import { useIntroInfo, useLabwareIdsBySection } from '../hooks'
 import { IntroScreen, INTERVAL_MS } from '../IntroScreen'
 import type { Section } from '../types'
-import { fireEvent } from '@testing-library/dom'
+import type { LabwareOffset } from '@opentrons/api-client'
 
 jest.mock('../hooks')
 jest.mock('../SectionList')
 jest.mock('../../hooks')
+jest.mock('../../../ProtocolUpload/hooks')
+jest.mock('../../LabwarePositionCheck/utils/getLatestLabwareOffsetCount')
+
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
   return {
@@ -46,6 +55,13 @@ const mockSectionList = SectionList as jest.MockedFunction<typeof SectionList>
 const mockRobotWorkSpace = RobotWorkSpace as jest.MockedFunction<
   typeof RobotWorkSpace
 >
+const mockUseCurrentProtocolRun = useCurrentProtocolRun as jest.MockedFunction<
+  typeof useCurrentProtocolRun
+>
+const mockGetLatestLabwareOffsetCount = getLatestLabwareOffsetCount as jest.MockedFunction<
+  typeof getLatestLabwareOffsetCount
+>
+
 const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
   (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
   {}
@@ -61,11 +77,21 @@ const render = (props: React.ComponentProps<typeof IntroScreen>) => {
 
 describe('IntroScreen', () => {
   let props: React.ComponentProps<typeof IntroScreen>
+  let mockOffsets: LabwareOffset[]
 
   beforeEach(() => {
     props = {
-      setCurrentLabwareCheckStep: jest.fn(),
+      beginLPC: jest.fn(),
     }
+    mockOffsets = [
+      {
+        id: 'someId',
+        createdAt: 'someTimestamp',
+        definitionUri: 'some_def_uri',
+        location: { slotName: '4' },
+        vector: { x: 1, y: 1, z: 1 },
+      },
+    ]
     when(mockRobotWorkSpace)
       .mockReturnValue(<div></div>) // this (default) empty div will be returned when RobotWorkSpace isn't called with expected props
       .calledWith(
@@ -97,15 +123,17 @@ describe('IntroScreen', () => {
     when(mockUseModuleRenderInfoById).calledWith().mockReturnValue({})
 
     when(mockUseIntroInfo).calledWith().mockReturnValue({
-      primaryTipRackSlot: '1',
-      primaryTipRackName: 'Opentrons 96 Tip Rack 300 µL',
       primaryPipetteMount: 'left',
       secondaryPipetteMount: '',
-      numberOfTips: 1,
-      firstStepLabwareSlot: '2',
+      firstTiprackSlot: '2',
       sections: MOCK_SECTIONS,
     })
     mockSectionList.mockReturnValue(<div>Mock Section List</div>)
+    when(mockUseCurrentProtocolRun)
+      .calledWith()
+      .mockReturnValue({
+        runRecord: { data: { labwareOffsets: mockOffsets } },
+      } as UseCurrentProtocolRun)
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -125,17 +153,37 @@ describe('IntroScreen', () => {
     )
     getByText('Mock Section List')
   })
-  it('should call setCurrentLabwareCheckStep when the CTA button is pressed', () => {
+  it('should call beginLPC when the CTA button is pressed', () => {
     const { getByRole } = render(props)
-    expect(props.setCurrentLabwareCheckStep).not.toHaveBeenCalled()
+    expect(props.beginLPC).not.toHaveBeenCalled()
     const genericStepScreenButton = getByRole('button', {
       name: 'begin labware position check, move to Slot 2',
     })
     fireEvent.click(genericStepScreenButton)
-    expect(props.setCurrentLabwareCheckStep).toHaveBeenCalled()
+    expect(props.beginLPC).toHaveBeenCalled()
   })
   it('should should rotate through the active section', () => {
     render(props)
     expect(mockUseInterval.mock.calls[0][1]).toBe(INTERVAL_MS)
+  })
+  it('should render offset deletion alert if there are previous offsets', () => {
+    when(mockGetLatestLabwareOffsetCount)
+      .calledWith(mockOffsets)
+      .mockReturnValue(2)
+    const { getByText } = render(props)
+    getByText(
+      'Once you begin Labware Position Check, previously created Labware Offsets will be discarded.'
+    )
+  })
+  it('should not render offset deletion alert if there are no previous offsets', () => {
+    when(mockGetLatestLabwareOffsetCount)
+      .calledWith(mockOffsets)
+      .mockReturnValue(0)
+    const { queryByText } = render(props)
+    expect(
+      queryByText(
+        'Once you begin Labware Position Check, previously created Labware Offsets will be discarded.'
+      )
+    ).toBeNull()
   })
 })

@@ -6,8 +6,8 @@ from pydantic import Field
 
 from opentrons.calibration_storage.types import SourceType
 from robot_server.service.json_api import (
-    ResponseModel,
-    MultiResponseModel,
+    DeprecatedResponseModel,
+    DeprecatedMultiResponseModel,
     ResponseDataModel,
 )
 from robot_server.service.shared_models import calibration as cal_model
@@ -50,7 +50,6 @@ class PipetteOffsetCalibration(ResponseDataModel):
     )
 
 
-MultipleCalibrationsResponse = MultiResponseModel[PipetteOffsetCalibration]
+MultipleCalibrationsResponse = DeprecatedMultiResponseModel[PipetteOffsetCalibration]
 
-
-SingleCalibrationResponse = ResponseModel[PipetteOffsetCalibration]
+SingleCalibrationResponse = DeprecatedResponseModel[PipetteOffsetCalibration]

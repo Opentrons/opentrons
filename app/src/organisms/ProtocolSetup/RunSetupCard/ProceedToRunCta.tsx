@@ -1,50 +1,20 @@
 import * as React from 'react'
-import every from 'lodash/every'
-import { useSelector } from 'react-redux'
 import { NavLink } from 'react-router-dom'
-import { useMissingModuleIds } from './hooks'
+import { useMissingModuleIds, useProtocolCalibrationStatus } from './hooks'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
-  PrimaryBtn,
+  NewPrimaryBtn,
   Tooltip,
   useHoverTooltip,
   JUSTIFY_CENTER,
-  C_BLUE,
 } from '@opentrons/components'
-import * as Pipettes from '../../../redux/pipettes'
-import type { State } from '../../../redux/types'
 
-interface ProceedToRunProps {
-  robotName: string
-}
-
-export const ProceedToRunCta = (
-  props: ProceedToRunProps
-): JSX.Element | null => {
-  const { robotName } = props
+export const ProceedToRunCta = (): JSX.Element | null => {
   const { t } = useTranslation('protocol_setup')
   const [targetProps, tooltipProps] = useHoverTooltip()
   const missingModuleIds = useMissingModuleIds()
-  const protocolPipetteTipRackData = useSelector((state: State) => {
-    return Pipettes.getProtocolPipetteTipRackCalInfo(state, robotName)
-  })
-  const isEverythingCalibrated = every(
-    protocolPipetteTipRackData,
-    pipCalData => {
-      if (pipCalData != null) {
-        return (
-          pipCalData.pipetteCalDate != null &&
-          pipCalData.tipRacks.every(
-            tipRackCal => tipRackCal.lastModifiedDate != null
-          )
-        )
-      } else {
-        // if no pipette requested on mount
-        return true
-      }
-    }
-  )
+  const isEverythingCalibrated = useProtocolCalibrationStatus().complete
   const calibrationIncomplete =
     missingModuleIds.length === 0 && !isEverythingCalibrated
   const moduleSetupIncomplete =
@@ -67,18 +37,17 @@ export const ProceedToRunCta = (
   const linkProps = proceedToRunDisabledReason != null ? {} : { to: '/run' }
   return (
     <Flex justifyContent={JUSTIFY_CENTER}>
-      <PrimaryBtn
+      <NewPrimaryBtn
         role="button"
         title={t('proceed_to_run')}
         disabled={proceedToRunDisabledReason != null}
         as={LinkComponent}
-        backgroundColor={C_BLUE}
         id={'LabwareSetup_proceedToRunButton'}
         {...linkProps}
         {...targetProps}
       >
         {t('proceed_to_run')}
-      </PrimaryBtn>
+      </NewPrimaryBtn>
       {proceedToRunDisabledReason != null && (
         <Tooltip {...tooltipProps}>{proceedToRunDisabledReason}</Tooltip>
       )}

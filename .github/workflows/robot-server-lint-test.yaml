@@ -7,12 +7,13 @@ on:
   # Most of the time, we run on pull requests, which lets us handle external PRs
   push:
     paths:
-      - 'api/**'
+      - 'api/**/*'
+      - 'hardware/**/*'
       - 'Makefile'
-      - 'shared-data/*/**'
-      - '!shared-data/js/**'
-      - 'robot-server/**'
-      - 'notify-server/**'
+      - 'shared-data/**/*'
+      - '!shared-data/js/**/*'
+      - 'robot-server/**/*'
+      - 'notify-server/**/*'
       - '.github/workflows/robot-server-test-lint.yaml'
       - '.github/actions/python/**'
     branches-ignore: # ignore any release-related thing (handled elsewhere)
@@ -22,11 +23,13 @@ on:
       - '*'
   pull_request:
     paths:
-      - 'api/**'
+      - 'api/**/*'
+      - 'hardware/**/*'
       - 'Makefile'
-      - 'shared-data/*/**'
-      - '!shared-data/js/**'
-      - 'robot-server/**'
+      - 'shared-data/**/*'
+      - '!shared-data/js/**/*'
+      - 'robot-server/**/*'
+      - 'notify-server/**/*'
   workflow_dispatch:
 
 defaults:

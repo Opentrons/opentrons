@@ -5,7 +5,13 @@ from typing import Any, List, Dict, Optional, Union, cast
 
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from .errors import LabwareIsNotTipRackError
-from .types import DeckSlotName, LabwareParameters, Point
+from .types import (
+    DeckSlotName,
+    LabwareParameters,
+    Point,
+    DeckSlotLocation,
+    ModuleLocation,
+)
 from .well import Well
 from ..protocols.models import LabwareDefinition
 
@@ -74,7 +80,10 @@ class Labware:  # noqa: D101
         parent = self._engine_client.state.labware.get_location(
             labware_id=self._labware_id
         )
-        return str(parent.slot)
+        if isinstance(parent, DeckSlotLocation):
+            return str(parent.slotName)
+        elif isinstance(parent, ModuleLocation):
+            raise NotImplementedError("Not yet implemented for labware on modules.")
 
     # TODO(mc, 2021-05-03): document removal of name setter
     @property

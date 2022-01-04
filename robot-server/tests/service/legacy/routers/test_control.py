@@ -2,7 +2,7 @@ from asyncio import Event
 from mock import call, MagicMock
 
 import pytest
-from opentrons.hardware_control.types import Axis
+from opentrons.hardware_control.types import Axis, CriticalPoint
 from opentrons.types import Mount, Point
 
 from robot_server.errors import ApiError
@@ -118,14 +118,22 @@ def test_move_mount(api_client, hardware_move):
 
     hardware_move.gantry_position.assert_has_calls(
         [
-            call(Mount.RIGHT),
+            call(Mount.RIGHT, critical_point=CriticalPoint.MOUNT),
             call(Mount.RIGHT),
         ]
     )
     hardware_move.move_to.assert_has_calls(
         [
-            call(Mount.RIGHT, Point(100.0, 200.0, 0.0)),
-            call(Mount.RIGHT, Point(100.0, 200.0, 50.0)),
+            call(
+                Mount.RIGHT,
+                Point(100.0, 200.0, 0.0),
+                critical_point=CriticalPoint.MOUNT,
+            ),
+            call(
+                Mount.RIGHT,
+                Point(100.0, 200.0, 50.0),
+                critical_point=CriticalPoint.MOUNT,
+            ),
         ]
     )
 
@@ -141,16 +149,18 @@ def test_move_pipette(api_client, hardware_move):
     assert res.status_code == 200
     assert res.json() == {"message": "Move complete. New position: (50.0, 100.0, 25.0)"}
 
+    hardware_move.cache_instruments.assert_called_once()
+
     hardware_move.gantry_position.assert_has_calls(
         [
-            call(Mount.LEFT),
+            call(Mount.LEFT, critical_point=None),
             call(Mount.LEFT),
         ]
     )
     hardware_move.move_to.assert_has_calls(
         [
-            call(Mount.LEFT, Point(50.0, 100.0, 0.0)),
-            call(Mount.LEFT, Point(50.0, 100.0, 25.0)),
+            call(Mount.LEFT, Point(50.0, 100.0, 0.0), critical_point=None),
+            call(Mount.LEFT, Point(50.0, 100.0, 25.0), critical_point=None),
         ]
     )
 

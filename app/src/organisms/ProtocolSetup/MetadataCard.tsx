@@ -6,6 +6,7 @@ import {
   SPACING_2,
   SPACING_3,
   C_WHITE,
+  TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
 import { LabeledValue } from '../../atoms/structure'
 
@@ -16,7 +17,12 @@ const DATE_FORMAT = 'PPpp'
 
 export function MetadataCard(): JSX.Element {
   const { t } = useTranslation('protocol_info')
-  const { author, lastUpdated, method, description } = useProtocolMetadata()
+  const {
+    author,
+    lastUpdated,
+    description,
+    creationMethod,
+  } = useProtocolMetadata()
 
   return (
     <Card width="100%" padding={SPACING_3} backgroundColor={C_WHITE}>
@@ -34,9 +40,10 @@ export function MetadataCard(): JSX.Element {
           id={'MetadataCard_protocolLastUpdated'}
         />
         <LabeledValue
+          textTransform={TEXT_TRANSFORM_CAPITALIZE}
           flex={2}
           label={t('creation_method')}
-          value={method || '-'}
+          value={creationMethod || '-'}
           id={'MetadataCard_protocolCreationMethod'}
         />
       </Flex>
@@ -47,12 +54,12 @@ export function MetadataCard(): JSX.Element {
           value={description || '-'}
           id={'MetadataCard_protocolDescription'}
         />
-        <LabeledValue
+        {/* <LabeledValue TODO: add estimated run time back in when ready
           flex={2}
           label={t('estimated_run_time')}
           value={'-'}
           id={'MetadataCard_protocolEstRunTime'}
-        />
+        /> */}
       </Flex>
     </Card>
   )

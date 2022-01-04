@@ -97,22 +97,6 @@ const EXPECTED_UPLOAD = {
   disabledReason: expect.any(String),
 }
 
-const EXPECTED_CALIBRATE = {
-  id: 'calibrate',
-  path: '/calibrate',
-  title: 'Calibrate',
-  iconName: 'ot-calibrate',
-  disabledReason: expect.any(String),
-}
-
-const EXPECTED_RUN = {
-  id: 'run',
-  path: '/run',
-  title: 'Run',
-  iconName: 'ot-run',
-  disabledReason: expect.any(String),
-}
-
 const EXPECTED_MORE = {
   id: 'more',
   path: '/more',
@@ -120,6 +104,8 @@ const EXPECTED_MORE = {
   iconName: 'dots-horizontal',
   notificationReason: null,
 }
+
+// TODO(sb, 2020-11-23) rip out unneccessary tests during PUR cleanup
 
 describe('nav selectors', () => {
   const mockState: State = { mockState: true } as any
@@ -129,7 +115,6 @@ describe('nav selectors', () => {
     mockGetFeatureFlags.mockReturnValue({
       allPipetteConfig: false,
       enableBundleUpload: false,
-      preProtocolFlowWithoutRPC: false,
     })
     mockGetConnectedRobot.mockReturnValue(null)
     mockGetProtocolData.mockReturnValue(null)
@@ -159,14 +144,6 @@ describe('nav selectors', () => {
           ...EXPECTED_UPLOAD,
           disabledReason: expect.stringMatching(/connect to a robot/),
         },
-        {
-          ...EXPECTED_CALIBRATE,
-          disabledReason: expect.stringMatching(/connect to a robot/),
-        },
-        {
-          ...EXPECTED_RUN,
-          disabledReason: expect.stringMatching(/connect to a robot/),
-        },
         EXPECTED_MORE,
       ],
     },
@@ -179,14 +156,6 @@ describe('nav selectors', () => {
       expected: [
         EXPECTED_ROBOTS,
         { ...EXPECTED_UPLOAD, disabledReason: null },
-        {
-          ...EXPECTED_CALIBRATE,
-          disabledReason: expect.stringMatching(/load a protocol/),
-        },
-        {
-          ...EXPECTED_RUN,
-          disabledReason: expect.stringMatching(/load a protocol/),
-        },
         EXPECTED_MORE,
       ],
     },
@@ -203,11 +172,6 @@ describe('nav selectors', () => {
           ...EXPECTED_UPLOAD,
           disabledReason: expect.stringMatching(/while a run is in progress/),
         },
-        {
-          ...EXPECTED_CALIBRATE,
-          disabledReason: expect.stringMatching(/while a run is in progress/),
-        },
-        EXPECTED_RUN,
         EXPECTED_MORE,
       ],
     },
@@ -221,14 +185,6 @@ describe('nav selectors', () => {
       expected: [
         EXPECTED_ROBOTS,
         { ...EXPECTED_UPLOAD, disabledReason: null },
-        {
-          ...EXPECTED_CALIBRATE,
-          disabledReason: expect.stringMatching(/with runnable steps/),
-        },
-        {
-          ...EXPECTED_RUN,
-          disabledReason: expect.stringMatching(/with runnable steps/),
-        },
         EXPECTED_MORE,
       ],
     },
@@ -246,14 +202,6 @@ describe('nav selectors', () => {
       expected: [
         EXPECTED_ROBOTS,
         { ...EXPECTED_UPLOAD, disabledReason: null },
-        {
-          ...EXPECTED_CALIBRATE,
-          disabledReason: expect.stringMatching(/pipettes do not match/),
-        },
-        {
-          ...EXPECTED_RUN,
-          disabledReason: expect.stringMatching(/pipettes do not match/),
-        },
         EXPECTED_MORE,
       ],
     },
@@ -272,14 +220,6 @@ describe('nav selectors', () => {
       expected: [
         EXPECTED_ROBOTS,
         { ...EXPECTED_UPLOAD, disabledReason: null },
-        {
-          ...EXPECTED_CALIBRATE,
-          disabledReason: expect.stringMatching(/calibrate all pipettes/),
-        },
-        {
-          ...EXPECTED_RUN,
-          disabledReason: expect.stringMatching(/calibrate all pipettes/),
-        },
         EXPECTED_MORE,
       ],
     },
@@ -299,14 +239,6 @@ describe('nav selectors', () => {
           ...EXPECTED_UPLOAD,
           disabledReason: expect.stringMatching(/calibrate your deck/i),
         },
-        {
-          ...EXPECTED_CALIBRATE,
-          disabledReason: expect.stringMatching(/load a protocol/i),
-        },
-        {
-          ...EXPECTED_RUN,
-          disabledReason: expect.stringMatching(/load a protocol/i),
-        },
         EXPECTED_MORE,
       ],
     },
@@ -320,24 +252,10 @@ describe('nav selectors', () => {
         mockGetCommands.mockReturnValue([
           { id: 0, description: 'Foo', handledAt: null, children: [] },
         ] as any)
-        mockGetProtocolPipettesMatching.mockReturnValue(true)
-        mockGetProtocolPipettesCalibrated.mockReturnValue(true)
-      },
-      after: () => {
-        expect(mockGetProtocolPipettesMatching).toHaveBeenCalledWith(
-          mockState,
-          mockRobot.name
-        )
-        expect(mockGetProtocolPipettesCalibrated).toHaveBeenCalledWith(
-          mockState,
-          mockRobot.name
-        )
       },
       expected: [
         EXPECTED_ROBOTS,
         { ...EXPECTED_UPLOAD, disabledReason: null },
-        { ...EXPECTED_CALIBRATE, disabledReason: null },
-        { ...EXPECTED_RUN, disabledReason: null },
         EXPECTED_MORE,
       ],
     },
@@ -351,11 +269,6 @@ describe('nav selectors', () => {
       expected: [
         EXPECTED_ROBOTS,
         { ...EXPECTED_UPLOAD, disabledReason: null },
-        {
-          ...EXPECTED_CALIBRATE,
-          disabledReason: expect.stringMatching(/reset your protocol/),
-        },
-        EXPECTED_RUN,
         EXPECTED_MORE,
       ],
     },
@@ -368,8 +281,6 @@ describe('nav selectors', () => {
       expected: [
         EXPECTED_ROBOTS,
         EXPECTED_UPLOAD,
-        EXPECTED_CALIBRATE,
-        EXPECTED_RUN,
         {
           ...EXPECTED_MORE,
           notificationReason: expect.stringMatching(/app update is available/),
@@ -385,8 +296,6 @@ describe('nav selectors', () => {
       expected: [
         EXPECTED_ROBOTS,
         EXPECTED_UPLOAD,
-        EXPECTED_CALIBRATE,
-        EXPECTED_RUN,
         {
           ...EXPECTED_MORE,
           notificationReason: expect.stringMatching(
@@ -414,8 +323,6 @@ describe('nav selectors', () => {
           notificationReason: expect.stringMatching(/update is available/),
         },
         { ...EXPECTED_UPLOAD, disabledReason: null },
-        EXPECTED_CALIBRATE,
-        EXPECTED_RUN,
         EXPECTED_MORE,
       ],
     },
@@ -430,27 +337,6 @@ describe('nav selectors', () => {
       expected: [
         EXPECTED_ROBOTS,
         { ...EXPECTED_UPLOAD, disabledReason: null },
-        EXPECTED_CALIBRATE,
-        EXPECTED_RUN,
-        EXPECTED_MORE,
-      ],
-    },
-    {
-      name:
-        'getNavbarLocations with feature flag for HTTP based pre-protocol flow',
-      selector: Selectors.getNavbarLocations,
-      before: () => {
-        mockGetFeatureFlags.mockReturnValue({
-          allPipetteConfig: false,
-          enableBundleUpload: false,
-          preProtocolFlowWithoutRPC: true,
-        })
-        mockGetConnectedRobot.mockReturnValue(mockRobot)
-      },
-      expected: [
-        EXPECTED_ROBOTS,
-        { ...EXPECTED_UPLOAD, disabledReason: null },
-        EXPECTED_RUN,
         EXPECTED_MORE,
       ],
     },
@@ -464,123 +350,6 @@ describe('nav selectors', () => {
       before()
       expect(selector(state)).toEqual(expected)
       after()
-    })
-  })
-
-  // rename this when RPC FF is removed and remove the next describe block as it will be unnecessary
-  describe('getRunDisabledReasonNoRPC', () => {
-    let robot: unknown
-    let protocolData: unknown
-    let pipettesMatch: boolean
-    let pipettesCalibrated: boolean
-    let deckCalOk: boolean
-    beforeEach(() => {
-      robot = {}
-      protocolData = {}
-      pipettesMatch = true
-      pipettesCalibrated = true
-      deckCalOk = true
-    })
-    it('should tell user to connect to a robot', () => {
-      robot = null
-      expect(
-        // @ts-expect-error resultFunc not part of Selector interface :(
-        Selectors.getRunDisabledReasonNoRPC.resultFunc(
-          robot,
-          protocolData,
-          pipettesMatch,
-          pipettesCalibrated,
-          deckCalOk
-        )
-      ).toBe('Please connect to a robot to proceed')
-    })
-    it('should tell user to load a protocol', () => {
-      protocolData = null
-      expect(
-        // @ts-expect-error resultFunc not part of Selector interface :(
-        Selectors.getRunDisabledReasonNoRPC.resultFunc(
-          robot,
-          protocolData,
-          pipettesMatch,
-          pipettesCalibrated,
-          deckCalOk
-        )
-      ).toBe('Please load a protocol to proceed')
-    })
-    it('should tell user that the attached pipettes do not match', () => {
-      pipettesMatch = false
-      expect(
-        // @ts-expect-error resultFunc not part of Selector interface :(
-        Selectors.getRunDisabledReasonNoRPC.resultFunc(
-          robot,
-          protocolData,
-          pipettesMatch,
-          pipettesCalibrated,
-          deckCalOk
-        )
-      ).toBe(
-        'Attached pipettes do not match pipettes specified in loaded protocol'
-      )
-    })
-    it('should tell user to calibrate pipettes', () => {
-      pipettesCalibrated = false
-      expect(
-        // @ts-expect-error resultFunc not part of Selector interface :(
-        Selectors.getRunDisabledReasonNoRPC.resultFunc(
-          robot,
-          protocolData,
-          pipettesMatch,
-          pipettesCalibrated,
-          deckCalOk
-        )
-      ).toBe(
-        'Please calibrate all pipettes specified in loaded protocol to proceed'
-      )
-    })
-    it('should tell user to calibrate the deck', () => {
-      deckCalOk = false
-      expect(
-        // @ts-expect-error resultFunc not part of Selector interface :(
-        Selectors.getRunDisabledReasonNoRPC.resultFunc(
-          robot,
-          protocolData,
-          pipettesMatch,
-          pipettesCalibrated,
-          deckCalOk
-        )
-      ).toBe('Calibrate your deck to proceed')
-    })
-  })
-  describe('getRunDisabledReason', () => {
-    let runDisabledReasonRPC: any
-    let runDisabledReasonNoRPC: any
-    let featureFlags: any
-    beforeEach(() => {
-      runDisabledReasonRPC = 'disabled reason RPC'
-      runDisabledReasonNoRPC = 'disabled reason No RPC'
-      featureFlags = { preProtocolFlowWithoutRPC: false }
-    })
-    it('should return the disabled reason for pre protocol flow WITHOUT RPC when FF ENABLED', () => {
-      featureFlags.preProtocolFlowWithoutRPC = true
-      expect(
-        // @ts-expect-error resultFunc not part of Selector interface :(
-        Selectors.getRunDisabledReason.resultFunc(
-          runDisabledReasonRPC,
-          runDisabledReasonNoRPC,
-          featureFlags
-        )
-      ).toBe('disabled reason No RPC')
-    })
-    it('should return the disabled reason for pre protocol flow WITH RPC when FF DISABLED', () => {
-      featureFlags.preProtocolFlowWithoutRPC = false
-      expect(
-        // @ts-expect-error resultFunc not part of Selector interface :(
-        Selectors.getRunDisabledReason.resultFunc(
-          runDisabledReasonRPC,
-          runDisabledReasonNoRPC,
-          featureFlags
-        )
-      ).toBe('disabled reason RPC')
     })
   })
 })

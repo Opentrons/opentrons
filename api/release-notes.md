@@ -6,13 +6,61 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# OT-2 Software Changes in 4.6.2
+# OT-2 Software Changes in 5.0.0-beta
 
-## New Features
+Welcome to the beta release of v5.0.0 release of the OT-2 software!
+
+In conjunction with changes on the app-side, the 5.0.0 release reshapes the way your OT-2 ingests and run protocols. We're very excited for you to try this new experience out, and we appreciate your feedback (and patience) as you use this new software.
+
+This is beta software! You may experience unexpected crashes or missing features not detailed here. Please see the [beta forum][] for more details and to leave feedback.
+
+[beta forum]: https://community.opentrons.com/c/beta/pe-beta/9
+
+### New Features
+
+- The OT-2 software has a completely new API for uploading protocol files and reporting run results
+
+## Bug Fixes
+
+Keep an eye on this space as we release new versions of the beta. See the [issue tracker][] for a full list of issues resolved by the v5 release.
+
+[issue tracker]: https://github.com/Opentrons/opentrons/labels/fixed-in-v5
+
+## Known Issues
+
+This beta is a work in progress! We'll be addressing the following features and issues in upcoming releases of 5.0.0.
+
+- Your last run protocol will not be saved through robot reboots
+- You may experience various performance issues and freezes
+- The OT-2 will not drop any tips if a protocol is canceled
+- The OT-2 will not pause if the front door is opened during a run
+- You may not be able to re-run a protocol using a thermocycler without re-uploading the protocol
+
+---
+
+## OT-2 Software Changes in 4.7.0
+
+The 4.7.0 release of the OT-2 Software fixes a handful of regressions and bugs.
+
+### New Features
+
+- This is primarily a bug fix release.
+
+### Bug Fixes
+
+- Fixed an issue where pipette offset and tip length calibration would sometimes not be saved correctly.
+- Fixed issues around attach pipette behavior.
+- Fixed error reporting from the Thermocycler in the instance that the module goes into an unrecoverable state.
+
+---
+
+## OT-2 Software Changes in 4.6.2
+
+### New Features
 
 - The `opentrons_simulate` command-line application can now estimate protocol duration using the `-e` option. This feature is experimental, but very cool!
 
-## Bug Fixes
+### Bug Fixes
 
 - If a protocol is canceled mid-run while there is a tip on a pipette, the tip will be dropped prior to resetting the plunger to avoid contaminating the pipette internals with liquids.
 - Fixed a movement planning issue that could cause multi-channel pipettes to collide with the deck when changing pipettes.
@@ -20,11 +68,11 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 - Fixed a few issues with the faster protocol analysis method added in the 4.5.0 release.
 - Fixed type annotations of the `ProtocolContext` classes.
 
-## 4.6.1 to 4.6.2
+#### 4.6.1 to 4.6.2
 
 The 4.6.2 hotfix release contains a small bug fix for an issue where the OT-2's max speed settings within a protocol will be ignored.
 
-## 4.6.0 to 4.6.1
+#### 4.6.0 to 4.6.1
 
 The 4.6.1 hotfix release contains a small configuration change to fix an issue with installing the `opentrons` PyPI package on computers running Python 3.8 and later. It does not affect the software running on your OT-2.
 

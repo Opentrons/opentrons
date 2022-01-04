@@ -86,7 +86,7 @@ class ProtocolContext:  # noqa: D101
 
         result = self._engine_client.load_labware(
             load_name=load_name,
-            location=DeckSlotLocation(slot=DeckSlotName.from_primitive(location)),
+            location=DeckSlotLocation(slotName=DeckSlotName.from_primitive(location)),
             # TODO(mc, 2021-04-22): make sure this default is compatible with using
             # namespace=None to load custom labware in PAPIv3
             namespace=namespace or "opentrons",

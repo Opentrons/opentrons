@@ -3,6 +3,99 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.0.0-beta.5](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.4...v5.0.0-beta.5) (2021-12-23)
+
+**Note:** Version bump only for package @opentrons/api-server
+
+
+
+
+
+# [5.0.0-beta.4](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.3...v5.0.0-beta.4) (2021-12-14)
+
+
+### Features
+
+* **api:** Remove legacy LC reset from robot settings ([#9093](https://github.com/Opentrons/opentrons/issues/9093)) ([9b78815](https://github.com/Opentrons/opentrons/commit/9b788154fffc405152f6f5f165a4d646dd47b4b5)), closes [#8283](https://github.com/Opentrons/opentrons/issues/8283)
+
+
+
+
+
+# [5.0.0-beta.3](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.2...v5.0.0-beta.3) (2021-12-10)
+
+**Note:** Version bump only for package @opentrons/api-server
+
+
+
+
+
+# [5.0.0-beta.2](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.1...v5.0.0-beta.2) (2021-12-08)
+
+**Note:** Version bump only for package @opentrons/api-server
+
+
+
+
+
+# [5.0.0-beta.1](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.0...v5.0.0-beta.1) (2021-12-07)
+
+
+### Features
+
+* **ot3:** introduce independent head l and r motion. ([#8966](https://github.com/Opentrons/opentrons/issues/8966)) ([30cb899](https://github.com/Opentrons/opentrons/commit/30cb899fe1769b996fb0ea6f0bae391c6dbec635))
+* **ot3:** ot3 hardware controller move ([#8738](https://github.com/Opentrons/opentrons/issues/8738)) ([883db3a](https://github.com/Opentrons/opentrons/commit/883db3a96ca9c6a48bd4ccee16e221fe03154361)), closes [#8946](https://github.com/Opentrons/opentrons/issues/8946)
+
+
+
+
+
+# [5.0.0-beta.0](https://github.com/Opentrons/opentrons/compare/v4.7.0...v5.0.0-beta.0) (2021-11-30)
+
+
+### Bug Fixes
+
+* **api:** check home status in move_rel ([#8724](https://github.com/Opentrons/opentrons/issues/8724)) ([7347847](https://github.com/Opentrons/opentrons/commit/734784718188f10e4b36ac0a0b043a4b3ca8b3b8))
+* **api:** don't show exception on module server disconnect. ([#8778](https://github.com/Opentrons/opentrons/issues/8778)) ([1bfaabe](https://github.com/Opentrons/opentrons/commit/1bfaabe233afe4d370313417a3423aa540a2a685))
+
+
+### Features
+
+* **robot-server:** enable /runs and /protocols endpoints by default ([#8913](https://github.com/Opentrons/opentrons/issues/8913)) ([aa3549f](https://github.com/Opentrons/opentrons/commit/aa3549fad49383243f9ad2ccc291d15e8fd50725)), closes [#8155](https://github.com/Opentrons/opentrons/issues/8155)
+
+
+### BREAKING CHANGES
+
+* **robot-server:** The RPC WebSocket endpoint has been removed. The /protocols endpoints have been
+heavily reworked.
+
+
+
+
+
+# [4.7.0](https://github.com/Opentrons/opentrons/compare/v4.6.2...v4.7.0) (2021-11-18)
+
+
+### Bug Fixes
+
+* **api:** 4.6.x set max speed fails ([#8437](https://github.com/Opentrons/opentrons/issues/8437)) ([5989af0](https://github.com/Opentrons/opentrons/commit/5989af08e19d78c8cfff65e6bb2bb415ed7e174b)), closes [#8436](https://github.com/Opentrons/opentrons/issues/8436)
+* **api:** Improve metadata parse error messages and fix metadata typechecking ([#8378](https://github.com/Opentrons/opentrons/issues/8378)) ([1015b14](https://github.com/Opentrons/opentrons/commit/1015b1459cd5da834f88925ce3f6b5eece4018ef)), closes [#8352](https://github.com/Opentrons/opentrons/issues/8352)
+* **api:** thermocycler error handling ([#8439](https://github.com/Opentrons/opentrons/issues/8439)) ([7dcff2f](https://github.com/Opentrons/opentrons/commit/7dcff2f7e0f5427c83738fca14c8d2dde7476740)), closes [#8393](https://github.com/Opentrons/opentrons/issues/8393)
+* **api:** lock reads to pipettes in the hardware controller ([d78939c] https://github.com/Opentrons/opentrons/commit/d78939c6a791b8e260f598bee916d5fb8799a7d3), closes [#8576](https://github.com/Opentrons/opentrons/issues/8576)
+* **robot-server:** avoid LabwareDefinition type in cal models ([#8698](https://github.com/Opentrons/opentrons/issues/8698)) ([c3bf7ab](https://github.com/Opentrons/opentrons/commit/c3bf7ab51074e8b5e160ce5755be6e80296f1963)), closes [#8654](https://github.com/Opentrons/opentrons/issues/8654)
+* **robot-server:** ensure background tasks do not affect requests ([#8362](https://github.com/Opentrons/opentrons/issues/8362)) ([3e4bc2f](https://github.com/Opentrons/opentrons/commit/3e4bc2f504282c51622682001780f35d5f3e5312))
+
+
+### Features
+
+* **api:** Add hardware control for heater shaker ([#8435](https://github.com/Opentrons/opentrons/issues/8435)) ([1a68d66](https://github.com/Opentrons/opentrons/commit/1a68d66e9638206c2a4700ed0348f3137bc13789))
+* **api,robot-server:** upgrade fastapi and pydantic deps ([#8345](https://github.com/Opentrons/opentrons/issues/8345)) ([9cf416a](https://github.com/Opentrons/opentrons/commit/9cf416a498e77b2127a6e3e71298f9368f818d35)), closes [#8134](https://github.com/Opentrons/opentrons/issues/8134)
+* **ot3:** OT3Controller backend for hardware controller ([#8492](https://github.com/Opentrons/opentrons/issues/8492)) ([5600948](https://github.com/Opentrons/opentrons/commit/56009482a376b712384441f429c2e0d78192bdbd))
+
+
+
+
+
 
 
 **Note:** Version bump only for package @opentrons/api-server

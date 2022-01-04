@@ -11,6 +11,15 @@ describe('ApiHostProvider and useHost', () => {
     expect(result.current).toBe(null)
   })
 
+  it('should allow a hostname to be unset', () => {
+    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+      <ApiHostProvider hostname={null}>{children}</ApiHostProvider>
+    )
+    const { result } = renderHook(useHost, { wrapper })
+
+    expect(result.current).toBe(null)
+  })
+
   it('should allow a hostname to be set', () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
       <ApiHostProvider hostname="localhost">{children}</ApiHostProvider>

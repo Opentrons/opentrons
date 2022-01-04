@@ -1,1 +1,0 @@
-"""Can bus message definitions."""

@@ -9,6 +9,7 @@ from typing import Optional
 from opentrons.drivers.temp_deck.driver import GCODE
 from opentrons.hardware_control.emulation import util
 from opentrons.hardware_control.emulation.parser import Parser, Command
+from opentrons.hardware_control.emulation.settings import TempDeckSettings
 
 from .abstract_emulator import AbstractEmulator
 from .simulations import Temperature
@@ -17,17 +18,15 @@ from .simulations import Temperature
 logger = logging.getLogger(__name__)
 
 
-SERIAL = "temperature_emulator"
-MODEL = "temp_deck_v20"
-VERSION = "v2.0.1"
-
-
 class TempDeckEmulator(AbstractEmulator):
     """TempDeck emulator"""
 
-    def __init__(self, parser: Parser) -> None:
-        self.reset()
+    _temperature: Temperature
+
+    def __init__(self, parser: Parser, settings: TempDeckSettings) -> None:
+        self._settings = settings
         self._parser = parser
+        self.reset()
 
     def handle(self, line: str) -> Optional[str]:
         """Handle a line"""
@@ -36,7 +35,10 @@ class TempDeckEmulator(AbstractEmulator):
         return None if not joined else joined
 
     def reset(self):
-        self._temperature = Temperature(per_tick=0.25, current=0.0)
+        self._temperature = Temperature(
+            per_tick=self._settings.temperature.degrees_per_tick,
+            current=self._settings.temperature.starting,
+        )
 
     def _handle(self, command: Command) -> Optional[str]:
         """Handle a command."""
@@ -57,7 +59,11 @@ class TempDeckEmulator(AbstractEmulator):
         elif command.gcode == GCODE.DISENGAGE:
             self._temperature.deactivate(util.TEMPERATURE_ROOM)
         elif command.gcode == GCODE.DEVICE_INFO:
-            return f"serial:{SERIAL} model:{MODEL} version:{VERSION}"
+            return (
+                f"serial:{self._settings.serial_number} "
+                f"model:{self._settings.model} "
+                f"version:{self._settings.version}"
+            )
         elif command.gcode == GCODE.PROGRAMMING_MODE:
             pass
         return None

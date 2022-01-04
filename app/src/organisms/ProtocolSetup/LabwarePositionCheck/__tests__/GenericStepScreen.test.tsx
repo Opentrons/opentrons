@@ -61,7 +61,7 @@ describe('GenericStepScreen', () => {
     props = {
       selectedStep: MOCK_LABWARE_POSITION_CHECK_STEP_TIPRACK,
       setCurrentLabwareCheckStep: () => {},
-    }
+    } as any
     when(mockLabwarePositionCheckStepDetail)
       .calledWith(
         partialComponentPropsMatcher({
@@ -75,12 +75,9 @@ describe('GenericStepScreen', () => {
     mockUseLabwareIdsBySection.mockReturnValue({})
 
     when(mockUseIntroInfo).calledWith().mockReturnValue({
-      primaryTipRackSlot: '1',
-      primaryTipRackName: 'Opentrons 96 Filter Tip Rack 200 µL',
       primaryPipetteMount: 'left',
       secondaryPipetteMount: '',
-      numberOfTips: 1,
-      firstStepLabwareSlot: '2',
+      firstTiprackSlot: '2',
       sections: MOCK_SECTIONS,
     })
   })

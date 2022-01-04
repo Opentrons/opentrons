@@ -1,12 +1,14 @@
 """Can bus drivers package."""
 
 from .driver import CanDriver
-from .message import CanMessage
-from .arbitration_id import (
+from .can_messenger import CanMessenger
+from opentrons_ot3_firmware.message import CanMessage
+from opentrons_ot3_firmware.arbitration_id import (
     ArbitrationId,
     ArbitrationIdParts,
 )
-from .constants import NodeId, FunctionCode, MessageId
+from opentrons_ot3_firmware.constants import NodeId, FunctionCode, MessageId
+
 
 __all__ = [
     "CanMessage",
@@ -16,4 +18,5 @@ __all__ = [
     "FunctionCode",
     "MessageId",
     "ArbitrationIdParts",
+    "CanMessenger",
 ]

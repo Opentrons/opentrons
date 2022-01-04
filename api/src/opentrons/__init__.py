@@ -5,8 +5,9 @@ from pathlib import Path
 import logging
 import asyncio
 import re
-from typing import Any, List, Tuple, cast
+from typing import Any, List, Tuple
 
+from opentrons.config.feature_flags import enable_ot3_hardware_controller
 from opentrons.drivers.serial_communication import get_ports_by_name
 from opentrons.hardware_control import API, ThreadManager
 from opentrons.config import (
@@ -96,6 +97,18 @@ def _get_motor_control_serial_port() -> Any:
     return port
 
 
+def should_use_ot3() -> bool:
+    """Return true if ot3 hardware controller should be used."""
+    if enable_ot3_hardware_controller():
+        try:
+            from opentrons_hardware.drivers.can_bus import CanDriver  # noqa: F401
+
+            return True
+        except ModuleNotFoundError:
+            log.exception("Cannot use OT3 Hardware controller.")
+    return False
+
+
 async def _create_thread_manager() -> ThreadManager:
     """Build the hardware controller wrapped in a ThreadManager.
 
@@ -106,12 +119,18 @@ async def _create_thread_manager() -> ThreadManager:
         log.info("Initialized robot using virtual Smoothie")
         return ThreadManager(API.build_hardware_simulator)
 
-    thread_manager = ThreadManager(
-        API.build_hardware_controller,
-        threadmanager_nonblocking=True,
-        port=_get_motor_control_serial_port(),
-        firmware=_find_smoothie_file(),
-    )
+    if should_use_ot3():
+        thread_manager = ThreadManager(
+            API.build_ot3_controller,
+            threadmanager_nonblocking=True,
+        )
+    else:
+        thread_manager = ThreadManager(
+            API.build_hardware_controller,
+            threadmanager_nonblocking=True,
+            port=_get_motor_control_serial_port(),
+            firmware=_find_smoothie_file(),
+        )
 
     try:
         await thread_manager.managed_thread_ready_async()
@@ -127,6 +146,9 @@ async def _create_hardware_api() -> API:
 
     if use_hardware_simulator:
         return await API.build_hardware_simulator()
+
+    if should_use_ot3():
+        return await API.build_ot3_controller()
 
     return await API.build_hardware_controller(
         port=_get_motor_control_serial_port(),
@@ -144,13 +166,7 @@ async def initialize() -> API:
     log.info(f"API server version: {__version__}")
     log.info(f"Robot Name: {name()}")
 
-    use_thread_manager = ff.enable_protocol_engine() is False
-
-    if use_thread_manager:
-        thread_manager = await _create_thread_manager()
-        hardware = cast(API, thread_manager)
-    else:
-        hardware = await _create_hardware_api()
+    hardware = await _create_hardware_api()
 
     async def _blink() -> None:
         while True:

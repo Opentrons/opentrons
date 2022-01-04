@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING, Generic, Optional, TypeVar
 if TYPE_CHECKING:
     from opentrons.protocol_engine import execution
 
-CommandDataT = TypeVar("CommandDataT", bound=BaseModel)
+CommandParamsT = TypeVar("CommandParamsT", bound=BaseModel)
 
 CommandResultT = TypeVar("CommandResultT", bound=BaseModel)
 
@@ -25,7 +25,7 @@ class CommandStatus(str, Enum):
     FAILED = "failed"
 
 
-class BaseCommandRequest(GenericModel, Generic[CommandDataT]):
+class BaseCommandCreate(GenericModel, Generic[CommandParamsT]):
     """Base class for command creation requests.
 
     You shouldn't use this class directly; instead, use or define
@@ -39,17 +39,20 @@ class BaseCommandRequest(GenericModel, Generic[CommandDataT]):
             "execution behavior"
         ),
     )
-    data: CommandDataT = Field(..., description="Command execution data payload")
+    params: CommandParamsT = Field(..., description="Command execution data payload")
 
 
-class BaseCommand(GenericModel, Generic[CommandDataT, CommandResultT]):
+class BaseCommand(GenericModel, Generic[CommandParamsT, CommandResultT]):
     """Base command model.
 
     You shouldn't use this class directly; instead, use or define
     your own subclass per specific command type.
     """
 
-    id: str = Field(..., description="Unique identifier for a particular command")
+    id: str = Field(
+        ...,
+        description="Unique identifier of this particular command instance",
+    )
     createdAt: datetime = Field(..., description="Command creation timestamp")
     commandType: str = Field(
         ...,
@@ -58,16 +61,25 @@ class BaseCommand(GenericModel, Generic[CommandDataT, CommandResultT]):
             "execution behavior"
         ),
     )
+    key: str = Field(
+        ...,
+        description=(
+            "An identifier representing this command as a step in a protocol."
+            " A command's `key` will be unique within a given run, but stable"
+            " across all runs that perform the same exact procedure. Thus,"
+            " `key` be used to compare/match commands across multiple runs"
+            " of the same protocol."
+        ),
+    )
     status: CommandStatus = Field(..., description="Command execution status")
-    data: CommandDataT = Field(..., description="Command execution data payload")
+    params: CommandParamsT = Field(..., description="Command execution data payload")
     result: Optional[CommandResultT] = Field(
         None,
         description="Command execution result data, if succeeded",
     )
-    # TODO(mc, 2021-06-08): model ProtocolEngine errors
-    error: Optional[str] = Field(
+    errorId: Optional[str] = Field(
         None,
-        description="Command execution failure, if failed",
+        description="Reference to error occurrence, if execution failed",
     )
     startedAt: Optional[datetime] = Field(
         None,
@@ -81,7 +93,7 @@ class BaseCommand(GenericModel, Generic[CommandDataT, CommandResultT]):
 
 class AbstractCommandImpl(
     ABC,
-    Generic[CommandDataT, CommandResultT],
+    Generic[CommandParamsT, CommandResultT],
 ):
     """Abstract command creation and execution implementation.
 
@@ -106,6 +118,6 @@ class AbstractCommandImpl(
         self._run_control = run_control
 
     @abstractmethod
-    async def execute(self, data: CommandDataT) -> CommandResultT:
+    async def execute(self, params: CommandParamsT) -> CommandResultT:
         """Execute the command, mapping data from execution into a response model."""
         ...

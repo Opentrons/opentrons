@@ -1,6 +1,8 @@
-from typing import Generator
+from typing import Iterator
 
 import pytest
+from opentrons.hardware_control.emulation.settings import Settings
+
 from g_code_parsing import g_code_watcher
 from g_code_parsing.g_code import GCode
 from g_code_parsing.g_code_program.g_code_program import (
@@ -10,7 +12,7 @@ from g_code_parsing.errors import PollingGCodeAdditionError
 
 
 @pytest.fixture
-def watcher() -> Generator:
+def watcher() -> Iterator[g_code_watcher.GCodeWatcher]:
     def temp_return(self):
         return [
             g_code_watcher.WatcherData("M400", "smoothie", "ok\r\nok\r\n"),
@@ -32,7 +34,8 @@ def watcher() -> Generator:
 
     old_function = g_code_watcher.GCodeWatcher.get_command_list
     g_code_watcher.GCodeWatcher.get_command_list = temp_return  # type: ignore
-    yield g_code_watcher.GCodeWatcher()
+
+    yield g_code_watcher.GCodeWatcher(emulator_settings=Settings())
     g_code_watcher.GCodeWatcher = old_function  # type: ignore
 
 

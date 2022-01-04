@@ -7,7 +7,7 @@ import {
   Icon,
   Link,
   Modal,
-  PrimaryBtn,
+  NewPrimaryBtn,
   Text,
   C_BLUE,
   C_MED_DARK_GRAY,
@@ -27,8 +27,8 @@ import styles from '../../styles.css'
 
 const ROBOT_CAL_HELP_ARTICLE =
   'https://support.opentrons.com/en/articles/3499692-how-positional-calibration-works-on-the-ot-2'
-
-const OFFSET_DATA_HELP_ARTICLE = '#' //  TODO IMMEDIATELY: REPLACE WITH ACTUAL LINK
+const OFFSET_DATA_HELP_ARTICLE =
+  'http://support.opentrons.com/en/articles/5742955-how-labware-offsets-work-on-the-ot-2'
 interface LabwareOffsetModalProps {
   onCloseClick: () => unknown
 }
@@ -68,7 +68,7 @@ export const LabwareOffsetModal = (
             color={C_BLUE}
             href={ROBOT_CAL_HELP_ARTICLE}
             id={'LabwareOffsetModal_helpArticleLink1'}
-            rel="noopener noreferrer"
+            external
           >
             {t('learn_more_about_robot_cal_offset_modal_link')}
             <Icon name={'open-in-new'} marginLeft={SPACING_1} size="10px" />
@@ -85,7 +85,7 @@ export const LabwareOffsetModal = (
             color={C_BLUE}
             href={OFFSET_DATA_HELP_ARTICLE}
             id={'LabwareOffsetModal_helpArticleLink2'}
-            rel="noopener noreferrer"
+            external
           >
             {t('learn_more_about_offset_data_link')}
             <Icon name={'open-in-new'} marginLeft={SPACING_1} size="10px" />
@@ -125,14 +125,13 @@ export const LabwareOffsetModal = (
             }}
           />
           <Flex justifyContent={JUSTIFY_CENTER} marginBottom={SPACING_3}>
-            <PrimaryBtn
+            <NewPrimaryBtn
               onClick={props.onCloseClick}
               width={SIZE_4}
-              backgroundColor={C_BLUE}
               id={'LabwareSetupModal_closeButton'}
             >
               {t('shared:close')}
-            </PrimaryBtn>
+            </NewPrimaryBtn>
           </Flex>
         </Box>
       </Modal>

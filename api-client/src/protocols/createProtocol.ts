@@ -7,10 +7,8 @@ export function createProtocol(
   config: HostConfig,
   files: File[]
 ): ResponsePromise<Protocol> {
-  return request<Protocol, { files: File[] }>(
-    POST,
-    '/protocols',
-    { files },
-    config
-  )
+  const formData = new FormData()
+  files.forEach(file => formData.append('files', file, file.name))
+
+  return request<Protocol, FormData>(POST, '/protocols', formData, config)
 }

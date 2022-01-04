@@ -1,23 +1,48 @@
 import * as React from 'react'
 import { resetAllWhenMocks, when } from 'jest-when'
-import { renderWithProviders } from '@opentrons/components'
+import { anyProps, renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/dom'
 import { i18n } from '../../../../i18n'
 import { LabwarePositionCheck } from '../index'
 import { GenericStepScreen } from '../GenericStepScreen'
 import { IntroScreen } from '../IntroScreen'
-import { useSteps } from '../hooks'
-import { LabwarePositionCheckStep } from '../types'
+import { SummaryScreen } from '../SummaryScreen'
+import { RobotMotionLoadingModal } from '../RobotMotionLoadingModal'
+import { ConfirmPickUpTipModal } from '../ConfirmPickUpTipModal'
+import { ExitPreventionModal } from '../ExitPreventionModal'
+import { useSteps, useLabwarePositionCheck } from '../hooks'
+import type { LabwarePositionCheckStep } from '../types'
 
 jest.mock('../GenericStepScreen')
 jest.mock('../IntroScreen')
+jest.mock('../SummaryScreen')
+jest.mock('../RobotMotionLoadingModal')
+jest.mock('../ConfirmPickUpTipModal')
+jest.mock('../ExitPreventionModal')
 jest.mock('../hooks')
 
 const mockGenericStepScreen = GenericStepScreen as jest.MockedFunction<
   typeof GenericStepScreen
 >
 const mockIntroScreen = IntroScreen as jest.MockedFunction<typeof IntroScreen>
+const mockSummaryScreen = SummaryScreen as jest.MockedFunction<
+  typeof SummaryScreen
+>
+const mockRobotMotionLoadingModal = RobotMotionLoadingModal as jest.MockedFunction<
+  typeof RobotMotionLoadingModal
+>
+const mockConfirmPickUpTipModal = ConfirmPickUpTipModal as jest.MockedFunction<
+  typeof ConfirmPickUpTipModal
+>
+const mockExitPreventionModal = ExitPreventionModal as jest.MockedFunction<
+  typeof ExitPreventionModal
+>
+
 const mockUseSteps = useSteps as jest.MockedFunction<typeof useSteps>
+
+const mockUseLabwarePositionCheck = useLabwarePositionCheck as jest.MockedFunction<
+  typeof useLabwarePositionCheck
+>
 
 const PICKUP_TIP_LABWARE_ID = 'PICKUP_TIP_LABWARE_ID'
 const PRIMARY_PIPETTE_ID = 'PRIMARY_PIPETTE_ID'
@@ -40,10 +65,10 @@ describe('LabwarePositionCheck', () => {
         {
           commands: [
             {
-              command: 'pickUpTip',
+              commandType: 'pickUpTip',
               params: {
-                pipette: PRIMARY_PIPETTE_ID,
-                labware: PICKUP_TIP_LABWARE_ID,
+                pipetteId: PRIMARY_PIPETTE_ID,
+                labwareId: PICKUP_TIP_LABWARE_ID,
               },
             },
           ],
@@ -52,8 +77,28 @@ describe('LabwarePositionCheck', () => {
           section: 'PRIMARY_PIPETTE_TIPRACKS',
         } as LabwarePositionCheckStep,
       ])
-    mockIntroScreen.mockReturnValue(<div>Mock Intro Screen Component </div>)
-    mockGenericStepScreen.mockReturnValue(null)
+
+    when(mockUseLabwarePositionCheck)
+      .calledWith(expect.anything(), expect.anything())
+      .mockReturnValue({} as any)
+    when(mockIntroScreen)
+      .calledWith(anyProps())
+      .mockReturnValue(<div>Mock Intro Screen</div>)
+    when(mockGenericStepScreen)
+      .calledWith(anyProps())
+      .mockReturnValue(<div>Mock Generic Step Screen</div>)
+    when(mockSummaryScreen)
+      .calledWith(anyProps())
+      .mockReturnValue(<div>Mock Summary Screen</div>)
+    when(mockRobotMotionLoadingModal)
+      .calledWith(anyProps())
+      .mockReturnValue(<div>Mock Robot Motion Loading Modal</div>)
+    when(mockConfirmPickUpTipModal)
+      .calledWith(anyProps())
+      .mockReturnValue(<div>Mock Confirm Pick Up Tip Modal</div>)
+    when(mockExitPreventionModal)
+      .calledWith(anyProps())
+      .mockReturnValue(<div>Mock Exit Prevention Modal</div>)
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -68,18 +113,47 @@ describe('LabwarePositionCheck', () => {
       name: 'exit',
     })
   })
-  it('renders LabwarePositionCheck header and exit button is pressed', () => {
-    const { getByRole } = render(props)
+  it('prevention modal opens when exit button is pressed', () => {
+    const { getByRole, getByText } = render(props)
     expect(props.onCloseClick).not.toHaveBeenCalled()
     const exitButton = getByRole('button', {
       name: 'exit',
     })
     fireEvent.click(exitButton)
-    expect(props.onCloseClick).toHaveBeenCalled()
+    expect(mockExitPreventionModal).toHaveBeenCalled()
+    getByText('Mock Exit Prevention Modal')
   })
-
-  it('renders LabwarePositionCheck with IntroScreen component', () => {
+  it('renders the loading screen', () => {
+    mockUseLabwarePositionCheck.mockReturnValue({ isLoading: true } as any)
     const { getByText } = render(props)
-    getByText('Mock Intro Screen Component')
+    getByText('Mock Robot Motion Loading Modal')
+  })
+  it('renders the pick up tip confirmation modal', () => {
+    mockUseLabwarePositionCheck.mockReturnValue({
+      showPickUpTipConfirmationModal: true,
+    } as any)
+    const { getByText } = render(props)
+    getByText('Mock Confirm Pick Up Tip Modal')
+  })
+  it('renders the summary screen', () => {
+    mockUseLabwarePositionCheck.mockReturnValue({
+      isComplete: true,
+    } as any)
+    const { getByText } = render(props)
+    getByText('Mock Summary Screen')
+  })
+  it('renders the generic step screen', () => {
+    mockUseLabwarePositionCheck.mockReturnValue({
+      currentCommandIndex: 1,
+    } as any)
+    const { getByText } = render(props)
+    getByText('Mock Generic Step Screen')
+  })
+  it('renders the into screen', () => {
+    mockUseLabwarePositionCheck.mockReturnValue({
+      currentCommandIndex: 0,
+    } as any)
+    const { getByText } = render(props)
+    getByText('Mock Intro Screen')
   })
 })

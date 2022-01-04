@@ -41,13 +41,9 @@ describe('CollapsibleStep', () => {
     jest.resetAllMocks()
   })
 
-  it('renders children if expanded is true', () => {
+  it('renders children', () => {
     const { getByRole } = render()
     expect(getByRole('button', { name: 'stub children' })).toBeTruthy()
-  })
-  it('does not render children if expanded is false', () => {
-    const { queryByRole } = render({ expanded: false })
-    expect(queryByRole('button')).toBeNull()
   })
   it('calls toggle expanded on click', () => {
     const { getByRole } = render({ expanded: false })

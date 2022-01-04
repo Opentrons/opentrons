@@ -1,15 +1,14 @@
 import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   Text,
-  PrimaryBtn,
+  NewPrimaryBtn,
   useHoverTooltip,
   Tooltip,
   SPACING_2,
   SPACING_3,
   ALIGN_CENTER,
-  C_BLUE,
   FONT_WEIGHT_SEMIBOLD,
   FONT_HEADER_THIN,
   Box,
@@ -23,7 +22,9 @@ import { DeckCalibration } from './DeckCalibration'
 import { CalibrationItem } from './CalibrationItem'
 import { PipetteCalibration } from './PipetteCalibration'
 import { TipLengthCalibration } from './TipLengthCalibration'
-import type { Dispatch, State } from '../../../../redux/types'
+import { useCurrentRunPipetteInfoByMount } from '../hooks/useCurrentRunPipetteInfoByMount'
+
+import type { Dispatch } from '../../../../redux/types'
 import type { ViewableRobot } from '../../../../redux/discovery/types'
 import type { ProtocolCalibrationStatus } from '../../../../redux/calibration/types'
 
@@ -53,9 +54,7 @@ export function RobotCalibration(props: Props): JSX.Element {
     robotName && dispatch(TipLength.fetchTipLengthCalibrations(robotName))
   }, [dispatch, robotName, status])
 
-  const protocolPipetteTipRackData = useSelector((state: State) => {
-    return Pipettes.getProtocolPipetteTipRackCalInfo(state, robotName)
-  })
+  const currentRunPipetteInfoByMount = useCurrentRunPipetteInfoByMount()
 
   return (
     <>
@@ -71,20 +70,16 @@ export function RobotCalibration(props: Props): JSX.Element {
       </Text>
       <div>
         {PipetteConstants.PIPETTE_MOUNTS.map((mount, index) => {
-          const pipetteTipRackData = protocolPipetteTipRackData[mount]
-          if (pipetteTipRackData == null) {
-            return null
-          } else {
-            return (
-              <PipetteCalibration
-                key={index}
-                pipetteTipRackData={pipetteTipRackData}
-                index={index}
-                mount={mount}
-                robotName={robotName}
-              />
-            )
-          }
+          const pipetteInfo = currentRunPipetteInfoByMount[mount]
+          return pipetteInfo != null ? (
+            <PipetteCalibration
+              key={index}
+              pipetteInfo={pipetteInfo}
+              index={index}
+              mount={mount}
+              robotName={robotName}
+            />
+          ) : null
         })}
       </div>
       <Divider marginY={SPACING_3} />
@@ -97,8 +92,8 @@ export function RobotCalibration(props: Props): JSX.Element {
       </Text>
       <div>
         {PipetteConstants.PIPETTE_MOUNTS.map(mount => {
-          const pipetteTipRackData = protocolPipetteTipRackData[mount]
-          if (pipetteTipRackData == null) {
+          const pipetteInfo = currentRunPipetteInfoByMount[mount]
+          if (pipetteInfo == null) {
             return null
           } else {
             return (
@@ -108,25 +103,35 @@ export function RobotCalibration(props: Props): JSX.Element {
                   paddingY={SPACING_2}
                   fontWeight={FONT_WEIGHT_SEMIBOLD}
                 >
-                  {pipetteTipRackData.pipetteDisplayName}
+                  {pipetteInfo.pipetteSpecs?.displayName}
                 </Text>
-                {pipetteTipRackData.tipRacks.map((tipRack, index) => (
-                  <CalibrationItem
-                    key={index}
-                    calibratedDate={tipRack.lastModifiedDate}
-                    index={index}
-                    title={tipRack.displayName}
-                    button={
-                      <TipLengthCalibration
-                        mount={mount}
-                        robotName={robotName}
-                        hasCalibrated={tipRack.lastModifiedDate !== null}
-                        tipRackDefinition={tipRack.tipRackDef}
-                        isExtendedPipOffset={false}
-                      />
-                    }
-                  />
-                ))}
+                {pipetteInfo.tipRacksForPipette.map((tipRackInfo, index) => {
+                  const pipetteNotAttached =
+                    pipetteInfo.requestedPipetteMatch === 'incompatible'
+                  return (
+                    <CalibrationItem
+                      key={index}
+                      calibratedDate={tipRackInfo.lastModifiedDate}
+                      index={index}
+                      title={tipRackInfo.displayName}
+                      subText={
+                        pipetteNotAttached
+                          ? t('attach_pipette_tip_length_calibration')
+                          : undefined
+                      }
+                      button={
+                        <TipLengthCalibration
+                          mount={mount}
+                          disabled={pipetteNotAttached}
+                          robotName={robotName}
+                          hasCalibrated={tipRackInfo.lastModifiedDate !== null}
+                          tipRackDefinition={tipRackInfo.tipRackDef}
+                          isExtendedPipOffset={false}
+                        />
+                      }
+                    />
+                  )
+                })}
               </div>
             )
           }
@@ -134,15 +139,14 @@ export function RobotCalibration(props: Props): JSX.Element {
       </div>
       <Divider marginY={SPACING_3} />
       <Box textAlign={ALIGN_CENTER}>
-        <PrimaryBtn
+        <NewPrimaryBtn
           disabled={!calibrationStatus.complete}
           onClick={() => expandStep(nextStep)}
-          backgroundColor={C_BLUE}
           {...targetProps}
           id={'RobotCalStep_proceedButton'}
         >
           {t(nextStepButtonKey)}
-        </PrimaryBtn>
+        </NewPrimaryBtn>
         {calibrationStatus.reason !== undefined && (
           <Tooltip {...tooltipProps}>{t(calibrationStatus.reason)}</Tooltip>
         )}

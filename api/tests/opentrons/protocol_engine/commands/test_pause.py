@@ -9,7 +9,7 @@ from opentrons.protocol_engine.execution import (
 )
 
 from opentrons.protocol_engine.commands.pause import (
-    PauseData,
+    PauseParams,
     PauseResult,
     PauseImplementation,
 )
@@ -30,7 +30,7 @@ async def test_pause_implementation(
         run_control=run_control,
     )
 
-    data = PauseData(message="hello world")
+    data = PauseParams(message="hello world")
 
     result = await subject.execute(data)
 

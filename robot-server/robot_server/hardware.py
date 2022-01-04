@@ -3,13 +3,13 @@ import asyncio
 import logging
 from pathlib import Path
 from fastapi import Depends, status
-from typing import Callable, Union, cast
+from typing import Callable, Union
 from typing_extensions import Literal
 
-from opentrons import initialize as initialize_api
-from opentrons.config import feature_flags, IS_ROBOT, ARCHITECTURE, SystemArchitecture
+from opentrons import initialize as initialize_api, should_use_ot3
+from opentrons.config import IS_ROBOT, ARCHITECTURE, SystemArchitecture
 from opentrons.util.helpers import utc_now
-from opentrons.hardware_control import API as HardwareAPI, ThreadManager
+from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.simulator_setup import load_simulator
 from opentrons.hardware_control.types import HardwareEvent, DoorStateNotification
 
@@ -108,16 +108,14 @@ async def get_hardware(app_state: AppState = Depends(get_app_state)) -> Hardware
     return hardware_api
 
 
-async def _initialize_hardware_api(app_state: AppState) -> None:  # noqa: C901
+async def _initialize_hardware_api(app_state: AppState) -> None:
     """Initialize the HardwareAPI and attach it to global state."""
     try:
         app_settings = get_settings()
         simulator_config = app_settings.simulator_configuration_file_path
-        use_thread_manager = feature_flags.enable_protocol_engine() is False
-
         systemd_available = IS_ROBOT and ARCHITECTURE != SystemArchitecture.HOST
 
-        if systemd_available:
+        if systemd_available and not should_use_ot3():
             # During boot, opentrons-gpio-setup.service will be blinking the
             # front button light. Kill it here and wait for it to exit so it releases
             # that GPIO line. Otherwise, our hardware initialization would get a
@@ -145,12 +143,7 @@ async def _initialize_hardware_api(app_state: AppState) -> None:  # noqa: C901
         if simulator_config:
             simulator_config_path = Path(simulator_config)
             log.info(f"Loading simulator from {simulator_config_path}")
-
-            if use_thread_manager:
-                thread_manager = ThreadManager(load_simulator, simulator_config_path)
-                hardware_api = cast(HardwareAPI, thread_manager)
-            else:
-                hardware_api = await load_simulator(path=simulator_config_path)
+            hardware_api = await load_simulator(path=simulator_config_path)
 
         else:
             hardware_api = await initialize_api()

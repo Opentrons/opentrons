@@ -1,15 +1,18 @@
 """The can bus transport."""
 from __future__ import annotations
-
+import logging
 import asyncio
 import platform
 from typing import Optional
 
 from can import Notifier, Bus, AsyncBufferedReader, Message, util
 
-from .arbitration_id import ArbitrationId
-from .message import CanMessage
+from opentrons_ot3_firmware.arbitration_id import ArbitrationId
+from opentrons_ot3_firmware.message import CanMessage
 from .errors import ErrorFrameCanError
+from .abstract_driver import AbstractCanDriver
+
+log = logging.getLogger(__name__)
 
 
 if platform.system() == "Darwin":
@@ -20,20 +23,23 @@ if platform.system() == "Darwin":
     from can.interfaces.pcan import basic
 
     basic.TPCANMsgMac = basic.TPCANMsg
+    basic.TPCANMsgFDMac = basic.TPCANMsgFD
     basic.TPCANTimestampMac = basic.TPCANTimestamp
+
     from can.interfaces.pcan import pcan
 
     pcan.TPCANMsgMac = pcan.TPCANMsg
+    pcan.TPCANMsgFDMac = pcan.TPCANMsgFD
     pcan.TPCANTimestampMac = pcan.TPCANTimestamp
     # end super bad monkey patch
 
 
-class CanDriver:
+class CanDriver(AbstractCanDriver):
     """The can driver."""
 
-    DEFAULT_CAN_NETWORK = "vcan0"
+    DEFAULT_CAN_NETWORK = "can0"
     DEFAULT_CAN_INTERFACE = "socketcan"
-    DEFAULT_CAN_BITRATE = 0
+    DEFAULT_CAN_BITRATE = 250000
 
     def __init__(self, bus: Bus, loop: asyncio.AbstractEventLoop) -> None:
         """Constructor.
@@ -65,14 +71,25 @@ class CanDriver:
         Returns:
             A CanDriver instance.
         """
-        # TODO (amit, 2021-09-29): remove hacks to support `pcan` when we don't
-        #  need it anymore.
-        #  pcan will not initialize when `fd` is True. looks like it's
-        #  this issue https://forum.peak-system.com/viewtopic.php?t=5646
-        #  Luckily we can still send `fd` messages using `pcan`.
-        fd = True if interface != "pcan" else False
+        log.info(f"CAN connect: {interface}-{channel}-{bitrate}")
+        extra_kwargs = {}
+        if interface == "pcan":
+            # Special FDCAN parameters for use of PCAN driver.
+            extra_kwargs = {
+                "f_clock_mhz": 20,
+                "nom_brp": 5,
+                "nom_tseg1": 13,
+                "nom_tseg2": 2,
+                "nom_sjw": 16,
+            }
         return CanDriver(
-            bus=Bus(channel=channel, bitrate=bitrate, interface=interface, fd=fd),
+            bus=Bus(
+                channel=channel,
+                bitrate=bitrate,
+                interface=interface,
+                fd=True,
+                **extra_kwargs,
+            ),
             loop=asyncio.get_event_loop(),
         )
 
@@ -118,7 +135,6 @@ class CanDriver:
         Raises:
             ErrorFrameCanError
         """
-        ...
         m: Message = await self._reader.get_message()
         if m.is_error_frame:
             raise ErrorFrameCanError(message=repr(m))
@@ -126,20 +142,3 @@ class CanDriver:
         return CanMessage(
             arbitration_id=ArbitrationId(id=m.arbitration_id), data=m.data
         )
-
-    def __aiter__(self) -> CanDriver:
-        """Enter iterator.
-
-        Returns:
-            CanDriver
-        """
-        return self
-
-    async def __anext__(self) -> CanMessage:
-        """Async next.
-
-        Returns:
-            CanMessage
-
-        """
-        return await self.read()

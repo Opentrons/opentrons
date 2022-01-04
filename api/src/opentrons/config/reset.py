@@ -25,7 +25,6 @@ class CommonResetOption(NamedTuple):
 class ResetOptionId(str, Enum):
     """The available reset options"""
 
-    labware_calibration = "labwareCalibration"
     boot_scripts = "bootScripts"
     deck_calibration = "deckCalibration"
     pipette_offset = "pipetteOffsetCalibrations"
@@ -33,9 +32,6 @@ class ResetOptionId(str, Enum):
 
 
 _settings_reset_options = {
-    ResetOptionId.labware_calibration: CommonResetOption(
-        name="Labware Calibration", description="Clear labware calibration"
-    ),
     ResetOptionId.boot_scripts: CommonResetOption(
         name="Boot Scripts", description="Clear custom boot scripts"
     ),
@@ -65,9 +61,6 @@ def reset(options: Set[ResetOptionId]) -> None:
     :param options: the parts to reset
     """
     log.info("Reset requested for %s", options)
-
-    if ResetOptionId.labware_calibration in options:
-        reset_labware_calibration()
 
     if ResetOptionId.boot_scripts in options:
         reset_boot_scripts()

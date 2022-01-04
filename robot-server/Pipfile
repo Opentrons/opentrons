@@ -21,7 +21,7 @@ flake8 = "~=3.9.0"
 flake8-annotations = "~=2.6.2"
 flake8-docstrings = "~=1.6.0"
 flake8-noqa = "~=1.1.0"
-decoy = "~=1.6.7"
+decoy = "~=1.8.0"
 httpx = "==0.18.*"
 black = "==21.7b0"
 # pytest dependencies on windows, spec'd here to force lockfile inclusion
@@ -48,3 +48,4 @@ idna = "==3.2"
 click = "==8.0.1"
 numpy = "==1.15.1"
 zipp = "==3.5.0"
+opentrons-hardware = {editable = true, path = "./../hardware"}

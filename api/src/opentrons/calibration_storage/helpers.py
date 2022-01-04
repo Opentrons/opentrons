@@ -38,6 +38,11 @@ def convert_to_dict(obj) -> Dict:
     return asdict(obj, dict_factory=dict_filter_none)
 
 
+# TODO(mc, 2021-11-09): this hashing function may produce different hashes
+# for semantically identical labware defs. For example, a value of `10` will
+# produce a different hash than a value of `10.0`. Hashing should be produce
+# identical hashes for `==` values. This could be done by running defs through
+# Pydantic or simliar rather via json.dumps
 def hash_labware_def(labware_def: "LabwareDefinition") -> str:
     """
     Helper function to take in a labware definition and return

@@ -63,9 +63,12 @@ class PairedInstrumentContext(CommandPublisher):
         }
         self._api_version = api_version
         self._log = log_parent.getChild(repr(self))
-        self._tip_racks = list(
-            set(primary_instrument.tip_racks) & set(secondary_instrument.tip_racks)
-        )
+
+        self._tip_racks = [
+            tr
+            for tr in primary_instrument.tip_racks
+            if tr in secondary_instrument.tip_racks
+        ]
         self._pair_policy = pair_policy
 
         self._starting_tip: Union[Well, None] = None
@@ -249,7 +252,6 @@ class PairedInstrumentContext(CommandPublisher):
         secondary_target = self._get_secondary_target(tiprack, target)
         primary_pipette = self._instruments[self._pair_policy.primary]
         tip_length = primary_pipette._tip_length_for(tiprack)
-
         instruments = list(self._instruments.values())
         targets = [target, secondary_target]
 
@@ -634,8 +636,7 @@ class PairedInstrumentContext(CommandPublisher):
         if not loc or not loc.labware.is_well:
             raise RuntimeError("No previous Well cached to perform air gap")
         target = loc.labware.as_well().top(height)
-        self._implementation.move_to(target)
-        self._implementation.aspirate(volume=c_vol, location=loc, rate=1.0)
+        self._implementation.aspirate(volume=c_vol, location=target, rate=1.0)
         return self
 
     @requires_version(2, 7)

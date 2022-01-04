@@ -8,7 +8,7 @@ from opentrons.hardware_control import (
     ThreadedAsyncLock,
     ThreadedAsyncForbidden,
 )
-from opentrons.hardware_control.types import Axis
+from opentrons.hardware_control.types import Axis, CriticalPoint
 from opentrons.types import Mount, Point
 
 from robot_server.errors import LegacyErrorResponse
@@ -148,15 +148,25 @@ async def post_robot_light_state(
 async def _do_move(hardware: ThreadManager, robot_move_target: control.RobotMoveTarget):
     """Perform the move"""
 
+    await hardware.cache_instruments()
+
+    critical_point = None
+    if robot_move_target.target == control.MotionTarget.mount:
+        critical_point = CriticalPoint.MOUNT
+
     mount = Mount[robot_move_target.mount.upper()]
     target_pos = Point(*robot_move_target.point)
 
     # Reset z position
     await hardware.home_z()
 
-    pos = await hardware.gantry_position(mount)
+    pos = await hardware.gantry_position(mount, critical_point=critical_point)
     # Move to requested x, y and current z position
-    await hardware.move_to(mount, Point(x=target_pos.x, y=target_pos.y, z=pos.z))
+    await hardware.move_to(
+        mount,
+        Point(x=target_pos.x, y=target_pos.y, z=pos.z),
+        critical_point=critical_point,
+    )
     # Move to requested z position
-    await hardware.move_to(mount, target_pos)
+    await hardware.move_to(mount, target_pos, critical_point=critical_point)
     return await hardware.gantry_position(mount)

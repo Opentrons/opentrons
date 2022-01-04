@@ -1,6 +1,6 @@
 {
   "name": "@opentrons/app",
-  "version": "4.6.2",
+  "version": "5.0.0-beta.5",
   "description": "Opentrons desktop application UI",
   "source": "src/index.tsx",
   "types": "lib/index.d.ts",
@@ -19,13 +19,15 @@
   "homepage": "https://github.com/Opentrons/opentrons",
   "dependencies": {
     "@hot-loader/react-dom": "17.0.1",
-    "@opentrons/components": "4.6.2",
-    "@opentrons/shared-data": "4.6.2",
+    "@opentrons/api-client": "5.0.0-beta.5",
+    "@opentrons/components": "5.0.0-beta.5",
+    "@opentrons/react-api-client": "5.0.0-beta.5",
+    "@opentrons/shared-data": "5.0.0-beta.5",
     "@thi.ng/paths": "1.6.5",
     "classnames": "2.2.5",
     "connected-react-router": "6.8.0",
     "core-js": "3.2.1",
-    "date-fns": "2.10.0",
+    "date-fns": "2.25.0",
     "events": "3.0.0",
     "file-saver": "2.0.1",
     "formik": "2.1.4",
@@ -51,6 +53,7 @@
     "rxjs": "^6.5.1",
     "semver": "5.5.0",
     "styled-components": "5.1.1",
-    "typeface-open-sans": "0.0.75"
+    "typeface-open-sans": "0.0.75",
+    "uuid": "8.3.2"
   }
 }

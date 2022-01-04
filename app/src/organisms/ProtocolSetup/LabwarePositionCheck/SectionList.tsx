@@ -7,7 +7,6 @@ import {
   ALIGN_CENTER,
   SIZE_1,
   SPACING_2,
-  SPACING_5,
   C_WHITE,
   C_NEAR_WHITE,
   C_DARK_GRAY,
@@ -23,7 +22,7 @@ import {
 import type { Section } from './types'
 interface Props {
   sections: Section[]
-  currentSection: Section
+  currentSection?: Section
   primaryPipetteMount: string
   secondaryPipetteMount: string
   completedSections?: Section[]
@@ -44,7 +43,6 @@ export function SectionList(props: Props): JSX.Element {
       fontSize={FONT_SIZE_CAPTION}
       padding={SPACING_3}
       width="14rem"
-      marginLeft={SPACING_5}
       boxShadow="1px 1px 1px rgba(0, 0, 0, 0.25)"
       borderRadius="4px"
       backgroundColor={C_NEAR_WHITE}
@@ -96,6 +94,7 @@ export function SectionList(props: Props): JSX.Element {
                     ? C_SELECTED_DARK
                     : sectionTextColor
                 }
+                id={`sectionList_step_${index}`}
               >
                 {t(`${section.toLowerCase()}_section`, {
                   primary_mount: capitalize(primaryPipetteMount),

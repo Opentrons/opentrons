@@ -1,4 +1,4 @@
-**For** more details about this release, please see the full [technical change
+For more details about this release, please see the full [technical change
 log][]. For a list of currently known issues, please see the [Opentrons issue tracker][].
 
 [technical change log]: https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md
@@ -6,23 +6,78 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# Opentrons App Changes in 4.6.2
+# Opentrons App Changes in 5.0.0-beta
 
-The 4.6.2 release is primarily focused on bug fixes on the robot software side and behind the scenes changes in the app for future work. You shouldn't notice any big changes with this upgrade.
+Welcome to the beta release of v5.0.0 release of the Opentrons App! After you update your app, please be sure to update any OT-2's you will be using with this beta.
+
+The 5.0.0 release reshapes the way you upload and set up protocols to run on your OT-2. We're very excited for you to try this new experience out, and we appreciate your feedback (and patience) as you use this new software.
+
+This is beta software! You may experience unexpected crashes or missing features not detailed here. Please see the [beta forum][] for more details and to leave feedback.
+
+[beta forum]: https://community.opentrons.com/c/beta/pe-beta/9
 
 ## New Features
 
+- A completely revamped protocol upload experience that will walk you through setting up your OT-2 for the run
+- A new way to check the positioning of your labware prior to a run, where you can apply offsets to each labware individually
+- Quick and easy re-running of your last used protocol
+
+### Bug Fixes
+
+Keep an eye on this space as we release new versions of the beta. See the [issue tracker][] for a full list of issues resolved by the v5 release.
+
+Since the last beta release we have fixed the following critical issues:
+
+- Fix an issue where missing metadata on commands caused a white screen when expanding protocol setup steps
+- Display labware offsets for labware on top of modules
+- Fix Labware Position Check summary screen offset data flickering
+- Fix labware offsets not rendering on deckmap after completing labware position check
+
+[issue tracker]: https://github.com/Opentrons/opentrons/labels/fixed-in-v5
+
+## Known Issues
+
+This beta is a work in progress! We'll be addressing the following features and issues in upcoming releases of 5.0.0.
+
+- Your last run protocol will not be saved through robot reboots
+- You may experience various performance issues and freezes
+- The OT-2 will not drop any tips if a protocol is canceled
+- The OT-2 will not pause if the front door is opened during a run
+- You may not be able to re-run a protocol using a thermocycler without re-uploading the protocol
+
+---
+
+## Opentrons App Changes in 4.7.0
+
+The 4.7.0 release is primarily focused on bug fixes on the robot software side. You shouldn't notice any big changes with this upgrade.
+
+### New Features
+
 None in the Opentrons App.
 
-## Bug Fixes
+### Bug Fixes
 
 None in the Opentrons App.
 
-## 4.6.1 to 4.6.2
+---
+
+## Opentrons App Changes in 4.6.2
+
+The 4.6.2 release is primarily focused on bug fixes on the robot software side and behind the scenes changes in the app for future work. You shouldn't notice any big changes with this upgrade.
+
+### New Features
+
+None in the Opentrons App.
+
+### Bug Fixes
+
+None in the Opentrons App.
+
+#### 4.6.1 to 4.6.2
 
 The 4.6.2 hotfix release contains a small bug fix for an issue where the OT-2's max speed settings within a protocol will be ignored. It does not affect the software running in the Opentrons App.
 
-## 4.6.0 to 4.6.1
+#### 4.6.0 to 4.6.1
 
 The 4.6.1 hotfix release contains a small configuration change to fix an issue with installing the `opentrons` PyPI package on computers running Python 3.8 and later. It does not affect the software running in the Opentrons App.
 

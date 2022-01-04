@@ -1240,6 +1240,18 @@
   },
   "commands": [
     {
+      "commandType": "home",
+      "id": "00abc123",
+      "params": {}
+    },
+    {
+      "commandType": "home",
+      "id": "00abc123",
+      "params": {
+        "axes": ["x", "y", "leftZ", "rightZ", "leftPlunger", "rightPlunger"]
+      }
+    },
+    {
       "commandType": "loadPipette",
       "id": "0abc123",
       "params": {
@@ -1431,6 +1443,14 @@
         "wellName": "A1"
       }
     },
+    {
+      "commandType": "pause",
+      "id": "18abc123",
+      "params": {
+        "message": "pause command"
+      }
+    },
+
     {
       "commandType": "moveToCoordinates",
       "id": "16abc123",

@@ -142,6 +142,7 @@ push:
 push-ot3:
 	$(if $(host),@echo "Pushing to $(host)",$(error host variable required))
 	$(MAKE) -C $(API_DIR) push-no-restart-ot3
+	$(MAKE) -C $(HARDWARE_DIR) push-no-restart-ot3
 	$(MAKE) -C $(SHARED_DATA_DIR) push-no-restart-ot3
 	$(MAKE) -C $(NOTIFY_SERVER_DIR) push-no-restart-ot3
 	$(MAKE) -C $(ROBOT_SERVER_DIR) push-ot3
@@ -222,6 +223,7 @@ format-py:
 	$(MAKE) -C $(API_DIR) format
 	$(MAKE) -C $(ROBOT_SERVER_DIR) format
 	$(MAKE) -C $(G_CODE_TESTING_DIR) format
+	$(MAKE) -C $(UPDATE_SERVER_DIR) format
 
 .PHONY: format-js
 format-js:

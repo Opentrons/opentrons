@@ -52,11 +52,11 @@ def test_protocol_upload(
             robots_list.get_robot_toggle(RobotsList.DEV).click()
         left_menu = LeftMenu(driver)
         protocol_upload = ProtocolUpload(driver)
-        """left_menu.click_more_button()
+        left_menu.click_more_button()
         protocol_upload = ProtocolUpload(driver)
         protocol_upload.click_app_left_panel()
         protocol_upload.click_enable_developer_toggle()
-        protocol_upload.click_enable_pur_feature()"""
+        protocol_upload.click_enable_pur_feature()
         protocol_upload.goto_robots_page()
         # Instantiate the page object for the RobotsList.
         robots_list = RobotsList(driver)
@@ -67,7 +67,7 @@ def test_protocol_upload(
         robot_page = RobotPage(driver)
         # Check if calibration state. If calibration is started
         # but not finished, exit and start over
-        """calibrate = DeckCalibration(driver)
+        calibrate = DeckCalibration(driver)
         exit_button = calibrate.exit_button()
         if exit_button:
             exit_button.click()
@@ -77,7 +77,7 @@ def test_protocol_upload(
         )
         robot_page.start_calibration()
         calibrate.calibrate_deck()
-        assert robot_page.wait_for_deck_to_show_calibrated()"""
+        assert robot_page.wait_for_deck_to_show_calibrated()
         left_menu = LeftMenu(driver)
         left_menu.click_protocol_upload_button()
         protocol_file = ProtocolFile(driver)

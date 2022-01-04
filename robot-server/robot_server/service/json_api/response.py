@@ -1,9 +1,8 @@
-from typing import Generic, Optional, List, TypeVar
-from typing_extensions import Literal
+from typing import Any, Dict, Generic, List, Optional, TypeVar
 from pydantic import Field, BaseModel
 from pydantic.generics import GenericModel
 
-from .resource_links import ResourceLinks
+from .resource_links import ResourceLinks as DeprecatedResourceLinks
 
 
 class ResponseDataModel(BaseModel):
@@ -23,31 +22,106 @@ class ResourceModel(ResponseDataModel):
 
 
 ResponseDataT = TypeVar("ResponseDataT", bound=BaseModel)
+ResponseLinksT = TypeVar("ResponseLinksT")
 
 
-DESCRIPTION_DATA = "the document’s primary data"
+DESCRIPTION_DATA = "The document’s primary data"
 
-DESCRIPTION_LINKS = "a links object related to the primary data."
-
-DESCRIPTION_META = "a meta object that contains non-standard meta-information."
+DESCRIPTION_LINKS = "A links object related to the primary data."
 
 
-class ResponseModel(GenericModel, Generic[ResponseDataT]):
+class BaseResponse(BaseModel):
+    """Base model to for HTTP responses.
+
+    This model contains configuration and overrides to ensure returned
+    JSON responses adhere to the server's generated OpenAPI Spec.
+    """
+
+    def dict(self, *args: Any, **kwargs: Any) -> Dict[str, Any]:
+        """Always exclude `None` when serializing to an object.
+
+        The OpenAPI spec marks `Optional` BaseModel fields as omittable, but
+        not nullable. This `dict` method override ensures that `null` is never
+        returned in a response, which would violate the spec.
+        """
+        kwargs["exclude_none"] = True
+        return super().dict(*args, **kwargs)
+
+
+class SimpleResponse(BaseResponse, GenericModel, Generic[ResponseDataT]):
     """A response that returns a single resource."""
 
-    links: Optional[ResourceLinks] = Field(None, description=DESCRIPTION_LINKS)
     data: ResponseDataT = Field(..., description=DESCRIPTION_DATA)
 
 
-class EmptyResponseModel(BaseModel):
-    """A response that returns no data."""
+class Response(BaseResponse, GenericModel, Generic[ResponseDataT, ResponseLinksT]):
+    """A response that returns a single resource and stateful links."""
 
-    links: Optional[ResourceLinks] = Field(None, description=DESCRIPTION_LINKS)
-    data: Literal[None] = Field(None, description=DESCRIPTION_DATA)
+    data: ResponseDataT = Field(..., description=DESCRIPTION_DATA)
+    links: ResponseLinksT = Field(..., description=DESCRIPTION_LINKS)
 
 
-class MultiResponseModel(GenericModel, Generic[ResponseDataT]):
+class SimpleEmptyResponse(BaseResponse):
+    """A response that returns no data and no links."""
+
+
+class EmptyResponse(BaseResponse, GenericModel, Generic[ResponseLinksT]):
+    """A response that returns no data except stateful links."""
+
+    links: ResponseLinksT = Field(..., description=DESCRIPTION_LINKS)
+
+
+class SimpleMultiResponse(BaseResponse, GenericModel, Generic[ResponseDataT]):
     """A response that returns multiple resources."""
 
-    links: Optional[ResourceLinks] = Field(None, description=DESCRIPTION_LINKS)
     data: List[ResponseDataT] = Field(..., description=DESCRIPTION_DATA)
+
+
+class MultiResponse(
+    BaseResponse,
+    GenericModel,
+    Generic[ResponseDataT, ResponseLinksT],
+):
+    """A response that returns multiple resources and stateful links."""
+
+    data: List[ResponseDataT] = Field(..., description=DESCRIPTION_DATA)
+    links: ResponseLinksT = Field(..., description=DESCRIPTION_LINKS)
+
+
+# TODO(mc, 2021-12-09): remove this model prior to 5.0 prod release
+class DeprecatedResponseModel(GenericModel, Generic[ResponseDataT]):
+    """A response that returns a single resource and stateful links.
+
+    This deprecated response model may serialize `Optional` fields to `null`,
+    which violates our generated OpenAPI Spec.
+
+    Note:
+        Do not use this response model for new endpoints.
+    """
+
+    data: ResponseDataT = Field(..., description=DESCRIPTION_DATA)
+    links: Optional[DeprecatedResourceLinks] = Field(
+        None,
+        description=DESCRIPTION_LINKS,
+    )
+
+
+# TODO(mc, 2021-12-09): remove this model prior to 5.0 prod release
+class DeprecatedMultiResponseModel(
+    GenericModel,
+    Generic[ResponseDataT],
+):
+    """A response that returns multiple resources and stateful links.
+
+    This deprecated response model may serialize `Optional` fields to `null`,
+    which violates our generated OpenAPI Spec.
+
+    Note:
+        Do not use this response model for new endpoints.
+    """
+
+    data: List[ResponseDataT] = Field(..., description=DESCRIPTION_DATA)
+    links: Optional[DeprecatedResourceLinks] = Field(
+        None,
+        description=DESCRIPTION_LINKS,
+    )

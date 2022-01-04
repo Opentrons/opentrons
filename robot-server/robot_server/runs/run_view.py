@@ -1,26 +1,11 @@
 """Run response model factory."""
 from dataclasses import replace
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Tuple
-
-from opentrons.protocol_engine import (
-    Command as ProtocolEngineCommand,
-    EngineStatus,
-    LoadedLabware,
-    LoadedPipette,
-)
+from typing import Tuple
 
 from .run_store import RunResource
-from .action_models import RunAction, RunActionCreateData
-from .run_models import (
-    Run,
-    RunCreateData,
-    BasicRun,
-    BasicRunCreateData,
-    ProtocolRun,
-    ProtocolRunCreateData,
-    RunCommandSummary,
-)
+from .action_models import RunAction, RunActionCreate
+from .run_models import RunUpdate
 
 
 class RunView:
@@ -31,34 +16,24 @@ class RunView:
     """
 
     @staticmethod
-    def as_resource(
-        run_id: str,
-        created_at: datetime,
-        create_data: Optional[RunCreateData],
-    ) -> RunResource:
-        """Create a new run resource instance from its create data.
+    def with_update(run: RunResource, update: RunUpdate) -> RunResource:
+        """Update a run resource with update request data.
 
         Arguments:
-            run_id: Unique identifier.
-            created_at: Resource creation timestamp.
-            create_data: Data used to create the run.
+            run: Existing run resource.
+            update: Run update data.
 
         Returns:
-            The run in its internal resource representation, for use in
-                the `RunStore` and other classes.
+            The updated run resource.
         """
-        return RunResource(
-            run_id=run_id,
-            created_at=created_at,
-            create_data=create_data or BasicRunCreateData(),
-            actions=[],
-        )
+        is_current = update.current if update.current is not None else run.is_current
+        return replace(run, is_current=is_current)
 
     @staticmethod
     def with_action(
         run: RunResource,
         action_id: str,
-        action_data: RunActionCreateData,
+        action_data: RunActionCreate,
         created_at: datetime,
     ) -> Tuple[RunAction, RunResource]:
         """Create a new run control action resource instance.
@@ -74,7 +49,7 @@ class RunView:
             updated copy of the passed in RunResource.
 
         """
-        actions = RunAction(
+        actions = RunAction.construct(
             id=action_id,
             createdAt=created_at,
             actionType=action_data.actionType,
@@ -86,44 +61,3 @@ class RunView:
         )
 
         return actions, updated_run
-
-    @staticmethod
-    def as_response(
-        run: RunResource,
-        commands: List[ProtocolEngineCommand],
-        pipettes: List[LoadedPipette],
-        labware: List[LoadedLabware],
-        engine_status: EngineStatus,
-    ) -> Run:
-        """Transform a run resource into its public response model.
-
-        Arguments:
-            run: Internal resource representation of the run.
-
-        Returns:
-            Run response model representing the same resource.
-        """
-        create_data = run.create_data
-        command_summaries = [
-            RunCommandSummary(id=c.id, commandType=c.commandType, status=c.status)
-            for c in commands
-        ]
-
-        response_fields: Dict[str, Any] = {
-            "id": run.run_id,
-            "createdAt": run.created_at,
-            "actions": run.actions,
-            "commands": command_summaries,
-            "pipettes": pipettes,
-            "labware": labware,
-            "status": engine_status,
-        }
-
-        if isinstance(create_data, BasicRunCreateData):
-            return BasicRun(**response_fields)
-
-        if isinstance(create_data, ProtocolRunCreateData):
-            response_fields["createParams"] = create_data.createParams
-            return ProtocolRun(**response_fields)
-
-        raise ValueError(f"Invalid run resource {run}")

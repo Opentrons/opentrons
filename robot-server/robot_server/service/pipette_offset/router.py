@@ -50,7 +50,8 @@ async def get_all_pipette_offset_calibrations(
 
     if not all_calibrations:
         return pip_models.MultipleCalibrationsResponse(
-            data=[_format_calibration(cal) for cal in all_calibrations]
+            data=[_format_calibration(cal) for cal in all_calibrations],
+            links=None,
         )
 
     if pipette_id:
@@ -63,7 +64,7 @@ async def get_all_pipette_offset_calibrations(
         )
 
     calibrations = [_format_calibration(cal) for cal in all_calibrations]
-    return pip_models.MultipleCalibrationsResponse(data=calibrations)
+    return pip_models.MultipleCalibrationsResponse(data=calibrations, links=None)
 
 
 @router.delete(

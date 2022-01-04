@@ -1,13 +1,42 @@
+import type { CommonCommandInfo } from '.'
+import type { MotorAxis } from '../../../../js/types'
+export interface MoveToSlotCommand extends CommonCommandInfo {
+  commandType: 'moveToSlot'
+  params: MoveToSlotParams
+  result?: {}
+}
+export interface MoveToWellCommand extends CommonCommandInfo {
+  commandType: 'moveToWell'
+  params: MoveToWellParams
+  result?: {}
+}
+export interface MoveToCoordinatesCommand extends CommonCommandInfo {
+  commandType: 'moveToCoordinates'
+  params: MoveToCoordinatesParams
+  result?: {}
+}
+export interface MoveRelativeCommand extends CommonCommandInfo {
+  commandType: 'moveRelative'
+  params: MoveRelativeParams
+  result?: {}
+}
+export interface SavePositionCommand extends CommonCommandInfo {
+  commandType: 'savePosition'
+  params: SavePositionParams
+  result?: {}
+}
+export interface HomeCommand extends CommonCommandInfo {
+  commandType: 'home'
+  params: HomeParams
+  result?: {}
+}
 export type GantryCommand =
-  | { commandType: 'moveToSlot'; params: MoveToSlotParams; result?: {} }
-  | { commandType: 'moveToWell'; params: MoveToWellParams; result?: {} }
-  | {
-      commandType: 'moveToCoordinates'
-      params: MoveToCoordinatesParams
-      result?: {}
-    }
-  | { commandType: 'moveRelative'; params: MoveRelativeParams; result?: {} }
-  | { commandType: 'savePosition'; params: SavePositionParams; result?: {} }
+  | MoveToSlotCommand
+  | MoveToWellCommand
+  | MoveToCoordinatesCommand
+  | MoveRelativeCommand
+  | SavePositionCommand
+  | HomeCommand
 
 interface MoveToSlotParams {
   pipetteId: string
@@ -57,4 +86,8 @@ interface MoveRelativeParams {
 interface SavePositionParams {
   pipetteId: string // pipette to use in measurement
   positionId?: string // position ID, auto-assigned if left blank
+}
+
+interface HomeParams {
+  axes?: MotorAxis
 }

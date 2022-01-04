@@ -26,7 +26,7 @@ flake8 = "~=3.9.0"
 flake8-annotations = "~=2.6.2"
 flake8-docstrings = "~=1.6.0"
 flake8-noqa = "~=1.1.0"
-decoy = "~=1.6.7"
+decoy = "~=1.8.0"
 black = "==21.7b0"
 # pytest dependencies on windows, spec'd here to force lockfile inclusion
 # https://github.com/pypa/pipenv/issues/4408#issuecomment-668324177
@@ -36,3 +36,5 @@ types-mock = "==4.0.1"
 types-setuptools = "==57.0.2"
 opentrons-shared-data = {editable = true, path = "../shared-data/python"}
 opentrons = {editable = true, path = "."}
+opentrons-hardware = {editable = true, path = "./../hardware"}
+opentrons-ot3-firmware = {subdirectory = "python", git = "https://github.com/Opentrons/ot3-firmware.git", branch = "main"}

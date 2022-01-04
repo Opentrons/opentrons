@@ -77,7 +77,7 @@
     },
 
     "wellLocation": {
-      "required": ["origin", "offset"],
+      "required": ["origin"],
       "properties": {
         "origin": {
           "type": "string",
@@ -473,6 +473,35 @@
                   "positionId": {
                     "description": "Optional position ID, auto-assigned if left blank",
                     "type": "string"
+                  }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Home",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": { "enum": ["home"] },
+              "params": {
+                "type": "object",
+                "properties": {
+                  "axes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "x",
+                        "y",
+                        "leftZ",
+                        "rightZ",
+                        "leftPlunger",
+                        "rightPlunger"
+                      ]
+                    }
                   }
                 }
               }
@@ -1079,7 +1108,25 @@
               }
             }
           },
-
+          {
+            "description": "Pause: This command pauses the run.",
+            "type": "object",
+            "required": ["id", "commandType"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": {
+                "enum": ["pause"]
+              },
+              "params": {
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "description": "Optional message the user can set for their pause command"
+                  }
+                }
+              }
+            }
+          },
           {
             "description": "Custom: This command is meant to allow non-canonical commands to be included in the commands list.",
             "type": "object",
