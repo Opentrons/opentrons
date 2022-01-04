@@ -1,15 +1,14 @@
 """Motion planning types."""
 import enum
 import dataclasses
-import math
 import numpy as np
 import numpy.typing as npt
 from typing import Dict, Iterator, List, NamedTuple, Tuple
 
 
 class Axis(enum.Enum):
-    """Robot axis."""
 
+    """Robot axis."""
     X = 0
     Y = 1
     Z = 2
@@ -22,15 +21,31 @@ class Axis(enum.Enum):
 
 
 class Coordinates(NamedTuple):
-    """Coordinates for all axes."""
 
-    X: float
-    Y: float
-    Z: float
-    A: float
+    """Coordinates for all axes."""
+    X: np.float64
+    Y: np.float64
+    Z: np.float64
+    A: np.float64
+    
+    def __iter__(self):
+        """Make Coordinates iterable."""
+        look_up = self.to_dict()
+        return iter(
+            (axis, look_up[axis]) for axis in Axis.get_all_axes()
+        )
+
+    def to_dict(self) -> Dict[Axis, np.float64]:
+        """Return Coordaintes as a dictionary."""
+        return {
+            Axis.X: self.X,
+            Axis.Y: self.Y,
+            Axis.Z: self.Z,
+            Axis.A: self.A,
+        }
 
     @classmethod
-    def from_iter(cls, iter: Iterator[float]) -> "Coordinates":
+    def from_iter(cls, iter: Iterator[np.float64]) -> "Coordinates":
         """Create coordinates from an iterator of floats."""
         return cls(*iter)
 
@@ -39,23 +54,29 @@ class Coordinates(NamedTuple):
         return np.array(self)
 
 
+class UnitVector(Coordinates):
+    def __new__(cls, X: np.float64, Y: np.float64, Z: np.float64, A: np.float64):
+        assert np.linalg.norm([X, Y, Z, A]) == 1.0, f"({X}, {Y}, {Z}, {A}) is not a unit vector"
+        return super().__new__(cls, X, Y, Z, A)
+
+
 @dataclasses.dataclass
 class Block:
     """One of three groups that makes up a move."""
 
-    distance: float
-    initial_speed: float
-    acceleration: float
+    distance: np.float64
+    initial_speed: np.float64
+    acceleration: np.float64
 
     @property
-    def final_speed(self) -> float:
+    def final_speed(self) -> np.float64:
         """Get final speed of the block."""
-        return math.sqrt(
+        return numpy.sqrt(
             self.initial_speed ** 2 + self.acceleration * self.distance * 2
         )
 
     @property
-    def time(self) -> float:
+    def time(self) -> np.float64:
         """Get the time it takes for the block to complete its motion."""
         if self.acceleration:
             return (self.final_speed - self.initial_speed) / self.acceleration
