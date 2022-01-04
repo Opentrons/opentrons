@@ -1,4 +1,5 @@
 import shared from './shared.json'
+import devices_landing from './devices_landing.json'
 import labware_position_check from './labware_position_check.json'
 import more_network_and_system from './more_network_and_system.json'
 import more_panel from './more_panel.json'
@@ -15,6 +16,7 @@ import top_navigation from './top_navigation.json'
 
 export const en = {
   shared,
+  devices_landing,
   labware_position_check,
   more_network_and_system,
   more_panel,

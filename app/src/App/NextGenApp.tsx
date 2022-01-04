@@ -6,6 +6,7 @@ import {
   Box,
   Flex,
   BORDER_SOLID_LIGHT,
+  C_NEAR_WHITE,
   DIRECTION_COLUMN,
   FLEX_NONE,
   POSITION_RELATIVE,
@@ -14,6 +15,7 @@ import {
 } from '@opentrons/components'
 
 import { AppSettings } from '../pages/More/AppSettings'
+import { DevicesLanding } from '../pages/Devices/DevicesLanding'
 
 interface RouteProps {
   /**
@@ -113,7 +115,7 @@ export function NextGenApp(): JSX.Element {
       tier: 1,
     },
     {
-      component: () => <div>devices landing</div>,
+      component: DevicesLanding,
       exact: true,
       name: 'Devices',
       navLinkTo: '/devices',
@@ -165,7 +167,12 @@ export function NextGenApp(): JSX.Element {
   return (
     <>
       <TempNavBar routes={nextGenRoutes} />
-      <Box position={POSITION_RELATIVE} width="100%" height="100%">
+      <Box
+        position={POSITION_RELATIVE}
+        width="100%"
+        height="100%"
+        backgroundColor={C_NEAR_WHITE}
+      >
         <Switch>
           {nextGenRoutes.map(({ component, exact, path }: RouteProps) => {
             return (
@@ -178,7 +185,7 @@ export function NextGenApp(): JSX.Element {
             )
           })}
           {/* this redirect from /robots is necessary because the existing app <Redirect /> to /robots renders before feature flags load */}
-          <Redirect from="/robots" to="/app-settings/feature-flags" />
+          <Redirect from="/robots" to="/devices" />
           {/* this redirects from the existing app settings page on next gen app feature flag toggle */}
           <Redirect from="/more" to="/app-settings/feature-flags" />
         </Switch>
