@@ -92,7 +92,7 @@ async def test_hardware_stopping_sequence(
     )
 
 
-async def test_hardware_stopping_sequence_without_pitpette_tips(
+async def test_hardware_stopping_sequence_without_pipette_tips(
     decoy: Decoy,
     subject: HardwareStopper,
     hardware_api: HardwareAPI,
