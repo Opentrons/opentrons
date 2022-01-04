@@ -1,6 +1,7 @@
 import * as React from 'react'
 import map from 'lodash/map'
 import isEmpty from 'lodash/isEmpty'
+import some from 'lodash/some'
 import { useTranslation } from 'react-i18next'
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
@@ -91,6 +92,11 @@ export const LabwareSetup = (): JSX.Element | null => {
   const moduleAndCalibrationIncomplete =
     missingModuleIds.length > 0 && !isEverythingCalibrated
 
+  const tipRackLoadedInProtocol: boolean = some(
+    protocolData?.labwareDefinitions,
+    def => def.parameters?.isTiprack
+  )
+
   let lpcDisabledReason: string | null = null
 
   if (moduleAndCalibrationIncomplete) {
@@ -106,6 +112,8 @@ export const LabwareSetup = (): JSX.Element | null => {
     isEmpty(protocolData?.labware)
   ) {
     lpcDisabledReason = t('labware_position_check_not_available_empty_protocol')
+  } else if (!tipRackLoadedInProtocol) {
+    lpcDisabledReason = t('lpc_disabled_no_tipracks_loaded')
   }
 
   return (

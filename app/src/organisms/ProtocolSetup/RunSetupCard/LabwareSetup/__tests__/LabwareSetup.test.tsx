@@ -252,7 +252,7 @@ describe('LabwareSetup', () => {
           labware: {
             [mockLabwarePositionCheckStepTipRack.labwareId]: {
               slot: '1',
-              displayName: 'someDislpayName',
+              displayName: 'someDisplayName',
               definitionId: LABWARE_DEF_ID,
             },
           },
@@ -404,7 +404,7 @@ describe('LabwareSetup', () => {
       name: 'run labware position check',
     })
     fireEvent.click(button)
-    getByText('mock Labware Position Check')
+    getByText('run labware position check')
   })
   it('should render a disabled button when a run has been started', () => {
     mockUseRunStatus.mockReturnValue(RUN_STATUS_RUNNING)
@@ -440,7 +440,7 @@ describe('LabwareSetup', () => {
       name: 'run labware position check',
     })
     fireEvent.click(button)
-    const LPC = getByText('mock Labware Position Check')
+    const LPC = getByText('run labware position check')
     fireEvent.click(LPC)
     when(mockLabwarePostionCheck)
       .calledWith(
@@ -493,5 +493,32 @@ describe('LabwareSetup', () => {
     })
     fireEvent.click(button)
     expect(queryByText('mock Labware Position Check')).toBeNull()
+  })
+  it('should render a disabled button when a protocol does not load a tip rack', () => {
+    mockUseProtocolDetails.mockReturnValue({
+      protocolData: {
+        labware: {
+          'labware-0': {
+            slot: '1',
+            displayName: 'someDisplayName',
+            definitionId: LABWARE_DEF_ID,
+          },
+        },
+        labwareDefinitions: {
+          [LABWARE_DEF_ID]: { parameters: { isTiprack: false } },
+        },
+        pipettes: {
+          [PRIMARY_PIPETTE_ID]: {
+            name: PRIMARY_PIPETTE_NAME,
+            mount: 'left',
+          },
+        },
+      },
+    } as any)
+    const { getByRole } = render()
+    const button = getByRole('button', {
+      name: 'run labware position check',
+    })
+    expect(button).toBeDisabled()
   })
 })
