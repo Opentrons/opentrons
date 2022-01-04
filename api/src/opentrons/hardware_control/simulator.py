@@ -218,7 +218,7 @@ class Simulator:
             expected_instr
             and found_model
             and (
-                not found_model.startswith(expected_instr)
+                configs[found_model]["name"] != expected_instr
                 and expected_instr not in back_compat
             )
         ):
