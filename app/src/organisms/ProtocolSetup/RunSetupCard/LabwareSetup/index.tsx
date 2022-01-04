@@ -128,7 +128,7 @@ export const LabwareSetup = (): JSX.Element | null => {
           onCloseClick={() => setShowLabwarePositionCheckModal(false)}
         />
       )}
-      <Flex flex="1" maxHeight="85vh" flexDirection={DIRECTION_COLUMN}>
+      <Flex flex="1" maxHeight="100vh" flexDirection={DIRECTION_COLUMN}>
         {moduleTypesThatRequireExtraAttention.length > 0 && (
           <ExtraAttentionWarning
             moduleTypes={moduleTypesThatRequireExtraAttention}

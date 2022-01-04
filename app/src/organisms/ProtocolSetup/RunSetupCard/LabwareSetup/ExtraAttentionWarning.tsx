@@ -86,7 +86,6 @@ export const ExtraAttentionWarning = (
         />
       )}
       <Box
-        marginX={SPACING_5}
         marginY={SPACING_3}
         backgroundColor={COLOR_WARNING_LIGHT}
         color={C_DARK_GRAY}
