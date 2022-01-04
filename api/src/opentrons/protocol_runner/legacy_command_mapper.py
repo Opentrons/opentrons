@@ -64,7 +64,7 @@ class LegacyCommandMapper:
         # running count of each legacy command type, to construct IDs
         self._command_count: Dict[str, int] = defaultdict(lambda: 0)
 
-        # equipment IDs by phyiscal location
+        # equipment IDs by physical location
         self._labware_id_by_slot: Dict[DeckSlotName, str] = {
             DeckSlotName.FIXED_TRASH: "fixedTrash"
         }
