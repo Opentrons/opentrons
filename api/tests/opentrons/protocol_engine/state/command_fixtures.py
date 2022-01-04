@@ -58,6 +58,7 @@ def create_failed_command(
     command_key: str = "command-key",
     command_type: str = "command-type",
     error_id: str = "error-id",
+    created_at: datetime = datetime(year=2021, month=1, day=1),
     completed_at: datetime = datetime(year=2022, month=2, day=2),
     params: Optional[BaseModel] = None,
 ) -> cmd.Command:
@@ -67,7 +68,7 @@ def create_failed_command(
         cmd.BaseCommand(
             id=command_id,
             key=command_key,
-            createdAt=datetime(year=2021, month=1, day=1),
+            createdAt=created_at,
             commandType=command_type,
             status=cmd.CommandStatus.FAILED,
             params=params or BaseModel(),

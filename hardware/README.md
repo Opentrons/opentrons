@@ -28,13 +28,17 @@ Example: `opentrons_generate_header --target some_file.h`
 
 ### CAN Communication
 
-This is a tool for sending messages to firmware over CAN bus
+This is a tool for sending messages to firmware (or simulator) over CAN bus. The CAN bus can either be a [python-can](https://python-can.readthedocs.io/en/master/interfaces.html) defined interface or `opentrons`.
+
+**SocketCan's vcan (virtual can network) only works on Linux.** Firmware simulations on non-Linux computers require `opentrons` as it uses a plain old socket CAN network simulation.
 
 #### Usage
 
 ```
-opentrons_can_comm --interface INTERFACE [--bitrate BITRATE]
-                   [--channel CHANNEL]
+opentrons_can_comm [-h] --interface INTERFACE [--bitrate BITRATE]
+                   [--channel CHANNEL] [--port PORT]
 ```
 
-Example: `opentrons_can_comm --interface socketcan --channel vcan0`
+Example using socketcan: `opentrons_can_comm --interface socketcan --channel vcan0`
+
+Example using opentrons' CAN over socket: `opentrons_can_comm --interface opentrons`
