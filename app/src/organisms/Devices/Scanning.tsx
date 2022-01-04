@@ -22,7 +22,7 @@ export function Scanning(): JSX.Element {
       justifyContent={JUSTIFY_CENTER}
       padding={`${SPACING_5} 0`}
     >
-      <Text as="h3" fontWeight={FONT_WEIGHT_REGULAR} paddingBottom="10px">
+      <Text as="h3" fontWeight={FONT_WEIGHT_REGULAR} paddingBottom="0.625rem">
         {t('looking_for_robots')}
       </Text>
       <Icon name="ot-spinner" size={SIZE_2} spin />
