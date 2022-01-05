@@ -14,6 +14,7 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.resources import ModelUtils, ModuleDataProvider
 from opentrons.protocols.models.labware_definition import LabwareDefinition
+from opentrons.protocols.geometry.deck import FIXED_TRASH_ID
 
 from .legacy_wrappers import (
     LegacyInstrumentLoadInfo,
@@ -66,7 +67,7 @@ class LegacyCommandMapper:
 
         # equipment IDs by physical location
         self._labware_id_by_slot: Dict[DeckSlotName, str] = {
-            DeckSlotName.FIXED_TRASH: "fixedTrash"
+            DeckSlotName.FIXED_TRASH: FIXED_TRASH_ID
         }
         self._pipette_id_by_mount: Dict[MountType, str] = {}
         self._module_id_by_slot: Dict[DeckSlotName, str] = {}

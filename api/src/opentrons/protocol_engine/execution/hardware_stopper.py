@@ -1,5 +1,7 @@
 """Post-protocol hardware stopper."""
 from typing import Optional
+
+from opentrons.protocols.geometry.deck import FIXED_TRASH_ID
 from opentrons.hardware_control import API as HardwareAPI
 from ..state import StateStore
 from ..types import MotorAxis, WellLocation
@@ -58,7 +60,7 @@ class HardwareStopper:
             # TODO: Add ability to drop tip onto custom trash as well.
             await self._pipetting_handler.drop_tip(
                 pipette_id=pip_id,
-                labware_id="fixedTrash",
+                labware_id=FIXED_TRASH_ID,
                 well_name="A1",
                 well_location=WellLocation(),
             )
