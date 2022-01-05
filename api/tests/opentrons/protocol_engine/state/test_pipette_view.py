@@ -260,9 +260,3 @@ def test_pipette_not_ready_to_aspirate() -> None:
     )
 
     assert result is False
-
-
-def test_get_attached_tip_labware_id() -> None:
-    """It should return the labware id of the pipette's attached tip, if any."""
-    subject = get_pipette_view(attached_tip_labware_by_id={"pipette-id": "tiprack-id"})
-    assert subject.get_attached_tip_labware_id(pipette_id="pipette-id") == "tiprack-id"

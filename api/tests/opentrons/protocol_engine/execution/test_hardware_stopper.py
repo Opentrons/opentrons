@@ -3,15 +3,17 @@ import pytest
 from decoy import Decoy
 
 from opentrons.hardware_control import API as HardwareAPI
-from opentrons.protocol_engine import LoadedPipette, PipetteName, WellLocation
-from opentrons.protocol_engine.state import StateStore
+from opentrons.protocol_engine import WellLocation
+from opentrons.protocol_engine.state import StateStore, HardwarePipette, TipGeometry
 from opentrons.protocol_engine.execution import (
     MovementHandler,
     PipettingHandler,
     HardwareStopper,
 )
 from opentrons.protocol_engine.types import MotorAxis
-from opentrons.types import MountType, Mount
+from opentrons.types import Mount
+
+from .mock_defs import MockPipettes
 
 
 @pytest.fixture
@@ -24,6 +26,14 @@ def state_store(decoy: Decoy) -> StateStore:
 def hardware_api(decoy: Decoy) -> HardwareAPI:
     """Get a mocked out HardwareAPI instance."""
     return decoy.mock(cls=HardwareAPI)
+
+
+@pytest.fixture
+def mock_hw_pipettes(hardware_api: HardwareAPI) -> MockPipettes:
+    """Get mock pipette configs and attach them to the mock HW controller."""
+    mock_hw_pipettes = MockPipettes()
+    hardware_api.attached_instruments = mock_hw_pipettes.by_mount  # type: ignore[misc]
+    return mock_hw_pipettes
 
 
 @pytest.fixture
@@ -61,20 +71,33 @@ async def test_hardware_stopping_sequence(
     hardware_api: HardwareAPI,
     movement: MovementHandler,
     pipetting: PipettingHandler,
+    mock_hw_pipettes: MockPipettes,
 ) -> None:
     """It should stop the hardware, home the robot and perform drop tip if required."""
     decoy.when(state_store.pipettes.get_attached_tip_labware_by_id()).then_return(
         {"pipette-id": "tiprack-id"}
     )
-    decoy.when(state_store.pipettes.get("pipette-id")).then_return(
-        LoadedPipette(
-            id="pipette-id",
-            pipetteName=PipetteName.P300_SINGLE,
-            mount=MountType.LEFT,
+    decoy.when(
+        state_store.pipettes.get_hardware_pipette(
+            pipette_id="pipette-id", attached_pipettes=mock_hw_pipettes.by_mount
+        )
+    ).then_return(
+        HardwarePipette(mount=Mount.LEFT, config=mock_hw_pipettes.left_config)
+    )
+    decoy.when(
+        state_store.geometry.get_tip_geometry(
+            labware_id="tiprack-id",
+            well_name="A1",
+            pipette_config=mock_hw_pipettes.left_config,
+        )
+    ).then_return(
+        TipGeometry(
+            effective_length=100,
+            diameter=5,
+            volume=300,
         )
     )
-    decoy.when(state_store.labware.get_tip_length("tiprack-id")).then_return(100)
-    await subject.execute_complete_stop()
+    await subject.do_halt_and_recover()
     decoy.verify(
         await hardware_api.halt(),
         await hardware_api.stop(home_after=False),
@@ -101,12 +124,8 @@ async def test_hardware_stopping_sequence_without_pipette_tips(
 ) -> None:
     """Don't drop tip when there aren't any tips attached to pipettes."""
     decoy.when(state_store.pipettes.get_attached_tip_labware_by_id()).then_return({})
-    await subject.execute_complete_stop()
+    await subject.do_halt_and_recover()
     decoy.verify(
         await hardware_api.halt(),
-        await hardware_api.stop(home_after=False),
-        await movement.home(
-            axes=[MotorAxis.X, MotorAxis.Y, MotorAxis.LEFT_Z, MotorAxis.RIGHT_Z]
-        ),
         await hardware_api.stop(home_after=True),
     )

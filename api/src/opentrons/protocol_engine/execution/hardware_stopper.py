@@ -36,11 +36,24 @@ class HardwareStopper:
         """Drop currently attached tip, if any, into trash after a run cancel."""
         attached_tip_racks = self._state_store.pipettes.get_attached_tip_labware_by_id()
 
+        if attached_tip_racks:
+            await self._hardware_api.stop(home_after=False)
+            await self._movement_handler.home(
+                axes=[MotorAxis.X, MotorAxis.Y, MotorAxis.LEFT_Z, MotorAxis.RIGHT_Z]
+            )
         for pip_id, tiprack_id in attached_tip_racks.items():
-            mount = self._state_store.pipettes.get(pip_id).mount
+            hw_pipette = self._state_store.pipettes.get_hardware_pipette(
+                pipette_id=pip_id,
+                attached_pipettes=self._hardware_api.attached_instruments,
+            )
+            tip_geometry = self._state_store.geometry.get_tip_geometry(
+                labware_id=tiprack_id,
+                well_name="A1",
+                pipette_config=hw_pipette.config,
+            )
             await self._hardware_api.add_tip(
-                mount=mount.to_hw_mount(),
-                tip_length=self._state_store.labware.get_tip_length(tiprack_id),
+                mount=hw_pipette.mount,
+                tip_length=tip_geometry.effective_length,
             )
             # TODO: Add ability to drop tip onto custom trash as well.
             await self._pipetting_handler.drop_tip(
@@ -50,16 +63,13 @@ class HardwareStopper:
                 well_location=WellLocation(),
             )
 
-    async def execute_complete_stop(self) -> None:
+    async def do_halt_and_recover(self) -> None:
         """Run the sequence to stop hardware, drop tip and home."""
         await self._hardware_api.halt()
-        await self._hardware_api.stop(home_after=False)
-        await self._movement_handler.home(
-            axes=[MotorAxis.X, MotorAxis.Y, MotorAxis.LEFT_Z, MotorAxis.RIGHT_Z]
-        )
         await self._drop_tip()
         await self._hardware_api.stop(home_after=True)
 
-    async def simple_stop(self) -> None:
+    async def do_stop(self) -> None:
         """Only issue hardware api stop."""
+        # TODO: Don't home after once the stop/ drop tip initiation is moved to client
         await self._hardware_api.stop(home_after=True)

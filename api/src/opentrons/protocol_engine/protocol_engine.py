@@ -86,14 +86,14 @@ class ProtocolEngine:
         # TODO(mc, 2021-08-05): if starting, ensure plungers motors are
         # homed if necessary
         action = PlayAction()
-        self._state_store.commands.validate_action_allowed(action)
+        self._state_store.commands.raise_if_stop_requested()
         self._action_dispatcher.dispatch(action)
         self._queue_worker.start()
 
     def pause(self) -> None:
         """Pause executing commands in the queue."""
         action = PauseAction(source=PauseSource.CLIENT)
-        self._state_store.commands.validate_action_allowed(action)
+        self._state_store.commands.raise_if_stop_requested()
         self._action_dispatcher.dispatch(action)
 
     def add_command(self, request: CommandCreate) -> Command:
@@ -143,9 +143,10 @@ class ProtocolEngine:
 
         After an engine has been `stop`'ed, it cannot be restarted.
         """
+        self._state_store.commands.raise_if_stop_requested()
         self._action_dispatcher.dispatch(StopAction())
         self._queue_worker.cancel()
-        await self._hardware_stopper.execute_complete_stop()
+        await self._hardware_stopper.do_halt_and_recover()
         self._action_dispatcher.dispatch(HardwareStoppedAction())
 
     # TODO(mc, 2021-12-27): commands.get_all_complete not yet implemented
@@ -186,7 +187,7 @@ class ProtocolEngine:
         try:
             await self._queue_worker.join()
         finally:
-            await self._hardware_stopper.simple_stop()
+            await self._hardware_stopper.do_stop()
 
         self._action_dispatcher.dispatch(HardwareStoppedAction())
         self._plugin_starter.stop()

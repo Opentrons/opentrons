@@ -214,7 +214,7 @@ def return_tip() -> command_types.ReturnTipCommand:
 
 
 def pick_up_tip(
-    instrument: InstrumentContext, location: Union[Location, Well]
+    instrument: InstrumentContext, location: Well
 ) -> command_types.PickUpTipCommand:
     location_text = stringify_location(location)
     text = f"Picking up tip from {location_text}"
@@ -225,7 +225,7 @@ def pick_up_tip(
 
 
 def drop_tip(
-    instrument: InstrumentContext, location: Union[Location, Well]
+    instrument: InstrumentContext, location: Location
 ) -> command_types.DropTipCommand:
     location_text = stringify_location(location)
     text = "Dropping tip into {location}".format(location=location_text)

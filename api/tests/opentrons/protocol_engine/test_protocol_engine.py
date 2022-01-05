@@ -227,7 +227,7 @@ def test_play(
     subject.play()
 
     decoy.verify(
-        state_store.commands.validate_action_allowed(PlayAction()),
+        state_store.commands.raise_if_stop_requested(),
         action_dispatcher.dispatch(PlayAction()),
     )
 
@@ -244,7 +244,7 @@ def test_pause(
     subject.pause()
 
     decoy.verify(
-        state_store.commands.validate_action_allowed(expected_action),
+        state_store.commands.raise_if_stop_requested(),
         action_dispatcher.dispatch(expected_action),
     )
 
@@ -264,7 +264,7 @@ async def test_finish(
     decoy.verify(
         action_dispatcher.dispatch(FinishAction()),
         await queue_worker.join(),
-        await hardware_stopper.simple_stop(),
+        await hardware_stopper.do_stop(),
         action_dispatcher.dispatch(HardwareStoppedAction()),
         plugin_starter.stop(),
     )
@@ -297,7 +297,7 @@ async def test_finish_with_error(
     decoy.verify(
         action_dispatcher.dispatch(FinishAction(error_details=expected_error_details)),
         await queue_worker.join(),
-        await hardware_stopper.simple_stop(),
+        await hardware_stopper.do_stop(),
         action_dispatcher.dispatch(HardwareStoppedAction()),
     )
 
@@ -318,7 +318,7 @@ async def test_finish_stops_hardware_if_queue_worker_join_fails(
         await subject.finish()
 
     decoy.verify(
-        await hardware_stopper.simple_stop(),
+        await hardware_stopper.do_stop(),
         times=1,
     )
 
@@ -350,7 +350,7 @@ async def test_stop(
     decoy.verify(
         action_dispatcher.dispatch(StopAction()),
         queue_worker.cancel(),
-        await hardware_stopper.execute_complete_stop(),
+        await hardware_stopper.do_halt_and_recover(),
         action_dispatcher.dispatch(HardwareStoppedAction()),
     )
 

@@ -119,9 +119,10 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
 
         elif isinstance(command.result, DropTipResult):
             pipette_id = command.params.pipetteId
-            if self._state.attached_tip_labware_by_id.get(pipette_id):
-                self._state.attached_tip_labware_by_id.pop(pipette_id)
-            # TODO (spp): If no pipette-id, log warning instead of just no-oping?
+            # No-op if pipette_id not found; makes unit testing easier.
+            # That should never happen outside of tests. But if it somehow does,
+            # it won't harm the state.
+            self._state.attached_tip_labware_by_id.pop(pipette_id, None)
 
 
 class PipetteView(HasState[PipetteState]):
@@ -201,14 +202,6 @@ class PipetteView(HasState[PipetteState]):
             self.get_aspirated_volume(pipette_id) > 0
             or pipette_config["ready_to_aspirate"]
         )
-
-    def get_attached_tip_labware_id(self, pipette_id: str) -> str:
-        """Get the tiprack labware id of the attached tip."""
-        tipracks_by_pip_id = self.get_attached_tip_labware_by_id()
-        labware_id = tipracks_by_pip_id.get(pipette_id)
-        if labware_id:
-            return labware_id
-        raise errors.PipetteTipInfoNotFoundError
 
     def get_attached_tip_labware_by_id(self) -> Dict[str, str]:
         """Get the tiprack ids of attached tip by pipette ids."""

@@ -289,8 +289,6 @@ class LegacyCommandMapper:
     ) -> pe_commands.Command:
         engine_command: pe_commands.Command
         well: LegacyWell
-        # TODO: Check if there is a bug here. A pickUpTip can have a
-        #  non-LegacyWell location type in payload
         if (
             command["name"] == legacy_command_types.PICK_UP_TIP
             and "instrument" in command["payload"]
@@ -298,7 +296,12 @@ class LegacyCommandMapper:
             and isinstance(command["payload"]["location"], LegacyWell)  # type: ignore  # noqa: E501
         ):
             pipette: LegacyPipetteContext = command["payload"]["instrument"]  # type: ignore  # noqa: E501
-            well = command["payload"]["location"]  # type: ignore  # noqa: E501
+            # TODO: Support paired pipettes
+            _well = command["payload"].get("location")
+            if isinstance(_well, LegacyWell):
+                well = _well
+            else:
+                raise Exception("Unknown pick_up_tip location.")
             mount = MountType(pipette.mount)
             slot = DeckSlotName.from_primitive(well.parent.parent)  # type: ignore[arg-type] # noqa: E501
             well_name = well.well_name
@@ -323,14 +326,12 @@ class LegacyCommandMapper:
             and "location" in command["payload"]
         ):
             pipette: LegacyPipetteContext = command["payload"]["instrument"]  # type: ignore  # noqa: E501
-            # TODO (spp): How to handle PairedPipette locations?
+            # TODO: Support paired pipettes
             location = command["payload"].get("location")
-            if isinstance(location, LegacyWell):
-                well = location
-            elif isinstance(location, Location):
+            if isinstance(location, Location):
                 well = location.labware.as_well()
             else:
-                raise Exception("Unknown Droptip location.")
+                raise Exception("Unknown drop_tip location.")
             mount = MountType(pipette.mount)
             slot = DeckSlotName.from_primitive(well.parent.parent)  # type: ignore[arg-type] # noqa: E501
             well_name = well.well_name
