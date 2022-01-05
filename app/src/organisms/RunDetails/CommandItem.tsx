@@ -23,7 +23,12 @@ import {
   TEXT_TRANSFORM_UPPERCASE,
   C_MED_DARK_GRAY,
 } from '@opentrons/components'
+import {
+  useAllCommandsQuery,
+  useCommandQuery,
+} from '@opentrons/react-api-client'
 import { css } from 'styled-components'
+import { useCurrentRunId } from '../ProtocolUpload/hooks/useCurrentRunId'
 import { CommandTimer } from './CommandTimer'
 import { CommandText } from './CommandText'
 import {
@@ -31,11 +36,7 @@ import {
   RUN_STATUS_PAUSE_REQUESTED,
   RUN_STATUS_PAUSED,
 } from '@opentrons/api-client'
-import type {
-  CommandDetail,
-  RunStatus,
-  RunCommandSummary,
-} from '@opentrons/api-client'
+import type { RunStatus, RunCommandSummary } from '@opentrons/api-client'
 
 import type {
   Command,
@@ -45,7 +46,6 @@ import type {
 export interface CommandItemProps {
   commandOrSummary: Command | RunCommandSummary
   runStatus?: RunStatus
-  commandDetails?: CommandDetail
 }
 
 const WRAPPER_STYLE_BY_STATUS: {
@@ -66,8 +66,20 @@ const WRAPPER_STYLE_BY_STATUS: {
   },
 }
 export function CommandItem(props: CommandItemProps): JSX.Element | null {
-  const { commandOrSummary, commandDetails, runStatus } = props
+  const { commandOrSummary, runStatus } = props
+
   const { t } = useTranslation('run_details')
+  const currentRunId = useCurrentRunId()
+  const robotCommands = useAllCommandsQuery(currentRunId as string).data?.data
+  const isAnticipatedCommand = !Boolean(
+    robotCommands?.some(command => command.id === commandOrSummary.id)
+  )
+  const disabled = commandOrSummary.status !== 'running' || isAnticipatedCommand
+  const { data: commandDetails } = useCommandQuery(
+    currentRunId,
+    commandOrSummary.id,
+    { enabled: !disabled }
+  )
   const commandStatus =
     runStatus !== RUN_STATUS_IDLE && commandOrSummary.status != null
       ? commandOrSummary.status
