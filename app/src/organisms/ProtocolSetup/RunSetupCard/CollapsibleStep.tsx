@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { css } from 'styled-components'
 import {
   Icon,
   Flex,
@@ -27,12 +28,23 @@ interface CollapsibleStepProps {
   rightAlignedNode: React.ReactNode
 }
 
+const EXPANDED_STYLE = css`
+  transition: max-height 300ms ease-in, visibility 400ms ease;
+  visibility: visible;
+  max-height: 100vh;
+  overflow: hidden;
+`
+const COLLAPSED_STYLE = css`
+  transition: max-height 500ms ease-out;
+  visibility: hidden;
+  max-height: 0vh;
+  overflow: hidden;
+`
 export function CollapsibleStep({
   expanded,
   title,
   description,
   label,
-  id,
   toggleExpanded,
   children,
   rightAlignedNode,
@@ -70,15 +82,7 @@ export function CollapsibleStep({
         {rightAlignedNode != null ? rightAlignedNode : null}
         <Icon size={SIZE_1} name={expanded ? 'minus' : 'plus'} />
       </Flex>
-      <Box
-        maxHeight={expanded ? '100vh' : '0vh'}
-        transition={
-          expanded ? 'max-height 500ms ease-in' : 'max-height 500ms ease-out'
-        }
-        overflow="hidden"
-      >
-        {children}
-      </Box>
+      <Box css={expanded ? EXPANDED_STYLE : COLLAPSED_STYLE}>{children}</Box>
     </Flex>
   )
 }
