@@ -18,9 +18,11 @@ import {
 import { useProtocolDetails } from '../../../RunDetails/hooks'
 import { useCurrentProtocolRun } from '../../../ProtocolUpload/hooks'
 import { getLabwareLocation } from '../../utils/getLabwareLocation'
-import { sendModuleCommand } from '../../../../redux/modules'
+import {
+  sendModuleCommand,
+  getAttachedModulesForConnectedRobot,
+} from '../../../../redux/modules'
 import { getConnectedRobotName } from '../../../../redux/robot/selectors'
-import { getAttachedModulesForConnectedRobot } from '../../../../redux/modules/selectors'
 import { getLabwareDefinitionUri } from '../../utils/getLabwareDefinitionUri'
 import { getModuleInitialLoadInfo } from '../../utils/getModuleInitialLoadInfo'
 import { getLabwareOffsetLocation } from '../../utils/getLabwareOffsetLocation'
@@ -197,6 +199,7 @@ export function useLabwarePositionCheck(
     commandId: string
   } | null>(null)
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
+  const [isJogging, setIsJogging] = React.useState<boolean>(false)
   const [error, setError] = React.useState<Error | null>(null)
   const [
     showPickUpTipConfirmationModal,
@@ -216,8 +219,8 @@ export function useLabwarePositionCheck(
   const attachedModules = useSelector(getAttachedModulesForConnectedRobot)
 
   const LPCCommands = LPCSteps.reduce<LabwarePositionCheckCommand[]>(
-    (steps, currentStep) => {
-      return [...steps, ...currentStep.commands]
+    (commands, currentStep) => {
+      return [...commands, ...currentStep.commands]
     },
     []
   )
@@ -315,7 +318,15 @@ export function useLabwarePositionCheck(
     setIsLoading(false)
     setPendingMovementCommandData(null)
   }
-
+  if (
+    Boolean(
+      robotCommands
+        ?.filter(command => command.commandType === 'moveRelative')
+        .every(moveRelCommand => commandIsComplete(moveRelCommand.status))
+    )
+  ) {
+    isJogging && setIsJogging(false)
+  }
   // (sa 11-18-2021): refactor this function after beta release
   const proceed = (): void => {
     setIsLoading(true)
@@ -599,6 +610,8 @@ export function useLabwarePositionCheck(
   }
 
   const jog = (axis: Axis, dir: Sign, step: StepSize): void => {
+    // if a jog is currently in flight, return early
+    if (isJogging) return
     const moveRelCommand: AnonymousCommand = {
       commandType: 'moveRelative',
       params: {
@@ -607,7 +620,7 @@ export function useLabwarePositionCheck(
         axis,
       },
     }
-
+    !isJogging && setIsJogging(true)
     createCommand({
       runId: currentRun?.data?.id as string,
       command: moveRelCommand,
