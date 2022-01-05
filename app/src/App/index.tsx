@@ -83,7 +83,7 @@ export const AppComponent = (): JSX.Element => {
                 </Route>
                 <Redirect exact from="/" to="/robots" />
                 {/* redirect after next gen app feature flag toggle */}
-                <Redirect exact from="/app-settings" to="/more" />
+                <Redirect exact from="/app-settings/feature-flags" to="/more" />
               </Switch>
               <Alerts />
             </Box>

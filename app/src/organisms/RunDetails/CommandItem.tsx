@@ -31,9 +31,11 @@ import {
   RUN_STATUS_PAUSE_REQUESTED,
   RUN_STATUS_PAUSED,
 } from '@opentrons/api-client'
-import { useCommandQuery } from '@opentrons/react-api-client'
-import { useCurrentRunId } from '../ProtocolUpload/hooks/useCurrentRunId'
-import type { RunStatus, RunCommandSummary } from '@opentrons/api-client'
+import type {
+  CommandDetail,
+  RunStatus,
+  RunCommandSummary,
+} from '@opentrons/api-client'
 
 import type {
   Command,
@@ -43,6 +45,7 @@ import type {
 export interface CommandItemProps {
   commandOrSummary: Command | RunCommandSummary
   runStatus?: RunStatus
+  commandDetails?: CommandDetail
 }
 
 const WRAPPER_STYLE_BY_STATUS: {
@@ -63,17 +66,12 @@ const WRAPPER_STYLE_BY_STATUS: {
   },
 }
 export function CommandItem(props: CommandItemProps): JSX.Element | null {
-  const { commandOrSummary, runStatus } = props
+  const { commandOrSummary, commandDetails, runStatus } = props
   const { t } = useTranslation('run_details')
   const commandStatus =
     runStatus !== RUN_STATUS_IDLE && commandOrSummary.status != null
       ? commandOrSummary.status
       : 'queued'
-  const currentRunId = useCurrentRunId()
-  const {
-    data: commandDetails,
-    refetch: refetchCommandDetails,
-  } = useCommandQuery(currentRunId, commandOrSummary.id)
 
   let isComment = false
   if (
@@ -90,10 +88,6 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
   }
 
   const isPause = commandOrSummary.commandType === 'pause'
-
-  React.useEffect(() => {
-    refetchCommandDetails()
-  }, [commandStatus])
 
   const WRAPPER_STYLE = css`
     font-size: ${FONT_SIZE_BODY_1};
@@ -146,7 +140,7 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
           />
         ) : null}
         <CommandText
-          commandOrSummary={commandDetails?.data ?? commandOrSummary}
+          commandDetailsOrSummary={commandDetails?.data ?? commandOrSummary}
         />
       </Flex>
     </Flex>

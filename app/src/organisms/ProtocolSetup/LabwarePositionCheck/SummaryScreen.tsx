@@ -37,7 +37,9 @@ export const SummaryScreen = (props: {
   const introInfo = useIntroInfo()
   const { protocolData } = useProtocolDetails()
   useLabwareOffsets(savePositionCommandData, protocolData as ProtocolFile<{}>)
-    .then(offsets => setLabwareOffsets(offsets))
+    .then(offsets => {
+      labwareOffsets.length === 0 && setLabwareOffsets(offsets)
+    })
     .catch((e: Error) =>
       console.error(`error getting labware offsetsL ${e.message}`)
     )
