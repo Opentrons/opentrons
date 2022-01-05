@@ -55,6 +55,7 @@ describe('useLabwarePositionCheck', () => {
   const MOCK_RUN_ID = 'MOCK_RUN_ID'
   const MOCK_PIPETTE_ID = 'MOCK_PIPETTE_ID'
   const MOCK_LABWARE_ID = 'MOCK_LABWARE_ID'
+  const MOCK_COMMAND_ID = 'MOCK_COMMAND_ID'
   const MOCK_SLOT = '1'
   let mockCreateCommand: jest.Mock
   let mockCreateLabwareOffset: jest.Mock
@@ -80,7 +81,7 @@ describe('useLabwarePositionCheck', () => {
         } as LabwarePositionCheckStep,
       ])
     mockCreateCommand = jest.fn(() =>
-      Promise.resolve({ data: { id: 'SOME_ID' } })
+      Promise.resolve({ data: { id: MOCK_COMMAND_ID } })
     )
     when(mockUseCreateCommandMutation)
       .calledWith()
@@ -164,12 +165,18 @@ describe('useLabwarePositionCheck', () => {
         },
       })
     })
-    it('should queue up a new jog command when a previous jog command has succeeded', async () => {
+    it('should queue up a new jog command when the previous jog command has succeeded', async () => {
       when(mockUseAllCommandsQuery)
         .calledWith(MOCK_RUN_ID)
         .mockReturnValue({
           data: {
-            data: [{ commandType: 'moveRelative', status: 'succeeded' }],
+            data: [
+              {
+                id: MOCK_COMMAND_ID,
+                commandType: 'moveRelative',
+                status: 'succeeded',
+              },
+            ],
           },
         } as any)
 
@@ -201,6 +208,7 @@ describe('useLabwarePositionCheck', () => {
         FIRST_JOG_DIRECTION,
         FIRST_JOG_DISTANCE
       )
+      await waitForNextUpdate()
       result.current.jog(
         SECOND_JOG_AXIS,
         SECOND_JOG_DIRECTION,

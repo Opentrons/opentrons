@@ -199,7 +199,10 @@ export function useLabwarePositionCheck(
     commandId: string
   } | null>(null)
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
-  const [isJogging, setIsJogging] = React.useState<boolean>(false)
+  const isJogging = React.useRef(false)
+  const [pendingJogCommandId, setPendingJogCommandId] = React.useState<
+    string | null
+  >(null)
   const [error, setError] = React.useState<Error | null>(null)
   const [
     showPickUpTipConfirmationModal,
@@ -318,14 +321,17 @@ export function useLabwarePositionCheck(
     setIsLoading(false)
     setPendingMovementCommandData(null)
   }
-  if (
-    Boolean(
-      robotCommands
-        ?.filter(command => command.commandType === 'moveRelative')
-        .every(moveRelCommand => commandIsComplete(moveRelCommand.status))
+  if (pendingJogCommandId != null) {
+    const isJogCommandComplete = Boolean(
+      robotCommands?.find(
+        (command: RunCommandSummary) =>
+          command.id === pendingJogCommandId &&
+          commandIsComplete(command.status)
+      )
     )
-  ) {
-    isJogging && setIsJogging(false)
+    if (isJogCommandComplete) {
+      isJogging.current = false
+    }
   }
   // (sa 11-18-2021): refactor this function after beta release
   const proceed = (): void => {
@@ -611,7 +617,7 @@ export function useLabwarePositionCheck(
 
   const jog = (axis: Axis, dir: Sign, step: StepSize): void => {
     // if a jog is currently in flight, return early
-    if (isJogging) return
+    if (isJogging.current) return
     const moveRelCommand: AnonymousCommand = {
       commandType: 'moveRelative',
       params: {
@@ -620,14 +626,19 @@ export function useLabwarePositionCheck(
         axis,
       },
     }
-    !isJogging && setIsJogging(true)
+    isJogging.current = true
     createCommand({
       runId: currentRun?.data?.id as string,
       command: moveRelCommand,
-    }).catch((e: Error) => {
-      setError(e)
-      console.error(`error issuing jog command: ${e.message}`)
     })
+      .then(response => {
+        const jogCommandId = response.data.id
+        setPendingJogCommandId(jogCommandId)
+      })
+      .catch((e: Error) => {
+        setError(e)
+        console.error(`error issuing jog command: ${e.message}`)
+      })
   }
 
   return {
