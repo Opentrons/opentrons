@@ -4,7 +4,7 @@ import { fireEvent } from '@testing-library/dom'
 import { i18n } from '../../../i18n'
 import { renderWithProviders } from '@opentrons/components'
 import { AlertItem } from '@opentrons/components/src/alerts'
-import { useProtocolDetails } from '../hooks'
+import { useCommandDetailsById, useProtocolDetails } from '../hooks'
 import { useCurrentProtocolRun } from '../../ProtocolUpload/hooks'
 import { useRunStatus } from '../../RunTimeControl/hooks'
 import { ProtocolSetupInfo } from '../ProtocolSetupInfo'
@@ -21,6 +21,9 @@ jest.mock('../../RunTimeControl/hooks')
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('@opentrons/components/src/alerts')
 
+const mockUseCommandDetailsById = useCommandDetailsById as jest.MockedFunction<
+  typeof useCommandDetailsById
+>
 const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
   typeof useProtocolDetails
 >
@@ -51,6 +54,7 @@ describe('CommandList', () => {
       protocolData: _fixtureAnalysis,
       displayName: 'mock display name',
     })
+    mockUseCommandDetailsById.mockReturnValue({})
     mockUseCurrentProtocolRun.mockReturnValue({
       createProtocolRun: () => {},
       protocolRecord: null,
