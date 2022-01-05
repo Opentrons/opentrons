@@ -40,8 +40,8 @@ class MoveManager:
 
     def _add_dummy_start_end_to_moves(self, move_list: List[Move]) -> List[Move]:
         """Append dummy moves to the start and the end of the move list."""
-        start_move = move_utils.create_dummy_move()
-        end_move = move_utils.create_dummy_move()
+        start_move = Move.build_dummy_move()
+        end_move = Move.build_dummy_move()
         return [start_move] + move_list + [end_move]
 
     def plan_motion(

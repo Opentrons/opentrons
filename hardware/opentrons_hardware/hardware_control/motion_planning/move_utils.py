@@ -21,20 +21,6 @@ log = logging.getLogger(__name__)
 FLOAT_THRESHOLD = 0.001  # TODO: re-evaluate this value based on system limitations
 
 
-def create_dummy_move() -> Move:
-    """Create a move without real data."""
-    return Move(
-        unit_vector=Coordinates(0, 0, 0, 0),
-        distance=0,
-        max_speed=0,
-        blocks=(
-            Block(distance=0, initial_speed=0, acceleration=0),
-            Block(distance=0, initial_speed=0, acceleration=0),
-            Block(distance=0, initial_speed=0, acceleration=0),
-        ),
-    )
-
-
 def get_unit_vector(
     initial: Coordinates, target: Coordinates
 ) -> Tuple[UnitVector, np.float64]:

@@ -3,7 +3,10 @@ import enum
 import dataclasses
 import numpy as np
 import numpy.typing as npt
-from typing import Dict, Iterator, List, NamedTuple, Tuple
+from typing import Dict, Iterator, List, NamedTuple, OrderedDict, Tuple, Optional, Union
+
+
+AcceptableType = Union[int, float, np.float64]
 
 
 class Axis(enum.Enum):
@@ -23,41 +26,23 @@ class Axis(enum.Enum):
 class Coordinates(NamedTuple):
 
     """Coordinates for all axes."""
-    X: np.float64
-    Y: np.float64
-    Z: np.float64
-    A: np.float64
-    
-    def __iter__(self):
-        """Make Coordinates iterable."""
-        look_up = self.to_dict()
-        return iter(
-            (axis, look_up[axis]) for axis in Axis.get_all_axes()
-        )
+    X: float
+    Y: float
+    Z: float
+    A: float
 
-    def to_dict(self) -> Dict[Axis, np.float64]:
+    def to_dict(self) -> OrderedDict[Axis, float]:
         """Return Coordaintes as a dictionary."""
-        return {
-            Axis.X: self.X,
-            Axis.Y: self.Y,
-            Axis.Z: self.Z,
-            Axis.A: self.A,
-        }
+        return OrderedDict(zip(Axis.get_all_axes(), self))
 
     @classmethod
-    def from_iter(cls, iter: Iterator[np.float64]) -> "Coordinates":
+    def from_iter(cls, iter: Iterator[float]) -> "Coordinates":
         """Create coordinates from an iterator of floats."""
         return cls(*iter)
 
-    def vectorize(self) -> npt.NDArray[np.float64]:
+    def vectorize(self) -> npt.NDArray[float]:
         """Represent coordinates as a Numpy array."""
         return np.array(self)
-
-
-class UnitVector(Coordinates):
-    def __new__(cls, X: np.float64, Y: np.float64, Z: np.float64, A: np.float64):
-        assert np.linalg.norm([X, Y, Z, A]) == 1.0, f"({X}, {Y}, {Z}, {A}) is not a unit vector"
-        return super().__new__(cls, X, Y, Z, A)
 
 
 @dataclasses.dataclass
@@ -68,10 +53,20 @@ class Block:
     initial_speed: np.float64
     acceleration: np.float64
 
+    def __init__(
+        self,
+        distance: AcceptableType,
+        initial_speed: AcceptableType,
+        acceleration: AcceptableType
+    ):
+        self.distance = np.float64(distance)
+        self.initial_speed = np.float64(initial_speed)
+        self.acceleration = np.float64(acceleration)
+
     @property
     def final_speed(self) -> np.float64:
         """Get final speed of the block."""
-        return numpy.sqrt(
+        return np.sqrt(  # type: ignore[no-any-return]
             self.initial_speed ** 2 + self.acceleration * self.distance * 2
         )
 
@@ -82,30 +77,52 @@ class Block:
             return (self.final_speed - self.initial_speed) / self.acceleration
         else:
             if not self.initial_speed:
-                return 0
+                return np.float64(0.0)
             return self.distance / self.initial_speed
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclasses.dataclass(frozen=False)
 class Move:
     """A trajectory between two coordinates."""
 
-    unit_vector: Coordinates
-    distance: float
-    max_speed: float
+    distance: np.float64
+    max_speed: np.float64
     blocks: Tuple[Block, Block, Block]
+    unit_vector: Optional[Coordinates]
+
+    @classmethod
+    def build_dummy_move(cls) -> "Move":
+        return cls(
+            distance=np.float64(0),
+            max_speed=np.float64(0),
+            blocks=(
+                Block(distance=0.0, initial_speed=0, acceleration=0),
+                Block(distance=0, initial_speed=0, acceleration=0),
+                Block(distance=0, initial_speed=0, acceleration=0),
+            ),
+            unit_vector=None,
+        )
+    
+    @classmethod
+    def build(cls, distance, max_speed, blocks, unit_vector) -> "Move":
+        return cls(
+            distance=np.float64(distance),
+            max_speed=np.float64(max_speed),
+            blocks=blocks,
+            unit_vector=unit_vector
+        )
 
     @property
-    def initial_speed(self) -> float:
+    def initial_speed(self) -> np.float64:
         """Get initial speed of the move."""
         for block in self.blocks:
             if block.distance == 0:
                 continue
             return block.initial_speed
-        return 0
+        return np.float64(0.0)
 
     @property
-    def final_speed(self) -> float:
+    def final_speed(self) -> np.float64:
         """Get final speed of the move."""
         for block in reversed(self.blocks):
             if block.distance == 0:

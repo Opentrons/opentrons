@@ -41,7 +41,7 @@ CONSTRAINTS: SystemConstraints = {
 }
 
 
-SIMPLE_FORWARD_MOVE = Move(
+SIMPLE_FORWARD_MOVE = Move.build(
     unit_vector=Coordinates(1, 0, 0, 0),
     distance=1,
     max_speed=1,
@@ -52,7 +52,7 @@ SIMPLE_FORWARD_MOVE = Move(
     ),
 )
 
-SIMPLE_BACKWARD_MOVE = Move(
+SIMPLE_BACKWARD_MOVE = Move.build(
     unit_vector=Coordinates(-1, 0, 0, 0),
     distance=1,
     max_speed=1,
@@ -74,7 +74,7 @@ def test_convert_targets_to_moves() -> None:
     ]
 
     expected = [
-        Move(
+        Move.build(
             unit_vector=Coordinates(1.0, 0.0, 0.0, 0.0),
             distance=10.0,
             max_speed=1,
@@ -84,7 +84,7 @@ def test_convert_targets_to_moves() -> None:
                 Block(distance=0, initial_speed=1, acceleration=0),
             ),
         ),
-        Move(
+        Move.build(
             unit_vector=Coordinates(0.0, 1.0, 0.0, 0.0),
             distance=20.0,
             max_speed=2,
@@ -94,7 +94,7 @@ def test_convert_targets_to_moves() -> None:
                 Block(distance=0, initial_speed=2, acceleration=0),
             ),
         ),
-        Move(
+        Move.build(
             unit_vector=Coordinates(0.0, 0.0, 1.0, 0.0),
             distance=151.0,
             max_speed=3,
@@ -104,7 +104,7 @@ def test_convert_targets_to_moves() -> None:
                 Block(distance=0, initial_speed=3, acceleration=0),
             ),
         ),
-        Move(
+        Move.build(
             unit_vector=Coordinates(0.0, 0.0, 0.0, 1.0),
             distance=1255.0,
             max_speed=4,
@@ -150,7 +150,7 @@ def test_initial_speed(
     origin: Move, unit_vector: Coordinates, max_speed: float, expected: float
 ) -> None:
     """It should find the correct initial speed of the move."""
-    move = Move(
+    move = Move.build(
         unit_vector=Coordinates(*unit_vector),
         distance=100,
         max_speed=max_speed,
@@ -189,7 +189,7 @@ def test_final_speed(
     next_move: Move, unit_vector: Coordinates, max_speed: float, expected: float
 ) -> None:
     """It should find the correct final speed of the move."""
-    move = Move(
+    move = Move.build(
         unit_vector=Coordinates(*unit_vector),
         distance=100,
         max_speed=max_speed,
