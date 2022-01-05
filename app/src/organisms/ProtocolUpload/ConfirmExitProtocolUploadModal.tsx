@@ -9,11 +9,10 @@ import {
   SPACING_3,
 } from '@opentrons/components'
 
-import { useCurrentProtocolRun } from './hooks/useCurrentProtocolRun'
+import { useCloseCurrentRun } from '../ProtocolUpload/hooks'
 
 interface ConfirmExitProtocolUploadModalProps {
   back: () => unknown
-  exit: () => unknown
 }
 
 export function ConfirmExitProtocolUploadModal(
@@ -23,18 +22,18 @@ export function ConfirmExitProtocolUploadModal(
 
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
 
-  const { protocolRecord, runRecord } = useCurrentProtocolRun()
+  const { closeCurrentRun, isProtocolClosing } = useCloseCurrentRun()
 
   React.useEffect(() => {
-    if (isLoading && protocolRecord == null && runRecord == null) {
+    if (isLoading && !isProtocolClosing) {
       setIsLoading(false)
       props.back()
     }
-  }, [isLoading, protocolRecord, runRecord, props])
+  }, [isLoading, setIsLoading, isProtocolClosing, props])
 
   const handleExitClick = (): void => {
     setIsLoading(true)
-    props.exit()
+    closeCurrentRun()
   }
 
   return (
@@ -50,7 +49,7 @@ export function ConfirmExitProtocolUploadModal(
         },
         {
           Component: () =>
-            isLoading ? (
+            isProtocolClosing ? (
               <NewPrimaryBtn disabled marginLeft={SPACING_3}>
                 <Icon
                   name="ot-spinner"

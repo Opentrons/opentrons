@@ -39,7 +39,7 @@ export function useDismissCurrentRunMutation(
       queryClient
         .invalidateQueries([host, 'runs'])
         .catch((e: Error) =>
-          console.error(`error invalidating runs query: ${e.message}`)
+          console.info(`error invalidating runs query: ${e.message}`)
         )
       return response.data
     })

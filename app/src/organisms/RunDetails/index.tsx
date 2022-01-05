@@ -20,10 +20,7 @@ import { useProtocolDetails } from './hooks'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { ConfirmCancelModal } from '../../pages/Run/RunLog'
 import { ConfirmExitProtocolUploadModal } from '../ProtocolUpload/ConfirmExitProtocolUploadModal'
-import {
-  useCloseCurrentRun,
-  useCurrentProtocolRun,
-} from '../ProtocolUpload/hooks'
+import { useCloseCurrentRun } from '../ProtocolUpload/hooks'
 import { useCurrentRunControls } from '../../pages/Run/RunLog/hooks'
 import { CommandList } from './CommandList'
 
@@ -33,8 +30,7 @@ export function RunDetails(): JSX.Element | null {
   const { t } = useTranslation(['run_details', 'shared'])
   const { displayName } = useProtocolDetails()
   const runStatus = useRunStatus()
-  const { closeCurrentRun } = useCloseCurrentRun()
-  const { protocolRecord, runRecord } = useCurrentProtocolRun()
+  const { isProtocolClosing } = useCloseCurrentRun()
 
   const { pauseRun } = useCurrentRunControls()
 
@@ -54,7 +50,7 @@ export function RunDetails(): JSX.Element | null {
     cancel: cancelExit,
   } = useConditionalConfirm(cancelRunAndExit, true)
 
-  if (protocolRecord == null && runRecord == null) {
+  if (isProtocolClosing) {
     return <Redirect to="/upload" />
   }
 
@@ -100,7 +96,6 @@ export function RunDetails(): JSX.Element | null {
       {showConfirmExitProtocolUploadModal && (
         <Portal level="top">
           <ConfirmExitProtocolUploadModal
-            exit={closeCurrentRun}
             back={() => setShowConfirmExitProtocolUploadModal(false)}
           />
         </Portal>

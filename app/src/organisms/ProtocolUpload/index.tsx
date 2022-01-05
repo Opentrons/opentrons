@@ -188,7 +188,6 @@ export function ProtocolUpload(): JSX.Element {
     <>
       {showConfirmExitProtocolUploadModal && (
         <ConfirmExitProtocolUploadModal
-          exit={closeCurrentRun}
           back={() => setShowConfirmExitProtocolUploadModal(false)}
         />
       )}
