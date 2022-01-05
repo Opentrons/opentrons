@@ -3,7 +3,7 @@ from datetime import datetime
 from pydantic import BaseModel
 from robot_server.service.json_api import (
     DeprecatedResponseModel,
-    ResponseDataModel,
+    DeprecatedResponseDataModel,
     RequestModel,
 )
 
@@ -14,7 +14,7 @@ class SystemTimeAttributes(BaseModel):
     systemTime: datetime
 
 
-class SystemTimeResponseAttributes(ResponseDataModel, SystemTimeAttributes):
+class SystemTimeResponseAttributes(DeprecatedResponseDataModel, SystemTimeAttributes):
     """System time response model attributes."""
 
 

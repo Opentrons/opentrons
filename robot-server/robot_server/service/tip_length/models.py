@@ -6,12 +6,12 @@ from opentrons.calibration_storage.types import SourceType
 from robot_server.service.json_api import (
     DeprecatedResponseModel,
     DeprecatedMultiResponseModel,
-    ResponseDataModel,
+    DeprecatedResponseDataModel,
 )
 from robot_server.service.shared_models import calibration as cal_model
 
 
-class TipLengthCalibration(ResponseDataModel):
+class TipLengthCalibration(DeprecatedResponseDataModel):
     """
     A model describing tip length calibration
     """

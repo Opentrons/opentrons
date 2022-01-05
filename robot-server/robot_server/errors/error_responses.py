@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 from pydantic.generics import GenericModel
 from typing import Any, Dict, Generic, Optional, Sequence, Tuple, TypeVar
 
-from robot_server.service.json_api import BaseResponse, ResourceLinks
+from robot_server.service.json_api import BaseResponseBody, ResourceLinks
 
 
 class ApiError(Exception):
@@ -20,7 +20,7 @@ class ApiError(Exception):
         self.content = content
 
 
-class BaseErrorResponse(BaseResponse):
+class BaseErrorResponse(BaseResponseBody):
     """Base class for error response bodies."""
 
     def as_error(self, status_code: int) -> ApiError:

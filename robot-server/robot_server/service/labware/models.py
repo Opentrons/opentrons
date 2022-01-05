@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 
 from robot_server.service.json_api import (
     DeprecatedResponseModel,
-    ResponseDataModel,
+    DeprecatedResponseDataModel,
     DeprecatedMultiResponseModel,
 )
 
@@ -51,7 +51,7 @@ class CalibrationData(BaseModel):
     )
 
 
-class LabwareCalibration(ResponseDataModel):
+class LabwareCalibration(DeprecatedResponseDataModel):
     """
     A model describing labware calibrations (tiplength and offset)
     """

@@ -8,8 +8,9 @@ from opentrons.protocol_engine import commands as pe_commands, errors as pe_erro
 from robot_server.errors import ErrorDetails, ErrorResponse
 from robot_server.service.json_api import (
     RequestModel,
-    SimpleResponse,
-    SimpleMultiResponse,
+    SimpleBody,
+    SimpleMultiBody,
+    PydanticResponse,
 )
 
 from ..run_models import Run, RunCommandSummary
@@ -35,9 +36,8 @@ class CommandNotFound(ErrorDetails):
         "Add a single protocol command to the run. "
         "The command is placed at the back of the queue."
     ),
-    status_code=status.HTTP_200_OK,
     responses={
-        status.HTTP_200_OK: {"model": SimpleResponse[pe_commands.Command]},
+        status.HTTP_201_CREATED: {"model": SimpleBody[pe_commands.Command]},
         status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse[RunStopped]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
     },
@@ -45,8 +45,8 @@ class CommandNotFound(ErrorDetails):
 async def create_run_command(
     request_body: RequestModel[pe_commands.CommandCreate],
     engine_store: EngineStore = Depends(get_engine_store),
-    run: SimpleResponse[Run] = Depends(get_run),
-) -> SimpleResponse[pe_commands.Command]:
+    run: SimpleBody[Run] = Depends(get_run),
+) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
     """Enqueue a protocol command.
 
     Arguments:
@@ -64,7 +64,11 @@ async def create_run_command(
         )
 
     command = engine_store.engine.add_command(request_body.data)
-    return SimpleResponse.construct(data=command)
+
+    return PydanticResponse(
+        content=SimpleBody.construct(data=command),
+        status_code=status.HTTP_201_CREATED,
+    )
 
 
 @commands_router.get(
@@ -76,22 +80,24 @@ async def create_run_command(
         "`GET /runs/{runId}/commands/{commandId}` to get all "
         "information available for a given command."
     ),
-    status_code=status.HTTP_200_OK,
     responses={
-        status.HTTP_200_OK: {"model": SimpleMultiResponse[RunCommandSummary]},
+        status.HTTP_200_OK: {"model": SimpleMultiBody[RunCommandSummary]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
     },
 )
 async def get_run_commands(
-    run: SimpleResponse[Run] = Depends(get_run),
-) -> SimpleMultiResponse[RunCommandSummary]:
+    run: SimpleBody[Run] = Depends(get_run),
+) -> PydanticResponse[SimpleMultiBody[RunCommandSummary]]:
     """Get a summary of all commands in a run.
 
     Arguments:
         run: Run response model, provided by the route handler for
             `GET /runs/{runId}`
     """
-    return SimpleMultiResponse.construct(data=run.data.commands)
+    return PydanticResponse(
+        content=SimpleMultiBody.construct(data=run.data.commands),
+        status_code=status.HTTP_200_OK,
+    )
 
 
 @commands_router.get(
@@ -101,9 +107,8 @@ async def get_run_commands(
         "Get a command along with any associated payload, result, and "
         "execution information."
     ),
-    status_code=status.HTTP_200_OK,
     responses={
-        status.HTTP_200_OK: {"model": SimpleResponse[pe_commands.Command]},
+        status.HTTP_200_OK: {"model": SimpleBody[pe_commands.Command]},
         status.HTTP_404_NOT_FOUND: {
             "model": Union[
                 ErrorResponse[RunNotFound],
@@ -115,8 +120,8 @@ async def get_run_commands(
 async def get_run_command(
     commandId: str,
     engine_store: EngineStore = Depends(get_engine_store),
-    run: SimpleResponse[Run] = Depends(get_run),
-) -> SimpleResponse[pe_commands.Command]:
+    run: SimpleBody[Run] = Depends(get_run),
+) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
     """Get a specific command from a run.
 
     Arguments:
@@ -132,4 +137,7 @@ async def get_run_command(
     except pe_errors.CommandDoesNotExistError as e:
         raise CommandNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
-    return SimpleResponse(data=command)
+    return PydanticResponse(
+        content=SimpleBody(data=command),
+        status_code=status.HTTP_200_OK,
+    )
