@@ -636,6 +636,7 @@ export function useLabwarePositionCheck(
         setPendingJogCommandId(jogCommandId)
       })
       .catch((e: Error) => {
+        isJogging.current = false
         setError(e)
         console.error(`error issuing jog command: ${e.message}`)
       })
