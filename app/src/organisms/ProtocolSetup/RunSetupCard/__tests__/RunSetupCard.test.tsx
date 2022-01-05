@@ -257,7 +257,7 @@ describe('RunSetupCard', () => {
     } as any)
 
     const { queryByText, getByText } = render()
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 1000))
     expect(getByText('Mock Labware Setup')).toBeVisible()
     expect(queryByText(/mock module setup/i)).toBeNull()
   })
@@ -267,7 +267,7 @@ describe('RunSetupCard', () => {
     } as any)
 
     const { queryByText, getByText } = render()
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 1000))
     expect(getByText('Mock Module Setup')).toBeVisible()
     expect(queryByText(/mock labware setup/i)).not.toBeVisible()
   })
@@ -278,7 +278,7 @@ describe('RunSetupCard', () => {
     mockUseProtocolCalibrationStatus.mockReturnValue({ complete: false })
 
     const { queryByText, getByText } = render()
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 1000))
     expect(getByText('Mock Robot Calibration')).toBeVisible()
     expect(queryByText(/mock labware setup/i)).not.toBeVisible()
   })
@@ -289,7 +289,7 @@ describe('RunSetupCard', () => {
     mockUseProtocolCalibrationStatus.mockReturnValue({ complete: false })
 
     const { queryByText, getByText } = render()
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 1000))
     expect(getByText('Mock Robot Calibration')).toBeVisible()
     expect(queryByText(/mock module setup/i)).not.toBeVisible()
   })
