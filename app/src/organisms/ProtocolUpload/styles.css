@@ -13,3 +13,8 @@
   left: auto !important;
   right: var(--button-pad) !important;
 }
+
+.close_button {
+  margin-right: 0.5rem;
+  width: 7rem;
+}

@@ -162,6 +162,7 @@ export function ProtocolUpload(): JSX.Element {
         title: t('shared:close'),
         children: t('shared:close'),
         iconName: 'close' as const,
+        className: styles.close_button
       },
       className: styles.reverse_titlebar_items,
     }
