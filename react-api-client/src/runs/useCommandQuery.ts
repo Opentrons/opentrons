@@ -9,6 +9,7 @@ export function useCommandQuery(
   options?: UseQueryOptions<CommandDetail, Error>
 ): UseQueryResult<CommandDetail, Error> {
   const host = useHost()
+  const defaultEnabled = host !== null && runId != null && commandId != null
   const query = useQuery<CommandDetail, Error>(
     [host, 'runs', runId, 'commands', commandId],
     () =>
@@ -18,8 +19,11 @@ export function useCommandQuery(
           throw e
         }),
     {
-      enabled: host !== null && runId != null && commandId != null,
       ...options,
+      enabled:
+        options != null && 'enabled' in options
+          ? options.enabled && defaultEnabled
+          : defaultEnabled,
     }
   )
 

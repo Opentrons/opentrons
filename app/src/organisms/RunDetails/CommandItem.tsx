@@ -65,6 +65,10 @@ const WRAPPER_STYLE_BY_STATUS: {
     backgroundColor: C_ERROR_LIGHT,
   },
 }
+
+const commandIsComplete = (status: RunCommandSummary['status']): boolean =>
+  status === 'succeeded' || status === 'failed'
+
 export function CommandItem(props: CommandItemProps): JSX.Element | null {
   const { commandOrSummary, runStatus } = props
   const { t } = useTranslation('run_details')
@@ -73,11 +77,16 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
   const isAnticipatedCommand = !Boolean(
     robotCommands?.some(command => command.id === commandOrSummary.id)
   )
-  const disabled = commandOrSummary.status !== 'running' || isAnticipatedCommand
   const { data: commandDetails } = useCommandQuery(
     currentRunId,
     commandOrSummary.id,
-    { enabled: !disabled }
+    {
+      enabled: runStatus === 'running' && !isAnticipatedCommand,
+      staleTime:
+        commandOrSummary.status && commandIsComplete(commandOrSummary.status)
+          ? Infinity
+          : 0,
+    }
   )
   const commandStatus =
     runStatus !== RUN_STATUS_IDLE && commandOrSummary.status != null
