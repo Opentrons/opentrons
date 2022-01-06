@@ -82,7 +82,10 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
     currentRunId,
     commandOrSummary.id,
     {
-      enabled: runStatus === 'running' && !isAnticipatedCommand,
+      enabled:
+        runStatus === 'running' ||
+        runStatus === 'paused' ||
+        (runStatus === 'pause-requested' && !isAnticipatedCommand),
       staleTime,
     }
   )
