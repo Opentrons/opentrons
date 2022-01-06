@@ -69,7 +69,7 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
   const { commandOrSummary, runStatus } = props
   const { t } = useTranslation('run_details')
   const currentRunId = useCurrentRunId()
-  const robotCommands = useAllCommandsQuery(currentRunId as string).data?.data
+  const robotCommands = useAllCommandsQuery(currentRunId).data?.data
   const isAnticipatedCommand = !Boolean(
     robotCommands?.some(command => command.id === commandOrSummary.id)
   )
