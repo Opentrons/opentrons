@@ -6,7 +6,7 @@ from typing import Generic, TypeVar
 from .protocols import AsyncioConfigurable
 
 
-WrappedObj = TypeVar("WrappedObj", bound=AsyncioConfigurable)
+WrappedObj = TypeVar("WrappedObj", bound=AsyncioConfigurable, covariant=True)
 
 
 # TODO: BC 2020-02-25 instead of overwriting __get_attribute__ in this class

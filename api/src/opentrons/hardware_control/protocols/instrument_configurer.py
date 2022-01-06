@@ -1,9 +1,10 @@
-from typing import Dict, Union
+from typing import Dict, Union, Optional
 from typing_extensions import Protocol
 
 from opentrons_shared_data.pipette.dev_types import PipetteName
 from opentrons.types import Mount
 
+from ..pipette import Pipette
 from ..dev_types import PipetteDict
 from ..types import PipettePair, CriticalPoint
 
@@ -153,5 +154,13 @@ class InstrumentConfigurer(Protocol):
 
         This will set the limit of aspiration for the pipette, and is
         necessary for backcompatibility.
+        """
+        ...
+
+    @property
+    def hardware_instruments(self) -> Dict[Mount, Optional[Pipette]]:
+        """Return the underlying hardware representation of the instruments.
+
+        This should rarely be used. Do not write new code that uses it.
         """
         ...

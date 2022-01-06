@@ -570,6 +570,11 @@ class API:
         return self.get_attached_instruments()
 
     @property
+    def hardware_instruments(self) -> InstrumentsByMount:
+        """Do not write new code that uses this."""
+        return self._attached_instruments
+
+    @property
     def attached_modules(self) -> List[modules.AbstractModule]:
         return self._backend.module_controls.available_modules
 
@@ -693,7 +698,7 @@ class API:
         await self.cache_instruments()
 
     # Gantry/frame (i.e. not pipette) action API
-    async def home_z(self, mount: top_types.Mount = None):
+    async def home_z(self, mount: Optional[top_types.Mount] = None):
         """Home the two z-axes"""
         self._reset_last_mount()
         if not mount:
@@ -744,7 +749,7 @@ class API:
         await self.current_position(mount=mount, refresh=True)
         await self._do_plunger_home(mount=mount, acquire_lock=True)
 
-    async def home(self, axes: List[Axis] = None):
+    async def home(self, axes: Optional[List[Axis]] = None):
         """Home the entire robot and initialize current position.
         :param axes: A list of axes to home. Default is `None`, which will
                      home everything.
@@ -897,7 +902,7 @@ class API:
     async def gantry_position(
         self,
         mount: top_types.Mount,
-        critical_point: CriticalPoint = None,
+        critical_point: Optional[CriticalPoint] = None,
         refresh: bool = False,
         # TODO(mc, 2021-11-15): combine with `refresh` for more reliable
         # position reporting when motors are not homed
@@ -944,9 +949,9 @@ class API:
         self,
         mount: Union[top_types.Mount, PipettePair],
         abs_position: top_types.Point,
-        speed: float = None,
-        critical_point: CriticalPoint = None,
-        max_speeds: Dict[Axis, float] = None,
+        speed: Optional[float] = None,
+        critical_point: Optional[CriticalPoint] = None,
+        max_speeds: Optional[Dict[Axis, float]] = None,
     ):
         """Move the critical point of the specified mount to a location
         relative to the deck, at the specified speed. 'speed' sets the speed
@@ -1039,8 +1044,8 @@ class API:
         self,
         mount: Union[top_types.Mount, PipettePair],
         delta: top_types.Point,
-        speed: float = None,
-        max_speeds: Dict[Axis, float] = None,
+        speed: Optional[float] = None,
+        max_speeds: Optional[Dict[Axis, float]] = None,
         check_bounds: MotionChecks = MotionChecks.NONE,
         fail_on_not_homed: bool = False,
     ):

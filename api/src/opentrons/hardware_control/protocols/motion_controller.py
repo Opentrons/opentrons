@@ -41,7 +41,7 @@ class MotionController(Protocol):
         ...
 
     # Gantry/frame (i.e. not pipette) action API
-    async def home_z(self, mount: Mount = None) -> None:
+    async def home_z(self, mount: Optional[Mount] = None) -> None:
         """Home a selected z-axis, or both if not specified."""
         ...
 
@@ -54,7 +54,7 @@ class MotionController(Protocol):
         """
         ...
 
-    async def home(self, axes: List[Axis] = None) -> None:
+    async def home(self, axes: Optional[List[Axis]] = None) -> None:
         """Home a list of axes and initialize current position.
 
         axes A list of axes to home. Default is `None`, which will
@@ -93,7 +93,7 @@ class MotionController(Protocol):
     async def gantry_position(
         self,
         mount: Mount,
-        critical_point: CriticalPoint = None,
+        critical_point: Optional[CriticalPoint] = None,
         refresh: bool = False,
         # TODO(mc, 2021-11-15): combine with `refresh` for more reliable
         # position reporting when motors are not homed
@@ -111,9 +111,9 @@ class MotionController(Protocol):
         self,
         mount: Union[Mount, PipettePair],
         abs_position: Point,
-        speed: float = None,
-        critical_point: CriticalPoint = None,
-        max_speeds: Dict[Axis, float] = None,
+        speed: Optional[float] = None,
+        critical_point: Optional[CriticalPoint] = None,
+        max_speeds: Optional[Dict[Axis, float]] = None,
     ):
         """Move the critical point of the specified mount to a location
         relative to the deck, at the specified speed. 'speed' sets the speed
@@ -158,8 +158,8 @@ class MotionController(Protocol):
         self,
         mount: Union[Mount, PipettePair],
         delta: Point,
-        speed: float = None,
-        max_speeds: Dict[Axis, float] = None,
+        speed: Optional[float] = None,
+        max_speeds: Optional[Dict[Axis, float]] = None,
         check_bounds: MotionChecks = MotionChecks.NONE,
         fail_on_not_homed: bool = False,
     ):

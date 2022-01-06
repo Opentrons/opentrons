@@ -4,7 +4,7 @@ import logging
 import asyncio
 import functools
 import weakref
-from typing import Any, Awaitable, Callable, Generic, Optional, TypeVar
+from typing import Any, Awaitable, Callable, Generic, Optional, TypeVar, cast
 from .adapters import SynchronousAdapter
 from .modules.mod_abc import AbstractModule
 from .protocols import (
@@ -171,7 +171,7 @@ class ThreadManager(Generic[WrappedObj]):
             loop.close()
 
     @property
-    def sync(self) -> SynchronousAdapter:
+    def sync(self) -> SynchronousAdapter[WrappedObj]:
         # Why the ignore?
         # While self._sync_managed_obj is initialized None, a failure to build
         # the managed_obj and _sync_managed_obj is a catastrophic failure.
@@ -181,7 +181,7 @@ class ThreadManager(Generic[WrappedObj]):
     def __repr__(self):
         return "<ThreadManager>"
 
-    def clean_up(self):
+    def clean_up(self) -> None:
         try:
             loop = object.__getattribute__(self, "_loop")
             loop.call_soon_threadsafe(loop.stop)
@@ -259,3 +259,18 @@ class ThreadManager(Generic[WrappedObj]):
                 return getattr(object.__getattribute__(self, "bridged_obj"), attr_name)
             except AttributeError:
                 return object.__getattribute__(self, attr_name)
+
+    def wrapped(self) -> WrappedObj:
+        """Expose the type of the underlying wrapped object.
+
+        This isn't a method that does anything (it just returns self again) but the cast
+        means that the type of self will be what the threadmanager's generic wrapped
+        object is. You can therefore use this to get typechecking when using
+        ThreadManagers.
+
+        While the generic type is what you say it is when you annotate the instance
+        variable containing a ThreadManager, if you restrict yourself to annotating
+         those instances using a protocol from hardware_api.protocols, things will more
+        or less work out through the rest of the system. Not perfect, but ok.
+        """
+        return cast(WrappedObj, self)
