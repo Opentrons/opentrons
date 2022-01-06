@@ -112,6 +112,7 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
     isComment = analysisCommand?.params.legacyCommandType === 'command.COMMENT'
   } else if (
     runCommandSummary != null &&
+    runCommandSummary.result != null &&
     'legacyCommandType' in runCommandSummary.result
   ) {
     isComment = runCommandSummary.result.legacyCommandType === 'command.COMMENT'
