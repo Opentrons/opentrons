@@ -27,7 +27,7 @@ from .constants import DROP_TIP_RELEASE_DISTANCE
 from .thread_manager import ThreadManager
 from .execution_manager import ExecutionManager
 from .threaded_async_lock import ThreadedAsyncLock, ThreadedAsyncForbidden
-from .hardware_protocols import BaseHardwareControl
+from .protocols import HardwareControlAPI
 
 __all__ = [
     "API",
@@ -36,7 +36,7 @@ __all__ = [
     "Pipette",
     "PauseManager",
     "SynchronousAdapter",
-    "BaseHardwareControl",
+    "HardwareControlAPI",
     "CriticalPoint",
     "NoTipAttachedError",
     "TipAttachedError",

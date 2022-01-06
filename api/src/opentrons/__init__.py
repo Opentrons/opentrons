@@ -9,7 +9,7 @@ from typing import Any, List, Tuple, cast
 
 from opentrons.config.feature_flags import enable_ot3_hardware_controller
 from opentrons.drivers.serial_communication import get_ports_by_name
-from opentrons.hardware_control import API as HardwareAPI, ThreadManager
+from opentrons.hardware_control import API as HardwareAPI, ThreadManager, HardwareControlAPI
 from opentrons.config import (
     feature_flags as ff,
     name,

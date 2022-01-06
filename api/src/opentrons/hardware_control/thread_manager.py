@@ -7,7 +7,7 @@ import weakref
 from typing import Any, Awaitable, Callable, Generic, Optional, TypeVar
 from .adapters import SynchronousAdapter
 from .modules.mod_abc import AbstractModule
-from .hardware_protocols import BaseHardwareControl
+from .protocols import HardwareControlAPI
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -97,7 +97,7 @@ class ThreadManager:
 
     def __init__(
         self,
-        builder: Callable[..., Awaitable[BaseHardwareControl]],
+        builder: Callable[..., Awaitable[HardwareControlAPI]],
         *args: Any,
         **kwargs: Any,
     ) -> None:
@@ -107,7 +107,7 @@ class ThreadManager:
         """
 
         self._loop: Optional[asyncio.AbstractEventLoop] = None
-        self.managed_obj: Optional[BaseHardwareControl] = None
+        self.managed_obj: Optional[HardwareControlAPI] = None
         self.bridged_obj: Optional[CallBridger[Any]] = None
         self._sync_managed_obj: Optional[SynchronousAdapter] = None
         is_running = threading.Event()

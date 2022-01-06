@@ -9,7 +9,7 @@ from typing_extensions import Literal
 from opentrons import initialize as initialize_api, should_use_ot3
 from opentrons.config import IS_ROBOT, ARCHITECTURE, SystemArchitecture
 from opentrons.util.helpers import utc_now
-from opentrons.hardware_control import BaseHardwareControl
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.simulator_setup import load_simulator
 from opentrons.hardware_control.types import HardwareEvent, DoorStateNotification
 
@@ -25,7 +25,7 @@ from .settings import get_settings
 
 log = logging.getLogger(__name__)
 
-_hw_api = AppStateValue[BaseHardwareControl]("hardware_api")
+_hw_api = AppStateValue[HardwareControlAPI]("hardware_api")
 _init_task = AppStateValue["asyncio.Task[None]"]("hardware_init_task")
 _event_unsubscribe = AppStateValue[Callable[[], None]]("hardware_event_unsubscribe")
 
@@ -77,7 +77,7 @@ async def cleanup_hardware(app_state: AppState) -> None:
 
 async def get_hardware(
     app_state: AppState = Depends(get_app_state),
-) -> BaseHardwareControl:
+) -> HardwareControlAPI:
     """Get the HardwareAPI as a route dependency.
 
     Arguments:
@@ -176,7 +176,7 @@ async def _initialize_hardware_api(app_state: AppState) -> None:
 # server, this logic needs to be in its own unit and not tucked away here in
 # test-less wrapper module
 def _initialize_event_watchers(
-    app_state: AppState, hardware_api: BaseHardwareControl
+    app_state: AppState, hardware_api: HardwareControlAPI
 ) -> None:
     """Initialize notification publishing for hardware events."""
     notify_server_settings = NotifyServerSettings()

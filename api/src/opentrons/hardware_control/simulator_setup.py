@@ -6,7 +6,7 @@ from pathlib import Path
 from opentrons.config import robot_configs
 from opentrons.config.types import RobotConfig
 from opentrons.types import Mount
-from opentrons.hardware_control import API, BaseHardwareControl
+from opentrons.hardware_control import API, HardwareControlAPI
 
 
 # Name and kwargs for a module function
@@ -27,7 +27,7 @@ class SimulatorSetup:
     strict_attached_instruments: bool = True
 
 
-async def create_simulator(setup: SimulatorSetup, loop=None) -> BaseHardwareControl:
+async def create_simulator(setup: SimulatorSetup, loop=None) -> HardwareControlAPI:
     """Create a simulator"""
     simulator = await API.build_hardware_simulator(
         attached_instruments=setup.attached_instruments,
@@ -46,7 +46,7 @@ async def create_simulator(setup: SimulatorSetup, loop=None) -> BaseHardwareCont
     return simulator
 
 
-async def load_simulator(path: Path, loop=None) -> BaseHardwareControl:
+async def load_simulator(path: Path, loop=None) -> HardwareControlAPI:
     """Create a simulator from a JSON file."""
     return await create_simulator(setup=load_simulator_setup(path), loop=loop)
 
