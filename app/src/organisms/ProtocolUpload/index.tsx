@@ -201,7 +201,7 @@ export function ProtocolUpload(): JSX.Element {
             width="100%"
           >
             <AlertItem
-              type="warning"
+              type="error"
               onCloseClick={clearError}
               title={t('protocol_upload_failed')}
             >

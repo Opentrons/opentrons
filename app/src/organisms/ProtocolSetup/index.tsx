@@ -80,17 +80,17 @@ export function ProtocolSetup(): JSX.Element {
         flexDirection={DIRECTION_COLUMN}
         padding={`${SPACING_1} ${SPACING_3} ${SPACING_3} ${SPACING_3}`}
       >
-        {showLPCSuccessToast && (
-          <LabwareOffsetSuccessToast
-            onCloseClick={() => setShowLPCSuccessToast(false)}
-          />
-        )}
-        <MetadataCard />
         <LPCSuccessToastContext.Provider
           value={{
             setShowLPCSuccessToast: () => setShowLPCSuccessToast(true),
           }}
         >
+          {showLPCSuccessToast && (
+            <LabwareOffsetSuccessToast
+              onCloseClick={() => setShowLPCSuccessToast(false)}
+            />
+          )}
+          <MetadataCard />
           <RunSetupCard />
         </LPCSuccessToastContext.Provider>
         <Text

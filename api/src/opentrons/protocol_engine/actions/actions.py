@@ -90,7 +90,11 @@ class UpdateCommandAction:
 
 @dataclass(frozen=True)
 class FailCommandAction:
-    """Mark a given command as failed."""
+    """Mark a given command as failed.
+
+    The given command and all currently queued commands will be marked
+    as failed due to the given error.
+    """
 
     # TODO(mc, 2021-11-12): we'll likely need to add the command params
     # to this payload for state reaction purposes

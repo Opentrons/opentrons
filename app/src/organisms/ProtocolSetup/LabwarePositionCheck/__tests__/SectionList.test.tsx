@@ -40,7 +40,7 @@ describe('SectionList', () => {
   it('renders a 2 step Nav with 1 pipette', () => {
     const { getByText } = render(props)
     expect(getByText('1')).toHaveStyle('backgroundColor: C_SELECTED_DARK')
-    getByText('Check tipracks with Left Pipette')
+    getByText('Check tip racks with Left Pipette')
     expect(getByText('2')).toHaveStyle('backgroundColor: C_DISABLED')
     getByText('Return tip')
   })
@@ -53,9 +53,9 @@ describe('SectionList', () => {
     }
     const { getByText } = render(props)
     expect(getByText('1')).toHaveStyle('backgroundColor: C_SELECTED_DARK')
-    getByText('Check tipracks with Left Pipette')
+    getByText('Check tip racks with Left Pipette')
     expect(getByText('2')).toHaveStyle('backgroundColor: C_DISABLED')
-    getByText('Check tipracks with Right Pipette')
+    getByText('Check tip racks with Right Pipette')
     expect(getByText('3')).toHaveStyle('backgroundColor: C_DISABLED')
     getByText('Return tip')
   })
@@ -68,9 +68,9 @@ describe('SectionList', () => {
     }
     const { getByText } = render(props)
     expect(getByText('1')).toHaveStyle('backgroundColor: C_SELECTED_DARK')
-    getByText('Check tipracks with Left Pipette')
+    getByText('Check tip racks with Left Pipette')
     expect(getByText('2')).toHaveStyle('backgroundColor: C_DISABLED')
-    getByText('Check tipracks with Right Pipette')
+    getByText('Check tip racks with Right Pipette')
     expect(getByText('3')).toHaveStyle('backgroundColor: C_DISABLED')
     getByText('Check remaining labware with Left Pipette')
     expect(getByText('4')).toHaveStyle('backgroundColor: C_DISABLED')
@@ -85,9 +85,9 @@ describe('SectionList', () => {
       completedSections: ['PRIMARY_PIPETTE_TIPRACKS'],
     }
     const { getByText } = render(props)
-    getByText('Check tipracks with Left Pipette')
+    getByText('Check tip racks with Left Pipette')
     expect(getByText('2')).toHaveStyle('backgroundColor: C_SELECTED_DARK')
-    getByText('Check tipracks with Right Pipette')
+    getByText('Check tip racks with Right Pipette')
     expect(getByText('3')).toHaveStyle('backgroundColor: C_DISABLED')
     getByText('Return tip')
   })

@@ -23,7 +23,12 @@ import {
   TEXT_TRANSFORM_UPPERCASE,
   C_MED_DARK_GRAY,
 } from '@opentrons/components'
+import {
+  useAllCommandsQuery,
+  useCommandQuery,
+} from '@opentrons/react-api-client'
 import { css } from 'styled-components'
+import { useCurrentRunId } from '../ProtocolUpload/hooks/useCurrentRunId'
 import { CommandTimer } from './CommandTimer'
 import { CommandText } from './CommandText'
 import {
@@ -31,8 +36,6 @@ import {
   RUN_STATUS_PAUSE_REQUESTED,
   RUN_STATUS_PAUSED,
 } from '@opentrons/api-client'
-import { useCommandQuery } from '@opentrons/react-api-client'
-import { useCurrentRunId } from '../ProtocolUpload/hooks/useCurrentRunId'
 import type { RunStatus, RunCommandSummary } from '@opentrons/api-client'
 
 import type {
@@ -62,18 +65,47 @@ const WRAPPER_STYLE_BY_STATUS: {
     backgroundColor: C_ERROR_LIGHT,
   },
 }
+
+const commandIsComplete = (status: RunCommandSummary['status']): boolean =>
+  status === 'succeeded' || status === 'failed'
+
 export function CommandItem(props: CommandItemProps): JSX.Element | null {
   const { commandOrSummary, runStatus } = props
   const { t } = useTranslation('run_details')
+  const currentRunId = useCurrentRunId()
+  const robotCommands = useAllCommandsQuery(currentRunId).data?.data
+  const [staleTime, setStaleTime] = React.useState<number>(0)
+  const isAnticipatedCommand = !Boolean(
+    robotCommands?.some(command => command.id === commandOrSummary.id)
+  )
+  const { data: commandDetails, refetch } = useCommandQuery(
+    currentRunId,
+    commandOrSummary.id,
+    {
+      enabled: !isAnticipatedCommand && runStatus !== 'idle',
+      staleTime,
+    }
+  )
+
+  React.useEffect(() => {
+    if (
+      commandDetails?.data.status &&
+      commandIsComplete(commandDetails?.data.status) &&
+      commandDetails?.data.completedAt != null
+    ) {
+      setStaleTime(Infinity)
+    }
+    if (
+      commandDetails?.data.startedAt != null &&
+      commandDetails?.data.completedAt == null
+    ) {
+      refetch()
+    }
+  }, [commandOrSummary.status, commandDetails?.data.completedAt])
   const commandStatus =
     runStatus !== RUN_STATUS_IDLE && commandOrSummary.status != null
       ? commandOrSummary.status
       : 'queued'
-  const currentRunId = useCurrentRunId()
-  const {
-    data: commandDetails,
-    refetch: refetchCommandDetails,
-  } = useCommandQuery(currentRunId, commandOrSummary.id)
 
   let isComment = false
   if (
@@ -90,10 +122,6 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
   }
 
   const isPause = commandOrSummary.commandType === 'pause'
-
-  React.useEffect(() => {
-    refetchCommandDetails()
-  }, [commandStatus])
 
   const WRAPPER_STYLE = css`
     font-size: ${FONT_SIZE_BODY_1};
@@ -146,7 +174,7 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
           />
         ) : null}
         <CommandText
-          commandOrSummary={commandDetails?.data ?? commandOrSummary}
+          commandDetailsOrSummary={commandDetails?.data ?? commandOrSummary}
         />
       </Flex>
     </Flex>

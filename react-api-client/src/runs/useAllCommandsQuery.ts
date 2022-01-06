@@ -3,7 +3,7 @@ import { HostConfig, CommandsData, getCommands } from '@opentrons/api-client'
 import { useHost } from '../api'
 
 export function useAllCommandsQuery(
-  runId?: string
+  runId: string | null
 ): UseQueryResult<CommandsData, Error> {
   const host = useHost()
   const query = useQuery<CommandsData, Error>(

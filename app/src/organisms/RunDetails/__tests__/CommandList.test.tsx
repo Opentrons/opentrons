@@ -116,8 +116,17 @@ describe('CommandList', () => {
     )
     expect(getByText('Protocol Run Failed')).toHaveStyle('color: Error_dark')
   })
-  it('renders the protocol canceled banner', () => {
+  it('renders the protocol canceled banner when the status is stop-requested', () => {
     mockUseRunStatus.mockReturnValue('stop-requested')
+    mockAlertItem.mockReturnValue(<div>Protocol Run Canceled</div>)
+    const { getByText } = render()
+    expect(getByText('Protocol Run Canceled')).toHaveStyle(
+      'backgroundColor: Error_light'
+    )
+    expect(getByText('Protocol Run Canceled')).toHaveStyle('color: Error_dark')
+  })
+  it('renders the protocol canceled banner when the status is stopped', () => {
+    mockUseRunStatus.mockReturnValue('stopped')
     mockAlertItem.mockReturnValue(<div>Protocol Run Canceled</div>)
     const { getByText } = render()
     expect(getByText('Protocol Run Canceled')).toHaveStyle(

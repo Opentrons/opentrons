@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import last from 'lodash/last'
+import { schemaV6Adapter } from '@opentrons/shared-data'
 import { useCurrentProtocolRun } from '../ProtocolUpload/hooks'
-import { schemaV6Adapter, ProtocolFile } from '@opentrons/shared-data'
 import { formatInterval } from '../RunTimeControl/utils'
-
+import type { ProtocolFile } from '@opentrons/shared-data'
 interface ProtocolDetails {
   displayName: string | null
   protocolData: ProtocolFile<{}> | null
