@@ -7,6 +7,7 @@ from opentrons.protocol_engine.errors import ProtocolEngineStoppedError
 
 from robot_server.errors import ApiError
 from robot_server.service.json_api import RequestModel
+from robot_server.service.task_runner import TaskRunner
 from robot_server.runs.run_view import RunView
 from robot_server.runs.engine_store import EngineStore
 from robot_server.runs.run_store import (
@@ -22,6 +23,12 @@ from robot_server.runs.action_models import (
 )
 
 from robot_server.runs.router.actions_router import create_run_action
+
+
+@pytest.fixture
+def task_runner(decoy: Decoy) -> TaskRunner:
+    """Get a mock background TaskRunner."""
+    return decoy.mock(cls=TaskRunner)
 
 
 @pytest.fixture
@@ -254,6 +261,7 @@ async def test_create_stop_action(
     run_store: RunStore,
     engine_store: EngineStore,
     prev_run: RunResource,
+    task_runner: TaskRunner,
 ) -> None:
     """It should handle a stop action."""
     action = RunAction(
@@ -285,6 +293,7 @@ async def test_create_stop_action(
         run_view=run_view,
         run_store=run_store,
         engine_store=engine_store,
+        task_runner=task_runner,
         action_id="action-id",
         created_at=datetime(year=2022, month=2, day=2),
     )
@@ -293,6 +302,6 @@ async def test_create_stop_action(
     assert result.status_code == 201
 
     decoy.verify(
-        await engine_store.runner.stop(),
+        task_runner.run(engine_store.runner.stop),
         run_store.upsert(run=next_run),
     )

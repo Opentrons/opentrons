@@ -5,7 +5,10 @@ import { i18n } from '../../../i18n'
 import { CommandItem } from '../CommandItem'
 import { CommandText } from '../CommandText'
 import { CommandTimer } from '../CommandTimer'
-import { useCommandQuery } from '@opentrons/react-api-client'
+import {
+  useAllCommandsQuery,
+  useCommandQuery,
+} from '@opentrons/react-api-client'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks/useCurrentRunId'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6/command'
 
@@ -23,6 +26,9 @@ const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
 >
 const mockUseCommandQuery = useCommandQuery as jest.MockedFunction<
   typeof useCommandQuery
+>
+const mockUseAllCommandsQuery = useAllCommandsQuery as jest.MockedFunction<
+  typeof useAllCommandsQuery
 >
 const render = (props: React.ComponentProps<typeof CommandItem>) => {
   return renderWithProviders(<CommandItem {...props} />, {
@@ -85,10 +91,15 @@ describe('Run Details Command item', () => {
     mockCommandTimer.mockReturnValue(<div>Mock Command Timer</div>)
     when(mockUseCurrentRunId).calledWith().mockReturnValue(RUN_ID)
     when(mockUseCommandQuery)
-      .calledWith(RUN_ID, MOCK_COMMAND.id)
+      .calledWith(RUN_ID, MOCK_COMMAND.id, expect.anything())
       .mockReturnValue({
         data: { data: MOCK_COMMAND_DETAILS },
         refetch: jest.fn(),
+      } as any)
+    when(mockUseAllCommandsQuery)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        data: { data: [] },
       } as any)
   })
 
@@ -153,7 +164,7 @@ describe('Run Details Command item', () => {
 
   it('renders the comment text when the command is a comment', () => {
     when(mockUseCommandQuery)
-      .calledWith(RUN_ID, MOCK_COMMENT_COMMAND.id)
+      .calledWith(RUN_ID, MOCK_COMMENT_COMMAND.id, expect.anything())
       .mockReturnValue({
         data: { data: MOCK_COMMAND_DETAILS_COMMENT },
         refetch: jest.fn(),
@@ -168,7 +179,7 @@ describe('Run Details Command item', () => {
   })
   it('renders the pause text when the command is a pause', () => {
     when(mockUseCommandQuery)
-      .calledWith(RUN_ID, MOCK_PAUSE_COMMAND.id)
+      .calledWith(RUN_ID, MOCK_PAUSE_COMMAND.id, expect.anything())
       .mockReturnValue({
         data: { data: MOCK_COMMAND_DETAILS_PAUSE },
         refetch: jest.fn(),

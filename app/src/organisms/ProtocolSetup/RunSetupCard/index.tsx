@@ -66,20 +66,23 @@ export function RunSetupCard(): JSX.Element | null {
   ])
 
   React.useEffect(() => {
+    let nextStepKeysInOrder = stepsKeysInOrder
     if (protocolData != null && protocolHasModules(protocolData)) {
-      setStepKeysInOrder([
+      nextStepKeysInOrder = [
         ROBOT_CALIBRATION_STEP_KEY,
         MODULE_SETUP_KEY,
         LABWARE_SETUP_KEY,
-      ])
+      ]
     }
     let initialExpandedStepKey: StepKey = ROBOT_CALIBRATION_STEP_KEY
     if (calibrationStatus.complete) {
       initialExpandedStepKey =
-        stepsKeysInOrder[
-          stepsKeysInOrder.findIndex(v => v === ROBOT_CALIBRATION_STEP_KEY) + 1
+        nextStepKeysInOrder[
+          nextStepKeysInOrder.findIndex(v => v === ROBOT_CALIBRATION_STEP_KEY) +
+            1
         ]
     }
+    setStepKeysInOrder(nextStepKeysInOrder)
     const initialExpandTimer = setTimeout(
       () => setExpandedStepKey(initialExpandedStepKey),
       INITIAL_EXPAND_DELAY_MS

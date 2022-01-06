@@ -11,6 +11,7 @@ from opentrons.protocol_engine.errors import ProtocolEngineStoppedError
 from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.service.json_api import RequestModel, SimpleBody, PydanticResponse
+from robot_server.service.task_runner import TaskRunner
 
 from ..run_store import RunStore, RunNotFoundError
 from ..run_view import RunView
@@ -52,6 +53,7 @@ async def create_run_action(
     engine_store: EngineStore = Depends(get_engine_store),
     action_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
+    task_runner: TaskRunner = Depends(TaskRunner),
 ) -> PydanticResponse[SimpleBody[RunAction]]:
     """Create a run control action.
 
@@ -63,6 +65,7 @@ async def create_run_action(
         engine_store: Protocol engine and runner storage.
         action_id: Generated ID to assign to the control action.
         created_at: Timestamp to attach to the control action.
+        task_runner: Background task runner.
     """
     try:
         prev_run = run_store.get(run_id=runId)
@@ -90,7 +93,7 @@ async def create_run_action(
             engine_store.runner.pause()
         elif action.actionType == RunActionType.STOP:
             log.info(f'Stopping run "{runId}".')
-            await engine_store.runner.stop()
+            task_runner.run(engine_store.runner.stop)
 
     except ProtocolEngineStoppedError as e:
         raise RunActionNotAllowed(detail=str(e)).as_error(status.HTTP_409_CONFLICT)

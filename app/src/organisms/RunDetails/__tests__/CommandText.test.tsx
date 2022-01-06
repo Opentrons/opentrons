@@ -78,7 +78,7 @@ describe('CommandText', () => {
   })
   it('renders correct command text for custom legacy commands', () => {
     const { getByText } = render({
-      commandOrSummary: {
+      commandDetailsOrSummary: {
         ...MOCK_COMMAND_DETAILS,
         params: {
           legacyCommandText: 'legacy command text',
@@ -89,7 +89,7 @@ describe('CommandText', () => {
   })
   it('renders correct command text for pause commands', () => {
     const { getByText } = render({
-      commandOrSummary: {
+      commandDetailsOrSummary: {
         ...MOCK_PAUSE_COMMAND,
       } as Command,
     })
@@ -97,7 +97,7 @@ describe('CommandText', () => {
   })
   it('renders correct command text for load commands', () => {
     const { getByText } = render({
-      commandOrSummary: {
+      commandDetailsOrSummary: {
         ...MOCK_LOAD_COMMAND,
       } as Command,
     })
@@ -119,7 +119,7 @@ describe('CommandText', () => {
       },
     } as any)
     const { getByText } = render({
-      commandOrSummary: {
+      commandDetailsOrSummary: {
         ...MOCK_COMMAND_DETAILS,
         commandType: 'pickUpTip',
         params: {
