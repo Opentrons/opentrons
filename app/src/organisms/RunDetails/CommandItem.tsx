@@ -67,7 +67,6 @@ const WRAPPER_STYLE_BY_STATUS: {
 }
 export function CommandItem(props: CommandItemProps): JSX.Element | null {
   const { commandOrSummary, runStatus } = props
-
   const { t } = useTranslation('run_details')
   const currentRunId = useCurrentRunId()
   const robotCommands = useAllCommandsQuery(currentRunId as string).data?.data
