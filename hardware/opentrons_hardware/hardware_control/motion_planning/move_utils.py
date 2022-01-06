@@ -2,7 +2,7 @@
 import numpy as np
 import numpy.typing as npt
 import logging
-from typing import Iterator, List, Optional, Tuple, cast
+from typing import Iterator, List, Tuple, cast
 
 from opentrons_hardware.hardware_control.motion_planning.types import (
     Block,

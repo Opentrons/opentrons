@@ -9,10 +9,8 @@ from typing import (
     Dict,
     Iterator,
     List,
-    NamedTuple,
     OrderedDict,
     Tuple,
-    Optional,
     Union,
 )
 
@@ -21,7 +19,6 @@ AcceptableType = Union[SupportsFloat, np.float64]
 
 
 class Axis(enum.Enum):
-
     """Robot axis."""
 
     X = 0
@@ -35,13 +32,8 @@ class Axis(enum.Enum):
         return [cls.X, cls.Y, cls.Z, cls.A]
 
 
-def coordinates(*args: AcceptableType) -> "Coordinates":
-    return Coordinates(*(np.float64(arg) for arg in args))
-
-
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=False)
 class Coordinates:
-
     """Coordinates for all axes."""
 
     X: np.float64
@@ -51,16 +43,19 @@ class Coordinates:
 
     def __init__(
         self, X: AcceptableType, Y: AcceptableType, Z: AcceptableType, A: AcceptableType
-    ):
+    ) -> None:
+        """Constructor."""
         self.X = np.float64(X)
         self.Y = np.float64(Y)
         self.Z = np.float64(Z)
         self.A = np.float64(A)
 
     def __iter__(self) -> "Coordinates":
+        """Return an iterator."""
         return self
 
     def __getitem__(self, key: Axis) -> np.float64:
+        """Access axis coordinate value."""
         return self.to_dict()[key]
 
     def to_dict(self) -> OrderedDict[Axis, np.float64]:
@@ -90,7 +85,8 @@ class Block:
         distance: AcceptableType,
         initial_speed: AcceptableType,
         acceleration: AcceptableType,
-    ):
+    ) -> None:
+        """Constructor."""
         self.distance = np.float64(distance)
         self.initial_speed = np.float64(initial_speed)
         self.acceleration = np.float64(acceleration)
@@ -128,7 +124,8 @@ class Move:
         distance: np.float64,
         max_speed: np.float64,
         blocks: Tuple[Block, Block, Block],
-    ):
+    ) -> None:
+        """Constructor."""
         # verify unit vector before creating Move
         if not Move._is_unit_vector(unit_vector):
             raise ValueError(f"{unit_vector} is not a valid unit vector.")
@@ -139,13 +136,17 @@ class Move:
 
     @classmethod
     def _is_unit_vector(cls, unit_vector: Coordinates) -> bool:
-        magnitude = np.linalg.norm(unit_vector.vectorize())  # type: ignore[no-untyped-call]
+        """Verify unit vector."""
+        magnitude = np.linalg.norm(
+            unit_vector.vectorize()
+        )  # type: ignore[no-untyped-call]
         return cast(bool, magnitude == np.float64(1.0))
 
     @classmethod
     def build_dummy_move(cls) -> "Move":
+        """Return a Move with dummy values."""
         return cls(
-            unit_vector=coordinates(1, 0, 0, 0),
+            unit_vector=Coordinates(1, 0, 0, 0),
             distance=np.float64(0),
             max_speed=np.float64(0),
             blocks=(
@@ -163,6 +164,7 @@ class Move:
         max_speed: AcceptableType,
         blocks: Tuple[Block, Block, Block],
     ) -> "Move":
+        """Build function for Move."""
         return cls(
             unit_vector=unit_vector,
             distance=np.float64(distance),
@@ -202,6 +204,7 @@ class MoveTarget:
 
     @classmethod
     def build(cls, position: Coordinates, max_speed: AcceptableType) -> "MoveTarget":
+        """Build MoveTarget."""
         return cls(position=position, max_speed=np.float64(max_speed))
 
 
@@ -220,6 +223,7 @@ class AxisConstraints:
         max_speed_discont: AcceptableType,
         max_direction_change_speed_discont: AcceptableType,
     ) -> "AxisConstraints":
+        """Build AxisConstraints."""
         return cls(
             max_acceleration=np.float64(max_acceleration),
             max_speed_discont=np.float64(max_speed_discont),
