@@ -22,124 +22,56 @@ from opentrons_shared_data.pipette.dev_types import PipetteName
 from .dev_types import PipetteDict
 
 
-class BaseHardwareControl(Protocol):
-    """A mypy protocol for a hardware controller.
-
-    This class provides an protocol for the basic hardware controller class,
-    with at least two implementations: one for the OT-2, and one for the
-    OT-3. While the two classes have the same API, fundamental architectural
-    decisions in the OT-2 hardware controller (specifically the data types used
-    in the HardwareControl/backend split) make it unsuitable for the OT-3.
-
-    This is a protocol rather than an ABC because of the use of wrapping adapters
-    such as ThreadManager and SynchAdapter. Because those classes work via
-    getattr, they can't inherit from an ABC that requires specific methods;
-    however, they can satisfy protocols.
-    """
+class ModuleProvider(Protocol):
+    """A protocol specifying access to modules."""
 
     @property
-    def robot_calibration(self) -> RobotCalibration:
-        """The currently-active robot calibration of the machine."""
+    def attached_modules(self) -> List[AbstractModule]:
+        """Return a list of currently-attached modules."""
         ...
 
-    def reset_robot_calibration(self) -> None:
-        """Reset the active robot calibration to the machine default.
+    async def find_modules(
+        self,
+        by_model: ModuleModel,
+        resolved_type: ModuleType,
+    ) -> Tuple[List[AbstractModule], Optional[AbstractModule]]:
+        """Query the attached modules for a specific kind or model of module."""
+        ...
 
-        This may be an identity on some machines but not on others; this
-        method is therefore preferred to using set_robot_calibration() with a
-        caller-constructed identity.
+
+class ExecutionControllable(Protocol):
+    """A protocol specifying run control (pause, resume)."""
+
+    def pause(self, pause_type: PauseType) -> None:
+        """
+        Pause motion of the robot after a current motion concludes.
+
+        Individual calls to move
+        (which aspirate and dispense and other calls may depend on) are
+        considered atomic and will always complete if they have been called
+        prior to a call to this method. However, subsequent calls to move that
+        occur when the system is paused will not proceed until the system is
+        resumed with resume.
         """
         ...
 
-    def set_robot_calibration(self, robot_calibration: RobotCalibration) -> None:
-        """Set the current robot calibration from stored data."""
+    def pause_with_message(self, message: str) -> None:
+        """Pause motion of the robot as with pause, but specify a message."""
         ...
 
-    @property
-    def door_state(self) -> DoorState:
-        """The current state of the machine's door."""
-        ...
-
-    @property
-    def loop(self) -> asyncio.AbstractEventLoop:
-        """The event loop used by this instance."""
-        ...
-
-    def set_loop(self, loop: asyncio.AbstractEventLoop) -> None:
-        """Override the loop used by this instance."""
-        ...
-
-    @property
-    def is_simulator(self):
-        """`True` if this is a simulator; `False` otherwise."""
-        ...
-
-    def validate_calibration(self) -> DeckTransformState:
-        """Check whether the current calibration is valid."""
-        ...
-
-    def register_callback(self, cb: HardwareEventHandler) -> Callable[[], None]:
-        """Register a callback that will be called when an event occurs.
-
-        The events may be asynchronous, from various things that can happen
-        to the hardware (for instance, the door opening or closing).
-
-        The returned callable removes the callback.
+    def resume(self, pause_type: PauseType) -> None:
         """
-        ...
-
-    def get_fw_version(self) -> str:
-        """
-        Return the firmware version of the connected hardware.
-        """
-        ...
-
-    @property
-    def fw_version(self) -> str:
-        """
-        Return the firmware version of the connected hardware.
-
-        The version is a string retrieved directly from the attached hardware
-        (or possibly simulator).
-        """
-        ...
-
-    @property
-    def board_revision(self) -> str:
-        """
-        Return the revision of the central hardware.
-        """
-        ...
-
-    async def set_lights(self, button: bool = None, rails: bool = None) -> None:
-        """Control the robot lights.
-
-        button If specified, turn the button light on (`True`) or
-               off (`False`). If not specified, do not change the
-               button light.
-        rails: If specified, turn the rail lights on (`True`) or
-               off (`False`). If not specified, do not change the
-               rail lights.
-        """
-        ...
-
-    def get_lights(self) -> Dict[str, bool]:
-        """Return the current status of the robot lights.
-
-        :returns: A dict of the lights: `{'button': bool, 'rails': bool}`
-        """
-        ...
-
-    async def identify(self, duration_s: int = 5) -> None:
-        """Run a routine to identify the robot.
-
-        duration_s: The duration to blink for, in seconds.
+        Resume motion after a call to pause.
         """
         ...
 
     async def delay(self, duration_s: float):
         """Delay execution by pausing and sleeping."""
         ...
+
+
+class InstrumentConfigurer(Protocol):
+    """A protocol specifying how to interact with instrument presence and detection."""
 
     def reset_instrument(self, mount: Mount = None) -> None:
         """
@@ -203,34 +135,94 @@ class BaseHardwareControl(Protocol):
     def attached_instruments(self) -> Dict[Mount, PipetteDict]:
         return self.get_attached_instruments()
 
-    @property
-    def attached_modules(self) -> List[AbstractModule]:
-        """Return a list of currently-attached modules."""
-        ...
-
-    # Global actions API
-    def pause(self, pause_type: PauseType) -> None:
+    def calibrate_plunger(
+        self,
+        mount: Mount,
+        top: float = None,
+        bottom: float = None,
+        blow_out: float = None,
+        drop_tip: float = None,
+    ):
         """
-        Pause motion of the robot after a current motion concludes.
-
-        Individual calls to move
-        (which aspirate and dispense and other calls may depend on) are
-        considered atomic and will always complete if they have been called
-        prior to a call to this method. However, subsequent calls to move that
-        occur when the system is paused will not proceed until the system is
-        resumed with resume.
-        """
-        ...
-
-    def pause_with_message(self, message: str) -> None:
-        """Pause motion of the robot as with pause, but specify a message."""
-        ...
-
-    def resume(self, pause_type: PauseType) -> None:
-        """
-        Resume motion after a call to pause.
+        Set calibration values for the pipette plunger.
+        This can be called multiple times as the user sets each value,
+        or you can set them all at once.
+        :param top: Touching but not engaging the plunger.
+        :param bottom: Must be above the pipette's physical hard-stop, while
+        still leaving enough room for 'blow_out'
+        :param blow_out: Plunger is pushed down enough to expel all liquids.
+        :param drop_tip: Position that causes the tip to be released from the
+        pipette
         """
         ...
+
+    def set_flow_rate(
+        self,
+        mount: Mount,
+        aspirate: float = None,
+        dispense: float = None,
+        blow_out: float = None,
+    ) -> None:
+        """Set a pipette's rate of liquid handling in flow rate units"""
+        ...
+
+    def set_pipette_speed(
+        self,
+        mount: Mount,
+        aspirate: float = None,
+        dispense: float = None,
+        blow_out: float = None,
+    ) -> None:
+        """Set a pipette's rate of liquid handling in linear speed units."""
+        ...
+
+    def get_instrument_max_height(
+        self, mount: Mount, critical_point: CriticalPoint = None
+    ) -> float:
+        """Return max achievable height of the attached instrument
+        based on the current critical point
+        """
+        ...
+
+    async def add_tip(self, mount: Mount, tip_length: float) -> None:
+        """Inform the hardware that a tip is now attached to a pipette.
+
+        This changes the critical point of the pipette to make sure that
+        the end of the tip is what moves around, and allows liquid handling.
+        """
+        ...
+
+    async def remove_tip(self, mount: Mount) -> None:
+        """Inform the hardware that a tip is no longer attached to a pipette.
+
+        This changes the critical point of the system to the end of the
+        nozzle and prevents further liquid handling commands.
+        """
+        ...
+
+    def set_current_tiprack_diameter(
+        self, mount: Union[Mount, PipettePair], tiprack_diameter: float
+    ) -> None:
+        """Inform the hardware of the diameter of the tiprack.
+
+        This drives the magnitude of the shake commanded for pipettes that need
+        a shake after dropping or picking up tips.
+        """
+        ...
+
+    def set_working_volume(
+        self, mount: Union[Mount, PipettePair], tip_volume: int
+    ) -> None:
+        """Inform the hardware how much volume a pipette can aspirate.
+
+        This will set the limit of aspiration for the pipette, and is
+        necessary for backcompatibility.
+        """
+        ...
+
+
+class MotionController(Protocol):
+    """Protocol specifying fundamental motion controls."""
 
     async def halt(self) -> None:
         """Immediately stop motion.
@@ -283,22 +275,6 @@ class BaseHardwareControl(Protocol):
 
         axes A list of axes to home. Default is `None`, which will
              home everything.
-        """
-        ...
-
-    async def add_tip(self, mount: Mount, tip_length: float) -> None:
-        """Inform the hardware that a tip is now attached to a pipette.
-
-        This changes the critical point of the pipette to make sure that
-        the end of the tip is what moves around, and allows liquid handling.
-        """
-        ...
-
-    async def remove_tip(self, mount: Mount) -> None:
-        """Inform the hardware that a tip is no longer attached to a pipette.
-
-        This changes the critical point of the system to the end of the
-        nozzle and prevents further liquid handling commands.
         """
         ...
 
@@ -435,6 +411,10 @@ class BaseHardwareControl(Protocol):
         """
         ...
 
+
+class Configurable(Protocol):
+    """Protocol specifying hardware control configuration."""
+
     def get_config(self) -> RobotConfig:
         """Get the robot's configuration object.
 
@@ -466,7 +446,40 @@ class BaseHardwareControl(Protocol):
         """
         ...
 
-    # Pipette action API
+
+class Calibratable(Protocol):
+    """Protocol specifying calibration information"""
+
+    @property
+    def robot_calibration(self) -> RobotCalibration:
+        """The currently-active robot calibration of the machine."""
+        ...
+
+    def reset_robot_calibration(self) -> None:
+        """Reset the active robot calibration to the machine default.
+
+        This may be an identity on some machines but not on others; this
+        method is therefore preferred to using set_robot_calibration() with a
+        caller-constructed identity.
+        """
+        ...
+
+    def set_robot_calibration(self, robot_calibration: RobotCalibration) -> None:
+        """Set the current robot calibration from stored data."""
+        ...
+
+    def validate_calibration(self) -> DeckTransformState:
+        """Check whether the current calibration is valid."""
+        ...
+
+
+class LiquidHandler(
+    InstrumentConfigurer,
+    MotionController,
+    Configurable,
+    Calibratable,
+    Protocol,
+):
     async def prepare_for_aspirate(
         self, mount: Union[Mount, PipettePair], rate: float = 1.0
     ) -> None:
@@ -566,26 +579,6 @@ class BaseHardwareControl(Protocol):
         """
         ...
 
-    def set_current_tiprack_diameter(
-        self, mount: Union[Mount, PipettePair], tiprack_diameter: float
-    ) -> None:
-        """Inform the hardware of the diameter of the tiprack.
-
-        This drives the magnitude of the shake commanded for pipettes that need
-        a shake after dropping or picking up tips.
-        """
-        ...
-
-    def set_working_volume(
-        self, mount: Union[Mount, PipettePair], tip_volume: int
-    ) -> None:
-        """Inform the hardware how much volume a pipette can aspirate.
-
-        This will set the limit of aspiration for the pipette, and is
-        necessary for backcompatibility.
-        """
-        ...
-
     async def drop_tip(self, mount: Union[Mount, PipettePair], home_after=True) -> None:
         """
         Drop tip at the current location
@@ -598,64 +591,134 @@ class BaseHardwareControl(Protocol):
         """
         ...
 
-    async def find_modules(
-        self,
-        by_model: ModuleModel,
-        resolved_type: ModuleType,
-    ) -> Tuple[List[AbstractModule], Optional[AbstractModule]]:
-        """Query the attached modules for a specific kind or model of module."""
-        ...
 
-    # Pipette config api
-    def calibrate_plunger(
-        self,
-        mount: Mount,
-        top: float = None,
-        bottom: float = None,
-        blow_out: float = None,
-        drop_tip: float = None,
-    ):
-        """
-        Set calibration values for the pipette plunger.
-        This can be called multiple times as the user sets each value,
-        or you can set them all at once.
-        :param top: Touching but not engaging the plunger.
-        :param bottom: Must be above the pipette's physical hard-stop, while
-        still leaving enough room for 'blow_out'
-        :param blow_out: Plunger is pushed down enough to expel all liquids.
-        :param drop_tip: Position that causes the tip to be released from the
-        pipette
+class EventSourcer(Protocol):
+    """Protocol specifying how to react to events."""
+
+    def register_callback(self, cb: HardwareEventHandler) -> Callable[[], None]:
+        """Register a callback that will be called when an event occurs.
+
+        The events may be asynchronous, from various things that can happen
+        to the hardware (for instance, the door opening or closing).
+
+        The returned callable removes the callback.
         """
         ...
 
-    def set_flow_rate(
-        self,
-        mount: Mount,
-        aspirate: float = None,
-        dispense: float = None,
-        blow_out: float = None,
-    ) -> None:
-        """Set a pipette's rate of liquid handling in flow rate units"""
+
+class ChassisAccessoryManager(EventSourcer, Protocol):
+    """Protocol specifying control of non-motion peripherals on the robot."""
+
+    @property
+    def door_state(self) -> DoorState:
+        """The current state of the machine's door."""
         ...
 
-    def set_pipette_speed(
-        self,
-        mount: Mount,
-        aspirate: float = None,
-        dispense: float = None,
-        blow_out: float = None,
-    ) -> None:
-        """Set a pipette's rate of liquid handling in linear speed units."""
-        ...
+    async def set_lights(self, button: bool = None, rails: bool = None) -> None:
+        """Control the robot lights.
 
-    def get_instrument_max_height(
-        self, mount: Mount, critical_point: CriticalPoint = None
-    ) -> float:
-        """Return max achievable height of the attached instrument
-        based on the current critical point
+        button If specified, turn the button light on (`True`) or
+               off (`False`). If not specified, do not change the
+               button light.
+        rails: If specified, turn the rail lights on (`True`) or
+               off (`False`). If not specified, do not change the
+               rail lights.
         """
         ...
+
+    def get_lights(self) -> Dict[str, bool]:
+        """Return the current status of the robot lights.
+
+        :returns: A dict of the lights: `{'button': bool, 'rails': bool}`
+        """
+        ...
+
+    async def identify(self, duration_s: int = 5) -> None:
+        """Run a routine to identify the robot.
+
+        duration_s: The duration to blink for, in seconds.
+        """
+        ...
+
+
+class HardwareManager(Protocol):
+    """Protocol specifying access to configuration plane elements of hardware."""
+
+    def get_fw_version(self) -> str:
+        """
+        Return the firmware version of the connected hardware.
+        """
+        ...
+
+    @property
+    def fw_version(self) -> str:
+        """
+        Return the firmware version of the connected hardware.
+
+        The version is a string retrieved directly from the attached hardware
+        (or possibly simulator).
+        """
+        ...
+
+    @property
+    def board_revision(self) -> str:
+        """
+        Return the revision of the central hardware.
+        """
+        ...
+
+
+class AsyncioConfigurable(Protocol):
+    """Protocol specifying controllability of asyncio behavior"""
+
+    @property
+    def loop(self) -> asyncio.AbstractEventLoop:
+        """The event loop used by this instance."""
+        ...
+
+    def set_loop(self, loop: asyncio.AbstractEventLoop) -> None:
+        """Override the loop used by this instance."""
+        ...
+
+
+class Stoppable(Protocol):
+    """Protocol specifying controllability of teardown"""
 
     def clean_up(self) -> None:
         """Get the API ready to stop cleanly."""
         ...
+
+
+class Simulatable(Protocol):
+    """Protocol specifying ability to simulate"""
+
+    @property
+    def is_simulator(self):
+        """`True` if this is a simulator; `False` otherwise."""
+        ...
+
+
+class BaseHardwareControl(
+    ModuleProvider,
+    ExecutionControllable,
+    LiquidHandler,
+    ChassisAccessoryManager,
+    HardwareManager,
+    AsyncioConfigurable,
+    Stoppable,
+    Simulatable,
+    Protocol,
+):
+    """A mypy protocol for a hardware controller.
+
+    This class provides an protocol for the basic hardware controller class,
+    with at least two implementations: one for the OT-2, and one for the
+    OT-3. While the two classes have the same API, fundamental architectural
+    decisions in the OT-2 hardware controller (specifically the data types used
+    in the HardwareControl/backend split) make it unsuitable for the OT-3.
+
+    This is a protocol rather than an ABC because of the use of wrapping adapters
+    such as ThreadManager and SynchAdapter. Because those classes work via
+    getattr, they can't inherit from an ABC that requires specific methods;
+    however, they can satisfy protocols.
+    """
