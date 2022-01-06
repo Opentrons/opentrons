@@ -74,6 +74,7 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
   const { t } = useTranslation('run_details')
   const currentRunId = useCurrentRunId()
   const robotCommands = useAllCommandsQuery(currentRunId).data?.data
+  const [staleTime, setStaleTime] = React.useState<number>(0)
   const isAnticipatedCommand = !Boolean(
     robotCommands?.some(command => command.id === commandOrSummary.id)
   )
@@ -82,12 +83,18 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
     commandOrSummary.id,
     {
       enabled: runStatus === 'running' && !isAnticipatedCommand,
-      staleTime:
-        commandOrSummary.status && commandIsComplete(commandOrSummary.status)
-          ? Infinity
-          : 0,
+      staleTime,
     }
   )
+  React.useEffect(() => {
+    if (
+      commandOrSummary.status &&
+      commandIsComplete(commandOrSummary.status) &&
+      commandDetails?.data.completedAt != null
+    ) {
+      setStaleTime(Infinity)
+    }
+  }, [commandOrSummary.status, commandDetails?.data.completedAt])
   const commandStatus =
     runStatus !== RUN_STATUS_IDLE && commandOrSummary.status != null
       ? commandOrSummary.status
