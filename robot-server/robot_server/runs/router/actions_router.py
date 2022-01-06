@@ -8,7 +8,7 @@ from typing_extensions import Literal
 
 from opentrons.protocol_engine.errors import ProtocolEngineStoppedError
 
-from robot_server.errors import ErrorDetails, ErrorResponse
+from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.service.json_api import RequestModel, SimpleBody, PydanticResponse
 
@@ -35,12 +35,13 @@ class RunActionNotAllowed(ErrorDetails):
     path="/runs/{runId}/actions",
     summary="Issue a control action to the run",
     description="Provide an action in order to control execution of the run.",
+    status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_201_CREATED: {"model": SimpleBody[RunAction]},
         status.HTTP_409_CONFLICT: {
-            "model": ErrorResponse[Union[RunActionNotAllowed, RunStopped]],
+            "model": ErrorBody[Union[RunActionNotAllowed, RunStopped]],
         },
-        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
     },
 )
 async def create_run_action(

@@ -9,7 +9,7 @@ from opentrons.calibration_storage import (
     delete,
 )
 
-from robot_server.errors import ErrorResponse
+from robot_server.errors import ErrorBody
 from robot_server.service.tip_length import models as tl_models
 from robot_server.service.errors import RobotServerError, CommonErrorDef
 from robot_server.service.shared_models import calibration as cal_model
@@ -76,7 +76,7 @@ async def get_all_tip_length_calibrations(
     "/calibration/tip_length",
     description="Delete one specific tip length calibration by pipette "
     "serial and tiprack hash",
-    responses={status.HTTP_404_NOT_FOUND: {"model": ErrorResponse}},
+    responses={status.HTTP_404_NOT_FOUND: {"model": ErrorBody}},
 )
 async def delete_specific_tip_length_calibration(tiprack_hash: str, pipette_id: str):
     try:

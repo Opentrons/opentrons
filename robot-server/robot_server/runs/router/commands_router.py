@@ -5,7 +5,7 @@ from typing_extensions import Literal
 
 from opentrons.protocol_engine import commands as pe_commands, errors as pe_errors
 
-from robot_server.errors import ErrorDetails, ErrorResponse
+from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.json_api import (
     RequestModel,
     SimpleBody,
@@ -36,10 +36,11 @@ class CommandNotFound(ErrorDetails):
         "Add a single protocol command to the run. "
         "The command is placed at the back of the queue."
     ),
+    status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_201_CREATED: {"model": SimpleBody[pe_commands.Command]},
-        status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse[RunStopped]},
-        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
+        status.HTTP_400_BAD_REQUEST: {"model": ErrorBody[RunStopped]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
     },
 )
 async def create_run_command(
@@ -82,7 +83,7 @@ async def create_run_command(
     ),
     responses={
         status.HTTP_200_OK: {"model": SimpleMultiBody[RunCommandSummary]},
-        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
     },
 )
 async def get_run_commands(
@@ -110,10 +111,7 @@ async def get_run_commands(
     responses={
         status.HTTP_200_OK: {"model": SimpleBody[pe_commands.Command]},
         status.HTTP_404_NOT_FOUND: {
-            "model": Union[
-                ErrorResponse[RunNotFound],
-                ErrorResponse[CommandNotFound],
-            ]
+            "model": Union[ErrorBody[RunNotFound], ErrorBody[CommandNotFound]]
         },
     },
 )

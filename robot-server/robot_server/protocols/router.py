@@ -9,7 +9,7 @@ from typing_extensions import Literal
 
 from opentrons.protocol_reader import ProtocolReader, ProtocolFilesInvalidError
 
-from robot_server.errors import ErrorDetails, ErrorResponse
+from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.task_runner import TaskRunner
 from robot_server.service.dependencies import get_unique_id, get_current_time
 from robot_server.service.json_api import (
@@ -62,10 +62,11 @@ protocols_router = APIRouter()
         - A single JSON protocol file (any additional labware files will be ignored)
         """
     ),
+    status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_201_CREATED: {"model": SimpleBody[Protocol]},
         status.HTTP_422_UNPROCESSABLE_ENTITY: {
-            "model": ErrorResponse[ProtocolFilesInvalid]
+            "model": ErrorBody[ProtocolFilesInvalid]
         },
     },
 )
@@ -179,7 +180,7 @@ async def get_protocols(
     summary="Get an uploaded protocol",
     responses={
         status.HTTP_200_OK: {"model": SimpleBody[Protocol]},
-        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[ProtocolNotFound]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[ProtocolNotFound]},
     },
 )
 async def get_protocol_by_id(
@@ -221,7 +222,7 @@ async def get_protocol_by_id(
     summary="Delete an uploaded protocol",
     responses={
         status.HTTP_200_OK: {"model": SimpleEmptyBody},
-        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[ProtocolNotFound]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[ProtocolNotFound]},
     },
 )
 async def delete_protocol_by_id(

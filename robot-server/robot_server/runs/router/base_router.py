@@ -12,7 +12,7 @@ from pydantic import BaseModel, Field
 
 from opentrons.protocol_engine import LabwareOffsetCreate
 
-from robot_server.errors import ErrorDetails, ErrorResponse
+from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.service.task_runner import TaskRunner
 from robot_server.service.json_api import (
@@ -92,10 +92,11 @@ class AllRunsLinks(BaseModel):
     path="/runs",
     summary="Create a run",
     description="Create a new run to track robot interaction.",
+    status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_201_CREATED: {"model": SimpleBody[Run]},
-        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[ProtocolNotFound]},
-        status.HTTP_409_CONFLICT: {"model": ErrorResponse[RunAlreadyActive]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[ProtocolNotFound]},
+        status.HTTP_409_CONFLICT: {"model": ErrorBody[RunAlreadyActive]},
     },
 )
 async def create_run(
@@ -242,7 +243,7 @@ async def get_runs(
     description="Get a specific run by its unique identifier.",
     responses={
         status.HTTP_200_OK: {"model": SimpleBody[Run]},
-        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
     },
 )
 async def get_run(
@@ -298,7 +299,7 @@ async def get_run(
     description="Delete a specific run by its unique identifier.",
     responses={
         status.HTTP_200_OK: {"model": SimpleEmptyBody},
-        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
     },
 )
 async def remove_run(
@@ -339,12 +340,11 @@ async def remove_run(
         " To read the list of labware offsets currently on the run,"
         " see the run's `labwareOffsets` field."
     ),
+    status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_201_CREATED: {"model": SimpleBody[Run]},
-        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
-        status.HTTP_409_CONFLICT: {
-            "model": ErrorResponse[Union[RunStopped, RunNotIdle]]
-        },
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
+        status.HTTP_409_CONFLICT: {"model": ErrorBody[Union[RunStopped, RunNotIdle]]},
     },
 )
 async def add_labware_offset(
@@ -409,10 +409,8 @@ async def add_labware_offset(
     description="Update a specific run, returning the updated resource.",
     responses={
         status.HTTP_200_OK: {"model": SimpleBody[Run]},
-        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
-        status.HTTP_409_CONFLICT: {
-            "model": ErrorResponse[Union[RunStopped, RunNotIdle]]
-        },
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
+        status.HTTP_409_CONFLICT: {"model": ErrorBody[Union[RunStopped, RunNotIdle]]},
     },
 )
 async def update_run(
