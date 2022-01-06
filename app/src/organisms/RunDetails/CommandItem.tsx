@@ -23,10 +23,7 @@ import {
   TEXT_TRANSFORM_UPPERCASE,
   C_MED_DARK_GRAY,
 } from '@opentrons/components'
-import {
-  useAllCommandsQuery,
-  useCommandQuery,
-} from '@opentrons/react-api-client'
+import { useCommandQuery } from '@opentrons/react-api-client'
 import { css } from 'styled-components'
 import { useCurrentRunId } from '../ProtocolUpload/hooks/useCurrentRunId'
 import { CommandTimer } from './CommandTimer'
@@ -44,7 +41,8 @@ import type {
 } from '@opentrons/shared-data/protocol/types/schemaV6/command'
 
 export interface CommandItemProps {
-  commandOrSummary: Command | RunCommandSummary
+  analysisCommand: Command | null
+  runCommandSummary: RunCommandSummary | null
   runStatus?: RunStatus
 }
 
@@ -70,17 +68,15 @@ const commandIsComplete = (status: RunCommandSummary['status']): boolean =>
   status === 'succeeded' || status === 'failed'
 
 export function CommandItem(props: CommandItemProps): JSX.Element | null {
-  const { commandOrSummary, runStatus } = props
+  const { analysisCommand, runCommandSummary, runStatus } = props
   const { t } = useTranslation('run_details')
   const currentRunId = useCurrentRunId()
-  const robotCommands = useAllCommandsQuery(currentRunId).data?.data
   const [staleTime, setStaleTime] = React.useState<number>(0)
-  const isAnticipatedCommand = !Boolean(
-    robotCommands?.some(command => command.id === commandOrSummary.id)
-  )
+  const isAnticipatedCommand =
+    analysisCommand !== null && runCommandSummary === null
   const { data: commandDetails, refetch } = useCommandQuery(
     currentRunId,
-    commandOrSummary.id,
+    runCommandSummary?.id ?? null,
     {
       enabled: !isAnticipatedCommand && runStatus !== 'idle',
       staleTime,
@@ -101,18 +97,24 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
     ) {
       refetch()
     }
-  }, [commandOrSummary.status, commandDetails?.data.completedAt])
+  }, [runCommandSummary?.status, commandDetails?.data, refetch])
   const commandStatus =
-    runStatus !== RUN_STATUS_IDLE && commandOrSummary.status != null
-      ? commandOrSummary.status
+    runStatus !== RUN_STATUS_IDLE && runCommandSummary?.status != null
+      ? runCommandSummary.status
       : 'queued'
 
   let isComment = false
   if (
-    'params' in commandOrSummary &&
-    'legacyCommandType' in commandOrSummary.params
+    analysisCommand != null &&
+    'params' in analysisCommand &&
+    'legacyCommandType' in analysisCommand.params
   ) {
-    isComment = commandOrSummary.params.legacyCommandType === 'command.COMMENT'
+    isComment = analysisCommand?.params.legacyCommandType === 'command.COMMENT'
+  } else if (
+    runCommandSummary != null &&
+    'legacyCommandType' in runCommandSummary.result
+  ) {
+    isComment = runCommandSummary.result.legacyCommandType === 'command.COMMENT'
   } else if (
     commandDetails?.data.commandType === 'custom' &&
     'legacyCommandType' in commandDetails?.data.params
@@ -121,7 +123,9 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
       commandDetails.data.params.legacyCommandType === 'command.COMMENT'
   }
 
-  const isPause = commandOrSummary.commandType === 'pause'
+  const isPause =
+    analysisCommand?.commandType === 'pause' ||
+    runCommandSummary?.commandType === 'pause'
 
   const WRAPPER_STYLE = css`
     font-size: ${FONT_SIZE_BODY_1};
@@ -174,7 +178,8 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
           />
         ) : null}
         <CommandText
-          commandDetailsOrSummary={commandDetails?.data ?? commandOrSummary}
+          analysisCommand={analysisCommand}
+          runCommand={commandDetails?.data ?? null}
         />
       </Flex>
     </Flex>
