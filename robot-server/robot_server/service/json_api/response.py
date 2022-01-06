@@ -85,8 +85,8 @@ ResponseBodyT = TypeVar("ResponseBodyT", bound=BaseResponseBody)
 class PydanticResponse(JSONResponse, Generic[ResponseBodyT]):
     """A custom JSON response that uses Pydantic for JSON serialization.
 
-    Pydantic's JSON serialization is much more performant than the
-    default FastAPI serialization.
+    Returning this class from an endpoint function is much more performant
+    than returning a plain Pydantic model and letting FastAPI serialize it.
     """
 
     def __init__(
