@@ -77,9 +77,24 @@ async def test_clear_engine_noop(subject: EngineStore) -> None:
     subject.clear()
 
 
-async def test_clear_engine_not_stopped(subject: EngineStore) -> None:
+async def test_clear_engine_not_stopped_or_idle(subject: EngineStore) -> None:
     """It should raise a conflict if the engine is not stopped."""
     await subject.create(run_id="run-id")
+    subject.runner.play()
 
     with pytest.raises(EngineConflictError):
         subject.clear()
+
+
+async def test_clear_idle_engine(subject: EngineStore) -> None:
+    """It should successfully clear engine if idle (not started)."""
+    await subject.create(run_id="run-id")
+    assert subject.engine is not None
+    assert subject.runner is not None
+
+    subject.clear()
+
+    with pytest.raises(EngineMissingError):
+        subject.engine
+    with pytest.raises(EngineMissingError, match="Runner not yet created."):
+        subject.runner

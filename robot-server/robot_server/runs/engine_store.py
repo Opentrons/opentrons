@@ -2,7 +2,11 @@
 from typing import Dict, NamedTuple, Optional
 
 from opentrons.hardware_control import API as HardwareAPI
-from opentrons.protocol_engine import ProtocolEngine, StateView, create_protocol_engine
+from opentrons.protocol_engine import (
+    ProtocolEngine,
+    StateView,
+    create_protocol_engine,
+    EngineStatus)
 from opentrons.protocol_runner import ProtocolRunner
 
 
@@ -114,7 +118,10 @@ class EngineStore:
             they cannot be cleared.
         """
         if self._runner_engine_pair is not None:
-            if not self.engine.state_view.commands.get_is_stopped():
-                raise EngineConflictError("Current run is not stopped.")
+            if (self.engine.state_view.commands.get_was_queue_never_started()
+                    or self.engine.state_view.commands.get_is_stopped()):
+                pass
+            else:
+                raise EngineConflictError("Current run is not idle or stopped.")
 
         self._runner_engine_pair = None

@@ -252,6 +252,14 @@ class CommandView(HasState[CommandState]):
 
         return next(iter(self._state.queued_command_ids.keys()), None)
 
+    def get_was_queue_never_started(self) -> bool:
+        """Get whether the command queue was every played."""
+        if self.get_status() == EngineStatus.IDLE:
+            if len(self.get_all()) == len(self._state.queued_command_ids):
+                # No commands added to the engine have been run
+                return True
+        return False
+
     def get_is_running(self) -> bool:
         """Get whether the engine is running and queued commands should be executed."""
         queue_status = self._state.queue_status
