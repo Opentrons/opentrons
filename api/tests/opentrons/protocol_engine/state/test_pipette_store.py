@@ -36,6 +36,7 @@ def test_sets_initial_state(subject: PipetteStore) -> None:
         pipettes_by_id={},
         aspirated_volume_by_id={},
         current_well=None,
+        attached_tip_labware_by_id={},
     )
 
 
@@ -223,3 +224,36 @@ def test_home_clears_current_well(subject: PipetteStore) -> None:
     subject.handle_action(UpdateCommandAction(command=home_command))
 
     assert subject.state.current_well is None
+
+
+def test_tip_commands_update_has_tip(subject: PipetteStore) -> None:
+    """It should update has_tip after a successful pickUpTip command."""
+    pipette_id = "pipette-id"
+    load_pipette_command = create_load_pipette_command(
+        pipette_id=pipette_id,
+        pipette_name=PipetteName.P300_SINGLE,
+        mount=MountType.LEFT,
+    )
+
+    pick_up_tip_command = create_pick_up_tip_command(
+        pipette_id=pipette_id,
+        labware_id="pick-up-tip-labware-id",
+        well_name="pick-up-tip-well-name",
+    )
+
+    drop_tip_command = create_drop_tip_command(
+        pipette_id=pipette_id,
+        labware_id="drop-tip-labware-id",
+        well_name="drop-tip-well-name",
+    )
+    subject.handle_action(UpdateCommandAction(command=load_pipette_command))
+    subject.handle_action(UpdateCommandAction(command=pick_up_tip_command))
+
+    assert (
+        subject.state.attached_tip_labware_by_id.get(pipette_id)
+        == "pick-up-tip-labware-id"
+    )
+
+    subject.handle_action(UpdateCommandAction(command=drop_tip_command))
+
+    assert not subject.state.attached_tip_labware_by_id
