@@ -2,10 +2,12 @@
 import pytest
 from typing import Iterator
 
+from opentrons_hardware.hardware_control.motion_planning.move_manager import MoveManager
 from opentrons_hardware.hardware_control.motion_planning.move_utils import (
     find_initial_speed,
     find_final_speed,
     targets_to_moves,
+    all_blended,
 )
 from opentrons_hardware.hardware_control.motion_planning.types import (
     Axis,
@@ -210,3 +212,17 @@ def test_final_speed(
         ),
     )
     assert find_final_speed(CONSTRAINTS, move, next_move) == expected
+
+
+def test_blend_motion() -> None:
+    """Motion should blend."""
+    manager = MoveManager(CONSTRAINTS)
+    origin = Coordinates(0, 0, 0, 0)
+    target_list = [
+        MoveTarget.build(position=Coordinates(10, 0, 0, 0), max_speed=30),
+        MoveTarget.build(position=Coordinates(10, 10, 0, 0), max_speed=20),
+        MoveTarget.build(position=Coordinates(10, 10, 15, 10), max_speed=10),
+    ]
+    success, blend_log = manager.plan_motion(origin, target_list)
+    assert success
+    assert all_blended(CONSTRAINTS, blend_log[-1])

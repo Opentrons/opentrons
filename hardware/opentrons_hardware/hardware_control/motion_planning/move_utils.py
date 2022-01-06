@@ -218,7 +218,12 @@ def achievable_final(
                 )
                 + initial_speed
             )
-            final_speed = np.minimum(max_axis_final_velocity, final_speed, key=abs)
+            # take the smaller of the aboslute value
+            final_speed = np.where(
+                abs(max_axis_final_velocity) <= abs(final_speed),
+                max_axis_final_velocity,
+                final_speed,
+            )
 
     return final_speed
 
