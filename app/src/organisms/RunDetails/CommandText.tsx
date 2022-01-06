@@ -15,6 +15,8 @@ import { useProtocolDetails } from './hooks'
 import { getLabwareLocation } from '../ProtocolSetup/utils/getLabwareLocation'
 import { useLabwareRenderInfoById } from '../ProtocolSetup/hooks'
 
+const TRASH_ID = 'fixedTrash'
+
 interface Props {
   commandDetailsOrSummary: Command | RunCommandSummary
 }
@@ -43,6 +45,35 @@ export function CommandText(props: Props): JSX.Element | null {
               ? commandDetailsOrSummary.result
               : null}
           </>
+        )
+        break
+      }
+      case 'dropTip': {
+        // protocolData should never be null as we don't render the `RunDetails` unless we have an analysis
+        // but we're experiencing a zombie children issue, see https://github.com/Opentrons/opentrons/pull/9091
+        if (protocolData == null) {
+          return null
+        }
+        const { wellName, labwareId } = commandDetailsOrSummary.params
+        const labwareLocation = getLabwareLocation(
+          labwareId,
+          protocolData.commands
+        )
+        if (!('slotName' in labwareLocation)) {
+          throw new Error('expected tip rack to be in a slot')
+        }
+        messageNode = (
+          <Trans
+            t={t}
+            i18nKey={'drop_tip'}
+            values={{
+              well_name: wellName,
+              labware: labwareId === TRASH_ID ? 'Opentrons Fixed Trash' : getLabwareDisplayName(
+                labwareRenderInfoById[labwareId].labwareDef
+              ),
+              labware_location: labwareLocation.slotName,
+            }}
+          />
         )
         break
       }
