@@ -273,7 +273,8 @@ export function useLabwarePositionCheck(
   }) as LabwarePositionCheckStep
 
   const ctaText = useLpcCtaText(currentCommand)
-  const robotCommands = useAllCommandsQuery(currentRun?.data?.id).data?.data
+  const robotCommands = useAllCommandsQuery(currentRun?.data?.id ?? null).data
+    ?.data
   const titleText = useTitleText(
     isLoading,
     prevCommand,
