@@ -1,5 +1,5 @@
 """Pipetting command handling."""
-from opentrons.hardware_control.api import API as HardwareAPI
+from opentrons.hardware_control import HardwareControlAPI
 
 from ..state import StateStore, CurrentWell
 from ..types import WellLocation, WellOrigin
@@ -10,13 +10,13 @@ class PipettingHandler:
     """Implementation logic for liquid handling commands."""
 
     _state_store: StateStore
-    _hardware_api: HardwareAPI
+    _hardware_api: HardwareControlAPI
     _movement_handler: MovementHandler
 
     def __init__(
         self,
         state_store: StateStore,
-        hardware_api: HardwareAPI,
+        hardware_api: HardwareControlAPI,
         movement_handler: MovementHandler,
     ) -> None:
         """Initialize a PipettingHandler instance."""

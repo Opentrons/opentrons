@@ -6,7 +6,7 @@ from pathlib import Path
 from opentrons.config import robot_configs
 from opentrons.config.types import RobotConfig
 from opentrons.types import Mount
-from opentrons.hardware_control import API, HardwareControlAPI
+from opentrons.hardware_control import API, HardwareControlAPI, ThreadManager
 
 
 # Name and kwargs for a module function
@@ -49,6 +49,29 @@ async def create_simulator(setup: SimulatorSetup, loop=None) -> HardwareControlA
 async def load_simulator(path: Path, loop=None) -> HardwareControlAPI:
     """Create a simulator from a JSON file."""
     return await create_simulator(setup=load_simulator_setup(path), loop=loop)
+
+
+async def load_simulator_thread_manager(
+    path: Path,
+) -> ThreadManager[HardwareControlAPI]:
+    """Create a simulator wrapped in a ThreadManager from a JSON file."""
+    setup = load_simulator_setup(path)
+    thread_manager: ThreadManager[HardwareControlAPI] = ThreadManager(
+        API.build_hardware_simulator,
+        attached_instruments=setup.attached_instruments,
+        attached_modules=list(setup.attached_modules.keys()),
+        config=setup.config,
+        strict_attached_instruments=setup.strict_attached_instruments,
+    )
+    await thread_manager.managed_thread_ready_async()
+
+    for attached_module in thread_manager.wrapped().attached_modules:
+        calls = setup.attached_modules[attached_module.name()]
+        for call in calls:
+            f = getattr(attached_module, call.function_name)
+            await f(*call.args, **call.kwargs)
+
+    return thread_manager
 
 
 def save_simulator_setup(simulator_setup: SimulatorSetup, path: Path):

@@ -1,11 +1,10 @@
 from fastapi import APIRouter, Depends
 from typing_extensions import Protocol
 
-from opentrons.hardware_control import ThreadManager
 from opentrons.hardware_control.protocols import Calibratable, AsyncioConfigurable
 from opentrons.calibration_storage import helpers
 
-from robot_server.service.dependencies import get_hardware
+from robot_server.hardware import get_hardware
 from robot_server.service.legacy.models.deck_calibration import (
     CalibrationStatus,
     DeckCalibrationStatus,
@@ -31,7 +30,7 @@ class TMCalibratable(AsyncioConfigurable, Calibratable, Protocol):
     response_model=CalibrationStatus,
 )
 async def get_calibration_status(
-    hardware: ThreadManager[TMCalibratable] = Depends(get_hardware),
+    hardware: TMCalibratable = Depends(get_hardware),
 ) -> CalibrationStatus:
     # TODO: AA 12-01-2020 Instrument offset has been deprecated. We should
     # exclude instrument calibration in a future refactor

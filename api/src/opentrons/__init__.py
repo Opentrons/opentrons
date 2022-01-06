@@ -5,14 +5,13 @@ from pathlib import Path
 import logging
 import asyncio
 import re
-from typing import Any, List, Tuple, cast
+from typing import Any, List, Tuple
 
 from opentrons.config.feature_flags import enable_ot3_hardware_controller
 from opentrons.drivers.serial_communication import get_ports_by_name
 from opentrons.hardware_control import (
     API as HardwareAPI,
     ThreadManager,
-    HardwareControlAPI,
     ThreadManagedHardware,
 )
 
@@ -123,7 +122,9 @@ async def _create_thread_manager() -> ThreadManagedHardware:
     """
     if os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"):
         log.info("Initialized robot using virtual Smoothie")
-        thread_manager = ThreadManager(HardwareAPI.build_hardware_simulator)
+        thread_manager: ThreadManagedHardware = ThreadManager(
+            HardwareAPI.build_hardware_simulator
+        )
     elif should_use_ot3():
         thread_manager = ThreadManager(
             HardwareAPI.build_ot3_controller,
@@ -145,6 +146,7 @@ async def _create_thread_manager() -> ThreadManagedHardware:
 
     return thread_manager
 
+
 async def initialize() -> ThreadManagedHardware:
     """
     Initialize the Opentrons hardware returning a hardware instance.
@@ -155,7 +157,7 @@ async def initialize() -> ThreadManagedHardware:
     log.info(f"API server version: {__version__}")
     log.info(f"Robot Name: {name()}")
 
-    hardware = await _create_hardware_api()
+    hardware = await _create_thread_manager()
 
     async def _blink() -> None:
         while True:

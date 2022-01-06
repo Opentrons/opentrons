@@ -9,7 +9,7 @@ from opentrons.protocols.geometry.module_geometry import (
     module_model_from_string,
 )
 from opentrons.types import MountType
-from opentrons.hardware_control.api import API as HardwareAPI
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules.mod_abc import AbstractModule
 
 from ..errors import (
@@ -58,7 +58,7 @@ class LoadedModuleData:
 class EquipmentHandler:
     """Implementation logic for labware, pipette, and module loading."""
 
-    _hardware_api: HardwareAPI
+    _hardware_api: HardwareControlAPI
     _state_store: StateStore
     _labware_data_provider: LabwareDataProvider
     _module_data_provider: ModuleDataProvider
@@ -66,7 +66,7 @@ class EquipmentHandler:
 
     def __init__(
         self,
-        hardware_api: HardwareAPI,
+        hardware_api: HardwareControlAPI,
         state_store: StateStore,
         labware_data_provider: Optional[LabwareDataProvider] = None,
         module_data_provider: Optional[ModuleDataProvider] = None,
@@ -171,7 +171,7 @@ class EquipmentHandler:
         # pipette existence check
         # TODO(mc, 2021-04-16): reconcile PipetteName enum with PipetteName union
         try:
-            await self._hardware_api.cache_instruments(cache_request)  # type: ignore[arg-type]  # noqa: E501
+            await self._hardware_api.cache_instruments(cache_request)  # type: ignore
         except RuntimeError as e:
             raise FailedToLoadPipetteError(str(e)) from e
 

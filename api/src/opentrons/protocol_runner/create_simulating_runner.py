@@ -11,7 +11,7 @@ from .protocol_runner import ProtocolRunner
 
 
 async def create_simulating_runner() -> ProtocolRunner:
-    """Create a ProtocolRunner wired to a simulating HardwareAPI.
+    """Create a ProtocolRunner wired to a simulating HardwareControlAPI.
 
     Example:
         ```python

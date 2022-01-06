@@ -4,12 +4,12 @@ import asyncio
 from starlette import status
 from fastapi import Path, APIRouter, Depends
 
-from opentrons.hardware_control import ThreadManager, modules
+from opentrons.hardware_control import modules
 from opentrons.hardware_control.modules import AbstractModule
 from opentrons.hardware_control.protocols import ModuleProvider, AsyncioConfigurable
 
 from robot_server.errors import LegacyErrorResponse
-from robot_server.service.dependencies import get_hardware
+from robot_server.hardware import get_hardware
 from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.legacy.models.modules import (
     Module,
@@ -33,23 +33,26 @@ class TMModules(AsyncioConfigurable, ModuleProvider, Protocol):
     response_model=Modules,
 )
 async def get_modules(
-    hardware: ThreadManager[TMModules] = Depends(get_hardware),
+    hardware: TMModules = Depends(get_hardware),
 ) -> Modules:
     attached_modules = hardware.attached_modules
     module_data = [
         Module(
             name=mod.name(),  # TODO: legacy, remove
             displayName=mod.name(),  # TODO: legacy, remove
-            model=mod.device_info.get("model"),  # TODO legacy, remove
+            model=mod.device_info.get("model") or "",  # TODO legacy, remove
             moduleModel=mod.model(),
             port=mod.port,  # /dev/ttyS0
             usbPort=PhysicalPort(hub=mod.usb_port.hub, port=mod.usb_port.port_number),
-            serial=mod.device_info.get("serial"),
-            revision=mod.device_info.get("model"),
-            fwVersion=mod.device_info.get("version"),
+            serial=mod.device_info.get("serial") or "",
+            revision=mod.device_info.get("model") or "",
+            fwVersion=mod.device_info.get("version") or "",
             hasAvailableUpdate=mod.has_available_update(),
-            status=mod.live_data["status"],
-            data=mod.live_data["data"],
+            # TODO: these type ignores are necessary for now because of imprecision in
+            # the return values on the hardware side now that we're actually chekcing
+            # the types
+            status=mod.live_data["status"],  # type: ignore
+            data=mod.live_data["data"],  # type: ignore
         )
         for mod in attached_modules
     ]
@@ -70,7 +73,7 @@ async def get_modules(
 )
 async def get_module_serial(
     serial: str = Path(..., description="Serial number of the module"),
-    hardware: ThreadManager[TMModules] = Depends(get_hardware),
+    hardware: TMModules = Depends(get_hardware),
 ) -> ModuleSerial:
     res = None
 
@@ -110,7 +113,7 @@ async def get_module_serial(
 async def post_serial_command(
     command: SerialCommand,
     serial: str = Path(..., description="Serial number of the module"),
-    hardware: ThreadManager[TMModules] = Depends(get_hardware),
+    hardware: TMModules = Depends(get_hardware),
 ) -> SerialCommandResponse:
     """Send a command on device identified by serial"""
     attached_modules = hardware.attached_modules
@@ -164,7 +167,7 @@ async def post_serial_command(
 )
 async def post_serial_update(
     serial: str = Path(..., description="Serial number of the module"),
-    hardware: ThreadManager[TMModules] = Depends(get_hardware),
+    hardware: TMModules = Depends(get_hardware),
 ) -> V1BasicResponse:
     """Update module firmware"""
     attached_modules = hardware.attached_modules

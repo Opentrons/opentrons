@@ -51,13 +51,3 @@ __all__ = [
     "ThreadedAsyncForbidden",
     "ThreadManagedHardware",
 ]
-
-
-# TODO: Figure out how to make this unconditional without really screwing
-# up server imports
-try:
-    from .ot3api import OT3API  # noqa: F401
-
-    __all__.append("OT3API")
-except ModuleNotFoundError:
-    pass

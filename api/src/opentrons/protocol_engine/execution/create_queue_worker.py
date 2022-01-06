@@ -1,5 +1,5 @@
 """QueueWorker and dependency factory."""
-from opentrons.hardware_control.api import API as HardwareAPI
+from opentrons.hardware_control import HardwareControlAPI
 
 from ..state import StateStore
 from ..actions import ActionDispatcher
@@ -12,7 +12,7 @@ from .queue_worker import QueueWorker
 
 
 def create_queue_worker(
-    hardware_api: HardwareAPI,
+    hardware_api: HardwareControlAPI,
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
 ) -> QueueWorker:

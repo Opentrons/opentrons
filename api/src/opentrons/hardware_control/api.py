@@ -29,6 +29,7 @@ from opentrons.config.types import RobotConfig
 from .util import use_or_initialize_loop, DeckTransformState, check_motion_bounds
 from .pipette import Pipette, generate_hardware_configs, load_from_config_and_check_skip
 from .controller import Controller
+from .ot3controller import OT3Controller
 from .simulator import Simulator
 from .constants import (
     SHAKE_OFF_TIPS_SPEED,
@@ -84,7 +85,7 @@ class API:
 
     def __init__(
         self,
-        backend: Union[Controller, Simulator],
+        backend: Union[Controller, Simulator, OT3Controller],
         loop: asyncio.AbstractEventLoop,
         config: RobotConfig,
     ) -> None:
