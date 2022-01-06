@@ -23,7 +23,6 @@ from opentrons.hardware_control import (
     types,
     SynchronousAdapter,
     API,
-    HardwareAPILike,
     ThreadManager,
 )
 
@@ -354,7 +353,7 @@ class HardwareManager:
             self._current = hardware
         elif isinstance(hardware, ThreadManager):
             self._current = hardware.sync
-        elif isinstance(hardware, HardwareAPILike):
+        elif isinstance(hardware, (API,)):
             self._current = SynchronousAdapter(hardware)
         else:
             raise TypeError(

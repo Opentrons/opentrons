@@ -30,7 +30,6 @@ from .util import use_or_initialize_loop, DeckTransformState, check_motion_bound
 from .pipette import Pipette, generate_hardware_configs, load_from_config_and_check_skip
 from .controller import Controller
 from .simulator import Simulator
-from .ot3controller import OT3Controller
 from .constants import (
     SHAKE_OFF_TIPS_SPEED,
     SHAKE_OFF_TIPS_DROP_DISTANCE,
@@ -42,7 +41,6 @@ from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
 from .types import (
     Axis,
-    HardwareAPILike,
     CriticalPoint,
     MustHomeError,
     NoTipAttachedError,
@@ -71,7 +69,7 @@ InstrumentsByMount = Dict[top_types.Mount, Optional[Pipette]]
 PipetteHandlingData = Tuple[Pipette, top_types.Mount]
 
 
-class API(HardwareAPILike):
+class API:
     """This API is the primary interface to the hardware controller.
 
     Because the hardware manager controls access to the system's hardware
@@ -86,7 +84,7 @@ class API(HardwareAPILike):
 
     def __init__(
         self,
-        backend: Union[Controller, Simulator, OT3Controller],
+        backend: Union[Controller, Simulator],
         loop: asyncio.AbstractEventLoop,
         config: RobotConfig,
     ) -> None:
@@ -1342,18 +1340,30 @@ class API(HardwareAPILike):
             return top_types.Point(0, 0, 30)
 
     # Gantry/frame (i.e. not pipette) config API
-    def get_config(self) -> RobotConfig:
+    @property
+    def config(self) -> RobotConfig:
         """Get the robot's configuration object.
 
         :returns .RobotConfig: The object.
         """
         return self._config
 
-    def set_config(self, config: RobotConfig):
+    @config.setter
+    def config(self, config: RobotConfig) -> None:
         """Replace the currently-loaded config"""
         self._config = config
 
-    config = property(fget=get_config, fset=set_config)
+    def get_config(self) -> RobotConfig:
+        """
+        Get the robot's configuration object.
+
+        :returns .RobotConfig: The object.
+        """
+        return self.config
+
+    def set_config(self, config: RobotConfig) -> None:
+        """Replace the currently-loaded config"""
+        self.config = config
 
     async def update_config(self, **kwargs):
         """Update values of the robot's configuration.

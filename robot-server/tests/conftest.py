@@ -22,7 +22,7 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons import config
 from opentrons.hardware_control import (
     API,
-    HardwareAPILike,
+    BaseHardwareControl,
     ThreadedAsyncLock,
     ThreadManager,
 )
@@ -74,7 +74,7 @@ def hardware() -> MagicMock:
 
 @pytest.fixture
 def override_hardware(hardware: MagicMock) -> None:
-    async def get_hardware_override() -> HardwareAPILike:
+    async def get_hardware_override() -> BaseHardwareControl:
         """Override for get_hardware dependency"""
         return hardware
 

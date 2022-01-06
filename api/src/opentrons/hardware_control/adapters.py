@@ -4,8 +4,6 @@ import asyncio
 import functools
 from typing import TYPE_CHECKING
 
-from .types import HardwareAPILike
-
 if TYPE_CHECKING:
     from .dev_types import HasLoop
 
@@ -17,7 +15,7 @@ if TYPE_CHECKING:
 # object.__get_attribute__(self,...) to opt out of the overwritten
 # functionality. It is more readable and protected from
 # unintentional recursion.
-class SynchronousAdapter(HardwareAPILike):
+class SynchronousAdapter:
     """A wrapper to make every call into :py:class:`.hardware_control.API`
     synchronous.
 

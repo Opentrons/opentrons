@@ -109,7 +109,7 @@ def should_use_ot3() -> bool:
     return False
 
 
-async def _create_hardware_api() -> HardwareAPI:
+async def _create_hardware_api() -> ThreadManager:
     """Build a HardwareAPI wrapped in a ThreadManager."""
     if os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"):
         log.info("Initialized robot using virtual Smoothie")
@@ -134,10 +134,9 @@ async def _create_hardware_api() -> HardwareAPI:
         log.exception("Could not build hardware controller, forcing virtual")
         thread_manager = ThreadManager(HardwareAPI.build_hardware_simulator)
 
-    return cast(HardwareAPI, thread_manager)
+    return thread_manager
 
-
-async def initialize() -> HardwareAPI:
+async def initialize() -> ThreadManager:
     """
     Initialize the Opentrons hardware returning a hardware instance.
     """

@@ -17,7 +17,6 @@ from .controller import Controller
 from .simulator import Simulator
 from .pipette import Pipette
 from .types import (
-    HardwareAPILike,
     CriticalPoint,
     NoTipAttachedError,
     TipAttachedError,
@@ -28,6 +27,7 @@ from .constants import DROP_TIP_RELEASE_DISTANCE
 from .thread_manager import ThreadManager
 from .execution_manager import ExecutionManager
 from .threaded_async_lock import ThreadedAsyncLock, ThreadedAsyncForbidden
+from .hardware_protocols import BaseHardwareControl
 
 __all__ = [
     "API",
@@ -36,7 +36,7 @@ __all__ = [
     "Pipette",
     "PauseManager",
     "SynchronousAdapter",
-    "HardwareAPILike",
+    "BaseHardwareControl",
     "CriticalPoint",
     "NoTipAttachedError",
     "TipAttachedError",
@@ -48,3 +48,13 @@ __all__ = [
     "ThreadedAsyncLock",
     "ThreadedAsyncForbidden",
 ]
+
+
+# TODO: Figure out how to make this unconditional without really screwing
+# up server imports
+try:
+    from .ot3api import OT3API  # noqa: F401
+
+    __all__.append("OT3API")
+except ModuleNotFoundError:
+    pass
