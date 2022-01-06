@@ -18,22 +18,22 @@ from opentrons_hardware.hardware_control.motion_planning.types import (
 
 
 CONSTRAINTS: SystemConstraints = {
-    Axis.X: AxisConstraints(
+    Axis.X: AxisConstraints.build(
         max_acceleration=10,
         max_speed_discont=15,
         max_direction_change_speed_discont=500,
     ),
-    Axis.Y: AxisConstraints(
+    Axis.Y: AxisConstraints.build(
         max_acceleration=10,
         max_speed_discont=15,
         max_direction_change_speed_discont=500,
     ),
-    Axis.Z: AxisConstraints(
+    Axis.Z: AxisConstraints.build(
         max_acceleration=100,
         max_speed_discont=100,
         max_direction_change_speed_discont=500,
     ),
-    Axis.A: AxisConstraints(
+    Axis.A: AxisConstraints.build(
         max_acceleration=100,
         max_speed_discont=100,
         max_direction_change_speed_discont=500,
@@ -67,10 +67,10 @@ SIMPLE_BACKWARD_MOVE = Move.build(
 def test_convert_targets_to_moves() -> None:
     """It should convert a list of move targets into a list of moves."""
     targets = [
-        MoveTarget(Coordinates(10, 0, 0, 0), 1),
-        MoveTarget(Coordinates(10, 20, 0, 0), 2),
-        MoveTarget(Coordinates(10, 20, 151, 0), 3),
-        MoveTarget(Coordinates(10, 20, 151, 1255), 4),
+        MoveTarget.build(Coordinates(10, 0, 0, 0), 1),
+        MoveTarget.build(Coordinates(10, 20, 0, 0), 2),
+        MoveTarget.build(Coordinates(10, 20, 151, 0), 3),
+        MoveTarget.build(Coordinates(10, 20, 151, 1255), 4),
     ]
 
     expected = [
@@ -151,7 +151,7 @@ def test_initial_speed(
 ) -> None:
     """It should find the correct initial speed of the move."""
     move = Move.build(
-        unit_vector=Coordinates(*unit_vector),
+        unit_vector=unit_vector,
         distance=100,
         max_speed=max_speed,
         blocks=(
@@ -190,7 +190,7 @@ def test_final_speed(
 ) -> None:
     """It should find the correct final speed of the move."""
     move = Move.build(
-        unit_vector=Coordinates(*unit_vector),
+        unit_vector=unit_vector,
         distance=100,
         max_speed=max_speed,
         blocks=(

@@ -3,15 +3,27 @@ import enum
 import dataclasses
 import numpy as np
 import numpy.typing as npt
-from typing import Dict, Iterator, List, NamedTuple, OrderedDict, Tuple, Optional, Union
+from typing import (
+    cast,
+    SupportsFloat,
+    Dict,
+    Iterator,
+    List,
+    NamedTuple,
+    OrderedDict,
+    Tuple,
+    Optional,
+    Union,
+)
 
 
-AcceptableType = Union[int, float, np.float64]
+AcceptableType = Union[SupportsFloat, np.float64]
 
 
 class Axis(enum.Enum):
 
     """Robot axis."""
+
     X = 0
     Y = 1
     Z = 2
@@ -23,26 +35,46 @@ class Axis(enum.Enum):
         return [cls.X, cls.Y, cls.Z, cls.A]
 
 
-class Coordinates(NamedTuple):
+def coordinates(*args: AcceptableType) -> "Coordinates":
+    return Coordinates(*(np.float64(arg) for arg in args))
+
+
+@dataclasses.dataclass
+class Coordinates:
 
     """Coordinates for all axes."""
-    X: float
-    Y: float
-    Z: float
-    A: float
 
-    def to_dict(self) -> OrderedDict[Axis, float]:
+    X: np.float64
+    Y: np.float64
+    Z: np.float64
+    A: np.float64
+
+    def __init__(
+        self, X: AcceptableType, Y: AcceptableType, Z: AcceptableType, A: AcceptableType
+    ):
+        self.X = np.float64(X)
+        self.Y = np.float64(Y)
+        self.Z = np.float64(Z)
+        self.A = np.float64(A)
+
+    def __iter__(self) -> "Coordinates":
+        return self
+
+    def __getitem__(self, key: Axis) -> np.float64:
+        return self.to_dict()[key]
+
+    def to_dict(self) -> OrderedDict[Axis, np.float64]:
         """Return Coordaintes as a dictionary."""
-        return OrderedDict(zip(Axis.get_all_axes(), self))
+        return OrderedDict(zip(Axis.get_all_axes(), self.vectorize()))
 
     @classmethod
-    def from_iter(cls, iter: Iterator[float]) -> "Coordinates":
+    def from_iter(cls, iter: Iterator[AcceptableType]) -> "Coordinates":
         """Create coordinates from an iterator of floats."""
-        return cls(*iter)
+        return cls(*(np.float64(i) for i in iter))
 
-    def vectorize(self) -> npt.NDArray[float]:
+    def vectorize(self) -> npt.NDArray[np.float64]:
         """Represent coordinates as a Numpy array."""
-        return np.array(self)
+        return np.array(dataclasses.astuple(self))
 
 
 @dataclasses.dataclass
@@ -57,7 +89,7 @@ class Block:
         self,
         distance: AcceptableType,
         initial_speed: AcceptableType,
-        acceleration: AcceptableType
+        acceleration: AcceptableType,
     ):
         self.distance = np.float64(distance)
         self.initial_speed = np.float64(initial_speed)
@@ -85,14 +117,35 @@ class Block:
 class Move:
     """A trajectory between two coordinates."""
 
+    unit_vector: Coordinates
     distance: np.float64
     max_speed: np.float64
     blocks: Tuple[Block, Block, Block]
-    unit_vector: Optional[Coordinates]
+
+    def __init__(
+        self,
+        unit_vector: Coordinates,
+        distance: np.float64,
+        max_speed: np.float64,
+        blocks: Tuple[Block, Block, Block],
+    ):
+        # verify unit vector before creating Move
+        if not Move._is_unit_vector(unit_vector):
+            raise ValueError(f"{unit_vector} is not a valid unit vector.")
+        self.unit_vector = unit_vector
+        self.distance = distance
+        self.max_speed = max_speed
+        self.blocks = blocks
+
+    @classmethod
+    def _is_unit_vector(cls, unit_vector: Coordinates) -> bool:
+        magnitude = np.linalg.norm(unit_vector)  # type: ignore[no-untyped-call]
+        return cast(bool, magnitude == np.float64(1.0))
 
     @classmethod
     def build_dummy_move(cls) -> "Move":
         return cls(
+            unit_vector=coordinates(1, 0, 0, 0),
             distance=np.float64(0),
             max_speed=np.float64(0),
             blocks=(
@@ -100,16 +153,21 @@ class Move:
                 Block(distance=0, initial_speed=0, acceleration=0),
                 Block(distance=0, initial_speed=0, acceleration=0),
             ),
-            unit_vector=None,
         )
-    
+
     @classmethod
-    def build(cls, distance, max_speed, blocks, unit_vector) -> "Move":
+    def build(
+        cls,
+        unit_vector: Coordinates,
+        distance: AcceptableType,
+        max_speed: AcceptableType,
+        blocks: Tuple[Block, Block, Block],
+    ) -> "Move":
         return cls(
+            unit_vector=unit_vector,
             distance=np.float64(distance),
             max_speed=np.float64(max_speed),
             blocks=blocks,
-            unit_vector=unit_vector
         )
 
     @property
@@ -140,16 +198,35 @@ class MoveTarget:
     """Target coordinates and extrinsic constraint for the move."""
 
     position: Coordinates
-    max_speed: float
+    max_speed: np.float64
+
+    @classmethod
+    def build(cls, position: Coordinates, max_speed: AcceptableType) -> "MoveTarget":
+        return cls(position=position, max_speed=np.float64(max_speed))
 
 
 @dataclasses.dataclass(frozen=True)
 class AxisConstraints:
     """Axis intrinsic constraints."""
 
-    max_acceleration: float
-    max_speed_discont: float
-    max_direction_change_speed_discont: float
+    max_acceleration: np.float64
+    max_speed_discont: np.float64
+    max_direction_change_speed_discont: np.float64
+
+    @classmethod
+    def build(
+        cls,
+        max_acceleration: AcceptableType,
+        max_speed_discont: AcceptableType,
+        max_direction_change_speed_discont: AcceptableType,
+    ) -> "AxisConstraints":
+        return cls(
+            max_acceleration=np.float64(max_acceleration),
+            max_speed_discont=np.float64(max_speed_discont),
+            max_direction_change_speed_discont=np.float64(
+                max_direction_change_speed_discont
+            ),
+        )
 
 
 SystemConstraints = Dict[Axis, AxisConstraints]

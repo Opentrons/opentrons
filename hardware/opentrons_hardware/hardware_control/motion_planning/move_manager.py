@@ -30,9 +30,7 @@ class MoveManager:
         self._blend_log = []
 
     def _get_initial_moves_from_targets(
-        self,
-        origin: Coordinates,
-        target_list: List[MoveTarget]
+        self, origin: Coordinates, target_list: List[MoveTarget]
     ) -> List[Move]:
         """Create a list of moves from the target list for blending."""
         initial_moves = list(move_utils.targets_to_moves(origin, target_list))
@@ -48,7 +46,7 @@ class MoveManager:
         self,
         origin: Coordinates,
         target_list: List[MoveTarget],
-        iteration_limit: int = 10
+        iteration_limit: int = 10,
     ) -> Tuple[bool, List[List[Move]]]:
         """Create and blend moves from targets."""
         self._clear_blend_log()
