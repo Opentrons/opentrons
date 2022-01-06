@@ -17,7 +17,7 @@ from opentrons.calibration_storage.types import TipLengthCalNotFound
 from opentrons.calibration_storage import helpers
 from opentrons.config import feature_flags as ff
 from opentrons.hardware_control import robot_calibration as robot_cal
-from opentrons.hardware_control import ThreadManager, CriticalPoint
+from opentrons.hardware_control import ThreadManagedHardware, CriticalPoint
 from opentrons.hardware_control.pipette import Pipette
 from opentrons.protocol_api import labware
 from opentrons.protocols.geometry.deck import Deck
@@ -81,7 +81,7 @@ def tuplefy_cal_point_dicts(
 
 
 class DeckCalibrationUserFlow:
-    def __init__(self, hardware: ThreadManager):
+    def __init__(self, hardware: ThreadManagedHardware):
         self._hardware = hardware
         self._hw_pipette, self._mount = self._select_target_pipette()
         self._default_tipracks = self._get_default_tipracks()
@@ -127,7 +127,7 @@ class DeckCalibrationUserFlow:
         return self._deck
 
     @property
-    def hardware(self) -> ThreadManager:
+    def hardware(self) -> ThreadManagedHardware:
         return self._hardware
 
     @property

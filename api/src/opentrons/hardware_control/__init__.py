@@ -29,6 +29,8 @@ from .execution_manager import ExecutionManager
 from .threaded_async_lock import ThreadedAsyncLock, ThreadedAsyncForbidden
 from .protocols import HardwareControlAPI
 
+ThreadManagedHardware = ThreadManager[HardwareControlAPI]
+
 __all__ = [
     "API",
     "Controller",
@@ -47,6 +49,7 @@ __all__ = [
     "ExecutionCancelledError",
     "ThreadedAsyncLock",
     "ThreadedAsyncForbidden",
+    "ThreadManagedHardware",
 ]
 
 

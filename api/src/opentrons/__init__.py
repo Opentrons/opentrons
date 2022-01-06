@@ -9,7 +9,13 @@ from typing import Any, List, Tuple, cast
 
 from opentrons.config.feature_flags import enable_ot3_hardware_controller
 from opentrons.drivers.serial_communication import get_ports_by_name
-from opentrons.hardware_control import API as HardwareAPI, ThreadManager, HardwareControlAPI
+from opentrons.hardware_control import (
+    API as HardwareAPI,
+    ThreadManager,
+    HardwareControlAPI,
+    ThreadManagedHardware,
+)
+
 from opentrons.config import (
     feature_flags as ff,
     name,
@@ -109,12 +115,15 @@ def should_use_ot3() -> bool:
     return False
 
 
-async def _create_hardware_api() -> ThreadManager:
-    """Build a HardwareAPI wrapped in a ThreadManager."""
+async def _create_thread_manager() -> ThreadManagedHardware:
+    """Build the hardware controller wrapped in a ThreadManager.
+
+    .. deprecated:: 4.6
+        ThreadManager is on its way out.
+    """
     if os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"):
         log.info("Initialized robot using virtual Smoothie")
         thread_manager = ThreadManager(HardwareAPI.build_hardware_simulator)
-
     elif should_use_ot3():
         thread_manager = ThreadManager(
             HardwareAPI.build_ot3_controller,
@@ -136,7 +145,7 @@ async def _create_hardware_api() -> ThreadManager:
 
     return thread_manager
 
-async def initialize() -> ThreadManager:
+async def initialize() -> ThreadManagedHardware:
     """
     Initialize the Opentrons hardware returning a hardware instance.
     """

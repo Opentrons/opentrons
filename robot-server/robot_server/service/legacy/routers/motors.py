@@ -2,7 +2,10 @@ from starlette import status
 from fastapi import APIRouter, Depends
 from pydantic import ValidationError
 
+from typing_extensions import Protocol
+
 from opentrons.hardware_control import ThreadManager
+from opentrons.hardware_control.protocols import MotionController, AsyncioConfigurable
 from opentrons.hardware_control.types import Axis
 
 from robot_server.errors import LegacyErrorResponse
@@ -11,6 +14,10 @@ from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.legacy.models import motors as model
 
 router = APIRouter()
+
+
+class TMMotion(AsyncioConfigurable, MotionController, Protocol):
+    ...
 
 
 @router.get(
@@ -22,7 +29,7 @@ router = APIRouter()
     },
 )
 async def get_engaged_motors(
-    hardware: ThreadManager = Depends(get_hardware),
+    hardware: ThreadManager[TMMotion] = Depends(get_hardware),
 ) -> model.EngagedMotors:
     try:
         engaged_axes = hardware.engaged_axes
@@ -43,7 +50,7 @@ async def get_engaged_motors(
     response_model=V1BasicResponse,
 )
 async def post_disengage_motors(
-    axes: model.Axes, hardware: ThreadManager = Depends(get_hardware)
+    axes: model.Axes, hardware: ThreadManager[TMMotion] = Depends(get_hardware)
 ) -> V1BasicResponse:
 
     input_axes = [Axis[ax.upper()] for ax in axes.axes]

@@ -7,7 +7,9 @@ import weakref
 from typing import Any, Awaitable, Callable, Generic, Optional, TypeVar
 from .adapters import SynchronousAdapter
 from .modules.mod_abc import AbstractModule
-from .protocols import HardwareControlAPI
+from .protocols import (
+    AsyncioConfigurable,
+)
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -24,7 +26,7 @@ async def call_coroutine_threadsafe(
     return await wrapped
 
 
-WrappedObj = TypeVar("WrappedObj")
+WrappedObj = TypeVar("WrappedObj", bound=AsyncioConfigurable)
 
 
 class CallBridger(Generic[WrappedObj]):
@@ -71,7 +73,7 @@ class CallBridger(Generic[WrappedObj]):
 # object.__get_attribute__(self,...) to opt out of the overwritten
 # functionality. It is more readable and protected from
 # unintentional recursion.
-class ThreadManager:
+class ThreadManager(Generic[WrappedObj]):
     """A wrapper to make every call into :py:class:`.hardware_control.API`
     execute within the same thread.
 
@@ -97,7 +99,7 @@ class ThreadManager:
 
     def __init__(
         self,
-        builder: Callable[..., Awaitable[HardwareControlAPI]],
+        builder: Callable[..., Awaitable[WrappedObj]],
         *args: Any,
         **kwargs: Any,
     ) -> None:
@@ -107,8 +109,8 @@ class ThreadManager:
         """
 
         self._loop: Optional[asyncio.AbstractEventLoop] = None
-        self.managed_obj: Optional[HardwareControlAPI] = None
-        self.bridged_obj: Optional[CallBridger[Any]] = None
+        self.managed_obj: Optional[WrappedObj] = None
+        self.bridged_obj: Optional[CallBridger[WrappedObj]] = None
         self._sync_managed_obj: Optional[SynchronousAdapter] = None
         is_running = threading.Event()
         self._is_running = is_running
@@ -150,7 +152,9 @@ class ThreadManager:
         if not object.__getattribute__(self, "managed_obj"):
             raise ThreadManagerException("Failed to create Managed Object")
 
-    def _build_and_start_loop(self, builder, *args, **kwargs):
+    def _build_and_start_loop(
+        self, builder: Callable[..., Awaitable[WrappedObj]], *args, **kwargs
+    ):
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         self._loop = loop

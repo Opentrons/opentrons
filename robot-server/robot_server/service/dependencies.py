@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from uuid import uuid4
 from fastapi import Depends
 
-from opentrons.hardware_control import ThreadManager, ThreadedAsyncLock
+from opentrons.hardware_control import ThreadManagedHardware, ThreadedAsyncLock
 
 from robot_server.util import call_once
 from robot_server.hardware import get_hardware
@@ -28,7 +28,7 @@ async def get_protocol_manager() -> ProtocolManager:
 
 @call_once
 async def get_session_manager(
-    hardware: ThreadManager = Depends(get_hardware),
+    hardware: ThreadManagedHardware = Depends(get_hardware),
     motion_lock: ThreadedAsyncLock = Depends(get_motion_lock),
     protocol_manager: ProtocolManager = Depends(get_protocol_manager),
 ) -> SessionManager:

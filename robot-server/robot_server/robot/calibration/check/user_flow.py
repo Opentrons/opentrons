@@ -10,7 +10,7 @@ from opentrons.calibration_storage.types import (
 )
 from opentrons.types import Mount, Point, Location
 from opentrons.hardware_control import (
-    ThreadManager,
+    ThreadManagedHardware,
     CriticalPoint,
     Pipette,
     robot_calibration,
@@ -86,7 +86,7 @@ COMMAND_MAP = Dict[str, COMMAND_HANDLER]
 class CheckCalibrationUserFlow:
     def __init__(
         self,
-        hardware: "ThreadManager",
+        hardware: "ThreadManagedHardware",
         has_calibration_block: bool = False,
         tip_rack_defs: Optional[List[LabwareDefinition]] = None,
     ):
@@ -150,7 +150,7 @@ class CheckCalibrationUserFlow:
         return self._deck
 
     @property
-    def hardware(self) -> ThreadManager:
+    def hardware(self) -> ThreadManagedHardware:
         return self._hardware
 
     @property

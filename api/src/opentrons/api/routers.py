@@ -1,7 +1,11 @@
 from asyncio import AbstractEventLoop
 from typing import Union
 from opentrons.broker import Notifications, Broker
-from opentrons.hardware_control import ThreadManager, ThreadedAsyncLock
+from opentrons.hardware_control import (
+    ThreadManager,
+    ThreadedAsyncLock,
+    HardwareControlAPI,
+)
 from .session import SessionManager, Session
 from .dev_types import Message as SessionMessage
 from .calibration import CalibrationManager, Message as CalibrationMessage
@@ -10,7 +14,7 @@ from .calibration import CalibrationManager, Message as CalibrationMessage
 class MainRouter:
     def __init__(
         self,
-        hardware: ThreadManager,
+        hardware: ThreadManager[HardwareControlAPI],
         loop: AbstractEventLoop = None,
         lock: ThreadedAsyncLock = None,
     ) -> None:

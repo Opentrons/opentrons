@@ -1,10 +1,12 @@
 import typing
+from typing_extensions import Protocol
 import asyncio
 from starlette import status
 from fastapi import Path, APIRouter, Depends
 
 from opentrons.hardware_control import ThreadManager, modules
 from opentrons.hardware_control.modules import AbstractModule
+from opentrons.hardware_control.protocols import ModuleProvider, AsyncioConfigurable
 
 from robot_server.errors import LegacyErrorResponse
 from robot_server.service.dependencies import get_hardware
@@ -21,12 +23,18 @@ from robot_server.service.legacy.models.modules import (
 router = APIRouter()
 
 
+class TMModules(AsyncioConfigurable, ModuleProvider, Protocol):
+    ...
+
+
 @router.get(
     "/modules",
     description="Describe the modules attached to the OT-2",
     response_model=Modules,
 )
-async def get_modules(hardware: ThreadManager = Depends(get_hardware)) -> Modules:
+async def get_modules(
+    hardware: ThreadManager[TMModules] = Depends(get_hardware),
+) -> Modules:
     attached_modules = hardware.attached_modules
     module_data = [
         Module(
@@ -62,7 +70,7 @@ async def get_modules(hardware: ThreadManager = Depends(get_hardware)) -> Module
 )
 async def get_module_serial(
     serial: str = Path(..., description="Serial number of the module"),
-    hardware: ThreadManager = Depends(get_hardware),
+    hardware: ThreadManager[TMModules] = Depends(get_hardware),
 ) -> ModuleSerial:
     res = None
 
@@ -102,7 +110,7 @@ async def get_module_serial(
 async def post_serial_command(
     command: SerialCommand,
     serial: str = Path(..., description="Serial number of the module"),
-    hardware: ThreadManager = Depends(get_hardware),
+    hardware: ThreadManager[TMModules] = Depends(get_hardware),
 ) -> SerialCommandResponse:
     """Send a command on device identified by serial"""
     attached_modules = hardware.attached_modules
@@ -156,7 +164,7 @@ async def post_serial_command(
 )
 async def post_serial_update(
     serial: str = Path(..., description="Serial number of the module"),
-    hardware: ThreadManager = Depends(get_hardware),
+    hardware: ThreadManager[TMModules] = Depends(get_hardware),
 ) -> V1BasicResponse:
     """Update module firmware"""
     attached_modules = hardware.attached_modules

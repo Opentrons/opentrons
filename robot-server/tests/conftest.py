@@ -236,7 +236,7 @@ def set_up_deck_calibration_temp_directory(server_temp_directory: str) -> None:
 
 
 @pytest.fixture
-def session_manager(hardware: ThreadManager) -> SessionManager:
+def session_manager(hardware: ThreadManager[HardwareControlAPI]) -> SessionManager:
     return SessionManager(
         hardware=hardware,
         motion_lock=ThreadedAsyncLock(),

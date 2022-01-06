@@ -3,7 +3,7 @@ from typing import Dict, Awaitable, Callable, Any, Set, List, Optional
 
 from opentrons.types import Mount, Point, Location
 from opentrons.config import feature_flags as ff
-from opentrons.hardware_control import ThreadManager, CriticalPoint, Pipette
+from opentrons.hardware_control import ThreadManagedHardware, CriticalPoint, Pipette
 from opentrons.protocol_api import labware
 from opentrons.protocols.geometry.deck import Deck
 
@@ -42,7 +42,7 @@ COMMAND_MAP = Dict[str, COMMAND_HANDLER]
 class TipCalibrationUserFlow:
     def __init__(
         self,
-        hardware: ThreadManager,
+        hardware: ThreadManagedHardware,
         mount: Mount,
         has_calibration_block: bool,
         tip_rack: LabwareDefinition,
@@ -86,7 +86,7 @@ class TipCalibrationUserFlow:
         self._current_state = to_state
 
     @property
-    def hardware(self) -> ThreadManager:
+    def hardware(self) -> ThreadManagedHardware:
         return self._hardware
 
     @property
