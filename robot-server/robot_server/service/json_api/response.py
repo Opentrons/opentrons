@@ -94,8 +94,8 @@ class PydanticResponse(JSONResponse, Generic[ResponseBodyT]):
         content: ResponseBodyT,
         status_code: int = 200,
     ) -> None:
-        self.content = content
         super().__init__(content, status_code)
+        self.content = content
 
     def render(self, content: ResponseBodyT) -> bytes:
         return content.json().encode(self.charset)
