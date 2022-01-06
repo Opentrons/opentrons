@@ -88,7 +88,9 @@ async def test_create_play_action(
         created_at=datetime(year=2022, month=2, day=2),
     )
 
-    assert result.data == action
+    assert result.content.data == action
+    assert result.status_code == 201
+
     decoy.verify(
         engine_store.runner.play(),
         run_store.upsert(run=next_run),
@@ -244,7 +246,9 @@ async def test_create_pause_action(
         created_at=datetime(year=2022, month=2, day=2),
     )
 
-    assert result.data == action
+    assert result.content.data == action
+    assert result.status_code == 201
+
     decoy.verify(
         engine_store.runner.pause(),
         run_store.upsert(run=next_run),
@@ -294,7 +298,9 @@ async def test_create_stop_action(
         created_at=datetime(year=2022, month=2, day=2),
     )
 
-    assert result.data == action
+    assert result.content.data == action
+    assert result.status_code == 201
+
     decoy.verify(
         task_runner.run(engine_store.runner.stop),
         run_store.upsert(run=next_run),

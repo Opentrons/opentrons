@@ -12,7 +12,7 @@ from opentrons.calibration_storage import (
     delete,
 )
 
-from robot_server.errors import ErrorResponse
+from robot_server.errors import ErrorBody
 from robot_server.service.labware import models as lw_models
 from robot_server.service.errors import RobotServerError, CommonErrorDef
 
@@ -158,7 +158,7 @@ async def get_all_labware_calibrations(
     "/labware/calibrations/{calibrationId}",
     description="Fetch one specific labware offset by ID",
     response_model=lw_models.SingleCalibrationResponse,
-    responses={status.HTTP_404_NOT_FOUND: {"model": ErrorResponse}},
+    responses={status.HTTP_404_NOT_FOUND: {"model": ErrorBody}},
 )
 async def get_specific_labware_calibration(
     calibrationId: str,
@@ -186,7 +186,7 @@ async def get_specific_labware_calibration(
 @router.delete(
     "/labware/calibrations/{calibrationId}",
     description="Delete one specific labware offset by ID",
-    responses={status.HTTP_404_NOT_FOUND: {"model": ErrorResponse}},
+    responses={status.HTTP_404_NOT_FOUND: {"model": ErrorBody}},
 )
 async def delete_specific_labware_calibration(calibrationId: cal_types.CalibrationID):
     try:

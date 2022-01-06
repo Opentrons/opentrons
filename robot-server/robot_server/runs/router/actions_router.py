@@ -8,9 +8,9 @@ from typing_extensions import Literal
 
 from opentrons.protocol_engine.errors import ProtocolEngineStoppedError
 
-from robot_server.errors import ErrorDetails, ErrorResponse
+from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.dependencies import get_current_time, get_unique_id
-from robot_server.service.json_api import RequestModel, SimpleResponse
+from robot_server.service.json_api import RequestModel, SimpleBody, PydanticResponse
 from robot_server.service.task_runner import TaskRunner
 
 from ..run_store import RunStore, RunNotFoundError
@@ -38,11 +38,11 @@ class RunActionNotAllowed(ErrorDetails):
     description="Provide an action in order to control execution of the run.",
     status_code=status.HTTP_201_CREATED,
     responses={
-        status.HTTP_201_CREATED: {"model": SimpleResponse[RunAction]},
+        status.HTTP_201_CREATED: {"model": SimpleBody[RunAction]},
         status.HTTP_409_CONFLICT: {
-            "model": ErrorResponse[Union[RunActionNotAllowed, RunStopped]],
+            "model": ErrorBody[Union[RunActionNotAllowed, RunStopped]],
         },
-        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
     },
 )
 async def create_run_action(
@@ -54,7 +54,7 @@ async def create_run_action(
     action_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
     task_runner: TaskRunner = Depends(TaskRunner),
-) -> SimpleResponse[RunAction]:
+) -> PydanticResponse[SimpleBody[RunAction]]:
     """Create a run control action.
 
     Arguments:
@@ -100,4 +100,7 @@ async def create_run_action(
 
     run_store.upsert(run=next_run)
 
-    return SimpleResponse.construct(data=action)
+    return PydanticResponse(
+        content=SimpleBody.construct(data=action),
+        status_code=status.HTTP_201_CREATED,
+    )

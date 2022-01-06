@@ -12,15 +12,16 @@ from pydantic import BaseModel, Field
 
 from opentrons.protocol_engine import LabwareOffsetCreate
 
-from robot_server.errors import ErrorDetails, ErrorResponse
+from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.service.task_runner import TaskRunner
 from robot_server.service.json_api import (
     RequestModel,
-    SimpleResponse,
-    SimpleEmptyResponse,
-    MultiResponse,
+    SimpleBody,
+    SimpleEmptyBody,
+    MultiBody,
     ResourceLink,
+    PydanticResponse,
 )
 
 from robot_server.protocols import (
@@ -93,9 +94,9 @@ class AllRunsLinks(BaseModel):
     description="Create a new run to track robot interaction.",
     status_code=status.HTTP_201_CREATED,
     responses={
-        status.HTTP_201_CREATED: {"model": SimpleResponse[Run]},
-        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[ProtocolNotFound]},
-        status.HTTP_409_CONFLICT: {"model": ErrorResponse[RunAlreadyActive]},
+        status.HTTP_201_CREATED: {"model": SimpleBody[Run]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[ProtocolNotFound]},
+        status.HTTP_409_CONFLICT: {"model": ErrorBody[RunAlreadyActive]},
     },
 )
 async def create_run(
@@ -106,7 +107,7 @@ async def create_run(
     run_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
     task_runner: TaskRunner = Depends(TaskRunner),
-) -> SimpleResponse[Run]:
+) -> PydanticResponse[SimpleBody[Run]]:
     """Create a new run.
 
     Arguments:
@@ -173,22 +174,24 @@ async def create_run(
         status=engine_state.commands.get_status(),
     )
 
-    return SimpleResponse.construct(data=data)
+    return PydanticResponse(
+        content=SimpleBody.construct(data=data),
+        status_code=status.HTTP_201_CREATED,
+    )
 
 
 @base_router.get(
     path="/runs",
     summary="Get all runs",
     description="Get a list of all active and inactive runs.",
-    status_code=status.HTTP_200_OK,
     responses={
-        status.HTTP_200_OK: {"model": MultiResponse[Run, AllRunsLinks]},
+        status.HTTP_200_OK: {"model": MultiBody[Run, AllRunsLinks]},
     },
 )
 async def get_runs(
     run_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
-) -> MultiResponse[Run, AllRunsLinks]:
+) -> PydanticResponse[MultiBody[Run, AllRunsLinks]]:
     """Get all runs.
 
     Args:
@@ -228,24 +231,26 @@ async def get_runs(
         if run.is_current:
             links.current = ResourceLink.construct(href=f"/runs/{run.run_id}")
 
-    return MultiResponse.construct(data=data, links=links)
+    return PydanticResponse(
+        content=MultiBody.construct(data=data, links=links),
+        status_code=status.HTTP_200_OK,
+    )
 
 
 @base_router.get(
     path="/runs/{runId}",
     summary="Get a run",
     description="Get a specific run by its unique identifier.",
-    status_code=status.HTTP_200_OK,
     responses={
-        status.HTTP_200_OK: {"model": SimpleResponse[Run]},
-        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
+        status.HTTP_200_OK: {"model": SimpleBody[Run]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
     },
 )
 async def get_run(
     runId: str,
     run_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
-) -> SimpleResponse[Run]:
+) -> PydanticResponse[SimpleBody[Run]]:
     """Get a run by its ID.
 
     Args:
@@ -282,24 +287,26 @@ async def get_run(
         status=engine_state.commands.get_status(),
     )
 
-    return SimpleResponse.construct(data=data)
+    return PydanticResponse(
+        content=SimpleBody.construct(data=data),
+        status_code=status.HTTP_200_OK,
+    )
 
 
 @base_router.delete(
     path="/runs/{runId}",
     summary="Delete a run",
     description="Delete a specific run by its unique identifier.",
-    status_code=status.HTTP_200_OK,
     responses={
-        status.HTTP_200_OK: {"model": SimpleEmptyResponse},
-        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
+        status.HTTP_200_OK: {"model": SimpleEmptyBody},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
     },
 )
 async def remove_run(
     runId: str,
     run_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
-) -> SimpleEmptyResponse:
+) -> PydanticResponse[SimpleEmptyBody]:
     """Delete a run by its ID.
 
     Arguments:
@@ -317,7 +324,10 @@ async def remove_run(
     except RunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
-    return SimpleEmptyResponse()
+    return PydanticResponse(
+        content=SimpleEmptyBody(),
+        status_code=status.HTTP_200_OK,
+    )
 
 
 @base_router.post(
@@ -332,11 +342,9 @@ async def remove_run(
     ),
     status_code=status.HTTP_201_CREATED,
     responses={
-        status.HTTP_201_CREATED: {"model": SimpleResponse[Run]},
-        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
-        status.HTTP_409_CONFLICT: {
-            "model": ErrorResponse[Union[RunStopped, RunNotIdle]]
-        },
+        status.HTTP_201_CREATED: {"model": SimpleBody[Run]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
+        status.HTTP_409_CONFLICT: {"model": ErrorBody[Union[RunStopped, RunNotIdle]]},
     },
 )
 async def add_labware_offset(
@@ -344,7 +352,7 @@ async def add_labware_offset(
     request_body: RequestModel[LabwareOffsetCreate],
     run_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
-) -> SimpleResponse[Run]:
+) -> PydanticResponse[SimpleBody[Run]]:
     """Add a labware offset to a run.
 
     Args:
@@ -389,20 +397,20 @@ async def add_labware_offset(
         status=engine_state.commands.get_status(),
     )
 
-    return SimpleResponse.construct(data=data)
+    return PydanticResponse(
+        content=SimpleBody.construct(data=data),
+        status_code=status.HTTP_201_CREATED,
+    )
 
 
 @base_router.patch(
     path="/runs/{runId}",
     summary="Update a run",
     description="Update a specific run, returning the updated resource.",
-    status_code=status.HTTP_200_OK,
     responses={
-        status.HTTP_200_OK: {"model": SimpleResponse[Run]},
-        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[RunNotFound]},
-        status.HTTP_409_CONFLICT: {
-            "model": ErrorResponse[Union[RunStopped, RunNotIdle]]
-        },
+        status.HTTP_200_OK: {"model": SimpleBody[Run]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
+        status.HTTP_409_CONFLICT: {"model": ErrorBody[Union[RunStopped, RunNotIdle]]},
     },
 )
 async def update_run(
@@ -411,7 +419,7 @@ async def update_run(
     run_view: RunView = Depends(RunView),
     run_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
-) -> SimpleResponse[Run]:
+) -> PydanticResponse[SimpleBody[Run]]:
     """Update a run by its ID.
 
     Args:
@@ -467,4 +475,7 @@ async def update_run(
         status=engine_state.commands.get_status(),
     )
 
-    return SimpleResponse.construct(data=data)
+    return PydanticResponse(
+        content=SimpleBody.construct(data=data),
+        status_code=status.HTTP_200_OK,
+    )

@@ -40,7 +40,7 @@ from robot_server.service.session.models.common import EmptyModel, JogPosition
 from robot_server.service.json_api import (
     DeprecatedResponseModel,
     RequestModel,
-    ResponseDataModel,
+    DeprecatedResponseDataModel,
 )
 
 
@@ -100,7 +100,7 @@ class SessionCommandRequest(
 
 
 class SessionCommandResponse(
-    ResponseDataModel,
+    DeprecatedResponseDataModel,
     GenericModel,
     typing.Generic[CommandT, RequestDataT, ResponseDataT],
 ):
