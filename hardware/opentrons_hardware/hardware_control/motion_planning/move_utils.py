@@ -346,7 +346,7 @@ def blended(constraints: SystemConstraints, first: Move, second: Move) -> bool:
             if final_speed <= constraints[axis].max_speed_discont:
                 return cast(bool, initial_speed <= constraints[axis].max_speed_discont)
             else:
-                return cast(bool, initial_speed == final_speed)
+                return cast(bool, abs(initial_speed - final_speed) < FLOAT_THRESHOLD)
         else:
             # if they're in different directions, then the junction has to be at or
             # under the speed change discontinuity

@@ -117,6 +117,9 @@ class Move:
     distance: np.float64
     max_speed: np.float64
     blocks: Tuple[Block, Block, Block]
+    initial_speed: np.float64 = dataclasses.field(init=False)
+    final_speed: np.float64 = dataclasses.field(init=False)
+    nonzero_blocks: int = dataclasses.field(init=False)
 
     def __init__(
         self,
@@ -133,13 +136,36 @@ class Move:
         self.distance = distance
         self.max_speed = max_speed
         self.blocks = blocks
+        self.__post_init__()
+
+    def __post_init__(self) -> None:
+        """Initialize field values in post-init processing."""
+
+        def _initial_speed() -> np.float64:
+            """Get initial speed of the move."""
+            for block in self.blocks:
+                if block.distance == 0:
+                    continue
+                return block.initial_speed
+            return np.float64(0.0)
+
+        def _final_speed() -> np.float64:
+            """Get final speed of the move."""
+            for block in reversed(self.blocks):
+                if block.distance == 0:
+                    continue
+            return block.final_speed
+
+        self.initial_speed = _initial_speed()
+        self.final_speed = _final_speed()
+        self.nonzero_blocks = len([b for b in self.blocks if b.time])
 
     @classmethod
     def _is_unit_vector(cls, unit_vector: Coordinates) -> bool:
         """Verify unit vector."""
-        magnitude = np.linalg.norm(
+        magnitude = np.linalg.norm(  # type: ignore[no-untyped-call]
             unit_vector.vectorize()
-        )  # type: ignore[no-untyped-call]
+        )
         return cast(bool, magnitude == np.float64(1.0))
 
     @classmethod
@@ -171,28 +197,6 @@ class Move:
             max_speed=np.float64(max_speed),
             blocks=blocks,
         )
-
-    @property
-    def initial_speed(self) -> np.float64:
-        """Get initial speed of the move."""
-        for block in self.blocks:
-            if block.distance == 0:
-                continue
-            return block.initial_speed
-        return np.float64(0.0)
-
-    @property
-    def final_speed(self) -> np.float64:
-        """Get final speed of the move."""
-        for block in reversed(self.blocks):
-            if block.distance == 0:
-                continue
-        return block.final_speed
-
-    @property
-    def nonzero_blocks(self) -> int:
-        """Get the number of non-zero blocks."""
-        return len([b for b in self.blocks if b.time])
 
 
 @dataclasses.dataclass(frozen=True)
