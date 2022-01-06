@@ -78,24 +78,26 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
   const isAnticipatedCommand = !Boolean(
     robotCommands?.some(command => command.id === commandOrSummary.id)
   )
-  const { data: commandDetails } = useCommandQuery(
+  const { data: commandDetails, refetch } = useCommandQuery(
     currentRunId,
     commandOrSummary.id,
     {
       enabled:
-        (!isAnticipatedCommand && runStatus === 'running') ||
-        runStatus === 'paused' ||
-        runStatus === 'pause-requested',
+        !isAnticipatedCommand && runStatus !== 'idle',
       staleTime,
     }
   )
+
   React.useEffect(() => {
     if (
-      commandOrSummary.status &&
-      commandIsComplete(commandOrSummary.status) &&
+      commandDetails?.data.status &&
+      commandIsComplete(commandDetails?.data.status) &&
       commandDetails?.data.completedAt != null
     ) {
       setStaleTime(Infinity)
+    }
+    if( commandDetails?.data.startedAt != null &&  commandDetails?.data.completedAt == null){
+      refetch()
     }
   }, [commandOrSummary.status, commandDetails?.data.completedAt])
   const commandStatus =
