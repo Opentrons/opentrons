@@ -139,7 +139,7 @@ class Move:
 
     @classmethod
     def _is_unit_vector(cls, unit_vector: Coordinates) -> bool:
-        magnitude = np.linalg.norm(unit_vector)  # type: ignore[no-untyped-call]
+        magnitude = np.linalg.norm(unit_vector.vectorize())  # type: ignore[no-untyped-call]
         return cast(bool, magnitude == np.float64(1.0))
 
     @classmethod

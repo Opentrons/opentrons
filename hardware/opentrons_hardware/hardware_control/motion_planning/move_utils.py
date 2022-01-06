@@ -51,8 +51,8 @@ def targets_to_moves(initial: Coordinates, targets: List[MoveTarget]) -> Iterato
 
 def initial_speed_limit_from_axis(
     axis_constraints: AxisConstraints,
-    prev_component: np.float64,
     axis_component: np.float64,
+    prev_component: np.float64,
     prev_final_speed: np.float64,
 ) -> np.float64:
     """Compute the initial move speed limit for an axis."""
@@ -93,7 +93,6 @@ def find_initial_speed(
     """Get a move's initial speed."""
     # Figure out how fast we can be going when we start
     initial_speed: np.float64 = move.max_speed
-    assert move.unit_vector, "Cannot find initial speed for dummy moves"
 
     for axis in Axis.get_all_axes():
 
@@ -101,7 +100,9 @@ def find_initial_speed(
         axis_component = move.unit_vector[axis]
         axis_constraints = constraints[axis]
         prev_component = (
-            prev_move.unit_vector[axis] if prev_move.distance else np.float64(0)
+            prev_move.unit_vector[axis]
+            if prev_move.distance > FLOAT_THRESHOLD
+            else np.float64(0)
         )
         prev_final_speed = prev_move.final_speed
 
@@ -165,14 +166,15 @@ def find_final_speed(
     # Figure out how fast we can be going when we stop
     final_speed: np.float64 = move.max_speed
     log = logging.getLogger("find_final_speed")
-    assert move.unit_vector, "Cannot find final speed for dummy moves"
 
     for axis in Axis.get_all_axes():
         log.debug(f"Find final speed for {axis}")
         axis_component = move.unit_vector[axis]
         axis_constraints = constraints[axis]
         next_component = (
-            next_move.unit_vector[axis] if next_move.distance else np.float64(0)
+            next_move.unit_vector[axis]
+            if next_move.distance > FLOAT_THRESHOLD
+            else np.float64(0)
         )
         next_initial_speed = next_move.initial_speed
 

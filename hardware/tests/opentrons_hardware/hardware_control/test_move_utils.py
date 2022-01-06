@@ -1,5 +1,6 @@
 """Tests for move util functions."""
 import pytest
+from typing import Iterator
 
 from opentrons_hardware.hardware_control.motion_planning.move_utils import (
     find_initial_speed,
@@ -13,6 +14,7 @@ from opentrons_hardware.hardware_control.motion_planning.types import (
     Coordinates,
     Move,
     MoveTarget,
+    AcceptableType,
     SystemConstraints,
 )
 
@@ -62,6 +64,8 @@ SIMPLE_BACKWARD_MOVE = Move.build(
         Block(distance=10, initial_speed=1, acceleration=0),
     ),
 )
+
+DUMMY_MOVE = Move.build_dummy_move()
 
 
 def test_convert_targets_to_moves() -> None:
@@ -124,8 +128,8 @@ def test_convert_targets_to_moves() -> None:
     argvalues=[
         # previous move is not moving, use the smaller of move max speed and axis max
         # speed discontinuity
-        [None, [1, 0, 0, 0], 5, 5],
-        [None, [1, 0, 0, 0], 200, CONSTRAINTS[Axis.X].max_speed_discont],
+        [DUMMY_MOVE, [1, 0, 0, 0], 5, 5],
+        [DUMMY_MOVE, [1, 0, 0, 0], 200, CONSTRAINTS[Axis.X].max_speed_discont],
         # previous move is moving in same direction as current move, use the smaller
         # of move max speed and axis max speed discontinuity
         [SIMPLE_FORWARD_MOVE, [1, 0, 0, 0], 5, 5],
@@ -147,11 +151,14 @@ def test_convert_targets_to_moves() -> None:
     ],
 )
 def test_initial_speed(
-    origin: Move, unit_vector: Coordinates, max_speed: float, expected: float
+    origin: Move,
+    unit_vector: Iterator[AcceptableType],
+    max_speed: float,
+    expected: float,
 ) -> None:
     """It should find the correct initial speed of the move."""
     move = Move.build(
-        unit_vector=unit_vector,
+        unit_vector=Coordinates.from_iter(unit_vector),
         distance=100,
         max_speed=max_speed,
         blocks=(
@@ -168,8 +175,8 @@ def test_initial_speed(
     argvalues=[
         # next move is not moving, use the smaller of move max speed and axis max
         # speed discontinuity
-        [None, [1, 0, 0, 0], 5, 5],
-        [None, [1, 0, 0, 0], 200, CONSTRAINTS[Axis.X].max_speed_discont],
+        [DUMMY_MOVE, [1, 0, 0, 0], 5, 5],
+        [DUMMY_MOVE, [1, 0, 0, 0], 200, CONSTRAINTS[Axis.X].max_speed_discont],
         # next move is moving in same direction as current move, use the smaller
         # of move max speed and axis max speed discontinuity
         [SIMPLE_FORWARD_MOVE, [1, 0, 0, 0], 5, 5],
@@ -186,11 +193,14 @@ def test_initial_speed(
     ],
 )
 def test_final_speed(
-    next_move: Move, unit_vector: Coordinates, max_speed: float, expected: float
+    next_move: Move,
+    unit_vector: Iterator[AcceptableType],
+    max_speed: float,
+    expected: float,
 ) -> None:
     """It should find the correct final speed of the move."""
     move = Move.build(
-        unit_vector=unit_vector,
+        unit_vector=Coordinates.from_iter(unit_vector),
         distance=100,
         max_speed=max_speed,
         blocks=(
