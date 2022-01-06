@@ -39,7 +39,6 @@ export function CommandText(props: Props): JSX.Element | null {
   // params will not exist on command summaries
   switch (displayCommand.commandType) {
     case 'delay': {
-      // TODO: IMMEDIATELY address displaying real comments
       messageNode = (
         <>
           <Flex
