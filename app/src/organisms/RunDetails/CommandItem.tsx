@@ -82,8 +82,7 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
     currentRunId,
     commandOrSummary.id,
     {
-      enabled:
-        !isAnticipatedCommand && runStatus !== 'idle',
+      enabled: !isAnticipatedCommand && runStatus !== 'idle',
       staleTime,
     }
   )
@@ -96,7 +95,10 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
     ) {
       setStaleTime(Infinity)
     }
-    if( commandDetails?.data.startedAt != null &&  commandDetails?.data.completedAt == null){
+    if (
+      commandDetails?.data.startedAt != null &&
+      commandDetails?.data.completedAt == null
+    ) {
       refetch()
     }
   }, [commandOrSummary.status, commandDetails?.data.completedAt])
