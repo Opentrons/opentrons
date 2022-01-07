@@ -24,7 +24,7 @@ from opentrons.hardware_control import (
     API,
     HardwareControlAPI,
     ThreadedAsyncLock,
-    ThreadManager,
+    ThreadManagedHardware,
 )
 from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
 from opentrons.calibration_storage import delete, modify, helpers
@@ -236,7 +236,7 @@ def set_up_deck_calibration_temp_directory(server_temp_directory: str) -> None:
 
 
 @pytest.fixture
-def session_manager(hardware: ThreadManager[HardwareControlAPI]) -> SessionManager:
+def session_manager(hardware: ThreadManagedHardware) -> SessionManager:
     return SessionManager(
         hardware=hardware,
         motion_lock=ThreadedAsyncLock(),

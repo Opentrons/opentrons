@@ -480,7 +480,9 @@ class PipetteOffsetCalibrationUserFlow:
             new_tip_length = self._get_stored_tip_length_cal()
             self._has_calibrated_tip_length = new_tip_length is not None
             # load the new tip length for the rest of the session
-            self._hw_pipette.current_tip_length = new_tip_length or 0.0
+            self._hw_pipette.current_tip_length = (
+                new_tip_length  # type: ignore[assignment]
+            )
             await self.hardware.retract(self._mount, 20)
 
     async def move_to_reference_point(self):
