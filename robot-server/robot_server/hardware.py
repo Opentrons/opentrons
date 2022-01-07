@@ -9,8 +9,8 @@ from typing_extensions import Literal
 from opentrons import initialize as initialize_api, should_use_ot3
 from opentrons.config import IS_ROBOT, ARCHITECTURE, SystemArchitecture
 from opentrons.util.helpers import utc_now
-from opentrons.hardware_control import API as HardwareAPI
-from opentrons.hardware_control.simulator_setup import load_simulator
+from opentrons.hardware_control import ThreadManagedHardware, HardwareControlAPI
+from opentrons.hardware_control.simulator_setup import load_simulator_thread_manager
 from opentrons.hardware_control.types import HardwareEvent, DoorStateNotification
 
 from notify_server.clients import publisher
@@ -25,7 +25,7 @@ from .settings import get_settings
 
 log = logging.getLogger(__name__)
 
-_hw_api = AppStateValue[HardwareAPI]("hardware_api")
+_hw_api = AppStateValue[ThreadManagedHardware]("hardware_api")
 _init_task = AppStateValue["asyncio.Task[None]"]("hardware_init_task")
 _event_unsubscribe = AppStateValue[Callable[[], None]]("hardware_event_unsubscribe")
 
@@ -75,15 +75,17 @@ async def cleanup_hardware(app_state: AppState) -> None:
         hardware_api.clean_up()
 
 
-async def get_hardware(app_state: AppState = Depends(get_app_state)) -> HardwareAPI:
-    """Get the HardwareAPI as a route dependency.
+async def get_thread_manager(
+    app_state: AppState = Depends(get_app_state),
+) -> ThreadManagedHardware:
+    """Get the ThreadManager'd HardwareAPI as a route dependency.
 
     Arguments:
         app_state: Global app state from `app.state`, provided by
             FastAPI's dependency injection system via `fastapi.Depends`
 
     Returns:
-        The initialized HardwareAPI.
+        The initialized ThreadManager containing a HardwareAPI
 
     Raises:
         ApiError: The Hardware API is still initializing or failed to initialize.
@@ -106,6 +108,27 @@ async def get_hardware(app_state: AppState = Depends(get_app_state)) -> Hardware
         ) from exc
 
     return hardware_api
+
+
+async def get_hardware(
+    thread_manager: ThreadManagedHardware = Depends(get_thread_manager),
+) -> HardwareControlAPI:
+    """Get the HardwareAPI as a route dependency.
+
+    Arguments:
+        thread_manager: The global thread manager singleton, provided by
+            FastAPI's dependency injection system via `fastapi.Depends`
+
+    Returns:
+        The same object, but this time properly typed as a hardware controller.
+        It is still a ThreadManager and provides the same guarantees that
+        everything will be run in another thread, but will be checked by mypy
+        as if it was the hardware controller.
+
+    Raises:
+        ApiError: The Hardware API is still initializing or failed to initialize.
+    """
+    return thread_manager.wrapped()
 
 
 async def _initialize_hardware_api(app_state: AppState) -> None:
@@ -143,7 +166,9 @@ async def _initialize_hardware_api(app_state: AppState) -> None:
         if simulator_config:
             simulator_config_path = Path(simulator_config)
             log.info(f"Loading simulator from {simulator_config_path}")
-            hardware_api = await load_simulator(path=simulator_config_path)
+            hardware_api = await load_simulator_thread_manager(
+                path=simulator_config_path
+            )
 
         else:
             hardware_api = await initialize_api()
@@ -173,7 +198,10 @@ async def _initialize_hardware_api(app_state: AppState) -> None:
 # TODO(mc, 2021-09-01): if we're ever going to actually use the notification
 # server, this logic needs to be in its own unit and not tucked away here in
 # test-less wrapper module
-def _initialize_event_watchers(app_state: AppState, hardware_api: HardwareAPI) -> None:
+def _initialize_event_watchers(
+    app_state: AppState,
+    hardware_api: ThreadManagedHardware,
+) -> None:
     """Initialize notification publishing for hardware events."""
     notify_server_settings = NotifyServerSettings()
     hw_event_publisher = publisher.create(

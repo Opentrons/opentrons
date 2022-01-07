@@ -1,6 +1,8 @@
 """Class that schedules motion on can bus."""
 import asyncio
 import logging
+
+from opentrons_ot3_firmware import ArbitrationId
 from opentrons_ot3_firmware.constants import NodeId
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
@@ -105,12 +107,14 @@ class MoveScheduler(MessageListener):
 
         self._event = asyncio.Event()
 
-    def on_message(self, message: MessageDefinition) -> None:
+    def on_message(
+        self, message: MessageDefinition, arbitration_id: ArbitrationId
+    ) -> None:
         """Incoming message handler."""
         if isinstance(message, MoveCompleted):
             seq_id = message.payload.seq_id.value
-            node_id = message.payload.node_id.value
             group_id = message.payload.group_id.value
+            node_id = arbitration_id.parts.originating_node_id
             self._moves[group_id].remove((node_id, seq_id))
             if not self._moves[group_id]:
                 log.info(f"Move group {group_id} has completed.")

@@ -1,9 +1,8 @@
 """ProtocolEngine class definition."""
 from typing import Optional
 
-from opentrons.hardware_control import API as HardwareAPI
-
 from opentrons.protocols.models import LabwareDefinition
+from opentrons.hardware_control import HardwareControlAPI
 
 from .resources import ModelUtils
 from .commands import (
@@ -39,7 +38,7 @@ class ProtocolEngine:
 
     def __init__(
         self,
-        hardware_api: HardwareAPI,
+        hardware_api: HardwareControlAPI,
         state_store: StateStore,
         action_dispatcher: Optional[ActionDispatcher] = None,
         plugin_starter: Optional[PluginStarter] = None,

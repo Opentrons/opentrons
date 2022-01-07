@@ -4,7 +4,7 @@ from decoy import Decoy
 from typing import Tuple
 
 from opentrons.types import Mount
-from opentrons.hardware_control.api import API as HardwareAPI
+from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
 
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset

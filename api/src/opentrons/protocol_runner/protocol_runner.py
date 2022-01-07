@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from typing import List, Optional
 
-from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_reader import (
     ProtocolSource,
     PythonProtocolConfig,
@@ -58,7 +58,7 @@ class ProtocolRunner:
     def __init__(
         self,
         protocol_engine: ProtocolEngine,
-        hardware_api: HardwareAPI,
+        hardware_api: HardwareControlAPI,
         task_queue: Optional[TaskQueue] = None,
         json_file_reader: Optional[JsonFileReader] = None,
         json_command_translator: Optional[JsonCommandTranslator] = None,

@@ -16,6 +16,7 @@
   "status_pause-requested": "Pause requested",
   "status_paused": "Paused",
   "status_idle": "Not started",
+  "status_finishing": "Finishing",
   "status_running": "Running",
   "status_stop-requested": "Stop requested",
   "status_stopped": "Canceled",

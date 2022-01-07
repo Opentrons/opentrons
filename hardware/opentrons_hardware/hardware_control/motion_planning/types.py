@@ -1,8 +1,7 @@
 """Motion planning types."""
 import enum
 import dataclasses
-import numpy as np
-import numpy.typing as npt
+import numpy as np  # type: ignore[import]
 from typing import (
     cast,
     SupportsFloat,
@@ -60,14 +59,15 @@ class Coordinates:
 
     def to_dict(self) -> OrderedDict[Axis, np.float64]:
         """Return Coordaintes as a dictionary."""
-        return OrderedDict(zip(Axis.get_all_axes(), self.vectorize()))
+        vectorized = self.vectorize()
+        return OrderedDict(zip(Axis.get_all_axes(), vectorized))
 
     @classmethod
     def from_iter(cls, iter: Iterator[AcceptableType]) -> "Coordinates":
         """Create coordinates from an iterator of floats."""
         return cls(*(np.float64(i) for i in iter))
 
-    def vectorize(self) -> npt.NDArray[np.float64]:
+    def vectorize(self) -> np.ndarray:
         """Represent coordinates as a Numpy array."""
         return np.array(dataclasses.astuple(self))
 
@@ -94,9 +94,7 @@ class Block:
     @property
     def final_speed(self) -> np.float64:
         """Get final speed of the block."""
-        return np.sqrt(  # type: ignore[no-any-return]
-            self.initial_speed ** 2 + self.acceleration * self.distance * 2
-        )
+        return np.sqrt(self.initial_speed ** 2 + self.acceleration * self.distance * 2)
 
     @property
     def time(self) -> np.float64:
@@ -163,9 +161,8 @@ class Move:
     @classmethod
     def _is_unit_vector(cls, unit_vector: Coordinates) -> bool:
         """Verify unit vector."""
-        magnitude = np.linalg.norm(  # type: ignore[no-untyped-call]
-            unit_vector.vectorize()
-        )
+        vectorized = unit_vector.vectorize()
+        magnitude = np.linalg.norm(vectorized)
         return cast(bool, magnitude == np.float64(1.0))
 
     @classmethod

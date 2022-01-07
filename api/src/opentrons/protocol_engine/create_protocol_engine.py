@@ -1,5 +1,5 @@
 """Main ProtocolEngine factory."""
-from opentrons.hardware_control.api import API as HardwareAPI
+from opentrons.hardware_control import HardwareControlAPI
 
 from .protocol_engine import ProtocolEngine
 from .resources import DeckDataProvider
@@ -7,7 +7,7 @@ from .state import StateStore, EngineConfigs
 
 
 async def create_protocol_engine(
-    hardware_api: HardwareAPI,
+    hardware_api: HardwareControlAPI,
     configs: EngineConfigs = EngineConfigs(),
 ) -> ProtocolEngine:
     """Create a ProtocolEngine instance.

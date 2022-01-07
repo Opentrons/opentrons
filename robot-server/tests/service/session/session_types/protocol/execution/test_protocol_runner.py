@@ -1,6 +1,6 @@
 import pytest
 from pathlib import Path
-from mock import MagicMock, patch, PropertyMock
+from mock import MagicMock, patch, PropertyMock, ANY
 from typing import List
 
 from opentrons.api import Session
@@ -68,7 +68,7 @@ def test_load(protocol_runner, mock_context, uploaded_protocol_meta, mock_protoc
         mock.assert_called_once_with(
             name=uploaded_protocol_meta.contents.protocol_file.path.name,
             contents=mock_protocol.get_contents(),
-            hardware=protocol_runner._hardware.sync,
+            hardware=ANY,
             loop=protocol_runner._loop,
             broker=protocol_runner._broker,
             motion_lock=protocol_runner._motion_lock,

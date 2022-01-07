@@ -1,12 +1,8 @@
 """In-memory storage of ProtocolEngine instances."""
 from typing import Dict, NamedTuple, Optional
 
-from opentrons.hardware_control import API as HardwareAPI
-from opentrons.protocol_engine import (
-    ProtocolEngine,
-    StateView,
-    create_protocol_engine,
-)
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.protocol_engine import ProtocolEngine, StateView, create_protocol_engine
 from opentrons.protocol_runner import ProtocolRunner
 
 
@@ -36,7 +32,7 @@ class RunnerEnginePair(NamedTuple):
 class EngineStore:
     """Factory and in-memory storage for ProtocolEngine."""
 
-    def __init__(self, hardware_api: HardwareAPI) -> None:
+    def __init__(self, hardware_api: HardwareControlAPI) -> None:
         """Initialize an engine storage interface.
 
         Arguments:
