@@ -12,7 +12,7 @@ import {
   FONT_STYLE_ITALIC,
   FONT_SIZE_BODY_1,
   FONT_SIZE_CAPTION,
-  COLOR_ERROR,
+  COLOR_WARNING,
   COLOR_SUCCESS,
   ALIGN_CENTER,
   JUSTIFY_CENTER,
@@ -64,7 +64,7 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
           <Icon
             name={isAttached ? 'check-circle' : 'alert-circle'}
-            color={isAttached ? COLOR_SUCCESS : COLOR_ERROR}
+            color={isAttached ? COLOR_SUCCESS : COLOR_WARNING}
             key="icon"
             size="10px"
             marginRight={SPACING_1}

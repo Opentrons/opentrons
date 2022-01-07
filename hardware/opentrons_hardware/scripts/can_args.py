@@ -33,6 +33,13 @@ def add_can_args(parser: ArgumentParser) -> ArgumentParser:
         required=False,
         help="port to use for opentrons interface",
     )
+    parser.add_argument(
+        "--host",
+        type=str,
+        default="localhost",
+        required=False,
+        help="host to connect to for opentrons interface",
+    )
     return parser
 
 
@@ -46,7 +53,7 @@ async def build_driver(args: Namespace) -> AbstractCanDriver:
         A driver.
     """
     if args.interface == "opentrons":
-        return await SocketDriver.build(port=args.port)
+        return await SocketDriver.build(port=args.port, host=args.host)
     else:
         return await CanDriver.build(
             interface=args.interface, bitrate=args.bitrate, channel=args.channel

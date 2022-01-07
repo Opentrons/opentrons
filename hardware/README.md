@@ -14,29 +14,29 @@ your network.
 
 The `opentrons-hardware` package includes some utility scripts.
 
-### Header Generator
+### Simulated CAN bus
 
-This will generate a C++ header file defining constants shared between firmware and the `opentrons-hardware` package.
+Runs a simulated CAN network using a socket server. This supports the `opentrons` interface.
 
 #### Usage
 
 ```
-opentrons_generate_header --target TARGET
+opentrons_sim_can_bus [-h] [--port PORT]
 ```
 
-Example: `opentrons_generate_header --target some_file.h`
+Example: `opentrons_sim_can_bus --port 12345`
 
 ### CAN Communication
 
 This is a tool for sending messages to firmware (or simulator) over CAN bus. The CAN bus can either be a [python-can](https://python-can.readthedocs.io/en/master/interfaces.html) defined interface or `opentrons`.
 
-**SocketCan's vcan (virtual can network) only works on Linux.** Firmware simulations on non-Linux computers require `opentrons` as it uses a plain old socket CAN network simulation.
+**SocketCan's vcan (virtual can network) only works on Linux.** Firmware simulations on non-Linux computers require `opentrons` as it uses a plain old socket CAN network simulation. [Simulated CAN bus](#simulated-can-bus) must be started to use the `opentrons` interface.
 
 #### Usage
 
 ```
 opentrons_can_comm [-h] --interface INTERFACE [--bitrate BITRATE]
-                   [--channel CHANNEL] [--port PORT]
+                   [--channel CHANNEL] [--port PORT] [--host HOST]
 ```
 
 Example using socketcan: `opentrons_can_comm --interface socketcan --channel vcan0`
