@@ -160,7 +160,7 @@ class ProtocolEngine:
         )
 
     async def finish(
-        self, error: Optional[Exception] = None, home_after: Optional[bool] = True
+        self, error: Optional[Exception] = None, home_after: bool = True
     ) -> None:
         """Gracefully finish using the ProtocolEngine, waiting for it to become idle.
 

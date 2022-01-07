@@ -264,7 +264,7 @@ async def test_finish(
     decoy.verify(
         action_dispatcher.dispatch(FinishAction()),
         await queue_worker.join(),
-        await hardware_stopper.do_stop(),
+        await hardware_stopper.do_stop(home_after=True),
         action_dispatcher.dispatch(HardwareStoppedAction()),
         plugin_starter.stop(),
     )
@@ -297,7 +297,7 @@ async def test_finish_with_error(
     decoy.verify(
         action_dispatcher.dispatch(FinishAction(error_details=expected_error_details)),
         await queue_worker.join(),
-        await hardware_stopper.do_stop(),
+        await hardware_stopper.do_stop(home_after=True),
         action_dispatcher.dispatch(HardwareStoppedAction()),
     )
 
@@ -318,7 +318,7 @@ async def test_finish_stops_hardware_if_queue_worker_join_fails(
         await subject.finish()
 
     decoy.verify(
-        await hardware_stopper.do_stop(),
+        await hardware_stopper.do_stop(home_after=True),
         times=1,
     )
 

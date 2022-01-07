@@ -86,14 +86,14 @@ async def test_clear_engine_not_stopped_or_idle(subject: EngineStore) -> None:
         await subject.clear()
 
 
-async def test_clear_idle_engine(subject: EngineStore) -> None:
+async def test_clear_idle_engine(decoy: Decoy, subject: EngineStore) -> None:
     """It should successfully clear engine if idle (not started)."""
     await subject.create(run_id="run-id")
     assert subject.engine is not None
     assert subject.runner is not None
 
     await subject.clear()
-
+    # TODO: test engine finish is called
     with pytest.raises(EngineMissingError):
         subject.engine
     with pytest.raises(EngineMissingError, match="Runner not yet created."):
