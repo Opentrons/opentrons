@@ -398,7 +398,7 @@ get_okay_to_clear_specs: List[GetOkayToClearSpec] = [
                 ("command-id", create_queued_command(command_id="command-id"))
             ],
         ),
-        expected_is_okay=False,
+        expected_is_okay=True,
     ),
     GetOkayToClearSpec(
         subject=get_command_view(

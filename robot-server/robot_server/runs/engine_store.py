@@ -119,8 +119,8 @@ class EngineStore:
         """
         if self._runner_engine_pair is not None:
             if self.engine.state_view.commands.get_is_okay_to_clear():
-                await self.engine.finish(home_after=False)
+                engine = self._runner_engine_pair.engine
+                self._runner_engine_pair = None
+                await engine.finish(home_after=False)
             else:
                 raise EngineConflictError("Current run is not idle or stopped.")
-
-        self._runner_engine_pair = None

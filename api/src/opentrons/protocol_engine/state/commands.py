@@ -254,12 +254,9 @@ class CommandView(HasState[CommandState]):
 
     def get_is_okay_to_clear(self) -> bool:
         """Get whether the engine is stopped or unplayed so it could be removed."""
-        if self.get_is_stopped():
+        if self.get_is_stopped() or self.get_status() == EngineStatus.IDLE:
             return True
-        elif self.get_status() == EngineStatus.IDLE:
-            if len(self.get_all()) == len(self._state.queued_command_ids):
-                # No commands added to the engine have been run
-                return True
+
         return False
 
     def get_is_running(self) -> bool:
