@@ -2,8 +2,6 @@ from starlette import status
 from fastapi import APIRouter, Depends
 from pydantic import ValidationError
 
-from typing_extensions import Protocol
-
 from opentrons.hardware_control.types import Axis
 from opentrons.hardware_control import HardwareControlAPI
 

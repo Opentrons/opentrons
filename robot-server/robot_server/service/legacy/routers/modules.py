@@ -1,5 +1,4 @@
 import typing
-from typing_extensions import Protocol
 import asyncio
 from starlette import status
 from fastapi import Path, APIRouter, Depends

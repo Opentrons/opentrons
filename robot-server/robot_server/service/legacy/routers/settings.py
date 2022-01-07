@@ -1,7 +1,6 @@
 from dataclasses import asdict
 import logging
 from typing import Dict
-from typing_extensions import Protocol
 
 from starlette import status
 from fastapi import APIRouter, Depends

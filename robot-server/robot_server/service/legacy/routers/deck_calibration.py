@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends
-from typing_extensions import Protocol
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.calibration_storage import helpers

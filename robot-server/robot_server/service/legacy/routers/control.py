@@ -2,7 +2,6 @@ import asyncio
 
 from fastapi import APIRouter, Query, Depends
 from starlette import status
-from typing_extensions import Protocol
 
 from opentrons.hardware_control import (
     ThreadedAsyncLock,

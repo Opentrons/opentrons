@@ -1,4 +1,3 @@
-from typing_extensions import Protocol
 import typing
 from fastapi import APIRouter, Query, Depends
 
