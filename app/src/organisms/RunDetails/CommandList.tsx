@@ -144,7 +144,7 @@ export function CommandList(): JSX.Element | null {
           </Box>
         ) : null}
         <Flex
-          paddingLeft={SPACING_3}
+          paddingLeft={SPACING_2}
           paddingTop={SPACING_1}
           css={FONT_HEADER_DARK}
           textTransform={TEXT_TRANSFORM_CAPITALIZE}
