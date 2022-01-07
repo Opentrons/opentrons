@@ -68,9 +68,12 @@ export function CommandText(props: Props): JSX.Element | null {
             i18nKey={'drop_tip'}
             values={{
               well_name: wellName,
-              labware: labwareId === TRASH_ID ? 'Opentrons Fixed Trash' : getLabwareDisplayName(
-                labwareRenderInfoById[labwareId].labwareDef
-              ),
+              labware:
+                labwareId === TRASH_ID
+                  ? 'Opentrons Fixed Trash'
+                  : getLabwareDisplayName(
+                      labwareRenderInfoById[labwareId].labwareDef
+                    ),
               labware_location: labwareLocation.slotName,
             }}
           />
