@@ -67,7 +67,7 @@ class Coordinates:
         """Create coordinates from an iterator of floats."""
         return cls(*(np.float64(i) for i in iter))
 
-    def vectorize(self) -> np.NDArray[np.float64]:
+    def vectorize(self) -> np.ndarray:
         """Represent coordinates as a Numpy array."""
         return np.array(dataclasses.astuple(self))
 

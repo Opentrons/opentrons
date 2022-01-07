@@ -25,7 +25,7 @@ def get_unit_vector(
     """Get the unit vector and the distance the two coordinates."""
     initial_vectorized = initial.vectorize()
     target_vectorized = target.vectorize()
-    displacement: np.NDArray[np.float64] = target_vectorized - initial_vectorized
+    displacement: np.ndarray = target_vectorized - initial_vectorized
     distance = np.linalg.norm(displacement)
     unit_vector = Coordinates.from_iter(displacement / distance)
     return unit_vector, distance
