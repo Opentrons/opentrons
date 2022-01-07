@@ -72,9 +72,17 @@ export function CommandList(): JSX.Element | null {
     firstNonSetupIndex
   )
 
-  let currentCommandList: Array<
-    Command | RunCommandSummary
-  > = postSetupAnticipatedCommands
+  interface CommandRuntimeInfo {
+    analysisCommand: Command | null // analysisCommand will only be null if protocol is nondeterministic
+    runCommandSummary: RunCommandSummary | null
+  }
+
+  let currentCommandList: CommandRuntimeInfo[] = postSetupAnticipatedCommands.map(
+    postSetupAnticaptedCommand => ({
+      analysisCommand: postSetupAnticaptedCommand,
+      runCommandSummary: null,
+    })
+  )
   if (
     runDataCommands != null &&
     runDataCommands.length > 0 &&
@@ -85,20 +93,33 @@ export function CommandList(): JSX.Element | null {
     )
     const postPlayRunCommands =
       firstPostPlayRunCommandIndex >= 0
-        ? runDataCommands.slice(firstPostPlayRunCommandIndex)
+        ? runDataCommands
+            .slice(firstPostPlayRunCommandIndex)
+            .map(runDataCommand => ({
+              runCommandSummary: runDataCommand,
+              analysisCommand:
+                postSetupAnticipatedCommands.find(
+                  postSetupAnticipatedCommand =>
+                    runDataCommand.id === postSetupAnticipatedCommand.id
+                ) ?? null,
+            }))
         : []
 
     const remainingAnticipatedCommands = dropWhile(
       postSetupAnticipatedCommands,
       anticipatedCommand =>
         runDataCommands.some(runC => runC.id === anticipatedCommand.id)
-    )
+    ).map(remainingAnticipatedCommand => ({
+      analysisCommand: remainingAnticipatedCommand,
+      runCommandSummary: null,
+    }))
 
     const isProtocolDeterministic = postPlayRunCommands.reduce(
       (isDeterministic, command, index) => {
         return (
           isDeterministic &&
-          command.id === postSetupAnticipatedCommands[index]?.id
+          command.runCommandSummary.id ===
+            postSetupAnticipatedCommands[index]?.id
         )
       },
       true
@@ -230,11 +251,14 @@ export function CommandList(): JSX.Element | null {
               const showAnticipatedStepsTitle =
                 (index === 0 && runDataCommands?.length === 0) ||
                 (index > 0 &&
-                  currentCommandList[index - 1].status === 'running')
+                  currentCommandList[index - 1].runCommandSummary?.status ===
+                    'running')
 
               return (
                 <Flex
-                  key={command.id}
+                  key={
+                    command.analysisCommand?.id ?? command.runCommandSummary?.id
+                  }
                   id={`RunDetails_CommandItem`}
                   paddingLeft={SPACING_1}
                   justifyContent={JUSTIFY_START}
@@ -256,7 +280,8 @@ export function CommandList(): JSX.Element | null {
                     flex={'auto'}
                   >
                     <CommandItem
-                      commandOrSummary={command}
+                      analysisCommand={command.analysisCommand}
+                      runCommandSummary={command.runCommandSummary}
                       runStatus={runStatus}
                     />
                   </Flex>
