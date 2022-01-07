@@ -1,8 +1,9 @@
 import * as React from 'react'
 import { when } from 'jest-when'
+import { useInView } from 'react-intersection-observer'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-import { CommandItem } from '../CommandItem'
+import { CommandItem, OBSERVER_DELAY } from '../CommandItem'
 import { CommandText } from '../CommandText'
 import { CommandTimer } from '../CommandTimer'
 import {
@@ -13,6 +14,7 @@ import { useCurrentRunId } from '../../ProtocolUpload/hooks/useCurrentRunId'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6/command'
 import type { RunCommandSummary } from '@opentrons/api-client'
 
+jest.mock('react-intersection-observer')
 jest.mock('../CommandText')
 jest.mock('../CommandTimer')
 jest.mock('../../ProtocolUpload/hooks/useCurrentRunId')
@@ -31,6 +33,7 @@ const mockUseCommandQuery = useCommandQuery as jest.MockedFunction<
 const mockUseAllCommandsQuery = useAllCommandsQuery as jest.MockedFunction<
   typeof useAllCommandsQuery
 >
+const mockUseInView = useInView as jest.MockedFunction<typeof useInView>
 const render = (props: React.ComponentProps<typeof CommandItem>) => {
   return renderWithProviders(<CommandItem {...props} />, {
     i18nInstance: i18n,
@@ -83,6 +86,9 @@ describe('Run Details Command item', () => {
       .mockReturnValue({
         data: { data: [] },
       } as any)
+    when(mockUseInView)
+      .calledWith({ delay: OBSERVER_DELAY })
+      .mockReturnValue([() => null, true] as any)
   })
 
   it('renders the correct failed status', () => {
