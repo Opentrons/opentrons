@@ -40,7 +40,10 @@ import type {
 } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { SetupCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import type { DropTipCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
-import type { SavePositionCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
+import type {
+  HomeCommand,
+  SavePositionCommand,
+} from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
 import type {
   Axis,
   Jog,
@@ -244,7 +247,7 @@ export function useLabwarePositionCheck(
     }) as Command[]) ?? []
   // TC open lid commands come from the LPC command generator
   const TCOpenCommands = LPCCommands.filter(isTCOpenCommand) ?? []
-  const homeCommand: Command = {
+  const homeCommand: HomeCommand = {
     commandType: 'home',
     id: uuidv4(),
     params: {},
@@ -472,6 +475,21 @@ export function useLabwarePositionCheck(
               console.error(`error saving position: ${e.message}`)
               setError(e)
             })
+        }
+        // if this was the last LPC command, home the robot
+        if (currentCommandIndex === LPCMovementCommands.length - 1) {
+          const homeCommand: HomeCommand = {
+            commandType: 'home',
+            id: uuidv4(),
+            params: {},
+          }
+          createCommand({
+            runId: currentRun?.data?.id as string,
+            command: createCommandData(homeCommand),
+          }).catch((e: Error) => {
+            console.error(`error homing robot: ${e.message}`)
+            setError(e)
+          })
         }
         setCurrentCommandIndex(currentCommandIndex + 1)
       })
