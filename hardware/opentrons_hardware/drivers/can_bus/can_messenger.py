@@ -27,7 +27,9 @@ class MessageListener(ABC):
     """Incoming message listener."""
 
     @abstractmethod
-    def on_message(self, message: MessageDefinition, arbitration_id: ArbitrationId) -> None:
+    def on_message(
+        self, message: MessageDefinition, arbitration_id: ArbitrationId
+    ) -> None:
         """A new message arrived."""
         ...
 
@@ -107,7 +109,7 @@ class CanMessenger:
                         f"payload: {build}"
                     )
                     for listener in self._listeners:
-                        listener.on_message(message_definition(payload=build))  # type: ignore[arg-type]  # noqa: E501
+                        listener.on_message(message_definition(payload=build), message.arbitration_id)  # type: ignore[arg-type]  # noqa: E501
                 except BinarySerializableException:
                     log.exception(f"Failed to build from {message}")
             else:

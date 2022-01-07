@@ -1,6 +1,7 @@
 """Tests for the move scheduler."""
 import pytest
 from mock import AsyncMock, call, MagicMock
+from opentrons_ot3_firmware import ArbitrationId, ArbitrationIdParts
 
 from opentrons_ot3_firmware.constants import NodeId
 from opentrons_hardware.drivers.can_bus.can_messenger import MessageListener
@@ -309,10 +310,14 @@ class MockSendMoveCompleter:
                         group_id=message.payload.group_id,
                         seq_id=UInt8Field(seq_id),
                         current_position=UInt32Field(0),
-                        node_id=UInt8Field(node.value),
                         ack_id=UInt8Field(0),
                     )
-                    self._listener.on_message(md.MoveCompleted(payload=payload))
+                    arbitration_id = ArbitrationId(
+                        parts=ArbitrationIdParts(originating_node_id=node)
+                    )
+                    self._listener.on_message(
+                        md.MoveCompleted(payload=payload), arbitration_id
+                    )
 
 
 async def test_single_move(
