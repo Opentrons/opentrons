@@ -238,4 +238,64 @@ describe('useLabwarePositionCheck', () => {
       })
     })
   })
+  describe('proceed', () => {
+    it('should home the robot after issuing the last LPC command', async () => {
+      when(mockUseAllCommandsQuery)
+        .calledWith(MOCK_RUN_ID)
+        .mockReturnValue({
+          data: {},
+        } as any)
+      when(mockUseSteps)
+        .calledWith()
+        .mockReturnValue([
+          {
+            commands: [
+              {
+                commandType: 'pickUpTip',
+                params: {
+                  pipetteId: MOCK_PIPETTE_ID,
+                  labwareId: MOCK_LABWARE_ID,
+                },
+              },
+            ],
+            labwareId: MOCK_LABWARE_ID,
+            section: 'PRIMARY_PIPETTE_TIPRACKS',
+          } as LabwarePositionCheckStep,
+          {
+            commands: [
+              {
+                commandType: 'dropTip',
+                params: {
+                  pipetteId: MOCK_PIPETTE_ID,
+                  labwareId: MOCK_LABWARE_ID,
+                },
+              },
+            ],
+            labwareId: MOCK_LABWARE_ID,
+            section: 'RETURN_TIP',
+          } as LabwarePositionCheckStep,
+        ])
+      const { result, waitForNextUpdate } = renderHook(
+        () => useLabwarePositionCheck(() => null, {}),
+        { wrapper }
+      )
+      if ('error' in result.current) {
+        throw new Error('error should not be present')
+      }
+      const { beginLPC } = result.current
+      beginLPC()
+      await waitForNextUpdate()
+      mockCreateCommand.mockClear() // clear calls to mockCreateCommand because beginLPC issues a home command
+      const { proceed } = result.current
+      proceed()
+      await waitForNextUpdate()
+      expect(mockCreateCommand).toHaveBeenCalledWith({
+        runId: MOCK_RUN_ID,
+        command: {
+          commandType: 'home',
+          params: {},
+        },
+      })
+    })
+  })
 })
