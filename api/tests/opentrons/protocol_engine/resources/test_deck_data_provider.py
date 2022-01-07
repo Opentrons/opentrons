@@ -1,6 +1,7 @@
 """Test deck data provider."""
 import pytest
 from decoy import Decoy
+from typing import AsyncGenerator
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
 from opentrons.protocols.models import LabwareDefinition
@@ -38,9 +39,10 @@ async def test_get_deck_definition(
 async def test_get_deck_definition_short_trash(
     short_trash_deck_def: DeckDefinitionV2,
     subject: DeckDataProvider,
+    short_trash_flag: AsyncGenerator[None, None],
 ) -> None:
     """It should be able to load the short-trash deck definition."""
-    result = await subject.get_deck_definition(short_fixed_trash=True)
+    result = await subject.get_deck_definition()
     assert result == short_trash_deck_def
 
 
