@@ -186,7 +186,7 @@ class Move:
         distance: AcceptableType,
         max_speed: AcceptableType,
         blocks: Tuple[Block, Block, Block],
-    ) -> "Move":
+    ) -> Move:
         """Build function for Move."""
         return cls(
             unit_vector=unit_vector,
@@ -223,7 +223,7 @@ class AxisConstraints:
         max_acceleration: AcceptableType,
         max_speed_discont: AcceptableType,
         max_direction_change_speed_discont: AcceptableType,
-    ) -> "AxisConstraints":
+    ) -> AxisConstraints:
         """Build AxisConstraints."""
         return cls(
             max_acceleration=np.float64(max_acceleration),
