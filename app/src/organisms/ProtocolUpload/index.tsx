@@ -17,11 +17,9 @@ import {
   TEXT_TRANSFORM_UPPERCASE,
   FONT_SIZE_BIG,
   SPACING_8,
-  LINE_HEIGHT_SOLID,
   SPACING_3,
   SPACING_2,
-  NewSecondaryBtn,
-  C_ERROR_DARK,
+  NewAlertSecondaryBtn,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
@@ -137,17 +135,16 @@ export function ProtocolUpload(): JSX.Element {
     cancel: cancelModalExit,
   } = useConditionalConfirm(cancelRunAndExit, true)
 
+  /** NOTE: the logic to determine the contents of this titlebar is
+  very close to the logic present on the RunDetails organism */
   const cancelRunButton = (
-    <NewSecondaryBtn
+    <NewAlertSecondaryBtn
       onClick={confirmCancelModalExit}
-      lineHeight={LINE_HEIGHT_SOLID}
       marginX={SPACING_3}
-      paddingRight={SPACING_2}
-      paddingLeft={SPACING_2}
-      color={C_ERROR_DARK}
+      paddingX={SPACING_2}
     >
       {t('cancel_run')}
-    </NewSecondaryBtn>
+    </NewAlertSecondaryBtn>
   )
   const isRunInMotion =
     runStatus === RUN_STATUS_RUNNING ||
@@ -165,6 +162,7 @@ export function ProtocolUpload(): JSX.Element {
         title: t('shared:close'),
         children: t('shared:close'),
         iconName: 'close' as const,
+        className: styles.close_button,
       },
       className: styles.reverse_titlebar_items,
     }
