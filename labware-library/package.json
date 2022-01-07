@@ -1,7 +1,7 @@
 {
   "name": "@opentrons/labware-library",
   "productName": "Labware Library",
-  "version": "5.0.0-beta.5",
+  "version": "5.0.0-beta.6",
   "description": "Opentrons standard labware library",
   "main": "dist/index.js",
   "source": "src/index.tsx",
@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "@hot-loader/react-dom": "17.0.1",
-    "@opentrons/components": "5.0.0-beta.5",
+    "@opentrons/components": "5.0.0-beta.6",
     "ajv": "6.10.2",
     "classnames": "2.2.5",
     "cookie": "0.4.0",
