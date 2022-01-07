@@ -300,10 +300,10 @@ def build_blocks(
             acceleration=0,
             distance=distance - first.distance - final.distance,
         )
-        return (first, coast, final)
+        return first, coast, final
     else:
         # no coast phase for us
-        return (first, Block(0, 0, 0), final)
+        return first, Block(0, 0, 0), final
 
 
 def build_move(
