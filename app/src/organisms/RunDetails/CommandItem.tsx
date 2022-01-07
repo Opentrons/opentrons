@@ -100,7 +100,8 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
     }
     if (
       commandDetails?.data.startedAt != null &&
-      commandDetails?.data.completedAt == null
+      commandDetails?.data.completedAt == null &&
+      isInView
     ) {
       refetch()
     }
