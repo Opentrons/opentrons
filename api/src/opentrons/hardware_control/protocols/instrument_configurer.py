@@ -22,7 +22,10 @@ class InstrumentConfigurer(Protocol):
         """
         ...
 
-    async def cache_instruments(self, require: Dict[Mount, PipetteName] = None) -> None:
+    async def cache_instruments(
+        self,
+        require: Optional[Dict[Mount, PipetteName]] = None,
+    ) -> None:
         """
         Scan the attached instruments, take necessary configuration actions,
         and set up hardware controller internal state if necessary.
