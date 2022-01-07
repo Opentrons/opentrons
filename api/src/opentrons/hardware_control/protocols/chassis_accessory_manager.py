@@ -12,7 +12,11 @@ class ChassisAccessoryManager(EventSourcer, Protocol):
         """The current state of the machine's door."""
         ...
 
-    async def set_lights(self, button: bool = None, rails: bool = None) -> None:
+    async def set_lights(
+        self,
+        button: Optional[bool] = None,
+        rails: Optional[bool] = None,
+    ) -> None:
         """Control the robot lights.
 
         button If specified, turn the button light on (`True`) or
