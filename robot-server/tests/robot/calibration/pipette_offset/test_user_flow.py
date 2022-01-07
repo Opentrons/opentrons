@@ -85,7 +85,7 @@ def mock_hw_pipette_all_combos(request):
 @pytest.fixture(params=[Mount.RIGHT, Mount.LEFT])
 def mock_hw_all_combos(hardware, mock_hw_pipette_all_combos, request):
     mount = request.param
-    hardware._attached_instruments = {mount: mock_hw_pipette_all_combos}
+    hardware.hardware_instruments = {mount: mock_hw_pipette_all_combos}
     hardware._current_pos = Point(0, 0, 0)
 
     async def async_mock_move_to(*args, **kwargs):
@@ -108,7 +108,7 @@ def mock_hw(hardware):
         PIP_CAL,
         "testId",
     )
-    hardware._attached_instruments = {Mount.RIGHT: pip}
+    hardware.hardware_instruments = {Mount.RIGHT: pip}
     hardware._current_pos = Point(0, 0, 0)
 
     async def async_mock_move_rel(*args, **kwargs):
@@ -131,7 +131,7 @@ def mock_hw(hardware):
 
 @pytest.fixture
 def mock_user_flow(mock_hw):
-    mount = next(k for k, v in mock_hw._attached_instruments.items() if v)
+    mount = next(k for k, v in mock_hw.hardware_instruments.items() if v)
     with patch.object(
         PipetteOffsetCalibrationUserFlow,
         "_get_stored_tip_length_cal",
@@ -147,7 +147,7 @@ def mock_user_flow(mock_hw):
 
 @pytest.fixture
 def mock_user_flow_fused(mock_hw):
-    mount = next(k for k, v in mock_hw._attached_instruments.items() if v)
+    mount = next(k for k, v in mock_hw.hardware_instruments.items() if v)
     with patch.object(
         PipetteOffsetCalibrationUserFlow,
         "_get_stored_tip_length_cal",
@@ -509,7 +509,7 @@ async def test_load_labware(mock_user_flow, monkeypatch):
 
 @pytest.mark.parametrize(argnames="mount", argvalues=[Mount.RIGHT, Mount.LEFT])
 def test_no_pipette(hardware, mount):
-    hardware._attached_instruments = {mount: None}
+    hardware.hardware_instruments = {mount: None}
     with pytest.raises(RobotServerError) as error:
         PipetteOffsetCalibrationUserFlow(hardware=hardware, mount=mount)
 

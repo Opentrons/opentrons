@@ -5,11 +5,16 @@ from pathlib import Path
 import logging
 import asyncio
 import re
-from typing import Any, List, Tuple, cast
+from typing import Any, List, Tuple
 
 from opentrons.config.feature_flags import enable_ot3_hardware_controller
 from opentrons.drivers.serial_communication import get_ports_by_name
-from opentrons.hardware_control import API as HardwareAPI, ThreadManager
+from opentrons.hardware_control import (
+    API as HardwareAPI,
+    ThreadManager,
+    ThreadManagedHardware,
+)
+
 from opentrons.config import (
     feature_flags as ff,
     name,
@@ -109,12 +114,17 @@ def should_use_ot3() -> bool:
     return False
 
 
-async def _create_hardware_api() -> HardwareAPI:
-    """Build a HardwareAPI wrapped in a ThreadManager."""
+async def _create_thread_manager() -> ThreadManagedHardware:
+    """Build the hardware controller wrapped in a ThreadManager.
+
+    .. deprecated:: 4.6
+        ThreadManager is on its way out.
+    """
     if os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"):
         log.info("Initialized robot using virtual Smoothie")
-        thread_manager = ThreadManager(HardwareAPI.build_hardware_simulator)
-
+        thread_manager: ThreadManagedHardware = ThreadManager(
+            HardwareAPI.build_hardware_simulator
+        )
     elif should_use_ot3():
         thread_manager = ThreadManager(
             HardwareAPI.build_ot3_controller,
@@ -134,10 +144,10 @@ async def _create_hardware_api() -> HardwareAPI:
         log.exception("Could not build hardware controller, forcing virtual")
         thread_manager = ThreadManager(HardwareAPI.build_hardware_simulator)
 
-    return cast(HardwareAPI, thread_manager)
+    return thread_manager
 
 
-async def initialize() -> HardwareAPI:
+async def initialize() -> ThreadManagedHardware:
     """
     Initialize the Opentrons hardware returning a hardware instance.
     """
@@ -147,7 +157,7 @@ async def initialize() -> HardwareAPI:
     log.info(f"API server version: {__version__}")
     log.info(f"Robot Name: {name()}")
 
-    hardware = await _create_hardware_api()
+    hardware = await _create_thread_manager()
 
     async def _blink() -> None:
         while True:

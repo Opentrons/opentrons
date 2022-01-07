@@ -1,7 +1,7 @@
 """Run router dependency-injection wire-up."""
 from fastapi import Depends
 
-from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control import HardwareControlAPI
 
 from robot_server.app_state import AppState, AppStateValue, get_app_state
 from robot_server.hardware import get_hardware
@@ -27,7 +27,7 @@ def get_run_store(app_state: AppState = Depends(get_app_state)) -> RunStore:
 
 def get_engine_store(
     app_state: AppState = Depends(get_app_state),
-    hardware_api: HardwareAPI = Depends(get_hardware),
+    hardware_api: HardwareControlAPI = Depends(get_hardware),
 ) -> EngineStore:
     """Get a singleton EngineStore to keep track of created engines / runners."""
     engine_store = _engine_store.get_from(app_state)

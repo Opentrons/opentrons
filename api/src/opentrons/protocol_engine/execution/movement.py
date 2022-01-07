@@ -5,7 +5,7 @@ from typing import Dict, Optional, Sequence
 from dataclasses import dataclass
 
 from opentrons.types import Point
-from opentrons.hardware_control.api import API as HardwareAPI
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import (
     CriticalPoint,
     Axis as HardwareAxis,
@@ -41,13 +41,13 @@ class MovementHandler:
     """Implementation logic for gantry movement."""
 
     _state_store: StateStore
-    _hardware_api: HardwareAPI
+    _hardware_api: HardwareControlAPI
     _model_utils: ModelUtils
 
     def __init__(
         self,
         state_store: StateStore,
-        hardware_api: HardwareAPI,
+        hardware_api: HardwareControlAPI,
         model_utils: Optional[ModelUtils] = None,
         thermocycler_movement_flagger: Optional[ThermocyclerMovementFlagger] = None,
     ) -> None:

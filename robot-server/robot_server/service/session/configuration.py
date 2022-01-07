@@ -1,6 +1,6 @@
 from typing import Callable
 
-from opentrons.hardware_control import ThreadManager, ThreadedAsyncLock
+from opentrons.hardware_control import ThreadedAsyncLock, ThreadManagedHardware
 
 from robot_server.service.protocol.manager import ProtocolManager
 from robot_server.service.session.models.common import IdentifierType
@@ -12,7 +12,7 @@ class SessionConfiguration:
 
     def __init__(
         self,
-        hardware: ThreadManager,
+        hardware: ThreadManagedHardware,
         is_active: Callable[[IdentifierType], bool],
         motion_lock: ThreadedAsyncLock,
         protocol_manager: ProtocolManager,
@@ -23,7 +23,7 @@ class SessionConfiguration:
         self._protocol_manager = protocol_manager
 
     @property
-    def hardware(self) -> ThreadManager:
+    def hardware(self) -> ThreadManagedHardware:
         """Access to robot hardware"""
         return self._hardware
 

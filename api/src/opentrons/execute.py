@@ -23,13 +23,13 @@ from opentrons.commands import types as command_types
 from opentrons.protocols.parse import parse, version_from_string
 from opentrons.protocols.types import ApiDeprecationError
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.hardware_control import API, ThreadManager
+from opentrons.hardware_control import API, ThreadManager, HardwareControlAPI
 from .util.entrypoint_util import labware_from_paths, datafiles_from_paths
 
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
-_THREAD_MANAGED_HW: Optional[ThreadManager] = None
+_THREAD_MANAGED_HW: Optional[ThreadManager[HardwareControlAPI]] = None
 #: The background global cache that all protocol contexts created by
 #: :py:meth:`get_protocol_api` will share
 
