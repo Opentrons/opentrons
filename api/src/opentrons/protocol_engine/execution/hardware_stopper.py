@@ -2,7 +2,7 @@
 from typing import Optional
 
 from opentrons.protocols.geometry.deck import FIXED_TRASH_ID
-from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control import HardwareControlAPI
 from ..state import StateStore
 from ..types import MotorAxis, WellLocation
 
@@ -15,7 +15,7 @@ class HardwareStopper:
 
     def __init__(
         self,
-        hardware_api: HardwareAPI,
+        hardware_api: HardwareControlAPI,
         state_store: StateStore,
         movement: Optional[MovementHandler] = None,
         pipetting: Optional[PipettingHandler] = None,
