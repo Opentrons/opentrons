@@ -1,4 +1,5 @@
 """Motion planning types."""
+from __future__ import annotations
 import enum
 import dataclasses
 import numpy as np  # type: ignore[import]
@@ -26,7 +27,7 @@ class Axis(enum.Enum):
     A = 3
 
     @classmethod
-    def get_all_axes(cls) -> List["Axis"]:
+    def get_all_axes(cls) -> List[Axis]:
         """Return all system axes of the robot."""
         return [cls.X, cls.Y, cls.Z, cls.A]
 
@@ -49,7 +50,7 @@ class Coordinates:
         self.Z = np.float64(Z)
         self.A = np.float64(A)
 
-    def __iter__(self) -> "Coordinates":
+    def __iter__(self) -> Coordinates:
         """Return an iterator."""
         return self
 
@@ -63,13 +64,19 @@ class Coordinates:
         return OrderedDict(zip(Axis.get_all_axes(), vectorized))
 
     @classmethod
-    def from_iter(cls, iter: Iterator[AcceptableType]) -> "Coordinates":
+    def from_iter(cls, iter: Iterator[AcceptableType]) -> Coordinates:
         """Create coordinates from an iterator of floats."""
         return cls(*(np.float64(i) for i in iter))
 
     def vectorize(self) -> np.ndarray:
         """Represent coordinates as a Numpy array."""
         return np.array(dataclasses.astuple(self))
+
+    def is_unit_vector(self) -> bool:
+        """Return true if this is a unit vector."""
+        vectorized = self.vectorize()
+        magnitude = np.linalg.norm(vectorized)
+        return cast(bool, np.isclose(magnitude, 1.0))
 
 
 @dataclasses.dataclass
@@ -128,7 +135,7 @@ class Move:
     ) -> None:
         """Constructor."""
         # verify unit vector before creating Move
-        if not Move._is_unit_vector(unit_vector):
+        if not unit_vector.is_unit_vector():
             raise ValueError(f"{unit_vector} is not a valid unit vector.")
         self.unit_vector = unit_vector
         self.distance = distance
@@ -159,14 +166,7 @@ class Move:
         self.nonzero_blocks = len([b for b in self.blocks if b.time])
 
     @classmethod
-    def _is_unit_vector(cls, unit_vector: Coordinates) -> bool:
-        """Verify unit vector."""
-        vectorized = unit_vector.vectorize()
-        magnitude = np.linalg.norm(vectorized)
-        return cast(bool, magnitude == np.float64(1.0))
-
-    @classmethod
-    def build_dummy_move(cls) -> "Move":
+    def build_dummy_move(cls) -> Move:
         """Return a Move with dummy values."""
         return cls(
             unit_vector=Coordinates(1, 0, 0, 0),
@@ -204,7 +204,7 @@ class MoveTarget:
     max_speed: np.float64
 
     @classmethod
-    def build(cls, position: Coordinates, max_speed: AcceptableType) -> "MoveTarget":
+    def build(cls, position: Coordinates, max_speed: AcceptableType) -> MoveTarget:
         """Build MoveTarget."""
         return cls(position=position, max_speed=np.float64(max_speed))
 
