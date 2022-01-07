@@ -57,7 +57,10 @@ class CanMessenger:
         # TODO (amit, 2021-11-05): Use function code when it is better defined.
         arbitration_id = ArbitrationId(
             parts=ArbitrationIdParts(
-                message_id=message.message_id, node_id=node_id, function_code=0
+                message_id=message.message_id,
+                node_id=node_id,
+                function_code=0,
+                originating_node_id=NodeId.host,
             )
         )
         data = message.payload.serialize()
@@ -74,7 +77,7 @@ class CanMessenger:
         if self._task:
             log.warning("task already running.")
             return
-        self._task = asyncio.get_event_loop().create_task(self._read_task())
+        self._task = asyncio.get_event_loop().create_task(self._read_task_shield())
 
     async def stop(self) -> None:
         """Stop the reader task."""
@@ -95,6 +98,13 @@ class CanMessenger:
         """Remove a message listener."""
         self._listeners.remove(listener)
 
+    async def _read_task_shield(self) -> None:
+        try:
+            await self._read_task()
+        except Exception:
+            log.exception("Exception in read")
+            raise
+
     async def _read_task(self) -> None:
         """Read task."""
         async for message in self._drive:
@@ -109,7 +119,10 @@ class CanMessenger:
                         f"payload: {build}"
                     )
                     for listener in self._listeners:
-                        listener.on_message(message_definition(payload=build), message.arbitration_id)  # type: ignore[arg-type]  # noqa: E501
+                        listener.on_message(
+                            message_definition(payload=build),  # type: ignore[arg-type]  # noqa: E501
+                            message.arbitration_id,
+                        )
                 except BinarySerializableException:
                     log.exception(f"Failed to build from {message}")
             else:

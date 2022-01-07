@@ -148,7 +148,10 @@ def prompt_message(get_user_input: GetInputFunc, output_func: OutputFunc) -> Can
     can_message = CanMessage(
         arbitration_id=ArbitrationId(
             parts=ArbitrationIdParts(
-                message_id=message_id, node_id=node_id, function_code=function_code
+                message_id=message_id,
+                node_id=node_id,
+                function_code=function_code,
+                originating_node_id=NodeId.host,
             )
         ),
         data=data,
