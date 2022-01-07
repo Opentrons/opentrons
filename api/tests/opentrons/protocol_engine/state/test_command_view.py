@@ -361,3 +361,55 @@ get_status_specs: List[GetStatusSpec] = [
 def test_get_status(subject: CommandView, expected_status: EngineStatus) -> None:
     """It should set a status according to the command queue and running flag."""
     assert subject.get_status() == expected_status
+
+
+class GetOkayToClearSpec(NamedTuple):
+    """Spec data for get_status tests."""
+
+    subject: CommandView
+    expected_is_okay: bool
+
+
+get_okay_to_clear_specs: List[GetOkayToClearSpec] = [
+    GetOkayToClearSpec(
+        subject=get_command_view(
+            queue_status=QueueStatus.IMPLICITLY_ACTIVE,
+            running_command_id=None,
+            queued_command_ids=[],
+        ),
+        expected_is_okay=True,
+    ),
+    GetOkayToClearSpec(
+        subject=get_command_view(
+            queue_status=QueueStatus.IMPLICITLY_ACTIVE,
+            running_command_id=None,
+            queued_command_ids=["command-id"],
+            commands_by_id=[
+                ("command-id", create_queued_command(command_id="command-id"))
+            ],
+        ),
+        expected_is_okay=False,
+    ),
+    GetOkayToClearSpec(
+        subject=get_command_view(
+            running_command_id=None,
+            queued_command_ids=[],
+            commands_by_id=[
+                ("command-id", create_queued_command(command_id="command-id"))
+            ],
+        ),
+        expected_is_okay=True,
+    ),
+    GetOkayToClearSpec(
+        subject=get_command_view(
+            is_hardware_stopped=True,
+        ),
+        expected_is_okay=True,
+    ),
+]
+
+
+@pytest.mark.parametrize(GetOkayToClearSpec._fields, get_okay_to_clear_specs)
+def test_get_okay_to_clear(subject: CommandView, expected_is_okay: bool) -> None:
+    """It should okay only an unstarted or stopped engine to clear."""
+    assert subject.get_is_okay_to_clear() is expected_is_okay

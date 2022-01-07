@@ -158,7 +158,9 @@ class ProtocolEngine:
             condition=self._state_store.commands.get_all_complete
         )
 
-    async def finish(self, error: Optional[Exception] = None) -> None:
+    async def finish(
+        self, error: Optional[Exception] = None, home_after: bool = True
+    ) -> None:
         """Gracefully finish using the ProtocolEngine, waiting for it to become idle.
 
         The engine will finish executing its current command (if any),
@@ -171,6 +173,7 @@ class ProtocolEngine:
 
         Arguments:
             error: An error that caused the stop, if applicable.
+            home_after: Whether to home after or not.
         """
         if error:
             error_details: Optional[FinishErrorDetails] = FinishErrorDetails(
@@ -186,7 +189,7 @@ class ProtocolEngine:
         try:
             await self._queue_worker.join()
         finally:
-            await self._hardware_stopper.do_stop()
+            await self._hardware_stopper.do_stop(home_after)
 
         self._action_dispatcher.dispatch(HardwareStoppedAction())
         self._plugin_starter.stop()

@@ -324,7 +324,7 @@ async def remove_run(
         engine_store: ProtocolEngine storage and control.
     """
     try:
-        engine_store.clear()
+        await engine_store.clear()
     except EngineConflictError:
         raise RunNotIdle().as_error(status.HTTP_409_CONFLICT)
 
@@ -453,7 +453,7 @@ async def update_run(
         run = run_view.with_update(run=run, update=update)
 
         try:
-            engine_store.clear()
+            await engine_store.clear()
         except EngineConflictError:
             raise RunNotIdle().as_error(status.HTTP_409_CONFLICT)
 

@@ -71,7 +71,7 @@ class HardwareStopper:
         await self._drop_tip()
         await self._hardware_api.stop(home_after=True)
 
-    async def do_stop(self) -> None:
+    async def do_stop(self, home_after: bool) -> None:
         """Only issue hardware api stop."""
         # TODO: Don't home after once the stop/ drop tip initiation is moved to client
-        await self._hardware_api.stop(home_after=True)
+        await self._hardware_api.stop(home_after=home_after)

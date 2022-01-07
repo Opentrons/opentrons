@@ -252,6 +252,13 @@ class CommandView(HasState[CommandState]):
 
         return next(iter(self._state.queued_command_ids.keys()), None)
 
+    def get_is_okay_to_clear(self) -> bool:
+        """Get whether the engine is stopped or unplayed so it could be removed."""
+        if self.get_is_stopped() or self.get_status() == EngineStatus.IDLE:
+            return True
+
+        return False
+
     def get_is_running(self) -> bool:
         """Get whether the engine is running and queued commands should be executed."""
         queue_status = self._state.queue_status
