@@ -1,6 +1,5 @@
 """Utils for motion planning."""
-import numpy as np
-import numpy.typing as npt
+import numpy as np  # type: ignore[import]
 import logging
 from typing import Iterator, List, Tuple, cast
 
@@ -24,8 +23,10 @@ def get_unit_vector(
     initial: Coordinates, target: Coordinates
 ) -> Tuple[Coordinates, np.float64]:
     """Get the unit vector and the distance the two coordinates."""
-    displacement: npt.NDArray[np.float64] = target.vectorize() - initial.vectorize()
-    distance = np.linalg.norm(displacement)  # type: ignore[no-untyped-call]
+    initial_vectorized = initial.vectorize()
+    target_vectorized = target.vectorize()
+    displacement: np.ndarray = target_vectorized - initial_vectorized
+    distance = np.linalg.norm(displacement)
     unit_vector = Coordinates.from_iter(displacement / distance)
     return unit_vector, distance
 
@@ -253,13 +254,13 @@ def build_blocks(
     max_acc = np.array(
         [constraints[axis].max_acceleration for axis in Axis.get_all_axes()]
     )
-    max_acc_magnitude = np.linalg.norm(max_acc)  # type: ignore[no-untyped-call]
+    max_acc_magnitude = np.linalg.norm(max_acc)
     acc_v = max_acc_magnitude * unit_vector.vectorize()
 
     for a_i, max_acc_i in zip(acc_v, max_acc):
         if abs(a_i) > max_acc_i:
             acc_v *= max_acc_i / a_i
-    max_acceleration = np.linalg.norm(acc_v)  # type: ignore[no-untyped-call]
+    max_acceleration = np.linalg.norm(acc_v)
 
     initial_speed_sq = initial_speed ** 2
     final_speed_sq = final_speed ** 2

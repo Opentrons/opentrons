@@ -67,7 +67,6 @@ def subject(mock_driver: AsyncMock) -> CanMessenger:
                     seq_id=UInt8Field(2),
                     current_position=UInt32Field(3),
                     ack_id=UInt8Field(4),
-                    node_id=UInt8Field(5),
                 )
             ),
         ],
@@ -98,15 +97,16 @@ async def test_listen_messages(
 ) -> None:
     """It should call listener with new messages."""
     # Add a received message to the driver
+    arbitration_id = ArbitrationId(
+        parts=ArbitrationIdParts(
+            message_id=MessageId.get_move_group_request,
+            node_id=0,
+            function_code=0,
+        )
+    )
     incoming_messages.put_nowait(
         CanMessage(
-            arbitration_id=ArbitrationId(
-                parts=ArbitrationIdParts(
-                    message_id=MessageId.get_move_group_request,
-                    node_id=0,
-                    function_code=0,
-                )
-            ),
+            arbitration_id=arbitration_id,
             data=b"\1",
         )
     )
@@ -128,5 +128,6 @@ async def test_listen_messages(
 
     # Validate message.
     listener.on_message.assert_called_once_with(
-        GetMoveGroupRequest(payload=MoveGroupRequestPayload(group_id=UInt8Field(1)))
+        GetMoveGroupRequest(payload=MoveGroupRequestPayload(group_id=UInt8Field(1))),
+        arbitration_id,
     )
