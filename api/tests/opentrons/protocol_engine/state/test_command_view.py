@@ -379,7 +379,6 @@ get_okay_to_clear_specs: List[GetOkayToClearSpec] = [
         ),
         expected_is_okay=True,
     ),
-    # TODO (spp: This should be True for v6 JSON protocols)
     GetOkayToClearSpec(
         subject=get_command_view(
             queue_status=QueueStatus.IMPLICITLY_ACTIVE,
