@@ -171,7 +171,9 @@ class EquipmentHandler:
         # pipette existence check
         # TODO(mc, 2021-04-16): reconcile PipetteName enum with PipetteName union
         try:
-            await self._hardware_api.cache_instruments(cache_request)  # type: ignore
+            await self._hardware_api.cache_instruments(
+                cache_request  # type: ignore[arg-type]
+            )
         except RuntimeError as e:
             raise FailedToLoadPipetteError(str(e)) from e
 

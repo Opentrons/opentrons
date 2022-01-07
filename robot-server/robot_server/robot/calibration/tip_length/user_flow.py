@@ -133,7 +133,7 @@ class TipCalibrationUserFlow:
             name=self._hw_pipette.name,
             tipLength=self._hw_pipette.config.tip_length,
             mount=str(self._mount),
-            serial=self._hw_pipette.pipette_id or "",
+            serial=self._hw_pipette.pipette_id,  # type: ignore[arg-type]
             defaultTipracks=self._default_tipracks,  # type: ignore[arg-type]
         )
 
@@ -185,7 +185,7 @@ class TipCalibrationUserFlow:
             cur_pt = await self.get_current_point(critical_point=CriticalPoint.NOZZLE)
 
             util.save_tip_length_calibration(
-                pipette_id=self._hw_pipette.pipette_id or "",
+                pipette_id=self._hw_pipette.pipette_id,  # type: ignore[arg-type]
                 tip_length_offset=cur_pt.z - self._nozzle_height_at_reference,
                 tip_rack=self._tip_rack,
             )

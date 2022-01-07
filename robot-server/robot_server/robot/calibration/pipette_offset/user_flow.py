@@ -196,7 +196,7 @@ class PipetteOffsetCalibrationUserFlow:
             name=self._hw_pipette.name,
             tipLength=self._hw_pipette.config.tip_length,
             mount=str(self._mount),
-            serial=self._hw_pipette.pipette_id or "",
+            serial=self._hw_pipette.pipette_id,  # type: ignore[arg-type]
             defaultTipracks=self._default_tipracks,  # type: ignore[arg-type]
         )
 
@@ -309,14 +309,16 @@ class PipetteOffsetCalibrationUserFlow:
     def _get_stored_tip_length_cal(self) -> Optional[float]:
         try:
             return get.load_tip_length_calibration(
-                self._hw_pipette.pipette_id or "",
+                self._hw_pipette.pipette_id,  # type: ignore[arg-type]
                 self._tip_rack._implementation.get_definition(),
             ).tip_length
         except TipLengthCalNotFound:
             return None
 
     def _get_stored_pipette_offset_cal(self) -> Optional[PipetteOffsetByPipetteMount]:
-        return get.get_pipette_offset(self._hw_pipette.pipette_id or "", self._mount)
+        return get.get_pipette_offset(
+            self._hw_pipette.pipette_id, self._mount  # type: ignore[arg-type]
+        )
 
     def _get_tip_length(self) -> float:
         stored_tip_length_cal = self._get_stored_tip_length_cal()
@@ -448,7 +450,7 @@ class PipetteOffsetCalibrationUserFlow:
             modify.save_pipette_calibration(
                 offset=offset,
                 mount=self._mount,
-                pip_id=self._hw_pipette.pipette_id or "",
+                pip_id=self._hw_pipette.pipette_id,  # type: ignore[arg-type]
                 tiprack_hash=tiprack_hash,
                 tiprack_uri=self._tip_rack.uri,
             )
@@ -468,12 +470,12 @@ class PipetteOffsetCalibrationUserFlow:
             noz_pt = await self.get_current_point(critical_point=CriticalPoint.NOZZLE)
 
             util.save_tip_length_calibration(
-                pipette_id=self._hw_pipette.pipette_id or "",
+                pipette_id=self._hw_pipette.pipette_id,  # type: ignore[arg-type]
                 tip_length_offset=noz_pt.z - self._nozzle_height_at_reference,
                 tip_rack=self._tip_rack,
             )
             delete.delete_pipette_offset_file(
-                self._hw_pipette.pipette_id or "", self.mount
+                self._hw_pipette.pipette_id, self.mount  # type: ignore[arg-type]
             )
             new_tip_length = self._get_stored_tip_length_cal()
             self._has_calibrated_tip_length = new_tip_length is not None

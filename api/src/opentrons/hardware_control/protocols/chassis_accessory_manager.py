@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Optional
 from typing_extensions import Protocol
 from ..types import DoorState
 from .event_sourcer import EventSourcer

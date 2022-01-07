@@ -40,13 +40,13 @@ async def get_modules(
         Module(
             name=mod.name(),  # TODO: legacy, remove
             displayName=mod.name(),  # TODO: legacy, remove
-            model=mod.device_info.get("model") or "",  # TODO legacy, remove
+            model=mod.device_info.get("model"),  # type: ignore
             moduleModel=mod.model(),
             port=mod.port,  # /dev/ttyS0
             usbPort=PhysicalPort(hub=mod.usb_port.hub, port=mod.usb_port.port_number),
-            serial=mod.device_info.get("serial") or "",
-            revision=mod.device_info.get("model") or "",
-            fwVersion=mod.device_info.get("version") or "",
+            serial=mod.device_info.get("serial"),  # type: ignore
+            revision=mod.device_info.get("model"),  # type: ignore
+            fwVersion=mod.device_info.get("version"),  # type: ignore
             hasAvailableUpdate=mod.has_available_update(),
             # TODO: these type ignores are necessary for now because of imprecision in
             # the return values on the hardware side now that we're actually chekcing

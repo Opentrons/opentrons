@@ -57,6 +57,7 @@ from .types import (
     PauseType,
 )
 from . import modules, robot_calibration as rb_cal
+from .protocols import HardwareControlAPI
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import UlPerMmAction, PipetteName
@@ -70,7 +71,7 @@ InstrumentsByMount = Dict[top_types.Mount, Optional[Pipette]]
 PipetteHandlingData = Tuple[Pipette, top_types.Mount]
 
 
-class API:
+class API(HardwareControlAPI):
     """This API is the primary interface to the hardware controller.
 
     Because the hardware manager controls access to the system's hardware
@@ -1422,7 +1423,7 @@ class API:
     async def aspirate(
         self,
         mount: Union[top_types.Mount, PipettePair],
-        volume: float = None,
+        volume: Optional[float] = None,
         rate: float = 1.0,
     ):
         """
@@ -1495,7 +1496,7 @@ class API:
     async def dispense(
         self,
         mount: Union[top_types.Mount, PipettePair],
-        volume: float = None,
+        volume: Optional[float] = None,
         rate: float = 1.0,
     ):
         """
@@ -1661,8 +1662,8 @@ class API:
         self,
         mount: Union[top_types.Mount, PipettePair],
         tip_length: float,
-        presses: int = None,
-        increment: float = None,
+        presses: Optional[int] = None,
+        increment: Optional[float] = None,
     ):
         """
         Pick up tip from current location.
@@ -1891,10 +1892,10 @@ class API:
     def calibrate_plunger(
         self,
         mount: top_types.Mount,
-        top: float = None,
-        bottom: float = None,
-        blow_out: float = None,
-        drop_tip: float = None,
+        top: Optional[float] = None,
+        bottom: Optional[float] = None,
+        blow_out: Optional[float] = None,
+        drop_tip: Optional[float] = None,
     ):
         """
         Set calibration values for the pipette plunger.
@@ -1963,7 +1964,7 @@ class API:
             )
 
     def get_instrument_max_height(
-        self, mount: top_types.Mount, critical_point: CriticalPoint = None
+        self, mount: top_types.Mount, critical_point: Optional[CriticalPoint] = None
     ) -> float:
         """Return max achievable height of the attached instrument
         based on the current critical point
