@@ -557,7 +557,7 @@ async def test_delete_run_by_id(
     )
 
     decoy.verify(
-        engine_store.clear(),
+        await engine_store.clear(),
         run_store.remove(run_id="run-id"),
     )
 
@@ -591,7 +591,7 @@ async def test_delete_active_run(
     run_store: RunStore,
 ) -> None:
     """It should 409 if the run is not finished."""
-    decoy.when(engine_store.clear()).then_raise(EngineConflictError("oh no"))
+    decoy.when(await engine_store.clear()).then_raise(EngineConflictError("oh no"))
 
     with pytest.raises(ApiError) as exc_info:
         await remove_run(
@@ -752,7 +752,7 @@ async def test_update_run_to_not_current(
 
     assert result == SimpleResponse(data=expected_response)
     decoy.verify(
-        engine_store.clear(),
+        await engine_store.clear(),
         run_store.upsert(updated_resource),
     )
 
@@ -815,7 +815,7 @@ async def test_update_current_to_current_noop(
 
     assert result == SimpleResponse(data=expected_response)
     decoy.verify(run_store.upsert(run_resource), times=0)
-    decoy.verify(engine_store.clear(), times=0)
+    decoy.verify(await engine_store.clear(), times=0)
 
 
 async def test_update_to_current_conflict(

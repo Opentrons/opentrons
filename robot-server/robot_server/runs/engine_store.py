@@ -6,7 +6,7 @@ from opentrons.protocol_engine import (
     ProtocolEngine,
     StateView,
     create_protocol_engine,
-    EngineStatus)
+)
 from opentrons.protocol_runner import ProtocolRunner
 
 
@@ -110,7 +110,7 @@ class EngineStore:
         except KeyError:
             raise EngineMissingError(f"No engine state found for run {run_id}")
 
-    def clear(self) -> None:
+    async def clear(self) -> None:
         """Remove the persisted ProtocolEngine, if present, no-op otherwise.
 
         Raises:
@@ -118,9 +118,8 @@ class EngineStore:
             they cannot be cleared.
         """
         if self._runner_engine_pair is not None:
-            if (self.engine.state_view.commands.get_was_queue_never_started()
-                    or self.engine.state_view.commands.get_is_stopped()):
-                pass
+            if self.engine.state_view.commands.get_is_okay_to_clear():
+                await self.engine.finish(home_after=False)
             else:
                 raise EngineConflictError("Current run is not idle or stopped.")
 
