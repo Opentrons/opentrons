@@ -69,7 +69,7 @@ const commandIsComplete = (status: RunCommandSummary['status']): boolean =>
   status === 'succeeded' || status === 'failed'
 
 // minimum delay in MS for observer notifications
-const OBSERVER_DELAY = 300
+export const OBSERVER_DELAY = 300
 
 export function CommandItem(props: CommandItemProps): JSX.Element | null {
   const { analysisCommand, runCommandSummary, runStatus } = props
