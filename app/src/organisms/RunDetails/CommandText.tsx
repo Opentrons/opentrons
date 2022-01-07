@@ -11,8 +11,9 @@ import { ProtocolSetupInfo } from './ProtocolSetupInfo'
 import { useProtocolDetails } from './hooks'
 import { getLabwareLocation } from '../ProtocolSetup/utils/getLabwareLocation'
 import { useLabwareRenderInfoById } from '../ProtocolSetup/hooks'
-
 import type { Command } from '@opentrons/shared-data'
+
+const TRASH_ID = 'fixedTrash'
 
 interface Props {
   analysisCommand: Command | null
@@ -25,6 +26,7 @@ export function CommandText(props: Props): JSX.Element | null {
   const labwareRenderInfoById = useLabwareRenderInfoById()
 
   let messageNode = null
+
   const displayCommand =
     analysisCommand !== null && runCommand === null
       ? analysisCommand
@@ -33,6 +35,14 @@ export function CommandText(props: Props): JSX.Element | null {
   if (displayCommand === null) {
     console.warn(
       'display command should never be null, command text could find no source'
+    )
+    return null
+  }
+  // protocolData should never be null as we don't render the `RunDetails` unless we have an analysis
+  // but we're experiencing a zombie children issue, see https://github.com/Opentrons/opentrons/pull/9091
+  if (protocolData == null) {
+    console.warn(
+      'protocolData never be null, command text could find no protocolData'
     )
     return null
   }
@@ -53,12 +63,34 @@ export function CommandText(props: Props): JSX.Element | null {
       )
       break
     }
-    case 'pickUpTip': {
-      // protocolData should never be null as we don't render the `RunDetails` unless we have an analysis
-      // but we're experiencing a zombie children issue, see https://github.com/Opentrons/opentrons/pull/9091
-      if (protocolData == null) {
-        return null
+    case 'dropTip': {
+      const { wellName, labwareId } = displayCommand.params
+      const labwareLocation = getLabwareLocation(
+        labwareId,
+        protocolData.commands
+      )
+      if (!('slotName' in labwareLocation)) {
+        throw new Error('expected tip rack to be in a slot')
       }
+      messageNode = (
+        <Trans
+          t={t}
+          i18nKey={'drop_tip'}
+          values={{
+            well_name: wellName,
+            labware:
+              labwareId === TRASH_ID
+                ? 'Opentrons Fixed Trash'
+                : getLabwareDisplayName(
+                    labwareRenderInfoById[labwareId].labwareDef
+                  ),
+            labware_location: labwareLocation.slotName,
+          }}
+        />
+      )
+      break
+    }
+    case 'pickUpTip': {
       const { wellName, labwareId } = displayCommand.params
       const labwareLocation = getLabwareLocation(
         labwareId,
