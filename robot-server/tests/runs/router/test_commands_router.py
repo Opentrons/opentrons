@@ -13,7 +13,7 @@ from opentrons.protocol_engine import (
 )
 
 from robot_server.errors import ApiError
-from robot_server.service.json_api import RequestModel, SimpleBody
+from robot_server.service.json_api import RequestModel
 from robot_server.runs.run_models import Run, RunCommandSummary
 from robot_server.runs.engine_store import EngineStore
 from robot_server.runs.router.commands_router import (
@@ -59,7 +59,7 @@ async def test_create_run_command(decoy: Decoy, engine_store: EngineStore) -> No
     result = await create_run_command(
         request_body=RequestModel(data=command_request),
         engine_store=engine_store,
-        run=SimpleBody(data=run),
+        run=run,
     )
 
     assert result.content.data == output_command
@@ -93,7 +93,7 @@ async def test_create_run_command_not_current(
         await create_run_command(
             request_body=RequestModel(data=command_request),
             engine_store=engine_store,
-            run=SimpleBody(data=run),
+            run=run,
         )
 
     assert exc_info.value.status_code == 400
@@ -122,7 +122,7 @@ async def test_get_run_commands() -> None:
         labwareOffsets=[],
     )
 
-    result = await get_run_commands(run=SimpleBody(data=run))
+    result = await get_run_commands(run=run)
 
     assert result.content.data == [command_summary]
     assert result.status_code == 200
@@ -169,7 +169,7 @@ async def test_get_run_command_by_id(
     result = await get_run_command(
         commandId="command-id",
         engine_store=engine_store,
-        run=SimpleBody(data=run),
+        run=run,
     )
 
     assert result.content.data == command
@@ -205,7 +205,7 @@ async def test_get_run_command_missing_command(
         await get_run_command(
             commandId="command-id",
             engine_store=engine_store,
-            run=SimpleBody(data=run),
+            run=run,
         )
 
     assert exc_info.value.status_code == 404

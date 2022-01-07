@@ -16,7 +16,7 @@ from robot_server.service.json_api import (
 from ..run_models import Run, RunCommandSummary
 from ..engine_store import EngineStore
 from ..dependencies import get_engine_store
-from .base_router import RunNotFound, RunStopped, get_run
+from .base_router import RunNotFound, RunStopped, get_run_data_from_url
 
 commands_router = APIRouter()
 
@@ -46,7 +46,7 @@ class CommandNotFound(ErrorDetails):
 async def create_run_command(
     request_body: RequestModel[pe_commands.CommandCreate],
     engine_store: EngineStore = Depends(get_engine_store),
-    run: SimpleBody[Run] = Depends(get_run),
+    run: Run = Depends(get_run_data_from_url),
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
     """Enqueue a protocol command.
 
@@ -59,8 +59,8 @@ async def create_run_command(
             `GET /runs/{runId}`. Present to ensure 404 if run
             not found.
     """
-    if not run.data.current:
-        raise RunStopped(detail=f"Run {run.data.id} is not the current run").as_error(
+    if not run.current:
+        raise RunStopped(detail=f"Run {run.id} is not the current run").as_error(
             status.HTTP_400_BAD_REQUEST
         )
 
@@ -87,7 +87,7 @@ async def create_run_command(
     },
 )
 async def get_run_commands(
-    run: SimpleBody[Run] = Depends(get_run),
+    run: Run = Depends(get_run_data_from_url),
 ) -> PydanticResponse[SimpleMultiBody[RunCommandSummary]]:
     """Get a summary of all commands in a run.
 
@@ -96,7 +96,7 @@ async def get_run_commands(
             `GET /runs/{runId}`
     """
     return PydanticResponse(
-        content=SimpleMultiBody.construct(data=run.data.commands),
+        content=SimpleMultiBody.construct(data=run.commands),
         status_code=status.HTTP_200_OK,
     )
 
@@ -118,7 +118,7 @@ async def get_run_commands(
 async def get_run_command(
     commandId: str,
     engine_store: EngineStore = Depends(get_engine_store),
-    run: SimpleBody[Run] = Depends(get_run),
+    run: Run = Depends(get_run_data_from_url),
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
     """Get a specific command from a run.
 
@@ -129,7 +129,7 @@ async def get_run_command(
             `GET /run/{runId}`. Present to ensure 404 if run
             not found.
     """
-    engine_state = engine_store.get_state(run.data.id)
+    engine_state = engine_store.get_state(run.id)
     try:
         command = engine_state.commands.get(commandId)
     except pe_errors.CommandDoesNotExistError as e:
