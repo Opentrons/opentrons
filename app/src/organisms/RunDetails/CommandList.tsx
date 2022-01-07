@@ -20,6 +20,7 @@ import {
   TEXT_TRANSFORM_CAPITALIZE,
   AlertItem,
   Box,
+  SPACING_3,
 } from '@opentrons/components'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { useProtocolDetails } from './hooks'
@@ -143,7 +144,8 @@ export function CommandList(): JSX.Element | null {
           </Box>
         ) : null}
         <Flex
-          paddingLeft={SPACING_2}
+          paddingLeft={SPACING_3}
+          paddingTop={SPACING_1}
           css={FONT_HEADER_DARK}
           textTransform={TEXT_TRANSFORM_CAPITALIZE}
         >
