@@ -20,7 +20,7 @@ from .global_errors import UnexpectedError, BadRequest, InvalidRequest
 from .error_responses import (
     ApiError,
     ErrorSource,
-    BaseErrorResponse,
+    BaseErrorBody,
     LegacyErrorResponse,
     MultiErrorResponse,
 )
@@ -86,7 +86,7 @@ async def handle_framework_error(
 ) -> JSONResponse:
     """Map an HTTP exception from the framework to an API response."""
     if _route_is_legacy(request):
-        response: BaseErrorResponse = LegacyErrorResponse(message=error.detail)
+        response: BaseErrorBody = LegacyErrorResponse(message=error.detail)
     else:
         response = BadRequest(detail=error.detail)
 
@@ -105,7 +105,7 @@ async def handle_validation_error(
             f"{'.'.join([str(v) for v in val_error['loc']])}: {val_error['msg']}"
             for val_error in validation_errors
         )
-        response: BaseErrorResponse = LegacyErrorResponse(message=message)
+        response: BaseErrorBody = LegacyErrorResponse(message=message)
     else:
         response = MultiErrorResponse(
             errors=[
@@ -131,7 +131,7 @@ async def handle_unexpected_error(request: Request, error: Exception) -> JSONRes
     ).strip()
 
     if _route_is_legacy(request):
-        response: BaseErrorResponse = LegacyErrorResponse(message=detail)
+        response: BaseErrorBody = LegacyErrorResponse(message=detail)
     else:
         response = UnexpectedError(detail=detail, meta={"stacktrace": stacktrace})
 

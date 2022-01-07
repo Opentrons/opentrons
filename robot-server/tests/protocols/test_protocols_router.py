@@ -18,7 +18,7 @@ from opentrons.protocol_reader import (
 )
 
 from robot_server.errors import ApiError
-from robot_server.service.json_api import SimpleEmptyResponse
+from robot_server.service.json_api import SimpleEmptyBody
 from robot_server.service.task_runner import TaskRunner
 from robot_server.protocols.analysis_store import AnalysisStore
 from robot_server.protocols.protocol_analyzer import ProtocolAnalyzer
@@ -83,7 +83,8 @@ async def test_get_protocols_no_protocols(
 
     result = await get_protocols(protocol_store=protocol_store)
 
-    assert result.data == []
+    assert result.content.data == []
+    assert result.status_code == 200
 
 
 async def test_get_protocols(
@@ -149,7 +150,8 @@ async def test_get_protocols(
         analysis_store=analysis_store,
     )
 
-    assert result.data == [expected_protocol_1, expected_protocol_2]
+    assert result.content.data == [expected_protocol_1, expected_protocol_2]
+    assert result.status_code == 200
 
 
 async def test_get_protocol_by_id(
@@ -184,7 +186,7 @@ async def test_get_protocol_by_id(
         analysis_store=analysis_store,
     )
 
-    assert result.data == Protocol(
+    assert result.content.data == Protocol(
         id="protocol-id",
         createdAt=datetime(year=2021, month=1, day=1),
         protocolType=ProtocolType.PYTHON,
@@ -192,6 +194,7 @@ async def test_get_protocol_by_id(
         analyses=[analysis],
         files=[],
     )
+    assert result.status_code == 200
 
 
 async def test_get_protocol_not_found(
@@ -265,7 +268,7 @@ async def test_create_protocol(
         created_at=datetime(year=2021, month=1, day=1),
     )
 
-    assert result.data == Protocol(
+    assert result.content.data == Protocol(
         id="protocol-id",
         createdAt=datetime(year=2021, month=1, day=1),
         protocolType=ProtocolType.JSON,
@@ -273,6 +276,7 @@ async def test_create_protocol(
         analyses=[analysis],
         files=[ProtocolFile(name="foo.json", role=ProtocolFileRole.MAIN)],
     )
+    assert result.status_code == 201
 
     decoy.verify(
         protocol_store.upsert(protocol_resource),
@@ -315,7 +319,8 @@ async def test_delete_protocol_by_id(
 
     decoy.verify(protocol_store.remove(protocol_id="protocol-id"))
 
-    assert result == SimpleEmptyResponse()
+    assert result.content == SimpleEmptyBody()
+    assert result.status_code == 200
 
 
 async def test_delete_protocol_not_found(
