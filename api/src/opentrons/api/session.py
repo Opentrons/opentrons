@@ -52,6 +52,7 @@ from opentrons.hardware_control import (
     SynchronousAdapter,
     ExecutionCancelledError,
     ThreadedAsyncLock,
+    HardwareControlAPI,
 )
 from opentrons.hardware_control.types import Axis
 from opentrons.hardware_control.types import (
@@ -78,7 +79,7 @@ VALID_STATES: Set[State] = {
 class SessionManager:
     def __init__(
         self,
-        hardware: SynchronousAdapter,
+        hardware: SynchronousAdapter[HardwareControlAPI],
         loop: asyncio.AbstractEventLoop = None,
         broker: Broker = None,
         lock: ThreadedAsyncLock = None,
@@ -247,7 +248,7 @@ class Session(RobotBusy):
         cls,
         name: str,
         contents: Any,
-        hardware: SynchronousAdapter,
+        hardware: SynchronousAdapter[HardwareControlAPI],
         loop: asyncio.AbstractEventLoop,
         broker: Broker,
         motion_lock: ThreadedAsyncLock,
@@ -268,7 +269,7 @@ class Session(RobotBusy):
         self,
         name: str,
         protocol: Protocol,
-        hardware: SynchronousAdapter,
+        hardware: SynchronousAdapter[HardwareControlAPI],
         loop: asyncio.AbstractEventLoop,
         broker: Broker,
         motion_lock: ThreadedAsyncLock,
@@ -328,7 +329,7 @@ class Session(RobotBusy):
     def busy_lock(self) -> ThreadedAsyncLock:
         return self._motion_lock
 
-    def _hw_iface(self) -> SynchronousAdapter:
+    def _hw_iface(self) -> SynchronousAdapter[HardwareControlAPI]:
         return self._hardware
 
     def prepare(self) -> None:

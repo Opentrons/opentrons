@@ -59,7 +59,6 @@ def test_prompt_message_with_payload(
     mock_get_input.side_effect = [
         str(list(MessageId).index(message_id)),
         str(list(NodeId).index(node_id)),
-        "14",
         str(0xFF00FF00),
     ]
     r = can_comm.prompt_message(mock_get_input, mock_output)
@@ -67,7 +66,7 @@ def test_prompt_message_with_payload(
         arbitration_id=ArbitrationId(
             parts=ArbitrationIdParts(message_id=message_id, node_id=node_id)
         ),
-        data=b"\x0e\xff\x00\xff\x00",
+        data=b"\xff\x00\xff\x00",
     )
 
 
@@ -94,7 +93,6 @@ def test_prompt_enum_bad_input(
     argvalues=[
         # Not a number
         [["b"]],
-        [["0", "b"]],
     ],
 )
 def test_prompt_payload_bad_input(
@@ -115,9 +113,8 @@ def test_prompt_message_bad_input(
     mock_get_input.side_effect = [
         str(list(MessageId).index(message_id)),
         str(list(NodeId).index(node_id)),
-        # out of range for Uint8
-        "256",
-        str(0xFF00FF00),
+        # out of range for Uint32
+        str(0x1FF00FF00),
     ]
     with pytest.raises(can_comm.InvalidInput):
         can_comm.prompt_message(mock_get_input, mock_output)

@@ -3,7 +3,7 @@ from .error_responses import (
     ApiError,
     ErrorSource,
     ErrorDetails,
-    ErrorResponse,
+    ErrorBody,
     LegacyErrorResponse,
     MultiErrorResponse,
 )
@@ -15,7 +15,7 @@ __all__ = [
     "ApiError",
     "ErrorSource",
     "ErrorDetails",
-    "ErrorResponse",
+    "ErrorBody",
     "LegacyErrorResponse",
     "MultiErrorResponse",
     "exception_handlers",

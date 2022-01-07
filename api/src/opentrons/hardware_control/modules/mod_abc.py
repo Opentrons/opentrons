@@ -50,6 +50,13 @@ class AbstractModule(abc.ABC):
         self._execution_manager = execution_manager
         self._bundled_fw: Optional[BundledFirmware] = self.get_bundled_fw()
 
+    @property
+    def loop(self) -> asyncio.AbstractEventLoop:
+        return self._loop
+
+    def set_loop(self, loop: asyncio.AbstractEventLoop) -> None:
+        self._loop = loop
+
     def get_bundled_fw(self) -> Optional[BundledFirmware]:
         """Get absolute path to bundled version of module fw if available."""
         if not IS_ROBOT:

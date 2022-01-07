@@ -23,15 +23,14 @@ from opentrons.hardware_control import (
     types,
     SynchronousAdapter,
     API,
-    HardwareAPILike,
     ThreadManager,
+    HardwareControlAPI,
 )
 
 if TYPE_CHECKING:
     from opentrons.protocols.context.instrument import AbstractInstrument
     from opentrons.protocol_api.labware import Well, Labware
     from opentrons.protocols.geometry.deck import Deck
-    from opentrons.hardware_control.dev_types import HasLoop
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -318,7 +317,11 @@ class AxisMaxSpeeds(UserDict):
         return ((k.name, v) for k, v in self.data.items())
 
 
-HardwareToManage = Union[ThreadManager, SynchronousAdapter, "HasLoop"]
+HardwareToManage = Union[
+    ThreadManager[HardwareControlAPI],
+    SynchronousAdapter[HardwareControlAPI],
+    HardwareControlAPI,
+]
 
 
 # TODO: BC 2020-03-02 This class's utility as a utility class is drying up.
@@ -337,7 +340,9 @@ class HardwareManager:
     def __init__(self, hardware: Optional[HardwareToManage]):
         if hardware is None:
             # TODO AL 20210209. This is a highly dangerous thread leak.
-            self._current = ThreadManager(API.build_hardware_simulator).sync
+            self._current: SynchronousAdapter[HardwareControlAPI] = ThreadManager(
+                API.build_hardware_simulator
+            ).sync
         elif isinstance(hardware, SynchronousAdapter):
             self._current = hardware
         elif isinstance(hardware, ThreadManager):
@@ -354,7 +359,7 @@ class HardwareManager:
             self._current = hardware
         elif isinstance(hardware, ThreadManager):
             self._current = hardware.sync
-        elif isinstance(hardware, HardwareAPILike):
+        elif isinstance(hardware, (API,)):
             self._current = SynchronousAdapter(hardware)
         else:
             raise TypeError(

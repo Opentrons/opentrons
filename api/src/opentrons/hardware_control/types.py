@@ -1,5 +1,3 @@
-import abc
-import asyncio
 import enum
 import logging
 from dataclasses import dataclass
@@ -101,29 +99,6 @@ class ErrorMessageNotification:
 HardwareEvent = Union[DoorStateNotification, ErrorMessageNotification]
 
 HardwareEventHandler = Callable[[HardwareEvent], None]
-
-
-class HardwareAPILike(abc.ABC):
-    """A dummy class useful in isinstance checks to accept an API or adapter"""
-
-    @property
-    def loop(self) -> asyncio.AbstractEventLoop:
-        ...
-
-    @property
-    def board_revision(self) -> str:
-        ...
-
-    @property
-    def door_state(self) -> DoorState:
-        ...
-
-    @door_state.setter
-    def door_state(self, door_state: DoorState) -> DoorState:
-        ...
-
-    def validate_calibration(self):
-        ...
 
 
 RevisionLiteral = Literal["2.1", "A", "B", "C", "UNKNOWN"]

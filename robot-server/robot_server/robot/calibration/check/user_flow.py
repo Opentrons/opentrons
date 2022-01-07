@@ -1,5 +1,5 @@
 import logging
-from typing import List, Optional, Tuple, Awaitable, Callable, Dict, Any
+from typing import List, Optional, Tuple, Awaitable, Callable, Dict, Any, cast
 from typing_extensions import Literal
 
 from opentrons.calibration_storage import get, helpers, modify, types as cal_types
@@ -10,7 +10,7 @@ from opentrons.calibration_storage.types import (
 )
 from opentrons.types import Mount, Point, Location
 from opentrons.hardware_control import (
-    ThreadManager,
+    HardwareControlAPI,
     CriticalPoint,
     Pipette,
     robot_calibration,
@@ -86,7 +86,7 @@ COMMAND_MAP = Dict[str, COMMAND_HANDLER]
 class CheckCalibrationUserFlow:
     def __init__(
         self,
-        hardware: "ThreadManager",
+        hardware: HardwareControlAPI,
         has_calibration_block: bool = False,
         tip_rack_defs: Optional[List[LabwareDefinition]] = None,
     ):
@@ -150,7 +150,7 @@ class CheckCalibrationUserFlow:
         return self._deck
 
     @property
-    def hardware(self) -> ThreadManager:
+    def hardware(self) -> HardwareControlAPI:
         return self._hardware
 
     @property
@@ -255,7 +255,7 @@ class CheckCalibrationUserFlow:
         return RequiredLabware.from_lw(self.active_tiprack)
 
     def _filter_hw_pips(self):
-        hw_instr = self._hardware._attached_instruments
+        hw_instr = self._hardware.hardware_instruments
         return {m: p for m, p in hw_instr.items() if p}
 
     def _select_starting_pipette(self) -> Tuple[PipetteInfo, List[PipetteInfo]]:
@@ -265,7 +265,7 @@ class CheckCalibrationUserFlow:
         2: single-channel over multi
         3: right mount over left
         """
-        if not any(self._hardware._attached_instruments.values()):
+        if not any(self._hardware.hardware_instruments.values()):
             raise RobotServerError(
                 definition=CalibrationError.NO_PIPETTE_ATTACHED,
                 flow="Calibration Health Check",
@@ -491,15 +491,18 @@ class CheckCalibrationUserFlow:
     def _get_hw_pipettes(self) -> List[Pipette]:
         # Return a list of instruments, ordered with the active pipette first
         active_mount = self.active_pipette.mount
-        hw_instruments = self._hardware._attached_instruments
+        hw_instruments = self._hardware.hardware_instruments
         if active_mount == Mount.RIGHT:
             other_mount = Mount.LEFT
         else:
             other_mount = Mount.RIGHT
         if self._is_checking_both_mounts():
-            return [hw_instruments[active_mount], hw_instruments[other_mount]]
+            return [
+                cast(Pipette, hw_instruments[active_mount]),
+                cast(Pipette, hw_instruments[other_mount]),
+            ]
         else:
-            return [hw_instruments[active_mount]]
+            return [cast(Pipette, hw_instruments[active_mount])]
 
     def _get_ordered_info_pipettes(self) -> List[PipetteInfo]:
         active_rank = self.active_pipette.rank

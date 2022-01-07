@@ -38,7 +38,13 @@ const render = (props: React.ComponentProps<typeof CommandText>) => {
   })[0]
 }
 
-const MOCK_COMMAND_DETAILS = {
+const MOCK_ANALYSIS_COMMAND: Command = {
+  id: 'some_id',
+  commandType: 'custom',
+  status: 'queued',
+  params: {},
+}
+const MOCK_COMMAND_DETAILS: Command = {
   id: '123',
   commandType: 'custom',
   params: {},
@@ -46,9 +52,9 @@ const MOCK_COMMAND_DETAILS = {
   result: {},
   startedAt: 'start timestamp',
   completedAt: 'end timestamp',
-} as Command
+}
 
-const MOCK_PAUSE_COMMAND = {
+const MOCK_PAUSE_COMMAND: Command = {
   id: '1234',
   commandType: 'pause',
   params: { message: 'THIS IS THE PAUSE MESSAGE' },
@@ -78,28 +84,25 @@ describe('CommandText', () => {
   })
   it('renders correct command text for custom legacy commands', () => {
     const { getByText } = render({
-      commandDetailsOrSummary: {
+      analysisCommand: MOCK_ANALYSIS_COMMAND,
+      runCommand: {
         ...MOCK_COMMAND_DETAILS,
-        params: {
-          legacyCommandText: 'legacy command text',
-        },
-      } as Command,
+        params: { legacyCommandText: 'legacy command text' },
+      },
     })
     getByText('legacy command text')
   })
   it('renders correct command text for pause commands', () => {
     const { getByText } = render({
-      commandDetailsOrSummary: {
-        ...MOCK_PAUSE_COMMAND,
-      } as Command,
+      analysisCommand: null,
+      runCommand: MOCK_PAUSE_COMMAND,
     })
     getByText('THIS IS THE PAUSE MESSAGE')
   })
   it('renders correct command text for load commands', () => {
     const { getByText } = render({
-      commandDetailsOrSummary: {
-        ...MOCK_LOAD_COMMAND,
-      } as Command,
+      analysisCommand: null,
+      runCommand: MOCK_LOAD_COMMAND as Command,
     })
     getByText('Mock Protocol Setup Step')
   })
@@ -119,7 +122,8 @@ describe('CommandText', () => {
       },
     } as any)
     const { getByText } = render({
-      commandDetailsOrSummary: {
+      analysisCommand: null,
+      runCommand: {
         ...MOCK_COMMAND_DETAILS,
         commandType: 'pickUpTip',
         params: {

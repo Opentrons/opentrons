@@ -1,21 +1,12 @@
+from __future__ import annotations
 from typing import Any, Dict, Generic, List, Optional, TypeVar
 from pydantic import Field, BaseModel
 from pydantic.generics import GenericModel
-
+from fastapi.responses import JSONResponse
 from .resource_links import ResourceLinks as DeprecatedResourceLinks
 
 
-class ResponseDataModel(BaseModel):
-    """A model representing an identifiable resource of the server.
-
-    .. deprecated::
-        Prefer ResourceModel, which requires ID to be specified
-    """
-
-    id: str = Field(None, description="Unique identifier for the resource object.")
-
-
-class ResourceModel(ResponseDataModel):
+class ResourceModel(BaseModel):
     """A model representing an identifiable resource of the server."""
 
     id: str = Field(..., description="Unique identifier of the resource.")
@@ -30,7 +21,7 @@ DESCRIPTION_DATA = "The document’s primary data"
 DESCRIPTION_LINKS = "A links object related to the primary data."
 
 
-class BaseResponse(BaseModel):
+class BaseResponseBody(BaseModel):
     """Base model to for HTTP responses.
 
     This model contains configuration and overrides to ensure returned
@@ -48,37 +39,37 @@ class BaseResponse(BaseModel):
         return super().dict(*args, **kwargs)
 
 
-class SimpleResponse(BaseResponse, GenericModel, Generic[ResponseDataT]):
+class SimpleBody(BaseResponseBody, GenericModel, Generic[ResponseDataT]):
     """A response that returns a single resource."""
 
     data: ResponseDataT = Field(..., description=DESCRIPTION_DATA)
 
 
-class Response(BaseResponse, GenericModel, Generic[ResponseDataT, ResponseLinksT]):
+class Body(BaseResponseBody, GenericModel, Generic[ResponseDataT, ResponseLinksT]):
     """A response that returns a single resource and stateful links."""
 
     data: ResponseDataT = Field(..., description=DESCRIPTION_DATA)
     links: ResponseLinksT = Field(..., description=DESCRIPTION_LINKS)
 
 
-class SimpleEmptyResponse(BaseResponse):
+class SimpleEmptyBody(BaseResponseBody):
     """A response that returns no data and no links."""
 
 
-class EmptyResponse(BaseResponse, GenericModel, Generic[ResponseLinksT]):
+class EmptyBody(BaseResponseBody, GenericModel, Generic[ResponseLinksT]):
     """A response that returns no data except stateful links."""
 
     links: ResponseLinksT = Field(..., description=DESCRIPTION_LINKS)
 
 
-class SimpleMultiResponse(BaseResponse, GenericModel, Generic[ResponseDataT]):
+class SimpleMultiBody(BaseResponseBody, GenericModel, Generic[ResponseDataT]):
     """A response that returns multiple resources."""
 
     data: List[ResponseDataT] = Field(..., description=DESCRIPTION_DATA)
 
 
-class MultiResponse(
-    BaseResponse,
+class MultiBody(
+    BaseResponseBody,
     GenericModel,
     Generic[ResponseDataT, ResponseLinksT],
 ):
@@ -88,7 +79,40 @@ class MultiResponse(
     links: ResponseLinksT = Field(..., description=DESCRIPTION_LINKS)
 
 
-# TODO(mc, 2021-12-09): remove this model prior to 5.0 prod release
+ResponseBodyT = TypeVar("ResponseBodyT", bound=BaseResponseBody)
+
+
+class PydanticResponse(JSONResponse, Generic[ResponseBodyT]):
+    """A custom JSON response that uses Pydantic for JSON serialization.
+
+    Returning this class from an endpoint function is much more performant
+    than returning a plain Pydantic model and letting FastAPI serialize it.
+    """
+
+    def __init__(
+        self,
+        content: ResponseBodyT,
+        status_code: int = 200,
+    ) -> None:
+        super().__init__(content, status_code)
+        self.content = content
+
+    def render(self, content: ResponseBodyT) -> bytes:
+        return content.json().encode(self.charset)
+
+
+# TODO(mc, 2021-12-09): remove this model
+class DeprecatedResponseDataModel(BaseModel):
+    """A model representing an identifiable resource of the server.
+
+    .. deprecated::
+        Prefer ResourceModel, which requires ID to be specified
+    """
+
+    id: str = Field(None, description="Unique identifier for the resource object.")
+
+
+# TODO(mc, 2021-12-09): remove this model
 class DeprecatedResponseModel(GenericModel, Generic[ResponseDataT]):
     """A response that returns a single resource and stateful links.
 
@@ -106,7 +130,7 @@ class DeprecatedResponseModel(GenericModel, Generic[ResponseDataT]):
     )
 
 
-# TODO(mc, 2021-12-09): remove this model prior to 5.0 prod release
+# TODO(mc, 2021-12-09): remove this model
 class DeprecatedMultiResponseModel(
     GenericModel,
     Generic[ResponseDataT],

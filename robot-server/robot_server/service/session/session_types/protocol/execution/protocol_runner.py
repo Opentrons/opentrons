@@ -4,7 +4,7 @@ import typing
 
 from opentrons.broker import Broker
 from opentrons.commands import types as command_types
-from opentrons.hardware_control import ThreadedAsyncLock, ThreadManager
+from opentrons.hardware_control import ThreadedAsyncLock, ThreadManagedHardware
 from opentrons.api.session import Session as ApiProtocolSession
 
 from robot_server.service.protocol.protocol import UploadedProtocol
@@ -36,7 +36,7 @@ class ProtocolRunner:
         self,
         protocol: UploadedProtocol,
         loop: asyncio.AbstractEventLoop,
-        hardware: ThreadManager,
+        hardware: ThreadManagedHardware,
         motion_lock: ThreadedAsyncLock,
     ):
         """Constructor"""
