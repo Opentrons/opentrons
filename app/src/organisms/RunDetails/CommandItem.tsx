@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useInView } from 'react-intersection-observer'
 import {
   DIRECTION_ROW,
   Flex,
@@ -67,10 +68,16 @@ const WRAPPER_STYLE_BY_STATUS: {
 const commandIsComplete = (status: RunCommandSummary['status']): boolean =>
   status === 'succeeded' || status === 'failed'
 
+// minimum delay in MS for observer notifications
+const OBSERVER_DELAY = 300
+
 export function CommandItem(props: CommandItemProps): JSX.Element | null {
   const { analysisCommand, runCommandSummary, runStatus } = props
   const { t } = useTranslation('run_details')
   const currentRunId = useCurrentRunId()
+  const [commandItemRef, isInView] = useInView({
+    delay: OBSERVER_DELAY,
+  })
   const [staleTime, setStaleTime] = React.useState<number>(0)
   const isAnticipatedCommand =
     analysisCommand !== null && runCommandSummary === null
@@ -78,7 +85,7 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
     currentRunId,
     runCommandSummary?.id ?? null,
     {
-      enabled: !isAnticipatedCommand && runStatus !== 'idle',
+      enabled: !isAnticipatedCommand && runStatus !== 'idle' && isInView,
       staleTime,
     }
   )
@@ -137,7 +144,7 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
     flex-direction: ${DIRECTION_COLUMN};
   `
   return (
-    <Flex css={WRAPPER_STYLE}>
+    <Flex css={WRAPPER_STYLE} ref={commandItemRef}>
       {commandStatus === 'running' ? (
         <CurrentCommandLabel runStatus={runStatus} />
       ) : null}
