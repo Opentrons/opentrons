@@ -10,6 +10,7 @@ export const RUN_STATUS_PAUSED: 'paused' = 'paused'
 export const RUN_STATUS_STOP_REQUESTED: 'stop-requested' = 'stop-requested'
 export const RUN_STATUS_STOPPED: 'stopped' = 'stopped'
 export const RUN_STATUS_FAILED: 'failed' = 'failed'
+export const RUN_STATUS_FINISHING: 'finishing' = 'finishing'
 export const RUN_STATUS_SUCCEEDED: 'succeeded' = 'succeeded'
 
 export type RunStatus =
@@ -20,6 +21,7 @@ export type RunStatus =
   | typeof RUN_STATUS_STOP_REQUESTED
   | typeof RUN_STATUS_STOPPED
   | typeof RUN_STATUS_FAILED
+  | typeof RUN_STATUS_FINISHING
   | typeof RUN_STATUS_SUCCEEDED
 
 export interface RunData {
