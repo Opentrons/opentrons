@@ -17,8 +17,8 @@ from robot_server.errors import ApiError
 from robot_server.service.task_runner import TaskRunner
 from robot_server.service.json_api import (
     RequestModel,
-    SimpleResponse,
-    SimpleEmptyResponse,
+    SimpleBody,
+    SimpleEmptyBody,
     ResourceLink,
 )
 
@@ -141,7 +141,8 @@ async def test_create_run(
         created_at=run_created_at,
     )
 
-    assert result.data == expected_response
+    assert result.content.data == expected_response
+    assert result.status_code == 201
 
     decoy.verify(
         # It should have added each requested labware offset to the engine,
@@ -228,7 +229,8 @@ async def test_create_protocol_run(
         created_at=run_created_at,
     )
 
-    assert result.data == expected_response
+    assert result.content.data == expected_response
+    assert result.status_code == 201
 
     decoy.verify(
         # It should have added each requested labware offset to the engine,
@@ -352,7 +354,8 @@ async def test_get_run(
         engine_store=engine_store,
     )
 
-    assert result.data == expected_response
+    assert result.content.data == expected_response
+    assert result.status_code == 200
 
 
 async def test_get_run_with_errors(
@@ -433,7 +436,8 @@ async def test_get_run_with_errors(
         engine_store=engine_store,
     )
 
-    assert result.data == expected_response
+    assert result.content.data == expected_response
+    assert result.status_code == 200
 
 
 async def test_get_run_with_missing_id(decoy: Decoy, run_store: RunStore) -> None:
@@ -455,8 +459,9 @@ async def test_get_runs_empty(decoy: Decoy, run_store: RunStore) -> None:
 
     result = await get_runs(run_store=run_store)
 
-    assert result.data == []
-    assert result.links == AllRunsLinks(current=None)
+    assert result.content.data == []
+    assert result.content.links == AllRunsLinks(current=None)
+    assert result.status_code == 200
 
 
 async def test_get_runs_not_empty(
@@ -540,8 +545,11 @@ async def test_get_runs_not_empty(
 
     result = await get_runs(run_store=run_store, engine_store=engine_store)
 
-    assert result.data == [response_1, response_2]
-    assert result.links == AllRunsLinks(current=ResourceLink(href="/runs/unique-id-2"))
+    assert result.content.data == [response_1, response_2]
+    assert result.content.links == AllRunsLinks(
+        current=ResourceLink(href="/runs/unique-id-2")
+    )
+    assert result.status_code == 200
 
 
 async def test_delete_run_by_id(
@@ -561,7 +569,8 @@ async def test_delete_run_by_id(
         run_store.remove(run_id="run-id"),
     )
 
-    assert result == SimpleEmptyResponse()
+    assert result.content == SimpleEmptyBody()
+    assert result.status_code == 200
 
 
 async def test_delete_run_with_bad_id(
@@ -676,14 +685,15 @@ async def test_add_labware_offset(
         pe_types.EngineStatus.SUCCEEDED
     )
 
-    response = await add_labware_offset(
+    result = await add_labware_offset(
         runId="run-id",
         request_body=RequestModel(data=labware_offset_request),
         engine_store=engine_store,
         run_store=run_store,
     )
 
-    assert response == SimpleResponse(data=expected_response)
+    assert result.content == SimpleBody(data=expected_response)
+    assert result.status_code == 201
 
 
 async def test_update_run_to_not_current(
@@ -750,7 +760,9 @@ async def test_update_run_to_not_current(
         engine_store=engine_store,
     )
 
-    assert result == SimpleResponse(data=expected_response)
+    assert result.content == SimpleBody(data=expected_response)
+    assert result.status_code == 200
+
     decoy.verify(
         await engine_store.clear(),
         run_store.upsert(updated_resource),
@@ -813,7 +825,9 @@ async def test_update_current_to_current_noop(
         engine_store=engine_store,
     )
 
-    assert result == SimpleResponse(data=expected_response)
+    assert result.content == SimpleBody(data=expected_response)
+    assert result.status_code == 200
+
     decoy.verify(run_store.upsert(run_resource), times=0)
     decoy.verify(await engine_store.clear(), times=0)
 

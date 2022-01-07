@@ -47,6 +47,7 @@ class PipetteState:
     pipettes_by_id: Dict[str, LoadedPipette]
     aspirated_volume_by_id: Dict[str, float]
     current_well: Optional[CurrentWell]
+    attached_tip_labware_by_id: Dict[str, str]
 
 
 class PipetteStore(HasState[PipetteState], HandlesActions):
@@ -60,6 +61,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             pipettes_by_id={},
             aspirated_volume_by_id={},
             current_well=None,
+            attached_tip_labware_by_id={},
         )
 
     def handle_action(self, action: Action) -> None:
@@ -107,9 +109,20 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         elif isinstance(command.result, DispenseResult):
             pipette_id = command.params.pipetteId
             previous_volume = self._state.aspirated_volume_by_id[pipette_id]
-            next_volume = max(0, previous_volume - command.result.volume)
-
+            next_volume = max(0.0, previous_volume - command.result.volume)
             self._state.aspirated_volume_by_id[pipette_id] = next_volume
+
+        elif isinstance(command.result, PickUpTipResult):
+            pipette_id = command.params.pipetteId
+            tiprack_id = command.params.labwareId
+            self._state.attached_tip_labware_by_id[pipette_id] = tiprack_id
+
+        elif isinstance(command.result, DropTipResult):
+            pipette_id = command.params.pipetteId
+            # No-op if pipette_id not found; makes unit testing easier.
+            # That should never happen outside of tests. But if it somehow does,
+            # it won't harm the state.
+            self._state.attached_tip_labware_by_id.pop(pipette_id, None)
 
 
 class PipetteView(HasState[PipetteState]):
@@ -189,3 +202,7 @@ class PipetteView(HasState[PipetteState]):
             self.get_aspirated_volume(pipette_id) > 0
             or pipette_config["ready_to_aspirate"]
         )
+
+    def get_attached_tip_labware_by_id(self) -> Dict[str, str]:
+        """Get the tiprack ids of attached tip by pipette ids."""
+        return self._state.attached_tip_labware_by_id

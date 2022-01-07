@@ -18,12 +18,14 @@ def get_pipette_view(
     pipettes_by_id: Optional[Dict[str, LoadedPipette]] = None,
     aspirated_volume_by_id: Optional[Dict[str, float]] = None,
     current_well: Optional[CurrentWell] = None,
+    attached_tip_labware_by_id: Optional[Dict[str, str]] = None,
 ) -> PipetteView:
     """Get a pipette view test subject with the specified state."""
     state = PipetteState(
         pipettes_by_id=pipettes_by_id or {},
         aspirated_volume_by_id=aspirated_volume_by_id or {},
         current_well=current_well,
+        attached_tip_labware_by_id=attached_tip_labware_by_id or {},
     )
 
     return PipetteView(state=state)
