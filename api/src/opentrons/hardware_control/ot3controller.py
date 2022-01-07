@@ -12,6 +12,12 @@ from opentrons.types import Mount
 from opentrons.config import pipette_config
 
 try:
+    import aionotify  # type: ignore[import]
+except (OSError, ModuleNotFoundError):
+    aionotify = None
+
+
+try:
     from opentrons_hardware.drivers.can_bus import CanDriver, CanMessenger
     from opentrons_hardware.hardware_control.motion import create
     from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
@@ -25,7 +31,7 @@ except ModuleNotFoundError:
     pass
 
 from .module_control import AttachedModulesControl
-from .types import BoardRevision, Axis
+from .types import BoardRevision, Axis, AionotifyEvent
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
@@ -78,6 +84,15 @@ class OT3Controller:
         self._messenger = CanMessenger(driver=driver)
         self._messenger.start()
         self._position = self._get_home_position()
+        try:
+            self._event_watcher = self._build_event_watcher()
+        except AttributeError:
+            MODULE_LOG.warning(
+                "Failed to initiate aionotify, cannot watch modules "
+                "or door, likely because not running on linux"
+            )
+
+
 
     async def setup_motors(self) -> None:
         """Set up the motors."""
@@ -232,9 +247,36 @@ class OT3Controller:
         """Save the current."""
         yield
 
-    async def watch(self, loop: asyncio.AbstractEventLoop) -> None:
-        """Watch hardware events."""
-        return None
+    @staticmethod
+    def _build_event_watcher():
+        watcher = aionotify.Watcher()
+        watcher.watch(
+            alias="modules",
+            path="/dev",
+            flags=(aionotify.Flags.CREATE | aionotify.Flags.DELETE),
+        )
+        return watcher
+
+    async def _handle_watch_event(self):
+        try:
+            event = await self._event_watcher.get_event()
+        except asyncio.IncompleteReadError:
+            MODULE_LOG.debug("incomplete read error when quitting watcher")
+            return
+        if event is not None:
+            if "ot_module" in event.name:
+                event_name = event.name
+                flags = aionotify.Flags.parse(event.flags)
+                event_description = AionotifyEvent.build(event_name, flags)
+                await self.module_controls.handle_module_appearance(event_description)
+
+    async def watch(self, loop: asyncio.AbstractEventLoop):
+        can_watch = aionotify is not None
+        if can_watch:
+            await self._event_watcher.setup(loop)
+
+        while can_watch and (not self._event_watcher.closed):
+            await self._handle_watch_event()
 
     @property
     def axis_bounds(self) -> Dict[Axis, Tuple[float, float]]:
@@ -299,6 +341,15 @@ class OT3Controller:
 
     def clean_up(self) -> None:
         """Clean up."""
+
+        try:
+            loop = asyncio.get_event_loop()
+        except RuntimeError:
+            return
+
+        if hasattr(self, "_event_watcher"):
+            if loop.is_running() and self._event_watcher:
+                self._event_watcher.close()
         return None
 
     async def configure_mount(
