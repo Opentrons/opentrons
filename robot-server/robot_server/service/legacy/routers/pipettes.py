@@ -1,19 +1,12 @@
 from typing_extensions import Protocol
 import typing
 from fastapi import APIRouter, Query, Depends
-from opentrons.hardware_control.protocols import (
-    InstrumentConfigurer,
-    AsyncioConfigurable,
-)
+
 from opentrons.hardware_control.types import Axis
+from opentrons.hardware_control import HardwareControlAPI
 
 from robot_server.hardware import get_hardware
 from robot_server.service.legacy.models import pipettes
-
-
-class TMInstrument(AsyncioConfigurable, InstrumentConfigurer, Protocol):
-    ...
-
 
 router = APIRouter()
 
@@ -39,7 +32,7 @@ async def get_pipettes(
         " should only be done when no  protocol is running "
         "and you know  it won't cause a problem",
     ),
-    hardware: TMInstrument = Depends(get_hardware),
+    hardware: HardwareControlAPI = Depends(get_hardware),
 ) -> pipettes.PipettesByMount:
     """
     Query robot for model strings on 'left' and 'right' mounts, and return a

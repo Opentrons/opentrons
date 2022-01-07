@@ -6,7 +6,7 @@ from typing_extensions import Protocol
 from starlette import status
 from fastapi import APIRouter, Depends
 
-from opentrons.hardware_control.protocols import Configurable, AsyncioConfigurable
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.system import log_control
 from opentrons.config import (
     pipette_config,
@@ -38,12 +38,6 @@ from robot_server.service.legacy.models.settings import (
 log = logging.getLogger(__name__)
 
 router = APIRouter()
-
-
-class TMConfig(AsyncioConfigurable, Configurable, Protocol):
-    """ThreadManager's managed object supporting configuration"""
-
-    ...
 
 
 @router.post(
@@ -116,7 +110,7 @@ def _create_settings_response() -> AdvancedSettingsResponse:
     },
 )
 async def post_log_level_local(
-    log_level: LogLevel, hardware: TMConfig = Depends(get_hardware)
+    log_level: LogLevel, hardware: HardwareControlAPI = Depends(get_hardware)
 ) -> V1BasicResponse:
     """Update local log level"""
     level = log_level.log_level
@@ -219,7 +213,7 @@ async def post_settings_reset_options(
     response_model=RobotConfigs,
 )
 async def get_robot_settings(
-    hardware: TMConfig = Depends(get_hardware),
+    hardware: HardwareControlAPI = Depends(get_hardware),
 ) -> RobotConfigs:
     return asdict(hardware.config)
 

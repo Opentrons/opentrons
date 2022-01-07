@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from typing_extensions import Protocol
 
-from opentrons.hardware_control.protocols import Calibratable, AsyncioConfigurable
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.calibration_storage import helpers
 
 from robot_server.hardware import get_hardware
@@ -20,17 +20,13 @@ router = APIRouter()
 DEFAULT_INSTR_OFFSET = InstrumentOffset(single=(0, 0, 0), multi=(0, 0, 0))
 
 
-class TMCalibratable(AsyncioConfigurable, Calibratable, Protocol):
-    ...
-
-
 @router.get(
     "/calibration/status",
     description="Get the calibration status",
     response_model=CalibrationStatus,
 )
 async def get_calibration_status(
-    hardware: TMCalibratable = Depends(get_hardware),
+    hardware: HardwareControlAPI = Depends(get_hardware),
 ) -> CalibrationStatus:
     # TODO: AA 12-01-2020 Instrument offset has been deprecated. We should
     # exclude instrument calibration in a future refactor
