@@ -47,6 +47,7 @@ from robot_server.runs.run_store import (
 from robot_server.runs.router.base_router import (
     AllRunsLinks,
     create_run,
+    get_run_data_from_url,
     get_run,
     get_runs,
     remove_run,
@@ -274,7 +275,7 @@ async def test_create_run_conflict(decoy: Decoy, engine_store: EngineStore) -> N
     assert exc_info.value.content["errors"][0]["id"] == "RunAlreadyActive"
 
 
-async def test_get_run(
+async def test_get_run_data_from_url(
     decoy: Decoy,
     run_store: RunStore,
     engine_store: EngineStore,
@@ -348,14 +349,13 @@ async def test_get_run(
         pe_types.EngineStatus.IDLE
     )
 
-    result = await get_run(
+    result = await get_run_data_from_url(
         runId="run-id",
         run_store=run_store,
         engine_store=engine_store,
     )
 
-    assert result.content.data == expected_response
-    assert result.status_code == 200
+    assert result == expected_response
 
 
 async def test_get_run_with_errors(
@@ -430,14 +430,13 @@ async def test_get_run_with_errors(
         pe_types.EngineStatus.FAILED
     )
 
-    result = await get_run(
+    result = await get_run_data_from_url(
         runId="run-id",
         run_store=run_store,
         engine_store=engine_store,
     )
 
-    assert result.content.data == expected_response
-    assert result.status_code == 200
+    assert result == expected_response
 
 
 async def test_get_run_with_missing_id(decoy: Decoy, run_store: RunStore) -> None:
@@ -447,10 +446,32 @@ async def test_get_run_with_missing_id(decoy: Decoy, run_store: RunStore) -> Non
     decoy.when(run_store.get(run_id="run-id")).then_raise(not_found_error)
 
     with pytest.raises(ApiError) as exc_info:
-        await get_run(runId="run-id", run_store=run_store)
+        await get_run_data_from_url(runId="run-id", run_store=run_store)
 
     assert exc_info.value.status_code == 404
     assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
+
+
+async def test_get_run() -> None:
+    """It should wrap the run data in a response."""
+    run_data = Run(
+        id="run-id",
+        protocolId=None,
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=pe_types.EngineStatus.IDLE,
+        current=False,
+        actions=[],
+        errors=[],
+        commands=[],
+        pipettes=[],
+        labware=[],
+        labwareOffsets=[],
+    )
+
+    result = await get_run(run_data=run_data)
+
+    assert result.content.data == run_data
+    assert result.status_code == 200
 
 
 async def test_get_runs_empty(decoy: Decoy, run_store: RunStore) -> None:

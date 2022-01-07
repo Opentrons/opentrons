@@ -11,6 +11,7 @@ import {
 } from '@opentrons/react-api-client'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks/useCurrentRunId'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6/command'
+import type { RunCommandSummary } from '@opentrons/api-client'
 
 jest.mock('../CommandText')
 jest.mock('../CommandTimer')
@@ -37,20 +38,17 @@ const render = (props: React.ComponentProps<typeof CommandItem>) => {
 }
 const RUN_ID = 'run_id'
 
-const MOCK_COMMAND = {
-  id: '123',
+const MOCK_COMMAND_SUMMARY: RunCommandSummary = {
+  id: 'some_id',
   commandType: 'custom',
-  params: {},
-  status: 'running',
-  result: {},
-} as Command
-const MOCK_COMMENT_COMMAND = {
-  id: 'COMMENT',
-  commandType: 'custom',
-  params: { legacyCommandType: 'command.COMMENT' },
   status: 'queued',
-  result: {},
-} as Command
+}
+const MOCK_ANALYSIS_COMMAND: Command = {
+  id: 'some_id',
+  commandType: 'custom',
+  status: 'queued',
+  params: {},
+}
 const MOCK_COMMAND_DETAILS = {
   id: '123',
   commandType: 'custom',
@@ -69,29 +67,13 @@ const MOCK_COMMAND_DETAILS_COMMENT = {
   startedAt: 'start timestamp',
   completedAt: 'end timestamp',
 } as Command
-const MOCK_PAUSE_COMMAND = {
-  id: 'PAUSE',
-  commandType: 'pause',
-  params: {},
-  status: 'queued',
-  result: {},
-} as Command
-const MOCK_COMMAND_DETAILS_PAUSE = {
-  id: 'PAUSE',
-  commandType: 'pause',
-  params: {},
-  status: 'queued',
-  result: {},
-  startedAt: 'start timestamp',
-  completedAt: 'end timestamp',
-} as Command
 describe('Run Details Command item', () => {
   beforeEach(() => {
     mockCommandText.mockReturnValue(<div>Mock Command Text</div>)
     mockCommandTimer.mockReturnValue(<div>Mock Command Timer</div>)
     when(mockUseCurrentRunId).calledWith().mockReturnValue(RUN_ID)
     when(mockUseCommandQuery)
-      .calledWith(RUN_ID, MOCK_COMMAND.id, expect.anything())
+      .calledWith(RUN_ID, MOCK_COMMAND_SUMMARY.id, expect.anything())
       .mockReturnValue({
         data: { data: MOCK_COMMAND_DETAILS },
         refetch: jest.fn(),
@@ -105,8 +87,8 @@ describe('Run Details Command item', () => {
 
   it('renders the correct failed status', () => {
     const { getByText } = render({
-      commandOrSummary: { ...MOCK_COMMAND, status: 'failed' },
-      runStatus: 'stopped',
+      runCommandSummary: { ...MOCK_COMMAND_SUMMARY, status: 'failed' },
+      analysisCommand: { ...MOCK_ANALYSIS_COMMAND },
     })
     expect(getByText('Step failed')).toHaveStyle(
       'backgroundColor: C_ERROR_LIGHT'
@@ -116,7 +98,8 @@ describe('Run Details Command item', () => {
   })
   it('renders the correct success status', () => {
     const props = {
-      commandOrSummary: { ...MOCK_COMMAND, status: 'succeeded' },
+      runCommandSummary: { ...MOCK_COMMAND_SUMMARY, status: 'succeeded' },
+      analysisCommand: { ...MOCK_ANALYSIS_COMMAND },
       runStatus: 'succeeded',
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
@@ -127,7 +110,8 @@ describe('Run Details Command item', () => {
   })
   it('renders the correct running status', () => {
     const props = {
-      commandOrSummary: { ...MOCK_COMMAND, status: 'running' },
+      runCommandSummary: { ...MOCK_COMMAND_SUMMARY, status: 'running' },
+      analysisCommand: { ...MOCK_ANALYSIS_COMMAND },
       runStatus: 'running',
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
@@ -140,7 +124,8 @@ describe('Run Details Command item', () => {
 
   it('renders the correct queued status', () => {
     const props = {
-      commandOrSummary: { ...MOCK_COMMAND, status: 'queued' },
+      runCommandSummary: { ...MOCK_COMMAND_SUMMARY, status: 'queued' },
+      analysisCommand: { ...MOCK_ANALYSIS_COMMAND },
       runStatus: 'running',
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
@@ -151,7 +136,8 @@ describe('Run Details Command item', () => {
 
   it('renders the correct running status with run paused', () => {
     const props = {
-      commandOrSummary: { ...MOCK_COMMAND, status: 'running' },
+      runCommandSummary: { ...MOCK_COMMAND_SUMMARY, status: 'running' },
+      analysisCommand: { ...MOCK_ANALYSIS_COMMAND },
       runStatus: 'paused',
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
@@ -163,14 +149,27 @@ describe('Run Details Command item', () => {
   })
 
   it('renders the comment text when the command is a comment', () => {
+    const MOCK_COMMENT_COMMAND: Command = {
+      id: 'COMMENT',
+      commandType: 'custom',
+      params: { legacyCommandType: 'command.COMMENT' },
+      status: 'queued',
+      result: {},
+    }
+    const MOCK_COMMENT_COMMAND_SUMMARY: RunCommandSummary = {
+      id: 'COMMENT',
+      commandType: 'custom',
+      status: 'queued',
+    }
     when(mockUseCommandQuery)
-      .calledWith(RUN_ID, MOCK_COMMENT_COMMAND.id, expect.anything())
+      .calledWith(RUN_ID, MOCK_COMMENT_COMMAND_SUMMARY.id, expect.anything())
       .mockReturnValue({
         data: { data: MOCK_COMMAND_DETAILS_COMMENT },
         refetch: jest.fn(),
       } as any)
     const props = {
-      commandOrSummary: { ...MOCK_COMMENT_COMMAND, status: 'queued' },
+      runCommandSummary: MOCK_COMMENT_COMMAND_SUMMARY,
+      analysisCommand: MOCK_COMMENT_COMMAND,
       runStatus: 'running',
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
@@ -178,6 +177,27 @@ describe('Run Details Command item', () => {
     getByText('Mock Command Text')
   })
   it('renders the pause text when the command is a pause', () => {
+    const MOCK_PAUSE_COMMAND: Command = {
+      id: 'PAUSE',
+      commandType: 'pause',
+      params: {},
+      status: 'queued',
+      result: {},
+    }
+    const MOCK_PAUSE_COMMAND_SUMMARY: RunCommandSummary = {
+      id: 'PAUSE',
+      commandType: 'pause',
+      status: 'queued',
+    }
+    const MOCK_COMMAND_DETAILS_PAUSE: Command = {
+      id: 'PAUSE',
+      commandType: 'pause',
+      params: {},
+      status: 'running',
+      result: {},
+      startedAt: 'start timestamp',
+      completedAt: 'end timestamp',
+    }
     when(mockUseCommandQuery)
       .calledWith(RUN_ID, MOCK_PAUSE_COMMAND.id, expect.anything())
       .mockReturnValue({
@@ -185,7 +205,8 @@ describe('Run Details Command item', () => {
         refetch: jest.fn(),
       } as any)
     const props = {
-      commandOrSummary: { ...MOCK_PAUSE_COMMAND, status: 'queued' },
+      runCommandSummary: MOCK_PAUSE_COMMAND_SUMMARY,
+      analysisCommand: MOCK_PAUSE_COMMAND,
       runStatus: 'paused',
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)

@@ -88,6 +88,48 @@ class AllRunsLinks(BaseModel):
     )
 
 
+async def get_run_data_from_url(
+    runId: str,
+    run_store: RunStore = Depends(get_run_store),
+    engine_store: EngineStore = Depends(get_engine_store),
+) -> Run:
+    """Get the data of a run.
+
+    Args:
+        runId: Run ID pulled from URL.
+        run_store: Run storage interface.
+        engine_store: ProtocolEngine storage and control.
+    """
+    try:
+        run = run_store.get(run_id=runId)
+    except RunNotFoundError as e:
+        raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
+
+    engine_state = engine_store.get_state(run.run_id)
+
+    return Run.construct(
+        id=run.run_id,
+        protocolId=run.protocol_id,
+        createdAt=run.created_at,
+        current=run.is_current,
+        actions=run.actions,
+        commands=[
+            RunCommandSummary.construct(
+                id=c.id,
+                commandType=c.commandType,
+                status=c.status,
+                errorId=c.errorId,
+            )
+            for c in engine_state.commands.get_all()
+        ],
+        errors=engine_state.commands.get_all_errors(),
+        pipettes=engine_state.pipettes.get_all(),
+        labware=engine_state.labware.get_all(),
+        labwareOffsets=engine_state.labware.get_labware_offsets(),
+        status=engine_state.commands.get_status(),
+    )
+
+
 @base_router.post(
     path="/runs",
     summary="Create a run",
@@ -247,48 +289,15 @@ async def get_runs(
     },
 )
 async def get_run(
-    runId: str,
-    run_store: RunStore = Depends(get_run_store),
-    engine_store: EngineStore = Depends(get_engine_store),
+    run_data: Run = Depends(get_run_data_from_url),
 ) -> PydanticResponse[SimpleBody[Run]]:
     """Get a run by its ID.
 
     Args:
-        runId: Run ID pulled from URL.
-        run_store: Run storage interface.
-        engine_store: ProtocolEngine storage and control.
+        run_data: Data of the run specified in the runId url parameter.
     """
-    try:
-        run = run_store.get(run_id=runId)
-    except RunNotFoundError as e:
-        raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
-
-    engine_state = engine_store.get_state(run.run_id)
-
-    data = Run.construct(
-        id=run.run_id,
-        protocolId=run.protocol_id,
-        createdAt=run.created_at,
-        current=run.is_current,
-        actions=run.actions,
-        commands=[
-            RunCommandSummary.construct(
-                id=c.id,
-                commandType=c.commandType,
-                status=c.status,
-                errorId=c.errorId,
-            )
-            for c in engine_state.commands.get_all()
-        ],
-        errors=engine_state.commands.get_all_errors(),
-        pipettes=engine_state.pipettes.get_all(),
-        labware=engine_state.labware.get_all(),
-        labwareOffsets=engine_state.labware.get_labware_offsets(),
-        status=engine_state.commands.get_status(),
-    )
-
     return PydanticResponse(
-        content=SimpleBody.construct(data=data),
+        content=SimpleBody.construct(data=run_data),
         status_code=status.HTTP_200_OK,
     )
 
