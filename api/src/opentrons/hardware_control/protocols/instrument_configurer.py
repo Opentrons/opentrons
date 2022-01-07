@@ -12,7 +12,7 @@ from ..types import PipettePair, CriticalPoint
 class InstrumentConfigurer(Protocol):
     """A protocol specifying how to interact with instrument presence and detection."""
 
-    def reset_instrument(self, mount: Mount = None) -> None:
+    def reset_instrument(self, mount: Optional[Mount] = None) -> None:
         """
         Reset the internal state of a pipette by its mount, without doing
         any lower level reconfiguration. This is useful to make sure that no
