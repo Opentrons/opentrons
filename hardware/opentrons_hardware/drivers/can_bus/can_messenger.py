@@ -27,7 +27,7 @@ class MessageListener(ABC):
     """Incoming message listener."""
 
     @abstractmethod
-    def on_message(self, message: MessageDefinition) -> None:
+    def on_message(self, message: MessageDefinition, arbitration_id: ArbitrationId) -> None:
         """A new message arrived."""
         ...
 
