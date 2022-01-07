@@ -16,7 +16,7 @@ class ConnectionHandler:
 
     _writers: List[asyncio.StreamWriter]
 
-    BYTES_TO_READ = 64 + 4 + 4   # Max data size + arbitration id + total size
+    BYTES_TO_READ = 64 + 4 + 4  # Max data size + arbitration id + total size
 
     def __init__(self) -> None:
         """Constructor."""
