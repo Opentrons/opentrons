@@ -79,6 +79,7 @@ if __name__ == "__main__":
         entry_points={
             "console_scripts": [
                 "opentrons_can_comm = opentrons_hardware.scripts.can_comm:main",
+                "opentrons_sim_can_bus = opentrons_hardware.scripts.sim_socket_can:main",
             ]
         },
     )

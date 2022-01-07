@@ -36,6 +36,8 @@ class ConnectionHandler:
                 log.warning("client disconnected.")
                 break
 
+            log.info("Read %d bytes", len(data))
+
             for w in self._writers:
                 if w != writer:
                     w.write(data)
@@ -46,6 +48,7 @@ class ConnectionHandler:
 
 async def run(port: int) -> None:
     """Run the application."""
+    log.info("Starting simulated CAN bus on port %d", port)
     connection_handler = ConnectionHandler()
     server = await asyncio.start_server(connection_handler, port=port)
     await server.serve_forever()
