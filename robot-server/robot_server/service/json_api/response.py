@@ -1,4 +1,5 @@
 from __future__ import annotations
+from anyio import to_thread
 from typing import Any, Dict, Generic, List, Optional, TypeVar
 from pydantic import Field, BaseModel
 from pydantic.generics import GenericModel
@@ -94,10 +95,26 @@ class PydanticResponse(JSONResponse, Generic[ResponseBodyT]):
         content: ResponseBodyT,
         status_code: int = 200,
     ) -> None:
+        """Initialize the response object and render the response body."""
         super().__init__(content, status_code)
         self.content = content
 
+    @classmethod
+    async def create(
+        cls,
+        content: ResponseBodyT,
+        status_code: int = 200,
+    ) -> PydanticResponse[ResponseBodyT]:
+        """Asynchronously create a response object.
+
+        This factory creates the response in a worker thread, thus moving
+        JSON rendering off the main thread. This can help resolve blocking
+        issues with large responses.
+        """
+        return await to_thread.run_sync(cls, content, status_code)
+
     def render(self, content: ResponseBodyT) -> bytes:
+        """Render the response body to JSON bytes."""
         return content.json().encode(self.charset)
 
 

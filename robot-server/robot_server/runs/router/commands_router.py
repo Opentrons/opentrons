@@ -66,7 +66,7 @@ async def create_run_command(
 
     command = engine_store.engine.add_command(request_body.data)
 
-    return PydanticResponse(
+    return await PydanticResponse.create(
         content=SimpleBody.construct(data=command),
         status_code=status.HTTP_201_CREATED,
     )
@@ -95,7 +95,7 @@ async def get_run_commands(
         run: Run response model, provided by the route handler for
             `GET /runs/{runId}`
     """
-    return PydanticResponse(
+    return await PydanticResponse.create(
         content=SimpleMultiBody.construct(data=run.commands),
         status_code=status.HTTP_200_OK,
     )
@@ -135,7 +135,7 @@ async def get_run_command(
     except pe_errors.CommandDoesNotExistError as e:
         raise CommandNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
-    return PydanticResponse(
+    return await PydanticResponse.create(
         content=SimpleBody(data=command),
         status_code=status.HTTP_200_OK,
     )

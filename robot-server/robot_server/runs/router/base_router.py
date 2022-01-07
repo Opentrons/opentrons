@@ -216,7 +216,7 @@ async def create_run(
         status=engine_state.commands.get_status(),
     )
 
-    return PydanticResponse(
+    return await PydanticResponse.create(
         content=SimpleBody.construct(data=data),
         status_code=status.HTTP_201_CREATED,
     )
@@ -273,7 +273,7 @@ async def get_runs(
         if run.is_current:
             links.current = ResourceLink.construct(href=f"/runs/{run.run_id}")
 
-    return PydanticResponse(
+    return await PydanticResponse.create(
         content=MultiBody.construct(data=data, links=links),
         status_code=status.HTTP_200_OK,
     )
@@ -296,7 +296,7 @@ async def get_run(
     Args:
         run_data: Data of the run specified in the runId url parameter.
     """
-    return PydanticResponse(
+    return await PydanticResponse.create(
         content=SimpleBody.construct(data=run_data),
         status_code=status.HTTP_200_OK,
     )
@@ -406,7 +406,7 @@ async def add_labware_offset(
         status=engine_state.commands.get_status(),
     )
 
-    return PydanticResponse(
+    return await PydanticResponse.create(
         content=SimpleBody.construct(data=data),
         status_code=status.HTTP_201_CREATED,
     )
@@ -484,7 +484,7 @@ async def update_run(
         status=engine_state.commands.get_status(),
     )
 
-    return PydanticResponse(
+    return await PydanticResponse.create(
         content=SimpleBody.construct(data=data),
         status_code=status.HTTP_200_OK,
     )

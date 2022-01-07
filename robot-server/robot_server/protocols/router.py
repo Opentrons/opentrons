@@ -169,7 +169,7 @@ async def get_protocols(
         for r in protocol_resources
     ]
 
-    return PydanticResponse(
+    return await PydanticResponse.create(
         content=SimpleMultiBody.construct(data=data),
         status_code=status.HTTP_200_OK,
     )
