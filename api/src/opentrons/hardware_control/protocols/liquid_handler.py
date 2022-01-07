@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Optional, Union
 from typing_extensions import Protocol
 
 from opentrons.types import Mount
@@ -42,7 +42,7 @@ class LiquidHandler(
     async def aspirate(
         self,
         mount: Union[Mount, PipettePair],
-        volume: float = None,
+        volume: Optional[float] = None,
         rate: float = 1.0,
     ) -> None:
         """
@@ -69,7 +69,7 @@ class LiquidHandler(
     async def dispense(
         self,
         mount: Union[Mount, PipettePair],
-        volume: float = None,
+        volume: Optional[float] = None,
         rate: float = 1.0,
     ) -> None:
         """
@@ -95,8 +95,8 @@ class LiquidHandler(
         self,
         mount: Union[Mount, PipettePair],
         tip_length: float,
-        presses: int = None,
-        increment: float = None,
+        presses: Optional[int] = None,
+        increment: Optional[float] = None,
     ) -> None:
         """
         Pick up tip from current location.
@@ -116,7 +116,11 @@ class LiquidHandler(
         """
         ...
 
-    async def drop_tip(self, mount: Union[Mount, PipettePair], home_after=True) -> None:
+    async def drop_tip(
+        self,
+        mount: Union[Mount, PipettePair],
+        home_after: bool = True,
+    ) -> None:
         """
         Drop tip at the current location
 

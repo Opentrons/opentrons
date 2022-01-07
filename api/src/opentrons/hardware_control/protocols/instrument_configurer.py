@@ -78,10 +78,10 @@ class InstrumentConfigurer(Protocol):
     def calibrate_plunger(
         self,
         mount: Mount,
-        top: float = None,
-        bottom: float = None,
-        blow_out: float = None,
-        drop_tip: float = None,
+        top: Optional[float] = None,
+        bottom: Optional[float] = None,
+        blow_out: Optional[float] = None,
+        drop_tip: Optional[float] = None,
     ):
         """
         Set calibration values for the pipette plunger.
@@ -99,9 +99,9 @@ class InstrumentConfigurer(Protocol):
     def set_flow_rate(
         self,
         mount: Mount,
-        aspirate: float = None,
-        dispense: float = None,
-        blow_out: float = None,
+        aspirate: Optional[float] = None,
+        dispense: Optional[float] = None,
+        blow_out: Optional[float] = None,
     ) -> None:
         """Set a pipette's rate of liquid handling in flow rate units"""
         ...
@@ -109,15 +109,17 @@ class InstrumentConfigurer(Protocol):
     def set_pipette_speed(
         self,
         mount: Mount,
-        aspirate: float = None,
-        dispense: float = None,
-        blow_out: float = None,
+        aspirate: Optional[float] = None,
+        dispense: Optional[float] = None,
+        blow_out: Optional[float] = None,
     ) -> None:
         """Set a pipette's rate of liquid handling in linear speed units."""
         ...
 
     def get_instrument_max_height(
-        self, mount: Mount, critical_point: CriticalPoint = None
+        self,
+        mount: Mount,
+        critical_point: Optional[CriticalPoint] = None,
     ) -> float:
         """Return max achievable height of the attached instrument
         based on the current critical point
