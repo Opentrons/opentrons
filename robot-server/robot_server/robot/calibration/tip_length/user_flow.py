@@ -2,7 +2,6 @@ import logging
 from typing import Dict, Awaitable, Callable, Any, Set, List, Optional
 
 from opentrons.types import Mount, Point, Location
-from opentrons.config import feature_flags as ff
 from opentrons.hardware_control import HardwareControlAPI, CriticalPoint, Pipette
 from opentrons.protocol_api import labware
 from opentrons.protocols.geometry.deck import Deck
@@ -17,8 +16,6 @@ from ..errors import CalibrationError
 from ..helper_classes import RequiredLabware, AttachedPipette, SupportedCommands
 from ..constants import (
     TIP_RACK_LOOKUP_BY_MAX_VOL,
-    SHORT_TRASH_DECK,
-    STANDARD_DECK,
     CAL_BLOCK_SETUP_BY_MOUNT,
     MOVE_TO_TIP_RACK_SAFETY_BUFFER,
 )
@@ -59,8 +56,7 @@ class TipCalibrationUserFlow:
         self._tip_origin_pt: Optional[Point] = None
         self._nozzle_height_at_reference: Optional[float] = None
 
-        deck_load_name = SHORT_TRASH_DECK if ff.short_fixed_trash() else STANDARD_DECK
-        self._deck = Deck(load_name=deck_load_name)
+        self._deck = Deck()
         self._tip_rack = self._get_tip_rack_lw(tip_rack)
         self._initialize_deck()
 

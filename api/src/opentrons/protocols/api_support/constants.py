@@ -9,7 +9,6 @@ STANDARD_DEFS_PATH = Path("labware/definitions/2")
 USER_DEFS_PATH = get_opentrons_path("labware_user_definitions_dir_v2")
 
 SHORT_TRASH_DECK = "ot2_short_trash"
-STANDARD_DECK = "ot2_standard"
 STANDARD_OT2_DECK = "ot2_standard"
 STANDARD_OT3_DECK = "ot3_standard"
 

@@ -8,7 +8,10 @@ from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
 from opentrons_shared_data.labware import load_definition
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV2
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.protocols.api_support.constants import STANDARD_DECK, SHORT_TRASH_DECK
+from opentrons.protocols.api_support.constants import (
+    STANDARD_OT2_DECK,
+    SHORT_TRASH_DECK,
+)
 from opentrons.protocol_engine.types import ModuleDefinition
 
 
@@ -23,7 +26,7 @@ async def short_trash_flag() -> AsyncGenerator[None, None]:
 @pytest.fixture(scope="session")
 def standard_deck_def() -> DeckDefinitionV2:
     """Get the OT-2 standard deck definition."""
-    return load_deck(STANDARD_DECK, 2)
+    return load_deck(STANDARD_OT2_DECK, 2)
 
 
 @pytest.fixture(scope="session")
