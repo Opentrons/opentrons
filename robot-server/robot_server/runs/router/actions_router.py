@@ -93,7 +93,11 @@ async def create_run_action(
             engine_store.runner.pause()
         elif action.actionType == RunActionType.STOP:
             log.info(f'Stopping run "{runId}".')
-            task_runner.run(engine_store.runner.stop)
+            runner = engine_store.runner
+            async def stop_and_log() -> None:
+                await runner.stop()
+                log.info(f'Stopped run "{runId}".')
+            task_runner.run(stop_and_log)
 
     except ProtocolEngineStoppedError as e:
         raise RunActionNotAllowed(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
