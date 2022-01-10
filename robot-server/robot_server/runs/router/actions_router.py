@@ -93,6 +93,7 @@ async def create_run_action(
             engine_store.runner.pause()
         elif action.actionType == RunActionType.STOP:
             log.info(f'Stopping run "{runId}".')
+
             # Grab engine_store.runner outside stop_and_log() in case it changes between
             # now and when task_runner runs stop_and_log().
             runner = engine_store.runner
