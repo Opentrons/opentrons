@@ -10,8 +10,8 @@ import { useProtocolDetails } from '../../../../RunDetails/hooks'
 import * as hooks from '..'
 import { getLabwareLocation } from '../../../utils/getLabwareLocation'
 import { getLabwarePositionCheckSteps } from '../../getLabwarePositionCheckSteps'
-import type { PickUpTipCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
-import type { LoadLabwareCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import type { PickUpTipCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+import type { LoadLabwareCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
 jest.mock('@opentrons/shared-data')
 jest.mock('../../getLabwarePositionCheckSteps')
@@ -61,7 +61,7 @@ describe('useIntroInfo', () => {
             slotName: PICKUP_TIP_LABWARE_SLOT,
           },
         },
-      } as LoadLabwareCommand,
+      } as LoadLabwareCreateCommand,
     ]
     mockGetLabwarePositionCheckSteps.mockReturnValue([
       {
@@ -75,7 +75,7 @@ describe('useIntroInfo', () => {
               pipetteId: PRIMARY_PIPETTE_ID,
               labwareId: PICKUP_TIP_LABWARE_ID,
             },
-          } as PickUpTipCommand,
+          } as PickUpTipCreateCommand,
         ],
       },
     ])

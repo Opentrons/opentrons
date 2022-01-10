@@ -10,7 +10,7 @@ import {
   getMoveToLabwareSteps,
   getDropTipStep,
 } from './stepCreators'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
+import type { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { LabwarePositionCheckStep } from '../types'
 
 export const getTwoPipettePositionCheckSteps = (args: {
@@ -19,7 +19,7 @@ export const getTwoPipettePositionCheckSteps = (args: {
   labware: ProtocolFile<{}>['labware']
   labwareDefinitions: Record<string, LabwareDefinition2>
   modules: ProtocolFile<{}>['modules']
-  commands: Command[]
+  commands: CreateCommand[]
 }): LabwarePositionCheckStep[] => {
   const {
     primaryPipetteId,

@@ -35,13 +35,13 @@ import type {
   AnonymousCommand,
 } from '@opentrons/api-client'
 import type {
-  Command,
+  CreateCommand,
   ProtocolFile,
 } from '@opentrons/shared-data/protocol/types/schemaV6'
-import type { SetupCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-import type { DropTipCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+import type { SetupCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import type { DropTipCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import type {
-  HomeCommand,
+  HomeCreateCommand,
   SavePositionCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
 import type {
@@ -164,7 +164,7 @@ export const useTitleText = (
 const commandIsComplete = (status: RunCommandSummary['status']): boolean =>
   status === 'succeeded' || status === 'failed'
 
-const createCommandData = (command: Command): AnonymousCommand => {
+const createCommandData = (command: CreateCommand): AnonymousCommand => {
   if (command.commandType === 'loadLabware') {
     return {
       commandType: command.commandType,
@@ -174,8 +174,8 @@ const createCommandData = (command: Command): AnonymousCommand => {
   return { commandType: command.commandType, params: command.params }
 }
 
-const isLoadCommand = (command: Command): boolean => {
-  const loadCommands: Array<SetupCommand['commandType']> = [
+const isLoadCommand = (command: CreateCommand): boolean => {
+  const loadCommands: Array<SetupCreateCommand['commandType']> = [
     'loadLabware',
     'loadLiquid',
     'loadModule',
@@ -185,7 +185,7 @@ const isLoadCommand = (command: Command): boolean => {
   return loadCommands.includes(command.commandType)
 }
 
-const isTCOpenCommand = (command: Command): boolean =>
+const isTCOpenCommand = (command: CreateCommand): boolean =>
   command.commandType === 'thermocycler/openLid'
 
 export function useLabwarePositionCheck(
@@ -244,16 +244,16 @@ export function useLabwarePositionCheck(
         return commandWithCommandId
       }
       return command
-    }) as Command[]) ?? []
+    }) as CreateCommand[]) ?? []
   // TC open lid commands come from the LPC command generator
   const TCOpenCommands = LPCCommands.filter(isTCOpenCommand) ?? []
-  const homeCommand: HomeCommand = {
+  const homeCommand: HomeCreateCommand = {
     commandType: 'home',
     id: uuidv4(),
     params: {},
   }
   // prepCommands will be run when a user starts LPC
-  const prepCommands: Command[] = [
+  const prepCommands: CreateCommand[] = [
     ...loadCommands,
     ...TCOpenCommands,
     homeCommand,
@@ -345,7 +345,7 @@ export function useLabwarePositionCheck(
     setCurrentCommandIndex(currentCommandIndex + 1)
     setShowPickUpTipConfirmationModal(false)
     // before executing the next movement command, save the current position
-    const savePositionCommand: Command = {
+    const savePositionCommand: CreateCommand = {
       commandType: 'savePosition',
       id: uuidv4(),
       params: { pipetteId: prevCommand.params.pipetteId },
@@ -481,7 +481,7 @@ export function useLabwarePositionCheck(
         }
         // if this was the last LPC command, home the robot
         if (currentCommandIndex === LPCMovementCommands.length - 1) {
-          const homeCommand: HomeCommand = {
+          const homeCommand: HomeCreateCommand = {
             commandType: 'home',
             id: uuidv4(),
             params: {},
@@ -595,11 +595,11 @@ export function useLabwarePositionCheck(
     setIsLoading(true)
     setShowPickUpTipConfirmationModal(false)
     // drop the tip  back where it was before
-    const commandType: DropTipCommand['commandType'] = 'dropTip'
+    const commandType: DropTipCreateCommand['commandType'] = 'dropTip'
     const pipetteId = prevCommand.params.pipetteId
     const labwareId = prevCommand.params.labwareId
     const wellName = prevCommand.params.wellName
-    const dropTipCommand: DropTipCommand = {
+    const dropTipCommand: DropTipCreateCommand = {
       commandType,
       id: uuidv4(),
       params: {

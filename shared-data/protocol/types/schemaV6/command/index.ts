@@ -32,7 +32,7 @@ export interface CommonCommandRunTimeInfo extends CommonCommandInfo {
   completedAt: string | null
 }
 
-export type CommandCreateData =
+export type CreateCommand =
   | PipettingCreateCommand // involves the pipettes plunger motor
   | GantryCreateCommand // movement that only effects the x,y,z position of the gantry/pipette
   | ModuleCreateCommand // directed at a hardware module
@@ -45,7 +45,7 @@ export type CommandCreateData =
     } & CommonCommandInfo) // allows for experimentation between schema versions with no expectation of system support
 
 // commands will be required to have a key, but will not be created with one
-export type Command =
+export type RunTimeCommand =
   | PipettingRunTimeCommand // involves the pipettes plunger motor
   | GantryRunTimeCommand // movement that only effects the x,y,z position of the gantry/pipette
   | ModuleRunTimeCommand // directed at a hardware module

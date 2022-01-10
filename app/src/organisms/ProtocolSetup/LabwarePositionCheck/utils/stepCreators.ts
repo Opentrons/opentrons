@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 import {
-  CommandCreateData,
+  CreateCommand,
   getModuleType,
   ProtocolFile,
   THERMOCYCLER_MODULE_TYPE,
@@ -11,13 +11,13 @@ import type {
   LabwarePositionCheckStep,
   Section,
 } from '../types'
-import type { TCOpenLidCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
-import type { MoveToWellCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
+import type { TCOpenLidCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import type { MoveToWellCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
 
 const getIsLabwareOnTopOfTC = (
   modules: ProtocolFile<{}>['modules'],
   labwareId: string,
-  commands: CommandCreateData[]
+  commands: CreateCommand[]
 ): boolean => {
   const labwareLocation = getLabwareLocation(labwareId, commands)
   return (
@@ -55,10 +55,10 @@ export const getMoveToLabwareSteps = (
   labwareIds: string[],
   pipetteId: string,
   section: Section,
-  commands: CommandCreateData[]
+  commands: CreateCommand[]
 ): LabwarePositionCheckStep[] =>
   labwareIds.map(labwareId => {
-    const moveToWellCommand: MoveToWellCommand = {
+    const moveToWellCommand: MoveToWellCreateCommand = {
       commandType: 'moveToWell' as const,
       id: uuidv4(),
       params: {
@@ -80,7 +80,7 @@ export const getMoveToLabwareSteps = (
     if (isLabwareOnTopOfTC) {
       // @ts-expect-error we know there is a moduleId key on type LabwareLocation because the labware is on top of a TC
       const moduleId = getLabwareLocation(labwareId, commands).moduleId
-      const openTCLidCommand: TCOpenLidCommand = {
+      const openTCLidCommand: TCOpenLidCreateCommand = {
         commandType: 'thermocycler/openLid',
         id: uuidv4(),
         params: {

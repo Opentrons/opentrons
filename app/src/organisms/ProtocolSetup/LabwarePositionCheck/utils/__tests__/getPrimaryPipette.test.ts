@@ -1,6 +1,6 @@
 import { getPrimaryPipetteId } from '../getPrimaryPipetteId'
 import { ProtocolFile } from '@opentrons/shared-data'
-import { LoadPipetteCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import { LoadPipetteCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
 describe('getPrimaryPipetteId', () => {
   it('should return the one and only pipette if there is only one pipette in the protocol', () => {
@@ -12,7 +12,7 @@ describe('getPrimaryPipetteId', () => {
     expect(getPrimaryPipetteId({ ...mockPipette }, [])).toBe('p10SingleId')
   })
   it('should throw an error if there are two pipettes with the same mount', () => {
-    const loadPipetteCommands: LoadPipetteCommand[] = [
+    const loadPipetteCommands: LoadPipetteCreateCommand[] = [
       {
         id: '1',
         commandType: 'loadPipette',
@@ -51,7 +51,7 @@ describe('getPrimaryPipetteId', () => {
     )
   })
   it('should return the pipette with fewer channels', () => {
-    const loadPipetteCommands: LoadPipetteCommand[] = [
+    const loadPipetteCommands: LoadPipetteCreateCommand[] = [
       {
         id: '1',
         commandType: 'loadPipette',
@@ -95,7 +95,7 @@ describe('getPrimaryPipetteId', () => {
     )
   })
   it('should return the smaller pipette', () => {
-    const loadPipetteCommands: LoadPipetteCommand[] = [
+    const loadPipetteCommands: LoadPipetteCreateCommand[] = [
       {
         id: '1',
         commandType: 'loadPipette',
@@ -140,7 +140,7 @@ describe('getPrimaryPipetteId', () => {
     )
   })
   it('should return the newer model', () => {
-    const loadPipetteCommands: LoadPipetteCommand[] = [
+    const loadPipetteCommands: LoadPipetteCreateCommand[] = [
       {
         id: '1',
         commandType: 'loadPipette',
@@ -186,7 +186,7 @@ describe('getPrimaryPipetteId', () => {
   })
 
   it('should return the left pipette when all else is the same', () => {
-    const loadPipetteCommands: LoadPipetteCommand[] = [
+    const loadPipetteCommands: LoadPipetteCreateCommand[] = [
       {
         id: '1',
         commandType: 'loadPipette',
