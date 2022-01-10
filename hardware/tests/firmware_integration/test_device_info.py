@@ -26,7 +26,7 @@ async def test_broadcast(
     await driver.send(CanMessage(arbitration_id=arbitration_id, data=b""))
 
     async def _check() -> None:
-        """Loop until all nodes respond"""
+        """Loop until all nodes respond."""
         nodes = set(NodeId)
         while len(nodes):
             m = await driver.read()
