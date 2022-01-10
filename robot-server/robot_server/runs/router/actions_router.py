@@ -96,9 +96,11 @@ async def create_run_action(
             # Grab engine_store.runner outside stop_and_log() in case it changes between
             # now and when task_runner runs stop_and_log().
             runner = engine_store.runner
+
             async def stop_and_log() -> None:
                 await runner.stop()
                 log.info(f'Stopped run "{runId}".')
+
             task_runner.run(stop_and_log)
 
     except ProtocolEngineStoppedError as e:
