@@ -54,7 +54,7 @@ import type {
   LabwarePositionCheckStep,
   SavePositionCommandData,
 } from '../types'
-import { LabwareOffsets } from './useLabwareOffsets'
+import { LabwareOffsets, useLabwareOffsets } from './useLabwareOffsets'
 
 export type LabwarePositionCheckUtils =
   | {
@@ -71,7 +71,6 @@ export type LabwarePositionCheckUtils =
       ctaText: string
       labwareOffsets: LabwareOffsets
       applyLabwareOffsets: () => void
-      setLabwareOffsets: (active: LabwareOffsets) => void
     }
   | { error: Error }
 
@@ -216,16 +215,23 @@ export function useLabwarePositionCheck(
   const [dropTipOffset, setDropTipOffset] = React.useState<VectorOffset>(
     IDENTITY_VECTOR
   )
-  const { createLabwareOffset } = useCreateLabwareOffsetMutation()
   const { createCommand } = useCreateCommandMutation()
   const host = useHost()
-  const { runRecord: currentRun } = useCurrentProtocolRun()
   const LPCSteps = useSteps()
   const dispatch = useDispatch()
   const robotName = useSelector(getConnectedRobotName)
   const attachedModules = useSelector(getAttachedModulesForConnectedRobot)
   const { protocolData } = useProtocolDetails()
   const [labwareOffsets, setLabwareOffsets] = React.useState<LabwareOffsets>([])
+
+  useLabwareOffsets(savePositionCommandData, protocolData as ProtocolFile<{}>)
+    .then(offsets => setLabwareOffsets(offsets))
+    .catch((e: Error) =>
+      console.error(`error getting labware offsets ${e.message}`)
+    )
+
+  const { createLabwareOffset } = useCreateLabwareOffsetMutation()
+  const { runRecord: currentRun } = useCurrentProtocolRun()
 
   const LPCCommands = LPCSteps.reduce<LabwarePositionCheckCommand[]>(
     (commands, currentStep) => {
@@ -663,6 +669,7 @@ export function useLabwarePositionCheck(
         console.error(`error issuing jog command: ${e.message}`)
       })
   }
+
   const applyLabwareOffsets = (): void => {
     if (labwareOffsets.length > 0) {
       labwareOffsets.forEach(labwareOffset => {
@@ -698,6 +705,5 @@ export function useLabwarePositionCheck(
     showPickUpTipConfirmationModal,
     labwareOffsets,
     applyLabwareOffsets,
-    setLabwareOffsets,
   }
 }

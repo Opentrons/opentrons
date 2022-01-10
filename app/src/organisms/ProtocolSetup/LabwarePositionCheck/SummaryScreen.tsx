@@ -19,32 +19,18 @@ import { useLPCSuccessToast } from '../hooks'
 import { DeckMap } from './DeckMap'
 import { SectionList } from './SectionList'
 import { LabwareOffsetsSummary } from './LabwareOffsetsSummary'
-import { useIntroInfo, LabwareOffsets, useLabwareOffsets } from './hooks'
-import type { ProtocolFile } from '@opentrons/shared-data'
-import type { SavePositionCommandData } from './types'
+import { useIntroInfo, LabwareOffsets } from './hooks'
 
 export const SummaryScreen = (props: {
   labwareOffsets: LabwareOffsets
   applyLabwareOffsets: () => void
   onCloseClick: () => unknown
-  setLabwareOffsets: (active: LabwareOffsets) => void
-  savePositionCommandData: SavePositionCommandData
 }): JSX.Element | null => {
-  const {
-    labwareOffsets,
-    applyLabwareOffsets,
-    savePositionCommandData,
-    setLabwareOffsets,
-  } = props
+  const { labwareOffsets, applyLabwareOffsets } = props
   const { t } = useTranslation('labware_position_check')
   const introInfo = useIntroInfo()
   const { protocolData } = useProtocolDetails()
   const { setShowLPCSuccessToast } = useLPCSuccessToast()
-  useLabwareOffsets(savePositionCommandData, protocolData as ProtocolFile<{}>)
-    .then(offsets => setLabwareOffsets(offsets))
-    .catch((e: Error) =>
-      console.error(`error getting labware offsets ${e.message}`)
-    )
   if (introInfo == null) return null
   if (protocolData == null) return null
   const labwareIds = Object.keys(protocolData.labware)

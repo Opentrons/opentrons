@@ -66,10 +66,8 @@ describe('SummaryScreen', () => {
 
   beforeEach(() => {
     props = {
-      savePositionCommandData: { someLabwareIf: ['commandId1', 'commandId2'] },
       onCloseClick: jest.fn(),
       applyLabwareOffsets: jest.fn(),
-      setLabwareOffsets: jest.fn(),
       labwareOffsets: MOCK_LABWARE_OFFSETS,
     }
     mockSectionList.mockReturnValue(<div>Mock SectionList</div>)

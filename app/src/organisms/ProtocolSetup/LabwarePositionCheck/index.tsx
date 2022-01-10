@@ -112,7 +112,6 @@ export const LabwarePositionCheck = (
     jog,
     labwareOffsets,
     applyLabwareOffsets,
-    setLabwareOffsets,
   } = labwarePositionCheckUtils
 
   let modalContent: JSX.Element
@@ -178,7 +177,6 @@ export const LabwarePositionCheck = (
           labwareOffsets={labwareOffsets}
           onCloseClick={props.onCloseClick}
           applyLabwareOffsets={applyLabwareOffsets}
-          setLabwareOffsets={setLabwareOffsets}
           savePositionCommandData={savePositionCommandData}
         />
       </ModalPage>
