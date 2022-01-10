@@ -33,12 +33,12 @@
     },
     {
       "coordinates": [400, 200, 0, 0],
-      "max_speed": 500
+      "max_speed": 30
     },
     {
       "coordinates": [300, 300, 150, 0],
-      "max_speed": 500
+      "max_speed": 20
     }
   ],
-  "iteration_limit": 10
+  "iteration_limit": 1
 }
