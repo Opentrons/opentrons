@@ -87,7 +87,7 @@ describe('CommandText', () => {
       analysisCommand: MOCK_ANALYSIS_COMMAND,
       runCommand: {
         ...MOCK_COMMAND_DETAILS,
-        params: { legacyCommandText: 'legacy command text' },
+        params: { legacyCommandText: 'legacy command text' } as any,
       },
     })
     getByText('legacy command text')

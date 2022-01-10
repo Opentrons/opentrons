@@ -171,12 +171,12 @@ describe('Run Details RunTimeCommand item', () => {
       params: { legacyCommandType: 'command.COMMENT' },
       status: 'queued',
       result: {},
-    }
+    } as any
     const MOCK_COMMENT_COMMAND_SUMMARY: RunCommandSummary = {
       id: 'COMMENT',
       commandType: 'custom',
       status: 'queued',
-    }
+    } as any
     when(mockUseCommandQuery)
       .calledWith(RUN_ID, MOCK_COMMENT_COMMAND_SUMMARY.id, expect.anything())
       .mockReturnValue({
