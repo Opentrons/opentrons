@@ -48,7 +48,7 @@ const LABWARE_DEF = {
 }
 const MOCK_LABWARE_OFFSETS = {
   labwareId: 'id',
-  LabwareOffsetLocation: { slotName: 'slot' },
+  labwareOffsetLocation: { slotName: 'slot' },
   labwareDefinitionUri: 'uri',
   displayLocation: 'location',
   displayName: 'name',
