@@ -1,5 +1,9 @@
 """A simple script to create a motion plan."""
+import os
+import json
 import logging
+from logging.config import dictConfig
+import argparse
 
 from opentrons_hardware.hardware_control.motion_planning import move_manager
 from opentrons_hardware.hardware_control.motion_planning.types import (
@@ -37,37 +41,32 @@ LOG_CONFIG = {
 
 def main() -> None:
     """Entry point."""
-    constraints: SystemConstraints = {
-        Axis.X: AxisConstraints.build(
-            max_acceleration=10000,
-            max_speed_discont=40,
-            max_direction_change_speed_discont=20,
-        ),
-        Axis.Y: AxisConstraints.build(
-            max_acceleration=10000,
-            max_speed_discont=40,
-            max_direction_change_speed_discont=20,
-        ),
-        Axis.Z: AxisConstraints.build(
-            max_acceleration=10000,
-            max_speed_discont=40,
-            max_direction_change_speed_discont=20,
-        ),
-        Axis.A: AxisConstraints.build(
-            max_acceleration=10000,
-            max_speed_discont=40,
-            max_direction_change_speed_discont=20,
-        ),
-    }
+    dictConfig(LOG_CONFIG)
 
+    parser = argparse.ArgumentParser(description="Motion planning script.")
+    parser.add_argument(
+        "--params-file-path",
+        type=str,
+        required=False,
+        default=os.path.join(os.path.dirname(__file__) + '/motion_params.json'),
+        help="the parameter file path"
+    )
+    args = parser.parse_args()
+
+    with open(args.params_file_path, "r") as f:
+        params = json.load(f)
+
+    constraints: SystemConstraints = {
+        axis: AxisConstraints.build(
+            **params['constraints'][axis.name]) for axis in Axis
+    }
+    origin = Coordinates(*params['origin'])
     target_list = [
-        MoveTarget.build(Coordinates(100, 100, 0, 0), 400),
-        MoveTarget.build(Coordinates(200, 0, 0, 0), 200),
-        MoveTarget.build(Coordinates(300, 0, 0, 0), 400),
-        MoveTarget.build(Coordinates(200, 0, 0, 0), 400),
+        MoveTarget.build(
+            Coordinates(*target['coordinates']), target['max_speed'])
+            for target in params['target_list']
     ]
 
-    origin = Coordinates(0, 0, 0, 0)
     manager = move_manager.MoveManager(constraints=constraints)
     manager.plan_motion(origin=origin, target_list=target_list)
 
