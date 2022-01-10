@@ -9,7 +9,6 @@ import {
   useConditionalConfirm,
 } from '@opentrons/components'
 import { Portal } from '../../../App/portal'
-import { useRestartRun } from '../../ProtocolUpload/hooks/useRestartRun'
 import { useLabwarePositionCheck } from './hooks'
 import { IntroScreen } from './IntroScreen'
 import { GenericStepScreen } from './GenericStepScreen'
@@ -27,7 +26,6 @@ export const LabwarePositionCheck = (
   props: LabwarePositionCheckModalProps
 ): JSX.Element | null => {
   const { t } = useTranslation(['labware_position_check', 'shared'])
-  const restartRun = useRestartRun()
   const [
     savePositionCommandData,
     savePositionCommandDataDispatch,
@@ -72,7 +70,7 @@ export const LabwarePositionCheck = (
   if ('error' in labwarePositionCheckUtils) {
     // show the modal for 5 seconds, then unmount and restart the run
     if (!isRestartingRun) {
-      setTimeout(() => restartRun(), 5000)
+      setTimeout(props.onCloseClick, 5000)
       !isRestartingRun && setIsRestartingRun(true)
     }
     const { error } = labwarePositionCheckUtils
