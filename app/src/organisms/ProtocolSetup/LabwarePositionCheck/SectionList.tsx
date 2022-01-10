@@ -99,9 +99,6 @@ export function SectionList(props: Props): JSX.Element {
                 {t(`${section.toLowerCase()}_section`, {
                   primary_mount: capitalize(primaryPipetteMount),
                   secondary_mount: capitalize(secondaryPipetteMount),
-                  count: sections.includes('SECONDARY_PIPETTE_TIPRACKS')
-                    ? 2
-                    : 1,
                 })}
               </Text>
             </Box>
