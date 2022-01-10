@@ -85,6 +85,11 @@ test:
 test-with-emulator:
 	$(pytest) $(tests) $(test_opts)
 
+
+.PHONY: test-with-opentrons-sock-emulator
+test-with-opentrons-sock-emulator: export OT3_CAN_DRIVER_INTERFACE ?= opentrons_sock
+test-with-opentrons-sock-emulator: test-with-emulator
+
 .PHONY: lint
 lint:
 	$(python) -m mypy opentrons_hardware tests
