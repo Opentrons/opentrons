@@ -4,9 +4,12 @@ import asyncio
 import contextlib
 from concurrent.futures.thread import ThreadPoolExecutor
 from functools import partial
-from typing import Optional, Generator
+from typing import Optional, AsyncGenerator, Union
+from typing_extensions import Literal
 
 from serial import Serial, serial_for_url  # type: ignore[import]
+
+TimeoutProperties = Union[Literal["write_timeout"], Literal["timeout"]]
 
 
 class AsyncSerial:
@@ -73,7 +76,7 @@ class AsyncSerial:
         self._loop = loop
         self._reset_buffer_before_write = reset_buffer_before_write
 
-    async def read_until(self, match: bytes, timeout: Optional[float] = None) -> bytes:
+    async def read_until(self, match: bytes) -> bytes:
         """
         Read data until match.
 
@@ -85,44 +88,40 @@ class AsyncSerial:
         Returns:
             read data.
         """
-        with self._timeout_override("timeout", timeout):
-            return await self._loop.run_in_executor(
-                executor=self._executor,
-                func=partial(self._serial.read_until, expected=match),
-            )
+        return await self._loop.run_in_executor(
+            executor=self._executor,
+            func=partial(self._serial.read_until, expected=match),
+        )
 
-    async def write(self, data: bytes, timeout: Optional[float] = None) -> None:
+    async def write(self, data: bytes) -> None:
         """
         Write data
 
         Args:
             data: data to write.
-            timeout: optional timeout in seconds. this is a temporary override
-                of parameter supplied to create
 
         Returns:
             None
         """
         await self._loop.run_in_executor(
             executor=self._executor,
-            func=lambda: self._sync_write(data=data, timeout=timeout),
+            func=lambda: self._sync_write(data=data),
         )
 
-    def _sync_write(self, data: bytes, timeout: Optional[float] = None) -> None:
+    def _sync_write(self, data: bytes) -> None:
         """
         The synchronous write function
 
         Args:
             data: data to write.
-            timeout: optional timeout in seconds.
 
         Returns:
             None
         """
-        with self._timeout_override("write_timeout", timeout):
-            if self._reset_buffer_before_write:
-                self._serial.reset_input_buffer()
-            self._serial.write(data=data)
+        if self._reset_buffer_before_write:
+            self._serial.reset_input_buffer()
+        self._serial.write(data=data)
+        self._serial.flush()
 
     async def open(self) -> None:
         """
@@ -152,17 +151,25 @@ class AsyncSerial:
         """
         return self._serial.is_open is True
 
-    @contextlib.contextmanager
-    def _timeout_override(
-        self, timeout_property: str, timeout: Optional[float]
-    ) -> Generator[None, None, None]:
+    @contextlib.asynccontextmanager
+    async def timeout_override(
+        self, timeout_property: TimeoutProperties, timeout: Optional[float]
+    ) -> AsyncGenerator[None, None]:
         """Context manager that will temporarily override the default timeout."""
         default_timeout = getattr(self._serial, timeout_property)
         override = timeout is not None and default_timeout != timeout
         try:
             if override:
-                setattr(self._serial, timeout_property, timeout)
+                await self._loop.run_in_executor(
+                    executor=self._executor,
+                    func=lambda: setattr(self._serial, timeout_property, timeout),
+                )
             yield
         finally:
             if override:
-                setattr(self._serial, timeout_property, default_timeout)
+                await self._loop.run_in_executor(
+                    executor=self._executor,
+                    func=lambda: setattr(
+                        self._serial, timeout_property, default_timeout
+                    ),
+                )
