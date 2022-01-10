@@ -6,13 +6,13 @@ import {
 } from '@opentrons/shared-data'
 import { getPickUpTipCommandsWithPipette } from '../../utils/getPickUpTipCommandsWithPipette'
 import { getTipracksVisited } from '../../utils/getTipracksVisited'
-import type { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
+import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 
 export const doesPipetteVisitAllTipracks = (
   pipetteId: string,
   labware: ProtocolFile<{}>['labware'],
   labwareDefinitions: Record<string, LabwareDefinition2>,
-  commands: CreateCommand[]
+  commands: RunTimeCommand[]
 ): boolean => {
   const numberOfTipracks = reduce(
     labware,

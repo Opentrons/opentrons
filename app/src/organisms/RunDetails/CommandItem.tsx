@@ -37,12 +37,12 @@ import {
 import type { RunStatus, RunCommandSummary } from '@opentrons/api-client'
 
 import type {
-  Command,
+  RunTimeCommand,
   CommandStatus,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command'
 
 export interface CommandItemProps {
-  analysisCommand: Command | null
+  analysisCommand: RunTimeCommand | null
   runCommandSummary: RunCommandSummary | null
   runStatus: RunStatus
   currentRunId: string | null

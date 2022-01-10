@@ -1,7 +1,4 @@
-import type {
-  Command as FullCommand,
-  ModuleModel,
-} from '@opentrons/shared-data'
+import type { RunTimeCommand, ModuleModel } from '@opentrons/shared-data'
 
 export const RUN_STATUS_IDLE: 'idle' = 'idle'
 export const RUN_STATUS_RUNNING: 'running' = 'running'
@@ -87,7 +84,8 @@ export interface CreateRunActionData {
 }
 export interface RunCommandSummary {
   id: string
-  commandType: FullCommand['commandType']
+  key: string
+  commandType: RunTimeCommand['commandType']
   status: 'queued' | 'running' | 'succeeded' | 'failed'
   result?: any
 }
@@ -113,7 +111,7 @@ export interface CommandsData {
 }
 
 export interface CommandDetail {
-  data: FullCommand
+  data: RunTimeCommand
   links: ResourceLinks | null
 }
 

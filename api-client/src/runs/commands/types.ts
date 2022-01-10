@@ -1,3 +1,3 @@
-import type { Command } from '@opentrons/shared-data'
+import type { CreateCommand } from '@opentrons/shared-data'
 
-export type AnonymousCommand = Omit<Command, 'id'>
+export type AnonymousCommand = Omit<CreateCommand, 'id'>

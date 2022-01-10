@@ -1,4 +1,4 @@
-import type { Command } from '@opentrons/shared-data'
+import type { RunTimeCommand } from '@opentrons/shared-data'
 import type {
   LoadModuleRunTimeCommand,
   ModuleLocation,
@@ -10,10 +10,10 @@ interface ModuleInitialLoadInfo {
 }
 export const getModuleInitialLoadInfo = (
   moduleId: string,
-  commands: Command[]
+  commands: RunTimeCommand[]
 ): ModuleInitialLoadInfo => {
   const moduleLoadIndex = commands.findIndex(
-    (command: Command): command is LoadModuleRunTimeCommand =>
+    (command: RunTimeCommand): command is LoadModuleRunTimeCommand =>
       command.commandType === 'loadModule' &&
       command.params.moduleId === moduleId
   )

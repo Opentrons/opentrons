@@ -62,7 +62,7 @@ describe('useIntroInfo', () => {
           },
         },
       } as LoadLabwareCreateCommand,
-    ]
+    ] as any
     mockGetLabwarePositionCheckSteps.mockReturnValue([
       {
         labwareId: PICKUP_TIP_LABWARE_ID,

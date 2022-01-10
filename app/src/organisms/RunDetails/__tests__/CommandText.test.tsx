@@ -8,7 +8,7 @@ import { useLabwareRenderInfoById } from '../../ProtocolSetup/hooks'
 import { getLabwareLocation } from '../../ProtocolSetup/utils/getLabwareLocation'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { ProtocolSetupInfo } from './../ProtocolSetupInfo'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6/command'
+import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command'
 
 jest.mock('../hooks')
 jest.mock('../../ProtocolSetup/hooks')
@@ -38,13 +38,13 @@ const render = (props: React.ComponentProps<typeof CommandText>) => {
   })[0]
 }
 
-const MOCK_ANALYSIS_COMMAND: Command = {
+const MOCK_ANALYSIS_COMMAND: RunTimeCommand = {
   id: 'some_id',
   commandType: 'custom',
   status: 'queued',
   params: {},
-}
-const MOCK_COMMAND_DETAILS: Command = {
+} as any
+const MOCK_COMMAND_DETAILS: RunTimeCommand = {
   id: '123',
   commandType: 'custom',
   params: {},
@@ -52,9 +52,9 @@ const MOCK_COMMAND_DETAILS: Command = {
   result: {},
   startedAt: 'start timestamp',
   completedAt: 'end timestamp',
-}
+} as any
 
-const MOCK_PAUSE_COMMAND: Command = {
+const MOCK_PAUSE_COMMAND: RunTimeCommand = {
   id: '1234',
   commandType: 'pause',
   params: { message: 'THIS IS THE PAUSE MESSAGE' },
@@ -62,7 +62,7 @@ const MOCK_PAUSE_COMMAND: Command = {
   result: {},
   startedAt: 'start timestamp',
   completedAt: 'end timestamp',
-}
+} as any
 
 const MOCK_LOAD_COMMAND = {
   id: '1234',
@@ -102,7 +102,7 @@ describe('CommandText', () => {
   it('renders correct command text for load commands', () => {
     const { getByText } = render({
       analysisCommand: null,
-      runCommand: MOCK_LOAD_COMMAND as Command,
+      runCommand: MOCK_LOAD_COMMAND as RunTimeCommand,
     })
     getByText('Mock Protocol Setup Step')
   })
@@ -130,7 +130,7 @@ describe('CommandText', () => {
           wellName,
           labwareId,
         },
-      } as Command,
+      } as RunTimeCommand,
     })
     getByText(
       'Picking up tip from wellName of fake_display_name in fake_labware_location'

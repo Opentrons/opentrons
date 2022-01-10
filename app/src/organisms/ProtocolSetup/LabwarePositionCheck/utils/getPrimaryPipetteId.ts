@@ -1,21 +1,24 @@
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import type { Command, ProtocolFile } from '@opentrons/shared-data/protocol'
-import { LoadPipetteCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import type {
+  RunTimeCommand,
+  ProtocolFile,
+} from '@opentrons/shared-data/protocol'
+import { LoadPipetteRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
 export const getPrimaryPipetteId = (
   pipettesById: ProtocolFile<{}>['pipettes'],
-  commands: Command[]
+  commands: RunTimeCommand[]
 ): string => {
   if (Object.keys(pipettesById).length === 1) {
     return Object.keys(pipettesById)[0]
   }
 
   const leftPipetteId = commands.find(
-    (command: Command): command is LoadPipetteCreateCommand =>
+    (command: RunTimeCommand): command is LoadPipetteRunTimeCommand =>
       command.commandType === 'loadPipette' && command.params.mount === 'left'
   )?.result?.pipetteId
   const rightPipetteId = commands.find(
-    (command: Command): command is LoadPipetteCreateCommand =>
+    (command: RunTimeCommand): command is LoadPipetteRunTimeCommand =>
       command.commandType === 'loadPipette' && command.params.mount === 'right'
   )?.result?.pipetteId
 

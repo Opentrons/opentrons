@@ -55,4 +55,5 @@ export type RunTimeCommand =
   | ({
       commandType: 'custom'
       params: { [key: string]: any }
+      result: any
     } & CommonCommandRunTimeInfo) // allows for experimentation between schema versions with no expectation of system support

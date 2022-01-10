@@ -42,7 +42,7 @@ import type { SetupCreateCommand } from '@opentrons/shared-data/protocol/types/s
 import type { DropTipCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import type {
   HomeCreateCommand,
-  SavePositionCommand,
+  SavePositionCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
 import type {
   Axis,
@@ -458,7 +458,7 @@ export function useLabwarePositionCheck(
         })
         // if the command is a movement command, save it's location after it completes
         if (currentCommand.commandType === 'moveToWell') {
-          const savePositionCommand: SavePositionCommand = {
+          const savePositionCommand: SavePositionCreateCommand = {
             commandType: 'savePosition',
             id: uuidv4(),
             params: { pipetteId: currentCommand.params.pipetteId },
@@ -571,7 +571,7 @@ export function useLabwarePositionCheck(
         setPendingMovementCommandData({
           commandId,
         })
-        const savePositionCommand: SavePositionCommand = {
+        const savePositionCommand: SavePositionCreateCommand = {
           commandType: 'savePosition',
           id: uuidv4(),
           params: { pipetteId: currentCommand.params.pipetteId },
