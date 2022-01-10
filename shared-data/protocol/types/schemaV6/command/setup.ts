@@ -1,5 +1,6 @@
 import {
   CommonCommandInfo,
+  CommonCommandRunTimeInfo,
   LabwareDefinition2,
   LabwareOffset,
 } from '../../../../js'
@@ -7,41 +8,47 @@ import {
 export interface LoadPipetteCreateCommand extends CommonCommandInfo {
   commandType: 'loadPipette'
   params: LoadPipetteParams
-  result?: LoadPipetteResult
 }
-export interface LoadPipetteCommand extends LoadPipetteCreateCommand {
-  key: string
+export interface LoadPipetteRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    LoadPipetteCreateCommand {
+  result: LoadPipetteResult
 }
 export interface LoadLabwareCreateCommand extends CommonCommandInfo {
   commandType: 'loadLabware'
   params: LoadLabwareParams
-  result?: LoadLabwareResult
 }
-export interface LoadLabwareCommand extends LoadLabwareCreateCommand {
-  key: string
+export interface LoadLabwareRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    LoadLabwareCreateCommand {
+  result: LoadLabwareResult
 }
 export interface LoadModuleCreateCommand extends CommonCommandInfo {
   commandType: 'loadModule'
   params: LoadModuleParams
-  result?: LoadModuleResult
 }
-export interface LoadModuleCommand extends LoadModuleCreateCommand {
-  key: string
+export interface LoadModuleRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    LoadModuleCreateCommand {
+  result: LoadModuleResult
 }
-export interface LoadLiquidCreateCommand extends CommonCommandInfo {
+export interface LoadLiquidCreateCommand
+  extends CommonCommandRunTimeInfo,
+    CommonCommandInfo {
   commandType: 'loadLiquid'
   params: LoadLiquidParams
-  result?: LoadLiquidResult
 }
-export interface LoadLiquidCommand extends LoadLiquidCreateCommand {
-  key: string
+export interface LoadLiquidRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    LoadLiquidCreateCommand {
+  result: LoadLiquidResult
 }
 
-export type SetupCommand =
-  | LoadPipetteCommand
-  | LoadLabwareCommand
-  | LoadModuleCommand
-  | LoadLiquidCommand
+export type SetupRunTimeCommand =
+  | LoadPipetteRunTimeCommand
+  | LoadLabwareRunTimeCommand
+  | LoadModuleRunTimeCommand
+  | LoadLiquidRunTimeCommand
 export type SetupCreateCommand =
   | LoadPipetteCreateCommand
   | LoadLabwareCreateCommand

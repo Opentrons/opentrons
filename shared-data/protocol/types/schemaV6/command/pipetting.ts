@@ -1,13 +1,13 @@
-import { CommonCommandInfo } from '.'
-export type PipettingCommand =
-  | AspirateCommand
-  | DispenseCommand
-  | AspirateAirGapCommand
-  | DispenseAirGapCommand
-  | BlowoutCommand
-  | TouchTipCommand
-  | PickUpTipCommand
-  | DropTipCommand
+import { CommonCommandInfo, CommonCommandRunTimeInfo } from '.'
+export type PipettingRunTimeCommand =
+  | AspirateRunTimeCommand
+  | DispenseRunTimeCommand
+  | AspirateAirGapRunTimeCommand
+  | DispenseAirGapRunTimeCommand
+  | BlowoutRunTimeCommand
+  | TouchTipRunTimeCommand
+  | PickUpTipRunTimeCommand
+  | DropTipRunTimeCommand
 export type PipettingCreateCommand =
   | AspirateCreateCommand
   | DispenseCreateCommand
@@ -21,65 +21,74 @@ export type PipettingCreateCommand =
 export interface AspirateCreateCommand extends CommonCommandInfo {
   commandType: 'aspirate'
   params: AspDispAirgapParams
-  result?: BasicLiquidHandlingResult
 }
-export interface AspirateCommand extends AspirateCreateCommand {
-  key: string
+export interface AspirateRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    AspirateCreateCommand {
+  result: BasicLiquidHandlingResult
 }
 export interface DispenseCreateCommand extends CommonCommandInfo {
   commandType: 'dispense'
   params: AspDispAirgapParams
-  result?: BasicLiquidHandlingResult
 }
-export interface DispenseCommand extends DispenseCreateCommand {
-  key: string
+export interface DispenseRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    DispenseCreateCommand {
+  result: BasicLiquidHandlingResult
 }
 export interface AspirateAirGapCreateCommand extends CommonCommandInfo {
   commandType: 'aspirateAirGap'
   params: AspDispAirgapParams
-  result?: BasicLiquidHandlingResult
 }
-export interface AspirateAirGapCommand extends AspirateAirGapCreateCommand {
-  key: string
+export interface AspirateAirGapRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    AspirateAirGapCreateCommand {
+  result: BasicLiquidHandlingResult
 }
 export interface DispenseAirGapCreateCommand extends CommonCommandInfo {
   commandType: 'dispenseAirGap'
   params: AspDispAirgapParams
-  result?: BasicLiquidHandlingResult
 }
-export interface DispenseAirGapCommand extends DispenseAirGapCreateCommand {
-  key: string
+export interface DispenseAirGapRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    DispenseAirGapCreateCommand {
+  result: BasicLiquidHandlingResult
 }
 export interface BlowoutCreateCommand extends CommonCommandInfo {
   commandType: 'blowout'
   params: BlowoutParams
-  result?: BasicLiquidHandlingResult
 }
-export interface BlowoutCommand extends BlowoutCreateCommand {
-  key: string
+export interface BlowoutRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    BlowoutCreateCommand {
+  result: BasicLiquidHandlingResult
 }
 export interface TouchTipCreateCommand extends CommonCommandInfo {
   commandType: 'touchTip'
   params: TouchTipParams
-  result?: BasicLiquidHandlingResult
 }
-export interface TouchTipCommand extends TouchTipCreateCommand {
-  key: string
+export interface TouchTipRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    TouchTipCreateCommand {
+  result: BasicLiquidHandlingResult
 }
 export interface PickUpTipCreateCommand extends CommonCommandInfo {
-  id: string
   commandType: 'pickUpTip'
   params: PipetteAccessParams & WellLocationParam
 }
-export interface PickUpTipCommand extends PickUpTipCreateCommand {
-  key: string
+export interface PickUpTipRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    PickUpTipCreateCommand {
+  result: any
 }
 export interface DropTipCreateCommand extends CommonCommandInfo {
   commandType: 'dropTip'
   params: PipetteAccessParams & WellLocationParam
 }
-export interface DropTipCommand extends DropTipCreateCommand {
-  key: string
+export interface DropTipRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    DropTipCreateCommand {
+  result: any
 }
 
 type AspDispAirgapParams = FlowRateParams &
