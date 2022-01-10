@@ -1,5 +1,6 @@
 """Motion planning types."""
 from __future__ import annotations
+import logging
 import enum
 import dataclasses
 import numpy as np  # type: ignore[import]
@@ -14,6 +15,7 @@ from typing import (
     Union,
 )
 
+log = logging.getLogger(__name__)
 
 AcceptableType = Union[SupportsFloat, np.float64]
 
