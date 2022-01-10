@@ -20,7 +20,6 @@ import {
   TEXT_TRANSFORM_CAPITALIZE,
   AlertItem,
   Box,
-  SPACING_3,
 } from '@opentrons/components'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { useProtocolDetails } from './hooks'
@@ -125,12 +124,16 @@ export function CommandList(): JSX.Element | null {
 
   return (
     <React.Fragment>
-      <Flex flexDirection={DIRECTION_COLUMN} flex={'auto'}>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        flex={'auto'}
+        paddingLeft={SPACING_2}
+      >
         {runStatus === 'failed' ||
         runStatus === 'succeeded' ||
         runStatus === 'stop-requested' ||
         runStatus === 'stopped' ? (
-          <Box padding={SPACING_2}>
+          <Box padding={`${SPACING_2} ${SPACING_2} ${SPACING_2} 0`}>
             <AlertItem
               type={
                 runStatus === 'stop-requested' ||
@@ -144,22 +147,20 @@ export function CommandList(): JSX.Element | null {
           </Box>
         ) : null}
         <Flex
-          paddingLeft={SPACING_2}
-          paddingTop={SPACING_1}
+          paddingY={SPACING_2}
           css={FONT_HEADER_DARK}
           textTransform={TEXT_TRANSFORM_CAPITALIZE}
         >
           {t('protocol_steps')}
         </Flex>
         {protocolSetupCommandList.length > 0 && (
-          <Flex margin={SPACING_1}>
+          <Flex marginY={SPACING_1}>
             {showProtocolSetupInfo ? (
               <React.Fragment>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   flex={'auto'}
                   backgroundColor={C_NEAR_WHITE}
-                  marginLeft={SPACING_2}
                 >
                   <Flex
                     justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -202,7 +203,7 @@ export function CommandList(): JSX.Element | null {
                 width={'100%'}
                 role={'link'}
                 onClick={() => setShowProtocolSetupInfo(true)}
-                margin={SPACING_1}
+                paddingRight={SPACING_1}
               >
                 <Flex
                   fontSize={FONT_SIZE_CAPTION}
@@ -210,7 +211,7 @@ export function CommandList(): JSX.Element | null {
                   textTransform={TEXT_TRANSFORM_UPPERCASE}
                   color={C_MED_DARK_GRAY}
                   backgroundColor={C_NEAR_WHITE}
-                  marginLeft={SPACING_1}
+                  marginRight={SPACING_1}
                 >
                   <Flex padding={SPACING_2}>{t('protocol_setup')}</Flex>
                   <Flex>
@@ -238,22 +239,18 @@ export function CommandList(): JSX.Element | null {
                 <Flex
                   key={command.id}
                   id={`RunDetails_CommandItem`}
-                  paddingLeft={SPACING_1}
                   justifyContent={JUSTIFY_START}
                   flexDirection={DIRECTION_COLUMN}
                   flex={'auto'}
                 >
                   {showAnticipatedStepsTitle && (
-                    <Flex
-                      fontSize={FONT_SIZE_CAPTION}
-                      marginLeft={SPACING_2}
-                      paddingBottom={SPACING_1}
-                    >
+                    <Flex fontSize={FONT_SIZE_CAPTION} paddingY={SPACING_1}>
                       {t('anticipated')}
                     </Flex>
                   )}
                   <Flex
-                    padding={`${SPACING_1} ${SPACING_2} ${SPACING_1} ${SPACING_2}`}
+                    paddingY={SPACING_1}
+                    paddingRight={SPACING_2}
                     flexDirection={DIRECTION_COLUMN}
                     flex={'auto'}
                   >
@@ -266,7 +263,7 @@ export function CommandList(): JSX.Element | null {
               )
             })}
           </Flex>
-          <Flex padding={SPACING_1}>{t('end_of_protocol')}</Flex>
+          <Flex paddingY={SPACING_1}>{t('end_of_protocol')}</Flex>
         </Flex>
       </Flex>
     </React.Fragment>
