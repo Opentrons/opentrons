@@ -6,6 +6,7 @@ import dataclasses
 import numpy as np  # type: ignore[import]
 from typing import (
     cast,
+    Any,
     SupportsFloat,
     Dict,
     Iterator,
@@ -196,6 +197,10 @@ class Move:
             max_speed=np.float64(max_speed),
             blocks=blocks,
         )
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Return Move a dict."""
+        return dataclasses.asdict(self)
 
 
 @dataclasses.dataclass(frozen=True)
