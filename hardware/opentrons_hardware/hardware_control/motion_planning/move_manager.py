@@ -52,7 +52,7 @@ class MoveManager:
         self._clear_blend_log()
         to_blend = self._get_initial_moves_from_targets(origin, target_list)
         assert to_blend, "Check target list"
-
+        log.debug("Motion planning begins.")
         for i in range(iteration_limit):
             blend_log = []
             moveiter = iter(to_blend)

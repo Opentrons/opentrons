@@ -313,6 +313,7 @@ def build_move(
     constraints: SystemConstraints,
 ) -> Move:
     """Build a move."""
+    log.debug(f"Build move: {move}")
     initial_speed = find_initial_speed(constraints, move, prev_move)
     final_speed = find_final_speed(constraints, move, next_move)
     final_speed = achievable_final(constraints, move, initial_speed, final_speed)
