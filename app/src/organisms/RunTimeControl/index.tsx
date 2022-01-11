@@ -99,6 +99,12 @@ export function RunTimeControl(): JSX.Element | null {
       if (lastRunAction === 'reset' && runStatus === RUN_STATUS_IDLE) {
         setIsRunActionLoading(false)
       }
+      if (
+        runStatus === RUN_STATUS_SUCCEEDED ||
+        runStatus === RUN_STATUS_STOPPED
+      ) {
+        setIsRunActionLoading(false)
+      }
     }
     if (isFinishing && runStatus !== 'finishing') {
       setIsFinishing(false)
