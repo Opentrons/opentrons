@@ -113,6 +113,9 @@ async def test_get_all_adv_settings_lru_cache(
     advanced_settings.get_all_adv_settings()
     mock_read_settings_file.assert_not_called()
     mock_read_settings_file.reset_mock()
+    # Updating will invalidate cache
+    await advanced_settings.set_adv_setting("enableDoorSafetySwitch", True)
+    mock_read_settings_file.reset_mock()
     # Cache should not be used
     advanced_settings.get_all_adv_settings()
     mock_read_settings_file.assert_called_once()
