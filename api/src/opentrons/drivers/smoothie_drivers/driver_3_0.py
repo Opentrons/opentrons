@@ -1826,10 +1826,10 @@ class SmoothieDriver:
 
     async def hard_halt(self) -> None:
         log.debug(f"Halting Smoothie (simulating: {self.simulating}")
+        self._is_hard_halting.set()
         if self.simulating:
             pass
         else:
-            self._is_hard_halting.set()
             self._gpio_chardev.set_halt_pin(False)
             await asyncio.sleep(0.25)
             self._gpio_chardev.set_halt_pin(True)
