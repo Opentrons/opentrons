@@ -143,10 +143,7 @@ async def test_play_starts_run(
     """It should start a protocol run with play."""
     subject.play()
 
-    decoy.verify(
-        protocol_engine.play(),
-        task_queue.start(),
-    )
+    decoy.verify(protocol_engine.play(), times=1)
 
 
 async def test_pause(
@@ -167,23 +164,40 @@ async def test_stop(
     subject: ProtocolRunner,
 ) -> None:
     """It should halt a protocol run with stop."""
+    subject.play()
     await subject.stop()
 
-    decoy.verify(
-        task_queue.stop(),
-        await protocol_engine.stop(),
-    )
+    decoy.verify(await protocol_engine.stop(), times=1)
 
 
-async def test_join(
+async def test_stop_never_started(
     decoy: Decoy,
+    task_queue: TaskQueue,
+    protocol_engine: ProtocolEngine,
+    subject: ProtocolRunner,
+) -> None:
+    """It should clean up rather than halt if the runner was never started."""
+    await subject.stop()
+
+    decoy.verify(await protocol_engine.finish(drop_tips_and_home=False), times=1)
+
+
+async def test_run(
+    decoy: Decoy,
+    protocol_engine: ProtocolEngine,
     task_queue: TaskQueue,
     subject: ProtocolRunner,
 ) -> None:
-    """It should join the run's background task."""
-    await subject.join()
+    """It should run a protocol to completion."""
+    assert subject.was_started() is False
+    await subject.run()
+    assert subject.was_started() is True
 
-    decoy.verify(await task_queue.join(), times=1)
+    decoy.verify(
+        protocol_engine.play(),
+        task_queue.start(),
+        await task_queue.join(),
+    )
 
 
 @pytest.mark.xfail(raises=NotImplementedError, strict=True)
@@ -229,7 +243,6 @@ def test_load_json(
             )
         ),
         task_queue.set_run_func(func=protocol_engine.wait_until_complete),
-        task_queue.set_cleanup_func(func=protocol_engine.finish),
     )
 
 
@@ -270,7 +283,6 @@ def test_load_python(
             protocol=python_protocol,
             context=protocol_context,
         ),
-        task_queue.set_cleanup_func(func=protocol_engine.finish),
     )
 
 
@@ -328,7 +340,6 @@ def test_load_legacy_python(
             protocol=legacy_protocol,
             context=legacy_context,
         ),
-        task_queue.set_cleanup_func(func=protocol_engine.finish),
     )
 
 
@@ -381,5 +392,4 @@ def test_load_legacy_json(
             protocol=legacy_protocol,
             context=legacy_context,
         ),
-        task_queue.set_cleanup_func(func=protocol_engine.finish),
     )

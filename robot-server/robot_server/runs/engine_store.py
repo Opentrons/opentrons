@@ -83,9 +83,7 @@ class EngineStore:
         engine = await create_protocol_engine(hardware_api=self._hardware_api)
         runner = ProtocolRunner(protocol_engine=engine, hardware_api=self._hardware_api)
 
-        if self._runner_engine_pair is not None:
-            if not self.engine.state_view.commands.get_is_stopped():
-                raise EngineConflictError("Current run is not stopped.")
+        await self.clear()
 
         self._runner_engine_pair = RunnerEnginePair(runner=runner, engine=engine)
         self._engines_by_run_id[run_id] = engine
@@ -115,7 +113,7 @@ class EngineStore:
         """
         if self._runner_engine_pair is not None:
             if self.engine.state_view.commands.get_is_okay_to_clear():
-                await self.engine.finish(home_after=False)
+                await self.engine.finish(drop_tips_and_home=False)
             else:
                 raise EngineConflictError("Current run is not idle or stopped.")
 

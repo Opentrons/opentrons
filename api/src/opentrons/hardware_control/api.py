@@ -489,6 +489,8 @@ class API(HardwareControlAPI):
             await self._backend.configure_mount(mount, hw_config)
         mod_log.info("Instruments found: {}".format(self._attached_instruments))
 
+    # TODO(mc, 2022-01-11): change returned map value type to `Optional[PipetteDict]`
+    # instead of potentially returning an empty dict
     def get_attached_instruments(self) -> Dict[top_types.Mount, "PipetteDict"]:
         """Get the status dicts of the cached attached instruments.
 
@@ -509,6 +511,8 @@ class API(HardwareControlAPI):
             for m in (top_types.Mount.LEFT, top_types.Mount.RIGHT)
         }
 
+    # TODO(mc, 2022-01-11): change return type to `Optional[PipetteDict]` instead
+    # of potentially returning an empty dict
     def get_attached_instrument(self, mount: top_types.Mount) -> "PipetteDict":
         instr = self._attached_instruments[mount]
         result: Dict[str, Any] = {}
@@ -686,7 +690,7 @@ class API(HardwareControlAPI):
         if not self.is_simulator:
             await self._execution_manager.wait_for_is_running()
 
-    async def reset(self):
+    async def reset(self) -> None:
         """Reset the stored state of the system.
 
         This will re-scan instruments and models, clearing any cached
