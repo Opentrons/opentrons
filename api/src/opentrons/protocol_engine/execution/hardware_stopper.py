@@ -1,13 +1,18 @@
 """Post-protocol hardware stopper."""
+import logging
 from typing import Optional
 
 from opentrons.protocols.geometry.deck import FIXED_TRASH_ID
 from opentrons.hardware_control import HardwareControlAPI
 from ..state import StateStore
 from ..types import MotorAxis, WellLocation
+from ..errors import PipetteNotAttachedError
 
 from .movement import MovementHandler
 from .pipetting import PipettingHandler
+
+
+log = logging.getLogger(__name__)
 
 
 class HardwareStopper:
@@ -45,26 +50,34 @@ class HardwareStopper:
             )
 
         for pip_id, tiprack_id in attached_tip_racks.items():
-            hw_pipette = self._state_store.pipettes.get_hardware_pipette(
-                pipette_id=pip_id,
-                attached_pipettes=self._hardware_api.attached_instruments,
-            )
-            tip_geometry = self._state_store.geometry.get_tip_geometry(
-                labware_id=tiprack_id,
-                well_name="A1",
-                pipette_config=hw_pipette.config,
-            )
-            await self._hardware_api.add_tip(
-                mount=hw_pipette.mount,
-                tip_length=tip_geometry.effective_length,
-            )
-            # TODO: Add ability to drop tip onto custom trash as well.
-            await self._pipetting_handler.drop_tip(
-                pipette_id=pip_id,
-                labware_id=FIXED_TRASH_ID,
-                well_name="A1",
-                well_location=WellLocation(),
-            )
+            try:
+                hw_pipette = self._state_store.pipettes.get_hardware_pipette(
+                    pipette_id=pip_id,
+                    attached_pipettes=self._hardware_api.attached_instruments,
+                )
+
+            except PipetteNotAttachedError:
+                # this will happen normally during protocol analysis, but
+                # should no happen during an actual run
+                log.debug(f"Pipette ID {pip_id} no longer attached.")
+
+            else:
+                tip_geometry = self._state_store.geometry.get_tip_geometry(
+                    labware_id=tiprack_id,
+                    well_name="A1",
+                    pipette_config=hw_pipette.config,
+                )
+                await self._hardware_api.add_tip(
+                    mount=hw_pipette.mount,
+                    tip_length=tip_geometry.effective_length,
+                )
+                # TODO: Add ability to drop tip onto custom trash as well.
+                await self._pipetting_handler.drop_tip(
+                    pipette_id=pip_id,
+                    labware_id=FIXED_TRASH_ID,
+                    well_name="A1",
+                    well_location=WellLocation(),
+                )
 
     async def do_halt(self) -> None:
         """Issue a halt signal to the hardware API.

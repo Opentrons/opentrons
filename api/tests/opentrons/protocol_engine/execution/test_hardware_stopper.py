@@ -3,7 +3,7 @@ import pytest
 from decoy import Decoy
 
 from opentrons.hardware_control import API as HardwareAPI
-from opentrons.protocol_engine import WellLocation
+from opentrons.protocol_engine import WellLocation, errors
 from opentrons.protocol_engine.state import StateStore, HardwarePipette, TipGeometry
 from opentrons.protocol_engine.execution import (
     MovementHandler,
@@ -182,4 +182,32 @@ async def test_hardware_stopping_sequence_no_home(
 
     decoy.verify(
         await hardware_api.stop(home_after=False),
+    )
+
+
+async def test_hardware_stopping_sequence_no_pipette(
+    decoy: Decoy,
+    subject: HardwareStopper,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    movement: MovementHandler,
+    pipetting: PipettingHandler,
+    mock_hw_pipettes: MockPipettes,
+) -> None:
+    """It should gracefully no-op if the HW API reports no attached pipette."""
+    decoy.when(state_store.pipettes.get_attached_tip_labware_by_id()).then_return(
+        {"pipette-id": "tiprack-id"}
+    )
+
+    decoy.when(
+        state_store.pipettes.get_hardware_pipette(
+            pipette_id="pipette-id",
+            attached_pipettes=mock_hw_pipettes.by_mount,
+        )
+    ).then_raise(errors.PipetteNotAttachedError("oh no"))
+
+    await subject.do_stop_and_recover(drop_tips_and_home=True)
+
+    decoy.verify(
+        await hardware_api.stop(home_after=True),
     )
