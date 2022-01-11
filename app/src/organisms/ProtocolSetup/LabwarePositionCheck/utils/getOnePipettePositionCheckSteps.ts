@@ -9,7 +9,7 @@ import {
 import type {
   ProtocolFile,
   LabwareDefinition2,
-  CreateCommand,
+  RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { LabwarePositionCheckStep } from '../types'
 
@@ -18,7 +18,7 @@ export const getOnePipettePositionCheckSteps = (args: {
   labware: ProtocolFile<{}>['labware']
   labwareDefinitions: Record<string, LabwareDefinition2>
   modules: ProtocolFile<{}>['modules']
-  commands: CreateCommand[]
+  commands: RunTimeCommand[]
 }): LabwarePositionCheckStep[] => {
   const {
     commands,

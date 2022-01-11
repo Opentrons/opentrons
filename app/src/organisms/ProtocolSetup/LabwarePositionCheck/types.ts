@@ -9,7 +9,7 @@ import type {
 
 export type Section = keyof typeof SECTIONS
 
-export type LabwarePositionCheckCommand =
+export type LabwarePositionCheckCreateCommand =
   | MoveToWellCreateCommand
   | PickUpTipCreateCommand
   | DropTipCreateCommand
@@ -22,7 +22,7 @@ export type LabwarePositionCheckMovementCommand =
 export interface LabwarePositionCheckStep {
   labwareId: string
   section: Section
-  commands: LabwarePositionCheckCommand[]
+  commands: LabwarePositionCheckCreateCommand[]
 }
 export interface LabwareToOrder {
   definition: LabwareDefinition2

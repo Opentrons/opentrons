@@ -51,7 +51,7 @@ import type {
   StepSize,
 } from '../../../../molecules/JogControls/types'
 import type {
-  LabwarePositionCheckCommand,
+  LabwarePositionCheckCreateCommand,
   LabwarePositionCheckMovementCommand,
   LabwarePositionCheckStep,
   SavePositionCommandData,
@@ -73,7 +73,7 @@ export type LabwarePositionCheckUtils =
     }
   | { error: Error }
 
-const useLpcCtaText = (command: LabwarePositionCheckCommand): string => {
+const useLpcCtaText = (command: LabwarePositionCheckCreateCommand): string => {
   const { protocolData } = useProtocolDetails()
   const { t } = useTranslation('labware_position_check')
   if (command == null) return ''
@@ -168,7 +168,7 @@ const createCommandData = (command: CreateCommand): AnonymousCommand => {
   if (command.commandType === 'loadLabware') {
     return {
       commandType: command.commandType,
-      params: { ...command.params, labwareId: command.result?.labwareId },
+      params: { ...command.params, labwareId: command?.result?.labwareId },
     }
   }
   return { commandType: command.commandType, params: command.params }
@@ -224,7 +224,7 @@ export function useLabwarePositionCheck(
   const robotName = useSelector(getConnectedRobotName)
   const attachedModules = useSelector(getAttachedModulesForConnectedRobot)
 
-  const LPCCommands = LPCSteps.reduce<LabwarePositionCheckCommand[]>(
+  const LPCCommands = LPCSteps.reduce<LabwarePositionCheckCreateCommand[]>(
     (commands, currentStep) => {
       return [...commands, ...currentStep.commands]
     },
@@ -261,7 +261,7 @@ export function useLabwarePositionCheck(
   // LPCMovementCommands will be run during the guided LPC flow
   const LPCMovementCommands: LabwarePositionCheckMovementCommand[] = LPCCommands.filter(
     (
-      command: LabwarePositionCheckCommand
+      command: LabwarePositionCheckCreateCommand
     ): command is LabwarePositionCheckMovementCommand =>
       command.commandType !== 'thermocycler/openLid'
   )
