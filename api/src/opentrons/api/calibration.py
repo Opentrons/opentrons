@@ -6,7 +6,6 @@ from copy import copy
 from typing import Any, cast, Callable, Optional, Union, Set, TypeVar
 from typing_extensions import TypedDict, Literal, Final
 
-from opentrons.config import feature_flags as ff
 from opentrons.broker import Broker
 from opentrons.types import Point, Mount, Location
 from opentrons.protocol_api import labware
