@@ -121,6 +121,7 @@ async def test_get_all_adv_settings_lru_cache(
     advanced_settings.get_all_adv_settings()
     mock_read_settings_file.assert_not_called()
 
+
 async def test_restart_required(
     loop,
     restore_restart_required,
@@ -148,6 +149,7 @@ async def test_restart_required(
             assert advanced_settings.is_restart_required() is False
             await advanced_settings.set_adv_setting(_id, True)
             assert advanced_settings.is_restart_required() is True
+
 
 @pytest.mark.parametrize(
     argnames=["v", "expected_level"],
