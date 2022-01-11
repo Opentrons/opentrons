@@ -37,6 +37,7 @@ import type {
 import type {
   CreateCommand,
   ProtocolFile,
+  RunTimeCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { SetupCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import type { DropTipCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
@@ -164,8 +165,10 @@ export const useTitleText = (
 const commandIsComplete = (status: RunCommandSummary['status']): boolean =>
   status === 'succeeded' || status === 'failed'
 
-const createCommandData = (command: CreateCommand): AnonymousCommand => {
-  if (command.commandType === 'loadLabware') {
+const createCommandData = (
+  command: CreateCommand | RunTimeCommand
+): AnonymousCommand => {
+  if (command.commandType === 'loadLabware' && 'result' in command) {
     return {
       commandType: command.commandType,
       params: { ...command.params, labwareId: command?.result?.labwareId },
@@ -174,7 +177,7 @@ const createCommandData = (command: CreateCommand): AnonymousCommand => {
   return { commandType: command.commandType, params: command.params }
 }
 
-const isLoadCommand = (command: CreateCommand): boolean => {
+const isLoadCommand = (command: RunTimeCommand): boolean => {
   const loadCommands: Array<SetupCreateCommand['commandType']> = [
     'loadLabware',
     'loadLiquid',
