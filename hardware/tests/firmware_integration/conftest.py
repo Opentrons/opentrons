@@ -1,15 +1,17 @@
 """Common fixtures for integration tests."""
+from __future__ import annotations
 import pytest
 import asyncio
-from typing import AsyncGenerator, Iterator, AsyncIterator
+from typing import AsyncGenerator, Iterator, AsyncIterator, Tuple
 
 from _pytest.fixtures import FixtureRequest
+from opentrons_ot3_firmware.messages import MessageDefinition
 
 from opentrons_hardware.drivers.can_bus.settings import DriverSettings
 from opentrons_hardware.drivers.can_bus.build import build_driver
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_hardware.drivers.can_bus import CanMessenger
-from opentrons_ot3_firmware import constants
+from opentrons_ot3_firmware import constants, ArbitrationId
 
 
 @pytest.fixture
@@ -32,6 +34,16 @@ async def can_messenger(
     messenger.start()
     yield messenger
     await messenger.stop()
+
+
+@pytest.fixture
+def can_messenger_queue(
+    can_messenger: CanMessenger,
+) -> "asyncio.Queue[Tuple[MessageDefinition, ArbitrationId]]":
+    """Create Can messenger."""
+    queue: "asyncio.Queue[Tuple[MessageDefinition, ArbitrationId]]" = asyncio.Queue()
+    can_messenger.add_listener(lambda m, arb: queue.put_nowait((m, arb)))
+    return queue
 
 
 @pytest.fixture(
