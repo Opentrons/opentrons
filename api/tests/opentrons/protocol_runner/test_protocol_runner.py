@@ -164,9 +164,22 @@ async def test_stop(
     subject: ProtocolRunner,
 ) -> None:
     """It should halt a protocol run with stop."""
+    subject.play()
     await subject.stop()
 
     decoy.verify(await protocol_engine.stop(), times=1)
+
+
+async def test_stop_never_started(
+    decoy: Decoy,
+    task_queue: TaskQueue,
+    protocol_engine: ProtocolEngine,
+    subject: ProtocolRunner,
+) -> None:
+    """It should clean up rather than halt if the runner was never started."""
+    await subject.stop()
+
+    decoy.verify(await protocol_engine.finish(drop_tips_and_home=False), times=1)
 
 
 async def test_run(

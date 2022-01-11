@@ -43,6 +43,8 @@ class ProtocolRunData:
     pipettes: List[LoadedPipette]
 
 
+# TODO(mc, 2022-01-11): this class has become bloated. Split into an abstract
+# interfaces and several concrete implementations per protocol type
 class ProtocolRunner:
     """An interface to manage and control a protocol run.
 
@@ -131,6 +133,7 @@ class ProtocolRunner:
 
     def play(self) -> None:
         """Start or resume the run."""
+        self._was_started = True
         self._protocol_engine.play()
 
     def pause(self) -> None:
@@ -139,15 +142,16 @@ class ProtocolRunner:
 
     async def stop(self) -> None:
         """Stop (cancel) the run."""
-        await self._protocol_engine.stop()
+        if self._was_started:
+            await self._protocol_engine.stop()
+        else:
+            await self._protocol_engine.finish(drop_tips_and_home=False)
 
     async def run(
         self,
         protocol_source: Optional[ProtocolSource] = None,
     ) -> ProtocolRunData:
         """Run a given protocol to completion."""
-        self._was_started = True
-
         # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`
         # currently `protocol_source` arg is only used by tests
         if protocol_source:
