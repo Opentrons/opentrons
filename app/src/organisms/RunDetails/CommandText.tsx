@@ -82,7 +82,9 @@ export function CommandText(props: Props): JSX.Element | null {
               labwareId === TRASH_ID
                 ? 'Opentrons Fixed Trash'
                 : getLabwareDisplayName(
-                    labwareRenderInfoById[labwareId].labwareDef
+                    protocolData.labwareDefinitions[
+                      protocolData.labware[labwareId].definitionId
+                    ]
                   ),
             labware_location: labwareLocation.slotName,
           }}
