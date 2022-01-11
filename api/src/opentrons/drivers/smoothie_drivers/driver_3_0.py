@@ -810,6 +810,7 @@ class SmoothieDriver:
         # after it has entered an error state, so sleep for some milliseconds
         await asyncio.sleep(DEFAULT_STABILIZE_DELAY)
         log.debug("reset_from_error")
+        self._is_hard_halting.clear()
         await self._send_command(
             _command_builder().add_gcode(gcode=GCODE.RESET_FROM_ERROR)
         )
