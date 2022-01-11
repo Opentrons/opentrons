@@ -58,7 +58,7 @@ class HardwareStopper:
 
             except PipetteNotAttachedError:
                 # this will happen normally during protocol analysis, but
-                # should no happen during an actual run
+                # should not happen during an actual run
                 log.debug(f"Pipette ID {pip_id} no longer attached.")
 
             else:

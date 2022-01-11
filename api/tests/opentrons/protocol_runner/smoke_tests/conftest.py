@@ -53,14 +53,6 @@ def json_protocol_file() -> InputFile:
                             "well": "A1",
                         },
                     },
-                    {
-                        "command": "dropTip",
-                        "params": {
-                            "pipette": "pipette-id",
-                            "labware": "labware-id",
-                            "well": "A1",
-                        },
-                    },
                 ],
             }
         ).encode()
@@ -92,9 +84,6 @@ def python_protocol_file() -> InputFile:
                 pipette.pick_up_tip(
                     location=tip_rack.wells_by_name()["A1"],
                 )
-                pipette.drop_tip(
-                    location=tip_rack.wells_by_name()["A1"],
-                )
             """
         ).encode()
     )
@@ -123,9 +112,6 @@ def legacy_python_protocol_file() -> InputFile:
                     location="1",
                 )
                 pipette.pick_up_tip(
-                    location=tip_rack.wells_by_name()["A1"],
-                )
-                pipette.drop_tip(
                     location=tip_rack.wells_by_name()["A1"],
                 )
             """
@@ -164,14 +150,6 @@ def legacy_json_protocol_file() -> InputFile:
                 "commands": [
                     {
                         "command": "pickUpTip",
-                        "params": {
-                            "pipette": "pipette-id",
-                            "labware": "labware-id",
-                            "well": "A1",
-                        },
-                    },
-                    {
-                        "command": "dropTip",
                         "params": {
                             "pipette": "pipette-id",
                             "labware": "labware-id",

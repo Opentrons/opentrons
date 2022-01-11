@@ -53,8 +53,6 @@ PICK_UP_TIP_PROTOCOL = textwrap.dedent(
         pipette_left.drop_tip(
             location=tip_rack_1.wells_by_name()["A1"]
         )
-
-        pipette_right.drop_tip()
     """
 ).encode()
 
@@ -84,7 +82,7 @@ async def test_legacy_pick_up_tip(
     pipette_left_result_captor = matchers.Captor()
     pipette_right_result_captor = matchers.Captor()
 
-    assert len(commands_result) == 10
+    assert len(commands_result) == 9
 
     assert commands_result[0] == commands.LoadLabware.construct(
         id=matchers.IsA(str),
@@ -207,21 +205,6 @@ async def test_legacy_pick_up_tip(
         params=commands.DropTipParams(
             pipetteId=pipette_left_id,
             labwareId=tiprack_1_id,
-            wellName="A1",
-        ),
-        result=commands.DropTipResult(),
-    )
-
-    assert commands_result[9] == commands.DropTip.construct(
-        id=matchers.IsA(str),
-        key=matchers.IsA(str),
-        status=commands.CommandStatus.SUCCEEDED,
-        createdAt=matchers.IsA(datetime),
-        startedAt=matchers.IsA(datetime),
-        completedAt=matchers.IsA(datetime),
-        params=commands.DropTipParams(
-            pipetteId=pipette_right_id,
-            labwareId="fixedTrash",
             wellName="A1",
         ),
         result=commands.DropTipResult(),
