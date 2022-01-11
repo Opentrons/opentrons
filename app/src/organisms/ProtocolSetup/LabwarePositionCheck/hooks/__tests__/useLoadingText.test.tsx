@@ -58,9 +58,22 @@ describe('useTitleText', () => {
     })
     expect(result.current).toBe(`Moving to slot ${mockSlotNumber}`)
   })
-  it('should return the loading text for a pick up tip command', () => {
-    const command: PickUpTipCommand = {
+  it('should return the loading text for a move to well and pick up tip command', () => {
+    const firstCommand: MoveToWellCommand = {
       id: '1',
+      commandType: 'moveToWell',
+      params: {
+        labwareId: mockLabwareId,
+        pipetteId: 'p300SingleId',
+        wellName: 'A1',
+        wellLocation: {
+          origin: 'top',
+        },
+      },
+    }
+
+    const secondCommand: PickUpTipCommand = {
+      id: '2',
       commandType: 'pickUpTip',
       params: {
         labwareId: mockLabwareId,
@@ -69,13 +82,30 @@ describe('useTitleText', () => {
       },
     }
 
+    const command = firstCommand && secondCommand
+
     const { result } = renderHook(() => useTitleText(true, command), {
       wrapper,
     })
-    expect(result.current).toBe(`Picking up tip in slot ${mockSlotNumber}`)
+    expect(result.current).toBe(
+      `Moving to slot ${mockSlotNumber} and picking up tip`
+    )
   })
-  it('should return the loading text for a drop tip command', () => {
-    const command: DropTipCommand = {
+  it('should return the loading text for a move to well and returning a tip command', () => {
+    const firstCommand: MoveToWellCommand = {
+      id: '1',
+      commandType: 'moveToWell',
+      params: {
+        labwareId: mockLabwareId,
+        pipetteId: 'p300SingleId',
+        wellName: 'A1',
+        wellLocation: {
+          origin: 'top',
+        },
+      },
+    }
+
+    const secondCommand: DropTipCommand = {
       id: '1',
       commandType: 'dropTip',
       params: {
@@ -85,9 +115,13 @@ describe('useTitleText', () => {
       },
     }
 
+    const command = firstCommand && secondCommand
+
     const { result } = renderHook(() => useTitleText(true, command), {
       wrapper,
     })
-    expect(result.current).toBe(`Returning tip in slot ${mockSlotNumber}`)
+    expect(result.current).toBe(
+      `Moving to slot ${mockSlotNumber} and returning tip`
+    )
   })
 })

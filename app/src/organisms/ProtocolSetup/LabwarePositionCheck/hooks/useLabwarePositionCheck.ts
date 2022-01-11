@@ -131,6 +131,14 @@ export const useTitleText = (
 
   if (loading) {
     switch (command.commandType) {
+      case 'moveToWell' && 'pickUpTip': {
+        return t('moving_and_picking_up_tip_title', {
+          slot,
+        })
+      }
+      case 'moveToWell' && 'dropTip': {
+        return t('moving_and_returning_tip_title', { slot })
+      }
       case 'moveToWell': {
         return t('moving_to_slot_title', {
           slot,

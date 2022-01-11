@@ -37,6 +37,8 @@
   "error_modal_header": "Something went wrong",
   "error_modal_text": "There was an error processing your request on the robot",
   "robot_in_motion": "Stand back, robot is in motion.",
+  "moving_and_returning_tip_title": "Moving to slot {{slot}} and returning tip",
+  "moving_and_picking_up_tip_title": "Moving to slot {{slot}} and picking up tip",
   "moving_to_slot_title": "Moving to slot {{slot}}",
   "picking_up_tip_title": "Picking up tip in slot {{slot}}",
   "returning_tip_title": "Returning tip in slot {{slot}}",
