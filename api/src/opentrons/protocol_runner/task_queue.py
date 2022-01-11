@@ -59,13 +59,6 @@ class TaskQueue:
         if self._run_task is None:
             self._run_task = asyncio.create_task(self._run())
 
-    def stop(self) -> None:
-        """Stop running tasks, allowing the queue to be joined."""
-        self._ok_to_join_event.set()
-
-        if self._run_task:
-            self._run_task.cancel()
-
     async def join(self) -> None:
         """Wait for the background run task to complete, propagating errors."""
         await self._ok_to_join_event.wait()
@@ -79,9 +72,6 @@ class TaskQueue:
         try:
             if self._run_func is not None:
                 await self._run_func()
-        except asyncio.CancelledError:
-            log.debug("Run task was cancelled")
-            raise
         except Exception as e:
             log.debug(
                 "Exception raised during protocol run",

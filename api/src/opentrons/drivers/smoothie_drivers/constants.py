@@ -83,7 +83,7 @@ XY_HOMING_SPEED = 80
 
 HOME_SEQUENCE = ["ZABC", "X", "Y"]
 
-AXES = "".join(HOME_SEQUENCE)
+AXES: Final[str] = "".join(HOME_SEQUENCE)
 
 DISABLE_AXES = ""
 """Ignore these axis when sending move or home command"""

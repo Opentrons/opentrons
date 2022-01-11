@@ -145,8 +145,7 @@ class ProtocolEngine:
         self._state_store.commands.raise_if_stop_requested()
         self._action_dispatcher.dispatch(StopAction())
         self._queue_worker.cancel()
-        await self._hardware_stopper.do_halt_and_recover()
-        self._action_dispatcher.dispatch(HardwareStoppedAction())
+        await self._hardware_stopper.do_halt()
 
     # TODO(mc, 2021-12-27): commands.get_all_complete not yet implemented
     async def wait_until_complete(self) -> None:
@@ -159,7 +158,9 @@ class ProtocolEngine:
         )
 
     async def finish(
-        self, error: Optional[Exception] = None, home_after: bool = True
+        self,
+        error: Optional[Exception] = None,
+        drop_tips_and_home: bool = True,
     ) -> None:
         """Gracefully finish using the ProtocolEngine, waiting for it to become idle.
 
@@ -173,7 +174,7 @@ class ProtocolEngine:
 
         Arguments:
             error: An error that caused the stop, if applicable.
-            home_after: Whether to home after or not.
+            drop_tips_and_home: Whether to home and drop tips as part of cleanup.
         """
         if error:
             error_details: Optional[FinishErrorDetails] = FinishErrorDetails(
@@ -188,11 +189,11 @@ class ProtocolEngine:
 
         try:
             await self._queue_worker.join()
-        finally:
-            await self._hardware_stopper.do_stop(home_after)
 
-        self._action_dispatcher.dispatch(HardwareStoppedAction())
-        self._plugin_starter.stop()
+        finally:
+            await self._hardware_stopper.do_stop_and_recover(drop_tips_and_home)
+            self._action_dispatcher.dispatch(HardwareStoppedAction())
+            self._plugin_starter.stop()
 
     def add_labware_offset(self, request: LabwareOffsetCreate) -> LabwareOffset:
         """Add a new labware offset and return it.

@@ -43,6 +43,7 @@ class HardwareStopper:
             await self._movement_handler.home(
                 axes=[MotorAxis.X, MotorAxis.Y, MotorAxis.LEFT_Z, MotorAxis.RIGHT_Z]
             )
+
         for pip_id, tiprack_id in attached_tip_racks.items():
             hw_pipette = self._state_store.pipettes.get_hardware_pipette(
                 pipette_id=pip_id,
@@ -65,13 +66,17 @@ class HardwareStopper:
                 well_location=WellLocation(),
             )
 
-    async def do_halt_and_recover(self) -> None:
-        """Run the sequence to stop hardware, drop tip and home."""
-        await self._hardware_api.halt()
-        await self._drop_tip()
-        await self._hardware_api.stop(home_after=True)
+    async def do_halt(self) -> None:
+        """Issue a halt signal to the hardware API.
 
-    async def do_stop(self, home_after: bool) -> None:
-        """Only issue hardware api stop."""
-        # TODO: Don't home after once the stop/ drop tip initiation is moved to client
-        await self._hardware_api.stop(home_after=home_after)
+        After issuing a halt, you must call do_stop_and_recover after
+        anything using the HardwareAPI has settled.
+        """
+        await self._hardware_api.halt()
+
+    async def do_stop_and_recover(self, drop_tips_and_home: bool = False) -> None:
+        """Stop and reset the HardwareAPI, optionally dropping tips and homing."""
+        if drop_tips_and_home:
+            await self._drop_tip()
+
+        await self._hardware_api.stop(home_after=drop_tips_and_home)

@@ -29,6 +29,7 @@ from opentrons.protocol_reader import (
 from opentrons.protocol_runner import create_simulating_runner
 
 
+@pytest.mark.xfail(strict=True, raises=NotImplementedError)
 async def test_runner_with_python(
     protocol_reader: ProtocolReader,
     python_protocol_file: InputFile,

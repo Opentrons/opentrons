@@ -182,10 +182,6 @@ async def create_run(
     if protocol_resource is not None:
         engine_store.runner.load(protocol_resource.source)
 
-    # TODO(mc, 2021-08-05): capture errors from `runner.join` and place
-    # them in the run resource
-    task_runner.run(engine_store.runner.join)
-
     run = RunResource(
         run_id=run_id,
         protocol_id=protocol_id,

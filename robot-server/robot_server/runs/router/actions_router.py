@@ -32,7 +32,7 @@ class RunActionNotAllowed(ErrorDetails):
     title: str = "Run Action Not Allowed"
 
 
-@actions_router.post(
+@actions_router.post(  # noqa: C901
     path="/runs/{runId}/actions",
     summary="Issue a control action to the run",
     description="Provide an action in order to control execution of the run.",
@@ -86,11 +86,17 @@ async def create_run_action(
 
     try:
         if action.actionType == RunActionType.PLAY:
-            log.info(f'Playing run "{runId}".')
-            engine_store.runner.play()
+            if engine_store.runner.was_started():
+                log.info(f'Resuming run "{runId}".')
+                engine_store.runner.play()
+            else:
+                log.info(f'Starting run "{runId}".')
+                task_runner.run(engine_store.runner.run)
+
         elif action.actionType == RunActionType.PAUSE:
             log.info(f'Pausing run "{runId}".')
             engine_store.runner.pause()
+
         elif action.actionType == RunActionType.STOP:
             log.info(f'Stopping run "{runId}".')
             task_runner.run(engine_store.runner.stop)

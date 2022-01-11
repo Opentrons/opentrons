@@ -90,6 +90,14 @@ class ProtocolRunner:
         self._legacy_executor = legacy_executor or LegacyExecutor(
             hardware_api=hardware_api
         )
+        self._was_started = False
+
+    def was_started(self) -> bool:
+        """Whether the runner has been started.
+
+        This value is latched; once it is True, it will never become False.
+        """
+        return self._was_started
 
     def load(self, protocol_source: ProtocolSource) -> None:
         """Load a ProtocolSource into managed ProtocolEngine.
@@ -125,7 +133,6 @@ class ProtocolRunner:
     def play(self) -> None:
         """Start or resume the run."""
         self._protocol_engine.play()
-        self._task_queue.start()
 
     def pause(self) -> None:
         """Pause the run."""
@@ -133,22 +140,23 @@ class ProtocolRunner:
 
     async def stop(self) -> None:
         """Stop (cancel) the run."""
-        self._task_queue.stop()
         await self._protocol_engine.stop()
 
-    async def join(self) -> None:
-        """Wait for the run to complete, propagating any errors.
-
-        This method may be called before the run starts, in which case,
-        it will wait for the run to start before waiting for completion.
-        """
-        return await self._task_queue.join()
-
-    async def run(self, protocol_source: ProtocolSource) -> ProtocolRunData:
+    async def run(
+        self,
+        protocol_source: Optional[ProtocolSource] = None,
+    ) -> ProtocolRunData:
         """Run a given protocol to completion."""
-        self.load(protocol_source)
+        self._was_started = True
+
+        # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`
+        # currently `protocol_source` arg is only used by tests
+        if protocol_source:
+            self.load(protocol_source)
+
         self.play()
-        await self.join()
+        self._task_queue.start()
+        await self._task_queue.join()
 
         return ProtocolRunData(
             commands=self._protocol_engine.state_view.commands.get_all(),

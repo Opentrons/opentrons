@@ -143,10 +143,7 @@ async def test_play_starts_run(
     """It should start a protocol run with play."""
     subject.play()
 
-    decoy.verify(
-        protocol_engine.play(),
-        task_queue.start(),
-    )
+    decoy.verify(protocol_engine.play(), times=1)
 
 
 async def test_pause(
@@ -169,21 +166,25 @@ async def test_stop(
     """It should halt a protocol run with stop."""
     await subject.stop()
 
-    decoy.verify(
-        task_queue.stop(),
-        await protocol_engine.stop(),
-    )
+    decoy.verify(await protocol_engine.stop(), times=1)
 
 
-async def test_join(
+async def test_run(
     decoy: Decoy,
+    protocol_engine: ProtocolEngine,
     task_queue: TaskQueue,
     subject: ProtocolRunner,
 ) -> None:
-    """It should join the run's background task."""
-    await subject.join()
+    """It should run a protocol to completion."""
+    assert subject.was_started() is False
+    await subject.run()
+    assert subject.was_started() is True
 
-    decoy.verify(await task_queue.join(), times=1)
+    decoy.verify(
+        protocol_engine.play(),
+        task_queue.start(),
+        await task_queue.join(),
+    )
 
 
 @pytest.mark.xfail(raises=NotImplementedError, strict=True)
