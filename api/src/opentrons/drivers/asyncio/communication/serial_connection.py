@@ -207,11 +207,12 @@ class SerialConnection:
         Raises: SerialException
         """
         lower = response.lower()
-        if self._error_keyword in lower:
-            raise ErrorResponse(port=self._port, response=response)
 
         if self._alarm_keyword in lower:
             raise AlarmResponse(port=self._port, response=response)
+
+        if self._error_keyword in lower:
+            raise ErrorResponse(port=self._port, response=response)
 
     async def on_retry(self) -> None:
         """
