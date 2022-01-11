@@ -42,7 +42,6 @@ LOG_CONFIG: Dict[str, Any] = {
 
 def main() -> None:
     """Entry point."""
-
     parser = argparse.ArgumentParser(description="Motion planning script.")
     parser.add_argument(
         "--params-file-path",
