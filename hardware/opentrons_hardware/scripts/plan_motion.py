@@ -42,9 +42,11 @@ LOG_CONFIG: Dict[str, Any] = {
 
 def main() -> None:
     """Entry point."""
+
     parser = argparse.ArgumentParser(description="Motion planning script.")
     parser.add_argument(
         "--params-file-path",
+        "-p",
         type=str,
         required=False,
         default=os.path.join(os.path.dirname(__file__) + "/motion_params.json"),
@@ -52,10 +54,19 @@ def main() -> None:
     )
     parser.add_argument(
         "--debug",
+        "-d",
         type=bool,
         required=False,
         default=False,
         help="set logging level to debug",
+    )
+    parser.add_argument(
+        "--output",
+        "-o",
+        type=str,
+        required=False,
+        default=os.path.join(os.path.dirname(__file__) + "/motion_output.json"),
+        help="the output file path",
     )
     args = parser.parse_args()
 
@@ -77,11 +88,18 @@ def main() -> None:
     ]
 
     manager = move_manager.MoveManager(constraints=constraints)
-    manager.plan_motion(
+    _, blend_log = manager.plan_motion(
         origin=origin,
         target_list=target_list,
         iteration_limit=params["iteration_limit"],
     )
+
+    output = {
+        index: [v.to_dict() for v in value] for index, value in enumerate(blend_log)
+    }
+
+    with open(args.output, "w") as f:
+        json.dump(output, f, indent=2)
 
 
 if __name__ == "__main__":
