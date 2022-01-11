@@ -110,13 +110,6 @@ def is_robot(monkeypatch):
 
 # -------feature flag fixtures-------------
 @pytest.fixture
-async def calibrate_bottom_flag():
-    await config.advanced_settings.set_adv_setting("calibrateToBottom", True)
-    yield
-    await config.advanced_settings.set_adv_setting("calibrateToBottom", False)
-
-
-@pytest.fixture
 async def short_trash_flag():
     await config.advanced_settings.set_adv_setting("shortFixedTrash", True)
     yield
