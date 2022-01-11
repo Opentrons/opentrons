@@ -86,6 +86,8 @@ async def create_run_action(
 
     try:
         if action.actionType == RunActionType.PLAY:
+            # TODO(mc, 2022-01-11): this won't work very well for HTTP-only
+            # runs, which is ok at the time of writing but needs to be addressed
             if engine_store.runner.was_started():
                 log.info(f'Resuming run "{runId}".')
                 engine_store.runner.play()

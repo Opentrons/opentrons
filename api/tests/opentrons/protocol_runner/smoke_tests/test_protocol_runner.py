@@ -29,7 +29,6 @@ from opentrons.protocol_reader import (
 from opentrons.protocol_runner import create_simulating_runner
 
 
-@pytest.mark.xfail(strict=True, raises=NotImplementedError)
 async def test_runner_with_python(
     protocol_reader: ProtocolReader,
     python_protocol_file: InputFile,
@@ -69,7 +68,7 @@ async def test_runner_with_python(
     assert expected_pipette in pipettes_result
     assert expected_labware in labware_result
 
-    expected_command = commands.PickUpTip.construct(
+    expected_pick_up_command = commands.PickUpTip.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -83,8 +82,23 @@ async def test_runner_with_python(
         ),
         result=commands.PickUpTipResult(),
     )
+    expected_drop_command = commands.DropTip.construct(
+        id=matchers.IsA(str),
+        key=matchers.IsA(str),
+        status=commands.CommandStatus.SUCCEEDED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        params=commands.DropTipParams(
+            pipetteId=pipette_id_captor.value,
+            labwareId=labware_id_captor.value,
+            wellName="A1",
+        ),
+        result=commands.DropTipResult(),
+    )
 
-    assert expected_command in commands_result
+    assert expected_pick_up_command in commands_result
+    assert expected_drop_command in commands_result
 
 
 @pytest.mark.xfail(raises=ProtocolFilesInvalidError, strict=True)

@@ -72,7 +72,6 @@ class ProtocolRunner:
         """Initialize the ProtocolRunner with its dependencies."""
         self._protocol_engine = protocol_engine
         self._hardware_api = hardware_api
-        self._task_queue = task_queue or TaskQueue()
         self._json_file_reader = json_file_reader or JsonFileReader()
         self._json_command_translator = (
             json_command_translator or JsonCommandTranslator()
@@ -91,6 +90,10 @@ class ProtocolRunner:
             hardware_api=hardware_api
         )
         self._was_started = False
+
+        # TODO(mc, 2022-01-11): replace task queue with specific implementations
+        # of runner interface
+        self._task_queue = task_queue or TaskQueue(cleanup_func=protocol_engine.finish)
 
     def was_started(self) -> bool:
         """Whether the runner has been started.
@@ -125,10 +128,6 @@ class ProtocolRunner:
                 self._load_python(protocol_source)
             else:
                 self._load_legacy(protocol_source)
-
-        # ensure the engine is stopped gracefully once the
-        # protocol file stops issuing commands
-        self._task_queue.set_cleanup_func(self._protocol_engine.finish)
 
     def play(self) -> None:
         """Start or resume the run."""

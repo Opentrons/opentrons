@@ -35,7 +35,7 @@ async def test_create_engine(subject: EngineStore) -> None:
 async def test_archives_state_if_engine_already_exists(subject: EngineStore) -> None:
     """It should not create more than one engine / runner pair."""
     state_1 = await subject.create(run_id="run-id-1")
-    await subject.runner.stop()
+    await subject.runner.run()
     state_2 = await subject.create(run_id="run-id-2")
 
     assert state_2 is subject.engine.state_view
@@ -62,7 +62,7 @@ def test_raise_if_engine_does_not_exist(subject: EngineStore) -> None:
 async def test_clear_engine(subject: EngineStore) -> None:
     """It should clear a stored engine entry."""
     await subject.create(run_id="run-id")
-    await subject.runner.stop()
+    await subject.runner.run()
     await subject.clear()
 
     with pytest.raises(EngineMissingError):
