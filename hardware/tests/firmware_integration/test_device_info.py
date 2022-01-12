@@ -27,7 +27,12 @@ async def test_broadcast(
 
     async def _check() -> None:
         """Loop until all nodes respond."""
-        nodes = set(NodeId)
+        nodes = {
+            NodeId.head,
+            NodeId.pipette,
+            NodeId.gantry_x,
+            NodeId.gantry_y,
+        }
         while len(nodes):
             m = await driver.read()
             assert m.arbitration_id.parts.message_id == MessageId.device_info_response
