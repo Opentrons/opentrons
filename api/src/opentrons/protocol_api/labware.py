@@ -338,14 +338,14 @@ class Labware(DeckItem):
         self._implementation.set_calibration(delta)
 
     @requires_version(2, 12)
-    def set_offset(self, vector: Point) -> None:
+    def set_offset(self, x: float, y: float, z: float) -> None:
         """Set the labware's position offset directly.
 
-        This method is primarily for in Jupyter and command-line applications
+        This method is primarily for Jupyter and command-line applications
         of the Python Protocol API. If you're not using Jupyter or the CLI,
         use Labware Position Check in the Opentrons App, instead.
         """
-        self._implementation.set_calibration(vector)
+        self._implementation.set_calibration(Point(x=x, y=y, z=z))
 
     @property  # type: ignore
     @requires_version(2, 0)

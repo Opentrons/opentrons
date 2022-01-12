@@ -752,9 +752,9 @@ def test_set_offset(decoy: Decoy) -> None:
     labware_impl = decoy.mock(cls=AbstractLabware)
     subject = labware.Labware(implementation=labware_impl)
 
-    subject.set_offset(Point(1, 2, 3))
-    decoy.verify(labware_impl.set_calibration(Point(1, 2, 3)))
+    subject.set_offset(x=1.1, y=2.2, z=3.3)
+    decoy.verify(labware_impl.set_calibration(Point(1.1, 2.2, 3.3)))
 
     subject = labware.Labware(implementation=labware_impl, api_level=APIVersion(2, 11))
     with pytest.raises(APIVersionError):
-        subject.set_offset(Point(4, 5, 6))
+        subject.set_offset(x=4.4, y=5.5, z=6.6)
