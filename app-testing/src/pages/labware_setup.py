@@ -46,6 +46,30 @@ class LabwareSetup:
     )
     proceed_to_run_button: Tuple[str, str] = (By.ID, "LabwareSetup_proceedToRunButton")
 
+    start_run_button: Tuple[str, str] = (
+        By.XPATH,
+        "//p[text()='Start Run']",
+    )
+
+    run_again_button: Tuple[str, str] = (
+        By.XPATH,
+        "//p[text()='Run Again']",
+    )
+
+    protocol_complete_banner: Tuple[str, str] = (
+        By.XPATH,
+        "//span[text()='Protocol run complete']",
+    )
+
+    close_protocol_text_locator: Tuple[str, str] = (
+        By.XPATH,
+        "//button[text()='close']",
+    )
+    yes_close_now_text_locator: Tuple[str, str] = (
+        By.XPATH,
+        "//button[text()='Yes, close now']",
+    )
+
     @highlight
     def get_labware_setup_text(self) -> WebElement:
         return WebDriverWait(self.driver, 2).until(
@@ -109,3 +133,42 @@ class LabwareSetup:
 
     def click_proceed_to_run_button(self) -> None:
         self.get_proceed_to_run_button().click()
+
+    @highlight
+    def get_start_run_button(self) -> WebElement:
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(LabwareSetup.start_run_button)
+        )
+
+    def click_start_run_button(self) -> None:
+        self.get_start_run_button().click()
+
+    @highlight
+    def get_run_again_button(self) -> WebElement:
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(LabwareSetup.run_again_button)
+        )
+
+    @highlight
+    def get_protocol_complete_banner(self) -> WebElement:
+        return WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable(LabwareSetup.protocol_complete_banner)
+        )
+
+    @highlight
+    def get_protocol_close_button(self) -> WebElement:
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(LabwareSetup.close_protocol_text_locator)
+        )
+
+    @highlight
+    def get_confirmation_close_button(self) -> WebElement:
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(LabwareSetup.yes_close_now_text_locator)
+        )
+
+    def click_protocol_close_button(self) -> None:
+        self.get_protocol_close_button().click()
+
+    def click_confirmation_close_button(self) -> None:
+        self.get_confirmation_close_button().click()

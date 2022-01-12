@@ -75,6 +75,7 @@ def test_protocol_upload(
             assert robot_page.wait_for_deck_to_show_calibrated()
         left_menu = LeftMenu(driver)
         left_menu.click_protocol_upload_button()
+        labware_setup = LabwareSetup(driver)
         protocol_file = ProtocolFile(driver)
         logger.info(
             f"uploading protocol: {test_protocols['protocoluploadjson'].resolve()}"
@@ -114,7 +115,6 @@ def test_protocol_upload(
         assert module_setup.get_temperature_module().text == "Temperature Module GEN1"
         assert module_setup.get_proceed_to_labware_setup().is_displayed()
         module_setup.click_proceed_to_labware_setup()
-        labware_setup = LabwareSetup(driver)
         assert labware_setup.get_labware_setup_text().is_displayed()
         assert labware_setup.get_magnetic_module_link().is_displayed()
         assert labware_setup.get_thermocycler_link().is_displayed()
@@ -127,6 +127,11 @@ def test_protocol_upload(
         labware_setup = LabwareSetup(driver)
         labware_setup.click_close_button()
         labware_setup.click_proceed_to_run_button()
+        labware_setup.click_start_run_button()
+        assert labware_setup.get_protocol_complete_banner().is_displayed()
+        assert labware_setup.get_run_again_button().is_displayed
+        labware_setup.click_protocol_close_button()
+        labware_setup.click_confirmation_close_button()
 
 
 def test_moam_pur(
