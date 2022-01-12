@@ -1,4 +1,5 @@
 import * as React from 'react'
+import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
 import { useInView } from 'react-intersection-observer'
 import {
@@ -26,7 +27,6 @@ import {
 } from '@opentrons/components'
 import { useCommandQuery } from '@opentrons/react-api-client'
 import { css } from 'styled-components'
-import { useCurrentRunId } from '../ProtocolUpload/hooks/useCurrentRunId'
 import { CommandTimer } from './CommandTimer'
 import { CommandText } from './CommandText'
 import {
@@ -44,7 +44,8 @@ import type {
 export interface CommandItemProps {
   analysisCommand: Command | null
   runCommandSummary: RunCommandSummary | null
-  runStatus?: RunStatus
+  runStatus: RunStatus
+  currentRunId: string | null
 }
 
 const WRAPPER_STYLE_BY_STATUS: {
@@ -71,10 +72,9 @@ const commandIsComplete = (status: RunCommandSummary['status']): boolean =>
 // minimum delay in MS for observer notifications
 export const OBSERVER_DELAY = 300
 
-export function CommandItem(props: CommandItemProps): JSX.Element | null {
-  const { analysisCommand, runCommandSummary, runStatus } = props
+function CommandItemComponent(props: CommandItemProps): JSX.Element | null {
+  const {analysisCommand, runCommandSummary, runStatus, currentRunId} = props
   const { t } = useTranslation('run_details')
-  const currentRunId = useCurrentRunId()
   const [commandItemRef, isInView] = useInView({
     delay: OBSERVER_DELAY,
   })
@@ -194,6 +194,21 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
     </Flex>
   )
 }
+
+export const CommandItem = React.memo(
+  CommandItemComponent,
+  (prevProps, nextProps) => {
+    const shouldRerender = !isEqual(prevProps.analysisCommand, nextProps.analysisCommand)
+      || !isEqual(prevProps.runCommandSummary, nextProps.runCommandSummary)
+      || (
+        (([RUN_STATUS_PAUSED, RUN_STATUS_PAUSE_REQUESTED] as RunStatus[]).includes(nextProps.runStatus)
+        || ([RUN_STATUS_PAUSED, RUN_STATUS_PAUSE_REQUESTED] as RunStatus[]).includes(prevProps.runStatus)) &&
+        (prevProps.runCommandSummary?.status === 'running'
+        || nextProps.runCommandSummary?.status === 'running')
+      )
+    return !shouldRerender
+  }
+)
 
 interface CurrentCommandLabelProps {
   runStatus?: RunStatus
