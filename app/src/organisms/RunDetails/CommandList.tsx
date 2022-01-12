@@ -283,6 +283,7 @@ export function CommandList(): JSX.Element | null {
                       analysisCommand={command.analysisCommand}
                       runCommandSummary={command.runCommandSummary}
                       runStatus={runStatus}
+                      currentRunId={runRecord?.data.id ?? null}
                     />
                   </Flex>
                 </Flex>
