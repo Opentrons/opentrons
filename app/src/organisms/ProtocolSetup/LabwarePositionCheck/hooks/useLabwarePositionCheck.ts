@@ -2,7 +2,6 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import reduce from 'lodash/reduce'
-import { v4 as uuidv4 } from 'uuid'
 import { getCommand } from '@opentrons/api-client'
 import {
   getLabwareDisplayName,
@@ -39,8 +38,12 @@ import type {
   ProtocolFile,
   RunTimeCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6'
-import type { SetupCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import type {
+  SetupCreateCommand,
+  SetupRunTimeCommand,
+} from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import type { DropTipCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+import type { TCOpenLidCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 import type {
   HomeCreateCommand,
   SavePositionCreateCommand,
@@ -73,6 +76,11 @@ export type LabwarePositionCheckUtils =
       ctaText: string
     }
   | { error: Error }
+
+type LPCPrepCommand =
+  | HomeCreateCommand
+  | SetupRunTimeCommand
+  | TCOpenLidCreateCommand
 
 const useLpcCtaText = (command: LabwarePositionCheckCreateCommand): string => {
   const { protocolData } = useProtocolDetails()
@@ -166,18 +174,23 @@ const commandIsComplete = (status: RunCommandSummary['status']): boolean =>
   status === 'succeeded' || status === 'failed'
 
 const createCommandData = (
-  command: CreateCommand | RunTimeCommand
+  command:
+    | LabwarePositionCheckMovementCommand
+    | LPCPrepCommand
+    | SavePositionCreateCommand
 ): AnonymousCommand => {
-  if (command.commandType === 'loadLabware' && 'result' in command) {
+  if (command.commandType === 'loadLabware') {
     return {
       commandType: command.commandType,
-      params: { ...command.params, labwareId: command?.result?.labwareId },
+      params: { ...command.params, labwareId: command.result.labwareId },
     }
   }
   return { commandType: command.commandType, params: command.params }
 }
 
-const isLoadCommand = (command: RunTimeCommand): boolean => {
+const isLoadCommand = (
+  command: RunTimeCommand
+): command is SetupRunTimeCommand => {
   const loadCommands: Array<SetupCreateCommand['commandType']> = [
     'loadLabware',
     'loadLiquid',
@@ -188,7 +201,9 @@ const isLoadCommand = (command: RunTimeCommand): boolean => {
   return loadCommands.includes(command.commandType)
 }
 
-const isTCOpenCommand = (command: CreateCommand): boolean =>
+const isTCOpenCommand = (
+  command: CreateCommand
+): command is TCOpenLidCreateCommand =>
   command.commandType === 'thermocycler/openLid'
 
 export function useLabwarePositionCheck(
@@ -234,29 +249,28 @@ export function useLabwarePositionCheck(
     []
   )
   // load commands come from the protocol resource
-  const loadCommands =
-    (protocolData?.commands.filter(isLoadCommand).map(command => {
+  const loadCommands: SetupRunTimeCommand[] =
+    protocolData?.commands.filter(isLoadCommand).map(command => {
       if (command.commandType === 'loadPipette') {
-        const commandWithCommandId = {
+        const commandWithPipetteId = {
           ...command,
           params: {
             ...command.params,
             pipetteId: command.result?.pipetteId,
           },
         }
-        return commandWithCommandId
+        return commandWithPipetteId
       }
       return command
-    }) as CreateCommand[]) ?? []
+    }) ?? []
   // TC open lid commands come from the LPC command generator
   const TCOpenCommands = LPCCommands.filter(isTCOpenCommand) ?? []
   const homeCommand: HomeCreateCommand = {
     commandType: 'home',
-    id: uuidv4(),
     params: {},
   }
   // prepCommands will be run when a user starts LPC
-  const prepCommands: CreateCommand[] = [
+  const prepCommands: LPCPrepCommand[] = [
     ...loadCommands,
     ...TCOpenCommands,
     homeCommand,
@@ -350,7 +364,6 @@ export function useLabwarePositionCheck(
     // before executing the next movement command, save the current position
     const savePositionCommand: CreateCommand = {
       commandType: 'savePosition',
-      id: uuidv4(),
       params: { pipetteId: prevCommand.params.pipetteId },
     }
 
@@ -463,7 +476,6 @@ export function useLabwarePositionCheck(
         if (currentCommand.commandType === 'moveToWell') {
           const savePositionCommand: SavePositionCreateCommand = {
             commandType: 'savePosition',
-            id: uuidv4(),
             params: { pipetteId: currentCommand.params.pipetteId },
           }
           createCommand({
@@ -486,7 +498,6 @@ export function useLabwarePositionCheck(
         if (currentCommandIndex === LPCMovementCommands.length - 1) {
           const homeCommand: HomeCreateCommand = {
             commandType: 'home',
-            id: uuidv4(),
             params: {},
           }
           createCommand({
@@ -576,7 +587,6 @@ export function useLabwarePositionCheck(
         })
         const savePositionCommand: SavePositionCreateCommand = {
           commandType: 'savePosition',
-          id: uuidv4(),
           params: { pipetteId: currentCommand.params.pipetteId },
         }
         createCommand({
