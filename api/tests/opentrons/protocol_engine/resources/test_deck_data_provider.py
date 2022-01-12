@@ -39,7 +39,7 @@ async def test_get_deck_definition(
 async def test_get_deck_definition_short_trash(
     short_trash_deck_def: DeckDefinitionV2,
     subject: DeckDataProvider,
-    short_trash_flag: AsyncGenerator[None, None],
+    short_trash_flag: None,
 ) -> None:
     """It should be able to load the short-trash deck definition."""
     result = await subject.get_deck_definition()
