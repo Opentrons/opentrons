@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid'
 import {
   getModuleType,
   ProtocolFile,
@@ -36,7 +35,6 @@ export const getMoveToTiprackSteps = (
     const commands = [
       {
         commandType: 'moveToWell' as const,
-        id: uuidv4(),
         params: {
           pipetteId: pipetteId,
           labwareId: labwareId,
@@ -60,7 +58,6 @@ export const getMoveToLabwareSteps = (
   labwareIds.map(labwareId => {
     const moveToWellCommand: MoveToWellCreateCommand = {
       commandType: 'moveToWell' as const,
-      id: uuidv4(),
       params: {
         pipetteId: pipetteId,
         labwareId: labwareId,
@@ -82,7 +79,6 @@ export const getMoveToLabwareSteps = (
       const moduleId = getLabwareLocation(labwareId, commands).moduleId
       const openTCLidCommand: TCOpenLidCreateCommand = {
         commandType: 'thermocycler/openLid',
-        id: uuidv4(),
         params: {
           moduleId,
         },
@@ -109,7 +105,6 @@ export const getPickupTipStep = (
   commands: [
     {
       commandType: 'pickUpTip',
-      id: uuidv4(),
       params: {
         pipetteId,
         labwareId: tiprackId,
@@ -129,7 +124,6 @@ export const getDropTipStep = (
   commands: [
     {
       commandType: 'dropTip',
-      id: uuidv4(),
       params: {
         pipetteId: pipetteId,
         labwareId: tiprackId,

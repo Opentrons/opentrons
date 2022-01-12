@@ -1,4 +1,4 @@
-import { CommonCommandInfo, CommonCommandRunTimeInfo } from '.'
+import { CommonCommandRunTimeInfo } from '.'
 export type PipettingRunTimeCommand =
   | AspirateRunTimeCommand
   | DispenseRunTimeCommand
@@ -18,7 +18,7 @@ export type PipettingCreateCommand =
   | PickUpTipCreateCommand
   | DropTipCreateCommand
 
-export interface AspirateCreateCommand extends CommonCommandInfo {
+export interface AspirateCreateCommand {
   commandType: 'aspirate'
   params: AspDispAirgapParams
 }
@@ -27,7 +27,7 @@ export interface AspirateRunTimeCommand
     AspirateCreateCommand {
   result: BasicLiquidHandlingResult
 }
-export interface DispenseCreateCommand extends CommonCommandInfo {
+export interface DispenseCreateCommand {
   commandType: 'dispense'
   params: AspDispAirgapParams
 }
@@ -36,7 +36,7 @@ export interface DispenseRunTimeCommand
     DispenseCreateCommand {
   result: BasicLiquidHandlingResult
 }
-export interface AspirateAirGapCreateCommand extends CommonCommandInfo {
+export interface AspirateAirGapCreateCommand {
   commandType: 'aspirateAirGap'
   params: AspDispAirgapParams
 }
@@ -45,7 +45,7 @@ export interface AspirateAirGapRunTimeCommand
     AspirateAirGapCreateCommand {
   result: BasicLiquidHandlingResult
 }
-export interface DispenseAirGapCreateCommand extends CommonCommandInfo {
+export interface DispenseAirGapCreateCommand {
   commandType: 'dispenseAirGap'
   params: AspDispAirgapParams
 }
@@ -54,7 +54,7 @@ export interface DispenseAirGapRunTimeCommand
     DispenseAirGapCreateCommand {
   result: BasicLiquidHandlingResult
 }
-export interface BlowoutCreateCommand extends CommonCommandInfo {
+export interface BlowoutCreateCommand {
   commandType: 'blowout'
   params: BlowoutParams
 }
@@ -63,7 +63,7 @@ export interface BlowoutRunTimeCommand
     BlowoutCreateCommand {
   result: BasicLiquidHandlingResult
 }
-export interface TouchTipCreateCommand extends CommonCommandInfo {
+export interface TouchTipCreateCommand {
   commandType: 'touchTip'
   params: TouchTipParams
 }
@@ -72,7 +72,7 @@ export interface TouchTipRunTimeCommand
     TouchTipCreateCommand {
   result: BasicLiquidHandlingResult
 }
-export interface PickUpTipCreateCommand extends CommonCommandInfo {
+export interface PickUpTipCreateCommand {
   commandType: 'pickUpTip'
   params: PipetteAccessParams & WellLocationParam
 }
@@ -81,7 +81,7 @@ export interface PickUpTipRunTimeCommand
     PickUpTipCreateCommand {
   result: any
 }
-export interface DropTipCreateCommand extends CommonCommandInfo {
+export interface DropTipCreateCommand {
   commandType: 'dropTip'
   params: PipetteAccessParams & WellLocationParam
 }

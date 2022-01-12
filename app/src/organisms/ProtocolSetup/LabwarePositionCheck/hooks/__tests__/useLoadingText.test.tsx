@@ -41,7 +41,6 @@ describe('useTitleText', () => {
   })
   it('should return the loading text for a move to well command', () => {
     const command: MoveToWellCreateCommand = {
-      id: '1',
       commandType: 'moveToWell',
       params: {
         labwareId: mockLabwareId,
@@ -60,7 +59,6 @@ describe('useTitleText', () => {
   })
   it('should return the loading text for a pick up tip command', () => {
     const command: PickUpTipCreateCommand = {
-      id: '1',
       commandType: 'pickUpTip',
       params: {
         labwareId: mockLabwareId,
@@ -76,7 +74,6 @@ describe('useTitleText', () => {
   })
   it('should return the loading text for a drop tip command', () => {
     const command: DropTipCreateCommand = {
-      id: '1',
       commandType: 'dropTip',
       params: {
         labwareId: mockLabwareId,

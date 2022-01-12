@@ -25,7 +25,6 @@ describe('getTwoPipettePositionCheckSteps', () => {
       '9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1'
 
     const moveToWellSeconaryPipetteSecondTiprack: CreateCommand = {
-      id: expect.any(String),
       commandType: 'moveToWell',
       params: {
         pipetteId: secondaryPipetteId,
@@ -38,7 +37,6 @@ describe('getTwoPipettePositionCheckSteps', () => {
     }
 
     const moveToWellPrimaryPipetteFirstTiprack: CreateCommand = {
-      id: expect.any(String),
       commandType: 'moveToWell',
       params: {
         pipetteId: primaryPipetteId,
@@ -51,7 +49,6 @@ describe('getTwoPipettePositionCheckSteps', () => {
     }
 
     const pickupTipAtLastTiprackPrimaryPipetteUses: CreateCommand = {
-      id: expect.any(String),
       commandType: 'pickUpTip',
       params: {
         pipetteId: primaryPipetteId,
@@ -61,7 +58,6 @@ describe('getTwoPipettePositionCheckSteps', () => {
     }
 
     const moveToWellFirstLabware: CreateCommand = {
-      id: expect.any(String),
       commandType: 'moveToWell',
       params: {
         pipetteId: primaryPipetteId,
@@ -74,7 +70,6 @@ describe('getTwoPipettePositionCheckSteps', () => {
     }
 
     const dropTipIntoLastTiprackPrimaryPipetteUses: CreateCommand = {
-      id: expect.any(String),
       commandType: 'dropTip',
       params: {
         pipetteId: primaryPipetteId,
@@ -140,7 +135,6 @@ describe('getTwoPipettePositionCheckSteps', () => {
       '1dc0c050-0122-11ec-88a3-f1745cf9b36c:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1'
 
     const moveToWellSeconaryPipetteSecondTiprack: CreateCommand = {
-      id: expect.any(String),
       commandType: 'moveToWell',
       params: {
         pipetteId: secondaryPipetteId,
@@ -153,7 +147,6 @@ describe('getTwoPipettePositionCheckSteps', () => {
     }
 
     const moveToWellPrimaryPipetteFirstTiprack: CreateCommand = {
-      id: expect.any(String),
       commandType: 'moveToWell',
       params: {
         pipetteId: primaryPipetteId,
@@ -166,7 +159,6 @@ describe('getTwoPipettePositionCheckSteps', () => {
     }
 
     const pickupTipAtLastTiprackPrimaryPipetteUses: CreateCommand = {
-      id: expect.any(String),
       commandType: 'pickUpTip',
       params: {
         pipetteId: primaryPipetteId,
@@ -176,7 +168,6 @@ describe('getTwoPipettePositionCheckSteps', () => {
     }
 
     const moveToWellFirstLabware: CreateCommand = {
-      id: expect.any(String),
       commandType: 'moveToWell',
       params: {
         pipetteId: primaryPipetteId,
@@ -189,7 +180,6 @@ describe('getTwoPipettePositionCheckSteps', () => {
     }
 
     const openTCLidCommand: CreateCommand = {
-      id: expect.any(String),
       commandType: 'thermocycler/openLid',
       params: {
         moduleId: TCId,
@@ -197,7 +187,6 @@ describe('getTwoPipettePositionCheckSteps', () => {
     }
 
     const moveToWellAfterOpeningTCLidCommand: CreateCommand = {
-      id: expect.any(String),
       commandType: 'moveToWell',
       params: {
         pipetteId: primaryPipetteId,
@@ -210,7 +199,6 @@ describe('getTwoPipettePositionCheckSteps', () => {
     }
 
     const dropTipIntoLastTiprackPrimaryPipetteUses: CreateCommand = {
-      id: expect.any(String),
       commandType: 'dropTip',
       params: {
         pipetteId: primaryPipetteId,

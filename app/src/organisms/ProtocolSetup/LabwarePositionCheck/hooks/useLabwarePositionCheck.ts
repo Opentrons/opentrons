@@ -31,7 +31,6 @@ import type {
   RunCommandSummary,
   VectorOffset,
   LabwareOffsetCreateData,
-  AnonymousCommand,
 } from '@opentrons/api-client'
 import type {
   CreateCommand,
@@ -178,7 +177,7 @@ const createCommandData = (
     | LabwarePositionCheckMovementCommand
     | LPCPrepCommand
     | SavePositionCreateCommand
-): AnonymousCommand => {
+): CreateCommand => {
   if (command.commandType === 'loadLabware') {
     return {
       commandType: command.commandType,
@@ -614,7 +613,6 @@ export function useLabwarePositionCheck(
     const wellName = prevCommand.params.wellName
     const dropTipCommand: DropTipCreateCommand = {
       commandType,
-      id: uuidv4(),
       params: {
         pipetteId,
         labwareId,
@@ -652,7 +650,7 @@ export function useLabwarePositionCheck(
   const jog = (axis: Axis, dir: Sign, step: StepSize): void => {
     // if a jog is currently in flight, return early
     if (isJogging.current) return
-    const moveRelCommand: AnonymousCommand = {
+    const moveRelCommand: CreateCommand = {
       commandType: 'moveRelative',
       params: {
         pipetteId: prevCommand.params.pipetteId,

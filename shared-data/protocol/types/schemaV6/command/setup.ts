@@ -1,11 +1,10 @@
 import {
-  CommonCommandInfo,
   CommonCommandRunTimeInfo,
   LabwareDefinition2,
   LabwareOffset,
 } from '../../../../js'
 
-export interface LoadPipetteCreateCommand extends CommonCommandInfo {
+export interface LoadPipetteCreateCommand {
   commandType: 'loadPipette'
   params: LoadPipetteParams
 }
@@ -14,7 +13,7 @@ export interface LoadPipetteRunTimeCommand
     LoadPipetteCreateCommand {
   result: LoadPipetteResult
 }
-export interface LoadLabwareCreateCommand extends CommonCommandInfo {
+export interface LoadLabwareCreateCommand {
   commandType: 'loadLabware'
   params: LoadLabwareParams
 }
@@ -23,7 +22,7 @@ export interface LoadLabwareRunTimeCommand
     LoadLabwareCreateCommand {
   result: LoadLabwareResult
 }
-export interface LoadModuleCreateCommand extends CommonCommandInfo {
+export interface LoadModuleCreateCommand {
   commandType: 'loadModule'
   params: LoadModuleParams
 }
@@ -32,9 +31,7 @@ export interface LoadModuleRunTimeCommand
     LoadModuleCreateCommand {
   result: LoadModuleResult
 }
-export interface LoadLiquidCreateCommand
-  extends CommonCommandRunTimeInfo,
-    CommonCommandInfo {
+export interface LoadLiquidCreateCommand {
   commandType: 'loadLiquid'
   params: LoadLiquidParams
 }
