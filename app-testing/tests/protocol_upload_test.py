@@ -52,12 +52,6 @@ def test_protocol_upload(
             robots_list.get_robot_toggle(RobotsList.DEV).click()
         left_menu = LeftMenu(driver)
         protocol_upload = ProtocolUpload(driver)
-        left_menu.click_more_button()
-        protocol_upload = ProtocolUpload(driver)
-        protocol_upload.click_app_left_panel()
-        protocol_upload.click_enable_developer_toggle()
-        protocol_upload.click_enable_pur_feature()
-        protocol_upload.goto_robots_page()
         # Instantiate the page object for the RobotsList.
         robots_list = RobotsList(driver)
         # toggle the DEV robot
@@ -75,9 +69,10 @@ def test_protocol_upload(
         driver.save_screenshot(
             f"results/{request.node.originalname}.before_start_calibration.png"
         )
-        robot_page.start_calibration()
-        calibrate.calibrate_deck()
-        assert robot_page.wait_for_deck_to_show_calibrated()
+        if not robot_page.is_calibrated():
+            robot_page.start_calibration()
+            calibrate.calibrate_deck()
+            assert robot_page.wait_for_deck_to_show_calibrated()
         left_menu = LeftMenu(driver)
         left_menu.click_protocol_upload_button()
         protocol_file = ProtocolFile(driver)
@@ -115,8 +110,8 @@ def test_protocol_upload(
         module_setup.click_proceed_to_module_setup()
         assert module_setup.get_module_setup_text_locator().text == "Module Setup"
         assert module_setup.get_thermocycler_module().text == "Thermocycler Module"
-        assert module_setup.get_magetic_module().text == "Magnetic Module GEN2"
-        assert module_setup.get_temperature_module().text == "Temperature Module GEN2"
+        assert module_setup.get_magetic_module().text == "Magnetic Module GEN1"
+        assert module_setup.get_temperature_module().text == "Temperature Module GEN1"
         assert module_setup.get_proceed_to_labware_setup().is_displayed()
         module_setup.click_proceed_to_labware_setup()
         labware_setup = LabwareSetup(driver)
@@ -129,6 +124,7 @@ def test_protocol_upload(
         assert labware_setup.get_thermocycler_link().is_displayed()
         labware_setup.click_thermocycler_module_link()
         assert labware_setup.get_thermocycler_module_modal_text().is_displayed()
+        labware_setup = LabwareSetup(driver)
         labware_setup.click_close_button()
         labware_setup.click_proceed_to_run_button()
 
@@ -156,12 +152,6 @@ def test_moam_pur(
         if not robots_list.is_robot_toggle_active(RobotsList.DEV):
             robots_list.get_robot_toggle(RobotsList.DEV).click()
         left_menu = LeftMenu(driver)
-        left_menu.click_more_button()
-        protocol_upload = ProtocolUpload(driver)
-        protocol_upload.click_app_left_panel()
-        protocol_upload.click_enable_developer_toggle()
-        protocol_upload.click_enable_pur_feature()
-        protocol_upload.goto_robots_page()
         # Instantiate the page object for the RobotsList.
         robots_list = RobotsList(driver)
         # toggle the DEV robot
@@ -216,12 +206,12 @@ def test_gen1_pipette(
         if not robots_list.is_robot_toggle_active(RobotsList.DEV):
             robots_list.get_robot_toggle(RobotsList.DEV).click()
         left_menu = LeftMenu(driver)
-        left_menu.click_more_button()
+        """left_menu.click_more_button()
         protocol_upload = ProtocolUpload(driver)
         protocol_upload.click_app_left_panel()
         protocol_upload.click_enable_developer_toggle()
         protocol_upload.click_enable_pur_feature()
-        protocol_upload.goto_robots_page()
+        protocol_upload.goto_robots_page()"""
         # Instantiate the page object for the RobotsList.
         robots_list = RobotsList(driver)
         # toggle the DEV robot

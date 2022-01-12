@@ -32,11 +32,11 @@ class ModuleSetup:
         "//p[text()='Thermocycler Module']",
     )
 
-    magetic_module: Tuple[str, str] = (By.XPATH, "//p[text()='Magnetic Module GEN2']")
+    magetic_module: Tuple[str, str] = (By.XPATH, "//p[text()='Magnetic Module GEN1']")
 
     temperature_module: Tuple[str, str] = (
         By.XPATH,
-        "//p[text()='Temperature Module GEN2']",
+        "//p[text()='Temperature Module GEN1']",
     )
 
     proceed_to_labware_setup: Tuple[str, str] = (
