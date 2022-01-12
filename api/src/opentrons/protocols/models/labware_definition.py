@@ -37,7 +37,7 @@ _Number = Union[StrictInt, StrictFloat]
 
 For labware definition hashing, which is an older part of the codebase,
 this ensures that Pydantic won't change `"someFloatField: 0` to
-"someFloatField: 0.0, which
+`"someFloatField"`: 0.0, which would hash differently.
 """
 
 _NonNegativeNumber = Union[_StrictNonNegativeInt, _StrictNonNegativeFloat]
