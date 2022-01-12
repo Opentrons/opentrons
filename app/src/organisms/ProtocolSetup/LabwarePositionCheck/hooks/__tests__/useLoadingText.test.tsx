@@ -40,7 +40,19 @@ describe('useTitleText', () => {
       .mockReturnValue({ slotName: mockSlotNumber })
   })
   it('should return the loading text for a move to well command', () => {
-    const command: MoveToWellCommand = {
+    const previousCommand: MoveToWellCommand = {
+      id: '1',
+      commandType: 'moveToWell',
+      params: {
+        labwareId: mockLabwareId,
+        pipetteId: 'p300SingleId',
+        wellName: 'A1',
+        wellLocation: {
+          origin: 'top',
+        },
+      },
+    }
+    const currentCommand: MoveToWellCommand = {
       id: '1',
       commandType: 'moveToWell',
       params: {
@@ -53,13 +65,16 @@ describe('useTitleText', () => {
       },
     }
 
-    const { result } = renderHook(() => useTitleText(true, command), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => useTitleText(true, previousCommand, currentCommand),
+      {
+        wrapper,
+      }
+    )
     expect(result.current).toBe(`Moving to slot ${mockSlotNumber}`)
   })
   it('should return the loading text for a move to well and pick up tip command', () => {
-    const firstCommand: MoveToWellCommand = {
+    const previousCommand: MoveToWellCommand = {
       id: '1',
       commandType: 'moveToWell',
       params: {
@@ -72,7 +87,7 @@ describe('useTitleText', () => {
       },
     }
 
-    const secondCommand: PickUpTipCommand = {
+    const currentCommand: PickUpTipCommand = {
       id: '2',
       commandType: 'pickUpTip',
       params: {
@@ -82,17 +97,18 @@ describe('useTitleText', () => {
       },
     }
 
-    const command = firstCommand && secondCommand
-
-    const { result } = renderHook(() => useTitleText(true, command), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => useTitleText(true, previousCommand, currentCommand),
+      {
+        wrapper,
+      }
+    )
     expect(result.current).toBe(
       `Moving to slot ${mockSlotNumber} and picking up tip`
     )
   })
   it('should return the loading text for a move to well and returning a tip command', () => {
-    const firstCommand: MoveToWellCommand = {
+    const previousCommand: MoveToWellCommand = {
       id: '1',
       commandType: 'moveToWell',
       params: {
@@ -105,7 +121,7 @@ describe('useTitleText', () => {
       },
     }
 
-    const secondCommand: DropTipCommand = {
+    const currentCommand: DropTipCommand = {
       id: '1',
       commandType: 'dropTip',
       params: {
@@ -114,14 +130,76 @@ describe('useTitleText', () => {
         wellName: 'A1',
       },
     }
-
-    const command = firstCommand && secondCommand
-
-    const { result } = renderHook(() => useTitleText(true, command), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => useTitleText(true, previousCommand, currentCommand),
+      {
+        wrapper,
+      }
+    )
     expect(result.current).toBe(
       `Moving to slot ${mockSlotNumber} and returning tip`
     )
+  })
+  it('should return the loading text for returning a tip command', () => {
+    const previousCommand: DropTipCommand = {
+      id: '1',
+      commandType: 'dropTip',
+      params: {
+        labwareId: mockLabwareId,
+        pipetteId: 'p300SingleId',
+        wellName: 'A1',
+      },
+    }
+    const currentCommand: MoveToWellCommand = {
+      id: '1',
+      commandType: 'moveToWell',
+      params: {
+        labwareId: mockLabwareId,
+        pipetteId: 'p300SingleId',
+        wellName: 'A1',
+        wellLocation: {
+          origin: 'top',
+        },
+      },
+    }
+
+    const { result } = renderHook(
+      () => useTitleText(true, previousCommand, currentCommand),
+      {
+        wrapper,
+      }
+    )
+    expect(result.current).toBe(`Returning tip in slot ${mockSlotNumber}`)
+  })
+  it('should return the loading text for pick up tip command', () => {
+    const previousCommand: PickUpTipCommand = {
+      id: '2',
+      commandType: 'pickUpTip',
+      params: {
+        labwareId: mockLabwareId,
+        pipetteId: 'p300SingleId',
+        wellName: 'A1',
+      },
+    }
+    const currentCommand: MoveToWellCommand = {
+      id: '1',
+      commandType: 'moveToWell',
+      params: {
+        labwareId: mockLabwareId,
+        pipetteId: 'p300SingleId',
+        wellName: 'A1',
+        wellLocation: {
+          origin: 'top',
+        },
+      },
+    }
+
+    const { result } = renderHook(
+      () => useTitleText(true, previousCommand, currentCommand),
+      {
+        wrapper,
+      }
+    )
+    expect(result.current).toBe(`Picking up tip in slot ${mockSlotNumber}`)
   })
 })

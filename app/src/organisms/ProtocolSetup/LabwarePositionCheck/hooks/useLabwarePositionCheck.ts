@@ -108,20 +108,22 @@ const useLpcCtaText = (command: LabwarePositionCheckCommand): string => {
 
 export const useTitleText = (
   loading: boolean,
-  command: LabwarePositionCheckMovementCommand,
+  isComplete: boolean,
+  previousCommand: LabwarePositionCheckMovementCommand,
+  currentCommand: LabwarePositionCheckMovementCommand,
   labware?: ProtocolFile<{}>['labware'],
   labwareDefinitions?: ProtocolFile<{}>['labwareDefinitions']
 ): string => {
   const { protocolData } = useProtocolDetails()
   const { t } = useTranslation('labware_position_check')
 
-  if (command == null) {
+  if (previousCommand == null || isComplete) {
     return ''
   }
 
   const commands = protocolData?.commands ?? []
 
-  const labwareId = command.params.labwareId
+  const labwareId = previousCommand.params.labwareId
   const labwareLocation = getLabwareLocation(labwareId, commands)
   const slot =
     'slotName' in labwareLocation
@@ -130,34 +132,37 @@ export const useTitleText = (
           .slotName
 
   if (loading) {
-    switch (command.commandType) {
-      case 'moveToWell' && 'pickUpTip': {
-        return t('moving_and_picking_up_tip_title', {
-          slot,
-        })
-      }
-      case 'moveToWell' && 'dropTip': {
-        return t('moving_and_returning_tip_title', { slot })
-      }
-      case 'moveToWell': {
-        return t('moving_to_slot_title', {
-          slot,
-        })
-      }
-      case 'pickUpTip': {
-        return t('picking_up_tip_title', {
-          slot,
-        })
-      }
-      case 'dropTip': {
-        return t('returning_tip_title', {
-          slot,
-        })
-      }
+    console.log('previous command', previousCommand.commandType)
+    console.log('current command', currentCommand.commandType)
+    if (
+      previousCommand.commandType === 'moveToWell' &&
+      currentCommand.commandType === 'pickUpTip'
+    ) {
+      return t('moving_and_picking_up_tip_title', {
+        slot,
+      })
+    } else if (
+      previousCommand.commandType === 'moveToWell' &&
+      currentCommand.commandType === 'dropTip'
+    ) {
+      return t('moving_and_returning_tip_title', { slot })
+    } else if (previousCommand.commandType === 'moveToWell') {
+      return t('moving_to_slot_title', {
+        slot,
+      })
+    } else if (previousCommand.commandType === 'dropTip') {
+      return t('returning_tip_title', {
+        slot,
+      })
+    } else if (previousCommand.commandType === 'pickUpTip') {
+      return t('picking_up_tip_title', {
+        slot,
+      })
+    } else {
+      return ''
     }
   } else {
     if (labware == null || labwareDefinitions == null) return ''
-
     const labwareDefId = labware[labwareId].definitionId
     const labwareDisplayName = getLabwareDisplayName(
       labwareDefinitions[labwareDefId]
@@ -168,7 +173,6 @@ export const useTitleText = (
     })
   }
 }
-
 const commandIsComplete = (status: RunCommandSummary['status']): boolean =>
   status === 'succeeded' || status === 'failed'
 
@@ -283,12 +287,15 @@ export function useLabwarePositionCheck(
     return matchingCommand
   }) as LabwarePositionCheckStep
 
+  const isComplete = currentCommandIndex === LPCMovementCommands.length
   const ctaText = useLpcCtaText(currentCommand)
   const robotCommands = useAllCommandsQuery(currentRun?.data?.id ?? null).data
     ?.data
   const titleText = useTitleText(
     isLoading,
+    isComplete,
     prevCommand,
+    currentCommand,
     protocolData?.labware,
     protocolData?.labwareDefinitions
   )
@@ -302,7 +309,6 @@ export function useLabwarePositionCheck(
   }
   if (error != null) return { error }
 
-  const isComplete = currentCommandIndex === LPCMovementCommands.length
   const failedCommand = robotCommands?.find(
     command => command.status === 'failed'
   )
