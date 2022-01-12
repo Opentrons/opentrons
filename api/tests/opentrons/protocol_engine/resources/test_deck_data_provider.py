@@ -1,7 +1,6 @@
 """Test deck data provider."""
 import pytest
 from decoy import Decoy
-from typing import AsyncGenerator
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
 from opentrons.protocols.models import LabwareDefinition
