@@ -130,7 +130,6 @@ export const useTitleText = (
           .slotName
 
   if (loading) {
-    console.log(command.commandType)
     switch (command.commandType) {
       case 'moveToWell': {
         return t('moving_to_slot_title', {
