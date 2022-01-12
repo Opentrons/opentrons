@@ -184,7 +184,7 @@ def test_quirks(
     assert reservoir_quirks == ["centerMultichannelOnWells", "touchTipDisabled"]
 
 
-def test_get_well_definition_bad_id(well_plate_def: LabwareDefinition) -> None:
+def test_get_well_definition_bad_name(well_plate_def: LabwareDefinition) -> None:
     """get_well_definition should raise if well name doesn't exist."""
     subject = get_labware_view(
         labware_by_id={"plate-id": plate},
@@ -196,7 +196,7 @@ def test_get_well_definition_bad_id(well_plate_def: LabwareDefinition) -> None:
 
 
 def test_get_well_definition(well_plate_def: LabwareDefinition) -> None:
-    """It should return a well definition by well ID."""
+    """It should return a well definition by well name."""
     subject = get_labware_view(
         labware_by_id={"plate-id": plate},
         definitions_by_uri={"some-plate-uri": well_plate_def},
@@ -204,6 +204,19 @@ def test_get_well_definition(well_plate_def: LabwareDefinition) -> None:
 
     expected_well_def = well_plate_def.wells["B2"]
     result = subject.get_well_definition(labware_id="plate-id", well_name="B2")
+
+    assert result == expected_well_def
+
+
+def test_get_well_definition_get_first(well_plate_def: LabwareDefinition) -> None:
+    """It should return the first well definition if no given well name."""
+    subject = get_labware_view(
+        labware_by_id={"plate-id": plate},
+        definitions_by_uri={"some-plate-uri": well_plate_def},
+    )
+
+    expected_well_def = well_plate_def.wells["A1"]
+    result = subject.get_well_definition(labware_id="plate-id", well_name=None)
 
     assert result == expected_well_def
 
