@@ -8,12 +8,40 @@ TODO: 20210330 Amit - consider moving this to opentrons-shared-data.
 from __future__ import annotations
 
 from enum import Enum
-from typing import Dict, List, Optional
+from typing import TYPE_CHECKING, Dict, List, Optional, Union
 
-from pydantic import BaseModel, Extra, Field
+from pydantic import (
+    BaseModel,
+    Extra,
+    Field,
+    conint,
+    confloat,
+    StrictInt,
+    StrictFloat,
+)
 from typing_extensions import Literal
 
 SAFE_STRING_REGEX = "^[a-z0-9._]+$"
+
+
+if TYPE_CHECKING:
+    _StrictNonNegativeInt = int
+    _StrictNonNegativeFloat = float
+else:
+    _StrictNonNegativeInt = conint(strict=True, ge=0)
+    _StrictNonNegativeFloat = confloat(strict=True, ge=0.0)
+
+
+_Number = Union[StrictInt, StrictFloat]
+"""JSON number type, written to preserve lack of decimal point.
+
+For labware definition hashing, which is an older part of the codebase,
+this ensures that Pydantic won't change `"someFloatField: 0` to
+"someFloatField: 0.0, which
+"""
+
+_NonNegativeNumber = Union[_StrictNonNegativeInt, _StrictNonNegativeFloat]
+"""Non-negative JSON number type, written to preserve lack of decimal point."""
 
 
 class CornerOffsetFromSlot(BaseModel):
@@ -23,9 +51,9 @@ class CornerOffsetFromSlot(BaseModel):
       labware that does not span multiple slots, x/y/z should all be zero.
     """
 
-    x: float
-    y: float
-    z: float
+    x: _Number
+    y: _Number
+    z: _Number
 
 
 class BrandData(BaseModel):
@@ -84,15 +112,13 @@ class Parameters(BaseModel):
     isTiprack: bool = Field(
         ..., description="Flag marking whether a labware is a tiprack or not"
     )
-    tipLength: Optional[float] = Field(
+    tipLength: Optional[_NonNegativeNumber] = Field(
         None,
-        ge=0.0,
         description="Required if labware is tiprack, specifies length of tip"
         " from drawing or as measured with calipers",
     )
-    tipOverlap: Optional[float] = Field(
+    tipOverlap: Optional[_NonNegativeNumber] = Field(
         None,
-        ge=0.0,
         description="Required if labware is tiprack, specifies the length of "
         "the area of the tip that overlaps the nozzle of the pipette",
     )
@@ -106,8 +132,8 @@ class Parameters(BaseModel):
         description="Flag marking whether a labware is compatible by default "
         "with the Magnetic Module",
     )
-    magneticModuleEngageHeight: Optional[float] = Field(
-        None, ge=0.0, description="Distance to move magnetic module magnets to engage"
+    magneticModuleEngageHeight: Optional[_NonNegativeNumber] = Field(
+        None, description="Distance to move magnetic module magnets to engage"
     )
 
 
@@ -116,45 +142,45 @@ class Dimensions(BaseModel):
     Outer dimensions of a labware
     """
 
-    yDimension: float = Field(..., ge=0.0)
-    zDimension: float = Field(..., ge=0.0)
-    xDimension: float = Field(..., ge=0.0)
+    yDimension: _NonNegativeNumber = Field(...)
+    zDimension: _NonNegativeNumber = Field(...)
+    xDimension: _NonNegativeNumber = Field(...)
 
 
 class WellDefinition(BaseModel):
     class Config:
         extra = Extra.allow
 
-    depth: float = Field(..., ge=0.0)
-    x: float = Field(
+    depth: _NonNegativeNumber = Field(...)
+    x: _NonNegativeNumber = Field(
         ...,
-        ge=0.0,
         description="x location of center-bottom of well in reference to "
         "left-front-bottom of labware",
     )
-    y: float = Field(
+    y: _NonNegativeNumber = Field(
         ...,
-        ge=0.0,
         description="y location of center-bottom of well in reference to "
         "left-front-bottom of labware",
     )
-    z: float = Field(
+    z: _NonNegativeNumber = Field(
         ...,
-        ge=0.0,
         description="z location of center-bottom of well in reference to "
         "left-front-bottom of labware",
     )
-    totalLiquidVolume: float = Field(
-        ..., ge=0.0, description="Total well, tube, or tip volume in microliters"
+    totalLiquidVolume: _NonNegativeNumber = Field(
+        ..., description="Total well, tube, or tip volume in microliters"
     )
-    xDimension: Optional[float] = Field(
-        None, ge=0.0, description="x dimension of rectangular wells"
+    xDimension: Optional[_NonNegativeNumber] = Field(
+        None,
+        description="x dimension of rectangular wells",
     )
-    yDimension: Optional[float] = Field(
-        None, ge=0.0, description="y dimension of rectangular wells"
+    yDimension: Optional[_NonNegativeNumber] = Field(
+        None,
+        description="y dimension of rectangular wells",
     )
-    diameter: Optional[float] = Field(
-        None, ge=0.0, description="diameter of circular wells"
+    diameter: Optional[_NonNegativeNumber] = Field(
+        None,
+        description="diameter of circular wells",
     )
     shape: Literal["rectangular", "circular"] = Field(
         ...,

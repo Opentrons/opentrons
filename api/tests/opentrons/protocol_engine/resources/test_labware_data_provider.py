@@ -1,4 +1,8 @@
-"""Functional tests for the LabwareData provider."""
+"""Functional tests for the LabwareDataProvider."""
+from typing import cast
+
+from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
+from opentrons.calibration_storage.helpers import hash_labware_def
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_api.labware import get_labware_definition
 
@@ -19,3 +23,22 @@ async def test_labware_data_gets_standard_definition() -> None:
     )
 
     assert result == LabwareDefinition.parse_obj(expected)
+
+
+async def test_labware_hash_match() -> None:
+    """Labware dict vs Pydantic model hashing should match.
+
+    This is a smoke test to ensure proper functioning of
+    LabwareDataProvider.get_calibrated_tip_length given its
+    internal implementation relies on this to work.
+    """
+    labware_dict = get_labware_definition(
+        load_name="opentrons_96_tiprack_300ul",
+        namespace="opentrons",
+        version=1,
+    )
+
+    labware_model = LabwareDefinition.parse_obj(labware_dict)
+    labware_model_dict = cast(LabwareDefDict, labware_model.dict(exclude_none=True))
+
+    assert hash_labware_def(labware_dict) == hash_labware_def(labware_model_dict)
