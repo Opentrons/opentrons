@@ -130,6 +130,7 @@ export const useTitleText = (
           .slotName
 
   if (loading) {
+    console.log(command.commandType)
     switch (command.commandType) {
       case 'moveToWell': {
         return t('moving_to_slot_title', {
@@ -340,6 +341,7 @@ export function useLabwarePositionCheck(
   // (sa 11-18-2021): refactor this function after beta release
   const proceed = (): void => {
     setIsLoading(true)
+    setCurrentCommandIndex(currentCommandIndex + 1)
     setShowPickUpTipConfirmationModal(false)
     // before executing the next movement command, save the current position
     const savePositionCommand: Command = {
@@ -491,7 +493,6 @@ export function useLabwarePositionCheck(
             setError(e)
           })
         }
-        setCurrentCommandIndex(currentCommandIndex + 1)
       })
       .catch((e: Error) => {
         console.error(`error issuing command to robot: ${e.message}`)
