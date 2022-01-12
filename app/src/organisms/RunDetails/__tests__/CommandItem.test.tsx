@@ -95,6 +95,8 @@ describe('Run Details Command item', () => {
     const { getByText } = render({
       runCommandSummary: { ...MOCK_COMMAND_SUMMARY, status: 'failed' },
       analysisCommand: { ...MOCK_ANALYSIS_COMMAND },
+      runStatus: 'running',
+      currentRunId: RUN_ID,
     })
     expect(getByText('Step failed')).toHaveStyle(
       'backgroundColor: C_ERROR_LIGHT'
@@ -107,6 +109,7 @@ describe('Run Details Command item', () => {
       runCommandSummary: { ...MOCK_COMMAND_SUMMARY, status: 'succeeded' },
       analysisCommand: { ...MOCK_ANALYSIS_COMMAND },
       runStatus: 'succeeded',
+      currentRunId: RUN_ID,
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
     expect(getByText('Mock Command Timer')).toHaveStyle(
@@ -119,6 +122,7 @@ describe('Run Details Command item', () => {
       runCommandSummary: { ...MOCK_COMMAND_SUMMARY, status: 'running' },
       analysisCommand: { ...MOCK_ANALYSIS_COMMAND },
       runStatus: 'running',
+      currentRunId: RUN_ID,
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
     expect(getByText('Current Step')).toHaveStyle(
@@ -133,6 +137,7 @@ describe('Run Details Command item', () => {
       runCommandSummary: { ...MOCK_COMMAND_SUMMARY, status: 'queued' },
       analysisCommand: { ...MOCK_ANALYSIS_COMMAND },
       runStatus: 'running',
+      currentRunId: RUN_ID,
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
     expect(getByText('Mock Command Text')).toHaveStyle(
@@ -145,6 +150,7 @@ describe('Run Details Command item', () => {
       runCommandSummary: { ...MOCK_COMMAND_SUMMARY, status: 'running' },
       analysisCommand: { ...MOCK_ANALYSIS_COMMAND },
       runStatus: 'paused',
+      currentRunId: RUN_ID,
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
     expect(getByText('Current Step - Paused by User')).toHaveStyle(
@@ -177,6 +183,7 @@ describe('Run Details Command item', () => {
       runCommandSummary: MOCK_COMMENT_COMMAND_SUMMARY,
       analysisCommand: MOCK_COMMENT_COMMAND,
       runStatus: 'running',
+      currentRunId: RUN_ID,
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
     expect(getByText('Comment')).toHaveStyle('backgroundColor: C_NEAR_WHITE')
@@ -214,6 +221,7 @@ describe('Run Details Command item', () => {
       runCommandSummary: MOCK_PAUSE_COMMAND_SUMMARY,
       analysisCommand: MOCK_PAUSE_COMMAND,
       runStatus: 'paused',
+      currentRunId: RUN_ID,
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
     expect(getByText('Pause protocol')).toHaveStyle(

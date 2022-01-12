@@ -72,7 +72,7 @@ const commandIsComplete = (status: RunCommandSummary['status']): boolean =>
 // minimum delay in MS for observer notifications
 export const OBSERVER_DELAY = 300
 
-function CommandItemComponent(props: CommandItemProps): JSX.Element | null {
+export function CommandItemComponent(props: CommandItemProps): JSX.Element | null {
   const { analysisCommand, runCommandSummary, runStatus, currentRunId } = props
   const { t } = useTranslation('run_details')
   const [commandItemRef, isInView] = useInView({
