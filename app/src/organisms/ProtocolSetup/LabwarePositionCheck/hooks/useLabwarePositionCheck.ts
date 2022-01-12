@@ -339,6 +339,8 @@ export function useLabwarePositionCheck(
   }
   // (sa 11-18-2021): refactor this function after beta release
   const proceed = (): void => {
+    // if a jog command is in flight, ignore this call to proceed
+    if (isJogging.current) return
     setIsLoading(true)
     setShowPickUpTipConfirmationModal(false)
     // before executing the next movement command, save the current position

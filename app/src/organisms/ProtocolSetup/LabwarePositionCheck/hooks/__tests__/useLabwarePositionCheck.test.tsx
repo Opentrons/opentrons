@@ -297,5 +297,148 @@ describe('useLabwarePositionCheck', () => {
         },
       })
     })
+    it('should NOT execute the next command if a jog command is in flight', async () => {
+      when(mockUseAllCommandsQuery)
+        .calledWith(MOCK_RUN_ID)
+        .mockReturnValue({
+          data: {
+            data: [],
+          },
+        } as any)
+
+      when(mockUseSteps)
+        .calledWith()
+        .mockReturnValue([
+          {
+            commands: [
+              {
+                commandType: 'pickUpTip',
+                params: {
+                  pipetteId: MOCK_PIPETTE_ID,
+                  labwareId: MOCK_LABWARE_ID,
+                },
+              },
+              {
+                commandType: 'dropTip',
+                params: {
+                  pipetteId: MOCK_PIPETTE_ID,
+                  labwareId: MOCK_LABWARE_ID,
+                },
+              },
+            ],
+            labwareId: MOCK_LABWARE_ID,
+            section: 'PRIMARY_PIPETTE_TIPRACKS',
+          } as LabwarePositionCheckStep,
+        ])
+
+      const { result, waitForNextUpdate } = renderHook(
+        () => useLabwarePositionCheck(() => null, {}),
+        { wrapper }
+      )
+      if ('error' in result.current) {
+        throw new Error('error should not be present')
+      }
+      const { beginLPC } = result.current
+      beginLPC() // beginLPC calls the first command
+      await waitForNextUpdate()
+      const { jog } = result.current
+      const [JOG_AXIS, JOG_DIRECTION, JOG_DISTANCE] = ['x' as 'x', 1 as 1, 2]
+      jog(JOG_AXIS, JOG_DIRECTION, JOG_DISTANCE)
+      await waitForNextUpdate()
+      const { proceed } = result.current
+      proceed()
+      // this is from the begin LPC call
+      expect(mockCreateCommand).toHaveBeenCalledWith({
+        runId: MOCK_RUN_ID,
+        command: {
+          commandType: 'pickUpTip',
+          params: {
+            pipetteId: MOCK_PIPETTE_ID,
+            labwareId: MOCK_LABWARE_ID,
+          },
+        },
+      })
+      // no drop tip call should get logged since jog is in flight
+      expect(mockCreateCommand).not.toHaveBeenCalledWith({
+        runId: MOCK_RUN_ID,
+        command: {
+          commandType: 'dropTip',
+          params: expect.objectContaining({
+            pipetteId: MOCK_PIPETTE_ID,
+            labwareId: MOCK_LABWARE_ID,
+          }),
+        },
+      })
+    })
+    it('should execute the next command if no jog command is in flight', async () => {
+      when(mockUseAllCommandsQuery)
+        .calledWith(MOCK_RUN_ID)
+        .mockReturnValue({
+          data: {
+            data: [],
+          },
+        } as any)
+
+      when(mockUseSteps)
+        .calledWith()
+        .mockReturnValue([
+          {
+            commands: [
+              {
+                commandType: 'pickUpTip',
+                params: {
+                  pipetteId: MOCK_PIPETTE_ID,
+                  labwareId: MOCK_LABWARE_ID,
+                },
+              },
+              {
+                commandType: 'dropTip',
+                params: {
+                  pipetteId: MOCK_PIPETTE_ID,
+                  labwareId: MOCK_LABWARE_ID,
+                },
+              },
+            ],
+            labwareId: MOCK_LABWARE_ID,
+            section: 'PRIMARY_PIPETTE_TIPRACKS',
+          } as LabwarePositionCheckStep,
+        ])
+
+      const { result, waitForNextUpdate } = renderHook(
+        () => useLabwarePositionCheck(() => null, {}),
+        { wrapper }
+      )
+      if ('error' in result.current) {
+        throw new Error('error should not be present')
+      }
+      const { beginLPC } = result.current
+      beginLPC() // beginLPC calls the first command
+      await waitForNextUpdate()
+      const { proceed } = result.current
+      proceed()
+      await waitForNextUpdate()
+      // this is from the begin LPC call
+      expect(mockCreateCommand).toHaveBeenCalledWith({
+        runId: MOCK_RUN_ID,
+        command: {
+          commandType: 'pickUpTip',
+          params: {
+            pipetteId: MOCK_PIPETTE_ID,
+            labwareId: MOCK_LABWARE_ID,
+          },
+        },
+      })
+      // drop tip call should get logged since no jog is in flight
+      expect(mockCreateCommand).toHaveBeenCalledWith({
+        runId: MOCK_RUN_ID,
+        command: {
+          commandType: 'dropTip',
+          params: expect.objectContaining({
+            pipetteId: MOCK_PIPETTE_ID,
+            labwareId: MOCK_LABWARE_ID,
+          }),
+        },
+      })
+    })
   })
 })
