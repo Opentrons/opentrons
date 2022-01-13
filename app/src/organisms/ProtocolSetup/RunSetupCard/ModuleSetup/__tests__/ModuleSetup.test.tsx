@@ -296,10 +296,10 @@ describe('ModuleSetup', () => {
       )
       .mockReturnValue(<div>mock modules mismatch</div>)
 
-      mockUseModuleMatchResults.mockReturnValue({
-        missingModuleIds: ['foo'],
-        remainingAttachedModules: [mockTemperatureModule],
-      })
+    mockUseModuleMatchResults.mockReturnValue({
+      missingModuleIds: ['foo'],
+      remainingAttachedModules: [mockTemperatureModule],
+    })
 
     const { getByText, getByRole } = render(props)
     getByText('mock module info magneticModuleV2')
