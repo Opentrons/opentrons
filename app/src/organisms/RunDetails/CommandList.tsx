@@ -124,11 +124,7 @@ export function CommandList(): JSX.Element | null {
 
   return (
     <React.Fragment>
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        flex={'auto'}
-        paddingLeft={SPACING_2}
-      >
+      <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING_2}>
         {runStatus === 'failed' ||
         runStatus === 'succeeded' ||
         runStatus === 'stop-requested' ||
