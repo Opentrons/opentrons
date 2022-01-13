@@ -24,7 +24,7 @@ This is beta software! You may experience unexpected crashes or missing features
 
 Keep an eye on this space as we release new versions of the beta. See the [issue tracker][] for a full list of issues resolved by the v5 release.
 
-[issue tracker]: https://github.com/Opentrons/opentrons/labels/fixed-in-v6
+[issue tracker]: https://github.com/Opentrons/opentrons/labels/fixed-in-v5
 
 ## Known Issues
 
