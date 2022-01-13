@@ -4,15 +4,12 @@ from dataclasses import replace
 import logging
 from collections import OrderedDict
 from typing import (
-    Any,
     Callable,
     Dict,
     Union,
     List,
     Optional,
     Tuple,
-    TYPE_CHECKING,
-    cast,
     overload,
     Sequence,
     Set,
@@ -56,10 +53,9 @@ from .types import (
 from . import modules
 from .robot_calibration import RobotCalibrationProvider, load_pipette_offset
 from .protocols import HardwareControlAPI
+from .instrument_handler import InstrumentHandlerProvider
 
-if TYPE_CHECKING:
-    from opentrons_shared_data.pipette.dev_types import UlPerMmAction, PipetteName
-    from .dev_types import PipetteDict
+from opentrons_shared_data.pipette.dev_types import UlPerMmAction, PipetteName
 
 
 mod_log = logging.getLogger(__name__)
@@ -69,7 +65,9 @@ InstrumentsByMount = Dict[top_types.Mount, Optional[Pipette]]
 PipetteHandlingData = Tuple[Pipette, top_types.Mount]
 
 
-class OT3API(ExecutionManagerProvider, RobotCalibrationProvider):
+class OT3API(
+    ExecutionManagerProvider, RobotCalibrationProvider, InstrumentHandlerProvider
+):
     """This API is the primary interface to the hardware controller.
 
     Because the hardware manager controls access to the system's hardware
@@ -103,10 +101,6 @@ class OT3API(ExecutionManagerProvider, RobotCalibrationProvider):
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
         self._current_position: Dict[Axis, float] = {}
 
-        self._attached_instruments: InstrumentsByMount = {
-            top_types.Mount.LEFT: None,
-            top_types.Mount.RIGHT: None,
-        }
         self._last_moved_mount: Optional[top_types.Mount] = None
         # The motion lock synchronizes calls to long-running physical tasks
         # involved in motion. This fixes issue where for instance a move()
@@ -117,8 +111,9 @@ class OT3API(ExecutionManagerProvider, RobotCalibrationProvider):
         self._door_state = DoorState.CLOSED
         self._pause_manager = PauseManager(self._door_state)
         ExecutionManagerProvider.__init__(self, loop, isinstance(backend, Simulator))
-        OT3API._check_type(self)
         RobotCalibrationProvider.__init__(self)
+        InstrumentHandlerProvider.__init__(self)
+        OT3API._check_type(self)
 
     @staticmethod
     def _check_type(inst: HardwareControlAPI) -> None:
@@ -297,35 +292,36 @@ class OT3API(ExecutionManagerProvider, RobotCalibrationProvider):
         finally:
             self.resume(PauseType.DELAY)
 
-    def reset_instrument(self, mount: top_types.Mount = None):
+    @property
+    def attached_modules(self) -> List[modules.AbstractModule]:
+        return self._backend.module_controls.available_modules
+
+    async def update_firmware(
+        self,
+        firmware_file: str,
+        loop: asyncio.AbstractEventLoop = None,
+        explicit_modeset: bool = True,
+    ) -> str:
+        """Update the firmware on the Smoothie board.
+
+        :param firmware_file: The path to the firmware file.
+        :param explicit_modeset: `True` to force the smoothie into programming
+                                 mode; `False` to assume it is already in
+                                 programming mode.
+        :param loop: An asyncio event loop to use; if not specified, the one
+                     associated with this instance will be used.
+        :returns: The stdout of the tool used to update the smoothie
         """
-        Reset the internal state of a pipette by its mount, without doing
-        any lower level reconfiguration. This is useful to make sure that no
-        settings changes from a protocol persist.
-
-        :param mount: If specified, reset that mount. If not specified,
-                      reset both
-        """
-
-        def _reset(m: top_types.Mount):
-            self._log.info(f"Resetting configuration for {m}")
-            p = self._attached_instruments[m]
-            if not p:
-                return
-            new_p = Pipette(
-                p._config, load_pipette_offset(p.pipette_id, m), p.pipette_id
-            )
-            new_p.act_as(p.acting_as)
-            self._attached_instruments[m] = new_p
-
-        if not mount:
-            for m in top_types.Mount:
-                _reset(m)
+        if None is loop:
+            checked_loop = self._loop
         else:
-            _reset(mount)
+            checked_loop = loop
+        return await self._backend.update_firmware(
+            firmware_file, checked_loop, explicit_modeset
+        )
 
     async def cache_instruments(
-        self, require: Dict[top_types.Mount, "PipetteName"] = None
+        self, require: Dict[top_types.Mount, PipetteName] = None
     ):
         """
         Scan the attached instruments, take necessary configuration actions,
@@ -383,122 +379,7 @@ class OT3API(ExecutionManagerProvider, RobotCalibrationProvider):
                 p, self._config, self._backend.board_revision
             )
             await self._backend.configure_mount(mount, hw_config)
-        mod_log.info("Instruments found: {}".format(self._attached_instruments))
-
-    def get_attached_instruments(self) -> Dict[top_types.Mount, "PipetteDict"]:
-        """Get the status dicts of the cached attached instruments.
-
-        Also available as :py:meth:`get_attached_instruments`.
-
-        This returns a dictified version of the
-        :py:class:`hardware_control.pipette.Pipette` as a dict keyed by
-        the :py:class:`top_types.Mount` to which the pipette is attached.
-        If no pipette is attached on a given mount, the mount key will
-        still be present but will have the value ``None``.
-
-        Note that this is only a query of a cached value; to actively scan
-        for changes, use :py:meth:`cache_instruments`. This process deactivates
-        the motors and should be used sparingly.
-        """
-        return {
-            m: self.get_attached_instrument(m)
-            for m in (top_types.Mount.LEFT, top_types.Mount.RIGHT)
-        }
-
-    def get_attached_instrument(self, mount: top_types.Mount) -> "PipetteDict":
-        instr = self._attached_instruments[mount]
-        result: Dict[str, Any] = {}
-        if instr:
-            configs = [
-                "name",
-                "min_volume",
-                "max_volume",
-                "channels",
-                "aspirate_flow_rate",
-                "dispense_flow_rate",
-                "pipette_id",
-                "current_volume",
-                "display_name",
-                "tip_length",
-                "model",
-                "blow_out_flow_rate",
-                "working_volume",
-                "tip_overlap",
-                "available_volume",
-                "return_tip_height",
-                "default_aspirate_flow_rates",
-                "default_blow_out_flow_rates",
-                "default_dispense_flow_rates",
-                "back_compat_names",
-            ]
-
-            instr_dict = instr.as_dict()
-            # TODO (spp, 2021-08-27): Revisit this logic. Why do we need to build
-            #  this dict newly every time? Any why only a few items are being updated?
-            for key in configs:
-                result[key] = instr_dict[key]
-            result["has_tip"] = instr.has_tip
-            result["tip_length"] = instr.current_tip_length
-            result["aspirate_speed"] = self._plunger_speed(
-                instr, instr.aspirate_flow_rate, "aspirate"
-            )
-            result["dispense_speed"] = self._plunger_speed(
-                instr, instr.dispense_flow_rate, "dispense"
-            )
-            result["blow_out_speed"] = self._plunger_speed(
-                instr, instr.blow_out_flow_rate, "dispense"
-            )
-            result["ready_to_aspirate"] = instr.ready_to_aspirate
-            result["default_blow_out_speeds"] = {
-                alvl: self._plunger_speed(instr, fr, "dispense")
-                for alvl, fr in instr.config.default_aspirate_flow_rates.items()
-            }
-            result["default_dispense_speeds"] = {
-                alvl: self._plunger_speed(instr, fr, "dispense")
-                for alvl, fr in instr.config.default_dispense_flow_rates.items()
-            }
-            result["default_aspirate_speeds"] = {
-                alvl: self._plunger_speed(instr, fr, "aspirate")
-                for alvl, fr in instr.config.default_aspirate_flow_rates.items()
-            }
-        return cast("PipetteDict", result)
-
-    @property
-    def attached_instruments(self) -> Dict[top_types.Mount, "PipetteDict"]:
-        return self.get_attached_instruments()
-
-    @property
-    def hardware_instruments(self) -> InstrumentsByMount:
-        """Do not write new code that uses this."""
-        return self._attached_instruments
-
-    @property
-    def attached_modules(self) -> List[modules.AbstractModule]:
-        return self._backend.module_controls.available_modules
-
-    async def update_firmware(
-        self,
-        firmware_file: str,
-        loop: asyncio.AbstractEventLoop = None,
-        explicit_modeset: bool = True,
-    ) -> str:
-        """Update the firmware on the Smoothie board.
-
-        :param firmware_file: The path to the firmware file.
-        :param explicit_modeset: `True` to force the smoothie into programming
-                                 mode; `False` to assume it is already in
-                                 programming mode.
-        :param loop: An asyncio event loop to use; if not specified, the one
-                     associated with this instance will be used.
-        :returns: The stdout of the tool used to update the smoothie
-        """
-        if None is loop:
-            checked_loop = self._loop
-        else:
-            checked_loop = loop
-        return await self._backend.update_firmware(
-            firmware_file, checked_loop, explicit_modeset
-        )
+        self._log.info("Instruments found: {}".format(self._attached_instruments))
 
     # Global actions API
     def pause(self, pause_type: PauseType):
@@ -586,9 +467,7 @@ class OT3API(ExecutionManagerProvider, RobotCalibrationProvider):
         """
         self._pause_manager.reset()
         await self._execution_manager.reset()
-        self._attached_instruments = {
-            k: None for k in self._attached_instruments.keys()
-        }
+        await InstrumentHandlerProvider.reset(self)
         await self.cache_instruments()
 
     # Gantry/frame (i.e. not pipette) action API
@@ -663,32 +542,6 @@ class OT3API(ExecutionManagerProvider, RobotCalibrationProvider):
                 self._current_position = self._deck_from_smoothie(smoothie_pos)
             for plunger in plungers:
                 await self._do_plunger_home(axis=plunger, acquire_lock=False)
-
-    async def add_tip(self, mount: top_types.Mount, tip_length: float):
-        instr = self._attached_instruments[mount]
-        attached = self.attached_instruments
-        instr_dict = attached[mount]
-        if instr and not instr.has_tip:
-            instr.add_tip(tip_length=tip_length)
-            # TODO (spp, 2021-08-27): These items are being updated in a local copy
-            #  of the PipetteDict, which gets thrown away. Fix this.
-            instr_dict["has_tip"] = True
-            instr_dict["tip_length"] = tip_length
-        else:
-            mod_log.warning("attach tip called while tip already attached")
-
-    async def remove_tip(self, mount: top_types.Mount):
-        instr = self._attached_instruments[mount]
-        attached = self.attached_instruments
-        instr_dict = attached[mount]
-        if instr and instr.has_tip:
-            instr.remove_tip()
-            # TODO (spp, 2021-08-27): These items are being updated in a local copy
-            #  of the PipetteDict, which gets thrown away. Fix this.
-            instr_dict["has_tip"] = False
-            instr_dict["tip_length"] = 0.0
-        else:
-            mod_log.warning("detach tip called with no tip")
 
     def _deck_from_smoothie(self, smoothie_pos: Dict[str, float]) -> Dict[Axis, float]:
         """Build a deck-abs position store from the smoothie's position
@@ -785,7 +638,7 @@ class OT3API(ExecutionManagerProvider, RobotCalibrationProvider):
             else:
                 offset = top_types.Point(*self._config.left_mount_offset)
 
-            cp = self._critical_point_for(mount, critical_point)
+            cp = self.critical_point_for(mount, critical_point)
             return {
                 Axis.X: self._current_position[Axis.X] + offset[0] + cp.x,
                 Axis.Y: self._current_position[Axis.Y] + offset[1] + cp.y,
@@ -825,19 +678,6 @@ class OT3API(ExecutionManagerProvider, RobotCalibrationProvider):
         return top_types.Point(
             x=cur_pos[Axis.X], y=cur_pos[Axis.Y], z=cur_pos[Axis.by_mount(mount)]
         )
-
-    @overload
-    def _mounts(self, z_axis: PipettePair) -> Tuple[top_types.Mount, top_types.Mount]:
-        ...
-
-    @overload
-    def _mounts(self, z_axis: top_types.Mount) -> Tuple[top_types.Mount]:
-        ...
-
-    def _mounts(self, z_axis):
-        if isinstance(z_axis, PipettePair):
-            return (z_axis.primary, z_axis.secondary)
-        return (z_axis,)
 
     async def move_to(
         self,
@@ -887,7 +727,7 @@ class OT3API(ExecutionManagerProvider, RobotCalibrationProvider):
         if not self._current_position:
             await self.home()
 
-        mounts = self._mounts(mount)
+        mounts = self.mounts(mount)
         primary_mount = mounts[0]
         secondary_mount = None
         # Even with overloads, mypy cannot accept a length check on
@@ -907,8 +747,8 @@ class OT3API(ExecutionManagerProvider, RobotCalibrationProvider):
         if secondary_mount:
             primary_z = Axis.by_mount(primary_mount)
             secondary_z = Axis.by_mount(secondary_mount)
-            primary_cp = self._critical_point_for(primary_mount, critical_point)
-            s_cp = self._critical_point_for(secondary_mount, critical_point)
+            primary_cp = self.critical_point_for(primary_mount, critical_point)
+            s_cp = self.critical_point_for(secondary_mount, critical_point)
             target_position = OrderedDict(
                 (
                     (Axis.X, abs_position.x - primary_offset.x - primary_cp.x),
@@ -918,7 +758,7 @@ class OT3API(ExecutionManagerProvider, RobotCalibrationProvider):
                 )
             )
         else:
-            primary_cp = self._critical_point_for(primary_mount, critical_point)
+            primary_cp = self.critical_point_for(primary_mount, critical_point)
             primary_z = Axis.by_mount(primary_mount)
             secondary_z = None
             target_position = OrderedDict(
@@ -955,7 +795,7 @@ class OT3API(ExecutionManagerProvider, RobotCalibrationProvider):
         # TODO: Remove the fail_on_not_homed and make this the behavior all the time.
         # Having the optional arg makes the bug stick around in existing code and we
         # really want to fix it when we're not gearing up for a release.
-        mounts = self._mounts(mount)
+        mounts = self.mounts(mount)
         if fail_on_not_homed:
             axes_moving = [Axis.X, Axis.Y] + [Axis.by_mount(m) for m in mounts]
             if (
@@ -1033,7 +873,7 @@ class OT3API(ExecutionManagerProvider, RobotCalibrationProvider):
             )
         )
         plunger_pos = OrderedDict()
-        mounts = self._mounts(mount)
+        mounts = self.mounts(mount)
         secondary_z = None
         for idx, m in enumerate(mounts):
             z = Axis.by_mount(m)
@@ -1063,7 +903,7 @@ class OT3API(ExecutionManagerProvider, RobotCalibrationProvider):
                 (Axis.Y, self._current_position[Axis.Y] + target[1]),
             )
         )
-        mounts = self._mounts(mount)
+        mounts = self.mounts(mount)
         secondary_z = None
         for (
             idx,
@@ -1218,26 +1058,6 @@ class OT3API(ExecutionManagerProvider, RobotCalibrationProvider):
             smoothie_pos = await self._fast_home(smoothie_ax, margin)
             self._current_position = self._deck_from_smoothie(smoothie_pos)
 
-    def _critical_point_for(
-        self, mount: top_types.Mount, cp_override: CriticalPoint = None
-    ) -> top_types.Point:
-        """Return the current critical point of the specified mount.
-
-        The mount's critical point is the position of the mount itself, if no
-        pipette is attached, or the pipette's critical point (which depends on
-        tip status).
-
-        If `cp_override` is specified, and that critical point actually exists,
-        it will be used instead. Invalid `cp_override`s are ignored.
-        """
-        pip = self._attached_instruments[mount]
-        if pip is not None and cp_override != CriticalPoint.MOUNT:
-            return pip.critical_point(cp_override)
-        else:
-            # This offset is required because the motor driver coordinate system is
-            # configured such that the end of a p300 single gen1's tip is 0.
-            return top_types.Point(0, 0, 30)
-
     # Gantry/frame (i.e. not pipette) config API
     @property
     def config(self) -> RobotConfig:
@@ -1305,7 +1125,7 @@ class OT3API(ExecutionManagerProvider, RobotCalibrationProvider):
 
         with_zero = filter(lambda i: i[0].current_volume == 0, instruments)
         for instr in with_zero:
-            speed = self._plunger_speed(
+            speed = self.plunger_speed(
                 instr[0], instr[0].blow_out_flow_rate, "aspirate"
             )
             bottom = (instr[0].config.bottom,)
@@ -1364,13 +1184,11 @@ class OT3API(ExecutionManagerProvider, RobotCalibrationProvider):
             ), "Cannot aspirate more than pipette max volume"
 
         dist = tuple(
-            self._plunger_position(instr[0], instr[0].current_volume + vol, "aspirate")
+            self.plunger_position(instr[0], instr[0].current_volume + vol, "aspirate")
             for instr, vol in zip(instruments, asp_vol)
         )
         speed = min(
-            self._plunger_speed(
-                instr[0], instr[0].aspirate_flow_rate * rate, "aspirate"
-            )
+            self.plunger_speed(instr[0], instr[0].aspirate_flow_rate * rate, "aspirate")
             for instr in instruments
         )
         try:
@@ -1429,13 +1247,11 @@ class OT3API(ExecutionManagerProvider, RobotCalibrationProvider):
             raise PairedPipetteConfigValueError("Cannot only dispense from one pipette")
 
         dist = tuple(
-            self._plunger_position(instr[0], instr[0].current_volume - vol, "dispense")
+            self.plunger_position(instr[0], instr[0].current_volume - vol, "dispense")
             for instr, vol in zip(instruments, disp_vol)
         )
         speed = min(
-            self._plunger_speed(
-                instr[0], instr[0].dispense_flow_rate * rate, "dispense"
-            )
+            self.plunger_speed(instr[0], instr[0].dispense_flow_rate * rate, "dispense")
             for instr in instruments
         )
 
@@ -1450,25 +1266,6 @@ class OT3API(ExecutionManagerProvider, RobotCalibrationProvider):
         else:
             for instr, vol in zip(instruments, disp_vol):
                 instr[0].remove_current_volume(vol)
-
-    def _plunger_position(
-        self, instr: Pipette, ul: float, action: "UlPerMmAction"
-    ) -> float:
-        mm = ul / instr.ul_per_mm(ul, action)
-        position = instr.config.bottom - mm
-        return round(position, 6)
-
-    def _plunger_speed(
-        self, instr: Pipette, ul_per_s: float, action: "UlPerMmAction"
-    ) -> float:
-        mm_per_s = ul_per_s / instr.ul_per_mm(instr.config.max_volume, action)
-        return round(mm_per_s, 6)
-
-    def _plunger_flowrate(
-        self, instr: Pipette, mm_per_s: float, action: "UlPerMmAction"
-    ) -> float:
-        ul_per_s = mm_per_s * instr.ul_per_mm(instr.config.max_volume, action)
-        return round(ul_per_s, 6)
 
     async def blow_out(self, mount: Union[top_types.Mount, PipettePair]):
         """
@@ -1485,7 +1282,7 @@ class OT3API(ExecutionManagerProvider, RobotCalibrationProvider):
 
         self._backend.set_active_current(plunger_currents)
         speed = max(
-            self._plunger_speed(instr[0], instr[0].blow_out_flow_rate, "dispense")
+            self.plunger_speed(instr[0], instr[0].blow_out_flow_rate, "dispense")
             for instr in instruments
         )
         try:
@@ -1780,98 +1577,20 @@ class OT3API(ExecutionManagerProvider, RobotCalibrationProvider):
         )
         return modules_result
 
-    # Pipette config api
-    def calibrate_plunger(
-        self,
-        mount: top_types.Mount,
-        top: Optional[float] = None,
-        bottom: Optional[float] = None,
-        blow_out: Optional[float] = None,
-        drop_tip: Optional[float] = None,
-    ):
-        """
-        Set calibration values for the pipette plunger.
-        This can be called multiple times as the user sets each value,
-        or you can set them all at once.
-        :param top: Touching but not engaging the plunger.
-        :param bottom: Must be above the pipette's physical hard-stop, while
-        still leaving enough room for 'blow_out'
-        :param blow_out: Plunger is pushed down enough to expel all liquids.
-        :param drop_tip: Position that causes the tip to be released from the
-        pipette
-        """
-        instr = self._attached_instruments[mount]
-        if not instr:
-            raise top_types.PipetteNotAttachedError(
-                "No pipette attached to {} mount".format(mount.name)
-            )
+    def clean_up(self) -> None:
+        """Get the API ready to stop cleanly."""
+        self._backend.clean_up()
 
-        pos_dict: Dict = {
-            "top": instr.config.top,
-            "bottom": instr.config.bottom,
-            "blow_out": instr.config.blow_out,
-            "drop_tip": instr.config.drop_tip,
-        }
-        if top is not None:
-            pos_dict["top"] = top
-        if bottom is not None:
-            pos_dict["bottom"] = bottom
-        if blow_out is not None:
-            pos_dict["blow_out"] = blow_out
-        if bottom is not None:
-            pos_dict["drop_tip"] = drop_tip
-        for key in pos_dict.keys():
-            instr.update_config_item(key, pos_dict[key])
-
-    def set_flow_rate(self, mount, aspirate=None, dispense=None, blow_out=None):
-        this_pipette = self._attached_instruments[mount]
-        if not this_pipette:
-            raise top_types.PipetteNotAttachedError(
-                "No pipette attached to {} mount".format(mount)
-            )
-        if aspirate:
-            this_pipette.aspirate_flow_rate = aspirate
-        if dispense:
-            this_pipette.dispense_flow_rate = dispense
-        if blow_out:
-            this_pipette.blow_out_flow_rate = blow_out
-
-    def set_pipette_speed(self, mount, aspirate=None, dispense=None, blow_out=None):
-        this_pipette = self._attached_instruments[mount]
-        if not this_pipette:
-            raise top_types.PipetteNotAttachedError(
-                "No pipette attached to {} mount".format(mount)
-            )
-        if aspirate:
-            this_pipette.aspirate_flow_rate = self._plunger_flowrate(
-                this_pipette, aspirate, "aspirate"
-            )
-        if dispense:
-            this_pipette.dispense_flow_rate = self._plunger_flowrate(
-                this_pipette, dispense, "dispense"
-            )
-        if blow_out:
-            this_pipette.blow_out_flow_rate = self._plunger_flowrate(
-                this_pipette, blow_out, "dispense"
-            )
+    def plunger_position(
+        self, instr: Pipette, ul: float, action: "UlPerMmAction"
+    ) -> float:
+        mm = ul / instr.ul_per_mm(ul, action)
+        position = instr.config.bottom - mm
+        return round(position, 6)
 
     def get_instrument_max_height(
         self, mount: top_types.Mount, critical_point: Optional[CriticalPoint] = None
     ) -> float:
-        """Return max achievable height of the attached instrument
-        based on the current critical point
-        """
-        pip = self._attached_instruments[mount]
-        assert pip
-        cp = self._critical_point_for(mount, critical_point)
-
-        max_height = pip.config.home_position - self._config.z_retract_distance + cp.z
-        self._log.debug(
-            f"GIMH[{mount}]: pip {pip} home {pip.config.home_position} "
-            "- zrd {self._config.z_retract_distance} + cp.z {cp.z} = max {max_height}"
+        return InstrumentHandlerProvider.instrument_max_height(
+            self, mount, self._config.z_retract_distance, critical_point
         )
-        return max_height
-
-    def clean_up(self) -> None:
-        """Get the API ready to stop cleanly."""
-        self._backend.clean_up()

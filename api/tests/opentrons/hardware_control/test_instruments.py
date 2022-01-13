@@ -437,16 +437,16 @@ async def test_aspirate_flow_rate(dummy_instruments, loop, monkeypatch, sim_buil
     await hw_api.aspirate(types.Mount.LEFT, 2)
     assert mock_move_plunger.called_with(
         mount,
-        hw_api._plunger_position(pip, 2, "aspirate"),
-        speed=hw_api._plunger_speed(pip, pip.config.aspirate_flow_rate, "aspirate"),
+        hw_api.plunger_position(pip, 2, "aspirate"),
+        speed=hw_api.plunger_speed(pip, pip.config.aspirate_flow_rate, "aspirate"),
     )
     mock_move_plunger.reset_mock()
     await hw_api.prepare_for_aspirate(types.Mount.LEFT)
     await hw_api.aspirate(types.Mount.LEFT, 2, rate=0.5)
     assert mock_move_plunger.called_with(
         mount,
-        hw_api._plunger_position(pip, 4, "aspirate"),
-        speed=hw_api._plunger_speed(
+        hw_api.plunger_position(pip, 4, "aspirate"),
+        speed=hw_api.plunger_speed(
             pip, pip.config.aspirate_flow_rate * 0.5, "aspirate"
         ),
     )
@@ -456,29 +456,29 @@ async def test_aspirate_flow_rate(dummy_instruments, loop, monkeypatch, sim_buil
     await hw_api.aspirate(types.Mount.LEFT, 2)
     assert mock_move_plunger.called_with(
         mount,
-        hw_api._plunger_position(pip, 6, "aspirate"),
-        speed=hw_api._plunger_speed(pip, 2, "aspirate"),
+        hw_api.plunger_position(pip, 6, "aspirate"),
+        speed=hw_api.plunger_speed(pip, 2, "aspirate"),
     )
     mock_move_plunger.reset_mock()
     await hw_api.prepare_for_aspirate(types.Mount.LEFT)
     await hw_api.aspirate(types.Mount.LEFT, 2, rate=0.5)
     assert mock_move_plunger.called_with(
         mount,
-        hw_api._plunger_position(pip, 8, "aspirate"),
-        speed=hw_api._plunger_speed(pip, 1, "aspirate"),
+        hw_api.plunger_position(pip, 8, "aspirate"),
+        speed=hw_api.plunger_speed(pip, 1, "aspirate"),
     )
     mock_move_plunger.reset_mock()
     hw_api.set_pipette_speed(mount, aspirate=10)
     await hw_api.prepare_for_aspirate(types.Mount.LEFT)
     await hw_api.aspirate(types.Mount.LEFT, 1)
     assert mock_move_plunger.called_with(
-        mount, hw_api._plunger_position(pip, 8, "aspirate"), speed=10
+        mount, hw_api.plunger_position(pip, 8, "aspirate"), speed=10
     )
     mock_move_plunger.reset_mock()
     await hw_api.prepare_for_aspirate(types.Mount.LEFT)
     await hw_api.aspirate(types.Mount.LEFT, 1, rate=0.5)
     assert mock_move_plunger.called_with(
-        mount, hw_api._plunger_position(pip, 8, "aspirate"), speed=5
+        mount, hw_api.plunger_position(pip, 8, "aspirate"), speed=5
     )
 
 
@@ -505,15 +505,15 @@ async def test_dispense_flow_rate(dummy_instruments, loop, monkeypatch, sim_buil
     await hw_api.dispense(types.Mount.LEFT, 2)
     assert mock_move_plunger.called_with(
         mount,
-        hw_api._plunger_position(pip, 8, "dispense"),
-        speed=hw_api._plunger_speed(pip, pip.config.dispense_flow_rate, "dispense"),
+        hw_api.plunger_position(pip, 8, "dispense"),
+        speed=hw_api.plunger_speed(pip, pip.config.dispense_flow_rate, "dispense"),
     )
     mock_move_plunger.reset_mock()
     await hw_api.dispense(types.Mount.LEFT, 2, rate=0.5)
     assert mock_move_plunger.called_with(
         mount,
-        hw_api._plunger_position(pip, 6, "dispense"),
-        speed=hw_api._plunger_speed(
+        hw_api.plunger_position(pip, 6, "dispense"),
+        speed=hw_api.plunger_speed(
             pip, pip.config.dispense_flow_rate * 0.5, "dispense"
         ),
     )
@@ -522,26 +522,26 @@ async def test_dispense_flow_rate(dummy_instruments, loop, monkeypatch, sim_buil
     await hw_api.dispense(types.Mount.LEFT, 2)
     assert mock_move_plunger.called_with(
         mount,
-        hw_api._plunger_position(pip, 4, "dispense"),
-        speed=hw_api._plunger_speed(pip, 3, "dispense"),
+        hw_api.plunger_position(pip, 4, "dispense"),
+        speed=hw_api.plunger_speed(pip, 3, "dispense"),
     )
     mock_move_plunger.reset_mock()
     await hw_api.dispense(types.Mount.LEFT, 2, rate=0.5)
     assert mock_move_plunger.called_with(
         mount,
-        hw_api._plunger_position(pip, 2, "dispense"),
-        speed=hw_api._plunger_speed(pip, 1.5, "dispense"),
+        hw_api.plunger_position(pip, 2, "dispense"),
+        speed=hw_api.plunger_speed(pip, 1.5, "dispense"),
     )
     mock_move_plunger.reset_mock()
     hw_api.set_pipette_speed(mount, dispense=10)
     await hw_api.dispense(types.Mount.LEFT, 1)
     assert mock_move_plunger.called_with(
-        mount, hw_api._plunger_position(pip, 1, "dispense"), speed=10
+        mount, hw_api.plunger_position(pip, 1, "dispense"), speed=10
     )
     mock_move_plunger.reset_mock()
     await hw_api.dispense(types.Mount.LEFT, 1, rate=0.5)
     assert mock_move_plunger.called_with(
-        mount, hw_api._plunger_position(pip, 0, "dispense"), speed=5
+        mount, hw_api.plunger_position(pip, 0, "dispense"), speed=5
     )
 
 
@@ -571,7 +571,7 @@ async def test_blowout_flow_rate(dummy_instruments, loop, sim_builder, monkeypat
     assert mock_move_plunger.called_with(
         mount,
         pip.config.blow_out,
-        speed=hw_api._plunger_speed(pip, pip.config.blow_out_flow_rate, "dispense"),
+        speed=hw_api.plunger_speed(pip, pip.config.blow_out_flow_rate, "dispense"),
     )
     mock_move_plunger.reset_mock()
 
@@ -581,7 +581,7 @@ async def test_blowout_flow_rate(dummy_instruments, loop, sim_builder, monkeypat
     mock_move_plunger.reset_mock()
     await hw_api.blow_out(types.Mount.LEFT)
     assert mock_move_plunger.called_with(
-        mount, pip.config.blow_out, speed=hw_api._plunger_speed(pip, 2, "dispense")
+        mount, pip.config.blow_out, speed=hw_api.plunger_speed(pip, 2, "dispense")
     )
     mock_move_plunger.reset_mock()
 
