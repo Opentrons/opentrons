@@ -22,11 +22,10 @@ from typing import (
 from opentrons_shared_data.pipette import name_config
 from opentrons import types as top_types
 from opentrons.util import linal
-from functools import lru_cache
 from opentrons.config import robot_configs
 from opentrons.config.types import RobotConfig
 
-from .util import use_or_initialize_loop, DeckTransformState, check_motion_bounds
+from .util import use_or_initialize_loop, check_motion_bounds
 from .pipette import Pipette, generate_hardware_configs, load_from_config_and_check_skip
 from .controller import Controller
 from .simulator import Simulator
@@ -36,7 +35,7 @@ from .constants import (
     SHAKE_OFF_TIPS_PICKUP_DISTANCE,
     DROP_TIP_RELEASE_DISTANCE,
 )
-from .execution_manager import ExecutionManager
+from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
 from .types import (
@@ -55,7 +54,8 @@ from .types import (
     MotionChecks,
     PauseType,
 )
-from . import modules, robot_calibration as rb_cal
+from . import modules
+from .robot_calibration import RobotCalibrationProvider, load_pipette_offset
 from .protocols import HardwareControlAPI
 
 if TYPE_CHECKING:
@@ -70,7 +70,7 @@ InstrumentsByMount = Dict[top_types.Mount, Optional[Pipette]]
 PipetteHandlingData = Tuple[Pipette, top_types.Mount]
 
 
-class API(HardwareControlAPI):
+class API(ExecutionManagerProvider, RobotCalibrationProvider):
     """This API is the primary interface to the hardware controller.
 
     Because the hardware manager controls access to the system's hardware
@@ -100,7 +100,6 @@ class API(HardwareControlAPI):
         self._backend = backend
         self._loop = loop
 
-        self._execution_manager = ExecutionManager(loop=loop)
         self._callbacks: Set[HardwareEventHandler] = set()
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
         self._current_position: Dict[Axis, float] = {}
@@ -117,20 +116,25 @@ class API(HardwareControlAPI):
         # home() call succeeds or fails.
         self._motion_lock = asyncio.Lock(loop=self._loop)
         self._door_state = DoorState.CLOSED
-        self._robot_calibration = rb_cal.load()
         self._pause_manager = PauseManager(self._door_state)
+        ExecutionManagerProvider.__init__(self, loop, isinstance(backend, Simulator))
+        RobotCalibrationProvider.__init__(self)
+        API._check_type(self)
 
-    @property
-    def robot_calibration(self) -> rb_cal.RobotCalibration:
-        return self._robot_calibration
+    @staticmethod
+    def _check_type(inst: HardwareControlAPI) -> None:
+        """Do-nothing to provide early warning if the protocol is not satisfied.
 
-    def reset_robot_calibration(self):
-        self._calculate_valid_attitude.cache_clear()
-        self._robot_calibration = rb_cal.load()
+        This class can't inherit from the HardwareControlAPI protocol if we're also
+        doing multiple inheritance, because it confuses MRO - it looks like it should
+        have all these functions, but they're defined to not do anything. That means
+        that we don't get the early warning when the class doesn't fulfill the
+        protocol.
 
-    def set_robot_calibration(self, robot_calibration: rb_cal.RobotCalibration):
-        self._calculate_valid_attitude.cache_clear()
-        self._robot_calibration = robot_calibration
+        What we can do instead is this, a bogus function that exists to make mypy
+        verify while parsing the class that it fulfilles the protocol.
+        """
+        pass
 
     @property
     def door_state(self) -> DoorState:
@@ -285,22 +289,6 @@ class API(HardwareControlAPI):
         """`True` if this is a simulator; `False` otherwise."""
         return isinstance(self._backend, Simulator)
 
-    def validate_calibration(self) -> DeckTransformState:
-        """
-        The lru cache decorator is currently not supported by the
-        ThreadManager. To work around this, we need to wrap the
-        actual function around a dummy outer function.
-
-        Once decorators are more fully supported, we can remove this.
-        """
-        return self._calculate_valid_attitude()
-
-    @lru_cache(maxsize=1)
-    def _calculate_valid_attitude(self) -> DeckTransformState:
-        return rb_cal.validate_attitude_deck_calibration(
-            self._robot_calibration.deck_calibration
-        )
-
     def register_callback(self, cb: HardwareEventHandler) -> Callable[[], None]:
         """Allows the caller to register a callback, and returns a closure
         that can be used to unregister the provided callback
@@ -369,18 +357,12 @@ class API(HardwareControlAPI):
             await asyncio.sleep(max(0, 0.25 - (now - then)))
         await self.set_lights(button=True)
 
+    @ExecutionManagerProvider.wait_for_running
     async def delay(self, duration_s: float):
         """Delay execution by pausing and sleeping."""
-        await self._wait_for_is_running()
         self.pause(PauseType.DELAY)
         try:
-            if not self.is_simulator:
-
-                async def sleep_for_seconds(seconds: float):
-                    await asyncio.sleep(seconds)
-
-                delay_task = self._loop.create_task(sleep_for_seconds(duration_s))
-                await self._execution_manager.register_cancellable_task(delay_task)
+            await self.do_delay(duration_s)
         finally:
             self.resume(PauseType.DELAY)
 
@@ -400,7 +382,7 @@ class API(HardwareControlAPI):
             if not p:
                 return
             new_p = Pipette(
-                p._config, rb_cal.load_pipette_offset(p.pipette_id, m), p.pipette_id
+                p._config, load_pipette_offset(p.pipette_id, m), p.pipette_id
             )
             new_p.act_as(p.acting_as)
             self._attached_instruments[m] = new_p
@@ -449,7 +431,7 @@ class API(HardwareControlAPI):
             config = instrument_data.get("config")
             req_instr = checked_require.get(mount, None)
             pip_id = instrument_data.get("id")
-            pip_offset_cal = rb_cal.load_pipette_offset(pip_id, mount)
+            pip_offset_cal = load_pipette_offset(pip_id, mount)
             p, may_skip = load_from_config_and_check_skip(
                 config,
                 self._attached_instruments[mount],
@@ -669,10 +651,6 @@ class API(HardwareControlAPI):
         if home_after:
             await self.home()
 
-    async def _wait_for_is_running(self):
-        if not self.is_simulator:
-            await self._execution_manager.wait_for_is_running()
-
     async def reset(self) -> None:
         """Reset the stored state of the system.
 
@@ -738,12 +716,12 @@ class API(HardwareControlAPI):
         await self.current_position(mount=mount, refresh=True)
         await self._do_plunger_home(mount=mount, acquire_lock=True)
 
+    @ExecutionManagerProvider.wait_for_running
     async def home(self, axes: Optional[List[Axis]] = None):
         """Home the entire robot and initialize current position.
         :param axes: A list of axes to home. Default is `None`, which will
                      home everything.
         """
-        await self._wait_for_is_running()
         self._reset_last_mount()
         # Initialize/update current_position
         checked_axes = axes or [ax for ax in Axis]
@@ -1191,6 +1169,7 @@ class API(HardwareControlAPI):
         )
         return primary_transformed, secondary_transformed
 
+    @ExecutionManagerProvider.wait_for_running
     async def _move(
         self,
         target_position: "OrderedDict[Axis, float]",
@@ -1212,7 +1191,6 @@ class API(HardwareControlAPI):
         at most one of a ZA or BC components. The frame in which to move
         is identified by the presence of (ZA) or (BC).
         """
-        await self._wait_for_is_running()
         # Transform only the x, y, and (z or a) axes specified since this could
         # get the b or c axes as well
         to_transform_primary = tuple(
@@ -1294,6 +1272,7 @@ class API(HardwareControlAPI):
         converted_axes = "".join(axes)
         return await self._backend.fast_home(converted_axes, margin)
 
+    @ExecutionManagerProvider.wait_for_running
     async def retract(
         self, mount: Union[top_types.Mount, PipettePair], margin: float = 10
     ):
@@ -1301,7 +1280,6 @@ class API(HardwareControlAPI):
 
         Works regardless of critical point or home status.
         """
-        await self._wait_for_is_running()
         if isinstance(mount, PipettePair):
             primary_ax = Axis.by_mount(mount.primary).name.upper()
             secondary_ax = Axis.by_mount(mount.secondary).name.upper()
