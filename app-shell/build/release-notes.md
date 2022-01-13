@@ -24,16 +24,7 @@ This is beta software! You may experience unexpected crashes or missing features
 
 ### Bug Fixes
 
-Keep an eye on this space as we release new versions of the beta. See the [issue tracker][] for a full list of issues resolved by the v5 release.
-
-Since the last beta release we have fixed the following critical issues:
-
-- Fix an issue where missing metadata on commands caused a white screen when expanding protocol setup steps
-- Display labware offsets for labware on top of modules
-- Fix Labware Position Check summary screen offset data flickering
-- Fix labware offsets not rendering on deckmap after completing labware position check
-
-[issue tracker]: https://github.com/Opentrons/opentrons/labels/fixed-in-v5
+Keep an eye on this space as we release new versions of the beta.
 
 ## Known Issues
 
