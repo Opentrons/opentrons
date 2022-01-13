@@ -16,9 +16,10 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
+import { AttachedModule } from '../../../../redux/modules/types'
 
 interface ModuleMismatchProps {
-  missingModuleId: string[]
+  remainingAttachedModules: AttachedModule[]
 }
 
 export const ModulesMismatch = (
@@ -28,7 +29,8 @@ export const ModulesMismatch = (
   const [showModulesMismatch, setShowModulesMismatch] = React.useState<boolean>(
     false
   )
-  const isVisible = props.missingModuleId !== [] && !showModulesMismatch
+  const isVisible =
+    props.remainingAttachedModules !== [] && !showModulesMismatch
   if (!isVisible) return null
 
   return (

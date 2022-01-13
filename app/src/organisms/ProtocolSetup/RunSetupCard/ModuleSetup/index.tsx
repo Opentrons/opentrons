@@ -20,7 +20,7 @@ import {
 } from '@opentrons/components'
 import { inferModuleOrientationFromXCoordinate } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
-import { useMissingModuleIds } from '../hooks'
+import { useModuleMatchResults } from '../hooks'
 import { fetchModules } from '../../../../redux/modules'
 import { ModuleInfo } from './ModuleInfo'
 import { ModulesMismatch } from './ModulesMismatch'
@@ -58,7 +58,7 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
     setShowMultipleModulesModal,
   ] = React.useState<boolean>(false)
 
-  const missingModuleIds = useMissingModuleIds()
+  const missingModuleIdInfo = useModuleMatchResults()
   useInterval(
     () => dispatch(fetchModules(robotName)),
     robotName === null ? POLL_MODULE_INTERVAL_MS : null,
@@ -70,6 +70,8 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
   )
 
   const hasADuplicateModule = new Set(moduleModels).size !== moduleModels.length
+
+  const { missingModuleIds, remainingAttachedModules } = missingModuleIdInfo
 
   const proceedToLabwareDisabledReason =
     missingModuleIds.length > 0
@@ -96,8 +98,8 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
         </Btn>
       ) : null}
 
-      <ModulesMismatch missingModuleId={missingModuleIds} />
-      
+      <ModulesMismatch remainingAttachedModules={remainingAttachedModules} />
+
       <RobotWorkSpace
         deckDef={standardDeckDef as any}
         viewBox={DECK_VIEW_BOX}

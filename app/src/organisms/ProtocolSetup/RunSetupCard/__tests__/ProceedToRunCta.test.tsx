@@ -15,8 +15,8 @@ jest.mock('@opentrons/components', () => {
 jest.mock('../../../../redux/protocol')
 jest.mock('../hooks')
 
-const mockUseMissingModuleIds = hooks.useMissingModuleIds as jest.MockedFunction<
-  typeof hooks.useMissingModuleIds
+const mockUseModuleMatchResults = hooks.useModuleMatchResults as jest.MockedFunction<
+  typeof hooks.useModuleMatchResults
 >
 const mockUseProtocolCalibrationStatus = hooks.useProtocolCalibrationStatus as jest.MockedFunction<
   typeof hooks.useProtocolCalibrationStatus
@@ -40,21 +40,31 @@ describe('ProceedToRunCta', () => {
   })
 
   it('should be enabled with no tooltip if there are no missing Ids', () => {
-    mockUseMissingModuleIds.mockReturnValue([])
+    mockUseModuleMatchResults.mockReturnValue({
+      missingModuleIds: [],
+      remainingAttachedModules: [],
+    })
+
     const { getByRole } = render()
     const button = getByRole('button', { name: 'Proceed to Run' })
     expect(button).not.toBeDisabled()
   })
 
   it('should be disabled with modules not connected tooltip when there are missing moduleIds', () => {
-    mockUseMissingModuleIds.mockReturnValue(['temperatureModuleV1'])
+    mockUseModuleMatchResults.mockReturnValue({
+      missingModuleIds: ['temperatureModuleV1'],
+      remainingAttachedModules: [],
+    })
     const { getByRole, getByText } = render()
     const button = getByRole('button', { name: 'Proceed to Run' })
     expect(button).toBeDisabled()
     getByText('Make sure all modules are connected before proceeding to run')
   })
   it('should be disabled with modules not connected and calibration not completed tooltip if missing cal and moduleIds', async () => {
-    mockUseMissingModuleIds.mockReturnValue(['temperatureModuleV1'])
+    mockUseModuleMatchResults.mockReturnValue({
+      missingModuleIds: ['temperatureModuleV1'],
+      remainingAttachedModules: [],
+    })
     mockUseProtocolCalibrationStatus.mockReturnValue({
       complete: false,
     } as any)
@@ -66,7 +76,10 @@ describe('ProceedToRunCta', () => {
     )
   })
   it('should be disabled with calibration not complete tooltip', async () => {
-    mockUseMissingModuleIds.mockReturnValue([])
+    mockUseModuleMatchResults.mockReturnValue({
+      missingModuleIds: [],
+      remainingAttachedModules: [],
+    })
     mockUseProtocolCalibrationStatus.mockReturnValue({
       complete: false,
     } as any)

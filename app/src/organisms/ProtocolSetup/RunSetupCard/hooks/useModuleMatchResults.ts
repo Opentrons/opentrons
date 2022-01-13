@@ -6,23 +6,23 @@ import type { State } from '../../../../redux/types'
 import type { AttachedModule } from '../../../../redux/modules/types'
 import { useModuleRenderInfoById } from '../../hooks'
 
-interface ModuleMatchResults {
+export interface ModuleMatchResults {
   missingModuleIds: string[]
   remainingAttachedModules: AttachedModule[]
 }
 
 // get requested protocol moduleId's that do map to a robot attached modulemodule of the requested model
-export function useMissingModuleIds(): string[] {
+export function useModuleMatchResults(): ModuleMatchResults {
   const robot = useSelector((state: State) => getConnectedRobot(state))
   const moduleRenderInfoById = useModuleRenderInfoById()
   const attachedModules = useSelector((state: State) =>
     getAttachedModules(state, robot === null ? null : robot.name)
   )
   if (robot === null) {
-    return []
+    return { missingModuleIds: [], remainingAttachedModules: [] }
   }
 
-  const { missingModuleIds } = reduce<
+  const { missingModuleIds, remainingAttachedModules } = reduce<
     typeof moduleRenderInfoById,
     ModuleMatchResults
   >(
@@ -50,5 +50,5 @@ export function useMissingModuleIds(): string[] {
     },
     { missingModuleIds: [], remainingAttachedModules: attachedModules }
   )
-  return missingModuleIds
+  return { missingModuleIds, remainingAttachedModules }
 }

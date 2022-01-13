@@ -3,6 +3,7 @@ import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import { ModulesMismatch } from '../ModulesMismatch'
+import { mockTemperatureModule } from '../../../../../redux/modules/__fixtures__'
 
 const render = (props: React.ComponentProps<typeof ModulesMismatch>) => {
   return renderWithProviders(<ModulesMismatch {...props} />, {
@@ -13,7 +14,7 @@ const render = (props: React.ComponentProps<typeof ModulesMismatch>) => {
 describe('ModulesMismatch', () => {
   let props: React.ComponentProps<typeof ModulesMismatch>
   beforeEach(() => {
-    props = { missingModuleId: ['MISSINGID'] }
+    props = { remainingAttachedModules: [mockTemperatureModule] }
   })
 
   it('should render the correct header', () => {

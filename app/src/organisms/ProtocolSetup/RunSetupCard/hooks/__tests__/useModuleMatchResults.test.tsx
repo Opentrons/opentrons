@@ -7,10 +7,11 @@ import { useModuleRenderInfoById } from '../../../hooks'
 import { getAttachedModules } from '../../../../../redux/modules'
 import { mockConnectedRobot } from '../../../../../redux/discovery/__fixtures__'
 import { renderHook } from '@testing-library/react-hooks'
-import { useMissingModuleIds } from '..'
+import { useModuleMatchResults } from '..'
 import type { Store } from 'redux'
 import type { State } from '../../../../../redux/types'
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
+import { mockTemperatureModule } from '../../../../../redux/modules/__fixtures__'
 
 jest.mock('../../../hooks')
 jest.mock('../../../../../redux/modules')
@@ -33,7 +34,7 @@ const mockMagneticModuleDef = {
   type: 'magneticModuleType' as ModuleType,
 }
 
-describe('useMissingModuleIds', () => {
+describe('useModuleMatchResults', () => {
   const store: Store<State> = createStore(jest.fn(), {})
 
   beforeEach(() => {
@@ -59,9 +60,10 @@ describe('useMissingModuleIds', () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
       <Provider store={store}>{children}</Provider>
     )
-    const { result } = renderHook(useMissingModuleIds, { wrapper })
-    const missingModuleIds = result.current
+    const { result } = renderHook(useModuleMatchResults, { wrapper })
+    const { missingModuleIds, remainingAttachedModules } = result.current
     expect(missingModuleIds).toStrictEqual([])
+    expect(remainingAttachedModules).toStrictEqual([])
   })
   it('should return 1 missing moduleId if requested model not attached', () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
@@ -85,7 +87,22 @@ describe('useMissingModuleIds', () => {
         },
       })
 
-    const { result } = renderHook(useMissingModuleIds, { wrapper })
-    expect(result.current).toStrictEqual([moduleId])
+    const { result } = renderHook(useModuleMatchResults, { wrapper })
+    const { missingModuleIds } = result.current
+    expect(missingModuleIds).toStrictEqual([moduleId])
+  })
+  it('should return 1 remaining attached module if not required for protocols', () => {
+    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+      <Provider store={store}>{children}</Provider>
+    )
+    const remaingingModule = mockTemperatureModule
+
+    when(mockGetAttachedModules)
+      .calledWith(undefined as any, mockConnectedRobot.name)
+      .mockReturnValue([mockTemperatureModule])
+
+    const { result } = renderHook(useModuleMatchResults, { wrapper })
+    const { remainingAttachedModules } = result.current
+    expect(remainingAttachedModules).toStrictEqual([remaingingModule])
   })
 })

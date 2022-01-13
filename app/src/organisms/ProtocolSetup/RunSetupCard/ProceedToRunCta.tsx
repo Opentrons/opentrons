@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { NavLink } from 'react-router-dom'
-import { useMissingModuleIds, useProtocolCalibrationStatus } from './hooks'
+import { useModuleMatchResults, useProtocolCalibrationStatus } from './hooks'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
@@ -13,8 +13,9 @@ import {
 export const ProceedToRunCta = (): JSX.Element | null => {
   const { t } = useTranslation('protocol_setup')
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const missingModuleIds = useMissingModuleIds()
+  const moduleMatchResults = useModuleMatchResults()
   const isEverythingCalibrated = useProtocolCalibrationStatus().complete
+  const { missingModuleIds } = moduleMatchResults
   const calibrationIncomplete =
     missingModuleIds.length === 0 && !isEverythingCalibrated
   const moduleSetupIncomplete =

@@ -19,10 +19,11 @@ import {
 import {
   mockThermocycler as mockThermocyclerFixture,
   mockMagneticModule as mockMagneticModuleFixture,
+  mockTemperatureModule,
 } from '../../../../../redux/modules/__fixtures__/index'
 import { getAttachedModules } from '../../../../../redux/modules'
 import { useModuleRenderInfoById } from '../../../hooks'
-import { useMissingModuleIds } from '../../hooks'
+import { useModuleMatchResults } from '../../hooks'
 import { MultipleModulesModal } from '../MultipleModulesModal'
 import { ModuleSetup } from '..'
 import { ModuleInfo } from '../ModuleInfo'
@@ -51,8 +52,8 @@ jest.mock('@opentrons/shared-data', () => {
 const mockMultipleModulesModal = MultipleModulesModal as jest.MockedFunction<
   typeof MultipleModulesModal
 >
-const mockUseMissingModuleIds = useMissingModuleIds as jest.MockedFunction<
-  typeof useMissingModuleIds
+const mockUseModuleMatchResults = useModuleMatchResults as jest.MockedFunction<
+  typeof useModuleMatchResults
 >
 const mockGetAttachedModules = getAttachedModules as jest.MockedFunction<
   typeof getAttachedModules
@@ -142,7 +143,7 @@ describe('ModuleSetup', () => {
     when(mockModulesMismatch)
       .calledWith(
         componentPropsMatcher({
-          missingModuleId: [],
+          remainingAttachedModules: [],
         })
       )
       .mockReturnValue(<div></div>)
@@ -177,7 +178,10 @@ describe('ModuleSetup', () => {
   it('should render a deck WITHOUT modules if none passed (component will never be rendered in this circumstance)', () => {
     when(mockUseModuleRenderInfoById).calledWith().mockReturnValue({})
 
-    mockUseMissingModuleIds.mockReturnValue([])
+    mockUseModuleMatchResults.mockReturnValue({
+      missingModuleIds: [],
+      remainingAttachedModules: [],
+    })
 
     render(props)
     expect(mockModuleInfo).not.toHaveBeenCalled()
@@ -287,12 +291,15 @@ describe('ModuleSetup', () => {
     when(mockModulesMismatch)
       .calledWith(
         componentPropsMatcher({
-          missingModuleId: ['foo'],
+          remainingAttachedModules: [mockTemperatureModule],
         })
       )
       .mockReturnValue(<div>mock modules mismatch</div>)
 
-    mockUseMissingModuleIds.mockReturnValue(['foo'])
+      mockUseModuleMatchResults.mockReturnValue({
+        missingModuleIds: ['foo'],
+        remainingAttachedModules: [mockTemperatureModule],
+      })
 
     const { getByText, getByRole } = render(props)
     getByText('mock module info magneticModuleV2')
@@ -301,7 +308,10 @@ describe('ModuleSetup', () => {
   })
 
   it('should render a deck WITH modules with CTA enabled if all protocol requested modules have a matching attached module', () => {
-    mockUseMissingModuleIds.mockReturnValue([])
+    mockUseModuleMatchResults.mockReturnValue({
+      missingModuleIds: [],
+      remainingAttachedModules: [],
+    })
 
     when(mockUseModuleRenderInfoById)
       .calledWith()
@@ -366,7 +376,10 @@ describe('ModuleSetup', () => {
     expect(button).not.toBeDisabled()
   })
   it('renders Moam with the correct module in the correct slot', () => {
-    mockUseMissingModuleIds.mockReturnValue([])
+    mockUseModuleMatchResults.mockReturnValue({
+      missingModuleIds: [],
+      remainingAttachedModules: [],
+    })
 
     const dupModId = `${mockMagneticModule.moduleId}duplicate`
     const dupModPort = 10
