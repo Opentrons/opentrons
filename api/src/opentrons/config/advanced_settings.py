@@ -418,6 +418,16 @@ def _migrate11to12(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate12to13(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 13 of the feature flags file.
+
+    - Removes deprecated calibrateToBottom option
+    """
+    removals = ["calibrateToBottom"]
+    newmap = {k: v for k, v in previous.items() if k not in removals}
+    return newmap
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -431,6 +441,7 @@ _MIGRATIONS = [
     _migrate9to10,
     _migrate10to11,
     _migrate11to12,
+    _migrate12to13
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

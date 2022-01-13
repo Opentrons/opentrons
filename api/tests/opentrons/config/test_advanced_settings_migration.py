@@ -7,7 +7,7 @@ from opentrons.config.advanced_settings import _migrate, _ensure
 
 @pytest.fixture
 def migrated_file_version() -> int:
-    return 12
+    return 13
 
 
 @pytest.fixture
@@ -34,6 +34,7 @@ def empty_settings():
 def version_less():
     return {
         "shortFixedTrash": True,
+        "calibrateToBottom": True,
         "deckCalibrationDots": True,
         "disableHomeOnBoot": True,
         "useOldAspirationFunctions": True,
@@ -45,6 +46,7 @@ def v1_config():
     return {
         "_version": 1,
         "shortFixedTrash": True,
+        "calibrateToBottom": True,
         "deckCalibrationDots": True,
         "disableHomeOnBoot": True,
         "useProtocolApi2": None,
@@ -175,6 +177,14 @@ def v12_config(v11_config):
     return r
 
 
+@pytest.fixture
+def v13_config(v12_config):
+    r = v12_config.copy()
+    r.pop("calibrateToBottom")
+    r.update({"_version": 13})
+    return r
+
+
 @pytest.fixture(
     scope="session",
     params=[
@@ -192,6 +202,7 @@ def v12_config(v11_config):
         lazy_fixture("v10_config"),
         lazy_fixture("v11_config"),
         lazy_fixture("v12_config"),
+        lazy_fixture("v13_config"),
     ],
 )
 def old_settings(request):
