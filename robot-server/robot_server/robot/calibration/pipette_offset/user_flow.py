@@ -15,9 +15,8 @@ from opentrons.calibration_storage.types import (
     TipLengthCalNotFound,
     PipetteOffsetByPipetteMount,
 )
-from opentrons.config import feature_flags as ff
 from opentrons.hardware_control import (
-    ThreadManager,
+    HardwareControlAPI,
     CriticalPoint,
     Pipette,
     robot_calibration as robot_cal,
@@ -30,8 +29,6 @@ from robot_server.service.session.models.command_definitions import CalibrationC
 from robot_server.robot.calibration import util
 from robot_server.robot.calibration.constants import (
     TIP_RACK_LOOKUP_BY_MAX_VOL,
-    SHORT_TRASH_DECK,
-    STANDARD_DECK,
     POINT_ONE_ID,
     MOVE_TO_DECK_SAFETY_BUFFER,
     MOVE_TO_TIP_RACK_SAFETY_BUFFER,
@@ -74,7 +71,7 @@ PipetteOffsetState = Union[POWTState, POCState]
 class PipetteOffsetCalibrationUserFlow:
     def __init__(
         self,
-        hardware: ThreadManager,
+        hardware: HardwareControlAPI,
         mount: Mount = Mount.RIGHT,
         recalibrate_tip_length: bool = False,
         has_calibration_block: bool = False,
@@ -84,14 +81,14 @@ class PipetteOffsetCalibrationUserFlow:
         self._hardware = hardware
         self._mount = mount
 
-        self._hw_pipette = self._hardware._attached_instruments[mount]
-        if not self._hw_pipette:
+        pip = self._hardware.hardware_instruments[mount]
+        if not pip:
             raise RobotServerError(
                 definition=CalibrationError.NO_PIPETTE_ON_MOUNT, mount=mount
             )
+        self._hw_pipette = pip
 
-        deck_load_name = SHORT_TRASH_DECK if ff.short_fixed_trash() else STANDARD_DECK
-        self._deck = Deck(load_name=deck_load_name)
+        self._deck = Deck()
 
         self._saved_offset_this_session = False
 
@@ -160,7 +157,7 @@ class PipetteOffsetCalibrationUserFlow:
         return self._mount
 
     @property
-    def hardware(self) -> ThreadManager:
+    def hardware(self) -> HardwareControlAPI:
         return self._hardware
 
     @property
@@ -195,7 +192,7 @@ class PipetteOffsetCalibrationUserFlow:
             name=self._hw_pipette.name,
             tipLength=self._hw_pipette.config.tip_length,
             mount=str(self._mount),
-            serial=self._hw_pipette.pipette_id,
+            serial=self._hw_pipette.pipette_id,  # type: ignore[arg-type]
             defaultTipracks=self._default_tipracks,  # type: ignore[arg-type]
         )
 
@@ -308,14 +305,16 @@ class PipetteOffsetCalibrationUserFlow:
     def _get_stored_tip_length_cal(self) -> Optional[float]:
         try:
             return get.load_tip_length_calibration(
-                self._hw_pipette.pipette_id,
+                self._hw_pipette.pipette_id,  # type: ignore[arg-type]
                 self._tip_rack._implementation.get_definition(),
             ).tip_length
         except TipLengthCalNotFound:
             return None
 
     def _get_stored_pipette_offset_cal(self) -> Optional[PipetteOffsetByPipetteMount]:
-        return get.get_pipette_offset(self._hw_pipette.pipette_id, self._mount)
+        return get.get_pipette_offset(
+            self._hw_pipette.pipette_id, self._mount  # type: ignore[arg-type]
+        )
 
     def _get_tip_length(self) -> float:
         stored_tip_length_cal = self._get_stored_tip_length_cal()
@@ -447,7 +446,7 @@ class PipetteOffsetCalibrationUserFlow:
             modify.save_pipette_calibration(
                 offset=offset,
                 mount=self._mount,
-                pip_id=self._hw_pipette.pipette_id,
+                pip_id=self._hw_pipette.pipette_id,  # type: ignore[arg-type]
                 tiprack_hash=tiprack_hash,
                 tiprack_uri=self._tip_rack.uri,
             )
@@ -467,15 +466,19 @@ class PipetteOffsetCalibrationUserFlow:
             noz_pt = await self.get_current_point(critical_point=CriticalPoint.NOZZLE)
 
             util.save_tip_length_calibration(
-                pipette_id=self._hw_pipette.pipette_id,
+                pipette_id=self._hw_pipette.pipette_id,  # type: ignore[arg-type]
                 tip_length_offset=noz_pt.z - self._nozzle_height_at_reference,
                 tip_rack=self._tip_rack,
             )
-            delete.delete_pipette_offset_file(self._hw_pipette.pipette_id, self.mount)
+            delete.delete_pipette_offset_file(
+                self._hw_pipette.pipette_id, self.mount  # type: ignore[arg-type]
+            )
             new_tip_length = self._get_stored_tip_length_cal()
             self._has_calibrated_tip_length = new_tip_length is not None
             # load the new tip length for the rest of the session
-            self._hw_pipette.current_tip_length = new_tip_length
+            self._hw_pipette.current_tip_length = (
+                new_tip_length  # type: ignore[assignment]
+            )
             await self.hardware.retract(self._mount, 20)
 
     async def move_to_reference_point(self):

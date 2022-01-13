@@ -197,4 +197,16 @@ export const labwareImages: Record<string, string[]> = {
   'usascientific_96_wellplate_2.4ml_deep': [
     require('../../images/usascientific_96_wellplate_2.4ml_deep_side_view.jpg'),
   ],
+  thermoscientificnunc_96_wellplate_1300ul: [
+    require('../../images/thermoscientificnunc_96_wellplate_1300ul.jpg'),
+  ],
+  thermoscientificnunc_96_wellplate_2000ul: [
+    require('../../images/thermoscientificnunc_96_wellplate_2000ul.jpg'),
+  ],
+  appliedbiosystemsmicroamp_384_wellplate_40ul: [
+    require('../../images/appliedbiosystemsmicroamp_384_wellplate_40ul.jpg'),
+  ],
+  biorad_384_wellplate_50ul: [
+    require('../../images/biorad_384_wellplate_50ul.jpg'),
+  ],
 }

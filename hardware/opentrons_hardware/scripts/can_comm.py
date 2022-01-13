@@ -53,7 +53,7 @@ async def listen_task(can_driver: AbstractCanDriver) -> None:
                 build = message_definition.payload_type.build(message.data)
                 log.info(f"Received <-- \n\traw: {message}, " f"\n\tparsed: {build}")
             except BinarySerializableException:
-                log.warning(f"Failed to build from {message}")
+                log.exception(f"Failed to build from {message}")
         else:
             log.info(f"Received <-- \traw: {message}")
 

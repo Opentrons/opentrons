@@ -164,6 +164,59 @@ describe('RunTimeControl', () => {
     expect(button).toBeDisabled()
   })
 
+  it('should render a disabled Run Again button if run status is stop requested', () => {
+    when(mockUseRunControls)
+      .calledWith()
+      .mockReturnValue({
+        play: () => {},
+        pause: () => {},
+        reset: () => {},
+        isPlayRunActionLoading: true,
+        isPauseRunActionLoading: false,
+        isResetRunLoading: false,
+      })
+    when(mockUseRunStatus)
+      .calledWith()
+      .mockReturnValue(RUN_STATUS_STOP_REQUESTED)
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Run Again' })
+    expect(button).toBeDisabled()
+  })
+
+  it('should render an enabled Run Again button if run is completed', () => {
+    when(mockUseRunControls)
+      .calledWith()
+      .mockReturnValue({
+        play: () => {},
+        pause: () => {},
+        reset: () => {},
+        isPlayRunActionLoading: false,
+        isPauseRunActionLoading: false,
+        isResetRunLoading: false,
+      })
+    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_SUCCEEDED)
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Run Again' })
+    expect(button).toBeEnabled()
+  })
+
+  it('should render an enabled Run Again button if run is canceled', () => {
+    when(mockUseRunControls)
+      .calledWith()
+      .mockReturnValue({
+        play: () => {},
+        pause: () => {},
+        reset: () => {},
+        isPlayRunActionLoading: false,
+        isPauseRunActionLoading: false,
+        isResetRunLoading: false,
+      })
+    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_STOPPED)
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Run Again' })
+    expect(button).toBeEnabled()
+  })
+
   it('renders a run status and timer if running', () => {
     when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_RUNNING)
     when(mockUseRunStartTime).calledWith().mockReturnValue('noon')

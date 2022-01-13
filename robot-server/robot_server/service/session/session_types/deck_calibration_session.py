@@ -61,7 +61,9 @@ class DeckCalibrationSession(BaseSession):
 
         if session_controls_lights:
             await configuration.hardware.set_lights(rails=True)
-            shutdown_handler = configuration.hardware.set_lights(rails=False)
+            shutdown_handler: Optional[
+                Awaitable[None]
+            ] = configuration.hardware.set_lights(rails=False)
         else:
             shutdown_handler = None
 

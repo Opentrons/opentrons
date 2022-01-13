@@ -61,9 +61,6 @@ TIP_RACK_LOOKUP_BY_MAX_VOL: Dict[str, LabwareLookUp] = {
     ),
 }
 
-SHORT_TRASH_DECK = "ot2_short_trash"
-STANDARD_DECK = "ot2_standard"
-
 POINT_ONE_ID: Final = "1BLC"
 POINT_TWO_ID: Final = "3BRC"
 POINT_THREE_ID: Final = "7TLC"

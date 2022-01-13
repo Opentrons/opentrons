@@ -10,7 +10,11 @@ from opentrons.config import feature_flags as ff
 from opentrons.broker import Broker
 from opentrons.types import Point, Mount, Location
 from opentrons.protocol_api import labware
-from opentrons.hardware_control import CriticalPoint, ThreadedAsyncLock
+from opentrons.hardware_control import (
+    CriticalPoint,
+    ThreadedAsyncLock,
+    HardwareControlAPI,
+)
 from opentrons.hardware_control.types import OutOfBoundsMove, MotionChecks
 from opentrons.hardware_control.adapters import SynchronousAdapter
 
@@ -63,7 +67,7 @@ class CalibrationManager(RobotBusy):
 
     def __init__(
         self,
-        hardware: SynchronousAdapter,
+        hardware: SynchronousAdapter[HardwareControlAPI],
         loop: asyncio.AbstractEventLoop = None,
         broker: Broker = None,
         lock: ThreadedAsyncLock = None,

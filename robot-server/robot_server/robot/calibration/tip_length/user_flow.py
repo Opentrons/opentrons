@@ -2,8 +2,7 @@ import logging
 from typing import Dict, Awaitable, Callable, Any, Set, List, Optional
 
 from opentrons.types import Mount, Point, Location
-from opentrons.config import feature_flags as ff
-from opentrons.hardware_control import ThreadManager, CriticalPoint, Pipette
+from opentrons.hardware_control import HardwareControlAPI, CriticalPoint, Pipette
 from opentrons.protocol_api import labware
 from opentrons.protocols.geometry.deck import Deck
 
@@ -17,8 +16,6 @@ from ..errors import CalibrationError
 from ..helper_classes import RequiredLabware, AttachedPipette, SupportedCommands
 from ..constants import (
     TIP_RACK_LOOKUP_BY_MAX_VOL,
-    SHORT_TRASH_DECK,
-    STANDARD_DECK,
     CAL_BLOCK_SETUP_BY_MOUNT,
     MOVE_TO_TIP_RACK_SAFETY_BUFFER,
 )
@@ -42,7 +39,7 @@ COMMAND_MAP = Dict[str, COMMAND_HANDLER]
 class TipCalibrationUserFlow:
     def __init__(
         self,
-        hardware: ThreadManager,
+        hardware: HardwareControlAPI,
         mount: Mount,
         has_calibration_block: bool,
         tip_rack: LabwareDefinition,
@@ -50,16 +47,16 @@ class TipCalibrationUserFlow:
         self._hardware = hardware
         self._mount = mount
         self._has_calibration_block = has_calibration_block
-        self._hw_pipette = self._hardware._attached_instruments[mount]
-        if not self._hw_pipette:
+        pip = self._hardware.hardware_instruments[mount]
+        if not pip:
             raise RobotServerError(
                 definition=CalibrationError.NO_PIPETTE_ON_MOUNT, mount=mount
             )
+        self._hw_pipette = pip
         self._tip_origin_pt: Optional[Point] = None
         self._nozzle_height_at_reference: Optional[float] = None
 
-        deck_load_name = SHORT_TRASH_DECK if ff.short_fixed_trash() else STANDARD_DECK
-        self._deck = Deck(load_name=deck_load_name)
+        self._deck = Deck()
         self._tip_rack = self._get_tip_rack_lw(tip_rack)
         self._initialize_deck()
 
@@ -86,7 +83,7 @@ class TipCalibrationUserFlow:
         self._current_state = to_state
 
     @property
-    def hardware(self) -> ThreadManager:
+    def hardware(self) -> HardwareControlAPI:
         return self._hardware
 
     @property
@@ -132,7 +129,7 @@ class TipCalibrationUserFlow:
             name=self._hw_pipette.name,
             tipLength=self._hw_pipette.config.tip_length,
             mount=str(self._mount),
-            serial=self._hw_pipette.pipette_id,
+            serial=self._hw_pipette.pipette_id,  # type: ignore[arg-type]
             defaultTipracks=self._default_tipracks,  # type: ignore[arg-type]
         )
 
@@ -184,7 +181,7 @@ class TipCalibrationUserFlow:
             cur_pt = await self.get_current_point(critical_point=CriticalPoint.NOZZLE)
 
             util.save_tip_length_calibration(
-                pipette_id=self._hw_pipette.pipette_id,
+                pipette_id=self._hw_pipette.pipette_id,  # type: ignore[arg-type]
                 tip_length_offset=cur_pt.z - self._nozzle_height_at_reference,
                 tip_rack=self._tip_rack,
             )

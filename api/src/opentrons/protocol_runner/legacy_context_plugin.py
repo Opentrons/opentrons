@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Callable, Optional, NamedTuple
 
 from opentrons.commands.types import CommandMessage as LegacyCommand
-from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import PauseType as HardwarePauseType
 from opentrons.protocol_engine import AbstractPlugin, actions as pe_actions
 
@@ -29,7 +29,7 @@ class LegacyContextPlugin(AbstractPlugin):
     """A ProtocolEngine plugin wrapping a legacy ProtocolContext.
 
     In the legacy ProtocolContext, protocol execution is accomplished
-    by direct communication with the HardwareAPI, as opposed to an
+    by direct communication with the HardwareControlAPI, as opposed to an
     intermediate layer like the ProtocolEngine. This plugin wraps up
     and hides this behavior, so the ProtocolEngine can monitor and control
     the run of a legacy protocol without affecting the execution of
@@ -37,7 +37,7 @@ class LegacyContextPlugin(AbstractPlugin):
 
     This plugin allows a ProtocolEngine to:
 
-    1. Play/pause the protocol run using the HardwareAPI, as was done before
+    1. Play/pause the protocol run using the HardwareControlAPI, as was done before
        the ProtocolEngine existed.
     2. Subscribe to what is being done with the legacy ProtocolContext,
        and insert matching commands into ProtocolEngine state for
@@ -46,7 +46,7 @@ class LegacyContextPlugin(AbstractPlugin):
 
     def __init__(
         self,
-        hardware_api: HardwareAPI,
+        hardware_api: HardwareControlAPI,
         protocol_context: LegacyProtocolContext,
         legacy_command_mapper: Optional[LegacyCommandMapper] = None,
     ) -> None:

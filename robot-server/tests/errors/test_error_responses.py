@@ -3,7 +3,7 @@ from robot_server.errors.error_responses import (
     ApiError,
     ErrorSource,
     ErrorDetails,
-    ErrorResponse,
+    ErrorBody,
     LegacyErrorResponse,
     MultiErrorResponse,
 )
@@ -68,7 +68,7 @@ def test_legacy_error_response() -> None:
 
 def test_error_response() -> None:
     """It should serialize an error response from an ErrorResponse."""
-    result = ErrorResponse(
+    result = ErrorBody(
         errors=(
             ErrorDetails(
                 id="SomeErrorId",

@@ -1,9 +1,9 @@
 from copy import deepcopy
-from typing import Dict
+from typing import Dict, cast
 
 from opentrons.drivers import utils
 from opentrons.drivers.asyncio.communication import AlarmResponse
-from mock import AsyncMock
+from mock import AsyncMock, patch
 import pytest
 from opentrons.drivers.smoothie_drivers.connection import SmoothieConnection
 from opentrons.drivers.smoothie_drivers.constants import (
@@ -13,7 +13,7 @@ from opentrons.drivers.smoothie_drivers.constants import (
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 
 from opentrons.drivers.smoothie_drivers import driver_3_0, constants
-from opentrons.drivers.smoothie_drivers.errors import SmoothieError
+from opentrons.drivers.smoothie_drivers.errors import SmoothieError, SmoothieAlarm
 
 
 @pytest.fixture
@@ -397,3 +397,68 @@ async def test_restore_speed(
         "G0 F180",
         "M400",
     ]
+
+
+async def test_alarm_handling_halt(
+    smoothie: driver_3_0.SmoothieDriver, mock_connection: AsyncMock
+) -> None:
+    """Alarms should clear the halt flag and errors should not."""
+    await smoothie.hard_halt()
+    assert smoothie._is_hard_halting.is_set()
+
+    with pytest.raises(SmoothieError):
+        smoothie._handle_return("error: something else", is_error=True)
+
+    assert smoothie._is_hard_halting.is_set()
+
+    with pytest.raises(SmoothieAlarm):
+        smoothie._handle_return("error: Alarm lock", is_alarm=True)
+
+    assert not smoothie._is_hard_halting.is_set()
+
+
+async def test_alarm_handling_nohalt(
+    smoothie: driver_3_0.SmoothieDriver, mock_connection: AsyncMock
+) -> None:
+    """Alarms should be turned into errors outside of halt"""
+    assert not smoothie._is_hard_halting.is_set()
+
+    with pytest.raises(SmoothieError):
+        smoothie._handle_return("Alarm: Hard limit -X", is_alarm=True)
+
+    with pytest.raises(SmoothieError):
+        smoothie._handle_return("error oh no!", is_error=True)
+
+
+async def test_no_auto_recover_on_alarm(
+    smoothie: driver_3_0.SmoothieDriver, mock_connection: AsyncMock
+) -> None:
+    """Alarms that dont get turned into errors should not incur recovery."""
+
+    await smoothie.hard_halt()
+    assert smoothie._is_hard_halting.is_set()
+
+    with patch.object(smoothie, "_send_command_unsynchronized"), patch.object(
+        smoothie, "_reset_from_error"
+    ):
+        mocked_send = cast(AsyncMock, smoothie._send_command_unsynchronized)
+        mocked_send.side_effect = [SmoothieAlarm("G0", "Alarm: Hard limit -X")]
+        with pytest.raises(SmoothieAlarm):
+            await smoothie.move({"X": 10})
+        mocked_send._reset_from_error.assert_not_called()
+
+
+async def test_auto_recover_on_error(
+    smoothie: driver_3_0.SmoothieDriver, mock_connection: AsyncMock
+) -> None:
+    """Errors do incur recovery."""
+    with patch.object(smoothie, "_send_command_unsynchronized"), patch.object(
+        smoothie, "_reset_from_error"
+    ), patch.object(smoothie, "home"):
+        mocked_home = cast(AsyncMock, smoothie.home)
+        mocked_send = cast(AsyncMock, smoothie._send_command_unsynchronized)
+        mocked_send.side_effect = [SmoothieError("G0", "error: Uh oh")]
+        with pytest.raises(SmoothieError):
+            await smoothie.move({"X": 10})
+        mocked_send.assert_called_once()
+        mocked_home.assert_called_once()

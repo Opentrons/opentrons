@@ -95,5 +95,6 @@
   "protocol_run_complete": "Protocol run complete.",
   "protocol_run_failed": "Protocol run failed.",
   "protocol_run_canceled": "Protocol run canceled.",
-  "labware_position_check_not_available_empty_protocol": "Labware Position Check requires that the protocol loads labware and pipettes"
+  "labware_position_check_not_available_empty_protocol": "Labware Position Check requires that the protocol loads labware and pipettes",
+  "lpc_disabled_no_tipracks_loaded": "Labware Position Check requires that the protocol loads a tip rack"
 }

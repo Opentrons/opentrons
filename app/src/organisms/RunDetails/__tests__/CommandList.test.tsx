@@ -11,7 +11,7 @@ import { ProtocolSetupInfo } from '../ProtocolSetupInfo'
 import { CommandList } from '../CommandList'
 import fixtureAnalysis from '@opentrons/app/src/organisms/RunDetails/Fixture_analysis.json'
 import fixtureCommandSummary from '@opentrons/app/src/organisms/RunDetails/Fixture_commandSummary.json'
-import { CommandItem } from '../CommandItem'
+import { CommandItemComponent as CommandItem } from '../CommandItem'
 import type { ProtocolFile } from '@opentrons/shared-data'
 
 jest.mock('../hooks')
@@ -116,8 +116,17 @@ describe('CommandList', () => {
     )
     expect(getByText('Protocol Run Failed')).toHaveStyle('color: Error_dark')
   })
-  it('renders the protocol canceled banner', () => {
+  it('renders the protocol canceled banner when the status is stop-requested', () => {
     mockUseRunStatus.mockReturnValue('stop-requested')
+    mockAlertItem.mockReturnValue(<div>Protocol Run Canceled</div>)
+    const { getByText } = render()
+    expect(getByText('Protocol Run Canceled')).toHaveStyle(
+      'backgroundColor: Error_light'
+    )
+    expect(getByText('Protocol Run Canceled')).toHaveStyle('color: Error_dark')
+  })
+  it('renders the protocol canceled banner when the status is stopped', () => {
+    mockUseRunStatus.mockReturnValue('stopped')
     mockAlertItem.mockReturnValue(<div>Protocol Run Canceled</div>)
     const { getByText } = render()
     expect(getByText('Protocol Run Canceled')).toHaveStyle(

@@ -1,7 +1,7 @@
 import logging
 from typing import Optional, Tuple, Dict, Type
 
-from opentrons.hardware_control import ThreadManager, ThreadedAsyncLock
+from opentrons.hardware_control import ThreadManagedHardware, ThreadedAsyncLock
 
 from robot_server.service.errors import RobotServerError, CommonErrorDef
 from robot_server.service.protocol.manager import ProtocolManager
@@ -42,14 +42,14 @@ class SessionManager:
 
     def __init__(
         self,
-        hardware: ThreadManager,
+        hardware: ThreadManagedHardware,
         motion_lock: ThreadedAsyncLock,
         protocol_manager: ProtocolManager,
     ):
         """
         Construct the session manager
 
-        :param hardware: ThreadManager to interact with hardware
+        :param hardware: ThreadManagedHardware to interact with hardware
         :param protocol_manager: ProtocolManager for protocol related sessions
         """
         self._sessions: Dict[IdentifierType, BaseSession] = {}

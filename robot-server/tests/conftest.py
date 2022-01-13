@@ -22,9 +22,9 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons import config
 from opentrons.hardware_control import (
     API,
-    HardwareAPILike,
+    HardwareControlAPI,
     ThreadedAsyncLock,
-    ThreadManager,
+    ThreadManagedHardware,
 )
 from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
 from opentrons.calibration_storage import delete, modify, helpers
@@ -74,7 +74,7 @@ def hardware() -> MagicMock:
 
 @pytest.fixture
 def override_hardware(hardware: MagicMock) -> None:
-    async def get_hardware_override() -> HardwareAPILike:
+    async def get_hardware_override() -> HardwareControlAPI:
         """Override for get_hardware dependency"""
         return hardware
 
@@ -236,7 +236,7 @@ def set_up_deck_calibration_temp_directory(server_temp_directory: str) -> None:
 
 
 @pytest.fixture
-def session_manager(hardware: ThreadManager) -> SessionManager:
+def session_manager(hardware: ThreadManagedHardware) -> SessionManager:
     return SessionManager(
         hardware=hardware,
         motion_lock=ThreadedAsyncLock(),

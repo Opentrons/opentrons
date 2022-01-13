@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.0.0-beta.6](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.5...v5.0.0-beta.6) (2022-01-07)
+
+
+### Bug Fixes
+
+* **api:** check pipette names in simulator ([#9181](https://github.com/Opentrons/opentrons/issues/9181)) ([a81ebd9](https://github.com/Opentrons/opentrons/commit/a81ebd96cf3079bb518a2cb89ee6763149177a5c))
+
+
+### Performance Improvements
+
+* **api:** bring back the ThreadManager ([#9199](https://github.com/Opentrons/opentrons/issues/9199)) ([ba931f7](https://github.com/Opentrons/opentrons/commit/ba931f750cf67ce68a6dc9e2ae9ac8682ce43d3a))
+* **protocol-engine:** avoid iterating all commands for every state update ([#9170](https://github.com/Opentrons/opentrons/issues/9170)) ([b12bffc](https://github.com/Opentrons/opentrons/commit/b12bffcee1edaba848c43b4af8c95a7bba367dde)), closes [#9109](https://github.com/Opentrons/opentrons/issues/9109) [#8739](https://github.com/Opentrons/opentrons/issues/8739)
+
+
+
+
+
 # [5.0.0-beta.5](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.4...v5.0.0-beta.5) (2021-12-23)
 
 **Note:** Version bump only for package @opentrons/api-server

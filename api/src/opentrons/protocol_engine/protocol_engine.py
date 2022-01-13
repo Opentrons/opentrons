@@ -1,13 +1,16 @@
 """ProtocolEngine class definition."""
 from typing import Optional
 
-from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocols.models import LabwareDefinition
+from opentrons.hardware_control import HardwareControlAPI
 
 from .resources import ModelUtils
-from .commands import Command, CommandCreate
+from .commands import (
+    Command,
+    CommandCreate,
+)
 from .types import LabwareOffset, LabwareOffsetCreate
-from .execution import QueueWorker, create_queue_worker
+from .execution import QueueWorker, create_queue_worker, HardwareStopper
 from .state import StateStore, StateView
 from .plugins import AbstractPlugin, PluginStarter
 from .actions import (
@@ -35,19 +38,19 @@ class ProtocolEngine:
 
     def __init__(
         self,
-        hardware_api: HardwareAPI,
+        hardware_api: HardwareControlAPI,
         state_store: StateStore,
         action_dispatcher: Optional[ActionDispatcher] = None,
         plugin_starter: Optional[PluginStarter] = None,
         queue_worker: Optional[QueueWorker] = None,
         model_utils: Optional[ModelUtils] = None,
+        hardware_stopper: Optional[HardwareStopper] = None,
     ) -> None:
         """Initialize a ProtocolEngine instance.
 
         This constructor does not inject provider implementations. Prefer the
         ProtocolEngine.create factory classmethod.
         """
-        self._hardware_api = hardware_api
         self._state_store = state_store
         self._model_utils = model_utils or ModelUtils()
 
@@ -59,11 +62,13 @@ class ProtocolEngine:
             action_dispatcher=self._action_dispatcher,
         )
         self._queue_worker = queue_worker or create_queue_worker(
-            hardware_api=self._hardware_api,
+            hardware_api=hardware_api,
             state_store=self._state_store,
             action_dispatcher=self._action_dispatcher,
         )
-
+        self._hardware_stopper = hardware_stopper or HardwareStopper(
+            hardware_api=hardware_api, state_store=state_store
+        )
         self._queue_worker.start()
 
     @property
@@ -80,14 +85,14 @@ class ProtocolEngine:
         # TODO(mc, 2021-08-05): if starting, ensure plungers motors are
         # homed if necessary
         action = PlayAction()
-        self._state_store.commands.validate_action_allowed(action)
+        self._state_store.commands.raise_if_stop_requested()
         self._action_dispatcher.dispatch(action)
         self._queue_worker.start()
 
     def pause(self) -> None:
         """Pause executing commands in the queue."""
         action = PauseAction(source=PauseSource.CLIENT)
-        self._state_store.commands.validate_action_allowed(action)
+        self._state_store.commands.raise_if_stop_requested()
         self._action_dispatcher.dispatch(action)
 
     def add_command(self, request: CommandCreate) -> Command:
@@ -110,7 +115,6 @@ class ProtocolEngine:
             created_at=self._model_utils.get_timestamp(),
         )
         self._action_dispatcher.dispatch(action)
-
         return self._state_store.commands.get(command_id)
 
     async def add_and_execute_command(self, request: CommandCreate) -> Command:
@@ -127,12 +131,10 @@ class ProtocolEngine:
             The completed command, whether it succeeded or failed.
         """
         command = self.add_command(request)
-
         await self._state_store.wait_for(
             condition=self._state_store.commands.get_is_complete,
             command_id=command.id,
         )
-
         return self._state_store.commands.get(command.id)
 
     async def stop(self) -> None:
@@ -140,11 +142,10 @@ class ProtocolEngine:
 
         After an engine has been `stop`'ed, it cannot be restarted.
         """
+        self._state_store.commands.raise_if_stop_requested()
         self._action_dispatcher.dispatch(StopAction())
         self._queue_worker.cancel()
-        await self._hardware_api.halt()
-        await self._hardware_api.stop(home_after=False)
-        self._action_dispatcher.dispatch(HardwareStoppedAction())
+        await self._hardware_stopper.do_halt()
 
     # TODO(mc, 2021-12-27): commands.get_all_complete not yet implemented
     async def wait_until_complete(self) -> None:
@@ -156,7 +157,11 @@ class ProtocolEngine:
             condition=self._state_store.commands.get_all_complete
         )
 
-    async def finish(self, error: Optional[Exception] = None) -> None:
+    async def finish(
+        self,
+        error: Optional[Exception] = None,
+        drop_tips_and_home: bool = True,
+    ) -> None:
         """Gracefully finish using the ProtocolEngine, waiting for it to become idle.
 
         The engine will finish executing its current command (if any),
@@ -169,6 +174,7 @@ class ProtocolEngine:
 
         Arguments:
             error: An error that caused the stop, if applicable.
+            drop_tips_and_home: Whether to home and drop tips as part of cleanup.
         """
         if error:
             error_details: Optional[FinishErrorDetails] = FinishErrorDetails(
@@ -183,11 +189,11 @@ class ProtocolEngine:
 
         try:
             await self._queue_worker.join()
-        finally:
-            await self._hardware_api.stop(home_after=False)
 
-        self._action_dispatcher.dispatch(HardwareStoppedAction())
-        self._plugin_starter.stop()
+        finally:
+            await self._hardware_stopper.do_stop_and_recover(drop_tips_and_home)
+            self._action_dispatcher.dispatch(HardwareStoppedAction())
+            self._plugin_starter.stop()
 
     def add_labware_offset(self, request: LabwareOffsetCreate) -> LabwareOffset:
         """Add a new labware offset and return it.

@@ -11,7 +11,7 @@ from typing import Any, Awaitable, Callable
 log = getLogger(__name__)
 
 
-TaskFunc = Callable[..., Awaitable[None]]
+TaskFunc = Callable[..., Awaitable[Any]]
 
 
 class TaskRunner:

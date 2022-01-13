@@ -17,6 +17,8 @@ services:
     # Uncomment lines below to override the pipette(s) loaded by emulator
     #environment:
     #  OT_EMULATOR_smoothie: '{"right": {"model": "p300_multi"}, "left": {"model": "p20_single_v2.0"}}'
+    networks:
+      - container-network
   robot-server:
     build: .
     command: uvicorn "robot_server:app" --host 0.0.0.0 --port 31950 --ws wsproto --reload
@@ -26,8 +28,8 @@ services:
       OT_API_CONFIG_DIR: /config
       OT_SMOOTHIE_EMULATOR_URI: socket://emulator:9996
       OT_EMULATOR_module_server: '{"host": "emulator"}'
-    links:
-      - 'emulator'
+    networks:
+      - container-network
     depends_on:
       - 'emulator'
     volumes:
@@ -35,21 +37,24 @@ services:
   tempdeck:
     build: .
     command: python3 -m opentrons.hardware_control.emulation.scripts.run_module_emulator tempdeck emulator
-    links:
-      - 'emulator'
+    networks:
+      - container-network
     depends_on:
       - 'emulator'
   thermocycler:
     build: .
     command: python3 -m opentrons.hardware_control.emulation.scripts.run_module_emulator thermocycler emulator
-    links:
-      - 'emulator'
+    networks:
+      - container-network
     depends_on:
       - 'emulator'
   magdeck:
     build: .
     command: python3 -m opentrons.hardware_control.emulation.scripts.run_module_emulator magdeck emulator
-    links:
-      - 'emulator'
+    networks:
+      - container-network
     depends_on:
       - 'emulator'
+
+networks:
+  container-network:

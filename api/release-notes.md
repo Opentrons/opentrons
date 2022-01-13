@@ -22,9 +22,7 @@ This is beta software! You may experience unexpected crashes or missing features
 
 ## Bug Fixes
 
-Keep an eye on this space as we release new versions of the beta. See the [issue tracker][] for a full list of issues resolved by the v5 release.
-
-[issue tracker]: https://github.com/Opentrons/opentrons/labels/fixed-in-v5
+Keep an eye on this space as we release new versions of the beta.
 
 ## Known Issues
 
@@ -32,7 +30,6 @@ This beta is a work in progress! We'll be addressing the following features and 
 
 - Your last run protocol will not be saved through robot reboots
 - You may experience various performance issues and freezes
-- The OT-2 will not drop any tips if a protocol is canceled
 - The OT-2 will not pause if the front door is opened during a run
 - You may not be able to re-run a protocol using a thermocycler without re-uploading the protocol
 

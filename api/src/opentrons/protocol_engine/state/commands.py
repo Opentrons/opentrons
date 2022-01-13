@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections import OrderedDict
 from enum import Enum
 from dataclasses import dataclass
-from typing import Dict, List, Mapping, Optional, Union
+from typing import Dict, List, Mapping, Optional
 from typing_extensions import Literal
 from ..actions import (
     Action,
@@ -252,6 +252,13 @@ class CommandView(HasState[CommandState]):
 
         return next(iter(self._state.queued_command_ids.keys()), None)
 
+    def get_is_okay_to_clear(self) -> bool:
+        """Get whether the engine is stopped or unplayed so it could be removed."""
+        if self.get_is_stopped() or self.get_status() == EngineStatus.IDLE:
+            return True
+
+        return False
+
     def get_is_running(self) -> bool:
         """Get whether the engine is running and queued commands should be executed."""
         queue_status = self._state.queue_status
@@ -299,17 +306,16 @@ class CommandView(HasState[CommandState]):
         return self._state.is_hardware_stopped
 
     # TODO(mc, 2021-12-07): reject adding commands to a stopped engine
-    def validate_action_allowed(self, action: Union[PlayAction, PauseAction]) -> None:
-        """Validate if a PlayAction or PauseAction is allowed, raising if not.
+    def raise_if_stop_requested(self) -> None:
+        """Raise if a stop has already been requested.
 
-        For safety / reliability reasons, a StopAction is always allowed.
+        Mainly used to validate if an Action is allowed, raising if not.
 
         Raises:
             ProtocolEngineStoppedError: the engine has been stopped.
         """
-        if self._state.run_result:
-            action_desc = "play" if isinstance(action, PlayAction) else "pause"
-            raise ProtocolEngineStoppedError(f"Cannot {action_desc} a stopped engine.")
+        if self.get_stop_requested():
+            raise ProtocolEngineStoppedError("Cannot modify a stopped engine.")
 
     def get_status(self) -> EngineStatus:
         """Get the current execution status of the engine."""

@@ -192,7 +192,7 @@ async def test_runner_with_legacy_python(
             labwareId=labware_id_captor.value,
             wellName="A1",
         ),
-        result=None,
+        result=commands.PickUpTipResult(),
     )
 
     assert expected_command in commands_result
@@ -249,7 +249,7 @@ async def test_runner_with_legacy_json(
             labwareId=labware_id_captor.value,
             wellName="A1",
         ),
-        result=None,
+        result=commands.PickUpTipResult(),
     )
 
     assert expected_command in commands_result

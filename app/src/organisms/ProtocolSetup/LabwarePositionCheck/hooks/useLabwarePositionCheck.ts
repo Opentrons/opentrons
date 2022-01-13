@@ -18,9 +18,11 @@ import {
 import { useProtocolDetails } from '../../../RunDetails/hooks'
 import { useCurrentProtocolRun } from '../../../ProtocolUpload/hooks'
 import { getLabwareLocation } from '../../utils/getLabwareLocation'
-import { sendModuleCommand } from '../../../../redux/modules'
+import {
+  sendModuleCommand,
+  getAttachedModulesForConnectedRobot,
+} from '../../../../redux/modules'
 import { getConnectedRobotName } from '../../../../redux/robot/selectors'
-import { getAttachedModulesForConnectedRobot } from '../../../../redux/modules/selectors'
 import { getLabwareDefinitionUri } from '../../utils/getLabwareDefinitionUri'
 import { getModuleInitialLoadInfo } from '../../utils/getModuleInitialLoadInfo'
 import { getLabwareOffsetLocation } from '../../utils/getLabwareOffsetLocation'
@@ -38,7 +40,10 @@ import type {
 } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { SetupCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import type { DropTipCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
-import type { SavePositionCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
+import type {
+  HomeCommand,
+  SavePositionCommand,
+} from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
 import type {
   Axis,
   Jog,
@@ -197,6 +202,10 @@ export function useLabwarePositionCheck(
     commandId: string
   } | null>(null)
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
+  const isJogging = React.useRef(false)
+  const [pendingJogCommandId, setPendingJogCommandId] = React.useState<
+    string | null
+  >(null)
   const [error, setError] = React.useState<Error | null>(null)
   const [
     showPickUpTipConfirmationModal,
@@ -216,8 +225,8 @@ export function useLabwarePositionCheck(
   const attachedModules = useSelector(getAttachedModulesForConnectedRobot)
 
   const LPCCommands = LPCSteps.reduce<LabwarePositionCheckCommand[]>(
-    (steps, currentStep) => {
-      return [...steps, ...currentStep.commands]
+    (commands, currentStep) => {
+      return [...commands, ...currentStep.commands]
     },
     []
   )
@@ -238,7 +247,7 @@ export function useLabwarePositionCheck(
     }) as Command[]) ?? []
   // TC open lid commands come from the LPC command generator
   const TCOpenCommands = LPCCommands.filter(isTCOpenCommand) ?? []
-  const homeCommand: Command = {
+  const homeCommand: HomeCommand = {
     commandType: 'home',
     id: uuidv4(),
     params: {},
@@ -267,7 +276,8 @@ export function useLabwarePositionCheck(
   }) as LabwarePositionCheckStep
 
   const ctaText = useLpcCtaText(currentCommand)
-  const robotCommands = useAllCommandsQuery(currentRun?.data?.id).data?.data
+  const robotCommands = useAllCommandsQuery(currentRun?.data?.id ?? null).data
+    ?.data
   const titleText = useTitleText(
     isLoading,
     prevCommand,
@@ -315,9 +325,22 @@ export function useLabwarePositionCheck(
     setIsLoading(false)
     setPendingMovementCommandData(null)
   }
-
+  if (pendingJogCommandId != null) {
+    const isJogCommandComplete = Boolean(
+      robotCommands?.find(
+        (command: RunCommandSummary) =>
+          command.id === pendingJogCommandId &&
+          commandIsComplete(command.status)
+      )
+    )
+    if (isJogCommandComplete) {
+      isJogging.current = false
+    }
+  }
   // (sa 11-18-2021): refactor this function after beta release
   const proceed = (): void => {
+    // if a jog command is in flight, ignore this call to proceed
+    if (isJogging.current) return
     setIsLoading(true)
     setShowPickUpTipConfirmationModal(false)
     // before executing the next movement command, save the current position
@@ -454,6 +477,21 @@ export function useLabwarePositionCheck(
               console.error(`error saving position: ${e.message}`)
               setError(e)
             })
+        }
+        // if this was the last LPC command, home the robot
+        if (currentCommandIndex === LPCMovementCommands.length - 1) {
+          const homeCommand: HomeCommand = {
+            commandType: 'home',
+            id: uuidv4(),
+            params: {},
+          }
+          createCommand({
+            runId: currentRun?.data?.id as string,
+            command: createCommandData(homeCommand),
+          }).catch((e: Error) => {
+            console.error(`error homing robot: ${e.message}`)
+            setError(e)
+          })
         }
         setCurrentCommandIndex(currentCommandIndex + 1)
       })
@@ -599,6 +637,8 @@ export function useLabwarePositionCheck(
   }
 
   const jog = (axis: Axis, dir: Sign, step: StepSize): void => {
+    // if a jog is currently in flight, return early
+    if (isJogging.current) return
     const moveRelCommand: AnonymousCommand = {
       commandType: 'moveRelative',
       params: {
@@ -607,14 +647,20 @@ export function useLabwarePositionCheck(
         axis,
       },
     }
-
+    isJogging.current = true
     createCommand({
       runId: currentRun?.data?.id as string,
       command: moveRelCommand,
-    }).catch((e: Error) => {
-      setError(e)
-      console.error(`error issuing jog command: ${e.message}`)
     })
+      .then(response => {
+        const jogCommandId = response.data.id
+        setPendingJogCommandId(jogCommandId)
+      })
+      .catch((e: Error) => {
+        isJogging.current = false
+        setError(e)
+        console.error(`error issuing jog command: ${e.message}`)
+      })
   }
 
   return {
