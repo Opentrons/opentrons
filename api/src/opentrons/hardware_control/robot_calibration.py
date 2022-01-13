@@ -1,3 +1,4 @@
+from functools import lru_cache
 import logging
 import numpy as np
 from dataclasses import dataclass
@@ -165,3 +166,36 @@ def load_pipette_offset(
 
 def load() -> RobotCalibration:
     return RobotCalibration(deck_calibration=load_attitude_matrix())
+
+
+class RobotCalibrationProvider:
+    def __init__(self):
+        self._robot_calibration = load()
+
+    @lru_cache(1)
+    def _validate(self) -> DeckTransformState:
+        return validate_attitude_deck_calibration(
+            self._robot_calibration.deck_calibration
+        )
+
+    @property
+    def robot_calibration(self) -> RobotCalibration:
+        return self._robot_calibration
+
+    def reset_robot_calibration(self):
+        self._validate.cache_clear()
+        self._robot_calibration = load()
+
+    def set_robot_calibration(self, robot_calibration: RobotCalibration):
+        self._validate.cache_clear()
+        self._robot_calibration = robot_calibration
+
+    def validate_calibration(self) -> DeckTransformState:
+        """
+        The lru cache decorator is currently not supported by the
+        ThreadManager. To work around this, we need to wrap the
+        actual function around a dummy outer function.
+
+        Once decorators are more fully supported, we can remove this.
+        """
+        return self._validate()
