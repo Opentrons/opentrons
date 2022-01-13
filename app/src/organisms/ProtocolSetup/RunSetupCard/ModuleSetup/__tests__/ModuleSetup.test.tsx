@@ -26,12 +26,14 @@ import { useMissingModuleIds } from '../../hooks'
 import { MultipleModulesModal } from '../MultipleModulesModal'
 import { ModuleSetup } from '..'
 import { ModuleInfo } from '../ModuleInfo'
+import { ModulesMismatch } from '../ModulesMismatch'
 
 jest.mock('../../../../../redux/modules')
 jest.mock('../ModuleInfo')
 jest.mock('../../hooks')
 jest.mock('../../../hooks')
 jest.mock('../MultipleModulesModal')
+jest.mock('../ModulesMismatch')
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
   return {
@@ -64,6 +66,9 @@ const mockRobotWorkSpace = RobotWorkSpace as jest.MockedFunction<
 >
 const mockUseModuleRenderInfoById = useModuleRenderInfoById as jest.MockedFunction<
   typeof useModuleRenderInfoById
+>
+const mockModulesMismatch = ModulesMismatch as jest.MockedFunction<
+  typeof ModulesMismatch
 >
 
 const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
@@ -133,6 +138,14 @@ describe('ModuleSetup', () => {
     when(mockInferModuleOrientationFromXCoordinate)
       .calledWith(expect.anything())
       .mockReturnValue(STUBBED_ORIENTATION_VALUE)
+
+    when(mockModulesMismatch)
+      .calledWith(
+        componentPropsMatcher({
+          missingModuleId: [],
+        })
+      )
+      .mockReturnValue(<div></div>)
 
     when(mockRobotWorkSpace)
       .mockReturnValue(<div></div>) // this (default) empty div will be returned when RobotWorkSpace isn't called with expected props
@@ -270,6 +283,14 @@ describe('ModuleSetup', () => {
         })
       )
       .mockReturnValue(<div>mock module info {mockTCModule.model} </div>)
+
+    when(mockModulesMismatch)
+      .calledWith(
+        componentPropsMatcher({
+          missingModuleId: ['foo'],
+        })
+      )
+      .mockReturnValue(<div>mock modules mismatch</div>)
 
     mockUseMissingModuleIds.mockReturnValue(['foo'])
 

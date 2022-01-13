@@ -23,6 +23,7 @@ import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_stand
 import { useMissingModuleIds } from '../hooks'
 import { fetchModules } from '../../../../redux/modules'
 import { ModuleInfo } from './ModuleInfo'
+import { ModulesMismatch } from './ModulesMismatch'
 import { MultipleModulesModal } from './MultipleModulesModal'
 import { useModuleRenderInfoById } from '../../hooks'
 import styles from '../../styles.css'
@@ -56,13 +57,13 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
     showMultipleModulesModal,
     setShowMultipleModulesModal,
   ] = React.useState<boolean>(false)
+
   const missingModuleIds = useMissingModuleIds()
   useInterval(
     () => dispatch(fetchModules(robotName)),
     robotName === null ? POLL_MODULE_INTERVAL_MS : null,
     true
   )
-
   const moduleModels = map(
     moduleRenderInfoById,
     ({ moduleDef }) => moduleDef.model
@@ -94,6 +95,9 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
           {t('multiple_modules_help_link_title')}
         </Btn>
       ) : null}
+
+      <ModulesMismatch missingModuleId={missingModuleIds} />
+      
       <RobotWorkSpace
         deckDef={standardDeckDef as any}
         viewBox={DECK_VIEW_BOX}
