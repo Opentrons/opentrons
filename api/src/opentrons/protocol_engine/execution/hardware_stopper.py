@@ -49,35 +49,24 @@ class HardwareStopper:
                 axes=[MotorAxis.X, MotorAxis.Y, MotorAxis.LEFT_Z, MotorAxis.RIGHT_Z]
             )
 
-        for pip_id, tiprack_id in attached_tip_racks.items():
+        for pipette_id, tiprack_id in attached_tip_racks.items():
             try:
-                hw_pipette = self._state_store.pipettes.get_hardware_pipette(
-                    pipette_id=pip_id,
-                    attached_pipettes=self._hardware_api.attached_instruments,
+                await self._pipetting_handler.add_tip(
+                    pipette_id=pipette_id,
+                    labware_id=tiprack_id,
+                )
+                # TODO: Add ability to drop tip onto custom trash as well.
+                await self._pipetting_handler.drop_tip(
+                    pipette_id=pipette_id,
+                    labware_id=FIXED_TRASH_ID,
+                    well_name="A1",
+                    well_location=WellLocation(),
                 )
 
             except PipetteNotAttachedError:
                 # this will happen normally during protocol analysis, but
                 # should not happen during an actual run
-                log.debug(f"Pipette ID {pip_id} no longer attached.")
-
-            else:
-                tip_geometry = self._state_store.geometry.get_tip_geometry(
-                    labware_id=tiprack_id,
-                    well_name="A1",
-                    pipette_config=hw_pipette.config,
-                )
-                await self._hardware_api.add_tip(
-                    mount=hw_pipette.mount,
-                    tip_length=tip_geometry.effective_length,
-                )
-                # TODO: Add ability to drop tip onto custom trash as well.
-                await self._pipetting_handler.drop_tip(
-                    pipette_id=pip_id,
-                    labware_id=FIXED_TRASH_ID,
-                    well_name="A1",
-                    well_location=WellLocation(),
-                )
+                log.debug(f"Pipette ID {pipette_id} no longer attached.")
 
     async def do_halt(self) -> None:
         """Issue a halt signal to the hardware API.
