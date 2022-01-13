@@ -211,12 +211,6 @@ def test_gen1_pipette(
         if not robots_list.is_robot_toggle_active(RobotsList.DEV):
             robots_list.get_robot_toggle(RobotsList.DEV).click()
         left_menu = LeftMenu(driver)
-        """left_menu.click_more_button()
-        protocol_upload = ProtocolUpload(driver)
-        protocol_upload.click_app_left_panel()
-        protocol_upload.click_enable_developer_toggle()
-        protocol_upload.click_enable_pur_feature()
-        protocol_upload.goto_robots_page()"""
         # Instantiate the page object for the RobotsList.
         robots_list = RobotsList(driver)
         # toggle the DEV robot
