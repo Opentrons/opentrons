@@ -6,10 +6,7 @@ import type {
   UseMutationOptions,
   UseMutateAsyncFunction,
 } from 'react-query'
-import type {
-  CommandData,
-  HostConfig,
-} from '@opentrons/api-client'
+import type { CommandData, HostConfig } from '@opentrons/api-client'
 import type { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 
 interface CreateCommandParams {

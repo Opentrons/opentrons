@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import reduce from 'lodash/reduce'
+import isEqual from 'lodash/isEqual'
 import { getCommand } from '@opentrons/api-client'
 import {
   getLabwareDisplayName,
@@ -184,7 +185,7 @@ const createCommandData = (
       params: { ...command.params, labwareId: command.result.labwareId },
     }
   }
-  return { commandType: command.commandType, params: command.params }
+  return { ...command }
 }
 
 const isLoadCommand = (
@@ -286,7 +287,7 @@ export function useLabwarePositionCheck(
 
   const currentStep = LPCSteps.find(step => {
     const matchingCommand = step.commands.find(
-      command => prevCommand != null && command.id === prevCommand.id
+      command => prevCommand != null && isEqual(command, prevCommand)
     )
     return matchingCommand
   }) as LabwarePositionCheckStep
