@@ -5,7 +5,6 @@ import type {
 
 import type {
   CalibrationStatus,
-  AllLabwareCalibrations,
   AllPipetteOffsetCalibrations,
   AllTipLengthCalibrations,
 } from './api-types'
