@@ -18,6 +18,7 @@ import {
   TEXT_DECORATION_UNDERLINE,
   JUSTIFY_SPACE_BETWEEN,
   DIRECTION_COLUMN,
+  COLOR_WARNING_DARK,
 } from '@opentrons/components'
 import { getModuleName } from './utils/getModuleName'
 import { SecureLabwareModal } from './SecureLabwareModal'
@@ -110,6 +111,7 @@ export const ExtraAttentionWarning = (
                 as="h4"
                 marginY={SPACING_2}
                 id={`ExtraAttentionWarning_title`}
+                color={COLOR_WARNING_DARK}
               >
                 {t('extra_attention_warning_title')}
               </Text>
