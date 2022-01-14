@@ -141,6 +141,9 @@ class ProtocolEngine:
         """Stop execution immediately, halting all motion and cancelling future commands.
 
         After an engine has been `stop`'ed, it cannot be restarted.
+
+        After a `stop`, you must still call `finish` to give the engine a chance
+        to clean up resources and propagate errors.
         """
         self._state_store.commands.raise_if_stop_requested()
         self._action_dispatcher.dispatch(StopAction())
