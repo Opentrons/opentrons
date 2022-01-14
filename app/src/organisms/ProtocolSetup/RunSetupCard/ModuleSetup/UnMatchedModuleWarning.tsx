@@ -18,12 +18,12 @@ import {
 } from '@opentrons/components'
 import { AttachedModule } from '../../../../redux/modules/types'
 
-interface ModuleMismatchProps {
+interface UnMatchedModuleWarningProps {
   remainingAttachedModules: AttachedModule[]
 }
 
-export const ModulesMismatch = (
-  props: ModuleMismatchProps
+export const UnMatchedModuleWarning = (
+  props: UnMatchedModuleWarningProps
 ): JSX.Element | null => {
   const { t } = useTranslation('protocol_setup')
   const [showModulesMismatch, setShowModulesMismatch] = React.useState<boolean>(

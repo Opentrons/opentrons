@@ -2,17 +2,17 @@ import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
-import { ModulesMismatch } from '../ModulesMismatch'
+import { UnMatchedModuleWarning } from '../UnMatchedModuleWarning'
 import { mockTemperatureModule } from '../../../../../redux/modules/__fixtures__'
 
-const render = (props: React.ComponentProps<typeof ModulesMismatch>) => {
-  return renderWithProviders(<ModulesMismatch {...props} />, {
+const render = (props: React.ComponentProps<typeof UnMatchedModuleWarning>) => {
+  return renderWithProviders(<UnMatchedModuleWarning {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
-describe('ModulesMismatch', () => {
-  let props: React.ComponentProps<typeof ModulesMismatch>
+describe('UnMatchedModuleWarning', () => {
+  let props: React.ComponentProps<typeof UnMatchedModuleWarning>
   beforeEach(() => {
     props = { remainingAttachedModules: [mockTemperatureModule] }
   })

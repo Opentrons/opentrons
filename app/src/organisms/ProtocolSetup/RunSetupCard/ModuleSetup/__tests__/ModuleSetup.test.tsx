@@ -27,14 +27,14 @@ import { useModuleMatchResults } from '../../hooks'
 import { MultipleModulesModal } from '../MultipleModulesModal'
 import { ModuleSetup } from '..'
 import { ModuleInfo } from '../ModuleInfo'
-import { ModulesMismatch } from '../ModulesMismatch'
+import { UnMatchedModuleWarning } from '../UnMatchedModuleWarning'
 
 jest.mock('../../../../../redux/modules')
 jest.mock('../ModuleInfo')
 jest.mock('../../hooks')
 jest.mock('../../../hooks')
 jest.mock('../MultipleModulesModal')
-jest.mock('../ModulesMismatch')
+jest.mock('../UnMatchedModuleWarning')
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
   return {
@@ -68,8 +68,8 @@ const mockRobotWorkSpace = RobotWorkSpace as jest.MockedFunction<
 const mockUseModuleRenderInfoById = useModuleRenderInfoById as jest.MockedFunction<
   typeof useModuleRenderInfoById
 >
-const mockModulesMismatch = ModulesMismatch as jest.MockedFunction<
-  typeof ModulesMismatch
+const mockUnMatchedModuleWarning = UnMatchedModuleWarning as jest.MockedFunction<
+  typeof UnMatchedModuleWarning
 >
 
 const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
@@ -140,7 +140,7 @@ describe('ModuleSetup', () => {
       .calledWith(expect.anything())
       .mockReturnValue(STUBBED_ORIENTATION_VALUE)
 
-    when(mockModulesMismatch)
+    when(mockUnMatchedModuleWarning)
       .calledWith(
         componentPropsMatcher({
           remainingAttachedModules: [],
@@ -288,7 +288,7 @@ describe('ModuleSetup', () => {
       )
       .mockReturnValue(<div>mock module info {mockTCModule.model} </div>)
 
-    when(mockModulesMismatch)
+    when(mockUnMatchedModuleWarning)
       .calledWith(
         componentPropsMatcher({
           remainingAttachedModules: [mockTemperatureModule],

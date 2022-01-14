@@ -23,7 +23,7 @@ import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_stand
 import { useModuleMatchResults } from '../hooks'
 import { fetchModules } from '../../../../redux/modules'
 import { ModuleInfo } from './ModuleInfo'
-import { ModulesMismatch } from './ModulesMismatch'
+import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
 import { MultipleModulesModal } from './MultipleModulesModal'
 import { useModuleRenderInfoById } from '../../hooks'
 import styles from '../../styles.css'
@@ -58,7 +58,7 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
     setShowMultipleModulesModal,
   ] = React.useState<boolean>(false)
 
-  const missingModuleIdInfo = useModuleMatchResults()
+  const moduleMatchResults = useModuleMatchResults()
   useInterval(
     () => dispatch(fetchModules(robotName)),
     robotName === null ? POLL_MODULE_INTERVAL_MS : null,
@@ -71,7 +71,7 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
 
   const hasADuplicateModule = new Set(moduleModels).size !== moduleModels.length
 
-  const { missingModuleIds, remainingAttachedModules } = missingModuleIdInfo
+  const { missingModuleIds, remainingAttachedModules } = moduleMatchResults
 
   const proceedToLabwareDisabledReason =
     missingModuleIds.length > 0
@@ -98,7 +98,9 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
         </Btn>
       ) : null}
 
-      <ModulesMismatch remainingAttachedModules={remainingAttachedModules} />
+      <UnMatchedModuleWarning
+        remainingAttachedModules={remainingAttachedModules}
+      />
 
       <RobotWorkSpace
         deckDef={standardDeckDef as any}
