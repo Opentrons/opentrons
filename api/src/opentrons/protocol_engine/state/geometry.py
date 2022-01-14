@@ -21,10 +21,19 @@ from .modules import ModuleView
 DEFAULT_TIP_DROP_HEIGHT_FACTOR = 0.5
 
 
-# TODO(mc, 2020-11-12): reconcile this data structure with WellGeometry
 @dataclass(frozen=True)
 class TipGeometry:
-    """Tip geometry data."""
+    """Nominal tip geometry data.
+
+    This data is loaded from definitions and configurations, and does
+    not take calibration values into account.
+
+    Props:
+        effective_length: The nominal working length (total length minus overlap)
+            of a tip, according to a tip rack and pipette's definitions.
+        diameter: Nominal tip diameter.
+        volume: Nominal volume capacity.
+    """
 
     effective_length: float
     diameter: float
@@ -137,9 +146,7 @@ class GeometryView:
             height_over_labware = self._modules.get_height_over_labware(module_id)
         return labware_pos.z + z_dim + height_over_labware
 
-    # TODO(mc, 2020-11-12): reconcile with existing protocol logic and include
-    # data from tip-length calibration once v4.0.0 is in `edge`
-    def get_effective_tip_length(
+    def get_nominal_effective_tip_length(
         self,
         labware_id: str,
         pipette_config: PipetteDict,
@@ -147,7 +154,9 @@ class GeometryView:
         """Given a labware and a pipette's config, get the effective tip length.
 
         Effective tip length is the nominal tip length less the distance the
-        tip overlaps with the pipette nozzle.
+        tip overlaps with the pipette nozzle. This does not take calibrated
+        tip lengths into account. For calibrated data,
+        see `LabwareDataProvider.get_calibrated_tip_length`.
         """
         labware_uri = self._labware.get_definition_uri(labware_id)
         nominal_length = self._labware.get_tip_length(labware_id)
@@ -157,19 +166,24 @@ class GeometryView:
 
         return nominal_length - overlap
 
-    # TODO(mc, 2020-11-12): reconcile with existing geometry logic
-    def get_tip_geometry(
+    def get_nominal_tip_geometry(
         self,
         labware_id: str,
-        well_name: str,
         pipette_config: PipetteDict,
+        well_name: Optional[str] = None,
     ) -> TipGeometry:
         """Given a labware, well, and hardware pipette config, get the tip geometry.
 
         Tip geometry includes effective tip length, tip diameter, and tip volume,
         which is all data required by the hardware controller for proper tip handling.
+
+        This geometry data is based solely on labware and pipette definitions and
+        does not take calibrated tip lengths into account.
         """
-        effective_length = self.get_effective_tip_length(labware_id, pipette_config)
+        effective_length = self.get_nominal_effective_tip_length(
+            labware_id=labware_id,
+            pipette_config=pipette_config,
+        )
         well_def = self._labware.get_well_definition(labware_id, well_name)
 
         if well_def.shape != "circular":

@@ -246,10 +246,17 @@ class LabwareView(HasState[LabwareState]):
     def get_well_definition(
         self,
         labware_id: str,
-        well_name: str,
+        well_name: Optional[str] = None,
     ) -> WellDefinition:
-        """Get a well's definition by labware and well identifier."""
+        """Get a well's definition by labware and well name.
+
+        If `well_name` is omitted, the first well in the labware
+        will be used.
+        """
         definition = self.get_definition(labware_id)
+
+        if well_name is None:
+            well_name = definition.ordering[0][0]
 
         try:
             return definition.wells[well_name]

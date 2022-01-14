@@ -12,7 +12,7 @@
   "instrument_not_attached": "Not attached",
   "instrument_cal_data_title": "Calibration data",
   "instruments_title": "Required Pipettes",
-  "invalid_file_type": "Invalid file type. Protocols must be '.py', '.json', or '.zip'.",
+  "invalid_file_type": "Invalid file type. Protocols must be '.py' or '.json'.",
   "invalid_json_file": "Invalid JSON file.",
   "labware_title": "Required Labware",
   "labware_legacy_definition": "N/A",

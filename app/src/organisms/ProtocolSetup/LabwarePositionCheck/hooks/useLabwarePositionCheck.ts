@@ -339,7 +339,10 @@ export function useLabwarePositionCheck(
   }
   // (sa 11-18-2021): refactor this function after beta release
   const proceed = (): void => {
+    // if a jog command is in flight, ignore this call to proceed
+    if (isJogging.current) return
     setIsLoading(true)
+    setCurrentCommandIndex(currentCommandIndex + 1)
     setShowPickUpTipConfirmationModal(false)
     // before executing the next movement command, save the current position
     const savePositionCommand: Command = {
@@ -491,7 +494,6 @@ export function useLabwarePositionCheck(
             setError(e)
           })
         }
-        setCurrentCommandIndex(currentCommandIndex + 1)
       })
       .catch((e: Error) => {
         console.error(`error issuing command to robot: ${e.message}`)
