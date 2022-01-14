@@ -189,7 +189,6 @@ async def _build_ot2_hw() -> AsyncGenerator[HardwareControlAPI, None]:
         hw_sim.clean_up()
 
 
-@pytest.mark.skipif(aionotify is None, reason="requires inotify (linux only)")
 @pytest.fixture
 async def ot2_hardware(request, loop, virtual_smoothie_env):
     async for hw in _build_ot2_hw():
@@ -207,14 +206,12 @@ async def _build_ot3_hw() -> AsyncGenerator[HardwareControlAPI, None]:
         hw_sim.clean_up()
 
 
-@pytest.mark.skipif(aionotify is None, reason="requires inotify (linux only)")
 @pytest.fixture
 async def ot3_hardware(request, loop, enable_ot3_hardware_controller):
     async for hw in _build_ot3_hw():
         yield hw
 
 
-@pytest.mark.skipif(aionotify is None, reason="requires inotify (linux only)")
 @pytest.fixture(
     # these have to be lambdas because pytest calls them when providing the param
     # value and we want to use the function's identity

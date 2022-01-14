@@ -37,7 +37,7 @@ class Axis(enum.Enum):
     C = 5
 
     @classmethod
-    def by_mount(cls, mount: top_types.Mount):
+    def by_mount(cls, mount: top_types.Mount) -> "Axis":
         bm = {top_types.Mount.LEFT: cls.Z, top_types.Mount.RIGHT: cls.A}
         return bm[mount]
 
@@ -49,12 +49,12 @@ class Axis(enum.Enum):
         return cls.X, cls.Y, cls.Z, cls.A
 
     @classmethod
-    def of_plunger(cls, mount: top_types.Mount):
+    def of_plunger(cls, mount: top_types.Mount) -> "Axis":
         pm = {top_types.Mount.LEFT: cls.B, top_types.Mount.RIGHT: cls.C}
         return pm[mount]
 
     @classmethod
-    def to_mount(cls, inst: "Axis"):
+    def to_mount(cls, inst: "Axis") -> top_types.Mount:
         return {
             cls.Z: top_types.Mount.LEFT,
             cls.A: top_types.Mount.RIGHT,
@@ -62,7 +62,7 @@ class Axis(enum.Enum):
             cls.C: top_types.Mount.RIGHT,
         }[inst]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 

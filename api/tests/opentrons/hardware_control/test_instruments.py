@@ -414,14 +414,22 @@ async def test_pick_up_tip(dummy_instruments, loop, is_robot, sim_builder):
     assert hw_api._current_position == target_position
 
 
-def assert_move_called(mock_move, speed, lock=True):
-    mock_move.assert_called_with(
-        mock.ANY,
-        speed,
-        False,
-        acquire_lock=lock,
-        secondary_z=mock.ANY,
-    )
+def assert_move_called(mock_move, speed, lock=None):
+    if lock is not None:
+        mock_move.assert_called_with(
+            mock.ANY,
+            speed=speed,
+            home_flagged_axes=False,
+            acquire_lock=lock,
+            secondary_z=mock.ANY,
+        )
+    else:
+        mock_move.assert_called_with(
+            mock.ANY,
+            speed=speed,
+            home_flagged_axes=False,
+            secondary_z=mock.ANY,
+        )
 
 
 async def test_aspirate_flow_rate(dummy_instruments, loop, sim_builder):
