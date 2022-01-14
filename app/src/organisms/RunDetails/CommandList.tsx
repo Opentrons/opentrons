@@ -100,7 +100,7 @@ export function CommandList(): JSX.Element | null {
               analysisCommand:
                 postSetupAnticipatedCommands.find(
                   postSetupAnticipatedCommand =>
-                    runDataCommand.id === postSetupAnticipatedCommand.id
+                    runDataCommand.key === postSetupAnticipatedCommand.key
                 ) ?? null,
             }))
         : []
