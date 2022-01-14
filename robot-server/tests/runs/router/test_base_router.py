@@ -322,6 +322,7 @@ async def test_get_run_data_from_url(
         commands=[
             RunCommandSummary.construct(
                 id=command.id,
+                key=command.key,
                 commandType=command.commandType,
                 status=command.status,
             ),
@@ -404,6 +405,7 @@ async def test_get_run_with_errors(
         commands=[
             RunCommandSummary.construct(
                 id=command.id,
+                key=command.key,
                 commandType=command.commandType,
                 status=command.status,
                 errorId="error-1",
