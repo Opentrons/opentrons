@@ -370,19 +370,6 @@ class InstrumentHandlerProvider:
                 raise RuntimeError("Pipette not ready to aspirate")
             self._ihp_log.debug(f"{action} on {pipettes[0].name}")
 
-    @overload
-    def mounts(self, z_axis: PipettePair) -> Tuple[top_types.Mount, top_types.Mount]:
-        ...
-
-    @overload
-    def mounts(self, z_axis: top_types.Mount) -> Tuple[top_types.Mount]:
-        ...
-
-    def mounts(self, z_axis):
-        if isinstance(z_axis, PipettePair):
-            return (z_axis.primary, z_axis.secondary)
-        return (z_axis,)
-
     def plunger_position(
         self, instr: Pipette, ul: float, action: "UlPerMmAction"
     ) -> float:
