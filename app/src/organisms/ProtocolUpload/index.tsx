@@ -38,7 +38,7 @@ import { ingestProtocolFile } from '../../redux/protocol/utils'
 import { getConnectedRobotName } from '../../redux/robot/selectors'
 import { getValidCustomLabwareFiles } from '../../redux/custom-labware/selectors'
 import { ConfirmCancelModal } from '../RunDetails/ConfirmCancelModal'
-import { useRunStatus, useRunControls  } from '../RunTimeControl/hooks'
+import { useRunStatus, useRunControls } from '../RunTimeControl/hooks'
 
 import { ConfirmExitProtocolUploadModal } from './ConfirmExitProtocolUploadModal'
 
@@ -135,7 +135,10 @@ export function ProtocolUpload(): JSX.Element {
     confirm: confirmExit,
     cancel: cancelExit,
   } = useConditionalConfirm(handleCloseProtocol, true)
-  const [showConfirmCancelModal, setShowConfirmCancelModal] = React.useState<boolean>(false)
+  const [
+    showConfirmCancelModal,
+    setShowConfirmCancelModal,
+  ] = React.useState<boolean>(false)
 
   /** NOTE: the logic to determine the contents of this titlebar is
   very close to the logic present on the RunDetails organism */
@@ -192,7 +195,9 @@ export function ProtocolUpload(): JSX.Element {
       {showConfirmExit && (
         <ConfirmExitProtocolUploadModal exit={confirmExit} back={cancelExit} />
       )}
-      {showConfirmCancelModal && <ConfirmCancelModal onClose={() => setShowConfirmCancelModal(false)} />}
+      {showConfirmCancelModal && (
+        <ConfirmCancelModal onClose={() => setShowConfirmCancelModal(false)} />
+      )}
       <Page titleBarProps={titleBarProps}>
         {uploadError != null && (
           <Flex

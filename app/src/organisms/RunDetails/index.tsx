@@ -17,7 +17,11 @@ import {
 import { Page } from '../../atoms/Page'
 import { Portal } from '../../App/portal'
 import { useProtocolDetails } from './hooks'
-import { useRunStatus, useRunStartTime, useRunControls } from '../RunTimeControl/hooks'
+import {
+  useRunStatus,
+  useRunStartTime,
+  useRunControls,
+} from '../RunTimeControl/hooks'
 import { ConfirmExitProtocolUploadModal } from '../ProtocolUpload/ConfirmExitProtocolUploadModal'
 import { useCloseCurrentRun } from '../ProtocolUpload/hooks/useCloseCurrentRun'
 import { CommandList } from './CommandList'
@@ -39,7 +43,10 @@ export function RunDetails(): JSX.Element | null {
       : runStatus
 
   const { pause } = useRunControls()
-  const [showConfirmCancelModal, setShowConfirmCancelModal] = React.useState<boolean>(false)
+  const [
+    showConfirmCancelModal,
+    setShowConfirmCancelModal,
+  ] = React.useState<boolean>(false)
 
   const handleCancelClick = (): void => {
     pause()
@@ -105,7 +112,11 @@ export function RunDetails(): JSX.Element | null {
         </Portal>
       )}
       <Page titleBarProps={titleBarProps}>
-        {showConfirmCancelModal ? <ConfirmCancelModal onClose={() => setShowConfirmCancelModal(false)} /> : null}
+        {showConfirmCancelModal ? (
+          <ConfirmCancelModal
+            onClose={() => setShowConfirmCancelModal(false)}
+          />
+        ) : null}
         <CommandList />
       </Page>
     </>

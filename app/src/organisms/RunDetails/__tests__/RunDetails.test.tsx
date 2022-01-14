@@ -67,18 +67,16 @@ describe('RunDetails', () => {
         closeCurrentRun: jest.fn(),
       } as any)
 
-    when(mockUseRunControls)
-      .calledWith()
-      .mockReturnValue({
-        play: jest.fn(),
-        pause: jest.fn(),
-        stop: jest.fn(),
-        reset: jest.fn(),
-        isPlayRunActionLoading: false,
-        isPauseRunActionLoading: false,
-        isStopRunActionLoading: false,
-        isResetRunLoading: false,
-      })
+    when(mockUseRunControls).calledWith().mockReturnValue({
+      play: jest.fn(),
+      pause: jest.fn(),
+      stop: jest.fn(),
+      reset: jest.fn(),
+      isPlayRunActionLoading: false,
+      isPauseRunActionLoading: false,
+      isStopRunActionLoading: false,
+      isResetRunLoading: false,
+    })
   })
 
   afterEach(() => {
