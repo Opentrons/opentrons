@@ -39,18 +39,12 @@ export function RunDetails(): JSX.Element | null {
       : runStatus
 
   const { pause } = useRunControls()
+  const [showConfirmCancelModal, setShowConfirmCancelModal] = React.useState<boolean>(false)
 
-  const cancelRunAndExit = (): void => {
+  const handleCancelClick = (): void => {
     pause()
-    confirmExit()
+    setShowConfirmCancelModal(true)
   }
-
-  const {
-    showConfirmation: showConfirmExit,
-    confirm: confirmExit,
-    cancel: cancelExit,
-  } = useConditionalConfirm(cancelRunAndExit, true)
-
   const handleCloseProtocol: React.MouseEventHandler = _event => {
     closeCurrentRun()
   }
@@ -67,7 +61,7 @@ export function RunDetails(): JSX.Element | null {
 
   const cancelRunButton = (
     <NewAlertSecondaryBtn
-      onClick={cancelRunAndExit}
+      onClick={handleCancelClick}
       marginX={SPACING_3}
       paddingX={SPACING_2}
     >
@@ -111,7 +105,7 @@ export function RunDetails(): JSX.Element | null {
         </Portal>
       )}
       <Page titleBarProps={titleBarProps}>
-        {showConfirmExit ? <ConfirmCancelModal onClose={cancelExit} /> : null}
+        {showConfirmCancelModal ? <ConfirmCancelModal onClose={() => setShowConfirmCancelModal(false)} /> : null}
         <CommandList />
       </Page>
     </>

@@ -122,9 +122,9 @@ export function ProtocolUpload(): JSX.Element {
   }
   const { pause } = useRunControls()
 
-  const cancelRunAndExit = (): void => {
+  const handleCancelClick = (): void => {
     pause()
-    confirmExit()
+    setShowConfirmCancelModal(true)
   }
   const handleCloseProtocol: React.MouseEventHandler = _event => {
     closeCurrentRun()
@@ -135,17 +135,13 @@ export function ProtocolUpload(): JSX.Element {
     confirm: confirmExit,
     cancel: cancelExit,
   } = useConditionalConfirm(handleCloseProtocol, true)
-  const {
-    showConfirmation: showConfirmModalExit,
-    confirm: confirmCancelModalExit,
-    cancel: cancelModalExit,
-  } = useConditionalConfirm(cancelRunAndExit, true)
+  const [showConfirmCancelModal, setShowConfirmCancelModal] = React.useState<boolean>(false)
 
   /** NOTE: the logic to determine the contents of this titlebar is
   very close to the logic present on the RunDetails organism */
   const cancelRunButton = (
     <NewAlertSecondaryBtn
-      onClick={confirmCancelModalExit}
+      onClick={handleCancelClick}
       marginX={SPACING_3}
       paddingX={SPACING_2}
     >
@@ -196,7 +192,7 @@ export function ProtocolUpload(): JSX.Element {
       {showConfirmExit && (
         <ConfirmExitProtocolUploadModal exit={confirmExit} back={cancelExit} />
       )}
-      {showConfirmModalExit && <ConfirmCancelModal onClose={cancelModalExit} />}
+      {showConfirmCancelModal && <ConfirmCancelModal onClose={() => setShowConfirmCancelModal(false)} />}
       <Page titleBarProps={titleBarProps}>
         {uploadError != null && (
           <Flex

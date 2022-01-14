@@ -50,20 +50,11 @@ export function useRunControls(): RunControls {
     currentRunId as string
   )
 
-  const play = (): void => {
-    playRun()
-  }
-  const pause = (): void => {
-    pauseRun()
-  }
-  const reset = (): void => {
-    cloneRun()
-  }
   return {
-    play,
-    pause,
-    stop,
-    reset,
+    play: playRun,
+    pause: pauseRun,
+    stop: stopRun,
+    reset: cloneRun,
     isPlayRunActionLoading,
     isPauseRunActionLoading,
     isStopRunActionLoading,
