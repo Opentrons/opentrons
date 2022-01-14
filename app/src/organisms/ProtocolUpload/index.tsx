@@ -37,9 +37,8 @@ import { loadProtocol } from '../../redux/protocol/actions'
 import { ingestProtocolFile } from '../../redux/protocol/utils'
 import { getConnectedRobotName } from '../../redux/robot/selectors'
 import { getValidCustomLabwareFiles } from '../../redux/custom-labware/selectors'
-import { ConfirmCancelModal } from '../../pages/Run/RunLog'
-import { useRunStatus } from '../RunTimeControl/hooks'
-import { useCurrentRunControls } from '../../pages/Run/RunLog/hooks'
+import { ConfirmCancelModal } from '../RunDetails/ConfirmCancelModal'
+import { useRunStatus, useRunControls  } from '../RunTimeControl/hooks'
 
 import { ConfirmExitProtocolUploadModal } from './ConfirmExitProtocolUploadModal'
 
@@ -121,10 +120,10 @@ export function ProtocolUpload(): JSX.Element {
       }
     )
   }
-  const { pauseRun } = useCurrentRunControls()
+  const { pause } = useRunControls()
 
   const cancelRunAndExit = (): void => {
-    pauseRun()
+    pause()
     confirmExit()
   }
   const handleCloseProtocol: React.MouseEventHandler = _event => {
