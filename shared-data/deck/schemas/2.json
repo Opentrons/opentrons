@@ -110,9 +110,9 @@
       "required": ["model"],
       "properties": {
         "model": {
-          "description": "Model of the robot (currently only OT-2 Standard is supported)",
+          "description": "Model of the robot",
           "type": "string",
-          "enum": ["OT-2 Standard"]
+          "enum": ["OT-2 Standard", "OT-3 Standard"]
         }
       }
     },

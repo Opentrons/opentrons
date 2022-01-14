@@ -73,7 +73,7 @@ class CommandExecutor:
             result = await command_impl.execute(command.params)  # type: ignore[arg-type]  # noqa: E501
 
         except Exception as error:
-            log.warn(f"Execution of {command.id} failed", exc_info=error)
+            log.warning(f"Execution of {command.id} failed", exc_info=error)
 
             if not isinstance(error, ProtocolEngineError):
                 error = UnexpectedProtocolError(error)

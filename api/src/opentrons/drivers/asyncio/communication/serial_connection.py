@@ -134,19 +134,18 @@ class SerialConnection:
 
         Raises: SerialException
         """
-        async with self._send_data_lock:
-            return await self._send_data(data=data, retries=retries, timeout=timeout)
+        async with self._send_data_lock, self._serial.timeout_override(
+            "timeout", timeout
+        ):
+            return await self._send_data(data=data, retries=retries)
 
-    async def _send_data(
-        self, data: str, retries: int = 0, timeout: Optional[float] = None
-    ) -> str:
+    async def _send_data(self, data: str, retries: int = 0) -> str:
         """
         Send data and return the response.
 
         Args:
             data: The data to send.
             retries: number of times to retry in case of timeout
-            timeout: optional override of default timeout in seconds
 
         Returns: The command response
 
@@ -158,7 +157,7 @@ class SerialConnection:
             log.debug(f"{self.name}: Write -> {data_encode!r}")
             await self._serial.write(data=data_encode)
 
-            response = await self._serial.read_until(match=self._ack, timeout=timeout)
+            response = await self._serial.read_until(match=self._ack)
             log.debug(f"{self.name}: Read <- {response!r}")
 
             if self._ack in response:
@@ -208,11 +207,12 @@ class SerialConnection:
         Raises: SerialException
         """
         lower = response.lower()
-        if self._error_keyword in lower:
-            raise ErrorResponse(port=self._port, response=response)
 
         if self._alarm_keyword in lower:
             raise AlarmResponse(port=self._port, response=response)
+
+        if self._error_keyword in lower:
+            raise ErrorResponse(port=self._port, response=response)
 
     async def on_retry(self) -> None:
         """

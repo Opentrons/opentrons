@@ -19,7 +19,7 @@ from robot_server.robot.calibration.tip_length.models import TipCalibrationSessi
 from robot_server.service.json_api import (
     RequestModel,
     DeprecatedResponseModel,
-    ResponseDataModel,
+    DeprecatedResponseDataModel,
     DeprecatedMultiResponseModel,
 )
 from robot_server.service.session.models.common import EmptyModel
@@ -119,7 +119,7 @@ class LiveProtocolCreateAttributes(SessionCreateAttributesNoParams):
     sessionType: Literal[SessionType.live_protocol] = SessionType.live_protocol
 
 
-class SessionResponseAttributes(ResponseDataModel):
+class SessionResponseAttributes(DeprecatedResponseDataModel):
     """Common session response attributes."""
 
     createdAt: datetime = Field(

@@ -1,38 +1,42 @@
 from .request import RequestModel
 from .resource_links import ResourceLink, ResourceLinks, ResourceLinkKey
 from .response import (
-    BaseResponse,
-    Response,
-    SimpleResponse,
-    EmptyResponse,
-    SimpleEmptyResponse,
-    MultiResponse,
-    SimpleMultiResponse,
+    BaseResponseBody,
+    Body,
+    SimpleBody,
+    EmptyBody,
+    SimpleEmptyBody,
+    MultiBody,
+    SimpleMultiBody,
     DeprecatedResponseModel,
     DeprecatedMultiResponseModel,
-    ResponseDataModel,
+    DeprecatedResponseDataModel,
     ResourceModel,
+    PydanticResponse,
 )
 
 
 __all__ = [
     # request body model
     "RequestModel",
+    # response models
+    "PydanticResponse",
     # response body models
-    "BaseResponse",
-    "Response",
-    "SimpleResponse",
-    "EmptyResponse",
-    "SimpleEmptyResponse",
-    "MultiResponse",
-    "SimpleMultiResponse",
-    "DeprecatedResponseModel",
-    "DeprecatedMultiResponseModel",
-    # response data models
-    "ResponseDataModel",
+    "BaseResponseBody",
+    "Body",
+    "SimpleBody",
+    "EmptyBody",
+    "SimpleEmptyBody",
+    "MultiBody",
+    "SimpleMultiBody",
+    # resource data models
     "ResourceModel",
     # response links models
     "ResourceLink",
     "ResourceLinks",
     "ResourceLinkKey",
+    # deprecated interfaces
+    "DeprecatedResponseDataModel",
+    "DeprecatedResponseModel",
+    "DeprecatedMultiResponseModel",
 ]

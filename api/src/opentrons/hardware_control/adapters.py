@@ -2,12 +2,11 @@
 """
 import asyncio
 import functools
-from typing import TYPE_CHECKING
+from typing import Generic, TypeVar
+from .protocols import AsyncioConfigurable
 
-from .types import HardwareAPILike
 
-if TYPE_CHECKING:
-    from .dev_types import HasLoop
+WrappedObj = TypeVar("WrappedObj", bound=AsyncioConfigurable, covariant=True)
 
 
 # TODO: BC 2020-02-25 instead of overwriting __get_attribute__ in this class
@@ -17,7 +16,7 @@ if TYPE_CHECKING:
 # object.__get_attribute__(self,...) to opt out of the overwritten
 # functionality. It is more readable and protected from
 # unintentional recursion.
-class SynchronousAdapter(HardwareAPILike):
+class SynchronousAdapter(Generic[WrappedObj]):
     """A wrapper to make every call into :py:class:`.hardware_control.API`
     synchronous.
 
@@ -40,7 +39,7 @@ class SynchronousAdapter(HardwareAPILike):
     >>> sync_api.home()
     """
 
-    def __init__(self, asynchronous_instance: "HasLoop") -> None:
+    def __init__(self, asynchronous_instance: WrappedObj) -> None:
         """Build the SynchronousAdapter.
 
         :param asynchronous_instance: The asynchronous class instance to wrap

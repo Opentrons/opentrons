@@ -46,10 +46,9 @@ async def test_send_command(
 
     await subject.send_data(data="send data")
 
+    mock_serial_port.timeout_override.assert_called_once_with("timeout", None)
     mock_serial_port.write.assert_called_once_with(data=b"send data")
-    mock_serial_port.read_until.assert_called_once_with(
-        match=ack.encode(), timeout=None
-    )
+    mock_serial_port.read_until.assert_called_once_with(match=ack.encode())
 
 
 async def test_send_command_with_retry(
@@ -61,13 +60,14 @@ async def test_send_command_with_retry(
 
     await subject.send_data(data="send data", retries=1)
 
+    mock_serial_port.timeout_override.assert_called_once_with("timeout", None)
     mock_serial_port.write.assert_has_calls(
         calls=[call(data=b"send data"), call(data=b"send data")]
     )
     mock_serial_port.read_until.assert_has_calls(
         calls=[
-            call(match=ack.encode(), timeout=None),
-            call(match=ack.encode(), timeout=None),
+            call(match=ack.encode()),
+            call(match=ack.encode()),
         ]
     )
 
@@ -104,6 +104,9 @@ async def test_send_command_response(
         ["alarm", AlarmResponse],
         ["ALARM", AlarmResponse],
         ["This is an Alarm", AlarmResponse],
+        ["error:Alarm lock", AlarmResponse],
+        ["alarm:error", AlarmResponse],
+        ["ALARM: Hard limit -X", AlarmResponse],
     ],
 )
 def test_raise_on_error(

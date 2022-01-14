@@ -12,7 +12,6 @@ import {
   SPACING_1,
   SPACING_2,
   SPACING_3,
-  SPACING_5,
   COLOR_WARNING,
   COLOR_WARNING_LIGHT,
   C_DARK_GRAY,
@@ -86,7 +85,6 @@ export const ExtraAttentionWarning = (
         />
       )}
       <Box
-        marginX={SPACING_5}
         marginY={SPACING_3}
         backgroundColor={COLOR_WARNING_LIGHT}
         color={C_DARK_GRAY}

@@ -104,7 +104,7 @@ export const LabwareSetup = (): JSX.Element | null => {
   } else if (calibrationIncomplete) {
     lpcDisabledReason = t('lpc_disabled_calibration_not_complete')
   } else if (moduleSetupIncomplete) {
-    lpcDisabledReason = t('lpc_disabled_modules_not_connected"')
+    lpcDisabledReason = t('lpc_disabled_modules_not_connected')
   } else if (runStatus != null && runStatus !== RUN_STATUS_IDLE) {
     lpcDisabledReason = t('labware_position_check_not_available')
   } else if (
@@ -128,7 +128,7 @@ export const LabwareSetup = (): JSX.Element | null => {
           onCloseClick={() => setShowLabwarePositionCheckModal(false)}
         />
       )}
-      <Flex flex="1" maxHeight="85vh" flexDirection={DIRECTION_COLUMN}>
+      <Flex flex="1" maxHeight="100vh" flexDirection={DIRECTION_COLUMN}>
         {moduleTypesThatRequireExtraAttention.length > 0 && (
           <ExtraAttentionWarning
             moduleTypes={moduleTypesThatRequireExtraAttention}

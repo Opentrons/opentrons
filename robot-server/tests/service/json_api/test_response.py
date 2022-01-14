@@ -5,12 +5,12 @@ from typing import Any, Dict, NamedTuple, Optional
 from robot_server.service.json_api.resource_links import ResourceLink
 from robot_server.service.json_api.response import (
     ResourceModel,
-    SimpleResponse,
-    Response,
-    SimpleEmptyResponse,
-    EmptyResponse,
-    SimpleMultiResponse,
-    MultiResponse,
+    SimpleBody,
+    Body,
+    SimpleEmptyBody,
+    EmptyBody,
+    SimpleMultiBody,
+    MultiBody,
     DeprecatedResponseModel,
     DeprecatedMultiResponseModel,
 )
@@ -35,11 +35,11 @@ class ResponseSpec(NamedTuple):
 
 RESPONSE_SPECS = [
     ResponseSpec(
-        subject=SimpleResponse(data=_Resource(id="hello")),
+        subject=SimpleBody(data=_Resource(id="hello")),
         expected={"data": {"id": "hello"}},
     ),
     ResponseSpec(
-        subject=Response(
+        subject=Body(
             data=_Resource(id="hello"),
             links=_Links(sibling=ResourceLink(href="/bar")),
         ),
@@ -49,21 +49,19 @@ RESPONSE_SPECS = [
         },
     ),
     ResponseSpec(
-        subject=SimpleEmptyResponse(),
+        subject=SimpleEmptyBody(),
         expected={},
     ),
     ResponseSpec(
-        subject=EmptyResponse(links=_Links(sibling=ResourceLink(href="/bar"))),
+        subject=EmptyBody(links=_Links(sibling=ResourceLink(href="/bar"))),
         expected={"links": {"sibling": {"href": "/bar"}}},
     ),
     ResponseSpec(
-        subject=SimpleMultiResponse(
-            data=[_Resource(id="hello"), _Resource(id="goodbye")]
-        ),
+        subject=SimpleMultiBody(data=[_Resource(id="hello"), _Resource(id="goodbye")]),
         expected={"data": [{"id": "hello"}, {"id": "goodbye"}]},
     ),
     ResponseSpec(
-        subject=MultiResponse(
+        subject=MultiBody(
             data=[_Resource(id="hello"), _Resource(id="goodbye")],
             links=_Links(sibling=ResourceLink(href="/bar")),
         ),

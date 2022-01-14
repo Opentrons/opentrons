@@ -12,6 +12,7 @@ from .movement import MovementHandler, SavedPositionData
 from .pipetting import PipettingHandler
 from .queue_worker import QueueWorker
 from .run_control import RunControlHandler
+from .hardware_stopper import HardwareStopper
 
 # .thermocycler_movement_flagger omitted from package's public interface.
 
@@ -28,4 +29,5 @@ __all__ = [
     "PipettingHandler",
     "QueueWorker",
     "RunControlHandler",
+    "HardwareStopper",
 ]

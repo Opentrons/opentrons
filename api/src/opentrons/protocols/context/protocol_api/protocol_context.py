@@ -4,7 +4,6 @@ from collections import OrderedDict
 
 from opentrons import types
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.config import feature_flags as fflags
 from opentrons.hardware_control.types import DoorState, PauseType
 from opentrons.hardware_control import ThreadManager, SynchronousAdapter
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
@@ -35,9 +34,6 @@ if TYPE_CHECKING:
 
 
 logger = logging.getLogger(__name__)
-
-SHORT_TRASH_DECK = "ot2_short_trash"
-STANDARD_DECK = "ot2_standard"
 
 
 class ProtocolContextImplementation(AbstractProtocol):
@@ -74,10 +70,7 @@ class ProtocolContextImplementation(AbstractProtocol):
         # TODO AL 20201110 - Find a way to omit api_version from this class.
         #  it is used in creating module geometry and instrument context.
         self._api_version = api_version or MAX_SUPPORTED_VERSION
-        deck_load_name = (
-            SHORT_TRASH_DECK if fflags.short_fixed_trash() else STANDARD_DECK
-        )
-        self._deck_layout = Deck(load_name=deck_load_name)
+        self._deck_layout = Deck()
         self._instruments: InstrumentDict = {mount: None for mount in types.Mount}
         self._modules: List[LoadModuleResult] = []
 

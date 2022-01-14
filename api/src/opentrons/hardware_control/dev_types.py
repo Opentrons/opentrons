@@ -3,10 +3,9 @@ from __future__ import annotations
 # this file defines types that require dev dependencies
 # and are only relevant for static typechecking. this file should only
 # be imported if typing.TYPE_CHECKING is True
-import asyncio
 from typing import Optional, Dict, List, Union
 
-from typing_extensions import Protocol, TypedDict, Literal
+from typing_extensions import TypedDict, Literal
 
 from opentrons_shared_data.pipette.dev_types import (
     PipetteModel,
@@ -17,12 +16,6 @@ from opentrons_shared_data.pipette.dev_types import (
 from opentrons.drivers.types import MoveSplit
 from opentrons.types import Mount
 from opentrons.config.pipette_config import PipetteConfig
-
-
-class HasLoop(Protocol):
-    @property
-    def loop(self) -> asyncio.AbstractEventLoop:
-        ...
 
 
 class InstrumentSpec(TypedDict):

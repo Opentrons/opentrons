@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 from pydantic.generics import GenericModel
 from typing import Any, Dict, Generic, Optional, Sequence, Tuple, TypeVar
 
-from robot_server.service.json_api import BaseResponse, ResourceLinks
+from robot_server.service.json_api import BaseResponseBody, ResourceLinks
 
 
 class ApiError(Exception):
@@ -20,7 +20,7 @@ class ApiError(Exception):
         self.content = content
 
 
-class BaseErrorResponse(BaseResponse):
+class BaseErrorBody(BaseResponseBody):
     """Base class for error response bodies."""
 
     def as_error(self, status_code: int) -> ApiError:
@@ -50,7 +50,7 @@ class ErrorSource(BaseModel):
     )
 
 
-class ErrorDetails(BaseErrorResponse):
+class ErrorDetails(BaseErrorBody):
     """An error response with error type and occurrence details.
 
     Extend this class to create specific error responses, and use it in your
@@ -108,13 +108,13 @@ class ErrorDetails(BaseErrorResponse):
 
     def as_error(self, status_code: int) -> ApiError:
         """Serial this ErrorDetails as an ApiError from an ErrorResponse."""
-        return ErrorResponse(errors=(self,)).as_error(status_code)
+        return ErrorBody(errors=(self,)).as_error(status_code)
 
 
 ErrorDetailsT = TypeVar("ErrorDetailsT", bound=ErrorDetails)
 
 
-class LegacyErrorResponse(BaseErrorResponse):
+class LegacyErrorResponse(BaseErrorBody):
     """An error response with a human readable message."""
 
     message: str = Field(
@@ -123,7 +123,7 @@ class LegacyErrorResponse(BaseErrorResponse):
     )
 
 
-class ErrorResponse(BaseErrorResponse, GenericModel, Generic[ErrorDetailsT]):
+class ErrorBody(BaseErrorBody, GenericModel, Generic[ErrorDetailsT]):
     """A response body for a single error."""
 
     errors: Tuple[ErrorDetailsT] = Field(..., description="Error details.")
@@ -136,7 +136,7 @@ class ErrorResponse(BaseErrorResponse, GenericModel, Generic[ErrorDetailsT]):
     )
 
 
-class MultiErrorResponse(BaseErrorResponse, GenericModel, Generic[ErrorDetailsT]):
+class MultiErrorResponse(BaseErrorBody, GenericModel, Generic[ErrorDetailsT]):
     """An response body for multiple errors."""
 
     errors: Sequence[ErrorDetailsT] = Field(..., description="Error details.")

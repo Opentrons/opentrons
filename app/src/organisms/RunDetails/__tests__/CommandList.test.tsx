@@ -11,7 +11,7 @@ import { ProtocolSetupInfo } from '../ProtocolSetupInfo'
 import { CommandList } from '../CommandList'
 import fixtureAnalysis from '@opentrons/app/src/organisms/RunDetails/Fixture_analysis.json'
 import fixtureCommandSummary from '@opentrons/app/src/organisms/RunDetails/Fixture_commandSummary.json'
-import { CommandItem } from '../CommandItem'
+import { CommandItemComponent as CommandItem } from '../CommandItem'
 import type { ProtocolFile } from '@opentrons/shared-data'
 
 jest.mock('../hooks')

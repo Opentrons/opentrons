@@ -9,7 +9,7 @@ from opentrons.hardware_control.modules.types import (
     ThermocyclerModuleModel as OpentronsThermocyclerModuleModel,
 )
 from opentrons.drivers.types import ThermocyclerLidStatus
-from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import (
     AbstractModule as AbstractHardwareModule,
     Thermocycler as HardwareThermocycler,
@@ -27,7 +27,9 @@ class ThermocyclerMovementFlagger:
     It's a separate class for independent testability.
     """
 
-    def __init__(self, state_store: StateStore, hardware_api: HardwareAPI) -> None:
+    def __init__(
+        self, state_store: StateStore, hardware_api: HardwareControlAPI
+    ) -> None:
         """Initialize the ThermocyclerMovementFlagger.
 
         Args:

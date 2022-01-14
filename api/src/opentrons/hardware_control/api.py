@@ -29,8 +29,8 @@ from opentrons.config.types import RobotConfig
 from .util import use_or_initialize_loop, DeckTransformState, check_motion_bounds
 from .pipette import Pipette, generate_hardware_configs, load_from_config_and_check_skip
 from .controller import Controller
-from .simulator import Simulator
 from .ot3controller import OT3Controller
+from .simulator import Simulator
 from .constants import (
     SHAKE_OFF_TIPS_SPEED,
     SHAKE_OFF_TIPS_DROP_DISTANCE,
@@ -42,7 +42,6 @@ from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
 from .types import (
     Axis,
-    HardwareAPILike,
     CriticalPoint,
     MustHomeError,
     NoTipAttachedError,
@@ -58,6 +57,7 @@ from .types import (
     PauseType,
 )
 from . import modules, robot_calibration as rb_cal
+from .protocols import HardwareControlAPI
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import UlPerMmAction, PipetteName
@@ -71,7 +71,7 @@ InstrumentsByMount = Dict[top_types.Mount, Optional[Pipette]]
 PipetteHandlingData = Tuple[Pipette, top_types.Mount]
 
 
-class API(HardwareAPILike):
+class API(HardwareControlAPI):
     """This API is the primary interface to the hardware controller.
 
     Because the hardware manager controls access to the system's hardware
@@ -489,6 +489,8 @@ class API(HardwareAPILike):
             await self._backend.configure_mount(mount, hw_config)
         mod_log.info("Instruments found: {}".format(self._attached_instruments))
 
+    # TODO(mc, 2022-01-11): change returned map value type to `Optional[PipetteDict]`
+    # instead of potentially returning an empty dict
     def get_attached_instruments(self) -> Dict[top_types.Mount, "PipetteDict"]:
         """Get the status dicts of the cached attached instruments.
 
@@ -509,6 +511,8 @@ class API(HardwareAPILike):
             for m in (top_types.Mount.LEFT, top_types.Mount.RIGHT)
         }
 
+    # TODO(mc, 2022-01-11): change return type to `Optional[PipetteDict]` instead
+    # of potentially returning an empty dict
     def get_attached_instrument(self, mount: top_types.Mount) -> "PipetteDict":
         instr = self._attached_instruments[mount]
         result: Dict[str, Any] = {}
@@ -570,6 +574,11 @@ class API(HardwareAPILike):
     @property
     def attached_instruments(self) -> Dict[top_types.Mount, "PipetteDict"]:
         return self.get_attached_instruments()
+
+    @property
+    def hardware_instruments(self) -> InstrumentsByMount:
+        """Do not write new code that uses this."""
+        return self._attached_instruments
 
     @property
     def attached_modules(self) -> List[modules.AbstractModule]:
@@ -681,7 +690,7 @@ class API(HardwareAPILike):
         if not self.is_simulator:
             await self._execution_manager.wait_for_is_running()
 
-    async def reset(self):
+    async def reset(self) -> None:
         """Reset the stored state of the system.
 
         This will re-scan instruments and models, clearing any cached
@@ -695,7 +704,7 @@ class API(HardwareAPILike):
         await self.cache_instruments()
 
     # Gantry/frame (i.e. not pipette) action API
-    async def home_z(self, mount: top_types.Mount = None):
+    async def home_z(self, mount: Optional[top_types.Mount] = None):
         """Home the two z-axes"""
         self._reset_last_mount()
         if not mount:
@@ -746,7 +755,7 @@ class API(HardwareAPILike):
         await self.current_position(mount=mount, refresh=True)
         await self._do_plunger_home(mount=mount, acquire_lock=True)
 
-    async def home(self, axes: List[Axis] = None):
+    async def home(self, axes: Optional[List[Axis]] = None):
         """Home the entire robot and initialize current position.
         :param axes: A list of axes to home. Default is `None`, which will
                      home everything.
@@ -899,7 +908,7 @@ class API(HardwareAPILike):
     async def gantry_position(
         self,
         mount: top_types.Mount,
-        critical_point: CriticalPoint = None,
+        critical_point: Optional[CriticalPoint] = None,
         refresh: bool = False,
         # TODO(mc, 2021-11-15): combine with `refresh` for more reliable
         # position reporting when motors are not homed
@@ -946,9 +955,9 @@ class API(HardwareAPILike):
         self,
         mount: Union[top_types.Mount, PipettePair],
         abs_position: top_types.Point,
-        speed: float = None,
-        critical_point: CriticalPoint = None,
-        max_speeds: Dict[Axis, float] = None,
+        speed: Optional[float] = None,
+        critical_point: Optional[CriticalPoint] = None,
+        max_speeds: Optional[Dict[Axis, float]] = None,
     ):
         """Move the critical point of the specified mount to a location
         relative to the deck, at the specified speed. 'speed' sets the speed
@@ -1041,8 +1050,8 @@ class API(HardwareAPILike):
         self,
         mount: Union[top_types.Mount, PipettePair],
         delta: top_types.Point,
-        speed: float = None,
-        max_speeds: Dict[Axis, float] = None,
+        speed: Optional[float] = None,
+        max_speeds: Optional[Dict[Axis, float]] = None,
         check_bounds: MotionChecks = MotionChecks.NONE,
         fail_on_not_homed: bool = False,
     ):
@@ -1342,18 +1351,30 @@ class API(HardwareAPILike):
             return top_types.Point(0, 0, 30)
 
     # Gantry/frame (i.e. not pipette) config API
-    def get_config(self) -> RobotConfig:
+    @property
+    def config(self) -> RobotConfig:
         """Get the robot's configuration object.
 
         :returns .RobotConfig: The object.
         """
         return self._config
 
-    def set_config(self, config: RobotConfig):
+    @config.setter
+    def config(self, config: RobotConfig) -> None:
         """Replace the currently-loaded config"""
         self._config = config
 
-    config = property(fget=get_config, fset=set_config)
+    def get_config(self) -> RobotConfig:
+        """
+        Get the robot's configuration object.
+
+        :returns .RobotConfig: The object.
+        """
+        return self.config
+
+    def set_config(self, config: RobotConfig) -> None:
+        """Replace the currently-loaded config"""
+        self.config = config
 
     async def update_config(self, **kwargs):
         """Update values of the robot's configuration.
@@ -1406,7 +1427,7 @@ class API(HardwareAPILike):
     async def aspirate(
         self,
         mount: Union[top_types.Mount, PipettePair],
-        volume: float = None,
+        volume: Optional[float] = None,
         rate: float = 1.0,
     ):
         """
@@ -1479,7 +1500,7 @@ class API(HardwareAPILike):
     async def dispense(
         self,
         mount: Union[top_types.Mount, PipettePair],
-        volume: float = None,
+        volume: Optional[float] = None,
         rate: float = 1.0,
     ):
         """
@@ -1645,8 +1666,8 @@ class API(HardwareAPILike):
         self,
         mount: Union[top_types.Mount, PipettePair],
         tip_length: float,
-        presses: int = None,
-        increment: float = None,
+        presses: Optional[int] = None,
+        increment: Optional[float] = None,
     ):
         """
         Pick up tip from current location.
@@ -1875,10 +1896,10 @@ class API(HardwareAPILike):
     def calibrate_plunger(
         self,
         mount: top_types.Mount,
-        top: float = None,
-        bottom: float = None,
-        blow_out: float = None,
-        drop_tip: float = None,
+        top: Optional[float] = None,
+        bottom: Optional[float] = None,
+        blow_out: Optional[float] = None,
+        drop_tip: Optional[float] = None,
     ):
         """
         Set calibration values for the pipette plunger.
@@ -1947,7 +1968,7 @@ class API(HardwareAPILike):
             )
 
     def get_instrument_max_height(
-        self, mount: top_types.Mount, critical_point: CriticalPoint = None
+        self, mount: top_types.Mount, critical_point: Optional[CriticalPoint] = None
     ) -> float:
         """Return max achievable height of the attached instrument
         based on the current critical point

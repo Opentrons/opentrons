@@ -4,15 +4,17 @@ from fastapi import APIRouter, Query, Depends
 from starlette import status
 
 from opentrons.hardware_control import (
-    ThreadManager,
     ThreadedAsyncLock,
     ThreadedAsyncForbidden,
 )
 from opentrons.hardware_control.types import Axis, CriticalPoint
+from opentrons.hardware_control import HardwareControlAPI
+
 from opentrons.types import Mount, Point
 
 from robot_server.errors import LegacyErrorResponse
-from robot_server.service.dependencies import get_hardware, get_motion_lock
+from robot_server.service.dependencies import get_motion_lock
+from robot_server.hardware import get_hardware
 from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.legacy.models import control
 
@@ -25,7 +27,7 @@ router = APIRouter()
 )
 async def post_identify(
     seconds: int = Query(..., description="Time to blink the lights for"),
-    hardware: ThreadManager = Depends(get_hardware),
+    hardware: HardwareControlAPI = Depends(get_hardware),
 ) -> V1BasicResponse:
     identify = hardware.identify
     asyncio.ensure_future(identify(seconds))
@@ -68,7 +70,7 @@ async def get_robot_positions() -> control.RobotPositionsResponse:
 )
 async def post_move_robot(
     robot_move_target: control.RobotMoveTarget,
-    hardware: ThreadManager = Depends(get_hardware),
+    hardware: HardwareControlAPI = Depends(get_hardware),
     motion_lock: ThreadedAsyncLock = Depends(get_motion_lock),
 ) -> V1BasicResponse:
     """Move the robot"""
@@ -91,7 +93,7 @@ async def post_move_robot(
 )
 async def post_home_robot(
     robot_home_target: control.RobotHomeTarget,
-    hardware: ThreadManager = Depends(get_hardware),
+    hardware: HardwareControlAPI = Depends(get_hardware),
     motion_lock: ThreadedAsyncLock = Depends(get_motion_lock),
 ) -> V1BasicResponse:
     """Home the robot or one of the pipettes"""
@@ -126,7 +128,7 @@ async def post_home_robot(
     response_model=control.RobotLightState,
 )
 async def get_robot_light_state(
-    hardware: ThreadManager = Depends(get_hardware),
+    hardware: HardwareControlAPI = Depends(get_hardware),
 ) -> control.RobotLightState:
     light_state = hardware.get_lights()
     return control.RobotLightState(on=light_state.get("rails", False))
@@ -139,13 +141,15 @@ async def get_robot_light_state(
 )
 async def post_robot_light_state(
     robot_light_state: control.RobotLightState,
-    hardware: ThreadManager = Depends(get_hardware),
+    hardware: HardwareControlAPI = Depends(get_hardware),
 ) -> control.RobotLightState:
     await hardware.set_lights(rails=robot_light_state.on)
     return robot_light_state
 
 
-async def _do_move(hardware: ThreadManager, robot_move_target: control.RobotMoveTarget):
+async def _do_move(
+    hardware: HardwareControlAPI, robot_move_target: control.RobotMoveTarget
+):
     """Perform the move"""
 
     await hardware.cache_instruments()

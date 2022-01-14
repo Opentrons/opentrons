@@ -52,6 +52,10 @@ test-g-code-swift-smoke:
 test-g-code-swift-turbo:
 	$(pytest) -m 'slow' -k 'test_swift_turbo' $(tests) $(test_opts)
 
+.PHONY: test-g-code-omega
+test-g-code-omega:
+	$(pytest) -m 'slow' -k 'test_omega_biotek_magbind_totalpure_ngs' $(tests) $(test_opts)
+
 .PHONY: lint
 lint:
 	$(python) -m mypy g_code_parsing $(tests_to_typecheck)

@@ -251,4 +251,46 @@ describe('RunSetupCard', () => {
     fireEvent.click(proceedToRun)
     getByText('Mock Proceed To Run')
   })
+  it('defaults to labware step expanded if calibration complete and no modules present', async () => {
+    mockUseProtocolDetails.mockReturnValue({
+      protocolData: noModulesProtocol,
+    } as any)
+
+    const { queryByText, getByText } = render()
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    expect(getByText('Mock Labware Setup')).toBeVisible()
+    expect(queryByText(/mock module setup/i)).toBeNull()
+  })
+  it('defaults to module step expanded if calibration complete and modules present', async () => {
+    mockUseProtocolDetails.mockReturnValue({
+      protocolData: withModulesProtocol,
+    } as any)
+
+    const { queryByText, getByText } = render()
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    expect(getByText('Mock Module Setup')).toBeVisible()
+    expect(queryByText(/mock labware setup/i)).not.toBeVisible()
+  })
+  it('defaults to robot cal expanded if calibration incomplete and no modules present', async () => {
+    mockUseProtocolDetails.mockReturnValue({
+      protocolData: noModulesProtocol,
+    } as any)
+    mockUseProtocolCalibrationStatus.mockReturnValue({ complete: false })
+
+    const { queryByText, getByText } = render()
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    expect(getByText('Mock Robot Calibration')).toBeVisible()
+    expect(queryByText(/mock labware setup/i)).not.toBeVisible()
+  })
+  it('defaults to robot cal expanded if calibration incomplete and modules present', async () => {
+    mockUseProtocolDetails.mockReturnValue({
+      protocolData: withModulesProtocol,
+    } as any)
+    mockUseProtocolCalibrationStatus.mockReturnValue({ complete: false })
+
+    const { queryByText, getByText } = render()
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    expect(getByText('Mock Robot Calibration')).toBeVisible()
+    expect(queryByText(/mock module setup/i)).not.toBeVisible()
+  })
 })
