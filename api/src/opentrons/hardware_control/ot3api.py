@@ -1,5 +1,6 @@
 import asyncio
 import contextlib
+from functools import partial
 from dataclasses import replace
 import logging
 from collections import OrderedDict
@@ -54,6 +55,11 @@ from . import modules
 from .robot_calibration import RobotCalibrationProvider, load_pipette_offset
 from .protocols import HardwareControlAPI
 from .instrument_handler import InstrumentHandlerProvider
+from .motion_utilities import (
+    target_position_from_absolute,
+    target_position_from_relative,
+    target_position_from_plunger,
+)
 
 from opentrons_shared_data.pipette.dev_types import UlPerMmAction, PipetteName
 
@@ -507,8 +513,14 @@ class OT3API(
                 # either we were passed False for our acquire_lock and we
                 # should pass it on, or we acquired the lock above and
                 # shouldn't do it again
-                await self._move_plunger(
-                    checked_mount, (instr.config.bottom,), acquire_lock=False
+                target_pos, _, secondary_z = target_position_from_plunger(
+                    checked_mount, (instr.config.bottom,), self._current_position
+                )
+                await self._move(
+                    target_pos,
+                    acquire_lock=False,
+                    secondary_z=secondary_z,
+                    home_flagged_axes=False,
                 )
 
     async def home_plunger(self, mount: top_types.Mount):
@@ -727,47 +739,12 @@ class OT3API(
         if not self._current_position:
             await self.home()
 
-        mounts = self.mounts(mount)
-        primary_mount = mounts[0]
-        secondary_mount = None
-        # Even with overloads, mypy cannot accept a length check on
-        # a tuple to confirm whether there are one or two mounts
-        # see: https://github.com/python/mypy/issues/1178
-        if len(mounts) > 1:
-            secondary_mount = mounts[1]  # type: ignore
-
-        mount_offset = self._config.left_mount_offset
-        if primary_mount == top_types.Mount.LEFT:
-            primary_offset = top_types.Point(*mount_offset)
-            s_offset = top_types.Point(0, 0, 0)
-        else:
-            primary_offset = top_types.Point(0, 0, 0)
-            s_offset = top_types.Point(*mount_offset)
-
-        if secondary_mount:
-            primary_z = Axis.by_mount(primary_mount)
-            secondary_z = Axis.by_mount(secondary_mount)
-            primary_cp = self.critical_point_for(primary_mount, critical_point)
-            s_cp = self.critical_point_for(secondary_mount, critical_point)
-            target_position = OrderedDict(
-                (
-                    (Axis.X, abs_position.x - primary_offset.x - primary_cp.x),
-                    (Axis.Y, abs_position.y - primary_offset.y - primary_cp.y),
-                    (primary_z, abs_position.z - primary_offset.z - primary_cp.z),
-                    (secondary_z, abs_position.z - s_offset.z - s_cp.z),
-                )
-            )
-        else:
-            primary_cp = self.critical_point_for(primary_mount, critical_point)
-            primary_z = Axis.by_mount(primary_mount)
-            secondary_z = None
-            target_position = OrderedDict(
-                (
-                    (Axis.X, abs_position.x - primary_offset.x - primary_cp.x),
-                    (Axis.Y, abs_position.y - primary_offset.y - primary_cp.y),
-                    (primary_z, abs_position.z - primary_offset.z - primary_cp.z),
-                )
-            )
+        target_position, primary_mount, secondary_z = target_position_from_absolute(
+            mount,
+            abs_position,
+            partial(self.critical_point_for, cp_override=critical_point),
+            top_types.Point(*self._config.left_mount_offset),
+        )
 
         await self._cache_and_maybe_retract_mount(primary_mount)
         await self._move(
@@ -795,49 +772,23 @@ class OT3API(
         # TODO: Remove the fail_on_not_homed and make this the behavior all the time.
         # Having the optional arg makes the bug stick around in existing code and we
         # really want to fix it when we're not gearing up for a release.
-        mounts = self.mounts(mount)
-        if fail_on_not_homed:
-            axes_moving = [Axis.X, Axis.Y] + [Axis.by_mount(m) for m in mounts]
-            if (
-                not self._backend.is_homed([axis.name for axis in axes_moving])
-                or not self._current_position
-            ):
-                raise MustHomeError(
-                    "Cannot make a relative move because absolute position is unknown"
-                )
-        elif not self._current_position:
-            await self.home()
+        mhe = MustHomeError(
+            "Cannot make a relative move because absolute position is unknown"
+        )
+        if not self._current_position:
+            if fail_on_not_homed:
+                raise mhe
+            else:
+                await self.home()
 
-        primary_mount = mounts[0]
-        secondary_mount = None
-        # Even with overloads, mypy cannot accept a length check on
-        # a tuple to confirm whether there are one or two mounts
-        # see: https://github.com/python/mypy/issues/1178
-        if len(mounts) > 1:
-            secondary_mount = mounts[1]  # type: ignore
-
-        if secondary_mount:
-            primary_z = Axis.by_mount(primary_mount)
-            secondary_z = Axis.by_mount(secondary_mount)
-            target_position = OrderedDict(
-                (
-                    (Axis.X, self._current_position[Axis.X] + delta.x),
-                    (Axis.Y, self._current_position[Axis.Y] + delta.y),
-                    (primary_z, self._current_position[primary_z] + delta.z),
-                    (secondary_z, self._current_position[secondary_z] + delta.z),
-                )
-            )
-        else:
-            z_axis = Axis.by_mount(primary_mount)
-            secondary_z = None
-            target_position = OrderedDict(
-                (
-                    (Axis.X, self._current_position[Axis.X] + delta.x),
-                    (Axis.Y, self._current_position[Axis.Y] + delta.y),
-                    (z_axis, self._current_position[z_axis] + delta.z),
-                )
-            )
-
+        target_position, primary_mount, secondary_z = target_position_from_relative(
+            mount, delta, self._current_position
+        )
+        axes_moving = [Axis.X, Axis.Y, Axis.by_mount(primary_mount), secondary_z]
+        if fail_on_not_homed and not self._backend.is_homed(
+            [axis.name for axis in axes_moving if axis is not None]
+        ):
+            raise mhe
         await self._cache_and_maybe_retract_mount(primary_mount)
         await self._move(
             target_position,
@@ -858,63 +809,6 @@ class OT3API(
         if mount != self._last_moved_mount and self._last_moved_mount:
             await self.retract(self._last_moved_mount, 10)
         self._last_moved_mount = mount
-
-    async def _move_plunger(
-        self,
-        mount: Union[top_types.Mount, PipettePair],
-        dist: Sequence[float],
-        speed: float = None,
-        acquire_lock: bool = True,
-    ):
-        all_axes_pos = OrderedDict(
-            (
-                (Axis.X, self._current_position[Axis.X]),
-                (Axis.Y, self._current_position[Axis.Y]),
-            )
-        )
-        plunger_pos = OrderedDict()
-        mounts = self.mounts(mount)
-        secondary_z = None
-        for idx, m in enumerate(mounts):
-            z = Axis.by_mount(m)
-            plunger = Axis.of_plunger(m)
-            all_axes_pos[z] = self._current_position[z]
-            plunger_pos[plunger] = dist[idx]
-            if idx == 1:
-                secondary_z = z
-        all_axes_pos.update(plunger_pos)
-        await self._move(
-            all_axes_pos,
-            speed,
-            False,
-            acquire_lock=acquire_lock,
-            secondary_z=secondary_z,
-        )
-
-    async def _move_relative_n_axes(
-        self,
-        mount: Union[top_types.Mount, PipettePair],
-        target: Sequence[float],
-        speed: float = None,
-    ):
-        all_axes_pos = OrderedDict(
-            (
-                (Axis.X, self._current_position[Axis.X] + target[0]),
-                (Axis.Y, self._current_position[Axis.Y] + target[1]),
-            )
-        )
-        mounts = self.mounts(mount)
-        secondary_z = None
-        for (
-            idx,
-            m,
-        ) in enumerate(mounts):
-            z = Axis.by_mount(m)
-            t_index = idx + 2
-            all_axes_pos[z] = self._current_position[z] + target[t_index]
-            if idx == 1:
-                secondary_z = z
-        await self._move(all_axes_pos, speed=speed, secondary_z=secondary_z)
 
     def _get_transformed(
         self,
@@ -1129,7 +1023,15 @@ class OT3API(
                 instr[0], instr[0].blow_out_flow_rate, "aspirate"
             )
             bottom = (instr[0].config.bottom,)
-            await self._move_plunger(instr[1], bottom, speed=(speed * rate))
+            target_pos, _, secondary_z = target_position_from_plunger(
+                instr[1], bottom, self._current_position
+            )
+            await self._move(
+                target_pos,
+                speed=(speed * rate),
+                secondary_z=secondary_z,
+                home_flagged_axes=False,
+            )
             instr[0].ready_to_aspirate = True
 
     async def aspirate(
@@ -1193,7 +1095,15 @@ class OT3API(
         )
         try:
             self._backend.set_active_current(plunger_currents)
-            await self._move_plunger(mount, dist, speed=speed)
+            target_pos, _, secondary_z = target_position_from_plunger(
+                mount, dist, self._current_position
+            )
+            await self._move(
+                target_pos,
+                speed=speed,
+                secondary_z=secondary_z,
+                home_flagged_axes=False,
+            )
         except Exception:
             self._log.exception("Aspirate failed")
             for instr in instruments:
@@ -1257,7 +1167,15 @@ class OT3API(
 
         try:
             self._backend.set_active_current(plunger_currents)
-            await self._move_plunger(mount, dist, speed=speed)
+            target_pos, _, secondary_z = target_position_from_plunger(
+                mount, dist, self._current_position
+            )
+            await self._move(
+                target_pos,
+                speed=speed,
+                secondary_z=secondary_z,
+                home_flagged_axes=False,
+            )
         except Exception:
             self._log.exception("Dispense failed")
             for instr in instruments:
@@ -1286,7 +1204,15 @@ class OT3API(
             for instr in instruments
         )
         try:
-            await self._move_plunger(mount, blow_out, speed=speed)
+            target_pos, _, secondary_z = target_position_from_plunger(
+                mount, blow_out, self._current_position
+            )
+            await self._move(
+                target_pos,
+                speed=speed,
+                secondary_z=secondary_z,
+                home_flagged_axes=False,
+            )
         except Exception:
             self._log.exception("Blow out failed")
             raise
@@ -1384,7 +1310,14 @@ class OT3API(
         self._backend.set_active_current(plunger_currents)
         # Initialize plunger to bottom position
         bottom_positions = tuple(instr[0].config.bottom for instr in instruments)
-        await self._move_plunger(mount, bottom_positions)
+        target_absolute, _, secondary_z = target_position_from_plunger(
+            mount, bottom_positions, self._current_position
+        )
+        await self._move(
+            target_absolute,
+            secondary_z=secondary_z,
+            home_flagged_axes=False,
+        )
 
         if not presses or presses < 0:
             all_presses = tuple(
@@ -1417,11 +1350,25 @@ class OT3API(
                     for instr, incrt in zip(instruments, check_incr)
                 )
                 target_pos = (0, 0, *dist)
-                await self._move_relative_n_axes(mount, target_pos, pick_up_speed)
+                (
+                    target_absolute,
+                    primary_mount,
+                    secondary_z,
+                ) = target_position_from_relative(
+                    mount, target_pos, self._current_position
+                )
+                await self._move(
+                    target_absolute, speed=pick_up_speed, secondary_z=secondary_z
+                )
 
             # move nozzle back up
             backup_pos = (0, 0, *tuple(-d for d in dist))
-            await self._move_relative_n_axes(mount, backup_pos)
+            target_absolute, primary_mount, secondary_z = target_position_from_relative(
+                mount, backup_pos, self._current_position
+            )
+            await self._move(
+                target_absolute, speed=pick_up_speed, secondary_z=secondary_z
+            )
         for instr in instruments:
             instr[0].add_tip(tip_length=tip_length)
             instr[0].set_current_volume(0)
@@ -1499,9 +1446,24 @@ class OT3API(
 
         async def _drop_tip():
             self._backend.set_active_current(plunger_currents)
-            await self._move_plunger(mount, bottom)
+            target_pos, _, secondary_z = target_position_from_plunger(
+                mount, bottom, self._current_position
+            )
+            await self._move(
+                target_pos,
+                secondary_z=secondary_z,
+                home_flagged_axes=False,
+            )
             self._backend.set_active_current(drop_tip_currents)
-            await self._move_plunger(mount, droptip, speed=speed)
+            target_pos, _, secondary_z = target_position_from_plunger(
+                mount, droptip, self._current_position
+            )
+            await self._move(
+                target_pos,
+                speed=speed,
+                secondary_z=secondary_z,
+                home_flagged_axes=False,
+            )
             if home_after:
                 safety_margin = abs(max(bottom) - max(droptip))
                 smoothie_pos = await self._backend.fast_home(
@@ -1509,7 +1471,14 @@ class OT3API(
                 )
                 self._current_position = self._deck_from_smoothie(smoothie_pos)
                 self._backend.set_active_current(plunger_currents)
-                await self._move_plunger(mount, bottom)
+                target_pos, _, secondary_z = target_position_from_plunger(
+                    mount, bottom, self._current_position
+                )
+                await self._move(
+                    target_pos,
+                    secondary_z=secondary_z,
+                    home_flagged_axes=False,
+                )
 
         if any(["doubleDropTip" in instr[0].config.quirks for instr in instruments]):
             await _drop_tip()
