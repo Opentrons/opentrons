@@ -158,16 +158,6 @@ settings = [
         restart_required=False,
     ),
     SettingDefinition(
-        _id="enableHttpProtocolSessions",
-        title="Enable deprecated experimental HTTP protocol upload",
-        description=(
-            "This setting is deprecated and exists only for backwards compatibility."
-            " If you have been using this setting, we recommend you disable it and"
-            " transition to using the standard HTTP API added in version 5."
-        ),
-        restart_required=True,
-    ),
-    SettingDefinition(
         _id="enableOT3HardwareController",
         title="Enable experimental OT3 hardware controller",
         description=(
@@ -428,6 +418,16 @@ def _migrate12to13(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate13to14(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 14 of the feature flags file.
+
+    - Removes deprecated enableHttpProtocolSessions option
+    """
+    removals = ["enableHttpProtocolSessions"]
+    newmap = {k: v for k, v in previous.items() if k not in removals}
+    return newmap
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -442,6 +442,7 @@ _MIGRATIONS = [
     _migrate10to11,
     _migrate11to12,
     _migrate12to13,
+    _migrate13to14,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

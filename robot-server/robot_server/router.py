@@ -1,10 +1,6 @@
 """Application routes."""
 from fastapi import APIRouter, Depends, status
 
-from opentrons.config.feature_flags import (
-    enable_http_protocol_sessions as enable_deprecated_protocol_uploads,
-)
-
 from .constants import V1_TAG
 from .errors import LegacyErrorResponse
 from .health import health_router
@@ -16,7 +12,6 @@ from .service.legacy.routers import legacy_routes
 from .service.session.router import router as deprecated_session_router
 from .service.pipette_offset.router import router as pip_os_router
 from .service.labware.router import router as labware_router
-from .service.protocol.router import router as deprecated_protocol_router
 from .service.tip_length.router import router as tl_router
 from .service.notifications.router import router as notifications_router
 
@@ -50,18 +45,11 @@ router.include_router(
     dependencies=[Depends(check_version_header)],
 )
 
-if enable_deprecated_protocol_uploads():
-    router.include_router(
-        router=deprecated_protocol_router,
-        tags=["Protocol Management"],
-        dependencies=[Depends(check_version_header)],
-    )
-else:
-    router.include_router(
-        router=protocols_router,
-        tags=["Protocol Management"],
-        dependencies=[Depends(check_version_header)],
-    )
+router.include_router(
+    router=protocols_router,
+    tags=["Protocol Management"],
+    dependencies=[Depends(check_version_header)],
+)
 
 router.include_router(
     router=deprecated_session_router,

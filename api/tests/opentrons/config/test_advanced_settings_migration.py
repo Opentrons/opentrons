@@ -7,7 +7,7 @@ from opentrons.config.advanced_settings import _migrate, _ensure
 
 @pytest.fixture
 def migrated_file_version() -> int:
-    return 13
+    return 14
 
 
 @pytest.fixture
@@ -19,7 +19,6 @@ def default_file_settings() -> Dict[str, Optional[bool]]:
         "useOldAspirationFunctions": None,
         "disableLogAggregation": None,
         "enableDoorSafetySwitch": None,
-        "enableHttpProtocolSessions": None,
         "disableFastProtocolUpload": None,
         "enableOT3HardwareController": None,
     }
@@ -185,6 +184,14 @@ def v13_config(v12_config):
     return r
 
 
+@pytest.fixture
+def v14_config(v13_config):
+    r = v13_config.copy()
+    r.pop("enableHttpProtocolSessions")
+    r.update({"_version": 14})
+    return r
+
+
 @pytest.fixture(
     scope="session",
     params=[
@@ -203,6 +210,7 @@ def v13_config(v12_config):
         lazy_fixture("v11_config"),
         lazy_fixture("v12_config"),
         lazy_fixture("v13_config"),
+        lazy_fixture("v14_config"),
     ],
 )
 def old_settings(request):
@@ -271,7 +279,6 @@ def test_ensures_config():
         "useOldAspirationFunctions": None,
         "disableLogAggregation": True,
         "enableDoorSafetySwitch": None,
-        "enableHttpProtocolSessions": None,
         "disableFastProtocolUpload": None,
         "enableOT3HardwareController": None,
     }
