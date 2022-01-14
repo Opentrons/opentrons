@@ -18,12 +18,6 @@ stages:
             description: !re_search 'Trash box is 55mm tall'
             restart_required: false
             value: !anything
-          - id: calibrateToBottom
-            old_id: calibrate-to-bottom
-            title: Calibrate to bottom
-            description: !re_search 'Calibrate using the bottom-center'
-            restart_required: false
-            value: !anything
           - id: deckCalibrationDots
             old_id: dots-deck-type
             title: Deck calibration to dots
@@ -78,7 +72,6 @@ marks:
       key: id
       vals:
         - shortFixedTrash
-        - calibrateToBottom
         - deckCalibrationDots
         - disableHomeOnBoot
         - useOldAspirationFunctions
@@ -116,7 +109,6 @@ marks:
       key: id
       vals:
         - shortFixedTrash
-        - calibrateToBottom
         - deckCalibrationDots
         - disableHomeOnBoot
         - useOldAspirationFunctions
