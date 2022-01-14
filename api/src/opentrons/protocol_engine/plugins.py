@@ -37,20 +37,6 @@ class AbstractPlugin(ActionHandler, ABC):
         """
         return self._action_dispatcher.dispatch(action)
 
-    @final
-    def dispatch_threadsafe(self, action: Action) -> None:
-        """Dispatch an action into the action pipeline from a child thread.
-
-        Child thread must be created with `anyio.to_thread`.
-
-        Arguments:
-            action: A new ProtocolEngine action to send into the pipeline.
-                This action will flow through all plugins, including
-                this one, so be careful to avoid infinite loops. In general,
-                do not dispatch an action your plugin will react to.
-        """
-        return from_thread.run_sync(self._action_dispatcher.dispatch, action)
-
     def setup(self) -> None:
         """Run any necessary setup steps prior to plugin usage."""
         ...
