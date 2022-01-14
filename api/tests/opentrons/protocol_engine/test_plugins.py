@@ -44,7 +44,7 @@ def test_configure(
     decoy.verify(action_dispatcher.dispatch(action))
 
 
-def test_setup_teardown(
+async def test_setup_teardown(
     decoy: Decoy,
     state_view: StateView,
     action_dispatcher: ActionDispatcher,
@@ -55,22 +55,22 @@ def test_setup_teardown(
 
     subject = PluginStarter(state=state_view, action_dispatcher=action_dispatcher)
 
-    subject.start(plugin_1)
+    await subject.start(plugin_1)
     decoy.verify(
         plugin_1._configure(state=state_view, action_dispatcher=action_dispatcher),
         action_dispatcher.add_handler(plugin_1),
-        plugin_1.setup(),
+        await plugin_1.setup(),
     )
 
-    subject.start(plugin_2)
+    await subject.start(plugin_2)
     decoy.verify(
         plugin_2._configure(state=state_view, action_dispatcher=action_dispatcher),
         action_dispatcher.add_handler(plugin_2),
-        plugin_2.setup(),
+        await plugin_2.setup(),
     )
 
-    subject.stop()
+    await subject.stop()
     decoy.verify(
-        plugin_1.teardown(),
-        plugin_2.teardown(),
+        await plugin_1.teardown(),
+        await plugin_2.teardown(),
     )

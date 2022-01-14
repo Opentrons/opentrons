@@ -187,6 +187,7 @@ class ProtocolRunner:
         protocol = self._legacy_file_reader.read(protocol_source)
         context = self._legacy_context_creator.create(protocol)
 
+        # Ugh, does load have to be async now too?
         self._protocol_engine.add_plugin(
             LegacyContextPlugin(
                 hardware_api=self._hardware_api,

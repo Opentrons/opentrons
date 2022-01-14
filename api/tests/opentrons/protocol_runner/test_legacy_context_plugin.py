@@ -106,7 +106,7 @@ def test_pause_action(
     decoy.verify(hardware_api.pause(PauseType.PAUSE), times=1)
 
 
-def test_broker_subscribe_unsubscribe(
+async def test_broker_subscribe_unsubscribe(
     decoy: Decoy,
     legacy_context: LegacyProtocolContext,
     legacy_command_mapper: LegacyCommandMapper,
@@ -134,15 +134,13 @@ def test_broker_subscribe_unsubscribe(
         legacy_context.module_load_broker.subscribe(callback=matchers.Anything())
     ).then_return(module_unsubscribe)
 
-    subject.setup()
-    subject.teardown()
+    await subject.setup()
+    await subject.teardown()
 
-    decoy.verify(
-        main_unsubscribe(),
-        labware_unsubscribe(),
-        instrument_unsubscribe(),
-        module_unsubscribe(),
-    )
+    decoy.verify(main_unsubscribe())
+    decoy.verify(labware_unsubscribe())
+    decoy.verify(instrument_unsubscribe())
+    decoy.verify(module_unsubscribe())
 
 
 async def test_main_broker_messages(
@@ -153,8 +151,7 @@ async def test_main_broker_messages(
     subject: LegacyContextPlugin,
 ) -> None:
     """It should dispatch commands from main broker messages."""
-    subject.setup()
-    subject.handle_action(pe_actions.PlayAction())
+    await subject.setup()
 
     handler_captor = matchers.Captor()
     decoy.verify(
@@ -184,6 +181,8 @@ async def test_main_broker_messages(
 
     await to_thread.run_sync(handler, legacy_command)
 
+    await subject.teardown()
+
     decoy.verify(
         action_dispatcher.dispatch(pe_actions.UpdateCommandAction(engine_command))
     )
@@ -199,7 +198,6 @@ async def test_labware_load_broker_messages(
 ) -> None:
     """It should dispatch commands from labware load broker messages."""
     subject.setup()
-    subject.handle_action(pe_actions.PlayAction())
 
     handler_captor = matchers.Captor()
 
@@ -245,7 +243,6 @@ async def test_instrument_load_broker_messages(
 ) -> None:
     """It should dispatch commands from instrument load broker messages."""
     subject.setup()
-    subject.handle_action(pe_actions.PlayAction())
 
     handler_captor = matchers.Captor()
 
@@ -288,8 +285,7 @@ async def test_module_load_broker_messages(
     subject: LegacyContextPlugin,
 ) -> None:
     """It should dispatch commands from module load broker messages."""
-    subject.setup()
-    subject.handle_action(pe_actions.PlayAction())
+    await subject.setup()
 
     handler_captor = matchers.Captor()
 
@@ -320,3 +316,5 @@ async def test_module_load_broker_messages(
     decoy.verify(
         action_dispatcher.dispatch(pe_actions.UpdateCommandAction(engine_command))
     )
+
+    # Forgetting to do teardown here. What happens?
