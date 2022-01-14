@@ -76,9 +76,9 @@ class ProtocolEngine:
         """Get an interface to retrieve calculated state values."""
         return self._state_store
 
-    def add_plugin(self, plugin: AbstractPlugin) -> None:
+    async def add_plugin(self, plugin: AbstractPlugin) -> None:
         """Add a plugin to the engine to customize behavior."""
-        self._plugin_starter.start(plugin)
+        await self._plugin_starter.start(plugin)
 
     def play(self) -> None:
         """Start or resume executing commands in the queue."""
@@ -196,7 +196,7 @@ class ProtocolEngine:
         finally:
             await self._hardware_stopper.do_stop_and_recover(drop_tips_and_home)
             self._action_dispatcher.dispatch(HardwareStoppedAction())
-            self._plugin_starter.stop()
+            await self._plugin_starter.stop()
 
     def add_labware_offset(self, request: LabwareOffsetCreate) -> LabwareOffset:
         """Add a new labware offset and return it.

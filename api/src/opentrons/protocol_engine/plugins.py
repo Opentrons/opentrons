@@ -37,11 +37,11 @@ class AbstractPlugin(ActionHandler, ABC):
         """
         return self._action_dispatcher.dispatch(action)
 
-    def setup(self) -> None:
+    async def setup(self) -> None:
         """Run any necessary setup steps prior to plugin usage."""
         ...
 
-    def teardown(self) -> None:
+    async def teardown(self) -> None:
         """Run any necessary teardown steps once the engine is stopped."""
         ...
 
@@ -90,16 +90,16 @@ class PluginStarter:
         self._action_dispatcher = action_dispatcher
         self._plugins: List[AbstractPlugin] = []
 
-    def start(self, plugin: AbstractPlugin) -> None:
+    async def start(self, plugin: AbstractPlugin) -> None:
         """Configure a given plugin and add it to the dispatch pipeline."""
         plugin._configure(state=self._state, action_dispatcher=self._action_dispatcher)
         self._plugins.append(plugin)
         self._action_dispatcher.add_handler(plugin)
-        plugin.setup()
+        await plugin.setup()
 
-    def stop(self) -> None:
+    async def stop(self) -> None:
         """Stop any configured plugins."""
         for p in self._plugins:
-            p.teardown()
+            await p.teardown()
 
         self._plugins = []
