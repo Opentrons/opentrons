@@ -15,6 +15,7 @@ import {
   C_DARK_GRAY,
   JUSTIFY_SPACE_BETWEEN,
   DIRECTION_COLUMN,
+  COLOR_WARNING_DARK,
 } from '@opentrons/components'
 import { AttachedModule } from '../../../../redux/modules/types'
 
@@ -47,7 +48,12 @@ export const UnMatchedModuleWarning = (
               <Box size={SIZE_2} paddingY={SPACING_1} paddingRight={SPACING_2}>
                 <Icon name="alert-circle" color={COLOR_WARNING} />
               </Box>
-              <Text as="h4" marginY={SPACING_2} id={`ModuleMismatch_title`}>
+              <Text
+                as="h4"
+                marginY={SPACING_2}
+                id={`ModuleMismatch_title`}
+                color={COLOR_WARNING_DARK}
+              >
                 {t('module_mismatch_title')}
               </Text>
             </Flex>
