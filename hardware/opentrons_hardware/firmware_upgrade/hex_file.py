@@ -10,6 +10,7 @@ from typing_extensions import Final
 
 class RecordType(int, Enum):
     """Enumeration of hex file record types."""
+
     Data = 0
     EOF = 1
     ExtendedSegmentAddress = 2
@@ -21,6 +22,7 @@ class RecordType(int, Enum):
 @dataclass(frozen=True)
 class HexRecord:
     """Represents a parsed line in a hex file."""
+
     byte_count: int
     address: int
     record_type: RecordType
@@ -42,6 +44,18 @@ class MalformedLineException(HexFileException):
 
 class ChecksumException(HexFileException):
     """Wrong checksum."""
+
+    pass
+
+
+class StartAddressException(HexFileException):
+    """Start address error."""
+
+    pass
+
+
+class BadChunkSizeException(HexFileException):
+    """Invalid chunk size."""
 
     pass
 
@@ -89,12 +103,12 @@ def process_line(line: str) -> HexRecord:
     checksum_index: Final = byte_count_index + byte_count
 
     # byte_count of data
-    data = binary_line[byte_count_index: checksum_index]
+    data = binary_line[byte_count_index:checksum_index]
 
     # Checksum from line
     checksum = binary_line[checksum_index]
     # compute checksum
-    computed_checksum = 0xFF & (~sum(binary_line[: checksum_index]) + 1)
+    computed_checksum = 0xFF & (~sum(binary_line[:checksum_index]) + 1)
 
     if computed_checksum != checksum:
         raise ChecksumException(f"Expected {checksum} but computed {computed_checksum}")
@@ -119,6 +133,7 @@ class HexRecordProcessor:
 
     Iterate through the process generator to get data chunks and start_address.
     """
+
     def __init__(self, records: Iterable[HexRecord]) -> None:
         """Constructor."""
         self._records = records
@@ -142,6 +157,7 @@ class HexRecordProcessor:
 
         """
         pass
+
 
 def ffff():
     x = from_hex_file_path(
