@@ -1,6 +1,6 @@
-import type { Command } from '@opentrons/shared-data'
+import type { RunTimeCommand } from '@opentrons/shared-data'
 import type {
-  LoadModuleCommand,
+  LoadModuleRunTimeCommand,
   ModuleLocation,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
@@ -10,10 +10,10 @@ interface ModuleInitialLoadInfo {
 }
 export const getModuleInitialLoadInfo = (
   moduleId: string,
-  commands: Command[]
+  commands: RunTimeCommand[]
 ): ModuleInitialLoadInfo => {
   const moduleLoadIndex = commands.findIndex(
-    (command: Command): command is LoadModuleCommand =>
+    (command: RunTimeCommand): command is LoadModuleRunTimeCommand =>
       command.commandType === 'loadModule' &&
       command.params.moduleId === moduleId
   )
@@ -35,7 +35,8 @@ export const getModuleInitialLoadInfo = (
     )
 
   return {
-    location: (commands[moduleLoadIndex] as LoadModuleCommand).params.location,
+    location: (commands[moduleLoadIndex] as LoadModuleRunTimeCommand).params
+      .location,
     protocolLoadOrder,
   }
 }

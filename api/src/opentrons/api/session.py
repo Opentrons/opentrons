@@ -23,11 +23,7 @@ from uuid import uuid4
 from opentrons.types import Mount as MountType
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
-from opentrons.api.util import (
-    RobotBusy,
-    robot_is_busy,
-    requires_http_protocols_disabled,
-)
+from opentrons.api.util import RobotBusy, robot_is_busy
 from opentrons.drivers.smoothie_drivers.errors import SmoothieAlarm
 from opentrons.broker import Broker
 from opentrons.config import feature_flags as ff
@@ -93,7 +89,6 @@ class SessionManager:
         self._broker.set_logger(self._command_logger)
         self._motion_lock = lock or ThreadedAsyncLock()
 
-    @requires_http_protocols_disabled
     def create(self, name: str, contents: str, is_binary: bool = False) -> Session:
         """Create a protocol session from either
 
@@ -147,7 +142,6 @@ class SessionManager:
         finally:
             self._session_lock = False
 
-    @requires_http_protocols_disabled
     def create_from_bundle(self, name: str, contents: str) -> Session:
         """Create a protocol session from a base64'd zip file.
 
@@ -184,7 +178,6 @@ class SessionManager:
         finally:
             self._session_lock = False
 
-    @requires_http_protocols_disabled
     def create_with_extra_labware(
         self, name: str, contents: str, extra_labware: List[LabwareDefinition]
     ) -> Session:

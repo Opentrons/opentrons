@@ -48,12 +48,6 @@ stages:
             description: !re_search 'Use an older, slower method of analyzing uploaded protocols'
             restart_required: false
             value: !anything
-          - id: enableHttpProtocolSessions
-            old_id: Null
-            title: Enable deprecated experimental HTTP protocol upload
-            description: !re_search 'This setting is deprecated'
-            restart_required: true
-            value: !anything
           - id: enableOT3HardwareController
             old_id: Null
             title: Enable experimental OT3 hardware controller
@@ -77,7 +71,6 @@ marks:
         - useOldAspirationFunctions
         - enableDoorSafetySwitch
         - disableFastProtocolUpload
-        - enableHttpProtocolSessions
   - parametrize:
       key: value
       vals:
@@ -114,7 +107,6 @@ marks:
         - useOldAspirationFunctions
         - enableDoorSafetySwitch
         - disableFastProtocolUpload
-        - enableHttpProtocolSessions
 stages:
   - name: Set each setting to acceptable values
     request:

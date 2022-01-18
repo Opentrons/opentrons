@@ -28,7 +28,7 @@ import { ProtocolSetupInfo } from './ProtocolSetupInfo'
 import { CommandItem } from './CommandItem'
 import type {
   ProtocolFile,
-  Command,
+  RunTimeCommand,
   CommandStatus,
 } from '@opentrons/shared-data'
 import type { RunCommandSummary } from '@opentrons/api-client'
@@ -55,7 +55,7 @@ export function CommandList(): JSX.Element | null {
           status: 'queued' as CommandStatus,
         }))
       : []
-  const allProtocolCommands: Command[] =
+  const allProtocolCommands: RunTimeCommand[] =
     protocolData != null ? analysisCommandsWithStatus : []
 
   const firstNonSetupIndex = allProtocolCommands.findIndex(
@@ -68,12 +68,12 @@ export function CommandList(): JSX.Element | null {
     0,
     firstNonSetupIndex
   )
-  const postSetupAnticipatedCommands: Command[] = allProtocolCommands.slice(
+  const postSetupAnticipatedCommands: RunTimeCommand[] = allProtocolCommands.slice(
     firstNonSetupIndex
   )
 
   interface CommandRuntimeInfo {
-    analysisCommand: Command | null // analysisCommand will only be null if protocol is nondeterministic
+    analysisCommand: RunTimeCommand | null // analysisCommand will only be null if protocol is nondeterministic
     runCommandSummary: RunCommandSummary | null
   }
 
@@ -89,7 +89,7 @@ export function CommandList(): JSX.Element | null {
     firstPlayTimestamp != null
   ) {
     const firstPostPlayRunCommandIndex = runDataCommands.findIndex(
-      command => command.id === postSetupAnticipatedCommands[0]?.id
+      command => command.key === postSetupAnticipatedCommands[0]?.key
     )
     const postPlayRunCommands =
       firstPostPlayRunCommandIndex >= 0
@@ -100,7 +100,7 @@ export function CommandList(): JSX.Element | null {
               analysisCommand:
                 postSetupAnticipatedCommands.find(
                   postSetupAnticipatedCommand =>
-                    runDataCommand.id === postSetupAnticipatedCommand.id
+                    runDataCommand.key === postSetupAnticipatedCommand.key
                 ) ?? null,
             }))
         : []
@@ -108,7 +108,7 @@ export function CommandList(): JSX.Element | null {
     const remainingAnticipatedCommands = dropWhile(
       postSetupAnticipatedCommands,
       anticipatedCommand =>
-        runDataCommands.some(runC => runC.id === anticipatedCommand.id)
+        runDataCommands.some(runC => runC.key === anticipatedCommand.key)
     ).map(remainingAnticipatedCommand => ({
       analysisCommand: remainingAnticipatedCommand,
       runCommandSummary: null,
@@ -118,8 +118,8 @@ export function CommandList(): JSX.Element | null {
       (isDeterministic, command, index) => {
         return (
           isDeterministic &&
-          command.runCommandSummary.id ===
-            postSetupAnticipatedCommands[index]?.id
+          command.runCommandSummary.key ===
+            postSetupAnticipatedCommands[index]?.key
         )
       },
       true
@@ -208,7 +208,7 @@ export function CommandList(): JSX.Element | null {
                       return (
                         <ProtocolSetupInfo
                           key={command.id}
-                          setupCommand={command as Command}
+                          setupCommand={command as RunTimeCommand}
                         />
                       )
                     })}

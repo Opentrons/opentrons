@@ -17,11 +17,11 @@ import * as discoverySelectors from '../../../redux/discovery/selectors'
 import * as protocolSelectors from '../../../redux/protocol/selectors'
 import * as customLabwareSelectors from '../../../redux/custom-labware/selectors'
 import * as protocolUtils from '../../../redux/protocol/utils'
-import { ConfirmCancelModal } from '../../../pages/Run/RunLog'
+import { ConfirmCancelModal } from '../../RunDetails/ConfirmCancelModal'
 import { useProtocolDetails } from '../../RunDetails/hooks'
 import { ConfirmExitProtocolUploadModal } from '../ConfirmExitProtocolUploadModal'
 import { mockCalibrationStatus } from '../../../redux/calibration/__fixtures__'
-import { useRunStatus } from '../../RunTimeControl/hooks'
+import { useRunStatus, useRunControls } from '../../RunTimeControl/hooks'
 import { useCurrentProtocolRun } from '../hooks/useCurrentProtocolRun'
 import { useCloseCurrentRun } from '../hooks/useCloseCurrentRun'
 import { ProtocolUpload } from '..'
@@ -37,7 +37,7 @@ jest.mock('../hooks/useCloseCurrentRun')
 jest.mock('../ConfirmExitProtocolUploadModal')
 jest.mock('../../../redux/robot/selectors')
 jest.mock('../../RunTimeControl/hooks')
-jest.mock('../../../pages/Run/RunLog')
+jest.mock('../../RunDetails/ConfirmCancelModal')
 
 const getProtocolFile = protocolSelectors.getProtocolFile as jest.MockedFunction<
   typeof protocolSelectors.getProtocolFile
@@ -56,6 +56,9 @@ const mockConfirmExitProtocolUploadModal = ConfirmExitProtocolUploadModal as jes
 >
 const mockUseRunStatus = useRunStatus as jest.MockedFunction<
   typeof useRunStatus
+>
+const mockUseRunControls = useRunControls as jest.MockedFunction<
+  typeof useRunControls
 >
 const mockUseCurrentProtocolRun = useCurrentProtocolRun as jest.MockedFunction<
   typeof useCurrentProtocolRun
@@ -113,6 +116,9 @@ describe('ProtocolUpload', () => {
       isProtocolRunLoaded: true,
     })
     when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_IDLE)
+    when(mockUseRunControls)
+      .calledWith()
+      .mockReturnValue({ pause: jest.fn() } as any)
   })
   afterEach(() => {
     resetAllWhenMocks()

@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import NamedTuple
 
 
@@ -6,7 +7,7 @@ class APIVersion(NamedTuple):
     minor: int
 
     @classmethod
-    def from_string(cls, inp: str) -> "APIVersion":
+    def from_string(cls, inp: str) -> APIVersion:
         parts = inp.split(".")
         if len(parts) != 2:
             raise ValueError(inp)

@@ -1,12 +1,7 @@
 import logging
 from typing import cast
 
-from opentrons.config.feature_flags import enable_http_protocol_sessions
-
-from robot_server.service.session.errors import (
-    UnsupportedFeature,
-    SessionCreationException,
-)
+from robot_server.service.session.errors import UnsupportedFeature
 from robot_server.service.session.models.session import (
     SessionType,
     ProtocolResponseAttributes,
@@ -45,9 +40,6 @@ class ProtocolSession(BaseSession):
         cls, configuration: SessionConfiguration, instance_meta: SessionMetaData
     ) -> "BaseSession":
         """Try to create the protocol session"""
-        if not enable_http_protocol_sessions():
-            raise SessionCreationException("HTTP Protocol Session feature is disabled")
-
         protocol = configuration.protocol_manager.get(
             cast(ProtocolCreateParams, instance_meta.create_params).protocolId
         )

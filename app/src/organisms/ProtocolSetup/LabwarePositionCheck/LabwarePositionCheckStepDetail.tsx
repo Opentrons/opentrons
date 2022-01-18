@@ -33,7 +33,7 @@ import levelWithTip from '../../../assets/images/lpc_level_with_tip.svg'
 import levelWithLabware from '../../../assets/images/lpc_level_with_labware.svg'
 import type { Jog } from '../../../molecules/JogControls/types'
 import type {
-  LabwarePositionCheckCommand,
+  LabwarePositionCheckCreateCommand,
   LabwarePositionCheckMovementCommand,
   LabwarePositionCheckStep,
 } from './types'
@@ -57,7 +57,7 @@ export const LabwarePositionCheckStepDetail = (
   // filter out the TC open lid command as it does not have an associated pipette id
   const stepMovementCommands = selectedStep.commands.filter(
     (
-      command: LabwarePositionCheckCommand
+      command: LabwarePositionCheckCreateCommand
     ): command is LabwarePositionCheckMovementCommand =>
       command.commandType !== 'thermocycler/openLid'
   )

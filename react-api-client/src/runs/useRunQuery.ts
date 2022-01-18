@@ -6,10 +6,10 @@ import type { UseQueryResult, UseQueryOptions } from 'react-query'
 
 export function useRunQuery(
   runId: string | null,
-  options?: UseQueryOptions<Run | null>
-): UseQueryResult<Run | null> {
+  options?: UseQueryOptions<Run>
+): UseQueryResult<Run> {
   const host = useHost()
-  const query = useQuery(
+  const query = useQuery<Run>(
     [host, 'runs', runId],
     () =>
       getRun(host as HostConfig, runId as string).then(

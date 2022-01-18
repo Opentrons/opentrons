@@ -11,13 +11,13 @@ import { ProtocolSetupInfo } from './ProtocolSetupInfo'
 import { useProtocolDetails } from './hooks'
 import { getLabwareLocation } from '../ProtocolSetup/utils/getLabwareLocation'
 import { useLabwareRenderInfoById } from '../ProtocolSetup/hooks'
-import type { Command } from '@opentrons/shared-data'
+import type { RunTimeCommand } from '@opentrons/shared-data'
 
 const TRASH_ID = 'fixedTrash'
 
 interface Props {
-  analysisCommand: Command | null
-  runCommand: Command | null
+  analysisCommand: RunTimeCommand | null
+  runCommand: RunTimeCommand | null
 }
 export function CommandText(props: Props): JSX.Element | null {
   const { analysisCommand, runCommand } = props

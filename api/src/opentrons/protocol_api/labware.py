@@ -337,6 +337,28 @@ class Labware(DeckItem):
         """
         self._implementation.set_calibration(delta)
 
+    @requires_version(2, 12)
+    def set_offset(self, x: float, y: float, z: float) -> None:
+        """Set the labware's position offset.
+
+        The offset is a simple x, y, z vector in deck coordinates
+        (see :ref:`protocol-api-deck-coords`) that the motion system
+        will add to any movement targeting this labware instance.
+
+        The offset will *not* apply to any other labware instances,
+        even if those labware are of the same type.
+
+        .. caution::
+            This method is *only* for Jupyter and command-line applications
+            of the Python Protocol API. Do not use this method in a protocol
+            uploaded via the Opentrons App.
+
+            Using this method and the Opentrons App's Labware Position Check
+            at the same time will produce undefined behavior. We may choose
+            to define this behavior in a future release.
+        """
+        self._implementation.set_calibration(Point(x=x, y=y, z=z))
+
     @property  # type: ignore
     @requires_version(2, 0)
     def calibrated_offset(self) -> Point:

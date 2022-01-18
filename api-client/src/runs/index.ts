@@ -10,5 +10,4 @@ export { createRunAction } from './createRunAction'
 export * from './createLabwareOffset'
 
 export * from './types'
-export * from './commands/types'
 export type { CreateRunData } from './createRun'
