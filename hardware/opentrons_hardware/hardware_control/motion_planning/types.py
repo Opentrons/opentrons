@@ -89,6 +89,8 @@ class Block:
     distance: np.float64
     initial_speed: np.float64
     acceleration: np.float64
+    final_speed: np.float64 = dataclasses.field(init=False)
+    time: np.float64 = dataclasses.field(init=False)
 
     def __init__(
         self,
@@ -100,21 +102,25 @@ class Block:
         self.distance = np.float64(distance)
         self.initial_speed = np.float64(initial_speed)
         self.acceleration = np.float64(acceleration)
+        self.__post_init__()
 
-    @property
-    def final_speed(self) -> np.float64:
-        """Get final speed of the block."""
-        return np.sqrt(self.initial_speed ** 2 + self.acceleration * self.distance * 2)
+    def __post_init__(self) -> None:
+        """Initialize field values in post-init processing."""
+        def _final_speed() -> np.float64:
+            """Get final speed of the block."""
+            return np.sqrt(self.initial_speed ** 2 + self.acceleration * self.distance * 2)
 
-    @property
-    def time(self) -> np.float64:
-        """Get the time it takes for the block to complete its motion."""
-        if self.acceleration:
-            return (self.final_speed - self.initial_speed) / self.acceleration
-        else:
-            if not self.initial_speed:
-                return np.float64(0.0)
-            return self.distance / self.initial_speed
+        def _time() -> np.float64:
+            """Get the time it takes for the block to complete its motion."""
+            if self.acceleration:
+                return (self.final_speed - self.initial_speed) / self.acceleration
+            else:
+                if not self.initial_speed:
+                    return np.float64(0.0)
+                return self.distance / self.initial_speed
+
+        self.final_speed = _final_speed()
+        self.time = _time()
 
 
 @dataclasses.dataclass(frozen=False)
@@ -162,7 +168,8 @@ class Move:
             for block in reversed(self.blocks):
                 if block.distance == 0:
                     continue
-            return block.final_speed
+                return block.final_speed
+            return np.float64(0.0)
 
         self.initial_speed = _initial_speed()
         self.final_speed = _final_speed()

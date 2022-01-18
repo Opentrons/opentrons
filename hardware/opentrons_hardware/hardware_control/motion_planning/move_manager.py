@@ -52,8 +52,8 @@ class MoveManager:
         self._clear_blend_log()
         to_blend = self._get_initial_moves_from_targets(origin, target_list)
         assert to_blend, "Check target list"
-        log.debug("Motion planning begins.")
         for i in range(iteration_limit):
+            # log.debug("Blend iteration: {i}")
             blend_log = []
             moveiter = iter(to_blend)
             first = next(moveiter)
@@ -70,18 +70,19 @@ class MoveManager:
                     if blend_log:
                         self._blend_log.append(blend_log)
                     break
-
-            if move_utils.all_blended(self._constraints, self._blend_log[i]):
+            if move_utils.all_blended(self._constraints, self._blend_log[-1]):
                 log.info(
-                    f"built {len(self._blend_log[i])} moves with "
-                    f"{sum(list(m.nonzero_blocks for m in self._blend_log[i]))} "
+                    f"built {len(self._blend_log[-1])} moves with "
+                    f"{sum(list(m.nonzero_blocks for m in self._blend_log[-1]))} "
                     f"non-zero blocks after {i+1} iteration(s)"
                 )
                 return True, self._blend_log
             else:
-                self._blend_log[i] = self._add_dummy_start_end_to_moves(
-                    self._blend_log[i]
+                self._blend_log[-1] = self._add_dummy_start_end_to_moves(
+                    self._blend_log[-1]
                 )
-                to_blend = self._blend_log[i]
+                to_blend = self._blend_log[-1]
+        # print(self._blend_log[0])
+        # print(self._blend_log[-1])
         log.error("Could not converge!")
         return False, self._blend_log
