@@ -355,7 +355,7 @@ class Labware(DeckItem):
 
             Using this method and the Opentrons App's Labware Position Check
             at the same time will produce undefined behavior. We may choose
-            to define this behavior in a future release
+            to define this behavior in a future release.
         """
         self._implementation.set_calibration(Point(x=x, y=y, z=z))
 
