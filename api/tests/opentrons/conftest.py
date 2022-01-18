@@ -110,13 +110,6 @@ def is_robot(monkeypatch):
 
 # -------feature flag fixtures-------------
 @pytest.fixture
-async def calibrate_bottom_flag():
-    await config.advanced_settings.set_adv_setting("calibrateToBottom", True)
-    yield
-    await config.advanced_settings.set_adv_setting("calibrateToBottom", False)
-
-
-@pytest.fixture
 async def short_trash_flag():
     await config.advanced_settings.set_adv_setting("shortFixedTrash", True)
     yield
@@ -135,6 +128,13 @@ async def enable_door_safety_switch():
     await config.advanced_settings.set_adv_setting("enableDoorSafetySwitch", True)
     yield
     await config.advanced_settings.set_adv_setting("enableDoorSafetySwitch", False)
+
+
+@pytest.fixture
+async def enable_ot3_hardware_controller():
+    await config.advanced_settings.set_adv_setting("enableOT3HardwareController", True)
+    yield
+    await config.advanced_settings.set_adv_setting("enableOT3HardwareController", False)
 
 
 # -----end feature flag fixtures-----------
@@ -184,6 +184,19 @@ async def hardware(request, loop, virtual_smoothie_env):
         hw_sim.clean_up()
 
 
+@pytest.mark.skipif(aionotify is None, reason="requires inotify (linux only)")
+@pytest.fixture
+async def ot3_hardware(request, loop, virtual_smoothie_env):
+    hw_sim = ThreadManager(API.build_hardware_simulator)
+    old_config = config.robot_configs.load()
+    try:
+        yield hw_sim
+    finally:
+        config.robot_configs.clear()
+        hw_sim.set_config(old_config)
+        hw_sim.clean_up()
+
+
 @pytest.fixture
 def main_router(loop, virtual_smoothie_env, hardware):
     router = MainRouter(hardware=hardware, loop=loop, lock=ThreadedAsyncLock())
@@ -215,6 +228,15 @@ async def wait_until(matcher, notifications, timeout=1, loop=None):
 async def ctx(loop, hardware) -> ProtocolContext:
     return ProtocolContext(
         implementation=ProtocolContextImplementation(hardware=hardware), loop=loop
+    )
+
+
+@pytest.fixture
+async def ot3_ctx(
+    loop, ot3_hardware, enable_ot3_hardware_controller
+) -> ProtocolContext:
+    return ProtocolContext(
+        implementation=ProtocolContextImplementation(hardware=ot3_hardware), loop=loop
     )
 
 

@@ -1,0 +1,50 @@
+{
+  "ordering": [["A1"]],
+  "metadata": {
+    "displayCategory": "trash",
+    "displayVolumeUnits": "mL",
+    "displayName": "Opentrons Fixed Trash",
+    "tags": []
+  },
+  "schemaVersion": 2,
+  "version": 1,
+  "namespace": "opentrons",
+  "dimensions": {
+    "xDimension": 210.75,
+    "yDimension": 79.75,
+    "zDimension": 93.5
+  },
+  "parameters": {
+    "format": "trash",
+    "isTiprack": false,
+    "loadName": "opentrons_1_trash_3200ml_fixed",
+    "isMagneticModuleCompatible": false,
+    "quirks": ["fixedTrash", "centerMultichannelOnWells", "touchTipDisabled"]
+  },
+  "wells": {
+    "A1": {
+      "shape": "rectangular",
+      "yDimension": 165.67,
+      "xDimension": 107.11,
+      "totalLiquidVolume": 3200000,
+      "depth": 187.5,
+      "x": 105.375,
+      "y": 39.875,
+      "z": 93.5
+    }
+  },
+  "brand": {
+    "brand": "Opentrons"
+  },
+  "groups": [
+    {
+      "wells": ["A1"],
+      "metadata": {}
+    }
+  ],
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  }
+}

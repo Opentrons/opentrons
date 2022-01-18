@@ -11,10 +11,14 @@ class MockPipettes:
     """Dummy pipette data to use in liquid handling collabortation tests."""
 
     left_config: PipetteDict = field(
-        default_factory=lambda: cast(PipetteDict, {"name": "p300_single"})
+        default_factory=lambda: cast(
+            PipetteDict, {"name": "p300_single", "pipette_id": "123"}
+        )
     )
     right_config: PipetteDict = field(
-        default_factory=lambda: cast(PipetteDict, {"name": "p300_multi"})
+        default_factory=lambda: cast(
+            PipetteDict, {"name": "p300_multi", "pipette_id": "abc"}
+        )
     )
 
     @property

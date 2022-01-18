@@ -7,14 +7,13 @@ from opentrons.config.advanced_settings import _migrate, _ensure
 
 @pytest.fixture
 def migrated_file_version() -> int:
-    return 12
+    return 13
 
 
 @pytest.fixture
 def default_file_settings() -> Dict[str, Optional[bool]]:
     return {
         "shortFixedTrash": None,
-        "calibrateToBottom": None,
         "deckCalibrationDots": None,
         "disableHomeOnBoot": None,
         "useOldAspirationFunctions": None,
@@ -178,6 +177,14 @@ def v12_config(v11_config):
     return r
 
 
+@pytest.fixture
+def v13_config(v12_config):
+    r = v12_config.copy()
+    r.pop("calibrateToBottom")
+    r.update({"_version": 13})
+    return r
+
+
 @pytest.fixture(
     scope="session",
     params=[
@@ -195,6 +202,7 @@ def v12_config(v11_config):
         lazy_fixture("v10_config"),
         lazy_fixture("v11_config"),
         lazy_fixture("v12_config"),
+        lazy_fixture("v13_config"),
     ],
 )
 def old_settings(request):
@@ -231,7 +239,6 @@ def test_migrates_versionless_old_config(migrated_file_version, default_file_set
     expected.update(
         {
             "shortFixedTrash": None,
-            "calibrateToBottom": None,
             "deckCalibrationDots": True,
             "disableHomeOnBoot": None,
         }
@@ -259,7 +266,6 @@ def test_ensures_config():
     ) == {
         "_version": 3,
         "shortFixedTrash": False,
-        "calibrateToBottom": None,
         "deckCalibrationDots": None,
         "disableHomeOnBoot": None,
         "useOldAspirationFunctions": None,

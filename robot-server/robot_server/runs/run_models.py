@@ -21,6 +21,10 @@ class RunCommandSummary(ResourceModel):
     """A stripped down model of a full Command for usage in a Run response."""
 
     id: str = Field(..., description="Unique command identifier.")
+    key: str = Field(
+        ...,
+        description="An identifier representing this command as a step in a protocol.",
+    )
     commandType: CommandType = Field(..., description="Specific type of command.")
     status: CommandStatus = Field(..., description="Execution status of the command.")
     errorId: Optional[str] = Field(

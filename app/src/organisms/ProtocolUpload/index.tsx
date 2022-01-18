@@ -52,6 +52,7 @@ import styles from './styles.css'
 const VALIDATION_ERROR_T_MAP: { [errorKey: string]: string } = {
   INVALID_FILE_TYPE: 'invalid_file_type',
   INVALID_JSON_FILE: 'invalid_json_file',
+  INVALID_PROTOCOL: 'invalid_protocol',
   ANALYSIS_ERROR: 'analysis_error',
 }
 
@@ -62,6 +63,7 @@ export function ProtocolUpload(): JSX.Element {
     createProtocolRun,
     protocolRecord,
     isCreatingProtocolRun,
+    protocolCreationError,
   } = useCurrentProtocolRun()
   const runStatus = useRunStatus()
   const { closeCurrentRun, isProtocolRunLoaded } = useCloseCurrentRun()
@@ -89,8 +91,13 @@ export function ProtocolUpload(): JSX.Element {
         VALIDATION_ERROR_T_MAP.ANALYSIS_ERROR,
         protocolRecord?.data.analyses[0].errors[0].detail as string,
       ])
+    } else if (protocolCreationError != null) {
+      setUploadError([
+        VALIDATION_ERROR_T_MAP.INVALID_PROTOCOL,
+        protocolCreationError,
+      ])
     }
-  }, [protocolRecord])
+  }, [protocolRecord, protocolCreationError])
 
   React.useEffect(() => {
     if (uploadError != null) {

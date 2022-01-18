@@ -5,10 +5,6 @@ def short_fixed_trash() -> bool:
     return advs.get_setting_with_env_overload("shortFixedTrash")
 
 
-def calibrate_to_bottom() -> bool:
-    return advs.get_setting_with_env_overload("calibrateToBottom")
-
-
 def dots_deck_type() -> bool:
     return advs.get_setting_with_env_overload("deckCalibrationDots")
 
