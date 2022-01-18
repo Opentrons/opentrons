@@ -70,7 +70,7 @@ def test_process_line(line: str, expected: hex_file.HexRecord) -> None:
     argnames=["line"],
     argvalues=[
         [
-            # Missing :
+            # Missing ':'
             "020000040800F2",
         ],
         [
@@ -121,7 +121,7 @@ def test_process_bad_checksum(line: str) -> None:
 def hex_records() -> Iterable[hex_file.HexRecord]:
     """A stream of hex records."""
     return [
-        # Data line
+        # Data record
         hex_file.HexRecord(
             byte_count=4,
             address=0x10,
@@ -137,7 +137,7 @@ def hex_records() -> Iterable[hex_file.HexRecord]:
             data=b"\x80\x00",
             checksum=0,
         ),
-        # Data line
+        # Data record
         hex_file.HexRecord(
             byte_count=4,
             address=0x0,
@@ -145,7 +145,7 @@ def hex_records() -> Iterable[hex_file.HexRecord]:
             data=b"\x04\x05\x06\x07",
             checksum=0,
         ),
-        # Data line that is not contiguous with prior record
+        # Data record that is not contiguous with prior record
         hex_file.HexRecord(
             byte_count=4,
             address=0x10,
@@ -153,6 +153,7 @@ def hex_records() -> Iterable[hex_file.HexRecord]:
             data=b"\x08\x09\x0a\x0b",
             checksum=0,
         ),
+        # Data record
         hex_file.HexRecord(
             byte_count=4,
             address=0x14,
@@ -160,7 +161,7 @@ def hex_records() -> Iterable[hex_file.HexRecord]:
             data=b"\x0c\x0d\x0e\x0f",
             checksum=0,
         ),
-        # Data line
+        # Data record
         hex_file.HexRecord(
             byte_count=4,
             address=0x18,
@@ -227,6 +228,16 @@ def hex_records() -> Iterable[hex_file.HexRecord]:
                 hex_file.Chunk(address=0x80000013, data=[11, 12, 13]),
                 hex_file.Chunk(address=0x80000016, data=[14, 15, 16]),
                 hex_file.Chunk(address=0x80000019, data=[17, 18, 19]),
+            ],
+        ],
+        [
+            5,
+            [
+                hex_file.Chunk(address=0x10, data=[0, 1, 2, 3]),
+                hex_file.Chunk(address=0x80000000, data=[4, 5, 6, 7]),
+                hex_file.Chunk(address=0x80000010, data=[8, 9, 10, 11, 12]),
+                hex_file.Chunk(address=0x80000015, data=[13, 14, 15, 16, 17]),
+                hex_file.Chunk(address=0x8000001A, data=[18, 19]),
             ],
         ],
     ],

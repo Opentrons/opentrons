@@ -154,7 +154,7 @@ class HexRecordProcessor:
         """
         return self._start_address
 
-    def process(self, chunk_size: int) -> Generator[Chunk, None, None]:
+    def process(self, chunk_size: int) -> Generator[Chunk, None, None]:  # noqa: C901
         """Process the records.
 
         Args:
@@ -204,6 +204,7 @@ class HexRecordProcessor:
                 if len(buffer):
                     # Still something in our buffer. Yield it.
                     yield Chunk(address=chunk_addr, data=buffer)
+                log.debug("Got EOF.")
                 break
             elif (
                 record.record_type == RecordType.StartSegmentAddress
