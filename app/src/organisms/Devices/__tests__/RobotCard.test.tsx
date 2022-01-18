@@ -18,6 +18,8 @@ import {
 import { useAttachedModules, useAttachedPipettes } from '../hooks'
 import { RobotCard } from '../RobotCard'
 
+import type { UseCurrentProtocolRun } from '../../ProtocolUpload/hooks'
+
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../hooks')
 
@@ -53,7 +55,7 @@ describe('RobotCard', () => {
       left: mockLeftProtoPipette,
       right: mockRightProtoPipette,
     })
-    mockUseCurrentProtocolRun.mockReturnValue({ createProtocolRun: () => {} })
+    mockUseCurrentProtocolRun.mockReturnValue({} as UseCurrentProtocolRun)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -84,9 +86,8 @@ describe('RobotCard', () => {
 
   it('renders an active robot status when a protocol is running', () => {
     mockUseCurrentProtocolRun.mockReturnValue({
-      createProtocolRun: () => {},
       runRecord: { data: { status: RUN_STATUS_RUNNING } } as Run,
-    })
+    } as UseCurrentProtocolRun)
 
     const [{ getByText }] = render()
 
@@ -95,12 +96,11 @@ describe('RobotCard', () => {
 
   it('does not render a protocol run banner when a protocol is not running', () => {
     mockUseCurrentProtocolRun.mockReturnValue({
-      createProtocolRun: () => {},
       runRecord: { data: { status: RUN_STATUS_IDLE } } as Run,
       protocolRecord: {
         data: { metadata: { protocolName: 'Testosaur' } },
       } as Protocol,
-    })
+    } as UseCurrentProtocolRun)
 
     const [{ queryByText }] = render()
 
@@ -112,12 +112,11 @@ describe('RobotCard', () => {
 
   it('renders a protocol run banner when a protocol is running', () => {
     mockUseCurrentProtocolRun.mockReturnValue({
-      createProtocolRun: () => {},
       runRecord: { data: { status: RUN_STATUS_RUNNING } } as Run,
       protocolRecord: {
         data: { metadata: { protocolName: 'Testosaur' } },
       } as Protocol,
-    })
+    } as UseCurrentProtocolRun)
 
     const [{ getByText }] = render()
 
