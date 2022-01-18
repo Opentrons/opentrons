@@ -1,11 +1,16 @@
+"""Hex file tools."""
 from pathlib import Path
 from dataclasses import dataclass
 from enum import Enum
-from typing import Iterable, List, Optional, Generator
+from typing import Iterable, List, Generator
 import binascii
 import struct
+import logging
 
 from typing_extensions import Final
+
+
+log = logging.getLogger(__name__)
 
 
 class RecordType(int, Enum):
@@ -124,6 +129,8 @@ def process_line(line: str) -> HexRecord:
 
 @dataclass(frozen=True)
 class Chunk:
+    """A chunk of memory."""
+
     address: int
     data: List[int]
 
@@ -137,13 +144,14 @@ class HexRecordProcessor:
     def __init__(self, records: Iterable[HexRecord]) -> None:
         """Constructor."""
         self._records = records
-        self._start_address: Optional[int] = None
+        self._start_address: int = 0
 
     @property
-    def start_address(self) -> Optional[int]:
+    def start_address(self) -> int:
         """Get the start address.
 
-        Only valid after process completes."""
+        Only valid after process completes.
+        """
         return self._start_address
 
     def process(self, chunk_size: int) -> Generator[Chunk, None, None]:
@@ -156,39 +164,50 @@ class HexRecordProcessor:
             Generates chunks.
 
         """
-        pass
+        if chunk_size <= 0:
+            raise BadChunkSizeException("chunk size must be greater than 0.")
 
+        # Address offset set by the StartLinearAddress record type
+        address_offset = 0
+        # The accumulated buffer that will yield a new Chunk
+        buffer: List[int] = []
+        # The start address of the next yielded Chunk
+        chunk_addr = 0
 
-def ffff():
-    x = from_hex_file_path(
-        Path(
-            "/Users/amit/firmware/ot3-firmware/build-cross/gantry/firmware/gantry-x.hex"
-        )
-    )
-    add_offset = 0
-    gg = []
-    data_size = 0
+        for record in self._records:
+            if record.record_type == RecordType.Data:
+                addr = record.address + address_offset
+                if not buffer:
+                    # There's nothing in our buffer. This record's address will be
+                    # the next chunk's address.
+                    chunk_addr = addr
+                elif addr != (chunk_addr + len(buffer)):
+                    # This new record is not contiguous. Yield the previous one.
+                    yield Chunk(address=chunk_addr, data=buffer)
+                    buffer = []
+                    chunk_addr = addr
 
-    for bb in x:
-        print(bb)
-        if bb.record_type == RecordType.StartLinearAddress:
-            add_offset = struct.unpack(">L", bb.data)[0]
-        elif bb.record_type == RecordType.ExtendedLinearAddress:
-            add_offset = struct.unpack(">H", bb.data)[0] << 16
-        elif bb.record_type == RecordType.Data:
-            # print(f"{add_offset + bb.address}-{add_offset + bb.address + len(bb.data)}")
-            gg.append((add_offset + bb.address, len(bb.data)))
-            data_size += len(bb.data)
-
-    p = None
-    for g in gg:
-        if p:
-            if p[0] + p[1] != g[0]:
-                print(f"{p}, {g}")
-        p = g
-
-    print(len(gg))
-    print(data_size)
-
-
-# ffff()
+                for byte in record.data:
+                    buffer.append(byte)
+                    if len(buffer) == chunk_size:
+                        # Yield chunk.
+                        yield Chunk(address=chunk_addr, data=buffer)
+                        chunk_addr += len(buffer)
+                        buffer = []
+            elif record.record_type == RecordType.StartLinearAddress:
+                self._start_address = struct.unpack(">L", record.data)[0]
+                log.debug(f"Start address {self._start_address}")
+            elif record.record_type == RecordType.ExtendedLinearAddress:
+                address_offset = struct.unpack(">H", record.data)[0] << 16
+                log.debug(f"New offset to {address_offset}")
+            elif record.record_type == RecordType.EOF:
+                if len(buffer):
+                    # Still something in our buffer. Yield it.
+                    yield Chunk(address=chunk_addr, data=buffer)
+                break
+            elif (
+                record.record_type == RecordType.StartSegmentAddress
+                or record.record_type == RecordType.ExtendedSegmentAddress
+            ):
+                # x86 specific. Ignoring.
+                log.warning(f"Found record type {record.record_type}. Ignoring.")

@@ -24,7 +24,8 @@ from opentrons_hardware.firmware_upgrade import hex_file
                 byte_count=16,
                 address=0x01C0,
                 record_type=hex_file.RecordType.Data,
-                data=b"\xE9\x45\x00\x08\xE9\x45\x00\x08\xE9\x45\x00\x08\xE9\x45\x00\x08",
+                data=b"\xE9\x45\x00\x08\xE9\x45\x00\x08"
+                b"\xE9\x45\x00\x08\xE9\x45\x00\x08",
                 checksum=0x57,
             ),
         ],
@@ -147,30 +148,22 @@ def hex_records() -> Iterable[hex_file.HexRecord]:
         # Data line that is not contiguous with prior record
         hex_file.HexRecord(
             byte_count=4,
-            address=0x0,
+            address=0x10,
             record_type=hex_file.RecordType.Data,
             data=b"\x08\x09\x0a\x0b",
             checksum=0,
         ),
         hex_file.HexRecord(
             byte_count=4,
-            address=0x4,
+            address=0x14,
             record_type=hex_file.RecordType.Data,
             data=b"\x0c\x0d\x0e\x0f",
-            checksum=0,
-        ),
-        # Segment offset
-        hex_file.HexRecord(
-            byte_count=2,
-            address=0,
-            record_type=hex_file.RecordType.ExtendedSegmentAddress,
-            data=b"\xab\xcd",
             checksum=0,
         ),
         # Data line
         hex_file.HexRecord(
             byte_count=4,
-            address=0,
+            address=0x18,
             record_type=hex_file.RecordType.Data,
             data=b"\x10\x11\x12\x13",
             checksum=0,
@@ -181,6 +174,14 @@ def hex_records() -> Iterable[hex_file.HexRecord]:
             address=0x100,
             record_type=hex_file.RecordType.StartLinearAddress,
             data=b"\x80\x90\xa0\xb0",
+            checksum=0,
+        ),
+        # EOF
+        hex_file.HexRecord(
+            byte_count=0,
+            address=0,
+            record_type=hex_file.RecordType.EOF,
+            data=b"",
             checksum=0,
         ),
     ]
@@ -194,9 +195,10 @@ def hex_records() -> Iterable[hex_file.HexRecord]:
             [
                 hex_file.Chunk(address=0x10, data=[0, 1, 2, 3]),
                 hex_file.Chunk(address=0x80000000, data=[4, 5, 6, 7]),
-                hex_file.Chunk(address=0x80000000, data=[8, 9, 10, 11]),
-                hex_file.Chunk(address=0x80000004, data=[12, 13, 14, 15]),
-                hex_file.Chunk(address=0x800ABCD4, data=[16, 17, 18, 19]),
+                hex_file.Chunk(
+                    address=0x80000010,
+                    data=[8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
+                ),
             ],
         ],
         [
@@ -206,12 +208,12 @@ def hex_records() -> Iterable[hex_file.HexRecord]:
                 hex_file.Chunk(address=0x12, data=[2, 3]),
                 hex_file.Chunk(address=0x80000000, data=[4, 5]),
                 hex_file.Chunk(address=0x80000002, data=[6, 7]),
-                hex_file.Chunk(address=0x80000004, data=[8, 9]),
-                hex_file.Chunk(address=0x80000006, data=[10, 11]),
-                hex_file.Chunk(address=0x80000004, data=[12, 13]),
-                hex_file.Chunk(address=0x80000006, data=[14, 15]),
-                hex_file.Chunk(address=0x800ABCD4, data=[16, 17]),
-                hex_file.Chunk(address=0x800ABCD6, data=[18, 19]),
+                hex_file.Chunk(address=0x80000010, data=[8, 9]),
+                hex_file.Chunk(address=0x80000012, data=[10, 11]),
+                hex_file.Chunk(address=0x80000014, data=[12, 13]),
+                hex_file.Chunk(address=0x80000016, data=[14, 15]),
+                hex_file.Chunk(address=0x80000018, data=[16, 17]),
+                hex_file.Chunk(address=0x8000001A, data=[18, 19]),
             ],
         ],
         [
@@ -220,12 +222,11 @@ def hex_records() -> Iterable[hex_file.HexRecord]:
                 hex_file.Chunk(address=0x10, data=[0, 1, 2]),
                 hex_file.Chunk(address=0x13, data=[3]),
                 hex_file.Chunk(address=0x80000000, data=[4, 5, 6]),
-                hex_file.Chunk(address=0x80000003, data=[7, 8, 9]),
-                hex_file.Chunk(address=0x80000006, data=[10, 11]),
-                hex_file.Chunk(address=0x80000004, data=[12, 13, 14]),
-                hex_file.Chunk(address=0x80000007, data=[15]),
-                hex_file.Chunk(address=0x800ABCD4, data=[16, 17, 18]),
-                hex_file.Chunk(address=0x800ABCD7, data=[19]),
+                hex_file.Chunk(address=0x80000003, data=[7]),
+                hex_file.Chunk(address=0x80000010, data=[8, 9, 10]),
+                hex_file.Chunk(address=0x80000013, data=[11, 12, 13]),
+                hex_file.Chunk(address=0x80000016, data=[14, 15, 16]),
+                hex_file.Chunk(address=0x80000019, data=[17, 18, 19]),
             ],
         ],
     ],
@@ -236,45 +237,12 @@ def test_process(
     """It should read n sized chunks from a stream of HexRecord objects."""
     subject = hex_file.HexRecordProcessor(records=hex_records)
 
-    data = list(subject.process(size)) == expected
-    assert data.start_address == 0x8090A0B0
+    assert list(subject.process(size)) == expected
+    assert subject.start_address == 0x8090A0B0
 
 
-def test_process_failure_no_start_address() -> None:
-    """It should fail if there's no start address."""
-    subject = hex_file.HexRecordProcessor(records=[])
-
-    with pytest.raises(hex_file.StartAddressException):
-        subject.process(1)
-
-
-def test_process_failure_multiple_start_address() -> None:
-    """It should fail if there are multiple start addresses."""
-    subject = hex_file.HexRecordProcessor(
-        records=[
-            hex_file.HexRecord(
-                byte_count=4,
-                address=0x100,
-                record_type=hex_file.RecordType.StartLinearAddress,
-                data=b"\x80\x90\xa0\xb0",
-                checksum=0,
-            ),
-            hex_file.HexRecord(
-                byte_count=4,
-                address=0x100,
-                record_type=hex_file.RecordType.StartLinearAddress,
-                data=b"\x80\x90\xa0\xb0",
-                checksum=0,
-            ),
-        ]
-    )
-
-    with pytest.raises(hex_file.StartAddressException):
-        subject.process(1)
-
-
-def test_process_failure_multiple_zero_size(hex_records: Iterable[hex_file.HexRecord]) -> None:
+def test_process_failure_zero_size(hex_records: Iterable[hex_file.HexRecord]) -> None:
     """It should fail if 0 is the requested size."""
     subject = hex_file.HexRecordProcessor(records=hex_records)
     with pytest.raises(hex_file.BadChunkSizeException):
-        subject.process(0)
+        list(subject.process(0))
