@@ -80,11 +80,11 @@ export const ExtraAttentionWarning = (
   ] = React.useState<ModuleTypesThatRequiresExtraAttention | null>(null)
   const { t } = useTranslation('protocol_setup')
   const [
-    showExtraAttentionWarning,
+    hideExtraAttentionWarning,
     setHideExtraAttentionWarning,
   ] = React.useState(false)
 
-  const isVisible = !showExtraAttentionWarning
+  const isVisible = !hideExtraAttentionWarning
   if (!isVisible) return null
 
   return (
