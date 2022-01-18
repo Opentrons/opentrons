@@ -81,10 +81,10 @@ export const ExtraAttentionWarning = (
   const { t } = useTranslation('protocol_setup')
   const [
     showExtraAttentionWarning,
-    setShowExtraAttentionWarning,
+    setHideExtraAttentionWarning,
   ] = React.useState(false)
 
-  const isVisible = !showExtraAttentionWarning && moduleTypes !== []
+  const isVisible = !showExtraAttentionWarning
   if (!isVisible) return null
 
   return (
@@ -101,7 +101,7 @@ export const ExtraAttentionWarning = (
         color={C_DARK_GRAY}
         id={'ExtraAttentionWarning'}
       >
-        <Flex flexDirection={DIRECTION_COLUMN} flex="auto" margin={SPACING_3}>
+        <Flex flexDirection={DIRECTION_COLUMN} margin={SPACING_3}>
           <Flex margin={SPACING_2} justifyContent={JUSTIFY_SPACE_BETWEEN}>
             <Flex>
               <Box size={SIZE_2} paddingY={SPACING_1} paddingRight={SPACING_2}>
@@ -118,7 +118,7 @@ export const ExtraAttentionWarning = (
             </Flex>
             <Btn
               size={SIZE_2}
-              onClick={() => setShowExtraAttentionWarning(true)}
+              onClick={() => setHideExtraAttentionWarning(true)}
               aria-label="close"
             >
               <Icon name={'close'} color={COLOR_WARNING} />
