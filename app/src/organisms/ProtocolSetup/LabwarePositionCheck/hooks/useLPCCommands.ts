@@ -1,8 +1,8 @@
-import { LabwarePositionCheckCommand } from '../types'
+import { LabwarePositionCheckCreateCommand } from '../types'
 import { useSteps } from './useSteps'
 
-export function useLPCCommands(): LabwarePositionCheckCommand[] {
-  return useSteps().reduce<LabwarePositionCheckCommand[]>(
+export function useLPCCommands(): LabwarePositionCheckCreateCommand[] {
+  return useSteps().reduce<LabwarePositionCheckCreateCommand[]>(
     (steps, currentStep) => {
       return [...steps, ...currentStep.commands]
     },

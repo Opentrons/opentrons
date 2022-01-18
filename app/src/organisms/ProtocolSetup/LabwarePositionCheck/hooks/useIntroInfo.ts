@@ -3,7 +3,7 @@ import { getPipetteMount } from '../../utils/getPipetteMount'
 import { getLabwareLocation } from '../../utils/getLabwareLocation'
 import { useSteps } from './useSteps'
 import { useSections } from './useSections'
-import type { PickUpTipCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+import type { PickUpTipCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import type { Section } from '../types'
 
 interface IntroInfo {
@@ -31,7 +31,7 @@ export function useIntroInfo(): IntroInfo | null {
   if (pickUpTipStep == null) return null // this state should never be reached
 
   const { pipetteId: primaryPipetteId } = (pickUpTipStep
-    .commands[0] as PickUpTipCommand).params
+    .commands[0] as PickUpTipCreateCommand).params
   const primaryPipetteMount = getPipetteMount(
     primaryPipetteId,
     protocolData.commands
