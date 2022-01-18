@@ -48,8 +48,8 @@ Some important directories:
 
 - `app/src` — Client-side React app run in Electron's [renderer process][electron-renderer]
 - API clients (see [`api/opentrons/server`][api-server-source])
-  - `app/src/rpc` - RPC API client
-  - `app/src/robot-api` - HTTP API client
+  - `api-client` - HTTP Robot API client
+  - `react-api-client` - react utilities for Robot API client
 - `app/webpack` - Webpack configuration helpers
 
 ## copy management

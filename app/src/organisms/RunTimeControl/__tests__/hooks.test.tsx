@@ -284,6 +284,8 @@ describe('useRunControls hook', () => {
     expect(mockPlayRun).toHaveBeenCalledTimes(1)
     act(() => result.current.pause())
     expect(mockPauseRun).toHaveBeenCalledTimes(1)
+    act(() => result.current.stop())
+    expect(mockStopRun).toHaveBeenCalledTimes(1)
     act(() => result.current.reset())
     expect(mockCloneRun).toHaveBeenCalledTimes(1)
   })

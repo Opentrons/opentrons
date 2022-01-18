@@ -17,12 +17,15 @@ import {
 import { Page } from '../../atoms/Page'
 import { Portal } from '../../App/portal'
 import { useProtocolDetails } from './hooks'
-import { useRunStatus, useRunStartTime } from '../RunTimeControl/hooks'
-import { ConfirmCancelModal } from '../../pages/Run/RunLog'
+import {
+  useRunStatus,
+  useRunStartTime,
+  useRunControls,
+} from '../RunTimeControl/hooks'
 import { ConfirmExitProtocolUploadModal } from '../ProtocolUpload/ConfirmExitProtocolUploadModal'
 import { useCloseCurrentRun } from '../ProtocolUpload/hooks/useCloseCurrentRun'
-import { useCurrentRunControls } from '../../pages/Run/RunLog/hooks'
 import { CommandList } from './CommandList'
+import { ConfirmCancelModal } from './ConfirmCancelModal'
 
 import styles from '../ProtocolUpload/styles.css'
 
@@ -39,19 +42,16 @@ export function RunDetails(): JSX.Element | null {
       ? RUN_STATUS_RUNNING
       : runStatus
 
-  const { pauseRun } = useCurrentRunControls()
+  const { pause } = useRunControls()
+  const [
+    showConfirmCancelModal,
+    setShowConfirmCancelModal,
+  ] = React.useState<boolean>(false)
 
-  const cancelRunAndExit = (): void => {
-    pauseRun()
-    confirmExit()
+  const handleCancelClick = (): void => {
+    pause()
+    setShowConfirmCancelModal(true)
   }
-
-  const {
-    showConfirmation: showConfirmExit,
-    confirm: confirmExit,
-    cancel: cancelExit,
-  } = useConditionalConfirm(cancelRunAndExit, true)
-
   const handleCloseProtocol: React.MouseEventHandler = _event => {
     closeCurrentRun()
   }
@@ -68,7 +68,7 @@ export function RunDetails(): JSX.Element | null {
 
   const cancelRunButton = (
     <NewAlertSecondaryBtn
-      onClick={cancelRunAndExit}
+      onClick={handleCancelClick}
       marginX={SPACING_3}
       paddingX={SPACING_2}
     >
@@ -112,7 +112,11 @@ export function RunDetails(): JSX.Element | null {
         </Portal>
       )}
       <Page titleBarProps={titleBarProps}>
-        {showConfirmExit ? <ConfirmCancelModal onClose={cancelExit} /> : null}
+        {showConfirmCancelModal ? (
+          <ConfirmCancelModal
+            onClose={() => setShowConfirmCancelModal(false)}
+          />
+        ) : null}
         <CommandList />
       </Page>
     </>

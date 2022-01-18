@@ -9,8 +9,3 @@ export interface NavLocation {
   notificationReason?: string | null
   warningReason?: string | null
 }
-
-export interface SubnavLocation {
-  path: string
-  disabledReason?: string | null
-}
