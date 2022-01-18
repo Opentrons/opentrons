@@ -2,7 +2,6 @@ import functools
 from abc import ABC, abstractmethod
 from typing import Any, cast, Callable, TypeVar
 
-from opentrons.config.feature_flags import enable_http_protocol_sessions
 from opentrons.hardware_control import ThreadedAsyncLock
 
 
@@ -33,25 +32,5 @@ def robot_is_busy(func: Func) -> Func:
                 return func(*args, **kwargs)
         else:
             return func(*args, **kwargs)
-
-    return cast(Func, decorated)
-
-
-def requires_http_protocols_disabled(func: Func) -> Func:
-    """Decorator that makes sure the enableHttpProtocolSessions is disabled
-    before proceeding.
-
-    :raises RuntimeError: if enableHttpProtocolSessions is enabled
-    """
-
-    @functools.wraps(func)
-    def decorated(*args: Any, **kwargs: Any) -> Any:
-        if enable_http_protocol_sessions():
-            raise RuntimeError(
-                "Please disable the 'Enable Experimental HTTP Protocol "
-                "Sessions' advanced setting for this robot if you'd like to "
-                "upload protocols from the Opentrons App"
-            )
-        return func(*args, **kwargs)
 
     return cast(Func, decorated)

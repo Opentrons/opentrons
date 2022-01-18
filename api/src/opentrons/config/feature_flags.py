@@ -21,10 +21,6 @@ def enable_door_safety_switch() -> bool:
     return advs.get_setting_with_env_overload("enableDoorSafetySwitch")
 
 
-def enable_http_protocol_sessions() -> bool:
-    return advs.get_setting_with_env_overload("enableHttpProtocolSessions")
-
-
 def disable_fast_protocol_upload() -> bool:
     return advs.get_setting_with_env_overload("disableFastProtocolUpload")
 
