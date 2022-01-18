@@ -172,7 +172,7 @@ async def create_run(
             engine_store.engine.add_labware_offset(offset_request)
 
     if protocol_resource is not None:
-        engine_store.runner.load(protocol_resource.source)
+        await engine_store.runner.load(protocol_resource.source)
 
     run = RunResource(
         run_id=run_id,

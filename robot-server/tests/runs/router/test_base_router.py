@@ -236,7 +236,7 @@ async def test_create_protocol_run(
         # It should have added each requested labware offset to the engine,
         # in the exact order they appear in the request.
         *[engine_store.engine.add_labware_offset(r) for r in LABWARE_OFFSET_REQUESTS],
-        engine_store.runner.load(protocol_resource.source),
+        await engine_store.runner.load(protocol_resource.source),
         run_store.upsert(run=run),
     )
 

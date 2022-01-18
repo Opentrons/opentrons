@@ -286,7 +286,7 @@ def test_load_python(
     )
 
 
-def test_load_legacy_python(
+async def test_load_legacy_python(
     decoy: Decoy,
     legacy_file_reader: LegacyFileReader,
     legacy_context_creator: LegacyContextCreator,
@@ -330,7 +330,7 @@ def test_load_legacy_python(
         legacy_context
     )
 
-    subject.load(legacy_protocol_source)
+    await subject.load(legacy_protocol_source)
 
     decoy.verify(
         protocol_engine.add_labware_definition(labware_definition),
@@ -343,7 +343,7 @@ def test_load_legacy_python(
     )
 
 
-def test_load_legacy_json(
+async def test_load_legacy_json(
     decoy: Decoy,
     legacy_file_reader: LegacyFileReader,
     legacy_context_creator: LegacyContextCreator,
@@ -382,7 +382,7 @@ def test_load_legacy_json(
         legacy_context
     )
 
-    subject.load(legacy_protocol_source)
+    await subject.load(legacy_protocol_source)
 
     decoy.verify(
         protocol_engine.add_labware_definition(labware_definition),
