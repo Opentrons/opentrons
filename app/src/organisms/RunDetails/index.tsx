@@ -44,7 +44,7 @@ export function RunDetails(): JSX.Element | null {
       ? RUN_STATUS_RUNNING
       : runStatus
 
-  const { pause } = useRunControls()
+  const { pause, play } = useRunControls()
   const [
     showConfirmCancelModal,
     setShowConfirmCancelModal,
@@ -115,6 +115,7 @@ export function RunDetails(): JSX.Element | null {
           <ConfirmExitProtocolUploadModal
             exit={confirmCloseExit}
             back={cancelCloseExit}
+            isRobotMoving={adjustedRunStatus === RUN_STATUS_RUNNING}
           />
         </Portal>
       )}
