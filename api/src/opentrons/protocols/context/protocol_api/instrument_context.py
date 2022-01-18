@@ -21,6 +21,10 @@ from opentrons.protocols.context.protocol import AbstractProtocol
 from opentrons.protocols.context.well import WellImplementation
 
 
+import logging
+log = logging.getLogger(__name__)
+
+
 class InstrumentContextImplementation(AbstractInstrument):
     """Implementation of the InstrumentContext interface."""
 
@@ -102,9 +106,11 @@ class InstrumentContextImplementation(AbstractInstrument):
             version=self._api_version,
         )
         for edge in edges:
+            log.debug("MAX: About to do touch_tip movement.")
             self._protocol_interface.get_hardware().hardware.move_to(
                 self._mount, edge, speed
             )
+            log.debug("MAX: Done touch_tip movement.")
 
     def pick_up_tip(
         self,

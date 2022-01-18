@@ -20,6 +20,10 @@ from .legacy_command_mapper import LegacyCommandMapper
 from .thread_async_queue import ThreadAsyncQueue, QueueClosed
 
 
+import logging
+log = logging.getLogger(__name__)
+
+
 class LegacyContextPlugin(AbstractPlugin):
     """A ProtocolEngine plugin wrapping a legacy ProtocolContext.
 
@@ -151,9 +155,11 @@ class LegacyContextPlugin(AbstractPlugin):
 
         Used as a broker callback, so this will run in the APIv2 protocol's thread.
         """
+        log.debug("MAX: Handling legacy command.")
         pe_actions = self._legacy_command_mapper.map_command(command=command)
         for pe_action in pe_actions:
             self._actions_to_dispatch.put(pe_action)
+        log.debug("MAX: Done handling legacy command.")
 
     def _handle_labware_loaded(self, labware_load_info: LegacyLabwareLoadInfo) -> None:
         """Handle a labware load reported by the APIv2 protocol.
@@ -198,7 +204,9 @@ class LegacyContextPlugin(AbstractPlugin):
         """
         while True:
             try:
+                log.debug("MAX: Dispatching action in event loop.")
                 action = await self._actions_to_dispatch.get_async()
+                log.debug("MAX: Done dispatching action in event loop.")
             except QueueClosed:
                 break
             else:
