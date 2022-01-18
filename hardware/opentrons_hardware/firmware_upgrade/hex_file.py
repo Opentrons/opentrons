@@ -1,7 +1,7 @@
 from pathlib import Path
 from dataclasses import dataclass
 from enum import Enum
-from typing import Iterator
+from typing import Iterable, List, Optional, Generator
 import binascii
 import struct
 
@@ -9,6 +9,7 @@ from typing_extensions import Final
 
 
 class RecordType(int, Enum):
+    """Enumeration of hex file record types."""
     Data = 0
     EOF = 1
     ExtendedSegmentAddress = 2
@@ -17,8 +18,9 @@ class RecordType(int, Enum):
     StartLinearAddress = 5
 
 
-@dataclass
-class HexLine:
+@dataclass(frozen=True)
+class HexRecord:
+    """Represents a parsed line in a hex file."""
     byte_count: int
     address: int
     record_type: RecordType
@@ -44,20 +46,20 @@ class ChecksumException(HexFileException):
     pass
 
 
-def from_hex_file_path(file_path: Path) -> Iterator[HexLine]:
+def from_hex_file_path(file_path: Path) -> Iterable[HexRecord]:
     """A generator that processes a hex file at file_path."""
     with file_path.open() as hex_file:
         for line in hex_file.readlines():
             yield process_line(line)
 
 
-def from_hex_contents(data: str) -> Iterator[HexLine]:
+def from_hex_contents(data: str) -> Iterable[HexRecord]:
     """A generator that processes a hex file contents."""
     for line in data.splitlines():
         yield process_line(line)
 
 
-def process_line(line: str) -> HexLine:
+def process_line(line: str) -> HexRecord:
     """Convert a line in a HEX file into a HexLine."""
     if len(line) < 11:
         # 11 = 1 (':') + 2 (byte count) + 4 (address) + 2 (record type) + 2 (checksum)
@@ -97,7 +99,7 @@ def process_line(line: str) -> HexLine:
     if computed_checksum != checksum:
         raise ChecksumException(f"Expected {checksum} but computed {computed_checksum}")
 
-    return HexLine(
+    return HexRecord(
         byte_count=byte_count,
         address=address,
         record_type=record_type,
@@ -105,6 +107,41 @@ def process_line(line: str) -> HexLine:
         checksum=checksum,
     )
 
+
+@dataclass(frozen=True)
+class Chunk:
+    address: int
+    data: List[int]
+
+
+class HexRecordProcessor:
+    """Process an iterable of hex records.
+
+    Iterate through the process generator to get data chunks and start_address.
+    """
+    def __init__(self, records: Iterable[HexRecord]) -> None:
+        """Constructor."""
+        self._records = records
+        self._start_address: Optional[int] = None
+
+    @property
+    def start_address(self) -> Optional[int]:
+        """Get the start address.
+
+        Only valid after process completes."""
+        return self._start_address
+
+    def process(self, chunk_size: int) -> Generator[Chunk, None, None]:
+        """Process the records.
+
+        Args:
+            chunk_size: The number of bytes in each chunk.
+
+        Returns:
+            Generates chunks.
+
+        """
+        pass
 
 def ffff():
     x = from_hex_file_path(
