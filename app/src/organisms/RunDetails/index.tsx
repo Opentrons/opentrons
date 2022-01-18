@@ -7,6 +7,8 @@ import {
   RUN_STATUS_RUNNING,
   RUN_STATUS_PAUSED,
   RUN_STATUS_PAUSE_REQUESTED,
+  RUN_STATUS_FINISHING,
+  RUN_STATUS_STOP_REQUESTED,
 } from '@opentrons/api-client'
 import {
   SPACING_2,
@@ -81,11 +83,16 @@ export function RunDetails(): JSX.Element | null {
   if (
     adjustedRunStatus === RUN_STATUS_RUNNING ||
     adjustedRunStatus === RUN_STATUS_PAUSED ||
-    adjustedRunStatus === RUN_STATUS_PAUSE_REQUESTED
+    adjustedRunStatus === RUN_STATUS_PAUSE_REQUESTED ||
+    adjustedRunStatus === RUN_STATUS_FINISHING
   ) {
     titleBarProps = {
       title: t('protocol_title', { protocol_name: displayName }),
       rightNode: cancelRunButton,
+    }
+  } else if (adjustedRunStatus === RUN_STATUS_STOP_REQUESTED) {
+    titleBarProps = {
+      title: t('protocol_title', { protocol_name: displayName }),
     }
   } else {
     titleBarProps = {

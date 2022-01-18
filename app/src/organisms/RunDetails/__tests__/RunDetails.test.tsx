@@ -7,6 +7,10 @@ import {
   RUN_STATUS_SUCCEEDED,
   RUN_STATUS_FAILED,
   RUN_STATUS_STOPPED,
+  RUN_STATUS_FINISHING,
+  RUN_STATUS_PAUSED,
+  RUN_STATUS_PAUSE_REQUESTED,
+  RUN_STATUS_STOP_REQUESTED,
 } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
 import { resetAllWhenMocks, when } from 'jest-when'
@@ -114,6 +118,29 @@ describe('RunDetails', () => {
     expect(getByText('yes, cancel run')).toBeTruthy()
   })
 
+  it('renders a cancel run button when the status is finishing', () => {
+    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_FINISHING)
+    const { getByRole } = render()
+    const button = getByRole('button', { name: 'Cancel Run' })
+    expect(button).toBeEnabled()
+  })
+
+  it('renders a cancel run button when the status is paused', () => {
+    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_PAUSED)
+    const { getByRole } = render()
+    const button = getByRole('button', { name: 'Cancel Run' })
+    expect(button).toBeEnabled()
+  })
+
+  it('renders a cancel run button when the status is pause requested', () => {
+    when(mockUseRunStatus)
+      .calledWith()
+      .mockReturnValue(RUN_STATUS_PAUSE_REQUESTED)
+    const { getByRole } = render()
+    const button = getByRole('button', { name: 'Cancel Run' })
+    expect(button).toBeEnabled()
+  })
+
   it('renders the protocol close button, button is clickable, and confirm close protocol modal is rendered when status is succeeded', () => {
     when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_SUCCEEDED)
     const { getByRole, getByText } = render()
@@ -151,6 +178,15 @@ describe('RunDetails', () => {
     ).toBeTruthy()
     expect(getByText('No, go back')).toBeTruthy()
     expect(getByText('Yes, close now')).toBeTruthy()
+  })
+
+  it('renders no button in the titlebar when the run status is stop requested', () => {
+    when(mockUseRunStatus)
+      .calledWith()
+      .mockReturnValue(RUN_STATUS_STOP_REQUESTED)
+    const { queryByRole } = render()
+    const button = queryByRole('button', { name: 'close' })
+    expect(button).not.toBeInTheDocument()
   })
 
   it('redirects to /upload if protocol run is not loaded', () => {
