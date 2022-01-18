@@ -479,7 +479,7 @@ def test_get_well_position_with_bottom_offset(
     )
 
 
-def test_get_effective_tip_length(
+def test_get_nominal_effective_tip_length(
     decoy: Decoy,
     labware_view: LabwareView,
     subject: GeometryView,
@@ -501,7 +501,7 @@ def test_get_effective_tip_length(
         "opentrons/opentrons_96_tiprack_300ul/1"
     )
 
-    length_eff = subject.get_effective_tip_length(
+    length_eff = subject.get_nominal_effective_tip_length(
         labware_id="tip-rack-id",
         pipette_config=pipette_config,
     )
@@ -512,7 +512,7 @@ def test_get_effective_tip_length(
         "opentrons/something_else/1"
     )
 
-    default_length_eff = subject.get_effective_tip_length(
+    default_length_eff = subject.get_nominal_effective_tip_length(
         labware_id="tip-rack-id",
         pipette_config=pipette_config,
     )
@@ -520,7 +520,7 @@ def test_get_effective_tip_length(
     assert default_length_eff == 40
 
 
-def test_get_tip_geometry(
+def test_get_nominal_tip_geometry(
     decoy: Decoy,
     tip_rack_def: LabwareDefinition,
     labware_view: LabwareView,
@@ -538,7 +538,7 @@ def test_get_tip_geometry(
         well_def
     )
 
-    tip_geometry = subject.get_tip_geometry(
+    tip_geometry = subject.get_nominal_tip_geometry(
         labware_id="tip-rack-id",
         well_name="B2",
         pipette_config=pipette_config,
@@ -549,7 +549,7 @@ def test_get_tip_geometry(
     assert tip_geometry.volume == well_def.totalLiquidVolume
 
 
-def test_get_tip_geometry_raises(
+def test_get_nominal_tip_geometry_raises(
     decoy: Decoy,
     tip_rack_def: LabwareDefinition,
     labware_view: LabwareView,
@@ -567,7 +567,7 @@ def test_get_tip_geometry_raises(
             well_def
         )
 
-        subject.get_tip_geometry(
+        subject.get_nominal_tip_geometry(
             labware_id="tip-rack-id", well_name="B2", pipette_config=pipette_config
         )
 

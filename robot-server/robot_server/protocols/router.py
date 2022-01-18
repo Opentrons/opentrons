@@ -9,13 +9,14 @@ from typing_extensions import Literal
 
 from opentrons.protocol_reader import ProtocolReader, ProtocolFilesInvalidError
 
-from robot_server.errors import ErrorDetails, ErrorResponse
+from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.task_runner import TaskRunner
 from robot_server.service.dependencies import get_unique_id, get_current_time
 from robot_server.service.json_api import (
-    SimpleResponse,
-    SimpleMultiResponse,
-    SimpleEmptyResponse,
+    SimpleBody,
+    SimpleMultiBody,
+    SimpleEmptyBody,
+    PydanticResponse,
 )
 
 from .protocol_models import Protocol, ProtocolFile, Metadata
@@ -63,9 +64,9 @@ protocols_router = APIRouter()
     ),
     status_code=status.HTTP_201_CREATED,
     responses={
-        status.HTTP_201_CREATED: {"model": SimpleResponse[Protocol]},
+        status.HTTP_201_CREATED: {"model": SimpleBody[Protocol]},
         status.HTTP_422_UNPROCESSABLE_ENTITY: {
-            "model": ErrorResponse[ProtocolFilesInvalid]
+            "model": ErrorBody[ProtocolFilesInvalid]
         },
     },
 )
@@ -79,7 +80,7 @@ async def create_protocol(
     protocol_id: str = Depends(get_unique_id, use_cache=False),
     analysis_id: str = Depends(get_unique_id, use_cache=False),
     created_at: datetime = Depends(get_current_time),
-) -> SimpleResponse[Protocol]:
+) -> PydanticResponse[SimpleBody[Protocol]]:
     """Create a new protocol by uploading its files.
 
     Arguments:
@@ -133,19 +134,22 @@ async def create_protocol(
     log.info(
         f'Created protocol "{protocol_id}"' f' and started analysis "{analysis_id}".'
     )
-    return SimpleResponse.construct(data=data)
+
+    return PydanticResponse(
+        content=SimpleBody.construct(data=data),
+        status_code=status.HTTP_201_CREATED,
+    )
 
 
 @protocols_router.get(
     path="/protocols",
     summary="Get uploaded protocols",
-    status_code=status.HTTP_200_OK,
-    responses={status.HTTP_200_OK: {"model": SimpleMultiResponse[Protocol]}},
+    responses={status.HTTP_200_OK: {"model": SimpleMultiBody[Protocol]}},
 )
 async def get_protocols(
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
-) -> SimpleMultiResponse[Protocol]:
+) -> PydanticResponse[SimpleMultiBody[Protocol]]:
     """Get a list of all currently uploaded protocols.
 
     Args:
@@ -165,23 +169,25 @@ async def get_protocols(
         for r in protocol_resources
     ]
 
-    return SimpleMultiResponse.construct(data=data)
+    return await PydanticResponse.create(
+        content=SimpleMultiBody.construct(data=data),
+        status_code=status.HTTP_200_OK,
+    )
 
 
 @protocols_router.get(
     path="/protocols/{protocolId}",
     summary="Get an uploaded protocol",
-    status_code=status.HTTP_200_OK,
     responses={
-        status.HTTP_200_OK: {"model": SimpleResponse[Protocol]},
-        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[ProtocolNotFound]},
+        status.HTTP_200_OK: {"model": SimpleBody[Protocol]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[ProtocolNotFound]},
     },
 )
 async def get_protocol_by_id(
     protocolId: str,
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
-) -> SimpleResponse[Protocol]:
+) -> PydanticResponse[SimpleBody[Protocol]]:
     """Get an uploaded protocol by ID.
 
     Args:
@@ -205,22 +211,24 @@ async def get_protocol_by_id(
         files=[ProtocolFile(name=f.name, role=f.role) for f in resource.source.files],
     )
 
-    return SimpleResponse.construct(data=data)
+    return PydanticResponse(
+        content=SimpleBody.construct(data=data),
+        status_code=status.HTTP_200_OK,
+    )
 
 
 @protocols_router.delete(
     path="/protocols/{protocolId}",
     summary="Delete an uploaded protocol",
-    status_code=status.HTTP_200_OK,
     responses={
-        status.HTTP_200_OK: {"model": SimpleEmptyResponse},
-        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse[ProtocolNotFound]},
+        status.HTTP_200_OK: {"model": SimpleEmptyBody},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[ProtocolNotFound]},
     },
 )
 async def delete_protocol_by_id(
     protocolId: str,
     protocol_store: ProtocolStore = Depends(get_protocol_store),
-) -> SimpleEmptyResponse:
+) -> PydanticResponse[SimpleEmptyBody]:
     """Delete an uploaded protocol by ID.
 
     Arguments:
@@ -233,4 +241,7 @@ async def delete_protocol_by_id(
     except ProtocolNotFoundError as e:
         raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
-    return SimpleEmptyResponse()
+    return PydanticResponse(
+        content=SimpleEmptyBody(),
+        status_code=status.HTTP_200_OK,
+    )

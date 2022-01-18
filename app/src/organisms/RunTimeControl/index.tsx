@@ -8,6 +8,7 @@ import {
   RUN_STATUS_STOP_REQUESTED,
   RUN_STATUS_STOPPED,
   RUN_STATUS_FAILED,
+  RUN_STATUS_FINISHING,
   RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
 import {
@@ -65,6 +66,7 @@ export function RunTimeControl(): JSX.Element | null {
   } = useRunControls()
 
   const [isRunActionLoading, setIsRunActionLoading] = React.useState(false)
+  const [isFinishing, setIsFinishing] = React.useState(false)
   const [lastRunAction, setLastRunAction] = React.useState<
     'play' | 'pause' | 'reset' | null
   >(null)
@@ -79,6 +81,8 @@ export function RunTimeControl(): JSX.Element | null {
     } else if (isResetRunLoading) {
       setIsRunActionLoading(true)
       setLastRunAction('reset')
+    } else if (!isFinishing && runStatus === 'finishing') {
+      setIsFinishing(true)
     }
 
     if (isRunActionLoading) {
@@ -95,6 +99,20 @@ export function RunTimeControl(): JSX.Element | null {
       if (lastRunAction === 'reset' && runStatus === RUN_STATUS_IDLE) {
         setIsRunActionLoading(false)
       }
+    }
+    if (isFinishing && runStatus !== 'finishing') {
+      setIsFinishing(false)
+    }
+    if (
+      (lastRunAction === 'play' || lastRunAction === 'pause') &&
+      runStatus === RUN_STATUS_STOP_REQUESTED
+    ) {
+      setIsRunActionLoading(true)
+    } else if (
+      (lastRunAction === 'play' || lastRunAction === 'pause') &&
+      (runStatus === RUN_STATUS_STOPPED || runStatus === RUN_STATUS_SUCCEEDED)
+    ) {
+      setIsRunActionLoading(false)
     }
   }, [
     isPlayRunActionLoading,
@@ -127,6 +145,7 @@ export function RunTimeControl(): JSX.Element | null {
   } else if (
     runStatus === RUN_STATUS_STOP_REQUESTED ||
     runStatus === RUN_STATUS_STOPPED ||
+    runStatus === RUN_STATUS_FINISHING ||
     runStatus === RUN_STATUS_FAILED ||
     runStatus === RUN_STATUS_SUCCEEDED
   ) {
@@ -166,10 +185,10 @@ export function RunTimeControl(): JSX.Element | null {
         justifyContent={JUSTIFY_CENTER}
         alignItems={ALIGN_CENTER}
         display={DISPLAY_FLEX}
-        disabled={disableRunCta || isRunActionLoading}
+        disabled={disableRunCta || isRunActionLoading || isFinishing}
         {...targetProps}
       >
-        {isRunActionLoading ? (
+        {isRunActionLoading || isFinishing ? (
           <Icon name="ot-spinner" size={SIZE_1} marginRight={SPACING_2} spin />
         ) : (
           buttonIcon

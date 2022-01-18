@@ -1,5 +1,7 @@
 import * as React from 'react'
+import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
+import { useInView } from 'react-intersection-observer'
 import {
   DIRECTION_ROW,
   Flex,
@@ -23,12 +25,8 @@ import {
   TEXT_TRANSFORM_UPPERCASE,
   C_MED_DARK_GRAY,
 } from '@opentrons/components'
-import {
-  useAllCommandsQuery,
-  useCommandQuery,
-} from '@opentrons/react-api-client'
+import { useCommandQuery } from '@opentrons/react-api-client'
 import { css } from 'styled-components'
-import { useCurrentRunId } from '../ProtocolUpload/hooks/useCurrentRunId'
 import { CommandTimer } from './CommandTimer'
 import { CommandText } from './CommandText'
 import {
@@ -44,8 +42,10 @@ import type {
 } from '@opentrons/shared-data/protocol/types/schemaV6/command'
 
 export interface CommandItemProps {
-  commandOrSummary: Command | RunCommandSummary
-  runStatus?: RunStatus
+  analysisCommand: Command | null
+  runCommandSummary: RunCommandSummary | null
+  runStatus: RunStatus
+  currentRunId: string | null
 }
 
 const WRAPPER_STYLE_BY_STATUS: {
@@ -69,20 +69,25 @@ const WRAPPER_STYLE_BY_STATUS: {
 const commandIsComplete = (status: RunCommandSummary['status']): boolean =>
   status === 'succeeded' || status === 'failed'
 
-export function CommandItem(props: CommandItemProps): JSX.Element | null {
-  const { commandOrSummary, runStatus } = props
+// minimum delay in MS for observer notifications
+export const OBSERVER_DELAY = 300
+
+export function CommandItemComponent(
+  props: CommandItemProps
+): JSX.Element | null {
+  const { analysisCommand, runCommandSummary, runStatus, currentRunId } = props
   const { t } = useTranslation('run_details')
-  const currentRunId = useCurrentRunId()
-  const robotCommands = useAllCommandsQuery(currentRunId).data?.data
+  const [commandItemRef, isInView] = useInView({
+    delay: OBSERVER_DELAY,
+  })
   const [staleTime, setStaleTime] = React.useState<number>(0)
-  const isAnticipatedCommand = !Boolean(
-    robotCommands?.some(command => command.id === commandOrSummary.id)
-  )
+  const isAnticipatedCommand =
+    analysisCommand !== null && runCommandSummary === null
   const { data: commandDetails, refetch } = useCommandQuery(
     currentRunId,
-    commandOrSummary.id,
+    runCommandSummary?.id ?? null,
     {
-      enabled: !isAnticipatedCommand && runStatus !== 'idle',
+      enabled: !isAnticipatedCommand && runStatus !== 'idle' && isInView,
       staleTime,
     }
   )
@@ -97,22 +102,30 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
     }
     if (
       commandDetails?.data.startedAt != null &&
-      commandDetails?.data.completedAt == null
+      commandDetails?.data.completedAt == null &&
+      isInView
     ) {
       refetch()
     }
-  }, [commandOrSummary.status, commandDetails?.data.completedAt])
+  }, [runCommandSummary?.status, commandDetails?.data, refetch])
   const commandStatus =
-    runStatus !== RUN_STATUS_IDLE && commandOrSummary.status != null
-      ? commandOrSummary.status
+    runStatus !== RUN_STATUS_IDLE && runCommandSummary?.status != null
+      ? runCommandSummary.status
       : 'queued'
 
   let isComment = false
   if (
-    'params' in commandOrSummary &&
-    'legacyCommandType' in commandOrSummary.params
+    analysisCommand != null &&
+    'params' in analysisCommand &&
+    'legacyCommandType' in analysisCommand.params
   ) {
-    isComment = commandOrSummary.params.legacyCommandType === 'command.COMMENT'
+    isComment = analysisCommand?.params.legacyCommandType === 'command.COMMENT'
+  } else if (
+    runCommandSummary != null &&
+    runCommandSummary.result != null &&
+    'legacyCommandType' in runCommandSummary.result
+  ) {
+    isComment = runCommandSummary.result.legacyCommandType === 'command.COMMENT'
   } else if (
     commandDetails?.data.commandType === 'custom' &&
     'legacyCommandType' in commandDetails?.data.params
@@ -121,7 +134,9 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
       commandDetails.data.params.legacyCommandType === 'command.COMMENT'
   }
 
-  const isPause = commandOrSummary.commandType === 'pause'
+  const isPause =
+    analysisCommand?.commandType === 'pause' ||
+    runCommandSummary?.commandType === 'pause'
 
   const WRAPPER_STYLE = css`
     font-size: ${FONT_SIZE_BODY_1};
@@ -132,7 +147,7 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
     flex-direction: ${DIRECTION_COLUMN};
   `
   return (
-    <Flex css={WRAPPER_STYLE}>
+    <Flex css={WRAPPER_STYLE} ref={commandItemRef}>
       {commandStatus === 'running' ? (
         <CurrentCommandLabel runStatus={runStatus} />
       ) : null}
@@ -174,12 +189,33 @@ export function CommandItem(props: CommandItemProps): JSX.Element | null {
           />
         ) : null}
         <CommandText
-          commandDetailsOrSummary={commandDetails?.data ?? commandOrSummary}
+          analysisCommand={analysisCommand}
+          runCommand={commandDetails?.data ?? null}
         />
       </Flex>
     </Flex>
   )
 }
+
+export const CommandItem = React.memo(
+  CommandItemComponent,
+  (prevProps, nextProps) => {
+    const shouldRerender =
+      !isEqual(prevProps.analysisCommand, nextProps.analysisCommand) ||
+      !isEqual(prevProps.runCommandSummary, nextProps.runCommandSummary) ||
+      ((([
+        RUN_STATUS_PAUSED,
+        RUN_STATUS_PAUSE_REQUESTED,
+      ] as RunStatus[]).includes(nextProps.runStatus) ||
+        ([
+          RUN_STATUS_PAUSED,
+          RUN_STATUS_PAUSE_REQUESTED,
+        ] as RunStatus[]).includes(prevProps.runStatus)) &&
+        (prevProps.runCommandSummary?.status === 'running' ||
+          nextProps.runCommandSummary?.status === 'running'))
+    return !shouldRerender
+  }
+)
 
 interface CurrentCommandLabelProps {
   runStatus?: RunStatus

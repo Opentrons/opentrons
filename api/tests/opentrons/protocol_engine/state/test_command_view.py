@@ -3,10 +3,9 @@ import pytest
 from collections import OrderedDict
 from contextlib import nullcontext as does_not_raise
 from datetime import datetime
-from typing import Dict, List, NamedTuple, Optional, Sequence, Tuple, Type, Union
+from typing import Dict, List, NamedTuple, Optional, Sequence, Tuple, Type
 
 from opentrons.protocol_engine import EngineStatus, commands as cmd, errors
-from opentrons.protocol_engine.actions import PlayAction, PauseAction, PauseSource
 
 from opentrons.protocol_engine.state.commands import (
     CommandState,
@@ -210,49 +209,24 @@ class ActionAllowedSpec(NamedTuple):
     """Spec data to test CommandView.validate_action_allowed."""
 
     subject: CommandView
-    action: Union[PlayAction, PauseAction]
     expected_error: Optional[Type[errors.ProtocolEngineError]]
 
 
 action_allowed_specs: List[ActionAllowedSpec] = [
     ActionAllowedSpec(
         subject=get_command_view(run_result=None),
-        action=PlayAction(),
         expected_error=None,
     ),
     ActionAllowedSpec(
         subject=get_command_view(run_result=RunResult.STOPPED),
-        action=PlayAction(),
         expected_error=errors.ProtocolEngineStoppedError,
     ),
     ActionAllowedSpec(
         subject=get_command_view(run_result=RunResult.SUCCEEDED),
-        action=PlayAction(),
         expected_error=errors.ProtocolEngineStoppedError,
     ),
     ActionAllowedSpec(
         subject=get_command_view(run_result=RunResult.FAILED),
-        action=PlayAction(),
-        expected_error=errors.ProtocolEngineStoppedError,
-    ),
-    ActionAllowedSpec(
-        subject=get_command_view(run_result=None),
-        action=PauseAction(source=PauseSource.CLIENT),
-        expected_error=None,
-    ),
-    ActionAllowedSpec(
-        subject=get_command_view(run_result=RunResult.STOPPED),
-        action=PauseAction(source=PauseSource.CLIENT),
-        expected_error=errors.ProtocolEngineStoppedError,
-    ),
-    ActionAllowedSpec(
-        subject=get_command_view(run_result=RunResult.SUCCEEDED),
-        action=PauseAction(source=PauseSource.CLIENT),
-        expected_error=errors.ProtocolEngineStoppedError,
-    ),
-    ActionAllowedSpec(
-        subject=get_command_view(run_result=RunResult.FAILED),
-        action=PauseAction(source=PauseSource.CLIENT),
         expected_error=errors.ProtocolEngineStoppedError,
     ),
 ]
@@ -261,14 +235,13 @@ action_allowed_specs: List[ActionAllowedSpec] = [
 @pytest.mark.parametrize(ActionAllowedSpec._fields, action_allowed_specs)
 def test_validate_action_allowed(
     subject: CommandView,
-    action: Union[PlayAction, PauseAction],
     expected_error: Optional[Type[errors.ProtocolEngineError]],
 ) -> None:
     """It should validate allowed play/pause actions."""
     expectation = pytest.raises(expected_error) if expected_error else does_not_raise()
 
     with expectation:  # type: ignore[attr-defined]
-        subject.validate_action_allowed(action)
+        subject.raise_if_stop_requested()
 
 
 def test_get_errors() -> None:
@@ -388,3 +361,55 @@ get_status_specs: List[GetStatusSpec] = [
 def test_get_status(subject: CommandView, expected_status: EngineStatus) -> None:
     """It should set a status according to the command queue and running flag."""
     assert subject.get_status() == expected_status
+
+
+class GetOkayToClearSpec(NamedTuple):
+    """Spec data for get_status tests."""
+
+    subject: CommandView
+    expected_is_okay: bool
+
+
+get_okay_to_clear_specs: List[GetOkayToClearSpec] = [
+    GetOkayToClearSpec(
+        subject=get_command_view(
+            queue_status=QueueStatus.IMPLICITLY_ACTIVE,
+            running_command_id=None,
+            queued_command_ids=[],
+        ),
+        expected_is_okay=True,
+    ),
+    GetOkayToClearSpec(
+        subject=get_command_view(
+            queue_status=QueueStatus.IMPLICITLY_ACTIVE,
+            running_command_id=None,
+            queued_command_ids=["command-id"],
+            commands_by_id=[
+                ("command-id", create_queued_command(command_id="command-id"))
+            ],
+        ),
+        expected_is_okay=False,
+    ),
+    GetOkayToClearSpec(
+        subject=get_command_view(
+            running_command_id=None,
+            queued_command_ids=[],
+            commands_by_id=[
+                ("command-id", create_queued_command(command_id="command-id"))
+            ],
+        ),
+        expected_is_okay=True,
+    ),
+    GetOkayToClearSpec(
+        subject=get_command_view(
+            is_hardware_stopped=True,
+        ),
+        expected_is_okay=True,
+    ),
+]
+
+
+@pytest.mark.parametrize(GetOkayToClearSpec._fields, get_okay_to_clear_specs)
+def test_get_okay_to_clear(subject: CommandView, expected_is_okay: bool) -> None:
+    """It should okay only an unstarted or stopped engine to clear."""
+    assert subject.get_is_okay_to_clear() is expected_is_okay

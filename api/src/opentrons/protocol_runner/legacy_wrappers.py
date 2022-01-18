@@ -8,7 +8,7 @@ from opentrons_shared_data.labware.dev_types import (
 
 from opentrons.calibration_storage.helpers import uri_from_details
 
-from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules.types import (
     ModuleModel as LegacyModuleModel,
     TemperatureModuleModel as LegacyTemperatureModuleModel,
@@ -92,7 +92,7 @@ class LegacyContextCreator:
 
     def __init__(
         self,
-        hardware_api: HardwareAPI,
+        hardware_api: HardwareControlAPI,
         labware_offset_provider: LegacyLabwareOffsetProvider,
     ) -> None:
         """Prepare the LegacyContextCreator.
@@ -140,7 +140,7 @@ class LegacySimulatingContextCreator(LegacyContextCreator):
 class LegacyExecutor:
     """Interface to execute Protocol API v2 protocols in a child thread."""
 
-    def __init__(self, hardware_api: HardwareAPI) -> None:
+    def __init__(self, hardware_api: HardwareControlAPI) -> None:
         self._hardware_api = hardware_api
 
     async def execute(

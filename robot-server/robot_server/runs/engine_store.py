@@ -1,7 +1,7 @@
 """In-memory storage of ProtocolEngine instances."""
 from typing import Dict, NamedTuple, Optional
 
-from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine import ProtocolEngine, StateView, create_protocol_engine
 from opentrons.protocol_runner import ProtocolRunner
 
@@ -32,7 +32,7 @@ class RunnerEnginePair(NamedTuple):
 class EngineStore:
     """Factory and in-memory storage for ProtocolEngine."""
 
-    def __init__(self, hardware_api: HardwareAPI) -> None:
+    def __init__(self, hardware_api: HardwareControlAPI) -> None:
         """Initialize an engine storage interface.
 
         Arguments:
@@ -83,9 +83,7 @@ class EngineStore:
         engine = await create_protocol_engine(hardware_api=self._hardware_api)
         runner = ProtocolRunner(protocol_engine=engine, hardware_api=self._hardware_api)
 
-        if self._runner_engine_pair is not None:
-            if not self.engine.state_view.commands.get_is_stopped():
-                raise EngineConflictError("Current run is not stopped.")
+        await self.clear()
 
         self._runner_engine_pair = RunnerEnginePair(runner=runner, engine=engine)
         self._engines_by_run_id[run_id] = engine
@@ -106,7 +104,7 @@ class EngineStore:
         except KeyError:
             raise EngineMissingError(f"No engine state found for run {run_id}")
 
-    def clear(self) -> None:
+    async def clear(self) -> None:
         """Remove the persisted ProtocolEngine, if present, no-op otherwise.
 
         Raises:
@@ -114,7 +112,9 @@ class EngineStore:
             they cannot be cleared.
         """
         if self._runner_engine_pair is not None:
-            if not self.engine.state_view.commands.get_is_stopped():
-                raise EngineConflictError("Current run is not stopped.")
+            if self.engine.state_view.commands.get_is_okay_to_clear():
+                await self.engine.finish(drop_tips_and_home=False)
+            else:
+                raise EngineConflictError("Current run is not idle or stopped.")
 
         self._runner_engine_pair = None

@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field
 from opentrons.hardware_control.dev_types import ONE_CHANNEL, EIGHT_CHANNELS
 from robot_server.service.json_api import (
     DeprecatedResponseModel,
-    ResponseDataModel,
+    DeprecatedResponseDataModel,
     DeprecatedMultiResponseModel,
 )
 
@@ -78,7 +78,7 @@ class FileAttributes(BaseModel):
     basename: str
 
 
-class ProtocolResponseAttributes(ResponseDataModel):
+class ProtocolResponseAttributes(DeprecatedResponseDataModel):
     protocolFile: FileAttributes
     supportFiles: typing.List[FileAttributes]
     lastModifiedAt: datetime = Field(

@@ -15,9 +15,8 @@ from typing import (
 from opentrons.calibration_storage import get, delete
 from opentrons.calibration_storage.types import TipLengthCalNotFound
 from opentrons.calibration_storage import helpers
-from opentrons.config import feature_flags as ff
 from opentrons.hardware_control import robot_calibration as robot_cal
-from opentrons.hardware_control import ThreadManager, CriticalPoint
+from opentrons.hardware_control import HardwareControlAPI, CriticalPoint
 from opentrons.hardware_control.pipette import Pipette
 from opentrons.protocol_api import labware
 from opentrons.protocols.geometry.deck import Deck
@@ -34,8 +33,6 @@ from robot_server.service.session.models.command_definitions import (
     DeckCalibrationCommand,
 )
 from robot_server.robot.calibration.constants import (
-    SHORT_TRASH_DECK,
-    STANDARD_DECK,
     MOVE_TO_DECK_SAFETY_BUFFER,
     MOVE_TO_TIP_RACK_SAFETY_BUFFER,
     POINT_ONE_ID,
@@ -81,13 +78,12 @@ def tuplefy_cal_point_dicts(
 
 
 class DeckCalibrationUserFlow:
-    def __init__(self, hardware: ThreadManager):
+    def __init__(self, hardware: HardwareControlAPI):
         self._hardware = hardware
         self._hw_pipette, self._mount = self._select_target_pipette()
         self._default_tipracks = self._get_default_tipracks()
 
-        deck_load_name = SHORT_TRASH_DECK if ff.short_fixed_trash() else STANDARD_DECK
-        self._deck = Deck(load_name=deck_load_name)
+        self._deck = Deck()
         self._tip_rack = self._get_tip_rack_lw()
         self._deck[TIP_RACK_SLOT] = self._tip_rack
 
@@ -127,7 +123,7 @@ class DeckCalibrationUserFlow:
         return self._deck
 
     @property
-    def hardware(self) -> ThreadManager:
+    def hardware(self) -> HardwareControlAPI:
         return self._hardware
 
     @property
@@ -188,11 +184,11 @@ class DeckCalibrationUserFlow:
         2: single-channel over multi
         3: right mount over left
         """
-        if not any(self._hardware._attached_instruments.values()):
+        if not any(self._hardware.hardware_instruments.values()):
             raise RobotServerError(
                 definition=CalibrationError.NO_PIPETTE_ATTACHED, flow="Deck Calibration"
             )
-        pips = {m: p for m, p in self._hardware._attached_instruments.items() if p}
+        pips = {m: p for m, p in self._hardware.hardware_instruments.items() if p}
         if len(pips) == 1:
             for mount, pip in pips.items():
                 return pip, mount

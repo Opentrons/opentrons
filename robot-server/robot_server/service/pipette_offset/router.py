@@ -10,7 +10,7 @@ from opentrons.calibration_storage import (
     delete,
 )
 
-from robot_server.errors import ErrorResponse
+from robot_server.errors import ErrorBody
 from robot_server.service.pipette_offset import models as pip_models
 from robot_server.service.errors import RobotServerError, CommonErrorDef
 from robot_server.service.shared_models import calibration as cal_model
@@ -71,7 +71,7 @@ async def get_all_pipette_offset_calibrations(
     "/calibration/pipette_offset",
     description="Delete one specific pipette calibration "
     "by pipette serial and mount",
-    responses={status.HTTP_404_NOT_FOUND: {"model": ErrorResponse}},
+    responses={status.HTTP_404_NOT_FOUND: {"model": ErrorBody}},
 )
 async def get_specific_pipette_offset_calibration(
     pipette_id: str, mount: pip_models.MountType

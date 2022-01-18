@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from typing import List, Optional
 
-from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_reader import (
     ProtocolSource,
     PythonProtocolConfig,
@@ -43,6 +43,8 @@ class ProtocolRunData:
     pipettes: List[LoadedPipette]
 
 
+# TODO(mc, 2022-01-11): this class has become bloated. Split into an abstract
+# interfaces and several concrete implementations per protocol type
 class ProtocolRunner:
     """An interface to manage and control a protocol run.
 
@@ -58,7 +60,7 @@ class ProtocolRunner:
     def __init__(
         self,
         protocol_engine: ProtocolEngine,
-        hardware_api: HardwareAPI,
+        hardware_api: HardwareControlAPI,
         task_queue: Optional[TaskQueue] = None,
         json_file_reader: Optional[JsonFileReader] = None,
         json_command_translator: Optional[JsonCommandTranslator] = None,
@@ -72,7 +74,6 @@ class ProtocolRunner:
         """Initialize the ProtocolRunner with its dependencies."""
         self._protocol_engine = protocol_engine
         self._hardware_api = hardware_api
-        self._task_queue = task_queue or TaskQueue()
         self._json_file_reader = json_file_reader or JsonFileReader()
         self._json_command_translator = (
             json_command_translator or JsonCommandTranslator()
@@ -90,6 +91,18 @@ class ProtocolRunner:
         self._legacy_executor = legacy_executor or LegacyExecutor(
             hardware_api=hardware_api
         )
+        self._was_started = False
+
+        # TODO(mc, 2022-01-11): replace task queue with specific implementations
+        # of runner interface
+        self._task_queue = task_queue or TaskQueue(cleanup_func=protocol_engine.finish)
+
+    def was_started(self) -> bool:
+        """Whether the runner has been started.
+
+        This value is latched; once it is True, it will never become False.
+        """
+        return self._was_started
 
     def load(self, protocol_source: ProtocolSource) -> None:
         """Load a ProtocolSource into managed ProtocolEngine.
@@ -118,14 +131,10 @@ class ProtocolRunner:
             else:
                 self._load_legacy(protocol_source)
 
-        # ensure the engine is stopped gracefully once the
-        # protocol file stops issuing commands
-        self._task_queue.set_cleanup_func(self._protocol_engine.finish)
-
     def play(self) -> None:
         """Start or resume the run."""
+        self._was_started = True
         self._protocol_engine.play()
-        self._task_queue.start()
 
     def pause(self) -> None:
         """Pause the run."""
@@ -133,22 +142,24 @@ class ProtocolRunner:
 
     async def stop(self) -> None:
         """Stop (cancel) the run."""
-        self._task_queue.stop()
-        await self._protocol_engine.stop()
+        if self._was_started:
+            await self._protocol_engine.stop()
+        else:
+            await self._protocol_engine.finish(drop_tips_and_home=False)
 
-    async def join(self) -> None:
-        """Wait for the run to complete, propagating any errors.
-
-        This method may be called before the run starts, in which case,
-        it will wait for the run to start before waiting for completion.
-        """
-        return await self._task_queue.join()
-
-    async def run(self, protocol_source: ProtocolSource) -> ProtocolRunData:
+    async def run(
+        self,
+        protocol_source: Optional[ProtocolSource] = None,
+    ) -> ProtocolRunData:
         """Run a given protocol to completion."""
-        self.load(protocol_source)
+        # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`
+        # currently `protocol_source` arg is only used by tests
+        if protocol_source:
+            self.load(protocol_source)
+
         self.play()
-        await self.join()
+        self._task_queue.start()
+        await self._task_queue.join()
 
         return ProtocolRunData(
             commands=self._protocol_engine.state_view.commands.get_all(),

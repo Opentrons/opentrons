@@ -26,10 +26,16 @@ class TaskQueue:
     Once started, a TaskQueue may not be re-used.
     """
 
-    def __init__(self) -> None:
-        """Initialize the TaskQueue."""
+    def __init__(self, cleanup_func: CleanupFunc) -> None:
+        """Initialize the TaskQueue.
+
+        Args:
+            cleanup_func: A function to call at run function completion
+                with any error raised by the run function.
+        """
+        self._cleanup_func: CleanupFunc = cleanup_func
+
         self._run_func: Optional[Callable[[], Any]] = None
-        self._cleanup_func: Optional[CleanupFunc] = None
         self._run_task: Optional["asyncio.Task[None]"] = None
         self._ok_to_join_event: asyncio.Event = asyncio.Event()
 
@@ -44,27 +50,12 @@ class TaskQueue:
         """
         self._run_func = partial(func, **kwargs)
 
-    def set_cleanup_func(self, func: CleanupFunc) -> None:
-        """Add the run cleanup task to the queue.
-
-        The "cleanup" task will run after the "run" task, and will be passed
-        any exceptions raised by the "run" task.
-        """
-        self._cleanup_func = func
-
     def start(self) -> None:
         """Start running tasks in the queue."""
         self._ok_to_join_event.set()
 
         if self._run_task is None:
             self._run_task = asyncio.create_task(self._run())
-
-    def stop(self) -> None:
-        """Stop running tasks, allowing the queue to be joined."""
-        self._ok_to_join_event.set()
-
-        if self._run_task:
-            self._run_task.cancel()
 
     async def join(self) -> None:
         """Wait for the background run task to complete, propagating errors."""
@@ -79,9 +70,6 @@ class TaskQueue:
         try:
             if self._run_func is not None:
                 await self._run_func()
-        except asyncio.CancelledError:
-            log.debug("Run task was cancelled")
-            raise
         except Exception as e:
             log.debug(
                 "Exception raised during protocol run",
@@ -89,7 +77,4 @@ class TaskQueue:
             )
             error = e
 
-        if self._cleanup_func is not None:
-            await self._cleanup_func(error=error)
-        elif error:
-            raise error
+        await self._cleanup_func(error=error)

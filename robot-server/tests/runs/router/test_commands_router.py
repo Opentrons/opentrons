@@ -13,7 +13,7 @@ from opentrons.protocol_engine import (
 )
 
 from robot_server.errors import ApiError
-from robot_server.service.json_api import RequestModel, SimpleResponse
+from robot_server.service.json_api import RequestModel
 from robot_server.runs.run_models import Run, RunCommandSummary
 from robot_server.runs.engine_store import EngineStore
 from robot_server.runs.router.commands_router import (
@@ -56,13 +56,14 @@ async def test_create_run_command(decoy: Decoy, engine_store: EngineStore) -> No
         output_command
     )
 
-    response = await create_run_command(
+    result = await create_run_command(
         request_body=RequestModel(data=command_request),
         engine_store=engine_store,
-        run=SimpleResponse(data=run),
+        run=run,
     )
 
-    assert response.data == output_command
+    assert result.content.data == output_command
+    assert result.status_code == 201
 
 
 async def test_create_run_command_not_current(
@@ -92,7 +93,7 @@ async def test_create_run_command_not_current(
         await create_run_command(
             request_body=RequestModel(data=command_request),
             engine_store=engine_store,
-            run=SimpleResponse(data=run),
+            run=run,
         )
 
     assert exc_info.value.status_code == 400
@@ -103,6 +104,7 @@ async def test_get_run_commands() -> None:
     """It should return a list of all commands in a run."""
     command_summary = RunCommandSummary.construct(
         id="command-id",
+        key="command-key",
         commandType="moveToWell",
         status=CommandStatus.RUNNING,
     )
@@ -121,9 +123,10 @@ async def test_get_run_commands() -> None:
         labwareOffsets=[],
     )
 
-    response = await get_run_commands(run=SimpleResponse(data=run))
+    result = await get_run_commands(run=run)
 
-    assert response.data == [command_summary]
+    assert result.content.data == [command_summary]
+    assert result.status_code == 200
 
 
 async def test_get_run_command_by_id(
@@ -133,6 +136,7 @@ async def test_get_run_command_by_id(
     """It should return full details about a command by ID."""
     command_summary = RunCommandSummary.construct(
         id="command-id",
+        key="command-key",
         commandType="moveToWell",
         status=CommandStatus.RUNNING,
     )
@@ -164,13 +168,14 @@ async def test_get_run_command_by_id(
     decoy.when(engine_store.get_state("run-id")).then_return(engine_state)
     decoy.when(engine_state.commands.get("command-id")).then_return(command)
 
-    response = await get_run_command(
+    result = await get_run_command(
         commandId="command-id",
         engine_store=engine_store,
-        run=SimpleResponse(data=run),
+        run=run,
     )
 
-    assert response.data == command
+    assert result.content.data == command
+    assert result.status_code == 200
 
 
 async def test_get_run_command_missing_command(
@@ -202,7 +207,7 @@ async def test_get_run_command_missing_command(
         await get_run_command(
             commandId="command-id",
             engine_store=engine_store,
-            run=SimpleResponse(data=run),
+            run=run,
         )
 
     assert exc_info.value.status_code == 404

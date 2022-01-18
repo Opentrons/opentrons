@@ -9,12 +9,10 @@ import {
   RUN_STATUS_PAUSE_REQUESTED,
 } from '@opentrons/api-client'
 import {
-  LINE_HEIGHT_SOLID,
   SPACING_2,
   SPACING_3,
-  C_ERROR_DARK,
   useConditionalConfirm,
-  NewSecondaryBtn,
+  NewAlertSecondaryBtn,
 } from '@opentrons/components'
 import { Page } from '../../atoms/Page'
 import { Portal } from '../../App/portal'
@@ -69,16 +67,13 @@ export function RunDetails(): JSX.Element | null {
   }
 
   const cancelRunButton = (
-    <NewSecondaryBtn
+    <NewAlertSecondaryBtn
       onClick={cancelRunAndExit}
-      lineHeight={LINE_HEIGHT_SOLID}
       marginX={SPACING_3}
-      paddingRight={SPACING_2}
-      paddingLeft={SPACING_2}
-      color={C_ERROR_DARK}
+      paddingX={SPACING_2}
     >
       {t('cancel_run')}
-    </NewSecondaryBtn>
+    </NewAlertSecondaryBtn>
   )
 
   let titleBarProps
@@ -100,6 +95,7 @@ export function RunDetails(): JSX.Element | null {
         title: t('shared:close'),
         children: t('shared:close'),
         iconName: 'close' as const,
+        className: styles.close_button,
       },
       className: styles.reverse_titlebar_items,
     }

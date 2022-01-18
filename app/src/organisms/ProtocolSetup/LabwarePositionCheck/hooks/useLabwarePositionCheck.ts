@@ -40,7 +40,10 @@ import type {
 } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { SetupCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import type { DropTipCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
-import type { SavePositionCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
+import type {
+  HomeCommand,
+  SavePositionCommand,
+} from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
 import type {
   Axis,
   Jog,
@@ -244,7 +247,7 @@ export function useLabwarePositionCheck(
     }) as Command[]) ?? []
   // TC open lid commands come from the LPC command generator
   const TCOpenCommands = LPCCommands.filter(isTCOpenCommand) ?? []
-  const homeCommand: Command = {
+  const homeCommand: HomeCommand = {
     commandType: 'home',
     id: uuidv4(),
     params: {},
@@ -336,7 +339,10 @@ export function useLabwarePositionCheck(
   }
   // (sa 11-18-2021): refactor this function after beta release
   const proceed = (): void => {
+    // if a jog command is in flight, ignore this call to proceed
+    if (isJogging.current) return
     setIsLoading(true)
+    setCurrentCommandIndex(currentCommandIndex + 1)
     setShowPickUpTipConfirmationModal(false)
     // before executing the next movement command, save the current position
     const savePositionCommand: Command = {
@@ -473,7 +479,21 @@ export function useLabwarePositionCheck(
               setError(e)
             })
         }
-        setCurrentCommandIndex(currentCommandIndex + 1)
+        // if this was the last LPC command, home the robot
+        if (currentCommandIndex === LPCMovementCommands.length - 1) {
+          const homeCommand: HomeCommand = {
+            commandType: 'home',
+            id: uuidv4(),
+            params: {},
+          }
+          createCommand({
+            runId: currentRun?.data?.id as string,
+            command: createCommandData(homeCommand),
+          }).catch((e: Error) => {
+            console.error(`error homing robot: ${e.message}`)
+            setError(e)
+          })
+        }
       })
       .catch((e: Error) => {
         console.error(`error issuing command to robot: ${e.message}`)

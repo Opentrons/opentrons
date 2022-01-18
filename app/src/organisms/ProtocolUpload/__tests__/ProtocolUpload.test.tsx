@@ -274,4 +274,17 @@ describe('ProtocolUpload', () => {
     const [{ getByText }] = render()
     getByText('FAKE ERROR')
   })
+  it('renders an error if the protocol is invalid', () => {
+    when(mockUseCurrentProtocolRun)
+      .calledWith()
+      .mockReturnValue({
+        protocolRecord: {},
+        runRecord: {},
+        createProtocolRun: jest.fn(),
+        protocolCreationError: 'invalid protocol!',
+      } as any)
+    const [{ getByText }] = render()
+    getByText('Protocol upload failed. Fix the error and try again')
+    getByText('invalid protocol!')
+  })
 })

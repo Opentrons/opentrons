@@ -6,11 +6,14 @@ from copy import copy
 from typing import Any, cast, Callable, Optional, Union, Set, TypeVar
 from typing_extensions import TypedDict, Literal, Final
 
-from opentrons.config import feature_flags as ff
 from opentrons.broker import Broker
 from opentrons.types import Point, Mount, Location
 from opentrons.protocol_api import labware
-from opentrons.hardware_control import CriticalPoint, ThreadedAsyncLock
+from opentrons.hardware_control import (
+    CriticalPoint,
+    ThreadedAsyncLock,
+    HardwareControlAPI,
+)
 from opentrons.hardware_control.types import OutOfBoundsMove, MotionChecks
 from opentrons.hardware_control.adapters import SynchronousAdapter
 
@@ -63,7 +66,7 @@ class CalibrationManager(RobotBusy):
 
     def __init__(
         self,
-        hardware: SynchronousAdapter,
+        hardware: SynchronousAdapter[HardwareControlAPI],
         loop: asyncio.AbstractEventLoop = None,
         broker: Broker = None,
         lock: ThreadedAsyncLock = None,
@@ -264,10 +267,7 @@ class CalibrationManager(RobotBusy):
         # Reset calibration so we don’t actually calibrate the offset
         # relative to the old calibration
         container._container.set_calibration(Point(0, 0, 0))
-        if ff.calibrate_to_bottom() and not (container._container.is_tiprack):
-            orig = _well0(container._container).geometry.bottom()
-        else:
-            orig = _well0(container._container).geometry.top()
+        orig = _well0(container._container).geometry.top()
         delta = here - orig
         labware.save_calibration(container._container, delta)
 

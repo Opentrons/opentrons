@@ -428,6 +428,15 @@ def test_instrument_trash(ctx, get_labware_def):
     assert instr.trash_container.name == "usascientific_12_reservoir_22ml"
 
 
+def test_instrument_trash_ot3(ot3_ctx, get_labware_def):
+    ot3_ctx.home()
+
+    mount = Mount.LEFT
+    instr = ot3_ctx.load_instrument("p300_single", mount)
+
+    assert instr.trash_container.name == "opentrons_1_trash_3200ml_fixed"
+
+
 def test_aspirate(ctx, get_labware_def, monkeypatch):
     ctx.home()
     lw = ctx.load_labware("corning_96_wellplate_360ul_flat", 1)

@@ -30,7 +30,7 @@ PIP_OFFSET = cal_types.PipetteOffsetByPipetteMount(
 @pytest.fixture
 def mock_hw(hardware):
     pip = pipette.Pipette(load("p300_single_v2.1", "testiId"), PIP_OFFSET, "testId")
-    hardware._attached_instruments = {Mount.RIGHT: pip, Mount.LEFT: pip}
+    hardware.hardware_instruments = {Mount.RIGHT: pip, Mount.LEFT: pip}
     hardware._current_pos = Point(0, 0, 0)
 
     async def async_mock_move_rel(*args, **kwargs):
@@ -69,10 +69,10 @@ def test_user_flow_select_pipette(pipettes, target_mount, hardware):
         pip = pipette.Pipette(load(pipettes[0], "testId"), PIP_OFFSET, "testId")
     if pipettes[1]:
         pip2 = pipette.Pipette(load(pipettes[1], "testId"), PIP_OFFSET, "testId2")
-    hardware._attached_instruments = {Mount.LEFT: pip, Mount.RIGHT: pip2}
+    hardware.hardware_instruments = {Mount.LEFT: pip, Mount.RIGHT: pip2}
 
     uf = DeckCalibrationUserFlow(hardware=hardware)
-    assert uf._hw_pipette == hardware._attached_instruments[target_mount]
+    assert uf._hw_pipette == hardware.hardware_instruments[target_mount]
 
 
 @pytest.fixture
@@ -119,7 +119,7 @@ async def test_save_default_pick_up_current(mock_hw):
     # make sure pick up current for multi-channels is
     # modified during tip pick up
     pip = pipette.Pipette(load("p20_multi_v2.1", "testId"), PIP_OFFSET, "testid")
-    mock_hw._attached_instruments[Mount.LEFT] = pip
+    mock_hw.hardware_instruments[Mount.LEFT] = pip
     uf = DeckCalibrationUserFlow(hardware=mock_hw)
 
     def mock_update_config_item(*args, **kwargs):
