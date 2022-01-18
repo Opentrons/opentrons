@@ -9,6 +9,7 @@ import {
   RUN_STATUS_PAUSE_REQUESTED,
   RUN_STATUS_FINISHING,
   RUN_STATUS_STOP_REQUESTED,
+  RUN_STATUS_STOPPED,
 } from '@opentrons/api-client'
 import {
   SPACING_2,
@@ -44,11 +45,12 @@ export function RunDetails(): JSX.Element | null {
       ? RUN_STATUS_RUNNING
       : runStatus
 
-  const { pause, play } = useRunControls()
+  const { pause } = useRunControls()
   const [
     showConfirmCancelModal,
     setShowConfirmCancelModal,
   ] = React.useState<boolean>(false)
+  const [isRunCancelling, setRunCancelling] = React.useState(false)
 
   const handleCancelClick = (): void => {
     pause()
@@ -77,6 +79,13 @@ export function RunDetails(): JSX.Element | null {
       {t('cancel_run')}
     </NewAlertSecondaryBtn>
   )
+  // React.useEffect(() => {
+  //   if (isRunCancelling) {
+  //     if (adjustedRunStatus === RUN_STATUS_STOP_REQUESTED) {
+  //       setRunCancelling(true)
+  //     }
+  //   }
+  // }, [isRunCancelling])
 
   let titleBarProps
 
@@ -108,14 +117,15 @@ export function RunDetails(): JSX.Element | null {
     }
   }
 
+  console.log(adjustedRunStatus)
   return (
     <>
       {showCloseConfirmExit && (
         <Portal level="top">
           <ConfirmExitProtocolUploadModal
-            exit={confirmCloseExit}
             back={cancelCloseExit}
-            isRobotMoving={adjustedRunStatus === RUN_STATUS_RUNNING}
+            exit={confirmCloseExit}
+
           />
         </Portal>
       )}
@@ -123,6 +133,12 @@ export function RunDetails(): JSX.Element | null {
         {showConfirmCancelModal ? (
           <ConfirmCancelModal
             onClose={() => setShowConfirmCancelModal(false)}
+            isRunCancelling={
+              adjustedRunStatus === RUN_STATUS_STOP_REQUESTED ? true : false
+            }
+            isRunIdleOrStopped={
+              adjustedRunStatus === RUN_STATUS_IDLE ? true : false
+            }
           />
         ) : null}
         <CommandList />

@@ -27,6 +27,8 @@ import {
   RUN_STATUS_RUNNING,
   RUN_STATUS_PAUSED,
   RUN_STATUS_PAUSE_REQUESTED,
+  RUN_STATUS_FINISHING,
+  RUN_STATUS_STOP_REQUESTED,
 } from '@opentrons/api-client'
 import { Page } from '../../atoms/Page'
 import { UploadInput } from './UploadInput'
@@ -154,7 +156,8 @@ export function ProtocolUpload(): JSX.Element {
   const isRunInMotion =
     runStatus === RUN_STATUS_RUNNING ||
     runStatus === RUN_STATUS_PAUSED ||
-    runStatus === RUN_STATUS_PAUSE_REQUESTED
+    runStatus === RUN_STATUS_PAUSE_REQUESTED ||
+    runStatus === RUN_STATUS_FINISHING
 
   let titleBarProps
   if (isProtocolRunLoaded && !isRunInMotion) {
@@ -170,6 +173,12 @@ export function ProtocolUpload(): JSX.Element {
         className: styles.close_button,
       },
       className: styles.reverse_titlebar_items,
+    }
+  } else if (runStatus === RUN_STATUS_STOP_REQUESTED) {
+    titleBarProps = {
+      title: t('protocol_title', {
+        protocol_name: protocolRecord?.data?.metadata?.protocolName ?? '',
+      }),
     }
   } else if (isRunInMotion) {
     titleBarProps = {

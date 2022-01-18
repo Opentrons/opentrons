@@ -2,7 +2,14 @@ import * as React from 'react'
 import { resetAllWhenMocks, when } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { fireEvent, screen } from '@testing-library/react'
-import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
+import {
+  RUN_STATUS_FINISHING,
+  RUN_STATUS_IDLE,
+  RUN_STATUS_PAUSED,
+  RUN_STATUS_PAUSE_REQUESTED,
+  RUN_STATUS_RUNNING,
+  RUN_STATUS_STOP_REQUESTED,
+} from '@opentrons/api-client'
 import {
   renderWithProviders,
   componentPropsMatcher,
@@ -231,7 +238,7 @@ describe('ProtocolUpload', () => {
     getByText('Open a protocol to run on robotName')
   })
 
-  it('renders the cancel button, button is clickable, and cancel modal is rendered', () => {
+  it('renders the cancel button, button is clickable, and cancel modal is rendered when run status is running', () => {
     when(mockUseCurrentProtocolRun)
       .calledWith()
       .mockReturnValue({
@@ -247,6 +254,79 @@ describe('ProtocolUpload', () => {
     const button = getByRole('button', { name: 'Cancel Run' })
     fireEvent.click(button)
     expect(screen.queryByText('mock confirm cancel modal')).not.toBeNull()
+  })
+
+  it('renders the cancel button, button is clickable, and cancel modal is rendered when run status is paused', () => {
+    when(mockUseCurrentProtocolRun)
+      .calledWith()
+      .mockReturnValue({
+        protocolRecord: { data: { analyses: [] } },
+        runRecord: {},
+        createProtocolRun: jest.fn(),
+      } as any)
+    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_PAUSED)
+    when(mockConfirmCancelModal).mockReturnValue(
+      <div>mock confirm cancel modal</div>
+    )
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Cancel Run' })
+    fireEvent.click(button)
+    expect(screen.queryByText('mock confirm cancel modal')).not.toBeNull()
+  })
+
+  it('renders the cancel button, button is clickable, and cancel modal is rendered when run status is pause requested', () => {
+    when(mockUseCurrentProtocolRun)
+      .calledWith()
+      .mockReturnValue({
+        protocolRecord: { data: { analyses: [] } },
+        runRecord: {},
+        createProtocolRun: jest.fn(),
+      } as any)
+    when(mockUseRunStatus)
+      .calledWith()
+      .mockReturnValue(RUN_STATUS_PAUSE_REQUESTED)
+    when(mockConfirmCancelModal).mockReturnValue(
+      <div>mock confirm cancel modal</div>
+    )
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Cancel Run' })
+    fireEvent.click(button)
+    expect(screen.queryByText('mock confirm cancel modal')).not.toBeNull()
+  })
+
+  it('renders the cancel button, button is clickable, and cancel modal is rendered when run status is finishing', () => {
+    when(mockUseCurrentProtocolRun)
+      .calledWith()
+      .mockReturnValue({
+        protocolRecord: { data: { analyses: [] } },
+        runRecord: {},
+        createProtocolRun: jest.fn(),
+      } as any)
+    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_FINISHING)
+    when(mockConfirmCancelModal).mockReturnValue(
+      <div>mock confirm cancel modal</div>
+    )
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Cancel Run' })
+    fireEvent.click(button)
+    expect(screen.queryByText('mock confirm cancel modal')).not.toBeNull()
+  })
+
+  it('renders only the protocol title with no button when run status is stop requested', () => {
+    when(mockUseCurrentProtocolRun)
+      .calledWith()
+      .mockReturnValue({
+        protocolRecord: { data: { analyses: [] } },
+        runRecord: {},
+        createProtocolRun: jest.fn(),
+      } as any)
+    when(mockUseRunStatus)
+      .calledWith()
+      .mockReturnValue(RUN_STATUS_STOP_REQUESTED)
+    when(mockConfirmCancelModal).mockReturnValue(
+      <div>mock confirm cancel modal</div>
+    )
+    expect(screen.queryByText('mock confirm cancel modal')).toBeNull()
   })
 
   it('renders an error if protocol has a not-ok result', () => {
