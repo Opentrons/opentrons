@@ -17,6 +17,7 @@ export interface AttachedPipette {
   id: string
   name: string
   model: string
+  mount: Mount
   tip_length: number
   mount_axis: string
   plunger_axis: string
