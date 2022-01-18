@@ -1,7 +1,6 @@
 """Protocol engine plugin interface."""
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from anyio import from_thread
 from typing import List
 from typing_extensions import final
 

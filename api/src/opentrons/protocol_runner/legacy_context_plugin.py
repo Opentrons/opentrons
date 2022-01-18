@@ -155,9 +155,7 @@ class LegacyContextPlugin(AbstractPlugin):
         for pe_action in pe_actions:
             self._actions_to_dispatch.put(pe_action)
 
-    def _handle_labware_loaded(
-        self, labware_load_info: LegacyLabwareLoadInfo
-    ) -> None:
+    def _handle_labware_loaded(self, labware_load_info: LegacyLabwareLoadInfo) -> None:
         """Handle a labware load reported by the APIv2 protocol.
 
         Used as a broker callback, so this will run in the APIv2 protocol's thread.
