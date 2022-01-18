@@ -1,4 +1,5 @@
 """Hex file tools."""
+from __future__ import annotations
 from pathlib import Path
 from dataclasses import dataclass
 from enum import Enum
@@ -79,7 +80,7 @@ def from_hex_contents(data: str) -> Iterable[HexRecord]:
 
 
 def process_line(line: str) -> HexRecord:
-    """Convert a line in a HEX file into a HexLine."""
+    """Convert a line in a HEX file into a HexRecord."""
     if len(line) < 11:
         # 11 = 1 (':') + 2 (byte count) + 4 (address) + 2 (record type) + 2 (checksum)
         raise MalformedLineException(f"Line is missing fields '{line}'")
@@ -140,11 +141,15 @@ class HexRecordProcessor:
 
     Iterate through the process generator to get data chunks and start_address.
     """
-
     def __init__(self, records: Iterable[HexRecord]) -> None:
         """Constructor."""
         self._records = records
         self._start_address: int = 0
+
+    @classmethod
+    def from_file(cls, file_path: Path) -> HexRecordProcessor:
+        """Construct from file."""
+        return HexRecordProcessor(from_hex_file_path(file_path))
 
     @property
     def start_address(self) -> int:
