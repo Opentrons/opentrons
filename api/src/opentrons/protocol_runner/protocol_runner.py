@@ -155,7 +155,7 @@ class ProtocolRunner:
         # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`
         # currently `protocol_source` arg is only used by tests
         if protocol_source:
-            self.load(protocol_source)
+            await self.load(protocol_source)
 
         self.play()
         self._task_queue.start()
