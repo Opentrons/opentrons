@@ -141,6 +141,7 @@ class HexRecordProcessor:
 
     Iterate through the process generator to get data chunks and start_address.
     """
+
     def __init__(self, records: Iterable[HexRecord]) -> None:
         """Constructor."""
         self._records = records
