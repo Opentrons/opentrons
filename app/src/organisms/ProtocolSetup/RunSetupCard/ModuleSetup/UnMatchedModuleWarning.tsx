@@ -17,7 +17,7 @@ import {
   DIRECTION_COLUMN,
   COLOR_WARNING_DARK,
 } from '@opentrons/components'
-import { AttachedModule } from '../../../../redux/modules/types'
+import type { AttachedModule } from '../../../../redux/modules/types'
 
 interface UnMatchedModuleWarningProps {
   remainingAttachedModules: AttachedModule[]
@@ -30,8 +30,7 @@ export const UnMatchedModuleWarning = (
   const [showModulesMismatch, setShowModulesMismatch] = React.useState<boolean>(
     false
   )
-  const isVisible =
-    props.remainingAttachedModules !== [] && !showModulesMismatch
+  const isVisible = !showModulesMismatch
   if (!isVisible) return null
 
   return (
@@ -42,7 +41,7 @@ export const UnMatchedModuleWarning = (
         color={C_DARK_GRAY}
         id={'ModuleMismatch'}
       >
-        <Flex flexDirection={DIRECTION_COLUMN} flex="auto" margin={SPACING_3}>
+        <Flex flexDirection={DIRECTION_COLUMN} margin={SPACING_3}>
           <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
             <Flex>
               <Box size={SIZE_2} paddingY={SPACING_1} paddingRight={SPACING_2}>

@@ -24,7 +24,7 @@ describe('UnMatchedModuleWarning', () => {
         name:
           'This robot has connected modules that are not specified in this protocol',
       })
-    ).toBeTruthy()
+    )
   })
   it('should render the correct body', () => {
     const { getByText } = render(props)
