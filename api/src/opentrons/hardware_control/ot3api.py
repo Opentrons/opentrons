@@ -1104,61 +1104,33 @@ class OT3API(
         rate : [float] Set plunger speed for this dispense, where
             speed = rate * dispense_speed
         """
-        instruments = self._instruments_for(mount)
-        self._ready_for_tip_action(instruments, HardwareAction.DISPENSE)
-
-        plunger_currents = {
-            Axis.of_plunger(instr[1]): instr[0].config.plunger_current
-            for instr in instruments
-        }
-        if volume is None:
-            disp_vol = tuple(instr[0].current_volume for instr in instruments)
-            mod_log.debug(
-                "No dispense volume specified. Dispensing all "
-                "remaining liquid ({}uL) from pipette".format(disp_vol)
-            )
-        else:
-            disp_vol = tuple(volume for instr in instruments)
-
-        # Ensure we don't dispense more than the current volume
-        disp_vol = tuple(
-            min(instr[0].current_volume, vol)
-            for instr, vol in zip(instruments, disp_vol)
-        )
-
-        if all([vol == 0 for vol in disp_vol]):
+        dispense_spec = self.plan_check_dispense(mount, volume, rate)
+        if not dispense_spec:
             return
-        elif 0 in disp_vol:
-            raise PairedPipetteConfigValueError("Cannot only dispense from one pipette")
-
-        dist = tuple(
-            self.plunger_position(instr[0], instr[0].current_volume - vol, "dispense")
-            for instr, vol in zip(instruments, disp_vol)
-        )
-        speed = min(
-            self.plunger_speed(instr[0], instr[0].dispense_flow_rate * rate, "dispense")
-            for instr in instruments
+        target_pos, _, secondary_z = target_position_from_plunger(
+            mount,
+            [spec.plunger_distance for spec in dispense_spec],
+            self._current_position,
         )
 
         try:
-            self._backend.set_active_current(plunger_currents)
-            target_pos, _, secondary_z = target_position_from_plunger(
-                mount, dist, self._current_position
+            self._backend.set_active_current(
+                {spec.axis: spec.current for spec in dispense_spec}
             )
             await self._move(
                 target_pos,
-                speed=speed,
+                speed=dispense_spec[0].speed,
                 secondary_z=secondary_z,
                 home_flagged_axes=False,
             )
         except Exception:
             self._log.exception("Dispense failed")
-            for instr in instruments:
-                instr[0].set_current_volume(0)
+            for spec in dispense_spec:
+                spec.instr.set_current_volume(0)
             raise
         else:
-            for instr, vol in zip(instruments, disp_vol):
-                instr[0].remove_current_volume(vol)
+            for spec in dispense_spec:
+                spec.instr.remove_current_volume(spec.volume)
 
     async def blow_out(self, mount: Union[top_types.Mount, PipettePair]):
         """
