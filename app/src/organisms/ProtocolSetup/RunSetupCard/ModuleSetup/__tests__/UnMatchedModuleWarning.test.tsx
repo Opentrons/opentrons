@@ -19,12 +19,10 @@ describe('UnMatchedModuleWarning', () => {
 
   it('should render the correct header', () => {
     const { getByRole } = render(props)
-    expect(
-      getByRole('heading', {
-        name:
-          'This robot has connected modules that are not specified in this protocol',
-      })
-    )
+    getByRole('heading', {
+      name:
+        'This robot has connected modules that are not specified in this protocol',
+    })
   })
   it('should render the correct body', () => {
     const { getByText } = render(props)
