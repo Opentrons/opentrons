@@ -18,8 +18,7 @@ def change_notifier(decoy: Decoy) -> ChangeNotifier:
 
 @pytest.fixture
 def subject(
-    change_notifier: ChangeNotifier,
-    standard_deck_def: DeckDefinitionV2,
+    change_notifier: ChangeNotifier, standard_deck_def: DeckDefinitionV2
 ) -> StateStore:
     """Get a StateStore test subject."""
     return StateStore(

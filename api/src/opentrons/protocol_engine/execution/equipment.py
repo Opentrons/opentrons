@@ -186,7 +186,13 @@ class EquipmentHandler:
                        If None, an ID will be generated.
 
         Returns:
-            A LoadedModuleData object
+            A LoadedModuleData object.
+
+        Raises:
+            ModuleNotAttachedError: A not-yet-assigned module matching the requested
+                parameters could not be found in the attached modules list.
+            ModuleAlreadyPresentError: A module of a different type is already
+                assigned to the requested location.
         """
         attached_modules = [
             HardwareModule(

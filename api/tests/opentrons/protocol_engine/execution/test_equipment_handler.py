@@ -463,32 +463,3 @@ async def test_load_module(
         serial_number="serial-1",
         definition=tempdeck_v1_def,
     )
-
-
-# async def test_load_module_not_attached(
-#     decoy: Decoy,
-#     model_utils: ModelUtils,
-#     state_store: StateStore,
-#     hardware_api: HardwareAPI,
-#     tempdeck_v2_def: ModuleDefinition,
-#     temp_module_v1: AbstractModule,
-#     subject: EquipmentHandler,
-# ) -> None:
-#     """It should raise if the right module isn't attached."""
-#     decoy.when(
-#         state_store.modules.get_definition_by_model(ModuleModel.TEMPERATURE_MODULE_V2)
-#     ).then_return(tempdeck_v2_def)
-
-#     decoy.when(
-#         await hardware_api.find_modules(
-#             by_model=ModuleModel.TEMPERATURE_MODULE_V2,  # type: ignore[arg-type]
-#             resolved_type=ModuleType.TEMPERATURE,
-#         )
-#     ).then_return(([temp_module_v1], None))
-
-#     with pytest.raises(errors.ModuleNotAttachedError):
-#         await subject.load_module(
-#             model=ModuleModel.TEMPERATURE_MODULE_V2,
-#             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-#             module_id="module-id",
-#         )
