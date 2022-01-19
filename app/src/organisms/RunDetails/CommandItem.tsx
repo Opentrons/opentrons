@@ -24,6 +24,7 @@ import {
   SPACING_3,
   TEXT_TRANSFORM_UPPERCASE,
   C_MED_DARK_GRAY,
+  JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 import { useCommandQuery } from '@opentrons/react-api-client'
 import { css } from 'styled-components'
@@ -46,6 +47,7 @@ export interface CommandItemProps {
   runCommandSummary: RunCommandSummary | null
   runStatus: RunStatus
   currentRunId: string | null
+  stepNumber: number
 }
 
 const WRAPPER_STYLE_BY_STATUS: {
@@ -75,7 +77,7 @@ export const OBSERVER_DELAY = 300
 export function CommandItemComponent(
   props: CommandItemProps
 ): JSX.Element | null {
-  const { analysisCommand, runCommandSummary, runStatus, currentRunId } = props
+  const { analysisCommand, runCommandSummary, runStatus, currentRunId, stepNumber } = props
   const { t } = useTranslation('run_details')
   const [commandItemRef, isInView] = useInView({
     delay: OBSERVER_DELAY,
@@ -180,18 +182,21 @@ export function CommandItemComponent(
           {t('pause_protocol')}
         </Flex>
       ) : null}
-      <Flex flexDirection={DIRECTION_ROW}>
-        {['running', 'failed', 'succeeded'].includes(commandStatus) &&
-        !isComment ? (
-          <CommandTimer
-            commandStartedAt={commandDetails?.data.startedAt}
-            commandCompletedAt={commandDetails?.data.completedAt}
+      <Flex flexDirection={DIRECTION_ROW} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+        <Flex flexDirection={DIRECTION_ROW}>
+          {['running', 'failed', 'succeeded'].includes(commandStatus) &&
+          !isComment ? (
+            <CommandTimer
+              commandStartedAt={commandDetails?.data.startedAt}
+              commandCompletedAt={commandDetails?.data.completedAt}
+            />
+          ) : null}
+          <CommandText
+            analysisCommand={analysisCommand}
+            runCommand={commandDetails?.data ?? null}
           />
-        ) : null}
-        <CommandText
-          analysisCommand={analysisCommand}
-          runCommand={commandDetails?.data ?? null}
-        />
+        </Flex>
+        <Text fontSize={FONT_SIZE_CAPTION} paddingY={SPACING_1}>{stepNumber}</Text>
       </Flex>
     </Flex>
   )
