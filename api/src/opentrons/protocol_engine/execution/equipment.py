@@ -1,16 +1,16 @@
 """Equipment command side-effect logic."""
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, cast
 
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.protocols.geometry.module_geometry import (
-    resolve_module_type,
-    module_model_from_string,
-)
 from opentrons.types import MountType
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.modules.mod_abc import AbstractModule
+from opentrons.hardware_control.modules import (
+    AbstractModule,
+    ModuleType,
+    ModuleModel as HwModuleModel,
+)
 
 from ..errors import (
     FailedToLoadPipetteError,
@@ -182,7 +182,10 @@ class EquipmentHandler:
         return LoadedPipetteData(pipette_id=pipette_id)
 
     async def load_module(
-        self, model: ModuleModel, location: DeckSlotLocation, module_id: Optional[str]
+        self,
+        model: ModuleModel,
+        location: DeckSlotLocation,
+        module_id: Optional[str],
     ) -> LoadedModuleData:
         """Ensure the required module is attached.
 
@@ -195,7 +198,6 @@ class EquipmentHandler:
         Returns:
             A LoadedModuleData object
         """
-        definition: ModuleDefinition
         try:
             # Try to use existing definition in state.
             definition = self._state_store.modules.get_definition_by_model(model)
@@ -204,32 +206,26 @@ class EquipmentHandler:
 
         module_id = module_id or self._model_utils.generate_id()
 
-        attached_mod_instance = await self._get_hardware_module(model)
+        matching_modules, simulating_module = await self._hardware_api.find_modules(
+            # TODO(mc, 2022-01-18): reconcile enums+unions to remove this cast
+            by_model=cast(HwModuleModel, model),
+            resolved_type=ModuleType(definition.moduleType),
+        )
+
+        hw_module_instance = simulating_module
+
+        attached_module = matching_modules[0]
+        module_serial = attached_module.device_info["serial"]
+
+        if hw_module_instance is None:
+            raise ModuleNotAttachedError(
+                f"No available module found matching {model.value}"
+            )
+
+        module_serial = hw_module_instance.device_info["serial"]
 
         return LoadedModuleData(
             module_id=module_id,
-            module_serial=attached_mod_instance.device_info.get("serial"),
+            module_serial=module_serial,
             definition=definition,
         )
-
-    async def _get_hardware_module(self, model: ModuleModel) -> AbstractModule:
-        hw_model = module_model_from_string(model.value)
-        model_type = resolve_module_type(hw_model)
-
-        available, simulating = await self._hardware_api.find_modules(
-            by_model=hw_model, resolved_type=model_type
-        )
-
-        for mod in available:
-            # TODO (spp, 2021-11-22): make this accept compatible module models
-            # and update LoadModule command docs accordingly
-            if mod.model() == model.value:
-                if not self._state_store.modules.get_by_serial(
-                    mod.device_info["serial"]
-                ):
-                    return mod
-
-        if simulating:
-            return simulating
-        else:
-            raise ModuleNotAttachedError("Requested module not found.")

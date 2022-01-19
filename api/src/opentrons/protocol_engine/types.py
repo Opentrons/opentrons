@@ -126,6 +126,7 @@ class MotorAxis(str, Enum):
     RIGHT_PLUNGER = "rightPlunger"
 
 
+# TODO(mc, 2022-01-18): move enum to hardware control module
 class ModuleModel(str, Enum):
     """All available modules' models."""
 
