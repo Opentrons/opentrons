@@ -11,7 +11,6 @@ from typing import (
     List,
     Optional,
     Tuple,
-    overload,
     Sequence,
     Set,
 )
@@ -1014,7 +1013,7 @@ class OT3API(
         aspiration. To make the problem more obvious, :py:meth:`aspirate` will
         raise an exception if this method has not previously been called.
         """
-        instruments = self._instruments_for(mount)
+        instruments = self.instruments_for(mount)
         self._ready_for_tip_action(instruments, HardwareAction.PREPARE_ASPIRATE)
 
         with_zero = filter(lambda i: i[0].current_volume == 0, instruments)
@@ -1059,7 +1058,7 @@ class OT3API(
         rate : [float] Set plunger speed for this aspirate, where
             speed = rate * aspirate_speed
         """
-        instruments = self._instruments_for(mount)
+        instruments = self.instruments_for(mount)
         self._ready_for_tip_action(instruments, HardwareAction.ASPIRATE)
         plunger_currents = {
             Axis.of_plunger(instr[1]): instr[0].config.plunger_current
@@ -1129,7 +1128,7 @@ class OT3API(
         rate : [float] Set plunger speed for this dispense, where
             speed = rate * dispense_speed
         """
-        instruments = self._instruments_for(mount)
+        instruments = self.instruments_for(mount)
         self._ready_for_tip_action(instruments, HardwareAction.DISPENSE)
 
         plunger_currents = {
@@ -1190,7 +1189,7 @@ class OT3API(
         Force any remaining liquid to dispense. The liquid will be dispensed at
         the current location of pipette
         """
-        instruments = self._instruments_for(mount)
+        instruments = self.instruments_for(mount)
         self._ready_for_tip_action(instruments, HardwareAction.BLOWOUT)
         plunger_currents = {
             Axis.of_plunger(instr[1]): instr[0].config.plunger_current
@@ -1220,28 +1219,6 @@ class OT3API(
             for instr in instruments:
                 instr[0].set_current_volume(0)
                 instr[0].ready_to_aspirate = False
-
-    @overload
-    def _instruments_for(self, mount: top_types.Mount) -> Tuple[PipetteHandlingData]:
-        ...
-
-    @overload
-    def _instruments_for(
-        self, mount: PipettePair
-    ) -> Tuple[PipetteHandlingData, PipetteHandlingData]:
-        ...
-
-    def _instruments_for(self, mount):
-        if isinstance(mount, PipettePair):
-            primary_mount = mount.primary
-            secondary_mount = mount.secondary
-            instr1 = self._attached_instruments[primary_mount]
-            instr2 = self._attached_instruments[secondary_mount]
-            return ((instr1, primary_mount), (instr2, secondary_mount))
-        else:
-            primary_mount = mount
-            instr1 = self._attached_instruments[primary_mount]
-            return ((instr1, primary_mount),)
 
     def _ready_for_pick_up_tip(self, targets: Sequence[PipetteHandlingData]):
         for pipettes in targets:
@@ -1296,7 +1273,7 @@ class OT3API(
         If ``presses`` or ``increment`` is not specified (or is ``None``),
         their value is taken from the pipette configuration.
         """
-        instruments = self._instruments_for(mount)
+        instruments = self.instruments_for(mount)
         self._ready_for_pick_up_tip(instruments)
         plunger_currents = {
             Axis.of_plunger(instr[1]): instr[0].config.plunger_current
@@ -1392,7 +1369,7 @@ class OT3API(
     def set_current_tiprack_diameter(
         self, mount: Union[top_types.Mount, PipettePair], tiprack_diameter: float
     ):
-        instruments = self._instruments_for(mount)
+        instruments = self.instruments_for(mount)
         for instr in instruments:
             assert instr[0]
             self._log.info(
@@ -1404,7 +1381,7 @@ class OT3API(
     def set_working_volume(
         self, mount: Union[top_types.Mount, PipettePair], tip_volume: int
     ):
-        instruments = self._instruments_for(mount)
+        instruments = self.instruments_for(mount)
         for instr in instruments:
             assert instr[0]
             self._log.info(
@@ -1426,7 +1403,7 @@ class OT3API(
                                 the ejector shroud after a drop.
         """
 
-        instruments = self._instruments_for(mount)
+        instruments = self.instruments_for(mount)
         self._ready_for_tip_action(instruments, HardwareAction.DROPTIP)
         plunger_currents = {
             Axis.of_plunger(instr[1]): instr[0].config.plunger_current
