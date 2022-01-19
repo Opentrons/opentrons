@@ -529,3 +529,25 @@ class InstrumentHandlerProvider:
             )
             for instr, this_dist, this_vol in zip(instruments, dist, disp_vol)
         ]
+
+    def plan_check_blow_out(
+        self, mount: Union[top_types.Mount, PipettePair]
+    ) -> Sequence["InstrumentHandlerProvider.LiquidActionSpec"]:
+        """Check preconditions and calculate values for blowout."""
+        instruments = self.instruments_for(mount)
+        self.ready_for_tip_action(instruments, HardwareAction.BLOWOUT)
+        speed = max(
+            self.plunger_speed(instr[0], instr[0].blow_out_flow_rate, "dispense")
+            for instr in instruments
+        )
+        return [
+            self.LiquidActionSpec(
+                axis=Axis.of_plunger(instr[1]),
+                volume=0,
+                plunger_distance=instr[0].config.blow_out,
+                speed=speed,
+                instr=instr[0],
+                current=instr[0].config.plunger_current,
+            )
+            for instr in instruments
+        ]
