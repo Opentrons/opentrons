@@ -256,7 +256,9 @@ class OT3API(
 
     # Incidentals (i.e. not motion) API
 
-    async def set_lights(self, button: bool = None, rails: bool = None):
+    async def set_lights(
+        self, button: Optional[bool] = None, rails: Optional[bool] = None
+    ) -> None:
         """Control the robot lights."""
         self._backend.set_lights(button, rails)
 
@@ -305,8 +307,8 @@ class OT3API(
         )
 
     async def cache_instruments(
-        self, require: Dict[top_types.Mount, PipetteName] = None
-    ):
+        self, require: Optional[Dict[top_types.Mount, PipetteName]] = None
+    ) -> None:
         """
         Scan the attached instruments, take necessary configuration actions,
         and set up hardware controller internal state if necessary.
