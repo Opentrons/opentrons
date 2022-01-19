@@ -85,7 +85,6 @@ const mockGetConnectedRobotName = RobotSelectors.getConnectedRobotName as jest.M
 const mockGetValidCustomLabwareFiles = customLabwareSelectors.getValidCustomLabwareFiles as jest.MockedFunction<
   typeof customLabwareSelectors.getValidCustomLabwareFiles
 >
-
 const queryClient = new QueryClient()
 
 const render = () => {

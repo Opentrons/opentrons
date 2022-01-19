@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Redirect } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import {
   RunStatus,
   RUN_STATUS_IDLE,
@@ -9,7 +9,6 @@ import {
   RUN_STATUS_PAUSE_REQUESTED,
   RUN_STATUS_FINISHING,
   RUN_STATUS_STOP_REQUESTED,
-  RUN_STATUS_STOPPED,
 } from '@opentrons/api-client'
 import {
   SPACING_2,
@@ -31,7 +30,6 @@ import { CommandList } from './CommandList'
 import { ConfirmCancelModal } from './ConfirmCancelModal'
 
 import styles from '../ProtocolUpload/styles.css'
-import { useDismissCurrentRunMutation } from '@opentrons/react-api-client'
 
 export function RunDetails(): JSX.Element | null {
   const { t } = useTranslation(['run_details', 'shared'])
@@ -39,7 +37,7 @@ export function RunDetails(): JSX.Element | null {
   const runStatus = useRunStatus()
   const startTime = useRunStartTime()
   const { closeCurrentRun, isProtocolRunLoaded } = useCloseCurrentRun()
-  const dismissRun = useDismissCurrentRunMutation()
+  const history = useHistory()
 
   // display an idle status as 'running' in the UI after a run has started
   const adjustedRunStatus: RunStatus | null =
@@ -58,7 +56,7 @@ export function RunDetails(): JSX.Element | null {
     setShowConfirmCancelModal(true)
   }
   const handleCloseProtocol: React.MouseEventHandler = _event => {
-    closeCurrentRun()
+    closeCurrentRun({ onSuccess: () => history.push('/upload') })
   }
 
   const {
@@ -68,7 +66,7 @@ export function RunDetails(): JSX.Element | null {
   } = useConditionalConfirm(handleCloseProtocol, true)
 
   if (!isProtocolRunLoaded) {
-    return <Redirect to="/upload" />
+    return null
   }
 
   const cancelRunButton = (
@@ -111,7 +109,6 @@ export function RunDetails(): JSX.Element | null {
     }
   }
 
-  console.log(adjustedRunStatus)
   return (
     <>
       {showCloseConfirmExit && (
@@ -119,9 +116,6 @@ export function RunDetails(): JSX.Element | null {
           <ConfirmExitProtocolUploadModal
             back={cancelCloseExit}
             exit={confirmCloseExit}
-            isRunCloseSuccessful={
-              adjustedRunStatus === RUN_STATUS_STOPPED ? true : false
-            }
           />
         </Portal>
       )}

@@ -142,6 +142,8 @@ export function ProtocolUpload(): JSX.Element {
     setShowConfirmCancelModal,
   ] = React.useState<boolean>(false)
 
+  const isStatusFinishing = runStatus === RUN_STATUS_FINISHING
+
   /** NOTE: the logic to determine the contents of this titlebar is
   very close to the logic present on the RunDetails organism */
   const cancelRunButton = (
@@ -198,7 +200,6 @@ export function ProtocolUpload(): JSX.Element {
   ) : (
     <UploadInput onUpload={handleUpload} />
   )
-
   return (
     <>
       {showConfirmExit && (
@@ -237,16 +238,31 @@ export function ProtocolUpload(): JSX.Element {
           width="100%"
           backgroundColor={C_NEAR_WHITE}
         >
-          {isCreatingProtocolRun ? <ProtocolLoader /> : pageContents}
+          {isCreatingProtocolRun || isStatusFinishing ? (
+            <ProtocolLoader
+              loadingText={
+                isCreatingProtocolRun
+                  ? t('protocol_loading', {
+                      robot_name: robotName,
+                    })
+                  : t('protocol_finishing', {
+                      robot_name: robotName,
+                    })
+              }
+            />
+          ) : (
+            pageContents
+          )}
         </Box>
       </Page>
     </>
   )
 }
+interface ProtocolLoaderProps {
+  loadingText: string
+}
 
-function ProtocolLoader(): JSX.Element | null {
-  const { t } = useTranslation('protocol_info')
-  const robotName = useSelector((state: State) => getConnectedRobotName(state))
+function ProtocolLoader(props: ProtocolLoaderProps): JSX.Element | null {
   return (
     <Flex
       justifyContent={JUSTIFY_CENTER}
@@ -263,9 +279,7 @@ function ProtocolLoader(): JSX.Element | null {
         fontWeight={FONT_WEIGHT_REGULAR}
         fontSize={FONT_SIZE_BIG}
       >
-        {t('protocol_loading', {
-          robot_name: robotName,
-        })}
+        {props.loadingText}
       </Text>
       <Icon
         name="ot-spinner"
