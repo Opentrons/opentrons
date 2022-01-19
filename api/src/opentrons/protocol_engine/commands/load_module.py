@@ -59,9 +59,17 @@ class LoadModuleResult(BaseModel):
     # TODO (spp, 2021-11-24): Evaluate if this needs to be in the result
     definition: ModuleDefinition = Field(description="The definition of this module.")
 
-    # TODO (spp, 2021-11-24): Remove optional
-    moduleSerial: Optional[str] = Field(
-        None, description="Hardware serial number of the module, if connected."
+    model: ModuleModel = Field(
+        ...,
+        description=(
+            "Hardware model of the connected module. May be different than"
+            " the requested model if the attached module is still compatible."
+        ),
+    )
+
+    serialNumber: str = Field(
+        ...,
+        description="Hardware serial number of the connected module.",
     )
 
 
@@ -77,7 +85,8 @@ class LoadModuleImplementation(AbstractCommandImpl[LoadModuleParams, LoadModuleR
         )
         return LoadModuleResult(
             moduleId=loaded_module.module_id,
-            moduleSerial=loaded_module.module_serial,
+            serialNumber=loaded_module.serial_number,
+            model=loaded_module.definition.model,
             definition=loaded_module.definition,
         )
 

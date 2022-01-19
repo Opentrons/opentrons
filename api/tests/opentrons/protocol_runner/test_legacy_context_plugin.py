@@ -301,7 +301,7 @@ async def test_module_load_broker_messages(
         module_model=LegacyMagneticModuleModel.MAGNETIC_V2,
         deck_slot=DeckSlotName.SLOT_1,
         configuration=None,
-        module_serial=None,
+        module_serial="serial-number",
     )
     engine_command = pe_commands.Custom(
         id="command-id",

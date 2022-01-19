@@ -255,7 +255,7 @@ class LegacyCommandMapper:
         # have similar info, with V2 having additional info fields.
         definition = self._module_definition_by_model.get(
             module_model
-        ) or self._module_data_provider.get_module_definition(module_model)
+        ) or self._module_data_provider.get_definition(module_model)
 
         load_module_command = pe_commands.LoadModule.construct(
             id=command_id,
@@ -273,8 +273,9 @@ class LegacyCommandMapper:
             ),
             result=pe_commands.LoadModuleResult.construct(
                 moduleId=module_id,
-                moduleSerial=module_load_info.module_serial,
+                serialNumber=module_load_info.module_serial,
                 definition=definition,
+                model=definition.model,
             ),
         )
         self._command_count["LOAD_MODULE"] = count + 1

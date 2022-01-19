@@ -1,6 +1,7 @@
 """Unique ID generation provider."""
 from datetime import datetime, timezone
 from uuid import uuid4
+from typing import Optional
 
 
 class ModelUtils:
@@ -13,6 +14,14 @@ class ModelUtils:
         Uses UUIDv4 for safety in a multiprocessing environment.
         """
         return str(uuid4())
+
+    @staticmethod
+    def ensure_id(maybe_id: Optional[str] = None) -> str:
+        """Generate a unique identifier only if the given input is None.
+
+        Uses UUIDv4 for safety in a multiprocessing environment.
+        """
+        return maybe_id if maybe_id is not None else ModelUtils.generate_id()
 
     @staticmethod
     def get_timestamp() -> datetime:

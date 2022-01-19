@@ -1,25 +1,15 @@
 """Equipment command side-effect logic."""
 from dataclasses import dataclass
-from typing import Optional, cast
+from typing import Optional
 
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import MountType
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.modules import (
-    AbstractModule,
-    ModuleType,
-    ModuleModel as HwModuleModel,
-)
 
-from ..errors import (
-    FailedToLoadPipetteError,
-    LabwareDefinitionDoesNotExistError,
-    ModuleNotAttachedError,
-    ModuleDefinitionDoesNotExistError,
-)
+from ..errors import FailedToLoadPipetteError, LabwareDefinitionDoesNotExistError
 from ..resources import LabwareDataProvider, ModuleDataProvider, ModelUtils
-from ..state import StateStore
+from ..state import StateStore, HardwareModule
 from ..types import (
     LabwareLocation,
     PipetteName,
@@ -51,7 +41,7 @@ class LoadedModuleData:
     """The result of a load module procedure."""
 
     module_id: str
-    module_serial: Optional[str]
+    serial_number: str
     definition: ModuleDefinition
 
 
@@ -198,34 +188,24 @@ class EquipmentHandler:
         Returns:
             A LoadedModuleData object
         """
-        try:
-            # Try to use existing definition in state.
-            definition = self._state_store.modules.get_definition_by_model(model)
-        except ModuleDefinitionDoesNotExistError:
-            definition = self._module_data_provider.get_module_definition(model)
+        attached_modules = [
+            HardwareModule(
+                serial_number=hw_mod.device_info["serial"],
+                definition=self._module_data_provider.get_definition(
+                    ModuleModel(hw_mod.model())
+                ),
+            )
+            for hw_mod in self._hardware_api.attached_modules
+        ]
 
-        module_id = module_id or self._model_utils.generate_id()
-
-        matching_modules, simulating_module = await self._hardware_api.find_modules(
-            # TODO(mc, 2022-01-18): reconcile enums+unions to remove this cast
-            by_model=cast(HwModuleModel, model),
-            resolved_type=ModuleType(definition.moduleType),
+        attached_module = self._state_store.modules.find_attached_module(
+            model=model,
+            location=location,
+            attached_modules=attached_modules,
         )
 
-        hw_module_instance = simulating_module
-
-        attached_module = matching_modules[0]
-        module_serial = attached_module.device_info["serial"]
-
-        if hw_module_instance is None:
-            raise ModuleNotAttachedError(
-                f"No available module found matching {model.value}"
-            )
-
-        module_serial = hw_module_instance.device_info["serial"]
-
         return LoadedModuleData(
-            module_id=module_id,
-            module_serial=module_serial,
-            definition=definition,
+            module_id=self._model_utils.ensure_id(module_id),
+            serial_number=attached_module.serial_number,
+            definition=attached_module.definition,
         )
