@@ -204,7 +204,7 @@ export function CommandList(): JSX.Element | null {
               {t('protocol_steps')}
             </Text>
             {protocolSetupCommandList.length > 0
-              ? <ProtocolSetupInfo protocolSetupCommandList={protocolSetupCommandList} />
+              ? <ProtocolSetupItem protocolSetupCommandList={protocolSetupCommandList} />
               : null
             }
           </>
