@@ -35,7 +35,7 @@ class InstrumentHandlerProvider:
         }
         self._ihp_log = InstrumentHandlerProvider.IHP_LOG.getChild(str(id(self)))
 
-    def reset_instrument(self, mount: top_types.Mount = None):
+    def reset_instrument(self, mount: Optional[top_types.Mount] = None):
         """
         Reset the internal state of a pipette by its mount, without doing
         any lower level reconfiguration. This is useful to make sure that no
