@@ -393,7 +393,7 @@ class InstrumentHandlerProvider:
         return round(ul_per_s, 6)
 
     @dataclass(frozen=True)
-    class AspirateSpec:
+    class LiquidActionSpec:
         axis: Axis
         volume: float
         plunger_distance: float
@@ -406,7 +406,7 @@ class InstrumentHandlerProvider:
         mount: Union[top_types.Mount, PipettePair],
         volume: Optional[float],
         rate: float,
-    ) -> Sequence["InstrumentHandlerProvider.AspirateSpec"]:
+    ) -> Sequence["InstrumentHandlerProvider.LiquidActionSpec"]:
         """Check preconditions for aspirate, parse args, and calculate positions.
 
         While the mechanics of issuing an aspirate move itself are left to child
@@ -453,7 +453,7 @@ class InstrumentHandlerProvider:
             for instr in instruments
         )
         return [
-            self.AspirateSpec(
+            self.LiquidActionSpec(
                 axis=Axis.of_plunger(instr[1]),
                 volume=this_vol,
                 plunger_distance=this_dist,
@@ -462,4 +462,70 @@ class InstrumentHandlerProvider:
                 current=instr[0].config.plunger_current,
             )
             for instr, this_dist, this_vol in zip(instruments, dist, asp_vol)
+        ]
+
+    def plan_check_dispense(
+        self,
+        mount: Union[top_types.Mount, PipettePair],
+        volume: Optional[float],
+        rate: float,
+    ) -> Sequence["InstrumentHandlerProvider.LiquidActionSpec"]:
+        """Check preconditions for dispense, parse args, and calculate positions.
+
+        While the mechanics of issuing a dispense move itself are left to child
+        classes, determining things like dispense volume from the allowed argument
+        types is invariant between machines, and this method gathers that functionality.
+
+        Coalesce
+        - Optional volumes
+        - Pair/single dispense
+
+        Check
+        - Dispense volumes compared to max and remaining
+
+        Calculate
+        - Plunger distances (possibly calling an overridden plunger_volume)
+        """
+
+        instruments = self.instruments_for(mount)
+        self.ready_for_tip_action(instruments, HardwareAction.DISPENSE)
+
+        if volume is None:
+            disp_vol = tuple(instr[0].current_volume for instr in instruments)
+            self._ihp_log.debug(
+                "No dispense volume specified. Dispensing all "
+                "remaining liquid ({}uL) from pipette".format(disp_vol)
+            )
+        else:
+            disp_vol = tuple(volume for instr in instruments)
+
+        # Ensure we don't dispense more than the current volume
+        disp_vol = tuple(
+            min(instr[0].current_volume, vol)
+            for instr, vol in zip(instruments, disp_vol)
+        )
+
+        if all([vol == 0 for vol in disp_vol]):
+            return []
+        elif 0 in disp_vol:
+            raise PairedPipetteConfigValueError("Cannot only dispense from one pipette")
+
+        dist = tuple(
+            self.plunger_position(instr[0], instr[0].current_volume - vol, "dispense")
+            for instr, vol in zip(instruments, disp_vol)
+        )
+        speed = min(
+            self.plunger_speed(instr[0], instr[0].dispense_flow_rate * rate, "dispense")
+            for instr in instruments
+        )
+        return [
+            self.LiquidActionSpec(
+                axis=Axis.of_plunger(instr[1]),
+                volume=this_vol,
+                plunger_distance=this_dist,
+                speed=speed,
+                instr=instr[0],
+                current=instr[0].config.plunger_current,
+            )
+            for instr, this_dist, this_vol in zip(instruments, dist, disp_vol)
         ]
