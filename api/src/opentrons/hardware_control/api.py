@@ -1195,26 +1195,20 @@ class API(
         Force any remaining liquid to dispense. The liquid will be dispensed at
         the current location of pipette
         """
-        instruments = self.instruments_for(mount)
-        self.ready_for_tip_action(instruments, HardwareAction.BLOWOUT)
-        plunger_currents = {
-            Axis.of_plunger(instr[1]): instr[0].config.plunger_current
-            for instr in instruments
-        }
-        blow_out = tuple(instr[0].config.blow_out for instr in instruments)
-
-        self._backend.set_active_current(plunger_currents)
-        speed = max(
-            self.plunger_speed(instr[0], instr[0].blow_out_flow_rate, "dispense")
-            for instr in instruments
+        blowout_spec = self.plan_check_blow_out(mount)
+        self._backend.set_active_current(
+            {spec.axis: spec.current for spec in blowout_spec}
         )
+        target_pos, _, secondary_z = target_position_from_plunger(
+            mount,
+            [spec.plunger_distance for spec in blowout_spec],
+            self._current_position,
+        )
+
         try:
-            target_pos, _, secondary_z = target_position_from_plunger(
-                mount, blow_out, self._current_position
-            )
             await self._move(
                 target_pos,
-                speed=speed,
+                speed=blowout_spec[0].speed,
                 secondary_z=secondary_z,
                 home_flagged_axes=False,
             )
@@ -1222,9 +1216,9 @@ class API(
             self._log.exception("Blow out failed")
             raise
         finally:
-            for instr in instruments:
-                instr[0].set_current_volume(0)
-                instr[0].ready_to_aspirate = False
+            for spec in blowout_spec:
+                spec.instr.set_current_volume(0)
+                spec.instr.ready_to_aspirate = False
 
     async def pick_up_tip(
         self,
