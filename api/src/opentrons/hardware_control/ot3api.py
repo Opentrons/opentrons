@@ -1059,59 +1059,34 @@ class OT3API(
         rate : [float] Set plunger speed for this aspirate, where
             speed = rate * aspirate_speed
         """
-        instruments = self._instruments_for(mount)
-        self._ready_for_tip_action(instruments, HardwareAction.ASPIRATE)
-        plunger_currents = {
-            Axis.of_plunger(instr[1]): instr[0].config.plunger_current
-            for instr in instruments
-        }
-
-        if volume is None:
-            mod_log.debug(
-                "No aspirate volume defined. Aspirating up to "
-                "max_volume for the pipette"
-            )
-            asp_vol = tuple(instr[0].available_volume for instr in instruments)
-        else:
-            asp_vol = tuple(volume for instr in instruments)
-
-        if all([vol == 0 for vol in asp_vol]):
+        aspirate_spec = self.plan_check_aspirate(mount, volume, rate)
+        if not aspirate_spec:
             return
-        elif 0 in asp_vol:
-            raise PairedPipetteConfigValueError("Cannot only aspirate from one pipette")
-
-        for instr, vol in zip(instruments, asp_vol):
-            assert instr[0].ok_to_add_volume(
-                vol
-            ), "Cannot aspirate more than pipette max volume"
-
-        dist = tuple(
-            self.plunger_position(instr[0], instr[0].current_volume + vol, "aspirate")
-            for instr, vol in zip(instruments, asp_vol)
+        target_pos, _, secondary_z = target_position_from_plunger(
+            mount,
+            [spec.plunger_distance for spec in aspirate_spec],
+            self._current_position,
         )
-        speed = min(
-            self.plunger_speed(instr[0], instr[0].aspirate_flow_rate * rate, "aspirate")
-            for instr in instruments
-        )
+
         try:
-            self._backend.set_active_current(plunger_currents)
-            target_pos, _, secondary_z = target_position_from_plunger(
-                mount, dist, self._current_position
+            self._backend.set_active_current(
+                {spec.axis: spec.current for spec in aspirate_spec}
             )
+
             await self._move(
                 target_pos,
-                speed=speed,
+                speed=aspirate_spec[0].speed,
                 secondary_z=secondary_z,
                 home_flagged_axes=False,
             )
         except Exception:
             self._log.exception("Aspirate failed")
-            for instr in instruments:
-                instr[0].set_current_volume(0)
+            for spec in aspirate_spec:
+                spec.instr.set_current_volume(0)
             raise
         else:
-            for instr, vol in zip(instruments, asp_vol):
-                instr[0].add_current_volume(vol)
+            for spec in aspirate_spec:
+                spec.instr.add_current_volume(spec.volume)
 
     async def dispense(
         self,
