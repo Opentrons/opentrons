@@ -82,6 +82,11 @@ class OT3API(
     of external access to the hardware. Each method may be minimal - it may
     only delegate the call to another submodule of the hardware manager -
     but its purpose is to be gathered here to provide a single interface.
+
+    This implements the protocols in opentrons.hardware_control.protocols,
+    and longer method docstrings may be found there. Docstrings for the
+    methods in this class only note where their behavior is different or
+    extended from that described in the protocol.
     """
 
     CLS_LOG = mod_log.getChild("OT3API")
@@ -235,9 +240,6 @@ class OT3API(
     def get_fw_version(self) -> str:
         """
         Return the firmware version of the connected hardware.
-
-        The version is a string retrieved directly from the attached hardware
-        (or possibly simulator).
         """
         from_backend = self._backend.fw_version
         if from_backend is None:
@@ -256,29 +258,15 @@ class OT3API(
     # Incidentals (i.e. not motion) API
 
     async def set_lights(self, button: bool = None, rails: bool = None):
-        """Control the robot lights.
-
-        :param button: If specified, turn the button light on (`True`) or
-                       off (`False`). If not specified, do not change the
-                       button light.
-        :param rails: If specified, turn the rail lights on (`True`) or
-                      off (`False`). If not specified, do not change the
-                      rail lights.
-        """
+        """Control the robot lights."""
         self._backend.set_lights(button, rails)
 
     def get_lights(self) -> Dict[str, bool]:
-        """Return the current status of the robot lights.
-
-        :returns: A dict of the lights: `{'button': bool, 'rails': bool}`
-        """
+        """Return the current status of the robot lights."""
         return self._backend.get_lights()
 
     async def identify(self, duration_s: int = 5):
-        """Blink the button light to identify the robot.
-
-        :param int duration_s: The duration to blink for, in seconds.
-        """
+        """Blink the button light to identify the robot."""
         count = duration_s * 4
         on = False
         for sec in range(count):
@@ -308,16 +296,7 @@ class OT3API(
         loop: asyncio.AbstractEventLoop = None,
         explicit_modeset: bool = True,
     ) -> str:
-        """Update the firmware on the Smoothie board.
-
-        :param firmware_file: The path to the firmware file.
-        :param explicit_modeset: `True` to force the smoothie into programming
-                                 mode; `False` to assume it is already in
-                                 programming mode.
-        :param loop: An asyncio event loop to use; if not specified, the one
-                     associated with this instance will be used.
-        :returns: The stdout of the tool used to update the smoothie
-        """
+        """Update the firmware on the hardware."""
         if None is loop:
             checked_loop = self._loop
         else:
@@ -332,25 +311,6 @@ class OT3API(
         """
         Scan the attached instruments, take necessary configuration actions,
         and set up hardware controller internal state if necessary.
-
-        :param require: If specified, the require should be a dict
-                        of mounts to instrument names describing
-                        the instruments expected to be present. This can
-                        save a subsequent of :py:attr:`attached_instruments`
-                        and also serves as the hook for the hardware
-                        simulator to decide what is attached.
-        :raises RuntimeError: If an instrument is expected but not found.
-
-        .. note::
-
-            This function will only change the things that need to be changed.
-            If the same pipette (by serial) or the same lack of pipette is
-            observed on a mount before and after the scan, no action will be
-            taken. That makes this function appropriate for setting up the
-            robot for operation, but not for making sure that any previous
-            settings changes have been reset. For the latter use case, use
-            :py:meth:`reset_instrument`.
-
         """
         self._log.info("Updating instrument model cache")
         checked_require = require or {}
@@ -390,16 +350,7 @@ class OT3API(
     # Global actions API
     def pause(self, pause_type: PauseType):
         """
-        Pause motion of the robot after a current motion concludes.
-
-        Individual calls to :py:meth:`move`
-        (which :py:meth:`aspirate` and :py:meth:`dispense` and other
-        calls may depend on) are considered atomic and will always complete if
-        they have been called prior to a call to this method. However,
-        subsequent calls to :py:meth:`move` that occur when the system
-        is paused will not proceed until the system is resumed with
-        :py:meth:`resume`.
-        """
+        Pause motion of the robot after a current motion concludes."""
         self._pause_manager.pause(pause_type)
 
         async def _chained_calls():
@@ -436,28 +387,12 @@ class OT3API(
         asyncio.run_coroutine_threadsafe(_chained_calls(), self._loop)
 
     async def halt(self) -> None:
-        """Immediately stop motion.
-
-        Calls to :py:meth:`stop` through the synch adapter while other calls
-        are ongoing will typically wait until those calls are done, since most
-        of the async calls here in fact block the loop while they talk to
-        smoothie. To provide actual immediate halting, call this method which
-        does not require use of the loop.
-
-        After this call, the smoothie will be in a bad state until a call to
-        :py:meth:`stop`.
-        """
+        """Immediately stop motion."""
         await self._backend.hard_halt()
         asyncio.run_coroutine_threadsafe(self._execution_manager.cancel(), self._loop)
 
     async def stop(self, home_after: bool = True):
-        """
-        Stop motion as soon as possible, reset, and optionally home.
-
-        This will cancel motion (after the current call to :py:meth:`move`;
-        see :py:meth:`pause` for more detail), then home and reset the
-        robot.
-        """
+        """Stop motion as soon as possible, reset, and optionally home."""
         await self._backend.halt()
         self._log.info("Recovering from halt")
         await self.reset()
@@ -466,11 +401,7 @@ class OT3API(
             await self.home()
 
     async def reset(self):
-        """Reset the stored state of the system.
-
-        This will re-scan instruments and models, clearing any cached
-        information about their presence or state.
-        """
+        """Reset the stored state of the system."""
         self._pause_manager.reset()
         await self._execution_manager.reset()
         await InstrumentHandlerProvider.reset(self)
@@ -527,19 +458,13 @@ class OT3API(
         """
         Home the plunger motor for a mount, and then return it to the 'bottom'
         position.
-
-        :param mount: the mount associated with the target plunger
-        :type mount: :py:class:`.top_types.Mount`
         """
         await self.current_position(mount=mount, refresh=True)
         await self._do_plunger_home(mount=mount, acquire_lock=True)
 
     @ExecutionManagerProvider.wait_for_running
     async def home(self, axes: Optional[List[Axis]] = None):
-        """Home the entire robot and initialize current position.
-        :param axes: A list of axes to home. Default is `None`, which will
-                     home everything.
-        """
+        """Home the entire robot and initialize current position."""
         self._reset_last_mount()
         # Initialize/update current_position
         checked_axes = axes or [ax for ax in Axis]
@@ -556,23 +481,7 @@ class OT3API(
                 await self._do_plunger_home(axis=plunger, acquire_lock=False)
 
     def _deck_from_smoothie(self, smoothie_pos: Dict[str, float]) -> Dict[Axis, float]:
-        """Build a deck-abs position store from the smoothie's position
-
-        This should take the smoothie style position {'X': float, etc}
-        and turn it into the position dict used here {Axis.X: float} in
-        deck-absolute coordinates. It runs the reverse deck transformation
-        for the axes that require it.
-
-        One piece of complexity is that if the gantry transformation includes
-        a transition between non parallel planes, the z position of the left
-        mount would depend on its actual position in deck frame, so we have
-        to apply the mount offset.
-
-        TODO: Figure out which frame the mount offset is measured in, because
-              if it's measured in the deck frame (e.g. by touching off points
-              on the deck) it has to go through the reverse transform to be
-              added to the smoothie coordinates here.
-        """
+        """Build a deck-abs position store from the smoothie's position"""
         with_enum = {Axis[k]: v for k, v in smoothie_pos.items()}
         plunger_axes = {
             k: v for k, v in with_enum.items() if k not in Axis.gantry_axes()
@@ -611,20 +520,6 @@ class OT3API(
     ) -> Dict[Axis, float]:
         """Return the postion (in deck coords) of the critical point of the
         specified mount.
-
-        This returns cached position to avoid hitting the smoothie driver
-        unless ``refresh`` is ``True``.
-
-        If `critical_point` is specified, that critical point will be applied
-        instead of the default one. For instance, if
-        `critical_point=CriticalPoints.MOUNT` then the position of the mount
-        will be returned. If the critical point specified does not exist, then
-        the next one down is returned - for instance, if there is no tip on the
-        specified mount but `CriticalPoint.TIP` was specified, the position of
-        the nozzle will be returned.
-
-        If `fail_on_not_homed` is `True`, this method will raise a `MustHomeError`
-        if any of the relavent axes are not homed, regardless of `refresh`.
         """
         z_ax = Axis.by_mount(mount)
         plunger_ax = Axis.of_plunger(mount)
@@ -667,20 +562,7 @@ class OT3API(
         # position reporting when motors are not homed
         fail_on_not_homed: bool = False,
     ) -> top_types.Point:
-        """Return the position of the critical point as pertains to the gantry
-
-        This ignores the plunger position and gives the Z-axis a predictable
-        name (as :py:attr:`.Point.z`).
-
-        `critical_point` specifies an override to the current critical point to
-        use (see :py:meth:`current_position`).
-
-        `refresh` if set to True, update the cached position using the
-        smoothie driver (see :py:meth:`current_position`).
-
-        If `fail_on_not_homed` is `True`, this method will raise a `MustHomeError`
-        if any of the relavent axes are not homed, regardless of `refresh`.
-        """
+        """Return the position of the critical point as pertains to the gantry."""
         cur_pos = await self.current_position(
             mount,
             critical_point,
@@ -700,42 +582,7 @@ class OT3API(
         max_speeds: Optional[Dict[Axis, float]] = None,
     ):
         """Move the critical point of the specified mount to a location
-        relative to the deck, at the specified speed. 'speed' sets the speed
-        of all robot axes to the given value. So, if multiple axes are to be
-        moved, they will do so at the same speed
-
-        The critical point of the mount depends on the current status of
-        the mount:
-        - If the mount does not have anything attached, its critical point is
-          the bottom of the mount attach bracket.
-        - If the mount has a pipette attached and it is not known to have a
-          pipette tip, the critical point is the end of the nozzle of a single
-          pipette or the end of the backmost nozzle of a multipipette
-        - If the mount has a pipette attached and it is known to have a
-          pipette tip, the critical point is the end of the pipette tip for
-          a single pipette or the end of the tip of the backmost nozzle of a
-          multipipette
-
-        :param mount: The mount to move
-        :param abs_position: The target absolute position in
-                             deck coordinates to move the
-                             critical point to
-        :param speed: An overall head speed to use during the move
-        :param critical_point: The critical point to move. In most situations
-                               this is not needed. If not specified, the
-                               current critical point will be moved. If
-                               specified, the critical point must be one that
-                               actually exists - that is, specifying
-                               :py:attr:`.CriticalPoint.NOZZLE` when no pipette
-                               is attached or :py:attr:`.CriticalPoint.TIP`
-                               when no tip is applied will result in an error.
-        :param max_speeds: An optional override for per-axis maximum speeds. If
-                           an axis is specified, it will not move faster than
-                           the given speed. Note that this does not make that
-                           axis move precisely at the given speed; it only
-                           it if it was going to go faster. Direct speed
-                           is still set by ``speed``.
-        """
+        relative to the deck, at the specified speed."""
         if not self._current_position:
             await self.home()
 
@@ -761,13 +608,7 @@ class OT3API(
         fail_on_not_homed: bool = False,
     ):
         """Move the critical point of the specified mount by a specified
-        displacement in a specified direction, at the specified speed.
-        'speed' sets the speed of all axes to the given value. So, if multiple
-        axes are to be moved, they will do so at the same speed.
-
-        If fail_on_not_homed is True (default False), if an axis that is not
-        homed moves it will raise a MustHomeError. Otherwise, it will home the axis.
-        """
+        displacement in a specified direction, at the specified speed."""
 
         # TODO: Remove the fail_on_not_homed and make this the behavior all the time.
         # Having the optional arg makes the bug stick around in existing code and we
@@ -841,17 +682,7 @@ class OT3API(
         secondary_z: Axis = None,
         check_bounds: MotionChecks = MotionChecks.NONE,
     ):
-        """Worker function to apply robot motion.
-
-        Robot motion means the kind of motions that are relevant to the robot,
-        i.e. only one pipette plunger and mount move at the same time, and an
-        XYZ move in the coordinate frame of one of the pipettes.
-
-        ``target_position`` should be an ordered dict (ordered by XYZABC)
-        of deck calibrated values, containing any specified XY motion and
-        at most one of a ZA or BC components. The frame in which to move
-        is identified by the presence of (ZA) or (BC).
-        """
+        """Worker function to apply robot motion."""
         # Transform only the x, y, and (z or a) axes specified since this could
         # get the b or c axes as well
         to_transform_primary = tuple(
@@ -979,15 +810,7 @@ class OT3API(
         self.config = config
 
     async def update_config(self, **kwargs):
-        """Update values of the robot's configuration.
-
-        `kwargs` should contain keys of the robot's configuration. For
-        instance, `update_config(log_level='debug)` would change the API
-        server log level to :py:attr:`logging.DEBUG`.
-
-        Documentation on keys can be found in the documentation for
-        :py:class:`.RobotConfig`.
-        """
+        """Update values of the robot's configuration."""
         self._config = replace(self._config, **kwargs)
 
     async def update_deck_calibration(self, new_transform):
@@ -998,22 +821,7 @@ class OT3API(
         self, mount: Union[top_types.Mount, PipettePair], rate: float = 1.0
     ):
         """
-        Prepare the pipette for aspiration.
-
-        This must happen after every :py:meth:`blow_out` and should probably be
-        called before every :py:meth:`aspirate`, while the pipette tip is not
-        immersed in a well. It ensures that the plunger is at the 0-volume
-        position of the pipette if necessary (if not necessary, it does
-        nothing).
-
-        If :py:meth:`aspirate` is called immediately after :py:meth:`blow_out`,
-        the plunger is left at the ``blow_out`` position, below the ``bottom``
-        position, and moving the plunger up during :py:meth:`aspirate` is
-        expected to aspirate liquid - :py:meth:`aspirate` is called once the
-        pipette tip is already in the well. This will cause a subtle over
-        aspiration. To make the problem more obvious, :py:meth:`aspirate` will
-        raise an exception if this method has not previously been called.
-        """
+        Prepare the pipette for aspiration."""
         instruments = self._instruments_for(mount)
         self._ready_for_tip_action(instruments, HardwareAction.PREPARE_ASPIRATE)
 
@@ -1041,24 +849,7 @@ class OT3API(
         rate: float = 1.0,
     ):
         """
-        Aspirate a volume of liquid (in microliters/uL) using this pipette
-        from the *current location*. If no volume is passed, `aspirate` will
-        default to max available volume (after taking into account the volume
-        already present in the tip).
-
-        The function :py:meth:`prepare_for_aspirate` must be called prior to
-        calling this function, while the tip is above the well. This ensures
-        that the pipette tip is in the proper position at the bottom of the
-        pipette to begin aspiration, and prevents subtle over-aspiration if
-        an aspirate is done immediately after :py:meth:`blow_out`. If
-        :py:meth:`prepare_for_aspirate` has not been called since the last
-        call to :py:meth:`aspirate`, an exception will be raised.
-
-        mount : Mount.LEFT or Mount.RIGHT
-        volume : [float] The number of microliters to aspirate
-        rate : [float] Set plunger speed for this aspirate, where
-            speed = rate * aspirate_speed
-        """
+        Aspirate a volume of liquid (in microliters/uL) using this pipette."""
         aspirate_spec = self.plan_check_aspirate(mount, volume, rate)
         if not aspirate_spec:
             return
@@ -1095,15 +886,7 @@ class OT3API(
         rate: float = 1.0,
     ):
         """
-        Dispense a volume of liquid in microliters(uL) using this pipette
-        at the current location. If no volume is specified, `dispense` will
-        dispense all volume currently present in pipette
-
-        mount : Mount.LEFT or Mount.RIGHT
-        volume : [float] The number of microliters to dispense
-        rate : [float] Set plunger speed for this dispense, where
-            speed = rate * dispense_speed
-        """
+        Dispense a volume of liquid in microliters(uL) using this pipette."""
         dispense_spec = self.plan_check_dispense(mount, volume, rate)
         if not dispense_spec:
             return
@@ -1222,21 +1005,7 @@ class OT3API(
         increment: Optional[float] = None,
     ):
         """
-        Pick up tip from current location.
-
-        This is achieved by attempting to move the instrument down by its
-        `pick_up_distance`, in a series of presses. This distance is larger
-        than the space available in the tip, so the stepper motor will
-        eventually skip steps, which is resolved by homing afterwards. The
-        pick up operation is done at a current specified in the pipette config,
-        which is experimentally determined to skip steps at a level of force
-        sufficient to provide a good seal between the pipette nozzle and tip
-        while also avoiding attaching the tip so firmly that it can't be
-        dropped later.
-
-        If ``presses`` or ``increment`` is not specified (or is ``None``),
-        their value is taken from the pipette configuration.
-        """
+        Pick up tip from current location."""
         instruments = self._instruments_for(mount)
         self._ready_for_pick_up_tip(instruments)
         plunger_currents = {
@@ -1357,15 +1126,7 @@ class OT3API(
     async def drop_tip(
         self, mount: Union[top_types.Mount, PipettePair], home_after=True
     ):
-        """
-        Drop tip at the current location
-
-        :param Mount mount: The mount to drop a tip from
-        :param bool home_after: Home the plunger motor after dropping tip. This
-                                is used in case the plunger motor skipped while
-                                dropping the tip, and is also used to recover
-                                the ejector shroud after a drop.
-        """
+        """Drop tip at the current location."""
 
         instruments = self._instruments_for(mount)
         self._ready_for_tip_action(instruments, HardwareAction.DROPTIP)
