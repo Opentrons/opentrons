@@ -33,7 +33,7 @@ export function ConfirmCancelModal(
         buttons={[
           {
             Component: () => (
-              <NewSecondaryBtn onClick={onClose} marginLeft={SPACING_3}>
+              <NewSecondaryBtn onClick={onClose}>
                 {t('cancel_run_modal_back')}
               </NewSecondaryBtn>
             ),

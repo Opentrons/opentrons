@@ -16,7 +16,6 @@ export function ConfirmExitProtocolUploadModal(
   props: ConfirmExitProtocolUploadModalProps
 ): JSX.Element {
   const { t } = useTranslation('protocol_info')
-
   return (
     <AlertModal
       heading={t('exit_modal_heading')}
