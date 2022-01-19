@@ -31,6 +31,7 @@ import { CommandList } from './CommandList'
 import { ConfirmCancelModal } from './ConfirmCancelModal'
 
 import styles from '../ProtocolUpload/styles.css'
+import { useDismissCurrentRunMutation } from '@opentrons/react-api-client'
 
 export function RunDetails(): JSX.Element | null {
   const { t } = useTranslation(['run_details', 'shared'])
@@ -38,6 +39,7 @@ export function RunDetails(): JSX.Element | null {
   const runStatus = useRunStatus()
   const startTime = useRunStartTime()
   const { closeCurrentRun, isProtocolRunLoaded } = useCloseCurrentRun()
+  const dismissRun = useDismissCurrentRunMutation()
 
   // display an idle status as 'running' in the UI after a run has started
   const adjustedRunStatus: RunStatus | null =
@@ -50,7 +52,6 @@ export function RunDetails(): JSX.Element | null {
     showConfirmCancelModal,
     setShowConfirmCancelModal,
   ] = React.useState<boolean>(false)
-  const [isRunCancelling, setRunCancelling] = React.useState(false)
 
   const handleCancelClick = (): void => {
     pause()
@@ -79,13 +80,6 @@ export function RunDetails(): JSX.Element | null {
       {t('cancel_run')}
     </NewAlertSecondaryBtn>
   )
-  // React.useEffect(() => {
-  //   if (isRunCancelling) {
-  //     if (adjustedRunStatus === RUN_STATUS_STOP_REQUESTED) {
-  //       setRunCancelling(true)
-  //     }
-  //   }
-  // }, [isRunCancelling])
 
   let titleBarProps
 
@@ -125,7 +119,9 @@ export function RunDetails(): JSX.Element | null {
           <ConfirmExitProtocolUploadModal
             back={cancelCloseExit}
             exit={confirmCloseExit}
-
+            isRunCloseSuccessful={
+              adjustedRunStatus === RUN_STATUS_STOPPED ? true : false
+            }
           />
         </Portal>
       )}
@@ -133,12 +129,6 @@ export function RunDetails(): JSX.Element | null {
         {showConfirmCancelModal ? (
           <ConfirmCancelModal
             onClose={() => setShowConfirmCancelModal(false)}
-            isRunCancelling={
-              adjustedRunStatus === RUN_STATUS_STOP_REQUESTED ? true : false
-            }
-            isRunIdleOrStopped={
-              adjustedRunStatus === RUN_STATUS_IDLE ? true : false
-            }
           />
         ) : null}
         <CommandList />
