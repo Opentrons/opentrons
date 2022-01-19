@@ -1,4 +1,5 @@
 """Shared code for managing pipette configuration and storage."""
+from dataclasses import dataclass
 import logging
 from typing import Dict, Optional, Tuple, overload, Sequence, Any, cast, Union
 
@@ -11,6 +12,8 @@ from .types import (
     TipAttachedError,
     NoTipAttachedError,
     PipettePair,
+    PairedPipetteConfigValueError,
+    Axis,
 )
 from .robot_calibration import load_pipette_offset
 from .dev_types import PipetteDict
@@ -388,3 +391,75 @@ class InstrumentHandlerProvider:
     ) -> float:
         ul_per_s = mm_per_s * instr.ul_per_mm(instr.config.max_volume, action)
         return round(ul_per_s, 6)
+
+    @dataclass(frozen=True)
+    class AspirateSpec:
+        axis: Axis
+        volume: float
+        plunger_distance: float
+        speed: float
+        instr: Pipette
+        current: float
+
+    def plan_check_aspirate(
+        self,
+        mount: Union[top_types.Mount, PipettePair],
+        volume: Optional[float],
+        rate: float,
+    ) -> Sequence["InstrumentHandlerProvider.AspirateSpec"]:
+        """Check preconditions for aspirate, parse args, and calculate positions.
+
+        While the mechanics of issuing an aspirate move itself are left to child
+        classes, determining things like aspiration volume from the allowed argument
+        types is invariant between machines, and this method gathers that functionality.
+
+        Coalesce
+        - Optional volumes
+        - Pair/single aspiration
+
+        Check
+        - Aspiration volumes compared to max and remaining
+
+        Calculate
+        - Plunger distances (possibly calling an overridden plunger_volume)
+        """
+        instruments = self.instruments_for(mount)
+        self.ready_for_tip_action(instruments, HardwareAction.ASPIRATE)
+        if volume is None:
+            self._ihp_log.debug(
+                "No aspirate volume defined. Aspirating up to "
+                "max_volume for the pipette"
+            )
+            asp_vol = tuple(instr[0].available_volume for instr in instruments)
+        else:
+            asp_vol = tuple(volume for instr in instruments)
+
+        if all([vol == 0 for vol in asp_vol]):
+            return []
+        elif 0 in asp_vol:
+            raise PairedPipetteConfigValueError("Cannot only aspirate from one pipette")
+
+        for instr, vol in zip(instruments, asp_vol):
+            assert instr[0].ok_to_add_volume(
+                vol
+            ), "Cannot aspirate more than pipette max volume"
+
+        dist = tuple(
+            self.plunger_position(instr[0], instr[0].current_volume + vol, "aspirate")
+            for instr, vol in zip(instruments, asp_vol)
+        )
+        speed = min(
+            self.plunger_speed(instr[0], instr[0].aspirate_flow_rate * rate, "aspirate")
+            for instr in instruments
+        )
+        return [
+            self.AspirateSpec(
+                axis=Axis.of_plunger(instr[1]),
+                volume=this_vol,
+                plunger_distance=this_dist,
+                speed=speed,
+                instr=instr[0],
+                current=instr[0].config.plunger_current,
+            )
+            for instr, this_dist, this_vol in zip(instruments, dist, asp_vol)
+        ]
