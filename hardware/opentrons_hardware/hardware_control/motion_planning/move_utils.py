@@ -105,18 +105,18 @@ def find_initial_speed(
     initial_speed = move.initial_speed
     for axis in Axis.get_all_axes():
         axis_component = move.unit_vector[axis]
-        axis_constraints = constraints[axis]
-        prev_component = (
-            prev_move.unit_vector[axis]
-            if prev_move.distance > FLOAT_THRESHOLD
-            else np.float64(0)
-        )
-        prev_final_speed = prev_move.final_speed
 
         if abs(axis_component * initial_speed) < FLOAT_THRESHOLD:
             log.debug(f"Skip {axis} because it is not moving")
             continue
         else:
+            axis_constraints = constraints[axis]
+            prev_component = (
+                prev_move.unit_vector[axis]
+                if prev_move.distance > FLOAT_THRESHOLD
+                else np.float64(0)
+            )
+            prev_final_speed = prev_move.final_speed
             log.debug(f"Find initial speed for {axis}")
             # find speed limit per axis
             axis_constrained_speed = initial_speed_limit_from_axis(
@@ -365,19 +365,16 @@ def blended(constraints: SystemConstraints, first: Move, second: Move) -> bool:
         if first.unit_vector[axis] * second.unit_vector[axis] > 0:
             # if they're in the same direction, we can check that either the junction
             # speeds exactly match, or that they're both under the discontinuity limit
-            if not (abs(initial_speed - final_speed) <= constraints[axis].max_speed_discont):
-                    return False
-            else:
-                if not (abs(initial_speed - final_speed) < FLOAT_THRESHOLD):
+            discont_limit = constraints[axis].max_speed_discont
+            if not (abs(initial_speed - final_speed) < FLOAT_THRESHOLD):
+                if abs(final_speed) > discont_limit or abs(initial_speed) > discont_limit:
                     return False
         else:
             # if they're in different directions, then the junction has to be at or
             # under the speed change discontinuity
-            if not (abs(initial_speed - final_speed) <= constraints[axis].max_direction_change_speed_discont):
+            discont_limit = constraints[axis].max_direction_change_speed_discont
+            if abs(final_speed) > discont_limit or abs(initial_speed) > discont_limit:
                 return False
-            # if not (final_speed <= constraints[axis].max_direction_change_speed_discont) \
-            #     and (initial_speed <= constraints[axis].max_direction_change_speed_discont):
-            #     return False
     log.debug('Successfully blended.')
     return True
 
