@@ -203,11 +203,12 @@ class LegacyContextPlugin(AbstractPlugin):
         (or an unexpected exception is raised).
         """
         while True:
+            log.debug("MAX: Dispatching action in event loop.")
             try:
-                log.debug("MAX: Dispatching action in event loop.")
                 action = await self._actions_to_dispatch.get_async()
-                log.debug("MAX: Done dispatching action in event loop.")
             except QueueClosed:
                 break
             else:
                 self.dispatch(action)
+            finally:
+                log.debug("MAX: Done dispatching action in event loop.")
