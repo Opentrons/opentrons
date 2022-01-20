@@ -87,7 +87,10 @@ export function useCurrentProtocolRun(): UseCurrentProtocolRun {
   })
 
   return {
-    createProtocolRun,
+    createProtocolRun: (...args) => {
+      setProtocolCreationError(null)
+      createProtocolRun(...args)
+    },
     protocolRecord,
     runRecord,
     isCreatingProtocolRun:
