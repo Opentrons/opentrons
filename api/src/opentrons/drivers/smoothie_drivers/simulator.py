@@ -20,7 +20,7 @@ class SimulatingDriver:
 
     async def home(self, axis: str = AXES, disabled: str = DISABLE_AXES) -> None:
         for ax in axis:
-            self._homed_flags[axis] = True
+            self._homed_flags[ax] = True
 
     async def _smoothie_reset(self) -> None:
         self._homed_flags.clear()
