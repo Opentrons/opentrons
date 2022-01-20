@@ -17,7 +17,7 @@ from .legacy_wrappers import (
     LegacyModuleLoadInfo,
 )
 from .legacy_command_mapper import LegacyCommandMapper
-from .thread_async_queue import ThreadAsyncQueue, QueueClosed
+from .thread_async_queue import ThreadAsyncQueue
 
 
 class LegacyContextPlugin(AbstractPlugin):
@@ -196,10 +196,5 @@ class LegacyContextPlugin(AbstractPlugin):
         Exits only when `self._actions_to_dispatch` is closed
         (or an unexpected exception is raised).
         """
-        while True:
-            try:
-                action = await self._actions_to_dispatch.get_async()
-            except QueueClosed:
-                break
-            else:
-                self.dispatch(action)
+        async for action in self._actions_to_dispatch.get_async_until_closed():
+            self.dispatch(action)

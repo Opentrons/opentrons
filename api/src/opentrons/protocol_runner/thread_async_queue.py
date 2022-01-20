@@ -3,7 +3,7 @@
 from collections import deque
 from contextlib import contextmanager
 from threading import Condition
-from typing import Deque, Generic, TypeVar, Generator
+from typing import AsyncIterable, Deque, Generic, Iterable, TypeVar, Generator
 
 from anyio.to_thread import run_sync
 
@@ -81,13 +81,12 @@ class ThreadAsyncQueue(Generic[_T]):
     def get(self) -> _T:
         """Remove and return the value at the front of the queue.
 
-        If the queue is empty, block until a value is available.
-        If you're calling from an async task, use `get_async()` instead.
+        If the queue is empty, this blocks until a value is available.
+        If you're calling from an async task, use one of the async methods instead.
 
         Raises:
-            QueueClosed: If `done_putting()` has been called.
-                If any values were in the queue when `done_putting()` was called,
-                this will raise only after those values have been retrieved.
+            QueueClosed: If all values have been consumed
+                and the queue has been closed with `done_putting()`.
         """
         with self._condition:
             while True:
@@ -100,13 +99,26 @@ class ThreadAsyncQueue(Generic[_T]):
                     # Wait for something to change, then check again.
                     self._condition.wait()
 
+    def get_until_closed(self) -> Iterable[_T]:
+        """Remove and return values from the front of the queue until it's closed.
+
+        Example:
+            for value in queue.get_until_closed():
+                print(value)
+        """
+        while True:
+            try:
+                yield self.get()
+            except QueueClosed:
+                break
+
     async def get_async(self) -> _T:
         """Like `get()`, except yield to the event loop while waiting.
 
         Warning:
             A waiting `get_async()` won't be interrupted by an async cancellation.
-            The proper way to interrupt a waiting `get_async()` is to close the queue,
-            just like you have to do with `get()`.
+            The proper way to interrupt a waiting `get_async()`
+            is to close the queue, just like you have to do with `get()`.
         """
         return await run_sync(
             self.get,
@@ -117,6 +129,30 @@ class ThreadAsyncQueue(Generic[_T]):
             # completion would never happen and it would hang around forever.
             cancellable=False,
         )
+
+    async def get_async_until_closed(self) -> AsyncIterable[_T]:
+        """Like `get_until_closed()`, except yield to the event loop while waiting.
+
+        Example:
+            async for value in queue.get_async_until_closed():
+                print(value)
+
+        Warning:
+            While the ``async for`` is waiting for a new value,
+            it won't be interrupted by an async cancellation.
+            The proper way to interrupt a waiting `get_async_until_closed()`
+            is to close the queue, just like you have to do with `get()`.
+        """
+        while True:
+            try:
+                value = await self.get_async()
+            except QueueClosed:
+                break
+            else:
+                # Do not yield from within the try-block,
+                # since we only want to catch our own QueueClosed,
+                # not QueueClosed from our caller.
+                yield value
 
 
 class QueueClosed(Exception):

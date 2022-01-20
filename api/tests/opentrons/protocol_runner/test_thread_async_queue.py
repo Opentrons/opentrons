@@ -167,12 +167,10 @@ def _consume(queue: ThreadAsyncQueue[_ProducedValue]) -> List[_ProducedValue]:
 
     Return everything consumed, in the order that this function consumed it.
     """
-    result: List[_ProducedValue] = []
-    while True:
-        try:
-            result.append(queue.get())
-        except QueueClosed:
-            return result
+    result = []
+    for value in queue.get_until_closed():
+        result.append(value)
+    return result
 
 
 async def _produce_async(
@@ -190,9 +188,7 @@ async def _consume_async(
     queue: ThreadAsyncQueue[_ProducedValue],
 ) -> List[_ProducedValue]:
     """Like _consume()`, except yield to the event loop while waiting."""
-    result: List[_ProducedValue] = []
-    while True:
-        try:
-            result.append(await queue.get_async())
-        except QueueClosed:
-            return result
+    result = []
+    async for value in queue.get_async_until_closed():
+        result.append(value)
+    return result
