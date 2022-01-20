@@ -17,7 +17,7 @@ from opentrons.hardware_control.emulation.module_server.helpers import (
     wait_emulators,
     ModuleStatusClient,
 )
-from opentrons.hardware_control.emulation.scripts import run_app
+from opentrons.hardware_control.emulation.scripts import run_app, run_smoothie
 from opentrons.hardware_control import API, ThreadManager
 from g_code_parsing.g_code_program.g_code_program import (
     GCodeProgram,
@@ -68,7 +68,13 @@ class GCodeEngine:
 
         # Entry point for the emulator app process
         def _run_app():
-            asyncio.run(run_app.run(self._config, modules=[m.value for m in modules]))
+            async def _async_entry():
+                await asyncio.gather(
+                    run_smoothie.run(self._config),
+                    run_app.run(self._config,
+                                modules=[m.value for m in modules])
+                )
+            asyncio.run(_async_entry())
 
         proc = Process(target=_run_app)
         proc.daemon = True
