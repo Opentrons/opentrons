@@ -10,10 +10,16 @@ services:
       - '9003:9003'
       - '9004:9004'
       - '9995:9995'
-      - '9996:9996'
       - '9997:9997'
       - '9998:9998'
       - '9999:9999'
+    networks:
+      - container-network
+  smoothie:
+    build: .
+    command: python3 -m opentrons.hardware_control.emulation.scripts.run_smoothie
+    ports:
+      - '9996:9996'
     # Uncomment lines below to override the pipette(s) loaded by emulator
     #environment:
     #  OT_EMULATOR_smoothie: '{"right": {"model": "p300_multi"}, "left": {"model": "p20_single_v2.0"}}'
@@ -26,12 +32,13 @@ services:
       - '31950:31950'
     environment:
       OT_API_CONFIG_DIR: /config
-      OT_SMOOTHIE_EMULATOR_URI: socket://emulator:9996
+      OT_SMOOTHIE_EMULATOR_URI: socket://smoothie:9996
       OT_EMULATOR_module_server: '{"host": "emulator"}'
     networks:
       - container-network
     depends_on:
       - 'emulator'
+      - 'smoothie'
     volumes:
       - .opentrons_config:/config:rw
   tempdeck:
