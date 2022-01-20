@@ -520,7 +520,6 @@ class InstrumentContext(CommandPublisher):
             ``Placeable`` as the ``location`` parameter)
 
         """
-        log.debug("MAX: Entering top-level touch_tip() method.")
         if not self._implementation.has_tip():
             raise hc.NoTipAttachedError("Pipette has no tip to touch_tip()")
 
@@ -564,7 +563,6 @@ class InstrumentContext(CommandPublisher):
             v_offset=v_offset,
             speed=checked_speed,
         )
-        log.debug("MAX: Leaving top-level touch_tip() method.")
         return self
 
     @publish(command=cmds.air_gap)
