@@ -21,7 +21,7 @@ from .thread_async_queue import ThreadAsyncQueue
 
 
 class LegacyContextPlugin(AbstractPlugin):
-    """A ProtocolEngine plugin wrapping a legacy ProtocolContext.
+    """A ProtocolEngine plugin to monitor and control an APIv2 protocol.
 
     In the legacy ProtocolContext, protocol execution is accomplished
     by direct communication with the HardwareControlAPI, as opposed to an
@@ -51,10 +51,10 @@ class LegacyContextPlugin(AbstractPlugin):
         self._legacy_command_mapper = legacy_command_mapper or LegacyCommandMapper()
 
         # We use a non-blocking queue to communicate activity
-        # from the APIv2 protocol, which is running in a thread,
+        # from the APIv2 protocol, which is running in its own thread,
         # to the ProtocolEngine, which is running in the main thread's async event loop.
         #
-        # The non-blocking property lets the protocol communicate its activity
+        # The queue being non-blocking lets the protocol communicate its activity
         # instantly *even if the event loop is currently occupied by something else.*
         # Various things can accidentally occupy the event loop for too long.
         # So if the protocol had to wait for the event loop to be free
@@ -73,11 +73,11 @@ class LegacyContextPlugin(AbstractPlugin):
         """
         context = self._protocol_context
 
-        # If any part of this setup fails,
-        # clean up the parts that succeeded in reverse order.
+        # Use an exit stack so if any part of this setup fails,
+        # we clean up the parts that succeeded in reverse order.
         async with AsyncExitStack() as exit_stack:
             # Subscribe to activity on the APIv2 context,
-            # and arrange to unsubscribe when we're torn down.
+            # and arrange to unsubscribe when this plugin is torn down:
 
             command_unsubscribe = context.broker.subscribe(
                 topic="command",
@@ -101,7 +101,7 @@ class LegacyContextPlugin(AbstractPlugin):
             exit_stack.callback(module_unsubscribe)
 
             # Kick off a background task to report activity to the ProtocolEngine,
-            # and arrange to await its exit when we're torn down.
+            # and arrange to await its exit when this plugin is torn down:
 
             action_dispatching_task = create_task(self._dispatch_all_actions())
 
@@ -110,25 +110,24 @@ class LegacyContextPlugin(AbstractPlugin):
 
             exit_stack.push_async_callback(await_action_dispatching_task)
 
-            # Arrange to close the actions queue when we're torn down,
-            # so the background task knows to exit.
-            #
+            # Arrange to close the actions queue when this plugin is torn down,
+            # so the background task knows it's time to exit:
+
             # Registering this cleanup must come below registering the await of the
             # background task, so this will happen first on teardown
             # and the await won't deadlock.
-
             exit_stack.callback(self._actions_to_dispatch.done_putting)
 
             # All setup succeeded.
-            # Save the exit stack so our teardown method can clean up these resources.
-
+            # Save the exit stack so our teardown method can use it later
+            # to clean up these resources.
             self._exit_stack = exit_stack.pop_all()
 
     async def teardown(self) -> None:
         """Tear down the plugin, undoing the work done in `setup()`.
 
         Called by Protocol Engine.
-        At this point, the APIv2 protocol script has exited and is done
+        At this point, the APIv2 protocol script must have exited.
         """
         # self._exit_stack should never be None at this point.
         if self._exit_stack is not None:

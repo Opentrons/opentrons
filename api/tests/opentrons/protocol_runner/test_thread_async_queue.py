@@ -103,10 +103,12 @@ def test_multi_thread_producer_consumer() -> None:
     # No duplicates, no extras, and nothing missing.
     assert sorted(all_values) == sorted(all_expected_values)
 
-    def check_consumer_result(consumer_result: List[_ProducedValue]) -> None:
-        # Assert that each consumer got values in the order the producer provided them.
-        # But values from different producers can be interleaved,
-        # and values can be skipped (if they were given to a different consumer).
+    def assert_consumer_result_correctly_ordered(
+        consumer_result: List[_ProducedValue],
+    ) -> None:
+        # Assert that the consumer got values in the order the producer provided them.
+        # Allow values from different producers to be interleaved,
+        # and tolerate skipped values (assume they were given to a different consumer).
 
         # [[All consumed from producer 0], [All consumed from producer 1], etc.]
         consumed_values_per_producer = [
@@ -117,7 +119,7 @@ def test_multi_thread_producer_consumer() -> None:
             assert values_from_single_producer == sorted(values_from_single_producer)
 
     for consumer_result in consumer_results:
-        check_consumer_result(consumer_result)
+        assert_consumer_result_correctly_ordered(consumer_result)
 
 
 async def test_async() -> None:
@@ -132,6 +134,9 @@ async def test_async() -> None:
     1. That async retrieval returns basically the expected values.
     2. That async retrieval keeps the event loop free while waiting.
        If it didn't, this test would reveal the problem by deadlocking.
+
+    We trust that more complicated multi-producer/multi-consumer interactions
+    are covered by the non-async tests.
     """
     expected_values = list(range(1000))
 
@@ -139,7 +144,7 @@ async def test_async() -> None:
 
     consumer = asyncio.create_task(_consume_async(queue=subject))
     try:
-        with subject.putting():
+        with subject:
             await _produce_async(queue=subject, values=expected_values, producer_id=0)
     finally:
         consumed = await consumer
