@@ -71,7 +71,15 @@ PipetteHandlingData = Tuple[Pipette, top_types.Mount]
 
 
 class OT3API(
-    ExecutionManagerProvider, RobotCalibrationProvider, InstrumentHandlerProvider
+    ExecutionManagerProvider,
+    RobotCalibrationProvider,
+    InstrumentHandlerProvider,
+    # This MUST be kept last in the inheritance list so that it is
+    # deprioritized in the method resolution order; otherwise, invocations
+    # of methods that are present in the protocol will call the (empty,
+    # do-nothing) methods in the protocol. This will happily make all the
+    # tests fail.
+    HardwareControlAPI,
 ):
     """This API is the primary interface to the hardware controller.
 
@@ -123,11 +131,6 @@ class OT3API(
         ExecutionManagerProvider.__init__(self, loop, isinstance(backend, Simulator))
         RobotCalibrationProvider.__init__(self)
         InstrumentHandlerProvider.__init__(self)
-        OT3API._check_type(self)
-
-    @staticmethod
-    def _check_type(inst: HardwareControlAPI) -> None:
-        pass
 
     @property
     def door_state(self) -> DoorState:
