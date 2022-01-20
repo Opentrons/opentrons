@@ -162,7 +162,11 @@ export function ProtocolUpload(): JSX.Element {
     runStatus === RUN_STATUS_FINISHING
 
   let titleBarProps
-  if (isProtocolRunLoaded && !isRunInMotion) {
+  if (
+    isProtocolRunLoaded &&
+    !isRunInMotion &&
+    runStatus !== RUN_STATUS_STOP_REQUESTED
+  ) {
     titleBarProps = {
       title: t('protocol_title', {
         protocol_name: protocolRecord?.data?.metadata?.protocolName ?? '',
