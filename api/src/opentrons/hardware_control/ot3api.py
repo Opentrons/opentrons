@@ -25,11 +25,6 @@ from .util import use_or_initialize_loop, check_motion_bounds
 from .pipette import Pipette, generate_hardware_configs, load_from_config_and_check_skip
 from .ot3controller import OT3Controller
 from .simulator import Simulator
-from .constants import (
-    SHAKE_OFF_TIPS_SPEED,
-    SHAKE_OFF_TIPS_DROP_DISTANCE,
-    DROP_TIP_RELEASE_DISTANCE,
-)
 from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
@@ -1053,92 +1048,31 @@ class OT3API(
     ):
         """Drop tip at the current location."""
 
-        instruments = self.instruments_for(mount)
-        self._ready_for_tip_action(instruments, HardwareAction.DROPTIP)
-        plunger_currents = {
-            Axis.of_plunger(instr[1]): instr[0].config.plunger_current
-            for instr in instruments
-        }
-        drop_tip_currents = {
-            Axis.of_plunger(instr[1]): instr[0].config.drop_tip_current
-            for instr in instruments
-        }
-        plunger_axes = tuple(
-            Axis.of_plunger(instr[1]).name.upper() for instr in instruments
-        )
+        spec, _remove = self.plan_check_drop_tip(mount, home_after)
 
-        bottom = tuple(instr[0].config.bottom for instr in instruments)
-        droptip = tuple(instr[0].config.drop_tip for instr in instruments)
-        speed = min(instr[0].config.drop_tip_speed for instr in instruments)
-
-        async def _drop_tip():
-            self._backend.set_active_current(plunger_currents)
+        for move in spec.drop_moves:
+            self._backend.set_active_current(move.current)
             target_pos, _, secondary_z = target_position_from_plunger(
-                mount, bottom, self._current_position
+                mount, move.target_position, self._current_position
             )
             await self._move(
                 target_pos,
+                speed=move.speed,
                 secondary_z=secondary_z,
                 home_flagged_axes=False,
             )
-            self._backend.set_active_current(drop_tip_currents)
-            target_pos, _, secondary_z = target_position_from_plunger(
-                mount, droptip, self._current_position
-            )
-            await self._move(
-                target_pos,
-                speed=speed,
-                secondary_z=secondary_z,
-                home_flagged_axes=False,
-            )
-            if home_after:
-                safety_margin = abs(max(bottom) - max(droptip))
+            if move.home_after:
                 smoothie_pos = await self._backend.fast_home(
-                    plunger_axes, safety_margin
+                    [ax.name.upper() for ax in move.home_axes],
+                    move.home_after_safety_margin,
                 )
                 self._current_position = self._deck_from_smoothie(smoothie_pos)
-                self._backend.set_active_current(plunger_currents)
-                target_pos, _, secondary_z = target_position_from_plunger(
-                    mount, bottom, self._current_position
-                )
-                await self._move(
-                    target_pos,
-                    secondary_z=secondary_z,
-                    home_flagged_axes=False,
-                )
 
-        if any(["doubleDropTip" in instr[0].config.quirks for instr in instruments]):
-            await _drop_tip()
-        await _drop_tip()
+        for shake in spec.shake_moves:
+            await self.move_rel(mount, shake[0], speed=shake[1])
 
-        if any(["dropTipShake" in instr[0].config.quirks for instr in instruments]):
-            diameter = min(instr[0].current_tiprack_diameter for instr in instruments)
-            await self._shake_off_tips_drop(mount, diameter)
-        self._backend.set_active_current(plunger_currents)
-        for instr in instruments:
-            instr[0].set_current_volume(0)
-            instr[0].current_tiprack_diameter = 0.0
-            instr[0].remove_tip()
-
-    async def _shake_off_tips_drop(self, mount, tiprack_diameter):
-        # tips don't always fall off, especially if resting against
-        # tiprack or other tips below it. To ensure the tip has fallen
-        # first, shake the pipette to dislodge partially-sealed tips,
-        # then second, raise the pipette so loosened tips have room to fall
-        shake_off_dist = SHAKE_OFF_TIPS_DROP_DISTANCE
-        if tiprack_diameter > 0.0:
-            shake_off_dist = min(shake_off_dist, tiprack_diameter / 4)
-        shake_off_dist = max(shake_off_dist, 1.0)
-
-        shake_pos = top_types.Point(-shake_off_dist, 0, 0)  # move left
-        await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
-        shake_pos = top_types.Point(2 * shake_off_dist, 0, 0)  # move right
-        await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
-        shake_pos = top_types.Point(-shake_off_dist, 0, 0)  # original position
-        await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
-        # raise the pipette upwards so we are sure tip has fallen off
-        up_pos = top_types.Point(0, 0, DROP_TIP_RELEASE_DISTANCE)
-        await self.move_rel(mount, up_pos)
+        self._backend.set_active_current(spec.ending_current)
+        _remove()
 
     async def find_modules(
         self,
