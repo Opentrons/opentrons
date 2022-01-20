@@ -157,19 +157,6 @@ export function CommandList(): JSX.Element | null {
     currentCommandList.length - 1 <= windowFirstIndex + WINDOW_SIZE &&
     currentCommandList.length - 1 >= windowFirstIndex
 
-
-  const handleJumpToCurrentItem = (): void => {
-    const currentItemIndex = currentCommandList.findIndex(
-      command =>
-        command.runCommandSummary == null ||
-        command.runCommandSummary.status === 'running'
-    )
-    const windowIndexWithCurrentItem = Math.floor(
-      currentItemIndex / WINDOW_OVERLAP
-    )
-    setWindowIndex(windowIndexWithCurrentItem)
-    setIsJumpingToCurrent(true)
-  }
   const currentItemIndex = currentCommandList.findIndex(
     command =>
       command.runCommandSummary == null ||
