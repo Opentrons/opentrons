@@ -2,11 +2,8 @@ import asyncio
 import logging
 
 from opentrons.hardware_control.emulation.module_server import ModuleStatusServer
-from opentrons.hardware_control.emulation.parser import Parser
 from opentrons.hardware_control.emulation.proxy import Proxy
-from opentrons.hardware_control.emulation.run_emulator import run_emulator_server
 from opentrons.hardware_control.emulation.settings import Settings
-from opentrons.hardware_control.emulation.smoothie import SmoothieEmulator
 from opentrons.hardware_control.emulation.types import ModuleType
 
 logger = logging.getLogger(__name__)
@@ -23,9 +20,6 @@ class Application:
         """
         self._settings = settings
         self._status_server = ModuleStatusServer(settings.module_server)
-        self._smoothie_emulator = SmoothieEmulator(
-            parser=Parser(), settings=settings.smoothie
-        )
         self._magdeck = Proxy(
             ModuleType.Magnetic, self._status_server, self._settings.magdeck_proxy
         )
@@ -49,11 +43,6 @@ class Application:
         """Run the application."""
         await asyncio.gather(
             self._status_server.run(),
-            run_emulator_server(
-                host=self._settings.smoothie.host,
-                port=self._settings.smoothie.port,
-                emulator=self._smoothie_emulator,
-            ),
             self._magdeck.run(),
             self._temperature.run(),
             self._thermocycler.run(),

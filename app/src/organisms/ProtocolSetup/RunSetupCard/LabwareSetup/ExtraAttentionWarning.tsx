@@ -16,6 +16,9 @@ import {
   COLOR_WARNING_LIGHT,
   C_DARK_GRAY,
   TEXT_DECORATION_UNDERLINE,
+  JUSTIFY_SPACE_BETWEEN,
+  DIRECTION_COLUMN,
+  COLOR_WARNING_DARK,
 } from '@opentrons/components'
 import { getModuleName } from './utils/getModuleName'
 import { SecureLabwareModal } from './SecureLabwareModal'
@@ -69,13 +72,21 @@ const ModuleWarning = (props: {
 
 export const ExtraAttentionWarning = (
   props: ExtraAttentionWarningProps
-): JSX.Element => {
+): JSX.Element | null => {
   const { moduleTypes } = props
   const [
     secureLabwareModalType,
     setSecureLabwareModalType,
   ] = React.useState<ModuleTypesThatRequiresExtraAttention | null>(null)
   const { t } = useTranslation('protocol_setup')
+  const [
+    hideExtraAttentionWarning,
+    setHideExtraAttentionWarning,
+  ] = React.useState(false)
+
+  const isVisible = !hideExtraAttentionWarning
+  if (!isVisible) return null
+
   return (
     <React.Fragment>
       {secureLabwareModalType != null && (
@@ -90,18 +101,28 @@ export const ExtraAttentionWarning = (
         color={C_DARK_GRAY}
         id={'ExtraAttentionWarning'}
       >
-        <Box margin={SPACING_3}>
-          <Flex margin={SPACING_2}>
-            <Box size={SIZE_2} paddingY={SPACING_1} paddingRight={SPACING_2}>
-              <Icon name="alert-circle" color={COLOR_WARNING} />
-            </Box>
-            <Text
-              as="h4"
-              marginY={SPACING_2}
-              id={`ExtraAttentionWarning_title`}
+        <Flex flexDirection={DIRECTION_COLUMN} margin={SPACING_3}>
+          <Flex margin={SPACING_2} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+            <Flex>
+              <Box size={SIZE_2} paddingY={SPACING_1} paddingRight={SPACING_2}>
+                <Icon name="alert-circle" color={COLOR_WARNING} />
+              </Box>
+              <Text
+                as="h4"
+                marginY={SPACING_2}
+                id={`ExtraAttentionWarning_title`}
+                color={COLOR_WARNING_DARK}
+              >
+                {t('extra_attention_warning_title')}
+              </Text>
+            </Flex>
+            <Btn
+              size={SIZE_2}
+              onClick={() => setHideExtraAttentionWarning(true)}
+              aria-label="close"
             >
-              {t('extra_attention_warning_title')}
-            </Text>
+              <Icon name={'close'} color={COLOR_WARNING} />
+            </Btn>
           </Flex>
           {moduleTypes.map(moduleType => (
             <ModuleWarning
@@ -110,7 +131,7 @@ export const ExtraAttentionWarning = (
               onLinkClick={() => setSecureLabwareModalType(moduleType)}
             />
           ))}
-        </Box>
+        </Flex>
       </Box>
     </React.Fragment>
   )
