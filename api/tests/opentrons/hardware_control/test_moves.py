@@ -346,14 +346,10 @@ async def test_shake_during_drop(hardware_api, monkeypatch):
     }
     await hardware_api.cache_instruments()
     await hardware_api.add_tip(types.Mount.RIGHT, 50.0)
-    hardware_api.set_current_tiprack_diameter(types.Mount.RIGHT, 30.0)
+    hardware_api.set_current_tiprack_diameter(types.Mount.RIGHT, 2.0 * 4)
 
     shake_tips_drop = mock.Mock(side_effect=hardware_api._shake_off_tips_drop)
     monkeypatch.setattr(hardware_api, "_shake_off_tips_drop", shake_tips_drop)
-
-    # Test single shake after drop tip
-    await hardware_api.drop_tip(types.Mount.RIGHT)
-    shake_tips_drop.assert_called_once_with(types.Mount.RIGHT, 30)
 
     move_rel = mock.Mock(side_effect=hardware_api.move_rel)
     monkeypatch.setattr(hardware_api, "move_rel", move_rel)
@@ -361,36 +357,43 @@ async def test_shake_during_drop(hardware_api, monkeypatch):
     # Test drop tip shake with 25% of tiprack well diameter
     # between upper (2.25 mm) and lower limit (1.0 mm)
     shake_tips_drop.reset_mock()
-    await shake_tips_drop(types.Mount.RIGHT, 2.0 * 4)
+    await hardware_api.drop_tip(types.Mount.RIGHT)
+    shake_tips_drop.assert_called_once()
     move_rel_calls = [
         mock.call(types.Mount.RIGHT, types.Point(-2, 0, 0), speed=50),
         mock.call(types.Mount.RIGHT, types.Point(4, 0, 0), speed=50),
         mock.call(types.Mount.RIGHT, types.Point(-2, 0, 0), speed=50),
-        mock.call(types.Mount.RIGHT, types.Point(0, 0, 20)),
+        mock.call(types.Mount.RIGHT, types.Point(0, 0, 20), speed=None),
     ]
     move_rel.assert_has_calls(move_rel_calls)
 
     # Test drop tip shake with 25% of tiprack well diameter
     # over upper (2.25 mm) limit
+    await hardware_api.add_tip(types.Mount.RIGHT, 20)
+    hardware_api.set_current_tiprack_diameter(types.Mount.RIGHT, 2.3 * 4)
     shake_tips_drop.reset_mock()
-    await shake_tips_drop(types.Mount.RIGHT, 2.3 * 4)
+    move_rel.reset_move()
+    await hardware_api.drop_tip(types.Mount.RIGHT)
     move_rel_calls = [
         mock.call(types.Mount.RIGHT, types.Point(-2.25, 0, 0), speed=50),
         mock.call(types.Mount.RIGHT, types.Point(4.5, 0, 0), speed=50),
         mock.call(types.Mount.RIGHT, types.Point(-2.25, 0, 0), speed=50),
-        mock.call(types.Mount.RIGHT, types.Point(0, 0, 20)),
+        mock.call(types.Mount.RIGHT, types.Point(0, 0, 20), speed=None),
     ]
     move_rel.assert_has_calls(move_rel_calls)
 
     # Test drop tip shake with 25% of tiprack well diameter
     # below lower (1.0 mm) limit
+    await hardware_api.add_tip(types.Mount.RIGHT, 50)
+    hardware_api.set_current_tiprack_diameter(types.Mount.RIGHT, 0.9 * 4)
     shake_tips_drop.reset_mock()
-    await shake_tips_drop(types.Mount.RIGHT, 0.9 * 4)
+    move_rel.reset_mock()
+    await hardware_api.drop_tip(types.Mount.RIGHT)
     move_rel_calls = [
         mock.call(types.Mount.RIGHT, types.Point(-1, 0, 0), speed=50),
         mock.call(types.Mount.RIGHT, types.Point(2, 0, 0), speed=50),
         mock.call(types.Mount.RIGHT, types.Point(-1, 0, 0), speed=50),
-        mock.call(types.Mount.RIGHT, types.Point(0, 0, 20)),
+        mock.call(types.Mount.RIGHT, types.Point(0, 0, 20), speed=None),
     ]
     move_rel.assert_has_calls(move_rel_calls)
 
