@@ -30,7 +30,6 @@ from .simulator import Simulator
 from .constants import (
     SHAKE_OFF_TIPS_SPEED,
     SHAKE_OFF_TIPS_DROP_DISTANCE,
-    SHAKE_OFF_TIPS_PICKUP_DISTANCE,
     DROP_TIP_RELEASE_DISTANCE,
 )
 from .execution_manager import ExecutionManagerProvider
@@ -46,7 +45,6 @@ from .types import (
     HardwareEventHandler,
     PipettePair,
     HardwareAction,
-    PairedPipetteConfigValueError,
     MotionChecks,
     PauseType,
 )
@@ -1072,22 +1070,13 @@ class API(
         """
         Pick up tip from current location.
         """
-        instruments = self.instruments_for(mount)
-        self.ready_for_pick_up_tip(instruments)
-        plunger_currents = {
-            Axis.of_plunger(instr[1]): instr[0].config.plunger_current
-            for instr in instruments
-        }
-        z_axis_currents = {
-            Axis.by_mount(instr[1]): instr[0].config.pick_up_current
-            for instr in instruments
-        }
 
-        self._backend.set_active_current(plunger_currents)
-        # Initialize plunger to bottom position
-        bottom_positions = tuple(instr[0].config.bottom for instr in instruments)
+        spec, _add_tip_to_instrs = self.plan_check_pick_up_tip(
+            mount, tip_length, presses, increment
+        )
+        self._backend.set_active_current(spec.plunger_currents)
         target_absolute, _, secondary_z = target_position_from_plunger(
-            mount, bottom_positions, self._current_position
+            mount, spec.plunger_prep_pos, self._current_position
         )
         await self._move(
             target_absolute,
@@ -1095,73 +1084,27 @@ class API(
             home_flagged_axes=False,
         )
 
-        if not presses or presses < 0:
-            all_presses = tuple(
-                instr[0].config.pick_up_presses for instr in instruments
-            )
-            if len(all_presses) > 1 and all_presses[0] != all_presses[1]:
-                raise PairedPipetteConfigValueError(
-                    "Number of pipette pickups must match"
-                )
-            checked_presses = all_presses[0]
-        else:
-            checked_presses = presses
-
-        if not increment or increment < 0:
-            check_incr = tuple(
-                instr[0].config.pick_up_increment for instr in instruments
-            )
-        else:
-            check_incr = tuple(increment for instr in instruments)
-
-        pick_up_speed = min(instr[0].config.pick_up_speed for instr in instruments)
-        # Press the nozzle into the tip <presses> number of times,
-        # moving further by <increment> mm after each press
-        for i in range(checked_presses):
-            # move nozzle down into the tip
+        for press in spec.presses:
             with self._backend.save_current():
-                self._backend.set_active_current(z_axis_currents)
-                dist = tuple(
-                    -1.0 * instr[0].config.pick_up_distance + -1.0 * incrt * i
-                    for instr, incrt in zip(instruments, check_incr)
-                )
-                target_pos = (0, 0, *dist)
-                (
-                    target_absolute,
-                    primary_mount,
-                    secondary_z,
-                ) = target_position_from_relative(
-                    mount, target_pos, self._current_position
+                self._backend.set_active_current(press.current)
+                target_down, _, secondary_z = target_position_from_relative(
+                    mount, press.relative_down, self._current_position
                 )
                 await self._move(
-                    target_absolute, speed=pick_up_speed, secondary_z=secondary_z
+                    target_down, speed=press.speed, secondary_z=secondary_z
                 )
-
-            # move nozzle back up
-            backup_pos = (0, 0, *tuple(-d for d in dist))
-            target_absolute, primary_mount, secondary_z = target_position_from_relative(
-                mount, backup_pos, self._current_position
+            target_up, _, secondary_z = target_position_from_relative(
+                mount, press.relative_up, self._current_position
             )
-            await self._move(target_absolute, secondary_z=secondary_z)
-        for instr in instruments:
-            instr[0].add_tip(tip_length=tip_length)
-            instr[0].set_current_volume(0)
-
+            await self._move(target_up, secondary_z=secondary_z)
+        _add_tip_to_instrs()
         # neighboring tips tend to get stuck in the space between
         # the volume chamber and the drop-tip sleeve on p1000.
         # This extra shake ensures those tips are removed
-        if any(["pickupTipShake" in instr[0].config.quirks for instr in instruments]):
-            await self._shake_off_tips_pick_up(mount)
-            await self._shake_off_tips_pick_up(mount)
+        for rel_point, speed in spec.shake_off_list:
+            await self.move_rel(mount, rel_point, speed=speed)
 
-        # Here we add in the debounce distance for the switch as
-        # a safety precaution
-        retract_target = max(
-            instr[0].config.pick_up_distance + incrt * checked_presses + 2
-            for instr, incrt in zip(instruments, check_incr)
-        )
-
-        await self.retract(mount, retract_target)
+        await self.retract(mount, spec.retract_target)
 
     async def drop_tip(
         self, mount: Union[top_types.Mount, PipettePair], home_after=True
@@ -1252,29 +1195,6 @@ class API(
         shake_pos = top_types.Point(2 * shake_off_dist, 0, 0)  # move right
         await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
         shake_pos = top_types.Point(-shake_off_dist, 0, 0)  # original position
-        await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
-        # raise the pipette upwards so we are sure tip has fallen off
-        up_pos = top_types.Point(0, 0, DROP_TIP_RELEASE_DISTANCE)
-        await self.move_rel(mount, up_pos)
-
-    async def _shake_off_tips_pick_up(self, mount: Union[top_types.Mount, PipettePair]):
-        # tips don't always fall off, especially if resting against
-        # tiprack or other tips below it. To ensure the tip has fallen
-        # first, shake the pipette to dislodge partially-sealed tips,
-        # then second, raise the pipette so loosened tips have room to fall
-        shake_off_dist = SHAKE_OFF_TIPS_PICKUP_DISTANCE
-
-        shake_pos = top_types.Point(-shake_off_dist, 0, 0)  # move left
-        await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
-        shake_pos = top_types.Point(2 * shake_off_dist, 0, 0)  # move right
-        await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
-        shake_pos = top_types.Point(-shake_off_dist, 0, 0)  # original position
-        await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
-        shake_pos = top_types.Point(0, -shake_off_dist, 0)  # move front
-        await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
-        shake_pos = top_types.Point(0, 2 * shake_off_dist, 0)  # move back
-        await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
-        shake_pos = top_types.Point(0, -shake_off_dist, 0)  # original position
         await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
         # raise the pipette upwards so we are sure tip has fallen off
         up_pos = top_types.Point(0, 0, DROP_TIP_RELEASE_DISTANCE)

@@ -317,20 +317,15 @@ async def test_shake_during_pick_up(hardware_api, monkeypatch):
     }
     await hardware_api.cache_instruments()
 
-    shake_tips_pick_up = mock.Mock(side_effect=hardware_api._shake_off_tips_pick_up)
-    monkeypatch.setattr(hardware_api, "_shake_off_tips_pick_up", shake_tips_pick_up)
-
-    # Test double shake for after pick up tips
-    await hardware_api.pick_up_tip(types.Mount.RIGHT, 50)
-    shake_tip_calls = [mock.call(types.Mount.RIGHT), mock.call(types.Mount.RIGHT)]
-    shake_tips_pick_up.assert_has_calls(shake_tip_calls)
+    shake_tips_pick_up = mock.Mock(side_effect=hardware_api._build_pickup_shakes)
+    monkeypatch.setattr(hardware_api, "_build_pickup_shakes", shake_tips_pick_up)
 
     move_rel = mock.Mock(side_effect=hardware_api.move_rel)
     monkeypatch.setattr(hardware_api, "move_rel", move_rel)
 
-    # Test shakes in X and Y direction with 0.3 mm shake tip distance
-    shake_tips_pick_up.reset_mock()
-    await shake_tips_pick_up(types.Mount.RIGHT)
+    # Test double shake for after pick up tips
+    await hardware_api.pick_up_tip(types.Mount.RIGHT, 50)
+    shake_tips_pick_up.assert_called_once()
     move_rel_calls = [
         mock.call(types.Mount.RIGHT, types.Point(-0.3, 0, 0), speed=50),
         mock.call(types.Mount.RIGHT, types.Point(0.6, 0, 0), speed=50),
@@ -338,7 +333,7 @@ async def test_shake_during_pick_up(hardware_api, monkeypatch):
         mock.call(types.Mount.RIGHT, types.Point(0, -0.3, 0), speed=50),
         mock.call(types.Mount.RIGHT, types.Point(0, 0.6, 0), speed=50),
         mock.call(types.Mount.RIGHT, types.Point(0, -0.3, 0), speed=50),
-        mock.call(types.Mount.RIGHT, types.Point(0, 0, 20)),
+        mock.call(types.Mount.RIGHT, types.Point(0, 0, 20), speed=None),
     ]
     move_rel.assert_has_calls(move_rel_calls)
 
