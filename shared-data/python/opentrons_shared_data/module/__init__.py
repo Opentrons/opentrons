@@ -2,7 +2,7 @@
 
 import json
 from pathlib import Path
-from typing import overload, TYPE_CHECKING
+from typing import TYPE_CHECKING, Union, overload
 
 from ..load import load_shared_data
 
@@ -46,18 +46,21 @@ def load_definition(
     ...
 
 
-def load_definition(version, model_or_definition):
+def load_definition(
+    version: Union['SchemaV1', 'SchemaV2'],
+    model_or_loadname: Union[str, 'ModuleModel'],
+) -> Union['ModuleDefinitionV1', 'ModuleDefinitionV2']:
     if version == '1':
         path = Path('module') / 'definitions' / '1.json'
         data = json.loads(load_shared_data(path))
         try:
-            return data[model_or_definition]
+            return data[model_or_loadname]
         except KeyError:
-            raise ModuleNotFoundError('1', model_or_definition)
+            raise ModuleNotFoundError('1', model_or_loadname)
     else:
-        path = Path(f'module/definitions/2/{model_or_definition}.json')
+        path = Path(f'module/definitions/2/{model_or_loadname}.json')
         try:
             data = load_shared_data(path)
         except FileNotFoundError:
-            raise ModuleNotFoundError('2', model_or_definition)
+            raise ModuleNotFoundError('2', model_or_loadname)
         return json.loads(data)
