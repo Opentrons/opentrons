@@ -45,6 +45,11 @@ const ENABLE_DEV_TOOLS_BODY =
 
 const DEV_TITLE = 'Developer Only (unstable)'
 
+const LABWARE_OFFSET_DATA_LABEL =
+  'Display a link to download Labware Offset Data'
+const LABWARE_OFFSET_DATA_BODY =
+  'If you need to access Labware Offset data outside of the Opentrons App, enabling this setting will display a link to download Offset Data (if it is present) on the Labware Setup section of the Protocol page and the Labware Position Check Summary screen.'
+
 export function AppAdvancedSettingsCard(): JSX.Element {
   const useTrashSurfaceForTipCal = useSelector((state: State) =>
     Config.getUseTrashSurfaceForTipCal(state)
@@ -55,6 +60,7 @@ export function AppAdvancedSettingsCard(): JSX.Element {
   const channelOptions: DropdownOption[] = useSelector(
     Config.getUpdateChannelOptions
   )
+  const islabwareOffsetDataOn = useSelector(Config.getIsLabwareOffsetDataOn)
   const dispatch = useDispatch<Dispatch>()
 
   const handleUseTrashSelection = (selection: BlockSelection): void => {
@@ -70,6 +76,13 @@ export function AppAdvancedSettingsCard(): JSX.Element {
         break
     }
   }
+  const toggleLabwareOffsetData = (): unknown =>
+    dispatch(
+      Config.updateConfigValue(
+        'robotSettings.labwareOffsetData',
+        Boolean(!islabwareOffsetDataOn)
+      )
+    )
   const toggleDevtools = (): unknown => dispatch(Config.toggleDevtools())
   const toggleDevInternalFlag = (flag: DevInternalFlag): unknown =>
     dispatch(Config.toggleDevInternalFlag(flag))
@@ -103,6 +116,14 @@ export function AppAdvancedSettingsCard(): JSX.Element {
         >
           <p>{USE_TRASH_SURFACE_TIP_CAL_BODY}</p>
         </LabeledRadioGroup>
+        <LabeledToggle
+          data-test="labwareOffsetData"
+          label={LABWARE_OFFSET_DATA_LABEL}
+          toggledOn={islabwareOffsetDataOn}
+          onClick={toggleLabwareOffsetData}
+        >
+          <p>{LABWARE_OFFSET_DATA_BODY}</p>
+        </LabeledToggle>
         <LabeledSelect
           data-test="updateChannelSetting"
           label={UPDATE_CHANNEL_LABEL}

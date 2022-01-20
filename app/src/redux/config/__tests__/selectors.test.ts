@@ -107,4 +107,20 @@ describe('shell selectors', () => {
       expect(Selectors.getUseTrashSurfaceForTipCal(state)).toEqual(false)
     })
   })
+
+  describe('getIsLabwareOffsetDataOn', () => {
+    it('should return true is saved value in config is true', () => {
+      const state: State = {
+        config: { robotSettings: { labwareOffsetData: true } },
+      } as any
+      expect(Selectors.getIsLabwareOffsetDataOn(state)).toEqual(true)
+    })
+
+    it('should return false is saved value in config is false', () => {
+      const state: State = {
+        config: { robotSettings: { labwareOffsetData: false } },
+      } as any
+      expect(Selectors.getIsLabwareOffsetDataOn(state)).toEqual(false)
+    })
+  })
 })
