@@ -71,9 +71,9 @@ class GCodeEngine:
             async def _async_entry():
                 await asyncio.gather(
                     run_smoothie.run(self._config),
-                    run_app.run(self._config,
-                                modules=[m.value for m in modules])
+                    run_app.run(self._config, modules=[m.value for m in modules]),
                 )
+
             asyncio.run(_async_entry())
 
         proc = Process(target=_run_app)
