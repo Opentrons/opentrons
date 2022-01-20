@@ -32,6 +32,7 @@ import { useRunStatus, useRunControls } from '../../RunTimeControl/hooks'
 import { useCurrentProtocolRun } from '../hooks/useCurrentProtocolRun'
 import { useCloseCurrentRun } from '../hooks/useCloseCurrentRun'
 import { ProtocolUpload } from '..'
+import { ProtocolLoader } from '..'
 
 jest.mock('../../../redux/protocol/selectors')
 jest.mock('../../../redux/protocol/utils')
@@ -95,6 +96,8 @@ const render = () => {
     { i18nInstance: i18n }
   )
 }
+
+const mockLoadingText = 'mockLoadingText'
 
 describe('ProtocolUpload', () => {
   beforeEach(() => {
@@ -326,6 +329,7 @@ describe('ProtocolUpload', () => {
       <div>mock confirm cancel modal</div>
     )
     expect(screen.queryByText('mock confirm cancel modal')).toBeNull()
+    expect(screen.queryByText('Cnacel Run')).toBeNull()
   })
 
   it('renders an error if protocol has a not-ok result', () => {
@@ -371,5 +375,23 @@ describe('ProtocolUpload', () => {
     const [{ getByText }] = render()
     getByText('Protocol upload failed. Fix the error and try again')
     getByText('invalid protocol!')
+  })
+})
+
+const renderProtocolLoader = (
+  props: React.ComponentProps<typeof ProtocolLoader>
+) => {
+  return renderWithProviders(<ProtocolLoader {...props} />)[0]
+}
+
+describe('ProtocolLoader', () => {
+  let props: React.ComponentProps<typeof ProtocolLoader>
+  beforeEach(() => {
+    props = { loadingText: mockLoadingText }
+  })
+
+  it('should render ProtocolLoader text with spinner', () => {
+    const { getByText } = renderProtocolLoader(props)
+    getByText('mockLoadingText')
   })
 })

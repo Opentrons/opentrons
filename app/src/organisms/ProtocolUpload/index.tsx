@@ -262,7 +262,7 @@ interface ProtocolLoaderProps {
   loadingText: string
 }
 
-function ProtocolLoader(props: ProtocolLoaderProps): JSX.Element | null {
+export function ProtocolLoader(props: ProtocolLoaderProps): JSX.Element | null {
   return (
     <Flex
       justifyContent={JUSTIFY_CENTER}
