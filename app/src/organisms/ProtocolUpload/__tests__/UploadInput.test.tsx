@@ -10,6 +10,7 @@ import {
 import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
 import { i18n } from '../../../i18n'
 import * as RobotSelectors from '../../../redux/robot/selectors'
+import { useTrackEvent } from '../../../redux/analytics'
 import { useProtocolDetails } from '../../RunDetails/hooks'
 import { getLatestLabwareOffsetCount } from '../../ProtocolSetup/LabwarePositionCheck/utils/getLatestLabwareOffsetCount'
 import { UploadInput } from '../UploadInput'
@@ -20,15 +21,16 @@ import { useCloneRun } from '../hooks'
 import type { ProtocolFile } from '@opentrons/shared-data'
 import type { LabwareOffset } from '@opentrons/api-client'
 
-jest.mock('../hooks/useMostRecentRunId')
 jest.mock('@opentrons/react-api-client')
+jest.mock('../../../redux/analytics')
+jest.mock(
+  '../../ProtocolSetup/LabwarePositionCheck/utils/getLatestLabwareOffsetCount'
+)
 jest.mock('../../RunDetails/hooks')
 jest.mock('../../../redux/robot/selectors')
 jest.mock('../hooks')
 jest.mock('../RerunningProtocolModal')
-jest.mock(
-  '../../ProtocolSetup/LabwarePositionCheck/utils/getLatestLabwareOffsetCount'
-)
+jest.mock('../hooks/useMostRecentRunId')
 
 const mockUseMostRecentRunId = useMostRecentRunId as jest.MockedFunction<
   typeof useMostRecentRunId
@@ -50,6 +52,9 @@ const mockRerunningProtocolModal = RerunningProtocolModal as jest.MockedFunction
 const mockGetLatestLabwareOffsetCount = getLatestLabwareOffsetCount as jest.MockedFunction<
   typeof getLatestLabwareOffsetCount
 >
+const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
+  typeof useTrackEvent
+>
 
 const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolFile<{}>
 
@@ -58,6 +63,8 @@ const render = (props: React.ComponentProps<typeof UploadInput>) => {
     i18nInstance: i18n,
   })[0]
 }
+
+let mockTrackEvent: jest.Mock
 
 describe('UploadInput', () => {
   let props = {} as React.ComponentProps<typeof UploadInput>
@@ -122,6 +129,8 @@ describe('UploadInput', () => {
     when(mockGetLatestLabwareOffsetCount)
       .calledWith(mockOffsets)
       .mockReturnValue(0)
+    mockTrackEvent = jest.fn()
+    when(mockUseTrackEvent).calledWith().mockReturnValue(mockTrackEvent)
   })
 
   afterEach(() => {
@@ -210,6 +219,10 @@ describe('UploadInput', () => {
     const button = getByRole('button', { name: 'Run again' })
     expect(button).not.toBeDisabled()
     fireEvent.click(button)
+    expect(mockTrackEvent).toHaveBeenCalledWith({
+      name: 'runAgain',
+      properties: {},
+    })
   })
   it('renders correct link text', () => {
     const { getByRole } = render(props)

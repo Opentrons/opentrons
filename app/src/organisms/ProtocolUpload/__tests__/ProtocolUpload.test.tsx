@@ -10,6 +10,7 @@ import {
 import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/testModulesProtocol.json'
 
 import { i18n } from '../../../i18n'
+import { useTrackEvent } from '../../../redux/analytics'
 import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
 import * as RobotSelectors from '../../../redux/robot/selectors'
 import * as calibrationSelectors from '../../../redux/calibration/selectors'
@@ -27,6 +28,7 @@ import { useCloseCurrentRun } from '../hooks/useCloseCurrentRun'
 import { ProtocolUpload } from '..'
 
 jest.mock('../../../redux/protocol/selectors')
+jest.mock('../../../redux/analytics')
 jest.mock('../../../redux/protocol/utils')
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../../redux/calibration/selectors')
@@ -78,7 +80,9 @@ const mockGetConnectedRobotName = RobotSelectors.getConnectedRobotName as jest.M
 const mockGetValidCustomLabwareFiles = customLabwareSelectors.getValidCustomLabwareFiles as jest.MockedFunction<
   typeof customLabwareSelectors.getValidCustomLabwareFiles
 >
-
+const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
+  typeof useTrackEvent
+>
 const queryClient = new QueryClient()
 
 const render = () => {
@@ -89,6 +93,8 @@ const render = () => {
     { i18nInstance: i18n }
   )
 }
+
+let mockTrackEvent: jest.Mock
 
 describe('ProtocolUpload', () => {
   beforeEach(() => {
@@ -119,6 +125,8 @@ describe('ProtocolUpload', () => {
     when(mockUseRunControls)
       .calledWith()
       .mockReturnValue({ pause: jest.fn() } as any)
+    mockTrackEvent = jest.fn()
+    when(mockUseTrackEvent).calledWith().mockReturnValue(mockTrackEvent)
   })
   afterEach(() => {
     resetAllWhenMocks()

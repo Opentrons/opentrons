@@ -37,6 +37,7 @@ import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 import { getLatestLabwareOffsetCount } from '../ProtocolSetup/LabwarePositionCheck/utils/getLatestLabwareOffsetCount'
 import { useProtocolDetails } from '../RunDetails/hooks'
 import { getConnectedRobotName } from '../../redux/robot/selectors'
+import { useTrackEvent } from '../../redux/analytics'
 import { Divider } from '../../atoms/structure'
 import { useMostRecentRunId } from './hooks/useMostRecentRunId'
 import { RerunningProtocolModal } from './RerunningProtocolModal'
@@ -91,6 +92,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
     mostRecentRunId != null ? mostRecentRunId : null
   )
   const robotName = useSelector((state: State) => getConnectedRobotName(state))
+  const trackEvent = useTrackEvent()
   const fileInput = React.useRef<HTMLInputElement>(null)
   const [isFileOverDropZone, setIsFileOverDropZone] = React.useState<boolean>(
     false
@@ -304,7 +306,10 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
             </Flex>
             <Flex>
               <NewSecondaryBtn
-                onClick={cloneRun}
+                onClick={() => {
+                  trackEvent({ name: 'runAgain', properties: {} })
+                  cloneRun()
+                }}
                 id={'UploadInput_runAgainButton'}
               >
                 {t('run_again')}
