@@ -31,8 +31,7 @@ import { mockCalibrationStatus } from '../../../redux/calibration/__fixtures__'
 import { useRunStatus, useRunControls } from '../../RunTimeControl/hooks'
 import { useCurrentProtocolRun } from '../hooks/useCurrentProtocolRun'
 import { useCloseCurrentRun } from '../hooks/useCloseCurrentRun'
-import { ProtocolUpload } from '..'
-import { ProtocolLoader } from '..'
+import { ProtocolUpload, ProtocolLoader } from '..'
 
 jest.mock('../../../redux/protocol/selectors')
 jest.mock('../../../redux/protocol/utils')
