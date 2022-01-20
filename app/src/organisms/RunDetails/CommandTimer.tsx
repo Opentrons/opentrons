@@ -33,7 +33,11 @@ export function CommandTimer(props: TimerProps): JSX.Element | null {
     >
       <Flex>
         <Flex marginRight={SPACING_1}>{t('start_step_time')}</Flex>
-        <Flex>{commandStartedAt != null ? formatRunTimestamp(commandStartedAt) : EMPTY_TIMESTAMP}</Flex>
+        <Flex>
+          {commandStartedAt != null
+            ? formatRunTimestamp(commandStartedAt)
+            : EMPTY_TIMESTAMP}
+        </Flex>
       </Flex>
 
       {commandStatus === 'running' && timeElapsedSincePause != null ? (

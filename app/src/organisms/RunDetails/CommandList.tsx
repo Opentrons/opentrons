@@ -24,12 +24,18 @@ import {
   ALIGN_STRETCH,
   ALIGN_CENTER,
 } from '@opentrons/components'
-import { RunCommandSummary, RUN_STATUS_FAILED, RUN_STATUS_IDLE, RUN_STATUS_STOP_REQUESTED, RUN_STATUS_STOPPED, RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
+import {
+  RUN_STATUS_FAILED,
+  RUN_STATUS_STOP_REQUESTED,
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_SUCCEEDED,
+} from '@opentrons/api-client'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { useProtocolDetails } from './hooks'
 import { useCurrentProtocolRun } from '../ProtocolUpload/hooks'
 import { ProtocolSetupInfo } from './ProtocolSetupInfo'
 import { CommandItem } from './CommandItem'
+import type { RunStatus, RunCommandSummary } from '@opentrons/api-client'
 import type {
   ProtocolFile,
   RunTimeCommand,
@@ -46,20 +52,14 @@ export function CommandList(): JSX.Element | null {
     .protocolData
   const { runRecord } = useCurrentProtocolRun()
   const runStatus = useRunStatus()
-  const listInnerRef = React.useRef<HTMLDivElement>()
-  const currentItemRef = React.useRef<HTMLDivElement>()
+  const listInnerRef = React.useRef<HTMLDivElement>(null)
+  const currentItemRef = React.useRef<HTMLDivElement>(null)
   const runDataCommands = runRecord?.data.commands
   const [windowIndex, setWindowIndex] = React.useState<number>(0)
-  const [isJumpingToCurrent, setIsJumpingToCurrent] = React.useState<boolean>(false)
-  React.useEffect(
-    () => {
-      if (isJumpingToCurrent) {
-        currentItemRef.current?.scrollIntoView({behavior: 'smooth'})
-        setIsJumpingToCurrent(false)
-      }
-    },
-    [windowIndex, isJumpingToCurrent]
+  const [isJumpingToCurrent, setIsJumpingToCurrent] = React.useState<boolean>(
+    false
   )
+
   const firstPlayTimestamp = runRecord?.data.actions.find(
     action => action.actionType === 'play'
   )?.createdAt
@@ -99,6 +99,7 @@ export function CommandList(): JSX.Element | null {
       runCommandSummary: null,
     })
   )
+  let postPlayRunCommands: CommandRuntimeInfo[] = []
   if (
     runDataCommands != null &&
     runDataCommands.length > 0 &&
@@ -107,7 +108,7 @@ export function CommandList(): JSX.Element | null {
     const firstPostPlayRunCommandIndex = runDataCommands.findIndex(
       command => command.key === postSetupAnticipatedCommands[0]?.key
     )
-    const postPlayRunCommands =
+    postPlayRunCommands =
       firstPostPlayRunCommandIndex >= 0
         ? runDataCommands
             .slice(firstPostPlayRunCommandIndex)
@@ -134,7 +135,7 @@ export function CommandList(): JSX.Element | null {
       (isDeterministic, command, index) => {
         return (
           isDeterministic &&
-          command.runCommandSummary.key ===
+          command.runCommandSummary?.key ===
             postSetupAnticipatedCommands[index]?.key
         )
       },
@@ -146,19 +147,6 @@ export function CommandList(): JSX.Element | null {
       : [...postPlayRunCommands]
   }
 
-  if (protocolData == null || runStatus == null) return null
-
-  let alertItemTitle
-  if (runStatus === 'failed') {
-    alertItemTitle = t('protocol_run_failed')
-  }
-  if (runStatus === RUN_STATUS_STOP_REQUESTED || runStatus === RUN_STATUS_STOPPED) {
-    alertItemTitle = t('protocol_run_canceled')
-  }
-  if (runStatus === RUN_STATUS_SUCCEEDED) {
-    alertItemTitle = t('protocol_run_complete')
-  }
-
   const windowFirstIndex = WINDOW_OVERLAP * windowIndex
   const commandWindow = currentCommandList.slice(
     windowFirstIndex,
@@ -166,36 +154,88 @@ export function CommandList(): JSX.Element | null {
   )
   const isFirstWindow = windowIndex === 0
   const isFinalWindow =
-    (currentCommandList.length - 1) <= windowFirstIndex + WINDOW_SIZE &&
-    (currentCommandList.length - 1) >= windowFirstIndex
+    currentCommandList.length - 1 <= windowFirstIndex + WINDOW_SIZE &&
+    currentCommandList.length - 1 >= windowFirstIndex
 
-  const onScroll = () => {
+
+  const handleJumpToCurrentItem = (): void => {
+    const currentItemIndex = currentCommandList.findIndex(
+      command =>
+        command.runCommandSummary == null ||
+        command.runCommandSummary.status === 'running'
+    )
+    const windowIndexWithCurrentItem = Math.floor(
+      currentItemIndex / WINDOW_OVERLAP
+    )
+    setWindowIndex(windowIndexWithCurrentItem)
+    setIsJumpingToCurrent(true)
+  }
+  const currentItemIndex = currentCommandList.findIndex(
+    command =>
+      command.runCommandSummary == null ||
+      command.runCommandSummary.status === 'running' ||
+      command.runCommandSummary.status === 'queued'
+  )
+  const windowIndexWithCurrentItem = Math.floor(
+    (currentItemIndex - (WINDOW_SIZE - WINDOW_OVERLAP)) / WINDOW_OVERLAP
+  )
+
+  // when we initially mount, if the current item is not in view, jump to it
+  React.useEffect(() => {
+    if (windowIndexWithCurrentItem !== windowIndex) {
+      setWindowIndex(windowIndexWithCurrentItem)
+    }
+    setIsJumpingToCurrent(true)
+  }, [])
+
+  // if jumping to current item and on correct window index, scroll to current item
+  React.useEffect(() => {
+    if (isJumpingToCurrent && windowIndex === windowIndexWithCurrentItem) {
+      currentItemRef.current?.scrollIntoView({ behavior: 'smooth' })
+      setIsJumpingToCurrent(false)
+    }
+  }, [windowIndex, isJumpingToCurrent])
+
+  if (protocolData == null || runStatus == null) return null
+
+  let alertItemTitle
+  if (runStatus === 'failed') {
+    alertItemTitle = t('protocol_run_failed')
+  }
+  if (
+    runStatus === RUN_STATUS_STOP_REQUESTED ||
+    runStatus === RUN_STATUS_STOPPED
+  ) {
+    alertItemTitle = t('protocol_run_canceled')
+  }
+  if (runStatus === RUN_STATUS_SUCCEEDED) {
+    alertItemTitle = t('protocol_run_complete')
+  }
+
+  const onScroll = (): void => {
     if (listInnerRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = listInnerRef.current
       const firstIndexInWindow = windowIndex * WINDOW_SIZE
-      if (scrollTop + clientHeight + (EAGER_BUFFER_COEFFICIENT * clientHeight) >= scrollHeight) {
+      if (
+        scrollTop + clientHeight + EAGER_BUFFER_COEFFICIENT * clientHeight >=
+        scrollHeight
+      ) {
         const potentialNextWindowFirstIndex =
           firstIndexInWindow + WINDOW_OVERLAP
         if (potentialNextWindowFirstIndex < currentCommandList.length) {
           setWindowIndex(windowIndex + 1)
         }
-      } else if (scrollTop <= (EAGER_BUFFER_COEFFICIENT * clientHeight)) {
+      } else if (scrollTop <= EAGER_BUFFER_COEFFICIENT * clientHeight) {
         const potentialPrevWindowFirstIndex =
           firstIndexInWindow - WINDOW_OVERLAP
         if (windowIndex > 0 && potentialPrevWindowFirstIndex >= 0) {
           setWindowIndex(windowIndex - 1)
-          listInnerRef.current?.scrollTo({ top: 1})
+          listInnerRef.current?.scrollTo({ top: 1 })
         }
       }
     }
   }
 
-  const handleJumpToCurrentItem = () => {
-    const currentItemIndex = currentCommandList.findIndex(command =>  command.runCommandSummary == null || command.runCommandSummary.status === 'running')
-    const windowIndexWithCurrentItem = Math.floor(currentItemIndex / WINDOW_OVERLAP);
-    setWindowIndex(windowIndexWithCurrentItem)
-    setIsJumpingToCurrent(true)
-  }
 
   return (
     <Box
@@ -208,15 +248,31 @@ export function CommandList(): JSX.Element | null {
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING_2}>
         {isFirstWindow ? (
           <>
-            {[RUN_STATUS_FAILED, RUN_STATUS_SUCCEEDED, RUN_STATUS_STOP_REQUESTED, RUN_STATUS_STOPPED].includes(runStatus) ? (
+            {([
+              RUN_STATUS_FAILED,
+              RUN_STATUS_SUCCEEDED,
+              RUN_STATUS_STOP_REQUESTED,
+              RUN_STATUS_STOPPED,
+            ] as RunStatus[]).includes(runStatus) ? (
               <Box padding={`${SPACING_2} ${SPACING_2} ${SPACING_2} 0`}>
                 <AlertItem
-                  type={[RUN_STATUS_STOP_REQUESTED, RUN_STATUS_FAILED, RUN_STATUS_STOPPED].includes(runStatus) ? 'error' : 'success'}
+                  type={
+                    ([
+                      RUN_STATUS_STOP_REQUESTED,
+                      RUN_STATUS_FAILED,
+                      RUN_STATUS_STOPPED,
+                    ] as RunStatus[]).includes(runStatus)
+                      ? 'error'
+                      : 'success'
+                  }
                   title={alertItemTitle}
                 />
               </Box>
             ) : null}
-            <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
+            <Flex
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
+              alignItems={ALIGN_CENTER}
+            >
               <Text
                 paddingY={SPACING_2}
                 css={FONT_HEADER_DARK}
@@ -224,12 +280,20 @@ export function CommandList(): JSX.Element | null {
               >
                 {t('protocol_steps')}
               </Text>
-              <Text fontSize={FONT_SIZE_CAPTION} paddingY={SPACING_1}>{t('total_step_count', {count: currentCommandList.length} )}</Text>
+              <Text fontSize={FONT_SIZE_CAPTION} paddingY={SPACING_1}>
+                {t('total_step_count', { count: currentCommandList.length })}
+              </Text>
             </Flex>
-            {protocolSetupCommandList.length > 0
-              ? <ProtocolSetupItem protocolSetupCommandList={protocolSetupCommandList} />
-              : null
-            }
+            {currentCommandList[0]?.runCommandSummary == null ? (
+              <Text fontSize={FONT_SIZE_CAPTION} marginY={SPACING_2}>
+                {t('anticipated')}
+              </Text>
+            ) : null}
+            {protocolSetupCommandList.length > 0 ? (
+              <ProtocolSetupItem
+                protocolSetupCommandList={protocolSetupCommandList}
+              />
+            ) : null}
           </>
         ) : null}
         <Flex
@@ -238,10 +302,11 @@ export function CommandList(): JSX.Element | null {
           flexDirection={DIRECTION_COLUMN}
         >
           {commandWindow?.map((command, index) => {
+            const overallIndex = index + windowFirstIndex
             const isCurrentCommand =
               command.runCommandSummary?.status === 'running'
             const showAnticipatedStepsTitle =
-              index != commandWindow.length - 1 && isCurrentCommand
+              overallIndex !== currentCommandList.length - 1 && isCurrentCommand
 
             return (
               <Flex
@@ -251,7 +316,7 @@ export function CommandList(): JSX.Element | null {
                 id={`RunDetails_CommandItem`}
                 justifyContent={JUSTIFY_START}
                 flexDirection={DIRECTION_COLUMN}
-                ref={isCurrentCommand ? currentItemRef : () => {}}
+                ref={isCurrentCommand ? currentItemRef : undefined}
                 marginBottom={SPACING_2}
               >
                 <CommandItem
@@ -259,10 +324,13 @@ export function CommandList(): JSX.Element | null {
                   runCommandSummary={command.runCommandSummary}
                   runStatus={runStatus}
                   currentRunId={runRecord?.data.id ?? null}
-                  stepNumber={index + windowFirstIndex + 1}
+                  stepNumber={overallIndex + 1}
                 />
                 {showAnticipatedStepsTitle && (
-                  <Text fontSize={FONT_SIZE_CAPTION} margin={`${SPACING_3} 0 ${SPACING_2}`}>
+                  <Text
+                    fontSize={FONT_SIZE_CAPTION}
+                    margin={`${SPACING_3} 0 ${SPACING_2}`}
+                  >
                     {t('anticipated')}
                   </Text>
                 )}
@@ -281,8 +349,8 @@ export function CommandList(): JSX.Element | null {
 interface ProtocolSetupItemProps {
   protocolSetupCommandList: RunTimeCommand[]
 }
-function ProtocolSetupItem(props: ProtocolSetupItemProps) {
-  const {protocolSetupCommandList} = props
+function ProtocolSetupItem(props: ProtocolSetupItemProps): JSX.Element {
+  const { protocolSetupCommandList } = props
   const [
     showProtocolSetupInfo,
     setShowProtocolSetupInfo,
@@ -290,7 +358,7 @@ function ProtocolSetupItem(props: ProtocolSetupItemProps) {
   const { t } = useTranslation('run_details')
 
   return (
-    <Flex marginY={SPACING_2} >
+    <Flex marginY={SPACING_2}>
       {showProtocolSetupInfo ? (
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -300,10 +368,7 @@ function ProtocolSetupItem(props: ProtocolSetupItemProps) {
           alignSelf={ALIGN_STRETCH}
           alignItems={ALIGN_STRETCH}
         >
-          <Flex
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
-            color={C_MED_DARK_GRAY}
-          >
+          <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} color={C_MED_DARK_GRAY}>
             <Text
               textTransform={TEXT_TRANSFORM_UPPERCASE}
               fontSize={FONT_SIZE_CAPTION}
@@ -312,10 +377,7 @@ function ProtocolSetupItem(props: ProtocolSetupItemProps) {
             >
               {t('protocol_setup')}
             </Text>
-            <Btn
-              size={SIZE_1}
-              onClick={() => setShowProtocolSetupInfo(false)}
-            >
+            <Btn size={SIZE_1} onClick={() => setShowProtocolSetupInfo(false)}>
               <Icon name="chevron-up" color={C_MED_DARK_GRAY} />
             </Btn>
           </Flex>
@@ -323,7 +385,7 @@ function ProtocolSetupItem(props: ProtocolSetupItemProps) {
             id={`RunDetails_ProtocolSetup_CommandList`}
             flexDirection={DIRECTION_COLUMN}
           >
-            {protocolSetupCommandList?.map(command => {
+            {protocolSetupCommandList.map(command => {
               return (
                 <ProtocolSetupInfo
                   key={command.id}

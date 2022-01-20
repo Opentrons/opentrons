@@ -77,7 +77,13 @@ export const OBSERVER_DELAY = 150
 export function CommandItemComponent(
   props: CommandItemProps
 ): JSX.Element | null {
-  const { analysisCommand, runCommandSummary, runStatus, currentRunId, stepNumber } = props
+  const {
+    analysisCommand,
+    runCommandSummary,
+    runStatus,
+    currentRunId,
+    stepNumber,
+  } = props
   const { t } = useTranslation('run_details')
   const [commandItemRef, isInView] = useInView({
     delay: OBSERVER_DELAY,
@@ -180,7 +186,10 @@ export function CommandItemComponent(
           {t('pause_protocol')}
         </Flex>
       ) : null}
-      <Flex flexDirection={DIRECTION_ROW} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+      >
         <Flex flexDirection={DIRECTION_ROW}>
           {['running', 'failed', 'succeeded'].includes(commandStatus) &&
           !isComment ? (
@@ -195,7 +204,9 @@ export function CommandItemComponent(
             runCommand={commandDetails?.data ?? null}
           />
         </Flex>
-        <Text fontSize={FONT_SIZE_CAPTION} marginY={SPACING_1}>{stepNumber}</Text>
+        <Text fontSize={FONT_SIZE_CAPTION} marginY={SPACING_1}>
+          {stepNumber}
+        </Text>
       </Flex>
     </Flex>
   )
