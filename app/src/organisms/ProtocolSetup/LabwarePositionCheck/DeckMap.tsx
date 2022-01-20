@@ -12,6 +12,8 @@ import {
 import {
   THERMOCYCLER_MODULE_V1,
   inferModuleOrientationFromXCoordinate,
+  MAGNETIC_MODULE_V1,
+  MAGNETIC_MODULE_V2,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../hooks'
@@ -38,6 +40,7 @@ export const DeckMap = (props: DeckMapProps): JSX.Element | null => {
   const moduleRenderInfoById = useModuleRenderInfoById()
   const labwareRenderInfoById = useLabwareRenderInfoById()
 
+  console.log(moduleRenderInfoById)
   return (
     <RobotWorkSpace
       deckDef={standardDeckDef as any}
@@ -91,13 +94,16 @@ export const DeckMap = (props: DeckMapProps): JSX.Element | null => {
                         ) === true && (
                           <g
                             transform={
-                              moduleDef.model !== THERMOCYCLER_MODULE_V1
+                              moduleDef.model === THERMOCYCLER_MODULE_V1
+                                ? `translate(${x + 35},${
+                                    y - 110
+                                  }) scale(0.1, -0.1)`
+                                : moduleDef.model === MAGNETIC_MODULE_V1 ||
+                                  moduleDef.model === MAGNETIC_MODULE_V2
                                 ? `translate(${x + 35},${
                                     y + 70
                                   }) scale(0.1, -0.1)`
-                                : `translate(${x + 35},${
-                                    y - 110
-                                  }) scale(0.1, -0.1)`
+                                : `translate(${35},${y + 69}) scale(0.1, -0.1)`
                             }
                           >
                             <circle

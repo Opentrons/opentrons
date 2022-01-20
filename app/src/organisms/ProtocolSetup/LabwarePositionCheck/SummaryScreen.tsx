@@ -72,7 +72,6 @@ export const SummaryScreen = (props: {
       console.error('no labware offset data found')
     }
   }
-
   return (
     <Flex margin={SPACING_3} flexDirection={DIRECTION_COLUMN}>
       <Text
