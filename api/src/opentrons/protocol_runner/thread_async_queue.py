@@ -1,9 +1,11 @@
 """Safely pass values between threads and async tasks."""
 
+
+from __future__ import annotations
+
 from collections import deque
-from contextlib import contextmanager
 from threading import Condition
-from typing import AsyncIterable, Deque, Generic, Iterable, TypeVar, Generator
+from typing import AsyncIterable, Deque, Generic, Iterable, TypeVar
 
 from anyio.to_thread import run_sync
 
@@ -69,14 +71,6 @@ class ThreadAsyncQueue(Generic[_T]):
             else:
                 self._is_closed = True
                 self._condition.notify_all()
-
-    @contextmanager
-    def putting(self) -> Generator[None, None, None]:
-        """Return a context manager that, when exited, calls `done_putting()`."""  # noqa: D402,E501
-        try:
-            yield
-        finally:
-            self.done_putting()
 
     def get(self) -> _T:
         """Remove and return the value at the front of the queue.
@@ -153,6 +147,12 @@ class ThreadAsyncQueue(Generic[_T]):
                 # since we only want to catch our own QueueClosed,
                 # not QueueClosed from our caller.
                 yield value
+
+    def __enter__(self) -> ThreadAsyncQueue[_T]:
+        return self
+
+    def __exit__(self, exc_type: object, exc_val: object, exc_tb: object) -> None:
+        self.done_putting()
 
 
 class QueueClosed(Exception):

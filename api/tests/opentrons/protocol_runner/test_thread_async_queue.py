@@ -19,7 +19,7 @@ def test_basic_single_threaded_behavior() -> None:
     """Test basic queue behavior in a single thread."""
     subject = ThreadAsyncQueue[int]()
 
-    with subject.putting():
+    with subject:
         subject.put(1)
         subject.put(2)
         subject.put(3)
@@ -73,11 +73,12 @@ def test_multi_thread_producer_consumer() -> None:
 
     # Run producers concurrently with consumers.
     with ThreadPoolExecutor(max_workers=num_producers + num_consumers) as executor:
+        # `with subject` needs to be inside `with ThreadPoolExecutor`
+        # to avoid deadlocks in case something in here raises.
         # Consumers need to see the queue closed eventually to terminate,
         # and `with ThreadPoolExecutor` will wait until all threads are terminated
-        # before exiting. So, to avoid deadlocks in case something goes wrong,
-        # `with subject.putting()` needs to be inside `with ThreadPoolExecutor`.
-        with subject.putting():
+        # before exiting.
+        with subject:
             producers = [
                 executor.submit(
                     _produce,
@@ -91,8 +92,8 @@ def test_multi_thread_producer_consumer() -> None:
                 executor.submit(_consume, queue=subject) for i in range(num_consumers)
             ]
 
-            # Ensure all producers are done before exiting
-            # the `with subject.putting()` block.
+            # Ensure all producers are done before we exit the `with subject` block
+            # and close off the queue to further submissions.
             for c in producers:
                 c.result()
 
