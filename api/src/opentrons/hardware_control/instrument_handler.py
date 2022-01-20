@@ -31,6 +31,7 @@ from .constants import (
     SHAKE_OFF_TIPS_SPEED,
     SHAKE_OFF_TIPS_PICKUP_DISTANCE,
     DROP_TIP_RELEASE_DISTANCE,
+    SHAKE_OFF_TIPS_DROP_DISTANCE,
 )
 
 from .robot_calibration import load_pipette_offset
@@ -685,4 +686,104 @@ class InstrumentHandlerProvider:
                 ),
             ),
             add_tip_to_instr,
+        )
+
+    @dataclass(frozen=True)
+    class DropTipMove:
+        target_position: Sequence[float]
+        current: Dict[Axis, float]
+        speed: Optional[float]
+        home_after: bool = False
+        home_after_safety_margin: float = 0
+        home_axes: Sequence[Axis] = tuple()
+
+    @dataclass(frozen=True)
+    class DropTipSpec:
+        drop_moves: List["InstrumentHandlerProvider.DropTipMove"]
+        shake_moves: List[Tuple[top_types.Point, Optional[float]]]
+        ending_current: Dict[Axis, float]
+
+    @staticmethod
+    def _shake_off_tips_drop(
+        tiprack_diameter: float,
+    ) -> List[Tuple[top_types.Point, Optional[float]]]:
+        # tips don't always fall off, especially if resting against
+        # tiprack or other tips below it. To ensure the tip has fallen
+        # first, shake the pipette to dislodge partially-sealed tips,
+        # then second, raise the pipette so loosened tips have room to fall
+        shake_off_dist = SHAKE_OFF_TIPS_DROP_DISTANCE
+        if tiprack_diameter > 0.0:
+            shake_off_dist = min(shake_off_dist, tiprack_diameter / 4)
+        shake_off_dist = max(shake_off_dist, 1.0)
+        speed = SHAKE_OFF_TIPS_SPEED
+        return [
+            (top_types.Point(-shake_off_dist, 0, 0), speed),  # left
+            (top_types.Point(2 * shake_off_dist, 0, 0), speed),  # right
+            (top_types.Point(-shake_off_dist, 0, 0), speed),  # center
+            (top_types.Point(0, 0, DROP_TIP_RELEASE_DISTANCE), None),  # top
+        ]
+
+    def plan_check_drop_tip(
+        self,
+        mount: Union[top_types.Mount, PipettePair],
+        home_after: bool,
+    ) -> Tuple["InstrumentHandlerProvider.DropTipSpec", Callable[[], None]]:
+        instruments = self.instruments_for(mount)
+        self.ready_for_tip_action(instruments, HardwareAction.DROPTIP)
+        plunger_currents = {
+            Axis.of_plunger(instr[1]): instr[0].config.plunger_current
+            for instr in instruments
+        }
+        drop_tip_currents = {
+            Axis.of_plunger(instr[1]): instr[0].config.drop_tip_current
+            for instr in instruments
+        }
+        plunger_axes = tuple(Axis.of_plunger(instr[1]) for instr in instruments)
+
+        bottom = tuple(instr[0].config.bottom for instr in instruments)
+        droptip = tuple(instr[0].config.drop_tip for instr in instruments)
+        speed = min(instr[0].config.drop_tip_speed for instr in instruments)
+
+        def _build_single_sequence() -> List[InstrumentHandlerProvider.DropTipMove]:
+            base = [
+                self.DropTipMove(
+                    target_position=bottom, current=plunger_currents, speed=None
+                ),
+                self.DropTipMove(
+                    target_position=droptip,
+                    current=drop_tip_currents,
+                    speed=speed,
+                    home_after=home_after,
+                    home_after_safety_margin=abs(max(bottom) - max(droptip)),
+                    home_axes=plunger_axes,
+                ),
+            ]
+            if home_after:
+                base.append(
+                    self.DropTipMove(
+                        target_position=bottom, current=plunger_currents, speed=None
+                    )
+                )
+            return base
+
+        seq = _build_single_sequence()
+        if any(["doubleDropTip" in instr[0].config.quirks for instr in instruments]):
+            seq += seq
+
+        shakes: List[Tuple[top_types.Point, Optional[float]]] = []
+        if any(["dropTipShake" in instr[0].config.quirks for instr in instruments]):
+            diameter = min(instr[0].current_tiprack_diameter for instr in instruments)
+            shakes = self._shake_off_tips_drop(diameter)
+
+        def _remove_tips() -> None:
+            for instr in instruments:
+                instr[0].set_current_volume(0)
+                instr[0].current_tiprack_diameter = 0.0
+                instr[0].remove_tip()
+
+        return (
+            self.DropTipSpec(
+                drop_moves=seq, shake_moves=shakes, ending_current=plunger_currents
+            ),
+            _remove_tips,
         )
