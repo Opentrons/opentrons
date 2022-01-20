@@ -4,10 +4,10 @@ import {
   LabwareRender,
   Module,
   RobotWorkSpace,
+  RobotCoordsForeignObject,
   C_SELECTED_DARK,
   Icon,
   COLOR_SUCCESS,
-  C_WHITE,
 } from '@opentrons/components'
 import {
   THERMOCYCLER_MODULE_V1,
@@ -89,23 +89,8 @@ export const DeckMap = (props: DeckMapProps): JSX.Element | null => {
                         completedLabwareIdSections?.includes(
                           nestedLabwareId
                         ) === true && (
-                          <g
-                            transform={
-                              moduleDef.model !== THERMOCYCLER_MODULE_V1
-                                ? `translate(${x + 35},${
-                                    y + 70
-                                  }) scale(0.1, -0.1)`
-                                : `translate(${x + 35},${
-                                    y - 110
-                                  }) scale(0.1, -0.1)`
-                            }
-                          >
+                          <g>
                             <circle
-                              cx="0"
-                              cy="0"
-                              r={230}
-                              fill={C_WHITE}
-                              transform={`translate(273,235)`}
                               data-testid={`DeckMap_module_${nestedLabwareId}_whiteBackground`}
                             />
                             <Icon
@@ -140,25 +125,19 @@ export const DeckMap = (props: DeckMapProps): JSX.Element | null => {
                     )}
                   </g>
                   {completedLabwareIdSections?.includes(labwareId) === true && (
-                    <g
-                      transform={`
-                      translate(${x + 35},${y + 70}) scale(0.1, -0.1) 
-                      `}
+                    <RobotCoordsForeignObject
+                      x={0}
+                      y={0}
+                      height="100%"
+                      width="100%"
+                      // flexProps={{ padding: SPACING_3 }}
                     >
-                      <circle
-                        cx="0"
-                        cy="0"
-                        r={230}
-                        fill={C_WHITE}
-                        transform={`translate(273,235)`}
-                        data-testid={`DeckMap_${labwareId}_whiteBackground`}
-                      />
                       <Icon
                         name="check-circle"
                         color={COLOR_SUCCESS}
                         data-testid={`DeckMap_${labwareId}_checkmark`}
                       />
-                    </g>
+                    </RobotCoordsForeignObject>
                   )}
                 </React.Fragment>
               )
