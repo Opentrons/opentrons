@@ -7,7 +7,6 @@ import {
   Box,
   Flex,
   Icon,
-  IconProps,
   Text,
   ALIGN_CENTER,
   ALIGN_START,
@@ -38,6 +37,25 @@ import type { DiscoveredRobot } from '../../redux/discovery/types'
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const OT2_PNG = require('../../assets/images/OT2-R_HERO.png')
 
+const iconNamesByModuleType = {
+  [MAGNETIC_MODULE_TYPE]: 'ot-magnet',
+  [TEMPERATURE_MODULE_TYPE]: 'ot-temperature',
+  [THERMOCYCLER_MODULE_TYPE]: 'ot-thermocycler',
+} as const
+
+const ModuleIcon = ({
+  moduleType,
+}: {
+  moduleType:
+    | typeof MAGNETIC_MODULE_TYPE
+    | typeof TEMPERATURE_MODULE_TYPE
+    | typeof THERMOCYCLER_MODULE_TYPE
+}): JSX.Element => {
+  return (
+    <Icon name={iconNamesByModuleType[moduleType]} marginRight={SPACING_2} />
+  )
+}
+
 type RobotCardProps = Pick<DiscoveredRobot, 'name' | 'local'>
 
 export function RobotCard(props: RobotCardProps): JSX.Element {
@@ -57,28 +75,6 @@ export function RobotCard(props: RobotCardProps): JSX.Element {
       <Link to={`/devices/${name}/protocol-runs/run`}>{t('go_to_run')}</Link>
     </Flex>
   )
-
-  const ModuleIcon = ({
-    moduleType,
-  }: {
-    moduleType:
-      | typeof MAGNETIC_MODULE_TYPE
-      | typeof TEMPERATURE_MODULE_TYPE
-      | typeof THERMOCYCLER_MODULE_TYPE
-  }): JSX.Element | null => {
-    let iconName: IconProps['name'] | null = null
-
-    if (moduleType === MAGNETIC_MODULE_TYPE) {
-      iconName = 'ot-magnet'
-    } else if (moduleType === TEMPERATURE_MODULE_TYPE) {
-      iconName = 'ot-temperature'
-    } else if (moduleType === THERMOCYCLER_MODULE_TYPE) {
-      iconName = 'ot-thermocycler'
-    }
-    return iconName != null ? (
-      <Icon name={iconName} marginRight={SPACING_2} />
-    ) : null
-  }
 
   const attachedModules = useAttachedModules(name)
   const attachedPipettes = useAttachedPipettes(name)
