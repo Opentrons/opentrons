@@ -1,7 +1,19 @@
 """Shared code for managing pipette configuration and storage."""
 from dataclasses import dataclass
 import logging
-from typing import Dict, Optional, Tuple, overload, Sequence, Any, cast, Union
+from typing import (
+    Callable,
+    Dict,
+    Optional,
+    Tuple,
+    overload,
+    Any,
+    cast,
+    Union,
+    List,
+    Sequence,
+    Iterator,
+)
 
 from opentrons_shared_data.pipette.dev_types import UlPerMmAction
 
@@ -15,6 +27,12 @@ from .types import (
     PairedPipetteConfigValueError,
     Axis,
 )
+from .constants import (
+    SHAKE_OFF_TIPS_SPEED,
+    SHAKE_OFF_TIPS_PICKUP_DISTANCE,
+    DROP_TIP_RELEASE_DISTANCE,
+)
+
 from .robot_calibration import load_pipette_offset
 from .dev_types import PipetteDict
 from .pipette import Pipette
@@ -551,3 +569,120 @@ class InstrumentHandlerProvider:
             )
             for instr in instruments
         ]
+
+    @dataclass(frozen=True)
+    class PickUpTipPressSpec:
+        relative_down: Sequence[float]
+        relative_up: Sequence[float]
+        current: Dict[Axis, float]
+        speed: float
+
+    @dataclass(frozen=True)
+    class PickUpTipSpec:
+        plunger_prep_pos: Sequence[float]
+        plunger_currents: Dict[Axis, float]
+        presses: List["InstrumentHandlerProvider.PickUpTipPressSpec"]
+        shake_off_list: List[Tuple[top_types.Point, Optional[float]]]
+        retract_target: float
+
+    @staticmethod
+    def _build_pickup_shakes(
+        instruments: Sequence[PipetteHandlingData],
+    ) -> List[Tuple[top_types.Point, Optional[float]]]:
+        def build_one_shake() -> List[Tuple[top_types.Point, Optional[float]]]:
+            shake_dist = float(SHAKE_OFF_TIPS_PICKUP_DISTANCE)
+            shake_speed = float(SHAKE_OFF_TIPS_SPEED)
+            return [
+                (top_types.Point(-shake_dist, 0, 0), shake_speed),  # left
+                (top_types.Point(2 * shake_dist, 0, 0), shake_speed),  # right
+                (top_types.Point(-shake_dist, 0, 0), shake_speed),  # center
+                (top_types.Point(0, -shake_dist, 0), shake_speed),  # front
+                (top_types.Point(0, 2 * shake_dist, 0), shake_speed),  # back
+                (top_types.Point(0, -shake_dist, 0), shake_speed),  # center
+                (top_types.Point(0, 0, DROP_TIP_RELEASE_DISTANCE), None),  # up
+            ]
+
+        if any(["pickupTipShake" in instr[0].config.quirks for instr in instruments]):
+            return build_one_shake() + build_one_shake()
+        else:
+            return []
+
+    def plan_check_pick_up_tip(
+        self,
+        mount: Union[top_types.Mount, PipettePair],
+        tip_length: float,
+        presses: Optional[int],
+        increment: Optional[float],
+    ) -> Tuple["InstrumentHandlerProvider.PickUpTipSpec", Callable[[], None]]:
+
+        # Prechecks: ready for pickup tip and press/increment are valid
+        instruments = self.instruments_for(mount)
+        self.ready_for_pick_up_tip(instruments)
+
+        if not presses or presses < 0:
+            all_presses = tuple(
+                instr[0].config.pick_up_presses for instr in instruments
+            )
+            if len(all_presses) > 1 and all_presses[0] != all_presses[1]:
+                raise PairedPipetteConfigValueError(
+                    "Number of pipette pickups must match"
+                )
+            checked_presses = all_presses[0]
+        else:
+            checked_presses = presses
+
+        if not increment or increment < 0:
+            check_incr = tuple(
+                instr[0].config.pick_up_increment for instr in instruments
+            )
+        else:
+            check_incr = tuple(increment for instr in instruments)
+
+        z_axis_currents = {
+            Axis.by_mount(instr[1]): instr[0].config.pick_up_current
+            for instr in instruments
+        }
+        pick_up_speed = min(instr[0].config.pick_up_speed for instr in instruments)
+
+        def build_presses() -> Iterator[Tuple[Sequence[float], Sequence[float]]]:
+            # Press the nozzle into the tip <presses> number of times,
+            # moving further by <increment> mm after each press
+            for i in range(checked_presses):
+                # move nozzle down into the tip
+                press_dist = tuple(
+                    -1.0 * instr[0].config.pick_up_distance + -1.0 * incrt * i
+                    for instr, incrt in zip(instruments, check_incr)
+                )
+                # move nozzle back up
+                backup_dist = tuple(-d for d in press_dist)
+                yield (press_dist, backup_dist)
+
+        def add_tip_to_instr() -> None:
+            for instr in instruments:
+                instr[0].add_tip(tip_length=tip_length)
+            instr[0].set_current_volume(0)
+
+        return (
+            InstrumentHandlerProvider.PickUpTipSpec(
+                plunger_prep_pos=tuple(instr[0].config.bottom for instr in instruments),
+                plunger_currents={
+                    Axis.of_plunger(instr[1]): instr[0].config.plunger_current
+                    for instr in instruments
+                },
+                presses=[
+                    InstrumentHandlerProvider.PickUpTipPressSpec(
+                        current=z_axis_currents,
+                        speed=pick_up_speed,
+                        relative_down=(0, 0, *press_dist),
+                        relative_up=(0, 0, *backup_dist),
+                    )
+                    for press_dist, backup_dist in build_presses()
+                ],
+                shake_off_list=self._build_pickup_shakes(instruments),
+                retract_target=max(
+                    instr[0].config.pick_up_distance + incrt * checked_presses + 2
+                    for instr, incrt in zip(instruments, check_incr)
+                ),
+            ),
+            add_tip_to_instr,
+        )
