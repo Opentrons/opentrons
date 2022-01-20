@@ -193,11 +193,12 @@ class Simulator:
 
     async def home(self, axes: List[str] = None) -> Dict[str, float]:
         # driver_3_0-> HOMED_POSITION
-        checked_axes = axes or "XYZABC"
+        checked_axes = ''.join(axes) if axes else "XYZABC"
         self._position.update(
             {ax: self._smoothie_driver.homed_position[ax] for ax in checked_axes}
         )
         self._engaged_axes.update({ax: True for ax in checked_axes})
+        await self._smoothie_driver.home(axis=checked_axes)
         return self._position
 
     async def fast_home(self, axis: Sequence[str], margin: float) -> Dict[str, float]:
