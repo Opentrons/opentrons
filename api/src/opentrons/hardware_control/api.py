@@ -65,7 +65,15 @@ mod_log = logging.getLogger(__name__)
 
 
 class API(
-    ExecutionManagerProvider, RobotCalibrationProvider, InstrumentHandlerProvider
+    ExecutionManagerProvider,
+    RobotCalibrationProvider,
+    InstrumentHandlerProvider,
+    # This MUST be kept last in the inheritance list so that it is
+    # deprioritized in the method resolution order; otherwise, invocations
+    # of methods that are present in the protocol will call the (empty,
+    # do-nothing) methods in the protocol. This will happily make all the
+    # tests fail.
+    HardwareControlAPI,
 ):
     """This API is the primary interface to the hardware controller.
 
@@ -117,22 +125,6 @@ class API(
         ExecutionManagerProvider.__init__(self, loop, isinstance(backend, Simulator))
         RobotCalibrationProvider.__init__(self)
         InstrumentHandlerProvider.__init__(self)
-        API._check_type(self)
-
-    @staticmethod
-    def _check_type(inst: HardwareControlAPI) -> None:
-        """Do-nothing to provide early warning if the protocol is not satisfied.
-
-        This class can't inherit from the HardwareControlAPI protocol if we're also
-        doing multiple inheritance, because it confuses MRO - it looks like it should
-        have all these functions, but they're defined to not do anything. That means
-        that we don't get the early warning when the class doesn't fulfill the
-        protocol.
-
-        What we can do instead is this, a bogus function that exists to make mypy
-        verify while parsing the class that it fulfilles the protocol.
-        """
-        pass
 
     @property
     def door_state(self) -> DoorState:
