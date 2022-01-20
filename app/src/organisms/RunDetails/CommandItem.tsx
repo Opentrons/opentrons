@@ -72,7 +72,7 @@ const commandIsComplete = (status: RunCommandSummary['status']): boolean =>
   status === 'succeeded' || status === 'failed'
 
 // minimum delay in MS for observer notifications
-export const OBSERVER_DELAY = 300
+export const OBSERVER_DELAY = 150
 
 export function CommandItemComponent(
   props: CommandItemProps
@@ -160,7 +160,6 @@ export function CommandItemComponent(
           fontSize={FONT_SIZE_CAPTION}
           color={C_MED_DARK_GRAY}
           marginBottom={SPACING_1}
-          marginLeft={SPACING_1}
         >
           {t('comment_step')}
         </Flex>
@@ -171,12 +170,11 @@ export function CommandItemComponent(
           fontSize={FONT_SIZE_CAPTION}
           color={C_MED_DARK_GRAY}
           marginBottom={SPACING_1}
-          marginLeft={SPACING_1}
         >
           <Icon
             name="pause"
             width={SPACING_3}
-            paddingRight={SPACING_2}
+            marginRight={SPACING_2}
             color={C_DARK_GRAY}
           />
           {t('pause_protocol')}
@@ -189,6 +187,7 @@ export function CommandItemComponent(
             <CommandTimer
               commandStartedAt={commandDetails?.data.startedAt}
               commandCompletedAt={commandDetails?.data.completedAt}
+              commandStatus={commandStatus}
             />
           ) : null}
           <CommandText
@@ -196,7 +195,7 @@ export function CommandItemComponent(
             runCommand={commandDetails?.data ?? null}
           />
         </Flex>
-        <Text fontSize={FONT_SIZE_CAPTION} paddingY={SPACING_1}>{stepNumber}</Text>
+        <Text fontSize={FONT_SIZE_CAPTION} marginY={SPACING_1}>{stepNumber}</Text>
       </Flex>
     </Flex>
   )
