@@ -139,14 +139,9 @@ class ThreadAsyncQueue(Generic[_T]):
         """
         while True:
             try:
-                value = await self.get_async()
+                yield await self.get_async()
             except QueueClosed:
                 break
-            else:
-                # Do not yield from within the try-block,
-                # since we only want to catch our own QueueClosed,
-                # not QueueClosed from our caller.
-                yield value
 
     def __enter__(self) -> ThreadAsyncQueue[_T]:
         return self
