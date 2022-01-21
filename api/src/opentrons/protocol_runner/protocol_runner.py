@@ -3,6 +3,8 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.types import HardwareEvent, DoorStateNotification, \
+    DoorState
 from opentrons.protocol_reader import (
     ProtocolSource,
     PythonProtocolConfig,
@@ -92,7 +94,9 @@ class ProtocolRunner:
             hardware_api=hardware_api
         )
         self._was_started = False
-
+        self._hardware_api.register_callback(self.hardware_event_handler)
+        self._door_state: DoorState = self._hardware_api.door_state
+        self._blocked = self._hardware_api._pause_manager.blocked_by_door
         # TODO(mc, 2022-01-11): replace task queue with specific implementations
         # of runner interface
         self._task_queue = task_queue or TaskQueue(cleanup_func=protocol_engine.finish)
@@ -133,8 +137,28 @@ class ProtocolRunner:
 
     def play(self) -> None:
         """Start or resume the run."""
+        print(f"Starting play. Blocked by door? {self._blocked}")
+        self._verify_ok_to_play()
         self._was_started = True
         self._protocol_engine.play()
+
+    def _verify_ok_to_play(self) -> None:
+        """Verify if it is okay to start playing the engine.
+
+        Raises: if not okay.
+        """
+        if self._blocked:
+            raise
+
+    def hardware_event_handler(self, hw_event: HardwareEvent) -> None:
+        """Update the runner on hardware events."""
+        if isinstance(hw_event, DoorStateNotification):
+            print("____ Got a door state notification _____")
+            self._door_state = hw_event.new_state
+            self._blocked = hw_event.blocking
+            print(f"blocked?: {self._blocked} | was_started?: {self._was_started}")
+            if self._blocked and self._was_started:
+                self.pause()
 
     def pause(self) -> None:
         """Pause the run."""
