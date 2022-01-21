@@ -14,6 +14,8 @@ import {
   inferModuleOrientationFromXCoordinate,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
+  TEMPERATURE_MODULE_V1,
+  TEMPERATURE_MODULE_V2,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../hooks'
@@ -103,7 +105,31 @@ export const DeckMap = (props: DeckMapProps): JSX.Element | null => {
                                 ? `translate(${x + 35},${
                                     y + 70
                                   }) scale(0.1, -0.1)`
-                                : `translate(${35},${y + 69}) scale(0.1, -0.1)`
+                                : (moduleDef.model === TEMPERATURE_MODULE_V1 ||
+                                    moduleDef.model ===
+                                      TEMPERATURE_MODULE_V2) &&
+                                  x !== 0 &&
+                                  y === 0
+                                ? `translate(${35},${y + 69}) scale(0.1, -0.1)`
+                                : (moduleDef.model === TEMPERATURE_MODULE_V1 ||
+                                    moduleDef.model ===
+                                      TEMPERATURE_MODULE_V2) &&
+                                  x !== 0 &&
+                                  y === 90.5
+                                ? `translate(${35},${y - 22}) scale(0.1, -0.1)`
+                                : (moduleDef.model === TEMPERATURE_MODULE_V1 ||
+                                    moduleDef.model ===
+                                      TEMPERATURE_MODULE_V2) &&
+                                  x === 0 &&
+                                  y === 181
+                                ? `translate(${35},${y - 110}) scale(0.1, -0.1)`
+                                : (moduleDef.model === TEMPERATURE_MODULE_V1 ||
+                                    moduleDef.model ===
+                                      TEMPERATURE_MODULE_V2) &&
+                                  x === 0 &&
+                                  y === 90.5
+                                ? `translate(${35},${y - 26}) scale(0.1, -0.1)`
+                                : `translate(${35},${y - 26}) scale(0.1, -0.1)`
                             }
                           >
                             <circle
