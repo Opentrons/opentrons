@@ -2,8 +2,9 @@
 import pytest
 from decoy import matchers, Decoy
 from datetime import datetime
+from typing import cast
 
-from opentrons.commands.types import CommentMessage, PauseMessage
+from opentrons.commands.types import CommentMessage, PauseMessage, CommandMessage
 from opentrons.protocol_engine import (
     DeckSlotLocation,
     ModuleLocation,
@@ -415,3 +416,45 @@ def test_map_pause() -> None:
         ),
         pe_actions.PauseAction(source=pe_actions.PauseSource.PROTOCOL),
     ]
+
+
+@pytest.mark.parametrize(
+    "command_type",
+    [
+        "command.MIX",
+        "command.CONSOLIDATE",
+        "command.DISTRIBUTE",
+        "command.TRANSFER",
+        "command.RETURN_TIP",
+    ],
+)
+def test_filter_higher_order_commands(command_type: str) -> None:
+    """It should filter out higher order commands."""
+    legacy_command_start = cast(
+        CommandMessage,
+        {
+            "$": "before",
+            "id": "message-id",
+            "name": command_type,
+            "payload": {"text": "hello world"},
+            "error": None,
+        },
+    )
+    legacy_command_end = cast(
+        CommandMessage,
+        {
+            "$": "after",
+            "id": "message-id",
+            "name": command_type,
+            "payload": {"text": "hello world"},
+            "error": None,
+        },
+    )
+
+    subject = LegacyCommandMapper()
+    result = [
+        *subject.map_command(legacy_command_start),
+        *subject.map_command(legacy_command_end),
+    ]
+
+    assert result == []
