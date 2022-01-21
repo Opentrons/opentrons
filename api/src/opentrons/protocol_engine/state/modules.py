@@ -46,7 +46,7 @@ _THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = [
 
 @dataclass(frozen=True)
 class HardwareModule:
-    """Data describing from an actually connected module."""
+    """Data describing an actually connected module."""
 
     serial_number: str
     definition: ModuleDefinition
