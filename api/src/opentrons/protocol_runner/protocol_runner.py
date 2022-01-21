@@ -104,7 +104,7 @@ class ProtocolRunner:
         """
         return self._was_started
 
-    async def load(self, protocol_source: ProtocolSource) -> None:
+    def load(self, protocol_source: ProtocolSource) -> None:
         """Load a ProtocolSource into managed ProtocolEngine.
 
         Calling this method is only necessary if the runner will be used
@@ -121,7 +121,7 @@ class ProtocolRunner:
             if schema_version >= LEGACY_JSON_SCHEMA_VERSION_CUTOFF:
                 self._load_json(protocol_source)
             else:
-                await self._load_legacy(protocol_source)
+                self._load_legacy(protocol_source)
 
         elif isinstance(config, PythonProtocolConfig):
             api_version = config.api_version
@@ -129,7 +129,7 @@ class ProtocolRunner:
             if api_version >= LEGACY_PYTHON_API_VERSION_CUTOFF:
                 self._load_python(protocol_source)
             else:
-                await self._load_legacy(protocol_source)
+                self._load_legacy(protocol_source)
 
     def play(self) -> None:
         """Start or resume the run."""
@@ -155,7 +155,7 @@ class ProtocolRunner:
         # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`
         # currently `protocol_source` arg is only used by tests
         if protocol_source:
-            await self.load(protocol_source)
+            self.load(protocol_source)
 
         self.play()
         self._task_queue.start()
@@ -180,14 +180,14 @@ class ProtocolRunner:
             context=context,
         )
 
-    async def _load_legacy(
+    def _load_legacy(
         self,
         protocol_source: ProtocolSource,
     ) -> None:
         protocol = self._legacy_file_reader.read(protocol_source)
         context = self._legacy_context_creator.create(protocol)
 
-        await self._protocol_engine.add_plugin(
+        self._protocol_engine.add_plugin(
             LegacyContextPlugin(
                 hardware_api=self._hardware_api,
                 protocol_context=context,

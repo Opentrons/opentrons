@@ -358,7 +358,7 @@ async def test_stop(
     )
 
 
-async def test_add_plugin(
+def test_add_plugin(
     decoy: Decoy,
     plugin_starter: PluginStarter,
     subject: ProtocolEngine,
@@ -366,9 +366,9 @@ async def test_add_plugin(
     """It should add a plugin to the PluginStarter."""
     plugin = decoy.mock(cls=AbstractPlugin)
 
-    await subject.add_plugin(plugin)
+    subject.add_plugin(plugin)
 
-    decoy.verify(await plugin_starter.start(plugin))
+    decoy.verify(plugin_starter.start(plugin))
 
 
 def test_add_labware_offset(

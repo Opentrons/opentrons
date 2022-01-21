@@ -55,18 +55,18 @@ async def test_setup_teardown(
 
     subject = PluginStarter(state=state_view, action_dispatcher=action_dispatcher)
 
-    await subject.start(plugin_1)
+    subject.start(plugin_1)
     decoy.verify(
         plugin_1._configure(state=state_view, action_dispatcher=action_dispatcher),
         action_dispatcher.add_handler(plugin_1),
-        await plugin_1.setup(),
+        plugin_1.setup(),
     )
 
-    await subject.start(plugin_2)
+    subject.start(plugin_2)
     decoy.verify(
         plugin_2._configure(state=state_view, action_dispatcher=action_dispatcher),
         action_dispatcher.add_handler(plugin_2),
-        await plugin_2.setup(),
+        plugin_2.setup(),
     )
 
     await subject.stop()

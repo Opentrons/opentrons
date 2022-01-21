@@ -201,7 +201,7 @@ async def test_run(
 
 
 @pytest.mark.xfail(raises=NotImplementedError, strict=True)
-async def test_load_json(
+def test_load_json(
     decoy: Decoy,
     json_file_reader: JsonFileReader,
     json_command_translator: JsonCommandTranslator,
@@ -229,7 +229,7 @@ async def test_load_json(
     decoy.when(json_file_reader.read(json_protocol_source)).then_return(json_protocol)
     decoy.when(json_command_translator.translate(json_protocol)).then_return(commands)
 
-    await subject.load(json_protocol_source)
+    subject.load(json_protocol_source)
 
     decoy.verify(
         protocol_engine.add_command(
@@ -246,7 +246,7 @@ async def test_load_json(
     )
 
 
-async def test_load_python(
+def test_load_python(
     decoy: Decoy,
     python_file_reader: PythonFileReader,
     python_context_creator: PythonContextCreator,
@@ -275,7 +275,7 @@ async def test_load_python(
         protocol_context
     )
 
-    await subject.load(python_protocol_source)
+    subject.load(python_protocol_source)
 
     decoy.verify(
         task_queue.set_run_func(
@@ -286,7 +286,7 @@ async def test_load_python(
     )
 
 
-async def test_load_legacy_python(
+def test_load_legacy_python(
     decoy: Decoy,
     legacy_file_reader: LegacyFileReader,
     legacy_context_creator: LegacyContextCreator,
@@ -330,11 +330,11 @@ async def test_load_legacy_python(
         legacy_context
     )
 
-    await subject.load(legacy_protocol_source)
+    subject.load(legacy_protocol_source)
 
     decoy.verify(
         protocol_engine.add_labware_definition(labware_definition),
-        await protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)),
+        protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)),
         task_queue.set_run_func(
             func=legacy_executor.execute,
             protocol=legacy_protocol,
@@ -343,7 +343,7 @@ async def test_load_legacy_python(
     )
 
 
-async def test_load_legacy_json(
+def test_load_legacy_json(
     decoy: Decoy,
     legacy_file_reader: LegacyFileReader,
     legacy_context_creator: LegacyContextCreator,
@@ -382,11 +382,11 @@ async def test_load_legacy_json(
         legacy_context
     )
 
-    await subject.load(legacy_protocol_source)
+    subject.load(legacy_protocol_source)
 
     decoy.verify(
         protocol_engine.add_labware_definition(labware_definition),
-        await protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)),
+        protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)),
         task_queue.set_run_func(
             func=legacy_executor.execute,
             protocol=legacy_protocol,

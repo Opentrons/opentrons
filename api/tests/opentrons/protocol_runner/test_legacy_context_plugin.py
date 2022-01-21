@@ -200,7 +200,7 @@ async def test_broker_subscribe_unsubscribe(
         legacy_context.module_load_broker.subscribe(callback=matchers.Anything())
     ).then_return(module_unsubscribe)
 
-    await subject.setup()
+    subject.setup()
     await subject.teardown()
 
     decoy.verify(main_unsubscribe())
@@ -219,7 +219,7 @@ async def test_main_broker_messages(
     """It should dispatch commands from main broker messages."""
     handler_captors, _ = _mock_subscribes(decoy=decoy, legacy_context=legacy_context)
 
-    await subject.setup()
+    subject.setup()
 
     handler: Callable[
         [LegacyCommand], None
@@ -264,7 +264,7 @@ async def test_labware_load_broker_messages(
     """It should dispatch commands from labware load broker messages."""
     handler_captors, _ = _mock_subscribes(decoy=decoy, legacy_context=legacy_context)
 
-    await subject.setup()
+    subject.setup()
 
     handler: Callable[
         [LegacyLabwareLoadInfo], None
@@ -311,7 +311,7 @@ async def test_instrument_load_broker_messages(
     """It should dispatch commands from instrument load broker messages."""
     handler_captors, _ = _mock_subscribes(decoy=decoy, legacy_context=legacy_context)
 
-    await subject.setup()
+    subject.setup()
 
     handler: Callable[
         [LegacyInstrumentLoadInfo], None
@@ -354,7 +354,7 @@ async def test_module_load_broker_messages(
     """It should dispatch commands from module load broker messages."""
     handler_captors, _ = _mock_subscribes(decoy=decoy, legacy_context=legacy_context)
 
-    await subject.setup()
+    subject.setup()
 
     handler: Callable[
         [LegacyModuleLoadInfo], None

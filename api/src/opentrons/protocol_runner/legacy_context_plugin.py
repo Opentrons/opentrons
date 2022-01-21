@@ -1,8 +1,8 @@
 """Customize the ProtocolEngine to monitor and control legacy (APIv2) protocols."""
 from __future__ import annotations
 
-from asyncio import create_task
-from contextlib import AsyncExitStack
+from asyncio import create_task, Task
+from contextlib import ExitStack
 from typing import Optional
 
 from opentrons.commands.types import CommandMessage as LegacyCommand
@@ -61,10 +61,11 @@ class LegacyContextPlugin(AbstractPlugin):
         # every time it reported some activity,
         # it could visibly stall for a moment, making its motion jittery.
         self._actions_to_dispatch = ThreadAsyncQueue[pe_actions.Action]()
+        self._action_dispatching_task: Optional[Task[None]] = None
 
-        self._exit_stack: Optional[AsyncExitStack] = None
+        self._subscription_exit_stack: Optional[ExitStack] = None
 
-    async def setup(self) -> None:
+    def setup(self) -> None:
         """Set up the plugin.
 
         * Subscribe to the APIv2 context's message brokers to be informed
@@ -73,12 +74,11 @@ class LegacyContextPlugin(AbstractPlugin):
         """
         context = self._protocol_context
 
+        # Subscribe to activity on the APIv2 context,
+        # and arrange to unsubscribe when this plugin is torn down.
         # Use an exit stack so if any part of this setup fails,
         # we clean up the parts that succeeded in reverse order.
-        async with AsyncExitStack() as exit_stack:
-            # Subscribe to activity on the APIv2 context,
-            # and arrange to unsubscribe when this plugin is torn down:
-
+        with ExitStack() as exit_stack:
             command_unsubscribe = context.broker.subscribe(
                 topic="command",
                 handler=self._handle_legacy_command,
@@ -100,28 +100,13 @@ class LegacyContextPlugin(AbstractPlugin):
             )
             exit_stack.callback(module_unsubscribe)
 
-            # Kick off a background task to report activity to the ProtocolEngine,
-            # and arrange to await its exit when this plugin is torn down:
-
-            action_dispatching_task = create_task(self._dispatch_all_actions())
-
-            async def await_action_dispatching_task() -> None:
-                await action_dispatching_task
-
-            exit_stack.push_async_callback(await_action_dispatching_task)
-
-            # Arrange to close the actions queue when this plugin is torn down,
-            # so the background task knows it's time to exit:
-
-            # Registering this cleanup must come below registering the await of the
-            # background task, so this will happen first on teardown
-            # and the await won't deadlock.
-            exit_stack.callback(self._actions_to_dispatch.done_putting)
-
-            # All setup succeeded.
+            # All subscriptions succeeded.
             # Save the exit stack so our teardown method can use it later
-            # to clean up these resources.
-            self._exit_stack = exit_stack.pop_all()
+            # to clean up these subscriptions.
+            self._subscription_exit_stack = exit_stack.pop_all()
+
+        # Kick off a background task to report activity to the ProtocolEngine.
+        self._action_dispatching_task = create_task(self._dispatch_all_actions())
 
     async def teardown(self) -> None:
         """Tear down the plugin, undoing the work done in `setup()`.
@@ -129,10 +114,16 @@ class LegacyContextPlugin(AbstractPlugin):
         Called by Protocol Engine.
         At this point, the APIv2 protocol script must have exited.
         """
-        # self._exit_stack should never be None at this point.
-        if self._exit_stack is not None:
-            await self._exit_stack.aclose()
-            self._exit_stack = None
+        # todo:
+        self._actions_to_dispatch.done_putting()
+        try:
+            if self._action_dispatching_task is not None:
+                await self._action_dispatching_task
+                self._action_dispatching_task = None
+        finally:
+            if self._subscription_exit_stack is not None:
+                self._subscription_exit_stack.close()
+                self._subscription_exit_stack = None
 
     def handle_action(self, action: pe_actions.Action) -> None:
         """React to a ProtocolEngine action."""

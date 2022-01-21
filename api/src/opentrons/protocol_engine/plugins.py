@@ -36,7 +36,7 @@ class AbstractPlugin(ActionHandler, ABC):
         """
         return self._action_dispatcher.dispatch(action)
 
-    async def setup(self) -> None:
+    def setup(self) -> None:
         """Run any necessary setup steps prior to plugin usage."""
         ...
 
@@ -89,12 +89,12 @@ class PluginStarter:
         self._action_dispatcher = action_dispatcher
         self._plugins: List[AbstractPlugin] = []
 
-    async def start(self, plugin: AbstractPlugin) -> None:
+    def start(self, plugin: AbstractPlugin) -> None:
         """Configure a given plugin and add it to the dispatch pipeline."""
         plugin._configure(state=self._state, action_dispatcher=self._action_dispatcher)
         self._plugins.append(plugin)
         self._action_dispatcher.add_handler(plugin)
-        await plugin.setup()
+        plugin.setup()
 
     async def stop(self) -> None:
         """Stop any configured plugins."""

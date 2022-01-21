@@ -76,13 +76,9 @@ class ProtocolEngine:
         """Get an interface to retrieve calculated state values."""
         return self._state_store
 
-    # todo(mm, 2022-01-14): Adding a plugin should be synchronous.
-    # This is currently async only because adding the LegacyContextPlugin
-    # is intertwined with initializing the LegacyContextPlugin, which is async.
-    # Separate those concerns and then make this synchronous.
-    async def add_plugin(self, plugin: AbstractPlugin) -> None:
+    def add_plugin(self, plugin: AbstractPlugin) -> None:
         """Add a plugin to the engine to customize behavior."""
-        await self._plugin_starter.start(plugin)
+        self._plugin_starter.start(plugin)
 
     def play(self) -> None:
         """Start or resume executing commands in the queue."""
