@@ -2,6 +2,7 @@ import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import '@testing-library/jest-dom'
 import { fireEvent, screen } from '@testing-library/react'
+import { BrowserRouter } from 'react-router-dom'
 import {
   componentPropsMatcher,
   nestedTextMatcher,
@@ -54,9 +55,14 @@ const mockGetLatestLabwareOffsetCount = getLatestLabwareOffsetCount as jest.Mock
 const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolFile<{}>
 
 const render = (props: React.ComponentProps<typeof UploadInput>) => {
-  return renderWithProviders(<UploadInput onUpload={props.onUpload} />, {
-    i18nInstance: i18n,
-  })[0]
+  return renderWithProviders(
+    <BrowserRouter>
+      <UploadInput onUpload={props.onUpload} />
+    </BrowserRouter>,
+    {
+      i18nInstance: i18n,
+    }
+  )[0]
 }
 
 describe('UploadInput', () => {
