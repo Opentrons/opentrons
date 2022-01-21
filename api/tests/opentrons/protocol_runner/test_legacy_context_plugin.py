@@ -3,7 +3,7 @@ import pytest
 from anyio import to_thread
 from decoy import Decoy, matchers
 from datetime import datetime
-from typing import Any, Callable, NamedTuple, TypeVar
+from typing import Callable
 
 from opentrons.commands.types import CommandMessage as LegacyCommand, PauseMessage
 from opentrons.hardware_control import API as HardwareAPI
@@ -79,72 +79,6 @@ def subject(
     return plugin
 
 
-_UnsubscribeCallback = Callable[[], None]
-_PayloadT = TypeVar("_PayloadT")
-_Handler = Callable[[_PayloadT], None]
-
-
-class _UnsubscribeCallbackSet(NamedTuple):
-    command_unsubscribe: _UnsubscribeCallback
-    labware_unsubscribe: _UnsubscribeCallback
-    instrument_unsubscribe: _UnsubscribeCallback
-    module_unsubscribe: _UnsubscribeCallback
-
-
-class _HandlerCaptorSet(NamedTuple):
-    command_handler_captor: Any
-    labware_handler_captor: Any
-    instrument_handler_captor: Any
-    module_handler_captor: Any
-
-
-class _Result(NamedTuple):
-    handler_captors: _HandlerCaptorSet
-    unsubscribe_callbacks: _UnsubscribeCallbackSet
-
-
-def _mock_subscribes(decoy: Decoy, legacy_context: LegacyProtocolContext) -> _Result:
-    handler_captors = _HandlerCaptorSet(
-        command_handler_captor=matchers.Captor(),
-        labware_handler_captor=matchers.Captor(),
-        instrument_handler_captor=matchers.Captor(),
-        module_handler_captor=matchers.Captor(),
-    )
-
-    unsubscribe_callbacks = _UnsubscribeCallbackSet(
-        command_unsubscribe=decoy.mock(),
-        labware_unsubscribe=decoy.mock(),
-        instrument_unsubscribe=decoy.mock(),
-        module_unsubscribe=decoy.mock(),
-    )
-
-    decoy.when(
-        legacy_context.broker.subscribe(
-            topic="command", handler=handler_captors.command_handler_captor
-        )
-    ).then_return(unsubscribe_callbacks.command_unsubscribe)
-    decoy.when(
-        legacy_context.labware_load_broker.subscribe(
-            callback=handler_captors.labware_handler_captor
-        )
-    ).then_return(unsubscribe_callbacks.labware_unsubscribe)
-    decoy.when(
-        legacy_context.instrument_load_broker.subscribe(
-            callback=handler_captors.instrument_handler_captor
-        )
-    ).then_return(unsubscribe_callbacks.instrument_unsubscribe)
-    decoy.when(
-        legacy_context.module_load_broker.subscribe(
-            callback=handler_captors.module_handler_captor
-        )
-    ).then_return(unsubscribe_callbacks.module_unsubscribe)
-
-    return _Result(
-        handler_captors=handler_captors,
-        unsubscribe_callbacks=unsubscribe_callbacks,
-    )
-
-
 def test_play_action(
     decoy: Decoy,
     hardware_api: HardwareAPI,
@@ -217,13 +151,26 @@ async def test_main_broker_messages(
     subject: LegacyContextPlugin,
 ) -> None:
     """It should dispatch commands from main broker messages."""
-    handler_captors, _ = _mock_subscribes(decoy=decoy, legacy_context=legacy_context)
+    # Capture the function that the plugin sets up as its command broker callback.
+    # Also, ensure that all subscribe calls return an actual unsubscribe callable
+    # (instead of Decoy's default `None`) so subject.teardown() works.
+    command_handler_captor = matchers.Captor()
+    decoy.when(
+        legacy_context.broker.subscribe(topic="command", handler=command_handler_captor)
+    ).then_return(decoy.mock())
+    decoy.when(
+        legacy_context.labware_load_broker.subscribe(callback=matchers.Anything())
+    ).then_return(decoy.mock())
+    decoy.when(
+        legacy_context.instrument_load_broker.subscribe(callback=matchers.Anything())
+    ).then_return(decoy.mock())
+    decoy.when(
+        legacy_context.module_load_broker.subscribe(callback=matchers.Anything())
+    ).then_return(decoy.mock())
 
     subject.setup()
 
-    handler: Callable[
-        [LegacyCommand], None
-    ] = handler_captors.command_handler_captor.value
+    handler: Callable[[LegacyCommand], None] = command_handler_captor.value
 
     legacy_command: PauseMessage = {
         "$": "before",
@@ -262,13 +209,26 @@ async def test_labware_load_broker_messages(
     minimal_labware_def: LabwareDefinitionDict,
 ) -> None:
     """It should dispatch commands from labware load broker messages."""
-    handler_captors, _ = _mock_subscribes(decoy=decoy, legacy_context=legacy_context)
+    # Capture the function that the plugin sets up as its labware load callback.
+    # Also, ensure that all subscribe calls return an actual unsubscribe callable
+    # (instead of Decoy's default `None`) so subject.teardown() works.
+    labware_handler_captor = matchers.Captor()
+    decoy.when(
+        legacy_context.broker.subscribe(topic="command", handler=matchers.Anything())
+    ).then_return(decoy.mock())
+    decoy.when(
+        legacy_context.labware_load_broker.subscribe(callback=labware_handler_captor)
+    ).then_return(decoy.mock())
+    decoy.when(
+        legacy_context.instrument_load_broker.subscribe(callback=matchers.Anything())
+    ).then_return(decoy.mock())
+    decoy.when(
+        legacy_context.module_load_broker.subscribe(callback=matchers.Anything())
+    ).then_return(decoy.mock())
 
     subject.setup()
 
-    handler: Callable[
-        [LegacyLabwareLoadInfo], None
-    ] = handler_captors.labware_handler_captor.value
+    handler: Callable[[LegacyLabwareLoadInfo], None] = labware_handler_captor.value
 
     labware_load_info = LegacyLabwareLoadInfo(
         labware_definition=minimal_labware_def,
@@ -309,13 +269,30 @@ async def test_instrument_load_broker_messages(
     subject: LegacyContextPlugin,
 ) -> None:
     """It should dispatch commands from instrument load broker messages."""
-    handler_captors, _ = _mock_subscribes(decoy=decoy, legacy_context=legacy_context)
+    # Capture the function that the plugin sets up as its labware load callback.
+    # Also, ensure that all subscribe calls return an actual unsubscribe callable
+    # (instead of Decoy's default `None`) so subject.teardown() works.
+    instrument_handler_captor = matchers.Captor()
+    decoy.when(
+        legacy_context.broker.subscribe(topic="command", handler=matchers.Anything())
+    ).then_return(decoy.mock())
+    decoy.when(
+        legacy_context.labware_load_broker.subscribe(callback=matchers.Anything())
+    ).then_return(decoy.mock())
+    decoy.when(
+        legacy_context.instrument_load_broker.subscribe(
+            callback=instrument_handler_captor
+        )
+    ).then_return(decoy.mock())
+    decoy.when(
+        legacy_context.module_load_broker.subscribe(callback=matchers.Anything())
+    ).then_return(decoy.mock())
 
     subject.setup()
 
     handler: Callable[
         [LegacyInstrumentLoadInfo], None
-    ] = handler_captors.instrument_handler_captor.value
+    ] = instrument_handler_captor.value
 
     instrument_load_info = LegacyInstrumentLoadInfo(
         instrument_load_name="some_load_name", mount=Mount.LEFT
@@ -352,13 +329,26 @@ async def test_module_load_broker_messages(
     subject: LegacyContextPlugin,
 ) -> None:
     """It should dispatch commands from module load broker messages."""
-    handler_captors, _ = _mock_subscribes(decoy=decoy, legacy_context=legacy_context)
+    # Capture the function that the plugin sets up as its module load callback.
+    # Also, ensure that all subscribe calls return an actual unsubscribe callable
+    # (instead of Decoy's default `None`) so subject.teardown() works.
+    module_handler_captor = matchers.Captor()
+    decoy.when(
+        legacy_context.broker.subscribe(topic="command", handler=matchers.Anything())
+    ).then_return(decoy.mock())
+    decoy.when(
+        legacy_context.labware_load_broker.subscribe(callback=matchers.Anything())
+    ).then_return(decoy.mock())
+    decoy.when(
+        legacy_context.instrument_load_broker.subscribe(callback=matchers.Anything())
+    ).then_return(decoy.mock())
+    decoy.when(
+        legacy_context.module_load_broker.subscribe(callback=module_handler_captor)
+    ).then_return(decoy.mock())
 
     subject.setup()
 
-    handler: Callable[
-        [LegacyModuleLoadInfo], None
-    ] = handler_captors.module_handler_captor.value
+    handler: Callable[[LegacyModuleLoadInfo], None] = module_handler_captor.value
 
     module_load_info = LegacyModuleLoadInfo(
         module_model=LegacyMagneticModuleModel.MAGNETIC_V2,
