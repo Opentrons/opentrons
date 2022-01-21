@@ -99,9 +99,10 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
       ) : null}
 
       <UnMatchedModuleWarning
-        remainingAttachedModules={remainingAttachedModules}
+        isUnnecessaryModules={
+          remainingAttachedModules.length !== 0 && missingModuleIds.length !== 0
+        }
       />
-
       <RobotWorkSpace
         deckDef={standardDeckDef as any}
         viewBox={DECK_VIEW_BOX}

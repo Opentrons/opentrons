@@ -3,7 +3,6 @@ import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import { UnMatchedModuleWarning } from '../UnMatchedModuleWarning'
-import { mockTemperatureModule } from '../../../../../redux/modules/__fixtures__'
 
 const render = (props: React.ComponentProps<typeof UnMatchedModuleWarning>) => {
   return renderWithProviders(<UnMatchedModuleWarning {...props} />, {
@@ -14,7 +13,7 @@ const render = (props: React.ComponentProps<typeof UnMatchedModuleWarning>) => {
 describe('UnMatchedModuleWarning', () => {
   let props: React.ComponentProps<typeof UnMatchedModuleWarning>
   beforeEach(() => {
-    props = { remainingAttachedModules: [mockTemperatureModule] }
+    props = { isUnnecessaryModules: true }
   })
 
   it('should render the correct header', () => {
