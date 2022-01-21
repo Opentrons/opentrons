@@ -18,14 +18,18 @@ class ThreadAsyncQueue(Generic[_T]):
 
     All methods are safe to call concurrently from any thread or task.
 
-    Unlike queue.Queue, this class supports
-    a `done_putting()` method to make common producer/consumer patterns easier,
-    and a `get_async()` method to support async consumers.
+    Compared to queue.Queue:
 
-    Unlike asyncio.Queue and AnyIO memory object streams,
-    you can use this class to communicate between async tasks and threads
-    without the threads having to wait for the event loop to be free
-    every time they access the queue.
+    * This class lets you close the queue to signal that no more values will be added,
+      which makes common producer/consumer patterns easier.
+      (This is like Golang channels and AnyIO memory object streams.)
+    * This class has built-in support for async consumers.
+
+    Compared to asyncio.Queue and AnyIO memory object streams:
+
+    * You can use this class to communicate between async tasks and threads
+      without the threads having to wait for the event loop to be free
+      every time they access the queue.
     """
 
     def __init__(self) -> None:
@@ -40,7 +44,7 @@ class ThreadAsyncQueue(Generic[_T]):
         Returns immediately, without blocking. The queue can grow without bound.
 
         Raises:
-            QueueClosed: If `done_putting()` has already been called.
+            QueueClosed: If the queue is already closed.
         """
         with self._condition:
             if self._is_closed:
@@ -49,34 +53,12 @@ class ThreadAsyncQueue(Generic[_T]):
                 self._deque.append(value)
                 self._condition.notify()
 
-    def done_putting(self) -> None:
-        """Signal that no more values will be `put()`, closing the queue.
-
-        If other threads or tasks are calling `get()`,
-        you probably have to call `done_putting()` eventually,
-        to let them know when they can stop waiting.
-        Forgetting to call `done_putting()` can leave them waiting forever.
-        Consider using `with putting()` to make this easier.
-
-        Raises:
-            QueueClosed: If `done_putting()` has already been called.
-                Wanting to close the queue more than once can suggest a structural
-                problem,
-                prone to race conditions depending on what closes the queue first.
-                (This opinion is also held by Golang in its channel API.)
-        """
-        with self._condition:
-            if self._is_closed:
-                raise QueueClosed("Can't close when queue is already closed.")
-            else:
-                self._is_closed = True
-                self._condition.notify_all()
-
     def get(self) -> _T:
         """Remove and return the value at the front of the queue.
 
-        If the queue is empty, this blocks until a value is available.
-        If you're calling from an async task, use one of the async methods instead.
+        If the queue is empty, this blocks until a new value is available.
+        If you're calling from an async task, use one of the async methods instead
+        to avoid blocking the event loop.
 
         Raises:
             QueueClosed: If all values have been consumed
@@ -142,6 +124,26 @@ class ThreadAsyncQueue(Generic[_T]):
                 yield await self.get_async()
             except QueueClosed:
                 break
+
+    def done_putting(self) -> None:
+        """Close the queue, i.e. signal that no more values will be `put()`.
+
+        You normally *must* close the queue eventually
+        to inform consumers that they can stop waiting for new values.
+        Forgetting to do this can leave them waiting forever,
+        leaking tasks or threads or causing deadlocks.
+
+        Consider using a ``with`` block instead. See `__enter__()`.
+
+        Raises:
+            QueueClosed: If the queue is already closed.
+        """
+        with self._condition:
+            if self._is_closed:
+                raise QueueClosed("Can't close when queue is already closed.")
+            else:
+                self._is_closed = True
+                self._condition.notify_all()
 
     def __enter__(self) -> ThreadAsyncQueue[_T]:
         """Use the queue as a context manager, closing the queue upon exit.
