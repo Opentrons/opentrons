@@ -8,6 +8,10 @@ import {
   C_SELECTED_DARK,
   Icon,
   COLOR_SUCCESS,
+  DISPLAY_FLEX,
+  ALIGN_CENTER,
+  JUSTIFY_CENTER,
+  C_WHITE,
 } from '@opentrons/components'
 import {
   THERMOCYCLER_MODULE_V1,
@@ -28,6 +32,12 @@ const DECK_LAYER_BLOCKLIST = [
   'screwHoles',
 ]
 
+const flexProps = {
+  display: DISPLAY_FLEX,
+  alignItems: ALIGN_CENTER,
+  justifyContent: JUSTIFY_CENTER,
+  flex: '1 1 100%',
+}
 interface DeckMapProps {
   labwareIdsToHighlight?: string[]
   completedLabwareIdSections?: string[]
@@ -89,16 +99,47 @@ export const DeckMap = (props: DeckMapProps): JSX.Element | null => {
                         completedLabwareIdSections?.includes(
                           nestedLabwareId
                         ) === true && (
-                          <g>
-                            <circle
-                              data-testid={`DeckMap_module_${nestedLabwareId}_whiteBackground`}
-                            />
-                            <Icon
-                              name="check-circle"
-                              color={COLOR_SUCCESS}
-                              data-testid={`DeckMap_module_${nestedLabwareId}_checkmark`}
-                            />
-                          </g>
+                          <>
+                            <RobotCoordsForeignObject
+                              x={x}
+                              y={y}
+                              height="100%"
+                              width="100%"
+                              flexProps={flexProps}
+                              foreignObjectProps={{
+                                width: nestedLabwareDef.dimensions.xDimension,
+                                height: nestedLabwareDef.dimensions.yDimension,
+                              }}
+                            >
+                              <svg height="36" width="36">
+                                <circle
+                                  cx="50%"
+                                  cy="50%"
+                                  r={16}
+                                  fill={C_WHITE}
+                                  data-testid={`DeckMap_${nestedLabwareId}_whiteBackground`}
+                                />
+                              </svg>
+                            </RobotCoordsForeignObject>
+                            <RobotCoordsForeignObject
+                              x={x}
+                              y={y}
+                              height="100%"
+                              width="100%"
+                              flexProps={flexProps}
+                              foreignObjectProps={{
+                                width: nestedLabwareDef.dimensions.xDimension,
+                                height: nestedLabwareDef.dimensions.yDimension,
+                              }}
+                            >
+                              <Icon
+                                name="check-circle"
+                                color={COLOR_SUCCESS}
+                                data-testid={`DeckMap_${nestedLabwareId}_checkmark`}
+                                width="2rem"
+                              />
+                            </RobotCoordsForeignObject>
+                          </>
                         )}
                     </React.Fragment>
                   ) : null}
@@ -125,19 +166,47 @@ export const DeckMap = (props: DeckMapProps): JSX.Element | null => {
                     )}
                   </g>
                   {completedLabwareIdSections?.includes(labwareId) === true && (
-                    <RobotCoordsForeignObject
-                      x={0}
-                      y={0}
-                      height="100%"
-                      width="100%"
-                      // flexProps={{ padding: SPACING_3 }}
-                    >
-                      <Icon
-                        name="check-circle"
-                        color={COLOR_SUCCESS}
-                        data-testid={`DeckMap_${labwareId}_checkmark`}
-                      />
-                    </RobotCoordsForeignObject>
+                    <>
+                      <RobotCoordsForeignObject
+                        x={x}
+                        y={y}
+                        height="100%"
+                        width="100%"
+                        flexProps={flexProps}
+                        foreignObjectProps={{
+                          width: labwareDef.dimensions.xDimension,
+                          height: labwareDef.dimensions.yDimension,
+                        }}
+                      >
+                        <svg height="36" width="36">
+                          <circle
+                            cx="50%"
+                            cy="50%"
+                            r={16}
+                            fill={C_WHITE}
+                            data-testid={`DeckMap_${labwareId}_whiteBackground`}
+                          />
+                        </svg>
+                      </RobotCoordsForeignObject>
+                      <RobotCoordsForeignObject
+                        x={x}
+                        y={y}
+                        height="100%"
+                        width="100%"
+                        flexProps={flexProps}
+                        foreignObjectProps={{
+                          width: labwareDef.dimensions.xDimension,
+                          height: labwareDef.dimensions.yDimension,
+                        }}
+                      >
+                        <Icon
+                          name="check-circle"
+                          color={COLOR_SUCCESS}
+                          data-testid={`DeckMap_${labwareId}_checkmark`}
+                          width="2rem"
+                        />
+                      </RobotCoordsForeignObject>
+                    </>
                   )}
                 </React.Fragment>
               )
