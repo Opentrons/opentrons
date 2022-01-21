@@ -10,7 +10,6 @@ from .router import router
 from .errors import exception_handlers
 from .hardware import initialize_hardware, cleanup_hardware
 from .service import initialize_logging
-from .service.dependencies import get_protocol_manager
 
 log = logging.getLogger(__name__)
 
@@ -51,9 +50,6 @@ async def on_startup() -> None:
 @app.on_event("shutdown")
 async def on_shutdown() -> None:
     """Handle app shutdown."""
-    protocol_manager = await get_protocol_manager()
-    protocol_manager.remove_all()
-
     shutdown_results = await asyncio.gather(
         cleanup_hardware(app.state),
         return_exceptions=True,

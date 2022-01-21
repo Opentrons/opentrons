@@ -35,7 +35,6 @@ from opentrons.protocols.geometry.deck import Deck
 from robot_server import app
 from robot_server.hardware import get_hardware
 from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADER_VALUE
-from robot_server.service.protocol.manager import ProtocolManager
 from robot_server.service.session.manager import SessionManager
 
 test_router = routing.APIRouter()
@@ -240,7 +239,6 @@ def session_manager(hardware: ThreadManagedHardware) -> SessionManager:
     return SessionManager(
         hardware=hardware,
         motion_lock=ThreadedAsyncLock(),
-        protocol_manager=ProtocolManager(),
     )
 
 
