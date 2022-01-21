@@ -9,6 +9,7 @@ import type {
   ConfigV1,
   ConfigV2,
   ConfigV3,
+  ConfigV4,
 } from '@opentrons/app/src/redux/config/types'
 
 // base config v0 defaults
@@ -129,24 +130,38 @@ const toVersion3 = (prevConfig: ConfigV2): ConfigV3 => {
   return nextConfig
 }
 
+// config version 4 migration and defaults
+const toVersion4 = (prevConfig: ConfigV3): ConfigV4 => {
+  const nextConfig = {
+    ...prevConfig,
+    version: 4,
+    labware: {
+      //  @ts-expect-error(bc, 2022-01-21): will be fixed by config TS types from app?
+      ...prevConfig.labware,
+      showLabwareOffsetCodeSnippets: false,
+    },
+  }
+
+  return nextConfig
+}
+
 const MIGRATIONS: [
   (prefConfig: ConfigV0) => ConfigV1,
   (prefConfig: ConfigV1) => ConfigV2,
-  (prefConfig: ConfigV2) => ConfigV3
-] = [toVersion1, toVersion2, toVersion3]
+  (prefConfig: ConfigV2) => ConfigV3,
+  (prefConfig: ConfigV3) => ConfigV4
+] = [toVersion1, toVersion2, toVersion3, toVersion4]
 
 export const DEFAULTS: Config = migrate(DEFAULTS_V0)
 
 export function migrate(
-  prevConfig: ConfigV0 | ConfigV1 | ConfigV2 | ConfigV3
+  prevConfig: ConfigV0 | ConfigV1 | ConfigV2 | ConfigV3 | ConfigV4
 ): Config {
   const prevVersion = prevConfig.version
-  let result: ConfigV0 | ConfigV1 | ConfigV2 | ConfigV3 = prevConfig
+  let result: ConfigV0 | ConfigV1 | ConfigV2 | ConfigV3 | ConfigV4 = prevConfig
 
   // loop through the migrations, skipping any migrations that are unnecessary
   for (let i = prevVersion; i < MIGRATIONS.length; i++) {
-    // NOTE(mc, 2020-05-22): Flow will always be unable to resolve this type
-    // ensure good unit test coverage for this logic
     const migrateVersion = MIGRATIONS[i]
     result = migrateVersion(result)
   }
@@ -157,6 +172,5 @@ export function migrate(
     )
   }
 
-  //  @ts-expect-error(mc, 2021-02-16): will be fixed by config TS types from app
   return result
 }

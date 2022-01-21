@@ -110,4 +110,11 @@ export interface ConfigV3 extends Omit<ConfigV2, 'version' | 'support'> {
   }
 }
 
-export type Config = ConfigV3
+export interface ConfigV4 extends Omit<ConfigV3, 'version' | 'labware'> {
+  version: 4
+  labware: ConfigV3['labware'] & {
+    showLabwareOffsetCodeSnippets: boolean
+  }
+}
+
+export type Config = ConfigV4
