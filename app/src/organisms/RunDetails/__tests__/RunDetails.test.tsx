@@ -189,14 +189,14 @@ describe('RunDetails', () => {
     expect(button).not.toBeInTheDocument()
   })
 
-  it('redirects to /upload if protocol run is not loaded', () => {
+  it('renders null if protocol run is not loaded', () => {
     when(mockUseCloseCurrentRun)
       .calledWith()
       .mockReturnValue({
         isProtocolRunLoaded: false,
         closeCurrentRun: jest.fn(),
       } as any)
-    const { getByText } = render()
-    expect(getByText('Upload page')).toBeTruthy()
+    const { container } = render()
+    expect(container.firstChild).toBeNull()
   })
 })

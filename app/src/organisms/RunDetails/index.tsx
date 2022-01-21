@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Redirect } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import {
   RunStatus,
   RUN_STATUS_IDLE,
@@ -37,6 +37,7 @@ export function RunDetails(): JSX.Element | null {
   const runStatus = useRunStatus()
   const startTime = useRunStartTime()
   const { closeCurrentRun, isProtocolRunLoaded } = useCloseCurrentRun()
+  const history = useHistory()
 
   // display an idle status as 'running' in the UI after a run has started
   const adjustedRunStatus: RunStatus | null =
@@ -55,7 +56,7 @@ export function RunDetails(): JSX.Element | null {
     setShowConfirmCancelModal(true)
   }
   const handleCloseProtocol: React.MouseEventHandler = _event => {
-    closeCurrentRun()
+    closeCurrentRun({ onSuccess: () => history.push('/upload') })
   }
 
   const {
@@ -65,7 +66,7 @@ export function RunDetails(): JSX.Element | null {
   } = useConditionalConfirm(handleCloseProtocol, true)
 
   if (!isProtocolRunLoaded) {
-    return <Redirect to="/upload" />
+    return null
   }
 
   const cancelRunButton = (
@@ -113,8 +114,8 @@ export function RunDetails(): JSX.Element | null {
       {showCloseConfirmExit && (
         <Portal level="top">
           <ConfirmExitProtocolUploadModal
-            exit={confirmCloseExit}
             back={cancelCloseExit}
+            exit={confirmCloseExit}
           />
         </Portal>
       )}
