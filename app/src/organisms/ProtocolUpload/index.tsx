@@ -161,6 +161,8 @@ export function ProtocolUpload(): JSX.Element {
     runStatus === RUN_STATUS_PAUSE_REQUESTED ||
     runStatus === RUN_STATUS_FINISHING
 
+  const protocolName = protocolRecord?.data?.metadata?.protocolName ?? ''
+
   let titleBarProps
   if (
     isProtocolRunLoaded &&
@@ -169,7 +171,7 @@ export function ProtocolUpload(): JSX.Element {
   ) {
     titleBarProps = {
       title: t('protocol_title', {
-        protocol_name: protocolRecord?.data?.metadata?.protocolName ?? '',
+        protocol_name: protocolName,
       }),
       back: {
         onClick: confirmExit,
@@ -183,13 +185,13 @@ export function ProtocolUpload(): JSX.Element {
   } else if (runStatus === RUN_STATUS_STOP_REQUESTED) {
     titleBarProps = {
       title: t('protocol_title', {
-        protocol_name: protocolRecord?.data?.metadata?.protocolName ?? '',
+        protocol_name: protocolName,
       }),
     }
   } else if (isRunInMotion) {
     titleBarProps = {
       title: t('protocol_title', {
-        protocol_name: protocolRecord?.data?.metadata?.protocolName ?? '',
+        protocol_name: protocolName,
       }),
       rightNode: cancelRunButton,
     }
@@ -204,6 +206,24 @@ export function ProtocolUpload(): JSX.Element {
   ) : (
     <UploadInput onUpload={handleUpload} />
   )
+
+  const pageDisplay =
+    isCreatingProtocolRun || isStatusFinishing ? (
+      <ProtocolLoader
+        loadingText={
+          isCreatingProtocolRun
+            ? t('protocol_loading', {
+                robot_name: robotName,
+              })
+            : t('protocol_finishing', {
+                robot_name: robotName,
+              })
+        }
+      />
+    ) : (
+      pageContents
+    )
+
   return (
     <>
       {showConfirmExit && (
@@ -242,21 +262,7 @@ export function ProtocolUpload(): JSX.Element {
           width="100%"
           backgroundColor={C_NEAR_WHITE}
         >
-          {isCreatingProtocolRun || isStatusFinishing ? (
-            <ProtocolLoader
-              loadingText={
-                isCreatingProtocolRun
-                  ? t('protocol_loading', {
-                      robot_name: robotName,
-                    })
-                  : t('protocol_finishing', {
-                      robot_name: robotName,
-                    })
-              }
-            />
-          ) : (
-            pageContents
-          )}
+          {pageDisplay}
         </Box>
       </Page>
     </>

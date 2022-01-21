@@ -328,7 +328,7 @@ describe('ProtocolUpload', () => {
       <div>mock confirm cancel modal</div>
     )
     expect(screen.queryByText('mock confirm cancel modal')).toBeNull()
-    expect(screen.queryByText('Cnacel Run')).toBeNull()
+    expect(screen.queryByText('Cancel Run')).toBeNull()
   })
 
   it('renders an error if protocol has a not-ok result', () => {
