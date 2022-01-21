@@ -144,9 +144,25 @@ class ThreadAsyncQueue(Generic[_T]):
                 break
 
     def __enter__(self) -> ThreadAsyncQueue[_T]:
+        """Use the queue as a context manager, closing the queue upon exit.
+
+        Example:
+            This:
+
+                with queue:
+                    do_stuff()
+
+            Is equivalent to:
+
+                try:
+                    do_stuff()
+                finally:
+                    queue.done_putting()
+        """
         return self
 
     def __exit__(self, exc_type: object, exc_val: object, exc_tb: object) -> None:
+        """See `__enter__()`."""
         self.done_putting()
 
 
