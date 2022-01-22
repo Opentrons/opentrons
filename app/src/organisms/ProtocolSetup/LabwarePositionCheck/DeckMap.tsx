@@ -7,6 +7,7 @@ import {
   RobotCoordsForeignObject,
   C_SELECTED_DARK,
   Icon,
+  Flex,
   COLOR_SUCCESS,
   ALIGN_CENTER,
   JUSTIFY_CENTER,
@@ -91,7 +92,7 @@ export const DeckMap = (props: DeckMapProps): JSX.Element | null => {
                         boundingYDimension={
                           nestedLabwareDef.dimensions.yDimension
                         }
-                        data-testid={`DeckMap_${nestedLabwareId}_checkmark`}
+                        data-testid={`DeckMap_module_${nestedLabwareId}_checkmark`}
                       />
                     ) : null}
                   </>
@@ -100,7 +101,10 @@ export const DeckMap = (props: DeckMapProps): JSX.Element | null => {
             )
           )}
           {map(labwareRenderInfoById, ({ x, y, labwareDef }, labwareId) => (
-            <g transform={`translate(${x},${y})`}>
+            <g
+              key={`LabwarePositionCheck_Labware_${labwareId}_${x}${y}`}
+              transform={`translate(${x},${y})`}
+            >
               <LabwareRender definition={labwareDef} />
               {labwareIdsToHighlight?.includes(labwareId) === true && (
                 <rect
@@ -130,16 +134,15 @@ export const DeckMap = (props: DeckMapProps): JSX.Element | null => {
 }
 
 interface RobotCoordsCenteredCheckProps
-  extends Omit<
-    React.ComponentProps<typeof RobotCoordsForeignObject>,
-    'width' | 'height'
-  > {
+  extends React.ComponentProps<typeof Flex> {
   x: number
   y: number
   boundingXDimension: number
   boundingYDimension: number
 }
-function RobotCoordsCenteredCheck(props: RobotCoordsCenteredCheckProps): JSX.Element {
+function RobotCoordsCenteredCheck(
+  props: RobotCoordsCenteredCheckProps
+): JSX.Element {
   const {
     x,
     y,
@@ -149,7 +152,6 @@ function RobotCoordsCenteredCheck(props: RobotCoordsCenteredCheckProps): JSX.Ele
   } = props
   return (
     <RobotCoordsForeignObject
-      {...wrapperProps}
       x={x}
       y={y}
       width={boundingXDimension}
@@ -157,6 +159,7 @@ function RobotCoordsCenteredCheck(props: RobotCoordsCenteredCheckProps): JSX.Ele
       foreignObjectProps={{
         alignItems: ALIGN_CENTER,
         justifyContent: JUSTIFY_CENTER,
+        ...wrapperProps,
       }}
     >
       <Icon name="check-circle" color={COLOR_SUCCESS} width="2rem">
