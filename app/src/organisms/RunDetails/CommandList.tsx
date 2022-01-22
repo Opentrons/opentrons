@@ -45,6 +45,10 @@ import type {
 const WINDOW_SIZE = 100 // number of command items rendered at a time
 const WINDOW_OVERLAP = 50 // number of command items that fall within two adjacent windows
 const EAGER_BUFFER_COEFFICIENT = 0.5 // multiplied by clientHeight to determine number of pixels away from the next window required for it to load
+interface CommandRuntimeInfo {
+  analysisCommand: RunTimeCommand | null // analysisCommand will only be null if protocol is nondeterministic
+  runCommandSummary: RunCommandSummary | null
+}
 
 export function CommandList(): JSX.Element | null {
   const { t } = useTranslation('run_details')
@@ -87,11 +91,6 @@ export function CommandList(): JSX.Element | null {
   const postSetupAnticipatedCommands: RunTimeCommand[] = allProtocolCommands.slice(
     firstNonSetupIndex
   )
-
-  interface CommandRuntimeInfo {
-    analysisCommand: RunTimeCommand | null // analysisCommand will only be null if protocol is nondeterministic
-    runCommandSummary: RunCommandSummary | null
-  }
 
   let currentCommandList: CommandRuntimeInfo[] = postSetupAnticipatedCommands.map(
     postSetupAnticaptedCommand => ({
@@ -161,10 +160,12 @@ export function CommandList(): JSX.Element | null {
     command =>
       command.runCommandSummary == null ||
       command.runCommandSummary.status === 'running' ||
+      command.runCommandSummary.status === 'failed' ||
       command.runCommandSummary.status === 'queued'
   )
   const windowIndexWithCurrentItem = Math.floor(
-    (currentItemIndex - (WINDOW_SIZE - WINDOW_OVERLAP)) / WINDOW_OVERLAP
+    Math.max(currentItemIndex - (WINDOW_SIZE - WINDOW_OVERLAP), 0) /
+      WINDOW_OVERLAP
   )
 
   // when we initially mount, if the current item is not in view, jump to it
@@ -222,7 +223,6 @@ export function CommandList(): JSX.Element | null {
       }
     }
   }
-
 
   return (
     <Box
@@ -291,7 +291,8 @@ export function CommandList(): JSX.Element | null {
           {commandWindow?.map((command, index) => {
             const overallIndex = index + windowFirstIndex
             const isCurrentCommand =
-              command.runCommandSummary?.status === 'running'
+              command.runCommandSummary != null &&
+              ['running', 'failed'].includes(command.runCommandSummary.status)
             const showAnticipatedStepsTitle =
               overallIndex !== currentCommandList.length - 1 && isCurrentCommand
 
@@ -372,14 +373,12 @@ function ProtocolSetupItem(props: ProtocolSetupItemProps): JSX.Element {
             id={`RunDetails_ProtocolSetup_CommandList`}
             flexDirection={DIRECTION_COLUMN}
           >
-            {protocolSetupCommandList.map(command => {
-              return (
-                <ProtocolSetupInfo
-                  key={command.id}
-                  setupCommand={command as RunTimeCommand}
-                />
-              )
-            })}
+            {protocolSetupCommandList.map(command => (
+              <ProtocolSetupInfo
+                key={command.id}
+                setupCommand={command as RunTimeCommand}
+              />
+            ))}
           </Flex>
         </Flex>
       ) : (
