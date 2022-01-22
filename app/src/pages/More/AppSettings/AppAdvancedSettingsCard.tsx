@@ -60,7 +60,9 @@ export function AppAdvancedSettingsCard(): JSX.Element {
   const channelOptions: DropdownOption[] = useSelector(
     Config.getUpdateChannelOptions
   )
-  const islabwareOffsetDataOn = useSelector(Config.getIsLabwareOffsetDataOn)
+  const isLabwareOffsetCodeSnippetsOn = useSelector(
+    Config.getIsLabwareOffsetCodeSnippetsOn
+  )
   const dispatch = useDispatch<Dispatch>()
 
   const handleUseTrashSelection = (selection: BlockSelection): void => {
@@ -79,8 +81,8 @@ export function AppAdvancedSettingsCard(): JSX.Element {
   const toggleLabwareOffsetData = (): unknown =>
     dispatch(
       Config.updateConfigValue(
-        'robotSettings.labwareOffsetData',
-        Boolean(!islabwareOffsetDataOn)
+        'labware.showLabwareOffsetCodeSnippets',
+        Boolean(!isLabwareOffsetCodeSnippetsOn)
       )
     )
   const toggleDevtools = (): unknown => dispatch(Config.toggleDevtools())
@@ -119,7 +121,7 @@ export function AppAdvancedSettingsCard(): JSX.Element {
         <LabeledToggle
           data-test="labwareOffsetData"
           label={LABWARE_OFFSET_DATA_LABEL}
-          toggledOn={islabwareOffsetDataOn}
+          toggledOn={isLabwareOffsetCodeSnippetsOn}
           onClick={toggleLabwareOffsetData}
         >
           <p>{LABWARE_OFFSET_DATA_BODY}</p>

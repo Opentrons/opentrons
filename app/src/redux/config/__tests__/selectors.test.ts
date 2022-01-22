@@ -108,19 +108,19 @@ describe('shell selectors', () => {
     })
   })
 
-  describe('getIsLabwareOffsetDataOn', () => {
+  describe('getIsLabwareOffsetCodeSnippetsOn', () => {
     it('should return true is saved value in config is true', () => {
       const state: State = {
-        config: { robotSettings: { labwareOffsetData: true } },
+        config: { labware: { showLabwareOffsetCodeSnippets: true } },
       } as any
-      expect(Selectors.getIsLabwareOffsetDataOn(state)).toEqual(true)
+      expect(Selectors.getIsLabwareOffsetCodeSnippetsOn(state)).toEqual(true)
     })
 
     it('should return false is saved value in config is false', () => {
       const state: State = {
-        config: { robotSettings: { labwareOffsetData: false } },
+        config: { labware: { showLabwareOffsetCodeSnippets: false } },
       } as any
-      expect(Selectors.getIsLabwareOffsetDataOn(state)).toEqual(false)
+      expect(Selectors.getIsLabwareOffsetCodeSnippetsOn(state)).toEqual(false)
     })
   })
 })

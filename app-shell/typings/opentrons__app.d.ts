@@ -69,6 +69,8 @@ declare module '@opentrons/app/src/redux/config/types' {
 
   export type ConfigV3 = Record<string, unknown> & { version: number }
 
+  export type ConfigV4 = Record<string, unknown> & { version: number }
+
   export interface Config {
     version: number
     devtools: boolean

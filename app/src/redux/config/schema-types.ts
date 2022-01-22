@@ -105,9 +105,6 @@ export interface ConfigV3 extends Omit<ConfigV2, 'version' | 'support'> {
     name: string | null
     email: string | null
   }
-  robotSettings: {
-    labwareOffsetData: boolean
-  }
 }
 
 export interface ConfigV4 extends Omit<ConfigV3, 'version' | 'labware'> {

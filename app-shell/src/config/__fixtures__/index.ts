@@ -3,6 +3,7 @@ import type {
   ConfigV1,
   ConfigV2,
   ConfigV3,
+  ConfigV4,
 } from '@opentrons/app/src/redux/config/types'
 
 export const MOCK_CONFIG_V0: ConfigV0 = {
@@ -88,5 +89,15 @@ export const MOCK_CONFIG_V3: ConfigV3 = {
     ...MOCK_CONFIG_V2.support,
     name: null,
     email: null,
+  },
+}
+
+export const MOCK_CONFIG_V4: ConfigV4 = {
+  ...MOCK_CONFIG_V3,
+  version: 4,
+  labware: {
+    //  @ts-expect-error(bc, 2022-01-21): will be fixed by config TS types from app?
+    ...MOCK_CONFIG_V3.labware,
+    showLabwareOffsetCodeSnippets: false,
   },
 }
