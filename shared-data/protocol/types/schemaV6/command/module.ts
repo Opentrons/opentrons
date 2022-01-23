@@ -17,9 +17,13 @@ export type ModuleRunTimeCommand =
   | TCRunProfileRunTimeCommand
   | TCAwaitProfileCompleteRunTimeCommand
   | HeaterShakerSetTargetTemperatureRunTimeCommand
+  | HeaterShakerStartSetTargetTemperatureRunTimeCommand
   | HeaterShakerAwaitTemperatureRunTimeCommand
   | HeaterShakerSetTargetShakeSpeedRunTimeCommand
+  | HeaterShakerStartSetTargetShakeSpeedRunTimeCommand
   | HeaterShakerAwaitShakeSpeedRunTimeCommand
+  | HeaterShakerOpenLatchRunTimeCommand
+  | HeaterShakerCloseLatchRunTimeCommand
   | HeaterShakerDeactivateHeaterRunTimeCommand
 
 export type ModuleCreateCommand =
@@ -42,6 +46,8 @@ export type ModuleCreateCommand =
   | HeaterShakerAwaitTemperatureCreateCommand
   | HeaterShakerSetTargetShakeSpeedCreateCommand
   | HeaterShakerAwaitShakeSpeedCreateCommand
+  | HeaterShakerOpenLatchCreateCommand
+  | HeaterShakerCloseLatchCreateCommand
   | HeaterShakerDeactivateHeaterCreateCommand
 
 export interface MagneticModuleEngageMagnetCreateCommand {
@@ -188,6 +194,15 @@ export interface HeaterShakerSetTargetTemperatureRunTimeCommand
     HeaterShakerSetTargetTemperatureCreateCommand {
   result: any
 }
+export interface HeaterShakerStartSetTargetTemperatureCreateCommand {
+  commandType: 'heaterShaker/startSetTargetTemperature'
+  params: TemperatureParams
+}
+export interface HeaterShakerStartSetTargetTemperatureRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    HeaterShakerStartSetTargetTemperatureCreateCommand {
+  result: any
+}
 export interface HeaterShakerAwaitTemperatureCreateCommand {
   commandType: 'heaterShaker/awaitTemperature'
   params: TemperatureParams
@@ -206,6 +221,15 @@ export interface HeaterShakerSetTargetShakeSpeedRunTimeCommand
     HeaterShakerSetTargetShakeSpeedCreateCommand {
   result: any
 }
+export interface HeaterShakerStartSetTargetShakeSpeedCreateCommand {
+  commandType: 'heaterShaker/startSetTargetShakeSpeed'
+  params: ShakeSpeedParams
+}
+export interface HeaterShakerStartSetTargetShakeSpeedRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    HeaterShakerStartSetTargetShakeSpeedCreateCommand {
+  result: any
+}
 export interface HeaterShakerAwaitShakeSpeedCreateCommand {
   commandType: 'heaterShaker/awaitShakeSpeed'
   params: ShakeSpeedParams
@@ -222,6 +246,24 @@ export interface HeaterShakerDeactivateHeaterCreateCommand {
 export interface HeaterShakerDeactivateHeaterRunTimeCommand
   extends CommonCommandRunTimeInfo,
     HeaterShakerDeactivateHeaterCreateCommand {
+  result: any
+}
+export interface HeaterShakerOpenLatchCreateCommand {
+  commandType: 'heaterShaker/openLatch'
+  params: ModuleOnlyParams
+}
+export interface HeaterShakerOpenLatchRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    HeaterShakerOpenLatchCreateCommand {
+  result: any
+}
+export interface HeaterShakerCloseLatchCreateCommand {
+  commandType: 'heaterShaker/closeLatch'
+  params: ModuleOnlyParams
+}
+export interface HeaterShakerCloseLatchRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    HeaterShakerCloseLatchCreateCommand {
   result: any
 }
 
