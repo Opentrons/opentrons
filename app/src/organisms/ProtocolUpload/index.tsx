@@ -27,6 +27,8 @@ import {
   RUN_STATUS_RUNNING,
   RUN_STATUS_PAUSED,
   RUN_STATUS_PAUSE_REQUESTED,
+  RUN_STATUS_FINISHING,
+  RUN_STATUS_STOP_REQUESTED,
 } from '@opentrons/api-client'
 import { Page } from '../../atoms/Page'
 import { UploadInput } from './UploadInput'
@@ -139,6 +141,8 @@ export function ProtocolUpload(): JSX.Element {
     setShowConfirmCancelModal,
   ] = React.useState<boolean>(false)
 
+  const isStatusFinishing = runStatus === RUN_STATUS_FINISHING
+
   /** NOTE: the logic to determine the contents of this titlebar is
   very close to the logic present on the RunDetails organism */
   const cancelRunButton = (
@@ -153,13 +157,20 @@ export function ProtocolUpload(): JSX.Element {
   const isRunInMotion =
     runStatus === RUN_STATUS_RUNNING ||
     runStatus === RUN_STATUS_PAUSED ||
-    runStatus === RUN_STATUS_PAUSE_REQUESTED
+    runStatus === RUN_STATUS_PAUSE_REQUESTED ||
+    runStatus === RUN_STATUS_FINISHING
+
+  const protocolName = protocolRecord?.data?.metadata?.protocolName ?? ''
 
   let titleBarProps
-  if (isProtocolRunLoaded && !isRunInMotion) {
+  if (
+    isProtocolRunLoaded &&
+    !isRunInMotion &&
+    runStatus !== RUN_STATUS_STOP_REQUESTED
+  ) {
     titleBarProps = {
       title: t('protocol_title', {
-        protocol_name: protocolRecord?.data?.metadata?.protocolName ?? '',
+        protocol_name: protocolName,
       }),
       back: {
         onClick: confirmExit,
@@ -170,10 +181,16 @@ export function ProtocolUpload(): JSX.Element {
       },
       className: styles.reverse_titlebar_items,
     }
+  } else if (runStatus === RUN_STATUS_STOP_REQUESTED) {
+    titleBarProps = {
+      title: t('protocol_title', {
+        protocol_name: protocolName,
+      }),
+    }
   } else if (isRunInMotion) {
     titleBarProps = {
       title: t('protocol_title', {
-        protocol_name: protocolRecord?.data?.metadata?.protocolName ?? '',
+        protocol_name: protocolName,
       }),
       rightNode: cancelRunButton,
     }
@@ -188,6 +205,23 @@ export function ProtocolUpload(): JSX.Element {
   ) : (
     <UploadInput onUpload={handleUpload} />
   )
+
+  const pageDisplay =
+    isCreatingProtocolRun || isStatusFinishing ? (
+      <ProtocolLoader
+        loadingText={
+          isCreatingProtocolRun
+            ? t('protocol_loading', {
+                robot_name: robotName,
+              })
+            : t('protocol_finishing', {
+                robot_name: robotName,
+              })
+        }
+      />
+    ) : (
+      pageContents
+    )
 
   return (
     <>
@@ -227,16 +261,17 @@ export function ProtocolUpload(): JSX.Element {
           width="100%"
           backgroundColor={C_NEAR_WHITE}
         >
-          {isCreatingProtocolRun ? <ProtocolLoader /> : pageContents}
+          {pageDisplay}
         </Box>
       </Page>
     </>
   )
 }
+interface ProtocolLoaderProps {
+  loadingText: string
+}
 
-function ProtocolLoader(): JSX.Element | null {
-  const { t } = useTranslation('protocol_info')
-  const robotName = useSelector((state: State) => getConnectedRobotName(state))
+export function ProtocolLoader(props: ProtocolLoaderProps): JSX.Element | null {
   return (
     <Flex
       justifyContent={JUSTIFY_CENTER}
@@ -253,9 +288,7 @@ function ProtocolLoader(): JSX.Element | null {
         fontWeight={FONT_WEIGHT_REGULAR}
         fontSize={FONT_SIZE_BIG}
       >
-        {t('protocol_loading', {
-          robot_name: robotName,
-        })}
+        {props.loadingText}
       </Text>
       <Icon
         name="ot-spinner"

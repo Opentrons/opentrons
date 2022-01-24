@@ -90,7 +90,7 @@ $(sdist_file): setup.py $(py_sources)
 
 .PHONY: lint
 lint: $(py_sources)
-	$(python) -m mypy opentrons_shared_data
+	$(python) -m mypy opentrons_shared_data tests
 	$(python) -m flake8 opentrons_shared_data tests setup.py
 
 .PHONY: push-no-restart
