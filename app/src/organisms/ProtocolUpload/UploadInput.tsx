@@ -154,6 +154,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
   const labwareOffsetCount = getLatestLabwareOffsetCount(labwareOffsets ?? [])
 
   const handleCloneRun = (): void => {
+    trackEvent({ name: 'runAgain', properties: {} })
     cloneRun()
     history.push('/run')
   }
@@ -313,10 +314,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
             </Flex>
             <Flex>
               <NewSecondaryBtn
-                onClick={() => {
-                  trackEvent({ name: 'runAgain', properties: {} })
-                  cloneRun()
-                }}
+                onClick={handleCloneRun}
                 id={'UploadInput_runAgainButton'}
               >
                 {t('run_again')}
