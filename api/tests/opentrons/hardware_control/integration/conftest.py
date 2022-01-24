@@ -6,7 +6,7 @@ import asyncio
 
 from opentrons.hardware_control.emulation.module_server import ModuleStatusClient
 from opentrons.hardware_control.emulation.module_server.helpers import wait_emulators
-from opentrons.hardware_control.emulation.scripts import run_app
+from opentrons.hardware_control.emulation.scripts import run_app, run_smoothie
 from opentrons.hardware_control.emulation.types import ModuleType
 from opentrons.hardware_control.emulation.settings import (
     Settings,
@@ -32,7 +32,13 @@ def emulation_app(emulator_settings: Settings) -> Iterator[None]:
     modules = [ModuleType.Magnetic, ModuleType.Temperature, ModuleType.Thermocycler]
 
     def _run_app() -> None:
-        asyncio.run(run_app.run(emulator_settings, modules=[m.value for m in modules]))
+        async def _async_run() -> None:
+            await asyncio.gather(
+                run_smoothie.run(emulator_settings),
+                run_app.run(emulator_settings, modules=[m.value for m in modules]),
+            )
+
+        asyncio.run(_async_run())
 
     async def _wait_ready() -> None:
         c = await ModuleStatusClient.connect(

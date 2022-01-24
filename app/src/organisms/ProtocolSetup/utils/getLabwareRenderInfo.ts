@@ -4,7 +4,7 @@ import {
   LabwareDefinition2,
   ProtocolFile,
 } from '@opentrons/shared-data'
-import type { LoadLabwareCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
 const getSlotPosition = (
   deckDef: DeckDefinition,
@@ -45,7 +45,7 @@ export const getLabwareRenderInfo = (
 ): LabwareRenderInfoById =>
   protocolData.commands
     .filter(
-      (command): command is LoadLabwareCommand =>
+      (command): command is LoadLabwareRunTimeCommand =>
         command.commandType === 'loadLabware'
     )
     .reduce((acc, command) => {

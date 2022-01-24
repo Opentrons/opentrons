@@ -6,10 +6,10 @@ import { getLabwareLocation } from '../../../utils/getLabwareLocation'
 import { useProtocolDetails } from '../../../../RunDetails/hooks'
 import { i18n } from '../../../../../i18n'
 import { useTitleText } from '../useLabwarePositionCheck'
-import type { MoveToWellCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
+import type { MoveToWellCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
 import type {
-  DropTipCommand,
-  PickUpTipCommand,
+  DropTipCreateCommand,
+  PickUpTipCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 
 jest.mock('../../../../RunDetails/hooks')
@@ -40,8 +40,7 @@ describe('useTitleText', () => {
       .mockReturnValue({ slotName: mockSlotNumber })
   })
   it('should return the loading text for a move to well command', () => {
-    const command: MoveToWellCommand = {
-      id: '1',
+    const command: MoveToWellCreateCommand = {
       commandType: 'moveToWell',
       params: {
         labwareId: mockLabwareId,
@@ -59,8 +58,7 @@ describe('useTitleText', () => {
     expect(result.current).toBe(`Moving to slot ${mockSlotNumber}`)
   })
   it('should return the loading text for a pick up tip command', () => {
-    const command: PickUpTipCommand = {
-      id: '1',
+    const command: PickUpTipCreateCommand = {
       commandType: 'pickUpTip',
       params: {
         labwareId: mockLabwareId,
@@ -75,8 +73,7 @@ describe('useTitleText', () => {
     expect(result.current).toBe(`Picking up tip in slot ${mockSlotNumber}`)
   })
   it('should return the loading text for a drop tip command', () => {
-    const command: DropTipCommand = {
-      id: '1',
+    const command: DropTipCreateCommand = {
       commandType: 'dropTip',
       params: {
         labwareId: mockLabwareId,

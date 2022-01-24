@@ -7,6 +7,10 @@ import {
   RUN_STATUS_SUCCEEDED,
   RUN_STATUS_FAILED,
   RUN_STATUS_STOPPED,
+  RUN_STATUS_FINISHING,
+  RUN_STATUS_PAUSED,
+  RUN_STATUS_PAUSE_REQUESTED,
+  RUN_STATUS_STOP_REQUESTED,
 } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
 import { resetAllWhenMocks, when } from 'jest-when'
@@ -14,7 +18,7 @@ import { RunDetails } from '..'
 import { i18n } from '../../../i18n'
 import { CommandList } from '../CommandList'
 import { useProtocolDetails } from '../hooks'
-import { useRunStatus } from '../../RunTimeControl/hooks'
+import { useRunStatus, useRunControls } from '../../RunTimeControl/hooks'
 import { useCloseCurrentRun } from '../../ProtocolUpload/hooks/useCloseCurrentRun'
 import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
 import type { ProtocolFile } from '@opentrons/shared-data'
@@ -32,7 +36,9 @@ const mockCommandList = CommandList as jest.MockedFunction<typeof CommandList>
 const mockUseRunStatus = useRunStatus as jest.MockedFunction<
   typeof useRunStatus
 >
-
+const mockUseRunControls = useRunControls as jest.MockedFunction<
+  typeof useRunControls
+>
 const mockUseCloseCurrentRun = useCloseCurrentRun as jest.MockedFunction<
   typeof useCloseCurrentRun
 >
@@ -64,6 +70,17 @@ describe('RunDetails', () => {
         isProtocolRunLoaded: true,
         closeCurrentRun: jest.fn(),
       } as any)
+
+    when(mockUseRunControls).calledWith().mockReturnValue({
+      play: jest.fn(),
+      pause: jest.fn(),
+      stop: jest.fn(),
+      reset: jest.fn(),
+      isPlayRunActionLoading: false,
+      isPauseRunActionLoading: false,
+      isStopRunActionLoading: false,
+      isResetRunLoading: false,
+    })
   })
 
   afterEach(() => {
@@ -99,6 +116,29 @@ describe('RunDetails', () => {
     ).toBeTruthy()
     expect(getByText('no, go back')).toBeTruthy()
     expect(getByText('yes, cancel run')).toBeTruthy()
+  })
+
+  it('renders a cancel run button when the status is finishing', () => {
+    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_FINISHING)
+    const { getByRole } = render()
+    const button = getByRole('button', { name: 'Cancel Run' })
+    expect(button).toBeEnabled()
+  })
+
+  it('renders a cancel run button when the status is paused', () => {
+    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_PAUSED)
+    const { getByRole } = render()
+    const button = getByRole('button', { name: 'Cancel Run' })
+    expect(button).toBeEnabled()
+  })
+
+  it('renders a cancel run button when the status is pause requested', () => {
+    when(mockUseRunStatus)
+      .calledWith()
+      .mockReturnValue(RUN_STATUS_PAUSE_REQUESTED)
+    const { getByRole } = render()
+    const button = getByRole('button', { name: 'Cancel Run' })
+    expect(button).toBeEnabled()
   })
 
   it('renders the protocol close button, button is clickable, and confirm close protocol modal is rendered when status is succeeded', () => {
@@ -140,14 +180,23 @@ describe('RunDetails', () => {
     expect(getByText('Yes, close now')).toBeTruthy()
   })
 
-  it('redirects to /upload if protocol run is not loaded', () => {
+  it('renders no button in the titlebar when the run status is stop requested', () => {
+    when(mockUseRunStatus)
+      .calledWith()
+      .mockReturnValue(RUN_STATUS_STOP_REQUESTED)
+    const { queryByRole } = render()
+    const button = queryByRole('button', { name: 'close' })
+    expect(button).not.toBeInTheDocument()
+  })
+
+  it('renders null if protocol run is not loaded', () => {
     when(mockUseCloseCurrentRun)
       .calledWith()
       .mockReturnValue({
         isProtocolRunLoaded: false,
         closeCurrentRun: jest.fn(),
       } as any)
-    const { getByText } = render()
-    expect(getByText('Upload page')).toBeTruthy()
+    const { container } = render()
+    expect(container.firstChild).toBeNull()
   })
 })

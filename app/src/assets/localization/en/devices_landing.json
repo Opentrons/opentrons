@@ -1,8 +1,16 @@
 {
+  "active": "Active",
   "devices": "Devices",
+  "empty": "Empty",
+  "go_to_run": "Go to Run",
+  "idle": "Idle",
+  "left_mount": "Left Mount",
   "looking_for_robots": "Looking for robots...",
+  "modules": "Modules",
   "no_robots_found": "No robots found",
   "refresh": "Refresh",
+  "running": "Running",
+  "right_mount": "Right Mount",
   "setting_up_new_robot": "Learn about setting up a new robot",
   "troubleshooting_connection_problems": "Learn more about troubleshooting connection problems"
 }

@@ -3,20 +3,43 @@ import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
 import { DevicesEmptyState } from '../../../../organisms/Devices/DevicesEmptyState'
+import { RobotSection } from '../../../../organisms/Devices/RobotSection'
 import { Scanning } from '../../../../organisms/Devices/Scanning'
-import { getScanning } from '../../../../redux/discovery'
+import {
+  mockConnectableRobot,
+  mockReachableRobot,
+  mockUnreachableRobot,
+} from '../../../../redux/discovery/__fixtures__'
+import {
+  getConnectableRobots,
+  getReachableRobots,
+  getUnreachableRobots,
+  getScanning,
+} from '../../../../redux/discovery'
 import { DevicesLanding } from '..'
 
 jest.mock('../../../../organisms/Devices/DevicesEmptyState')
+jest.mock('../../../../organisms/Devices/RobotSection')
 jest.mock('../../../../organisms/Devices/Scanning')
 jest.mock('../../../../redux/discovery')
 
 const mockGetScanning = getScanning as jest.MockedFunction<typeof getScanning>
+const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
+  typeof getConnectableRobots
+>
+const mockGetReachableRobots = getReachableRobots as jest.MockedFunction<
+  typeof getReachableRobots
+>
+const mockGetUnreachableRobots = getUnreachableRobots as jest.MockedFunction<
+  typeof getUnreachableRobots
+>
 
 const mockScanning = Scanning as jest.MockedFunction<typeof Scanning>
-
 const mockDevicesEmptyState = DevicesEmptyState as jest.MockedFunction<
   typeof DevicesEmptyState
+>
+const mockRobotSection = RobotSection as jest.MockedFunction<
+  typeof RobotSection
 >
 
 const render = () => {
@@ -30,6 +53,10 @@ describe('DevicesLanding', () => {
     mockGetScanning.mockReturnValue(false)
     mockScanning.mockReturnValue(<div>Mock Scanning</div>)
     mockDevicesEmptyState.mockReturnValue(<div>Mock DevicesEmptyState</div>)
+    mockRobotSection.mockReturnValue(<div>Mock RobotSection</div>)
+    mockGetConnectableRobots.mockReturnValue([])
+    mockGetReachableRobots.mockReturnValue([])
+    mockGetUnreachableRobots.mockReturnValue([])
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -52,5 +79,26 @@ describe('DevicesLanding', () => {
     const [{ getByText }] = render()
 
     expect(getByText('Mock DevicesEmptyState')).toBeTruthy()
+  })
+
+  it('renders a RobotSection when connectable robots are found', () => {
+    mockGetConnectableRobots.mockReturnValue([mockConnectableRobot])
+    const [{ getByText }] = render()
+
+    expect(getByText('Mock RobotSection')).toBeTruthy()
+  })
+
+  it('renders a RobotSection when reachable robots are found', () => {
+    mockGetReachableRobots.mockReturnValue([mockReachableRobot])
+    const [{ getByText }] = render()
+
+    expect(getByText('Mock RobotSection')).toBeTruthy()
+  })
+
+  it('renders a RobotSection when unreachable robots are found', () => {
+    mockGetUnreachableRobots.mockReturnValue([mockUnreachableRobot])
+    const [{ getByText }] = render()
+
+    expect(getByText('Mock RobotSection')).toBeTruthy()
   })
 })

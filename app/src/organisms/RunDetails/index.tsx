@@ -1,12 +1,14 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Redirect } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import {
   RunStatus,
   RUN_STATUS_IDLE,
   RUN_STATUS_RUNNING,
   RUN_STATUS_PAUSED,
   RUN_STATUS_PAUSE_REQUESTED,
+  RUN_STATUS_FINISHING,
+  RUN_STATUS_STOP_REQUESTED,
 } from '@opentrons/api-client'
 import {
   SPACING_2,
@@ -17,12 +19,15 @@ import {
 import { Page } from '../../atoms/Page'
 import { Portal } from '../../App/portal'
 import { useProtocolDetails } from './hooks'
-import { useRunStatus, useRunStartTime } from '../RunTimeControl/hooks'
-import { ConfirmCancelModal } from '../../pages/Run/RunLog'
+import {
+  useRunStatus,
+  useRunStartTime,
+  useRunControls,
+} from '../RunTimeControl/hooks'
 import { ConfirmExitProtocolUploadModal } from '../ProtocolUpload/ConfirmExitProtocolUploadModal'
 import { useCloseCurrentRun } from '../ProtocolUpload/hooks/useCloseCurrentRun'
-import { useCurrentRunControls } from '../../pages/Run/RunLog/hooks'
 import { CommandList } from './CommandList'
+import { ConfirmCancelModal } from './ConfirmCancelModal'
 
 import styles from '../ProtocolUpload/styles.css'
 
@@ -32,6 +37,7 @@ export function RunDetails(): JSX.Element | null {
   const runStatus = useRunStatus()
   const startTime = useRunStartTime()
   const { closeCurrentRun, isProtocolRunLoaded } = useCloseCurrentRun()
+  const history = useHistory()
 
   // display an idle status as 'running' in the UI after a run has started
   const adjustedRunStatus: RunStatus | null =
@@ -39,21 +45,18 @@ export function RunDetails(): JSX.Element | null {
       ? RUN_STATUS_RUNNING
       : runStatus
 
-  const { pauseRun } = useCurrentRunControls()
+  const { pause } = useRunControls()
+  const [
+    showConfirmCancelModal,
+    setShowConfirmCancelModal,
+  ] = React.useState<boolean>(false)
 
-  const cancelRunAndExit = (): void => {
-    pauseRun()
-    confirmExit()
+  const handleCancelClick = (): void => {
+    pause()
+    setShowConfirmCancelModal(true)
   }
-
-  const {
-    showConfirmation: showConfirmExit,
-    confirm: confirmExit,
-    cancel: cancelExit,
-  } = useConditionalConfirm(cancelRunAndExit, true)
-
   const handleCloseProtocol: React.MouseEventHandler = _event => {
-    closeCurrentRun()
+    closeCurrentRun({ onSuccess: () => history.push('/upload') })
   }
 
   const {
@@ -63,12 +66,12 @@ export function RunDetails(): JSX.Element | null {
   } = useConditionalConfirm(handleCloseProtocol, true)
 
   if (!isProtocolRunLoaded) {
-    return <Redirect to="/upload" />
+    return null
   }
 
   const cancelRunButton = (
     <NewAlertSecondaryBtn
-      onClick={cancelRunAndExit}
+      onClick={handleCancelClick}
       marginX={SPACING_3}
       paddingX={SPACING_2}
     >
@@ -81,11 +84,16 @@ export function RunDetails(): JSX.Element | null {
   if (
     adjustedRunStatus === RUN_STATUS_RUNNING ||
     adjustedRunStatus === RUN_STATUS_PAUSED ||
-    adjustedRunStatus === RUN_STATUS_PAUSE_REQUESTED
+    adjustedRunStatus === RUN_STATUS_PAUSE_REQUESTED ||
+    adjustedRunStatus === RUN_STATUS_FINISHING
   ) {
     titleBarProps = {
       title: t('protocol_title', { protocol_name: displayName }),
       rightNode: cancelRunButton,
+    }
+  } else if (adjustedRunStatus === RUN_STATUS_STOP_REQUESTED) {
+    titleBarProps = {
+      title: t('protocol_title', { protocol_name: displayName }),
     }
   } else {
     titleBarProps = {
@@ -106,13 +114,17 @@ export function RunDetails(): JSX.Element | null {
       {showCloseConfirmExit && (
         <Portal level="top">
           <ConfirmExitProtocolUploadModal
-            exit={confirmCloseExit}
             back={cancelCloseExit}
+            exit={confirmCloseExit}
           />
         </Portal>
       )}
       <Page titleBarProps={titleBarProps}>
-        {showConfirmExit ? <ConfirmCancelModal onClose={cancelExit} /> : null}
+        {showConfirmCancelModal ? (
+          <ConfirmCancelModal
+            onClose={() => setShowConfirmCancelModal(false)}
+          />
+        ) : null}
         <CommandList />
       </Page>
     </>

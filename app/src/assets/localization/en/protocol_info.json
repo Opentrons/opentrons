@@ -12,7 +12,7 @@
   "instrument_not_attached": "Not attached",
   "instrument_cal_data_title": "Calibration data",
   "instruments_title": "Required Pipettes",
-  "invalid_file_type": "Invalid file type. Protocols must be '.py', '.json', or '.zip'.",
+  "invalid_file_type": "Invalid file type. Protocols must be '.py' or '.json'.",
   "invalid_json_file": "Invalid JSON file.",
   "labware_title": "Required Labware",
   "labware_legacy_definition": "N/A",
@@ -51,5 +51,6 @@
   "labware_positon_check_complete_toast_with_offsets": "Labware Position Check complete. {{count}} Labware Offset created.",
   "labware_positon_check_complete_toast_with_offsets_plural": "Labware Position Check complete. {{count}} Labware Offsets created.",
   "protocol_loading": "Opening Protocol On {{robot_name}}",
+  "protocol_finishing": "Closing Protocol On {{robot_name}}",
   "cancel_run": "Cancel Run"
 }

@@ -1,9 +1,9 @@
 import { getLabwareDisplayName } from '.'
 import type {
-  LoadLabwareCommand,
-  LoadModuleCommand,
+  LoadLabwareRunTimeCommand,
+  LoadModuleRunTimeCommand,
 } from '../../protocol/types/schemaV6/command/setup'
-import type { Command, ProtocolFile } from '../../protocol'
+import type { RunTimeCommand, ProtocolFile } from '../../protocol'
 import type { PipetteName } from '../pipettes'
 import type {
   ProtocolResource,
@@ -40,7 +40,7 @@ export const schemaV6Adapter = (
         return { ...acc }
       }
       const labwareDef: LabwareDefinition2 = protocolAnalyses.commands.find(
-        (command: Command) =>
+        (command: RunTimeCommand) =>
           command.commandType === 'loadLabware' &&
           command.result?.labwareId === labwareId
       )?.result.definition
@@ -58,11 +58,10 @@ export const schemaV6Adapter = (
       [definitionId: string]: LabwareDefinition2
     } = protocolAnalyses.commands
       .filter(
-        (command: Command): command is LoadLabwareCommand =>
+        (command: RunTimeCommand): command is LoadLabwareRunTimeCommand =>
           command.commandType === 'loadLabware'
       )
-      .reduce((acc, command: LoadLabwareCommand) => {
-        // @ts-expect-error at the time this adapter is being used the commands should all be resolved
+      .reduce((acc, command: LoadLabwareRunTimeCommand) => {
         const labwareDef: LabwareDefinition2 = command.result?.definition
         const labwareId = command.result?.labwareId ?? ''
         const definitionUri = protocolAnalyses.labware.find(
@@ -80,10 +79,10 @@ export const schemaV6Adapter = (
       [moduleId: string]: { model: ModuleModel }
     } = protocolAnalyses.commands
       .filter(
-        (command: Command): command is LoadModuleCommand =>
+        (command: RunTimeCommand): command is LoadModuleRunTimeCommand =>
           command.commandType === 'loadModule'
       )
-      .reduce((acc, command: LoadModuleCommand) => {
+      .reduce((acc, command: LoadModuleRunTimeCommand) => {
         const moduleId = command.result?.moduleId ?? ''
         // @ts-expect-error at the time this adapter is being used model is not a part of params yet, only moduleId
         const moduleModel = command.params?.model

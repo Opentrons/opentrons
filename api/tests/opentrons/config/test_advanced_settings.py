@@ -114,7 +114,7 @@ async def test_get_all_adv_settings_lru_cache(
     mock_read_settings_file.assert_not_called()
     mock_read_settings_file.reset_mock()
     # Updating will invalidate cache
-    await advanced_settings.set_adv_setting("calibrateToBottom", True)
+    await advanced_settings.set_adv_setting("enableDoorSafetySwitch", True)
     mock_read_settings_file.reset_mock()
     # Cache should not be used
     advanced_settings.get_all_adv_settings()
@@ -123,24 +123,6 @@ async def test_get_all_adv_settings_lru_cache(
     # Should use cache
     advanced_settings.get_all_adv_settings()
     mock_read_settings_file.assert_not_called()
-
-
-async def test_on_change_called(
-    loop,
-    mock_read_settings_file,
-    mock_settings_values,
-    mock_write_settings_file,
-    restore_restart_required,
-):
-    _id = "calibrateToBottom"
-    with patch("opentrons.config.advanced_settings.SettingDefinition.on_change") as m:
-
-        async def on_change(v):
-            pass
-
-        m.side_effect = on_change
-        await advanced_settings.set_adv_setting(_id, True)
-        m.assert_called_once_with(True)
 
 
 async def test_restart_required(
@@ -170,18 +152,6 @@ async def test_restart_required(
             assert advanced_settings.is_restart_required() is False
             await advanced_settings.set_adv_setting(_id, True)
             assert advanced_settings.is_restart_required() is True
-
-
-def test_get_setting_use_env_overload(mock_read_settings_file, mock_settings_values):
-    with patch("os.environ", new={"OT_API_FF_calibrateToBottom": "TRUE"}):
-        v = advanced_settings.get_setting_with_env_overload("calibrateToBottom")
-        assert v is not mock_settings_values["calibrateToBottom"]
-
-
-def test_get_setting_with_env_overload(mock_read_settings_file, mock_settings_values):
-    with patch("os.environ", new={}):
-        v = advanced_settings.get_setting_with_env_overload("calibrateToBottom")
-        assert v is mock_settings_values["calibrateToBottom"]
 
 
 @pytest.mark.parametrize(
