@@ -128,6 +128,39 @@ describe('useModuleMatchResults', () => {
     const { missingModuleIds } = result.current
     expect(missingModuleIds).toStrictEqual([])
   })
+  it('should return one missing moduleId if nocompatible model is attached', () => {
+    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+      <Provider store={store}>{children}</Provider>
+    )
+    const moduleId = 'someTempModule'
+    when(mockUseModuleRenderInfoById)
+      .calledWith()
+      .mockReturnValue({
+        [moduleId]: {
+          moduleId: moduleId,
+          x: 0,
+          y: 0,
+          z: 0,
+          moduleDef: {
+            ...mockTemperatureModuleDef,
+            compatibleWith: ['fakeModuleModel'],
+          } as any,
+          nestedLabwareDef: null,
+          nestedLabwareId: null,
+          protocolLoadOrder: 0,
+          attachedModuleMatch: null,
+          slotName: '1',
+        },
+      })
+
+    when(mockGetAttachedModules)
+      .calledWith(undefined as any, mockConnectedRobot.name)
+      .mockReturnValue([mockTemperatureModule])
+
+    const { result } = renderHook(useModuleMatchResults, { wrapper })
+    const { missingModuleIds } = result.current
+    expect(missingModuleIds).toStrictEqual([moduleId])
+  })
   it('should return 1 remaining attached module if not required for protocols', () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
       <Provider store={store}>{children}</Provider>

@@ -29,11 +29,14 @@ export function useModuleMatchResults(): ModuleMatchResults {
     moduleRenderInfoById,
     (acc, { moduleDef }, id) => {
       const { model, compatibleWith } = moduleDef
-      const isCompatibleModel = model in compatibleWith
-      const compatible = isCompatibleModel ? model : null
       // for this required module, find a remaining (unmatched) attached module of the requested model
       const moduleTypeMatchIndex = acc.remainingAttachedModules.findIndex(
-        attachedModule => model || compatible === attachedModule.model
+        attachedModule => {
+          return (
+            model === attachedModule.model ||
+            compatibleWith.includes(attachedModule.model)
+          )
+        }
       )
       return moduleTypeMatchIndex !== -1
         ? {
