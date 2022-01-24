@@ -1,7 +1,7 @@
 """Utils for motion planning."""
 import numpy as np  # type: ignore[import]
 import logging
-from typing import Iterator, List, Tuple, cast, Optional
+from typing import Iterator, List, Tuple
 
 from opentrons_hardware.hardware_control.motion_planning.types import (
     Block,
@@ -137,7 +137,8 @@ def find_initial_speed(
             )
 
         log.debug(
-            f"Axis_constrained_speed for {axis} is {axis_constrained_speed} compared to initial speed: {initial_speed}"
+            f"Axis_constrained_speed for {axis} is {axis_constrained_speed} compared "
+            f"to initial speed: {initial_speed}"
         )
         initial_speed = np.minimum(axis_constrained_speed, initial_speed)
 
@@ -210,7 +211,8 @@ def find_final_speed(
                 axis_constraints, axis_component, next_component, next_initial_speed
             )
         log.debug(
-            f"Axis constrained speed for {axis} is {axis_speed_limit} compared to final speed: {final_speed}"
+            f"Axis constrained speed for {axis} is {axis_speed_limit} compared "
+            f"to final speed: {final_speed}"
         )
         final_speed = np.minimum(axis_speed_limit, final_speed)
 
@@ -245,7 +247,8 @@ def achievable_final(
                 + initial_speed
             )
             log.debug(
-                f"Max axis final velocity for {axis} is {max_axis_final_velocity}, compared to final speed: {final_speed}"
+                f"Max axis final velocity for {axis} is {max_axis_final_velocity}, "
+                f"compared to final speed: {final_speed}"
             )
             # take the smaller of the aboslute value
             final_speed = apply_constraint(max_axis_final_velocity, final_speed)
@@ -372,14 +375,18 @@ def blended(constraints: SystemConstraints, first: Move, second: Move) -> bool:
     """Check if the moves are blended."""
     log = logging.getLogger("blended")
     # have these actually had their blocks built?
-    if abs(sum(b.distance for b in first.blocks) - first.distance) > FLOAT_THRESHOLD:
+    fist_dist_sum = sum(b.distance for b in first.blocks)
+    if abs(fist_dist_sum - first.distance) > FLOAT_THRESHOLD:
         log.debug(
-            f"Sum of distance for first move blocks {sum(b.distance for b in first.blocks)} does not match {first.distance}"
+            f"Sum of distance for first move blocks {fist_dist_sum} does not match "
+            f"{first.distance}"
         )
         return False
-    if abs(sum(b.distance for b in second.blocks) - second.distance) > FLOAT_THRESHOLD:
+    second_dist_sum = sum(b.distance for b in second.blocks)
+    if abs(second_dist_sum - second.distance) > FLOAT_THRESHOLD:
         log.debug(
-            f"Sum of distance for second move blocks {sum(b.distance for b in second.blocks)} does not match {second.distance}"
+            f"Sum of distance for second move blocks {second_dist_sum} does not match "
+            f"{second.distance}"
         )
         return False
 
