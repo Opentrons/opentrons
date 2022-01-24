@@ -100,15 +100,11 @@ def main() -> None:
         target_list=target_list,
         iteration_limit=params["iteration_limit"],
     )
-    if args.blend_log == 'all':
-        output = {
-            index: [v.to_dict() for v in value] for index, value in enumerate(blend_log)
-        }
-    else:
-        output = {
-            'moves': [v.to_dict() for v in blend_log[-1]],
-            'origin': list(origin.vectorize()),
-        }
+
+    output = {
+        'moves': [v.to_dict() for v in blend_log[-1]],
+        'origin': list(origin.vectorize()),
+    }
 
     with open(args.output, "w") as f:
         json.dump(output, f, indent=2)

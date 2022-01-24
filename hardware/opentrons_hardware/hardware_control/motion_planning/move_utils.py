@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 FLOAT_THRESHOLD = 0.001  # TODO: re-evaluate this value based on system limitations
 
 
-def apply_constraint(constraint: np.float64, input: np.float64):
+def apply_constraint(constraint: np.float64, input: np.float64) -> np.float64:
     """Keep the sign of the input but cap the numeric value at the constraint value."""
     return np.copysign(np.minimum(abs(constraint), abs(input)), input)
 
