@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { format, parseISO } from 'date-fns'
 import { useSelector } from 'react-redux'
+import { useHistory } from 'react-router-dom'
 import { css } from 'styled-components'
 import { Trans, useTranslation } from 'react-i18next'
 import {
@@ -79,6 +80,7 @@ export interface UploadInputProps {
 
 export function UploadInput(props: UploadInputProps): JSX.Element | null {
   const { t } = useTranslation('protocol_info')
+  const history = useHistory()
   const mostRecentRunId = useMostRecentRunId()
   const runQuery = useRunQuery(mostRecentRunId)
   const mostRecentRun = runQuery.data?.data
@@ -150,6 +152,11 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
     : DROP_ZONE_STYLES
 
   const labwareOffsetCount = getLatestLabwareOffsetCount(labwareOffsets ?? [])
+
+  const handleCloneRun = (): void => {
+    cloneRun()
+    history.push('/run')
+  }
 
   return (
     <Flex

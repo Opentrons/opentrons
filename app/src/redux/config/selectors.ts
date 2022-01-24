@@ -25,6 +25,10 @@ export const getHasCalibrationBlock = (state: State): boolean | null => {
   return useTrashSurface === null ? null : !useTrashSurface
 }
 
+export const getIsLabwareOffsetCodeSnippetsOn = (state: State): boolean => {
+  return state.config?.labware.showLabwareOffsetCodeSnippets ?? false
+}
+
 const UPDATE_CHANNEL_OPTS = [
   { name: 'Stable', value: 'latest' as UpdateChannel },
   { name: 'Beta', value: 'beta' as UpdateChannel },

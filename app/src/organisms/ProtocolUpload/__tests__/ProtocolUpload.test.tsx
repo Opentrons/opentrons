@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { resetAllWhenMocks, when } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { BrowserRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import {
   RUN_STATUS_FINISHING,
@@ -95,7 +96,9 @@ const queryClient = new QueryClient()
 const render = () => {
   return renderWithProviders(
     <QueryClientProvider client={queryClient}>
-      <ProtocolUpload />
+      <BrowserRouter>
+        <ProtocolUpload />
+      </BrowserRouter>
     </QueryClientProvider>,
     { i18nInstance: i18n }
   )
