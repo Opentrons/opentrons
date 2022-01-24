@@ -114,7 +114,6 @@ class LegacyContextPlugin(AbstractPlugin):
         Called by Protocol Engine.
         At this point, the APIv2 protocol script must have exited.
         """
-        # todo:
         self._actions_to_dispatch.done_putting()
         try:
             if self._action_dispatching_task is not None:
