@@ -1,6 +1,8 @@
 """ProtocolEngine class definition."""
 from typing import Optional
 
+from opentrons.hardware_control.types import HardwareEvent, DoorStateNotification, \
+    DoorState
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control import HardwareControlAPI
 
@@ -9,6 +11,7 @@ from .commands import (
     Command,
     CommandCreate,
 )
+from .errors import RobotDoorOpenError
 from .types import LabwareOffset, LabwareOffsetCreate
 from .execution import QueueWorker, create_queue_worker, HardwareStopper
 from .state import StateStore, StateView
@@ -69,6 +72,9 @@ class ProtocolEngine:
         self._hardware_stopper = hardware_stopper or HardwareStopper(
             hardware_api=hardware_api, state_store=state_store
         )
+        hardware_api.register_callback(self.hardware_event_handler)
+        self._door_state: DoorState = hardware_api.door_state
+        self._blocked = hardware_api._pause_manager.blocked_by_door
         self._queue_worker.start()
 
     @property
@@ -80,18 +86,39 @@ class ProtocolEngine:
         """Add a plugin to the engine to customize behavior."""
         self._plugin_starter.start(plugin)
 
+    def _verify_ok_to_play(self) -> None:
+        """Verify if it is okay to start playing the engine.
+
+        Raises: if not okay.
+        """
+        if self._blocked:
+            raise RobotDoorOpenError
+
+    def hardware_event_handler(self, hw_event: HardwareEvent) -> None:
+        """Update the runner on hardware events."""
+        if isinstance(hw_event, DoorStateNotification):
+            print("____ Got a door state notification _____")
+            self._door_state = hw_event.new_state
+            self._blocked = hw_event.blocking
+            print(f"blocked?: {self._blocked} | is running?: {self._state_store.commands.get_is_running()}")
+            if self._blocked and self._state_store.commands.get_is_running():
+                self.pause(door_pause=True)
+
     def play(self) -> None:
         """Start or resume executing commands in the queue."""
         # TODO(mc, 2021-08-05): if starting, ensure plungers motors are
         # homed if necessary
         action = PlayAction()
+        print(f"Starting play. Blocked by door? {self._blocked}")
+        self._verify_ok_to_play()
         self._state_store.commands.raise_if_stop_requested()
         self._action_dispatcher.dispatch(action)
         self._queue_worker.start()
 
-    def pause(self) -> None:
+    def pause(self, door_pause: bool = False) -> None:
         """Pause executing commands in the queue."""
-        action = PauseAction(source=PauseSource.CLIENT)
+        source = PauseSource.DOOR_PAUSE if door_pause else PauseSource.CLIENT
+        action = PauseAction(source=source)
         self._state_store.commands.raise_if_stop_requested()
         self._action_dispatcher.dispatch(action)
 

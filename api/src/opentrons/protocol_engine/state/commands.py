@@ -15,6 +15,7 @@ from ..actions import (
     StopAction,
     FinishAction,
     HardwareStoppedAction,
+    PauseSource,
 )
 
 from ..commands import Command, CommandStatus
@@ -63,6 +64,7 @@ class CommandState:
             executing, and the robot may still be in motion, even if INACTIVE.
         is_hardware_stopped: Whether the engine's hardware has ceased
             motion. Once set, this flag cannot be unset.
+        is_paused_by_door: Whether the run is paused due to an open door.
         run_result: Whether the run is done and succeeded, failed, or stopped.
             Once set, this status cannot be unset.
         running_command_id: The ID of the currently running command, if any.
@@ -75,6 +77,7 @@ class CommandState:
 
     queue_status: QueueStatus
     is_hardware_stopped: bool
+    is_paused_by_door: bool
     run_result: Optional[RunResult]
     running_command_id: Optional[str]
     queued_command_ids: OrderedDict[str, Literal[True]]
@@ -92,11 +95,13 @@ class CommandStore(HasState[CommandState], HandlesActions):
         self._state = CommandState(
             queue_status=QueueStatus.IMPLICITLY_ACTIVE,
             is_hardware_stopped=False,
+            is_paused_by_door=False,
             run_result=None,
             running_command_id=None,
             queued_command_ids=OrderedDict(),
             commands_by_id=OrderedDict(),
             errors_by_id={},
+
         )
 
     def handle_action(self, action: Action) -> None:  # noqa: C901
@@ -165,9 +170,13 @@ class CommandStore(HasState[CommandState], HandlesActions):
         elif isinstance(action, PlayAction):
             if not self._state.run_result:
                 self._state.queue_status = QueueStatus.ACTIVE
+                if self._state.is_paused_by_door:
+                    self._state.is_paused_by_door = False
 
         elif isinstance(action, PauseAction):
             self._state.queue_status = QueueStatus.INACTIVE
+            if action.source == PauseSource.DOOR_PAUSE:
+                self._state.is_paused_by_door = True
 
         elif isinstance(action, StopAction):
             if not self._state.run_result:
@@ -337,7 +346,10 @@ class CommandView(HasState[CommandState]):
             return EngineStatus.RUNNING
 
         elif self._state.queue_status == QueueStatus.INACTIVE:
-            return EngineStatus.PAUSED
+            if self._state.is_paused_by_door:
+                return EngineStatus.PAUSED_BY_OPEN_DOOR
+            else:
+                return EngineStatus.PAUSED
 
         else:
             any_running = self._state.running_command_id is not None

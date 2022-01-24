@@ -30,6 +30,7 @@ class PauseSource(str, Enum):
 
     CLIENT = "client"
     PROTOCOL = "protocol"
+    DOOR_PAUSE = "door-pause"
 
 
 @dataclass(frozen=True)

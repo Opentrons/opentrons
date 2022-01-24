@@ -96,7 +96,8 @@ class LegacyContextPlugin(AbstractPlugin):
 
         elif (
             isinstance(action, pe_actions.PauseAction)
-            and action.source == pe_actions.PauseSource.CLIENT
+            and (action.source == pe_actions.PauseSource.CLIENT
+                 or action.source == pe_actions.PauseSource.DOOR_PAUSE)
         ):
             self._hardware_api.pause(HardwarePauseType.PAUSE)
 
