@@ -106,9 +106,12 @@ class Block:
 
     def __post_init__(self) -> None:
         """Initialize field values in post-init processing."""
+
         def _final_speed() -> np.float64:
             """Get final speed of the block."""
-            return np.sqrt(self.initial_speed ** 2 + self.acceleration * self.distance * 2)
+            return np.sqrt(
+                self.initial_speed ** 2 + self.acceleration * self.distance * 2
+            )
 
         def _time() -> np.float64:
             """Get the time it takes for the block to complete its motion."""

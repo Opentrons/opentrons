@@ -70,10 +70,10 @@ def main() -> None:
     parser.add_argument(
         "--blend-log",
         "-b",
-        choices=['last', 'all'],
+        choices=["last", "all"],
         required=False,
-        default='last',
-        help="output the last list or all of the blend log"
+        default="last",
+        help="output the last list or all of the blend log",
     )
     args = parser.parse_args()
 
@@ -102,8 +102,8 @@ def main() -> None:
     )
 
     output = {
-        'moves': [v.to_dict() for v in blend_log[-1]],
-        'origin': list(origin.vectorize()),
+        "moves": [v.to_dict() for v in blend_log[-1]],
+        "origin": list(origin.vectorize()),
     }
 
     with open(args.output, "w") as f:
