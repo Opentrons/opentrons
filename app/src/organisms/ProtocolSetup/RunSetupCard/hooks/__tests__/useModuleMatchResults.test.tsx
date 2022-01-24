@@ -32,8 +32,15 @@ const mockMagneticModuleDef = {
   moduleId: 'someMagneticModule',
   model: 'magneticModuleV2' as ModuleModel,
   type: 'magneticModuleType' as ModuleType,
+  compatibleWith: [],
 }
-
+const mockTemperatureModuleDef = {
+  labwareOffset: { x: 5, y: 5, z: 5 },
+  moduleId: 'someTempModule',
+  model: 'temperatureModuleV2' as ModuleModel,
+  type: 'temperatureModuleType' as ModuleType,
+  compatibleWith: ['temperatureModuleV1'],
+}
 describe('useModuleMatchResults', () => {
   const store: Store<State> = createStore(jest.fn(), {})
 
@@ -90,6 +97,36 @@ describe('useModuleMatchResults', () => {
     const { result } = renderHook(useModuleMatchResults, { wrapper })
     const { missingModuleIds } = result.current
     expect(missingModuleIds).toStrictEqual([moduleId])
+  })
+  it('should return no missing moduleId if compatible model is attached', () => {
+    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+      <Provider store={store}>{children}</Provider>
+    )
+    const moduleId = 'someTempModule'
+    when(mockUseModuleRenderInfoById)
+      .calledWith()
+      .mockReturnValue({
+        [moduleId]: {
+          moduleId: moduleId,
+          x: 0,
+          y: 0,
+          z: 0,
+          moduleDef: mockTemperatureModuleDef as any,
+          nestedLabwareDef: null,
+          nestedLabwareId: null,
+          protocolLoadOrder: 0,
+          attachedModuleMatch: null,
+          slotName: '1',
+        },
+      })
+
+    when(mockGetAttachedModules)
+      .calledWith(undefined as any, mockConnectedRobot.name)
+      .mockReturnValue([mockTemperatureModule])
+
+    const { result } = renderHook(useModuleMatchResults, { wrapper })
+    const { missingModuleIds } = result.current
+    expect(missingModuleIds).toStrictEqual([])
   })
   it('should return 1 remaining attached module if not required for protocols', () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
