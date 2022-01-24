@@ -84,8 +84,8 @@ export const DeckMap = (props: DeckMapProps): JSX.Element | null => {
                     {nestedLabwareId != null &&
                     completedLabwareIds?.includes(nestedLabwareId) ? (
                       <RobotCoordsCenteredCheck
-                        x={x}
-                        y={y}
+                        x={0}
+                        y={0}
                         boundingXDimension={
                           nestedLabwareDef.dimensions.xDimension
                         }
