@@ -15,6 +15,7 @@ import {
   useCreateLabwareOffsetMutation,
   useCreateCommandMutation,
 } from '@opentrons/react-api-client'
+import { useTrackEvent } from '../../../../redux/analytics'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
 import { useCurrentProtocolRun } from '../../../ProtocolUpload/hooks'
 import { getLabwareLocation } from '../../utils/getLabwareLocation'
@@ -237,6 +238,7 @@ export function useLabwarePositionCheck(
   const { createCommand } = useCreateCommandMutation()
   const host = useHost()
   const { runRecord: currentRun } = useCurrentProtocolRun()
+  const trackEvent = useTrackEvent()
   const LPCSteps = useSteps()
   const dispatch = useDispatch()
   const robotName = useSelector(getConnectedRobotName)
@@ -494,7 +496,7 @@ export function useLabwarePositionCheck(
               setError(e)
             })
         }
-        // if this was the last LPC command, home the robot
+        // if this was the last LPC command, home the robot and log a mixpanel event
         if (currentCommandIndex === LPCMovementCommands.length - 1) {
           const homeCommand: HomeCreateCommand = {
             commandType: 'home',
@@ -503,10 +505,17 @@ export function useLabwarePositionCheck(
           createCommand({
             runId: currentRun?.data?.id as string,
             command: createCommandData(homeCommand),
-          }).catch((e: Error) => {
-            console.error(`error homing robot: ${e.message}`)
-            setError(e)
           })
+            .then(() =>
+              trackEvent({
+                name: 'LabwarePositionCheckComplete',
+                properties: {},
+              })
+            )
+            .catch((e: Error) => {
+              console.error(`error homing robot: ${e.message}`)
+              setError(e)
+            })
         }
       })
       .catch((e: Error) => {
@@ -516,6 +525,7 @@ export function useLabwarePositionCheck(
   }
 
   const beginLPC = (): void => {
+    trackEvent({ name: 'LabwarePositionCheckStarted', properties: {} })
     setIsLoading(true)
     // first clear all previous labware offsets for each labware
     const identityLabwareOffsets: LabwareOffsetCreateData[] = reduce<

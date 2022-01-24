@@ -18,6 +18,7 @@ import * as PipetteOffset from '../../../../redux/calibration/pipette-offset'
 import * as Pipettes from '../../../../redux/pipettes'
 import * as TipLength from '../../../../redux/calibration/tip-length'
 import * as PipetteConstants from '../../../../redux/pipettes/constants'
+import { useTrackEvent } from '../../../../redux/analytics'
 import { DeckCalibration } from './DeckCalibration'
 import { CalibrationItem } from './CalibrationItem'
 import { PipetteCalibration } from './PipetteCalibration'
@@ -45,6 +46,7 @@ export function RobotCalibration(props: Props): JSX.Element {
       ? 'proceed_to_module_setup_step'
       : 'proceed_to_labware_setup_step'
   const [targetProps, tooltipProps] = useHoverTooltip()
+  const trackEvent = useTrackEvent()
 
   const dispatch = useDispatch<Dispatch>()
   React.useEffect(() => {
@@ -141,7 +143,13 @@ export function RobotCalibration(props: Props): JSX.Element {
       <Box textAlign={ALIGN_CENTER}>
         <NewPrimaryBtn
           disabled={!calibrationStatus.complete}
-          onClick={() => expandStep(nextStep)}
+          onClick={() => {
+            expandStep(nextStep)
+            trackEvent({
+              name: nextStepButtonKey,
+              properties: {},
+            })
+          }}
           {...targetProps}
           id={'RobotCalStep_proceedButton'}
         >
