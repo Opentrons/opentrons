@@ -1,6 +1,8 @@
 """Tests for move util functions."""
 import pytest
-from typing import Iterator
+import numpy as np  # type: ignore[import]
+from typing import Iterator, List
+from hypothesis import given, strategies as st, assume
 
 from opentrons_hardware.hardware_control.motion_planning.move_manager import MoveManager
 from opentrons_hardware.hardware_control.motion_planning.move_utils import (
@@ -8,6 +10,8 @@ from opentrons_hardware.hardware_control.motion_planning.move_utils import (
     find_final_speed,
     targets_to_moves,
     all_blended,
+    get_unit_vector,
+    FLOAT_THRESHOLD,
 )
 from opentrons_hardware.hardware_control.motion_planning.types import (
     Axis,
@@ -226,3 +230,17 @@ def test_blend_motion() -> None:
     success, blend_log = manager.plan_motion(origin, target_list)
     assert success
     assert all_blended(CONSTRAINTS, blend_log[-1])
+
+
+coords = st.lists(st.floats(min_value=0, max_value=1e64), min_size=4, max_size=4)
+
+
+@given(coords, coords)
+def test_get_unit_vector(x: List[float], y: List[float]) -> None:
+    """Get unit vector function should return a unit vector."""
+    assume(x != y)
+    assume(all(abs(j - i) > FLOAT_THRESHOLD for i, j in zip(x, y)))
+    coord_0 = Coordinates.from_iter(np.float64(i) for i in x)
+    coord_1 = Coordinates.from_iter(np.float64(i) for i in y)
+    unit_v, _ = get_unit_vector(coord_1, coord_0)
+    assert unit_v.is_unit_vector()
