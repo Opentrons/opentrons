@@ -45,7 +45,6 @@ describe('config migration', () => {
     const v4Config = {
       ...MOCK_CONFIG_V4,
       labware: {
-        //  @ts-expect-error(bc, 2022-01-21): will be fixed by config TS types from app?
         ...MOCK_CONFIG_V3.labware,
         showLabwareOffsetCodeSnippets: false,
       },

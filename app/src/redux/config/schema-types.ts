@@ -63,7 +63,7 @@ export interface ConfigV0 {
   support: {
     userId: string
     createdAt: number
-    name: string
+    name: string | null
     email: string | null | undefined
   }
 

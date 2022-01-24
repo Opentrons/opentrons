@@ -88,9 +88,8 @@ export const DEFAULTS_V0: ConfigV0 = {
 const toVersion1 = (prevConfig: ConfigV0): ConfigV1 => {
   const nextConfig = {
     ...prevConfig,
-    version: 1,
+    version: 1 as const,
     discovery: {
-      //  @ts-expect-error(mc, 2021-02-16): will be fixed by config TS types from app
       ...prevConfig.discovery,
       disableCache: false,
     },
@@ -103,7 +102,7 @@ const toVersion1 = (prevConfig: ConfigV0): ConfigV1 => {
 const toVersion2 = (prevConfig: ConfigV1): ConfigV2 => {
   const nextConfig = {
     ...prevConfig,
-    version: 2,
+    version: 2 as const,
     calibration: {
       useTrashSurfaceForTipCal: null,
     },
@@ -116,9 +115,8 @@ const toVersion2 = (prevConfig: ConfigV1): ConfigV2 => {
 const toVersion3 = (prevConfig: ConfigV2): ConfigV3 => {
   const nextConfig = {
     ...prevConfig,
-    version: 3,
+    version: 3 as const,
     support: {
-      //  @ts-expect-error(mc, 2021-02-16): will be fixed by config TS types from app
       ...prevConfig.support,
       // name and email were never changed by the app, and its default values
       // were causing problems. Null them out for future implementations
@@ -134,9 +132,8 @@ const toVersion3 = (prevConfig: ConfigV2): ConfigV3 => {
 const toVersion4 = (prevConfig: ConfigV3): ConfigV4 => {
   const nextConfig = {
     ...prevConfig,
-    version: 4,
+    version: 4 as const,
     labware: {
-      //  @ts-expect-error(bc, 2022-01-21): will be fixed by config TS types from app?
       ...prevConfig.labware,
       showLabwareOffsetCodeSnippets: false,
     },
@@ -146,10 +143,10 @@ const toVersion4 = (prevConfig: ConfigV3): ConfigV4 => {
 }
 
 const MIGRATIONS: [
-  (prefConfig: ConfigV0) => ConfigV1,
-  (prefConfig: ConfigV1) => ConfigV2,
-  (prefConfig: ConfigV2) => ConfigV3,
-  (prefConfig: ConfigV3) => ConfigV4
+  (prevConfig: ConfigV0) => ConfigV1,
+  (prevConfig: ConfigV1) => ConfigV2,
+  (prevConfig: ConfigV2) => ConfigV3,
+  (prevConfig: ConfigV3) => ConfigV4
 ] = [toVersion1, toVersion2, toVersion3, toVersion4]
 
 export const DEFAULTS: Config = migrate(DEFAULTS_V0)
@@ -158,11 +155,12 @@ export function migrate(
   prevConfig: ConfigV0 | ConfigV1 | ConfigV2 | ConfigV3 | ConfigV4
 ): Config {
   const prevVersion = prevConfig.version
-  let result: ConfigV0 | ConfigV1 | ConfigV2 | ConfigV3 | ConfigV4 = prevConfig
+  let result = prevConfig
 
   // loop through the migrations, skipping any migrations that are unnecessary
-  for (let i = prevVersion; i < MIGRATIONS.length; i++) {
+  for (let i: number = prevVersion; i < MIGRATIONS.length; i++) {
     const migrateVersion = MIGRATIONS[i]
+    // @ts-expect-error (sh: 01-24-2021): migrateVersion function input typed to never
     result = migrateVersion(result)
   }
 
@@ -172,5 +170,5 @@ export function migrate(
     )
   }
 
-  return result
+  return result as Config
 }

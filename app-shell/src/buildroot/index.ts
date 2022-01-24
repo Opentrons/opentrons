@@ -88,14 +88,14 @@ export function registerBuildrootUpdate(dispatch: Dispatch): Dispatch {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         uploadSystemFile(host, path, file)
           .then(() => ({
-            type: 'buildroot:FILE_UPLOAD_DONE',
+            type: 'buildroot:FILE_UPLOAD_DONE' as 'buildroot:FILE_UPLOAD_DONE',
             payload: host.name,
           }))
           .catch((error: Error) => {
             log.warn('Error uploading update to robot', { path, file, error })
 
             return {
-              type: 'buildroot:UNEXPECTED_ERROR',
+              type: 'buildroot:UNEXPECTED_ERROR' as 'buildroot:UNEXPECTED_ERROR',
               payload: {
                 message: `Error uploading update to robot: ${error.message}`,
               },
@@ -112,14 +112,14 @@ export function registerBuildrootUpdate(dispatch: Dispatch): Dispatch {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         readUserFileInfo(systemFile)
           .then(userFile => ({
-            type: 'buildroot:USER_FILE_INFO',
+            type: 'buildroot:USER_FILE_INFO' as 'buildroot:USER_FILE_INFO',
             payload: {
               systemFile: userFile.systemFile,
               version: userFile.versionInfo.opentrons_api_version,
             },
           }))
           .catch((error: Error) => ({
-            type: 'buildroot:UNEXPECTED_ERROR',
+            type: 'buildroot:UNEXPECTED_ERROR' as 'buildroot:UNEXPECTED_ERROR',
             payload: { message: error.message },
           }))
           .then(dispatch)
