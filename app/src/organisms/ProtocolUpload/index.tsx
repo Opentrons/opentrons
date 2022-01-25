@@ -1,4 +1,5 @@
 import * as React from 'react'
+import styled from 'styled-components'
 import {
   AlertItem,
   Text,
@@ -47,8 +48,11 @@ import { ConfirmExitProtocolUploadModal } from './ConfirmExitProtocolUploadModal
 import { useLogger } from '../../logger'
 import type { ErrorObject } from 'ajv'
 import type { Dispatch, State } from '../../redux/types'
-
+import { getLabwareDefinitionUri } from '../ProtocolSetup/utils/getLabwareDefinitionUri'
 import styles from './styles.css'
+import type { ProtocolFile, RunTimeCommand } from '@opentrons/shared-data'
+import type { RunData } from '@opentrons/api-client'
+import { useProtocolDetails } from '../RunDetails/hooks'
 
 const VALIDATION_ERROR_T_MAP: { [errorKey: string]: string } = {
   INVALID_FILE_TYPE: 'invalid_file_type',
@@ -57,15 +61,48 @@ const VALIDATION_ERROR_T_MAP: { [errorKey: string]: string } = {
   ANALYSIS_ERROR: 'analysis_error',
 }
 
+const JsonTextArea = styled.textarea`
+  min-height: 30vh;
+  width: 100%;
+`
+
+const JUPYTER_PREFIX = 'import opentrons.execute\nprotocol = opentrons.execute.get_protocol_api("2.12")'
+function createSSHSnippet(protocol: ProtocolFile<{}> | null, run: RunData | null): string | null{
+  if (protocol == null || run == null) return null
+  const { labwareOffsets } = run
+  const labwareAndModuleLoadCommands  = protocol.commands.reduce<string>((acc, command, index) => {
+    let addendum = null
+    if(command.commandType === 'loadLabware') {
+      const loadedLabware = protocol.labware[command.result.labwareId]
+      if(loadedLabware == null) return acc
+      const loadStatement = `labware_${index} = protocol.load_labware("${protocol.labwareDefinitions[loadedLabware.definitionId].parameters.loadName}", location="${command.params.location?.slotName ?? command.params.location?.moduleId}")`
+      const labwareDefUri = getLabwareDefinitionUri(command.result.labwareId, protocol.labware)
+      const labwareOffset = labwareOffsets?.find(offset => offset.definitionUri === labwareDefUri)
+      if(labwareOffset == null) {
+       addendum = loadStatement
+      } else {
+        const {x,y,z} = labwareOffset.vector
+        addendum = `${loadStatement}\nlabware_${index}.set_offset(x=${x}, y=${y}, z=${z})\n`
+      }
+    } else if (command.commandType === 'loadModule') {
+      addendum =  ''
+    }
+    return addendum != null ? `${acc}\n${addendum}` : acc
+  }, '')
+  return `${JUPYTER_PREFIX}\n${labwareAndModuleLoadCommands}`
+}
+
 export function ProtocolUpload(): JSX.Element {
   const { t } = useTranslation(['protocol_info', 'shared'])
   const dispatch = useDispatch<Dispatch>()
   const {
     createProtocolRun,
+    runRecord,
     protocolRecord,
     isCreatingProtocolRun,
     protocolCreationError,
   } = useCurrentProtocolRun()
+  const { protocolData } = useProtocolDetails()
   const runStatus = useRunStatus()
   const { closeCurrentRun, isProtocolRunLoaded } = useCloseCurrentRun()
   const robotName = useSelector((state: State) => getConnectedRobotName(state))
@@ -76,6 +113,7 @@ export function ProtocolUpload(): JSX.Element {
   const [uploadError, setUploadError] = React.useState<
     [string, ErrorObject[] | string | null | undefined] | null
   >(null)
+
 
   const clearError = (): void => {
     setUploadError(null)
@@ -232,6 +270,7 @@ export function ProtocolUpload(): JSX.Element {
         <ConfirmCancelModal onClose={() => setShowConfirmCancelModal(false)} />
       )}
       <Page titleBarProps={titleBarProps}>
+        <JsonTextArea value={createSSHSnippet(protocolData, runRecord?.data ?? null)} />
         {uploadError != null && (
           <Flex
             position="absolute"
