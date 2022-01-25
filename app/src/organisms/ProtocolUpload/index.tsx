@@ -21,6 +21,7 @@ import {
   SPACING_3,
   SPACING_2,
   NewAlertSecondaryBtn,
+  FONT_SIZE_CAPTION,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
@@ -64,32 +65,86 @@ const VALIDATION_ERROR_T_MAP: { [errorKey: string]: string } = {
 const JsonTextArea = styled.textarea`
   min-height: 30vh;
   width: 100%;
+  font-size: ${FONT_SIZE_CAPTION};
+  font-family: monospace;
 `
 
-const JUPYTER_PREFIX = 'import opentrons.execute\nprotocol = opentrons.execute.get_protocol_api("2.12")'
-function createSSHSnippet(protocol: ProtocolFile<{}> | null, run: RunData | null): string | null{
+const PYTHON_INDENT = '    '
+const JUPYTER_PREFIX =
+  'import opentrons.execute\nprotocol = opentrons.execute.get_protocol_api("2.12")\n\n'
+const CLI_PREFIX =
+  `from opentrons import protocol_api\n\nmetadata = {\n${PYTHON_INDENT}"apiLevel": "2.12"\n}\n\ndef run(protocol: protocol_api.ProtocolContext):`
+function createSnippet(
+  mode: 'jupyter' | 'cli',
+  protocol: ProtocolFile<{}> | null,
+  run: RunData | null
+): string | null {
   if (protocol == null || run == null) return null
   const { labwareOffsets } = run
-  const labwareAndModuleLoadCommands  = protocol.commands.reduce<string>((acc, command, index) => {
-    let addendum = null
-    if(command.commandType === 'loadLabware') {
-      const loadedLabware = protocol.labware[command.result.labwareId]
-      if(loadedLabware == null) return acc
-      const loadStatement = `labware_${index} = protocol.load_labware("${protocol.labwareDefinitions[loadedLabware.definitionId].parameters.loadName}", location="${command.params.location?.slotName ?? command.params.location?.moduleId}")`
-      const labwareDefUri = getLabwareDefinitionUri(command.result.labwareId, protocol.labware)
-      const labwareOffset = labwareOffsets?.find(offset => offset.definitionUri === labwareDefUri)
-      if(labwareOffset == null) {
-       addendum = loadStatement
-      } else {
-        const {x,y,z} = labwareOffset.vector
-        addendum = `${loadStatement}\nlabware_${index}.set_offset(x=${x}, y=${y}, z=${z})\n`
+  let moduleVariableById: { [moduleId: string]: string } = {}
+  const loadCommandLines = protocol.commands.reduce<string[]>(
+    (acc, command, index) => {
+      let loadStatement = ''
+      let addendum = null
+      if (command.commandType === 'loadLabware') {
+        const loadedLabware = protocol.labware[command.result.labwareId]
+        if (loadedLabware == null) return acc
+        const { loadName } = protocol.labwareDefinitions[
+          loadedLabware.definitionId
+        ].parameters
+        if ('slotName' in command.params.location) {
+          // load labware on deck
+          const { slotName } = command.params.location
+          loadStatement = `labware_${index} = protocol.load_labware("${loadName}", location="${slotName}")`
+        } else if ('moduleId' in command.params.location) {
+          // load labware on module
+          const moduleVariable =
+            moduleVariableById[command.params.location.moduleId]
+          loadStatement = `labware_${index} = ${moduleVariable}.load_labware("${loadName}")`
+        }
+        const labwareDefUri = getLabwareDefinitionUri(
+          command.result.labwareId,
+          protocol.labware
+        )
+        const labwareOffset = labwareOffsets?.find(
+          offset => offset.definitionUri === labwareDefUri
+        )
+        if (labwareOffset == null) {
+          addendum = [loadStatement, '']
+        } else {
+          const { x, y, z } = labwareOffset.vector
+          addendum = [
+            loadStatement,
+            `labware_${index}.set_offset(x=${x}, y=${y}, z=${z})`,
+            '',
+          ]
+        }
+      } else if (command.commandType === 'loadModule') {
+        // load module on deck
+        const moduleVariable = `module_${index}`
+        moduleVariableById = {
+          ...moduleVariableById,
+          [command.result.moduleId]: moduleVariable,
+        }
+        const { model } = protocol.modules[command.params.moduleId]
+        const { slotName } = command.params.location
+        addendum = [
+          `${moduleVariable} = protocol.load_module("${model}", location="${slotName}")`,
+          '',
+        ]
       }
-    } else if (command.commandType === 'loadModule') {
-      addendum =  ''
+
+      return addendum != null ? [...acc, ...addendum] : acc
+    },
+    []
+  )
+  return loadCommandLines.reduce<string>((acc, line) => {
+    if (mode === 'jupyter') {
+      return `${acc}\n${line}`
+    } else {
+      return `${acc}\n${PYTHON_INDENT}${line}`
     }
-    return addendum != null ? `${acc}\n${addendum}` : acc
-  }, '')
-  return `${JUPYTER_PREFIX}\n${labwareAndModuleLoadCommands}`
+  }, `${mode === 'jupyter' ? JUPYTER_PREFIX : CLI_PREFIX}`)
 }
 
 export function ProtocolUpload(): JSX.Element {
@@ -113,7 +168,6 @@ export function ProtocolUpload(): JSX.Element {
   const [uploadError, setUploadError] = React.useState<
     [string, ErrorObject[] | string | null | undefined] | null
   >(null)
-
 
   const clearError = (): void => {
     setUploadError(null)
@@ -270,7 +324,18 @@ export function ProtocolUpload(): JSX.Element {
         <ConfirmCancelModal onClose={() => setShowConfirmCancelModal(false)} />
       )}
       <Page titleBarProps={titleBarProps}>
-        <JsonTextArea value={createSSHSnippet(protocolData, runRecord?.data ?? null)} />
+        <Flex>
+          <JsonTextArea
+            value={createSnippet(
+              'jupyter',
+              protocolData,
+              runRecord?.data ?? null
+            )}
+          />
+          <JsonTextArea
+            value={createSnippet('cli', protocolData, runRecord?.data ?? null)}
+          />
+        </Flex>
         {uploadError != null && (
           <Flex
             position="absolute"
