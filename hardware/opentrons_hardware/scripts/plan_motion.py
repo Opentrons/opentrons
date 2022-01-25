@@ -67,6 +67,14 @@ def main() -> None:
         default=os.path.join(os.path.dirname(__file__) + "/motion_output.json"),
         help="the output file path",
     )
+    parser.add_argument(
+        "--blend-log",
+        "-b",
+        choices=["last", "all"],
+        required=False,
+        default="last",
+        help="output the last list or all of the blend log",
+    )
     args = parser.parse_args()
 
     if args.debug:
@@ -94,7 +102,8 @@ def main() -> None:
     )
 
     output = {
-        index: [v.to_dict() for v in value] for index, value in enumerate(blend_log)
+        "moves": [v.to_dict() for v in blend_log[-1]],
+        "origin": list(origin.vectorize()),
     }
 
     with open(args.output, "w") as f:
