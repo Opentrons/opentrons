@@ -3,7 +3,11 @@ import pytest
 from mock import AsyncMock, call, MagicMock
 from opentrons_ot3_firmware import ArbitrationId, ArbitrationIdParts
 
-from opentrons_ot3_firmware.constants import NodeId
+from opentrons_ot3_firmware.constants import (
+    NodeId,
+    MessageId,
+    FunctionCode,
+)
 from opentrons_hardware.drivers.can_bus.can_messenger import MessageListener
 from opentrons_ot3_firmware.messages.message_definitions import (
     AddLinearMoveRequest,
@@ -14,7 +18,9 @@ from opentrons_ot3_firmware.messages.payloads import (
     EmptyPayload,
     ExecuteMoveGroupRequestPayload,
 )
-from opentrons_hardware.hardware_control.constants import interrupts_per_sec
+from opentrons_hardware.hardware_control.constants import (
+    interrupts_per_sec,
+)
 from opentrons_hardware.hardware_control.motion import (
     MoveGroups,
     MoveGroupSingleAxisStep,
@@ -135,7 +141,8 @@ async def test_single_send_setup_commands(
                 velocity=Int32Field(
                     int(
                         move_group_single[0][0][NodeId.head].velocity_mm_sec
-                        * interrupts_per_sec
+                        / interrupts_per_sec
+                        * (2 ** 31)
                     )
                 ),
                 acceleration=Int32Field(0),
@@ -167,7 +174,8 @@ async def test_multi_send_setup_commands(
                 velocity=Int32Field(
                     int(
                         move_group_multiple[0][0][NodeId.head].velocity_mm_sec
-                        * interrupts_per_sec
+                        / interrupts_per_sec
+                        * (2 ** 31)
                     )
                 ),
                 acceleration=Int32Field(0),
@@ -191,7 +199,8 @@ async def test_multi_send_setup_commands(
                 velocity=Int32Field(
                     int(
                         move_group_multiple[1][0][NodeId.gantry_x].velocity_mm_sec
-                        * interrupts_per_sec
+                        / interrupts_per_sec
+                        * (2 ** 31)
                     )
                 ),
                 acceleration=Int32Field(0),
@@ -214,7 +223,8 @@ async def test_multi_send_setup_commands(
                 velocity=Int32Field(
                     int(
                         move_group_multiple[1][0][NodeId.gantry_y].velocity_mm_sec
-                        * interrupts_per_sec
+                        / interrupts_per_sec
+                        * (2 ** 31)
                     )
                 ),
                 acceleration=Int32Field(0),
@@ -238,7 +248,8 @@ async def test_multi_send_setup_commands(
                 velocity=Int32Field(
                     int(
                         move_group_multiple[2][0][NodeId.pipette].velocity_mm_sec
-                        * interrupts_per_sec
+                        / interrupts_per_sec
+                        * (2 ** 31)
                     )
                 ),
                 acceleration=Int32Field(0),
@@ -261,7 +272,8 @@ async def test_multi_send_setup_commands(
                 velocity=Int32Field(
                     int(
                         move_group_multiple[2][1][NodeId.pipette].velocity_mm_sec
-                        * interrupts_per_sec
+                        / interrupts_per_sec
+                        * (2 ** 31)
                     )
                 ),
                 acceleration=Int32Field(0),
@@ -312,11 +324,16 @@ class MockSendMoveCompleter:
                         current_position=UInt32Field(0),
                         ack_id=UInt8Field(0),
                     )
-                    arbitration_id = ArbitrationId(
-                        parts=ArbitrationIdParts(originating_node_id=node)
-                    )
                     self._listener.on_message(
-                        md.MoveCompleted(payload=payload), arbitration_id
+                        md.MoveCompleted(payload=payload),
+                        ArbitrationId(
+                            parts=ArbitrationIdParts(
+                                node_id=NodeId.host,
+                                message_id=MessageId.move_completed,
+                                function_id=FunctionCode.status,
+                                originating_node_id=node.value,
+                            )
+                        ),
                     )
 
 

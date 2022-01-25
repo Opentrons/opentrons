@@ -16,9 +16,13 @@ def build_tar(pkgname: str, outdir: str):
     with tarfile.open(
             name=os.path.join(outdir, f'{pkgname}-{pkg.version}.tar.gz'),
             mode='w:gz') as tar:
-        tar.add(os.path.join(pkg.location, pkgname), pkgname, recursive=True)
+        tar.add(os.path.join(pkg.location, pkgname),
+                os.path.join(
+                    f'{pkgname}-{pkg.version}', pkgname), recursive=True)
         tar.add(os.path.join(pkg.location, f'{pkgname}-{pkg.version}.dist-info'),
-                f'{pkgname}-{pkg.version}.dist-info',
+                os.path.join(
+                    f'{pkgname}-{pkg.version}',
+                    f'{pkgname}-{pkg.version}.dist-info'),
                 recursive=True)
 
 def main():

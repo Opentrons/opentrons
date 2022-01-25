@@ -137,6 +137,7 @@ class CanDriver(AbstractCanDriver):
         """
         m: Message = await self._reader.get_message()
         if m.is_error_frame:
+            log.error("Error frame encountered")
             raise ErrorFrameCanError(message=repr(m))
 
         return CanMessage(

@@ -29,6 +29,7 @@ endef
 # argument 5 is the path to go to on the remote side
 # argument 6 is the python package name
 # argument 7 is an additional subdir if necessary in the sdist
+# argument 8 is either egg or dist (default egg)
 define push-python-sdist
 scp $(if $(2),"-i $(2)") $(3) $(4) root@$(1):/var/$(notdir $(4))
 ssh $(if $(2),"-i $(2)") $(3) root@$(1) \
@@ -37,7 +38,7 @@ ssh $(if $(2),"-i $(2)") $(3) root@$(1) \
  cd /var/$(notdir $(4))-unzip && tar xf ../$(notdir $(4)) ; \
  rm -rf $(5)/$(6) $(5)/$(6)*.egg-info ; \
  mv /var/$(notdir $(4))-unzip/$(basename $(basename $(notdir $(4))))/$(if $(7),$(7)/)$(6) $(5)/ ; \
- mv /var/$(notdir $(4))-unzip/$(basename $(basename $(notdir $(4))))/$(if $(7),$(7)/)$(6)*.egg-info $(5)/$(basename $(basename $(notdir $(4)))).egg-info ; \
+ mv /var/$(notdir $(4))-unzip/$(basename $(basename $(notdir $(4))))/$(if $(7),$(7)/)$(6)*.$(if $(8),$(8),egg)-info $(5)/$(basename $(basename $(notdir $(4)))).$(if $(8),$(8),egg)-info ; \
  cleanup \
  "
 endef
