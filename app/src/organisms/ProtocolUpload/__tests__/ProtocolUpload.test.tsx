@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { resetAllWhenMocks, when } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { BrowserRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import {
   RUN_STATUS_FINISHING,
@@ -17,6 +18,7 @@ import {
 import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/testModulesProtocol.json'
 
 import { i18n } from '../../../i18n'
+import { useTrackEvent } from '../../../redux/analytics'
 import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
 import * as RobotSelectors from '../../../redux/robot/selectors'
 import * as calibrationSelectors from '../../../redux/calibration/selectors'
@@ -35,6 +37,7 @@ import { UploadInput } from '../UploadInput'
 import { ProtocolUpload, ProtocolLoader } from '..'
 
 jest.mock('../../../redux/protocol/selectors')
+jest.mock('../../../redux/analytics')
 jest.mock('../../../redux/protocol/utils')
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../../redux/calibration/selectors')
@@ -88,18 +91,24 @@ const mockGetConnectedRobotName = RobotSelectors.getConnectedRobotName as jest.M
 const mockGetValidCustomLabwareFiles = customLabwareSelectors.getValidCustomLabwareFiles as jest.MockedFunction<
   typeof customLabwareSelectors.getValidCustomLabwareFiles
 >
+const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
+  typeof useTrackEvent
+>
 const queryClient = new QueryClient()
 
 const render = () => {
   return renderWithProviders(
     <QueryClientProvider client={queryClient}>
-      <ProtocolUpload />
+      <BrowserRouter>
+        <ProtocolUpload />
+      </BrowserRouter>
     </QueryClientProvider>,
     { i18nInstance: i18n }
   )
 }
 
 const mockLoadingText = 'mockLoadingText'
+let mockTrackEvent: jest.Mock
 
 describe('ProtocolUpload', () => {
   beforeEach(() => {
@@ -130,6 +139,8 @@ describe('ProtocolUpload', () => {
     when(mockUseRunControls)
       .calledWith()
       .mockReturnValue({ pause: jest.fn() } as any)
+    mockTrackEvent = jest.fn()
+    when(mockUseTrackEvent).calledWith().mockReturnValue(mockTrackEvent)
 
     when(mockUploadInput).mockReturnValue(<div></div>)
   })
