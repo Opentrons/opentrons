@@ -1,9 +1,11 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import map from 'lodash/map'
 import isEmpty from 'lodash/isEmpty'
 import some from 'lodash/some'
 import { useTranslation } from 'react-i18next'
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
+import * as Config from '../../../../redux/config'
 import {
   Btn,
   Flex,
@@ -45,6 +47,7 @@ import { LabwareOffsetModal } from './LabwareOffsetModal'
 import { getModuleTypesThatRequireExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
 import { ExtraAttentionWarning } from './ExtraAttentionWarning'
 import { useMissingModuleIds, useProtocolCalibrationStatus } from '../hooks'
+import { DownloadOffsetDataModal } from '../../../ProtocolUpload/DownloadOffsetDataModal'
 
 const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
@@ -97,6 +100,13 @@ export const LabwareSetup = (): JSX.Element | null => {
     def => def.parameters?.isTiprack
   )
 
+  const [downloadOffsetDataModal, showDownloadOffsetDataModal] = React.useState(
+    false
+  )
+  const isLabwareOffsetCodeSnippetsOn = useSelector(
+    Config.getIsLabwareOffsetCodeSnippetsOn
+  )
+
   let lpcDisabledReason: string | null = null
 
   if (moduleAndCalibrationIncomplete) {
@@ -126,6 +136,11 @@ export const LabwareSetup = (): JSX.Element | null => {
       {showLabwarePositionCheckModal && (
         <LabwarePositionCheck
           onCloseClick={() => setShowLabwarePositionCheckModal(false)}
+        />
+      )}
+      {downloadOffsetDataModal && (
+        <DownloadOffsetDataModal
+          onCloseClick={() => showDownloadOffsetDataModal(false)}
         />
       )}
       <Flex flex="1" maxHeight="100vh" flexDirection={DIRECTION_COLUMN}>
@@ -208,6 +223,17 @@ export const LabwareSetup = (): JSX.Element | null => {
             <Text color={C_DARK_GRAY} margin={SPACING_3}>
               {t('labware_position_check_text')}
             </Text>
+            {isLabwareOffsetCodeSnippetsOn ? (
+              <Link
+                role={'link'}
+                fontSize={FONT_SIZE_BODY_1}
+                color={C_BLUE}
+                onClick={() => showDownloadOffsetDataModal(true)}
+                id={'DownloadOffsetData'}
+              >
+                Download Labware Offset data
+              </Link>
+            ) : null}
           </Box>
           <Flex flexDirection={DIRECTION_COLUMN}>
             <Btn

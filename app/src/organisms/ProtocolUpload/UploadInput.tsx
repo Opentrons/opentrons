@@ -34,6 +34,7 @@ import {
   JUSTIFY_START,
   TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
+import * as Config from '../../redux/config'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 import { getLatestLabwareOffsetCount } from '../ProtocolSetup/LabwarePositionCheck/utils/getLatestLabwareOffsetCount'
 import { useProtocolDetails } from '../RunDetails/hooks'
@@ -42,6 +43,7 @@ import { useTrackEvent } from '../../redux/analytics'
 import { Divider } from '../../atoms/structure'
 import { useMostRecentRunId } from './hooks/useMostRecentRunId'
 import { RerunningProtocolModal } from './RerunningProtocolModal'
+import { DownloadOffsetDataModal } from './DownloadOffsetDataModal'
 import { useCloneRun } from './hooks'
 import { getRunDisplayStatus } from './getRunDisplayStatus'
 import type { State } from '../../redux/types'
@@ -101,6 +103,12 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
   )
   const [rerunningProtocolModal, showRerunningProtocolModal] = React.useState(
     false
+  )
+  const [downloadOffsetDataModal, showDownloadOffsetDataModal] = React.useState(
+    false
+  )
+  const isLabwareOffsetCodeSnippetsOn = useSelector(
+    Config.getIsLabwareOffsetCodeSnippetsOn
   )
   const labwareOffsets = mostRecentRun?.labwareOffsets
   const protocolName = protocolData.displayName
@@ -169,6 +177,11 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
       {rerunningProtocolModal && (
         <RerunningProtocolModal
           onCloseClick={() => showRerunningProtocolModal(false)}
+        />
+      )}
+      {downloadOffsetDataModal && (
+        <DownloadOffsetDataModal
+          onCloseClick={() => showDownloadOffsetDataModal(false)}
         />
       )}
       <NewPrimaryBtn
@@ -304,11 +317,24 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
                 {labwareOffsetCount === 0 ? (
                   <Text>{t('no_labware_offset_data')}</Text>
                 ) : (
-                  <Trans
-                    t={t}
-                    i18nKey="labware_offsets_info"
-                    values={{ number: labwareOffsetCount }}
-                  />
+                  <Flex flexDirection={DIRECTION_COLUMN}>
+                    <Trans
+                      t={t}
+                      i18nKey="labware_offsets_info"
+                      values={{ number: labwareOffsetCount }}
+                    />
+                    {isLabwareOffsetCodeSnippetsOn ? (
+                      <Link
+                        role={'link'}
+                        fontSize={FONT_SIZE_BODY_1}
+                        color={C_BLUE}
+                        onClick={() => showDownloadOffsetDataModal(true)}
+                        id={'DownloadOffsetData'}
+                      >
+                        Download data
+                      </Link>
+                    ) : null}
+                  </Flex>
                 )}
               </Flex>
             </Flex>
