@@ -23,12 +23,8 @@ import {
   SPACING_5,
   TEXT_TRANSFORM_UPPERCASE,
   Text,
-  Link,
-  FONT_SIZE_BODY_1,
-  C_BLUE,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
-import { DownloadOffsetDataModal } from '../../ProtocolUpload/DownloadOffsetDataModal'
 import type { LabwareOffsets } from './hooks/useLabwareOffsets'
 
 interface LabwareOffsetSummary {
@@ -174,19 +170,11 @@ export const LabwareOffsetsSummary = (
 ): JSX.Element | null => {
   const { offsetData } = props
   const { t } = useTranslation('labware_position_check')
-  const [downloadOffsetDataModal, showDownloadOffsetDataModal] = React.useState(
-    false
-  )
   const isLabwareOffsetCodeSnippetsOn = useSelector(
     Config.getIsLabwareOffsetCodeSnippetsOn
   )
   return (
     <React.Fragment>
-      {downloadOffsetDataModal && (
-        <DownloadOffsetDataModal
-          onCloseClick={() => showDownloadOffsetDataModal(false)}
-        />
-      )}
       <Flex
         flex={'auto'}
         padding={SPACING_4}
@@ -206,17 +194,6 @@ export const LabwareOffsetsSummary = (
           >
             {t('labware_offsets_summary_title')}
           </Text>
-          {isLabwareOffsetCodeSnippetsOn ? (
-            <Link
-              role={'link'}
-              fontSize={FONT_SIZE_BODY_1}
-              color={C_BLUE}
-              onClick={() => showDownloadOffsetDataModal(true)}
-              id={'DownloadOffsetData'}
-            >
-              Download offset data
-            </Link>
-          ) : null}
         </Flex>
         {offsetData.length === 0 ? (
           <OffsetDataLoader />

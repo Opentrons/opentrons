@@ -43,7 +43,6 @@ import { useTrackEvent } from '../../redux/analytics'
 import { Divider } from '../../atoms/structure'
 import { useMostRecentRunId } from './hooks/useMostRecentRunId'
 import { RerunningProtocolModal } from './RerunningProtocolModal'
-import { DownloadOffsetDataModal } from './DownloadOffsetDataModal'
 import { useCloneRun } from './hooks'
 import { getRunDisplayStatus } from './getRunDisplayStatus'
 import type { State } from '../../redux/types'
@@ -102,9 +101,6 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
     false
   )
   const [rerunningProtocolModal, showRerunningProtocolModal] = React.useState(
-    false
-  )
-  const [downloadOffsetDataModal, showDownloadOffsetDataModal] = React.useState(
     false
   )
   const isLabwareOffsetCodeSnippetsOn = useSelector(
@@ -177,11 +173,6 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
       {rerunningProtocolModal && (
         <RerunningProtocolModal
           onCloseClick={() => showRerunningProtocolModal(false)}
-        />
-      )}
-      {downloadOffsetDataModal && (
-        <DownloadOffsetDataModal
-          onCloseClick={() => showDownloadOffsetDataModal(false)}
         />
       )}
       <NewPrimaryBtn
@@ -323,17 +314,6 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
                       i18nKey="labware_offsets_info"
                       values={{ number: labwareOffsetCount }}
                     />
-                    {isLabwareOffsetCodeSnippetsOn ? (
-                      <Link
-                        role={'link'}
-                        fontSize={FONT_SIZE_BODY_1}
-                        color={C_BLUE}
-                        onClick={() => showDownloadOffsetDataModal(true)}
-                        id={'DownloadOffsetData'}
-                      >
-                        Download data
-                      </Link>
-                    ) : null}
                   </Flex>
                 )}
               </Flex>

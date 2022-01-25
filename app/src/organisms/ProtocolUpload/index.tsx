@@ -1,5 +1,4 @@
 import * as React from 'react'
-import styled from 'styled-components'
 import {
   AlertItem,
   Text,
@@ -42,7 +41,6 @@ import { getConnectedRobotName } from '../../redux/robot/selectors'
 import { getValidCustomLabwareFiles } from '../../redux/custom-labware/selectors'
 import { ConfirmCancelModal } from '../RunDetails/ConfirmCancelModal'
 import { useRunStatus, useRunControls } from '../RunTimeControl/hooks'
-import { PythonLabwareOffsetSnippet } from '../../molecules/PythonLabwareOffsetSnippet'
 
 import { ConfirmExitProtocolUploadModal } from './ConfirmExitProtocolUploadModal'
 
@@ -50,7 +48,6 @@ import { useLogger } from '../../logger'
 import type { ErrorObject } from 'ajv'
 import type { Dispatch, State } from '../../redux/types'
 import styles from './styles.css'
-import { useProtocolDetails } from '../RunDetails/hooks'
 
 const VALIDATION_ERROR_T_MAP: { [errorKey: string]: string } = {
   INVALID_FILE_TYPE: 'invalid_file_type',
@@ -64,12 +61,10 @@ export function ProtocolUpload(): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   const {
     createProtocolRun,
-    runRecord,
     protocolRecord,
     isCreatingProtocolRun,
     protocolCreationError,
   } = useCurrentProtocolRun()
-  const { protocolData } = useProtocolDetails()
   const runStatus = useRunStatus()
   const { closeCurrentRun, isProtocolRunLoaded } = useCloseCurrentRun()
   const robotName = useSelector((state: State) => getConnectedRobotName(state))
@@ -236,18 +231,6 @@ export function ProtocolUpload(): JSX.Element {
         <ConfirmCancelModal onClose={() => setShowConfirmCancelModal(false)} />
       )}
       <Page titleBarProps={titleBarProps}>
-        <Flex>
-          <PythonLabwareOffsetSnippet
-            mode="jupyter"
-            protocol={protocolData}
-            run={runRecord?.data ?? null}
-          />
-          <PythonLabwareOffsetSnippet
-            mode="cli"
-            protocol={protocolData}
-            run={runRecord?.data ?? null}
-          />
-        </Flex>
         {uploadError != null && (
           <Flex
             position="absolute"
