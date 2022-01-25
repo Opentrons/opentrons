@@ -1,6 +1,7 @@
 {
   "browse_protocol_library": "Launch Opentrons Protocol Library",
   "choose_file": "Choose File...",
+  "choose_snippet_type": "Choose the Labware Offset Data Python Snippet based on target execution environment.",
   "continue_proceed_to_calibrate": "Proceed to Calibrate",
   "continue_verify_calibrations": "Verify pipette and labware calibrations",
   "creation_method": "Creation Method",
@@ -9,6 +10,7 @@
   "drag_file_here": "Drag and drop protocol file here",
   "estimated_run_time": "Estimated Run Time",
   "error_message_no_steps": "This protocol has no steps in it - there's nothing for your robot to do! Your protocol needs at least one aspirate/dispense to import properly",
+  "get_labware_offset_data": "Get Labware Offset Data",
   "instrument_not_attached": "Not attached",
   "instrument_cal_data_title": "Calibration data",
   "instruments_title": "Required Pipettes",

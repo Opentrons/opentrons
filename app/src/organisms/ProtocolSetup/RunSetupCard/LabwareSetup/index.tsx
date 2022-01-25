@@ -210,17 +210,19 @@ export const LabwareSetup = (): JSX.Element | null => {
             )
           }}
         </RobotWorkSpace>
-        <Flex flexDirection={DIRECTION_ROW} backgroundColor={C_NEAR_WHITE}>
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          backgroundColor={C_NEAR_WHITE}
+          padding={SPACING_3}
+        >
           <Box flexDirection={DIRECTION_COLUMN} width="65%">
             <Text
               color={C_DARK_GRAY}
               fontWeight={FONT_WEIGHT_SEMIBOLD}
-              marginLeft={SPACING_3}
-              marginTop={SPACING_3}
             >
               {t('lpc_and_offset_data_title')}
             </Text>
-            <Text color={C_DARK_GRAY} margin={SPACING_3}>
+            <Text color={C_DARK_GRAY} marginRight={SPACING_3} marginY={SPACING_3}>
               {t('labware_position_check_text')}
             </Text>
             {isLabwareOffsetCodeSnippetsOn ? (
@@ -243,8 +245,7 @@ export const LabwareSetup = (): JSX.Element | null => {
               alignSelf={ALIGN_FLEX_END}
               onClick={() => setShowLabwareHelpModal(true)}
               data-test={'LabwareSetup_helpLink'}
-              marginTop={SPACING_3}
-              marginBottom={SPACING_3}
+              marginY={SPACING_3}
             >
               {t('labware_help_link_title')}
             </Btn>
