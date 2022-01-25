@@ -5,7 +5,7 @@ import { useCurrentProtocolRun } from '../ProtocolUpload/hooks'
 import { formatInterval } from '../RunTimeControl/utils'
 import type { ProtocolFile } from '@opentrons/shared-data'
 interface ProtocolDetails {
-  displayName: string | null
+  displayName: string | undefined
   protocolData: ProtocolFile<{}> | null
 }
 
@@ -52,7 +52,10 @@ export function useProtocolDetails(): ProtocolDetails {
       protocolData = schemaV6Adapter(lastProtocolAnalysis)
     }
   }
-  const displayName = protocolRecord?.data.metadata.protocolName ?? null
+  const displayName =
+    protocolRecord?.data.metadata.protocolName === undefined
+      ? protocolRecord?.data.files[0].name
+      : protocolRecord?.data.metadata.protocolName
   return { displayName, protocolData }
 }
 

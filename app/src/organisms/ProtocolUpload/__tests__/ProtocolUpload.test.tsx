@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { resetAllWhenMocks, when } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { BrowserRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import {
   RUN_STATUS_FINISHING,
@@ -18,7 +17,6 @@ import {
 import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/testModulesProtocol.json'
 
 import { i18n } from '../../../i18n'
-import { useTrackEvent } from '../../../redux/analytics'
 import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
 import * as RobotSelectors from '../../../redux/robot/selectors'
 import * as calibrationSelectors from '../../../redux/calibration/selectors'
@@ -33,10 +31,10 @@ import { mockCalibrationStatus } from '../../../redux/calibration/__fixtures__'
 import { useRunStatus, useRunControls } from '../../RunTimeControl/hooks'
 import { useCurrentProtocolRun } from '../hooks/useCurrentProtocolRun'
 import { useCloseCurrentRun } from '../hooks/useCloseCurrentRun'
+import { UploadInput } from '../UploadInput'
 import { ProtocolUpload, ProtocolLoader } from '..'
 
 jest.mock('../../../redux/protocol/selectors')
-jest.mock('../../../redux/analytics')
 jest.mock('../../../redux/protocol/utils')
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../../redux/calibration/selectors')
@@ -48,6 +46,7 @@ jest.mock('../ConfirmExitProtocolUploadModal')
 jest.mock('../../../redux/robot/selectors')
 jest.mock('../../RunTimeControl/hooks')
 jest.mock('../../RunDetails/ConfirmCancelModal')
+jest.mock('../UploadInput')
 
 const getProtocolFile = protocolSelectors.getProtocolFile as jest.MockedFunction<
   typeof protocolSelectors.getProtocolFile
@@ -82,29 +81,25 @@ const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
 const mockConfirmCancelModal = ConfirmCancelModal as jest.MockedFunction<
   typeof ConfirmCancelModal
 >
+const mockUploadInput = UploadInput as jest.MockedFunction<typeof UploadInput>
 const mockGetConnectedRobotName = RobotSelectors.getConnectedRobotName as jest.MockedFunction<
   typeof RobotSelectors.getConnectedRobotName
 >
 const mockGetValidCustomLabwareFiles = customLabwareSelectors.getValidCustomLabwareFiles as jest.MockedFunction<
   typeof customLabwareSelectors.getValidCustomLabwareFiles
 >
-const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
-  typeof useTrackEvent
->
 const queryClient = new QueryClient()
 
 const render = () => {
   return renderWithProviders(
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <ProtocolUpload />
-      </BrowserRouter>
+      <ProtocolUpload />
     </QueryClientProvider>,
     { i18nInstance: i18n }
   )
 }
 
-let mockTrackEvent: jest.Mock
+const mockLoadingText = 'mockLoadingText'
 
 describe('ProtocolUpload', () => {
   beforeEach(() => {
@@ -135,8 +130,8 @@ describe('ProtocolUpload', () => {
     when(mockUseRunControls)
       .calledWith()
       .mockReturnValue({ pause: jest.fn() } as any)
-    mockTrackEvent = jest.fn()
-    when(mockUseTrackEvent).calledWith().mockReturnValue(mockTrackEvent)
+
+    when(mockUploadInput).mockReturnValue(<div></div>)
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -164,10 +159,13 @@ describe('ProtocolUpload', () => {
     when(mockUseCurrentProtocolRun)
       .calledWith()
       .mockReturnValue({
-        protocolRecord: { data: { analyses: [] } },
+        protocolRecord: {
+          data: { analyses: [], metadata: { protocolName: 'protocolName' } },
+        },
         runRecord: {},
         createProtocolRun: jest.fn(),
       } as any)
+
     const { queryByRole, getByText } = render()[0]
     expect(queryByRole('button', { name: 'Choose File...' })).toBeNull()
     expect(getByText('Organization/Author')).toBeTruthy()
@@ -178,7 +176,9 @@ describe('ProtocolUpload', () => {
     when(mockUseCurrentProtocolRun)
       .calledWith()
       .mockReturnValue({
-        protocolRecord: {},
+        protocolRecord: {
+          data: { analyses: [], metadata: { protocolName: 'protocolName' } },
+        },
         runRecord: {},
         createProtocolRun: jest.fn(),
       } as any)
@@ -193,7 +193,9 @@ describe('ProtocolUpload', () => {
     when(mockUseCurrentProtocolRun)
       .calledWith()
       .mockReturnValue({
-        protocolRecord: {},
+        protocolRecord: {
+          data: { analyses: [], metadata: { protocolName: 'protocolName' } },
+        },
         runRecord: {},
         createProtocolRun: jest.fn(),
       } as any)
@@ -235,7 +237,9 @@ describe('ProtocolUpload', () => {
     when(mockUseCurrentProtocolRun)
       .calledWith()
       .mockReturnValue({
-        protocolRecord: {},
+        protocolRecord: {
+          data: { analyses: [], metadata: { protocolName: 'protocolName' } },
+        },
         runRecord: {},
         createProtocolRun: jest.fn(),
       } as any)
@@ -253,7 +257,9 @@ describe('ProtocolUpload', () => {
     when(mockUseCurrentProtocolRun)
       .calledWith()
       .mockReturnValue({
-        protocolRecord: { data: { analyses: [] } },
+        protocolRecord: {
+          data: { analyses: [], metadata: { protocolName: 'protocolName' } },
+        },
         runRecord: {},
         createProtocolRun: jest.fn(),
       } as any)
@@ -271,7 +277,9 @@ describe('ProtocolUpload', () => {
     when(mockUseCurrentProtocolRun)
       .calledWith()
       .mockReturnValue({
-        protocolRecord: { data: { analyses: [] } },
+        protocolRecord: {
+          data: { analyses: [], metadata: { protocolName: 'protocolName' } },
+        },
         runRecord: {},
         createProtocolRun: jest.fn(),
       } as any)
@@ -289,7 +297,9 @@ describe('ProtocolUpload', () => {
     when(mockUseCurrentProtocolRun)
       .calledWith()
       .mockReturnValue({
-        protocolRecord: { data: { analyses: [] } },
+        protocolRecord: {
+          data: { analyses: [], metadata: { protocolName: 'protocolName' } },
+        },
         runRecord: {},
         createProtocolRun: jest.fn(),
       } as any)
@@ -309,7 +319,9 @@ describe('ProtocolUpload', () => {
     when(mockUseCurrentProtocolRun)
       .calledWith()
       .mockReturnValue({
-        protocolRecord: { data: { analyses: [] } },
+        protocolRecord: {
+          data: { analyses: [], metadata: { protocolName: 'protocolName' } },
+        },
         runRecord: {},
         createProtocolRun: jest.fn(),
       } as any)
@@ -327,7 +339,9 @@ describe('ProtocolUpload', () => {
     when(mockUseCurrentProtocolRun)
       .calledWith()
       .mockReturnValue({
-        protocolRecord: { data: { analyses: [] } },
+        protocolRecord: {
+          data: { analyses: [], metadata: { protocolName: 'protocolName' } },
+        },
         runRecord: {},
         createProtocolRun: jest.fn(),
       } as any)
@@ -337,6 +351,8 @@ describe('ProtocolUpload', () => {
     when(mockConfirmCancelModal).mockReturnValue(
       <div>mock confirm cancel modal</div>
     )
+    const [{ getByText }] = render()
+    getByText('Protocol - protocolName')
     expect(screen.queryByText('mock confirm cancel modal')).toBeNull()
     expect(screen.queryByText('Cancel Run')).toBeNull()
   })
@@ -358,6 +374,7 @@ describe('ProtocolUpload', () => {
                 ],
               },
             ],
+            metadata: { protocolName: 'protocolName' },
           },
         },
         runRecord: {},
@@ -376,7 +393,9 @@ describe('ProtocolUpload', () => {
     when(mockUseCurrentProtocolRun)
       .calledWith()
       .mockReturnValue({
-        protocolRecord: {},
+        protocolRecord: {
+          data: { analyses: [], metadata: { protocolName: 'protocolName' } },
+        },
         runRecord: {},
         createProtocolRun: jest.fn(),
         protocolCreationError: 'invalid protocol!',
@@ -396,7 +415,7 @@ const renderProtocolLoader = (
 describe('ProtocolLoader', () => {
   let props: React.ComponentProps<typeof ProtocolLoader>
   beforeEach(() => {
-    props = { loadingText: 'mockLoadingText' }
+    props = { loadingText: mockLoadingText }
   })
 
   it('should render ProtocolLoader text with spinner', () => {

@@ -72,6 +72,7 @@ export function ProtocolUpload(): JSX.Element {
   const customLabwareFiles = useSelector((state: State) =>
     getValidCustomLabwareFiles(state)
   )
+
   const logger = useLogger(__filename)
   const [uploadError, setUploadError] = React.useState<
     [string, ErrorObject[] | string | null | undefined] | null
@@ -160,7 +161,10 @@ export function ProtocolUpload(): JSX.Element {
     runStatus === RUN_STATUS_PAUSE_REQUESTED ||
     runStatus === RUN_STATUS_FINISHING
 
-  const protocolName = protocolRecord?.data?.metadata?.protocolName ?? ''
+  const protocolName =
+    protocolRecord?.data?.metadata?.protocolName === undefined
+      ? protocolRecord?.data.files[0].name
+      : protocolRecord?.data.metadata.protocolName
 
   let titleBarProps
   if (
