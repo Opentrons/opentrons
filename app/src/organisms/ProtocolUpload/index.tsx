@@ -21,7 +21,6 @@ import {
   SPACING_3,
   SPACING_2,
   NewAlertSecondaryBtn,
-  FONT_SIZE_CAPTION,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
@@ -43,16 +42,14 @@ import { getConnectedRobotName } from '../../redux/robot/selectors'
 import { getValidCustomLabwareFiles } from '../../redux/custom-labware/selectors'
 import { ConfirmCancelModal } from '../RunDetails/ConfirmCancelModal'
 import { useRunStatus, useRunControls } from '../RunTimeControl/hooks'
+import { PythonLabwareOffsetSnippet } from '../../molecules/PythonLabwareOffsetSnippet'
 
 import { ConfirmExitProtocolUploadModal } from './ConfirmExitProtocolUploadModal'
 
 import { useLogger } from '../../logger'
 import type { ErrorObject } from 'ajv'
 import type { Dispatch, State } from '../../redux/types'
-import { getLabwareDefinitionUri } from '../ProtocolSetup/utils/getLabwareDefinitionUri'
 import styles from './styles.css'
-import type { ProtocolFile, RunTimeCommand } from '@opentrons/shared-data'
-import type { RunData } from '@opentrons/api-client'
 import { useProtocolDetails } from '../RunDetails/hooks'
 
 const VALIDATION_ERROR_T_MAP: { [errorKey: string]: string } = {
@@ -60,91 +57,6 @@ const VALIDATION_ERROR_T_MAP: { [errorKey: string]: string } = {
   INVALID_JSON_FILE: 'invalid_json_file',
   INVALID_PROTOCOL: 'invalid_protocol',
   ANALYSIS_ERROR: 'analysis_error',
-}
-
-const JsonTextArea = styled.textarea`
-  min-height: 30vh;
-  width: 100%;
-  font-size: ${FONT_SIZE_CAPTION};
-  font-family: monospace;
-`
-
-const PYTHON_INDENT = '    '
-const JUPYTER_PREFIX =
-  'import opentrons.execute\nprotocol = opentrons.execute.get_protocol_api("2.12")\n\n'
-const CLI_PREFIX =
-  `from opentrons import protocol_api\n\nmetadata = {\n${PYTHON_INDENT}"apiLevel": "2.12"\n}\n\ndef run(protocol: protocol_api.ProtocolContext):`
-function createSnippet(
-  mode: 'jupyter' | 'cli',
-  protocol: ProtocolFile<{}> | null,
-  run: RunData | null
-): string | null {
-  if (protocol == null || run == null) return null
-  const { labwareOffsets } = run
-  let moduleVariableById: { [moduleId: string]: string } = {}
-  const loadCommandLines = protocol.commands.reduce<string[]>(
-    (acc, command, index) => {
-      let loadStatement = ''
-      let addendum = null
-      if (command.commandType === 'loadLabware') {
-        const loadedLabware = protocol.labware[command.result.labwareId]
-        if (loadedLabware == null) return acc
-        const { loadName } = protocol.labwareDefinitions[
-          loadedLabware.definitionId
-        ].parameters
-        if ('slotName' in command.params.location) {
-          // load labware on deck
-          const { slotName } = command.params.location
-          loadStatement = `labware_${index} = protocol.load_labware("${loadName}", location="${slotName}")`
-        } else if ('moduleId' in command.params.location) {
-          // load labware on module
-          const moduleVariable =
-            moduleVariableById[command.params.location.moduleId]
-          loadStatement = `labware_${index} = ${moduleVariable}.load_labware("${loadName}")`
-        }
-        const labwareDefUri = getLabwareDefinitionUri(
-          command.result.labwareId,
-          protocol.labware
-        )
-        const labwareOffset = labwareOffsets?.find(
-          offset => offset.definitionUri === labwareDefUri
-        )
-        if (labwareOffset == null) {
-          addendum = [loadStatement, '']
-        } else {
-          const { x, y, z } = labwareOffset.vector
-          addendum = [
-            loadStatement,
-            `labware_${index}.set_offset(x=${x}, y=${y}, z=${z})`,
-            '',
-          ]
-        }
-      } else if (command.commandType === 'loadModule') {
-        // load module on deck
-        const moduleVariable = `module_${index}`
-        moduleVariableById = {
-          ...moduleVariableById,
-          [command.result.moduleId]: moduleVariable,
-        }
-        const { model } = protocol.modules[command.params.moduleId]
-        const { slotName } = command.params.location
-        addendum = [
-          `${moduleVariable} = protocol.load_module("${model}", location="${slotName}")`,
-          '',
-        ]
-      }
-
-      return addendum != null ? [...acc, ...addendum] : acc
-    },
-    []
-  )
-  return loadCommandLines.reduce<string>((acc, line) => {
-    if (mode === 'jupyter') {
-      return `${acc}\n${line}`
-    } else {
-      return `${acc}\n${PYTHON_INDENT}${line}`
-    }
-  }, `${mode === 'jupyter' ? JUPYTER_PREFIX : CLI_PREFIX}`)
 }
 
 export function ProtocolUpload(): JSX.Element {
@@ -325,15 +237,15 @@ export function ProtocolUpload(): JSX.Element {
       )}
       <Page titleBarProps={titleBarProps}>
         <Flex>
-          <JsonTextArea
-            value={createSnippet(
-              'jupyter',
-              protocolData,
-              runRecord?.data ?? null
-            )}
+          <PythonLabwareOffsetSnippet
+            mode="jupyter"
+            protocol={protocolData}
+            run={runRecord?.data ?? null}
           />
-          <JsonTextArea
-            value={createSnippet('cli', protocolData, runRecord?.data ?? null)}
+          <PythonLabwareOffsetSnippet
+            mode="cli"
+            protocol={protocolData}
+            run={runRecord?.data ?? null}
           />
         </Flex>
         {uploadError != null && (
