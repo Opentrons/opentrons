@@ -304,8 +304,9 @@ def test_map_module_load(
         module_serial="module-serial",
     )
     decoy.when(
-        module_data_provider.get_module_definition(ModuleModel.MAGNETIC_MODULE_V2)
+        module_data_provider.get_definition(ModuleModel.MAGNETIC_MODULE_V2)
     ).then_return(test_definition)
+
     expected_output = pe_commands.LoadModule.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
@@ -320,8 +321,9 @@ def test_map_module_load(
         ),
         result=pe_commands.LoadModuleResult.construct(
             moduleId=matchers.IsA(str),
-            moduleSerial="module-serial",
+            serialNumber="module-serial",
             definition=test_definition,
+            model=test_definition.model,
         ),
     )
     output = LegacyCommandMapper(
