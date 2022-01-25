@@ -21,6 +21,7 @@ import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fi
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '../../../../../i18n'
+import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../../redux/config'
 import { useRunStatus } from '../../../../RunTimeControl/hooks'
 import { useProtocolDetails } from '../../../../RunDetails/hooks'
 import { LabwareOffsetSuccessToast } from '../../../LabwareOffsetSuccessToast'
@@ -37,6 +38,7 @@ import { ExtraAttentionWarning } from '../ExtraAttentionWarning'
 import { getModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 
 jest.mock('../../hooks')
+jest.mock('../../../../../redux/config')
 jest.mock('../../../../../redux/modules')
 jest.mock('../../../../../redux/pipettes/selectors')
 jest.mock('../LabwareOffsetModal')
@@ -111,6 +113,9 @@ const mockUseMissingModuleIds = hooks.useMissingModuleIds as jest.MockedFunction
 >
 const mockUseProtocolCalibrationStatus = hooks.useProtocolCalibrationStatus as jest.MockedFunction<
   typeof hooks.useProtocolCalibrationStatus
+>
+const mockGetIsLabwareOffsetCodeSnippetsOn = getIsLabwareOffsetCodeSnippetsOn as jest.MockedFunction<
+  typeof getIsLabwareOffsetCodeSnippetsOn
 >
 const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
   (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
@@ -267,6 +272,7 @@ describe('LabwareSetup', () => {
           },
         },
       } as any)
+    mockGetIsLabwareOffsetCodeSnippetsOn.mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -520,5 +526,12 @@ describe('LabwareSetup', () => {
       name: 'run labware position check',
     })
     expect(button).toBeDisabled()
+  })
+  it('should render a get labware offset data link only when setting is true', () => {
+    mockGetIsLabwareOffsetCodeSnippetsOn.mockReturnValue(true)
+    const { getByRole } = render()
+    getByRole('link', {
+      name: 'Get Labware Offset Data',
+    })
   })
 })

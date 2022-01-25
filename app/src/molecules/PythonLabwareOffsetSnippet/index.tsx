@@ -3,10 +3,6 @@ import styled from 'styled-components'
 import {
   FONT_SIZE_CAPTION,
   SPACING_2,
-  NewPrimaryBtn,
-  Icon,
-  SIZE_3,
-  C_WHITE,
 } from '@opentrons/components'
 import { createSnippet } from './createSnippet'
 import type { ProtocolFile } from '@opentrons/shared-data'
@@ -29,12 +25,15 @@ export function PythonLabwareOffsetSnippet(
   props: PythonLabwareOffsetSnippetProps
 ): JSX.Element | null {
   const { protocol, run, mode } = props
+  const [snippet, setSnippet] = React.useState<string | null>(null)
 
-  if (protocol == null || run == null) return null
-  const snippet = createSnippet(mode, protocol, run.labwareOffsets)
-  if (snippet == null) return null
+  React.useEffect(() => {
+    if (protocol != null && run != null) {
+      setSnippet(createSnippet(mode, protocol, run.labwareOffsets))
+    }
+  }, [mode, JSON.stringify(run?.labwareOffsets)])
 
-  return (
-    <JsonTextArea readOnly value={snippet} spellCheck={false} />
-  )
+  if (protocol == null || run == null || snippet == null) return null
+
+  return <JsonTextArea readOnly value={snippet} spellCheck={false} />
 }

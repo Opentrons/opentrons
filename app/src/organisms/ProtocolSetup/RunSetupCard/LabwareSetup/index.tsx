@@ -216,13 +216,14 @@ export const LabwareSetup = (): JSX.Element | null => {
           padding={SPACING_3}
         >
           <Box flexDirection={DIRECTION_COLUMN} width="65%">
-            <Text
-              color={C_DARK_GRAY}
-              fontWeight={FONT_WEIGHT_SEMIBOLD}
-            >
+            <Text color={C_DARK_GRAY} fontWeight={FONT_WEIGHT_SEMIBOLD}>
               {t('lpc_and_offset_data_title')}
             </Text>
-            <Text color={C_DARK_GRAY} marginRight={SPACING_3} marginY={SPACING_3}>
+            <Text
+              color={C_DARK_GRAY}
+              marginRight={SPACING_3}
+              marginY={SPACING_3}
+            >
               {t('labware_position_check_text')}
             </Text>
             {isLabwareOffsetCodeSnippetsOn ? (
@@ -233,7 +234,7 @@ export const LabwareSetup = (): JSX.Element | null => {
                 onClick={() => showDownloadOffsetDataModal(true)}
                 id={'DownloadOffsetData'}
               >
-                Download Labware Offset data
+                {t('get_labware_offset_data')}
               </Link>
             ) : null}
           </Box>

@@ -48,10 +48,6 @@ export const DownloadOffsetDataModal = (
   const { runRecord } = useCurrentProtocolRun()
   const [mode, setMode] = React.useState<typeof MODES[number]>('jupyter')
 
-  const handleModeSelect: React.ChangeEventHandler<HTMLInputElement> = event => {
-    setMode(event.target.value as typeof MODES[number])
-    event.target.blur()
-  }
   return (
     <Portal level={'top'}>
       <BaseModal borderRadius={SIZE_1}>
@@ -70,10 +66,13 @@ export const DownloadOffsetDataModal = (
               <Icon name={'close'} size={SIZE_2} />
             </Box>
           </Flex>
-          <Text css={FONT_BODY_1_DARK} marginBottom={SPACING_3}>{t('choose_snippet_type')}</Text>
+          <Text css={FONT_BODY_1_DARK} marginBottom={SPACING_3}>
+            {t('choose_snippet_type')}
+          </Text>
           <Flex>
             {MODES.map(m => (
               <Btn
+                key={m}
                 onClick={() => setMode(m)}
                 width={SIZE_5}
                 paddingY={SPACING_2}
@@ -93,13 +92,15 @@ export const DownloadOffsetDataModal = (
           </Flex>
           <Flex
             borderRadius={`0 0 ${BORDER_RADIUS_DEFAULT} ${BORDER_RADIUS_DEFAULT}`}
-            border={`solid ${C_MED_GRAY}`} borderWidth="0 1px 1px 1px" padding={SPACING_3}>
+            border={`solid ${C_MED_GRAY}`}
+            borderWidth="0 1px 1px 1px"
+            padding={SPACING_3}
+          >
             <PythonLabwareOffsetSnippet
               mode={mode}
               protocol={protocolData}
               run={runRecord?.data ?? null}
             />
-
           </Flex>
           <Box textAlign={ALIGN_CENTER} marginTop={SPACING_4}>
             <NewPrimaryBtn

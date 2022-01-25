@@ -34,7 +34,6 @@ import {
   JUSTIFY_START,
   TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
-import * as Config from '../../redux/config'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 import { getLatestLabwareOffsetCount } from '../ProtocolSetup/LabwarePositionCheck/utils/getLatestLabwareOffsetCount'
 import { useProtocolDetails } from '../RunDetails/hooks'
@@ -102,9 +101,6 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
   )
   const [rerunningProtocolModal, showRerunningProtocolModal] = React.useState(
     false
-  )
-  const isLabwareOffsetCodeSnippetsOn = useSelector(
-    Config.getIsLabwareOffsetCodeSnippetsOn
   )
   const labwareOffsets = mostRecentRun?.labwareOffsets
   const protocolName = protocolData.displayName

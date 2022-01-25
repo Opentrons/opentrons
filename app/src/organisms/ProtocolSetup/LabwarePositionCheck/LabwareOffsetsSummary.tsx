@@ -1,7 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
-import * as Config from '../../../redux/config'
 import {
   ALIGN_CENTER,
   C_DARK_GRAY,
@@ -170,9 +168,6 @@ export const LabwareOffsetsSummary = (
 ): JSX.Element | null => {
   const { offsetData } = props
   const { t } = useTranslation('labware_position_check')
-  const isLabwareOffsetCodeSnippetsOn = useSelector(
-    Config.getIsLabwareOffsetCodeSnippetsOn
-  )
   return (
     <React.Fragment>
       <Flex
