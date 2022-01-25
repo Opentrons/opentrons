@@ -84,7 +84,10 @@ async def test_send(
         message=CanMessage(
             arbitration_id=ArbitrationId(
                 parts=ArbitrationIdParts(
-                    message_id=message.message_id, node_id=node_id, function_code=0
+                    message_id=message.message_id,
+                    node_id=node_id,
+                    function_code=0,
+                    originating_node_id=NodeId.host,
                 )
             ),
             data=message.payload.serialize(),
@@ -97,16 +100,16 @@ async def test_listen_messages(
 ) -> None:
     """It should call listener with new messages."""
     # Add a received message to the driver
-    arbitration_id = ArbitrationId(
-        parts=ArbitrationIdParts(
-            message_id=MessageId.get_move_group_request,
-            node_id=0,
-            function_code=0,
-        )
-    )
     incoming_messages.put_nowait(
         CanMessage(
-            arbitration_id=arbitration_id,
+            arbitration_id=ArbitrationId(
+                parts=ArbitrationIdParts(
+                    message_id=MessageId.get_move_group_request,
+                    node_id=0,
+                    function_code=0,
+                    originating_node_id=NodeId.gantry_x,
+                )
+            ),
             data=b"\1",
         )
     )
@@ -129,5 +132,12 @@ async def test_listen_messages(
     # Validate message.
     listener.on_message.assert_called_once_with(
         GetMoveGroupRequest(payload=MoveGroupRequestPayload(group_id=UInt8Field(1))),
-        arbitration_id,
+        ArbitrationId(
+            parts=ArbitrationIdParts(
+                node_id=NodeId.broadcast,
+                message_id=MessageId.get_move_group_request,
+                function_code=0,
+                originating_node_id=NodeId.gantry_x,
+            )
+        ),
     )

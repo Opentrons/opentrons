@@ -2,7 +2,6 @@ import asyncio
 import contextlib
 from dataclasses import replace
 import logging
-import pathlib
 from collections import OrderedDict
 from typing import (
     Any,
@@ -28,7 +27,7 @@ from opentrons.config.types import RobotConfig
 
 from .util import use_or_initialize_loop, DeckTransformState, check_motion_bounds
 from .pipette import Pipette, generate_hardware_configs, load_from_config_and_check_skip
-from .controller import Controller
+from .ot3controller import OT3Controller
 from .simulator import Simulator
 from .constants import (
     SHAKE_OFF_TIPS_SPEED,
@@ -70,7 +69,7 @@ InstrumentsByMount = Dict[top_types.Mount, Optional[Pipette]]
 PipetteHandlingData = Tuple[Pipette, top_types.Mount]
 
 
-class API(HardwareControlAPI):
+class OT3API(HardwareControlAPI):
     """This API is the primary interface to the hardware controller.
 
     Because the hardware manager controls access to the system's hardware
@@ -81,11 +80,11 @@ class API(HardwareControlAPI):
     but its purpose is to be gathered here to provide a single interface.
     """
 
-    CLS_LOG = mod_log.getChild("API")
+    CLS_LOG = mod_log.getChild("OT3API")
 
     def __init__(
         self,
-        backend: Union[Controller, Simulator],
+        backend: Union[Simulator, OT3Controller],
         loop: asyncio.AbstractEventLoop,
         config: RobotConfig,
     ) -> None:
@@ -159,75 +158,18 @@ class API(HardwareControlAPI):
     @classmethod
     async def build_hardware_controller(
         cls,
+        attached_instruments: Dict[top_types.Mount, Dict[str, Optional[str]]] = None,
+        attached_modules: List[str] = None,
         config: RobotConfig = None,
-        port: str = None,
         loop: asyncio.AbstractEventLoop = None,
-        firmware: Tuple[pathlib.Path, str] = None,
-    ) -> "API":
-        """Build a hardware controller that will actually talk to hardware.
-
-        This method should not be used outside of a real robot, and on a
-        real robot only one true hardware controller may be active at one
-        time.
-
-        :param config: A config to preload. If not specified, load the default.
-        :param port: A port to connect to. If not specified, the default port
-                     (found by scanning for connected FT232Rs).
-        :param loop: An event loop to use. If not specified, use the result of
-                     :py:meth:`asyncio.get_event_loop`.
-        """
+        strict_attached_instruments: bool = True,
+    ) -> "OT3API":
+        """Build an ot3 hardware controller."""
         checked_loop = use_or_initialize_loop(loop)
         checked_config = config or robot_configs.load()
-        backend = await Controller.build(checked_config)
-        backend.set_lights(button=None, rails=False)
-
-        async def blink():
-            while True:
-                backend.set_lights(button=True, rails=None)
-                await asyncio.sleep(0.5)
-                backend.set_lights(button=False, rails=None)
-                await asyncio.sleep(0.5)
-
-        blink_task = checked_loop.create_task(blink())
-        try:
-            try:
-                await backend.connect(port)
-                fw_version = backend.fw_version
-            except Exception:
-                mod_log.exception(
-                    "Motor driver could not connect, reprogramming if possible"
-                )
-                fw_version = None
-
-            if firmware is not None:
-                if fw_version != firmware[1]:
-                    await backend.update_firmware(str(firmware[0]), checked_loop, True)
-                    await backend.connect(port)
-            elif firmware is None and fw_version is None:
-                msg = (
-                    "Motor controller could not be connected and no "
-                    "firmware was provided for (re)programming"
-                )
-                mod_log.error(msg)
-                raise RuntimeError(msg)
-
-            api_instance = cls(backend, loop=checked_loop, config=checked_config)
-            await api_instance.cache_instruments()
-            module_controls = await AttachedModulesControl.build(
-                api_instance, board_revision=backend.board_revision
-            )
-            backend.module_controls = module_controls
-            checked_loop.create_task(backend.watch(loop=checked_loop))
-            backend.start_gpio_door_watcher(
-                loop=checked_loop, update_door_state=api_instance._update_door_state
-            )
-            return api_instance
-        finally:
-            blink_task.cancel()
-            try:
-                await blink_task
-            except asyncio.CancelledError:
-                pass
+        backend = await OT3Controller.build(checked_config)
+        await backend.setup_motors()
+        return cls(backend, loop=checked_loop, config=checked_config)
 
     @classmethod
     async def build_hardware_simulator(
@@ -237,7 +179,7 @@ class API(HardwareControlAPI):
         config: RobotConfig = None,
         loop: asyncio.AbstractEventLoop = None,
         strict_attached_instruments: bool = True,
-    ) -> "API":
+    ) -> "OT3API":
         """Build a simulating hardware controller.
 
         This method may be used both on a real robot and on dev machines.
@@ -472,8 +414,6 @@ class API(HardwareControlAPI):
             await self._backend.configure_mount(mount, hw_config)
         mod_log.info("Instruments found: {}".format(self._attached_instruments))
 
-    # TODO(mc, 2022-01-11): change returned map value type to `Optional[PipetteDict]`
-    # instead of potentially returning an empty dict
     def get_attached_instruments(self) -> Dict[top_types.Mount, "PipetteDict"]:
         """Get the status dicts of the cached attached instruments.
 
@@ -494,8 +434,6 @@ class API(HardwareControlAPI):
             for m in (top_types.Mount.LEFT, top_types.Mount.RIGHT)
         }
 
-    # TODO(mc, 2022-01-11): change return type to `Optional[PipetteDict]` instead
-    # of potentially returning an empty dict
     def get_attached_instrument(self, mount: top_types.Mount) -> "PipetteDict":
         instr = self._attached_instruments[mount]
         result: Dict[str, Any] = {}
@@ -673,7 +611,7 @@ class API(HardwareControlAPI):
         if not self.is_simulator:
             await self._execution_manager.wait_for_is_running()
 
-    async def reset(self) -> None:
+    async def reset(self):
         """Reset the stored state of the system.
 
         This will re-scan instruments and models, clearing any cached
@@ -1550,7 +1488,7 @@ class API(HardwareControlAPI):
         self, instr: Pipette, ul: float, action: "UlPerMmAction"
     ) -> float:
         mm = ul / instr.ul_per_mm(ul, action)
-        position = mm + instr.config.bottom
+        position = instr.config.bottom - mm
         return round(position, 6)
 
     def _plunger_speed(
@@ -1961,7 +1899,10 @@ class API(HardwareControlAPI):
         cp = self._critical_point_for(mount, critical_point)
 
         max_height = pip.config.home_position - self._config.z_retract_distance + cp.z
-
+        self._log.debug(
+            f"GIMH[{mount}]: pip {pip} home {pip.config.home_position} "
+            "- zrd {self._config.z_retract_distance} + cp.z {cp.z} = max {max_height}"
+        )
         return max_height
 
     def clean_up(self) -> None:

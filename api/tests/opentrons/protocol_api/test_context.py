@@ -95,26 +95,33 @@ async def test_motion(ctx, hardware):
 async def test_max_speeds(ctx, monkeypatch, hardware):
     ctx.connect(hardware)
     ctx.home()
-    mock_move = mock.Mock()
-    monkeypatch.setattr(
-        ctx._implementation.get_hardware().hardware, "move_to", mock_move
-    )
-    instr = ctx.load_instrument("p10_single", Mount.RIGHT)
-    instr.move_to(Location(Point(0, 0, 0), None))
-    assert all(kwargs["max_speeds"] == {} for args, kwargs in mock_move.call_args_list)
+    with mock.patch.object(
+        ctx._implementation.get_hardware().hardware, "move_to"
+    ) as mock_move:
+        instr = ctx.load_instrument("p10_single", Mount.RIGHT)
+        instr.move_to(Location(Point(0, 0, 0), None))
+        assert all(
+            kwargs["max_speeds"] == {} for args, kwargs in mock_move.call_args_list
+        )
 
-    mock_move.reset_mock()
-    ctx.max_speeds["x"] = 10
-    instr.move_to(Location(Point(0, 0, 1), None))
-    assert all(
-        kwargs["max_speeds"] == {Axis.X: 10}
-        for args, kwargs in mock_move.call_args_list
-    )
+    with mock.patch.object(
+        ctx._implementation.get_hardware().hardware, "move_to"
+    ) as mock_move:
+        ctx.max_speeds["x"] = 10
+        instr.move_to(Location(Point(0, 0, 1), None))
+        assert all(
+            kwargs["max_speeds"] == {Axis.X: 10}
+            for args, kwargs in mock_move.call_args_list
+        )
 
-    mock_move.reset_mock()
-    ctx.max_speeds["x"] = None
-    instr.move_to(Location(Point(1, 0, 1), None))
-    assert all(kwargs["max_speeds"] == {} for args, kwargs in mock_move.call_args_list)
+    with mock.patch.object(
+        ctx._implementation.get_hardware().hardware, "move_to"
+    ) as mock_move:
+        ctx.max_speeds["x"] = None
+        instr.move_to(Location(Point(1, 0, 1), None))
+        assert all(
+            kwargs["max_speeds"] == {} for args, kwargs in mock_move.call_args_list
+        )
 
 
 async def test_location_cache(ctx, monkeypatch, get_labware_def, hardware):
@@ -211,18 +218,15 @@ async def test_move_uses_arc(ctx, monkeypatch, get_labware_def, hardware):
     lw = ctx.load_labware("corning_96_wellplate_360ul_flat", 1)
     ctx.home()
 
-    targets = []
-
-    async def fake_move(self, mount, target_pos, **kwargs):
-        nonlocal targets
-        targets.append((mount, target_pos, kwargs))
-
-    monkeypatch.setattr(API, "move_to", fake_move)
-
-    right.move_to(lw.wells()[0].top())
-    assert len(targets) == 3
-    assert targets[-1][0] == Mount.RIGHT
-    assert targets[-1][1] == lw.wells()[0].top().point
+    with mock.patch.object(
+        ctx._implementation.get_hardware().hardware._obj_to_adapt, "move_to"
+    ) as fake_move:
+        right.move_to(lw.wells()[0].top())
+        assert len(fake_move.call_args_list) == 3
+        assert fake_move.call_args_list[-1][0] == (
+            Mount.RIGHT,
+            lw.wells()[0].top().point,
+        )
 
 
 def test_pipette_info(ctx):
@@ -414,6 +418,7 @@ def test_pick_up_tip_no_location(ctx, get_labware_def, pipette_model, tiprack_ki
     assert not tiprack2.wells()[0].has_tip
 
 
+@pytest.mark.ot2_only
 def test_instrument_trash(ctx, get_labware_def):
     ctx.home()
 
@@ -428,70 +433,85 @@ def test_instrument_trash(ctx, get_labware_def):
     assert instr.trash_container.name == "usascientific_12_reservoir_22ml"
 
 
-def test_instrument_trash_ot3(ot3_ctx, get_labware_def):
-    ot3_ctx.home()
+@pytest.mark.ot3_only
+def test_instrument_trash_ot3(ctx, get_labware_def):
+    ctx.home()
 
     mount = Mount.LEFT
-    instr = ot3_ctx.load_instrument("p300_single", mount)
+    instr = ctx.load_instrument("p300_single", mount)
 
     assert instr.trash_container.name == "opentrons_1_trash_3200ml_fixed"
 
 
-def test_aspirate(ctx, get_labware_def, monkeypatch):
+def test_aspirate(ctx, get_labware_def):
     ctx.home()
     lw = ctx.load_labware("corning_96_wellplate_360ul_flat", 1)
     tiprack = ctx.load_labware("opentrons_96_tiprack_10ul", 2)
     instr = ctx.load_instrument("p10_single", Mount.RIGHT, tip_racks=[tiprack])
 
-    fake_hw_aspirate = mock.Mock()
-    fake_move = mock.Mock()
-    monkeypatch.setattr(API, "aspirate", fake_hw_aspirate)
-    monkeypatch.setattr(API, "move_to", fake_move)
+    with mock.patch.object(
+        ctx._implementation.get_hardware().hardware._obj_to_adapt, "move_to"
+    ) as fake_move, mock.patch.object(
+        ctx._implementation.get_hardware().hardware._obj_to_adapt, "aspirate"
+    ) as fake_hw_aspirate:
+        instr.pick_up_tip()
+        instr.aspirate(2.0, lw.wells()[0].bottom())
+        assert "aspirating" in ",".join([cmd.lower() for cmd in ctx.commands()])
 
-    instr.pick_up_tip()
-    instr.aspirate(2.0, lw.wells()[0].bottom())
-    assert "aspirating" in ",".join([cmd.lower() for cmd in ctx.commands()])
+        fake_hw_aspirate.assert_called_once_with(Mount.RIGHT, 2.0, 1.0)
+        assert fake_move.call_args_list[-1] == mock.call(
+            Mount.RIGHT,
+            lw.wells()[0].bottom().point,
+            critical_point=None,
+            speed=400,
+            max_speeds={},
+        )
 
-    fake_hw_aspirate.assert_called_once_with(Mount.RIGHT, 2.0, 1.0)
-    assert fake_move.call_args_list[-1] == mock.call(
-        Mount.RIGHT,
-        lw.wells()[0].bottom().point,
-        critical_point=None,
-        speed=400,
-        max_speeds={},
-    )
-    fake_move.reset_mock()
-    fake_hw_aspirate.reset_mock()
-    instr.well_bottom_clearance.aspirate = 1.0
-    instr.aspirate(2.0, lw.wells()[0])
-    dest_point, dest_lw = lw.wells()[0].bottom()
-    dest_point = dest_point._replace(z=dest_point.z + 1.0)
-    assert len(fake_move.call_args_list) == 1
-    assert fake_move.call_args_list[0] == mock.call(
-        Mount.RIGHT, dest_point, critical_point=None, speed=400, max_speeds={}
-    )
-    fake_move.reset_mock()
-    hardware = ctx._implementation.get_hardware().hardware
-    hardware._obj_to_adapt._attached_instruments[Mount.RIGHT]._current_volume = 1
+    with mock.patch.object(
+        ctx._implementation.get_hardware().hardware._obj_to_adapt, "move_to"
+    ) as fake_move, mock.patch.object(
+        ctx._implementation.get_hardware().hardware._obj_to_adapt, "aspirate"
+    ) as fake_hw_aspirate:
+        instr.well_bottom_clearance.aspirate = 1.0
+        instr.aspirate(2.0, lw.wells()[0])
+        dest_point, dest_lw = lw.wells()[0].bottom()
+        dest_point = dest_point._replace(z=dest_point.z + 1.0)
+        assert len(fake_move.call_args_list) == 1
+        assert fake_move.call_args_list[0] == mock.call(
+            Mount.RIGHT, dest_point, critical_point=None, speed=400, max_speeds={}
+        )
 
-    instr.aspirate(2.0)
-    fake_move.assert_not_called()
+    with mock.patch.object(
+        ctx._implementation.get_hardware().hardware._obj_to_adapt, "move_to"
+    ) as fake_move, mock.patch.object(
+        ctx._implementation.get_hardware().hardware._obj_to_adapt, "aspirate"
+    ) as fake_hw_aspirate:
+        hardware = ctx._implementation.get_hardware().hardware
+        hardware._obj_to_adapt._attached_instruments[Mount.RIGHT]._current_volume = 1
 
-    instr.blow_out()
-    fake_move.reset_mock()
-    instr.aspirate(2.0)
-    assert len(fake_move.call_args_list) == 2
-    # reset plunger at the top of the well after blowout
-    assert fake_move.call_args_list[0] == mock.call(
-        Mount.RIGHT,
-        dest_lw.as_well().top().point,
-        critical_point=None,
-        speed=400,
-        max_speeds={},
-    )
-    assert fake_move.call_args_list[1] == mock.call(
-        Mount.RIGHT, dest_point, critical_point=None, speed=400, max_speeds={}
-    )
+        instr.aspirate(2.0)
+        fake_move.assert_not_called()
+
+        instr.blow_out()
+
+    with mock.patch.object(
+        ctx._implementation.get_hardware().hardware._obj_to_adapt, "move_to"
+    ) as fake_move, mock.patch.object(
+        ctx._implementation.get_hardware().hardware._obj_to_adapt, "aspirate"
+    ) as fake_hw_aspirate:
+        instr.aspirate(2.0)
+        assert len(fake_move.call_args_list) == 2
+        # reset plunger at the top of the well after blowout
+        assert fake_move.call_args_list[0] == mock.call(
+            Mount.RIGHT,
+            dest_lw.as_well().top().point,
+            critical_point=None,
+            speed=400,
+            max_speeds={},
+        )
+        assert fake_move.call_args_list[1] == mock.call(
+            Mount.RIGHT, dest_point, critical_point=None, speed=400, max_speeds={}
+        )
 
 
 def test_dispense(ctx, get_labware_def, monkeypatch):
@@ -499,43 +519,53 @@ def test_dispense(ctx, get_labware_def, monkeypatch):
     lw = ctx.load_labware("corning_96_wellplate_360ul_flat", 1)
     instr = ctx.load_instrument("p10_single", Mount.RIGHT)
 
-    disp_called_with = None
+    with mock.patch.object(
+        ctx._implementation.get_hardware().hardware._obj_to_adapt, "move_to"
+    ) as fake_move, mock.patch.object(
+        ctx._implementation.get_hardware().hardware._obj_to_adapt, "dispense"
+    ) as fake_hw_dispense:
 
-    async def fake_hw_dispense(self, mount, volume=None, rate=1.0):
-        nonlocal disp_called_with
-        disp_called_with = (mount, volume, rate)
+        instr.dispense(2.0, lw.wells()[0].bottom())
+        assert "dispensing" in ",".join([cmd.lower() for cmd in ctx.commands()])
+        fake_hw_dispense.assert_called_once_with(Mount.RIGHT, 2.0, 1.0)
+        fake_move.assert_called_with(
+            Mount.RIGHT,
+            lw.wells()[0].bottom().point,
+            critical_point=None,
+            speed=400,
+            max_speeds={},
+        )
 
-    move_called_with = None
+    with mock.patch.object(
+        ctx._implementation.get_hardware().hardware._obj_to_adapt, "move_to"
+    ) as fake_move, mock.patch.object(
+        ctx._implementation.get_hardware().hardware._obj_to_adapt, "dispense"
+    ) as fake_hw_dispense:
 
-    def fake_move(self, mount, loc, **kwargs):
-        nonlocal move_called_with
-        move_called_with = (mount, loc, kwargs)
+        instr.well_bottom_clearance.dispense = 2.0
+        instr.dispense(2.0, lw.wells()[0])
+        dest_point, dest_lw = lw.wells()[0].bottom()
+        dest_point = dest_point._replace(z=dest_point.z + 2.0)
+        fake_move.assert_called_with(
+            Mount.RIGHT, dest_point, critical_point=None, speed=400, max_speeds={}
+        )
 
-    monkeypatch.setattr(API, "dispense", fake_hw_dispense)
-    monkeypatch.setattr(API, "move_to", fake_move)
+    with mock.patch.object(
+        ctx._implementation.get_hardware().hardware._obj_to_adapt, "move_to"
+    ) as fake_move, mock.patch.object(
+        ctx._implementation.get_hardware().hardware._obj_to_adapt, "dispense"
+    ) as fake_hw_dispense:
 
-    instr.dispense(2.0, lw.wells()[0].bottom())
-    assert "dispensing" in ",".join([cmd.lower() for cmd in ctx.commands()])
-    assert disp_called_with == (Mount.RIGHT, 2.0, 1.0)
-    assert move_called_with == (
-        Mount.RIGHT,
-        lw.wells()[0].bottom().point,
-        {"critical_point": None, "speed": 400, "max_speeds": {}},
-    )
-
-    instr.well_bottom_clearance.dispense = 2.0
-    instr.dispense(2.0, lw.wells()[0])
-    dest_point, dest_lw = lw.wells()[0].bottom()
-    dest_point = dest_point._replace(z=dest_point.z + 2.0)
-    assert move_called_with == (
-        Mount.RIGHT,
-        dest_point,
-        {"critical_point": None, "speed": 400, "max_speeds": {}},
-    )
-
-    move_called_with = None
-    instr.dispense(2.0)
-    assert move_called_with is None
+        instr.well_bottom_clearance.dispense = 2.0
+        instr.dispense(2.0, lw.wells()[0])
+        dest_point, dest_lw = lw.wells()[0].bottom()
+        dest_point = dest_point._replace(z=dest_point.z + 2.0)
+        fake_move.assert_called_with(
+            Mount.RIGHT, dest_point, critical_point=None, speed=400, max_speeds={}
+        )
+        instr.dispense(2.0)
+        fake_move.reset_mock()
+        fake_move.assert_not_called()
 
 
 def test_prevent_liquid_handling_without_tip(ctx):
@@ -639,32 +669,33 @@ def test_touch_tip_default_args(loop, monkeypatch):
     instr = ctx.load_instrument("p300_single", Mount.RIGHT, tip_racks=[tiprack])
 
     instr.pick_up_tip()
-    total_hw_moves = []
-
-    async def fake_hw_move(
-        self, mount, abs_position, speed=None, critical_point=None, max_speeds=None
-    ):
-        nonlocal total_hw_moves
-        total_hw_moves.append((abs_position, speed))
 
     instr.aspirate(10, lw.wells()[0])
-    monkeypatch.setattr(API, "move_to", fake_hw_move)
-    instr.touch_tip()
-    z_offset = Point(0, 0, 1)  # default z offset of 1mm
-    speed = 60  # default speed
-    edges = [
-        lw.wells()[0].from_center_cartesian(1, 0, 1) - z_offset,
-        lw.wells()[0].from_center_cartesian(-1, 0, 1) - z_offset,
-        lw.wells()[0].from_center_cartesian(0, 1, 1) - z_offset,
-        lw.wells()[0].from_center_cartesian(0, -1, 1) - z_offset,
-    ]
-    for i in range(1, 5):
-        assert total_hw_moves[i] == (edges[i - 1], speed)
+    with mock.patch.object(
+        ctx._implementation.get_hardware().hardware._obj_to_adapt, "move_to"
+    ) as fake_move:
+        instr.touch_tip()
+        z_offset = Point(0, 0, 1)  # default z offset of 1mm
+        speed = 60  # default speed
+        edges = [
+            lw.wells()[0].from_center_cartesian(1, 0, 1) - z_offset,
+            lw.wells()[0].from_center_cartesian(-1, 0, 1) - z_offset,
+            lw.wells()[0].from_center_cartesian(0, 1, 1) - z_offset,
+            lw.wells()[0].from_center_cartesian(0, -1, 1) - z_offset,
+        ]
+        assert fake_move.call_count == 5
+        for i in range(1, 5):
+            assert fake_move.call_args_list[i] == mock.call(
+                Mount.RIGHT, edges[i - 1], speed
+            )
+        old_z = fake_move.call_args_list[1][0][1].z
     # Check that the old api version initial well move has the same z height
     # as the calculated edges.
-    total_hw_moves.clear()
-    instr.touch_tip(v_offset=1)
-    assert total_hw_moves[0][0].z != total_hw_moves[1][0].z
+    with mock.patch.object(
+        ctx._implementation.get_hardware().hardware._obj_to_adapt, "move_to"
+    ) as fake_move:
+        instr.touch_tip(v_offset=1)
+        assert fake_move.call_args_list[0][0][1].z != old_z
 
 
 def test_touch_tip_new_default_args(ctx, monkeypatch):
@@ -674,19 +705,11 @@ def test_touch_tip_new_default_args(ctx, monkeypatch):
     instr = ctx.load_instrument("p300_single", Mount.RIGHT, tip_racks=[tiprack])
 
     instr.pick_up_tip()
-    total_hw_moves = []
-
-    async def fake_hw_move(
-        self, mount, abs_position, speed=None, critical_point=None, max_speeds=None
-    ):
-        nonlocal total_hw_moves
-        total_hw_moves.append((abs_position, speed))
 
     instr.aspirate(10, lw.wells()[0])
-    monkeypatch.setattr(API, "move_to", fake_hw_move)
-    instr.touch_tip()
+
     z_offset = Point(0, 0, 1)  # default z offset of 1mm
-    speed = 60  # default speed
+    speed = 60.0  # default speed
     edges = [
         lw.wells()[0].from_center_cartesian(1, 0, 1) - z_offset,
         lw.wells()[0].from_center_cartesian(-1, 0, 1) - z_offset,
@@ -694,14 +717,24 @@ def test_touch_tip_new_default_args(ctx, monkeypatch):
         lw.wells()[0].from_center_cartesian(0, 1, 1) - z_offset,
         lw.wells()[0].from_center_cartesian(0, -1, 1) - z_offset,
     ]
-    for i in range(1, 5):
-        assert total_hw_moves[i] == (edges[i - 1], speed)
+
+    with mock.patch.object(
+        ctx._implementation.get_hardware().hardware._obj_to_adapt, "move_to"
+    ) as fake_move:
+        instr.touch_tip()
+        for i in range(1, 5):
+            assert fake_move.call_args_list[i] == mock.call(
+                Mount.RIGHT, edges[i - 1], speed
+            )
+        old_z = fake_move.call_args_list[0][0][1].z
 
     # Check that the new api version initial well move has the same z height
     # as the calculated edges.
-    total_hw_moves.clear()
-    instr.touch_tip(v_offset=1)
-    assert total_hw_moves[0][0].z == total_hw_moves[1][0].z
+    with mock.patch.object(
+        ctx._implementation.get_hardware().hardware._obj_to_adapt, "move_to"
+    ) as fake_move:
+        instr.touch_tip(v_offset=1)
+        assert fake_move.call_args_list[0][0][1].z != old_z
 
 
 def test_touch_tip_disabled(ctx, monkeypatch, get_labware_fixture):

@@ -76,7 +76,10 @@ class MoveGroupRunner:
                                 ),
                                 acceleration=Int32Field(0),
                                 velocity=Int32Field(
-                                    int(interrupts_per_sec * step.velocity_mm_sec)
+                                    int(
+                                        (step.velocity_mm_sec / interrupts_per_sec)
+                                        * (2 ** 31)
+                                    )
                                 ),
                             )
                         ),
@@ -104,6 +107,7 @@ class MoveScheduler(MessageListener):
             for seq_id, move in enumerate(move_group):
                 move_set.update(set((k.value, seq_id) for k in move.keys()))
             self._moves.append(move_set)
+        log.info(f"Move scheduler running for groups {move_groups}")
 
         self._event = asyncio.Event()
 
@@ -112,9 +116,16 @@ class MoveScheduler(MessageListener):
     ) -> None:
         """Incoming message handler."""
         if isinstance(message, MoveCompleted):
+            node_id = NodeId(arbitration_id.parts.originating_node_id).value
             seq_id = message.payload.seq_id.value
             group_id = message.payload.group_id.value
             node_id = arbitration_id.parts.originating_node_id
+            log.info(
+                f"Received completion for {node_id} group {group_id} seq {seq_id}"
+                ", which "
+                f"{'is' if (node_id, seq_id) in self._moves[group_id] else 'isnt'}"
+                "in group"
+            )
             self._moves[group_id].remove((node_id, seq_id))
             if not self._moves[group_id]:
                 log.info(f"Move group {group_id} has completed.")
