@@ -83,9 +83,9 @@ def test_get_pipette_data() -> None:
 def test_get_hardware_pipette() -> None:
     """It maps a pipette ID to a config given the HC's attached pipettes."""
     pipette_config = create_pipette_config("p300_single")
-    attached_pipettes: Dict[HwMount, Optional[PipetteDict]] = {
+    attached_pipettes: Dict[HwMount, PipetteDict] = {
         HwMount.LEFT: pipette_config,
-        HwMount.RIGHT: None,
+        HwMount.RIGHT: cast(PipetteDict, {}),
     }
 
     subject = get_pipette_view(
@@ -127,9 +127,9 @@ def test_get_hardware_pipette_with_back_compat() -> None:
         "p300_single_gen2",
         back_compat_names=["p300_single"],
     )
-    attached_pipettes: Dict[HwMount, Optional[PipetteDict]] = {
+    attached_pipettes: Dict[HwMount, PipetteDict] = {
         HwMount.LEFT: pipette_config,
-        HwMount.RIGHT: None,
+        HwMount.RIGHT: cast(PipetteDict, {}),
     }
 
     subject = get_pipette_view(
@@ -159,7 +159,7 @@ def test_get_hardware_pipette_raises_with_name_mismatch() -> None:
     pipette_config = create_pipette_config("p300_single_gen2")
     attached_pipettes: Dict[HwMount, Optional[PipetteDict]] = {
         HwMount.LEFT: pipette_config,
-        HwMount.RIGHT: None,
+        HwMount.RIGHT: cast(PipetteDict, {}),
     }
 
     subject = get_pipette_view(

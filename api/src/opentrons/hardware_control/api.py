@@ -29,7 +29,6 @@ from opentrons.config.types import RobotConfig
 from .util import use_or_initialize_loop, DeckTransformState, check_motion_bounds
 from .pipette import Pipette, generate_hardware_configs, load_from_config_and_check_skip
 from .controller import Controller
-from .ot3controller import OT3Controller
 from .simulator import Simulator
 from .constants import (
     SHAKE_OFF_TIPS_SPEED,
@@ -86,7 +85,7 @@ class API(HardwareControlAPI):
 
     def __init__(
         self,
-        backend: Union[Controller, Simulator, OT3Controller],
+        backend: Union[Controller, Simulator],
         loop: asyncio.AbstractEventLoop,
         config: RobotConfig,
     ) -> None:
@@ -268,22 +267,6 @@ class API(HardwareControlAPI):
         backend.module_controls = module_controls
         await backend.watch()
         return api_instance
-
-    @classmethod
-    async def build_ot3_controller(
-        cls,
-        attached_instruments: Dict[top_types.Mount, Dict[str, Optional[str]]] = None,
-        attached_modules: List[str] = None,
-        config: RobotConfig = None,
-        loop: asyncio.AbstractEventLoop = None,
-        strict_attached_instruments: bool = True,
-    ) -> "API":
-        """Build an ot3 hardware controller."""
-        checked_loop = use_or_initialize_loop(loop)
-        checked_config = config or robot_configs.load()
-        backend = await OT3Controller.build(checked_config)
-        await backend.setup_motors()
-        return cls(backend, loop=checked_loop, config=checked_config)
 
     def __repr__(self):
         return "<{} using backend {}>".format(type(self), type(self._backend))
@@ -489,6 +472,8 @@ class API(HardwareControlAPI):
             await self._backend.configure_mount(mount, hw_config)
         mod_log.info("Instruments found: {}".format(self._attached_instruments))
 
+    # TODO(mc, 2022-01-11): change returned map value type to `Optional[PipetteDict]`
+    # instead of potentially returning an empty dict
     def get_attached_instruments(self) -> Dict[top_types.Mount, "PipetteDict"]:
         """Get the status dicts of the cached attached instruments.
 
@@ -509,6 +494,8 @@ class API(HardwareControlAPI):
             for m in (top_types.Mount.LEFT, top_types.Mount.RIGHT)
         }
 
+    # TODO(mc, 2022-01-11): change return type to `Optional[PipetteDict]` instead
+    # of potentially returning an empty dict
     def get_attached_instrument(self, mount: top_types.Mount) -> "PipetteDict":
         instr = self._attached_instruments[mount]
         result: Dict[str, Any] = {}
@@ -686,7 +673,7 @@ class API(HardwareControlAPI):
         if not self.is_simulator:
             await self._execution_manager.wait_for_is_running()
 
-    async def reset(self):
+    async def reset(self) -> None:
         """Reset the stored state of the system.
 
         This will re-scan instruments and models, clearing any cached

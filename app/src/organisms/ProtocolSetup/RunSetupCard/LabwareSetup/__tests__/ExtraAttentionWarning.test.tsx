@@ -33,6 +33,21 @@ describe('ExtraAttentionWarning', () => {
       name: 'Secure labware and modules before proceeding to run',
     })
   })
+  it('should click on the X icon and close the warning label', () => {
+    const { queryByText, getByRole } = render(props)
+    const closeButton = getByRole('button', {
+      name: /close/i,
+    })
+    getByRole('heading', {
+      name: 'Secure labware and modules before proceeding to run',
+    })
+
+    fireEvent.click(closeButton)
+
+    expect(
+      queryByText('Secure labware and modules before proceeding to run')
+    ).toBeNull()
+  })
   it('should render the correct text for the mag mod', () => {
     props = {
       ...props,

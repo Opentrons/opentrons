@@ -28,7 +28,7 @@ async def test_load_module_implementation(
     movement: MovementHandler,
     pipetting: PipettingHandler,
     run_control: RunControlHandler,
-    tempdeck_v1_def: ModuleDefinition,
+    tempdeck_v2_def: ModuleDefinition,
 ) -> None:
     """A loadModule command should have an execution implementation."""
     subject = LoadModuleImplementation(
@@ -53,12 +53,15 @@ async def test_load_module_implementation(
     ).then_return(
         LoadedModuleData(
             module_id="module-id",
-            module_serial="mod-serial",
-            definition=tempdeck_v1_def,
+            serial_number="mod-serial",
+            definition=tempdeck_v2_def,
         )
     )
 
     result = await subject.execute(data)
     assert result == LoadModuleResult(
-        moduleId="module-id", moduleSerial="mod-serial", definition=tempdeck_v1_def
+        moduleId="module-id",
+        serialNumber="mod-serial",
+        model=ModuleModel.TEMPERATURE_MODULE_V2,
+        definition=tempdeck_v2_def,
     )

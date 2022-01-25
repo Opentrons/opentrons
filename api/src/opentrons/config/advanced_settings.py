@@ -117,13 +117,6 @@ settings = [
         description="Trash box is 55mm tall (rather than the 77mm default)",
     ),
     SettingDefinition(
-        _id="calibrateToBottom",
-        old_id="calibrate-to-bottom",
-        title="Calibrate to bottom",
-        description="Calibrate using the bottom-center of well A1 for each"
-        " labware (rather than the top-center)",
-    ),
-    SettingDefinition(
         _id="deckCalibrationDots",
         old_id="dots-deck-type",
         title="Deck calibration to dots",
@@ -163,16 +156,6 @@ settings = [
             "problems with the newer, faster protocol analysis method."
         ),
         restart_required=False,
-    ),
-    SettingDefinition(
-        _id="enableHttpProtocolSessions",
-        title="Enable deprecated experimental HTTP protocol upload",
-        description=(
-            "This setting is deprecated and exists only for backwards compatibility."
-            " If you have been using this setting, we recommend you disable it and"
-            " transition to using the standard HTTP API added in version 5."
-        ),
-        restart_required=True,
     ),
     SettingDefinition(
         _id="enableOT3HardwareController",
@@ -425,6 +408,26 @@ def _migrate11to12(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate12to13(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 13 of the feature flags file.
+
+    - Removes deprecated calibrateToBottom option
+    """
+    removals = ["calibrateToBottom"]
+    newmap = {k: v for k, v in previous.items() if k not in removals}
+    return newmap
+
+
+def _migrate13to14(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 14 of the feature flags file.
+
+    - Removes deprecated enableHttpProtocolSessions option
+    """
+    removals = ["enableHttpProtocolSessions"]
+    newmap = {k: v for k, v in previous.items() if k not in removals}
+    return newmap
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -438,6 +441,8 @@ _MIGRATIONS = [
     _migrate9to10,
     _migrate10to11,
     _migrate11to12,
+    _migrate12to13,
+    _migrate13to14,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

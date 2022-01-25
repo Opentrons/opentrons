@@ -13,8 +13,8 @@ import { useCurrentProtocolRun } from '../ProtocolUpload/hooks'
 
 import type { ProtocolModuleInfo } from './utils/getProtocolModulesInfo'
 import type { LabwareRenderInfoById } from './utils/getLabwareRenderInfo'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
-import type { LoadPipetteCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
+import type { LoadPipetteRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
 interface ProtocolMetadata {
   author?: string
@@ -96,11 +96,11 @@ export function useLabwareRenderInfoById(): LabwareRenderInfoById {
 
 export function usePipetteMount(
   pipetteId: string
-): LoadPipetteCommand['params']['mount'] | null {
+): LoadPipetteRunTimeCommand['params']['mount'] | null {
   const { protocolData } = useProtocolDetails()
   return (
     protocolData?.commands.find(
-      (command: Command): command is LoadPipetteCommand =>
+      (command: RunTimeCommand): command is LoadPipetteRunTimeCommand =>
         command.commandType === 'loadPipette' &&
         command.params.pipetteId === pipetteId
     )?.params.mount ?? null

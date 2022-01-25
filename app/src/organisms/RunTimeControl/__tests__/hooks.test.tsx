@@ -129,7 +129,9 @@ const mockFailedRun: RunData = {
       actionType: RUN_ACTION_TYPE_PLAY,
     },
   ],
-  commands: [{ id: COMMAND_ID, commandType: 'custom', status: 'succeeded' }],
+  commands: [
+    { id: COMMAND_ID, commandType: 'custom', status: 'succeeded' },
+  ] as any,
   errors: [
     {
       id: '5',
@@ -169,7 +171,9 @@ const mockStoppedRun: RunData = {
       actionType: RUN_ACTION_TYPE_STOP,
     },
   ],
-  commands: [{ id: COMMAND_ID, commandType: 'custom', status: 'succeeded' }],
+  commands: [
+    { id: COMMAND_ID, commandType: 'custom', status: 'succeeded' },
+  ] as any,
   errors: [],
   pipettes: [],
   labware: [],
@@ -197,7 +201,9 @@ const mockSucceededRun: RunData = {
       actionType: RUN_ACTION_TYPE_PLAY,
     },
   ],
-  commands: [{ id: COMMAND_ID, commandType: 'custom', status: 'succeeded' }],
+  commands: [
+    { id: COMMAND_ID, commandType: 'custom', status: 'succeeded' },
+  ] as any,
   errors: [],
   pipettes: [],
   labware: [],
@@ -237,7 +243,9 @@ const mockIdleStartedRun: RunData = {
       actionType: RUN_ACTION_TYPE_PLAY,
     },
   ],
-  commands: [{ id: COMMAND_ID, commandType: 'custom', status: 'succeeded' }],
+  commands: [
+    { id: COMMAND_ID, commandType: 'custom', status: 'succeeded' },
+  ] as any,
   errors: [],
   pipettes: [],
   labware: [],
@@ -284,6 +292,8 @@ describe('useRunControls hook', () => {
     expect(mockPlayRun).toHaveBeenCalledTimes(1)
     act(() => result.current.pause())
     expect(mockPauseRun).toHaveBeenCalledTimes(1)
+    act(() => result.current.stop())
+    expect(mockStopRun).toHaveBeenCalledTimes(1)
     act(() => result.current.reset())
     expect(mockCloneRun).toHaveBeenCalledTimes(1)
   })

@@ -116,6 +116,7 @@ def _get_tip_length_data(
         )
 
 
+# TODO(mc, 2022-01-12): no longer used; remove
 def get_labware_calibration(
     lookup_path: local_types.StrPath,
     definition: "LabwareDefinition",

@@ -3,6 +3,40 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.0.0-beta.6](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.5...v5.0.0-beta.6) (2022-01-07)
+
+
+### Bug Fixes
+
+* **app:** titlebar cancel run button behavior and styling ([#9192](https://github.com/Opentrons/opentrons/issues/9192)) ([46c1428](https://github.com/Opentrons/opentrons/commit/46c14284a752d1a76558bf64e8a70e5cad4dcae5))
+* Change links to networks ([#9182](https://github.com/Opentrons/opentrons/issues/9182)) ([5fce550](https://github.com/Opentrons/opentrons/commit/5fce5504879121bfe294e0e4d6a09d09b1761c03))
+* **api:** check pipette names in simulator ([#9181](https://github.com/Opentrons/opentrons/issues/9181)) ([a81ebd9](https://github.com/Opentrons/opentrons/commit/a81ebd96cf3079bb518a2cb89ee6763149177a5c))
+* **app:** adjust deck map and module warning sizes ([#9184](https://github.com/Opentrons/opentrons/issues/9184)) ([cb682f1](https://github.com/Opentrons/opentrons/commit/cb682f10dd2dd0891d96798610eba69cf59e9e89)), closes [#9158](https://github.com/Opentrons/opentrons/issues/9158)
+* **app:** block LPC when a protocol does not have a tip rack loaded ([#9145](https://github.com/Opentrons/opentrons/issues/9145)) ([feefc8b](https://github.com/Opentrons/opentrons/commit/feefc8b3dfd0a67bd3a4401c9ac2a12ab43fe080)), closes [#9090](https://github.com/Opentrons/opentrons/issues/9090)
+* **app:** fix borken tooltip translation for LPC CTA when modules not detected ([#9189](https://github.com/Opentrons/opentrons/issues/9189)) ([fe92615](https://github.com/Opentrons/opentrons/commit/fe92615a941bb17becfef799a70cfcabe327ef41))
+* **app:** initially expand correct setup step with modules and cal complete ([#9185](https://github.com/Opentrons/opentrons/issues/9185)) ([7e93404](https://github.com/Opentrons/opentrons/commit/7e9340441735d628d8d37f4c8a79675e3f78c2c7)), closes [#9127](https://github.com/Opentrons/opentrons/issues/9127)
+* Fix poetry errors ([#9176](https://github.com/Opentrons/opentrons/issues/9176)) ([6080065](https://github.com/Opentrons/opentrons/commit/6080065579a94fb99d31d27b19073e153fc53ea3))
+* **app:** copy changes in LPC for consistency ([#9178](https://github.com/Opentrons/opentrons/issues/9178)) ([e7013e2](https://github.com/Opentrons/opentrons/commit/e7013e2fe2e72495920b46acc5deb2e77ce7b269)), closes [#9156](https://github.com/Opentrons/opentrons/issues/9156)
+* **app:** prevent run canceled banner from disappearing ([#9179](https://github.com/Opentrons/opentrons/issues/9179)) ([2bf57d9](https://github.com/Opentrons/opentrons/commit/2bf57d9795864c4fab8b5e54db57d34cd2b0d748)), closes [#9108](https://github.com/Opentrons/opentrons/issues/9108)
+* **app:** update protocol upload failed banner style ([#9180](https://github.com/Opentrons/opentrons/issues/9180)) ([d9e3cef](https://github.com/Opentrons/opentrons/commit/d9e3cef40965188125263c926634faa7d957c2c9)), closes [#9097](https://github.com/Opentrons/opentrons/issues/9097)
+
+
+### Features
+
+* **hardware:** add move manager ([#9022](https://github.com/Opentrons/opentrons/issues/9022)) ([93cc6fb](https://github.com/Opentrons/opentrons/commit/93cc6fb66627427abbe64bc77784da5995721ef6))
+
+
+### Performance Improvements
+
+* **api:** bring back the ThreadManager ([#9199](https://github.com/Opentrons/opentrons/issues/9199)) ([ba931f7](https://github.com/Opentrons/opentrons/commit/ba931f750cf67ce68a6dc9e2ae9ac8682ce43d3a))
+* **protocol-engine:** avoid iterating all commands for every state update ([#9170](https://github.com/Opentrons/opentrons/issues/9170)) ([b12bffc](https://github.com/Opentrons/opentrons/commit/b12bffcee1edaba848c43b4af8c95a7bba367dde)), closes [#9109](https://github.com/Opentrons/opentrons/issues/9109) [#8739](https://github.com/Opentrons/opentrons/issues/8739)
+* **robot-server:** move large response serialization to worker thread ([#9197](https://github.com/Opentrons/opentrons/issues/9197)) ([21c044d](https://github.com/Opentrons/opentrons/commit/21c044d4010bd1441950150acf4275b0b72a0d52))
+* **robot-server:** serialize /protocols, /runs responses with Pydantic ([#9188](https://github.com/Opentrons/opentrons/issues/9188)) ([85b7ebb](https://github.com/Opentrons/opentrons/commit/85b7ebbe6dd728583c4f341803f9d756a5a6c685))
+
+
+
+
+
 # [5.0.0-beta.5](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.4...v5.0.0-beta.5) (2021-12-23)
 
 

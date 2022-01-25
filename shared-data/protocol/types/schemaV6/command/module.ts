@@ -1,131 +1,228 @@
-import { CommonCommandInfo } from '.'
+import { CommonCommandRunTimeInfo } from '.'
 
-export type ModuleCommand =
-  | MagneticModuleEngageMagnetCommand
-  | MagneticModuleDisengageMagnetCommand
-  | TemperatureModuleSetTargetTemperatureCommand
-  | TemperatureModuleDeactivateCommand
-  | TemperatureModuleAwaitTemperatureCommand
-  | TCSetTargetBlockTemperatureCommand
-  | TCSetTargetLidTemperatureCommand
-  | TCAwaitBlockTemperatureCommand
-  | TCAwaitLidTemperatureCommand
-  | TCOpenLidCommand
-  | TCCloseLidCommand
-  | TCDeactivateBlockCommand
-  | TCDeactivateLidCommand
-  | TCRunProfileCommand
-  | TCAwaitProfileCompleteCommand
-  | HeaterShakerSetTargetTemperatureCommand
-  | HeaterShakerAwaitTemperatureCommand
-  | HeaterShakerSetTargetShakeSpeedCommand
-  | HeaterShakerAwaitShakeSpeedCommand
-  | HeaterShakerDeactivateHeaterCommand
+export type ModuleRunTimeCommand =
+  | MagneticModuleEngageMagnetRunTimeCommand
+  | MagneticModuleDisengageMagnetRunTimeCommand
+  | TemperatureModuleSetTargetTemperatureRunTimeCommand
+  | TemperatureModuleDeactivateRunTimeCommand
+  | TemperatureModuleAwaitTemperatureRunTimeCommand
+  | TCSetTargetBlockTemperatureRunTimeCommand
+  | TCSetTargetLidTemperatureRunTimeCommand
+  | TCAwaitBlockTemperatureRunTimeCommand
+  | TCAwaitLidTemperatureRunTimeCommand
+  | TCOpenLidRunTimeCommand
+  | TCCloseLidRunTimeCommand
+  | TCDeactivateBlockRunTimeCommand
+  | TCDeactivateLidRunTimeCommand
+  | TCRunProfileRunTimeCommand
+  | TCAwaitProfileCompleteRunTimeCommand
+  | HeaterShakerSetTargetTemperatureRunTimeCommand
+  | HeaterShakerAwaitTemperatureRunTimeCommand
+  | HeaterShakerSetTargetShakeSpeedRunTimeCommand
+  | HeaterShakerAwaitShakeSpeedRunTimeCommand
+  | HeaterShakerDeactivateHeaterRunTimeCommand
 
-export interface MagneticModuleEngageMagnetCommand extends CommonCommandInfo {
+export type ModuleCreateCommand =
+  | MagneticModuleEngageMagnetCreateCommand
+  | MagneticModuleDisengageMagnetCreateCommand
+  | TemperatureModuleSetTargetTemperatureCreateCommand
+  | TemperatureModuleDeactivateCreateCommand
+  | TemperatureModuleAwaitTemperatureCreateCommand
+  | TCSetTargetBlockTemperatureCreateCommand
+  | TCSetTargetLidTemperatureCreateCommand
+  | TCAwaitBlockTemperatureCreateCommand
+  | TCAwaitLidTemperatureCreateCommand
+  | TCOpenLidCreateCommand
+  | TCCloseLidCreateCommand
+  | TCDeactivateBlockCreateCommand
+  | TCDeactivateLidCreateCommand
+  | TCRunProfileCreateCommand
+  | TCAwaitProfileCompleteCreateCommand
+  | HeaterShakerSetTargetTemperatureCreateCommand
+  | HeaterShakerAwaitTemperatureCreateCommand
+  | HeaterShakerSetTargetShakeSpeedCreateCommand
+  | HeaterShakerAwaitShakeSpeedCreateCommand
+  | HeaterShakerDeactivateHeaterCreateCommand
+
+export interface MagneticModuleEngageMagnetCreateCommand {
   commandType: 'magneticModule/engageMagnet'
   params: EngageMagnetParams
-  result?: any
 }
-export interface MagneticModuleDisengageMagnetCommand
-  extends CommonCommandInfo {
+export interface MagneticModuleEngageMagnetRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    MagneticModuleEngageMagnetCreateCommand {
+  result: any
+}
+export interface MagneticModuleDisengageMagnetCreateCommand {
   commandType: 'magneticModule/disengageMagnet'
   params: ModuleOnlyParams
-  result?: any
 }
-export interface TemperatureModuleSetTargetTemperatureCommand
-  extends CommonCommandInfo {
+export interface MagneticModuleDisengageMagnetRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    MagneticModuleDisengageMagnetCreateCommand {
+  result: any
+}
+export interface TemperatureModuleSetTargetTemperatureCreateCommand {
   commandType: 'temperatureModule/setTargetTemperature'
   params: TemperatureParams
-  result?: any
 }
-export interface TemperatureModuleDeactivateCommand extends CommonCommandInfo {
+export interface TemperatureModuleSetTargetTemperatureRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    TemperatureModuleSetTargetTemperatureCreateCommand {
+  result: any
+}
+export interface TemperatureModuleDeactivateCreateCommand {
   commandType: 'temperatureModule/deactivate'
   params: ModuleOnlyParams
-  result?: any
 }
-export interface TemperatureModuleAwaitTemperatureCommand
-  extends CommonCommandInfo {
+export interface TemperatureModuleDeactivateRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    TemperatureModuleDeactivateCreateCommand {
+  result: any
+}
+export interface TemperatureModuleAwaitTemperatureCreateCommand {
   commandType: 'temperatureModule/awaitTemperature'
   params: TemperatureParams
-  result?: any
 }
-export interface TCSetTargetBlockTemperatureCommand extends CommonCommandInfo {
+export interface TemperatureModuleAwaitTemperatureRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    TemperatureModuleAwaitTemperatureCreateCommand {
+  result: any
+}
+export interface TCSetTargetBlockTemperatureCreateCommand {
   commandType: 'thermocycler/setTargetBlockTemperature'
   params: ThermocyclerSetTargetBlockTemperatureParams
-  result?: any
 }
-export interface TCSetTargetLidTemperatureCommand extends CommonCommandInfo {
+export interface TCSetTargetBlockTemperatureRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    TCSetTargetBlockTemperatureCreateCommand {
+  result: any
+}
+export interface TCSetTargetLidTemperatureCreateCommand {
   commandType: 'thermocycler/setTargetLidTemperature'
   params: TemperatureParams
-  result?: any
 }
-export interface TCAwaitBlockTemperatureCommand extends CommonCommandInfo {
+export interface TCSetTargetLidTemperatureRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    TCSetTargetLidTemperatureCreateCommand {
+  result: any
+}
+export interface TCAwaitBlockTemperatureCreateCommand {
   commandType: 'thermocycler/awaitBlockTemperature'
   params: TemperatureParams
-  result?: any
 }
-export interface TCAwaitLidTemperatureCommand extends CommonCommandInfo {
+export interface TCAwaitBlockTemperatureRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    TCAwaitBlockTemperatureCreateCommand {
+  result: any
+}
+export interface TCAwaitLidTemperatureCreateCommand {
   commandType: 'thermocycler/awaitLidTemperature'
   params: TemperatureParams
-  result?: any
 }
-export interface TCOpenLidCommand extends CommonCommandInfo {
+export interface TCAwaitLidTemperatureRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    TCAwaitLidTemperatureCreateCommand {
+  result: any
+}
+export interface TCOpenLidCreateCommand {
   commandType: 'thermocycler/openLid'
   params: ModuleOnlyParams
-  result?: any
 }
-export interface TCCloseLidCommand extends CommonCommandInfo {
+export interface TCOpenLidRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    TCOpenLidCreateCommand {
+  result: any
+}
+export interface TCCloseLidCreateCommand {
   commandType: 'thermocycler/closeLid'
   params: ModuleOnlyParams
-  result?: any
 }
-export interface TCDeactivateBlockCommand extends CommonCommandInfo {
+export interface TCCloseLidRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    TCCloseLidCreateCommand {
+  result: any
+}
+export interface TCDeactivateBlockCreateCommand {
   commandType: 'thermocycler/deactivateBlock'
   params: ModuleOnlyParams
-  result?: any
 }
-export interface TCDeactivateLidCommand extends CommonCommandInfo {
+export interface TCDeactivateBlockRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    TCDeactivateBlockCreateCommand {
+  result: any
+}
+export interface TCDeactivateLidCreateCommand {
   commandType: 'thermocycler/deactivateLid'
   params: ModuleOnlyParams
-  result?: any
 }
-export interface TCRunProfileCommand extends CommonCommandInfo {
+export interface TCDeactivateLidRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    TCDeactivateLidCreateCommand {
+  result: any
+}
+export interface TCRunProfileCreateCommand {
   commandType: 'thermocycler/runProfile'
   params: TCProfileParams
-  result?: any
 }
-export interface TCAwaitProfileCompleteCommand extends CommonCommandInfo {
+export interface TCRunProfileRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    TCRunProfileCreateCommand {
+  result: any
+}
+export interface TCAwaitProfileCompleteCreateCommand {
   commandType: 'thermocycler/awaitProfileComplete'
   params: ModuleOnlyParams
-  result?: any
 }
-export interface HeaterShakerSetTargetTemperatureCommand
-  extends CommonCommandInfo {
+export interface TCAwaitProfileCompleteRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    TCAwaitProfileCompleteCreateCommand {
+  result: any
+}
+export interface HeaterShakerSetTargetTemperatureCreateCommand {
   commandType: 'heaterShaker/setTargetTemperature'
   params: TemperatureParams
-  result?: any
 }
-export interface HeaterShakerAwaitTemperatureCommand extends CommonCommandInfo {
+export interface HeaterShakerSetTargetTemperatureRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    HeaterShakerSetTargetTemperatureCreateCommand {
+  result: any
+}
+export interface HeaterShakerAwaitTemperatureCreateCommand {
   commandType: 'heaterShaker/awaitTemperature'
   params: TemperatureParams
-  result?: any
 }
-export interface HeaterShakerSetTargetShakeSpeedCommand
-  extends CommonCommandInfo {
+export interface HeaterShakerAwaitTemperatureRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    HeaterShakerAwaitTemperatureCreateCommand {
+  result: any
+}
+export interface HeaterShakerSetTargetShakeSpeedCreateCommand {
   commandType: 'heaterShaker/setTargetShakeSpeed'
   params: ShakeSpeedParams
-  result?: any
 }
-export interface HeaterShakerAwaitShakeSpeedCommand extends CommonCommandInfo {
+export interface HeaterShakerSetTargetShakeSpeedRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    HeaterShakerSetTargetShakeSpeedCreateCommand {
+  result: any
+}
+export interface HeaterShakerAwaitShakeSpeedCreateCommand {
   commandType: 'heaterShaker/awaitShakeSpeed'
   params: ShakeSpeedParams
-  result?: any
 }
-export interface HeaterShakerDeactivateHeaterCommand extends CommonCommandInfo {
+export interface HeaterShakerAwaitShakeSpeedRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    HeaterShakerAwaitShakeSpeedCreateCommand {
+  result: any
+}
+export interface HeaterShakerDeactivateHeaterCreateCommand {
   commandType: 'heaterShaker/deactivateHeater'
   params: ModuleOnlyParams
-  result?: any
+}
+export interface HeaterShakerDeactivateHeaterRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    HeaterShakerDeactivateHeaterCreateCommand {
+  result: any
 }
 
 export interface EngageMagnetParams {

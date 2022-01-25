@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { useDismissCurrentRunMutation } from '@opentrons/react-api-client'
-import { UseDismissCurrentRunMutationOptions } from '@opentrons/react-api-client/src/runs/useDismissCurrentRunMutation'
 import { useCurrentProtocolRun } from './useCurrentProtocolRun'
 import { useCurrentRunId } from './useCurrentRunId'
+import type { UseDismissCurrentRunMutationOptions } from '@opentrons/react-api-client/src/runs/useDismissCurrentRunMutation'
 
 type CloseCallback = (options?: UseDismissCurrentRunMutationOptions) => void
 
@@ -17,9 +17,12 @@ export function useCloseCurrentRun(): {
   } = useDismissCurrentRunMutation()
   const { protocolRecord, runRecord } = useCurrentProtocolRun()
 
-  const closeCurrentRun = (): void => {
+  const closeCurrentRun = (
+    options?: UseDismissCurrentRunMutationOptions
+  ): void => {
     if (currentRunId != null) {
       dismissCurrentRun(currentRunId, {
+        ...options,
         onError: () => console.warn('failed to dismiss current'),
       })
     }

@@ -1,6 +1,6 @@
-import type { AnonymousCommand } from '@opentrons/api-client'
+import type { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 
-export const mockAnonLoadCommand: AnonymousCommand = {
+export const mockAnonLoadCommand: CreateCommand = {
   commandType: 'loadLabware',
   params: {
     labwareId: 'abc123',

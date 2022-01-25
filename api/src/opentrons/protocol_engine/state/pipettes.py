@@ -165,8 +165,10 @@ class PipetteView(HasState[PipetteState]):
         hw_mount = mount.to_hw_mount()
         hw_config = attached_pipettes[hw_mount]
 
-        if hw_config is None:
-            raise errors.PipetteNotAttachedError(f"No pipetted attached on {mount}")
+        # TODO(mc, 2022-01-11): HW controller may return an empty dict for
+        # no pipette attached instead of `None`. Update when fixed in HWAPI
+        if not hw_config:
+            raise errors.PipetteNotAttachedError(f"No pipette attached on {mount}")
 
         elif (
             hw_config["name"] != pipette_name

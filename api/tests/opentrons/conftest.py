@@ -1,6 +1,7 @@
 # Uncomment to enable logging during tests
 # import logging
 # from logging.config import dictConfig
+from typing import AsyncGenerator
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
@@ -28,7 +29,13 @@ from opentrons.api.routers import MainRouter
 from opentrons.api import models
 from opentrons import config
 from opentrons import hardware_control as hc
-from opentrons.hardware_control import API, ThreadManager, ThreadedAsyncLock
+from opentrons.hardware_control import (
+    HardwareControlAPI,
+    API,
+    ThreadManager,
+    ThreadedAsyncLock,
+)
+from opentrons.hardware_control.ot3api import OT3API
 from opentrons.protocol_api import ProtocolContext
 from opentrons.types import Mount, Location, Point
 
@@ -110,13 +117,6 @@ def is_robot(monkeypatch):
 
 # -------feature flag fixtures-------------
 @pytest.fixture
-async def calibrate_bottom_flag():
-    await config.advanced_settings.set_adv_setting("calibrateToBottom", True)
-    yield
-    await config.advanced_settings.set_adv_setting("calibrateToBottom", False)
-
-
-@pytest.fixture
 async def short_trash_flag():
     await config.advanced_settings.set_adv_setting("shortFixedTrash", True)
     yield
@@ -135,6 +135,13 @@ async def enable_door_safety_switch():
     await config.advanced_settings.set_adv_setting("enableDoorSafetySwitch", True)
     yield
     await config.advanced_settings.set_adv_setting("enableDoorSafetySwitch", False)
+
+
+@pytest.fixture
+async def enable_ot3_hardware_controller():
+    await config.advanced_settings.set_adv_setting("enableOT3HardwareController", True)
+    yield
+    await config.advanced_settings.set_adv_setting("enableOT3HardwareController", False)
 
 
 # -----end feature flag fixtures-----------
@@ -171,9 +178,7 @@ def virtual_smoothie_env(monkeypatch):
     monkeypatch.setenv("ENABLE_VIRTUAL_SMOOTHIE", "false")
 
 
-@pytest.mark.skipif(aionotify is None, reason="requires inotify (linux only)")
-@pytest.fixture
-async def hardware(request, loop, virtual_smoothie_env):
+async def _build_ot2_hw() -> AsyncGenerator[HardwareControlAPI, None]:
     hw_sim = ThreadManager(API.build_hardware_simulator)
     old_config = config.robot_configs.load()
     try:
@@ -182,6 +187,58 @@ async def hardware(request, loop, virtual_smoothie_env):
         config.robot_configs.clear()
         hw_sim.set_config(old_config)
         hw_sim.clean_up()
+
+
+@pytest.mark.skipif(aionotify is None, reason="requires inotify (linux only)")
+@pytest.fixture
+async def ot2_hardware(request, loop, virtual_smoothie_env):
+    async for hw in _build_ot2_hw():
+        yield hw
+
+
+async def _build_ot3_hw() -> AsyncGenerator[HardwareControlAPI, None]:
+    hw_sim = ThreadManager(OT3API.build_hardware_simulator)
+    old_config = config.robot_configs.load()
+    try:
+        yield hw_sim
+    finally:
+        config.robot_configs.clear()
+        hw_sim.set_config(old_config)
+        hw_sim.clean_up()
+
+
+@pytest.mark.skipif(aionotify is None, reason="requires inotify (linux only)")
+@pytest.fixture
+async def ot3_hardware(request, loop, enable_ot3_hardware_controller):
+    async for hw in _build_ot3_hw():
+        yield hw
+
+
+@pytest.mark.skipif(aionotify is None, reason="requires inotify (linux only)")
+@pytest.fixture(
+    # these have to be lambdas because pytest calls them when providing the param
+    # value and we want to use the function's identity
+    params=[lambda: _build_ot2_hw, lambda: _build_ot3_hw],
+    ids=["ot2", "ot3"],
+)
+async def hardware(request, loop, virtual_smoothie_env):
+    if request.node.get_closest_marker("ot2_only") and request.param() == _build_ot3_hw:
+        pytest.skip()
+    if request.node.get_closest_marker("ot3_only") and request.param() == _build_ot2_hw:
+        pytest.skip()
+
+    # param() return a function we have to call
+    async for hw in request.param()():
+        if request.param() == _build_ot3_hw:
+            await config.advanced_settings.set_adv_setting(
+                "enableOT3HardwareController", True
+            )
+        try:
+            yield hw
+        finally:
+            await config.advanced_settings.set_adv_setting(
+                "enableOT3HardwareController", False
+            )
 
 
 @pytest.fixture

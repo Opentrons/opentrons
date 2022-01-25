@@ -20,7 +20,7 @@ from .exceptions import (
     ProtocolEngineStoppedError,
     WellOriginNotAllowedError,
     ModuleNotAttachedError,
-    ModuleDefinitionDoesNotExistError,
+    ModuleAlreadyPresentError,
     ModuleIsNotThermocyclerError,
     ThermocyclerNotOpenError,
 )
@@ -48,7 +48,7 @@ __all__ = [
     "ProtocolEngineStoppedError",
     "WellOriginNotAllowedError",
     "ModuleNotAttachedError",
-    "ModuleDefinitionDoesNotExistError",
+    "ModuleAlreadyPresentError",
     "ModuleIsNotThermocyclerError",
     "ThermocyclerNotOpenError",
     # error occurrence models

@@ -1,5 +1,5 @@
 import { PipetteName } from '../../../js'
-import type { Command } from './command'
+import type { RunTimeCommand } from './command'
 import type { LabwareDefinition2, ModuleModel } from '../../../js/types'
 
 export * from './command'
@@ -50,7 +50,7 @@ export interface ProtocolFile<DesignerApplicationData> {
       description: string
     }
   }
-  commands: Command[]
+  commands: RunTimeCommand[]
   commandAnnotations?: {
     commandIds: string[]
     annotationType: string

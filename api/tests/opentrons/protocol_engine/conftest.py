@@ -1,19 +1,32 @@
 """ProtocolEngine shared test fixtures."""
 import pytest
+from typing import AsyncGenerator
 
+from opentrons import config
+from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
 from opentrons_shared_data.labware import load_definition
-from opentrons_shared_data.module.dev_types import ModuleDefinitionV2
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.protocols.api_support.constants import STANDARD_DECK, SHORT_TRASH_DECK
+from opentrons.protocols.api_support.constants import (
+    STANDARD_OT2_DECK,
+    SHORT_TRASH_DECK,
+)
 from opentrons.protocol_engine.types import ModuleDefinition
+
+
+@pytest.fixture(scope="function")
+async def short_trash_flag() -> AsyncGenerator[None, None]:
+    """Feature flag simulator for short fixed trash."""
+    await config.advanced_settings.set_adv_setting("shortFixedTrash", True)
+    yield
+    await config.advanced_settings.set_adv_setting("shortFixedTrash", False)
 
 
 @pytest.fixture(scope="session")
 def standard_deck_def() -> DeckDefinitionV2:
     """Get the OT-2 standard deck definition."""
-    return load_deck(STANDARD_DECK, 2)
+    return load_deck(STANDARD_OT2_DECK, 2)
 
 
 @pytest.fixture(scope="session")
@@ -66,7 +79,36 @@ def falcon_tuberack_def() -> LabwareDefinition:
     )
 
 
-@pytest.fixture
-def tempdeck_v1_def(minimal_module_def: ModuleDefinitionV2) -> ModuleDefinition:
+@pytest.fixture(scope="session")
+def tempdeck_v1_def() -> ModuleDefinition:
     """Get the definition of a V1 tempdeck."""
-    return ModuleDefinition.parse_obj(minimal_module_def)
+    definition = load_shared_data("module/definitions/2/temperatureModuleV1.json")
+    return ModuleDefinition.parse_raw(definition)
+
+
+@pytest.fixture(scope="session")
+def tempdeck_v2_def() -> ModuleDefinition:
+    """Get the definition of a V2 tempdeck."""
+    definition = load_shared_data("module/definitions/2/temperatureModuleV2.json")
+    return ModuleDefinition.parse_raw(definition)
+
+
+@pytest.fixture(scope="session")
+def magdeck_v1_def() -> ModuleDefinition:
+    """Get the definition of a V1 magdeck."""
+    definition = load_shared_data("module/definitions/2/magneticModuleV1.json")
+    return ModuleDefinition.parse_raw(definition)
+
+
+@pytest.fixture(scope="session")
+def magdeck_v2_def() -> ModuleDefinition:
+    """Get the definition of a V2 magdeck."""
+    definition = load_shared_data("module/definitions/2/magneticModuleV2.json")
+    return ModuleDefinition.parse_raw(definition)
+
+
+@pytest.fixture(scope="session")
+def thermocycler_v1_def() -> ModuleDefinition:
+    """Get the definition of a V2 thermocycler."""
+    definition = load_shared_data("module/definitions/2/thermocyclerModuleV1.json")
+    return ModuleDefinition.parse_raw(definition)

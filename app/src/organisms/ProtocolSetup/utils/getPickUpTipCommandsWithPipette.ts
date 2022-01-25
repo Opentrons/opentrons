@@ -1,13 +1,13 @@
-import { PickUpTipCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
-import { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
+import { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+import { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 
 export const getPickUpTipCommandsWithPipette = (
-  commands: Command[],
+  commands: RunTimeCommand[],
   pipetteId: string
-): PickUpTipCommand[] =>
+): PickUpTipRunTimeCommand[] =>
   commands
     .filter(
-      (command): command is PickUpTipCommand =>
+      (command): command is PickUpTipRunTimeCommand =>
         command.commandType === 'pickUpTip'
     )
     .filter(command => command.params.pipetteId === pipetteId)

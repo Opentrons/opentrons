@@ -20,6 +20,7 @@ export interface UseCurrentProtocolRun {
   protocolRecord?: Protocol | null
   runRecord?: Run | null
   isCreatingProtocolRun?: boolean
+  protocolCreationError: string | null
 }
 
 export function useCurrentProtocolRun(): UseCurrentProtocolRun {
@@ -30,6 +31,9 @@ export function useCurrentProtocolRun(): UseCurrentProtocolRun {
     refetchInterval: REFETCH_INTERVAL,
   })
   const [isInitializing, setIsInitializing] = React.useState(false)
+  const [protocolCreationError, setProtocolCreationError] = React.useState<
+    string | null
+  >(null)
   const enableProtocolPolling = React.useRef<boolean>(
     runRecord?.data.protocolId != null
   )
@@ -77,13 +81,20 @@ export function useCurrentProtocolRun(): UseCurrentProtocolRun {
     onSuccess: data => {
       createRun({ protocolId: data.data.id })
     },
+    onError: error => {
+      setProtocolCreationError(error.response?.data.errors[0].detail ?? null)
+    },
   })
 
   return {
-    createProtocolRun,
+    createProtocolRun: (...args) => {
+      setProtocolCreationError(null)
+      createProtocolRun(...args)
+    },
     protocolRecord,
     runRecord,
     isCreatingProtocolRun:
       isCreatingProtocol || isCreatingRun || isInitializing,
+    protocolCreationError,
   }
 }

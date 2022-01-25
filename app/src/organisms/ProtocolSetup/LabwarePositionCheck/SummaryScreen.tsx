@@ -95,7 +95,7 @@ export const SummaryScreen = (props: {
             />
           </Flex>
           <Flex paddingTop={SPACING_2}>
-            <DeckMap completedLabwareIdSections={labwareIds} />
+            <DeckMap completedLabwareIds={labwareIds} />
           </Flex>
         </Flex>
         <Flex flex={'1 1 45%'}>

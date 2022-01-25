@@ -103,8 +103,14 @@ def test_aspirate(set_up_paired_instrument, monkeypatch, ctx):
 
     fake_hw_aspirate = mock.Mock()
     fake_move = mock.Mock()
-    monkeypatch.setattr(API, "aspirate", fake_hw_aspirate)
-    monkeypatch.setattr(API, "move_to", fake_move)
+    monkeypatch.setattr(
+        ctx._implementation.get_hardware().hardware._obj_to_adapt,
+        "aspirate",
+        fake_hw_aspirate,
+    )
+    monkeypatch.setattr(
+        ctx._implementation.get_hardware().hardware._obj_to_adapt, "move_to", fake_move
+    )
 
     paired.pick_up_tip()
     paired.aspirate(2.0, lw.wells()[0].bottom())
@@ -158,18 +164,24 @@ def test_dispense(set_up_paired_instrument, monkeypatch, ctx):
 
     disp_called_with = None
 
-    async def fake_hw_dispense(self, mount, volume=None, rate=1.0):
+    async def fake_hw_dispense(mount, volume=None, rate=1.0):
         nonlocal disp_called_with
         disp_called_with = (mount, volume, rate)
 
     move_called_with = None
 
-    def fake_move(self, mount, loc, **kwargs):
+    async def fake_move(mount, abs_position, **kwargs):
         nonlocal move_called_with
-        move_called_with = (mount, loc, kwargs)
+        move_called_with = (mount, abs_position, kwargs)
 
-    monkeypatch.setattr(API, "dispense", fake_hw_dispense)
-    monkeypatch.setattr(API, "move_to", fake_move)
+    monkeypatch.setattr(
+        ctx._implementation.get_hardware().hardware._obj_to_adapt,
+        "dispense",
+        fake_hw_dispense,
+    )
+    monkeypatch.setattr(
+        ctx._implementation.get_hardware().hardware._obj_to_adapt, "move_to", fake_move
+    )
     paired.pick_up_tip()
     paired.dispense(2.0, lw.wells()[0].bottom())
     assert "dispensing" in ",".join([cmd.lower() for cmd in ctx.commands()])
@@ -280,7 +292,7 @@ def test_air_gap(set_up_paired_instrument, monkeypatch, ctx):
         policy, air_gap_loc, critical_point=None, max_speeds={}, speed=400.0
     )
     move_mock = mock.Mock()
-    monkeypatch.setattr(API, "move_to", move_mock)
+    monkeypatch.setattr(hardware._obj_to_adapt, "move_to", move_mock)
 
     paired.pick_up_tip()
     assert r_pip.current_volume == 0
@@ -309,7 +321,7 @@ def test_air_gap(set_up_paired_instrument, monkeypatch, ctx):
     paired.drop_tip()
 
     aspirate_mock = mock.Mock()
-    monkeypatch.setattr(API, "aspirate", aspirate_mock)
+    monkeypatch.setattr(hardware._obj_to_adapt, "aspirate", aspirate_mock)
     move_mock.reset_mock()
 
     assert ctx.location_cache != lw.wells()[0].top(5)
@@ -340,13 +352,17 @@ def test_touch_tip_new_default_args(ctx, monkeypatch):
     total_hw_moves = []
 
     async def fake_hw_move(
-        self, mount, abs_position, speed=None, critical_point=None, max_speeds=None
+        mount, abs_position, speed=None, critical_point=None, max_speeds=None
     ):
         nonlocal total_hw_moves
         total_hw_moves.append((abs_position, speed))
 
     paired.aspirate(10, lw.wells()[0])
-    monkeypatch.setattr(API, "move_to", fake_hw_move)
+    monkeypatch.setattr(
+        ctx._implementation.get_hardware().hardware._obj_to_adapt,
+        "move_to",
+        fake_hw_move,
+    )
     paired.touch_tip()
     assert "touching tip" in ",".join([cmd.lower() for cmd in ctx.commands()])
     z_offset = Point(0, 0, 1)  # default z offset of 1mm

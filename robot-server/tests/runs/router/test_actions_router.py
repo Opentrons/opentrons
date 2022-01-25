@@ -47,14 +47,15 @@ def prev_run(decoy: Decoy, run_store: RunStore) -> RunResource:
     return run
 
 
-async def test_create_play_action(
+async def test_create_play_action_to_start_run(
     decoy: Decoy,
     run_view: RunView,
     run_store: RunStore,
     engine_store: EngineStore,
     prev_run: RunResource,
+    task_runner: TaskRunner,
 ) -> None:
-    """It should handle a play action."""
+    """It should handle a play action that start the runner."""
     action = RunAction(
         actionType=RunActionType.PLAY,
         createdAt=datetime(year=2022, month=2, day=2),
@@ -77,6 +78,61 @@ async def test_create_play_action(
             created_at=datetime(year=2022, month=2, day=2),
         ),
     ).then_return((action, next_run))
+
+    decoy.when(engine_store.runner.was_started()).then_return(False)
+
+    result = await create_run_action(
+        runId="run-id",
+        request_body=RequestModel(data=RunActionCreate(actionType=RunActionType.PLAY)),
+        run_view=run_view,
+        run_store=run_store,
+        engine_store=engine_store,
+        action_id="action-id",
+        created_at=datetime(year=2022, month=2, day=2),
+        task_runner=task_runner,
+    )
+
+    assert result.content.data == action
+    assert result.status_code == 201
+
+    decoy.verify(
+        task_runner.run(engine_store.runner.run),
+        run_store.upsert(run=next_run),
+    )
+
+
+async def test_create_play_action_to_resume_run(
+    decoy: Decoy,
+    run_view: RunView,
+    run_store: RunStore,
+    engine_store: EngineStore,
+    prev_run: RunResource,
+) -> None:
+    """It should handle a play action that resumes the runner."""
+    action = RunAction(
+        actionType=RunActionType.PLAY,
+        createdAt=datetime(year=2022, month=2, day=2),
+        id="action-id",
+    )
+
+    next_run = RunResource(
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1),
+        actions=[action],
+        is_current=True,
+    )
+
+    decoy.when(
+        run_view.with_action(
+            run=prev_run,
+            action_id="action-id",
+            action_data=RunActionCreate(actionType=RunActionType.PLAY),
+            created_at=datetime(year=2022, month=2, day=2),
+        ),
+    ).then_return((action, next_run))
+
+    decoy.when(engine_store.runner.was_started()).then_return(True)
 
     result = await create_run_action(
         runId="run-id",
@@ -125,6 +181,7 @@ async def test_create_play_action_not_allowed(
     run_store: RunStore,
     engine_store: EngineStore,
     prev_run: RunResource,
+    task_runner: TaskRunner,
 ) -> None:
     """It should 409 if the runner is not able to handle the action."""
     actions = RunAction(
@@ -150,6 +207,8 @@ async def test_create_play_action_not_allowed(
         ),
     ).then_return((actions, next_run))
 
+    decoy.when(engine_store.runner.was_started()).then_return(True)
+
     decoy.when(engine_store.runner.play()).then_raise(
         ProtocolEngineStoppedError("oh no")
     )
@@ -163,6 +222,7 @@ async def test_create_play_action_not_allowed(
             run_view=run_view,
             run_store=run_store,
             engine_store=engine_store,
+            task_runner=task_runner,
             action_id="action-id",
             created_at=datetime(year=2022, month=2, day=2),
         )

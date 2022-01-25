@@ -13,7 +13,7 @@ from opentrons_ot3_firmware.arbitration_id import (
     ArbitrationIdParts,
 )
 from opentrons_ot3_firmware.messages.payloads import (
-    DeviceInfoResponsePayload,
+    GetStatusResponsePayload,
 )
 from opentrons_hardware.scripts import can_comm
 from opentrons_ot3_firmware.constants import MessageId, NodeId
@@ -44,7 +44,9 @@ def test_prompt_message_without_payload(
     r = can_comm.prompt_message(mock_get_input, mock_output)
     assert r == CanMessage(
         arbitration_id=ArbitrationId(
-            parts=ArbitrationIdParts(message_id=message_id, node_id=node_id)
+            parts=ArbitrationIdParts(
+                message_id=message_id, node_id=node_id, originating_node_id=NodeId.host
+            )
         ),
         data=b"",
     )
@@ -64,7 +66,9 @@ def test_prompt_message_with_payload(
     r = can_comm.prompt_message(mock_get_input, mock_output)
     assert r == CanMessage(
         arbitration_id=ArbitrationId(
-            parts=ArbitrationIdParts(message_id=message_id, node_id=node_id)
+            parts=ArbitrationIdParts(
+                message_id=message_id, node_id=node_id, originating_node_id=NodeId.host
+            )
         ),
         data=b"\xff\x00\xff\x00",
     )
@@ -101,18 +105,19 @@ def test_prompt_payload_bad_input(
     """It should raise on bad input."""
     mock_get_input.side_effect = user_input
     with pytest.raises(can_comm.InvalidInput):
-        can_comm.prompt_payload(DeviceInfoResponsePayload, mock_get_input)
+        can_comm.prompt_payload(GetStatusResponsePayload, mock_get_input)
 
 
 def test_prompt_message_bad_input(
     mock_get_input: MagicMock, mock_output: MagicMock
 ) -> None:
     """It should raise on bad input."""
-    message_id = MessageId.device_info_response
+    message_id = MessageId.get_status_response
     node_id = NodeId.pipette
     mock_get_input.side_effect = [
         str(list(MessageId).index(message_id)),
         str(list(NodeId).index(node_id)),
+        "-123",
         # out of range for Uint32
         str(0x1FF00FF00),
     ]

@@ -10,7 +10,7 @@ from typing_extensions import Literal
 from fastapi import APIRouter, Depends, status
 from pydantic import BaseModel, Field
 
-from opentrons.protocol_engine import LabwareOffsetCreate
+from opentrons.protocol_engine import Command, LabwareOffsetCreate
 
 from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.dependencies import get_current_time, get_unique_id
@@ -113,15 +113,7 @@ async def get_run_data_from_url(
         createdAt=run.created_at,
         current=run.is_current,
         actions=run.actions,
-        commands=[
-            RunCommandSummary.construct(
-                id=c.id,
-                commandType=c.commandType,
-                status=c.status,
-                errorId=c.errorId,
-            )
-            for c in engine_state.commands.get_all()
-        ],
+        commands=[_summarize_command(c) for c in engine_state.commands.get_all()],
         errors=engine_state.commands.get_all_errors(),
         pipettes=engine_state.pipettes.get_all(),
         labware=engine_state.labware.get_all(),
@@ -182,10 +174,6 @@ async def create_run(
     if protocol_resource is not None:
         engine_store.runner.load(protocol_resource.source)
 
-    # TODO(mc, 2021-08-05): capture errors from `runner.join` and place
-    # them in the run resource
-    task_runner.run(engine_store.runner.join)
-
     run = RunResource(
         run_id=run_id,
         protocol_id=protocol_id,
@@ -203,12 +191,7 @@ async def create_run(
         createdAt=run.created_at,
         current=run.is_current,
         actions=run.actions,
-        commands=[
-            RunCommandSummary.construct(
-                id=c.id, commandType=c.commandType, status=c.status
-            )
-            for c in engine_state.commands.get_all()
-        ],
+        commands=[_summarize_command(c) for c in engine_state.commands.get_all()],
         errors=[],
         pipettes=engine_state.pipettes.get_all(),
         labware=engine_state.labware.get_all(),
@@ -252,15 +235,7 @@ async def get_runs(
             createdAt=run.created_at,
             current=run.is_current,
             actions=run.actions,
-            commands=[
-                RunCommandSummary.construct(
-                    id=c.id,
-                    commandType=c.commandType,
-                    status=c.status,
-                    errorId=c.errorId,
-                )
-                for c in engine_state.commands.get_all()
-            ],
+            commands=[_summarize_command(c) for c in engine_state.commands.get_all()],
             errors=engine_state.commands.get_all_errors(),
             pipettes=engine_state.pipettes.get_all(),
             labware=engine_state.labware.get_all(),
@@ -390,15 +365,7 @@ async def add_labware_offset(
         createdAt=run.created_at,
         current=run.is_current,
         actions=run.actions,
-        commands=[
-            RunCommandSummary.construct(
-                id=c.id,
-                commandType=c.commandType,
-                status=c.status,
-                errorId=c.errorId,
-            )
-            for c in engine_state.commands.get_all()
-        ],
+        commands=[_summarize_command(c) for c in engine_state.commands.get_all()],
         errors=engine_state.commands.get_all_errors(),
         pipettes=engine_state.pipettes.get_all(),
         labware=engine_state.labware.get_all(),
@@ -468,15 +435,7 @@ async def update_run(
         createdAt=run.created_at,
         current=run.is_current,
         actions=run.actions,
-        commands=[
-            RunCommandSummary.construct(
-                id=c.id,
-                commandType=c.commandType,
-                status=c.status,
-                errorId=c.errorId,
-            )
-            for c in engine_state.commands.get_all()
-        ],
+        commands=[_summarize_command(c) for c in engine_state.commands.get_all()],
         errors=engine_state.commands.get_all_errors(),
         pipettes=engine_state.pipettes.get_all(),
         labware=engine_state.labware.get_all(),
@@ -487,4 +446,14 @@ async def update_run(
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=data),
         status_code=status.HTTP_200_OK,
+    )
+
+
+def _summarize_command(full_command: Command) -> RunCommandSummary:
+    return RunCommandSummary.construct(
+        id=full_command.id,
+        key=full_command.key,
+        commandType=full_command.commandType,
+        status=full_command.status,
+        errorId=full_command.errorId,
     )

@@ -149,7 +149,6 @@ async def test_create_run(
         # It should have added each requested labware offset to the engine,
         # in the exact order they appear in the request.
         *[engine_store.engine.add_labware_offset(r) for r in LABWARE_OFFSET_REQUESTS],
-        task_runner.run(engine_store.runner.join),
         run_store.upsert(run=expected_run),
     )
 
@@ -238,7 +237,6 @@ async def test_create_protocol_run(
         # in the exact order they appear in the request.
         *[engine_store.engine.add_labware_offset(r) for r in LABWARE_OFFSET_REQUESTS],
         engine_store.runner.load(protocol_resource.source),
-        task_runner.run(engine_store.runner.join),
         run_store.upsert(run=run),
     )
 
@@ -324,6 +322,7 @@ async def test_get_run_data_from_url(
         commands=[
             RunCommandSummary.construct(
                 id=command.id,
+                key=command.key,
                 commandType=command.commandType,
                 status=command.status,
             ),
@@ -406,6 +405,7 @@ async def test_get_run_with_errors(
         commands=[
             RunCommandSummary.construct(
                 id=command.id,
+                key=command.key,
                 commandType=command.commandType,
                 status=command.status,
                 errorId="error-1",

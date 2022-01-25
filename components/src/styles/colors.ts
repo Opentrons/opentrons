@@ -19,6 +19,7 @@ export const C_POWDER_BLUE = '#f1f8ff'
 // TODO(mc, 2020-10-08): s/COLOR_/C_
 export const COLOR_WARNING = '#e28200'
 export const COLOR_WARNING_LIGHT = '#ffd58f'
+export const COLOR_WARNING_DARK = '#9e5e00'
 export const COLOR_ERROR = '#d12929'
 export const COLOR_SUCCESS = '#60b120'
 export const C_DISABLED = '#9c9c9c'

@@ -104,6 +104,9 @@ async def test_send_command_response(
         ["alarm", AlarmResponse],
         ["ALARM", AlarmResponse],
         ["This is an Alarm", AlarmResponse],
+        ["error:Alarm lock", AlarmResponse],
+        ["alarm:error", AlarmResponse],
+        ["ALARM: Hard limit -X", AlarmResponse],
     ],
 )
 def test_raise_on_error(

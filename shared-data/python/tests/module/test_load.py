@@ -26,7 +26,7 @@ def test_bad_module_name_throws():
         load_definition('1', 'alsjdag')
 
     with pytest.raises(ModuleNotFoundError):
-        load_definition('2', 'asdasda')
+        load_definition('2', 'asdasda')  # type: ignore[call-overload]
 
 
 @pytest.mark.parametrize('schemaname', ['1', '2'])

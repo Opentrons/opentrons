@@ -126,8 +126,10 @@ async def _create_thread_manager() -> ThreadManagedHardware:
             HardwareAPI.build_hardware_simulator
         )
     elif should_use_ot3():
+        from opentrons.hardware_control.ot3api import OT3API
+
         thread_manager = ThreadManager(
-            HardwareAPI.build_ot3_controller,
+            OT3API.build_hardware_controller,
             threadmanager_nonblocking=True,
         )
     else:

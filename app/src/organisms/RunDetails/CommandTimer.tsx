@@ -13,8 +13,8 @@ import { useFormatRunTimestamp, useTimeElapsedSincePause } from './hooks'
 
 const EMPTY_TIMESTAMP = '-- : -- : --'
 interface TimerProps {
-  commandStartedAt?: string
-  commandCompletedAt?: string
+  commandStartedAt?: string | null
+  commandCompletedAt?: string | null
 }
 export function CommandTimer(props: TimerProps): JSX.Element | null {
   const { commandStartedAt, commandCompletedAt } = props

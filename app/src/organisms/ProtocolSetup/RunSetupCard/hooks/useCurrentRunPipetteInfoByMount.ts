@@ -13,8 +13,8 @@ import { getTipLengthCalibrations } from '../../../../redux/calibration'
 
 import { useProtocolDetails } from '../../../RunDetails/hooks'
 
-import type { LoadPipetteCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-import type { PickUpTipCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+import type { LoadPipetteRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import type { Mount, AttachedPipette } from '../../../../redux/pipettes/types'
 import type {
   LabwareDefinition2,
@@ -60,11 +60,11 @@ export function useCurrentRunPipetteInfoByMount(): {
   }
   const { pipettes, labware, labwareDefinitions, commands } = protocolData
   const loadPipetteCommands = commands.filter(
-    (command): command is LoadPipetteCommand =>
+    (command): command is LoadPipetteRunTimeCommand =>
       command.commandType === 'loadPipette'
   )
   const pickUpTipCommands = commands.filter(
-    (command): command is PickUpTipCommand =>
+    (command): command is PickUpTipRunTimeCommand =>
       command.commandType === 'pickUpTip'
   )
 

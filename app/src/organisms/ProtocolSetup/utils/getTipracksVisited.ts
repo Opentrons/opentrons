@@ -1,7 +1,7 @@
-import { PickUpTipCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+import { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 
 export const getTipracksVisited = (
-  pickupTipCommands: PickUpTipCommand[]
+  pickupTipCommands: PickUpTipRunTimeCommand[]
 ): string[] =>
   pickupTipCommands.reduce<string[]>((visited, command) => {
     const tiprack = command.params.labwareId

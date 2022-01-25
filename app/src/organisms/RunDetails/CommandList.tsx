@@ -28,7 +28,7 @@ import { ProtocolSetupInfo } from './ProtocolSetupInfo'
 import { CommandItem } from './CommandItem'
 import type {
   ProtocolFile,
-  Command,
+  RunTimeCommand,
   CommandStatus,
 } from '@opentrons/shared-data'
 import type { RunCommandSummary } from '@opentrons/api-client'
@@ -55,7 +55,7 @@ export function CommandList(): JSX.Element | null {
           status: 'queued' as CommandStatus,
         }))
       : []
-  const allProtocolCommands: Command[] =
+  const allProtocolCommands: RunTimeCommand[] =
     protocolData != null ? analysisCommandsWithStatus : []
 
   const firstNonSetupIndex = allProtocolCommands.findIndex(
@@ -68,12 +68,12 @@ export function CommandList(): JSX.Element | null {
     0,
     firstNonSetupIndex
   )
-  const postSetupAnticipatedCommands: Command[] = allProtocolCommands.slice(
+  const postSetupAnticipatedCommands: RunTimeCommand[] = allProtocolCommands.slice(
     firstNonSetupIndex
   )
 
   interface CommandRuntimeInfo {
-    analysisCommand: Command | null // analysisCommand will only be null if protocol is nondeterministic
+    analysisCommand: RunTimeCommand | null // analysisCommand will only be null if protocol is nondeterministic
     runCommandSummary: RunCommandSummary | null
   }
 
@@ -89,7 +89,7 @@ export function CommandList(): JSX.Element | null {
     firstPlayTimestamp != null
   ) {
     const firstPostPlayRunCommandIndex = runDataCommands.findIndex(
-      command => command.id === postSetupAnticipatedCommands[0]?.id
+      command => command.key === postSetupAnticipatedCommands[0]?.key
     )
     const postPlayRunCommands =
       firstPostPlayRunCommandIndex >= 0
@@ -100,7 +100,7 @@ export function CommandList(): JSX.Element | null {
               analysisCommand:
                 postSetupAnticipatedCommands.find(
                   postSetupAnticipatedCommand =>
-                    runDataCommand.id === postSetupAnticipatedCommand.id
+                    runDataCommand.key === postSetupAnticipatedCommand.key
                 ) ?? null,
             }))
         : []
@@ -108,7 +108,7 @@ export function CommandList(): JSX.Element | null {
     const remainingAnticipatedCommands = dropWhile(
       postSetupAnticipatedCommands,
       anticipatedCommand =>
-        runDataCommands.some(runC => runC.id === anticipatedCommand.id)
+        runDataCommands.some(runC => runC.key === anticipatedCommand.key)
     ).map(remainingAnticipatedCommand => ({
       analysisCommand: remainingAnticipatedCommand,
       runCommandSummary: null,
@@ -118,8 +118,8 @@ export function CommandList(): JSX.Element | null {
       (isDeterministic, command, index) => {
         return (
           isDeterministic &&
-          command.runCommandSummary.id ===
-            postSetupAnticipatedCommands[index]?.id
+          command.runCommandSummary.key ===
+            postSetupAnticipatedCommands[index]?.key
         )
       },
       true
@@ -145,12 +145,12 @@ export function CommandList(): JSX.Element | null {
 
   return (
     <React.Fragment>
-      <Flex flexDirection={DIRECTION_COLUMN} flex={'auto'}>
+      <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING_2}>
         {runStatus === 'failed' ||
         runStatus === 'succeeded' ||
         runStatus === 'stop-requested' ||
         runStatus === 'stopped' ? (
-          <Box padding={SPACING_2}>
+          <Box padding={`${SPACING_2} ${SPACING_2} ${SPACING_2} 0`}>
             <AlertItem
               type={
                 runStatus === 'stop-requested' ||
@@ -164,21 +164,20 @@ export function CommandList(): JSX.Element | null {
           </Box>
         ) : null}
         <Flex
-          paddingLeft={SPACING_2}
+          paddingY={SPACING_2}
           css={FONT_HEADER_DARK}
           textTransform={TEXT_TRANSFORM_CAPITALIZE}
         >
           {t('protocol_steps')}
         </Flex>
         {protocolSetupCommandList.length > 0 && (
-          <Flex margin={SPACING_1}>
+          <Flex marginY={SPACING_1}>
             {showProtocolSetupInfo ? (
               <React.Fragment>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   flex={'auto'}
                   backgroundColor={C_NEAR_WHITE}
-                  marginLeft={SPACING_2}
                 >
                   <Flex
                     justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -209,7 +208,7 @@ export function CommandList(): JSX.Element | null {
                       return (
                         <ProtocolSetupInfo
                           key={command.id}
-                          setupCommand={command as Command}
+                          setupCommand={command as RunTimeCommand}
                         />
                       )
                     })}
@@ -221,7 +220,7 @@ export function CommandList(): JSX.Element | null {
                 width={'100%'}
                 role={'link'}
                 onClick={() => setShowProtocolSetupInfo(true)}
-                margin={SPACING_1}
+                paddingRight={SPACING_1}
               >
                 <Flex
                   fontSize={FONT_SIZE_CAPTION}
@@ -229,7 +228,7 @@ export function CommandList(): JSX.Element | null {
                   textTransform={TEXT_TRANSFORM_UPPERCASE}
                   color={C_MED_DARK_GRAY}
                   backgroundColor={C_NEAR_WHITE}
-                  marginLeft={SPACING_1}
+                  marginRight={SPACING_1}
                 >
                   <Flex padding={SPACING_2}>{t('protocol_setup')}</Flex>
                   <Flex>
@@ -260,22 +259,18 @@ export function CommandList(): JSX.Element | null {
                     command.analysisCommand?.id ?? command.runCommandSummary?.id
                   }
                   id={`RunDetails_CommandItem`}
-                  paddingLeft={SPACING_1}
                   justifyContent={JUSTIFY_START}
                   flexDirection={DIRECTION_COLUMN}
                   flex={'auto'}
                 >
                   {showAnticipatedStepsTitle && (
-                    <Flex
-                      fontSize={FONT_SIZE_CAPTION}
-                      marginLeft={SPACING_2}
-                      paddingBottom={SPACING_1}
-                    >
+                    <Flex fontSize={FONT_SIZE_CAPTION} paddingY={SPACING_1}>
                       {t('anticipated')}
                     </Flex>
                   )}
                   <Flex
-                    padding={`${SPACING_1} ${SPACING_2} ${SPACING_1} ${SPACING_2}`}
+                    paddingY={SPACING_1}
+                    paddingRight={SPACING_2}
                     flexDirection={DIRECTION_COLUMN}
                     flex={'auto'}
                   >
@@ -283,13 +278,14 @@ export function CommandList(): JSX.Element | null {
                       analysisCommand={command.analysisCommand}
                       runCommandSummary={command.runCommandSummary}
                       runStatus={runStatus}
+                      currentRunId={runRecord?.data.id ?? null}
                     />
                   </Flex>
                 </Flex>
               )
             })}
           </Flex>
-          <Flex padding={SPACING_1}>{t('end_of_protocol')}</Flex>
+          <Flex paddingY={SPACING_1}>{t('end_of_protocol')}</Flex>
         </Flex>
       </Flex>
     </React.Fragment>

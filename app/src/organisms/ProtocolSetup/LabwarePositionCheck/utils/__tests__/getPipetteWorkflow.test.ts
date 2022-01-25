@@ -2,7 +2,7 @@ import { PipetteName } from '@opentrons/shared-data'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { getPipetteWorkflow } from '../getPipetteWorkflow'
 import { doesPipetteVisitAllTipracks } from '../doesPipetteVisitAllTipracks'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
+import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 
 jest.mock('../doesPipetteVisitAllTipracks')
 
@@ -43,7 +43,7 @@ describe('getPipetteWorkflow', () => {
     const primaryPipetteId = 'someId'
     const labware = {}
     const labwareDefinitions = {}
-    const moveToWellCommand: Command = {
+    const moveToWellCommand: RunTimeCommand = {
       id: '1',
       commandType: 'moveToWell',
       params: {
@@ -59,8 +59,8 @@ describe('getPipetteWorkflow', () => {
           },
         },
       },
-    }
-    const commands: Command[] = [moveToWellCommand]
+    } as any
+    const commands: RunTimeCommand[] = [moveToWellCommand]
 
     when(mockDoesPipetteVisitAllTipracks)
       .calledWith(primaryPipetteId, labware, labwareDefinitions, commands)
@@ -81,7 +81,7 @@ describe('getPipetteWorkflow', () => {
     const primaryPipetteId = 'someId'
     const labware = {}
     const labwareDefinitions = {}
-    const moveToWellCommand: Command = {
+    const moveToWellCommand: RunTimeCommand = {
       id: '1',
       commandType: 'moveToWell',
       params: {
@@ -97,8 +97,8 @@ describe('getPipetteWorkflow', () => {
           },
         },
       },
-    }
-    const commands: Command[] = [moveToWellCommand]
+    } as any
+    const commands: RunTimeCommand[] = [moveToWellCommand]
 
     when(mockDoesPipetteVisitAllTipracks)
       .calledWith(primaryPipetteId, labware, labwareDefinitions, commands)

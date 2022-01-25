@@ -8,7 +8,7 @@ import { useCurrentRunPipetteInfoByMount } from '../../ProtocolSetup/RunSetupCar
 import { ProtocolSetupInfo } from '../ProtocolSetupInfo'
 import { useProtocolDetails } from '../hooks'
 import type {
-  Command,
+  RunTimeCommand,
   LabwareDefinition2,
   ProtocolFile,
 } from '@opentrons/shared-data'
@@ -43,7 +43,7 @@ const COMMAND_TYPE_LOAD_LABWARE = {
     definition: fixture_96_plate as LabwareDefinition2,
     offset: { x: 0, y: 0, z: 0 },
   },
-} as Command
+} as RunTimeCommand
 const COMMAND_TYPE_TRASH = {
   commandType: 'loadLabware',
   params: {
@@ -57,7 +57,7 @@ const COMMAND_TYPE_TRASH = {
       },
     },
   },
-} as Command
+} as RunTimeCommand
 const LABWARE_LOCATION_WITH_MODULE = {
   moduleId: 'magneticModuleId',
 }
@@ -72,7 +72,7 @@ const COMMAND_TYPE_LOAD_LABWARE_WITH_MODULE = {
     definition: fixture_96_plate as LabwareDefinition2,
     offset: { x: 0, y: 0, z: 0 },
   },
-} as Command
+} as RunTimeCommand
 const COMMAND_TYPE_LOAD_MODULE = {
   commandType: 'loadModule',
   params: {
@@ -82,7 +82,7 @@ const COMMAND_TYPE_LOAD_MODULE = {
   result: {
     moduleId: 'temperature_module_gen2',
   },
-} as Command
+} as RunTimeCommand
 const COMMAND_TYPE_LOAD_MODULE_TC = {
   commandType: 'loadModule',
   params: {
@@ -92,7 +92,7 @@ const COMMAND_TYPE_LOAD_MODULE_TC = {
   result: {
     moduleId: TC_ID,
   },
-} as Command
+} as RunTimeCommand
 const COMMAND_TYPE_LOAD_PIPETTE = {
   commandType: 'loadPipette',
   params: {
@@ -102,7 +102,7 @@ const COMMAND_TYPE_LOAD_PIPETTE = {
   result: {
     pipetteId: '300uL_multichannel',
   },
-} as Command
+} as RunTimeCommand
 
 const PICKUP_TIP_LABWARE_ID = 'PICKUP_TIP_LABWARE_ID'
 const PRIMARY_PIPETTE_ID = 'My Pipette'

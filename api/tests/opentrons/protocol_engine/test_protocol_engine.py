@@ -249,6 +249,7 @@ def test_pause(
     )
 
 
+@pytest.mark.parametrize("drop_tips_and_home", [True, False])
 async def test_finish(
     decoy: Decoy,
     action_dispatcher: ActionDispatcher,
@@ -257,14 +258,17 @@ async def test_finish(
     hardware_api: HardwareAPI,
     subject: ProtocolEngine,
     hardware_stopper: HardwareStopper,
+    drop_tips_and_home: bool,
 ) -> None:
     """It should be able to gracefully tell the engine it's done."""
-    await subject.finish()
+    await subject.finish(drop_tips_and_home=drop_tips_and_home)
 
     decoy.verify(
         action_dispatcher.dispatch(FinishAction()),
         await queue_worker.join(),
-        await hardware_stopper.do_stop(home_after=True),
+        await hardware_stopper.do_stop_and_recover(
+            drop_tips_and_home=drop_tips_and_home
+        ),
         action_dispatcher.dispatch(HardwareStoppedAction()),
         plugin_starter.stop(),
     )
@@ -297,7 +301,7 @@ async def test_finish_with_error(
     decoy.verify(
         action_dispatcher.dispatch(FinishAction(error_details=expected_error_details)),
         await queue_worker.join(),
-        await hardware_stopper.do_stop(home_after=True),
+        await hardware_stopper.do_stop_and_recover(drop_tips_and_home=True),
         action_dispatcher.dispatch(HardwareStoppedAction()),
     )
 
@@ -318,7 +322,7 @@ async def test_finish_stops_hardware_if_queue_worker_join_fails(
         await subject.finish()
 
     decoy.verify(
-        await hardware_stopper.do_stop(home_after=True),
+        await hardware_stopper.do_stop_and_recover(drop_tips_and_home=True),
         times=1,
     )
 
@@ -344,14 +348,13 @@ async def test_stop(
     subject: ProtocolEngine,
     hardware_stopper: HardwareStopper,
 ) -> None:
-    """It should be able to stop the engine."""
+    """It should be able to stop the engine and halt the hardware."""
     await subject.stop()
 
     decoy.verify(
         action_dispatcher.dispatch(StopAction()),
         queue_worker.cancel(),
-        await hardware_stopper.do_halt_and_recover(),
-        action_dispatcher.dispatch(HardwareStoppedAction()),
+        await hardware_stopper.do_halt(),
     )
 
 
