@@ -46,7 +46,9 @@ export function createSnippet(
           const { x, y, z } = labwareOffset.vector
           addendum = [
             loadStatement,
-            `labware_${index}.set_offset(x=${x}, y=${y}, z=${z})`,
+            `labware_${index}.set_offset(x=${x.toFixed(2)}, y=${y.toFixed(
+              2
+            )}, z=${z.toFixed(2)})`,
             '',
           ]
         }
