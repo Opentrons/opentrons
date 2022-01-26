@@ -5,7 +5,7 @@ import { useCurrentProtocolRun } from '../ProtocolUpload/hooks'
 import { formatInterval } from '../RunTimeControl/utils'
 import type { ProtocolFile } from '@opentrons/shared-data'
 interface ProtocolDetails {
-  displayName: string | undefined
+  displayName: string | null
   protocolData: ProtocolFile<{}> | null
 }
 
@@ -55,7 +55,7 @@ export function useProtocolDetails(): ProtocolDetails {
   const displayName =
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name
-  return { displayName, protocolData }
+  return { displayName: displayName ?? null, protocolData }
 }
 
 export function useTimeElapsedSincePause(): string | null {
