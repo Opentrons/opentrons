@@ -33,6 +33,7 @@ import { mockCalibrationStatus } from '../../../redux/calibration/__fixtures__'
 import { useRunStatus, useRunControls } from '../../RunTimeControl/hooks'
 import { useCurrentProtocolRun } from '../hooks/useCurrentProtocolRun'
 import { useCloseCurrentRun } from '../hooks/useCloseCurrentRun'
+import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
 import { UploadInput } from '../UploadInput'
 import { ProtocolUpload, ProtocolLoader } from '..'
 
@@ -94,6 +95,7 @@ const mockGetValidCustomLabwareFiles = customLabwareSelectors.getValidCustomLabw
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
+
 const queryClient = new QueryClient()
 
 const render = () => {
@@ -141,7 +143,6 @@ describe('ProtocolUpload', () => {
       .mockReturnValue({ pause: jest.fn() } as any)
     mockTrackEvent = jest.fn()
     when(mockUseTrackEvent).calledWith().mockReturnValue(mockTrackEvent)
-
     when(mockUploadInput).mockReturnValue(<div></div>)
   })
   afterEach(() => {
@@ -171,7 +172,7 @@ describe('ProtocolUpload', () => {
       .calledWith()
       .mockReturnValue({
         protocolRecord: {
-          data: { analyses: [], metadata: { protocolName: 'protocolName' } },
+          data: { analyses: [] },
         },
         runRecord: {},
         createProtocolRun: jest.fn(),
@@ -187,9 +188,7 @@ describe('ProtocolUpload', () => {
     when(mockUseCurrentProtocolRun)
       .calledWith()
       .mockReturnValue({
-        protocolRecord: {
-          data: { analyses: [], metadata: { protocolName: 'protocolName' } },
-        },
+        protocolRecord: {},
         runRecord: {},
         createProtocolRun: jest.fn(),
       } as any)
@@ -204,9 +203,7 @@ describe('ProtocolUpload', () => {
     when(mockUseCurrentProtocolRun)
       .calledWith()
       .mockReturnValue({
-        protocolRecord: {
-          data: { analyses: [], metadata: { protocolName: 'protocolName' } },
-        },
+        protocolRecord: {},
         runRecord: {},
         createProtocolRun: jest.fn(),
       } as any)
@@ -248,9 +245,7 @@ describe('ProtocolUpload', () => {
     when(mockUseCurrentProtocolRun)
       .calledWith()
       .mockReturnValue({
-        protocolRecord: {
-          data: { analyses: [], metadata: { protocolName: 'protocolName' } },
-        },
+        protocolRecord: { data: { analyses: [] } },
         runRecord: {},
         createProtocolRun: jest.fn(),
       } as any)
@@ -268,9 +263,7 @@ describe('ProtocolUpload', () => {
     when(mockUseCurrentProtocolRun)
       .calledWith()
       .mockReturnValue({
-        protocolRecord: {
-          data: { analyses: [], metadata: { protocolName: 'protocolName' } },
-        },
+        protocolRecord: { data: { analyses: [] } },
         runRecord: {},
         createProtocolRun: jest.fn(),
       } as any)
@@ -288,9 +281,7 @@ describe('ProtocolUpload', () => {
     when(mockUseCurrentProtocolRun)
       .calledWith()
       .mockReturnValue({
-        protocolRecord: {
-          data: { analyses: [], metadata: { protocolName: 'protocolName' } },
-        },
+        protocolRecord: { data: { analyses: [] } },
         runRecord: {},
         createProtocolRun: jest.fn(),
       } as any)
@@ -308,9 +299,7 @@ describe('ProtocolUpload', () => {
     when(mockUseCurrentProtocolRun)
       .calledWith()
       .mockReturnValue({
-        protocolRecord: {
-          data: { analyses: [], metadata: { protocolName: 'protocolName' } },
-        },
+        protocolRecord: { data: { analyses: [] } },
         runRecord: {},
         createProtocolRun: jest.fn(),
       } as any)
@@ -330,9 +319,7 @@ describe('ProtocolUpload', () => {
     when(mockUseCurrentProtocolRun)
       .calledWith()
       .mockReturnValue({
-        protocolRecord: {
-          data: { analyses: [], metadata: { protocolName: 'protocolName' } },
-        },
+        protocolRecord: { data: { analyses: [] } },
         runRecord: {},
         createProtocolRun: jest.fn(),
       } as any)
@@ -345,14 +332,26 @@ describe('ProtocolUpload', () => {
     fireEvent.click(button)
     expect(screen.queryByText('mock confirm cancel modal')).not.toBeNull()
   })
-
-  it('renders only the protocol title with no button when run status is stop requested', () => {
+  it('renders protocol title', () => {
     when(mockUseCurrentProtocolRun)
       .calledWith()
       .mockReturnValue({
-        protocolRecord: {
-          data: { analyses: [], metadata: { protocolName: 'protocolName' } },
-        },
+        protocolRecord: { withModulesProtocol },
+        runRecord: {},
+        createProtocolRun: jest.fn(),
+      } as any)
+    mockUseProtocolDetails.mockReturnValue({
+      displayName: 'mock protocol name',
+    } as any)
+    const [{ getByText }] = render()
+    getByText('Protocol - mock protocol name')
+  })
+
+  it('renders only the protocol with no button when run status is stop requested', () => {
+    when(mockUseCurrentProtocolRun)
+      .calledWith()
+      .mockReturnValue({
+        protocolRecord: { data: { analyses: [] } },
         runRecord: {},
         createProtocolRun: jest.fn(),
       } as any)
@@ -363,7 +362,7 @@ describe('ProtocolUpload', () => {
       <div>mock confirm cancel modal</div>
     )
     const [{ getByText }] = render()
-    getByText('Protocol - protocolName')
+    getByText('Protocol -')
     expect(screen.queryByText('mock confirm cancel modal')).toBeNull()
     expect(screen.queryByText('Cancel Run')).toBeNull()
   })
@@ -385,7 +384,6 @@ describe('ProtocolUpload', () => {
                 ],
               },
             ],
-            metadata: { protocolName: 'protocolName' },
           },
         },
         runRecord: {},
@@ -404,9 +402,7 @@ describe('ProtocolUpload', () => {
     when(mockUseCurrentProtocolRun)
       .calledWith()
       .mockReturnValue({
-        protocolRecord: {
-          data: { analyses: [], metadata: { protocolName: 'protocolName' } },
-        },
+        protocolRecord: {},
         runRecord: {},
         createProtocolRun: jest.fn(),
         protocolCreationError: 'invalid protocol!',

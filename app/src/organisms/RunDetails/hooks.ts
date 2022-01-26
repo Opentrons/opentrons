@@ -53,9 +53,8 @@ export function useProtocolDetails(): ProtocolDetails {
     }
   }
   const displayName =
-    protocolRecord?.data.metadata.protocolName === undefined
-      ? protocolRecord?.data.files[0].name
-      : protocolRecord?.data.metadata.protocolName
+    protocolRecord?.data.metadata.protocolName ??
+    protocolRecord?.data.files[0].name
   return { displayName, protocolData }
 }
 
