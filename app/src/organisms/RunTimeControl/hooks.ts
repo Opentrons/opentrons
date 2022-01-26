@@ -11,6 +11,7 @@ import {
   RUN_STATUS_STOPPED,
   RUN_STATUS_FAILED,
   RUN_STATUS_SUCCEEDED,
+  RUN_ACTION_TYPE_STOP,
 } from '@opentrons/api-client'
 import {
   useCommandQuery,
@@ -123,6 +124,21 @@ export function useRunPauseTime(): string | null {
   const lastAction = last(actions)
 
   return lastAction?.actionType === RUN_ACTION_TYPE_PAUSE
+    ? lastAction.createdAt
+    : null
+}
+
+export function useRunStopTime(): string | null {
+  const { runRecord } = useCurrentProtocolRun()
+
+  const currentRunId = runRecord?.data?.id
+
+  const { data } = useRunQuery(currentRunId as string)
+
+  const actions = data?.data.actions as RunAction[]
+  const lastAction = last(actions)
+
+  return lastAction?.actionType === RUN_ACTION_TYPE_STOP
     ? lastAction.createdAt
     : null
 }
