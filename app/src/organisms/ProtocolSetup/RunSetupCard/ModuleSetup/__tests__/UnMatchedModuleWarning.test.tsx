@@ -13,7 +13,7 @@ const render = (props: React.ComponentProps<typeof UnMatchedModuleWarning>) => {
 describe('UnMatchedModuleWarning', () => {
   let props: React.ComponentProps<typeof UnMatchedModuleWarning>
   beforeEach(() => {
-    props = { isUnnecessaryModules: true }
+    props = { isAnyModuleUnnecessary: true }
   })
 
   it('should render the correct header', () => {

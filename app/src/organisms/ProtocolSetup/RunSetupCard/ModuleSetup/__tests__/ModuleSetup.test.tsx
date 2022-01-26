@@ -143,7 +143,7 @@ describe('ModuleSetup', () => {
     when(mockUnMatchedModuleWarning)
       .calledWith(
         componentPropsMatcher({
-          isUnnecessaryModules: false,
+          isAnyModuleUnnecessary: false,
         })
       )
       .mockReturnValue(<div></div>)
@@ -291,7 +291,7 @@ describe('ModuleSetup', () => {
     when(mockUnMatchedModuleWarning)
       .calledWith(
         componentPropsMatcher({
-          isUnnecessaryModules: true,
+          isAnyModuleUnnecessary: true,
         })
       )
       .mockReturnValue(<div>mock modules mismatch</div>)

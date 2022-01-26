@@ -47,15 +47,13 @@ describe('useModuleMatchResults', () => {
   beforeEach(() => {
     store.dispatch = jest.fn()
 
-    when(mockGetConnectedRobot)
-      .calledWith(undefined as any)
-      .mockReturnValue(mockConnectedRobot)
+    when(mockGetConnectedRobot).mockReturnValue(mockConnectedRobot)
+
+    when(mockUseModuleRenderInfoById).calledWith().mockReturnValue({})
 
     when(mockGetAttachedModules)
       .calledWith(undefined as any, mockConnectedRobot.name)
-      .mockReturnValue([])
-
-    when(mockUseModuleRenderInfoById).calledWith().mockReturnValue({})
+      .mockReturnValue([mockTemperatureModule])
   })
 
   afterEach(() => {
@@ -67,6 +65,10 @@ describe('useModuleMatchResults', () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
       <Provider store={store}>{children}</Provider>
     )
+    when(mockGetAttachedModules)
+      .calledWith(undefined as any, mockConnectedRobot.name)
+      .mockReturnValue([])
+
     const { result } = renderHook(useModuleMatchResults, { wrapper })
     const { missingModuleIds, remainingAttachedModules } = result.current
     expect(missingModuleIds).toStrictEqual([])
@@ -93,6 +95,9 @@ describe('useModuleMatchResults', () => {
           slotName: '1',
         },
       })
+    when(mockGetAttachedModules)
+      .calledWith(undefined as any, mockConnectedRobot.name)
+      .mockReturnValue([])
 
     const { result } = renderHook(useModuleMatchResults, { wrapper })
     const { missingModuleIds } = result.current
@@ -119,10 +124,6 @@ describe('useModuleMatchResults', () => {
           slotName: '1',
         },
       })
-
-    when(mockGetAttachedModules)
-      .calledWith(undefined as any, mockConnectedRobot.name)
-      .mockReturnValue([mockTemperatureModule])
 
     const { result } = renderHook(useModuleMatchResults, { wrapper })
     const { missingModuleIds } = result.current
@@ -153,10 +154,6 @@ describe('useModuleMatchResults', () => {
         },
       })
 
-    when(mockGetAttachedModules)
-      .calledWith(undefined as any, mockConnectedRobot.name)
-      .mockReturnValue([mockTemperatureModule])
-
     const { result } = renderHook(useModuleMatchResults, { wrapper })
     const { missingModuleIds } = result.current
     expect(missingModuleIds).toStrictEqual([moduleId])
@@ -166,10 +163,6 @@ describe('useModuleMatchResults', () => {
       <Provider store={store}>{children}</Provider>
     )
     const remaingingModule = mockTemperatureModule
-
-    when(mockGetAttachedModules)
-      .calledWith(undefined as any, mockConnectedRobot.name)
-      .mockReturnValue([mockTemperatureModule])
 
     const { result } = renderHook(useModuleMatchResults, { wrapper })
     const { remainingAttachedModules } = result.current

@@ -19,7 +19,7 @@ import {
 } from '@opentrons/components'
 
 interface UnMatchedModuleWarningProps {
-  isUnnecessaryModules: boolean
+  isAnyModuleUnnecessary: boolean
 }
 
 export const UnMatchedModuleWarning = (
@@ -27,9 +27,9 @@ export const UnMatchedModuleWarning = (
 ): JSX.Element | null => {
   const { t } = useTranslation('protocol_setup')
   const [showModulesMismatch, setShowModulesMismatch] = React.useState<boolean>(
-    false
+    true
   )
-  const isVisible = !showModulesMismatch && props.isUnnecessaryModules
+  const isVisible = showModulesMismatch && props.isAnyModuleUnnecessary
   if (!isVisible) return null
 
   return (
@@ -57,7 +57,7 @@ export const UnMatchedModuleWarning = (
             </Flex>
             <Btn
               size={SIZE_2}
-              onClick={() => setShowModulesMismatch(true)}
+              onClick={() => setShowModulesMismatch(false)}
               aria-label="close"
             >
               <Icon name={'close'} color={COLOR_WARNING} />

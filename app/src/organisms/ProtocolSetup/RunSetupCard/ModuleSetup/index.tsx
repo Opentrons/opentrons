@@ -99,7 +99,7 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
       ) : null}
 
       <UnMatchedModuleWarning
-        isUnnecessaryModules={
+        isAnyModuleUnnecessary={
           remainingAttachedModules.length !== 0 && missingModuleIds.length !== 0
         }
       />
