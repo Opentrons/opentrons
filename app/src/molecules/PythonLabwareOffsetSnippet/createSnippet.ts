@@ -37,6 +37,8 @@ export function createSnippet(
           command.result.labwareId,
           protocol.labware
         )
+        console.log('labwareDefUri', labwareDefUri)
+        console.log('labwareOffsets', labwareOffsets)
         const labwareOffset = labwareOffsets?.find(
           offset => offset.definitionUri === labwareDefUri
         )
