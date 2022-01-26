@@ -60,9 +60,10 @@ export function CommandList(): JSX.Element | null {
   const currentItemRef = React.useRef<HTMLDivElement>(null)
   const runDataCommands = runRecord?.data.commands
   const [windowIndex, setWindowIndex] = React.useState<number>(0)
-  const [isInitiallyJumpingToCurrent, setIsInitiallyJumpingToCurrent] = React.useState<boolean>(
-    false
-  )
+  const [
+    isInitiallyJumpingToCurrent,
+    setIsInitiallyJumpingToCurrent,
+  ] = React.useState<boolean>(false)
 
   const firstPlayTimestamp = runRecord?.data.actions.find(
     action => action.actionType === 'play'
@@ -152,7 +153,8 @@ export function CommandList(): JSX.Element | null {
     windowFirstCommandIndex + WINDOW_SIZE
   )
   const isFirstWindow = windowIndex === 0
-  const isFinalWindow = currentCommandList.length - 1 <= windowFirstCommandIndex + WINDOW_SIZE
+  const isFinalWindow =
+    currentCommandList.length - 1 <= windowFirstCommandIndex + WINDOW_SIZE
 
   const currentItemIndex = currentCommandList.findIndex(
     command =>
@@ -176,7 +178,10 @@ export function CommandList(): JSX.Element | null {
 
   // if jumping to current item and on correct window index, scroll to current item
   React.useEffect(() => {
-    if (isInitiallyJumpingToCurrent && windowIndex === indexOfWindowContainingCurrentItem) {
+    if (
+      isInitiallyJumpingToCurrent &&
+      windowIndex === indexOfWindowContainingCurrentItem
+    ) {
       currentItemRef.current?.scrollIntoView({ behavior: 'smooth' })
       setIsInitiallyJumpingToCurrent(false)
     }
@@ -201,19 +206,19 @@ export function CommandList(): JSX.Element | null {
   const onScroll = (): void => {
     if (listInnerRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = listInnerRef.current
-      const firstIndexInWindow = windowIndex * WINDOW_SIZE
       if (
         scrollTop + clientHeight + EAGER_BUFFER_COEFFICIENT * clientHeight >=
-        scrollHeight
+          scrollHeight &&
+        !isFinalWindow
       ) {
         const potentialNextWindowFirstIndex =
-          firstIndexInWindow + WINDOW_OVERLAP
+          windowFirstCommandIndex + WINDOW_OVERLAP
         if (potentialNextWindowFirstIndex < currentCommandList.length) {
           setWindowIndex(windowIndex + 1)
         }
       } else if (scrollTop <= EAGER_BUFFER_COEFFICIENT * clientHeight) {
         const potentialPrevWindowFirstIndex =
-          firstIndexInWindow - WINDOW_OVERLAP
+          windowFirstCommandIndex - WINDOW_OVERLAP
         if (windowIndex > 0 && potentialPrevWindowFirstIndex >= 0) {
           setWindowIndex(windowIndex - 1)
           listInnerRef.current?.scrollTo({ top: 1 })
@@ -324,7 +329,9 @@ export function CommandList(): JSX.Element | null {
             )
           })}
           {isFinalWindow ? (
-            <Flex paddingY={SPACING_1}>{t('end_of_protocol')}</Flex>
+            <Text paddingY={SPACING_1} marginBottom="98vh">
+              {t('end_of_protocol')}
+            </Text>
           ) : null}
         </Flex>
       </Flex>

@@ -187,7 +187,11 @@ export function CommandItemComponent(
         alignItems={ALIGN_CENTER}
       >
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-          <Text fontSize={FONT_SIZE_CAPTION} marginRight={SPACING_3} minWidth={SIZE_1}>
+          <Text
+            fontSize={FONT_SIZE_CAPTION}
+            marginRight={SPACING_3}
+            minWidth={SIZE_1}
+          >
             {stepNumber}
           </Text>
           <CommandText
