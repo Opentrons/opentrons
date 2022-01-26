@@ -1,12 +1,13 @@
 """Basic modules data state and store."""
 from dataclasses import dataclass
-from typing import Dict, List, Optional, NamedTuple
+from typing import Dict, List, NamedTuple, Sequence
 from numpy import array, dot
 
 from opentrons.types import DeckSlotName
 from ..types import (
     LoadedModule,
     ModuleModel,
+    ModuleType,
     ModuleDefinition,
     DeckSlotLocation,
     ModuleDimensions,
@@ -25,7 +26,7 @@ class SlotTransit(NamedTuple):
     end: DeckSlotName
 
 
-THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = [
+_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = [
     SlotTransit(start=DeckSlotName.SLOT_1, end=DeckSlotName.FIXED_TRASH),
     SlotTransit(start=DeckSlotName.FIXED_TRASH, end=DeckSlotName.SLOT_1),
     SlotTransit(start=DeckSlotName.SLOT_4, end=DeckSlotName.FIXED_TRASH),
@@ -43,19 +44,22 @@ THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = [
 ]
 
 
+@dataclass(frozen=True)
+class HardwareModule:
+    """Data describing an actually connected module."""
+
+    serial_number: str
+    definition: ModuleDefinition
+
+
 @dataclass
 class ModuleState:
     """Basic module data state and getter methods."""
 
-    modules_by_id: Dict[str, LoadedModule]
-
-    # TODO (spp, 2021-11-24): remove definition_by_model and
-    #  unconditionally fetch definitions from ModuleDataProvider
-    definition_by_model: Dict[ModuleModel, ModuleDefinition]
+    slot_by_module_id: Dict[str, DeckSlotName]
+    hardware_module_by_slot: Dict[DeckSlotName, HardwareModule]
 
 
-# TODO(mc, 2021-12-28): ModuleStore is entirely untested. See
-# https://github.com/Opentrons/opentrons/issues/8914
 class ModuleStore(HasState[ModuleState], HandlesActions):
     """Module state container."""
 
@@ -63,7 +67,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
 
     def __init__(self) -> None:
         """Initialize a ModuleStore and its state."""
-        self._state = ModuleState(modules_by_id={}, definition_by_model={})
+        self._state = ModuleState(slot_by_module_id={}, hardware_module_by_slot={})
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
@@ -73,18 +77,15 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
     def _handle_command(self, command: Command) -> None:
         if isinstance(command.result, LoadModuleResult):
             module_id = command.result.moduleId
+            serial_number = command.result.serialNumber
+            definition = command.result.definition
+            slot_name = command.params.location.slotName
 
-            self._state.modules_by_id[module_id] = LoadedModule(
-                id=module_id,
-                model=command.params.model,
-                location=command.params.location,
-                serial=command.result.moduleSerial,
-                definition=command.result.definition,
+            self._state.slot_by_module_id[module_id] = slot_name
+            self._state.hardware_module_by_slot[slot_name] = HardwareModule(
+                serial_number=serial_number,
+                definition=definition,
             )
-
-            self._state.definition_by_model[
-                command.params.model
-            ] = command.result.definition
 
 
 class ModuleView(HasState[ModuleState]):
@@ -99,64 +100,52 @@ class ModuleView(HasState[ModuleState]):
     def get(self, module_id: str) -> LoadedModule:
         """Get module data by the module's unique identifier."""
         try:
-            return self._state.modules_by_id[module_id]
+            slot_name = self._state.slot_by_module_id[module_id]
+            attached_module = self._state.hardware_module_by_slot[slot_name]
+
         except KeyError:
             raise errors.ModuleDoesNotExistError(f"Module {module_id} not found.")
 
+        return LoadedModule.construct(
+            id=module_id,
+            model=attached_module.definition.model,
+            serialNumber=attached_module.serial_number,
+            location=DeckSlotLocation(slotName=slot_name),
+            definition=attached_module.definition,
+        )
+
     def get_all(self) -> List[LoadedModule]:
         """Get a list of all module entries in state."""
-        mod_list = []
-        for mod in self._state.modules_by_id.values():
-            mod_list.append(mod)
-        return mod_list
+        return [self.get(mod_id) for mod_id in self._state.slot_by_module_id.keys()]
 
     def get_location(self, module_id: str) -> DeckSlotLocation:
         """Get the slot location of the given module."""
-        return self.get(module_id=module_id).location
+        return self.get(module_id).location
 
     def get_model(self, module_id: str) -> ModuleModel:
         """Get the model name of the given module."""
-        return self.get(module_id=module_id).model
+        return self.get(module_id).model
 
-    def get_serial(self, module_id: str) -> str:
+    def get_serial_number(self, module_id: str) -> str:
         """Get the hardware serial number of the given module.
 
         If the underlying hardware API is simulating, this will be a dummy value
         provided by the hardware API.
         """
-        loaded_module = self.get(module_id=module_id)
-        # As far as we know, None can never actually happen. See todo in
-        # protocol_engine.types.LoadedModule.
-        assert loaded_module.serial is not None
-        return loaded_module.serial
+        return self.get(module_id).serialNumber
 
-    def get_definition_by_id(self, module_id: str) -> ModuleDefinition:
+    def get_definition(self, module_id: str) -> ModuleDefinition:
         """Module definition by ID."""
         return self.get(module_id).definition
-
-    def get_definition_by_model(self, model: ModuleModel) -> ModuleDefinition:
-        """Return module definition by model."""
-        try:
-            return self._state.definition_by_model[model]
-        except KeyError as e:
-            raise errors.ModuleDefinitionDoesNotExistError(
-                f"Module definition for matching {model} not found."
-            ) from e
-
-    def get_by_serial(self, serial: str) -> Optional[LoadedModule]:
-        """Get a loaded module by its serial number."""
-        for mod in self.get_all():
-            if mod.serial == serial:
-                return mod
-        return None
 
     def get_dimensions(self, module_id: str) -> ModuleDimensions:
         """Get the specified module's dimensions."""
         return self.get(module_id).definition.dimensions
 
+    # TODO(mc, 2022-01-19): this method is missing unit test coverage
     def get_module_offset(self, module_id: str) -> LabwareOffsetVector:
         """Get the module's offset vector computed with slot transform."""
-        definition = self.get_definition_by_id(module_id)
+        definition = self.get_definition(module_id)
         slot = self.get_location(module_id).slotName.value
         pre_transform = array(
             (definition.labwareOffset.x, definition.labwareOffset.y, 1)
@@ -170,23 +159,30 @@ class ModuleView(HasState[ModuleState]):
         xform = array(xforms_ser)
         xformed = dot(xform, pre_transform)  # type: ignore[no-untyped-call]
         return LabwareOffsetVector(
-            x=xformed[0], y=xformed[1], z=definition.labwareOffset.z
+            x=xformed[0],
+            y=xformed[1],
+            z=definition.labwareOffset.z,
         )
 
+    # TODO(mc, 2022-01-19): this method is missing unit test coverage and
+    # is also unused. Remove or add tests.
     def get_overall_height(self, module_id: str) -> float:
         """Get the height of the module."""
-        return self.get_definition_by_id(module_id).dimensions.bareOverallHeight
+        return self.get_dimensions(module_id).bareOverallHeight
 
+    # TODO(mc, 2022-01-19): this method is missing unit test coverage
     def get_height_over_labware(self, module_id: str) -> float:
         """Get the height of module parts above module labware base."""
-        return self.get_definition_by_id(module_id).dimensions.overLabwareHeight
+        return self.get_dimensions(module_id).overLabwareHeight
 
+    # TODO(mc, 2022-01-19): this method is missing unit test coverage and
+    # is also unused. Remove or add tests.
     def get_lid_height(self, module_id: str) -> float:
         """Get lid height if module is thermocycler."""
-        definition = self.get_definition_by_id(module_id)
+        definition = self.get_definition(module_id)
 
         if (
-            definition.moduleType == "thermocyclerModuleType"
+            definition.moduleType == ModuleType.THERMOCYCLER
             and hasattr(definition.dimensions, "lidHeight")
             and definition.dimensions.lidHeight is not None
         ):
@@ -196,17 +192,10 @@ class ModuleView(HasState[ModuleState]):
                 f"Cannot get lid height of {definition.moduleType}"
             )
 
-    def get_module_by_location(
-        self, deck_location: DeckSlotLocation
-    ) -> Optional[LoadedModule]:
-        """Get the module loaded in the given slot."""
-        for mod in self.get_all():
-            if mod.location == deck_location:
-                return mod
-        return None
-
     def should_dodge_thermocycler(
-        self, from_slot: DeckSlotName, to_slot: DeckSlotName
+        self,
+        from_slot: DeckSlotName,
+        to_slot: DeckSlotName,
     ) -> bool:
         """Decide if the requested path would cross the thermocycler, if installed.
 
@@ -217,6 +206,54 @@ class ModuleView(HasState[ModuleState]):
             mod.model for mod in all_mods
         ]:
             transit = (from_slot, to_slot)
-            if transit in THERMOCYCLER_SLOT_TRANSITS_TO_DODGE:
+            if transit in _THERMOCYCLER_SLOT_TRANSITS_TO_DODGE:
                 return True
         return False
+
+    def find_attached_module(
+        self,
+        model: ModuleModel,
+        location: DeckSlotLocation,
+        attached_modules: Sequence[HardwareModule],
+    ) -> HardwareModule:
+        """Get the next matching hardware module for the given model and location.
+
+        If a "matching" model is found already loaded in state at the requested
+        location, that hardware module will be "reused" and selected. This behavior
+        allows multiple load module commands to be issued while always preserving
+        module hardware instance to deck slot mapping, which is required for
+        multiples-of-a-module functionality.
+
+        Args:
+            model: The requested module model. The selected module may have a
+                different model if the definition lists the model as compatible.
+            location: The location the module will be assigned to.
+            attached_modules: All attached modules as reported by the HardwareAPI,
+                in the order in which they should be used.
+
+        Raises:
+            ModuleNotAttachedError: A not-yet-assigned module matching the requested
+                parameters could not be found in the attached modules list.
+            ModuleAlreadyPresentError: A module of a different type is already
+                assigned to the requested location.
+        """
+        existing_mod = self._state.hardware_module_by_slot.get(location.slotName)
+
+        if existing_mod:
+            existing_def = existing_mod.definition
+
+            if existing_def.model == model or model in existing_def.compatibleWith:
+                return existing_mod
+
+            else:
+                raise errors.ModuleAlreadyPresentError(
+                    f"A {existing_def.model.value} is already"
+                    f" present in {location.slotName.value}"
+                )
+
+        for m in attached_modules:
+            if m not in self._state.hardware_module_by_slot.values():
+                if model == m.definition.model or model in m.definition.compatibleWith:
+                    return m
+
+        raise errors.ModuleNotAttachedError(f"No available {model.value} found.")

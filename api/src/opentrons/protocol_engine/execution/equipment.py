@@ -4,22 +4,12 @@ from typing import Optional
 
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.protocols.geometry.module_geometry import (
-    resolve_module_type,
-    module_model_from_string,
-)
 from opentrons.types import MountType
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.modules.mod_abc import AbstractModule
 
-from ..errors import (
-    FailedToLoadPipetteError,
-    LabwareDefinitionDoesNotExistError,
-    ModuleNotAttachedError,
-    ModuleDefinitionDoesNotExistError,
-)
+from ..errors import FailedToLoadPipetteError, LabwareDefinitionDoesNotExistError
 from ..resources import LabwareDataProvider, ModuleDataProvider, ModelUtils
-from ..state import StateStore
+from ..state import StateStore, HardwareModule
 from ..types import (
     LabwareLocation,
     PipetteName,
@@ -51,7 +41,7 @@ class LoadedModuleData:
     """The result of a load module procedure."""
 
     module_id: str
-    module_serial: Optional[str]
+    serial_number: str
     definition: ModuleDefinition
 
 
@@ -182,7 +172,10 @@ class EquipmentHandler:
         return LoadedPipetteData(pipette_id=pipette_id)
 
     async def load_module(
-        self, model: ModuleModel, location: DeckSlotLocation, module_id: Optional[str]
+        self,
+        model: ModuleModel,
+        location: DeckSlotLocation,
+        module_id: Optional[str],
     ) -> LoadedModuleData:
         """Ensure the required module is attached.
 
@@ -193,43 +186,32 @@ class EquipmentHandler:
                        If None, an ID will be generated.
 
         Returns:
-            A LoadedModuleData object
+            A LoadedModuleData object.
+
+        Raises:
+            ModuleNotAttachedError: A not-yet-assigned module matching the requested
+                parameters could not be found in the attached modules list.
+            ModuleAlreadyPresentError: A module of a different type is already
+                assigned to the requested location.
         """
-        definition: ModuleDefinition
-        try:
-            # Try to use existing definition in state.
-            definition = self._state_store.modules.get_definition_by_model(model)
-        except ModuleDefinitionDoesNotExistError:
-            definition = self._module_data_provider.get_module_definition(model)
+        attached_modules = [
+            HardwareModule(
+                serial_number=hw_mod.device_info["serial"],
+                definition=self._module_data_provider.get_definition(
+                    ModuleModel(hw_mod.model())
+                ),
+            )
+            for hw_mod in self._hardware_api.attached_modules
+        ]
 
-        module_id = module_id or self._model_utils.generate_id()
-
-        attached_mod_instance = await self._get_hardware_module(model)
+        attached_module = self._state_store.modules.find_attached_module(
+            model=model,
+            location=location,
+            attached_modules=attached_modules,
+        )
 
         return LoadedModuleData(
-            module_id=module_id,
-            module_serial=attached_mod_instance.device_info.get("serial"),
-            definition=definition,
+            module_id=self._model_utils.ensure_id(module_id),
+            serial_number=attached_module.serial_number,
+            definition=attached_module.definition,
         )
-
-    async def _get_hardware_module(self, model: ModuleModel) -> AbstractModule:
-        hw_model = module_model_from_string(model.value)
-        model_type = resolve_module_type(hw_model)
-
-        available, simulating = await self._hardware_api.find_modules(
-            by_model=hw_model, resolved_type=model_type
-        )
-
-        for mod in available:
-            # TODO (spp, 2021-11-22): make this accept compatible module models
-            # and update LoadModule command docs accordingly
-            if mod.model() == model.value:
-                if not self._state_store.modules.get_by_serial(
-                    mod.device_info["serial"]
-                ):
-                    return mod
-
-        if simulating:
-            return simulating
-        else:
-            raise ModuleNotAttachedError("Requested module not found.")

@@ -142,8 +142,11 @@ export function RunTimeControl(): JSX.Element | null {
     buttonIconName = 'play'
     buttonText = t('resume_run')
     handleButtonClick = play
+  } else if (runStatus === RUN_STATUS_STOP_REQUESTED) {
+    buttonIconName = null
+    buttonText = t('canceling_run')
+    handleButtonClick = reset
   } else if (
-    runStatus === RUN_STATUS_STOP_REQUESTED ||
     runStatus === RUN_STATUS_STOPPED ||
     runStatus === RUN_STATUS_FINISHING ||
     runStatus === RUN_STATUS_FAILED ||

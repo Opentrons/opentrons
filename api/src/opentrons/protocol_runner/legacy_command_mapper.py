@@ -40,12 +40,20 @@ class LegacyContextCommandError(ProtocolEngineError):
     """An error returned when a PAPIv2 ProtocolContext command fails."""
 
 
-LEGACY_TO_PE_MODULE: Dict[LegacyModuleModel, pe_types.ModuleModel] = {
+_LEGACY_TO_PE_MODULE: Dict[LegacyModuleModel, pe_types.ModuleModel] = {
     LegacyMagneticModuleModel.MAGNETIC_V1: pe_types.ModuleModel.MAGNETIC_MODULE_V1,
     LegacyMagneticModuleModel.MAGNETIC_V2: pe_types.ModuleModel.MAGNETIC_MODULE_V2,
     LegacyTemperatureModuleModel.TEMPERATURE_V1: pe_types.ModuleModel.TEMPERATURE_MODULE_V1,  # noqa: E501
     LegacyTemperatureModuleModel.TEMPERATURE_V2: pe_types.ModuleModel.TEMPERATURE_MODULE_V2,  # noqa: E501
     LegacyThermocyclerModuleModel.THERMOCYCLER_V1: pe_types.ModuleModel.THERMOCYCLER_MODULE_V1,  # noqa: E501
+}
+
+_HIGHER_ORDER_COMMAND_TYPES = {
+    legacy_command_types.MIX,
+    legacy_command_types.CONSOLIDATE,
+    legacy_command_types.DISTRIBUTE,
+    legacy_command_types.TRANSFER,
+    legacy_command_types.RETURN_TIP,
 }
 
 
@@ -94,6 +102,10 @@ class LegacyCommandMapper:
         command's status in-place.
         """
         command_type = command["name"]
+
+        if command_type in _HIGHER_ORDER_COMMAND_TYPES:
+            return []
+
         command_error = command["error"]
         stage = command["$"]
         # TODO(mc, 2021-12-08): use message ID as command ID directly once
@@ -246,7 +258,7 @@ class LegacyCommandMapper:
         count = self._command_count["LOAD_MODULE"]
         command_id = f"commands.LOAD_MODULE-{count}"
         module_id = f"module-{count}"
-        module_model = LEGACY_TO_PE_MODULE[module_load_info.module_model]
+        module_model = _LEGACY_TO_PE_MODULE[module_load_info.module_model]
 
         # This will fetch a V2 definition only. PAPI < v2.3 use V1 definitions.
         # When running a < v2.3 protocol, there will be a mismatch of definitions used
@@ -255,7 +267,7 @@ class LegacyCommandMapper:
         # have similar info, with V2 having additional info fields.
         definition = self._module_definition_by_model.get(
             module_model
-        ) or self._module_data_provider.get_module_definition(module_model)
+        ) or self._module_data_provider.get_definition(module_model)
 
         load_module_command = pe_commands.LoadModule.construct(
             id=command_id,
@@ -273,8 +285,9 @@ class LegacyCommandMapper:
             ),
             result=pe_commands.LoadModuleResult.construct(
                 moduleId=module_id,
-                moduleSerial=module_load_info.module_serial,
+                serialNumber=module_load_info.module_serial,
                 definition=definition,
+                model=definition.model,
             ),
         )
         self._command_count["LOAD_MODULE"] = count + 1
