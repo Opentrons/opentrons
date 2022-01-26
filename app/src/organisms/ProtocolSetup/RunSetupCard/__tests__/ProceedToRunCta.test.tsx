@@ -68,7 +68,10 @@ describe('ProceedToRunCta', () => {
   })
 
   it('should track a mixpanel event when clicked', () => {
-    mockUseMissingModuleIds.mockReturnValue([])
+    mockUseModuleMatchResults.mockReturnValue({
+      missingModuleIds: [],
+      remainingAttachedModules: [],
+    })
     const { getByRole } = render()
     const button = getByRole('button', { name: 'Proceed to Run' })
     fireEvent.click(button)
