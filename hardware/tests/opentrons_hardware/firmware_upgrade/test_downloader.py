@@ -1,4 +1,5 @@
 """Tests for the firmware downloader."""
+from typing import List
 
 import pytest
 from mock import AsyncMock, MagicMock
@@ -21,8 +22,19 @@ def mock_hex_processor() -> MagicMock:
 
 
 @pytest.fixture
+def chunks() -> List[Chunk]:
+    """Data chunks produced by hex processor."""
+    return [
+        Chunk(address=0x000, data=list(range(56))),
+        Chunk(address=0x100, data=[5, 6, 7, 8]),
+        Chunk(address=0x200, data=[100, 1002]),
+    ]
+
+
+@pytest.fixture
 def subject(mock_messenger: AsyncMock) -> downloader.FirmwareUpgradeDownloader:
     """Test subject."""
     return downloader.FirmwareUpgradeDownloader(mock_messenger)
 
 
+def

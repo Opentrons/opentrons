@@ -114,3 +114,4 @@ class CanMessenger:
                     log.exception(f"Failed to build from {message}")
             else:
                 log.error(f"Message {message} is not recognized.")
+
