@@ -33,7 +33,6 @@ import { mockCalibrationStatus } from '../../../redux/calibration/__fixtures__'
 import { useRunStatus, useRunControls } from '../../RunTimeControl/hooks'
 import { useCurrentProtocolRun } from '../hooks/useCurrentProtocolRun'
 import { useCloseCurrentRun } from '../hooks/useCloseCurrentRun'
-import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
 import { UploadInput } from '../UploadInput'
 import { ProtocolUpload, ProtocolLoader } from '..'
 
@@ -245,7 +244,7 @@ describe('ProtocolUpload', () => {
     when(mockUseCurrentProtocolRun)
       .calledWith()
       .mockReturnValue({
-        protocolRecord: { data: { analyses: [] } },
+        protocolRecord: {},
         runRecord: {},
         createProtocolRun: jest.fn(),
       } as any)
@@ -347,7 +346,7 @@ describe('ProtocolUpload', () => {
     getByText('Protocol - mock protocol name')
   })
 
-  it('renders only the protocol with no button when run status is stop requested', () => {
+  it('renders only the protocol title with no button when run status is stop requested', () => {
     when(mockUseCurrentProtocolRun)
       .calledWith()
       .mockReturnValue({
@@ -361,8 +360,6 @@ describe('ProtocolUpload', () => {
     when(mockConfirmCancelModal).mockReturnValue(
       <div>mock confirm cancel modal</div>
     )
-    const [{ getByText }] = render()
-    getByText('Protocol -')
     expect(screen.queryByText('mock confirm cancel modal')).toBeNull()
     expect(screen.queryByText('Cancel Run')).toBeNull()
   })
