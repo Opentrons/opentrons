@@ -178,6 +178,28 @@ def virtual_smoothie_env(monkeypatch):
     monkeypatch.setenv("ENABLE_VIRTUAL_SMOOTHIE", "false")
 
 
+@pytest.fixture(
+    params=["ot2", "ot3"],
+)
+async def machine_variant_ffs(request, loop):
+    if request.node.get_closest_marker("ot2_only") and request.param == "ot2":
+        pytest.skip()
+    if request.node.get_closest_marker("ot3_only") and request.param == "ot3":
+        pytest.skip()
+
+    old = config.advanced_settings.get_adv_setting("enableOT3HardwareController")
+    assert old
+    old_value = old.value
+
+    await config.advanced_settings.set_adv_setting(
+        "enableOT3HardwareController", request.param == "ot3"
+    )
+    yield
+    await config.advanced_settings.set_adv_setting(
+        "enableOT3HardwareController", old_value
+    )
+
+
 async def _build_ot2_hw() -> AsyncGenerator[HardwareControlAPI, None]:
     hw_sim = ThreadManager(API.build_hardware_simulator)
     old_config = config.robot_configs.load()
@@ -319,7 +341,9 @@ async def smoothie(monkeypatch):
     from opentrons.config import robot_configs
 
     monkeypatch.setenv("ENABLE_VIRTUAL_SMOOTHIE", "true")
-    driver = SmoothieDriver(robot_configs.load(), SimulatingGPIOCharDev("simulated"))
+    driver = SmoothieDriver(
+        robot_configs.load_ot2(), SimulatingGPIOCharDev("simulated")
+    )
     await driver.connect()
     yield driver
     try:

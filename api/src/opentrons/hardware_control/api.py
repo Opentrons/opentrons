@@ -21,7 +21,7 @@ from opentrons_shared_data.pipette.dev_types import PipetteName
 from opentrons import types as top_types
 from opentrons.util import linal
 from opentrons.config import robot_configs
-from opentrons.config.types import RobotConfig
+from opentrons.config.types import RobotConfig, OT3Config
 
 from .util import use_or_initialize_loop, check_motion_bounds
 from .pipette import generate_hardware_configs, load_from_config_and_check_skip
@@ -143,10 +143,10 @@ class API(
     def _reset_last_mount(self):
         self._last_moved_mount = None
 
-    @classmethod
+    @classmethod  # noqa: C901
     async def build_hardware_controller(
         cls,
-        config: RobotConfig = None,
+        config: Union[RobotConfig, OT3Config] = None,
         port: str = None,
         loop: asyncio.AbstractEventLoop = None,
         firmware: Tuple[pathlib.Path, str] = None,
@@ -164,7 +164,10 @@ class API(
                      :py:meth:`asyncio.get_event_loop`.
         """
         checked_loop = use_or_initialize_loop(loop)
-        checked_config = config or robot_configs.load()
+        if isinstance(config, RobotConfig):
+            checked_config = config
+        else:
+            checked_config = robot_configs.load_ot2()
         backend = await Controller.build(checked_config)
         backend.set_lights(button=None, rails=False)
 
@@ -221,7 +224,7 @@ class API(
         cls,
         attached_instruments: Dict[top_types.Mount, Dict[str, Optional[str]]] = None,
         attached_modules: List[str] = None,
-        config: RobotConfig = None,
+        config: Union[RobotConfig, OT3Config] = None,
         loop: asyncio.AbstractEventLoop = None,
         strict_attached_instruments: bool = True,
     ) -> "API":
@@ -238,7 +241,10 @@ class API(
             attached_modules = []
 
         checked_loop = use_or_initialize_loop(loop)
-        checked_config = config or robot_configs.load()
+        if isinstance(config, RobotConfig):
+            checked_config = config
+        else:
+            checked_config = robot_configs.load_ot2()
         backend = await Simulator.build(
             attached_instruments,
             attached_modules,
@@ -895,9 +901,12 @@ class API(
         return self._config
 
     @config.setter
-    def config(self, config: RobotConfig) -> None:
+    def config(self, config: Union[RobotConfig, OT3Config]) -> None:
         """Replace the currently-loaded config"""
-        self._config = config
+        if isinstance(config, RobotConfig):
+            self._config = config
+        else:
+            self._log.error("Cannot use an OT-3 config on an OT-2")
 
     def get_config(self) -> RobotConfig:
         """
@@ -907,9 +916,12 @@ class API(
         """
         return self.config
 
-    def set_config(self, config: RobotConfig) -> None:
+    def set_config(self, config: Union[OT3Config, RobotConfig]) -> None:
         """Replace the currently-loaded config"""
-        self.config = config
+        if isinstance(config, RobotConfig):
+            self.config = config
+        else:
+            self._log.error("Cannot use an OT-3 config on an OT-2")
 
     async def update_config(self, **kwargs):
         """Update values of the robot's configuration.
