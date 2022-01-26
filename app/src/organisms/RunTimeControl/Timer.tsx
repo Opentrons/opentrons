@@ -47,21 +47,14 @@ export function Timer({
           </Text>
         </>
       ) : null}
-      {runStatus === RUN_STATUS_STOP_REQUESTED && stoppedAt != null ? (
-        <>
-          <Text css={FONT_BODY_1_DARK_SEMIBOLD}>{`${t('run_time')}:`}</Text>
-          <Text css={FONT_HUGE_DARK_SEMIBOLD} marginBottom={SPACING_3}>
-            {formatInterval(stoppedAt, startTime)}
-          </Text>
-        </>
-      ) : (
-        <>
-          <Text css={FONT_BODY_1_DARK_SEMIBOLD}>{`${t('run_time')}:`}</Text>
-          <Text css={FONT_HUGE_DARK_SEMIBOLD} marginBottom={SPACING_3}>
-            {formatInterval(startTime, endTime)}
-          </Text>
-        </>
-      )}
+      <>
+        <Text css={FONT_BODY_1_DARK_SEMIBOLD}>{`${t('run_time')}:`}</Text>
+        <Text css={FONT_HUGE_DARK_SEMIBOLD} marginBottom={SPACING_3}>
+          {runStatus === RUN_STATUS_STOP_REQUESTED && stoppedAt != null
+            ? formatInterval(stoppedAt, startTime)
+            : formatInterval(startTime, endTime)}
+        </Text>
+      </>
     </>
   )
 }
