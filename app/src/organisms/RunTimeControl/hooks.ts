@@ -48,7 +48,7 @@ export function useRunControls(): RunControls {
   } = useRunActionMutations(currentRunId as string)
 
   const { cloneRun, isLoading: isResetRunLoading } = useCloneRun(
-    currentRunId as string
+    currentRunId ?? null
   )
 
   return {
@@ -68,7 +68,7 @@ export function useRunStatus(): RunStatus | null {
 
   const currentRunId = runRecord?.data?.id
 
-  const { data } = useRunQuery(currentRunId as string, {
+  const { data } = useRunQuery(currentRunId ?? null, {
     refetchInterval: 1000,
   })
 
@@ -102,7 +102,7 @@ export function useRunStartTime(): string | undefined {
 
   const currentRunId = runRecord?.data?.id
 
-  const { data } = useRunQuery(currentRunId as string)
+  const { data } = useRunQuery(currentRunId ?? null)
 
   const actions = data?.data?.actions as RunAction[]
   const firstPlay = actions?.find(
@@ -118,7 +118,7 @@ export function useRunPauseTime(): string | null {
 
   const currentRunId = runRecord?.data?.id
 
-  const { data } = useRunQuery(currentRunId as string)
+  const { data } = useRunQuery(currentRunId ?? null)
 
   const actions = data?.data.actions as RunAction[]
   const lastAction = last(actions)
@@ -133,7 +133,7 @@ export function useRunStopTime(): string | null {
 
   const currentRunId = runRecord?.data?.id
 
-  const { data } = useRunQuery(currentRunId as string)
+  const { data } = useRunQuery(currentRunId ?? null)
 
   const actions = data?.data.actions as RunAction[]
   const lastAction = last(actions)
@@ -152,7 +152,7 @@ export function useRunCompleteTime(): string | null {
 
   const lastCommandId = last(runData?.commands)?.id
 
-  const { data: commandData } = useCommandQuery(runId, lastCommandId as string)
+  const { data: commandData } = useCommandQuery(runId, lastCommandId ?? null)
 
   const lastActionAt = last(runData?.actions)?.createdAt
   const lastErrorAt = last(runData?.errors)?.createdAt
