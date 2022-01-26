@@ -29,7 +29,7 @@ describe('createSnippet', () => {
         definitionUri: TC_PLATE_DEF_URI,
         location: {
           slotName: '7',
-          moduleId: TC_MODULE_ID,
+          moduleModel: 'thermocyclerModuleV1',
         },
         vector: { x: 0, y: 2, z: 0 },
       },

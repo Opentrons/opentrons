@@ -1,6 +1,8 @@
+import isEqual from 'lodash/isEqual'
 import { getLabwareDefinitionUri } from '../../organisms/ProtocolSetup/utils/getLabwareDefinitionUri'
 import type { ProtocolFile } from '@opentrons/shared-data'
 import type { LabwareOffset } from '@opentrons/api-client'
+import { getLabwareOffsetLocation } from '../../organisms/ProtocolSetup/utils/getLabwareOffsetLocation'
 
 const PYTHON_INDENT = '    '
 const JUPYTER_PREFIX =
@@ -35,13 +37,21 @@ export function createSnippet(
         }
         const labwareDefUri = getLabwareDefinitionUri(
           command.result.labwareId,
-          protocol.labware
+          protocol.labware,
+          protocol.labwareDefinitions
         )
-        console.log('labwareDefUri', labwareDefUri)
-        console.log('labwareOffsets', labwareOffsets)
-        const labwareOffset = labwareOffsets?.find(
-          offset => offset.definitionUri === labwareDefUri
+        const offsetLocation = getLabwareOffsetLocation(
+          command.result.labwareId,
+          protocol.commands,
+          protocol.modules
         )
+
+        const labwareOffset = labwareOffsets?.find(offset => {
+          return (
+            offset.definitionUri === labwareDefUri &&
+            isEqual(offset.location, offsetLocation)
+          )
+        })
         if (labwareOffset == null) {
           addendum = [loadStatement, '']
         } else {
@@ -73,6 +83,8 @@ export function createSnippet(
     },
     []
   )
+
+  console.log('protocolData', protocol)
   return loadCommandLines.reduce<string>((acc, line) => {
     if (mode === 'jupyter') {
       return `${acc}\n${line}`
