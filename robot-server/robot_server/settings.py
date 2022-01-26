@@ -49,7 +49,7 @@ class RobotServerSettings(BaseSettings):
     ws_port: int = Field(
         31950,
         description=(
-            "TCP/IP port to serve on. Will be ignored if domain socket" " is defined."
+            "TCP/IP port to serve on. Will be ignored if domain socket is defined."
         ),
     )
     ws_domain_socket: typing.Optional[str] = Field(
