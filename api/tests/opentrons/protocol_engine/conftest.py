@@ -3,10 +3,10 @@ import pytest
 from typing import AsyncGenerator
 
 from opentrons import config
+from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
 from opentrons_shared_data.labware import load_definition
-from opentrons_shared_data.module.dev_types import ModuleDefinitionV2
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocols.api_support.constants import (
     STANDARD_OT2_DECK,
@@ -79,7 +79,36 @@ def falcon_tuberack_def() -> LabwareDefinition:
     )
 
 
-@pytest.fixture
-def tempdeck_v1_def(minimal_module_def: ModuleDefinitionV2) -> ModuleDefinition:
+@pytest.fixture(scope="session")
+def tempdeck_v1_def() -> ModuleDefinition:
     """Get the definition of a V1 tempdeck."""
-    return ModuleDefinition.parse_obj(minimal_module_def)
+    definition = load_shared_data("module/definitions/2/temperatureModuleV1.json")
+    return ModuleDefinition.parse_raw(definition)
+
+
+@pytest.fixture(scope="session")
+def tempdeck_v2_def() -> ModuleDefinition:
+    """Get the definition of a V2 tempdeck."""
+    definition = load_shared_data("module/definitions/2/temperatureModuleV2.json")
+    return ModuleDefinition.parse_raw(definition)
+
+
+@pytest.fixture(scope="session")
+def magdeck_v1_def() -> ModuleDefinition:
+    """Get the definition of a V1 magdeck."""
+    definition = load_shared_data("module/definitions/2/magneticModuleV1.json")
+    return ModuleDefinition.parse_raw(definition)
+
+
+@pytest.fixture(scope="session")
+def magdeck_v2_def() -> ModuleDefinition:
+    """Get the definition of a V2 magdeck."""
+    definition = load_shared_data("module/definitions/2/magneticModuleV2.json")
+    return ModuleDefinition.parse_raw(definition)
+
+
+@pytest.fixture(scope="session")
+def thermocycler_v1_def() -> ModuleDefinition:
+    """Get the definition of a V2 thermocycler."""
+    definition = load_shared_data("module/definitions/2/thermocyclerModuleV1.json")
+    return ModuleDefinition.parse_raw(definition)

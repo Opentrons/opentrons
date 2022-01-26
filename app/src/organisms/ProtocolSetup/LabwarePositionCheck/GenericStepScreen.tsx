@@ -1,4 +1,6 @@
 import * as React from 'react'
+import uniq from 'lodash/uniq'
+import isEqual from 'lodash/isEqual'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -13,7 +15,7 @@ import {
 } from '@opentrons/components'
 import { LabwarePositionCheckStepDetail } from './LabwarePositionCheckStepDetail'
 import { SectionList } from './SectionList'
-import { useIntroInfo, useLabwareIdsBySection } from './hooks'
+import { useIntroInfo, useLabwareIdsBySection, useSteps } from './hooks'
 import { DeckMap } from './DeckMap'
 import type { Jog } from '../../../molecules/JogControls'
 import type { LabwarePositionCheckStep } from './types'
@@ -30,7 +32,7 @@ export const GenericStepScreen = (
 ): JSX.Element | null => {
   const introInfo = useIntroInfo()
   const labwareIdsBySection = useLabwareIdsBySection()
-  const [sectionIndex] = React.useState<number>(0)
+  const allSteps = useSteps()
   if (introInfo == null) return null
   const { sections, primaryPipetteMount, secondaryPipetteMount } = introInfo
   const labwareIdsToHighlight = labwareIdsBySection[props.selectedStep.section]
@@ -38,7 +40,18 @@ export const GenericStepScreen = (
     section => section === props.selectedStep.section
   )
   const completedSections = sections.slice(0, currentSectionIndex)
+  const selectedStepIndex = allSteps.findIndex(step =>
+    isEqual(step, props.selectedStep)
+  )
+  const completedSteps =
+    selectedStepIndex > 0 ? allSteps.slice(0, selectedStepIndex) : []
 
+  const completedLabwareIds = completedSteps.reduce<string[]>(
+    (acc, step) => uniq([...acc, step.labwareId]),
+    []
+  )
+
+  console.log(completedLabwareIds)
   return (
     <Flex margin={SPACING_3} flexDirection={DIRECTION_COLUMN}>
       <Text
@@ -64,9 +77,7 @@ export const GenericStepScreen = (
           <Flex justifyContent={JUSTIFY_CENTER} paddingTop={SPACING_3}>
             <DeckMap
               labwareIdsToHighlight={labwareIdsToHighlight}
-              completedLabwareIdSections={
-                labwareIdsBySection[sections[sectionIndex - 1]]
-              }
+              completedLabwareIds={completedLabwareIds}
             />
           </Flex>
         </Flex>

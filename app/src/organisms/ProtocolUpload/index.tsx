@@ -72,7 +72,6 @@ export function ProtocolUpload(): JSX.Element {
   const customLabwareFiles = useSelector((state: State) =>
     getValidCustomLabwareFiles(state)
   )
-
   const logger = useLogger(__filename)
   const [uploadError, setUploadError] = React.useState<
     [string, ErrorObject[] | string | null | undefined] | null
