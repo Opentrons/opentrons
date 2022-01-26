@@ -1,14 +1,14 @@
 import type { RunTimeCommand, ModuleModel } from '@opentrons/shared-data'
 
-export const RUN_STATUS_IDLE: 'idle' = 'idle'
-export const RUN_STATUS_RUNNING: 'running' = 'running'
-export const RUN_STATUS_PAUSE_REQUESTED: 'pause-requested' = 'pause-requested'
-export const RUN_STATUS_PAUSED: 'paused' = 'paused'
-export const RUN_STATUS_STOP_REQUESTED: 'stop-requested' = 'stop-requested'
-export const RUN_STATUS_STOPPED: 'stopped' = 'stopped'
-export const RUN_STATUS_FAILED: 'failed' = 'failed'
-export const RUN_STATUS_FINISHING: 'finishing' = 'finishing'
-export const RUN_STATUS_SUCCEEDED: 'succeeded' = 'succeeded'
+export const RUN_STATUS_IDLE = 'idle' as const
+export const RUN_STATUS_RUNNING = 'running' as const
+export const RUN_STATUS_PAUSE_REQUESTED = 'pause-requested' as const
+export const RUN_STATUS_PAUSED = 'paused'
+export const RUN_STATUS_STOP_REQUESTED = 'stop-requested' as const
+export const RUN_STATUS_STOPPED = 'stopped' as const
+export const RUN_STATUS_FAILED = 'failed' as const
+export const RUN_STATUS_FINISHING = 'finishing' as const
+export const RUN_STATUS_SUCCEEDED = 'succeeded' as const
 
 export type RunStatus =
   | typeof RUN_STATUS_IDLE

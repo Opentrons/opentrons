@@ -41,6 +41,7 @@ import { getConnectedRobotName } from '../../redux/robot/selectors'
 import { getValidCustomLabwareFiles } from '../../redux/custom-labware/selectors'
 import { ConfirmCancelModal } from '../RunDetails/ConfirmCancelModal'
 import { useRunStatus, useRunControls } from '../RunTimeControl/hooks'
+import { useProtocolDetails } from '../RunDetails/hooks'
 
 import { ConfirmExitProtocolUploadModal } from './ConfirmExitProtocolUploadModal'
 
@@ -66,11 +67,13 @@ export function ProtocolUpload(): JSX.Element {
     protocolCreationError,
   } = useCurrentProtocolRun()
   const runStatus = useRunStatus()
+  const { displayName } = useProtocolDetails()
   const { closeCurrentRun, isProtocolRunLoaded } = useCloseCurrentRun()
   const robotName = useSelector((state: State) => getConnectedRobotName(state))
   const customLabwareFiles = useSelector((state: State) =>
     getValidCustomLabwareFiles(state)
   )
+
   const logger = useLogger(__filename)
   const [uploadError, setUploadError] = React.useState<
     [string, ErrorObject[] | string | null | undefined] | null
@@ -159,8 +162,6 @@ export function ProtocolUpload(): JSX.Element {
     runStatus === RUN_STATUS_PAUSE_REQUESTED ||
     runStatus === RUN_STATUS_FINISHING
 
-  const protocolName = protocolRecord?.data?.metadata?.protocolName ?? ''
-
   let titleBarProps
   if (
     isProtocolRunLoaded &&
@@ -169,7 +170,7 @@ export function ProtocolUpload(): JSX.Element {
   ) {
     titleBarProps = {
       title: t('protocol_title', {
-        protocol_name: protocolName,
+        protocol_name: displayName,
       }),
       back: {
         onClick: confirmExit,
@@ -183,13 +184,13 @@ export function ProtocolUpload(): JSX.Element {
   } else if (runStatus === RUN_STATUS_STOP_REQUESTED) {
     titleBarProps = {
       title: t('protocol_title', {
-        protocol_name: protocolName,
+        protocol_name: displayName,
       }),
     }
   } else if (isRunInMotion) {
     titleBarProps = {
       title: t('protocol_title', {
-        protocol_name: protocolName,
+        protocol_name: displayName,
       }),
       rightNode: cancelRunButton,
     }

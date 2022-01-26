@@ -6,16 +6,10 @@ from opentrons.calibration_storage.helpers import uri_from_details
 
 from opentrons.types import Mount as HwMount, MountType, DeckSlotName
 from opentrons.hardware_control import API as HardwareAPI
-from opentrons.hardware_control.modules.types import TemperatureModuleModel, ModuleType
-from opentrons.hardware_control.modules import TempDeck
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.hardware_control.modules import TempDeck, AbstractModule
 from opentrons.protocols.models import LabwareDefinition
 
 from opentrons.protocol_engine import errors
-from opentrons.protocol_engine.errors import (
-    LabwareDefinitionDoesNotExistError,
-    ModuleDefinitionDoesNotExistError,
-)
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     ModuleLocation,
@@ -30,6 +24,7 @@ from opentrons.protocol_engine.types import (
 )
 
 from opentrons.protocol_engine.state import StateStore
+from opentrons.protocol_engine.state.modules import HardwareModule
 from opentrons.protocol_engine.resources import (
     ModelUtils,
     LabwareDataProvider,
@@ -74,18 +69,23 @@ def module_data_provider(decoy: Decoy) -> ModuleDataProvider:
 
 
 @pytest.fixture
-async def simulating_module_fixture(hardware_api: HardwareAPI) -> TempDeck:
+async def temp_module_v1(decoy: Decoy) -> TempDeck:
     """Get a mocked out module fixture."""
-    mod = await TempDeck.build(
-        port="",
-        usb_port=USBPort(sub_names=[], name=""),
-        simulating=True,
-        execution_manager=hardware_api._execution_manager,
-        sim_model="temperatureModuleV1",
-    )
-    mod._device_info = {"serial": "abc123"}
-    mod._poller = None
-    return mod  # type: ignore[no-any-return]
+    temp_mod = decoy.mock(cls=TempDeck)
+    temp_mod.device_info = {"serial": "serial-1"}  # type: ignore[misc]
+    decoy.when(temp_mod.model()).then_return("temperatureModuleV1")
+
+    return temp_mod
+
+
+@pytest.fixture
+async def temp_module_v2(decoy: Decoy) -> TempDeck:
+    """Get a mocked out module fixture."""
+    temp_mod = decoy.mock(cls=TempDeck)
+    temp_mod.device_info = {"serial": "serial-2"}  # type: ignore[misc]
+    decoy.when(temp_mod.model()).then_return("temperatureModuleV2")
+
+    return temp_mod
 
 
 @pytest.fixture
@@ -118,7 +118,7 @@ async def test_load_labware(
     decoy.when(model_utils.generate_id()).then_return("unique-id")
 
     decoy.when(state_store.labware.get_definition_by_uri(matchers.IsA(str))).then_raise(
-        LabwareDefinitionDoesNotExistError("oh no")
+        errors.LabwareDefinitionDoesNotExistError("oh no")
     )
 
     decoy.when(
@@ -169,7 +169,7 @@ async def test_load_labware_uses_provided_id(
 ) -> None:
     """It should use the provided ID rather than generating an ID for the labware."""
     decoy.when(state_store.labware.get_definition_by_uri(matchers.IsA(str))).then_raise(
-        LabwareDefinitionDoesNotExistError("oh no")
+        errors.LabwareDefinitionDoesNotExistError("oh no")
     )
 
     decoy.when(
@@ -272,8 +272,8 @@ async def test_load_labware_on_module(
         LoadedModule(
             id="module-id",
             model=ModuleModel.THERMOCYCLER_MODULE_V1,
+            serialNumber="module-serial",
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
-            serial="module-serial",
             definition=tempdeck_v1_def,
         )
     )
@@ -413,64 +413,53 @@ async def test_load_pipette_raises_if_pipette_not_attached(
         )
 
 
-# TODO (spp, 2021-11-24): So many mocks or the possible need to mock out
-#  an internal method of subject is code smell.
 async def test_load_module(
     decoy: Decoy,
     model_utils: ModelUtils,
     state_store: StateStore,
     module_data_provider: ModuleDataProvider,
-    tempdeck_v1_def: ModuleDefinition,
-    subject: EquipmentHandler,
     hardware_api: HardwareAPI,
-    simulating_module_fixture: TempDeck,
+    tempdeck_v1_def: ModuleDefinition,
+    tempdeck_v2_def: ModuleDefinition,
+    temp_module_v1: AbstractModule,
+    temp_module_v2: AbstractModule,
+    subject: EquipmentHandler,
 ) -> None:
     """It should load a module, returning its ID, serial & definition in result."""
-    decoy.when(model_utils.generate_id()).then_return("unique-id")
-    decoy.when(
-        state_store.modules.get_definition_by_model(ModuleModel.TEMPERATURE_MODULE_V1)
-    ).then_raise(ModuleDefinitionDoesNotExistError("oh no"))
+    decoy.when(model_utils.ensure_id("input-module-id")).then_return("module-id")
 
     decoy.when(
-        module_data_provider.get_module_definition(ModuleModel.TEMPERATURE_MODULE_V1)
+        module_data_provider.get_definition(ModuleModel.TEMPERATURE_MODULE_V1)
     ).then_return(tempdeck_v1_def)
 
     decoy.when(
-        await hardware_api.find_modules(
-            by_model=TemperatureModuleModel.TEMPERATURE_V1,
-            resolved_type=ModuleType.TEMPERATURE,
-        )
-    ).then_return(([], simulating_module_fixture))
+        module_data_provider.get_definition(ModuleModel.TEMPERATURE_MODULE_V2)
+    ).then_return(tempdeck_v2_def)
 
-    expected_output = LoadedModuleData(
-        module_id="unique-id",
-        module_serial=simulating_module_fixture.device_info["serial"],
-        definition=tempdeck_v1_def,
-    )
+    hardware_api.attached_modules = [  # type: ignore[misc]
+        temp_module_v1,
+        temp_module_v2,
+    ]
+
+    decoy.when(
+        state_store.modules.find_attached_module(
+            model=ModuleModel.TEMPERATURE_MODULE_V1,
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            attached_modules=[
+                HardwareModule(serial_number="serial-1", definition=tempdeck_v1_def),
+                HardwareModule(serial_number="serial-2", definition=tempdeck_v2_def),
+            ],
+        )
+    ).then_return(HardwareModule(serial_number="serial-1", definition=tempdeck_v1_def))
+
     result = await subject.load_module(
         model=ModuleModel.TEMPERATURE_MODULE_V1,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-        module_id=None,
+        module_id="input-module-id",
     )
-    assert result == expected_output
 
-
-# TODO (spp, 2021-11-23): Add tests for fetching a match from available modules
-async def test_get_hardware_module(
-    decoy: Decoy,
-    subject: EquipmentHandler,
-    hardware_api: HardwareAPI,
-    simulating_module_fixture: TempDeck,
-) -> None:
-    """It should fetch the matching module instance from attached modules."""
-    decoy.when(
-        await hardware_api.find_modules(
-            by_model=TemperatureModuleModel.TEMPERATURE_V1,
-            resolved_type=ModuleType.TEMPERATURE,
-        )
-    ).then_return(([], simulating_module_fixture))
-
-    assert (
-        await subject._get_hardware_module(ModuleModel.TEMPERATURE_MODULE_V1)
-        == simulating_module_fixture
+    assert result == LoadedModuleData(
+        module_id="module-id",
+        serial_number="serial-1",
+        definition=tempdeck_v1_def,
     )

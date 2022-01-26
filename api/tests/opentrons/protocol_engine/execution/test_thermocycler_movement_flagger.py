@@ -103,9 +103,9 @@ async def test_raises_depending_on_thermocycler_lid_status(
     decoy.when(state_store.modules.get_model(module_id="module-id")).then_return(
         PEModuleModel.THERMOCYCLER_MODULE_V1,
     )
-    decoy.when(state_store.modules.get_serial(module_id="module-id")).then_return(
-        "module-serial"
-    )
+    decoy.when(
+        state_store.modules.get_serial_number(module_id="module-id")
+    ).then_return("module-serial")
 
     # These "type: ignore[misc]" comments let us assign to read-only properties,
     # necessary to work around Decoy not being able to stub properties.
@@ -139,9 +139,9 @@ async def test_raises_if_hardware_module_has_gone_missing(
     decoy.when(state_store.modules.get_model(module_id="module-id")).then_return(
         PEModuleModel.THERMOCYCLER_MODULE_V1,
     )
-    decoy.when(state_store.modules.get_serial(module_id="module-id")).then_return(
-        "module-serial"
-    )
+    decoy.when(
+        state_store.modules.get_serial_number(module_id="module-id")
+    ).then_return("module-serial")
 
     decoy.when(
         await hardware_api.find_modules(

@@ -189,7 +189,7 @@ describe('RunTimeControl', () => {
       .calledWith()
       .mockReturnValue(RUN_STATUS_STOP_REQUESTED)
     const [{ getByRole }] = render()
-    const button = getByRole('button', { name: 'Run Again' })
+    const button = getByRole('button', { name: 'Canceling Run' })
     expect(button).toBeDisabled()
   })
 
@@ -275,7 +275,7 @@ describe('RunTimeControl', () => {
 
     expect(getByText('Status: Stop requested')).toBeTruthy()
     expect(queryByText('Mock Timer')).toBeTruthy()
-    expect(getByRole('button', { name: 'Run Again' })).toBeTruthy()
+    expect(getByRole('button', { name: 'Canceling Run' })).toBeTruthy()
   })
 
   it('renders a run status and timer if stopped', () => {

@@ -52,8 +52,10 @@ export function useProtocolDetails(): ProtocolDetails {
       protocolData = schemaV6Adapter(lastProtocolAnalysis)
     }
   }
-  const displayName = protocolRecord?.data.metadata.protocolName ?? null
-  return { displayName, protocolData }
+  const displayName =
+    protocolRecord?.data.metadata.protocolName ??
+    protocolRecord?.data.files[0].name
+  return { displayName: displayName ?? null, protocolData }
 }
 
 export function useTimeElapsedSincePause(): string | null {
