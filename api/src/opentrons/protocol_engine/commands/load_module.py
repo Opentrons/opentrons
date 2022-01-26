@@ -17,12 +17,10 @@ class LoadModuleParams(BaseModel):
     model: ModuleModel = Field(
         ...,
         description=(
-            "The exact model name of the module to load."
+            "The model name of the module to load."
             "\n\n"
-            "In the future,"
-            " this command may change so that the load will succeed"
-            " if the physically attached module is merely compatible"
-            " with the version you requested."
+            "Protocol Engine will look for a connected module that either"
+            " exactly matches this one, or is compatible."
         ),
     )
 
