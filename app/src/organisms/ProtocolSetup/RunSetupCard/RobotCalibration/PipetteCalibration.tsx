@@ -28,7 +28,6 @@ import { CalibrationItem } from './CalibrationItem'
 
 import type { PipetteInfo } from '../hooks/useCurrentRunPipetteInfoByMount'
 
-const pipettesPageUrl = `/robots/opentrons-dev/instruments`
 const inexactPipetteSupportArticle =
   'https://support.opentrons.com/en/articles/3450143-gen2-pipette-compatibility'
 
@@ -44,6 +43,7 @@ export function PipetteCalibration(props: Props): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
   const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
+  const pipettesPageUrl = `/robots/${robotName}/instruments`
 
   const [
     startPipetteOffsetCalibration,
