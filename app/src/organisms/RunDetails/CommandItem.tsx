@@ -12,7 +12,6 @@ import {
   C_NEAR_WHITE,
   C_AQUAMARINE,
   C_MINT,
-  SPACING_2,
   C_ERROR_LIGHT,
   C_POWDER_BLUE,
   ALIGN_CENTER,
@@ -21,9 +20,12 @@ import {
   FONT_WEIGHT_BOLD,
   Icon,
   SPACING_1,
+  SPACING_2,
   SPACING_3,
   TEXT_TRANSFORM_UPPERCASE,
   C_MED_DARK_GRAY,
+  JUSTIFY_SPACE_BETWEEN,
+  SIZE_1,
 } from '@opentrons/components'
 import { useCommandQuery } from '@opentrons/react-api-client'
 import { css } from 'styled-components'
@@ -46,6 +48,7 @@ export interface CommandItemProps {
   runCommandSummary: RunCommandSummary | null
   runStatus: RunStatus
   currentRunId: string | null
+  stepNumber: number
 }
 
 const WRAPPER_STYLE_BY_STATUS: {
@@ -70,12 +73,18 @@ const commandIsComplete = (status: RunCommandSummary['status']): boolean =>
   status === 'succeeded' || status === 'failed'
 
 // minimum delay in MS for observer notifications
-export const OBSERVER_DELAY = 300
+export const OBSERVER_DELAY = 150
 
 export function CommandItemComponent(
   props: CommandItemProps
 ): JSX.Element | null {
-  const { analysisCommand, runCommandSummary, runStatus, currentRunId } = props
+  const {
+    analysisCommand,
+    runCommandSummary,
+    runStatus,
+    currentRunId,
+    stepNumber,
+  } = props
   const { t } = useTranslation('run_details')
   const [commandItemRef, isInView] = useInView({
     delay: OBSERVER_DELAY,
@@ -126,12 +135,6 @@ export function CommandItemComponent(
     'legacyCommandType' in runCommandSummary.result
   ) {
     isComment = runCommandSummary.result.legacyCommandType === 'command.COMMENT'
-  } else if (
-    commandDetails?.data.commandType === 'custom' &&
-    'legacyCommandType' in commandDetails?.data.params
-  ) {
-    isComment =
-      commandDetails.data.params.legacyCommandType === 'command.COMMENT'
   }
 
   const isPause =
@@ -158,7 +161,6 @@ export function CommandItemComponent(
           fontSize={FONT_SIZE_CAPTION}
           color={C_MED_DARK_GRAY}
           marginBottom={SPACING_1}
-          marginLeft={SPACING_1}
         >
           {t('comment_step')}
         </Flex>
@@ -169,29 +171,42 @@ export function CommandItemComponent(
           fontSize={FONT_SIZE_CAPTION}
           color={C_MED_DARK_GRAY}
           marginBottom={SPACING_1}
-          marginLeft={SPACING_1}
         >
           <Icon
             name="pause"
             width={SPACING_3}
-            paddingRight={SPACING_2}
+            marginRight={SPACING_2}
             color={C_DARK_GRAY}
           />
           {t('pause_protocol')}
         </Flex>
       ) : null}
-      <Flex flexDirection={DIRECTION_ROW}>
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        alignItems={ALIGN_CENTER}
+      >
+        <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
+          <Text
+            fontSize={FONT_SIZE_CAPTION}
+            marginRight={SPACING_3}
+            minWidth={SIZE_1}
+          >
+            {stepNumber}
+          </Text>
+          <CommandText
+            analysisCommand={analysisCommand}
+            runCommand={commandDetails?.data ?? null}
+          />
+        </Flex>
         {['running', 'failed', 'succeeded'].includes(commandStatus) &&
         !isComment ? (
           <CommandTimer
             commandStartedAt={commandDetails?.data.startedAt}
             commandCompletedAt={commandDetails?.data.completedAt}
+            commandStatus={commandStatus}
           />
         ) : null}
-        <CommandText
-          analysisCommand={analysisCommand}
-          runCommand={commandDetails?.data ?? null}
-        />
       </Flex>
     </Flex>
   )
