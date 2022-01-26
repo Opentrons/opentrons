@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import { UnMatchedModuleWarning } from '../UnMatchedModuleWarning'
+import { renderWithProviders } from '@opentrons/components'
 
 const render = (props: React.ComponentProps<typeof UnMatchedModuleWarning>) => {
   return renderWithProviders(<UnMatchedModuleWarning {...props} />, {
@@ -30,7 +30,7 @@ describe('UnMatchedModuleWarning', () => {
     )
   })
 
-  it('should call onCloseClick when the close button is pressed', () => {
+  it('should close warning when button is clicked', () => {
     const { queryByText, getByRole } = render(props)
     const closeButton = getByRole('button', {
       name: /close/i,
