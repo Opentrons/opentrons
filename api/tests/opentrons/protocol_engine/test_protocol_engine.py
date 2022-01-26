@@ -270,7 +270,7 @@ async def test_finish(
             drop_tips_and_home=drop_tips_and_home
         ),
         action_dispatcher.dispatch(HardwareStoppedAction()),
-        plugin_starter.stop(),
+        await plugin_starter.stop(),
     )
 
 
