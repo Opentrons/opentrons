@@ -60,7 +60,7 @@ export function CommandList(): JSX.Element | null {
   const currentItemRef = React.useRef<HTMLDivElement>(null)
   const runDataCommands = runRecord?.data.commands
   const [windowIndex, setWindowIndex] = React.useState<number>(0)
-  const [isJumpingToCurrent, setIsJumpingToCurrent] = React.useState<boolean>(
+  const [isInitiallyJumpingToCurrent, setIsInitiallyJumpingToCurrent] = React.useState<boolean>(
     false
   )
 
@@ -146,15 +146,13 @@ export function CommandList(): JSX.Element | null {
       : [...postPlayRunCommands]
   }
 
-  const windowFirstIndex = WINDOW_OVERLAP * windowIndex
+  const windowFirstCommandIndex = WINDOW_OVERLAP * windowIndex
   const commandWindow = currentCommandList.slice(
-    windowFirstIndex,
-    windowFirstIndex + WINDOW_SIZE
+    windowFirstCommandIndex,
+    windowFirstCommandIndex + WINDOW_SIZE
   )
   const isFirstWindow = windowIndex === 0
-  const isFinalWindow =
-    currentCommandList.length - 1 <= windowFirstIndex + WINDOW_SIZE &&
-    currentCommandList.length - 1 >= windowFirstIndex
+  const isFinalWindow = currentCommandList.length - 1 <= windowFirstCommandIndex + WINDOW_SIZE
 
   const currentItemIndex = currentCommandList.findIndex(
     command =>
@@ -163,26 +161,26 @@ export function CommandList(): JSX.Element | null {
       command.runCommandSummary.status === 'failed' ||
       command.runCommandSummary.status === 'queued'
   )
-  const windowIndexWithCurrentItem = Math.floor(
+  const indexOfWindowContainingCurrentItem = Math.floor(
     Math.max(currentItemIndex - (WINDOW_SIZE - WINDOW_OVERLAP), 0) /
       WINDOW_OVERLAP
   )
 
   // when we initially mount, if the current item is not in view, jump to it
   React.useEffect(() => {
-    if (windowIndexWithCurrentItem !== windowIndex) {
-      setWindowIndex(windowIndexWithCurrentItem)
+    if (indexOfWindowContainingCurrentItem !== windowIndex) {
+      setWindowIndex(indexOfWindowContainingCurrentItem)
     }
-    setIsJumpingToCurrent(true)
+    setIsInitiallyJumpingToCurrent(true)
   }, [])
 
   // if jumping to current item and on correct window index, scroll to current item
   React.useEffect(() => {
-    if (isJumpingToCurrent && windowIndex === windowIndexWithCurrentItem) {
+    if (isInitiallyJumpingToCurrent && windowIndex === indexOfWindowContainingCurrentItem) {
       currentItemRef.current?.scrollIntoView({ behavior: 'smooth' })
-      setIsJumpingToCurrent(false)
+      setIsInitiallyJumpingToCurrent(false)
     }
-  }, [windowIndex, isJumpingToCurrent])
+  }, [windowIndex, isInitiallyJumpingToCurrent])
 
   if (protocolData == null || runStatus == null) return null
 
@@ -289,7 +287,7 @@ export function CommandList(): JSX.Element | null {
           flexDirection={DIRECTION_COLUMN}
         >
           {commandWindow?.map((command, index) => {
-            const overallIndex = index + windowFirstIndex
+            const overallIndex = index + windowFirstCommandIndex
             const isCurrentCommand =
               command.runCommandSummary != null &&
               ['running', 'failed'].includes(command.runCommandSummary.status)

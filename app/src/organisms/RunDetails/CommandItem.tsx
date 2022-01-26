@@ -12,7 +12,6 @@ import {
   C_NEAR_WHITE,
   C_AQUAMARINE,
   C_MINT,
-  SPACING_2,
   C_ERROR_LIGHT,
   C_POWDER_BLUE,
   ALIGN_CENTER,
@@ -21,10 +20,12 @@ import {
   FONT_WEIGHT_BOLD,
   Icon,
   SPACING_1,
+  SPACING_2,
   SPACING_3,
   TEXT_TRANSFORM_UPPERCASE,
   C_MED_DARK_GRAY,
   JUSTIFY_SPACE_BETWEEN,
+  SIZE_1,
 } from '@opentrons/components'
 import { useCommandQuery } from '@opentrons/react-api-client'
 import { css } from 'styled-components'
@@ -134,12 +135,6 @@ export function CommandItemComponent(
     'legacyCommandType' in runCommandSummary.result
   ) {
     isComment = runCommandSummary.result.legacyCommandType === 'command.COMMENT'
-  } else if (
-    commandDetails?.data.commandType === 'custom' &&
-    'legacyCommandType' in commandDetails?.data.params
-  ) {
-    isComment =
-      commandDetails.data.params.legacyCommandType === 'command.COMMENT'
   }
 
   const isPause =
@@ -189,24 +184,25 @@ export function CommandItemComponent(
       <Flex
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
+        alignItems={ALIGN_CENTER}
       >
-        <Flex flexDirection={DIRECTION_ROW}>
-          {['running', 'failed', 'succeeded'].includes(commandStatus) &&
-          !isComment ? (
-            <CommandTimer
-              commandStartedAt={commandDetails?.data.startedAt}
-              commandCompletedAt={commandDetails?.data.completedAt}
-              commandStatus={commandStatus}
-            />
-          ) : null}
+        <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
+          <Text fontSize={FONT_SIZE_CAPTION} marginRight={SPACING_3} minWidth={SIZE_1}>
+            {stepNumber}
+          </Text>
           <CommandText
             analysisCommand={analysisCommand}
             runCommand={commandDetails?.data ?? null}
           />
         </Flex>
-        <Text fontSize={FONT_SIZE_CAPTION} marginY={SPACING_1}>
-          {stepNumber}
-        </Text>
+        {['running', 'failed', 'succeeded'].includes(commandStatus) &&
+        !isComment ? (
+          <CommandTimer
+            commandStartedAt={commandDetails?.data.startedAt}
+            commandCompletedAt={commandDetails?.data.completedAt}
+            commandStatus={commandStatus}
+          />
+        ) : null}
       </Flex>
     </Flex>
   )
