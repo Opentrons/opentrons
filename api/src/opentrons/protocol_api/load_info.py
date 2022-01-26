@@ -62,4 +62,4 @@ class ModuleLoadInfo:
     module_model: ModuleModel
     deck_slot: DeckSlotName
     configuration: Optional[str]
-    module_serial: Optional[str]
+    module_serial: str

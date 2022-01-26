@@ -4,6 +4,7 @@ import {
   MOCK_CONFIG_V1,
   MOCK_CONFIG_V2,
   MOCK_CONFIG_V3,
+  MOCK_CONFIG_V4,
 } from '../__fixtures__'
 import { migrate } from '../migrate'
 
@@ -12,39 +13,45 @@ describe('config migration', () => {
     const v0Config = MOCK_CONFIG_V0
     const result = migrate(v0Config)
 
-    expect(result.version).toBe(3)
-    expect(result).toEqual(MOCK_CONFIG_V3)
+    expect(result.version).toBe(4)
+    expect(result).toEqual(MOCK_CONFIG_V4)
   })
 
   it('should migrate version 1 to latest', () => {
     const v1Config = MOCK_CONFIG_V1
     const result = migrate(v1Config)
 
-    expect(result.version).toBe(3)
-    expect(result).toEqual(MOCK_CONFIG_V3)
+    expect(result.version).toBe(4)
+    expect(result).toEqual(MOCK_CONFIG_V4)
   })
 
   it('should migrate version 2 to latest', () => {
     const v2Config = MOCK_CONFIG_V2
     const result = migrate(v2Config)
 
-    expect(result.version).toBe(3)
-    expect(result).toEqual(MOCK_CONFIG_V3)
+    expect(result.version).toBe(4)
+    expect(result).toEqual(MOCK_CONFIG_V4)
   })
 
-  it('should keep version 3 unchanged', () => {
-    const v3Config = {
-      ...MOCK_CONFIG_V3,
-      support: {
-        // @ts-expect-error(mc, 2021-02-17): will be fixed by app in TS
-        ...MOCK_CONFIG_V3.support,
-        name: 'Known Kname',
-        email: 'hello@example.com',
-      },
-    }
+  it('should migrate version 3 to latest', () => {
+    const v3Config = MOCK_CONFIG_V3
     const result = migrate(v3Config)
 
-    expect(result.version).toBe(3)
-    expect(result).toEqual(v3Config)
+    expect(result.version).toBe(4)
+    expect(result).toEqual(MOCK_CONFIG_V4)
+  })
+
+  it('should keep version 4 unchanged', () => {
+    const v4Config = {
+      ...MOCK_CONFIG_V4,
+      labware: {
+        ...MOCK_CONFIG_V3.labware,
+        showLabwareOffsetCodeSnippets: false,
+      },
+    }
+    const result = migrate(v4Config)
+
+    expect(result.version).toBe(4)
+    expect(result).toEqual(v4Config)
   })
 })

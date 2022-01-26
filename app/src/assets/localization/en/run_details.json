@@ -56,5 +56,8 @@
   "protocol_run_failed": "Protocol run failed",
   "protocol_run_canceled": "Protocol run canceled",
   "protocol_run_complete": "Protocol run complete",
-  "run_cta_disabled": "Complete required steps on Protocol tab before starting the run"
+  "run_cta_disabled": "Complete required steps on Protocol tab before starting the run",
+  "loading_protocol": "Loading Protocol",
+  "closing_protocol": "Closing Protocol",
+  "canceling_run": "Canceling Run"
 }

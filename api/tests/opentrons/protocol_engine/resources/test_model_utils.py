@@ -21,3 +21,11 @@ def test_model_utils_generates_unique() -> None:
     unique_results = set(results)
 
     assert len(results) == len(unique_results)
+
+
+def test_model_utils_ensures_id() -> None:
+    """It should generate unique IDs only when needed."""
+    subject = ModelUtils()
+    assert subject.ensure_id("hello world") == "hello world"
+    assert RE_UUID.match(subject.ensure_id())
+    assert RE_UUID.match(subject.ensure_id(None))

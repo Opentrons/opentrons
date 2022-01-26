@@ -9,6 +9,7 @@ import {
   useConditionalConfirm,
 } from '@opentrons/components'
 import { Portal } from '../../../App/portal'
+import { useTrackEvent } from '../../../redux/analytics'
 import { useRestartRun } from '../../ProtocolUpload/hooks/useRestartRun'
 import { useLabwarePositionCheck } from './hooks'
 import { IntroScreen } from './IntroScreen'
@@ -28,6 +29,7 @@ export const LabwarePositionCheck = (
 ): JSX.Element | null => {
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const restartRun = useRestartRun()
+  const trackEvent = useTrackEvent()
   const [
     savePositionCommandData,
     savePositionCommandDataDispatch,
@@ -73,7 +75,12 @@ export const LabwarePositionCheck = (
     // show the modal for 5 seconds, then unmount and restart the run
     if (!isRestartingRun) {
       setTimeout(() => restartRun(), 5000)
-      !isRestartingRun && setIsRestartingRun(true)
+      setIsRestartingRun(true)
+      const { name, message } = labwarePositionCheckUtils.error
+      trackEvent({
+        name: 'labwarePositionCheckFailed',
+        properties: { error: { message, name } },
+      })
     }
     const { error } = labwarePositionCheckUtils
     return (

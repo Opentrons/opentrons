@@ -34,6 +34,8 @@ LiveData = Mapping[str, Union[str, Mapping[str, Union[float, str, None]]]]
 E = TypeVar("E", bound="_ProvideLookup")
 
 
+# TODO(mc, 2022-01-18): this mixin is unnecessary; Python enums can
+# use parenthetical notation to access by value
 class _ProvideLookup(Enum):
     @classmethod
     def from_str(cls: Type[E], typename: str) -> "E":
@@ -97,6 +99,7 @@ class ModuleInfo(NamedTuple):
     serial: str  # the serial number
 
 
+# TODO(mc, 2022-01-18): replace with enum
 ModuleModel = Union[
     MagneticModuleModel, TemperatureModuleModel, ThermocyclerModuleModel
 ]
