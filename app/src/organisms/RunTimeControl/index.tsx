@@ -10,6 +10,7 @@ import {
   RUN_STATUS_FAILED,
   RUN_STATUS_FINISHING,
   RUN_STATUS_SUCCEEDED,
+  RUN_STATUS_PAUSED_DOOR_OPEN,
 } from '@opentrons/api-client'
 import {
   Flex,
@@ -31,6 +32,7 @@ import {
   SIZE_1,
   SPACING_2,
   SPACING_3,
+  AlertItem,
 } from '@opentrons/components'
 import {
   useMissingModuleIds,
@@ -137,7 +139,8 @@ export function RunTimeControl(): JSX.Element | null {
     handleButtonClick = pause
   } else if (
     runStatus === RUN_STATUS_PAUSED ||
-    runStatus === RUN_STATUS_PAUSE_REQUESTED
+    runStatus === RUN_STATUS_PAUSE_REQUESTED ||
+    runStatus === RUN_STATUS_PAUSED_DOOR_OPEN
   ) {
     buttonIconName = 'play'
     buttonText = t('resume_run')
@@ -179,6 +182,12 @@ export function RunTimeControl(): JSX.Element | null {
           completedAt={completedAt}
         />
       ) : null}
+      {runStatus === RUN_STATUS_PAUSED_DOOR_OPEN ? (
+        <Flex marginBottom={SPACING_3}>
+          <AlertItem type="warning" title="Close robot door to resume" />
+        </Flex>
+      ) : null}
+
       <NewPrimaryBtn
         onClick={handleButtonClick}
         alignSelf={ALIGN_STRETCH}

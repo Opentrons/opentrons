@@ -33,6 +33,7 @@ import {
   RUN_STATUS_IDLE,
   RUN_STATUS_PAUSE_REQUESTED,
   RUN_STATUS_PAUSED,
+  RUN_STATUS_PAUSED_DOOR_OPEN,
 } from '@opentrons/api-client'
 import type { RunStatus, RunCommandSummary } from '@opentrons/api-client'
 
@@ -223,6 +224,18 @@ interface CurrentCommandLabelProps {
 
 function CurrentCommandLabel(props: CurrentCommandLabelProps): JSX.Element {
   const { t } = useTranslation('run_details')
+  const pauseCommandTypeLabel = (): string => {
+    if (
+      props.runStatus === RUN_STATUS_PAUSED ||
+      props.runStatus === RUN_STATUS_PAUSE_REQUESTED
+    ) {
+      return t('current_step_pause')
+    } else if (props.runStatus === RUN_STATUS_PAUSED_DOOR_OPEN) {
+      return t('door_open_pause')
+    } else {
+      return t('current_step')
+    }
+  }
   return (
     <Text
       fontWeight={FONT_WEIGHT_BOLD}
@@ -231,10 +244,7 @@ function CurrentCommandLabel(props: CurrentCommandLabelProps): JSX.Element {
       textTransform={TEXT_TRANSFORM_UPPERCASE}
       fontSize={FONT_SIZE_CAPTION}
     >
-      {props.runStatus === RUN_STATUS_PAUSED ||
-      props.runStatus === RUN_STATUS_PAUSE_REQUESTED
-        ? t('current_step_pause')
-        : t('current_step')}
+      {pauseCommandTypeLabel()}
     </Text>
   )
 }

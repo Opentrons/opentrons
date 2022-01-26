@@ -9,6 +9,8 @@ export const RUN_STATUS_STOPPED: 'stopped' = 'stopped'
 export const RUN_STATUS_FAILED: 'failed' = 'failed'
 export const RUN_STATUS_FINISHING: 'finishing' = 'finishing'
 export const RUN_STATUS_SUCCEEDED: 'succeeded' = 'succeeded'
+export const RUN_STATUS_PAUSED_DOOR_OPEN: 'blocked-by-open-door' =
+  'blocked-by-open-door'
 
 export type RunStatus =
   | typeof RUN_STATUS_IDLE
@@ -20,6 +22,7 @@ export type RunStatus =
   | typeof RUN_STATUS_FAILED
   | typeof RUN_STATUS_FINISHING
   | typeof RUN_STATUS_SUCCEEDED
+  | typeof RUN_STATUS_PAUSED_DOOR_OPEN
 
 export interface RunData {
   id: string

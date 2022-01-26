@@ -15,6 +15,7 @@
   "status_failed": "Completed",
   "status_pause-requested": "Pause requested",
   "status_paused": "Paused",
+  "status_blocked-by-open-door": "Paused - door open",
   "status_idle": "Not started",
   "status_finishing": "Finishing",
   "status_running": "Running",
@@ -59,5 +60,6 @@
   "run_cta_disabled": "Complete required steps on Protocol tab before starting the run",
   "loading_protocol": "Loading Protocol",
   "closing_protocol": "Closing Protocol",
-  "canceling_run": "Canceling Run"
+  "canceling_run": "Canceling Run",
+  "door_open_pause": "Current Step - Paused - Door Open"
 }
