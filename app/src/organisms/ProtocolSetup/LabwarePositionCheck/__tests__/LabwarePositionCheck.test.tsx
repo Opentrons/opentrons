@@ -3,6 +3,7 @@ import { resetAllWhenMocks, when } from 'jest-when'
 import { anyProps, renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/dom'
 import { i18n } from '../../../../i18n'
+import { useTrackEvent } from '../../../../redux/analytics'
 import { LabwarePositionCheck } from '../index'
 import { GenericStepScreen } from '../GenericStepScreen'
 import { IntroScreen } from '../IntroScreen'
@@ -13,6 +14,7 @@ import { ExitPreventionModal } from '../ExitPreventionModal'
 import { useSteps, useLabwarePositionCheck } from '../hooks'
 import type { LabwarePositionCheckStep } from '../types'
 
+jest.mock('../../../../redux/analytics')
 jest.mock('../GenericStepScreen')
 jest.mock('../IntroScreen')
 jest.mock('../SummaryScreen')
@@ -43,6 +45,9 @@ const mockUseSteps = useSteps as jest.MockedFunction<typeof useSteps>
 const mockUseLabwarePositionCheck = useLabwarePositionCheck as jest.MockedFunction<
   typeof useLabwarePositionCheck
 >
+const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
+  typeof useTrackEvent
+>
 
 const PICKUP_TIP_LABWARE_ID = 'PICKUP_TIP_LABWARE_ID'
 const PRIMARY_PIPETTE_ID = 'PRIMARY_PIPETTE_ID'
@@ -52,6 +57,8 @@ const render = (props: React.ComponentProps<typeof LabwarePositionCheck>) => {
     i18nInstance: i18n,
   })[0]
 }
+
+let mockTrackEvent: jest.Mock
 
 describe('LabwarePositionCheck', () => {
   let props: React.ComponentProps<typeof LabwarePositionCheck>
@@ -99,6 +106,9 @@ describe('LabwarePositionCheck', () => {
     when(mockExitPreventionModal)
       .calledWith(anyProps())
       .mockReturnValue(<div>Mock Exit Prevention Modal</div>)
+
+    mockTrackEvent = jest.fn()
+    when(mockUseTrackEvent).calledWith().mockReturnValue(mockTrackEvent)
   })
   afterEach(() => {
     resetAllWhenMocks()

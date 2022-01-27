@@ -17,12 +17,10 @@ class LoadModuleParams(BaseModel):
     model: ModuleModel = Field(
         ...,
         description=(
-            "The exact model name of the module to load."
+            "The model name of the module to load."
             "\n\n"
-            "In the future,"
-            " this command may change so that the load will succeed"
-            " if the physically attached module is merely compatible"
-            " with the version you requested."
+            "Protocol Engine will look for a connected module that either"
+            " exactly matches this one, or is compatible."
         ),
     )
 
@@ -59,9 +57,17 @@ class LoadModuleResult(BaseModel):
     # TODO (spp, 2021-11-24): Evaluate if this needs to be in the result
     definition: ModuleDefinition = Field(description="The definition of this module.")
 
-    # TODO (spp, 2021-11-24): Remove optional
-    moduleSerial: Optional[str] = Field(
-        None, description="Hardware serial number of the module, if connected."
+    model: ModuleModel = Field(
+        ...,
+        description=(
+            "Hardware model of the connected module. May be different than"
+            " the requested model if the attached module is still compatible."
+        ),
+    )
+
+    serialNumber: str = Field(
+        ...,
+        description="Hardware serial number of the connected module.",
     )
 
 
@@ -77,7 +83,8 @@ class LoadModuleImplementation(AbstractCommandImpl[LoadModuleParams, LoadModuleR
         )
         return LoadModuleResult(
             moduleId=loaded_module.module_id,
-            moduleSerial=loaded_module.module_serial,
+            serialNumber=loaded_module.serial_number,
+            model=loaded_module.definition.model,
             definition=loaded_module.definition,
         )
 

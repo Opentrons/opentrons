@@ -198,4 +198,11 @@ describe('AppAdvancedSettingsCard', () => {
       Config.updateConfigValue('update.channel', 'alpha')
     )
   })
+
+  it('renders download labware offset data setting', () => {
+    const { wrapper } = render()
+    expect(
+      wrapper.text().includes('Display a link to download Labware Offset Data')
+    ).toBe(true)
+  })
 })

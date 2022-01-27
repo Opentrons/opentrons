@@ -20,6 +20,7 @@ import { CommandList } from '../CommandList'
 import { useProtocolDetails } from '../hooks'
 import { useRunStatus, useRunControls } from '../../RunTimeControl/hooks'
 import { useCloseCurrentRun } from '../../ProtocolUpload/hooks/useCloseCurrentRun'
+import { ProtocolLoader } from '../../ProtocolUpload'
 import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
 import type { ProtocolFile } from '@opentrons/shared-data'
 
@@ -189,14 +190,25 @@ describe('RunDetails', () => {
     expect(button).not.toBeInTheDocument()
   })
 
-  it('redirects to /upload if protocol run is not loaded', () => {
+  const renderProtocolLoader = (
+    props: React.ComponentProps<typeof ProtocolLoader>
+  ) => {
+    return renderWithProviders(<ProtocolLoader {...props} />)[0]
+  }
+
+  let props: React.ComponentProps<typeof ProtocolLoader>
+  beforeEach(() => {
+    props = { loadingText: 'Loading Protocol' }
+  })
+
+  it('renders a loader if protocol run is not loaded', () => {
     when(mockUseCloseCurrentRun)
       .calledWith()
       .mockReturnValue({
         isProtocolRunLoaded: false,
         closeCurrentRun: jest.fn(),
       } as any)
-    const { getByText } = render()
-    expect(getByText('Upload page')).toBeTruthy()
+    const { getByText } = renderProtocolLoader(props)
+    getByText('Loading Protocol')
   })
 })

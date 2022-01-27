@@ -1,7 +1,6 @@
 """Protocol engine plugin interface."""
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from anyio import from_thread
 from typing import List
 from typing_extensions import final
 
@@ -37,25 +36,11 @@ class AbstractPlugin(ActionHandler, ABC):
         """
         return self._action_dispatcher.dispatch(action)
 
-    @final
-    def dispatch_threadsafe(self, action: Action) -> None:
-        """Dispatch an action into the action pipeline from a child thread.
-
-        Child thread must be created with `anyio.to_thread`.
-
-        Arguments:
-            action: A new ProtocolEngine action to send into the pipeline.
-                This action will flow through all plugins, including
-                this one, so be careful to avoid infinite loops. In general,
-                do not dispatch an action your plugin will react to.
-        """
-        return from_thread.run_sync(self._action_dispatcher.dispatch, action)
-
     def setup(self) -> None:
         """Run any necessary setup steps prior to plugin usage."""
         ...
 
-    def teardown(self) -> None:
+    async def teardown(self) -> None:
         """Run any necessary teardown steps once the engine is stopped."""
         ...
 
@@ -111,9 +96,9 @@ class PluginStarter:
         self._action_dispatcher.add_handler(plugin)
         plugin.setup()
 
-    def stop(self) -> None:
+    async def stop(self) -> None:
         """Stop any configured plugins."""
         for p in self._plugins:
-            p.teardown()
+            await p.teardown()
 
         self._plugins = []
