@@ -33,7 +33,7 @@ import {
   SPACING_3,
 } from '@opentrons/components'
 import {
-  useMissingModuleIds,
+  useModuleMatchResults,
   useProtocolCalibrationStatus,
 } from '../ProtocolSetup/RunSetupCard/hooks'
 import {
@@ -48,8 +48,9 @@ import { Timer } from './Timer'
 
 export function RunTimeControl(): JSX.Element | null {
   const { t } = useTranslation('run_details')
-  const missingModuleIds = useMissingModuleIds()
+  const moduleMatchResults = useModuleMatchResults()
   const isEverythingCalibrated = useProtocolCalibrationStatus().complete
+  const { missingModuleIds } = moduleMatchResults
   const disableRunCta = !isEverythingCalibrated || missingModuleIds.length > 0
   const [targetProps, tooltipProps] = useHoverTooltip()
   const runStatus = useRunStatus()
