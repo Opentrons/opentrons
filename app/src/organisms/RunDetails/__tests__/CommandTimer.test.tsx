@@ -32,6 +32,7 @@ describe('CommandTimer', () => {
     props = {
       commandStartedAt: '0',
       commandCompletedAt: undefined,
+      commandStatus: 'running',
     }
     const { getByText } = render(props)
     getByText('0')
@@ -42,6 +43,7 @@ describe('CommandTimer', () => {
     props = {
       commandStartedAt: '5',
       commandCompletedAt: '10',
+      commandStatus: 'running',
     }
     const { getByText } = render(props)
     getByText('5')

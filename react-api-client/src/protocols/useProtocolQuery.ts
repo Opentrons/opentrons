@@ -8,11 +8,11 @@ const POLLING_INTERVAL = 1000
 
 export function useProtocolQuery(
   protocolId: string | null,
-  options?: UseQueryOptions<Protocol | null>,
+  options?: UseQueryOptions<Protocol>,
   enablePolling?: boolean
 ): UseQueryResult<Protocol | null> {
   const host = useHost()
-  const allOptions: UseQueryOptions<Protocol | null> = {
+  const allOptions: UseQueryOptions<Protocol> = {
     ...options,
     enabled:
       host !== null &&
@@ -23,7 +23,7 @@ export function useProtocolQuery(
         ? options?.refetchInterval ?? POLLING_INTERVAL
         : false,
   }
-  const query = useQuery(
+  const query = useQuery<Protocol>(
     [host, 'protocols', protocolId],
     () =>
       getProtocol(host as HostConfig, protocolId as string).then(

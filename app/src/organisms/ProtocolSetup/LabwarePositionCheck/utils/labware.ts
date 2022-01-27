@@ -7,8 +7,8 @@ import {
   getSlotHasMatingSurfaceUnitVector,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
-import type { PickUpTipCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
+import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { LabwareToOrder } from '../types'
 import { getLabwareLocation } from '../../utils/getLabwareLocation'
 import { getModuleInitialLoadInfo } from '../../utils/getModuleInitialLoadInfo'
@@ -39,7 +39,7 @@ export const orderBySlot = (
 export const getTiprackIdsInOrder = (
   labware: ProtocolFile<{}>['labware'],
   labwareDefinitions: Record<string, LabwareDefinition2>,
-  commands: Command[]
+  commands: RunTimeCommand[]
 ): string[] => {
   const unorderedTipracks = reduce<typeof labware, LabwareToOrder[]>(
     labware,
@@ -74,13 +74,13 @@ export const getTiprackIdsInOrder = (
 
 export const getAllTipracksIdsThatPipetteUsesInOrder = (
   pipetteId: string,
-  commands: Command[],
+  commands: RunTimeCommand[],
   labware: ProtocolFile<{}>['labware'],
   labwareDefinitions: Record<string, LabwareDefinition2>
 ): string[] => {
-  const pickUpTipCommandsWithPipette: PickUpTipCommand[] = commands
+  const pickUpTipCommandsWithPipette: PickUpTipRunTimeCommand[] = commands
     .filter(
-      (command): command is PickUpTipCommand =>
+      (command): command is PickUpTipRunTimeCommand =>
         command.commandType === 'pickUpTip'
     )
     .filter(command => command.params.pipetteId === pipetteId)
@@ -117,7 +117,7 @@ export const getLabwareIdsInOrder = (
   labware: ProtocolFile<{}>['labware'],
   labwareDefinitions: Record<string, LabwareDefinition2>,
   modules: ProtocolFile<{}>['modules'],
-  commands: Command[]
+  commands: RunTimeCommand[]
 ): string[] => {
   const unorderedLabware = reduce<typeof labware, LabwareToOrder[]>(
     labware,

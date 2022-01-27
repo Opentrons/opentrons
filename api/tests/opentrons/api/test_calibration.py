@@ -113,30 +113,6 @@ async def test_update_container_offset_v2(main_router, model):
 
 
 @pytest.mark.api2_only
-async def test_jog_calibrate_bottom_v2(main_router, model, calibrate_bottom_flag):
-
-    # Check that the feature flag correctly implements calibrate to bottom
-    container = model.container._container
-    height = container.wells()[0].geometry._depth
-    old_bottom = container.wells()[0].bottom().point
-
-    main_router.calibration_manager.home(model.instrument)
-    main_router.calibration_manager.move_to(model.instrument, model.container)
-    main_router.calibration_manager.jog(model.instrument, 1, "x")
-    main_router.calibration_manager.jog(model.instrument, 2, "y")
-    main_router.calibration_manager.jog(model.instrument, 3, "z")
-    main_router.calibration_manager.jog(model.instrument, -height, "z")
-
-    main_router.calibration_manager.update_container_offset(
-        model.container, model.instrument
-    )
-
-    assert list(model.container._container.wells()[0].bottom().point) == pytest.approx(
-        old_bottom + Point(1, 2, 3)
-    )
-
-
-@pytest.mark.api2_only
 async def test_jog_calibrate_top_v2(main_router, model):
 
     # Check that the old behavior remains the same without the feature flag

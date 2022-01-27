@@ -1,42 +1,74 @@
-import type { CommonCommandInfo } from '.'
+import type { CommonCommandRunTimeInfo } from '.'
 import type { MotorAxis } from '../../../../js/types'
-export interface MoveToSlotCommand extends CommonCommandInfo {
+
+export interface MoveToSlotCreateCommand {
   commandType: 'moveToSlot'
   params: MoveToSlotParams
-  result?: {}
 }
-export interface MoveToWellCommand extends CommonCommandInfo {
+export interface MoveToSlotRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    MoveToSlotCreateCommand {
+  result: {}
+}
+export interface MoveToWellCreateCommand {
   commandType: 'moveToWell'
   params: MoveToWellParams
-  result?: {}
 }
-export interface MoveToCoordinatesCommand extends CommonCommandInfo {
+export interface MoveToWellRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    MoveToWellCreateCommand {
+  result: {}
+}
+export interface MoveToCoordinatesCreateCommand {
   commandType: 'moveToCoordinates'
   params: MoveToCoordinatesParams
-  result?: {}
 }
-export interface MoveRelativeCommand extends CommonCommandInfo {
+export interface MoveToCoordinatesRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    MoveToCoordinatesCreateCommand {
+  result: {}
+}
+export interface MoveRelativeCreateCommand {
   commandType: 'moveRelative'
   params: MoveRelativeParams
-  result?: {}
 }
-export interface SavePositionCommand extends CommonCommandInfo {
+export interface MoveRelativeRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    MoveRelativeCreateCommand {
+  result: {}
+}
+export interface SavePositionCreateCommand {
   commandType: 'savePosition'
   params: SavePositionParams
-  result?: {}
 }
-export interface HomeCommand extends CommonCommandInfo {
+export interface SavePositionRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    SavePositionCreateCommand {
+  result: {}
+}
+export interface HomeCreateCommand {
   commandType: 'home'
   params: HomeParams
-  result?: {}
 }
-export type GantryCommand =
-  | MoveToSlotCommand
-  | MoveToWellCommand
-  | MoveToCoordinatesCommand
-  | MoveRelativeCommand
-  | SavePositionCommand
-  | HomeCommand
+export interface HomeRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    HomeCreateCommand {
+  result: {}
+}
+export type GantryRunTimeCommand =
+  | MoveToSlotRunTimeCommand
+  | MoveToWellRunTimeCommand
+  | MoveToCoordinatesRunTimeCommand
+  | MoveRelativeRunTimeCommand
+  | SavePositionRunTimeCommand
+  | HomeRunTimeCommand
+export type GantryCreateCommand =
+  | MoveToSlotCreateCommand
+  | MoveToWellCreateCommand
+  | MoveToCoordinatesCreateCommand
+  | MoveRelativeCreateCommand
+  | SavePositionCreateCommand
+  | HomeCreateCommand
 
 interface MoveToSlotParams {
   pipetteId: string

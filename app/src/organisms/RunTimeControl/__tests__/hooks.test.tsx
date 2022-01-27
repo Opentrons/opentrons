@@ -31,6 +31,7 @@ import {
   useRunCompleteTime,
   useRunControls,
   useRunPauseTime,
+  useRunStopTime,
   useRunStatus,
   useRunStartTime,
 } from '../hooks'
@@ -129,7 +130,9 @@ const mockFailedRun: RunData = {
       actionType: RUN_ACTION_TYPE_PLAY,
     },
   ],
-  commands: [{ id: COMMAND_ID, commandType: 'custom', status: 'succeeded' }],
+  commands: [
+    { id: COMMAND_ID, commandType: 'custom', status: 'succeeded' },
+  ] as any,
   errors: [
     {
       id: '5',
@@ -169,7 +172,9 @@ const mockStoppedRun: RunData = {
       actionType: RUN_ACTION_TYPE_STOP,
     },
   ],
-  commands: [{ id: COMMAND_ID, commandType: 'custom', status: 'succeeded' }],
+  commands: [
+    { id: COMMAND_ID, commandType: 'custom', status: 'succeeded' },
+  ] as any,
   errors: [],
   pipettes: [],
   labware: [],
@@ -197,7 +202,9 @@ const mockSucceededRun: RunData = {
       actionType: RUN_ACTION_TYPE_PLAY,
     },
   ],
-  commands: [{ id: COMMAND_ID, commandType: 'custom', status: 'succeeded' }],
+  commands: [
+    { id: COMMAND_ID, commandType: 'custom', status: 'succeeded' },
+  ] as any,
   errors: [],
   pipettes: [],
   labware: [],
@@ -237,7 +244,9 @@ const mockIdleStartedRun: RunData = {
       actionType: RUN_ACTION_TYPE_PLAY,
     },
   ],
-  commands: [{ id: COMMAND_ID, commandType: 'custom', status: 'succeeded' }],
+  commands: [
+    { id: COMMAND_ID, commandType: 'custom', status: 'succeeded' },
+  ] as any,
   errors: [],
   pipettes: [],
   labware: [],
@@ -284,6 +293,8 @@ describe('useRunControls hook', () => {
     expect(mockPlayRun).toHaveBeenCalledTimes(1)
     act(() => result.current.pause())
     expect(mockPauseRun).toHaveBeenCalledTimes(1)
+    act(() => result.current.stop())
+    expect(mockStopRun).toHaveBeenCalledTimes(1)
     act(() => result.current.reset())
     expect(mockCloneRun).toHaveBeenCalledTimes(1)
   })
@@ -400,6 +411,44 @@ describe('useRunPauseTime hook', () => {
 
     const { result } = renderHook(useRunPauseTime)
     expect(result.current).toBe('2021-10-25T13:23:31.366581+00:00')
+  })
+})
+
+describe('useRunStopTime hook', () => {
+  afterEach(() => {
+    resetAllWhenMocks()
+  })
+
+  it('returns null when stop is not the last action', async () => {
+    when(mockUseCurrentProtocolRun)
+      .calledWith()
+      .mockReturnValue({
+        runRecord: { data: mockRunningRun },
+      } as UseCurrentProtocolRun)
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID_2)
+      .mockReturnValue(({
+        data: { data: mockRunningRun },
+      } as unknown) as UseQueryResult<Run>)
+
+    const { result } = renderHook(useRunStopTime)
+    expect(result.current).toBe(null)
+  })
+
+  it('returns the stop time of the current run when stop is the last action', async () => {
+    when(mockUseCurrentProtocolRun)
+      .calledWith()
+      .mockReturnValue({
+        runRecord: { data: mockStoppedRun },
+      } as UseCurrentProtocolRun)
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID_2)
+      .mockReturnValue(({
+        data: { data: mockStoppedRun },
+      } as unknown) as UseQueryResult<Run>)
+
+    const { result } = renderHook(useRunStopTime)
+    expect(result.current).toBe('2021-10-25T13:58:22.366581+00:00')
   })
 })
 

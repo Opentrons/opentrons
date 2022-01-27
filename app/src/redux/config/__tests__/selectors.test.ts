@@ -107,4 +107,20 @@ describe('shell selectors', () => {
       expect(Selectors.getUseTrashSurfaceForTipCal(state)).toEqual(false)
     })
   })
+
+  describe('getIsLabwareOffsetCodeSnippetsOn', () => {
+    it('should return true is saved value in config is true', () => {
+      const state: State = {
+        config: { labware: { showLabwareOffsetCodeSnippets: true } },
+      } as any
+      expect(Selectors.getIsLabwareOffsetCodeSnippetsOn(state)).toEqual(true)
+    })
+
+    it('should return false is saved value in config is false', () => {
+      const state: State = {
+        config: { labware: { showLabwareOffsetCodeSnippets: false } },
+      } as any
+      expect(Selectors.getIsLabwareOffsetCodeSnippetsOn(state)).toEqual(false)
+    })
+  })
 })

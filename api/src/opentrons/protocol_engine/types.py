@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 from typing import Optional, Union, List, Dict, Any
 
 from opentrons.types import MountType, DeckSlotName
+from opentrons.hardware_control.modules import ModuleType as ModuleType
 
 
 class EngineStatus(str, Enum):
@@ -127,6 +128,7 @@ class MotorAxis(str, Enum):
     RIGHT_PLUNGER = "rightPlunger"
 
 
+# TODO(mc, 2022-01-18): move enum to hardware control module
 class ModuleModel(str, Enum):
     """All available modules' models."""
 
@@ -164,24 +166,29 @@ class ModuleDefinition(BaseModel):
     """Module definition class."""
 
     otSharedSchema: str = Field("module/schemas/2", description="The current schema.")
-    moduleType: str = Field(
-        ..., description="Module type (Temperature/ Magnetic/ Thermocycler)"
+    moduleType: ModuleType = Field(
+        ...,
+        description="Module type (Temperature/Magnetic/Thermocycler)",
     )
-    model: str = Field(..., description="Model name of the module")
+    model: ModuleModel = Field(..., description="Model name of the module")
     labwareOffset: LabwareOffsetVector = Field(
-        ..., description="Labware offset in x, y, z."
+        ...,
+        description="Labware offset in x, y, z.",
     )
     dimensions: ModuleDimensions = Field(..., description="Module dimension")
     calibrationPoint: ModuleCalibrationPoint = Field(
-        ..., description="Calibration point of module."
+        ...,
+        description="Calibration point of module.",
     )
     displayName: str = Field(..., description="Display name.")
     quirks: List[str] = Field(..., description="Module quirks")
     slotTransforms: Dict[str, Any] = Field(
-        ..., description="Dictionary of transforms for each slot."
+        ...,
+        description="Dictionary of transforms for each slot.",
     )
-    compatibleWith: List[str] = Field(
-        ..., description="List of module models this model is compatible with."
+    compatibleWith: List[ModuleModel] = Field(
+        ...,
+        description="List of module models this model is compatible with.",
     )
 
 
@@ -192,9 +199,7 @@ class LoadedModule(BaseModel):
     model: ModuleModel
     location: DeckSlotLocation
     definition: ModuleDefinition
-    # TODO(mc, 2021-11-24): make serial non-optional, here and in internal state.
-    # Our hardware backend always provides a module serial, even when it's simulated.
-    serial: Optional[str]
+    serialNumber: str
 
 
 class LabwareOffsetLocation(BaseModel):

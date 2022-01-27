@@ -5,14 +5,14 @@ import type {
   LabwareDefinition2,
   PipetteName,
 } from '@opentrons/shared-data'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
+import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 
 export const getPipetteWorkflow = (args: {
   pipetteNames: PipetteName[]
   primaryPipetteId: string
   labware: ProtocolFile<{}>['labware']
   labwareDefinitions: Record<string, LabwareDefinition2>
-  commands: Command[]
+  commands: RunTimeCommand[]
 }): 1 | 2 => {
   const {
     pipetteNames,

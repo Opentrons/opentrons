@@ -156,7 +156,7 @@ class LegacyExecutor:
 
 
 __all__ = [
-    # Re-exports of main public API stuff:
+    # Re-exports of user-facing Python Protocol APIv2 stuff:
     "LegacyProtocolContext",
     "LegacyLabware",
     "LegacyWell",

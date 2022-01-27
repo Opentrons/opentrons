@@ -1,11 +1,17 @@
 import {
   CONNECTABLE,
   REACHABLE,
+  UNREACHABLE,
   HEALTH_STATUS_OK,
   HEALTH_STATUS_NOT_OK,
 } from '../constants'
 
-import type { BaseRobot, Robot, ReachableRobot } from '../types'
+import type {
+  BaseRobot,
+  Robot,
+  ReachableRobot,
+  UnreachableRobot,
+} from '../types'
 
 export const mockHealthResponse = {
   name: 'robot-name',
@@ -74,6 +80,18 @@ export const mockConnectedRobot: Robot = {
 export const mockReachableRobot: ReachableRobot = {
   ...mockBaseRobot,
   status: REACHABLE,
+  health: mockHealthResponse,
+  serverHealth: mockUpdateServerHealthResponse as Robot['serverHealth'],
+  healthStatus: HEALTH_STATUS_NOT_OK,
+  serverHealthStatus: HEALTH_STATUS_OK,
+  ip: '127.0.0.1',
+  port: 31950,
+  seen: true,
+}
+
+export const mockUnreachableRobot: UnreachableRobot = {
+  ...mockBaseRobot,
+  status: UNREACHABLE,
   health: mockHealthResponse,
   serverHealth: mockUpdateServerHealthResponse as Robot['serverHealth'],
   healthStatus: HEALTH_STATUS_NOT_OK,

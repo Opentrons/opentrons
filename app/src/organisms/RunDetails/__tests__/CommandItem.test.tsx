@@ -11,7 +11,7 @@ import {
   useCommandQuery,
 } from '@opentrons/react-api-client'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks/useCurrentRunId'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6/command'
+import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command'
 import type { RunCommandSummary } from '@opentrons/api-client'
 
 jest.mock('react-intersection-observer')
@@ -43,37 +43,41 @@ const RUN_ID = 'run_id'
 
 const MOCK_COMMAND_SUMMARY: RunCommandSummary = {
   id: 'some_id',
+  key: 'some_key',
   commandType: 'custom',
   status: 'queued',
 }
-const MOCK_ANALYSIS_COMMAND: Command = {
+const MOCK_ANALYSIS_COMMAND: RunTimeCommand = {
   id: 'some_id',
+  key: 'some_key',
   commandType: 'custom',
   status: 'queued',
   params: {},
-}
-const MOCK_COMMAND_DETAILS = {
+} as any
+const MOCK_COMMAND_DETAILS: RunTimeCommand = {
   id: '123',
+  key: '123',
   commandType: 'custom',
   params: {},
   status: 'running',
   result: {},
   startedAt: 'start timestamp',
   completedAt: 'end timestamp',
-} as Command
-const MOCK_COMMAND_DETAILS_COMMENT = {
+} as any
+const MOCK_COMMAND_DETAILS_COMMENT: RunTimeCommand = {
   id: 'COMMENT',
+  key: 'COMMENT',
   commandType: 'custom',
   params: { legacyCommandType: 'command.COMMENT' },
   status: 'queued',
   result: {},
   startedAt: 'start timestamp',
   completedAt: 'end timestamp',
-} as Command
-describe('Run Details Command item', () => {
+} as any
+describe('Run Details RunTimeCommand item', () => {
   beforeEach(() => {
-    mockCommandText.mockReturnValue(<div>Mock Command Text</div>)
-    mockCommandTimer.mockReturnValue(<div>Mock Command Timer</div>)
+    mockCommandText.mockReturnValue(<div>Mock RunTimeCommand Text</div>)
+    mockCommandTimer.mockReturnValue(<div>Mock RunTimeCommand Timer</div>)
     when(mockUseCurrentRunId).calledWith().mockReturnValue(RUN_ID)
     when(mockUseCommandQuery)
       .calledWith(RUN_ID, MOCK_COMMAND_SUMMARY.id, expect.anything())
@@ -97,12 +101,13 @@ describe('Run Details Command item', () => {
       analysisCommand: { ...MOCK_ANALYSIS_COMMAND },
       runStatus: 'running',
       currentRunId: RUN_ID,
+      stepNumber: 1,
     })
     expect(getByText('Step failed')).toHaveStyle(
       'backgroundColor: C_ERROR_LIGHT'
     )
-    getByText('Mock Command Text')
-    getByText('Mock Command Timer')
+    getByText('Mock RunTimeCommand Text')
+    getByText('Mock RunTimeCommand Timer')
   })
   it('renders the correct success status', () => {
     const props = {
@@ -110,12 +115,13 @@ describe('Run Details Command item', () => {
       analysisCommand: { ...MOCK_ANALYSIS_COMMAND },
       runStatus: 'succeeded',
       currentRunId: RUN_ID,
+      stepNumber: 1,
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
-    expect(getByText('Mock Command Timer')).toHaveStyle(
+    expect(getByText('Mock RunTimeCommand Timer')).toHaveStyle(
       'backgroundColor: C_AQUAMARINE'
     )
-    getByText('Mock Command Text')
+    getByText('Mock RunTimeCommand Text')
   })
   it('renders the correct running status', () => {
     const props = {
@@ -123,13 +129,14 @@ describe('Run Details Command item', () => {
       analysisCommand: { ...MOCK_ANALYSIS_COMMAND },
       runStatus: 'running',
       currentRunId: RUN_ID,
+      stepNumber: 1,
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
     expect(getByText('Current Step')).toHaveStyle(
       'backgroundColor: C_POWDER_BLUE'
     )
-    getByText('Mock Command Timer')
-    getByText('Mock Command Text')
+    getByText('Mock RunTimeCommand Timer')
+    getByText('Mock RunTimeCommand Text')
   })
 
   it('renders the correct queued status', () => {
@@ -138,9 +145,10 @@ describe('Run Details Command item', () => {
       analysisCommand: { ...MOCK_ANALYSIS_COMMAND },
       runStatus: 'running',
       currentRunId: RUN_ID,
+      stepNumber: 1,
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
-    expect(getByText('Mock Command Text')).toHaveStyle(
+    expect(getByText('Mock RunTimeCommand Text')).toHaveStyle(
       'backgroundColor: C_NEAR_WHITE'
     )
   })
@@ -151,28 +159,29 @@ describe('Run Details Command item', () => {
       analysisCommand: { ...MOCK_ANALYSIS_COMMAND },
       runStatus: 'paused',
       currentRunId: RUN_ID,
+      stepNumber: 1,
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
     expect(getByText('Current Step - Paused by User')).toHaveStyle(
       'backgroundColor: C_POWDER_BLUE'
     )
-    getByText('Mock Command Text')
-    getByText('Mock Command Timer')
+    getByText('Mock RunTimeCommand Text')
+    getByText('Mock RunTimeCommand Timer')
   })
 
   it('renders the comment text when the command is a comment', () => {
-    const MOCK_COMMENT_COMMAND: Command = {
+    const MOCK_COMMENT_COMMAND: RunTimeCommand = {
       id: 'COMMENT',
       commandType: 'custom',
       params: { legacyCommandType: 'command.COMMENT' },
       status: 'queued',
       result: {},
-    }
+    } as any
     const MOCK_COMMENT_COMMAND_SUMMARY: RunCommandSummary = {
       id: 'COMMENT',
       commandType: 'custom',
       status: 'queued',
-    }
+    } as any
     when(mockUseCommandQuery)
       .calledWith(RUN_ID, MOCK_COMMENT_COMMAND_SUMMARY.id, expect.anything())
       .mockReturnValue({
@@ -184,25 +193,26 @@ describe('Run Details Command item', () => {
       analysisCommand: MOCK_COMMENT_COMMAND,
       runStatus: 'running',
       currentRunId: RUN_ID,
+      stepNumber: 1,
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
     expect(getByText('Comment')).toHaveStyle('backgroundColor: C_NEAR_WHITE')
-    getByText('Mock Command Text')
+    getByText('Mock RunTimeCommand Text')
   })
   it('renders the pause text when the command is a pause', () => {
-    const MOCK_PAUSE_COMMAND: Command = {
+    const MOCK_PAUSE_COMMAND: RunTimeCommand = {
       id: 'PAUSE',
       commandType: 'pause',
       params: {},
       status: 'queued',
       result: {},
-    }
+    } as any
     const MOCK_PAUSE_COMMAND_SUMMARY: RunCommandSummary = {
       id: 'PAUSE',
       commandType: 'pause',
       status: 'queued',
-    }
-    const MOCK_COMMAND_DETAILS_PAUSE: Command = {
+    } as any
+    const MOCK_COMMAND_DETAILS_PAUSE: RunTimeCommand = {
       id: 'PAUSE',
       commandType: 'pause',
       params: {},
@@ -210,7 +220,7 @@ describe('Run Details Command item', () => {
       result: {},
       startedAt: 'start timestamp',
       completedAt: 'end timestamp',
-    }
+    } as any
     when(mockUseCommandQuery)
       .calledWith(RUN_ID, MOCK_PAUSE_COMMAND.id, expect.anything())
       .mockReturnValue({
@@ -222,6 +232,7 @@ describe('Run Details Command item', () => {
       analysisCommand: MOCK_PAUSE_COMMAND,
       runStatus: 'paused',
       currentRunId: RUN_ID,
+      stepNumber: 1,
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
     expect(getByText('Pause protocol')).toHaveStyle(

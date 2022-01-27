@@ -9,10 +9,10 @@ import {
 import { getModuleDisplayName, ProtocolFile } from '@opentrons/shared-data'
 import { useCurrentRunPipetteInfoByMount } from '../ProtocolSetup/RunSetupCard/hooks'
 import { useProtocolDetails } from './hooks'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
+import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 
 interface ProtocolSetupInfoProps {
-  setupCommand?: Command
+  setupCommand?: RunTimeCommand
 }
 
 export const ProtocolSetupInfo = (

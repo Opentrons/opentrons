@@ -4,7 +4,7 @@ import { getPipetteWorkflow } from './utils/getPipetteWorkflow'
 import { getOnePipettePositionCheckSteps } from './utils/getOnePipettePositionCheckSteps'
 import { getTwoPipettePositionCheckSteps } from './utils/getTwoPipettePositionCheckSteps'
 import type {
-  Command,
+  RunTimeCommand,
   ProtocolFile,
 } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { LabwarePositionCheckStep } from './types'
@@ -19,7 +19,7 @@ export const getLabwarePositionCheckSteps = (
     const labware = protocolData.labware
     const modules: ProtocolFile<{}>['modules'] = protocolData.modules
     const labwareDefinitions = protocolData.labwareDefinitions
-    const commands: Command[] = protocolData.commands
+    const commands: RunTimeCommand[] = protocolData.commands
     const primaryPipetteId = getPrimaryPipetteId(pipettesById, commands)
     const pipetteWorkflow = getPipetteWorkflow({
       pipetteNames,

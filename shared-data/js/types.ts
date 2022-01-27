@@ -16,7 +16,7 @@ import {
   RIGHT,
 } from './constants'
 import type { INode } from 'svgson'
-import type { Command } from '../protocol'
+import type { RunTimeCommand } from '../protocol'
 import type { PipetteName } from './pipettes'
 
 // TODO Ian 2019-06-04 split this out into eg ../labware/flowTypes/labwareV1.js
@@ -397,7 +397,7 @@ export interface CompletedProtocolAnalysis {
   result: 'ok' | 'not-ok' | 'error'
   pipettes: LoadedPipette[]
   labware: LoadedLabware[]
-  commands: Command[]
+  commands: RunTimeCommand[]
   errors: AnalysisError[]
 }
 

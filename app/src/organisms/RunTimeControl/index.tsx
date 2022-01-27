@@ -42,6 +42,7 @@ import {
   useRunPauseTime,
   useRunStartTime,
   useRunStatus,
+  useRunStopTime,
 } from './hooks'
 import { Timer } from './Timer'
 
@@ -54,6 +55,7 @@ export function RunTimeControl(): JSX.Element | null {
   const runStatus = useRunStatus()
   const startTime = useRunStartTime()
   const pausedAt = useRunPauseTime()
+  const stoppedAt = useRunStopTime()
   const completedAt = useRunCompleteTime()
 
   const {
@@ -142,8 +144,11 @@ export function RunTimeControl(): JSX.Element | null {
     buttonIconName = 'play'
     buttonText = t('resume_run')
     handleButtonClick = play
+  } else if (runStatus === RUN_STATUS_STOP_REQUESTED) {
+    buttonIconName = null
+    buttonText = t('canceling_run')
+    handleButtonClick = reset
   } else if (
-    runStatus === RUN_STATUS_STOP_REQUESTED ||
     runStatus === RUN_STATUS_STOPPED ||
     runStatus === RUN_STATUS_FINISHING ||
     runStatus === RUN_STATUS_FAILED ||
@@ -173,7 +178,9 @@ export function RunTimeControl(): JSX.Element | null {
         <Timer
           startTime={startTime}
           pausedAt={pausedAt}
+          stoppedAt={stoppedAt}
           completedAt={completedAt}
+          runStatus={runStatus}
         />
       ) : null}
       <NewPrimaryBtn

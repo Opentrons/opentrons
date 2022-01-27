@@ -101,7 +101,6 @@ describe('Upload page', () => {
       enableBundleUpload: false,
     })
     const { wrapper } = render()
-    expect(wrapper.find('FileInfo').exists()).toBe(false)
     expect(wrapper.find('ProtocolUpload').exists()).toBe(true)
   })
 })

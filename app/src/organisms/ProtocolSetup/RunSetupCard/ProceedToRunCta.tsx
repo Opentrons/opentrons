@@ -9,11 +9,13 @@ import {
   useHoverTooltip,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
+import { useTrackEvent } from '../../../redux/analytics'
 
 export const ProceedToRunCta = (): JSX.Element | null => {
   const { t } = useTranslation('protocol_setup')
   const [targetProps, tooltipProps] = useHoverTooltip()
   const missingModuleIds = useMissingModuleIds()
+  const trackEvent = useTrackEvent()
   const isEverythingCalibrated = useProtocolCalibrationStatus().complete
   const calibrationIncomplete =
     missingModuleIds.length === 0 && !isEverythingCalibrated
@@ -43,6 +45,7 @@ export const ProceedToRunCta = (): JSX.Element | null => {
         disabled={proceedToRunDisabledReason != null}
         as={LinkComponent}
         id={'LabwareSetup_proceedToRunButton'}
+        onClick={() => trackEvent({ name: 'proceedToRun', properties: {} })}
         {...linkProps}
         {...targetProps}
       >

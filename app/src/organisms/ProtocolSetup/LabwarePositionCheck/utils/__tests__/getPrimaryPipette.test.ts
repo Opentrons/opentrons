@@ -1,6 +1,6 @@
 import { getPrimaryPipetteId } from '../getPrimaryPipetteId'
 import { ProtocolFile } from '@opentrons/shared-data'
-import { LoadPipetteCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import { LoadPipetteRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
 describe('getPrimaryPipetteId', () => {
   it('should return the one and only pipette if there is only one pipette in the protocol', () => {
@@ -12,7 +12,7 @@ describe('getPrimaryPipetteId', () => {
     expect(getPrimaryPipetteId({ ...mockPipette }, [])).toBe('p10SingleId')
   })
   it('should throw an error if there are two pipettes with the same mount', () => {
-    const loadPipetteCommands: LoadPipetteCommand[] = [
+    const loadPipetteCommands: LoadPipetteRunTimeCommand[] = [
       {
         id: '1',
         commandType: 'loadPipette',
@@ -29,7 +29,7 @@ describe('getPrimaryPipetteId', () => {
           mount: 'left',
         },
       },
-    ]
+    ] as any
 
     const p10Single: ProtocolFile<{}>['pipettes'] = {
       p10SingleId: {
@@ -51,7 +51,7 @@ describe('getPrimaryPipetteId', () => {
     )
   })
   it('should return the pipette with fewer channels', () => {
-    const loadPipetteCommands: LoadPipetteCommand[] = [
+    const loadPipetteCommands: LoadPipetteRunTimeCommand[] = [
       {
         id: '1',
         commandType: 'loadPipette',
@@ -74,7 +74,7 @@ describe('getPrimaryPipetteId', () => {
           pipetteId: 'p10MultiId',
         },
       },
-    ]
+    ] as any
     const p10Single: ProtocolFile<{}>['pipettes'] = {
       p10SingleId: {
         name: 'p10_single',
@@ -95,7 +95,7 @@ describe('getPrimaryPipetteId', () => {
     )
   })
   it('should return the smaller pipette', () => {
-    const loadPipetteCommands: LoadPipetteCommand[] = [
+    const loadPipetteCommands: LoadPipetteRunTimeCommand[] = [
       {
         id: '1',
         commandType: 'loadPipette',
@@ -118,7 +118,7 @@ describe('getPrimaryPipetteId', () => {
           pipetteId: 'p50MultiId',
         },
       },
-    ]
+    ] as any
 
     const p10Single: ProtocolFile<{}>['pipettes'] = {
       p10SingleId: {
@@ -140,7 +140,7 @@ describe('getPrimaryPipetteId', () => {
     )
   })
   it('should return the newer model', () => {
-    const loadPipetteCommands: LoadPipetteCommand[] = [
+    const loadPipetteCommands: LoadPipetteRunTimeCommand[] = [
       {
         id: '1',
         commandType: 'loadPipette',
@@ -163,7 +163,7 @@ describe('getPrimaryPipetteId', () => {
           pipetteId: 'p300SingleGen2Id',
         },
       },
-    ]
+    ] as any
 
     const p300Single: ProtocolFile<{}>['pipettes'] = {
       p300SingleId: {
@@ -186,7 +186,7 @@ describe('getPrimaryPipetteId', () => {
   })
 
   it('should return the left pipette when all else is the same', () => {
-    const loadPipetteCommands: LoadPipetteCommand[] = [
+    const loadPipetteCommands: LoadPipetteRunTimeCommand[] = [
       {
         id: '1',
         commandType: 'loadPipette',
@@ -209,7 +209,7 @@ describe('getPrimaryPipetteId', () => {
           pipetteId: 'p300SingleRightId',
         },
       },
-    ]
+    ] as any
 
     const p300SingleLeft: ProtocolFile<{}>['pipettes'] = {
       p300SingleLeftId: {
