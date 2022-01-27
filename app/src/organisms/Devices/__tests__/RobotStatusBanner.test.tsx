@@ -47,17 +47,17 @@ describe('RobotStatusBanner', () => {
 
   it('renders the type of robot', () => {
     const [{ getByText }] = render()
-    expect(getByText('OT-2')).toBeTruthy()
+    getByText('OT-2')
   })
 
   it('renders the robot name', () => {
     const [{ getByText }] = render()
-    expect(getByText('otie')).toBeTruthy()
+    getByText('otie')
   })
 
   it('renders an idle robot status when not running a protocol', () => {
     const [{ getByText }] = render()
-    expect(getByText('Idle')).toBeTruthy()
+    getByText('Idle')
   })
 
   it('renders an active robot status when a protocol is running', () => {
@@ -65,7 +65,7 @@ describe('RobotStatusBanner', () => {
 
     const [{ getByText }] = render()
 
-    expect(getByText('Active')).toBeTruthy()
+    getByText('Active')
   })
 
   it('does not render a running protocol banner when a protocol is not running', () => {
@@ -95,10 +95,9 @@ describe('RobotStatusBanner', () => {
 
     const [{ getByText }] = render()
 
-    expect(getByText('Running Testosaur')).toBeTruthy()
+    getByText('Running Testosaur')
 
     const runLink = getByText('Go to Run')
-    expect(runLink).toBeTruthy()
     expect(runLink.getAttribute('href')).toEqual(
       '/devices/otie/protocol-runs/run'
     )

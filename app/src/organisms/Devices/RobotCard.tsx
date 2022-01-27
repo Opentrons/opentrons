@@ -25,13 +25,11 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
+import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import { useAttachedModules, useAttachedPipettes } from './hooks'
 import { RobotStatusBanner } from './RobotStatusBanner'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const OT2_PNG = require('../../assets/images/OT2-R_HERO.png')
 
 const iconNamesByModuleType = {
   [MAGNETIC_MODULE_TYPE]: 'ot-magnet',
@@ -72,7 +70,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
       padding={SPACING_2}
       width="100%"
     >
-      <img src={OT2_PNG} width="93px" />
+      <img src={OT2_PNG} style={{ width: '6rem' }} />
       <Box padding={SPACING_2} width="100%">
         <RobotStatusBanner name={name} local={local} />
         <Flex>

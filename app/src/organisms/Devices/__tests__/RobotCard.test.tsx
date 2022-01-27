@@ -59,27 +59,26 @@ describe('RobotCard', () => {
     const [{ getByRole }] = render()
     const image = getByRole('img')
 
-    expect(image).toBeTruthy()
     expect(image.getAttribute('src')).toEqual(OT2_PNG_FILE_NAME)
   })
 
   it('renders a RobotStatusBanner component', () => {
     const [{ getByText }] = render()
-    expect(getByText('Mock RobotStatusBanner')).toBeTruthy()
+    getByText('Mock RobotStatusBanner')
   })
 
   it('renders the type of pipettes attached to left and right mounts', () => {
     const [{ getByText }] = render()
 
-    expect(getByText('Left Mount')).toBeTruthy()
-    expect(getByText('Left Pipette')).toBeTruthy()
-    expect(getByText('Right Mount')).toBeTruthy()
-    expect(getByText('Right Pipette')).toBeTruthy()
+    getByText('Left Mount')
+    getByText('Left Pipette')
+    getByText('Right Mount')
+    getByText('Right Pipette')
   })
 
   it('renders a modules section', () => {
     const [{ getByText }] = render()
 
-    expect(getByText('Modules')).toBeTruthy()
+    getByText('Modules')
   })
 })

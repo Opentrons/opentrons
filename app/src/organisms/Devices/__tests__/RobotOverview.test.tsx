@@ -54,21 +54,19 @@ describe('RobotOverview', () => {
   it('renders an OT image', () => {
     const [{ getByRole }] = render()
     const image = getByRole('img')
-
-    expect(image).toBeTruthy()
     expect(image.getAttribute('src')).toEqual(OT2_PNG_FILE_NAME)
   })
 
   it('renders a RobotStatusBanner component', () => {
     const [{ getByText }] = render()
-    expect(getByText('Mock RobotStatusBanner')).toBeTruthy()
+    getByText('Mock RobotStatusBanner')
   })
 
   it('renders a lights toggle button', () => {
     const [{ getByRole, getByText }] = render()
 
-    expect(getByText('Controls')).toBeTruthy()
-    expect(getByText('Lights')).toBeTruthy()
+    getByText('Controls')
+    getByText('Lights')
     const toggle = getByRole('switch', { name: 'Lights' })
     toggle.click()
     expect(mockToggleLights).toBeCalled()
@@ -77,6 +75,6 @@ describe('RobotOverview', () => {
   it('renders a Run a Protocol button', () => {
     const [{ getByText }] = render()
 
-    expect(getByText('Run a Protocol')).toBeTruthy()
+    getByText('Run a Protocol')
   })
 })

@@ -42,26 +42,26 @@ describe('NextGenApp', () => {
   })
   it('renders an AppSettings component', () => {
     const [{ getByText }] = render('/app-settings/feature-flags')
-    expect(getByText('Mock AppSettings')).toBeTruthy()
+    getByText('Mock AppSettings')
   })
 
   it('renders a DevicesLanding component from /robots', () => {
     const [{ getByText }] = render('/devices')
-    expect(getByText('Mock DevicesLanding')).toBeTruthy()
+    getByText('Mock DevicesLanding')
   })
 
   it('renders a DeviceDetails component from /robots/:robotName', () => {
     when(mockUseRobot).calledWith('otie').mockReturnValue(mockConnectableRobot)
     const [{ getByText }] = render('/devices/otie')
-    expect(getByText('Mock DeviceDetails')).toBeTruthy()
+    getByText('Mock DeviceDetails')
   })
 
   it('renders an AppSettings component from /more', () => {
     const [{ getByText }] = render('/more')
-    expect(getByText('Mock AppSettings')).toBeTruthy()
+    getByText('Mock AppSettings')
   })
   it('renders a nav bar with a protocols from /more', () => {
     const [{ getByText }] = render('/more')
-    expect(getByText('Mock AppSettings')).toBeTruthy()
+    getByText('Mock AppSettings')
   })
 })

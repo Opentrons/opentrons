@@ -24,12 +24,10 @@ import {
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
+import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import { ToggleBtn } from '../../atoms/ToggleBtn'
 import { useLights, useRobot, useIsProtocolRunning } from './hooks'
 import { RobotStatusBanner } from './RobotStatusBanner'
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const OT2_PNG = require('../../assets/images/OT2-R_HERO.png')
 
 interface RobotOverviewProps {
   robotName: string
@@ -57,7 +55,7 @@ export function RobotOverview({
         padding={SPACING_2}
         width="100%"
       >
-        <img src={OT2_PNG} width="93px" />
+        <img src={OT2_PNG} style={{ width: '6rem' }} />
         <Box padding={SPACING_2} width="100%">
           <RobotStatusBanner name={robot.name} local={robot.local} />
           <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>

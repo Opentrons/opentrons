@@ -56,6 +56,6 @@ describe('DeviceDetails', () => {
     mockUseRobot.mockReturnValue(mockConnectableRobot)
     const [{ getByText }] = render('/devices/otie')
 
-    expect(getByText('Mock RobotOverview')).toBeTruthy()
+    getByText('Mock RobotOverview')
   })
 })
