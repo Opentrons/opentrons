@@ -2,7 +2,7 @@ from functools import lru_cache
 import logging
 import numpy as np
 from dataclasses import dataclass
-from typing import Optional, List
+from typing import Optional, List, Tuple
 
 from opentrons import config
 
@@ -11,6 +11,7 @@ from opentrons.config.robot_configs import (
     default_deck_calibration,
     default_pipette_offset,
 )
+from opentrons.config.types import OT3Config
 from opentrons.calibration_storage import modify, types, get
 from opentrons.types import Mount
 from opentrons.util import linal
@@ -23,6 +24,28 @@ log = logging.getLogger(__name__)
 @dataclass
 class RobotCalibration:
     deck_calibration: types.DeckCalibration
+
+
+@dataclass
+class OT3Transforms(RobotCalibration):
+    carriage_offset: Tuple[float, float, float]
+    left_mount_offset: Tuple[float, float, float]
+    right_mount_offset: Tuple[float, float, float]
+    gripper_mount_offset: Tuple[float, float, float]
+
+
+def build_ot3_transforms(config: OT3Config) -> OT3Transforms:
+    return OT3Transforms(
+        deck_calibration=types.DeckCalibration(
+            attitude=config.deck_transform,
+            source=types.SourceType.default,
+            status=types.CalibrationStatus(),
+        ),
+        carriage_offset=config.carriage_offset,
+        left_mount_offset=config.left_mount_offset,
+        right_mount_offset=config.right_mount_offset,
+        gripper_mount_offset=config.gripper_mount_offset,
+    )
 
 
 def build_temporary_identity_calibration() -> RobotCalibration:

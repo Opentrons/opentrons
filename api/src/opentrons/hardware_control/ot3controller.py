@@ -51,8 +51,6 @@ _FIXED_PIPETTE_ID: str = "P1KSV3120211118A01"
 _FIXED_PIPETTE_NAME: PipetteName = "p1000_single_gen3"
 _FIXED_PIPETTE_MODEL: PipetteModel = cast("PipetteModel", "p1000_single_v3.0")
 
-HEAD_AXIS_ORIGIN: float = 220
-
 
 class OT3Controller:
     """OT3 Hardware Controller Backend."""
@@ -199,11 +197,7 @@ class OT3Controller:
         for node, pos in position.items():
             # we need to make robot config apply to z or in some other way
             # reflect the sense of the axis direction
-            if node == NodeId.head_r:
-                ret["A"] = HEAD_AXIS_ORIGIN - pos
-            elif node == NodeId.head_l:
-                ret["Z"] = HEAD_AXIS_ORIGIN - pos
-            elif OT3Controller._node_is_axis(node):
+            if OT3Controller._node_is_axis(node):
                 ret[OT3Controller._node_to_axis(node)] = pos
         log.info(f"update_position: {ret}")
         return ret
@@ -229,11 +223,7 @@ class OT3Controller:
         log.info(f"move: {target_position}")
         target: Dict[NodeId, float] = {}
         for axis, pos in target_position.items():
-            if axis == "A":
-                target[NodeId.head_r] = HEAD_AXIS_ORIGIN - pos
-            elif axis == "Z":
-                target[NodeId.head_l] = HEAD_AXIS_ORIGIN - pos
-            elif self._axis_is_node(axis):
+            if self._axis_is_node(axis):
                 target[self._axis_to_node(axis)] = pos
 
         log.info(f"move targets: {target}")

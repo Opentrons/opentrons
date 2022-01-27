@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Dict, Tuple, TypeVar, Generic
+from typing import Dict, Tuple, TypeVar, Generic, List
 from typing_extensions import TypedDict, Literal
 
 
@@ -73,7 +73,6 @@ class OT3Config:
     name: str
     version: int
     log_level: str
-    left_mount_offset: Tuple[float, float, float]
     default_max_speed: PerPipetteAxisSettings
     acceleration: PerPipetteAxisSettings
     max_speed_discontinuity: PerPipetteAxisSettings
@@ -81,3 +80,8 @@ class OT3Config:
     holding_current: PerPipetteAxisSettings
     normal_motion_current: PerPipetteAxisSettings
     z_retract_distance: float
+    deck_transform: List[List[float]]
+    carriage_offset: Tuple[float, float, float]
+    left_mount_offset: Tuple[float, float, float]
+    right_mount_offset: Tuple[float, float, float]
+    gripper_mount_offset: Tuple[float, float, float]

@@ -32,6 +32,7 @@ from .simulator import Simulator
 from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
+from .util import DeckTransformState
 from .types import (
     Axis,
     CriticalPoint,
@@ -48,7 +49,14 @@ from .types import (
     PauseType,
 )
 from . import modules
-from .robot_calibration import RobotCalibrationProvider, load_pipette_offset
+from .robot_calibration import (
+    load_pipette_offset,
+    OT3Transforms,
+    RobotCalibration,
+    build_ot3_transforms,
+)
+
+
 from .protocols import HardwareControlAPI
 from .instrument_handler import InstrumentHandlerProvider
 from .motion_utilities import (
@@ -69,7 +77,6 @@ PipetteHandlingData = Tuple[Pipette, top_types.Mount]
 
 class OT3API(
     ExecutionManagerProvider,
-    RobotCalibrationProvider,
     InstrumentHandlerProvider,
     # This MUST be kept last in the inheritance list so that it is
     # deprioritized in the method resolution order; otherwise, invocations
@@ -125,9 +132,23 @@ class OT3API(
         self._motion_lock = asyncio.Lock(loop=self._loop)
         self._door_state = DoorState.CLOSED
         self._pause_manager = PauseManager(self._door_state)
+        self._transforms = build_ot3_transforms(self._config)
+
         ExecutionManagerProvider.__init__(self, loop, isinstance(backend, Simulator))
-        RobotCalibrationProvider.__init__(self)
         InstrumentHandlerProvider.__init__(self)
+
+    def set_robot_calibration(self, robot_calibration: RobotCalibration) -> None:
+        self._transforms.deck_calibration = robot_calibration.deck_calibration
+
+    def reset_robot_calibration(self) -> None:
+        self._transforms = build_ot3_transforms(self._config)
+
+    @property
+    def robot_calibration(self) -> OT3Transforms:
+        return self._transforms
+
+    def validate_calibration(self) -> DeckTransformState:
+        return DeckTransformState.OK
 
     @property
     def door_state(self) -> DoorState:
@@ -504,7 +525,7 @@ class OT3API(
             with_enum[Axis.by_mount(top_types.Mount.LEFT)],
         )
 
-        gantry_calibration = self.robot_calibration.deck_calibration.attitude
+        gantry_calibration = self._transforms.deck_calibration.attitude
         right_deck = linal.apply_reverse(gantry_calibration, right)
         left_deck = linal.apply_reverse(gantry_calibration, left)
         deck_pos = {
@@ -669,11 +690,11 @@ class OT3API(
         # size; unfortunately, mypy can’t quite figure out the length check
         # above that makes this OK
         primary_transformed = linal.apply_transform(
-            self.robot_calibration.deck_calibration.attitude,
+            self._transforms.deck_calibration.attitude,
             to_transform_primary,  # type: ignore[arg-type]
         )
         secondary_transformed = linal.apply_transform(
-            self.robot_calibration.deck_calibration.attitude,
+            self._transforms.deck_calibration.attitude,
             to_transform_secondary,  # type: ignore[arg-type]
         )
         return primary_transformed, secondary_transformed
