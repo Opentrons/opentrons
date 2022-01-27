@@ -93,6 +93,7 @@ class StateStore(StateView, ActionHandler):
         self,
         deck_definition: DeckDefinitionV2,
         deck_fixed_labware: Sequence[DeckFixedLabware],
+        is_door_blocking: bool,
         configs: EngineConfigs = EngineConfigs(),
         change_notifier: Optional[ChangeNotifier] = None,
     ) -> None:
@@ -106,7 +107,7 @@ class StateStore(StateView, ActionHandler):
             configs: Configurations for the engine.
             change_notifier: Internal state change notifier.
         """
-        self._command_store = CommandStore()
+        self._command_store = CommandStore(is_door_blocking)
         self._pipette_store = PipetteStore()
         self._labware_store = LabwareStore(
             deck_fixed_labware=deck_fixed_labware,

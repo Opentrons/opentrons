@@ -125,6 +125,11 @@ class API(HardwareControlAPI):
     def robot_calibration(self) -> rb_cal.RobotCalibration:
         return self._robot_calibration
 
+    @property
+    def is_blocked_by_door(self) -> bool:
+        """Whether door is open when enable_door_safety_switch feature flag is ON."""
+        return self._pause_manager.blocked_by_door
+
     def reset_robot_calibration(self):
         self._calculate_valid_attitude.cache_clear()
         self._robot_calibration = rb_cal.load()

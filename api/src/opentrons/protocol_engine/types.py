@@ -15,7 +15,7 @@ class EngineStatus(str, Enum):
     IDLE = "idle"
     RUNNING = "running"
     PAUSED = "paused"
-    PAUSED_BY_OPEN_DOOR = "paused-by-open-door"
+    BLOCKED_BY_OPEN_DOOR = "blocked-by-open-door"
     STOP_REQUESTED = "stop-requested"
     STOPPED = "stopped"
     FINISHING = "finishing"

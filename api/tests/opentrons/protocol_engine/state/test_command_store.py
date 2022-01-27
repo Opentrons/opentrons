@@ -5,6 +5,11 @@ from datetime import datetime
 from typing import NamedTuple, Type
 
 from opentrons.types import MountType, DeckSlotName
+from opentrons.hardware_control.types import (
+    HardwareEvent,
+    DoorStateNotification,
+    DoorState,
+)
 from opentrons.protocol_engine import commands, errors
 from opentrons.protocol_engine.types import DeckSlotLocation, PipetteName, WellLocation
 
@@ -26,6 +31,7 @@ from opentrons.protocol_engine.actions import (
     FinishErrorDetails,
     StopAction,
     HardwareStoppedAction,
+    HardwareEventAction,
 )
 
 from .command_fixtures import (
@@ -43,6 +49,7 @@ def test_initial_state() -> None:
     assert subject.state == CommandState(
         queue_status=QueueStatus.IMPLICITLY_ACTIVE,
         is_hardware_stopped=False,
+        is_door_blocking=False,
         run_result=None,
         running_command_id=None,
         queued_command_ids=OrderedDict(),
@@ -345,6 +352,7 @@ def test_command_store_handles_pause_action(pause_source: PauseSource) -> None:
         queue_status=QueueStatus.INACTIVE,
         run_result=None,
         is_hardware_stopped=False,
+        is_door_blocking=False,
         running_command_id=None,
         queued_command_ids=OrderedDict(),
         commands_by_id=OrderedDict(),
@@ -363,6 +371,38 @@ def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
         queue_status=QueueStatus.ACTIVE,
         run_result=None,
         is_hardware_stopped=False,
+        is_door_blocking=False,
+        running_command_id=None,
+        queued_command_ids=OrderedDict(),
+        commands_by_id=OrderedDict(),
+        errors_by_id={},
+    )
+
+
+def test_command_store_handles_play_according_to_door_state() -> None:
+    """It should inactivate/activate command queue according to door state."""
+    subject = CommandStore(is_door_blocking=True)
+    subject.handle_action(PlayAction())
+    assert subject.state == CommandState(
+        queue_status=QueueStatus.INACTIVE,
+        run_result=None,
+        is_hardware_stopped=False,
+        is_door_blocking=True,
+        running_command_id=None,
+        queued_command_ids=OrderedDict(),
+        commands_by_id=OrderedDict(),
+        errors_by_id={},
+    )
+
+    door_close_event = DoorStateNotification(new_state=DoorState.CLOSED, blocking=False)
+    subject.handle_action(HardwareEventAction(event=door_close_event))
+    subject.handle_action(PlayAction())
+
+    assert subject.state == CommandState(
+        queue_status=QueueStatus.ACTIVE,
+        run_result=None,
+        is_hardware_stopped=False,
+        is_door_blocking=False,
         running_command_id=None,
         queued_command_ids=OrderedDict(),
         commands_by_id=OrderedDict(),
@@ -381,6 +421,7 @@ def test_command_store_handles_finish_action() -> None:
         queue_status=QueueStatus.INACTIVE,
         run_result=RunResult.SUCCEEDED,
         is_hardware_stopped=False,
+        is_door_blocking=False,
         running_command_id=None,
         queued_command_ids=OrderedDict(),
         commands_by_id=OrderedDict(),
@@ -399,6 +440,7 @@ def test_command_store_handles_stop_action() -> None:
         queue_status=QueueStatus.INACTIVE,
         run_result=RunResult.STOPPED,
         is_hardware_stopped=False,
+        is_door_blocking=False,
         running_command_id=None,
         queued_command_ids=OrderedDict(),
         commands_by_id=OrderedDict(),
@@ -416,6 +458,7 @@ def test_command_store_cannot_restart_after_should_stop() -> None:
         queue_status=QueueStatus.INACTIVE,
         run_result=RunResult.SUCCEEDED,
         is_hardware_stopped=False,
+        is_door_blocking=False,
         running_command_id=None,
         queued_command_ids=OrderedDict(),
         commands_by_id=OrderedDict(),
@@ -438,6 +481,7 @@ def test_command_store_ignores_known_finish_error() -> None:
         queue_status=QueueStatus.INACTIVE,
         run_result=RunResult.FAILED,
         is_hardware_stopped=False,
+        is_door_blocking=False,
         running_command_id=None,
         queued_command_ids=OrderedDict(),
         commands_by_id=OrderedDict(),
@@ -460,6 +504,7 @@ def test_command_store_saves_unknown_finish_error() -> None:
         queue_status=QueueStatus.INACTIVE,
         run_result=RunResult.FAILED,
         is_hardware_stopped=False,
+        is_door_blocking=False,
         running_command_id=None,
         queued_command_ids=OrderedDict(),
         commands_by_id=OrderedDict(),
@@ -486,6 +531,7 @@ def test_command_store_ignores_stop_after_graceful_finish() -> None:
         queue_status=QueueStatus.INACTIVE,
         run_result=RunResult.SUCCEEDED,
         is_hardware_stopped=False,
+        is_door_blocking=False,
         running_command_id=None,
         queued_command_ids=OrderedDict(),
         commands_by_id=OrderedDict(),
@@ -505,6 +551,7 @@ def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
         queue_status=QueueStatus.INACTIVE,
         run_result=RunResult.STOPPED,
         is_hardware_stopped=False,
+        is_door_blocking=False,
         running_command_id=None,
         queued_command_ids=OrderedDict(),
         commands_by_id=OrderedDict(),
@@ -536,6 +583,7 @@ def test_command_store_handles_command_failed() -> None:
         queue_status=QueueStatus.IMPLICITLY_ACTIVE,
         run_result=None,
         is_hardware_stopped=False,
+        is_door_blocking=False,
         running_command_id=None,
         queued_command_ids=OrderedDict(),
         commands_by_id=OrderedDict([("command-id", expected_failed_command)]),
@@ -559,6 +607,76 @@ def test_handles_hardware_stopped() -> None:
         queue_status=QueueStatus.INACTIVE,
         run_result=RunResult.STOPPED,
         is_hardware_stopped=True,
+        is_door_blocking=False,
+        running_command_id=None,
+        queued_command_ids=OrderedDict(),
+        commands_by_id=OrderedDict(),
+        errors_by_id={},
+    )
+
+
+def test_handles_door_open_and_close_event() -> None:
+    """It should update state when door opened and closed after run is played."""
+    subject = CommandStore()
+    door_open_event = DoorStateNotification(new_state=DoorState.OPEN, blocking=True)
+    door_close_event = DoorStateNotification(new_state=DoorState.CLOSED, blocking=False)
+
+    subject.handle_action(PlayAction())
+    subject.handle_action(HardwareEventAction(event=door_open_event))
+
+    # Pause queue and update state
+    assert subject.state == CommandState(
+        queue_status=QueueStatus.INACTIVE,
+        run_result=None,
+        is_hardware_stopped=False,
+        is_door_blocking=True,
+        running_command_id=None,
+        queued_command_ids=OrderedDict(),
+        commands_by_id=OrderedDict(),
+        errors_by_id={},
+    )
+
+    subject.handle_action(HardwareEventAction(event=door_close_event))
+
+    # Don't unpause but update state
+    assert subject.state == CommandState(
+        queue_status=QueueStatus.INACTIVE,
+        run_result=None,
+        is_hardware_stopped=False,
+        is_door_blocking=False,
+        running_command_id=None,
+        queued_command_ids=OrderedDict(),
+        commands_by_id=OrderedDict(),
+        errors_by_id={},
+    )
+
+
+def test_handles_door_event_during_idle_run() -> None:
+    """It should update state but not pause on door open when implicitly active."""
+    subject = CommandStore()
+    door_open_event = DoorStateNotification(new_state=DoorState.OPEN, blocking=True)
+    door_close_event = DoorStateNotification(new_state=DoorState.CLOSED, blocking=False)
+
+    subject.handle_action(HardwareEventAction(event=door_open_event))
+
+    assert subject.state == CommandState(
+        queue_status=QueueStatus.IMPLICITLY_ACTIVE,
+        run_result=None,
+        is_hardware_stopped=False,
+        is_door_blocking=True,
+        running_command_id=None,
+        queued_command_ids=OrderedDict(),
+        commands_by_id=OrderedDict(),
+        errors_by_id={},
+    )
+
+    subject.handle_action(HardwareEventAction(event=door_close_event))
+
+    assert subject.state == CommandState(
+        queue_status=QueueStatus.IMPLICITLY_ACTIVE,
+        run_result=None,
+        is_hardware_stopped=False,
+        is_door_blocking=False,
         running_command_id=None,
         queued_command_ids=OrderedDict(),
         commands_by_id=OrderedDict(),

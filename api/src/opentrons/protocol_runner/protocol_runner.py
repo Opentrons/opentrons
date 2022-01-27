@@ -3,8 +3,11 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.types import HardwareEvent, DoorStateNotification, \
-    DoorState
+from opentrons.hardware_control.types import (
+    HardwareEvent,
+    DoorStateNotification,
+    DoorState,
+)
 from opentrons.protocol_reader import (
     ProtocolSource,
     PythonProtocolConfig,
