@@ -2,17 +2,21 @@
 from typing import List
 
 import pytest
-from mock import AsyncMock, MagicMock
+from mock import AsyncMock, MagicMock, call
+from opentrons_ot3_firmware import NodeId, utils, ArbitrationId, ArbitrationIdParts
+from opentrons_ot3_firmware.constants import ErrorCode
+from opentrons_ot3_firmware.messages import MessageDefinition
+from opentrons_ot3_firmware.messages.message_definitions import (
+    FirmwareUpdateData,
+    FirmwareUpdateComplete,
+    FirmwareUpdateDataAcknowledge,
+    FirmwareUpdateCompleteAcknowledge,
+)
+from opentrons_ot3_firmware.messages import payloads
 
 from opentrons_hardware.firmware_upgrade import downloader
-from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons_hardware.firmware_upgrade.hex_file import HexRecordProcessor, Chunk
-
-
-@pytest.fixture
-def mock_messenger() -> AsyncMock:
-    """Mock can messenger."""
-    return AsyncMock(spec=CanMessenger)
+from tests.conftest import MockCanMessageNotifier
 
 
 @pytest.fixture
@@ -27,7 +31,7 @@ def chunks() -> List[Chunk]:
     return [
         Chunk(address=0x000, data=list(range(56))),
         Chunk(address=0x100, data=[5, 6, 7, 8]),
-        Chunk(address=0x200, data=[100, 1002]),
+        Chunk(address=0x200, data=[100, 121]),
     ]
 
 
@@ -37,4 +41,77 @@ def subject(mock_messenger: AsyncMock) -> downloader.FirmwareUpgradeDownloader:
     return downloader.FirmwareUpgradeDownloader(mock_messenger)
 
 
-def
+async def test_messaging(
+    subject: downloader.FirmwareUpgradeDownloader,
+    chunks: List[Chunk],
+    mock_hex_processor: MagicMock,
+    mock_messenger: AsyncMock,
+    can_message_notifier: MockCanMessageNotifier,
+) -> None:
+    """It should send all the chunks as CAN messages."""
+    # TODO (amit, 2022-1-27): Replace this test with integration test.
+    def responder(node_id: NodeId, message: MessageDefinition) -> None:
+        """Message responder."""
+        if isinstance(message, FirmwareUpdateData):
+            can_message_notifier.notify(
+                FirmwareUpdateDataAcknowledge(
+                    payload=payloads.FirmwareUpdateDataAcknowledge(
+                        address=message.payload.address,
+                        error_code=utils.UInt16Field(ErrorCode.ok),
+                    )
+                ),
+                ArbitrationId(
+                    parts=ArbitrationIdParts(
+                        message_id=FirmwareUpdateDataAcknowledge.message_id,
+                        node_id=NodeId.host,
+                        function_code=0,
+                        originating_node_id=node_id,
+                    )
+                ),
+            )
+        elif isinstance(message, FirmwareUpdateComplete):
+            can_message_notifier.notify(
+                FirmwareUpdateCompleteAcknowledge(
+                    payload=payloads.FirmwareUpdateCompleteAcknowledge(
+                        error_code=utils.UInt16Field(ErrorCode.ok)
+                    )
+                ),
+                ArbitrationId(
+                    parts=ArbitrationIdParts(
+                        message_id=FirmwareUpdateCompleteAcknowledge.message_id,
+                        node_id=NodeId.host,
+                        function_code=0,
+                        originating_node_id=node_id,
+                    )
+                ),
+            )
+
+    mock_messenger.send.side_effect = responder
+
+    mock_hex_processor.process.return_value = iter(chunks)
+
+    await subject.run(NodeId.gantry_y_bootloader, mock_hex_processor)
+
+    mock_messenger.send.assert_has_calls(
+        [
+            call(
+                node_id=NodeId.gantry_y_bootloader,
+                message=FirmwareUpdateData(
+                    payload=payloads.FirmwareUpdateData.create(
+                        address=chunk.address, data=bytes(chunk.data)
+                    )
+                ),
+            )
+            for chunk in chunks
+        ]
+        + [
+            call(
+                node_id=NodeId.gantry_y_bootloader,
+                message=FirmwareUpdateComplete(
+                    payload=payloads.FirmwareUpdateComplete(
+                        num_messages=utils.UInt32Field(len(chunks))
+                    )
+                ),
+            )
+        ]
+    )
