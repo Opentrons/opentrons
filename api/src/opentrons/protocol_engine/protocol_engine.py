@@ -1,5 +1,5 @@
 """ProtocolEngine class definition."""
-from typing import Optional
+from typing import Optional, Callable
 
 from opentrons.hardware_control.types import HardwareEvent
 from opentrons.protocols.models import LabwareDefinition
@@ -71,9 +71,9 @@ class ProtocolEngine:
         self._hardware_stopper = hardware_stopper or HardwareStopper(
             hardware_api=hardware_api, state_store=state_store
         )
-        self._hardware_event_watcher = hardware_api.register_callback(
-            self.hardware_event_handler
-        )
+        self._hw_event_watcher: Optional[
+            Callable[[], None]
+        ] = hardware_api.register_callback(self.hardware_event_handler)
         self._queue_worker.start()
 
     @property
@@ -91,8 +91,9 @@ class ProtocolEngine:
         self._action_dispatcher.dispatch(action)
 
     def _remove_hardware_event_watcher(self) -> None:
-        if self._hardware_event_watcher and callable(self._hardware_event_watcher):
-            self._hardware_event_watcher()
+        if self._hw_event_watcher and callable(self._hw_event_watcher):
+            self._hw_event_watcher()
+            self._hw_event_watcher = None
 
     def play(self) -> None:
         """Start or resume executing commands in the queue."""

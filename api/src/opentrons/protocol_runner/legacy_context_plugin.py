@@ -143,6 +143,7 @@ class LegacyContextPlugin(AbstractPlugin):
             self._hardware_api.pause(HardwarePauseType.PAUSE)
         elif (
             isinstance(action, pe_actions.HardwareEventAction)
+            and not self.state.commands.get_is_implicitly_active()
             and isinstance(action.event, DoorStateNotification)
             and action.event.blocking
         ):

@@ -285,6 +285,10 @@ class CommandView(HasState[CommandState]):
         """Get whether the robot door is open when 'pause on door open' ff is True."""
         return self._state.is_door_blocking
 
+    def get_is_implicitly_active(self) -> bool:
+        """Get whether the queue is implicitly active, i.e., never 'played'."""
+        return self._state.queue_status == QueueStatus.IMPLICITLY_ACTIVE
+
     def get_is_running(self) -> bool:
         """Get whether the engine is running and queued commands should be executed."""
         queue_status = self._state.queue_status
