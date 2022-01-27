@@ -24,6 +24,11 @@ def apply_constraint(constraint: np.float64, input: np.float64) -> np.float64:
     return np.copysign(np.minimum(abs(constraint), abs(input)), input)
 
 
+def check_against_constraint(constraint: np.float64, input: np.float64) -> bool:
+    """Evaluate whether the input value equals to or less than the constraint."""
+    return abs(input) <= constraint or bool(np.isclose(input, constraint))
+
+
 def get_unit_vector(
     initial: Coordinates, target: Coordinates
 ) -> Tuple[Coordinates, np.float64]:
@@ -66,7 +71,7 @@ def targets_to_moves(initial: Coordinates, targets: List[MoveTarget]) -> Iterato
                 ),
             ),
         )
-        log.debug(f"Built move from {initial} to {target} as {m}")
+        log.info(f"Built move from {initial} to {target} as {m}")
         yield m
         initial = target.position
 
@@ -82,7 +87,7 @@ def initial_speed_limit_from_axis(
     if not prev_component or prev_final_speed == 0:
         # If we're previously stopped, we can use maximum speed
         # discontinuity to start
-        log.debug("started from 0, using max speed dc")
+        log.info("started from 0, using max speed dc")
         return abs(axis_constraints.max_speed_discont / axis_component)
 
     if prev_component * axis_component > 0:
@@ -93,7 +98,7 @@ def initial_speed_limit_from_axis(
         prev_axis_constrained_speed = np.maximum(
             prev_axis_final_speed, axis_constraints.max_speed_discont
         )
-        log.debug(
+        log.info(
             f"starting from same-dir, using {prev_axis_constrained_speed} "
             f"from prev final {prev_axis_final_speed} and dc "
             f"{axis_constraints.max_speed_discont}"
@@ -103,7 +108,7 @@ def initial_speed_limit_from_axis(
     if prev_component * axis_component < 0:
         # If we are changing directions, we should start at our direction-change
         # discontinuity speed
-        log.debug("changed direction, using change discont")
+        log.info("changed direction, using change discont")
         return abs(axis_constraints.max_direction_change_speed_discont / axis_component)
     else:
         assert False, "planning initial speed failed"
@@ -120,7 +125,7 @@ def find_initial_speed(
         axis_component = move.unit_vector[axis]
 
         if abs(axis_component * initial_speed) < FLOAT_THRESHOLD:
-            log.debug(f"Skip {axis} because it is not moving")
+            log.info(f"Skip {axis} because it is not moving")
             continue
         else:
             axis_constraints = constraints[axis]
@@ -130,19 +135,19 @@ def find_initial_speed(
                 else np.float64(0)
             )
             prev_final_speed = prev_move.final_speed
-            log.debug(f"Find initial speed for {axis}")
+            log.info(f"Find initial speed for {axis}")
             # find speed limit per axis
             axis_constrained_speed = initial_speed_limit_from_axis(
                 axis_constraints, axis_component, prev_component, prev_final_speed
             )
 
-        log.debug(
+        log.info(
             f"Axis_constrained_speed for {axis} is {axis_constrained_speed} compared "
             f"to initial speed: {initial_speed}"
         )
         initial_speed = np.minimum(axis_constrained_speed, initial_speed)
 
-    log.debug(f"Initial speed: {initial_speed}")
+    log.info(f"Initial speed: {initial_speed}")
     return initial_speed
 
 
@@ -156,7 +161,7 @@ def final_speed_limit_from_axis(
     log = logging.getLogger("final_speed_limit_from_axis")
     if not next_component or next_initial_speed == 0:
         # if we're stopping, we can stop from our speed discontinuity
-        log.debug("stopping, using max speed dc")
+        log.info("stopping, using max speed dc")
         return abs(axis_constraints.max_speed_discont / axis_component)
 
     elif next_component * axis_component > 0:
@@ -168,7 +173,7 @@ def final_speed_limit_from_axis(
         next_axis_constrained_speed = np.maximum(
             axis_constraints.max_speed_discont, next_axis_initial_speed
         )
-        log.debug(
+        log.info(
             f"same dir, using {next_axis_constrained_speed} "
             f"from next initial {next_axis_initial_speed} and dc "
             f"{axis_constraints.max_speed_discont}"
@@ -177,7 +182,7 @@ def final_speed_limit_from_axis(
 
     elif next_component * axis_component < 0:
         # if we're changing direction, then we should prepare ourselves
-        log.debug("changed direction")
+        log.info("changed direction")
         return abs(axis_constraints.max_direction_change_speed_discont / axis_component)
     else:
         assert False, "planning final speed failed"
@@ -196,10 +201,10 @@ def find_final_speed(
     for axis in Axis.get_all_axes():
         axis_component = move.unit_vector[axis]
         if abs(axis_component * final_speed) < FLOAT_THRESHOLD:
-            log.debug(f"Skip {axis} because it is not moving")
+            log.info(f"Skip {axis} because it is not moving")
             continue
         else:
-            log.debug(f"Find final speed for {axis}")
+            log.info(f"Find final speed for {axis}")
             axis_constraints = constraints[axis]
             next_component = (
                 next_move.unit_vector[axis]
@@ -210,13 +215,13 @@ def find_final_speed(
             axis_speed_limit = final_speed_limit_from_axis(
                 axis_constraints, axis_component, next_component, next_initial_speed
             )
-        log.debug(
+        log.info(
             f"Axis constrained speed for {axis} is {axis_speed_limit} compared "
             f"to final speed: {final_speed}"
         )
         final_speed = np.minimum(axis_speed_limit, final_speed)
 
-    log.debug(f"Final speed: {final_speed}")
+    log.info(f"Final speed: {final_speed}")
     return final_speed
 
 
@@ -246,13 +251,13 @@ def achievable_final(
                 )
                 + initial_speed
             )
-            log.debug(
+            log.info(
                 f"Max axis final velocity for {axis} is {max_axis_final_velocity}, "
                 f"compared to final speed: {final_speed}"
             )
             # take the smaller of the aboslute value
             final_speed = apply_constraint(max_axis_final_velocity, final_speed)
-            log.debug(f"final: {final_speed}")
+            log.info(f"final: {final_speed}")
 
     return final_speed
 
@@ -275,11 +280,11 @@ def build_blocks(
     - have at most one 0 acceleration coast phase at our max speed
     """
     log = logging.getLogger("build_blocks")
-    assert (
-        initial_speed <= max_speed
+    assert abs(initial_speed) <= max_speed or np.isclose(
+        abs(initial_speed), max_speed
     ), f"initial speed {initial_speed} exceeds max speed {max_speed}"
-    assert (
-        final_speed <= max_speed
+    assert abs(final_speed) <= max_speed or np.isclose(
+        abs(final_speed), max_speed
     ), f"final speed {final_speed} exceeds max speed {max_speed}"
 
     constraint_max_speed = max_speed
@@ -306,7 +311,7 @@ def build_blocks(
     max_speed = np.minimum(max_achievable_speed, max_speed)
     max_speed_sq = max_speed ** 2
 
-    log.debug(
+    log.info(
         f"{initial_speed} mm/s to {final_speed} mm/s in {distance} mm "
         f"with {max_acceleration} mm/s2 max a "
         f"gives {max_achievable_speed} mm/s limited to {max_speed} mm/s"
@@ -367,7 +372,7 @@ def build_move(
             constraints,
         ),
     )
-    log.debug(f"applied constraints to {move} generating {m}")
+    log.info(f"applied constraints to {move} generating {m}")
     return m
 
 
@@ -375,15 +380,19 @@ def blended(constraints: SystemConstraints, first: Move, second: Move) -> bool:
     """Check if the moves are blended."""
     log = logging.getLogger("blended")
     # have these actually had their blocks built?
-    fist_dist_sum = sum(b.distance for b in first.blocks)
-    if abs(fist_dist_sum - first.distance) > FLOAT_THRESHOLD:
+    first_dist_sum = sum(b.distance for b in first.blocks)
+    if (abs(first_dist_sum - first.distance) > FLOAT_THRESHOLD) or not np.isclose(
+        first_dist_sum, first.distance
+    ):
         log.debug(
-            f"Sum of distance for first move blocks {fist_dist_sum} does not match "
+            f"Sum of distance for first move blocks {first_dist_sum} does not match "
             f"{first.distance}"
         )
         return False
     second_dist_sum = sum(b.distance for b in second.blocks)
-    if abs(second_dist_sum - second.distance) > FLOAT_THRESHOLD:
+    if abs(second_dist_sum - second.distance) > FLOAT_THRESHOLD or not np.isclose(
+        second_dist_sum, second.distance
+    ):
         log.debug(
             f"Sum of distance for second move blocks {second_dist_sum} does not match "
             f"{second.distance}"
@@ -393,26 +402,37 @@ def blended(constraints: SystemConstraints, first: Move, second: Move) -> bool:
     # do their junction velocities match constraints?
     for axis in Axis.get_all_axes():
         final_speed = first.blocks[-1].final_speed * first.unit_vector[axis]
-        log.debug(f"final_speed: {final_speed}")
+        log.info(f"final_speed: {final_speed}")
         initial_speed = second.blocks[0].initial_speed * second.unit_vector[axis]
-        log.debug(f"initial_speed: {initial_speed}")
+        log.info(f"initial_speed: {initial_speed}")
         if first.unit_vector[axis] * second.unit_vector[axis] > 0:
             # if they're in the same direction, we can check that either the junction
             # speeds exactly match, or that they're both under the discontinuity limit
             discont_limit = constraints[axis].max_speed_discont
             if not (abs(initial_speed - final_speed) < FLOAT_THRESHOLD):
-                if (
-                    abs(final_speed) > discont_limit
-                    or abs(initial_speed) > discont_limit
+                if not (
+                    check_against_constraint(discont_limit, final_speed)
+                    or check_against_constraint(discont_limit, initial_speed)
                 ):
+                    log.debug(
+                        f"Final speed: {final_speed}, initial speed: {initial_speed}, "
+                        f"discont: {discont_limit}"
+                    )
                     return False
         else:
             # if they're in different directions, then the junction has to be at or
             # under the speed change discontinuity
             discont_limit = constraints[axis].max_direction_change_speed_discont
-            if abs(final_speed) > discont_limit or abs(initial_speed) > discont_limit:
+            if not (
+                check_against_constraint(discont_limit, final_speed)
+                or check_against_constraint(discont_limit, initial_speed)
+            ):
+                log.debug(
+                    f"Final speed: {final_speed}, initial speed: {initial_speed}, "
+                    f"discont: {discont_limit}"
+                )
                 return False
-    log.debug("Successfully blended.")
+    log.info("Successfully blended.")
     return True
 
 
