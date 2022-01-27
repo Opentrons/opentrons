@@ -539,8 +539,12 @@ describe('LabwareSetup', () => {
   it('should render a get labware offset data link only when setting is true', () => {
     mockGetIsLabwareOffsetCodeSnippetsOn.mockReturnValue(true)
     const { getByRole } = render()
-    getByRole('link', {
+    const getOffsetDataLink = getByRole('link', {
       name: 'Get Labware Offset Data',
+    })
+    fireEvent.click(getOffsetDataLink)
+    getByRole('button', {
+      name: 'Jupyter Notebook',
     })
   })
 })

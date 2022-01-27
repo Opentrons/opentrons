@@ -42,12 +42,12 @@ import { LabwarePositionCheck } from '../../LabwarePositionCheck'
 import styles from '../../styles.css'
 import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../../hooks'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
+import { DownloadOffsetDataModal } from '../../../ProtocolUpload/DownloadOffsetDataModal'
+import { useModuleMatchResults, useProtocolCalibrationStatus } from '../hooks'
 import { LabwareInfoOverlay } from './LabwareInfoOverlay'
 import { LabwareOffsetModal } from './LabwareOffsetModal'
 import { getModuleTypesThatRequireExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
 import { ExtraAttentionWarning } from './ExtraAttentionWarning'
-import { DownloadOffsetDataModal } from '../../../ProtocolUpload/DownloadOffsetDataModal'
-import { useModuleMatchResults, useProtocolCalibrationStatus } from '../hooks'
 
 const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
