@@ -8,6 +8,7 @@ const mockGetLabareDefURI = getLabwareDefURI as jest.MockedFunction<
 >
 
 const MOCK_DEFINITION_URI = 'some_labware_definition_uri'
+const MOCK_DEF: LabwareDefinition2 = {} as any
 
 describe('getLabwareDefinitionUri', () => {
   beforeEach(() => {
@@ -23,7 +24,7 @@ describe('getLabwareDefinitionUri', () => {
       },
     }
     const mockLabwareDefinitions = {
-      [DEF_ID]: {} as LabwareDefinition2,
+      [DEF_ID]: MOCK_DEF,
     }
     expect(
       getLabwareDefinitionUri(
