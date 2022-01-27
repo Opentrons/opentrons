@@ -108,8 +108,8 @@ const mockLabwareOffsetSuccessToast = LabwareOffsetSuccessToast as jest.MockedFu
 const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
   typeof useProtocolDetails
 >
-const mockUseMissingModuleIds = hooks.useMissingModuleIds as jest.MockedFunction<
-  typeof hooks.useMissingModuleIds
+const mockUseModuleMatchResults = hooks.useModuleMatchResults as jest.MockedFunction<
+  typeof hooks.useModuleMatchResults
 >
 const mockUseProtocolCalibrationStatus = hooks.useProtocolCalibrationStatus as jest.MockedFunction<
   typeof hooks.useProtocolCalibrationStatus
@@ -244,7 +244,10 @@ describe('LabwareSetup', () => {
     mockLabwarePostionCheck.mockReturnValue(
       <div>mock Labware Position Check</div>
     )
-    mockUseMissingModuleIds.mockReturnValue([])
+    mockUseModuleMatchResults.mockReturnValue({
+      missingModuleIds: [],
+      remainingAttachedModules: [],
+    })
 
     mockUseProtocolCalibrationStatus.mockReturnValue({
       complete: true,
@@ -480,7 +483,10 @@ describe('LabwareSetup', () => {
     expect(queryByText('mock Labware Position Check')).toBeNull()
   })
   it('should render a disabled button when modules are not connected', () => {
-    mockUseMissingModuleIds.mockReturnValue(['temperatureModuleV1'])
+    mockUseModuleMatchResults.mockReturnValue({
+      missingModuleIds: ['temperatureModuleV1'],
+      remainingAttachedModules: [],
+    })
     const { getByRole, queryByText } = render()
     const button = getByRole('button', {
       name: 'run labware position check',
@@ -492,7 +498,10 @@ describe('LabwareSetup', () => {
     mockUseProtocolCalibrationStatus.mockReturnValue({
       complete: false,
     })
-    mockUseMissingModuleIds.mockReturnValue(['temperatureModuleV1'])
+    mockUseModuleMatchResults.mockReturnValue({
+      missingModuleIds: ['temperatureModuleV1'],
+      remainingAttachedModules: [],
+    })
     const { getByRole, queryByText } = render()
     const button = getByRole('button', {
       name: 'run labware position check',

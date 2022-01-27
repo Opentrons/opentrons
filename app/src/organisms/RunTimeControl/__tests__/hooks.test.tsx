@@ -31,6 +31,7 @@ import {
   useRunCompleteTime,
   useRunControls,
   useRunPauseTime,
+  useRunStopTime,
   useRunStatus,
   useRunStartTime,
 } from '../hooks'
@@ -410,6 +411,44 @@ describe('useRunPauseTime hook', () => {
 
     const { result } = renderHook(useRunPauseTime)
     expect(result.current).toBe('2021-10-25T13:23:31.366581+00:00')
+  })
+})
+
+describe('useRunStopTime hook', () => {
+  afterEach(() => {
+    resetAllWhenMocks()
+  })
+
+  it('returns null when stop is not the last action', async () => {
+    when(mockUseCurrentProtocolRun)
+      .calledWith()
+      .mockReturnValue({
+        runRecord: { data: mockRunningRun },
+      } as UseCurrentProtocolRun)
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID_2)
+      .mockReturnValue(({
+        data: { data: mockRunningRun },
+      } as unknown) as UseQueryResult<Run>)
+
+    const { result } = renderHook(useRunStopTime)
+    expect(result.current).toBe(null)
+  })
+
+  it('returns the stop time of the current run when stop is the last action', async () => {
+    when(mockUseCurrentProtocolRun)
+      .calledWith()
+      .mockReturnValue({
+        runRecord: { data: mockStoppedRun },
+      } as UseCurrentProtocolRun)
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID_2)
+      .mockReturnValue(({
+        data: { data: mockStoppedRun },
+      } as unknown) as UseQueryResult<Run>)
+
+    const { result } = renderHook(useRunStopTime)
+    expect(result.current).toBe('2021-10-25T13:58:22.366581+00:00')
   })
 })
 
