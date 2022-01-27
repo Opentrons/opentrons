@@ -65,40 +65,40 @@ describe('DevicesLanding', () => {
   it('renders a Devices title', () => {
     const [{ getByText }] = render()
 
-    expect(getByText('Devices')).toBeTruthy()
+    getByText('Devices')
   })
 
   it('renders a Scanning component when scanning for robots', () => {
     mockGetScanning.mockReturnValue(true)
     const [{ getByText }] = render()
 
-    expect(getByText('Mock Scanning')).toBeTruthy()
+    getByText('Mock Scanning')
   })
 
   it('renders the DevicesEmptyState when no robots are found', () => {
     const [{ getByText }] = render()
 
-    expect(getByText('Mock DevicesEmptyState')).toBeTruthy()
+    getByText('Mock DevicesEmptyState')
   })
 
   it('renders a RobotSection when connectable robots are found', () => {
     mockGetConnectableRobots.mockReturnValue([mockConnectableRobot])
     const [{ getByText }] = render()
 
-    expect(getByText('Mock RobotSection')).toBeTruthy()
+    getByText('Mock RobotSection')
   })
 
   it('renders a RobotSection when reachable robots are found', () => {
     mockGetReachableRobots.mockReturnValue([mockReachableRobot])
     const [{ getByText }] = render()
 
-    expect(getByText('Mock RobotSection')).toBeTruthy()
+    getByText('Mock RobotSection')
   })
 
   it('renders a RobotSection when unreachable robots are found', () => {
     mockGetUnreachableRobots.mockReturnValue([mockUnreachableRobot])
     const [{ getByText }] = render()
 
-    expect(getByText('Mock RobotSection')).toBeTruthy()
+    getByText('Mock RobotSection')
   })
 })

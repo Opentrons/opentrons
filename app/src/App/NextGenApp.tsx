@@ -15,6 +15,7 @@ import {
 } from '@opentrons/components'
 
 import { AppSettings } from '../pages/More/AppSettings'
+import { DeviceDetails } from '../pages/Devices/DeviceDetails'
 import { DevicesLanding } from '../pages/Devices/DevicesLanding'
 
 interface RouteProps {
@@ -22,7 +23,7 @@ interface RouteProps {
    * the component rendered by a route match
    * drop developed components into slots held by placeholder div components
    */
-  component: () => JSX.Element
+  component: () => JSX.Element | null
   exact?: boolean
   /**
    * a route/page name to render in the temp nav bar
@@ -77,6 +78,18 @@ function TempNavBar({ routes }: { routes: RouteProps[] }): JSX.Element {
 }
 
 /**
+ * route params type definition for the next gen app
+ */
+export interface NextGenRouteParams {
+  appSettingsTab: string
+  robotName: string
+  protocolId: string
+  labwareId: string
+  robotSettingsTab: string
+  runDetailsTab: string
+}
+
+/**
  * Component for the next gen app routes and navigation
  * @returns {JSX.Element}
  */
@@ -95,14 +108,12 @@ export function NextGenApp(): JSX.Element {
       component: () => <div>protocol details</div>,
       exact: true,
       name: 'Protocol Details',
-      navLinkTo: '/protocols/1', // temp
       path: '/protocols/:protocolId',
       tier: 2,
     },
     {
       component: () => <div>deck setup</div>,
       name: 'Deck Setup',
-      navLinkTo: '/protocols/1/deck-setup', // temp
       path: '/protocols/:protocolId/deck-setup',
       tier: 3,
     },
@@ -123,36 +134,32 @@ export function NextGenApp(): JSX.Element {
       tier: 1,
     },
     {
-      component: () => <div>device details</div>,
+      component: DeviceDetails,
       exact: true,
       name: 'Device Details',
-      navLinkTo: '/devices/otie', // temp
-      path: '/devices/:deviceName',
+      path: '/devices/:robotName',
       tier: 2,
     },
     {
       component: () => <div>robot settings</div>,
       exact: true,
       name: 'Robot Settings',
-      navLinkTo: '/devices/otie/robot-settings/calibration', // temp
       // robot settings tabs params: 'calibration' | 'networking' | 'advanced'
-      path: '/devices/:deviceName/robot-settings/:robotSettingsTab',
+      path: '/devices/:robotName/robot-settings/:robotSettingsTab',
       tier: 3,
     },
     {
       component: () => <div>protocol runs landing</div>,
       exact: true,
       name: 'Protocol Runs',
-      navLinkTo: '/devices/otie/protocol-runs', // temp
-      path: '/devices/:deviceName/protocol-runs',
+      path: '/devices/:robotName/protocol-runs',
       tier: 3,
     },
     {
       component: () => <div>protocol run details page</div>,
       name: 'Run Details',
-      // navLinkTo: '/devices/otie/protocol-runs/setup', // temp
       // run details tabs params: 'setup' | 'run'
-      path: '/devices/:deviceName/protocol-runs/:runDetailsTab',
+      path: '/devices/:robotName/protocol-runs/:runDetailsTab',
       tier: 4,
     },
     {

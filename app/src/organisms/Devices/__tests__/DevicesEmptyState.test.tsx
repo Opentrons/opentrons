@@ -25,7 +25,7 @@ describe('DevicesEmptyState', () => {
   it('renders a "No robots found" message', () => {
     const [{ getByText }] = render()
 
-    expect(getByText('No robots found')).toBeTruthy()
+    getByText('No robots found')
   })
 
   it('renders a refresh button that scans for robots', () => {

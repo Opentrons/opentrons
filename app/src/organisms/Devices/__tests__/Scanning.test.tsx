@@ -14,6 +14,6 @@ describe('Scanning', () => {
   it('renders a scanning message', () => {
     const [{ getByText }] = render()
 
-    expect(getByText('Looking for robots...')).toBeTruthy()
+    getByText('Looking for robots...')
   })
 })
