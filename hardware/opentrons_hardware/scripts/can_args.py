@@ -1,9 +1,8 @@
 """ArgumentParser setup for a can device."""
 from argparse import ArgumentParser, Namespace
 
-from opentrons_hardware.drivers.can_bus import CanDriver
-from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
-from opentrons_hardware.drivers.can_bus.socket_driver import SocketDriver
+from opentrons_hardware.drivers.can_bus import DriverSettings
+from opentrons_hardware.drivers.can_bus import settings
 
 
 def add_can_args(parser: ArgumentParser) -> ArgumentParser:
@@ -18,43 +17,46 @@ def add_can_args(parser: ArgumentParser) -> ArgumentParser:
         "--interface",
         type=str,
         required=True,
-        help="the interface to use (ie: opentrons, virtual, pcan, socketcan)",
+        help=f"the interface to use (ie: {settings.OPENTRONS_INTERFACE}, "
+        f"virtual, pcan, socketcan)",
     )
     parser.add_argument(
-        "--bitrate", type=int, default=250000, required=False, help="the bitrate"
+        "--bitrate",
+        type=int,
+        default=settings.DEFAULT_BITRATE,
+        required=False,
+        help="the bitrate",
     )
     parser.add_argument(
-        "--channel", type=str, default=None, required=False, help="optional channel"
+        "--channel",
+        type=str,
+        default=settings.DEFAULT_CHANNEL,
+        required=False,
+        help="optional channel",
     )
     parser.add_argument(
         "--port",
         type=int,
-        default=9898,
+        default=settings.DEFAULT_PORT,
         required=False,
-        help="port to use for opentrons interface",
+        help=f"port to use for {settings.OPENTRONS_INTERFACE} interface",
     )
     parser.add_argument(
         "--host",
         type=str,
-        default="localhost",
+        default=settings.DEFAULT_HOST,
         required=False,
-        help="host to connect to for opentrons interface",
+        help=f"host to connect to for {settings.OPENTRONS_INTERFACE} interface",
     )
     return parser
 
 
-async def build_driver(args: Namespace) -> AbstractCanDriver:
-    """Create the driver.
-
-    Args:
-        args: arguments created by using `add_can_args`
-
-    Returns:
-        A driver.
-    """
-    if args.interface == "opentrons":
-        return await SocketDriver.build(port=args.port, host=args.host)
-    else:
-        return await CanDriver.build(
-            interface=args.interface, bitrate=args.bitrate, channel=args.channel
-        )
+def build_settings(args: Namespace) -> DriverSettings:
+    """Create driver settings from args."""
+    return DriverSettings(
+        interface=args.interface,
+        port=args.port,
+        host=args.host,
+        bit_rate=args.bitrate,
+        channel=args.channel,
+    )

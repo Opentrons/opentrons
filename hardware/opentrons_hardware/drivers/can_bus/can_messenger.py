@@ -1,18 +1,15 @@
 """Can messenger class."""
 import asyncio
-from typing import List, Optional
+from typing import List, Optional, Callable
 import logging
 
-from opentrons_hardware.drivers.can_bus import (
-    CanDriver,
-)
+from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_ot3_firmware.arbitration_id import (
     ArbitrationId,
     ArbitrationIdParts,
 )
 from opentrons_ot3_firmware.message import CanMessage
 from opentrons_ot3_firmware.constants import NodeId, MessageId
-from abc import ABC, abstractmethod
 
 from opentrons_ot3_firmware.messages.messages import (
     MessageDefinition,
@@ -23,15 +20,8 @@ from opentrons_ot3_firmware.utils import BinarySerializableException
 log = logging.getLogger(__name__)
 
 
-class MessageListener(ABC):
-    """Incoming message listener."""
-
-    @abstractmethod
-    def on_message(
-        self, message: MessageDefinition, arbitration_id: ArbitrationId
-    ) -> None:
-        """A new message arrived."""
-        ...
+MessageListenerCallback = Callable[[MessageDefinition, ArbitrationId], None]
+"""Incoming message listener."""
 
 
 class CanMessenger:
@@ -42,14 +32,14 @@ class CanMessenger:
     To receive message notifications add a listener using add_listener
     """
 
-    def __init__(self, driver: CanDriver) -> None:
+    def __init__(self, driver: AbstractCanDriver) -> None:
         """Constructor.
 
         Args:
             driver: The can bus driver to use.
         """
         self._drive = driver
-        self._listeners: List[MessageListener] = []
+        self._listeners: List[MessageListenerCallback] = []
         self._task: Optional[asyncio.Task[None]] = None
 
     async def send(self, node_id: NodeId, message: MessageDefinition) -> None:
@@ -90,11 +80,11 @@ class CanMessenger:
         else:
             log.warning("task not running.")
 
-    def add_listener(self, listener: MessageListener) -> None:
+    def add_listener(self, listener: MessageListenerCallback) -> None:
         """Add a message listener."""
         self._listeners.append(listener)
 
-    def remove_listener(self, listener: MessageListener) -> None:
+    def remove_listener(self, listener: MessageListenerCallback) -> None:
         """Remove a message listener."""
         self._listeners.remove(listener)
 
@@ -119,10 +109,7 @@ class CanMessenger:
                         f"payload: {build}"
                     )
                     for listener in self._listeners:
-                        listener.on_message(
-                            message_definition(payload=build),  # type: ignore[arg-type]  # noqa: E501
-                            message.arbitration_id,
-                        )
+                        listener(message_definition(payload=build), message.arbitration_id)  # type: ignore[arg-type]  # noqa: E501
                 except BinarySerializableException:
                     log.exception(f"Failed to build from {message}")
             else:

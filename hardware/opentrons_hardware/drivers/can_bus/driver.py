@@ -5,7 +5,7 @@ import asyncio
 import platform
 from typing import Optional
 
-from can import Notifier, Bus, AsyncBufferedReader, Message, util
+from can import Notifier, Bus, AsyncBufferedReader, Message
 
 from opentrons_ot3_firmware.arbitration_id import ArbitrationId
 from opentrons_ot3_firmware.message import CanMessage
@@ -36,10 +36,6 @@ if platform.system() == "Darwin":
 
 class CanDriver(AbstractCanDriver):
     """The can driver."""
-
-    DEFAULT_CAN_NETWORK = "can0"
-    DEFAULT_CAN_INTERFACE = "socketcan"
-    DEFAULT_CAN_BITRATE = 250000
 
     def __init__(self, bus: Bus, loop: asyncio.AbstractEventLoop) -> None:
         """Constructor.
@@ -92,18 +88,6 @@ class CanDriver(AbstractCanDriver):
             ),
             loop=asyncio.get_event_loop(),
         )
-
-    @classmethod
-    async def from_env(cls) -> CanDriver:
-        """Build a CanDriver from env variables."""
-        environment_config = util.load_environment_config()
-        can_channel: str = environment_config.get("channel", cls.DEFAULT_CAN_NETWORK)
-        can_interface: str = environment_config.get(
-            "interface", cls.DEFAULT_CAN_INTERFACE
-        )
-        can_bitrate: int = environment_config.get("bitrate", cls.DEFAULT_CAN_BITRATE)
-
-        return await CanDriver.build(can_interface, can_channel, can_bitrate)
 
     def shutdown(self) -> None:
         """Stop the driver."""

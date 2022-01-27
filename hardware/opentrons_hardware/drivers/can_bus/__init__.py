@@ -8,6 +8,7 @@ from opentrons_ot3_firmware.arbitration_id import (
     ArbitrationIdParts,
 )
 from opentrons_ot3_firmware.constants import NodeId, FunctionCode, MessageId
+from .settings import DriverSettings
 
 
 __all__ = [
@@ -19,4 +20,5 @@ __all__ = [
     "MessageId",
     "ArbitrationIdParts",
     "CanMessenger",
+    "DriverSettings",
 ]

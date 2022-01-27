@@ -16,7 +16,7 @@ The `opentrons-hardware` package includes some utility scripts.
 
 ### Simulated CAN bus
 
-Runs a simulated CAN network using a socket server. This supports the `opentrons` interface.
+Runs a simulated CAN network using a socket server. This supports the `opentrons_sock` interface.
 
 #### Usage
 
@@ -30,7 +30,7 @@ Example: `opentrons_sim_can_bus --port 12345`
 
 This is a tool for sending messages to firmware (or simulator) over CAN bus. The CAN bus can either be a [python-can](https://python-can.readthedocs.io/en/master/interfaces.html) defined interface or `opentrons`.
 
-**SocketCan's vcan (virtual can network) only works on Linux.** Firmware simulations on non-Linux computers require `opentrons` as it uses a plain old socket CAN network simulation. [Simulated CAN bus](#simulated-can-bus) must be started to use the `opentrons` interface.
+**SocketCan's vcan (virtual can network) only works on Linux.** Firmware simulations on non-Linux computers require `opentrons_sock` as it uses a plain old socket CAN network simulation. [Simulated CAN bus](#simulated-can-bus) must be started to use the `opentrons` interface.
 
 #### Usage
 
@@ -41,4 +41,4 @@ opentrons_can_comm [-h] --interface INTERFACE [--bitrate BITRATE]
 
 Example using socketcan: `opentrons_can_comm --interface socketcan --channel vcan0`
 
-Example using opentrons' CAN over socket: `opentrons_can_comm --interface opentrons`
+Example using opentrons' CAN over socket: `opentrons_can_comm --interface opentrons_sock`
