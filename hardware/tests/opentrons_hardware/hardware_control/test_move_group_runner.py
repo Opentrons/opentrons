@@ -3,12 +3,8 @@ import pytest
 from mock import AsyncMock, call, MagicMock
 from opentrons_ot3_firmware import ArbitrationId, ArbitrationIdParts
 
-from opentrons_ot3_firmware.constants import (
-    NodeId,
-    MessageId,
-    FunctionCode,
-)
-from opentrons_hardware.drivers.can_bus.can_messenger import MessageListener
+from opentrons_ot3_firmware.constants import NodeId
+from opentrons_hardware.drivers.can_bus.can_messenger import MessageListenerCallback
 from opentrons_ot3_firmware.messages.message_definitions import (
     AddLinearMoveRequest,
 )
@@ -300,7 +296,9 @@ async def test_move() -> None:
 class MockSendMoveCompleter:
     """Side effect mock of CanMessenger.send that immediately completes moves."""
 
-    def __init__(self, move_groups: MoveGroups, listener: MessageListener) -> None:
+    def __init__(
+        self, move_groups: MoveGroups, listener: MessageListenerCallback
+    ) -> None:
         """Constructor."""
         self._move_groups = move_groups
         self._listener = listener
@@ -324,17 +322,10 @@ class MockSendMoveCompleter:
                         current_position=UInt32Field(0),
                         ack_id=UInt8Field(0),
                     )
-                    self._listener.on_message(
-                        md.MoveCompleted(payload=payload),
-                        ArbitrationId(
-                            parts=ArbitrationIdParts(
-                                node_id=NodeId.host,
-                                message_id=MessageId.move_completed,
-                                function_id=FunctionCode.status,
-                                originating_node_id=node.value,
-                            )
-                        ),
+                    arbitration_id = ArbitrationId(
+                        parts=ArbitrationIdParts(originating_node_id=node)
                     )
+                    self._listener(md.MoveCompleted(payload=payload), arbitration_id)
 
 
 async def test_single_move(

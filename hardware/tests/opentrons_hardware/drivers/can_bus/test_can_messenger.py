@@ -18,7 +18,7 @@ from opentrons_ot3_firmware.arbitration_id import (
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
-    MessageListener,
+    MessageListenerCallback,
 )
 from opentrons_ot3_firmware.messages import MessageDefinition
 from opentrons_ot3_firmware.messages.message_definitions import (
@@ -115,7 +115,7 @@ async def test_listen_messages(
     )
 
     # Set up a listener
-    listener = Mock(spec=MessageListener)
+    listener = Mock(spec=MessageListenerCallback)
     subject.add_listener(listener)
 
     # Start the listener
@@ -130,7 +130,7 @@ async def test_listen_messages(
     await subject.stop()
 
     # Validate message.
-    listener.on_message.assert_called_once_with(
+    listener.assert_called_once_with(
         GetMoveGroupRequest(payload=MoveGroupRequestPayload(group_id=UInt8Field(1))),
         ArbitrationId(
             parts=ArbitrationIdParts(

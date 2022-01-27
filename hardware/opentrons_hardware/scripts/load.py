@@ -10,10 +10,7 @@ from typing import Set, Optional, Dict
 import time
 
 from opentrons_hardware.drivers.can_bus import CanDriver
-from opentrons_hardware.drivers.can_bus.can_messenger import (
-    CanMessenger,
-    MessageListener,
-)
+from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_ot3_firmware.constants import NodeId
 from opentrons_ot3_firmware.messages.message_definitions import (
     DeviceInfoRequest,
@@ -62,7 +59,7 @@ async def build_messenger(
     return messenger
 
 
-class BusProber(MessageListener):
+class BusProber:
     """Listener/sender to probe which nodes are active on the bus."""
 
     def __init__(self) -> None:
@@ -90,7 +87,7 @@ class BusProber(MessageListener):
         )
         await self._done.wait()
 
-    def on_message(
+    def __call__(
         self, message: MessageDefinition, arbitration_id: ArbitrationId
     ) -> None:
         """Incoming message callback."""
@@ -118,7 +115,7 @@ class LoadResults:
     messages_received: Dict[NodeId, int]
 
 
-class BusLoader(MessageListener):
+class BusLoader:
     """Main class for loading the bus and gathering data."""
 
     @classmethod
@@ -155,7 +152,7 @@ class BusLoader(MessageListener):
         self._responders = responders
         self._stats = LoadResults({}, {})
 
-    def on_message(
+    def __call__(
         self, message: MessageDefinition, arbitration_id: ArbitrationId
     ) -> None:
         """Message receive callback."""
