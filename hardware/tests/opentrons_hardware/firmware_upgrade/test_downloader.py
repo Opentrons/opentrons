@@ -15,6 +15,7 @@ from opentrons_ot3_firmware.messages.message_definitions import (
 from opentrons_ot3_firmware.messages import payloads
 
 from opentrons_hardware.firmware_upgrade import downloader
+from opentrons_hardware.firmware_upgrade.errors import ErrorResponse, TimeoutResponse
 from opentrons_hardware.firmware_upgrade.hex_file import HexRecordProcessor, Chunk
 from tests.conftest import MockCanMessageNotifier
 
@@ -115,3 +116,161 @@ async def test_messaging(
             )
         ]
     )
+
+
+async def test_messaging_data_error_response(
+    subject: downloader.FirmwareUpgradeDownloader,
+    chunks: List[Chunk],
+    mock_hex_processor: MagicMock,
+    mock_messenger: AsyncMock,
+    can_message_notifier: MockCanMessageNotifier,
+) -> None:
+    """It should fail due to error response to data message."""
+
+    def responder(node_id: NodeId, message: MessageDefinition) -> None:
+        """Message responder."""
+        if isinstance(message, FirmwareUpdateData):
+            can_message_notifier.notify(
+                FirmwareUpdateDataAcknowledge(
+                    payload=payloads.FirmwareUpdateDataAcknowledge(
+                        address=message.payload.address,
+                        error_code=utils.UInt16Field(ErrorCode.ok),
+                    )
+                ),
+                ArbitrationId(
+                    parts=ArbitrationIdParts(
+                        message_id=FirmwareUpdateDataAcknowledge.message_id,
+                        node_id=NodeId.host,
+                        function_code=0,
+                        originating_node_id=node_id,
+                    )
+                ),
+            )
+        elif isinstance(message, FirmwareUpdateData):
+            can_message_notifier.notify(
+                FirmwareUpdateDataAcknowledge(
+                    payload=payloads.FirmwareUpdateDataAcknowledge(
+                        address=message.payload.address,
+                        error_code=utils.UInt16Field(ErrorCode.bad_checksum),
+                    )
+                ),
+                ArbitrationId(
+                    parts=ArbitrationIdParts(
+                        message_id=FirmwareUpdateDataAcknowledge.message_id,
+                        node_id=NodeId.host,
+                        function_code=0,
+                        originating_node_id=node_id,
+                    )
+                ),
+            )
+
+    mock_messenger.send.side_effect = responder
+
+    mock_hex_processor.process.return_value = iter(chunks)
+
+    with pytest.raises(ErrorResponse):
+        await subject.run(NodeId.gantry_y_bootloader, mock_hex_processor)
+
+
+async def test_messaging_complete_error_response(
+    subject: downloader.FirmwareUpgradeDownloader,
+    chunks: List[Chunk],
+    mock_hex_processor: MagicMock,
+    mock_messenger: AsyncMock,
+    can_message_notifier: MockCanMessageNotifier,
+) -> None:
+    """It should fail due to error response to upgrade complete message."""
+
+    def responder(node_id: NodeId, message: MessageDefinition) -> None:
+        """Message responder."""
+        if isinstance(message, FirmwareUpdateData):
+            can_message_notifier.notify(
+                FirmwareUpdateDataAcknowledge(
+                    payload=payloads.FirmwareUpdateDataAcknowledge(
+                        address=message.payload.address,
+                        error_code=utils.UInt16Field(ErrorCode.ok),
+                    )
+                ),
+                ArbitrationId(
+                    parts=ArbitrationIdParts(
+                        message_id=FirmwareUpdateDataAcknowledge.message_id,
+                        node_id=NodeId.host,
+                        function_code=0,
+                        originating_node_id=node_id,
+                    )
+                ),
+            )
+        elif isinstance(message, FirmwareUpdateComplete):
+            can_message_notifier.notify(
+                FirmwareUpdateCompleteAcknowledge(
+                    payload=payloads.FirmwareUpdateCompleteAcknowledge(
+                        error_code=utils.UInt16Field(ErrorCode.invalid_size)
+                    )
+                ),
+                ArbitrationId(
+                    parts=ArbitrationIdParts(
+                        message_id=FirmwareUpdateCompleteAcknowledge.message_id,
+                        node_id=NodeId.host,
+                        function_code=0,
+                        originating_node_id=node_id,
+                    )
+                ),
+            )
+
+    mock_messenger.send.side_effect = responder
+
+    mock_hex_processor.process.return_value = iter(chunks)
+
+    with pytest.raises(ErrorResponse):
+        await subject.run(NodeId.gantry_y_bootloader, mock_hex_processor)
+
+
+async def test_messaging_data_no_response(
+    subject: downloader.FirmwareUpgradeDownloader,
+    chunks: List[Chunk],
+    mock_hex_processor: MagicMock,
+    mock_messenger: AsyncMock,
+    can_message_notifier: MockCanMessageNotifier,
+) -> None:
+    """It should fail with timeout waiting for data response."""
+    mock_hex_processor.process.return_value = iter(chunks)
+
+    with pytest.raises(TimeoutResponse):
+        await subject.run(NodeId.gantry_y_bootloader, mock_hex_processor)
+
+
+async def test_messaging_complete_no_response(
+    subject: downloader.FirmwareUpgradeDownloader,
+    chunks: List[Chunk],
+    mock_hex_processor: MagicMock,
+    mock_messenger: AsyncMock,
+    can_message_notifier: MockCanMessageNotifier,
+) -> None:
+    """It should fail with timeout waiting for complete response."""
+
+    def responder(node_id: NodeId, message: MessageDefinition) -> None:
+        """Message responder."""
+        if isinstance(message, FirmwareUpdateData):
+            can_message_notifier.notify(
+                FirmwareUpdateDataAcknowledge(
+                    payload=payloads.FirmwareUpdateDataAcknowledge(
+                        address=message.payload.address,
+                        error_code=utils.UInt16Field(ErrorCode.ok),
+                    )
+                ),
+                ArbitrationId(
+                    parts=ArbitrationIdParts(
+                        message_id=FirmwareUpdateDataAcknowledge.message_id,
+                        node_id=NodeId.host,
+                        function_code=0,
+                        originating_node_id=node_id,
+                    )
+                ),
+            )
+
+    mock_messenger.send.side_effect = responder
+
+    mock_hex_processor.process.return_value = iter(chunks)
+
+    with pytest.raises(TimeoutResponse):
+        await subject.run(NodeId.gantry_y_bootloader, mock_hex_processor)
