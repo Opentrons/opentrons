@@ -21,6 +21,7 @@ import {
   SPACING_5,
   TEXT_TRANSFORM_UPPERCASE,
   Text,
+  JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 import type { LabwareOffsets } from './hooks/useLabwareOffsets'
 
@@ -177,13 +178,18 @@ export const LabwareOffsetsSummary = (
         backgroundColor={C_NEAR_WHITE}
         flexDirection={DIRECTION_COLUMN}
       >
-        <Text
-          as={'h5'}
-          fontWeight={FONT_WEIGHT_SEMIBOLD}
-          marginBottom={SPACING_3}
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
-          {t('labware_offsets_summary_title')}
-        </Text>
+          <Text
+            as={'h5'}
+            fontWeight={FONT_WEIGHT_SEMIBOLD}
+            marginBottom={SPACING_3}
+          >
+            {t('labware_offsets_summary_title')}
+          </Text>
+        </Flex>
         {offsetData.length === 0 ? (
           <OffsetDataLoader />
         ) : (

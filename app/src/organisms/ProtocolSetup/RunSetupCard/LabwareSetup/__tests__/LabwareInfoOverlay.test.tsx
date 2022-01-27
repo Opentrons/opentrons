@@ -62,6 +62,7 @@ const MOCK_LABWARE_VECTOR = { x: 1, y: 2, z: 3 }
 describe('LabwareInfoOverlay', () => {
   let props: React.ComponentProps<typeof LabwareInfoOverlay>
   let labware: ProtocolFile<{}>['labware']
+  let labwareDefinitions: ProtocolFile<{}>['labwareDefinitions']
   beforeEach(() => {
     props = {
       definition: fixture_tiprack_300_ul as LabwareDefinition2,
@@ -71,6 +72,9 @@ describe('LabwareInfoOverlay', () => {
       [MOCK_LABWARE_ID]: {
         definitionId: MOCK_LABWARE_DEFINITION_ID,
       },
+    }
+    labwareDefinitions = {
+      [MOCK_LABWARE_DEFINITION_ID]: fixture_tiprack_300_ul as LabwareDefinition2,
     }
     when(mockGetLabwareDisplayName)
       .calledWith(props.definition)
@@ -82,6 +86,7 @@ describe('LabwareInfoOverlay', () => {
         protocolData: {
           commands: [],
           labware,
+          labwareDefinitions,
           modules: [],
         },
       } as any)
@@ -95,7 +100,7 @@ describe('LabwareInfoOverlay', () => {
       .mockReturnValue({ slotName: MOCK_SLOT_NAME })
 
     when(mockGetLabwareDefinitionUri)
-      .calledWith(MOCK_LABWARE_ID, labware)
+      .calledWith(MOCK_LABWARE_ID, labware, labwareDefinitions)
       .mockReturnValue(MOCK_LABWARE_DEFINITION_URI)
   })
   afterEach(() => {

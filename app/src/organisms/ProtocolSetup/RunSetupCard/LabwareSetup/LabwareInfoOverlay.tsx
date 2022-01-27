@@ -51,7 +51,8 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
 
   const labwareDefinitionUri = getLabwareDefinitionUri(
     labwareId,
-    protocolData?.labware
+    protocolData.labware,
+    protocolData.labwareDefinitions
   )
   const labwareLocation = getLabwareOffsetLocation(
     labwareId,
