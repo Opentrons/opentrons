@@ -4,10 +4,7 @@ import logging
 
 from opentrons_ot3_firmware import ArbitrationId
 from opentrons_ot3_firmware.constants import NodeId
-from opentrons_hardware.drivers.can_bus.can_messenger import (
-    CanMessenger,
-    MessageListener,
-)
+from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_ot3_firmware.messages import MessageDefinition
 from opentrons_ot3_firmware.messages.message_definitions import (
     ClearAllMoveGroupsRequest,
@@ -95,7 +92,7 @@ class MoveGroupRunner:
             can_messenger.remove_listener(scheduler)
 
 
-class MoveScheduler(MessageListener):
+class MoveScheduler:
     """A message listener that manages the sending of execute move group messages."""
 
     def __init__(self, move_groups: MoveGroups) -> None:
@@ -111,7 +108,7 @@ class MoveScheduler(MessageListener):
 
         self._event = asyncio.Event()
 
-    def on_message(
+    def __call__(
         self, message: MessageDefinition, arbitration_id: ArbitrationId
     ) -> None:
         """Incoming message handler."""
