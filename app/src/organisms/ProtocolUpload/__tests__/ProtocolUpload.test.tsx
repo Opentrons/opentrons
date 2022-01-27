@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import { BrowserRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import {
+  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_FINISHING,
   RUN_STATUS_IDLE,
   RUN_STATUS_PAUSED,
@@ -305,6 +306,26 @@ describe('ProtocolUpload', () => {
     when(mockUseRunStatus)
       .calledWith()
       .mockReturnValue(RUN_STATUS_PAUSE_REQUESTED)
+    when(mockConfirmCancelModal).mockReturnValue(
+      <div>mock confirm cancel modal</div>
+    )
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Cancel Run' })
+    fireEvent.click(button)
+    expect(screen.queryByText('mock confirm cancel modal')).not.toBeNull()
+  })
+
+  it('renders the cancel button, button is clickable, and cancel modal is rendered when run status is blocked by open door', () => {
+    when(mockUseCurrentProtocolRun)
+      .calledWith()
+      .mockReturnValue({
+        protocolRecord: { data: { analyses: [] } },
+        runRecord: {},
+        createProtocolRun: jest.fn(),
+      } as any)
+    when(mockUseRunStatus)
+      .calledWith()
+      .mockReturnValue(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
     when(mockConfirmCancelModal).mockReturnValue(
       <div>mock confirm cancel modal</div>
     )

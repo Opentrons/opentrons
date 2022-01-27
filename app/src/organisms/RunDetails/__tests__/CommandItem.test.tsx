@@ -169,6 +169,21 @@ describe('Run Details RunTimeCommand item', () => {
     getByText('Mock RunTimeCommand Timer')
   })
 
+  it('renders the correct running status with run paused by door open', () => {
+    const props = {
+      runCommandSummary: { ...MOCK_COMMAND_SUMMARY, status: 'running' },
+      analysisCommand: { ...MOCK_ANALYSIS_COMMAND },
+      runStatus: 'blocked-by-open-door',
+      currentRunId: RUN_ID,
+    } as React.ComponentProps<typeof CommandItem>
+    const { getByText } = render(props)
+    expect(getByText('Current Step - Paused - Door Open')).toHaveStyle(
+      'backgroundColor: C_POWDER_BLUE'
+    )
+    getByText('Mock RunTimeCommand Text')
+    getByText('Mock RunTimeCommand Timer')
+  })
+
   it('renders the comment text when the command is a comment', () => {
     const MOCK_COMMENT_COMMAND: RunTimeCommand = {
       id: 'COMMENT',

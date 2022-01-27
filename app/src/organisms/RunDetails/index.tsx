@@ -10,6 +10,7 @@ import {
   RUN_STATUS_FINISHING,
   RUN_STATUS_STOP_REQUESTED,
   RUN_STATUS_STOPPED,
+  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
 } from '@opentrons/api-client'
 import {
   SPACING_2,
@@ -94,7 +95,8 @@ export function RunDetails(): JSX.Element | null {
     adjustedRunStatus === RUN_STATUS_RUNNING ||
     adjustedRunStatus === RUN_STATUS_PAUSED ||
     adjustedRunStatus === RUN_STATUS_PAUSE_REQUESTED ||
-    adjustedRunStatus === RUN_STATUS_FINISHING
+    adjustedRunStatus === RUN_STATUS_FINISHING ||
+    adjustedRunStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR
   ) {
     titleBarProps = {
       title: t('protocol_title', { protocol_name: displayName }),

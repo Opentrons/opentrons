@@ -29,6 +29,7 @@ import {
   RUN_STATUS_PAUSE_REQUESTED,
   RUN_STATUS_FINISHING,
   RUN_STATUS_STOP_REQUESTED,
+  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
 } from '@opentrons/api-client'
 import { Page } from '../../atoms/Page'
 import { UploadInput } from './UploadInput'
@@ -160,7 +161,8 @@ export function ProtocolUpload(): JSX.Element {
     runStatus === RUN_STATUS_RUNNING ||
     runStatus === RUN_STATUS_PAUSED ||
     runStatus === RUN_STATUS_PAUSE_REQUESTED ||
-    runStatus === RUN_STATUS_FINISHING
+    runStatus === RUN_STATUS_FINISHING ||
+    runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR
 
   let titleBarProps
   if (

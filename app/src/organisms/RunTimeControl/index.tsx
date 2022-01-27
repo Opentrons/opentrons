@@ -10,6 +10,7 @@ import {
   RUN_STATUS_FAILED,
   RUN_STATUS_FINISHING,
   RUN_STATUS_SUCCEEDED,
+  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
 } from '@opentrons/api-client'
 import {
   Flex,
@@ -31,6 +32,7 @@ import {
   SIZE_1,
   SPACING_2,
   SPACING_3,
+  AlertItem,
 } from '@opentrons/components'
 import {
   useModuleMatchResults,
@@ -140,7 +142,8 @@ export function RunTimeControl(): JSX.Element | null {
     handleButtonClick = pause
   } else if (
     runStatus === RUN_STATUS_PAUSED ||
-    runStatus === RUN_STATUS_PAUSE_REQUESTED
+    runStatus === RUN_STATUS_PAUSE_REQUESTED ||
+    runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR
   ) {
     buttonIconName = 'play'
     buttonText = t('resume_run')
@@ -184,6 +187,12 @@ export function RunTimeControl(): JSX.Element | null {
           runStatus={runStatus}
         />
       ) : null}
+      {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ? (
+        <Flex marginBottom={SPACING_3}>
+          <AlertItem type="warning" title={t('close_door_to_resume')} />
+        </Flex>
+      ) : null}
+
       <NewPrimaryBtn
         onClick={handleButtonClick}
         alignSelf={ALIGN_STRETCH}
@@ -193,7 +202,12 @@ export function RunTimeControl(): JSX.Element | null {
         justifyContent={JUSTIFY_CENTER}
         alignItems={ALIGN_CENTER}
         display={DISPLAY_FLEX}
-        disabled={disableRunCta || isRunActionLoading || isFinishing}
+        disabled={
+          disableRunCta ||
+          isRunActionLoading ||
+          isFinishing ||
+          runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR
+        }
         {...targetProps}
       >
         {isRunActionLoading || isFinishing ? (
@@ -205,6 +219,9 @@ export function RunTimeControl(): JSX.Element | null {
       </NewPrimaryBtn>
       {disableRunCta && (
         <Tooltip {...tooltipProps}>{t('run_cta_disabled')}</Tooltip>
+      )}
+      {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR && (
+        <Tooltip {...tooltipProps}>{t('close_door_to_resume')}</Tooltip>
       )}
     </Flex>
   ) : null

@@ -11,6 +11,7 @@ import {
   RUN_STATUS_PAUSED,
   RUN_STATUS_PAUSE_REQUESTED,
   RUN_STATUS_STOP_REQUESTED,
+  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
 } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
 import { resetAllWhenMocks, when } from 'jest-when'
@@ -137,6 +138,15 @@ describe('RunDetails', () => {
     when(mockUseRunStatus)
       .calledWith()
       .mockReturnValue(RUN_STATUS_PAUSE_REQUESTED)
+    const { getByRole } = render()
+    const button = getByRole('button', { name: 'Cancel Run' })
+    expect(button).toBeEnabled()
+  })
+
+  it('renders a cancel run button when the status is paused by door open', () => {
+    when(mockUseRunStatus)
+      .calledWith()
+      .mockReturnValue(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
     const { getByRole } = render()
     const button = getByRole('button', { name: 'Cancel Run' })
     expect(button).toBeEnabled()
