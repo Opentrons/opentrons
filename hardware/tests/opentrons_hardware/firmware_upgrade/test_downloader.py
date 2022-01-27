@@ -91,7 +91,7 @@ async def test_messaging(
 
     mock_hex_processor.process.return_value = iter(chunks)
 
-    await subject.run(NodeId.gantry_y_bootloader, mock_hex_processor)
+    await subject.run(NodeId.gantry_y_bootloader, mock_hex_processor, 10)
 
     mock_messenger.send.assert_has_calls(
         [
@@ -134,23 +134,6 @@ async def test_messaging_data_error_response(
                 FirmwareUpdateDataAcknowledge(
                     payload=payloads.FirmwareUpdateDataAcknowledge(
                         address=message.payload.address,
-                        error_code=utils.UInt16Field(ErrorCode.ok),
-                    )
-                ),
-                ArbitrationId(
-                    parts=ArbitrationIdParts(
-                        message_id=FirmwareUpdateDataAcknowledge.message_id,
-                        node_id=NodeId.host,
-                        function_code=0,
-                        originating_node_id=node_id,
-                    )
-                ),
-            )
-        elif isinstance(message, FirmwareUpdateData):
-            can_message_notifier.notify(
-                FirmwareUpdateDataAcknowledge(
-                    payload=payloads.FirmwareUpdateDataAcknowledge(
-                        address=message.payload.address,
                         error_code=utils.UInt16Field(ErrorCode.bad_checksum),
                     )
                 ),
@@ -169,7 +152,7 @@ async def test_messaging_data_error_response(
     mock_hex_processor.process.return_value = iter(chunks)
 
     with pytest.raises(ErrorResponse):
-        await subject.run(NodeId.gantry_y_bootloader, mock_hex_processor)
+        await subject.run(NodeId.gantry_y_bootloader, mock_hex_processor, 10)
 
 
 async def test_messaging_complete_error_response(
@@ -222,7 +205,7 @@ async def test_messaging_complete_error_response(
     mock_hex_processor.process.return_value = iter(chunks)
 
     with pytest.raises(ErrorResponse):
-        await subject.run(NodeId.gantry_y_bootloader, mock_hex_processor)
+        await subject.run(NodeId.gantry_y_bootloader, mock_hex_processor, 10)
 
 
 async def test_messaging_data_no_response(
@@ -236,7 +219,7 @@ async def test_messaging_data_no_response(
     mock_hex_processor.process.return_value = iter(chunks)
 
     with pytest.raises(TimeoutResponse):
-        await subject.run(NodeId.gantry_y_bootloader, mock_hex_processor)
+        await subject.run(NodeId.gantry_y_bootloader, mock_hex_processor, 0.5)
 
 
 async def test_messaging_complete_no_response(
@@ -273,4 +256,4 @@ async def test_messaging_complete_no_response(
     mock_hex_processor.process.return_value = iter(chunks)
 
     with pytest.raises(TimeoutResponse):
-        await subject.run(NodeId.gantry_y_bootloader, mock_hex_processor)
+        await subject.run(NodeId.gantry_y_bootloader, mock_hex_processor, 0.5)

@@ -1,11 +1,15 @@
 """Firmware upgrade."""
+import asyncio
+
 from opentrons_ot3_firmware import NodeId
+from opentrons_ot3_firmware.constants import ErrorCode
 from opentrons_ot3_firmware.utils import UInt32Field
 
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
     WaitableCallback,
 )
+from opentrons_hardware.firmware_upgrade.errors import ErrorResponse, TimeoutResponse
 from opentrons_hardware.firmware_upgrade.hex_file import HexRecordProcessor
 from opentrons_ot3_firmware.messages import message_definitions, payloads
 
@@ -17,12 +21,18 @@ class FirmwareUpgradeDownloader:
         """Constructor."""
         self._messenger = messenger
 
-    async def run(self, node_id: NodeId, hex_processor: HexRecordProcessor) -> None:
+    async def run(
+        self,
+        node_id: NodeId,
+        hex_processor: HexRecordProcessor,
+        ack_wait_seconds: float,
+    ) -> None:
         """Download hex record chunks to node.
 
         Args:
             node_id: The target node id.
             hex_processor: The producer of hex chunks.
+            ack_wait_seconds: Number of seconds to wait for an ACK
 
         Returns:
             None
@@ -32,32 +42,58 @@ class FirmwareUpgradeDownloader:
             for chunk in hex_processor.process(
                 payloads.FirmwareUpdateDataField.NUM_BYTES
             ):
+                # Create and send message from this chunk
                 data_message = message_definitions.FirmwareUpdateData(
                     payload=payloads.FirmwareUpdateData.create(
                         address=chunk.address, data=bytes(chunk.data)
                     )
                 )
                 await self._messenger.send(node_id=node_id, message=data_message)
-
-                async for response, arbitration_id in reader:
-                    if arbitration_id.parts.originating_node_id == node_id:
-                        if isinstance(
-                            response, message_definitions.FirmwareUpdateDataAcknowledge
-                        ):
-                            break
+                # Wait for ack.
+                try:
+                    await asyncio.wait_for(
+                        self._wait_data_message_ack(node_id, reader), ack_wait_seconds
+                    )
+                except asyncio.TimeoutError:
+                    raise TimeoutResponse(data_message)
 
                 num_messages += 1
 
+            # Create and send firmware update complete message.
             complete_message = message_definitions.FirmwareUpdateComplete(
                 payload=payloads.FirmwareUpdateComplete(
                     num_messages=UInt32Field(num_messages)
                 )
             )
             await self._messenger.send(node_id=node_id, message=complete_message)
+            # wait for ack.
+            try:
+                await asyncio.wait_for(
+                    self._wait_update_complete_ack(node_id, reader), ack_wait_seconds
+                )
+            except asyncio.TimeoutError:
+                raise TimeoutResponse(complete_message)
 
-            async for response, arbitration_id in reader:
-                if arbitration_id.parts.originating_node_id == node_id:
-                    if isinstance(
-                        response, message_definitions.FirmwareUpdateCompleteAcknowledge
-                    ):
-                        break
+    @staticmethod
+    async def _wait_data_message_ack(node_id: NodeId, reader: WaitableCallback) -> None:
+        async for response, arbitration_id in reader:
+            if arbitration_id.parts.originating_node_id == node_id:
+                if isinstance(
+                    response, message_definitions.FirmwareUpdateDataAcknowledge
+                ):
+                    if response.payload.error_code.value != ErrorCode.ok:
+                        raise ErrorResponse(response.payload.error_code.value)
+                    break
+
+    @staticmethod
+    async def _wait_update_complete_ack(
+        node_id: NodeId, reader: WaitableCallback
+    ) -> None:
+        async for response, arbitration_id in reader:
+            if arbitration_id.parts.originating_node_id == node_id:
+                if isinstance(
+                    response, message_definitions.FirmwareUpdateCompleteAcknowledge
+                ):
+                    if response.payload.error_code.value != ErrorCode.ok:
+                        raise ErrorResponse(response.payload.error_code.value)
+                    break
