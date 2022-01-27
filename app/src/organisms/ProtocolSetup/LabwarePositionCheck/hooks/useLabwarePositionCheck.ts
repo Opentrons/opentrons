@@ -528,28 +528,29 @@ export function useLabwarePositionCheck(
     trackEvent({ name: 'LabwarePositionCheckStarted', properties: {} })
     setIsLoading(true)
     // first clear all previous labware offsets for each labware
-    const identityLabwareOffsets: LabwareOffsetCreateData[] = reduce<
-      ProtocolFile<{}>['labware'],
-      LabwareOffsetCreateData[]
-    >(
-      protocolData?.labware,
-      (acc, _, labwareId) => {
-        const identityOffset = {
-          definitionUri: getLabwareDefinitionUri(
-            labwareId,
-            protocolData?.labware
-          ),
-          location: getLabwareOffsetLocation(
-            labwareId,
-            protocolData?.commands ?? [],
-            protocolData?.modules ?? {}
-          ),
-          vector: IDENTITY_VECTOR,
-        }
-        return [...acc, identityOffset]
-      },
-      []
-    )
+    const identityLabwareOffsets: LabwareOffsetCreateData[] =
+      protocolData != null
+        ? reduce<ProtocolFile<{}>['labware'], LabwareOffsetCreateData[]>(
+            protocolData?.labware,
+            (acc, _, labwareId) => {
+              const identityOffset = {
+                definitionUri: getLabwareDefinitionUri(
+                  labwareId,
+                  protocolData.labware,
+                  protocolData.labwareDefinitions
+                ),
+                location: getLabwareOffsetLocation(
+                  labwareId,
+                  protocolData?.commands ?? [],
+                  protocolData?.modules ?? {}
+                ),
+                vector: IDENTITY_VECTOR,
+              }
+              return [...acc, identityOffset]
+            },
+            []
+          )
+        : []
 
     identityLabwareOffsets.forEach(identityOffsetEntry => {
       createLabwareOffset({

@@ -137,9 +137,5 @@ export function CommandText(props: Props): JSX.Element | null {
     }
   }
 
-  return (
-    <Flex alignItems={ALIGN_CENTER} marginLeft={SPACING_1}>
-      {messageNode}
-    </Flex>
-  )
+  return <Flex alignItems={ALIGN_CENTER}>{messageNode}</Flex>
 }

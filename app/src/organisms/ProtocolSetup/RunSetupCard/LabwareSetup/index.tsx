@@ -1,9 +1,11 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import map from 'lodash/map'
 import isEmpty from 'lodash/isEmpty'
 import some from 'lodash/some'
 import { useTranslation } from 'react-i18next'
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
+import * as Config from '../../../../redux/config'
 import {
   Btn,
   Flex,
@@ -40,11 +42,12 @@ import { LabwarePositionCheck } from '../../LabwarePositionCheck'
 import styles from '../../styles.css'
 import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../../hooks'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
+import { DownloadOffsetDataModal } from '../../../ProtocolUpload/DownloadOffsetDataModal'
+import { useModuleMatchResults, useProtocolCalibrationStatus } from '../hooks'
 import { LabwareInfoOverlay } from './LabwareInfoOverlay'
 import { LabwareOffsetModal } from './LabwareOffsetModal'
 import { getModuleTypesThatRequireExtraAttention } from './utils/getModuleTypesThatRequireExtraAttention'
 import { ExtraAttentionWarning } from './ExtraAttentionWarning'
-import { useMissingModuleIds, useProtocolCalibrationStatus } from '../hooks'
 
 const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
@@ -61,7 +64,7 @@ const DECK_MAP_VIEWBOX = '-80 -40 550 500'
 export const LabwareSetup = (): JSX.Element | null => {
   const moduleRenderInfoById = useModuleRenderInfoById()
   const labwareRenderInfoById = useLabwareRenderInfoById()
-  const missingModuleIds = useMissingModuleIds()
+  const moduleMatchResults = useModuleMatchResults()
   const isEverythingCalibrated = useProtocolCalibrationStatus().complete
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_LEFT,
@@ -85,6 +88,7 @@ export const LabwareSetup = (): JSX.Element | null => {
     showLabwarePositionCheckModal,
     setShowLabwarePositionCheckModal,
   ] = React.useState<boolean>(false)
+  const { missingModuleIds } = moduleMatchResults
   const calibrationIncomplete =
     missingModuleIds.length === 0 && !isEverythingCalibrated
   const moduleSetupIncomplete =
@@ -95,6 +99,13 @@ export const LabwareSetup = (): JSX.Element | null => {
   const tipRackLoadedInProtocol: boolean = some(
     protocolData?.labwareDefinitions,
     def => def.parameters?.isTiprack
+  )
+
+  const [downloadOffsetDataModal, showDownloadOffsetDataModal] = React.useState(
+    false
+  )
+  const isLabwareOffsetCodeSnippetsOn = useSelector(
+    Config.getIsLabwareOffsetCodeSnippetsOn
   )
 
   let lpcDisabledReason: string | null = null
@@ -126,6 +137,11 @@ export const LabwareSetup = (): JSX.Element | null => {
       {showLabwarePositionCheckModal && (
         <LabwarePositionCheck
           onCloseClick={() => setShowLabwarePositionCheckModal(false)}
+        />
+      )}
+      {downloadOffsetDataModal && (
+        <DownloadOffsetDataModal
+          onCloseClick={() => showDownloadOffsetDataModal(false)}
         />
       )}
       <Flex flex="1" maxHeight="100vh" flexDirection={DIRECTION_COLUMN}>
@@ -195,19 +211,33 @@ export const LabwareSetup = (): JSX.Element | null => {
             )
           }}
         </RobotWorkSpace>
-        <Flex flexDirection={DIRECTION_ROW} backgroundColor={C_NEAR_WHITE}>
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          backgroundColor={C_NEAR_WHITE}
+          padding={SPACING_3}
+        >
           <Box flexDirection={DIRECTION_COLUMN} width="65%">
-            <Text
-              color={C_DARK_GRAY}
-              fontWeight={FONT_WEIGHT_SEMIBOLD}
-              marginLeft={SPACING_3}
-              marginTop={SPACING_3}
-            >
+            <Text color={C_DARK_GRAY} fontWeight={FONT_WEIGHT_SEMIBOLD}>
               {t('lpc_and_offset_data_title')}
             </Text>
-            <Text color={C_DARK_GRAY} margin={SPACING_3}>
+            <Text
+              color={C_DARK_GRAY}
+              marginRight={SPACING_3}
+              marginY={SPACING_3}
+            >
               {t('labware_position_check_text')}
             </Text>
+            {isLabwareOffsetCodeSnippetsOn ? (
+              <Link
+                role={'link'}
+                fontSize={FONT_SIZE_BODY_1}
+                color={C_BLUE}
+                onClick={() => showDownloadOffsetDataModal(true)}
+                id={'DownloadOffsetData'}
+              >
+                {t('get_labware_offset_data')}
+              </Link>
+            ) : null}
           </Box>
           <Flex flexDirection={DIRECTION_COLUMN}>
             <Btn
@@ -217,8 +247,7 @@ export const LabwareSetup = (): JSX.Element | null => {
               alignSelf={ALIGN_FLEX_END}
               onClick={() => setShowLabwareHelpModal(true)}
               data-test={'LabwareSetup_helpLink'}
-              marginTop={SPACING_3}
-              marginBottom={SPACING_3}
+              marginY={SPACING_3}
             >
               {t('labware_help_link_title')}
             </Btn>

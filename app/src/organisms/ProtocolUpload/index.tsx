@@ -48,7 +48,6 @@ import { ConfirmExitProtocolUploadModal } from './ConfirmExitProtocolUploadModal
 import { useLogger } from '../../logger'
 import type { ErrorObject } from 'ajv'
 import type { Dispatch, State } from '../../redux/types'
-
 import styles from './styles.css'
 
 const VALIDATION_ERROR_T_MAP: { [errorKey: string]: string } = {

@@ -17,7 +17,7 @@ import { AlertItem } from '@opentrons/components/src/alerts'
 
 import { i18n } from '../../../i18n'
 import {
-  useMissingModuleIds,
+  useModuleMatchResults,
   useProtocolCalibrationStatus,
 } from '../../ProtocolSetup/RunSetupCard/hooks'
 import {
@@ -54,8 +54,8 @@ const mockUseRunStatus = useRunStatus as jest.MockedFunction<
 >
 const mockTimer = Timer as jest.MockedFunction<typeof Timer>
 
-const mockUseMissingModuleIds = useMissingModuleIds as jest.MockedFunction<
-  typeof useMissingModuleIds
+const mockUseModuleMatchResults = useModuleMatchResults as jest.MockedFunction<
+  typeof useModuleMatchResults
 >
 const mockUseProtocolCalibrationStatus = useProtocolCalibrationStatus as jest.MockedFunction<
   typeof useProtocolCalibrationStatus
@@ -85,7 +85,10 @@ describe('RunTimeControl', () => {
     mockUseProtocolCalibrationStatus.mockReturnValue({
       complete: true,
     })
-    mockUseMissingModuleIds.mockReturnValue([])
+    mockUseModuleMatchResults.mockReturnValue({
+      missingModuleIds: [],
+      remainingAttachedModules: [],
+    })
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -114,7 +117,10 @@ describe('RunTimeControl', () => {
     getByText('Complete required steps on Protocol tab before starting the run')
   })
   it('should render disabled button with tooltip if a module is missing', () => {
-    mockUseMissingModuleIds.mockReturnValue(['temperatureModuleV1'])
+    mockUseModuleMatchResults.mockReturnValue({
+      missingModuleIds: ['temperatureModuleV1'],
+      remainingAttachedModules: [],
+    })
     const [{ getByRole, getByText }] = render()
     const button = getByRole('button', { name: 'Start Run' })
     expect(button).toBeDisabled()

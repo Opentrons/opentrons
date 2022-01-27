@@ -76,7 +76,8 @@ export const useLabwareOffsets = (
       )
       const labwareDefinitionUri = getLabwareDefinitionUri(
         labwareId,
-        protocolData.labware
+        protocolData.labware,
+        protocolData.labwareDefinitions
       )
       const displayName = protocolData.labware[labwareId].displayName ?? ''
       const vectorPromise = offsetDataByLabwareId.then(result => ({

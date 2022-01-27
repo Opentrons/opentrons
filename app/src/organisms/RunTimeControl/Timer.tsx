@@ -9,19 +9,23 @@ import {
   FONT_HUGE_DARK_SEMIBOLD,
   SPACING_3,
 } from '@opentrons/components'
-
+import { RUN_STATUS_STOP_REQUESTED } from '@opentrons/api-client'
 import { formatInterval } from './utils'
 
 interface TimerProps {
   startTime: string
   pausedAt: string | null
+  stoppedAt: string | null
   completedAt: string | null
+  runStatus?: string
 }
 
 export function Timer({
   startTime,
   pausedAt,
+  stoppedAt,
   completedAt,
+  runStatus,
 }: TimerProps): JSX.Element {
   const { t } = useTranslation('run_details')
 
@@ -43,10 +47,14 @@ export function Timer({
           </Text>
         </>
       ) : null}
-      <Text css={FONT_BODY_1_DARK_SEMIBOLD}>{`${t('run_time')}:`}</Text>
-      <Text css={FONT_HUGE_DARK_SEMIBOLD} marginBottom={SPACING_3}>
-        {formatInterval(startTime, endTime)}
-      </Text>
+      <>
+        <Text css={FONT_BODY_1_DARK_SEMIBOLD}>{`${t('run_time')}:`}</Text>
+        <Text css={FONT_HUGE_DARK_SEMIBOLD} marginBottom={SPACING_3}>
+          {runStatus === RUN_STATUS_STOP_REQUESTED && stoppedAt != null
+            ? formatInterval(stoppedAt, startTime)
+            : formatInterval(startTime, endTime)}
+        </Text>
+      </>
     </>
   )
 }

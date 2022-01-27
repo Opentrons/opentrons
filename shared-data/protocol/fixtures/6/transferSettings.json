@@ -4584,6 +4584,9 @@
         "location": {
           "slotName": "1"
         }
+      },
+      "result": {
+        "moduleId": "3e012450-3412-11eb-ad93-ed232a2337cf:magneticModuleType"
       }
     },
     {
@@ -4594,6 +4597,9 @@
         "location": {
           "slotName": "3"
         }
+      },
+      "result": {
+        "moduleId": "3e0283e0-3412-11eb-ad93-ed232a2337cf:temperatureModuleType"
       }
     },
     {
@@ -4604,6 +4610,9 @@
         "location": {
           "slotName": "7"
         }
+      },
+      "result": {
+        "moduleId": "3e039550-3412-11eb-ad93-ed232a2337cf:thermocyclerModuleType"
       }
     },
     {

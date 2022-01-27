@@ -304,11 +304,13 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
                 {labwareOffsetCount === 0 ? (
                   <Text>{t('no_labware_offset_data')}</Text>
                 ) : (
-                  <Trans
-                    t={t}
-                    i18nKey="labware_offsets_info"
-                    values={{ number: labwareOffsetCount }}
-                  />
+                  <Flex flexDirection={DIRECTION_COLUMN}>
+                    <Trans
+                      t={t}
+                      i18nKey="labware_offsets_info"
+                      values={{ number: labwareOffsetCount }}
+                    />
+                  </Flex>
                 )}
               </Flex>
             </Flex>
