@@ -2,7 +2,6 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
-import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   Box,
   Flex,
@@ -11,16 +10,13 @@ import {
   ALIGN_CENTER,
   ALIGN_START,
   C_BLUE,
-  C_MED_DARK_GRAY,
   C_MED_LIGHT_GRAY,
   C_WHITE,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  SIZE_1,
   SIZE_2,
   SPACING_2,
   SPACING_3,
-  JUSTIFY_SPACE_BETWEEN,
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
 import {
@@ -29,8 +25,8 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { useCurrentProtocolRun } from '../../organisms/ProtocolUpload/hooks'
 import { useAttachedModules, useAttachedPipettes } from './hooks'
+import { RobotStatusBanner } from './RobotStatusBanner'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 
@@ -58,28 +54,14 @@ const ModuleIcon = ({
 
 type RobotCardProps = Pick<DiscoveredRobot, 'name' | 'local'>
 
-export function RobotCard(props: RobotCardProps): JSX.Element {
+export function RobotCard(props: RobotCardProps): JSX.Element | null {
   const { name = null, local } = props
   const { t } = useTranslation('devices_landing')
-
-  const { protocolRecord, runRecord } = useCurrentProtocolRun()
-
-  const isProtocolRunning =
-    runRecord != null && runRecord.data.status !== RUN_STATUS_IDLE
-
-  const ProtocolRunBanner = (): JSX.Element => (
-    <Flex>
-      <Text paddingRight={SPACING_2}>
-        {`${t('running')} ${protocolRecord?.data.metadata.protocolName}`}
-      </Text>
-      <Link to={`/devices/${name}/protocol-runs/run`}>{t('go_to_run')}</Link>
-    </Flex>
-  )
 
   const attachedModules = useAttachedModules(name)
   const attachedPipettes = useAttachedPipettes(name)
 
-  return (
+  return name != null ? (
     <Flex
       alignItems={ALIGN_CENTER}
       backgroundColor={C_WHITE}
@@ -92,34 +74,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element {
     >
       <img src={OT2_PNG} width="93px" />
       <Box padding={SPACING_2} width="100%">
-        <Flex flexDirection={DIRECTION_COLUMN}>
-          {/* robot_model can be seen in the health response, but only for "connectable" robots. 
-          Probably best to leave as "OT-2" for now */}
-          <Text>OT-2</Text>
-          <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-            <Flex paddingBottom={SPACING_3}>
-              <Text as="span" marginRight={SPACING_3}>
-                {name}
-              </Text>
-              <Icon
-                // local boolean corresponds to a wired usb connection
-                name={local ? 'usb' : 'wifi'}
-                size={SIZE_1}
-                marginRight={SPACING_2}
-              />
-              <Icon
-                name="circle"
-                color={isProtocolRunning ? C_BLUE : C_MED_DARK_GRAY}
-                size={SIZE_1}
-                marginRight={SPACING_2}
-              />
-              <Text as="span">
-                {isProtocolRunning ? t('active') : t('idle')}
-              </Text>
-            </Flex>
-            {isProtocolRunning ? <ProtocolRunBanner /> : null}
-          </Flex>
-        </Flex>
+        <RobotStatusBanner name={name} local={local} />
         <Flex>
           <Flex flexDirection={DIRECTION_COLUMN} paddingRight={SPACING_3}>
             <Text textTransform={TEXT_TRANSFORM_UPPERCASE}>
@@ -147,12 +102,12 @@ export function RobotCard(props: RobotCardProps): JSX.Element {
           </Flex>
         </Flex>
       </Box>
-      <Icon
-        name="dots-horizontal"
-        color={C_BLUE}
-        size={SIZE_2}
-        alignSelf={ALIGN_START}
-      />
+      {/* temp link from three dot menu to device detail page. Robot actions menu covered in ticket #8673 */}
+      <Box alignSelf={ALIGN_START}>
+        <Link to={`/devices/${name}`}>
+          <Icon name="dots-horizontal" color={C_BLUE} size={SIZE_2} />
+        </Link>
+      </Box>
     </Flex>
-  )
+  ) : null
 }
