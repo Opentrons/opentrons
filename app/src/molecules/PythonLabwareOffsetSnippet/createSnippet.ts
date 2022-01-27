@@ -15,11 +15,13 @@ export function createSnippet(
   labwareOffsets?: LabwareOffset[]
 ): string | null {
   let moduleVariableById: { [moduleId: string]: string } = {}
+  let labwareCount = 0
   const loadCommandLines = protocol.commands.reduce<string[]>(
-    (acc, command, index) => {
+    (acc, command) => {
       let loadStatement = ''
       let addendum = null
       if (command.commandType === 'loadLabware') {
+        labwareCount = labwareCount + 1
         const loadedLabware = protocol.labware[command.result.labwareId]
         if (loadedLabware == null) return acc
         const { loadName } = protocol.labwareDefinitions[
@@ -28,12 +30,12 @@ export function createSnippet(
         if ('slotName' in command.params.location) {
           // load labware on deck
           const { slotName } = command.params.location
-          loadStatement = `labware_${index} = protocol.load_labware("${loadName}", location="${slotName}")`
+          loadStatement = `labware_${labwareCount} = protocol.load_labware("${loadName}", location="${slotName}")`
         } else if ('moduleId' in command.params.location) {
           // load labware on module
           const moduleVariable =
             moduleVariableById[command.params.location.moduleId]
-          loadStatement = `labware_${index} = ${moduleVariable}.load_labware("${loadName}")`
+          loadStatement = `labware_${labwareCount} = ${moduleVariable}.load_labware("${loadName}")`
         }
         const labwareDefUri = getLabwareDefinitionUri(
           command.result.labwareId,
@@ -58,15 +60,17 @@ export function createSnippet(
           const { x, y, z } = labwareOffset.vector
           addendum = [
             loadStatement,
-            `labware_${index}.set_offset(x=${x.toFixed(2)}, y=${y.toFixed(
+            `labware_${labwareCount}.set_offset(x=${x.toFixed(
               2
-            )}, z=${z.toFixed(2)})`,
+            )}, y=${y.toFixed(2)}, z=${z.toFixed(2)})`,
             '',
           ]
         }
       } else if (command.commandType === 'loadModule') {
         // load module on deck
-        const moduleVariable = `module_${index}`
+        const moduleVariable = `module_${
+          Object.keys(moduleVariableById).length + 1
+        }`
         moduleVariableById = {
           ...moduleVariableById,
           [command.result.moduleId]: moduleVariable,
@@ -84,7 +88,6 @@ export function createSnippet(
     []
   )
 
-  console.log('protocolData', protocol)
   return loadCommandLines.reduce<string>((acc, line) => {
     if (mode === 'jupyter') {
       return `${acc}\n${line}`
