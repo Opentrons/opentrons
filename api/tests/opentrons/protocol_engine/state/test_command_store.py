@@ -5,11 +5,8 @@ from datetime import datetime
 from typing import NamedTuple, Type
 
 from opentrons.types import MountType, DeckSlotName
-from opentrons.hardware_control.types import (
-    HardwareEvent,
-    DoorStateNotification,
-    DoorState,
-)
+from opentrons.hardware_control.types import DoorStateNotification, DoorState
+
 from opentrons.protocol_engine import commands, errors
 from opentrons.protocol_engine.types import DeckSlotLocation, PipetteName, WellLocation
 

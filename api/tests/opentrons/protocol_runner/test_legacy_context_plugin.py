@@ -9,7 +9,6 @@ from opentrons.commands.types import CommandMessage as LegacyCommand, PauseMessa
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.types import (
     PauseType,
-    PauseResumeError,
     DoorStateNotification,
     DoorState,
 )
@@ -131,7 +130,7 @@ def test_hardware_event_action(
     hardware_api: HardwareAPI,
     subject: LegacyContextPlugin,
 ) -> None:
-    """It should pause the hardware controller upon a blocking door HardwareEventAction."""
+    """It should pause the hardware controller upon a blocking HardwareEventAction."""
     door_open_event = DoorStateNotification(new_state=DoorState.OPEN, blocking=True)
     subject.handle_action(pe_actions.HardwareEventAction(event=door_open_event))
     decoy.verify(hardware_api.pause(PauseType.PAUSE), times=1)

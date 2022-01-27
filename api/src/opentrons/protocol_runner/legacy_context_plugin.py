@@ -5,16 +5,11 @@ from typing import Callable, Optional, NamedTuple
 from opentrons.commands.types import CommandMessage as LegacyCommand
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import (
-    PauseResumeError,
     DoorStateNotification,
     PauseType as HardwarePauseType,
 )
 
-from opentrons.protocol_engine import (
-    AbstractPlugin,
-    EngineStatus,
-    actions as pe_actions,
-)
+from opentrons.protocol_engine import AbstractPlugin, actions as pe_actions
 
 from .legacy_wrappers import (
     LegacyInstrumentLoadInfo,

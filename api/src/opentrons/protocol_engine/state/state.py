@@ -104,6 +104,7 @@ class StateStore(StateView, ActionHandler):
                 labware state.
             deck_fixed_labware: Labware definitions from the deck
                 definition to preload into labware state.
+            is_door_blocking: Whether the robot's door state is blocking protocol run
             configs: Configurations for the engine.
             change_notifier: Internal state change notifier.
         """

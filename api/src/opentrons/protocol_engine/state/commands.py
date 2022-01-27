@@ -6,11 +6,7 @@ from dataclasses import dataclass
 from typing import Dict, List, Mapping, Optional
 from typing_extensions import Literal
 
-from opentrons.hardware_control.types import (
-    HardwareEvent,
-    DoorStateNotification,
-    DoorState,
-)
+from opentrons.hardware_control.types import DoorStateNotification, DoorState
 
 from ..actions import (
     Action,
@@ -22,7 +18,6 @@ from ..actions import (
     StopAction,
     FinishAction,
     HardwareStoppedAction,
-    PauseSource,
     HardwareEventAction,
 )
 
