@@ -71,7 +71,9 @@ class ProtocolEngine:
         self._hardware_stopper = hardware_stopper or HardwareStopper(
             hardware_api=hardware_api, state_store=state_store
         )
-        hardware_api.register_callback(self.hardware_event_handler)
+        self._hardware_event_watcher = hardware_api.register_callback(
+            self.hardware_event_handler
+        )
         self._queue_worker.start()
 
     @property
@@ -87,6 +89,10 @@ class ProtocolEngine:
         """Update the runner on hardware events."""
         action = HardwareEventAction(event=hw_event)
         self._action_dispatcher.dispatch(action)
+
+    def _remove_hardware_event_watcher(self) -> None:
+        if self._hardware_event_watcher and callable(self._hardware_event_watcher):
+            self._hardware_event_watcher()
 
     def play(self) -> None:
         """Start or resume executing commands in the queue."""
@@ -205,6 +211,7 @@ class ProtocolEngine:
         finally:
             await self._hardware_stopper.do_stop_and_recover(drop_tips_and_home)
             self._action_dispatcher.dispatch(HardwareStoppedAction())
+            self._remove_hardware_event_watcher()
             await self._plugin_starter.stop()
 
     def add_labware_offset(self, request: LabwareOffsetCreate) -> LabwareOffset:

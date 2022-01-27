@@ -41,7 +41,7 @@ async def test_create_engine_initializes_state_with_deck_geometry(
 
 
 @pytest.mark.xfail
-# How to mock feature flag value?
+# TODO: Figure out how to mock feature flag value and finish is test
 async def test_create_engine_initializes_state_with_door_state(
     decoy: Decoy,
     hardware_api: HardwareAPI,

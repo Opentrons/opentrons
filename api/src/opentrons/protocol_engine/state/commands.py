@@ -346,7 +346,7 @@ class CommandView(HasState[CommandState]):
     def raise_if_paused_by_blocking_door(self) -> None:
         """Raise if the engine is currently paused by an open door."""
         if self.get_status() == EngineStatus.BLOCKED_BY_OPEN_DOOR:
-            raise RobotDoorOpenError
+            raise RobotDoorOpenError("Front door or top window is currently open.")
 
     def get_status(self) -> EngineStatus:
         """Get the current execution status of the engine."""
