@@ -10,8 +10,10 @@ import {
   RUN_STATUS_STOPPED,
   RUN_STATUS_FAILED,
   RUN_STATUS_SUCCEEDED,
+  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
 } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
+import { AlertItem } from '@opentrons/components/src/alerts'
 
 import { i18n } from '../../../i18n'
 import {
@@ -266,6 +268,19 @@ describe('RunTimeControl', () => {
     expect(getByRole('button', { name: 'Resume Run' })).toBeTruthy()
   })
 
+  it('renders a run status, timer, and disabled resume run button if paused by door open', () => {
+    when(mockUseRunStatus)
+      .calledWith()
+      .mockReturnValue(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
+    when(mockUseRunStartTime).calledWith().mockReturnValue('noon')
+
+    const [{ getByRole, getByText }] = render()
+
+    expect(getByText('Status: Paused - door open')).toBeTruthy()
+    expect(getByText('Mock Timer')).toBeTruthy()
+    expect(getByRole('button', { name: 'Resume Run' })).toBeDisabled()
+  })
+
   it('renders a run status and timer if stop-requested', () => {
     when(mockUseRunStatus)
       .calledWith()
@@ -312,5 +327,20 @@ describe('RunTimeControl', () => {
     expect(getByText('Status: Completed')).toBeTruthy()
     expect(getByText('Mock Timer')).toBeTruthy()
     expect(getByRole('button', { name: 'Run Again' })).toBeTruthy()
+  })
+
+  it('renders an alert when run status is paused by opened door', () => {
+    when(mockUseRunStatus)
+      .calledWith()
+      .mockReturnValue(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
+
+    const renderPauseAlert = () => {
+      return renderWithProviders(
+        <AlertItem type="warning" title="Close robot door to resume run" />
+      )
+    }
+
+    const [{ getByText }] = renderPauseAlert()
+    getByText('Close robot door to resume run')
   })
 })

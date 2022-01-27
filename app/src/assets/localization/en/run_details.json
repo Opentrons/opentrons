@@ -61,5 +61,6 @@
   "loading_protocol": "Loading Protocol",
   "closing_protocol": "Closing Protocol",
   "canceling_run": "Canceling Run",
-  "door_open_pause": "Current Step - Paused - Door Open"
+  "door_open_pause": "Current Step - Paused - Door Open",
+  "close_door_to_resume": "Close robot door to resume run"
 }
