@@ -6,7 +6,11 @@ from typing import Optional, List
 
 from opentrons import config
 
-from opentrons.config.robot_configs import get_legacy_gantry_calibration
+from opentrons.config.robot_configs import (
+    get_legacy_gantry_calibration,
+    default_deck_calibration,
+    default_pipette_offset,
+)
 from opentrons.calibration_storage import modify, types, get
 from opentrons.types import Mount
 from opentrons.util import linal
@@ -28,7 +32,7 @@ def build_temporary_identity_calibration() -> RobotCalibration:
     """
     return RobotCalibration(
         deck_calibration=types.DeckCalibration(
-            attitude=linal.identity_deck_transform().tolist(),
+            attitude=default_deck_calibration(),
             source=types.SourceType.default,
             status=types.CalibrationStatus(),
         )
@@ -142,7 +146,7 @@ def load_attitude_matrix() -> types.DeckCalibration:
     else:
         # load default if deck calibration data do not exist
         return types.DeckCalibration(
-            attitude=config.robot_configs.defaults_ot2.DEFAULT_DECK_CALIBRATION_V2,
+            attitude=default_deck_calibration(),
             source=types.SourceType.default,
             status=types.CalibrationStatus(),
         )
@@ -153,7 +157,7 @@ def load_pipette_offset(
 ) -> types.PipetteOffsetByPipetteMount:
     # load default if pipette offset data do not exist
     pip_cal_obj = types.PipetteOffsetByPipetteMount(
-        offset=config.robot_configs.defaults_ot2.DEFAULT_PIPETTE_OFFSET,
+        offset=default_pipette_offset(),
         source=types.SourceType.default,
         status=types.CalibrationStatus(),
     )

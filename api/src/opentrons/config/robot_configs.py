@@ -141,3 +141,17 @@ def _save_json(data: Dict[str, Any], filename: Union[str, Path]) -> None:
             os.fsync(file.fileno())
     except OSError:
         log.exception("Write failed with exception:")
+
+
+def default_deck_calibration() -> List[List[float]]:
+    if enable_ot3_hardware_controller():
+        return defaults_ot3.DEFAULT_DECK_CALIBRATION
+    else:
+        return defaults_ot2.DEFAULT_DECK_CALIBRATION_V2
+
+
+def default_pipette_offset() -> List[float]:
+    if enable_ot3_hardware_controller():
+        return defaults_ot3.DEFAULT_PIPETTE_OFFSET
+    else:
+        return defaults_ot2.DEFAULT_PIPETTE_OFFSET

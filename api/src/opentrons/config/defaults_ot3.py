@@ -1,8 +1,17 @@
-from typing import Any, Dict, cast
+from typing import Any, Dict, cast, List
 from typing_extensions import Final
 from dataclasses import asdict
 
 from .types import OT3Config, ByPipetteKind, GeneralizeableAxisDict
+
+DEFAULT_DECK_CALIBRATION: List[List[float]] = [
+    [-1.00, 0.00, 0.00],
+    [0.00, -1.00, 0.00],
+    [0.00, 0.00, 1.00],
+]
+
+DEFAULT_PIPETTE_OFFSET = [0.0, 0.0, 0.0]
+
 
 ROBOT_CONFIG_VERSION: Final = 1
 DEFAULT_LOG_LEVEL = "INFO"
