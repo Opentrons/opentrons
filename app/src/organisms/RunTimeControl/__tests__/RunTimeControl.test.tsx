@@ -282,8 +282,8 @@ describe('RunTimeControl', () => {
 
     const [{ getByRole, getByText }] = render()
 
-    expect(getByText('Status: Paused - door open')).toBeTruthy()
-    expect(getByText('Mock Timer')).toBeTruthy()
+    getByText('Status: Paused - door open')
+    getByText('Mock Timer')
     expect(getByRole('button', { name: 'Resume Run' })).toBeDisabled()
   })
 
