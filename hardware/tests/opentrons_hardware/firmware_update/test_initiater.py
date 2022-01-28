@@ -48,22 +48,20 @@ async def test_messaging(
 
     await subject.run(target, 1, 1)
 
-    mock_messenger.send.assert_has_calls(
-        [
-            call(
-                node_id=target.system_node,
-                message=message_definitions.FirmwareUpdateInitiate(
-                    payload=payloads.EmptyPayload()
-                ),
+    assert mock_messenger.send.mock_calls == [
+        call(
+            node_id=target.system_node,
+            message=message_definitions.FirmwareUpdateInitiate(
+                payload=payloads.EmptyPayload()
             ),
-            call(
-                node_id=target.bootloader_node,
-                message=message_definitions.DeviceInfoRequest(
-                    payload=payloads.EmptyPayload()
-                ),
+        ),
+        call(
+            node_id=target.bootloader_node,
+            message=message_definitions.DeviceInfoRequest(
+                payload=payloads.EmptyPayload()
             ),
-        ]
-    )
+        ),
+    ]
 
 
 async def test_retry(
@@ -72,7 +70,6 @@ async def test_retry(
     can_message_notifier: MockCanMessageNotifier,
 ) -> None:
     """It should retry device info request."""
-
     responses = [
         message_definitions.DeviceInfoResponse(
             payload=payloads.DeviceInfoResponsePayload(version=UInt32Field(0))
@@ -105,23 +102,25 @@ async def test_retry(
 
     await subject.run(target, retry_count=retry_count + 1, ready_wait_time_sec=0.1)
 
-    mock_messenger.send.assert_has_calls(
-        [
+    assert (
+        mock_messenger.send.mock_calls
+        == [
             call(
                 node_id=target.system_node,
                 message=message_definitions.FirmwareUpdateInitiate(
                     payload=payloads.EmptyPayload()
                 ),
             ),
-        ] +
-        [
+        ]
+        + [
             call(
                 node_id=target.bootloader_node,
                 message=message_definitions.DeviceInfoRequest(
                     payload=payloads.EmptyPayload()
                 ),
             ),
-        ] * retry_count
+        ]
+        * retry_count
     )
 
 
@@ -130,28 +129,29 @@ async def test_bootloader_not_ready(
     mock_messenger: AsyncMock,
 ) -> None:
     """It should raise an error when bootloader never responds."""
-
     target = initiator.head
 
     retry_count = 3
     with pytest.raises(BootloaderNotReady):
         await subject.run(target, retry_count=retry_count, ready_wait_time_sec=0.1)
 
-    mock_messenger.send.assert_has_calls(
-        [
+    assert (
+        mock_messenger.send.mock_calls
+        == [
             call(
                 node_id=target.system_node,
                 message=message_definitions.FirmwareUpdateInitiate(
                     payload=payloads.EmptyPayload()
                 ),
             ),
-        ] +
-        [
+        ]
+        + [
             call(
                 node_id=target.bootloader_node,
                 message=message_definitions.DeviceInfoRequest(
                     payload=payloads.EmptyPayload()
                 ),
             ),
-        ] * retry_count
+        ]
+        * retry_count
     )

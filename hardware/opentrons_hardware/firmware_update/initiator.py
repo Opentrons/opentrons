@@ -1,4 +1,7 @@
-"""Firmware update"""
+"""Firmware update initiation."""
+
+import asyncio
+import logging
 from dataclasses import dataclass
 
 from opentrons_ot3_firmware import NodeId
@@ -6,6 +9,9 @@ from opentrons_ot3_firmware.messages import message_definitions, payloads
 
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons_hardware.drivers.can_bus.can_messenger import WaitableCallback
+from opentrons_hardware.firmware_update.errors import BootloaderNotReady
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -55,16 +61,36 @@ class FirmwareUpdateInitiator:
                 node_id=target.system_node, message=initiate_message
             )
 
-            device_info_request_message = message_definitions.DeviceInfoRequest(
-                payload=payloads.EmptyPayload()
-            )
-            await self._messenger.send(
-                node_id=target.bootloader_node, message=device_info_request_message
-            )
+            i = 1
+            while True:
+                try:
+                    await asyncio.wait_for(
+                        self._wait_bootloader(reader, target), ready_wait_time_sec
+                    )
+                    break
+                except asyncio.TimeoutError:
+                    logger.warning(
+                        f"Try {i}: Bootloader not ready "
+                        f"after {ready_wait_time_sec} seconds."
+                    )
+                    if i < retry_count:
+                        i += 1
+                    else:
+                        raise BootloaderNotReady()
 
-            response, arbitration_id = await reader.read()
+    async def _wait_bootloader(self, reader: WaitableCallback, target: Target) -> None:
+        """Wait for bootloader to be ready."""
+        # Send device info request
+        device_info_request_message = message_definitions.DeviceInfoRequest(
+            payload=payloads.EmptyPayload()
+        )
+        await self._messenger.send(
+            node_id=target.bootloader_node, message=device_info_request_message
+        )
+        # Poll for device info response.
+        async for response, arbitration_id in reader:
             if (
                 isinstance(response, message_definitions.DeviceInfoResponse)
                 and arbitration_id.parts.originating_node_id == target.bootloader_node
             ):
-                return
+                break

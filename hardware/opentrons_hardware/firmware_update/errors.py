@@ -28,3 +28,9 @@ class TimeoutResponse(FirmwareUpgradeException):
         """Constructor."""
         self.message = message
         super().__init__(f"Timed out waiting for response to {message}")
+
+
+class BootloaderNotReady(FirmwareUpgradeException):
+    """Bootloader is not ready."""
+
+    pass
