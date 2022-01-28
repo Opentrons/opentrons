@@ -308,8 +308,8 @@ async def remove_run(
     except RunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
-    return PydanticResponse(
-        content=SimpleEmptyBody(),
+    return await PydanticResponse.create(
+        content=SimpleEmptyBody.construct(),
         status_code=status.HTTP_200_OK,
     )
 
