@@ -304,7 +304,7 @@ describe('useRunStatus hook', () => {
     when(mockUseCurrentRun)
       .calledWith()
       .mockReturnValue({
-         data: mockRunningRun,
+        data: mockRunningRun,
       } as Run)
     when(mockUseRunQuery)
       .calledWith(RUN_ID_2, { refetchInterval: 1000 })
@@ -320,7 +320,7 @@ describe('useRunStatus hook', () => {
     when(mockUseCurrentRun)
       .calledWith()
       .mockReturnValue({
-         data: mockIdleUnstartedRun ,
+        data: mockIdleUnstartedRun,
       } as Run)
     when(mockUseRunQuery)
       .calledWith(RUN_ID_2, { refetchInterval: 1000 })
@@ -336,7 +336,7 @@ describe('useRunStatus hook', () => {
     when(mockUseCurrentRun)
       .calledWith()
       .mockReturnValue({
-         data: mockIdleStartedRun ,
+        data: mockIdleStartedRun,
       } as Run)
     when(mockUseRunQuery)
       .calledWith(RUN_ID_2, { refetchInterval: 1000 })
@@ -358,7 +358,7 @@ describe('useRunStartTime hook', () => {
     when(mockUseCurrentRun)
       .calledWith()
       .mockReturnValue({
-         data: mockRunningRun,
+        data: mockRunningRun,
       } as Run)
     when(mockUseRunQuery)
       .calledWith(RUN_ID_2)
@@ -380,7 +380,7 @@ describe('useRunPauseTime hook', () => {
     when(mockUseCurrentRun)
       .calledWith()
       .mockReturnValue({
-         data: mockRunningRun,
+        data: mockRunningRun,
       } as Run)
     when(mockUseRunQuery)
       .calledWith(RUN_ID_2)
@@ -418,7 +418,7 @@ describe('useRunStopTime hook', () => {
     when(mockUseCurrentRun)
       .calledWith()
       .mockReturnValue({
-         data: mockRunningRun,
+        data: mockRunningRun,
       } as Run)
     when(mockUseRunQuery)
       .calledWith(RUN_ID_2)
