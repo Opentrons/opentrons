@@ -99,6 +99,10 @@ class ProtocolEngine:
     def hardware_event_handler(self, hw_event: HardwareEvent) -> None:
         """Update the runner on hardware events."""
         action = HardwareEventAction(event=hw_event)
+        # todo: Instead of using a queue, use something
+        # blocking, like anyio.from_thread_run_sync().
+        # That way, we won't have to manage a background task,
+        # and deterministic unit testing will be easier.
         self._hw_actions_to_dispatch.put(action)
 
     def _remove_hardware_event_watcher(self) -> None:
