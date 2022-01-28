@@ -19,10 +19,14 @@ from opentrons_shared_data.pipette import name_config
 from opentrons import types as top_types
 from opentrons.util import linal
 from opentrons.config import robot_configs
-from opentrons.config.types import RobotConfig
+from opentrons.config.types import RobotConfig, OT3Config
 
 from .util import use_or_initialize_loop, check_motion_bounds
-from .pipette import Pipette, generate_hardware_configs, load_from_config_and_check_skip
+from .pipette import (
+    Pipette,
+    generate_hardware_configs_ot3,
+    load_from_config_and_check_skip,
+)
 from .ot3controller import OT3Controller
 from .simulator import Simulator
 from .execution_manager import ExecutionManagerProvider
@@ -95,7 +99,7 @@ class OT3API(
         self,
         backend: Union[Simulator, OT3Controller],
         loop: asyncio.AbstractEventLoop,
-        config: RobotConfig,
+        config: OT3Config,
     ) -> None:
         """Initialize an API instance.
 
@@ -154,13 +158,16 @@ class OT3API(
         cls,
         attached_instruments: Dict[top_types.Mount, Dict[str, Optional[str]]] = None,
         attached_modules: List[str] = None,
-        config: RobotConfig = None,
+        config: Union[OT3Config, RobotConfig] = None,
         loop: asyncio.AbstractEventLoop = None,
         strict_attached_instruments: bool = True,
     ) -> "OT3API":
         """Build an ot3 hardware controller."""
         checked_loop = use_or_initialize_loop(loop)
-        checked_config = config or robot_configs.load()
+        if not isinstance(config, OT3Config):
+            checked_config = robot_configs.load_ot3()
+        else:
+            checked_config = config
         backend = await OT3Controller.build(checked_config)
         await backend.setup_motors()
         return cls(backend, loop=checked_loop, config=checked_config)
@@ -170,7 +177,7 @@ class OT3API(
         cls,
         attached_instruments: Dict[top_types.Mount, Dict[str, Optional[str]]] = None,
         attached_modules: List[str] = None,
-        config: RobotConfig = None,
+        config: Union[RobotConfig, OT3Config] = None,
         loop: asyncio.AbstractEventLoop = None,
         strict_attached_instruments: bool = True,
     ) -> "OT3API":
@@ -187,7 +194,10 @@ class OT3API(
             attached_modules = []
 
         checked_loop = use_or_initialize_loop(loop)
-        checked_config = config or robot_configs.load()
+        if not isinstance(config, OT3Config):
+            checked_config = robot_configs.load_ot3()
+        else:
+            checked_config = config
         backend = await Simulator.build(
             attached_instruments,
             attached_modules,
@@ -338,7 +348,7 @@ class OT3API(
                 continue
 
             self._log.info(f"Doing full configuration on {mount.name}")
-            hw_config = generate_hardware_configs(
+            hw_config = generate_hardware_configs_ot3(
                 p, self._config, self._backend.board_revision
             )
             await self._backend.configure_mount(mount, hw_config)
@@ -782,7 +792,7 @@ class OT3API(
 
     # Gantry/frame (i.e. not pipette) config API
     @property
-    def config(self) -> RobotConfig:
+    def config(self) -> OT3Config:
         """Get the robot's configuration object.
 
         :returns .RobotConfig: The object.
@@ -790,11 +800,14 @@ class OT3API(
         return self._config
 
     @config.setter
-    def config(self, config: RobotConfig) -> None:
+    def config(self, config: Union[OT3Config, RobotConfig]) -> None:
         """Replace the currently-loaded config"""
-        self._config = config
+        if isinstance(config, OT3Config):
+            self._config = config
+        else:
+            self._log.error("Tried to specify an OT2 config object")
 
-    def get_config(self) -> RobotConfig:
+    def get_config(self) -> OT3Config:
         """
         Get the robot's configuration object.
 
@@ -802,9 +815,12 @@ class OT3API(
         """
         return self.config
 
-    def set_config(self, config: RobotConfig) -> None:
+    def set_config(self, config: Union[OT3Config, RobotConfig]) -> None:
         """Replace the currently-loaded config"""
-        self.config = config
+        if isinstance(config, OT3Config):
+            self.config = config
+        else:
+            self._log.error("Tried to specify an OT2 config object")
 
     async def update_config(self, **kwargs):
         """Update values of the robot's configuration."""

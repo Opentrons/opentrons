@@ -1,9 +1,10 @@
+import copy
 import json
 import os
 
 import pytest
 
-from opentrons.config import CONFIG, robot_configs
+from opentrons.config import CONFIG, robot_configs, defaults_ot2, defaults_ot3
 from opentrons.config.types import CurrentDict
 from opentrons.hardware_control.types import BoardRevision
 
@@ -89,14 +90,100 @@ new_dummy_settings = {
     "log_level": "NADA",
 }
 
+ot3_dummy_settings = {
+    "name": "Marie Curie",
+    "model": "OT-3 Standard",
+    "version": 1,
+    "acceleration": {
+        "none": {"X": 3, "Y": 2, "Z": 15, "A": 15, "P": 2},
+        "low_throughput": {
+            "X": 3,
+            "Y": 2,
+            "Z": 15,
+            "P": 15,
+        },
+        "high_throughput": {
+            "X": 3,
+            "Y": 2,
+            "Z": 15,
+            "P": 15,
+        },
+        "two_low_throughput": {"X": 3, "Y": 2},
+        "gripper": {
+            "Z": 15,
+        },
+    },
+    "default_max_speed": {
+        "none": {
+            "X": 1,
+            "Y": 2,
+            "Z": 3,
+            "P": 4,
+        },
+        "low_throughput": {
+            "X": 1,
+            "Y": 2,
+            "Z": 3,
+            "P": 4,
+        },
+        "high_throughput": {"X": 1, "Y": 2, "Z": 3, "P": 4},
+        "two_low_throughput": {"X": 1, "Y": 2, "Z": 3, "P": 4},
+        "gripper": {"Z": 3},
+    },
+    "max_speed_discontinuity": {
+        "none": {"X": 10, "Y": 20, "Z": 30, "P": 40},
+        "low_throughput": {"X": 1, "Y": 2, "Z": 3, "P": 6},
+        "high_throughput": {"X": 1, "Y": 2, "Z": 3, "P": 6},
+        "two_low_throughput": {"X": 1, "Y": 2, "Z": 3, "P": 6},
+        "gripper": {"Z": 3},
+    },
+    "direction_change_speed_discontinuity": {
+        "none": {"X": 5, "Y": 10, "Z": 15, "P": 20},
+        "low_throughput": {"X": 0.8, "Y": 1, "Z": 2, "P": 4},
+        "high_throughput": {"X": 1, "Y": 2, "Z": 3, "P": 6},
+        "two_low_throughput": {"X": 0.5, "Y": 1, "Z": 1.5, "P": 3},
+        "gripper": {"Z": 2.8},
+    },
+    "holding_current": {
+        "none": {"X": 0.7, "Y": 0.7, "Z": 0.7, "P": 0.8},
+        "low_throughput": {"X": 0.7, "Y": 0.7, "Z": 0.7, "P": 0.8},
+        "high_throughput": {"X": 0.7, "Y": 0.7, "Z": 0.7, "P": 0.8},
+        "two_low_throughput": {
+            "X": 0.7,
+            "Y": 0.7,
+        },
+        "gripper": {
+            "Z": 0.7,
+        },
+    },
+    "normal_motion_current": {
+        "none": {"X": 7.0, "Y": 7.0, "Z": 7.0, "P": 5.0},
+        "low_throughput": {"X": 1, "Y": 2, "Z": 3, "P": 4.0},
+        "high_throughput": {"X": 0.2, "Y": 0.5, "Z": 0.4, "P": 2.0},
+        "two_low_throughput": {
+            "X": 9,
+            "Y": 0.1,
+        },
+        "gripper": {
+            "Z": 10,
+        },
+    },
+    "left_mount_offset": [-50, 0, 0],
+    "log_level": "NADA",
+    "z_retract_distance": 10,
+}
 
-def test_load_corrupt_json():
+
+def test_load_corrupt_json(machine_variant_ffs):
     filename = os.path.join(os.path.dirname(__file__), "bad_config.json")
     with open(filename, "w") as file:
         file.write("")  # empty config file
     new_setting = robot_configs._load_json(filename)
     c = robot_configs.build_config(new_setting)
-    assert c.version == 4
+    assert c.version in [
+        defaults_ot2.ROBOT_CONFIG_VERSION,
+        defaults_ot3.ROBOT_CONFIG_VERSION,
+    ]
     os.remove(filename)
 
 
@@ -106,10 +193,11 @@ def test_migrate_config():
     assert new_config == migrated_dummy_settings
 
 
-def test_dictify_roundtrip():
-    built_config = robot_configs.build_config(new_dummy_settings)
+@pytest.mark.parametrize("config_dict", [new_dummy_settings, ot3_dummy_settings])
+def test_dictify_roundtrip(config_dict):
+    built_config = robot_configs.build_config(config_dict)
     new_saved_config = robot_configs.config_to_save(built_config)
-    assert new_saved_config == new_dummy_settings
+    assert new_saved_config == config_dict
 
 
 def test_load_legacy_gantry_cal():
@@ -138,14 +226,15 @@ def test_load_currents():
         "2.1": {"X": 0, "Y": 1, "Z": 2, "A": 3, "B": 4, "C": 5},
     }
     from_legacy = {"default": default["default"], "B": default["B"], "2.1": legacy}
+    assert defaults_ot2._build_hw_versioned_current_dict(legacy, default) == from_legacy
     assert (
-        robot_configs._build_hw_versioned_current_dict(legacy, default) == from_legacy
-    )
-    assert (
-        robot_configs._build_hw_versioned_current_dict(default_different_vals, default)
+        defaults_ot2._build_hw_versioned_current_dict(default_different_vals, default)
         == default_different_vals
     )
-    assert robot_configs._build_hw_versioned_current_dict(None, default) == default
+    assert (
+        robot_configs.defaults_ot2._build_hw_versioned_current_dict(None, default)
+        == default
+    )
 
 
 @pytest.mark.parametrize(
@@ -162,3 +251,42 @@ def test_load_currents():
 )
 def test_current_for_revision(current_dict, board_rev, result):
     assert robot_configs.current_for_revision(current_dict, board_rev) == result
+
+
+def test_load_per_pipette_vals():
+    # nothing provided
+    assert (
+        defaults_ot3._build_default_bpk({}, defaults_ot3.DEFAULT_HOLDING_CURRENT)
+        == defaults_ot3.DEFAULT_HOLDING_CURRENT
+    )
+
+    # some dicts not formatted right
+    mostly_right = defaults_ot3.serialize(defaults_ot3.build_with_defaults({}))
+    del mostly_right["acceleration"]["low_throughput"]
+    assert (
+        defaults_ot3._build_default_bpk(
+            mostly_right["acceleration"], defaults_ot3.DEFAULT_ACCELERATIONS
+        ).low_throughput
+        == defaults_ot3.DEFAULT_ACCELERATIONS.low_throughput
+    )
+
+    # altered values aare preserved
+    mostly_right["acceleration"]["high_throughput"]["X"] -= 2
+    assert (
+        defaults_ot3._build_default_bpk(
+            mostly_right["acceleration"], defaults_ot3.DEFAULT_ACCELERATIONS
+        ).high_throughput["X"]
+        == defaults_ot3.DEFAULT_ACCELERATIONS.high_throughput["X"] - 2
+    )
+
+    # added values are preserved
+    altered_default = copy.deepcopy(defaults_ot3.DEFAULT_ACCELERATIONS)
+    altered_default.two_low_throughput.pop("X", None)
+
+    mostly_right["acceleration"]["two_low_throughput"]["X"] = -72
+    assert (
+        defaults_ot3._build_default_bpk(
+            mostly_right["acceleration"], altered_default
+        ).two_low_throughput["X"]
+        == -72
+    )
