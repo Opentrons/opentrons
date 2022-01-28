@@ -10,24 +10,20 @@ import {
   SPACING_3,
 } from '@opentrons/components'
 import { RUN_STATUS_STOP_REQUESTED } from '@opentrons/api-client'
+import { useRunCompleteTime, useRunPauseTime, useRunStopTime } from './hooks'
 import { formatInterval } from './utils'
 
 interface TimerProps {
   startTime: string
-  pausedAt: string | null
-  stoppedAt: string | null
-  completedAt: string | null
   runStatus?: string
 }
 
-export function Timer({
-  startTime,
-  pausedAt,
-  stoppedAt,
-  completedAt,
-  runStatus,
-}: TimerProps): JSX.Element {
+export function Timer({ startTime, runStatus }: TimerProps): JSX.Element {
   const { t } = useTranslation('run_details')
+
+  const pausedAt = useRunPauseTime()
+  const stoppedAt = useRunStopTime()
+  const completedAt = useRunCompleteTime()
 
   const [now, setNow] = React.useState(Date())
   useInterval(() => setNow(Date()), 500, true)

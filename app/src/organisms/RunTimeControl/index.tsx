@@ -38,28 +38,16 @@ import {
   useModuleMatchResults,
   useProtocolCalibrationStatus,
 } from '../ProtocolSetup/RunSetupCard/hooks'
-import {
-  useRunCompleteTime,
-  useRunControls,
-  useRunPauseTime,
-  useRunStartTime,
-  useRunStatus,
-  useRunStopTime,
-} from './hooks'
+import { useRunControls, useRunStartTime, useRunStatus } from './hooks'
 import { Timer } from './Timer'
 
 export function RunTimeControl(): JSX.Element | null {
   const { t } = useTranslation('run_details')
-  const moduleMatchResults = useModuleMatchResults()
+  const missingModuleIds = useModuleMatchResults().missingModuleIds
   const isEverythingCalibrated = useProtocolCalibrationStatus().complete
-  const { missingModuleIds } = moduleMatchResults
-  const disableRunCta = !isEverythingCalibrated || missingModuleIds.length > 0
   const [targetProps, tooltipProps] = useHoverTooltip()
   const runStatus = useRunStatus()
   const startTime = useRunStartTime()
-  const pausedAt = useRunPauseTime()
-  const stoppedAt = useRunStopTime()
-  const completedAt = useRunCompleteTime()
 
   const {
     play,
@@ -70,98 +58,57 @@ export function RunTimeControl(): JSX.Element | null {
     isResetRunLoading,
   } = useRunControls()
 
-  const [isRunActionLoading, setIsRunActionLoading] = React.useState(false)
-  const [isFinishing, setIsFinishing] = React.useState(false)
-  const [lastRunAction, setLastRunAction] = React.useState<
-    'play' | 'pause' | 'reset' | null
-  >(null)
-
-  React.useEffect(() => {
-    if (isPlayRunActionLoading) {
-      setIsRunActionLoading(true)
-      setLastRunAction('play')
-    } else if (isPauseRunActionLoading) {
-      setIsRunActionLoading(true)
-      setLastRunAction('pause')
-    } else if (isResetRunLoading) {
-      setIsRunActionLoading(true)
-      setLastRunAction('reset')
-    } else if (!isFinishing && runStatus === 'finishing') {
-      setIsFinishing(true)
-    }
-
-    if (isRunActionLoading) {
-      if (lastRunAction === 'play' && runStatus === RUN_STATUS_RUNNING) {
-        setIsRunActionLoading(false)
-      }
-      if (
-        lastRunAction === 'pause' &&
-        (runStatus === RUN_STATUS_PAUSED ||
-          runStatus === RUN_STATUS_PAUSE_REQUESTED)
-      ) {
-        setIsRunActionLoading(false)
-      }
-      if (lastRunAction === 'reset' && runStatus === RUN_STATUS_IDLE) {
-        setIsRunActionLoading(false)
-      }
-    }
-    if (isFinishing && runStatus !== 'finishing') {
-      setIsFinishing(false)
-    }
-    if (
-      (lastRunAction === 'play' || lastRunAction === 'pause') &&
-      runStatus === RUN_STATUS_STOP_REQUESTED
-    ) {
-      setIsRunActionLoading(true)
-    } else if (
-      (lastRunAction === 'play' || lastRunAction === 'pause') &&
-      (runStatus === RUN_STATUS_STOPPED || runStatus === RUN_STATUS_SUCCEEDED)
-    ) {
-      setIsRunActionLoading(false)
-    }
-  }, [
-    isPlayRunActionLoading,
-    isPauseRunActionLoading,
-    isResetRunLoading,
-    isRunActionLoading,
-    lastRunAction,
-    runStatus,
-  ])
+  const isMutationLoading =
+    isPlayRunActionLoading || isPauseRunActionLoading || isResetRunLoading
 
   let handleButtonClick = (): void => {}
   let buttonIconName: IconName | null = null
   let buttonText: string = ''
 
-  if (runStatus === RUN_STATUS_IDLE) {
-    buttonIconName = 'play'
-    buttonText = t('start_run')
-    handleButtonClick = play
-  } else if (runStatus === RUN_STATUS_RUNNING) {
-    buttonIconName = 'pause'
-    buttonText = t('pause_run')
-    handleButtonClick = pause
-  } else if (
-    runStatus === RUN_STATUS_PAUSED ||
-    runStatus === RUN_STATUS_PAUSE_REQUESTED ||
-    runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR
-  ) {
-    buttonIconName = 'play'
-    buttonText = t('resume_run')
-    handleButtonClick = play
-  } else if (runStatus === RUN_STATUS_STOP_REQUESTED) {
-    buttonIconName = null
-    buttonText = t('canceling_run')
-    handleButtonClick = reset
-  } else if (
-    runStatus === RUN_STATUS_STOPPED ||
-    runStatus === RUN_STATUS_FINISHING ||
-    runStatus === RUN_STATUS_FAILED ||
-    runStatus === RUN_STATUS_SUCCEEDED
-  ) {
-    buttonIconName = null
-    buttonText = t('run_again')
-    handleButtonClick = reset
+  switch (runStatus) {
+    case RUN_STATUS_IDLE:
+    case RUN_STATUS_PAUSED:
+    case RUN_STATUS_PAUSE_REQUESTED:
+    case RUN_STATUS_BLOCKED_BY_OPEN_DOOR:
+      buttonIconName = 'play'
+      buttonText =
+        runStatus === RUN_STATUS_IDLE ? t('start_run') : t('resume_run')
+      handleButtonClick = play
+      break
+    case RUN_STATUS_RUNNING:
+      buttonIconName = 'pause'
+      buttonText = t('pause_run')
+      handleButtonClick = pause
+      break
+    case RUN_STATUS_STOP_REQUESTED:
+      buttonIconName = null
+      buttonText = t('canceling_run')
+      handleButtonClick = reset
+      break
+    case RUN_STATUS_STOPPED:
+    case RUN_STATUS_FINISHING:
+    case RUN_STATUS_FAILED:
+    case RUN_STATUS_SUCCEEDED:
+      buttonIconName = null
+      buttonText = t('run_again')
+      handleButtonClick = reset
+      break
   }
+
+  let disableReason = null
+  if (!isEverythingCalibrated) {
+    disableReason = t('run_cta_disabled')
+  } else if (missingModuleIds.length > 0) {
+    disableReason = t('run_cta_disabled')
+  } else if (runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR) {
+    disableReason = t('close_door_to_resume')
+  }
+
+  const showSpinner =
+    isMutationLoading ||
+    runStatus === RUN_STATUS_FINISHING ||
+    runStatus === RUN_STATUS_PAUSE_REQUESTED ||
+    runStatus === RUN_STATUS_STOP_REQUESTED
 
   const buttonIcon =
     buttonIconName != null ? (
@@ -179,13 +126,7 @@ export function RunTimeControl(): JSX.Element | null {
           : ''}
       </Text>
       {startTime != null ? (
-        <Timer
-          startTime={startTime}
-          pausedAt={pausedAt}
-          stoppedAt={stoppedAt}
-          completedAt={completedAt}
-          runStatus={runStatus}
-        />
+        <Timer startTime={startTime} runStatus={runStatus} />
       ) : null}
       {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ? (
         <Flex marginBottom={SPACING_3}>
@@ -202,26 +143,18 @@ export function RunTimeControl(): JSX.Element | null {
         justifyContent={JUSTIFY_CENTER}
         alignItems={ALIGN_CENTER}
         display={DISPLAY_FLEX}
-        disabled={
-          disableRunCta ||
-          isRunActionLoading ||
-          isFinishing ||
-          runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR
-        }
+        disabled={showSpinner || disableReason != null}
         {...targetProps}
       >
-        {isRunActionLoading || isFinishing ? (
+        {showSpinner ? (
           <Icon name="ot-spinner" size={SIZE_1} marginRight={SPACING_2} spin />
         ) : (
           buttonIcon
         )}
         <Text fontSize={FONT_SIZE_DEFAULT}>{buttonText}</Text>
       </NewPrimaryBtn>
-      {disableRunCta && (
-        <Tooltip {...tooltipProps}>{t('run_cta_disabled')}</Tooltip>
-      )}
-      {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR && (
-        <Tooltip {...tooltipProps}>{t('close_door_to_resume')}</Tooltip>
+      {disableReason != null && (
+        <Tooltip {...tooltipProps}>{disableReason}</Tooltip>
       )}
     </Flex>
   ) : null
