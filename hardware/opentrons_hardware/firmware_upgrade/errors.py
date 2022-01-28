@@ -11,12 +11,12 @@ class FirmwareUpgradeException(Exception):
 class ErrorResponse(FirmwareUpgradeException):
     """Error response exception."""
 
-    error_code: int
+    message: MessageDefinition
 
-    def __init__(self, error_code: int) -> None:
+    def __init__(self, message: MessageDefinition) -> None:
         """Constructor."""
-        self.error_code = error_code
-        super().__init__(f"Got error response: {error_code}")
+        self.message = message
+        super().__init__(f"Got error response {message}.")
 
 
 class TimeoutResponse(FirmwareUpgradeException):
@@ -27,4 +27,4 @@ class TimeoutResponse(FirmwareUpgradeException):
     def __init__(self, message: MessageDefinition) -> None:
         """Constructor."""
         self.message = message
-        super().__init__(f"Timed out waiting for response to : {message}")
+        super().__init__(f"Timed out waiting for response to {message}")
