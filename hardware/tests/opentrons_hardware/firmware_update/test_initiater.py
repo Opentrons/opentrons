@@ -20,7 +20,6 @@ async def test_messaging(
     subject: initiator.FirmwareUpdateInitiator,
     mock_messenger: AsyncMock,
     can_message_notifier: MockCanMessageNotifier,
-    target: initiator.Target,
 ) -> None:
     """It should initiate update and prepare for update."""
 
@@ -35,16 +34,18 @@ async def test_messaging(
                 arbitration_id=ArbitrationId(
                     parts=ArbitrationIdParts(
                         message_id=response.message_id,
-                        originating_node_id=target.bootloader_node,
+                        originating_node_id=node_id,
                         node_id=NodeId.host,
                         function_code=0,
                     )
                 ),
             )
 
+    target = initiator.head
+
     mock_messenger.send.side_effect = responder
 
-    await subject.run(target)
+    await subject.run(target, 1, 1)
 
     mock_messenger.send.assert_has_calls(
         [
