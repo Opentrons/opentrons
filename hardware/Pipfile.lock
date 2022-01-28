@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "ec599a1ef8bfe86e263507863562e34984c32950348ecc0dda165716c8c28924"
+            "sha256": "8f6babf8d74450e42968cd4b62436292f0e48263c2b63f24a2ee9857b0be580c"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -53,7 +53,7 @@
         },
         "opentrons-ot3-firmware": {
             "git": "https://github.com/Opentrons/ot3-firmware.git",
-            "ref": "987d4e72e08ab014d03c5859b46175e93b7ba6c1",
+            "ref": "ddf9322c074ca8a66a58bd5ba20b1ccaac795971",
             "subdirectory": "python"
         },
         "pydantic": {
@@ -297,7 +297,7 @@
                 "sha256:876d180e9d7432c5d1dfd4c5d26b72f099d503e8fcc0feb7532c9289be60fcbd",
                 "sha256:cb957888737fc0bbcd78e3df769addb41fd1ff8cf950dc9e7ad7793f1bf44455"
             ],
-            "markers": "python_full_version >= '3.5.0'",
+            "markers": "python_version >= '3.5'",
             "version": "==2.0.10"
         },
         "click": {
@@ -467,7 +467,7 @@
                 "sha256:84d9dd047ffa80596e0f246e2eab0b391788b0503584e8945f2368256d2735ff",
                 "sha256:9d643ff0a55b762d5cdb124b8eaa99c66322e2157b69160bc32796e824360e6d"
             ],
-            "markers": "python_full_version >= '3.5.0'",
+            "markers": "python_version >= '3.5'",
             "version": "==3.3"
         },
         "importlib-metadata": {
