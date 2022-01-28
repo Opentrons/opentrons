@@ -1,6 +1,8 @@
 """Can messenger class."""
+from __future__ import annotations
 import asyncio
-from typing import List, Optional, Callable
+from inspect import Traceback
+from typing import List, Optional, Callable, Tuple
 import logging
 
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
@@ -114,3 +116,47 @@ class CanMessenger:
                     log.exception(f"Failed to build from {message}")
             else:
                 log.error(f"Message {message} is not recognized.")
+
+
+class WaitableCallback:
+    """MessageListenerCallback that can be awaited or iterated."""
+
+    def __init__(self, messenger: CanMessenger) -> None:
+        """Constructor.
+
+        Args:
+            messenger: Messenger to listen on.
+        """
+        self._messenger = messenger
+        self._queue: asyncio.Queue[
+            Tuple[MessageDefinition, ArbitrationId]
+        ] = asyncio.Queue()
+
+    def __call__(
+        self, message: MessageDefinition, arbitration_id: ArbitrationId
+    ) -> None:
+        """Callback."""
+        self._queue.put_nowait((message, arbitration_id))
+
+    def __enter__(self) -> WaitableCallback:
+        """Enter context manager."""
+        self._messenger.add_listener(self)
+        return self
+
+    def __exit__(
+        self, exc_type: type, exc_val: BaseException, exc_tb: Traceback
+    ) -> None:
+        """Exit context manager."""
+        self._messenger.remove_listener(self)
+
+    def __aiter__(self) -> WaitableCallback:
+        """Enter iterator."""
+        return self
+
+    async def __anext__(self) -> Tuple[MessageDefinition, ArbitrationId]:
+        """Async next."""
+        return await self.read()
+
+    async def read(self) -> Tuple[MessageDefinition, ArbitrationId]:
+        """Read next message."""
+        return await self._queue.get()
