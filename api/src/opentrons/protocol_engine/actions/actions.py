@@ -9,6 +9,7 @@ from enum import Enum
 from typing import Optional, Union
 
 from opentrons.protocols.models import LabwareDefinition
+from opentrons.hardware_control.types import HardwareEvent
 
 from ..commands import Command, CommandCreate
 from ..errors import ProtocolEngineError
@@ -72,6 +73,13 @@ class HardwareStoppedAction:
 
 
 @dataclass(frozen=True)
+class HardwareEventAction:
+    """Handle events coming in from hardware control."""
+
+    event: HardwareEvent
+
+
+@dataclass(frozen=True)
 class QueueCommandAction:
     """Add a command request to the queue."""
 
@@ -126,6 +134,7 @@ Action = Union[
     StopAction,
     FinishAction,
     HardwareStoppedAction,
+    HardwareEventAction,
     QueueCommandAction,
     UpdateCommandAction,
     FailCommandAction,

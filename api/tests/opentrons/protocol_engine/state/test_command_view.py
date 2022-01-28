@@ -25,6 +25,7 @@ from .command_fixtures import (
 def get_command_view(
     queue_status: QueueStatus = QueueStatus.IMPLICITLY_ACTIVE,
     is_hardware_stopped: bool = False,
+    is_door_blocking: bool = False,
     run_result: Optional[RunResult] = None,
     running_command_id: Optional[str] = None,
     queued_command_ids: Sequence[str] = (),
@@ -35,6 +36,7 @@ def get_command_view(
     state = CommandState(
         queue_status=queue_status,
         is_hardware_stopped=is_hardware_stopped,
+        is_door_blocking=is_door_blocking,
         run_result=run_result,
         running_command_id=running_command_id,
         queued_command_ids=OrderedDict((i, True) for i in queued_command_ids),
@@ -244,6 +246,46 @@ def test_validate_action_allowed(
         subject.raise_if_stop_requested()
 
 
+class PlayAllowedSpec(NamedTuple):
+    """Spec data to test CommandView.validate_action_allowed."""
+
+    subject: CommandView
+    expected_error: Optional[Type[errors.RobotDoorOpenError]]
+
+
+play_allowed_specs: List[PlayAllowedSpec] = [
+    PlayAllowedSpec(
+        subject=get_command_view(
+            is_door_blocking=True, queue_status=QueueStatus.IMPLICITLY_ACTIVE
+        ),
+        expected_error=None,
+    ),
+    PlayAllowedSpec(
+        subject=get_command_view(
+            is_door_blocking=True, queue_status=QueueStatus.INACTIVE
+        ),
+        expected_error=errors.RobotDoorOpenError,
+    ),
+    PlayAllowedSpec(
+        subject=get_command_view(
+            is_door_blocking=False, queue_status=QueueStatus.INACTIVE
+        ),
+        expected_error=None,
+    ),
+]
+
+
+@pytest.mark.parametrize(PlayAllowedSpec._fields, play_allowed_specs)
+def test_validate_action_for_door_status(
+    subject: CommandView, expected_error: Optional[Type[errors.RobotDoorOpenError]]
+) -> None:
+    """It should raise error if playing when door open."""
+    expectation = pytest.raises(expected_error) if expected_error else does_not_raise()
+
+    with expectation:  # type: ignore[attr-defined]
+        subject.raise_if_paused_by_blocking_door()
+
+
 def test_get_errors() -> None:
     """It should be able to pull all ErrorOccurrences from the store."""
     error_1 = errors.ErrorOccurrence(
@@ -353,6 +395,27 @@ get_status_specs: List[GetStatusSpec] = [
             is_hardware_stopped=True,
         ),
         expected_status=EngineStatus.STOPPED,
+    ),
+    GetStatusSpec(
+        subject=get_command_view(
+            queue_status=QueueStatus.INACTIVE,
+            is_door_blocking=True,
+        ),
+        expected_status=EngineStatus.BLOCKED_BY_OPEN_DOOR,
+    ),
+    GetStatusSpec(
+        subject=get_command_view(
+            queue_status=QueueStatus.IMPLICITLY_ACTIVE,
+            is_door_blocking=True,
+        ),
+        expected_status=EngineStatus.IDLE,
+    ),
+    GetStatusSpec(
+        subject=get_command_view(
+            queue_status=QueueStatus.INACTIVE,
+            is_door_blocking=False,
+        ),
+        expected_status=EngineStatus.PAUSED,
     ),
 ]
 

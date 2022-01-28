@@ -1,6 +1,7 @@
 """ProtocolEngine class definition."""
-from typing import Optional
+from typing import Optional, Callable
 
+from opentrons.hardware_control.types import HardwareEvent
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control import HardwareControlAPI
 
@@ -25,6 +26,7 @@ from .actions import (
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
     HardwareStoppedAction,
+    HardwareEventAction,
 )
 
 
@@ -69,6 +71,9 @@ class ProtocolEngine:
         self._hardware_stopper = hardware_stopper or HardwareStopper(
             hardware_api=hardware_api, state_store=state_store
         )
+        self._hw_event_watcher: Optional[
+            Callable[[], None]
+        ] = hardware_api.register_callback(self.hardware_event_handler)
         self._queue_worker.start()
 
     @property
@@ -80,11 +85,22 @@ class ProtocolEngine:
         """Add a plugin to the engine to customize behavior."""
         self._plugin_starter.start(plugin)
 
+    def hardware_event_handler(self, hw_event: HardwareEvent) -> None:
+        """Update the runner on hardware events."""
+        action = HardwareEventAction(event=hw_event)
+        self._action_dispatcher.dispatch(action)
+
+    def _remove_hardware_event_watcher(self) -> None:
+        if self._hw_event_watcher and callable(self._hw_event_watcher):
+            self._hw_event_watcher()
+            self._hw_event_watcher = None
+
     def play(self) -> None:
         """Start or resume executing commands in the queue."""
         # TODO(mc, 2021-08-05): if starting, ensure plungers motors are
         # homed if necessary
         action = PlayAction()
+        self._state_store.commands.raise_if_paused_by_blocking_door()
         self._state_store.commands.raise_if_stop_requested()
         self._action_dispatcher.dispatch(action)
         self._queue_worker.start()
@@ -196,6 +212,7 @@ class ProtocolEngine:
         finally:
             await self._hardware_stopper.do_stop_and_recover(drop_tips_and_home)
             self._action_dispatcher.dispatch(HardwareStoppedAction())
+            self._remove_hardware_event_watcher()
             await self._plugin_starter.stop()
 
     def add_labware_offset(self, request: LabwareOffsetCreate) -> LabwareOffset:

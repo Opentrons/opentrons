@@ -5,6 +5,9 @@ from enum import Enum
 from dataclasses import dataclass
 from typing import Dict, List, Mapping, Optional
 from typing_extensions import Literal
+
+from opentrons.hardware_control.types import DoorStateNotification, DoorState
+
 from ..actions import (
     Action,
     QueueCommandAction,
@@ -15,6 +18,7 @@ from ..actions import (
     StopAction,
     FinishAction,
     HardwareStoppedAction,
+    HardwareEventAction,
 )
 
 from ..commands import Command, CommandStatus
@@ -23,6 +27,7 @@ from ..errors import (
     CommandDoesNotExistError,
     ProtocolEngineStoppedError,
     ErrorOccurrence,
+    RobotDoorOpenError,
 )
 from ..types import EngineStatus
 from .abstract_store import HasState, HandlesActions
@@ -63,6 +68,8 @@ class CommandState:
             executing, and the robot may still be in motion, even if INACTIVE.
         is_hardware_stopped: Whether the engine's hardware has ceased
             motion. Once set, this flag cannot be unset.
+        is_door_blocking: Whether the door is open when
+            enable_door_safety_switch feature flag is ON.
         run_result: Whether the run is done and succeeded, failed, or stopped.
             Once set, this status cannot be unset.
         running_command_id: The ID of the currently running command, if any.
@@ -75,6 +82,7 @@ class CommandState:
 
     queue_status: QueueStatus
     is_hardware_stopped: bool
+    is_door_blocking: bool
     run_result: Optional[RunResult]
     running_command_id: Optional[str]
     queued_command_ids: OrderedDict[str, Literal[True]]
@@ -87,11 +95,12 @@ class CommandStore(HasState[CommandState], HandlesActions):
 
     _state: CommandState
 
-    def __init__(self) -> None:
+    def __init__(self, is_door_blocking: bool = False) -> None:
         """Initialize a CommandStore and its state."""
         self._state = CommandState(
             queue_status=QueueStatus.IMPLICITLY_ACTIVE,
             is_hardware_stopped=False,
+            is_door_blocking=is_door_blocking,
             run_result=None,
             running_command_id=None,
             queued_command_ids=OrderedDict(),
@@ -164,7 +173,11 @@ class CommandStore(HasState[CommandState], HandlesActions):
 
         elif isinstance(action, PlayAction):
             if not self._state.run_result:
-                self._state.queue_status = QueueStatus.ACTIVE
+                if self._state.is_door_blocking:
+                    # Always inactivate queue when door is blocking
+                    self._state.queue_status = QueueStatus.INACTIVE
+                else:
+                    self._state.queue_status = QueueStatus.ACTIVE
 
         elif isinstance(action, PauseAction):
             self._state.queue_status = QueueStatus.INACTIVE
@@ -204,6 +217,15 @@ class CommandStore(HasState[CommandState], HandlesActions):
             self._state.queue_status = QueueStatus.INACTIVE
             self._state.run_result = self._state.run_result or RunResult.STOPPED
             self._state.is_hardware_stopped = True
+
+        elif isinstance(action, HardwareEventAction):
+            if isinstance(action.event, DoorStateNotification):
+                if action.event.blocking:
+                    self._state.is_door_blocking = True
+                    if self._state.queue_status != QueueStatus.IMPLICITLY_ACTIVE:
+                        self._state.queue_status = QueueStatus.INACTIVE
+                elif action.event.new_state == DoorState.CLOSED:
+                    self._state.is_door_blocking = False
 
 
 class CommandView(HasState[CommandState]):
@@ -256,8 +278,16 @@ class CommandView(HasState[CommandState]):
         """Get whether the engine is stopped or unplayed so it could be removed."""
         if self.get_is_stopped() or self.get_status() == EngineStatus.IDLE:
             return True
+        else:
+            return False
 
-        return False
+    def get_is_door_blocking(self) -> bool:
+        """Get whether the robot door is open when 'pause on door open' ff is True."""
+        return self._state.is_door_blocking
+
+    def get_is_implicitly_active(self) -> bool:
+        """Get whether the queue is implicitly active, i.e., never 'played'."""
+        return self._state.queue_status == QueueStatus.IMPLICITLY_ACTIVE
 
     def get_is_running(self) -> bool:
         """Get whether the engine is running and queued commands should be executed."""
@@ -317,6 +347,11 @@ class CommandView(HasState[CommandState]):
         if self.get_stop_requested():
             raise ProtocolEngineStoppedError("Cannot modify a stopped engine.")
 
+    def raise_if_paused_by_blocking_door(self) -> None:
+        """Raise if the engine is currently paused by an open door."""
+        if self.get_status() == EngineStatus.BLOCKED_BY_OPEN_DOOR:
+            raise RobotDoorOpenError("Front door or top window is currently open.")
+
     def get_status(self) -> EngineStatus:
         """Get the current execution status of the engine."""
         if self._state.run_result:
@@ -337,7 +372,10 @@ class CommandView(HasState[CommandState]):
             return EngineStatus.RUNNING
 
         elif self._state.queue_status == QueueStatus.INACTIVE:
-            return EngineStatus.PAUSED
+            if self._state.is_door_blocking:
+                return EngineStatus.BLOCKED_BY_OPEN_DOOR
+            else:
+                return EngineStatus.PAUSED
 
         else:
             any_running = self._state.running_command_id is not None
@@ -345,6 +383,5 @@ class CommandView(HasState[CommandState]):
 
             if any_running or any_queued:
                 return EngineStatus.RUNNING
-
             else:
                 return EngineStatus.IDLE

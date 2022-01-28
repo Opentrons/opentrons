@@ -5,6 +5,7 @@ from decoy import Decoy
 
 from opentrons.types import DeckSlotName, MountType
 from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control.types import DoorStateNotification, DoorState
 from opentrons.protocols.models import LabwareDefinition
 
 from opentrons.protocol_engine import ProtocolEngine, commands
@@ -32,6 +33,7 @@ from opentrons.protocol_engine.actions import (
     FinishErrorDetails,
     QueueCommandAction,
     HardwareStoppedAction,
+    HardwareEventAction,
 )
 
 
@@ -227,6 +229,7 @@ def test_play(
     subject.play()
 
     decoy.verify(
+        state_store.commands.raise_if_paused_by_blocking_door(),
         state_store.commands.raise_if_stop_requested(),
         action_dispatcher.dispatch(PlayAction()),
     )
@@ -245,6 +248,24 @@ def test_pause(
 
     decoy.verify(
         state_store.commands.raise_if_stop_requested(),
+        action_dispatcher.dispatch(expected_action),
+    )
+
+
+def test_hardware_event_handler(
+    decoy: Decoy,
+    state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
+    subject: ProtocolEngine,
+) -> None:
+    """It should be able to pause executing queued commands."""
+    door_open_event = DoorStateNotification(new_state=DoorState.OPEN, blocking=True)
+
+    expected_action = HardwareEventAction(door_open_event)
+
+    subject.hardware_event_handler(door_open_event)
+
+    decoy.verify(
         action_dispatcher.dispatch(expected_action),
     )
 

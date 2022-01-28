@@ -106,3 +106,7 @@ class ModuleIsNotThermocyclerError(ProtocolEngineError):
 
 class ThermocyclerNotOpenError(ProtocolEngineError):
     """An error raised when trying to move to labware that's covered inside a TC."""
+
+
+class RobotDoorOpenError(ProtocolEngineError):
+    """An error raised when executing a protocol command when a robot door is open."""

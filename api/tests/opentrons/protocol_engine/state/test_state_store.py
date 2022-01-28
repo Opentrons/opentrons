@@ -25,6 +25,7 @@ def subject(
         deck_definition=standard_deck_def,
         deck_fixed_labware=[],
         change_notifier=change_notifier,
+        is_door_blocking=False,
     )
 
 
