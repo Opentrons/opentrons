@@ -54,6 +54,10 @@ describe('RobotStatusBanner', () => {
   })
 
   it('renders an active robot status when a protocol is running', () => {
+    mockUseCurrentProtocol.mockReturnValue({
+      data: { metadata: { protocolName: 'Testosaur' } },
+    } as Protocol)
+
     mockUseIsProtocolRunning.mockReturnValue(true)
 
     const [{ getByText }] = render()

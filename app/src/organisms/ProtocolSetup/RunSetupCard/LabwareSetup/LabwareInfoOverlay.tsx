@@ -60,7 +60,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
     protocolData.modules
   )
 
-  const labwareOffsets = runRecord?.data.labwareOffsets ?? []
+  const labwareOffsets = runRecord?.data?.labwareOffsets ?? []
   const mostRecentLabwareOffsets = uniqBy<LabwareOffset>(
     labwareOffsets.sort(
       (a, b) =>

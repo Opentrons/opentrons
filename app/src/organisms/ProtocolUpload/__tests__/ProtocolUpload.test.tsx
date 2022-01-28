@@ -364,7 +364,7 @@ describe('ProtocolUpload', () => {
   it('renders protocol title', () => {
     when(mockUseCurrentProtocol)
       .calledWith()
-      .mockReturnValue({ data: withModulesProtocol } as any)
+      .mockReturnValue({ data: { analyses: [withModulesProtocol] } } as any)
     when(mockUseCreateRun).calledWith().mockReturnValue({
       createProtocolRun: jest.fn(),
       isCreatingProtocolRun: false,

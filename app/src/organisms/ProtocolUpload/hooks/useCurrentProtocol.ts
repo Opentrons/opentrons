@@ -7,13 +7,12 @@ import type { Protocol } from '@opentrons/api-client'
 
 export function useCurrentProtocol(): Protocol | null {
   const currentRun = useCurrentRun()
-  if (currentRun == null) return null
 
   const enableProtocolPolling = React.useRef<boolean>(
-    currentRun.data.protocolId != null
+    currentRun?.data.protocolId != null
   )
   const { data: protocolRecord } = useProtocolQuery(
-    (currentRun.data?.protocolId as string) ?? null,
+    (currentRun?.data?.protocolId as string) ?? null,
     { staleTime: Infinity },
     enableProtocolPolling.current
   )
@@ -27,13 +26,13 @@ export function useCurrentProtocol(): Protocol | null {
     ) {
       enableProtocolPolling.current = false
     } else if (
-      currentRun.data.protocolId != null &&
+      currentRun?.data.protocolId != null &&
       !enableProtocolPolling.current &&
       mostRecentAnalysis?.status !== 'completed'
     ) {
       enableProtocolPolling.current = true
     }
-  }, [mostRecentAnalysis?.status, currentRun.data.protocolId])
+  }, [mostRecentAnalysis?.status, currentRun?.data.protocolId])
 
   return protocolRecord ?? null
 }

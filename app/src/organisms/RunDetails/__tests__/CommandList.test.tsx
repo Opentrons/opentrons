@@ -9,8 +9,8 @@ import { useCurrentRun } from '../../ProtocolUpload/hooks'
 import { useRunStatus } from '../../RunTimeControl/hooks'
 import { ProtocolSetupInfo } from '../ProtocolSetupInfo'
 import { CommandList } from '../CommandList'
-import fixtureAnalysis from '@opentrons/app/src/organisms/RunDetails/Fixture_analysis.json'
-import fixtureCommandSummary from '@opentrons/app/src/organisms/RunDetails/Fixture_commandSummary.json'
+import fixtureAnalysis from '../__fixtures__/analysis.json'
+import runRecord from '../__fixtures__/runRecord.json'
 import { CommandItemComponent as CommandItem } from '../CommandItem'
 import type { ProtocolFile } from '@opentrons/shared-data'
 
@@ -90,8 +90,7 @@ describe('CommandList', () => {
     ).toEqual(9)
   })
   it('renders only anticipated steps if the current run info is present and has not updated', () => {
-    // @ts-expect-error not a full match of RunData type
-    mockUseCurrentRun.mockReturnValue(fixtureCommandSummary)
+    mockUseCurrentRun.mockReturnValue(runRecord as any)
     const { getAllByText } = render()
     expect(
       getAllByText(

@@ -226,7 +226,7 @@ describe('useIsProtocolRunning hook', () => {
   it('returns false when current run record does not exist', () => {
     when(mockUseCurrentRun)
       .calledWith()
-      .mockReturnValue({} as any)
+      .mockReturnValue(null)
 
     const { result } = renderHook(() => useIsProtocolRunning(), { wrapper })
 
@@ -237,7 +237,7 @@ describe('useIsProtocolRunning hook', () => {
     when(mockUseCurrentRun)
       .calledWith()
       .mockReturnValue({
-        runRecord: { data: { status: RUN_STATUS_IDLE } },
+        data: { status: RUN_STATUS_IDLE },
       } as any)
 
     const { result } = renderHook(() => useIsProtocolRunning(), { wrapper })
