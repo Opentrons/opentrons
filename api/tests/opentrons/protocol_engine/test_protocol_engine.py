@@ -82,7 +82,7 @@ def hardware_stopper(decoy: Decoy) -> HardwareStopper:
 
 
 @pytest.fixture
-async def subject(
+async def base_subject(
     hardware_api: HardwareAPI,
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
@@ -90,9 +90,9 @@ async def subject(
     queue_worker: QueueWorker,
     model_utils: ModelUtils,
     hardware_stopper: HardwareStopper,
-) -> AsyncGenerator[ProtocolEngine, None]:
+) -> ProtocolEngine:
     """Get a ProtocolEngine test subject with its dependencies stubbed out."""
-    pe = ProtocolEngine(
+    return ProtocolEngine(
         hardware_api=hardware_api,
         state_store=state_store,
         action_dispatcher=action_dispatcher,
@@ -101,11 +101,13 @@ async def subject(
         model_utils=model_utils,
         hardware_stopper=hardware_stopper,
     )
-    yield pe
-    try:
-        await pe.finish()
-    except RuntimeError:
-        pass
+
+
+@pytest.fixture
+async def subject(base_subject: ProtocolEngine) -> AsyncGenerator[ProtocolEngine, None]:
+    """Get a ProtocolEngine test subject and cleanup after use."""
+    yield base_subject
+    await base_subject.finish()
 
 
 def test_create_starts_queue_worker(
@@ -341,7 +343,7 @@ async def test_finish_stops_hardware_if_queue_worker_join_fails(
     decoy: Decoy,
     queue_worker: QueueWorker,
     hardware_api: HardwareAPI,
-    subject: ProtocolEngine,
+    base_subject: ProtocolEngine,
     hardware_stopper: HardwareStopper,
 ) -> None:
     """It should be able to stop the engine."""
@@ -350,7 +352,7 @@ async def test_finish_stops_hardware_if_queue_worker_join_fails(
     ).then_raise(RuntimeError("oh no"))
 
     with pytest.raises(RuntimeError, match="oh no"):
-        await subject.finish()
+        await base_subject.finish()
 
     decoy.verify(
         await hardware_stopper.do_stop_and_recover(drop_tips_and_home=True),
