@@ -2,6 +2,7 @@
 
 import asyncio
 import logging
+from typing_extensions import Final
 from dataclasses import dataclass
 
 from opentrons_ot3_firmware import NodeId
@@ -22,12 +23,14 @@ class Target:
     bootloader_node: NodeId
 
 
-head = Target(system_node=NodeId.head, bootloader_node=NodeId.head_bootloader)
-pipette = Target(system_node=NodeId.pipette, bootloader_node=NodeId.pipette_bootloader)
-gantry_x = Target(
+head: Final = Target(system_node=NodeId.head, bootloader_node=NodeId.head_bootloader)
+pipette: Final = Target(
+    system_node=NodeId.pipette, bootloader_node=NodeId.pipette_bootloader
+)
+gantry_x: Final = Target(
     system_node=NodeId.gantry_x, bootloader_node=NodeId.gantry_x_bootloader
 )
-gantry_y = Target(
+gantry_y: Final = Target(
     system_node=NodeId.gantry_y, bootloader_node=NodeId.gantry_y_bootloader
 )
 
