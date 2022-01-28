@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.0.0-beta.7](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.6...v5.0.0-beta.7) (2022-01-28)
+
+
+### Performance Improvements
+
+* **robot-server, api-client:** return run summaries from GET /runs rather than full run models ([#9332](https://github.com/Opentrons/opentrons/issues/9332)) ([66b1d7c](https://github.com/Opentrons/opentrons/commit/66b1d7c0082970c53306eb99006309914ad33b22))
+
+
+
+
+
 # [5.0.0-beta.6](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.5...v5.0.0-beta.6) (2022-01-07)
 
 **Note:** Version bump only for package @opentrons/react-api-client

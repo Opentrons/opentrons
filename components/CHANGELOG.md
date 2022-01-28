@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.0.0-beta.7](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.6...v5.0.0-beta.7) (2022-01-28)
+
+
+### Features
+
+* **app:** add X icon to close out of exta attention warning labels ([#9258](https://github.com/Opentrons/opentrons/issues/9258)) ([9406ff6](https://github.com/Opentrons/opentrons/commit/9406ff6937173aafd86403335293d049b197decc)), closes [#8487](https://github.com/Opentrons/opentrons/issues/8487)
+
+
+
+
+
 # [5.0.0-beta.6](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.5...v5.0.0-beta.6) (2022-01-07)
 
 **Note:** Version bump only for package @opentrons/components

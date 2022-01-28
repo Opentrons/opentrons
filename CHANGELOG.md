@@ -3,6 +3,57 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.0.0-beta.7](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.6...v5.0.0-beta.7) (2022-01-28)
+
+
+### Bug Fixes
+
+* **api:**  Fix simulator home and is_homed ([#9279](https://github.com/Opentrons/opentrons/issues/9279)) ([e5db3b7](https://github.com/Opentrons/opentrons/commit/e5db3b7447fbb8624d63345bab661463c936d1a4)), closes [#8969](https://github.com/Opentrons/opentrons/issues/8969)
+* **api:** filter higher order commands out of legacy command response ([#9294](https://github.com/Opentrons/opentrons/issues/9294)) ([21e5bf5](https://github.com/Opentrons/opentrons/commit/21e5bf590f5523f90adff5ad447baa9c2db7bf6c)), closes [#9102](https://github.com/Opentrons/opentrons/issues/9102)
+* **app:** add fileName to title bar if protocolName is undefined ([#9307](https://github.com/Opentrons/opentrons/issues/9307)) ([18cc3ac](https://github.com/Opentrons/opentrons/commit/18cc3acd78924f84e23384599133547ec6732d71)), closes [#9163](https://github.com/Opentrons/opentrons/issues/9163)
+* **app:** calibrate pipette cta goes to robotName/instruments ([#9310](https://github.com/Opentrons/opentrons/issues/9310)) ([0717d4f](https://github.com/Opentrons/opentrons/commit/0717d4f8724966a187e41d6acc877b653c41fac3)), closes [#9267](https://github.com/Opentrons/opentrons/issues/9267)
+* **app:** fix loading and disabling of run cta button to avoid infinite spinner ([#9333](https://github.com/Opentrons/opentrons/issues/9333)) ([bce5334](https://github.com/Opentrons/opentrons/commit/bce533450ba6da489f4d4a38aee3a6b3d691fb29))
+* **app:** redirect to run page when run is cloned ([#9297](https://github.com/Opentrons/opentrons/issues/9297)) ([df85a2b](https://github.com/Opentrons/opentrons/commit/df85a2bae4fc0da110f7762fd41b7c70159c1539)), closes [#9106](https://github.com/Opentrons/opentrons/issues/9106)
+* **app:** set run again button loading state for completed and stopped runs ([#9229](https://github.com/Opentrons/opentrons/issues/9229)) ([c74b241](https://github.com/Opentrons/opentrons/commit/c74b2417702ca65108d38b8c01774e4678710bf7)), closes [#9161](https://github.com/Opentrons/opentrons/issues/9161)
+
+
+### Code Refactoring
+
+* **robot-server:** remove deprecated protocols endpoints and FF ([#9261](https://github.com/Opentrons/opentrons/issues/9261)) ([802d858](https://github.com/Opentrons/opentrons/commit/802d8582dbc09566b8de9eca3672254ef271164b))
+* **robot-server:** remove unused experimental /protocols code ([#9296](https://github.com/Opentrons/opentrons/issues/9296)) ([e462d17](https://github.com/Opentrons/opentrons/commit/e462d17dff12ce42a038ad221eb4ec52564e37e5))
+
+
+### Features
+
+* **api:** remove Calibrate to Bottom from Robot Settings ([#9111](https://github.com/Opentrons/opentrons/issues/9111)) ([06a92ee](https://github.com/Opentrons/opentrons/commit/06a92eecd9fba67c596d91e7c0096b5144b32ab6))
+* **app:** add jupyter advanced setting to download offset data ([#9284](https://github.com/Opentrons/opentrons/issues/9284)) ([a15601b](https://github.com/Opentrons/opentrons/commit/a15601bd95bc775a9f203c02ee5681c1d67b4932))
+* **app:** add module mismatch warning label to Module Setup ([#9250](https://github.com/Opentrons/opentrons/issues/9250)) ([af472e6](https://github.com/Opentrons/opentrons/commit/af472e6910c4726c876b025d23fe0c720c36e95a)), closes [#9160](https://github.com/Opentrons/opentrons/issues/9160)
+* **app:** add X icon to close out of exta attention warning labels ([#9258](https://github.com/Opentrons/opentrons/issues/9258)) ([9406ff6](https://github.com/Opentrons/opentrons/commit/9406ff6937173aafd86403335293d049b197decc)), closes [#8487](https://github.com/Opentrons/opentrons/issues/8487)
+* **engine:** allow compatible module loads and reloads ([#9273](https://github.com/Opentrons/opentrons/issues/9273)) ([1c7e00d](https://github.com/Opentrons/opentrons/commit/1c7e00d8da77273eca1a8d0bb5e7bed544e3c168))
+* **ot3:** create over the wire format from hex file ([#9266](https://github.com/Opentrons/opentrons/issues/9266)) ([b43ee0d](https://github.com/Opentrons/opentrons/commit/b43ee0dfee0823c3c14d69f4ef61762921050031))
+* **papi:** add labware.set_offset for jupyter/cli, bump papi to 2.12 ([#9242](https://github.com/Opentrons/opentrons/issues/9242)) ([17d03cd](https://github.com/Opentrons/opentrons/commit/17d03cdfbf1b41be17dd41d6b064f75d2184938a))
+* **robot-server:** Add the `key` field to command HTTP summaries ([#9257](https://github.com/Opentrons/opentrons/issues/9257)) ([0be9e94](https://github.com/Opentrons/opentrons/commit/0be9e941a3ecc635550fbfef5926623c39876b43))
+
+
+### Performance Improvements
+
+* **api:** Do not wait for the event loop to be free when reporting APIv2 commands ([#9238](https://github.com/Opentrons/opentrons/issues/9238)) ([6ab9b10](https://github.com/Opentrons/opentrons/commit/6ab9b10425eec5c63db93abdd3e68a1c33e0a3ac))
+* **app:** virtualize command list on run detail page ([#9275](https://github.com/Opentrons/opentrons/issues/9275)) ([028e85f](https://github.com/Opentrons/opentrons/commit/028e85f89a9e12da98824e009e822d2dbb0022ea)), closes [#9217](https://github.com/Opentrons/opentrons/issues/9217)
+* **robot-server:** Return some HTTP results slightly more efficiently ([#9336](https://github.com/Opentrons/opentrons/issues/9336)) ([0573ba6](https://github.com/Opentrons/opentrons/commit/0573ba62e914f1ab8d0fe7d984890b44ea2fd706))
+* **robot-server, api-client:** return run summaries from GET /runs rather than full run models ([#9332](https://github.com/Opentrons/opentrons/issues/9332)) ([66b1d7c](https://github.com/Opentrons/opentrons/commit/66b1d7c0082970c53306eb99006309914ad33b22))
+
+
+### BREAKING CHANGES
+
+* **robot-server:** Removes experimental `protocol` session type
+in favor of v5 `/protocols` and `/runs` endpoints
+* **robot-server:** This removes endpoints used during the 2021 HTTP protocol upload beta.
+Users should transition to the new `/protocols` and `/runs` endpoints, instead.
+
+
+
+
+
 # [5.0.0-beta.6](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.5...v5.0.0-beta.6) (2022-01-07)
 
 

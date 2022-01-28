@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.0.0-beta.7](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.6...v5.0.0-beta.7) (2022-01-28)
+
+
+### Bug Fixes
+
+* **api:**  Fix simulator home and is_homed ([#9279](https://github.com/Opentrons/opentrons/issues/9279)) ([e5db3b7](https://github.com/Opentrons/opentrons/commit/e5db3b7447fbb8624d63345bab661463c936d1a4)), closes [#8969](https://github.com/Opentrons/opentrons/issues/8969)
+* **api:** filter higher order commands out of legacy command response ([#9294](https://github.com/Opentrons/opentrons/issues/9294)) ([21e5bf5](https://github.com/Opentrons/opentrons/commit/21e5bf590f5523f90adff5ad447baa9c2db7bf6c)), closes [#9102](https://github.com/Opentrons/opentrons/issues/9102)
+
+
+### Code Refactoring
+
+* **robot-server:** remove deprecated protocols endpoints and FF ([#9261](https://github.com/Opentrons/opentrons/issues/9261)) ([802d858](https://github.com/Opentrons/opentrons/commit/802d8582dbc09566b8de9eca3672254ef271164b))
+
+
+### Features
+
+* **api:** remove Calibrate to Bottom from Robot Settings ([#9111](https://github.com/Opentrons/opentrons/issues/9111)) ([06a92ee](https://github.com/Opentrons/opentrons/commit/06a92eecd9fba67c596d91e7c0096b5144b32ab6))
+* **engine:** allow compatible module loads and reloads ([#9273](https://github.com/Opentrons/opentrons/issues/9273)) ([1c7e00d](https://github.com/Opentrons/opentrons/commit/1c7e00d8da77273eca1a8d0bb5e7bed544e3c168))
+* **papi:** add labware.set_offset for jupyter/cli, bump papi to 2.12 ([#9242](https://github.com/Opentrons/opentrons/issues/9242)) ([17d03cd](https://github.com/Opentrons/opentrons/commit/17d03cdfbf1b41be17dd41d6b064f75d2184938a))
+
+
+### Performance Improvements
+
+* **api:** Do not wait for the event loop to be free when reporting APIv2 commands ([#9238](https://github.com/Opentrons/opentrons/issues/9238)) ([6ab9b10](https://github.com/Opentrons/opentrons/commit/6ab9b10425eec5c63db93abdd3e68a1c33e0a3ac))
+
+
+### BREAKING CHANGES
+
+* **robot-server:** This removes endpoints used during the 2021 HTTP protocol upload beta.
+Users should transition to the new `/protocols` and `/runs` endpoints, instead.
+
+
+
+
+
 # [5.0.0-beta.6](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.5...v5.0.0-beta.6) (2022-01-07)
 
 
