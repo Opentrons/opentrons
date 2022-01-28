@@ -1,5 +1,6 @@
 """Tests for the ProtocolEngine class."""
 import pytest
+from anyio import to_thread
 from datetime import datetime
 from decoy import Decoy
 
@@ -80,7 +81,7 @@ def hardware_stopper(decoy: Decoy) -> HardwareStopper:
 
 
 @pytest.fixture
-def subject(
+async def subject(
     hardware_api: HardwareAPI,
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
@@ -90,7 +91,7 @@ def subject(
     hardware_stopper: HardwareStopper,
 ) -> ProtocolEngine:
     """Get a ProtocolEngine test subject with its dependencies stubbed out."""
-    return ProtocolEngine(
+    pe = ProtocolEngine(
         hardware_api=hardware_api,
         state_store=state_store,
         action_dispatcher=action_dispatcher,
@@ -99,6 +100,11 @@ def subject(
         model_utils=model_utils,
         hardware_stopper=hardware_stopper,
     )
+    yield pe
+    try:
+        await pe.finish()
+    except RuntimeError:
+        pass
 
 
 def test_create_starts_queue_worker(
@@ -252,7 +258,7 @@ def test_pause(
     )
 
 
-def test_hardware_event_handler(
+async def test_hardware_event_handler(
     decoy: Decoy,
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
@@ -260,10 +266,13 @@ def test_hardware_event_handler(
 ) -> None:
     """It should be able to pause executing queued commands."""
     door_open_event = DoorStateNotification(new_state=DoorState.OPEN, blocking=True)
-
     expected_action = HardwareEventAction(door_open_event)
 
-    subject.hardware_event_handler(door_open_event)
+    # Call the event handler callback function from a separate thread
+    await to_thread.run_sync(subject.hardware_event_handler, door_open_event)
+
+    # To make sure all actions are dispatched before verifying
+    await subject.finish()
 
     decoy.verify(
         action_dispatcher.dispatch(expected_action),

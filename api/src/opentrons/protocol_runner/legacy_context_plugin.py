@@ -21,7 +21,7 @@ from .legacy_wrappers import (
     LegacyModuleLoadInfo,
 )
 from .legacy_command_mapper import LegacyCommandMapper
-from .thread_async_queue import ThreadAsyncQueue
+from opentrons.thread_async_queue import ThreadAsyncQueue
 
 
 class LegacyContextPlugin(AbstractPlugin):
