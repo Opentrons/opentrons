@@ -83,15 +83,6 @@ class AllRunsLinks(BaseModel):
     )
 
 
-class RunLinks(BaseModel):
-    """Links returned along with a single run."""
-
-    commands: Optional[ResourceLink] = Field(
-        None,
-        description="Path to the run's command list endpoint",
-    )
-
-
 async def get_run_data_from_url(
     runId: str,
     run_store: RunStore = Depends(get_run_store),
