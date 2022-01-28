@@ -395,8 +395,6 @@ async def test_pick_up_tip(dummy_instruments, loop, is_robot, sim_builder):
     await hw_api.cache_instruments()
     tip_position = types.Point(12.13, 9, 150)
     target_position = {
-        Axis.X: 46.13,  # Left mount offset
-        Axis.Y: 9,
         Axis.Z: 218,  # Z retracts after pick_up
         Axis.A: 218,
         Axis.B: 2,
@@ -411,7 +409,8 @@ async def test_pick_up_tip(dummy_instruments, loop, is_robot, sim_builder):
     await hw_api.pick_up_tip(mount, tip_length)
     assert hw_api._attached_instruments[mount].has_tip
     assert hw_api._attached_instruments[mount].current_volume == 0
-    assert hw_api._current_position == target_position
+    for k, v in target_position.items():
+        assert hw_api._current_position[k] == v, f"{k} position doesnt match"
 
 
 def assert_move_called(mock_move, speed, lock=None):

@@ -6,7 +6,7 @@ from contextlib import contextmanager
 import logging
 from typing import Dict, List, Optional, Tuple, TYPE_CHECKING, Sequence, Generator, cast
 
-from opentrons.config.types import RobotConfig
+from opentrons.config.types import OT3Config
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.types import Mount
 from opentrons.config import pipette_config
@@ -61,7 +61,7 @@ class OT3Controller:
     _position: Dict[NodeId, float]
 
     @classmethod
-    async def build(cls, config: RobotConfig) -> OT3Controller:
+    async def build(cls, config: OT3Config) -> OT3Controller:
         """Create the OT3Controller instance.
 
         Args:
@@ -73,7 +73,7 @@ class OT3Controller:
         driver = await build_driver(DriverSettings())
         return cls(config, driver=driver)
 
-    def __init__(self, config: RobotConfig, driver: AbstractCanDriver) -> None:
+    def __init__(self, config: OT3Config, driver: AbstractCanDriver) -> None:
         """Construct.
 
         Args:
