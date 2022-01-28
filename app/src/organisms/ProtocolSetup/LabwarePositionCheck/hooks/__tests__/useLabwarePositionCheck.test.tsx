@@ -11,7 +11,7 @@ import {
 } from '@opentrons/react-api-client'
 import { useTrackEvent } from '../../../../../redux/analytics'
 import { getConnectedRobotName } from '../../../../../redux/robot/selectors'
-import { useCurrentProtocolRun } from '../../../../ProtocolUpload/hooks'
+import { useCurrentRun } from '../../../../ProtocolUpload/hooks'
 import { getLabwareLocation } from '../../../utils/getLabwareLocation'
 import { useSteps } from '../useSteps'
 import { useLabwarePositionCheck } from '../useLabwarePositionCheck'
@@ -34,8 +34,8 @@ const wrapper: React.FunctionComponent<{}> = ({ children }) => (
   </Provider>
 )
 
-const mockUseCurrentProtocolRun = useCurrentProtocolRun as jest.MockedFunction<
-  typeof useCurrentProtocolRun
+const mockUseCurrentRun = useCurrentRun as jest.MockedFunction<
+  typeof useCurrentRun
 >
 const mockUseSteps = useSteps as jest.MockedFunction<typeof useSteps>
 const mockUseCreateCommandMutation = useCreateCommandMutation as jest.MockedFunction<
@@ -66,9 +66,9 @@ describe('useLabwarePositionCheck', () => {
   let mockCreateCommand: jest.Mock
   let mockCreateLabwareOffset: jest.Mock
   beforeEach(() => {
-    when(mockUseCurrentProtocolRun)
+    when(mockUseCurrentRun)
       .calledWith()
-      .mockReturnValue({ runRecord: { data: { id: MOCK_RUN_ID } } } as any)
+      .mockReturnValue({ data: { id: MOCK_RUN_ID } } as any)
     when(mockUseAllCommandsQuery)
       .calledWith(MOCK_RUN_ID)
       .mockReturnValue({

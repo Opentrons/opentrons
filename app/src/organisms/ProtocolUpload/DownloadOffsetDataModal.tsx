@@ -28,7 +28,7 @@ import {
 import { Portal } from '../../App/portal'
 import { PythonLabwareOffsetSnippet } from '../../molecules/PythonLabwareOffsetSnippet'
 import { useProtocolDetails } from '../RunDetails/hooks'
-import { useCurrentProtocolRun } from './hooks'
+import { useCurrentRun } from './hooks'
 
 const MODES = ['jupyter', 'cli'] as const
 
@@ -45,7 +45,7 @@ export const DownloadOffsetDataModal = (
 ): JSX.Element => {
   const { t } = useTranslation(['protocol_info', 'shared'])
   const { protocolData } = useProtocolDetails()
-  const { runRecord } = useCurrentProtocolRun()
+  const runRecord = useCurrentRun()
   const [mode, setMode] = React.useState<typeof MODES[number]>('jupyter')
 
   return (

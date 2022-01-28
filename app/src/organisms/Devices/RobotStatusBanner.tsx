@@ -15,7 +15,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 
-import { useCurrentProtocolRun } from '../../organisms/ProtocolUpload/hooks'
+import { useCurrentProtocol } from '../../organisms/ProtocolUpload/hooks'
 import { useIsProtocolRunning } from './hooks'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
@@ -26,7 +26,7 @@ export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
   const { name, local } = props
   const { t } = useTranslation('devices_landing')
 
-  const { protocolRecord } = useCurrentProtocolRun()
+  const protocolRecord = useCurrentProtocol()
 
   const isProtocolRunning = useIsProtocolRunning()
 
@@ -41,7 +41,7 @@ export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      {/* robot_model can be seen in the health response, but only for "connectable" robots. 
+      {/* robot_model can be seen in the health response, but only for "connectable" robots.
   Probably best to leave as "OT-2" for now */}
       <Text>OT-2</Text>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>

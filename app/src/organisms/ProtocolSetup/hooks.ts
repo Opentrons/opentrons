@@ -9,7 +9,7 @@ import { getLabwareRenderInfo } from './utils/getLabwareRenderInfo'
 import { getAttachedModules } from '../../redux/modules'
 import { getConnectedRobotName } from '../../redux/robot/selectors'
 import { AttachedModule } from '../../redux/modules/types'
-import { useCurrentProtocolRun } from '../ProtocolUpload/hooks'
+import { useCurrentProtocol } from '../ProtocolUpload/hooks'
 
 import type { ProtocolModuleInfo } from './utils/getProtocolModulesInfo'
 import type { LabwareRenderInfoById } from './utils/getLabwareRenderInfo'
@@ -24,9 +24,9 @@ interface ProtocolMetadata {
 }
 
 export function useProtocolMetadata(): ProtocolMetadata {
-  const currentProtocolRun = useCurrentProtocolRun()
-  const protocolMetadata = currentProtocolRun.protocolRecord?.data?.metadata
-  const creationMethod = currentProtocolRun.protocolRecord?.data?.protocolType
+  const protocolRecord = useCurrentProtocol()
+  const protocolMetadata = protocolRecord?.data?.metadata
+  const creationMethod = protocolRecord?.data?.protocolType
   const author = protocolMetadata?.author
   const description = protocolMetadata?.description
   const lastUpdated = protocolMetadata?.lastModified
