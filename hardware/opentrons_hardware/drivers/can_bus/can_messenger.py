@@ -119,7 +119,7 @@ class CanMessenger:
 
 
 class WaitableCallback:
-    """MessageListenerCallback that can be awaited."""
+    """MessageListenerCallback that can be awaited or iterated."""
 
     def __init__(self, messenger: CanMessenger) -> None:
         """Constructor.

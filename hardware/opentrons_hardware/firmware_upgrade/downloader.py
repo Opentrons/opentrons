@@ -46,7 +46,9 @@ class FirmwareUpgradeDownloader:
             for chunk in hex_processor.process(
                 payloads.FirmwareUpdateDataField.NUM_BYTES
             ):
-                logger.debug(f"Sending chunk {num_messages} to address {chunk.address}.")
+                logger.debug(
+                    f"Sending chunk {num_messages} to address {chunk.address}."
+                )
                 # Create and send message from this chunk
                 data_message = message_definitions.FirmwareUpdateData(
                     payload=payloads.FirmwareUpdateData.create(
