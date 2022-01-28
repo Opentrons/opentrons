@@ -1,1 +1,1 @@
-"""Tests for the firmware upgrader."""
+"""Tests for the firmware update."""

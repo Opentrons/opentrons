@@ -1,1 +1,1 @@
-"""Firmware upgrade package."""
+"""Firmware update package."""

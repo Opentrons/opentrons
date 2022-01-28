@@ -1,14 +1,14 @@
-"""Firmware upgrade exceptions."""
+"""Firmware update exceptions."""
 from opentrons_ot3_firmware.messages import MessageDefinition
 
 
-class FirmwareUpgradeException(Exception):
+class FirmwareUpdateException(Exception):
     """Base exception."""
 
     pass
 
 
-class ErrorResponse(FirmwareUpgradeException):
+class ErrorResponse(FirmwareUpdateException):
     """Error response exception."""
 
     message: MessageDefinition
@@ -19,7 +19,7 @@ class ErrorResponse(FirmwareUpgradeException):
         super().__init__(f"Got error response {message}.")
 
 
-class TimeoutResponse(FirmwareUpgradeException):
+class TimeoutResponse(FirmwareUpdateException):
     """No response exception."""
 
     message: MessageDefinition
@@ -30,7 +30,7 @@ class TimeoutResponse(FirmwareUpgradeException):
         super().__init__(f"Timed out waiting for response to {message}")
 
 
-class BootloaderNotReady(FirmwareUpgradeException):
+class BootloaderNotReady(FirmwareUpdateException):
     """Bootloader is not ready."""
 
     pass
