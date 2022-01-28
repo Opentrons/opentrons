@@ -87,16 +87,32 @@ async def create_run_command(
     },
 )
 async def get_run_commands(
+    engine_store: EngineStore = Depends(get_engine_store),
     run: Run = Depends(get_run_data_from_url),
 ) -> PydanticResponse[SimpleMultiBody[RunCommandSummary]]:
     """Get a summary of all commands in a run.
 
     Arguments:
+        engine_store: Protocol engine and runner storage.
         run: Run response model, provided by the route handler for
             `GET /runs/{runId}`
     """
+    data = [
+        RunCommandSummary.construct(
+            id=c.id,
+            key=c.key,
+            commandType=c.commandType,
+            status=c.status,
+            createdAt=c.createdAt,
+            startedAt=c.startedAt,
+            completedAt=c.completedAt,
+            errorId=c.errorId,
+        )
+        for c in engine_store.get_state(run.id).commands.get_all()
+    ]
+
     return await PydanticResponse.create(
-        content=SimpleMultiBody.construct(data=run.commands),
+        content=SimpleMultiBody.construct(data=data),
         status_code=status.HTTP_200_OK,
     )
 

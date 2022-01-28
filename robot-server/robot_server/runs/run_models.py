@@ -26,6 +26,15 @@ class RunCommandSummary(ResourceModel):
         description="An identifier representing this command as a step in a protocol.",
     )
     commandType: CommandType = Field(..., description="Specific type of command.")
+    createdAt: datetime = Field(..., description="Command creation timestamp")
+    startedAt: Optional[datetime] = Field(
+        None,
+        description="Command execution start timestamp, if started",
+    )
+    completedAt: Optional[datetime] = Field(
+        None,
+        description="Command execution completed timestamp, if completed",
+    )
     status: CommandStatus = Field(..., description="Execution status of the command.")
     errorId: Optional[str] = Field(
         None,
@@ -71,10 +80,6 @@ class Run(ResourceModel):
     actions: List[RunAction] = Field(
         ...,
         description="Client-initiated run control actions.",
-    )
-    commands: List[RunCommandSummary] = Field(
-        ...,
-        description="Protocol commands queued, running, or executed for the run.",
     )
     errors: List[ErrorOccurrence] = Field(
         ...,
