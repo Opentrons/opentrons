@@ -1,4 +1,5 @@
 import type { RunTimeCommand, ModuleModel } from '@opentrons/shared-data'
+import type { ResourceLink } from '../types'
 
 export const RUN_STATUS_IDLE = 'idle' as const
 export const RUN_STATUS_RUNNING = 'running' as const
@@ -26,6 +27,7 @@ export type RunStatus =
 export interface RunData {
   id: string
   createdAt: string
+  current: boolean
   status: RunStatus
   actions: RunAction[]
   commands: RunCommandSummary[]
@@ -34,6 +36,14 @@ export interface RunData {
   labware: unknown[]
   protocolId?: string
   labwareOffsets?: LabwareOffset[]
+}
+
+export interface RunSummaryData {
+  id: string
+  createdAt: string
+  current: boolean
+  status: RunStatus
+  protocolId?: string
 }
 
 export interface VectorOffset {
@@ -49,21 +59,17 @@ export interface LabwareOffset {
   vector: VectorOffset
 }
 
-interface ResourceLink {
-  href: string
-  meta?: Partial<{ [key: string]: string | null | undefined }> | null
-}
-
-type ResourceLinks = Record<string, ResourceLink | string | null | undefined>
-
 export interface Run {
   data: RunData
-  links?: ResourceLinks
 }
 
-export interface Runs {
-  data: RunData[]
-  links?: ResourceLinks
+export interface RunSummariesLinks {
+  current?: ResourceLink
+}
+
+export interface RunSummaries {
+  data: RunSummaryData[]
+  links: RunSummariesLinks
 }
 
 export const RUN_ACTION_TYPE_PLAY: 'play' = 'play'
@@ -104,17 +110,14 @@ export interface LabwareOffsetCreateData {
 
 export interface CommandData {
   data: RunCommandSummary
-  links?: ResourceLinks
 }
 
 export interface CommandsData {
   data: RunCommandSummary[]
-  links?: ResourceLinks
 }
 
 export interface CommandDetail {
   data: RunTimeCommand
-  links: ResourceLinks | null
 }
 
 export interface Error {

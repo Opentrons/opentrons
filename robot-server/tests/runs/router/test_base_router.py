@@ -30,7 +30,13 @@ from robot_server.protocols import (
 )
 
 from robot_server.runs.run_view import RunView
-from robot_server.runs.run_models import RunCommandSummary, Run, RunCreate, RunUpdate
+from robot_server.runs.run_models import (
+    RunCommandSummary,
+    Run,
+    RunSummary,
+    RunCreate,
+    RunUpdate,
+)
 
 from robot_server.runs.engine_store import (
     EngineStore,
@@ -510,32 +516,20 @@ async def test_get_runs_not_empty(
         is_current=True,
     )
 
-    response_1 = Run.construct(
+    response_1 = RunSummary.construct(
         id="unique-id-1",
         protocolId=None,
         createdAt=created_at_1,
         status=pe_types.EngineStatus.SUCCEEDED,
         current=False,
-        actions=[],
-        commands=[],
-        errors=[],
-        pipettes=[],
-        labware=[],
-        labwareOffsets=[],
     )
 
-    response_2 = Run.construct(
+    response_2 = RunSummary.construct(
         id="unique-id-2",
         protocolId=None,
         createdAt=created_at_2,
         status=pe_types.EngineStatus.IDLE,
         current=True,
-        actions=[],
-        commands=[],
-        errors=[],
-        pipettes=[],
-        labware=[],
-        labwareOffsets=[],
     )
 
     decoy.when(run_store.get_all()).then_return([run_1, run_2])
@@ -546,20 +540,10 @@ async def test_get_runs_not_empty(
     decoy.when(engine_store.get_state("unique-id-1")).then_return(engine_state_1)
     decoy.when(engine_store.get_state("unique-id-2")).then_return(engine_state_2)
 
-    decoy.when(engine_state_1.commands.get_all()).then_return([])
-    decoy.when(engine_state_1.commands.get_all_errors()).then_return([])
-    decoy.when(engine_state_1.pipettes.get_all()).then_return([])
-    decoy.when(engine_state_1.labware.get_all()).then_return([])
-    decoy.when(engine_state_1.labware.get_labware_offsets()).then_return([])
     decoy.when(engine_state_1.commands.get_status()).then_return(
         pe_types.EngineStatus.SUCCEEDED
     )
 
-    decoy.when(engine_state_2.commands.get_all()).then_return([])
-    decoy.when(engine_state_2.commands.get_all_errors()).then_return([])
-    decoy.when(engine_state_2.pipettes.get_all()).then_return([])
-    decoy.when(engine_state_2.labware.get_all()).then_return([])
-    decoy.when(engine_state_2.labware.get_labware_offsets()).then_return([])
     decoy.when(engine_state_2.commands.get_status()).then_return(
         pe_types.EngineStatus.IDLE
     )

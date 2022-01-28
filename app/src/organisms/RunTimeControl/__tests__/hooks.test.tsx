@@ -60,6 +60,7 @@ const COMMAND_ID = '4'
 const mockPausedRun: RunData = {
   id: RUN_ID_1,
   createdAt: '2021-10-07T18:44:49.366581+00:00',
+  current: true,
   status: RUN_STATUS_PAUSED,
   protocolId: PROTOCOL_ID,
   actions: [
@@ -83,6 +84,7 @@ const mockPausedRun: RunData = {
 const mockRunningRun: RunData = {
   id: RUN_ID_2,
   createdAt: '2021-10-07T18:44:49.366581+00:00',
+  current: true,
   status: RUN_STATUS_RUNNING,
   protocolId: PROTOCOL_ID,
   actions: [
@@ -111,6 +113,7 @@ const mockRunningRun: RunData = {
 const mockFailedRun: RunData = {
   id: RUN_ID_2,
   createdAt: '2021-10-07T18:44:49.366581+00:00',
+  current: true,
   status: RUN_STATUS_FAILED,
   protocolId: PROTOCOL_ID,
   actions: [
@@ -148,6 +151,7 @@ const mockFailedRun: RunData = {
 const mockStoppedRun: RunData = {
   id: RUN_ID_2,
   createdAt: '2021-10-07T18:44:49.366581+00:00',
+  current: true,
   status: RUN_STATUS_STOPPED,
   protocolId: PROTOCOL_ID,
   actions: [
@@ -183,6 +187,7 @@ const mockStoppedRun: RunData = {
 const mockSucceededRun: RunData = {
   id: RUN_ID_2,
   createdAt: '2021-10-07T18:44:49.366581+00:00',
+  current: true,
   status: RUN_STATUS_SUCCEEDED,
   protocolId: PROTOCOL_ID,
   actions: [
@@ -213,6 +218,7 @@ const mockSucceededRun: RunData = {
 const mockIdleUnstartedRun: RunData = {
   id: RUN_ID_2,
   createdAt: '2021-10-07T18:44:49.366581+00:00',
+  current: true,
   status: RUN_STATUS_IDLE,
   protocolId: PROTOCOL_ID,
   actions: [],
@@ -225,6 +231,7 @@ const mockIdleUnstartedRun: RunData = {
 const mockIdleStartedRun: RunData = {
   id: RUN_ID_2,
   createdAt: '2021-10-07T18:44:49.366581+00:00',
+  current: true,
   status: RUN_STATUS_IDLE,
   protocolId: PROTOCOL_ID,
   actions: [
@@ -257,7 +264,6 @@ const mockCommand = {
     id: COMMAND_ID,
     createdAt: 'noon thirty',
   },
-  links: null,
 } as CommandDetail
 
 describe('useRunControls hook', () => {
