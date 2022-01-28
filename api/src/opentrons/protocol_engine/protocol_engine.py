@@ -82,9 +82,9 @@ class ProtocolEngine:
         #  then the background task needs to be cleaned up.. but, it will need to happen
         #  in an async method, which the init function isn't.
         self._hw_actions_to_dispatch = ThreadAsyncQueue[HardwareEventAction]()
-        self._hw_action_dispatching_task: Optional[
-            Task[None]
-        ] = create_task(self._dispatch_all_actions())
+        self._hw_action_dispatching_task: Task[None] = create_task(
+            self._dispatch_all_actions()
+        )
         self._queue_worker.start()
 
     @property

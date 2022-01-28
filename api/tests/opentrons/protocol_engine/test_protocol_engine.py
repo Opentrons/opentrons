@@ -3,6 +3,7 @@ import pytest
 from anyio import to_thread
 from datetime import datetime
 from decoy import Decoy
+from typing import AsyncGenerator
 
 from opentrons.types import DeckSlotName, MountType
 from opentrons.hardware_control import API as HardwareAPI
@@ -89,7 +90,7 @@ async def subject(
     queue_worker: QueueWorker,
     model_utils: ModelUtils,
     hardware_stopper: HardwareStopper,
-) -> ProtocolEngine:
+) -> AsyncGenerator[ProtocolEngine, None]:
     """Get a ProtocolEngine test subject with its dependencies stubbed out."""
     pe = ProtocolEngine(
         hardware_api=hardware_api,
