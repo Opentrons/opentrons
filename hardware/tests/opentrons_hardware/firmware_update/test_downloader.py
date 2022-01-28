@@ -14,9 +14,9 @@ from opentrons_ot3_firmware.messages.message_definitions import (
 )
 from opentrons_ot3_firmware.messages import payloads
 
-from opentrons_hardware.firmware_upgrade import downloader
-from opentrons_hardware.firmware_upgrade.errors import ErrorResponse, TimeoutResponse
-from opentrons_hardware.firmware_upgrade.hex_file import HexRecordProcessor, Chunk
+from opentrons_hardware.firmware_update import downloader
+from opentrons_hardware.firmware_update.errors import ErrorResponse, TimeoutResponse
+from opentrons_hardware.firmware_update.hex_file import HexRecordProcessor, Chunk
 from tests.conftest import MockCanMessageNotifier
 
 
@@ -37,13 +37,13 @@ def chunks() -> List[Chunk]:
 
 
 @pytest.fixture
-def subject(mock_messenger: AsyncMock) -> downloader.FirmwareUpgradeDownloader:
+def subject(mock_messenger: AsyncMock) -> downloader.FirmwareUpdateDownloader:
     """Test subject."""
-    return downloader.FirmwareUpgradeDownloader(mock_messenger)
+    return downloader.FirmwareUpdateDownloader(mock_messenger)
 
 
 async def test_messaging(
-    subject: downloader.FirmwareUpgradeDownloader,
+    subject: downloader.FirmwareUpdateDownloader,
     chunks: List[Chunk],
     mock_hex_processor: MagicMock,
     mock_messenger: AsyncMock,
@@ -119,7 +119,7 @@ async def test_messaging(
 
 
 async def test_messaging_data_error_response(
-    subject: downloader.FirmwareUpgradeDownloader,
+    subject: downloader.FirmwareUpdateDownloader,
     chunks: List[Chunk],
     mock_hex_processor: MagicMock,
     mock_messenger: AsyncMock,
@@ -156,13 +156,13 @@ async def test_messaging_data_error_response(
 
 
 async def test_messaging_complete_error_response(
-    subject: downloader.FirmwareUpgradeDownloader,
+    subject: downloader.FirmwareUpdateDownloader,
     chunks: List[Chunk],
     mock_hex_processor: MagicMock,
     mock_messenger: AsyncMock,
     can_message_notifier: MockCanMessageNotifier,
 ) -> None:
-    """It should fail due to error response to upgrade complete message."""
+    """It should fail due to error response to update complete message."""
 
     def responder(node_id: NodeId, message: MessageDefinition) -> None:
         """Message responder."""
@@ -209,7 +209,7 @@ async def test_messaging_complete_error_response(
 
 
 async def test_messaging_data_no_response(
-    subject: downloader.FirmwareUpgradeDownloader,
+    subject: downloader.FirmwareUpdateDownloader,
     chunks: List[Chunk],
     mock_hex_processor: MagicMock,
     mock_messenger: AsyncMock,
@@ -223,7 +223,7 @@ async def test_messaging_data_no_response(
 
 
 async def test_messaging_complete_no_response(
-    subject: downloader.FirmwareUpgradeDownloader,
+    subject: downloader.FirmwareUpdateDownloader,
     chunks: List[Chunk],
     mock_hex_processor: MagicMock,
     mock_messenger: AsyncMock,

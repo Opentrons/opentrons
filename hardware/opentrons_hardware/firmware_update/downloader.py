@@ -1,4 +1,4 @@
-"""Firmware upgrade."""
+"""Firmware download."""
 import asyncio
 import logging
 
@@ -10,16 +10,16 @@ from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
     WaitableCallback,
 )
-from opentrons_hardware.firmware_upgrade.errors import ErrorResponse, TimeoutResponse
-from opentrons_hardware.firmware_upgrade.hex_file import HexRecordProcessor
+from opentrons_hardware.firmware_update.errors import ErrorResponse, TimeoutResponse
+from opentrons_hardware.firmware_update.hex_file import HexRecordProcessor
 from opentrons_ot3_firmware.messages import message_definitions, payloads
 
 
 logger = logging.getLogger(__name__)
 
 
-class FirmwareUpgradeDownloader:
-    """Class that performs a FW upgrade using CAN messages."""
+class FirmwareUpdateDownloader:
+    """Class that downloads FW using CAN messages."""
 
     def __init__(self, messenger: CanMessenger) -> None:
         """Constructor."""
