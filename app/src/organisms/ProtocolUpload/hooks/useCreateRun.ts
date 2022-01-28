@@ -11,7 +11,7 @@ import type { Protocol } from '@opentrons/api-client'
 
 export interface UseCreateRun {
   createProtocolRun: UseMutateFunction<Protocol, unknown, File[], unknown>
-  isCreatingProtocolRun?: boolean
+  isCreatingProtocolRun: boolean
   protocolCreationError: string | null
 }
 
