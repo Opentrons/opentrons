@@ -3,7 +3,7 @@ export interface HostConfig {
   port?: number | null
 }
 
-interface ResourceLink {
+export interface ResourceLink {
   href: string
   meta?: Partial<{ [key: string]: string | null | undefined }>
 }

@@ -35,6 +35,7 @@ from ..run_store import RunStore, RunResource, RunNotFoundError
 from ..run_view import RunView
 from ..run_models import (
     Run,
+    RunSummary,
     RunCreate,
     RunUpdate,
     RunCommandSummary,
@@ -210,13 +211,13 @@ async def create_run(
     summary="Get all runs",
     description="Get a list of all active and inactive runs.",
     responses={
-        status.HTTP_200_OK: {"model": MultiBody[Run, AllRunsLinks]},
+        status.HTTP_200_OK: {"model": MultiBody[RunSummary, AllRunsLinks]},
     },
 )
 async def get_runs(
     run_store: RunStore = Depends(get_run_store),
     engine_store: EngineStore = Depends(get_engine_store),
-) -> PydanticResponse[MultiBody[Run, AllRunsLinks]]:
+) -> PydanticResponse[MultiBody[RunSummary, AllRunsLinks]]:
     """Get all runs.
 
     Args:
@@ -229,17 +230,11 @@ async def get_runs(
     for run in run_store.get_all():
         run_id = run.run_id
         engine_state = engine_store.get_state(run_id)
-        run_data = Run.construct(
+        run_data = RunSummary.construct(
             id=run_id,
             protocolId=run.protocol_id,
             createdAt=run.created_at,
             current=run.is_current,
-            actions=run.actions,
-            commands=[_summarize_command(c) for c in engine_state.commands.get_all()],
-            errors=engine_state.commands.get_all_errors(),
-            pipettes=engine_state.pipettes.get_all(),
-            labware=engine_state.labware.get_all(),
-            labwareOffsets=engine_state.labware.get_labware_offsets(),
             status=engine_state.commands.get_status(),
         )
 

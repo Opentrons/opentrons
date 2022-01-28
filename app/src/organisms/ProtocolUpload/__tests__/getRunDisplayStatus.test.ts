@@ -17,6 +17,7 @@ import {
 const mockCompletedRun: RunData = {
   id: '1',
   createdAt: '2021-10-07T18:44:49.366581+00:00',
+  current: true,
   status: RUN_STATUS_SUCCEEDED,
   protocolId: '1',
   actions: [
@@ -45,6 +46,7 @@ const mockCompletedRun: RunData = {
 const mockNotStartedRun: RunData = {
   id: '1',
   createdAt: '2021-10-07T18:44:49.366581+00:00',
+  current: true,
   status: RUN_STATUS_STOPPED,
   protocolId: '1',
   actions: [
@@ -63,6 +65,7 @@ const mockNotStartedRun: RunData = {
 const mockCanceledRun: RunData = {
   id: '1',
   createdAt: '2021-10-07T18:44:49.366581+00:00',
+  current: true,
   status: RUN_STATUS_STOPPED,
   protocolId: '1',
   actions: [
