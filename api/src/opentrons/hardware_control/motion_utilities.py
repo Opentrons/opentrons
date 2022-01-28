@@ -4,6 +4,7 @@ from typing import Callable, Dict, Optional, Tuple, Union, Iterator, Sequence
 from collections import OrderedDict
 from opentrons.types import Mount, Point
 from .types import PipettePair, Axis
+from functools import lru_cache
 
 
 def mounts(z_axis: Union[PipettePair, Mount]) -> Tuple[Mount, Optional[Mount]]:
@@ -20,21 +21,29 @@ def mounts_enumerable(z_axis: Union[PipettePair, Mount]) -> Iterator[Mount]:
             yield mount
 
 
+@lru_cache(2)
+def offset_for_mount(
+    primary_mount: Mount, left_mount_offset: Point, right_mount_offset: Point
+) -> Tuple[Point, Point]:
+    offsets = {Mount.LEFT: left_mount_offset, Mount.RIGHT: right_mount_offset}
+    return (
+        offsets[primary_mount],
+        offsets[{Mount.RIGHT: Mount.LEFT, Mount.LEFT: Mount.RIGHT}[primary_mount]],
+    )
+
+
 def target_position_from_absolute(
     mount: Union[Mount, PipettePair],
     abs_position: Point,
     get_critical_point: Callable[[Mount], Point],
     left_mount_offset: Point,
+    right_mount_offset: Point,
 ) -> "Tuple[OrderedDict[Axis, float], Mount, Optional[Axis]]":
     primary_mount, secondary_mount = mounts(mount)
 
-    def offsets(primary: Mount, mount_offset: Point) -> Tuple[Point, Point]:
-        if primary == Mount.LEFT:
-            return (mount_offset, Point(0, 0, 0))
-        else:
-            return (Point(0, 0, 0), mount_offset)
-
-    primary_offset, secondary_offset = offsets(primary_mount, left_mount_offset)
+    primary_offset, secondary_offset = offset_for_mount(
+        primary_mount, left_mount_offset, right_mount_offset
+    )
     primary_cp = get_critical_point(primary_mount)
     primary_z = Axis.by_mount(primary_mount)
     target_position = OrderedDict(

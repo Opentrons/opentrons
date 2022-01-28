@@ -687,6 +687,7 @@ class API(
             abs_position,
             partial(self.critical_point_for, cp_override=critical_point),
             top_types.Point(*self._config.left_mount_offset),
+            top_types.Point(0, 0, 0),
         )
 
         await self._cache_and_maybe_retract_mount(primary_mount)

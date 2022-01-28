@@ -42,6 +42,11 @@ class Axis(enum.Enum):
         return bm[mount]
 
     @classmethod
+    def mount_axes(cls) -> Tuple["Axis", "Axis"]:
+        """The axes which are used for moving pipettes up and down."""
+        return cls.Z, cls.A
+
+    @classmethod
     def gantry_axes(cls) -> Tuple["Axis", "Axis", "Axis", "Axis"]:
         """The axes which are tied to the gantry and require the deck
         calibration transform

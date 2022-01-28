@@ -1,6 +1,6 @@
 import asyncio
 import contextlib
-from functools import partial
+from functools import partial, lru_cache
 from dataclasses import replace
 import logging
 from collections import OrderedDict
@@ -62,6 +62,7 @@ from .motion_utilities import (
     target_position_from_absolute,
     target_position_from_relative,
     target_position_from_plunger,
+    offset_for_mount,
 )
 
 from opentrons_shared_data.pipette.dev_types import UlPerMmAction, PipetteName
@@ -496,37 +497,36 @@ class OT3API(
         # Initialize/update current_position
         checked_axes = axes or [ax for ax in Axis]
         gantry = [ax for ax in checked_axes if ax in Axis.gantry_axes()]
-        smoothie_gantry = [ax.name.upper() for ax in gantry]
-        smoothie_pos = {}
+        machine_gantry = [ax.name.upper() for ax in gantry]
+        machine_pos = {}
         plungers = [ax for ax in checked_axes if ax not in Axis.gantry_axes()]
 
         async with self._motion_lock:
-            if smoothie_gantry:
-                smoothie_pos.update(await self._backend.home(smoothie_gantry))
-                self._current_position = self._deck_from_smoothie(smoothie_pos)
+            if machine_gantry:
+                machine_pos.update(await self._backend.home(machine_gantry))
+                self._current_position = self._deck_from_machine(machine_pos)
             for plunger in plungers:
                 await self._do_plunger_home(axis=plunger, acquire_lock=False)
 
-    def _deck_from_smoothie(self, smoothie_pos: Dict[str, float]) -> Dict[Axis, float]:
-        """Build a deck-abs position store from the smoothie's position"""
-        with_enum = {Axis[k]: v for k, v in smoothie_pos.items()}
+    def _deck_from_machine(self, machine_pos: Dict[str, float]) -> Dict[Axis, float]:
+        """Build a deck-abs position store from the machine's position"""
+        with_enum = {Axis[k]: v for k, v in machine_pos.items()}
         plunger_axes = {
             k: v for k, v in with_enum.items() if k not in Axis.gantry_axes()
         }
-        right = (
+        right = top_types.Point(
             with_enum[Axis.X],
             with_enum[Axis.Y],
             with_enum[Axis.by_mount(top_types.Mount.RIGHT)],
         )
-        left = (
+        left = top_types.Point(
             with_enum[Axis.X],
             with_enum[Axis.Y],
             with_enum[Axis.by_mount(top_types.Mount.LEFT)],
         )
 
-        gantry_calibration = self._transforms.deck_calibration.attitude
-        right_deck = linal.apply_reverse(gantry_calibration, right)
-        left_deck = linal.apply_reverse(gantry_calibration, left)
+        right_deck = self._deck_point_from_machine_point(right)
+        left_deck = self._deck_point_from_machine_point(left)
         deck_pos = {
             Axis.X: right_deck[0],
             Axis.Y: right_deck[1],
@@ -535,6 +535,86 @@ class OT3API(
         }
         deck_pos.update(plunger_axes)
         return deck_pos
+
+    @lru_cache(1)
+    def _carriage_offset(self) -> top_types.Point:
+        return top_types.Point(*self._config.carriage_offset)
+
+    def _deck_point_from_machine_point(
+        self, machine_point: top_types.Point
+    ) -> top_types.Point:
+        return top_types.Point(
+            *linal.apply_reverse(
+                self._transforms.deck_calibration.attitude,
+                machine_point - self._carriage_offset(),
+            )
+        )
+
+    def _machine_point_from_deck_point(
+        self, deck_point: top_types.Point
+    ) -> top_types.Point:
+        return (
+            top_types.Point(
+                *linal.apply_transform(
+                    self._transforms.deck_calibration.attitude, deck_point
+                )
+            )
+            + self._carriage_offset()
+        )
+
+    def _machine_from_deck(
+        self, deck_pos: Dict[Axis, float], secondary_z: Optional[Axis]
+    ) -> Dict[str, float]:
+        """Build a machine-axis position from a deck position"""
+        to_transform_primary = top_types.Point(
+            *(
+                tp
+                for ax, tp in deck_pos.items()
+                if (ax in Axis.gantry_axes() and ax != secondary_z)
+            )
+        )
+        if secondary_z:
+            to_transform_secondary = top_types.Point(0, 0, deck_pos[secondary_z])
+        else:
+            to_transform_secondary = top_types.Point(0, 0, 0)
+
+        # Pre-fill the dict we’ll send to the backend with the axes we don’t
+        # need to transform
+        machine_pos = {
+            ax.name: pos for ax, pos in deck_pos.items() if ax not in Axis.gantry_axes()
+        }
+        if len(to_transform_primary) != 3:
+            self._log.error(
+                "Move derived {} axes to transform from {}".format(
+                    len(to_transform_primary), deck_pos
+                )
+            )
+            raise ValueError(
+                "Moves must specify either exactly an "
+                "x, y, and (z or a) or none of them"
+            )
+
+        # Type ignored below because linal.apply_transform (rightly) specifies
+        # Tuple[float, float, float] and the implied type from
+        # target_position.items() is (rightly) Tuple[float, ...] with unbounded
+        # size; unfortunately, mypy can’t quite figure out the length check
+        # above that makes this OK
+        primary_transformed = self._machine_point_from_deck_point(to_transform_primary)
+        if secondary_z:
+            secondary_transformed = self._machine_point_from_deck_point(
+                to_transform_secondary
+            )
+        else:
+            secondary_transformed = top_types.Point(0, 0, 0)
+
+        transformed = (*primary_transformed, secondary_transformed[2])
+        to_check = {
+            ax.name: transformed[idx]
+            for idx, ax in enumerate(deck_pos.keys())
+            if ax in Axis.gantry_axes()
+        }
+        machine_pos.update({ax: pos for ax, pos in to_check.items()})
+        return machine_pos
 
     async def current_position(
         self,
@@ -564,14 +644,12 @@ class OT3API(
             raise MustHomeError("Current position is unknown; please home motors.")
         async with self._motion_lock:
             if refresh:
-                self._current_position = self._deck_from_smoothie(
+                self._current_position = self._deck_from_machine(
                     await self._backend.update_position()
                 )
-            if mount == top_types.Mount.RIGHT:
-                offset = top_types.Point(0, 0, 0)
-            else:
-                offset = top_types.Point(*self._config.left_mount_offset)
-
+            offset = offset_for_mount(
+                mount, self._config.left_mount_offset, self._config.right_mount_offset
+            )[0]
             cp = self.critical_point_for(mount, critical_point)
             return {
                 Axis.X: self._current_position[Axis.X] + offset[0] + cp.x,
@@ -618,6 +696,7 @@ class OT3API(
             abs_position,
             partial(self.critical_point_for, cp_override=critical_point),
             top_types.Point(*self._config.left_mount_offset),
+            top_types.Point(*self._config.right_mount_offset),
         )
 
         await self._cache_and_maybe_retract_mount(primary_mount)
@@ -678,26 +757,6 @@ class OT3API(
             await self.retract(self._last_moved_mount, 10)
         self._last_moved_mount = mount
 
-    def _get_transformed(
-        self,
-        to_transform_primary: Tuple[float, ...],
-        to_transform_secondary: Tuple[float, ...],
-    ) -> Tuple[Tuple, Tuple]:
-        # Type ignored below because linal.apply_transform (rightly) specifies
-        # Tuple[float, float, float] and the implied type from
-        # target_position.items() is (rightly) Tuple[float, ...] with unbounded
-        # size; unfortunately, mypy can’t quite figure out the length check
-        # above that makes this OK
-        primary_transformed = linal.apply_transform(
-            self._transforms.deck_calibration.attitude,
-            to_transform_primary,  # type: ignore[arg-type]
-        )
-        secondary_transformed = linal.apply_transform(
-            self._transforms.deck_calibration.attitude,
-            to_transform_secondary,  # type: ignore[arg-type]
-        )
-        return primary_transformed, secondary_transformed
-
     @ExecutionManagerProvider.wait_for_running
     async def _move(
         self,
@@ -710,53 +769,14 @@ class OT3API(
         check_bounds: MotionChecks = MotionChecks.NONE,
     ):
         """Worker function to apply robot motion."""
-        # Transform only the x, y, and (z or a) axes specified since this could
-        # get the b or c axes as well
-        to_transform_primary = tuple(
-            (
-                tp
-                for ax, tp in target_position.items()
-                if (ax in Axis.gantry_axes() and ax != secondary_z)
-            )
-        )
-        if secondary_z:
-            to_transform_secondary = tuple((0, 0, target_position[secondary_z]))
-        else:
-            to_transform_secondary = tuple((0, 0, 0))
-        # Pre-fill the dict we’ll send to the backend with the axes we don’t
-        # need to transform
-        smoothie_pos = {
-            ax.name: pos
-            for ax, pos in target_position.items()
-            if ax not in Axis.gantry_axes()
-        }
-        if len(to_transform_primary) != 3:
-            self._log.error(
-                "Move derived {} axes to transform from {}".format(
-                    len(to_transform_primary), target_position
-                )
-            )
-            raise ValueError(
-                "Moves must specify either exactly an "
-                "x, y, and (z or a) or none of them"
-            )
-        primary_transformed, secondary_transformed = self._get_transformed(
-            to_transform_primary, to_transform_secondary
-        )
-        transformed = (*primary_transformed, secondary_transformed[2])
-        # Since target_position is an OrderedDict with the axes ordered by
-        # (x, y, z, a, b, c), and we’ll only have one of a or z (as checked
-        # by the len(to_transform) check above) we can use an enumerate to
-        # fuse the specified axes and the transformed values back together.
-        # While we do this iteration, we’ll also check axis bounds.
+        machine_pos = self._machine_from_deck(target_position, secondary_z)
         bounds = self._backend.axis_bounds
         to_check = {
-            ax: transformed[idx]
+            ax: machine_pos[ax.name]
             for idx, ax in enumerate(target_position.keys())
             if ax in Axis.gantry_axes()
         }
         check_motion_bounds(to_check, target_position, bounds, check_bounds)
-        smoothie_pos.update({ax.name: pos for ax, pos in to_check.items()})
         checked_maxes = max_speeds or {}
         str_maxes = {ax.name: val for ax, val in checked_maxes.items()}
         async with contextlib.AsyncExitStack() as stack:
@@ -764,7 +784,7 @@ class OT3API(
                 await stack.enter_async_context(self._motion_lock)
             try:
                 await self._backend.move(
-                    smoothie_pos,
+                    machine_pos,
                     speed=speed,
                     home_flagged_axes=home_flagged_axes,
                     axis_max_speeds=str_maxes,
@@ -802,13 +822,13 @@ class OT3API(
         if isinstance(mount, PipettePair):
             primary_ax = Axis.by_mount(mount.primary).name.upper()
             secondary_ax = Axis.by_mount(mount.secondary).name.upper()
-            smoothie_ax: Tuple[str, ...] = (primary_ax, secondary_ax)
+            machine_ax: Tuple[str, ...] = (primary_ax, secondary_ax)
         else:
-            smoothie_ax = (Axis.by_mount(mount).name.upper(),)
+            machine_ax = (Axis.by_mount(mount).name.upper(),)
 
         async with self._motion_lock:
-            smoothie_pos = await self._fast_home(smoothie_ax, margin)
-            self._current_position = self._deck_from_smoothie(smoothie_pos)
+            machine_pos = await self._fast_home(machine_ax, margin)
+            self._current_position = self._deck_from_machine(machine_pos)
 
     # Gantry/frame (i.e. not pipette) config API
     @property
@@ -1097,11 +1117,11 @@ class OT3API(
                 home_flagged_axes=False,
             )
             if move.home_after:
-                smoothie_pos = await self._backend.fast_home(
+                machine_pos = await self._backend.fast_home(
                     [ax.name.upper() for ax in move.home_axes],
                     move.home_after_safety_margin,
                 )
-                self._current_position = self._deck_from_smoothie(smoothie_pos)
+                self._current_position = self._deck_from_machine(machine_pos)
 
         for shake in spec.shake_moves:
             await self.move_rel(mount, shake[0], speed=shake[1])
