@@ -19,6 +19,7 @@ from opentrons_ot3_firmware.arbitration_id import (
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
     MessageListenerCallback,
+    WaitableCallback,
 )
 from opentrons_ot3_firmware.messages import MessageDefinition
 from opentrons_ot3_firmware.messages.message_definitions import (
@@ -141,3 +142,11 @@ async def test_listen_messages(
             )
         ),
     )
+
+
+async def test_waitable_callback_context() -> None:
+    """It should add itself and remove itself using context manager."""
+    mock_messenger = Mock(spec=CanMessenger)
+    with WaitableCallback(mock_messenger) as callback:
+        mock_messenger.add_listener.assert_called_once_with(callback)
+    mock_messenger.remove_listener.assert_called_once_with(callback)
