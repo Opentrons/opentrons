@@ -12,10 +12,7 @@ import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_stand
 import { LabwareDefinition2 } from '@opentrons/shared-data'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../../hooks'
-import {
-  UseCurrentProtocolRun,
-  useCurrentProtocolRun,
-} from '../../../ProtocolUpload/hooks'
+import { useCurrentRun } from '../../../ProtocolUpload/hooks'
 import { getLatestLabwareOffsetCount } from '../../LabwarePositionCheck/utils/getLatestLabwareOffsetCount'
 import { SectionList } from '../SectionList'
 import { useIntroInfo, useLabwareIdsBySection } from '../hooks'
@@ -55,8 +52,8 @@ const mockSectionList = SectionList as jest.MockedFunction<typeof SectionList>
 const mockRobotWorkSpace = RobotWorkSpace as jest.MockedFunction<
   typeof RobotWorkSpace
 >
-const mockUseCurrentProtocolRun = useCurrentProtocolRun as jest.MockedFunction<
-  typeof useCurrentProtocolRun
+const mockUseCurrentRun = useCurrentRun as jest.MockedFunction<
+  typeof useCurrentRun
 >
 const mockGetLatestLabwareOffsetCount = getLatestLabwareOffsetCount as jest.MockedFunction<
   typeof getLatestLabwareOffsetCount
@@ -129,11 +126,11 @@ describe('IntroScreen', () => {
       sections: MOCK_SECTIONS,
     })
     mockSectionList.mockReturnValue(<div>Mock Section List</div>)
-    when(mockUseCurrentProtocolRun)
+    when(mockUseCurrentRun)
       .calledWith()
       .mockReturnValue({
-        runRecord: { data: { labwareOffsets: mockOffsets } },
-      } as UseCurrentProtocolRun)
+        data: { labwareOffsets: mockOffsets },
+      } as any)
   })
   afterEach(() => {
     resetAllWhenMocks()

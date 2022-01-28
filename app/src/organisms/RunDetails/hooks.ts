@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import last from 'lodash/last'
 import { schemaV6Adapter } from '@opentrons/shared-data'
-import { useCurrentProtocolRun } from '../ProtocolUpload/hooks'
+import { useCurrentProtocol, useCurrentRun } from '../ProtocolUpload/hooks'
 import { formatInterval } from '../RunTimeControl/utils'
 import type { ProtocolFile } from '@opentrons/shared-data'
 interface ProtocolDetails {
@@ -44,7 +44,7 @@ function useNow(): string {
 
 export function useProtocolDetails(): ProtocolDetails {
   let protocolData: ProtocolFile<{}> | null = null
-  const { protocolRecord } = useCurrentProtocolRun()
+  const protocolRecord = useCurrentProtocol()
   const protocolAnalysis = protocolRecord?.data.analyses
   if (protocolAnalysis != null) {
     const lastProtocolAnalysis = protocolAnalysis[protocolAnalysis.length - 1]
@@ -59,7 +59,7 @@ export function useProtocolDetails(): ProtocolDetails {
 }
 
 export function useTimeElapsedSincePause(): string | null {
-  const { runRecord } = useCurrentProtocolRun()
+  const runRecord = useCurrentRun()
   const now = useNow()
   const mostRecentAction = last(runRecord?.data.actions)
   if (
@@ -74,7 +74,7 @@ export function useTimeElapsedSincePause(): string | null {
 }
 
 export function useFormatRunTimestamp(): (timestamp: string) => string | null {
-  const { runRecord } = useCurrentProtocolRun()
+  const runRecord = useCurrentRun()
 
   return (timestamp: string) => {
     if (runRecord == null) return null // run doesn't exist

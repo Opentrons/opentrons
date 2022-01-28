@@ -5,35 +5,31 @@ import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 import { renderHook } from '@testing-library/react-hooks'
 import { useProtocolMetadata } from '../hooks'
-import { useCurrentProtocolRun } from '../../ProtocolUpload/hooks'
+import { useCurrentProtocol } from '../../ProtocolUpload/hooks'
 
 import type { Store } from 'redux'
 import type { State } from '../../../redux/types'
 
 jest.mock('../../ProtocolUpload/hooks')
 
-const mockUseCurrentProtocolRun = useCurrentProtocolRun as jest.MockedFunction<
-  typeof useCurrentProtocolRun
+const mockUseCurrentProtocol = useCurrentProtocol as jest.MockedFunction<
+  typeof useCurrentProtocol
 >
 
 describe('useProtocolMetadata', () => {
   const store: Store<State> = createStore(jest.fn(), {})
 
-  when(mockUseCurrentProtocolRun)
+  when(mockUseCurrentProtocol)
     .calledWith()
     .mockReturnValue({
-      protocolRecord: {
-        data: {
-          protocolType: 'json',
-          metadata: {
-            author: 'AUTHOR',
-            description: 'DESCRIPTION',
-            lastModified: 123456,
-          },
+      data: {
+        protocolType: 'json',
+        metadata: {
+          author: 'AUTHOR',
+          description: 'DESCRIPTION',
+          lastModified: 123456,
         },
       },
-      runRecord: {},
-      createProtocolRun: jest.fn(),
     } as any)
 
   beforeEach(() => {

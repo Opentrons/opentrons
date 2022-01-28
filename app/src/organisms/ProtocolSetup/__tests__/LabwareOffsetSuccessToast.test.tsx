@@ -3,10 +3,7 @@ import { fireEvent } from '@testing-library/dom'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-import {
-  UseCurrentProtocolRun,
-  useCurrentProtocolRun,
-} from '../../ProtocolUpload/hooks'
+import { useCurrentRun } from '../../ProtocolUpload/hooks'
 import { LabwareOffsetSuccessToast } from '../LabwareOffsetSuccessToast'
 import { getLatestLabwareOffsetCount } from '../LabwarePositionCheck/utils/getLatestLabwareOffsetCount'
 import type { LabwareOffset } from '@opentrons/api-client'
@@ -14,8 +11,8 @@ import type { LabwareOffset } from '@opentrons/api-client'
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../LabwarePositionCheck/utils/getLatestLabwareOffsetCount')
 
-const mockUseCurrentProtocolRun = useCurrentProtocolRun as jest.MockedFunction<
-  typeof useCurrentProtocolRun
+const mockUseCurrentRun = useCurrentRun as jest.MockedFunction<
+  typeof useCurrentRun
 >
 const mockGetLatestLabwareOffsetCount = getLatestLabwareOffsetCount as jest.MockedFunction<
   typeof getLatestLabwareOffsetCount
@@ -44,11 +41,9 @@ describe('LabwareOffsetSuccessToast', () => {
         vector: { x: 1, y: 1, z: 1 },
       },
     ]
-    when(mockUseCurrentProtocolRun)
+    when(mockUseCurrentRun)
       .calledWith()
-      .mockReturnValue({
-        runRecord: { data: { labwareOffsets: mockOffsets } },
-      } as UseCurrentProtocolRun)
+      .mockReturnValue({ data: { labwareOffsets: mockOffsets } } as any)
   })
 
   afterEach(() => {

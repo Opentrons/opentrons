@@ -18,7 +18,7 @@ import {
 import { IDENTITY_VECTOR } from '@opentrons/shared-data'
 import { useCreateLabwareOffsetMutation } from '@opentrons/react-api-client'
 import { useProtocolDetails } from '../../RunDetails/hooks'
-import { useCurrentProtocolRun } from '../../ProtocolUpload/hooks'
+import { useCurrentRun } from '../../ProtocolUpload/hooks'
 import { useLPCSuccessToast } from '../hooks'
 import { DeckMap } from './DeckMap'
 import { SectionList } from './SectionList'
@@ -44,7 +44,7 @@ export const SummaryScreen = (props: {
       console.error(`error getting labware offsetsL ${e.message}`)
     )
   const { createLabwareOffset } = useCreateLabwareOffsetMutation()
-  const { runRecord } = useCurrentProtocolRun()
+  const runRecord = useCurrentRun()
   const { setShowLPCSuccessToast } = useLPCSuccessToast()
 
   if (introInfo == null) return null

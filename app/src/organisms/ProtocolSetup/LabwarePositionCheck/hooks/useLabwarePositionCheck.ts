@@ -17,7 +17,7 @@ import {
 } from '@opentrons/react-api-client'
 import { useTrackEvent } from '../../../../redux/analytics'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
-import { useCurrentProtocolRun } from '../../../ProtocolUpload/hooks'
+import { useCurrentRun } from '../../../ProtocolUpload/hooks'
 import { getLabwareLocation } from '../../utils/getLabwareLocation'
 import {
   sendModuleCommand,
@@ -237,7 +237,7 @@ export function useLabwarePositionCheck(
   const { createLabwareOffset } = useCreateLabwareOffsetMutation()
   const { createCommand } = useCreateCommandMutation()
   const host = useHost()
-  const { runRecord: currentRun } = useCurrentProtocolRun()
+  const currentRun = useCurrentRun()
   const trackEvent = useTrackEvent()
   const LPCSteps = useSteps()
   const dispatch = useDispatch()

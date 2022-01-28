@@ -21,9 +21,8 @@ import {
   updateLights,
   getLightsOn,
 } from '../../../redux/robot-controls'
-import { useCurrentProtocolRun } from '../../ProtocolUpload/hooks'
+import { useCurrentRun } from '../../ProtocolUpload/hooks'
 
-import type { UseCurrentProtocolRun } from '../../ProtocolUpload/hooks'
 import type { DispatchApiRequestType } from '../../../redux/robot-api'
 
 import {
@@ -46,8 +45,8 @@ const mockGetLightsOn = getLightsOn as jest.MockedFunction<typeof getLightsOn>
 const mockUpdateLights = updateLights as jest.MockedFunction<
   typeof updateLights
 >
-const mockUseCurrentProtocolRun = useCurrentProtocolRun as jest.MockedFunction<
-  typeof useCurrentProtocolRun
+const mockUseCurrentRun = useCurrentRun as jest.MockedFunction<
+  typeof useCurrentRun
 >
 const mockGetDiscoverableRobotByName = getDiscoverableRobotByName as jest.MockedFunction<
   typeof getDiscoverableRobotByName
@@ -225,9 +224,7 @@ describe('useIsProtocolRunning hook', () => {
   })
 
   it('returns false when current run record does not exist', () => {
-    when(mockUseCurrentProtocolRun)
-      .calledWith()
-      .mockReturnValue({} as UseCurrentProtocolRun)
+    when(mockUseCurrentRun).calledWith().mockReturnValue(null)
 
     const { result } = renderHook(() => useIsProtocolRunning(), { wrapper })
 
@@ -235,11 +232,11 @@ describe('useIsProtocolRunning hook', () => {
   })
 
   it('returns false when current run record is idle', () => {
-    when(mockUseCurrentProtocolRun)
+    when(mockUseCurrentRun)
       .calledWith()
       .mockReturnValue({
-        runRecord: { data: { status: RUN_STATUS_IDLE } },
-      } as UseCurrentProtocolRun)
+        data: { status: RUN_STATUS_IDLE },
+      } as any)
 
     const { result } = renderHook(() => useIsProtocolRunning(), { wrapper })
 
@@ -247,11 +244,11 @@ describe('useIsProtocolRunning hook', () => {
   })
 
   it('returns true when current run record is not idle', () => {
-    when(mockUseCurrentProtocolRun)
+    when(mockUseCurrentRun)
       .calledWith()
       .mockReturnValue({
-        runRecord: { data: { status: RUN_STATUS_RUNNING } },
-      } as UseCurrentProtocolRun)
+        data: { status: RUN_STATUS_RUNNING },
+      } as any)
 
     const { result } = renderHook(() => useIsProtocolRunning(), {
       wrapper,

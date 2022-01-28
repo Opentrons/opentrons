@@ -19,8 +19,7 @@ import {
   useRunActionMutations,
 } from '@opentrons/react-api-client'
 
-import { useCloneRun } from '../ProtocolUpload/hooks/useCloneRun'
-import { useCurrentProtocolRun } from '../ProtocolUpload/hooks/useCurrentProtocolRun'
+import { useCloneRun, useCurrentRun } from '../ProtocolUpload/hooks'
 
 interface RunControls {
   play: () => void
@@ -34,7 +33,7 @@ interface RunControls {
 }
 
 export function useRunControls(): RunControls {
-  const { runRecord } = useCurrentProtocolRun()
+  const runRecord = useCurrentRun()
 
   const currentRunId = runRecord?.data?.id
 
@@ -64,7 +63,7 @@ export function useRunControls(): RunControls {
 }
 
 export function useRunStatus(): RunStatus | null {
-  const { runRecord } = useCurrentProtocolRun()
+  const runRecord = useCurrentRun()
 
   const currentRunId = runRecord?.data?.id
 
@@ -98,7 +97,7 @@ export function useRunDisabledReason(): string | null {
 }
 
 export function useRunStartTime(): string | undefined {
-  const { runRecord } = useCurrentProtocolRun()
+  const runRecord = useCurrentRun()
 
   const currentRunId = runRecord?.data?.id
 
@@ -114,7 +113,7 @@ export function useRunStartTime(): string | undefined {
 }
 
 export function useRunPauseTime(): string | null {
-  const { runRecord } = useCurrentProtocolRun()
+  const runRecord = useCurrentRun()
 
   const currentRunId = runRecord?.data?.id
 
@@ -129,7 +128,7 @@ export function useRunPauseTime(): string | null {
 }
 
 export function useRunStopTime(): string | null {
-  const { runRecord } = useCurrentProtocolRun()
+  const runRecord = useCurrentRun()
 
   const currentRunId = runRecord?.data?.id
 
@@ -144,7 +143,7 @@ export function useRunStopTime(): string | null {
 }
 
 export function useRunCompleteTime(): string | null {
-  const { runRecord } = useCurrentProtocolRun()
+  const runRecord = useCurrentRun()
 
   const runData = runRecord?.data as RunData
   const runId = runData?.id

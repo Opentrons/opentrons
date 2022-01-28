@@ -1,25 +1,18 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import {
-  Protocol,
-  Run,
-  RUN_STATUS_IDLE,
-  RUN_STATUS_RUNNING,
-} from '@opentrons/api-client'
+import { Protocol } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
-import { useCurrentProtocolRun } from '../../ProtocolUpload/hooks'
+import { useCurrentProtocol } from '../../ProtocolUpload/hooks'
 import { useIsProtocolRunning } from '../hooks'
 import { RobotStatusBanner } from '../RobotStatusBanner'
-
-import type { UseCurrentProtocolRun } from '../../ProtocolUpload/hooks'
 
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../hooks')
 
-const mockUseCurrentProtocolRun = useCurrentProtocolRun as jest.MockedFunction<
-  typeof useCurrentProtocolRun
+const mockUseCurrentProtocol = useCurrentProtocol as jest.MockedFunction<
+  typeof useCurrentProtocol
 >
 const mockUseIsProtocolRunning = useIsProtocolRunning as jest.MockedFunction<
   typeof useIsProtocolRunning
@@ -38,7 +31,7 @@ const render = () => {
 
 describe('RobotStatusBanner', () => {
   beforeEach(() => {
-    mockUseCurrentProtocolRun.mockReturnValue({} as UseCurrentProtocolRun)
+    mockUseCurrentProtocol.mockReturnValue({} as any)
     mockUseIsProtocolRunning.mockReturnValue(false)
   })
   afterEach(() => {
@@ -61,6 +54,10 @@ describe('RobotStatusBanner', () => {
   })
 
   it('renders an active robot status when a protocol is running', () => {
+    mockUseCurrentProtocol.mockReturnValue({
+      data: { metadata: { protocolName: 'Testosaur' } },
+    } as Protocol)
+
     mockUseIsProtocolRunning.mockReturnValue(true)
 
     const [{ getByText }] = render()
@@ -69,12 +66,11 @@ describe('RobotStatusBanner', () => {
   })
 
   it('does not render a running protocol banner when a protocol is not running', () => {
-    mockUseCurrentProtocolRun.mockReturnValue({
-      runRecord: { data: { status: RUN_STATUS_IDLE } } as Run,
-      protocolRecord: {
-        data: { metadata: { protocolName: 'Testosaur' } },
-      } as Protocol,
-    } as UseCurrentProtocolRun)
+    mockUseCurrentProtocol.mockReturnValue({
+      data: { metadata: { protocolName: 'Testosaur' } },
+    } as Protocol)
+
+    mockUseIsProtocolRunning.mockReturnValue(false)
 
     const [{ queryByText }] = render()
 
@@ -85,12 +81,9 @@ describe('RobotStatusBanner', () => {
   })
 
   it('renders a running protocol banner when a protocol is running', () => {
-    mockUseCurrentProtocolRun.mockReturnValue({
-      runRecord: { data: { status: RUN_STATUS_RUNNING } } as Run,
-      protocolRecord: {
-        data: { metadata: { protocolName: 'Testosaur' } },
-      } as Protocol,
-    } as UseCurrentProtocolRun)
+    mockUseCurrentProtocol.mockReturnValue({
+      data: { metadata: { protocolName: 'Testosaur' } },
+    } as Protocol)
     mockUseIsProtocolRunning.mockReturnValue(true)
 
     const [{ getByText }] = render()
