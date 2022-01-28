@@ -17,12 +17,12 @@ from opentrons.config import pipette_config
 from opentrons.config.types import RobotConfig
 from opentrons.types import Mount
 
-from .module_control import AttachedModulesControl
-from .types import AionotifyEvent, BoardRevision, Axis
+from ..module_control import AttachedModulesControl
+from ..types import AionotifyEvent, BoardRevision, Axis
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import PipetteModel, PipetteName
-    from .dev_types import (
+    from ..dev_types import (
         AttachedInstrument,
         AttachedInstruments,
         InstrumentHardwareConfigs,

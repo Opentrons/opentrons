@@ -27,8 +27,7 @@ from .pipette import (
     generate_hardware_configs_ot3,
     load_from_config_and_check_skip,
 )
-from .ot3controller import OT3Controller
-from .simulator import Simulator
+from .backends import OT3Controller, OT3Simulator
 from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
@@ -104,7 +103,7 @@ class OT3API(
 
     def __init__(
         self,
-        backend: Union[Simulator, OT3Controller],
+        backend: Union[OT3Simulator, OT3Controller],
         loop: asyncio.AbstractEventLoop,
         config: OT3Config,
     ) -> None:
@@ -134,7 +133,7 @@ class OT3API(
         self._pause_manager = PauseManager(self._door_state)
         self._transforms = build_ot3_transforms(self._config)
 
-        ExecutionManagerProvider.__init__(self, loop, isinstance(backend, Simulator))
+        ExecutionManagerProvider.__init__(self, loop, isinstance(backend, OT3Simulator))
         InstrumentHandlerProvider.__init__(self)
 
     def set_robot_calibration(self, robot_calibration: RobotCalibration) -> None:
@@ -219,7 +218,7 @@ class OT3API(
             checked_config = robot_configs.load_ot3()
         else:
             checked_config = config
-        backend = await Simulator.build(
+        backend = await OT3Simulator.build(
             attached_instruments,
             attached_modules,
             checked_config,
@@ -232,7 +231,7 @@ class OT3API(
             api_instance, board_revision=backend.board_revision
         )
         backend.module_controls = module_controls
-        await backend.watch()
+        await backend.watch(api_instance.loop)
         return api_instance
 
     def __repr__(self):
@@ -250,7 +249,7 @@ class OT3API(
     @property
     def is_simulator(self):
         """`True` if this is a simulator; `False` otherwise."""
-        return isinstance(self._backend, Simulator)
+        return isinstance(self._backend, OT3Simulator)
 
     def register_callback(self, cb: HardwareEventHandler) -> Callable[[], None]:
         """Allows the caller to register a callback, and returns a closure
@@ -1017,7 +1016,6 @@ class OT3API(
         increment: Optional[float] = None,
     ):
         """Pick up tip from current location."""
-
         spec, _add_tip_to_instrs = self.plan_check_pick_up_tip(
             mount, tip_length, presses, increment
         )

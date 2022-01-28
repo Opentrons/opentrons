@@ -31,12 +31,12 @@ try:
 except ModuleNotFoundError:
     pass
 
-from .module_control import AttachedModulesControl
-from .types import BoardRevision, Axis, AionotifyEvent
+from ..module_control import AttachedModulesControl
+from ..types import BoardRevision, Axis, AionotifyEvent
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
-    from .dev_types import (
+    from ..dev_types import (
         AttachedInstruments,
         InstrumentHardwareConfigs,
     )
@@ -244,7 +244,7 @@ class OT3Controller:
         checked_axes = axes or self._node_axes()
         home_pos = self._get_home_position()
         target_pos = {ax: home_pos[self._axis_to_node(ax)] for ax in checked_axes}
-        self.move(target_pos)
+        await self.move(target_pos)
         return self._axis_convert(self._position)
 
     async def fast_home(self, axes: Sequence[str], margin: float) -> AxisValueMap:
@@ -261,7 +261,7 @@ class OT3Controller:
         target_pos = {ax: home_pos[self._axis_to_node(ax)] for ax in axes}
         if not target_pos:
             return self._axis_convert(self._position)
-        self.move(target_pos)
+        await self.move(target_pos)
         return self._axis_convert(self._position)
 
     async def get_attached_instruments(

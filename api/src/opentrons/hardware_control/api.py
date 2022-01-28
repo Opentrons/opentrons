@@ -25,8 +25,7 @@ from opentrons.config.types import RobotConfig, OT3Config
 
 from .util import use_or_initialize_loop, check_motion_bounds
 from .pipette import generate_hardware_configs, load_from_config_and_check_skip
-from .controller import Controller
-from .simulator import Simulator
+from .backends import Controller, Simulator
 from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
