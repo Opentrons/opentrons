@@ -233,6 +233,7 @@ class ProtocolEngine:
             try:
                 self._hw_actions_to_dispatch.done_putting()
             except QueueClosed:
+                # Accounting for finish being called twice.
                 pass
 
             # While we are awaiting the action dispatching task to finish, it might

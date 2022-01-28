@@ -5,6 +5,7 @@ from asyncio import create_task, Task
 from contextlib import ExitStack
 from typing import Optional
 
+from opentrons.thread_async_queue import ThreadAsyncQueue
 from opentrons.commands.types import CommandMessage as LegacyCommand
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import (
@@ -21,7 +22,6 @@ from .legacy_wrappers import (
     LegacyModuleLoadInfo,
 )
 from .legacy_command_mapper import LegacyCommandMapper
-from opentrons.thread_async_queue import ThreadAsyncQueue
 
 
 class LegacyContextPlugin(AbstractPlugin):
