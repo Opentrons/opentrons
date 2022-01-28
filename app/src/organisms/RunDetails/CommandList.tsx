@@ -32,7 +32,7 @@ import {
 } from '@opentrons/api-client'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { useProtocolDetails } from './hooks'
-import { useCurrentProtocolRun } from '../ProtocolUpload/hooks'
+import { useCurrentRun } from '../ProtocolUpload/hooks'
 import { ProtocolSetupInfo } from './ProtocolSetupInfo'
 import { CommandItem } from './CommandItem'
 import type { RunStatus, RunCommandSummary } from '@opentrons/api-client'
@@ -54,7 +54,7 @@ export function CommandList(): JSX.Element | null {
   const { t } = useTranslation('run_details')
   const protocolData: ProtocolFile<{}> | null = useProtocolDetails()
     .protocolData
-  const { runRecord } = useCurrentProtocolRun()
+  const runRecord = useCurrentRun()
   const runStatus = useRunStatus()
   const listInnerRef = React.useRef<HTMLDivElement>(null)
   const currentItemRef = React.useRef<HTMLDivElement>(null)

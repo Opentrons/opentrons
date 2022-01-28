@@ -34,7 +34,8 @@ import {
 import { Page } from '../../atoms/Page'
 import { UploadInput } from './UploadInput'
 import { ProtocolSetup } from '../ProtocolSetup'
-import { useCurrentProtocolRun } from './hooks/useCurrentProtocolRun'
+import { useCurrentProtocol } from './hooks/useCurrentProtocol'
+import { useCreateRun } from './hooks/useCreateRun'
 import { useCloseCurrentRun } from './hooks/useCloseCurrentRun'
 import { loadProtocol } from '../../redux/protocol/actions'
 import { ingestProtocolFile } from '../../redux/protocol/utils'
@@ -61,12 +62,12 @@ const VALIDATION_ERROR_T_MAP: { [errorKey: string]: string } = {
 export function ProtocolUpload(): JSX.Element {
   const { t } = useTranslation(['protocol_info', 'shared'])
   const dispatch = useDispatch<Dispatch>()
+  const protocolRecord = useCurrentProtocol()
   const {
     createProtocolRun,
-    protocolRecord,
     isCreatingProtocolRun,
     protocolCreationError,
-  } = useCurrentProtocolRun()
+  } = useCreateRun()
   const runStatus = useRunStatus()
   const { displayName } = useProtocolDetails()
   const { closeCurrentRun, isProtocolRunLoaded } = useCloseCurrentRun()

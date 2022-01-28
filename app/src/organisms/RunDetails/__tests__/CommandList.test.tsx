@@ -5,12 +5,12 @@ import { i18n } from '../../../i18n'
 import { renderWithProviders } from '@opentrons/components'
 import { AlertItem } from '@opentrons/components/src/alerts'
 import { useProtocolDetails } from '../hooks'
-import { useCurrentProtocolRun } from '../../ProtocolUpload/hooks'
+import { useCurrentRun } from '../../ProtocolUpload/hooks'
 import { useRunStatus } from '../../RunTimeControl/hooks'
 import { ProtocolSetupInfo } from '../ProtocolSetupInfo'
 import { CommandList } from '../CommandList'
-import fixtureAnalysis from '@opentrons/app/src/organisms/RunDetails/Fixture_analysis.json'
-import fixtureCommandSummary from '@opentrons/app/src/organisms/RunDetails/Fixture_commandSummary.json'
+import fixtureAnalysis from '../__fixtures__/analysis.json'
+import runRecord from '../__fixtures__/runRecord.json'
 import { CommandItemComponent as CommandItem } from '../CommandItem'
 import type { ProtocolFile } from '@opentrons/shared-data'
 
@@ -24,8 +24,8 @@ jest.mock('@opentrons/components/src/alerts')
 const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
   typeof useProtocolDetails
 >
-const mockUseCurrentProtocolRun = useCurrentProtocolRun as jest.MockedFunction<
-  typeof useCurrentProtocolRun
+const mockUseCurrentRun = useCurrentRun as jest.MockedFunction<
+  typeof useCurrentRun
 >
 const mockUseRunStatus = useRunStatus as jest.MockedFunction<
   typeof useRunStatus
@@ -51,16 +51,8 @@ describe('CommandList', () => {
       protocolData: _fixtureAnalysis,
       displayName: 'mock display name',
     })
-    mockUseCurrentProtocolRun.mockReturnValue({
-      createProtocolRun: () => {},
-      protocolRecord: null,
-      runRecord: {
-        // @ts-expect-error not a full match of RunData type
-        data: {
-          commands: [],
-          actions: [],
-        },
-      },
+    mockUseCurrentRun.mockReturnValue({
+      data: { commands: [], actions: [] } as any,
     })
     mockUseRunStatus.mockReturnValue('idle')
     mockProtocolSetupInfo.mockReturnValue(<div>Mock ProtocolSetup Info</div>)
@@ -98,8 +90,7 @@ describe('CommandList', () => {
     ).toEqual(9)
   })
   it('renders only anticipated steps if the current run info is present and has not updated', () => {
-    // @ts-expect-error not a full match of RunData type
-    mockUseCurrentProtocolRun.mockReturnValue(fixtureCommandSummary)
+    mockUseCurrentRun.mockReturnValue(runRecord as any)
     const { getAllByText } = render()
     expect(
       getAllByText(

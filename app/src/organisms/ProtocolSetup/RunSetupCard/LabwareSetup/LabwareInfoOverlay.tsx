@@ -18,7 +18,7 @@ import {
   JUSTIFY_FLEX_END,
   FONT_SIZE_CAPTION,
 } from '@opentrons/components'
-import { useCurrentProtocolRun } from '../../../ProtocolUpload/hooks'
+import { useCurrentRun } from '../../../ProtocolUpload/hooks'
 import { getLabwareOffsetLocation } from '../../utils/getLabwareOffsetLocation'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
 import { getLabwareDefinitionUri } from '../../utils/getLabwareDefinitionUri'
@@ -42,7 +42,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
   const { displayName, labwareId } = props
   const { t } = useTranslation('protocol_setup')
   const { protocolData } = useProtocolDetails()
-  const { runRecord } = useCurrentProtocolRun()
+  const runRecord = useCurrentRun()
   // protocolData should never be null as we don't render the `ProtocolSetup` unless we have an analysis
   // but we're experiencing a zombie children issue, see https://github.com/Opentrons/opentrons/pull/9091
   if (protocolData == null) {
@@ -60,7 +60,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
     protocolData.modules
   )
 
-  const labwareOffsets = runRecord?.data.labwareOffsets ?? []
+  const labwareOffsets = runRecord?.data?.labwareOffsets ?? []
   const mostRecentLabwareOffsets = uniqBy<LabwareOffset>(
     labwareOffsets.sort(
       (a, b) =>
