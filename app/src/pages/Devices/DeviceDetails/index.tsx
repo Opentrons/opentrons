@@ -11,6 +11,8 @@ import {
   SIZE_6,
   SPACING_2,
   SPACING_3,
+  DIRECTION_ROW,
+  WRAP,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
@@ -46,11 +48,11 @@ export function DeviceDetails(): JSX.Element | null {
           width="100%"
         >
           <RobotOverview robotName={robotName} />
-
-          {attachedModules.map(module => {
-            console.log(module)
-            return <ModuleCard />
-          })}
+          <Flex flexWrap={WRAP} flexDirection={DIRECTION_ROW}>
+            {attachedModules.map(module => {
+              return <ModuleCard module={module} />
+            })}
+          </Flex>
         </Flex>
       </Box>
     </ApiHostProvider>
