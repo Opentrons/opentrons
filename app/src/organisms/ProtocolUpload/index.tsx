@@ -199,7 +199,7 @@ export function ProtocolUpload(): JSX.Element {
     }
   } else {
     titleBarProps = {
-      title: <Text>{t('upload_and_simulate', { robot_name: robotName })}</Text>,
+      title: <Text></Text>,
     }
   }
 

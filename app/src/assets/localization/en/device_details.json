@@ -1,5 +1,6 @@
 {
   "controls": "Controls",
   "lights": "Lights",
-  "run_a_protocol": "Run a Protocol"
+  "run_a_protocol": "Run a Protocol",
+  "usb_port": "usb port {{port}}"
 }
