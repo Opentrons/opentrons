@@ -30,9 +30,9 @@ import {
   RUN_STATUS_STOPPED,
   RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
-import { useRunStatus } from '../RunTimeControl/hooks'
+import { useRunStatus, useRunStartTime } from '../RunTimeControl/hooks'
 import { useProtocolDetails } from './hooks'
-import { useCurrentRun } from '../ProtocolUpload/hooks'
+import { useCurrentRunCommands, useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ProtocolSetupInfo } from './ProtocolSetupInfo'
 import { CommandItem } from './CommandItem'
 import type { RunStatus, RunCommandSummary } from '@opentrons/api-client'
@@ -54,20 +54,17 @@ export function CommandList(): JSX.Element | null {
   const { t } = useTranslation('run_details')
   const protocolData: ProtocolFile<{}> | null = useProtocolDetails()
     .protocolData
-  const runRecord = useCurrentRun()
+  const currentRunId = useCurrentRunId()
+  const runStartTime = useRunStartTime()
+  const runCommands = useCurrentRunCommands()
   const runStatus = useRunStatus()
   const listInnerRef = React.useRef<HTMLDivElement>(null)
   const currentItemRef = React.useRef<HTMLDivElement>(null)
-  const runDataCommands = runRecord?.data.commands
   const [windowIndex, setWindowIndex] = React.useState<number>(0)
   const [
     isInitiallyJumpingToCurrent,
     setIsInitiallyJumpingToCurrent,
   ] = React.useState<boolean>(false)
-
-  const firstPlayTimestamp = runRecord?.data.actions.find(
-    action => action.actionType === 'play'
-  )?.createdAt
 
   const analysisCommandsWithStatus =
     protocolData?.commands != null
@@ -101,16 +98,16 @@ export function CommandList(): JSX.Element | null {
   )
   let postPlayRunCommands: CommandRuntimeInfo[] = []
   if (
-    runDataCommands != null &&
-    runDataCommands.length > 0 &&
-    firstPlayTimestamp != null
+    runCommands != null &&
+    runCommands.length > 0 &&
+    runStartTime != null
   ) {
-    const firstPostPlayRunCommandIndex = runDataCommands.findIndex(
+    const firstPostPlayRunCommandIndex = runCommands.findIndex(
       command => command.key === postSetupAnticipatedCommands[0]?.key
     )
     postPlayRunCommands =
       firstPostPlayRunCommandIndex >= 0
-        ? runDataCommands
+        ? runCommands
             .slice(firstPostPlayRunCommandIndex)
             .map(runDataCommand => ({
               runCommandSummary: runDataCommand,
@@ -125,7 +122,7 @@ export function CommandList(): JSX.Element | null {
     const remainingAnticipatedCommands = dropWhile(
       postSetupAnticipatedCommands,
       anticipatedCommand =>
-        runDataCommands.some(runC => runC.key === anticipatedCommand.key)
+        runCommands.some(runC => runC.key === anticipatedCommand.key)
     ).map(remainingAnticipatedCommand => ({
       analysisCommand: remainingAnticipatedCommand,
       runCommandSummary: null,
@@ -314,7 +311,7 @@ export function CommandList(): JSX.Element | null {
                   analysisCommand={command.analysisCommand}
                   runCommandSummary={command.runCommandSummary}
                   runStatus={runStatus}
-                  currentRunId={runRecord?.data.id ?? null}
+                  currentRunId={currentRunId ?? null}
                   stepNumber={overallIndex + 1}
                 />
                 {showAnticipatedStepsTitle && (

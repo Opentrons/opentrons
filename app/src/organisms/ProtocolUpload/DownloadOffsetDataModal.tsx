@@ -45,7 +45,7 @@ export const DownloadOffsetDataModal = (
 ): JSX.Element => {
   const { t } = useTranslation(['protocol_info', 'shared'])
   const { protocolData } = useProtocolDetails()
-  const runRecord = useCurrentRun()
+  const labwareOffsets = useCurrentRun()?.data?.labwareOffsets ?? null
   const [mode, setMode] = React.useState<typeof MODES[number]>('jupyter')
 
   return (
@@ -99,7 +99,7 @@ export const DownloadOffsetDataModal = (
             <PythonLabwareOffsetSnippet
               mode={mode}
               protocol={protocolData}
-              run={runRecord?.data ?? null}
+              labwareOffsets={labwareOffsets}
             />
           </Flex>
           <Box textAlign={ALIGN_CENTER} marginTop={SPACING_4}>

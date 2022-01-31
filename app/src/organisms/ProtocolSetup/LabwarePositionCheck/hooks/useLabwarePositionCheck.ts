@@ -295,6 +295,7 @@ export function useLabwarePositionCheck(
   }) as LabwarePositionCheckStep
 
   const ctaText = useLpcCtaText(currentCommand)
+  // TODO(bc, 2022-01-31): this can be replaced by useCurrentRunCommands
   const robotCommands = useAllCommandsQuery(currentRunId ?? null).data?.data
   const titleText = useTitleText(
     isLoading,

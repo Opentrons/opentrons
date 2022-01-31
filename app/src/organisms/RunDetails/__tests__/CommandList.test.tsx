@@ -5,7 +5,7 @@ import { i18n } from '../../../i18n'
 import { renderWithProviders } from '@opentrons/components'
 import { AlertItem } from '@opentrons/components/src/alerts'
 import { useProtocolDetails } from '../hooks'
-import { useCurrentRun } from '../../ProtocolUpload/hooks'
+import { useCurrentRunCommands, useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { useRunStatus } from '../../RunTimeControl/hooks'
 import { ProtocolSetupInfo } from '../ProtocolSetupInfo'
 import { CommandList } from '../CommandList'
@@ -24,8 +24,11 @@ jest.mock('@opentrons/components/src/alerts')
 const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
   typeof useProtocolDetails
 >
-const mockUseCurrentRun = useCurrentRun as jest.MockedFunction<
-  typeof useCurrentRun
+const mockUseCurrentRunCommands = useCurrentRunCommands as jest.MockedFunction<
+  typeof useCurrentRunCommands
+>
+const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
+  typeof useCurrentRunId
 >
 const mockUseRunStatus = useRunStatus as jest.MockedFunction<
   typeof useRunStatus
@@ -51,9 +54,8 @@ describe('CommandList', () => {
       protocolData: _fixtureAnalysis,
       displayName: 'mock display name',
     })
-    mockUseCurrentRun.mockReturnValue({
-      data: { commands: [], actions: [] } as any,
-    })
+    mockUseCurrentRunCommands.mockReturnValue([])
+    mockUseCurrentRunId.mockReturnValue('fakeRunId')
     mockUseRunStatus.mockReturnValue('idle')
     mockProtocolSetupInfo.mockReturnValue(<div>Mock ProtocolSetup Info</div>)
 
@@ -90,7 +92,7 @@ describe('CommandList', () => {
     ).toEqual(9)
   })
   it('renders only anticipated steps if the current run info is present and has not updated', () => {
-    mockUseCurrentRun.mockReturnValue(runRecord as any)
+    mockUseCurrentRunCommands.mockReturnValue(runRecord.data.commands as any)
     const { getAllByText } = render()
     expect(
       getAllByText(

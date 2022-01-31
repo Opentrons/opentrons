@@ -1,6 +1,7 @@
 export * from './useCloseCurrentRun'
 export * from './useCurrentProtocol'
 export * from './useCurrentRun'
+export * from './useCurrentRunCommands'
 export * from './useCurrentRunId'
 export * from './useCreateRun'
 export * from './useCloneRun'

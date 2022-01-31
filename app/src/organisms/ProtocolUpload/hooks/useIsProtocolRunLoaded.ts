@@ -3,12 +3,12 @@ import { useCurrentRun } from './useCurrentRun'
 
 export function useIsProtocolRunLoaded(): boolean {
   const protocolRecord = useCurrentProtocol()
-  const runRecord = useCurrentRun()
+  const isRunPresent = useCurrentRun() != null
 
   const analysisNotOk =
     protocolRecord?.data?.analyses[0] != null &&
     'result' in protocolRecord.data.analyses[0] &&
     protocolRecord.data.analyses[0].result === 'not-ok'
 
-  return runRecord != null && protocolRecord != null && !analysisNotOk
+  return isRunPresent && protocolRecord != null && !analysisNotOk
 }
