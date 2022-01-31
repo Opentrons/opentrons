@@ -152,6 +152,6 @@ async def get_run_command(
         raise CommandNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
     return await PydanticResponse.create(
-        content=SimpleBody(data=command),
+        content=SimpleBody.construct(data=command),
         status_code=status.HTTP_200_OK,
     )

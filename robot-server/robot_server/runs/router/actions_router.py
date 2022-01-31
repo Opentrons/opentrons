@@ -108,7 +108,7 @@ async def create_run_action(
 
     run_store.upsert(run=next_run)
 
-    return PydanticResponse(
+    return await PydanticResponse.create(
         content=SimpleBody.construct(data=action),
         status_code=status.HTTP_201_CREATED,
     )

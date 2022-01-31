@@ -313,6 +313,7 @@ export function CommandList(): JSX.Element | null {
                   runStatus={runStatus}
                   currentRunId={currentRunId ?? null}
                   stepNumber={overallIndex + 1}
+                  runStartedAt={firstPlayTimestamp ?? null}
                 />
                 {showAnticipatedStepsTitle && (
                   <Text

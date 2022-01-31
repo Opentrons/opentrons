@@ -50,6 +50,7 @@ export interface CommandItemProps {
   runStatus: RunStatus
   currentRunId: string | null
   stepNumber: number
+  runStartedAt: string | null
 }
 
 const WRAPPER_STYLE_BY_STATUS: {
@@ -85,6 +86,7 @@ export function CommandItemComponent(
     runStatus,
     currentRunId,
     stepNumber,
+    runStartedAt,
   } = props
   const { t } = useTranslation('run_details')
   const [commandItemRef, isInView] = useInView({
@@ -203,9 +205,9 @@ export function CommandItemComponent(
         {['running', 'failed', 'succeeded'].includes(commandStatus) &&
         !isComment ? (
           <CommandTimer
-            commandStartedAt={commandDetails?.data.startedAt}
-            commandCompletedAt={commandDetails?.data.completedAt}
-            commandStatus={commandStatus}
+            commandStartedAt={commandDetails?.data.startedAt ?? null}
+            commandCompletedAt={commandDetails?.data.completedAt ?? null}
+            runStartedAt={runStartedAt}
           />
         ) : null}
       </Flex>

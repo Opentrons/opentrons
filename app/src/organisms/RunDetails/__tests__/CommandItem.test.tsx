@@ -102,6 +102,7 @@ describe('Run Details RunTimeCommand item', () => {
       runStatus: 'running',
       currentRunId: RUN_ID,
       stepNumber: 1,
+      runStartedAt: 'fake_timestamp',
     })
     expect(getByText('Step failed')).toHaveStyle(
       'backgroundColor: C_ERROR_LIGHT'
@@ -116,6 +117,7 @@ describe('Run Details RunTimeCommand item', () => {
       runStatus: 'succeeded',
       currentRunId: RUN_ID,
       stepNumber: 1,
+      runStartedAt: 'fake_timestamp',
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
     expect(getByText('Mock RunTimeCommand Timer')).toHaveStyle(
@@ -130,6 +132,7 @@ describe('Run Details RunTimeCommand item', () => {
       runStatus: 'running',
       currentRunId: RUN_ID,
       stepNumber: 1,
+      runStartedAt: 'fake_timestamp',
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
     expect(getByText('Current Step')).toHaveStyle(
@@ -146,6 +149,7 @@ describe('Run Details RunTimeCommand item', () => {
       runStatus: 'running',
       currentRunId: RUN_ID,
       stepNumber: 1,
+      runStartedAt: 'fake_timestamp',
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
     expect(getByText('Mock RunTimeCommand Text')).toHaveStyle(
@@ -160,6 +164,7 @@ describe('Run Details RunTimeCommand item', () => {
       runStatus: 'paused',
       currentRunId: RUN_ID,
       stepNumber: 1,
+      runStartedAt: 'fake_timestamp',
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
     expect(getByText('Current Step - Paused by User')).toHaveStyle(
@@ -209,6 +214,7 @@ describe('Run Details RunTimeCommand item', () => {
       runStatus: 'running',
       currentRunId: RUN_ID,
       stepNumber: 1,
+      runStartedAt: 'fake_timestamp',
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
     expect(getByText('Comment')).toHaveStyle('backgroundColor: C_NEAR_WHITE')
@@ -248,6 +254,7 @@ describe('Run Details RunTimeCommand item', () => {
       runStatus: 'paused',
       currentRunId: RUN_ID,
       stepNumber: 1,
+      runStartedAt: 'fake_timestamp',
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
     expect(getByText('Pause protocol')).toHaveStyle(

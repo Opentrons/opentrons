@@ -135,7 +135,7 @@ async def create_protocol(
         f'Created protocol "{protocol_id}"' f' and started analysis "{analysis_id}".'
     )
 
-    return PydanticResponse(
+    return await PydanticResponse.create(
         content=SimpleBody.construct(data=data),
         status_code=status.HTTP_201_CREATED,
     )
@@ -211,7 +211,7 @@ async def get_protocol_by_id(
         files=[ProtocolFile(name=f.name, role=f.role) for f in resource.source.files],
     )
 
-    return PydanticResponse(
+    return await PydanticResponse.create(
         content=SimpleBody.construct(data=data),
         status_code=status.HTTP_200_OK,
     )
@@ -241,7 +241,7 @@ async def delete_protocol_by_id(
     except ProtocolNotFoundError as e:
         raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
-    return PydanticResponse(
-        content=SimpleEmptyBody(),
+    return await PydanticResponse.create(
+        content=SimpleEmptyBody.construct(),
         status_code=status.HTTP_200_OK,
     )

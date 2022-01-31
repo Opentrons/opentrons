@@ -3,6 +3,37 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.0.0-beta.7](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.6...v5.0.0-beta.7) (2022-01-28)
+
+
+### Code Refactoring
+
+* **robot-server:** remove deprecated protocols endpoints and FF ([#9261](https://github.com/Opentrons/opentrons/issues/9261)) ([802d858](https://github.com/Opentrons/opentrons/commit/802d8582dbc09566b8de9eca3672254ef271164b))
+* **robot-server:** remove unused experimental /protocols code ([#9296](https://github.com/Opentrons/opentrons/issues/9296)) ([e462d17](https://github.com/Opentrons/opentrons/commit/e462d17dff12ce42a038ad221eb4ec52564e37e5))
+
+
+### Features
+
+* **robot-server:** Add the `key` field to command HTTP summaries ([#9257](https://github.com/Opentrons/opentrons/issues/9257)) ([0be9e94](https://github.com/Opentrons/opentrons/commit/0be9e941a3ecc635550fbfef5926623c39876b43))
+
+
+### Performance Improvements
+
+* **robot-server:** Return some HTTP results slightly more efficiently ([#9336](https://github.com/Opentrons/opentrons/issues/9336)) ([0573ba6](https://github.com/Opentrons/opentrons/commit/0573ba62e914f1ab8d0fe7d984890b44ea2fd706))
+* **robot-server, api-client:** return run summaries from GET /runs rather than full run models ([#9332](https://github.com/Opentrons/opentrons/issues/9332)) ([66b1d7c](https://github.com/Opentrons/opentrons/commit/66b1d7c0082970c53306eb99006309914ad33b22))
+
+
+### BREAKING CHANGES
+
+* **robot-server:** Removes experimental `protocol` session type
+in favor of v5 `/protocols` and `/runs` endpoints
+* **robot-server:** This removes endpoints used during the 2021 HTTP protocol upload beta.
+Users should transition to the new `/protocols` and `/runs` endpoints, instead.
+
+
+
+
+
 # [5.0.0-beta.6](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.5...v5.0.0-beta.6) (2022-01-07)
 
 
