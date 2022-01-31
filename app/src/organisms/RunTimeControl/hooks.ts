@@ -102,14 +102,14 @@ export function useRunDisabledReason(): string | null {
   return null
 }
 
-export function useRunStartTime(): string | undefined {
+export function useRunStartTime(): string | null {
   const actions = useCurrentRun()?.data?.actions ?? []
   const firstPlay = actions.find(
     action => action.actionType === RUN_ACTION_TYPE_PLAY
   )
   const runStartTime = firstPlay?.createdAt
 
-  return runStartTime
+  return runStartTime ?? null
 }
 
 export function useRunPauseTime(): string | null {
