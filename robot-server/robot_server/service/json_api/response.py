@@ -23,7 +23,7 @@ DESCRIPTION_LINKS = "A links object related to the primary data."
 
 
 class BaseResponseBody(BaseModel):
-    """Base model to for HTTP responses.
+    """Base model for HTTP responses.
 
     This model contains configuration and overrides to ensure returned
     JSON responses adhere to the server's generated OpenAPI Spec.
@@ -63,10 +63,42 @@ class EmptyBody(BaseResponseBody, GenericModel, Generic[ResponseLinksT]):
     links: ResponseLinksT = Field(..., description=DESCRIPTION_LINKS)
 
 
+class MultiBodyMeta(BaseModel):
+    cursor: int = Field(
+        ...,
+        description=(
+            "The index of the response's cursor in the overall collection"
+            " the response represents."
+        ),
+    )
+    before: int = Field(
+        ...,
+        description=(
+            "How many items before the cursor (exclusive)"
+            " are included in the response"
+        ),
+    )
+    after: int = Field(
+        ...,
+        description=(
+            "How many items after the cursor (inclusive)"
+            " are included in the response"
+        ),
+    )
+    totalCount: int = Field(
+        ...,
+        description="The total number of items in the overall collection.",
+    )
+
+
 class SimpleMultiBody(BaseResponseBody, GenericModel, Generic[ResponseDataT]):
     """A response that returns multiple resources."""
 
     data: List[ResponseDataT] = Field(..., description=DESCRIPTION_DATA)
+    meta: MultiBodyMeta = Field(
+        ...,
+        description="Metadata about the colletion response.",
+    )
 
 
 class MultiBody(
@@ -78,6 +110,10 @@ class MultiBody(
 
     data: List[ResponseDataT] = Field(..., description=DESCRIPTION_DATA)
     links: ResponseLinksT = Field(..., description=DESCRIPTION_LINKS)
+    meta: MultiBodyMeta = Field(
+        ...,
+        description="Metadata about the colletion response.",
+    )
 
 
 ResponseBodyT = TypeVar("ResponseBodyT", bound=BaseResponseBody)

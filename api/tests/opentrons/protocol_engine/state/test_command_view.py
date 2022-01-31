@@ -10,6 +10,7 @@ from opentrons.protocol_engine import EngineStatus, commands as cmd, errors
 from opentrons.protocol_engine.state.commands import (
     CommandState,
     CommandView,
+    CommandSlice,
     RunResult,
     QueueStatus,
 )
@@ -476,3 +477,116 @@ get_okay_to_clear_specs: List[GetOkayToClearSpec] = [
 def test_get_okay_to_clear(subject: CommandView, expected_is_okay: bool) -> None:
     """It should okay only an unstarted or stopped engine to clear."""
     assert subject.get_is_okay_to_clear() is expected_is_okay
+
+
+def test_get_current() -> None:
+    """It should return the "current" command."""
+    subject = get_command_view(
+        running_command_id=None,
+        queued_command_ids=[],
+    )
+    assert subject.get_current() is None
+
+    subject = get_command_view(
+        running_command_id="command-id",
+        queued_command_ids=[],
+    )
+    assert subject.get_current() == "command-id"
+
+    subject = get_command_view(
+        running_command_id=None,
+        queued_command_ids=["command-id", "next-command-id"],
+    )
+    assert subject.get_current() == "command-id"
+
+
+def test_get_slice() -> None:
+    """It should return a slice of all commands."""
+    command_1 = create_succeeded_command(command_id="command-id-1")
+    command_2 = create_running_command(command_id="command-id-2")
+    command_3 = create_queued_command(command_id="command-id-3")
+    command_4 = create_queued_command(command_id="command-id-4")
+
+    subject = get_command_view(
+        commands_by_id=[
+            ("command-id-1", command_1),
+            ("command-id-2", command_2),
+            ("command-id-3", command_3),
+            ("command-id-4", command_4),
+        ]
+    )
+
+    result = subject.get_slice(cursor=2, before=1, after=2)
+
+    assert result == CommandSlice(
+        commands=[command_2, command_3, command_4],
+        cursor=2,
+        before=1,
+        after=2,
+        total_count=4,
+    )
+
+    result = subject.get_slice(cursor=2, before=10, after=10)
+
+    assert result == CommandSlice(
+        commands=[command_1, command_2, command_3, command_4],
+        cursor=2,
+        before=2,
+        after=2,
+        total_count=4,
+    )
+
+
+def test_get_slice_default_cursor() -> None:
+    """It should use the current command as the default cursor location."""
+    command_1 = create_succeeded_command(command_id="command-id-1")
+    command_2 = create_succeeded_command(command_id="command-id-2")
+    command_3 = create_running_command(command_id="command-id-3")
+    command_4 = create_queued_command(command_id="command-id-4")
+
+    subject = get_command_view(
+        running_command_id="command-id-3",
+        commands_by_id=[
+            ("command-id-1", command_1),
+            ("command-id-2", command_2),
+            ("command-id-3", command_3),
+            ("command-id-4", command_4),
+        ],
+    )
+
+    result = subject.get_slice(cursor=None, before=1, after=2)
+
+    assert result == CommandSlice(
+        commands=[command_2, command_3, command_4],
+        cursor=2,
+        before=1,
+        after=2,
+        total_count=4,
+    )
+
+
+def test_get_slice_default_cursor_no_current() -> None:
+    """It should return a slice from the tail if no current command."""
+    command_1 = create_succeeded_command(command_id="command-id-1")
+    command_2 = create_succeeded_command(command_id="command-id-2")
+    command_3 = create_succeeded_command(command_id="command-id-3")
+    command_4 = create_succeeded_command(command_id="command-id-4")
+
+    subject = get_command_view(
+        commands_by_id=[
+            ("command-id-1", command_1),
+            ("command-id-2", command_2),
+            ("command-id-3", command_3),
+            ("command-id-4", command_4),
+        ],
+    )
+
+    result = subject.get_slice(cursor=None, before=1, after=2)
+
+    assert result == CommandSlice(
+        commands=[command_2, command_3, command_4],
+        cursor=2,
+        before=1,
+        after=2,
+        total_count=4,
+    )

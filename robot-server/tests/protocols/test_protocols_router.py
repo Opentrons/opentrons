@@ -18,7 +18,7 @@ from opentrons.protocol_reader import (
 )
 
 from robot_server.errors import ApiError
-from robot_server.service.json_api import SimpleEmptyBody
+from robot_server.service.json_api import SimpleEmptyBody, MultiBodyMeta
 from robot_server.service.task_runner import TaskRunner
 from robot_server.protocols.analysis_store import AnalysisStore
 from robot_server.protocols.protocol_analyzer import ProtocolAnalyzer
@@ -84,6 +84,12 @@ async def test_get_protocols_no_protocols(
     result = await get_protocols(protocol_store=protocol_store)
 
     assert result.content.data == []
+    assert result.content.meta == MultiBodyMeta(
+        cursor=0,
+        before=0,
+        after=0,
+        totalCount=0,
+    )
     assert result.status_code == 200
 
 
@@ -151,6 +157,12 @@ async def test_get_protocols(
     )
 
     assert result.content.data == [expected_protocol_1, expected_protocol_2]
+    assert result.content.meta == MultiBodyMeta(
+        cursor=0,
+        before=0,
+        after=2,
+        totalCount=2,
+    )
     assert result.status_code == 200
 
 

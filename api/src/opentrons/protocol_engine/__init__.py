@@ -9,7 +9,7 @@ from .create_protocol_engine import create_protocol_engine
 from .protocol_engine import ProtocolEngine
 from .errors import ProtocolEngineError, ErrorOccurrence
 from .commands import Command, CommandCreate, CommandStatus, CommandType
-from .state import State, StateView
+from .state import State, StateView, CommandSlice
 from .plugins import AbstractPlugin
 
 from .types import (
@@ -47,6 +47,7 @@ __all__ = [
     # state interfaces and models
     "State",
     "StateView",
+    "CommandSlice",
     # public value interfaces and models
     "LabwareOffset",
     "LabwareOffsetCreate",
