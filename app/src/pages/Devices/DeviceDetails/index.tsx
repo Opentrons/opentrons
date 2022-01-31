@@ -4,7 +4,6 @@ import { useParams } from 'react-router-dom'
 import {
   Box,
   Flex,
-  ALIGN_CENTER,
   C_MED_LIGHT_GRAY,
   C_WHITE,
   DIRECTION_COLUMN,
@@ -17,6 +16,7 @@ import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { useAttachedModules, useRobot } from '../../../organisms/Devices/hooks'
 import { RobotOverview } from '../../../organisms/Devices/RobotOverview'
+import { ModuleCard } from '../../../organisms/Devices/ModuleCard'
 
 import type { NextGenRouteParams } from '../../../App/NextGenApp'
 
@@ -37,7 +37,6 @@ export function DeviceDetails(): JSX.Element | null {
         padding={SPACING_3}
       >
         <Flex
-          alignItems={ALIGN_CENTER}
           backgroundColor={C_WHITE}
           border={`1px solid ${C_MED_LIGHT_GRAY}`}
           borderRadius="4px"
@@ -47,7 +46,11 @@ export function DeviceDetails(): JSX.Element | null {
           width="100%"
         >
           <RobotOverview robotName={robotName} />
-          <div>insert modules here</div>
+
+          {attachedModules.map(module => {
+            console.log(module)
+            return <ModuleCard />
+          })}
         </Flex>
       </Box>
     </ApiHostProvider>
