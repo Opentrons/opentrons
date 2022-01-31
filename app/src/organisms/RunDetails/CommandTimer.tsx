@@ -9,19 +9,17 @@ import {
   SPACING_2,
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
-import { useFormatRunTimestamp, useTimeElapsedSincePause } from './hooks'
+import { formatInterval } from '../RunTimeControl/utils'
 
 const EMPTY_TIMESTAMP = '-- : -- : --'
 interface TimerProps {
-  commandStartedAt?: string | null
-  commandCompletedAt?: string | null
-  commandStatus: 'running' | 'failed' | 'succeeded' | 'queued'
+  commandStartedAt: string | null
+  commandCompletedAt: string | null
+  runStartedAt: string | null
 }
 export function CommandTimer(props: TimerProps): JSX.Element | null {
-  const { commandStartedAt, commandCompletedAt, commandStatus } = props
+  const { commandStartedAt, commandCompletedAt, runStartedAt } = props
   const { t } = useTranslation('run_details')
-  const timeElapsedSincePause = useTimeElapsedSincePause()
-  const formatRunTimestamp = useFormatRunTimestamp()
 
   return (
     <Flex
@@ -34,23 +32,16 @@ export function CommandTimer(props: TimerProps): JSX.Element | null {
       <Flex>
         <Flex marginRight={SPACING_1}>{t('start_step_time')}</Flex>
         <Flex>
-          {commandStartedAt != null
-            ? formatRunTimestamp(commandStartedAt)
+          {commandStartedAt != null && runStartedAt != null
+            ? formatInterval(runStartedAt, commandStartedAt)
             : EMPTY_TIMESTAMP}
         </Flex>
       </Flex>
-
-      {commandStatus === 'running' && timeElapsedSincePause != null ? (
-        <Flex>
-          <Flex marginRight={SPACING_1}>{t('current_step_pause_timer')}</Flex>
-          <Flex>{timeElapsedSincePause}</Flex>
-        </Flex>
-      ) : null}
       <Flex>
         <Flex marginRight={SPACING_1}>{t('end_step_time')}</Flex>
         <Flex marginLeft={SPACING_2}>
-          {commandCompletedAt
-            ? formatRunTimestamp(commandCompletedAt)
+          {commandCompletedAt && runStartedAt != null
+            ? formatInterval(runStartedAt, commandCompletedAt)
             : EMPTY_TIMESTAMP}
         </Flex>
       </Flex>
