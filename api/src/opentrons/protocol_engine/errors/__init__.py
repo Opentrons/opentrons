@@ -20,9 +20,10 @@ from .exceptions import (
     ProtocolEngineStoppedError,
     WellOriginNotAllowedError,
     ModuleNotAttachedError,
-    ModuleDefinitionDoesNotExistError,
+    ModuleAlreadyPresentError,
     ModuleIsNotThermocyclerError,
     ThermocyclerNotOpenError,
+    RobotDoorOpenError,
 )
 
 from .error_occurrence import ErrorOccurrence
@@ -48,9 +49,10 @@ __all__ = [
     "ProtocolEngineStoppedError",
     "WellOriginNotAllowedError",
     "ModuleNotAttachedError",
-    "ModuleDefinitionDoesNotExistError",
+    "ModuleAlreadyPresentError",
     "ModuleIsNotThermocyclerError",
     "ThermocyclerNotOpenError",
+    "RobotDoorOpenError",
     # error occurrence models
     "ErrorOccurrence",
 ]

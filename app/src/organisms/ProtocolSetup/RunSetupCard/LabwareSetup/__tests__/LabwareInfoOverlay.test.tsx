@@ -8,7 +8,7 @@ import {
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
-import { useCurrentProtocolRun } from '../../../../ProtocolUpload/hooks'
+import { useCurrentRun } from '../../../../ProtocolUpload/hooks'
 import { useProtocolDetails } from '../../../../RunDetails/hooks'
 import { getLabwareLocation } from '../../../utils/getLabwareLocation'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
@@ -41,8 +41,8 @@ const render = (props: React.ComponentProps<typeof LabwareInfoOverlay>) => {
 const mockGetLabwareDisplayName = getLabwareDisplayName as jest.MockedFunction<
   typeof getLabwareDisplayName
 >
-const mockUseCurrentProtocolRun = useCurrentProtocolRun as jest.MockedFunction<
-  typeof useCurrentProtocolRun
+const mockUseCurrentRun = useCurrentRun as jest.MockedFunction<
+  typeof useCurrentRun
 >
 const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
   typeof useProtocolDetails
@@ -62,6 +62,7 @@ const MOCK_LABWARE_VECTOR = { x: 1, y: 2, z: 3 }
 describe('LabwareInfoOverlay', () => {
   let props: React.ComponentProps<typeof LabwareInfoOverlay>
   let labware: ProtocolFile<{}>['labware']
+  let labwareDefinitions: ProtocolFile<{}>['labwareDefinitions']
   beforeEach(() => {
     props = {
       definition: fixture_tiprack_300_ul as LabwareDefinition2,
@@ -71,6 +72,9 @@ describe('LabwareInfoOverlay', () => {
       [MOCK_LABWARE_ID]: {
         definitionId: MOCK_LABWARE_DEFINITION_ID,
       },
+    }
+    labwareDefinitions = {
+      [MOCK_LABWARE_DEFINITION_ID]: fixture_tiprack_300_ul as LabwareDefinition2,
     }
     when(mockGetLabwareDisplayName)
       .calledWith(props.definition)
@@ -82,11 +86,12 @@ describe('LabwareInfoOverlay', () => {
         protocolData: {
           commands: [],
           labware,
+          labwareDefinitions,
           modules: [],
         },
       } as any)
 
-    when(mockUseCurrentProtocolRun)
+    when(mockUseCurrentRun)
       .calledWith()
       .mockReturnValue({} as any)
 
@@ -95,7 +100,7 @@ describe('LabwareInfoOverlay', () => {
       .mockReturnValue({ slotName: MOCK_SLOT_NAME })
 
     when(mockGetLabwareDefinitionUri)
-      .calledWith(MOCK_LABWARE_ID, labware)
+      .calledWith(MOCK_LABWARE_ID, labware, labwareDefinitions)
       .mockReturnValue(MOCK_LABWARE_DEFINITION_URI)
   })
   afterEach(() => {
@@ -114,20 +119,18 @@ describe('LabwareInfoOverlay', () => {
   })
 
   it('should render the offset data when offset data exists', () => {
-    when(mockUseCurrentProtocolRun)
+    when(mockUseCurrentRun)
       .calledWith()
       .mockReturnValue({
-        runRecord: {
-          data: {
-            labwareOffsets: [
-              {
-                id: '1',
-                definitionUri: MOCK_LABWARE_DEFINITION_URI,
-                location: { slotName: MOCK_SLOT_NAME },
-                vector: MOCK_LABWARE_VECTOR,
-              },
-            ],
-          },
+        data: {
+          labwareOffsets: [
+            {
+              id: '1',
+              definitionUri: MOCK_LABWARE_DEFINITION_URI,
+              location: { slotName: MOCK_SLOT_NAME },
+              vector: MOCK_LABWARE_VECTOR,
+            },
+          ],
         },
       } as any)
     const { getByText } = render(props)

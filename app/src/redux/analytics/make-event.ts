@@ -57,8 +57,7 @@ export function makeEvent(
       })
     }
 
-    // TODO (ka, 2018-6-6): add file open type 'button' | 'drag-n-drop' (work required in action meta)
-    case 'protocol:UPLOAD': {
+    case 'protocol:LOAD': {
       return getProtocolAnalyticsData(state).then(data => ({
         name: 'protocolUploadRequest',
         properties: {

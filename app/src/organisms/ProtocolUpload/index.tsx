@@ -29,11 +29,13 @@ import {
   RUN_STATUS_PAUSE_REQUESTED,
   RUN_STATUS_FINISHING,
   RUN_STATUS_STOP_REQUESTED,
+  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
 } from '@opentrons/api-client'
 import { Page } from '../../atoms/Page'
 import { UploadInput } from './UploadInput'
 import { ProtocolSetup } from '../ProtocolSetup'
-import { useCurrentProtocolRun } from './hooks/useCurrentProtocolRun'
+import { useCurrentProtocol } from './hooks/useCurrentProtocol'
+import { useCreateRun } from './hooks/useCreateRun'
 import { useCloseCurrentRun } from './hooks/useCloseCurrentRun'
 import { loadProtocol } from '../../redux/protocol/actions'
 import { ingestProtocolFile } from '../../redux/protocol/utils'
@@ -41,13 +43,13 @@ import { getConnectedRobotName } from '../../redux/robot/selectors'
 import { getValidCustomLabwareFiles } from '../../redux/custom-labware/selectors'
 import { ConfirmCancelModal } from '../RunDetails/ConfirmCancelModal'
 import { useRunStatus, useRunControls } from '../RunTimeControl/hooks'
+import { useProtocolDetails } from '../RunDetails/hooks'
 
 import { ConfirmExitProtocolUploadModal } from './ConfirmExitProtocolUploadModal'
 
 import { useLogger } from '../../logger'
 import type { ErrorObject } from 'ajv'
 import type { Dispatch, State } from '../../redux/types'
-
 import styles from './styles.css'
 
 const VALIDATION_ERROR_T_MAP: { [errorKey: string]: string } = {
@@ -60,13 +62,14 @@ const VALIDATION_ERROR_T_MAP: { [errorKey: string]: string } = {
 export function ProtocolUpload(): JSX.Element {
   const { t } = useTranslation(['protocol_info', 'shared'])
   const dispatch = useDispatch<Dispatch>()
+  const protocolRecord = useCurrentProtocol()
   const {
     createProtocolRun,
-    protocolRecord,
     isCreatingProtocolRun,
     protocolCreationError,
-  } = useCurrentProtocolRun()
+  } = useCreateRun()
   const runStatus = useRunStatus()
+  const { displayName } = useProtocolDetails()
   const { closeCurrentRun, isProtocolRunLoaded } = useCloseCurrentRun()
   const robotName = useSelector((state: State) => getConnectedRobotName(state))
   const customLabwareFiles = useSelector((state: State) =>
@@ -159,9 +162,8 @@ export function ProtocolUpload(): JSX.Element {
     runStatus === RUN_STATUS_RUNNING ||
     runStatus === RUN_STATUS_PAUSED ||
     runStatus === RUN_STATUS_PAUSE_REQUESTED ||
-    runStatus === RUN_STATUS_FINISHING
-
-  const protocolName = protocolRecord?.data?.metadata?.protocolName ?? ''
+    runStatus === RUN_STATUS_FINISHING ||
+    runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR
 
   let titleBarProps
   if (
@@ -171,7 +173,7 @@ export function ProtocolUpload(): JSX.Element {
   ) {
     titleBarProps = {
       title: t('protocol_title', {
-        protocol_name: protocolName,
+        protocol_name: displayName,
       }),
       back: {
         onClick: confirmExit,
@@ -185,13 +187,13 @@ export function ProtocolUpload(): JSX.Element {
   } else if (runStatus === RUN_STATUS_STOP_REQUESTED) {
     titleBarProps = {
       title: t('protocol_title', {
-        protocol_name: protocolName,
+        protocol_name: displayName,
       }),
     }
   } else if (isRunInMotion) {
     titleBarProps = {
       title: t('protocol_title', {
-        protocol_name: protocolName,
+        protocol_name: displayName,
       }),
       rightNode: cancelRunButton,
     }

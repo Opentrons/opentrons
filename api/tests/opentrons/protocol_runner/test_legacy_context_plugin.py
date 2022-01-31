@@ -7,7 +7,11 @@ from typing import Callable
 
 from opentrons.commands.types import CommandMessage as LegacyCommand, PauseMessage
 from opentrons.hardware_control import API as HardwareAPI
-from opentrons.hardware_control.types import PauseType
+from opentrons.hardware_control.types import (
+    PauseType,
+    DoorStateNotification,
+    DoorState,
+)
 from opentrons.protocol_engine import (
     StateView,
     actions as pe_actions,
@@ -91,6 +95,21 @@ def test_play_action(
     decoy.verify(hardware_api.resume(PauseType.PAUSE))
 
 
+def test_play_pauses_when_door_is_open(
+    decoy: Decoy,
+    hardware_api: HardwareAPI,
+    state_view: StateView,
+    subject: LegacyContextPlugin,
+) -> None:
+    """It should not play the hardware controller when door is blocking."""
+    action = pe_actions.PlayAction()
+
+    decoy.when(state_view.commands.get_is_door_blocking()).then_return(True)
+    subject.handle_action(action)
+
+    decoy.verify(hardware_api.pause(PauseType.PAUSE))
+
+
 def test_pause_action(
     decoy: Decoy,
     hardware_api: HardwareAPI,
@@ -106,7 +125,26 @@ def test_pause_action(
     decoy.verify(hardware_api.pause(PauseType.PAUSE), times=1)
 
 
-def test_broker_subscribe_unsubscribe(
+def test_hardware_event_action(
+    decoy: Decoy,
+    hardware_api: HardwareAPI,
+    state_view: StateView,
+    subject: LegacyContextPlugin,
+) -> None:
+    """It should pause the hardware controller upon a blocking HardwareEventAction."""
+    door_open_event = DoorStateNotification(new_state=DoorState.OPEN, blocking=True)
+    decoy.when(state_view.commands.get_is_implicitly_active()).then_return(True)
+    subject.handle_action(pe_actions.HardwareEventAction(event=door_open_event))
+    # Should not pause when engine queue is implicitly active
+    decoy.verify(hardware_api.pause(PauseType.PAUSE), times=0)
+
+    decoy.when(state_view.commands.get_is_implicitly_active()).then_return(False)
+    subject.handle_action(pe_actions.HardwareEventAction(event=door_open_event))
+    # Should pause
+    decoy.verify(hardware_api.pause(PauseType.PAUSE), times=1)
+
+
+async def test_broker_subscribe_unsubscribe(
     decoy: Decoy,
     legacy_context: LegacyProtocolContext,
     legacy_command_mapper: LegacyCommandMapper,
@@ -135,14 +173,12 @@ def test_broker_subscribe_unsubscribe(
     ).then_return(module_unsubscribe)
 
     subject.setup()
-    subject.teardown()
+    await subject.teardown()
 
-    decoy.verify(
-        main_unsubscribe(),
-        labware_unsubscribe(),
-        instrument_unsubscribe(),
-        module_unsubscribe(),
-    )
+    decoy.verify(main_unsubscribe())
+    decoy.verify(labware_unsubscribe())
+    decoy.verify(instrument_unsubscribe())
+    decoy.verify(module_unsubscribe())
 
 
 async def test_main_broker_messages(
@@ -153,15 +189,26 @@ async def test_main_broker_messages(
     subject: LegacyContextPlugin,
 ) -> None:
     """It should dispatch commands from main broker messages."""
+    # Capture the function that the plugin sets up as its command broker callback.
+    # Also, ensure that all subscribe calls return an actual unsubscribe callable
+    # (instead of Decoy's default `None`) so subject.teardown() works.
+    command_handler_captor = matchers.Captor()
+    decoy.when(
+        legacy_context.broker.subscribe(topic="command", handler=command_handler_captor)
+    ).then_return(decoy.mock())
+    decoy.when(
+        legacy_context.labware_load_broker.subscribe(callback=matchers.Anything())
+    ).then_return(decoy.mock())
+    decoy.when(
+        legacy_context.instrument_load_broker.subscribe(callback=matchers.Anything())
+    ).then_return(decoy.mock())
+    decoy.when(
+        legacy_context.module_load_broker.subscribe(callback=matchers.Anything())
+    ).then_return(decoy.mock())
+
     subject.setup()
-    subject.handle_action(pe_actions.PlayAction())
 
-    handler_captor = matchers.Captor()
-    decoy.verify(
-        legacy_context.broker.subscribe(topic="command", handler=handler_captor)
-    )
-
-    handler: Callable[[LegacyCommand], None] = handler_captor.value
+    handler: Callable[[LegacyCommand], None] = command_handler_captor.value
 
     legacy_command: PauseMessage = {
         "$": "before",
@@ -184,6 +231,8 @@ async def test_main_broker_messages(
 
     await to_thread.run_sync(handler, legacy_command)
 
+    await subject.teardown()
+
     decoy.verify(
         action_dispatcher.dispatch(pe_actions.UpdateCommandAction(engine_command))
     )
@@ -198,14 +247,26 @@ async def test_labware_load_broker_messages(
     minimal_labware_def: LabwareDefinitionDict,
 ) -> None:
     """It should dispatch commands from labware load broker messages."""
+    # Capture the function that the plugin sets up as its labware load callback.
+    # Also, ensure that all subscribe calls return an actual unsubscribe callable
+    # (instead of Decoy's default `None`) so subject.teardown() works.
+    labware_handler_captor = matchers.Captor()
+    decoy.when(
+        legacy_context.broker.subscribe(topic="command", handler=matchers.Anything())
+    ).then_return(decoy.mock())
+    decoy.when(
+        legacy_context.labware_load_broker.subscribe(callback=labware_handler_captor)
+    ).then_return(decoy.mock())
+    decoy.when(
+        legacy_context.instrument_load_broker.subscribe(callback=matchers.Anything())
+    ).then_return(decoy.mock())
+    decoy.when(
+        legacy_context.module_load_broker.subscribe(callback=matchers.Anything())
+    ).then_return(decoy.mock())
+
     subject.setup()
-    subject.handle_action(pe_actions.PlayAction())
 
-    handler_captor = matchers.Captor()
-
-    decoy.verify(legacy_context.labware_load_broker.subscribe(callback=handler_captor))
-
-    handler: Callable[[LegacyLabwareLoadInfo], None] = handler_captor.value
+    handler: Callable[[LegacyLabwareLoadInfo], None] = labware_handler_captor.value
 
     labware_load_info = LegacyLabwareLoadInfo(
         labware_definition=minimal_labware_def,
@@ -231,6 +292,8 @@ async def test_labware_load_broker_messages(
 
     await to_thread.run_sync(handler, labware_load_info)
 
+    await subject.teardown()
+
     decoy.verify(
         action_dispatcher.dispatch(pe_actions.UpdateCommandAction(engine_command))
     )
@@ -244,16 +307,30 @@ async def test_instrument_load_broker_messages(
     subject: LegacyContextPlugin,
 ) -> None:
     """It should dispatch commands from instrument load broker messages."""
+    # Capture the function that the plugin sets up as its labware load callback.
+    # Also, ensure that all subscribe calls return an actual unsubscribe callable
+    # (instead of Decoy's default `None`) so subject.teardown() works.
+    instrument_handler_captor = matchers.Captor()
+    decoy.when(
+        legacy_context.broker.subscribe(topic="command", handler=matchers.Anything())
+    ).then_return(decoy.mock())
+    decoy.when(
+        legacy_context.labware_load_broker.subscribe(callback=matchers.Anything())
+    ).then_return(decoy.mock())
+    decoy.when(
+        legacy_context.instrument_load_broker.subscribe(
+            callback=instrument_handler_captor
+        )
+    ).then_return(decoy.mock())
+    decoy.when(
+        legacy_context.module_load_broker.subscribe(callback=matchers.Anything())
+    ).then_return(decoy.mock())
+
     subject.setup()
-    subject.handle_action(pe_actions.PlayAction())
 
-    handler_captor = matchers.Captor()
-
-    decoy.verify(
-        legacy_context.instrument_load_broker.subscribe(callback=handler_captor)
-    )
-
-    handler: Callable[[LegacyInstrumentLoadInfo], None] = handler_captor.value
+    handler: Callable[
+        [LegacyInstrumentLoadInfo], None
+    ] = instrument_handler_captor.value
 
     instrument_load_info = LegacyInstrumentLoadInfo(
         instrument_load_name="some_load_name", mount=Mount.LEFT
@@ -275,6 +352,8 @@ async def test_instrument_load_broker_messages(
 
     await to_thread.run_sync(handler, instrument_load_info)
 
+    await subject.teardown()
+
     decoy.verify(
         action_dispatcher.dispatch(pe_actions.UpdateCommandAction(engine_command))
     )
@@ -288,20 +367,32 @@ async def test_module_load_broker_messages(
     subject: LegacyContextPlugin,
 ) -> None:
     """It should dispatch commands from module load broker messages."""
+    # Capture the function that the plugin sets up as its module load callback.
+    # Also, ensure that all subscribe calls return an actual unsubscribe callable
+    # (instead of Decoy's default `None`) so subject.teardown() works.
+    module_handler_captor = matchers.Captor()
+    decoy.when(
+        legacy_context.broker.subscribe(topic="command", handler=matchers.Anything())
+    ).then_return(decoy.mock())
+    decoy.when(
+        legacy_context.labware_load_broker.subscribe(callback=matchers.Anything())
+    ).then_return(decoy.mock())
+    decoy.when(
+        legacy_context.instrument_load_broker.subscribe(callback=matchers.Anything())
+    ).then_return(decoy.mock())
+    decoy.when(
+        legacy_context.module_load_broker.subscribe(callback=module_handler_captor)
+    ).then_return(decoy.mock())
+
     subject.setup()
-    subject.handle_action(pe_actions.PlayAction())
 
-    handler_captor = matchers.Captor()
-
-    decoy.verify(legacy_context.module_load_broker.subscribe(callback=handler_captor))
-
-    handler: Callable[[LegacyModuleLoadInfo], None] = handler_captor.value
+    handler: Callable[[LegacyModuleLoadInfo], None] = module_handler_captor.value
 
     module_load_info = LegacyModuleLoadInfo(
         module_model=LegacyMagneticModuleModel.MAGNETIC_V2,
         deck_slot=DeckSlotName.SLOT_1,
         configuration=None,
-        module_serial=None,
+        module_serial="serial-number",
     )
     engine_command = pe_commands.Custom(
         id="command-id",
@@ -316,6 +407,8 @@ async def test_module_load_broker_messages(
     ).then_return(engine_command)
 
     await to_thread.run_sync(handler, module_load_info)
+
+    await subject.teardown()
 
     decoy.verify(
         action_dispatcher.dispatch(pe_actions.UpdateCommandAction(engine_command))

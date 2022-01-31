@@ -9,7 +9,7 @@ import { GenericStepScreen } from '../GenericStepScreen'
 import { LabwarePositionCheckStepDetail } from '../LabwarePositionCheckStepDetail'
 import { SectionList } from '../SectionList'
 import { DeckMap } from '../DeckMap'
-import { useIntroInfo, useLabwareIdsBySection } from '../hooks'
+import { useIntroInfo, useLabwareIdsBySection, useSteps } from '../hooks'
 import { Section } from '../types'
 
 jest.mock('../LabwarePositionCheckStepDetail')
@@ -24,6 +24,7 @@ const mockSectionList = SectionList as jest.MockedFunction<typeof SectionList>
 const mockUseIntroInfo = useIntroInfo as jest.MockedFunction<
   typeof useIntroInfo
 >
+const mockUseSteps = useSteps as jest.MockedFunction<typeof useSteps>
 const mockUseLabwareIdsBySection = useLabwareIdsBySection as jest.MockedFunction<
   typeof useLabwareIdsBySection
 >
@@ -73,6 +74,7 @@ describe('GenericStepScreen', () => {
     mockSectionList.mockReturnValue(<div>Mock SectionList </div>)
     mockDeckmap.mockReturnValue(<div>Mock DeckMap </div>)
     mockUseLabwareIdsBySection.mockReturnValue({})
+    mockUseSteps.mockReturnValue([])
 
     when(mockUseIntroInfo).calledWith().mockReturnValue({
       primaryPipetteMount: 'left',

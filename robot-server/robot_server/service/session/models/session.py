@@ -23,10 +23,6 @@ from robot_server.service.json_api import (
     DeprecatedMultiResponseModel,
 )
 from robot_server.service.session.models.common import EmptyModel
-from robot_server.service.session.session_types.protocol.models import (
-    ProtocolCreateParams,
-    ProtocolSessionDetails,
-)
 
 
 class SessionType(str, Enum):
@@ -45,7 +41,6 @@ A Union of all the create param types.
 """
 SessionCreateParamType = typing.Union[
     SessionCreateParams,
-    ProtocolCreateParams,
     BaseModel,
     None,
 ]
@@ -58,7 +53,6 @@ SessionDetails = typing.Union[
     PipetteOffsetCalibrationSessionStatus,
     TipCalibrationSessionStatus,
     DeckCalibrationSessionStatus,
-    ProtocolSessionDetails,
     EmptyModel,
 ]
 
@@ -104,13 +98,6 @@ class PipetteOffsetCalibrationCreateAttributes(SessionCreateAttributes):
         SessionType.pipette_offset_calibration
     ] = SessionType.pipette_offset_calibration
     createParams: SessionCreateParams
-
-
-class ProtocolCreateAttributes(SessionCreateAttributes):
-    """Protocol session create request."""
-
-    sessionType: Literal[SessionType.protocol] = SessionType.protocol
-    createParams: ProtocolCreateParams
 
 
 class LiveProtocolCreateAttributes(SessionCreateAttributesNoParams):
@@ -160,12 +147,6 @@ class PipetteOffsetCalibrationResponseAttributes(
     details: PipetteOffsetCalibrationSessionStatus
 
 
-class ProtocolResponseAttributes(ProtocolCreateAttributes, SessionResponseAttributes):
-    """Response attributes of protocol session."""
-
-    details: ProtocolSessionDetails
-
-
 class LiveProtocolResponseAttributes(
     LiveProtocolCreateAttributes, SessionResponseAttributes
 ):
@@ -179,7 +160,6 @@ RequestTypes = typing.Union[
     TipLengthCalibrationCreateAttributes,
     DeckCalibrationCreateAttributes,
     PipetteOffsetCalibrationCreateAttributes,
-    ProtocolCreateAttributes,
     LiveProtocolCreateAttributes,
 ]
 
@@ -189,7 +169,6 @@ ResponseTypes = typing.Union[
     TipLengthCalibrationResponseAttributes,
     DeckCalibrationResponseAttributes,
     PipetteOffsetCalibrationResponseAttributes,
-    ProtocolResponseAttributes,
     LiveProtocolResponseAttributes,
 ]
 

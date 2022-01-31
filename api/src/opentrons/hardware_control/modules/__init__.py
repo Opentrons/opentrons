@@ -11,6 +11,8 @@ from .types import (
     BundledFirmware,
     UpdateError,
     ModuleAtPort,
+    ModuleType,
+    ModuleModel,
 )
 
 __all__ = [
@@ -27,4 +29,6 @@ __all__ = [
     "UpdateError",
     "ModuleAtPort",
     "HeaterShaker",
+    "ModuleType",
+    "ModuleModel",
 ]

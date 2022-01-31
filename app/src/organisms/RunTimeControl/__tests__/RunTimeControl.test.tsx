@@ -10,12 +10,14 @@ import {
   RUN_STATUS_STOPPED,
   RUN_STATUS_FAILED,
   RUN_STATUS_SUCCEEDED,
+  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
 } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
+import { AlertItem } from '@opentrons/components/src/alerts'
 
 import { i18n } from '../../../i18n'
 import {
-  useMissingModuleIds,
+  useModuleMatchResults,
   useProtocolCalibrationStatus,
 } from '../../ProtocolSetup/RunSetupCard/hooks'
 import {
@@ -52,8 +54,8 @@ const mockUseRunStatus = useRunStatus as jest.MockedFunction<
 >
 const mockTimer = Timer as jest.MockedFunction<typeof Timer>
 
-const mockUseMissingModuleIds = useMissingModuleIds as jest.MockedFunction<
-  typeof useMissingModuleIds
+const mockUseModuleMatchResults = useModuleMatchResults as jest.MockedFunction<
+  typeof useModuleMatchResults
 >
 const mockUseProtocolCalibrationStatus = useProtocolCalibrationStatus as jest.MockedFunction<
   typeof useProtocolCalibrationStatus
@@ -83,7 +85,10 @@ describe('RunTimeControl', () => {
     mockUseProtocolCalibrationStatus.mockReturnValue({
       complete: true,
     })
-    mockUseMissingModuleIds.mockReturnValue([])
+    mockUseModuleMatchResults.mockReturnValue({
+      missingModuleIds: [],
+      remainingAttachedModules: [],
+    })
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -112,7 +117,10 @@ describe('RunTimeControl', () => {
     getByText('Complete required steps on Protocol tab before starting the run')
   })
   it('should render disabled button with tooltip if a module is missing', () => {
-    mockUseMissingModuleIds.mockReturnValue(['temperatureModuleV1'])
+    mockUseModuleMatchResults.mockReturnValue({
+      missingModuleIds: ['temperatureModuleV1'],
+      remainingAttachedModules: [],
+    })
     const [{ getByRole, getByText }] = render()
     const button = getByRole('button', { name: 'Start Run' })
     expect(button).toBeDisabled()
@@ -189,7 +197,7 @@ describe('RunTimeControl', () => {
       .calledWith()
       .mockReturnValue(RUN_STATUS_STOP_REQUESTED)
     const [{ getByRole }] = render()
-    const button = getByRole('button', { name: 'Run Again' })
+    const button = getByRole('button', { name: 'Canceling Run' })
     expect(button).toBeDisabled()
   })
 
@@ -266,6 +274,19 @@ describe('RunTimeControl', () => {
     expect(getByRole('button', { name: 'Resume Run' })).toBeTruthy()
   })
 
+  it('renders a run status, timer, and disabled resume run button if paused by door open', () => {
+    when(mockUseRunStatus)
+      .calledWith()
+      .mockReturnValue(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
+    when(mockUseRunStartTime).calledWith().mockReturnValue('noon')
+
+    const [{ getByRole, getByText }] = render()
+
+    getByText('Status: Paused - door open')
+    getByText('Mock Timer')
+    expect(getByRole('button', { name: 'Resume Run' })).toBeDisabled()
+  })
+
   it('renders a run status and timer if stop-requested', () => {
     when(mockUseRunStatus)
       .calledWith()
@@ -275,7 +296,7 @@ describe('RunTimeControl', () => {
 
     expect(getByText('Status: Stop requested')).toBeTruthy()
     expect(queryByText('Mock Timer')).toBeTruthy()
-    expect(getByRole('button', { name: 'Run Again' })).toBeTruthy()
+    expect(getByRole('button', { name: 'Canceling Run' })).toBeTruthy()
   })
 
   it('renders a run status and timer if stopped', () => {
@@ -312,5 +333,20 @@ describe('RunTimeControl', () => {
     expect(getByText('Status: Completed')).toBeTruthy()
     expect(getByText('Mock Timer')).toBeTruthy()
     expect(getByRole('button', { name: 'Run Again' })).toBeTruthy()
+  })
+
+  it('renders an alert when run status is paused by opened door', () => {
+    when(mockUseRunStatus)
+      .calledWith()
+      .mockReturnValue(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
+
+    const renderPauseAlert = () => {
+      return renderWithProviders(
+        <AlertItem type="warning" title="Close robot door to resume run" />
+      )
+    }
+
+    const [{ getByText }] = renderPauseAlert()
+    getByText('Close robot door to resume run')
   })
 })

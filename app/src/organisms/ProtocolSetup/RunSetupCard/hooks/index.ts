@@ -1,3 +1,3 @@
-export * from './useMissingModuleIds'
+export * from './useModuleMatchResults'
 export * from './useCurrentRunPipetteInfoByMount'
 export * from './useProtocolCalibrationStatus'

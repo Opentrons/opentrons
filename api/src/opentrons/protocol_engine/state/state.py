@@ -93,6 +93,7 @@ class StateStore(StateView, ActionHandler):
         self,
         deck_definition: DeckDefinitionV2,
         deck_fixed_labware: Sequence[DeckFixedLabware],
+        is_door_blocking: bool,
         configs: EngineConfigs = EngineConfigs(),
         change_notifier: Optional[ChangeNotifier] = None,
     ) -> None:
@@ -103,10 +104,11 @@ class StateStore(StateView, ActionHandler):
                 labware state.
             deck_fixed_labware: Labware definitions from the deck
                 definition to preload into labware state.
+            is_door_blocking: Whether the robot's door state is blocking protocol run
             configs: Configurations for the engine.
             change_notifier: Internal state change notifier.
         """
-        self._command_store = CommandStore()
+        self._command_store = CommandStore(is_door_blocking)
         self._pipette_store = PipetteStore()
         self._labware_store = LabwareStore(
             deck_fixed_labware=deck_fixed_labware,

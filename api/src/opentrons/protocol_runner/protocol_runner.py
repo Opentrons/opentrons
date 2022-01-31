@@ -92,7 +92,6 @@ class ProtocolRunner:
             hardware_api=hardware_api
         )
         self._was_started = False
-
         # TODO(mc, 2022-01-11): replace task queue with specific implementations
         # of runner interface
         self._task_queue = task_queue or TaskQueue(cleanup_func=protocol_engine.finish)

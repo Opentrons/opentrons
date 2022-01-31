@@ -30,8 +30,6 @@ This beta is a work in progress! We'll be addressing the following features and 
 
 - Your last run protocol will not be saved through robot reboots
 - You may experience various performance issues and freezes
-- The OT-2 will not pause if the front door is opened during a run
-- You may not be able to re-run a protocol using a thermocycler without re-uploading the protocol
 
 ---
 

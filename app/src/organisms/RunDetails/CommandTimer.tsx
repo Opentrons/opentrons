@@ -9,20 +9,17 @@ import {
   SPACING_2,
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
-import { useFormatRunTimestamp, useTimeElapsedSincePause } from './hooks'
+import { formatInterval } from '../RunTimeControl/utils'
 
 const EMPTY_TIMESTAMP = '-- : -- : --'
 interface TimerProps {
-  commandStartedAt?: string | null
-  commandCompletedAt?: string | null
+  commandStartedAt: string | null
+  commandCompletedAt: string | null
+  runStartedAt: string | null
 }
 export function CommandTimer(props: TimerProps): JSX.Element | null {
-  const { commandStartedAt, commandCompletedAt } = props
+  const { commandStartedAt, commandCompletedAt, runStartedAt } = props
   const { t } = useTranslation('run_details')
-  const timeElapsedSincePause = useTimeElapsedSincePause()
-  const formatRunTimestamp = useFormatRunTimestamp()
-
-  if (commandStartedAt == null) return null // this state should never be reached, all command statuses with timer will have start time
 
   return (
     <Flex
@@ -30,23 +27,21 @@ export function CommandTimer(props: TimerProps): JSX.Element | null {
       textTransform={TEXT_TRANSFORM_UPPERCASE}
       fontSize={FONT_SIZE_CAPTION}
       fontWeight={FONT_WEIGHT_REGULAR}
+      marginRight={SPACING_2}
     >
       <Flex>
         <Flex marginRight={SPACING_1}>{t('start_step_time')}</Flex>
-        <Flex>{formatRunTimestamp(commandStartedAt)}</Flex>
-      </Flex>
-
-      {commandCompletedAt == null && timeElapsedSincePause != null ? (
         <Flex>
-          <Flex marginRight={SPACING_1}>{t('current_step_pause_timer')}</Flex>
-          <Flex>{timeElapsedSincePause}</Flex>
+          {commandStartedAt != null && runStartedAt != null
+            ? formatInterval(runStartedAt, commandStartedAt)
+            : EMPTY_TIMESTAMP}
         </Flex>
-      ) : null}
+      </Flex>
       <Flex>
         <Flex marginRight={SPACING_1}>{t('end_step_time')}</Flex>
         <Flex marginLeft={SPACING_2}>
-          {commandCompletedAt
-            ? formatRunTimestamp(commandCompletedAt)
+          {commandCompletedAt && runStartedAt != null
+            ? formatInterval(runStartedAt, commandCompletedAt)
             : EMPTY_TIMESTAMP}
         </Flex>
       </Flex>

@@ -7,7 +7,6 @@ from opentrons.hardware_control import ThreadedAsyncLock, ThreadManagedHardware
 from robot_server.util import call_once
 from robot_server.hardware import get_thread_manager
 from robot_server.service.session.manager import SessionManager
-from robot_server.service.protocol.manager import ProtocolManager
 
 
 @call_once
@@ -21,22 +20,14 @@ async def get_motion_lock() -> ThreadedAsyncLock:
 
 
 @call_once
-async def get_protocol_manager() -> ProtocolManager:
-    """The single protocol manager instance"""
-    return ProtocolManager()
-
-
-@call_once
 async def get_session_manager(
     thread_manager: ThreadManagedHardware = Depends(get_thread_manager),
     motion_lock: ThreadedAsyncLock = Depends(get_motion_lock),
-    protocol_manager: ProtocolManager = Depends(get_protocol_manager),
 ) -> SessionManager:
     """The single session manager instance"""
     return SessionManager(
         hardware=thread_manager,
         motion_lock=motion_lock,
-        protocol_manager=protocol_manager,
     )
 
 

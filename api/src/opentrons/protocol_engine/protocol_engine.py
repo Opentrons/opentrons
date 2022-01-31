@@ -1,8 +1,11 @@
 """ProtocolEngine class definition."""
-from typing import Optional
+from typing import Optional, Callable
+from asyncio import create_task, Task
 
+from opentrons.hardware_control.types import HardwareEvent
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control import HardwareControlAPI
+from opentrons.thread_async_queue import ThreadAsyncQueue, QueueClosed
 
 from .resources import ModelUtils
 from .commands import (
@@ -25,6 +28,7 @@ from .actions import (
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
     HardwareStoppedAction,
+    HardwareEventAction,
 )
 
 
@@ -69,6 +73,18 @@ class ProtocolEngine:
         self._hardware_stopper = hardware_stopper or HardwareStopper(
             hardware_api=hardware_api, state_store=state_store
         )
+        self._hw_event_watcher: Optional[
+            Callable[[], None]
+        ] = hardware_api.register_callback(self.hardware_event_handler)
+
+        # TODO: The constructor isn't the best place to spawn background tasks
+        #  like this (async queue) one since if a part of this init fails,
+        #  then the background task needs to be cleaned up.. but, it will need to happen
+        #  in an async method, which the init function isn't.
+        self._hw_actions_to_dispatch = ThreadAsyncQueue[HardwareEventAction]()
+        self._hw_action_dispatching_task: Task[None] = create_task(
+            self._dispatch_all_actions()
+        )
         self._queue_worker.start()
 
     @property
@@ -80,11 +96,26 @@ class ProtocolEngine:
         """Add a plugin to the engine to customize behavior."""
         self._plugin_starter.start(plugin)
 
+    def hardware_event_handler(self, hw_event: HardwareEvent) -> None:
+        """Update the runner on hardware events."""
+        action = HardwareEventAction(event=hw_event)
+        # todo: Instead of using a queue, use something
+        # blocking, like anyio.from_thread_run_sync().
+        # That way, we won't have to manage a background task,
+        # and deterministic unit testing will be easier.
+        self._hw_actions_to_dispatch.put(action)
+
+    def _remove_hardware_event_watcher(self) -> None:
+        if self._hw_event_watcher and callable(self._hw_event_watcher):
+            self._hw_event_watcher()
+            self._hw_event_watcher = None
+
     def play(self) -> None:
         """Start or resume executing commands in the queue."""
         # TODO(mc, 2021-08-05): if starting, ensure plungers motors are
         # homed if necessary
         action = PlayAction()
+        self._state_store.commands.raise_if_paused_by_blocking_door()
         self._state_store.commands.raise_if_stop_requested()
         self._action_dispatcher.dispatch(action)
         self._queue_worker.start()
@@ -141,6 +172,9 @@ class ProtocolEngine:
         """Stop execution immediately, halting all motion and cancelling future commands.
 
         After an engine has been `stop`'ed, it cannot be restarted.
+
+        After a `stop`, you must still call `finish` to give the engine a chance
+        to clean up resources and propagate errors.
         """
         self._state_store.commands.raise_if_stop_requested()
         self._action_dispatcher.dispatch(StopAction())
@@ -191,9 +225,26 @@ class ProtocolEngine:
             await self._queue_worker.join()
 
         finally:
+            # TODO: We should use something like contextlib.AsyncExitStack so that we
+            #  can handle resource cleanups gracefully instead of needing to use nested
+            #  try excepts for multiple resources.
             await self._hardware_stopper.do_stop_and_recover(drop_tips_and_home)
             self._action_dispatcher.dispatch(HardwareStoppedAction())
-            self._plugin_starter.stop()
+            try:
+                self._hw_actions_to_dispatch.done_putting()
+            except QueueClosed:
+                # Accounting for finish being called twice.
+                pass
+
+            # While we are awaiting the action dispatching task to finish, it might
+            # still be dispatching hw actions, so it could affect the engine state..
+            # BUT, since for now it is only handling door event action which
+            # only sets the Queue to inactive, we are OK. If in the future we add more
+            # actions that could be disruptive to the engine even after it is stopped
+            # then we will need to rethink how to handle this shutdown.
+            await self._hw_action_dispatching_task
+            self._remove_hardware_event_watcher()
+            await self._plugin_starter.stop()
 
     def add_labware_offset(self, request: LabwareOffsetCreate) -> LabwareOffset:
         """Add a new labware offset and return it.
@@ -220,3 +271,12 @@ class ProtocolEngine:
         self._action_dispatcher.dispatch(
             AddLabwareDefinitionAction(definition=definition)
         )
+
+    async def _dispatch_all_actions(self) -> None:
+        """Dispatch all actions to the `ProtocolEngine`.
+
+        Exits only when `self._actions_to_dispatch` is closed
+        (or an unexpected exception is raised).
+        """
+        async for action in self._hw_actions_to_dispatch.get_async_until_closed():
+            self._action_dispatcher.dispatch(action)

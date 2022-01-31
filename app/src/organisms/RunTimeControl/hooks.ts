@@ -11,6 +11,7 @@ import {
   RUN_STATUS_STOPPED,
   RUN_STATUS_FAILED,
   RUN_STATUS_SUCCEEDED,
+  RUN_ACTION_TYPE_STOP,
 } from '@opentrons/api-client'
 import {
   useCommandQuery,
@@ -18,8 +19,7 @@ import {
   useRunActionMutations,
 } from '@opentrons/react-api-client'
 
-import { useCloneRun } from '../ProtocolUpload/hooks/useCloneRun'
-import { useCurrentProtocolRun } from '../ProtocolUpload/hooks/useCurrentProtocolRun'
+import { useCloneRun, useCurrentRun } from '../ProtocolUpload/hooks'
 
 interface RunControls {
   play: () => void
@@ -33,7 +33,7 @@ interface RunControls {
 }
 
 export function useRunControls(): RunControls {
-  const { runRecord } = useCurrentProtocolRun()
+  const runRecord = useCurrentRun()
 
   const currentRunId = runRecord?.data?.id
 
@@ -47,7 +47,7 @@ export function useRunControls(): RunControls {
   } = useRunActionMutations(currentRunId as string)
 
   const { cloneRun, isLoading: isResetRunLoading } = useCloneRun(
-    currentRunId as string
+    currentRunId ?? null
   )
 
   return {
@@ -63,11 +63,11 @@ export function useRunControls(): RunControls {
 }
 
 export function useRunStatus(): RunStatus | null {
-  const { runRecord } = useCurrentProtocolRun()
+  const runRecord = useCurrentRun()
 
   const currentRunId = runRecord?.data?.id
 
-  const { data } = useRunQuery(currentRunId as string, {
+  const { data } = useRunQuery(currentRunId ?? null, {
     refetchInterval: 1000,
   })
 
@@ -97,11 +97,11 @@ export function useRunDisabledReason(): string | null {
 }
 
 export function useRunStartTime(): string | undefined {
-  const { runRecord } = useCurrentProtocolRun()
+  const runRecord = useCurrentRun()
 
   const currentRunId = runRecord?.data?.id
 
-  const { data } = useRunQuery(currentRunId as string)
+  const { data } = useRunQuery(currentRunId ?? null)
 
   const actions = data?.data?.actions as RunAction[]
   const firstPlay = actions?.find(
@@ -113,11 +113,11 @@ export function useRunStartTime(): string | undefined {
 }
 
 export function useRunPauseTime(): string | null {
-  const { runRecord } = useCurrentProtocolRun()
+  const runRecord = useCurrentRun()
 
   const currentRunId = runRecord?.data?.id
 
-  const { data } = useRunQuery(currentRunId as string)
+  const { data } = useRunQuery(currentRunId ?? null)
 
   const actions = data?.data.actions as RunAction[]
   const lastAction = last(actions)
@@ -127,8 +127,23 @@ export function useRunPauseTime(): string | null {
     : null
 }
 
+export function useRunStopTime(): string | null {
+  const runRecord = useCurrentRun()
+
+  const currentRunId = runRecord?.data?.id
+
+  const { data } = useRunQuery(currentRunId ?? null)
+
+  const actions = data?.data.actions as RunAction[]
+  const lastAction = last(actions)
+
+  return lastAction?.actionType === RUN_ACTION_TYPE_STOP
+    ? lastAction.createdAt
+    : null
+}
+
 export function useRunCompleteTime(): string | null {
-  const { runRecord } = useCurrentProtocolRun()
+  const runRecord = useCurrentRun()
 
   const runData = runRecord?.data as RunData
   const runId = runData?.id
@@ -136,7 +151,7 @@ export function useRunCompleteTime(): string | null {
 
   const lastCommandId = last(runData?.commands)?.id
 
-  const { data: commandData } = useCommandQuery(runId, lastCommandId as string)
+  const { data: commandData } = useCommandQuery(runId, lastCommandId ?? null)
 
   const lastActionAt = last(runData?.actions)?.createdAt
   const lastErrorAt = last(runData?.errors)?.createdAt

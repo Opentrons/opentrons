@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { AlertItem } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
-import { useCurrentProtocolRun } from '../ProtocolUpload/hooks'
+import { useCurrentRun } from '../ProtocolUpload/hooks'
 import { getLatestLabwareOffsetCount } from './LabwarePositionCheck/utils/getLatestLabwareOffsetCount'
 
 import styles from './styles.css'
@@ -13,8 +13,8 @@ export function LabwareOffsetSuccessToast(
   props: LabwareOffsetSuccessToastProps
 ): JSX.Element {
   const { t } = useTranslation('protocol_info')
-  const currentProtocolRun = useCurrentProtocolRun()
-  const currentRunData = currentProtocolRun.runRecord?.data
+  const runRecord = useCurrentRun()
+  const currentRunData = runRecord?.data
   const labwareOffsetCount = getLatestLabwareOffsetCount(
     currentRunData?.labwareOffsets ?? []
   )

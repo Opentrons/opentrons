@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { format, parseISO } from 'date-fns'
 import { useSelector } from 'react-redux'
+import { useHistory } from 'react-router-dom'
 import { css } from 'styled-components'
 import { Trans, useTranslation } from 'react-i18next'
 import {
@@ -37,6 +38,7 @@ import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 import { getLatestLabwareOffsetCount } from '../ProtocolSetup/LabwarePositionCheck/utils/getLatestLabwareOffsetCount'
 import { useProtocolDetails } from '../RunDetails/hooks'
 import { getConnectedRobotName } from '../../redux/robot/selectors'
+import { useTrackEvent } from '../../redux/analytics'
 import { Divider } from '../../atoms/structure'
 import { useMostRecentRunId } from './hooks/useMostRecentRunId'
 import { RerunningProtocolModal } from './RerunningProtocolModal'
@@ -78,6 +80,7 @@ export interface UploadInputProps {
 
 export function UploadInput(props: UploadInputProps): JSX.Element | null {
   const { t } = useTranslation('protocol_info')
+  const history = useHistory()
   const mostRecentRunId = useMostRecentRunId()
   const runQuery = useRunQuery(mostRecentRunId)
   const mostRecentRun = runQuery.data?.data
@@ -91,6 +94,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
     mostRecentRunId != null ? mostRecentRunId : null
   )
   const robotName = useSelector((state: State) => getConnectedRobotName(state))
+  const trackEvent = useTrackEvent()
   const fileInput = React.useRef<HTMLInputElement>(null)
   const [isFileOverDropZone, setIsFileOverDropZone] = React.useState<boolean>(
     false
@@ -148,6 +152,12 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
     : DROP_ZONE_STYLES
 
   const labwareOffsetCount = getLatestLabwareOffsetCount(labwareOffsets ?? [])
+
+  const handleCloneRun = (): void => {
+    trackEvent({ name: 'runAgain', properties: {} })
+    cloneRun()
+    history.push('/run')
+  }
 
   return (
     <Flex
@@ -294,17 +304,19 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
                 {labwareOffsetCount === 0 ? (
                   <Text>{t('no_labware_offset_data')}</Text>
                 ) : (
-                  <Trans
-                    t={t}
-                    i18nKey="labware_offsets_info"
-                    values={{ number: labwareOffsetCount }}
-                  />
+                  <Flex flexDirection={DIRECTION_COLUMN}>
+                    <Trans
+                      t={t}
+                      i18nKey="labware_offsets_info"
+                      values={{ number: labwareOffsetCount }}
+                    />
+                  </Flex>
                 )}
               </Flex>
             </Flex>
             <Flex>
               <NewSecondaryBtn
-                onClick={cloneRun}
+                onClick={handleCloneRun}
                 id={'UploadInput_runAgainButton'}
               >
                 {t('run_again')}

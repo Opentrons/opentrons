@@ -1,8 +1,8 @@
 """Module data resource provider."""
-from opentrons.protocols.geometry.module_geometry import (
-    _load_v2_module_def,
-    module_model_from_string,
-)
+from typing import cast
+from opentrons_shared_data.module import load_definition
+from opentrons_shared_data.module.dev_types import ModuleModel as ModuleModelStr
+
 from ..types import ModuleModel, ModuleDefinition
 
 
@@ -10,9 +10,8 @@ class ModuleDataProvider:
     """Module data provider."""
 
     @staticmethod
-    def get_module_definition(model: ModuleModel) -> ModuleDefinition:
+    def get_definition(model: ModuleModel) -> ModuleDefinition:
         """Get the module definition."""
-        legacy_model = module_model_from_string(model.value)
-        return ModuleDefinition.parse_obj(
-            _load_v2_module_def(module_model=legacy_model)
-        )
+        model_name = cast(ModuleModelStr, model.value)
+        data = load_definition(model_or_loadname=model_name, version="2")
+        return ModuleDefinition.parse_obj(data)

@@ -17,7 +17,7 @@ import {
   FONT_SIZE_BODY_2,
   SPACING_6,
 } from '@opentrons/components'
-import { useCurrentProtocolRun } from '../../ProtocolUpload/hooks'
+import { useCurrentRun } from '../../ProtocolUpload/hooks'
 import { getLatestLabwareOffsetCount } from '../LabwarePositionCheck/utils/getLatestLabwareOffsetCount'
 import { SectionList } from './SectionList'
 import { DeckMap } from './DeckMap'
@@ -32,8 +32,8 @@ export const IntroScreen = (props: {
   const labwareIdsBySection = useLabwareIdsBySection()
   const { t } = useTranslation(['labware_position_check', 'shared'])
 
-  const currentProtocolRun = useCurrentProtocolRun()
-  const currentRunData = currentProtocolRun.runRecord?.data
+  const runRecord = useCurrentRun()
+  const currentRunData = runRecord?.data
   const labwareOffsetCount = getLatestLabwareOffsetCount(
     currentRunData?.labwareOffsets ?? []
   )

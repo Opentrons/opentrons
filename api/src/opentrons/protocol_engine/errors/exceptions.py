@@ -93,11 +93,11 @@ class WellOriginNotAllowedError(ProtocolEngineError):
 
 
 class ModuleNotAttachedError(ProtocolEngineError):
-    """An error raised when no simulating or real modules are found attached."""
+    """An error raised when a requested module is not attached."""
 
 
-class ModuleDefinitionDoesNotExistError(ProtocolEngineError):
-    """An error raised when referencing a module definition that does not exist."""
+class ModuleAlreadyPresentError(ProtocolEngineError):
+    """An error raised when a module is already present in a requested location."""
 
 
 class ModuleIsNotThermocyclerError(ProtocolEngineError):
@@ -106,3 +106,7 @@ class ModuleIsNotThermocyclerError(ProtocolEngineError):
 
 class ThermocyclerNotOpenError(ProtocolEngineError):
     """An error raised when trying to move to labware that's covered inside a TC."""
+
+
+class RobotDoorOpenError(ProtocolEngineError):
+    """An error raised when executing a protocol command when a robot door is open."""

@@ -1,8 +1,10 @@
 import * as React from 'react'
 import { resetAllWhenMocks, when } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { BrowserRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import {
+  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_FINISHING,
   RUN_STATUS_IDLE,
   RUN_STATUS_PAUSED,
@@ -17,6 +19,7 @@ import {
 import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/testModulesProtocol.json'
 
 import { i18n } from '../../../i18n'
+import { useTrackEvent } from '../../../redux/analytics'
 import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
 import * as RobotSelectors from '../../../redux/robot/selectors'
 import * as calibrationSelectors from '../../../redux/calibration/selectors'
@@ -29,22 +32,27 @@ import { useProtocolDetails } from '../../RunDetails/hooks'
 import { ConfirmExitProtocolUploadModal } from '../ConfirmExitProtocolUploadModal'
 import { mockCalibrationStatus } from '../../../redux/calibration/__fixtures__'
 import { useRunStatus, useRunControls } from '../../RunTimeControl/hooks'
-import { useCurrentProtocolRun } from '../hooks/useCurrentProtocolRun'
+import { useCreateRun } from '../hooks/useCreateRun'
+import { useCurrentProtocol } from '../hooks/useCurrentProtocol'
 import { useCloseCurrentRun } from '../hooks/useCloseCurrentRun'
+import { UploadInput } from '../UploadInput'
 import { ProtocolUpload, ProtocolLoader } from '..'
 
 jest.mock('../../../redux/protocol/selectors')
+jest.mock('../../../redux/analytics')
 jest.mock('../../../redux/protocol/utils')
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../../redux/calibration/selectors')
 jest.mock('../../../redux/custom-labware/selectors')
 jest.mock('../../RunDetails/hooks')
-jest.mock('../hooks/useCurrentProtocolRun')
+jest.mock('../hooks/useCurrentProtocol')
+jest.mock('../hooks/useCreateRun')
 jest.mock('../hooks/useCloseCurrentRun')
 jest.mock('../ConfirmExitProtocolUploadModal')
 jest.mock('../../../redux/robot/selectors')
 jest.mock('../../RunTimeControl/hooks')
 jest.mock('../../RunDetails/ConfirmCancelModal')
+jest.mock('../UploadInput')
 
 const getProtocolFile = protocolSelectors.getProtocolFile as jest.MockedFunction<
   typeof protocolSelectors.getProtocolFile
@@ -67,8 +75,11 @@ const mockUseRunStatus = useRunStatus as jest.MockedFunction<
 const mockUseRunControls = useRunControls as jest.MockedFunction<
   typeof useRunControls
 >
-const mockUseCurrentProtocolRun = useCurrentProtocolRun as jest.MockedFunction<
-  typeof useCurrentProtocolRun
+const mockUseCurrentProtocol = useCurrentProtocol as jest.MockedFunction<
+  typeof useCurrentProtocol
+>
+const mockUseCreateRun = useCreateRun as jest.MockedFunction<
+  typeof useCreateRun
 >
 const mockUseCloseProtocolRun = useCloseCurrentRun as jest.MockedFunction<
   typeof useCloseCurrentRun
@@ -79,24 +90,32 @@ const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
 const mockConfirmCancelModal = ConfirmCancelModal as jest.MockedFunction<
   typeof ConfirmCancelModal
 >
+const mockUploadInput = UploadInput as jest.MockedFunction<typeof UploadInput>
 const mockGetConnectedRobotName = RobotSelectors.getConnectedRobotName as jest.MockedFunction<
   typeof RobotSelectors.getConnectedRobotName
 >
 const mockGetValidCustomLabwareFiles = customLabwareSelectors.getValidCustomLabwareFiles as jest.MockedFunction<
   typeof customLabwareSelectors.getValidCustomLabwareFiles
 >
+const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
+  typeof useTrackEvent
+>
+
 const queryClient = new QueryClient()
 
 const render = () => {
   return renderWithProviders(
     <QueryClientProvider client={queryClient}>
-      <ProtocolUpload />
+      <BrowserRouter>
+        <ProtocolUpload />
+      </BrowserRouter>
     </QueryClientProvider>,
     { i18nInstance: i18n }
   )
 }
 
 const mockLoadingText = 'mockLoadingText'
+let mockTrackEvent: jest.Mock
 
 describe('ProtocolUpload', () => {
   beforeEach(() => {
@@ -106,6 +125,11 @@ describe('ProtocolUpload', () => {
     ingestProtocolFile.mockImplementation((_f, _s, _e) => {})
     mockGetConnectedRobotName.mockReturnValue('robotName')
     mockGetValidCustomLabwareFiles.mockReturnValue({} as any)
+    when(mockUseCreateRun).calledWith().mockReturnValue({
+      createProtocolRun: jest.fn(),
+      isCreatingProtocolRun: false,
+      protocolCreationError: null,
+    })
     when(mockConfirmExitProtocolUploadModal)
       .calledWith(
         componentPropsMatcher({
@@ -127,6 +151,9 @@ describe('ProtocolUpload', () => {
     when(mockUseRunControls)
       .calledWith()
       .mockReturnValue({ pause: jest.fn() } as any)
+    mockTrackEvent = jest.fn()
+    when(mockUseTrackEvent).calledWith().mockReturnValue(mockTrackEvent)
+    when(mockUploadInput).mockReturnValue(<div></div>)
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -134,13 +161,7 @@ describe('ProtocolUpload', () => {
   })
 
   it('renders Protocol Upload Input for empty state', () => {
-    when(mockUseCurrentProtocolRun)
-      .calledWith()
-      .mockReturnValue({
-        protocolRecord: null,
-        runRecord: null,
-        createProtocolRun: jest.fn(),
-      } as any)
+    when(mockUseCurrentProtocol).calledWith().mockReturnValue(null)
     when(mockUseCloseProtocolRun).calledWith().mockReturnValue({
       closeCurrentRun: jest.fn(),
       isProtocolRunLoaded: false,
@@ -151,13 +172,9 @@ describe('ProtocolUpload', () => {
   })
   it('renders Protocol Setup if file loaded', () => {
     getProtocolFile.mockReturnValue(withModulesProtocol as any)
-    when(mockUseCurrentProtocolRun)
+    when(mockUseCurrentProtocol)
       .calledWith()
-      .mockReturnValue({
-        protocolRecord: { data: { analyses: [] } },
-        runRecord: {},
-        createProtocolRun: jest.fn(),
-      } as any)
+      .mockReturnValue({ data: { analyses: [] } } as any)
     const { queryByRole, getByText } = render()[0]
     expect(queryByRole('button', { name: 'Choose File...' })).toBeNull()
     expect(getByText('Organization/Author')).toBeTruthy()
@@ -165,13 +182,9 @@ describe('ProtocolUpload', () => {
 
   it('opens up the confirm close protocol modal when clicked', () => {
     getProtocolFile.mockReturnValue(withModulesProtocol as any)
-    when(mockUseCurrentProtocolRun)
+    when(mockUseCurrentProtocol)
       .calledWith()
-      .mockReturnValue({
-        protocolRecord: {},
-        runRecord: {},
-        createProtocolRun: jest.fn(),
-      } as any)
+      .mockReturnValue({} as any)
     const { getByRole, getByText } = render()[0]
 
     fireEvent.click(getByRole('button', { name: 'close' }))
@@ -180,13 +193,9 @@ describe('ProtocolUpload', () => {
 
   it('closes the confirm close protocol modal when Yes, close now is clicked', () => {
     getProtocolFile.mockReturnValue(withModulesProtocol as any)
-    when(mockUseCurrentProtocolRun)
+    when(mockUseCurrentProtocol)
       .calledWith()
-      .mockReturnValue({
-        protocolRecord: {},
-        runRecord: {},
-        createProtocolRun: jest.fn(),
-      } as any)
+      .mockReturnValue({} as any)
     const mockCloseCurrentRun = jest.fn()
     when(mockUseCloseProtocolRun).calledWith().mockReturnValue({
       closeCurrentRun: mockCloseCurrentRun,
@@ -204,13 +213,7 @@ describe('ProtocolUpload', () => {
   })
 
   it('calls ingest protocol if handleUpload', () => {
-    when(mockUseCurrentProtocolRun)
-      .calledWith()
-      .mockReturnValue({
-        protocolRecord: null,
-        runRecord: null,
-        createProtocolRun: jest.fn(),
-      } as any)
+    when(mockUseCurrentProtocol).calledWith().mockReturnValue(null)
     when(mockUseCloseProtocolRun).calledWith().mockReturnValue({
       closeCurrentRun: jest.fn(),
       isProtocolRunLoaded: false,
@@ -222,13 +225,9 @@ describe('ProtocolUpload', () => {
 
   it('renders empty state input if the current run is being closed or has a not-ok status', () => {
     getProtocolFile.mockReturnValue(withModulesProtocol as any)
-    when(mockUseCurrentProtocolRun)
+    when(mockUseCurrentProtocol)
       .calledWith()
-      .mockReturnValue({
-        protocolRecord: {},
-        runRecord: {},
-        createProtocolRun: jest.fn(),
-      } as any)
+      .mockReturnValue({} as any)
     const mockCloseCurrentRun = jest.fn()
     when(mockUseCloseProtocolRun).calledWith().mockReturnValue({
       closeCurrentRun: mockCloseCurrentRun,
@@ -240,13 +239,9 @@ describe('ProtocolUpload', () => {
   })
 
   it('renders the cancel button, button is clickable, and cancel modal is rendered when run status is running', () => {
-    when(mockUseCurrentProtocolRun)
+    when(mockUseCurrentProtocol)
       .calledWith()
-      .mockReturnValue({
-        protocolRecord: { data: { analyses: [] } },
-        runRecord: {},
-        createProtocolRun: jest.fn(),
-      } as any)
+      .mockReturnValue({ data: { analyses: [] } } as any)
     when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_RUNNING)
     when(mockConfirmCancelModal).mockReturnValue(
       <div>mock confirm cancel modal</div>
@@ -258,13 +253,9 @@ describe('ProtocolUpload', () => {
   })
 
   it('renders the cancel button, button is clickable, and cancel modal is rendered when run status is paused', () => {
-    when(mockUseCurrentProtocolRun)
+    when(mockUseCurrentProtocol)
       .calledWith()
-      .mockReturnValue({
-        protocolRecord: { data: { analyses: [] } },
-        runRecord: {},
-        createProtocolRun: jest.fn(),
-      } as any)
+      .mockReturnValue({ data: { analyses: [] } } as any)
     when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_PAUSED)
     when(mockConfirmCancelModal).mockReturnValue(
       <div>mock confirm cancel modal</div>
@@ -276,13 +267,9 @@ describe('ProtocolUpload', () => {
   })
 
   it('renders the cancel button, button is clickable, and cancel modal is rendered when run status is pause requested', () => {
-    when(mockUseCurrentProtocolRun)
+    when(mockUseCurrentProtocol)
       .calledWith()
-      .mockReturnValue({
-        protocolRecord: { data: { analyses: [] } },
-        runRecord: {},
-        createProtocolRun: jest.fn(),
-      } as any)
+      .mockReturnValue({ data: { analyses: [] } } as any)
     when(mockUseRunStatus)
       .calledWith()
       .mockReturnValue(RUN_STATUS_PAUSE_REQUESTED)
@@ -295,15 +282,13 @@ describe('ProtocolUpload', () => {
     expect(screen.queryByText('mock confirm cancel modal')).not.toBeNull()
   })
 
-  it('renders the cancel button, button is clickable, and cancel modal is rendered when run status is finishing', () => {
-    when(mockUseCurrentProtocolRun)
+  it('renders the cancel button, button is clickable, and cancel modal is rendered when run status is blocked by open door', () => {
+    when(mockUseCurrentProtocol)
       .calledWith()
-      .mockReturnValue({
-        protocolRecord: { data: { analyses: [] } },
-        runRecord: {},
-        createProtocolRun: jest.fn(),
-      } as any)
-    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_FINISHING)
+      .mockReturnValue({ data: { analyses: [] } } as any)
+    when(mockUseRunStatus)
+      .calledWith()
+      .mockReturnValue(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
     when(mockConfirmCancelModal).mockReturnValue(
       <div>mock confirm cancel modal</div>
     )
@@ -313,14 +298,34 @@ describe('ProtocolUpload', () => {
     expect(screen.queryByText('mock confirm cancel modal')).not.toBeNull()
   })
 
-  it('renders only the protocol title with no button when run status is stop requested', () => {
-    when(mockUseCurrentProtocolRun)
+  it('renders the cancel button, button is clickable, and cancel modal is rendered when run status is finishing', () => {
+    when(mockUseCurrentProtocol)
       .calledWith()
-      .mockReturnValue({
-        protocolRecord: { data: { analyses: [] } },
-        runRecord: {},
-        createProtocolRun: jest.fn(),
-      } as any)
+      .mockReturnValue({ data: { analyses: [] } } as any)
+    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_FINISHING)
+    when(mockConfirmCancelModal).mockReturnValue(
+      <div>mock confirm cancel modal</div>
+    )
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Cancel Run' })
+    fireEvent.click(button)
+    expect(screen.queryByText('mock confirm cancel modal')).not.toBeNull()
+  })
+  it('renders protocol title', () => {
+    when(mockUseCurrentProtocol)
+      .calledWith()
+      .mockReturnValue({ data: { analyses: [withModulesProtocol] } } as any)
+    mockUseProtocolDetails.mockReturnValue({
+      displayName: 'mock protocol name',
+    } as any)
+    const [{ getByText }] = render()
+    getByText('Protocol - mock protocol name')
+  })
+
+  it('renders only the protocol title with no button when run status is stop requested', () => {
+    when(mockUseCurrentProtocol)
+      .calledWith()
+      .mockReturnValue({ data: { analyses: [] } } as any)
     when(mockUseRunStatus)
       .calledWith()
       .mockReturnValue(RUN_STATUS_STOP_REQUESTED)
@@ -333,25 +338,21 @@ describe('ProtocolUpload', () => {
 
   it('renders an error if protocol has a not-ok result', () => {
     getProtocolFile.mockReturnValue(withModulesProtocol as any)
-    when(mockUseCurrentProtocolRun)
+    when(mockUseCurrentProtocol)
       .calledWith()
       .mockReturnValue({
-        protocolRecord: {
-          data: {
-            analyses: [
-              {
-                result: 'not-ok',
-                errors: [
-                  {
-                    detail: 'FAKE ERROR',
-                  },
-                ],
-              },
-            ],
-          },
+        data: {
+          analyses: [
+            {
+              result: 'not-ok',
+              errors: [
+                {
+                  detail: 'FAKE ERROR',
+                },
+              ],
+            },
+          ],
         },
-        runRecord: {},
-        createProtocolRun: jest.fn(),
       } as any)
     const mockCloseCurrentRun = jest.fn()
     when(mockUseCloseProtocolRun).calledWith().mockReturnValue({
@@ -363,14 +364,14 @@ describe('ProtocolUpload', () => {
     getByText('FAKE ERROR')
   })
   it('renders an error if the protocol is invalid', () => {
-    when(mockUseCurrentProtocolRun)
+    when(mockUseCurrentProtocol)
       .calledWith()
-      .mockReturnValue({
-        protocolRecord: {},
-        runRecord: {},
-        createProtocolRun: jest.fn(),
-        protocolCreationError: 'invalid protocol!',
-      } as any)
+      .mockReturnValue({} as any)
+    when(mockUseCreateRun).calledWith().mockReturnValue({
+      createProtocolRun: jest.fn(),
+      isCreatingProtocolRun: false,
+      protocolCreationError: 'invalid protocol!',
+    })
     const [{ getByText }] = render()
     getByText('Protocol upload failed. Fix the error and try again')
     getByText('invalid protocol!')

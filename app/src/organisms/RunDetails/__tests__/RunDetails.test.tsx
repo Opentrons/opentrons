@@ -11,6 +11,7 @@ import {
   RUN_STATUS_PAUSED,
   RUN_STATUS_PAUSE_REQUESTED,
   RUN_STATUS_STOP_REQUESTED,
+  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
 } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
 import { resetAllWhenMocks, when } from 'jest-when'
@@ -20,6 +21,7 @@ import { CommandList } from '../CommandList'
 import { useProtocolDetails } from '../hooks'
 import { useRunStatus, useRunControls } from '../../RunTimeControl/hooks'
 import { useCloseCurrentRun } from '../../ProtocolUpload/hooks/useCloseCurrentRun'
+import { ProtocolLoader } from '../../ProtocolUpload'
 import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
 import type { ProtocolFile } from '@opentrons/shared-data'
 
@@ -141,6 +143,15 @@ describe('RunDetails', () => {
     expect(button).toBeEnabled()
   })
 
+  it('renders a cancel run button when the status is paused by door open', () => {
+    when(mockUseRunStatus)
+      .calledWith()
+      .mockReturnValue(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
+    const { getByRole } = render()
+    const button = getByRole('button', { name: 'Cancel Run' })
+    expect(button).toBeEnabled()
+  })
+
   it('renders the protocol close button, button is clickable, and confirm close protocol modal is rendered when status is succeeded', () => {
     when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_SUCCEEDED)
     const { getByRole, getByText } = render()
@@ -189,14 +200,25 @@ describe('RunDetails', () => {
     expect(button).not.toBeInTheDocument()
   })
 
-  it('renders null if protocol run is not loaded', () => {
+  const renderProtocolLoader = (
+    props: React.ComponentProps<typeof ProtocolLoader>
+  ) => {
+    return renderWithProviders(<ProtocolLoader {...props} />)[0]
+  }
+
+  let props: React.ComponentProps<typeof ProtocolLoader>
+  beforeEach(() => {
+    props = { loadingText: 'Loading Protocol' }
+  })
+
+  it('renders a loader if protocol run is not loaded', () => {
     when(mockUseCloseCurrentRun)
       .calledWith()
       .mockReturnValue({
         isProtocolRunLoaded: false,
         closeCurrentRun: jest.fn(),
       } as any)
-    const { container } = render()
-    expect(container.firstChild).toBeNull()
+    const { getByText } = renderProtocolLoader(props)
+    getByText('Loading Protocol')
   })
 })

@@ -33,6 +33,28 @@ class RunCommandSummary(ResourceModel):
     )
 
 
+class RunSummary(ResourceModel):
+    """A stripped down model of a full Run for usage in a Runs collection response."""
+
+    id: str = Field(..., description="Unique run identifier.")
+    status: RunStatus = Field(..., description="Execution status of the run")
+    createdAt: datetime = Field(..., description="When the run was created")
+    current: bool = Field(
+        ...,
+        description=(
+            "Whether this run is currently controlling the robot."
+            " There can be, at most, one current run."
+        ),
+    )
+    protocolId: Optional[str] = Field(
+        None,
+        description=(
+            "Protocol resource being run, if any. If not present, the run may"
+            " still be used to execute protocol commands over HTTP."
+        ),
+    )
+
+
 class Run(ResourceModel):
     """Run resource model."""
 

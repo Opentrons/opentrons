@@ -30,7 +30,7 @@ export interface NetworkInterface {
   family: string
   mac: string
   internal: boolean
-  cidr: string
+  cidr: string | null
   scopeid?: number
 }
 

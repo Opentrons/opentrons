@@ -4,7 +4,6 @@ from typing import Optional, Tuple, Dict, Type
 from opentrons.hardware_control import ThreadManagedHardware, ThreadedAsyncLock
 
 from robot_server.service.errors import RobotServerError, CommonErrorDef
-from robot_server.service.protocol.manager import ProtocolManager
 from robot_server.service.session.errors import (
     SessionCreationException,
     SessionException,
@@ -23,7 +22,6 @@ from robot_server.service.session.session_types import (
 from robot_server.service.session.session_types.live_protocol.session import (
     LiveProtocolSession,
 )
-from robot_server.service.session.session_types.protocol.session import ProtocolSession
 
 log = logging.getLogger(__name__)
 
@@ -32,7 +30,6 @@ SessionTypeToClass: Dict[SessionType, Type[BaseSession]] = {
     SessionType.tip_length_calibration: TipLengthCalibration,
     SessionType.deck_calibration: DeckCalibrationSession,
     SessionType.pipette_offset_calibration: PipetteOffsetCalibrationSession,
-    SessionType.protocol: ProtocolSession,
     SessionType.live_protocol: LiveProtocolSession,
 }
 
@@ -44,13 +41,11 @@ class SessionManager:
         self,
         hardware: ThreadManagedHardware,
         motion_lock: ThreadedAsyncLock,
-        protocol_manager: ProtocolManager,
     ):
         """
         Construct the session manager
 
         :param hardware: ThreadManagedHardware to interact with hardware
-        :param protocol_manager: ProtocolManager for protocol related sessions
         """
         self._sessions: Dict[IdentifierType, BaseSession] = {}
         self._active = ActiveSessionId()
@@ -59,7 +54,6 @@ class SessionManager:
             hardware=hardware,
             is_active=self.is_active,
             motion_lock=motion_lock,
-            protocol_manager=protocol_manager,
         )
 
     async def add(
