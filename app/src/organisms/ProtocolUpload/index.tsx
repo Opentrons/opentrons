@@ -34,9 +34,7 @@ import {
 import { Page } from '../../atoms/Page'
 import { UploadInput } from './UploadInput'
 import { ProtocolSetup } from '../ProtocolSetup'
-import { useCurrentProtocol } from './hooks/useCurrentProtocol'
-import { useCreateRun } from './hooks/useCreateRun'
-import { useCloseCurrentRun } from './hooks/useCloseCurrentRun'
+import { useCurrentProtocol, useCreateRun, useCloseCurrentRun, useIsProtocolRunLoaded } from './hooks'
 import { loadProtocol } from '../../redux/protocol/actions'
 import { ingestProtocolFile } from '../../redux/protocol/utils'
 import { getConnectedRobotName } from '../../redux/robot/selectors'
@@ -70,7 +68,8 @@ export function ProtocolUpload(): JSX.Element {
   } = useCreateRun()
   const runStatus = useRunStatus()
   const { displayName } = useProtocolDetails()
-  const { closeCurrentRun, isProtocolRunLoaded } = useCloseCurrentRun()
+  const isProtocolRunLoaded = useIsProtocolRunLoaded()
+  const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   const robotName = useSelector((state: State) => getConnectedRobotName(state))
   const customLabwareFiles = useSelector((state: State) =>
     getValidCustomLabwareFiles(state)
@@ -168,6 +167,7 @@ export function ProtocolUpload(): JSX.Element {
   let titleBarProps
   if (
     isProtocolRunLoaded &&
+    !isClosingCurrentRun &&
     !isRunInMotion &&
     runStatus !== RUN_STATUS_STOP_REQUESTED
   ) {
@@ -203,7 +203,7 @@ export function ProtocolUpload(): JSX.Element {
     }
   }
 
-  const pageContents = isProtocolRunLoaded ? (
+  const pageContents = isProtocolRunLoaded && !isClosingCurrentRun ? (
     <ProtocolSetup />
   ) : (
     <UploadInput onUpload={handleUpload} />

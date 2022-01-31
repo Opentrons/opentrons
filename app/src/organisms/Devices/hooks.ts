@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 
-import { useCurrentRun } from '../../organisms/ProtocolUpload/hooks'
+import { useRunStatus } from '../../organisms/RunTimeControl/hooks'
 import { getDiscoverableRobotByName } from '../../redux/discovery'
 import { fetchModules, getAttachedModules } from '../../redux/modules'
 import { fetchPipettes, getAttachedPipettes } from '../../redux/pipettes'
@@ -82,11 +82,10 @@ export function useLights(
 }
 
 export function useIsProtocolRunning(): boolean {
-  const runRecord = useCurrentRun()
+  const runStatus = useRunStatus()
 
   // may want to adjust the condition that shows the active run - only running, paused, etc
-  const isProtocolRunning =
-    runRecord != null && runRecord.data.status !== RUN_STATUS_IDLE
+  const isProtocolRunning = runStatus != null && runStatus !== RUN_STATUS_IDLE
 
   return isProtocolRunning
 }

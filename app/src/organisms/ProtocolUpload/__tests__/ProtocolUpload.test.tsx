@@ -32,9 +32,12 @@ import { useProtocolDetails } from '../../RunDetails/hooks'
 import { ConfirmExitProtocolUploadModal } from '../ConfirmExitProtocolUploadModal'
 import { mockCalibrationStatus } from '../../../redux/calibration/__fixtures__'
 import { useRunStatus, useRunControls } from '../../RunTimeControl/hooks'
-import { useCreateRun } from '../hooks/useCreateRun'
-import { useCurrentProtocol } from '../hooks/useCurrentProtocol'
-import { useCloseCurrentRun } from '../hooks/useCloseCurrentRun'
+import {
+  useCreateRun,
+  useCurrentProtocol,
+  useCloseCurrentRun,
+  useIsProtocolRunLoaded,
+} from '../hooks'
 import { UploadInput } from '../UploadInput'
 import { ProtocolUpload, ProtocolLoader } from '..'
 
@@ -45,9 +48,7 @@ jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../../redux/calibration/selectors')
 jest.mock('../../../redux/custom-labware/selectors')
 jest.mock('../../RunDetails/hooks')
-jest.mock('../hooks/useCurrentProtocol')
-jest.mock('../hooks/useCreateRun')
-jest.mock('../hooks/useCloseCurrentRun')
+jest.mock('../hooks')
 jest.mock('../ConfirmExitProtocolUploadModal')
 jest.mock('../../../redux/robot/selectors')
 jest.mock('../../RunTimeControl/hooks')
@@ -80,6 +81,9 @@ const mockUseCurrentProtocol = useCurrentProtocol as jest.MockedFunction<
 >
 const mockUseCreateRun = useCreateRun as jest.MockedFunction<
   typeof useCreateRun
+>
+const mockUseIsProtocolRunLoaded = useIsProtocolRunLoaded as jest.MockedFunction<
+  typeof useIsProtocolRunLoaded
 >
 const mockUseCloseProtocolRun = useCloseCurrentRun as jest.MockedFunction<
   typeof useCloseCurrentRun
@@ -145,8 +149,9 @@ describe('ProtocolUpload', () => {
       .mockReturnValue({} as any)
     when(mockUseCloseProtocolRun).calledWith().mockReturnValue({
       closeCurrentRun: jest.fn(),
-      isProtocolRunLoaded: true,
+      isClosingCurrentRun: false,
     })
+    when(mockUseIsProtocolRunLoaded).calledWith().mockReturnValue(true)
     when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_IDLE)
     when(mockUseRunControls)
       .calledWith()
@@ -162,10 +167,7 @@ describe('ProtocolUpload', () => {
 
   it('renders Protocol Upload Input for empty state', () => {
     when(mockUseCurrentProtocol).calledWith().mockReturnValue(null)
-    when(mockUseCloseProtocolRun).calledWith().mockReturnValue({
-      closeCurrentRun: jest.fn(),
-      isProtocolRunLoaded: false,
-    })
+    when(mockUseIsProtocolRunLoaded).calledWith().mockReturnValue(false)
     mockGetConnectedRobotName.mockReturnValue(null)
     const { queryByText } = render()[0]
     expect(queryByText('Organization/Author')).toBeNull()
@@ -199,8 +201,9 @@ describe('ProtocolUpload', () => {
     const mockCloseCurrentRun = jest.fn()
     when(mockUseCloseProtocolRun).calledWith().mockReturnValue({
       closeCurrentRun: mockCloseCurrentRun,
-      isProtocolRunLoaded: true,
+      isClosingCurrentRun: true,
     })
+    when(mockUseIsProtocolRunLoaded).calledWith().mockReturnValue(false)
 
     const [{ getByRole, getByText }] = render()
     fireEvent.click(getByRole('button', { name: 'close' }))
@@ -214,11 +217,8 @@ describe('ProtocolUpload', () => {
 
   it('calls ingest protocol if handleUpload', () => {
     when(mockUseCurrentProtocol).calledWith().mockReturnValue(null)
-    when(mockUseCloseProtocolRun).calledWith().mockReturnValue({
-      closeCurrentRun: jest.fn(),
-      isProtocolRunLoaded: false,
-    })
 
+    when(mockUseIsProtocolRunLoaded).calledWith().mockReturnValue(false)
     const { getByText } = render()[0]
     getByText('Open a protocol to run on robotName')
   })
@@ -231,8 +231,9 @@ describe('ProtocolUpload', () => {
     const mockCloseCurrentRun = jest.fn()
     when(mockUseCloseProtocolRun).calledWith().mockReturnValue({
       closeCurrentRun: mockCloseCurrentRun,
-      isProtocolRunLoaded: false,
+      isClosingCurrentRun: false,
     })
+    when(mockUseIsProtocolRunLoaded).calledWith().mockReturnValue(false)
 
     const [{ getByText }] = render()
     getByText('Open a protocol to run on robotName')
@@ -357,9 +358,10 @@ describe('ProtocolUpload', () => {
     const mockCloseCurrentRun = jest.fn()
     when(mockUseCloseProtocolRun).calledWith().mockReturnValue({
       closeCurrentRun: mockCloseCurrentRun,
-      isProtocolRunLoaded: false,
+      isClosingCurrentRun: false,
     })
 
+    when(mockUseIsProtocolRunLoaded).calledWith().mockReturnValue(false)
     const [{ getByText }] = render()
     getByText('FAKE ERROR')
   })

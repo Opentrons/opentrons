@@ -20,6 +20,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { useCloneRun, useCurrentRun } from '../ProtocolUpload/hooks'
+import { QueryOptions } from '@testing-library/react'
 
 interface RunControls {
   play: () => void
@@ -62,16 +63,20 @@ export function useRunControls(): RunControls {
   }
 }
 
-export function useRunStatus(): RunStatus | null {
+const DEFAULT_STATUS_REFETCH_INTERVAL = 10000 // 10 seconds
+// TODO: remove refetch interval, and pas through optional options param,
+// get runStartTime from top level timestamp
+export function useRunStatus(options?: QueryOptions): RunStatus | null {
   const runRecord = useCurrentRun()
 
   const currentRunId = runRecord?.data?.id
 
   const { data } = useRunQuery(currentRunId ?? null, {
-    refetchInterval: 1000,
+    refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+    ...options,
   })
 
-  const runStatus = data?.data.status as RunStatus
+  const runStatus = data?.data?.status as RunStatus
 
   const actions = data?.data?.actions as RunAction[]
   const firstPlay = actions?.find(

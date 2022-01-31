@@ -9,15 +9,13 @@ type CloseCallback = (options?: UseDismissCurrentRunMutationOptions) => void
 
 export function useCloseCurrentRun(): {
   closeCurrentRun: CloseCallback
-  isProtocolRunLoaded: boolean
+  isClosingCurrentRun: boolean
 } {
   const currentRunId = useCurrentRunId()
   const {
     dismissCurrentRun,
     isLoading: isDismissing,
   } = useDismissCurrentRunMutation()
-  const protocolRecord = useCurrentProtocol()
-  const runRecord = useCurrentRun()
 
   const closeCurrentRun = (
     options?: UseDismissCurrentRunMutationOptions
@@ -31,21 +29,11 @@ export function useCloseCurrentRun(): {
   }
   const closeCurrentRunCallback = React.useCallback(closeCurrentRun, [
     dismissCurrentRun,
-    runRecord,
     currentRunId,
   ])
 
-  const analysisNotOk =
-    protocolRecord?.data?.analyses[0] != null &&
-    'result' in protocolRecord.data.analyses[0] &&
-    protocolRecord.data.analyses[0].result === 'not-ok'
-
   return {
     closeCurrentRun: closeCurrentRunCallback,
-    isProtocolRunLoaded:
-      !isDismissing &&
-      runRecord != null &&
-      protocolRecord != null &&
-      !analysisNotOk,
+    isClosingCurrentRun: isDismissing,
   }
 }
