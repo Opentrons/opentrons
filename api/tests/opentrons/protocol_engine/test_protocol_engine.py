@@ -1,7 +1,10 @@
 """Tests for the ProtocolEngine class."""
-import pytest
 from datetime import datetime
 from decoy import Decoy
+from typing import AsyncGenerator
+
+import pytest
+from anyio import to_thread
 
 from opentrons.types import DeckSlotName, MountType
 from opentrons.hardware_control import API as HardwareAPI
@@ -80,7 +83,7 @@ def hardware_stopper(decoy: Decoy) -> HardwareStopper:
 
 
 @pytest.fixture
-def subject(
+async def base_subject(
     hardware_api: HardwareAPI,
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
@@ -99,6 +102,13 @@ def subject(
         model_utils=model_utils,
         hardware_stopper=hardware_stopper,
     )
+
+
+@pytest.fixture
+async def subject(base_subject: ProtocolEngine) -> AsyncGenerator[ProtocolEngine, None]:
+    """Get a ProtocolEngine test subject and cleanup after use."""
+    yield base_subject
+    await base_subject.finish()
 
 
 def test_create_starts_queue_worker(
@@ -252,7 +262,7 @@ def test_pause(
     )
 
 
-def test_hardware_event_handler(
+async def test_hardware_event_handler(
     decoy: Decoy,
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
@@ -260,10 +270,10 @@ def test_hardware_event_handler(
 ) -> None:
     """It should be able to pause executing queued commands."""
     door_open_event = DoorStateNotification(new_state=DoorState.OPEN, blocking=True)
-
     expected_action = HardwareEventAction(door_open_event)
 
-    subject.hardware_event_handler(door_open_event)
+    # Call the event handler callback function from a separate thread
+    await to_thread.run_sync(subject.hardware_event_handler, door_open_event)
 
     decoy.verify(
         action_dispatcher.dispatch(expected_action),
@@ -331,7 +341,7 @@ async def test_finish_stops_hardware_if_queue_worker_join_fails(
     decoy: Decoy,
     queue_worker: QueueWorker,
     hardware_api: HardwareAPI,
-    subject: ProtocolEngine,
+    base_subject: ProtocolEngine,
     hardware_stopper: HardwareStopper,
 ) -> None:
     """It should be able to stop the engine."""
@@ -340,7 +350,7 @@ async def test_finish_stops_hardware_if_queue_worker_join_fails(
     ).then_raise(RuntimeError("oh no"))
 
     with pytest.raises(RuntimeError, match="oh no"):
-        await subject.finish()
+        await base_subject.finish()
 
     decoy.verify(
         await hardware_stopper.do_stop_and_recover(drop_tips_and_home=True),
