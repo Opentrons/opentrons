@@ -34,7 +34,12 @@ import {
 import { Page } from '../../atoms/Page'
 import { UploadInput } from './UploadInput'
 import { ProtocolSetup } from '../ProtocolSetup'
-import { useCurrentProtocol, useCreateRun, useCloseCurrentRun, useIsProtocolRunLoaded } from './hooks'
+import {
+  useCurrentProtocol,
+  useCreateRun,
+  useCloseCurrentRun,
+  useIsProtocolRunLoaded,
+} from './hooks'
 import { loadProtocol } from '../../redux/protocol/actions'
 import { ingestProtocolFile } from '../../redux/protocol/utils'
 import { getConnectedRobotName } from '../../redux/robot/selectors'
@@ -203,11 +208,12 @@ export function ProtocolUpload(): JSX.Element {
     }
   }
 
-  const pageContents = isProtocolRunLoaded && !isClosingCurrentRun ? (
-    <ProtocolSetup />
-  ) : (
-    <UploadInput onUpload={handleUpload} />
-  )
+  const pageContents =
+    isProtocolRunLoaded && !isClosingCurrentRun ? (
+      <ProtocolSetup />
+    ) : (
+      <UploadInput onUpload={handleUpload} />
+    )
 
   const pageDisplay =
     isCreatingProtocolRun || isStatusFinishing ? (

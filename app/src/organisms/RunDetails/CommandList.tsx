@@ -50,6 +50,9 @@ interface CommandRuntimeInfo {
   runCommandSummary: RunCommandSummary | null
 }
 
+// use state for the cursor whcih defaults to null
+// grab the current command id from the all command response
+// remove command detials fetching , don't remvoe  but make it way les
 export function CommandList(): JSX.Element | null {
   const { t } = useTranslation('run_details')
   const protocolData: ProtocolFile<{}> | null = useProtocolDetails()
@@ -97,11 +100,7 @@ export function CommandList(): JSX.Element | null {
     })
   )
   let postPlayRunCommands: CommandRuntimeInfo[] = []
-  if (
-    runCommands != null &&
-    runCommands.length > 0 &&
-    runStartTime != null
-  ) {
+  if (runCommands != null && runCommands.length > 0 && runStartTime != null) {
     const firstPostPlayRunCommandIndex = runCommands.findIndex(
       command => command.key === postSetupAnticipatedCommands[0]?.key
     )

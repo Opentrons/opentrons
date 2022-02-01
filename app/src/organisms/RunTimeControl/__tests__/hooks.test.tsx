@@ -18,8 +18,12 @@ import {
   useRunActionMutations,
 } from '@opentrons/react-api-client'
 
-import { useCloneRun } from '../../ProtocolUpload/hooks/useCloneRun'
-import { useCurrentRun } from '../../ProtocolUpload/hooks/useCurrentRun'
+import {
+  useCloneRun,
+  useCurrentRun,
+  useCurrentRunId,
+  useCurrentRunCommands,
+} from '../../ProtocolUpload/hooks'
 
 import {
   useRunCompleteTime,
@@ -32,12 +36,17 @@ import {
 
 import type { Run, RunData, CommandDetail } from '@opentrons/api-client'
 jest.mock('@opentrons/react-api-client')
-jest.mock('../../ProtocolUpload/hooks/useCloneRun')
-jest.mock('../../ProtocolUpload/hooks/useCurrentRun')
+jest.mock('../../ProtocolUpload/hooks')
 
 const mockUseCloneRun = useCloneRun as jest.MockedFunction<typeof useCloneRun>
 const mockUseCurrentRun = useCurrentRun as jest.MockedFunction<
   typeof useCurrentRun
+>
+const mockUseCurrentRunCommands = useCurrentRunCommands as jest.MockedFunction<
+  typeof useCurrentRunCommands
+>
+const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
+  typeof useCurrentRunId
 >
 const mockUseCommandQuery = useCommandQuery as jest.MockedFunction<
   typeof useCommandQuery
@@ -70,7 +79,6 @@ const mockPausedRun: RunData = {
       actionType: RUN_ACTION_TYPE_PAUSE,
     },
   ],
-  commands: [],
   errors: [],
   pipettes: [],
   labware: [],
@@ -99,7 +107,6 @@ const mockRunningRun: RunData = {
       actionType: RUN_ACTION_TYPE_PLAY,
     },
   ],
-  commands: [],
   errors: [],
   pipettes: [],
   labware: [],
@@ -128,9 +135,6 @@ const mockFailedRun: RunData = {
       actionType: RUN_ACTION_TYPE_PLAY,
     },
   ],
-  commands: [
-    { id: COMMAND_ID, commandType: 'custom', status: 'succeeded' },
-  ] as any,
   errors: [
     {
       id: '5',
@@ -171,9 +175,6 @@ const mockStoppedRun: RunData = {
       actionType: RUN_ACTION_TYPE_STOP,
     },
   ],
-  commands: [
-    { id: COMMAND_ID, commandType: 'custom', status: 'succeeded' },
-  ] as any,
   errors: [],
   pipettes: [],
   labware: [],
@@ -202,9 +203,6 @@ const mockSucceededRun: RunData = {
       actionType: RUN_ACTION_TYPE_PLAY,
     },
   ],
-  commands: [
-    { id: COMMAND_ID, commandType: 'custom', status: 'succeeded' },
-  ] as any,
   errors: [],
   pipettes: [],
   labware: [],
@@ -217,7 +215,6 @@ const mockIdleUnstartedRun: RunData = {
   status: RUN_STATUS_IDLE,
   protocolId: PROTOCOL_ID,
   actions: [],
-  commands: [],
   errors: [],
   pipettes: [],
   labware: [],
@@ -246,9 +243,6 @@ const mockIdleStartedRun: RunData = {
       actionType: RUN_ACTION_TYPE_PLAY,
     },
   ],
-  commands: [
-    { id: COMMAND_ID, commandType: 'custom', status: 'succeeded' },
-  ] as any,
   errors: [],
   pipettes: [],
   labware: [],
@@ -257,11 +251,14 @@ const mockIdleStartedRun: RunData = {
 const mockCommand = {
   data: {
     id: COMMAND_ID,
-    createdAt: 'noon thirty',
+    completedAt: 'noon thirty',
   },
 } as CommandDetail
 
 describe('useRunControls hook', () => {
+  beforeEach(() => {
+    when(mockUseCurrentRunId).calledWith().mockReturnValue(RUN_ID_2)
+  })
   afterEach(() => {
     resetAllWhenMocks()
   })
@@ -271,11 +268,7 @@ describe('useRunControls hook', () => {
     const mockStopRun = jest.fn()
     const mockCloneRun = jest.fn()
 
-    when(mockUseCurrentRun)
-      .calledWith()
-      .mockReturnValue({
-        data: mockPausedRun,
-      } as Run)
+    when(mockUseCurrentRunId).calledWith().mockReturnValue(mockPausedRun.id)
     when(mockUseRunActionMutations).calledWith('1').mockReturnValue({
       playRun: mockPlayRun,
       pauseRun: mockPauseRun,
@@ -302,18 +295,16 @@ describe('useRunControls hook', () => {
 })
 
 describe('useRunStatus hook', () => {
+  beforeEach(() => {
+    when(mockUseCurrentRunId).calledWith().mockReturnValue(RUN_ID_2)
+  })
   afterEach(() => {
     resetAllWhenMocks()
   })
 
   it('returns the run status of the current run', async () => {
-    when(mockUseCurrentRun)
-      .calledWith()
-      .mockReturnValue({
-        data: mockRunningRun,
-      } as Run)
     when(mockUseRunQuery)
-      .calledWith(RUN_ID_2, { refetchInterval: 1000 })
+      .calledWith(RUN_ID_2, { refetchInterval: 10000 })
       .mockReturnValue(({
         data: { data: mockRunningRun },
       } as unknown) as UseQueryResult<Run>)
@@ -323,13 +314,8 @@ describe('useRunStatus hook', () => {
   })
 
   it('returns a "idle" run status if idle and run unstarted', () => {
-    when(mockUseCurrentRun)
-      .calledWith()
-      .mockReturnValue({
-        data: mockIdleUnstartedRun,
-      } as Run)
     when(mockUseRunQuery)
-      .calledWith(RUN_ID_2, { refetchInterval: 1000 })
+      .calledWith(RUN_ID_2, { refetchInterval: 10000 })
       .mockReturnValue(({
         data: { data: mockIdleUnstartedRun },
       } as unknown) as UseQueryResult<Run>)
@@ -339,13 +325,8 @@ describe('useRunStatus hook', () => {
   })
 
   it('returns a "running" run status if idle and run started', () => {
-    when(mockUseCurrentRun)
-      .calledWith()
-      .mockReturnValue({
-        data: mockIdleStartedRun,
-      } as Run)
     when(mockUseRunQuery)
-      .calledWith(RUN_ID_2, { refetchInterval: 1000 })
+      .calledWith(RUN_ID_2, { refetchInterval: 10000 })
       .mockReturnValue(({
         data: { data: mockIdleStartedRun },
       } as unknown) as UseQueryResult<Run>)
@@ -454,16 +435,27 @@ describe('useRunStopTime hook', () => {
 })
 
 describe('useRunCompleteTime hook', () => {
+  beforeEach(() => {
+    when(mockUseCurrentRunId).calledWith().mockReturnValue(RUN_ID_2)
+  })
   afterEach(() => {
     resetAllWhenMocks()
   })
 
   it('returns the complete time of a successful current run', async () => {
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID_2, { refetchInterval: 10000 })
+      .mockReturnValue(({
+        data: { data: mockSucceededRun },
+      } as unknown) as UseQueryResult<Run>)
     when(mockUseCurrentRun)
       .calledWith()
       .mockReturnValue({
         data: mockSucceededRun,
       } as Run)
+    when(mockUseCurrentRunCommands)
+      .calledWith()
+      .mockReturnValue([mockCommand.data as any])
     when(mockUseCommandQuery)
       .calledWith(RUN_ID_2, COMMAND_ID)
       .mockReturnValue({
@@ -475,11 +467,20 @@ describe('useRunCompleteTime hook', () => {
   })
 
   it('returns the complete time of a failed current run', async () => {
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID_2, { refetchInterval: 10000 })
+      .mockReturnValue(({
+        data: { data: mockFailedRun },
+      } as unknown) as UseQueryResult<Run>)
+    when(mockUseCurrentRunCommands)
+      .calledWith()
+      .mockReturnValue([mockCommand.data as any])
     when(mockUseCurrentRun)
       .calledWith()
       .mockReturnValue({
         data: mockFailedRun,
       } as Run)
+    when(mockUseCurrentRunId).calledWith().mockReturnValue(RUN_ID_2)
     when(mockUseCommandQuery)
       .calledWith(RUN_ID_2, COMMAND_ID)
       .mockReturnValue({
@@ -491,11 +492,20 @@ describe('useRunCompleteTime hook', () => {
   })
 
   it('returns the complete time of a stopped current run', async () => {
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID_2, { refetchInterval: 10000 })
+      .mockReturnValue(({
+        data: { data: mockStoppedRun },
+      } as unknown) as UseQueryResult<Run>)
+    when(mockUseCurrentRunCommands)
+      .calledWith()
+      .mockReturnValue([mockCommand.data as any])
     when(mockUseCurrentRun)
       .calledWith()
       .mockReturnValue({
         data: mockStoppedRun,
       } as Run)
+    when(mockUseCurrentRunId).calledWith().mockReturnValue(RUN_ID_2)
     when(mockUseCommandQuery)
       .calledWith(RUN_ID_2, COMMAND_ID)
       .mockReturnValue({

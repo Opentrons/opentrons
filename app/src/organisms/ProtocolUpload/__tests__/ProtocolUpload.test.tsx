@@ -201,9 +201,9 @@ describe('ProtocolUpload', () => {
     const mockCloseCurrentRun = jest.fn()
     when(mockUseCloseProtocolRun).calledWith().mockReturnValue({
       closeCurrentRun: mockCloseCurrentRun,
-      isClosingCurrentRun: true,
+      isClosingCurrentRun: false,
     })
-    when(mockUseIsProtocolRunLoaded).calledWith().mockReturnValue(false)
+    when(mockUseIsProtocolRunLoaded).calledWith().mockReturnValue(true)
 
     const [{ getByRole, getByText }] = render()
     fireEvent.click(getByRole('button', { name: 'close' }))

@@ -11,13 +11,15 @@ import {
 } from '@opentrons/shared-data'
 import {
   useHost,
-  useAllCommandsQuery,
   useCreateLabwareOffsetMutation,
   useCreateCommandMutation,
 } from '@opentrons/react-api-client'
 import { useTrackEvent } from '../../../../redux/analytics'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
-import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
+import {
+  useCurrentRunId,
+  useCurrentRunCommands,
+} from '../../../ProtocolUpload/hooks'
 import { getLabwareLocation } from '../../utils/getLabwareLocation'
 import {
   sendModuleCommand,
@@ -295,8 +297,7 @@ export function useLabwarePositionCheck(
   }) as LabwarePositionCheckStep
 
   const ctaText = useLpcCtaText(currentCommand)
-  // TODO(bc, 2022-01-31): this can be replaced by useCurrentRunCommands
-  const robotCommands = useAllCommandsQuery(currentRunId ?? null).data?.data
+  const robotCommands = useCurrentRunCommands()
   const titleText = useTitleText(
     isLoading,
     prevCommand,
@@ -560,7 +561,7 @@ export function useLabwarePositionCheck(
 
     identityLabwareOffsets.forEach(identityOffsetEntry => {
       createLabwareOffset({
-        runId: currentRun?.data.id as string,
+        runId: currentRunId,
         data: identityOffsetEntry,
       }).catch((e: Error) => {
         console.error(`error clearing labware offsets: ${e.message}`)

@@ -21,15 +21,17 @@ import { i18n } from '../../../i18n'
 import { CommandList } from '../CommandList'
 import { useProtocolDetails } from '../hooks'
 import { useRunStatus, useRunControls } from '../../RunTimeControl/hooks'
-import { useCloseCurrentRun } from '../../ProtocolUpload/hooks/useCloseCurrentRun'
 import { ProtocolLoader } from '../../ProtocolUpload'
-import { useIsProtocolRunLoaded } from '../../ProtocolUpload/hooks'
+import {
+  useCloseCurrentRun,
+  useIsProtocolRunLoaded,
+} from '../../ProtocolUpload/hooks'
 import type { ProtocolFile } from '@opentrons/shared-data'
 
 jest.mock('../hooks')
 jest.mock('../CommandList')
 jest.mock('../../RunTimeControl/hooks')
-jest.mock('../../ProtocolUpload/hooks/useCloseCurrentRun')
+jest.mock('../../ProtocolUpload/hooks/')
 
 const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
   typeof useProtocolDetails
@@ -224,7 +226,7 @@ describe('RunDetails', () => {
   it('renders a loader if closing current run', () => {
     when(mockUseCloseCurrentRun).calledWith().mockReturnValue({
       closeCurrentRun: jest.fn(),
-      isClosingCurrentRun: true
+      isClosingCurrentRun: true,
     })
     const { getByText } = renderProtocolLoader(props)
     getByText('Loading Protocol')

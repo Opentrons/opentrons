@@ -51,7 +51,6 @@ export const GenericStepScreen = (
     []
   )
 
-  console.log(completedLabwareIds)
   return (
     <Flex margin={SPACING_3} flexDirection={DIRECTION_COLUMN}>
       <Text

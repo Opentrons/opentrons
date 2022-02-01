@@ -5,7 +5,10 @@ import { i18n } from '../../../i18n'
 import { renderWithProviders } from '@opentrons/components'
 import { AlertItem } from '@opentrons/components/src/alerts'
 import { useProtocolDetails } from '../hooks'
-import { useCurrentRunCommands, useCurrentRunId } from '../../ProtocolUpload/hooks'
+import {
+  useCurrentRunCommands,
+  useCurrentRunId,
+} from '../../ProtocolUpload/hooks'
 import { useRunStatus } from '../../RunTimeControl/hooks'
 import { ProtocolSetupInfo } from '../ProtocolSetupInfo'
 import { CommandList } from '../CommandList'

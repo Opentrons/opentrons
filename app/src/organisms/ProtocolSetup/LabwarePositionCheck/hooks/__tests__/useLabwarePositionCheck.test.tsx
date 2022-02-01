@@ -5,13 +5,16 @@ import { Provider } from 'react-redux'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { renderHook } from '@testing-library/react-hooks'
 import {
-  useAllCommandsQuery,
   useCreateCommandMutation,
   useCreateLabwareOffsetMutation,
 } from '@opentrons/react-api-client'
 import { useTrackEvent } from '../../../../../redux/analytics'
 import { getConnectedRobotName } from '../../../../../redux/robot/selectors'
-import { useCurrentRun } from '../../../../ProtocolUpload/hooks'
+import {
+  useCurrentRun,
+  useCurrentRunId,
+  useCurrentRunCommands,
+} from '../../../../ProtocolUpload/hooks'
 import { getLabwareLocation } from '../../../utils/getLabwareLocation'
 import { useSteps } from '../useSteps'
 import { useLabwarePositionCheck } from '../useLabwarePositionCheck'
@@ -34,8 +37,8 @@ const wrapper: React.FunctionComponent<{}> = ({ children }) => (
   </Provider>
 )
 
-const mockUseCurrentRun = useCurrentRun as jest.MockedFunction<
-  typeof useCurrentRun
+const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
+  typeof useCurrentRunId
 >
 const mockUseSteps = useSteps as jest.MockedFunction<typeof useSteps>
 const mockUseCreateCommandMutation = useCreateCommandMutation as jest.MockedFunction<
@@ -47,8 +50,8 @@ const mockUseCreateLabwareOffsetMutation = useCreateLabwareOffsetMutation as jes
 const mockGetConnectedRobotName = getConnectedRobotName as jest.MockedFunction<
   typeof getConnectedRobotName
 >
-const mockUseAllCommandsQuery = useAllCommandsQuery as jest.MockedFunction<
-  typeof useAllCommandsQuery
+const mockUseCurrentRunCommands = useCurrentRunCommands as jest.MockedFunction<
+  typeof useCurrentRunCommands
 >
 const mockGetLabwareLocation = getLabwareLocation as jest.MockedFunction<
   typeof getLabwareLocation
@@ -66,14 +69,8 @@ describe('useLabwarePositionCheck', () => {
   let mockCreateCommand: jest.Mock
   let mockCreateLabwareOffset: jest.Mock
   beforeEach(() => {
-    when(mockUseCurrentRun)
-      .calledWith()
-      .mockReturnValue({ data: { id: MOCK_RUN_ID } } as any)
-    when(mockUseAllCommandsQuery)
-      .calledWith(MOCK_RUN_ID)
-      .mockReturnValue({
-        data: {},
-      } as any)
+    when(mockUseCurrentRunId).calledWith().mockReturnValue(MOCK_RUN_ID)
+    when(mockUseCurrentRunCommands).calledWith().mockReturnValue([])
     when(mockUseSteps)
       .calledWith()
       .mockReturnValue([
@@ -134,11 +131,11 @@ describe('useLabwarePositionCheck', () => {
   })
   describe('jog', () => {
     it('should NOT queue up a new jog command when a previous jog command has NOT completed', async () => {
-      when(mockUseAllCommandsQuery)
-        .calledWith(MOCK_RUN_ID)
-        .mockReturnValue({
-          data: { data: [{ commandType: 'moveRelative', status: 'running' }] },
-        } as any)
+      when(mockUseCurrentRunCommands)
+        .calledWith()
+        .mockReturnValue([
+          { commandType: 'moveRelative', status: 'running' } as any,
+        ])
 
       const { result, waitForNextUpdate } = renderHook(
         () => useLabwarePositionCheck(() => null, {}),
@@ -197,20 +194,15 @@ describe('useLabwarePositionCheck', () => {
       })
     })
     it('should queue up a new jog command when the previous jog command has succeeded', async () => {
-      when(mockUseAllCommandsQuery)
-        .calledWith(MOCK_RUN_ID)
-        .mockReturnValue({
-          data: {
-            data: [
-              {
-                id: MOCK_COMMAND_ID,
-                commandType: 'moveRelative',
-                status: 'succeeded',
-              },
-            ],
-          },
-        } as any)
-
+      when(mockUseCurrentRunCommands)
+        .calledWith()
+        .mockReturnValue([
+          {
+            id: MOCK_COMMAND_ID,
+            commandType: 'moveRelative',
+            status: 'succeeded',
+          } as any,
+        ])
       const { result, waitForNextUpdate } = renderHook(
         () => useLabwarePositionCheck(() => null, {}),
         { wrapper }

@@ -94,14 +94,6 @@ export function useRunStatus(options?: QueryOptions): RunStatus | null {
   return adjustedRunStatus
 }
 
-export function useRunDisabledReason(): string | null {
-  /* TODO: IMMEDIATELY return reasons for "protocol analysis incomplete" ,
-   "protocol is being canceled", "required modules not detected",
-   "required pipettes not detected", "isBlocked?"
-  */
-  return null
-}
-
 export function useRunStartTime(): string | null {
   const actions = useCurrentRun()?.data?.actions ?? []
   const firstPlay = actions.find(
