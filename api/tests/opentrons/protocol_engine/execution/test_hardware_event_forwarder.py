@@ -71,25 +71,16 @@ async def test_event_forwarding(
     decoy.verify(action_dispatcher.dispatch(expected_action_to_forward))
 
 
-async def test_exactly_one_subscription(
+async def test_one_subscribe_one_unsubscribe(
     decoy: Decoy,
-    hardware_api: HardwareControlAPI,
+    hardware_control_api: HardwareControlAPI,
     subject: HardwareEventForwarder,
 ) -> None:
-    """Multiple starts() should be collapsed."""
-    subject.start()
-    subject.start()
-    decoy.verify(hardware_api.register_callback(matchers.Anything()), times=1)
-
-
-async def test_exactly_one_unsubscription(
-    decoy: Decoy, hardware_api: HardwareControlAPI, subject: HardwareEventForwarder
-) -> None:
-    """Multiple stop()s should be collapsed."""
+    """Multiple start()s and stop()s should be collapsed."""
     unsubscribe = decoy.mock()
     wrong_unsubscribe = decoy.mock()
 
-    decoy.when(hardware_api.register_callback(matchers.Anything())).then_return(
+    decoy.when(hardware_control_api.register_callback(matchers.Anything())).then_return(
         unsubscribe, wrong_unsubscribe
     )
 
