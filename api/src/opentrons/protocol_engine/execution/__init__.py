@@ -13,6 +13,7 @@ from .pipetting import PipettingHandler
 from .queue_worker import QueueWorker
 from .run_control import RunControlHandler
 from .hardware_stopper import HardwareStopper
+from .hardware_event_forwarder import HardwareEventForwarder
 
 # .thermocycler_movement_flagger omitted from package's public interface.
 
@@ -30,4 +31,5 @@ __all__ = [
     "QueueWorker",
     "RunControlHandler",
     "HardwareStopper",
+    "HardwareEventForwarder"
 ]

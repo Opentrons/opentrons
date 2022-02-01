@@ -61,10 +61,6 @@ async def test_hardware_event_forwarder(
     await to_thread.run_sync(captured_handler, input_event)
     decoy.verify(action_dispatcher.dispatch(expected_action_to_forward))
 
-    # It can forward events that come from the same thread, without deadlocking.
-    captured_handler(input_event)
-    decoy.verify(action_dispatcher.dispatch(expected_action_to_forward))
-
     # It supports unsubscribing, and unsubscribing is safe to do multiple times.
     subject.stop_forwarding_soon()
     subject.stop_forwarding_soon()

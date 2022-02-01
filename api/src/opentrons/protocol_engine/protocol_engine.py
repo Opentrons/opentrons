@@ -12,7 +12,12 @@ from .commands import (
     CommandCreate,
 )
 from .types import LabwareOffset, LabwareOffsetCreate
-from .execution import QueueWorker, create_queue_worker, HardwareStopper
+from .execution import (
+    QueueWorker,
+    create_queue_worker,
+    HardwareEventForwarder,
+    HardwareStopper,
+)
 from .state import StateStore, StateView
 from .plugins import AbstractPlugin, PluginStarter
 from .actions import (
@@ -39,14 +44,6 @@ class ProtocolEngine:
     of the commands themselves.
     """
 
-    # todo(mm, 2022-01-31): Move this initialization to an async factory method.
-    #
-    # Our initialization requires an event loop to be active, so making the factory
-    # method async would make that harder to forget.
-    # And, we create several resources that need async cleanup,
-    # so making the factory async is good for robust cleanup
-    # in the face of partial initialization failure
-    # (e.g. with something like contextlib.AsyncExitStack).
     def __init__(
         self,
         hardware_api: HardwareControlAPI,
@@ -56,6 +53,7 @@ class ProtocolEngine:
         queue_worker: Optional[QueueWorker] = None,
         model_utils: Optional[ModelUtils] = None,
         hardware_stopper: Optional[HardwareStopper] = None,
+        hardware_event_forwarder: Optional[HardwareEventForwarder] = None
     ) -> None:
         """Initialize a ProtocolEngine instance.
 
@@ -84,14 +82,15 @@ class ProtocolEngine:
         )
         self._queue_worker.start()
 
-        # todo(mm, 2022-01-31): Use an anyio.BlockingPortal instead of saving the whole
-        # event loop, once this initialization is moved to an async factory method.
-        # (anyio.BlockingPortal needs async initialization.)
-        self._loop = get_running_loop()
-
-        self._hw_event_watcher: Optional[
-            Callable[[], None]
-        ] = hardware_api.register_callback(self.hardware_event_handler)
+        self._hardware_event_forwarder = (
+            hardware_event_forwarder
+            or
+            HardwareEventForwarder.start_forwarding(
+                event_source=hardware_api,
+                action_destination=self._action_dispatcher,
+                destination_loop=get_running_loop(),
+            )
+        )
 
     @property
     def state_view(self) -> StateView:
@@ -101,33 +100,6 @@ class ProtocolEngine:
     def add_plugin(self, plugin: AbstractPlugin) -> None:
         """Add a plugin to the engine to customize behavior."""
         self._plugin_starter.start(plugin)
-
-    def hardware_event_handler(self, hw_event: HardwareEvent) -> None:
-        """Inform the ProtocolEngine of a hardware event.
-
-        This method is safe to call from threads other than the event loop thread
-        that this `ProtocolEngine` is running in.
-        So, it can be used directly as a callback for a `HardwareControlAPI`.
-
-        This method will only return after the `ProtocolEngine` processes the event.
-        If something else is hogging the event loop thread that the `ProtocolEngine`
-        is running in, that may take a moment.
-        """
-        action = HardwareEventAction(event=hw_event)
-
-        async def dispatch_action() -> None:
-            self._action_dispatcher.dispatch(action)
-
-        future = run_coroutine_threadsafe(dispatch_action(), self._loop)
-
-        # Wait for the scheduled processing in the event loop to complete.
-        # Propagate any unexpected exceptions.
-        future.result()
-
-    def _remove_hardware_event_watcher(self) -> None:
-        if self._hw_event_watcher and callable(self._hw_event_watcher):
-            self._hw_event_watcher()
-            self._hw_event_watcher = None
 
     def play(self) -> None:
         """Start or resume executing commands in the queue."""
@@ -247,15 +219,13 @@ class ProtocolEngine:
         # to robustly clean up all these resources
         # instead of try/finally, which can't scale without making indentation silly.
         finally:
-            # Stop listening for new hardware events.
-            #
             # Note: After we stop listening, there may be hardware events remaining
             # whose processing we've scheduled in the event loop,
             # but that the event loop hasn't gotten around to running yet.
             # Those hardware events might be processed
             # concurrently to the below lines in this .finish() call,
             # or even after this .finish() call completes.
-            self._remove_hardware_event_watcher()
+            self._hardware_event_forwarder.stop_forwarding_soon()
 
             await self._hardware_stopper.do_stop_and_recover(drop_tips_and_home)
 
