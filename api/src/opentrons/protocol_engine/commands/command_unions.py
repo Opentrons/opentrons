@@ -2,14 +2,33 @@
 
 from typing import Union
 
-from .aspirate import Aspirate, AspirateCreate, AspirateResult, AspirateCommandType
+from .aspirate import (
+    Aspirate,
+    AspirateParams,
+    AspirateCreate,
+    AspirateResult,
+    AspirateCommandType,
+)
 
-from .dispense import Dispense, DispenseCreate, DispenseResult, DispenseCommandType
+from .dispense import (
+    Dispense,
+    DispenseParams,
+    DispenseCreate,
+    DispenseResult,
+    DispenseCommandType,
+)
 
-from .drop_tip import DropTip, DropTipCreate, DropTipResult, DropTipCommandType
+from .drop_tip import (
+    DropTip,
+    DropTipParams,
+    DropTipCreate,
+    DropTipResult,
+    DropTipCommandType,
+)
 
 from .load_labware import (
     LoadLabware,
+    LoadLabwareParams,
     LoadLabwareCreate,
     LoadLabwareResult,
     LoadLabwareCommandType,
@@ -17,6 +36,7 @@ from .load_labware import (
 
 from .load_module import (
     LoadModule,
+    LoadModuleParams,
     LoadModuleCreate,
     LoadModuleResult,
     LoadModuleCommandType,
@@ -24,15 +44,17 @@ from .load_module import (
 
 from .load_pipette import (
     LoadPipette,
+    LoadPipetteParams,
     LoadPipetteCreate,
     LoadPipetteResult,
     LoadPipetteCommandType,
 )
 
-from .home import Home, HomeCreate, HomeResult, HomeCommandType
+from .home import Home, HomeParams, HomeCreate, HomeResult, HomeCommandType
 
 from .move_relative import (
     MoveRelative,
+    MoveRelativeParams,
     MoveRelativeCreate,
     MoveRelativeResult,
     MoveRelativeCommandType,
@@ -40,6 +62,7 @@ from .move_relative import (
 
 from .move_to_well import (
     MoveToWell,
+    MoveToWellParams,
     MoveToWellCreate,
     MoveToWellResult,
     MoveToWellCommandType,
@@ -47,6 +70,7 @@ from .move_to_well import (
 
 from .pick_up_tip import (
     PickUpTip,
+    PickUpTipParams,
     PickUpTipCreate,
     PickUpTipResult,
     PickUpTipCommandType,
@@ -54,6 +78,7 @@ from .pick_up_tip import (
 
 from .pause import (
     Pause,
+    PauseParams,
     PauseCreate,
     PauseResult,
     PauseCommandType,
@@ -61,6 +86,7 @@ from .pause import (
 
 from .save_position import (
     SavePosition,
+    SavePositionParams,
     SavePositionCreate,
     SavePositionResult,
     SavePositionCommandType,
@@ -68,6 +94,7 @@ from .save_position import (
 
 from .custom import (
     Custom,
+    CustomParams,
     CustomResult,
     CustomCommandType,
 )
@@ -86,6 +113,22 @@ Command = Union[
     Pause,
     SavePosition,
     Custom,
+]
+
+CommandParams = Union[
+    AspirateParams,
+    DispenseParams,
+    DropTipParams,
+    LoadLabwareParams,
+    LoadModuleParams,
+    LoadPipetteParams,
+    HomeParams,
+    MoveRelativeParams,
+    MoveToWellParams,
+    PickUpTipParams,
+    PauseParams,
+    SavePositionParams,
+    CustomParams,
 ]
 
 CommandType = Union[

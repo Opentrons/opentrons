@@ -147,6 +147,7 @@ async def get_run_commands(
             createdAt=c.createdAt,
             startedAt=c.startedAt,
             completedAt=c.completedAt,
+            params=c.params,
             errorId=c.errorId,
         )
         for c in command_slice.commands

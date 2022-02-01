@@ -159,6 +159,7 @@ async def test_get_run_commands(decoy: Decoy, engine_store: EngineStore) -> None
             startedAt=datetime(year=2022, month=2, day=2),
             completedAt=datetime(year=2023, month=3, day=3),
             status=pe_commands.CommandStatus.FAILED,
+            params=pe_commands.PauseParams(message="hello world"),
             errorId="error-id",
         )
     ]
