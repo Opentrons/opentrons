@@ -1377,14 +1377,6 @@
       }
     },
     {
-      "commandType": "heaterShakerModule/awaitShakeSpeed",
-      "id": "14abc123",
-      "params": {
-        "moduleId": "heaterShakerId",
-        "rpm": 2000
-      }
-    },
-    {
       "commandType": "heaterShakerModule/awaitTemperature",
       "id": "15abc123",
       "params": {
