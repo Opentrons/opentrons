@@ -19,6 +19,9 @@ import {
   C_BRIGHT_GRAY,
   C_HARBOR_GRAY,
   Btn,
+  TEXT_TRANSFORM_CAPITALIZE,
+  C_BLUE,
+  ALIGN_CENTER,
 } from '@opentrons/components'
 import { AttachedModule } from '../../redux/modules/types'
 import {
@@ -31,8 +34,6 @@ import {
 import magneticModule from '../../assets/images/magnetic_module_gen_2_transparent.svg'
 import temperatureModule from '../../assets/images/temp_deck_gen_2_transparent.svg'
 import thermoModule from '../../assets/images/thermocycler_open_transparent.svg'
-import magneticModuleEngaged from '../../assets/images/ModuleCard_status_engaged.svg'
-import magneticModuleDisenaged from '../../assets/images/ModuleCard_status_disengaged.svg'
 
 interface ModuleCardProps {
   module: AttachedModule
@@ -81,7 +82,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       marginBottom={SPACING_2}
       marginLeft={SPACING_2}
       padding={SPACING_2}
-      width="49%"
+      width={'370px'}
     >
       <Box padding={SPACING_2} width="100%">
         <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING_3}>
@@ -94,7 +95,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               fontSize={'10px'}
               paddingBottom={SPACING_1}
             >
-              {/* TODO (sh, 2021-01-31): Conditionally render title here based on usbPort info */}
               {t('usb_port', {
                 port: module.usbPort.hub ?? module.usbPort.port,
               })}
@@ -107,14 +107,28 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             </Flex>
             {module.type === MAGNETIC_MODULE_TYPE ? (
               <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-                {module.status === 'engaged' ? (
-                  <img src={magneticModuleEngaged} style={{ width: '5rem' }} />
-                ) : (
-                  <img
-                    src={magneticModuleDisenaged}
-                    style={{ width: '5rem' }}
+                <Flex
+                  backgroundColor={'rgba(172, 207, 255, 0.5)'}
+                  borderRadius="4px"
+                  padding={SPACING_1}
+                  alignItems={ALIGN_CENTER}
+                  marginTop={SPACING_2}
+                >
+                  <Icon
+                    name="circle"
+                    color={C_BLUE}
+                    size={'0.5rem'}
+                    marginX={SPACING_1}
                   />
-                )}
+                  <Text
+                    fontSize={'10px'}
+                    color={'#003172'}
+                    textTransform={TEXT_TRANSFORM_CAPITALIZE}
+                    marginRight={SPACING_1}
+                  >
+                    {module.status}
+                  </Text>
+                </Flex>
               </Flex>
             ) : null}
             {module.type === THERMOCYCLER_MODULE_TYPE ? (

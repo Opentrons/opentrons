@@ -45,7 +45,7 @@ export function DeviceDetails(): JSX.Element | null {
           flexDirection={DIRECTION_COLUMN}
           marginBottom={SPACING_2}
           padding={SPACING_3}
-          width="100%"
+          width={'100%'}
         >
           <RobotOverview robotName={robotName} />
           <Flex flexWrap={WRAP} alignItems={ALIGN_CENTER} width="100%">
