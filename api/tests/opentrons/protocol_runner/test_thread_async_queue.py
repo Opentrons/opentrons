@@ -9,7 +9,7 @@ from typing import List, NamedTuple
 
 import pytest
 
-from opentrons.thread_async_queue import (
+from opentrons.protocol_runner.thread_async_queue import (
     ThreadAsyncQueue,
     QueueClosed,
 )
