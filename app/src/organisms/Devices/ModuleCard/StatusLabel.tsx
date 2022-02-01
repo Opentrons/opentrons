@@ -28,6 +28,8 @@ interface StatusLabelProps {
 
 export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
   const { moduleType, moduleStatus } = props
+
+  //  TODO IMMADIATELY: 2/1/21 use a switch statement when building out rest of the modules
   return moduleType === MAGNETIC_MODULE_TYPE ? (
     <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Flex
@@ -44,7 +46,7 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
           marginX={SPACING_1}
         />
         <Text
-          fontSize={'10px'}
+          fontSize={'0.625rem'}
           color={C_DARK_GRAY}
           textTransform={TEXT_TRANSFORM_CAPITALIZE}
           marginRight={SPACING_1}

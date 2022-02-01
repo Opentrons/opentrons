@@ -18,8 +18,8 @@ import {
   C_BRIGHT_GRAY,
   C_HARBOR_GRAY,
   Btn,
+  FONT_WEIGHT_REGULAR,
 } from '@opentrons/components'
-import { AttachedModule } from '../../../redux/modules/types'
 import {
   getModuleDisplayName,
   MAGNETIC_MODULE_TYPE,
@@ -31,6 +31,8 @@ import magneticModule from '../../../assets/images/magnetic_module_gen_2_transpa
 import temperatureModule from '../../../assets/images/temp_deck_gen_2_transparent.svg'
 import thermoModule from '../../../assets/images/thermocycler_open_transparent.svg'
 import { StatusLabel } from './StatusLabel'
+
+import type { AttachedModule } from '../../../redux/modules/types'
 
 interface ModuleCardProps {
   module: AttachedModule
@@ -64,12 +66,20 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const { module } = props
 
   let image = ''
-  if (module.type === 'magneticModuleType') {
-    image = magneticModule
-  } else if (module.type === 'temperatureModuleType') {
-    image = temperatureModule
-  } else if (module.type === 'thermocyclerModuleType') {
-    image = thermoModule
+  switch (module.type) {
+    case 'magneticModuleType':
+      {
+        image = magneticModule
+      }
+      break
+    case 'temperatureModuleType':
+      {
+        image = temperatureModule
+      }
+      break
+    case 'thermocyclerModuleType': {
+      image = thermoModule
+    }
   }
 
   return (
@@ -88,8 +98,8 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             <Text
               textTransform={TEXT_TRANSFORM_UPPERCASE}
               color={C_HARBOR_GRAY}
-              fontWeight={'400'}
-              fontSize={'10px'}
+              fontWeight={FONT_WEIGHT_REGULAR}
+              fontSize={'0.625rem'}
               paddingBottom={SPACING_1}
             >
               {t('usb_port', {
@@ -111,10 +121,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       </Box>
 
       <Box alignSelf={ALIGN_START}>
-        <Btn
-          onClick={() => console.log('set engage height')}
-          aria-label="close"
-        >
+        <Btn onClick={() => console.log('overflow')} aria-label="overflow">
           <Icon name="dots-vertical" color={C_DARK_GRAY} size={SIZE_2} />
         </Btn>
       </Box>
