@@ -67,18 +67,19 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
 
   let image = ''
   switch (module.type) {
-    case 'magneticModuleType':
-      {
-        image = magneticModule
-      }
+    case 'magneticModuleType': {
+      image = magneticModule
       break
-    case 'temperatureModuleType':
-      {
-        image = temperatureModule
-      }
+    }
+
+    case 'temperatureModuleType': {
+      image = temperatureModule
       break
+    }
+
     case 'thermocyclerModuleType': {
       image = thermoModule
+      break
     }
   }
 
