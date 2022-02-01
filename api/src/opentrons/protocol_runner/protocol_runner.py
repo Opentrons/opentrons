@@ -158,6 +158,15 @@ class ProtocolRunner:
 
         self.play()
         self._task_queue.start()
+
+        # fixme(mm, 2022-02-01):
+        # This looks like it will call ProtocolEngine.finish() twice?
+        #
+        #   1. Calling code calls this method and backgrounds it.
+        #   2. Calling code calls .stop().
+        #      This possibly calls ProtocolEngine.finish() once.
+        #   3.
+        #
         await self._task_queue.join()
 
         return ProtocolRunData(
