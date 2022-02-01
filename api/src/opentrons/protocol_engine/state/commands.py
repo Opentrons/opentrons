@@ -294,9 +294,9 @@ class CommandView(HasState[CommandState]):
                 cursor = total_count - after
 
         # start is inclusive, stop is exclusive
-        actual_cursor = min(cursor, total_count - 1)
-        start = max(0, cursor - before)
-        stop = min(total_count, cursor + after)
+        actual_cursor = max(0, min(cursor, total_count - 1))
+        start = max(0, actual_cursor - before)
+        stop = min(total_count, actual_cursor + after)
         actual_before = actual_cursor - start
         actual_after = stop - actual_cursor
         commands = list(itertools.islice(commands_by_id.values(), start, stop))

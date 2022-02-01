@@ -500,6 +500,21 @@ def test_get_current() -> None:
     assert subject.get_current() == "command-id"
 
 
+def test_get_slice_empty() -> None:
+    """It should return a slice from the tail if no current command."""
+    subject = get_command_view(commands_by_id=[])
+
+    result = subject.get_slice(cursor=None, before=1, after=2)
+
+    assert result == CommandSlice(
+        commands=[],
+        cursor=0,
+        before=0,
+        after=0,
+        total_count=0,
+    )
+
+
 def test_get_slice() -> None:
     """It should return a slice of all commands."""
     command_1 = create_succeeded_command(command_id="command-id-1")
