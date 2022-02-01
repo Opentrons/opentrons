@@ -61,8 +61,8 @@ class ProtocolEngine:
 
         Must be called while an event loop is active.
 
-        This constructor does not inject provider implementations. Prefer the
-        ProtocolEngine.create factory classmethod.
+        This constructor does not inject provider implementations.
+        Prefer the `create_protocol_engine()` factory function.
         """
         self._state_store = state_store
         self._model_utils = model_utils or ModelUtils()
