@@ -3,9 +3,6 @@ import last from 'lodash/last'
 import {
   RUN_ACTION_TYPE_PLAY,
   RUN_ACTION_TYPE_PAUSE,
-  RunAction,
-  RunData,
-  RunStatus,
   RUN_STATUS_IDLE,
   RUN_STATUS_RUNNING,
   RUN_STATUS_STOPPED,
@@ -19,7 +16,14 @@ import {
   useRunActionMutations,
 } from '@opentrons/react-api-client'
 
-import { useCloneRun, useCurrentRun } from '../ProtocolUpload/hooks'
+import {
+  useCloneRun,
+  useCurrentRun,
+  useCurrentRunId,
+  useCurrentRunCommands,
+} from '../ProtocolUpload/hooks'
+import { UseQueryOptions } from 'react-query'
+import type { RunAction, RunStatus, Run } from '@opentrons/api-client'
 
 interface RunControls {
   play: () => void
@@ -33,9 +37,7 @@ interface RunControls {
 }
 
 export function useRunControls(): RunControls {
-  const runRecord = useCurrentRun()
-
-  const currentRunId = runRecord?.data?.id
+  const currentRunId = useCurrentRunId()
 
   const {
     playRun,
@@ -62,16 +64,18 @@ export function useRunControls(): RunControls {
   }
 }
 
-export function useRunStatus(): RunStatus | null {
-  const runRecord = useCurrentRun()
-
-  const currentRunId = runRecord?.data?.id
+const DEFAULT_STATUS_REFETCH_INTERVAL = 10000 // 10 seconds
+// TODO: remove refetch interval, and pass through optional options param,
+// get runStartTime from top level timestamp
+export function useRunStatus(options?: UseQueryOptions<Run>): RunStatus | null {
+  const currentRunId = useCurrentRunId()
 
   const { data } = useRunQuery(currentRunId ?? null, {
-    refetchInterval: 1000,
+    refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+    ...options,
   })
 
-  const runStatus = data?.data.status as RunStatus
+  const runStatus = data?.data?.status as RunStatus
 
   const actions = data?.data?.actions as RunAction[]
   const firstPlay = actions?.find(
@@ -88,38 +92,18 @@ export function useRunStatus(): RunStatus | null {
   return adjustedRunStatus
 }
 
-export function useRunDisabledReason(): string | null {
-  /* TODO: IMMEDIATELY return reasons for "protocol analysis incomplete" ,
-   "protocol is being canceled", "required modules not detected",
-   "required pipettes not detected", "isBlocked?"
-  */
-  return null
-}
-
-export function useRunStartTime(): string | undefined {
-  const runRecord = useCurrentRun()
-
-  const currentRunId = runRecord?.data?.id
-
-  const { data } = useRunQuery(currentRunId ?? null)
-
-  const actions = data?.data?.actions as RunAction[]
-  const firstPlay = actions?.find(
+export function useRunStartTime(): string | null {
+  const actions = useCurrentRun()?.data?.actions ?? []
+  const firstPlay = actions.find(
     action => action.actionType === RUN_ACTION_TYPE_PLAY
   )
   const runStartTime = firstPlay?.createdAt
 
-  return runStartTime
+  return runStartTime ?? null
 }
 
 export function useRunPauseTime(): string | null {
-  const runRecord = useCurrentRun()
-
-  const currentRunId = runRecord?.data?.id
-
-  const { data } = useRunQuery(currentRunId ?? null)
-
-  const actions = data?.data.actions as RunAction[]
+  const actions = useCurrentRun()?.data?.actions ?? []
   const lastAction = last(actions)
 
   return lastAction?.actionType === RUN_ACTION_TYPE_PAUSE
@@ -128,13 +112,7 @@ export function useRunPauseTime(): string | null {
 }
 
 export function useRunStopTime(): string | null {
-  const runRecord = useCurrentRun()
-
-  const currentRunId = runRecord?.data?.id
-
-  const { data } = useRunQuery(currentRunId ?? null)
-
-  const actions = data?.data.actions as RunAction[]
+  const actions = useCurrentRun()?.data?.actions ?? []
   const lastAction = last(actions)
 
   return lastAction?.actionType === RUN_ACTION_TYPE_STOP
@@ -142,20 +120,21 @@ export function useRunStopTime(): string | null {
     : null
 }
 
+// TODO: IMMEDIATELY replace with actual run timestamps from server,
+// and remove command detail request once summary includes timestamps,
+// consider refactoring these timestamp hooks into one useRunTimestamps hook
 export function useRunCompleteTime(): string | null {
-  const runRecord = useCurrentRun()
+  const runStatus = useRunStatus()
+  const { actions = [], errors = [], id: runId = null } =
+    useCurrentRun()?.data ?? {}
+  const runCommands = useCurrentRunCommands() ?? []
 
-  const runData = runRecord?.data as RunData
-  const runId = runData?.id
-  const runStatus = runData?.status
-
-  const lastCommandId = last(runData?.commands)?.id
-
+  const lastCommandId = last(runCommands)?.id
   const { data: commandData } = useCommandQuery(runId, lastCommandId ?? null)
 
-  const lastActionAt = last(runData?.actions)?.createdAt
-  const lastErrorAt = last(runData?.errors)?.createdAt
-  const lastCommandAt = commandData?.data?.createdAt
+  const lastActionAt = last(actions)?.createdAt
+  const lastErrorAt = last(errors)?.createdAt
+  const lastCommandAt = commandData?.data?.completedAt
 
   let runCompletedTime = null
 

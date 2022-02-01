@@ -33,13 +33,15 @@ import { ConfirmCancelModal } from './ConfirmCancelModal'
 
 import styles from '../ProtocolUpload/styles.css'
 import { ProtocolLoader } from '../ProtocolUpload'
+import { useIsProtocolRunLoaded } from '../ProtocolUpload/hooks'
 
 export function RunDetails(): JSX.Element | null {
   const { t } = useTranslation(['run_details', 'shared'])
   const { displayName } = useProtocolDetails()
   const runStatus = useRunStatus()
   const startTime = useRunStartTime()
-  const { closeCurrentRun, isProtocolRunLoaded } = useCloseCurrentRun()
+  const isProtocolRunLoaded = useIsProtocolRunLoaded()
+  const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   const history = useHistory()
 
   // display an idle status as 'running' in the UI after a run has started
@@ -68,9 +70,10 @@ export function RunDetails(): JSX.Element | null {
     cancel: cancelCloseExit,
   } = useConditionalConfirm(handleCloseProtocol, true)
 
-  if (!isProtocolRunLoaded) {
+  if (!isProtocolRunLoaded || isClosingCurrentRun) {
     let text = t('loading_protocol')
     if (
+      isClosingCurrentRun ||
       adjustedRunStatus === RUN_STATUS_FINISHING ||
       adjustedRunStatus === RUN_STATUS_STOPPED
     ) {

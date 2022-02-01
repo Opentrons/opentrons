@@ -6,11 +6,11 @@ import { useCurrentRun } from './useCurrentRun'
 import type { Protocol } from '@opentrons/api-client'
 
 export function useCurrentProtocol(): Protocol | null {
-  const currentRun = useCurrentRun()
+  const currentProtocolId = useCurrentRun()?.data?.protocolId ?? null
 
   const enableProtocolPolling = React.useRef<boolean>(true)
   const { data: protocolRecord } = useProtocolQuery(
-    currentRun?.data?.protocolId ?? null,
+    currentProtocolId,
     { staleTime: Infinity },
     enableProtocolPolling.current
   )

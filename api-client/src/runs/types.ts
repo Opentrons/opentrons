@@ -30,7 +30,6 @@ export interface RunData {
   current: boolean
   status: RunStatus
   actions: RunAction[]
-  commands: RunCommandSummary[]
   errors: Error[]
   pipettes: unknown[]
   labware: unknown[]
