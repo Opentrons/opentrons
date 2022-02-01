@@ -83,7 +83,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     >
       <Box padding={SPACING_2} width="100%">
         <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING_3}>
-          <img src={image} style={{ width: '6rem' }} />
+          <img src={image} style={{ width: '6rem' }} alt={module.model} />
           <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING_2}>
             <Text
               textTransform={TEXT_TRANSFORM_UPPERCASE}
