@@ -1,10 +1,20 @@
 import type { RunTimeCommand } from '@opentrons/shared-data'
-import type { RunCommandSummary } from '../types'
 
 export interface GetCommandsParams {
   cursor: number | null // the index of the command at the center of the window
   before: number // the number of items before the cursor to include
   after: number // the number of items after the cursor to include
+}
+
+export interface RunCommandSummary {
+  id: string
+  key: string
+  commandType: RunTimeCommand['commandType']
+  status: 'queued' | 'running' | 'succeeded' | 'failed'
+  createdAt: string
+  result?: any
+  startedAt?: string
+  completedAt?: string
 }
 
 export interface CommandDetail {

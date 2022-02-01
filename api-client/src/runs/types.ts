@@ -1,5 +1,6 @@
-import type { RunTimeCommand, ModuleModel } from '@opentrons/shared-data'
+import type { ModuleModel } from '@opentrons/shared-data'
 import type { ResourceLink } from '../types'
+import type { RunCommandSummary } from './commands/types'
 export * from './commands/types'
 
 export const RUN_STATUS_IDLE = 'idle' as const
@@ -89,13 +90,6 @@ export interface RunAction {
 
 export interface CreateRunActionData {
   actionType: RunActionType
-}
-export interface RunCommandSummary {
-  id: string
-  key: string
-  commandType: RunTimeCommand['commandType']
-  status: 'queued' | 'running' | 'succeeded' | 'failed'
-  result?: any
 }
 
 export interface LabwareOffsetLocation {

@@ -29,6 +29,7 @@ import {
   RUN_STATUS_STOP_REQUESTED,
   RUN_STATUS_STOPPED,
   RUN_STATUS_SUCCEEDED,
+  RUN_STATUS_RUNNING,
 } from '@opentrons/api-client'
 import { useRunStatus, useRunStartTime } from '../RunTimeControl/hooks'
 import { useProtocolDetails } from './hooks'
@@ -63,7 +64,18 @@ export function CommandList(): JSX.Element | null {
   const listInnerRef = React.useRef<HTMLDivElement>(null)
   const currentItemRef = React.useRef<HTMLDivElement>(null)
   const [commandCursorIndex, setCommandCursorIndex] = React.useState<number | null>(null)
-  const runCommands = useCurrentRunCommands({cursor: commandCursorIndex, before: WINDOW_OVERLAP, after: WINDOW_OVERLAP})
+  const runCommands = useCurrentRunCommands({
+    cursor: commandCursorIndex,
+    before: WINDOW_OVERLAP,
+    after: WINDOW_OVERLAP
+  }, {
+    onSuccess: (data) => {
+      if (commandCursorIndex === null) {
+        setCommandCursorIndex(data.meta.cursor ?? null)
+      }
+    },
+    enabled: runStatus === RUN_STATUS_RUNNING
+  })
 
   const [windowIndex, setWindowIndex] = React.useState<number>(0)
   const [

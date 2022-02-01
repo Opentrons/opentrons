@@ -27,10 +27,10 @@ export function CommandText(props: Props): JSX.Element | null {
 
   let messageNode = null
 
-  const displayCommand =
-    analysisCommand !== null && runCommand === null
-      ? analysisCommand
-      : runCommand
+  const displayCommand = analysisCommand
+    // analysisCommand !== null && runCommand === null
+    //   ? analysisCommand
+    //   : runCommand
 
   if (displayCommand === null) {
     console.warn(

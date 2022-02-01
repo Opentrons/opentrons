@@ -95,31 +95,32 @@ export function CommandItemComponent(
   const [staleTime, setStaleTime] = React.useState<number>(0)
   const isAnticipatedCommand =
     analysisCommand !== null && runCommandSummary === null
-  const { data: commandDetails, refetch } = useCommandQuery(
-    currentRunId,
-    runCommandSummary?.id ?? null,
-    {
-      enabled: !isAnticipatedCommand && runStatus !== 'idle' && isInView,
-      staleTime,
-    }
-  )
+  // const { data: commandDetails, refetch } = useCommandQuery(
+  //   currentRunId,
+  //   runCommandSummary?.id ?? null,
+  //   {
+  //     enabled: !isAnticipatedCommand && runStatus !== 'idle' && isInView,
+  //     staleTime,
+  //   }
+  // )
 
-  React.useEffect(() => {
-    if (
-      commandDetails?.data.status &&
-      commandIsComplete(commandDetails?.data.status) &&
-      commandDetails?.data.completedAt != null
-    ) {
-      setStaleTime(Infinity)
-    }
-    if (
-      commandDetails?.data.startedAt != null &&
-      commandDetails?.data.completedAt == null &&
-      isInView
-    ) {
-      refetch()
-    }
-  }, [runCommandSummary?.status, commandDetails?.data, refetch])
+  // React.useEffect(() => {
+  //   if (
+  //     commandDetails?.data.status &&
+  //     commandIsComplete(commandDetails?.data.status) &&
+  //     commandDetails?.data.completedAt != null
+  //   ) {
+  //     setStaleTime(Infinity)
+  //   }
+  //   if (
+  //     commandDetails?.data.startedAt != null &&
+  //     commandDetails?.data.completedAt == null &&
+  //     isInView
+  //   ) {
+  //     refetch()
+  //   }
+  // }, [runCommandSummary?.status, commandDetails?.data, refetch])
+
   const commandStatus =
     runStatus !== RUN_STATUS_IDLE && runCommandSummary?.status != null
       ? runCommandSummary.status
@@ -199,14 +200,14 @@ export function CommandItemComponent(
           </Text>
           <CommandText
             analysisCommand={analysisCommand}
-            runCommand={commandDetails?.data ?? null}
+            runCommand={{...runCommandSummary, params: analysisCommand?.params} ?? null}
           />
         </Flex>
         {['running', 'failed', 'succeeded'].includes(commandStatus) &&
         !isComment ? (
           <CommandTimer
-            commandStartedAt={commandDetails?.data.startedAt ?? null}
-            commandCompletedAt={commandDetails?.data.completedAt ?? null}
+            commandStartedAt={runCommandSummary?.startedAt ?? null}
+            commandCompletedAt={runCommandSummary?.completedAt ?? null}
             runStartedAt={runStartedAt}
           />
         ) : null}

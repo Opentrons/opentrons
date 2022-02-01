@@ -13,7 +13,6 @@ import {
   RUN_STATUS_STOPPED,
 } from '@opentrons/api-client'
 import {
-  useCommandQuery,
   useRunQuery,
   useRunActionMutations,
 } from '@opentrons/react-api-client'
@@ -48,13 +47,10 @@ const mockUseCurrentRunCommands = useCurrentRunCommands as jest.MockedFunction<
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
 >
-const mockUseCommandQuery = useCommandQuery as jest.MockedFunction<
-  typeof useCommandQuery
->
-const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
 const mockUseRunActionMutations = useRunActionMutations as jest.MockedFunction<
   typeof useRunActionMutations
 >
+const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
 
 const PROTOCOL_ID = '1'
 const RUN_ID_1 = '1'
@@ -456,11 +452,6 @@ describe('useRunCompleteTime hook', () => {
     when(mockUseCurrentRunCommands)
       .calledWith()
       .mockReturnValue([mockCommand.data as any])
-    when(mockUseCommandQuery)
-      .calledWith(RUN_ID_2, COMMAND_ID)
-      .mockReturnValue({
-        data: mockCommand,
-      } as UseQueryResult<CommandDetail, Error>)
 
     const { result } = renderHook(useRunCompleteTime)
     expect(result.current).toBe('noon thirty')
@@ -481,11 +472,6 @@ describe('useRunCompleteTime hook', () => {
         data: mockFailedRun,
       } as Run)
     when(mockUseCurrentRunId).calledWith().mockReturnValue(RUN_ID_2)
-    when(mockUseCommandQuery)
-      .calledWith(RUN_ID_2, COMMAND_ID)
-      .mockReturnValue({
-        data: mockCommand,
-      } as UseQueryResult<CommandDetail, Error>)
 
     const { result } = renderHook(useRunCompleteTime)
     expect(result.current).toBe('noon forty-five')
@@ -506,11 +492,6 @@ describe('useRunCompleteTime hook', () => {
         data: mockStoppedRun,
       } as Run)
     when(mockUseCurrentRunId).calledWith().mockReturnValue(RUN_ID_2)
-    when(mockUseCommandQuery)
-      .calledWith(RUN_ID_2, COMMAND_ID)
-      .mockReturnValue({
-        data: mockCommand,
-      } as UseQueryResult<CommandDetail, Error>)
 
     const { result } = renderHook(useRunCompleteTime)
     expect(result.current).toBe('2021-10-25T13:58:22.366581+00:00')

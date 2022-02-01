@@ -1,8 +1,12 @@
 import { UseQueryResult, useQuery } from 'react-query'
-import { HostConfig, CommandsData, getCommands } from '@opentrons/api-client'
+import { getCommands } from '@opentrons/api-client'
 import { useHost } from '../api'
 import type { UseQueryOptions } from 'react-query'
-import { GetCommandsParams } from '@opentrons/api-client'
+import type {
+  GetCommandsParams,
+  HostConfig,
+  CommandsData,
+} from '@opentrons/api-client'
 
 const DEFAULT_REFETCH_INTERVAL = 10000 // 10 seconds
 const DEFAULT_WINDOW_OVERLAP = 30
