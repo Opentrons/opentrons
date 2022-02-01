@@ -22,8 +22,8 @@ import {
   useCurrentRunId,
   useCurrentRunCommands,
 } from '../ProtocolUpload/hooks'
-import { QueryOptions } from '@testing-library/react'
-import type { RunAction, RunStatus } from '@opentrons/api-client'
+import { UseQueryOptions } from 'react-query'
+import type { RunAction, RunStatus, Run } from '@opentrons/api-client'
 
 interface RunControls {
   play: () => void
@@ -67,7 +67,7 @@ export function useRunControls(): RunControls {
 const DEFAULT_STATUS_REFETCH_INTERVAL = 10000 // 10 seconds
 // TODO: remove refetch interval, and pass through optional options param,
 // get runStartTime from top level timestamp
-export function useRunStatus(options?: QueryOptions): RunStatus | null {
+export function useRunStatus(options?: UseQueryOptions<Run>): RunStatus | null {
   const currentRunId = useCurrentRunId()
 
   const { data } = useRunQuery(currentRunId ?? null, {
