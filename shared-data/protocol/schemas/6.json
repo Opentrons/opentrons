@@ -905,13 +905,7 @@
                 "enum": ["heaterShakerModule/awaitTemperature"]
               },
               "params": {
-                "required": ["moduleId"],
-                "properties": {
-                  "moduleId": {
-                    "type": "string",
-                    "description": "Unique identifier of Heater Shaker Module to target. Must be a key from the top level 'modules' object"
-                  }
-                }
+                "$ref": "#/definitions/moduleOnlyParams"
               }
             }
           },
