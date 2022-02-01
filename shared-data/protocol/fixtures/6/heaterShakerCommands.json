@@ -1388,8 +1388,7 @@
       "commandType": "heaterShakerModule/awaitTemperature",
       "id": "15abc123",
       "params": {
-        "moduleId": "heaterShakerId",
-        "temperature": 80
+        "moduleId": "heaterShakerId"
       }
     },
     {
