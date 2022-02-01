@@ -12,7 +12,8 @@ export interface RunCommandSummary {
   commandType: RunTimeCommand['commandType']
   status: 'queued' | 'running' | 'succeeded' | 'failed'
   createdAt: string
-  result?: any
+  params?: RunTimeCommand['params']
+  result?: RunTimeCommand['result']
   startedAt?: string
   completedAt?: string
 }

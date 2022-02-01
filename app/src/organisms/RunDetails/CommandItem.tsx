@@ -89,37 +89,7 @@ export function CommandItemComponent(
     runStartedAt,
   } = props
   const { t } = useTranslation('run_details')
-  const [commandItemRef, isInView] = useInView({
-    delay: OBSERVER_DELAY,
-  })
-  const [staleTime, setStaleTime] = React.useState<number>(0)
-  const isAnticipatedCommand =
-    analysisCommand !== null && runCommandSummary === null
-  // const { data: commandDetails, refetch } = useCommandQuery(
-  //   currentRunId,
-  //   runCommandSummary?.id ?? null,
-  //   {
-  //     enabled: !isAnticipatedCommand && runStatus !== 'idle' && isInView,
-  //     staleTime,
-  //   }
-  // )
 
-  // React.useEffect(() => {
-  //   if (
-  //     commandDetails?.data.status &&
-  //     commandIsComplete(commandDetails?.data.status) &&
-  //     commandDetails?.data.completedAt != null
-  //   ) {
-  //     setStaleTime(Infinity)
-  //   }
-  //   if (
-  //     commandDetails?.data.startedAt != null &&
-  //     commandDetails?.data.completedAt == null &&
-  //     isInView
-  //   ) {
-  //     refetch()
-  //   }
-  // }, [runCommandSummary?.status, commandDetails?.data, refetch])
 
   const commandStatus =
     runStatus !== RUN_STATUS_IDLE && runCommandSummary?.status != null
@@ -154,7 +124,7 @@ export function CommandItemComponent(
     flex-direction: ${DIRECTION_COLUMN};
   `
   return (
-    <Flex css={WRAPPER_STYLE} ref={commandItemRef}>
+    <Flex css={WRAPPER_STYLE}>
       {commandStatus === 'running' ? (
         <CurrentCommandLabel runStatus={runStatus} />
       ) : null}
@@ -200,7 +170,7 @@ export function CommandItemComponent(
           </Text>
           <CommandText
             analysisCommand={analysisCommand}
-            runCommand={{...runCommandSummary, params: analysisCommand?.params} ?? null}
+            runCommand={runCommandSummary}
           />
         </Flex>
         {['running', 'failed', 'succeeded'].includes(commandStatus) &&
