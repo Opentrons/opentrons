@@ -30,6 +30,5 @@ export function formatInterval(start: string, end: string): string {
     start: new Date(start),
     end: new Date(end),
   })
-
   return formatDuration(duration)
 }
