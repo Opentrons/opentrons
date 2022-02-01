@@ -153,11 +153,12 @@ async def test_location_cache(ctx, monkeypatch, get_labware_def, hardware):
     monkeypatch.setattr(papi_geometry.planning, "plan_moves", fake_plan_move)
     # When we move without a cache, the from location should be the gantry
     # position
+    gantry_pos = await hardware.gantry_position(Mount.RIGHT)
     right.move_to(lw.wells()[0].top())
     # The home position from hardware_control/simulator.py, taking into account
     # that the right pipette is a p10 single which is a different height than
     # the reference p300 single
-    assert test_args[0].point == Point(418, 353, 230)
+    assert test_args[0].point == gantry_pos
     assert test_args[0].labware.is_empty
 
     # Once we have a location cache, that should be our from_loc

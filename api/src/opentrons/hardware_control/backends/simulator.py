@@ -3,26 +3,26 @@ import asyncio
 import copy
 import logging
 from threading import Event
-from typing import Dict, Optional, List, Tuple, TYPE_CHECKING, Sequence, Union
+from typing import Dict, Optional, List, Tuple, TYPE_CHECKING, Sequence
 from contextlib import contextmanager
 
 from opentrons_shared_data.pipette import dummy_model_for_name
 
 from opentrons import types
 from opentrons.config.pipette_config import config_models, config_names, configs, load
-from opentrons.config.types import RobotConfig, OT3Config
+from opentrons.config.types import RobotConfig
 from opentrons.drivers.smoothie_drivers import SimulatingDriver
 
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 
-from . import modules
-from .types import BoardRevision, Axis
-from .module_control import AttachedModulesControl
+from .. import modules
+from ..types import BoardRevision, Axis
+from ..module_control import AttachedModulesControl
 
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import PipetteName
-    from .dev_types import (
+    from ..dev_types import (
         AttachedInstrument,
         AttachedInstruments,
         InstrumentSpec,
@@ -45,7 +45,7 @@ class Simulator:
         cls,
         attached_instruments: Dict[types.Mount, Dict[str, Optional[str]]],
         attached_modules: List[str],
-        config: Union[RobotConfig, OT3Config],
+        config: RobotConfig,
         loop: asyncio.AbstractEventLoop,
         strict_attached_instruments: bool = True,
     ) -> Simulator:
@@ -101,7 +101,7 @@ class Simulator:
         self,
         attached_instruments: Dict[types.Mount, Dict[str, Optional[str]]],
         attached_modules: List[str],
-        config: Union[RobotConfig, OT3Config],
+        config: RobotConfig,
         loop: asyncio.AbstractEventLoop,
         gpio_chardev: GPIODriverLike,
         strict_attached_instruments: bool = True,

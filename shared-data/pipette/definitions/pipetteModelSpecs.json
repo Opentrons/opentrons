@@ -5609,7 +5609,7 @@
         "units": "mm/s",
         "type": "float"
       },
-      "nozzleOffset": [14.5, 4.0, 6.45],
+      "nozzleOffset": [0.5, -22.0, -259.15],
       "modelOffset": [0.0, 0.0, -14.55],
       "plungerCurrent": {
         "value": 1.5,
@@ -5781,7 +5781,7 @@
         "type": "float"
       },
       "modelOffset": [0.0, 0.0, 4.45],
-      "nozzleOffset": [14.5, 4.0, 6.45],
+      "nozzleOffset": [0.5, -22.0, -259.15],
       "ulPerMm": [
         {
           "aspirate": [
@@ -5982,7 +5982,7 @@
         "units": "mm/s",
         "type": "float"
       },
-      "nozzleOffset": [14.5, 4.0, 6.45],
+      "nozzleOffset": [0.5, -22.0, -259.15],
       "modelOffset": [0.0, 0.0, 25.14],
       "ulPerMm": [
         {
