@@ -16,6 +16,7 @@ export const C_BLUE = '#006fff'
 export const C_MINT = '#00bfa8'
 export const C_AQUAMARINE = '#eefff8'
 export const C_POWDER_BLUE = '#f1f8ff'
+export const C_SKY_BLUE = 'rgba(172, 207, 255, 0.5)'
 
 // colors by usage
 // TODO(mc, 2020-10-08): s/COLOR_/C_

@@ -28,7 +28,6 @@ export function DeviceDetails(): JSX.Element | null {
   const robot = useRobot(robotName)
 
   const attachedModules = useAttachedModules(robotName)
-  console.log('attachedModules', attachedModules)
 
   return robot != null ? (
     <ApiHostProvider key={robot.name} hostname={robot.ip ?? null}>
@@ -49,9 +48,9 @@ export function DeviceDetails(): JSX.Element | null {
         >
           <RobotOverview robotName={robotName} />
           <Flex flexWrap={WRAP} alignItems={ALIGN_CENTER} width="100%">
-            {attachedModules.map(module => {
+            {attachedModules.map((module, index) => {
               return (
-                <Flex id={`moduleCard_${module}`}>
+                <Flex key={`moduleCard_${module.type}_${index}`}>
                   <ModuleCard module={module} />
                 </Flex>
               )

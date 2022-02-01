@@ -14,16 +14,12 @@ import {
   SPACING_3,
   TEXT_TRANSFORM_UPPERCASE,
   SIZE_1,
-  JUSTIFY_SPACE_BETWEEN,
   SPACING_1,
   C_BRIGHT_GRAY,
   C_HARBOR_GRAY,
   Btn,
-  TEXT_TRANSFORM_CAPITALIZE,
-  C_BLUE,
-  ALIGN_CENTER,
 } from '@opentrons/components'
-import { AttachedModule } from '../../redux/modules/types'
+import { AttachedModule } from '../../../redux/modules/types'
 import {
   getModuleDisplayName,
   MAGNETIC_MODULE_TYPE,
@@ -31,9 +27,10 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import magneticModule from '../../assets/images/magnetic_module_gen_2_transparent.svg'
-import temperatureModule from '../../assets/images/temp_deck_gen_2_transparent.svg'
-import thermoModule from '../../assets/images/thermocycler_open_transparent.svg'
+import magneticModule from '../../../assets/images/magnetic_module_gen_2_transparent.svg'
+import temperatureModule from '../../../assets/images/temp_deck_gen_2_transparent.svg'
+import thermoModule from '../../../assets/images/thermocycler_open_transparent.svg'
+import { StatusLabel } from './StatusLabel'
 
 interface ModuleCardProps {
   module: AttachedModule
@@ -82,7 +79,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       marginBottom={SPACING_2}
       marginLeft={SPACING_2}
       padding={SPACING_2}
-      width={'370px'}
+      width={'24rem'}
     >
       <Box padding={SPACING_2} width="100%">
         <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING_3}>
@@ -105,54 +102,10 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 {getModuleDisplayName(module.model)}
               </Text>
             </Flex>
-            {module.type === MAGNETIC_MODULE_TYPE ? (
-              <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-                <Flex
-                  backgroundColor={'rgba(172, 207, 255, 0.5)'}
-                  borderRadius="4px"
-                  padding={SPACING_1}
-                  alignItems={ALIGN_CENTER}
-                  marginTop={SPACING_2}
-                >
-                  <Icon
-                    name="circle"
-                    color={C_BLUE}
-                    size={'0.5rem'}
-                    marginX={SPACING_1}
-                  />
-                  <Text
-                    fontSize={'10px'}
-                    color={'#003172'}
-                    textTransform={TEXT_TRANSFORM_CAPITALIZE}
-                    marginRight={SPACING_1}
-                  >
-                    {module.status}
-                  </Text>
-                </Flex>
-              </Flex>
-            ) : null}
-            {module.type === THERMOCYCLER_MODULE_TYPE ? (
-              <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-                <Text
-                  textTransform={TEXT_TRANSFORM_UPPERCASE}
-                  color={C_HARBOR_GRAY}
-                  fontWeight={'400'}
-                  fontSize={'10px'}
-                  marginTop={SPACING_2}
-                >
-                  Lid
-                </Text>
-                <Text
-                  textTransform={TEXT_TRANSFORM_UPPERCASE}
-                  color={C_HARBOR_GRAY}
-                  fontWeight={'400'}
-                  fontSize={'10px'}
-                  marginTop={SPACING_2}
-                >
-                  Block
-                </Text>
-              </Flex>
-            ) : null}
+            <StatusLabel
+              moduleType={module.type}
+              moduleStatus={module.status}
+            />
           </Flex>
         </Flex>
       </Box>
@@ -162,8 +115,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           onClick={() => console.log('set engage height')}
           aria-label="close"
         >
-          {/* TODO (sh, 2021-01-31): Export vertical dots icon SVG and add to icon types */}
-          <Icon name="dots-horizontal" color={C_DARK_GRAY} size={SIZE_2} />
+          <Icon name="dots-vertical" color={C_DARK_GRAY} size={SIZE_2} />
         </Btn>
       </Box>
     </Flex>
