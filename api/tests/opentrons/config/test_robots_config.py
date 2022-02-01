@@ -168,9 +168,13 @@ ot3_dummy_settings = {
             "Z": 10,
         },
     },
-    "left_mount_offset": [-50, 0, 0],
     "log_level": "NADA",
     "z_retract_distance": 10,
+    "deck_transform": [[-0.5, 0, 1], [0.1, -2, 4], [0, 0, -1]],
+    "carriage_offset": (1, 2, 3),
+    "right_mount_offset": (3, 2, 1),
+    "left_mount_offset": (2, 2, 2),
+    "gripper_mount_offset": (1, 1, 1),
 }
 
 
@@ -290,3 +294,77 @@ def test_load_per_pipette_vals():
         ).two_low_throughput["X"]
         == -72
     )
+
+
+def test_load_offset_vals():
+    # nothing provided
+    assert (
+        defaults_ot3._build_default_offset([], defaults_ot3.DEFAULT_RIGHT_MOUNT_OFFSET)
+        == defaults_ot3.DEFAULT_RIGHT_MOUNT_OFFSET
+    )
+    # wrong shape
+    assert (
+        defaults_ot3._build_default_offset(
+            [
+                1,
+            ],
+            defaults_ot3.DEFAULT_RIGHT_MOUNT_OFFSET,
+        )
+        == defaults_ot3.DEFAULT_RIGHT_MOUNT_OFFSET
+    )
+    # absolutely wrong type
+    assert (
+        defaults_ot3._build_default_offset(2, defaults_ot3.DEFAULT_RIGHT_MOUNT_OFFSET)
+        == defaults_ot3.DEFAULT_RIGHT_MOUNT_OFFSET
+    )
+    # right shape, different values
+    assert defaults_ot3._build_default_offset([1, 2, 3], (0, 0, 0)) == (1, 2, 3)
+
+
+def test_load_transform_vals():
+    # not list
+    assert (
+        defaults_ot3._build_default_transform(None, defaults_ot3.DEFAULT_DECK_TRANSFORM)
+        == defaults_ot3.DEFAULT_DECK_TRANSFORM
+    )
+    # list of not lists
+    assert (
+        defaults_ot3._build_default_transform(
+            [1, 2, 3], defaults_ot3.DEFAULT_DECK_TRANSFORM
+        )
+        == defaults_ot3.DEFAULT_DECK_TRANSFORM
+    )
+    # list of wrong number of lists
+    assert (
+        defaults_ot3._build_default_transform(
+            [[1, 2, 3], [3, 2, 1]], defaults_ot3.DEFAULT_DECK_TRANSFORM
+        )
+        == defaults_ot3.DEFAULT_DECK_TRANSFORM
+    )
+    # list of right number of lists of wrong number of elements
+    assert (
+        defaults_ot3._build_default_transform(
+            [[1, 2, 3], [1, 2, 3], [1, 2, 3, 4]], defaults_ot3.DEFAULT_DECK_TRANSFORM
+        )
+        == defaults_ot3.DEFAULT_DECK_TRANSFORM
+    )
+    # list of right number of lists of right number of elements of wrong type
+    assert (
+        defaults_ot3._build_default_transform(
+            [
+                [
+                    1,
+                    2,
+                    3,
+                ],
+                [1, "hi", 3],
+                [1, 2, {}],
+            ],
+            defaults_ot3.DEFAULT_DECK_TRANSFORM,
+        )
+        == defaults_ot3.DEFAULT_DECK_TRANSFORM
+    )
+    # right shape, different data is preserved
+    assert defaults_ot3._build_default_transform(
+        [[1, 2, 3], [1, 2, 3], [1, 2, 3]], defaults_ot3.DEFAULT_DECK_TRANSFORM
+    ) == [[1, 2, 3], [1, 2, 3], [1, 2, 3]]

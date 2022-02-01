@@ -2,7 +2,6 @@ from unittest.mock import MagicMock
 import pytest
 
 from opentrons import hardware_control as hc
-from opentrons.hardware_control import controller
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 
 
@@ -30,8 +29,10 @@ async def test_current_setting(monkeypatch, revision, a_current):
 
     mock_gpio.setup.side_effect = fake_side_effect
     mock_gpio.board_rev = revision
-    mock_build = MagicMock(spec=controller.build_gpio_chardev, return_value=mock_gpio)
-    monkeypatch.setattr(controller, "build_gpio_chardev", mock_build)
+    mock_build = MagicMock(
+        spec=hc.backends.controller.build_gpio_chardev, return_value=mock_gpio
+    )
+    monkeypatch.setattr(hc.backends.controller, "build_gpio_chardev", mock_build)
     backend = await hc.Controller.build(config=None)
     assert backend.board_revision == revision
     assert backend._smoothie_driver._active_current_settings.now["A"] == a_current

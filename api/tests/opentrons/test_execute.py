@@ -8,7 +8,7 @@ import pytest
 
 from opentrons_shared_data.pipette.dev_types import PipetteModel
 from opentrons import execute, types
-from opentrons.hardware_control import controller, api
+from opentrons.hardware_control import Controller, api
 from opentrons.protocols.execution.errors import ExceptionInProtocolError
 from opentrons.config.pipette_config import load
 
@@ -22,7 +22,7 @@ def mock_get_attached_instr(monkeypatch, virtual_smoothie_env):
     async def dummy_delay(self, duration_s):
         pass
 
-    monkeypatch.setattr(controller.Controller, "get_attached_instruments", gai_mock)
+    monkeypatch.setattr(Controller, "get_attached_instruments", gai_mock)
     monkeypatch.setattr(api.API, "delay", dummy_delay)
     gai_mock.return_value = {
         types.Mount.RIGHT: {"model": None, "id": None},

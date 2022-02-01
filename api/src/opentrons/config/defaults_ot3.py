@@ -2,23 +2,31 @@ from typing import Any, Dict, cast, List
 from typing_extensions import Final
 from dataclasses import asdict
 
-from .types import OT3Config, ByPipetteKind, GeneralizeableAxisDict
-
-DEFAULT_DECK_CALIBRATION: List[List[float]] = [
-    [-1.00, 0.00, 0.00],
-    [0.00, -1.00, 0.00],
-    [0.00, 0.00, 1.00],
-]
+from .types import (
+    OT3Config,
+    ByPipetteKind,
+    GeneralizeableAxisDict,
+    OT3Transform,
+    Offset,
+)
 
 DEFAULT_PIPETTE_OFFSET = [0.0, 0.0, 0.0]
 
 
 ROBOT_CONFIG_VERSION: Final = 1
-DEFAULT_LOG_LEVEL = "INFO"
-DEFAULT_MOUNT_OFFSET = [50.0, 0.0, 0.0]
-DEFAULT_Z_RETRACT_DISTANCE = 2
+DEFAULT_LOG_LEVEL: Final = "INFO"
+DEFAULT_DECK_TRANSFORM: Final[OT3Transform] = [
+    [-1.0, 0.0, 0.0],
+    [0.0, -1.0, 0.0],
+    [0.0, 0.0, -1.0],
+]
+DEFAULT_CARRIAGE_OFFSET: Final[Offset] = (436.605, 484.975, 233.475)
+DEFAULT_LEFT_MOUNT_OFFSET: Final[Offset] = (-21.0, -63.05, 256.175)
+DEFAULT_RIGHT_MOUNT_OFFSET: Final[Offset] = (33, -63.05, 256.175)
+DEFAULT_GRIPPER_MOUNT_OFFSET: Final[Offset] = (-50.0, 0.0, 0.0)
+DEFAULT_Z_RETRACT_DISTANCE: Final = 2
 
-DEFAULT_MAX_SPEEDS: ByPipetteKind[GeneralizeableAxisDict] = ByPipetteKind(
+DEFAULT_MAX_SPEEDS: Final[ByPipetteKind[GeneralizeableAxisDict]] = ByPipetteKind(
     none={
         "X": 500,
         "Y": 500,
@@ -46,7 +54,7 @@ DEFAULT_MAX_SPEEDS: ByPipetteKind[GeneralizeableAxisDict] = ByPipetteKind(
     },
 )
 
-DEFAULT_ACCELERATIONS: ByPipetteKind[GeneralizeableAxisDict] = ByPipetteKind(
+DEFAULT_ACCELERATIONS: Final[ByPipetteKind[GeneralizeableAxisDict]] = ByPipetteKind(
     none={
         "X": 10000,
         "Y": 10000,
@@ -74,7 +82,9 @@ DEFAULT_ACCELERATIONS: ByPipetteKind[GeneralizeableAxisDict] = ByPipetteKind(
     },
 )
 
-DEFAULT_MAX_SPEED_DISCONTINUITY: ByPipetteKind[GeneralizeableAxisDict] = ByPipetteKind(
+DEFAULT_MAX_SPEED_DISCONTINUITY: Final[
+    ByPipetteKind[GeneralizeableAxisDict]
+] = ByPipetteKind(
     none={
         "X": 40,
         "Y": 40,
@@ -102,8 +112,8 @@ DEFAULT_MAX_SPEED_DISCONTINUITY: ByPipetteKind[GeneralizeableAxisDict] = ByPipet
     },
 )
 
-DEFAULT_DIRECTION_CHANGE_SPEED_DISCONTINUITY: ByPipetteKind[
-    GeneralizeableAxisDict
+DEFAULT_DIRECTION_CHANGE_SPEED_DISCONTINUITY: Final[
+    ByPipetteKind[GeneralizeableAxisDict]
 ] = ByPipetteKind(
     none={
         "X": 20,
@@ -132,7 +142,7 @@ DEFAULT_DIRECTION_CHANGE_SPEED_DISCONTINUITY: ByPipetteKind[
     },
 )
 
-DEFAULT_HOLDING_CURRENT: ByPipetteKind[GeneralizeableAxisDict] = ByPipetteKind(
+DEFAULT_HOLDING_CURRENT: Final[ByPipetteKind[GeneralizeableAxisDict]] = ByPipetteKind(
     none={
         "X": 0.1,
         "Y": 0.1,
@@ -160,7 +170,9 @@ DEFAULT_HOLDING_CURRENT: ByPipetteKind[GeneralizeableAxisDict] = ByPipetteKind(
     },
 )
 
-DEFAULT_NORMAL_MOTION_CURRENT: ByPipetteKind[GeneralizeableAxisDict] = ByPipetteKind(
+DEFAULT_NORMAL_MOTION_CURRENT: Final[
+    ByPipetteKind[GeneralizeableAxisDict]
+] = ByPipetteKind(
     none={
         "X": 1.0,
         "Y": 1.0,
@@ -220,13 +232,34 @@ def _build_default_bpk(
     )
 
 
+def _build_default_offset(from_conf: Any, default: Offset) -> Offset:
+    if not isinstance(from_conf, (list, tuple)) or len(from_conf) != 3:
+        return default
+    return cast(Offset, tuple(from_conf))
+
+
+def _build_default_transform(
+    from_conf: Any, default: List[List[float]]
+) -> List[List[float]]:
+    if (
+        not isinstance(from_conf, list)
+        or len(from_conf) != 3
+        or not all(isinstance(elem, list) for elem in from_conf)
+        or not all(len(e) == 3 for e in from_conf)
+        or not all(
+            all(isinstance(elem, (int, float)) for elem in vec) for vec in from_conf
+        )
+    ):
+        return default
+    return cast(OT3Transform, from_conf)
+
+
 def build_with_defaults(robot_settings: Dict[str, Any]) -> OT3Config:
     return OT3Config(
         model="OT-3 Standard",
         version=ROBOT_CONFIG_VERSION,
         name=robot_settings.get("name", "Grace Hopper"),
         log_level=robot_settings.get("log_level", DEFAULT_LOG_LEVEL),
-        left_mount_offset=robot_settings.get("left_mount_offset", DEFAULT_MOUNT_OFFSET),
         default_max_speed=_build_default_bpk(
             robot_settings.get("default_max_speed", {}), DEFAULT_MAX_SPEEDS
         ),
@@ -250,6 +283,21 @@ def build_with_defaults(robot_settings: Dict[str, Any]) -> OT3Config:
         ),
         z_retract_distance=robot_settings.get(
             "z_retract_distance", DEFAULT_Z_RETRACT_DISTANCE
+        ),
+        deck_transform=_build_default_transform(
+            robot_settings.get("deck_transform", []), DEFAULT_DECK_TRANSFORM
+        ),
+        carriage_offset=_build_default_offset(
+            robot_settings.get("carriage_offset", []), DEFAULT_CARRIAGE_OFFSET
+        ),
+        left_mount_offset=_build_default_offset(
+            robot_settings.get("left_mount_offset", []), DEFAULT_LEFT_MOUNT_OFFSET
+        ),
+        right_mount_offset=_build_default_offset(
+            robot_settings.get("right_mount_offset", []), DEFAULT_RIGHT_MOUNT_OFFSET
+        ),
+        gripper_mount_offset=_build_default_offset(
+            robot_settings.get("gripper_mount_offset", []), DEFAULT_GRIPPER_MOUNT_OFFSET
         ),
     )
 

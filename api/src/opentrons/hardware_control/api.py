@@ -19,14 +19,12 @@ from typing import (
 from opentrons_shared_data.pipette import name_config
 from opentrons_shared_data.pipette.dev_types import PipetteName
 from opentrons import types as top_types
-from opentrons.util import linal
 from opentrons.config import robot_configs
 from opentrons.config.types import RobotConfig, OT3Config
 
 from .util import use_or_initialize_loop, check_motion_bounds
 from .pipette import generate_hardware_configs, load_from_config_and_check_skip
-from .controller import Controller
-from .simulator import Simulator
+from .backends import Controller, Simulator
 from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
@@ -51,6 +49,8 @@ from .motion_utilities import (
     target_position_from_absolute,
     target_position_from_relative,
     target_position_from_plunger,
+    deck_from_machine,
+    machine_from_deck,
 )
 
 
@@ -555,54 +555,13 @@ class API(
         async with self._motion_lock:
             if smoothie_gantry:
                 smoothie_pos.update(await self._backend.home(smoothie_gantry))
-                self._current_position = self._deck_from_smoothie(smoothie_pos)
+                self._current_position = deck_from_machine(
+                    smoothie_pos,
+                    self._robot_calibration.deck_calibration.attitude,
+                    top_types.Point(0, 0, 0),
+                )
             for plunger in plungers:
                 await self._do_plunger_home(axis=plunger, acquire_lock=False)
-
-    def _deck_from_smoothie(self, smoothie_pos: Dict[str, float]) -> Dict[Axis, float]:
-        """Build a deck-abs position store from the smoothie's position
-
-        This should take the smoothie style position {'X': float, etc}
-        and turn it into the position dict used here {Axis.X: float} in
-        deck-absolute coordinates. It runs the reverse deck transformation
-        for the axes that require it.
-
-        One piece of complexity is that if the gantry transformation includes
-        a transition between non parallel planes, the z position of the left
-        mount would depend on its actual position in deck frame, so we have
-        to apply the mount offset.
-
-        TODO: Figure out which frame the mount offset is measured in, because
-              if it's measured in the deck frame (e.g. by touching off points
-              on the deck) it has to go through the reverse transform to be
-              added to the smoothie coordinates here.
-        """
-        with_enum = {Axis[k]: v for k, v in smoothie_pos.items()}
-        plunger_axes = {
-            k: v for k, v in with_enum.items() if k not in Axis.gantry_axes()
-        }
-        right = (
-            with_enum[Axis.X],
-            with_enum[Axis.Y],
-            with_enum[Axis.by_mount(top_types.Mount.RIGHT)],
-        )
-        left = (
-            with_enum[Axis.X],
-            with_enum[Axis.Y],
-            with_enum[Axis.by_mount(top_types.Mount.LEFT)],
-        )
-
-        gantry_calibration = self.robot_calibration.deck_calibration.attitude
-        right_deck = linal.apply_reverse(gantry_calibration, right)
-        left_deck = linal.apply_reverse(gantry_calibration, left)
-        deck_pos = {
-            Axis.X: right_deck[0],
-            Axis.Y: right_deck[1],
-            Axis.by_mount(top_types.Mount.RIGHT): right_deck[2],
-            Axis.by_mount(top_types.Mount.LEFT): left_deck[2],
-        }
-        deck_pos.update(plunger_axes)
-        return deck_pos
 
     async def current_position(
         self,
@@ -632,8 +591,10 @@ class API(
             raise MustHomeError("Current position is unknown; please home motors.")
         async with self._motion_lock:
             if refresh:
-                self._current_position = self._deck_from_smoothie(
-                    await self._backend.update_position()
+                self._current_position = deck_from_machine(
+                    await self._backend.update_position(),
+                    self._robot_calibration.deck_calibration.attitude,
+                    top_types.Point(0, 0, 0),
                 )
             if mount == top_types.Mount.RIGHT:
                 offset = top_types.Point(0, 0, 0)
@@ -688,6 +649,7 @@ class API(
             abs_position,
             partial(self.critical_point_for, cp_override=critical_point),
             top_types.Point(*self._config.left_mount_offset),
+            top_types.Point(0, 0, 0),
         )
 
         await self._cache_and_maybe_retract_mount(primary_mount)
@@ -749,26 +711,6 @@ class API(
             await self.retract(self._last_moved_mount, 10)
         self._last_moved_mount = mount
 
-    def _get_transformed(
-        self,
-        to_transform_primary: Tuple[float, ...],
-        to_transform_secondary: Tuple[float, ...],
-    ) -> Tuple[Tuple, Tuple]:
-        # Type ignored below because linal.apply_transform (rightly) specifies
-        # Tuple[float, float, float] and the implied type from
-        # target_position.items() is (rightly) Tuple[float, ...] with unbounded
-        # size; unfortunately, mypy can’t quite figure out the length check
-        # above that makes this OK
-        primary_transformed = linal.apply_transform(
-            self.robot_calibration.deck_calibration.attitude,
-            to_transform_primary,  # type: ignore[arg-type]
-        )
-        secondary_transformed = linal.apply_transform(
-            self.robot_calibration.deck_calibration.attitude,
-            to_transform_secondary,  # type: ignore[arg-type]
-        )
-        return primary_transformed, secondary_transformed
-
     @ExecutionManagerProvider.wait_for_running
     async def _move(
         self,
@@ -791,53 +733,21 @@ class API(
         at most one of a ZA or BC components. The frame in which to move
         is identified by the presence of (ZA) or (BC).
         """
-        # Transform only the x, y, and (z or a) axes specified since this could
-        # get the b or c axes as well
-        to_transform_primary = tuple(
-            (
-                tp
-                for ax, tp in target_position.items()
-                if (ax in Axis.gantry_axes() and ax != secondary_z)
-            )
+        machine_pos = machine_from_deck(
+            target_position,
+            secondary_z,
+            self._robot_calibration.deck_calibration.attitude,
+            top_types.Point(0, 0, 0),
         )
-        if secondary_z:
-            to_transform_secondary = tuple((0, 0, target_position[secondary_z]))
-        else:
-            to_transform_secondary = tuple((0, 0, 0))
-        # Pre-fill the dict we’ll send to the backend with the axes we don’t
-        # need to transform
-        smoothie_pos = {
-            ax.name: pos
-            for ax, pos in target_position.items()
-            if ax not in Axis.gantry_axes()
-        }
-        if len(to_transform_primary) != 3:
-            self._log.error(
-                "Move derived {} axes to transform from {}".format(
-                    len(to_transform_primary), target_position
-                )
-            )
-            raise ValueError(
-                "Moves must specify either exactly an "
-                "x, y, and (z or a) or none of them"
-            )
-        primary_transformed, secondary_transformed = self._get_transformed(
-            to_transform_primary, to_transform_secondary
-        )
-        transformed = (*primary_transformed, secondary_transformed[2])
-        # Since target_position is an OrderedDict with the axes ordered by
-        # (x, y, z, a, b, c), and we’ll only have one of a or z (as checked
-        # by the len(to_transform) check above) we can use an enumerate to
-        # fuse the specified axes and the transformed values back together.
-        # While we do this iteration, we’ll also check axis bounds.
+
         bounds = self._backend.axis_bounds
         to_check = {
-            ax: transformed[idx]
+            ax: machine_pos[ax.name]
             for idx, ax in enumerate(target_position.keys())
             if ax in Axis.gantry_axes()
         }
+
         check_motion_bounds(to_check, target_position, bounds, check_bounds)
-        smoothie_pos.update({ax.name: pos for ax, pos in to_check.items()})
         checked_maxes = max_speeds or {}
         str_maxes = {ax.name: val for ax, val in checked_maxes.items()}
         async with contextlib.AsyncExitStack() as stack:
@@ -845,7 +755,7 @@ class API(
                 await stack.enter_async_context(self._motion_lock)
             try:
                 await self._backend.move(
-                    smoothie_pos,
+                    machine_pos,
                     speed=speed,
                     home_flagged_axes=home_flagged_axes,
                     axis_max_speeds=str_maxes,
@@ -889,7 +799,11 @@ class API(
 
         async with self._motion_lock:
             smoothie_pos = await self._fast_home(smoothie_ax, margin)
-            self._current_position = self._deck_from_smoothie(smoothie_pos)
+            self._current_position = deck_from_machine(
+                smoothie_pos,
+                self._robot_calibration.deck_calibration.attitude,
+                top_types.Point(0, 0, 0),
+            )
 
     # Gantry/frame (i.e. not pipette) config API
     @property
@@ -1136,7 +1050,11 @@ class API(
                     [ax.name.upper() for ax in move.home_axes],
                     move.home_after_safety_margin,
                 )
-                self._current_position = self._deck_from_smoothie(smoothie_pos)
+                self._current_position = deck_from_machine(
+                    smoothie_pos,
+                    self._robot_calibration.deck_calibration.attitude,
+                    top_types.Point(0, 0, 0),
+                )
 
         for shake in spec.shake_moves:
             await self.move_rel(mount, shake[0], speed=shake[1])
