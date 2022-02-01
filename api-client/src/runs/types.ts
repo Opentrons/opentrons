@@ -1,5 +1,6 @@
 import type { RunTimeCommand, ModuleModel } from '@opentrons/shared-data'
 import type { ResourceLink } from '../types'
+export * from './commands/types'
 
 export const RUN_STATUS_IDLE = 'idle' as const
 export const RUN_STATUS_RUNNING = 'running' as const
@@ -109,14 +110,6 @@ export interface LabwareOffsetCreateData {
 
 export interface CommandData {
   data: RunCommandSummary
-}
-
-export interface CommandsData {
-  data: RunCommandSummary[]
-}
-
-export interface CommandDetail {
-  data: RunTimeCommand
 }
 
 export interface Error {

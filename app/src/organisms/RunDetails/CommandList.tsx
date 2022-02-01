@@ -42,8 +42,8 @@ import type {
   CommandStatus,
 } from '@opentrons/shared-data'
 
-const WINDOW_SIZE = 100 // number of command items rendered at a time
-const WINDOW_OVERLAP = 50 // number of command items that fall within two adjacent windows
+const WINDOW_SIZE = 60 // number of command items rendered at a time
+const WINDOW_OVERLAP = 30 // number of command items that fall within two adjacent windows
 const EAGER_BUFFER_COEFFICIENT = 0.5 // multiplied by clientHeight to determine number of pixels away from the next window required for it to load
 interface CommandRuntimeInfo {
   analysisCommand: RunTimeCommand | null // analysisCommand will only be null if protocol is nondeterministic
@@ -59,10 +59,12 @@ export function CommandList(): JSX.Element | null {
     .protocolData
   const currentRunId = useCurrentRunId()
   const runStartTime = useRunStartTime()
-  const runCommands = useCurrentRunCommands()
   const runStatus = useRunStatus()
   const listInnerRef = React.useRef<HTMLDivElement>(null)
   const currentItemRef = React.useRef<HTMLDivElement>(null)
+  const [commandCursorIndex, setCommandCursorIndex] = React.useState<number | null>(null)
+  const runCommands = useCurrentRunCommands({cursor: commandCursorIndex, before: WINDOW_OVERLAP, after: WINDOW_OVERLAP})
+
   const [windowIndex, setWindowIndex] = React.useState<number>(0)
   const [
     isInitiallyJumpingToCurrent,
