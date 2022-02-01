@@ -871,31 +871,6 @@
           },
 
           {
-            "description": "Heater Shaker Module Start Set Target Shake Speed: Module will begin accelerating to the target shake speed. This command is non-blocking, it does not delay protocol execution while approaching the target shake speed.",
-            "type": "object",
-            "required": ["id", "commandType", "params"],
-            "properties": {
-              "id": { "type": "string" },
-              "commandType": {
-                "enum": ["heaterShakerModule/startSetTargetShakeSpeed"]
-              },
-              "params": {
-                "required": ["moduleId", "rpm"],
-                "properties": {
-                  "moduleId": {
-                    "type": "string",
-                    "description": "Unique identifier of Heater Shaker Module to target. Must be a key from the top level 'modules' object"
-                  },
-                  "rpm": {
-                    "type": "number",
-                    "description": "target orbital rotations per minute"
-                  }
-                }
-              }
-            }
-          },
-
-          {
             "description": "Heater Shaker Module Set Target Shake Speed: Module will delay protocol execution until the target shake speed is reached. This command is blocking, it delays protocol execution while approaching the target shake speed.",
             "type": "object",
             "required": ["id", "commandType", "params"],
@@ -921,7 +896,7 @@
           },
 
           {
-            "description": "Heater Shaker Module Await Temperature: Delay protocol execution until the specified target temperature is reached.",
+            "description": "Heater Shaker Module Await Temperature: Delay protocol execution until the previously supplied startSetTemperature command's temperature parameter has been reached. Errors if no previous startSetTemperatureCommand has been executed",
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
@@ -930,15 +905,11 @@
                 "enum": ["heaterShakerModule/awaitTemperature"]
               },
               "params": {
-                "required": ["moduleId", "temperature"],
+                "required": ["moduleId"],
                 "properties": {
                   "moduleId": {
                     "type": "string",
                     "description": "Unique identifier of Heater Shaker Module to target. Must be a key from the top level 'modules' object"
-                  },
-                  "temperature": {
-                    "type": "number",
-                    "description": "temperature in °C to await"
                   }
                 }
               }
@@ -976,6 +947,21 @@
               "id": { "type": "string" },
               "commandType": {
                 "enum": ["heaterShakerModule/deactivateHeater"]
+              },
+              "params": {
+                "$ref": "#/definitions/moduleOnlyParams"
+              }
+            }
+          },
+
+          {
+            "description": "Heater Shaker Module Stop Shake: Module will stop actively shaking and ramp down to a still state",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": {
+                "enum": ["heaterShakerModule/stopShake"]
               },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
