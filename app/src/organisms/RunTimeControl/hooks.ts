@@ -3,9 +3,6 @@ import last from 'lodash/last'
 import {
   RUN_ACTION_TYPE_PLAY,
   RUN_ACTION_TYPE_PAUSE,
-  RunAction,
-  RunData,
-  RunStatus,
   RUN_STATUS_IDLE,
   RUN_STATUS_RUNNING,
   RUN_STATUS_STOPPED,
@@ -26,6 +23,7 @@ import {
   useCurrentRunCommands,
 } from '../ProtocolUpload/hooks'
 import { QueryOptions } from '@testing-library/react'
+import type { RunAction, RunStatus } from '@opentrons/api-client'
 
 interface RunControls {
   play: () => void

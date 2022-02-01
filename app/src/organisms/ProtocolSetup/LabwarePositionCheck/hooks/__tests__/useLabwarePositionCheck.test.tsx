@@ -11,7 +11,6 @@ import {
 import { useTrackEvent } from '../../../../../redux/analytics'
 import { getConnectedRobotName } from '../../../../../redux/robot/selectors'
 import {
-  useCurrentRun,
   useCurrentRunId,
   useCurrentRunCommands,
 } from '../../../../ProtocolUpload/hooks'
