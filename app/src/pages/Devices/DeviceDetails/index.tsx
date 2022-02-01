@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom'
 import {
   Box,
   Flex,
+  ALIGN_CENTER,
   C_MED_LIGHT_GRAY,
   C_WHITE,
   DIRECTION_COLUMN,
@@ -12,7 +13,6 @@ import {
   SPACING_2,
   SPACING_3,
   WRAP,
-  ALIGN_CENTER,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
@@ -38,13 +38,14 @@ export function DeviceDetails(): JSX.Element | null {
         padding={SPACING_3}
       >
         <Flex
+          alignItems={ALIGN_CENTER}
           backgroundColor={C_WHITE}
           border={`1px solid ${C_MED_LIGHT_GRAY}`}
           borderRadius="4px"
           flexDirection={DIRECTION_COLUMN}
           marginBottom={SPACING_2}
           padding={SPACING_3}
-          width={'100%'}
+          width="100%"
         >
           <RobotOverview robotName={robotName} />
           <Flex flexWrap={WRAP} alignItems={ALIGN_CENTER} width="100%">
