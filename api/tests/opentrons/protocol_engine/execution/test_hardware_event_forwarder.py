@@ -35,10 +35,13 @@ def action_dispatcher(decoy: Decoy) -> ActionDispatcher:
 
 
 @pytest.fixture
-def subject(
+async def subject(
     hardware_control_api: HardwareControlAPI, action_dispatcher: ActionDispatcher
 ) -> HardwareEventForwarder:
-    """Return a HardwareEventForwarder with mocked dependencies."""
+    """Return a HardwareEventForwarder with mocked dependencies.
+
+    Async because HardwareEventForwarder's initializer requires a running event loop.
+    """
     return HardwareEventForwarder(
         hardware_api=hardware_control_api, action_dispatcher=action_dispatcher
     )
@@ -56,6 +59,8 @@ async def test_event_forwarding(
     decoy.when(hardware_control_api.register_callback(handler_captor)).then_return(
         unsubscribe_callback
     )
+
+    subject.start()
 
     captured_handler = cast(HardwareEventHandler, handler_captor.value)
 
