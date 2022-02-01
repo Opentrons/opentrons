@@ -145,7 +145,7 @@ def _save_json(data: Dict[str, Any], filename: Union[str, Path]) -> None:
 
 def default_deck_calibration() -> List[List[float]]:
     if enable_ot3_hardware_controller():
-        return defaults_ot3.DEFAULT_DECK_CALIBRATION
+        return defaults_ot3.DEFAULT_DECK_TRANSFORM
     else:
         return defaults_ot2.DEFAULT_DECK_CALIBRATION_V2
 

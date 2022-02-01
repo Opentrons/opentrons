@@ -49,6 +49,9 @@ class CurrentDict(CurrentDictDefault, CurrentDictModelEntries):
     pass
 
 
+Offset = Tuple[float, float, float]
+
+
 @dataclass
 class RobotConfig:
     model: Literal["OT-2 Standard"]
@@ -64,7 +67,10 @@ class RobotConfig:
     default_max_speed: AxisDict
     log_level: str
     z_retract_distance: float
-    left_mount_offset: Tuple[float, float, float]
+    left_mount_offset: Offset
+
+
+OT3Transform = List[List[float]]
 
 
 @dataclass
@@ -80,8 +86,8 @@ class OT3Config:
     holding_current: PerPipetteAxisSettings
     normal_motion_current: PerPipetteAxisSettings
     z_retract_distance: float
-    deck_transform: List[List[float]]
-    carriage_offset: Tuple[float, float, float]
-    left_mount_offset: Tuple[float, float, float]
-    right_mount_offset: Tuple[float, float, float]
-    gripper_mount_offset: Tuple[float, float, float]
+    deck_transform: OT3Transform
+    carriage_offset: Offset
+    left_mount_offset: Offset
+    right_mount_offset: Offset
+    gripper_mount_offset: Offset
