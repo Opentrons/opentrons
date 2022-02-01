@@ -8,7 +8,7 @@ import type {
   GetCommandsParams,
 } from '@opentrons/api-client'
 
-const REFETCH_INTERVAL = 1000
+const REFETCH_INTERVAL = 3000
 
 export function useCurrentRunCommands(
   params?: GetCommandsParams,

@@ -10,7 +10,7 @@ export function useRunQuery(
 ): UseQueryResult<Run> {
   const host = useHost()
   const query = useQuery<Run>(
-    [host, 'runs', runId],
+    [host, 'runs', runId, 'details'],
     () =>
       getRun(host as HostConfig, runId as string).then(
         response => response.data

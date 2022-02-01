@@ -48,7 +48,6 @@ export interface CommandItemProps {
   analysisCommand: RunTimeCommand | null
   runCommandSummary: RunCommandSummary | null
   runStatus: RunStatus
-  currentRunId: string | null
   stepNumber: number
   runStartedAt: string | null
 }
@@ -84,7 +83,6 @@ export function CommandItemComponent(
     analysisCommand,
     runCommandSummary,
     runStatus,
-    currentRunId,
     stepNumber,
     runStartedAt,
   } = props
