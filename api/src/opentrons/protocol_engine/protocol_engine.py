@@ -1,8 +1,6 @@
 """ProtocolEngine class definition."""
-from asyncio import get_running_loop, run_coroutine_threadsafe
-from typing import Optional, Callable
+from typing import Optional
 
-from opentrons.hardware_control.types import HardwareEvent
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control import HardwareControlAPI
 
@@ -32,7 +30,6 @@ from .actions import (
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
     HardwareStoppedAction,
-    HardwareEventAction,
 )
 
 
@@ -53,7 +50,7 @@ class ProtocolEngine:
         queue_worker: Optional[QueueWorker] = None,
         model_utils: Optional[ModelUtils] = None,
         hardware_stopper: Optional[HardwareStopper] = None,
-        hardware_event_forwarder: Optional[HardwareEventForwarder] = None
+        hardware_event_forwarder: Optional[HardwareEventForwarder] = None,
     ) -> None:
         """Initialize a ProtocolEngine instance.
 
@@ -80,17 +77,16 @@ class ProtocolEngine:
         self._hardware_stopper = hardware_stopper or HardwareStopper(
             hardware_api=hardware_api, state_store=state_store
         )
-        self._queue_worker.start()
-
         self._hardware_event_forwarder = (
             hardware_event_forwarder
-            or
-            HardwareEventForwarder.start_forwarding(
-                event_source=hardware_api,
-                action_destination=self._action_dispatcher,
-                destination_loop=get_running_loop(),
+            or HardwareEventForwarder(
+                hardware_api=hardware_api,
+                action_dispatcher=self._action_dispatcher,
             )
         )
+
+        self._queue_worker.start()
+        self._hardware_event_forwarder.start()
 
     @property
     def state_view(self) -> StateView:
@@ -219,13 +215,10 @@ class ProtocolEngine:
         # to robustly clean up all these resources
         # instead of try/finally, which can't scale without making indentation silly.
         finally:
-            # Note: After we stop listening, there may be hardware events remaining
-            # whose processing we've scheduled in the event loop,
-            # but that the event loop hasn't gotten around to running yet.
-            # Those hardware events might be processed
+            # Note: After we stop listening, straggling events might be processed
             # concurrently to the below lines in this .finish() call,
             # or even after this .finish() call completes.
-            self._hardware_event_forwarder.stop_forwarding_soon()
+            self._hardware_event_forwarder.stop_soon()
 
             await self._hardware_stopper.do_stop_and_recover(drop_tips_and_home)
 

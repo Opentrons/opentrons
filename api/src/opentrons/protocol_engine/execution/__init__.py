@@ -31,5 +31,5 @@ __all__ = [
     "QueueWorker",
     "RunControlHandler",
     "HardwareStopper",
-    "HardwareEventForwarder"
+    "HardwareEventForwarder",
 ]
