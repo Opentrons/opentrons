@@ -6,7 +6,7 @@ import { GetCommandsParams } from '@opentrons/api-client'
 
 const DEFAULT_REFETCH_INTERVAL = 10000 // 10 seconds
 const DEFAULT_WINDOW_OVERLAP = 30
-const DEFAULT_PARAMS: GetCommandsParams = {
+export const DEFAULT_PARAMS: GetCommandsParams = {
   cursor: null,
   before: DEFAULT_WINDOW_OVERLAP,
   after: DEFAULT_WINDOW_OVERLAP,
