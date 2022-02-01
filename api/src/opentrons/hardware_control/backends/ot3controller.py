@@ -31,8 +31,8 @@ try:
 except ModuleNotFoundError:
     pass
 
-from ..module_control import AttachedModulesControl
-from ..types import BoardRevision, Axis, AionotifyEvent
+from opentrons.hardware_control.module_control import AttachedModulesControl
+from opentrons.hardware_control.types import BoardRevision, Axis, AionotifyEvent
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel

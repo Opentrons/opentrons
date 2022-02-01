@@ -28,13 +28,13 @@ try:
 except ModuleNotFoundError:
     pass
 
-from ..module_control import AttachedModulesControl
-from .. import modules
-from ..types import BoardRevision, Axis
+from opentrons.hardware_control.module_control import AttachedModulesControl
+from opentrons.hardware_control import modules
+from opentrons.hardware_control.types import BoardRevision, Axis
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
-    from ..dev_types import (
+    from opentrons.hardware_control.dev_types import (
         AttachedInstruments,
         InstrumentHardwareConfigs,
         InstrumentSpec,
