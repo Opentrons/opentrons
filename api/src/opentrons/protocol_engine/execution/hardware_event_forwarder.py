@@ -63,21 +63,21 @@ class HardwareEventForwarder:
     def _handle_hardware_event(self, event: HardwareEvent) -> None:
         """Handle a hardware event, ensuring thread-safety.
 
-        Note:
-            This method will only return after the `ProtocolEngine` processes the event.
-            If something else is hogging the event loop thread that the `ProtocolEngine`
-            is running in, that may take a moment.
+        This is used as a callback for HardwareControlAPI.register_callback(),
+        and it's run inside the hardware thread.
+
+        This method will only return after the `ProtocolEngine` processes the event.
+        If something else is hogging the event loop thread that the `ProtocolEngine`
+        is running in, that may take a moment, and the hardware thread may be blocked.
+
+        This method will deadlock if it's ever run from the same thread that
+        owns the event loop that this HardwareEventForwarder was constructed in.
         """
         action = HardwareEventAction(event=event)
         coroutine = self._dispatch_action(action)
         future = run_coroutine_threadsafe(coroutine, self._loop)
-
         # Wait for the dispatch to complete before returning,
         # which is important for ordering guarantees.
-        #
-        # NOTE: We assume we're being called from a separate thread
-        # from the one that owns the event loop we were constructed in.
-        # If that's ever the same thread for whatever reason, this will deadlock.
         future.result()
 
     async def _dispatch_action(self, action: HardwareEventAction) -> None:
