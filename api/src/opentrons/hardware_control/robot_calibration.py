@@ -2,7 +2,7 @@ from functools import lru_cache
 import logging
 import numpy as np
 from dataclasses import dataclass
-from typing import Optional, List, Tuple
+from typing import Optional, List
 
 from opentrons import config
 
@@ -13,7 +13,7 @@ from opentrons.config.robot_configs import (
 )
 from opentrons.config.types import OT3Config
 from opentrons.calibration_storage import modify, types, get
-from opentrons.types import Mount
+from opentrons.types import Mount, Point
 from opentrons.util import linal
 
 from .util import DeckTransformState
@@ -28,10 +28,10 @@ class RobotCalibration:
 
 @dataclass
 class OT3Transforms(RobotCalibration):
-    carriage_offset: Tuple[float, float, float]
-    left_mount_offset: Tuple[float, float, float]
-    right_mount_offset: Tuple[float, float, float]
-    gripper_mount_offset: Tuple[float, float, float]
+    carriage_offset: Point
+    left_mount_offset: Point
+    right_mount_offset: Point
+    gripper_mount_offset: Point
 
 
 def build_ot3_transforms(config: OT3Config) -> OT3Transforms:
@@ -41,10 +41,10 @@ def build_ot3_transforms(config: OT3Config) -> OT3Transforms:
             source=types.SourceType.default,
             status=types.CalibrationStatus(),
         ),
-        carriage_offset=config.carriage_offset,
-        left_mount_offset=config.left_mount_offset,
-        right_mount_offset=config.right_mount_offset,
-        gripper_mount_offset=config.gripper_mount_offset,
+        carriage_offset=Point(*config.carriage_offset),
+        left_mount_offset=Point(*config.left_mount_offset),
+        right_mount_offset=Point(*config.right_mount_offset),
+        gripper_mount_offset=Point(*config.gripper_mount_offset),
     )
 
 
