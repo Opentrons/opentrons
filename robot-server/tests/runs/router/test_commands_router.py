@@ -131,7 +131,7 @@ async def test_get_run_commands(decoy: Decoy, engine_store: EngineStore) -> None
     decoy.when(engine_store.get_state("run-id")).then_return(engine_state)
     decoy.when(engine_state.commands.get_current()).then_return("current-command-id")
     decoy.when(engine_state.commands.get_slice(cursor=None, length=42)).then_return(
-        CommandSlice(commands=[command], cursor=1, length=2, total_length=2)
+        CommandSlice(commands=[command], cursor=1, length=2, total_length=3)
     )
 
     result = await get_run_commands(

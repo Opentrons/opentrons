@@ -532,7 +532,7 @@ describe('useRunTimestamps hook', () => {
         data: mockSucceededRun,
       } as Run)
     when(mockUseCurrentRunCommands)
-      .calledWith({cursor: null, after: 1, before: 0}, expect.any(Object))
+      .calledWith({ cursor: null, pageLength: 1 }, expect.any(Object))
       .mockReturnValue([mockCommand.data as any])
 
     const { result } = renderHook(useRunTimestamps)
@@ -546,7 +546,7 @@ describe('useRunTimestamps hook', () => {
         data: { data: mockFailedRun },
       } as unknown) as UseQueryResult<Run>)
     when(mockUseCurrentRunCommands)
-      .calledWith({cursor: null, after: 1, before: 0}, expect.any(Object))
+      .calledWith({ cursor: null, pageLength: 1 }, expect.any(Object))
       .mockReturnValue([mockCommand.data as any])
     when(mockUseCurrentRun)
       .calledWith()
@@ -566,7 +566,7 @@ describe('useRunTimestamps hook', () => {
         data: { data: mockStoppedRun },
       } as unknown) as UseQueryResult<Run>)
     when(mockUseCurrentRunCommands)
-      .calledWith({cursor: null, after: 1, before: 0}, expect.any(Object))
+      .calledWith({ cursor: null, pageLength: 1 }, expect.any(Object))
       .mockReturnValue([mockCommand.data as any])
     when(mockUseCurrentRun)
       .calledWith()

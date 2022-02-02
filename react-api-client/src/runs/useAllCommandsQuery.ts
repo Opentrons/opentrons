@@ -8,11 +8,10 @@ import type {
   CommandsData,
 } from '@opentrons/api-client'
 
-const DEFAULT_WINDOW_OVERLAP = 30
+const DEFAULT_PAGE_LENGTH = 30
 export const DEFAULT_PARAMS: GetCommandsParams = {
   cursor: null,
-  before: DEFAULT_WINDOW_OVERLAP,
-  after: DEFAULT_WINDOW_OVERLAP,
+  pageLength: DEFAULT_PAGE_LENGTH,
 }
 
 export function useAllCommandsQuery(
@@ -25,9 +24,9 @@ export function useAllCommandsQuery(
     ...options,
     enabled: host !== null && runId != null && options.enabled !== false,
   }
-  const { cursor, before, after } = params
+  const { cursor, pageLength } = params
   const query = useQuery<CommandsData>(
-    [host, 'runs', runId, 'commands', cursor, before, after],
+    [host, 'runs', runId, 'commands', cursor, pageLength],
     () => {
       return getCommands(host as HostConfig, runId as string, params).then(
         response => response.data

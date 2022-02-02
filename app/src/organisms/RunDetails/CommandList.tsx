@@ -66,15 +66,14 @@ export function CommandList(): JSX.Element | null {
     currentRunId,
     {
       cursor: windowFirstCommandIndex,
-      before: 0,
-      after: WINDOW_SIZE,
+      pageLength: WINDOW_SIZE,
     },
     {
       refetchInterval: COMMANDS_REFETCH_INTERVAL,
       keepPreviousData: true,
     }
   )
-  const totalRunCommandCount = commandsData?.meta.totalCount ?? 0
+  const totalRunCommandCount = commandsData?.meta.totalLength ?? 0
   const runCommands = commandsData?.data ?? []
 
   const [

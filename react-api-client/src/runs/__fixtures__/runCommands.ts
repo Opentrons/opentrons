@@ -53,9 +53,8 @@ export const mockCommandsResponse: CommandsData = {
   data: [mockLoadLabwareRunCommandSummary, mockLoadPipetteRunCommandSummary],
   meta: {
     cursor: 0,
-    before: 0,
-    after: 60,
-    totalCount: 100,
+    pageLength: 60,
+    totalLength: 100,
   },
   links: {
     current: {

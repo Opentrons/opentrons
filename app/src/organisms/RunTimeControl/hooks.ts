@@ -138,7 +138,7 @@ export function useRunTimestamps(): RunTimestamps {
   const { actions = [], errors = [] } = useCurrentRun()?.data ?? {}
   const runCommands =
     useCurrentRunCommands(
-      { cursor: null, after: 1, before: 0 },
+      { cursor: null, pageLength: 1 },
       {
         enabled:
           runStatus === RUN_STATUS_SUCCEEDED ||

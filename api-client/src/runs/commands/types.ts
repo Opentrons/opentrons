@@ -2,8 +2,7 @@ import type { RunTimeCommand } from '@opentrons/shared-data'
 
 export interface GetCommandsParams {
   cursor: number | null // the index of the command at the center of the window
-  before: number // the number of items before the cursor to include
-  after: number // the number of items after the cursor to include
+  pageLength: number // the number of items to include
 }
 
 export interface RunCommandSummary {
@@ -36,6 +35,6 @@ export interface CommandsLinks {
 
 export interface CommandsData {
   data: RunCommandSummary[]
-  meta: GetCommandsParams & { totalCount: number }
+  meta: GetCommandsParams & { totalLength: number }
   links: CommandsLinks
 }
