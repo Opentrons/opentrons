@@ -3,6 +3,8 @@ import argparse
 import asyncio
 import logging
 from logging.config import dictConfig
+from pathlib import Path
+
 from typing_extensions import Final
 
 from opentrons_hardware.drivers.can_bus import CanMessenger
@@ -53,11 +55,12 @@ async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
     target = TARGETS[args.target]
 
-    hex_processor = HexRecordProcessor.from_file(args.file)
+    hex_processor = HexRecordProcessor.from_file(Path(args.file))
 
     driver = await build_driver(build_settings(args))
 
     messenger = CanMessenger(driver)
+    messenger.start()
 
     initiator = FirmwareUpdateInitiator(messenger)
     downloader = FirmwareUpdateDownloader(messenger)
@@ -75,6 +78,8 @@ async def run(args: argparse.Namespace) -> None:
         hex_processor=hex_processor,
         ack_wait_seconds=args.timeout_seconds,
     )
+
+    await messenger.stop()
 
     logger.info("Done")
 
@@ -95,8 +100,8 @@ def main() -> None:
     )
     parser.add_argument(
         "--file",
-        help="The hex file containing the FW executable.",
-        type=argparse.FileType("r"),
+        help="Path to hex file containing the FW executable.",
+        type=str,
         required=True,
     )
     parser.add_argument(
