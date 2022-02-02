@@ -1,23 +1,22 @@
 """Tests for move groups."""
 import asyncio
-from typing import Iterator, Tuple
+from typing import Iterator
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from opentrons_ot3_firmware import NodeId, ArbitrationId
+from opentrons_ot3_firmware import NodeId
 from opentrons_ot3_firmware.messages.message_definitions import (
     AddLinearMoveRequest,
     GetMoveGroupRequest,
     GetMoveGroupResponse,
 )
-from opentrons_ot3_firmware.messages import MessageDefinition
 from opentrons_ot3_firmware.messages.payloads import (
     AddLinearMoveRequestPayload,
     MoveGroupRequestPayload,
 )
 from opentrons_ot3_firmware.utils import UInt8Field, Int32Field, UInt32Field
 
-from opentrons_hardware.drivers.can_bus import CanMessenger
+from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
 
 
 @pytest.fixture(
@@ -33,7 +32,7 @@ def group_id(request: FixtureRequest) -> Iterator[int]:
 async def test_add_moves(
     loop: asyncio.BaseEventLoop,
     can_messenger: CanMessenger,
-    can_messenger_queue: "asyncio.Queue[Tuple[MessageDefinition, ArbitrationId]]",
+    can_messenger_queue: WaitableCallback,
     motor_node_id: NodeId,
     group_id: int,
 ) -> None:
@@ -65,7 +64,7 @@ async def test_add_moves(
         ),
     )
 
-    response, arbitration_id = await asyncio.wait_for(can_messenger_queue.get(), 1)
+    response, arbitration_id = await asyncio.wait_for(can_messenger_queue.read(), 1)
 
     assert isinstance(response, GetMoveGroupResponse)
     assert response.payload.num_moves.value == len(durations)

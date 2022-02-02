@@ -36,7 +36,8 @@ async def test_broadcast(
         while len(nodes):
             m = await driver.read()
             assert m.arbitration_id.parts.message_id == MessageId.device_info_response
-            nodes.remove(m.arbitration_id.parts.originating_node_id)
+            if m.arbitration_id.parts.originating_node_id in nodes:
+                nodes.remove(m.arbitration_id.parts.originating_node_id)
 
     t = loop.create_task(_check())
     await asyncio.wait_for(t, 1)
