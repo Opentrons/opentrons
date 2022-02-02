@@ -2,13 +2,15 @@ import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
-import { StatusLabel } from '../StatusLabel'
+import { MagneticModuleData } from '../MagneticModuleData'
 import { ModuleCard } from '..'
 import { mockMagneticModule } from '../../../../redux/modules/__fixtures__'
 
-jest.mock('../StatusLabel')
+jest.mock('../MagneticModuleData')
 
-const mockStatusLabel = StatusLabel as jest.MockedFunction<typeof StatusLabel>
+const mockMagneticModuleData = MagneticModuleData as jest.MockedFunction<
+  typeof MagneticModuleData
+>
 
 const render = (props: React.ComponentProps<typeof ModuleCard>) => {
   return renderWithProviders(<ModuleCard {...props} />, {
@@ -23,13 +25,13 @@ describe('ModuleCard', () => {
     props = {
       module: mockMagneticModule,
     }
-    mockStatusLabel.mockReturnValue(<div>Mock Status Label</div>)
+    mockMagneticModuleData.mockReturnValue(<div>Mock Magnetic Module Data</div>)
   })
 
   it('renders information for a magnetic module with mocked status', () => {
     const { getByText, getByAltText } = render(props)
     getByText('Magnetic Module GEN1')
-    getByText('Mock Status Label')
+    getByText('Mock Magnetic Module Data')
     getByText('usb port 1')
     getByAltText('magneticModuleV1')
   })
