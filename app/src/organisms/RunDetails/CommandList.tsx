@@ -203,13 +203,15 @@ export function CommandList(): JSX.Element | null {
         !isFinalWindow &&
         potentialNextWindowFirstIndex < currentCommandList.length &&
         scrollTop >=
-          topBufferHeightPx + ((WINDOW_SIZE - 5) * AVERAGE_ITEM_HEIGHT_PX) - clientHeight
+          topBufferHeightPx +
+            (WINDOW_SIZE - 5) * AVERAGE_ITEM_HEIGHT_PX -
+            clientHeight
       ) {
         setWindowIndex(windowIndex + 1)
       } else if (
         windowIndex > 0 &&
         potentialPrevWindowFirstIndex >= 0 &&
-        scrollTop <= topBufferHeightPx + (5 * AVERAGE_ITEM_HEIGHT_PX)
+        scrollTop <= topBufferHeightPx + 5 * AVERAGE_ITEM_HEIGHT_PX
       ) {
         setWindowIndex(windowIndex - 1)
       }
