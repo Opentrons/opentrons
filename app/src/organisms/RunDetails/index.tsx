@@ -80,8 +80,8 @@ export function RunDetails(): JSX.Element | null {
       text = t('closing_protocol')
     }
     return (
-    <Portal level="top">
-      <SpinnerModal message={text} />
+      <Portal level="top">
+        <SpinnerModal message={text} />
       </Portal>
     )
   }
