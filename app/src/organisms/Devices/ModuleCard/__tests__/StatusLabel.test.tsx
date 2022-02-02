@@ -1,8 +1,6 @@
-import { renderWithProviders } from '@opentrons/components'
+import { C_BLUE, C_SKY_BLUE, renderWithProviders } from '@opentrons/components'
 import * as React from 'react'
 import { StatusLabel } from '../StatusLabel'
-
-import { mockMagneticModule } from '../../../../redux/modules/__fixtures__'
 
 const render = (props: React.ComponentProps<typeof StatusLabel>) => {
   return renderWithProviders(<StatusLabel {...props} />)[0]
@@ -11,19 +9,21 @@ const render = (props: React.ComponentProps<typeof StatusLabel>) => {
 describe('StatusLabel', () => {
   let props: React.ComponentProps<typeof StatusLabel>
 
-  it('renders an engaged status', () => {
+  it('renders an engaged status label with a blue background and text', () => {
     props = {
-      moduleType: mockMagneticModule.type,
       moduleStatus: 'Engaged',
+      backgroundColor: C_SKY_BLUE,
+      iconColor: C_BLUE,
     }
     const { getByText } = render(props)
     getByText('Engaged')
   })
 
-  it('renders a disengaged status', () => {
+  it('renders a disengaged status label with a blue background and text', () => {
     props = {
-      moduleType: mockMagneticModule.type,
       moduleStatus: 'Disengaged',
+      backgroundColor: C_SKY_BLUE,
+      iconColor: C_BLUE,
     }
     const { getByText } = render(props)
     getByText('Disengaged')

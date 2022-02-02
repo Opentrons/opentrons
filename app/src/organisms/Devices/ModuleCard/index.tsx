@@ -8,8 +8,6 @@ import {
   DIRECTION_ROW,
   SPACING_2,
   ALIGN_START,
-  C_DARK_GRAY,
-  SIZE_2,
   DIRECTION_COLUMN,
   SPACING_3,
   TEXT_TRANSFORM_UPPERCASE,
@@ -19,7 +17,6 @@ import {
   C_HARBOR_GRAY,
   Btn,
   FONT_WEIGHT_REGULAR,
-  C_BLUE_PRESSED,
 } from '@opentrons/components'
 import {
   getModuleDisplayName,

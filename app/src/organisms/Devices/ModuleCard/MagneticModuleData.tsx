@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { C_BLUE, C_SKY_BLUE, Flex, Text } from '@opentrons/components'
+import { C_BLUE, C_SKY_BLUE, Text } from '@opentrons/components'
 import { StatusLabel } from './StatusLabel'
 import {
   MAGNETIC_MODULE_V1,
@@ -27,7 +27,7 @@ export const MagneticModuleData = (
         backgroundColor={C_SKY_BLUE}
         iconColor={moduleStatus === 'disengaged' ? C_BLUE : C_BLUE}
       />
-      <Text fontSize='0.625rem'>
+      <Text fontSize="0.625rem">
         {moduleModel === MAGNETIC_MODULE_V2
           ? t('magdeck_gen2_height', {
               height: moduleHeight,
