@@ -39,8 +39,8 @@ interface ModuleCardProps {
 }
 
 const iconNamesByModuleType = {
-  [MAGNETIC_MODULE_TYPE]: 'ot-magnet',
-  [TEMPERATURE_MODULE_TYPE]: 'ot-temperature',
+  [MAGNETIC_MODULE_TYPE]: 'ot-magnet-v2',
+  [TEMPERATURE_MODULE_TYPE]: 'ot-temperature-v2',
   [THERMOCYCLER_MODULE_TYPE]: 'ot-thermocycler',
 } as const
 
@@ -57,6 +57,7 @@ const ModuleIcon = ({
       name={iconNamesByModuleType[moduleType]}
       size={SIZE_1}
       marginRight={SPACING_2}
+      color={C_HARBOR_GRAY}
     />
   )
 }
