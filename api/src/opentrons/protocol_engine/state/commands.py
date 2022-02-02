@@ -65,9 +65,8 @@ class CommandSlice:
 
     commands: List[Command]
     cursor: int
-    before: int
-    after: int
-    total_count: int
+    length: int
+    total_length: int
 
 
 @dataclass
@@ -268,15 +267,14 @@ class CommandView(HasState[CommandState]):
     def get_slice(
         self,
         cursor: Optional[int],
-        before: int,
-        after: int,
+        length: int,
     ) -> CommandSlice:
         """Get a subset of commands around a given cursor."""
         # TODO(mc, 2022-01-31): this is not the most performant way to implement
         # this; if this becomes a problem, change or the underlying data structure
         # to something that isn't just an OrderedDict
         commands_by_id = self._state.commands_by_id
-        total_count = len(commands_by_id)
+        total_length = len(commands_by_id)
 
         if cursor is None:
             current_id = self.get_current()
@@ -288,25 +286,22 @@ class CommandView(HasState[CommandState]):
                 # worst-case in practice for Python + PAPIv2 protocols
                 for index, command_id in enumerate(reversed(commands_by_id.keys())):
                     if command_id == current_id:
-                        cursor = total_count - index - 1
+                        cursor = total_length - index - 1
 
             if cursor is None:
-                cursor = total_count - after
+                cursor = total_length - length
 
         # start is inclusive, stop is exclusive
-        actual_cursor = max(0, min(cursor, total_count - 1))
-        start = max(0, actual_cursor - before)
-        stop = min(total_count, actual_cursor + after)
-        actual_before = actual_cursor - start
-        actual_after = stop - actual_cursor
-        commands = list(itertools.islice(commands_by_id.values(), start, stop))
+        actual_cursor = max(0, min(cursor, total_length - 1))
+        stop = min(total_length, actual_cursor + length)
+        actual_length = stop - actual_cursor
+        commands = list(itertools.islice(commands_by_id.values(), actual_cursor, stop))
 
         return CommandSlice(
             commands=commands,
             cursor=actual_cursor,
-            before=actual_before,
-            after=actual_after,
-            total_count=total_count,
+            length=actual_length,
+            total_length=total_length,
         )
 
     def get_all_errors(self) -> List[ErrorOccurrence]:

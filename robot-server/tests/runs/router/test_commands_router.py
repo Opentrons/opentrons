@@ -130,24 +130,15 @@ async def test_get_run_commands(decoy: Decoy, engine_store: EngineStore) -> None
     engine_state = decoy.mock(cls=StateView)
     decoy.when(engine_store.get_state("run-id")).then_return(engine_state)
     decoy.when(engine_state.commands.get_current()).then_return("current-command-id")
-    decoy.when(
-        engine_state.commands.get_slice(cursor=None, before=42, after=84)
-    ).then_return(
-        CommandSlice(
-            commands=[command],
-            cursor=1,
-            before=2,
-            after=3,
-            total_count=4,
-        )
+    decoy.when(engine_state.commands.get_slice(cursor=None, length=42)).then_return(
+        CommandSlice(commands=[command], cursor=1, length=2, total_length=2)
     )
 
     result = await get_run_commands(
         run=run,
         engine_store=engine_store,
         cursor=None,
-        before=42,
-        after=84,
+        pageLength=42,
     )
 
     assert result.content.data == [
@@ -163,12 +154,7 @@ async def test_get_run_commands(decoy: Decoy, engine_store: EngineStore) -> None
             errorId="error-id",
         )
     ]
-    assert result.content.meta == MultiBodyMeta(
-        cursor=1,
-        before=2,
-        after=3,
-        totalCount=4,
-    )
+    assert result.content.meta == MultiBodyMeta(cursor=1, pageLength=2, totalLength=3)
     assert result.content.links == CommandCollectionLinks(
         current=CommandLink(
             href="/runs/run-id/commands/current-command-id",
@@ -196,25 +182,19 @@ async def test_get_run_commands_empty(decoy: Decoy, engine_store: EngineStore) -
     engine_state = decoy.mock(cls=StateView)
     decoy.when(engine_store.get_state("run-id")).then_return(engine_state)
     decoy.when(engine_state.commands.get_current()).then_return(None)
-    decoy.when(
-        engine_state.commands.get_slice(cursor=21, before=42, after=84)
-    ).then_return(CommandSlice(commands=[], cursor=0, before=0, after=0, total_count=0))
+    decoy.when(engine_state.commands.get_slice(cursor=21, length=42)).then_return(
+        CommandSlice(commands=[], cursor=0, length=0, total_length=0)
+    )
 
     result = await get_run_commands(
         run=run,
         engine_store=engine_store,
         cursor=21,
-        before=42,
-        after=84,
+        pageLength=42,
     )
 
     assert result.content.data == []
-    assert result.content.meta == MultiBodyMeta(
-        cursor=0,
-        before=0,
-        after=0,
-        totalCount=0,
-    )
+    assert result.content.meta == MultiBodyMeta(cursor=0, pageLength=0, totalLength=0)
     assert result.content.links == CommandCollectionLinks(current=None)
     assert result.status_code == 200
 

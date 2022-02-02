@@ -236,12 +236,7 @@ async def get_runs(
         if run.is_current:
             links.current = ResourceLink.construct(href=f"/runs/{run.run_id}")
 
-    meta = MultiBodyMeta(
-        cursor=0,
-        before=0,
-        after=len(data),
-        totalCount=len(data),
-    )
+    meta = MultiBodyMeta(cursor=0, pageLength=len(data), totalLength=len(data))
 
     return await PydanticResponse.create(
         content=MultiBody.construct(data=data, links=links, meta=meta),

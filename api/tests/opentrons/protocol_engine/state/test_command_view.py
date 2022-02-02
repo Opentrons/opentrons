@@ -504,14 +504,13 @@ def test_get_slice_empty() -> None:
     """It should return a slice from the tail if no current command."""
     subject = get_command_view(commands_by_id=[])
 
-    result = subject.get_slice(cursor=None, before=1, after=2)
+    result = subject.get_slice(cursor=None, length=2)
 
     assert result == CommandSlice(
         commands=[],
         cursor=0,
-        before=0,
-        after=0,
-        total_count=0,
+        length=0,
+        total_length=0,
     )
 
 
@@ -531,24 +530,22 @@ def test_get_slice() -> None:
         ]
     )
 
-    result = subject.get_slice(cursor=2, before=1, after=2)
+    result = subject.get_slice(cursor=1, length=3)
 
     assert result == CommandSlice(
         commands=[command_2, command_3, command_4],
-        cursor=2,
-        before=1,
-        after=2,
-        total_count=4,
+        cursor=1,
+        length=3,
+        total_length=4,
     )
 
-    result = subject.get_slice(cursor=2, before=10, after=10)
+    result = subject.get_slice(cursor=-3, length=10)
 
     assert result == CommandSlice(
         commands=[command_1, command_2, command_3, command_4],
-        cursor=2,
-        before=2,
-        after=2,
-        total_count=4,
+        cursor=0,
+        length=4,
+        total_length=4,
     )
 
 
@@ -560,7 +557,7 @@ def test_get_slice_default_cursor() -> None:
     command_4 = create_queued_command(command_id="command-id-4")
 
     subject = get_command_view(
-        running_command_id="command-id-3",
+        running_command_id="command-id-2",
         commands_by_id=[
             ("command-id-1", command_1),
             ("command-id-2", command_2),
@@ -569,14 +566,13 @@ def test_get_slice_default_cursor() -> None:
         ],
     )
 
-    result = subject.get_slice(cursor=None, before=1, after=2)
+    result = subject.get_slice(cursor=None, length=2)
 
     assert result == CommandSlice(
-        commands=[command_2, command_3, command_4],
-        cursor=2,
-        before=1,
-        after=2,
-        total_count=4,
+        commands=[command_2, command_3],
+        cursor=1,
+        length=2,
+        total_length=4,
     )
 
 
@@ -596,12 +592,11 @@ def test_get_slice_default_cursor_no_current() -> None:
         ],
     )
 
-    result = subject.get_slice(cursor=None, before=1, after=2)
+    result = subject.get_slice(cursor=None, length=3)
 
     assert result == CommandSlice(
         commands=[command_2, command_3, command_4],
-        cursor=2,
-        before=1,
-        after=2,
-        total_count=4,
+        cursor=1,
+        length=3,
+        total_length=4,
     )

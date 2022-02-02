@@ -121,22 +121,19 @@ async def get_run_commands(
     engine_store: EngineStore = Depends(get_engine_store),
     run: Run = Depends(get_run_data_from_url),
     cursor: Optional[int] = None,
-    before: int = _DEFAULT_COMMANDS_BEFORE,
-    after: int = _DEFAULT_COMMANDS_AFTER,
+    pageLength: int = _DEFAULT_COMMANDS_BEFORE,
 ) -> PydanticResponse[MultiBody[RunCommandSummary, CommandCollectionLinks]]:
     """Get a summary of all commands in a run.
 
     Arguments:
         engine_store: Protocol engine and runner storage.
-        run: Run response model, provided by the route handler for
-            `GET /runs/{runId}`
+        run: Run response model, provided by the route handler for `GET /runs/{runId}`
         cursor: Cursor index for the collection response.
-        before: Maximum number of items before the cursor (exclusive) to return.
-        after: Maximum number of items after the cursor (inclusive) to return.
+        pageLength: Maximum number of items to return.
     """
     state = engine_store.get_state(run.id)
     current_command_id = state.commands.get_current()
-    command_slice = state.commands.get_slice(cursor=cursor, before=before, after=after)
+    command_slice = state.commands.get_slice(cursor=cursor, length=pageLength)
 
     data = [
         RunCommandSummary.construct(
@@ -155,9 +152,8 @@ async def get_run_commands(
 
     meta = MultiBodyMeta(
         cursor=command_slice.cursor,
-        before=command_slice.before,
-        after=command_slice.after,
-        totalCount=command_slice.total_count,
+        pageLength=command_slice.length,
+        totalLength=command_slice.total_length,
     )
 
     links = CommandCollectionLinks()

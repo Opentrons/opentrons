@@ -71,23 +71,13 @@ class MultiBodyMeta(BaseModel):
             " the response represents."
         ),
     )
-    before: int = Field(
+    pageLength: int = Field(
         ...,
-        description=(
-            "How many items before the cursor (exclusive)"
-            " are included in the response"
-        ),
+        description="Number of items included in the response.",
     )
-    after: int = Field(
+    totalLength: int = Field(
         ...,
-        description=(
-            "How many items after the cursor (inclusive)"
-            " are included in the response"
-        ),
-    )
-    totalCount: int = Field(
-        ...,
-        description="The total number of items in the overall collection.",
+        description="Total number of items in the overall collection.",
     )
 
 
