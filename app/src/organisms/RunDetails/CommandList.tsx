@@ -1,4 +1,3 @@
-import dropWhile from 'lodash/dropWhile'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
@@ -29,15 +28,14 @@ import {
   RUN_STATUS_STOP_REQUESTED,
   RUN_STATUS_STOPPED,
   RUN_STATUS_SUCCEEDED,
-  RUN_STATUS_RUNNING,
 } from '@opentrons/api-client'
 import { useAllCommandsQuery } from '@opentrons/react-api-client'
 import { useRunStatus, useRunStartTime } from '../RunTimeControl/hooks'
 import { useProtocolDetails } from './hooks'
-import { useCurrentRunCommands, useCurrentRunId } from '../ProtocolUpload/hooks'
+import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ProtocolSetupInfo } from './ProtocolSetupInfo'
 import { CommandItem } from './CommandItem'
-import type { RunStatus, RunCommandSummary } from '@oppentrons/api-client'
+import type { RunStatus, RunCommandSummary } from '@opentrons/api-client'
 import type {
   ProtocolFile,
   RunTimeCommand,
@@ -53,9 +51,6 @@ interface CommandRuntimeInfo {
   runCommandSummary: RunCommandSummary | null
 }
 
-// use state for the cursor whcih defaults to null
-// grab the current command id from the all command response
-// remove command detials fetching , don't remvoe  but make it way les
 export function CommandList(): JSX.Element | null {
   const { t } = useTranslation('run_details')
   const protocolData: ProtocolFile<{}> | null = useProtocolDetails()
@@ -71,10 +66,7 @@ export function CommandList(): JSX.Element | null {
     number | null
   >(0)
   const currentRunId = useCurrentRunId()
-  const {
-    data: commandsData,
-    isFetching: isFetchingCommands,
-  } = useAllCommandsQuery(
+  const { data: commandsData } = useAllCommandsQuery(
     currentRunId,
     {
       cursor: commandCursorIndex,
@@ -166,25 +158,7 @@ export function CommandList(): JSX.Element | null {
       }
     })
 
-    // const remainingAnticipatedCommands = dropWhile(
-    //   postSetupAnticipatedCommands,
-    //   anticipatedCommand =>
-    //     runCommands.some(runC => runC.key === anticipatedCommand.key)
-    // ).map(remainingAnticipatedCommand => ({
-    //   analysisCommand: remainingAnticipatedCommand,
-    //   runCommandSummary: null,
-    // }))
 
-    // const isProtocolDeterministic = postPlayRunCommands.reduce(
-    //   (isDeterministic, command, index) => {
-    //     return (
-    //       isDeterministic &&
-    //       command.runCommandSummary?.key ===
-    //         postSetupAnticipatedCommands[index]?.key
-    //     )
-    //   },
-    //   true
-    // )
     // TODO: implement deterministic check
     const isProtocolDeterministic = true
 

@@ -1,4 +1,4 @@
-import { CommandsData } from '@opentrons/api-client'
+import { CommandsData, RunCommandSummary } from '@opentrons/api-client'
 import type {
   CreateCommand,
   RunTimeCommand,
@@ -14,7 +14,7 @@ export const mockAnonLoadCommand: CreateCommand = {
   },
 }
 
-export const mockLoadLabwareRunTimeCommand: RunTimeCommand = {
+export const mockLoadLabwareRunCommandSummary: RunCommandSummary = {
   id: 'qwerty',
   key: 'first_load_labware',
   commandType: 'loadLabware',
@@ -29,14 +29,13 @@ export const mockLoadLabwareRunTimeCommand: RunTimeCommand = {
     definition: {} as any,
     offset: { x: 1, y: 2, z: 3 },
   },
-  error: null,
   status: 'running',
   createdAt: 'fake_created_at_timestamp',
   startedAt: 'fake_created_at_timestamp',
   completedAt: 'fake_created_at_timestamp',
 }
 
-export const mockLoadPipetteRunTimeCommand: RunTimeCommand = {
+export const mockLoadPipetteRunCommandSummary: RunCommandSummary = {
   id: 'qwerty',
   key: 'first_load_pipette',
   commandType: 'loadPipette',
@@ -47,7 +46,6 @@ export const mockLoadPipetteRunTimeCommand: RunTimeCommand = {
   result: {
     pipetteId: 'abc123',
   },
-  error: null,
   status: 'running',
   createdAt: 'fake_created_at_timestamp',
   startedAt: 'fake_created_at_timestamp',
@@ -55,12 +53,12 @@ export const mockLoadPipetteRunTimeCommand: RunTimeCommand = {
 }
 
 export const mockCommandsResponse: CommandsData = {
-  data: [mockLoadLabwareRunTimeCommand, mockLoadPipetteRunTimeCommand],
+  data: [mockLoadLabwareRunCommandSummary, mockLoadPipetteRunCommandSummary],
   meta: {
     cursor: 0,
     before: 0,
     after: 60,
-    total: 100,
+    totalCount: 100,
   },
   links: {
     current: {

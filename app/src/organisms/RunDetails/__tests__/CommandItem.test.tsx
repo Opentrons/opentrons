@@ -1,9 +1,8 @@
 import * as React from 'react'
 import { when } from 'jest-when'
-import { useInView } from 'react-intersection-observer'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-import { CommandItem, OBSERVER_DELAY } from '../CommandItem'
+import { CommandItem } from '../CommandItem'
 import { CommandText } from '../CommandText'
 import { CommandTimer } from '../CommandTimer'
 import {
@@ -33,7 +32,6 @@ const mockUseCommandQuery = useCommandQuery as jest.MockedFunction<
 const mockUseAllCommandsQuery = useAllCommandsQuery as jest.MockedFunction<
   typeof useAllCommandsQuery
 >
-const mockUseInView = useInView as jest.MockedFunction<typeof useInView>
 const render = (props: React.ComponentProps<typeof CommandItem>) => {
   return renderWithProviders(<CommandItem {...props} />, {
     i18nInstance: i18n,
@@ -46,6 +44,9 @@ const MOCK_COMMAND_SUMMARY: RunCommandSummary = {
   key: 'some_key',
   commandType: 'custom',
   status: 'queued',
+  createdAt: 'create timestamp',
+  startedAt: 'start timestamp',
+  completedAt: 'end timestamp',
 }
 const MOCK_ANALYSIS_COMMAND: RunTimeCommand = {
   id: 'some_id',
@@ -90,18 +91,15 @@ describe('Run Details RunTimeCommand item', () => {
       .mockReturnValue({
         data: { data: [] },
       } as any)
-    when(mockUseInView)
-      .calledWith({ delay: OBSERVER_DELAY })
-      .mockReturnValue([() => null, true] as any)
   })
 
   it('renders the correct failed status', () => {
     const { getByText } = render({
       runCommandSummary: { ...MOCK_COMMAND_SUMMARY, status: 'failed' },
-      analysisCommand: { ...MOCK_ANALYSIS_COMMAND },
+      analysisCommand: MOCK_ANALYSIS_COMMAND,
       runStatus: 'running',
-      currentRunId: RUN_ID,
       stepNumber: 1,
+      hasBeenRun: true,
       runStartedAt: 'fake_timestamp',
     })
     expect(getByText('Step failed')).toHaveStyle(
@@ -110,12 +108,27 @@ describe('Run Details RunTimeCommand item', () => {
     getByText('Mock RunTimeCommand Text')
     getByText('Mock RunTimeCommand Timer')
   })
+  it('renders the green background if has been run but runCommandSummary not loaded', () => {
+    const props = {
+      runCommandSummary: null,
+      analysisCommand: MOCK_ANALYSIS_COMMAND,
+      runStatus: 'succeeded',
+      stepNumber: 1,
+      hasBeenRun: true,
+      runStartedAt: 'fake_timestamp',
+    } as React.ComponentProps<typeof CommandItem>
+    const { getByText } = render(props)
+    expect(getByText('Mock RunTimeCommand Timer')).toHaveStyle(
+      'backgroundColor: C_AQUAMARINE'
+    )
+    getByText('Mock RunTimeCommand Text')
+  })
   it('renders the correct success status', () => {
     const props = {
       runCommandSummary: { ...MOCK_COMMAND_SUMMARY, status: 'succeeded' },
-      analysisCommand: { ...MOCK_ANALYSIS_COMMAND },
+      analysisCommand: MOCK_ANALYSIS_COMMAND,
       runStatus: 'succeeded',
-      currentRunId: RUN_ID,
+      hasBeenRun: true,
       stepNumber: 1,
       runStartedAt: 'fake_timestamp',
     } as React.ComponentProps<typeof CommandItem>
@@ -128,10 +141,10 @@ describe('Run Details RunTimeCommand item', () => {
   it('renders the correct running status', () => {
     const props = {
       runCommandSummary: { ...MOCK_COMMAND_SUMMARY, status: 'running' },
-      analysisCommand: { ...MOCK_ANALYSIS_COMMAND },
+      analysisCommand: MOCK_ANALYSIS_COMMAND,
       runStatus: 'running',
-      currentRunId: RUN_ID,
       stepNumber: 1,
+      hasBeenRun: true,
       runStartedAt: 'fake_timestamp',
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
@@ -145,9 +158,9 @@ describe('Run Details RunTimeCommand item', () => {
   it('renders the correct queued status', () => {
     const props = {
       runCommandSummary: { ...MOCK_COMMAND_SUMMARY, status: 'queued' },
-      analysisCommand: { ...MOCK_ANALYSIS_COMMAND },
+      analysisCommand: MOCK_ANALYSIS_COMMAND,
       runStatus: 'running',
-      currentRunId: RUN_ID,
+      hasBeenRun: false,
       stepNumber: 1,
       runStartedAt: 'fake_timestamp',
     } as React.ComponentProps<typeof CommandItem>
@@ -160,9 +173,9 @@ describe('Run Details RunTimeCommand item', () => {
   it('renders the correct running status with run paused', () => {
     const props = {
       runCommandSummary: { ...MOCK_COMMAND_SUMMARY, status: 'running' },
-      analysisCommand: { ...MOCK_ANALYSIS_COMMAND },
+      analysisCommand: MOCK_ANALYSIS_COMMAND,
       runStatus: 'paused',
-      currentRunId: RUN_ID,
+      hasBeenRun: true,
       stepNumber: 1,
       runStartedAt: 'fake_timestamp',
     } as React.ComponentProps<typeof CommandItem>
@@ -177,9 +190,11 @@ describe('Run Details RunTimeCommand item', () => {
   it('renders the correct running status with run paused by door open', () => {
     const props = {
       runCommandSummary: { ...MOCK_COMMAND_SUMMARY, status: 'running' },
-      analysisCommand: { ...MOCK_ANALYSIS_COMMAND },
+      analysisCommand: MOCK_ANALYSIS_COMMAND,
       runStatus: 'blocked-by-open-door',
-      currentRunId: RUN_ID,
+      hasBeenRun: true,
+      stepNumber: 1,
+      runStartedAt: 'fake_timestamp'
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
     expect(getByText('Current Step - Paused - Door Open')).toHaveStyle(
@@ -212,8 +227,8 @@ describe('Run Details RunTimeCommand item', () => {
       runCommandSummary: MOCK_COMMENT_COMMAND_SUMMARY,
       analysisCommand: MOCK_COMMENT_COMMAND,
       runStatus: 'running',
-      currentRunId: RUN_ID,
       stepNumber: 1,
+      hasBeenRun: true,
       runStartedAt: 'fake_timestamp',
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
@@ -252,7 +267,7 @@ describe('Run Details RunTimeCommand item', () => {
       runCommandSummary: MOCK_PAUSE_COMMAND_SUMMARY,
       analysisCommand: MOCK_PAUSE_COMMAND,
       runStatus: 'paused',
-      currentRunId: RUN_ID,
+      hasBeenRun: true,
       stepNumber: 1,
       runStartedAt: 'fake_timestamp',
     } as React.ComponentProps<typeof CommandItem>

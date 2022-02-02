@@ -3,6 +3,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import {
   Box,
   FONT_SIZE_BODY_1,
+  Mount,
   SPACING_1,
   SPACING_2,
 } from '@opentrons/components'
@@ -10,9 +11,10 @@ import { getModuleDisplayName, ProtocolFile } from '@opentrons/shared-data'
 import { useCurrentRunPipetteInfoByMount } from '../ProtocolSetup/RunSetupCard/hooks'
 import { useProtocolDetails } from './hooks'
 import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
+import { RunCommandSummary } from '@opentrons/api-client'
 
 interface ProtocolSetupInfoProps {
-  setupCommand?: RunTimeCommand
+  setupCommand?: RunTimeCommand | RunCommandSummary
 }
 
 export const ProtocolSetupInfo = (
@@ -36,7 +38,7 @@ export const ProtocolSetupInfo = (
 
   let SetupCommandText
   if (setupCommand.commandType === 'loadPipette') {
-    const pipetteData = protocolPipetteData[setupCommand.params.mount]
+    const pipetteData = protocolPipetteData[setupCommand.params.mount as Mount]
     if (pipetteData == null) {
       return null
     }
