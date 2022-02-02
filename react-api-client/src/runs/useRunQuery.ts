@@ -6,7 +6,7 @@ import type { UseQueryResult, UseQueryOptions } from 'react-query'
 
 export function useRunQuery(
   runId: string | null,
-  options?: UseQueryOptions<Run>
+  options: UseQueryOptions<Run> = {}
 ): UseQueryResult<Run> {
   const host = useHost()
   const query = useQuery<Run>(
@@ -16,8 +16,8 @@ export function useRunQuery(
         response => response.data
       ),
     {
-      enabled: host !== null && runId != null,
       ...options,
+      enabled: host !== null && runId != null && options.enabled !== false,
     }
   )
 
