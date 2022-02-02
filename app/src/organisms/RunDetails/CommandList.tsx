@@ -42,9 +42,9 @@ import type {
   CommandStatus,
 } from '@opentrons/shared-data'
 
+const AVERAGE_ITEM_HEIGHT_PX = 52 // average px height of a command item
 const WINDOW_SIZE = 60 // number of command items rendered at a time
-const WINDOW_OVERLAP = 30 // number of command items that fall within two adjacent windows
-const EAGER_BUFFER_COEFFICIENT = 0.1 // multiplied by clientHeight to determine number of pixels away from the next window required for it to load
+const WINDOW_OVERLAP = 40 // number of command items that fall within two adjacent windows
 const COMMANDS_REFETCH_INTERVAL = 3000
 interface CommandRuntimeInfo {
   analysisCommand: RunTimeCommand | null // analysisCommand will only be null if protocol is nondeterministic
@@ -59,30 +59,24 @@ export function CommandList(): JSX.Element | null {
   const runStatus = useRunStatus()
   const listInnerRef = React.useRef<HTMLDivElement>(null)
   const currentItemRef = React.useRef<HTMLDivElement>(null)
-  const [commandCursorIndex, setCommandCursorIndex] = React.useState<
-    number | null
-  >(0)
+  const [windowIndex, setWindowIndex] = React.useState<number>(0)
   const currentRunId = useCurrentRunId()
+  const windowFirstCommandIndex = (WINDOW_SIZE - WINDOW_OVERLAP) * windowIndex
   const { data: commandsData } = useAllCommandsQuery(
     currentRunId,
     {
-      cursor: commandCursorIndex,
+      cursor: windowFirstCommandIndex,
       before: 0,
       after: WINDOW_SIZE,
     },
     {
       refetchInterval: COMMANDS_REFETCH_INTERVAL,
-      onSuccess: data => {
-        if (commandCursorIndex === null) {
-          setCommandCursorIndex(data.meta.cursor ?? null)
-        }
-      },
+      keepPreviousData: true,
     }
   )
   const totalRunCommandCount = commandsData?.meta.totalCount ?? 0
   const runCommands = commandsData?.data ?? []
 
-  const [windowIndex, setWindowIndex] = React.useState<number>(0)
   const [
     isInitiallyJumpingToCurrent,
     setIsInitiallyJumpingToCurrent,
@@ -137,13 +131,12 @@ export function CommandList(): JSX.Element | null {
       }
     })
 
-    // TODO(bc, 2022-02-02): no that we don't have all of the run commands at once,
+    // TODO(bc, 2022-02-02): now that we don't have all of the run commands at once,
     // we need to develop another approach to tell if protocol is deterministic, perhaps on backend
 
     currentCommandList = allCommands.slice(firstNonSetupIndex)
   }
 
-  const windowFirstCommandIndex = WINDOW_OVERLAP * windowIndex
   const commandWindow = currentCommandList.slice(
     windowFirstCommandIndex,
     windowFirstCommandIndex + WINDOW_SIZE
@@ -156,7 +149,7 @@ export function CommandList(): JSX.Element | null {
     totalRunCommandCount - 1 - protocolSetupCommandList.length
   const indexOfWindowContainingCurrentItem = Math.floor(
     Math.max(currentCommandIndex - (WINDOW_SIZE - WINDOW_OVERLAP), 0) /
-      WINDOW_OVERLAP
+      (WINDOW_SIZE - WINDOW_OVERLAP)
   )
 
   // when we initially mount, if the current item is not in view, jump to it
@@ -194,143 +187,147 @@ export function CommandList(): JSX.Element | null {
     alertItemTitle = t('protocol_run_complete')
   }
 
+  const topBufferHeightPx = windowFirstCommandIndex * AVERAGE_ITEM_HEIGHT_PX
+  const bottomBufferHeightPx =
+    (currentCommandList.length - (windowFirstCommandIndex + WINDOW_SIZE)) *
+    AVERAGE_ITEM_HEIGHT_PX
+
   const onScroll = (): void => {
     if (listInnerRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = listInnerRef.current
       if (
-        scrollTop + clientHeight + EAGER_BUFFER_COEFFICIENT * clientHeight >=
-          scrollHeight &&
+        scrollTop >=
+          topBufferHeightPx + ((WINDOW_SIZE / 2)  * AVERAGE_ITEM_HEIGHT_PX) &&
         !isFinalWindow
       ) {
         const potentialNextWindowFirstIndex =
-          windowFirstCommandIndex + WINDOW_OVERLAP
+          windowFirstCommandIndex + (WINDOW_SIZE - WINDOW_OVERLAP)
         if (potentialNextWindowFirstIndex < currentCommandList.length) {
+console.log('window down', scrollTop, '>=' ,topBufferHeightPx + ((WINDOW_SIZE - WINDOW_OVERLAP) * AVERAGE_ITEM_HEIGHT_PX))
           setWindowIndex(windowIndex + 1)
-          if (potentialNextWindowFirstIndex <= totalRunCommandCount) {
-            setCommandCursorIndex(potentialNextWindowFirstIndex)
-          }
         }
-      } else if (scrollTop <= EAGER_BUFFER_COEFFICIENT * clientHeight) {
+      } else if (scrollTop <= (topBufferHeightPx + (((WINDOW_SIZE - WINDOW_OVERLAP)/2) * AVERAGE_ITEM_HEIGHT_PX))) {
         const potentialPrevWindowFirstIndex =
-          windowFirstCommandIndex - WINDOW_OVERLAP
+          windowFirstCommandIndex - (WINDOW_SIZE - WINDOW_OVERLAP)
         if (windowIndex > 0 && potentialPrevWindowFirstIndex >= 0) {
+console.log('window up ', scrollTop, '<=' , topBufferHeightPx + ((WINDOW_SIZE - WINDOW_OVERLAP) * AVERAGE_ITEM_HEIGHT_PX))
           setWindowIndex(windowIndex - 1)
-          listInnerRef.current?.scrollTo({ top: 1 })
-          if (potentialPrevWindowFirstIndex <= totalRunCommandCount) {
-            setCommandCursorIndex(potentialPrevWindowFirstIndex)
-          }
         }
       }
     }
   }
 
   return (
-    <Box
-      height="calc(100vh - 3rem)" // height of viewport minus titlebar
-      width="100%"
-      ref={listInnerRef}
-      onScroll={onScroll}
-      overflowY="scroll"
-    >
-      <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING_2}>
-        {isFirstWindow ? (
-          <>
-            {([
-              RUN_STATUS_FAILED,
-              RUN_STATUS_SUCCEEDED,
-              RUN_STATUS_STOP_REQUESTED,
-              RUN_STATUS_STOPPED,
-            ] as RunStatus[]).includes(runStatus) ? (
-              <Box padding={`${SPACING_2} ${SPACING_2} ${SPACING_2} 0`}>
-                <AlertItem
-                  type={
-                    ([
-                      RUN_STATUS_STOP_REQUESTED,
-                      RUN_STATUS_FAILED,
-                      RUN_STATUS_STOPPED,
-                    ] as RunStatus[]).includes(runStatus)
-                      ? 'error'
-                      : 'success'
-                  }
-                  title={alertItemTitle}
-                />
-              </Box>
-            ) : null}
-            <Flex
-              justifyContent={JUSTIFY_SPACE_BETWEEN}
-              alignItems={ALIGN_CENTER}
-            >
-              <Text
-                paddingY={SPACING_2}
-                css={FONT_HEADER_DARK}
-                textTransform={TEXT_TRANSFORM_CAPITALIZE}
-              >
-                {t('protocol_steps')}
-              </Text>
-              <Text fontSize={FONT_SIZE_CAPTION} paddingY={SPACING_1}>
-                {t('total_step_count', { count: currentCommandList.length })}
-              </Text>
-            </Flex>
-            {currentCommandIndex <= 0 ? (
-              <Text fontSize={FONT_SIZE_CAPTION} marginY={SPACING_2}>
-                {t('anticipated')}
-              </Text>
-            ) : null}
-            {protocolSetupCommandList.length > 0 ? (
-              <ProtocolSetupItem
-                protocolSetupCommandList={protocolSetupCommandList}
-              />
-            ) : null}
-          </>
-        ) : null}
-        <Flex
-          fontSize={FONT_SIZE_CAPTION}
-          color={C_MED_DARK_GRAY}
-          flexDirection={DIRECTION_COLUMN}
-        >
-          {commandWindow?.map((command, index) => {
-            const overallIndex = index + windowFirstCommandIndex
-            const isCurrentCommand = overallIndex === currentCommandIndex
-            const showAnticipatedStepsTitle =
-              overallIndex !== currentCommandList.length - 1 && isCurrentCommand
-
-            return (
+      <Box
+        height="calc(100vh - 3rem)" // height of viewport minus titlebar
+        width="100%"
+        ref={listInnerRef}
+        onScroll={onScroll}
+        overflowY="scroll"
+      >
+        <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING_2}>
+          {isFirstWindow ? (
+            <>
+              {([
+                RUN_STATUS_FAILED,
+                RUN_STATUS_SUCCEEDED,
+                RUN_STATUS_STOP_REQUESTED,
+                RUN_STATUS_STOPPED,
+              ] as RunStatus[]).includes(runStatus) ? (
+                <Box padding={`${SPACING_2} ${SPACING_2} ${SPACING_2} 0`}>
+                  <AlertItem
+                    type={
+                      ([
+                        RUN_STATUS_STOP_REQUESTED,
+                        RUN_STATUS_FAILED,
+                        RUN_STATUS_STOPPED,
+                      ] as RunStatus[]).includes(runStatus)
+                        ? 'error'
+                        : 'success'
+                    }
+                    title={alertItemTitle}
+                  />
+                </Box>
+              ) : null}
               <Flex
-                key={
-                  command.analysisCommand?.id ?? command.runCommandSummary?.id
-                }
-                justifyContent={JUSTIFY_START}
-                flexDirection={DIRECTION_COLUMN}
-                ref={isCurrentCommand ? currentItemRef : undefined}
-                marginBottom={SPACING_2}
+                justifyContent={JUSTIFY_SPACE_BETWEEN}
+                alignItems={ALIGN_CENTER}
               >
-                <CommandItem
-                  analysisCommand={command.analysisCommand}
-                  runCommandSummary={command.runCommandSummary}
-                  hasBeenRun={overallIndex <= currentCommandIndex}
-                  runStatus={runStatus}
-                  stepNumber={overallIndex + 1}
-                  runStartedAt={runStartTime}
-                />
-                {showAnticipatedStepsTitle && (
-                  <Text
-                    fontSize={FONT_SIZE_CAPTION}
-                    margin={`${SPACING_3} 0 ${SPACING_2}`}
-                  >
-                    {t('anticipated')}
-                  </Text>
-                )}
+                <Text
+                  paddingY={SPACING_2}
+                  css={FONT_HEADER_DARK}
+                  textTransform={TEXT_TRANSFORM_CAPITALIZE}
+                >
+                  {t('protocol_steps')}
+                </Text>
+                <Text fontSize={FONT_SIZE_CAPTION} paddingY={SPACING_1}>
+                  {t('total_step_count', { count: currentCommandList.length })}
+                </Text>
               </Flex>
-            )
-          })}
-          {isFinalWindow ? (
-            <Text paddingY={SPACING_1} marginBottom="98vh">
-              {t('end_of_protocol')}
-            </Text>
+              {currentCommandIndex <= 0 ? (
+                <Text fontSize={FONT_SIZE_CAPTION} marginY={SPACING_2}>
+                  {t('anticipated')}
+                </Text>
+              ) : null}
+              {protocolSetupCommandList.length > 0 ? (
+                <ProtocolSetupItem
+                  protocolSetupCommandList={protocolSetupCommandList}
+                />
+              ) : null}
+            </>
           ) : null}
+          <Flex
+            fontSize={FONT_SIZE_CAPTION}
+            color={C_MED_DARK_GRAY}
+            flexDirection={DIRECTION_COLUMN}
+          >
+            <Box width="100%" height={`${topBufferHeightPx}px`} />
+            {commandWindow?.map((command, index) => {
+              const overallIndex = index + windowFirstCommandIndex
+              const isCurrentCommand = overallIndex === currentCommandIndex
+              const showAnticipatedStepsTitle =
+                overallIndex !== currentCommandList.length - 1 &&
+                isCurrentCommand
+
+              return (
+                <Flex
+                  key={
+                    command.analysisCommand?.id ?? command.runCommandSummary?.id
+                  }
+                  justifyContent={JUSTIFY_START}
+                  flexDirection={DIRECTION_COLUMN}
+                  ref={isCurrentCommand ? currentItemRef : undefined}
+                  marginBottom={SPACING_2}
+                >
+                  <CommandItem
+                    analysisCommand={command.analysisCommand}
+                    runCommandSummary={command.runCommandSummary}
+                    hasBeenRun={overallIndex <= currentCommandIndex}
+                    runStatus={runStatus}
+                    stepNumber={overallIndex + 1}
+                    runStartedAt={runStartTime}
+                  />
+                  {showAnticipatedStepsTitle && (
+                    <Text
+                      fontSize={FONT_SIZE_CAPTION}
+                      margin={`${SPACING_3} 0 ${SPACING_2}`}
+                    >
+                      {t('anticipated')}
+                    </Text>
+                  )}
+                </Flex>
+              )
+            })}
+            {isFinalWindow ? (
+              <Text paddingY={SPACING_1}>
+                {t('end_of_protocol')}
+              </Text>
+            ) : (
+              <Box width="100%" height={`${bottomBufferHeightPx}px`} />
+            )}
+          </Flex>
         </Flex>
-      </Flex>
-    </Box>
+      </Box>
   )
 }
 

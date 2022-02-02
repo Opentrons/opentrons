@@ -8,6 +8,7 @@ import {
   RUN_STATUS_RUNNING,
   RUN_STATUS_STOPPED,
   RUN_STATUS_FAILED,
+  RUN_STATUS_FINISHING,
   RUN_STATUS_SUCCEEDED,
   RUN_ACTION_TYPE_STOP,
   RUN_STATUS_STOP_REQUESTED,
@@ -136,9 +137,18 @@ export function useRunTimestamps(): RunTimestamps {
   const runStatus = useRunStatus()
   const { actions = [], errors = [] } = useCurrentRun()?.data ?? {}
   const runCommands =
-    useCurrentRunCommands(undefined, {
-      enabled: runStatus === RUN_STATUS_RUNNING,
-    }) ?? []
+    useCurrentRunCommands(
+      { cursor: null, after: 1, before: 0 },
+      {
+        enabled:
+          runStatus === RUN_STATUS_SUCCEEDED ||
+          runStatus === RUN_STATUS_STOPPED ||
+          runStatus === RUN_STATUS_FAILED ||
+          runStatus === RUN_STATUS_STOP_REQUESTED ||
+          runStatus === RUN_STATUS_FINISHING,
+        refetchInterval: false,
+      }
+    ) ?? []
 
   const firstPlay = actions.find(
     action => action.actionType === RUN_ACTION_TYPE_PLAY
