@@ -25,7 +25,10 @@ class LegacyLabwareOffsetProvider(AbstractLegacyLabwareOffsetProvider):
         module_model: Optional[str],
         deck_slot: DeckSlotName,
     ) -> LegacyProvidedLabwareOffset:
-        """Look up an offset in ProtocolEngine state and return it, if one exists."""
+        """Look up an offset in ProtocolEngine state and return it, if one exists.
+
+        See the parent class for param details.
+        """
         offset = self._labware_view.find_applicable_labware_offset(
             definition_uri=labware_definition_uri,
             location=LabwareOffsetLocation(
