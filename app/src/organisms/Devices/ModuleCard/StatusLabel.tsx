@@ -4,50 +4,40 @@ import {
   Icon,
   Text,
   SPACING_2,
-  C_DARK_GRAY,
   JUSTIFY_SPACE_BETWEEN,
   SPACING_1,
   TEXT_TRANSFORM_CAPITALIZE,
-  C_BLUE,
   ALIGN_CENTER,
-  C_SKY_BLUE,
+  C_BLUE_PRESSED,
 } from '@opentrons/components'
-import {
-  TEMPERATURE_MODULE_TYPE,
-  MAGNETIC_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
-} from '../../../redux/modules'
-
 interface StatusLabelProps {
-  moduleType:
-    | typeof TEMPERATURE_MODULE_TYPE
-    | typeof MAGNETIC_MODULE_TYPE
-    | typeof THERMOCYCLER_MODULE_TYPE
   moduleStatus: string
+  backgroundColor: string
+  iconColor: string
 }
 
 export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
-  const { moduleType, moduleStatus } = props
+  const { moduleStatus, backgroundColor, iconColor } = props
 
-  //  TODO IMMADIATELY: 2/1/21 use a switch statement when building out rest of the modules
-  return moduleType === MAGNETIC_MODULE_TYPE ? (
+  return (
     <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Flex
-        backgroundColor={C_SKY_BLUE}
+        backgroundColor={backgroundColor}
         borderRadius="4px"
-        padding={SPACING_1}
+        padding="0.1rem"
         alignItems={ALIGN_CENTER}
-        marginTop={SPACING_2}
+        marginTop={SPACING_1}
+        marginBottom={SPACING_1}
       >
         <Icon
           name="circle"
-          color={C_BLUE}
+          color={iconColor}
           size={SPACING_2}
           marginX={SPACING_1}
         />
         <Text
           fontSize={'0.625rem'}
-          color={C_DARK_GRAY}
+          color={C_BLUE_PRESSED}
           textTransform={TEXT_TRANSFORM_CAPITALIZE}
           marginRight={SPACING_1}
         >
@@ -55,5 +45,5 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
         </Text>
       </Flex>
     </Flex>
-  ) : null
+  )
 }

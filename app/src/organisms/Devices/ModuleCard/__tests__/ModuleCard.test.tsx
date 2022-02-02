@@ -34,7 +34,7 @@ describe('ModuleCard', () => {
     getByAltText('magneticModuleV1')
   })
 
-  //  TODO Immediately: fix this when we add more details to the overflow button
+  //  TODO Immediately: add more details to this test when overflow button has more functionality
   it('renders 3 dot button icon and is clickable', () => {
     const { getByRole, getByText } = render(props)
     const overflowButton = getByRole('button', {

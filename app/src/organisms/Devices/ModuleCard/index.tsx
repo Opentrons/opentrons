@@ -19,6 +19,7 @@ import {
   C_HARBOR_GRAY,
   Btn,
   FONT_WEIGHT_REGULAR,
+  C_BLUE_PRESSED,
 } from '@opentrons/components'
 import {
   getModuleDisplayName,
@@ -30,9 +31,10 @@ import {
 import magneticModule from '../../../assets/images/magnetic_module_gen_2_transparent.svg'
 import temperatureModule from '../../../assets/images/temp_deck_gen_2_transparent.svg'
 import thermoModule from '../../../assets/images/thermocycler_open_transparent.svg'
-import { StatusLabel } from './StatusLabel'
+import overflow_icon from '../../../assets/images/overflow_icon.svg'
 
 import type { AttachedModule } from '../../../redux/modules/types'
+import { MagneticModuleData } from './MagneticModuleData'
 
 interface ModuleCardProps {
   module: AttachedModule
@@ -56,7 +58,7 @@ const ModuleIcon = ({
     <Icon
       name={iconNamesByModuleType[moduleType]}
       size={SIZE_1}
-      marginRight={SPACING_2}
+      marginRight={SPACING_1}
       color={C_HARBOR_GRAY}
     />
   )
@@ -67,9 +69,17 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const { module } = props
 
   let image = ''
+  let moduleData: JSX.Element = <div></div>
   switch (module.type) {
     case 'magneticModuleType': {
       image = magneticModule
+      moduleData = (
+        <MagneticModuleData
+          moduleStatus={module.status}
+          moduleHeight={module.data.height}
+          moduleModel={module.model}
+        />
+      )
       break
     }
 
@@ -95,7 +105,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     >
       <Box padding={SPACING_2} width="100%">
         <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING_3}>
-          <img src={image} style={{ width: '6rem' }} alt={module.model} />
+          <img src={image} alt={module.model} />
           <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING_2}>
             <Text
               textTransform={TEXT_TRANSFORM_UPPERCASE}
@@ -114,17 +124,14 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 {getModuleDisplayName(module.model)}
               </Text>
             </Flex>
-            <StatusLabel
-              moduleType={module.type}
-              moduleStatus={module.status}
-            />
+            {moduleData}
           </Flex>
         </Flex>
       </Box>
 
       <Box alignSelf={ALIGN_START}>
         <Btn onClick={() => console.log('overflow')} aria-label="overflow">
-          <Icon name="dots-vertical" color={C_DARK_GRAY} size={SIZE_2} />
+          <img src={overflow_icon} />
         </Btn>
       </Box>
     </Flex>
