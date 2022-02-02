@@ -11,5 +11,9 @@
   "OT_PD_ENABLE_BATCH_EDIT_MIX": {
     "title": "Enable mix batch edit",
     "description": "Allow users to batch edit mix forms"
+  },
+  "OT_PD_ENABLE_HEATER_SHAKER": {
+    "title": "Enable heater shaker module",
+    "description": "Allow adding heater shaker module and steps to protocols"
   }
 }
