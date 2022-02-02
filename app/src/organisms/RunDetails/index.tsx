@@ -17,6 +17,7 @@ import {
   SPACING_3,
   useConditionalConfirm,
   NewAlertSecondaryBtn,
+  SpinnerModal,
 } from '@opentrons/components'
 import { Page } from '../../atoms/Page'
 import { Portal } from '../../App/portal'
@@ -79,7 +80,11 @@ export function RunDetails(): JSX.Element | null {
     ) {
       text = t('closing_protocol')
     }
-    return <ProtocolLoader loadingText={text} />
+    return (
+    <Portal level="top">
+      <SpinnerModal message={text} />
+      </Portal>
+    )
   }
 
   const cancelRunButton = (
