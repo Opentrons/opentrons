@@ -28,9 +28,7 @@ export function CommandText(props: Props): JSX.Element | null {
 
   let messageNode = null
 
-  const displayCommand = analysisCommand !== null && runCommand === null
-      ? analysisCommand
-      : runCommand
+  const displayCommand = runCommand !== null ? runCommand : analysisCommand
 
   if (displayCommand === null) {
     console.warn(

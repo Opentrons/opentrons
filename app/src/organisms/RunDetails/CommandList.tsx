@@ -31,12 +31,13 @@ import {
   RUN_STATUS_SUCCEEDED,
   RUN_STATUS_RUNNING,
 } from '@opentrons/api-client'
+import { useAllCommandsQuery } from '@opentrons/react-api-client'
 import { useRunStatus, useRunStartTime } from '../RunTimeControl/hooks'
 import { useProtocolDetails } from './hooks'
 import { useCurrentRunCommands, useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ProtocolSetupInfo } from './ProtocolSetupInfo'
 import { CommandItem } from './CommandItem'
-import type { RunStatus, RunCommandSummary } from '@opentrons/api-client'
+import type { RunStatus, RunCommandSummary } from '@oppentrons/api-client'
 import type {
   ProtocolFile,
   RunTimeCommand,
@@ -45,7 +46,8 @@ import type {
 
 const WINDOW_SIZE = 60 // number of command items rendered at a time
 const WINDOW_OVERLAP = 30 // number of command items that fall within two adjacent windows
-const EAGER_BUFFER_COEFFICIENT = 0.5 // multiplied by clientHeight to determine number of pixels away from the next window required for it to load
+const EAGER_BUFFER_COEFFICIENT = 0.1 // multiplied by clientHeight to determine number of pixels away from the next window required for it to load
+const COMMANDS_REFETCH_INTERVAL = 3000
 interface CommandRuntimeInfo {
   analysisCommand: RunTimeCommand | null // analysisCommand will only be null if protocol is nondeterministic
   runCommandSummary: RunCommandSummary | null
@@ -58,24 +60,35 @@ export function CommandList(): JSX.Element | null {
   const { t } = useTranslation('run_details')
   const protocolData: ProtocolFile<{}> | null = useProtocolDetails()
     .protocolData
-  const currentRunId = useCurrentRunId()
   const runStartTime = useRunStartTime()
   const runStatus = useRunStatus()
+  const [currentCommandId, setCurrentCommandId] = React.useState<string | null>(
+    null
+  )
   const listInnerRef = React.useRef<HTMLDivElement>(null)
   const currentItemRef = React.useRef<HTMLDivElement>(null)
-  const [commandCursorIndex, setCommandCursorIndex] = React.useState<number | null>(null)
-  const runCommands = useCurrentRunCommands({
-    cursor: commandCursorIndex,
-    before: WINDOW_OVERLAP,
-    after: WINDOW_OVERLAP
-  }, {
-    onSuccess: (data) => {
-      if (commandCursorIndex === null) {
-        setCommandCursorIndex(data.meta.cursor ?? null)
-      }
+  const [commandCursorIndex, setCommandCursorIndex] = React.useState<
+    number | null
+  >(0)
+  const currentRunId = useCurrentRunId()
+  const { data: commandsData, isFetching: isFetchingCommands } = useAllCommandsQuery(
+    currentRunId,
+    {
+      cursor: commandCursorIndex,
+      before: 0,
+      after: WINDOW_SIZE,
     },
-    enabled: runStatus === RUN_STATUS_RUNNING
-  })
+    {
+      refetchInterval: COMMANDS_REFETCH_INTERVAL,
+      onSuccess: data => {
+        if (commandCursorIndex === null) {
+          setCommandCursorIndex(data.meta.cursor ?? null)
+        }
+      },
+    }
+  )
+  const totalRunCommandCount = commandsData?.meta.totalCount ?? 0
+  const runCommands = commandsData?.data ?? []
 
   const [windowIndex, setWindowIndex] = React.useState<number>(0)
   const [
@@ -132,29 +145,47 @@ export function CommandList(): JSX.Element | null {
             }))
         : []
 
-    const remainingAnticipatedCommands = dropWhile(
-      postSetupAnticipatedCommands,
-      anticipatedCommand =>
-        runCommands.some(runC => runC.key === anticipatedCommand.key)
-    ).map(remainingAnticipatedCommand => ({
-      analysisCommand: remainingAnticipatedCommand,
-      runCommandSummary: null,
-    }))
+    const allCommands = allProtocolCommands.map((anticipatedCommand, index) => {
+      const isAnticipated = index + 1 > totalRunCommandCount
+      const matchedRunCommand = runCommands.find(
+        runCommandSummary => runCommandSummary.key === anticipatedCommand.key
+      )
+      if (!isAnticipated && matchedRunCommand != null) {
+        return {
+          analysisCommand: anticipatedCommand,
+          runCommandSummary: matchedRunCommand,
+        }
+      } else {
+        return {
+          analysisCommand: anticipatedCommand,
+          runCommandSummary: null,
+        }
+      }
+    })
 
-    const isProtocolDeterministic = postPlayRunCommands.reduce(
-      (isDeterministic, command, index) => {
-        return (
-          isDeterministic &&
-          command.runCommandSummary?.key ===
-            postSetupAnticipatedCommands[index]?.key
-        )
-      },
-      true
-    )
+    // const remainingAnticipatedCommands = dropWhile(
+    //   postSetupAnticipatedCommands,
+    //   anticipatedCommand =>
+    //     runCommands.some(runC => runC.key === anticipatedCommand.key)
+    // ).map(remainingAnticipatedCommand => ({
+    //   analysisCommand: remainingAnticipatedCommand,
+    //   runCommandSummary: null,
+    // }))
 
-    currentCommandList = isProtocolDeterministic
-      ? [...postPlayRunCommands, ...remainingAnticipatedCommands]
-      : [...postPlayRunCommands]
+    // const isProtocolDeterministic = postPlayRunCommands.reduce(
+    //   (isDeterministic, command, index) => {
+    //     return (
+    //       isDeterministic &&
+    //       command.runCommandSummary?.key ===
+    //         postSetupAnticipatedCommands[index]?.key
+    //     )
+    //   },
+    //   true
+    // )
+    // TODO: implement deterministic check
+    const isProtocolDeterministic = true
+
+    currentCommandList = allCommands.slice(firstNonSetupIndex)
   }
 
   const windowFirstCommandIndex = WINDOW_OVERLAP * windowIndex
@@ -166,15 +197,10 @@ export function CommandList(): JSX.Element | null {
   const isFinalWindow =
     currentCommandList.length - 1 <= windowFirstCommandIndex + WINDOW_SIZE
 
-  const currentItemIndex = currentCommandList.findIndex(
-    command =>
-      command.runCommandSummary == null ||
-      command.runCommandSummary.status === 'running' ||
-      command.runCommandSummary.status === 'failed' ||
-      command.runCommandSummary.status === 'queued'
-  )
+  const currentCommandIndex =
+    totalRunCommandCount - 1 - protocolSetupCommandList.length
   const indexOfWindowContainingCurrentItem = Math.floor(
-    Math.max(currentItemIndex - (WINDOW_SIZE - WINDOW_OVERLAP), 0) /
+    Math.max(currentCommandIndex - (WINDOW_SIZE - WINDOW_OVERLAP), 0) /
       WINDOW_OVERLAP
   )
 
@@ -225,6 +251,9 @@ export function CommandList(): JSX.Element | null {
           windowFirstCommandIndex + WINDOW_OVERLAP
         if (potentialNextWindowFirstIndex < currentCommandList.length) {
           setWindowIndex(windowIndex + 1)
+          if (potentialNextWindowFirstIndex <= totalRunCommandCount) {
+            setCommandCursorIndex(potentialNextWindowFirstIndex)
+          }
         }
       } else if (scrollTop <= EAGER_BUFFER_COEFFICIENT * clientHeight) {
         const potentialPrevWindowFirstIndex =
@@ -232,6 +261,9 @@ export function CommandList(): JSX.Element | null {
         if (windowIndex > 0 && potentialPrevWindowFirstIndex >= 0) {
           setWindowIndex(windowIndex - 1)
           listInnerRef.current?.scrollTo({ top: 1 })
+          if (potentialPrevWindowFirstIndex <= totalRunCommandCount) {
+            setCommandCursorIndex(potentialPrevWindowFirstIndex)
+          }
         }
       }
     }
@@ -284,7 +316,7 @@ export function CommandList(): JSX.Element | null {
                 {t('total_step_count', { count: currentCommandList.length })}
               </Text>
             </Flex>
-            {currentCommandList[0]?.runCommandSummary == null ? (
+            {currentCommandIndex <= 0 ? (
               <Text fontSize={FONT_SIZE_CAPTION} marginY={SPACING_2}>
                 {t('anticipated')}
               </Text>
@@ -303,9 +335,7 @@ export function CommandList(): JSX.Element | null {
         >
           {commandWindow?.map((command, index) => {
             const overallIndex = index + windowFirstCommandIndex
-            const isCurrentCommand =
-              command.runCommandSummary != null &&
-              ['running', 'failed'].includes(command.runCommandSummary.status)
+            const isCurrentCommand = overallIndex === currentCommandIndex
             const showAnticipatedStepsTitle =
               overallIndex !== currentCommandList.length - 1 && isCurrentCommand
 
@@ -314,7 +344,6 @@ export function CommandList(): JSX.Element | null {
                 key={
                   command.analysisCommand?.id ?? command.runCommandSummary?.id
                 }
-                id={`RunDetails_CommandItem`}
                 justifyContent={JUSTIFY_START}
                 flexDirection={DIRECTION_COLUMN}
                 ref={isCurrentCommand ? currentItemRef : undefined}
@@ -323,8 +352,8 @@ export function CommandList(): JSX.Element | null {
                 <CommandItem
                   analysisCommand={command.analysisCommand}
                   runCommandSummary={command.runCommandSummary}
+                  hasBeenRun={overallIndex <= currentCommandIndex}
                   runStatus={runStatus}
-                  currentRunId={currentRunId ?? null}
                   stepNumber={overallIndex + 1}
                   runStartedAt={runStartTime}
                 />
@@ -390,10 +419,7 @@ function ProtocolSetupItem(props: ProtocolSetupItemProps): JSX.Element {
             flexDirection={DIRECTION_COLUMN}
           >
             {protocolSetupCommandList.map(command => (
-              <ProtocolSetupInfo
-                key={command.id}
-                setupCommand={command as RunTimeCommand}
-              />
+              <ProtocolSetupInfo key={command.id} setupCommand={command} />
             ))}
           </Flex>
         </Flex>

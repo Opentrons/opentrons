@@ -36,6 +36,6 @@ export interface CommandsLinks {
 
 export interface CommandsData {
   data: RunCommandSummary[]
-  meta: GetCommandsParams & { total: number }
+  meta: GetCommandsParams & { totalCount: number }
   links: CommandsLinks
 }

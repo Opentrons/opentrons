@@ -63,19 +63,19 @@ export function useRunControls(): RunControls {
 }
 
 const DEFAULT_STATUS_REFETCH_INTERVAL = 10000 // 10 seconds
-// TODO: remove refetch interval, and pass through optional options param,
-// get runStartTime from top level timestamp
 export function useRunStatus(options?: UseQueryOptions<Run>): RunStatus | null {
   const currentRunId = useCurrentRunId()
   const lastRunStatus = React.useRef<RunStatus | null>(null)
 
   const { data } = useRunQuery(currentRunId ?? null, {
     refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
-    enabled: ![
-      RUN_STATUS_STOP_REQUESTED,
-      RUN_STATUS_FAILED,
-      RUN_STATUS_SUCCEEDED,
-    ].includes(lastRunStatus.current),
+    enabled:
+      lastRunStatus.current == null ||
+      !([
+        RUN_STATUS_STOP_REQUESTED,
+        RUN_STATUS_FAILED,
+        RUN_STATUS_SUCCEEDED,
+      ] as RunStatus[]).includes(lastRunStatus.current),
     onSuccess: data => (lastRunStatus.current = data?.data?.status ?? null),
     ...options,
   })
@@ -131,7 +131,11 @@ export function useRunCompleteTime(): string | null {
     useCurrentRun()?.data ?? {}
   const runCommands =
     useCurrentRunCommands(undefined, {
-      enabled: runStatus === RUN_STATUS_RUNNING,
+      enabled:
+        runStatus === RUN_STATUS_SUCCEEDED ||
+        runStatus === RUN_STATUS_STOPPED ||
+        runStatus === RUN_STATUS_FAILED,
+      refetchInterval: false,
     }) ?? []
 
   const lastCommand = last(runCommands)
@@ -156,6 +160,7 @@ export function useRunCompleteTime(): string | null {
   return runCompletedTime
 }
 
+// TODO(bc, 2022-02-01): replace all usage of the above individual timestamp hooks with useRunTimestamps
 interface RunTimestamps {
   startedAt: string | null
   pausedAt: string | null
