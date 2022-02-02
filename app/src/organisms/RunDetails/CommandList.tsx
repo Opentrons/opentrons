@@ -71,7 +71,10 @@ export function CommandList(): JSX.Element | null {
     number | null
   >(0)
   const currentRunId = useCurrentRunId()
-  const { data: commandsData, isFetching: isFetchingCommands } = useAllCommandsQuery(
+  const {
+    data: commandsData,
+    isFetching: isFetchingCommands,
+  } = useAllCommandsQuery(
     currentRunId,
     {
       cursor: commandCursorIndex,

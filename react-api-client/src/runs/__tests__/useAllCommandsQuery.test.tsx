@@ -7,7 +7,7 @@ import { useHost } from '../../api'
 import { useAllCommandsQuery, DEFAULT_PARAMS } from '../useAllCommandsQuery'
 import { mockCommandsResponse } from '../__fixtures__'
 
-import type { HostConfig, Response, CommandsData} from '@opentrons/api-client'
+import type { HostConfig, Response, CommandsData } from '@opentrons/api-client'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')
@@ -36,20 +36,22 @@ describe('useAllCommandsQuery hook', () => {
   it('should return no data if no host', () => {
     when(mockUseHost).calledWith().mockReturnValue(null)
 
-    const { result } = renderHook(() => (
-      useAllCommandsQuery(RUN_ID)
-    ), { wrapper })
+    const { result } = renderHook(() => useAllCommandsQuery(RUN_ID), {
+      wrapper,
+    })
 
     expect(result.current.data).toBeUndefined()
   })
 
   it('should return no data if the get commands request fails', () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockGetCommands).calledWith(HOST_CONFIG, RUN_ID, DEFAULT_PARAMS).mockRejectedValue('oh no')
+    when(mockGetCommands)
+      .calledWith(HOST_CONFIG, RUN_ID, DEFAULT_PARAMS)
+      .mockRejectedValue('oh no')
 
-    const { result } = renderHook(() => (
-      useAllCommandsQuery(RUN_ID)
-    ), { wrapper })
+    const { result } = renderHook(() => useAllCommandsQuery(RUN_ID), {
+      wrapper,
+    })
     expect(result.current.data).toBeUndefined()
   })
 
@@ -57,11 +59,13 @@ describe('useAllCommandsQuery hook', () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockGetCommands)
       .calledWith(HOST_CONFIG, RUN_ID, DEFAULT_PARAMS)
-      .mockResolvedValue({ data: mockCommandsResponse } as Response<CommandsData>)
+      .mockResolvedValue({
+        data: mockCommandsResponse,
+      } as Response<CommandsData>)
 
-    const { result, waitFor } = renderHook(() => (
-      useAllCommandsQuery(RUN_ID)
-    ), { wrapper })
+    const { result, waitFor } = renderHook(() => useAllCommandsQuery(RUN_ID), {
+      wrapper,
+    })
 
     await waitFor(() => result.current.data != null)
 
