@@ -8,7 +8,7 @@ import asyncio
 from . import ArbitrationId
 from opentrons_hardware.firmware_bindings import CanMessage
 from .abstract_driver import AbstractCanDriver
-
+from .errors import CanError
 
 log = logging.getLogger(__name__)
 
@@ -71,7 +71,10 @@ class SocketDriver(AbstractCanDriver):
     async def _read_buff(self, min_length: int) -> bytes:
         """Read a minimum of min_length bytes."""
         while len(self._buffer) < min_length:
-            self._buffer += await self._reader.read(min_length - len(self._buffer))
+            buff = await self._reader.read(min_length - len(self._buffer))
+            if not buff:
+                raise CanError("Disconnected")
+            self._buffer += buff
         ret = self._buffer[:min_length]
         self._buffer = self._buffer[min_length:]
         return ret
