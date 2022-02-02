@@ -24,6 +24,7 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import { MagneticModuleData } from './MagneticModuleData'
 
 import magneticModule from '../../../assets/images/magnetic_module_gen_2_transparent.svg'
 import temperatureModule from '../../../assets/images/temp_deck_gen_2_transparent.svg'
@@ -31,7 +32,6 @@ import thermoModule from '../../../assets/images/thermocycler_open_transparent.s
 import overflow_icon from '../../../assets/images/overflow_icon.svg'
 
 import type { AttachedModule } from '../../../redux/modules/types'
-import { MagneticModuleData } from './MagneticModuleData'
 
 interface ModuleCardProps {
   module: AttachedModule
@@ -94,14 +94,16 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   return (
     <Flex
       backgroundColor={C_BRIGHT_GRAY}
-      borderRadius="4px"
+      borderRadius={SPACING_1}
       marginBottom={SPACING_2}
       marginLeft={SPACING_2}
-      padding={SPACING_2}
       width={'24rem'}
     >
-      <Box padding={SPACING_2} width="100%">
-        <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING_3}>
+      <Box
+        padding={`${SPACING_3} ${SPACING_2} ${SPACING_3} ${SPACING_2}`}
+        width="100%"
+      >
+        <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING_2}>
           <img src={image} alt={module.model} />
           <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING_2}>
             <Text
@@ -117,7 +119,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             </Text>
             <Flex paddingBottom={SPACING_1}>
               <ModuleIcon moduleType={module.type} />
-              <Text fontSize={'11px'}>
+              <Text fontSize={'0.6875rem'}>
                 {getModuleDisplayName(module.model)}
               </Text>
             </Flex>
@@ -126,7 +128,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         </Flex>
       </Box>
 
-      <Box alignSelf={ALIGN_START}>
+      <Box alignSelf={ALIGN_START} padding={SPACING_1}>
         <Btn onClick={() => console.log('overflow')} aria-label="overflow">
           <img src={overflow_icon} />
         </Btn>

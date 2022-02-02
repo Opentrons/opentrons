@@ -1,5 +1,5 @@
-import { C_BLUE, C_SKY_BLUE, renderWithProviders } from '@opentrons/components'
 import * as React from 'react'
+import { C_BLUE, C_SKY_BLUE, renderWithProviders } from '@opentrons/components'
 import { StatusLabel } from '../StatusLabel'
 
 const render = (props: React.ComponentProps<typeof StatusLabel>) => {
@@ -16,7 +16,7 @@ describe('StatusLabel', () => {
       iconColor: C_BLUE,
     }
     const { getByText } = render(props)
-    getByText('Engaged')
+    expect(getByText('Engaged')).toHaveStyle('backgroundColor: C_SKY_BLUE')
   })
 
   it('renders a disengaged status label with a blue background and text', () => {
@@ -26,6 +26,6 @@ describe('StatusLabel', () => {
       iconColor: C_BLUE,
     }
     const { getByText } = render(props)
-    getByText('Disengaged')
+    expect(getByText('Disengaged')).toHaveStyle('backgroundColor: C_SKY_BLUE')
   })
 })

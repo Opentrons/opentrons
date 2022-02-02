@@ -3,7 +3,6 @@ import {
   Flex,
   Icon,
   Text,
-  SPACING_2,
   JUSTIFY_SPACE_BETWEEN,
   SPACING_1,
   TEXT_TRANSFORM_CAPITALIZE,
@@ -23,8 +22,8 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
     <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Flex
         backgroundColor={backgroundColor}
-        borderRadius="4px"
-        padding="0.1rem"
+        borderRadius={SPACING_1}
+        padding="0.2rem"
         alignItems={ALIGN_CENTER}
         marginTop={SPACING_1}
         marginBottom={SPACING_1}
@@ -32,7 +31,7 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
         <Icon
           name="circle"
           color={iconColor}
-          size={SPACING_2}
+          size={SPACING_1}
           marginX={SPACING_1}
         />
         <Text

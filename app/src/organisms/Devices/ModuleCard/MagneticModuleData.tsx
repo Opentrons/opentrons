@@ -1,11 +1,11 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { C_BLUE, C_SKY_BLUE, Text } from '@opentrons/components'
-import { StatusLabel } from './StatusLabel'
 import {
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
 } from '@opentrons/shared-data/js/constants'
+import { StatusLabel } from './StatusLabel'
 
 interface MagModuleProps {
   moduleStatus: string
