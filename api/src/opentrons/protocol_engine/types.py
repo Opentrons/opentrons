@@ -211,7 +211,7 @@ class LabwareOffsetLocation(BaseModel):
             "The deck slot where the protocol will load the labware."
             " Or, if the protocol will load the labware on a module,"
             " the deck slot where the protocol will load that module."
-        )
+        ),
     )
     moduleModel: Optional[ModuleModel] = Field(
         None,
@@ -227,7 +227,7 @@ class LabwareOffsetLocation(BaseModel):
             " The two models will differ"
             " if the physically connected module is compatible, but not identical,"
             " to the one that the protocol requested."
-        )
+        ),
     )
 
 
