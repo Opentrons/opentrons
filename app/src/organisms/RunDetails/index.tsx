@@ -33,7 +33,6 @@ import { CommandList } from './CommandList'
 import { ConfirmCancelModal } from './ConfirmCancelModal'
 
 import styles from '../ProtocolUpload/styles.css'
-import { ProtocolLoader } from '../ProtocolUpload'
 import { useIsProtocolRunLoaded } from '../ProtocolUpload/hooks'
 
 export function RunDetails(): JSX.Element | null {
