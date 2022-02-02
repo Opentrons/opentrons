@@ -75,7 +75,7 @@ const MOCK_COMMAND_DETAILS_COMMENT: RunTimeCommand = {
   startedAt: 'start timestamp',
   completedAt: 'end timestamp',
 } as any
-describe('Run Details RunTimeCommand item', () => {
+describe('Run Details CommandItem', () => {
   beforeEach(() => {
     mockCommandText.mockReturnValue(<div>Mock RunTimeCommand Text</div>)
     mockCommandTimer.mockReturnValue(<div>Mock RunTimeCommand Timer</div>)
@@ -118,10 +118,9 @@ describe('Run Details RunTimeCommand item', () => {
       runStartedAt: 'fake_timestamp',
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
-    expect(getByText('Mock RunTimeCommand Timer')).toHaveStyle(
+    expect(getByText('Mock RunTimeCommand Text')).toHaveStyle(
       'backgroundColor: C_AQUAMARINE'
     )
-    getByText('Mock RunTimeCommand Text')
   })
   it('renders the correct success status', () => {
     const props = {
@@ -194,7 +193,7 @@ describe('Run Details RunTimeCommand item', () => {
       runStatus: 'blocked-by-open-door',
       hasBeenRun: true,
       stepNumber: 1,
-      runStartedAt: 'fake_timestamp'
+      runStartedAt: 'fake_timestamp',
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
     expect(getByText('Current Step - Paused - Door Open')).toHaveStyle(

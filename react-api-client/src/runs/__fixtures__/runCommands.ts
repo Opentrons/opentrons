@@ -1,8 +1,5 @@
 import { CommandsData, RunCommandSummary } from '@opentrons/api-client'
-import type {
-  CreateCommand,
-  RunTimeCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV6'
+import type { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 
 export const mockAnonLoadCommand: CreateCommand = {
   commandType: 'loadLabware',

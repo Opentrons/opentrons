@@ -38,11 +38,17 @@ import { useIsProtocolRunLoaded } from '../ProtocolUpload/hooks'
 export function RunDetails(): JSX.Element | null {
   const { t } = useTranslation(['run_details', 'shared'])
   const { displayName } = useProtocolDetails()
-  const runStatus = useRunStatus()
+  const history = useHistory()
+  const runStatus = useRunStatus({
+    onSettled: data => {
+      if (data == null) {
+        history.push('/upload')
+      }
+    },
+  })
   const startTime = useRunStartTime()
   const isProtocolRunLoaded = useIsProtocolRunLoaded()
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
-  const history = useHistory()
 
   // display an idle status as 'running' in the UI after a run has started
   const adjustedRunStatus: RunStatus | null =

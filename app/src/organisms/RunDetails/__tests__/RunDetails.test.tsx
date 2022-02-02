@@ -106,7 +106,7 @@ describe('RunDetails', () => {
   })
 
   it('renders the cancel button, button is clickable, and cancel modal is rendered', () => {
-    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_RUNNING)
+    when(mockUseRunStatus).calledWith(expect.any(Object)).mockReturnValue(RUN_STATUS_RUNNING)
     const { getByRole, getByText } = render()
     const button = getByRole('button', { name: 'Cancel Run' })
     fireEvent.click(button)
@@ -127,14 +127,14 @@ describe('RunDetails', () => {
   })
 
   it('renders a cancel run button when the status is finishing', () => {
-    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_FINISHING)
+    when(mockUseRunStatus).calledWith(expect.any(Object)).mockReturnValue(RUN_STATUS_FINISHING)
     const { getByRole } = render()
     const button = getByRole('button', { name: 'Cancel Run' })
     expect(button).toBeEnabled()
   })
 
   it('renders a cancel run button when the status is paused', () => {
-    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_PAUSED)
+    when(mockUseRunStatus).calledWith(expect.any(Object)).mockReturnValue(RUN_STATUS_PAUSED)
     const { getByRole } = render()
     const button = getByRole('button', { name: 'Cancel Run' })
     expect(button).toBeEnabled()
@@ -142,7 +142,7 @@ describe('RunDetails', () => {
 
   it('renders a cancel run button when the status is pause requested', () => {
     when(mockUseRunStatus)
-      .calledWith()
+      .calledWith(expect.any(Object))
       .mockReturnValue(RUN_STATUS_PAUSE_REQUESTED)
     const { getByRole } = render()
     const button = getByRole('button', { name: 'Cancel Run' })
@@ -151,7 +151,7 @@ describe('RunDetails', () => {
 
   it('renders a cancel run button when the status is paused by door open', () => {
     when(mockUseRunStatus)
-      .calledWith()
+      .calledWith(expect.any(Object))
       .mockReturnValue(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
     const { getByRole } = render()
     const button = getByRole('button', { name: 'Cancel Run' })
@@ -159,7 +159,7 @@ describe('RunDetails', () => {
   })
 
   it('renders the protocol close button, button is clickable, and confirm close protocol modal is rendered when status is succeeded', () => {
-    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_SUCCEEDED)
+    when(mockUseRunStatus).calledWith(expect.any(Object)).mockReturnValue(RUN_STATUS_SUCCEEDED)
     const { getByRole, getByText } = render()
     const button = getByRole('button', { name: 'close' })
     fireEvent.click(button)
@@ -172,7 +172,7 @@ describe('RunDetails', () => {
   })
 
   it('renders the protocol close button, button is clickable, and confirm close protocol modal is rendered when status is failed', () => {
-    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_FAILED)
+    when(mockUseRunStatus).calledWith(expect.any(Object)).mockReturnValue(RUN_STATUS_FAILED)
     const { getByRole, getByText } = render()
     const button = getByRole('button', { name: 'close' })
     fireEvent.click(button)
@@ -185,7 +185,7 @@ describe('RunDetails', () => {
   })
 
   it('renders the protocol close button, button is clickable, and confirm close protocol modal is rendered when status is stopped', () => {
-    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_STOPPED)
+    when(mockUseRunStatus).calledWith(expect.any(Object)).mockReturnValue(RUN_STATUS_STOPPED)
     const { getByRole, getByText } = render()
     const button = getByRole('button', { name: 'close' })
     fireEvent.click(button)
@@ -199,7 +199,7 @@ describe('RunDetails', () => {
 
   it('renders no button in the titlebar when the run status is stop requested', () => {
     when(mockUseRunStatus)
-      .calledWith()
+      .calledWith(expect.any(Object))
       .mockReturnValue(RUN_STATUS_STOP_REQUESTED)
     const { queryByRole } = render()
     const button = queryByRole('button', { name: 'close' })

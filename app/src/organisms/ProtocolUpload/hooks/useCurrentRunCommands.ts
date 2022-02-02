@@ -1,10 +1,8 @@
-import * as React from 'react'
 import { useAllCommandsQuery } from '@opentrons/react-api-client'
 import { useCurrentRunId } from './useCurrentRunId'
-import type { CommandsData } from '@opentrons/api-client'
 import type { UseQueryOptions } from 'react-query'
-
 import type {
+  CommandsData,
   RunCommandSummary,
   GetCommandsParams,
 } from '@opentrons/api-client'

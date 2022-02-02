@@ -57,9 +57,6 @@ export function CommandList(): JSX.Element | null {
     .protocolData
   const runStartTime = useRunStartTime()
   const runStatus = useRunStatus()
-  const [currentCommandId, setCurrentCommandId] = React.useState<string | null>(
-    null
-  )
   const listInnerRef = React.useRef<HTMLDivElement>(null)
   const currentItemRef = React.useRef<HTMLDivElement>(null)
   const [commandCursorIndex, setCommandCursorIndex] = React.useState<
@@ -121,25 +118,7 @@ export function CommandList(): JSX.Element | null {
       runCommandSummary: null,
     })
   )
-  let postPlayRunCommands: CommandRuntimeInfo[] = []
   if (runCommands != null && runCommands.length > 0 && runStartTime != null) {
-    const firstPostPlayRunCommandIndex = runCommands.findIndex(
-      command => command.key === postSetupAnticipatedCommands[0]?.key
-    )
-    postPlayRunCommands =
-      firstPostPlayRunCommandIndex >= 0
-        ? runCommands
-            .slice(firstPostPlayRunCommandIndex)
-            .map(runDataCommand => ({
-              runCommandSummary: runDataCommand,
-              analysisCommand:
-                postSetupAnticipatedCommands.find(
-                  postSetupAnticipatedCommand =>
-                    runDataCommand.key === postSetupAnticipatedCommand.key
-                ) ?? null,
-            }))
-        : []
-
     const allCommands = allProtocolCommands.map((anticipatedCommand, index) => {
       const isAnticipated = index + 1 > totalRunCommandCount
       const matchedRunCommand = runCommands.find(
@@ -158,9 +137,8 @@ export function CommandList(): JSX.Element | null {
       }
     })
 
-
-    // TODO: implement deterministic check
-    const isProtocolDeterministic = true
+    // TODO(bc, 2022-02-02): no that we don't have all of the run commands at once,
+    // we need to develop another approach to tell if protocol is deterministic, perhaps on backend
 
     currentCommandList = allCommands.slice(firstNonSetupIndex)
   }

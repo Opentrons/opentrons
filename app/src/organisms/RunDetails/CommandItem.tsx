@@ -1,7 +1,6 @@
 import * as React from 'react'
 import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
-import { useInView } from 'react-intersection-observer'
 import {
   DIRECTION_ROW,
   Flex,
@@ -27,7 +26,6 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SIZE_1,
 } from '@opentrons/components'
-import { useCommandQuery } from '@opentrons/react-api-client'
 import { css } from 'styled-components'
 import { CommandTimer } from './CommandTimer'
 import { CommandText } from './CommandText'
@@ -43,7 +41,6 @@ import type {
   RunTimeCommand,
   CommandStatus,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command'
-import { hasBasename } from 'history/PathUtils'
 
 export interface CommandItemProps {
   analysisCommand: RunTimeCommand | null

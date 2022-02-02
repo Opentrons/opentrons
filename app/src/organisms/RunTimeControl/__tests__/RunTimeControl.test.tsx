@@ -21,7 +21,7 @@ import {
   useProtocolCalibrationStatus,
 } from '../../ProtocolSetup/RunSetupCard/hooks'
 import {
-  useRunCompleteTime,
+  useRunTimestamps,
   useRunControls,
   useRunStartTime,
   useRunStatus,
@@ -40,8 +40,8 @@ jest.mock('../hooks')
 jest.mock('../Timer')
 jest.mock('../../ProtocolSetup/RunSetupCard/hooks')
 
-const mockUseRunCompleteTime = useRunCompleteTime as jest.MockedFunction<
-  typeof useRunCompleteTime
+const mockUseRunTimestamps = useRunTimestamps as jest.MockedFunction<
+  typeof useRunTimestamps
 >
 const mockUseRunControls = useRunControls as jest.MockedFunction<
   typeof useRunControls
@@ -81,7 +81,12 @@ describe('RunTimeControl', () => {
       })
     when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_IDLE)
     mockTimer.mockReturnValue(<div>Mock Timer</div>)
-    when(mockUseRunCompleteTime).calledWith().mockReturnValue(null)
+    when(mockUseRunTimestamps).calledWith().mockReturnValue({
+      startedAt: 'fake_start_timestamp',
+      pausedAt: null,
+      stoppedAt: null,
+      completedAt: null,
+    })
     mockUseProtocolCalibrationStatus.mockReturnValue({
       complete: true,
     })
@@ -302,7 +307,12 @@ describe('RunTimeControl', () => {
   it('renders a run status and timer if stopped', () => {
     when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_STOPPED)
     when(mockUseRunStartTime).calledWith().mockReturnValue('noon')
-    when(mockUseRunCompleteTime).calledWith().mockReturnValue('noon thirty')
+    when(mockUseRunTimestamps).calledWith().mockReturnValue({
+      startedAt: 'noon',
+      pausedAt: null,
+      stoppedAt: null,
+      completedAt: 'noon thirty',
+    })
 
     const [{ getByRole, getByText }] = render()
 
@@ -314,7 +324,12 @@ describe('RunTimeControl', () => {
   it('renders a run status and timer if failed', () => {
     when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_FAILED)
     when(mockUseRunStartTime).calledWith().mockReturnValue('noon')
-    when(mockUseRunCompleteTime).calledWith().mockReturnValue('noon thirty')
+    when(mockUseRunTimestamps).calledWith().mockReturnValue({
+      startedAt: 'noon',
+      pausedAt: null,
+      stoppedAt: null,
+      completedAt: 'noon thirty',
+    })
 
     const [{ getByRole, getByText }] = render()
 
@@ -326,7 +341,12 @@ describe('RunTimeControl', () => {
   it('renders a run status and timer if succeeded', () => {
     when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_SUCCEEDED)
     when(mockUseRunStartTime).calledWith().mockReturnValue('noon')
-    when(mockUseRunCompleteTime).calledWith().mockReturnValue('noon thirty')
+    when(mockUseRunTimestamps).calledWith().mockReturnValue({
+      startedAt: 'noon',
+      pausedAt: null,
+      stoppedAt: null,
+      completedAt: 'noon thirty',
+    })
 
     const [{ getByRole, getByText }] = render()
 

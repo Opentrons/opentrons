@@ -125,41 +125,6 @@ export function useRunStopTime(): string | null {
     : null
 }
 
-export function useRunCompleteTime(): string | null {
-  const runStatus = useRunStatus()
-  const { actions = [], errors = [], id: runId = null } =
-    useCurrentRun()?.data ?? {}
-  const runCommands =
-    useCurrentRunCommands(undefined, {
-      enabled:
-        runStatus === RUN_STATUS_SUCCEEDED ||
-        runStatus === RUN_STATUS_STOPPED ||
-        runStatus === RUN_STATUS_FAILED,
-      refetchInterval: false,
-    }) ?? []
-
-  const lastCommand = last(runCommands)
-  const lastActionAt = last(actions)?.createdAt
-  const lastErrorAt = last(errors)?.createdAt
-  const lastCommandAt = lastCommand?.completedAt
-
-  let runCompletedTime = null
-
-  if (runStatus === RUN_STATUS_STOPPED) {
-    runCompletedTime = lastActionAt ?? null
-  }
-
-  if (runStatus === RUN_STATUS_FAILED) {
-    runCompletedTime = lastErrorAt ?? null
-  }
-
-  if (runStatus === RUN_STATUS_SUCCEEDED) {
-    runCompletedTime = lastCommandAt ?? null
-  }
-
-  return runCompletedTime
-}
-
 // TODO(bc, 2022-02-01): replace all usage of the above individual timestamp hooks with useRunTimestamps
 interface RunTimestamps {
   startedAt: string | null
@@ -169,8 +134,7 @@ interface RunTimestamps {
 }
 export function useRunTimestamps(): RunTimestamps {
   const runStatus = useRunStatus()
-  const { actions = [], errors = [], id: runId = null } =
-    useCurrentRun()?.data ?? {}
+  const { actions = [], errors = [] } = useCurrentRun()?.data ?? {}
   const runCommands =
     useCurrentRunCommands(undefined, {
       enabled: runStatus === RUN_STATUS_RUNNING,

@@ -22,12 +22,12 @@ import {
 } from '../../ProtocolUpload/hooks'
 
 import {
-  useRunCompleteTime,
   useRunControls,
   useRunPauseTime,
   useRunStopTime,
   useRunStatus,
   useRunStartTime,
+  useRunTimestamps,
 } from '../hooks'
 
 import type { Run, RunData, CommandDetail } from '@opentrons/api-client'
@@ -427,12 +427,97 @@ describe('useRunStopTime hook', () => {
   })
 })
 
-describe('useRunCompleteTime hook', () => {
+describe('useRunTimestamps hook', () => {
   beforeEach(() => {
     when(mockUseCurrentRunId).calledWith().mockReturnValue(RUN_ID_2)
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID_2, expect.any(Object))
+      .mockReturnValue(({
+        data: { data: mockRunningRun },
+      } as unknown) as UseQueryResult<Run>)
   })
   afterEach(() => {
     resetAllWhenMocks()
+  })
+
+  it('returns the start time of the current run', async () => {
+    when(mockUseCurrentRun)
+      .calledWith()
+      .mockReturnValue({
+        data: mockRunningRun,
+      } as Run)
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID_2)
+      .mockReturnValue(({
+        data: { data: mockRunningRun },
+      } as unknown) as UseQueryResult<Run>)
+
+    const { result } = renderHook(useRunTimestamps)
+    expect(result.current.startedAt).toBe('2021-10-25T12:54:53.366581+00:00')
+  })
+
+  it('returns null when pause is not the last action', async () => {
+    when(mockUseCurrentRun)
+      .calledWith()
+      .mockReturnValue({
+        data: mockRunningRun,
+      } as Run)
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID_2)
+      .mockReturnValue(({
+        data: { data: mockRunningRun },
+      } as unknown) as UseQueryResult<Run>)
+
+    const { result } = renderHook(useRunTimestamps)
+    expect(result.current.pausedAt).toBe(null)
+  })
+
+  it('returns the pause time of the current run when pause is the last action', async () => {
+    when(mockUseCurrentRun)
+      .calledWith()
+      .mockReturnValue({
+        data: mockPausedRun,
+      } as Run)
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID_1)
+      .mockReturnValue(({
+        data: { data: mockPausedRun },
+      } as unknown) as UseQueryResult<Run>)
+
+    const { result } = renderHook(useRunTimestamps)
+    expect(result.current.pausedAt).toBe('2021-10-25T13:23:31.366581+00:00')
+  })
+
+  it('returns stopped time null when stop is not the last action', async () => {
+    when(mockUseCurrentRun)
+      .calledWith()
+      .mockReturnValue({
+        data: mockRunningRun,
+      } as Run)
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID_2)
+      .mockReturnValue(({
+        data: { data: mockRunningRun },
+      } as unknown) as UseQueryResult<Run>)
+
+    const { result } = renderHook(useRunTimestamps)
+    expect(result.current.stoppedAt).toBe(null)
+  })
+
+  it('returns the stop time of the current run when stop is the last action', async () => {
+    when(mockUseCurrentRun)
+      .calledWith()
+      .mockReturnValue({
+        data: mockStoppedRun,
+      } as Run)
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID_2)
+      .mockReturnValue(({
+        data: { data: mockStoppedRun },
+      } as unknown) as UseQueryResult<Run>)
+
+    const { result } = renderHook(useRunTimestamps)
+    expect(result.current.stoppedAt).toBe('2021-10-25T13:58:22.366581+00:00')
   })
 
   it('returns the complete time of a successful current run', async () => {
@@ -450,8 +535,8 @@ describe('useRunCompleteTime hook', () => {
       .calledWith(undefined, expect.any(Object))
       .mockReturnValue([mockCommand.data as any])
 
-    const { result } = renderHook(useRunCompleteTime)
-    expect(result.current).toBe('noon thirty')
+    const { result } = renderHook(useRunTimestamps)
+    expect(result.current.completedAt).toBe('noon thirty')
   })
 
   it('returns the complete time of a failed current run', async () => {
@@ -470,8 +555,8 @@ describe('useRunCompleteTime hook', () => {
       } as Run)
     when(mockUseCurrentRunId).calledWith().mockReturnValue(RUN_ID_2)
 
-    const { result } = renderHook(useRunCompleteTime)
-    expect(result.current).toBe('noon forty-five')
+    const { result } = renderHook(useRunTimestamps)
+    expect(result.current.completedAt).toBe('noon forty-five')
   })
 
   it('returns the complete time of a stopped current run', async () => {
@@ -490,7 +575,7 @@ describe('useRunCompleteTime hook', () => {
       } as Run)
     when(mockUseCurrentRunId).calledWith().mockReturnValue(RUN_ID_2)
 
-    const { result } = renderHook(useRunCompleteTime)
-    expect(result.current).toBe('2021-10-25T13:58:22.366581+00:00')
+    const { result } = renderHook(useRunTimestamps)
+    expect(result.current.completedAt).toBe('2021-10-25T13:58:22.366581+00:00')
   })
 })
