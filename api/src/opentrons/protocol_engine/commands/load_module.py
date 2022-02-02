@@ -60,8 +60,12 @@ class LoadModuleResult(BaseModel):
     model: ModuleModel = Field(
         ...,
         description=(
-            "Hardware model of the connected module. May be different than"
-            " the requested model if the attached module is still compatible."
+            "The hardware model of the connected module."
+            " May be different than the requested model"
+            " if the connected module is still compatible."
+            "\n\n"
+            "This field is only meaningful in the run's actual execution,"
+            " not in the protocol's analysis."
         ),
     )
 

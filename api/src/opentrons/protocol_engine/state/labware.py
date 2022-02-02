@@ -363,8 +363,12 @@ class LabwareView(HasState[LabwareState]):
 
         Returns the *most recently* added matching offset,
         so later offsets can override earlier ones.
+        Or, ``None`` if no offsets match at all.
 
-        Returns ``None`` if no offsets match at all.
+        An offset "matches"
+        if its ``definition_uri`` and ``location`` *exactly* match what's provided.
+        This implies that if the location involves a module,
+        it will *not* match a module that's compatible but not identical.
         """
         for candidate in reversed(list(self._state.labware_offsets_by_id.values())):
             if (

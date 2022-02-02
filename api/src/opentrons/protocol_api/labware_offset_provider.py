@@ -40,9 +40,11 @@ class AbstractLabwareOffsetProvider(ABC):
         Args:
             labware_definition_uri: The labware's definition URI.
             module_model: If the labware is atop a module, the module's model string,
-                          like "temperatureModuleV1". During protocol execution, this
-                          should be the model that's actually physically connected,
-                          which may be upgraded from the one that the protocol requested
+                          like "temperatureModuleV1".
+                          During protocol execution,
+                          this should be the model of the module that's actually
+                          physically connected, which may be different from the model
+                          that the protocol requested
                           with `ProtocolContext.load_module()`.
             deck_slot: The deck slot that the labware occupies. Or, if the labware is
                        atop a module, the deck slot that the module occupies.
