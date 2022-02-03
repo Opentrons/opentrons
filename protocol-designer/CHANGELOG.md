@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.0.0-beta.8](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.7...v5.0.0-beta.8) (2022-02-03)
+
+
+### Features
+
+* **protocol-designer:** add feature flag for heater shaker in PD ([#9345](https://github.com/Opentrons/opentrons/issues/9345)) ([d36fac0](https://github.com/Opentrons/opentrons/commit/d36fac0cb0247f09b0e6fa61a10eff4a852fc3e0))
+
+
+
+
+
 # [5.0.0-beta.7](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.6...v5.0.0-beta.7) (2022-01-28)
 
 **Note:** Version bump only for package protocol-designer
