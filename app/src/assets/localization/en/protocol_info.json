@@ -1,6 +1,7 @@
 {
   "browse_protocol_library": "Launch Opentrons Protocol Library",
   "choose_file": "Choose File...",
+  "choose_protocol_file": "Choose File",
   "choose_snippet_type": "Choose the Labware Offset Data Python Snippet based on target execution environment.",
   "continue_proceed_to_calibrate": "Proceed to Calibrate",
   "continue_verify_calibrations": "Verify pipette and labware calibrations",
@@ -11,6 +12,7 @@
   "estimated_run_time": "Estimated Run Time",
   "error_message_no_steps": "This protocol has no steps in it - there's nothing for your robot to do! Your protocol needs at least one aspirate/dispense to import properly",
   "get_labware_offset_data": "Get Labware Offset Data",
+  "import_a_file": "Import a protocol to get started",
   "instrument_not_attached": "Not attached",
   "instrument_cal_data_title": "Calibration data",
   "instruments_title": "Required Pipettes",
@@ -24,6 +26,7 @@
   "modules_title": "Required Modules",
   "no_protocol_yet": "Don't have a protocol yet?",
   "open_a_protocol": "Open a protocol to get started",
+  "open_api_docs": "Open Python API Documentation",
   "organization_and_author": "Organization/Author",
   "protocol_title": "Protocol - {{protocol_name}}",
   "protocol_upload_failed": "Protocol upload failed. Fix the error and try again",
@@ -54,5 +57,6 @@
   "labware_positon_check_complete_toast_with_offsets_plural": "Labware Position Check complete. {{count}} Labware Offsets created.",
   "protocol_loading": "Opening Protocol On {{robot_name}}",
   "protocol_finishing": "Closing Protocol On {{robot_name}}",
-  "cancel_run": "Cancel Run"
+  "cancel_run": "Cancel Run",
+  "valid_file_types": "Valid file types: Python files (.py), Protocol Designer files (.json), or .zip files"
 }
