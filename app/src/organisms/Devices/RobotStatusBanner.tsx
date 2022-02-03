@@ -6,8 +6,6 @@ import {
   Flex,
   Icon,
   Text,
-  C_BLUE,
-  C_MED_DARK_GRAY,
   DIRECTION_COLUMN,
   SIZE_1,
   SPACING_2,
@@ -55,13 +53,6 @@ export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
             size={SIZE_1}
             marginRight={SPACING_2}
           />
-          <Icon
-            name="circle"
-            color={isProtocolRunning ? C_BLUE : C_MED_DARK_GRAY}
-            size={SIZE_1}
-            marginRight={SPACING_2}
-          />
-          <Text as="span">{isProtocolRunning ? t('active') : t('idle')}</Text>
         </Flex>
         {isProtocolRunning ? <RunningProtocolBanner /> : null}
       </Flex>

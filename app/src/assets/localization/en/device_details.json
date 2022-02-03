@@ -1,5 +1,9 @@
 {
   "controls": "Controls",
   "lights": "Lights",
+  "offline_pipettes_and_modules": "Robot must be on the network to see pipettes and modules",
+  "offline_recent_protocol_runs": "Robot must be on the network to see protocol runs",
+  "pipettes_and_modules": "Pipettes and Modules",
+  "recent_protocol_runs": "Recent Protocol Runs",
   "run_a_protocol": "Run a Protocol"
 }

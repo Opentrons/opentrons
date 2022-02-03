@@ -10,12 +10,13 @@ import {
   DIRECTION_COLUMN,
   OVERFLOW_SCROLL,
   SIZE_6,
-  SPACING_2,
   SPACING_3,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { useAttachedModules, useRobot } from '../../../organisms/Devices/hooks'
+import { PipettesAndModules } from '../../../organisms/Devices/PipettesAndModules'
+import { RecentProtocolRuns } from '../../../organisms/Devices/RecentProtocolRuns'
 import { RobotOverview } from '../../../organisms/Devices/RobotOverview'
 
 import type { NextGenRouteParams } from '../../../App/NextGenApp'
@@ -40,15 +41,16 @@ export function DeviceDetails(): JSX.Element | null {
           alignItems={ALIGN_CENTER}
           backgroundColor={C_WHITE}
           border={`1px solid ${C_MED_LIGHT_GRAY}`}
-          borderRadius="4px"
+          borderRadius="3px"
           flexDirection={DIRECTION_COLUMN}
-          marginBottom={SPACING_2}
+          marginBottom={SPACING_3}
           padding={SPACING_3}
           width="100%"
         >
           <RobotOverview robotName={robotName} />
-          <div>insert modules here</div>
+          <PipettesAndModules robotName={robotName} />
         </Flex>
+        <RecentProtocolRuns robotName={robotName} />
       </Box>
     </ApiHostProvider>
   ) : null

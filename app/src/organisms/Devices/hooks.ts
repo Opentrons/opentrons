@@ -4,7 +4,11 @@ import { useSelector } from 'react-redux'
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 
 import { useRunStatus } from '../../organisms/RunTimeControl/hooks'
-import { getDiscoverableRobotByName } from '../../redux/discovery'
+import {
+  getDiscoverableRobotByName,
+  CONNECTABLE,
+  REACHABLE,
+} from '../../redux/discovery'
 import { fetchModules, getAttachedModules } from '../../redux/modules'
 import { fetchPipettes, getAttachedPipettes } from '../../redux/pipettes'
 import { useDispatchApiRequest } from '../../redux/robot-api'
@@ -88,4 +92,10 @@ export function useIsProtocolRunning(): boolean {
   const isProtocolRunning = runStatus != null && runStatus !== RUN_STATUS_IDLE
 
   return isProtocolRunning
+}
+
+export function useIsRobotViewable(robotName: string): boolean {
+  const robot = useRobot(robotName)
+
+  return robot?.status === CONNECTABLE || robot?.status === REACHABLE
 }
