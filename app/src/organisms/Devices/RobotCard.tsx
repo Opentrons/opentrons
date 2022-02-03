@@ -19,36 +19,13 @@ import {
   SPACING_3,
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
-import {
-  MAGNETIC_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
-} from '@opentrons/shared-data'
 
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
+import { ModuleIcon } from './ModuleIcon'
 import { useAttachedModules, useAttachedPipettes } from './hooks'
 import { RobotStatusBanner } from './RobotStatusBanner'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
-
-const iconNamesByModuleType = {
-  [MAGNETIC_MODULE_TYPE]: 'ot-magnet',
-  [TEMPERATURE_MODULE_TYPE]: 'ot-temperature',
-  [THERMOCYCLER_MODULE_TYPE]: 'ot-thermocycler',
-} as const
-
-const ModuleIcon = ({
-  moduleType,
-}: {
-  moduleType:
-    | typeof MAGNETIC_MODULE_TYPE
-    | typeof TEMPERATURE_MODULE_TYPE
-    | typeof THERMOCYCLER_MODULE_TYPE
-}): JSX.Element => {
-  return (
-    <Icon name={iconNamesByModuleType[moduleType]} marginRight={SPACING_2} />
-  )
-}
 
 type RobotCardProps = Pick<DiscoveredRobot, 'name' | 'local'>
 
