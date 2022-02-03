@@ -12,6 +12,7 @@ export interface RunCommandSummary {
   status: 'queued' | 'running' | 'succeeded' | 'failed'
   createdAt: string
   params?: any
+  // TODO(mc, 2022-02-02): `result` does not exist on RunCommandSummary
   result?: RunTimeCommand['result']
   startedAt?: string
   completedAt?: string
