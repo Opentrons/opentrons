@@ -13,9 +13,7 @@ from typing import (
     Sequence,
     Generator,
     cast,
-    Union,
 )
-from typing_extensions import Literal
 
 from opentrons.config.types import OT3Config
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
@@ -55,7 +53,7 @@ _FIXED_PIPETTE_MODEL: PipetteModel = cast("PipetteModel", "p1000_single_v3.0")
 class OT3Simulator:
     """OT3 Hardware Controller Backend."""
 
-    _position: Dict[Union[NodeId, Literal["Pipette2"]], float]
+    _position: Dict[NodeId, float]
 
     @classmethod
     async def build(
@@ -143,31 +141,31 @@ class OT3Simulator:
         return ["X", "Y", "Z", "A", "B", "C"]
 
     @staticmethod
-    def _axis_to_node(axis: str) -> Union["NodeId", Literal["Pipette2"]]:
-        anm: Dict[str, Union["NodeId", Literal["Pipette2"]]] = {
+    def _axis_to_node(axis: str) -> "NodeId":
+        anm: Dict[str, "NodeId"] = {
             "X": NodeId.gantry_x,
             "Y": NodeId.gantry_y,
             "Z": NodeId.head_l,
             "A": NodeId.head_r,
-            "B": NodeId.pipette,
-            "C": "Pipette2",
+            "B": NodeId.pipette_left,
+            "C": NodeId.pipette_right,
         }
         return anm[axis]
 
     @staticmethod
-    def _node_to_axis(node: Union["NodeId", Literal["Pipette2"]]) -> str:
+    def _node_to_axis(node: "NodeId") -> str:
         nam = {
             NodeId.gantry_x: "X",
             NodeId.gantry_y: "Y",
             NodeId.head_l: "Z",
             NodeId.head_r: "A",
-            NodeId.pipette: "B",
-            "Pipette2": "C",
+            NodeId.pipette_left: "B",
+            NodeId.pipette_right: "C",
         }
         return nam[node]
 
     @staticmethod
-    def _node_is_axis(node: Union["NodeId", Literal["Pipette2"]]) -> bool:
+    def _node_is_axis(node: "NodeId") -> bool:
         try:
             OT3Simulator._node_to_axis(node)
             return True
@@ -212,9 +210,7 @@ class OT3Simulator:
         return self._axis_convert(self._position)
 
     @staticmethod
-    def _axis_convert(
-        position: Dict[Union[NodeId, Literal["Pipette2"]], float]
-    ) -> AxisValueMap:
+    def _axis_convert(position: Dict[NodeId, float]) -> AxisValueMap:
         ret: AxisValueMap = {"A": 0, "B": 0, "C": 0, "X": 0, "Y": 0, "Z": 0}
         for node, pos in position.items():
             # we need to make robot config apply to z or in some other way
@@ -243,7 +239,7 @@ class OT3Simulator:
             None
         """
         log.info(f"move: {target_position}")
-        target: Dict[Union[NodeId, Literal["Pipette2"]], float] = {}
+        target: Dict[NodeId, float] = {}
         for axis, pos in target_position.items():
             if self._axis_is_node(axis):
                 target[self._axis_to_node(axis)] = pos
@@ -443,12 +439,12 @@ class OT3Simulator:
         return None
 
     @staticmethod
-    def _get_home_position() -> Dict[Union[NodeId, Literal["Pipette2"]], float]:
+    def _get_home_position() -> Dict[NodeId, float]:
         return {
             NodeId.head_l: 0,
             NodeId.head_r: 0,
             NodeId.gantry_x: 0,
             NodeId.gantry_y: 0,
-            NodeId.pipette: 0,
-            "Pipette2": 0,
+            NodeId.pipette_left: 0,
+            NodeId.pipette_right: 0,
         }

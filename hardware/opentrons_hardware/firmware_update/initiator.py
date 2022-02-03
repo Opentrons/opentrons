@@ -24,8 +24,11 @@ class Target:
 
 
 head: Final = Target(system_node=NodeId.head, bootloader_node=NodeId.head_bootloader)
-pipette: Final = Target(
-    system_node=NodeId.pipette, bootloader_node=NodeId.pipette_bootloader
+pipette_left: Final = Target(
+    system_node=NodeId.pipette_left, bootloader_node=NodeId.pipette_left_bootloader
+)
+pipette_right: Final = Target(
+    system_node=NodeId.pipette_right, bootloader_node=NodeId.pipette_right_bootloader
 )
 gantry_x: Final = Target(
     system_node=NodeId.gantry_x, bootloader_node=NodeId.gantry_x_bootloader
