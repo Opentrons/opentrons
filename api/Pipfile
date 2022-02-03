@@ -8,7 +8,7 @@ python_version = "3.7"
 
 [dev-packages]
 coverage = "==5.1"
-mypy = "0.910"
+mypy = "==0.910"
 numpydoc = "==0.9.1"
 pytest = "==6.1.0"
 pytest-aiohttp = "==0.3.0"

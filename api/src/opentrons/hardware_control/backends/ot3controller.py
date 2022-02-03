@@ -106,7 +106,8 @@ class OT3Controller:
             NodeId.gantry_y,
             NodeId.head_l,
             NodeId.head_r,
-            NodeId.pipette,
+            NodeId.pipette_left,
+            NodeId.pipette_right,
         ]
 
     @staticmethod
@@ -120,7 +121,8 @@ class OT3Controller:
             "Y": NodeId.gantry_y,
             "Z": NodeId.head_l,
             "A": NodeId.head_r,
-            "B": NodeId.pipette,
+            "B": NodeId.pipette_left,
+            "C": NodeId.pipette_right,
         }
         return anm[axis]
 
@@ -131,7 +133,8 @@ class OT3Controller:
             NodeId.gantry_y: "Y",
             NodeId.head_l: "Z",
             NodeId.head_r: "A",
-            NodeId.pipette: "B",
+            NodeId.pipette_left: "B",
+            NodeId.pipette_right: "C",
         }
         return nam[node]
 
@@ -419,5 +422,6 @@ class OT3Controller:
             NodeId.head_r: 0,
             NodeId.gantry_x: 0,
             NodeId.gantry_y: 0,
-            NodeId.pipette: 0,
+            NodeId.pipette_left: 0,
+            NodeId.pipette_right: 0,
         }
