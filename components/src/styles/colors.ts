@@ -5,6 +5,8 @@ export const C_MED_DARK_GRAY = '#6c6c6c'
 export const C_MED_GRAY = '#9b9b9b'
 export const C_MED_LIGHT_GRAY = '#d2d2d2'
 export const C_LIGHT_GRAY = '#e6e6e6'
+export const C_BRIGHT_GRAY = '#f8f8f8'
+export const C_HARBOR_GRAY = '#8a8c8e'
 export const C_NEAR_WHITE = '#fafafa'
 export const C_WHITE = '#ffffff'
 export const C_TRANSPARENT = 'transparent'
@@ -14,6 +16,8 @@ export const C_BLUE = '#006fff'
 export const C_MINT = '#00bfa8'
 export const C_AQUAMARINE = '#eefff8'
 export const C_POWDER_BLUE = '#f1f8ff'
+export const C_SKY_BLUE = '#accfff80'
+export const C_BLUE_PRESSED = '#0050b8'
 
 // colors by usage
 // TODO(mc, 2020-10-08): s/COLOR_/C_

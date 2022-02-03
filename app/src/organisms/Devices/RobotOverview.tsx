@@ -91,7 +91,7 @@ export function RobotOverview({
         </Flex>
       </Box>
       <Box alignSelf={ALIGN_START}>
-        <Icon name="dots-horizontal" color={C_MED_DARK_GRAY} size={SIZE_2} />
+        <Icon name="dots-vertical" color={C_MED_DARK_GRAY} size={SIZE_2} />
       </Box>
     </Flex>
   ) : null
