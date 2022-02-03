@@ -29,10 +29,47 @@ describe('TemperatureModuleData', () => {
     jest.resetAllMocks()
   })
 
-  it('renders a status', () => {
+  it('renders an idle status', () => {
     const { getByText } = render(props)
+    expect(getByText('Mock StatusLabel')).toHaveStyle(
+      'backgroundColor: C_SILVER_GRAY'
+    )
+  })
 
-    getByText('Mock StatusLabel')
+  it('renders a holding at target status', () => {
+    props = {
+      moduleStatus: 'holding at target',
+      targetTemp: mockTemperatureModuleGen2.data.targetTemp,
+      currentTemp: mockTemperatureModuleGen2.data.currentTemp,
+    }
+    const { getByText } = render(props)
+    expect(getByText('Mock StatusLabel')).toHaveStyle(
+      'backgroundColor: C_SKY_BLUE'
+    )
+  })
+
+  it('renders a cooling status', () => {
+    props = {
+      moduleStatus: 'cooling',
+      targetTemp: mockTemperatureModuleGen2.data.targetTemp,
+      currentTemp: mockTemperatureModuleGen2.data.currentTemp,
+    }
+    const { getByText } = render(props)
+    expect(getByText('Mock StatusLabel')).toHaveStyle(
+      'backgroundColor: C_SKY_BLUE'
+    )
+  })
+
+  it('renders a cooling status', () => {
+    props = {
+      moduleStatus: 'heating',
+      targetTemp: mockTemperatureModuleGen2.data.targetTemp,
+      currentTemp: mockTemperatureModuleGen2.data.currentTemp,
+    }
+    const { getByText } = render(props)
+    expect(getByText('Mock StatusLabel')).toHaveStyle(
+      'backgroundColor: C_SKY_BLUE'
+    )
   })
 
   it('renders correct temperature information when target temp is null', () => {
