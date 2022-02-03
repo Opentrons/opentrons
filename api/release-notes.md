@@ -6,7 +6,7 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# OT-2 Software Changes in 5.0.0-beta
+# OT-2 Software Changes in 5.0.0-beta.8
 
 Welcome to the beta release of v5.0.0 release of the OT-2 software!
 
@@ -24,12 +24,13 @@ This is beta software! You may experience unexpected crashes or missing features
 
 Keep an eye on this space as we release new versions of the beta.
 
+- We have addressed various performance issues and you should no longer encounter freezes with longer protocols.
+
 ## Known Issues
 
 This beta is a work in progress! We'll be addressing the following features and issues in upcoming releases of 5.0.0.
 
 - Your last run protocol will not be saved through robot reboots
-- You may experience various performance issues and freezes
 
 ---
 

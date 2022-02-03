@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.0.0-beta.8](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.7...v5.0.0-beta.8) (2022-02-03)
+
+
+### Features
+
+* **components:** add overflow icon ([#9346](https://github.com/Opentrons/opentrons/issues/9346)) ([5845b3f](https://github.com/Opentrons/opentrons/commit/5845b3f71dde54759fa66e0b27c2ff367f10be9d))
+
+
+
+
+
 # [5.0.0-beta.7](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.6...v5.0.0-beta.7) (2022-01-28)
 
 
