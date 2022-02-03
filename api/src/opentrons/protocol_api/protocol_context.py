@@ -32,7 +32,10 @@ from opentrons.protocols.types import Protocol
 from .labware import Labware
 from opentrons.protocols.context.labware import AbstractLabware
 from opentrons.protocols.context.protocol import AbstractProtocol
-from opentrons.protocols.geometry.module_geometry import ModuleGeometry
+from opentrons.protocols.geometry.module_geometry import (
+    ModuleGeometry,
+    resolve_module_model,
+)
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from .instrument_context import InstrumentContext
@@ -578,8 +581,10 @@ class ProtocolContext(CommandPublisher):
                 "using thermocycler parameters only available in 2.4"
             )
 
+        requested_model = resolve_module_model(module_name)
+
         module = self._implementation.load_module(
-            module_name=module_name, location=location, configuration=configuration
+            model=requested_model, location=location, configuration=configuration
         )
 
         if not module:
@@ -608,7 +613,8 @@ class ProtocolContext(CommandPublisher):
 
         self.module_load_broker.publish(
             ModuleLoadInfo(
-                module_model=module.geometry.model,
+                requested_model=requested_model,
+                loaded_model=module.geometry.model,
                 deck_slot=deck_slot,
                 configuration=configuration,
                 module_serial=module_serial,

@@ -389,7 +389,8 @@ async def test_module_load_broker_messages(
     handler: Callable[[LegacyModuleLoadInfo], None] = module_handler_captor.value
 
     module_load_info = LegacyModuleLoadInfo(
-        module_model=LegacyMagneticModuleModel.MAGNETIC_V2,
+        requested_model=LegacyMagneticModuleModel.MAGNETIC_V2,
+        loaded_model=LegacyMagneticModuleModel.MAGNETIC_V2,
         deck_slot=DeckSlotName.SLOT_1,
         configuration=None,
         module_serial="serial-number",
