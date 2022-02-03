@@ -34,6 +34,7 @@ from opentrons.protocols.context.labware import AbstractLabware
 from opentrons.protocols.context.protocol import AbstractProtocol
 from opentrons.protocols.geometry.module_geometry import (
     ModuleGeometry,
+    module_model_from_string,
     resolve_module_model,
 )
 from opentrons.protocols.geometry.deck import Deck
@@ -583,38 +584,38 @@ class ProtocolContext(CommandPublisher):
 
         requested_model = resolve_module_model(module_name)
 
-        module = self._implementation.load_module(
+        load_result = self._implementation.load_module(
             model=requested_model, location=location, configuration=configuration
         )
 
-        if not module:
+        if not load_result:
             raise RuntimeError(f"Could not find specified module: {module_name}")
 
         mod_class = {
             ModuleType.MAGNETIC: MagneticModuleContext,
             ModuleType.TEMPERATURE: TemperatureModuleContext,
             ModuleType.THERMOCYCLER: ThermocyclerContext,
-        }[module.type]
+        }[load_result.type]
 
         module_context = mod_class(
             ctx=self,
-            hw_module=module.module,
-            geometry=module.geometry,
+            hw_module=load_result.module,
+            geometry=load_result.geometry,
             at_version=self.api_version,
             loop=self._loop,
         )
         self._modules.append(module_context)
 
         # ===== Protocol Engine stuff ====
-        module_loc = module.geometry.parent
+        module_loc = load_result.geometry.parent
         assert isinstance(module_loc, (int, str)), "Unexpected labware object parent"
         deck_slot = types.DeckSlotName.from_primitive(module_loc)
-        module_serial = module.module.device_info["serial"]
+        module_serial = load_result.module.device_info["serial"]
 
         self.module_load_broker.publish(
             ModuleLoadInfo(
                 requested_model=requested_model,
-                loaded_model=module.geometry.model,
+                loaded_model=module_model_from_string(load_result.module.model()),
                 deck_slot=deck_slot,
                 configuration=configuration,
                 module_serial=module_serial,

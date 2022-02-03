@@ -186,7 +186,12 @@ class ProtocolContextImplementation(AbstractProtocol):
             resolved_type, location
         )
 
-        # Load the geometry
+        # Load the geometry.
+        #
+        # fixme(mm, 2022-02-03):
+        # This loads the geometry of the *requested* module.
+        # But because of module compatibility, ths won't necessarily match
+        # the hardware module that we will actually load.
         geometry = module_geometry.load_module(
             model=model,
             parent=self._deck_layout.position_for(resolved_location),
