@@ -17,6 +17,7 @@ import {
   SPACING_3,
   useConditionalConfirm,
   NewAlertSecondaryBtn,
+  SpinnerModal,
 } from '@opentrons/components'
 import { Page } from '../../atoms/Page'
 import { Portal } from '../../App/portal'
@@ -32,7 +33,6 @@ import { CommandList } from './CommandList'
 import { ConfirmCancelModal } from './ConfirmCancelModal'
 
 import styles from '../ProtocolUpload/styles.css'
-import { ProtocolLoader } from '../ProtocolUpload'
 import { useIsProtocolRunLoaded } from '../ProtocolUpload/hooks'
 
 export function RunDetails(): JSX.Element | null {
@@ -85,7 +85,11 @@ export function RunDetails(): JSX.Element | null {
     ) {
       text = t('closing_protocol')
     }
-    return <ProtocolLoader loadingText={text} />
+    return (
+      <Portal level="top">
+        <SpinnerModal message={text} />
+      </Portal>
+    )
   }
 
   const cancelRunButton = (

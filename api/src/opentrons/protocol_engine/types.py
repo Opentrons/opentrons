@@ -207,11 +207,27 @@ class LabwareOffsetLocation(BaseModel):
 
     slotName: DeckSlotName = Field(
         ...,
-        description="The deck slot the offset applies to",
+        description=(
+            "The deck slot where the protocol will load the labware."
+            " Or, if the protocol will load the labware on a module,"
+            " the deck slot where the protocol will load that module."
+        ),
     )
     moduleModel: Optional[ModuleModel] = Field(
         None,
-        description="The module model the labware will be loaded onto, if applicable",
+        description=(
+            "The model of the module that the labware will be loaded onto,"
+            " if applicable."
+            "\n\n"
+            "For the offset to apply,"
+            " this must exactly match the model that the robot will find"
+            " *physically connected* during the protocol's execution."
+            " This means it's not enough to blindly use the model"
+            " reported by the protocol's analysis."
+            " The two models will differ"
+            " if the physically connected module is compatible, but not identical,"
+            " to the one that the protocol requested."
+        ),
     )
 
 
