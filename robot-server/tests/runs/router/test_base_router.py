@@ -14,6 +14,7 @@ from robot_server.service.json_api import (
     RequestModel,
     SimpleBody,
     SimpleEmptyBody,
+    MultiBodyMeta,
     ResourceLink,
 )
 
@@ -436,6 +437,7 @@ async def test_get_runs_empty(decoy: Decoy, run_store: RunStore) -> None:
 
     assert result.content.data == []
     assert result.content.links == AllRunsLinks(current=None)
+    assert result.content.meta == MultiBodyMeta(cursor=0, pageLength=0, totalLength=0)
     assert result.status_code == 200
 
 
@@ -502,6 +504,7 @@ async def test_get_runs_not_empty(
     assert result.content.links == AllRunsLinks(
         current=ResourceLink(href="/runs/unique-id-2")
     )
+    assert result.content.meta == MultiBodyMeta(cursor=0, pageLength=2, totalLength=2)
     assert result.status_code == 200
 
 

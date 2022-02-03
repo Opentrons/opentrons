@@ -20,6 +20,7 @@ from robot_server.service.json_api import (
     SimpleBody,
     SimpleEmptyBody,
     MultiBody,
+    MultiBodyMeta,
     ResourceLink,
     PydanticResponse,
 )
@@ -235,8 +236,10 @@ async def get_runs(
         if run.is_current:
             links.current = ResourceLink.construct(href=f"/runs/{run.run_id}")
 
+    meta = MultiBodyMeta(cursor=0, pageLength=len(data), totalLength=len(data))
+
     return await PydanticResponse.create(
-        content=MultiBody.construct(data=data, links=links),
+        content=MultiBody.construct(data=data, links=links, meta=meta),
         status_code=status.HTTP_200_OK,
     )
 

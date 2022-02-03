@@ -12,11 +12,7 @@ import {
   RUN_STATUS_FAILED,
   RUN_STATUS_STOPPED,
 } from '@opentrons/api-client'
-import {
-  useCommandQuery,
-  useRunQuery,
-  useRunActionMutations,
-} from '@opentrons/react-api-client'
+import { useRunQuery, useRunActionMutations } from '@opentrons/react-api-client'
 
 import {
   useCloneRun,
@@ -26,12 +22,12 @@ import {
 } from '../../ProtocolUpload/hooks'
 
 import {
-  useRunCompleteTime,
   useRunControls,
   useRunPauseTime,
   useRunStopTime,
   useRunStatus,
   useRunStartTime,
+  useRunTimestamps,
 } from '../hooks'
 
 import type { Run, RunData, CommandDetail } from '@opentrons/api-client'
@@ -48,13 +44,10 @@ const mockUseCurrentRunCommands = useCurrentRunCommands as jest.MockedFunction<
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
 >
-const mockUseCommandQuery = useCommandQuery as jest.MockedFunction<
-  typeof useCommandQuery
->
-const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
 const mockUseRunActionMutations = useRunActionMutations as jest.MockedFunction<
   typeof useRunActionMutations
 >
+const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
 
 const PROTOCOL_ID = '1'
 const RUN_ID_1 = '1'
@@ -304,7 +297,7 @@ describe('useRunStatus hook', () => {
 
   it('returns the run status of the current run', async () => {
     when(mockUseRunQuery)
-      .calledWith(RUN_ID_2, { refetchInterval: 10000 })
+      .calledWith(RUN_ID_2, expect.any(Object))
       .mockReturnValue(({
         data: { data: mockRunningRun },
       } as unknown) as UseQueryResult<Run>)
@@ -315,7 +308,7 @@ describe('useRunStatus hook', () => {
 
   it('returns a "idle" run status if idle and run unstarted', () => {
     when(mockUseRunQuery)
-      .calledWith(RUN_ID_2, { refetchInterval: 10000 })
+      .calledWith(RUN_ID_2, expect.any(Object))
       .mockReturnValue(({
         data: { data: mockIdleUnstartedRun },
       } as unknown) as UseQueryResult<Run>)
@@ -326,7 +319,7 @@ describe('useRunStatus hook', () => {
 
   it('returns a "running" run status if idle and run started', () => {
     when(mockUseRunQuery)
-      .calledWith(RUN_ID_2, { refetchInterval: 10000 })
+      .calledWith(RUN_ID_2, expect.any(Object))
       .mockReturnValue(({
         data: { data: mockIdleStartedRun },
       } as unknown) as UseQueryResult<Run>)
@@ -434,17 +427,102 @@ describe('useRunStopTime hook', () => {
   })
 })
 
-describe('useRunCompleteTime hook', () => {
+describe('useRunTimestamps hook', () => {
   beforeEach(() => {
     when(mockUseCurrentRunId).calledWith().mockReturnValue(RUN_ID_2)
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID_2, expect.any(Object))
+      .mockReturnValue(({
+        data: { data: mockRunningRun },
+      } as unknown) as UseQueryResult<Run>)
   })
   afterEach(() => {
     resetAllWhenMocks()
   })
 
+  it('returns the start time of the current run', async () => {
+    when(mockUseCurrentRun)
+      .calledWith()
+      .mockReturnValue({
+        data: mockRunningRun,
+      } as Run)
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID_2)
+      .mockReturnValue(({
+        data: { data: mockRunningRun },
+      } as unknown) as UseQueryResult<Run>)
+
+    const { result } = renderHook(useRunTimestamps)
+    expect(result.current.startedAt).toBe('2021-10-25T12:54:53.366581+00:00')
+  })
+
+  it('returns null when pause is not the last action', async () => {
+    when(mockUseCurrentRun)
+      .calledWith()
+      .mockReturnValue({
+        data: mockRunningRun,
+      } as Run)
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID_2)
+      .mockReturnValue(({
+        data: { data: mockRunningRun },
+      } as unknown) as UseQueryResult<Run>)
+
+    const { result } = renderHook(useRunTimestamps)
+    expect(result.current.pausedAt).toBe(null)
+  })
+
+  it('returns the pause time of the current run when pause is the last action', async () => {
+    when(mockUseCurrentRun)
+      .calledWith()
+      .mockReturnValue({
+        data: mockPausedRun,
+      } as Run)
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID_1)
+      .mockReturnValue(({
+        data: { data: mockPausedRun },
+      } as unknown) as UseQueryResult<Run>)
+
+    const { result } = renderHook(useRunTimestamps)
+    expect(result.current.pausedAt).toBe('2021-10-25T13:23:31.366581+00:00')
+  })
+
+  it('returns stopped time null when stop is not the last action', async () => {
+    when(mockUseCurrentRun)
+      .calledWith()
+      .mockReturnValue({
+        data: mockRunningRun,
+      } as Run)
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID_2)
+      .mockReturnValue(({
+        data: { data: mockRunningRun },
+      } as unknown) as UseQueryResult<Run>)
+
+    const { result } = renderHook(useRunTimestamps)
+    expect(result.current.stoppedAt).toBe(null)
+  })
+
+  it('returns the stop time of the current run when stop is the last action', async () => {
+    when(mockUseCurrentRun)
+      .calledWith()
+      .mockReturnValue({
+        data: mockStoppedRun,
+      } as Run)
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID_2)
+      .mockReturnValue(({
+        data: { data: mockStoppedRun },
+      } as unknown) as UseQueryResult<Run>)
+
+    const { result } = renderHook(useRunTimestamps)
+    expect(result.current.stoppedAt).toBe('2021-10-25T13:58:22.366581+00:00')
+  })
+
   it('returns the complete time of a successful current run', async () => {
     when(mockUseRunQuery)
-      .calledWith(RUN_ID_2, { refetchInterval: 10000 })
+      .calledWith(RUN_ID_2, expect.any(Object))
       .mockReturnValue(({
         data: { data: mockSucceededRun },
       } as unknown) as UseQueryResult<Run>)
@@ -454,26 +532,21 @@ describe('useRunCompleteTime hook', () => {
         data: mockSucceededRun,
       } as Run)
     when(mockUseCurrentRunCommands)
-      .calledWith()
+      .calledWith({ cursor: null, pageLength: 1 }, expect.any(Object))
       .mockReturnValue([mockCommand.data as any])
-    when(mockUseCommandQuery)
-      .calledWith(RUN_ID_2, COMMAND_ID)
-      .mockReturnValue({
-        data: mockCommand,
-      } as UseQueryResult<CommandDetail, Error>)
 
-    const { result } = renderHook(useRunCompleteTime)
-    expect(result.current).toBe('noon thirty')
+    const { result } = renderHook(useRunTimestamps)
+    expect(result.current.completedAt).toBe('noon thirty')
   })
 
   it('returns the complete time of a failed current run', async () => {
     when(mockUseRunQuery)
-      .calledWith(RUN_ID_2, { refetchInterval: 10000 })
+      .calledWith(RUN_ID_2, expect.any(Object))
       .mockReturnValue(({
         data: { data: mockFailedRun },
       } as unknown) as UseQueryResult<Run>)
     when(mockUseCurrentRunCommands)
-      .calledWith()
+      .calledWith({ cursor: null, pageLength: 1 }, expect.any(Object))
       .mockReturnValue([mockCommand.data as any])
     when(mockUseCurrentRun)
       .calledWith()
@@ -481,24 +554,19 @@ describe('useRunCompleteTime hook', () => {
         data: mockFailedRun,
       } as Run)
     when(mockUseCurrentRunId).calledWith().mockReturnValue(RUN_ID_2)
-    when(mockUseCommandQuery)
-      .calledWith(RUN_ID_2, COMMAND_ID)
-      .mockReturnValue({
-        data: mockCommand,
-      } as UseQueryResult<CommandDetail, Error>)
 
-    const { result } = renderHook(useRunCompleteTime)
-    expect(result.current).toBe('noon forty-five')
+    const { result } = renderHook(useRunTimestamps)
+    expect(result.current.completedAt).toBe('noon forty-five')
   })
 
   it('returns the complete time of a stopped current run', async () => {
     when(mockUseRunQuery)
-      .calledWith(RUN_ID_2, { refetchInterval: 10000 })
+      .calledWith(RUN_ID_2, expect.any(Object))
       .mockReturnValue(({
         data: { data: mockStoppedRun },
       } as unknown) as UseQueryResult<Run>)
     when(mockUseCurrentRunCommands)
-      .calledWith()
+      .calledWith({ cursor: null, pageLength: 1 }, expect.any(Object))
       .mockReturnValue([mockCommand.data as any])
     when(mockUseCurrentRun)
       .calledWith()
@@ -506,13 +574,8 @@ describe('useRunCompleteTime hook', () => {
         data: mockStoppedRun,
       } as Run)
     when(mockUseCurrentRunId).calledWith().mockReturnValue(RUN_ID_2)
-    when(mockUseCommandQuery)
-      .calledWith(RUN_ID_2, COMMAND_ID)
-      .mockReturnValue({
-        data: mockCommand,
-      } as UseQueryResult<CommandDetail, Error>)
 
-    const { result } = renderHook(useRunCompleteTime)
-    expect(result.current).toBe('2021-10-25T13:58:22.366581+00:00')
+    const { result } = renderHook(useRunTimestamps)
+    expect(result.current.completedAt).toBe('2021-10-25T13:58:22.366581+00:00')
   })
 })

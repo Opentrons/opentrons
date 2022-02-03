@@ -7,7 +7,9 @@ from robot_server.service import logging as rs_logging
 @pytest.fixture
 def mock_robot_config():
     with patch("robot_server.service.logging.robot_configs") as m:
-        mock = MagicMock(spec=rs_logging.robot_configs.robot_config)
+        mock = MagicMock(
+            spec=rs_logging.robot_configs.robot_config  # type: ignore[attr-defined]
+        )
         m.load.return_value = mock
         yield mock
 

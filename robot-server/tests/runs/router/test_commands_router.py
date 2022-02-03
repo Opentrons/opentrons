@@ -7,15 +7,19 @@ from decoy import Decoy
 from opentrons.protocol_engine import (
     EngineStatus,
     StateView,
+    CommandSlice,
     commands as pe_commands,
     errors as pe_errors,
 )
 
 from robot_server.errors import ApiError
-from robot_server.service.json_api import RequestModel
+from robot_server.service.json_api import RequestModel, MultiBodyMeta
 from robot_server.runs.run_models import Run, RunCommandSummary
 from robot_server.runs.engine_store import EngineStore
 from robot_server.runs.router.commands_router import (
+    CommandCollectionLinks,
+    CommandLink,
+    CommandLinkMeta,
     create_run_command,
     get_run_command,
     get_run_commands,
@@ -125,9 +129,17 @@ async def test_get_run_commands(decoy: Decoy, engine_store: EngineStore) -> None
 
     engine_state = decoy.mock(cls=StateView)
     decoy.when(engine_store.get_state("run-id")).then_return(engine_state)
-    decoy.when(engine_state.commands.get_all()).then_return([command])
+    decoy.when(engine_state.commands.get_current()).then_return("current-command-id")
+    decoy.when(engine_state.commands.get_slice(cursor=None, length=42)).then_return(
+        CommandSlice(commands=[command], cursor=1, length=2, total_length=3)
+    )
 
-    result = await get_run_commands(run=run, engine_store=engine_store)
+    result = await get_run_commands(
+        run=run,
+        engine_store=engine_store,
+        cursor=None,
+        pageLength=42,
+    )
 
     assert result.content.data == [
         RunCommandSummary.construct(
@@ -138,9 +150,52 @@ async def test_get_run_commands(decoy: Decoy, engine_store: EngineStore) -> None
             startedAt=datetime(year=2022, month=2, day=2),
             completedAt=datetime(year=2023, month=3, day=3),
             status=pe_commands.CommandStatus.FAILED,
+            params=pe_commands.PauseParams(message="hello world"),
             errorId="error-id",
         )
     ]
+    assert result.content.meta == MultiBodyMeta(cursor=1, pageLength=2, totalLength=3)
+    assert result.content.links == CommandCollectionLinks(
+        current=CommandLink(
+            href="/runs/run-id/commands/current-command-id",
+            meta=CommandLinkMeta(runId="run-id", commandId="current-command-id"),
+        )
+    )
+    assert result.status_code == 200
+
+
+async def test_get_run_commands_empty(decoy: Decoy, engine_store: EngineStore) -> None:
+    """It should return an empty commands list if no commands."""
+    run = Run.construct(
+        id="run-id",
+        protocolId=None,
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=EngineStatus.RUNNING,
+        current=True,
+        actions=[],
+        errors=[],
+        pipettes=[],
+        labware=[],
+        labwareOffsets=[],
+    )
+
+    engine_state = decoy.mock(cls=StateView)
+    decoy.when(engine_store.get_state("run-id")).then_return(engine_state)
+    decoy.when(engine_state.commands.get_current()).then_return(None)
+    decoy.when(engine_state.commands.get_slice(cursor=21, length=42)).then_return(
+        CommandSlice(commands=[], cursor=0, length=0, total_length=0)
+    )
+
+    result = await get_run_commands(
+        run=run,
+        engine_store=engine_store,
+        cursor=21,
+        pageLength=42,
+    )
+
+    assert result.content.data == []
+    assert result.content.meta == MultiBodyMeta(cursor=0, pageLength=0, totalLength=0)
+    assert result.content.links == CommandCollectionLinks(current=None)
     assert result.status_code == 200
 
 

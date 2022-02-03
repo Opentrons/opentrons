@@ -1,4 +1,5 @@
 import last from 'lodash/last'
+import * as React from 'react'
 
 import {
   RUN_ACTION_TYPE_PLAY,
@@ -7,14 +8,12 @@ import {
   RUN_STATUS_RUNNING,
   RUN_STATUS_STOPPED,
   RUN_STATUS_FAILED,
+  RUN_STATUS_FINISHING,
   RUN_STATUS_SUCCEEDED,
   RUN_ACTION_TYPE_STOP,
+  RUN_STATUS_STOP_REQUESTED,
 } from '@opentrons/api-client'
-import {
-  useCommandQuery,
-  useRunQuery,
-  useRunActionMutations,
-} from '@opentrons/react-api-client'
+import { useRunQuery, useRunActionMutations } from '@opentrons/react-api-client'
 
 import {
   useCloneRun,
@@ -65,13 +64,20 @@ export function useRunControls(): RunControls {
 }
 
 const DEFAULT_STATUS_REFETCH_INTERVAL = 10000 // 10 seconds
-// TODO: remove refetch interval, and pass through optional options param,
-// get runStartTime from top level timestamp
 export function useRunStatus(options?: UseQueryOptions<Run>): RunStatus | null {
   const currentRunId = useCurrentRunId()
+  const lastRunStatus = React.useRef<RunStatus | null>(null)
 
   const { data } = useRunQuery(currentRunId ?? null, {
     refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+    enabled:
+      lastRunStatus.current == null ||
+      !([
+        RUN_STATUS_STOP_REQUESTED,
+        RUN_STATUS_FAILED,
+        RUN_STATUS_SUCCEEDED,
+      ] as RunStatus[]).includes(lastRunStatus.current),
+    onSuccess: data => (lastRunStatus.current = data?.data?.status ?? null),
     ...options,
   })
 
@@ -120,35 +126,62 @@ export function useRunStopTime(): string | null {
     : null
 }
 
-// TODO: IMMEDIATELY replace with actual run timestamps from server,
-// and remove command detail request once summary includes timestamps,
-// consider refactoring these timestamp hooks into one useRunTimestamps hook
-export function useRunCompleteTime(): string | null {
+// TODO(bc, 2022-02-01): replace all usage of the above individual timestamp hooks with useRunTimestamps
+interface RunTimestamps {
+  startedAt: string | null
+  pausedAt: string | null
+  stoppedAt: string | null
+  completedAt: string | null
+}
+export function useRunTimestamps(): RunTimestamps {
   const runStatus = useRunStatus()
-  const { actions = [], errors = [], id: runId = null } =
-    useCurrentRun()?.data ?? {}
-  const runCommands = useCurrentRunCommands() ?? []
+  const { actions = [], errors = [] } = useCurrentRun()?.data ?? {}
+  const runCommands =
+    useCurrentRunCommands(
+      { cursor: null, pageLength: 1 },
+      {
+        enabled:
+          runStatus === RUN_STATUS_SUCCEEDED ||
+          runStatus === RUN_STATUS_STOPPED ||
+          runStatus === RUN_STATUS_FAILED ||
+          runStatus === RUN_STATUS_STOP_REQUESTED ||
+          runStatus === RUN_STATUS_FINISHING,
+        refetchInterval: false,
+      }
+    ) ?? []
 
-  const lastCommandId = last(runCommands)?.id
-  const { data: commandData } = useCommandQuery(runId, lastCommandId ?? null)
+  const firstPlay = actions.find(
+    action => action.actionType === RUN_ACTION_TYPE_PLAY
+  )
+  const lastAction = last(actions)
 
-  const lastActionAt = last(actions)?.createdAt
+  const lastCommand = last(runCommands)
+  const lastActionAt = lastAction?.createdAt ?? null
   const lastErrorAt = last(errors)?.createdAt
-  const lastCommandAt = commandData?.data?.completedAt
+  const lastCommandAt = lastCommand?.completedAt
 
-  let runCompletedTime = null
-
-  if (runStatus === RUN_STATUS_STOPPED) {
-    runCompletedTime = lastActionAt ?? null
+  const startedAt = firstPlay?.createdAt ?? null
+  const pausedAt =
+    lastAction?.actionType === RUN_ACTION_TYPE_PAUSE ? lastActionAt : null
+  const stoppedAt =
+    lastAction?.actionType === RUN_ACTION_TYPE_STOP ? lastActionAt : null
+  let completedAt = null
+  switch (runStatus) {
+    case RUN_STATUS_STOPPED:
+      completedAt = lastActionAt ?? null
+      break
+    case RUN_STATUS_FAILED:
+      completedAt = lastErrorAt ?? null
+      break
+    case RUN_STATUS_SUCCEEDED:
+      completedAt = lastCommandAt ?? null
+      break
   }
 
-  if (runStatus === RUN_STATUS_FAILED) {
-    runCompletedTime = lastErrorAt ?? null
+  return {
+    startedAt,
+    pausedAt,
+    stoppedAt,
+    completedAt,
   }
-
-  if (runStatus === RUN_STATUS_SUCCEEDED) {
-    runCompletedTime = lastCommandAt ?? null
-  }
-
-  return runCompletedTime
 }
