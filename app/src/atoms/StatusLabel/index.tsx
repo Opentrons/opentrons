@@ -8,15 +8,16 @@ import {
   TEXT_TRANSFORM_CAPITALIZE,
   ALIGN_CENTER,
   C_BLUE_PRESSED,
+  FONT_SIZE_CAPTION,
 } from '@opentrons/components'
 interface StatusLabelProps {
-  moduleStatus: string
+  status: string
   backgroundColor: string
   iconColor: string
 }
 
 export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
-  const { moduleStatus, backgroundColor, iconColor } = props
+  const { status, backgroundColor, iconColor } = props
 
   return (
     <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -35,12 +36,12 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
           marginX={SPACING_1}
         />
         <Text
-          fontSize={'0.625rem'}
+          fontSize={FONT_SIZE_CAPTION}
           color={C_BLUE_PRESSED}
           textTransform={TEXT_TRANSFORM_CAPITALIZE}
           marginRight={SPACING_1}
         >
-          {moduleStatus}
+          {status}
         </Text>
       </Flex>
     </Flex>

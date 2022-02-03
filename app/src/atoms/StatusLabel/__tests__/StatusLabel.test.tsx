@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { C_BLUE, C_SKY_BLUE, renderWithProviders } from '@opentrons/components'
-import { StatusLabel } from '../StatusLabel'
+import { StatusLabel } from '..'
 
 const render = (props: React.ComponentProps<typeof StatusLabel>) => {
   return renderWithProviders(<StatusLabel {...props} />)[0]
@@ -11,7 +11,7 @@ describe('StatusLabel', () => {
 
   it('renders an engaged status label with a blue background and text', () => {
     props = {
-      moduleStatus: 'Engaged',
+      status: 'Engaged',
       backgroundColor: C_SKY_BLUE,
       iconColor: C_BLUE,
     }
@@ -21,7 +21,7 @@ describe('StatusLabel', () => {
 
   it('renders a disengaged status label with a blue background and text', () => {
     props = {
-      moduleStatus: 'Disengaged',
+      status: 'Disengaged',
       backgroundColor: C_SKY_BLUE,
       iconColor: C_BLUE,
     }

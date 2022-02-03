@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import {
   Box,
   Flex,
-  Icon,
   Text,
   DIRECTION_ROW,
   SPACING_2,
@@ -11,19 +10,15 @@ import {
   DIRECTION_COLUMN,
   SPACING_3,
   TEXT_TRANSFORM_UPPERCASE,
-  SIZE_1,
   SPACING_1,
   C_BRIGHT_GRAY,
   C_HARBOR_GRAY,
   Btn,
   FONT_WEIGHT_REGULAR,
+  FONT_SIZE_CAPTION,
 } from '@opentrons/components'
-import {
-  getModuleDisplayName,
-  MAGNETIC_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
-} from '@opentrons/shared-data'
+import { getModuleDisplayName } from '@opentrons/shared-data'
+import { ModuleIcon } from '../ModuleIcon'
 import { MagneticModuleData } from './MagneticModuleData'
 
 import magneticModule from '../../../assets/images/magnetic_module_gen_2_transparent.svg'
@@ -35,30 +30,6 @@ import type { AttachedModule } from '../../../redux/modules/types'
 
 interface ModuleCardProps {
   module: AttachedModule
-}
-
-const iconNamesByModuleType = {
-  [MAGNETIC_MODULE_TYPE]: 'ot-magnet-v2',
-  [TEMPERATURE_MODULE_TYPE]: 'ot-temperature-v2',
-  [THERMOCYCLER_MODULE_TYPE]: 'ot-thermocycler',
-} as const
-
-const ModuleIcon = ({
-  moduleType,
-}: {
-  moduleType:
-    | typeof MAGNETIC_MODULE_TYPE
-    | typeof TEMPERATURE_MODULE_TYPE
-    | typeof THERMOCYCLER_MODULE_TYPE
-}): JSX.Element => {
-  return (
-    <Icon
-      name={iconNamesByModuleType[moduleType]}
-      size={SIZE_1}
-      marginRight={SPACING_1}
-      color={C_HARBOR_GRAY}
-    />
-  )
 }
 
 export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
@@ -110,7 +81,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               textTransform={TEXT_TRANSFORM_UPPERCASE}
               color={C_HARBOR_GRAY}
               fontWeight={FONT_WEIGHT_REGULAR}
-              fontSize={'0.625rem'}
+              fontSize={FONT_SIZE_CAPTION}
               paddingBottom={SPACING_1}
             >
               {t('usb_port', {
