@@ -25,7 +25,10 @@ def test_create_just_head() -> None:
                 NodeId.head_l: MoveGroupSingleAxisStep(
                     distance_mm=-2.0, velocity_mm_sec=-0.25, duration_sec=8.0
                 ),
-                NodeId.pipette: MoveGroupSingleAxisStep(
+                NodeId.pipette_left: MoveGroupSingleAxisStep(
+                    distance_mm=0.0, velocity_mm_sec=0.0, duration_sec=8.0
+                ),
+                NodeId.pipette_right: MoveGroupSingleAxisStep(
                     distance_mm=0.0, velocity_mm_sec=0.0, duration_sec=8.0
                 ),
             },
@@ -63,7 +66,12 @@ def test_create_just_x_y() -> None:
                     velocity_mm_sec=0.0,
                     duration_sec=round(math.sqrt(8) / 0.25, 6),
                 ),
-                NodeId.pipette: MoveGroupSingleAxisStep(
+                NodeId.pipette_left: MoveGroupSingleAxisStep(
+                    distance_mm=0.0,
+                    velocity_mm_sec=0.0,
+                    duration_sec=round(math.sqrt(8) / 0.25, 6),
+                ),
+                NodeId.pipette_right: MoveGroupSingleAxisStep(
                     distance_mm=0.0,
                     velocity_mm_sec=0.0,
                     duration_sec=round(math.sqrt(8) / 0.25, 6),
@@ -103,7 +111,12 @@ def test_create_all() -> None:
                     velocity_mm_sec=0.05 * (4 / math.sqrt(24)),
                     duration_sec=round(math.sqrt(24) / 0.05, 6),
                 ),
-                NodeId.pipette: MoveGroupSingleAxisStep(
+                NodeId.pipette_left: MoveGroupSingleAxisStep(
+                    distance_mm=0.0,
+                    velocity_mm_sec=0.0,
+                    duration_sec=round(math.sqrt(24) / 0.05, 6),
+                ),
+                NodeId.pipette_right: MoveGroupSingleAxisStep(
                     distance_mm=0.0,
                     velocity_mm_sec=0.0,
                     duration_sec=round(math.sqrt(24) / 0.05, 6),
@@ -149,7 +162,12 @@ def test_limit_speeds_single_axis() -> None:
                     velocity_mm_sec=0.0,
                     duration_sec=target_duration,
                 ),
-                NodeId.pipette: MoveGroupSingleAxisStep(
+                NodeId.pipette_left: MoveGroupSingleAxisStep(
+                    distance_mm=0.0,
+                    velocity_mm_sec=0.0,
+                    duration_sec=target_duration,
+                ),
+                NodeId.pipette_right: MoveGroupSingleAxisStep(
                     distance_mm=0.0,
                     velocity_mm_sec=0.0,
                     duration_sec=target_duration,

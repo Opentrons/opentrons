@@ -36,7 +36,7 @@ def test_prompt_message_without_payload(
 ) -> None:
     """It should create a message without payload."""
     message_id = MessageId.get_status_request
-    node_id = NodeId.pipette
+    node_id = NodeId.pipette_left
     mock_get_input.side_effect = [
         str(list(MessageId).index(message_id)),
         str(list(NodeId).index(node_id)),
@@ -57,7 +57,7 @@ def test_prompt_message_with_payload(
 ) -> None:
     """It should send a message with payload."""
     message_id = MessageId.device_info_response
-    node_id = NodeId.pipette
+    node_id = NodeId.pipette_left
     mock_get_input.side_effect = [
         str(list(MessageId).index(message_id)),
         str(list(NodeId).index(node_id)),
@@ -113,7 +113,7 @@ def test_prompt_message_bad_input(
 ) -> None:
     """It should raise on bad input."""
     message_id = MessageId.get_status_response
-    node_id = NodeId.pipette
+    node_id = NodeId.pipette_right
     mock_get_input.side_effect = [
         str(list(MessageId).index(message_id)),
         str(list(NodeId).index(node_id)),
