@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.0.0-beta.8](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.7...v5.0.0-beta.8) (2022-02-03)
+
+
+### Bug Fixes
+
+* **app:** while closing a protocol run, place loading spinner over whole app ([#9353](https://github.com/Opentrons/opentrons/issues/9353)) ([9d0775f](https://github.com/Opentrons/opentrons/commit/9d0775f4e9991cf2d13708cba93eb3b1fc7d91d9))
+
+
+### Features
+
+* **components:** add overflow icon ([#9346](https://github.com/Opentrons/opentrons/issues/9346)) ([5845b3f](https://github.com/Opentrons/opentrons/commit/5845b3f71dde54759fa66e0b27c2ff367f10be9d))
+* **protocol-designer:** add feature flag for heater shaker in PD ([#9345](https://github.com/Opentrons/opentrons/issues/9345)) ([d36fac0](https://github.com/Opentrons/opentrons/commit/d36fac0cb0247f09b0e6fa61a10eff4a852fc3e0))
+
+
+### Performance Improvements
+
+* **robot-server, app:** remove commands from GET /runs/:run_id ([#9337](https://github.com/Opentrons/opentrons/issues/9337)) ([56f291a](https://github.com/Opentrons/opentrons/commit/56f291a1a4179322d440621e745186269e2dc4ee))
+
+
+
+
+
 # [5.0.0-beta.7](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.6...v5.0.0-beta.7) (2022-01-28)
 
 

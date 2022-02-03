@@ -14,7 +14,14 @@ and/or schema generation.
 """
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, CommandStatus
-from .command_unions import Command, CommandCreate, CommandResult, CommandType
+
+from .command_unions import (
+    Command,
+    CommandParams,
+    CommandCreate,
+    CommandResult,
+    CommandType,
+)
 
 from .aspirate import (
     Aspirate,
@@ -122,6 +129,7 @@ from .custom import (
 __all__ = [
     # command type unions
     "Command",
+    "CommandParams",
     "CommandCreate",
     "CommandResult",
     "CommandType",

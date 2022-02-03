@@ -10,7 +10,7 @@ from typing_extensions import Literal
 from fastapi import APIRouter, Depends, status
 from pydantic import BaseModel, Field
 
-from opentrons.protocol_engine import Command, LabwareOffsetCreate
+from opentrons.protocol_engine import LabwareOffsetCreate
 
 from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.dependencies import get_current_time, get_unique_id
@@ -20,6 +20,7 @@ from robot_server.service.json_api import (
     SimpleBody,
     SimpleEmptyBody,
     MultiBody,
+    MultiBodyMeta,
     ResourceLink,
     PydanticResponse,
 )
@@ -33,13 +34,7 @@ from robot_server.protocols import (
 
 from ..run_store import RunStore, RunResource, RunNotFoundError
 from ..run_view import RunView
-from ..run_models import (
-    Run,
-    RunSummary,
-    RunCreate,
-    RunUpdate,
-    RunCommandSummary,
-)
+from ..run_models import Run, RunSummary, RunCreate, RunUpdate
 from ..engine_store import EngineStore, EngineConflictError
 from ..dependencies import get_run_store, get_engine_store
 
@@ -114,7 +109,6 @@ async def get_run_data_from_url(
         createdAt=run.created_at,
         current=run.is_current,
         actions=run.actions,
-        commands=[_summarize_command(c) for c in engine_state.commands.get_all()],
         errors=engine_state.commands.get_all_errors(),
         pipettes=engine_state.pipettes.get_all(),
         labware=engine_state.labware.get_all(),
@@ -192,7 +186,6 @@ async def create_run(
         createdAt=run.created_at,
         current=run.is_current,
         actions=run.actions,
-        commands=[_summarize_command(c) for c in engine_state.commands.get_all()],
         errors=[],
         pipettes=engine_state.pipettes.get_all(),
         labware=engine_state.labware.get_all(),
@@ -243,8 +236,10 @@ async def get_runs(
         if run.is_current:
             links.current = ResourceLink.construct(href=f"/runs/{run.run_id}")
 
+    meta = MultiBodyMeta(cursor=0, pageLength=len(data), totalLength=len(data))
+
     return await PydanticResponse.create(
-        content=MultiBody.construct(data=data, links=links),
+        content=MultiBody.construct(data=data, links=links, meta=meta),
         status_code=status.HTTP_200_OK,
     )
 
@@ -360,7 +355,6 @@ async def add_labware_offset(
         createdAt=run.created_at,
         current=run.is_current,
         actions=run.actions,
-        commands=[_summarize_command(c) for c in engine_state.commands.get_all()],
         errors=engine_state.commands.get_all_errors(),
         pipettes=engine_state.pipettes.get_all(),
         labware=engine_state.labware.get_all(),
@@ -430,7 +424,6 @@ async def update_run(
         createdAt=run.created_at,
         current=run.is_current,
         actions=run.actions,
-        commands=[_summarize_command(c) for c in engine_state.commands.get_all()],
         errors=engine_state.commands.get_all_errors(),
         pipettes=engine_state.pipettes.get_all(),
         labware=engine_state.labware.get_all(),
@@ -441,14 +434,4 @@ async def update_run(
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=data),
         status_code=status.HTTP_200_OK,
-    )
-
-
-def _summarize_command(full_command: Command) -> RunCommandSummary:
-    return RunCommandSummary.construct(
-        id=full_command.id,
-        key=full_command.key,
-        commandType=full_command.commandType,
-        status=full_command.status,
-        errorId=full_command.errorId,
     )

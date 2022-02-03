@@ -9,6 +9,7 @@ import { getLabwareLocation } from '../../ProtocolSetup/utils/getLabwareLocation
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { ProtocolSetupInfo } from './../ProtocolSetupInfo'
 import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command'
+import { RunCommandSummary } from '@opentrons/api-client'
 
 jest.mock('../hooks')
 jest.mock('../../ProtocolSetup/hooks')
@@ -44,7 +45,7 @@ const MOCK_ANALYSIS_COMMAND: RunTimeCommand = {
   status: 'queued',
   params: {},
 } as any
-const MOCK_COMMAND_DETAILS: RunTimeCommand = {
+const MOCK_COMMAND_SUMMARY: RunCommandSummary = {
   id: '123',
   commandType: 'custom',
   params: {},
@@ -86,7 +87,7 @@ describe('CommandText', () => {
     const { getByText } = render({
       analysisCommand: MOCK_ANALYSIS_COMMAND,
       runCommand: {
-        ...MOCK_COMMAND_DETAILS,
+        ...MOCK_COMMAND_SUMMARY,
         params: { legacyCommandText: 'legacy command text' } as any,
       },
     })
@@ -95,14 +96,14 @@ describe('CommandText', () => {
   it('renders correct command text for pause commands', () => {
     const { getByText } = render({
       analysisCommand: null,
-      runCommand: MOCK_PAUSE_COMMAND,
+      runCommand: MOCK_PAUSE_COMMAND as RunCommandSummary,
     })
     getByText('THIS IS THE PAUSE MESSAGE')
   })
   it('renders correct command text for load commands', () => {
     const { getByText } = render({
       analysisCommand: null,
-      runCommand: MOCK_LOAD_COMMAND as RunTimeCommand,
+      runCommand: MOCK_LOAD_COMMAND as RunCommandSummary,
     })
     getByText('Mock Protocol Setup Step')
   })
@@ -124,13 +125,13 @@ describe('CommandText', () => {
     const { getByText } = render({
       analysisCommand: null,
       runCommand: {
-        ...MOCK_COMMAND_DETAILS,
+        ...MOCK_COMMAND_SUMMARY,
         commandType: 'pickUpTip',
         params: {
           wellName,
           labwareId,
         },
-      } as RunTimeCommand,
+      },
     })
     getByText(
       'Picking up tip from wellName of fake_display_name in fake_labware_location'

@@ -16,6 +16,7 @@ from robot_server.service.json_api import (
     SimpleBody,
     SimpleMultiBody,
     SimpleEmptyBody,
+    MultiBodyMeta,
     PydanticResponse,
 )
 
@@ -168,9 +169,10 @@ async def get_protocols(
         )
         for r in protocol_resources
     ]
+    meta = MultiBodyMeta(cursor=0, pageLength=len(data), totalLength=len(data))
 
     return await PydanticResponse.create(
-        content=SimpleMultiBody.construct(data=data),
+        content=SimpleMultiBody.construct(data=data, meta=meta),
         status_code=status.HTTP_200_OK,
     )
 

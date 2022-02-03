@@ -18,7 +18,7 @@ import {
 import { IDENTITY_VECTOR } from '@opentrons/shared-data'
 import { useCreateLabwareOffsetMutation } from '@opentrons/react-api-client'
 import { useProtocolDetails } from '../../RunDetails/hooks'
-import { useCurrentRun } from '../../ProtocolUpload/hooks'
+import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { useLPCSuccessToast } from '../hooks'
 import { DeckMap } from './DeckMap'
 import { SectionList } from './SectionList'
@@ -44,11 +44,10 @@ export const SummaryScreen = (props: {
       console.error(`error getting labware offsetsL ${e.message}`)
     )
   const { createLabwareOffset } = useCreateLabwareOffsetMutation()
-  const runRecord = useCurrentRun()
+  const runId = useCurrentRunId()
   const { setShowLPCSuccessToast } = useLPCSuccessToast()
 
-  if (introInfo == null) return null
-  if (protocolData == null) return null
+  if (runId == null || introInfo == null || protocolData == null) return null
   const labwareIds = Object.keys(protocolData.labware)
   const { sections, primaryPipetteMount, secondaryPipetteMount } = introInfo
 
@@ -57,7 +56,7 @@ export const SummaryScreen = (props: {
       labwareOffsets.forEach(labwareOffset => {
         if (!isEqual(labwareOffset.vector, IDENTITY_VECTOR)) {
           createLabwareOffset({
-            runId: runRecord?.data.id as string,
+            runId: runId,
             data: {
               definitionUri: labwareOffset.labwareDefinitionUri,
               location: labwareOffset.labwareOffsetLocation,

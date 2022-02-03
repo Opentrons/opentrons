@@ -12,12 +12,13 @@ import { useProtocolDetails } from './hooks'
 import { getLabwareLocation } from '../ProtocolSetup/utils/getLabwareLocation'
 import { useLabwareRenderInfoById } from '../ProtocolSetup/hooks'
 import type { RunTimeCommand } from '@opentrons/shared-data'
+import type { RunCommandSummary } from '@opentrons/api-client'
 
 const TRASH_ID = 'fixedTrash'
 
 interface Props {
   analysisCommand: RunTimeCommand | null
-  runCommand: RunTimeCommand | null
+  runCommand: RunCommandSummary | null
 }
 export function CommandText(props: Props): JSX.Element | null {
   const { analysisCommand, runCommand } = props
@@ -27,10 +28,7 @@ export function CommandText(props: Props): JSX.Element | null {
 
   let messageNode = null
 
-  const displayCommand =
-    analysisCommand !== null && runCommand === null
-      ? analysisCommand
-      : runCommand
+  const displayCommand = runCommand !== null ? runCommand : analysisCommand
 
   if (displayCommand === null) {
     console.warn(

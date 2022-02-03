@@ -17,6 +17,7 @@ import {
   SPACING_3,
   useConditionalConfirm,
   NewAlertSecondaryBtn,
+  SpinnerModal,
 } from '@opentrons/components'
 import { Page } from '../../atoms/Page'
 import { Portal } from '../../App/portal'
@@ -32,15 +33,22 @@ import { CommandList } from './CommandList'
 import { ConfirmCancelModal } from './ConfirmCancelModal'
 
 import styles from '../ProtocolUpload/styles.css'
-import { ProtocolLoader } from '../ProtocolUpload'
+import { useIsProtocolRunLoaded } from '../ProtocolUpload/hooks'
 
 export function RunDetails(): JSX.Element | null {
   const { t } = useTranslation(['run_details', 'shared'])
   const { displayName } = useProtocolDetails()
-  const runStatus = useRunStatus()
-  const startTime = useRunStartTime()
-  const { closeCurrentRun, isProtocolRunLoaded } = useCloseCurrentRun()
   const history = useHistory()
+  const runStatus = useRunStatus({
+    onSettled: data => {
+      if (data == null) {
+        history.push('/upload')
+      }
+    },
+  })
+  const startTime = useRunStartTime()
+  const isProtocolRunLoaded = useIsProtocolRunLoaded()
+  const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
 
   // display an idle status as 'running' in the UI after a run has started
   const adjustedRunStatus: RunStatus | null =
@@ -68,15 +76,20 @@ export function RunDetails(): JSX.Element | null {
     cancel: cancelCloseExit,
   } = useConditionalConfirm(handleCloseProtocol, true)
 
-  if (!isProtocolRunLoaded) {
+  if (!isProtocolRunLoaded || isClosingCurrentRun) {
     let text = t('loading_protocol')
     if (
+      isClosingCurrentRun ||
       adjustedRunStatus === RUN_STATUS_FINISHING ||
       adjustedRunStatus === RUN_STATUS_STOPPED
     ) {
       text = t('closing_protocol')
     }
-    return <ProtocolLoader loadingText={text} />
+    return (
+      <Portal level="top">
+        <SpinnerModal message={text} />
+      </Portal>
+    )
   }
 
   const cancelRunButton = (

@@ -74,13 +74,11 @@ export function useTimeElapsedSincePause(): string | null {
 }
 
 export function useFormatRunTimestamp(): (timestamp: string) => string | null {
-  const runRecord = useCurrentRun()
+  const actions = useCurrentRun()?.data?.actions ?? []
 
   return (timestamp: string) => {
-    if (runRecord == null) return null // run doesn't exist
-    const { actions } = runRecord.data
     const firstPlayAction = actions.find(action => action.actionType === 'play')
-    if (firstPlayAction == null) return null // run is unstarted
+    if (firstPlayAction == null) return null // run is unstarted or non-existent
     return formatInterval(firstPlayAction.createdAt, timestamp)
   }
 }

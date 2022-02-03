@@ -14,9 +14,8 @@ export function LabwareOffsetSuccessToast(
 ): JSX.Element {
   const { t } = useTranslation('protocol_info')
   const runRecord = useCurrentRun()
-  const currentRunData = runRecord?.data
   const labwareOffsetCount = getLatestLabwareOffsetCount(
-    currentRunData?.labwareOffsets ?? []
+    runRecord?.data?.labwareOffsets ?? []
   )
 
   return (

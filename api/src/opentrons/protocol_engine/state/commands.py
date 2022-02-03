@@ -1,5 +1,6 @@
 """Protocol engine commands sub-state."""
 from __future__ import annotations
+import itertools
 from collections import OrderedDict
 from enum import Enum
 from dataclasses import dataclass
@@ -56,6 +57,16 @@ class RunResult(str, Enum):
     SUCCEEDED = "succeeded"
     FAILED = "failed"
     STOPPED = "stopped"
+
+
+@dataclass(frozen=True)
+class CommandSlice:
+    """A subset of all commands in state."""
+
+    commands: List[Command]
+    cursor: int
+    length: int
+    total_length: int
 
 
 @dataclass
@@ -253,18 +264,66 @@ class CommandView(HasState[CommandState]):
         """
         return list(self._state.commands_by_id.values())
 
+    def get_slice(
+        self,
+        cursor: Optional[int],
+        length: int,
+    ) -> CommandSlice:
+        """Get a subset of commands around a given cursor."""
+        # TODO(mc, 2022-01-31): this is not the most performant way to implement
+        # this; if this becomes a problem, change or the underlying data structure
+        # to something that isn't just an OrderedDict
+        commands_by_id = self._state.commands_by_id
+        total_length = len(commands_by_id)
+
+        if cursor is None:
+            current_id = self.get_current()
+
+            if current_id is not None:
+                # TODO(mc, 2022-01-31): this risks becoming a performance bottleneck
+                # when runnning JSONv6 protocols and will require data structure
+                # changes (see TODO above). `reversed` will usually prevent O(n)
+                # worst-case in practice for Python + PAPIv2 protocols
+                for index, command_id in enumerate(reversed(commands_by_id.keys())):
+                    if command_id == current_id:
+                        cursor = total_length - index - 1
+
+            if cursor is None:
+                cursor = total_length - length
+
+        # start is inclusive, stop is exclusive
+        actual_cursor = max(0, min(cursor, total_length - 1))
+        stop = min(total_length, actual_cursor + length)
+        actual_length = stop - actual_cursor
+        commands = list(itertools.islice(commands_by_id.values(), actual_cursor, stop))
+
+        return CommandSlice(
+            commands=commands,
+            cursor=actual_cursor,
+            length=actual_length,
+            total_length=total_length,
+        )
+
     def get_all_errors(self) -> List[ErrorOccurrence]:
         """Get a list of all errors that have occurred."""
         return list(self._state.errors_by_id.values())
 
+    def get_current(self) -> Optional[str]:
+        """Return the command that is currently running, if any."""
+        if self._state.running_command_id:
+            return self._state.running_command_id
+
+        return next(iter(self._state.queued_command_ids.keys()), None)
+
     def get_next_queued(self) -> Optional[str]:
-        """Return the next request in line to be executed.
+        """Return the next command in line to be executed.
 
         Returns:
             The ID of the earliest queued command, if any.
 
         Raises:
-            EngineStoppedError:
+            ProtocolEngineStoppedError: The engine is currently stopped, so
+                there are not queued commands.
         """
         if self._state.run_result:
             raise ProtocolEngineStoppedError("Engine was stopped")

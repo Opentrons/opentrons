@@ -11,13 +11,15 @@ import {
 } from '@opentrons/shared-data'
 import {
   useHost,
-  useAllCommandsQuery,
   useCreateLabwareOffsetMutation,
   useCreateCommandMutation,
 } from '@opentrons/react-api-client'
 import { useTrackEvent } from '../../../../redux/analytics'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
-import { useCurrentRun } from '../../../ProtocolUpload/hooks'
+import {
+  useCurrentRunId,
+  useCurrentRunCommands,
+} from '../../../ProtocolUpload/hooks'
 import { getLabwareLocation } from '../../utils/getLabwareLocation'
 import {
   sendModuleCommand,
@@ -237,7 +239,7 @@ export function useLabwarePositionCheck(
   const { createLabwareOffset } = useCreateLabwareOffsetMutation()
   const { createCommand } = useCreateCommandMutation()
   const host = useHost()
-  const currentRun = useCurrentRun()
+  const currentRunId = useCurrentRunId()
   const trackEvent = useTrackEvent()
   const LPCSteps = useSteps()
   const dispatch = useDispatch()
@@ -295,8 +297,7 @@ export function useLabwarePositionCheck(
   }) as LabwarePositionCheckStep
 
   const ctaText = useLpcCtaText(currentCommand)
-  const robotCommands = useAllCommandsQuery(currentRun?.data?.id ?? null).data
-    ?.data
+  const robotCommands = useCurrentRunCommands()
   const titleText = useTitleText(
     isLoading,
     prevCommand,
@@ -312,6 +313,12 @@ export function useLabwarePositionCheck(
     setShowPickUpTipConfirmationModal(true)
   }
   if (error != null) return { error }
+  if (currentRunId == null)
+    return {
+      error: new Error(
+        'No current run id found, cannot perform Labware Position Check without current run.'
+      ),
+    }
 
   const isComplete = currentCommandIndex === LPCMovementCommands.length
   const failedCommand = robotCommands?.find(
@@ -370,7 +377,7 @@ export function useLabwarePositionCheck(
     }
 
     createCommand({
-      runId: currentRun?.data?.id as string,
+      runId: currentRunId,
       command: createCommandData(savePositionCommand),
     })
       .then(response => {
@@ -390,7 +397,7 @@ export function useLabwarePositionCheck(
 
         const prevSavePositionCommand = getCommand(
           host as HostConfig,
-          currentRun?.data?.id as string,
+          currentRunId,
           response.data.id
         )
 
@@ -398,7 +405,7 @@ export function useLabwarePositionCheck(
           savePositionCommandData[currentCommand.params.labwareId][0]
         const initialSavePositionCommand = getCommand(
           host as HostConfig,
-          currentRun?.data?.id as string,
+          currentRunId,
           initialSavePositionCommandId
         )
         const offsetFromPrevSavePositionCommand: Promise<VectorOffset> = prevSavePositionCommand.then(
@@ -465,7 +472,7 @@ export function useLabwarePositionCheck(
           }
           // execute the movement command
           return createCommand({
-            runId: currentRun?.data?.id as string,
+            runId: currentRunId,
             command: createCommandData(currentCommand),
           })
         }
@@ -481,7 +488,7 @@ export function useLabwarePositionCheck(
             params: { pipetteId: currentCommand.params.pipetteId },
           }
           createCommand({
-            runId: currentRun?.data?.id as string,
+            runId: currentRunId,
             command: createCommandData(savePositionCommand),
           })
             .then(response => {
@@ -503,7 +510,7 @@ export function useLabwarePositionCheck(
             params: {},
           }
           createCommand({
-            runId: currentRun?.data?.id as string,
+            runId: currentRunId,
             command: createCommandData(homeCommand),
           })
             .then(() =>
@@ -554,7 +561,7 @@ export function useLabwarePositionCheck(
 
     identityLabwareOffsets.forEach(identityOffsetEntry => {
       createLabwareOffset({
-        runId: currentRun?.data.id as string,
+        runId: currentRunId,
         data: identityOffsetEntry,
       }).catch((e: Error) => {
         console.error(`error clearing labware offsets: ${e.message}`)
@@ -578,7 +585,7 @@ export function useLabwarePositionCheck(
         dispatch(sendModuleCommand(robotName as string, serial, 'open'))
       } else {
         createCommand({
-          runId: currentRun?.data?.id as string,
+          runId: currentRunId,
           command: createCommandData(prepCommand),
         }).catch((e: Error) => {
           console.error(`error issuing command to robot: ${e.message}`)
@@ -588,7 +595,7 @@ export function useLabwarePositionCheck(
     })
     // issue first movement command
     createCommand({
-      runId: currentRun?.data?.id as string,
+      runId: currentRunId,
       command: createCommandData(currentCommand),
     })
       .then(response => {
@@ -601,7 +608,7 @@ export function useLabwarePositionCheck(
           params: { pipetteId: currentCommand.params.pipetteId },
         }
         createCommand({
-          runId: currentRun?.data?.id as string,
+          runId: currentRunId,
           command: createCommandData(savePositionCommand),
         }).then(response => {
           const commandId = response.data.id
@@ -632,7 +639,7 @@ export function useLabwarePositionCheck(
       },
     }
     createCommand({
-      runId: currentRun?.data?.id as string,
+      runId: currentRunId,
       command: createCommandData(dropTipCommand),
     })
       .then(() => {
@@ -640,7 +647,7 @@ export function useLabwarePositionCheck(
           // the last command was a pick up tip, the one before that was a move to well
           LPCMovementCommands[currentCommandIndex - 2]
         const moveBackToWell = createCommand({
-          runId: currentRun?.data?.id as string,
+          runId: currentRunId,
           command: createCommandData(moveBackToWellCommand),
         })
         return moveBackToWell
@@ -672,7 +679,7 @@ export function useLabwarePositionCheck(
     }
     isJogging.current = true
     createCommand({
-      runId: currentRun?.data?.id as string,
+      runId: currentRunId,
       command: moveRelCommand,
     })
       .then(response => {

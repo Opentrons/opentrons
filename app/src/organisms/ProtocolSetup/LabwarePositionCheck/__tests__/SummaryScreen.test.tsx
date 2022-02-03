@@ -5,6 +5,7 @@ import { fireEvent } from '@testing-library/dom'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
+import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
 import { SectionList } from '../SectionList'
 import { DeckMap } from '../DeckMap'
 import { SummaryScreen } from '../SummaryScreen'
@@ -13,6 +14,7 @@ import { useIntroInfo, useLabwareOffsets } from '../hooks'
 import { Section } from '../types'
 import { useLPCSuccessToast } from '../../hooks'
 
+jest.mock('../../../ProtocolUpload/hooks')
 jest.mock('../../../RunDetails/hooks')
 jest.mock('../../hooks')
 jest.mock('../SectionList')
@@ -38,6 +40,9 @@ const mockUseLabwareOffsets = useLabwareOffsets as jest.MockedFunction<
 const mockUseLPCSuccessToast = useLPCSuccessToast as jest.MockedFunction<
   typeof useLPCSuccessToast
 >
+const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
+  typeof useCurrentRunId
+>
 
 const MOCK_SECTIONS = ['PRIMARY_PIPETTE_TIPRACKS' as Section]
 const LABWARE_DEF_ID = 'LABWARE_DEF_ID'
@@ -61,6 +66,7 @@ describe('SummaryScreen', () => {
       savePositionCommandData: { someLabwareIf: ['commandId1', 'commandId2'] },
       onCloseClick: jest.fn(),
     }
+    mockUseCurrentRunId.mockReturnValue('fake_run_id')
     mockSectionList.mockReturnValue(<div>Mock SectionList</div>)
     mockDeckmap.mockReturnValue(<div>Mock DeckMap</div>)
     mockLabwareOffsetsSummary.mockReturnValue(

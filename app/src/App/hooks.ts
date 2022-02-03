@@ -7,7 +7,7 @@ import {
   getDeckCalibrationOk,
 } from '../redux/nav'
 import { getConnectedRobot } from '../redux/discovery'
-import { useCloseCurrentRun } from '../organisms/ProtocolUpload/hooks'
+import { useIsProtocolRunLoaded } from '../organisms/ProtocolUpload/hooks'
 import { NavLocation } from '../redux/nav/types'
 
 export function useRunLocation(): NavLocation {
@@ -17,7 +17,7 @@ export function useRunLocation(): NavLocation {
   const pipettesCalibrated = useSelector(getConnectedRobotPipettesCalibrated)
   const deckCalOk = useSelector(getDeckCalibrationOk)
 
-  const { isProtocolRunLoaded } = useCloseCurrentRun()
+  const isProtocolRunLoaded = useIsProtocolRunLoaded()
 
   let disabledReason = null
   if (!robot) disabledReason = t('please_connect_to_a_robot')

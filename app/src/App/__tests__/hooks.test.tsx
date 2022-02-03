@@ -13,7 +13,7 @@ import {
 } from '../../redux/nav'
 import { getConnectedRobot } from '../../redux/discovery'
 import { useNavLocations, useRunLocation } from '../hooks'
-import { useCloseCurrentRun } from '../../organisms/ProtocolUpload/hooks'
+import { useIsProtocolRunLoaded } from '../../organisms/ProtocolUpload/hooks'
 
 import type { Store } from 'redux'
 import type { State } from '../../redux/types'
@@ -38,8 +38,8 @@ const mockGetDeckCalibrationOk = getDeckCalibrationOk as jest.MockedFunction<
 const mockGetNavbarLocations = getNavbarLocations as jest.MockedFunction<
   typeof getNavbarLocations
 >
-const mockUseCloseCurrentRun = useCloseCurrentRun as jest.MockedFunction<
-  typeof useCloseCurrentRun
+const mockUseIsCurrentRunLoaded = useIsProtocolRunLoaded as jest.MockedFunction<
+  typeof useIsProtocolRunLoaded
 >
 
 describe('useRunLocation', () => {
@@ -58,10 +58,7 @@ describe('useRunLocation', () => {
       mockGetConnectedRobotPipettesMatch.mockReturnValue(true)
       mockGetConnectedRobotPipettesCalibrated.mockReturnValue(true)
       mockGetDeckCalibrationOk.mockReturnValue(true)
-      mockUseCloseCurrentRun.mockReturnValue({
-        closeCurrentRun: () => null,
-        isProtocolRunLoaded: true,
-      } as any)
+      mockUseIsCurrentRunLoaded.mockReturnValue(true)
     })
     afterEach(() => {
       jest.resetAllMocks()
@@ -73,10 +70,7 @@ describe('useRunLocation', () => {
       expect(disabledReason).toBe('Please connect to a robot to proceed')
     })
     it('should tell user to load a protocol', () => {
-      mockUseCloseCurrentRun.mockReturnValue({
-        closeCurrentRun: () => null,
-        isProtocolRunLoaded: false,
-      } as any)
+      mockUseIsCurrentRunLoaded.mockReturnValue(false)
       const { result } = renderHook(useRunLocation, { wrapper })
       const { disabledReason } = result.current
       expect(disabledReason).toBe('Please load a protocol to proceed')
@@ -112,10 +106,7 @@ describe('useRunLocation', () => {
       mockGetConnectedRobotPipettesCalibrated.mockReturnValue(true)
       mockGetDeckCalibrationOk.mockReturnValue(true)
       mockGetNavbarLocations.mockReturnValue([0, 1, 2, 3, 4] as any)
-      mockUseCloseCurrentRun.mockReturnValue({
-        closeCurrentRun: () => null,
-        isProtocolRunLoaded: true,
-      } as any)
+      mockUseIsCurrentRunLoaded.mockReturnValue(true)
       const { result } = renderHook(useNavLocations, { wrapper })
       expect(result.current.length).toBe(4)
     })

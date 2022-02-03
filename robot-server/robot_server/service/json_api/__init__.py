@@ -8,6 +8,7 @@ from .response import (
     SimpleEmptyBody,
     MultiBody,
     SimpleMultiBody,
+    MultiBodyMeta,
     DeprecatedResponseModel,
     DeprecatedMultiResponseModel,
     DeprecatedResponseDataModel,
@@ -29,6 +30,7 @@ __all__ = [
     "SimpleEmptyBody",
     "MultiBody",
     "SimpleMultiBody",
+    "MultiBodyMeta",
     # resource data models
     "ResourceModel",
     # response links models

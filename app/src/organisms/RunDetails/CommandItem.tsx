@@ -1,7 +1,6 @@
 import * as React from 'react'
 import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
-import { useInView } from 'react-intersection-observer'
 import {
   DIRECTION_ROW,
   Flex,
@@ -27,7 +26,6 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SIZE_1,
 } from '@opentrons/components'
-import { useCommandQuery } from '@opentrons/react-api-client'
 import { css } from 'styled-components'
 import { CommandTimer } from './CommandTimer'
 import { CommandText } from './CommandText'
@@ -48,7 +46,7 @@ export interface CommandItemProps {
   analysisCommand: RunTimeCommand | null
   runCommandSummary: RunCommandSummary | null
   runStatus: RunStatus
-  currentRunId: string | null
+  hasBeenRun: boolean
   stepNumber: number
   runStartedAt: string | null
 }
@@ -71,12 +69,6 @@ const WRAPPER_STYLE_BY_STATUS: {
   },
 }
 
-const commandIsComplete = (status: RunCommandSummary['status']): boolean =>
-  status === 'succeeded' || status === 'failed'
-
-// minimum delay in MS for observer notifications
-export const OBSERVER_DELAY = 150
-
 export function CommandItemComponent(
   props: CommandItemProps
 ): JSX.Element | null {
@@ -84,42 +76,12 @@ export function CommandItemComponent(
     analysisCommand,
     runCommandSummary,
     runStatus,
-    currentRunId,
+    hasBeenRun,
     stepNumber,
     runStartedAt,
   } = props
   const { t } = useTranslation('run_details')
-  const [commandItemRef, isInView] = useInView({
-    delay: OBSERVER_DELAY,
-  })
-  const [staleTime, setStaleTime] = React.useState<number>(0)
-  const isAnticipatedCommand =
-    analysisCommand !== null && runCommandSummary === null
-  const { data: commandDetails, refetch } = useCommandQuery(
-    currentRunId,
-    runCommandSummary?.id ?? null,
-    {
-      enabled: !isAnticipatedCommand && runStatus !== 'idle' && isInView,
-      staleTime,
-    }
-  )
 
-  React.useEffect(() => {
-    if (
-      commandDetails?.data.status &&
-      commandIsComplete(commandDetails?.data.status) &&
-      commandDetails?.data.completedAt != null
-    ) {
-      setStaleTime(Infinity)
-    }
-    if (
-      commandDetails?.data.startedAt != null &&
-      commandDetails?.data.completedAt == null &&
-      isInView
-    ) {
-      refetch()
-    }
-  }, [runCommandSummary?.status, commandDetails?.data, refetch])
   const commandStatus =
     runStatus !== RUN_STATUS_IDLE && runCommandSummary?.status != null
       ? runCommandSummary.status
@@ -143,17 +105,21 @@ export function CommandItemComponent(
   const isPause =
     analysisCommand?.commandType === 'pause' ||
     runCommandSummary?.commandType === 'pause'
+  const backgroundColor =
+    commandStatus === 'queued' && hasBeenRun
+      ? C_AQUAMARINE
+      : WRAPPER_STYLE_BY_STATUS[commandStatus].backgroundColor
 
   const WRAPPER_STYLE = css`
     font-size: ${FONT_SIZE_BODY_1};
-    background-color: ${WRAPPER_STYLE_BY_STATUS[commandStatus].backgroundColor};
+    background-color: ${backgroundColor};
     border: ${WRAPPER_STYLE_BY_STATUS[commandStatus].border};
     padding: ${SPACING_2};
     color: ${C_DARK_GRAY};
     flex-direction: ${DIRECTION_COLUMN};
   `
   return (
-    <Flex css={WRAPPER_STYLE} ref={commandItemRef}>
+    <Flex css={WRAPPER_STYLE}>
       {commandStatus === 'running' ? (
         <CurrentCommandLabel runStatus={runStatus} />
       ) : null}
@@ -188,6 +154,7 @@ export function CommandItemComponent(
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
+        minHeight="1.75rem"
       >
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
           <Text
@@ -199,14 +166,14 @@ export function CommandItemComponent(
           </Text>
           <CommandText
             analysisCommand={analysisCommand}
-            runCommand={commandDetails?.data ?? null}
+            runCommand={runCommandSummary}
           />
         </Flex>
         {['running', 'failed', 'succeeded'].includes(commandStatus) &&
         !isComment ? (
           <CommandTimer
-            commandStartedAt={commandDetails?.data.startedAt ?? null}
-            commandCompletedAt={commandDetails?.data.completedAt ?? null}
+            commandStartedAt={runCommandSummary?.startedAt ?? null}
+            commandCompletedAt={runCommandSummary?.completedAt ?? null}
             runStartedAt={runStartedAt}
           />
         ) : null}
