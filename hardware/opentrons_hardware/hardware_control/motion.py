@@ -32,7 +32,8 @@ MAX_SPEEDS = {
     NodeId.gantry_y: 50,
     NodeId.head_l: 50,
     NodeId.head_r: 50,
-    NodeId.pipette: 2,
+    NodeId.pipette_left: 2,
+    NodeId.pipette_right: 2,
 }
 
 
@@ -59,7 +60,8 @@ def create(
         NodeId.gantry_y,
         NodeId.head_r,
         NodeId.head_l,
-        NodeId.pipette,
+        NodeId.pipette_left,
+        NodeId.pipette_right,
     ]
     vec = np.array([deltas.get(node, 0) for node in ordered_nodes])
     if any(np.isnan(vec)):

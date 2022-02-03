@@ -16,7 +16,8 @@ from opentrons_hardware.firmware_update import (
     head,
     gantry_x,
     gantry_y,
-    pipette,
+    pipette_left,
+    pipette_right,
     HexRecordProcessor,
 )
 
@@ -47,7 +48,8 @@ TARGETS: Final = {
     "head": head,
     "gantry-x": gantry_x,
     "gantry-y": gantry_y,
-    "pipette": pipette,
+    "pipette-left": pipette_left,
+    "pipette-right": pipette_right,
 }
 
 
