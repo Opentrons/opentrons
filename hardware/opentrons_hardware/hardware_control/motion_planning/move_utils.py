@@ -24,6 +24,11 @@ def apply_constraint(constraint: np.float64, input: np.float64) -> np.float64:
     return np.copysign(np.minimum(abs(constraint), abs(input)), input)
 
 
+def check_less_or_close(constraint: np.float64, input: np.float64) -> bool:
+    """Evaluate whether the input value equals to or less than the constraint."""
+    return abs(input) <= constraint or bool(np.isclose(input, constraint))
+
+
 def get_unit_vector(
     initial: Coordinates, target: Coordinates
 ) -> Tuple[Coordinates, np.float64]:
@@ -142,7 +147,7 @@ def find_initial_speed(
         )
         initial_speed = np.minimum(axis_constrained_speed, initial_speed)
 
-    log.debug(f"Initial speed: {initial_speed}")
+    log.info(f"Initial speed: {initial_speed}")
     return initial_speed
 
 
@@ -216,7 +221,7 @@ def find_final_speed(
         )
         final_speed = np.minimum(axis_speed_limit, final_speed)
 
-    log.debug(f"Final speed: {final_speed}")
+    log.info(f"Final speed: {final_speed}")
     return final_speed
 
 
@@ -252,8 +257,8 @@ def achievable_final(
             )
             # take the smaller of the aboslute value
             final_speed = apply_constraint(max_axis_final_velocity, final_speed)
-            log.debug(f"final: {final_speed}")
 
+    log.info(f"final: {final_speed}")
     return final_speed
 
 
@@ -275,11 +280,11 @@ def build_blocks(
     - have at most one 0 acceleration coast phase at our max speed
     """
     log = logging.getLogger("build_blocks")
-    assert (
-        initial_speed <= max_speed
+    assert abs(initial_speed) <= max_speed or np.isclose(
+        abs(initial_speed), max_speed
     ), f"initial speed {initial_speed} exceeds max speed {max_speed}"
-    assert (
-        final_speed <= max_speed
+    assert abs(final_speed) <= max_speed or np.isclose(
+        abs(final_speed), max_speed
     ), f"final speed {final_speed} exceeds max speed {max_speed}"
 
     constraint_max_speed = max_speed
@@ -375,15 +380,19 @@ def blended(constraints: SystemConstraints, first: Move, second: Move) -> bool:
     """Check if the moves are blended."""
     log = logging.getLogger("blended")
     # have these actually had their blocks built?
-    fist_dist_sum = sum(b.distance for b in first.blocks)
-    if abs(fist_dist_sum - first.distance) > FLOAT_THRESHOLD:
+    first_dist_sum = sum(b.distance for b in first.blocks)
+    if (abs(first_dist_sum - first.distance) > FLOAT_THRESHOLD) or not np.isclose(
+        first_dist_sum, first.distance
+    ):
         log.debug(
-            f"Sum of distance for first move blocks {fist_dist_sum} does not match "
+            f"Sum of distance for first move blocks {first_dist_sum} does not match "
             f"{first.distance}"
         )
         return False
     second_dist_sum = sum(b.distance for b in second.blocks)
-    if abs(second_dist_sum - second.distance) > FLOAT_THRESHOLD:
+    if abs(second_dist_sum - second.distance) > FLOAT_THRESHOLD or not np.isclose(
+        second_dist_sum, second.distance
+    ):
         log.debug(
             f"Sum of distance for second move blocks {second_dist_sum} does not match "
             f"{second.distance}"
@@ -393,26 +402,37 @@ def blended(constraints: SystemConstraints, first: Move, second: Move) -> bool:
     # do their junction velocities match constraints?
     for axis in Axis.get_all_axes():
         final_speed = first.blocks[-1].final_speed * first.unit_vector[axis]
-        log.debug(f"final_speed: {final_speed}")
+        log.debug(f"{axis} final_speed: {final_speed}")
         initial_speed = second.blocks[0].initial_speed * second.unit_vector[axis]
-        log.debug(f"initial_speed: {initial_speed}")
+        log.debug(f"{axis} initial_speed: {initial_speed}")
         if first.unit_vector[axis] * second.unit_vector[axis] > 0:
             # if they're in the same direction, we can check that either the junction
             # speeds exactly match, or that they're both under the discontinuity limit
             discont_limit = constraints[axis].max_speed_discont
             if not (abs(initial_speed - final_speed) < FLOAT_THRESHOLD):
-                if (
-                    abs(final_speed) > discont_limit
-                    or abs(initial_speed) > discont_limit
+                if not (
+                    check_less_or_close(discont_limit, final_speed)
+                    or check_less_or_close(discont_limit, initial_speed)
                 ):
+                    log.debug(
+                        f"Final speed: {final_speed}, initial speed: {initial_speed}, "
+                        f"discont: {discont_limit}"
+                    )
                     return False
         else:
             # if they're in different directions, then the junction has to be at or
             # under the speed change discontinuity
             discont_limit = constraints[axis].max_direction_change_speed_discont
-            if abs(final_speed) > discont_limit or abs(initial_speed) > discont_limit:
+            if not (
+                check_less_or_close(discont_limit, final_speed)
+                or check_less_or_close(discont_limit, initial_speed)
+            ):
+                log.debug(
+                    f"Final speed: {final_speed}, initial speed: {initial_speed}, "
+                    f"discont: {discont_limit}"
+                )
                 return False
-    log.debug("Successfully blended.")
+    log.info("Successfully blended.")
     return True
 
 
