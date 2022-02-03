@@ -60,7 +60,7 @@ describe('TemperatureModuleData', () => {
     )
   })
 
-  it('renders a cooling status', () => {
+  it('renders a heating status', () => {
     props = {
       moduleStatus: 'heating',
       targetTemp: mockTemperatureModuleGen2.data.targetTemp,
