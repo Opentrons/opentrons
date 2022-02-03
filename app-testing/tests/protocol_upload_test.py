@@ -176,7 +176,6 @@ def test_moam_pur(
         )
         assert moam_pur.get_description_text().text == "Description\nModule - PUR"
         # Verify that the Pipette missing text is available
-        assert moam_pur.get_attach_pipette_button().is_displayed()
         module_setup = ModuleSetup(driver)
         module_setup.click_module_setup_text()
         assert moam_pur.get_moam_link().is_displayed()
@@ -227,8 +226,6 @@ def test_gen1_pipette(
         gen1_pipette = Gen1PipettePur(driver)
         assert gen1_pipette.get_gen1_pipette_mismatch_text().is_displayed()
         assert gen1_pipette.get_link_pipette_compatibility().is_displayed()
-        # Assert that Calibrate Now button is displayed in Tip length calibrations
-        assert gen1_pipette.get_tip_length_calibrate_now().is_displayed()
         # Assert that no modules are available and step2 is labware setup
         assert gen1_pipette.get_step2_text_locator().is_displayed()
         gen1_pipette.click_on_step2()
