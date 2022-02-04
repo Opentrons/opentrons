@@ -35,7 +35,9 @@ const feedbackFormLink =
   'https://docs.google.com/forms/d/e/1FAIpQLSd6oSV82IfgzSi5t_FP6n_pB_Y8wPGmAgFHsiiFho9qhxr-UQ/viewform'
 
 export function ProtocolSetup(): JSX.Element {
-  const [showLPCSuccessToast, setShowLPCSuccessToast] = React.useState(false)
+  const [showLPCSuccessToast, setIsShowingLPCSuccessToast] = React.useState(
+    false
+  )
   const { t } = useTranslation(['protocol_setup'])
 
   const runStatus = useRunStatus()
@@ -82,12 +84,13 @@ export function ProtocolSetup(): JSX.Element {
       >
         <LPCSuccessToastContext.Provider
           value={{
-            setShowLPCSuccessToast: () => setShowLPCSuccessToast(true),
+            setIsShowingLPCSuccessToast: (isShowing: boolean) =>
+              setIsShowingLPCSuccessToast(isShowing),
           }}
         >
           {showLPCSuccessToast && (
             <LabwareOffsetSuccessToast
-              onCloseClick={() => setShowLPCSuccessToast(false)}
+              onCloseClick={() => setIsShowingLPCSuccessToast(false)}
             />
           )}
           <MetadataCard />
