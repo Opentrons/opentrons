@@ -22,14 +22,10 @@ from opentrons.protocol_runner.legacy_command_mapper import LegacyCommandMapper
 from opentrons.protocol_runner.legacy_context_plugin import LegacyContextPlugin
 from opentrons.protocol_runner.legacy_wrappers import (
     LegacyProtocolContext,
-    LegacyLoadInfo,
     LegacyLabwareLoadInfo,
-    LegacyInstrumentLoadInfo,
-    LegacyModuleLoadInfo,
-    LegacyMagneticModuleModel,
 )
 
-from opentrons.types import DeckSlotName, Mount
+from opentrons.types import DeckSlotName
 
 from opentrons_shared_data.labware.dev_types import (
     LabwareDefinition as LabwareDefinitionDict,

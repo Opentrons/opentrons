@@ -14,13 +14,7 @@ from opentrons.hardware_control.types import (
 
 from opentrons.protocol_engine import AbstractPlugin, actions as pe_actions
 
-from .legacy_wrappers import (
-    LegacyProtocolContext,
-    LegacyLoadInfo,
-    LegacyInstrumentLoadInfo,
-    LegacyLabwareLoadInfo,
-    LegacyModuleLoadInfo,
-)
+from .legacy_wrappers import LegacyProtocolContext, LegacyLoadInfo
 from .legacy_command_mapper import LegacyCommandMapper
 from .thread_async_queue import ThreadAsyncQueue
 

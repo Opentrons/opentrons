@@ -173,6 +173,7 @@ class LegacyCommandMapper:
         return results
 
     def map_equipment_load(self, load_info: LegacyLoadInfo) -> pe_commands.Command:
+        """Map a labware, instrument (pipette), or module load to a PE command."""
         if isinstance(load_info, LegacyLabwareLoadInfo):
             return self._map_labware_load(load_info)
         elif isinstance(load_info, LegacyInstrumentLoadInfo):
