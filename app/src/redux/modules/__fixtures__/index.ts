@@ -157,6 +157,22 @@ export const mockMagneticModule: Types.MagneticModule = {
   usbPort: { hub: 1, port: 1 },
 }
 
+export const mockMagneticModuleGen2: Types.MagneticModule = {
+  model: 'magneticModuleV2',
+  type: 'magneticModuleType',
+  port: '/dev/ot_module_magdeck0',
+  serial: 'def456',
+  revision: 'mag_deck_v4.0',
+  fwVersion: 'v2.0.0',
+  status: 'disengaged',
+  hasAvailableUpdate: true,
+  data: {
+    engaged: false,
+    height: 42,
+  },
+  usbPort: { hub: 1, port: 1 },
+}
+
 export const mockApiThermocyclerLegacy: ApiTypes.ApiThermocyclerModuleLegacy = {
   name: 'thermocycler',
   displayName: 'Thermocycler',
