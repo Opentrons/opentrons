@@ -32,11 +32,11 @@ class ConnectionHandler:
 
         self._connections.append(driver)
 
-        while True:
+        while not reader.at_eof():
             try:
                 data = await driver.read()
-            except CanError:
-                log.error("Read error.")
+            except CanError as e:
+                log.error(f"Read error: {e}.")
                 break
 
             log.info(f"Read message: {data}")
