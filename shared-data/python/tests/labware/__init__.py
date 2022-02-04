@@ -4,10 +4,12 @@ from pathlib import Path
 
 
 def get_ot_defs() -> List[Tuple[str, int]]:
-    loadnames = [deffile for deffile
-                 in (Path(__file__).parent
-                     / '..' / '..' / '..'
-                     / 'labware' / 'definitions' / '2').iterdir()]
+    loadnames = [
+        deffile
+        for deffile in (
+            Path(__file__).parent / ".." / ".." / ".." / "labware" / "definitions" / "2"
+        ).iterdir()
+    ]
 
     def yielder():
         for dirpath in loadnames:

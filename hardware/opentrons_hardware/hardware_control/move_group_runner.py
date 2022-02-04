@@ -75,7 +75,7 @@ class MoveGroupRunner:
                                 velocity=Int32Field(
                                     int(
                                         (step.velocity_mm_sec / interrupts_per_sec)
-                                        * (2 ** 31)
+                                        * (2**31)
                                     )
                                 ),
                             )

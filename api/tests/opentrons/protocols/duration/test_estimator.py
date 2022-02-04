@@ -125,13 +125,13 @@ def mock_deck() -> MagicMock:
         # Same col sqrt(100**2) / 2
         ["1", "4", 2, 50],
         # Extremes
-        ["1", "12", 2, math.sqrt(20 ** 2 + 300 ** 2) / 2],
+        ["1", "12", 2, math.sqrt(20**2 + 300**2) / 2],
         # Same row sqrt(10**2) / 2
         ["3", "2", 2, 5],
         # Same col sqrt(100**2) / 2
         ["5", "2", 2, 50],
         # Extremes
-        ["12", "1", 2, math.sqrt(20 ** 2 + 300 ** 2) / 2],
+        ["12", "1", 2, math.sqrt(20**2 + 300**2) / 2],
     ],
 )
 def test_calc_deck_movement_time(

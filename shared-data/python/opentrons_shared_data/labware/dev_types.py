@@ -9,18 +9,25 @@ from typing_extensions import Literal, TypedDict
 
 
 LabwareDisplayCategory = Union[
-    Literal['tipRack'], Literal['tubeRack'],
-    Literal['reservoir'], Literal['trash'],
-    Literal['wellPlate'], Literal['aluminumBlock'],
-    Literal['other']]
-
-LabwareFormat = Union[
-    Literal['96Standard'], Literal['384Standard'], Literal['trough'],
-    Literal['irregular'], Literal['trash']
+    Literal["tipRack"],
+    Literal["tubeRack"],
+    Literal["reservoir"],
+    Literal["trash"],
+    Literal["wellPlate"],
+    Literal["aluminumBlock"],
+    Literal["other"],
 ]
 
-Circular = Literal['circular']
-Rectangular = Literal['rectangular']
+LabwareFormat = Union[
+    Literal["96Standard"],
+    Literal["384Standard"],
+    Literal["trough"],
+    Literal["irregular"],
+    Literal["trash"],
+]
+
+Circular = Literal["circular"]
+Rectangular = Literal["rectangular"]
 WellShape = Union[Circular, Rectangular]
 
 
@@ -50,7 +57,7 @@ class LabwareBrandData(TypedDict, total=False):
 class LabwareMetadata(TypedDict, total=False):
     displayName: str
     displayCategory: LabwareDisplayCategory
-    displayVolumeUnits: Union[Literal['µL'], Literal['mL'], Literal['L']]
+    displayVolumeUnits: Union[Literal["µL"], Literal["mL"], Literal["L"]]
     tags: List[str]
 
 
@@ -87,7 +94,7 @@ WellDefinition = Union[CircularWellDefinition, RectangularWellDefinition]
 class WellGroupMetadata(TypedDict, total=False):
     displayName: str
     displayCategory: LabwareDisplayCategory
-    wellBottomShape: Union[Literal['flat'], Literal['u'], Literal['v']]
+    wellBottomShape: Union[Literal["flat"], Literal["u"], Literal["v"]]
 
 
 class WellGroup(TypedDict, total=False):
