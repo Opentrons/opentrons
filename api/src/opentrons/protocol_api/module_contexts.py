@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Generic, List, Optional, TYPE_CHECKING, TypeVar, Union, cast
+from typing import Generic, List, Optional, TYPE_CHECKING, TypeVar, cast
 
 from opentrons import types
 from opentrons.hardware_control import modules
@@ -22,11 +22,6 @@ from opentrons.protocols.api_support.util import requires_version
 if TYPE_CHECKING:
     from .protocol_context import ProtocolContext
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
-
-
-ModuleTypes = Union[
-    "TemperatureModuleContext", "MagneticModuleContext", "ThermocyclerContext"
-]
 
 ENGAGE_HEIGHT_UNIT_CNV = 2
 STANDARD_MAGDECK_LABWARE = [
