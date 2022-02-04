@@ -602,6 +602,7 @@ class ProtocolContext(CommandPublisher):
             hw_module=load_result.module,
             geometry=load_result.geometry,
             at_version=self.api_version,
+            requested_as=requested_model,
             loop=self._loop,
         )
         self._modules.append(module_context)
