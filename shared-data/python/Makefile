@@ -91,11 +91,12 @@ $(sdist_file): setup.py $(py_sources)
 .PHONY: lint
 lint: $(py_sources)
 	$(python) -m mypy opentrons_shared_data tests
+	$(python) -m black --check opentrons_shared_data tests setup.py
 	$(python) -m flake8 opentrons_shared_data tests setup.py
 
 .PHONY: format
 format:
-	$(python) -m black .
+	$(python) -m black opentrons_shared_data tests setup.py
 
 .PHONY: push-no-restart
 push-no-restart: $(wheel_file)
