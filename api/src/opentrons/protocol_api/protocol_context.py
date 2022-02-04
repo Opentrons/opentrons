@@ -46,7 +46,12 @@ from .labware_offset_provider import (
     AbstractLabwareOffsetProvider,
     NullLabwareOffsetProvider,
 )
-from .load_info import LabwareLoadInfo, ModuleLoadInfo, InstrumentLoadInfo
+from .load_info import (
+    LoadInfo,
+    LabwareLoadInfo,
+    ModuleLoadInfo,
+    InstrumentLoadInfo,
+)
 from opentrons.protocols.api_support.util import (
     AxisMaxSpeeds,
     requires_version,
@@ -124,43 +129,21 @@ class ProtocolContext(CommandPublisher):
         self._unsubscribe_commands: Optional[Callable[[], None]] = None
         self.clear_commands()
 
-        self._labware_load_broker = EquipmentBroker[LabwareLoadInfo]()
-        self._instrument_load_broker = EquipmentBroker[InstrumentLoadInfo]()
-        self._module_load_broker = EquipmentBroker[ModuleLoadInfo]()
+        self._equipment_broker = EquipmentBroker[LoadInfo]()
 
     @property
-    def labware_load_broker(self) -> EquipmentBroker[LabwareLoadInfo]:
+    def equipment_broker(self) -> EquipmentBroker[LoadInfo]:
         """For internal Opentrons use only.
 
         :meta private:
 
         Subscribers to this broker will be notified with information about every
-        successful labware load.
+        successful labware load, instrument load, or module load.
 
         Only :py:obj:`ProtocolContext` is allowed to publish to this broker.
         Calling code may only subscribe or unsubscribe.
         """
-        return self._labware_load_broker
-
-    @property
-    def instrument_load_broker(self) -> EquipmentBroker[InstrumentLoadInfo]:
-        """For internal Opentrons use only.
-
-        :meta private:
-
-        Like `labware_load_broker`, but for pipettes.
-        """
-        return self._instrument_load_broker
-
-    @property
-    def module_load_broker(self) -> EquipmentBroker[ModuleLoadInfo]:
-        """For internal Opentrons use only.
-
-        :meta private:
-
-        Like `labware_load_broker`, but for modules.
-        """
-        return self._module_load_broker
+        return self._equipment_broker
 
     @classmethod
     def build_using(
@@ -404,7 +387,7 @@ class ProtocolContext(CommandPublisher):
 
         result.set_calibration(delta=provided_labware_offset.delta)
 
-        self.labware_load_broker.publish(
+        self.equipment_broker.publish(
             LabwareLoadInfo(
                 labware_definition=result._implementation.get_definition(),
                 labware_namespace=result_namespace,
@@ -471,7 +454,7 @@ class ProtocolContext(CommandPublisher):
 
         result.set_calibration(delta=provided_labware_offset.delta)
 
-        self.labware_load_broker.publish(
+        self.equipment_broker.publish(
             LabwareLoadInfo(
                 labware_definition=result._implementation.get_definition(),
                 labware_namespace=result_namespace,
@@ -606,7 +589,7 @@ class ProtocolContext(CommandPublisher):
         deck_slot = types.DeckSlotName.from_primitive(module_loc)
         module_serial = module.module.device_info["serial"]
 
-        self.module_load_broker.publish(
+        self.equipment_broker.publish(
             ModuleLoadInfo(
                 module_model=module.geometry.model,
                 deck_slot=deck_slot,
@@ -705,7 +688,7 @@ class ProtocolContext(CommandPublisher):
         )
         self._instruments[checked_mount] = new_instr
 
-        self.instrument_load_broker.publish(
+        self.equipment_broker.publish(
             InstrumentLoadInfo(
                 instrument_load_name=instrument_name,
                 mount=checked_mount,

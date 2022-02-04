@@ -97,7 +97,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
         labware.set_calibration(provided_offset.delta)
         self._ctx._implementation.get_deck().recalculate_high_z()
 
-        self._ctx.labware_load_broker.publish(
+        self._ctx.equipment_broker.publish(
             LabwareLoadInfo(
                 labware_definition=labware._implementation.get_definition(),
                 labware_namespace=labware_namespace,

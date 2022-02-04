@@ -15,9 +15,10 @@ from opentrons.hardware_control.types import (
 from opentrons.protocol_engine import AbstractPlugin, actions as pe_actions
 
 from .legacy_wrappers import (
+    LegacyProtocolContext,
+    LegacyLoadInfo,
     LegacyInstrumentLoadInfo,
     LegacyLabwareLoadInfo,
-    LegacyProtocolContext,
     LegacyModuleLoadInfo,
 )
 from .legacy_command_mapper import LegacyCommandMapper
@@ -83,26 +84,16 @@ class LegacyContextPlugin(AbstractPlugin):
         # Use an exit stack so if any part of this setup fails,
         # we clean up the parts that succeeded in reverse order.
         with ExitStack() as exit_stack:
-            command_unsubscribe = context.broker.subscribe(
+            command_broker_unsubscribe = context.broker.subscribe(
                 topic="command",
                 handler=self._handle_legacy_command,
             )
-            exit_stack.callback(command_unsubscribe)
+            exit_stack.callback(command_broker_unsubscribe)
 
-            labware_unsubscribe = context.labware_load_broker.subscribe(
-                callback=self._handle_labware_loaded
+            equipment_broker_unsubscribe = context.equipment_broker.subscribe(
+                callback=self._handle_equipment_loaded
             )
-            exit_stack.callback(labware_unsubscribe)
-
-            pipette_unsubscribe = context.instrument_load_broker.subscribe(
-                callback=self._handle_instrument_loaded
-            )
-            exit_stack.callback(pipette_unsubscribe)
-
-            module_unsubscribe = context.module_load_broker.subscribe(
-                callback=self._handle_module_loaded
-            )
-            exit_stack.callback(module_unsubscribe)
+            exit_stack.callback(equipment_broker_unsubscribe)
 
             # All subscriptions succeeded.
             # Save the exit stack so our teardown method can use it later
@@ -158,38 +149,8 @@ class LegacyContextPlugin(AbstractPlugin):
         for pe_action in pe_actions:
             self._actions_to_dispatch.put(pe_action)
 
-    def _handle_labware_loaded(self, labware_load_info: LegacyLabwareLoadInfo) -> None:
-        """Handle a labware load reported by the APIv2 protocol.
-
-        Used as a broker callback, so this will run in the APIv2 protocol's thread.
-        """
-        pe_command = self._legacy_command_mapper.map_labware_load(
-            labware_load_info=labware_load_info
-        )
-        pe_action = pe_actions.UpdateCommandAction(command=pe_command)
-        self._actions_to_dispatch.put(pe_action)
-
-    def _handle_instrument_loaded(
-        self, instrument_load_info: LegacyInstrumentLoadInfo
-    ) -> None:
-        """Handle an instrument (pipette) load reported by the APIv2 protocol.
-
-        Used as a broker callback, so this will run in the APIv2 protocol's thread.
-        """
-        pe_command = self._legacy_command_mapper.map_instrument_load(
-            instrument_load_info=instrument_load_info
-        )
-        pe_action = pe_actions.UpdateCommandAction(command=pe_command)
-        self._actions_to_dispatch.put(pe_action)
-
-    def _handle_module_loaded(self, module_load_info: LegacyModuleLoadInfo) -> None:
-        """Handle a module load reported by the APIv2 protocol.
-
-        Used as a broker callback, so this will run in the APIv2 protocol's thread.
-        """
-        pe_command = self._legacy_command_mapper.map_module_load(
-            module_load_info=module_load_info
-        )
+    def _handle_equipment_loaded(self, load_info: LegacyLoadInfo) -> None:
+        pe_command = self._legacy_command_mapper.map_equipment_load(load_info=load_info)
         pe_action = pe_actions.UpdateCommandAction(command=pe_command)
         self._actions_to_dispatch.put(pe_action)
 
