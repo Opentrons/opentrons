@@ -126,7 +126,7 @@ def test_move_plan(
     converged, blend_log = manager.plan_motion(
         origin=origin,
         target_list=targets,
-        iteration_limit=5,
+        iteration_limit=20,
     )
 
     assert converged
