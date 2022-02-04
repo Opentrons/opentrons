@@ -90,7 +90,6 @@ try:
         )
         _BUS_STATE.entrygroup.Commit()
 
-
 except ImportError:
     LOG.exception("Couldn't import dbus, name setting will be nonfunctional")
 

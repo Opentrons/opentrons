@@ -93,6 +93,10 @@ lint: $(py_sources)
 	$(python) -m mypy opentrons_shared_data tests
 	$(python) -m flake8 opentrons_shared_data tests setup.py
 
+.PHONY: format
+format:
+	$(python) -m black .
+
 .PHONY: push-no-restart
 push-no-restart: $(wheel_file)
 	$(call push-python-package,$(host),$(br_ssh_key),$(ssh_opts),$(wheel_file))

@@ -209,17 +209,14 @@ def test_available_resets(api_client):
     body = resp.json()
     options_list = body.get("options")
     assert resp.status_code == 200
-    assert (
-        sorted(
-            [
-                "deckCalibration",
-                "pipetteOffsetCalibrations",
-                "bootScripts",
-                "tipLengthCalibrations",
-            ]
-        )
-        == sorted([item["id"] for item in options_list])
-    )
+    assert sorted(
+        [
+            "deckCalibration",
+            "pipetteOffsetCalibrations",
+            "bootScripts",
+            "tipLengthCalibrations",
+        ]
+    ) == sorted([item["id"] for item in options_list])
 
 
 @pytest.fixture

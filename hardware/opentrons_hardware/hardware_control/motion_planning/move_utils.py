@@ -301,14 +301,14 @@ def build_blocks(
             acc_v *= max_acc_i / a_i
     max_acceleration = np.linalg.norm(acc_v)
 
-    initial_speed_sq = initial_speed ** 2
-    final_speed_sq = final_speed ** 2
+    initial_speed_sq = initial_speed**2
+    final_speed_sq = final_speed**2
 
     max_achievable_speed = np.sqrt(
         0.5 * (2 * max_acceleration * distance + initial_speed_sq + final_speed_sq)
     )
     max_speed = np.minimum(max_achievable_speed, max_speed)
-    max_speed_sq = max_speed ** 2
+    max_speed_sq = max_speed**2
 
     log.debug(
         f"{initial_speed} mm/s to {final_speed} mm/s in {distance} mm "

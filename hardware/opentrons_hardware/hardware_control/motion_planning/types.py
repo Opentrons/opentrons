@@ -110,7 +110,7 @@ class Block:
         def _final_speed() -> np.float64:
             """Get final speed of the block."""
             return np.sqrt(
-                self.initial_speed ** 2 + self.acceleration * self.distance * 2
+                self.initial_speed**2 + self.acceleration * self.distance * 2
             )
 
         def _time() -> np.float64:
