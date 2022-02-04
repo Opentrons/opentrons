@@ -10,7 +10,17 @@ import argparse
 import logging
 import os
 import sys
-from typing import Any, Callable, Dict, List, Optional, TextIO, Union, TYPE_CHECKING
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    List,
+    Mapping,
+    Optional,
+    TextIO,
+    Union,
+    TYPE_CHECKING,
+)
 
 from opentrons import protocol_api, __version__
 from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
@@ -203,7 +213,7 @@ def execute(
     protocol_name: str,
     propagate_logs: bool = False,
     log_level: str = "warning",
-    emit_runlog: Callable[[Dict[str, Any]], None] = None,
+    emit_runlog: Callable[[Mapping[str, Any]], None] = None,
     custom_labware_paths: List[str] = None,
     custom_data_paths: List[str] = None,
 ):
