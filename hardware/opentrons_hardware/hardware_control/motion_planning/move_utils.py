@@ -337,7 +337,6 @@ def build_blocks(
         # ratio between the acceleration and deceleration phases is quite imbalanced.
         # We can always fall back to having our target maximum speed be the larger
         # of the final and initial speeds.
-        print(f"relimited from {max_speed_sq} to {max(initial_speed_sq, final_speed_sq)}")
         max_speed_sq = max(initial_speed_sq, final_speed_sq)
         first.distance = abs(max_speed_sq - initial_speed_sq) / (2 * max_acceleration)
         final.initial_speed = first.final_speed
