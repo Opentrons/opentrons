@@ -137,7 +137,9 @@ if __name__ == "__main__":
         cmdclass={"build_py": BuildWithData, "sdist": SDistWithData},
         project_urls={
             "opentrons.com": "https://www.opentrons.com",
-            "Source Code On Github": "https://github.com/Opentrons/opentrons/tree/edge/shared-data",
+            "Source Code On Github": (
+                "https://github.com/Opentrons/opentrons/tree/edge/shared-data"
+            ),
             "Documentation": "https://docs.opentrons.com",
         },
     )
