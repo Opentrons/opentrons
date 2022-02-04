@@ -48,7 +48,7 @@ export function DeviceDetails(): JSX.Element | null {
           width="100%"
         >
           <RobotOverview robotName={robotName} />
-          <Flex flexWrap={WRAP} alignItems={ALIGN_CENTER} width="100%">
+          <Flex flexWrap={WRAP} width="100%">
             {attachedModules.map((module, index) => {
               return (
                 <Flex key={`moduleCard_${module.type}_${index}`}>

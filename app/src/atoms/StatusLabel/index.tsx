@@ -11,13 +11,14 @@ import {
   FONT_SIZE_CAPTION,
 } from '@opentrons/components'
 interface StatusLabelProps {
-  status: string
+  status: string | null
   backgroundColor: string
   iconColor: string
+  textColor?: string
 }
 
 export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
-  const { status, backgroundColor, iconColor } = props
+  const { status, backgroundColor, iconColor, textColor } = props
 
   return (
     <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -37,7 +38,7 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
         />
         <Text
           fontSize={FONT_SIZE_CAPTION}
-          color={C_BLUE_PRESSED}
+          color={textColor ?? C_BLUE_PRESSED}
           textTransform={TEXT_TRANSFORM_CAPITALIZE}
           marginRight={SPACING_1}
         >

@@ -20,6 +20,7 @@ import {
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import { ModuleIcon } from '../ModuleIcon'
 import { MagneticModuleData } from './MagneticModuleData'
+import { ThermocyclerModuleData } from './ThermocyclerModuleData'
 
 import magneticModule from '../../../assets/images/magnetic_module_gen_2_transparent.svg'
 import temperatureModule from '../../../assets/images/temp_deck_gen_2_transparent.svg'
@@ -58,6 +59,16 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
 
     case 'thermocyclerModuleType': {
       image = thermoModule
+      moduleData = (
+        <ThermocyclerModuleData
+          lidStatus={module.data.lid}
+          blockStatus={module.status}
+          currentTemp={module.data.currentTemp}
+          targetTemp={module.data.targetTemp}
+          lidTarget={module.data.lidTarget}
+          lidTemp={module.data.lidTemp}
+        />
+      )
       break
     }
   }
