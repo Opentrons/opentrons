@@ -14,7 +14,7 @@ from opentrons_hardware.firmware_update import HexRecordProcessor
 @pytest.fixture
 def target() -> firmware_update.Target:
     """Target node."""
-    return firmware_update.pipette
+    return firmware_update.pipette_left
 
 
 @pytest.fixture
