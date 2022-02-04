@@ -287,7 +287,6 @@ def build_blocks(
         abs(final_speed), max_speed
     ), f"final speed {final_speed} exceeds max speed {max_speed}"
 
-    constraint_max_speed = max_speed
     max_acc = np.array(
         [
             constraints[axis].max_acceleration if unit_vector[axis] else 0.0
@@ -328,13 +327,23 @@ def build_blocks(
         acceleration=-max_acceleration,
         distance=abs(max_speed_sq - final_speed_sq) / (2 * max_acceleration),
     )
+    if first.distance + final.distance > distance:
+        # the math did not quite work out and we need to trim down our top speed.
+        # This will be a suboptimal solution almost certainly, but it's better to
+        # have a suboptimal solution that doesn't violate constraints than an
+        # optimal one that does.
+        # This happens when we have a triangle move (so, anticipating no coast phase)
+        # where we slightly overaccelerate and end up moving too far, when the
+        # ratio between the acceleration and deceleration phases is quite imbalanced.
+        # We can always fall back to having our target maximum speed be the larger
+        # of the final and initial speeds.
+        max_speed_sq = max(initial_speed_sq, final_speed_sq)
+        first.distance = abs(max_speed_sq - initial_speed_sq) / (2 * max_acceleration)
+        final.initial_speed = first.final_speed
+        final.distance = abs(max_speed_sq - final_speed_sq) / (2 * max_acceleration)
 
-    if max_achievable_speed > constraint_max_speed:
+    if first.distance + final.distance < distance:
         # we'll have a coast phase!
-        assert distance - first.distance - final.distance > 0, (
-            f"bad coast phase detection: total {distance}, first {first.distance}, "
-            f"final {final.distance} "
-        )
         coast = Block(
             initial_speed=final.initial_speed,
             acceleration=0,
