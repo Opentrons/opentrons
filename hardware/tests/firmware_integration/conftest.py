@@ -50,7 +50,7 @@ def can_messenger_queue(
     scope="session",
     params=[
         constants.NodeId.head,
-        constants.NodeId.pipette,
+        constants.NodeId.pipette_left,
         constants.NodeId.gantry_x,
         constants.NodeId.gantry_y,
     ],
@@ -65,7 +65,7 @@ def subsystem_node_id(request: FixtureRequest) -> Iterator[constants.NodeId]:
     params=[
         constants.NodeId.head_l,
         constants.NodeId.head_r,
-        constants.NodeId.pipette,
+        constants.NodeId.pipette_left,
         constants.NodeId.gantry_x,
         constants.NodeId.gantry_y,
     ],

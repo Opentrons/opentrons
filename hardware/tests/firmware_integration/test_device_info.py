@@ -29,7 +29,7 @@ async def test_broadcast(
         """Loop until all nodes respond."""
         nodes = {
             NodeId.head,
-            NodeId.pipette,
+            NodeId.pipette_left,
             NodeId.gantry_x,
             NodeId.gantry_y,
         }
