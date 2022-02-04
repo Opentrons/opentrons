@@ -11,15 +11,13 @@ import {
   OVERFLOW_SCROLL,
   SIZE_6,
   SPACING_3,
-  WRAP,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
-import { useAttachedModules, useRobot } from '../../../organisms/Devices/hooks'
+import { useRobot } from '../../../organisms/Devices/hooks'
 import { PipettesAndModules } from '../../../organisms/Devices/PipettesAndModules'
 import { RecentProtocolRuns } from '../../../organisms/Devices/RecentProtocolRuns'
 import { RobotOverview } from '../../../organisms/Devices/RobotOverview'
-import { ModuleCard } from '../../../organisms/Devices/ModuleCard'
 
 import type { NextGenRouteParams } from '../../../App/NextGenApp'
 
@@ -27,8 +25,6 @@ export function DeviceDetails(): JSX.Element | null {
   const { robotName } = useParams<NextGenRouteParams>()
 
   const robot = useRobot(robotName)
-
-  const attachedModules = useAttachedModules(robotName)
 
   return robot != null ? (
     <ApiHostProvider key={robot.name} hostname={robot.ip ?? null}>
@@ -50,15 +46,6 @@ export function DeviceDetails(): JSX.Element | null {
         >
           <RobotOverview robotName={robotName} />
           <PipettesAndModules robotName={robotName} />
-          <Flex flexWrap={WRAP} alignItems={ALIGN_CENTER} width="100%">
-            {attachedModules.map((module, index) => {
-              return (
-                <Flex key={`moduleCard_${module.type}_${index}`}>
-                  <ModuleCard module={module} />
-                </Flex>
-              )
-            })}
-          </Flex>
         </Flex>
         <RecentProtocolRuns robotName={robotName} />
       </Box>

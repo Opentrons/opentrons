@@ -14,9 +14,11 @@ import {
   SIZE_3,
   SPACING_2,
   SPACING_3,
+  WRAP,
 } from '@opentrons/components'
 
-import { useIsRobotViewable } from './hooks'
+import { ModuleCard } from './ModuleCard'
+import { useAttachedModules, useIsRobotViewable } from './hooks'
 
 interface PipettesAndModulesProps {
   robotName: string
@@ -27,6 +29,7 @@ export function PipettesAndModules({
 }: PipettesAndModulesProps): JSX.Element | null {
   const { t } = useTranslation('device_details')
 
+  const attachedModules = useAttachedModules(robotName)
   const isRobotViewable = useIsRobotViewable(robotName)
 
   return (
@@ -50,7 +53,15 @@ export function PipettesAndModules({
         width="100%"
       >
         {isRobotViewable ? (
-          <div>pipettes and modules here</div>
+          <Flex flexWrap={WRAP} alignItems={ALIGN_CENTER} width="100%">
+            {attachedModules.map((module, index) => {
+              return (
+                <Flex key={`moduleCard_${module.type}_${index}`}>
+                  <ModuleCard module={module} />
+                </Flex>
+              )
+            })}
+          </Flex>
         ) : (
           <Text fontSize={FONT_SIZE_BODY_1}>
             {t('offline_pipettes_and_modules')}
