@@ -33,7 +33,6 @@ from opentrons.types import Location, Point
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV2
 
-Session = namedtuple("Session", ["server", "socket", "token", "call"])
 
 Protocol = namedtuple("Protocol", ["text", "filename", "filelike"])
 
@@ -46,22 +45,6 @@ def asyncio_loop_exception_handler(loop):
     loop.set_exception_handler(exception_handler)
     yield
     loop.set_exception_handler(None)
-
-
-def state(topic, state):
-    def _match(item):
-        return item["topic"] == topic and item["payload"].state == state
-
-    return _match
-
-
-def log_by_axis(log, axis):
-    from functools import reduce
-
-    def reducer(e1, e2):
-        return {axis: e1[axis] + [round(e2[axis])] for axis in axis}
-
-    return reduce(reducer, log, {axis: [] for axis in axis})
 
 
 @pytest.fixture
@@ -154,11 +137,6 @@ def protocol(request):
     yield Protocol(text=text, filename=filename, filelike=file)
 
     file.close()
-
-
-@pytest.fixture
-def session_manager(main_router):
-    return main_router.session_manager
 
 
 @pytest.fixture
@@ -256,13 +234,6 @@ async def ctx(loop, hardware) -> ProtocolContext:
     return ProtocolContext(
         implementation=ProtocolContextImplementation(hardware=hardware), loop=loop
     )
-
-
-def data_dir() -> str:
-    return os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
-
-
-Model = namedtuple("Model", ["robot", "instrument", "container"])
 
 
 @pytest.fixture
