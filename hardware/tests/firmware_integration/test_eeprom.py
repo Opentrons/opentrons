@@ -27,7 +27,7 @@ async def test_read_write(
 ) -> None:
     """It should be able to read and write eeprom values."""
     read_message = ReadFromEEPromRequest(payload=EmptyPayload())
-    await can_messenger.send(node_id=NodeId.pipette, message=read_message)
+    await can_messenger.send(node_id=NodeId.pipette_left, message=read_message)
 
     response, arbitration_id = await asyncio.wait_for(can_messenger_queue.get(), 1)
 
@@ -36,14 +36,14 @@ async def test_read_write(
 
     # Write to the again
     await can_messenger.send(
-        node_id=NodeId.pipette,
+        node_id=NodeId.pipette_left,
         message=WriteToEEPromRequest(
             payload=WriteToEEPromRequestPayload(serial_number=UInt8Field(expected_data))
         ),
     )
 
     # Read from eeprom again
-    await can_messenger.send(node_id=NodeId.pipette, message=read_message)
+    await can_messenger.send(node_id=NodeId.pipette_left, message=read_message)
 
     response, arbitration_id = await asyncio.wait_for(can_messenger_queue.get(), 1)
 
