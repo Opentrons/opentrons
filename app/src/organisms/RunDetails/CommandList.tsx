@@ -75,6 +75,7 @@ export function CommandList(): JSX.Element | null {
   )
   const totalRunCommandCount = commandsData?.meta.totalLength ?? 0
   const runCommands = commandsData?.data ?? []
+  // console.log(commandsData?.links.current.meta.commandId)
 
   const [
     isInitiallyJumpingToCurrent,
@@ -104,6 +105,14 @@ export function CommandList(): JSX.Element | null {
   const postSetupAnticipatedCommands: RunTimeCommand[] = allProtocolCommands.slice(
     firstNonSetupIndex
   )
+  const firstRunCommandIndexAfterInitialPlay = runCommands.findIndex(runCommandSummary => runCommandSummary.key === allProtocolCommands[0]?.key)
+  const postInitialPlayRunCommandCount = firstRunCommandIndexAfterInitialPlay > 0 ? totalRunCommandCount - firstRunCommandIndexAfterInitialPlay : 0
+  const currentCommandIndex = postInitialPlayRunCommandCount - 1
+
+  console.log('allProtocolCommands', allProtocolCommands.length)
+  console.log('runCommands', runCommands.length)
+  console.log('firstRunCommandIndexAfterInitialPlay', firstRunCommandIndexAfterInitialPlay)
+  console.log('postInitialPlayRunCommandCount', postInitialPlayRunCommandCount)
 
   let currentCommandList: CommandRuntimeInfo[] = postSetupAnticipatedCommands.map(
     postSetupAnticaptedCommand => ({
@@ -113,7 +122,8 @@ export function CommandList(): JSX.Element | null {
   )
   if (runCommands != null && runCommands.length > 0 && runStartTime != null) {
     const allCommands = allProtocolCommands.map((anticipatedCommand, index) => {
-      const isAnticipated = index + 1 > totalRunCommandCount
+      const isAnticipated = false //index + 1 > postInitialPlayRunCommandCount
+      // console.log('index + 1', index+1, '>' , 'postInitialPlayRunCommandCount', postInitialPlayRunCommandCount )
       const matchedRunCommand = runCommands.find(
         runCommandSummary => runCommandSummary.key === anticipatedCommand.key
       )
@@ -144,8 +154,6 @@ export function CommandList(): JSX.Element | null {
   const isFinalWindow =
     currentCommandList.length - 1 <= windowFirstCommandIndex + WINDOW_SIZE
 
-  const currentCommandIndex =
-    totalRunCommandCount - 1 - protocolSetupCommandList.length
   const indexOfWindowContainingCurrentItem = Math.floor(
     Math.max(currentCommandIndex - (WINDOW_SIZE - WINDOW_OVERLAP), 0) /
       (WINDOW_SIZE - WINDOW_OVERLAP)
@@ -264,7 +272,7 @@ export function CommandList(): JSX.Element | null {
                 {t('total_step_count', { count: currentCommandList.length })}
               </Text>
             </Flex>
-            {currentCommandIndex <= 0 ? (
+            {currentCommandList[0]?.runCommandSummary != null ? (
               <Text fontSize={FONT_SIZE_CAPTION} marginY={SPACING_2}>
                 {t('anticipated')}
               </Text>
@@ -284,7 +292,11 @@ export function CommandList(): JSX.Element | null {
           <Box width="100%" height={`${topBufferHeightPx}px`} />
           {commandWindow?.map((command, index) => {
             const overallIndex = index + windowFirstCommandIndex
-            const isCurrentCommand = overallIndex === currentCommandIndex
+            const isCurrentCommand =
+              commandWindow[index - 1]?.runCommandSummary?.status ===
+                'succeeded' &&
+              ((command?.analysisCommand?.status === 'queued' && command?.runCommandSummary == null) ||
+                command?.runCommandSummary?.status === 'running')
             const showAnticipatedStepsTitle =
               overallIndex !== currentCommandList.length - 1 && isCurrentCommand
 
@@ -301,7 +313,6 @@ export function CommandList(): JSX.Element | null {
                 <CommandItem
                   analysisCommand={command.analysisCommand}
                   runCommandSummary={command.runCommandSummary}
-                  hasBeenRun={overallIndex <= currentCommandIndex}
                   runStatus={runStatus}
                   stepNumber={overallIndex + 1}
                   runStartedAt={runStartTime}
