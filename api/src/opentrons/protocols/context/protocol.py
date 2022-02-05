@@ -45,10 +45,6 @@ class AbstractProtocol(ABC):
         ...
 
     @abstractmethod
-    def cleanup(self) -> None:
-        ...
-
-    @abstractmethod
     def get_max_speeds(self) -> AxisMaxSpeeds:
         ...
 

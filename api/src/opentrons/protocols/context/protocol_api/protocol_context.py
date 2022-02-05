@@ -104,16 +104,12 @@ class ProtocolContextImplementation(AbstractProtocol):
         """Extra labware definitions."""
         return self._extra_labware
 
-    def cleanup(self) -> None:
-        """Protocol context clean up."""
-        pass
-
     def get_max_speeds(self) -> AxisMaxSpeeds:
         """Get the maximum axis speeds."""
         return self._default_max_speeds
 
     def get_hardware(self) -> SyncHardwareAPI:
-        """Access to the hardware manager."""
+        """Access to the synchronous hardware API."""
         return self._sync_hardware
 
     def is_simulating(self) -> bool:
