@@ -48,7 +48,7 @@ export interface CommandItemProps {
   runStatus: RunStatus
   stepNumber: number
   runStartedAt: string | null
-  isFetchingRunCommands: boolean
+  isMostRecentCommand: boolean
 }
 
 const WRAPPER_STYLE_BY_STATUS: {
@@ -78,14 +78,19 @@ export function CommandItemComponent(
     runStatus,
     stepNumber,
     runStartedAt,
-    isFetchingRunCommands
+    isMostRecentCommand,
   } = props
   const { t } = useTranslation('run_details')
 
-  const commandStatus =
-    runStatus !== RUN_STATUS_IDLE && runCommandSummary?.status != null
-      ? runCommandSummary.status
-      : 'queued'
+  let commandStatus: RunCommandSummary['status'] = 'queued' as const
+  if (isMostRecentCommand) {
+    commandStatus = 'running' as const
+  } else if (
+    runStatus !== RUN_STATUS_IDLE &&
+    runCommandSummary?.status != null
+  ) {
+    commandStatus = runCommandSummary.status
+  }
 
   let isComment = false
   if (
@@ -106,7 +111,7 @@ export function CommandItemComponent(
     analysisCommand?.commandType === 'pause' ||
     runCommandSummary?.commandType === 'pause'
   const backgroundColor =
-    commandStatus === 'queued' && runCommandSummary != null && isFetchingRunCommands
+    commandStatus === 'queued' && isMostRecentCommand
       ? C_AQUAMARINE
       : WRAPPER_STYLE_BY_STATUS[commandStatus].backgroundColor
 
