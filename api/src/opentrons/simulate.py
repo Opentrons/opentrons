@@ -216,7 +216,7 @@ def _build_protocol_context(
     context = protocol_api.contexts.ProtocolContext(
         implementation=ctx_impl, api_version=version
     )
-    context.home()  # type: ignore[no-untyped-call]
+    context.home()
     return context
 
 
@@ -370,7 +370,7 @@ def simulate(
         ):
             bundle_contents = bundle_from_sim(protocol, context)
     finally:
-        context.cleanup()  # type: ignore[no-untyped-call]
+        context.cleanup()
 
     return scraper.commands, bundle_contents
 

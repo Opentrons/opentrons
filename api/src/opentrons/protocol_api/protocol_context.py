@@ -213,13 +213,13 @@ class ProtocolContext(CommandPublisher):
         """
         return self._implementation.get_bundled_data()
 
-    def cleanup(self):
+    def cleanup(self) -> None:
         """Finalize and clean up the protocol context."""
         if self._unsubscribe_commands:
             self._unsubscribe_commands()
             self._unsubscribe_commands = None
 
-    def __del__(self):
+    def __del__(self) -> None:
         if getattr(self, "_unsubscribe_commands", None):
             self._unsubscribe_commands()  # type: ignore
 
@@ -257,11 +257,11 @@ class ProtocolContext(CommandPublisher):
         return self._implementation.get_max_speeds()
 
     @requires_version(2, 0)
-    def commands(self):
+    def commands(self) -> List[str]:
         return self._commands
 
     @requires_version(2, 0)
-    def clear_commands(self):
+    def clear_commands(self) -> None:
         self._commands.clear()
         if self._unsubscribe_commands:
             self._unsubscribe_commands()
@@ -536,7 +536,7 @@ class ProtocolContext(CommandPublisher):
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def loaded_modules(self) -> Dict[int, "ModuleContext"]:
+    def loaded_modules(self) -> Dict[int, ModuleContext]:
         """Get the modules loaded into the protocol context.
 
         This is a map of deck positions to modules loaded by previous calls
@@ -551,7 +551,7 @@ class ProtocolContext(CommandPublisher):
                                            ordered by slot number.
         """
 
-        def _modules() -> Iterator[Tuple[int, "ModuleContext"]]:
+        def _modules() -> Iterator[Tuple[int, ModuleContext]]:
             for module in self._modules:
                 yield int(str(module.geometry.parent)), module
 
@@ -564,7 +564,7 @@ class ProtocolContext(CommandPublisher):
         mount: Union[types.Mount, str],
         tip_racks: List[Labware] = None,
         replace: bool = False,
-    ) -> "InstrumentContext":
+    ) -> InstrumentContext:
         """Load a specific instrument required by the protocol.
 
         This value will actually be checked when the protocol runs, to
@@ -634,7 +634,7 @@ class ProtocolContext(CommandPublisher):
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def loaded_instruments(self) -> Dict[str, "InstrumentContext"]:
+    def loaded_instruments(self) -> Dict[str, InstrumentContext]:
         """Get the instruments that have been loaded into the protocol.
 
         This is a map of mount name to instruments previously loaded with
@@ -700,7 +700,7 @@ class ProtocolContext(CommandPublisher):
 
     @publish(command=cmds.delay)
     @requires_version(2, 0)
-    def delay(self, seconds=0, minutes=0, msg=None):
+    def delay(self, seconds=0, minutes=0, msg=None) -> None:
         """Delay protocol execution for a specific amount of time.
 
         :param float seconds: A time to delay in seconds
@@ -712,7 +712,7 @@ class ProtocolContext(CommandPublisher):
         self._implementation.delay(seconds=delay_time, msg=msg)
 
     @requires_version(2, 0)
-    def home(self):
+    def home(self) -> None:
         """Homes the robot."""
         logger.debug("home")
         self._implementation.home()
@@ -723,7 +723,7 @@ class ProtocolContext(CommandPublisher):
         return self._implementation.get_last_location()
 
     @location_cache.setter
-    def location_cache(self, loc: Optional[types.Location]):
+    def location_cache(self, loc: Optional[types.Location]) -> None:
         self._implementation.set_last_location(loc)
 
     @property  # type: ignore
@@ -766,7 +766,7 @@ class ProtocolContext(CommandPublisher):
         return cast("Labware", trash)
 
     @requires_version(2, 5)
-    def set_rail_lights(self, on: bool):
+    def set_rail_lights(self, on: bool) -> None:
         """
         Controls the robot rail lights
 

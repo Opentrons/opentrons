@@ -83,6 +83,10 @@ target/
 .idea/
 .setup_litter
 
+# Accidental pipenv files in root
+/Pipfile
+/Pipfile.lock
+
 # Testing
 api/tests/opentrons/data/configs/
 api/tests/opentrons/data/labware-def/

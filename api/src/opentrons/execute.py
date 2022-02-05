@@ -302,11 +302,11 @@ def execute(
         if emit_runlog:
             broker = context.broker
             broker.subscribe(command_types.COMMAND, emit_runlog)
-        context.home()  # type: ignore[no-untyped-call]
+        context.home()
         try:
             execute_apiv2.run_protocol(protocol, context)
         finally:
-            context.cleanup()  # type: ignore[no-untyped-call]
+            context.cleanup()
 
 
 def make_runlog_cb() -> Callable[[command_types.CommandMessage], None]:
