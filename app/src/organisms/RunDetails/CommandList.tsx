@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import dropWhile from 'lodash/dropWhile'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -62,7 +63,7 @@ export function CommandList(): JSX.Element | null {
   const [windowIndex, setWindowIndex] = React.useState<number>(0)
   const currentRunId = useCurrentRunId()
   const windowFirstCommandIndex = (WINDOW_SIZE - WINDOW_OVERLAP) * windowIndex
-  const { data: commandsData } = useAllCommandsQuery(
+  const { data: commandsData, isFetching: isFetchingRunCommands } = useAllCommandsQuery(
     currentRunId,
     {
       cursor: windowFirstCommandIndex,
@@ -75,7 +76,7 @@ export function CommandList(): JSX.Element | null {
   )
   const totalRunCommandCount = commandsData?.meta.totalLength ?? 0
   const runCommands = commandsData?.data ?? []
-  // console.log(commandsData?.links.current.meta.commandId)
+  const currentCommandId = commandsData?.links?.current?.meta?.commandId ?? 0
 
   const [
     isInitiallyJumpingToCurrent,
@@ -105,14 +106,24 @@ export function CommandList(): JSX.Element | null {
   const postSetupAnticipatedCommands: RunTimeCommand[] = allProtocolCommands.slice(
     firstNonSetupIndex
   )
-  const firstRunCommandIndexAfterInitialPlay = runCommands.findIndex(runCommandSummary => runCommandSummary.key === allProtocolCommands[0]?.key)
-  const postInitialPlayRunCommandCount = firstRunCommandIndexAfterInitialPlay > 0 ? totalRunCommandCount - firstRunCommandIndexAfterInitialPlay : 0
-  const currentCommandIndex = postInitialPlayRunCommandCount - 1
 
-  console.log('allProtocolCommands', allProtocolCommands.length)
-  console.log('runCommands', runCommands.length)
-  console.log('firstRunCommandIndexAfterInitialPlay', firstRunCommandIndexAfterInitialPlay)
-  console.log('postInitialPlayRunCommandCount', postInitialPlayRunCommandCount)
+  // console.log('allProtocolCommands', allProtocolCommands.length)
+  // console.log('runCommands', runCommands.length)
+  // console.log('firstRunCommandIndexAfterInitialPlay', firstRunCommandIndexAfterInitialPlay)
+  // console.log('postInitialPlayRunCommandCount', postInitialPlayRunCommandCount)
+
+  const runStartDateTime = runStartTime != null ? new Date(runStartTime) : null
+  const postInitialPlayRunCommands = runStartDateTime != null ? dropWhile(runCommands, runCommandSummary => (
+    new Date(runCommandSummary.createdAt) <= runStartDateTime
+  )) : []
+  const postSetupRunCommands = dropWhile(postInitialPlayRunCommands, runCommandSummary => (
+      runCommandSummary.commandType !== 'loadLabware' &&
+      runCommandSummary.commandType !== 'loadPipette' &&
+      runCommandSummary.commandType !== 'loadModule'
+  ))
+  console.log('postSetupRunCommands', postSetupRunCommands)
+  // const currentCommandIndex = postSetupRunCommands.length - 1
+  // console.log('currentCommandIndex', currentCommandIndex)
 
   let currentCommandList: CommandRuntimeInfo[] = postSetupAnticipatedCommands.map(
     postSetupAnticaptedCommand => ({
@@ -120,11 +131,11 @@ export function CommandList(): JSX.Element | null {
       runCommandSummary: null,
     })
   )
-  if (runCommands != null && runCommands.length > 0 && runStartTime != null) {
+  if (postInitialPlayRunCommands != null && postInitialPlayRunCommands.length > 0 && runStartTime != null) {
     const allCommands = allProtocolCommands.map((anticipatedCommand, index) => {
-      const isAnticipated = false //index + 1 > postInitialPlayRunCommandCount
-      // console.log('index + 1', index+1, '>' , 'postInitialPlayRunCommandCount', postInitialPlayRunCommandCount )
-      const matchedRunCommand = runCommands.find(
+      const isAnticipated = index + 1 > postInitialPlayRunCommands.length
+      // console.log('index + 1', index+1, '>' , 'postInitialPlayRunCommandCount', postInitialPlayRunCommands.length)
+      const matchedRunCommand = postInitialPlayRunCommands.find(
         runCommandSummary => runCommandSummary.key === anticipatedCommand.key
       )
       if (!isAnticipated && matchedRunCommand != null) {
@@ -145,6 +156,7 @@ export function CommandList(): JSX.Element | null {
 
     currentCommandList = allCommands.slice(firstNonSetupIndex)
   }
+  const currentCommandIndex = currentCommandList.findIndex(command => command.analysisCommand?.id === currentCommandId)
 
   const commandWindow = currentCommandList.slice(
     windowFirstCommandIndex,
@@ -313,6 +325,7 @@ export function CommandList(): JSX.Element | null {
                 <CommandItem
                   analysisCommand={command.analysisCommand}
                   runCommandSummary={command.runCommandSummary}
+                  isFetchingRunCommands={isFetchingRunCommands}
                   runStatus={runStatus}
                   stepNumber={overallIndex + 1}
                   runStartedAt={runStartTime}

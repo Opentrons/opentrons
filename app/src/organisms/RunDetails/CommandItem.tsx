@@ -48,6 +48,7 @@ export interface CommandItemProps {
   runStatus: RunStatus
   stepNumber: number
   runStartedAt: string | null
+  isFetchingRunCommands: boolean
 }
 
 const WRAPPER_STYLE_BY_STATUS: {
@@ -77,6 +78,7 @@ export function CommandItemComponent(
     runStatus,
     stepNumber,
     runStartedAt,
+    isFetchingRunCommands
   } = props
   const { t } = useTranslation('run_details')
 
@@ -104,7 +106,7 @@ export function CommandItemComponent(
     analysisCommand?.commandType === 'pause' ||
     runCommandSummary?.commandType === 'pause'
   const backgroundColor =
-    commandStatus === 'queued' && runCommandSummary != null
+    commandStatus === 'queued' && runCommandSummary != null && isFetchingRunCommands
       ? C_AQUAMARINE
       : WRAPPER_STYLE_BY_STATUS[commandStatus].backgroundColor
 
