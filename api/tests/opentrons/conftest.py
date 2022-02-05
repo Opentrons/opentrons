@@ -13,36 +13,26 @@ try:
     import aionotify  # type: ignore[import]
 except (OSError, ModuleNotFoundError):
     aionotify = None
-import asyncio
 import os
 import io
 import json
 import pathlib
 import tempfile
 from collections import namedtuple
-from functools import partial
 import zipfile
 
 import pytest
 
-from opentrons.api.routers import MainRouter
-from opentrons.api import models
 from opentrons import config
 from opentrons import hardware_control as hc
-from opentrons.hardware_control import (
-    HardwareControlAPI,
-    API,
-    ThreadManager,
-    ThreadedAsyncLock,
-)
+from opentrons.hardware_control import HardwareControlAPI, API, ThreadManager
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.protocol_api import ProtocolContext
-from opentrons.types import Mount, Location, Point
+from opentrons.types import Location, Point
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV2
 
-Session = namedtuple("Session", ["server", "socket", "token", "call"])
 
 Protocol = namedtuple("Protocol", ["text", "filename", "filelike"])
 
@@ -55,22 +45,6 @@ def asyncio_loop_exception_handler(loop):
     loop.set_exception_handler(exception_handler)
     yield
     loop.set_exception_handler(None)
-
-
-def state(topic, state):
-    def _match(item):
-        return item["topic"] == topic and item["payload"].state == state
-
-    return _match
-
-
-def log_by_axis(log, axis):
-    from functools import reduce
-
-    def reducer(e1, e2):
-        return {axis: e1[axis] + [round(e2[axis])] for axis in axis}
-
-    return reduce(reducer, log, {axis: [] for axis in axis})
 
 
 @pytest.fixture
@@ -166,11 +140,6 @@ def protocol(request):
 
 
 @pytest.fixture
-def session_manager(main_router):
-    return main_router.session_manager
-
-
-@pytest.fixture
 def virtual_smoothie_env(monkeypatch):
     # TODO (ben 20180426): move this to the .env file
     monkeypatch.setenv("ENABLE_VIRTUAL_SMOOTHIE", "true")
@@ -261,78 +230,10 @@ async def hardware(request, loop, virtual_smoothie_env):
 
 
 @pytest.fixture
-def main_router(loop, virtual_smoothie_env, hardware):
-    router = MainRouter(hardware=hardware, loop=loop, lock=ThreadedAsyncLock())
-    # TODO(mc, 2021-09-12): What is this mocking? `MainRouter` does not
-    # have a `wait_until` method
-    router.wait_until = partial(  # type: ignore[attr-defined]
-        wait_until, notifications=router.notifications, loop=loop
-    )
-    yield router
-
-
-async def wait_until(matcher, notifications, timeout=1, loop=None):
-    # TODO(mc, 2021-09-03): see TODO above about `wait_until`
-    result = []  # type: ignore[var-annotated]
-    for coro in iter(notifications.__anext__, None):  # type: ignore[var-annotated]
-        done, pending = await asyncio.wait([coro], timeout=timeout)
-
-        if pending:
-            [task.cancel() for task in pending]
-            raise TimeoutError("Notifications: {0}".format(result))
-
-        result += [done.pop().result()]
-
-        if matcher(result[-1]):
-            return result
-
-
-@pytest.fixture
 async def ctx(loop, hardware) -> ProtocolContext:
     return ProtocolContext(
         implementation=ProtocolContextImplementation(hardware=hardware), loop=loop
     )
-
-
-def data_dir() -> str:
-    return os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
-
-
-Model = namedtuple("Model", ["robot", "instrument", "container"])
-
-
-def build_v2_model(h, lw_name, loop):
-    ctx = ProtocolContext(
-        implementation=ProtocolContextImplementation(hardware=h), loop=loop
-    )
-
-    loop.run_until_complete(h.cache_instruments({Mount.RIGHT: "p300_single"}))
-    tiprack = ctx.load_labware("opentrons_96_tiprack_300ul", "2")
-    pip = ctx.load_instrument("p300_single", "right", tip_racks=[tiprack])
-    instrument = models.Instrument(pip, [], ctx)
-    plate = ctx.load_labware(lw_name or "corning_96_wellplate_360ul_flat", 1)
-    container = models.Container(plate, [], context=ctx)
-
-    return Model(
-        robot=h,
-        instrument=instrument,
-        container=container,
-    )
-
-
-@pytest.fixture(params=[build_v2_model])
-def model(request, hardware, loop):
-    # Use with pytest.mark.parametrize(’labware’, [some-labware-name])
-    # to have a different labware loaded as .container. If not passed,
-    # defaults to the version-appropriate way to do 96 flat
-    try:
-        lw_name = request.getfixturevalue("labware_name")
-    except Exception:
-        lw_name = None
-
-    builder = request.param
-
-    return builder(hardware, lw_name, loop)
 
 
 @pytest.fixture
