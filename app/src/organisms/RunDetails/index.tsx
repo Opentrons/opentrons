@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 import {
@@ -34,9 +35,12 @@ import { ConfirmCancelModal } from './ConfirmCancelModal'
 
 import styles from '../ProtocolUpload/styles.css'
 import { useIsProtocolRunLoaded } from '../ProtocolUpload/hooks'
+import { getConnectedRobotName } from '../../redux/robot/selectors'
+import type { State } from '../../redux/types'
 
 export function RunDetails(): JSX.Element | null {
   const { t } = useTranslation(['run_details', 'shared'])
+  const robotName = useSelector<State>(getConnectedRobotName)
   const { displayName } = useProtocolDetails()
   const history = useHistory()
   const runStatus = useRunStatus({
@@ -44,7 +48,7 @@ export function RunDetails(): JSX.Element | null {
       if (data == null) {
         history.push('/upload')
       }
-    },
+    }
   })
   const startTime = useRunStartTime()
   const isProtocolRunLoaded = useIsProtocolRunLoaded()
@@ -75,6 +79,7 @@ export function RunDetails(): JSX.Element | null {
     confirm: confirmCloseExit,
     cancel: cancelCloseExit,
   } = useConditionalConfirm(handleCloseProtocol, true)
+  if(robotName == null) history.push('/robots')
 
   if (!isProtocolRunLoaded || isClosingCurrentRun) {
     let text = t('loading_protocol')

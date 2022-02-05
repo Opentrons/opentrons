@@ -46,7 +46,6 @@ export interface CommandItemProps {
   analysisCommand: RunTimeCommand | null
   runCommandSummary: RunCommandSummary | null
   runStatus: RunStatus
-  hasBeenRun: boolean
   stepNumber: number
   runStartedAt: string | null
 }
@@ -76,7 +75,6 @@ export function CommandItemComponent(
     analysisCommand,
     runCommandSummary,
     runStatus,
-    hasBeenRun,
     stepNumber,
     runStartedAt,
   } = props
@@ -106,7 +104,7 @@ export function CommandItemComponent(
     analysisCommand?.commandType === 'pause' ||
     runCommandSummary?.commandType === 'pause'
   const backgroundColor =
-    commandStatus === 'queued' && hasBeenRun
+    commandStatus === 'queued' && runCommandSummary != null
       ? C_AQUAMARINE
       : WRAPPER_STYLE_BY_STATUS[commandStatus].backgroundColor
 
