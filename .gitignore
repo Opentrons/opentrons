@@ -82,7 +82,6 @@ docs/build/
 target/
 .idea/
 .setup_litter
-/Pipfile
 
 # Testing
 api/tests/opentrons/data/configs/

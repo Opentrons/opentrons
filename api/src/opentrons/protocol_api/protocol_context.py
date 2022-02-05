@@ -2,14 +2,15 @@ from __future__ import annotations
 import asyncio
 import logging
 from typing import (
+    TYPE_CHECKING,
     Callable,
     Dict,
     Iterator,
     List,
+    NamedTuple,
     Optional,
     Tuple,
     Union,
-    TYPE_CHECKING,
     cast,
 )
 from collections import OrderedDict
@@ -55,6 +56,15 @@ logger = logging.getLogger(__name__)
 ModuleTypes = Union[
     "TemperatureModuleContext", "MagneticModuleContext", "ThermocyclerContext"
 ]
+
+
+class HardwareManager(NamedTuple):
+    """Back. compat. wrapper for a removed class called `HardwareManager`.
+
+    This interface will not be present in PAPIv3.
+    """
+
+    hardware: SyncHardwareAPI
 
 
 class ProtocolContext(CommandPublisher):
@@ -182,14 +192,14 @@ class ProtocolContext(CommandPublisher):
         return self._api_version
 
     @property
-    def _hw_manager(self) -> SyncHardwareAPI:
+    def _hw_manager(self) -> HardwareManager:
         # TODO (lc 01-05-2021) remove this once we have a more
         # user facing hardware control http api.
         logger.warning(
             "This function will be deprecated in later versions."
             "Please use with caution."
         )
-        return self._implementation.get_hardware()
+        return HardwareManager(hardware=self._implementation.get_hardware())
 
     @property  # type: ignore
     @requires_version(2, 0)

@@ -300,6 +300,5 @@ class InstrumentContextImplementation(AbstractInstrument):
             primary_instrument=self,
             secondary_instrument=other_instrument,
             pair_policy=PipettePair.of_mount(self.get_mount()),
-            sync_hardware=self._protocol_interface.get_hardware(),
-            ctx=self._protocol_interface,
+            protocol_interface=self._protocol_interface,
         )
