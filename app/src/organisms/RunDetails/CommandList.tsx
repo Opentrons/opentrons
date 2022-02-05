@@ -121,7 +121,7 @@ export function CommandList(): JSX.Element | null {
       runCommandSummary.commandType !== 'loadPipette' &&
       runCommandSummary.commandType !== 'loadModule'
   ))
-  console.log('postSetupRunCommands', postSetupRunCommands)
+  // console.log('postSetupRunCommands', postSetupRunCommands)
   // const currentCommandIndex = postSetupRunCommands.length - 1
   // console.log('currentCommandIndex', currentCommandIndex)
 
@@ -133,21 +133,12 @@ export function CommandList(): JSX.Element | null {
   )
   if (postInitialPlayRunCommands != null && postInitialPlayRunCommands.length > 0 && runStartTime != null) {
     const allCommands = allProtocolCommands.map((anticipatedCommand, index) => {
-      const isAnticipated = index + 1 > postInitialPlayRunCommands.length
-      // console.log('index + 1', index+1, '>' , 'postInitialPlayRunCommandCount', postInitialPlayRunCommands.length)
       const matchedRunCommand = postInitialPlayRunCommands.find(
         runCommandSummary => runCommandSummary.key === anticipatedCommand.key
       )
-      if (!isAnticipated && matchedRunCommand != null) {
-        return {
-          analysisCommand: anticipatedCommand,
-          runCommandSummary: matchedRunCommand,
-        }
-      } else {
-        return {
-          analysisCommand: anticipatedCommand,
-          runCommandSummary: null,
-        }
+      return {
+        analysisCommand: anticipatedCommand,
+        runCommandSummary: matchedRunCommand ?? null,
       }
     })
 
@@ -325,7 +316,7 @@ export function CommandList(): JSX.Element | null {
                 <CommandItem
                   analysisCommand={command.analysisCommand}
                   runCommandSummary={command.runCommandSummary}
-                  isFetchingRunCommands={isFetchingRunCommands}
+                  isMostRecentCommand={isCurrentCommand}
                   runStatus={runStatus}
                   stepNumber={overallIndex + 1}
                   runStartedAt={runStartTime}
