@@ -103,9 +103,9 @@ class GCode:
         HEATER_SHAKER_G_CODE.GET_TEMPERATURE.name: heater_shaker.GetTempGCodeFunctionalityDef,  # noqa: E501
         HEATER_SHAKER_G_CODE.HOME.name: heater_shaker.HomeGCodeFunctionalityDef,
         HEATER_SHAKER_G_CODE.GET_VERSION.name: heater_shaker.GetVersionGCodeFunctionalityDef,  # noqa: E501
-        HEATER_SHAKER_G_CODE.OPEN_PLATE_LOCK.name: heater_shaker.OpenPlateLockGCodeFunctionalityDef,  # noqa: E501
-        HEATER_SHAKER_G_CODE.CLOSE_PLATE_LOCK.name: heater_shaker.ClosePlateLockGCodeFunctionalityDef,  # noqa: E501
-        HEATER_SHAKER_G_CODE.GET_PLATE_LOCK_STATE.name: heater_shaker.GetPlateLockStateGCodeFunctionalityDef,  # noqa: E501
+        HEATER_SHAKER_G_CODE.OPEN_LABWARE_LATCH.name: heater_shaker.OpenLabwareLatchGCodeFunctionalityDef,  # noqa: E501
+        HEATER_SHAKER_G_CODE.CLOSE_LABWARE_LATCH.name: heater_shaker.CloseLabwareLatchGCodeFunctionalityDef,  # noqa: E501
+        HEATER_SHAKER_G_CODE.GET_LABWARE_LATCH_STATE.name: heater_shaker.GetLabwareLatchStateGCodeFunctionalityDef,  # noqa: E501
     }
 
     # Smoothie G-Code Parsing Characters

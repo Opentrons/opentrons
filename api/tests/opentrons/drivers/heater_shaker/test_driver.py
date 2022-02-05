@@ -3,7 +3,7 @@ from mock import AsyncMock
 from opentrons.drivers.asyncio.communication.serial_connection import SerialConnection
 from opentrons.drivers.heater_shaker import driver
 from opentrons.drivers.command_builder import CommandBuilder
-from opentrons.drivers.types import Temperature, RPM, HeaterShakerPlateLockStatus
+from opentrons.drivers.types import Temperature, RPM, HeaterShakerLabwareLatchStatus
 
 
 @pytest.fixture
@@ -22,7 +22,7 @@ async def test_open_lock(
 ) -> None:
     """It should send an open plate lock command"""
     connection.send_command.return_value = "M242 ok\n"
-    await subject.open_plate_lock()
+    await subject.open_labware_latch()
     expected = CommandBuilder(terminator=driver.HS_COMMAND_TERMINATOR).add_gcode(
         gcode="M242"
     )
@@ -34,7 +34,7 @@ async def test_close_lock(
 ) -> None:
     """It should send a close plate lock command"""
     connection.send_command.return_value = "M243 ok\n"
-    await subject.close_plate_lock()
+    await subject.close_labware_latch()
     expected = CommandBuilder(terminator=driver.HS_COMMAND_TERMINATOR).add_gcode(
         gcode="M243"
     )
@@ -47,14 +47,14 @@ async def test_get_lock_status(
     """It should send a get plate lock status command and parse response."""
     connection.send_command.return_value = "M241 STATUS:IDLE_UNKNOWN ok\n"
 
-    response = await subject.get_plate_lock_status()
+    response = await subject.get_labware_latch_status()
 
     expected = CommandBuilder(terminator=driver.HS_COMMAND_TERMINATOR).add_gcode(
         gcode="M241"
     )
 
     connection.send_command.assert_called_once_with(command=expected, retries=0)
-    assert response == HeaterShakerPlateLockStatus.IDLE_UNKNOWN
+    assert response == HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN
 
 
 async def test_set_temperature(

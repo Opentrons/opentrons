@@ -8,7 +8,7 @@ from opentrons.drivers.types import (
     Temperature,
     PlateTemperature,
     RPM,
-    HeaterShakerPlateLockStatus,
+    HeaterShakerLabwareLatchStatus,
 )
 
 log = logging.getLogger(__name__)
@@ -95,14 +95,16 @@ def parse_rpm_response(rpm_string: str) -> RPM:
         )
 
 
-def parse_plate_lock_status_response(status_string: str) -> HeaterShakerPlateLockStatus:
+def parse_labware_latch_status_response(
+    status_string: str,
+) -> HeaterShakerLabwareLatchStatus:
     """Example format: STATUS:IDLE_OPEN"""
     status_vals = parse_key_values(status_string)
     try:
-        return HeaterShakerPlateLockStatus[status_vals["STATUS"]]
+        return HeaterShakerLabwareLatchStatus[status_vals["STATUS"]]
     except KeyError:
         raise ParseError(
-            error_message="Unexpected argument to parse_plate_lock_status_response",
+            error_message="Unexpected argument to parse_labware_latch_status_response",
             parse_source=status_string,
         )
 
