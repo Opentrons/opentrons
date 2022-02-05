@@ -34,15 +34,15 @@ class ProtocolContextSimulation(ProtocolContextImplementation):
 
         attached = {
             att_mount: instr.get("name", None)
-            for att_mount, instr in self._hw_manager.hardware.attached_instruments.items()  # noqa: E501
+            for att_mount, instr in self._sync_hardware.attached_instruments.items()  # noqa: E501
             if instr
         }
         attached[mount] = instrument_name
-        self._hw_manager.hardware.cache_instruments(attached)
+        self._sync_hardware.cache_instruments(attached)
 
         new_instr = InstrumentContextSimulation(
             protocol_interface=self,
-            pipette_dict=self._hw_manager.hardware.get_attached_instruments()[mount],
+            pipette_dict=self._sync_hardware.get_attached_instruments()[mount],
             mount=mount,
             instrument_name=instrument_name,
             api_version=self._api_version,

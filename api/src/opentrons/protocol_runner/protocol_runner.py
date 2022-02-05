@@ -1,8 +1,8 @@
 """Protocol run control and management."""
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List, Optional, cast
 
-from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control import HardwareControlAPI, ThreadManagedHardware
 from opentrons.protocol_reader import (
     ProtocolSource,
     PythonProtocolConfig,
@@ -83,7 +83,9 @@ class ProtocolRunner:
         self._python_executor = python_executor or PythonExecutor()
         self._legacy_file_reader = legacy_file_reader or LegacyFileReader()
         self._legacy_context_creator = legacy_context_creator or LegacyContextCreator(
-            hardware_api=hardware_api,
+            # TODO(mc, 2022-02-05): handle this cast more gracefully, probably in
+            # a more specific runner implementation as mentioned in TODO below
+            sync_hardware_api=cast(ThreadManagedHardware, hardware_api).sync,
             labware_offset_provider=LegacyLabwareOffsetProvider(
                 labware_view=protocol_engine.state_view.labware,
             ),

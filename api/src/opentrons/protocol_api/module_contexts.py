@@ -493,7 +493,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
         else:
             ctx_impl = self._ctx._implementation
             instr_impl = instr._implementation
-            hardware = ctx_impl.get_hardware().hardware
+            hardware = ctx_impl.get_hardware()
 
             hardware.retract(instr_impl.get_mount())
             high_point = hardware.current_position(instr_impl.get_mount())

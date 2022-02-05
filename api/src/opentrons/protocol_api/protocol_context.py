@@ -1,6 +1,5 @@
 from __future__ import annotations
 import asyncio
-import contextlib
 import logging
 from typing import (
     Callable,
@@ -17,25 +16,25 @@ from collections import OrderedDict
 
 from opentrons import types
 from opentrons.equipment_broker import EquipmentBroker
-from opentrons.hardware_control import SynchronousAdapter, ThreadManager
+from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import ModuleType
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
 from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.context.protocol_api.instrument_context import (
-    InstrumentContextImplementation,
-)
-from opentrons.protocols.context.simulator.instrument_context import (
-    InstrumentContextSimulation,
+from opentrons.protocols.api_support.util import (
+    AxisMaxSpeeds,
+    requires_version,
+    APIVersionError,
 )
 from opentrons.protocols.types import Protocol
-from .labware import Labware
 from opentrons.protocols.context.labware import AbstractLabware
 from opentrons.protocols.context.protocol import AbstractProtocol
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
+
 from .instrument_context import InstrumentContext
+from .labware import Labware
 from .module_contexts import (
     ModuleContext,
     MagneticModuleContext,
@@ -47,11 +46,6 @@ from .labware_offset_provider import (
     NullLabwareOffsetProvider,
 )
 from .load_info import LabwareLoadInfo, ModuleLoadInfo, InstrumentLoadInfo
-from opentrons.protocols.api_support.util import (
-    AxisMaxSpeeds,
-    requires_version,
-    APIVersionError,
-)
 
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
@@ -188,7 +182,7 @@ class ProtocolContext(CommandPublisher):
         return self._api_version
 
     @property
-    def _hw_manager(self):
+    def _hw_manager(self) -> SyncHardwareAPI:
         # TODO (lc 01-05-2021) remove this once we have a more
         # user facing hardware control http api.
         logger.warning(
@@ -274,92 +268,6 @@ class ProtocolContext(CommandPublisher):
         self._unsubscribe_commands = self.broker.subscribe(
             cmd_types.COMMAND, on_command
         )
-
-    @contextlib.contextmanager
-    def temp_connect(self, hardware: Union[ThreadManager, SynchronousAdapter]):
-        """Connect temporarily to the specified hardware controller.
-
-        This should be used as a context manager:
-
-        .. code-block :: python
-
-            with ctx.temp_connect(hw):
-                # do some tasks
-                ctx.home()
-            # after the with block, the context is connected to the same
-            # hardware control API it was connected to before, even if
-            # an error occurred in the code inside the with block
-
-        """
-        hardware_manager = self._implementation.get_hardware()
-        old_hw = hardware_manager.hardware
-        old_tc = None
-        tc_context = None
-        # Cache the current instrument context implementations.
-        old_instrument_impls = {
-            k: v._implementation for k, v in self._instruments.items() if v
-        }
-        try:
-            hardware_manager.set_hw(hardware)
-            for mod_ctx in self._modules:
-                if isinstance(mod_ctx, ThermocyclerContext):
-                    tc_context = mod_ctx
-                    hw_tc = next(
-                        hw_mod
-                        for hw_mod in hardware.attached_modules
-                        if hw_mod.name() == "thermocycler"
-                    )
-                    if hw_tc:
-                        old_tc = mod_ctx._module
-                        mod_ctx._module = hw_tc
-
-            # InstrumentContextSimulation is an implementation that has no
-            # interaction with hardware controller. This is our fast
-            # simulation.
-            # InstrumentContext objects using an InstrumentContextSimulation
-            # must create an InstrumentContextImplementation in order to
-            # actually connect the InstrumentContext to the hardware
-            # connection.
-            for instrument_ctx in self._instruments.values():
-                if not instrument_ctx:
-                    continue
-                impl = instrument_ctx._implementation
-                if isinstance(impl, InstrumentContextSimulation):
-                    instrument_ctx._implementation = InstrumentContextImplementation(
-                        protocol_interface=self._implementation,
-                        mount=impl.get_mount(),
-                        default_speed=impl.get_default_speed(),
-                        instrument_name=impl.get_instrument_name(),
-                        api_version=self._api_version,
-                    )
-
-            yield self
-        finally:
-            hardware_manager.set_hw(old_hw)
-            if tc_context is not None and old_tc is not None:
-                tc_context._module = old_tc
-            # reset the instrument context implementations.
-            for mount, instrument_impl in old_instrument_impls.items():
-                instrument_context = self._instruments[mount]
-                if instrument_context:
-                    instrument_context._implementation = instrument_impl
-
-    @requires_version(2, 0)
-    def connect(self, hardware: Union[ThreadManager, SynchronousAdapter]):
-        """Connect to a running hardware API.
-
-        This can be either a simulator or a full hardware controller.
-
-        Note that there is no true disconnected state for a
-        :py:class:`.ProtocolContext`; :py:meth:`disconnect` simply creates
-        a new simulator and replaces the current hardware with it.
-        """
-        self._implementation.connect(hardware=hardware)
-
-    @requires_version(2, 0)
-    def disconnect(self):
-        """Disconnect from currently-connected hardware and simulate instead"""
-        self._implementation.disconnect()
 
     @requires_version(2, 0)
     def is_simulating(self) -> bool:

@@ -232,7 +232,8 @@ async def hardware(request, loop, virtual_smoothie_env):
 @pytest.fixture
 async def ctx(loop, hardware) -> ProtocolContext:
     return ProtocolContext(
-        implementation=ProtocolContextImplementation(hardware=hardware), loop=loop
+        implementation=ProtocolContextImplementation(sync_hardware=hardware.sync),
+        loop=loop,
     )
 
 

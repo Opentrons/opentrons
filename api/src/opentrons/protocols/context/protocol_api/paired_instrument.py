@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Optional, cast
+from typing import Optional, cast
 
 from opentrons import types
+from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules import Thermocycler
-from opentrons.hardware_control.types import CriticalPoint
+from opentrons.hardware_control.types import CriticalPoint, PipettePair
 from opentrons.protocol_api.labware import Labware, Well
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.context.instrument import AbstractInstrument
@@ -15,9 +16,6 @@ from opentrons.protocols.geometry import planning
 from opentrons.protocols.api_support.util import build_edges
 from opentrons.protocols.geometry.module_geometry import ThermocyclerGeometry
 
-if TYPE_CHECKING:
-    from opentrons.hardware_control import types as hc_types
-    from opentrons.protocols.api_support.util import HardwareManager
 
 logger = logging.getLogger(__name__)
 
@@ -27,15 +25,15 @@ class PairedInstrument(AbstractPairedInstrument):
         self,
         primary_instrument: AbstractInstrument,
         secondary_instrument: AbstractInstrument,
-        pair_policy: hc_types.PipettePair,
+        pair_policy: PipettePair,
         ctx: AbstractProtocol,
-        hardware_manager: HardwareManager,
+        sync_hardware: SyncHardwareAPI,
     ):
         self.p_instrument = primary_instrument
         self.s_instrument = secondary_instrument
         self._pair_policy = pair_policy
         self._ctx = ctx
-        self._hw_manager = hardware_manager
+        self._sync_hardware = sync_hardware
 
     def pick_up_tip(
         self,
@@ -48,23 +46,21 @@ class PairedInstrument(AbstractPairedInstrument):
     ):
         self.move_to(target.top())
 
-        self._hw_manager.hardware.set_current_tiprack_diameter(
+        self._sync_hardware.set_current_tiprack_diameter(
             self._pair_policy, target.diameter
         )
-        self._hw_manager.hardware.pick_up_tip(
+        self._sync_hardware.pick_up_tip(
             self._pair_policy, tip_length, presses, increment
         )
 
-        self._hw_manager.hardware.set_working_volume(
-            self._pair_policy, target.max_volume
-        )
+        self._sync_hardware.set_working_volume(self._pair_policy, target.max_volume)
 
         tiprack.use_tips(target, self.p_instrument.get_channels())
         tiprack.use_tips(secondary_target, self.s_instrument.get_channels())
 
     def drop_tip(self, target: types.Location, home_after: bool):
         self.move_to(target)
-        self._hw_manager.hardware.drop_tip(self._pair_policy, home_after=home_after)
+        self._sync_hardware.drop_tip(self._pair_policy, home_after=home_after)
         return self
 
     def move_to(
@@ -86,7 +82,7 @@ class PairedInstrument(AbstractPairedInstrument):
         from_center = "centerMultichannelOnWells" in from_lw.quirks_from_any_parent()
         cp_override = CriticalPoint.XY_CENTER if from_center else None
         from_loc = types.Location(
-            self._hw_manager.hardware.gantry_position(
+            self._sync_hardware.gantry_position(
                 self._pair_policy.primary, critical_point=cp_override
             ),
             from_lw,
@@ -100,10 +96,10 @@ class PairedInstrument(AbstractPairedInstrument):
                     lid_position=mod.module.lid_status,
                 )
 
-        primary_height = self._hw_manager.hardware.get_instrument_max_height(
+        primary_height = self._sync_hardware.get_instrument_max_height(
             self._pair_policy.primary
         )
-        secondary_height = self._hw_manager.hardware.get_instrument_max_height(
+        secondary_height = self._sync_hardware.get_instrument_max_height(
             self._pair_policy.secondary
         )
         moves = planning.plan_moves(
@@ -117,7 +113,7 @@ class PairedInstrument(AbstractPairedInstrument):
         logger.debug("move_to: {}->{} via:\n\t{}".format(from_loc, location, moves))
         try:
             for move in moves:
-                self._hw_manager.hardware.move_to(
+                self._sync_hardware.move_to(
                     self._pair_policy,
                     move[0],
                     critical_point=move[1],
@@ -156,22 +152,22 @@ class PairedInstrument(AbstractPairedInstrument):
                         "cause over aspiration if the previous command is a "
                         "blow_out."
                     )
-                self._hw_manager.hardware.prepare_for_aspirate(self._pair_policy)
+                self._sync_hardware.prepare_for_aspirate(self._pair_policy)
             self.move_to(location)
         elif location != self._ctx.get_last_location():
             self.move_to(location)
 
-        self._hw_manager.hardware.aspirate(self._pair_policy, volume, rate)
+        self._sync_hardware.aspirate(self._pair_policy, volume, rate)
 
     def dispense(self, volume: float, location: types.Location, rate: float) -> None:
         if location != self._ctx.get_last_location():
             self.move_to(location)
-        self._hw_manager.hardware.dispense(self._pair_policy, volume, rate)
+        self._sync_hardware.dispense(self._pair_policy, volume, rate)
 
     def blow_out(self, location: types.Location):
         if location != self._ctx.get_last_location():
             self.move_to(location)
-        self._hw_manager.hardware.blow_out(self._pair_policy)
+        self._sync_hardware.blow_out(self._pair_policy)
 
     def touch_tip(self, well: Well, radius: float, v_offset: float, speed: float):
         edges = build_edges(
@@ -182,4 +178,4 @@ class PairedInstrument(AbstractPairedInstrument):
             radius,
         )
         for edge in edges:
-            self._hw_manager.hardware.move_to(self._pair_policy, edge, speed)
+            self._sync_hardware.move_to(self._pair_policy, edge, speed)

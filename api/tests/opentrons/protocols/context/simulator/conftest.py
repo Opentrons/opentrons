@@ -1,5 +1,5 @@
 import pytest
-from opentrons import ThreadManager, types
+from opentrons import ThreadManagedHardware, types
 from opentrons.protocols.context.instrument import AbstractInstrument
 from opentrons.protocols.context.labware import AbstractLabware
 from opentrons.protocols.context.paired_instrument import AbstractPairedInstrument
@@ -17,15 +17,17 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
 @pytest.fixture
-def protocol_context(hardware: ThreadManager) -> ProtocolContextImplementation:
+def protocol_context(hardware: ThreadManagedHardware) -> ProtocolContextImplementation:
     """Protocol context implementation fixture."""
-    return ProtocolContextImplementation(hardware=hardware)
+    return ProtocolContextImplementation(sync_hardware=hardware.sync)
 
 
 @pytest.fixture
-def simulating_protocol_context(hardware: ThreadManager) -> ProtocolContextSimulation:
+def simulating_protocol_context(
+    hardware: ThreadManagedHardware,
+) -> ProtocolContextSimulation:
     """Protocol context simulation fixture."""
-    return ProtocolContextSimulation(hardware=hardware)
+    return ProtocolContextSimulation(sync_hardware=hardware.sync)
 
 
 @pytest.fixture

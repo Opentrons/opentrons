@@ -42,9 +42,7 @@ class InstrumentContextSimulation(AbstractInstrument):
         self._plunger_speeds = PlungerSpeeds(self)
         # Cache the maximum instrument height
         self._instrument_max_height = (
-            protocol_interface.get_hardware().hardware.get_instrument_max_height(
-                self._mount
-            )
+            protocol_interface.get_hardware().get_instrument_max_height(self._mount)
         )
 
     def get_default_speed(self) -> float:
