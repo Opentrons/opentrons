@@ -55,6 +55,7 @@
     "node-fetch": "2.6.0",
     "node-stream-zip": "1.8.2",
     "pump": "3.0.0",
+    "python-shell": "^3.0.1",
     "semver": "5.5.0",
     "tempy": "0.3.0",
     "usb-detection": "4.10.0",
