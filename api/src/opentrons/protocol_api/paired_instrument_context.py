@@ -98,11 +98,11 @@ class PairedInstrumentContext(CommandPublisher):
         return self._starting_tip
 
     @starting_tip.setter
-    def starting_tip(self, location: Union[Well, None]):
+    def starting_tip(self, location: Union[Well, None]) -> None:
         self._starting_tip = location
 
     @requires_version(2, 7)
-    def reset_tipracks(self):
+    def reset_tipracks(self) -> None:
         """Reload all tips in each tip rack and reset starting tip"""
         for tiprack in self.tip_racks:
             tiprack.reset()
@@ -140,7 +140,7 @@ class PairedInstrumentContext(CommandPublisher):
     @requires_version(2, 7)
     def pick_up_tip(
         self,
-        location: Union[types.Location, Well] = None,
+        location: Optional[Union[types.Location, Well]] = None,
         presses: Optional[int] = None,
         increment: Optional[float] = None,
     ) -> PairedInstrumentContext:
@@ -268,7 +268,9 @@ class PairedInstrumentContext(CommandPublisher):
 
     @requires_version(2, 7)
     def drop_tip(
-        self, location: Union[types.Location, Well] = None, home_after: bool = True
+        self,
+        location: Optional[Union[types.Location, Well]] = None,
+        home_after: bool = True,
     ) -> PairedInstrumentContext:
         """
         Drop the current tip.
@@ -641,7 +643,7 @@ class PairedInstrumentContext(CommandPublisher):
 
     @requires_version(2, 7)
     def blow_out(
-        self, location: Union[types.Location, Well] = None
+        self, location: Optional[Union[types.Location, Well]] = None
     ) -> PairedInstrumentContext:
         """
         Blow liquid out of the tip.
@@ -687,7 +689,7 @@ class PairedInstrumentContext(CommandPublisher):
                 "knows where it is."
             )
 
-        locations: Optional[List] = None
+        locations: Optional[List[Union[types.Location, Well]]] = None
         if loc and isinstance(loc.labware, Well):
             locations = self._get_locations(loc)
 
@@ -706,7 +708,7 @@ class PairedInstrumentContext(CommandPublisher):
         self,
         repetitions: int = 1,
         volume: Optional[float] = None,
-        location: Union[types.Location, Well] = None,
+        location: Optional[Union[types.Location, Well]] = None,
         rate: float = 1.0,
     ) -> PairedInstrumentContext:
         """
@@ -757,7 +759,7 @@ class PairedInstrumentContext(CommandPublisher):
         )
 
         instruments = list(self._instruments.values())
-        locations: Optional[List] = None
+        locations: Optional[List[Union[types.Location, Well]]] = None
         if location:
             locations = self._get_locations(location)
 
@@ -857,7 +859,7 @@ class PairedInstrumentContext(CommandPublisher):
         checked_speed = clamp_value(speed, 80, 1, "touch_tip:")
 
         instruments = list(self._instruments.values())
-        locations: Optional[List] = None
+        locations: Optional[List[Union[types.Location, Well]]] = None
         if location:
             locations = [
                 location,
@@ -959,7 +961,10 @@ class PairedInstrumentContext(CommandPublisher):
                 starting_point=start,
             )
 
-    def _get_locations(self, location: Union[types.Location, Well]) -> List:
+    def _get_locations(
+        self,
+        location: Union[types.Location, Well],
+    ) -> List[Union[types.Location, Well]]:
         if isinstance(location, Well):
             labware = location.parent
             well = location
