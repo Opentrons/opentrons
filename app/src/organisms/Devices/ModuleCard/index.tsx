@@ -86,7 +86,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       borderRadius={SPACING_1}
       marginBottom={SPACING_2}
       marginLeft={SPACING_2}
-      width={'24rem'}
+      width={'20rem'}
     >
       <Box
         padding={`${SPACING_3} ${SPACING_2} ${SPACING_3} ${SPACING_2}`}

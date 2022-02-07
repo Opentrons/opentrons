@@ -33,10 +33,48 @@ describe('ThermocyclerModuleData', () => {
     jest.resetAllMocks()
   })
 
-  it('renders a status', () => {
-    const { getAllByText } = render(props)
+  it('renders an idle status', () => {
+    const { getByText } = render(props)
 
-    getAllByText('Mock Thermocycler StatusLabel')
+    expect(getByText('Mock Thermocycler StatusLabel')).toHaveStyle(
+      'backgroundColor: C_SILVER_GRAY'
+    )
+  })
+
+  it('renders a holding at target status', () => {
+    props = {
+      ...props,
+      status: 'holding at target',
+    }
+    const { getByText } = render(props)
+
+    expect(getByText('Mock Thermocycler StatusLabel')).toHaveStyle(
+      'backgroundColor: C_SKY_BLUE'
+    )
+  })
+
+  it('renders a cooling status', () => {
+    props = {
+      ...props,
+      status: 'cooling',
+    }
+    const { getByText } = render(props)
+
+    expect(getByText('Mock Thermocycler StatusLabel')).toHaveStyle(
+      'backgroundColor: C_SKY_BLUE'
+    )
+  })
+
+  it('renders a heating status', () => {
+    props = {
+      ...props,
+      status: 'heating',
+    }
+    const { getByText } = render(props)
+
+    expect(getByText('Mock Thermocycler StatusLabel')).toHaveStyle(
+      'backgroundColor: C_SKY_BLUE'
+    )
   })
 
   it('renders thermocycler lid temperature data', () => {

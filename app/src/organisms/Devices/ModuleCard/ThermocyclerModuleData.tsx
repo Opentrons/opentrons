@@ -19,10 +19,11 @@ import {
   C_BLUE,
   C_BLUE_PRESSED,
 } from '@opentrons/components'
-import { ThermocyclerStatus } from '../../../redux/modules/api-types'
+
+import type { ThermocyclerStatus } from '../../../redux/modules/api-types'
 
 interface ThermocyclerModuleProps {
-  status: ThermocyclerStatus | null
+  status: ThermocyclerStatus
   currentTemp: number | null
   targetTemp: number | null
   lidTemp: number | null

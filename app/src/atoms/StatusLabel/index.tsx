@@ -11,7 +11,7 @@ import {
   FONT_SIZE_CAPTION,
 } from '@opentrons/components'
 interface StatusLabelProps {
-  status: string | null
+  status: string
   backgroundColor: string
   iconColor: string
   textColor?: string
