@@ -8,6 +8,7 @@ from opentrons.protocol_engine import (
     EngineStatus,
     StateView,
     CommandSlice,
+    CurrentCommand,
     commands as pe_commands,
     errors as pe_errors,
 )
@@ -129,7 +130,9 @@ async def test_get_run_commands(decoy: Decoy, engine_store: EngineStore) -> None
 
     engine_state = decoy.mock(cls=StateView)
     decoy.when(engine_store.get_state("run-id")).then_return(engine_state)
-    decoy.when(engine_state.commands.get_current()).then_return("current-command-id")
+    decoy.when(engine_state.commands.get_current()).then_return(
+        CurrentCommand(command_id="current-command-id", index=101)
+    )
     decoy.when(engine_state.commands.get_slice(cursor=None, length=42)).then_return(
         CommandSlice(commands=[command], cursor=1, length=2, total_length=3)
     )
@@ -158,7 +161,11 @@ async def test_get_run_commands(decoy: Decoy, engine_store: EngineStore) -> None
     assert result.content.links == CommandCollectionLinks(
         current=CommandLink(
             href="/runs/run-id/commands/current-command-id",
-            meta=CommandLinkMeta(runId="run-id", commandId="current-command-id"),
+            meta=CommandLinkMeta(
+                runId="run-id",
+                commandId="current-command-id",
+                index=101,
+            ),
         )
     )
     assert result.status_code == 200
