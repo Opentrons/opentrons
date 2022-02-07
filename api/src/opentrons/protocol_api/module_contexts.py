@@ -89,7 +89,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
 
         provided_offset = self._ctx._labware_offset_provider.find(
             labware_definition_uri=labware.uri,
-            module_model=self.requested_as,
+            requested_module_model=self.requested_as,
             deck_slot=deck_slot,
         )
 

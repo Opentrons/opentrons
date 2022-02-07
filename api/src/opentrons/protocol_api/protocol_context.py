@@ -401,7 +401,7 @@ class ProtocolContext(CommandPublisher):
 
         provided_labware_offset = self._labware_offset_provider.find(
             labware_definition_uri=result.uri,
-            module_model=None,
+            requested_module_model=None,
             deck_slot=types.DeckSlotName.from_primitive(location),
         )
 
@@ -468,7 +468,7 @@ class ProtocolContext(CommandPublisher):
 
         provided_labware_offset = self._labware_offset_provider.find(
             labware_definition_uri=result.uri,
-            module_model=None,
+            requested_module_model=None,
             deck_slot=types.DeckSlotName.from_primitive(location),
         )
 
