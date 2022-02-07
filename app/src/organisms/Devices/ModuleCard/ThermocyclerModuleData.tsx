@@ -22,8 +22,7 @@ import {
 import { ThermocyclerStatus } from '../../../redux/modules/api-types'
 
 interface ThermocyclerModuleProps {
-  lidStatus: string | null
-  blockStatus: ThermocyclerStatus | null
+  status: ThermocyclerStatus | null
   currentTemp: number | null
   targetTemp: number | null
   lidTemp: number | null
@@ -33,14 +32,7 @@ interface ThermocyclerModuleProps {
 export const ThermocyclerModuleData = (
   props: ThermocyclerModuleProps
 ): JSX.Element | null => {
-  const {
-    lidStatus,
-    blockStatus,
-    currentTemp,
-    targetTemp,
-    lidTemp,
-    lidTarget,
-  } = props
+  const { status, currentTemp, targetTemp, lidTemp, lidTarget } = props
   const { t } = useTranslation('device_details')
 
   const getStatusLabelProps = (
@@ -91,11 +83,6 @@ export const ThermocyclerModuleData = (
         >
           {t('tc_lid')}
         </Text>
-        <StatusLabel
-          status={lidStatus}
-          backgroundColor={'#e3e3e3'}
-          iconColor={C_DARK_GRAY}
-        />
         <Text title="lid_target_temp" fontSize={FONT_SIZE_CAPTION}>
           {t(lidTarget === null ? 'na_temp' : 'target_temp', {
             temp: lidTarget,
@@ -115,10 +102,7 @@ export const ThermocyclerModuleData = (
         >
           {t('tc_block')}
         </Text>
-        <StatusLabel
-          status={blockStatus}
-          {...getStatusLabelProps(blockStatus)}
-        />
+        <StatusLabel status={status} {...getStatusLabelProps(status)} />
         <Text title="tc_target_temp" fontSize={FONT_SIZE_CAPTION}>
           {t(targetTemp === null ? 'na_temp' : 'target_temp', {
             temp: targetTemp,

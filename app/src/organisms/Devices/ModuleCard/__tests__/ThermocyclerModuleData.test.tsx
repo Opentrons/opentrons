@@ -21,8 +21,7 @@ describe('ThermocyclerModuleData', () => {
   let props: React.ComponentProps<typeof ThermocyclerModuleData>
   beforeEach(() => {
     props = {
-      lidStatus: mockThermocycler.data.lid,
-      blockStatus: mockThermocycler.status,
+      status: mockThermocycler.status,
       currentTemp: mockThermocycler.data.currentTemp,
       targetTemp: mockThermocycler.data.targetTemp,
       lidTemp: mockThermocycler.data.lidTemp,

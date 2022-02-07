@@ -61,8 +61,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       image = thermoModule
       moduleData = (
         <ThermocyclerModuleData
-          lidStatus={module.data.lid}
-          blockStatus={module.status}
+          status={module.status}
           currentTemp={module.data.currentTemp}
           targetTemp={module.data.targetTemp}
           lidTarget={module.data.lidTarget}
