@@ -79,4 +79,23 @@ describe('StatusLabel', () => {
     const { getByText } = render(props)
     expect(getByText('heating')).toHaveStyle('backgroundColor: C_SKY_BLUE')
   })
+
+  it('renders a status label with a pulsing icon', () => {
+    props = {
+      status: 'Engaged',
+      backgroundColor: C_SKY_BLUE,
+      iconColor: C_BLUE,
+      pulse: true,
+    }
+    const { getByTestId } = render(props)
+    const pulsingCircle = getByTestId('pulsing_status_circle')
+    expect(pulsingCircle).toHaveAttribute('attributeName', 'fill')
+    expect(pulsingCircle).toHaveAttribute(
+      'values',
+      `${props.iconColor}; transparent`
+    )
+    expect(pulsingCircle).toHaveAttribute('dur', '1s')
+    expect(pulsingCircle).toHaveAttribute('calcMode', 'discrete')
+    expect(pulsingCircle).toHaveAttribute('repeatCount', 'indefinite')
+  })
 })
