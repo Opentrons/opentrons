@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { TFunctionResult } from 'i18next'
 import {
   Flex,
   SPACING_1,
@@ -21,12 +20,22 @@ import {
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
 import {
+  GEN1,
+  GEN2,
   getModuleDisplayName,
+  MAGNETIC_MODULE_TYPE_LABWARE_BOTTOM_HEIGHT,
   MAGNETIC_MODULE_V1,
+  MAGNETIC_MODULE_V1_DISNEGAGED_HEIGHT,
+  MAGNETIC_MODULE_V1_MAX_ENGAGE_HEIGHT,
+  MAGNETIC_MODULE_V2,
+  MAGNETIC_MODULE_V2_DISNEGAGED_HEIGHT,
+  MAGNETIC_MODULE_V2_MAX_ENGAGE_HEIGHT,
+  MM,
 } from '@opentrons/shared-data'
 import { useSendModuleCommand } from '../../../redux/modules'
 import { Slideout } from '../../../atoms/Slideout'
 
+import type { TFunctionResult } from 'i18next'
 import type { AttachedModule } from '../../../redux/modules/types'
 import type { ModuleModel } from '@opentrons/shared-data'
 
@@ -38,22 +47,22 @@ interface ModelContents {
   disengagedHeight: number
 }
 
-const infoByModel = (model: ModuleModel): ModelContents => {
+const getInfoByModel = (model: ModuleModel): ModelContents => {
   if (model === MAGNETIC_MODULE_V1) {
     return {
-      version: 'GEN 1',
+      version: GEN1,
       units: null,
-      maxHeight: 40,
-      labwareBottomHeight: 0,
-      disengagedHeight: -5,
+      maxHeight: MAGNETIC_MODULE_V1_MAX_ENGAGE_HEIGHT,
+      labwareBottomHeight: MAGNETIC_MODULE_TYPE_LABWARE_BOTTOM_HEIGHT,
+      disengagedHeight: MAGNETIC_MODULE_V1_DISNEGAGED_HEIGHT,
     }
   } else {
     return {
-      version: 'GEN 2',
-      units: 'mm',
-      maxHeight: 16,
-      labwareBottomHeight: 0,
-      disengagedHeight: -4,
+      version: GEN2,
+      units: MM,
+      maxHeight: MAGNETIC_MODULE_V2_MAX_ENGAGE_HEIGHT,
+      labwareBottomHeight: MAGNETIC_MODULE_TYPE_LABWARE_BOTTOM_HEIGHT,
+      disengagedHeight: MAGNETIC_MODULE_V2_DISNEGAGED_HEIGHT,
     }
   }
 }
@@ -79,7 +88,7 @@ export const MagneticModuleSlideout = (
     setEngageHeightValue(null)
   }
   const moduleName = getModuleDisplayName(model.model)
-  const info = infoByModel(model.model)
+  const info = getInfoByModel(model.model)
 
   let max: number | TFunctionResult = 0
   let labwareBottom: number | TFunctionResult = 0
@@ -112,8 +121,8 @@ export const MagneticModuleSlideout = (
           data-testid={`Mag_Slideout_body_text_${model.model}`}
         >
           {t('set_engage_height_slideout_body', {
-            lower: model.model === 'magneticModuleV1' ? 5 : 4,
-            higher: model.model === 'magneticModuleV1' ? 40 : 16,
+            lower: model.model === MAGNETIC_MODULE_V1 ? 5 : 4,
+            higher: model.model === MAGNETIC_MODULE_V2 ? 40 : 16,
           })}
         </Text>
         <Text
@@ -164,6 +173,7 @@ export const MagneticModuleSlideout = (
           <Text
             fontWeight={FONT_WEIGHT_REGULAR}
             fontSize={'10px'}
+            //  TODO immediately: change to typography standard color when its made
             color="#8A8C8E"
           >
             {t('engage_height_slideout')}

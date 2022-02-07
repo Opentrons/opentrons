@@ -66,13 +66,12 @@ export const Slideout = (props: Props): JSX.Element | null => {
 
   if (hideSlideOut) return null
 
-  console.log(hideSlideOut)
-
   return (
     <>
       <Portal>
         <Box
           css={props.isExpanded ? EXPANDED_STYLE : COLLAPSED_STYLE}
+          //  TODO Immediately: add this boxShadow to the new typography standards once it is made!
           boxShadow="0px 3px 6px rgba(0, 0, 0, 0.23)"
           borderRadius={SPACING_1}
         >
@@ -82,6 +81,7 @@ export const Slideout = (props: Props): JSX.Element | null => {
               justifyContent={JUSTIFY_SPACE_BETWEEN}
             >
               <Text
+                //  TODO immediately: add this fontSize to typography standard
                 fontSize="0.937rem"
                 fontWeight={FONT_WEIGHT_SEMIBOLD}
                 data-testid={`Slideout_title_${props.title}`}
