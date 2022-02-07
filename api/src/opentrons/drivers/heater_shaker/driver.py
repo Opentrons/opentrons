@@ -78,14 +78,20 @@ class HeaterShakerDriver(AbstractHeaterShakerDriver):
         return await self._connection.is_open()
 
     async def open_labware_latch(self) -> None:
-        """Send open-plate-lock command"""
+        """Send open-plate-lock command.
+
+        Note: Labware latch is referred to as 'plate lock' in firmware.
+        """
         c = CommandBuilder(terminator=HS_COMMAND_TERMINATOR).add_gcode(
             gcode=GCODE.OPEN_LABWARE_LATCH
         )
         await self._connection.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES)
 
     async def close_labware_latch(self) -> None:
-        """Send close-plate-lock command"""
+        """Send close-plate-lock command.
+
+        Note: Labware latch is referred to as 'plate lock' in firmware.
+        """
         c = CommandBuilder(terminator=HS_COMMAND_TERMINATOR).add_gcode(
             gcode=GCODE.CLOSE_LABWARE_LATCH
         )
@@ -137,7 +143,10 @@ class HeaterShakerDriver(AbstractHeaterShakerDriver):
         return utils.parse_rpm_response(rpm_string=response)
 
     async def get_labware_latch_status(self) -> HeaterShakerLabwareLatchStatus:
-        """Send get-labware-latch-status command"""
+        """Send get-labware-latch-status command.
+
+        Note: Labware latch is referred to as 'plate lock' in firmware.
+        """
         c = CommandBuilder(terminator=HS_COMMAND_TERMINATOR).add_gcode(
             gcode=GCODE.GET_LABWARE_LATCH_STATE
         )
