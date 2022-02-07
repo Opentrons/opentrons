@@ -42,6 +42,7 @@ export function PipettesAndModules({
         fontWeight={FONT_WEIGHT_SEMIBOLD}
         fontSize={FONT_SIZE_BODY_2}
         marginBottom={SPACING_3}
+        data-testid="PipettesAndModules_title"
       >
         {t('pipettes_and_modules')}
       </Text>
@@ -63,7 +64,10 @@ export function PipettesAndModules({
             })}
           </Flex>
         ) : (
-          <Text fontSize={FONT_SIZE_BODY_1}>
+          <Text
+            fontSize={FONT_SIZE_BODY_1}
+            data-testid="PipettesAndModules_offline"
+          >
             {t('offline_pipettes_and_modules')}
           </Text>
         )}

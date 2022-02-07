@@ -75,12 +75,16 @@ export function RobotOverview({
                 onClick={toggleLights}
                 size={SIZE_2}
                 marginRight={SPACING_2}
+                data-testid={`RobotOverview_${robot.name}_lights_toggle`}
               />
               <Text as="span">{t('lights')}</Text>
             </Flex>
           </Flex>
           {/* this link will change once protocol selection designs are finalized and functionality built out */}
-          <Link to={`/devices/${robot.name}/protocol-runs/run`}>
+          <Link
+            to={`/devices/${robot.name}/protocol-runs/run`}
+            data-testid={`RobotOverview_${robot.name}_protocol_run_link`}
+          >
             <NewPrimaryBtn
               textTransform={TEXT_TRANSFORM_NONE}
               disabled={isProtocolRunning || !isRobotViewable}
