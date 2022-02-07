@@ -8,7 +8,7 @@ from typing import Dict, Optional, Union
 
 from opentrons import types
 from opentrons.hardware_control import SynchronousAdapter, ThreadManager
-from opentrons.hardware_control.modules.types import ModuleType
+from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry
@@ -91,7 +91,7 @@ class AbstractProtocol(ABC):
     @abstractmethod
     def load_module(
         self,
-        module_name: str,
+        model: ModuleModel,
         location: Optional[types.DeckLocation],
         configuration: Optional[str],
     ) -> Optional[LoadModuleResult]:

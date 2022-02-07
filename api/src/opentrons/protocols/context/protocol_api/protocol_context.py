@@ -1,15 +1,21 @@
 import logging
-from typing import Dict, Optional, Set, List, Union, TYPE_CHECKING
+from typing import Dict, Optional, Set, List, Union
 from collections import OrderedDict
 
 from opentrons import types
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.hardware_control.types import DoorState, PauseType
+
 from opentrons.hardware_control import ThreadManager, SynchronousAdapter
+from opentrons.hardware_control.modules import AbstractModule, ModuleModel
+from opentrons.hardware_control.types import DoorState, PauseType
+
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
-from opentrons.protocols.geometry.deck import Deck
-from opentrons.protocols.geometry import module_geometry
-from opentrons.protocols.geometry.deck_item import DeckItem
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import (
+    AxisMaxSpeeds,
+    HardwareToManage,
+    HardwareManager,
+)
+
 from opentrons.protocols.context.protocol_api.instrument_context import (
     InstrumentContextImplementation,
 )
@@ -20,17 +26,16 @@ from opentrons.protocols.context.protocol import (
     InstrumentDict,
     LoadModuleResult,
 )
-from opentrons.protocols.api_support.util import (
-    AxisMaxSpeeds,
-    HardwareToManage,
-    HardwareManager,
-)
-from opentrons.protocols.labware import load_from_definition, get_labware_definition
-from opentrons.protocols.types import Protocol
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
-if TYPE_CHECKING:
-    from opentrons.hardware_control.modules import AbstractModule
+from opentrons.protocols.geometry import module_geometry
+from opentrons.protocols.geometry.deck import Deck
+from opentrons.protocols.geometry.deck_item import DeckItem
+
+from opentrons.protocols.labware import load_from_definition, get_labware_definition
+
+from opentrons.protocols.types import Protocol
+
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
 logger = logging.getLogger(__name__)
@@ -171,34 +176,25 @@ class ProtocolContextImplementation(AbstractProtocol):
 
     def load_module(
         self,
-        module_name: str,
+        model: ModuleModel,
         location: Optional[types.DeckLocation],
         configuration: Optional[str],
     ) -> Optional[LoadModuleResult]:
         """Load a module."""
-        resolved_model = module_geometry.resolve_module_model(module_name)
-        resolved_type = module_geometry.resolve_module_type(resolved_model)
+        resolved_type = module_geometry.resolve_module_type(model)
         resolved_location = self._deck_layout.resolve_module_location(
             resolved_type, location
         )
 
-        # Load the geometry
-        geometry = module_geometry.load_module(
-            model=resolved_model,
-            parent=self._deck_layout.position_for(resolved_location),
-            api_level=self._api_version,
-            configuration=configuration,
-        )
-
         # Try to find in the hardware instance
         available_modules, simulating_module = self._hw_manager.hardware.find_modules(
-            resolved_model, resolved_type
+            model, resolved_type
         )
 
         hc_mod_instance = None
         for mod in available_modules:
             compatible = module_geometry.models_compatible(
-                module_geometry.module_model_from_string(mod.model()), resolved_model
+                module_geometry.module_model_from_string(mod.model()), model
             )
             if compatible and mod not in self._loaded_modules:
                 self._loaded_modules.add(mod)
@@ -210,6 +206,14 @@ class ProtocolContextImplementation(AbstractProtocol):
 
         if not hc_mod_instance:
             return None
+
+        # Load geometry to match the hardware module that we found connected.
+        geometry = module_geometry.load_module(
+            model=module_geometry.module_model_from_string(hc_mod_instance.model()),
+            parent=self._deck_layout.position_for(resolved_location),
+            api_level=self._api_version,
+            configuration=configuration,
+        )
 
         result = LoadModuleResult(
             type=resolved_type, geometry=geometry, module=hc_mod_instance

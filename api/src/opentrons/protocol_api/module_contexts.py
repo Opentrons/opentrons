@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Generic, List, Optional, TYPE_CHECKING, TypeVar, Union, cast
+from typing import Generic, List, Optional, TYPE_CHECKING, TypeVar, cast
 
 from opentrons import types
 from opentrons.hardware_control import modules
+from opentrons.hardware_control.modules import ModuleModel
 from opentrons.hardware_control.types import Axis
 from opentrons.commands import module_commands as cmds
 from opentrons.commands.publisher import CommandPublisher, publish
@@ -22,11 +23,6 @@ from opentrons.protocols.api_support.util import requires_version
 if TYPE_CHECKING:
     from .protocol_context import ProtocolContext
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
-
-
-ModuleTypes = Union[
-    "TemperatureModuleContext", "MagneticModuleContext", "ThermocyclerContext"
-]
 
 ENGAGE_HEIGHT_UNIT_CNV = 2
 STANDARD_MAGDECK_LABWARE = [
@@ -50,6 +46,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
         self,
         ctx: ProtocolContext,
         geometry: GeometryType,
+        requested_as: ModuleModel,
         at_version: APIVersion,
     ) -> None:
         """Build the ModuleContext.
@@ -59,10 +56,12 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
 
         :param ctx: The parent context for the module
         :param geometry: The :py:class:`.ModuleGeometry` for the module
+        :param requested_as: See :py:obj:`requested_as`.
         """
         super().__init__(ctx.broker)
         self._geometry = geometry
         self._ctx = ctx
+        self._requested_as = requested_as
         self._api_version = at_version
 
     @property  # type: ignore
@@ -90,7 +89,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
 
         provided_offset = self._ctx._labware_offset_provider.find(
             labware_definition_uri=labware.uri,
-            module_model=self.geometry.model.value,
+            requested_module_model=self.requested_as,
             deck_slot=deck_slot,
         )
 
@@ -200,6 +199,19 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
         """
         return self._geometry
 
+    @property
+    def requested_as(self) -> ModuleModel:
+        """How the protocol requested this module.
+
+        For example, a physical ``temperatureModuleV2`` might have been requested
+        either as ``temperatureModuleV2`` or ``temperatureModuleV1``.
+
+        For Opentrons internal use only.
+
+        :meta private:
+        """
+        return self._requested_as
+
     def __repr__(self):
         return "{} at {} lw {}".format(
             self.__class__.__name__, self._geometry, self.labware
@@ -243,12 +255,13 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
         ctx: ProtocolContext,
         hw_module: modules.tempdeck.TempDeck,
         geometry: ModuleGeometry,
+        requested_as: ModuleModel,
         at_version: APIVersion,
         loop: asyncio.AbstractEventLoop,
     ) -> None:
         self._module = hw_module
         self._loop = loop
-        super().__init__(ctx, geometry, at_version)
+        super().__init__(ctx, geometry, requested_as, at_version)
 
     @publish(command=cmds.tempdeck_set_temp)
     @requires_version(2, 0)
@@ -327,12 +340,13 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
         ctx: ProtocolContext,
         hw_module: modules.magdeck.MagDeck,
         geometry: ModuleGeometry,
+        requested_as: ModuleModel,
         at_version: APIVersion,
         loop: asyncio.AbstractEventLoop,
     ) -> None:
         self._module = hw_module
         self._loop = loop
-        super().__init__(ctx, geometry, at_version)
+        super().__init__(ctx, geometry, requested_as, at_version)
 
     @publish(command=cmds.magdeck_calibrate)
     @requires_version(2, 0)
@@ -470,12 +484,13 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
         ctx: ProtocolContext,
         hw_module: modules.thermocycler.Thermocycler,
         geometry: ThermocyclerGeometry,
+        requested_as: ModuleModel,
         at_version: APIVersion,
         loop: asyncio.AbstractEventLoop,
     ) -> None:
         self._module = hw_module
         self._loop = loop
-        super().__init__(ctx, geometry, at_version)
+        super().__init__(ctx, geometry, requested_as, at_version)
 
     def _prepare_for_lid_move(self):
         loaded_instruments = [
