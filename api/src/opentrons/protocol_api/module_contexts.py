@@ -315,7 +315,7 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
 
 
 class MagneticModuleContext(ModuleContext[ModuleGeometry]):
-    """An object representing a connected Temperature Module.
+    """An object representing a connected Magnetic Module.
 
     It should not be instantiated directly; instead, it should be
     created through :py:meth:`.ProtocolContext.load_module`.
@@ -461,7 +461,7 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
 
 
 class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
-    """An object representing a connected Temperature Module.
+    """An object representing a connected Thermocycler Module.
 
     It should not be instantiated directly; instead, it should be
     created through :py:meth:`.ProtocolContext.load_module`.
