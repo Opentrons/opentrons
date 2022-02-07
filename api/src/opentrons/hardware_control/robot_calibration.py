@@ -1,3 +1,4 @@
+from functools import lru_cache
 import logging
 import numpy as np
 from dataclasses import dataclass
@@ -5,9 +6,14 @@ from typing import Optional, List
 
 from opentrons import config
 
-from opentrons.config.robot_configs import get_legacy_gantry_calibration
+from opentrons.config.robot_configs import (
+    get_legacy_gantry_calibration,
+    default_deck_calibration,
+    default_pipette_offset,
+)
+from opentrons.config.types import OT3Config
 from opentrons.calibration_storage import modify, types, get
-from opentrons.types import Mount
+from opentrons.types import Mount, Point
 from opentrons.util import linal
 
 from .util import DeckTransformState
@@ -20,6 +26,28 @@ class RobotCalibration:
     deck_calibration: types.DeckCalibration
 
 
+@dataclass
+class OT3Transforms(RobotCalibration):
+    carriage_offset: Point
+    left_mount_offset: Point
+    right_mount_offset: Point
+    gripper_mount_offset: Point
+
+
+def build_ot3_transforms(config: OT3Config) -> OT3Transforms:
+    return OT3Transforms(
+        deck_calibration=types.DeckCalibration(
+            attitude=config.deck_transform,
+            source=types.SourceType.default,
+            status=types.CalibrationStatus(),
+        ),
+        carriage_offset=Point(*config.carriage_offset),
+        left_mount_offset=Point(*config.left_mount_offset),
+        right_mount_offset=Point(*config.right_mount_offset),
+        gripper_mount_offset=Point(*config.gripper_mount_offset),
+    )
+
+
 def build_temporary_identity_calibration() -> RobotCalibration:
     """
     Get a temporary identity deck cal suitable for use during
@@ -27,7 +55,7 @@ def build_temporary_identity_calibration() -> RobotCalibration:
     """
     return RobotCalibration(
         deck_calibration=types.DeckCalibration(
-            attitude=linal.identity_deck_transform().tolist(),
+            attitude=default_deck_calibration(),
             source=types.SourceType.default,
             status=types.CalibrationStatus(),
         )
@@ -141,7 +169,7 @@ def load_attitude_matrix() -> types.DeckCalibration:
     else:
         # load default if deck calibration data do not exist
         return types.DeckCalibration(
-            attitude=config.robot_configs.DEFAULT_DECK_CALIBRATION_V2,
+            attitude=default_deck_calibration(),
             source=types.SourceType.default,
             status=types.CalibrationStatus(),
         )
@@ -152,7 +180,7 @@ def load_pipette_offset(
 ) -> types.PipetteOffsetByPipetteMount:
     # load default if pipette offset data do not exist
     pip_cal_obj = types.PipetteOffsetByPipetteMount(
-        offset=config.robot_configs.DEFAULT_PIPETTE_OFFSET,
+        offset=default_pipette_offset(),
         source=types.SourceType.default,
         status=types.CalibrationStatus(),
     )
@@ -165,3 +193,36 @@ def load_pipette_offset(
 
 def load() -> RobotCalibration:
     return RobotCalibration(deck_calibration=load_attitude_matrix())
+
+
+class RobotCalibrationProvider:
+    def __init__(self):
+        self._robot_calibration = load()
+
+    @lru_cache(1)
+    def _validate(self) -> DeckTransformState:
+        return validate_attitude_deck_calibration(
+            self._robot_calibration.deck_calibration
+        )
+
+    @property
+    def robot_calibration(self) -> RobotCalibration:
+        return self._robot_calibration
+
+    def reset_robot_calibration(self):
+        self._validate.cache_clear()
+        self._robot_calibration = load()
+
+    def set_robot_calibration(self, robot_calibration: RobotCalibration):
+        self._validate.cache_clear()
+        self._robot_calibration = robot_calibration
+
+    def validate_calibration(self) -> DeckTransformState:
+        """
+        The lru cache decorator is currently not supported by the
+        ThreadManager. To work around this, we need to wrap the
+        actual function around a dummy outer function.
+
+        Once decorators are more fully supported, we can remove this.
+        """
+        return self._validate()

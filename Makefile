@@ -217,13 +217,13 @@ lint-css:
 .PHONY: format
 format: format-js format-py
 
+PYTHON_FORMAT_TARGETS := $(addsuffix -py-format, $(PYTHON_DIRS))
+
 .PHONY: format-py
-format-py:
-	$(MAKE) -C $(HARDWARE_DIR) format
-	$(MAKE) -C $(API_DIR) format
-	$(MAKE) -C $(ROBOT_SERVER_DIR) format
-	$(MAKE) -C $(G_CODE_TESTING_DIR) format
-	$(MAKE) -C $(UPDATE_SERVER_DIR) format
+format-py: $(PYTHON_FORMAT_TARGETS)
+
+%-py-format:
+	$(MAKE) -C $* format
 
 .PHONY: format-js
 format-js:

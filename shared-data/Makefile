@@ -56,6 +56,10 @@ teardown-py:
 lint-py:
 	$(MAKE) -C python lint
 
+.PHONY: format-py
+format-py:
+	$(MAKE) -C python format
+
 .PHONY: push-no-restart
 push-no-restart:
 	$(MAKE) -C python push-no-restart

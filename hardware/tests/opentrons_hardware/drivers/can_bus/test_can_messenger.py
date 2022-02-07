@@ -18,7 +18,8 @@ from opentrons_ot3_firmware.arbitration_id import (
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
-    MessageListener,
+    MessageListenerCallback,
+    WaitableCallback,
 )
 from opentrons_ot3_firmware.messages import MessageDefinition
 from opentrons_ot3_firmware.messages.message_definitions import (
@@ -84,7 +85,10 @@ async def test_send(
         message=CanMessage(
             arbitration_id=ArbitrationId(
                 parts=ArbitrationIdParts(
-                    message_id=message.message_id, node_id=node_id, function_code=0
+                    message_id=message.message_id,
+                    node_id=node_id,
+                    function_code=0,
+                    originating_node_id=NodeId.host,
                 )
             ),
             data=message.payload.serialize(),
@@ -97,22 +101,22 @@ async def test_listen_messages(
 ) -> None:
     """It should call listener with new messages."""
     # Add a received message to the driver
-    arbitration_id = ArbitrationId(
-        parts=ArbitrationIdParts(
-            message_id=MessageId.get_move_group_request,
-            node_id=0,
-            function_code=0,
-        )
-    )
     incoming_messages.put_nowait(
         CanMessage(
-            arbitration_id=arbitration_id,
+            arbitration_id=ArbitrationId(
+                parts=ArbitrationIdParts(
+                    message_id=MessageId.get_move_group_request,
+                    node_id=0,
+                    function_code=0,
+                    originating_node_id=NodeId.gantry_x,
+                )
+            ),
             data=b"\1",
         )
     )
 
     # Set up a listener
-    listener = Mock(spec=MessageListener)
+    listener = Mock(spec=MessageListenerCallback)
     subject.add_listener(listener)
 
     # Start the listener
@@ -127,7 +131,22 @@ async def test_listen_messages(
     await subject.stop()
 
     # Validate message.
-    listener.on_message.assert_called_once_with(
+    listener.assert_called_once_with(
         GetMoveGroupRequest(payload=MoveGroupRequestPayload(group_id=UInt8Field(1))),
-        arbitration_id,
+        ArbitrationId(
+            parts=ArbitrationIdParts(
+                node_id=NodeId.broadcast,
+                message_id=MessageId.get_move_group_request,
+                function_code=0,
+                originating_node_id=NodeId.gantry_x,
+            )
+        ),
     )
+
+
+async def test_waitable_callback_context() -> None:
+    """It should add itself and remove itself using context manager."""
+    mock_messenger = Mock(spec=CanMessenger)
+    with WaitableCallback(mock_messenger) as callback:
+        mock_messenger.add_listener.assert_called_once_with(callback)
+    mock_messenger.remove_listener.assert_called_once_with(callback)
