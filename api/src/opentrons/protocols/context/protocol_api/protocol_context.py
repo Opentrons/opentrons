@@ -26,7 +26,7 @@ from opentrons.protocols.types import Protocol
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 if TYPE_CHECKING:
-    from opentrons.hardware_control.modules import AbstractModule
+    from opentrons.hardware_control.modules import AbstractModule, ModuleModel
 
 
 logger = logging.getLogger(__name__)
