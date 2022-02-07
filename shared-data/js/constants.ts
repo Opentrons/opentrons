@@ -85,3 +85,13 @@ export const OT3_PIPETTES = [
   'p1000_single_gen3',
   'p20_single_gen3',
 ]
+//  GEN2 magnetic module info
+export const MM: 'mm' = 'mm'
+export const MAGNETIC_MODULE_V2_MAX_ENGAGE_HEIGHT = 16
+export const MAGNETIC_MODULE_V2_DISNEGAGED_HEIGHT = -4
+
+//  GEN 1 magnetic module info
+export const MAGNETIC_MODULE_V1_MAX_ENGAGE_HEIGHT = 40
+export const MAGNETIC_MODULE_V1_DISNEGAGED_HEIGHT = -5
+
+export const MAGNETIC_MODULE_TYPE_LABWARE_BOTTOM_HEIGHT = 0

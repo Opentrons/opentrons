@@ -9,6 +9,15 @@
   "target_temp": "Target: {{temp}}°C",
   "na_temp": "Target: N/A",
   "current_temp": "Current: {{temp}}°C",
+  "set_engage_height_slideout": "Set Engage Height for {{name}}",
+  "set_engage_height_slideout_body": "Set the engage height for this Magnetic Module. Enter an integer between -{{lower}} and {{higher}}.",
+  "set_engage_height_slideout_subtitle": "{{gen}} Height Ranges",
+  "max_engage_height_slideout": "Max Engage Height",
+  "labware_bottom_slideout": "Labware Bottom",
+  "disengage_slideout": "Disengaged",
+  "engage_height_slideout": "Engage height",
+  "gen2_num_slideout": "{{num}} mm",
+  "set_engage_height_slideout_btn": "Set Engage Height",
   "tc_lid": "Lid",
   "tc_block": "Block"
 }
