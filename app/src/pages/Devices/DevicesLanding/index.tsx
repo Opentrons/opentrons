@@ -7,7 +7,6 @@ import {
   Flex,
   Text,
   FONT_WEIGHT_SEMIBOLD,
-  OVERFLOW_SCROLL,
   SIZE_6,
   SPACING_2,
   SPACING_3,
@@ -47,12 +46,7 @@ export function DevicesLanding(): JSX.Element {
     unreachableRobots.length > 0
 
   return (
-    <Box
-      minWidth={SIZE_6}
-      height="100%"
-      overflow={OVERFLOW_SCROLL}
-      padding={`${SPACING_2} ${SPACING_3}`}
-    >
+    <Box minWidth={SIZE_6} padding={`${SPACING_2} ${SPACING_3}`}>
       <Flex>
         <Text as="h3" fontWeight={FONT_WEIGHT_SEMIBOLD}>
           {t('devices')}
