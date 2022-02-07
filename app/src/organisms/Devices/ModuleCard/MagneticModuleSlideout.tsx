@@ -20,14 +20,11 @@ import {
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
 import {
-  GEN1,
-  GEN2,
   getModuleDisplayName,
   MAGNETIC_MODULE_TYPE_LABWARE_BOTTOM_HEIGHT,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V1_DISNEGAGED_HEIGHT,
   MAGNETIC_MODULE_V1_MAX_ENGAGE_HEIGHT,
-  MAGNETIC_MODULE_V2,
   MAGNETIC_MODULE_V2_DISNEGAGED_HEIGHT,
   MAGNETIC_MODULE_V2_MAX_ENGAGE_HEIGHT,
   MM,
@@ -50,7 +47,7 @@ interface ModelContents {
 const getInfoByModel = (model: ModuleModel): ModelContents => {
   if (model === MAGNETIC_MODULE_V1) {
     return {
-      version: GEN1,
+      version: 'GEN 1',
       units: null,
       maxHeight: MAGNETIC_MODULE_V1_MAX_ENGAGE_HEIGHT,
       labwareBottomHeight: MAGNETIC_MODULE_TYPE_LABWARE_BOTTOM_HEIGHT,
@@ -58,7 +55,7 @@ const getInfoByModel = (model: ModuleModel): ModelContents => {
     }
   } else {
     return {
-      version: GEN2,
+      version: 'GEN 2',
       units: MM,
       maxHeight: MAGNETIC_MODULE_V2_MAX_ENGAGE_HEIGHT,
       labwareBottomHeight: MAGNETIC_MODULE_TYPE_LABWARE_BOTTOM_HEIGHT,
@@ -122,7 +119,7 @@ export const MagneticModuleSlideout = (
         >
           {t('set_engage_height_slideout_body', {
             lower: module.model === MAGNETIC_MODULE_V1 ? 5 : 4,
-            higher: module.model === MAGNETIC_MODULE_V2 ? 40 : 16,
+            higher: module.model === MAGNETIC_MODULE_V1 ? 40 : 16,
           })}
         </Text>
         <Text
