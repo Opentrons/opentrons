@@ -120,11 +120,9 @@ describe('SummaryScreen', () => {
   })
   it('renders apply offset button and clicks it', () => {
     const mockSetIsShowingLPCSuccessToast = jest.fn()
-    when(mockUseLPCSuccessToast)
-      .calledWith()
-      .mockReturnValue({
-        setIsShowingLPCSuccessToast: mockSetIsShowingLPCSuccessToast,
-      })
+    when(mockUseLPCSuccessToast).calledWith().mockReturnValue({
+      setIsShowingLPCSuccessToast: mockSetIsShowingLPCSuccessToast,
+    })
     const { getByRole } = render(props)
     expect(props.onCloseClick).not.toHaveBeenCalled()
     expect(mockSetIsShowingLPCSuccessToast).not.toHaveBeenCalled()
