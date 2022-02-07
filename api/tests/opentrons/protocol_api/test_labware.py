@@ -66,7 +66,7 @@ def set_up_index_file(labware_offset_tempdir: Path) -> List[str]:
 
 
 def test_well_init() -> None:
-    slot = Location(Point(1, 2, 3), 1)
+    slot = Location(Point(1, 2, 3), 1)  # type: ignore[arg-type]
     well_name = "circular_well_json"
     has_tip = False
     well1 = labware.Well(
@@ -75,14 +75,14 @@ def test_well_init() -> None:
             well_geometry=WellGeometry(
                 well_props=test_data[well_name],
                 parent_point=slot.point,
-                parent_object=slot.labware,
+                parent_object=slot.labware,  # type: ignore[arg-type]
             ),
             display_name=well_name,
             has_tip=has_tip,
             name="A1",
         ),
     )
-    assert well1.geometry.diameter == test_data[well_name]["diameter"]
+    assert well1.geometry.diameter == test_data[well_name]["diameter"]  # type: ignore[typeddict-item]  # noqa: E501
     assert well1.geometry._length is None
     assert well1.geometry._width is None
 
@@ -93,7 +93,7 @@ def test_well_init() -> None:
             well_geometry=WellGeometry(
                 well_props=test_data[well2_name],
                 parent_point=slot.point,
-                parent_object=slot.labware,
+                parent_object=slot.labware,  # type: ignore[arg-type]
             ),
             display_name=well2_name,
             has_tip=has_tip,
@@ -101,12 +101,12 @@ def test_well_init() -> None:
         ),
     )
     assert well2.geometry.diameter is None
-    assert well2.geometry._length == test_data[well2_name]["xDimension"]
-    assert well2.geometry._width == test_data[well2_name]["yDimension"]
+    assert well2.geometry._length == test_data[well2_name]["xDimension"]  # type: ignore[typeddict-item]  # noqa: E501
+    assert well2.geometry._width == test_data[well2_name]["yDimension"]  # type: ignore[typeddict-item]  # noqa: E501
 
 
 def test_top() -> None:
-    slot = Location(Point(4, 5, 6), 1)
+    slot = Location(Point(4, 5, 6), 1)  # type: ignore[arg-type]
     well_name = "circular_well_json"
     has_tip = False
     well = labware.Well(
@@ -115,7 +115,7 @@ def test_top() -> None:
             well_geometry=WellGeometry(
                 well_props=test_data[well_name],
                 parent_point=slot.point,
-                parent_object=slot.labware,
+                parent_object=slot.labware,  # type: ignore[arg-type]
             ),
             display_name=well_name,
             has_tip=has_tip,
@@ -130,7 +130,7 @@ def test_top() -> None:
 
 
 def test_bottom() -> None:
-    slot = Location(Point(7, 8, 9), 1)
+    slot = Location(Point(7, 8, 9), 1)  # type: ignore[arg-type]
     well_name = "rectangular_well_json"
     has_tip = False
     well = labware.Well(
@@ -139,7 +139,7 @@ def test_bottom() -> None:
             well_geometry=WellGeometry(
                 well_props=test_data[well_name],
                 parent_point=slot.point,
-                parent_object=slot.labware,
+                parent_object=slot.labware,  # type: ignore[arg-type]
             ),
             display_name=well_name,
             has_tip=has_tip,
@@ -154,7 +154,7 @@ def test_bottom() -> None:
 
 
 def test_from_center_cartesian():
-    slot1 = Location(Point(10, 11, 12), 1)
+    slot1 = Location(Point(10, 11, 12), 1)  # type: ignore[arg-type]
     well_name = "circular_well_json"
     has_tip = False
     well1 = labware.Well(
@@ -163,7 +163,7 @@ def test_from_center_cartesian():
             well_geometry=WellGeometry(
                 well_props=test_data[well_name],
                 parent_point=slot1.point,
-                parent_object=slot1.labware,
+                parent_object=slot1.labware,  # type: ignore[arg-type]
             ),
             display_name=well_name,
             has_tip=has_tip,
@@ -177,17 +177,17 @@ def test_from_center_cartesian():
     point1 = well1.from_center_cartesian(percent1_x, percent1_y, percent1_z)
 
     # slot.x + well.x + 1 * well.diamter/2
-    expected_x = 10 + 40 + 15
+    expected_x: float = 10 + 40 + 15
     # slot.y + well.y + 1 * well.diamter/2
-    expected_y = 11 + 50 + 15
+    expected_y: float = 11 + 50 + 15
     # slot.z + well.z + (1 - 0.5) * well.depth/2
-    expected_z = 12 + 3 + 20 - 10
+    expected_z: float = 12 + 3 + 20 - 10
 
     assert point1.x == expected_x
     assert point1.y == expected_y
     assert point1.z == expected_z
 
-    slot2 = Location(Point(13, 14, 15), 1)
+    slot2 = Location(Point(13, 14, 15), 1)  # type: ignore[arg-type]
     well2_name = "rectangular_well_json"
     has_tip = False
     well2 = labware.Well(
@@ -196,7 +196,7 @@ def test_from_center_cartesian():
             well_geometry=WellGeometry(
                 well_props=test_data[well2_name],
                 parent_point=slot2.point,
-                parent_object=slot2.labware,
+                parent_object=slot2.labware,  # type: ignore[arg-type]
             ),
             display_name=well2_name,
             has_tip=has_tip,
@@ -499,7 +499,7 @@ def test_module_load_v1(v1_module_name) -> None:
     mod2 = module_geometry.load_module_from_definition(
         module_defs[v1_module_name],
         Location(Point(3, 2, 1), "test2"),
-        module_geometry.ThermocyclerConfiguration.FULL,
+        module_geometry.ThermocyclerConfiguration.FULL,  # type: ignore[attr-defined]
     )
     assert mod2.highest_z == high_z + 1
     assert mod2.location.point == (offset + Point(3, 2, 1))
@@ -507,9 +507,9 @@ def test_module_load_v1(v1_module_name) -> None:
 
 @pytest.mark.parametrize(
     "module_model",
-    list(module_geometry.MagneticModuleModel)
-    + list(module_geometry.TemperatureModuleModel)
-    + list(module_geometry.ThermocyclerModuleModel),
+    list(module_geometry.MagneticModuleModel)  # type: ignore[attr-defined]
+    + list(module_geometry.TemperatureModuleModel)  # type: ignore[attr-defined]
+    + list(module_geometry.ThermocyclerModuleModel),  # type: ignore[attr-defined]
 )
 def test_module_load_v2(module_model) -> None:
     mod = module_geometry.load_module(module_model, Location(Point(0, 0, 0), "3"))
@@ -600,7 +600,9 @@ def test_uris():
     details = ("opentrons", "opentrons_96_tiprack_300ul", "1")
     uri = "opentrons/opentrons_96_tiprack_300ul/1"
     assert helpers.uri_from_details(*details) == uri
-    defn = labware.get_labware_definition(details[1], details[0], details[2])
+    defn = labware.get_labware_definition(
+        details[1], details[0], details[2]  # type: ignore[arg-type]
+    )
     assert helpers.uri_from_definition(defn) == uri
     lw = labware.Labware(
         implementation=LabwareImplementation(
@@ -663,7 +665,7 @@ def test_delete_one_calibration(set_up_index_file) -> None:
 
     assert lw_to_delete in load_names
 
-    delete.delete_offset_file(id_saved)
+    delete.delete_offset_file(id_saved)  # type: ignore[arg-type]
 
     all_cals = get.get_all_calibrations()
     load_names = get_load_names(all_cals)

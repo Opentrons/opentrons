@@ -19,7 +19,7 @@ class CommandPublisher:
 
     def __init__(self, broker: Optional[Broker]) -> None:
         """Initialize the publisher with a Broker."""
-        self._broker = broker or Broker()  # type: ignore[no-untyped-call]
+        self._broker = broker or Broker()
 
     @property
     def broker(self) -> Broker:

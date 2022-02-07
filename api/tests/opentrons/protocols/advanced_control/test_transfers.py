@@ -1049,7 +1049,7 @@ def test_multichannel_transfer_old_version(loop, hardware):
     # for API version below 2.2, multichannel pipette can only
     # reach row A of 384-well plates
     ctx = papi.ProtocolContext(
-        implementation=ProtocolContextImplementation(hardware=hardware),
+        implementation=ProtocolContextImplementation(sync_hardware=hardware.sync),
         loop=loop,
         api_version=APIVersion(2, 1),
     )
@@ -1111,7 +1111,7 @@ def test_multichannel_transfer_locs(loop, hardware):
     api_version = APIVersion(2, 2)
     ctx = papi.ProtocolContext(
         implementation=ProtocolContextImplementation(
-            api_version=api_version, hardware=hardware
+            api_version=api_version, sync_hardware=hardware.sync
         ),
         loop=loop,
         api_version=api_version,

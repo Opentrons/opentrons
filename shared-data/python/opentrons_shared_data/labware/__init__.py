@@ -9,13 +9,14 @@ from .. import load_shared_data
 if TYPE_CHECKING:
     from .dev_types import LabwareDefinition
 
-Schema = NewType('Schema', Dict[str, Any])
+Schema = NewType("Schema", Dict[str, Any])
 
 
-def load_definition(loadname: str, version: int) -> 'LabwareDefinition':
+def load_definition(loadname: str, version: int) -> "LabwareDefinition":
     return json.loads(
-        load_shared_data(f'labware/definitions/2/{loadname}/{version}.json'))
+        load_shared_data(f"labware/definitions/2/{loadname}/{version}.json")
+    )
 
 
 def load_schema() -> Schema:
-    return json.loads(load_shared_data('labware/schemas/2.json'))
+    return json.loads(load_shared_data("labware/schemas/2.json"))

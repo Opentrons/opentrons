@@ -3,30 +3,20 @@
 This module has functions that provide a console entrypoint for simulating
 a protocol from the command line.
 """
-
 import argparse
-import asyncio
-
 import sys
 import logging
 import os
 import pathlib
 import queue
-from typing import (
-    Any,
-    Dict,
-    List,
-    Mapping,
-    TextIO,
-    Tuple,
-    BinaryIO,
-    Optional,
-    Union,
-    TYPE_CHECKING,
-)
-
+from typing import Any, Dict, List, Mapping, TextIO, Tuple, BinaryIO, Optional, Union
 
 import opentrons
+from opentrons.hardware_control import (
+    API as HardwareAPI,
+    ThreadManager,
+    SyncHardwareAPI,
+)
 from opentrons.hardware_control.simulator_setup import load_simulator
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocols.duration import DurationEstimator
@@ -35,21 +25,23 @@ import opentrons.broker
 from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
 from opentrons import protocol_api
 from opentrons.commands import types as command_types
-from opentrons.protocols.api_support.util import HardwareToManage
 from opentrons.protocols.context.protocol_api.protocol_context import (
     ProtocolContextImplementation,
 )
 from opentrons.protocols import parse, bundle
 from opentrons.protocols.types import PythonProtocol, BundleContents
 from opentrons.protocols.api_support.types import APIVersion
-from .util.entrypoint_util import labware_from_paths, datafiles_from_paths
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
-if TYPE_CHECKING:
-    from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from .util.entrypoint_util import labware_from_paths, datafiles_from_paths
 
 
 class AccumulatingHandler(logging.Handler):
-    def __init__(self, level, command_queue):
+    def __init__(
+        self,
+        level: str,
+        command_queue: "queue.Queue[Any]",
+    ) -> None:
         """Create the handler
 
         :param level: The logging level to capture
@@ -58,7 +50,7 @@ class AccumulatingHandler(logging.Handler):
         self._command_queue = command_queue
         super().__init__(level)
 
-    def emit(self, record):
+    def emit(self, record: Any) -> None:
         self._command_queue.put(record)
 
 
@@ -106,7 +98,7 @@ class CommandScraper:
         """The list of commands. See :py:obj:`simulate`"""
         return self._commands
 
-    def __del__(self):
+    def __del__(self) -> None:
         if getattr(self, "_handler", None):
             try:
                 self._logger.removeHandler(self._handler)  # type: ignore
@@ -115,7 +107,7 @@ class CommandScraper:
         if hasattr(self, "_unsub"):
             self._unsub()
 
-    def _command_callback(self, message):
+    def _command_callback(self, message: command_types.CommandMessage) -> None:
         """The callback subscribed to the broker"""
         payload = message["payload"]
         if message["$"] == "before":
@@ -131,10 +123,10 @@ class CommandScraper:
 
 def get_protocol_api(
     version: Union[str, APIVersion],
-    bundled_labware: Dict[str, "LabwareDefinition"] = None,
-    bundled_data: Dict[str, bytes] = None,
-    extra_labware: Dict[str, "LabwareDefinition"] = None,
-    hardware_simulator: HardwareToManage = None,
+    bundled_labware: Optional[Dict[str, LabwareDefinition]] = None,
+    bundled_data: Optional[Dict[str, bytes]] = None,
+    extra_labware: Optional[Dict[str, LabwareDefinition]] = None,
+    hardware_simulator: Optional[SyncHardwareAPI] = None,
 ) -> protocol_api.ProtocolContext:
     """
     Build and return a ``protocol_api.ProtocolContext``
@@ -190,21 +182,25 @@ def get_protocol_api(
         and JUPYTER_NOTEBOOK_LABWARE_DIR.is_dir()  # type: ignore[union-attr]
     ):
         extra_labware = labware_from_paths([str(JUPYTER_NOTEBOOK_LABWARE_DIR)])
+
+    if hardware_simulator is None:
+        hardware_simulator = ThreadManager(HardwareAPI.build_hardware_simulator).sync
+
     return _build_protocol_context(
-        checked_version,
-        bundled_labware,
-        bundled_data,
-        extra_labware,
-        hardware_simulator,
+        version=checked_version,
+        hardware_simulator=hardware_simulator,
+        bundled_labware=bundled_labware,
+        bundled_data=bundled_data,
+        extra_labware=extra_labware,
     )
 
 
 def _build_protocol_context(
-    version: APIVersion = None,
-    bundled_labware: Dict[str, "LabwareDefinition"] = None,
-    bundled_data: Dict[str, bytes] = None,
-    extra_labware: Dict[str, "LabwareDefinition"] = None,
-    hardware_simulator: HardwareToManage = None,
+    version: APIVersion,
+    hardware_simulator: SyncHardwareAPI,
+    bundled_labware: Optional[Dict[str, LabwareDefinition]],
+    bundled_data: Optional[Dict[str, bytes]],
+    extra_labware: Optional[Dict[str, LabwareDefinition]],
 ) -> protocol_api.ProtocolContext:
     """Internal version of :py:meth:`get_protocol_api` that allows deferring
     version specification for use with
@@ -215,7 +211,7 @@ def _build_protocol_context(
         bundled_data=bundled_data,
         api_version=version,
         extra_labware=extra_labware,
-        hardware=hardware_simulator,
+        sync_hardware=hardware_simulator,
     )
     context = protocol_api.contexts.ProtocolContext(
         implementation=ctx_impl, api_version=version
@@ -231,7 +227,7 @@ def bundle_from_sim(
     From a protocol, and the context that has finished simulating that
     protocol, determine what needs to go in a bundle for the protocol.
     """
-    bundled_labware: Dict[str, "LabwareDefinition"] = {}
+    bundled_labware: Dict[str, LabwareDefinition] = {}
     for lw in context.loaded_labwares.values():
         if (
             isinstance(lw, opentrons.protocol_api.labware.Labware)
@@ -249,11 +245,11 @@ def bundle_from_sim(
 
 def simulate(
     protocol_file: TextIO,
-    file_name: str = None,
-    custom_labware_paths: List[str] = None,
-    custom_data_paths: List[str] = None,
+    file_name: Optional[str] = None,
+    custom_labware_paths: Optional[List[str]] = None,
+    custom_data_paths: Optional[List[str]] = None,
     propagate_logs: bool = False,
-    hardware_simulator_file_path: str = None,
+    hardware_simulator_file_path: Optional[str] = None,
     duration_estimator: Optional[DurationEstimator] = None,
     log_level: str = "warning",
 ) -> Tuple[List[Mapping[str, Any]], Optional[BundleContents]]:
@@ -337,10 +333,12 @@ def simulate(
         extra_data = {}
 
     hardware_simulator = None
+
     if hardware_simulator_file_path:
-        hardware_simulator = asyncio.get_event_loop().run_until_complete(
-            load_simulator(pathlib.Path(hardware_simulator_file_path))
-        )
+        hardware_simulator = ThreadManager(
+            load_simulator,
+            pathlib.Path(hardware_simulator_file_path),
+        ).sync
 
     protocol = parse.parse(
         contents, file_name, extra_labware=extra_labware, extra_data=extra_data
@@ -579,7 +577,7 @@ def main() -> int:
     args = parser.parse_args()
     # Try to migrate api v1 containers if needed
 
-    duration_estimator = DurationEstimator() if args.estimate_duration else None
+    duration_estimator = DurationEstimator() if args.estimate_duration else None  # type: ignore[no-untyped-call]  # noqa: E501
 
     runlog, maybe_bundle = simulate(
         args.protocol,

@@ -29,6 +29,7 @@ from .threaded_async_lock import ThreadedAsyncLock, ThreadedAsyncForbidden
 from .protocols import HardwareControlAPI
 
 ThreadManagedHardware = ThreadManager[HardwareControlAPI]
+SyncHardwareAPI = SynchronousAdapter[HardwareControlAPI]
 
 __all__ = [
     "API",

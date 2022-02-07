@@ -3,6 +3,10 @@
   "lights": "Lights",
   "run_a_protocol": "Run a Protocol",
   "usb_port": "usb port {{port}}",
+  "usb_hub": "usb port {{port}} via hub",
   "magdeck_gen1_height": "Height: {{height}}",
-  "magdeck_gen2_height": "Height: {{height}} mm"
+  "magdeck_gen2_height": "Height: {{height}} mm",
+  "target_temp": "Target: {{temp}}°C",
+  "na_temp": "Target: N/A",
+  "current_temp": "Current: {{temp}}°C"
 }

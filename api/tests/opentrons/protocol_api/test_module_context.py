@@ -47,7 +47,7 @@ def ctx_with_tempdeck(
 
     mock_hardware.find_modules.side_effect = find_modules
     return ProtocolContext(
-        implementation=ProtocolContextImplementation(hardware=mock_hardware),
+        implementation=ProtocolContextImplementation(sync_hardware=mock_hardware),
     )
 
 
@@ -68,7 +68,7 @@ def ctx_with_magdeck(
 
     mock_hardware.find_modules.side_effect = find_modules
     return ProtocolContext(
-        implementation=ProtocolContextImplementation(hardware=mock_hardware),
+        implementation=ProtocolContextImplementation(sync_hardware=mock_hardware),
     )
 
 
@@ -89,7 +89,7 @@ def ctx_with_thermocycler(
 
     mock_hardware.find_modules.side_effect = find_modules
     return ProtocolContext(
-        implementation=ProtocolContextImplementation(hardware=mock_hardware),
+        implementation=ProtocolContextImplementation(sync_hardware=mock_hardware),
     )
 
 
@@ -523,20 +523,24 @@ def test_module_compatibility(get_module_fixture, monkeypatch):
         def __init__(self, value: str):
             self.value = value
 
-        def __eq__(self, other: "DummyEnum") -> bool:
+        def __eq__(self, other: "DummyEnum") -> bool:  # type: ignore[override]
             return self.value == other.value
 
     assert not papi_geometry.module_geometry.models_compatible(
-        DummyEnum("incompatibleGenerationV1"), DummyEnum("incompatibleGenerationV2")
+        DummyEnum("incompatibleGenerationV1"),  # type: ignore[arg-type]
+        DummyEnum("incompatibleGenerationV2"),  # type: ignore[arg-type]
     )
     assert papi_geometry.module_geometry.models_compatible(
-        DummyEnum("incompatibleGenerationV2"), DummyEnum("incompatibleGenerationV2")
+        DummyEnum("incompatibleGenerationV2"),  # type: ignore[arg-type]
+        DummyEnum("incompatibleGenerationV2"),  # type: ignore[arg-type]
     )
     assert papi_geometry.module_geometry.models_compatible(
-        DummyEnum("compatibleGenerationV1"), DummyEnum("compatibleGenerationV1")
+        DummyEnum("compatibleGenerationV1"),  # type: ignore[arg-type]
+        DummyEnum("compatibleGenerationV1"),  # type: ignore[arg-type]
     )
     assert not papi_geometry.module_geometry.models_compatible(
-        DummyEnum("compatibleGenerationV1"), DummyEnum("incompatibleGenerationV1")
+        DummyEnum("compatibleGenerationV1"),  # type: ignore[arg-type]
+        DummyEnum("incompatibleGenerationV1"),  # type: ignore[arg-type]
     )
 
 
@@ -562,8 +566,8 @@ def test_thermocycler_flag_unsafe_move(ctx_with_thermocycler, mock_module_contro
     labware_name = "nest_96_wellplate_100ul_pcr_full_skirt"
     tc_labware = mod.load_labware(labware_name)
 
-    with_tc_labware = Location(None, tc_labware)
-    without_tc_labware = Location(None, None)
+    with_tc_labware = Location(None, tc_labware)  # type: ignore[arg-type]
+    without_tc_labware = Location(None, None)  # type: ignore[arg-type]
 
     m = mock.PropertyMock(return_value="closed")
     type(mock_module_controller).lid_status = m

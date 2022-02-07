@@ -138,7 +138,7 @@ async def test_single_send_setup_commands(
                     int(
                         move_group_single[0][0][NodeId.head].velocity_mm_sec
                         / interrupts_per_sec
-                        * (2 ** 31)
+                        * (2**31)
                     )
                 ),
                 acceleration=Int32Field(0),
@@ -171,7 +171,7 @@ async def test_multi_send_setup_commands(
                     int(
                         move_group_multiple[0][0][NodeId.head].velocity_mm_sec
                         / interrupts_per_sec
-                        * (2 ** 31)
+                        * (2**31)
                     )
                 ),
                 acceleration=Int32Field(0),
@@ -196,7 +196,7 @@ async def test_multi_send_setup_commands(
                     int(
                         move_group_multiple[1][0][NodeId.gantry_x].velocity_mm_sec
                         / interrupts_per_sec
-                        * (2 ** 31)
+                        * (2**31)
                     )
                 ),
                 acceleration=Int32Field(0),
@@ -220,7 +220,7 @@ async def test_multi_send_setup_commands(
                     int(
                         move_group_multiple[1][0][NodeId.gantry_y].velocity_mm_sec
                         / interrupts_per_sec
-                        * (2 ** 31)
+                        * (2**31)
                     )
                 ),
                 acceleration=Int32Field(0),
@@ -245,7 +245,7 @@ async def test_multi_send_setup_commands(
                     int(
                         move_group_multiple[2][0][NodeId.pipette_left].velocity_mm_sec
                         / interrupts_per_sec
-                        * (2 ** 31)
+                        * (2**31)
                     )
                 ),
                 acceleration=Int32Field(0),
@@ -269,7 +269,7 @@ async def test_multi_send_setup_commands(
                     int(
                         move_group_multiple[2][1][NodeId.pipette_left].velocity_mm_sec
                         / interrupts_per_sec
-                        * (2 ** 31)
+                        * (2**31)
                     )
                 ),
                 acceleration=Int32Field(0),

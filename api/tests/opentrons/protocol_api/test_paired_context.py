@@ -1,4 +1,5 @@
 import pytest
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 from unittest import mock
 
 
@@ -61,7 +62,7 @@ def test_pick_up_and_drop_tip_no_tipracks(ctx):
     left = ctx.load_instrument("p300_multi", Mount.LEFT)
 
     paired = right.pair_with(left)
-    hardware = ctx._implementation.get_hardware().hardware
+    hardware = ctx._implementation.get_hardware()
     r_pip: Pipette = hardware._attached_instruments[Mount.RIGHT]
     l_pip: Pipette = hardware._attached_instruments[Mount.LEFT]
     nozzle_offset = Point(*r_pip.config.nozzle_offset)
@@ -104,12 +105,12 @@ def test_aspirate(set_up_paired_instrument, monkeypatch, ctx):
     fake_hw_aspirate = mock.Mock()
     fake_move = mock.Mock()
     monkeypatch.setattr(
-        ctx._implementation.get_hardware().hardware._obj_to_adapt,
+        ctx._implementation.get_hardware()._obj_to_adapt,
         "aspirate",
         fake_hw_aspirate,
     )
     monkeypatch.setattr(
-        ctx._implementation.get_hardware().hardware._obj_to_adapt, "move_to", fake_move
+        ctx._implementation.get_hardware()._obj_to_adapt, "move_to", fake_move
     )
 
     paired.pick_up_tip()
@@ -135,7 +136,7 @@ def test_aspirate(set_up_paired_instrument, monkeypatch, ctx):
         paired._pair_policy, dest_point, critical_point=None, speed=400, max_speeds={}
     )
     fake_move.reset_mock()
-    hardware = ctx._implementation.get_hardware().hardware
+    hardware = ctx._implementation.get_hardware()
     hardware._obj_to_adapt._attached_instruments[Mount.RIGHT]._current_volume = 1
 
     paired.aspirate(2.0)
@@ -175,12 +176,12 @@ def test_dispense(set_up_paired_instrument, monkeypatch, ctx):
         move_called_with = (mount, abs_position, kwargs)
 
     monkeypatch.setattr(
-        ctx._implementation.get_hardware().hardware._obj_to_adapt,
+        ctx._implementation.get_hardware()._obj_to_adapt,
         "dispense",
         fake_hw_dispense,
     )
     monkeypatch.setattr(
-        ctx._implementation.get_hardware().hardware._obj_to_adapt, "move_to", fake_move
+        ctx._implementation.get_hardware()._obj_to_adapt, "move_to", fake_move
     )
     paired.pick_up_tip()
     paired.dispense(2.0, lw.wells()[0].bottom())
@@ -281,7 +282,7 @@ def test_air_gap(set_up_paired_instrument, monkeypatch, ctx):
     paired, _ = set_up_paired_instrument
     lw = ctx.load_labware("corning_96_wellplate_360ul_flat", 4)
 
-    hardware = ctx._implementation.get_hardware().hardware
+    hardware = ctx._implementation.get_hardware()
     r_pip: Pipette = hardware._attached_instruments[Mount.RIGHT]
     l_pip: Pipette = hardware._attached_instruments[Mount.LEFT]
 
@@ -359,7 +360,7 @@ def test_touch_tip_new_default_args(ctx, monkeypatch):
 
     paired.aspirate(10, lw.wells()[0])
     monkeypatch.setattr(
-        ctx._implementation.get_hardware().hardware._obj_to_adapt,
+        ctx._implementation.get_hardware()._obj_to_adapt,
         "move_to",
         fake_hw_move,
     )
@@ -418,7 +419,7 @@ def tiprack3(ctx):
 @pytest.fixture(scope="function")
 @pytest.mark.parametrize(
     "tiprack1, tiprack2",
-    [pytest.lazy_fixture("tiprack1"), pytest.lazy_fixture("tiprack2")],
+    [lazy_fixture("tiprack1"), lazy_fixture("tiprack2")],
 )
 def tiprack_order_1(tiprack1, tiprack2):
     yield [tiprack1, tiprack2]
@@ -427,7 +428,7 @@ def tiprack_order_1(tiprack1, tiprack2):
 @pytest.fixture(scope="function")
 @pytest.mark.parametrize(
     "tiprack2, tiprack3",
-    [pytest.lazy_fixture("tiprack2"), pytest.lazy_fixture("tiprack3")],
+    [lazy_fixture("tiprack2"), lazy_fixture("tiprack3")],
 )
 def tiprack_order_2(tiprack2, tiprack3):
     yield [tiprack2, tiprack3]
@@ -437,9 +438,9 @@ def tiprack_order_2(tiprack2, tiprack3):
 @pytest.mark.parametrize(
     "tiprack1, tiprack2, tiprack3",
     [
-        pytest.lazy_fixture("tiprack1"),
-        pytest.lazy_fixture("tiprack2"),
-        pytest.lazy_fixture("tiprack3"),
+        lazy_fixture("tiprack1"),
+        lazy_fixture("tiprack2"),
+        lazy_fixture("tiprack3"),
     ],
 )
 def tiprack_order_3(tiprack1, tiprack2, tiprack3):
@@ -447,7 +448,7 @@ def tiprack_order_3(tiprack1, tiprack2, tiprack3):
 
 
 @pytest.fixture(scope="function")
-@pytest.mark.parametrize("tiprack1", [pytest.lazy_fixture("tiprack1")])
+@pytest.mark.parametrize("tiprack1", [lazy_fixture("tiprack1")])
 def tiprack_order_4(tiprack1):
     yield [tiprack1]
 
@@ -455,7 +456,7 @@ def tiprack_order_4(tiprack1):
 @pytest.fixture(scope="function")
 @pytest.mark.parametrize(
     "tiprack1, tiprack3",
-    [pytest.lazy_fixture("tiprack1"), pytest.lazy_fixture("tiprack3")],
+    [lazy_fixture("tiprack1"), lazy_fixture("tiprack3")],
 )
 def tiprack_order_5(tiprack1, tiprack3):
     yield [tiprack1, tiprack3]
@@ -464,7 +465,7 @@ def tiprack_order_5(tiprack1, tiprack3):
 @pytest.fixture(scope="function")
 @pytest.mark.parametrize(
     "tiprack2, tiprack3",
-    [pytest.lazy_fixture("tiprack2"), pytest.lazy_fixture("tiprack3")],
+    [lazy_fixture("tiprack2"), lazy_fixture("tiprack3")],
 )
 def tiprack_order_6(tiprack2, tiprack3):
     yield [tiprack3, tiprack2]
@@ -474,19 +475,19 @@ def tiprack_order_6(tiprack2, tiprack3):
     "right_tipracks, left_tipracks, expected_tipracks",
     argvalues=[
         (
-            pytest.lazy_fixture("tiprack_order_3"),
-            pytest.lazy_fixture("tiprack_order_2"),
-            pytest.lazy_fixture("tiprack_order_2"),
+            lazy_fixture("tiprack_order_3"),
+            lazy_fixture("tiprack_order_2"),
+            lazy_fixture("tiprack_order_2"),
         ),
         (
-            pytest.lazy_fixture("tiprack_order_4"),
-            pytest.lazy_fixture("tiprack_order_3"),
-            pytest.lazy_fixture("tiprack_order_4"),
+            lazy_fixture("tiprack_order_4"),
+            lazy_fixture("tiprack_order_3"),
+            lazy_fixture("tiprack_order_4"),
         ),
         (
-            pytest.lazy_fixture("tiprack_order_2"),
-            pytest.lazy_fixture("tiprack_order_6"),
-            pytest.lazy_fixture("tiprack_order_2"),
+            lazy_fixture("tiprack_order_2"),
+            lazy_fixture("tiprack_order_6"),
+            lazy_fixture("tiprack_order_2"),
         ),
     ],
 )

@@ -1,41 +1,41 @@
 from __future__ import annotations
 import asyncio
-import contextlib
 import logging
 from typing import (
+    TYPE_CHECKING,
     Callable,
     Dict,
     Iterator,
     List,
+    NamedTuple,
     Optional,
     Tuple,
     Union,
-    TYPE_CHECKING,
     cast,
 )
 from collections import OrderedDict
 
 from opentrons import types
 from opentrons.equipment_broker import EquipmentBroker
-from opentrons.hardware_control import SynchronousAdapter, ThreadManager
+from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import ModuleType
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
 from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.context.protocol_api.instrument_context import (
-    InstrumentContextImplementation,
-)
-from opentrons.protocols.context.simulator.instrument_context import (
-    InstrumentContextSimulation,
+from opentrons.protocols.api_support.util import (
+    AxisMaxSpeeds,
+    requires_version,
+    APIVersionError,
 )
 from opentrons.protocols.types import Protocol
-from .labware import Labware
 from opentrons.protocols.context.labware import AbstractLabware
 from opentrons.protocols.context.protocol import AbstractProtocol
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
+
 from .instrument_context import InstrumentContext
+from .labware import Labware
 from .module_contexts import (
     ModuleContext,
     MagneticModuleContext,
@@ -46,12 +46,7 @@ from .labware_offset_provider import (
     AbstractLabwareOffsetProvider,
     NullLabwareOffsetProvider,
 )
-from .load_info import LabwareLoadInfo, ModuleLoadInfo, InstrumentLoadInfo
-from opentrons.protocols.api_support.util import (
-    AxisMaxSpeeds,
-    requires_version,
-    APIVersionError,
-)
+from .load_info import LoadInfo, LabwareLoadInfo, ModuleLoadInfo, InstrumentLoadInfo
 
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
@@ -61,6 +56,15 @@ logger = logging.getLogger(__name__)
 ModuleTypes = Union[
     "TemperatureModuleContext", "MagneticModuleContext", "ThermocyclerContext"
 ]
+
+
+class HardwareManager(NamedTuple):
+    """Back. compat. wrapper for a removed class called `HardwareManager`.
+
+    This interface will not be present in PAPIv3.
+    """
+
+    hardware: SyncHardwareAPI
 
 
 class ProtocolContext(CommandPublisher):
@@ -124,43 +128,21 @@ class ProtocolContext(CommandPublisher):
         self._unsubscribe_commands: Optional[Callable[[], None]] = None
         self.clear_commands()
 
-        self._labware_load_broker = EquipmentBroker[LabwareLoadInfo]()
-        self._instrument_load_broker = EquipmentBroker[InstrumentLoadInfo]()
-        self._module_load_broker = EquipmentBroker[ModuleLoadInfo]()
+        self._equipment_broker = EquipmentBroker[LoadInfo]()
 
     @property
-    def labware_load_broker(self) -> EquipmentBroker[LabwareLoadInfo]:
+    def equipment_broker(self) -> EquipmentBroker[LoadInfo]:
         """For internal Opentrons use only.
 
         :meta private:
 
         Subscribers to this broker will be notified with information about every
-        successful labware load.
+        successful labware load, instrument load, or module load.
 
         Only :py:obj:`ProtocolContext` is allowed to publish to this broker.
         Calling code may only subscribe or unsubscribe.
         """
-        return self._labware_load_broker
-
-    @property
-    def instrument_load_broker(self) -> EquipmentBroker[InstrumentLoadInfo]:
-        """For internal Opentrons use only.
-
-        :meta private:
-
-        Like `labware_load_broker`, but for pipettes.
-        """
-        return self._instrument_load_broker
-
-    @property
-    def module_load_broker(self) -> EquipmentBroker[ModuleLoadInfo]:
-        """For internal Opentrons use only.
-
-        :meta private:
-
-        Like `labware_load_broker`, but for modules.
-        """
-        return self._module_load_broker
+        return self._equipment_broker
 
     @classmethod
     def build_using(
@@ -188,14 +170,14 @@ class ProtocolContext(CommandPublisher):
         return self._api_version
 
     @property
-    def _hw_manager(self):
+    def _hw_manager(self) -> HardwareManager:
         # TODO (lc 01-05-2021) remove this once we have a more
         # user facing hardware control http api.
         logger.warning(
             "This function will be deprecated in later versions."
             "Please use with caution."
         )
-        return self._implementation.get_hardware()
+        return HardwareManager(hardware=self._implementation.get_hardware())
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -209,13 +191,13 @@ class ProtocolContext(CommandPublisher):
         """
         return self._implementation.get_bundled_data()
 
-    def cleanup(self):
+    def cleanup(self) -> None:
         """Finalize and clean up the protocol context."""
         if self._unsubscribe_commands:
             self._unsubscribe_commands()
             self._unsubscribe_commands = None
 
-    def __del__(self):
+    def __del__(self) -> None:
         if getattr(self, "_unsubscribe_commands", None):
             self._unsubscribe_commands()  # type: ignore
 
@@ -253,11 +235,11 @@ class ProtocolContext(CommandPublisher):
         return self._implementation.get_max_speeds()
 
     @requires_version(2, 0)
-    def commands(self):
+    def commands(self) -> List[str]:
         return self._commands
 
     @requires_version(2, 0)
-    def clear_commands(self):
+    def clear_commands(self) -> None:
         self._commands.clear()
         if self._unsubscribe_commands:
             self._unsubscribe_commands()
@@ -274,92 +256,6 @@ class ProtocolContext(CommandPublisher):
         self._unsubscribe_commands = self.broker.subscribe(
             cmd_types.COMMAND, on_command
         )
-
-    @contextlib.contextmanager
-    def temp_connect(self, hardware: Union[ThreadManager, SynchronousAdapter]):
-        """Connect temporarily to the specified hardware controller.
-
-        This should be used as a context manager:
-
-        .. code-block :: python
-
-            with ctx.temp_connect(hw):
-                # do some tasks
-                ctx.home()
-            # after the with block, the context is connected to the same
-            # hardware control API it was connected to before, even if
-            # an error occurred in the code inside the with block
-
-        """
-        hardware_manager = self._implementation.get_hardware()
-        old_hw = hardware_manager.hardware
-        old_tc = None
-        tc_context = None
-        # Cache the current instrument context implementations.
-        old_instrument_impls = {
-            k: v._implementation for k, v in self._instruments.items() if v
-        }
-        try:
-            hardware_manager.set_hw(hardware)
-            for mod_ctx in self._modules:
-                if isinstance(mod_ctx, ThermocyclerContext):
-                    tc_context = mod_ctx
-                    hw_tc = next(
-                        hw_mod
-                        for hw_mod in hardware.attached_modules
-                        if hw_mod.name() == "thermocycler"
-                    )
-                    if hw_tc:
-                        old_tc = mod_ctx._module
-                        mod_ctx._module = hw_tc
-
-            # InstrumentContextSimulation is an implementation that has no
-            # interaction with hardware controller. This is our fast
-            # simulation.
-            # InstrumentContext objects using an InstrumentContextSimulation
-            # must create an InstrumentContextImplementation in order to
-            # actually connect the InstrumentContext to the hardware
-            # connection.
-            for instrument_ctx in self._instruments.values():
-                if not instrument_ctx:
-                    continue
-                impl = instrument_ctx._implementation
-                if isinstance(impl, InstrumentContextSimulation):
-                    instrument_ctx._implementation = InstrumentContextImplementation(
-                        protocol_interface=self._implementation,
-                        mount=impl.get_mount(),
-                        default_speed=impl.get_default_speed(),
-                        instrument_name=impl.get_instrument_name(),
-                        api_version=self._api_version,
-                    )
-
-            yield self
-        finally:
-            hardware_manager.set_hw(old_hw)
-            if tc_context is not None and old_tc is not None:
-                tc_context._module = old_tc
-            # reset the instrument context implementations.
-            for mount, instrument_impl in old_instrument_impls.items():
-                instrument_context = self._instruments[mount]
-                if instrument_context:
-                    instrument_context._implementation = instrument_impl
-
-    @requires_version(2, 0)
-    def connect(self, hardware: Union[ThreadManager, SynchronousAdapter]):
-        """Connect to a running hardware API.
-
-        This can be either a simulator or a full hardware controller.
-
-        Note that there is no true disconnected state for a
-        :py:class:`.ProtocolContext`; :py:meth:`disconnect` simply creates
-        a new simulator and replaces the current hardware with it.
-        """
-        self._implementation.connect(hardware=hardware)
-
-    @requires_version(2, 0)
-    def disconnect(self):
-        """Disconnect from currently-connected hardware and simulate instead"""
-        self._implementation.disconnect()
 
     @requires_version(2, 0)
     def is_simulating(self) -> bool:
@@ -404,7 +300,7 @@ class ProtocolContext(CommandPublisher):
 
         result.set_calibration(delta=provided_labware_offset.delta)
 
-        self.labware_load_broker.publish(
+        self.equipment_broker.publish(
             LabwareLoadInfo(
                 labware_definition=result._implementation.get_definition(),
                 labware_namespace=result_namespace,
@@ -471,7 +367,7 @@ class ProtocolContext(CommandPublisher):
 
         result.set_calibration(delta=provided_labware_offset.delta)
 
-        self.labware_load_broker.publish(
+        self.equipment_broker.publish(
             LabwareLoadInfo(
                 labware_definition=result._implementation.get_definition(),
                 labware_namespace=result_namespace,
@@ -606,7 +502,7 @@ class ProtocolContext(CommandPublisher):
         deck_slot = types.DeckSlotName.from_primitive(module_loc)
         module_serial = module.module.device_info["serial"]
 
-        self.module_load_broker.publish(
+        self.equipment_broker.publish(
             ModuleLoadInfo(
                 module_model=module.geometry.model,
                 deck_slot=deck_slot,
@@ -618,7 +514,7 @@ class ProtocolContext(CommandPublisher):
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def loaded_modules(self) -> Dict[int, "ModuleContext"]:
+    def loaded_modules(self) -> Dict[int, ModuleContext]:
         """Get the modules loaded into the protocol context.
 
         This is a map of deck positions to modules loaded by previous calls
@@ -633,7 +529,7 @@ class ProtocolContext(CommandPublisher):
                                            ordered by slot number.
         """
 
-        def _modules() -> Iterator[Tuple[int, "ModuleContext"]]:
+        def _modules() -> Iterator[Tuple[int, ModuleContext]]:
             for module in self._modules:
                 yield int(str(module.geometry.parent)), module
 
@@ -646,7 +542,7 @@ class ProtocolContext(CommandPublisher):
         mount: Union[types.Mount, str],
         tip_racks: List[Labware] = None,
         replace: bool = False,
-    ) -> "InstrumentContext":
+    ) -> InstrumentContext:
         """Load a specific instrument required by the protocol.
 
         This value will actually be checked when the protocol runs, to
@@ -705,7 +601,7 @@ class ProtocolContext(CommandPublisher):
         )
         self._instruments[checked_mount] = new_instr
 
-        self.instrument_load_broker.publish(
+        self.equipment_broker.publish(
             InstrumentLoadInfo(
                 instrument_load_name=instrument_name,
                 mount=checked_mount,
@@ -716,7 +612,7 @@ class ProtocolContext(CommandPublisher):
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def loaded_instruments(self) -> Dict[str, "InstrumentContext"]:
+    def loaded_instruments(self) -> Dict[str, InstrumentContext]:
         """Get the instruments that have been loaded into the protocol.
 
         This is a map of mount name to instruments previously loaded with
@@ -782,7 +678,7 @@ class ProtocolContext(CommandPublisher):
 
     @publish(command=cmds.delay)
     @requires_version(2, 0)
-    def delay(self, seconds=0, minutes=0, msg=None):
+    def delay(self, seconds=0, minutes=0, msg=None) -> None:
         """Delay protocol execution for a specific amount of time.
 
         :param float seconds: A time to delay in seconds
@@ -794,7 +690,7 @@ class ProtocolContext(CommandPublisher):
         self._implementation.delay(seconds=delay_time, msg=msg)
 
     @requires_version(2, 0)
-    def home(self):
+    def home(self) -> None:
         """Homes the robot."""
         logger.debug("home")
         self._implementation.home()
@@ -805,7 +701,7 @@ class ProtocolContext(CommandPublisher):
         return self._implementation.get_last_location()
 
     @location_cache.setter
-    def location_cache(self, loc: Optional[types.Location]):
+    def location_cache(self, loc: Optional[types.Location]) -> None:
         self._implementation.set_last_location(loc)
 
     @property  # type: ignore
@@ -848,7 +744,7 @@ class ProtocolContext(CommandPublisher):
         return cast("Labware", trash)
 
     @requires_version(2, 5)
-    def set_rail_lights(self, on: bool):
+    def set_rail_lights(self, on: bool) -> None:
         """
         Controls the robot rail lights
 

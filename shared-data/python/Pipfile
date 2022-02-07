@@ -23,3 +23,4 @@ typeguard = "==2.7.1"
 # https://github.com/pypa/pipenv/issues/4408#issuecomment-668324177
 atomicwrites = {version="==1.4.0", sys_platform="== 'win32'"}
 colorama = {version="==0.4.4", sys_platform="== 'win32'"}
+black = "==22.1.0"
