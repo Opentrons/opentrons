@@ -25,6 +25,8 @@ export * from './tooltips'
 
 // styles
 export * from './styles'
+// new ui-overhaul style vars
+export * from './ui-style-constants'
 
 // Pure Types
 export * from './robot-types'
