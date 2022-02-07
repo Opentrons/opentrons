@@ -29,6 +29,7 @@ from opentrons.protocol_api import (
 )
 from opentrons.protocol_api.labware import Labware as LegacyLabware, Well as LegacyWell
 from opentrons.protocol_api.load_info import (
+    LoadInfo as LegacyLoadInfo,
     InstrumentLoadInfo as LegacyInstrumentLoadInfo,
     LabwareLoadInfo as LegacyLabwareLoadInfo,
     ModuleLoadInfo as LegacyModuleLoadInfo,
@@ -166,6 +167,7 @@ __all__ = [
     "LegacyProtocol",
     "LegacyJsonProtocol",
     "LegacyPythonProtocol",
+    "LegacyLoadInfo",
     "LegacyLabwareLoadInfo",
     "LegacyInstrumentLoadInfo",
     "LegacyModuleLoadInfo",
