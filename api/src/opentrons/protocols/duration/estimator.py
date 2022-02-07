@@ -502,7 +502,7 @@ class DurationEstimator:
             # Inter slot movement defaults to half a second.
             deck_movement_time = 0.5
         else:
-            deck_distance = math.sqrt((x_difference ** 2) + (y_difference ** 2))
+            deck_distance = math.sqrt((x_difference**2) + (y_difference**2))
             deck_movement_time = deck_distance / gantry_speed
         return deck_movement_time
 
