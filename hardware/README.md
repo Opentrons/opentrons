@@ -41,4 +41,6 @@ opentrons_can_comm [-h] --interface INTERFACE [--bitrate BITRATE]
 
 Example using socketcan: `opentrons_can_comm --interface socketcan --channel vcan0`
 
+Example using pcan (Mac): `opentrons_can_comm --interface pcan --channel PCAN_USBBUS1 --bitrate 250000`
+
 Example using opentrons' CAN over socket: `opentrons_can_comm --interface opentrons_sock`
