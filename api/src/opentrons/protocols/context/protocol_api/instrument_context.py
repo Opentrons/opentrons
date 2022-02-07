@@ -65,20 +65,16 @@ class InstrumentContextImplementation(AbstractInstrument):
     def aspirate(self, volume: float, rate: float) -> None:
         """Aspirate a given volume of liquid from the specified location, using
         this pipette."""
-        self._protocol_interface.get_hardware().hardware.aspirate(
-            self._mount, volume, rate
-        )
+        self._protocol_interface.get_hardware().aspirate(self._mount, volume, rate)
 
     def dispense(self, volume: float, rate: float) -> None:
         """Dispense a volume of liquid (in microliters/uL) using this pipette
         into the specified location."""
-        self._protocol_interface.get_hardware().hardware.dispense(
-            self._mount, volume, rate
-        )
+        self._protocol_interface.get_hardware().dispense(self._mount, volume, rate)
 
     def blow_out(self) -> None:
         """Blow liquid out of the tip."""
-        self._protocol_interface.get_hardware().hardware.blow_out(self._mount)
+        self._protocol_interface.get_hardware().blow_out(self._mount)
 
     def touch_tip(
         self, location: WellImplementation, radius: float, v_offset: float, speed: float
@@ -102,9 +98,7 @@ class InstrumentContextImplementation(AbstractInstrument):
             version=self._api_version,
         )
         for edge in edges:
-            self._protocol_interface.get_hardware().hardware.move_to(
-                self._mount, edge, speed
-            )
+            self._protocol_interface.get_hardware().move_to(self._mount, edge, speed)
 
     def pick_up_tip(
         self,
@@ -114,7 +108,7 @@ class InstrumentContextImplementation(AbstractInstrument):
         increment: Optional[float],
     ) -> None:
         """Pick up a tip for the pipette to run liquid-handling commands."""
-        hw = self._protocol_interface.get_hardware().hardware
+        hw = self._protocol_interface.get_hardware()
         geometry = well.get_geometry()
 
         hw.set_current_tiprack_diameter(self._mount, geometry.diameter)
@@ -124,18 +118,18 @@ class InstrumentContextImplementation(AbstractInstrument):
 
     def drop_tip(self, home_after: bool) -> None:
         """Drop the tip."""
-        self._protocol_interface.get_hardware().hardware.drop_tip(
+        self._protocol_interface.get_hardware().drop_tip(
             self._mount, home_after=home_after
         )
 
     def home(self) -> None:
         """Home the mount"""
-        self._protocol_interface.get_hardware().hardware.home_z(self._mount)
+        self._protocol_interface.get_hardware().home_z(self._mount)
         self.home_plunger()
 
     def home_plunger(self) -> None:
         """Home the plunger associated with this mount."""
-        self._protocol_interface.get_hardware().hardware.home_plunger(self._mount)
+        self._protocol_interface.get_hardware().home_plunger(self._mount)
 
     def delay(self) -> None:
         """Delay protocol execution."""
@@ -166,7 +160,7 @@ class InstrumentContextImplementation(AbstractInstrument):
         if not speed:
             speed = self.get_default_speed()
 
-        hardware = self._protocol_interface.get_hardware().hardware
+        hardware = self._protocol_interface.get_hardware()
 
         from_center = from_lw.center_multichannel_on_wells() if from_lw else False
         cp_override = CriticalPoint.XY_CENTER if from_center else None
@@ -236,8 +230,8 @@ class InstrumentContextImplementation(AbstractInstrument):
 
     def get_pipette(self) -> PipetteDict:
         """Get the hardware pipette dictionary."""
-        hw_manager = self._protocol_interface.get_hardware()
-        pipette = hw_manager.hardware.get_attached_instrument(self._mount)
+        sync_hw_api = self._protocol_interface.get_hardware()
+        pipette = sync_hw_api.get_attached_instrument(self._mount)
         if pipette is None:
             raise types.PipetteNotAttachedError()
         return pipette
@@ -254,9 +248,7 @@ class InstrumentContextImplementation(AbstractInstrument):
         return self.get_pipette()["ready_to_aspirate"]
 
     def prepare_for_aspirate(self) -> None:
-        self._protocol_interface.get_hardware().hardware.prepare_for_aspirate(
-            self._mount
-        )
+        self._protocol_interface.get_hardware().prepare_for_aspirate(self._mount)
 
     def get_return_height(self) -> float:
         """The height to return a tip to its tiprack."""
@@ -279,7 +271,7 @@ class InstrumentContextImplementation(AbstractInstrument):
         blow_out: Optional[float] = None,
     ) -> None:
         """Set the flow rates."""
-        self._protocol_interface.get_hardware().hardware.set_flow_rate(
+        self._protocol_interface.get_hardware().set_flow_rate(
             mount=self._mount,
             aspirate=aspirate,
             dispense=dispense,
@@ -293,7 +285,7 @@ class InstrumentContextImplementation(AbstractInstrument):
         blow_out: Optional[float] = None,
     ) -> None:
         """Set pipette speeds."""
-        self._protocol_interface.get_hardware().hardware.set_pipette_speed(
+        self._protocol_interface.get_hardware().set_pipette_speed(
             mount=self._mount,
             aspirate=aspirate,
             dispense=dispense,
@@ -307,7 +299,6 @@ class InstrumentContextImplementation(AbstractInstrument):
         return PairedInstrument(
             primary_instrument=self,
             secondary_instrument=other_instrument,
-            ctx=self._protocol_interface,
             pair_policy=PipettePair.of_mount(self.get_mount()),
-            hardware_manager=self._protocol_interface.get_hardware(),
+            protocol_interface=self._protocol_interface,
         )

@@ -10,17 +10,7 @@ import argparse
 import logging
 import os
 import sys
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    List,
-    Mapping,
-    Optional,
-    TextIO,
-    Union,
-    TYPE_CHECKING,
-)
+from typing import TYPE_CHECKING, Callable, Dict, List, Optional, TextIO, Union
 
 from opentrons import protocol_api, __version__
 from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
@@ -46,9 +36,9 @@ _THREAD_MANAGED_HW: Optional[ThreadManager[HardwareControlAPI]] = None
 
 def get_protocol_api(
     version: Union[str, APIVersion],
-    bundled_labware: Dict[str, "LabwareDefinition"] = None,
-    bundled_data: Dict[str, bytes] = None,
-    extra_labware: Dict[str, "LabwareDefinition"] = None,
+    bundled_labware: Optional[Dict[str, "LabwareDefinition"]] = None,
+    bundled_data: Optional[Dict[str, bytes]] = None,
+    extra_labware: Optional[Dict[str, "LabwareDefinition"]] = None,
 ) -> protocol_api.ProtocolContext:
     """
     Build and return a ``protocol_api.ProtocolContext``
@@ -116,7 +106,7 @@ def get_protocol_api(
         extra_labware = labware_from_paths([str(JUPYTER_NOTEBOOK_LABWARE_DIR)])
 
     context_imp = ProtocolContextImplementation(
-        hardware=_THREAD_MANAGED_HW,
+        sync_hardware=_THREAD_MANAGED_HW.sync,
         bundled_labware=bundled_labware,
         bundled_data=bundled_data,
         extra_labware=extra_labware,
@@ -126,7 +116,7 @@ def get_protocol_api(
     context = protocol_api.ProtocolContext(
         implementation=context_imp, api_version=checked_version
     )
-    context_imp.get_hardware().hardware.cache_instruments()
+    context_imp.get_hardware().cache_instruments()
     return context
 
 
@@ -213,10 +203,10 @@ def execute(
     protocol_name: str,
     propagate_logs: bool = False,
     log_level: str = "warning",
-    emit_runlog: Callable[[Mapping[str, Any]], None] = None,
-    custom_labware_paths: List[str] = None,
-    custom_data_paths: List[str] = None,
-):
+    emit_runlog: Optional[Callable[[command_types.CommandMessage], None]] = None,
+    custom_labware_paths: Optional[List[str]] = None,
+    custom_data_paths: Optional[List[str]] = None,
+) -> None:
     """
     Run the protocol itself.
 
@@ -319,11 +309,11 @@ def execute(
             context.cleanup()
 
 
-def make_runlog_cb():
+def make_runlog_cb() -> Callable[[command_types.CommandMessage], None]:
     level = 0
     last_dollar = None
 
-    def _print_runlog(command: Dict[str, Any]):
+    def _print_runlog(command: command_types.CommandMessage) -> None:
         nonlocal level
         nonlocal last_dollar
 
@@ -382,7 +372,7 @@ def main() -> int:
 
 
 @atexit.register
-def _clear_cached_hardware_controller():
+def _clear_cached_hardware_controller() -> None:
     global _THREAD_MANAGED_HW
     if _THREAD_MANAGED_HW:
         _THREAD_MANAGED_HW.clean_up()

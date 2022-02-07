@@ -8,7 +8,7 @@ from opentrons_shared_data.labware.dev_types import (
 
 from opentrons.calibration_storage.helpers import uri_from_details
 
-from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control import SyncHardwareAPI, HardwareControlAPI
 from opentrons.hardware_control.modules.types import (
     ModuleModel as LegacyModuleModel,
     TemperatureModuleModel as LegacyTemperatureModuleModel,
@@ -93,19 +93,19 @@ class LegacyContextCreator:
 
     def __init__(
         self,
-        hardware_api: HardwareControlAPI,
+        sync_hardware_api: SyncHardwareAPI,
         labware_offset_provider: LegacyLabwareOffsetProvider,
     ) -> None:
         """Prepare the LegacyContextCreator.
 
         Args:
-            hardware_api: The interface to the hardware API that the created
+            sync_hardware_api: The interface to the hardware API that the created
                 Protocol API v2 contexts will use. Regardless of
                 ``use_simulating_implementation``, this can either be a real hardware
                 API to actually control the robot, or a simulating hardware API.
             labware_offset_provider: Interface for the context to load labware offsets.
         """
-        self._hardware_api = hardware_api
+        self._sync_hardware_api = sync_hardware_api
         self._labware_offset_provider = labware_offset_provider
 
     def create(self, protocol: LegacyProtocol) -> LegacyProtocolContext:
@@ -121,7 +121,7 @@ class LegacyContextCreator:
             api_version=api_version,
             labware_offset_provider=self._labware_offset_provider,
             implementation=self._ContextImplementation(
-                hardware=self._hardware_api,
+                sync_hardware=self._sync_hardware_api,
                 api_version=api_version,
                 extra_labware=extra_labware,
             ),
