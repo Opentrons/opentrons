@@ -343,7 +343,7 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
     def calibrate(self) -> None:
         """Calibrate the Magnetic Module.
 
-        The calibration is used to establish the position of the lawbare on
+        The calibration is used to establish the position of the labware on
         top of the magnetic module.
         """
         self._module.calibrate()
@@ -456,7 +456,7 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
     @property  # type: ignore
     @requires_version(2, 0)
     def status(self) -> str:
-        """The status of the module. either 'engaged' or 'disengaged'"""
+        """The status of the module; either 'engaged' or 'disengaged'"""
         return self._module.status
 
 
