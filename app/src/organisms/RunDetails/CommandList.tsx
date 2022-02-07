@@ -107,11 +107,6 @@ export function CommandList(): JSX.Element | null {
     firstNonSetupIndex
   )
 
-  // console.log('allProtocolCommands', allProtocolCommands.length)
-  // console.log('runCommands', runCommands.length)
-  // console.log('firstRunCommandIndexAfterInitialPlay', firstRunCommandIndexAfterInitialPlay)
-  // console.log('postInitialPlayRunCommandCount', postInitialPlayRunCommandCount)
-
   const runStartDateTime = runStartTime != null ? new Date(runStartTime) : null
   const postInitialPlayRunCommands = runStartDateTime != null ? dropWhile(runCommands, runCommandSummary => (
     new Date(runCommandSummary.createdAt) <= runStartDateTime
@@ -121,9 +116,6 @@ export function CommandList(): JSX.Element | null {
       runCommandSummary.commandType !== 'loadPipette' &&
       runCommandSummary.commandType !== 'loadModule'
   ))
-  // console.log('postSetupRunCommands', postSetupRunCommands)
-  // const currentCommandIndex = postSetupRunCommands.length - 1
-  // console.log('currentCommandIndex', currentCommandIndex)
 
   let currentCommandList: CommandRuntimeInfo[] = postSetupAnticipatedCommands.map(
     postSetupAnticaptedCommand => ({
