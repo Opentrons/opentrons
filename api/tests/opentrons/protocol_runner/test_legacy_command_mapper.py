@@ -264,7 +264,7 @@ def test_map_labware_load(minimal_labware_def: LabwareDefinition) -> None:
             offsetId="labware-offset-id-123",
         ),
     )
-    output = LegacyCommandMapper().map_labware_load(input)
+    output = LegacyCommandMapper().map_equipment_load(input)
     assert output == expected_output
 
 
@@ -287,7 +287,7 @@ def test_map_instrument_load() -> None:
         result=pe_commands.LoadPipetteResult.construct(pipetteId=matchers.IsA(str)),
     )
 
-    output = LegacyCommandMapper().map_instrument_load(input)
+    output = LegacyCommandMapper().map_equipment_load(input)
     assert output == expected_output
 
 
@@ -329,7 +329,7 @@ def test_map_module_load(
     )
     output = LegacyCommandMapper(
         module_data_provider=module_data_provider
-    ).map_module_load(input)
+    ).map_equipment_load(input)
     assert output == expected_output
 
 
@@ -367,7 +367,7 @@ def test_map_module_labware_load(minimal_labware_def: LabwareDefinition) -> None
     )
     subject = LegacyCommandMapper()
     subject._module_id_by_slot = {DeckSlotName.SLOT_1: "module-123"}
-    output = subject.map_labware_load(load_input)
+    output = subject.map_equipment_load(load_input)
     assert output == expected_output
 
 
