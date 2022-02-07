@@ -29,6 +29,7 @@ export const TemperatureModuleData = (
   let backgroundColor: string = C_SILVER_GRAY
   let iconColor: string = C_DARK_GRAY
   let textColor
+  let pulse
   switch (moduleStatus) {
     case 'idle': {
       backgroundColor = C_SILVER_GRAY
@@ -44,7 +45,7 @@ export const TemperatureModuleData = (
     case 'cooling':
     case 'heating': {
       backgroundColor = C_SKY_BLUE
-      //  TODO IMMEDIATELY: animate iconColor
+      pulse = true
       break
     }
   }
@@ -56,6 +57,7 @@ export const TemperatureModuleData = (
         backgroundColor={backgroundColor}
         iconColor={iconColor}
         textColor={textColor}
+        pulse={pulse}
       />
       <Flex fontSize={FONT_SIZE_CAPTION} flexDirection={DIRECTION_COLUMN}>
         <Text>

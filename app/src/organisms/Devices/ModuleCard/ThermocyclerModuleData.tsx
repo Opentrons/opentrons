@@ -43,6 +43,7 @@ export const ThermocyclerModuleData = (
       backgroundColor: C_SILVER_GRAY,
       iconColor: C_DARK_GRAY,
       textColor: C_BLUE_PRESSED,
+      pulse: false,
     }
 
     switch (status) {
@@ -60,7 +61,7 @@ export const ThermocyclerModuleData = (
       case 'cooling':
       case 'heating': {
         StatusLabelProps.backgroundColor = C_SKY_BLUE
-        //  TODO IMMEDIATELY: animate iconColor
+        StatusLabelProps.pulse = true
         break
       }
       case 'error': {
