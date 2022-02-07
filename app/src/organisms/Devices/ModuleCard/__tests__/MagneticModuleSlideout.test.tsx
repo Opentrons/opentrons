@@ -28,7 +28,7 @@ describe('MagneticModuleSlideout', () => {
   let props: React.ComponentProps<typeof MagneticModuleSlideout>
   beforeEach(() => {
     props = {
-      model: mockMagneticModule,
+      module: mockMagneticModule,
       isExpanded: true,
     }
     mockInputField.mockReturnValue(<div></div>)
@@ -58,7 +58,7 @@ describe('MagneticModuleSlideout', () => {
 
   it('renders correct title and body for a gen2 magnetic module', () => {
     props = {
-      model: mockMagneticModuleGen2,
+      module: mockMagneticModuleGen2,
       isExpanded: true,
     }
     const { getByText } = render(props)

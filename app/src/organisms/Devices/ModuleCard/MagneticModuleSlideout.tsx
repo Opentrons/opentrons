@@ -67,15 +67,15 @@ const getInfoByModel = (model: ModuleModel): ModelContents => {
   }
 }
 
-interface ModuleCardProps {
-  model: AttachedModule
+interface MagneticModuleSlideoutProps {
+  module: AttachedModule
   isExpanded: boolean
 }
 
 export const MagneticModuleSlideout = (
-  props: ModuleCardProps
+  props: MagneticModuleSlideoutProps
 ): JSX.Element | null => {
-  const { model, isExpanded } = props
+  const { module, isExpanded } = props
   const { t } = useTranslation('device_details')
   const sendModuleCommand = useSendModuleCommand()
   const [engageHeightValue, setEngageHeightValue] = React.useState<
@@ -83,12 +83,12 @@ export const MagneticModuleSlideout = (
   >(null)
   const handleSubmitHeight = (): void => {
     if (engageHeightValue != null) {
-      sendModuleCommand(model.serial, 'engage', [Number(engageHeightValue)])
+      sendModuleCommand(module.serial, 'engage', [Number(engageHeightValue)])
     }
     setEngageHeightValue(null)
   }
-  const moduleName = getModuleDisplayName(model.model)
-  const info = getInfoByModel(model.model)
+  const moduleName = getModuleDisplayName(module.model)
+  const info = getInfoByModel(module.model)
 
   let max: number | TFunctionResult = 0
   let labwareBottom: number | TFunctionResult = 0
@@ -118,11 +118,11 @@ export const MagneticModuleSlideout = (
           fontWeight={FONT_WEIGHT_REGULAR}
           fontSize="0.6875rem"
           paddingTop={SPACING_1}
-          data-testid={`Mag_Slideout_body_text_${model.model}`}
+          data-testid={`Mag_Slideout_body_text_${module.model}`}
         >
           {t('set_engage_height_slideout_body', {
-            lower: model.model === MAGNETIC_MODULE_V1 ? 5 : 4,
-            higher: model.model === MAGNETIC_MODULE_V2 ? 40 : 16,
+            lower: module.model === MAGNETIC_MODULE_V1 ? 5 : 4,
+            higher: module.model === MAGNETIC_MODULE_V2 ? 40 : 16,
           })}
         </Text>
         <Text
@@ -131,7 +131,7 @@ export const MagneticModuleSlideout = (
           paddingTop={SPACING_3}
           textTransform={TEXT_TRANSFORM_UPPERCASE}
           paddingBottom={SPACING_2}
-          data-testid={`Mag_Slideout_body_subtitle_${model.model}`}
+          data-testid={`Mag_Slideout_body_subtitle_${module.model}`}
         >
           {t('set_engage_height_slideout_subtitle', { gen: info.version })}
         </Text>
@@ -145,7 +145,7 @@ export const MagneticModuleSlideout = (
         >
           <Flex
             flexDirection={DIRECTION_COLUMN}
-            data-testid={`Mag_Slideout_body_data_text_${model.model}`}
+            data-testid={`Mag_Slideout_body_data_text_${module.model}`}
           >
             <Text paddingBottom={SPACING_2}>
               {t('max_engage_height_slideout')}
@@ -158,7 +158,7 @@ export const MagneticModuleSlideout = (
           <Flex
             flexDirection={DIRECTION_COLUMN}
             justifyContent={JUSTIFY_FLEX_END}
-            data-testid={`Mag_Slideout_body_data_num_${model.model}`}
+            data-testid={`Mag_Slideout_body_data_num_${module.model}`}
           >
             <Text paddingBottom={SPACING_2}>{max}</Text>
             <Text paddingBottom={SPACING_2}>{labwareBottom}</Text>
@@ -168,7 +168,7 @@ export const MagneticModuleSlideout = (
         <Flex
           marginTop={SPACING_3}
           flexDirection={DIRECTION_COLUMN}
-          data-testid={`Mag_Slideout_input_field_${model.model}`}
+          data-testid={`Mag_Slideout_input_field_${module.model}`}
         >
           <Text
             fontWeight={FONT_WEIGHT_REGULAR}
@@ -191,7 +191,7 @@ export const MagneticModuleSlideout = (
           textTransform={TEXT_TRANSFORM_NONE}
           onClick={handleSubmitHeight}
           disabled={engageHeightValue == null}
-          data-testid={`Mag_Slideout_set_height_btn_${model.model}`}
+          data-testid={`Mag_Slideout_set_height_btn_${module.model}`}
         >
           <Text fontWeight={FONT_WEIGHT_REGULAR} fontSize="0.6875rem">
             {t('set_engage_height_slideout_btn')}
