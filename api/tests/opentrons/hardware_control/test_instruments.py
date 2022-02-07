@@ -448,14 +448,12 @@ def assert_move_called(mock_move, speed, lock=None):
             speed=speed,
             home_flagged_axes=False,
             acquire_lock=lock,
-            secondary_z=mock.ANY,
         )
     else:
         mock_move.assert_called_with(
             mock.ANY,
             speed=speed,
             home_flagged_axes=False,
-            secondary_z=mock.ANY,
         )
 
 

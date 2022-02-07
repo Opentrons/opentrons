@@ -42,7 +42,7 @@ some challenges to correct use of both, stemming from weird organization of the 
 
 If you import ``opentrons.types`` and ``opentrons.hardware_control.types`` you should have all of the definitions
 necessary to interact with the hardware control API. For instance, ``opentrons.types`` provides ``Mount`` and ``Point``;
-``opentrons.hardware_control.types`` provides ``CriticalPoint``, ``Axis``, and ``PipettePair``.
+``opentrons.hardware_control.types`` provides ``CriticalPoint``, and ``Axis``.
 
 You also need to import ``opentrons.hardware_control`` to get the ``API`` object itself (which has classmethods to
 build it like ``build_hardware_controller``) and the ``ThreadManager`` class (which lets you run the hardware controller
