@@ -1,6 +1,8 @@
 """Tests for move util functions."""
 import pytest
-from typing import Iterator
+import numpy as np  # type: ignore[import]
+from typing import Iterator, List
+from hypothesis import given, strategies as st, assume
 
 from opentrons_hardware.hardware_control.motion_planning.move_manager import MoveManager
 from opentrons_hardware.hardware_control.motion_planning.move_utils import (
@@ -8,6 +10,8 @@ from opentrons_hardware.hardware_control.motion_planning.move_utils import (
     find_final_speed,
     targets_to_moves,
     all_blended,
+    get_unit_vector,
+    FLOAT_THRESHOLD,
 )
 from opentrons_hardware.hardware_control.motion_planning.types import (
     Axis,
@@ -85,9 +89,9 @@ def test_convert_targets_to_moves() -> None:
             distance=10.0,
             max_speed=1,
             blocks=(
-                Block(distance=0, initial_speed=1, acceleration=0),
-                Block(distance=0, initial_speed=1, acceleration=0),
-                Block(distance=0, initial_speed=1, acceleration=0),
+                Block(distance=10 / 3, initial_speed=1, acceleration=0),
+                Block(distance=10 / 3, initial_speed=1, acceleration=0),
+                Block(distance=10 / 3, initial_speed=1, acceleration=0),
             ),
         ),
         Move.build(
@@ -95,9 +99,9 @@ def test_convert_targets_to_moves() -> None:
             distance=20.0,
             max_speed=2,
             blocks=(
-                Block(distance=0, initial_speed=2, acceleration=0),
-                Block(distance=0, initial_speed=2, acceleration=0),
-                Block(distance=0, initial_speed=2, acceleration=0),
+                Block(distance=20 / 3, initial_speed=2, acceleration=0),
+                Block(distance=20 / 3, initial_speed=2, acceleration=0),
+                Block(distance=20 / 3, initial_speed=2, acceleration=0),
             ),
         ),
         Move.build(
@@ -105,9 +109,9 @@ def test_convert_targets_to_moves() -> None:
             distance=151.0,
             max_speed=3,
             blocks=(
-                Block(distance=0, initial_speed=3, acceleration=0),
-                Block(distance=0, initial_speed=3, acceleration=0),
-                Block(distance=0, initial_speed=3, acceleration=0),
+                Block(distance=151 / 3, initial_speed=3, acceleration=0),
+                Block(distance=151 / 3, initial_speed=3, acceleration=0),
+                Block(distance=151 / 3, initial_speed=3, acceleration=0),
             ),
         ),
         Move.build(
@@ -115,9 +119,9 @@ def test_convert_targets_to_moves() -> None:
             distance=1255.0,
             max_speed=4,
             blocks=(
-                Block(distance=0, initial_speed=4, acceleration=0),
-                Block(distance=0, initial_speed=4, acceleration=0),
-                Block(distance=0, initial_speed=4, acceleration=0),
+                Block(distance=1255 / 3, initial_speed=4, acceleration=0),
+                Block(distance=1255 / 3, initial_speed=4, acceleration=0),
+                Block(distance=1255 / 3, initial_speed=4, acceleration=0),
             ),
         ),
     ]
@@ -126,7 +130,7 @@ def test_convert_targets_to_moves() -> None:
 
 
 @pytest.mark.parametrize(
-    argnames=["origin", "unit_vector", "max_speed", "expected"],
+    argnames=["prev_move", "unit_vector", "max_speed", "expected"],
     argvalues=[
         # previous move is not moving, use the smaller of move max speed and axis max
         # speed discontinuity
@@ -153,7 +157,7 @@ def test_convert_targets_to_moves() -> None:
     ],
 )
 def test_initial_speed(
-    origin: Move,
+    prev_move: Move,
     unit_vector: Iterator[AcceptableType],
     max_speed: float,
     expected: float,
@@ -164,12 +168,12 @@ def test_initial_speed(
         distance=100,
         max_speed=max_speed,
         blocks=(
-            Block(distance=0, initial_speed=0, acceleration=0),
-            Block(distance=0, initial_speed=0, acceleration=0),
-            Block(distance=0, initial_speed=0, acceleration=0),
+            Block(distance=100 / 3, initial_speed=max_speed, acceleration=0),
+            Block(distance=100 / 3, initial_speed=max_speed, acceleration=0),
+            Block(distance=100 / 3, initial_speed=max_speed, acceleration=0),
         ),
     )
-    assert find_initial_speed(CONSTRAINTS, move, origin) == expected
+    assert find_initial_speed(CONSTRAINTS, move, prev_move) == expected
 
 
 @pytest.mark.parametrize(
@@ -206,9 +210,9 @@ def test_final_speed(
         distance=100,
         max_speed=max_speed,
         blocks=(
-            Block(distance=0, initial_speed=0, acceleration=0),
-            Block(distance=0, initial_speed=0, acceleration=0),
-            Block(distance=0, initial_speed=0, acceleration=0),
+            Block(distance=100 / 3, initial_speed=max_speed, acceleration=0),
+            Block(distance=100 / 3, initial_speed=max_speed, acceleration=0),
+            Block(distance=100 / 3, initial_speed=max_speed, acceleration=0),
         ),
     )
     assert find_final_speed(CONSTRAINTS, move, next_move) == expected
@@ -226,3 +230,17 @@ def test_blend_motion() -> None:
     success, blend_log = manager.plan_motion(origin, target_list)
     assert success
     assert all_blended(CONSTRAINTS, blend_log[-1])
+
+
+coords = st.lists(st.floats(min_value=0, max_value=1e64), min_size=4, max_size=4)
+
+
+@given(coords, coords)
+def test_get_unit_vector(x: List[float], y: List[float]) -> None:
+    """Get unit vector function should return a unit vector."""
+    assume(x != y)
+    assume(all(abs(j - i) > FLOAT_THRESHOLD for i, j in zip(x, y)))
+    coord_0 = Coordinates.from_iter(np.float64(i) for i in x)
+    coord_1 = Coordinates.from_iter(np.float64(i) for i in y)
+    unit_v, _ = get_unit_vector(coord_1, coord_0)
+    assert unit_v.is_unit_vector()

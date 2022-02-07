@@ -4,11 +4,11 @@ from mock import MagicMock
 from opentrons.drivers.types import MoveSplit
 from opentrons.hardware_control.emulation.settings import Settings
 
-from opentrons.config.robot_configs import (
+from opentrons.config.defaults_ot2 import (
     DEFAULT_GANTRY_STEPS_PER_MM,
     DEFAULT_PIPETTE_CONFIGS,
-    build_config,
 )
+from opentrons.config.robot_configs import build_config_ot2
 from opentrons.drivers.smoothie_drivers import SmoothieDriver
 
 
@@ -19,7 +19,7 @@ async def subject(
     """Smoothie driver connected to emulator."""
     d = await SmoothieDriver.build(
         port=f"socket://127.0.0.1:{emulator_settings.smoothie.port}",
-        config=build_config({}),
+        config=build_config_ot2({}),
     )
     yield d
     await d.disconnect()

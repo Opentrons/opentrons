@@ -1,5 +1,6 @@
 import ast
 import json
+from typing import Optional
 
 import pytest
 
@@ -280,7 +281,7 @@ def test_parse_json_details(
     else:
         protocol_text = protocol.encode("utf-8")
     if filename == "real":
-        fname = "simple.json"
+        fname: Optional[str] = "simple.json"
     else:
         fname = None
     parsed = parse(protocol_text, fname)
@@ -320,8 +321,8 @@ def test_extra_contents(get_labware_fixture, protocol_file, protocol):
         extra_labware=bundled_labware,
         extra_data=extra_data,
     )
-    assert parsed.extra_labware == bundled_labware
-    assert parsed.bundled_data == extra_data
+    assert parsed.extra_labware == bundled_labware  # type: ignore[union-attr]
+    assert parsed.bundled_data == extra_data  # type: ignore[union-attr]
 
 
 @pytest.mark.parametrize(

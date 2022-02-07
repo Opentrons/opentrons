@@ -79,3 +79,9 @@ export const GEN_ONE_MULTI_PIPETTES = ['p10_multi', 'p50_multi', 'p300_multi']
 export const IDENTITY_VECTOR = { x: 0, y: 0, z: 0 }
 
 export const ROBOT_MODELS = ['OT-2 Standard', 'OT-3 Standard']
+
+export const OT3_PIPETTES = [
+  'p300_single_gen3',
+  'p1000_single_gen3',
+  'p20_single_gen3',
+]

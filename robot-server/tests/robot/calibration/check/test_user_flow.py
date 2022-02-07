@@ -25,7 +25,7 @@ from robot_server.robot.calibration.constants import (
 
 
 PIP_OFFSET = CSTypes.PipetteOffsetByPipetteMount(
-    offset=robot_configs.DEFAULT_PIPETTE_OFFSET,
+    offset=robot_configs.defaults_ot2.DEFAULT_PIPETTE_OFFSET,
     source=CSTypes.SourceType.user,
     status=CSTypes.CalibrationStatus(),
 )
@@ -177,7 +177,7 @@ def build_mock_deck_calibration(kind="normal"):
     elif kind == "identity":
         return MagicMock(
             return_value=CSTypes.DeckCalibration(
-                attitude=robot_configs.DEFAULT_DECK_CALIBRATION_V2,
+                attitude=robot_configs.defaults_ot2.DEFAULT_DECK_CALIBRATION_V2,
                 source=CSTypes.SourceType.user,
                 status=CSTypes.CalibrationStatus(markedBad=False),
             )

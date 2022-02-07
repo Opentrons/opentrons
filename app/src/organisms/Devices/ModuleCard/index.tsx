@@ -20,12 +20,13 @@ import {
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import { ModuleIcon } from '../ModuleIcon'
 import { MagneticModuleData } from './MagneticModuleData'
+import { TemperatureModuleData } from './TemperatureModuleData'
 import { ThermocyclerModuleData } from './ThermocyclerModuleData'
 
 import magneticModule from '../../../assets/images/magnetic_module_gen_2_transparent.svg'
 import temperatureModule from '../../../assets/images/temp_deck_gen_2_transparent.svg'
 import thermoModule from '../../../assets/images/thermocycler_open_transparent.svg'
-import overflow_icon from '../../../assets/images/overflow_icon.svg'
+import overflowIcon from '../../../assets/images/overflow_icon.svg'
 
 import type { AttachedModule } from '../../../redux/modules/types'
 
@@ -54,6 +55,13 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
 
     case 'temperatureModuleType': {
       image = temperatureModule
+      moduleData = (
+        <TemperatureModuleData
+          moduleStatus={module.status}
+          targetTemp={module.data.targetTemp}
+          currentTemp={module.data.currentTemp}
+        />
+      )
       break
     }
 
@@ -94,7 +102,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               fontSize={FONT_SIZE_CAPTION}
               paddingBottom={SPACING_1}
             >
-              {t('usb_port', {
+              {t(module.usbPort.port === null ? 'usb_hub' : 'usb_port', {
                 port: module.usbPort.hub ?? module.usbPort.port,
               })}
             </Text>
@@ -111,7 +119,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
 
       <Box alignSelf={ALIGN_START} padding={SPACING_1}>
         <Btn onClick={() => console.log('overflow')} aria-label="overflow">
-          <img src={overflow_icon} />
+          <img src={overflowIcon} />
         </Btn>
       </Box>
     </Flex>

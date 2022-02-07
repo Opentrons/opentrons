@@ -5,7 +5,7 @@ import pytest
 from decoy import Decoy, matchers
 from typing import Any, Dict, cast
 from opentrons.broker import Broker
-from opentrons.commands.types import Command as CommandDict
+from opentrons.commands.types import Command as CommandDict, CommandMessage
 from opentrons.commands.publisher import CommandPublisher, publish, publish_context
 
 
@@ -39,24 +39,30 @@ def test_publish_decorator(decoy: Decoy, broker: Broker) -> None:
     decoy.verify(
         broker.publish(
             topic="command",
-            message={
-                "$": "before",
-                "id": before_message_id,
-                "name": "some_command",
-                "payload": {"foo": "hello", "bar": 42},
-                "error": None,
-            },
+            message=cast(
+                CommandMessage,
+                {
+                    "$": "before",
+                    "id": before_message_id,
+                    "name": "some_command",
+                    "payload": {"foo": "hello", "bar": 42},
+                    "error": None,
+                },
+            ),
         ),
         _act(),
         broker.publish(
             topic="command",
-            message={
-                "$": "after",
-                "id": after_message_id,
-                "name": "some_command",
-                "payload": {"foo": "hello", "bar": 42},
-                "error": None,
-            },
+            message=cast(
+                CommandMessage,
+                {
+                    "$": "after",
+                    "id": after_message_id,
+                    "name": "some_command",
+                    "payload": {"foo": "hello", "bar": 42},
+                    "error": None,
+                },
+            ),
         ),
     )
 
@@ -84,24 +90,30 @@ def test_publish_decorator_with_arg_defaults(decoy: Decoy, broker: Broker) -> No
     decoy.verify(
         broker.publish(
             topic="command",
-            message={
-                "$": "before",
-                "id": matchers.IsA(str),
-                "name": "some_command",
-                "payload": {"foo": "hello", "bar": 42},
-                "error": None,
-            },
+            message=cast(
+                CommandMessage,
+                {
+                    "$": "before",
+                    "id": matchers.IsA(str),
+                    "name": "some_command",
+                    "payload": {"foo": "hello", "bar": 42},
+                    "error": None,
+                },
+            ),
         ),
         _act(),
         broker.publish(
             topic="command",
-            message={
-                "$": "after",
-                "id": matchers.IsA(str),
-                "name": "some_command",
-                "payload": {"foo": "hello", "bar": 42},
-                "error": None,
-            },
+            message=cast(
+                CommandMessage,
+                {
+                    "$": "after",
+                    "id": matchers.IsA(str),
+                    "name": "some_command",
+                    "payload": {"foo": "hello", "bar": 42},
+                    "error": None,
+                },
+            ),
         ),
     )
 
@@ -128,23 +140,29 @@ def test_publish_decorator_with_error(decoy: Decoy, broker: Broker) -> None:
     decoy.verify(
         broker.publish(
             topic="command",
-            message={
-                "$": "before",
-                "id": before_message_id,
-                "name": "some_command",
-                "payload": {"foo": "hello", "bar": 42},
-                "error": None,
-            },
+            message=cast(
+                CommandMessage,
+                {
+                    "$": "before",
+                    "id": before_message_id,
+                    "name": "some_command",
+                    "payload": {"foo": "hello", "bar": 42},
+                    "error": None,
+                },
+            ),
         ),
         broker.publish(
             topic="command",
-            message={
-                "$": "after",
-                "id": after_message_id,
-                "name": "some_command",
-                "payload": {"foo": "hello", "bar": 42},
-                "error": matchers.IsA(RuntimeError),
-            },
+            message=cast(
+                CommandMessage,
+                {
+                    "$": "after",
+                    "id": after_message_id,
+                    "name": "some_command",
+                    "payload": {"foo": "hello", "bar": 42},
+                    "error": matchers.IsA(RuntimeError),
+                },
+            ),
         ),
     )
 
@@ -175,24 +193,30 @@ def test_publish_decorator_remaps_instrument(decoy: Decoy, broker: Broker) -> No
     decoy.verify(
         broker.publish(
             topic="command",
-            message={
-                "$": "before",
-                "id": matchers.IsA(str),
-                "name": "some_command",
-                "payload": {"foo": "hello", "bar": 42},
-                "error": None,
-            },
+            message=cast(
+                CommandMessage,
+                {
+                    "$": "before",
+                    "id": matchers.IsA(str),
+                    "name": "some_command",
+                    "payload": {"foo": "hello", "bar": 42},
+                    "error": None,
+                },
+            ),
         ),
         _act(),
         broker.publish(
             topic="command",
-            message={
-                "$": "after",
-                "id": matchers.IsA(str),
-                "name": "some_command",
-                "payload": {"foo": "hello", "bar": 42},
-                "error": None,
-            },
+            message=cast(
+                CommandMessage,
+                {
+                    "$": "after",
+                    "id": matchers.IsA(str),
+                    "name": "some_command",
+                    "payload": {"foo": "hello", "bar": 42},
+                    "error": None,
+                },
+            ),
         ),
     )
 
@@ -217,24 +241,30 @@ def test_publish_context(decoy: Decoy, broker: Broker) -> None:
     decoy.verify(
         broker.publish(
             topic="command",
-            message={
-                "$": "before",
-                "id": before_message_id,
-                "name": "some_command",
-                "payload": {"foo": "hello", "bar": 42},
-                "error": None,
-            },
+            message=cast(
+                CommandMessage,
+                {
+                    "$": "before",
+                    "id": before_message_id,
+                    "name": "some_command",
+                    "payload": {"foo": "hello", "bar": 42},
+                    "error": None,
+                },
+            ),
         ),
         _act(),
         broker.publish(
             topic="command",
-            message={
-                "$": "after",
-                "id": after_message_id,
-                "name": "some_command",
-                "payload": {"foo": "hello", "bar": 42},
-                "error": None,
-            },
+            message=cast(
+                CommandMessage,
+                {
+                    "$": "after",
+                    "id": after_message_id,
+                    "name": "some_command",
+                    "payload": {"foo": "hello", "bar": 42},
+                    "error": None,
+                },
+            ),
         ),
     )
 
@@ -260,23 +290,29 @@ def test_publish_context_with_error(decoy: Decoy, broker: Broker) -> None:
     decoy.verify(
         broker.publish(
             topic="command",
-            message={
-                "$": "before",
-                "id": before_message_id,
-                "name": "some_command",
-                "payload": {"foo": "hello", "bar": 42},
-                "error": None,
-            },
+            message=cast(
+                CommandMessage,
+                {
+                    "$": "before",
+                    "id": before_message_id,
+                    "name": "some_command",
+                    "payload": {"foo": "hello", "bar": 42},
+                    "error": None,
+                },
+            ),
         ),
         broker.publish(
             topic="command",
-            message={
-                "$": "after",
-                "id": after_message_id,
-                "name": "some_command",
-                "payload": {"foo": "hello", "bar": 42},
-                "error": matchers.IsA(RuntimeError),
-            },
+            message=cast(
+                CommandMessage,
+                {
+                    "$": "after",
+                    "id": after_message_id,
+                    "name": "some_command",
+                    "payload": {"foo": "hello", "bar": 42},
+                    "error": matchers.IsA(RuntimeError),
+                },
+            ),
         ),
     )
 

@@ -9,28 +9,39 @@ from typing import Dict, List, NewType, Union
 from typing_extensions import Literal, TypedDict
 
 
-LabwareUri = NewType('LabwareUri', str)
+LabwareUri = NewType("LabwareUri", str)
 # Explicit listing of pipette names because we don't frequently get new ones
-PipetteName = Union[Literal['p10_single'], Literal['p10_multi'],
-                    Literal['p20_single_gen2'], Literal['p20_multi_gen2'],
-                    Literal['p50_single'], Literal['p50_multi'],
-                    Literal['p300_single'], Literal['p300_multi'],
-                    Literal['p300_single_gen2'], Literal['p300_multi_gen2'],
-                    Literal['p1000_single'], Literal['p1000_single_gen2']]
+PipetteName = Union[
+    Literal["p10_single"],
+    Literal["p10_multi"],
+    Literal["p20_single_gen2"],
+    Literal["p20_multi_gen2"],
+    Literal["p50_single"],
+    Literal["p50_multi"],
+    Literal["p300_single"],
+    Literal["p300_multi"],
+    Literal["p300_single_gen2"],
+    Literal["p300_multi_gen2"],
+    Literal["p1000_single"],
+    Literal["p1000_single_gen2"],
+    Literal["p300_single_gen3"],
+    Literal["p1000_single_gen3"],
+    Literal["p20_single_gen3"],
+]
 
 # Generic NewType for models because we get new ones frequently and theres
 # a huge number of them
-PipetteModel = NewType('PipetteModel', str)
+PipetteModel = NewType("PipetteModel", str)
 
-DisplayCategory = Union[Literal['GEN1'], Literal['GEN2']]
+DisplayCategory = Union[Literal["GEN1"], Literal["GEN2"]]
 
-ConfigUnit = Union[Literal['mm'], Literal['amps'], Literal['mm/sec']]
+ConfigUnit = Union[Literal["mm"], Literal["amps"], Literal["mm/sec"]]
 
-Quirk = NewType('Quirk', str)
+Quirk = NewType("Quirk", str)
 
 ChannelCount = Union[Literal[1], Literal[8]]
 
-UlPerMmAction = Union[Literal['aspirate'], Literal['dispense']]
+UlPerMmAction = Union[Literal["aspirate"], Literal["dispense"]]
 
 
 class PipetteConfigElement(TypedDict):
@@ -52,7 +63,7 @@ class PipetteCustomizableConfigElementFloat(TypedDict):
     min: float
     max: float
     units: ConfigUnit
-    type: Literal['float']
+    type: Literal["float"]
 
 
 class PipetteCustomizableConfigElementInt(TypedDict):
@@ -60,17 +71,17 @@ class PipetteCustomizableConfigElementInt(TypedDict):
     min: int
     max: int
     units: ConfigUnit
-    type: Literal['int']
+    type: Literal["int"]
 
 
 PipetteCustomizableConfigElement = Union[
-    PipetteCustomizableConfigElementFloat, PipetteCustomizableConfigElementInt]
+    PipetteCustomizableConfigElementFloat, PipetteCustomizableConfigElementInt
+]
 
 SmoothieConfigs = TypedDict(
-    'SmoothieConfigs',
-    {'stepsPerMM': float,
-     'homePosition': float,
-     'travelDistance': float})
+    "SmoothieConfigs",
+    {"stepsPerMM": float, "homePosition": float, "travelDistance": float},
+)
 
 
 class PipetteNameSpec(TypedDict):

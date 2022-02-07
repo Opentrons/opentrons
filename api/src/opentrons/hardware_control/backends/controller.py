@@ -17,12 +17,12 @@ from opentrons.config import pipette_config
 from opentrons.config.types import RobotConfig
 from opentrons.types import Mount
 
-from .module_control import AttachedModulesControl
-from .types import AionotifyEvent, BoardRevision, Axis
+from ..module_control import AttachedModulesControl
+from ..types import AionotifyEvent, BoardRevision, Axis
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import PipetteModel, PipetteName
-    from .dev_types import (
+    from ..dev_types import (
         AttachedInstrument,
         AttachedInstruments,
         InstrumentHardwareConfigs,
@@ -68,7 +68,7 @@ class Controller:
                 "environmental variable to 1."
             )
 
-        self.config = config or opentrons.config.robot_configs.load()
+        self.config = config or opentrons.config.robot_configs.load_ot2()
 
         self._gpio_chardev: Final = gpio
         self._board_revision: Final = self.gpio_chardev.board_rev

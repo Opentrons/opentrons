@@ -1,3 +1,4 @@
+import pytest
 from opentrons.calibration_storage.types import (
     DeckCalibration,
     SourceType,
@@ -7,6 +8,7 @@ from opentrons.hardware_control.util import DeckTransformState
 from opentrons.hardware_control.robot_calibration import RobotCalibration
 
 
+@pytest.mark.ot2_only  # ot3 attitude is always correct
 async def test_validating_attitude(hardware):
 
     inrange_matrix = [[1, 0, 1], [0, 1, 2], [0, 0, 1]]

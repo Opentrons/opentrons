@@ -1,8 +1,12 @@
 """A collection of motions that define a single move."""
 from typing import List, Dict
 from dataclasses import dataclass
+import numpy as np  # type: ignore[import]
+from logging import getLogger
 
-from opentrons_hardware.drivers.can_bus import NodeId
+from opentrons_ot3_firmware.constants import NodeId
+
+LOG = getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -23,6 +27,15 @@ MoveGroup = List[MoveGroupStep]
 
 MoveGroups = List[MoveGroup]
 
+MAX_SPEEDS = {
+    NodeId.gantry_x: 50,
+    NodeId.gantry_y: 50,
+    NodeId.head_l: 50,
+    NodeId.head_r: 50,
+    NodeId.pipette_left: 2,
+    NodeId.pipette_right: 2,
+}
+
 
 def create(
     origin: Dict[NodeId, float], target: Dict[NodeId, float], speed: float
@@ -38,24 +51,51 @@ def create(
         A Move
     """
     # Raise KeyError if axis is missing from origin
-    deltas = {ax: target[ax] - origin[ax] for ax in target.keys()}
+    deltas = {ax: float(target[ax] - origin[ax]) for ax in target.keys()}
     # head (as opposed to head_l and head_r) is not an acceptable target for motion
     deltas.pop(NodeId.head, None)
 
-    move_groups = []
-    for axis_node, axis_delta in deltas.items():
-        if not axis_delta:
-            continue
-        move_groups.append(
-            [
-                {
-                    axis_node: MoveGroupSingleAxisStep(
-                        distance_mm=axis_delta,
-                        velocity_mm_sec=speed if axis_delta > 0 else -speed,
-                        duration_sec=abs(axis_delta) / speed,
-                    )
-                }
-            ]
+    ordered_nodes = [
+        NodeId.gantry_x,
+        NodeId.gantry_y,
+        NodeId.head_r,
+        NodeId.head_l,
+        NodeId.pipette_left,
+        NodeId.pipette_right,
+    ]
+    vec = np.array([deltas.get(node, 0) for node in ordered_nodes])
+    if any(np.isnan(vec)):
+        raise RuntimeError(vec)
+    distance = np.sqrt(vec.dot(vec))
+    if np.isnan(distance):
+        raise RuntimeError(distance)
+    if distance == 0:
+        return []
+    direction = vec / distance
+    speeds_mm_per_s = speed * direction
+    time_s = distance / speed
+    LOG.info(
+        f"{origin}->{target}={deltas}; distance={distance}mm "
+        f"@{speeds_mm_per_s}mm/s for {time_s}s"
+    )
+    if any(np.isnan(speeds_mm_per_s)):
+        raise RuntimeError(speeds_mm_per_s)
+    speed_abs = np.abs(speeds_mm_per_s)
+    for node_num, node in enumerate(ordered_nodes):
+        if MAX_SPEEDS[node] < speed_abs[node_num]:
+            speed_abs = np.multiply(speed_abs, MAX_SPEEDS[node] / speed_abs[node_num])
+    scaled_speeds = np.copysign(speed_abs, speeds_mm_per_s)
+    time_s_scaled = round(distance / np.sqrt(scaled_speeds.dot(scaled_speeds)), 6)
+    LOG.info(
+        f"Speed scaling {speeds_mm_per_s}->{scaled_speeds}, "
+        f"{time_s}s -> {time_s_scaled}s"
+    )
+    step: MoveGroupStep = {}
+    for axis_node, axis_delta, axis_speed in zip(ordered_nodes, vec, scaled_speeds):
+        step[axis_node] = MoveGroupSingleAxisStep(
+            distance_mm=axis_delta,
+            velocity_mm_sec=axis_speed,
+            duration_sec=time_s_scaled,
         )
 
-    return move_groups
+    return [[step]]

@@ -97,7 +97,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
         labware.set_calibration(provided_offset.delta)
         self._ctx._implementation.get_deck().recalculate_high_z()
 
-        self._ctx.labware_load_broker.publish(
+        self._ctx.equipment_broker.publish(
             LabwareLoadInfo(
                 labware_definition=labware._implementation.get_definition(),
                 labware_namespace=labware_namespace,
@@ -493,7 +493,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
         else:
             ctx_impl = self._ctx._implementation
             instr_impl = instr._implementation
-            hardware = ctx_impl.get_hardware().hardware
+            hardware = ctx_impl.get_hardware()
 
             hardware.retract(instr_impl.get_mount())
             high_point = hardware.current_position(instr_impl.get_mount())

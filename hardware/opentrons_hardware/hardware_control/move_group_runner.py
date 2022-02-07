@@ -4,10 +4,7 @@ import logging
 
 from opentrons_ot3_firmware import ArbitrationId
 from opentrons_ot3_firmware.constants import NodeId
-from opentrons_hardware.drivers.can_bus.can_messenger import (
-    CanMessenger,
-    MessageListener,
-)
+from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_ot3_firmware.messages import MessageDefinition
 from opentrons_ot3_firmware.messages.message_definitions import (
     ClearAllMoveGroupsRequest,
@@ -76,7 +73,10 @@ class MoveGroupRunner:
                                 ),
                                 acceleration=Int32Field(0),
                                 velocity=Int32Field(
-                                    int(interrupts_per_sec * step.velocity_mm_sec)
+                                    int(
+                                        (step.velocity_mm_sec / interrupts_per_sec)
+                                        * (2**31)
+                                    )
                                 ),
                             )
                         ),
@@ -92,7 +92,7 @@ class MoveGroupRunner:
             can_messenger.remove_listener(scheduler)
 
 
-class MoveScheduler(MessageListener):
+class MoveScheduler:
     """A message listener that manages the sending of execute move group messages."""
 
     def __init__(self, move_groups: MoveGroups) -> None:
@@ -104,17 +104,25 @@ class MoveScheduler(MessageListener):
             for seq_id, move in enumerate(move_group):
                 move_set.update(set((k.value, seq_id) for k in move.keys()))
             self._moves.append(move_set)
+        log.info(f"Move scheduler running for groups {move_groups}")
 
         self._event = asyncio.Event()
 
-    def on_message(
+    def __call__(
         self, message: MessageDefinition, arbitration_id: ArbitrationId
     ) -> None:
         """Incoming message handler."""
         if isinstance(message, MoveCompleted):
+            node_id = NodeId(arbitration_id.parts.originating_node_id).value
             seq_id = message.payload.seq_id.value
             group_id = message.payload.group_id.value
             node_id = arbitration_id.parts.originating_node_id
+            log.info(
+                f"Received completion for {node_id} group {group_id} seq {seq_id}"
+                ", which "
+                f"{'is' if (node_id, seq_id) in self._moves[group_id] else 'isnt'}"
+                "in group"
+            )
             self._moves[group_id].remove((node_id, seq_id))
             if not self._moves[group_id]:
                 log.info(f"Move group {group_id} has completed.")

@@ -33,6 +33,7 @@ def check_sequences_close(first, second):
             or c.endswith("1.5")
             or c.endswith("1.6")
             or "v2" in c
+            or "v3" in c
         )
     ],
 )

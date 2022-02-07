@@ -15,14 +15,14 @@ from opentrons.drivers.smoothie_drivers import SimulatingDriver
 
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 
-from . import modules
-from .types import BoardRevision, Axis
-from .module_control import AttachedModulesControl
+from .. import modules
+from ..types import BoardRevision, Axis
+from ..module_control import AttachedModulesControl
 
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import PipetteName
-    from .dev_types import (
+    from ..dev_types import (
         AttachedInstrument,
         AttachedInstruments,
         InstrumentSpec,

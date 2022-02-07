@@ -1,28 +1,29 @@
+from typing import Union
 from typing_extensions import Protocol
 
-from opentrons.config.types import RobotConfig
+from opentrons.config.types import RobotConfig, OT3Config
 
 
 class Configurable(Protocol):
     """Protocol specifying hardware control configuration."""
 
-    def get_config(self) -> RobotConfig:
+    def get_config(self) -> Union[RobotConfig, OT3Config]:
         """Get the robot's configuration object.
 
         :returns .RobotConfig: The object.
         """
         ...
 
-    def set_config(self, config: RobotConfig):
+    def set_config(self, config: Union[RobotConfig, OT3Config]):
         """Replace the currently-loaded config"""
         ...
 
     @property
-    def config(self) -> RobotConfig:
+    def config(self) -> Union[RobotConfig, OT3Config]:
         ...
 
     @config.setter
-    def config(self, config: RobotConfig) -> None:
+    def config(self, config: Union[RobotConfig, OT3Config]) -> None:
         ...
 
     async def update_config(self, **kwargs) -> None:
