@@ -5,6 +5,7 @@ from collections import OrderedDict
 from opentrons import types
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
+from opentrons.hardware_control.modules import AbstractModule, ModuleModel
 from opentrons.hardware_control.types import DoorState, PauseType
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.geometry.deck import Deck
@@ -24,9 +25,6 @@ from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.protocols.labware import load_from_definition, get_labware_definition
 from opentrons.protocols.types import Protocol
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
-
-if TYPE_CHECKING:
-    from opentrons.hardware_control.modules import AbstractModule, ModuleModel
 
 
 logger = logging.getLogger(__name__)
