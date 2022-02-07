@@ -2,9 +2,9 @@
 import asyncio
 import logging
 from enum import Enum
-from typing import Dict, Any, Optional, List, Mapping, Tuple
+from typing import Dict, Any, Optional, List, Mapping, Tuple, TypeVar
 
-from .types import CriticalPoint, MotionChecks, OutOfBoundsMove, Axis
+from .types import CriticalPoint, MotionChecks, OutOfBoundsMove
 from opentrons.types import Point
 
 mod_log = logging.getLogger(__name__)
@@ -50,12 +50,15 @@ class DeckTransformState(Enum):
         return self.name
 
 
+AxisType = TypeVar("AxisType")
+
+
 def check_motion_bounds(
-    target_smoothie: Mapping[Axis, float],
-    target_deck: Mapping[Axis, float],
-    bounds: Mapping[Axis, Tuple[float, float]],
+    target_smoothie: Mapping[AxisType, float],
+    target_deck: Mapping[AxisType, float],
+    bounds: Mapping[AxisType, Tuple[float, float]],
     checks: MotionChecks,
-):
+) -> None:
     """
     Log or raise an error (depending on checks) if a specified
     target position is outside the acceptable bounds of motion

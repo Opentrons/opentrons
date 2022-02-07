@@ -1,7 +1,7 @@
 import enum
 import logging
 from dataclasses import dataclass
-from typing import cast, Tuple, Union, List, Callable
+from typing import cast, Tuple, Union, List, Callable, Dict
 from typing_extensions import Literal
 from opentrons import types as top_types
 
@@ -69,6 +69,160 @@ class Axis(enum.Enum):
 
     def __str__(self) -> str:
         return self.name
+
+
+class OT3Mount(enum.Enum):
+    LEFT = top_types.Mount.LEFT.value
+    RIGHT = top_types.Mount.RIGHT.value
+    GRIPPER = enum.auto()
+
+    @classmethod
+    def from_mount(cls, mount: top_types.Mount) -> "OT3Mount":
+        return cls[mount.name]
+
+    def to_mount(self) -> top_types.Mount:
+        if self.value == self.GRIPPER.value:
+            raise KeyError("Gripper mount is not representable")
+        return top_types.Mount[self.name]
+
+
+class OT3AxisKind(enum.Enum):
+    """An enum of the different kinds of axis we have.
+
+    The machine may have different numbers of specific axes implementing
+    each axis kind.
+    """
+
+    X = 0
+    #: Gantry X axis
+    Y = 1
+    #: Gantry Y axis
+    Z = 2
+    #: Z axis (of the left and right and gripper mounts)
+    P = 3
+    #: Plunger axis (of the left and right pipettes)
+    OTHER = 4
+    #: The internal axes of high throughput pipettes, for instance
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class OT3Axis(enum.Enum):
+    X = 0  # gantry
+    Y = 1
+    Z_L = 2  # left pipette mount Z
+    Z_R = 3  # right pipette mount Z
+    Z_G = 4  # gripper mount Z
+    P_L = 5  # left pipette plunger
+    P_R = 6  # right pipette plunger
+    Q = 7  # hi-thruput pipette tiprack grab
+    G = 8  # gripper grab
+
+    @classmethod
+    def by_mount(cls, mount: Union[top_types.Mount, OT3Mount]) -> "OT3Axis":
+        bm = {
+            top_types.Mount.LEFT: cls.Z_L,
+            top_types.Mount.RIGHT: cls.Z_R,
+            OT3Mount.LEFT: cls.Z_L,
+            OT3Mount.RIGHT: cls.Z_R,
+            OT3Mount.GRIPPER: cls.Z_G,
+        }
+        return bm[mount]
+
+    @classmethod
+    def from_axis(cls, axis: Axis) -> "OT3Axis":
+        am = {
+            Axis.X: cls.X,
+            Axis.Y: cls.Y,
+            Axis.Z: cls.Z_L,
+            Axis.A: cls.Z_R,
+            Axis.B: cls.P_L,
+            Axis.C: cls.P_R,
+        }
+        return am[axis]
+
+    def to_axis(self) -> Axis:
+        am = {
+            OT3Axis.X: Axis.X,
+            OT3Axis.Y: Axis.Y,
+            OT3Axis.Z_L: Axis.Z,
+            OT3Axis.Z_R: Axis.A,
+            OT3Axis.P_L: Axis.B,
+            OT3Axis.P_R: Axis.C,
+        }
+        return am[self]
+
+    @classmethod
+    def pipette_axes(cls) -> Tuple["OT3Axis", "OT3Axis"]:
+        """The axes which are used for moving pipettes up and down."""
+        return cls.Z_L, cls.Z_R
+
+    @classmethod
+    def mount_axes(cls) -> Tuple["OT3Axis", "OT3Axis"]:
+        return cls.Z_L, cls.Z_R
+
+    @classmethod
+    def gantry_axes(
+        cls,
+    ) -> Tuple["OT3Axis", "OT3Axis", "OT3Axis", "OT3Axis"]:
+        """The axes which are tied to the gantry and require the deck
+        calibration transform
+        """
+        return cls.X, cls.Y, cls.Z_L, cls.Z_R
+
+    @classmethod
+    def of_main_tool_actuator(
+        cls, mount: Union[top_types.Mount, OT3Mount]
+    ) -> "OT3Axis":
+        if isinstance(mount, top_types.Mount):
+            checked_mount = OT3Mount.from_mount(mount)
+        else:
+            checked_mount = mount
+        pm = {OT3Mount.LEFT: cls.P_L, OT3Mount.RIGHT: cls.P_R, OT3Mount.GRIPPER: cls.G}
+        return pm[checked_mount]
+
+    def to_kind(self) -> OT3AxisKind:
+        kind_map: Dict[int, OT3AxisKind] = {
+            self.P_L: OT3AxisKind.P,
+            self.P_R: OT3AxisKind.P,
+            self.X: OT3AxisKind.X,
+            self.Y: OT3AxisKind.Y,
+            self.Z_L: OT3AxisKind.Z,
+            self.Z_R: OT3AxisKind.Z,
+            self.Z_G: OT3AxisKind.Z,
+            self.Q: OT3AxisKind.OTHER,
+            self.G: OT3AxisKind.OTHER,
+        }
+        return kind_map[self.value]
+
+    @classmethod
+    def of_kind(cls, kind: OT3AxisKind) -> List["OT3Axis"]:
+        kind_map: Dict[OT3AxisKind, List[OT3Axis]] = {
+            OT3AxisKind.P: [cls.P_R, cls.P_L],
+            OT3AxisKind.X: [cls.X],
+            OT3AxisKind.Y: [cls.Y],
+            OT3AxisKind.Z: [cls.Z_G, cls.Z_L, cls.Z_R],
+            OT3AxisKind.OTHER: [cls.Q, cls.G],
+        }
+        return kind_map[kind]
+
+    @classmethod
+    def to_mount(cls, inst: "OT3Axis") -> OT3Mount:
+        return {
+            cls.Z_R: OT3Mount.RIGHT,
+            cls.Z_L: OT3Mount.LEFT,
+            cls.P_L: OT3Mount.LEFT,
+            cls.P_R: OT3Mount.RIGHT,
+            cls.Z_G: OT3Mount.GRIPPER,
+            cls.G: OT3Mount.GRIPPER,
+        }[inst]
+
+    def __str__(self) -> str:
+        return self.name
+
+
+BCAxes = Union[Axis, OT3Axis]
 
 
 class DoorState(enum.Enum):

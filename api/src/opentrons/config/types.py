@@ -2,6 +2,7 @@ from enum import Enum
 from dataclasses import dataclass, asdict, fields
 from typing import Dict, Tuple, TypeVar, Generic, List
 from typing_extensions import TypedDict, Literal
+from opentrons.hardware_control.types import OT3AxisKind
 
 
 class AxisDict(TypedDict):
@@ -11,13 +12,6 @@ class AxisDict(TypedDict):
     A: float
     B: float
     C: float
-
-
-class GeneralizeableAxisDict(TypedDict, total=False):
-    X: float
-    Y: float
-    Z: float
-    P: float
 
 
 Vt = TypeVar("Vt")
@@ -43,7 +37,7 @@ class ByGantryLoad(Generic[Vt]):
         return asdict(self)[key.value]
 
 
-PerPipetteAxisSettings = ByGantryLoad[GeneralizeableAxisDict]
+PerPipetteAxisSettings = ByGantryLoad[Dict[OT3AxisKind, float]]
 
 
 class CurrentDictDefault(TypedDict):
@@ -94,7 +88,7 @@ class OT3MotionSettings:
 
     def by_gantry_load(
         self, gantry_load: GantryLoad
-    ) -> Dict[str, GeneralizeableAxisDict]:
+    ) -> Dict[str, Dict[OT3AxisKind, float]]:
         # create a shallow copy
         base = dict(
             (field.name, getattr(self, field.name)[GantryLoad.NONE])
