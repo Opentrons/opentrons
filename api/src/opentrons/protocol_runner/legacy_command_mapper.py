@@ -193,10 +193,9 @@ class LegacyCommandMapper:
             command["name"] == legacy_command_types.PICK_UP_TIP
             and "instrument" in command["payload"]
             and "location" in command["payload"]
-            and isinstance(command["payload"]["location"], LegacyWell)  # type: ignore  # noqa: E501
+            and isinstance(command["payload"]["location"], LegacyWell)
         ):
-            pipette: LegacyPipetteContext = command["payload"]["instrument"]  # type: ignore  # noqa: E501
-            # TODO: Support paired pipettes
+            pipette: LegacyPipetteContext = command["payload"]["instrument"]
             _well = command["payload"].get("location")
             if isinstance(_well, LegacyWell):
                 well = _well
@@ -226,7 +225,6 @@ class LegacyCommandMapper:
             and "location" in command["payload"]
         ):
             pipette: LegacyPipetteContext = command["payload"]["instrument"]  # type: ignore  # noqa: E501
-            # TODO: Support paired pipettes
             location = command["payload"].get("location")
             if isinstance(location, Location):
                 well = location.labware.as_well()

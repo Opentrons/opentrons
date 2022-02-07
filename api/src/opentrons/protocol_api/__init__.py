@@ -12,7 +12,6 @@ from . import labware
 from .contexts import (
     ProtocolContext,
     InstrumentContext,
-    PairedInstrumentContext,
     TemperatureModuleContext,
     MagneticModuleContext,
     ThermocyclerContext,
@@ -26,6 +25,5 @@ __all__ = [
     "TemperatureModuleContext",
     "MagneticModuleContext",
     "ThermocyclerContext",
-    "PairedInstrumentContext",
     "labware",
 ]

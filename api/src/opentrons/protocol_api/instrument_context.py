@@ -8,7 +8,6 @@ from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons import types, hardware_control as hc
 from opentrons.commands import commands as cmds
 from opentrons.commands.publisher import CommandPublisher, publish, publish_context
-from opentrons.hardware_control.types import PipettePair
 from opentrons.protocols.advanced_control.mix import mix_from_kwargs
 from opentrons.protocols.api_support.instrument import (
     validate_blowout_location,
@@ -31,10 +30,6 @@ from opentrons.protocols.context.instrument import AbstractInstrument
 from opentrons.protocols.api_support.types import APIVersion
 from .labware import Labware, OutOfTipsError, Well, next_available_tip
 from opentrons.protocols.advanced_control import transfers
-from .paired_instrument_context import (
-    PairedInstrumentContext,
-    UnsupportedInstrumentPairingError,
-)
 
 if TYPE_CHECKING:
     from opentrons.protocol_api import ProtocolContext
@@ -1419,111 +1414,6 @@ class InstrumentContext(CommandPublisher):
 
     def __str__(self):
         return "{} on {} mount".format(self.hw_pipette["display_name"], self.mount)
-
-    @requires_version(2, 7)
-    def pair_with(self, instrument: InstrumentContext) -> PairedInstrumentContext:
-        """Pair this pipette with another one so you can use both simultaneously.
-
-        .. warning::
-
-            Pipette pairing was an experimental feature
-            intended for Opentrons' own internal use.
-
-            **We no longer support this method in any way.**
-            We can't help you if you use it and run into any problems.
-
-            We keep this documentation here
-            for the benefit of people working with old protocols.
-            New protocols shouldn't use this method.
-
-            In a future robot software update,
-            we might change pipette pairing in a way that isn't backwards-compatible,
-            or even remove it entirely.
-            We might do this without advance warning,
-            and without leaving a way for you to restore the old behavior
-            by lowering your protocol's :ref:`apiLevel <v2-versioning>`.
-
-        Limitations:
-
-        * Only :ref:`building block commands <v2-atomic-commands>` are supported,
-          not :ref:`complex commands <v2-complex-commands>`.
-        * Only pipettes of the same type are supported.
-          For example, you can't pair a P1000 Single-Channel with a P300 Single-Channel.
-        * All positioning is based on the *primary pipette* only.
-          (See below for the difference between the primary pipette
-          and the secondary pipette.)
-          The physical offset between the two pipettes is assumed to match
-          an idealized value.
-          The OT-2's pipette offset calibration is not taken into account.
-
-          If the physical offset does not exactly match the ideal,
-          then the secondary pipette will always be off-position.
-          The OT-2 hardware does not provide an easy way
-          of adjusting the physical offset to fix this.
-
-        The :py:obj:`InstrumentContext` on which you call this method
-        is designated the *primary pipette*,
-        and the :py:obj:`InstrumentContext` that you provide as an argument
-        is designated the *secondary pipette*.
-
-        :param instrument: The secondary pipette that you wish to use.
-
-        :raises: ``UnsupportedInstrumentPairingError`` -- if you try to pair pipettes
-                 that are not currently supported together.
-
-        :returns: A ``PairedInstrumentContext``. This is the object you will call
-                  commands on. The building block commands are the same as an individual
-                  pipette's building block commands found at :ref:`v2-atomic-commands`,
-                  and when you want to move pipettes simultaneously you need to use the
-                  ``PairedInstrumentContext``.
-
-        .. code-block :: python
-            :substitutions:
-
-            from opentrons import protocol_api
-
-            # metadata
-            metadata = {
-                'protocolName': 'My Protocol',
-                'author': 'Name <email@address.com>',
-                'description': 'Simple paired pipette protocol,
-                'apiLevel': '|apiLevel|'
-            }
-
-            def run(ctx: protocol_api.ProtocolContext):
-                right_pipette = ctx.load_instrument(
-                    'p300_single_gen2', 'right')
-                left_pipette = ctx.load_instrument('p300_single_gen2', 'left')
-
-                # In this scenario, the right pipette is the primary pipette
-                # while the left pipette is the secondary pipette. All XY
-                # locations will be based on the right pipette.
-                right_paired_with_left = right_pipette.pair_with(left_pipette)
-                right_paired_with_left.pick_up_tip()
-                right_paired_with_left.drop_tip()
-
-                # In this scenario, the left pipette is the primary pipette
-                # while the right pipette is the secondary pipette. All XY
-                # locations will be based on the left pipette.
-                left_paired_with_right = left_pipette.pair_with(right_pipette)
-                left_paired_with_right.pick_up_tip()
-                left_paired_with_right.drop_tip()
-        """
-        if instrument.name != self.name:
-            raise UnsupportedInstrumentPairingError(
-                "At this time, you cannot pair" f"{instrument.name} with {self.name}"
-            )
-
-        return PairedInstrumentContext(
-            primary_instrument=self,
-            secondary_instrument=instrument,
-            implementation=self._implementation.pair_with(instrument._implementation),
-            ctx=self._ctx,
-            pair_policy=PipettePair.of_mount(self._implementation.get_mount()),
-            api_version=self.api_version,
-            trash=self.trash_container,
-            log_parent=logger,
-        )
 
     def _tip_length_for(self, tiprack: Labware) -> float:
         """Get the tip length, including overlap, for a tip from this rack"""

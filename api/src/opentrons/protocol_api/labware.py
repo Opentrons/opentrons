@@ -14,7 +14,7 @@ from itertools import dropwhile
 from typing import Any, AnyStr, List, Dict, Optional, Union, Tuple, TYPE_CHECKING
 
 
-from opentrons.protocols.api_support.util import requires_version, labware_column_shift
+from opentrons.protocols.api_support.util import requires_version
 from opentrons.protocols.context.labware import AbstractLabware
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocols import labware as labware_module
@@ -788,54 +788,6 @@ def select_tiprack_from_list(
         return first, next_tip
     else:
         return select_tiprack_from_list(rest, num_channels)
-
-
-def select_tiprack_from_list_paired_pipettes(
-    tip_racks: List[Labware],
-    p_channels: int,
-    s_channels: int,
-    starting_point: Optional[Well] = None,
-) -> Tuple[Labware, Well]:
-    """
-    Helper function utilized in ``PairedInstrumentContext``
-    to determine which pipette tiprack to pick up from.
-
-    If a starting point is specified, this method with check
-    that the parent of that tip was correctly filtered.
-
-    If a starting point is not specified, this method will filter
-    tipracks until it finds a well that is not empty.
-
-    :return: A Tuple of the tiprack and well to move to. In this
-             instance the starting well is specific to the primary pipette.
-    :raises TipSelectionError: if the starting tip specified
-                               does not exist in the filtered tipracks.
-    """
-    try:
-        first, rest = split_tipracks(tip_racks)
-    except IndexError:
-        raise OutOfTipsError
-
-    if starting_point and starting_point.parent != first:
-        raise TipSelectionError(
-            "The starting tip you selected " f"does not exist in {first}"
-        )
-    elif starting_point:
-        primary_well = starting_point
-    else:
-        primary_well = first.wells()[0]
-
-    try:
-        secondary_point = labware_column_shift(primary_well, first)
-    except IndexError:
-        return select_tiprack_from_list_paired_pipettes(rest, p_channels, s_channels)
-
-    primary_next_tip = first.next_tip(p_channels, starting_point)
-    secondary_next_tip = first.next_tip(s_channels, secondary_point)
-    if primary_next_tip and secondary_next_tip:
-        return first, primary_next_tip
-    else:
-        return select_tiprack_from_list_paired_pipettes(rest, p_channels, s_channels)
 
 
 def filter_tipracks_to_start(
