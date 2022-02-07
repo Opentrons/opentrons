@@ -11,6 +11,8 @@ import {
   mockTemperatureModuleGen2,
 } from '../../../../redux/modules/__fixtures__'
 
+import type { MagneticModule } from '../../../../redux/modules/types'
+
 jest.mock('../MagneticModuleData')
 jest.mock('../TemperatureModuleData')
 
@@ -20,6 +22,22 @@ const mockMagneticModuleData = MagneticModuleData as jest.MockedFunction<
 const mockTemperatureModuleData = TemperatureModuleData as jest.MockedFunction<
   typeof TemperatureModuleData
 >
+
+const mockMagneticModuleHub = {
+  model: 'magneticModuleV1',
+  type: 'magneticModuleType',
+  port: '/dev/ot_module_magdeck0',
+  serial: 'def456',
+  revision: 'mag_deck_v4.0',
+  fwVersion: 'v2.0.0',
+  status: 'disengaged',
+  hasAvailableUpdate: true,
+  data: {
+    engaged: false,
+    height: 42,
+  },
+  usbPort: { hub: 2, port: null },
+} as MagneticModule
 
 const render = (props: React.ComponentProps<typeof ModuleCard>) => {
   return renderWithProviders(<ModuleCard {...props} />, {
@@ -45,6 +63,16 @@ describe('ModuleCard', () => {
     getByText('Magnetic Module GEN1')
     getByText('Mock Magnetic Module Data')
     getByText('usb port 1')
+    getByAltText('magneticModuleV1')
+  })
+  it('renders information if module is connected via hub', () => {
+    props = {
+      module: mockMagneticModuleHub,
+    }
+    const { getByText, getByAltText } = render(props)
+    getByText('Magnetic Module GEN1')
+    getByText('Mock Magnetic Module Data')
+    getByText('usb port 2 via hub')
     getByAltText('magneticModuleV1')
   })
   it('renders information for a temperature module with mocked status', () => {

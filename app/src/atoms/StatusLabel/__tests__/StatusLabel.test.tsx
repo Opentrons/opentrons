@@ -48,7 +48,7 @@ describe('StatusLabel', () => {
     expect(getByText('Idle')).toHaveStyle('color: #16212d')
   })
 
-  it('renders an holding at target status label with a blue background and text', () => {
+  it('renders a holding at target status label with a blue background and text', () => {
     props = {
       status: 'holding at target',
       backgroundColor: C_SKY_BLUE,

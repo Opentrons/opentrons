@@ -37,7 +37,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const { t } = useTranslation('device_details')
   const { module } = props
 
-  console.log(module)
   let image = ''
   let moduleData: JSX.Element = <div></div>
   switch (module.type) {
@@ -93,8 +92,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               fontSize={FONT_SIZE_CAPTION}
               paddingBottom={SPACING_1}
             >
-              {/* TODO Immediately: add extra info if it is connected via port or hub */}
-              {t('usb_port', {
+              {t(module.usbPort.port === null ? 'usb_hub' : 'usb_port', {
                 port: module.usbPort.hub ?? module.usbPort.port,
               })}
             </Text>

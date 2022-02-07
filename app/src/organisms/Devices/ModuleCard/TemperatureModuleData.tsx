@@ -12,9 +12,10 @@ import {
   Text,
 } from '@opentrons/components'
 import { StatusLabel } from '../../../atoms/StatusLabel'
+import type { TemperatureStatus } from '../../../redux/modules/api-types'
 
 interface TemperatureModuleProps {
-  moduleStatus: string
+  moduleStatus: TemperatureStatus
   targetTemp: number | null
   currentTemp: number
 }
