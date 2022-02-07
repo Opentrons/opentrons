@@ -40,10 +40,13 @@ import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_stand
 import { useRunStatus } from '../../../RunTimeControl/hooks'
 import { LabwarePositionCheck } from '../../LabwarePositionCheck'
 import styles from '../../styles.css'
-import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../../hooks'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
 import { DownloadOffsetDataModal } from '../../../ProtocolUpload/DownloadOffsetDataModal'
-import { useLPCSuccessToast } from '../../hooks'
+import {
+  useModuleRenderInfoById,
+  useLabwareRenderInfoById,
+  useLPCSuccessToast,
+} from '../../hooks'
 import { useModuleMatchResults, useProtocolCalibrationStatus } from '../hooks'
 import { LabwareInfoOverlay } from './LabwareInfoOverlay'
 import { LabwareOffsetModal } from './LabwareOffsetModal'

@@ -9,7 +9,6 @@ import {
   LabwareRender,
   RobotWorkSpace,
   Module,
-  anyProps,
 } from '@opentrons/components'
 import {
   inferModuleOrientationFromXCoordinate,
