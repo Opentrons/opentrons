@@ -8,6 +8,7 @@ import {
   SPACING_2,
   ALIGN_START,
   DIRECTION_COLUMN,
+  SPACING_3,
   TEXT_TRANSFORM_UPPERCASE,
   SPACING_1,
   C_BRIGHT_GRAY,
@@ -77,24 +78,23 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       marginLeft={SPACING_2}
       width={'24rem'}
     >
-      <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING_2}>
-        <img src={image} alt={module.model} />
-        <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING_2}>
-          <Text
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
-            color={C_HARBOR_GRAY}
-            fontWeight={FONT_WEIGHT_REGULAR}
-            fontSize={FONT_SIZE_CAPTION}
-            paddingBottom={SPACING_1}
-          >
-            {t(module.usbPort.port === null ? 'usb_hub' : 'usb_port', {
-              port: module.usbPort.hub ?? module.usbPort.port,
-            })}
-          </Text>
-          <Flex paddingBottom={SPACING_1}>
-            <ModuleIcon moduleType={module.type} />
-            <Text fontSize={'0.6875rem'}>
-              {getModuleDisplayName(module.model)}
+      <Box
+        padding={`${SPACING_3} ${SPACING_2} ${SPACING_3} ${SPACING_2}`}
+        width="100%"
+      >
+        <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING_2}>
+          <img src={image} alt={module.model} />
+          <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING_2}>
+            <Text
+              textTransform={TEXT_TRANSFORM_UPPERCASE}
+              color={C_HARBOR_GRAY}
+              fontWeight={FONT_WEIGHT_REGULAR}
+              fontSize={FONT_SIZE_CAPTION}
+              paddingBottom={SPACING_1}
+            >
+              {t(module.usbPort.port === null ? 'usb_hub' : 'usb_port', {
+                port: module.usbPort.hub ?? module.usbPort.port,
+              })}
             </Text>
             <Flex paddingBottom={SPACING_1}>
               <ModuleIcon moduleType={module.type} />
@@ -105,13 +105,13 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             {moduleData}
           </Flex>
         </Flex>
+      </Box>
 
-        <Box alignSelf={ALIGN_START} padding={SPACING_1}>
-          <Btn onClick={() => console.log('overflow')} aria-label="overflow">
-            <img src={overflowIcon} />
-          </Btn>
-        </Box>
-      </Flex>
+      <Box alignSelf={ALIGN_START} padding={SPACING_1}>
+        <Btn onClick={() => console.log('overflow')} aria-label="overflow">
+          <img src={overflowIcon} />
+        </Btn>
+      </Box>
     </Flex>
   )
 }
