@@ -34,7 +34,6 @@ from opentrons.protocols.context.labware import AbstractLabware
 from opentrons.protocols.context.protocol import AbstractProtocol
 from opentrons.protocols.geometry.module_geometry import (
     ModuleGeometry,
-    module_model_from_string,
     resolve_module_model,
 )
 from opentrons.protocols.geometry.deck import Deck
@@ -616,7 +615,7 @@ class ProtocolContext(CommandPublisher):
         self.module_load_broker.publish(
             ModuleLoadInfo(
                 requested_model=requested_model,
-                loaded_model=module_model_from_string(load_result.module.model()),
+                loaded_model=load_result.geometry.model,
                 deck_slot=deck_slot,
                 configuration=configuration,
                 module_serial=module_serial,

@@ -186,19 +186,6 @@ class ProtocolContextImplementation(AbstractProtocol):
             resolved_type, location
         )
 
-        # Load the geometry.
-        #
-        # fixme(mm, 2022-02-03):
-        # This loads the geometry of the *requested* module.
-        # But because of module compatibility, ths won't necessarily match
-        # the hardware module that we will actually load.
-        geometry = module_geometry.load_module(
-            model=model,
-            parent=self._deck_layout.position_for(resolved_location),
-            api_level=self._api_version,
-            configuration=configuration,
-        )
-
         # Try to find in the hardware instance
         available_modules, simulating_module = self._hw_manager.hardware.find_modules(
             model, resolved_type
@@ -219,6 +206,14 @@ class ProtocolContextImplementation(AbstractProtocol):
 
         if not hc_mod_instance:
             return None
+
+        # Load geometry to match the hardware module that we found connected.
+        geometry = module_geometry.load_module(
+            model=module_geometry.module_model_from_string(hc_mod_instance.model()),
+            parent=self._deck_layout.position_for(resolved_location),
+            api_level=self._api_version,
+            configuration=configuration,
+        )
 
         result = LoadModuleResult(
             type=resolved_type, geometry=geometry, module=hc_mod_instance
