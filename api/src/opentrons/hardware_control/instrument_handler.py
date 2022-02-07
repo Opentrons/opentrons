@@ -593,8 +593,7 @@ class InstrumentHandlerProvider:
                 ],
                 shake_off_list=self._build_pickup_shakes(instrument),
                 retract_target=instrument.config.pick_up_distance
-                + check_incr
-                + checked_presses
+                + check_incr * checked_presses
                 + 2,
             ),
             add_tip_to_instr,
