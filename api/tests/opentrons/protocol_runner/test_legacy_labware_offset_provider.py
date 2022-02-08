@@ -18,6 +18,7 @@ from opentrons.protocol_runner.legacy_labware_offset_provider import (
     LegacyLabwareOffsetProvider,
     LegacyProvidedLabwareOffset,
 )
+from opentrons.protocol_runner.legacy_wrappers import LegacyTemperatureModuleModel
 
 
 @pytest.fixture
@@ -58,7 +59,7 @@ def test_find_something(
 
     result = subject.find(
         labware_definition_uri="some_namespace/some_load_name/123",
-        module_model="temperatureModuleV1",
+        requested_module_model=LegacyTemperatureModuleModel.TEMPERATURE_V1,
         deck_slot=DeckSlotName.SLOT_1,
     )
 
@@ -84,7 +85,7 @@ def test_find_nothing(
 
     result = subject.find(
         labware_definition_uri="some_namespace/some_load_name/123",
-        module_model="temperatureModuleV1",
+        requested_module_model=LegacyTemperatureModuleModel.TEMPERATURE_V1,
         deck_slot=DeckSlotName.SLOT_1,
     )
 
