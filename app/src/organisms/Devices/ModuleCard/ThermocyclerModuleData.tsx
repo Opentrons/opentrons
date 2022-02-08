@@ -18,6 +18,7 @@ import {
   C_SKY_BLUE,
   C_BLUE,
   C_BLUE_PRESSED,
+  COLORS,
 } from '@opentrons/components'
 
 import type { ThermocyclerStatus } from '../../../redux/modules/api-types'
@@ -65,9 +66,9 @@ export const ThermocyclerModuleData = (
         break
       }
       case 'error': {
-        StatusLabelProps.backgroundColor = '#fffcf5'
-        StatusLabelProps.iconColor = '#F09D20'
-        StatusLabelProps.textColor = '#7B5B09'
+        StatusLabelProps.backgroundColor = COLORS.warningBg
+        StatusLabelProps.iconColor = COLORS.warning
+        StatusLabelProps.textColor = COLORS.warningText
       }
     }
     return StatusLabelProps

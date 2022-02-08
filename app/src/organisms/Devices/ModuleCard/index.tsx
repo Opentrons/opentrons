@@ -16,6 +16,7 @@ import {
   Btn,
   FONT_WEIGHT_REGULAR,
   FONT_SIZE_CAPTION,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import { ModuleIcon } from '../ModuleIcon'
@@ -108,7 +109,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             </Text>
             <Flex paddingBottom={SPACING_1}>
               <ModuleIcon moduleType={module.type} />
-              <Text fontSize={'0.6875rem'}>
+              <Text fontSize={TYPOGRAPHY.fontSizeP}>
                 {getModuleDisplayName(module.model)}
               </Text>
             </Flex>
