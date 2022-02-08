@@ -5,11 +5,11 @@ import { css } from 'styled-components'
 export const fontSizeH1 = '1.125rem' // 18px
 export const fontSizeH2 = '0.9375rem' // 15px
 export const fontSizeH3 = '0.875rem' // 14px
-export const fontSizeH6 = '0.625' // 10px
-export const fontSizeP = '0.6875' // 11px
+export const fontSizeH6 = '0.625rem' // 10px
+export const fontSizeP = '0.6875rem' // 11px
 export const fontSizeLabel = '0.75rem' // 12px
 // this is redundant but we need this for captions and it makes more sense to call it caption rather than re-using fsh6
-export const fontSizeCaption = '0.625' // 10px
+export const fontSizeCaption = '0.625rem' // 10px
 
 // Font Weights
 export const fontWeightBold = 800

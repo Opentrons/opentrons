@@ -16,11 +16,13 @@ import {
   Btn,
   FONT_WEIGHT_REGULAR,
   FONT_SIZE_CAPTION,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import { ModuleIcon } from '../ModuleIcon'
 import { MagneticModuleData } from './MagneticModuleData'
 import { TemperatureModuleData } from './TemperatureModuleData'
+import { ThermocyclerModuleData } from './ThermocyclerModuleData'
 
 import magneticModule from '../../../assets/images/magnetic_module_gen_2_transparent.svg'
 import temperatureModule from '../../../assets/images/temp_deck_gen_2_transparent.svg'
@@ -66,6 +68,15 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
 
     case 'thermocyclerModuleType': {
       image = thermoModule
+      moduleData = (
+        <ThermocyclerModuleData
+          status={module.status}
+          currentTemp={module.data.currentTemp}
+          targetTemp={module.data.targetTemp}
+          lidTarget={module.data.lidTarget}
+          lidTemp={module.data.lidTemp}
+        />
+      )
       break
     }
   }
@@ -76,7 +87,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       borderRadius={SPACING_1}
       marginBottom={SPACING_2}
       marginLeft={SPACING_2}
-      width={'24rem'}
+      width={'20rem'}
     >
       <Box
         padding={`${SPACING_3} ${SPACING_2} ${SPACING_3} ${SPACING_2}`}
@@ -98,7 +109,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             </Text>
             <Flex paddingBottom={SPACING_1}>
               <ModuleIcon moduleType={module.type} />
-              <Text fontSize={'0.6875rem'}>
+              <Text fontSize={TYPOGRAPHY.fontSizeP}>
                 {getModuleDisplayName(module.model)}
               </Text>
             </Flex>
