@@ -77,6 +77,18 @@ describe('ThermocyclerModuleData', () => {
     )
   })
 
+  it('renders an error status', () => {
+    props = {
+      ...props,
+      status: 'heating',
+    }
+    const { getByText } = render(props)
+
+    expect(getByText('Mock Thermocycler StatusLabel')).toHaveStyle(
+      'backgroundColor: COLORS.warningBg'
+    )
+  })
+
   it('renders thermocycler lid temperature data', () => {
     const { getByText, getByTitle } = render(props)
 
