@@ -1361,14 +1361,6 @@
       }
     },
     {
-      "commandType": "heaterShakerModule/setTargetTemperature",
-      "id": "12abc123",
-      "params": {
-        "moduleId": "heaterShakerId",
-        "temperature": 80
-      }
-    },
-    {
       "commandType": "heaterShakerModule/setTargetShakeSpeed",
       "id": "13abc123",
       "params": {

@@ -846,31 +846,6 @@
           },
 
           {
-            "description": "Heater Shaker Module Set Target Temperature: Module will delay protocol execution until the target specified target temperature is reached. This command is locking, it delays protocol execution while approaching the target temperature.",
-            "type": "object",
-            "required": ["id", "commandType", "params"],
-            "properties": {
-              "id": { "type": "string" },
-              "commandType": {
-                "enum": ["heaterShakerModule/setTargetTemperature"]
-              },
-              "params": {
-                "required": ["moduleId", "temperature"],
-                "properties": {
-                  "moduleId": {
-                    "type": "string",
-                    "description": "Unique identifier of Heater Shaker Module to target. Must be a key from the top level 'modules' object"
-                  },
-                  "temperature": {
-                    "type": "number",
-                    "description": "target temperature to heat to in °C"
-                  }
-                }
-              }
-            }
-          },
-
-          {
             "description": "Heater Shaker Module Set Target Shake Speed: Module will delay protocol execution until the target shake speed is reached. This command is blocking, it delays protocol execution while approaching the target shake speed.",
             "type": "object",
             "required": ["id", "commandType", "params"],
