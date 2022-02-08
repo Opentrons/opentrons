@@ -29,6 +29,7 @@ export interface CommandsLinks {
     meta: {
       runId: string
       commandId: string
+      key: string
       index: number
     }
   }

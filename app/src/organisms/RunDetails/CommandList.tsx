@@ -76,7 +76,7 @@ export function CommandList(): JSX.Element | null {
   )
   const totalRunCommandCount = commandsData?.meta.totalLength ?? 0
   const runCommands = commandsData?.data ?? []
-  const currentRunCommandIndex = commandsData?.links?.current?.meta?.index ?? 0
+  const currentCommandKey = commandsData?.links?.current?.meta?.key ?? null
 
   const [
     isInitiallyJumpingToCurrent,
@@ -148,16 +148,19 @@ export function CommandList(): JSX.Element | null {
   const isFinalWindow =
     currentCommandList.length - 1 <= windowFirstCommandIndex + WINDOW_SIZE
 
-  console.table({currentRunCommandIndex, totalRunCommandCount, rC: postSetupRunCommands.length})
-
-  // run 50 commands total
-  // made up of 10 LPC, 5 setup commands, and 35 actual run commands
-  // commandsList has 100 commands, 35 of which have corresponding run commands
-
-  // knowns setup commands
-  //
-  const currentCommandIndex = Math.max(currentRunCommandIndex - (totalRunCommandCount - postSetupRunCommands.length), 0)
-  console.log(currentCommandIndex)
+  const currentCommandIndex = currentCommandList.findIndex(command => (
+    command?.analysisCommand?.key === currentCommandKey
+  ))
+  if (currentCommandIndex < 0) {
+    const isRunningSetupCommand = protocolSetupCommandList.find(command => command.key === currentCommandKey) != null
+    if (runStartTime !== null && !isRunningSetupCommand) {
+      // protocol is non-deterministic
+      console.log('NON DET')
+    } else {
+      // all run commands are from LPC
+      console.log('UNSTARTED WITH LPC or Setup')
+    }
+  }
   const indexOfWindowContainingCurrentItem = Math.floor(
     Math.max(currentCommandIndex - (WINDOW_SIZE - WINDOW_OVERLAP), 0) /
       (WINDOW_SIZE - WINDOW_OVERLAP)
