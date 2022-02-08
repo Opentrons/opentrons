@@ -23,6 +23,7 @@ import { ModuleIcon } from '../ModuleIcon'
 import { MagneticModuleData } from './MagneticModuleData'
 import { TemperatureModuleData } from './TemperatureModuleData'
 import { ThermocyclerModuleData } from './ThermocyclerModuleData'
+import { ModuleOverflowMenu } from './ModuleOverflowMenu'
 
 import magneticModule from '../../../assets/images/magnetic_module_gen_2_transparent.svg'
 import temperatureModule from '../../../assets/images/temp_deck_gen_2_transparent.svg'
@@ -38,6 +39,7 @@ interface ModuleCardProps {
 export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const { t } = useTranslation('device_details')
   const { module } = props
+  const [showOverflowMenu, setShowOverflowMenu] = React.useState(false)
 
   let image = ''
   let moduleData: JSX.Element = <div></div>
@@ -82,47 +84,57 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   }
 
   return (
-    <Flex
-      backgroundColor={C_BRIGHT_GRAY}
-      borderRadius={SPACING_1}
-      marginBottom={SPACING_2}
-      marginLeft={SPACING_2}
-      width={'20rem'}
-    >
-      <Box
-        padding={`${SPACING_3} ${SPACING_2} ${SPACING_3} ${SPACING_2}`}
-        width="100%"
+    <React.Fragment>
+      {showOverflowMenu && <ModuleOverflowMenu module={module} />}
+      <Flex
+        backgroundColor={C_BRIGHT_GRAY}
+        borderRadius={SPACING_1}
+        marginBottom={SPACING_2}
+        marginLeft={SPACING_2}
+        width={'20rem'}
       >
-        <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING_2}>
-          <img src={image} alt={module.model} />
-          <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING_2}>
-            <Text
-              textTransform={TEXT_TRANSFORM_UPPERCASE}
-              color={C_HARBOR_GRAY}
-              fontWeight={FONT_WEIGHT_REGULAR}
-              fontSize={FONT_SIZE_CAPTION}
-              paddingBottom={SPACING_1}
-            >
-              {t(module.usbPort.port === null ? 'usb_hub' : 'usb_port', {
-                port: module.usbPort.hub ?? module.usbPort.port,
-              })}
-            </Text>
-            <Flex paddingBottom={SPACING_1}>
-              <ModuleIcon moduleType={module.type} />
-              <Text fontSize={TYPOGRAPHY.fontSizeP}>
-                {getModuleDisplayName(module.model)}
+        <Box
+          padding={`${SPACING_3} ${SPACING_2} ${SPACING_3} ${SPACING_2}`}
+          width="100%"
+        >
+          <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING_2}>
+            <img src={image} alt={module.model} />
+            <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING_2}>
+              <Text
+                textTransform={TEXT_TRANSFORM_UPPERCASE}
+                color={C_HARBOR_GRAY}
+                fontWeight={FONT_WEIGHT_REGULAR}
+                fontSize={FONT_SIZE_CAPTION}
+                paddingBottom={SPACING_1}
+              >
+                {t(module.usbPort.port === null ? 'usb_hub' : 'usb_port', {
+                  port: module.usbPort.hub ?? module.usbPort.port,
+                })}
               </Text>
+              <Flex paddingBottom={SPACING_1}>
+                <ModuleIcon moduleType={module.type} />
+                <Text fontSize={TYPOGRAPHY.fontSizeP}>
+                  {getModuleDisplayName(module.model)}
+                </Text>
+              </Flex>
+              {moduleData}
             </Flex>
-            {moduleData}
           </Flex>
-        </Flex>
-      </Box>
+        </Box>
 
-      <Box alignSelf={ALIGN_START} padding={SPACING_1}>
-        <Btn onClick={() => console.log('overflow')} aria-label="overflow">
-          <img src={overflowIcon} />
-        </Btn>
-      </Box>
-    </Flex>
+        <Box alignSelf={ALIGN_START} padding={SPACING_1}>
+          <Btn
+            onClick={() => {
+              showOverflowMenu
+                ? setShowOverflowMenu(false)
+                : setShowOverflowMenu(true)
+            }}
+            aria-label="overflow"
+          >
+            <img src={overflowIcon} />
+          </Btn>
+        </Box>
+      </Flex>
+    </React.Fragment>
   )
 }
