@@ -135,6 +135,19 @@ class ProtocolEngine:
         self._action_dispatcher.dispatch(action)
         return self._state_store.commands.get(command_id)
 
+    async def wait_for_command(self, command_id: str) -> None:
+        """Wait for a command to be completed."""
+        is_already_complete = self._state_store.commands.get_is_complete(
+            command_id=command_id
+        )
+        # If the command is already complete, don't wait,
+        # because we'd only wake up on a subsequent state update,
+        # and we don't know that there would ever be one.
+        if not is_already_complete:
+            await self._state_store.wait_for(
+                self._state_store.commands.get_is_complete, command_id=command_id
+            )
+
     async def add_and_execute_command(self, request: CommandCreate) -> Command:
         """Add a command to the queue and wait for it to complete.
 
