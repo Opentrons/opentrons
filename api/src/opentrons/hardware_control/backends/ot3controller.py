@@ -4,7 +4,17 @@ from __future__ import annotations
 import asyncio
 from contextlib import contextmanager
 import logging
-from typing import Dict, List, Optional, Tuple, TYPE_CHECKING, Sequence, Generator, cast
+from typing import (
+    Dict,
+    List,
+    Optional,
+    Tuple,
+    TYPE_CHECKING,
+    Sequence,
+    Generator,
+    cast,
+    Set,
+)
 
 from opentrons.config.types import OT3Config
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
@@ -22,6 +32,7 @@ try:
     from opentrons_hardware.drivers.can_bus.build import build_driver
     from opentrons_hardware.hardware_control.motion import create
     from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
+    from opentrons_hardware.hardware_control.network import probe
     from opentrons_ot3_firmware.constants import NodeId
     from opentrons_ot3_firmware.messages.message_definitions import (
         SetupRequest,
@@ -38,6 +49,7 @@ if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
     from ..dev_types import (
         AttachedInstruments,
+        AttachedInstrument,
         InstrumentHardwareConfigs,
     )
     from opentrons.drivers.rpi_drivers.dev_types import GPIODriverLike
@@ -91,6 +103,7 @@ class OT3Controller:
                 "Failed to initiate aionotify, cannot watch modules "
                 "or door, likely because not running on linux"
             )
+        self._present_nodes: Set[NodeId] = set()
 
     # TODO: These staticmethods exist to defer uses of NodeId to inside
     # method bodies, which won't be evaluated until called. This is needed
@@ -230,7 +243,12 @@ class OT3Controller:
                 target[self._axis_to_node(axis)] = pos
 
         log.info(f"move targets: {target}")
-        move_group = create(origin=self._position, target=target, speed=speed or 5000.0)
+        move_group = create(
+            origin=self._position,
+            target=target,
+            speed=speed or 5000.0,
+            present_nodes=self._present_nodes,
+        )
         runner = MoveGroupRunner(move_groups=move_group)
         await runner.run(can_messenger=self._messenger)
         self._position.update(target)
@@ -425,3 +443,25 @@ class OT3Controller:
             NodeId.pipette_left: 0,
             NodeId.pipette_right: 0,
         }
+
+    async def probe_network(self, timeout: float = 5.0) -> None:
+        """Update the list of nodes present on the network.
+
+        The stored result is used to make sure that move commands include entries
+        for all present axes, so none incorrectly move before the others are ready.
+        """
+        # TODO: Only add pipette ids to expected if the head indicates
+        # they're present. In the meantime, we'll use get_attached_instruments to
+        # see if we should expect instruments to be present, which should be removed
+        # when that method actually does canbus stuff
+        instrs = await self.get_attached_instruments({})
+        expected = set(self._get_home_position().keys())
+        if not instrs.get(Mount.LEFT, cast("AttachedInstrument", {})).get(
+            "config", None
+        ):
+            expected.remove(NodeId.pipette_left)
+        if not instrs.get(Mount.RIGHT, cast("AttachedInstrument", {})).get(
+            "config", None
+        ):
+            expected.remove(NodeId.pipette_right)
+        self._present_nodes = await probe(self._messenger, expected, timeout)

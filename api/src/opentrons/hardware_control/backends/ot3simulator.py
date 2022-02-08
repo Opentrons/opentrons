@@ -13,6 +13,7 @@ from typing import (
     Sequence,
     Generator,
     cast,
+    Set,
 )
 
 from opentrons.config.types import OT3Config
@@ -127,6 +128,7 @@ class OT3Simulator:
         }
         self._module_controls: Optional[AttachedModulesControl] = None
         self._position = self._get_home_position()
+        self._present_nodes: Set[NodeId] = set()
 
     # TODO: These staticmethods exist to defer uses of NodeId to inside
     # method bodies, which won't be evaluated until called. This is needed
@@ -448,3 +450,11 @@ class OT3Simulator:
             NodeId.pipette_left: 0,
             NodeId.pipette_right: 0,
         }
+
+    async def probe_network(self) -> None:
+        nodes = set((NodeId.head_l, NodeId.head_r, NodeId.gantry_x, NodeId.gantry_y))
+        if self._attached_instruments[Mount.LEFT].get("model", None):
+            nodes.add(NodeId.pipette_left)
+        if self._attached_instruments[Mount.RIGHT].get("model", None):
+            nodes.add(NodeId.pipette_right)
+        self._present_nodes = nodes

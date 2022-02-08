@@ -374,7 +374,7 @@ class OT3API(
                 p, self._config, self._backend.board_revision
             )
             await self._backend.configure_mount(mount, hw_config)
-        self._log.info("Instruments found: {}".format(self._attached_instruments))
+        await self._backend.probe_network()
 
     # Global actions API
     def pause(self, pause_type: PauseType):
