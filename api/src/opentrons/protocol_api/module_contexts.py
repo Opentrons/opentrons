@@ -673,9 +673,9 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
-    def lid_position(self) -> str:
+    def lid_position(self) -> Optional[str]:
         """Lid open/close status string"""
-        return str(self._module.lid_status)
+        return self._module.lid_status
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
