@@ -30,7 +30,6 @@ export interface CommandsLinks {
       runId: string
       commandId: string
       index: number
-      key: string
     }
   }
 }
