@@ -13,7 +13,6 @@ import {
   SPACING_1,
   C_BRIGHT_GRAY,
   C_HARBOR_GRAY,
-  Btn,
   FONT_WEIGHT_REGULAR,
   FONT_SIZE_CAPTION,
   TYPOGRAPHY,
@@ -28,9 +27,9 @@ import { ModuleOverflowMenu } from './ModuleOverflowMenu'
 import magneticModule from '../../../assets/images/magnetic_module_gen_2_transparent.svg'
 import temperatureModule from '../../../assets/images/temp_deck_gen_2_transparent.svg'
 import thermoModule from '../../../assets/images/thermocycler_open_transparent.svg'
-import overflowIcon from '../../../assets/images/overflow_icon.svg'
 
 import type { AttachedModule } from '../../../redux/modules/types'
+import { OverflowBtn } from '../../../atoms/OverflowMenu/OverflowBtn'
 
 interface ModuleCardProps {
   module: AttachedModule
@@ -123,16 +122,14 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         </Box>
 
         <Box alignSelf={ALIGN_START} padding={SPACING_1}>
-          <Btn
+          <OverflowBtn
             onClick={() => {
               showOverflowMenu
                 ? setShowOverflowMenu(false)
                 : setShowOverflowMenu(true)
             }}
             aria-label="overflow"
-          >
-            <img src={overflowIcon} />
-          </Btn>
+          />
         </Box>
       </Flex>
     </React.Fragment>
