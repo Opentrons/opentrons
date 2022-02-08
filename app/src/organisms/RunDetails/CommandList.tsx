@@ -63,7 +63,7 @@ export function CommandList(): JSX.Element | null {
   const [windowIndex, setWindowIndex] = React.useState<number>(0)
   const currentRunId = useCurrentRunId()
   const windowFirstCommandIndex = (WINDOW_SIZE - WINDOW_OVERLAP) * windowIndex
-  const { data: commandsData, isFetching: isFetchingRunCommands } = useAllCommandsQuery(
+  const { data: commandsData } = useAllCommandsQuery(
     currentRunId,
     {
       cursor: windowFirstCommandIndex,
@@ -76,7 +76,7 @@ export function CommandList(): JSX.Element | null {
   )
   const totalRunCommandCount = commandsData?.meta.totalLength ?? 0
   const runCommands = commandsData?.data ?? []
-  const currentCommandId = commandsData?.links?.current?.meta?.commandId ?? 0
+  const currentRunCommandIndex = commandsData?.links?.current?.meta?.index ?? 0
 
   const [
     isInitiallyJumpingToCurrent,
@@ -139,7 +139,6 @@ export function CommandList(): JSX.Element | null {
 
     currentCommandList = allCommands.slice(firstNonSetupIndex)
   }
-  const currentCommandIndex = currentCommandList.findIndex(command => command.analysisCommand?.id === currentCommandId)
 
   const commandWindow = currentCommandList.slice(
     windowFirstCommandIndex,
@@ -149,6 +148,16 @@ export function CommandList(): JSX.Element | null {
   const isFinalWindow =
     currentCommandList.length - 1 <= windowFirstCommandIndex + WINDOW_SIZE
 
+  console.table({currentRunCommandIndex, totalRunCommandCount, rC: postSetupRunCommands.length})
+
+  // run 50 commands total
+  // made up of 10 LPC, 5 setup commands, and 35 actual run commands
+  // commandsList has 100 commands, 35 of which have corresponding run commands
+
+  // knowns setup commands
+  //
+  const currentCommandIndex = Math.max(currentRunCommandIndex - (totalRunCommandCount - postSetupRunCommands.length), 0)
+  console.log(currentCommandIndex)
   const indexOfWindowContainingCurrentItem = Math.floor(
     Math.max(currentCommandIndex - (WINDOW_SIZE - WINDOW_OVERLAP), 0) /
       (WINDOW_SIZE - WINDOW_OVERLAP)
@@ -287,13 +296,7 @@ export function CommandList(): JSX.Element | null {
           <Box width="100%" height={`${topBufferHeightPx}px`} />
           {commandWindow?.map((command, index) => {
             const overallIndex = index + windowFirstCommandIndex
-            const isCurrentCommand =
-              commandWindow[index - 1]?.runCommandSummary?.status ===
-                'succeeded' &&
-              ((command?.analysisCommand?.status === 'queued' && command?.runCommandSummary == null) ||
-                command?.runCommandSummary?.status === 'running')
-            const showAnticipatedStepsTitle =
-              overallIndex !== currentCommandList.length - 1 && isCurrentCommand
+            const isCurrentCommand = overallIndex === currentCommandIndex
 
             return (
               <Flex
@@ -313,7 +316,7 @@ export function CommandList(): JSX.Element | null {
                   stepNumber={overallIndex + 1}
                   runStartedAt={runStartTime}
                 />
-                {showAnticipatedStepsTitle && (
+                {isCurrentCommand && (
                   <Text
                     fontSize={FONT_SIZE_CAPTION}
                     margin={`${SPACING_3} 0 ${SPACING_2}`}
