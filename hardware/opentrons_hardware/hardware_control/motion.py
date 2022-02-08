@@ -1,5 +1,5 @@
 """A collection of motions that define a single move."""
-from typing import List, Dict
+from typing import List, Dict, Iterable, Optional
 from dataclasses import dataclass
 import numpy as np  # type: ignore[import]
 from logging import getLogger
@@ -38,7 +38,10 @@ MAX_SPEEDS = {
 
 
 def create(
-    origin: Dict[NodeId, float], target: Dict[NodeId, float], speed: float
+    origin: Dict[NodeId, float],
+    target: Dict[NodeId, float],
+    speed: float,
+    present_nodes: Optional[Iterable[NodeId]] = None,
 ) -> MoveGroups:
     """Create a move.
 
@@ -55,14 +58,19 @@ def create(
     # head (as opposed to head_l and head_r) is not an acceptable target for motion
     deltas.pop(NodeId.head, None)
 
-    ordered_nodes = [
-        NodeId.gantry_x,
-        NodeId.gantry_y,
-        NodeId.head_r,
-        NodeId.head_l,
-        NodeId.pipette_left,
-        NodeId.pipette_right,
-    ]
+    if not present_nodes:
+        checked_nodes: Iterable[NodeId] = [
+            NodeId.gantry_x,
+            NodeId.gantry_y,
+            NodeId.head_r,
+            NodeId.head_l,
+            NodeId.pipette_left,
+            NodeId.pipette_right,
+        ]
+    else:
+        checked_nodes = present_nodes
+
+    ordered_nodes = sorted(checked_nodes, key=lambda node: node.value)
     vec = np.array([deltas.get(node, 0) for node in ordered_nodes])
     if any(np.isnan(vec)):
         raise RuntimeError(vec)
