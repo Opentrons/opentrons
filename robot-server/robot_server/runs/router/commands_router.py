@@ -1,8 +1,10 @@
 """Router for /runs commands endpoints."""
-from fastapi import APIRouter, Depends, status
-from pydantic import BaseModel, Field
+from asyncio import wait_for, TimeoutError as AsyncioTimeoutError
 from typing import Optional, Union
 from typing_extensions import Final, Literal
+
+from fastapi import APIRouter, Depends, status
+from pydantic import BaseModel, Field
 
 from opentrons.protocol_engine import commands as pe_commands, errors as pe_errors
 
@@ -74,6 +76,8 @@ class CommandCollectionLinks(BaseModel):
 )
 async def create_run_command(
     request_body: RequestModel[pe_commands.CommandCreate],
+    waitUntilComplete: bool = False,
+    timeout: float = 30,
     engine_store: EngineStore = Depends(get_engine_store),
     run: Run = Depends(get_run_data_from_url),
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
@@ -82,6 +86,10 @@ async def create_run_command(
     Arguments:
         request_body: The request containing the command that the client wants
             to enqueue.
+        waitUntilComplete: If True, return only once the command is completed.
+            Else, return immediately. Comes from a query parameter in the URL.
+        timeout: The maximum time, in seconds, to wait before returning.
+            Comes from a query parameter in the URL.
         engine_store: Used to retrieve the `ProtocolEngine` on which the new
             command will be enqueued.
         run: Run response model, provided by the route handler for
@@ -93,10 +101,30 @@ async def create_run_command(
             status.HTTP_400_BAD_REQUEST
         )
 
-    command = engine_store.engine.add_command(request_body.data)
+    added_command = engine_store.engine.add_command(request_body.data)
+
+    command_to_return: pe_commands.Command
+
+    if waitUntilComplete:
+        try:
+            await wait_for(
+                engine_store.engine.wait_for_command(command_id=added_command.id),
+                timeout=timeout,
+            )
+            completed_command = engine_store.get_state(run.id).commands.get(
+                command_id=added_command.id
+            )
+            command_to_return = completed_command
+        except AsyncioTimeoutError:
+            timed_out_command = engine_store.get_state(run.id).commands.get(
+                command_id=added_command.id
+            )
+            command_to_return = timed_out_command
+    else:
+        command_to_return = added_command
 
     return await PydanticResponse.create(
-        content=SimpleBody.construct(data=command),
+        content=SimpleBody.construct(data=command_to_return),
         status_code=status.HTTP_201_CREATED,
     )
 
