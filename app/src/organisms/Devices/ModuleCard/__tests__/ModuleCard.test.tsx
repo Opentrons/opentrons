@@ -121,7 +121,9 @@ describe('ModuleCard', () => {
     const { getByRole, getByText } = render({
       module: mockMagneticModule,
     })
-    const overflowButton = getByRole('button')
+    const overflowButton = getByRole('button', {
+      name: /overflow/i,
+    })
     getByText('Magnetic Module GEN1')
     fireEvent.click(overflowButton)
     expect(overflowButton).not.toBeDisabled()

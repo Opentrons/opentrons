@@ -3,7 +3,6 @@ import styled from 'styled-components'
 import { Btn, COLORS, SPACING, PrimitiveComponent } from '@opentrons/components'
 
 export interface OverflowBtnProps {
-  onClick?: () => void
   children?: React.ReactNode
 }
 
@@ -34,9 +33,11 @@ const StyledOverflowIcon: BtnComponent = styled(Btn)`
   }
 `
 
-export const OverflowBtn = (props: OverflowBtnProps): JSX.Element | null => {
+export const OverflowBtn = (
+  props: React.ButtonHTMLAttributes<HTMLButtonElement> | OverflowBtnProps
+): JSX.Element | null => {
   return (
-    <StyledOverflowIcon onClick={props.onClick}>
+    <StyledOverflowIcon {...props}>
       <svg
         width="19"
         height="31"
