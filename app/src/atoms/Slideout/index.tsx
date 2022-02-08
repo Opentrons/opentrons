@@ -27,7 +27,7 @@ interface Props {
 
 const EXPANDED_STYLE = css`
   animation-duration: 300ms;
-  animation-name: slidein;s
+  animation-name: slidein;
   overflow: hidden;
   max-width: 19.5rem;
 

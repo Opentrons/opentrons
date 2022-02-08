@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Box, COLORS} from '@opentrons/components'
+import { Box, COLORS } from '@opentrons/components'
 
 interface OverflowMenuProps {
   children: React.ReactNode
