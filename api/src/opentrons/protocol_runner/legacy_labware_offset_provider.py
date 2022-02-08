@@ -11,6 +11,8 @@ from opentrons.protocol_api.labware_offset_provider import (
 from opentrons.protocol_engine import LabwareOffsetLocation, ModuleModel
 from opentrons.protocol_engine.state import LabwareView
 
+from .legacy_wrappers import LegacyModuleModel
+
 
 class LegacyLabwareOffsetProvider(AbstractLegacyLabwareOffsetProvider):
     """Provides a `ProtocolEngine`'s labware offsets."""
@@ -22,7 +24,7 @@ class LegacyLabwareOffsetProvider(AbstractLegacyLabwareOffsetProvider):
     def find(
         self,
         labware_definition_uri: str,
-        module_model: Optional[str],
+        requested_module_model: Optional[LegacyModuleModel],
         deck_slot: DeckSlotName,
     ) -> LegacyProvidedLabwareOffset:
         """Look up an offset in ProtocolEngine state and return it, if one exists.
@@ -34,7 +36,9 @@ class LegacyLabwareOffsetProvider(AbstractLegacyLabwareOffsetProvider):
             location=LabwareOffsetLocation(
                 slotName=deck_slot,
                 moduleModel=(
-                    None if module_model is None else ModuleModel(module_model)
+                    None
+                    if requested_module_model is None
+                    else ModuleModel(requested_module_model.value)
                 ),
             ),
         )
