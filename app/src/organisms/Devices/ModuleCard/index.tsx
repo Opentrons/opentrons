@@ -84,7 +84,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
 
   return (
     <React.Fragment>
-      {showOverflowMenu && <ModuleOverflowMenu module={module} />}
       <Flex
         backgroundColor={C_BRIGHT_GRAY}
         borderRadius={SPACING_1}
@@ -123,14 +122,15 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
 
         <Box alignSelf={ALIGN_START} padding={SPACING_1}>
           <OverflowBtn
+            aria-label="overflow"
             onClick={() => {
               showOverflowMenu
                 ? setShowOverflowMenu(false)
                 : setShowOverflowMenu(true)
             }}
-            aria-label="overflow"
           />
         </Box>
+        {showOverflowMenu && <ModuleOverflowMenu module={module} />}
       </Flex>
     </React.Fragment>
   )

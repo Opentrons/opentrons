@@ -1,6 +1,10 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Flex, DIRECTION_COLUMN } from '@opentrons/components'
+import {
+  Flex,
+  DIRECTION_COLUMN,
+  POSITION_RELATIVE,
+} from '@opentrons/components'
 import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
 import { OverflowMenu } from '../../../atoms/OverflowMenu'
 import { OverflowMenuBtn } from '../../../atoms/OverflowMenu/OverflowMenuBtn'
@@ -54,31 +58,33 @@ export const ModuleOverflowMenu = (
   return (
     <React.Fragment>
       {showSlideout && slideout}
-      <OverflowMenu>
-        <Flex flexDirection={DIRECTION_COLUMN}>
-          <OverflowMenuBtn
-            onClick={() => setShowSlideout(true)}
-            data-testid={`module_setting_${module.model}`}
-          >
-            {setSetting ?? turnOffSetting}
-          </OverflowMenuBtn>
-          {module.type === THERMOCYCLER_MODULE_TYPE ? (
+      <Flex position={POSITION_RELATIVE}>
+        <OverflowMenu>
+          <Flex flexDirection={DIRECTION_COLUMN}>
             <OverflowMenuBtn
               onClick={() => setShowSlideout(true)}
-              data-testid={`thermo_block_setting_${module.model}`}
+              data-testid={`module_setting_${module.model}`}
             >
-              {t('overflow_menu_set_block_temp')}
+              {setSetting ?? turnOffSetting}
             </OverflowMenuBtn>
-          ) : null}
-          <OverflowMenuBtn
-            data-testid={`about_module_${module.model}`}
-            //  TODO immediately - add actual module overflow menu
-            onClick={() => console.log('about module overflow menu')}
-          >
-            {t('overflow_menu_about')}
-          </OverflowMenuBtn>
-        </Flex>
-      </OverflowMenu>
+            {module.type === THERMOCYCLER_MODULE_TYPE ? (
+              <OverflowMenuBtn
+                onClick={() => setShowSlideout(true)}
+                data-testid={`thermo_block_setting_${module.model}`}
+              >
+                {t('overflow_menu_set_block_temp')}
+              </OverflowMenuBtn>
+            ) : null}
+            <OverflowMenuBtn
+              data-testid={`about_module_${module.model}`}
+              //  TODO immediately - add actual module overflow menu
+              onClick={() => console.log('about module overflow menu')}
+            >
+              {t('overflow_menu_about')}
+            </OverflowMenuBtn>
+          </Flex>
+        </OverflowMenu>
+      </Flex>
     </React.Fragment>
   )
 }
