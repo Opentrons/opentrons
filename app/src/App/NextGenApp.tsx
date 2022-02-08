@@ -9,6 +9,7 @@ import {
   C_NEAR_WHITE,
   DIRECTION_COLUMN,
   FLEX_NONE,
+  OVERFLOW_SCROLL,
   POSITION_RELATIVE,
   SIZE_4,
   SPACING_2,
@@ -179,6 +180,7 @@ export function NextGenApp(): JSX.Element {
         width="100%"
         height="100%"
         backgroundColor={C_NEAR_WHITE}
+        overflow={OVERFLOW_SCROLL}
       >
         <Switch>
           {nextGenRoutes.map(({ component, exact, path }: RouteProps) => {

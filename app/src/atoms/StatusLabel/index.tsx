@@ -14,10 +14,12 @@ interface StatusLabelProps {
   status: string
   backgroundColor: string
   iconColor: string
+  textColor?: string
+  pulse?: boolean
 }
 
 export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
-  const { status, backgroundColor, iconColor } = props
+  const { status, backgroundColor, iconColor, textColor, pulse } = props
 
   return (
     <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -34,10 +36,22 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
           color={iconColor}
           size={SPACING_1}
           marginX={SPACING_1}
-        />
+          data-testid="status_circle"
+        >
+          {pulse ? (
+            <animate
+              attributeName="fill"
+              values={`${iconColor}; transparent`}
+              dur="1s"
+              calcMode="discrete"
+              repeatCount="indefinite"
+              data-testid="pulsing_status_circle"
+            />
+          ) : null}
+        </Icon>
         <Text
           fontSize={FONT_SIZE_CAPTION}
-          color={C_BLUE_PRESSED}
+          color={textColor ?? C_BLUE_PRESSED}
           textTransform={TEXT_TRANSFORM_CAPITALIZE}
           marginRight={SPACING_1}
         >

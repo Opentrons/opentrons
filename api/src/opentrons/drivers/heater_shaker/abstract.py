@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Dict
 
-from opentrons.drivers.types import Temperature, RPM, HeaterShakerPlateLockStatus
+from opentrons.drivers.types import Temperature, RPM, HeaterShakerLabwareLatchStatus
 
 
 class AbstractHeaterShakerDriver(ABC):
@@ -21,13 +21,13 @@ class AbstractHeaterShakerDriver(ABC):
         ...
 
     @abstractmethod
-    async def open_plate_lock(self) -> None:
-        """Send open-plate-lock command"""
+    async def open_labware_latch(self) -> None:
+        """Send open-labware-latch command"""
         ...
 
     @abstractmethod
-    async def close_plate_lock(self) -> None:
-        """Send close-plate-lock command"""
+    async def close_labware_latch(self) -> None:
+        """Send close-labware-latch command"""
         ...
 
     @abstractmethod
@@ -51,8 +51,8 @@ class AbstractHeaterShakerDriver(ABC):
         ...
 
     @abstractmethod
-    async def get_plate_lock_status(self) -> HeaterShakerPlateLockStatus:
-        """Send get-plate-lock-status command"""
+    async def get_labware_latch_status(self) -> HeaterShakerLabwareLatchStatus:
+        """Send get-labware-latch-status command"""
         ...
 
     @abstractmethod

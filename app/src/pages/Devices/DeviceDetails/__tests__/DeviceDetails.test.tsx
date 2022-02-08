@@ -4,21 +4,20 @@ import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
 import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
-import {
-  mockFetchModulesSuccessActionPayloadModules,
-  mockMagneticModule,
-} from '../../../../redux/modules/__fixtures__'
+import { mockFetchModulesSuccessActionPayloadModules } from '../../../../redux/modules/__fixtures__'
 import {
   useAttachedModules,
   useRobot,
 } from '../../../../organisms/Devices/hooks'
+import { PipettesAndModules } from '../../../../organisms/Devices/PipettesAndModules'
+import { RecentProtocolRuns } from '../../../../organisms/Devices/RecentProtocolRuns'
 import { RobotOverview } from '../../../../organisms/Devices/RobotOverview'
 import { DeviceDetails } from '..'
-import { ModuleCard } from '../../../../organisms/Devices/ModuleCard'
 
 jest.mock('../../../../organisms/Devices/hooks')
+jest.mock('../../../../organisms/Devices/PipettesAndModules')
+jest.mock('../../../../organisms/Devices/RecentProtocolRuns')
 jest.mock('../../../../organisms/Devices/RobotOverview')
-jest.mock('../../../../organisms/Devices/ModuleCard')
 
 const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
   typeof useAttachedModules
@@ -27,7 +26,12 @@ const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 const mockRobotOverview = RobotOverview as jest.MockedFunction<
   typeof RobotOverview
 >
-const mockModuleCard = ModuleCard as jest.MockedFunction<typeof ModuleCard>
+const mockPipettesAndModules = PipettesAndModules as jest.MockedFunction<
+  typeof PipettesAndModules
+>
+const mockRecentProtocolRuns = RecentProtocolRuns as jest.MockedFunction<
+  typeof RecentProtocolRuns
+>
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -47,7 +51,8 @@ describe('DeviceDetails', () => {
     )
     mockUseRobot.mockReturnValue(null)
     mockRobotOverview.mockReturnValue(<div>Mock RobotOverview</div>)
-    mockModuleCard.mockReturnValue(<div>Mock ModuleCard</div>)
+    mockPipettesAndModules.mockReturnValue(<div>Mock PipettesAndModules</div>)
+    mockRecentProtocolRuns.mockReturnValue(<div>Mock RecentProtocolRuns</div>)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -65,11 +70,18 @@ describe('DeviceDetails', () => {
 
     getByText('Mock RobotOverview')
   })
-  it('renders a Module card', () => {
+
+  it('renders PipettesAndModules when a robot is found', () => {
     mockUseRobot.mockReturnValue(mockConnectableRobot)
-    mockUseAttachedModules.mockReturnValue([mockMagneticModule])
     const [{ getByText }] = render('/devices/otie')
 
-    getByText('Mock ModuleCard')
+    getByText('Mock PipettesAndModules')
+  })
+
+  it('renders RecentProtocolRuns when a robot is found', () => {
+    mockUseRobot.mockReturnValue(mockConnectableRobot)
+    const [{ getByText }] = render('/devices/otie')
+
+    getByText('Mock RecentProtocolRuns')
   })
 })
