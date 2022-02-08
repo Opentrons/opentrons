@@ -11,9 +11,10 @@ import {
   MAGNETIC_MODULE_V2,
 } from '@opentrons/shared-data/js/constants'
 import { StatusLabel } from '../../../atoms/StatusLabel'
+import type { MagneticStatus } from '../../../redux/modules/api-types'
 
 interface MagModuleProps {
-  moduleStatus: string
+  moduleStatus: MagneticStatus
   moduleHeight: number
   moduleModel: typeof MAGNETIC_MODULE_V1 | typeof MAGNETIC_MODULE_V2
 }
@@ -25,12 +26,12 @@ export const MagneticModuleData = (
   const { t } = useTranslation('device_details')
 
   return (
-    //    TODO Immediately: iconColor should be animated
     <>
       <StatusLabel
         status={moduleStatus}
         backgroundColor={C_SKY_BLUE}
         iconColor={C_BLUE}
+        pulse={moduleStatus === 'engaged'}
       />
       <Text fontSize={FONT_SIZE_CAPTION}>
         {t(

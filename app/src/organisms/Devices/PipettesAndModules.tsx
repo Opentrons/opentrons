@@ -54,7 +54,7 @@ export function PipettesAndModules({
         width="100%"
       >
         {isRobotViewable ? (
-          <Flex flexWrap={WRAP} alignItems={ALIGN_CENTER} width="100%">
+          <Flex flexWrap={WRAP} width="100%">
             {attachedModules.map((module, index) => {
               return (
                 <Flex key={`moduleCard_${module.type}_${index}`}>

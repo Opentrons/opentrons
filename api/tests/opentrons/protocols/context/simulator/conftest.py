@@ -2,7 +2,6 @@ import pytest
 from opentrons import ThreadManagedHardware, types
 from opentrons.protocols.context.instrument import AbstractInstrument
 from opentrons.protocols.context.labware import AbstractLabware
-from opentrons.protocols.context.paired_instrument import AbstractPairedInstrument
 from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
 from opentrons.protocols.context.protocol_api.protocol_context import (
     ProtocolContextImplementation,
@@ -76,25 +75,6 @@ def second_simulating_instrument_context(
         mount=types.Mount.LEFT,
         instrument_name="p300_single_gen2",
     )
-
-
-@pytest.fixture
-def paired_instrument(
-    instrument_context: AbstractInstrument,
-    second_instrument_context: AbstractInstrument,
-) -> AbstractPairedInstrument:
-    """A paired instrument."""
-    instrument_context.home()
-    return instrument_context.pair_with(second_instrument_context)
-
-
-@pytest.fixture
-def simulating_paired_instrument(
-    simulating_instrument_context: AbstractInstrument,
-    second_simulating_instrument_context: AbstractInstrument,
-) -> AbstractPairedInstrument:
-    """A simulating paired instrument."""
-    return simulating_instrument_context.pair_with(second_simulating_instrument_context)
 
 
 @pytest.fixture
