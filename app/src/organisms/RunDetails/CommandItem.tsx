@@ -89,7 +89,7 @@ export function CommandItemComponent(
   ) {
     commandStatus = runCommandSummary.status
   }
-  if (isMostRecentCommand && commandStatus === 'queued') {
+  if (isMostRecentCommand && (commandStatus === 'queued' || commandStatus === 'succeeded')) {
     commandStatus = 'running' as const
   }
 
@@ -194,6 +194,7 @@ export const CommandItem = React.memo(
     const shouldRerender =
       !isEqual(prevProps.analysisCommand, nextProps.analysisCommand) ||
       !isEqual(prevProps.runCommandSummary, nextProps.runCommandSummary) ||
+      !isEqual(prevProps.isMostRecentCommand, nextProps.isMostRecentCommand) ||
       ((([
         RUN_STATUS_PAUSED,
         RUN_STATUS_PAUSE_REQUESTED,
