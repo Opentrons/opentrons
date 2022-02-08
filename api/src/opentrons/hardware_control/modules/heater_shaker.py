@@ -10,7 +10,7 @@ from opentrons.hardware_control.modules import mod_abc, types, update
 from opentrons.drivers.heater_shaker.driver import HeaterShakerDriver
 from opentrons.drivers.heater_shaker.abstract import AbstractHeaterShakerDriver
 from opentrons.drivers.heater_shaker.simulator import SimulatingDriver
-from opentrons.drivers.types import Temperature, RPM, HeaterShakerPlateLockStatus
+from opentrons.drivers.types import Temperature, RPM, HeaterShakerLabwareLatchStatus
 
 log = logging.getLogger(__name__)
 
@@ -354,10 +354,10 @@ class HeaterShaker(mod_abc.AbstractModule):
             self.await_speed(speed), self.await_temperature(temperature)
         )
 
-    async def _wait_for_plate_lock(self, status: HeaterShakerPlateLockStatus):
-        current_status = await self._driver.get_plate_lock_status()
+    async def _wait_for_labware_latch(self, status: HeaterShakerLabwareLatchStatus):
+        current_status = await self._driver.get_labware_latch_status()
         while status != current_status:
-            current_status = await self._driver.get_plate_lock_status()
+            current_status = await self._driver.get_labware_latch_status()
 
     async def deactivate(self):
         """Stop heating/cooling; stop shaking and home the plate"""
@@ -365,15 +365,15 @@ class HeaterShaker(mod_abc.AbstractModule):
         await self._driver.set_temperature(0)
         await self._driver.home()
 
-    async def open_plate_lock(self):
+    async def open_labware_latch(self):
         await self.wait_for_is_running()
-        await self._driver.open_plate_lock()
-        await self._wait_for_plate_lock(HeaterShakerPlateLockStatus.IDLE_OPEN)
+        await self._driver.open_labware_latch()
+        await self._wait_for_labware_latch(HeaterShakerLabwareLatchStatus.IDLE_OPEN)
 
-    async def close_plate_lock(self):
+    async def close_labware_latch(self):
         await self.wait_for_is_running()
-        await self._driver.close_plate_lock()
-        await self._wait_for_plate_lock(HeaterShakerPlateLockStatus.IDLE_CLOSED)
+        await self._driver.close_labware_latch()
+        await self._wait_for_labware_latch(HeaterShakerLabwareLatchStatus.IDLE_CLOSED)
 
     async def prep_for_update(self) -> str:
         return "no"

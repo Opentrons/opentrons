@@ -32,8 +32,8 @@ class RPM:
     target: Optional[int]
 
 
-class HeaterShakerPlateLockStatus(str, Enum):
-    """Heater-shaker plate lock status"""
+class HeaterShakerLabwareLatchStatus(str, Enum):
+    """Heater-shaker labware latch status"""
 
     OPENING = "OPENING"
     IDLE_OPEN = "IDLE_OPEN"

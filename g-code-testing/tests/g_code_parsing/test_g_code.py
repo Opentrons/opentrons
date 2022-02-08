@@ -291,19 +291,19 @@ def heater_shaker_g_codes() -> List[GCode]:
             "M115 FW:v0.1.0-12-gba8ae71-ba8ae71 HW:Opentrons Heater-Shaker "
             "SerialNo:EMPTYSN OK",
         ],
-        # Test 81 - Open Plate Lock
+        # Test 81 - Open Labware Latch
         ["M242", "M242 OK"],
-        # Test 82 - Close Plate Lock
+        # Test 82 - Close Labware Latch
         ["M243", "M243 OK"],
-        # Test 83 - Get Plate Lock State (Opening)
+        # Test 83 - Get Labware Latch State (Opening)
         ["M241", "M241 STATE:OPENING OK"],
-        # Test 84 - Get Plate Lock State (Closing)
+        # Test 84 - Get Labware Latch State (Closing)
         ["M241", "M241 STATE:CLOSING OK"],
-        # Test 85 - Get Plate Lock State (Unknown)
+        # Test 85 - Get Labware Latch State (Unknown)
         ["M241", "M241 STATE:IDLE_UNKNOWN OK"],
-        # Test 86 - Get Plate Lock State (Open)
+        # Test 86 - Get Labware Latch State (Open)
         ["M241", "M241 STATE:IDLE_OPEN OK"],
-        # Test 87 - Get Plate Lock State (Closed)
+        # Test 87 - Get Labware Latch State (Closed)
         ["M241", "M241 STATE:IDLE_CLOSED OK"],
     ]
     g_code_list = [
@@ -420,13 +420,13 @@ def expected_function_name_values() -> List[str]:
         "GET_TEMPERATURE",  # Test 78 - Get Temperature
         "HOME",  # Test 79 - Home
         "GET_VERSION",  # Test 80 - Get Version
-        "OPEN_PLATE_LOCK",  # Test 81 - Open Plate Lock
-        "CLOSE_PLATE_LOCK",  # Test 82 - Close Plate Lock
-        "GET_PLATE_LOCK_STATE",  # Test 83 - Get Plate Lock State (Opening)
-        "GET_PLATE_LOCK_STATE",  # Test 84 - Get Plate Lock State (Closing)
-        "GET_PLATE_LOCK_STATE",  # Test 85 - Get Plate Lock State (Unknown)
-        "GET_PLATE_LOCK_STATE",  # Test 86 - Get Plate Lock State (Open)
-        "GET_PLATE_LOCK_STATE",  # Test 87 - Get Plate Lock State (Closed)
+        "OPEN_LABWARE_LATCH",  # Test 81 - Open Labware Latch
+        "CLOSE_LABWARE_LATCH",  # Test 82 - Close Labware Latch
+        "GET_LABWARE_LATCH_STATE",  # Test 83 - Get Labware Latch State (Opening)
+        "GET_LABWARE_LATCH_STATE",  # Test 84 - Get Labware Latch State (Closing)
+        "GET_LABWARE_LATCH_STATE",  # Test 85 - Get Labware Latch State (Unknown)
+        "GET_LABWARE_LATCH_STATE",  # Test 86 - Get Labware Latch State (Open)
+        "GET_LABWARE_LATCH_STATE",  # Test 87 - Get Labware Latch State (Closed)
     ]
 
 
@@ -610,19 +610,19 @@ def expected_arg_values() -> List[Dict[str, Union[int, float, str, None]]]:
         {},
         # Test 80 - Get Version
         {},
-        # Test 81 - Open Plate Lock
+        # Test 81 - Open Labware Latch
         {},
-        # Test 82 - Close Plate Lock
+        # Test 82 - Close Labware Latch
         {},
-        # Test 83 - Get Plate Lock State (Opening)
+        # Test 83 - Get Labware Latch State (Opening)
         {},
-        # Test 84 - Get Plate Lock State (Closing)
+        # Test 84 - Get Labware Latch State (Closing)
         {},
-        # Test 85 - Get Plate Lock State (Unknown)
+        # Test 85 - Get Labware Latch State (Unknown)
         {},
-        # Test 86 - Get Plate Lock State (Open)
+        # Test 86 - Get Labware Latch State (Open)
         {},
-        # Test 87 - Get Plate Lock State (Closed)
+        # Test 87 - Get Labware Latch State (Closed)
         {},
     ]
 
@@ -1396,58 +1396,58 @@ def explanations() -> List[Explanation]:
         # Test 81
         Explanation(
             code="M242",
-            command_name="OPEN_PLATE_LOCK",
+            command_name="OPEN_LABWARE_LATCH",
             response="",
             provided_args={},
-            command_explanation="Opening heater-shaker plate lock",
+            command_explanation="Opening heater-shaker labware latch",
         ),
         # Test 82
         Explanation(
             code="M243",
-            command_name="CLOSE_PLATE_LOCK",
+            command_name="CLOSE_LABWARE_LATCH",
             response="",
             provided_args={},
-            command_explanation="Closing heater-shaker plate lock",
+            command_explanation="Closing heater-shaker labware latch",
         ),
         # Test 83
         Explanation(
             code="M241",
-            command_name="GET_PLATE_LOCK_STATE",
-            response="Plate Lock State: OPENING",
+            command_name="GET_LABWARE_LATCH_STATE",
+            response="Labware Latch State: OPENING",
             provided_args={},
-            command_explanation="Getting heater-shaker plate lock state",
+            command_explanation="Getting heater-shaker labware latch state",
         ),
         # Test 84
         Explanation(
             code="M241",
-            command_name="GET_PLATE_LOCK_STATE",
-            response="Plate Lock State: CLOSING",
+            command_name="GET_LABWARE_LATCH_STATE",
+            response="Labware Latch State: CLOSING",
             provided_args={},
-            command_explanation="Getting heater-shaker plate lock state",
+            command_explanation="Getting heater-shaker labware latch state",
         ),
         # Test 85
         Explanation(
             code="M241",
-            command_name="GET_PLATE_LOCK_STATE",
-            response="Plate Lock State: IDLE_UNKNOWN",
+            command_name="GET_LABWARE_LATCH_STATE",
+            response="Labware Latch State: IDLE_UNKNOWN",
             provided_args={},
-            command_explanation="Getting heater-shaker plate lock state",
+            command_explanation="Getting heater-shaker labware latch state",
         ),
         # Test 86
         Explanation(
             code="M241",
-            command_name="GET_PLATE_LOCK_STATE",
-            response="Plate Lock State: IDLE_OPEN",
+            command_name="GET_LABWARE_LATCH_STATE",
+            response="Labware Latch State: IDLE_OPEN",
             provided_args={},
-            command_explanation="Getting heater-shaker plate lock state",
+            command_explanation="Getting heater-shaker labware latch state",
         ),
         # Test 87
         Explanation(
             code="M241",
-            command_name="GET_PLATE_LOCK_STATE",
-            response="Plate Lock State: IDLE_CLOSED",
+            command_name="GET_LABWARE_LATCH_STATE",
+            response="Labware Latch State: IDLE_CLOSED",
             provided_args={},
-            command_explanation="Getting heater-shaker plate lock state",
+            command_explanation="Getting heater-shaker labware latch state",
         ),
     ]
 
