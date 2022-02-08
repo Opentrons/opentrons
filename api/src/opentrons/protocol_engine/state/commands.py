@@ -64,7 +64,6 @@ class CommandSlice:
 
     commands: List[Command]
     cursor: int
-    length: int
     total_length: int
 
 
@@ -330,14 +329,12 @@ class CommandView(HasState[CommandState]):
         # start is inclusive, stop is exclusive
         actual_cursor = max(0, min(cursor, total_length - 1))
         stop = min(total_length, actual_cursor + length)
-        actual_length = stop - actual_cursor
         command_ids = all_command_ids[actual_cursor:stop]
         commands = [commands_by_id[cid].command for cid in command_ids]
 
         return CommandSlice(
             commands=commands,
             cursor=actual_cursor,
-            length=actual_length,
             total_length=total_length,
         )
 

@@ -503,15 +503,9 @@ def test_get_current() -> None:
 def test_get_slice_empty() -> None:
     """It should return a slice from the tail if no current command."""
     subject = get_command_view(commands=[])
-
     result = subject.get_slice(cursor=None, length=2)
 
-    assert result == CommandSlice(
-        commands=[],
-        cursor=0,
-        length=0,
-        total_length=0,
-    )
+    assert result == CommandSlice(commands=[], cursor=0, total_length=0)
 
 
 def test_get_slice() -> None:
@@ -528,7 +522,6 @@ def test_get_slice() -> None:
     assert result == CommandSlice(
         commands=[command_2, command_3, command_4],
         cursor=1,
-        length=3,
         total_length=4,
     )
 
@@ -537,7 +530,6 @@ def test_get_slice() -> None:
     assert result == CommandSlice(
         commands=[command_1, command_2, command_3, command_4],
         cursor=0,
-        length=4,
         total_length=4,
     )
 
@@ -558,7 +550,6 @@ def test_get_slice_default_cursor() -> None:
     assert result == CommandSlice(
         commands=[command_3, command_4],
         cursor=2,
-        length=2,
         total_length=4,
     )
 
@@ -577,6 +568,5 @@ def test_get_slice_default_cursor_no_current() -> None:
     assert result == CommandSlice(
         commands=[command_2, command_3, command_4],
         cursor=1,
-        length=3,
         total_length=4,
     )

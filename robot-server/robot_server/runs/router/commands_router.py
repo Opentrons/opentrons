@@ -153,7 +153,6 @@ async def get_run_commands(
 
     meta = MultiBodyMeta(
         cursor=command_slice.cursor,
-        pageLength=command_slice.length,
         totalLength=command_slice.total_length,
     )
 
