@@ -134,6 +134,7 @@ async def test_get_run_commands(decoy: Decoy, engine_store: EngineStore) -> None
         CurrentCommand(
             command_id="current-command-id",
             command_key="current-command-key",
+            created_at=datetime(year=2024, month=4, day=4),
             index=101,
         )
     )
@@ -169,6 +170,7 @@ async def test_get_run_commands(decoy: Decoy, engine_store: EngineStore) -> None
                 runId="run-id",
                 commandId="current-command-id",
                 key="current-command-key",
+                createdAt=datetime(year=2024, month=4, day=4),
                 index=101,
             ),
         )

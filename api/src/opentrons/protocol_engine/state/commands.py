@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import OrderedDict
 from enum import Enum
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Dict, List, Mapping, Optional
 from typing_extensions import Literal
 
@@ -73,6 +74,7 @@ class CurrentCommand:
 
     command_id: str
     command_key: str
+    created_at: datetime
     index: int
 
 
@@ -354,6 +356,7 @@ class CommandView(HasState[CommandState]):
             return CurrentCommand(
                 command_id=entry.command.id,
                 command_key=entry.command.key,
+                created_at=entry.command.createdAt,
                 index=entry.index,
             )
 
@@ -365,6 +368,7 @@ class CommandView(HasState[CommandState]):
                 return CurrentCommand(
                     command_id=entry.command.id,
                     command_key=entry.command.key,
+                    created_at=entry.command.createdAt,
                     index=len(self._state.all_command_ids) - reverse_index - 1,
                 )
 

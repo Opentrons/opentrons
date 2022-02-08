@@ -37,6 +37,7 @@ def create_running_command(
     command_id: str = "command-id",
     command_key: str = "command-key",
     command_type: str = "command-type",
+    created_at: datetime = datetime(year=2021, month=1, day=1),
     params: Optional[BaseModel] = None,
 ) -> cmd.Command:
     """Given command data, build a running command model."""
@@ -45,7 +46,7 @@ def create_running_command(
         cmd.BaseCommand(
             id=command_id,
             key=command_key,
-            createdAt=datetime(year=2021, month=1, day=1),
+            createdAt=created_at,
             commandType=command_type,
             status=cmd.CommandStatus.RUNNING,
             params=params or BaseModel(),
@@ -82,6 +83,7 @@ def create_succeeded_command(
     command_id: str = "command-id",
     command_key: str = "command-key",
     command_type: str = "command-type",
+    created_at: datetime = datetime(year=2021, month=1, day=1),
     params: Optional[BaseModel] = None,
     result: Optional[BaseModel] = None,
 ) -> cmd.Command:
@@ -91,7 +93,7 @@ def create_succeeded_command(
         cmd.BaseCommand(
             id=command_id,
             key=command_key,
-            createdAt=datetime(year=2021, month=1, day=1),
+            createdAt=created_at,
             commandType=command_type,
             status=cmd.CommandStatus.SUCCEEDED,
             params=params or BaseModel(),
