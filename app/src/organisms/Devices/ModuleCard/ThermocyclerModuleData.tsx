@@ -19,6 +19,7 @@ import {
   C_BLUE,
   C_BLUE_PRESSED,
   COLORS,
+  SPACING,
 } from '@opentrons/components'
 
 import type { ThermocyclerStatus } from '../../../redux/modules/api-types'
@@ -83,10 +84,15 @@ export const ThermocyclerModuleData = (
           fontWeight={FONT_WEIGHT_REGULAR}
           fontSize={FONT_SIZE_CAPTION}
           marginTop={SPACING_2}
+          marginBottom={SPACING.spacing2}
         >
           {t('tc_lid')}
         </Text>
-        <Text title="lid_target_temp" fontSize={FONT_SIZE_CAPTION}>
+        <Text
+          title="lid_target_temp"
+          fontSize={FONT_SIZE_CAPTION}
+          marginBottom={SPACING.spacing1}
+        >
           {t(lidTarget === null ? 'na_temp' : 'target_temp', {
             temp: lidTarget,
           })}
@@ -106,7 +112,11 @@ export const ThermocyclerModuleData = (
           {t('tc_block')}
         </Text>
         <StatusLabel status={status} {...getStatusLabelProps(status)} />
-        <Text title="tc_target_temp" fontSize={FONT_SIZE_CAPTION}>
+        <Text
+          title="tc_target_temp"
+          fontSize={FONT_SIZE_CAPTION}
+          marginBottom={SPACING.spacing1}
+        >
           {t(targetTemp === null ? 'na_temp' : 'target_temp', {
             temp: targetTemp,
           })}

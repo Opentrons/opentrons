@@ -10,6 +10,7 @@ import {
   Flex,
   FONT_SIZE_CAPTION,
   Text,
+  SPACING,
 } from '@opentrons/components'
 import { StatusLabel } from '../../../atoms/StatusLabel'
 import type { TemperatureStatus } from '../../../redux/modules/api-types'
@@ -60,7 +61,7 @@ export const TemperatureModuleData = (
         pulse={pulse}
       />
       <Flex fontSize={FONT_SIZE_CAPTION} flexDirection={DIRECTION_COLUMN}>
-        <Text>
+        <Text marginBottom={SPACING.spacing1}>
           {t(targetTemp === null ? 'na_temp' : 'target_temp', {
             temp: targetTemp,
           })}
