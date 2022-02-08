@@ -846,7 +846,7 @@
           },
 
           {
-            "description": "Heater Shaker Module Set Target Shake Speed: Module will delay protocol execution until the target shake speed is reached. This command is blocking, it delays protocol execution while approaching the target shake speed.",
+            "description": "Heater Shaker Module Set Target Shake Speed: Start the module's shake procedure. The protocol will proceed once the target shake speed is reached.",
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
