@@ -1,8 +1,8 @@
-from typing import Union, Dict, List, Optional
+from typing import Dict, List, Optional
 from typing_extensions import Protocol
 
 from opentrons.types import Mount, Point
-from ..types import Axis, CriticalPoint, PipettePair, MotionChecks
+from ..types import Axis, CriticalPoint, MotionChecks
 
 
 class MotionController(Protocol):
@@ -109,7 +109,7 @@ class MotionController(Protocol):
 
     async def move_to(
         self,
-        mount: Union[Mount, PipettePair],
+        mount: Mount,
         abs_position: Point,
         speed: Optional[float] = None,
         critical_point: Optional[CriticalPoint] = None,
@@ -156,7 +156,7 @@ class MotionController(Protocol):
 
     async def move_rel(
         self,
-        mount: Union[Mount, PipettePair],
+        mount: Mount,
         delta: Point,
         speed: Optional[float] = None,
         max_speeds: Optional[Dict[Axis, float]] = None,
@@ -186,9 +186,7 @@ class MotionController(Protocol):
         """Disengage some axes."""
         ...
 
-    async def retract(
-        self, mount: Union[Mount, PipettePair], margin: float = 10
-    ) -> None:
+    async def retract(self, mount: Mount, margin: float = 10) -> None:
         """Pull the specified mount up to its home position.
 
         Works regardless of critical point or home status.

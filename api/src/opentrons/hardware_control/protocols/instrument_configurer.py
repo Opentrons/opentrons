@@ -1,4 +1,4 @@
-from typing import Dict, Union, Optional
+from typing import Dict, Optional
 from typing_extensions import Protocol
 
 from opentrons_shared_data.pipette.dev_types import PipetteName
@@ -6,7 +6,7 @@ from opentrons.types import Mount
 
 from ..pipette import Pipette
 from ..dev_types import PipetteDict
-from ..types import PipettePair, CriticalPoint
+from ..types import CriticalPoint
 
 
 class InstrumentConfigurer(Protocol):
@@ -143,7 +143,7 @@ class InstrumentConfigurer(Protocol):
         ...
 
     def set_current_tiprack_diameter(
-        self, mount: Union[Mount, PipettePair], tiprack_diameter: float
+        self, mount: Mount, tiprack_diameter: float
     ) -> None:
         """Inform the hardware of the diameter of the tiprack.
 
@@ -152,9 +152,7 @@ class InstrumentConfigurer(Protocol):
         """
         ...
 
-    def set_working_volume(
-        self, mount: Union[Mount, PipettePair], tip_volume: int
-    ) -> None:
+    def set_working_volume(self, mount: Mount, tip_volume: int) -> None:
         """Inform the hardware how much volume a pipette can aspirate.
 
         This will set the limit of aspiration for the pipette, and is
