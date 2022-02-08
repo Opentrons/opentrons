@@ -272,7 +272,7 @@ class ProtocolContext(CommandPublisher):
                 return
 
             if message["$"] == "before":
-                self._commands.append(text.format(**payload))
+                self._commands.append(text)
 
         self._unsubscribe_commands = self.broker.subscribe(
             cmd_types.COMMAND, on_command
