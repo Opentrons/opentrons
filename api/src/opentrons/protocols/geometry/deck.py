@@ -172,7 +172,7 @@ class Deck(UserDict):
         key_int = self._check_name(key)
         return types.Location(self._positions[key_int], str(key))
 
-    def recalculate_high_z(self):
+    def recalculate_high_z(self) -> None:
         self._highest_z = 0.0
         for item in [lw for lw in self.data.values() if lw]:
             self._highest_z = max(item.highest_z, self._highest_z)

@@ -16,6 +16,7 @@ from typing import (
 from collections import OrderedDict
 
 from opentrons import types
+from opentrons.broker import Broker
 from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import ModuleType
@@ -27,7 +28,6 @@ from opentrons.protocols.api_support.util import (
     requires_version,
     APIVersionError,
 )
-from opentrons.protocols.types import Protocol
 from opentrons.protocols.context.labware import AbstractLabware
 from opentrons.protocols.context.protocol import AbstractProtocol
 from opentrons.protocols.geometry.module_geometry import (
@@ -40,7 +40,6 @@ from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from .instrument_context import InstrumentContext
 from .labware import Labware
 from .module_contexts import (
-    ModuleContext,
     MagneticModuleContext,
     TemperatureModuleContext,
     ThermocyclerContext,
@@ -55,6 +54,7 @@ if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 logger = logging.getLogger(__name__)
+
 
 ModuleTypes = Union[
     TemperatureModuleContext, MagneticModuleContext, ThermocyclerContext
@@ -92,7 +92,7 @@ class ProtocolContext(CommandPublisher):
         implementation: AbstractProtocol,
         labware_offset_provider: Optional[AbstractLabwareOffsetProvider] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
-        broker=None,
+        broker: Optional[Broker] = None,
         api_version: Optional[APIVersion] = None,
     ) -> None:
         """Build a :py:class:`.ProtocolContext`.
@@ -125,7 +125,7 @@ class ProtocolContext(CommandPublisher):
         self._instruments: Dict[types.Mount, Optional[InstrumentContext]] = {
             mount: None for mount in types.Mount
         }
-        self._modules: List[ModuleContext] = []
+        self._modules: List[ModuleTypes] = []
 
         self._commands: List[str] = []
         self._unsubscribe_commands: Optional[Callable[[], None]] = None
@@ -146,19 +146,6 @@ class ProtocolContext(CommandPublisher):
         Calling code may only subscribe or unsubscribe.
         """
         return self._equipment_broker
-
-    @classmethod
-    def build_using(
-        cls, implementation: AbstractProtocol, protocol: Protocol, *args, **kwargs
-    ) -> ProtocolContext:
-        """Build an API instance for the specified parsed protocol
-
-        This is used internally to provision the context with bundle
-        contents or api levels.
-        """
-        kwargs["api_version"] = getattr(protocol, "api_level", MAX_SUPPORTED_VERSION)
-        kwargs["implementation"] = implementation
-        return cls(*args, **kwargs)
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -247,9 +234,14 @@ class ProtocolContext(CommandPublisher):
         if self._unsubscribe_commands:
             self._unsubscribe_commands()
 
-        def on_command(message):
+        def on_command(message: cmd_types.CommandMessage) -> None:
             payload = message.get("payload")
+
+            if payload is None:
+                return
+
             text = payload.get("text")
+
             if text is None:
                 return
 
@@ -492,7 +484,7 @@ class ProtocolContext(CommandPublisher):
             ModuleType.THERMOCYCLER: ThermocyclerContext,
         }[load_result.type]
 
-        module_context = mod_class(
+        module_context: ModuleTypes = mod_class(
             ctx=self,
             hw_module=load_result.module,
             geometry=load_result.geometry,
@@ -521,7 +513,7 @@ class ProtocolContext(CommandPublisher):
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def loaded_modules(self) -> Dict[int, ModuleContext]:
+    def loaded_modules(self) -> Dict[int, ModuleTypes]:
         """Get the modules loaded into the protocol context.
 
         This is a map of deck positions to modules loaded by previous calls
@@ -536,7 +528,7 @@ class ProtocolContext(CommandPublisher):
                                            ordered by slot number.
         """
 
-        def _modules() -> Iterator[Tuple[int, ModuleContext]]:
+        def _modules() -> Iterator[Tuple[int, ModuleTypes]]:
             for module in self._modules:
                 yield int(str(module.geometry.parent)), module
 
@@ -547,7 +539,7 @@ class ProtocolContext(CommandPublisher):
         self,
         instrument_name: str,
         mount: Union[types.Mount, str],
-        tip_racks: List[Labware] = None,
+        tip_racks: Optional[List[Labware]] = None,
         replace: bool = False,
     ) -> InstrumentContext:
         """Load a specific instrument required by the protocol.
@@ -643,7 +635,7 @@ class ProtocolContext(CommandPublisher):
 
     @publish(command=cmds.pause)
     @requires_version(2, 0)
-    def pause(self, msg=None) -> None:
+    def pause(self, msg: Optional[str] = None) -> None:
         """Pause execution of the protocol until it's resumed.
 
         A human can resume the protocol through the Opentrons App.
@@ -672,7 +664,7 @@ class ProtocolContext(CommandPublisher):
 
     @publish(command=cmds.comment)
     @requires_version(2, 0)
-    def comment(self, msg) -> None:
+    def comment(self, msg: str) -> None:
         """
         Add a user-readable comment string that will be echoed to the Opentrons
         app.
@@ -685,7 +677,12 @@ class ProtocolContext(CommandPublisher):
 
     @publish(command=cmds.delay)
     @requires_version(2, 0)
-    def delay(self, seconds=0, minutes=0, msg=None) -> None:
+    def delay(
+        self,
+        seconds: float = 0,
+        minutes: float = 0,
+        msg: Optional[str] = None,
+    ) -> None:
         """Delay protocol execution for a specific amount of time.
 
         :param float seconds: A time to delay in seconds

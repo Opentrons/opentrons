@@ -23,7 +23,6 @@ from opentrons.protocols.context.protocol import (
 )
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.protocols.labware import load_from_definition, get_labware_definition
-from opentrons.protocols.types import Protocol
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
@@ -72,19 +71,6 @@ class ProtocolContextImplementation(AbstractProtocol):
         self._last_location: Optional[types.Location] = None
         self._last_mount: Optional[types.Mount] = None
         self._loaded_modules: Set["AbstractModule"] = set()
-
-    @classmethod
-    def build_using(cls, protocol: Protocol, *args, **kwargs):
-        """Build an API instance for the specified parsed protocol
-
-        This is used internally to provision the context with bundle
-        contents or api levels.
-        """
-        kwargs["bundled_data"] = getattr(protocol, "bundled_data", None)
-        kwargs["bundled_labware"] = getattr(protocol, "bundled_labware", None)
-        kwargs["extra_labware"] = getattr(protocol, "extra_labware", None)
-        kwargs["api_version"] = getattr(protocol, "api_level", MAX_SUPPORTED_VERSION)
-        return cls(*args, **kwargs)
 
     def get_bundled_data(self) -> Dict[str, bytes]:
         """Extra bundled data."""

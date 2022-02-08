@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from contextlib import nullcontext
-from typing import List, Optional, Sequence, TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Any, List, Optional, Sequence, Union
 from opentrons.broker import Broker
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons import types, hardware_control as hc
@@ -68,7 +68,7 @@ class InstrumentContext(CommandPublisher):
         ctx: ProtocolContext,
         broker: Broker,
         at_version: APIVersion,
-        tip_racks: List[Labware] = None,
+        tip_racks: Optional[List[Labware]] = None,
         trash: Optional[Labware] = None,
     ) -> None:
 
@@ -102,17 +102,17 @@ class InstrumentContext(CommandPublisher):
         return self._starting_tip
 
     @starting_tip.setter
-    def starting_tip(self, location: Union[Well, None]):
+    def starting_tip(self, location: Union[Well, None]) -> None:
         self._starting_tip = location
 
     @requires_version(2, 0)
-    def reset_tipracks(self):
+    def reset_tipracks(self) -> None:
         """Reload all tips in each tip rack and reset starting tip"""
         for tiprack in self.tip_racks:
             tiprack.reset()
         self.starting_tip = None
 
-    @property  # type: ignore
+    @property  # type: ignore[misc]
     @requires_version(2, 0)
     def default_speed(self) -> float:
         """The speed at which the robot's gantry moves.
@@ -125,14 +125,14 @@ class InstrumentContext(CommandPublisher):
         return self._implementation.get_default_speed()
 
     @default_speed.setter
-    def default_speed(self, speed: float):
+    def default_speed(self, speed: float) -> None:
         self._implementation.set_default_speed(speed)
 
     @requires_version(2, 0)  # noqa: C901
     def aspirate(
         self,
         volume: Optional[float] = None,
-        location: Union[types.Location, Well] = None,
+        location: Optional[Union[types.Location, Well]] = None,
         rate: float = 1.0,
     ) -> InstrumentContext:
         """
@@ -240,7 +240,7 @@ class InstrumentContext(CommandPublisher):
     def dispense(
         self,
         volume: Optional[float] = None,
-        location: Union[types.Location, Well] = None,
+        location: Optional[Union[types.Location, Well]] = None,
         rate: float = 1.0,
     ) -> InstrumentContext:
         """
@@ -335,7 +335,7 @@ class InstrumentContext(CommandPublisher):
         self,
         repetitions: int = 1,
         volume: Optional[float] = None,
-        location: Union[types.Location, Well] = None,
+        location: Optional[Union[types.Location, Well]] = None,
         rate: float = 1.0,
     ) -> InstrumentContext:
         """
@@ -466,7 +466,7 @@ class InstrumentContext(CommandPublisher):
 
         return self
 
-    def _determine_speed(self, speed: float):
+    def _determine_speed(self, speed: float) -> float:
         if self.api_version < APIVersion(2, 4):
             return clamp_value(speed, 80, 20, "touch_tip:")
         else:
@@ -641,7 +641,7 @@ class InstrumentContext(CommandPublisher):
     @requires_version(2, 0)
     def pick_up_tip(
         self,
-        location: Union[types.Location, Well] = None,
+        location: Optional[Union[types.Location, Well]] = None,
         presses: Optional[int] = None,
         increment: Optional[float] = None,
     ) -> InstrumentContext:
@@ -732,7 +732,9 @@ class InstrumentContext(CommandPublisher):
 
     @requires_version(2, 0)
     def drop_tip(
-        self, location: Union[types.Location, Well] = None, home_after: bool = True
+        self,
+        location: Optional[Union[types.Location, Well]] = None,
+        home_after: bool = True,
     ) -> InstrumentContext:
         """
         Drop the current tip.
@@ -888,8 +890,8 @@ class InstrumentContext(CommandPublisher):
         volume: Union[float, Sequence[float]],
         source: Well,
         dest: List[Well],
-        *args,
-        **kwargs,
+        *args: Any,
+        **kwargs: Any,
     ) -> InstrumentContext:
         """
         Move a volume of liquid from one source to multiple destinations.
@@ -920,8 +922,8 @@ class InstrumentContext(CommandPublisher):
         volume: Union[float, Sequence[float]],
         source: List[Well],
         dest: Well,
-        *args,
-        **kwargs,
+        *args: Any,
+        **kwargs: Any,
     ) -> InstrumentContext:
         """
         Move liquid from multiple wells (sources) to a single well(destination)
@@ -951,8 +953,8 @@ class InstrumentContext(CommandPublisher):
         volume: Union[float, Sequence[float]],
         source: AdvancedLiquidHandling,
         dest: AdvancedLiquidHandling,
-        trash=True,
-        **kwargs,
+        trash: bool = True,
+        **kwargs: Any,
     ) -> InstrumentContext:
         # source: Union[Well, List[Well], List[List[Well]]],
         # dest: Union[Well, List[Well], List[List[Well]]],
@@ -1139,12 +1141,12 @@ class InstrumentContext(CommandPublisher):
         self._execute_transfer(plan)
         return self
 
-    def _execute_transfer(self, plan: transfers.TransferPlan):
+    def _execute_transfer(self, plan: transfers.TransferPlan) -> None:
         for cmd in plan:
             getattr(self, cmd["method"])(*cmd["args"], **cmd["kwargs"])
 
     @requires_version(2, 0)
-    def delay(self):
+    def delay(self) -> None:
         return self._implementation.delay()
 
     @requires_version(2, 0)
@@ -1285,7 +1287,7 @@ class InstrumentContext(CommandPublisher):
         return self._tip_racks
 
     @tip_racks.setter
-    def tip_racks(self, racks: List[Labware]):
+    def tip_racks(self, racks: List[Labware]) -> None:
         self._tip_racks = racks
 
     @property  # type: ignore
@@ -1300,7 +1302,7 @@ class InstrumentContext(CommandPublisher):
         return self._trash
 
     @trash_container.setter
-    def trash_container(self, trash: Labware):
+    def trash_container(self, trash: Labware) -> None:
         self._trash = trash
 
     @property  # type: ignore
@@ -1405,14 +1407,14 @@ class InstrumentContext(CommandPublisher):
         """
         return self._implementation.get_well_bottom_clearance()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<{}: {} in {}>".format(
             self.__class__.__name__,
             self._implementation.get_model(),
             self._implementation.get_mount().name,
         )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "{} on {} mount".format(self.hw_pipette["display_name"], self.mount)
 
     def _tip_length_for(self, tiprack: Labware) -> float:
