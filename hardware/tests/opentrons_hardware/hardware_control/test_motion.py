@@ -8,6 +8,36 @@ from opentrons_hardware.hardware_control.motion import (
 import math
 
 
+def test_only_specified_nodes() -> None:
+    """It should only add specified nodes, if specified."""
+    expected = [
+        [
+            {
+                NodeId.gantry_x: MoveGroupSingleAxisStep(
+                    distance_mm=0.0, velocity_mm_sec=0.0, duration_sec=8.0
+                ),
+                NodeId.gantry_y: MoveGroupSingleAxisStep(
+                    distance_mm=0.0, velocity_mm_sec=0.0, duration_sec=8.0
+                ),
+                NodeId.head_r: MoveGroupSingleAxisStep(
+                    distance_mm=0.0, velocity_mm_sec=0.0, duration_sec=8.0
+                ),
+                NodeId.head_l: MoveGroupSingleAxisStep(
+                    distance_mm=-2.0, velocity_mm_sec=-0.25, duration_sec=8.0
+                ),
+            },
+        ],
+    ]
+    assert expected == create(
+        origin={NodeId.head_l: 4, NodeId.pipette_right: 10},
+        target={NodeId.head_l: 2, NodeId.pipette_right: 20},
+        speed=0.25,
+        present_nodes=set(
+            (NodeId.gantry_x, NodeId.gantry_y, NodeId.head_r, NodeId.head_l)
+        ),
+    )
+
+
 def test_create_just_head() -> None:
     """It should create a move in head."""
     expected = [
