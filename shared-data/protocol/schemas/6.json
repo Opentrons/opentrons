@@ -896,7 +896,7 @@
           },
 
           {
-            "description": "Heater Shaker Module Await Temperature: Delay protocol execution until the previously supplied startSetTemperature command's temperature parameter has been reached. Errors if no previous startSetTemperatureCommand has been executed",
+            "description": "Heater Shaker Module Await Temperature: Delay protocol execution until the previously supplied startSetTargetTemperature command's temperature parameter has been reached. Errors if no target temperature was set previously.",
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
@@ -941,7 +941,7 @@
           },
 
           {
-            "description": "Heater Shaker Module Open Latch.",
+            "description": "Heater Shaker Module Open Latch: Open the module's labware latch.",
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
@@ -956,7 +956,7 @@
           },
 
           {
-            "description": "Heater Shaker Module Close Latch.",
+            "description": "Heater Shaker Module Close Latch: Close the module's labware latch.",
             "type": "object",
             "required": ["id", "commandType", "params"],
             "properties": {
