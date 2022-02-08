@@ -47,6 +47,7 @@ const AVERAGE_ITEM_HEIGHT_PX = 52 // average px height of a command item
 const WINDOW_SIZE = 60 // number of command items rendered at a time
 const WINDOW_OVERLAP = 40 // number of command items that fall within two adjacent windows
 const COMMANDS_REFETCH_INTERVAL = 3000
+const AVERAGE_WINDOW_HEIGHT_PX = ((WINDOW_SIZE - WINDOW_OVERLAP) * AVERAGE_ITEM_HEIGHT_PX)
 interface CommandRuntimeInfo {
   analysisCommand: RunTimeCommand | null // analysisCommand will only be null if protocol is nondeterministic
   runCommandSummary: RunCommandSummary | null
@@ -60,6 +61,7 @@ export function CommandList(): JSX.Element | null {
   const runStatus = useRunStatus()
   const listInnerRef = React.useRef<HTMLDivElement>(null)
   const currentItemRef = React.useRef<HTMLDivElement>(null)
+  const [isDeterministic, setIsDeterministic] = React.useState<boolean>(true)
   const [windowIndex, setWindowIndex] = React.useState<number>(0)
   const currentRunId = useCurrentRunId()
   const windowFirstCommandIndex = (WINDOW_SIZE - WINDOW_OVERLAP) * windowIndex
@@ -77,6 +79,7 @@ export function CommandList(): JSX.Element | null {
   const totalRunCommandCount = commandsData?.meta.totalLength ?? 0
   const runCommands = commandsData?.data ?? []
   const currentCommandKey = commandsData?.links?.current?.meta?.key ?? null
+  const currentCommandCreatedAt = commandsData?.links?.current?.meta?.createdAt ?? null
 
   const [
     isInitiallyJumpingToCurrent,
@@ -134,10 +137,10 @@ export function CommandList(): JSX.Element | null {
       }
     })
 
-    // TODO(bc, 2022-02-02): now that we don't have all of the run commands at once,
-    // we need to develop another approach to tell if protocol is deterministic, perhaps on backend
-
-    currentCommandList = allCommands.slice(firstNonSetupIndex)
+    currentCommandList = isDeterministic ? allCommands.slice(firstNonSetupIndex) : postInitialPlayRunCommands.map(runCommandSummary => ({
+      analysisCommand: null,
+      runCommandSummary,
+    }))
   }
 
   const commandWindow = currentCommandList.slice(
@@ -151,16 +154,21 @@ export function CommandList(): JSX.Element | null {
   const currentCommandIndex = currentCommandList.findIndex(command => (
     command?.analysisCommand?.key === currentCommandKey
   ))
-  if (currentCommandIndex < 0) {
+
+  // if the run's current command key doesn't exist in the analysis commands
+  if (runCommands.length > 0 && currentCommandIndex < 0) {
     const isRunningSetupCommand = protocolSetupCommandList.find(command => command.key === currentCommandKey) != null
-    if (runStartTime !== null && !isRunningSetupCommand) {
-      // protocol is non-deterministic
-      console.log('NON DET')
-    } else {
-      // all run commands are from LPC
-      console.log('UNSTARTED WITH LPC or Setup')
+    // AND the run has been started and the current step is NOT an initial setup step
+    if (runStartDateTime !== null && !isRunningSetupCommand) {
+      // AND the current command was created after the run was started
+      if (new Date(currentCommandCreatedAt) > runStartDateTime) {
+        // then we know that the run has diverged from the analysis expectation and
+        // that this protocol is non-deterministic
+        setIsDeterministic(false)
+      }
     }
   }
+  console.log('isDeterministic', isDeterministic)
   const indexOfWindowContainingCurrentItem = Math.floor(
     Math.max(currentCommandIndex - (WINDOW_SIZE - WINDOW_OVERLAP), 0) /
       (WINDOW_SIZE - WINDOW_OVERLAP)
@@ -213,21 +221,27 @@ export function CommandList(): JSX.Element | null {
         windowFirstCommandIndex + (WINDOW_SIZE - WINDOW_OVERLAP)
       const potentialPrevWindowFirstIndex =
         windowFirstCommandIndex - (WINDOW_SIZE - WINDOW_OVERLAP)
+
+      const prevWindowBoundary = topBufferHeightPx + 5 * AVERAGE_ITEM_HEIGHT_PX
+      const nextWindowBoundary = topBufferHeightPx + (WINDOW_SIZE - 5) * AVERAGE_ITEM_HEIGHT_PX - clientHeight
       if (
         !isFinalWindow &&
         potentialNextWindowFirstIndex < currentCommandList.length &&
-        scrollTop >=
-          topBufferHeightPx +
-            (WINDOW_SIZE - 5) * AVERAGE_ITEM_HEIGHT_PX -
-            clientHeight
+        scrollTop >= nextWindowBoundary
       ) {
-        setWindowIndex(windowIndex + 1)
+        const numberOfWindowsTraveledDown = Math.ceil(
+          (scrollTop - nextWindowBoundary) / AVERAGE_WINDOW_HEIGHT_PX
+        )
+        setWindowIndex(windowIndex + numberOfWindowsTraveledDown)
       } else if (
         windowIndex > 0 &&
         potentialPrevWindowFirstIndex >= 0 &&
-        scrollTop <= topBufferHeightPx + 5 * AVERAGE_ITEM_HEIGHT_PX
+        scrollTop <= prevWindowBoundary
       ) {
-        setWindowIndex(windowIndex - 1)
+        const numberOfWindowsTraveledUp = Math.ceil(
+          (prevWindowBoundary - scrollTop) / AVERAGE_WINDOW_HEIGHT_PX
+        )
+        setWindowIndex(windowIndex - numberOfWindowsTraveledUp)
       }
     }
   }
