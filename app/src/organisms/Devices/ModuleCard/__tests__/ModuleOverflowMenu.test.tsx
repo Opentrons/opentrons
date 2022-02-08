@@ -70,16 +70,18 @@ describe('ModuleOverflowMenu', () => {
       module: mockThermocycler,
     }
     const { getByRole } = render(props)
-    const buttonSetting1 = getByRole('button', { name: 'Set lid temperature' })
-    fireEvent.click(buttonSetting1)
+    const buttonSettingLid = getByRole('button', {
+      name: 'Set lid temperature',
+    })
+    fireEvent.click(buttonSettingLid)
     const buttonAbout = getByRole('button', { name: 'About module' })
     fireEvent.click(buttonAbout)
-    const buttonSetting2 = getByRole('button', {
+    const buttonSettingBlock = getByRole('button', {
       name: 'Set block temperature',
     })
-    fireEvent.click(buttonSetting2)
+    fireEvent.click(buttonSettingBlock)
     expect(buttonAbout).toBeEnabled()
-    expect(buttonSetting1).toBeEnabled()
-    expect(buttonSetting2).toBeEnabled()
+    expect(buttonSettingLid).toBeEnabled()
+    expect(buttonSettingBlock).toBeEnabled()
   })
 })
