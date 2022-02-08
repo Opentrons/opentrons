@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Optional
 
+from opentrons.hardware_control.modules import ModuleModel
 from opentrons.types import DeckSlotName, Point
 
 
@@ -26,10 +27,7 @@ class AbstractLabwareOffsetProvider(ABC):
     def find(
         self,
         labware_definition_uri: str,
-        # todo(mm, 2021-11-22): When there's a good module model enum that's usable
-        # by both Protocol Engine and the legacy Python Protocol API, use that here
-        # instead of an unconstrained str.
-        module_model: Optional[str],
+        requested_module_model: Optional[ModuleModel],
         deck_slot: DeckSlotName,
     ) -> ProvidedLabwareOffset:
         """Return the offset that should apply to a newly loaded labware.
@@ -39,15 +37,14 @@ class AbstractLabwareOffsetProvider(ABC):
 
         Args:
             labware_definition_uri: The labware's definition URI.
-            module_model: If the labware is atop a module, the module's model string,
-                          like "temperatureModuleV1".
-                          During protocol execution,
-                          this should be the model of the module that's actually
-                          physically connected, which may be different from the model
-                          that the protocol requested
-                          with `ProtocolContext.load_module()`.
+            requested_module_model: If the labware is atop a module,
+                the model of that module.
+                To ensure stability between simulation and execution,
+                this is the model that the protocol requested,
+                not the model that was actually found via the hardware API.
+                (They can be different because of module compatibility.)
             deck_slot: The deck slot that the labware occupies. Or, if the labware is
-                       atop a module, the deck slot that the module occupies.
+                atop a module, the deck slot that the module occupies.
         """
         ...
 
@@ -58,7 +55,7 @@ class NullLabwareOffsetProvider(AbstractLabwareOffsetProvider):
     def find(
         self,
         labware_definition_uri: str,
-        module_model: Optional[str],
+        requested_module_model: Optional[ModuleModel],
         deck_slot: DeckSlotName,
     ) -> ProvidedLabwareOffset:
         return ProvidedLabwareOffset(delta=Point(0, 0, 0), offset_id=None)

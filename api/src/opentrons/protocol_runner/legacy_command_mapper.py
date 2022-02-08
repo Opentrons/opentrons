@@ -258,16 +258,17 @@ class LegacyCommandMapper:
         count = self._command_count["LOAD_MODULE"]
         command_id = f"commands.LOAD_MODULE-{count}"
         module_id = f"module-{count}"
-        module_model = _LEGACY_TO_PE_MODULE[module_load_info.module_model]
+        requested_model = _LEGACY_TO_PE_MODULE[module_load_info.requested_model]
+        loaded_model = _LEGACY_TO_PE_MODULE[module_load_info.loaded_model]
 
         # This will fetch a V2 definition only. PAPI < v2.3 use V1 definitions.
         # When running a < v2.3 protocol, there will be a mismatch of definitions used
         # during analysis+LPC (V2) and protocol execution (V1).
         # But this shouldn't result in any problems since V2 and V1 definitions
         # have similar info, with V2 having additional info fields.
-        definition = self._module_definition_by_model.get(
-            module_model
-        ) or self._module_data_provider.get_definition(module_model)
+        loaded_definition = self._module_definition_by_model.get(
+            loaded_model
+        ) or self._module_data_provider.get_definition(loaded_model)
 
         load_module_command = pe_commands.LoadModule.construct(
             id=command_id,
@@ -277,7 +278,7 @@ class LegacyCommandMapper:
             startedAt=now,
             completedAt=now,
             params=pe_commands.LoadModuleParams.construct(
-                model=module_model,
+                model=requested_model,
                 location=pe_types.DeckSlotLocation(
                     slotName=module_load_info.deck_slot,
                 ),
@@ -286,13 +287,13 @@ class LegacyCommandMapper:
             result=pe_commands.LoadModuleResult.construct(
                 moduleId=module_id,
                 serialNumber=module_load_info.module_serial,
-                definition=definition,
-                model=definition.model,
+                definition=loaded_definition,
+                model=loaded_model,
             ),
         )
         self._command_count["LOAD_MODULE"] = count + 1
         self._module_id_by_slot[module_load_info.deck_slot] = module_id
-        self._module_definition_by_model[module_model] = definition
+        self._module_definition_by_model[loaded_model] = loaded_definition
         return load_module_command
 
     def _build_initial_command(

@@ -592,8 +592,8 @@ def load_module(
         return load_module_from_definition(defn, parent, api_level)
 
 
-def resolve_module_model(module_name: str) -> ModuleModel:
-    """Turn any of the supported load names into module model names"""
+def resolve_module_model(module_model_or_load_name: str) -> ModuleModel:
+    """Turn any of the supported APIv2 load names into module model names."""
 
     model_map: Mapping[str, ModuleModel] = {
         "magneticModuleV1": MagneticModuleModel.MAGNETIC_V1,
@@ -614,11 +614,13 @@ def resolve_module_model(module_name: str) -> ModuleModel:
         "thermocycler module": ThermocyclerModuleModel.THERMOCYCLER_V1,
     }
 
-    lower_name = module_name.lower()
-    resolved_name = model_map.get(module_name, None) or alias_map.get(lower_name, None)
+    lower_name = module_model_or_load_name.lower()
+    resolved_name = model_map.get(module_model_or_load_name, None) or alias_map.get(
+        lower_name, None
+    )
     if not resolved_name:
         raise ValueError(
-            f"{module_name} is not a valid module load name.\n"
+            f"{module_model_or_load_name} is not a valid module load name.\n"
             "Valid names (ignoring case): "
             '"'
             + '", "'.join(alias_map.keys())

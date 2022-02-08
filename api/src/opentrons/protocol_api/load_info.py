@@ -59,7 +59,9 @@ class ModuleLoadInfo:
     :meta private:
     """
 
-    module_model: ModuleModel
+    requested_model: ModuleModel
+    loaded_model: ModuleModel
+
     deck_slot: DeckSlotName
     configuration: Optional[str]
     module_serial: str

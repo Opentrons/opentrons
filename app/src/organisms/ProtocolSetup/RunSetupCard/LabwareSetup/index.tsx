@@ -40,9 +40,13 @@ import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_stand
 import { useRunStatus } from '../../../RunTimeControl/hooks'
 import { LabwarePositionCheck } from '../../LabwarePositionCheck'
 import styles from '../../styles.css'
-import { useModuleRenderInfoById, useLabwareRenderInfoById } from '../../hooks'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
 import { DownloadOffsetDataModal } from '../../../ProtocolUpload/DownloadOffsetDataModal'
+import {
+  useModuleRenderInfoById,
+  useLabwareRenderInfoById,
+  useLPCSuccessToast,
+} from '../../hooks'
 import { useModuleMatchResults, useProtocolCalibrationStatus } from '../hooks'
 import { LabwareInfoOverlay } from './LabwareInfoOverlay'
 import { LabwareOffsetModal } from './LabwareOffsetModal'
@@ -107,6 +111,7 @@ export const LabwareSetup = (): JSX.Element | null => {
   const isLabwareOffsetCodeSnippetsOn = useSelector(
     Config.getIsLabwareOffsetCodeSnippetsOn
   )
+  const { setIsShowingLPCSuccessToast } = useLPCSuccessToast()
 
   let lpcDisabledReason: string | null = null
 
@@ -254,7 +259,10 @@ export const LabwareSetup = (): JSX.Element | null => {
             <Flex justifyContent={JUSTIFY_CENTER}>
               <NewSecondaryBtn
                 title={t('run_labware_position_check')}
-                onClick={() => setShowLabwarePositionCheckModal(true)}
+                onClick={() => {
+                  setShowLabwarePositionCheckModal(true)
+                  setIsShowingLPCSuccessToast(false)
+                }}
                 id={'LabwareSetup_checkLabwarePositionsButton'}
                 {...targetProps}
                 disabled={lpcDisabledReason !== null}

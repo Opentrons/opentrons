@@ -32,7 +32,10 @@ from opentrons.protocols.types import Protocol
 from .labware import Labware
 from opentrons.protocols.context.labware import AbstractLabware
 from opentrons.protocols.context.protocol import AbstractProtocol
-from opentrons.protocols.geometry.module_geometry import ModuleGeometry
+from opentrons.protocols.geometry.module_geometry import (
+    ModuleGeometry,
+    resolve_module_model,
+)
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from .instrument_context import InstrumentContext
@@ -59,7 +62,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 ModuleTypes = Union[
-    "TemperatureModuleContext", "MagneticModuleContext", "ThermocyclerContext"
+    TemperatureModuleContext, MagneticModuleContext, ThermocyclerContext
 ]
 
 
@@ -398,7 +401,7 @@ class ProtocolContext(CommandPublisher):
 
         provided_labware_offset = self._labware_offset_provider.find(
             labware_definition_uri=result.uri,
-            module_model=None,
+            requested_module_model=None,
             deck_slot=types.DeckSlotName.from_primitive(location),
         )
 
@@ -465,7 +468,7 @@ class ProtocolContext(CommandPublisher):
 
         provided_labware_offset = self._labware_offset_provider.find(
             labware_definition_uri=result.uri,
-            module_model=None,
+            requested_module_model=None,
             deck_slot=types.DeckSlotName.from_primitive(location),
         )
 
@@ -578,37 +581,41 @@ class ProtocolContext(CommandPublisher):
                 "using thermocycler parameters only available in 2.4"
             )
 
-        module = self._implementation.load_module(
-            module_name=module_name, location=location, configuration=configuration
+        requested_model = resolve_module_model(module_name)
+
+        load_result = self._implementation.load_module(
+            model=requested_model, location=location, configuration=configuration
         )
 
-        if not module:
+        if not load_result:
             raise RuntimeError(f"Could not find specified module: {module_name}")
 
         mod_class = {
             ModuleType.MAGNETIC: MagneticModuleContext,
             ModuleType.TEMPERATURE: TemperatureModuleContext,
             ModuleType.THERMOCYCLER: ThermocyclerContext,
-        }[module.type]
+        }[load_result.type]
 
         module_context = mod_class(
             ctx=self,
-            hw_module=module.module,
-            geometry=module.geometry,
+            hw_module=load_result.module,
+            geometry=load_result.geometry,
             at_version=self.api_version,
+            requested_as=requested_model,
             loop=self._loop,
         )
         self._modules.append(module_context)
 
         # ===== Protocol Engine stuff ====
-        module_loc = module.geometry.parent
+        module_loc = load_result.geometry.parent
         assert isinstance(module_loc, (int, str)), "Unexpected labware object parent"
         deck_slot = types.DeckSlotName.from_primitive(module_loc)
-        module_serial = module.module.device_info["serial"]
+        module_serial = load_result.module.device_info["serial"]
 
         self.module_load_broker.publish(
             ModuleLoadInfo(
-                module_model=module.geometry.model,
+                requested_model=requested_model,
+                loaded_model=load_result.geometry.model,
                 deck_slot=deck_slot,
                 configuration=configuration,
                 module_serial=module_serial,
