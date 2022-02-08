@@ -72,6 +72,7 @@ class CurrentCommand:
     """The "current" command's ID and index in the overall commands list."""
 
     command_id: str
+    command_key: str
     index: int
 
 
@@ -350,14 +351,20 @@ class CommandView(HasState[CommandState]):
         """
         if self._state.running_command_id:
             entry = self._state.commands_by_id[self._state.running_command_id]
-            return CurrentCommand(command_id=entry.command.id, index=entry.index)
+            return CurrentCommand(
+                command_id=entry.command.id,
+                command_key=entry.command.key,
+                index=entry.index,
+            )
 
         # TODO(mc, 2022-02-07): this is O(n) in the worst case for no good reason.
         # Resolve prior to JSONv6 support, where this will matter.
         for reverse_index, cid in enumerate(reversed(self._state.all_command_ids)):
             if self.get_is_complete(cid):
+                entry = self._state.commands_by_id[cid]
                 return CurrentCommand(
-                    command_id=cid,
+                    command_id=entry.command.id,
+                    command_key=entry.command.key,
                     index=len(self._state.all_command_ids) - reverse_index - 1,
                 )
 

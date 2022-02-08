@@ -40,6 +40,7 @@ class CommandLinkMeta(BaseModel):
     runId: str = Field(..., description="The ID of the command's run.")
     commandId: str = Field(..., description="The ID of the command.")
     index: int = Field(..., description="Index of the command in the overall list.")
+    key: str = Field(..., description="Value of the current command's `key` field.")
 
 
 class CommandLink(BaseModel):
@@ -165,6 +166,7 @@ async def get_run_commands(
                 runId=run.id,
                 commandId=current_command.command_id,
                 index=current_command.index,
+                key=current_command.command_key,
             ),
         )
 

@@ -481,23 +481,35 @@ def test_get_current() -> None:
     )
     assert subject.get_current() is None
 
-    command = create_running_command("command-id")
+    command = create_running_command("command-id", command_key="command-key")
     subject = get_command_view(
         running_command_id="command-id",
         queued_command_ids=[],
         commands=[command],
     )
-    assert subject.get_current() == CurrentCommand(index=0, command_id="command-id")
+    assert subject.get_current() == CurrentCommand(
+        index=0,
+        command_id="command-id",
+        command_key="command-key",
+    )
 
-    command_1 = create_succeeded_command("command-id-1")
-    command_2 = create_succeeded_command("command-id-2")
+    command_1 = create_succeeded_command("command-id-1", command_key="key-1")
+    command_2 = create_succeeded_command("command-id-2", command_key="key-2")
     subject = get_command_view(commands=[command_1, command_2])
-    assert subject.get_current() == CurrentCommand(index=1, command_id="command-id-2")
+    assert subject.get_current() == CurrentCommand(
+        index=1,
+        command_id="command-id-2",
+        command_key="key-2",
+    )
 
-    command_1 = create_succeeded_command("command-id-1")
-    command_2 = create_failed_command("command-id-2")
+    command_1 = create_succeeded_command("command-id-1", command_key="key-1")
+    command_2 = create_failed_command("command-id-2", command_key="key-2")
     subject = get_command_view(commands=[command_1, command_2])
-    assert subject.get_current() == CurrentCommand(index=1, command_id="command-id-2")
+    assert subject.get_current() == CurrentCommand(
+        index=1,
+        command_id="command-id-2",
+        command_key="key-2",
+    )
 
 
 def test_get_slice_empty() -> None:
