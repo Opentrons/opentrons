@@ -24,6 +24,10 @@ const StyledOverflowIcon: BtnComponent = styled(Btn)`
     fill: ${COLORS.blue};
   }
 
+  &:focus {
+    border: 3px solid ${COLORS.blueFocus};
+  }
+
   &:disabled,
   &.disabled {
     fill-opacity: 0.5;
