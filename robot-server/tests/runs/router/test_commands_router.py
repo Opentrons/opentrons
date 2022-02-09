@@ -60,6 +60,7 @@ async def test_create_run_command(decoy: Decoy, engine_store: EngineStore) -> No
 
     result = await create_run_command(
         request_body=RequestModel(data=command_request),
+        waitUntilComplete=False,
         engine_store=engine_store,
         run=run,
     )
@@ -93,6 +94,7 @@ async def test_create_run_command_not_current(
     with pytest.raises(ApiError) as exc_info:
         await create_run_command(
             request_body=RequestModel(data=command_request),
+            waitUntilComplete=False,
             engine_store=engine_store,
             run=run,
         )
