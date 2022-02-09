@@ -135,7 +135,7 @@ class ProtocolContext:
     def load_module(
         self,
         module_name: Literal[ModuleModel.THERMOCYCLER_MODULE_V1],
-    ) -> TemperatureModuleContext:
+    ) -> ThermocyclerModuleContext:
         ...
 
     @overload
