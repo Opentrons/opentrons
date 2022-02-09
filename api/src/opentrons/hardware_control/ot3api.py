@@ -14,11 +14,20 @@ from typing import (
     Sequence,
     Set,
 )
+from api.src.opentrons.config.types import ByPipetteKind
 
 from opentrons_shared_data.pipette import name_config
 from opentrons import types as top_types
 from opentrons.config import robot_configs
 from opentrons.config.types import RobotConfig, OT3Config
+
+try:
+    from opentrons_hardware.hardware_control.motion_planning import (
+        MoveManager,
+        AxisConstraints
+    )
+except ModuleNotFoundError:
+    pass
 
 from .util import use_or_initialize_loop, check_motion_bounds
 from .pipette import (
@@ -131,6 +140,11 @@ class OT3API(
         self._door_state = DoorState.CLOSED
         self._pause_manager = PauseManager(self._door_state)
         self._transforms = build_ot3_transforms(self._config)
+        self._pipette_kind = ByPipetteKind.none
+        self._move_manager = MoveManager(
+            constraints=robot_configs.get_system_constraints(
+                self._config, self._pipette_kind)
+            )
 
         ExecutionManagerProvider.__init__(self, loop, isinstance(backend, OT3Simulator))
         InstrumentHandlerProvider.__init__(self)
@@ -155,6 +169,16 @@ class OT3API(
     @door_state.setter
     def door_state(self, door_state: DoorState):
         self._door_state = door_state
+
+    @property
+    def pipette_kind(self) -> ByPipetteKind:
+        return self._pipette_kind
+
+    @pipette_kind.setter
+    def pipette_kind(self, pipette_kind: ByPipetteKind):
+        self._pipette_kind = pipette_kind
+        self._move_manager.update_constraints(
+            robot_configs.get_system_constraints(self._config, pipette_kind))
 
     def _update_door_state(self, door_state: DoorState):
         mod_log.info(f"Updating the window switch status: {door_state}")
@@ -372,6 +396,8 @@ class OT3API(
             )
             await self._backend.configure_mount(mount, hw_config)
         await self._backend.probe_network()
+        # TODO: (AA, 2022-02-09) Set correct pipette kind based on attached instr
+        self.pipette_kind = ByPipetteKind.two_low_throughput
 
     # Global actions API
     def pause(self, pause_type: PauseType):

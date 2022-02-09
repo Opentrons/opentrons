@@ -9,7 +9,12 @@ from typing_extensions import Literal
 from . import CONFIG, defaults_ot3, defaults_ot2
 from .feature_flags import enable_ot3_hardware_controller
 from opentrons.hardware_control.types import BoardRevision
-from .types import CurrentDict, RobotConfig, AxisDict, OT3Config
+from .types import ByPipetteKind, CurrentDict, RobotConfig, AxisDict, OT3Config
+
+from opentrons_hardware.hardware_control.motion_planning import (
+    SystemConstraints,
+    # AxisConstraints
+)
 
 log = logging.getLogger(__name__)
 
@@ -155,3 +160,21 @@ def default_pipette_offset() -> List[float]:
         return defaults_ot3.DEFAULT_PIPETTE_OFFSET
     else:
         return defaults_ot2.DEFAULT_PIPETTE_OFFSET
+
+
+def default_system_constraints(config: OT3Config) -> SystemConstraints:
+    constraints: SystemConstraints = {}
+    return constraints
+
+
+def get_system_constraints(
+    config: OT3Config, pipette_kind: ByPipetteKind
+) -> SystemConstraints:
+    constraints: SystemConstraints = {}
+    
+        # constraints[axis] = AxisConstraints.build(
+        #     max_acceleration=config.acceleration.two_low_throughput[axis],
+        #     max_speed_discont=config.max_speed_discontinuity.two_low_throughput[axis],
+        #     max_direction_change_speed_discont=\
+        #         config.direction_change_speed_discontinuity.two_low_throughput[axis])
+    return constraints
