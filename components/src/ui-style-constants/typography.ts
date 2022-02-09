@@ -38,6 +38,16 @@ export const textAlignRight = 'right'
 export const textAlignCenter = 'center'
 export const textAlignJustify = 'justify'
 
+//  Overflow menu constants
+export const borderRadiusS = '4px 4px 0px 0px'
+export const boxShadowS = '0px 1px 3px rgba(0, 0, 0, 0.2)'
+
+//  Slideout constants
+export const boxShadowM = '0px 3px 6px rgba(0, 0, 0, 0.23)'
+
+//  Overflow menu btn width
+export const overflowMenuWidth = '9.562rem'
+
 // Default font styles, color agnositic for first pass
 export const h1Default = css`
   font-size: ${fontSizeH1};

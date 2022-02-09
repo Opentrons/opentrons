@@ -6,6 +6,7 @@ import { i18n } from '../../../../i18n'
 import { MagneticModuleData } from '../MagneticModuleData'
 import { TemperatureModuleData } from '../TemperatureModuleData'
 import { ThermocyclerModuleData } from '../ThermocyclerModuleData'
+import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 import { ModuleCard } from '..'
 import {
   mockMagneticModule,
@@ -18,12 +19,16 @@ import type { MagneticModule } from '../../../../redux/modules/types'
 jest.mock('../MagneticModuleData')
 jest.mock('../TemperatureModuleData')
 jest.mock('../ThermocyclerModuleData')
+jest.mock('../ModuleOverflowMenu')
 
 const mockMagneticModuleData = MagneticModuleData as jest.MockedFunction<
   typeof MagneticModuleData
 >
 const mockTemperatureModuleData = TemperatureModuleData as jest.MockedFunction<
   typeof TemperatureModuleData
+>
+const mockModuleOverflowMenu = ModuleOverflowMenu as jest.MockedFunction<
+  typeof ModuleOverflowMenu
 >
 
 const mockThermocyclerModuleData = ThermocyclerModuleData as jest.MockedFunction<
@@ -58,6 +63,7 @@ describe('ModuleCard', () => {
     mockThermocyclerModuleData.mockReturnValue(
       <div>Mock Thermocycler Module Data</div>
     )
+    mockModuleOverflowMenu.mockReturnValue(<div>mock module overflow menu</div>)
   })
 
   afterEach(() => {
@@ -111,17 +117,16 @@ describe('ModuleCard', () => {
     getByAltText('thermocyclerModuleV1')
   })
 
-  //  TODO Immediately: add more details to this test when overflow button has more functionality
-  it('renders 3 dot button icon and is clickable', () => {
+  it('renders kebab icon and is clickable', () => {
     const { getByRole, getByText } = render({
       module: mockMagneticModule,
     })
-
     const overflowButton = getByRole('button', {
       name: /overflow/i,
     })
     getByText('Magnetic Module GEN1')
     fireEvent.click(overflowButton)
     expect(overflowButton).not.toBeDisabled()
+    getByText('mock module overflow menu')
   })
 })
