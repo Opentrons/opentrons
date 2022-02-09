@@ -18,7 +18,7 @@ export const OverflowMenu = (props: OverflowMenuProps): JSX.Element | null => {
       boxShadow={TYPOGRAPHY.boxShadowS}
       position={POSITION_ABSOLUTE}
       backgroundColor={COLORS.white}
-      top="2.5rem"
+      top="2.6rem"
       right={`calc(50% + ${SPACING_1})`}
     >
       {props.children}

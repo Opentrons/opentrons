@@ -120,7 +120,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           </Flex>
         </Box>
 
-        <Box alignSelf={ALIGN_START} padding={SPACING_1}>
+        {/* The padding is small to align with designs for background-color and border-radius for the different states */}
+
+        <Box alignSelf={ALIGN_START} padding="1px">
           <OverflowBtn
             aria-label="overflow"
             onClick={() => {

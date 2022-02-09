@@ -8,27 +8,34 @@ export interface OverflowBtnProps {
 
 type BtnComponent = PrimitiveComponent<'button'>
 const StyledOverflowIcon: BtnComponent = styled(Btn)`
+  padding: 3px;
   border-radius: 4px;
   max-height: ${SPACING.spacing6};
 
   &:hover {
+    padding: 3px;
     background-color: ${COLORS.medGrey};
   }
 
   &:active {
+    padding: 3px;
     background-color: ${COLORS.lightBlue};
   }
 
   &:active circle {
+    padding: 3px;
     fill: ${COLORS.blue};
   }
 
   &:focus {
+    padding-top: 1px;
+    padding-right: 1px;
     border: 3px solid ${COLORS.blueFocus};
   }
 
   &:disabled,
   &.disabled {
+    padding: 3px;
     fill-opacity: 0.5;
   }
 `
