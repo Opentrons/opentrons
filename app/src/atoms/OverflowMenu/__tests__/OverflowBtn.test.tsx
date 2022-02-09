@@ -54,8 +54,8 @@ describe('OverflowBtn', () => {
     })
 
     expect(getByRole('button')).toHaveStyleRule(
-      'outline',
-      '3px solid #deecff',
+      'box-shadow',
+      '0 0 0 3px #deecff',
       {
         modifier: ':focus',
       }

@@ -24,8 +24,7 @@ const StyledOverflowIcon: BtnComponent = styled(Btn)`
   }
 
   &:focus {
-    outline: 3px solid ${COLORS.blueFocus};
-    outline-offset: -3px;
+    box-shadow: 0 0 0 3px ${COLORS.blueFocus};
   }
 
   &:disabled,
