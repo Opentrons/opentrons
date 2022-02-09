@@ -47,7 +47,8 @@ const AVERAGE_ITEM_HEIGHT_PX = 52 // average px height of a command item
 const WINDOW_SIZE = 60 // number of command items rendered at a time
 const WINDOW_OVERLAP = 40 // number of command items that fall within two adjacent windows
 const COMMANDS_REFETCH_INTERVAL = 3000
-const AVERAGE_WINDOW_HEIGHT_PX = ((WINDOW_SIZE - WINDOW_OVERLAP) * AVERAGE_ITEM_HEIGHT_PX)
+const AVERAGE_WINDOW_HEIGHT_PX =
+  (WINDOW_SIZE - WINDOW_OVERLAP) * AVERAGE_ITEM_HEIGHT_PX
 interface CommandRuntimeInfo {
   analysisCommand: RunTimeCommand | null // analysisCommand will only be null if protocol is nondeterministic
   runCommandSummary: RunCommandSummary | null
@@ -79,7 +80,8 @@ export function CommandList(): JSX.Element | null {
   const totalRunCommandCount = commandsData?.meta.totalLength ?? 0
   const runCommands = commandsData?.data ?? []
   const currentCommandKey = commandsData?.links?.current?.meta?.key ?? null
-  const currentCommandCreatedAt = commandsData?.links?.current?.meta?.createdAt ?? null
+  const currentCommandCreatedAt =
+    commandsData?.links?.current?.meta?.createdAt ?? null
 
   const [
     isInitiallyJumpingToCurrent,
@@ -111,14 +113,21 @@ export function CommandList(): JSX.Element | null {
   )
 
   const runStartDateTime = runStartTime != null ? new Date(runStartTime) : null
-  const postInitialPlayRunCommands = runStartDateTime != null ? dropWhile(runCommands, runCommandSummary => (
-    new Date(runCommandSummary.createdAt) <= runStartDateTime
-  )) : []
-  const postSetupRunCommands = dropWhile(postInitialPlayRunCommands, runCommandSummary => (
+  const postInitialPlayRunCommands =
+    runStartDateTime != null
+      ? dropWhile(
+          runCommands,
+          runCommandSummary =>
+            new Date(runCommandSummary.createdAt) <= runStartDateTime
+        )
+      : []
+  const postSetupRunCommands = dropWhile(
+    postInitialPlayRunCommands,
+    runCommandSummary =>
       runCommandSummary.commandType !== 'loadLabware' &&
       runCommandSummary.commandType !== 'loadPipette' &&
       runCommandSummary.commandType !== 'loadModule'
-  ))
+  )
 
   let currentCommandList: CommandRuntimeInfo[] = postSetupAnticipatedCommands.map(
     postSetupAnticaptedCommand => ({
@@ -126,7 +135,11 @@ export function CommandList(): JSX.Element | null {
       runCommandSummary: null,
     })
   )
-  if (postInitialPlayRunCommands != null && postInitialPlayRunCommands.length > 0 && runStartTime != null) {
+  if (
+    postInitialPlayRunCommands != null &&
+    postInitialPlayRunCommands.length > 0 &&
+    runStartTime != null
+  ) {
     const allCommands = allProtocolCommands.map((anticipatedCommand, index) => {
       const matchedRunCommand = postInitialPlayRunCommands.find(
         runCommandSummary => runCommandSummary.key === anticipatedCommand.key
@@ -137,10 +150,12 @@ export function CommandList(): JSX.Element | null {
       }
     })
 
-    currentCommandList = isDeterministic ? allCommands.slice(firstNonSetupIndex) : postInitialPlayRunCommands.map(runCommandSummary => ({
-      analysisCommand: null,
-      runCommandSummary,
-    }))
+    currentCommandList = isDeterministic
+      ? allCommands.slice(firstNonSetupIndex)
+      : postInitialPlayRunCommands.map(runCommandSummary => ({
+          analysisCommand: null,
+          runCommandSummary,
+        }))
   }
 
   const commandWindow = currentCommandList.slice(
@@ -149,15 +164,18 @@ export function CommandList(): JSX.Element | null {
   )
   const isFirstWindow = windowIndex === 0
   const isFinalWindow =
-    currentCommandList.length - 1 <= windowFirstCommandIndex + WINDOW_SIZE
+    currentCommandList.length  <= windowFirstCommandIndex + WINDOW_SIZE
 
-  const currentCommandIndex = currentCommandList.findIndex(command => (
-    command?.analysisCommand?.key === currentCommandKey
-  ))
+  const currentCommandIndex = currentCommandList.findIndex(
+    command => command?.analysisCommand?.key === currentCommandKey
+  )
 
   // if the run's current command key doesn't exist in the analysis commands
   if (runCommands.length > 0 && currentCommandIndex < 0) {
-    const isRunningSetupCommand = protocolSetupCommandList.find(command => command.key === currentCommandKey) != null
+    const isRunningSetupCommand =
+      protocolSetupCommandList.find(
+        command => command.key === currentCommandKey
+      ) != null
     // AND the run has been started and the current step is NOT an initial setup step
     if (runStartDateTime !== null && !isRunningSetupCommand) {
       // AND the current command was created after the run was started
@@ -168,11 +186,14 @@ export function CommandList(): JSX.Element | null {
       }
     }
   }
-  console.log('isDeterministic', isDeterministic)
-  const indexOfWindowContainingCurrentItem = Math.floor(
-    Math.max(currentCommandIndex - (WINDOW_SIZE - WINDOW_OVERLAP), 0) /
-      (WINDOW_SIZE - WINDOW_OVERLAP)
-  )
+  const isCurrentCommandInFinalWindow =
+    currentCommandList.length - 1 - currentCommandIndex <= WINDOW_SIZE
+  const indexOfWindowContainingCurrentItem =
+    isCurrentCommandInFinalWindow
+      ? Math.ceil(((currentCommandIndex + 1) - WINDOW_SIZE) / (WINDOW_SIZE - WINDOW_OVERLAP))
+      : Math.floor(Math.max((currentCommandIndex + 1) - (WINDOW_SIZE - WINDOW_OVERLAP), 0) /
+          (WINDOW_SIZE - WINDOW_OVERLAP))
+
 
   // when we initially mount, if the current item is not in view, jump to it
   React.useEffect(() => {
@@ -188,6 +209,7 @@ export function CommandList(): JSX.Element | null {
       isInitiallyJumpingToCurrent &&
       windowIndex === indexOfWindowContainingCurrentItem
     ) {
+      console.log('jumped to', indexOfWindowContainingCurrentItem)
       currentItemRef.current?.scrollIntoView({ behavior: 'smooth' })
       setIsInitiallyJumpingToCurrent(false)
     }
@@ -223,7 +245,20 @@ export function CommandList(): JSX.Element | null {
         windowFirstCommandIndex - (WINDOW_SIZE - WINDOW_OVERLAP)
 
       const prevWindowBoundary = topBufferHeightPx + 5 * AVERAGE_ITEM_HEIGHT_PX
-      const nextWindowBoundary = topBufferHeightPx + (WINDOW_SIZE - 5) * AVERAGE_ITEM_HEIGHT_PX - clientHeight
+
+      const nextWindowSize = Math.max(
+        currentCommandList.length - (windowFirstCommandIndex + WINDOW_SIZE),
+        0
+      )
+      const nextWindowBoundary =
+        topBufferHeightPx +
+        Math.max(nextWindowSize - 5, 0) * AVERAGE_ITEM_HEIGHT_PX -
+        clientHeight
+      console.log('isFinalWindow', isFinalWindow)
+      console.log('windowFirstCommandIndex', windowFirstCommandIndex)
+      console.log('potentialNextWindowFirstIndex', potentialNextWindowFirstIndex)
+      console.log('scrollTop', scrollTop)
+      console.log('nextWindowBoundary', nextWindowBoundary)
       if (
         !isFinalWindow &&
         potentialNextWindowFirstIndex < currentCommandList.length &&
@@ -241,7 +276,7 @@ export function CommandList(): JSX.Element | null {
         const numberOfWindowsTraveledUp = Math.ceil(
           (prevWindowBoundary - scrollTop) / AVERAGE_WINDOW_HEIGHT_PX
         )
-        setWindowIndex(windowIndex - numberOfWindowsTraveledUp)
+        setWindowIndex(Math.max(windowIndex - numberOfWindowsTraveledUp, 0))
       }
     }
   }
@@ -333,14 +368,15 @@ export function CommandList(): JSX.Element | null {
                   stepNumber={overallIndex + 1}
                   runStartedAt={runStartTime}
                 />
-                {isCurrentCommand && (
+                {isCurrentCommand &&
+                overallIndex < currentCommandList.length - 1 ? (
                   <Text
                     fontSize={FONT_SIZE_CAPTION}
                     margin={`${SPACING_3} 0 ${SPACING_2}`}
                   >
                     {t('anticipated')}
                   </Text>
-                )}
+                ) : null}
               </Flex>
             )
           })}
