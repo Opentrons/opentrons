@@ -8,7 +8,7 @@ more readable format.
 import subprocess
 import re
 import os
-from typing import List, Set, cast
+from typing import List, cast
 
 from opentrons.algorithms.dfs import DFS
 from opentrons.algorithms.types import GenericNode
@@ -33,7 +33,7 @@ class USBBus(USBDriverInterface):
         self._board_revision = board_revision
         self._usb_dev = self.read_usb_bus()
         self._dfs: DFS[str] = DFS[str](cast(List[GenericNode[str]], self._usb_dev))
-        self._sorted = self._dfs.dfs()
+        self._searched = self._dfs.dfs()
 
     @staticmethod
     def read_bus() -> List[str]:
@@ -89,22 +89,22 @@ class USBBus(USBDriverInterface):
         self._usb_dev = ports
 
     @property
-    def sorted_ports(self) -> Set[str]:
+    def sorted_ports(self) -> List[str]:
         """
         USBBus property: sorted_ports.
 
         :returns: The set of sorted ports
         """
-        return self._sorted
+        return self._searched
 
     @sorted_ports.setter
-    def sorted_ports(self, sorted: Set[str]) -> None:
+    def sorted_ports(self, ports: List[str]) -> None:
         """
         USBBus setter: sorted_ports.
 
-        :param sorted: The updated set of usb ports.
+        :param ports: The updated set of usb ports.
         """
-        self._sorted = sorted
+        self._searched = ports
 
     def read_usb_bus(self) -> List[USBPort]:
         """

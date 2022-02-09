@@ -34,17 +34,21 @@ class DFS(Generic[VertexName]):
         """
         return self._graph
 
-    def dfs(self) -> Set[VertexName]:
+    def dfs(self) -> List[VertexName]:
         """Depth first search.
 
         :returns: the set of visited vertices
         in depth first search order.
         """
+        visited_check: List[VertexName] = []
         visited_vertices: Set[VertexName] = set()
         for node in self.graph.graph:
             if node.name not in visited_vertices:
-                visited_vertices.add(node.name)
+                visited_check.append(node.name)
+            visited_vertices.add(node.name)
             for neighbor in node.neighbors:
                 if neighbor not in visited_vertices:
-                    visited_vertices.add(neighbor)
-        return visited_vertices
+                    visited_check.append(neighbor)
+                visited_vertices.add(neighbor)
+
+        return visited_check

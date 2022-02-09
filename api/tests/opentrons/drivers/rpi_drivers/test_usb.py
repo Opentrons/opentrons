@@ -124,7 +124,7 @@ def test_unplug_device(usb_bus: USBBus) -> None:
 
 
 def test_sorted_usb_bus(usb_bus: USBBus) -> None:
-    expected_sorted = {"1-1.3", "1-1.5.1", "1-1.5.3", "1-1.5"}
+    expected_sorted = ["1-1.3", "1-1.5", "1-1.5.1", "1-1.5.3"]
     assert usb_bus.sorted_ports == expected_sorted
 
 
