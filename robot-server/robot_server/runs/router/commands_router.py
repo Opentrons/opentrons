@@ -1,5 +1,8 @@
 """Router for /runs commands endpoints."""
 from asyncio import wait_for, TimeoutError as AsyncioTimeoutError
+from datetime import datetime
+from fastapi import APIRouter, Depends, status
+from pydantic import BaseModel, Field
 from typing import Optional, Union
 from typing_extensions import Final, Literal
 
@@ -41,6 +44,12 @@ class CommandLinkMeta(BaseModel):
 
     runId: str = Field(..., description="The ID of the command's run.")
     commandId: str = Field(..., description="The ID of the command.")
+    index: int = Field(..., description="Index of the command in the overall list.")
+    key: str = Field(..., description="Value of the current command's `key` field.")
+    createdAt: datetime = Field(
+        ...,
+        description="When the current command was created.",
+    )
 
 
 class CommandLink(BaseModel):
@@ -186,7 +195,7 @@ async def get_run_commands(
         pageLength: Maximum number of items to return.
     """
     state = engine_store.get_state(run.id)
-    current_command_id = state.commands.get_current()
+    current_command = state.commands.get_current()
     command_slice = state.commands.get_slice(cursor=cursor, length=pageLength)
 
     data = [
@@ -206,16 +215,21 @@ async def get_run_commands(
 
     meta = MultiBodyMeta(
         cursor=command_slice.cursor,
-        pageLength=command_slice.length,
         totalLength=command_slice.total_length,
     )
 
     links = CommandCollectionLinks()
 
-    if current_command_id is not None:
+    if current_command is not None:
         links.current = CommandLink(
-            href=f"/runs/{run.id}/commands/{current_command_id}",
-            meta=CommandLinkMeta(runId=run.id, commandId=current_command_id),
+            href=f"/runs/{run.id}/commands/{current_command.command_id}",
+            meta=CommandLinkMeta(
+                runId=run.id,
+                commandId=current_command.command_id,
+                index=current_command.index,
+                key=current_command.command_key,
+                createdAt=current_command.created_at,
+            ),
         )
 
     return await PydanticResponse.create(
