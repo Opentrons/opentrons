@@ -43,7 +43,7 @@ export const OverflowBtn = (
         width="19"
         height="31"
         viewBox="0 0 19 31"
-        fill="#E3E3E3"
+        fill={COLORS.medGrey}
         xmlns="http://www.w3.org/2000/svg"
       >
         <circle
@@ -51,21 +51,21 @@ export const OverflowBtn = (
           cy="9.5"
           r="1.5"
           transform="rotate(90 9.5 9.5)"
-          fill="#8A8C8E"
+          fill={COLORS.darkGrey}
         />
         <circle
           cx="9.5"
           cy="15.5"
           r="1.5"
           transform="rotate(90 9.5 15.5)"
-          fill="#8A8C8E"
+          fill={COLORS.darkGrey}
         />
         <circle
           cx="9.5"
           cy="21.5"
           r="1.5"
           transform="rotate(90 9.5 21.5)"
-          fill="#8A8C8E"
+          fill={COLORS.darkGrey}
         />
       </svg>
       {props.children}

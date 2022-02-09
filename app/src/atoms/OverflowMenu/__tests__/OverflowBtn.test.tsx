@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { COLORS, renderWithProviders } from '@opentrons/components'
-import 'jest-styled-components'
-import { OverflowBtn } from '../OverflowBtn'
 import { fireEvent } from '@testing-library/react'
+import 'jest-styled-components'
+import { COLORS, renderWithProviders } from '@opentrons/components'
+import { OverflowBtn } from '../OverflowBtn'
 
 const render = (props: React.ComponentProps<typeof OverflowBtn>) => {
   return renderWithProviders(<OverflowBtn {...props} />)[0]
@@ -53,9 +53,13 @@ describe('OverflowBtn', () => {
       onClick: jest.fn(),
     })
 
-    expect(getByRole('button')).toHaveStyleRule('border', '3px solid #deecff', {
-      modifier: ':focus',
-    })
+    expect(getByRole('button')).toHaveStyleRule(
+      'outline',
+      '3px solid #deecff',
+      {
+        modifier: ':focus',
+      }
+    )
   })
 
   it('renders a disabled state', () => {
