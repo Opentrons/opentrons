@@ -103,6 +103,9 @@ class AttachedModulesControl:
                 f"Module {removed_mod.name()} detached" f" from port {removed_mod.port}"
             )
             await removed_mod.cleanup()
+        self._available_modules = sorted(
+            self._available_modules, key=modules.AbstractModule.sort_key
+        )
 
     async def register_modules(
         self,
@@ -138,6 +141,9 @@ class AttachedModulesControl:
                 f"Module {mod.name} discovered and attached"
                 f" at port {mod.port}, new_instance: {new_instance}"
             )
+        self._available_modules = sorted(
+            self._available_modules, key=modules.AbstractModule.sort_key
+        )
 
     async def parse_modules(
         self,
