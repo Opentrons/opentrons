@@ -80,7 +80,6 @@ describe('CommandList', () => {
     fireEvent.click(getByText('Protocol Setup'))
     getAllByText('Mock ProtocolSetup Info')
     getByText('End of protocol')
-    getByText('Anticipated steps')
   })
   it('renders the first non ProtocolSetup command', () => {
     const { getAllByText } = render()
