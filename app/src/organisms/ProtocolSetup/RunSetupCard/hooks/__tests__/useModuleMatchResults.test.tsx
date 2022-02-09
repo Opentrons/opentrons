@@ -47,7 +47,7 @@ describe('useModuleMatchResults', () => {
   beforeEach(() => {
     store.dispatch = jest.fn()
 
-    when(mockGetConnectedRobot).mockReturnValue(mockConnectedRobot)
+    mockGetConnectedRobot.mockReturnValue(mockConnectedRobot)
 
     when(mockUseModuleRenderInfoById).calledWith().mockReturnValue({})
 

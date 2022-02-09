@@ -42,11 +42,11 @@ import type {
   RunTimeCommand,
   CommandStatus,
 } from '@opentrons/shared-data'
-import { isYesterday } from 'date-fns'
 
 const AVERAGE_ITEM_HEIGHT_PX = 52 // average px height of a command item
 const WINDOW_SIZE = 60 // number of command items rendered at a time
 const WINDOW_OVERLAP = 40 // number of command items that fall within two adjacent windows
+const NUM_EAGER_ITEMS = 5 // number of command items away from the end of the current window that will trigger a window transition if scrolled into view
 const COMMANDS_REFETCH_INTERVAL = 3000
 const AVERAGE_WINDOW_HEIGHT_PX =
   (WINDOW_SIZE - WINDOW_OVERLAP) * AVERAGE_ITEM_HEIGHT_PX
@@ -122,13 +122,6 @@ export function CommandList(): JSX.Element | null {
             new Date(runCommandSummary.createdAt) <= runStartDateTime
         )
       : []
-  const postSetupRunCommands = dropWhile(
-    postInitialPlayRunCommands,
-    runCommandSummary =>
-      runCommandSummary.commandType !== 'loadLabware' &&
-      runCommandSummary.commandType !== 'loadPipette' &&
-      runCommandSummary.commandType !== 'loadModule'
-  )
 
   let currentCommandList: CommandRuntimeInfo[] = postSetupAnticipatedCommands.map(
     postSetupAnticaptedCommand => ({
@@ -165,7 +158,7 @@ export function CommandList(): JSX.Element | null {
   )
   const isFirstWindow = windowIndex === 0
   const isFinalWindow =
-    currentCommandList.length  <= windowFirstCommandIndex + WINDOW_SIZE
+    currentCommandList.length <= windowFirstCommandIndex + WINDOW_SIZE
 
   const currentCommandIndex = currentCommandList.findIndex(
     command => command?.analysisCommand?.key === currentCommandKey
@@ -179,24 +172,27 @@ export function CommandList(): JSX.Element | null {
       ) != null
     // AND the run has been started and the current step is NOT an initial setup step
     if (runStartDateTime !== null && !isRunningSetupCommand) {
-      console.log('\n\nASECOND IF DET\n\n', currentCommandCreatedAt, runStartDateTime, new Date(currentCommandCreatedAt) > runStartDateTime)
       // AND the current command was created after the run was started
       if (new Date(currentCommandCreatedAt) > runStartDateTime) {
         // then we know that the run has diverged from the analysis expectation and
         // that this protocol is non-deterministic
-        console.log('\n\nset is NON DET\n\n')
         setIsDeterministic(false)
       }
     }
   }
   const isCurrentCommandInFinalWindow =
     currentCommandList.length - 1 - currentCommandIndex <= WINDOW_SIZE
-  const indexOfWindowContainingCurrentItem =
-    isCurrentCommandInFinalWindow
-      ? Math.ceil(((currentCommandIndex + 1) - WINDOW_SIZE) / (WINDOW_SIZE - WINDOW_OVERLAP))
-      : Math.floor(Math.max((currentCommandIndex + 1) - (WINDOW_SIZE - WINDOW_OVERLAP), 0) /
-          (WINDOW_SIZE - WINDOW_OVERLAP))
 
+  const indexOfFirstWindowContainingCurrentCommand = Math.ceil(
+    (currentCommandIndex + 1 - WINDOW_SIZE) / (WINDOW_SIZE - WINDOW_OVERLAP)
+  )
+  const indexOfLastWindowContainingCurrentCommand = Math.floor(
+    Math.max(currentCommandIndex + 1 - (WINDOW_SIZE - WINDOW_OVERLAP), 0) /
+      (WINDOW_SIZE - WINDOW_OVERLAP)
+  )
+  const indexOfWindowContainingCurrentItem = isCurrentCommandInFinalWindow
+    ? indexOfFirstWindowContainingCurrentCommand
+    : indexOfLastWindowContainingCurrentCommand
 
   // when we initially mount, if the current item is not in view, jump to it
   React.useEffect(() => {
@@ -212,7 +208,6 @@ export function CommandList(): JSX.Element | null {
       isInitiallyJumpingToCurrent &&
       windowIndex === indexOfWindowContainingCurrentItem
     ) {
-      console.log('jumped to', indexOfWindowContainingCurrentItem)
       currentItemRef.current?.scrollIntoView({ behavior: 'smooth' })
       setIsInitiallyJumpingToCurrent(false)
     }
@@ -247,22 +242,12 @@ export function CommandList(): JSX.Element | null {
       const potentialPrevWindowFirstIndex =
         windowFirstCommandIndex - (WINDOW_SIZE - WINDOW_OVERLAP)
 
-      const prevWindowBoundary = topBufferHeightPx + 5 * AVERAGE_ITEM_HEIGHT_PX
-
-      const nextWindowSize = Math.max(
-        currentCommandList.length - (windowFirstCommandIndex + WINDOW_SIZE),
-        0
-      )
+      const prevWindowBoundary =
+        topBufferHeightPx + NUM_EAGER_ITEMS * AVERAGE_ITEM_HEIGHT_PX
       const nextWindowBoundary =
         topBufferHeightPx +
-        Math.max(nextWindowSize - 5, 0) * AVERAGE_ITEM_HEIGHT_PX -
+        Math.max(WINDOW_SIZE - NUM_EAGER_ITEMS, 0) * AVERAGE_ITEM_HEIGHT_PX -
         clientHeight
-      // console.log('isFinalWindow', isFinalWindow)
-      // console.log('windowFirstCommandIndex', windowFirstCommandIndex)
-      // console.log('potentialNextWindowFirstIndex', potentialNextWindowFirstIndex)
-      // console.log('scrollTop', scrollTop)
-      // console.log('nextWindowBoundary', nextWindowBoundary)
-      // console.log('isDeterministic', isDeterministic)
       if (
         !isFinalWindow &&
         potentialNextWindowFirstIndex < currentCommandList.length &&
@@ -332,7 +317,8 @@ export function CommandList(): JSX.Element | null {
                 {t('total_step_count', { count: currentCommandList.length })}
               </Text>
             </Flex>
-            {currentCommandList[0]?.runCommandSummary != null ? (
+            {currentCommandList[0]?.runCommandSummary != null &&
+            isDeterministic ? (
               <Text fontSize={FONT_SIZE_CAPTION} marginY={SPACING_2}>
                 {t('anticipated')}
               </Text>
@@ -373,6 +359,7 @@ export function CommandList(): JSX.Element | null {
                   runStartedAt={runStartTime}
                 />
                 {isCurrentCommand &&
+                isDeterministic &&
                 overallIndex < currentCommandList.length - 1 ? (
                   <Text
                     fontSize={FONT_SIZE_CAPTION}
