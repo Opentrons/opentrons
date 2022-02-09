@@ -42,6 +42,7 @@ import type {
   RunTimeCommand,
   CommandStatus,
 } from '@opentrons/shared-data'
+import { isYesterday } from 'date-fns'
 
 const AVERAGE_ITEM_HEIGHT_PX = 52 // average px height of a command item
 const WINDOW_SIZE = 60 // number of command items rendered at a time
@@ -171,17 +172,19 @@ export function CommandList(): JSX.Element | null {
   )
 
   // if the run's current command key doesn't exist in the analysis commands
-  if (runCommands.length > 0 && currentCommandIndex < 0) {
+  if (runCommands.length > 0 && currentCommandIndex < 0 && isDeterministic) {
     const isRunningSetupCommand =
       protocolSetupCommandList.find(
         command => command.key === currentCommandKey
       ) != null
     // AND the run has been started and the current step is NOT an initial setup step
     if (runStartDateTime !== null && !isRunningSetupCommand) {
+      console.log('\n\nASECOND IF DET\n\n', currentCommandCreatedAt, runStartDateTime, new Date(currentCommandCreatedAt) > runStartDateTime)
       // AND the current command was created after the run was started
       if (new Date(currentCommandCreatedAt) > runStartDateTime) {
         // then we know that the run has diverged from the analysis expectation and
         // that this protocol is non-deterministic
+        console.log('\n\nset is NON DET\n\n')
         setIsDeterministic(false)
       }
     }
@@ -198,7 +201,7 @@ export function CommandList(): JSX.Element | null {
   // when we initially mount, if the current item is not in view, jump to it
   React.useEffect(() => {
     if (indexOfWindowContainingCurrentItem !== windowIndex) {
-      setWindowIndex(indexOfWindowContainingCurrentItem)
+      setWindowIndex(Math.max(indexOfWindowContainingCurrentItem, 0))
     }
     setIsInitiallyJumpingToCurrent(true)
   }, [])
@@ -254,11 +257,12 @@ export function CommandList(): JSX.Element | null {
         topBufferHeightPx +
         Math.max(nextWindowSize - 5, 0) * AVERAGE_ITEM_HEIGHT_PX -
         clientHeight
-      console.log('isFinalWindow', isFinalWindow)
-      console.log('windowFirstCommandIndex', windowFirstCommandIndex)
-      console.log('potentialNextWindowFirstIndex', potentialNextWindowFirstIndex)
-      console.log('scrollTop', scrollTop)
-      console.log('nextWindowBoundary', nextWindowBoundary)
+      // console.log('isFinalWindow', isFinalWindow)
+      // console.log('windowFirstCommandIndex', windowFirstCommandIndex)
+      // console.log('potentialNextWindowFirstIndex', potentialNextWindowFirstIndex)
+      // console.log('scrollTop', scrollTop)
+      // console.log('nextWindowBoundary', nextWindowBoundary)
+      // console.log('isDeterministic', isDeterministic)
       if (
         !isFinalWindow &&
         potentialNextWindowFirstIndex < currentCommandList.length &&
