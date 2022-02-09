@@ -20,6 +20,7 @@ from src.pages.labware_setup import LabwareSetup
 from src.menus.robots_list import RobotsList
 from src.pages.moam_pur import MoamPur
 from src.pages.gen1_pipette_pur import Gen1PipettePur
+from src.pages.labware_position_check import LabwarePositionCheck
 from src.menus.protocol_file import ProtocolFile
 from src.driver.drag_drop import drag_and_drop_file
 
@@ -185,6 +186,72 @@ def test_moam_pur(
         labware_setup.click_close_button()
         moam_pur.click_protocol_close_button()
         moam_pur.click_confirmation_close_button()
+
+
+def test_LPC_flow(
+    chrome_options: Options,
+    test_protocols: Dict[str, Path],
+    request: FixtureRequest,
+) -> None:
+    """Upload a protocol."""
+    robot = OtRobot()
+    # expecting docker emulated robot
+    assert robot.is_alive(), "is a robot available?"
+    os.environ["OT_APP_DISCOVERY__CANDIDATES"] = "localhost"
+    os.environ["OT_APP_ANALYTICS__SEEN_OPT_IN"] = "true"
+    with webdriver.Chrome(options=chrome_options) as driver:
+        logger.debug(f"driver capabilities {driver.capabilities}")
+        ot_application = OtApplication(
+            Path(f"{driver.capabilities['chrome']['userDataDir']}/config.json")
+        )
+        # ignore updates
+        ot_application.config["alerts"]["ignored"] = ["appUpdateAvailable"]
+        ot_application.write_config()
+        robots_list = RobotsList(driver)
+        if not robots_list.is_robot_toggle_active(RobotsList.DEV):
+            robots_list.get_robot_toggle(RobotsList.DEV).click()
+        left_menu = LeftMenu(driver)
+        # Instantiate the page object for the RobotsList.
+        robots_list = RobotsList(driver)
+        # toggle the DEV robot
+        if not robots_list.is_robot_toggle_active(RobotsList.DEV):
+            robots_list.get_robot_toggle(RobotsList.DEV).click()
+        left_menu = LeftMenu(driver)
+        left_menu.click_protocol_upload_button()
+        protocol_file = ProtocolFile(driver)
+        logger.info(
+            f"uploading protocol: {test_protocols['protocoluploadjson'].resolve()}"
+        )
+        input = protocol_file.get_drag_json_protocol()
+        drag_and_drop_file(input, test_protocols["protocoluploadjson"])
+        robot_calibrate = RobotCalibration(driver)
+        labware_setup = LabwareSetup(driver)
+        labware_setup.click_labware_setup_text()
+        labware_position_check = LabwarePositionCheck(driver)
+        labware_position_check.click_labware_position_button()
+        labware_position_check.get_introScreen_labware_position_check_overview()
+        labware_position_check.click_begin_labware_position_check_button()
+        labware_position_check.click_how_to_tell_pipette_is_centered_link()
+        labware_setup.click_close_button()
+        labware_position_check.click_reveal_all_jog_controls()
+        labware_position_check.click_back_jog_button()
+        labware_position_check.click_down_jog_button()
+        labware_position_check.click_right_jog_button()
+        labware_position_check.click_forward_jog_button()
+        labware_position_check.click_confirm_position_button_pickup_tip()
+        labware_position_check.click_confirm_position_moveto_slot()
+        labware_position_check.click_reveal_all_jog_controls()
+        labware_position_check.click_back_jog_button()
+        labware_position_check.click_down_jog_button()
+        labware_position_check.click_right_jog_button()
+        labware_position_check.click_forward_jog_button()
+        labware_position_check.click_confirm_position_moveto_slot()
+        labware_position_check.click_reveal_all_jog_controls()
+        labware_position_check.click_back_jog_button()
+        labware_position_check.click_down_jog_button()
+        labware_position_check.click_right_jog_button()
+        labware_position_check.click_forward_jog_button()
+        labware_position_check.click_confirm_position_returntip_slot_home()
 
 
 def test_gen1_pipette(

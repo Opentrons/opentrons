@@ -172,3 +172,6 @@ class LabwareSetup:
 
     def click_confirmation_close_button(self) -> None:
         self.get_confirmation_close_button().click()
+
+    def click_labware_setup_text(self) -> None:
+        self.get_labware_setup_text().click()
