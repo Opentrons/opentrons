@@ -78,7 +78,6 @@ export function CommandList(): JSX.Element | null {
       keepPreviousData: true,
     }
   )
-  const totalRunCommandCount = commandsData?.meta.totalLength ?? 0
   const runCommands = commandsData?.data ?? []
   const currentCommandKey = commandsData?.links?.current?.meta?.key ?? null
   const currentCommandCreatedAt =
@@ -173,7 +172,10 @@ export function CommandList(): JSX.Element | null {
     // AND the run has been started and the current step is NOT an initial setup step
     if (runStartDateTime !== null && !isRunningSetupCommand) {
       // AND the current command was created after the run was started
-      if (new Date(currentCommandCreatedAt) > runStartDateTime) {
+      if (
+        currentCommandCreatedAt != null &&
+        new Date(currentCommandCreatedAt) > runStartDateTime
+      ) {
         // then we know that the run has diverged from the analysis expectation and
         // that this protocol is non-deterministic
         setIsDeterministic(false)

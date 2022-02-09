@@ -1,7 +1,7 @@
 import * as React from 'react'
 import '@testing-library/jest-dom'
 import { fireEvent } from '@testing-library/dom'
-import { Route, BrowserRouter, useHistory } from 'react-router-dom'
+import { Route, BrowserRouter } from 'react-router-dom'
 import { resetAllWhenMocks, when } from 'jest-when'
 import {
   RUN_STATUS_RUNNING,
@@ -29,7 +29,6 @@ import {
 } from '../../ProtocolUpload/hooks'
 import type { ProtocolFile } from '@opentrons/shared-data'
 
-
 const mockPush = jest.fn()
 
 jest.mock('../hooks')
@@ -39,7 +38,7 @@ jest.mock('react-router-dom', () => {
   const reactRouterDom = jest.requireActual('react-router-dom')
   return {
     ...reactRouterDom,
-    useHistory: () => ({push: mockPush } as any)
+    useHistory: () => ({ push: mockPush } as any),
   }
 })
 jest.mock('../../RunTimeControl/hooks')
