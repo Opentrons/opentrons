@@ -14,6 +14,8 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
   COLORS,
+  POSITION_ABSOLUTE,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { Divider } from '../structure'
@@ -70,12 +72,11 @@ export const Slideout = (props: Props): JSX.Element | null => {
     <>
       <Box
         css={props.isExpanded ? EXPANDED_STYLE : COLLAPSED_STYLE}
-        position="absolute"
+        position={POSITION_ABSOLUTE}
         right="0"
         top="0"
         backgroundColor={COLORS.white}
-        //  TODO Immediately: add this boxShadow to the new typography standards once it is made!
-        boxShadow="0px 3px 6px rgba(0, 0, 0, 0.23)"
+        boxShadow={TYPOGRAPHY.boxShadowM}
         borderRadius={SPACING_1}
       >
         <Flex padding={SPACING_3} flexDirection={DIRECTION_COLUMN}>
@@ -84,8 +85,7 @@ export const Slideout = (props: Props): JSX.Element | null => {
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
             <Text
-              //  TODO immediately: add this fontSize to typography standard
-              fontSize="0.937rem"
+              fontSize={TYPOGRAPHY.fontSizeH2}
               fontWeight={FONT_WEIGHT_SEMIBOLD}
               data-testid={`Slideout_title_${props.title}`}
             >
@@ -93,7 +93,7 @@ export const Slideout = (props: Props): JSX.Element | null => {
             </Text>
             <Flex alignItems={ALIGN_CENTER}>
               <Btn
-                size={'1.5rem'}
+                size={TYPOGRAPHY.lineHeight24}
                 onClick={() => setHideSlideOut(true)}
                 aria-label="exit"
                 data-testid={`Slideout_icon_close_${props.title}`}
@@ -103,7 +103,7 @@ export const Slideout = (props: Props): JSX.Element | null => {
             </Flex>
           </Flex>
         </Flex>
-        <Divider margin={SPACING_1} color="#e3e3e3" />
+        <Divider margin={SPACING_1} color={COLORS.medGrey} />
         <Flex
           padding={SPACING_3}
           flexDirection={DIRECTION_COLUMN}

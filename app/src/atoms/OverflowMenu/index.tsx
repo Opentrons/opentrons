@@ -4,6 +4,7 @@ import {
   COLORS,
   POSITION_ABSOLUTE,
   SPACING_1,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 interface OverflowMenuProps {
@@ -13,8 +14,8 @@ interface OverflowMenuProps {
 export const OverflowMenu = (props: OverflowMenuProps): JSX.Element | null => {
   return (
     <Box
-      borderRadius="4px 4px 0px 0px"
-      boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
+      borderRadius={TYPOGRAPHY.borderRadiusS}
+      boxShadow={TYPOGRAPHY.boxShadowS}
       position={POSITION_ABSOLUTE}
       backgroundColor={COLORS.white}
       top="2.5rem"

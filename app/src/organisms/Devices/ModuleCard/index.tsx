@@ -18,6 +18,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
+import { OverflowBtn } from '../../../atoms/OverflowMenu/OverflowBtn'
 import { ModuleIcon } from '../ModuleIcon'
 import { MagneticModuleData } from './MagneticModuleData'
 import { TemperatureModuleData } from './TemperatureModuleData'
@@ -29,7 +30,6 @@ import temperatureModule from '../../../assets/images/temp_deck_gen_2_transparen
 import thermoModule from '../../../assets/images/thermocycler_open_transparent.svg'
 
 import type { AttachedModule } from '../../../redux/modules/types'
-import { OverflowBtn } from '../../../atoms/OverflowMenu/OverflowBtn'
 
 interface ModuleCardProps {
   module: AttachedModule
@@ -124,9 +124,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           <OverflowBtn
             aria-label="overflow"
             onClick={() => {
-              showOverflowMenu
-                ? setShowOverflowMenu(false)
-                : setShowOverflowMenu(true)
+              setShowOverflowMenu(prevShowOverflowMenu => !prevShowOverflowMenu)
             }}
           />
         </Box>

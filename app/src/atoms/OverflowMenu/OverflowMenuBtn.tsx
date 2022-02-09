@@ -1,12 +1,18 @@
 import styled from 'styled-components'
-import { Btn, COLORS, TEXT_ALIGN_LEFT, TYPOGRAPHY } from '@opentrons/components'
+import {
+  SPACING,
+  Btn,
+  COLORS,
+  TEXT_ALIGN_LEFT,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 
 import type { PrimitiveComponent } from '@opentrons/components'
 
 type BtnComponent = PrimitiveComponent<'button'>
 
 export const OverflowMenuBtn: BtnComponent = styled(Btn)`
-  width: 153px;
+  width: 9.562rem;
   text-align: ${TEXT_ALIGN_LEFT};
   font-size: ${TYPOGRAPHY.fontSizeP};
   padding-bottom: ${TYPOGRAPHY.fontSizeH6};
@@ -14,7 +20,7 @@ export const OverflowMenuBtn: BtnComponent = styled(Btn)`
   color: ${COLORS.darkBlack};
   padding-left: ${TYPOGRAPHY.fontSizeLabel};
   padding-right: ${TYPOGRAPHY.fontSizeLabel};
-  padding-top: 8px;
+  padding-top: ${SPACING.spacing3};
 
   &:hover {
     background-color: ${COLORS.lightBlue};
@@ -22,7 +28,7 @@ export const OverflowMenuBtn: BtnComponent = styled(Btn)`
 
   &:focus,
   &:active {
-    font-weight: 600;
+    font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   }
 
   &:disabled,
