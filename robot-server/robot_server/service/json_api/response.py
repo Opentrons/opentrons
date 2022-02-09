@@ -71,10 +71,6 @@ class MultiBodyMeta(BaseModel):
             " the response represents."
         ),
     )
-    pageLength: int = Field(
-        ...,
-        description="Number of items included in the response.",
-    )
     totalLength: int = Field(
         ...,
         description="Total number of items in the overall collection.",
