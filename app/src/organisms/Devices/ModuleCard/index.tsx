@@ -11,6 +11,7 @@ import {
   SPACING_3,
   TEXT_TRANSFORM_UPPERCASE,
   SPACING_1,
+  SPACING,
   C_BRIGHT_GRAY,
   C_HARBOR_GRAY,
   FONT_WEIGHT_REGULAR,
@@ -103,13 +104,13 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 color={C_HARBOR_GRAY}
                 fontWeight={FONT_WEIGHT_REGULAR}
                 fontSize={FONT_SIZE_CAPTION}
-                paddingBottom={SPACING_1}
+                paddingBottom={SPACING.spacing2}
               >
                 {t(module.usbPort.port === null ? 'usb_hub' : 'usb_port', {
                   port: module.usbPort.hub ?? module.usbPort.port,
                 })}
               </Text>
-              <Flex paddingBottom={SPACING_1}>
+              <Flex paddingBottom={SPACING.spacing2}>
                 <ModuleIcon moduleType={module.type} />
                 <Text fontSize={TYPOGRAPHY.fontSizeP}>
                   {getModuleDisplayName(module.model)}
@@ -120,9 +121,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           </Flex>
         </Box>
 
-        {/* The padding is small to align with designs for background-color and border-radius for the different states */}
-
-        <Box alignSelf={ALIGN_START} padding="1px">
+        <Box alignSelf={ALIGN_START} padding={SPACING.spacing2}>
           <OverflowBtn
             aria-label="overflow"
             onClick={() => {
