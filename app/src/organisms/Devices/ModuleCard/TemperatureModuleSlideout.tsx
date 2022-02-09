@@ -11,6 +11,7 @@ import {
   InputField,
   PrimaryBtn,
   TEXT_TRANSFORM_NONE,
+  DIRECTION_COLUMN,
 } from '@opentrons/components'
 import {
   CELSIUS,
@@ -63,6 +64,7 @@ export const TemperatureModuleSlideout = (
         </Text>
         <Flex
           marginTop={SPACING.spacing4}
+          flexDirection={DIRECTION_COLUMN}
           data-testid={`Temp_Slideout_input_field_${name}`}
         >
           <Text

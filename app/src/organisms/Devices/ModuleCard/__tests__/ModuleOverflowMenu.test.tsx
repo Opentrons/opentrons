@@ -9,11 +9,16 @@ import {
 } from '../../../../redux/modules/__fixtures__'
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 import { MagneticModuleSlideout } from '../MagneticModuleSlideout'
+import { TemperatureModuleSlideout } from '../TemperatureModuleSlideout'
 
 jest.mock('../MagneticModuleSlideout')
+jest.mock('../TemperatureModuleSlideout')
 
 const mockMagneticModuleSlideout = MagneticModuleSlideout as jest.MockedFunction<
   typeof MagneticModuleSlideout
+>
+const mockTemperatureModuleSlideout = TemperatureModuleSlideout as jest.MockedFunction<
+  typeof TemperatureModuleSlideout
 >
 
 const render = (props: React.ComponentProps<typeof ModuleOverflowMenu>) => {
@@ -30,6 +35,9 @@ describe('ModuleOverflowMenu', () => {
     }
     mockMagneticModuleSlideout.mockReturnValue(
       <div>Mock mag module slideout</div>
+    )
+    mockTemperatureModuleSlideout.mockReturnValue(
+      <div>Mock temperature module slideout</div>
     )
   })
   afterEach(() => {
@@ -66,11 +74,12 @@ describe('ModuleOverflowMenu', () => {
     props = {
       module: mockTemperatureModuleGen2,
     }
-    const { getByRole } = render(props)
+    const { getByRole, getByText } = render(props)
     const buttonSetting = getByRole('button', {
       name: 'Set module temperature',
     })
     fireEvent.click(buttonSetting)
+    getByText('Mock temperature module slideout')
     const buttonAbout = getByRole('button', { name: 'About module' })
     fireEvent.click(buttonAbout)
     expect(buttonAbout).toBeEnabled()
