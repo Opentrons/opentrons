@@ -16,6 +16,8 @@ from opentrons.types import DeckSlotName, MountType
 from opentrons.protocol_engine import DeckSlotLocation, PipetteName, commands
 from opentrons.protocol_engine.clients import SyncClient, AbstractSyncTransport
 from opentrons.protocol_engine.types import (
+    ModuleDefinition,
+    ModuleModel,
     WellOrigin,
     WellOffset,
     WellLocation,
@@ -75,6 +77,37 @@ def test_load_labware(
     )
 
     assert result == stubbed_load_labware_result
+
+
+def test_load_module(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+    thermocycler_v1_def: ModuleDefinition,
+) -> None:
+    expected_request = commands.LoadModuleCreate(
+        params=commands.LoadModuleParams(
+            model=ModuleModel.THERMOCYCLER_MODULE_V1,
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_7),
+        )
+    )
+    expected_result = commands.LoadModuleResult(
+        moduleId="abc123",
+        model=ModuleModel.THERMOCYCLER_MODULE_V1,
+        definition=thermocycler_v1_def,
+        serialNumber="xyz789",
+    )
+
+    decoy.when(transport.execute_command(request=expected_request)).then_return(
+        expected_result
+    )
+
+    result = subject.load_module(
+        model=ModuleModel.THERMOCYCLER_MODULE_V1,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_7),
+    )
+
+    assert result == expected_result
 
 
 def test_load_pipette(

@@ -3,30 +3,35 @@
 from typing import List, Optional, Sequence, Union
 
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
+from opentrons.protocol_engine.types import ModuleModel as ModuleModel
+from opentrons.hardware_control.modules.types import ModuleType
 
 from .pipette_context import PipetteContext
 from .instrument_context import InstrumentContext
 from .labware import Labware
+from .module_contexts import (
+    MagneticModuleContext,
+    TemperatureModuleContext,
+    ThermocyclerModuleContext,
+)
 from .types import DeckSlotName, DeckSlotLocation, DeprecatedMount, Mount, PipetteName
 from . import errors
 
 
-class ProtocolContext:  # noqa: D101
+class ProtocolContext:
+    """Main Python Protocol API provider.
+
+    You do not need to initialize the ProtocolContext yourself; the system
+    will create one and pass it to your protocol's `run` method.
+    """
+
     def __init__(self, engine_client: ProtocolEngineClient) -> None:
-        """Initialize a ProtocolContext API provider.
-
-        You do not need to initialize the ProtocolContext yourself; the system
-        will create one and pass it to your protocol's `run` method.
-
-        Args:
-            engine_client: A ProtocolEngine client to issue protocol commands.
-        """
         self._engine_client = engine_client
 
     def load_pipette(  # noqa: D102
         self,
-        pipette_name: str,
-        mount: str,
+        pipette_name: Union[PipetteName, str],
+        mount: Union[Mount, str],
         tip_racks: Sequence[Labware] = (),
         replace: bool = False,
     ) -> PipetteContext:
@@ -94,6 +99,39 @@ class ProtocolContext:  # noqa: D101
         )
 
         return Labware(engine_client=self._engine_client, labware_id=result.labwareId)
+
+    # TODO(mc, 2022-02-09): typing.overload
+    # TODO(mc, 2022-02-09): add thermocycler full vs semi configuration
+    def load_module(
+        self,
+        module_name: str,
+        location: Optional[Union[int, str]] = None,
+    ) -> Union[
+        MagneticModuleContext, TemperatureModuleContext, ThermocyclerModuleContext
+    ]:
+        # TODO(mc, 2022-02-09): find out if we need to support old load strings
+        # in PAPIv3
+        module_model = ModuleModel(module_name)
+
+        if location is None:
+            if module_model.as_type() == ModuleType.THERMOCYCLER:
+                location = "7"
+            else:
+                raise errors.InvalidModuleLocationError(location, module_model)
+
+        result = self._engine_client.load_module(
+            model=module_model,
+            location=DeckSlotLocation(slotName=DeckSlotName.from_primitive(location)),
+        )
+
+        if result.definition.moduleType == ModuleType.MAGNETIC:
+            return MagneticModuleContext(module_id=result.moduleId)
+        elif result.definition.moduleType == ModuleType.TEMPERATURE:
+            return TemperatureModuleContext(module_id=result.moduleId)
+        elif result.definition.moduleType == ModuleType.THERMOCYCLER:
+            return ThermocyclerModuleContext(module_id=result.moduleId)
+        else:
+            assert False, "Unsupported module definition"
 
     def pause(self, msg: Optional[str] = None) -> None:
         """Pause execution of the protocol until resumed by the user.
