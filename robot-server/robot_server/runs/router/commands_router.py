@@ -3,7 +3,7 @@ from asyncio import wait_for, TimeoutError as AsyncioTimeoutError
 from typing import Optional, Union
 from typing_extensions import Final, Literal
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Query, status
 from pydantic import BaseModel, Field
 
 from opentrons.protocol_engine import commands as pe_commands, errors as pe_errors
@@ -59,7 +59,6 @@ class CommandCollectionLinks(BaseModel):
     )
 
 
-# todo(mm, 2021-09-23): Should this accept a list of commands, instead of just one?
 @commands_router.post(
     path="/runs/{runId}/commands",
     summary="Enqueue a protocol command",
