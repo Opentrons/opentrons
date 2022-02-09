@@ -8,13 +8,15 @@ from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.labware import dev_types as labware_dict_types
 
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.protocol_engine import commands as pe_commands, types as pe_types
+from opentrons.protocol_engine import commands as pe_commands
+from opentrons.protocol_engine.types import ModuleDefinition
 from opentrons.protocol_engine.clients import SyncClient
 
 from opentrons.protocol_api_experimental.types import (
     DeckSlotLocation,
     DeckSlotName,
     DeprecatedMount,
+    ModuleModel,
     Mount,
     PipetteName,
 )
@@ -29,24 +31,24 @@ from opentrons.protocol_api_experimental import (
 
 
 @pytest.fixture(scope="session")
-def magdeck_v1_def() -> pe_types.ModuleDefinition:
+def magdeck_v1_def() -> ModuleDefinition:
     """Get the definition of a V1 magdeck."""
     definition = load_shared_data("module/definitions/2/magneticModuleV1.json")
-    return pe_types.ModuleDefinition.parse_raw(definition)
+    return ModuleDefinition.parse_raw(definition)
 
 
 @pytest.fixture(scope="session")
-def tempdeck_v1_def() -> pe_types.ModuleDefinition:
+def tempdeck_v1_def() -> ModuleDefinition:
     """Get the definition of a V1 tempdeck."""
     definition = load_shared_data("module/definitions/2/temperatureModuleV1.json")
-    return pe_types.ModuleDefinition.parse_raw(definition)
+    return ModuleDefinition.parse_raw(definition)
 
 
 @pytest.fixture(scope="session")
-def thermocycler_v1_def() -> pe_types.ModuleDefinition:
+def thermocycler_v1_def() -> ModuleDefinition:
     """Get the definition of a V2 thermocycler."""
     definition = load_shared_data("module/definitions/2/thermocyclerModuleV1.json")
-    return pe_types.ModuleDefinition.parse_raw(definition)
+    return ModuleDefinition.parse_raw(definition)
 
 
 @pytest.fixture
@@ -238,13 +240,13 @@ def test_pause(
         (
             "magneticModuleV1",
             lazy_fixture("magdeck_v1_def"),
-            pe_types.ModuleModel.MAGNETIC_MODULE_V1,
+            ModuleModel.MAGNETIC_MODULE_V1,
             module_contexts.MagneticModuleContext,
         ),
         (
             "temperatureModuleV1",
             lazy_fixture("tempdeck_v1_def"),
-            pe_types.ModuleModel.TEMPERATURE_MODULE_V1,
+            ModuleModel.TEMPERATURE_MODULE_V1,
             module_contexts.TemperatureModuleContext,
         ),
     ],
@@ -254,8 +256,8 @@ def test_load_module(
     engine_client: SyncClient,
     subject: ProtocolContext,
     module_name: str,
-    definition: pe_types.ModuleDefinition,
-    expected_model: pe_types.ModuleModel,
+    definition: ModuleDefinition,
+    expected_model: ModuleModel,
     expected_ctx_cls: Type[Any],
 ) -> None:
     """It should send load module requests to the engine."""
@@ -281,13 +283,13 @@ def test_load_thermocycler(
     decoy: Decoy,
     engine_client: SyncClient,
     subject: ProtocolContext,
-    thermocycler_v1_def: pe_types.ModuleDefinition,
+    thermocycler_v1_def: ModuleDefinition,
 ) -> None:
     """It should load a thermocycler."""
     decoy.when(
         engine_client.load_module(
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_7),
-            model=pe_types.ModuleModel.THERMOCYCLER_MODULE_V1,
+            model=ModuleModel.THERMOCYCLER_MODULE_V1,
         )
     ).then_return(
         pe_commands.LoadModuleResult(
@@ -305,13 +307,21 @@ def test_load_thermocycler(
     assert result == module_contexts.ThermocyclerModuleContext(module_id="abc123")
 
 
+@pytest.mark.parametrize(
+    argnames="module_name",
+    argvalues=[
+        "magneticModuleV1",
+        "magneticModuleV2",
+        "temperatureModuleV1",
+        "temperatureModuleV2",
+    ],
+)
 def test_invalid_load_module_location(
     decoy: Decoy,
     engine_client: SyncClient,
     subject: ProtocolContext,
+    module_name: str,
 ) -> None:
+    """It should require locations for non-thermocycler modules."""
     with pytest.raises(errors.InvalidModuleLocationError):
-        subject.load_module(module_name="magneticModuleV2", location=None)
-
-    with pytest.raises(errors.InvalidModuleLocationError):
-        subject.load_module(module_name="temperatureModuleV2", location=None)
+        subject.load_module(module_name=module_name, location=None)

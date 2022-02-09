@@ -85,6 +85,7 @@ def test_load_module(
     subject: SyncClient,
     thermocycler_v1_def: ModuleDefinition,
 ) -> None:
+    """It should send a load module command to the engine."""
     expected_request = commands.LoadModuleCreate(
         params=commands.LoadModuleParams(
             model=ModuleModel.THERMOCYCLER_MODULE_V1,

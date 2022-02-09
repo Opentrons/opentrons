@@ -3,18 +3,26 @@
 from typing import List, Optional, Sequence, Union
 
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
-from opentrons.protocol_engine.types import ModuleModel as ModuleModel
 from opentrons.hardware_control.modules.types import ModuleType
 
 from .pipette_context import PipetteContext
 from .instrument_context import InstrumentContext
 from .labware import Labware
+
 from .module_contexts import (
     MagneticModuleContext,
     TemperatureModuleContext,
     ThermocyclerModuleContext,
 )
-from .types import DeckSlotName, DeckSlotLocation, DeprecatedMount, Mount, PipetteName
+from .types import (
+    DeckSlotName,
+    DeckSlotLocation,
+    DeprecatedMount,
+    Mount,
+    ModuleModel,
+    PipetteName,
+)
+
 from . import errors
 
 
@@ -104,11 +112,34 @@ class ProtocolContext:
     # TODO(mc, 2022-02-09): add thermocycler full vs semi configuration
     def load_module(
         self,
-        module_name: str,
+        module_name: Union[str, ModuleModel],
         location: Optional[Union[int, str]] = None,
     ) -> Union[
-        MagneticModuleContext, TemperatureModuleContext, ThermocyclerModuleContext
+        MagneticModuleContext,
+        TemperatureModuleContext,
+        ThermocyclerModuleContext,
     ]:
+        """Load a module onto the deck given its name.
+
+        Call this method to add a module in your protocol, like you would use
+        :py:meth:`load_pipette` to add a pipette. It returns a module API context,
+        which you can use to control the module.
+
+        Args:
+            module_name: The model name of the module to load. The first module
+                found that is compatible with this model will be loaded.
+            location: The deck slot location the module will be loaded into.
+                A thermocycler is only valid in slot 7, so you may omit it.
+                For non-thermocycler modules, this argument is required.
+
+        Returns:
+            A module context object. The specific class returned will depend
+            on the type of ``module_name`` that you request.
+
+        Raises:
+            InvalidModuleLocationError: The specified ``location`` was not valid.
+            ModuleNotAttachedError: The requested module is not attached.
+        """
         # TODO(mc, 2022-02-09): find out if we need to support old load strings
         # in PAPIv3
         module_model = ModuleModel(module_name)

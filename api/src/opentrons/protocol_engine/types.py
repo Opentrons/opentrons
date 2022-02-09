@@ -141,15 +141,13 @@ class ModuleModel(str, Enum):
     THERMOCYCLER_MODULE_V1 = "thermocyclerModuleV1"
 
     def as_type(self) -> ModuleType:
-        if (
-            self == ModuleModel.TEMPERATURE_MODULE_V1
-            or self == ModuleModel.TEMPERATURE_MODULE_V2
-        ):
+        """Get the ModuleType of this model."""
+        if self in [
+            ModuleModel.TEMPERATURE_MODULE_V1,
+            ModuleModel.TEMPERATURE_MODULE_V2,
+        ]:
             return ModuleType.TEMPERATURE
-        elif (
-            self == ModuleModel.MAGNETIC_MODULE_V1
-            or self == ModuleModel.MAGNETIC_MODULE_V2
-        ):
+        elif self in [ModuleModel.MAGNETIC_MODULE_V1, ModuleModel.MAGNETIC_MODULE_V2]:
             return ModuleType.MAGNETIC
         elif self == ModuleModel.THERMOCYCLER_MODULE_V1:
             return ModuleType.THERMOCYCLER

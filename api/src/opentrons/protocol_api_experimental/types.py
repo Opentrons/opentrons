@@ -9,7 +9,12 @@ from opentrons.types import (
     Point,
 )
 
-from opentrons.protocol_engine import DeckSlotLocation, PipetteName, ModuleLocation
+from opentrons.protocol_engine import (
+    DeckSlotLocation,
+    PipetteName,
+    ModuleLocation,
+    ModuleModel,
+)
 
 __all__ = [
     # re-exports from opentrons_shared_data.labware.dev_types
@@ -24,4 +29,5 @@ __all__ = [
     "DeckSlotLocation",
     "ModuleLocation",
     "PipetteName",
+    "ModuleModel",
 ]
