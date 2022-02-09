@@ -109,7 +109,7 @@ async def create_run_command(
         try:
             await wait_for(
                 engine_store.engine.wait_for_command(command_id=added_command.id),
-                timeout=timeout,
+                timeout=timeout/1000,
             )
             completed_command = engine_store.get_state(run.id).commands.get(
                 command_id=added_command.id
