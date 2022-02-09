@@ -204,7 +204,7 @@ def test_LPC_flow(
         ot_application = OtApplication(
             Path(f"{driver.capabilities['chrome']['userDataDir']}/config.json")
         )
-        # ignore updates
+        # ignore updates.
         ot_application.config["alerts"]["ignored"] = ["appUpdateAvailable"]
         ot_application.write_config()
         robots_list = RobotsList(driver)
