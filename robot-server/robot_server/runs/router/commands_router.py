@@ -76,8 +76,35 @@ class CommandCollectionLinks(BaseModel):
 )
 async def create_run_command(
     request_body: RequestModel[pe_commands.CommandCreate],
-    waitUntilComplete: bool = False,
-    timeout: float = 30,
+    waitUntilComplete: bool = Query(
+        default=False,
+        description=(
+            "If `false`, return immediately, while the new command is still queued."
+            "\n\n"
+            "If `true`, only return once the new command succeeds or fails,"
+            " or when the timeout is reached. See the `timeout` query parameter."
+        ),
+    ),
+    timeout: int = Query(
+        default=30_000,
+        gt=0,
+        description=(
+            "If `waitUntilComplete` is `true`,"
+            " the maximum number of milliseconds to wait before returning."
+            "\n\n"
+            "Ignored if `waitUntilComplete` is `false`."
+            "\n\n"
+            "The timer starts when the new command is enqueued,"
+            " *not* when it starts running."
+            " So if a different command runs before the new command,"
+            " it may exhaust the timeout even if the new command on its own"
+            " would have completed in time."
+            "\n\n"
+            "If the timeout triggers, the command will still be returned"
+            " with a `201` HTTP status code."
+            " Inspect the returned command's `status` to detect the timeout."
+        )
+    ),
     engine_store: EngineStore = Depends(get_engine_store),
     run: Run = Depends(get_run_data_from_url),
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
