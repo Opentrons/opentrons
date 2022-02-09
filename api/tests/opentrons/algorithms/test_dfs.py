@@ -58,10 +58,10 @@ def test_vertices(
     graph.add_vertex(additional_vertex)
     vertex_obj = graph.get_vertex(additional_vertex.name)
     assert additional_vertex.name in graph._lookup_table.keys()
-    assert vertex_obj in graph._sorted_graph
+    assert vertex_obj in graph._graph
     graph.remove_vertex(additional_vertex)
     assert additional_vertex.name not in graph._lookup_table.keys()
-    assert vertex_obj not in graph._sorted_graph
+    assert vertex_obj not in graph._graph
 
 
 def test_neighbors_int(str_named_graph: dfs.DFS[str]) -> None:
@@ -93,11 +93,11 @@ def test_neighbors_str(int_named_graph: dfs.DFS[int]) -> None:
     key = 1
     neighbor = 4
     og_neighbors = [2, 5]
-    sorted_neighbors = [2, 4, 5]
+    neighbors_by_add_order = [2, 5, 4]
     vertex = graph.get_vertex(key)
     assert vertex.neighbors == og_neighbors
     vertex.add_neighbor(neighbor)
-    assert vertex.neighbors == sorted_neighbors
+    assert vertex.neighbors == neighbors_by_add_order
     vertex.remove_neighbor(neighbor)
     assert vertex.neighbors == og_neighbors
 
@@ -109,7 +109,7 @@ def test_depth_first_search_str(str_named_graph: dfs.DFS[str]) -> None:
     before backtracking up to find unvisited nodes.
     """
     visited_vertices = str_named_graph.dfs()
-    sort = {"A", "B", "F", "G", "C", "J", "I", "H", "D", "E"}
+    sort = ["A", "B", "E", "F", "C", "G", "H", "I", "D", "J"]
     assert sort == visited_vertices
 
 
@@ -120,5 +120,5 @@ def test_depth_first_search_int(int_named_graph: dfs.DFS[int]) -> None:
     before backtracking up to find unvisited nodes.
     """
     visited_vertices = int_named_graph.dfs()
-    sort = {1, 2, 6, 7, 3, 10, 9, 8, 4, 5}
+    sort = [1, 2, 5, 6, 3, 7, 8, 9, 4, 10]
     assert sort == visited_vertices

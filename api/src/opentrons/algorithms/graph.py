@@ -59,7 +59,6 @@ class Vertex(Generic[VertexName]):
         :param vertex_name: The name of the neighbor
         """
         self._neighbors.append(vertex_name)
-        self._neighbors.sort()
 
     def remove_neighbor(self, vertex_name: VertexName) -> None:
         """Remove a neighbor.
@@ -94,21 +93,20 @@ class Graph(Generic[VertexName]):
     # https://github.com/python/typing/issues/760
     def __init__(
         self,
-        sorted_graph: List[Vertex[VertexName]],
+        graph: List[Vertex[VertexName]],
         lookup_table: Dict[VertexName, Vertex[VertexName]],
         sort_by: Callable[[Vertex[VertexName]], VertexName],
     ) -> None:
         """Graph class initializer.
 
-        :param sorted_graph: The initial graph, sorted
-        and converted to vertex objects.
+        :param graph: The initial graph, converted to vertex objects.
         :param lookup_table: A lookup table keyed by vertex
         name and with a value of the vertex object
         :param sort_by: The callable function used to sort
         the graph nodes in priority order.
         """
         self._sort_by = sort_by
-        self._sorted_graph = sorted_graph
+        self._graph = graph
         self._lookup_table = lookup_table
 
     @classmethod
@@ -124,14 +122,13 @@ class Graph(Generic[VertexName]):
         in priority order.
         :returns: A graph class
         """
-        sorted_graph = []
+        built_graph = []
         lookup_table = {}
         for vertex in graph:
             vertex_obj = cls.build_vertex(vertex)
             lookup_table[vertex.name] = vertex_obj
-            sorted_graph.append(vertex_obj)
-        sorted_graph.sort(key=sort_by)
-        return cls(sorted_graph, lookup_table, sort_by)
+            built_graph.append(vertex_obj)
+        return cls(built_graph, lookup_table, sort_by)
 
     @property
     def graph(self) -> Sequence[Vertex[VertexName]]:
@@ -139,7 +136,7 @@ class Graph(Generic[VertexName]):
 
         :returns: A list of sorted vertex objects
         """
-        return self._sorted_graph
+        return self._graph
 
     @staticmethod
     def build_vertex(vertex: GenericNode[VertexName]) -> Vertex[VertexName]:
@@ -150,7 +147,6 @@ class Graph(Generic[VertexName]):
         :param vertex: A node dataclass
         :returns: vertex object
         """
-        vertex.sub_names.sort()
         return Vertex(vertex, vertex.sub_names)
 
     def add_vertex(self, vertex: GenericNode[VertexName]) -> None:
@@ -161,8 +157,7 @@ class Graph(Generic[VertexName]):
         new_vertex = self.build_vertex(vertex)
         if new_vertex not in self._lookup_table.values():
             self._lookup_table[new_vertex.name] = new_vertex
-            self._sorted_graph.append(new_vertex)
-        self._sorted_graph.sort(key=self._sort_by)
+            self._graph.append(new_vertex)
 
     def remove_vertex(self, vertex: GenericNode[VertexName]) -> None:
         """Remove a vertex.
@@ -172,7 +167,7 @@ class Graph(Generic[VertexName]):
         if vertex.name in self._lookup_table.keys():
             vertex_to_remove = self._lookup_table[vertex.name]
             del self._lookup_table[vertex.name]
-            self._sorted_graph.remove(vertex_to_remove)
+            self._graph.remove(vertex_to_remove)
 
     def get_vertex(self, vertex_name: VertexName) -> Vertex[VertexName]:
         """Get a vertex.

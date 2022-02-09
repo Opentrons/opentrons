@@ -1,4 +1,4 @@
-from typing import List, Set
+from typing import List
 from typing_extensions import Protocol
 
 from opentrons.hardware_control.modules.types import ModuleAtPort
@@ -29,11 +29,11 @@ class USBDriverInterface(Protocol):
         ...
 
     @property
-    def sorted_ports(self) -> Set[str]:
+    def sorted_ports(self) -> List[str]:
         ...
 
     @sorted_ports.setter
-    def sorted_ports(self, sorted: Set[str]) -> None:
+    def sorted_ports(self, ports: List[str]) -> None:
         ...
 
     def read_usb_bus(self) -> List[USBPort]:
