@@ -56,4 +56,33 @@ describe('useCreateCommandMutation hook', () => {
     })
     expect(result.current.data).toBe('something')
   })
+  it('should pass waitUntilComplete and timeout through if given command', async () => {
+    const waitUntilComplete = true
+    const timeout = 2000
+    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
+    when(mockCreateCommand)
+      .calledWith(HOST_CONFIG, RUN_ID_1, mockAnonLoadCommand, {
+        waitUntilComplete,
+        timeout,
+      })
+      .mockResolvedValue({ data: 'something' } as any)
+
+    const { result, waitFor } = renderHook(() => useCreateCommandMutation(), {
+      wrapper,
+    })
+
+    expect(result.current.data).toBeUndefined()
+    act(() => {
+      result.current.createCommand({
+        runId: RUN_ID_1,
+        command: mockAnonLoadCommand,
+        waitUntilComplete,
+        timeout,
+      })
+    })
+    await waitFor(() => {
+      return result.current.data != null
+    })
+    expect(result.current.data).toBe('something')
+  })
 })
