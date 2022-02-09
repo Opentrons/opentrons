@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { COLORS, renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../../i18n'
 import {
@@ -49,6 +49,17 @@ describe('ModuleOverflowMenu', () => {
     fireEvent.click(buttonAbout)
     expect(buttonAbout).toBeEnabled()
     expect(getByText('About module')).toHaveStyle('color: #16212D')
+  })
+  it('renders hover state color correctly', () => {
+    const { getByRole } = render(props)
+    const buttonSetting = getByRole('button', { name: 'Set engage height' })
+    expect(buttonSetting).toHaveStyleRule(
+      'background-color',
+      COLORS.lightBlue,
+      {
+        modifier: ':hover',
+      }
+    )
   })
   //  todo imemdiately: add on to following 2 tests when their slideout component is made
   it('renders the correct temperature module menu', () => {

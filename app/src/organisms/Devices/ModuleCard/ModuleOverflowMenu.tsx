@@ -30,6 +30,7 @@ export const ModuleOverflowMenu = (
   switch (module.type) {
     case 'magneticModuleType': {
       setSetting = t('overflow_menu_engage')
+      //  TODO immediately: add functionality to turnOffSetting once slideouts are complete
       turnOffSetting = t('overflow_menu_disengage')
       slideout = (
         <MagneticModuleSlideout module={module} isExpanded={showSlideout} />
