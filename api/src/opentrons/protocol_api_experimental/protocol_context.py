@@ -1,6 +1,7 @@
 # noqa: D100
 
-from typing import List, Optional, Sequence, Union
+from typing import List, Optional, Sequence, Union, overload
+from typing_extensions import Literal
 
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.hardware_control.modules.types import ModuleType
@@ -89,7 +90,7 @@ class ProtocolContext:
     def load_labware(  # noqa: D102
         self,
         load_name: str,
-        location: Union[int, str],
+        location: Union[DeckSlotName, int, str],
         label: Optional[str] = None,
         namespace: Optional[str] = None,
         version: Optional[int] = None,
@@ -108,12 +109,52 @@ class ProtocolContext:
 
         return Labware(engine_client=self._engine_client, labware_id=result.labwareId)
 
-    # TODO(mc, 2022-02-09): typing.overload
+    @overload
+    def load_module(
+        self,
+        module_name: Union[
+            Literal[ModuleModel.MAGNETIC_MODULE_V1],
+            Literal[ModuleModel.MAGNETIC_MODULE_V2],
+        ],
+        location: Union[DeckSlotName, int, str],
+    ) -> MagneticModuleContext:
+        ...
+
+    @overload
+    def load_module(
+        self,
+        module_name: Union[
+            Literal[ModuleModel.TEMPERATURE_MODULE_V1],
+            Literal[ModuleModel.TEMPERATURE_MODULE_V2],
+        ],
+        location: Union[DeckSlotName, int, str],
+    ) -> TemperatureModuleContext:
+        ...
+
+    @overload
+    def load_module(
+        self,
+        module_name: Literal[ModuleModel.THERMOCYCLER_MODULE_V1],
+    ) -> TemperatureModuleContext:
+        ...
+
+    @overload
+    def load_module(
+        self,
+        module_name: str,
+        location: Optional[Union[DeckSlotName, int, str]] = None,
+    ) -> Union[
+        MagneticModuleContext,
+        TemperatureModuleContext,
+        ThermocyclerModuleContext,
+    ]:
+        ...
+
     # TODO(mc, 2022-02-09): add thermocycler full vs semi configuration
     def load_module(
         self,
         module_name: Union[str, ModuleModel],
-        location: Optional[Union[int, str]] = None,
+        location: Optional[Union[DeckSlotName, int, str]] = None,
     ) -> Union[
         MagneticModuleContext,
         TemperatureModuleContext,
