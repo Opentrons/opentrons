@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { i18n } from '../../../../i18n'
+import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { InputField } from '@opentrons/components/src/forms/InputField'
 import {
@@ -69,6 +70,14 @@ describe('TemperatureModuleSlideout', () => {
   it('renders the button and it is not clickable until there is something in form field', () => {
     const { getByRole } = render(props)
     const button = getByRole('button', { name: 'Set Temperature' })
+    expect(button).not.toBeEnabled()
+    mockInputField.mockReturnValue(<div>6 C</div>)
+    mockUseSendModuleCommand.mockReturnValue({
+      moduleId: SERIAL,
+      command: 'set_temperature',
+      args: 6,
+    } as any)
+    fireEvent.click(button)
     expect(button).not.toBeEnabled()
   })
 })
