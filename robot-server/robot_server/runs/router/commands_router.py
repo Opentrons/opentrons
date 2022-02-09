@@ -102,7 +102,7 @@ async def create_run_command(
             "If the timeout triggers, the command will still be returned"
             " with a `201` HTTP status code."
             " Inspect the returned command's `status` to detect the timeout."
-        )
+        ),
     ),
     engine_store: EngineStore = Depends(get_engine_store),
     run: Run = Depends(get_run_data_from_url),
@@ -135,7 +135,7 @@ async def create_run_command(
         try:
             await wait_for(
                 engine_store.engine.wait_for_command(command_id=added_command.id),
-                timeout=timeout/1000,
+                timeout=timeout / 1000,
             )
             completed_command = engine_store.get_state(run.id).commands.get(
                 command_id=added_command.id
