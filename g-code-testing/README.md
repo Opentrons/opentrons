@@ -343,3 +343,17 @@ OR
 
 ../relative/path/to/my/file.py
 ```
+
+## Updating S3
+
+When we make a change to the code that affects the _Master G-Code File_ we have to update
+it in S3. To do this follow these steps.
+
+1. Switch to the branch that is failing and pull the changes
+2. Run `make teardown` in the root of the repo
+3. Run `make setup` in the root of the repo
+4. Go into `g-code-testing` and run the test that is failing
+   1. For example: `pipenv run python cli.py diff protocol/2_modules`
+   2. Once you have confirmed that it is failing, push to s3
+5. For example: `pipenv run python cli.py push protocol/2_modules`
+6. Re-run tests locally and in CI
