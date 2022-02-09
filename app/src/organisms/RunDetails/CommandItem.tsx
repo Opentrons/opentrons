@@ -83,13 +83,13 @@ export function CommandItemComponent(
   const { t } = useTranslation('run_details')
 
   let commandStatus: RunCommandSummary['status'] = 'queued' as const
-  if (
-    runStatus !== RUN_STATUS_IDLE &&
-    runCommandSummary?.status != null
-  ) {
+  if (runStatus !== RUN_STATUS_IDLE && runCommandSummary?.status != null) {
     commandStatus = runCommandSummary.status
   }
-  if (isMostRecentCommand && (commandStatus === 'queued' || commandStatus === 'succeeded')) {
+  if (
+    isMostRecentCommand &&
+    (commandStatus === 'queued' || commandStatus === 'succeeded')
+  ) {
     commandStatus = 'running' as const
   }
 

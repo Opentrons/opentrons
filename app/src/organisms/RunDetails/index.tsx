@@ -48,7 +48,7 @@ export function RunDetails(): JSX.Element | null {
       if (data == null) {
         history.push('/upload')
       }
-    }
+    },
   })
   const startTime = useRunStartTime()
   const isProtocolRunLoaded = useIsProtocolRunLoaded()
@@ -79,7 +79,7 @@ export function RunDetails(): JSX.Element | null {
     confirm: confirmCloseExit,
     cancel: cancelCloseExit,
   } = useConditionalConfirm(handleCloseProtocol, true)
-  if(robotName == null) history.push('/robots')
+  if (robotName == null) history.push('/robots')
 
   if (!isProtocolRunLoaded || isClosingCurrentRun) {
     let text = t('loading_protocol')
