@@ -10,7 +10,6 @@ Tests will default to using `vcan0` as their SocketCAN network. If you wish to c
 the network, then specify the `CAN_CHANNEL` environment variable with the name of
 your network.
 
-
 ## CAN Bus simulation
 
 ### vcan (linux only)
@@ -23,7 +22,7 @@ To start a `vcan0` interface:
 
 ```
 sudo modprobe vcan
-sudo ip link add dev vcan0 type vcan 
+sudo ip link add dev vcan0 type vcan
 sudo ip link set vcan0 up fd on
 ```
 
@@ -33,7 +32,7 @@ This portable alternative to `vcan` runs a simulated CAN network using a socket 
 
 ### opentrons_sim_can_bus
 
-The preferred method of software CAN bus simulation is SocketCAN's vcan. But it is only available on linux. 
+The preferred method of software CAN bus simulation is SocketCAN's vcan. But it is only available on linux.
 
 This alternative to `vcan` runs a simulated CAN network using a socket server. This supports the `opentrons_sock` interface.
 
@@ -85,4 +84,3 @@ opentrons_update_fw [-h] --interface INTERFACE [--bitrate BITRATE]
 ```
 
 The FILE argument is a `.hex` file built by our ot3-firmware repo.
- 
