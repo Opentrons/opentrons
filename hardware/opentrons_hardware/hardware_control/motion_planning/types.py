@@ -13,9 +13,9 @@ from typing import (
     List,
     OrderedDict,
     Tuple,
-    Union,
-    Optional
+    Union
 )
+from typing_extensions import Literal
 
 log = logging.getLogger(__name__)
 
@@ -25,21 +25,25 @@ AcceptableType = Union[SupportsFloat, np.float64]
 class Axis(enum.Enum):
     """Robot axis."""
 
-    X = 0, "X"
-    Y = 1, "Y"
-    Z = 2, "Z"
-    A = 3, "Z"
+    X = 0, Literal["X"]
+    Y = 1, Literal["Y"]
+    Z = 2, Literal["Z"]
+    A = 3, Literal["Z"]
 
     def __new__(cls, value: int, lookup: str):
         member = object.__new__(cls)
         member._value_ = value
-        member.lookup = lookup
+        member._lookup = lookup
         return member
 
     @classmethod
     def get_all_axes(cls) -> List[Axis]:
         """Return all system axes of the robot."""
         return [cls.X, cls.Y, cls.Z, cls.A]
+
+    @property
+    def lookup(self) -> Literal["X", "Y", "Z", "P"]:
+        return self._lookup
 
 
 @dataclasses.dataclass(frozen=False)
@@ -258,4 +262,4 @@ class AxisConstraints:
         )
 
 
-SystemConstraints = Dict[Axis, AxisConstraints]
+SystemConstraints =  Dict[Axis.name, AxisConstraints]

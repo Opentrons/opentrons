@@ -23,7 +23,9 @@ from opentrons.config.types import RobotConfig, OT3Config, PipetteKind
 try:
     from opentrons_hardware.hardware_control.motion_planning import (
         MoveManager,
-        AxisConstraints
+        MoveTarget,
+        AxisConstraints,
+        Coordinates,
     )
 except ModuleNotFoundError:
     pass
@@ -142,8 +144,9 @@ class OT3API(
         self._pipette_kind = PipetteKind.NONE
         self._move_manager = MoveManager(
             constraints=robot_configs.get_system_constraints(
-                self._config, self._pipette_kind)
+                self._config, self._pipette_kind
             )
+        )
 
         ExecutionManagerProvider.__init__(self, loop, isinstance(backend, OT3Simulator))
         InstrumentHandlerProvider.__init__(self)
@@ -177,7 +180,8 @@ class OT3API(
     def pipette_kind(self, pipette_kind: PipetteKind):
         self._pipette_kind = pipette_kind
         self._move_manager.update_constraints(
-            robot_configs.get_system_constraints(self._config, pipette_kind))
+            robot_configs.get_system_constraints(self._config, pipette_kind)
+        )
 
     def _update_door_state(self, door_state: DoorState):
         mod_log.info(f"Updating the window switch status: {door_state}")
@@ -694,6 +698,11 @@ class OT3API(
             self._transforms.deck_calibration.attitude,
             self._transforms.carriage_offset,
         )
+        current_pos = machine_from_deck(
+            self._current_position,
+            self._transforms.deck_calibration.attitude,
+            self._transforms.carriage_offset,
+        )
         bounds = self._backend.axis_bounds
         to_check = {
             ax: machine_pos[ax.name]
@@ -703,6 +712,16 @@ class OT3API(
         check_motion_bounds(to_check, target_position, bounds, check_bounds)
         checked_maxes = max_speeds or {}
         str_maxes = {ax.name: val for ax, val in checked_maxes.items()}
+        origin = Coordinates.from_iter(iter(current_pos.values()))
+        # TODO: (2022-02-10) Use actual max speed for MoveTarget
+        move_target = MoveTarget.build(
+            position=Coordinates.from_iter(iter(machine_pos.values())), max_speed=500.0
+        )
+        blended, moves = self._move_manager.plan_motion(
+            origin=origin, target_list=[move_target]
+        )
+        assert blended, "Could not blend motion"
+        print(moves)
         async with contextlib.AsyncExitStack() as stack:
             if acquire_lock:
                 await stack.enter_async_context(self._motion_lock)
