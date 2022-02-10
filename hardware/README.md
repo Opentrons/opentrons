@@ -42,7 +42,7 @@ This alternative to `vcan` runs a simulated CAN network using a socket server. T
 opentrons_sim_can_bus [-h] [--port PORT]
 ```
 
-Example using default port (9898): `opentrons_sim_can_bus``
+Example using default port (9898): `opentrons_sim_can_bus`
 
 Example: `opentrons_sim_can_bus --port 12345`
 
