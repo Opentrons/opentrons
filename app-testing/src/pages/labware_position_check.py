@@ -84,11 +84,96 @@ class LabwarePositionCheck:
         "//button[text()='Confirm position, return tip to Slot  and home']",
     )
 
+    labware_position_check_complete: Tuple[str, str] = (
+        By.XPATH,
+        "//h3[text()='Labware Position Check Complete']",
+    )
+
+    deckmap_labware_check_complete: Tuple[str, str] = (
+        By.ID,
+        "LabwarePositionCheck_deckMap",
+    )
+
+    section_list_step0: Tuple[str, str] = (
+        By.ID,
+        "sectionList_step_0",
+    )
+
+    section_list_step1: Tuple[str, str] = (
+        By.ID,
+        "sectionList_step_1",
+    )
+
+    section_list_step2: Tuple[str, str] = (
+        By.ID,
+        "sectionList_step_2",
+    )
+
+    close_and_apply_labware_offset_data_button: Tuple[str, str] = (
+        By.ID,
+        "Lpc_summaryScreen_applyOffsetButton",
+    )
+
+    labware_success_toast: Tuple[str, str] = (
+        By.XPATH,
+        "//span[text()='Labware Position Check complete. 3 Labware Offsets created.']",
+    )
+
     @highlight
     def get_labware_position_check_button(self) -> WebElement:
         return WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(
                 LabwarePositionCheck.labware_setup_position_check_button
+            )
+        )
+
+    @highlight
+    def get_labware_success_toast(self) -> WebElement:
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(
+                LabwarePositionCheck.labware_setup_position_check_button
+            )
+        )
+
+    @highlight
+    def get_close_and_apply_labware_offset_data_button(self) -> WebElement:
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(
+                LabwarePositionCheck.close_and_apply_labware_offset_data_button
+            )
+        )
+
+    @highlight
+    def get_section_list_step2(self) -> WebElement:
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(LabwarePositionCheck.section_list_step2)
+        )
+
+    @highlight
+    def get_section_list_step1(self) -> WebElement:
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(LabwarePositionCheck.section_list_step1)
+        )
+
+    @highlight
+    def get_section_list_step0(self) -> WebElement:
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(LabwarePositionCheck.section_list_step0)
+        )
+
+    @highlight
+    def get_deckmap_labware_check_complete(self) -> WebElement:
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(
+                LabwarePositionCheck.deckmap_labware_check_complete
+            )
+        )
+
+    @highlight
+    def get_labware_position_check_complete(self) -> WebElement:
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(
+                LabwarePositionCheck.labware_position_check_complete
             )
         )
 
@@ -220,3 +305,6 @@ class LabwarePositionCheck:
 
     def click_confirm_position_returntip_slot_home(self) -> None:
         self.get_confirm_position_returntip_slot_home().click()
+
+    def click_get_close_and_apply_labware_offset_data_button(self) -> None:
+        self.get_close_and_apply_labware_offset_data_button().click()

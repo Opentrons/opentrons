@@ -229,8 +229,13 @@ def test_LPC_flow(
         labware_setup.click_labware_setup_text()
         labware_position_check = LabwarePositionCheck(driver)
         labware_position_check.click_labware_position_button()
-        labware_position_check.get_introScreen_labware_position_check_overview()
+        assert (
+            labware_position_check.get_introScreen_labware_position_check_overview().is_displayed()
+        )
         labware_position_check.click_begin_labware_position_check_button()
+        assert (
+            labware_position_check.get_how_to_tell_pipette_is_centered_link().is_displayed()
+        )
         labware_position_check.click_how_to_tell_pipette_is_centered_link()
         labware_setup.click_close_button()
         labware_position_check.click_reveal_all_jog_controls()
@@ -240,18 +245,38 @@ def test_LPC_flow(
         labware_position_check.click_forward_jog_button()
         labware_position_check.click_confirm_position_button_pickup_tip()
         labware_position_check.click_confirm_position_moveto_slot()
+        assert (
+            labware_position_check.get_how_to_tell_pipette_is_centered_link().is_displayed()
+        )
         labware_position_check.click_reveal_all_jog_controls()
         labware_position_check.click_back_jog_button()
         labware_position_check.click_down_jog_button()
         labware_position_check.click_right_jog_button()
         labware_position_check.click_forward_jog_button()
         labware_position_check.click_confirm_position_moveto_slot()
+        assert (
+            labware_position_check.get_how_to_tell_pipette_is_centered_link().is_displayed()
+        )
         labware_position_check.click_reveal_all_jog_controls()
         labware_position_check.click_back_jog_button()
         labware_position_check.click_down_jog_button()
         labware_position_check.click_right_jog_button()
         labware_position_check.click_forward_jog_button()
         labware_position_check.click_confirm_position_returntip_slot_home()
+        assert (
+            labware_position_check.get_labware_position_check_complete().is_displayed()
+        )
+        assert (
+            labware_position_check.get_deckmap_labware_check_complete().is_displayed()
+        )
+        assert labware_position_check.get_section_list_step0().is_displayed()
+        assert labware_position_check.get_section_list_step1().is_displayed()
+        assert labware_position_check.get_section_list_step2().is_displayed()
+        assert (
+            labware_position_check.get_close_and_apply_labware_offset_data_button().is_displayed()
+        )
+        labware_position_check.click_get_close_and_apply_labware_offset_data_button()
+        assert labware_position_check.get_labware_success_toast().is_displayed()
 
 
 def test_gen1_pipette(
