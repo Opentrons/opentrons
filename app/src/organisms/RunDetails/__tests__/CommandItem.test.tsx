@@ -99,7 +99,7 @@ describe('Run Details CommandItem', () => {
       analysisCommand: MOCK_ANALYSIS_COMMAND,
       runStatus: 'running',
       stepNumber: 1,
-      hasBeenRun: true,
+      isMostRecentCommand: true,
       runStartedAt: 'fake_timestamp',
     })
     expect(getByText('Step failed')).toHaveStyle(
@@ -108,14 +108,14 @@ describe('Run Details CommandItem', () => {
     getByText('Mock RunTimeCommand Text')
     getByText('Mock RunTimeCommand Timer')
   })
-  it('renders the green background if has been run but runCommandSummary not loaded', () => {
+  it('renders the green background if is most recent command but runCommandSummary not loaded', () => {
     const props = {
       runCommandSummary: null,
       analysisCommand: MOCK_ANALYSIS_COMMAND,
       runStatus: 'succeeded',
       stepNumber: 1,
-      hasBeenRun: true,
       runStartedAt: 'fake_timestamp',
+      isMostRecentCommand: true,
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
     expect(getByText('Mock RunTimeCommand Text')).toHaveStyle(
@@ -127,7 +127,7 @@ describe('Run Details CommandItem', () => {
       runCommandSummary: { ...MOCK_COMMAND_SUMMARY, status: 'succeeded' },
       analysisCommand: MOCK_ANALYSIS_COMMAND,
       runStatus: 'succeeded',
-      hasBeenRun: true,
+      isMostRecentCommand: true,
       stepNumber: 1,
       runStartedAt: 'fake_timestamp',
     } as React.ComponentProps<typeof CommandItem>
@@ -143,7 +143,7 @@ describe('Run Details CommandItem', () => {
       analysisCommand: MOCK_ANALYSIS_COMMAND,
       runStatus: 'running',
       stepNumber: 1,
-      hasBeenRun: true,
+      isMostRecentCommand: true,
       runStartedAt: 'fake_timestamp',
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
@@ -159,7 +159,7 @@ describe('Run Details CommandItem', () => {
       runCommandSummary: { ...MOCK_COMMAND_SUMMARY, status: 'queued' },
       analysisCommand: MOCK_ANALYSIS_COMMAND,
       runStatus: 'running',
-      hasBeenRun: false,
+      isMostRecentCommand: false,
       stepNumber: 1,
       runStartedAt: 'fake_timestamp',
     } as React.ComponentProps<typeof CommandItem>
@@ -174,7 +174,7 @@ describe('Run Details CommandItem', () => {
       runCommandSummary: { ...MOCK_COMMAND_SUMMARY, status: 'running' },
       analysisCommand: MOCK_ANALYSIS_COMMAND,
       runStatus: 'paused',
-      hasBeenRun: true,
+      isMostRecentCommand: true,
       stepNumber: 1,
       runStartedAt: 'fake_timestamp',
     } as React.ComponentProps<typeof CommandItem>
@@ -191,7 +191,7 @@ describe('Run Details CommandItem', () => {
       runCommandSummary: { ...MOCK_COMMAND_SUMMARY, status: 'running' },
       analysisCommand: MOCK_ANALYSIS_COMMAND,
       runStatus: 'blocked-by-open-door',
-      hasBeenRun: true,
+      isMostRecentCommand: true,
       stepNumber: 1,
       runStartedAt: 'fake_timestamp',
     } as React.ComponentProps<typeof CommandItem>
@@ -227,7 +227,7 @@ describe('Run Details CommandItem', () => {
       analysisCommand: MOCK_COMMENT_COMMAND,
       runStatus: 'running',
       stepNumber: 1,
-      hasBeenRun: true,
+      isMostRecentCommand: true,
       runStartedAt: 'fake_timestamp',
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
@@ -266,7 +266,7 @@ describe('Run Details CommandItem', () => {
       runCommandSummary: MOCK_PAUSE_COMMAND_SUMMARY,
       analysisCommand: MOCK_PAUSE_COMMAND,
       runStatus: 'paused',
-      hasBeenRun: true,
+      isMostRecentCommand: true,
       stepNumber: 1,
       runStartedAt: 'fake_timestamp',
     } as React.ComponentProps<typeof CommandItem>
