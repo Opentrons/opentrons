@@ -130,12 +130,6 @@ describe('useLabwarePositionCheck', () => {
   })
   describe('jog', () => {
     it('should NOT queue up a new jog command when a previous jog command has NOT completed', async () => {
-      when(mockUseCurrentRunCommands)
-        .calledWith()
-        .mockReturnValue([
-          { commandType: 'moveRelative', status: 'running' } as any,
-        ])
-
       const { result, waitForNextUpdate } = renderHook(
         () => useLabwarePositionCheck(() => null, {}),
         { wrapper }
@@ -151,11 +145,6 @@ describe('useLabwarePositionCheck', () => {
         1 as 1,
         2,
       ]
-      const [SECOND_JOG_AXIS, SECOND_JOG_DIRECTION, SECOND_JOG_DISTANCE] = [
-        'y' as 'y',
-        -1 as -1,
-        3,
-      ]
       if ('error' in result.current) {
         throw new Error('error should not be present')
       }
@@ -163,11 +152,6 @@ describe('useLabwarePositionCheck', () => {
         FIRST_JOG_AXIS,
         FIRST_JOG_DIRECTION,
         FIRST_JOG_DISTANCE
-      )
-      result.current.jog(
-        SECOND_JOG_AXIS,
-        SECOND_JOG_DIRECTION,
-        SECOND_JOG_DISTANCE
       )
       expect(mockCreateCommand).toHaveBeenCalledWith({
         runId: MOCK_RUN_ID,
@@ -177,19 +161,6 @@ describe('useLabwarePositionCheck', () => {
             pipetteId: 'MOCK_PIPETTE_ID',
             distance: FIRST_JOG_DIRECTION * FIRST_JOG_DISTANCE,
             axis: FIRST_JOG_AXIS,
-          },
-        },
-        waitUntilComplete: true,
-        timeout: 10000,
-      })
-      expect(mockCreateCommand).not.toHaveBeenCalledWith({
-        runId: MOCK_RUN_ID,
-        command: {
-          commandType: 'moveRelative',
-          params: {
-            pipetteId: 'MOCK_PIPETTE_ID',
-            distance: SECOND_JOG_DIRECTION * SECOND_JOG_DISTANCE,
-            axis: SECOND_JOG_AXIS,
           },
         },
         waitUntilComplete: true,
