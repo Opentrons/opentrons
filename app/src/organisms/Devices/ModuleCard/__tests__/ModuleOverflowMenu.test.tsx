@@ -9,11 +9,17 @@ import {
 } from '../../../../redux/modules/__fixtures__'
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 import { MagneticModuleSlideout } from '../MagneticModuleSlideout'
+import { ThermocyclerModuleSlideout } from '../ThermocyclerModuleSlideout'
 
 jest.mock('../MagneticModuleSlideout')
+jest.mock('../ThermocyclerModuleSlideout')
 
 const mockMagneticModuleSlideout = MagneticModuleSlideout as jest.MockedFunction<
   typeof MagneticModuleSlideout
+>
+
+const mockThermocyclerModuleSlideout = ThermocyclerModuleSlideout as jest.MockedFunction<
+  typeof ThermocyclerModuleSlideout
 >
 
 const render = (props: React.ComponentProps<typeof ModuleOverflowMenu>) => {
@@ -30,6 +36,9 @@ describe('ModuleOverflowMenu', () => {
     }
     mockMagneticModuleSlideout.mockReturnValue(
       <div>Mock mag module slideout</div>
+    )
+    mockThermocyclerModuleSlideout.mockReturnValue(
+      <div>Mock thermocycler module slideout</div>
     )
   })
   afterEach(() => {
