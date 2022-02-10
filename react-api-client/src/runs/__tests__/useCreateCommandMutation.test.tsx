@@ -37,7 +37,7 @@ describe('useCreateCommandMutation hook', () => {
   it('should issue the given command to the given run when callback is called', async () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockCreateCommand)
-      .calledWith(HOST_CONFIG, RUN_ID_1, mockAnonLoadCommand)
+      .calledWith(HOST_CONFIG, RUN_ID_1, mockAnonLoadCommand, {})
       .mockResolvedValue({ data: 'something' } as any)
 
     const { result, waitFor } = renderHook(() => useCreateCommandMutation(), {
