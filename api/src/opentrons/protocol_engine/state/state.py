@@ -146,11 +146,29 @@ class StateStore(StateView, ActionHandler):
     ) -> ReturnT:
         """Wait for a condition to become true, checking whenever state changes.
 
+        If the condition is already true, return immediately.
+
         !!! Warning:
+            All callers will be awoken concurrently, and they will run
+            concurrently to other tasks operating on the Protocol Engine.
+
+            This means:
+
+            1. When a caller inspects Protocol Engine state after being awoken,
+               the state will not necessarily still be in the exact condition
+               that it was waiting for. It may have changed even further.
+
+               For example, if the engine transitions through states A -> B -> C,
+               and a caller was waiting on B, it may see C when it wakes up.
+
+            2. If a caller does another `await` call after waking up,
+               it needs to account for the possibility that Protocol Engine state
+               changes from before that call to after it.
+
             In general, callers should not trigger a state change via
-            `handle_action` directly after a `wait_for`, as it may interfere
+            `handle_action` directly after a `wait_for()`, as it may interfere
             with other subscribers. If you _must_ trigger a state change, ensure
-            the change cannot affect the `condition`'s of other `wait_for`'s.
+            the change cannot affect the `condition`s of other `wait_for()`s.
 
         Arguments:
             condition: A function that returns a truthy value when the `await`
