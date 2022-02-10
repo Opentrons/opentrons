@@ -48,13 +48,13 @@ async def test_runner_with_python(
     pipette_id_captor = matchers.Captor()
     labware_id_captor = matchers.Captor()
 
-    expected_pipette = LoadedPipette.construct(
+    expected_pipette = LoadedPipette(
         id=pipette_id_captor,
         pipetteName=PipetteName.P300_SINGLE,
         mount=MountType.LEFT,
     )
 
-    expected_labware = LoadedLabware.construct(
+    expected_labware = LoadedLabware(
         id=labware_id_captor,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         loadName="opentrons_96_tiprack_300ul",
@@ -68,7 +68,7 @@ async def test_runner_with_python(
     assert expected_pipette in pipettes_result
     assert expected_labware in labware_result
 
-    expected_command = commands.PickUpTip.construct(
+    expected_command = commands.PickUpTip(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -123,7 +123,7 @@ async def test_runner_with_json(
     assert expected_pipette in pipettes_result
     assert expected_labware in labware_result
 
-    expected_command = commands.PickUpTip.construct(
+    expected_command = commands.PickUpTip(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -161,13 +161,13 @@ async def test_runner_with_legacy_python(
     pipette_id_captor = matchers.Captor()
     labware_id_captor = matchers.Captor()
 
-    expected_pipette = LoadedPipette.construct(
+    expected_pipette = LoadedPipette(
         id=pipette_id_captor,
         pipetteName=PipetteName.P300_SINGLE,
         mount=MountType.LEFT,
     )
 
-    expected_labware = LoadedLabware.construct(
+    expected_labware = LoadedLabware(
         id=labware_id_captor,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         loadName="opentrons_96_tiprack_300ul",
@@ -180,7 +180,7 @@ async def test_runner_with_legacy_python(
     assert expected_pipette in pipettes_result
     assert expected_labware in labware_result
 
-    expected_command = commands.PickUpTip.construct(
+    expected_command = commands.PickUpTip(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -218,13 +218,13 @@ async def test_runner_with_legacy_json(
     pipette_id_captor = matchers.Captor()
     labware_id_captor = matchers.Captor()
 
-    expected_pipette = LoadedPipette.construct(
+    expected_pipette = LoadedPipette(
         id=pipette_id_captor,
         pipetteName=PipetteName.P300_SINGLE,
         mount=MountType.LEFT,
     )
 
-    expected_labware = LoadedLabware.construct(
+    expected_labware = LoadedLabware(
         id=labware_id_captor,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         loadName="opentrons_96_tiprack_300ul",
@@ -237,7 +237,7 @@ async def test_runner_with_legacy_json(
     assert expected_pipette in pipettes_result
     assert expected_labware in labware_result
 
-    expected_command = commands.PickUpTip.construct(
+    expected_command = commands.PickUpTip(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,

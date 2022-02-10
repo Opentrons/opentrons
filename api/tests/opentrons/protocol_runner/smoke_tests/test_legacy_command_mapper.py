@@ -84,7 +84,7 @@ async def test_legacy_pick_up_tip(
 
     assert len(commands_result) == 9
 
-    assert commands_result[0] == commands.LoadLabware.construct(
+    assert commands_result[0] == commands.LoadLabware(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -95,7 +95,7 @@ async def test_legacy_pick_up_tip(
         result=tiprack_1_result_captor,
     )
 
-    assert commands_result[1] == commands.LoadLabware.construct(
+    assert commands_result[1] == commands.LoadLabware(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -106,7 +106,7 @@ async def test_legacy_pick_up_tip(
         result=tiprack_2_result_captor,
     )
 
-    assert commands_result[2] == commands.LoadPipette.construct(
+    assert commands_result[2] == commands.LoadPipette(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -117,7 +117,7 @@ async def test_legacy_pick_up_tip(
         result=pipette_left_result_captor,
     )
 
-    assert commands_result[3] == commands.LoadPipette.construct(
+    assert commands_result[3] == commands.LoadPipette(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -135,7 +135,7 @@ async def test_legacy_pick_up_tip(
     pipette_left_id = pipette_left_result_captor.value["pipetteId"]
     pipette_right_id = pipette_right_result_captor.value["pipetteId"]
 
-    assert commands_result[4] == commands.PickUpTip.construct(
+    assert commands_result[4] == commands.PickUpTip(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -150,7 +150,7 @@ async def test_legacy_pick_up_tip(
         result=commands.PickUpTipResult(),
     )
 
-    assert commands_result[5] == commands.PickUpTip.construct(
+    assert commands_result[5] == commands.PickUpTip(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -165,7 +165,7 @@ async def test_legacy_pick_up_tip(
         result=commands.PickUpTipResult(),
     )
 
-    assert commands_result[6] == commands.DropTip.construct(
+    assert commands_result[6] == commands.DropTip(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -180,7 +180,7 @@ async def test_legacy_pick_up_tip(
         result=commands.DropTipResult(),
     )
 
-    assert commands_result[7] == commands.PickUpTip.construct(
+    assert commands_result[7] == commands.PickUpTip(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -195,7 +195,7 @@ async def test_legacy_pick_up_tip(
         result=commands.PickUpTipResult(),
     )
 
-    assert commands_result[8] == commands.DropTip.construct(
+    assert commands_result[8] == commands.DropTip(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,

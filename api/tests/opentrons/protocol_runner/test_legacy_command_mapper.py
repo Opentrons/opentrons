@@ -52,7 +52,7 @@ def test_map_before_command() -> None:
 
     assert result == [
         pe_actions.UpdateCommandAction(
-            pe_commands.Custom.construct(
+            pe_commands.Custom(
                 id="command.COMMENT-0",
                 key="command.COMMENT-0",
                 status=pe_commands.CommandStatus.RUNNING,
@@ -91,7 +91,7 @@ def test_map_after_command() -> None:
 
     assert result == [
         pe_actions.UpdateCommandAction(
-            pe_commands.Custom.construct(
+            pe_commands.Custom(
                 id="command.COMMENT-0",
                 key="command.COMMENT-0",
                 status=pe_commands.CommandStatus.SUCCEEDED,
@@ -183,7 +183,7 @@ def test_command_stack() -> None:
 
     assert result == [
         pe_actions.UpdateCommandAction(
-            pe_commands.Custom.construct(
+            pe_commands.Custom(
                 id="command.COMMENT-0",
                 key="command.COMMENT-0",
                 status=pe_commands.CommandStatus.RUNNING,
@@ -196,7 +196,7 @@ def test_command_stack() -> None:
             )
         ),
         pe_actions.UpdateCommandAction(
-            pe_commands.Custom.construct(
+            pe_commands.Custom(
                 id="command.COMMENT-1",
                 key="command.COMMENT-1",
                 status=pe_commands.CommandStatus.RUNNING,
@@ -209,7 +209,7 @@ def test_command_stack() -> None:
             )
         ),
         pe_actions.UpdateCommandAction(
-            pe_commands.Custom.construct(
+            pe_commands.Custom(
                 id="command.COMMENT-0",
                 key="command.COMMENT-0",
                 status=pe_commands.CommandStatus.SUCCEEDED,
@@ -242,21 +242,21 @@ def test_map_labware_load(minimal_labware_def: LabwareDefinition) -> None:
         on_module=False,
         offset_id="labware-offset-id-123",
     )
-    expected_output = pe_commands.LoadLabware.construct(
+    expected_output = pe_commands.LoadLabware(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=pe_commands.CommandStatus.SUCCEEDED,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        params=pe_commands.LoadLabwareParams.construct(
+        params=pe_commands.LoadLabwareParams(
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             namespace="some_namespace",
             loadName="some_load_name",
             version=123,
             labwareId=None,
         ),
-        result=pe_commands.LoadLabwareResult.construct(
+        result=pe_commands.LoadLabwareResult(
             labwareId=matchers.IsA(str),
             # Trusting that the exact fields within in the labware definition
             # get passed through correctly.
@@ -274,17 +274,17 @@ def test_map_instrument_load() -> None:
         instrument_load_name="p1000_single_gen2",
         mount=Mount.LEFT,
     )
-    expected_output = pe_commands.LoadPipette.construct(
+    expected_output = pe_commands.LoadPipette(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=pe_commands.CommandStatus.SUCCEEDED,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        params=pe_commands.LoadPipetteParams.construct(
+        params=pe_commands.LoadPipetteParams(
             pipetteName=PipetteName.P1000_SINGLE_GEN2, mount=MountType.LEFT
         ),
-        result=pe_commands.LoadPipetteResult.construct(pipetteId=matchers.IsA(str)),
+        result=pe_commands.LoadPipetteResult(pipetteId=matchers.IsA(str)),
     )
 
     output = LegacyCommandMapper().map_equipment_load(input)
@@ -309,19 +309,19 @@ def test_map_module_load(
         module_data_provider.get_definition(ModuleModel.TEMPERATURE_MODULE_V2)
     ).then_return(test_definition)
 
-    expected_output = pe_commands.LoadModule.construct(
+    expected_output = pe_commands.LoadModule(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=pe_commands.CommandStatus.SUCCEEDED,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        params=pe_commands.LoadModuleParams.construct(
+        params=pe_commands.LoadModuleParams(
             model=ModuleModel.TEMPERATURE_MODULE_V1,
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             moduleId=matchers.IsA(str),
         ),
-        result=pe_commands.LoadModuleResult.construct(
+        result=pe_commands.LoadModuleResult(
             moduleId=matchers.IsA(str),
             serialNumber="module-serial",
             definition=test_definition,
@@ -346,21 +346,21 @@ def test_map_module_labware_load(minimal_labware_def: LabwareDefinition) -> None
         offset_id="labware-offset-id-123",
     )
 
-    expected_output = pe_commands.LoadLabware.construct(
+    expected_output = pe_commands.LoadLabware(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=pe_commands.CommandStatus.SUCCEEDED,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        params=pe_commands.LoadLabwareParams.construct(
+        params=pe_commands.LoadLabwareParams(
             location=ModuleLocation(moduleId="module-123"),
             namespace="some_namespace",
             loadName="some_load_name",
             version=123,
             labwareId=None,
         ),
-        result=pe_commands.LoadLabwareResult.construct(
+        result=pe_commands.LoadLabwareResult(
             labwareId=matchers.IsA(str),
             definition=matchers.Anything(),
             offsetId="labware-offset-id-123",
@@ -397,7 +397,7 @@ def test_map_pause() -> None:
 
     assert result == [
         pe_actions.UpdateCommandAction(
-            pe_commands.Pause.construct(
+            pe_commands.Pause(
                 id="command.PAUSE-0",
                 key="command.PAUSE-0",
                 status=pe_commands.CommandStatus.RUNNING,
@@ -407,7 +407,7 @@ def test_map_pause() -> None:
             )
         ),
         pe_actions.UpdateCommandAction(
-            pe_commands.Pause.construct(
+            pe_commands.Pause(
                 id="command.PAUSE-0",
                 key="command.PAUSE-0",
                 status=pe_commands.CommandStatus.SUCCEEDED,

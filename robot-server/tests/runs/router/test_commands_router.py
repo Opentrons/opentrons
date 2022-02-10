@@ -32,7 +32,7 @@ async def test_create_run_command(decoy: Decoy, engine_store: EngineStore) -> No
         params=pe_commands.PauseParams(message="Hello")
     )
 
-    run = Run.construct(
+    run = Run(
         id="run-id",
         protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
@@ -77,7 +77,7 @@ async def test_create_run_command_not_current(
         params=pe_commands.PauseParams(message="Hello")
     )
 
-    run = Run.construct(
+    run = Run(
         id="run-id",
         protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
@@ -103,7 +103,7 @@ async def test_create_run_command_not_current(
 
 async def test_get_run_commands(decoy: Decoy, engine_store: EngineStore) -> None:
     """It should return a list of all commands in a run."""
-    run = Run.construct(
+    run = Run(
         id="run-id",
         protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
@@ -142,7 +142,7 @@ async def test_get_run_commands(decoy: Decoy, engine_store: EngineStore) -> None
     )
 
     assert result.content.data == [
-        RunCommandSummary.construct(
+        RunCommandSummary(
             id="command-id",
             key="command-key",
             commandType="pause",
@@ -166,7 +166,7 @@ async def test_get_run_commands(decoy: Decoy, engine_store: EngineStore) -> None
 
 async def test_get_run_commands_empty(decoy: Decoy, engine_store: EngineStore) -> None:
     """It should return an empty commands list if no commands."""
-    run = Run.construct(
+    run = Run(
         id="run-id",
         protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
@@ -212,7 +212,7 @@ async def test_get_run_command_by_id(
         params=pe_commands.MoveToWellParams(pipetteId="a", labwareId="b", wellName="c"),
     )
 
-    run = Run.construct(
+    run = Run(
         id="run-id",
         protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
@@ -247,7 +247,7 @@ async def test_get_run_command_missing_command(
     """It should 404 if you attempt to get a non-existent command."""
     key_error = pe_errors.CommandDoesNotExistError("oh no")
 
-    run = Run.construct(
+    run = Run(
         id="run-id",
         protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
