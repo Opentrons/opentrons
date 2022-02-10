@@ -39,3 +39,8 @@ export interface CommandsData {
   meta: GetCommandsParams & { totalLength: number }
   links: CommandsLinks
 }
+
+export interface CreateCommandParams {
+  waitUntilComplete?: boolean
+  timeout?: number
+}
