@@ -29,6 +29,7 @@ import { useModuleRenderInfoById } from '../../hooks'
 import styles from '../../styles.css'
 
 import type { Dispatch } from '../../../../redux/types'
+import { HeaterShakerBanner } from './HeaterShakerSetupWizard/HeaterShakerBanner'
 
 const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
@@ -85,6 +86,19 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
           onCloseClick={() => setShowMultipleModulesModal(false)}
         />
       )}
+
+      {map(moduleRenderInfoById, ({ moduleDef }) => {
+        const { model } = moduleDef
+        return (
+          <>
+            {/* @ts-expect-error this will say false always until heaterShakerV1 is added to the model */}
+            {model === 'heaterShakerV1' && (
+              <HeaterShakerBanner moduleDef={moduleDef} />
+            )}
+          </>
+        )
+      })}
+
       {hasADuplicateModule ? (
         <Btn
           as={Link}
