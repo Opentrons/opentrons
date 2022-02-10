@@ -39,6 +39,7 @@ export function HeaterShakerBanner(
             color={COLORS.darkGrey}
             textTransform={TEXT_TRANSFORM_UPPERCASE}
             fontSize={TYPOGRAPHY.fontSizeH6}
+            data-testid={`heater_shaker_banner_slot`}
           >
             {/* TODO immediately: add in slot number, its stubbed for now until we can access protocol context */}
             {'Slot 1'}
@@ -47,6 +48,7 @@ export function HeaterShakerBanner(
             paddingTop={SPACING.spacing2}
             color={COLORS.darkBlack}
             fontSize={TYPOGRAPHY.fontSizeP}
+            data-testid={`heater_shaker_banner_${moduleDef.displayName}`}
           >
             {moduleDef.displayName}
           </Text>
@@ -54,6 +56,7 @@ export function HeaterShakerBanner(
             paddingTop={SPACING.spacing2}
             color={COLORS.darkGrey}
             fontSize={TYPOGRAPHY.fontSizeH6}
+            data-testid={`heater_shaker_banner_body`}
           >
             {t('banner_body')}
           </Text>
@@ -63,6 +66,7 @@ export function HeaterShakerBanner(
           fontSize={TYPOGRAPHY.fontSizeH6}
           alignItems={ALIGN_CENTER}
           paddingRight={SPACING.spacing3}
+          data-testid={`heater_shaker_banner_open_wizard`}
           onClick={() => console.log('open wizard')}
         >
           {t('banner_wizard_link')}
