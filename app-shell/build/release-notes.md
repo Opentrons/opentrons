@@ -6,7 +6,7 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# Opentrons App Changes in 5.0.0-beta.8
+# Opentrons App Changes in 5.0.0-beta.9
 
 Welcome to the beta release of v5.0.0 release of the Opentrons App! After you update your app, please be sure to update any OT-2's you will be using with this beta.
 
@@ -26,7 +26,8 @@ This is beta software! You may experience unexpected crashes or missing features
 
 Keep an eye on this space as we release new versions of the beta.
 
-- We have addressed various performance issues and you should no longer encounter freezes with longer protocols.
+- We have decreased jog latency in Labware Position Check
+- We have addressed some inconsitency in labeling and viewing the current command in a run
 
 ## Known Issues
 
