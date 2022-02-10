@@ -54,7 +54,6 @@ interface CommandRuntimeInfo {
   analysisCommand: RunTimeCommand | null // analysisCommand will only be null if protocol is nondeterministic
   runCommandSummary: RunCommandSummary | null
 }
-
 export function CommandList(): JSX.Element | null {
   const { t } = useTranslation('run_details')
   const protocolData: ProtocolFile<{}> | null = useProtocolDetails()
@@ -63,14 +62,19 @@ export function CommandList(): JSX.Element | null {
   const runStatus = useRunStatus()
   const listInnerRef = React.useRef<HTMLDivElement>(null)
   const currentItemRef = React.useRef<HTMLDivElement>(null)
+  const firstPostInitialPlayRunCommandIndex = React.useRef<number | null>(null)
   const [isDeterministic, setIsDeterministic] = React.useState<boolean>(true)
   const [windowIndex, setWindowIndex] = React.useState<number>(0)
   const currentRunId = useCurrentRunId()
   const windowFirstCommandIndex = (WINDOW_SIZE - WINDOW_OVERLAP) * windowIndex
+  const prePlayCommandCount =
+    firstPostInitialPlayRunCommandIndex.current != null
+      ? firstPostInitialPlayRunCommandIndex.current
+      : 0
   const { data: commandsData } = useAllCommandsQuery(
     currentRunId,
     {
-      cursor: windowFirstCommandIndex,
+      cursor: windowFirstCommandIndex + prePlayCommandCount,
       pageLength: WINDOW_SIZE,
     },
     {
@@ -82,6 +86,7 @@ export function CommandList(): JSX.Element | null {
   const currentCommandKey = commandsData?.links?.current?.meta?.key ?? null
   const currentCommandCreatedAt =
     commandsData?.links?.current?.meta?.createdAt ?? null
+  const runTotalCommandCount = commandsData?.meta.totalLength
 
   const [
     isInitiallyJumpingToCurrent,
@@ -162,6 +167,10 @@ export function CommandList(): JSX.Element | null {
   const currentCommandIndex = currentCommandList.findIndex(
     command => command?.analysisCommand?.key === currentCommandKey
   )
+  if (currentCommandIndex >= 0 && runTotalCommandCount != null) {
+    firstPostInitialPlayRunCommandIndex.current =
+      runTotalCommandCount - 1 - currentCommandIndex
+  }
 
   // if the run's current command key doesn't exist in the analysis commands
   if (runCommands.length > 0 && currentCommandIndex < 0 && isDeterministic) {
@@ -182,6 +191,11 @@ export function CommandList(): JSX.Element | null {
       }
     }
   }
+
+  // We normally want to initially jump to the last window that contains
+  // the current command. But, if the current item is in the final window then we
+  // actually want the first window that contains the current command, in order to show as many
+  // commands as possible and avoid an extra small final window
   const isCurrentCommandInFinalWindow =
     currentCommandList.length - 1 - currentCommandIndex <= WINDOW_SIZE
 
@@ -192,14 +206,17 @@ export function CommandList(): JSX.Element | null {
     Math.max(currentCommandIndex + 1 - (WINDOW_SIZE - WINDOW_OVERLAP), 0) /
       (WINDOW_SIZE - WINDOW_OVERLAP)
   )
-  const indexOfWindowContainingCurrentItem = isCurrentCommandInFinalWindow
-    ? indexOfFirstWindowContainingCurrentCommand
-    : indexOfLastWindowContainingCurrentCommand
 
   // when we initially mount, if the current item is not in view, jump to it
   React.useEffect(() => {
-    if (indexOfWindowContainingCurrentItem !== windowIndex) {
-      setWindowIndex(Math.max(indexOfWindowContainingCurrentItem, 0))
+    if (
+      indexOfFirstWindowContainingCurrentCommand !== windowIndex &&
+      indexOfLastWindowContainingCurrentCommand !== windowIndex
+    ) {
+      const targetWindow = isCurrentCommandInFinalWindow
+        ? indexOfFirstWindowContainingCurrentCommand
+        : indexOfLastWindowContainingCurrentCommand
+      setWindowIndex(Math.max(targetWindow, 0))
     }
     setIsInitiallyJumpingToCurrent(true)
   }, [])
@@ -208,7 +225,8 @@ export function CommandList(): JSX.Element | null {
   React.useEffect(() => {
     if (
       isInitiallyJumpingToCurrent &&
-      windowIndex === indexOfWindowContainingCurrentItem
+      (windowIndex === indexOfFirstWindowContainingCurrentCommand ||
+        windowIndex === indexOfLastWindowContainingCurrentCommand)
     ) {
       currentItemRef.current?.scrollIntoView({ behavior: 'smooth' })
       setIsInitiallyJumpingToCurrent(false)
