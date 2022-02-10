@@ -307,21 +307,14 @@ class SimpleLHCommandPayload(
     rate: float
 
 
-class SimplePairedLHCommandPayload(
-    TextOnlyPayload, MultiLocationPayload, MultiInstrumentPayload
-):
-    volume: float
-    rate: float
-
-
 class AspirateCommand(TypedDict):
     name: Literal["command.ASPIRATE"]
-    payload: Union[SimpleLHCommandPayload, SimplePairedLHCommandPayload]
+    payload: SimpleLHCommandPayload
 
 
 class DispenseCommand(TypedDict):
     name: Literal["command.DISPENSE"]
-    payload: Union[SimpleLHCommandPayload, SimplePairedLHCommandPayload]
+    payload: SimpleLHCommandPayload
 
 
 class ConsolidateCommandPayload(
@@ -370,16 +363,9 @@ class MixCommandPayload(
     repetitions: int
 
 
-class PairedMixCommandPayload(
-    TextOnlyPayload, OptionalMultiLocationPayload, MultiInstrumentPayload
-):
-    volume: float
-    repetitions: int
-
-
 class MixCommand(TypedDict):
     name: Literal["command.MIX"]
-    payload: Union[MixCommandPayload, PairedMixCommandPayload]
+    payload: MixCommandPayload
 
 
 class BlowOutCommandPayload(
@@ -388,30 +374,18 @@ class BlowOutCommandPayload(
     pass
 
 
-class PairedBlowOutCommandPayload(
-    TextOnlyPayload, OptionalMultiLocationPayload, MultiInstrumentPayload
-):
-    pass
-
-
 class BlowOutCommand(TypedDict):
     name: Literal["command.BLOW_OUT"]
-    payload: Union[BlowOutCommandPayload, PairedBlowOutCommandPayload]
+    payload: BlowOutCommandPayload
 
 
 class TouchTipCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
     pass
 
 
-class PairedTouchTipCommandPayload(
-    TextOnlyPayload, OptionalMultiLocationPayload, MultiInstrumentPayload
-):
-    pass
-
-
 class TouchTipCommand(TypedDict):
     name: Literal["command.TOUCH_TIP"]
-    payload: Union[TouchTipCommandPayload, PairedTouchTipCommandPayload]
+    payload: TouchTipCommandPayload
 
 
 class AirGapCommandPayload(TextOnlyPayload):
@@ -438,15 +412,9 @@ class PickUpTipCommandPayload(
     pass
 
 
-class PairedPickUpTipCommandPayload(
-    TextOnlyPayload, MultiLocationPayload, MultiInstrumentPayload
-):
-    pass
-
-
 class PickUpTipCommand(TypedDict):
     name: Literal["command.PICK_UP_TIP"]
-    payload: Union[PickUpTipCommandPayload, PairedPickUpTipCommandPayload]
+    payload: PickUpTipCommandPayload
     pass
 
 
@@ -456,30 +424,18 @@ class DropTipCommandPayload(
     pass
 
 
-class PairedDropTipCommandPayload(
-    TextOnlyPayload, MultiLocationPayload, MultiInstrumentPayload
-):
-    pass
-
-
 class DropTipCommand(TypedDict):
     name: Literal["command.DROP_TIP"]
-    payload: Union[DropTipCommandPayload, PairedDropTipCommandPayload]
+    payload: DropTipCommandPayload
 
 
 class MoveToCommand(TypedDict):
     name: Literal["command.MOVE_TO"]
-    payload: Union[MoveToCommandPayload, PairedMoveToCommandPayload]
+    payload: MoveToCommandPayload
 
 
 class MoveToCommandPayload(
     TextOnlyPayload, SingleLocationPayload, SingleInstrumentPayload
-):
-    pass
-
-
-class PairedMoveToCommandPayload(
-    TextOnlyPayload, MultiLocationPayload, MultiInstrumentPayload
 ):
     pass
 
@@ -541,20 +497,14 @@ CommandPayload = Union[
     AirGapCommandPayload,
     ReturnTipCommandPayload,
     DropTipCommandPayload,
-    PairedDropTipCommandPayload,
     PickUpTipCommandPayload,
-    PairedPickUpTipCommandPayload,
     TouchTipCommandPayload,
-    PairedTouchTipCommandPayload,
     BlowOutCommandPayload,
-    PairedBlowOutCommandPayload,
     MixCommandPayload,
-    PairedMixCommandPayload,
     TransferCommandPayload,
     DistributeCommandPayload,
     ConsolidateCommandPayload,
     SimpleLHCommandPayload,
-    SimplePairedLHCommandPayload,
     HomeCommandPayload,
     ThermocyclerExecuteProfileCommandPayload,
     ThermocyclerSetBlockTempCommandPayload,
@@ -563,7 +513,6 @@ CommandPayload = Union[
     PauseCommandPayload,
     DelayCommandPayload,
     MoveToCommandPayload,
-    PairedMoveToCommandPayload,
 ]
 
 

@@ -36,7 +36,6 @@ from .types import (
     DoorStateNotification,
     ErrorMessageNotification,
     HardwareEventHandler,
-    PipettePair,
     HardwareAction,
     MotionChecks,
     PauseType,
@@ -523,14 +522,13 @@ class API(
                 # either we were passed False for our acquire_lock and we
                 # should pass it on, or we acquired the lock above and
                 # shouldn't do it again
-                target_pos, _, secondary_z = target_position_from_plunger(
-                    checked_mount, (instr.config.bottom,), self._current_position
+                target_pos = target_position_from_plunger(
+                    checked_mount, instr.config.bottom, self._current_position
                 )
                 await self._move(
                     target_pos,
                     acquire_lock=False,
                     home_flagged_axes=False,
-                    secondary_z=secondary_z,
                 )
 
     async def home_plunger(self, mount: top_types.Mount):
@@ -631,7 +629,7 @@ class API(
 
     async def move_to(
         self,
-        mount: Union[top_types.Mount, PipettePair],
+        mount: top_types.Mount,
         abs_position: top_types.Point,
         speed: Optional[float] = None,
         critical_point: Optional[CriticalPoint] = None,
@@ -644,7 +642,7 @@ class API(
         if not self._current_position:
             await self.home()
 
-        target_position, primary_mount, secondary_z = target_position_from_absolute(
+        target_position = target_position_from_absolute(
             mount,
             abs_position,
             partial(self.critical_point_for, cp_override=critical_point),
@@ -652,14 +650,12 @@ class API(
             top_types.Point(0, 0, 0),
         )
 
-        await self._cache_and_maybe_retract_mount(primary_mount)
-        await self._move(
-            target_position, speed=speed, max_speeds=max_speeds, secondary_z=secondary_z
-        )
+        await self._cache_and_maybe_retract_mount(mount)
+        await self._move(target_position, speed=speed, max_speeds=max_speeds)
 
     async def move_rel(
         self,
-        mount: Union[top_types.Mount, PipettePair],
+        mount: top_types.Mount,
         delta: top_types.Point,
         speed: Optional[float] = None,
         max_speeds: Optional[Dict[Axis, float]] = None,
@@ -682,20 +678,19 @@ class API(
             else:
                 await self.home()
 
-        target_position, primary_mount, secondary_z = target_position_from_relative(
+        target_position = target_position_from_relative(
             mount, delta, self._current_position
         )
-        axes_moving = [Axis.X, Axis.Y, Axis.by_mount(primary_mount), secondary_z]
+        axes_moving = [Axis.X, Axis.Y, Axis.by_mount(mount)]
         if fail_on_not_homed and not self._backend.is_homed(
             [axis.name for axis in axes_moving if axis is not None]
         ):
             raise mhe
-        await self._cache_and_maybe_retract_mount(primary_mount)
+        await self._cache_and_maybe_retract_mount(mount)
         await self._move(
             target_position,
             speed=speed,
             max_speeds=max_speeds,
-            secondary_z=secondary_z,
             check_bounds=check_bounds,
         )
 
@@ -719,9 +714,8 @@ class API(
         home_flagged_axes: bool = True,
         max_speeds: Dict[Axis, float] = None,
         acquire_lock: bool = True,
-        secondary_z: Axis = None,
         check_bounds: MotionChecks = MotionChecks.NONE,
-    ):
+    ) -> None:
         """Worker function to apply robot motion.
 
         Robot motion means the kind of motions that are relevant to the robot,
@@ -735,7 +729,6 @@ class API(
         """
         machine_pos = machine_from_deck(
             target_position,
-            secondary_z,
             self._robot_calibration.deck_calibration.attitude,
             top_types.Point(0, 0, 0),
         )
@@ -783,19 +776,12 @@ class API(
         return await self._backend.fast_home(converted_axes, margin)
 
     @ExecutionManagerProvider.wait_for_running
-    async def retract(
-        self, mount: Union[top_types.Mount, PipettePair], margin: float = 10
-    ):
+    async def retract(self, mount: top_types.Mount, margin: float = 10):
         """Pull the specified mount up to its home position.
 
         Works regardless of critical point or home status.
         """
-        if isinstance(mount, PipettePair):
-            primary_ax = Axis.by_mount(mount.primary).name.upper()
-            secondary_ax = Axis.by_mount(mount.secondary).name.upper()
-            smoothie_ax: Tuple[str, ...] = (primary_ax, secondary_ax)
-        else:
-            smoothie_ax = (Axis.by_mount(mount).name.upper(),)
+        smoothie_ax = (Axis.by_mount(mount).name.upper(),)
 
         async with self._motion_lock:
             smoothie_pos = await self._fast_home(smoothie_ax, margin)
@@ -853,72 +839,65 @@ class API(
         pass
 
     # Pipette action API
-    async def prepare_for_aspirate(
-        self, mount: Union[top_types.Mount, PipettePair], rate: float = 1.0
-    ):
+    async def prepare_for_aspirate(self, mount: top_types.Mount, rate: float = 1.0):
         """
         Prepare the pipette for aspiration.
         """
-        instruments = self.instruments_for(mount)
-        self.ready_for_tip_action(instruments, HardwareAction.PREPARE_ASPIRATE)
+        instrument = self.get_pipette(mount)
+        self.ready_for_tip_action(instrument, HardwareAction.PREPARE_ASPIRATE)
 
-        with_zero = filter(lambda i: i[0].current_volume == 0, instruments)
-        for instr in with_zero:
+        if instrument.current_volume == 0:
             speed = self.plunger_speed(
-                instr[0], instr[0].blow_out_flow_rate, "aspirate"
+                instrument, instrument.blow_out_flow_rate, "aspirate"
             )
-            bottom = (instr[0].config.bottom,)
-            target, _, secondary_z = target_position_from_plunger(
-                instr[1], bottom, self._current_position
-            )
+            bottom = instrument.config.bottom
+            target = target_position_from_plunger(mount, bottom, self._current_position)
             await self._move(
                 target,
                 speed=(speed * rate),
-                secondary_z=secondary_z,
                 home_flagged_axes=False,
             )
-            instr[0].ready_to_aspirate = True
+            instrument.ready_to_aspirate = True
 
     async def aspirate(
         self,
-        mount: Union[top_types.Mount, PipettePair],
+        mount: top_types.Mount,
         volume: Optional[float] = None,
         rate: float = 1.0,
-    ):
+    ) -> None:
         """
         Aspirate a volume of liquid (in microliters/uL) using this pipette.
         """
         aspirate_spec = self.plan_check_aspirate(mount, volume, rate)
-        target_pos, _, secondary_z = target_position_from_plunger(
+        if not aspirate_spec:
+            return
+        target_pos = target_position_from_plunger(
             mount,
-            [spec.plunger_distance for spec in aspirate_spec],
+            aspirate_spec.plunger_distance,
             self._current_position,
         )
         try:
             self._backend.set_active_current(
-                {spec.axis: spec.current for spec in aspirate_spec}
+                {aspirate_spec.axis: aspirate_spec.current}
             )
             await self._move(
                 target_pos,
-                speed=aspirate_spec[0].speed,
-                secondary_z=secondary_z,
+                speed=aspirate_spec.speed,
                 home_flagged_axes=False,
             )
         except Exception:
             self._log.exception("Aspirate failed")
-            for spec in aspirate_spec:
-                spec.instr.set_current_volume(0)
+            aspirate_spec.instr.set_current_volume(0)
             raise
         else:
-            for spec in aspirate_spec:
-                spec.instr.add_current_volume(spec.volume)
+            aspirate_spec.instr.add_current_volume(aspirate_spec.volume)
 
     async def dispense(
         self,
-        mount: Union[top_types.Mount, PipettePair],
+        mount: top_types.Mount,
         volume: Optional[float] = None,
         rate: float = 1.0,
-    ):
+    ) -> None:
         """
         Dispense a volume of liquid in microliters(uL) using this pipette.
         """
@@ -926,68 +905,61 @@ class API(
         dispense_spec = self.plan_check_dispense(mount, volume, rate)
         if not dispense_spec:
             return
-        target_pos, _, secondary_z = target_position_from_plunger(
+        target_pos = target_position_from_plunger(
             mount,
-            [spec.plunger_distance for spec in dispense_spec],
+            dispense_spec.plunger_distance,
             self._current_position,
         )
 
         try:
             self._backend.set_active_current(
-                {spec.axis: spec.current for spec in dispense_spec}
+                {dispense_spec.axis: dispense_spec.current}
             )
             await self._move(
                 target_pos,
-                speed=dispense_spec[0].speed,
-                secondary_z=secondary_z,
+                speed=dispense_spec.speed,
                 home_flagged_axes=False,
             )
         except Exception:
             self._log.exception("Dispense failed")
-            for spec in dispense_spec:
-                spec.instr.set_current_volume(0)
+            dispense_spec.instr.set_current_volume(0)
             raise
         else:
-            for spec in dispense_spec:
-                spec.instr.remove_current_volume(spec.volume)
+            dispense_spec.instr.remove_current_volume(dispense_spec.volume)
 
-    async def blow_out(self, mount: Union[top_types.Mount, PipettePair]):
+    async def blow_out(self, mount: top_types.Mount) -> None:
         """
         Force any remaining liquid to dispense. The liquid will be dispensed at
         the current location of pipette
         """
         blowout_spec = self.plan_check_blow_out(mount)
-        self._backend.set_active_current(
-            {spec.axis: spec.current for spec in blowout_spec}
-        )
-        target_pos, _, secondary_z = target_position_from_plunger(
+        self._backend.set_active_current({blowout_spec.axis: blowout_spec.current})
+        target_pos = target_position_from_plunger(
             mount,
-            [spec.plunger_distance for spec in blowout_spec],
+            blowout_spec.plunger_distance,
             self._current_position,
         )
 
         try:
             await self._move(
                 target_pos,
-                speed=blowout_spec[0].speed,
-                secondary_z=secondary_z,
+                speed=blowout_spec.speed,
                 home_flagged_axes=False,
             )
         except Exception:
             self._log.exception("Blow out failed")
             raise
         finally:
-            for spec in blowout_spec:
-                spec.instr.set_current_volume(0)
-                spec.instr.ready_to_aspirate = False
+            blowout_spec.instr.set_current_volume(0)
+            blowout_spec.instr.ready_to_aspirate = False
 
     async def pick_up_tip(
         self,
-        mount: Union[top_types.Mount, PipettePair],
+        mount: top_types.Mount,
         tip_length: float,
         presses: Optional[int] = None,
         increment: Optional[float] = None,
-    ):
+    ) -> None:
         """
         Pick up tip from current location.
         """
@@ -996,28 +968,25 @@ class API(
             mount, tip_length, presses, increment
         )
         self._backend.set_active_current(spec.plunger_currents)
-        target_absolute, _, secondary_z = target_position_from_plunger(
+        target_absolute = target_position_from_plunger(
             mount, spec.plunger_prep_pos, self._current_position
         )
         await self._move(
             target_absolute,
-            secondary_z=secondary_z,
             home_flagged_axes=False,
         )
 
         for press in spec.presses:
             with self._backend.save_current():
                 self._backend.set_active_current(press.current)
-                target_down, _, secondary_z = target_position_from_relative(
+                target_down = target_position_from_relative(
                     mount, press.relative_down, self._current_position
                 )
-                await self._move(
-                    target_down, speed=press.speed, secondary_z=secondary_z
-                )
-            target_up, _, secondary_z = target_position_from_relative(
+                await self._move(target_down, speed=press.speed)
+            target_up = target_position_from_relative(
                 mount, press.relative_up, self._current_position
             )
-            await self._move(target_up, secondary_z=secondary_z)
+            await self._move(target_up)
         _add_tip_to_instrs()
         # neighboring tips tend to get stuck in the space between
         # the volume chamber and the drop-tip sleeve on p1000.
@@ -1027,22 +996,19 @@ class API(
 
         await self.retract(mount, spec.retract_target)
 
-    async def drop_tip(
-        self, mount: Union[top_types.Mount, PipettePair], home_after=True
-    ):
+    async def drop_tip(self, mount: top_types.Mount, home_after=True) -> None:
         """Drop tip at the current location."""
 
         spec, _remove = self.plan_check_drop_tip(mount, home_after)
 
         for move in spec.drop_moves:
             self._backend.set_active_current(move.current)
-            target_pos, _, secondary_z = target_position_from_plunger(
+            target_pos = target_position_from_plunger(
                 mount, move.target_position, self._current_position
             )
             await self._move(
                 target_pos,
                 speed=move.speed,
-                secondary_z=secondary_z,
                 home_flagged_axes=False,
             )
             if move.home_after:

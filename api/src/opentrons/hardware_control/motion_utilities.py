@@ -1,87 +1,49 @@
 """Utilities for calculating motion correctly."""
 
-from typing import Callable, Dict, Optional, Tuple, Union, Iterator, Sequence
+from typing import Callable, Dict
 from collections import OrderedDict
 from opentrons.types import Mount, Point
 from opentrons.calibration_storage.types import AttitudeMatrix
 from opentrons.util import linal
-from .types import PipettePair, Axis
+from .types import Axis
 from functools import lru_cache
-
-
-def mounts(z_axis: Union[PipettePair, Mount]) -> Tuple[Mount, Optional[Mount]]:
-    if isinstance(z_axis, PipettePair):
-        return (z_axis.primary, z_axis.secondary)
-    else:
-        return (z_axis, None)
-
-
-def mounts_enumerable(z_axis: Union[PipettePair, Mount]) -> Iterator[Mount]:
-    mount_or_pair = mounts(z_axis)
-    for mount in mount_or_pair:
-        if mount:
-            yield mount
 
 
 @lru_cache(2)
 def offset_for_mount(
     primary_mount: Mount, left_mount_offset: Point, right_mount_offset: Point
-) -> Tuple[Point, Point]:
+) -> Point:
     offsets = {Mount.LEFT: left_mount_offset, Mount.RIGHT: right_mount_offset}
-    return (
-        offsets[primary_mount],
-        offsets[{Mount.RIGHT: Mount.LEFT, Mount.LEFT: Mount.RIGHT}[primary_mount]],
-    )
+    return offsets[primary_mount]
 
 
 def target_position_from_absolute(
-    mount: Union[Mount, PipettePair],
+    mount: Mount,
     abs_position: Point,
     get_critical_point: Callable[[Mount], Point],
     left_mount_offset: Point,
     right_mount_offset: Point,
-) -> "Tuple[OrderedDict[Axis, float], Mount, Optional[Axis]]":
-    primary_mount, secondary_mount = mounts(mount)
-
-    primary_offset, secondary_offset = offset_for_mount(
-        primary_mount, left_mount_offset, right_mount_offset
-    )
-    primary_cp = get_critical_point(primary_mount)
-    primary_z = Axis.by_mount(primary_mount)
+) -> "OrderedDict[Axis, float]":
+    offset = offset_for_mount(mount, left_mount_offset, right_mount_offset)
+    primary_cp = get_critical_point(mount)
+    primary_z = Axis.by_mount(mount)
     target_position = OrderedDict(
         (
-            (Axis.X, abs_position.x - primary_offset.x - primary_cp.x),
-            (Axis.Y, abs_position.y - primary_offset.y - primary_cp.y),
-            (primary_z, abs_position.z - primary_offset.z - primary_cp.z),
+            (Axis.X, abs_position.x - offset.x - primary_cp.x),
+            (Axis.Y, abs_position.y - offset.y - primary_cp.y),
+            (primary_z, abs_position.z - offset.z - primary_cp.z),
         )
     )
-
-    if secondary_mount:
-        other_z = Axis.by_mount(secondary_mount)
-        secondary_cp = get_critical_point(secondary_mount)
-        target_position[other_z] = abs_position.z - secondary_offset.z - secondary_cp.z
-        secondary_z: Optional[Axis] = other_z
-    else:
-        secondary_z = None
-    return target_position, primary_mount, secondary_z
+    return target_position
 
 
 def target_position_from_relative(
-    mount: Union[Mount, PipettePair],
-    delta: Union[Point, Sequence[float]],
+    mount: Mount,
+    delta: Point,
     current_position: Dict[Axis, float],
-) -> "Tuple[OrderedDict[Axis, float], Mount, Optional[Axis]]":
-    """Create a target position for all specified machine axes.
-
-    If mount is a pair, then delta can be either a Point or a length
-    3 or 4 sequence. If a 4-sequence, the last two elements are mapped
-    to (primary, secondary) in the pair. If a 3-sequence or Point,
-    the last element is used for both z positions.
-    """
-    assert len(delta) < 5
-    primary_mount, secondary_mount = mounts(mount)
-
-    primary_z = Axis.by_mount(primary_mount)
+) -> "OrderedDict[Axis, float]":
+    """Create a target position for all specified machine axes."""
+    primary_z = Axis.by_mount(mount)
     target_position = OrderedDict(
         (
             (Axis.X, current_position[Axis.X] + delta[0]),
@@ -89,32 +51,19 @@ def target_position_from_relative(
             (primary_z, current_position[primary_z] + delta[2]),
         )
     )
-
-    if secondary_mount:
-        other_z = Axis.by_mount(secondary_mount)
-        secondary_z: Optional[Axis] = other_z
-        target_position[other_z] = current_position[other_z] + delta[-1]
-    else:
-        secondary_z = None
-
-    return target_position, primary_mount, secondary_z
+    return target_position
 
 
 def target_position_from_plunger(
-    mount: Union[Mount, PipettePair],
-    delta: Sequence[float],
+    mount: Mount,
+    delta: float,
     current_position: Dict[Axis, float],
-) -> "Tuple[OrderedDict[Axis, float], Mount, Optional[Axis]]":
+) -> "OrderedDict[Axis, float]":
     """Create a target position for machine axes including plungers.
-
-    If mount is a pair, then delta can be a 1- or 2-sequence. If mount
-    If a 2-sequence, then the two plungers go to different positions.
-    If a 1-sequence, both plungers go to the same position.
 
     Axis positions other than the plunger are identical to current
     position.
     """
-    assert len(delta) < 3
     all_axes_pos = OrderedDict(
         (
             (Axis.X, current_position[Axis.X]),
@@ -122,16 +71,12 @@ def target_position_from_plunger(
         )
     )
     plunger_pos = OrderedDict()
-    secondary_z = None
-    for idx, m in enumerate(mounts_enumerable(mount)):
-        z = Axis.by_mount(m)
-        plunger = Axis.of_plunger(m)
-        all_axes_pos[z] = current_position[z]
-        plunger_pos[plunger] = delta[idx]
-        if idx == 1:
-            secondary_z = z
+    z = Axis.by_mount(mount)
+    plunger = Axis.of_plunger(mount)
+    all_axes_pos[z] = current_position[z]
+    plunger_pos[plunger] = delta
     all_axes_pos.update(plunger_pos)
-    return all_axes_pos, mounts(mount)[0], secondary_z
+    return all_axes_pos
 
 
 def deck_point_from_machine_point(
@@ -153,29 +98,20 @@ def machine_point_from_deck_point(
 
 def machine_from_deck(
     deck_pos: Dict[Axis, float],
-    secondary_z: Optional[Axis],
     attitude: AttitudeMatrix,
     offset: Point,
 ) -> Dict[str, float]:
     """Build a machine-axis position from a deck position"""
-    to_transform_primary = Point(
-        *(
-            tp
-            for ax, tp in deck_pos.items()
-            if (ax in Axis.gantry_axes() and ax != secondary_z)
-        )
+    to_transform = Point(
+        *(tp for ax, tp in deck_pos.items() if ax in Axis.gantry_axes())
     )
-    if secondary_z:
-        to_transform_secondary = Point(0, 0, deck_pos[secondary_z])
-    else:
-        to_transform_secondary = Point(0, 0, 0)
 
     # Pre-fill the dict we’ll send to the backend with the axes we don’t
     # need to transform
     machine_pos = {
         ax.name: pos for ax, pos in deck_pos.items() if ax not in Axis.gantry_axes()
     }
-    if len(to_transform_primary) != 3:
+    if len(to_transform) != 3:
         raise ValueError(
             "Moves must specify either exactly an " "x, y, and (z or a) or none of them"
         )
@@ -185,17 +121,8 @@ def machine_from_deck(
     # target_position.items() is (rightly) Tuple[float, ...] with unbounded
     # size; unfortunately, mypy can’t quite figure out the length check
     # above that makes this OK
-    primary_transformed = machine_point_from_deck_point(
-        to_transform_primary, attitude, offset
-    )
-    if secondary_z:
-        secondary_transformed = machine_point_from_deck_point(
-            to_transform_secondary, attitude, offset
-        )
-    else:
-        secondary_transformed = Point(0, 0, 0)
+    transformed = machine_point_from_deck_point(to_transform, attitude, offset)
 
-    transformed = (*primary_transformed, secondary_transformed[2])
     to_check = {
         ax.name: transformed[idx]
         for idx, ax in enumerate(deck_pos.keys())

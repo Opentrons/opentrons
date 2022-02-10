@@ -21,5 +21,16 @@
   "disengage_slideout": "Disengaged",
   "engage_height_slideout": "Engage height",
   "gen2_num_slideout": "{{num}} mm",
-  "set_engage_height_slideout_btn": "Set Engage Height"
+  "set_engage_height_slideout_btn": "Set Engage Height",
+  "tc_lid": "Lid",
+  "tc_block": "Block",
+  "overflow_menu_engage": "Set engage height",
+  "overflow_menu_disengage": "Disengage module",
+  "overflow_menu_about": "About module",
+  "overflow_menu_lid_temp": "Set lid temperature",
+  "overflow_menu_set_block_temp": "Set block temperature",
+  "overflow_menu_deactivate_lid": "Deactivate lid",
+  "overflow_menu_deactivate_block": "Deactivate block",
+  "overflow_menu_mod_temp": "Set module temperature",
+  "overflow_menu_deactivate_temp": "Deactivate module"
 }

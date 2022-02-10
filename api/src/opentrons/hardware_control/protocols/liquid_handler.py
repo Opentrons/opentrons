@@ -1,8 +1,7 @@
-from typing import Optional, Union
+from typing import Optional
 from typing_extensions import Protocol
 
 from opentrons.types import Mount
-from ..types import PipettePair
 
 from .instrument_configurer import InstrumentConfigurer
 from .motion_controller import MotionController
@@ -17,9 +16,7 @@ class LiquidHandler(
     Calibratable,
     Protocol,
 ):
-    async def prepare_for_aspirate(
-        self, mount: Union[Mount, PipettePair], rate: float = 1.0
-    ) -> None:
+    async def prepare_for_aspirate(self, mount: Mount, rate: float = 1.0) -> None:
         """
         Prepare the pipette for aspiration.
 
@@ -41,7 +38,7 @@ class LiquidHandler(
 
     async def aspirate(
         self,
-        mount: Union[Mount, PipettePair],
+        mount: Mount,
         volume: Optional[float] = None,
         rate: float = 1.0,
     ) -> None:
@@ -68,7 +65,7 @@ class LiquidHandler(
 
     async def dispense(
         self,
-        mount: Union[Mount, PipettePair],
+        mount: Mount,
         volume: Optional[float] = None,
         rate: float = 1.0,
     ) -> None:
@@ -84,7 +81,7 @@ class LiquidHandler(
         """
         ...
 
-    async def blow_out(self, mount: Union[Mount, PipettePair]) -> None:
+    async def blow_out(self, mount: Mount) -> None:
         """
         Force any remaining liquid to dispense. The liquid will be dispensed at
         the current location of pipette
@@ -93,7 +90,7 @@ class LiquidHandler(
 
     async def pick_up_tip(
         self,
-        mount: Union[Mount, PipettePair],
+        mount: Mount,
         tip_length: float,
         presses: Optional[int] = None,
         increment: Optional[float] = None,
@@ -118,7 +115,7 @@ class LiquidHandler(
 
     async def drop_tip(
         self,
-        mount: Union[Mount, PipettePair],
+        mount: Mount,
         home_after: bool = True,
     ) -> None:
         """

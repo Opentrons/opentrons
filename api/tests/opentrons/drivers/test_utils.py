@@ -5,7 +5,7 @@ from opentrons.drivers.types import (
     Temperature,
     PlateTemperature,
     RPM,
-    HeaterShakerPlateLockStatus,
+    HeaterShakerLabwareLatchStatus,
 )
 
 
@@ -162,15 +162,15 @@ def test_parse_rpm_response_failure(input_str: str) -> None:
 @pytest.mark.parametrize(
     argnames=["input_str", "expected_result"],
     argvalues=[
-        ["STATUS:IDLE_OPEN", HeaterShakerPlateLockStatus.IDLE_OPEN],
-        ["STATUS:IDLE_CLOSED", HeaterShakerPlateLockStatus.IDLE_CLOSED],
-        ["a:safa STATUS:IDLE_UNKNOWN", HeaterShakerPlateLockStatus.IDLE_UNKNOWN],
+        ["STATUS:IDLE_OPEN", HeaterShakerLabwareLatchStatus.IDLE_OPEN],
+        ["STATUS:IDLE_CLOSED", HeaterShakerLabwareLatchStatus.IDLE_CLOSED],
+        ["a:safa STATUS:IDLE_UNKNOWN", HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN],
     ],
 )
-def test_parse_plate_lock_status_response_success(
-    input_str: str, expected_result: HeaterShakerPlateLockStatus
+def test_parse_labware_latch_status_response_success(
+    input_str: str, expected_result: HeaterShakerLabwareLatchStatus
 ):
-    assert utils.parse_plate_lock_status_response(input_str) == expected_result
+    assert utils.parse_labware_latch_status_response(input_str) == expected_result
 
 
 @pytest.mark.parametrize(
@@ -184,9 +184,9 @@ def test_parse_plate_lock_status_response_success(
         [":"],
     ],
 )
-def test_parse_plate_lock_status_response_failure(input_str):
+def test_parse_labware_latch_status_response_failure(input_str):
     with pytest.raises(utils.ParseError):
-        utils.parse_plate_lock_status_response(input_str)
+        utils.parse_labware_latch_status_response(input_str)
 
 
 @pytest.mark.parametrize(

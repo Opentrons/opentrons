@@ -18,6 +18,8 @@ import {
   C_BLUE,
   TEXT_TRANSFORM_NONE,
   JUSTIFY_FLEX_END,
+  COLORS,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   getModuleDisplayName,
@@ -113,7 +115,7 @@ export const MagneticModuleSlideout = (
       <React.Fragment>
         <Text
           fontWeight={FONT_WEIGHT_REGULAR}
-          fontSize="0.6875rem"
+          fontSize={TYPOGRAPHY.fontSizeP}
           paddingTop={SPACING_1}
           data-testid={`Mag_Slideout_body_text_${module.model}`}
         >
@@ -123,7 +125,7 @@ export const MagneticModuleSlideout = (
           })}
         </Text>
         <Text
-          fontSize={'10px'}
+          fontSize={TYPOGRAPHY.fontSizeH6}
           fontWeight={FONT_WEIGHT_SEMIBOLD}
           paddingTop={SPACING_3}
           textTransform={TEXT_TRANSFORM_UPPERCASE}
@@ -137,7 +139,7 @@ export const MagneticModuleSlideout = (
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           fontWeight={FONT_WEIGHT_REGULAR}
-          fontSize="0.6875rem"
+          fontSize={TYPOGRAPHY.fontSizeP}
           padding={SPACING_3}
         >
           <Flex
@@ -169,9 +171,9 @@ export const MagneticModuleSlideout = (
         >
           <Text
             fontWeight={FONT_WEIGHT_REGULAR}
-            fontSize={'10px'}
+            fontSize={TYPOGRAPHY.fontSizeH6}
             //  TODO immediately: change to typography standard color when its made
-            color="#8A8C8E"
+            color={COLORS.darkGrey}
           >
             {t('engage_height_slideout')}
           </Text>
