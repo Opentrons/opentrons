@@ -1,10 +1,12 @@
 """Tests for the /runs/.../commands routes."""
-import pytest
-
+import asyncio
 from datetime import datetime
+
+import pytest
 from decoy import Decoy
 
 from opentrons.protocol_engine import (
+    ProtocolEngine,
     EngineStatus,
     StateView,
     CommandSlice,
@@ -21,13 +23,122 @@ from robot_server.runs.router.commands_router import (
     CommandCollectionLinks,
     CommandLink,
     CommandLinkMeta,
+    CommandWaiter,
     create_run_command,
     get_run_command,
     get_run_commands,
 )
 
 
-async def test_create_run_command(decoy: Decoy, engine_store: EngineStore) -> None:
+@pytest.fixture
+def command_waiter(decoy: Decoy) -> CommandWaiter:
+    """Return a mock in the shape of a CommandWaiter."""
+    return decoy.mock(cls=CommandWaiter)
+
+
+async def test_command_waiter_not_timed_out(decoy: Decoy) -> None:
+    mock_pe = decoy.mock(cls=ProtocolEngine)
+    subject = CommandWaiter()
+
+    command_request = pe_commands.PauseCreate(
+        params=pe_commands.PauseParams(),
+    )
+
+    queued_command = pe_commands.Pause(
+        id="command-id",
+        key="command-key",
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=pe_commands.CommandStatus.QUEUED,
+        params=pe_commands.PauseParams(),
+        result=None,
+    )
+
+    completed_command = pe_commands.Pause(
+        id="command-id",
+        key="command-key",
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=pe_commands.CommandStatus.SUCCEEDED,
+        params=pe_commands.PauseParams(),
+        result=None,
+    )
+
+    decoy.when(mock_pe.add_command(request=command_request)).then_return(queued_command)
+
+    decoy.when(
+        await mock_pe.wait_for_command_completion(
+            command_id=queued_command.id,
+        )
+    ).then_return(completed_command)
+
+    result = await subject.add_and_wait_with_timeout(
+        engine=mock_pe,
+        command_request=command_request,
+        timeout_ms=9999999999,
+    )
+
+    assert result == completed_command
+
+
+async def test_command_waiter_timed_out(decoy: Decoy) -> None:
+    mock_pe = decoy.mock(cls=ProtocolEngine)
+    subject = CommandWaiter()
+
+    command_request = pe_commands.PauseCreate(
+        params=pe_commands.PauseParams(),
+    )
+
+    queued_command = pe_commands.Pause(
+        id="command-id",
+        key="command-key",
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=pe_commands.CommandStatus.QUEUED,
+        params=pe_commands.PauseParams(),
+        result=None,
+    )
+
+    running_command = pe_commands.Pause(
+        id="command-id",
+        key="command-key",
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=pe_commands.CommandStatus.RUNNING,
+        params=pe_commands.PauseParams(),
+        result=None,
+    )
+
+    decoy.when(mock_pe.add_command(request=command_request)).then_return(queued_command)
+
+    # After enqueueing the new command:
+    # 1. The subject should call `await wait_for_command_completion()`,
+    #    with the correct command ID, to try waiting for it to complete.
+    # 2. The subject should cancel that await once the timeout expires.
+    # 3. The subject should retrieve the current state of the command, to return.
+
+    async def mock_wait_for_command_completion(command_id: str) -> pe_commands.Command:
+        if command_id == queued_command.id:
+            decoy.when(mock_pe.state_view.commands.get(command_id)).then_return(
+                running_command
+            )
+        # Never return.
+        # Yield to the event loop frequently to give the caller
+        # the opportunity to cancel us.
+        while True:
+            await asyncio.sleep(0)
+
+    mock_pe.wait_for_command_completion = mock_wait_for_command_completion  # type: ignore[assignment]
+
+    result = await subject.add_and_wait_with_timeout(
+        engine=mock_pe,
+        command_request=command_request,
+        timeout_ms=100,
+    )
+
+    assert result == running_command
+
+
+async def test_create_run_command_non_blocking(
+    decoy: Decoy,
+    engine_store: EngineStore,
+) -> None:
     """It should add the requested command to the ProtocolEngine and return it."""
     command_request = pe_commands.PauseCreate(
         params=pe_commands.PauseParams(message="Hello")
@@ -62,8 +173,62 @@ async def test_create_run_command(decoy: Decoy, engine_store: EngineStore) -> No
     result = await create_run_command(
         request_body=RequestModel(data=command_request),
         waitUntilComplete=False,
+        timeout=123456,  # Should be ignored.
         engine_store=engine_store,
         run=run,
+    )
+
+    assert result.content.data == output_command
+    assert result.status_code == 201
+
+
+async def test_create_run_command_blocking(
+    decoy: Decoy,
+    engine_store: EngineStore,
+    command_waiter: CommandWaiter,
+) -> None:
+    """It should run the requested command in the ProtocolEngine and return it."""
+    command_request = pe_commands.PauseCreate(
+        params=pe_commands.PauseParams(message="Hello")
+    )
+
+    run = Run(
+        id="run-id",
+        protocolId=None,
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=EngineStatus.RUNNING,
+        current=True,
+        actions=[],
+        errors=[],
+        pipettes=[],
+        labware=[],
+        labwareOffsets=[],
+    )
+
+    output_command = pe_commands.Pause(
+        id="abc123",
+        key="command-key",
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=pe_commands.CommandStatus.SUCCEEDED,
+        params=pe_commands.PauseParams(message="Hello"),
+        result=None,
+    )
+
+    decoy.when(
+        await command_waiter.add_and_wait_with_timeout(
+            engine=engine_store.engine,
+            command_request=command_request,
+            timeout_ms=123456,
+        )
+    ).then_return(output_command)
+
+    result = await create_run_command(
+        request_body=RequestModel(data=command_request),
+        waitUntilComplete=True,
+        timeout=123456,
+        engine_store=engine_store,
+        run=run,
+        command_waiter=command_waiter,
     )
 
     assert result.content.data == output_command
@@ -102,68 +267,6 @@ async def test_create_run_command_not_current(
 
     assert exc_info.value.status_code == 400
     assert exc_info.value.content["errors"][0]["id"] == "RunStopped"
-
-
-async def test_create_run_command_blocking_completion(
-    decoy: Decoy, engine_store: EngineStore
-) -> None:
-    """It should return the completed command once the command is completed."""
-    run = Run.construct(
-        id="run-id",
-        protocolId=None,
-        createdAt=datetime(year=2021, month=1, day=1),
-        status=EngineStatus.RUNNING,
-        current=True,
-        actions=[],
-        errors=[],
-        pipettes=[],
-        labware=[],
-        labwareOffsets=[],
-    )
-
-    command_request = pe_commands.PauseCreate(
-        params=pe_commands.PauseParams(message="Hello")
-    )
-
-    command_once_added = pe_commands.Pause(
-        id="command-id",
-        key="command-key",
-        createdAt=datetime(year=2021, month=1, day=1),
-        status=pe_commands.CommandStatus.QUEUED,
-        params=pe_commands.PauseParams(message="Hello"),
-        result=None,
-    )
-
-    command_once_completed = pe_commands.Pause(
-        id="command-id",
-        key="command-key",
-        createdAt=datetime(year=2021, month=1, day=1),
-        status=pe_commands.CommandStatus.SUCCEEDED,
-        params=pe_commands.PauseParams(message="Hello"),
-        result=pe_commands.PauseResult(),
-    )
-
-    engine_state = decoy.mock(cls=StateView)
-    decoy.when(engine_store.get_state("run-id")).then_return(engine_state)
-    decoy.when(engine_store.engine.add_command(command_request)).then_return(
-        command_once_added
-    )
-    decoy.when(engine_state.commands.get("command-id")).then_return(
-        command_once_completed
-    )
-
-    result = await create_run_command(
-        request_body=RequestModel(data=command_request),
-        waitUntilComplete=True,
-        timeout=999,
-        engine_store=engine_store,
-        run=run,
-    )
-
-    decoy.verify(await engine_store.engine.wait_for_command("command-id"))
-
-    assert result.content.data == command_once_completed
-    assert result.status_code == 201
 
 
 async def test_get_run_commands(decoy: Decoy, engine_store: EngineStore) -> None:
