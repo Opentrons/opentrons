@@ -87,13 +87,13 @@ export const h6Default = css`
 export const pRegular = css`
   font-size: ${fontSizeP};
   font-weight: ${fontWeightRegular};
-  line-height: ${lineHeight12};
+  line-height: ${lineHeight16};
 `
 
 export const pSemiBold = css`
   font-size: ${fontSizeP};
   font-weight: ${fontWeightSemiBold};
-  line-height: ${lineHeight12};
+  line-height: ${lineHeight16};
 `
 
 export const labelRegular = css`
