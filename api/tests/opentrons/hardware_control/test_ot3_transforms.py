@@ -53,7 +53,7 @@ async def test_transform_values(pipette_model):
         spec=sim._move_manager.plan_motion,
     ) as mock_move:
         await sim.move_to(types.Mount.RIGHT, target)
-        right_offset = sim._attached_instruments[types.Mount.RIGHT].critical_point()
+        right_offset = sim.hardware_instruments[types.Mount.RIGHT].critical_point()
         point = [
             (target.x - right_offset[0] - sim.config.right_mount_offset[0]) * -1
             + sim.config.carriage_offset[0],
@@ -75,7 +75,7 @@ async def test_transform_values(pipette_model):
         spec=sim._move_manager.plan_motion,
     ) as mock_move:
         await sim.move_to(types.Mount.LEFT, target)
-        left_offset = sim._attached_instruments[types.Mount.LEFT].critical_point()
+        left_offset = sim.hardware_instruments[types.Mount.LEFT].critical_point()
         point = [
             (target.x - left_offset[0] - sim.config.left_mount_offset[0]) * -1
             + sim.config.carriage_offset[0],

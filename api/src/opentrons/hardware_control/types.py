@@ -77,7 +77,7 @@ class OT3Mount(enum.Enum):
     GRIPPER = enum.auto()
 
     @classmethod
-    def from_mount(cls, mount: top_types.Mount) -> "OT3Mount":
+    def from_mount(cls, mount: Union[top_types.Mount, "OT3Mount"]) -> "OT3Mount":
         return cls[mount.name]
 
     def to_mount(self) -> top_types.Mount:
@@ -131,7 +131,7 @@ class OT3Axis(enum.Enum):
         return bm[mount]
 
     @classmethod
-    def from_axis(cls, axis: Axis) -> "OT3Axis":
+    def from_axis(cls, axis: Union[Axis, "OT3Axis"]) -> "OT3Axis":
         am = {
             Axis.X: cls.X,
             Axis.Y: cls.Y,
@@ -140,7 +140,10 @@ class OT3Axis(enum.Enum):
             Axis.B: cls.P_L,
             Axis.C: cls.P_R,
         }
-        return am[axis]
+        try:
+            return am[axis]  # type: ignore
+        except KeyError:
+            return axis  # type: ignore
 
     def to_axis(self) -> Axis:
         am = {
