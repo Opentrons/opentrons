@@ -1,4 +1,5 @@
 import { useSelector } from 'react-redux'
+import { useLocation } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import {
   getNavbarLocations,
@@ -9,6 +10,7 @@ import {
 import { getConnectedRobot } from '../redux/discovery'
 import { useIsProtocolRunLoaded } from '../organisms/ProtocolUpload/hooks'
 import { NavLocation } from '../redux/nav/types'
+import { displayNameByPathSegment } from './NextGenApp'
 
 export function useRunLocation(): NavLocation {
   const { t } = useTranslation('top_navigation')
@@ -43,4 +45,20 @@ export function useNavLocations(): NavLocation[] {
   const navLocations = [robots, upload, runLocation, more]
 
   return navLocations
+}
+
+export function usePathCrumbs(): string[] {
+  const location = useLocation()
+
+  // trim initial /
+  const subPathname = location.pathname.substring(1)
+
+  const crumbs = subPathname
+    .split('/')
+    // filter out path segments explicitly defined as null
+    .filter(crumb => displayNameByPathSegment[crumb] !== null)
+    // map to the display name if defined, or leave alone
+    .map(crumb => displayNameByPathSegment[crumb] ?? crumb)
+
+  return crumbs
 }
