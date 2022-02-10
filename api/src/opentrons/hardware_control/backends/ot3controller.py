@@ -30,12 +30,18 @@ try:
     from opentrons_hardware.drivers.can_bus import CanMessenger, DriverSettings
     from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
     from opentrons_hardware.drivers.can_bus.build import build_driver
-    from opentrons_hardware.hardware_control.motion import create
+    from opentrons_hardware.hardware_control.motion import (
+        create,
+        create_move,
+        NodeIdMotionValues,
+    )
     from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
     from opentrons_hardware.hardware_control.motion_planning import (
         Block,
         Coordinates,
-        MoveUtils,
+    )
+    from opentrons_hardware.hardware_control.motion_planning.move_utils import (
+        unit_vector_multiplication,
     )
     from opentrons_hardware.hardware_control.network import probe
     from opentrons_ot3_firmware.constants import NodeId
@@ -227,8 +233,6 @@ class OT3Controller:
         self,
         unit_vector: Coordinates,
         block: Block,
-        home_flagged_axes: bool = True,
-        axis_max_speeds: Optional[AxisValueMap] = None,
     ) -> None:
         """Move to a position.
 
@@ -241,24 +245,31 @@ class OT3Controller:
         Returns:
             None
         """
-        target_position = MoveUtils.target_distance_per_axis(
-            unit_vector, block.distance
+
+        def _convert_to_node_id_dict(axis_pos: Coordinates) -> NodeIdMotionValues:
+            target: NodeIdMotionValues = {}
+            for axis, pos in axis_pos.to_dict().items():
+                if self._axis_is_node(axis.name):
+                    target[self._axis_to_node(axis.name)] = pos
+            return target
+
+        distances = unit_vector_multiplication(unit_vector, block.distance)
+        node_id_distances = _convert_to_node_id_dict(distances)
+        velocities = unit_vector_multiplication(unit_vector, block.initial_speed)
+        accelerations = unit_vector_multiplication(unit_vector, block.acceleration)
+        move_group = create_move(
+            distance=node_id_distances,
+            velocity=_convert_to_node_id_dict(velocities),
+            acceleration=_convert_to_node_id_dict(accelerations),
+            duration=block.time,
+            present_nodes=self._present_nodes,
         )
-        log.info(f"move: {target_position}")
-        target: Dict[NodeId, float] = {}
-
-        for axis, pos in target_position.to_dict():
-            if self._axis_is_node(axis):
-                target[self._axis_to_node(axis)] = pos
-
-        # log.info(f"move targets: {target}")
-        # move_group = create_move(
-        #     targets=unit_vector * block.distance,
-        #     present_nodes=self._present_nodes,
-        # )
-        # runner = MoveGroupRunner(move_groups=move_group)
-        # await runner.run(can_messenger=self._messenger)
-        self._position.update(target_position)
+        runner = MoveGroupRunner(move_groups=move_group)
+        await runner.run(can_messenger=self._messenger)
+        distances_in_float: Dict[NodeId, float] = {}
+        for key, val in node_id_distances.items():
+            distances_in_float[key] = float(val)
+        self._position.update(distances_in_float)
 
     async def move(
         self,

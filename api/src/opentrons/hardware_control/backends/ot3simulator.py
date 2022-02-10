@@ -27,7 +27,9 @@ try:
     from opentrons_hardware.hardware_control.motion_planning import (
         Block,
         Coordinates,
-        MoveUtils,
+    )
+    from opentrons_hardware.hardware_control.motion_planning.move_utils import (
+        unit_vector_multiplication,
     )
 except ModuleNotFoundError:
     pass
@@ -245,11 +247,13 @@ class OT3Simulator:
         Returns:
             None
         """
-        target_position = MoveUtils.target_distance_per_axis(
-            unit_vector, block.distance
-        )
+        target_position = unit_vector_multiplication(unit_vector, block.distance)
         log.info(f"move: {target_position}")
-        self._position.update(target_position)
+        target: Dict[NodeId, float] = {}
+        for axis, pos in target_position.to_dict().items():
+            if self._axis_is_node(axis.name):
+                target[self._axis_to_node(axis.name)] = float(pos)
+        self._position.update(target)
 
     async def move(
         self,

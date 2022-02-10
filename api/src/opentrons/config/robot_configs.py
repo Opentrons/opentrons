@@ -2,7 +2,6 @@ import json
 import logging
 import os
 from pathlib import Path
-from re import L
 
 from typing import Any, Dict, List, Union, Optional
 from typing_extensions import Literal
@@ -167,11 +166,9 @@ def default_system_constraints(config: OT3Config) -> Dict[str, AxisConstraints]:
     constraints = {}
     for axis in Axis.get_all_axes():
         constraints[axis.name] = AxisConstraints.build(
-            max_acceleration=config.acceleration.none[axis.lookup],
-            max_speed_discont=config.max_speed_discontinuity.none[axis.lookup],
-            max_direction_change_speed_discont=config.direction_change_speed_discontinuity.none[
-                axis.lookup
-            ],
+            config.acceleration.none[axis.lookup],
+            config.max_speed_discontinuity.none[axis.lookup],
+            config.direction_change_speed_discontinuity.none[axis.lookup],
         )
     return constraints
 

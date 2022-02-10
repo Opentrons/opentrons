@@ -1,6 +1,7 @@
 """A collection of motions that define a single move."""
 from typing import List, Dict, Iterable, Optional
 from dataclasses import dataclass
+from matplotlib.pyplot import axis
 import numpy as np  # type: ignore[import]
 from logging import getLogger
 
@@ -10,14 +11,16 @@ from .motion_planning.types import Coordinates, Block
 LOG = getLogger(__name__)
 
 
+NodeIdMotionValues = Dict[NodeId, np.float64]
+
 @dataclass(frozen=True)
 class MoveGroupSingleAxisStep:
     """A single move in a move group."""
 
     distance_mm: float
     velocity_mm_sec: float
-    acceleration_mm_sec_sq: float
     duration_sec: float
+    acceleration_mm_sec_sq: float = 0
 
 
 MoveGroupStep = Dict[
@@ -40,10 +43,43 @@ MAX_SPEEDS = {
 
 
 def create_move(
-    unit_vector: Coordinates,
-    block: Block 
+    distance: Dict[NodeId, np.float64],
+    velocity: Dict[NodeId, np.float64],
+    acceleration: Dict[NodeId, np.float64],
+    duration: np.float64,
+    present_nodes: Optional[Iterable[NodeId]] = None,
 ):
-    unit_vector
+    """Create a move from a block.
+
+    Args:
+        origin: Start position.
+        target: Target position.
+        speed: the speed
+
+    Returns:
+        A Move
+    """
+    if not present_nodes:
+        checked_nodes: Iterable[NodeId] = [
+            NodeId.gantry_x,
+            NodeId.gantry_y,
+            NodeId.head_r,
+            NodeId.head_l,
+            NodeId.pipette_left,
+            NodeId.pipette_right,
+        ]
+    else:
+        checked_nodes = present_nodes
+    ordered_nodes = sorted(checked_nodes, key=lambda node: node.value)
+    step: MoveGroupStep = {}
+    for axis_node in ordered_nodes:
+        step[axis_node] = MoveGroupSingleAxisStep(
+            distance_mm=distance[axis_node],
+            acceleration_mm_sec_sq=acceleration[axis_node],
+            velocity_mm_sec=velocity[axis_node],
+            duration_sec=duration,
+        )
+    return [[step]]
 
 
 def create(

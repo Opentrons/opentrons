@@ -4,6 +4,7 @@ import logging
 import enum
 import dataclasses
 import numpy as np  # type: ignore[import]
+from opentrons_ot3_firmware.constants import NodeId
 from typing import (
     cast,
     Any,
@@ -25,15 +26,16 @@ AcceptableType = Union[SupportsFloat, np.float64]
 class Axis(enum.Enum):
     """Robot axis."""
 
-    X = 0, Literal["X"]
-    Y = 1, Literal["Y"]
-    Z = 2, Literal["Z"]
-    A = 3, Literal["Z"]
+    X = 0, Literal["X"], NodeId.gantry_x
+    Y = 1, Literal["Y"], NodeId.gantry_y
+    Z = 2, Literal["Z"], NodeId.head_l
+    A = 3, Literal["Z"], NodeId.head_r
 
-    def __new__(cls, value: int, lookup: str):
+    def __new__(cls, value: int, lookup: str, node_id: NodeId):
         member = object.__new__(cls)
         member._value_ = value
         member._lookup = lookup
+        member._node_id = node_id
         return member
 
     @classmethod
@@ -44,6 +46,10 @@ class Axis(enum.Enum):
     @property
     def lookup(self) -> Literal["X", "Y", "Z", "P"]:
         return self._lookup
+
+    @property
+    def node_id(self) -> NodeId:
+        return self._node_id
 
 
 @dataclasses.dataclass(frozen=False)
@@ -262,4 +268,4 @@ class AxisConstraints:
         )
 
 
-SystemConstraints = Dict[Axis.name, AxisConstraints]
+SystemConstraints = Dict[str, AxisConstraints]

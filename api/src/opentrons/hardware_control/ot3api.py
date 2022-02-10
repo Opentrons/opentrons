@@ -24,7 +24,6 @@ try:
     from opentrons_hardware.hardware_control.motion_planning import (
         MoveManager,
         MoveTarget,
-        AxisConstraints,
         Coordinates,
     )
 except ModuleNotFoundError:
@@ -710,8 +709,6 @@ class OT3API(
             if ax in Axis.gantry_axes()
         }
         check_motion_bounds(to_check, target_position, bounds, check_bounds)
-        checked_maxes = max_speeds or {}
-        str_maxes = {ax.name: val for ax, val in checked_maxes.items()}
         origin = Coordinates.from_iter(iter(current_pos.values()))
         # TODO: (2022-02-10) Use actual max speed for MoveTarget
         move_target = MoveTarget.build(
@@ -726,12 +723,7 @@ class OT3API(
             try:
                 for move in moves[0]:
                     for block in move.blocks:
-                        await self._backend.move_block(
-                            move.unit_vector,
-                            block,
-                            home_flagged_axes=home_flagged_axes,
-                            axis_max_speeds=str_maxes,
-                        )
+                        await self._backend.move_block(move.unit_vector, block)
             except Exception:
                 self._log.exception("Move failed")
                 self._current_position.clear()
