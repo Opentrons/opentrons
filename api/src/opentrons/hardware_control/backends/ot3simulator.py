@@ -24,6 +24,11 @@ from opentrons_shared_data.pipette import dummy_model_for_name
 
 try:
     from opentrons_ot3_firmware.constants import NodeId
+    from opentrons_hardware.hardware_control.motion_planning import (
+        Block,
+        Coordinates,
+        MoveUtils,
+    )
 except ModuleNotFoundError:
     pass
 
@@ -221,6 +226,30 @@ class OT3Simulator:
                 ret[OT3Simulator._node_to_axis(node)] = pos
         log.info(f"update_position: {ret}")
         return ret
+
+    async def move_block(
+        self,
+        unit_vector: Coordinates,
+        block: Block,
+        home_flagged_axes: bool = True,
+        axis_max_speeds: Optional[AxisValueMap] = None,
+    ) -> None:
+        """Move to a position.
+
+        Args:
+            target_position: Map of axis to position.
+            home_flagged_axes: Whether to home afterwords.
+            speed: Optional speed
+            axis_max_speeds: Optional map of axis to speed.
+
+        Returns:
+            None
+        """
+        target_position = MoveUtils.target_distance_per_axis(
+            unit_vector, block.distance
+        )
+        log.info(f"move: {target_position}")
+        self._position.update(target_position)
 
     async def move(
         self,

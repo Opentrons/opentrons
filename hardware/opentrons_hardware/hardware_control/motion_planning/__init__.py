@@ -1,6 +1,7 @@
 """Motion planning package."""
 
 from .move_manager import MoveManager
+import move_utils as MoveUtils
 from .types import (
     Axis,
     Coordinates,
@@ -20,4 +21,6 @@ __all__ = [
     "MoveTarget",
     "AxisConstraints",
     "SystemConstraints"
+    "target_distance_per_axis",
+    "MoveUtils"
 ]

@@ -720,18 +720,18 @@ class OT3API(
         blended, moves = self._move_manager.plan_motion(
             origin=origin, target_list=[move_target]
         )
-        assert blended, "Could not blend motion"
-        print(moves)
         async with contextlib.AsyncExitStack() as stack:
             if acquire_lock:
                 await stack.enter_async_context(self._motion_lock)
             try:
-                await self._backend.move(
-                    machine_pos,
-                    speed=speed,
-                    home_flagged_axes=home_flagged_axes,
-                    axis_max_speeds=str_maxes,
-                )
+                for move in moves[0]:
+                    for block in move.blocks:
+                        await self._backend.move_block(
+                            move.unit_vector,
+                            block,
+                            home_flagged_axes=home_flagged_axes,
+                            axis_max_speeds=str_maxes,
+                        )
             except Exception:
                 self._log.exception("Move failed")
                 self._current_position.clear()

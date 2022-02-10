@@ -457,3 +457,8 @@ def all_blended(constraints: SystemConstraints, moves: List[Move]) -> bool:
             prev = current
         except StopIteration:
             return True
+
+
+def target_distance_per_axis(unit_vector: Coordinates, distance: np.float64):
+    targets: np.ndarray = unit_vector.vectorize() * distance
+    return Coordinates.from_iter(targets)

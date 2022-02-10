@@ -32,6 +32,11 @@ try:
     from opentrons_hardware.drivers.can_bus.build import build_driver
     from opentrons_hardware.hardware_control.motion import create
     from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
+    from opentrons_hardware.hardware_control.motion_planning import (
+        Block,
+        Coordinates,
+        MoveUtils,
+    )
     from opentrons_hardware.hardware_control.network import probe
     from opentrons_ot3_firmware.constants import NodeId
     from opentrons_ot3_firmware.messages.message_definitions import (
@@ -217,6 +222,43 @@ class OT3Controller:
                 ret[OT3Controller._node_to_axis(node)] = pos
         log.info(f"update_position: {ret}")
         return ret
+
+    async def move_block(
+        self,
+        unit_vector: Coordinates,
+        block: Block,
+        home_flagged_axes: bool = True,
+        axis_max_speeds: Optional[AxisValueMap] = None,
+    ) -> None:
+        """Move to a position.
+
+        Args:
+            target_position: Map of axis to position.
+            home_flagged_axes: Whether to home afterwords.
+            speed: Optional speed
+            axis_max_speeds: Optional map of axis to speed.
+
+        Returns:
+            None
+        """
+        target_position = MoveUtils.target_distance_per_axis(
+            unit_vector, block.distance
+        )
+        log.info(f"move: {target_position}")
+        target: Dict[NodeId, float] = {}
+
+        for axis, pos in target_position.to_dict():
+            if self._axis_is_node(axis):
+                target[self._axis_to_node(axis)] = pos
+
+        # log.info(f"move targets: {target}")
+        # move_group = create_move(
+        #     targets=unit_vector * block.distance,
+        #     present_nodes=self._present_nodes,
+        # )
+        # runner = MoveGroupRunner(move_groups=move_group)
+        # await runner.run(can_messenger=self._messenger)
+        self._position.update(target_position)
 
     async def move(
         self,

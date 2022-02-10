@@ -5,6 +5,7 @@ import numpy as np  # type: ignore[import]
 from logging import getLogger
 
 from opentrons_ot3_firmware.constants import NodeId
+from .motion_planning.types import Coordinates, Block
 
 LOG = getLogger(__name__)
 
@@ -15,6 +16,7 @@ class MoveGroupSingleAxisStep:
 
     distance_mm: float
     velocity_mm_sec: float
+    acceleration_mm_sec_sq: float
     duration_sec: float
 
 
@@ -35,6 +37,13 @@ MAX_SPEEDS = {
     NodeId.pipette_left: 2,
     NodeId.pipette_right: 2,
 }
+
+
+def create_move(
+    unit_vector: Coordinates,
+    block: Block 
+):
+    unit_vector
 
 
 def create(

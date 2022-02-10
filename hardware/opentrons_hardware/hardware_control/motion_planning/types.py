@@ -15,7 +15,7 @@ from typing import (
     Tuple,
     Union
 )
-from typing_extensions import Literal
+from typing_extensions import Literal, Final
 
 log = logging.getLogger(__name__)
 
@@ -262,4 +262,4 @@ class AxisConstraints:
         )
 
 
-SystemConstraints =  Dict[Axis.name, AxisConstraints]
+SystemConstraints = Dict[Axis.name, AxisConstraints]
