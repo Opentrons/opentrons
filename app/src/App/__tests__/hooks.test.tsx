@@ -4,6 +4,7 @@ import { renderHook } from '@testing-library/react-hooks'
 import { createStore } from 'redux'
 import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
+import { format, parseISO } from 'date-fns'
 
 import { i18n } from '../../i18n'
 import {
@@ -135,14 +136,19 @@ describe('usePathCrumbs', () => {
   })
 
   it('should return a mapped path crumb', () => {
+    const timeStampISO = '2022-02-10T20:25:42.662800+00:00'
+    const formattedTimeStamp = format(
+      parseISO(timeStampISO),
+      'MM/dd/yyyy HH:mm:ss'
+    )
     const { result } = renderHook(usePathCrumbs, { wrapper })
     expect(result.current).toStrictEqual([
       { pathSegment: 'devices', crumbName: 'Devices' },
       { pathSegment: 'litter-hood', crumbName: 'litter-hood' },
       { pathSegment: 'protocol-runs', crumbName: 'Protocol Runs' },
       {
-        pathSegment: '2022-02-10T20:25:42.662800+00:00',
-        crumbName: '02/10/2022 15:25:42',
+        pathSegment: timeStampISO,
+        crumbName: formattedTimeStamp,
       },
     ])
   })
