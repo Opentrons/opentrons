@@ -111,6 +111,13 @@ export function CommandItemComponent(
   const isPause =
     analysisCommand?.commandType === 'pause' ||
     runCommandSummary?.commandType === 'pause'
+<<<<<<< HEAD
+=======
+  const backgroundColor =
+    commandStatus === 'queued' && isMostRecentCommand
+      ? C_AQUAMARINE
+      : WRAPPER_STYLE_BY_STATUS[commandStatus].backgroundColor
+>>>>>>> cd877cefe7e11c8c0592667e0d1fd095292bc1bb
 
   const WRAPPER_STYLE = css`
     font-size: ${FONT_SIZE_BODY_1};
