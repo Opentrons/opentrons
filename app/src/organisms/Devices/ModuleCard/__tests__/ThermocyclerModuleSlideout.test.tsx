@@ -1,9 +1,10 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
-import { InputField } from '@opentrons/components/src/forms/InputField'
+import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../../i18n'
 import { useSendModuleCommand } from '../../../../redux/modules'
 import { ThermocyclerModuleSlideout } from '../ThermocyclerModuleSlideout'
+import { InputField } from '@opentrons/components/src/forms/InputField'
 
 import { mockThermocycler } from '../../../../redux/modules/__fixtures__'
 
@@ -65,7 +66,7 @@ describe('ThermocyclerModuleSlideout', () => {
     getByText('Set Block Temperature')
   })
 
-  it('renders the button and it is not clickable until there is something in form field', () => {
+  it('renders the button and it is not clickable until there is something in form field for the TC Block', () => {
     props = {
       module: mockThermocycler,
       isSecondaryTemp: false,
@@ -73,6 +74,33 @@ describe('ThermocyclerModuleSlideout', () => {
     }
     const { getByRole } = render(props)
     const button = getByRole('button', { name: 'Set Block Temperature' })
+    expect(button).not.toBeEnabled()
+    mockInputField.mockReturnValue(<div>12 C</div>)
+    mockUseSendModuleCommand.mockReturnValue({
+      moduleId: props.module.serial,
+      command: 'set_temperature',
+      args: 12,
+    } as any)
+    fireEvent.click(button)
+    expect(button).not.toBeEnabled()
+  })
+
+  it('renders the button and it is not clickable until there is something in form field for the TC Lid', () => {
+    props = {
+      module: mockThermocycler,
+      isSecondaryTemp: true,
+      isExpanded: true,
+    }
+    const { getByRole } = render(props)
+    const button = getByRole('button', { name: 'Set Lid Temperature' })
+    expect(button).not.toBeEnabled()
+    mockInputField.mockReturnValue(<div>40 C</div>)
+    mockUseSendModuleCommand.mockReturnValue({
+      moduleId: props.module.serial,
+      command: 'set_lid_temperature',
+      args: 40,
+    } as any)
+    fireEvent.click(button)
     expect(button).not.toBeEnabled()
   })
 })
