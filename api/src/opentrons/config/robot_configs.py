@@ -2,6 +2,7 @@ import json
 import logging
 import os
 from pathlib import Path
+from re import L
 
 from typing import Any, Dict, List, Union, Optional
 from typing_extensions import Literal
@@ -9,11 +10,12 @@ from typing_extensions import Literal
 from . import CONFIG, defaults_ot3, defaults_ot2
 from .feature_flags import enable_ot3_hardware_controller
 from opentrons.hardware_control.types import BoardRevision
-from .types import ByPipetteKind, CurrentDict, RobotConfig, AxisDict, OT3Config
+from .types import PipetteKind, CurrentDict, RobotConfig, AxisDict, OT3Config
 
 from opentrons_hardware.hardware_control.motion_planning import (
     SystemConstraints,
-    # AxisConstraints
+    AxisConstraints,
+    Axis
 )
 
 log = logging.getLogger(__name__)
@@ -164,14 +166,32 @@ def default_pipette_offset() -> List[float]:
 
 def default_system_constraints(config: OT3Config) -> SystemConstraints:
     constraints: SystemConstraints = {}
+    for axis in Axis.get_all_axes():
+        constraints[axis.name] = AxisConstraints.build(
+            max_acceleration=config.acceleration.none[axis.lookup],
+            max_speed_discont=config.max_speed_discontinuity.none[axis.lookup],
+            max_direction_change_speed_discont=\
+                config.direction_change_speed_discontinuity.none[axis.lookup]
+        )
     return constraints
 
 
 def get_system_constraints(
-    config: OT3Config, pipette_kind: ByPipetteKind
+    config: OT3Config, pipette_kind: PipetteKind
 ) -> SystemConstraints:
     constraints: SystemConstraints = {}
-    
+    default = default_system_constraints(config)
+    if pipette_kind is not PipetteKind.none:
+        for axis in Axis.get_all_axes():
+            # max_acceleration= 
+            constraints[axis.name] = AxisConstraints.build(
+                max_acceleration=config.acceleration.none[axis.lookup],
+                max_speed_discont=config.max_speed_discontinuity.none[axis.lookup],
+                max_direction_change_speed_discont=\
+                    config.direction_change_speed_discontinuity.none[axis.lookup]
+            )
+            # if axis.name in getattr(config.acceleration, pipette_kind.value):
+            #     default[axis.name]
         # constraints[axis] = AxisConstraints.build(
         #     max_acceleration=config.acceleration.two_low_throughput[axis],
         #     max_speed_discont=config.max_speed_discontinuity.two_low_throughput[axis],

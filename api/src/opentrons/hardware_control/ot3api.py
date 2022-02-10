@@ -14,12 +14,11 @@ from typing import (
     Sequence,
     Set,
 )
-from api.src.opentrons.config.types import ByPipetteKind
 
 from opentrons_shared_data.pipette import name_config
 from opentrons import types as top_types
 from opentrons.config import robot_configs
-from opentrons.config.types import RobotConfig, OT3Config
+from opentrons.config.types import RobotConfig, OT3Config, PipetteKind
 
 try:
     from opentrons_hardware.hardware_control.motion_planning import (
@@ -140,7 +139,7 @@ class OT3API(
         self._door_state = DoorState.CLOSED
         self._pause_manager = PauseManager(self._door_state)
         self._transforms = build_ot3_transforms(self._config)
-        self._pipette_kind = ByPipetteKind.none
+        self._pipette_kind = PipetteKind.NONE
         self._move_manager = MoveManager(
             constraints=robot_configs.get_system_constraints(
                 self._config, self._pipette_kind)
@@ -171,11 +170,11 @@ class OT3API(
         self._door_state = door_state
 
     @property
-    def pipette_kind(self) -> ByPipetteKind:
+    def pipette_kind(self) -> PipetteKind:
         return self._pipette_kind
 
     @pipette_kind.setter
-    def pipette_kind(self, pipette_kind: ByPipetteKind):
+    def pipette_kind(self, pipette_kind: PipetteKind):
         self._pipette_kind = pipette_kind
         self._move_manager.update_constraints(
             robot_configs.get_system_constraints(self._config, pipette_kind))
@@ -397,7 +396,7 @@ class OT3API(
             await self._backend.configure_mount(mount, hw_config)
         await self._backend.probe_network()
         # TODO: (AA, 2022-02-09) Set correct pipette kind based on attached instr
-        self.pipette_kind = ByPipetteKind.two_low_throughput
+        self.pipette_kind = PipetteKind.TWO_LOW_THROUGHPUT
 
     # Global actions API
     def pause(self, pause_type: PauseType):

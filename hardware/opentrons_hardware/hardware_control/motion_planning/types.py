@@ -14,6 +14,7 @@ from typing import (
     OrderedDict,
     Tuple,
     Union,
+    Optional
 )
 
 log = logging.getLogger(__name__)
@@ -24,10 +25,16 @@ AcceptableType = Union[SupportsFloat, np.float64]
 class Axis(enum.Enum):
     """Robot axis."""
 
-    X = 0
-    Y = 1
-    Z = 2
-    A = 3
+    X = 0, "X"
+    Y = 1, "Y"
+    Z = 2, "Z"
+    A = 3, "Z"
+
+    def __new__(cls, value: int, lookup: str):
+        member = object.__new__(cls)
+        member._value_ = value
+        member.lookup = lookup
+        return member
 
     @classmethod
     def get_all_axes(cls) -> List[Axis]:
@@ -226,7 +233,7 @@ class MoveTarget:
         return cls(position=position, max_speed=np.float64(max_speed))
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclasses.dataclass(frozen=False)
 class AxisConstraints:
     """Axis intrinsic constraints."""
 
