@@ -135,31 +135,31 @@ class ProtocolEngine:
         self._action_dispatcher.dispatch(action)
         return self._state_store.commands.get(command_id)
 
-    async def wait_for_command(self, command_id: str) -> None:
-        """Wait for a command to be completed."""
-        await self._state_store.wait_for(
-            self._state_store.commands.get_is_complete, command_id=command_id
-        )
+    async def wait_for_command_completion(self, command_id: str) -> Command:
+        """Wait for a command to be completed.
 
-    async def add_and_execute_command(self, request: CommandCreate) -> Command:
-        """Add a command to the queue and wait for it to complete.
-
-        The engine must be started by calling `play` before the command will
-        execute. You only need to call `play` once.
-
-        Arguments:
-            request: The command type and payload data used to construct
-                the command in state.
+        If the command never completes (because the engine is never `play()`ed,
+        for example), this will wait indefinitely.
+        Use something like `asyncio.wait_for()` if you need a timeout.
 
         Returns:
             The completed command, whether it succeeded or failed.
         """
-        command = self.add_command(request)
         await self._state_store.wait_for(
-            condition=self._state_store.commands.get_is_complete,
-            command_id=command.id,
+            self._state_store.commands.get_is_complete, command_id=command_id
         )
-        return self._state_store.commands.get(command.id)
+        return self._state_store.commands.get(command_id=command_id)
+
+    async def add_and_execute_command(self, request: CommandCreate) -> Command:
+        """Add a command to the queue and wait for it to complete.
+
+        Equivalent to `add_command()` followed by `wait_for_command_completion()`.
+
+        Returns:
+            The completed command, whether it succeeded or failed.
+        """
+        added_command = self.add_command(request)
+        return await self.wait_for_command_completion(added_command.id)
 
     async def stop(self) -> None:
         """Stop execution immediately, halting all motion and cancelling future commands.
