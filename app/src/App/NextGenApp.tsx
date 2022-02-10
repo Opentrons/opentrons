@@ -90,25 +90,26 @@ export interface NextGenRouteParams {
 }
 
 /**
- * provides a display name to substitute for a path segment, for breadcrumbs or menu
- * null indicates that a path segment should not be displayed
+ * Provides localized display name key to substitute for a path segment, for breadcrumbs or menu
+ * `null` indicates that a path segment should not be displayed
+ * Localized keys found in unified_app.json
  * TODO(bh, 2021-2-9):: test to iterate over routes and capture defined/undefined/not allowed path segments
  */
 export const displayNameByPathSegment: { [index: string]: string | null } = {
-  protocols: 'Protocols',
-  'deck-setup': 'Deck Setup',
-  labware: 'Labware',
-  devices: 'Devices',
-  'robot-settings': 'Robot Settings',
-  calibration: null,
-  networking: null,
   advanced: null,
-  'protocol-runs': 'Protocol Runs',
-  setup: null,
-  run: null,
-  general: null,
-  privacy: null,
+  calibration: null,
+  'deck-setup': 'deck_setup',
+  devices: 'devices',
   'feature-flags': null,
+  general: null,
+  labware: 'labware',
+  networking: null,
+  privacy: null,
+  'protocol-runs': 'protocol_runs',
+  protocols: 'protocols',
+  'robot-settings': 'robot_settings',
+  run: null,
+  setup: null,
 }
 
 export const nextGenRoutes: RouteProps[] = [
@@ -183,13 +184,13 @@ export const nextGenRoutes: RouteProps[] = [
  * @returns {JSX.Element}
  */
 export function NextGenApp(): JSX.Element {
-  const crumbs = usePathCrumbs()
+  const pathCrumbs = usePathCrumbs()
 
   return (
     <>
       <TempNavBar routes={nextGenRoutes} />
       <Box width="100%">
-        <Breadcrumbs crumbs={crumbs} />
+        <Breadcrumbs pathCrumbs={pathCrumbs} />
         <Box
           position={POSITION_RELATIVE}
           width="100%"

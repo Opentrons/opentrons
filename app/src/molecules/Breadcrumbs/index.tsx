@@ -15,8 +15,13 @@ import {
 
 import caret_right from '../../assets/images/caret_right.svg'
 
+export interface PathCrumb {
+  pathSegment: string
+  crumbName: string
+}
+
 interface BreadcrumbsProps {
-  crumbs: string[]
+  pathCrumbs: PathCrumb[]
 }
 
 const Crumb = styled(Flex)`
@@ -30,11 +35,13 @@ const Crumb = styled(Flex)`
 
 /**
  * a breadcrumb navigation bar
- * @param {string[]} crumbs an array of strings to render as breadcrumbs
+ * @param {PathCrumb[]} pathCrumbs an array of names/path segments to render as breadcrumbs
  * @returns {JSX.Element}
  */
-export function Breadcrumbs({ crumbs }: BreadcrumbsProps): JSX.Element | null {
-  return crumbs.length > 1 ? (
+export function Breadcrumbs({
+  pathCrumbs,
+}: BreadcrumbsProps): JSX.Element | null {
+  return pathCrumbs.length > 1 ? (
     <Flex
       alignItems={ALIGN_FLEX_START}
       backgroundColor={COLORS.white}
@@ -43,16 +50,25 @@ export function Breadcrumbs({ crumbs }: BreadcrumbsProps): JSX.Element | null {
       flexDirection={DIRECTION_ROW}
       padding={`${SPACING.spacing2} 0 ${SPACING.spacing2} ${SPACING.spacing3}`}
     >
-      {crumbs.map((crumb, i) => {
-        return i !== crumbs.length - 1 ? (
-          <Link to={`/${crumbs.slice(0, i + 1).join('/')}`}>
+      {pathCrumbs.map((crumb, i) => {
+        const linkPath = `/${pathCrumbs
+          // use all crumbs up to the current crumb
+          .slice(0, i + 1)
+          // construct path with original path segment
+          .map(crumb => crumb.pathSegment)
+          .join('/')}`
+
+        return i !== pathCrumbs.length - 1 ? (
+          <Link key={crumb.pathSegment} to={linkPath}>
             <Crumb>
-              <Box paddingRight={SPACING.spacing2}>{crumb}</Box>
+              <Box paddingRight={SPACING.spacing2}>{crumb.crumbName}</Box>
               <img src={caret_right} />
             </Crumb>
           </Link>
         ) : (
-          <Box color={COLORS.darkGreyEnabled}>{crumb}</Box>
+          <Box key={crumb.pathSegment} color={COLORS.darkGreyEnabled}>
+            {crumb.crumbName}
+          </Box>
         )
       })}
     </Flex>

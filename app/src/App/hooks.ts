@@ -1,3 +1,4 @@
+import { format, parseISO } from 'date-fns'
 import { useSelector } from 'react-redux'
 import { useLocation } from 'react-router'
 import { useTranslation } from 'react-i18next'
@@ -9,8 +10,10 @@ import {
 } from '../redux/nav'
 import { getConnectedRobot } from '../redux/discovery'
 import { useIsProtocolRunLoaded } from '../organisms/ProtocolUpload/hooks'
-import { NavLocation } from '../redux/nav/types'
 import { displayNameByPathSegment } from './NextGenApp'
+
+import type { PathCrumb } from '../molecules/Breadcrumbs'
+import type { NavLocation } from '../redux/nav/types'
 
 export function useRunLocation(): NavLocation {
   const { t } = useTranslation('top_navigation')
@@ -47,18 +50,41 @@ export function useNavLocations(): NavLocation[] {
   return navLocations
 }
 
-export function usePathCrumbs(): string[] {
+/**
+ * a hook for the unified app, to generate an array of path crumbs
+ * @returns {PathCrumb[]}
+ */
+export function usePathCrumbs(): PathCrumb[] {
+  const { t } = useTranslation('unified_app')
   const location = useLocation()
 
-  // trim initial /
   const subPathname = location.pathname.substring(1)
 
-  const crumbs = subPathname
+  const pathCrumbs = subPathname
     .split('/')
     // filter out path segments explicitly defined as null
     .filter(crumb => displayNameByPathSegment[crumb] !== null)
-    // map to the display name if defined, or leave alone
-    .map(crumb => displayNameByPathSegment[crumb] ?? crumb)
+    .map(crumb => {
+      const crumbDisplayNameValue = displayNameByPathSegment[crumb]
 
-  return crumbs
+      /**
+       * Check if the crumb is a date and parse. may want to pull out as a helper
+       * Necessary because 'Run Record ID' is planned to be rendered as a date timestamp
+       */
+      const crumbDateNameValue =
+        // eslint-disable-next-line eqeqeq
+        (new Date(crumb) as Date | string) != 'Invalid Date'
+          ? format(parseISO(crumb), 'MM/dd/yyyy HH:mm:ss')
+          : crumb
+
+      return {
+        pathSegment: crumb,
+        crumbName:
+          crumbDisplayNameValue != null
+            ? t(crumbDisplayNameValue)
+            : crumbDateNameValue,
+      }
+    })
+
+  return pathCrumbs
 }

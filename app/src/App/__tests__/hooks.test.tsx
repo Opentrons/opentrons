@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { MemoryRouter } from 'react-router-dom'
 import { renderHook } from '@testing-library/react-hooks'
 import { createStore } from 'redux'
 import { I18nextProvider } from 'react-i18next'
@@ -12,7 +13,7 @@ import {
   getDeckCalibrationOk,
 } from '../../redux/nav'
 import { getConnectedRobot } from '../../redux/discovery'
-import { useNavLocations, useRunLocation } from '../hooks'
+import { useNavLocations, usePathCrumbs, useRunLocation } from '../hooks'
 import { useIsProtocolRunLoaded } from '../../organisms/ProtocolUpload/hooks'
 
 import type { Store } from 'redux'
@@ -110,5 +111,39 @@ describe('useRunLocation', () => {
       const { result } = renderHook(useNavLocations, { wrapper })
       expect(result.current.length).toBe(4)
     })
+  })
+})
+
+describe('usePathCrumbs', () => {
+  let wrapper: React.FunctionComponent<{}>
+  beforeEach(() => {
+    wrapper = ({ children }) => (
+      <I18nextProvider i18n={i18n}>
+        <MemoryRouter
+          initialEntries={[
+            '/devices/litter-hood/protocol-runs/2022-02-10T20:25:42.662800+00:00',
+          ]}
+          initialIndex={0}
+        >
+          {children}
+        </MemoryRouter>
+      </I18nextProvider>
+    )
+  })
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
+  it('should return a mapped path crumb', () => {
+    const { result } = renderHook(usePathCrumbs, { wrapper })
+    expect(result.current).toStrictEqual([
+      { pathSegment: 'devices', crumbName: 'Devices' },
+      { pathSegment: 'litter-hood', crumbName: 'litter-hood' },
+      { pathSegment: 'protocol-runs', crumbName: 'Protocol Runs' },
+      {
+        pathSegment: '2022-02-10T20:25:42.662800+00:00',
+        crumbName: '02/10/2022 15:25:42',
+      },
+    ])
   })
 })
