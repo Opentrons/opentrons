@@ -78,6 +78,7 @@ if __name__ == "__main__":
         include_package_data=True,
         entry_points={
             "console_scripts": [
+                "opentrons_update_fw = opentrons_hardware.scripts.update_fw:main",
                 "opentrons_can_comm = opentrons_hardware.scripts.can_comm:main",
                 "opentrons_sim_can_bus = opentrons_hardware.scripts.sim_socket_can:main",  # noqa: E501
             ]

@@ -19,6 +19,7 @@ import { AppSettings } from '../pages/More/AppSettings'
 import { DeviceDetails } from '../pages/Devices/DeviceDetails'
 import { DevicesLanding } from '../pages/Devices/DevicesLanding'
 import { usePathCrumbs } from './hooks'
+import { ProtocolsLanding } from '../pages/Protocols/ProtocolsLanding'
 
 interface RouteProps {
   /**
@@ -114,7 +115,7 @@ export const translationKeyByPathSegment: { [index: string]: string | null } = {
 
 export const nextGenRoutes: RouteProps[] = [
   {
-    component: () => <div>protocols landing</div>,
+    component: ProtocolsLanding,
     exact: true,
     name: 'Protocols',
     navLinkTo: '/protocols',
