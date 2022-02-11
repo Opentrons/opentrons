@@ -19,6 +19,7 @@ export const darkBlackPressed = '#16212D'
 export const darkGrey = '#4a4a4a'
 export const darkGreyHover = '#787a7d'
 export const darkGreyPressed = '#646668'
+export const darkGreyEnabled = '#707075'
 // note: darkGreyDisabled = greyDisabled
 
 export const greyHover = '#acacaf'

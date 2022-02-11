@@ -35,9 +35,10 @@ export function Banner(props: BannerProps): JSX.Element | null {
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <Flex flexDirection={DIRECTION_ROW} color={COLORS.darkGrey}>
+          <Flex flexDirection={DIRECTION_ROW}>
             <Icon
               size={SPACING.spacing6}
+              color={COLORS.darkGreyEnabled}
               name="information"
               paddingRight={SPACING.spacing3}
               paddingBottom={TYPOGRAPHY.fontSizeCaption}
@@ -51,7 +52,7 @@ export function Banner(props: BannerProps): JSX.Element | null {
               {title}
             </Text>
           </Flex>
-          {subtitle !== null ? (
+          {subtitle !== null && (
             <Text
               fontSize={TYPOGRAPHY.fontSizeP}
               color={COLORS.darkBlack}
@@ -59,7 +60,7 @@ export function Banner(props: BannerProps): JSX.Element | null {
             >
               {subtitle}
             </Text>
-          ) : null}
+          )}
           <Text
             paddingTop={subtitle === null ? SPACING.spacingM : SPACING.spacing2}
             color={COLORS.darkGrey}

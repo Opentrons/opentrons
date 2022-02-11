@@ -17,7 +17,7 @@ const render = (props: React.ComponentProps<typeof HeaterShakerBanner>) => {
 describe('HeaterShakerBanner', () => {
   let props: React.ComponentProps<typeof HeaterShakerBanner>
   beforeEach(() => {
-    props = { model: 'HeaterShakerV1' }
+    props = { displayName: 'HeaterShakerV1' }
     mockBanner.mockReturnValue(<div>mock banner</div>)
   })
 

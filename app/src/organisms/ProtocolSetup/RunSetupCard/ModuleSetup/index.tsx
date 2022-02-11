@@ -80,7 +80,7 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
       : null
 
   return (
-    <Flex flex="1" maxHeight="80vh" flexDirection={DIRECTION_COLUMN}>
+    <Flex flex="1" maxHeight="100vh" flexDirection={DIRECTION_COLUMN}>
       {showMultipleModulesModal && (
         <MultipleModulesModal
           onCloseClick={() => setShowMultipleModulesModal(false)}
@@ -91,9 +91,8 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
         const { model } = moduleDef
         return (
           <>
-            {/* @ts-expect-error: this is always false until heater shaker is added to model */}
-            {model === 'heatershakermoduleV1' && (
-              <HeaterShakerBanner model={moduleDef.displayName} />
+            {model === 'magneticModuleV2' && (
+              <HeaterShakerBanner displayName={moduleDef.displayName} />
             )}
           </>
         )
