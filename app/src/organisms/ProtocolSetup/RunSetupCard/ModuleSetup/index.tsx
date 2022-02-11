@@ -91,7 +91,8 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
         const { model } = moduleDef
         return (
           <>
-            {model === 'magneticModuleV2' && (
+            {/* @ts-expect-error: this is always false until heater shaker is added to model */}
+            {model === 'heatershakermoduleV1' && (
               <HeaterShakerBanner displayName={moduleDef.displayName} />
             )}
           </>
