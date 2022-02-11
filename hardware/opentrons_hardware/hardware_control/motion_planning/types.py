@@ -48,7 +48,7 @@ class Axis(enum.Enum):
     @property
     def lookup(self) -> Literal["X", "Y", "Z", "P"]:
         """Return system constraint lookup value."""
-        return self.lookup
+        return self._lookup
 
 
 @dataclasses.dataclass(frozen=False)
