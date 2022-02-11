@@ -18,13 +18,11 @@ describe('HeaterShakerBanner', () => {
   let props: React.ComponentProps<typeof HeaterShakerBanner>
   beforeEach(() => {
     props = { model: 'HeaterShakerV1' }
-    mockBanner.mockReturnValue(
-      <div>Attach HeaterShakerV1 to deck before proceeding to run</div>
-    )
+    mockBanner.mockReturnValue(<div>mock banner</div>)
   })
 
   it('should render banner component', () => {
     const { getByText } = render(props)
-    getByText('Attach HeaterShakerV1 to deck before proceeding to run')
+    getByText('mock banner')
   })
 })

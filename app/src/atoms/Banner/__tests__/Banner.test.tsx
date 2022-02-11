@@ -19,12 +19,26 @@ describe('HeaterShakerBanner', () => {
     }
   })
 
-  it('should render correct text', () => {
-    const { getByText } = render(props)
+  it('should render correct text when subtitle is not null', () => {
+    const { getByText, getByLabelText } = render(props)
     getByText('TITLE')
     getByText('BODY')
     getByText('btnText')
     getByText('SUBTITLE')
+    getByLabelText('information_icon')
+  })
+
+  it('should render correct text when subtitle null', () => {
+    props = {
+      title: 'TITLE',
+      body: 'BODY',
+      btnText: 'btnText',
+      onClick: jest.fn(),
+    }
+    const { getByText } = render(props)
+    getByText('TITLE')
+    getByText('BODY')
+    getByText('btnText')
   })
 
   it('should render button and it is clickable', () => {
