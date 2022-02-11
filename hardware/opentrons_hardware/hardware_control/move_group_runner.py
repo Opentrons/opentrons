@@ -71,7 +71,14 @@ class MoveGroupRunner:
                                 duration=UInt32Field(
                                     int(step.duration_sec * interrupts_per_sec)
                                 ),
-                                acceleration=Int32Field(0),
+                                acceleration=Int32Field(
+                                    int(
+                                        (step.acceleration_mm_sec_sq
+                                         / interrupts_per_sec
+                                         / interrupts_per_sec)
+                                        * (2**31)
+                                        )
+                                ),
                                 velocity=Int32Field(
                                     int(
                                         (step.velocity_mm_sec / interrupts_per_sec)
