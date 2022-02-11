@@ -165,7 +165,7 @@ def default_pipette_offset() -> List[float]:
 def default_system_constraints(config: OT3Config) -> Dict[str, AxisConstraints]:
     constraints = {}
     for axis in Axis.get_all_axes():
-        constraints[axis.name] = AxisConstraints.build(
+        constraints[str(axis.name)] = AxisConstraints.build(
             config.acceleration.none[axis.lookup],
             config.max_speed_discontinuity.none[axis.lookup],
             config.direction_change_speed_discontinuity.none[axis.lookup],

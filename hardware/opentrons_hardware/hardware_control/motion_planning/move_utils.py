@@ -128,7 +128,7 @@ def find_initial_speed(
             log.debug(f"Skip {axis} because it is not moving")
             continue
         else:
-            axis_constraints = constraints[axis]
+            axis_constraints = constraints[axis.name]
             prev_component = (
                 prev_move.unit_vector[axis]
                 if prev_move.distance > FLOAT_THRESHOLD
@@ -205,7 +205,7 @@ def find_final_speed(
             continue
         else:
             log.debug(f"Find final speed for {axis}")
-            axis_constraints = constraints[axis]
+            axis_constraints = constraints[axis.name]
             next_component = (
                 next_move.unit_vector[axis]
                 if next_move.distance > FLOAT_THRESHOLD
@@ -238,7 +238,7 @@ def achievable_final(
     for axis in Axis.get_all_axes():
         axis_component = move.unit_vector[axis]
         if axis_component:
-            axis_max_acc = constraints[axis].max_acceleration
+            axis_max_acc = constraints[axis.name].max_acceleration
             # using the equation v_f^2  = v_i^2 + 2as
             max_axis_final_velocity_sq = (
                 initial_speed * axis_component
@@ -289,7 +289,7 @@ def build_blocks(
 
     max_acc = np.array(
         [
-            constraints[axis].max_acceleration if unit_vector[axis] else 0.0
+            constraints[axis.name].max_acceleration if unit_vector[axis] else 0.0
             for axis in Axis.get_all_axes()
         ]
     )
@@ -417,7 +417,7 @@ def blended(constraints: SystemConstraints, first: Move, second: Move) -> bool:
         if first.unit_vector[axis] * second.unit_vector[axis] > 0:
             # if they're in the same direction, we can check that either the junction
             # speeds exactly match, or that they're both under the discontinuity limit
-            discont_limit = constraints[axis].max_speed_discont
+            discont_limit = constraints[axis.name].max_speed_discont
             if not (abs(initial_speed - final_speed) < FLOAT_THRESHOLD):
                 if not (
                     check_less_or_close(discont_limit, final_speed)
@@ -431,7 +431,7 @@ def blended(constraints: SystemConstraints, first: Move, second: Move) -> bool:
         else:
             # if they're in different directions, then the junction has to be at or
             # under the speed change discontinuity
-            discont_limit = constraints[axis].max_direction_change_speed_discont
+            discont_limit = constraints[axis.name].max_direction_change_speed_discont
             if not (
                 check_less_or_close(discont_limit, final_speed)
                 or check_less_or_close(discont_limit, initial_speed)
@@ -462,5 +462,6 @@ def all_blended(constraints: SystemConstraints, moves: List[Move]) -> bool:
 def unit_vector_multiplication(
     unit_vector: Coordinates, value: np.float64
 ) -> Coordinates:
+    """Multiply coordinates type by a float value."""
     targets: np.ndarray = unit_vector.vectorize() * value
     return Coordinates.from_iter(targets)

@@ -86,7 +86,8 @@ def main() -> None:
         params = json.load(f)
 
     constraints: SystemConstraints = {
-        axis: AxisConstraints.build(**params["constraints"][axis.name]) for axis in Axis
+        axis.name: AxisConstraints.build(**params["constraints"][axis.name])
+        for axis in Axis
     }
     origin = Coordinates(*params["origin"])
     target_list = [

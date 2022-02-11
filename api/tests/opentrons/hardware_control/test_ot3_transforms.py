@@ -46,10 +46,10 @@ async def test_transform_values(pipette_model):
     sim = await ot3api.OT3API.build_hardware_simulator(attached_instruments=attached)
     target = types.Point(20, 30, 40)
     with mock.patch.object(
-        sim._backend,
-        "move",
-        mock.MagicMock(side_effect=sim._backend.move),
-        spec=sim._backend.move,
+        sim._move_manager,
+        "plan_motion",
+        mock.MagicMock(side_effect=sim._move_manager.plan_motion),
+        spec=sim._move_manager.plan_motion,
     ) as mock_move:
         await sim.move_to(types.Mount.RIGHT, target)
         right_offset = sim._attached_instruments[types.Mount.RIGHT].critical_point()
@@ -61,15 +61,15 @@ async def test_transform_values(pipette_model):
             (target.z - right_offset[2] - sim.config.right_mount_offset[2]) * -1
             + sim.config.carriage_offset[2],
         ]
-        assert mock_move.call_args[0][0]["X"] == point[0]
-        assert mock_move.call_args[0][0]["Y"] == point[1]
-        assert mock_move.call_args[0][0]["A"] == point[2]
+        assert mock_move.call_args[1]["target_list"][0].position.X == point[0]
+        assert mock_move.call_args[1]["target_list"][0].position.Y == point[1]
+        assert mock_move.call_args[1]["target_list"][0].position.A == point[2]
 
     with mock.patch.object(
-        sim._backend,
-        "move",
-        mock.MagicMock(side_effect=sim._backend.move),
-        spec=sim._backend.move,
+        sim._move_manager,
+        "plan_motion",
+        mock.MagicMock(side_effect=sim._move_manager.plan_motion),
+        spec=sim._move_manager.plan_motion,
     ) as mock_move:
         await sim.move_to(types.Mount.LEFT, target)
         left_offset = sim._attached_instruments[types.Mount.LEFT].critical_point()
@@ -81,6 +81,6 @@ async def test_transform_values(pipette_model):
             (target.z - left_offset[2] - sim.config.left_mount_offset[2]) * -1
             + sim.config.carriage_offset[2],
         ]
-        assert mock_move.call_args[0][0]["X"] == point[0]
-        assert mock_move.call_args[0][0]["Y"] == point[1]
-        assert mock_move.call_args[0][0]["Z"] == point[2]
+        assert mock_move.call_args[1]["target_list"][0].position.X == point[0]
+        assert mock_move.call_args[1]["target_list"][0].position.Y == point[1]
+        assert mock_move.call_args[1]["target_list"][0].position.Z == point[2]

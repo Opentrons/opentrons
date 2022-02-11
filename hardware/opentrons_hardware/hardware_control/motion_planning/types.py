@@ -14,9 +14,9 @@ from typing import (
     List,
     OrderedDict,
     Tuple,
-    Union
+    Union,
 )
-from typing_extensions import Literal, Final
+from typing_extensions import Literal
 
 log = logging.getLogger(__name__)
 
@@ -26,30 +26,37 @@ AcceptableType = Union[SupportsFloat, np.float64]
 class Axis(enum.Enum):
     """Robot axis."""
 
-    X = 0, Literal["X"], NodeId.gantry_x
-    Y = 1, Literal["Y"], NodeId.gantry_y
-    Z = 2, Literal["Z"], NodeId.head_l
-    A = 3, Literal["Z"], NodeId.head_r
+    X = 0, "X", NodeId.gantry_x
+    Y = 1, "Y", NodeId.gantry_y
+    Z = 2, "Z", NodeId.head_l
+    A = 3, "Z", NodeId.head_r
+    B = 4, "P", NodeId.pipette_left
+    C = 5, "P", NodeId.pipette_right
 
-    def __new__(cls, value: int, lookup: str, node_id: NodeId):
+    def __new__(
+        cls, value: int, lookup: Literal["X", "Y", "Z", "P"], node_id: NodeId
+    ) -> Axis:
+        """Create robot axis."""
         member = object.__new__(cls)
         member._value_ = value
         member._lookup = lookup
         member._node_id = node_id
-        return member
+        return member  # type: ignore[no-any-return]
 
     @classmethod
     def get_all_axes(cls) -> List[Axis]:
         """Return all system axes of the robot."""
-        return [cls.X, cls.Y, cls.Z, cls.A]
+        return [cls.X, cls.Y, cls.Z, cls.A, cls.B, cls.C]
 
     @property
     def lookup(self) -> Literal["X", "Y", "Z", "P"]:
-        return self._lookup
+        """Return system constraint lookup value."""
+        return self.lookup
 
     @property
     def node_id(self) -> NodeId:
-        return self._node_id
+        """Return associated node id."""
+        return self.node_id
 
 
 @dataclasses.dataclass(frozen=False)
@@ -60,15 +67,25 @@ class Coordinates:
     Y: np.float64
     Z: np.float64
     A: np.float64
+    B: np.float64
+    C: np.float64
 
     def __init__(
-        self, X: AcceptableType, Y: AcceptableType, Z: AcceptableType, A: AcceptableType
+        self,
+        X: AcceptableType = 0,
+        Y: AcceptableType = 0,
+        Z: AcceptableType = 0,
+        A: AcceptableType = 0,
+        B: AcceptableType = 0,
+        C: AcceptableType = 0,
     ) -> None:
         """Constructor."""
         self.X = np.float64(X)
         self.Y = np.float64(Y)
         self.Z = np.float64(Z)
         self.A = np.float64(A)
+        self.B = np.float64(B)
+        self.C = np.float64(C)
 
     def __iter__(self) -> Coordinates:
         """Return an iterator."""

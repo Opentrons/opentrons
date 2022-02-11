@@ -697,23 +697,19 @@ class OT3API(
             self._transforms.deck_calibration.attitude,
             self._transforms.carriage_offset,
         )
-        current_pos = machine_from_deck(
-            self._current_position,
-            self._transforms.deck_calibration.attitude,
-            self._transforms.carriage_offset,
-        )
         bounds = self._backend.axis_bounds
         to_check = {
             ax: machine_pos[ax.name]
-            for idx, ax in enumerate(target_position.keys())
+            for ax in target_position.keys()
             if ax in Axis.gantry_axes()
         }
         check_motion_bounds(to_check, target_position, bounds, check_bounds)
-        origin = Coordinates.from_iter(iter(current_pos.values()))
+
         # TODO: (2022-02-10) Use actual max speed for MoveTarget
         move_target = MoveTarget.build(
-            position=Coordinates.from_iter(iter(machine_pos.values())), max_speed=500.0
+            position=Coordinates(**machine_pos), max_speed=500.0
         )
+        origin = Coordinates.from_iter(iter(self._current_position.values()))
         blended, moves = self._move_manager.plan_motion(
             origin=origin, target_list=[move_target]
         )

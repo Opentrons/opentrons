@@ -6,7 +6,6 @@ from typing import Iterator, List
 
 from opentrons_hardware.hardware_control.motion_planning import move_manager
 from opentrons_hardware.hardware_control.motion_planning.types import (
-    Axis,
     AxisConstraints,
     Coordinates,
     MoveTarget,
@@ -35,6 +34,8 @@ def generate_coordinates(draw: st.DrawFn) -> Coordinates:
         draw(hynp.from_dtype(np.dtype(np.float64), min_value=0, max_value=490)),
         draw(hynp.from_dtype(np.dtype(np.float64), min_value=0, max_value=300)),
         draw(hynp.from_dtype(np.dtype(np.float64), min_value=0, max_value=300)),
+        draw(hynp.from_dtype(np.dtype(np.float64), min_value=0, max_value=300)),
+        draw(hynp.from_dtype(np.dtype(np.float64), min_value=0, max_value=300)),
     ]
     formatted: Iterator[np.float64] = (np.float64(i) for i in coord)
     return Coordinates.from_iter(formatted)
@@ -44,6 +45,8 @@ def generate_coordinates(draw: st.DrawFn) -> Coordinates:
 def generate_close_coordinates(draw: st.DrawFn, prev_coord: Coordinates) -> Coordinates:
     """Create coordinates using Hypothesis."""
     diff = [
+        draw(hynp.from_dtype(np.dtype(np.float64), min_value=0.1, max_value=1.0)),
+        draw(hynp.from_dtype(np.dtype(np.float64), min_value=0.1, max_value=1.0)),
         draw(hynp.from_dtype(np.dtype(np.float64), min_value=0.1, max_value=1.0)),
         draw(hynp.from_dtype(np.dtype(np.float64), min_value=0.1, max_value=1.0)),
         draw(hynp.from_dtype(np.dtype(np.float64), min_value=0.1, max_value=1.0)),
@@ -103,6 +106,8 @@ def generate_close_target_list(
     y_constraint=generate_axis_constraint(),
     z_constraint=generate_axis_constraint(),
     a_constraint=generate_axis_constraint(),
+    b_constraint=generate_axis_constraint(),
+    c_constraint=generate_axis_constraint(),
     origin=generate_coordinates(),
     targets=generate_target_list(),
 )
@@ -111,16 +116,20 @@ def test_move_plan(
     y_constraint: AxisConstraints,
     z_constraint: AxisConstraints,
     a_constraint: AxisConstraints,
+    b_constraint: AxisConstraints,
+    c_constraint: AxisConstraints,
     origin: Coordinates,
     targets: List[MoveTarget],
 ) -> None:
     """Test motion plan using Hypothesis."""
     assume(reject_close_coordinates(origin, targets[0].position))
     constraints = {
-        Axis.X: x_constraint,
-        Axis.Y: y_constraint,
-        Axis.Z: z_constraint,
-        Axis.A: a_constraint,
+        "X": x_constraint,
+        "Y": y_constraint,
+        "Z": z_constraint,
+        "A": a_constraint,
+        "B": b_constraint,
+        "C": c_constraint,
     }
     manager = move_manager.MoveManager(constraints=constraints)
     converged, blend_log = manager.plan_motion(
@@ -137,6 +146,8 @@ def test_move_plan(
     y_constraint=generate_axis_constraint(),
     z_constraint=generate_axis_constraint(),
     a_constraint=generate_axis_constraint(),
+    b_constraint=generate_axis_constraint(),
+    c_constraint=generate_axis_constraint(),
     origin=generate_coordinates(),
     data=st.data(),
 )
@@ -145,16 +156,20 @@ def test_close_move_plan(
     y_constraint: AxisConstraints,
     z_constraint: AxisConstraints,
     a_constraint: AxisConstraints,
+    b_constraint: AxisConstraints,
+    c_constraint: AxisConstraints,
     origin: Coordinates,
     data: st.DataObject,
 ) -> None:
     """Test motion plan using Hypothesis."""
     targets = data.draw(generate_close_target_list(origin))
     constraints = {
-        Axis.X: x_constraint,
-        Axis.Y: y_constraint,
-        Axis.Z: z_constraint,
-        Axis.A: a_constraint,
+        "X": x_constraint,
+        "Y": y_constraint,
+        "Z": z_constraint,
+        "A": a_constraint,
+        "B": b_constraint,
+        "C": c_constraint,
     }
     manager = move_manager.MoveManager(constraints=constraints)
     converged, blend_log = manager.plan_motion(

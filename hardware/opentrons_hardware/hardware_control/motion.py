@@ -1,17 +1,16 @@
 """A collection of motions that define a single move."""
 from typing import List, Dict, Iterable, Optional
 from dataclasses import dataclass
-from matplotlib.pyplot import axis
 import numpy as np  # type: ignore[import]
 from logging import getLogger
 
 from opentrons_ot3_firmware.constants import NodeId
-from .motion_planning.types import Coordinates, Block
 
 LOG = getLogger(__name__)
 
 
 NodeIdMotionValues = Dict[NodeId, np.float64]
+
 
 @dataclass(frozen=True)
 class MoveGroupSingleAxisStep:
@@ -48,7 +47,7 @@ def create_move(
     acceleration: Dict[NodeId, np.float64],
     duration: np.float64,
     present_nodes: Optional[Iterable[NodeId]] = None,
-):
+) -> MoveGroups:
     """Create a move from a block.
 
     Args:
