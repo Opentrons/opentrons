@@ -90,12 +90,12 @@ export interface NextGenRouteParams {
 }
 
 /**
- * Provides localized display name key to substitute for a path segment, for breadcrumbs or menu
+ * Provides localized translation keys to substitute for a path segment, for breadcrumbs or menu
  * `null` indicates that a path segment should not be displayed
  * Localized keys found in unified_app.json
  * TODO(bh, 2021-2-9):: test to iterate over routes and capture defined/undefined/not allowed path segments
  */
-export const displayNameByPathSegment: { [index: string]: string | null } = {
+export const translationKeyByPathSegment: { [index: string]: string | null } = {
   advanced: null,
   calibration: null,
   'deck-setup': 'deck_setup',

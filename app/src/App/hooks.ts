@@ -10,7 +10,7 @@ import {
 } from '../redux/nav'
 import { getConnectedRobot } from '../redux/discovery'
 import { useIsProtocolRunLoaded } from '../organisms/ProtocolUpload/hooks'
-import { displayNameByPathSegment } from './NextGenApp'
+import { translationKeyByPathSegment } from './NextGenApp'
 
 import type { PathCrumb } from '../molecules/Breadcrumbs'
 import type { NavLocation } from '../redux/nav/types'
@@ -55,7 +55,7 @@ export function useNavLocations(): NavLocation[] {
  * @returns {PathCrumb[]}
  */
 export function usePathCrumbs(): PathCrumb[] {
-  const { t } = useTranslation('unified_app')
+  const { t } = useTranslation('top_navigation')
   const location = useLocation()
 
   const subPathname = location.pathname.substring(1)
@@ -63,9 +63,9 @@ export function usePathCrumbs(): PathCrumb[] {
   const pathCrumbs = subPathname
     .split('/')
     // filter out path segments explicitly defined as null
-    .filter(crumb => displayNameByPathSegment[crumb] !== null)
+    .filter(crumb => translationKeyByPathSegment[crumb] !== null)
     .map(crumb => {
-      const crumbDisplayNameValue = displayNameByPathSegment[crumb]
+      const crumbDisplayNameValue = translationKeyByPathSegment[crumb]
 
       /**
        * Check if the crumb is a date and parse. may want to pull out as a helper
