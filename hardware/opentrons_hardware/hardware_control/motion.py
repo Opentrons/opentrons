@@ -46,7 +46,7 @@ def create_step(
     velocity: Dict[NodeId, np.float64],
     acceleration: Dict[NodeId, np.float64],
     duration: np.float64,
-    present_nodes: Optional[Iterable[NodeId]] = None,
+    present_nodes: Iterable[NodeId],
 ) -> MoveGroupStep:
     """Create a move from a block.
 
