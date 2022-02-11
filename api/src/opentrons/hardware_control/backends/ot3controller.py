@@ -20,6 +20,7 @@ from opentrons.config.types import OT3Config
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.types import Mount
 from opentrons.config import pipette_config
+import ot3utils
 
 try:
     import aionotify  # type: ignore[import]
@@ -43,9 +44,7 @@ try:
         Move,
         Coordinates,
     )
-    from opentrons_hardware.hardware_control.motion_planning.move_utils import (
-        unit_vector_multiplication,
-    )
+    
     from opentrons_hardware.hardware_control.network import probe
     from opentrons_ot3_firmware.constants import NodeId
     from opentrons_ot3_firmware.messages.message_definitions import (
@@ -119,68 +118,6 @@ class OT3Controller:
             )
         self._present_nodes: Set[NodeId] = set()
 
-    # TODO: These staticmethods exist to defer uses of NodeId to inside
-    # method bodies, which won't be evaluated until called. This is needed
-    # because the robot server doesn't have opentrons_ot3_firmware as a dep
-    # which is where they're defined, and therefore you can't have references
-    # to NodeId that are interpreted at import time because then the robot
-    # server tests fail when importing hardware controller. This is obviously
-    # terrible and needs to be fixed.
-    @staticmethod
-    def _axis_nodes() -> List["NodeId"]:
-        return [
-            NodeId.gantry_x,
-            NodeId.gantry_y,
-            NodeId.head_l,
-            NodeId.head_r,
-            NodeId.pipette_left,
-            NodeId.pipette_right,
-        ]
-
-    @staticmethod
-    def _node_axes() -> List[str]:
-        return ["X", "Y", "Z", "A", "B"]
-
-    @staticmethod
-    def _axis_to_node(axis: str) -> "NodeId":
-        anm = {
-            "X": NodeId.gantry_x,
-            "Y": NodeId.gantry_y,
-            "Z": NodeId.head_l,
-            "A": NodeId.head_r,
-            "B": NodeId.pipette_left,
-            "C": NodeId.pipette_right,
-        }
-        return anm[axis]
-
-    @staticmethod
-    def _node_to_axis(node: "NodeId") -> str:
-        nam = {
-            NodeId.gantry_x: "X",
-            NodeId.gantry_y: "Y",
-            NodeId.head_l: "Z",
-            NodeId.head_r: "A",
-            NodeId.pipette_left: "B",
-            NodeId.pipette_right: "C",
-        }
-        return nam[node]
-
-    @staticmethod
-    def _node_is_axis(node: "NodeId") -> bool:
-        try:
-            OT3Controller._node_to_axis(node)
-            return True
-        except KeyError:
-            return False
-
-    @staticmethod
-    def _axis_is_node(axis: str) -> bool:
-        try:
-            OT3Controller._axis_to_node(axis)
-            return True
-        except KeyError:
-            return False
-
     async def setup_motors(self) -> None:
         """Set up the motors."""
         await self._messenger.send(
@@ -232,8 +169,9 @@ class OT3Controller:
         log.info(f"update_position: {ret}")
         return ret
 
-    async def move_block(
+    async def move(
         self,
+        origin: "Coordinates",
         moves: List[Move],
     ) -> None:
         """Move to a position.
@@ -247,72 +185,13 @@ class OT3Controller:
         Returns:
             None
         """
-
-        def _convert_to_node_id_dict(axis_pos: Coordinates) -> NodeIdMotionValues:
-            target: NodeIdMotionValues = {}
-            for axis, pos in axis_pos.to_dict().items():
-                if self._axis_is_node(axis):
-                    target[self._axis_to_node(axis)] = pos
-            return target
-
-        move_groups: MoveGroups = []
-        for move in moves:
-            move_group: MoveGroup = []
-            unit_vector = move.unit_vector
-            for block in move.blocks:
-                distances = unit_vector_multiplication(unit_vector, block.distance)
-                node_id_distances = _convert_to_node_id_dict(distances)
-                velocities = unit_vector_multiplication(unit_vector, block.initial_speed)
-                accelerations = unit_vector_multiplication(unit_vector, block.acceleration)
-                step = create_step(
-                    distance=node_id_distances,
-                    velocity=_convert_to_node_id_dict(velocities),
-                    acceleration=_convert_to_node_id_dict(accelerations),
-                    duration=block.time,
-                    present_nodes=self._present_nodes,
-                )
-                move_group.append(step)
-        runner = MoveGroupRunner(move_groups=move_groups)
-        await runner.run(can_messenger=self._messenger)
-        distances_in_float: Dict[NodeId, float] = {}
-        for key, val in node_id_distances.items():
-            distances_in_float[key] = float(val)
-        self._position.update(distances_in_float)
-
-    async def move(
-        self,
-        target_position: AxisValueMap,
-        home_flagged_axes: bool = True,
-        speed: Optional[float] = None,
-        axis_max_speeds: Optional[AxisValueMap] = None,
-    ) -> None:
-        """Move to a position.
-
-        Args:
-            target_position: Map of axis to position.
-            home_flagged_axes: Whether to home afterwords.
-            speed: Optional speed
-            axis_max_speeds: Optional map of axis to speed.
-
-        Returns:
-            None
-        """
-        log.info(f"move: {target_position}")
-        target: Dict[NodeId, float] = {}
-        for axis, pos in target_position.items():
-            if self._axis_is_node(axis):
-                target[self._axis_to_node(axis)] = pos
-
-        log.info(f"move targets: {target}")
-        move_group = create(
-            origin=self._position,
-            target=target,
-            speed=speed or 5000.0,
-            present_nodes=self._present_nodes,
+        move_group, final_positions = ot3utils.create_move_group(
+            origin, moves, self._present_nodes
         )
-        runner = MoveGroupRunner(move_groups=move_group)
+        runner = MoveGroupRunner(move_groups=[move_group])
         await runner.run(can_messenger=self._messenger)
-        self._position.update(target)
+        self._position.update(final_positions)
+
 
     async def home(self, axes: Optional[List[str]] = None) -> AxisValueMap:
         """Home axes.
