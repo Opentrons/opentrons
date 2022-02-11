@@ -716,9 +716,7 @@ class OT3API(
             if acquire_lock:
                 await stack.enter_async_context(self._motion_lock)
             try:
-                for move in moves[0]:
-                    for block in move.blocks:
-                        await self._backend.move_block(move.unit_vector, block)
+                await self._backend.move_block(moves[0])
             except Exception:
                 self._log.exception("Move failed")
                 self._current_position.clear()

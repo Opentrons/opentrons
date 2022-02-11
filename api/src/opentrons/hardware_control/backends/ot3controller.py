@@ -38,6 +38,7 @@ try:
     from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
     from opentrons_hardware.hardware_control.motion_planning import (
         Block,
+        Move,
         Coordinates,
     )
     from opentrons_hardware.hardware_control.motion_planning.move_utils import (
@@ -231,8 +232,7 @@ class OT3Controller:
 
     async def move_block(
         self,
-        unit_vector: Coordinates,
-        block: Block,
+        moves: List[Move],
     ) -> None:
         """Move to a position.
 
