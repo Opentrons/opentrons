@@ -21,15 +21,13 @@ from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.types import Mount
 from opentrons.config import pipette_config
 from opentrons_shared_data.pipette import dummy_model_for_name
+from . import ot3utils
 
 try:
     from opentrons_ot3_firmware.constants import NodeId
     from opentrons_hardware.hardware_control.motion_planning import (
-        Block,
+        Move,
         Coordinates,
-    )
-    from opentrons_hardware.hardware_control.motion_planning.move_utils import (
-        unit_vector_multiplication,
     )
 except ModuleNotFoundError:
     pass
@@ -229,38 +227,10 @@ class OT3Simulator:
         log.info(f"update_position: {ret}")
         return ret
 
-    async def move_block(
-        self,
-        unit_vector: Coordinates,
-        block: Block,
-        home_flagged_axes: bool = True,
-        axis_max_speeds: Optional[AxisValueMap] = None,
-    ) -> None:
-        """Move to a position.
-
-        Args:
-            target_position: Map of axis to position.
-            home_flagged_axes: Whether to home afterwords.
-            speed: Optional speed
-            axis_max_speeds: Optional map of axis to speed.
-
-        Returns:
-            None
-        """
-        target_position = unit_vector_multiplication(unit_vector, block.distance)
-        log.info(f"move: {target_position}")
-        target: Dict[NodeId, float] = {}
-        for axis, pos in target_position.to_dict().items():
-            if self._axis_is_node(axis):
-                target[self._axis_to_node(axis)] = float(pos)
-        self._position.update(target)
-
     async def move(
         self,
-        target_position: AxisValueMap,
-        home_flagged_axes: bool = True,
-        speed: Optional[float] = None,
-        axis_max_speeds: Optional[AxisValueMap] = None,
+        origin: "Coordinates",
+        moves: List[Move],
     ) -> None:
         """Move to a position.
 
@@ -273,12 +243,10 @@ class OT3Simulator:
         Returns:
             None
         """
-        log.info(f"move: {target_position}")
-        target: Dict[NodeId, float] = {}
-        for axis, pos in target_position.items():
-            if self._axis_is_node(axis):
-                target[self._axis_to_node(axis)] = pos
-        self._position.update(target)
+        move_group, final_positions = ot3utils.create_move_group(
+            origin, moves, self._present_nodes
+        )
+        self._position.update(final_positions)
 
     async def home(self, axes: Optional[List[str]] = None) -> AxisValueMap:
         """Home axes.
@@ -289,10 +257,6 @@ class OT3Simulator:
         Returns:
             Homed position.
         """
-        checked_axes = axes or self._node_axes()
-        home_pos = self._get_home_position()
-        target_pos = {ax: home_pos[self._axis_to_node(ax)] for ax in checked_axes}
-        await self.move(target_pos)
         return self._axis_convert(self._position)
 
     async def fast_home(self, axes: Sequence[str], margin: float) -> AxisValueMap:
@@ -305,11 +269,6 @@ class OT3Simulator:
         Returns:
             New position.
         """
-        home_pos = self._get_home_position()
-        target_pos = {ax: home_pos[self._axis_to_node(ax)] for ax in axes}
-        if not target_pos:
-            return self._axis_convert(self._position)
-        await self.move(target_pos)
         return self._axis_convert(self._position)
 
     def _attached_to_mount(

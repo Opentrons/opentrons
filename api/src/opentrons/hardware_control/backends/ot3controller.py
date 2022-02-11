@@ -20,7 +20,7 @@ from opentrons.config.types import OT3Config
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.types import Mount
 from opentrons.config import pipette_config
-import ot3utils
+from . import ot3utils
 
 try:
     import aionotify  # type: ignore[import]
@@ -31,20 +31,12 @@ try:
     from opentrons_hardware.drivers.can_bus import CanMessenger, DriverSettings
     from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
     from opentrons_hardware.drivers.can_bus.build import build_driver
-    from opentrons_hardware.hardware_control.motion import (
-        create,
-        create_step,
-        NodeIdMotionValues,
-        MoveGroup,
-        MoveGroups,
-    )
     from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
     from opentrons_hardware.hardware_control.motion_planning import (
-        Block,
         Move,
         Coordinates,
     )
-    
+
     from opentrons_hardware.hardware_control.network import probe
     from opentrons_ot3_firmware.constants import NodeId
     from opentrons_ot3_firmware.messages.message_definitions import (
@@ -164,15 +156,15 @@ class OT3Controller:
         for node, pos in position.items():
             # we need to make robot config apply to z or in some other way
             # reflect the sense of the axis direction
-            if OT3Controller._node_is_axis(node):
-                ret[OT3Controller._node_to_axis(node)] = pos
+            if ot3utils.node_is_axis(node):
+                ret[ot3utils.node_to_axis(node)] = pos
         log.info(f"update_position: {ret}")
         return ret
 
     async def move(
         self,
         origin: "Coordinates",
-        moves: List[Move],
+        moves: List["Move"],
     ) -> None:
         """Move to a position.
 
@@ -192,7 +184,6 @@ class OT3Controller:
         await runner.run(can_messenger=self._messenger)
         self._position.update(final_positions)
 
-
     async def home(self, axes: Optional[List[str]] = None) -> AxisValueMap:
         """Home axes.
 
@@ -202,9 +193,6 @@ class OT3Controller:
         Returns:
             Homed position.
         """
-        checked_axes = axes or self._node_axes()
-        home_pos = self._get_home_position()
-        target_pos = {ax: home_pos[self._axis_to_node(ax)] for ax in checked_axes}
         return self._axis_convert(self._position)
 
     async def fast_home(self, axes: Sequence[str], margin: float) -> AxisValueMap:
@@ -217,10 +205,6 @@ class OT3Controller:
         Returns:
             New position.
         """
-        home_pos = self._get_home_position()
-        target_pos = {ax: home_pos[self._axis_to_node(ax)] for ax in axes}
-        if not target_pos:
-            return self._axis_convert(self._position)
         return self._axis_convert(self._position)
 
     async def get_attached_instruments(

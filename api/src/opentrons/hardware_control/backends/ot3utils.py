@@ -11,20 +11,19 @@ try:
         AxisNames,
         AXIS_NAMES,
         Coordinates,
-        Move
+        Move,
     )
     from opentrons_hardware.hardware_control.motion_planning.move_utils import (
         unit_vector_multiplication,
     )
     from opentrons_hardware.hardware_control.motion import (
-        create,
         create_step,
         NodeIdMotionValues,
         MoveGroup,
-        MoveGroups,
     )
 except ImportError:
     pass
+
 
 # TODO: These methods exist to defer uses of NodeId to inside
 # method bodies, which won't be evaluated until called. This is needed
@@ -55,7 +54,7 @@ def axis_to_node(axis: str) -> "NodeId":
         "Z": NodeId.head_l,
         "A": NodeId.head_r,
         "B": NodeId.pipette_left,
-    "C": NodeId.pipette_right,
+        "C": NodeId.pipette_right,
     }
     return anm[axis]
 
@@ -86,6 +85,7 @@ def axis_is_node(axis: str) -> bool:
         return True
     except KeyError:
         return False
+
 
 def _constraint_name_from_axis(ax: "AxisNames") -> Literal["X", "Y", "Z", "P"]:
     lookup: Dict[AxisNames, Literal["X", "Y", "Z", "P"]] = {
@@ -124,8 +124,8 @@ def get_system_constraints(
 def _convert_to_node_id_dict(axis_pos: "Coordinates") -> "NodeIdMotionValues":
     target: NodeIdMotionValues = {}
     for axis, pos in axis_pos.to_dict().items():
-        if axis_is_node(axis.name):
-            target[axis_to_node(axis.name)] = pos
+        if axis_is_node(axis):
+            target[axis_to_node(axis)] = pos
     return target
 
 
@@ -151,6 +151,6 @@ def create_move_group(
                 present_nodes=present_nodes,
             )
             for ax in pos.keys():
-                pos[ax] += distances[ax]
+                pos[ax] += node_id_distances[ax]
             move_group.append(step)
-    return move_group, pos
+    return move_group, {k: float(v) for k, v in pos.items()}
