@@ -1,4 +1,3 @@
-from xml.dom import Node
 from opentrons_hardware.hardware_control.motion_planning import Coordinates, Move
 from opentrons.hardware_control.backends import ot3utils
 from opentrons_ot3_firmware.constants import NodeId
