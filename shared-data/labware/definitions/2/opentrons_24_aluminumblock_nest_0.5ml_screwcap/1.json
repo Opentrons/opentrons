@@ -10,9 +10,7 @@
   "brand": {
     "brand": "Opentrons",
     "brandId": [],
-    "links": [
-      "https://shop.opentrons.com/collections/opentrons-tips/products/tube-rack-set-1"
-    ]
+    "links": ["https://shop.opentrons.com/aluminum-block-set/"]
   },
   "metadata": {
     "displayName": "Opentrons 24 Well Aluminum Block with NEST 0.5 mL Screwcap",

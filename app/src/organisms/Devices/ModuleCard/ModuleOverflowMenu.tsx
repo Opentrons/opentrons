@@ -9,6 +9,7 @@ import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
 import { OverflowMenu } from '../../../atoms/OverflowMenu'
 import { OverflowMenuBtn } from '../../../atoms/OverflowMenu/OverflowMenuBtn'
 import { MagneticModuleSlideout } from './MagneticModuleSlideout'
+import { TemperatureModuleSlideout } from './TemperatureModuleSlideout'
 
 import type { AttachedModule } from '../../../redux/modules/types'
 
@@ -41,8 +42,11 @@ export const ModuleOverflowMenu = (
       setSetting = t('overflow_menu_mod_temp')
       turnOffSetting = t('overflow_menu_deactivate_temp')
       slideout = (
-        //  TODO immediately: attach actual slideout!
-        <div></div>
+        <TemperatureModuleSlideout
+          model={module.model}
+          serial={module.serial}
+          isExpanded={showSlideout}
+        />
       )
       break
     }
