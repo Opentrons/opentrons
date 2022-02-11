@@ -33,9 +33,7 @@ class Axis(enum.Enum):
     B = 4, "P"
     C = 5, "P"
 
-    def __new__(
-        cls, value: int, lookup: Literal["X", "Y", "Z", "P"]
-    ) -> Axis:
+    def __new__(cls, value: int, lookup: Literal["X", "Y", "Z", "P"]) -> Axis:
         """Create robot axis."""
         member = object.__new__(cls)
         member._value_ = value
