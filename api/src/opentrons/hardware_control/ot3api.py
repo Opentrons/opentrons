@@ -19,6 +19,7 @@ from opentrons_shared_data.pipette import name_config
 from opentrons import types as top_types
 from opentrons.config import robot_configs
 from opentrons.config.types import RobotConfig, OT3Config, PipetteKind
+from .backends.ot3utils import get_system_constraints
 
 try:
     from opentrons_hardware.hardware_control.motion_planning import (
@@ -142,9 +143,7 @@ class OT3API(
         self._transforms = build_ot3_transforms(self._config)
         self._pipette_kind = PipetteKind.NONE
         self._move_manager = MoveManager(
-            constraints=robot_configs.get_system_constraints(
-                self._config, self._pipette_kind
-            )
+            constraints=get_system_constraints(self._config, self._pipette_kind)
         )
 
         ExecutionManagerProvider.__init__(self, loop, isinstance(backend, OT3Simulator))
@@ -179,7 +178,7 @@ class OT3API(
     def pipette_kind(self, pipette_kind: PipetteKind):
         self._pipette_kind = pipette_kind
         self._move_manager.update_constraints(
-            robot_configs.get_system_constraints(self._config, pipette_kind)
+            get_system_constraints(self._config, pipette_kind)
         )
 
     def _update_door_state(self, door_state: DoorState):

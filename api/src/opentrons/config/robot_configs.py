@@ -11,11 +11,6 @@ from .feature_flags import enable_ot3_hardware_controller
 from opentrons.hardware_control.types import BoardRevision
 from .types import PipetteKind, CurrentDict, RobotConfig, AxisDict, OT3Config
 
-from opentrons_hardware.hardware_control.motion_planning import (
-    AxisConstraints,
-    Axis,
-)
-
 log = logging.getLogger(__name__)
 
 
@@ -160,22 +155,3 @@ def default_pipette_offset() -> List[float]:
         return defaults_ot3.DEFAULT_PIPETTE_OFFSET
     else:
         return defaults_ot2.DEFAULT_PIPETTE_OFFSET
-
-
-def default_system_constraints(config: OT3Config) -> Dict[str, AxisConstraints]:
-    constraints = {}
-    for axis in Axis.get_all_axes():
-        constraints[str(axis.name)] = AxisConstraints.build(
-            config.acceleration.none[axis.lookup],
-            config.max_speed_discontinuity.none[axis.lookup],
-            config.direction_change_speed_discontinuity.none[axis.lookup],
-        )
-    return constraints
-
-
-def get_system_constraints(
-    config: OT3Config, pipette_kind: PipetteKind
-) -> Dict[str, AxisConstraints]:
-    # TODO: (2022-02-10) get correct system constraints based on pipette kind
-    default = default_system_constraints(config)
-    return default
