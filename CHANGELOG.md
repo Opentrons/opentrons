@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.0.0-beta.10](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.9...v5.0.0-beta.10) (2022-02-11)
+
+
+### Bug Fixes
+
+* **app:** display runtime errors in run detail header ([#9435](https://github.com/Opentrons/opentrons/issues/9435)) ([7e5e1e7](https://github.com/Opentrons/opentrons/commit/7e5e1e77562847e3957d54eec2469d40f1389771))
+
+
+
+
+
 # [5.0.0-beta.9](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.8...v5.0.0-beta.9) (2022-02-10)
 
 

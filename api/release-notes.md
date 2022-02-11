@@ -6,7 +6,7 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# OT-2 Software Changes in 5.0.0-beta.9
+# OT-2 Software Changes in 5.0.0-beta.10
 
 Welcome to the beta release of v5.0.0 release of the OT-2 software!
 
@@ -24,8 +24,7 @@ This is beta software! You may experience unexpected crashes or missing features
 
 Keep an eye on this space as we release new versions of the beta.
 
-- We have decreased jog latency in Labware Position Check
-- We have addressed some inconsitency in labeling and viewing the current command in a run
+- We now display runtime errors in the protocol run failed banner
 
 ## Known Issues
 
