@@ -1,6 +1,6 @@
 """Shared utilities for ot3 hardware control."""
 
-from typing import Dict, Optional, Iterable, List, Tuple
+from typing import Dict, Iterable, List, Tuple
 from typing_extensions import Literal
 from opentrons.config.types import OT3Config, PipetteKind
 

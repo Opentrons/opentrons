@@ -713,7 +713,7 @@ class OT3API(
             position=Coordinates(**machine_pos), max_speed=checked_speed
         )
         backend_position = await self._backend.update_position()
-        origin = Coordinates.from_iter([backend_position[ax.name] for ax in Axis])
+        origin = Coordinates.from_iter(iter([backend_position[ax.name] for ax in Axis]))
         blended, moves = self._move_manager.plan_motion(
             origin=origin, target_list=[move_target]
         )
