@@ -121,7 +121,7 @@ def get_system_constraints(
     return default_system_constraints(config)
 
 
-def _convert_to_node_id_dict(axis_pos: "Coordinates") -> NodeIdMotionValues:
+def _convert_to_node_id_dict(axis_pos: "Coordinates") -> "NodeIdMotionValues":
     target: NodeIdMotionValues = {}
     for axis, pos in axis_pos.to_dict().items():
         if axis_is_node(axis.name):
@@ -131,9 +131,9 @@ def _convert_to_node_id_dict(axis_pos: "Coordinates") -> NodeIdMotionValues:
 
 def create_move_group(
     origin: "Coordinates",
-    moves: List[Move],
-    present_nodes: Optional[Iterable[NodeId]] = None,
-) -> Tuple[MoveGroup, Dict[NodeId, float]]:
+    moves: List["Move"],
+    present_nodes: Optional[Iterable["NodeId"]] = None,
+) -> Tuple["MoveGroup", Dict["NodeId", float]]:
     pos = _convert_to_node_id_dict(origin)
     move_group: MoveGroup = []
     for move in moves:
