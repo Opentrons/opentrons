@@ -28,6 +28,7 @@ import {
   useRunStatus,
   useRunStartTime,
   useRunTimestamps,
+  useRunErrors,
 } from '../hooks'
 
 import type { Run, RunData, CommandDetail } from '@opentrons/api-client'
@@ -577,5 +578,53 @@ describe('useRunTimestamps hook', () => {
 
     const { result } = renderHook(useRunTimestamps)
     expect(result.current.completedAt).toBe('2021-10-25T13:58:22.366581+00:00')
+  })
+
+  describe('useRunErrors hook', () => {
+    afterEach(() => {
+      resetAllWhenMocks()
+    })
+
+    it('returns errors if presentaction', async () => {
+      const fixtureErrors = [
+        {
+          id: 'b5efe073-09a0-4874-8872-c42554bf15b5',
+          errorType: 'LegacyContextCommandError',
+          createdAt: '2022-02-11T14:58:20.676355+00:00',
+          detail:
+            "/dev/ot_module_thermocycler0: 'Received error response 'Error:Plate temperature is not uniform. T1: 35.1097\tT2: 35.8139\tT3: 35.6139\tT4: 35.9809\tT5: 35.4347\tT6: 35.5264\tT.Lid: 20.2052\tT.sink: 19.8993\tT_error: 0.0000\t\r\nLid:open'",
+        },
+        {
+          id: 'ac02fd2a-9bd0-47e3-b739-ae562321e71d',
+          errorType: 'ExceptionInProtocolError',
+          createdAt: '2022-02-11T14:58:20.688699+00:00',
+          detail:
+            "ErrorResponse [line 40]: /dev/ot_module_thermocycler0: 'Received error response 'Error:Plate temperature is not uniform. T1: 35.1097\tT2: 35.8139\tT3: 35.6139\tT4: 35.9809\tT5: 35.4347\tT6: 35.5264\tT.Lid: 20.2052\tT.sink: 19.8993\tT_error: 0.0000\t\r\nLid:open'",
+        },
+      ]
+      when(mockUseCurrentRun)
+        .calledWith()
+        .mockReturnValue({
+          data: {
+            ...mockRunningRun,
+            errors: fixtureErrors,
+          },
+        } as Run)
+
+      const { result } = renderHook(useRunErrors)
+      expect(result.current).toBe(fixtureErrors)
+    })
+
+    it('returns the stop time of the current run when stop is the last action', async () => {
+      when(mockUseCurrentRun)
+        .calledWith()
+        .mockReturnValue({
+          data: mockRunningRun,
+          errors: undefined,
+        } as Run)
+
+      const { result } = renderHook(useRunErrors)
+      expect(result.current).toEqual([])
+    })
   })
 })

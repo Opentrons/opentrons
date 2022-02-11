@@ -9,7 +9,7 @@ import {
   useCurrentRunCommands,
   useCurrentRunId,
 } from '../../ProtocolUpload/hooks'
-import { useRunStatus } from '../../RunTimeControl/hooks'
+import { useRunStatus, useRunErrors } from '../../RunTimeControl/hooks'
 import { ProtocolSetupInfo } from '../ProtocolSetupInfo'
 import { CommandList } from '../CommandList'
 import fixtureAnalysis from '../__fixtures__/analysis.json'
@@ -36,6 +36,9 @@ const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
 const mockUseRunStatus = useRunStatus as jest.MockedFunction<
   typeof useRunStatus
 >
+const mockUseRunErrors = useRunErrors as jest.MockedFunction<
+  typeof useRunErrors
+>
 const mockProtocolSetupInfo = ProtocolSetupInfo as jest.MockedFunction<
   typeof ProtocolSetupInfo
 >
@@ -58,6 +61,7 @@ describe('CommandList', () => {
       displayName: 'mock display name',
     })
     mockUseCurrentRunCommands.mockReturnValue([])
+    mockUseRunErrors.mockReturnValue([])
     mockUseCurrentRunId.mockReturnValue('fakeRunId')
     mockUseRunStatus.mockReturnValue('idle')
     mockProtocolSetupInfo.mockReturnValue(<div>Mock ProtocolSetup Info</div>)
@@ -102,14 +106,40 @@ describe('CommandList', () => {
       ).length
     ).toEqual(9)
   })
-  it('renders the protocol failed banner', () => {
+  it('renders the protocol failed banner with errors', () => {
+    const fixtureErrors = [
+      {
+        id: 'b5efe073-09a0-4874-8872-c42554bf15b5',
+        errorType: 'LegacyContextCommandError',
+        createdAt: '2022-02-11T14:58:20.676355+00:00',
+        detail:
+          "/dev/ot_module_thermocycler0: 'Received error response 'Error:Plate temperature is not uniform. T1: 35.1097\tT2: 35.8139\tT3: 35.6139\tT4: 35.9809\tT5: 35.4347\tT6: 35.5264\tT.Lid: 20.2052\tT.sink: 19.8993\tT_error: 0.0000\t\r\nLid:open'",
+      },
+      {
+        id: 'ac02fd2a-9bd0-47e3-b739-ae562321e71d',
+        errorType: 'ExceptionInProtocolError',
+        createdAt: '2022-02-11T14:58:20.688699+00:00',
+        detail:
+          "ErrorResponse [line 40]: /dev/ot_module_thermocycler0: 'Received error response 'Error:Plate temperature is not uniform. T1: 35.1097\tT2: 35.8139\tT3: 35.6139\tT4: 35.9809\tT5: 35.4347\tT6: 35.5264\tT.Lid: 20.2052\tT.sink: 19.8993\tT_error: 0.0000\t\r\nLid:open'",
+      },
+    ]
     mockUseRunStatus.mockReturnValue('failed')
-    mockAlertItem.mockReturnValue(<div>Protocol Run Failed</div>)
-    const { getByText } = render()
+    mockUseRunErrors.mockReturnValue(fixtureErrors)
+    mockAlertItem.mockImplementation(({ children }) => (
+      <div>
+        Protocol Run Failed{' '}
+        <div data-testid="test_failed_errors">{children}</div>
+      </div>
+    ))
+
+    const { getByText, getByTestId } = render()
     expect(getByText('Protocol Run Failed')).toHaveStyle(
       'backgroundColor: Error_light'
     )
     expect(getByText('Protocol Run Failed')).toHaveStyle('color: Error_dark')
+    const errors = getByTestId('test_failed_errors')
+    expect(errors).toContainHTML(fixtureErrors[0].errorType)
+    expect(errors).toContainHTML(fixtureErrors[1].errorType)
   })
   it('renders the protocol canceled banner when the status is stop-requested', () => {
     mockUseRunStatus.mockReturnValue('stop-requested')
