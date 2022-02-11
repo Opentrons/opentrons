@@ -251,8 +251,8 @@ class OT3Simulator:
         log.info(f"move: {target_position}")
         target: Dict[NodeId, float] = {}
         for axis, pos in target_position.to_dict().items():
-            if self._axis_is_node(axis.name):
-                target[self._axis_to_node(axis.name)] = float(pos)
+            if self._axis_is_node(axis):
+                target[self._axis_to_node(axis)] = float(pos)
         self._position.update(target)
 
     async def move(

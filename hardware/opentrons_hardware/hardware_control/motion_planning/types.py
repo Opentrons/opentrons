@@ -1,7 +1,6 @@
 """Motion planning types."""
 from __future__ import annotations
 import logging
-import enum
 import dataclasses
 import numpy as np  # type: ignore[import]
 
@@ -11,10 +10,10 @@ from typing import (
     SupportsFloat,
     Dict,
     Iterator,
-    List,
     OrderedDict,
     Tuple,
     Union,
+    List,
 )
 from typing_extensions import Literal
 
@@ -22,33 +21,8 @@ log = logging.getLogger(__name__)
 
 AcceptableType = Union[SupportsFloat, np.float64]
 
-
-class Axis(enum.Enum):
-    """Robot axis."""
-
-    X = 0, "X"
-    Y = 1, "Y"
-    Z = 2, "Z"
-    A = 3, "Z"
-    B = 4, "P"
-    C = 5, "P"
-
-    def __new__(cls, value: int, lookup: Literal["X", "Y", "Z", "P"]) -> Axis:
-        """Create robot axis."""
-        member = object.__new__(cls)
-        member._value_ = value
-        member._lookup = lookup
-        return member  # type: ignore[no-any-return]
-
-    @classmethod
-    def get_all_axes(cls) -> List[Axis]:
-        """Return all system axes of the robot."""
-        return [cls.X, cls.Y, cls.Z, cls.A, cls.B, cls.C]
-
-    @property
-    def lookup(self) -> Literal["X", "Y", "Z", "P"]:
-        """Return system constraint lookup value."""
-        return self._lookup
+AxisNames = Literal["X", "Y", "Z", "A", "B", "C"]
+AXIS_NAMES: List[AxisNames] = ["X", "Y", "Z", "A", "B", "C"]
 
 
 @dataclasses.dataclass(frozen=False)
@@ -83,14 +57,14 @@ class Coordinates:
         """Return an iterator."""
         return self
 
-    def __getitem__(self, key: Axis) -> np.float64:
+    def __getitem__(self, key: AxisNames) -> np.float64:
         """Access axis coordinate value."""
         return self.to_dict()[key]
 
-    def to_dict(self) -> OrderedDict[Axis, np.float64]:
+    def to_dict(self) -> OrderedDict[AxisNames, np.float64]:
         """Return Coordaintes as a dictionary."""
         vectorized = self.vectorize()
-        return OrderedDict(zip(Axis.get_all_axes(), vectorized))
+        return OrderedDict(zip(AXIS_NAMES, vectorized))
 
     @classmethod
     def from_iter(cls, iter: Iterator[AcceptableType]) -> Coordinates:
@@ -277,4 +251,4 @@ class AxisConstraints:
         )
 
 
-SystemConstraints = Dict[str, AxisConstraints]
+SystemConstraints = Dict[AxisNames, AxisConstraints]
