@@ -4,7 +4,7 @@ import logging
 import enum
 import dataclasses
 import numpy as np  # type: ignore[import]
-from opentrons_ot3_firmware.constants import NodeId
+
 from typing import (
     cast,
     Any,
@@ -26,21 +26,20 @@ AcceptableType = Union[SupportsFloat, np.float64]
 class Axis(enum.Enum):
     """Robot axis."""
 
-    X = 0, "X", NodeId.gantry_x
-    Y = 1, "Y", NodeId.gantry_y
-    Z = 2, "Z", NodeId.head_l
-    A = 3, "Z", NodeId.head_r
-    B = 4, "P", NodeId.pipette_left
-    C = 5, "P", NodeId.pipette_right
+    X = 0, "X"
+    Y = 1, "Y"
+    Z = 2, "Z"
+    A = 3, "Z"
+    B = 4, "P"
+    C = 5, "P"
 
     def __new__(
-        cls, value: int, lookup: Literal["X", "Y", "Z", "P"], node_id: NodeId
+        cls, value: int, lookup: Literal["X", "Y", "Z", "P"]
     ) -> Axis:
         """Create robot axis."""
         member = object.__new__(cls)
         member._value_ = value
         member._lookup = lookup
-        member._node_id = node_id
         return member  # type: ignore[no-any-return]
 
     @classmethod
@@ -52,11 +51,6 @@ class Axis(enum.Enum):
     def lookup(self) -> Literal["X", "Y", "Z", "P"]:
         """Return system constraint lookup value."""
         return self.lookup
-
-    @property
-    def node_id(self) -> NodeId:
-        """Return associated node id."""
-        return self.node_id
 
 
 @dataclasses.dataclass(frozen=False)
