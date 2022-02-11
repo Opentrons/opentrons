@@ -73,11 +73,13 @@ class MoveGroupRunner:
                                 ),
                                 acceleration=Int32Field(
                                     int(
-                                        (step.acceleration_mm_sec_sq
-                                         / interrupts_per_sec
-                                         / interrupts_per_sec)
-                                        * (2**31)
+                                        (
+                                            step.acceleration_mm_sec_sq
+                                            / interrupts_per_sec
+                                            / interrupts_per_sec
                                         )
+                                        * (2**31)
+                                    )
                                 ),
                                 velocity=Int32Field(
                                     int(
