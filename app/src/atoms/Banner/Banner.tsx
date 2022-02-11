@@ -11,6 +11,7 @@ import {
   SPACING,
   Icon,
   PrimaryBtn,
+  TEXT_TRANSFORM_NONE,
 } from '@opentrons/components'
 
 interface BannerProps {
@@ -74,7 +75,7 @@ export function Banner(props: BannerProps): JSX.Element | null {
           marginTop={TYPOGRAPHY.bannerButtonTopMargin}
           backgroundColor={COLORS.blue}
           borderRadius={SPACING.spacingM}
-          textTransform="none"
+          textTransform={TEXT_TRANSFORM_NONE}
           css={TYPOGRAPHY.labelRegular}
           alignItems={ALIGN_CENTER}
           marginRight={SPACING.spacing3}
