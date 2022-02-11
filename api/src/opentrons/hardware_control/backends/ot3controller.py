@@ -377,13 +377,14 @@ class OT3Controller:
         # see if we should expect instruments to be present, which should be removed
         # when that method actually does canbus stuff
         instrs = await self.get_attached_instruments({})
-        expected = set(self._get_home_position().keys())
-        if not instrs.get(Mount.LEFT, cast("AttachedInstrument", {})).get(
-            "config", None
-        ):
-            expected.remove(NodeId.pipette_left)
-        if not instrs.get(Mount.RIGHT, cast("AttachedInstrument", {})).get(
-            "config", None
-        ):
-            expected.remove(NodeId.pipette_right)
-        self._present_nodes = await probe(self._messenger, expected, timeout)
+        expected = set((NodeId.gantry_x, NodeId.gantry_y, NodeId.head))
+        if instrs.get(Mount.LEFT, cast("AttachedInstrument", {})).get("config", None):
+            expected.add(NodeId.pipette_left)
+        if instrs.get(Mount.RIGHT, cast("AttachedInstrument", {})).get("config", None):
+            expected.add(NodeId.pipette_right)
+        present = await probe(self._messenger, expected, timeout)
+        if NodeId.head in present:
+            present.remove(NodeId.head)
+            present.add(NodeId.head_r)
+            present.add(NodeId.head_l)
+        self._present_nodes = present
