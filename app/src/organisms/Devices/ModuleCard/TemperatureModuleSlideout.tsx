@@ -70,7 +70,7 @@ export const TemperatureModuleSlideout = (
           <Text
             fontWeight={FONT_WEIGHT_REGULAR}
             fontSize={TYPOGRAPHY.fontSizeH6}
-            color={COLORS.darkGrey}
+            color={COLORS.black}
           >
             {t('temperature')}
           </Text>

@@ -3,6 +3,7 @@ export const background = '#f8f8f8'
 export const white = '#ffffff'
 export const lightBlue = '#f1f8ff'
 export const medGrey = '#e3e3e3'
+export const black = '#000000'
 
 // colors with states
 export const blueFocus = '#deecff'
