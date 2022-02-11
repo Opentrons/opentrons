@@ -5,8 +5,9 @@ and expose it to a python commandline.
 """
 
 import os
-
-os.environ["RUNNING_ON_PI"] = "1"
+if not os.environ.get("RUNNING_ON_PI") and not os.environ.get("RUNNING_ON_VERDIN"):
+    print("You should run this through the script alias: ot3repl")
+    exit()
 if os.environ.get("OT2", None):
     print(
         '"OT2" env var detected, running with OT2 HC. '
