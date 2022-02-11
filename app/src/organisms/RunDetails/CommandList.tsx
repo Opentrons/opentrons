@@ -31,7 +31,11 @@ import {
   RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
 import { useAllCommandsQuery } from '@opentrons/react-api-client'
-import { useRunStatus, useRunStartTime } from '../RunTimeControl/hooks'
+import {
+  useRunStatus,
+  useRunStartTime,
+  useRunErrors,
+} from '../RunTimeControl/hooks'
 import { useProtocolDetails } from './hooks'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ProtocolSetupInfo } from './ProtocolSetupInfo'
@@ -60,6 +64,7 @@ export function CommandList(): JSX.Element | null {
     .protocolData
   const runStartTime = useRunStartTime()
   const runStatus = useRunStatus()
+  const runErrors = useRunErrors()
   const listInnerRef = React.useRef<HTMLDivElement>(null)
   const currentItemRef = React.useRef<HTMLDivElement>(null)
   const firstPostInitialPlayRunCommandIndex = React.useRef<number | null>(null)
@@ -319,7 +324,16 @@ export function CommandList(): JSX.Element | null {
                       : 'success'
                   }
                   title={alertItemTitle}
-                />
+                >
+                  {runErrors.length > 0
+                    ? runErrors.map(({ detail, errorType }, index) => (
+                        <Text
+                          key={index}
+                          marginBottom={SPACING_2}
+                        >{`${errorType}: ${detail}`}</Text>
+                      ))
+                    : null}
+                </AlertItem>
               </Box>
             ) : null}
             <Flex
