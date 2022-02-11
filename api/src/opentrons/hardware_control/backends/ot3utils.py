@@ -132,7 +132,7 @@ def _convert_to_node_id_dict(axis_pos: "Coordinates") -> "NodeIdMotionValues":
 def create_move_group(
     origin: "Coordinates",
     moves: List["Move"],
-    present_nodes: Optional[Iterable["NodeId"]] = None,
+    present_nodes: Iterable["NodeId"],
 ) -> Tuple["MoveGroup", Dict["NodeId", float]]:
     pos = _convert_to_node_id_dict(origin)
     move_group: MoveGroup = []
