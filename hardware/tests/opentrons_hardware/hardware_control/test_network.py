@@ -48,7 +48,7 @@ class MockStatusResponder:
             for node in self._respond_with_nodes:
                 response = message_definitions.DeviceInfoResponse(
                     payload=payloads.DeviceInfoResponsePayload(
-                        version=0,
+                        version=utils.UInt32Field(0),
                     )
                 )
                 asyncio.get_running_loop().call_soon(
