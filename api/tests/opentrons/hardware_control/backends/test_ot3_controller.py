@@ -60,24 +60,3 @@ async def test_probing(controller: OT3Controller) -> None:
             )
         )
     assert controller._present_nodes == fake_nodes
-
-
-async def test_move_limiting(controller: OT3Controller) -> None:
-    controller._present_nodes = set((NodeId.gantry_x, NodeId.head_l))
-    with patch(
-        "opentrons.hardware_control.backends.ot3controller.MoveGroupRunner", AsyncMock
-    ) as mgr, patch(
-        "opentrons.hardware_control.backends.ot3controller.create"
-    ) as mock_create:
-
-        async def fake_run(*args, **kwargs):
-            return
-
-        mgr.runner = fake_run
-        await controller.move({"X": 0})
-        mock_create.assert_called_once_with(
-            origin=ANY,
-            target=ANY,
-            speed=ANY,
-            present_nodes=set((NodeId.gantry_x, NodeId.head_l)),
-        )
