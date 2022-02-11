@@ -249,8 +249,8 @@ class OT3Controller:
         def _convert_to_node_id_dict(axis_pos: Coordinates) -> NodeIdMotionValues:
             target: NodeIdMotionValues = {}
             for axis, pos in axis_pos.to_dict().items():
-                if self._axis_is_node(axis.name):
-                    target[self._axis_to_node(axis.name)] = pos
+                if self._axis_is_node(axis):
+                    target[self._axis_to_node(axis)] = pos
             return target
 
         distances = unit_vector_multiplication(unit_vector, block.distance)

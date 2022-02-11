@@ -2,21 +2,24 @@
 
 from .move_manager import MoveManager
 from .types import (
-    Axis,
     Coordinates,
     Block,
     Move,
     MoveTarget,
     AxisConstraints,
+    AxisNames,
+    AXIS_NAMES,
 )
 
 __all__ = [
     "MoveManager",
-    "Axis",
     "Coordinates",
     "Block",
     "Move",
     "MoveTarget",
     "AxisConstraints",
-    "SystemConstraints" "unit_vector_multiplication",
+    "SystemConstraints",
+    "unit_vector_multiplication",
+    "AxisNames",
+    "AXIS_NAMES",
 ]

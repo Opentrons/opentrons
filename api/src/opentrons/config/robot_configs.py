@@ -9,7 +9,7 @@ from typing_extensions import Literal
 from . import CONFIG, defaults_ot3, defaults_ot2
 from .feature_flags import enable_ot3_hardware_controller
 from opentrons.hardware_control.types import BoardRevision
-from .types import PipetteKind, CurrentDict, RobotConfig, AxisDict, OT3Config
+from .types import CurrentDict, RobotConfig, AxisDict, OT3Config
 
 log = logging.getLogger(__name__)
 

@@ -9,6 +9,7 @@ from opentrons_hardware.hardware_control.motion_planning.types import (
     AxisConstraints,
     Coordinates,
     MoveTarget,
+    SystemConstraints,
 )
 
 
@@ -123,7 +124,7 @@ def test_move_plan(
 ) -> None:
     """Test motion plan using Hypothesis."""
     assume(reject_close_coordinates(origin, targets[0].position))
-    constraints = {
+    constraints: SystemConstraints = {
         "X": x_constraint,
         "Y": y_constraint,
         "Z": z_constraint,
@@ -163,7 +164,7 @@ def test_close_move_plan(
 ) -> None:
     """Test motion plan using Hypothesis."""
     targets = data.draw(generate_close_target_list(origin))
-    constraints = {
+    constraints: SystemConstraints = {
         "X": x_constraint,
         "Y": y_constraint,
         "Z": z_constraint,
