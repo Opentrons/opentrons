@@ -318,7 +318,6 @@ class OT3Controller:
         checked_axes = axes or self._node_axes()
         home_pos = self._get_home_position()
         target_pos = {ax: home_pos[self._axis_to_node(ax)] for ax in checked_axes}
-        await self.move(target_pos)
         return self._axis_convert(self._position)
 
     async def fast_home(self, axes: Sequence[str], margin: float) -> AxisValueMap:
@@ -335,7 +334,6 @@ class OT3Controller:
         target_pos = {ax: home_pos[self._axis_to_node(ax)] for ax in axes}
         if not target_pos:
             return self._axis_convert(self._position)
-        await self.move(target_pos)
         return self._axis_convert(self._position)
 
     async def get_attached_instruments(
