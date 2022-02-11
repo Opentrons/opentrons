@@ -7,7 +7,7 @@ from opentrons_ot3_firmware.constants import NodeId
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_ot3_firmware.messages import payloads, MessageDefinition
 from opentrons_ot3_firmware.messages.message_definitions import (
-    GetStatusRequest,
+    DeviceInfoRequest,
 )
 
 mod_log = logging.getLogger(__name__)
@@ -49,7 +49,7 @@ async def probe(
     can_messenger.add_listener(listener)
     await can_messenger.send(
         node_id=NodeId.broadcast,
-        message=GetStatusRequest(payload=payloads.EmptyPayload()),
+        message=DeviceInfoRequest(payload=payloads.EmptyPayload()),
     )
     try:
         await asyncio.wait_for(event.wait(), timeout)

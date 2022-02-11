@@ -36,7 +36,7 @@ def controller(mock_config: OT3Config, mock_driver: AbstractCanDriver) -> OT3Con
 async def test_probing(controller: OT3Controller) -> None:
     assert controller._present_nodes == set()
     call_count = 0
-    fake_nodes = set((NodeId.gantry_x, NodeId.head_l))
+    fake_nodes = set((NodeId.gantry_x, NodeId.head))
     passed_expected = None
 
     async def fake_probe(can_messenger, expected, timeout):
@@ -54,9 +54,10 @@ async def test_probing(controller: OT3Controller) -> None:
             (
                 NodeId.gantry_x,
                 NodeId.gantry_y,
-                NodeId.head_l,
-                NodeId.head_r,
+                NodeId.head,
                 NodeId.pipette_left,
             )
         )
-    assert controller._present_nodes == fake_nodes
+    assert controller._present_nodes == set(
+        (NodeId.gantry_x, NodeId.head_l, NodeId.head_r)
+    )

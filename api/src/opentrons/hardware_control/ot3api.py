@@ -705,10 +705,15 @@ class OT3API(
         check_motion_bounds(to_check, target_position, bounds, check_bounds)
 
         # TODO: (2022-02-10) Use actual max speed for MoveTarget
-        move_target = MoveTarget.build(
-            position=Coordinates(**machine_pos), max_speed=500.0
+        checked_speed = speed or 500
+        self._move_manager.update_constraints(
+            get_system_constraints(self._config, self._pipette_kind)
         )
-        origin = Coordinates.from_iter(iter(self._current_position.values()))
+        move_target = MoveTarget.build(
+            position=Coordinates(**machine_pos), max_speed=checked_speed
+        )
+        backend_position = await self._backend.update_position()
+        origin = Coordinates.from_iter([backend_position[ax.name] for ax in Axis])
         blended, moves = self._move_manager.plan_motion(
             origin=origin, target_list=[move_target]
         )
