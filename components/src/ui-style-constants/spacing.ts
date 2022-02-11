@@ -5,3 +5,4 @@ export const spacing3 = '0.5rem' // 8px
 export const spacing4 = '1rem' // 16px
 export const spacing5 = '1.5rem' // 24px
 export const spacing6 = '2rem' // 32px
+export const spacingM = '1.25rem' // 20px

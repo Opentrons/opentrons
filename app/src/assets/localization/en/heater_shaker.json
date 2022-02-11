@@ -1,4 +1,5 @@
 {
-  "banner_body": "Attach the module to the robot deck to prevent module from shaking out of a deck slot.",
-  "banner_wizard_link": "See how to attach module to deck"
+  "banner_title": "Attach {{name}} to deck before proceeding to run",
+  "banner_body": "Attachment prevents the module from shaking out of a deck slot.",
+  "banner_wizard_button": "See how to attach module to the deck"
 }

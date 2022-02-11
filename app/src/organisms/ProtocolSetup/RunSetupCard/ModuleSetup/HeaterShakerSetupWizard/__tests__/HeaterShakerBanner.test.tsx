@@ -1,10 +1,12 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../../../../i18n'
 import { renderWithProviders } from '@opentrons/components'
+import { Banner } from '../../../../../../atoms/Banner/Banner'
 import { HeaterShakerBanner } from '../HeaterShakerBanner'
 
-import type { ModuleDefinition } from '@opentrons/shared-data'
+jest.mock('../../../../../../atoms/Banner/Banner')
+
+const mockBanner = Banner as jest.MockedFunction<typeof Banner>
 
 const render = (props: React.ComponentProps<typeof HeaterShakerBanner>) => {
   return renderWithProviders(<HeaterShakerBanner {...props} />, {
@@ -12,30 +14,17 @@ const render = (props: React.ComponentProps<typeof HeaterShakerBanner>) => {
   })[0]
 }
 
-const mockHeaterShakerStub = {
-  displayName: 'Heater Shaker Module GEN1',
-} as ModuleDefinition
 describe('HeaterShakerBanner', () => {
   let props: React.ComponentProps<typeof HeaterShakerBanner>
   beforeEach(() => {
-    props = { moduleDef: mockHeaterShakerStub }
-  })
-
-  it('should render the correct header and body', () => {
-    const { getByText } = render(props)
-    getByText('Slot 1')
-    getByText('Heater Shaker Module GEN1')
-    getByText(
-      'Attach the module to the robot deck to prevent module from shaking out of a deck slot.'
+    props = { model: 'HeaterShakerV1' }
+    mockBanner.mockReturnValue(
+      <div>Attach HeaterShakerV1 to deck before proceeding to run</div>
     )
   })
 
-  it('should render button and it is clickable', () => {
-    const { getByRole } = render(props)
-    const wizardButton = getByRole('button', {
-      name: 'See how to attach module to deck',
-    })
-    fireEvent.click(wizardButton)
-    expect(wizardButton).toBeEnabled()
+  it('should render banner component', () => {
+    const { getByText } = render(props)
+    getByText('Attach HeaterShakerV1 to deck before proceeding to run')
   })
 })

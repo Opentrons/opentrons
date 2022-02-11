@@ -21,15 +21,15 @@ import {
 import { inferModuleOrientationFromXCoordinate } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { useModuleMatchResults } from '../hooks'
+import { useModuleRenderInfoById } from '../../hooks'
 import { fetchModules } from '../../../../redux/modules'
 import { ModuleInfo } from './ModuleInfo'
 import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
 import { MultipleModulesModal } from './MultipleModulesModal'
-import { useModuleRenderInfoById } from '../../hooks'
+import { HeaterShakerBanner } from './HeaterShakerSetupWizard/HeaterShakerBanner'
 import styles from '../../styles.css'
 
 import type { Dispatch } from '../../../../redux/types'
-import { HeaterShakerBanner } from './HeaterShakerSetupWizard/HeaterShakerBanner'
 
 const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
@@ -91,9 +91,9 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
         const { model } = moduleDef
         return (
           <>
-            {/* @ts-expect-error this will say false always until heaterShakerV1 is added to the model */}
-            {model === 'heaterShakerV1' && (
-              <HeaterShakerBanner moduleDef={moduleDef} />
+            {/* @ts-expect-error: this is always false until heater shaker is added to model */}
+            {model === 'heatershakermoduleV1' && (
+              <HeaterShakerBanner model={moduleDef.displayName} />
             )}
           </>
         )
