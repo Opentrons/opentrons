@@ -32,8 +32,10 @@ try:
     from opentrons_hardware.drivers.can_bus.build import build_driver
     from opentrons_hardware.hardware_control.motion import (
         create,
-        create_move,
+        create_step,
         NodeIdMotionValues,
+        MoveGroup,
+        MoveGroups,
     )
     from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
     from opentrons_hardware.hardware_control.motion_planning import (
@@ -253,18 +255,24 @@ class OT3Controller:
                     target[self._axis_to_node(axis.name)] = pos
             return target
 
-        distances = unit_vector_multiplication(unit_vector, block.distance)
-        node_id_distances = _convert_to_node_id_dict(distances)
-        velocities = unit_vector_multiplication(unit_vector, block.initial_speed)
-        accelerations = unit_vector_multiplication(unit_vector, block.acceleration)
-        move_group = create_move(
-            distance=node_id_distances,
-            velocity=_convert_to_node_id_dict(velocities),
-            acceleration=_convert_to_node_id_dict(accelerations),
-            duration=block.time,
-            present_nodes=self._present_nodes,
-        )
-        runner = MoveGroupRunner(move_groups=move_group)
+        move_groups: MoveGroups = []
+        for move in moves:
+            move_group: MoveGroup = []
+            unit_vector = move.unit_vector
+            for block in move.blocks:
+                distances = unit_vector_multiplication(unit_vector, block.distance)
+                node_id_distances = _convert_to_node_id_dict(distances)
+                velocities = unit_vector_multiplication(unit_vector, block.initial_speed)
+                accelerations = unit_vector_multiplication(unit_vector, block.acceleration)
+                step = create_step(
+                    distance=node_id_distances,
+                    velocity=_convert_to_node_id_dict(velocities),
+                    acceleration=_convert_to_node_id_dict(accelerations),
+                    duration=block.time,
+                    present_nodes=self._present_nodes,
+                )
+                move_group.append(step)
+        runner = MoveGroupRunner(move_groups=move_groups)
         await runner.run(can_messenger=self._messenger)
         distances_in_float: Dict[NodeId, float] = {}
         for key, val in node_id_distances.items():

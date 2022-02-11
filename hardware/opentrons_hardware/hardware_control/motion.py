@@ -40,14 +40,13 @@ MAX_SPEEDS = {
     NodeId.pipette_right: 2,
 }
 
-
-def create_move(
+def create_step(
     distance: Dict[NodeId, np.float64],
     velocity: Dict[NodeId, np.float64],
     acceleration: Dict[NodeId, np.float64],
     duration: np.float64,
     present_nodes: Optional[Iterable[NodeId]] = None,
-) -> MoveGroups:
+) -> MoveGroupStep:
     """Create a move from a block.
 
     Args:
@@ -78,7 +77,7 @@ def create_move(
             velocity_mm_sec=velocity[axis_node],
             duration_sec=duration,
         )
-    return [[step]]
+    return step
 
 
 def create(

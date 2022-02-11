@@ -42,3 +42,7 @@ def get_system_constraints(
     # TODO: (2022-02-10) get correct system constraints based on pipette kind
     default = default_system_constraints(config)
     return default
+
+
+def create_move_group():
+    
