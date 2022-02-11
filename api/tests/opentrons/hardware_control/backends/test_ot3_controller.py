@@ -1,5 +1,5 @@
 import pytest
-from mock import AsyncMock, patch, ANY
+from mock import AsyncMock, patch
 from opentrons.hardware_control.backends import OT3Controller
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons.config.types import OT3Config
