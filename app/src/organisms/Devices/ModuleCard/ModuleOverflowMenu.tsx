@@ -12,6 +12,7 @@ import {
 import { OverflowMenu } from '../../../atoms/OverflowMenu'
 import { OverflowMenuBtn } from '../../../atoms/OverflowMenu/OverflowMenuBtn'
 import { MagneticModuleSlideout } from './MagneticModuleSlideout'
+import { TemperatureModuleSlideout } from './TemperatureModuleSlideout'
 import { ThermocyclerModuleSlideout } from './ThermocyclerModuleSlideout'
 
 import type { AttachedModule } from '../../../redux/modules/types'
@@ -42,7 +43,13 @@ export const ModuleOverflowMenu = (
         <MagneticModuleSlideout module={module} isExpanded={showSlideout} />
       )
     } else {
-      return <div />
+      return (
+        <TemperatureModuleSlideout
+          model={module.model}
+          serial={module.serial}
+          isExpanded={showSlideout}
+        />
+      )
     }
   }
 
@@ -95,6 +102,7 @@ export const ModuleOverflowMenu = (
                   onClick={() => handleClick(item.isSecondary)}
                   data-testid={`module_setting_${module.model}`}
                 >
+                  {/* TODO(sh, 2022-02-11): conditionally render deactivate setting based on module status and pass the required commands. */}
                   {item.setSetting}
                 </OverflowMenuBtn>
               )

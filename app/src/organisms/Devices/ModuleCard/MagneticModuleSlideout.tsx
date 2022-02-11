@@ -172,7 +172,6 @@ export const MagneticModuleSlideout = (
           <Text
             fontWeight={FONT_WEIGHT_REGULAR}
             fontSize={TYPOGRAPHY.fontSizeH6}
-            //  TODO immediately: change to typography standard color when its made
             color={COLORS.darkGrey}
           >
             {t('engage_height_slideout')}

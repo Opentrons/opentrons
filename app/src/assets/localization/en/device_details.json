@@ -33,8 +33,11 @@
   "overflow_menu_deactivate_block": "Deactivate block",
   "overflow_menu_mod_temp": "Set module temperature",
   "overflow_menu_deactivate_temp": "Deactivate module",
+  "tempdeck_slideout_title": "Set Temperature for {{name}}",
+  "tempdeck_slideout_body": "Pre heat or cool your {{model}}. Enter a whole number between 4 °C and 96 °C.",
+  "temperature": "Temperature",
+  "set_temp_slideout_btn": "Set Temperature",
   "tc_set_temperature": "Set {{part}} Temperature for {{name}}",
   "tc_set_temperature_body": "Pre heat or cool your Thermocycler {{part}}. Enter a whole number between {{min}} °C and {{max}} °C.",
-  "temperature": "Temperature",
   "set_tc_temp_slideout_btn": "Set {{part}} Temperature"
 }
