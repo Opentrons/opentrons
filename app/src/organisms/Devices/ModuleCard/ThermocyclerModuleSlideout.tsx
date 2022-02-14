@@ -19,7 +19,7 @@ import {
 } from '@opentrons/components'
 
 import type { AttachedModule } from '../../../redux/modules/types'
-import { getModuleDisplayName, ModuleModel } from '@opentrons/shared-data'
+import { getModuleDisplayName } from '@opentrons/shared-data'
 
 interface ThermocyclerModuleSlideoutProps {
   module: AttachedModule
@@ -37,7 +37,7 @@ export const ThermocyclerModuleSlideout = (
 
   const moduleName = getModuleDisplayName(module.model)
   const modulePart = isSecondaryTemp ? 'Lid' : 'Block'
-  const tempRanges = getModuleTemperatureRanges(module.model, isSecondaryTemp)
+  const tempRanges = getTCTempRange(isSecondaryTemp)
 
   const handleSubmitTemp = (): void => {
     if (tempValue != null) {
@@ -113,26 +113,10 @@ interface TemperatureRanges {
   max: number
 }
 
-function getModuleTemperatureRanges(
-  model: ModuleModel,
-  isSecondaryTemp?: boolean
-): TemperatureRanges {
-  if (isSecondaryTemp && TEMPERATURE_RANGES[model].secondary) {
-    return TEMPERATURE_RANGES[model].secondary as TemperatureRanges
+const getTCTempRange = (isSecondaryTemp = false): TemperatureRanges => {
+  if (isSecondaryTemp) {
+    return { min: 37, max: 110 }
   } else {
-    return TEMPERATURE_RANGES[model].primary as TemperatureRanges
+    return { min: 4, max: 99 }
   }
-}
-
-// @ts-expect-error key should be optional as not all models are present
-const TEMPERATURE_RANGES: {
-  [model in ModuleModel]: {
-    primary: TemperatureRanges
-    secondary?: TemperatureRanges | null
-  }
-} = {
-  thermocyclerModuleV1: {
-    primary: { min: 4, max: 99 },
-    secondary: { min: 37, max: 110 },
-  },
 }
