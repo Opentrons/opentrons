@@ -97,6 +97,8 @@ async def test_analyze(
             errors=[analysis_error],
             labware=[analysis_labware],
             pipettes=[analysis_pipette],
+            # TODO(mc, 2022-02-14): evaluate usage of modules in the analysis resp.
+            modules=[],
         )
     )
 

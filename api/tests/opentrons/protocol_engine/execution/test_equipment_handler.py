@@ -9,7 +9,7 @@ from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.modules import TempDeck, AbstractModule
 from opentrons.protocols.models import LabwareDefinition
 
-from opentrons.protocol_engine import errors
+from opentrons.protocol_engine import EngineConfigs, errors
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     ModuleLocation,
@@ -441,6 +441,10 @@ async def test_load_module(
         temp_module_v2,
     ]
 
+    decoy.when(state_store.get_configs()).then_return(
+        EngineConfigs(use_virtual_modules=False)
+    )
+
     decoy.when(
         state_store.modules.find_attached_module(
             model=ModuleModel.TEMPERATURE_MODULE_V1,
@@ -461,5 +465,43 @@ async def test_load_module(
     assert result == LoadedModuleData(
         module_id="module-id",
         serial_number="serial-1",
+        definition=tempdeck_v1_def,
+    )
+
+
+async def test_load_module_using_virtual(
+    decoy: Decoy,
+    model_utils: ModelUtils,
+    state_store: StateStore,
+    module_data_provider: ModuleDataProvider,
+    hardware_api: HardwareAPI,
+    tempdeck_v1_def: ModuleDefinition,
+    tempdeck_v2_def: ModuleDefinition,
+    temp_module_v1: AbstractModule,
+    temp_module_v2: AbstractModule,
+    subject: EquipmentHandler,
+) -> None:
+    """It should load a virtual module."""
+    decoy.when(model_utils.ensure_id("input-module-id")).then_return("module-id")
+
+    decoy.when(model_utils.generate_id()).then_return("fake-serial-number")
+
+    decoy.when(
+        module_data_provider.get_definition(ModuleModel.TEMPERATURE_MODULE_V1)
+    ).then_return(tempdeck_v1_def)
+
+    decoy.when(state_store.get_configs()).then_return(
+        EngineConfigs(use_virtual_modules=True)
+    )
+
+    result = await subject.load_module(
+        model=ModuleModel.TEMPERATURE_MODULE_V1,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        module_id="input-module-id",
+    )
+
+    assert result == LoadedModuleData(
+        module_id="module-id",
+        serial_number="fake-serial-number",
         definition=tempdeck_v1_def,
     )
