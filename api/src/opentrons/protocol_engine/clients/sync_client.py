@@ -62,7 +62,7 @@ class SyncClient:
         model: ModuleModel,
         location: DeckSlotLocation,
     ) -> commands.LoadModuleResult:
-        """Execute a LoadLabware command and return the result."""
+        """Execute a LoadModule command and return the result."""
         request = commands.LoadModuleCreate(
             params=commands.LoadModuleParams(model=model, location=location)
         )
