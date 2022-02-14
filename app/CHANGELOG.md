@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.0.0-beta.11](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.10...v5.0.0-beta.11) (2022-02-14)
+
+
+### Bug Fixes
+
+* **app:** show run errors in banner if run fails, hide errors if canceled ([#9464](https://github.com/Opentrons/opentrons/issues/9464)) ([008c116](https://github.com/Opentrons/opentrons/commit/008c1168a8e46ae35cec00505ca16c3cb6d571d5))
+
+
+
+
+
 # [5.0.0-beta.10](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.9...v5.0.0-beta.10) (2022-02-11)
 
 
