@@ -7,3 +7,4 @@ class EngineConfigs:
     """Configurations for Protocol Engine."""
 
     ignore_pause: bool = False
+    use_virtual_modules: bool = False

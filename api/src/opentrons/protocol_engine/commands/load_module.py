@@ -85,6 +85,7 @@ class LoadModuleImplementation(AbstractCommandImpl[LoadModuleParams, LoadModuleR
             location=params.location,
             module_id=params.moduleId,
         )
+
         return LoadModuleResult(
             moduleId=loaded_module.module_id,
             serialNumber=loaded_module.serial_number,
