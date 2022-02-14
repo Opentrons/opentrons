@@ -18,6 +18,7 @@ import {
   ModalPage,
   PrimaryBtn,
   SecondaryBtn,
+  SPACING,
   TEXT_TRANSFORM_NONE,
 } from '@opentrons/components'
 
@@ -86,7 +87,7 @@ export const HeaterShakerWizard = (
             <SecondaryBtn
               alignItems={ALIGN_CENTER}
               color={COLORS.blue}
-              borderRadius={'3px'}
+              borderRadius={SPACING.spacingS}
               textTransform={TEXT_TRANSFORM_NONE}
               data-testid={`wizard_back_btn`}
               onClick={() => setCurrentPage(currentPage => currentPage - 1)}
@@ -98,7 +99,7 @@ export const HeaterShakerWizard = (
             <PrimaryBtn
               alignItems={ALIGN_CENTER}
               backgroundColor={COLORS.blue}
-              borderRadius={'3px'}
+              borderRadius={SPACING.spacingS}
               textTransform={TEXT_TRANSFORM_NONE}
               data-testid={`wizard_next_btn`}
               onClick={
