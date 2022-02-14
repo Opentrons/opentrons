@@ -1,11 +1,12 @@
 import logging
-from typing import Dict, Optional, Set, List, Union, TYPE_CHECKING
+from typing import Dict, List, Optional, Set
 from collections import OrderedDict
 
 from opentrons import types
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
+from opentrons.hardware_control.modules import AbstractModule, ModuleModel
 from opentrons.hardware_control.types import DoorState, PauseType
-from opentrons.hardware_control import ThreadManager, SynchronousAdapter
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry import module_geometry
@@ -20,17 +21,9 @@ from opentrons.protocols.context.protocol import (
     InstrumentDict,
     LoadModuleResult,
 )
-from opentrons.protocols.api_support.util import (
-    AxisMaxSpeeds,
-    HardwareToManage,
-    HardwareManager,
-)
+from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.protocols.labware import load_from_definition, get_labware_definition
-from opentrons.protocols.types import Protocol
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
-
-if TYPE_CHECKING:
-    from opentrons.hardware_control.modules import AbstractModule
 
 
 logger = logging.getLogger(__name__)
@@ -39,8 +32,8 @@ logger = logging.getLogger(__name__)
 class ProtocolContextImplementation(AbstractProtocol):
     def __init__(
         self,
+        sync_hardware: SyncHardwareAPI,
         api_version: Optional[APIVersion] = None,
-        hardware: Optional[HardwareToManage] = None,
         bundled_labware: Dict[str, LabwareDefinition] = None,
         bundled_data: Dict[str, bytes] = None,
         extra_labware: Dict[str, LabwareDefinition] = None,
@@ -49,8 +42,7 @@ class ProtocolContextImplementation(AbstractProtocol):
 
         :param api_version: The API version to use. If this is ``None``, uses
                             the max supported version.
-        :param hardware: An optional hardware controller to link to. If not
-                         specified, a new simulator will be created.
+        :param hardware: The hardware control API to use.
         :param bundled_labware: A dict mapping labware URIs to definitions.
                                 This is used when executing bundled protocols,
                                 and if specified will be the only allowed
@@ -67,36 +59,18 @@ class ProtocolContextImplementation(AbstractProtocol):
                               ``bundled_labware`` was not specified). Used to
                               provide custom labware definitions.
         """
-        # TODO AL 20201110 - Find a way to omit api_version from this class.
-        #  it is used in creating module geometry and instrument context.
+        self._sync_hardware = sync_hardware
         self._api_version = api_version or MAX_SUPPORTED_VERSION
         self._deck_layout = Deck()
         self._instruments: InstrumentDict = {mount: None for mount in types.Mount}
         self._modules: List[LoadModuleResult] = []
-
-        self._hw_manager = HardwareManager(hardware)
-
         self._bundled_labware = bundled_labware
         self._extra_labware = extra_labware or {}
-
         self._bundled_data: Dict[str, bytes] = bundled_data or {}
         self._default_max_speeds = AxisMaxSpeeds()
         self._last_location: Optional[types.Location] = None
         self._last_mount: Optional[types.Mount] = None
         self._loaded_modules: Set["AbstractModule"] = set()
-
-    @classmethod
-    def build_using(cls, protocol: Protocol, *args, **kwargs):
-        """Build an API instance for the specified parsed protocol
-
-        This is used internally to provision the context with bundle
-        contents or api levels.
-        """
-        kwargs["bundled_data"] = getattr(protocol, "bundled_data", None)
-        kwargs["bundled_labware"] = getattr(protocol, "bundled_labware", None)
-        kwargs["extra_labware"] = getattr(protocol, "extra_labware", None)
-        kwargs["api_version"] = getattr(protocol, "api_level", MAX_SUPPORTED_VERSION)
-        return cls(*args, **kwargs)
 
     def get_bundled_data(self) -> Dict[str, bytes]:
         """Extra bundled data."""
@@ -114,30 +88,17 @@ class ProtocolContextImplementation(AbstractProtocol):
         """Extra labware definitions."""
         return self._extra_labware
 
-    def cleanup(self) -> None:
-        """Protocol context clean up."""
-        pass
-
     def get_max_speeds(self) -> AxisMaxSpeeds:
         """Get the maximum axis speeds."""
         return self._default_max_speeds
 
-    def get_hardware(self) -> HardwareManager:
-        """Access to the hardware manager."""
-        return self._hw_manager
-
-    def connect(self, hardware: Union[ThreadManager, SynchronousAdapter]) -> None:
-        """Connect to the hardware."""
-        self._hw_manager.set_hw(hardware)
-        self._hw_manager.hardware.cache_instruments()
-
-    def disconnect(self) -> None:
-        """ "Disconnect from the hardware."""
-        self._hw_manager.reset_hw()
+    def get_hardware(self) -> SyncHardwareAPI:
+        """Access to the synchronous hardware API."""
+        return self._sync_hardware
 
     def is_simulating(self) -> bool:
         """Returns true if hardware is being simulated."""
-        return self._hw_manager.hardware.is_simulator
+        return self._sync_hardware.is_simulator
 
     def load_labware_from_definition(
         self,
@@ -171,34 +132,25 @@ class ProtocolContextImplementation(AbstractProtocol):
 
     def load_module(
         self,
-        module_name: str,
+        model: ModuleModel,
         location: Optional[types.DeckLocation],
         configuration: Optional[str],
     ) -> Optional[LoadModuleResult]:
         """Load a module."""
-        resolved_model = module_geometry.resolve_module_model(module_name)
-        resolved_type = module_geometry.resolve_module_type(resolved_model)
+        resolved_type = module_geometry.resolve_module_type(model)
         resolved_location = self._deck_layout.resolve_module_location(
             resolved_type, location
         )
 
-        # Load the geometry
-        geometry = module_geometry.load_module(
-            model=resolved_model,
-            parent=self._deck_layout.position_for(resolved_location),
-            api_level=self._api_version,
-            configuration=configuration,
-        )
-
         # Try to find in the hardware instance
-        available_modules, simulating_module = self._hw_manager.hardware.find_modules(
-            resolved_model, resolved_type
+        available_modules, simulating_module = self._sync_hardware.find_modules(
+            model, resolved_type
         )
 
         hc_mod_instance = None
         for mod in available_modules:
             compatible = module_geometry.models_compatible(
-                module_geometry.module_model_from_string(mod.model()), resolved_model
+                module_geometry.module_model_from_string(mod.model()), model
             )
             if compatible and mod not in self._loaded_modules:
                 self._loaded_modules.add(mod)
@@ -210,6 +162,14 @@ class ProtocolContextImplementation(AbstractProtocol):
 
         if not hc_mod_instance:
             return None
+
+        # Load geometry to match the hardware module that we found connected.
+        geometry = module_geometry.load_module(
+            model=module_geometry.module_model_from_string(hc_mod_instance.model()),
+            parent=self._deck_layout.position_for(resolved_location),
+            api_level=self._api_version,
+            configuration=configuration,
+        )
 
         result = LoadModuleResult(
             type=resolved_type, geometry=geometry, module=hc_mod_instance
@@ -238,11 +198,11 @@ class ProtocolContextImplementation(AbstractProtocol):
 
         attached = {
             att_mount: instr.get("name", None)
-            for att_mount, instr in self._hw_manager.hardware.attached_instruments.items()  # noqa: E501
+            for att_mount, instr in self._sync_hardware.attached_instruments.items()  # noqa: E501
             if instr
         }
         attached[mount] = instrument_name
-        self._hw_manager.hardware.cache_instruments(attached)
+        self._sync_hardware.cache_instruments(attached)
         # If the cache call didn’t raise, the instrument is attached
         new_instr = InstrumentContextImplementation(
             api_version=self._api_version,
@@ -261,11 +221,11 @@ class ProtocolContextImplementation(AbstractProtocol):
 
     def pause(self, msg: Optional[str]) -> None:
         """Pause the protocol."""
-        self._hw_manager.hardware.pause(PauseType.PAUSE)
+        self._sync_hardware.pause(PauseType.PAUSE)
 
     def resume(self) -> None:
         """Result the protocol."""
-        self._hw_manager.hardware.resume(PauseType.PAUSE)
+        self._sync_hardware.resume(PauseType.PAUSE)
 
     def comment(self, msg: str) -> None:
         """Add comment to run log."""
@@ -273,12 +233,12 @@ class ProtocolContextImplementation(AbstractProtocol):
 
     def delay(self, seconds: float, msg: Optional[str]) -> None:
         """Delay execution for x seconds."""
-        self._hw_manager.hardware.delay(seconds)
+        self._sync_hardware.delay(seconds)
 
     def home(self) -> None:
         """Home the robot."""
         self.set_last_location(None)
-        self._hw_manager.hardware.home()
+        self._sync_hardware.home()
 
     def get_deck(self) -> Deck:
         """Get the deck layout."""
@@ -293,15 +253,15 @@ class ProtocolContextImplementation(AbstractProtocol):
 
     def set_rail_lights(self, on: bool) -> None:
         """Set the rail light state."""
-        self._hw_manager.hardware.set_lights(rails=on)
+        self._sync_hardware.set_lights(rails=on)
 
     def get_rail_lights_on(self) -> bool:
         """Get the rail light state."""
-        return self._hw_manager.hardware.get_lights()["rails"]
+        return self._sync_hardware.get_lights()["rails"]
 
     def door_closed(self) -> bool:
         """Check if door is closed."""
-        return DoorState.CLOSED == self._hw_manager.hardware.door_state
+        return DoorState.CLOSED == self._sync_hardware.door_state
 
     def get_last_location(
         self,

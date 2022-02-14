@@ -8,7 +8,11 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
 import { getDiscoverableRobotByName } from '../../../redux/discovery'
-import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
+import {
+  mockConnectableRobot,
+  mockReachableRobot,
+  mockUnreachableRobot,
+} from '../../../redux/discovery/__fixtures__'
 import { fetchModules, getAttachedModules } from '../../../redux/modules'
 import { fetchPipettes, getAttachedPipettes } from '../../../redux/pipettes'
 import { mockFetchModulesSuccessActionPayloadModules } from '../../../redux/modules/__fixtures__'
@@ -30,6 +34,7 @@ import {
   useAttachedModules,
   useAttachedPipettes,
   useIsProtocolRunning,
+  useIsRobotViewable,
   useLights,
   useRobot,
 } from '../hooks'
@@ -292,6 +297,58 @@ describe('useIsProtocolRunning hook', () => {
     when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_RUNNING)
 
     const { result } = renderHook(() => useIsProtocolRunning(), {
+      wrapper,
+    })
+
+    expect(result.current).toEqual(true)
+  })
+})
+
+describe('useIsRobotViewable hook', () => {
+  let wrapper: React.FunctionComponent<{}>
+  beforeEach(() => {
+    const queryClient = new QueryClient()
+    wrapper = ({ children }) => (
+      <Provider store={store}>
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      </Provider>
+    )
+  })
+  afterEach(() => {
+    resetAllWhenMocks()
+    jest.resetAllMocks()
+  })
+
+  it('returns false when given an unreachable robot name', () => {
+    when(mockGetDiscoverableRobotByName)
+      .calledWith(undefined as any, 'otie')
+      .mockReturnValue(mockUnreachableRobot)
+
+    const { result } = renderHook(() => useIsRobotViewable('otie'), { wrapper })
+
+    expect(result.current).toEqual(false)
+  })
+
+  it('returns true when given a reachable robot name', () => {
+    when(mockGetDiscoverableRobotByName)
+      .calledWith(undefined as any, 'otie')
+      .mockReturnValue(mockReachableRobot)
+
+    const { result } = renderHook(() => useIsRobotViewable('otie'), {
+      wrapper,
+    })
+
+    expect(result.current).toEqual(true)
+  })
+
+  it('returns true when given a connectable robot name', () => {
+    when(mockGetDiscoverableRobotByName)
+      .calledWith(undefined as any, 'otie')
+      .mockReturnValue(mockConnectableRobot)
+
+    const { result } = renderHook(() => useIsRobotViewable('otie'), {
       wrapper,
     })
 

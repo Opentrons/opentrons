@@ -24,7 +24,7 @@ from opentrons.protocol_runner.legacy_wrappers import (
     LegacyInstrumentLoadInfo,
     LegacyLabwareLoadInfo,
     LegacyModuleLoadInfo,
-    LegacyMagneticModuleModel,
+    LegacyTemperatureModuleModel,
 )
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV2
@@ -264,7 +264,7 @@ def test_map_labware_load(minimal_labware_def: LabwareDefinition) -> None:
             offsetId="labware-offset-id-123",
         ),
     )
-    output = LegacyCommandMapper().map_labware_load(input)
+    output = LegacyCommandMapper().map_equipment_load(input)
     assert output == expected_output
 
 
@@ -287,7 +287,7 @@ def test_map_instrument_load() -> None:
         result=pe_commands.LoadPipetteResult.construct(pipetteId=matchers.IsA(str)),
     )
 
-    output = LegacyCommandMapper().map_instrument_load(input)
+    output = LegacyCommandMapper().map_equipment_load(input)
     assert output == expected_output
 
 
@@ -299,13 +299,14 @@ def test_map_module_load(
     """It should correctly map a module load."""
     test_definition = ModuleDefinition.parse_obj(minimal_module_def)
     input = LegacyModuleLoadInfo(
-        module_model=LegacyMagneticModuleModel.MAGNETIC_V2,
+        requested_model=LegacyTemperatureModuleModel.TEMPERATURE_V1,
+        loaded_model=LegacyTemperatureModuleModel.TEMPERATURE_V2,
         deck_slot=DeckSlotName.SLOT_1,
         configuration="conf",
         module_serial="module-serial",
     )
     decoy.when(
-        module_data_provider.get_definition(ModuleModel.MAGNETIC_MODULE_V2)
+        module_data_provider.get_definition(ModuleModel.TEMPERATURE_MODULE_V2)
     ).then_return(test_definition)
 
     expected_output = pe_commands.LoadModule.construct(
@@ -316,7 +317,7 @@ def test_map_module_load(
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
         params=pe_commands.LoadModuleParams.construct(
-            model=ModuleModel.MAGNETIC_MODULE_V2,
+            model=ModuleModel.TEMPERATURE_MODULE_V1,
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             moduleId=matchers.IsA(str),
         ),
@@ -324,12 +325,12 @@ def test_map_module_load(
             moduleId=matchers.IsA(str),
             serialNumber="module-serial",
             definition=test_definition,
-            model=test_definition.model,
+            model=ModuleModel.TEMPERATURE_MODULE_V2,
         ),
     )
     output = LegacyCommandMapper(
         module_data_provider=module_data_provider
-    ).map_module_load(input)
+    ).map_equipment_load(input)
     assert output == expected_output
 
 
@@ -367,7 +368,7 @@ def test_map_module_labware_load(minimal_labware_def: LabwareDefinition) -> None
     )
     subject = LegacyCommandMapper()
     subject._module_id_by_slot = {DeckSlotName.SLOT_1: "module-123"}
-    output = subject.map_labware_load(load_input)
+    output = subject.map_equipment_load(load_input)
     assert output == expected_output
 
 

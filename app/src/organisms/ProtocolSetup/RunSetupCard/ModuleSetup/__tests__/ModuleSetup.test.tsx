@@ -28,6 +28,7 @@ import { MultipleModulesModal } from '../MultipleModulesModal'
 import { ModuleSetup } from '..'
 import { ModuleInfo } from '../ModuleInfo'
 import { UnMatchedModuleWarning } from '../UnMatchedModuleWarning'
+import { HeaterShakerBanner } from '../HeaterShakerSetupWizard/HeaterShakerBanner'
 
 jest.mock('../../../../../redux/modules')
 jest.mock('../ModuleInfo')
@@ -35,6 +36,7 @@ jest.mock('../../hooks')
 jest.mock('../../../hooks')
 jest.mock('../MultipleModulesModal')
 jest.mock('../UnMatchedModuleWarning')
+jest.mock('../HeaterShakerSetupWizard/HeaterShakerBanner')
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
   return {
@@ -70,6 +72,9 @@ const mockUseModuleRenderInfoById = useModuleRenderInfoById as jest.MockedFuncti
 >
 const mockUnMatchedModuleWarning = UnMatchedModuleWarning as jest.MockedFunction<
   typeof UnMatchedModuleWarning
+>
+const mockHeaterShakerBanner = HeaterShakerBanner as jest.MockedFunction<
+  typeof HeaterShakerBanner
 >
 
 const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
@@ -168,6 +173,10 @@ describe('ModuleSetup', () => {
     when(mockGetAttachedModules)
       .calledWith(undefined as any, MOCK_ROBOT_NAME)
       .mockReturnValue([])
+
+    when(mockHeaterShakerBanner).mockReturnValue(
+      <div>mock Heater Shaker Banner</div>
+    )
   })
 
   afterEach(() => {
@@ -450,4 +459,5 @@ describe('ModuleSetup', () => {
     const button = getByRole('button', { name: 'Proceed to Labware Setup' })
     expect(button).not.toBeDisabled()
   })
+  it.todo('renders heater shaker banner correctly')
 })

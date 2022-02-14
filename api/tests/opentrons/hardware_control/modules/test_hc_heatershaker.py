@@ -1,7 +1,7 @@
 import pytest
 from opentrons.hardware_control import modules, ExecutionManager
 from opentrons.drivers.rpi_drivers.types import USBPort
-from opentrons.drivers.types import HeaterShakerPlateLockStatus
+from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
 
 
 @pytest.fixture
@@ -101,14 +101,14 @@ async def test_await_both(simulating_module):
     assert simulating_module.speed_status == "holding at target"
 
 
-async def test_plate_lock(simulating_module):
-    await simulating_module.open_plate_lock()
+async def test_labware_latch(simulating_module):
+    await simulating_module.open_labware_latch()
     assert (
-        await simulating_module._driver.get_plate_lock_status()
-        == HeaterShakerPlateLockStatus.IDLE_OPEN
+        await simulating_module._driver.get_labware_latch_status()
+        == HeaterShakerLabwareLatchStatus.IDLE_OPEN
     )
-    await simulating_module.close_plate_lock()
+    await simulating_module.close_labware_latch()
     assert (
-        await simulating_module._driver.get_plate_lock_status()
-        == HeaterShakerPlateLockStatus.IDLE_CLOSED
+        await simulating_module._driver.get_labware_latch_status()
+        == HeaterShakerLabwareLatchStatus.IDLE_CLOSED
     )

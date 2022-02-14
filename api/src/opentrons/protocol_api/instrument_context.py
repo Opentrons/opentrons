@@ -2,13 +2,12 @@ from __future__ import annotations
 
 import logging
 from contextlib import nullcontext
-from typing import List, Optional, Sequence, TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Any, List, Optional, Sequence, Union
 from opentrons.broker import Broker
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons import types, hardware_control as hc
 from opentrons.commands import commands as cmds
 from opentrons.commands.publisher import CommandPublisher, publish, publish_context
-from opentrons.hardware_control.types import PipettePair
 from opentrons.protocols.advanced_control.mix import mix_from_kwargs
 from opentrons.protocols.api_support.instrument import (
     validate_blowout_location,
@@ -31,10 +30,6 @@ from opentrons.protocols.context.instrument import AbstractInstrument
 from opentrons.protocols.api_support.types import APIVersion
 from .labware import Labware, OutOfTipsError, Well, next_available_tip
 from opentrons.protocols.advanced_control import transfers
-from .paired_instrument_context import (
-    PairedInstrumentContext,
-    UnsupportedInstrumentPairingError,
-)
 
 if TYPE_CHECKING:
     from opentrons.protocol_api import ProtocolContext
@@ -73,7 +68,7 @@ class InstrumentContext(CommandPublisher):
         ctx: ProtocolContext,
         broker: Broker,
         at_version: APIVersion,
-        tip_racks: List[Labware] = None,
+        tip_racks: Optional[List[Labware]] = None,
         trash: Optional[Labware] = None,
     ) -> None:
 
@@ -107,17 +102,17 @@ class InstrumentContext(CommandPublisher):
         return self._starting_tip
 
     @starting_tip.setter
-    def starting_tip(self, location: Union[Well, None]):
+    def starting_tip(self, location: Union[Well, None]) -> None:
         self._starting_tip = location
 
     @requires_version(2, 0)
-    def reset_tipracks(self):
+    def reset_tipracks(self) -> None:
         """Reload all tips in each tip rack and reset starting tip"""
         for tiprack in self.tip_racks:
             tiprack.reset()
         self.starting_tip = None
 
-    @property  # type: ignore
+    @property  # type: ignore[misc]
     @requires_version(2, 0)
     def default_speed(self) -> float:
         """The speed at which the robot's gantry moves.
@@ -130,14 +125,14 @@ class InstrumentContext(CommandPublisher):
         return self._implementation.get_default_speed()
 
     @default_speed.setter
-    def default_speed(self, speed: float):
+    def default_speed(self, speed: float) -> None:
         self._implementation.set_default_speed(speed)
 
     @requires_version(2, 0)  # noqa: C901
     def aspirate(
         self,
         volume: Optional[float] = None,
-        location: Union[types.Location, Well] = None,
+        location: Optional[Union[types.Location, Well]] = None,
         rate: float = 1.0,
     ) -> InstrumentContext:
         """
@@ -245,7 +240,7 @@ class InstrumentContext(CommandPublisher):
     def dispense(
         self,
         volume: Optional[float] = None,
-        location: Union[types.Location, Well] = None,
+        location: Optional[Union[types.Location, Well]] = None,
         rate: float = 1.0,
     ) -> InstrumentContext:
         """
@@ -340,7 +335,7 @@ class InstrumentContext(CommandPublisher):
         self,
         repetitions: int = 1,
         volume: Optional[float] = None,
-        location: Union[types.Location, Well] = None,
+        location: Optional[Union[types.Location, Well]] = None,
         rate: float = 1.0,
     ) -> InstrumentContext:
         """
@@ -471,7 +466,7 @@ class InstrumentContext(CommandPublisher):
 
         return self
 
-    def _determine_speed(self, speed: float):
+    def _determine_speed(self, speed: float) -> float:
         if self.api_version < APIVersion(2, 4):
             return clamp_value(speed, 80, 20, "touch_tip:")
         else:
@@ -646,7 +641,7 @@ class InstrumentContext(CommandPublisher):
     @requires_version(2, 0)
     def pick_up_tip(
         self,
-        location: Union[types.Location, Well] = None,
+        location: Optional[Union[types.Location, Well]] = None,
         presses: Optional[int] = None,
         increment: Optional[float] = None,
     ) -> InstrumentContext:
@@ -737,7 +732,9 @@ class InstrumentContext(CommandPublisher):
 
     @requires_version(2, 0)
     def drop_tip(
-        self, location: Union[types.Location, Well] = None, home_after: bool = True
+        self,
+        location: Optional[Union[types.Location, Well]] = None,
+        home_after: bool = True,
     ) -> InstrumentContext:
         """
         Drop the current tip.
@@ -893,8 +890,8 @@ class InstrumentContext(CommandPublisher):
         volume: Union[float, Sequence[float]],
         source: Well,
         dest: List[Well],
-        *args,
-        **kwargs,
+        *args: Any,
+        **kwargs: Any,
     ) -> InstrumentContext:
         """
         Move a volume of liquid from one source to multiple destinations.
@@ -925,8 +922,8 @@ class InstrumentContext(CommandPublisher):
         volume: Union[float, Sequence[float]],
         source: List[Well],
         dest: Well,
-        *args,
-        **kwargs,
+        *args: Any,
+        **kwargs: Any,
     ) -> InstrumentContext:
         """
         Move liquid from multiple wells (sources) to a single well(destination)
@@ -956,8 +953,8 @@ class InstrumentContext(CommandPublisher):
         volume: Union[float, Sequence[float]],
         source: AdvancedLiquidHandling,
         dest: AdvancedLiquidHandling,
-        trash=True,
-        **kwargs,
+        trash: bool = True,
+        **kwargs: Any,
     ) -> InstrumentContext:
         # source: Union[Well, List[Well], List[List[Well]]],
         # dest: Union[Well, List[Well], List[List[Well]]],
@@ -1144,12 +1141,12 @@ class InstrumentContext(CommandPublisher):
         self._execute_transfer(plan)
         return self
 
-    def _execute_transfer(self, plan: transfers.TransferPlan):
+    def _execute_transfer(self, plan: transfers.TransferPlan) -> None:
         for cmd in plan:
             getattr(self, cmd["method"])(*cmd["args"], **cmd["kwargs"])
 
     @requires_version(2, 0)
-    def delay(self):
+    def delay(self) -> None:
         return self._implementation.delay()
 
     @requires_version(2, 0)
@@ -1290,7 +1287,7 @@ class InstrumentContext(CommandPublisher):
         return self._tip_racks
 
     @tip_racks.setter
-    def tip_racks(self, racks: List[Labware]):
+    def tip_racks(self, racks: List[Labware]) -> None:
         self._tip_racks = racks
 
     @property  # type: ignore
@@ -1305,7 +1302,7 @@ class InstrumentContext(CommandPublisher):
         return self._trash
 
     @trash_container.setter
-    def trash_container(self, trash: Labware):
+    def trash_container(self, trash: Labware) -> None:
         self._trash = trash
 
     @property  # type: ignore
@@ -1410,120 +1407,15 @@ class InstrumentContext(CommandPublisher):
         """
         return self._implementation.get_well_bottom_clearance()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<{}: {} in {}>".format(
             self.__class__.__name__,
             self._implementation.get_model(),
             self._implementation.get_mount().name,
         )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "{} on {} mount".format(self.hw_pipette["display_name"], self.mount)
-
-    @requires_version(2, 7)
-    def pair_with(self, instrument: InstrumentContext) -> PairedInstrumentContext:
-        """Pair this pipette with another one so you can use both simultaneously.
-
-        .. warning::
-
-            Pipette pairing was an experimental feature
-            intended for Opentrons' own internal use.
-
-            **We no longer support this method in any way.**
-            We can't help you if you use it and run into any problems.
-
-            We keep this documentation here
-            for the benefit of people working with old protocols.
-            New protocols shouldn't use this method.
-
-            In a future robot software update,
-            we might change pipette pairing in a way that isn't backwards-compatible,
-            or even remove it entirely.
-            We might do this without advance warning,
-            and without leaving a way for you to restore the old behavior
-            by lowering your protocol's :ref:`apiLevel <v2-versioning>`.
-
-        Limitations:
-
-        * Only :ref:`building block commands <v2-atomic-commands>` are supported,
-          not :ref:`complex commands <v2-complex-commands>`.
-        * Only pipettes of the same type are supported.
-          For example, you can't pair a P1000 Single-Channel with a P300 Single-Channel.
-        * All positioning is based on the *primary pipette* only.
-          (See below for the difference between the primary pipette
-          and the secondary pipette.)
-          The physical offset between the two pipettes is assumed to match
-          an idealized value.
-          The OT-2's pipette offset calibration is not taken into account.
-
-          If the physical offset does not exactly match the ideal,
-          then the secondary pipette will always be off-position.
-          The OT-2 hardware does not provide an easy way
-          of adjusting the physical offset to fix this.
-
-        The :py:obj:`InstrumentContext` on which you call this method
-        is designated the *primary pipette*,
-        and the :py:obj:`InstrumentContext` that you provide as an argument
-        is designated the *secondary pipette*.
-
-        :param instrument: The secondary pipette that you wish to use.
-
-        :raises: ``UnsupportedInstrumentPairingError`` -- if you try to pair pipettes
-                 that are not currently supported together.
-
-        :returns: A ``PairedInstrumentContext``. This is the object you will call
-                  commands on. The building block commands are the same as an individual
-                  pipette's building block commands found at :ref:`v2-atomic-commands`,
-                  and when you want to move pipettes simultaneously you need to use the
-                  ``PairedInstrumentContext``.
-
-        .. code-block :: python
-            :substitutions:
-
-            from opentrons import protocol_api
-
-            # metadata
-            metadata = {
-                'protocolName': 'My Protocol',
-                'author': 'Name <email@address.com>',
-                'description': 'Simple paired pipette protocol,
-                'apiLevel': '|apiLevel|'
-            }
-
-            def run(ctx: protocol_api.ProtocolContext):
-                right_pipette = ctx.load_instrument(
-                    'p300_single_gen2', 'right')
-                left_pipette = ctx.load_instrument('p300_single_gen2', 'left')
-
-                # In this scenario, the right pipette is the primary pipette
-                # while the left pipette is the secondary pipette. All XY
-                # locations will be based on the right pipette.
-                right_paired_with_left = right_pipette.pair_with(left_pipette)
-                right_paired_with_left.pick_up_tip()
-                right_paired_with_left.drop_tip()
-
-                # In this scenario, the left pipette is the primary pipette
-                # while the right pipette is the secondary pipette. All XY
-                # locations will be based on the left pipette.
-                left_paired_with_right = left_pipette.pair_with(right_pipette)
-                left_paired_with_right.pick_up_tip()
-                left_paired_with_right.drop_tip()
-        """
-        if instrument.name != self.name:
-            raise UnsupportedInstrumentPairingError(
-                "At this time, you cannot pair" f"{instrument.name} with {self.name}"
-            )
-
-        return PairedInstrumentContext(
-            primary_instrument=self,
-            secondary_instrument=instrument,
-            implementation=self._implementation.pair_with(instrument._implementation),
-            ctx=self._ctx,
-            pair_policy=PipettePair.of_mount(self._implementation.get_mount()),
-            api_version=self.api_version,
-            trash=self.trash_container,
-            log_parent=logger,
-        )
 
     def _tip_length_for(self, tiprack: Labware) -> float:
         """Get the tip length, including overlap, for a tip from this rack"""

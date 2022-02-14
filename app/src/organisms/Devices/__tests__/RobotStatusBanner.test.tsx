@@ -48,23 +48,6 @@ describe('RobotStatusBanner', () => {
     getByText('otie')
   })
 
-  it('renders an idle robot status when not running a protocol', () => {
-    const [{ getByText }] = render()
-    getByText('Idle')
-  })
-
-  it('renders an active robot status when a protocol is running', () => {
-    mockUseCurrentProtocol.mockReturnValue({
-      data: { metadata: { protocolName: 'Testosaur' } },
-    } as Protocol)
-
-    mockUseIsProtocolRunning.mockReturnValue(true)
-
-    const [{ getByText }] = render()
-
-    getByText('Active')
-  })
-
   it('does not render a running protocol banner when a protocol is not running', () => {
     mockUseCurrentProtocol.mockReturnValue({
       data: { metadata: { protocolName: 'Testosaur' } },

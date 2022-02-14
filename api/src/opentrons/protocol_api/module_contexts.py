@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Generic, List, Optional, TYPE_CHECKING, TypeVar, Union, cast
+from typing import Generic, List, Optional, TYPE_CHECKING, TypeVar, cast
 
 from opentrons import types
 from opentrons.hardware_control import modules
+from opentrons.hardware_control.modules import ModuleModel
 from opentrons.hardware_control.types import Axis
 from opentrons.commands import module_commands as cmds
 from opentrons.commands.publisher import CommandPublisher, publish
@@ -22,11 +23,6 @@ from opentrons.protocols.api_support.util import requires_version
 if TYPE_CHECKING:
     from .protocol_context import ProtocolContext
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
-
-
-ModuleTypes = Union[
-    "TemperatureModuleContext", "MagneticModuleContext", "ThermocyclerContext"
-]
 
 ENGAGE_HEIGHT_UNIT_CNV = 2
 STANDARD_MAGDECK_LABWARE = [
@@ -50,6 +46,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
         self,
         ctx: ProtocolContext,
         geometry: GeometryType,
+        requested_as: ModuleModel,
         at_version: APIVersion,
     ) -> None:
         """Build the ModuleContext.
@@ -59,13 +56,15 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
 
         :param ctx: The parent context for the module
         :param geometry: The :py:class:`.ModuleGeometry` for the module
+        :param requested_as: See :py:obj:`requested_as`.
         """
         super().__init__(ctx.broker)
         self._geometry = geometry
         self._ctx = ctx
+        self._requested_as = requested_as
         self._api_version = at_version
 
-    @property  # type: ignore
+    @property  # type: ignore[misc]
     @requires_version(2, 0)
     def api_version(self) -> APIVersion:
         return self._api_version
@@ -90,14 +89,14 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
 
         provided_offset = self._ctx._labware_offset_provider.find(
             labware_definition_uri=labware.uri,
-            module_model=self.geometry.model.value,
+            requested_module_model=self.requested_as,
             deck_slot=deck_slot,
         )
 
         labware.set_calibration(provided_offset.delta)
         self._ctx._implementation.get_deck().recalculate_high_z()
 
-        self._ctx.labware_load_broker.publish(
+        self._ctx.equipment_broker.publish(
             LabwareLoadInfo(
                 labware_definition=labware._implementation.get_definition(),
                 labware_namespace=labware_namespace,
@@ -152,7 +151,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
 
     @requires_version(2, 0)
     def load_labware_from_definition(
-        self, definition: "LabwareDefinition", label: Optional[str] = None
+        self, definition: LabwareDefinition, label: Optional[str] = None
     ) -> Labware:
         """
         Specify the presence of a labware on the module, using an
@@ -185,13 +184,13 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
         )
         return self.load_labware(name, label, namespace, version)
 
-    @property  # type: ignore
+    @property  # type: ignore[misc]
     @requires_version(2, 0)
     def labware(self) -> Optional[Labware]:
         """The labware (if any) present on this module."""
         return self._geometry.labware
 
-    @property  # type: ignore
+    @property  # type: ignore[misc]
     @requires_version(2, 0)
     def geometry(self) -> ModuleGeometry:
         """The object representing the module as an item on the deck
@@ -200,7 +199,20 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
         """
         return self._geometry
 
-    def __repr__(self):
+    @property
+    def requested_as(self) -> ModuleModel:
+        """How the protocol requested this module.
+
+        For example, a physical ``temperatureModuleV2`` might have been requested
+        either as ``temperatureModuleV2`` or ``temperatureModuleV1``.
+
+        For Opentrons internal use only.
+
+        :meta private:
+        """
+        return self._requested_as
+
+    def __repr__(self) -> str:
         return "{} at {} lw {}".format(
             self.__class__.__name__, self._geometry, self.labware
         )
@@ -241,69 +253,72 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
     def __init__(
         self,
         ctx: ProtocolContext,
+        # TODO(mc, 2022-02-05): this type annotation is misleading;
+        # a SynchronousAdapter wrapper is actually passed in
         hw_module: modules.tempdeck.TempDeck,
         geometry: ModuleGeometry,
+        requested_as: ModuleModel,
         at_version: APIVersion,
         loop: asyncio.AbstractEventLoop,
     ) -> None:
         self._module = hw_module
         self._loop = loop
-        super().__init__(ctx, geometry, at_version)
+        super().__init__(ctx, geometry, requested_as, at_version)
 
     @publish(command=cmds.tempdeck_set_temp)
     @requires_version(2, 0)
-    def set_temperature(self, celsius: float):
+    def set_temperature(self, celsius: float) -> None:
         """Set the target temperature, in C.
 
         Must be between 4 and 95C based on Opentrons QA.
 
         :param celsius: The target temperature, in C
         """
-        return self._module.set_temperature(celsius)
+        self._module.set_temperature(celsius)
 
     @publish(command=cmds.tempdeck_set_temp)
     @requires_version(2, 3)
-    def start_set_temperature(self, celsius: float):
+    def start_set_temperature(self, celsius: float) -> None:
         """Start setting the target temperature, in C.
 
         Must be between 4 and 95C based on Opentrons QA.
 
         :param celsius: The target temperature, in C
         """
-        return self._module.start_set_temperature(celsius)
+        self._module.start_set_temperature(celsius)
 
     @publish(command=cmds.tempdeck_await_temp)
     @requires_version(2, 3)
-    def await_temperature(self, celsius: float):
+    def await_temperature(self, celsius: float) -> None:
         """Wait until module reaches temperature, in C.
 
         Must be between 4 and 95C based on Opentrons QA.
 
         :param celsius: The target temperature, in C
         """
-        return self._module.await_temperature(celsius)
+        self._module.await_temperature(celsius)
 
     @publish(command=cmds.tempdeck_deactivate)
     @requires_version(2, 0)
-    def deactivate(self):
+    def deactivate(self) -> None:
         """Stop heating (or cooling) and turn off the fan."""
-        return self._module.deactivate()
+        self._module.deactivate()
 
-    @property  # type: ignore
+    @property  # type: ignore[misc]
     @requires_version(2, 0)
-    def temperature(self):
+    def temperature(self) -> float:
         """Current temperature in C"""
         return self._module.temperature
 
-    @property  # type: ignore
+    @property  # type: ignore[misc]
     @requires_version(2, 0)
-    def target(self):
+    def target(self) -> Optional[float]:
         """Current target temperature in C"""
         return self._module.target
 
-    @property  # type: ignore
+    @property  # type: ignore[misc]
     @requires_version(2, 3)
-    def status(self):
+    def status(self) -> str:
         """The status of the module.
 
         Returns 'holding at target', 'cooling', 'heating', or 'idle'
@@ -313,7 +328,7 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
 
 
 class MagneticModuleContext(ModuleContext[ModuleGeometry]):
-    """An object representing a connected Temperature Module.
+    """An object representing a connected Magnetic Module.
 
     It should not be instantiated directly; instead, it should be
     created through :py:meth:`.ProtocolContext.load_module`.
@@ -325,21 +340,24 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
     def __init__(
         self,
         ctx: ProtocolContext,
+        # TODO(mc, 2022-02-05): this type annotation is misleading;
+        # a SynchronousAdapter wrapper is actually passed in
         hw_module: modules.magdeck.MagDeck,
         geometry: ModuleGeometry,
+        requested_as: ModuleModel,
         at_version: APIVersion,
         loop: asyncio.AbstractEventLoop,
     ) -> None:
         self._module = hw_module
         self._loop = loop
-        super().__init__(ctx, geometry, at_version)
+        super().__init__(ctx, geometry, requested_as, at_version)
 
     @publish(command=cmds.magdeck_calibrate)
     @requires_version(2, 0)
-    def calibrate(self):
+    def calibrate(self) -> None:
         """Calibrate the Magnetic Module.
 
-        The calibration is used to establish the position of the lawbare on
+        The calibration is used to establish the position of the labware on
         top of the magnetic module.
         """
         self._module.calibrate()
@@ -364,7 +382,7 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
         height: Optional[float] = None,
         offset: Optional[float] = None,
         height_from_base: Optional[float] = None,
-    ):
+    ) -> None:
         """Raise the Magnetic Module's magnets.
 
         The destination of the magnets can be specified in several different
@@ -445,19 +463,19 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
 
     @publish(command=cmds.magdeck_disengage)
     @requires_version(2, 0)
-    def disengage(self):
+    def disengage(self) -> None:
         """Lower the magnets back into the Magnetic Module."""
         self._module.deactivate()
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def status(self):
-        """The status of the module. either 'engaged' or 'disengaged'"""
+    def status(self) -> str:
+        """The status of the module; either 'engaged' or 'disengaged'"""
         return self._module.status
 
 
 class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
-    """An object representing a connected Temperature Module.
+    """An object representing a connected Thermocycler Module.
 
     It should not be instantiated directly; instead, it should be
     created through :py:meth:`.ProtocolContext.load_module`.
@@ -468,16 +486,19 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     def __init__(
         self,
         ctx: ProtocolContext,
+        # TODO(mc, 2022-02-05): this type annotation is misleading;
+        # a SynchronousAdapter wrapper is actually passed in
         hw_module: modules.thermocycler.Thermocycler,
         geometry: ThermocyclerGeometry,
+        requested_as: ModuleModel,
         at_version: APIVersion,
         loop: asyncio.AbstractEventLoop,
     ) -> None:
         self._module = hw_module
         self._loop = loop
-        super().__init__(ctx, geometry, at_version)
+        super().__init__(ctx, geometry, requested_as, at_version)
 
-    def _prepare_for_lid_move(self):
+    def _prepare_for_lid_move(self) -> None:
         loaded_instruments = [
             instr
             for mount, instr in self._ctx._instruments.items()
@@ -493,7 +514,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
         else:
             ctx_impl = self._ctx._implementation
             instr_impl = instr._implementation
-            hardware = ctx_impl.get_hardware().hardware
+            hardware = ctx_impl.get_hardware()
 
             hardware.retract(instr_impl.get_mount())
             high_point = hardware.current_position(instr_impl.get_mount())
@@ -503,25 +524,27 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
             )
             instr.move_to(types.Location(safe_point, None), force_direct=True)
 
-    def flag_unsafe_move(self, to_loc: types.Location, from_loc: types.Location):
+    def flag_unsafe_move(
+        self, to_loc: types.Location, from_loc: types.Location
+    ) -> None:
         cast(ThermocyclerGeometry, self.geometry).flag_unsafe_move(
             to_loc, from_loc, self.lid_position
         )
 
     @publish(command=cmds.thermocycler_open)
     @requires_version(2, 0)
-    def open_lid(self):
+    def open_lid(self) -> str:
         """Opens the lid"""
         self._prepare_for_lid_move()
-        self._geometry.lid_status = self._module.open()  # type: ignore
+        self._geometry.lid_status = self._module.open()  # type: ignore[assignment]
         return self._geometry.lid_status
 
     @publish(command=cmds.thermocycler_close)
     @requires_version(2, 0)
-    def close_lid(self):
+    def close_lid(self) -> str:
         """Closes the lid"""
         self._prepare_for_lid_move()
-        self._geometry.lid_status = self._module.close()  # type: ignore
+        self._geometry.lid_status = self._module.close()  # type: ignore[assignment]
         return self._geometry.lid_status
 
     @publish(command=cmds.thermocycler_set_block_temp)
@@ -533,7 +556,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
         hold_time_minutes: Optional[float] = None,
         ramp_rate: Optional[float] = None,
         block_max_volume: Optional[float] = None,
-    ):
+    ) -> None:
         """Set the target temperature for the well block, in °C.
 
         Valid operational range yet to be determined.
@@ -562,8 +585,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
             specified, the Thermocycler will proceed to the next command
             after ``temperature`` is reached.
         """
-
-        return self._module.set_temperature(
+        self._module.set_temperature(
             temperature=temperature,
             hold_time_seconds=hold_time_seconds,
             hold_time_minutes=hold_time_minutes,
@@ -573,7 +595,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
 
     @publish(command=cmds.thermocycler_set_lid_temperature)
     @requires_version(2, 0)
-    def set_lid_temperature(self, temperature: float):
+    def set_lid_temperature(self, temperature: float) -> None:
         """Set the target temperature for the heated lid, in °C.
 
         :param temperature: The target temperature, in °C clamped to the
@@ -594,7 +616,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
         steps: List[modules.ThermocyclerStep],
         repetitions: int,
         block_max_volume: Optional[float] = None,
-    ):
+    ) -> None:
         """Execute a Thermocycler Profile defined as a cycle of
         ``steps`` to repeat for a given number of ``repetitions``.
 
@@ -627,100 +649,100 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
                     "either hold_time_minutes or hold_time_seconds must be"
                     "defined for each step in cycle"
                 )
-        return self._module.cycle_temperatures(
+        self._module.cycle_temperatures(
             steps=steps, repetitions=repetitions, volume=block_max_volume
         )
 
     @publish(command=cmds.thermocycler_deactivate_lid)
     @requires_version(2, 0)
-    def deactivate_lid(self):
+    def deactivate_lid(self) -> None:
         """Turn off the heated lid"""
         self._module.deactivate_lid()
 
     @publish(command=cmds.thermocycler_deactivate_block)
     @requires_version(2, 0)
-    def deactivate_block(self):
+    def deactivate_block(self) -> None:
         """Turn off the well block temperature controller"""
         self._module.deactivate_block()
 
     @publish(command=cmds.thermocycler_deactivate)
     @requires_version(2, 0)
-    def deactivate(self):
+    def deactivate(self) -> None:
         """Turn off the well block temperature controller, and heated lid"""
         self._module.deactivate()
 
-    @property  # type: ignore
+    @property  # type: ignore[misc]
     @requires_version(2, 0)
-    def lid_position(self):
+    def lid_position(self) -> Optional[str]:
         """Lid open/close status string"""
         return self._module.lid_status
 
-    @property  # type: ignore
+    @property  # type: ignore[misc]
     @requires_version(2, 0)
-    def block_temperature_status(self):
+    def block_temperature_status(self) -> str:
         return self._module.status
 
-    @property  # type: ignore
+    @property  # type: ignore[misc]
     @requires_version(2, 0)
-    def lid_temperature_status(self):
+    def lid_temperature_status(self) -> Optional[str]:
         return self._module.lid_temp_status
 
-    @property  # type: ignore
+    @property  # type: ignore[misc]
     @requires_version(2, 0)
-    def block_temperature(self):
+    def block_temperature(self) -> Optional[float]:
         """Current temperature in degrees C"""
         return self._module.temperature
 
-    @property  # type: ignore
+    @property  # type: ignore[misc]
     @requires_version(2, 0)
-    def block_target_temperature(self):
+    def block_target_temperature(self) -> Optional[float]:
         """Target temperature in degrees C"""
         return self._module.target
 
-    @property  # type: ignore
+    @property  # type: ignore[misc]
     @requires_version(2, 0)
-    def lid_temperature(self):
+    def lid_temperature(self) -> Optional[float]:
         """Current temperature in degrees C"""
         return self._module.lid_temp
 
-    @property  # type: ignore
+    @property  # type: ignore[misc]
     @requires_version(2, 0)
-    def lid_target_temperature(self):
+    def lid_target_temperature(self) -> Optional[float]:
         """Target temperature in degrees C"""
         return self._module.lid_target
 
-    @property  # type: ignore
+    @property  # type: ignore[misc]
     @requires_version(2, 0)
-    def ramp_rate(self):
+    def ramp_rate(self) -> Optional[float]:
         """Current ramp rate in degrees C/sec"""
         return self._module.ramp_rate
 
-    @property  # type: ignore
+    @property  # type: ignore[misc]
     @requires_version(2, 0)
-    def hold_time(self):
+    def hold_time(self) -> Optional[float]:
         """Remaining hold time in sec"""
         return self._module.hold_time
 
-    @property  # type: ignore
+    @property  # type: ignore[misc]
     @requires_version(2, 0)
-    def total_cycle_count(self):
+    def total_cycle_count(self) -> Optional[int]:
         """Number of repetitions for current set cycle"""
         return self._module.total_cycle_count
 
-    @property  # type: ignore
+    @property  # type: ignore[misc]
     @requires_version(2, 0)
-    def current_cycle_index(self):
+    def current_cycle_index(self) -> Optional[int]:
         """Index of the current set cycle repetition"""
         return self._module.current_cycle_index
 
-    @property  # type: ignore
+    @property  # type: ignore[misc]
     @requires_version(2, 0)
-    def total_step_count(self):
+    def total_step_count(self) -> Optional[int]:
         """Number of steps within the current cycle"""
         return self._module.total_step_count
 
-    @property  # type: ignore
+    @property  # type: ignore[misc]
     @requires_version(2, 0)
-    def current_step_index(self):
+    def current_step_index(self) -> Optional[int]:
         """Index of the current step within the current cycle"""
         return self._module.current_step_index

@@ -19,7 +19,9 @@ from opentrons_ot3_firmware.arbitration_id import (
 )
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_ot3_firmware.messages.messages import get_definition
-from opentrons_hardware.scripts.can_args import add_can_args, build_driver
+
+from opentrons_hardware.drivers.can_bus.build import build_driver
+from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 from opentrons_ot3_firmware.utils import BinarySerializable, BinarySerializableException
 
 log = logging.getLogger(__name__)
@@ -148,7 +150,10 @@ def prompt_message(get_user_input: GetInputFunc, output_func: OutputFunc) -> Can
     can_message = CanMessage(
         arbitration_id=ArbitrationId(
             parts=ArbitrationIdParts(
-                message_id=message_id, node_id=node_id, function_code=function_code
+                message_id=message_id,
+                node_id=node_id,
+                function_code=function_code,
+                originating_node_id=NodeId.host,
             )
         ),
         data=data,
@@ -178,7 +183,7 @@ async def ui_task(can_driver: AbstractCanDriver) -> None:
 
 async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
-    driver = await build_driver(args)
+    driver = await build_driver(build_settings(args))
 
     loop = asyncio.get_event_loop()
     fut = asyncio.gather(

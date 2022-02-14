@@ -19,15 +19,6 @@ Main API Class
 
 This is the main class used by the API.
 
-.. note::
-
-    When methods of the API say that they take a "union", that's referring to `this <https://docs.python.org/3.7/library/typing.html#typing.Union>`_ concept, which means "any of
-    the things in the union are acceptable". For instance, when :py:meth:`.aspirate` says ``mount``
-    is a ``Union[opentrons.types.Mount, PipettePair]`` it means you can specify either a mount
-    like ``opentrons.types.Mount.LEFT`` or a pipette pair that will aspirate with both pipettes
-    at once.
-
-
 .. module:: opentrons.hardware_control.api
 
 .. autoclass:: opentrons.hardware_control.api.API

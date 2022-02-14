@@ -86,13 +86,13 @@ class MagDeck(mod_abc.AbstractModule):
         """Get the bootloating method."""
         return update.upload_via_avrdude
 
-    async def calibrate(self):
+    async def calibrate(self) -> None:
         """Calibration involves probing for top plate to get the plate height."""
         await self.wait_for_is_running()
         await self._driver.probe_plate()
         # return if successful or not?
 
-    async def engage(self, height: float):
+    async def engage(self, height: float) -> None:
         """Move the magnet to a specific height, in mm from home position."""
         await self.wait_for_is_running()
         if height > MAX_ENGAGE_HEIGHT[self.model()] or height < 0:
@@ -103,7 +103,7 @@ class MagDeck(mod_abc.AbstractModule):
         await self._driver.move(height)
         self._current_height = await self._driver.get_mag_position()
 
-    async def deactivate(self):
+    async def deactivate(self) -> None:
         """Home the magnet."""
         await self.wait_for_is_running()
         await self._driver.home()

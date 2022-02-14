@@ -4,7 +4,7 @@ from mock import AsyncMock, call, MagicMock
 from opentrons_ot3_firmware import ArbitrationId, ArbitrationIdParts
 
 from opentrons_ot3_firmware.constants import NodeId
-from opentrons_hardware.drivers.can_bus.can_messenger import MessageListener
+from opentrons_hardware.drivers.can_bus.can_messenger import MessageListenerCallback
 from opentrons_ot3_firmware.messages.message_definitions import (
     AddLinearMoveRequest,
 )
@@ -14,7 +14,9 @@ from opentrons_ot3_firmware.messages.payloads import (
     EmptyPayload,
     ExecuteMoveGroupRequestPayload,
 )
-from opentrons_hardware.hardware_control.constants import interrupts_per_sec
+from opentrons_hardware.hardware_control.constants import (
+    interrupts_per_sec,
+)
 from opentrons_hardware.hardware_control.motion import (
     MoveGroups,
     MoveGroupSingleAxisStep,
@@ -76,12 +78,12 @@ def move_group_multiple() -> MoveGroups:
         # Group 2
         [
             {
-                NodeId.pipette: MoveGroupSingleAxisStep(
+                NodeId.pipette_left: MoveGroupSingleAxisStep(
                     distance_mm=12, velocity_mm_sec=-23, duration_sec=1234
                 ),
             },
             {
-                NodeId.pipette: MoveGroupSingleAxisStep(
+                NodeId.pipette_left: MoveGroupSingleAxisStep(
                     distance_mm=12, velocity_mm_sec=23, duration_sec=1234
                 ),
             },
@@ -135,7 +137,8 @@ async def test_single_send_setup_commands(
                 velocity=Int32Field(
                     int(
                         move_group_single[0][0][NodeId.head].velocity_mm_sec
-                        * interrupts_per_sec
+                        / interrupts_per_sec
+                        * (2**31)
                     )
                 ),
                 acceleration=Int32Field(0),
@@ -167,7 +170,8 @@ async def test_multi_send_setup_commands(
                 velocity=Int32Field(
                     int(
                         move_group_multiple[0][0][NodeId.head].velocity_mm_sec
-                        * interrupts_per_sec
+                        / interrupts_per_sec
+                        * (2**31)
                     )
                 ),
                 acceleration=Int32Field(0),
@@ -191,7 +195,8 @@ async def test_multi_send_setup_commands(
                 velocity=Int32Field(
                     int(
                         move_group_multiple[1][0][NodeId.gantry_x].velocity_mm_sec
-                        * interrupts_per_sec
+                        / interrupts_per_sec
+                        * (2**31)
                     )
                 ),
                 acceleration=Int32Field(0),
@@ -214,7 +219,8 @@ async def test_multi_send_setup_commands(
                 velocity=Int32Field(
                     int(
                         move_group_multiple[1][0][NodeId.gantry_y].velocity_mm_sec
-                        * interrupts_per_sec
+                        / interrupts_per_sec
+                        * (2**31)
                     )
                 ),
                 acceleration=Int32Field(0),
@@ -230,21 +236,22 @@ async def test_multi_send_setup_commands(
 
     # Group 2
     mock_can_messenger.send.assert_any_call(
-        node_id=NodeId.pipette,
+        node_id=NodeId.pipette_left,
         message=AddLinearMoveRequest(
             payload=AddLinearMoveRequestPayload(
                 group_id=UInt8Field(2),
                 seq_id=UInt8Field(0),
                 velocity=Int32Field(
                     int(
-                        move_group_multiple[2][0][NodeId.pipette].velocity_mm_sec
-                        * interrupts_per_sec
+                        move_group_multiple[2][0][NodeId.pipette_left].velocity_mm_sec
+                        / interrupts_per_sec
+                        * (2**31)
                     )
                 ),
                 acceleration=Int32Field(0),
                 duration=UInt32Field(
                     int(
-                        move_group_multiple[2][0][NodeId.pipette].duration_sec
+                        move_group_multiple[2][0][NodeId.pipette_left].duration_sec
                         * interrupts_per_sec
                     )
                 ),
@@ -253,21 +260,22 @@ async def test_multi_send_setup_commands(
     )
 
     mock_can_messenger.send.assert_any_call(
-        node_id=NodeId.pipette,
+        node_id=NodeId.pipette_left,
         message=AddLinearMoveRequest(
             payload=AddLinearMoveRequestPayload(
                 group_id=UInt8Field(2),
                 seq_id=UInt8Field(1),
                 velocity=Int32Field(
                     int(
-                        move_group_multiple[2][1][NodeId.pipette].velocity_mm_sec
-                        * interrupts_per_sec
+                        move_group_multiple[2][1][NodeId.pipette_left].velocity_mm_sec
+                        / interrupts_per_sec
+                        * (2**31)
                     )
                 ),
                 acceleration=Int32Field(0),
                 duration=UInt32Field(
                     int(
-                        move_group_multiple[2][1][NodeId.pipette].duration_sec
+                        move_group_multiple[2][1][NodeId.pipette_left].duration_sec
                         * interrupts_per_sec
                     )
                 ),
@@ -288,7 +296,9 @@ async def test_move() -> None:
 class MockSendMoveCompleter:
     """Side effect mock of CanMessenger.send that immediately completes moves."""
 
-    def __init__(self, move_groups: MoveGroups, listener: MessageListener) -> None:
+    def __init__(
+        self, move_groups: MoveGroups, listener: MessageListenerCallback
+    ) -> None:
         """Constructor."""
         self._move_groups = move_groups
         self._listener = listener
@@ -315,9 +325,7 @@ class MockSendMoveCompleter:
                     arbitration_id = ArbitrationId(
                         parts=ArbitrationIdParts(originating_node_id=node)
                     )
-                    self._listener.on_message(
-                        md.MoveCompleted(payload=payload), arbitration_id
-                    )
+                    self._listener(md.MoveCompleted(payload=payload), arbitration_id)
 
 
 async def test_single_move(

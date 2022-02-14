@@ -37,9 +37,14 @@ class Axis(enum.Enum):
     C = 5
 
     @classmethod
-    def by_mount(cls, mount: top_types.Mount):
+    def by_mount(cls, mount: top_types.Mount) -> "Axis":
         bm = {top_types.Mount.LEFT: cls.Z, top_types.Mount.RIGHT: cls.A}
         return bm[mount]
+
+    @classmethod
+    def mount_axes(cls) -> Tuple["Axis", "Axis"]:
+        """The axes which are used for moving pipettes up and down."""
+        return cls.Z, cls.A
 
     @classmethod
     def gantry_axes(cls) -> Tuple["Axis", "Axis", "Axis", "Axis"]:
@@ -49,12 +54,12 @@ class Axis(enum.Enum):
         return cls.X, cls.Y, cls.Z, cls.A
 
     @classmethod
-    def of_plunger(cls, mount: top_types.Mount):
+    def of_plunger(cls, mount: top_types.Mount) -> "Axis":
         pm = {top_types.Mount.LEFT: cls.B, top_types.Mount.RIGHT: cls.C}
         return pm[mount]
 
     @classmethod
-    def to_mount(cls, inst: "Axis"):
+    def to_mount(cls, inst: "Axis") -> top_types.Mount:
         return {
             cls.Z: top_types.Mount.LEFT,
             cls.A: top_types.Mount.RIGHT,
@@ -62,7 +67,7 @@ class Axis(enum.Enum):
             cls.C: top_types.Mount.RIGHT,
         }[inst]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -182,33 +187,6 @@ class ExecutionState(enum.Enum):
         return self.name
 
 
-class PipettePair(enum.Enum):
-    PRIMARY_LEFT = enum.auto()
-    PRIMARY_RIGHT = enum.auto()
-
-    @property
-    def primary(self) -> top_types.Mount:
-        if self.name == "PRIMARY_RIGHT":
-            return top_types.Mount.RIGHT
-        else:
-            return top_types.Mount.LEFT
-
-    @property
-    def secondary(self) -> top_types.Mount:
-        if self.name == "PRIMARY_RIGHT":
-            return top_types.Mount.LEFT
-        else:
-            return top_types.Mount.RIGHT
-
-    @classmethod
-    def of_mount(cls, mount: top_types.Mount) -> "PipettePair":
-        pair = {
-            top_types.Mount.LEFT: cls.PRIMARY_LEFT,
-            top_types.Mount.RIGHT: cls.PRIMARY_RIGHT,
-        }
-        return pair[mount]
-
-
 class HardwareAction(enum.Enum):
     DROPTIP = enum.auto()
     ASPIRATE = enum.auto()
@@ -259,8 +237,4 @@ class NoTipAttachedError(RuntimeError):
 
 
 class TipAttachedError(RuntimeError):
-    pass
-
-
-class PairedPipetteConfigValueError(RuntimeError):
     pass

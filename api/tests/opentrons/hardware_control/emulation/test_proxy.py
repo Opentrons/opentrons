@@ -1,3 +1,4 @@
+# TODO(mc, 2022-04-05): tests in this file sometimes freeze; investigate
 import asyncio
 from typing import AsyncIterator
 

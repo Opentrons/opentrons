@@ -8,7 +8,6 @@ import typing
 from opentrons import types
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support.util import Clearances, PlungerSpeeds, FlowRates
-from opentrons.protocols.context.paired_instrument import AbstractPairedInstrument
 from opentrons.protocols.context.well import WellImplementation
 
 
@@ -159,10 +158,4 @@ class AbstractInstrument(ABC):
         dispense: typing.Optional[float] = None,
         blow_out: typing.Optional[float] = None,
     ) -> None:
-        ...
-
-    @abstractmethod
-    def pair_with(
-        self, other_instrument: AbstractInstrument
-    ) -> AbstractPairedInstrument:
         ...

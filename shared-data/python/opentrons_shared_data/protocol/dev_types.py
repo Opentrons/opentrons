@@ -10,17 +10,18 @@ from ..pipette.dev_types import PipetteName
 from ..labware.dev_types import LabwareDefinition
 from ..module.dev_types import ModuleModel
 
-SlotSpan = Literal['span7_8_10_11']
+SlotSpan = Literal["span7_8_10_11"]
 
 
 class BlowoutLocation(Enum):
-    SOURCE = 'source well'
-    DEST = 'destination well'
-    TRASH = 'trash'
+    SOURCE = "source well"
+    DEST = "destination well"
+    TRASH = "trash"
 
 
-LiquidHandlingCommand = Union[Literal['transfer'], Literal['consolidate'],
-                              Literal['distribute']]
+LiquidHandlingCommand = Union[
+    Literal["transfer"], Literal["consolidate"], Literal["distribute"]
+]
 
 
 class LabwareRequirement(TypedDict):
@@ -30,53 +31,49 @@ class LabwareRequirement(TypedDict):
 
 
 Metadata = TypedDict(
-    'Metadata',
+    "Metadata",
     {
-        'protocolName': str,
-        'protocol-name': str,
-        'author': str,
-        'description': Optional[str],
-        'created': int,
-        'lastModified': Optional[int],
-        'last-modified': Optional[int],
-        'category': Optional[str],
-        'subcategory': Optional[str],
-        'tags': List[str],
+        "protocolName": str,
+        "protocol-name": str,
+        "author": str,
+        "description": Optional[str],
+        "created": int,
+        "lastModified": Optional[int],
+        "last-modified": Optional[int],
+        "category": Optional[str],
+        "subcategory": Optional[str],
+        "tags": List[str],
     },
-    total=False
+    total=False,
 )
 
-AspirateCommandId = Literal['aspirate']
-DispenseCommandId = Literal['dispense']
-AirGapCommandId = Literal['airGap']
-BlowoutCommandId = Literal['blowout']
-TouchTipCommandId = Literal['touchTip']
-PickUpTipCommandId = Literal['pickUpTip']
-DropTipCommandId = Literal['dropTip']
-MoveToSlotCommandId = Literal['moveToSlot']
-MoveToWellCommandId = Literal['moveToWell']
-DelayCommandId = Literal['delay']
-MagneticModuleEngageCommandId = Literal['magneticModule/engageMagnet']
-MagneticModuleDisengageCommandId = Literal['magneticModule/disengageMagnet']
-TemperatureModuleSetTargetCommandId\
-    = Literal['temperatureModule/setTargetTemperature']
-TemperatureModuleAwaitCommandId = Literal['temperatureModule/awaitTemperature']
-TemperatureModuleDeactivateCommandId = Literal['temperatureModule/deactivate']
-ThermocyclerSetTargetBlockCommandId\
-    = Literal['thermocycler/setTargetBlockTemperature']
-ThermocyclerSetTargetLidCommandId\
-    = Literal['thermocycler/setTargetLidTemperature']
-ThermocyclerAwaitLidTemperatureCommandId \
-    = Literal['thermocycler/awaitLidTemperature']
-ThermocyclerAwaitBlockTemperatureCommandId \
-    = Literal['thermocycler/awaitBlockTemperature']
-ThermocyclerDeactivateBlockCommandId = Literal['thermocycler/deactivateBlock']
-ThermocyclerDeactivateLidCommandId = Literal['thermocycler/deactivateLid']
-ThermocyclerOpenLidCommandId = Literal['thermocycler/openLid']
-ThermocyclerCloseLidCommandId = Literal['thermocycler/closeLid']
-ThermocyclerRunProfileCommandId = Literal['thermocycler/runProfile']
-ThermocyclerAwaitProfileCommandId\
-    = Literal['thermocycler/awaitProfileComplete']
+AspirateCommandId = Literal["aspirate"]
+DispenseCommandId = Literal["dispense"]
+AirGapCommandId = Literal["airGap"]
+BlowoutCommandId = Literal["blowout"]
+TouchTipCommandId = Literal["touchTip"]
+PickUpTipCommandId = Literal["pickUpTip"]
+DropTipCommandId = Literal["dropTip"]
+MoveToSlotCommandId = Literal["moveToSlot"]
+MoveToWellCommandId = Literal["moveToWell"]
+DelayCommandId = Literal["delay"]
+MagneticModuleEngageCommandId = Literal["magneticModule/engageMagnet"]
+MagneticModuleDisengageCommandId = Literal["magneticModule/disengageMagnet"]
+TemperatureModuleSetTargetCommandId = Literal["temperatureModule/setTargetTemperature"]
+TemperatureModuleAwaitCommandId = Literal["temperatureModule/awaitTemperature"]
+TemperatureModuleDeactivateCommandId = Literal["temperatureModule/deactivate"]
+ThermocyclerSetTargetBlockCommandId = Literal["thermocycler/setTargetBlockTemperature"]
+ThermocyclerSetTargetLidCommandId = Literal["thermocycler/setTargetLidTemperature"]
+ThermocyclerAwaitLidTemperatureCommandId = Literal["thermocycler/awaitLidTemperature"]
+ThermocyclerAwaitBlockTemperatureCommandId = Literal[
+    "thermocycler/awaitBlockTemperature"
+]
+ThermocyclerDeactivateBlockCommandId = Literal["thermocycler/deactivateBlock"]
+ThermocyclerDeactivateLidCommandId = Literal["thermocycler/deactivateLid"]
+ThermocyclerOpenLidCommandId = Literal["thermocycler/openLid"]
+ThermocyclerCloseLidCommandId = Literal["thermocycler/closeLid"]
+ThermocyclerRunProfileCommandId = Literal["thermocycler/runProfile"]
+ThermocyclerAwaitProfileCommandId = Literal["thermocycler/awaitProfileComplete"]
 
 
 class NamedOffset(TypedDict):
@@ -87,15 +84,15 @@ class NamedOffset(TypedDict):
 
 class ModuleRequirement(TypedDict):
     slot: str
-    model: 'ModuleModel'
+    model: "ModuleModel"
 
 
 class RobotRequirement(TypedDict):
-    model: Literal['OT-2 Standard']
+    model: Literal["OT-2 Standard"]
 
 
 class PipetteRequirement(TypedDict):
-    mount: Union[Literal['left'], Literal['right']]
+    mount: Union[Literal["left"], Literal["right"]]
     name: PipetteName
 
 
@@ -113,8 +110,7 @@ class PipetteAccessWithOffsetParams(PipetteAccessParams):
     offsetFromBottomMm: float
 
 
-class StandardLiquidHandlingParams(
-        PipetteAccessWithOffsetParams, FlowRateParams):
+class StandardLiquidHandlingParams(PipetteAccessWithOffsetParams, FlowRateParams):
     volume: float
 
 
@@ -298,30 +294,39 @@ class ThermocyclerAwaitProfileCommand(TypedDict):
 
 
 ThermocyclerCommand = Union[
-    ThermocyclerAwaitProfileCommand, ThermocyclerRunProfileCommand,
-    ThermocyclerCloseLidCommand, ThermocyclerOpenLidCommand,
-    ThermocyclerDeactivateLidCommand, ThermocyclerDeactivateBlockCommand,
+    ThermocyclerAwaitProfileCommand,
+    ThermocyclerRunProfileCommand,
+    ThermocyclerCloseLidCommand,
+    ThermocyclerOpenLidCommand,
+    ThermocyclerDeactivateLidCommand,
+    ThermocyclerDeactivateBlockCommand,
     ThermocyclerAwaitBlockTemperatureCommand,
     ThermocyclerAwaitLidTemperatureCommand,
-    ThermocyclerSetTargetLidCommand, ThermocyclerSetTargetBlockCommand
+    ThermocyclerSetTargetLidCommand,
+    ThermocyclerSetTargetBlockCommand,
 ]
 ThermocyclerCommandId = Union[
-    ThermocyclerAwaitProfileCommandId, ThermocyclerRunProfileCommandId,
-    ThermocyclerCloseLidCommandId, ThermocyclerOpenLidCommandId,
-    ThermocyclerDeactivateLidCommandId, ThermocyclerDeactivateBlockCommandId,
+    ThermocyclerAwaitProfileCommandId,
+    ThermocyclerRunProfileCommandId,
+    ThermocyclerCloseLidCommandId,
+    ThermocyclerOpenLidCommandId,
+    ThermocyclerDeactivateLidCommandId,
+    ThermocyclerDeactivateBlockCommandId,
     ThermocyclerAwaitBlockTemperatureCommandId,
     ThermocyclerAwaitLidTemperatureCommandId,
     ThermocyclerSetTargetLidCommandId,
-    ThermocyclerSetTargetBlockCommandId
+    ThermocyclerSetTargetBlockCommandId,
 ]
 
 TemperatureModuleCommand = Union[
-    TemperatureModuleAwaitCommand, TemperatureModuleSetTargetCommand,
-    TemperatureModuleDeactivateCommand
+    TemperatureModuleAwaitCommand,
+    TemperatureModuleSetTargetCommand,
+    TemperatureModuleDeactivateCommand,
 ]
 TemperatureModuleCommandId = Union[
-    TemperatureModuleAwaitCommandId, TemperatureModuleSetTargetCommandId,
-    TemperatureModuleDeactivateCommandId
+    TemperatureModuleAwaitCommandId,
+    TemperatureModuleSetTargetCommandId,
+    TemperatureModuleDeactivateCommandId,
 ]
 
 MagneticModuleCommand = Union[
@@ -332,20 +337,34 @@ MagneticModuleCommandId = Union[
 ]
 
 
-ModuleCommand = Union[ThermocyclerCommand,
-                      TemperatureModuleCommand,
-                      MagneticModuleCommand]
-ModuleCommandId = Union[ThermocyclerCommandId,
-                        TemperatureModuleCommandId,
-                        MagneticModuleCommandId]
+ModuleCommand = Union[
+    ThermocyclerCommand, TemperatureModuleCommand, MagneticModuleCommand
+]
+ModuleCommandId = Union[
+    ThermocyclerCommandId, TemperatureModuleCommandId, MagneticModuleCommandId
+]
 
-PipetteCommand = Union[AspirateCommand, DispenseCommand, AirGapCommand,
-                       BlowoutCommand,  TouchTipCommand, PickUpTipCommand,
-                       DropTipCommand, MoveToSlotCommand]
-PipetteCommandId = Union[AspirateCommandId, DispenseCommandId, AirGapCommandId,
-                         BlowoutCommandId, TouchTipCommandId,
-                         PickUpTipCommandId, DropTipCommandId,
-                         MoveToSlotCommandId, MoveToWellCommandId]
+PipetteCommand = Union[
+    AspirateCommand,
+    DispenseCommand,
+    AirGapCommand,
+    BlowoutCommand,
+    TouchTipCommand,
+    PickUpTipCommand,
+    DropTipCommand,
+    MoveToSlotCommand,
+]
+PipetteCommandId = Union[
+    AspirateCommandId,
+    DispenseCommandId,
+    AirGapCommandId,
+    BlowoutCommandId,
+    TouchTipCommandId,
+    PickUpTipCommandId,
+    DropTipCommandId,
+    MoveToSlotCommandId,
+    MoveToWellCommandId,
+]
 
 RobotCommand = Union[DelayCommand]
 RobotCommandId = Union[DelayCommandId]
@@ -364,7 +383,7 @@ class DesignerApplication(TypedDict):
 
 
 JsonProtocolV4 = TypedDict(
-    'JsonProtocolV4',
+    "JsonProtocolV4",
     {
         "$otSharedSchema": Literal["#/protocol/schemas/4"],
         "schemaVersion": Literal[4],
@@ -376,11 +395,13 @@ JsonProtocolV4 = TypedDict(
         "modules": Dict[str, ModuleRequirement],
         "commands": List[Command],
         "commandAnnotations": Dict[str, Any],
-        "designerApplication": DesignerApplication
-    }, total=False)
+        "designerApplication": DesignerApplication,
+    },
+    total=False,
+)
 
 JsonProtocolV5 = TypedDict(
-    'JsonProtocolV5',
+    "JsonProtocolV5",
     {
         "$otSharedSchema": Literal["#/protocol/schemas/5"],
         "schemaVersion": Literal[5],
@@ -392,8 +413,10 @@ JsonProtocolV5 = TypedDict(
         "modules": Dict[str, ModuleRequirement],
         "commands": List[Command],
         "commandAnnotations": Dict[str, Any],
-        "designerApplication": DesignerApplication
-    }, total=False)
+        "designerApplication": DesignerApplication,
+    },
+    total=False,
+)
 
 
 class JsonProtocolV3(TypedDict, total=False):

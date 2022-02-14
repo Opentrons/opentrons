@@ -11,7 +11,7 @@ from opentrons_shared_data.pipette import name_config as pipette_name_config
 from opentrons.types import Point
 from opentrons.calibration_storage.types import PipetteOffsetByPipetteMount
 from opentrons.config import pipette_config, robot_configs
-from opentrons.config.types import RobotConfig
+from opentrons.config.types import RobotConfig, OT3Config
 from opentrons.drivers.types import MoveSplit
 from .types import CriticalPoint, BoardRevision
 
@@ -437,5 +437,30 @@ def generate_hardware_configs(
             "idle_current": robot_configs.current_for_revision(
                 robot_config.low_current, revision
             )["B"],
+            "splits": None,
+        }
+
+
+def generate_hardware_configs_ot3(
+    pipette: Optional[Pipette], robot_config: OT3Config, revision: BoardRevision
+) -> InstrumentHardwareConfigs:
+    """
+    Fuse robot and pipette configuration to generate commands to send to
+    the motor driver if required
+    """
+    if pipette:
+        return {
+            "steps_per_mm": 0,
+            "home_pos": 0,
+            "max_travel": pipette.config.max_travel,
+            "idle_current": pipette.config.idle_current,
+            "splits": _build_splits(pipette),
+        }
+    else:
+        return {
+            "steps_per_mm": 0,
+            "home_pos": 0,
+            "max_travel": 0,
+            "idle_current": robot_config.holding_current.none["P"],
             "splits": None,
         }

@@ -99,6 +99,8 @@ class PipetteName(str, Enum):
     P300_MULTI_GEN2 = "p300_multi_gen2"
     P1000_SINGLE = "p1000_single"
     P1000_SINGLE_GEN2 = "p1000_single_gen2"
+    P300_SINGLE_GEN3 = "p300_single_gen3"
+    P1000_SINGLE_GEN3 = "p1000_single_gen3"
 
 
 class LoadedPipette(BaseModel):
@@ -219,14 +221,13 @@ class LabwareOffsetLocation(BaseModel):
             "The model of the module that the labware will be loaded onto,"
             " if applicable."
             "\n\n"
-            "For the offset to apply,"
-            " this must exactly match the model that the robot will find"
-            " *physically connected* during the protocol's execution."
-            " This means it's not enough to blindly use the model"
-            " reported by the protocol's analysis."
-            " The two models will differ"
-            " if the physically connected module is compatible, but not identical,"
-            " to the one that the protocol requested."
+            "Because of module compatibility, the model that the protocol requests"
+            " may not beexactly the same"
+            " as what it will find physically connected during execution."
+            " For this labware offset to apply,"
+            " this field must be the *requested* model, not the connected one."
+            " You can retrieve this from a `loadModule` command's `params.model`"
+            " in the protocol's analysis."
         ),
     )
 

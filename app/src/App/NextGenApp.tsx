@@ -9,6 +9,7 @@ import {
   C_NEAR_WHITE,
   DIRECTION_COLUMN,
   FLEX_NONE,
+  OVERFLOW_SCROLL,
   POSITION_RELATIVE,
   SIZE_4,
   SPACING_2,
@@ -17,6 +18,7 @@ import {
 import { AppSettings } from '../pages/More/AppSettings'
 import { DeviceDetails } from '../pages/Devices/DeviceDetails'
 import { DevicesLanding } from '../pages/Devices/DevicesLanding'
+import { ProtocolsLanding } from '../pages/Protocols/ProtocolsLanding'
 
 interface RouteProps {
   /**
@@ -97,7 +99,7 @@ export function NextGenApp(): JSX.Element {
   // TODO(bh, 2021-12-10): i18n for route name once final nav/breadcrumbs implemented
   const nextGenRoutes: RouteProps[] = [
     {
-      component: () => <div>protocols landing</div>,
+      component: ProtocolsLanding,
       exact: true,
       name: 'Protocols',
       navLinkTo: '/protocols',
@@ -179,6 +181,7 @@ export function NextGenApp(): JSX.Element {
         width="100%"
         height="100%"
         backgroundColor={C_NEAR_WHITE}
+        overflow={OVERFLOW_SCROLL}
       >
         <Switch>
           {nextGenRoutes.map(({ component, exact, path }: RouteProps) => {

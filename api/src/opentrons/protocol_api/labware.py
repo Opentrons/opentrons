@@ -7,6 +7,7 @@ and labware calibration offsets. It contains all the code necessary to
 transform from labware symbolic points (such as "well a1 of an opentrons
 tiprack") to points in deck coordinates.
 """
+from __future__ import annotations
 import logging
 
 from pathlib import Path
@@ -14,7 +15,7 @@ from itertools import dropwhile
 from typing import Any, AnyStr, List, Dict, Optional, Union, Tuple, TYPE_CHECKING
 
 
-from opentrons.protocols.api_support.util import requires_version, labware_column_shift
+from opentrons.protocols.api_support.util import requires_version
 from opentrons.protocols.context.labware import AbstractLabware
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocols import labware as labware_module
@@ -72,18 +73,18 @@ class Well:
     def api_version(self) -> APIVersion:
         return self._api_version
 
-    @property  # type: ignore
+    @property  # type: ignore[misc]
     @requires_version(2, 0)
-    def parent(self) -> "Labware":
+    def parent(self) -> Labware:
         return Labware(implementation=self._geometry.parent, api_level=self.api_version)
 
-    @property  # type: ignore
+    @property  # type: ignore[misc]
     @requires_version(2, 0)
     def has_tip(self) -> bool:
         return self._impl.has_tip()
 
     @has_tip.setter
-    def has_tip(self, value: bool):
+    def has_tip(self, value: bool) -> None:
         self._impl.set_has_tip(value)
 
     @property
@@ -126,7 +127,7 @@ class Well:
         return self._geometry._depth
 
     @property
-    def display_name(self):
+    def display_name(self) -> str:
         return self._impl.get_display_name()
 
     @property  # type: ignore
@@ -198,7 +199,7 @@ class Well:
         )
         return self.from_center_cartesian(x, y, z)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self._impl.get_display_name()
 
     def __eq__(self, other: object) -> bool:
@@ -210,7 +211,7 @@ class Well:
             return NotImplemented
         return self.top().point == other.top().point
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.top().point)
 
 
@@ -286,13 +287,13 @@ class Labware(DeckItem):
         """
         return self._implementation.get_uri()
 
-    @property  # type: ignore
+    @property  # type: ignore[misc]
     @requires_version(2, 0)
     def parent(self) -> LocationLabware:
         """The parent of this labware. Usually a slot name."""
         return self._implementation.get_geometry().parent.labware.object
 
-    @property  # type: ignore
+    @property  # type: ignore[misc]
     @requires_version(2, 0)
     def name(self) -> str:
         """Can either be the canonical name of the labware, which is used to
@@ -300,17 +301,17 @@ class Labware(DeckItem):
         return self._implementation.get_name()
 
     @name.setter
-    def name(self, new_name):
+    def name(self, new_name: str) -> None:
         """Set the labware name"""
         self._implementation.set_name(new_name)
 
-    @property  # type: ignore
+    @property  # type: ignore[misc]
     @requires_version(2, 0)
     def load_name(self) -> str:
         """The API load name of the labware definition"""
         return self._implementation.load_name
 
-    @property  # type: ignore
+    @property  # type: ignore[misc]
     @requires_version(2, 0)
     def parameters(self) -> "LabwareParameters":
         """Internal properties of a labware including type and quirks"""
@@ -331,7 +332,7 @@ class Labware(DeckItem):
         else:
             return p["magneticModuleEngageHeight"]
 
-    def set_calibration(self, delta: Point):
+    def set_calibration(self, delta: Point) -> None:
         """
         Called by save calibration in order to update the offset on the object.
         """
@@ -365,7 +366,7 @@ class Labware(DeckItem):
         return self._implementation.get_calibrated_offset()
 
     @requires_version(2, 0)
-    def well(self, idx) -> Well:
+    def well(self, idx: Union[int, str]) -> Well:
         """Deprecated---use result of `wells` or `wells_by_name`"""
         if isinstance(idx, int):
             res = self._implementation.get_wells()[idx]
@@ -376,7 +377,7 @@ class Labware(DeckItem):
         return self._well_from_impl(res)
 
     @requires_version(2, 0)
-    def wells(self, *args) -> List[Well]:
+    def wells(self, *args: Union[str, int]) -> List[Well]:
         """
         Accessor function used to generate a list of wells in top -> down,
         left -> right order. This is representative of moving down `rows` and
@@ -396,10 +397,10 @@ class Labware(DeckItem):
         if not args:
             res = self._implementation.get_wells()
         elif isinstance(args[0], int):
-            res = [self._implementation.get_wells()[idx] for idx in args]
+            res = [self._implementation.get_wells()[idx] for idx in args]  # type: ignore[index]  # noqa: E501
         elif isinstance(args[0], str):
             by_name = self._implementation.get_wells_by_name()
-            res = [by_name[idx] for idx in args]
+            res = [by_name[idx] for idx in args]  # type: ignore[index]
         else:
             raise TypeError
         return [self._well_from_impl(w) for w in res]
@@ -430,7 +431,7 @@ class Labware(DeckItem):
         return self.wells_by_name()
 
     @requires_version(2, 0)
-    def rows(self, *args) -> List[List[Well]]:
+    def rows(self, *args: Union[int, str]) -> List[List[Well]]:
         """
         Accessor function used to navigate through a labware by row.
 
@@ -450,9 +451,9 @@ class Labware(DeckItem):
         if not args:
             res = grid.get_rows()
         elif isinstance(args[0], int):
-            res = [grid.get_rows()[idx] for idx in args]
+            res = [grid.get_rows()[idx] for idx in args]  # type: ignore[index]
         elif isinstance(args[0], str):
-            res = [grid.get_row(idx) for idx in args]
+            res = [grid.get_row(idx) for idx in args]  # type: ignore[arg-type]
         else:
             raise TypeError
         return [[self._well_from_impl(w) for w in row] for row in res]
@@ -481,7 +482,7 @@ class Labware(DeckItem):
         return self.rows_by_name()
 
     @requires_version(2, 0)
-    def columns(self, *args) -> List[List[Well]]:
+    def columns(self, *args: Union[int, str]) -> List[List[Well]]:
         """
         Accessor function used to navigate through a labware by column.
 
@@ -502,9 +503,9 @@ class Labware(DeckItem):
         if not args:
             res = grid.get_columns()
         elif isinstance(args[0], int):
-            res = [grid.get_columns()[idx] for idx in args]
+            res = [grid.get_columns()[idx] for idx in args]  # type: ignore[index]
         elif isinstance(args[0], str):
-            res = [grid.get_column(idx) for idx in args]
+            res = [grid.get_column(idx) for idx in args]  # type: ignore[arg-type]
         else:
             raise TypeError
         return [[self._well_from_impl(w) for w in col] for col in res]
@@ -551,18 +552,18 @@ class Labware(DeckItem):
         """as is_tiprack but not subject to version checking for speed"""
         return self._implementation.is_tiprack()
 
-    @property  # type: ignore
+    @property  # type: ignore[misc]
     @requires_version(2, 0)
     def is_tiprack(self) -> bool:
         return self._is_tiprack
 
-    @property  # type: ignore
+    @property  # type: ignore[misc]
     @requires_version(2, 0)
     def tip_length(self) -> float:
         return self._implementation.get_tip_length()
 
     @tip_length.setter
-    def tip_length(self, length: float):
+    def tip_length(self, length: float) -> None:
         self._implementation.set_tip_length(length)
 
     def next_tip(
@@ -589,7 +590,7 @@ class Labware(DeckItem):
         )
         return self._well_from_impl(well) if well else None
 
-    def use_tips(self, start_well: Well, num_channels: int = 1):
+    def use_tips(self, start_well: Well, num_channels: int = 1) -> None:
         """
         Removes tips from the tip tracker.
 
@@ -619,7 +620,7 @@ class Labware(DeckItem):
             fail_if_full=fail_if_full,
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self._implementation.get_display_name()
 
     def __eq__(self, other: object) -> bool:
@@ -627,7 +628,7 @@ class Labware(DeckItem):
             return NotImplemented
         return self._implementation == other._implementation
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self._implementation, self._api_version))
 
     def previous_tip(self, num_tips: int = 1) -> Optional[Well]:
@@ -648,7 +649,7 @@ class Labware(DeckItem):
         well = self._implementation.get_tip_tracker().previous_tip(num_tips=num_tips)
         return self._well_from_impl(well) if well else None
 
-    def return_tips(self, start_well: Well, num_channels: int = 1):
+    def return_tips(self, start_well: Well, num_channels: int = 1) -> None:
         """
         Re-adds tips to the tip tracker
 
@@ -677,7 +678,7 @@ class Labware(DeckItem):
         )
 
     @requires_version(2, 0)
-    def reset(self):
+    def reset(self) -> None:
         """Reset all tips in a tiprack"""
         if self._is_tiprack:
             self._implementation.reset_tips()
@@ -723,8 +724,8 @@ def get_labware_definition(
     load_name: str,
     namespace: Optional[str] = None,
     version: Optional[int] = None,
-    bundled_defs: Dict[str, "LabwareDefinition"] = None,
-    extra_defs: Dict[str, "LabwareDefinition"] = None,
+    bundled_defs: Optional[Dict[str, "LabwareDefinition"]] = None,
+    extra_defs: Optional[Dict[str, "LabwareDefinition"]] = None,
 ) -> "LabwareDefinition":
     """
     Look up and return a definition by load_name + namespace + version and
@@ -790,54 +791,6 @@ def select_tiprack_from_list(
         return select_tiprack_from_list(rest, num_channels)
 
 
-def select_tiprack_from_list_paired_pipettes(
-    tip_racks: List[Labware],
-    p_channels: int,
-    s_channels: int,
-    starting_point: Optional[Well] = None,
-) -> Tuple[Labware, Well]:
-    """
-    Helper function utilized in ``PairedInstrumentContext``
-    to determine which pipette tiprack to pick up from.
-
-    If a starting point is specified, this method with check
-    that the parent of that tip was correctly filtered.
-
-    If a starting point is not specified, this method will filter
-    tipracks until it finds a well that is not empty.
-
-    :return: A Tuple of the tiprack and well to move to. In this
-             instance the starting well is specific to the primary pipette.
-    :raises TipSelectionError: if the starting tip specified
-                               does not exist in the filtered tipracks.
-    """
-    try:
-        first, rest = split_tipracks(tip_racks)
-    except IndexError:
-        raise OutOfTipsError
-
-    if starting_point and starting_point.parent != first:
-        raise TipSelectionError(
-            "The starting tip you selected " f"does not exist in {first}"
-        )
-    elif starting_point:
-        primary_well = starting_point
-    else:
-        primary_well = first.wells()[0]
-
-    try:
-        secondary_point = labware_column_shift(primary_well, first)
-    except IndexError:
-        return select_tiprack_from_list_paired_pipettes(rest, p_channels, s_channels)
-
-    primary_next_tip = first.next_tip(p_channels, starting_point)
-    secondary_next_tip = first.next_tip(s_channels, secondary_point)
-    if primary_next_tip and secondary_next_tip:
-        return first, primary_next_tip
-    else:
-        return select_tiprack_from_list_paired_pipettes(rest, p_channels, s_channels)
-
-
 def filter_tipracks_to_start(
     starting_point: Well, tipracks: List[Labware]
 ) -> List[Labware]:
@@ -897,7 +850,7 @@ def load_from_definition(
     )
 
 
-def save_calibration(labware: "Labware", delta: Point):
+def save_calibration(labware: "Labware", delta: Point) -> None:
     labware_module.save_calibration(labware._implementation, delta)
 
 

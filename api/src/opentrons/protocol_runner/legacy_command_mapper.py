@@ -17,6 +17,7 @@ from opentrons.protocols.models.labware_definition import LabwareDefinition
 from opentrons.protocols.geometry.deck import FIXED_TRASH_ID
 
 from .legacy_wrappers import (
+    LegacyLoadInfo,
     LegacyInstrumentLoadInfo,
     LegacyLabwareLoadInfo,
     LegacyModuleLoadInfo,
@@ -171,129 +172,14 @@ class LegacyCommandMapper:
 
         return results
 
-    def map_labware_load(
-        self, labware_load_info: LegacyLabwareLoadInfo
-    ) -> pe_commands.Command:
-        """Map a legacy labware load to a ProtocolEngine command."""
-        now = ModelUtils.get_timestamp()
-        count = self._command_count["LOAD_LABWARE"]
-        slot = labware_load_info.deck_slot
-        location: pe_types.LabwareLocation
-        if labware_load_info.on_module:
-            location = pe_types.ModuleLocation.construct(
-                moduleId=self._module_id_by_slot[slot]
-            )
-        else:
-            location = pe_types.DeckSlotLocation.construct(slotName=slot)
-
-        command_id = f"commands.LOAD_LABWARE-{count}"
-        labware_id = f"labware-{count}"
-
-        load_labware_command = pe_commands.LoadLabware.construct(
-            id=command_id,
-            key=command_id,
-            status=pe_commands.CommandStatus.SUCCEEDED,
-            createdAt=now,
-            startedAt=now,
-            completedAt=now,
-            params=pe_commands.LoadLabwareParams.construct(
-                location=location,
-                loadName=labware_load_info.labware_load_name,
-                namespace=labware_load_info.labware_namespace,
-                version=labware_load_info.labware_version,
-            ),
-            result=pe_commands.LoadLabwareResult.construct(
-                labwareId=labware_id,
-                definition=LabwareDefinition.parse_obj(
-                    labware_load_info.labware_definition
-                ),
-                offsetId=labware_load_info.offset_id,
-            ),
-        )
-
-        self._command_count["LOAD_LABWARE"] = count + 1
-        if isinstance(location, pe_types.DeckSlotLocation):
-            # TODO (spp, 2021-11-16): Account for labware on modules when mapping legacy
-            #  pipetting commands; either in self._labware_id_by_slot or something else
-            self._labware_id_by_slot[location.slotName] = labware_id
-        return load_labware_command
-
-    def map_instrument_load(
-        self,
-        instrument_load_info: LegacyInstrumentLoadInfo,
-    ) -> pe_commands.Command:
-        """Map a legacy instrument (pipette) load to a ProtocolEngine command."""
-        now = ModelUtils.get_timestamp()
-        count = self._command_count["LOAD_PIPETTE"]
-        command_id = f"commands.LOAD_PIPETTE-{count}"
-        pipette_id = f"pipette-{count}"
-        mount = MountType(str(instrument_load_info.mount).lower())
-
-        load_pipette_command = pe_commands.LoadPipette.construct(
-            id=command_id,
-            key=command_id,
-            status=pe_commands.CommandStatus.SUCCEEDED,
-            createdAt=now,
-            startedAt=now,
-            completedAt=now,
-            params=pe_commands.LoadPipetteParams.construct(
-                pipetteName=pe_types.PipetteName(
-                    instrument_load_info.instrument_load_name
-                ),
-                mount=mount,
-            ),
-            result=pe_commands.LoadPipetteResult.construct(pipetteId=pipette_id),
-        )
-
-        self._command_count["LOAD_PIPETTE"] = count + 1
-        self._pipette_id_by_mount[mount] = pipette_id
-        return load_pipette_command
-
-    def map_module_load(
-        self, module_load_info: LegacyModuleLoadInfo
-    ) -> pe_commands.Command:
-        """Map a legacy module load to a Protocol Engine command."""
-        now = ModelUtils.get_timestamp()
-
-        count = self._command_count["LOAD_MODULE"]
-        command_id = f"commands.LOAD_MODULE-{count}"
-        module_id = f"module-{count}"
-        module_model = _LEGACY_TO_PE_MODULE[module_load_info.module_model]
-
-        # This will fetch a V2 definition only. PAPI < v2.3 use V1 definitions.
-        # When running a < v2.3 protocol, there will be a mismatch of definitions used
-        # during analysis+LPC (V2) and protocol execution (V1).
-        # But this shouldn't result in any problems since V2 and V1 definitions
-        # have similar info, with V2 having additional info fields.
-        definition = self._module_definition_by_model.get(
-            module_model
-        ) or self._module_data_provider.get_definition(module_model)
-
-        load_module_command = pe_commands.LoadModule.construct(
-            id=command_id,
-            key=command_id,
-            status=pe_commands.CommandStatus.SUCCEEDED,
-            createdAt=now,
-            startedAt=now,
-            completedAt=now,
-            params=pe_commands.LoadModuleParams.construct(
-                model=module_model,
-                location=pe_types.DeckSlotLocation(
-                    slotName=module_load_info.deck_slot,
-                ),
-                moduleId=module_id,
-            ),
-            result=pe_commands.LoadModuleResult.construct(
-                moduleId=module_id,
-                serialNumber=module_load_info.module_serial,
-                definition=definition,
-                model=definition.model,
-            ),
-        )
-        self._command_count["LOAD_MODULE"] = count + 1
-        self._module_id_by_slot[module_load_info.deck_slot] = module_id
-        self._module_definition_by_model[module_model] = definition
-        return load_module_command
+    def map_equipment_load(self, load_info: LegacyLoadInfo) -> pe_commands.Command:
+        """Map a labware, instrument (pipette), or module load to a PE command."""
+        if isinstance(load_info, LegacyLabwareLoadInfo):
+            return self._map_labware_load(load_info)
+        elif isinstance(load_info, LegacyInstrumentLoadInfo):
+            return self._map_instrument_load(load_info)
+        elif isinstance(load_info, LegacyModuleLoadInfo):
+            return self._map_module_load(load_info)
 
     def _build_initial_command(
         self,
@@ -307,10 +193,9 @@ class LegacyCommandMapper:
             command["name"] == legacy_command_types.PICK_UP_TIP
             and "instrument" in command["payload"]
             and "location" in command["payload"]
-            and isinstance(command["payload"]["location"], LegacyWell)  # type: ignore  # noqa: E501
+            and isinstance(command["payload"]["location"], LegacyWell)
         ):
-            pipette: LegacyPipetteContext = command["payload"]["instrument"]  # type: ignore  # noqa: E501
-            # TODO: Support paired pipettes
+            pipette: LegacyPipetteContext = command["payload"]["instrument"]
             _well = command["payload"].get("location")
             if isinstance(_well, LegacyWell):
                 well = _well
@@ -340,7 +225,6 @@ class LegacyCommandMapper:
             and "location" in command["payload"]
         ):
             pipette: LegacyPipetteContext = command["payload"]["instrument"]  # type: ignore  # noqa: E501
-            # TODO: Support paired pipettes
             location = command["payload"].get("location")
             if isinstance(location, Location):
                 well = location.labware.as_well()
@@ -388,3 +272,128 @@ class LegacyCommandMapper:
             )
 
         return engine_command
+
+    def _map_labware_load(
+        self, labware_load_info: LegacyLabwareLoadInfo
+    ) -> pe_commands.Command:
+        """Map a legacy labware load to a ProtocolEngine command."""
+        now = ModelUtils.get_timestamp()
+        count = self._command_count["LOAD_LABWARE"]
+        slot = labware_load_info.deck_slot
+        location: pe_types.LabwareLocation
+        if labware_load_info.on_module:
+            location = pe_types.ModuleLocation.construct(
+                moduleId=self._module_id_by_slot[slot]
+            )
+        else:
+            location = pe_types.DeckSlotLocation.construct(slotName=slot)
+
+        command_id = f"commands.LOAD_LABWARE-{count}"
+        labware_id = f"labware-{count}"
+
+        load_labware_command = pe_commands.LoadLabware.construct(
+            id=command_id,
+            key=command_id,
+            status=pe_commands.CommandStatus.SUCCEEDED,
+            createdAt=now,
+            startedAt=now,
+            completedAt=now,
+            params=pe_commands.LoadLabwareParams.construct(
+                location=location,
+                loadName=labware_load_info.labware_load_name,
+                namespace=labware_load_info.labware_namespace,
+                version=labware_load_info.labware_version,
+            ),
+            result=pe_commands.LoadLabwareResult.construct(
+                labwareId=labware_id,
+                definition=LabwareDefinition.parse_obj(
+                    labware_load_info.labware_definition
+                ),
+                offsetId=labware_load_info.offset_id,
+            ),
+        )
+
+        self._command_count["LOAD_LABWARE"] = count + 1
+        if isinstance(location, pe_types.DeckSlotLocation):
+            # TODO (spp, 2021-11-16): Account for labware on modules when mapping legacy
+            #  pipetting commands; either in self._labware_id_by_slot or something else
+            self._labware_id_by_slot[location.slotName] = labware_id
+        return load_labware_command
+
+    def _map_instrument_load(
+        self,
+        instrument_load_info: LegacyInstrumentLoadInfo,
+    ) -> pe_commands.Command:
+        """Map a legacy instrument (pipette) load to a ProtocolEngine command."""
+        now = ModelUtils.get_timestamp()
+        count = self._command_count["LOAD_PIPETTE"]
+        command_id = f"commands.LOAD_PIPETTE-{count}"
+        pipette_id = f"pipette-{count}"
+        mount = MountType(str(instrument_load_info.mount).lower())
+
+        load_pipette_command = pe_commands.LoadPipette.construct(
+            id=command_id,
+            key=command_id,
+            status=pe_commands.CommandStatus.SUCCEEDED,
+            createdAt=now,
+            startedAt=now,
+            completedAt=now,
+            params=pe_commands.LoadPipetteParams.construct(
+                pipetteName=pe_types.PipetteName(
+                    instrument_load_info.instrument_load_name
+                ),
+                mount=mount,
+            ),
+            result=pe_commands.LoadPipetteResult.construct(pipetteId=pipette_id),
+        )
+
+        self._command_count["LOAD_PIPETTE"] = count + 1
+        self._pipette_id_by_mount[mount] = pipette_id
+        return load_pipette_command
+
+    def _map_module_load(
+        self, module_load_info: LegacyModuleLoadInfo
+    ) -> pe_commands.Command:
+        """Map a legacy module load to a Protocol Engine command."""
+        now = ModelUtils.get_timestamp()
+
+        count = self._command_count["LOAD_MODULE"]
+        command_id = f"commands.LOAD_MODULE-{count}"
+        module_id = f"module-{count}"
+        requested_model = _LEGACY_TO_PE_MODULE[module_load_info.requested_model]
+        loaded_model = _LEGACY_TO_PE_MODULE[module_load_info.loaded_model]
+
+        # This will fetch a V2 definition only. PAPI < v2.3 use V1 definitions.
+        # When running a < v2.3 protocol, there will be a mismatch of definitions used
+        # during analysis+LPC (V2) and protocol execution (V1).
+        # But this shouldn't result in any problems since V2 and V1 definitions
+        # have similar info, with V2 having additional info fields.
+        loaded_definition = self._module_definition_by_model.get(
+            loaded_model
+        ) or self._module_data_provider.get_definition(loaded_model)
+
+        load_module_command = pe_commands.LoadModule.construct(
+            id=command_id,
+            key=command_id,
+            status=pe_commands.CommandStatus.SUCCEEDED,
+            createdAt=now,
+            startedAt=now,
+            completedAt=now,
+            params=pe_commands.LoadModuleParams.construct(
+                model=requested_model,
+                location=pe_types.DeckSlotLocation(
+                    slotName=module_load_info.deck_slot,
+                ),
+                moduleId=module_id,
+            ),
+            result=pe_commands.LoadModuleResult.construct(
+                moduleId=module_id,
+                serialNumber=module_load_info.module_serial,
+                definition=loaded_definition,
+                model=loaded_model,
+            ),
+        )
+        self._command_count["LOAD_MODULE"] = count + 1
+        self._module_id_by_slot[module_load_info.deck_slot] = module_id
+        self._module_definition_by_model[loaded_model] = loaded_definition
+        return load_module_command

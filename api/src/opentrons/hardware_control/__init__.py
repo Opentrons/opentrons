@@ -13,8 +13,7 @@ functions are available elsewhere.
 from .adapters import SynchronousAdapter
 from .api import API
 from .pause_manager import PauseManager
-from .controller import Controller
-from .simulator import Simulator
+from .backends import Controller, Simulator
 from .pipette import Pipette
 from .types import (
     CriticalPoint,
@@ -30,6 +29,7 @@ from .threaded_async_lock import ThreadedAsyncLock, ThreadedAsyncForbidden
 from .protocols import HardwareControlAPI
 
 ThreadManagedHardware = ThreadManager[HardwareControlAPI]
+SyncHardwareAPI = SynchronousAdapter[HardwareControlAPI]
 
 __all__ = [
     "API",

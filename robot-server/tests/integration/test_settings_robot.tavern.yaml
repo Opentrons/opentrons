@@ -12,6 +12,7 @@ stages:
       status_code: 200
       json:
         name: !anystr
+        model: !anystr
         version: !anyint
         gantry_steps_per_mm: !anydict
         acceleration: !anydict

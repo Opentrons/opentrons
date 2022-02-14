@@ -34,7 +34,9 @@ def smoothie(mock_connection: AsyncMock, sim_gpio) -> driver_3_0.SmoothieDriver:
     from opentrons.config import robot_configs
 
     d = driver_3_0.SmoothieDriver(
-        connection=mock_connection, config=robot_configs.load(), gpio_chardev=sim_gpio
+        connection=mock_connection,
+        config=robot_configs.load_ot2(),
+        gpio_chardev=sim_gpio,
     )
     return d
 

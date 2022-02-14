@@ -4,16 +4,16 @@ from __future__ import annotations
 
 from abc import abstractmethod, ABC
 from dataclasses import dataclass
-from typing import Dict, Optional, Union
+from typing import Dict, Optional
 
 from opentrons import types
-from opentrons.hardware_control import SynchronousAdapter, ThreadManager
-from opentrons.hardware_control.modules.types import ModuleType
+from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
+from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.protocols.context.instrument import AbstractInstrument
-from opentrons.protocols.api_support.util import AxisMaxSpeeds, HardwareManager
+from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.protocols.context.labware import AbstractLabware
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
@@ -45,23 +45,11 @@ class AbstractProtocol(ABC):
         ...
 
     @abstractmethod
-    def cleanup(self) -> None:
-        ...
-
-    @abstractmethod
     def get_max_speeds(self) -> AxisMaxSpeeds:
         ...
 
     @abstractmethod
-    def get_hardware(self) -> HardwareManager:
-        ...
-
-    @abstractmethod
-    def connect(self, hardware: Union[ThreadManager, SynchronousAdapter]) -> None:
-        ...
-
-    @abstractmethod
-    def disconnect(self) -> None:
+    def get_hardware(self) -> SyncHardwareAPI:
         ...
 
     @abstractmethod
@@ -91,7 +79,7 @@ class AbstractProtocol(ABC):
     @abstractmethod
     def load_module(
         self,
-        module_name: str,
+        model: ModuleModel,
         location: Optional[types.DeckLocation],
         configuration: Optional[str],
     ) -> Optional[LoadModuleResult]:

@@ -88,15 +88,6 @@ class DurationEstimator:
         # The actual payload of the command that varies by message.
         payload = message["payload"]
 
-        # We cannot handle paired pipette messages
-        # locations also applies to transfer commands
-        if "instruments" in payload:
-            logger.warning(
-                f"Paired pipettes are not supported by the duration estimator. "
-                f"Command '{payload['text']}' cannot be estimated properly."
-            )
-            return
-
         location = payload.get("location")
 
         try:
@@ -511,7 +502,7 @@ class DurationEstimator:
             # Inter slot movement defaults to half a second.
             deck_movement_time = 0.5
         else:
-            deck_distance = math.sqrt((x_difference ** 2) + (y_difference ** 2))
+            deck_distance = math.sqrt((x_difference**2) + (y_difference**2))
             deck_movement_time = deck_distance / gantry_speed
         return deck_movement_time
 

@@ -1,13 +1,13 @@
 from typing import Dict
 from opentrons.drivers.heater_shaker.abstract import AbstractHeaterShakerDriver
-from opentrons.drivers.types import Temperature, RPM, HeaterShakerPlateLockStatus
+from opentrons.drivers.types import Temperature, RPM, HeaterShakerLabwareLatchStatus
 
 
 class SimulatingDriver(AbstractHeaterShakerDriver):
     DEFAULT_TEMP = 23
 
     def __init__(self) -> None:
-        self._plate_lock_state = HeaterShakerPlateLockStatus.IDLE_UNKNOWN
+        self._labware_latch_state = HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN
         self._current_temperature = self.DEFAULT_TEMP
         self._temperature = Temperature(current=self.DEFAULT_TEMP, target=None)
         self._rpm = RPM(current=0, target=None)
@@ -22,14 +22,14 @@ class SimulatingDriver(AbstractHeaterShakerDriver):
     async def is_connected(self) -> bool:
         return True
 
-    async def open_plate_lock(self) -> None:
-        self._plate_lock_state = HeaterShakerPlateLockStatus.IDLE_OPEN
+    async def open_labware_latch(self) -> None:
+        self._labware_latch_state = HeaterShakerLabwareLatchStatus.IDLE_OPEN
 
-    async def close_plate_lock(self) -> None:
-        self._plate_lock_state = HeaterShakerPlateLockStatus.IDLE_CLOSED
+    async def close_labware_latch(self) -> None:
+        self._labware_latch_state = HeaterShakerLabwareLatchStatus.IDLE_CLOSED
 
-    async def get_plate_lock_status(self) -> HeaterShakerPlateLockStatus:
-        return self._plate_lock_state
+    async def get_labware_latch_status(self) -> HeaterShakerLabwareLatchStatus:
+        return self._labware_latch_state
 
     async def set_temperature(self, temperature: float) -> None:
         self._temperature.current = temperature
