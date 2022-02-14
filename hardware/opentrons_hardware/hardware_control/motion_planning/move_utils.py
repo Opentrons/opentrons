@@ -11,7 +11,7 @@ from opentrons_hardware.hardware_control.motion_planning.types import (
     AxisConstraints,
     SystemConstraints,
     AXIS_NAMES,
-    ZeroLengthMoveError
+    ZeroLengthMoveError,
 )
 
 log = logging.getLogger(__name__)

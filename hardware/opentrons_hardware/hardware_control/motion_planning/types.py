@@ -253,22 +253,38 @@ class AxisConstraints:
 
 SystemConstraints = Dict[AxisNames, AxisConstraints]
 
+
 class ZeroLengthMoveError(ValueError):
+    """Error that handles trying to make a unit vector from a 0-length input.
+
+    A unit vector would be undefined in this scenario, so this is the only safe way to
+    handle it; but it's not usually a systemic error, sometimes something wants you to
+    move to somewhere you already are. By using a special exception, we can specially
+    catch it.
+    """
+
     def __init__(self, origin: Coordinates, destination: Coordinates) -> None:
+        """Build the exception with the data that caused it."""
         self._origin = origin
         self._destination = destination
         super().__init__()
 
     def __repr__(self) -> str:
+        """Stringify."""
         return f"<{str(self)}>"
 
     def __str__(self) -> str:
-        return f"{type(self)}: No distance between {self._origin} and {self._destination}"
+        """Stringify."""
+        return (
+            f"{type(self)}: No distance between {self._origin} and {self._destination}"
+        )
 
     @property
     def origin(self) -> Coordinates:
+        """Get the origin."""
         return self._origin
 
     @property
     def destination(self) -> Coordinates:
+        """Get the destination."""
         return self._destination
