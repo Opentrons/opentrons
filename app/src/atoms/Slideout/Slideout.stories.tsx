@@ -8,7 +8,7 @@ import {
   TEXT_TRANSFORM_NONE,
   FONT_WEIGHT_REGULAR,
 } from '@opentrons/components'
-import { Slideout } from '@opentrons/app/src/atoms/Slideout/index'
+import { Slideout } from './index'
 
 import type { Story, Meta } from '@storybook/react'
 
