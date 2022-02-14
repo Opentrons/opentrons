@@ -194,6 +194,8 @@ class EquipmentHandler:
             ModuleAlreadyPresentError: A module of a different type is already
                 assigned to the requested location.
         """
+        # TODO(mc, 2022-02-09): validate module location given deck definition
+
         attached_modules = [
             HardwareModule(
                 serial_number=hw_mod.device_info["serial"],

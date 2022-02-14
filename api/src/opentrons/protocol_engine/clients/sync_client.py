@@ -5,7 +5,7 @@ from opentrons.types import MountType
 
 from .. import commands
 from ..state import StateView
-from ..types import DeckSlotLocation, PipetteName, WellLocation
+from ..types import DeckSlotLocation, ModuleModel, PipetteName, WellLocation
 from .transports import AbstractSyncTransport
 
 
@@ -56,6 +56,19 @@ class SyncClient:
         result = self._transport.execute_command(request=request)
 
         return cast(commands.LoadPipetteResult, result)
+
+    def load_module(
+        self,
+        model: ModuleModel,
+        location: DeckSlotLocation,
+    ) -> commands.LoadModuleResult:
+        """Execute a LoadModule command and return the result."""
+        request = commands.LoadModuleCreate(
+            params=commands.LoadModuleParams(model=model, location=location)
+        )
+        result = self._transport.execute_command(request=request)
+
+        return cast(commands.LoadModuleResult, result)
 
     def pick_up_tip(
         self,
