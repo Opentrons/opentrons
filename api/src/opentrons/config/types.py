@@ -1,5 +1,5 @@
 from enum import Enum
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from typing import Dict, Tuple, TypeVar, Generic, List
 from typing_extensions import TypedDict, Literal
 
@@ -38,6 +38,9 @@ class ByPipetteKind(Generic[Vt]):
     two_low_throughput: Vt
     none: Vt
     gripper: Vt
+
+    def __getitem__(self, key: PipetteKind):
+        return asdict(self)[key.value]
 
 
 PerPipetteAxisSettings = ByPipetteKind[GeneralizeableAxisDict]
