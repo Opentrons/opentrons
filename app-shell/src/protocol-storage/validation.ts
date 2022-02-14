@@ -17,7 +17,7 @@ export function sameIdentity(a: any, b: any): boolean {
 // TODO: IMMEDIATELY validate with shared-data utils
 const validateProtocol = (data: any): ProtocolFileV5<{}> | null => data
 
-// validate a collection of unchecked labware files
+// validate a collection of unchecked protocol files
 export function validateProtocolFiles(
   files: UncheckedProtocolFile[]
 ): CheckedProtocolFile[] {
