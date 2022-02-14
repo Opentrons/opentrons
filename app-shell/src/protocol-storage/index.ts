@@ -20,7 +20,7 @@ import type { Action, Dispatch } from '../types'
 const ensureDir: (dir: string) => Promise<void> = fse.ensureDir
 
 const fetchProtocols = (): Promise<UncheckedProtocolFile[]> => {
-  return ensureDir(FileSystem.PROTOCOL_DIRECTORY)
+  return ensureDir(FileSystem.PROTOCOL_DIRECTORY_PATH)
     .then(() => FileSystem.readProtocolDirectory())
     .then(FileSystem.parseProtocolFiles)
 }
@@ -124,7 +124,7 @@ export function registerProtocolStorage(
       }
 
       case ProtocolStorage.OPEN_PROTOCOL_DIRECTORY: {
-        shell.openPath(FileSystem.PROTOCOL_DIRECTORY)
+        shell.openPath(FileSystem.PROTOCOL_DIRECTORY_PATH)
         break
       }
     }
