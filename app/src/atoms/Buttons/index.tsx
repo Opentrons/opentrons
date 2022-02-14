@@ -12,8 +12,8 @@ export const TertiaryButton = (props: any): JSX.Element => (
   <NewPrimaryBtn
     backgroundColor={COLORS.blue}
     borderRadius="20px"
-    textTransform="none"
     overflow="no-wrap"
+    textTransform={TYPOGRAPHY.textTransformNone}
     css={TYPOGRAPHY.labelSemiBold}
     {...props}
   />
@@ -23,7 +23,7 @@ export const PrimaryButton = (props: any): JSX.Element => (
   <NewPrimaryBtn
     backgroundColor={COLORS.blue}
     borderRadius="3px"
-    textTransform="none"
+    textTransform={TYPOGRAPHY.textTransformNone}
     css={TYPOGRAPHY.pSemiBold}
     {...props}
   />
@@ -33,7 +33,7 @@ export const SecondaryButton = (props: any): JSX.Element => (
   <NewSecondaryBtn
     color={COLORS.blue}
     borderRadius="3px"
-    textTransform="none"
+    textTransform={TYPOGRAPHY.textTransformNone}
     css={TYPOGRAPHY.pSemiBold}
     {...props}
   />
