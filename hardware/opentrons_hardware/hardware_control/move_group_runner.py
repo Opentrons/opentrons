@@ -127,15 +127,14 @@ class MoveScheduler:
     ) -> None:
         """Incoming message handler."""
         if isinstance(message, MoveCompleted):
-            node_id = NodeId(arbitration_id.parts.originating_node_id).value
             seq_id = message.payload.seq_id.value
             group_id = message.payload.group_id.value
             node_id = arbitration_id.parts.originating_node_id
             log.info(
                 f"Received completion for {node_id} group {group_id} seq {seq_id}"
                 ", which "
-                f"{'is' if (node_id, seq_id) in self._moves[group_id] else 'isnt'}"
-                "in group"
+                f"{'is' if (node_id, seq_id) in self._moves[group_id] else 'isn''t'}"
+                " in group"
             )
             self._moves[group_id].remove((node_id, seq_id))
             if not self._moves[group_id]:
