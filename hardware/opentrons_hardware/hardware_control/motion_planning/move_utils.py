@@ -11,6 +11,7 @@ from opentrons_hardware.hardware_control.motion_planning.types import (
     AxisConstraints,
     SystemConstraints,
     AXIS_NAMES,
+    ZeroLengthMoveError
 )
 
 log = logging.getLogger(__name__)
@@ -38,9 +39,7 @@ def get_unit_vector(
     displacement: np.ndarray = target_vectorized - initial_vectorized
     distance = np.linalg.norm(displacement)
     if not distance or np.array_equal(initial_vectorized, target_vectorized):
-        raise ValueError(
-            f"No movement between initial position {initial} and target {target}."
-        )
+        raise ZeroLengthMoveError(initial, target)
     unit_vector = Coordinates.from_iter(displacement / distance)
     return unit_vector, distance
 

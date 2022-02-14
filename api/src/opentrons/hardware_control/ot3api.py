@@ -15,6 +15,7 @@ from typing import (
     Set,
 )
 
+
 from opentrons_shared_data.pipette import name_config
 from opentrons import types as top_types
 from opentrons.config import robot_configs
@@ -26,6 +27,7 @@ try:
         MoveManager,
         MoveTarget,
         Coordinates,
+        ZeroLengthMoveError,
     )
 except ModuleNotFoundError:
     pass
@@ -714,9 +716,13 @@ class OT3API(
         )
         backend_position = await self._backend.update_position()
         origin = Coordinates.from_iter(iter([backend_position[ax.name] for ax in Axis]))
-        blended, moves = self._move_manager.plan_motion(
-            origin=origin, target_list=[move_target]
-        )
+        try:
+            blended, moves = self._move_manager.plan_motion(
+                origin=origin, target_list=[move_target]
+            )
+        except ZeroLengthMoveError as zero_length_error:
+            self._log.info(f"{str(zero_length_error)}, ignoring")
+            return
         async with contextlib.AsyncExitStack() as stack:
             if acquire_lock:
                 await stack.enter_async_context(self._motion_lock)

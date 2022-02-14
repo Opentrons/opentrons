@@ -9,6 +9,7 @@ from .types import (
     AxisConstraints,
     AxisNames,
     AXIS_NAMES,
+    ZeroLengthMoveError,
 )
 
 __all__ = [
@@ -22,4 +23,5 @@ __all__ = [
     "unit_vector_multiplication",
     "AxisNames",
     "AXIS_NAMES",
+    "ZeroLengthMoveError",
 ]

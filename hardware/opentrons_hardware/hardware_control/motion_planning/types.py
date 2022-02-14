@@ -252,3 +252,23 @@ class AxisConstraints:
 
 
 SystemConstraints = Dict[AxisNames, AxisConstraints]
+
+class ZeroLengthMoveError(ValueError):
+    def __init__(self, origin: Coordinates, destination: Coordinates) -> None:
+        self._origin = origin
+        self._destination = destination
+        super().__init__()
+
+    def __repr__(self) -> str:
+        return f"<{str(self)}>"
+
+    def __str__(self) -> str:
+        return f"{type(self)}: No distance between {self._origin} and {self._destination}"
+
+    @property
+    def origin(self) -> Coordinates:
+        return self._origin
+
+    @property
+    def destination(self) -> Coordinates:
+        return self._destination
