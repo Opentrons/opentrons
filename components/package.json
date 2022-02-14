@@ -1,6 +1,6 @@
 {
   "name": "@opentrons/components",
-  "version": "5.0.0-beta.10",
+  "version": "5.0.0-beta.11",
   "description": "React components library for Opentrons' projects",
   "source": "src/index.ts",
   "types": "lib/index.d.ts",
@@ -20,7 +20,7 @@
     "react-router-dom": "5.1.1"
   },
   "dependencies": {
-    "@opentrons/shared-data": "5.0.0-beta.10",
+    "@opentrons/shared-data": "5.0.0-beta.11",
     "@popperjs/core": "2.1.1",
     "@types/classnames": "^2.2.5",
     "@types/lodash": "^4.14.168",

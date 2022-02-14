@@ -6,7 +6,7 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# Opentrons App Changes in 5.0.0-beta.10
+# Opentrons App Changes in 5.0.0-beta.11
 
 Welcome to the beta release of v5.0.0 release of the Opentrons App! After you update your app, please be sure to update any OT-2's you will be using with this beta.
 
@@ -26,7 +26,9 @@ This is beta software! You may experience unexpected crashes or missing features
 
 Keep an eye on this space as we release new versions of the beta.
 
-- We now display runtime errors in the protocol run failed banner
+- Canceled Protocols will no longer display confusing errors at the top of the run detail page
+- fixed bug where "Anticipated Steps" label would appear twice on the run detail page
+
 
 ## Known Issues
 
