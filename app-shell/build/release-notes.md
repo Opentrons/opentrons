@@ -29,7 +29,6 @@ Keep an eye on this space as we release new versions of the beta.
 - Canceled Protocols will no longer display confusing errors at the top of the run detail page
 - fixed bug where "Anticipated Steps" label would appear twice on the run detail page
 
-
 ## Known Issues
 
 This beta is a work in progress! We'll be addressing the following features and issues in upcoming releases of 5.0.0.
