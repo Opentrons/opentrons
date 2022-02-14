@@ -6,26 +6,22 @@ import { app, shell } from 'electron'
 import type { Dirent } from 'fs'
 import type { UncheckedLabwareFile } from '@opentrons/app/src/redux/custom-labware/types'
 
-export const PROTOCOL_DIRECTORY = path.join(app.getPath('appData'), 'protocols')
+export const PROTOCOL_DIRECTORY_NAME = 'protocols'
+export const PROTOCOL_DIRECTORY_PATH = path.join(
+  app.getPath('appData'),
+  PROTOCOL_DIRECTORY_NAME
+)
 
 const RE_JSON_EXT = /\.json$/i
 
-export function readProtocolDirectory(): Promise<string[]> {
-  const absoluteName = (e: Dirent): string =>
-    path.join(PROTOCOL_DIRECTORY, e.name)
+export function readProtocolDirectory(dir: string): Promise<string[]> {
+  const absoluteName = (e: Dirent): string => path.join(dir, e.name)
 
-  return (
-    fs
-      // @ts-expect-error(mc, 2021-02-17): maybe updating `fs-extra` and `@types/fs-extra` resolves this
-      .readdir(PROTOCOL_DIRECTORY, { withFileTypes: true })
-      .then((entries: Dirent[]) => {
-        const protocolFiles = entries
-          .filter(e => e.isFile() && RE_JSON_EXT.test(e.name))
-          .map(absoluteName)
+  return fs.readdir(dir, { withFileTypes: true }).then((entries: Dirent[]) => {
+    const protocolFiles = entries.filter(e => e.isDirectory()).map(absoluteName)
 
-        return protocolFiles
-      })
-  )
+    return protocolFiles
+  })
 }
 
 export function parseProtocolFiles(
@@ -49,7 +45,7 @@ const getFileName = (base: string, ext: string, count = 0): Promise<string> => {
   // TODO: appropriately grab python file name with fallback, also assign uuid
   // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   const basename = `${base}${count || ''}${ext}`
-  const name = path.join(PROTOCOL_DIRECTORY, basename)
+  const name = path.join(PROTOCOL_DIRECTORY_PATH, basename)
 
   return fs
     .pathExists(name)
