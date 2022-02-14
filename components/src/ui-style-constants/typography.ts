@@ -48,6 +48,9 @@ export const boxShadowM = '0px 3px 6px rgba(0, 0, 0, 0.23)'
 //  Overflow menu btn width
 export const overflowMenuWidth = '9.562rem'
 
+//  Banner component styling
+export const bannerButtonTopMargin = '2.75rem'
+
 // Default font styles, color agnositic for first pass
 export const h1Default = css`
   font-size: ${fontSizeH1};
