@@ -1,5 +1,13 @@
 {
   "banner_title": "Attach {{name}} to deck before proceeding to run",
   "banner_body": "Attachment prevents the module from shaking out of a deck slot.",
-  "banner_wizard_button": "See how to attach module to the deck"
+  "banner_wizard_button": "See how to attach module to the deck",
+  "btn_continue_attachment_guide": "Continue to attachment guide",
+  "btn_begin_attachment": "Begin attachment",
+  "btn_thermal_adapter": "Continue to attach thermal adapter",
+  "btn_power_module": "Continue to power on module",
+  "btn_test_shake": "Continue to test shake",
+  "complete": "Complete",
+  "back": "Back",
+  "modal_title": "{{name}} - Attach Heater Shaker Module"
 }
