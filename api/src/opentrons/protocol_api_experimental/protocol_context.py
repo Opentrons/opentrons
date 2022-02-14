@@ -21,6 +21,7 @@ from .types import (
     DeprecatedMount,
     Mount,
     ModuleModel,
+    ModuleName,
     PipetteName,
 )
 
@@ -113,6 +114,8 @@ class ProtocolContext:
     def load_module(
         self,
         module_name: Union[
+            Literal[ModuleName.MAGNETIC_MODULE],
+            Literal[ModuleName.MAGNETIC_MODULE_GEN2],
             Literal[ModuleModel.MAGNETIC_MODULE_V1],
             Literal[ModuleModel.MAGNETIC_MODULE_V2],
         ],
@@ -124,6 +127,8 @@ class ProtocolContext:
     def load_module(
         self,
         module_name: Union[
+            Literal[ModuleName.TEMPERATURE_MODULE],
+            Literal[ModuleName.TEMPERATURE_MODULE_GEN2],
             Literal[ModuleModel.TEMPERATURE_MODULE_V1],
             Literal[ModuleModel.TEMPERATURE_MODULE_V2],
         ],
@@ -134,7 +139,10 @@ class ProtocolContext:
     @overload
     def load_module(
         self,
-        module_name: Literal[ModuleModel.THERMOCYCLER_MODULE_V1],
+        module_name: Union[
+            Literal[ModuleName.THERMOCYCLER_MODULE],
+            Literal[ModuleModel.THERMOCYCLER_MODULE_V1],
+        ],
     ) -> ThermocyclerModuleContext:
         ...
 
@@ -153,7 +161,7 @@ class ProtocolContext:
     # TODO(mc, 2022-02-09): add thermocycler full vs semi configuration
     def load_module(
         self,
-        module_name: Union[str, ModuleModel],
+        module_name: Union[str, ModuleName, ModuleModel],
         location: Optional[Union[DeckSlotName, int, str]] = None,
     ) -> Union[
         MagneticModuleContext,
@@ -181,9 +189,7 @@ class ProtocolContext:
             InvalidModuleLocationError: The specified ``location`` was not valid.
             ModuleNotAttachedError: The requested module is not attached.
         """
-        # TODO(mc, 2022-02-09): find out if we need to support old load strings
-        # in PAPIv3
-        module_model = ModuleModel(module_name)
+        module_model = ModuleName.to_model(module_name)
 
         if location is None:
             if module_model.as_type() == ModuleType.THERMOCYCLER:

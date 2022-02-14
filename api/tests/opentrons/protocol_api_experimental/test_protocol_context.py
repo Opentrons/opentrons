@@ -2,7 +2,6 @@
 import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 from decoy import Decoy
-from typing import Any, Type
 
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.labware import dev_types as labware_dict_types
@@ -34,6 +33,20 @@ from opentrons.protocol_api_experimental import (
 def magdeck_v1_def() -> ModuleDefinition:
     """Get the definition of a V1 magdeck."""
     definition = load_shared_data("module/definitions/2/magneticModuleV1.json")
+    return ModuleDefinition.parse_raw(definition)
+
+
+@pytest.fixture(scope="session")
+def magdeck_v2_def() -> ModuleDefinition:
+    """Get the definition of a V1 magdeck."""
+    definition = load_shared_data("module/definitions/2/magneticModuleV2.json")
+    return ModuleDefinition.parse_raw(definition)
+
+
+@pytest.fixture(scope="session")
+def tempdeck_v2_def() -> ModuleDefinition:
+    """Get the definition of a V1 tempdeck."""
+    definition = load_shared_data("module/definitions/2/temperatureModuleV2.json")
     return ModuleDefinition.parse_raw(definition)
 
 
@@ -234,33 +247,44 @@ def test_pause(
         "module_name",
         "definition",
         "expected_model",
-        "expected_ctx_cls",
     ],
     argvalues=[
         (
             "magneticModuleV1",
             lazy_fixture("magdeck_v1_def"),
             ModuleModel.MAGNETIC_MODULE_V1,
-            module_contexts.MagneticModuleContext,
         ),
         (
-            "temperatureModuleV1",
-            lazy_fixture("tempdeck_v1_def"),
-            ModuleModel.TEMPERATURE_MODULE_V1,
-            module_contexts.TemperatureModuleContext,
+            "magdeck",
+            lazy_fixture("magdeck_v1_def"),
+            ModuleModel.MAGNETIC_MODULE_V1,
+        ),
+        (
+            "magnetic module",
+            lazy_fixture("magdeck_v1_def"),
+            ModuleModel.MAGNETIC_MODULE_V1,
+        ),
+        (
+            "magneticModuleV2",
+            lazy_fixture("magdeck_v2_def"),
+            ModuleModel.MAGNETIC_MODULE_V2,
+        ),
+        (
+            "magnetic module gen2",
+            lazy_fixture("magdeck_v2_def"),
+            ModuleModel.MAGNETIC_MODULE_V2,
         ),
     ],
 )
-def test_load_module(
+def test_load_magnetic_module(
     decoy: Decoy,
     engine_client: SyncClient,
     subject: ProtocolContext,
     module_name: str,
     definition: ModuleDefinition,
     expected_model: ModuleModel,
-    expected_ctx_cls: Type[Any],
 ) -> None:
-    """It should send load module requests to the engine."""
+    """It should send load magnetic module requests to the engine."""
     decoy.when(
         engine_client.load_module(
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
@@ -276,13 +300,79 @@ def test_load_module(
     )
 
     result = subject.load_module(module_name=module_name, location="3")
-    assert result == expected_ctx_cls(module_id="abc123")
+    assert result == module_contexts.MagneticModuleContext(module_id="abc123")
 
 
+@pytest.mark.parametrize(
+    argnames=[
+        "module_name",
+        "definition",
+        "expected_model",
+    ],
+    argvalues=[
+        (
+            "temperatureModuleV1",
+            lazy_fixture("tempdeck_v1_def"),
+            ModuleModel.TEMPERATURE_MODULE_V1,
+        ),
+        (
+            "tempdeck",
+            lazy_fixture("tempdeck_v1_def"),
+            ModuleModel.TEMPERATURE_MODULE_V1,
+        ),
+        (
+            "temperature module",
+            lazy_fixture("tempdeck_v1_def"),
+            ModuleModel.TEMPERATURE_MODULE_V1,
+        ),
+        (
+            "temperatureModuleV2",
+            lazy_fixture("tempdeck_v2_def"),
+            ModuleModel.TEMPERATURE_MODULE_V2,
+        ),
+        (
+            "temperature module gen2",
+            lazy_fixture("tempdeck_v2_def"),
+            ModuleModel.TEMPERATURE_MODULE_V2,
+        ),
+    ],
+)
+def test_load_temperature_module(
+    decoy: Decoy,
+    engine_client: SyncClient,
+    subject: ProtocolContext,
+    module_name: str,
+    definition: ModuleDefinition,
+    expected_model: ModuleModel,
+) -> None:
+    """It should send load temperature module requests to the engine."""
+    decoy.when(
+        engine_client.load_module(
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+            model=expected_model,
+        )
+    ).then_return(
+        pe_commands.LoadModuleResult(
+            moduleId="abc123",
+            definition=definition,
+            model=definition.model,
+            serialNumber="xyz789",
+        )
+    )
+
+    result = subject.load_module(module_name=module_name, location="3")
+    assert result == module_contexts.TemperatureModuleContext(module_id="abc123")
+
+
+@pytest.mark.parametrize(
+    "module_name",
+    ["thermocyclerModuleV1", "thermocycler", "thermocycler module"],
+)
 def test_load_thermocycler(
     decoy: Decoy,
     engine_client: SyncClient,
     subject: ProtocolContext,
+    module_name: str,
     thermocycler_v1_def: ModuleDefinition,
 ) -> None:
     """It should load a thermocycler."""
@@ -300,10 +390,10 @@ def test_load_thermocycler(
         )
     )
 
-    result = subject.load_module(module_name="thermocyclerModuleV1")
+    result = subject.load_module(module_name=module_name)
     assert result == module_contexts.ThermocyclerModuleContext(module_id="abc123")
 
-    result = subject.load_module(module_name="thermocyclerModuleV1", location="7")
+    result = subject.load_module(module_name=module_name, location="7")
     assert result == module_contexts.ThermocyclerModuleContext(module_id="abc123")
 
 
