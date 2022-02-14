@@ -6,5 +6,11 @@
   "please_connect_to_a_robot": "Please connect to a robot to proceed",
   "please_load_a_protocol": "Please load a protocol to proceed",
   "modules": "modules",
-  "run": "run"
+  "run": "run",
+  "deck_setup": "Deck Setup",
+  "devices": "Devices",
+  "labware": "Labware",
+  "protocol_runs": "Protocol Runs",
+  "protocols": "Protocols",
+  "robot_settings": "Robot Settings"
 }
