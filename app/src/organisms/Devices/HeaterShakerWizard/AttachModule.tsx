@@ -1,5 +1,9 @@
 import React from 'react'
 
-export function AttachModule(): JSX.Element {
+interface AttachModuleProps {
+  slotName: string
+}
+
+export function AttachModule(props: AttachModuleProps): JSX.Element {
   return <div>AttachModule</div>
 }

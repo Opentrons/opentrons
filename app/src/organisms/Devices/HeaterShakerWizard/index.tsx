@@ -1,5 +1,8 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { Portal } from '../../../App/portal'
+import { useSelector } from 'react-redux'
+import { getConnectedRobotName } from '../../../redux/robot/selectors'
 import { Introduction } from './Introduction'
 import { KeyParts } from './KeyParts'
 import { AttachModule } from './AttachModule'
@@ -15,7 +18,10 @@ import {
   ModalPage,
   PrimaryBtn,
   SecondaryBtn,
+  TEXT_TRANSFORM_NONE,
 } from '@opentrons/components'
+
+import type { State } from '../../../redux/types'
 
 interface HeaterShakerWizardProps {
   onCloseClick: () => unknown
@@ -25,27 +31,34 @@ export const HeaterShakerWizard = (
   props: HeaterShakerWizardProps
 ): JSX.Element => {
   const { onCloseClick } = props
+  const { t } = useTranslation(['heater_shaker', 'shared'])
   const [currentPage, setCurrentPage] = React.useState(0)
+  const robotName = useSelector((state: State) => getConnectedRobotName(state))
   let buttonContent = null
   const getWizardDisplayPage = (): JSX.Element | null => {
     switch (currentPage) {
       case 0:
-        buttonContent = 'Continue to attachment guide'
-        return <Introduction />
+        buttonContent = t('btn_continue_attachment_guide')
+        return (
+          <Introduction
+            labwareDefinition="plate"
+            thermalAdapterName="adapter"
+          />
+        )
       case 1:
-        buttonContent = 'Begin attachment'
+        buttonContent = t('btn_begin_attachment')
         return <KeyParts />
       case 2:
-        buttonContent = 'Continue to attach thermal adapter'
-        return <AttachModule />
+        buttonContent = t('btn_thermal_adapter')
+        return <AttachModule slotName={'1'} />
       case 3:
-        buttonContent = 'Continue to power on module'
+        buttonContent = t('btn_power_module')
         return <AttachAdapter />
       case 4:
-        buttonContent = 'Continue to test shake'
-        return <PowerOn />
+        buttonContent = t('btn_test_shake')
+        return <PowerOn status={'on'} />
       case 5:
-        buttonContent = 'Complete'
+        buttonContent = t('complete')
         return <TestShake />
       default:
         return null
@@ -56,11 +69,11 @@ export const HeaterShakerWizard = (
     <Portal level="top">
       <ModalPage
         titleBar={{
-          title: 'Robot Name - Attach Heater Shaker Module',
+          title: t('modal_title', { name: robotName }),
           back: {
             onClick: () => onCloseClick(),
-            title: 'Exit',
-            children: 'Exit',
+            title: t('shared:exit'),
+            children: t('shared:exit'),
           },
         }}
       >
@@ -71,20 +84,22 @@ export const HeaterShakerWizard = (
         >
           {currentPage > 0 ? (
             <SecondaryBtn
+              alignItems={ALIGN_CENTER}
               color={COLORS.blue}
               borderRadius={'3px'}
-              alignItems={ALIGN_CENTER}
+              textTransform={TEXT_TRANSFORM_NONE}
               data-testid={`wizard_back_btn`}
               onClick={() => setCurrentPage(currentPage => currentPage - 1)}
             >
-              Back
+              {t('back')}
             </SecondaryBtn>
           ) : null}
           {currentPage <= 5 ? (
             <PrimaryBtn
+              alignItems={ALIGN_CENTER}
               backgroundColor={COLORS.blue}
               borderRadius={'3px'}
-              alignItems={ALIGN_CENTER}
+              textTransform={TEXT_TRANSFORM_NONE}
               data-testid={`wizard_next_btn`}
               onClick={
                 currentPage === 5

@@ -1,5 +1,9 @@
 import React from 'react'
 
-export function PowerOn(): JSX.Element {
+interface PowerOnProps {
+  status: string
+}
+
+export function PowerOn(props: PowerOnProps): JSX.Element {
   return <div>PowerOn</div>
 }

@@ -1,5 +1,10 @@
 import React from 'react'
 
-export function Introduction(): JSX.Element {
+interface IntroductionProps {
+  labwareDefinition: string
+  thermalAdapterName: string
+}
+
+export function Introduction(props: IntroductionProps): JSX.Element {
   return <div>Introduction</div>
 }
