@@ -325,7 +325,7 @@ export function CommandList(): JSX.Element | null {
                   }
                   title={alertItemTitle}
                 >
-                  {runErrors.length > 0
+                  {runStatus === RUN_STATUS_FAILED && runErrors.length > 0
                     ? runErrors.map(({ detail, errorType }, index) => (
                         <Text
                           key={index}
@@ -351,7 +351,7 @@ export function CommandList(): JSX.Element | null {
                 {t('total_step_count', { count: currentCommandList.length })}
               </Text>
             </Flex>
-            {currentCommandList[0]?.runCommandSummary != null &&
+            {currentCommandList[0]?.runCommandSummary == null &&
             isDeterministic ? (
               <Text fontSize={FONT_SIZE_CAPTION} marginY={SPACING_2}>
                 {t('anticipated')}

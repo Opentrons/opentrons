@@ -141,14 +141,28 @@ describe('CommandList', () => {
     expect(errors).toContainHTML(fixtureErrors[0].errorType)
     expect(errors).toContainHTML(fixtureErrors[1].errorType)
   })
-  it('renders the protocol canceled banner when the status is stop-requested', () => {
+  it('renders the protocol canceled banner when the status is stop-requested, without errors shown', () => {
+    mockAlertItem.mockImplementation(({ children }) => (
+      <div>
+        Protocol Run Failed{' '}
+        <div data-testid="test_failed_errors">{children}</div>
+      </div>
+    ))
+    const fixtureError = {
+      id: 'ac02fd2a-9bd0-47e3-b739-ae562321e71d',
+      errorType: 'fakeErrorType',
+      createdAt: '2022-02-11T14:58:20.688699+00:00',
+      detail: 'fakeErrorDetail',
+    }
     mockUseRunStatus.mockReturnValue('stop-requested')
+    mockUseRunErrors.mockReturnValue([fixtureError])
     mockAlertItem.mockReturnValue(<div>Protocol Run Canceled</div>)
-    const { getByText } = render()
+    const { getByText, queryByTestId } = render()
     expect(getByText('Protocol Run Canceled')).toHaveStyle(
       'backgroundColor: Error_light'
     )
     expect(getByText('Protocol Run Canceled')).toHaveStyle('color: Error_dark')
+    expect(queryByTestId('test_failed_errors')).toBeNull()
   })
   it('renders the protocol canceled banner when the status is stopped', () => {
     mockUseRunStatus.mockReturnValue('stopped')
