@@ -184,6 +184,9 @@ class StateStore(StateView, ActionHandler):
 
         Returns:
             The truthy value returned by the `condition` function.
+
+        Raises:
+            The exception raised by the `condition` function, if any.
         """
         predicate = partial(condition, *args, **kwargs)
         is_done = predicate()
