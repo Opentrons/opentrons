@@ -33,11 +33,6 @@ def test_load_labware_from_definition(  # noqa: D103
 
 
 @pytest.mark.xfail(strict=True, raises=NotImplementedError)
-def test_load_labware_object(subject: MagneticModuleContext) -> None:  # noqa: D103
-    subject.load_labware_object(labware=None)  # type: ignore[arg-type]
-
-
-@pytest.mark.xfail(strict=True, raises=NotImplementedError)
 def test_labware_property(subject: MagneticModuleContext) -> None:  # noqa: D103
     _ = subject.labware
 

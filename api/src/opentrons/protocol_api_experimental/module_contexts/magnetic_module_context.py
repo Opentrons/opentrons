@@ -47,12 +47,6 @@ class MagneticModuleContext:  # noqa: D101
         """See APIv2 docstring."""
         raise NotImplementedError()
 
-    # todo(mm, 2021-02-15): This looks like a vestigial internal APIv2 thing.
-    # Can we remove it from APIv3?
-    def load_labware_object(self, labware: Labware) -> Labware:
-        """See APIv2 docstring."""
-        raise NotImplementedError()
-
     @property
     def labware(self) -> Optional[Labware]:
         """See APIv2 docstring."""
