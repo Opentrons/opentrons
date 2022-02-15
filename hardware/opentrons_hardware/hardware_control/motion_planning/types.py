@@ -25,7 +25,7 @@ AxisNames = Literal["X", "Y", "Z", "A", "B", "C"]
 AXIS_NAMES: List[AxisNames] = ["X", "Y", "Z", "A", "B", "C"]
 
 
-@dataclasses.dataclass(frozen=False)
+@dataclasses.dataclass
 class Coordinates:
     """Coordinates for all axes."""
 
@@ -126,7 +126,7 @@ class Block:
         self.time = _time()
 
 
-@dataclasses.dataclass(frozen=False)
+@dataclasses.dataclass
 class Move:
     """A trajectory between two coordinates."""
 
@@ -226,7 +226,7 @@ class MoveTarget:
         return cls(position=position, max_speed=np.float64(max_speed))
 
 
-@dataclasses.dataclass(frozen=False)
+@dataclasses.dataclass
 class AxisConstraints:
     """Axis intrinsic constraints."""
 

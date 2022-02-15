@@ -2,8 +2,7 @@
 
 from opentrons.config import feature_flags
 from opentrons.hardware_control import API as HardwareAPI, SynchronousAdapter
-from opentrons.protocol_engine import create_protocol_engine
-from opentrons.protocol_engine.state import EngineConfigs
+from opentrons.protocol_engine import EngineConfigs, create_protocol_engine
 
 from .legacy_wrappers import LegacySimulatingContextCreator
 from .legacy_labware_offset_provider import LegacyLabwareOffsetProvider
@@ -40,7 +39,10 @@ async def create_simulating_runner() -> ProtocolRunner:
 
     protocol_engine = await create_protocol_engine(
         hardware_api=simulating_hardware_api,
-        configs=EngineConfigs(ignore_pause=True),
+        configs=EngineConfigs(
+            ignore_pause=True,
+            use_virtual_modules=True,
+        ),
     )
 
     offset_provider = LegacyLabwareOffsetProvider(

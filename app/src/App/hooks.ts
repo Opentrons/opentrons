@@ -1,4 +1,6 @@
+import { format, parseISO } from 'date-fns'
 import { useSelector } from 'react-redux'
+import { useLocation } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import {
   getNavbarLocations,
@@ -8,7 +10,10 @@ import {
 } from '../redux/nav'
 import { getConnectedRobot } from '../redux/discovery'
 import { useIsProtocolRunLoaded } from '../organisms/ProtocolUpload/hooks'
-import { NavLocation } from '../redux/nav/types'
+import { translationKeyByPathSegment } from './NextGenApp'
+
+import type { PathCrumb } from '../molecules/Breadcrumbs'
+import type { NavLocation } from '../redux/nav/types'
 
 export function useRunLocation(): NavLocation {
   const { t } = useTranslation('top_navigation')
@@ -43,4 +48,43 @@ export function useNavLocations(): NavLocation[] {
   const navLocations = [robots, upload, runLocation, more]
 
   return navLocations
+}
+
+/**
+ * a hook for the unified app, to generate an array of path crumbs
+ * @returns {PathCrumb[]}
+ */
+export function usePathCrumbs(): PathCrumb[] {
+  const { t } = useTranslation('top_navigation')
+  const location = useLocation()
+
+  const subPathname = location.pathname.substring(1)
+
+  const pathCrumbs = subPathname
+    .split('/')
+    // filter out path segments explicitly defined as null
+    .filter(crumb => translationKeyByPathSegment[crumb] !== null)
+    .map(crumb => {
+      const crumbDisplayNameValue = translationKeyByPathSegment[crumb]
+
+      /**
+       * Check if the crumb is a date and parse. may want to pull out as a helper
+       * Necessary because 'Run Record ID' is planned to be rendered as a date timestamp
+       */
+      const crumbDateNameValue =
+        // eslint-disable-next-line eqeqeq
+        (new Date(crumb) as Date | string) != 'Invalid Date'
+          ? format(parseISO(crumb), 'MM/dd/yyyy HH:mm:ss')
+          : crumb
+
+      return {
+        pathSegment: crumb,
+        crumbName:
+          crumbDisplayNameValue != null
+            ? t(crumbDisplayNameValue)
+            : crumbDateNameValue,
+      }
+    })
+
+  return pathCrumbs
 }
