@@ -12,7 +12,13 @@ from ..labware import Labware
 
 
 class MagneticModuleStatus(str, Enum):
-    """The status of a Temperature Module's magnets."""
+    """The status of a Temperature Module's magnets.
+
+    Returned by `MagneticModuleContext.status`.
+
+    .. versionadded:: 3.0
+        This enum is now returned instead of a simple string.
+    """
 
     ENGAGED = "engaged"
     DISENGAGED = "disengaged"
