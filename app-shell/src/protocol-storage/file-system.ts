@@ -14,27 +14,35 @@ export const PROTOCOL_DIRECTORY_PATH = path.join(
 
 const RE_JSON_EXT = /\.json$/i
 
-export function readProtocolDirectory(dir: string): Promise<string[]> {
-  const absoluteName = (e: Dirent): string => path.join(dir, e.name)
+export function readProtocolsDirectory(dir: string): Promise<string[]> {
+  const getAbsolutePath = (e: Dirent): string => path.join(dir, e.name)
 
   return fs.readdir(dir, { withFileTypes: true }).then((entries: Dirent[]) => {
-    const protocolFiles = entries.filter(e => e.isDirectory()).map(absoluteName)
+    const protocolFiles = entries
+      .filter(e => e.isDirectory())
+      .map(getAbsolutePath)
 
     return protocolFiles
   })
 }
 
-export function parseProtocolFiles(
-  files: string[]
-): Promise<UncheckedLabwareFile[]> {
-  const tasks = files.map(f => {
-    const readTask = fs.readJson(f, { throws: false })
-    const statTask = fs.stat(f)
+interface UncheckedProtocolDir {
+  dirPath: string
+  modified: number
+  data: string[]
+}
+export function parseProtocolDirs(
+  dirPaths: string[]
+): Promise<UncheckedProtocolDir[]> {
+  const tasks = dirPaths.map(dirPath => {
+    const getAbsolutePath = (e: Dirent): string => path.join(dirPath, e.name)
+    const readTask = fs.readdir(dirPath, { withFileTypes: true })
+    const statTask = fs.stat(dirPath)
 
     return Promise.all([readTask, statTask]).then(([data, stats]) => ({
-      filename: f,
+      dirPath,
       modified: stats.mtimeMs,
-      data,
+      data: data.map((dirent: Dirent) => getAbsolutePath(dirent)),
     }))
   })
 
