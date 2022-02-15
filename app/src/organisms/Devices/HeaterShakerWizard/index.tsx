@@ -9,13 +9,13 @@ import { AttachModule } from './AttachModule'
 import { AttachAdapter } from './AttachAdapter'
 import { PowerOn } from './PowerOn'
 import { TestShake } from './TestShake'
+import { ModalPage } from '../../../atoms/ModalPage'
 import {
   ALIGN_CENTER,
   COLORS,
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  ModalPage,
   PrimaryBtn,
   SecondaryBtn,
   SPACING,

@@ -23,6 +23,7 @@ export const lineHeight24 = '1.5rem' // 24px
 export const lineHeight20 = '1.25rem' // 20px
 export const lineHeight16 = '1rem' // 16px
 export const lineHeight12 = '.75rem' // 12px
+export const lineHeight18 = '1.125rem' // 18px
 
 // font styles
 export const fontStyleNormal = 'normal'
@@ -45,7 +46,7 @@ export const boxShadowS = '0px 1px 3px rgba(0, 0, 0, 0.2)'
 
 //  Slideout constants
 export const boxShadowM = '0px 3px 6px rgba(0, 0, 0, 0.23)'
-
+export const boxShadowSM = '0px 1px 3px rgba(0, 0, 0, 0.3)'
 //  Overflow menu btn width
 export const overflowMenuWidth = '9.562rem'
 

@@ -129,7 +129,8 @@ export function Introduction(props: IntroductionProps): JSX.Element {
       >
         <Text
           fontSize={TYPOGRAPHY.lineHeight16}
-          data-testId={`heater_shaker_wizard_intro_title`}
+          width="39.625rem"
+          data-testid={`heater_shaker_wizard_intro_title`}
         >
           {t('intro_title')}
         </Text>
@@ -137,14 +138,14 @@ export function Introduction(props: IntroductionProps): JSX.Element {
           <Text
             paddingTop={TYPOGRAPHY.fontSizeH6}
             fontSize={TYPOGRAPHY.fontSizeH4}
-            paddingLeft={TYPOGRAPHY.introMarginLeft}
-            data-testId={`heater_shaker_wizard_intro_subtitle`}
+            paddingLeft={'8rem'}
+            data-testid={`heater_shaker_wizard_intro_subtitle`}
           >
             {t('intro_subtitle')}
           </Text>
           <Flex
             justifyContent={JUSTIFY_CENTER}
-            data-testId={`heater_shaker_wizard_intro_container_adapter`}
+            data-testid={`heater_shaker_wizard_intro_container_adapter`}
           >
             <IntroContainer
               text={
@@ -167,7 +168,7 @@ export function Introduction(props: IntroductionProps): JSX.Element {
           </Flex>
           <Flex
             justifyContent={JUSTIFY_CENTER}
-            data-testId={`heater_shaker_wizard_intro_container_labware`}
+            data-testid={`heater_shaker_wizard_intro_container_labware`}
           >
             <IntroContainer
               text={
@@ -189,7 +190,7 @@ export function Introduction(props: IntroductionProps): JSX.Element {
           </Flex>
           <Flex
             justifyContent={JUSTIFY_CENTER}
-            data-testId={`heater_shaker_wizard_intro_container_heater_shaker`}
+            data-testid={`heater_shaker_wizard_intro_container_heater_shaker`}
           >
             <IntroContainer
               image={<img src={heaterShaker} alt={'heater_shaker_image'} />}
@@ -198,7 +199,7 @@ export function Introduction(props: IntroductionProps): JSX.Element {
           </Flex>
           <Flex
             justifyContent={JUSTIFY_CENTER}
-            data-testId={`heater_shaker_wizard_intro_container_screwdriver`}
+            data-testid={`heater_shaker_wizard_intro_container_screwdriver`}
           >
             <IntroContainer
               image={<img src={screwdriver} alt={'screwdriver_image'} />}
