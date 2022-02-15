@@ -25,6 +25,10 @@ class MoveManager:
         self._constraints = constraints
         self._blend_log: List[List[Move]] = []
 
+    def update_constraints(self, constraints: SystemConstraints) -> None:
+        """Update system constraints when instruments are changed."""
+        self._constraints = constraints
+
     def _clear_blend_log(self) -> None:
         """Empty the blend log."""
         self._blend_log = []

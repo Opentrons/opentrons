@@ -8,9 +8,10 @@ from opentrons_hardware.hardware_control.motion_planning.types import (
     Coordinates,
     Move,
     MoveTarget,
-    Axis,
     AxisConstraints,
     SystemConstraints,
+    AXIS_NAMES,
+    ZeroLengthMoveError,
 )
 
 log = logging.getLogger(__name__)
@@ -38,9 +39,7 @@ def get_unit_vector(
     displacement: np.ndarray = target_vectorized - initial_vectorized
     distance = np.linalg.norm(displacement)
     if not distance or np.array_equal(initial_vectorized, target_vectorized):
-        raise ValueError(
-            f"No movement between initial position {initial} and target {target}."
-        )
+        raise ZeroLengthMoveError(initial, target)
     unit_vector = Coordinates.from_iter(displacement / distance)
     return unit_vector, distance
 
@@ -121,7 +120,7 @@ def find_initial_speed(
     log = logging.getLogger("find_initial_speed")
     # Figure out how fast we can be going when we start
     initial_speed = move.initial_speed
-    for axis in Axis.get_all_axes():
+    for axis in AXIS_NAMES:
         axis_component = move.unit_vector[axis]
 
         if abs(axis_component * initial_speed) < FLOAT_THRESHOLD:
@@ -198,7 +197,7 @@ def find_final_speed(
     # Figure out how fast we can be going when we stop
     final_speed: np.float64 = move.final_speed
 
-    for axis in Axis.get_all_axes():
+    for axis in AXIS_NAMES:
         axis_component = move.unit_vector[axis]
         if abs(axis_component * final_speed) < FLOAT_THRESHOLD:
             log.debug(f"Skip {axis} because it is not moving")
@@ -235,7 +234,7 @@ def achievable_final(
     log = logging.getLogger("achievable_final")
     # Figure out whether this final speed is in fact achievable from the initial speed
     # in the distance allowed
-    for axis in Axis.get_all_axes():
+    for axis in AXIS_NAMES:
         axis_component = move.unit_vector[axis]
         if axis_component:
             axis_max_acc = constraints[axis].max_acceleration
@@ -290,7 +289,7 @@ def build_blocks(
     max_acc = np.array(
         [
             constraints[axis].max_acceleration if unit_vector[axis] else 0.0
-            for axis in Axis.get_all_axes()
+            for axis in AXIS_NAMES
         ]
     )
     max_acc_magnitude = np.linalg.norm(max_acc)
@@ -409,7 +408,7 @@ def blended(constraints: SystemConstraints, first: Move, second: Move) -> bool:
         return False
 
     # do their junction velocities match constraints?
-    for axis in Axis.get_all_axes():
+    for axis in AXIS_NAMES:
         final_speed = first.blocks[-1].final_speed * first.unit_vector[axis]
         log.debug(f"{axis} final_speed: {final_speed}")
         initial_speed = second.blocks[0].initial_speed * second.unit_vector[axis]
@@ -457,3 +456,11 @@ def all_blended(constraints: SystemConstraints, moves: List[Move]) -> bool:
             prev = current
         except StopIteration:
             return True
+
+
+def unit_vector_multiplication(
+    unit_vector: Coordinates, value: np.float64
+) -> Coordinates:
+    """Multiply coordinates type by a float value."""
+    targets: np.ndarray = unit_vector.vectorize() * value
+    return Coordinates.from_iter(targets)

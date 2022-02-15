@@ -14,7 +14,6 @@ from opentrons_hardware.hardware_control.motion_planning.move_utils import (
     FLOAT_THRESHOLD,
 )
 from opentrons_hardware.hardware_control.motion_planning.types import (
-    Axis,
     AxisConstraints,
     Block,
     Coordinates,
@@ -26,22 +25,32 @@ from opentrons_hardware.hardware_control.motion_planning.types import (
 
 
 CONSTRAINTS: SystemConstraints = {
-    Axis.X: AxisConstraints.build(
+    "X": AxisConstraints.build(
         max_acceleration=10,
         max_speed_discont=15,
         max_direction_change_speed_discont=500,
     ),
-    Axis.Y: AxisConstraints.build(
+    "Y": AxisConstraints.build(
         max_acceleration=10,
         max_speed_discont=15,
         max_direction_change_speed_discont=500,
     ),
-    Axis.Z: AxisConstraints.build(
+    "Z": AxisConstraints.build(
         max_acceleration=100,
         max_speed_discont=100,
         max_direction_change_speed_discont=500,
     ),
-    Axis.A: AxisConstraints.build(
+    "A": AxisConstraints.build(
+        max_acceleration=100,
+        max_speed_discont=100,
+        max_direction_change_speed_discont=500,
+    ),
+    "B": AxisConstraints.build(
+        max_acceleration=100,
+        max_speed_discont=100,
+        max_direction_change_speed_discont=500,
+    ),
+    "C": AxisConstraints.build(
         max_acceleration=100,
         max_speed_discont=100,
         max_direction_change_speed_discont=500,
@@ -135,7 +144,7 @@ def test_convert_targets_to_moves() -> None:
         # previous move is not moving, use the smaller of move max speed and axis max
         # speed discontinuity
         [DUMMY_MOVE, [1, 0, 0, 0], 5, 5],
-        [DUMMY_MOVE, [1, 0, 0, 0], 200, CONSTRAINTS[Axis.X].max_speed_discont],
+        [DUMMY_MOVE, [1, 0, 0, 0], 200, CONSTRAINTS["X"].max_speed_discont],
         # previous move is moving in same direction as current move, use the smaller
         # of move max speed and axis max speed discontinuity
         [SIMPLE_FORWARD_MOVE, [1, 0, 0, 0], 5, 5],
@@ -143,7 +152,7 @@ def test_convert_targets_to_moves() -> None:
             SIMPLE_FORWARD_MOVE,
             [1, 0, 0, 0],
             200,
-            CONSTRAINTS[Axis.X].max_speed_discont,
+            CONSTRAINTS["X"].max_speed_discont,
         ],
         # previous move is moving in opposite direction, use the smaller of move max
         # speed and axis max dir change speed discontinuity
@@ -151,7 +160,7 @@ def test_convert_targets_to_moves() -> None:
             SIMPLE_FORWARD_MOVE,
             [-1, 0, 0, 0],
             600,
-            CONSTRAINTS[Axis.X].max_direction_change_speed_discont,
+            CONSTRAINTS["X"].max_direction_change_speed_discont,
         ],
         [SIMPLE_BACKWARD_MOVE, [1, 0, 0, 0], 455, 455],
     ],
@@ -182,18 +191,18 @@ def test_initial_speed(
         # next move is not moving, use the smaller of move max speed and axis max
         # speed discontinuity
         [DUMMY_MOVE, [1, 0, 0, 0], 5, 5],
-        [DUMMY_MOVE, [1, 0, 0, 0], 200, CONSTRAINTS[Axis.X].max_speed_discont],
+        [DUMMY_MOVE, [1, 0, 0, 0], 200, CONSTRAINTS["X"].max_speed_discont],
         # next move is moving in same direction as current move, use the smaller
         # of move max speed and axis max speed discontinuity
         [SIMPLE_FORWARD_MOVE, [1, 0, 0, 0], 5, 5],
-        [SIMPLE_FORWARD_MOVE, [1, 0, 0, 0], 200, CONSTRAINTS[Axis.X].max_speed_discont],
+        [SIMPLE_FORWARD_MOVE, [1, 0, 0, 0], 200, CONSTRAINTS["X"].max_speed_discont],
         # next move is moving in opposite direction, use the smaller of move max
         # speed and axis max direction change speed discontinuity
         [
             SIMPLE_FORWARD_MOVE,
             [-1, 0, 0, 0],
             600,
-            CONSTRAINTS[Axis.X].max_direction_change_speed_discont,
+            CONSTRAINTS["X"].max_direction_change_speed_discont,
         ],
         [SIMPLE_BACKWARD_MOVE, [1, 0, 0, 0], 455, 455],
     ],
@@ -221,11 +230,11 @@ def test_final_speed(
 def test_blend_motion() -> None:
     """Motion should blend."""
     manager = MoveManager(CONSTRAINTS)
-    origin = Coordinates(0, 0, 0, 0)
+    origin = Coordinates(0, 0, 0, 0, 0, 0)
     target_list = [
-        MoveTarget.build(position=Coordinates(10, 0, 0, 0), max_speed=30),
-        MoveTarget.build(position=Coordinates(10, 10, 0, 0), max_speed=20),
-        MoveTarget.build(position=Coordinates(10, 10, 15, 10), max_speed=10),
+        MoveTarget.build(position=Coordinates(10, 0, 0, 0, 0, 0), max_speed=30),
+        MoveTarget.build(position=Coordinates(10, 10, 0, 0, 0, 0), max_speed=20),
+        MoveTarget.build(position=Coordinates(10, 10, 15, 10, 0, 0), max_speed=10),
     ]
     success, blend_log = manager.plan_motion(origin, target_list)
     assert success

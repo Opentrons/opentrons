@@ -1,41 +1,31 @@
 """Motion planning types."""
 from __future__ import annotations
 import logging
-import enum
 import dataclasses
 import numpy as np  # type: ignore[import]
+
 from typing import (
     cast,
     Any,
     SupportsFloat,
     Dict,
     Iterator,
-    List,
     OrderedDict,
     Tuple,
     Union,
+    List,
 )
+from typing_extensions import Literal
 
 log = logging.getLogger(__name__)
 
 AcceptableType = Union[SupportsFloat, np.float64]
 
-
-class Axis(enum.Enum):
-    """Robot axis."""
-
-    X = 0
-    Y = 1
-    Z = 2
-    A = 3
-
-    @classmethod
-    def get_all_axes(cls) -> List[Axis]:
-        """Return all system axes of the robot."""
-        return [cls.X, cls.Y, cls.Z, cls.A]
+AxisNames = Literal["X", "Y", "Z", "A", "B", "C"]
+AXIS_NAMES: List[AxisNames] = ["X", "Y", "Z", "A", "B", "C"]
 
 
-@dataclasses.dataclass(frozen=False)
+@dataclasses.dataclass
 class Coordinates:
     """Coordinates for all axes."""
 
@@ -43,28 +33,38 @@ class Coordinates:
     Y: np.float64
     Z: np.float64
     A: np.float64
+    B: np.float64
+    C: np.float64
 
     def __init__(
-        self, X: AcceptableType, Y: AcceptableType, Z: AcceptableType, A: AcceptableType
+        self,
+        X: AcceptableType = 0,
+        Y: AcceptableType = 0,
+        Z: AcceptableType = 0,
+        A: AcceptableType = 0,
+        B: AcceptableType = 0,
+        C: AcceptableType = 0,
     ) -> None:
         """Constructor."""
         self.X = np.float64(X)
         self.Y = np.float64(Y)
         self.Z = np.float64(Z)
         self.A = np.float64(A)
+        self.B = np.float64(B)
+        self.C = np.float64(C)
 
     def __iter__(self) -> Coordinates:
         """Return an iterator."""
         return self
 
-    def __getitem__(self, key: Axis) -> np.float64:
+    def __getitem__(self, key: AxisNames) -> np.float64:
         """Access axis coordinate value."""
         return self.to_dict()[key]
 
-    def to_dict(self) -> OrderedDict[Axis, np.float64]:
+    def to_dict(self) -> OrderedDict[AxisNames, np.float64]:
         """Return Coordaintes as a dictionary."""
         vectorized = self.vectorize()
-        return OrderedDict(zip(Axis.get_all_axes(), vectorized))
+        return OrderedDict(zip(AXIS_NAMES, vectorized))
 
     @classmethod
     def from_iter(cls, iter: Iterator[AcceptableType]) -> Coordinates:
@@ -126,7 +126,7 @@ class Block:
         self.time = _time()
 
 
-@dataclasses.dataclass(frozen=False)
+@dataclasses.dataclass
 class Move:
     """A trajectory between two coordinates."""
 
@@ -226,7 +226,7 @@ class MoveTarget:
         return cls(position=position, max_speed=np.float64(max_speed))
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclasses.dataclass
 class AxisConstraints:
     """Axis intrinsic constraints."""
 
@@ -251,4 +251,40 @@ class AxisConstraints:
         )
 
 
-SystemConstraints = Dict[Axis, AxisConstraints]
+SystemConstraints = Dict[AxisNames, AxisConstraints]
+
+
+class ZeroLengthMoveError(ValueError):
+    """Error that handles trying to make a unit vector from a 0-length input.
+
+    A unit vector would be undefined in this scenario, so this is the only safe way to
+    handle it; but it's not usually a systemic error, sometimes something wants you to
+    move to somewhere you already are. By using a special exception, we can specially
+    catch it.
+    """
+
+    def __init__(self, origin: Coordinates, destination: Coordinates) -> None:
+        """Build the exception with the data that caused it."""
+        self._origin = origin
+        self._destination = destination
+        super().__init__()
+
+    def __repr__(self) -> str:
+        """Stringify."""
+        return f"<{str(self)}>"
+
+    def __str__(self) -> str:
+        """Stringify."""
+        return (
+            f"{type(self)}: No distance between {self._origin} and {self._destination}"
+        )
+
+    @property
+    def origin(self) -> Coordinates:
+        """Get the origin."""
+        return self._origin
+
+    @property
+    def destination(self) -> Coordinates:
+        """Get the destination."""
+        return self._destination

@@ -7,11 +7,11 @@ import argparse
 
 from opentrons_hardware.hardware_control.motion_planning import move_manager
 from opentrons_hardware.hardware_control.motion_planning.types import (
-    Axis,
     AxisConstraints,
     SystemConstraints,
     MoveTarget,
     Coordinates,
+    AXIS_NAMES,
 )
 from typing import Dict, Any
 
@@ -86,7 +86,8 @@ def main() -> None:
         params = json.load(f)
 
     constraints: SystemConstraints = {
-        axis: AxisConstraints.build(**params["constraints"][axis.name]) for axis in Axis
+        axis: AxisConstraints.build(**params["constraints"][axis])
+        for axis in AXIS_NAMES
     }
     origin = Coordinates(*params["origin"])
     target_list = [

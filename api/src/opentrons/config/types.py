@@ -1,3 +1,4 @@
+from enum import Enum
 from dataclasses import dataclass
 from typing import Dict, Tuple, TypeVar, Generic, List
 from typing_extensions import TypedDict, Literal
@@ -20,6 +21,14 @@ class GeneralizeableAxisDict(TypedDict, total=False):
 
 
 Vt = TypeVar("Vt")
+
+
+class PipetteKind(Enum):
+    HIGH_THROUGHPUT = "high_throughput"
+    LOW_THROUGHPUT = "low_throughput"
+    TWO_LOW_THROUGHPUT = "two_low_throughput"
+    NONE = "none"
+    GRIPPER = "gripper"
 
 
 @dataclass

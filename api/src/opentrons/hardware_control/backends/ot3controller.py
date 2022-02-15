@@ -20,6 +20,7 @@ from opentrons.config.types import OT3Config
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.types import Mount
 from opentrons.config import pipette_config
+from . import ot3utils
 
 try:
     import aionotify  # type: ignore[import]
@@ -30,8 +31,12 @@ try:
     from opentrons_hardware.drivers.can_bus import CanMessenger, DriverSettings
     from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
     from opentrons_hardware.drivers.can_bus.build import build_driver
-    from opentrons_hardware.hardware_control.motion import create
     from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
+    from opentrons_hardware.hardware_control.motion_planning import (
+        Move,
+        Coordinates,
+    )
+
     from opentrons_hardware.hardware_control.network import probe
     from opentrons_ot3_firmware.constants import NodeId
     from opentrons_ot3_firmware.messages.message_definitions import (
@@ -105,68 +110,6 @@ class OT3Controller:
             )
         self._present_nodes: Set[NodeId] = set()
 
-    # TODO: These staticmethods exist to defer uses of NodeId to inside
-    # method bodies, which won't be evaluated until called. This is needed
-    # because the robot server doesn't have opentrons_ot3_firmware as a dep
-    # which is where they're defined, and therefore you can't have references
-    # to NodeId that are interpreted at import time because then the robot
-    # server tests fail when importing hardware controller. This is obviously
-    # terrible and needs to be fixed.
-    @staticmethod
-    def _axis_nodes() -> List["NodeId"]:
-        return [
-            NodeId.gantry_x,
-            NodeId.gantry_y,
-            NodeId.head_l,
-            NodeId.head_r,
-            NodeId.pipette_left,
-            NodeId.pipette_right,
-        ]
-
-    @staticmethod
-    def _node_axes() -> List[str]:
-        return ["X", "Y", "Z", "A", "B"]
-
-    @staticmethod
-    def _axis_to_node(axis: str) -> "NodeId":
-        anm = {
-            "X": NodeId.gantry_x,
-            "Y": NodeId.gantry_y,
-            "Z": NodeId.head_l,
-            "A": NodeId.head_r,
-            "B": NodeId.pipette_left,
-            "C": NodeId.pipette_right,
-        }
-        return anm[axis]
-
-    @staticmethod
-    def _node_to_axis(node: "NodeId") -> str:
-        nam = {
-            NodeId.gantry_x: "X",
-            NodeId.gantry_y: "Y",
-            NodeId.head_l: "Z",
-            NodeId.head_r: "A",
-            NodeId.pipette_left: "B",
-            NodeId.pipette_right: "C",
-        }
-        return nam[node]
-
-    @staticmethod
-    def _node_is_axis(node: "NodeId") -> bool:
-        try:
-            OT3Controller._node_to_axis(node)
-            return True
-        except KeyError:
-            return False
-
-    @staticmethod
-    def _axis_is_node(axis: str) -> bool:
-        try:
-            OT3Controller._axis_to_node(axis)
-            return True
-        except KeyError:
-            return False
-
     async def setup_motors(self) -> None:
         """Set up the motors."""
         await self._messenger.send(
@@ -213,17 +156,15 @@ class OT3Controller:
         for node, pos in position.items():
             # we need to make robot config apply to z or in some other way
             # reflect the sense of the axis direction
-            if OT3Controller._node_is_axis(node):
-                ret[OT3Controller._node_to_axis(node)] = pos
+            if ot3utils.node_is_axis(node):
+                ret[ot3utils.node_to_axis(node)] = pos
         log.info(f"update_position: {ret}")
         return ret
 
     async def move(
         self,
-        target_position: AxisValueMap,
-        home_flagged_axes: bool = True,
-        speed: Optional[float] = None,
-        axis_max_speeds: Optional[AxisValueMap] = None,
+        origin: "Coordinates",
+        moves: List["Move"],
     ) -> None:
         """Move to a position.
 
@@ -236,22 +177,12 @@ class OT3Controller:
         Returns:
             None
         """
-        log.info(f"move: {target_position}")
-        target: Dict[NodeId, float] = {}
-        for axis, pos in target_position.items():
-            if self._axis_is_node(axis):
-                target[self._axis_to_node(axis)] = pos
-
-        log.info(f"move targets: {target}")
-        move_group = create(
-            origin=self._position,
-            target=target,
-            speed=speed or 5000.0,
-            present_nodes=self._present_nodes,
+        move_group, final_positions = ot3utils.create_move_group(
+            origin, moves, self._present_nodes
         )
-        runner = MoveGroupRunner(move_groups=move_group)
+        runner = MoveGroupRunner(move_groups=[move_group])
         await runner.run(can_messenger=self._messenger)
-        self._position.update(target)
+        self._position.update(final_positions)
 
     async def home(self, axes: Optional[List[str]] = None) -> AxisValueMap:
         """Home axes.
@@ -262,10 +193,6 @@ class OT3Controller:
         Returns:
             Homed position.
         """
-        checked_axes = axes or self._node_axes()
-        home_pos = self._get_home_position()
-        target_pos = {ax: home_pos[self._axis_to_node(ax)] for ax in checked_axes}
-        await self.move(target_pos)
         return self._axis_convert(self._position)
 
     async def fast_home(self, axes: Sequence[str], margin: float) -> AxisValueMap:
@@ -278,11 +205,6 @@ class OT3Controller:
         Returns:
             New position.
         """
-        home_pos = self._get_home_position()
-        target_pos = {ax: home_pos[self._axis_to_node(ax)] for ax in axes}
-        if not target_pos:
-            return self._axis_convert(self._position)
-        await self.move(target_pos)
         return self._axis_convert(self._position)
 
     async def get_attached_instruments(

@@ -15,10 +15,22 @@ from typing import (
     Set,
 )
 
+
 from opentrons_shared_data.pipette import name_config
 from opentrons import types as top_types
 from opentrons.config import robot_configs
-from opentrons.config.types import RobotConfig, OT3Config
+from opentrons.config.types import RobotConfig, OT3Config, PipetteKind
+from .backends.ot3utils import get_system_constraints
+
+try:
+    from opentrons_hardware.hardware_control.motion_planning import (
+        MoveManager,
+        MoveTarget,
+        Coordinates,
+        ZeroLengthMoveError,
+    )
+except ModuleNotFoundError:
+    pass
 
 from .util import use_or_initialize_loop, check_motion_bounds
 from .pipette import (
@@ -131,6 +143,10 @@ class OT3API(
         self._door_state = DoorState.CLOSED
         self._pause_manager = PauseManager(self._door_state)
         self._transforms = build_ot3_transforms(self._config)
+        self._pipette_kind = PipetteKind.NONE
+        self._move_manager = MoveManager(
+            constraints=get_system_constraints(self._config, self._pipette_kind)
+        )
 
         ExecutionManagerProvider.__init__(self, loop, isinstance(backend, OT3Simulator))
         InstrumentHandlerProvider.__init__(self)
@@ -155,6 +171,17 @@ class OT3API(
     @door_state.setter
     def door_state(self, door_state: DoorState):
         self._door_state = door_state
+
+    @property
+    def pipette_kind(self) -> PipetteKind:
+        return self._pipette_kind
+
+    @pipette_kind.setter
+    def pipette_kind(self, pipette_kind: PipetteKind):
+        self._pipette_kind = pipette_kind
+        self._move_manager.update_constraints(
+            get_system_constraints(self._config, pipette_kind)
+        )
 
     def _update_door_state(self, door_state: DoorState):
         mod_log.info(f"Updating the window switch status: {door_state}")
@@ -372,6 +399,8 @@ class OT3API(
             )
             await self._backend.configure_mount(mount, hw_config)
         await self._backend.probe_network()
+        # TODO: (AA, 2022-02-09) Set correct pipette kind based on attached instr
+        self.pipette_kind = PipetteKind.TWO_LOW_THROUGHPUT
 
     # Global actions API
     def pause(self, pause_type: PauseType):
@@ -672,22 +701,33 @@ class OT3API(
         bounds = self._backend.axis_bounds
         to_check = {
             ax: machine_pos[ax.name]
-            for idx, ax in enumerate(target_position.keys())
+            for ax in target_position.keys()
             if ax in Axis.gantry_axes()
         }
         check_motion_bounds(to_check, target_position, bounds, check_bounds)
-        checked_maxes = max_speeds or {}
-        str_maxes = {ax.name: val for ax, val in checked_maxes.items()}
+
+        # TODO: (2022-02-10) Use actual max speed for MoveTarget
+        checked_speed = speed or 500
+        self._move_manager.update_constraints(
+            get_system_constraints(self._config, self._pipette_kind)
+        )
+        move_target = MoveTarget.build(
+            position=Coordinates(**machine_pos), max_speed=checked_speed
+        )
+        backend_position = await self._backend.update_position()
+        origin = Coordinates.from_iter(iter([backend_position[ax.name] for ax in Axis]))
+        try:
+            blended, moves = self._move_manager.plan_motion(
+                origin=origin, target_list=[move_target]
+            )
+        except ZeroLengthMoveError as zero_length_error:
+            self._log.info(f"{str(zero_length_error)}, ignoring")
+            return
         async with contextlib.AsyncExitStack() as stack:
             if acquire_lock:
                 await stack.enter_async_context(self._motion_lock)
             try:
-                await self._backend.move(
-                    machine_pos,
-                    speed=speed,
-                    home_flagged_axes=home_flagged_axes,
-                    axis_max_speeds=str_maxes,
-                )
+                await self._backend.move(origin, moves[0])
             except Exception:
                 self._log.exception("Move failed")
                 self._current_position.clear()
