@@ -173,6 +173,30 @@ exports[`icons book-open-page-variant renders correctly 1`] = `
 </svg>
 `;
 
+exports[`icons caret-right renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
+<svg
+  aria-hidden="true"
+  className="sc-fznyAO c0 foo"
+  fill="currentColor"
+  version="1.1"
+  viewBox="0 0 4 5"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path
+    d="M1.4,4.9L0.6,4.1l1.6-1.6L0.6,0.9l0.7-0.7l2.4,2.4L1.4,4.9z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
 exports[`icons check renders correctly 1`] = `
 .c0.spin {
   -webkit-animation: GLFYz 0.8s steps(8) infinite;

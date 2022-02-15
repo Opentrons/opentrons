@@ -410,4 +410,8 @@ export const ICON_DATA_BY_NAME = {
     viewBox: '0 0 24 24',
     path: 'M 5.25 2.25 L 18.75 12.125 L 5.25 21.75 Z',
   },
+  'caret-right': {
+    viewBox: '0 0 4 5',
+    path: 'M1.4,4.9L0.6,4.1l1.6-1.6L0.6,0.9l0.7-0.7l2.4,2.4L1.4,4.9z',
+  },
 }
