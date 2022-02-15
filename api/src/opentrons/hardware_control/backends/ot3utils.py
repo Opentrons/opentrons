@@ -100,30 +100,19 @@ def _constraint_name_from_axis(ax: "AxisNames") -> Literal["X", "Y", "Z", "P"]:
     return lookup[ax]
 
 
-def default_system_constraints(
-    config: OT3SpeedSettings,
-) -> Dict["AxisNames", "AxisConstraints"]:
-    constraints = {}
-    for axis in AXIS_NAMES:
-        constraints[axis] = AxisConstraints.build(
-            config.acceleration.none[_constraint_name_from_axis(axis)],
-            config.max_speed_discontinuity.none[_constraint_name_from_axis(axis)],
-            config.direction_change_speed_discontinuity.none[
-                _constraint_name_from_axis(axis)
-            ],
-        )
-    return constraints
-
-
 def get_system_constraints(
     config: OT3SpeedSettings, pipette_kind: PipetteKind
 ) -> Dict["AxisNames", "AxisConstraints"]:
-    base_config = default_system_constraints(config)
-    # if pipette_kind is not PipetteKind.NONE:
-    #     for key, val in config.get_speed_constraints():
-    #         base_config[axis]
-        
-    return default_system_constraints(config)
+    constraints = {}
+    conf = config.speed_settings.by_pipette_kind(pipette_kind)
+    for axis in AXIS_NAMES:
+        constraint_name = _constraint_name_from_axis(axis)
+        constraints[axis] = AxisConstraints.build(
+            conf['acceleration'][constraint_name],
+            conf['max_speed_discontinuity'][constraint_name],
+            conf['direction_change_speed_discontinuity'][constraint_name],
+        )
+    return constraints
 
 
 def _convert_to_node_id_dict(axis_pos: "Coordinates") -> "NodeIdMotionValues":
