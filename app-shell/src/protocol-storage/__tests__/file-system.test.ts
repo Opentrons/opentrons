@@ -7,8 +7,8 @@ import Electron from 'electron'
 import { when } from 'jest-when'
 
 import {
-  readProtocolDirectory,
-  parseProtocolFiles,
+  readProtocolsDirectory,
+  parseProtocolDirs,
   addProtocolFile,
   removeProtocolFile,
   PROTOCOL_DIRECTORY_NAME,
@@ -16,13 +16,6 @@ import {
 } from '../file-system'
 
 jest.mock('electron')
-
-const trashItem = Electron.shell.trashItem as jest.MockedFunction<
-  typeof Electron.shell.trashItem
->
-const mockGetPath = Electron.app.getPath as jest.MockedFunction<
-  typeof Electron.app.getPath
->
 
 describe('protocol storage directory utilities', () => {
   let protocolsDir: string
@@ -32,9 +25,7 @@ describe('protocol storage directory utilities', () => {
     tempDirs.push(dir)
     return dir
   }
-  const mockAppDataDirPath = '/FakeAppData'
   beforeEach(() => {
-    when(mockGetPath).calledWith('appData').mockReturnValue(mockAppDataDirPath)
     protocolsDir = makeEmptyDir()
   })
 
@@ -46,94 +37,62 @@ describe('protocol storage directory utilities', () => {
   describe('PROTOCOL DIRECTORY', () => {
     it('constructs PROTOCOL_DIRECTORY_PATH', () => {
       return expect(PROTOCOL_DIRECTORY_PATH).toEqual(
-        `${mockAppDataDirPath}/${PROTOCOL_DIRECTORY_NAME}`
+        `__mock-app-path__/${PROTOCOL_DIRECTORY_NAME}`
       )
     })
   })
 
-  describe('readProtocolDirectory', () => {
+  describe('readProtocolsDirectory', () => {
     it('resolves empty array for empty directory', () => {
-      return expect(readProtocolDirectory(protocolsDir)).resolves.toEqual([])
+      return expect(readProtocolsDirectory(protocolsDir)).resolves.toEqual([])
     })
 
     it('rejects if directory is not found', () => {
       return expect(
-        readProtocolDirectory('__not_a_directory__')
+        readProtocolsDirectory('__not_a_directory__')
       ).rejects.toThrow(/no such file/)
     })
 
     it('returns paths to *.json files in directory', () => {
-      const firstProtocolItemDirName = 'protocol_item_1'
-      const secondProtocolItemDirName = 'protocol_item_1'
+      const firstProtocolDirName = 'protocol_item_1'
+      const secondProtocolDirName = 'protocol_item_2'
       return Promise.all([
-        fs.emptyDir(path.join(protocolsDir, firstProtocolItemDirName)),
-        fs.emptyDir(path.join(protocolsDir, secondProtocolItemDirName)),
+        fs.emptyDir(path.join(protocolsDir, firstProtocolDirName)),
+        fs.emptyDir(path.join(protocolsDir, secondProtocolDirName)),
       ]).then(() => {
-        return expect(readProtocolDirectory(protocolsDir)).resolves.toEqual([
-          path.join(protocolsDir, firstProtocolItemDirName),
-          path.join(protocolsDir, secondProtocolItemDirName),
+        return expect(readProtocolsDirectory(protocolsDir)).resolves.toEqual([
+          path.join(protocolsDir, firstProtocolDirName),
+          path.join(protocolsDir, secondProtocolDirName),
         ])
       })
     })
   })
 
-  describe('parseProtocolFiles', () => {
-    it('reads and parses JSON files', () => {
-      const dir = makeEmptyDir()
-      const files = [
-        path.join(dir, 'a.json'),
-        path.join(dir, 'b.json'),
-        path.join(dir, 'c.json'),
-      ]
+  describe('parseProtocolDirs', () => {
+    it('reads and parses directories', () => {
+      const protocolsDir = makeEmptyDir()
+
+      const firstProtocolDirName = 'protocol_item_1'
+      const secondProtocolDirName = 'protocol_item_2'
+
+      const firstDirPath = path.join(protocolsDir, firstProtocolDirName)
+      const secondDirPath = path.join(protocolsDir, secondProtocolDirName)
 
       return Promise.all([
-        fs.writeJson(files[0], { name: 'a' }),
-        fs.writeJson(files[1], { name: 'b' }),
-        fs.writeJson(files[2], { name: 'c' }),
+        fs.emptyDir(path.join(protocolsDir, firstProtocolDirName)),
+        fs.emptyDir(path.join(protocolsDir, secondProtocolDirName)),
       ]).then(() => {
-        return expect(parseProtocolFiles(files)).resolves.toEqual([
+        return expect(
+          parseProtocolDirs([firstDirPath, secondDirPath])
+        ).resolves.toEqual([
           {
-            filename: files[0],
-            data: { name: 'a' },
+            dirPath: firstDirPath,
+            data: [],
             modified: expect.any(Number),
           },
           {
-            filename: files[1],
-            data: { name: 'b' },
-            modified: expect.any(Number),
-          },
-          {
-            filename: files[2],
-            data: { name: 'c' },
-            modified: expect.any(Number),
-          },
-        ])
-      })
-    })
-
-    it('surfaces parse errors as null data', () => {
-      const dir = makeEmptyDir()
-      const files = [
-        path.join(dir, 'a.json'),
-        path.join(dir, 'b.json'),
-        path.join(dir, 'c.json'),
-      ]
-
-      return Promise.all([
-        fs.writeJson(files[0], { name: 'a' }),
-        fs.writeFile(files[1], `this isn't JSON!!!`),
-        fs.writeJson(files[2], { name: 'c' }),
-      ]).then(() => {
-        return expect(parseProtocolFiles(files)).resolves.toEqual([
-          {
-            filename: files[0],
-            data: { name: 'a' },
-            modified: expect.any(Number),
-          },
-          { filename: files[1], data: null, modified: expect.any(Number) },
-          {
-            filename: files[2],
-            data: { name: 'c' },
+            dirPath: secondDirPath,
+            data: [],
             modified: expect.any(Number),
           },
         ])
@@ -151,8 +110,8 @@ describe('protocol storage directory utilities', () => {
       return fs
         .writeJson(sourceName, { name: 'a' })
         .then(() => addProtocolFile(sourceName, destDir))
-        .then(() => readProtocolDirectory(destDir))
-        .then(parseProtocolFiles)
+        .then(() => readProtocolsDirectory(destDir))
+        .then(parseProtocolDirs)
         .then(files => {
           expect(files).toEqual([
             {
@@ -180,8 +139,8 @@ describe('protocol storage directory utilities', () => {
 
       return setup
         .then(() => addProtocolFile(sourceName, destDir))
-        .then(() => readProtocolDirectory(destDir))
-        .then(parseProtocolFiles)
+        .then(() => readProtocolsDirectory(destDir))
+        .then(parseProtocolDirs)
         .then(files => {
           expect(files).toContainEqual({
             filename: expectedName,
@@ -213,7 +172,7 @@ describe('protocol storage directory utilities', () => {
 
       return setup
         .then(() => removeProtocolFile(filename))
-        .then(() => readProtocolDirectory(dir))
+        .then(() => readProtocolsDirectory(dir))
         .then(files => expect(files).toEqual([]))
     })
   })
