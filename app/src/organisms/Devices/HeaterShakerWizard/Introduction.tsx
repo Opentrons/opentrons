@@ -121,7 +121,11 @@ export function Introduction(props: IntroductionProps): JSX.Element {
         flexDirection={DIRECTION_COLUMN}
         color={COLORS.darkBlack}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
-        marginBottom={TYPOGRAPHY.introImageHeight}
+        marginBottom={
+          labwareDefinition === undefined
+            ? '9.375rem'
+            : TYPOGRAPHY.introImageHeight
+        }
       >
         <Text
           fontSize={TYPOGRAPHY.lineHeight16}

@@ -20,6 +20,7 @@ import {
   SecondaryBtn,
   SPACING,
   TEXT_TRANSFORM_NONE,
+  JUSTIFY_FLEX_END,
 } from '@opentrons/components'
 
 import type { State } from '../../../redux/types'
@@ -81,7 +82,9 @@ export const HeaterShakerWizard = (
         {getWizardDisplayPage()}
         <Flex
           flexDirection={DIRECTION_ROW}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          justifyContent={
+            currentPage === 0 ? JUSTIFY_FLEX_END : JUSTIFY_SPACE_BETWEEN
+          }
         >
           {currentPage > 0 ? (
             <SecondaryBtn
