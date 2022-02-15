@@ -97,8 +97,13 @@ class MagneticModuleContext:  # noqa: D101
         """See APIv2 docstring."""
         raise NotImplementedError()
 
-    # todo(mm, 2021-02-15): Decide whether APIv3 will return the same module object
-    # every time the module is retrieved. If yes, we don't need this method.
+    def __hash__(self) -> int:
+        """Get hash.
+
+        Uses the module instance's unique identifier in protocol state.
+        """
+        return hash(self._module_id)
+
     def __eq__(self, other: object) -> bool:
         """Compare for object equality using identifier string."""
         return (
