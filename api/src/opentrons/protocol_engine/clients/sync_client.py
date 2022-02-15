@@ -5,7 +5,13 @@ from opentrons.types import MountType
 
 from .. import commands
 from ..state import StateView
-from ..types import DeckSlotLocation, ModuleModel, PipetteName, WellLocation
+from ..types import (
+    DeckSlotLocation,
+    LabwareLocation,
+    ModuleModel,
+    PipetteName,
+    WellLocation,
+)
 from .transports import AbstractSyncTransport
 
 
@@ -23,7 +29,7 @@ class SyncClient:
 
     def load_labware(
         self,
-        location: DeckSlotLocation,
+        location: LabwareLocation,
         load_name: str,
         namespace: str,
         version: int,

@@ -26,6 +26,7 @@ from .types import (
 )
 
 from . import errors
+from .constants import DEFAULT_LABWARE_NAMESPACE
 
 
 class ProtocolContext:
@@ -104,7 +105,7 @@ class ProtocolContext:
             location=DeckSlotLocation(slotName=DeckSlotName.from_primitive(location)),
             # TODO(mc, 2021-04-22): make sure this default is compatible with using
             # namespace=None to load custom labware in PAPIv3
-            namespace=namespace or "opentrons",
+            namespace=namespace if namespace is not None else DEFAULT_LABWARE_NAMESPACE,
             version=version or 1,
         )
 
@@ -203,7 +204,9 @@ class ProtocolContext:
         )
 
         if result.definition.moduleType == ModuleType.MAGNETIC:
-            return MagneticModuleContext(module_id=result.moduleId)
+            return MagneticModuleContext(
+                engine_client=self._engine_client, module_id=result.moduleId
+            )
         elif result.definition.moduleType == ModuleType.TEMPERATURE:
             return TemperatureModuleContext(module_id=result.moduleId)
         elif result.definition.moduleType == ModuleType.THERMOCYCLER:

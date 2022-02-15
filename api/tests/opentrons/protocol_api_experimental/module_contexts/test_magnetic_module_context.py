@@ -1,18 +1,33 @@
 """Tests for `magnetic_module_context`."""
 
 
+from decoy import Decoy
 import pytest
 
+from opentrons.protocols.models import LabwareDefinition
+
+from opentrons.protocol_engine import ModuleLocation, commands as pe_commands
+from opentrons.protocol_engine.clients import SyncClient
+
 from opentrons.protocol_api_experimental import (
+    Labware,
     MagneticModuleContext,
     InvalidMagnetEngageHeightError,
 )
 
 
 @pytest.fixture
-def subject() -> MagneticModuleContext:
-    """Return a MagneticModuleContext to test."""
-    return MagneticModuleContext(module_id="module-id")
+def engine_client(decoy: Decoy) -> SyncClient:
+    """Return a mock in the shape of a Protocol Engine client."""
+    return decoy.mock(cls=SyncClient)
+
+
+@pytest.fixture
+def subject(engine_client: SyncClient) -> MagneticModuleContext:
+    """Return a MagneticModuleContext with mocked dependencies."""
+    return MagneticModuleContext(
+        engine_client=engine_client, module_id="subject-module-id"
+    )
 
 
 @pytest.mark.xfail(strict=True, raises=NotImplementedError)
@@ -20,9 +35,66 @@ def test_api_version(subject: MagneticModuleContext) -> None:  # noqa: D103
     _ = subject.api_version
 
 
+def test_load_labware_default_namespace_and_version(
+    decoy: Decoy,
+    minimal_labware_def: LabwareDefinition,
+    engine_client: SyncClient,
+    subject: MagneticModuleContext,
+) -> None:
+    """It should default namespace to "opentrons" and version to 1."""
+    decoy.when(
+        engine_client.load_labware(
+            location=ModuleLocation(moduleId="subject-module-id"),
+            load_name="some_labware",
+            namespace="opentrons",
+            version=1,
+        )
+    ).then_return(
+        pe_commands.LoadLabwareResult(
+            labwareId="abc123",
+            definition=minimal_labware_def,
+            offsetId=None,
+        )
+    )
+
+    result = subject.load_labware(name="some_labware")
+    assert result == Labware(labware_id="abc123", engine_client=engine_client)
+
+
+def test_load_labware_explicit_namespace_and_version(
+    decoy: Decoy,
+    minimal_labware_def: LabwareDefinition,
+    engine_client: SyncClient,
+    subject: MagneticModuleContext,
+) -> None:
+    """It should pass along the namespace, version, and load name."""
+    decoy.when(
+        engine_client.load_labware(
+            location=ModuleLocation(moduleId="subject-module-id"),
+            load_name="some_labware",
+            namespace="some_explicit_namespace",
+            version=9001,
+        )
+    ).then_return(
+        pe_commands.LoadLabwareResult(
+            labwareId="abc123",
+            definition=minimal_labware_def,
+            offsetId=None,
+        )
+    )
+    result = subject.load_labware(
+        name="some_labware",
+        namespace="some_explicit_namespace",
+        version=9001,
+    )
+    assert result == Labware(labware_id="abc123", engine_client=engine_client)
+
+
 @pytest.mark.xfail(strict=True, raises=NotImplementedError)
-def test_load_labware(subject: MagneticModuleContext) -> None:  # noqa: D103
-    subject.load_labware("my_load_name")
+def test_load_labware_with_label(  # noqa: D103
+    subject: MagneticModuleContext,
+) -> None:
+    subject.load_labware(name="some_load_name", label="some_label")
 
 
 @pytest.mark.xfail(strict=True, raises=NotImplementedError)

@@ -300,7 +300,10 @@ def test_load_magnetic_module(
     )
 
     result = subject.load_module(module_name=module_name, location="3")
-    assert result == module_contexts.MagneticModuleContext(module_id="abc123")
+    assert result == module_contexts.MagneticModuleContext(
+        engine_client=engine_client,
+        module_id="abc123",
+    )
 
 
 @pytest.mark.parametrize(
