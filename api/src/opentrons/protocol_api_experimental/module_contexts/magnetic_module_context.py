@@ -1,7 +1,7 @@
 """Protocol API interfaces for Magnetic Modules."""
 
 from enum import Enum
-from typing import Optional
+from typing import Optional, overload
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
@@ -53,6 +53,22 @@ class MagneticModuleContext:  # noqa: D101
     @property
     def labware(self) -> Optional[Labware]:  # noqa: D102
         raise NotImplementedError()
+
+    @overload
+    def engage(self) -> None:
+        ...
+
+    @overload
+    def engage(self, height: float) -> None:
+        ...
+
+    @overload
+    def engage(self, *, height_from_base: float) -> None:
+        ...
+
+    @overload
+    def engage(self, *, offset: float) -> None:
+        ...
 
     def engage(
         self,

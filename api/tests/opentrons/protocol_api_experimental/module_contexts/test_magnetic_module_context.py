@@ -40,18 +40,23 @@ def test_labware_property(subject: MagneticModuleContext) -> None:  # noqa: D103
 @pytest.mark.xfail(strict=True, raises=NotImplementedError)
 def test_engage(subject: MagneticModuleContext) -> None:  # noqa: D103
     subject.engage(10)
+    subject.engage(height=10)
+    subject.engage(height_from_base=10)
+    subject.engage(offset=10)
 
 
 def test_engage_only_one_height_allowed(subject: MagneticModuleContext) -> None:
     """It should raise if you provide conflicting height arguments."""
+    # The type-checker wants to stop us from miscalling this function, but
+    # we need to test that the function protects itself when there is no type-checker.
     with pytest.raises(InvalidMagnetEngageHeightError):
-        subject.engage(height=1, height_from_base=2, offset=3)
+        subject.engage(height=1, height_from_base=2, offset=3)  # type: ignore[call-overload]  # noqa: E501
     with pytest.raises(InvalidMagnetEngageHeightError):
-        subject.engage(height=1, height_from_base=2)
+        subject.engage(height=1, height_from_base=2)  # type: ignore[call-overload]
     with pytest.raises(InvalidMagnetEngageHeightError):
-        subject.engage(height=1, offset=3)
+        subject.engage(height=1, offset=3)  # type: ignore[call-overload]
     with pytest.raises(InvalidMagnetEngageHeightError):
-        subject.engage(height_from_base=2, offset=3)
+        subject.engage(height_from_base=2, offset=3)  # type: ignore[call-overload]
 
 
 @pytest.mark.xfail(strict=True, raises=NotImplementedError)
