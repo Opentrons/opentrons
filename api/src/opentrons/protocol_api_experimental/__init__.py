@@ -27,7 +27,12 @@ from .module_contexts import (
 )
 from .labware import Labware
 from .well import Well
-from .errors import InvalidPipetteNameError, InvalidMountError
+from .errors import (
+    InvalidPipetteNameError,
+    InvalidMountError,
+    InvalidModuleLocationError,
+    InvalidMagnetEngageHeightError,
+)
 from .types import (
     DeckSlotName,
     LabwareParameters,
@@ -43,6 +48,7 @@ __all__ = [
     "PipetteContext",
     "InstrumentContext",
     "MagneticModuleContext",
+    "MagneticModuleStatus",
     "TemperatureModuleContext",
     "ThermocyclerModuleContext",
     "Labware",
@@ -50,6 +56,8 @@ __all__ = [
     # Protocol API errors
     "InvalidPipetteNameError",
     "InvalidMountError",
+    "InvalidModuleLocationError",
+    "InvalidMagnetEngageHeightError",
     # Protocol API types and data classes
     "DeckSlotName",
     "LabwareParameters",

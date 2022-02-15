@@ -3,7 +3,10 @@
 
 import pytest
 
-from opentrons.protocol_api_experimental.module_contexts import MagneticModuleContext
+from opentrons.protocol_api_experimental import (
+    MagneticModuleContext,
+    InvalidMagnetEngageHeightError,
+)
 
 
 @pytest.fixture
@@ -46,13 +49,13 @@ def test_engage(subject: MagneticModuleContext) -> None:  # noqa: D103
 
 def test_engage_only_one_height_allowed(subject: MagneticModuleContext) -> None:
     """It should raise if you provide conflicting height arguments."""
-    with pytest.raises(ValueError):
+    with pytest.raises(InvalidMagnetEngageHeightError):
         subject.engage(height=1, height_from_base=2, offset=3)
-    with pytest.raises(ValueError):
+    with pytest.raises(InvalidMagnetEngageHeightError):
         subject.engage(height=1, height_from_base=2)
-    with pytest.raises(ValueError):
+    with pytest.raises(InvalidMagnetEngageHeightError):
         subject.engage(height=1, offset=3)
-    with pytest.raises(ValueError):
+    with pytest.raises(InvalidMagnetEngageHeightError):
         subject.engage(height_from_base=2, offset=3)
 
 

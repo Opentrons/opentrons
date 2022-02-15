@@ -3,9 +3,11 @@
 from enum import Enum
 from typing import Optional
 
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
+from opentrons.protocols.api_support.types import APIVersion
+
+from ..errors import InvalidMagnetEngageHeightError
 from ..labware import Labware
 
 
@@ -75,7 +77,7 @@ class MagneticModuleContext:  # noqa: D101
             arguments.
         """
         if len([a for a in [height, height_from_base, offset] if a is not None]) > 1:
-            raise ValueError(
+            raise InvalidMagnetEngageHeightError(
                 "You may only specify one of"
                 " `height`, `height_from_base`, and `offset`."
             )
