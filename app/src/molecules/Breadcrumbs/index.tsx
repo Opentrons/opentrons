@@ -5,7 +5,6 @@ import styled from 'styled-components'
 import {
   Box,
   Flex,
-  Icon,
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   COLORS,
@@ -13,6 +12,8 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
+import caret_right from '../../assets/images/caret_right.svg'
 
 export interface PathCrumb {
   pathSegment: string
@@ -61,7 +62,7 @@ export function Breadcrumbs({
           <Link key={crumb.pathSegment} to={linkPath}>
             <Crumb>
               <Box paddingRight={SPACING.spacing2}>{crumb.crumbName}</Box>
-              <Icon name="caret-right" width="0.25rem" height="0.3125rem" />
+              <img src={caret_right} />
             </Crumb>
           </Link>
         ) : (
