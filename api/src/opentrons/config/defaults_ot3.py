@@ -35,10 +35,10 @@ DEFAULT_MAX_SPEEDS: Final[ByPipetteKind[GeneralizeableAxisDict]] = ByPipetteKind
         "P": 500,
     },
     high_throughput={
-        "X": 500,
-        "Y": 500,
-        "Z": 500,
-        "P": 500,
+        "X": 200,
+        "Y": 200,
+        "Z": 200,
+        "P": 200,
     },
     low_throughput={
         "X": 500,
@@ -63,10 +63,10 @@ DEFAULT_ACCELERATIONS: Final[ByPipetteKind[GeneralizeableAxisDict]] = ByPipetteK
         "P": 10000,
     },
     high_throughput={
-        "X": 10000,
-        "Y": 10000,
-        "Z": 10000,
-        "P": 10000,
+        "X": 2000,
+        "Y": 2000,
+        "Z": 2000,
+        "P": 2000,
     },
     low_throughput={
         "X": 10000,
@@ -109,7 +109,7 @@ DEFAULT_MAX_SPEED_DISCONTINUITY: Final[
         "Y": 40,
     },
     gripper={
-        "Z": 40,
+        "Z": 30,
     },
 )
 

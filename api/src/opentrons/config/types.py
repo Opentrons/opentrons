@@ -1,5 +1,5 @@
 from enum import Enum
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, fields
 from typing import Dict, Tuple, TypeVar, Generic, List
 from typing_extensions import TypedDict, Literal
 
@@ -85,7 +85,7 @@ class RobotConfig:
 OT3Transform = List[List[float]]
 
 
-@dataclass
+@dataclass(frozen=True)
 class OT3SpeedSettings:
     default_max_speed: PerPipetteAxisSettings
     acceleration: PerPipetteAxisSettings
@@ -93,12 +93,14 @@ class OT3SpeedSettings:
     direction_change_speed_discontinuity: PerPipetteAxisSettings
 
     def by_pipette_kind(self, pipette_kind: PipetteKind) -> Dict[str, AxisDict]:
-        return {
-            'default_max_speed': self.default_max_speed.none,
-            'acceleration': self.acceleration.none,
-            'max_speed_discontinuity': self.max_speed_discontinuity.none,
-            'direction_change_speed_discontinuity': self.direction_change_speed_discontinuity.none
-        }
+        # create a shallow copy
+        base = dict((field.name, getattr(self, field.name)[PipetteKind.NONE]) for field in fields(self))
+        if pipette_kind is PipetteKind.NONE:
+            return base
+        for key in base.keys():
+            base[key].update(getattr(self, key)[pipette_kind])
+        return base
+        
 
 
 @dataclass
