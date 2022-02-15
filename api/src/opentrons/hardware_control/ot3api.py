@@ -145,7 +145,9 @@ class OT3API(
         self._transforms = build_ot3_transforms(self._config)
         self._pipette_kind = PipetteKind.NONE
         self._move_manager = MoveManager(
-            constraints=get_system_constraints(self._config, self._pipette_kind)
+            constraints=get_system_constraints(
+                self._config.speed_settings, self._pipette_kind
+            )
         )
 
         ExecutionManagerProvider.__init__(self, loop, isinstance(backend, OT3Simulator))

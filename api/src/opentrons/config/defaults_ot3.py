@@ -6,6 +6,7 @@ from .types import (
     OT3Config,
     ByPipetteKind,
     GeneralizeableAxisDict,
+    OT3SpeedSettings,
     OT3Transform,
     Offset,
 )
@@ -260,19 +261,21 @@ def build_with_defaults(robot_settings: Dict[str, Any]) -> OT3Config:
         version=ROBOT_CONFIG_VERSION,
         name=robot_settings.get("name", "Grace Hopper"),
         log_level=robot_settings.get("log_level", DEFAULT_LOG_LEVEL),
-        default_max_speed=_build_default_bpk(
-            robot_settings.get("default_max_speed", {}), DEFAULT_MAX_SPEEDS
-        ),
-        acceleration=_build_default_bpk(
-            robot_settings.get("acceleration", {}), DEFAULT_ACCELERATIONS
-        ),
-        max_speed_discontinuity=_build_default_bpk(
-            robot_settings.get("max_speed_discontinuity", {}),
-            DEFAULT_MAX_SPEED_DISCONTINUITY,
-        ),
-        direction_change_speed_discontinuity=_build_default_bpk(
-            robot_settings.get("direction_change_speed_discontinuity", {}),
-            DEFAULT_DIRECTION_CHANGE_SPEED_DISCONTINUITY,
+        speed_settings=OT3SpeedSettings(
+            default_max_speed=_build_default_bpk(
+                robot_settings.get("default_max_speed", {}), DEFAULT_MAX_SPEEDS
+            ),
+            acceleration=_build_default_bpk(
+                robot_settings.get("acceleration", {}), DEFAULT_ACCELERATIONS
+            ),
+            max_speed_discontinuity=_build_default_bpk(
+                robot_settings.get("max_speed_discontinuity", {}),
+                DEFAULT_MAX_SPEED_DISCONTINUITY,
+            ),
+            direction_change_speed_discontinuity=_build_default_bpk(
+                robot_settings.get("direction_change_speed_discontinuity", {}),
+                DEFAULT_DIRECTION_CHANGE_SPEED_DISCONTINUITY,
+            ),
         ),
         holding_current=_build_default_bpk(
             robot_settings.get("holding_current", {}), DEFAULT_HOLDING_CURRENT

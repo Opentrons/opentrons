@@ -86,15 +86,28 @@ OT3Transform = List[List[float]]
 
 
 @dataclass
+class OT3SpeedSettings:
+    default_max_speed: PerPipetteAxisSettings
+    acceleration: PerPipetteAxisSettings
+    max_speed_discontinuity: PerPipetteAxisSettings
+    direction_change_speed_discontinuity: PerPipetteAxisSettings
+
+    def by_pipette_kind(self, pipette_kind: PipetteKind) -> Dict[str, AxisDict]:
+        return {
+            'default_max_speed': self.default_max_speed.none,
+            'acceleration': self.acceleration.none,
+            'max_speed_discontinuity': self.max_speed_discontinuity.none,
+            'direction_change_speed_discontinuity': self.direction_change_speed_discontinuity.none
+        }
+
+
+@dataclass
 class OT3Config:
     model: Literal["OT-3 Standard"]
     name: str
     version: int
     log_level: str
-    default_max_speed: PerPipetteAxisSettings
-    acceleration: PerPipetteAxisSettings
-    max_speed_discontinuity: PerPipetteAxisSettings
-    direction_change_speed_discontinuity: PerPipetteAxisSettings
+    speed_settings: OT3SpeedSettings
     holding_current: PerPipetteAxisSettings
     normal_motion_current: PerPipetteAxisSettings
     z_retract_distance: float
