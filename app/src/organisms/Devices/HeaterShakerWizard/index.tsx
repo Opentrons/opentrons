@@ -42,8 +42,8 @@ export const HeaterShakerWizard = (
         buttonContent = t('btn_continue_attachment_guide')
         return (
           <Introduction
-            labwareDefinition="plate"
-            thermalAdapterName="adapter"
+          //  TODO immediately: get labwareDefinition2 of labware on top of heater shaker (nestedLabwareDef from moduleRenderInfoById)
+          //  TODO Immediately: get adapter name and image - would this be connected to nestedLabwareDefinition?
           />
         )
       case 1:
