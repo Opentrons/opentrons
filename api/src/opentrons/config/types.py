@@ -92,15 +92,19 @@ class OT3SpeedSettings:
     max_speed_discontinuity: PerPipetteAxisSettings
     direction_change_speed_discontinuity: PerPipetteAxisSettings
 
-    def by_pipette_kind(self, pipette_kind: PipetteKind) -> Dict[str, AxisDict]:
+    def by_pipette_kind(
+        self, pipette_kind: PipetteKind
+    ) -> Dict[str, GeneralizeableAxisDict]:
         # create a shallow copy
-        base = dict((field.name, getattr(self, field.name)[PipetteKind.NONE]) for field in fields(self))
+        base = dict(
+            (field.name, getattr(self, field.name)[PipetteKind.NONE])
+            for field in fields(self)
+        )
         if pipette_kind is PipetteKind.NONE:
             return base
         for key in base.keys():
             base[key].update(getattr(self, key)[pipette_kind])
         return base
-        
 
 
 @dataclass

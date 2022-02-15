@@ -1,6 +1,4 @@
 """Shared utilities for ot3 hardware control."""
-
-from email.policy import default
 from typing import Dict, Iterable, List, Tuple
 from typing_extensions import Literal
 from opentrons.config.types import OT3SpeedSettings, PipetteKind
@@ -103,14 +101,14 @@ def _constraint_name_from_axis(ax: "AxisNames") -> Literal["X", "Y", "Z", "P"]:
 def get_system_constraints(
     config: OT3SpeedSettings, pipette_kind: PipetteKind
 ) -> Dict["AxisNames", "AxisConstraints"]:
+    conf_by_pip = config.by_pipette_kind(pipette_kind)
     constraints = {}
-    conf = config.speed_settings.by_pipette_kind(pipette_kind)
     for axis in AXIS_NAMES:
         constraint_name = _constraint_name_from_axis(axis)
         constraints[axis] = AxisConstraints.build(
-            conf['acceleration'][constraint_name],
-            conf['max_speed_discontinuity'][constraint_name],
-            conf['direction_change_speed_discontinuity'][constraint_name],
+            conf_by_pip["acceleration"][constraint_name],
+            conf_by_pip["max_speed_discontinuity"][constraint_name],
+            conf_by_pip["direction_change_speed_discontinuity"][constraint_name],
         )
     return constraints
 

@@ -182,7 +182,7 @@ class OT3API(
     def pipette_kind(self, pipette_kind: PipetteKind):
         self._pipette_kind = pipette_kind
         self._move_manager.update_constraints(
-            get_system_constraints(self._config, pipette_kind)
+            get_system_constraints(self._config.speed_settings, pipette_kind)
         )
 
     def _update_door_state(self, door_state: DoorState):
@@ -711,7 +711,7 @@ class OT3API(
         # TODO: (2022-02-10) Use actual max speed for MoveTarget
         checked_speed = speed or 500
         self._move_manager.update_constraints(
-            get_system_constraints(self._config, self._pipette_kind)
+            get_system_constraints(self._config.speed_settings, self._pipette_kind)
         )
         move_target = MoveTarget.build(
             position=Coordinates(**machine_pos), max_speed=checked_speed
