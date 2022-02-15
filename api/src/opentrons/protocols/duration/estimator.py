@@ -172,7 +172,7 @@ class DurationEstimator:
         elif message_name == types.COMMENT:
             pass
         elif message_name == types.AIR_GAP:
-            #calls Types.Asirate so it is covevered
+            # passed
             pass
 
         else:
@@ -182,23 +182,19 @@ class DurationEstimator:
             )
         return duration
 
-
     def on_move_to(self, payload) -> float:
         # What does this do:
         # It takes the instrument, location, previous, and current deck slot.
         # it then takes the amount of time it would to move from deck slot to deck slot in the x and y
-        # So far we don't have a sophisticated way of tracking the z axis movements. 
-        
-        # Set up 
-
+        # So far we don't have a sophisticated way of tracking the z axis movements.
+        # Set up
         instrument = payload["instrument"]
-        instrument[]
         # now lets handle the aspiration z-axis code.
         location = payload["location"]
         prev_slot = self._last_deckslot
         curr_slot = self.get_slot(location)
         gantry_speed = instrument.default_speed
-        
+
         # calculate time for movement in the x and y
         deck_travel_time = self.calc_deck_movement_time(
             self._deck, curr_slot, prev_slot, gantry_speed
@@ -210,7 +206,7 @@ class DurationEstimator:
             location.labware.parent.parent.is_module, gantry_speed
         )
 
-        duration = deck_travel_time+ z_total_time
+        duration = deck_travel_time + z_total_time
 
         logger.info(
             f"{instrument.name} moved to slot "
