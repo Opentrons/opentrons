@@ -20,6 +20,11 @@ This code is totally unsupported. To do science on a robot, use the stable
 from .protocol_context import ProtocolContext
 from .pipette_context import PipetteContext
 from .instrument_context import InstrumentContext
+from .module_contexts import (
+    MagneticModuleContext,
+    TemperatureModuleContext,
+    ThermocyclerModuleContext,
+)
 from .labware import Labware
 from .well import Well
 from .errors import InvalidPipetteNameError, InvalidMountError
@@ -37,6 +42,9 @@ __all__ = [
     "ProtocolContext",
     "PipetteContext",
     "InstrumentContext",
+    "MagneticModuleContext",
+    "TemperatureModuleContext",
+    "ThermocyclerModuleContext",
     "Labware",
     "Well",
     # Protocol API errors
