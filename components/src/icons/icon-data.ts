@@ -412,8 +412,6 @@ export const ICON_DATA_BY_NAME = {
   },
   'caret-right': {
     viewBox: '0 0 4 5',
-    path: 'M1 0.5L3 2.5L1 4.5',
-    fill: 'none',
-    stroke: 'currentColor',
+    path: 'M1.4,4.9L0.6,4.1l1.6-1.6L0.6,0.9l0.7-0.7l2.4,2.4L1.4,4.9z',
   },
 }
