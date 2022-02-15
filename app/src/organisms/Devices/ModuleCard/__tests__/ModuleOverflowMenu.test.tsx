@@ -10,15 +10,21 @@ import {
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 import { MagneticModuleSlideout } from '../MagneticModuleSlideout'
 import { TemperatureModuleSlideout } from '../TemperatureModuleSlideout'
+import { ThermocyclerModuleSlideout } from '../ThermocyclerModuleSlideout'
 
 jest.mock('../MagneticModuleSlideout')
 jest.mock('../TemperatureModuleSlideout')
+jest.mock('../ThermocyclerModuleSlideout')
 
 const mockMagneticModuleSlideout = MagneticModuleSlideout as jest.MockedFunction<
   typeof MagneticModuleSlideout
 >
 const mockTemperatureModuleSlideout = TemperatureModuleSlideout as jest.MockedFunction<
   typeof TemperatureModuleSlideout
+>
+
+const mockThermocyclerModuleSlideout = ThermocyclerModuleSlideout as jest.MockedFunction<
+  typeof ThermocyclerModuleSlideout
 >
 
 const render = (props: React.ComponentProps<typeof ModuleOverflowMenu>) => {
@@ -38,6 +44,9 @@ describe('ModuleOverflowMenu', () => {
     )
     mockTemperatureModuleSlideout.mockReturnValue(
       <div>Mock temperature module slideout</div>
+    )
+    mockThermocyclerModuleSlideout.mockReturnValue(
+      <div>Mock thermocycler module slideout</div>
     )
   })
   afterEach(() => {

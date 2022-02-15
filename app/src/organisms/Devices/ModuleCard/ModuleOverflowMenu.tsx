@@ -5,11 +5,15 @@ import {
   DIRECTION_COLUMN,
   POSITION_RELATIVE,
 } from '@opentrons/components'
-import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
+import {
+  THERMOCYCLER_MODULE_TYPE,
+  MAGNETIC_MODULE_TYPE,
+} from '@opentrons/shared-data'
 import { OverflowMenu } from '../../../atoms/OverflowMenu'
 import { OverflowMenuBtn } from '../../../atoms/OverflowMenu/OverflowMenuBtn'
 import { MagneticModuleSlideout } from './MagneticModuleSlideout'
 import { TemperatureModuleSlideout } from './TemperatureModuleSlideout'
+import { ThermocyclerModuleSlideout } from './ThermocyclerModuleSlideout'
 
 import type { AttachedModule } from '../../../redux/modules/types'
 
@@ -23,63 +27,86 @@ export const ModuleOverflowMenu = (
   const { t } = useTranslation('device_details')
   const { module } = props
   const [showSlideout, setShowSlideout] = React.useState(false)
+  const [hasSecondary, setHasSecondary] = React.useState(false)
 
-  let setSetting: string = ''
-  let turnOffSetting: string = ''
-  let slideout = <div></div>
-
-  switch (module.type) {
-    case 'magneticModuleType': {
-      setSetting = t('overflow_menu_engage')
-      //  TODO immediately: add functionality to turnOffSetting once slideouts are complete
-      turnOffSetting = t('overflow_menu_disengage')
-      slideout = (
+  const renderSlideOut = (isSecondary: boolean = false): JSX.Element => {
+    if (module.type === THERMOCYCLER_MODULE_TYPE) {
+      return (
+        <ThermocyclerModuleSlideout
+          module={module}
+          isExpanded={showSlideout}
+          isSecondaryTemp={isSecondary}
+        />
+      )
+    } else if (module.type === MAGNETIC_MODULE_TYPE) {
+      return (
         <MagneticModuleSlideout module={module} isExpanded={showSlideout} />
       )
-      break
-    }
-    case 'temperatureModuleType': {
-      setSetting = t('overflow_menu_mod_temp')
-      turnOffSetting = t('overflow_menu_deactivate_temp')
-      slideout = (
+    } else {
+      return (
         <TemperatureModuleSlideout
           model={module.model}
           serial={module.serial}
           isExpanded={showSlideout}
         />
       )
-      break
-    }
-    case 'thermocyclerModuleType': {
-      setSetting = t('overflow_menu_lid_temp')
-      turnOffSetting = t('overflow_menu_set_block_temp')
-      slideout = (
-        //  TODO immediately: attach actual slideout!
-        <div></div>
-      )
-      break
     }
   }
+
+  const menuItems = {
+    thermocyclerModuleType: [
+      {
+        setSetting: t('overflow_menu_lid_temp'),
+        turnOffSetting: t('overflow_menu_deactivate_block'),
+        isSecondary: true,
+      },
+      {
+        setSetting: t('overflow_menu_set_block_temp'),
+        turnOffSetting: t('overflow_menu_deactivate_block'),
+        isSecondary: false,
+      },
+    ],
+    temperatureModuleType: [
+      {
+        setSetting: t('overflow_menu_mod_temp'),
+        turnOffSetting: t('overflow_menu_deactivate_temp'),
+        isSecondary: false,
+      },
+    ],
+    magneticModuleType: [
+      {
+        setSetting: t('overflow_menu_engage'),
+        turnOffSetting: t('overflow_menu_deactivate_temp'),
+        isSecondary: false,
+      },
+    ],
+  }
+
+  const handleClick = (isSecondary: boolean = false): void => {
+    if (isSecondary) {
+      setHasSecondary(true)
+    }
+    setShowSlideout(true)
+  }
+
   return (
     <React.Fragment>
-      {showSlideout && slideout}
+      {showSlideout && renderSlideOut(hasSecondary)}
       <Flex position={POSITION_RELATIVE}>
         <OverflowMenu>
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <OverflowMenuBtn
-              onClick={() => setShowSlideout(true)}
-              data-testid={`module_setting_${module.model}`}
-            >
-              {setSetting ?? turnOffSetting}
-            </OverflowMenuBtn>
-            {module.type === THERMOCYCLER_MODULE_TYPE ? (
-              <OverflowMenuBtn
-                onClick={() => setShowSlideout(true)}
-                data-testid={`thermo_block_setting_${module.model}`}
-              >
-                {t('overflow_menu_set_block_temp')}
-              </OverflowMenuBtn>
-            ) : null}
+            {menuItems[module.type].map((item, index) => {
+              return (
+                <OverflowMenuBtn
+                  key={index}
+                  onClick={() => handleClick(item.isSecondary)}
+                  data-testid={`module_setting_${module.model}`}
+                >
+                  {/* TODO(sh, 2022-02-11): conditionally render deactivate setting based on module status and pass the required commands. */}
+                  {item.setSetting}
+                </OverflowMenuBtn>
+              )
+            })}
             <OverflowMenuBtn
               data-testid={`about_module_${module.model}`}
               //  TODO immediately - add actual module overflow menu
