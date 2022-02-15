@@ -22,20 +22,24 @@ const PROTOCOL_LIBRARY_URL = 'https://protocols.opentrons.com'
 const PROTOCOL_DESIGNER_URL = 'https://designer.opentrons.com'
 const API_DOCS_URL = 'https://docs.opentrons.com/v2/'
 
-export function EmptyStateLinks(): JSX.Element | null {
+interface Props {
+  title?: string
+}
+
+export function EmptyStateLinks(props: Props): JSX.Element | null {
   const { t } = useTranslation('protocol_info')
 
   return (
     <Flex
-      width="100%"
       flexDirection={DIRECTION_COLUMN}
       alignItems={ALIGN_CENTER}
       position={POSITION_ABSOLUTE}
       bottom="0"
       paddingBottom={SPACING_3}
+      width="96.5%"
     >
       <Text role="complementary" as="h5" marginBottom={SPACING_2}>
-        {t('no_protocol_yet')}
+        {props.title}
       </Text>
       <Flex justifyContent={JUSTIFY_START} flexDirection={DIRECTION_ROW}>
         <Link

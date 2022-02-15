@@ -34,6 +34,8 @@ const EXPANDED_STYLE = css`
   animation-name: slidein;
   overflow: hidden;
   width: 19.5rem;
+  max-width: 19.5rem;
+  height: 100%;
 
   @keyframes slidein {
     from {
