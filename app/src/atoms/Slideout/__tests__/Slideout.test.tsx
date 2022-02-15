@@ -12,11 +12,13 @@ const render = (props: React.ComponentProps<typeof Slideout>) => {
 
 describe('Slideout', () => {
   let props: React.ComponentProps<typeof Slideout>
+  const mockOnClick = jest.fn()
   beforeEach(() => {
     props = {
       title: 'Set Engage Height for Magnetic Module GEN1',
       children: <div>Mock Children</div>,
       isExpanded: true,
+      onCloseClick: mockOnClick,
     }
   })
   afterEach(() => {
@@ -35,6 +37,6 @@ describe('Slideout', () => {
     const button = getByRole('button', { name: /exit/i })
     expect(button).toBeEnabled()
     fireEvent.click(button)
-    expect(button).not.toBeInTheDocument()
+    expect(mockOnClick).toHaveBeenCalledTimes(1)
   })
 })

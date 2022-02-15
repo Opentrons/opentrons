@@ -34,19 +34,25 @@ export const ModuleOverflowMenu = (
       return (
         <ThermocyclerModuleSlideout
           module={module}
+          onCloseClick={() => setShowSlideout(false)}
           isExpanded={showSlideout}
           isSecondaryTemp={isSecondary}
         />
       )
     } else if (module.type === MAGNETIC_MODULE_TYPE) {
       return (
-        <MagneticModuleSlideout module={module} isExpanded={showSlideout} />
+        <MagneticModuleSlideout
+          module={module}
+          onCloseClick={() => setShowSlideout(false)}
+          isExpanded={showSlideout}
+        />
       )
     } else {
       return (
         <TemperatureModuleSlideout
           model={module.model}
           serial={module.serial}
+          onCloseClick={() => setShowSlideout(false)}
           isExpanded={showSlideout}
         />
       )

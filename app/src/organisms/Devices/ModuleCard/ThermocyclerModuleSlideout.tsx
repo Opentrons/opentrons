@@ -23,6 +23,7 @@ import { getModuleDisplayName } from '@opentrons/shared-data'
 
 interface ThermocyclerModuleSlideoutProps {
   module: AttachedModule
+  onCloseClick: () => unknown
   isExpanded: boolean
   isSecondaryTemp?: boolean
 }
@@ -30,7 +31,7 @@ interface ThermocyclerModuleSlideoutProps {
 export const ThermocyclerModuleSlideout = (
   props: ThermocyclerModuleSlideoutProps
 ): JSX.Element | null => {
-  const { module, isExpanded, isSecondaryTemp } = props
+  const { module, onCloseClick, isExpanded, isSecondaryTemp } = props
   const { t } = useTranslation('device_details')
   const [tempValue, setTempValue] = React.useState<string | null>(null)
   const sendModuleCommand = useSendModuleCommand()
@@ -53,6 +54,7 @@ export const ThermocyclerModuleSlideout = (
   return (
     <Slideout
       title={t('tc_set_temperature', { part: modulePart, name: moduleName })}
+      onCloseClick={onCloseClick}
       isExpanded={isExpanded}
     >
       <React.Fragment>

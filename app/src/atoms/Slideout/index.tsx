@@ -23,6 +23,7 @@ import { Divider } from '../structure'
 interface Props {
   title: string
   children: React.ReactNode
+  onCloseClick: () => unknown
   //  isExpanded is for collapse and expand animation
   isExpanded?: boolean
 }
@@ -64,10 +65,6 @@ const COLLAPSED_STYLE = css`
 `
 
 export const Slideout = (props: Props): JSX.Element | null => {
-  const [hideSlideOut, setHideSlideOut] = React.useState(false)
-
-  if (hideSlideOut) return null
-
   return (
     <>
       <Box
@@ -94,7 +91,7 @@ export const Slideout = (props: Props): JSX.Element | null => {
             <Flex alignItems={ALIGN_CENTER}>
               <Btn
                 size={TYPOGRAPHY.lineHeight24}
-                onClick={() => setHideSlideOut(true)}
+                onClick={props.onCloseClick}
                 aria-label="exit"
                 data-testid={`Slideout_icon_close_${props.title}`}
               >
