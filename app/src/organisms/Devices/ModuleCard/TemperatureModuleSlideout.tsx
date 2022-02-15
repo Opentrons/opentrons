@@ -25,13 +25,14 @@ import { Slideout } from '../../../atoms/Slideout'
 interface TemperatureModuleSlideoutProps {
   model: typeof TEMPERATURE_MODULE_V1 | typeof TEMPERATURE_MODULE_V2
   serial: string
+  onCloseClick: () => unknown
   isExpanded: boolean
 }
 
 export const TemperatureModuleSlideout = (
   props: TemperatureModuleSlideoutProps
 ): JSX.Element | null => {
-  const { model, isExpanded, serial } = props
+  const { model, onCloseClick, isExpanded, serial } = props
   const { t } = useTranslation('device_details')
   const sendModuleCommand = useSendModuleCommand()
   const name = getModuleDisplayName(model)
@@ -49,6 +50,7 @@ export const TemperatureModuleSlideout = (
   return (
     <Slideout
       title={t('tempdeck_slideout_title', { name: name })}
+      onCloseClick={onCloseClick}
       isExpanded={isExpanded}
     >
       <React.Fragment>

@@ -39,6 +39,7 @@ describe('ThermocyclerModuleSlideout', () => {
       module: mockThermocycler,
       isSecondaryTemp: true,
       isExpanded: true,
+      onCloseClick: jest.fn(),
     }
     const { getByText } = render(props)
 
@@ -55,6 +56,7 @@ describe('ThermocyclerModuleSlideout', () => {
       module: mockThermocycler,
       isSecondaryTemp: false,
       isExpanded: true,
+      onCloseClick: jest.fn(),
     }
     const { getByText } = render(props)
 
@@ -71,6 +73,7 @@ describe('ThermocyclerModuleSlideout', () => {
       module: mockThermocycler,
       isSecondaryTemp: false,
       isExpanded: true,
+      onCloseClick: jest.fn(),
     }
     const { getByRole } = render(props)
     const button = getByRole('button', { name: 'Set Block Temperature' })
@@ -90,6 +93,7 @@ describe('ThermocyclerModuleSlideout', () => {
       module: mockThermocycler,
       isSecondaryTemp: true,
       isExpanded: true,
+      onCloseClick: jest.fn(),
     }
     const { getByRole } = render(props)
     const button = getByRole('button', { name: 'Set Lid Temperature' })
