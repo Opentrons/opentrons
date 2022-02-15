@@ -25,7 +25,7 @@ class MagneticModuleStatus(str, Enum):
 
 
 class MagneticModuleContext:  # noqa: D101
-    # TODO(mc, 2022-02-09): copy or rewrite docstring from
+    # TODO(mc, 2022-02-09): copy or rewrite docstrings from
     # src/opentrons/protocol_api/module_contexts.py
 
     def __init__(self, module_id: str) -> None:
@@ -33,29 +33,25 @@ class MagneticModuleContext:  # noqa: D101
 
     # todo(mm, 2022-02-15): This public method returns an internal, undocumented type.
     @property
-    def api_version(self) -> APIVersion:
-        """See APIv2 docstring."""
+    def api_version(self) -> APIVersion:  # noqa: D102
         raise NotImplementedError()
 
-    def load_labware(
+    def load_labware(  # noqa: D102
         self,
         name: str,
         label: Optional[str] = None,
         namespace: Optional[str] = None,
         version: int = 1,
     ) -> Labware:
-        """See APIv2 docstring."""
         raise NotImplementedError()
 
-    def load_labware_from_definition(
+    def load_labware_from_definition(  # noqa: D102
         self, definition: LabwareDefinition, label: Optional[str] = None
     ) -> Labware:
-        """See APIv2 docstring."""
         raise NotImplementedError()
 
     @property
-    def labware(self) -> Optional[Labware]:
-        """See APIv2 docstring."""
+    def labware(self) -> Optional[Labware]:  # noqa: D102
         raise NotImplementedError()
 
     def engage(
@@ -65,8 +61,7 @@ class MagneticModuleContext:  # noqa: D101
         height_from_base: Optional[float] = None,
         offset: Optional[float] = None,
     ) -> None:
-        """See APIv2 docstring.
-
+        """
         .. versionchanged:: 3.0
             An error is now raised if you provide more than one of
             ``height``, ``height_from_base``, and ``offset``.
@@ -75,7 +70,7 @@ class MagneticModuleContext:  # noqa: D101
         .. versionchanged:: 3.0
             You must now specify ``height_from_base`` and ``offset`` as keyword
             arguments.
-        """
+        """  # noqa: D205,D212,D415
         if len([a for a in [height, height_from_base, offset] if a is not None]) > 1:
             raise InvalidMagnetEngageHeightError(
                 "You may only specify one of"
@@ -84,23 +79,20 @@ class MagneticModuleContext:  # noqa: D101
 
         raise NotImplementedError()
 
-    def disengage(self) -> None:
-        """See APIv2 docstring."""
+    def disengage(self) -> None:  # noqa: D102
         raise NotImplementedError()
 
     @property
-    def status(self) -> MagneticModuleStatus:
-        """See APIv2 docstring."""
+    def status(self) -> MagneticModuleStatus:  # noqa: D102
         raise NotImplementedError()
 
     # todo(mm, 2021-02-15): Does anyone internal or external
     # use calibrate() in APIv2? Can we remove it from APIv3?
-    def calibrate(self) -> None:
-        """See APIv2 docstring."""
+    def calibrate(self) -> None:  # noqa: D102
         raise NotImplementedError()
 
     def __hash__(self) -> int:
-        """Get hash.
+        """Return a hash.
 
         Uses the module instance's unique identifier in protocol state.
         """
