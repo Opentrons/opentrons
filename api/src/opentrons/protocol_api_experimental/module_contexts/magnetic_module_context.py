@@ -1,12 +1,19 @@
 """Protocol API interfaces for Magnetic Modules."""
 
+from enum import Enum
 from typing import Optional
-from typing_extensions import Literal
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from ..labware import Labware
+
+
+class MagneticModuleStatus(str, Enum):
+    """The status of a Temperature Module's magnets."""
+
+    ENGAGED = "engaged"
+    DISENGAGED = "disengaged"
 
 
 class MagneticModuleContext:  # noqa: D101
@@ -80,7 +87,7 @@ class MagneticModuleContext:  # noqa: D101
         raise NotImplementedError()
 
     @property
-    def status(self) -> Literal["engaged", "disengaged"]:
+    def status(self) -> MagneticModuleStatus:
         """See APIv2 docstring."""
         raise NotImplementedError()
 
