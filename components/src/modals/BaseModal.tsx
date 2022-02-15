@@ -49,6 +49,8 @@ export interface BaseModalProps extends StyleProps {
   overlayColor?: string
   /** Optional sticky header */
   header?: React.ReactNode
+  /** Option to turn off headerStyles */
+  noHeaderStyles?: boolean
   /** Optional sticky footer */
   footer?: React.ReactNode
   /** Modal content */
@@ -71,13 +73,16 @@ export function BaseModal(props: BaseModalProps): JSX.Element {
     header,
     footer,
     children,
+    noHeaderStyles,
     ...styleProps
   } = props
+
+  const headerStyle = props.noHeaderStyles === true ? null : HEADER_STYLE
 
   return (
     <Flex {...BASE_STYLE} backgroundColor={overlayColor} zIndex={zIndex}>
       <Box {...MODAL_STYLE} {...styleProps}>
-        {header != null ? <Box {...HEADER_STYLE}>{header}</Box> : null}
+        {header != null ? <Box {...headerStyle}>{header}</Box> : null}
         <Box {...CONTENT_STYLE}>{children}</Box>
         {footer != null ? <Box {...FOOTER_STYLE}>{footer}</Box> : null}
       </Box>
