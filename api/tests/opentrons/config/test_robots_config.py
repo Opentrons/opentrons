@@ -5,7 +5,7 @@ import os
 import pytest
 
 from opentrons.config import CONFIG, robot_configs, defaults_ot2, defaults_ot3
-from opentrons.config.types import CurrentDict, PipetteKind, OT3Config
+from opentrons.config.types import CurrentDict, GantryLoad, OT3Config
 from opentrons.hardware_control.types import BoardRevision
 
 legacy_dummy_settings = {
@@ -94,7 +94,7 @@ ot3_dummy_settings = {
     "name": "Marie Curie",
     "model": "OT-3 Standard",
     "version": 1,
-    "speed_settings": {
+    "motion_settings": {
         "acceleration": {
             "none": {"X": 3, "Y": 2, "Z": 15, "P": 2},
             "low_throughput": {
@@ -268,20 +268,20 @@ def test_load_per_pipette_vals():
 
     # some dicts not formatted right
     mostly_right = defaults_ot3.serialize(defaults_ot3.build_with_defaults({}))
-    del mostly_right["speed_settings"]["acceleration"]["low_throughput"]
+    del mostly_right["motion_settings"]["acceleration"]["low_throughput"]
     assert (
         defaults_ot3._build_default_bpk(
-            mostly_right["speed_settings"]["acceleration"],
+            mostly_right["motion_settings"]["acceleration"],
             defaults_ot3.DEFAULT_ACCELERATIONS,
         ).low_throughput
         == defaults_ot3.DEFAULT_ACCELERATIONS.low_throughput
     )
 
     # altered values aare preserved
-    mostly_right["speed_settings"]["acceleration"]["high_throughput"]["X"] -= 2
+    mostly_right["motion_settings"]["acceleration"]["high_throughput"]["X"] -= 2
     assert (
         defaults_ot3._build_default_bpk(
-            mostly_right["speed_settings"]["acceleration"],
+            mostly_right["motion_settings"]["acceleration"],
             defaults_ot3.DEFAULT_ACCELERATIONS,
         ).high_throughput["X"]
         == defaults_ot3.DEFAULT_ACCELERATIONS.high_throughput["X"] - 2
@@ -291,10 +291,10 @@ def test_load_per_pipette_vals():
     altered_default = copy.deepcopy(defaults_ot3.DEFAULT_ACCELERATIONS)
     altered_default.two_low_throughput.pop("X", None)
 
-    mostly_right["speed_settings"]["acceleration"]["two_low_throughput"]["X"] = -72
+    mostly_right["motion_settings"]["acceleration"]["two_low_throughput"]["X"] = -72
     assert (
         defaults_ot3._build_default_bpk(
-            mostly_right["speed_settings"]["acceleration"], altered_default
+            mostly_right["motion_settings"]["acceleration"], altered_default
         ).two_low_throughput["X"]
         == -72
     )
@@ -374,12 +374,12 @@ def test_load_transform_vals():
     ) == [[1, 2, 3], [1, 2, 3], [1, 2, 3]]
 
 
-def test_speed_settings_dataclass():
+def test_motion_settings_dataclass():
     built_config = robot_configs.build_config(ot3_dummy_settings)
     assert isinstance(built_config, OT3Config)
-    speed_settings = built_config.speed_settings
+    motion_settings = built_config.motion_settings
 
-    none_setting = speed_settings.by_pipette_kind(PipetteKind.NONE)
+    none_setting = motion_settings.by_gantry_load(GantryLoad.NONE)
     assert none_setting["acceleration"] == {"X": 3, "Y": 2, "Z": 15, "P": 2}
     assert none_setting["default_max_speed"] == {"X": 1, "Y": 2, "Z": 3, "P": 4}
     assert none_setting["max_speed_discontinuity"] == {
@@ -395,7 +395,7 @@ def test_speed_settings_dataclass():
         "P": 20,
     }
 
-    gripper_setting = speed_settings.by_pipette_kind(PipetteKind.GRIPPER)
+    gripper_setting = motion_settings.by_gantry_load(GantryLoad.GRIPPER)
     assert gripper_setting["acceleration"] == {"X": 3, "Y": 2, "Z": 2.8, "P": 2}
     assert gripper_setting["default_max_speed"] == {"X": 1, "Y": 2, "Z": 2.8, "P": 4}
     assert gripper_setting["max_speed_discontinuity"] == {
@@ -411,7 +411,7 @@ def test_speed_settings_dataclass():
         "P": 20,
     }
 
-    two_low_setting = speed_settings.by_pipette_kind(PipetteKind.TWO_LOW_THROUGHPUT)
+    two_low_setting = motion_settings.by_gantry_load(GantryLoad.TWO_LOW_THROUGHPUT)
     assert two_low_setting["acceleration"] == {"X": 1.1, "Y": 2.2, "Z": 15, "P": 2}
     assert two_low_setting["default_max_speed"] == {"X": 4, "Y": 3, "Z": 2, "P": 1}
     assert two_low_setting["max_speed_discontinuity"] == {

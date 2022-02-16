@@ -1,7 +1,7 @@
 """Shared utilities for ot3 hardware control."""
 from typing import Dict, Iterable, List, Tuple
 from typing_extensions import Literal
-from opentrons.config.types import OT3SpeedSettings, PipetteKind
+from opentrons.config.types import OT3MotionSettings, GantryLoad
 
 try:
     from opentrons_ot3_firmware.constants import NodeId
@@ -99,9 +99,9 @@ def _constraint_name_from_axis(ax: "AxisNames") -> Literal["X", "Y", "Z", "P"]:
 
 
 def get_system_constraints(
-    config: OT3SpeedSettings, pipette_kind: PipetteKind
+    config: OT3MotionSettings, gantry_load: GantryLoad
 ) -> Dict["AxisNames", "AxisConstraints"]:
-    conf_by_pip = config.by_pipette_kind(pipette_kind)
+    conf_by_pip = config.by_gantry_load(gantry_load)
     constraints = {}
     for axis in AXIS_NAMES:
         constraint_name = _constraint_name_from_axis(axis)

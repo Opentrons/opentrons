@@ -4,9 +4,9 @@ from dataclasses import asdict
 
 from .types import (
     OT3Config,
-    ByPipetteKind,
+    ByGantryLoad,
     GeneralizeableAxisDict,
-    OT3SpeedSettings,
+    OT3MotionSettings,
     OT3Transform,
     Offset,
 )
@@ -27,7 +27,7 @@ DEFAULT_RIGHT_MOUNT_OFFSET: Final[Offset] = (33, -63.05, 256.175)
 DEFAULT_GRIPPER_MOUNT_OFFSET: Final[Offset] = (-50.0, 0.0, 0.0)
 DEFAULT_Z_RETRACT_DISTANCE: Final = 2
 
-DEFAULT_MAX_SPEEDS: Final[ByPipetteKind[GeneralizeableAxisDict]] = ByPipetteKind(
+DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[GeneralizeableAxisDict]] = ByGantryLoad(
     none={
         "X": 500,
         "Y": 500,
@@ -55,7 +55,7 @@ DEFAULT_MAX_SPEEDS: Final[ByPipetteKind[GeneralizeableAxisDict]] = ByPipetteKind
     },
 )
 
-DEFAULT_ACCELERATIONS: Final[ByPipetteKind[GeneralizeableAxisDict]] = ByPipetteKind(
+DEFAULT_ACCELERATIONS: Final[ByGantryLoad[GeneralizeableAxisDict]] = ByGantryLoad(
     none={
         "X": 10000,
         "Y": 10000,
@@ -84,8 +84,8 @@ DEFAULT_ACCELERATIONS: Final[ByPipetteKind[GeneralizeableAxisDict]] = ByPipetteK
 )
 
 DEFAULT_MAX_SPEED_DISCONTINUITY: Final[
-    ByPipetteKind[GeneralizeableAxisDict]
-] = ByPipetteKind(
+    ByGantryLoad[GeneralizeableAxisDict]
+] = ByGantryLoad(
     none={
         "X": 40,
         "Y": 40,
@@ -114,8 +114,8 @@ DEFAULT_MAX_SPEED_DISCONTINUITY: Final[
 )
 
 DEFAULT_DIRECTION_CHANGE_SPEED_DISCONTINUITY: Final[
-    ByPipetteKind[GeneralizeableAxisDict]
-] = ByPipetteKind(
+    ByGantryLoad[GeneralizeableAxisDict]
+] = ByGantryLoad(
     none={
         "X": 20,
         "Y": 20,
@@ -143,7 +143,7 @@ DEFAULT_DIRECTION_CHANGE_SPEED_DISCONTINUITY: Final[
     },
 )
 
-DEFAULT_HOLDING_CURRENT: Final[ByPipetteKind[GeneralizeableAxisDict]] = ByPipetteKind(
+DEFAULT_HOLDING_CURRENT: Final[ByGantryLoad[GeneralizeableAxisDict]] = ByGantryLoad(
     none={
         "X": 0.1,
         "Y": 0.1,
@@ -172,8 +172,8 @@ DEFAULT_HOLDING_CURRENT: Final[ByPipetteKind[GeneralizeableAxisDict]] = ByPipett
 )
 
 DEFAULT_NORMAL_MOTION_CURRENT: Final[
-    ByPipetteKind[GeneralizeableAxisDict]
-] = ByPipetteKind(
+    ByGantryLoad[GeneralizeableAxisDict]
+] = ByGantryLoad(
     none={
         "X": 1.0,
         "Y": 1.0,
@@ -216,9 +216,9 @@ def _build_dict_with_default(
 
 
 def _build_default_bpk(
-    from_conf: Any, default: ByPipetteKind[GeneralizeableAxisDict]
-) -> ByPipetteKind[GeneralizeableAxisDict]:
-    return ByPipetteKind(
+    from_conf: Any, default: ByGantryLoad[GeneralizeableAxisDict]
+) -> ByGantryLoad[GeneralizeableAxisDict]:
+    return ByGantryLoad(
         low_throughput=_build_dict_with_default(
             from_conf.get("low_throughput", {}), default.low_throughput
         ),
@@ -256,25 +256,25 @@ def _build_default_transform(
 
 
 def build_with_defaults(robot_settings: Dict[str, Any]) -> OT3Config:
-    speed_settings = robot_settings.get("speed_settings", {})
+    motion_settings = robot_settings.get("motion_settings", {})
     return OT3Config(
         model="OT-3 Standard",
         version=ROBOT_CONFIG_VERSION,
         name=robot_settings.get("name", "Grace Hopper"),
         log_level=robot_settings.get("log_level", DEFAULT_LOG_LEVEL),
-        speed_settings=OT3SpeedSettings(
+        motion_settings=OT3MotionSettings(
             default_max_speed=_build_default_bpk(
-                speed_settings.get("default_max_speed", {}), DEFAULT_MAX_SPEEDS
+                motion_settings.get("default_max_speed", {}), DEFAULT_MAX_SPEEDS
             ),
             acceleration=_build_default_bpk(
-                speed_settings.get("acceleration", {}), DEFAULT_ACCELERATIONS
+                motion_settings.get("acceleration", {}), DEFAULT_ACCELERATIONS
             ),
             max_speed_discontinuity=_build_default_bpk(
-                speed_settings.get("max_speed_discontinuity", {}),
+                motion_settings.get("max_speed_discontinuity", {}),
                 DEFAULT_MAX_SPEED_DISCONTINUITY,
             ),
             direction_change_speed_discontinuity=_build_default_bpk(
-                speed_settings.get("direction_change_speed_discontinuity", {}),
+                motion_settings.get("direction_change_speed_discontinuity", {}),
                 DEFAULT_DIRECTION_CHANGE_SPEED_DISCONTINUITY,
             ),
         ),
