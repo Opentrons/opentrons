@@ -6,9 +6,14 @@ from typing import Dict
 from typing_extensions import Final
 from dataclasses import dataclass
 from opentrons_hardware.hardware_control.tools.errors import ToolDetectionFailiure
-from opentrons_ot3_firmware.constants import ToolType
+from opentrons_ot3_firmware.messages.message_definitions import (
+    AttachedToolsRequest,
+    PushToolsDetectedNotification,
+)
 
 from opentrons_ot3_firmware import NodeId
+from opentrons_ot3_firmware import ToolType
+
 from opentrons_ot3_firmware.messages import message_definitions, payloads
 
 from opentrons_hardware.drivers.can_bus import CanMessenger
