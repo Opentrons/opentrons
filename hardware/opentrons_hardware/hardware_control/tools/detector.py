@@ -1,4 +1,4 @@
-"""Firmware update initiation."""
+"""Head tool detector"""
 
 import asyncio
 import logging
