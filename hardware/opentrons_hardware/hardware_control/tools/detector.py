@@ -32,9 +32,8 @@ class ToolDetector:
         self._messenger = messenger
 
     async def run(self, retry_count: int, ready_wait_time_sec: float) -> None:
-        """Initialzie current attached tools.
+        """Identify current attached tools.
         Args:
-            current_tools: currently detected tools.
             retry_count: How many times to try.
             ready_wait_time_sec: How long to wait to register change in tools.
         Returns:
