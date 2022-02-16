@@ -3,4 +3,7 @@
 For Opentrons internal use only.
 """
 
-DEFAULT_LABWARE_NAMESPACE = "opentrons"
+from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
+
+
+DEFAULT_LABWARE_NAMESPACE = OPENTRONS_NAMESPACE
