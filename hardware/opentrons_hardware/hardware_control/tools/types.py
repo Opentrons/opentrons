@@ -1,9 +1,11 @@
+import enum
+
 # TODO(mc, 2020-10-22): use MountType implementation for Mount
 class Mount(enum.Enum):
     LEFT = enum.auto()
     RIGHT = enum.auto()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
     @classmethod
