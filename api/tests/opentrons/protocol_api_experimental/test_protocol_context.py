@@ -164,7 +164,7 @@ def test_load_pipette_with_replace(subject: ProtocolContext) -> None:
     subject.load_pipette(pipette_name="p300_single", mount="left", replace=True)
 
 
-def test_load_labware(
+def test_load_labware_explicit_namespace_and_version(
     decoy: Decoy,
     minimal_labware_def: labware_dict_types.LabwareDefinition,
     engine_client: SyncClient,
@@ -174,9 +174,9 @@ def test_load_labware(
     decoy.when(
         engine_client.load_labware(
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
-            load_name="some_labware",
+            load_name="some_explicit_namespace",
             namespace="opentrons",
-            version=1,
+            version=9001,
         )
     ).then_return(
         pe_commands.LoadLabwareResult(
@@ -189,8 +189,8 @@ def test_load_labware(
     result = subject.load_labware(
         load_name="some_labware",
         location=5,
-        namespace="opentrons",
-        version=1,
+        namespace="some_explicit_namespace",
+        version=9001,
     )
 
     assert result == Labware(labware_id="abc123", engine_client=engine_client)
