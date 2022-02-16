@@ -416,6 +416,12 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
         """
         if height is not None:
             dist = height
+
+        # This version check has a bug:
+        # if the caller sets height_from_base in an API version that's too low,
+        # we will silently ignore it instead of raising APIVersionError.
+        # Leaving this unfixed because we haven't thought through
+        # how to do backwards-compatible fixes to our version checking itself.
         elif height_from_base is not None and self._ctx._api_version >= APIVersion(
             2, 2
         ):
@@ -423,10 +429,12 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
                 height_from_base
                 + modules.magdeck.OFFSET_TO_LABWARE_BOTTOM[self._module.model()]
             )
+
         elif self.labware and self.labware.magdeck_engage_height is not None:
             dist = self._determine_lw_engage_height()
             if offset:
                 dist += offset
+
         else:
             raise ValueError(
                 "Currently loaded labware {} does not have a known engage "
@@ -434,6 +442,7 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
                     self.labware
                 )
             )
+
         self._module.engage(dist)
 
     def _determine_lw_engage_height(self) -> float:
