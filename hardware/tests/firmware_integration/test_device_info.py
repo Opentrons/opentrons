@@ -2,28 +2,23 @@
 import asyncio
 
 import pytest
-from opentrons_ot3_firmware import ArbitrationId, ArbitrationIdParts
+from opentrons_ot3_firmware.messages.message_definitions import DeviceInfoRequest
+from opentrons_ot3_firmware.messages.payloads import EmptyPayload
 
-from opentrons_hardware.drivers.can_bus import CanMessage
+from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
 from opentrons_ot3_firmware.constants import NodeId, MessageId
-
-from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 
 
 @pytest.mark.requires_emulator
 async def test_broadcast(
-    loop: asyncio.BaseEventLoop, driver: AbstractCanDriver
+    loop: asyncio.BaseEventLoop,
+    can_messenger: CanMessenger,
+    can_messenger_queue: WaitableCallback,
 ) -> None:
     """It should receive responses from all nodes."""
-    arbitration_id = ArbitrationId(
-        parts=ArbitrationIdParts(
-            message_id=MessageId.device_info_request,
-            node_id=NodeId.broadcast,
-            function_code=0,
-        )
+    await can_messenger.send(
+        node_id=NodeId.broadcast, message=DeviceInfoRequest(payload=EmptyPayload())
     )
-
-    await driver.send(CanMessage(arbitration_id=arbitration_id, data=b""))
 
     async def _check() -> None:
         """Loop until all nodes respond."""
@@ -34,10 +29,10 @@ async def test_broadcast(
             NodeId.gantry_y,
         }
         while len(nodes):
-            m = await driver.read()
-            assert m.arbitration_id.parts.message_id == MessageId.device_info_response
-            if m.arbitration_id.parts.originating_node_id in nodes:
-                nodes.remove(m.arbitration_id.parts.originating_node_id)
+            message, arbitration_id = await can_messenger_queue.read()
+            assert arbitration_id.parts.message_id == MessageId.device_info_response
+            if arbitration_id.parts.originating_node_id in nodes:
+                nodes.remove(arbitration_id.parts.originating_node_id)
 
     t = loop.create_task(_check())
     await asyncio.wait_for(t, 1)
@@ -45,19 +40,16 @@ async def test_broadcast(
 
 @pytest.mark.requires_emulator
 async def test_each_node(
-    loop: asyncio.BaseEventLoop, driver: AbstractCanDriver, subsystem_node_id: NodeId
+    loop: asyncio.BaseEventLoop,
+    can_messenger: CanMessenger,
+    can_messenger_queue: WaitableCallback,
+    subsystem_node_id: NodeId,
 ) -> None:
     """It should receive responses from each node."""
-    arbitration_id = ArbitrationId(
-        parts=ArbitrationIdParts(
-            message_id=MessageId.device_info_request,
-            node_id=subsystem_node_id,
-            function_code=0,
-        )
+    await can_messenger.send(
+        node_id=subsystem_node_id, message=DeviceInfoRequest(payload=EmptyPayload())
     )
 
-    await driver.send(CanMessage(arbitration_id=arbitration_id, data=b""))
-
-    response = await asyncio.wait_for(driver.read(), 1)
-    assert response.arbitration_id.parts.message_id == MessageId.device_info_response
-    assert response.arbitration_id.parts.originating_node_id == subsystem_node_id
+    message, arbitration_id = await asyncio.wait_for(can_messenger_queue.read(), 1)
+    assert arbitration_id.parts.message_id == MessageId.device_info_response
+    assert arbitration_id.parts.originating_node_id == subsystem_node_id
