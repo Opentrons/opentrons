@@ -1,6 +1,5 @@
 import * as React from 'react'
 import {
-  TitleBarProps,
   Box,
   Flex,
   POSITION_ABSOLUTE,
@@ -12,7 +11,7 @@ import {
   TYPOGRAPHY,
   SPACING,
 } from '@opentrons/components'
-import { TitleBar } from '../TitleBar'
+import { TitleBar, TitleBarProps } from '../TitleBar'
 
 function Overlay(): JSX.Element {
   return (

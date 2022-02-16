@@ -3,13 +3,13 @@ import { useTranslation } from 'react-i18next'
 import { Portal } from '../../../App/portal'
 import { useSelector } from 'react-redux'
 import { getConnectedRobotName } from '../../../redux/robot/selectors'
+import { ModalPage } from '../../../atoms/ModalPage'
 import { Introduction } from './Introduction'
 import { KeyParts } from './KeyParts'
 import { AttachModule } from './AttachModule'
 import { AttachAdapter } from './AttachAdapter'
 import { PowerOn } from './PowerOn'
 import { TestShake } from './TestShake'
-import { ModalPage } from '../../../atoms/ModalPage'
 import {
   ALIGN_CENTER,
   COLORS,
@@ -43,8 +43,8 @@ export const HeaterShakerWizard = (
         buttonContent = t('btn_continue_attachment_guide')
         return (
           <Introduction
-          //  TODO immediately: get labwareDefinition2 of labware on top of heater shaker (nestedLabwareDef from moduleRenderInfoById)
-          //  TODO Immediately: get adapter name and image - would this be connected to nestedLabwareDefinition?
+          //  TODO(jr, 2022-02-16): get labwareDefinition2 of labware on top of heater shaker (nestedLabwareDef from moduleRenderInfoById)
+          //  TODO(jr, 2022-02-16): get adapter name and image - would this be connected to nestedLabwareDefinition?
           />
         )
       case 1:
@@ -72,7 +72,7 @@ export const HeaterShakerWizard = (
       <ModalPage
         titleBar={{
           title: t('modal_title', { name: robotName }),
-          back: {
+          exit: {
             onClick: () => onCloseClick(),
             title: t('shared:exit'),
             children: t('shared:exit'),

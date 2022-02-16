@@ -17,7 +17,7 @@ import {
 
 export interface TitleBarProps {
   title: React.ReactNode
-  back?: ButtonProps
+  exit?: ButtonProps
 }
 
 const TITLE_BAR = css`
@@ -30,7 +30,7 @@ const TITLE_BAR = css`
 `
 
 export function TitleBar(props: TitleBarProps): JSX.Element {
-  const { title, back } = props
+  const { title, exit } = props
 
   return (
     <Flex
@@ -59,10 +59,10 @@ export function TitleBar(props: TitleBarProps): JSX.Element {
           {title}
         </Flex>
       </Flex>
-      {back && (
+      {exit && (
         <Flex
           paddingRight={TYPOGRAPHY.fontSizeH6}
-          data-testid={`titlebar_${back.title}`}
+          data-testid={`titlebar_${exit.title}`}
         >
           <Text
             paddingRight={SPACING.spacingSS}
@@ -71,11 +71,11 @@ export function TitleBar(props: TitleBarProps): JSX.Element {
             fontSize={TYPOGRAPHY.fontSizeH3}
             textTransform={TEXT_TRANSFORM_CAPITALIZE}
           >
-            {back.title}
+            {exit.title}
           </Text>
           <Btn
             size={'1.5rem'}
-            onClick={back.onBackClick}
+            onClick={exit.onClick}
             paddingTop={SPACING.spacingS}
             aria-label="close_btn"
           >

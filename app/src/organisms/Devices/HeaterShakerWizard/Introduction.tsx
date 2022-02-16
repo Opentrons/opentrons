@@ -132,13 +132,13 @@ export function Introduction(props: IntroductionProps): JSX.Element {
                 : t('intro_adapter_unknown')
             }
             subtext={t('intro_adapter_body')}
+            //  TODO(jr, 2022-02-16): plus in thermal adapter image
             image={
               thermalAdapterName != null ? (
                 <Flex
                   width={TYPOGRAPHY.introImageWidth}
                   height={TYPOGRAPHY.introImageHeight}
                 >
-                  {/* TODO immediately: add thermal adapter image */}
                   <div>{'thermal adapter image'}</div>
                 </Flex>
               ) : undefined

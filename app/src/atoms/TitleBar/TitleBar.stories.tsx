@@ -15,5 +15,5 @@ const Template: Story<React.ComponentProps<typeof TitleBar>> = args => (
 export const Primary = Template.bind({})
 Primary.args = {
   title: 'Title goes here',
-  back: { title: 'Exit', children: 'Exit' },
+  exit: { title: 'Exit', children: 'Exit' },
 }

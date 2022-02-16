@@ -15,7 +15,7 @@ export const Primary = Template.bind({})
 Primary.args = {
   titleBar: {
     title: 'title',
-    back: {
+    exit: {
       onClick: () => jest.fn(),
       title: 'exit',
       children: 'exit',

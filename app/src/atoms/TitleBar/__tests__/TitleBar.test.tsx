@@ -12,7 +12,7 @@ describe('TitleBar', () => {
   beforeEach(() => {
     props = {
       title: 'TITLE',
-      back: { title: 'EXIT', onCloseClick: jest.fn(), children: 'EXIT' },
+      exit: { title: 'EXIT', onCloseClick: jest.fn(), children: 'EXIT' },
     }
   })
   it('should render everything when back is defined and clicks button', () => {
