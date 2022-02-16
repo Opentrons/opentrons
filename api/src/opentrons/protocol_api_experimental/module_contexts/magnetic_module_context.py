@@ -5,10 +5,13 @@ from typing import Optional, overload
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
+from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocols.api_support.types import APIVersion
 
+from ..constants import DEFAULT_LABWARE_NAMESPACE
 from ..errors import InvalidMagnetEngageHeightError
 from ..labware import Labware
+from ..types import ModuleLocation
 
 
 class MagneticModuleStatus(str, Enum):
@@ -28,7 +31,8 @@ class MagneticModuleContext:  # noqa: D101
     # TODO(mc, 2022-02-09): copy or rewrite docstrings from
     # src/opentrons/protocol_api/module_contexts.py
 
-    def __init__(self, module_id: str) -> None:
+    def __init__(self, engine_client: ProtocolEngineClient, module_id: str) -> None:
+        self._engine_client = engine_client
         self._module_id = module_id
 
     # todo(mm, 2022-02-15): This public method returns an internal, undocumented type.
@@ -43,7 +47,20 @@ class MagneticModuleContext:  # noqa: D101
         namespace: Optional[str] = None,
         version: int = 1,
     ) -> Labware:
-        raise NotImplementedError()
+        if label is not None:  # github.com/Opentrons/opentrons/issues/9454
+            raise NotImplementedError("Labware labels not yet supported.")
+
+        namespace = DEFAULT_LABWARE_NAMESPACE if namespace is None else namespace
+
+        engine_result = self._engine_client.load_labware(
+            location=ModuleLocation(moduleId=self._module_id),
+            load_name=name,
+            namespace=namespace,
+            version=version,
+        )
+        return Labware(
+            engine_client=self._engine_client, labware_id=engine_result.labwareId
+        )
 
     def load_labware_from_definition(  # noqa: D102
         self, definition: LabwareDefinition, label: Optional[str] = None
