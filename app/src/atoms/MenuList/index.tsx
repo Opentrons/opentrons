@@ -10,7 +10,7 @@ import {
 
 interface MenuListProps {
   buttons: Array<ButtonProps | null | undefined>
-  id: string
+  id?: string
 }
 
 export const MenuList = (props: MenuListProps): JSX.Element | null => {
