@@ -67,8 +67,3 @@ def test_disengage(subject: MagneticModuleContext) -> None:  # noqa: D103
 @pytest.mark.xfail(strict=True, raises=NotImplementedError)
 def test_status(subject: MagneticModuleContext) -> None:  # noqa: D103
     _ = subject.status
-
-
-@pytest.mark.xfail(strict=True, raises=NotImplementedError)
-def test_calibrate(subject: MagneticModuleContext) -> None:  # noqa: D103
-    subject.calibrate()

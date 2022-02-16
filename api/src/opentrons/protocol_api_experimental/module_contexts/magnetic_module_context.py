@@ -102,11 +102,6 @@ class MagneticModuleContext:  # noqa: D101
     def status(self) -> MagneticModuleStatus:  # noqa: D102
         raise NotImplementedError()
 
-    # todo(mm, 2021-02-15): Does anyone internal or external
-    # use calibrate() in APIv2? Can we remove it from APIv3?
-    def calibrate(self) -> None:  # noqa: D102
-        raise NotImplementedError()
-
     def __hash__(self) -> int:
         """Return a hash.
 
