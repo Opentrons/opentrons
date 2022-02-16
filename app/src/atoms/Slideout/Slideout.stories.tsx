@@ -15,6 +15,7 @@ import type { Story, Meta } from '@storybook/react'
 export default {
   title: 'App/Atoms/Slideout',
   component: Slideout,
+  argTypes: { onClick: { action: 'clicked' } },
 } as Meta
 
 const Template: Story<React.ComponentProps<typeof Slideout>> = args => (
@@ -28,7 +29,7 @@ const Children = (
       fontSize={TYPOGRAPHY.fontSizeP}
       paddingTop={SPACING_1}
     >
-      {'blah blah blah some slide out body text'}
+      {'this is where the slideout body goes'}
     </Text>
 
     <PrimaryBtn
