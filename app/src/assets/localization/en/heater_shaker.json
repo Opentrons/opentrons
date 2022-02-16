@@ -9,5 +9,14 @@
   "btn_test_shake": "Continue to test shake",
   "complete": "Complete",
   "back": "Back",
-  "modal_title": "{{name}} - Attach Heater Shaker Module"
+  "modal_title": "{{name}} - Attach Heater Shaker Module",
+  "intro_title": "Use this guide to attach the Heater Shaker Module to your robot’s deck for secure shaking.",
+  "intro_subtitle": "You will need:",
+  "intro_heater_shaker_mod": "Heater Shaker Module",
+  "intro_screwdriver": "T10 Torx Screwdriver",
+  "intro_screwdriver_body": "Provided with module. Note: using another screwdriver size can strip the module’s screws.",
+  "intro_adapter_known": "{{adapter}} + Screw",
+  "intro_adapter_unknown": "Thermal Adapter + Screw",
+  "intro_adapter_body": "Screw may already be in the center of the module.",
+  "intro_labware": "Labware"
 }

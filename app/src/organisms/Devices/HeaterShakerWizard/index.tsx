@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Portal } from '../../../App/portal'
 import { useSelector } from 'react-redux'
 import { getConnectedRobotName } from '../../../redux/robot/selectors'
+import { ModalPage } from '../../../atoms/ModalPage'
 import { Introduction } from './Introduction'
 import { KeyParts } from './KeyParts'
 import { AttachModule } from './AttachModule'
@@ -15,11 +16,11 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  ModalPage,
   PrimaryBtn,
   SecondaryBtn,
   SPACING,
   TEXT_TRANSFORM_NONE,
+  JUSTIFY_FLEX_END,
 } from '@opentrons/components'
 
 import type { State } from '../../../redux/types'
@@ -42,8 +43,8 @@ export const HeaterShakerWizard = (
         buttonContent = t('btn_continue_attachment_guide')
         return (
           <Introduction
-            labwareDefinition="plate"
-            thermalAdapterName="adapter"
+          //  TODO(jr, 2022-02-16): get labwareDefinition2 of labware on top of heater shaker (nestedLabwareDef from moduleRenderInfoById)
+          //  TODO(jr, 2022-02-16): get adapter name and image - would this be connected to nestedLabwareDefinition?
           />
         )
       case 1:
@@ -71,7 +72,7 @@ export const HeaterShakerWizard = (
       <ModalPage
         titleBar={{
           title: t('modal_title', { name: robotName }),
-          back: {
+          exit: {
             onClick: () => onCloseClick(),
             title: t('shared:exit'),
             children: t('shared:exit'),
@@ -81,7 +82,9 @@ export const HeaterShakerWizard = (
         {getWizardDisplayPage()}
         <Flex
           flexDirection={DIRECTION_ROW}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          justifyContent={
+            currentPage === 0 ? JUSTIFY_FLEX_END : JUSTIFY_SPACE_BETWEEN
+          }
         >
           {currentPage > 0 ? (
             <SecondaryBtn
