@@ -36,10 +36,16 @@ class InvalidModuleLocationError(ValueError):
         self.module_name = module_name
 
 
+class InvalidMagnetEngageHeightError(ValueError):
+    """Error raised if a Magnetic Module engage height is invalid."""
+
+
 __all__ = [
     # re-exports from opentrons.protocol_engine
     "LabwareIsNotTipRackError",
     # exports specific to the Protocol API layer
     "InvalidPipetteNameError",
     "InvalidMountError",
+    "InvalidModuleLocationError",
+    "InvalidMagnetEngageHeightError",
 ]

@@ -20,9 +20,19 @@ This code is totally unsupported. To do science on a robot, use the stable
 from .protocol_context import ProtocolContext
 from .pipette_context import PipetteContext
 from .instrument_context import InstrumentContext
+from .module_contexts import (
+    MagneticModuleContext,
+    TemperatureModuleContext,
+    ThermocyclerModuleContext,
+)
 from .labware import Labware
 from .well import Well
-from .errors import InvalidPipetteNameError, InvalidMountError
+from .errors import (
+    InvalidPipetteNameError,
+    InvalidMountError,
+    InvalidModuleLocationError,
+    InvalidMagnetEngageHeightError,
+)
 from .types import (
     DeckSlotName,
     LabwareParameters,
@@ -37,11 +47,17 @@ __all__ = [
     "ProtocolContext",
     "PipetteContext",
     "InstrumentContext",
+    "MagneticModuleContext",
+    "MagneticModuleStatus",
+    "TemperatureModuleContext",
+    "ThermocyclerModuleContext",
     "Labware",
     "Well",
     # Protocol API errors
     "InvalidPipetteNameError",
     "InvalidMountError",
+    "InvalidModuleLocationError",
+    "InvalidMagnetEngageHeightError",
     # Protocol API types and data classes
     "DeckSlotName",
     "LabwareParameters",
