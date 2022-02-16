@@ -256,6 +256,7 @@ def _build_default_transform(
 
 
 def build_with_defaults(robot_settings: Dict[str, Any]) -> OT3Config:
+    speed_settings = robot_settings.get("speed_settings", {})
     return OT3Config(
         model="OT-3 Standard",
         version=ROBOT_CONFIG_VERSION,
@@ -263,17 +264,17 @@ def build_with_defaults(robot_settings: Dict[str, Any]) -> OT3Config:
         log_level=robot_settings.get("log_level", DEFAULT_LOG_LEVEL),
         speed_settings=OT3SpeedSettings(
             default_max_speed=_build_default_bpk(
-                robot_settings.get("default_max_speed", {}), DEFAULT_MAX_SPEEDS
+                speed_settings.get("default_max_speed", {}), DEFAULT_MAX_SPEEDS
             ),
             acceleration=_build_default_bpk(
-                robot_settings.get("acceleration", {}), DEFAULT_ACCELERATIONS
+                speed_settings.get("acceleration", {}), DEFAULT_ACCELERATIONS
             ),
             max_speed_discontinuity=_build_default_bpk(
-                robot_settings.get("max_speed_discontinuity", {}),
+                speed_settings.get("max_speed_discontinuity", {}),
                 DEFAULT_MAX_SPEED_DISCONTINUITY,
             ),
             direction_change_speed_discontinuity=_build_default_bpk(
-                robot_settings.get("direction_change_speed_discontinuity", {}),
+                speed_settings.get("direction_change_speed_discontinuity", {}),
                 DEFAULT_DIRECTION_CHANGE_SPEED_DISCONTINUITY,
             ),
         ),
