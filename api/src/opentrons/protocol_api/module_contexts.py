@@ -411,7 +411,7 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
         :param offset: An offset relative to the default height for the labware
                        in mm
 
-        .. versionadded:: 2.1
+        .. versionadded:: 2.2
             The *height_from_base* parameter.
         """
         if height is not None:
