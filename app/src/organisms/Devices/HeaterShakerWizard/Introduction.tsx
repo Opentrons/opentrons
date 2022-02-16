@@ -13,27 +13,24 @@ import {
   ALIGN_CENTER,
 } from '@opentrons/components'
 
-import heaterShaker from '@opentrons/app/src/assets/images/Heater_Shaker_HERO_EMPTY_LIGHT_OFF.svg'
-import screwdriver from '@opentrons/app/src/assets/images/screwdriver.svg'
+import heaterShaker from '@opentrons/app/src/assets/images/heater_shaker_empty.png'
+import screwdriver from '@opentrons/app/src/assets/images/change-pip/t10_torx_screwdriver.png'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-interface introContainerProps {
+interface IntroContainerProps {
   text: string
   image?: JSX.Element
   subtext?: string
 }
 
-const IntroItem = (props: introContainerProps): JSX.Element => {
+const IntroItem = (props: IntroContainerProps): JSX.Element => {
   let multiText: JSX.Element = <div></div>
   const leftPadding = props.image != null ? SPACING.spacingL : SPACING.spacing3
 
   if (props.subtext != null) {
     multiText = (
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        paddingRight={TYPOGRAPHY.lineHeight20}
-      >
+      <Flex flexDirection={DIRECTION_COLUMN} paddingRight={'1.25rem'}>
         <Flex
           fontSize={TYPOGRAPHY.fontSizeLabel}
           paddingLeft={leftPadding}
@@ -66,21 +63,18 @@ const IntroItem = (props: introContainerProps): JSX.Element => {
   }
   return (
     <Flex
-      marginTop={TYPOGRAPHY.fontSizeH6}
-      border={`${SPACING.spacingXXS} solid ${COLORS.medGrey}`}
+      marginTop={'0.625rem'}
+      border={`1px solid ${COLORS.medGrey}`}
       flexDirection={DIRECTION_ROW}
-      width={TYPOGRAPHY.introBoxWidth}
-      paddingBottom={TYPOGRAPHY.fontSizeH6}
+      width={'21.5rem'}
+      paddingBottom={'0.625rem'}
     >
       {props.image != null ? (
         <>
-          <Flex
-            paddingLeft={SPACING.spacingXS}
-            paddingTop={TYPOGRAPHY.fontSizeH6}
-          >
+          <Flex paddingLeft={SPACING.spacingXS} paddingTop={'0.625rem'}>
             {props.image}
           </Flex>
-          <Flex>{multiText}</Flex>
+          {multiText}
         </>
       ) : (
         <Flex>{multiText}</Flex>
@@ -103,9 +97,7 @@ export function Introduction(props: IntroductionProps): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       color={COLORS.darkBlack}
       fontWeight={TYPOGRAPHY.fontWeightRegular}
-      marginBottom={
-        labwareDefinition != null ? TYPOGRAPHY.introImageHeight : '9.375rem'
-      }
+      marginBottom={labwareDefinition != null ? '4.313rem' : '9.375rem'}
     >
       <Text
         fontSize={TYPOGRAPHY.lineHeight16}
@@ -137,10 +129,7 @@ export function Introduction(props: IntroductionProps): JSX.Element {
             //  TODO(jr, 2022-02-16): plus in thermal adapter image
             image={
               thermalAdapterName != null ? (
-                <Flex
-                  width={TYPOGRAPHY.introImageWidth}
-                  height={TYPOGRAPHY.introImageHeight}
-                >
+                <Flex width={'6.25rem'} height={'4.313rem'}>
                   <div>{'thermal adapter image'}</div>
                 </Flex>
               ) : undefined
@@ -159,10 +148,7 @@ export function Introduction(props: IntroductionProps): JSX.Element {
             }
             image={
               labwareDefinition != null ? (
-                <Flex
-                  width={TYPOGRAPHY.introImageWidth}
-                  height={TYPOGRAPHY.introImageHeight}
-                >
+                <Flex width={'6.25rem'} height={'4.313rem'}>
                   <LabwareRender definition={labwareDefinition} />
                 </Flex>
               ) : undefined

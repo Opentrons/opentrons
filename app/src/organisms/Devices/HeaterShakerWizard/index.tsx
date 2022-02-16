@@ -60,7 +60,7 @@ export const HeaterShakerWizard = (
         buttonContent = t('btn_test_shake')
         return <PowerOn status={'on'} />
       case 5:
-        buttonContent = t('complete')
+        buttonContent = t('btn_complete')
         return <TestShake />
       default:
         return null
@@ -71,7 +71,7 @@ export const HeaterShakerWizard = (
     <Portal level="top">
       <ModalPage
         titleBar={{
-          title: t('modal_title', { name: robotName }),
+          title: t('intro_wizard_modal_page_title', { name: robotName }),
           exit: {
             onClick: () => onCloseClick(),
             title: t('shared:exit'),
@@ -95,7 +95,7 @@ export const HeaterShakerWizard = (
               data-testid={`wizard_back_btn`}
               onClick={() => setCurrentPage(currentPage => currentPage - 1)}
             >
-              {t('back')}
+              {t('btn_back')}
             </SecondaryBtn>
           ) : null}
           {currentPage <= 5 ? (

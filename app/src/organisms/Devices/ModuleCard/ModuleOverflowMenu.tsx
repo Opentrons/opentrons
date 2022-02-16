@@ -93,6 +93,7 @@ export const ModuleOverflowMenu = (
 
   const AboutModuleBtn = (
     <MenuItem
+      key={`about_module_${module.model}`}
       data-testid={`about_module_${module.model}`}
       //  TODO immediately - add actual module overflow menu
       onClick={() => console.log('about module overflow menu')}
@@ -106,6 +107,7 @@ export const ModuleOverflowMenu = (
       {showSlideout && renderSlideOut(hasSecondary)}
       <Flex position={POSITION_RELATIVE}>
         <MenuList
+          id={`module_overflow_menu`}
           buttons={[
             menuItems[module.type].map((item, index) => {
               return (

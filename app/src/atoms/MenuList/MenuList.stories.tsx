@@ -21,7 +21,7 @@ const Template: Story<React.ComponentProps<typeof MenuList>> = args => (
 )
 
 const style = css`
-  width: ${TYPOGRAPHY.overflowMenuWidth};
+  width: 9.562rem;
   text-align: ${TEXT_ALIGN_LEFT};
   font-size: ${TYPOGRAPHY.fontSizeP};
   padding-bottom: ${TYPOGRAPHY.fontSizeH6};

@@ -9,12 +9,17 @@ const render = (props: React.ComponentProps<typeof TitleBar>) => {
 
 describe('TitleBar', () => {
   let props: React.ComponentProps<typeof TitleBar>
+  const EXIT = { title: 'EXIT', onClick: jest.fn(), children: 'EXIT' }
   beforeEach(() => {
     props = {
       title: 'TITLE',
-      exit: { title: 'EXIT', onCloseClick: jest.fn(), children: 'EXIT' },
+      exit: EXIT,
     }
   })
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
   it('should render everything when back is defined and clicks button', () => {
     const { getByText, getByLabelText, getByRole } = render(props)
     getByText('TITLE')
@@ -22,7 +27,8 @@ describe('TitleBar', () => {
     getByLabelText('close')
     getByText('EXIT')
     const button = getByRole('button', { name: /close_btn/i })
+    expect(button).toBeEnabled()
     fireEvent.click(button)
-    expect(button).not.toBeDisabled()
+    expect(EXIT.onClick).toBeCalled()
   })
 })

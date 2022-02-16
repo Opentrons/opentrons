@@ -9,7 +9,6 @@ import {
   COLORS,
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
-  SPACING,
 } from '@opentrons/components'
 import { TitleBar, TitleBarProps } from '../TitleBar'
 
@@ -47,7 +46,7 @@ export function ModalPage(props: ModalPageProps): JSX.Element {
       top="0"
       bottom="0"
       justifyContent={JUSTIFY_FLEX_START}
-      padding={`2.5rem 3rem ${TYPOGRAPHY.lineHeight16} 3rem`}
+      padding={`2.5rem 3rem 1rem 3rem`}
       data-testid={`modal_page`}
       {...outerProps}
     >
@@ -58,10 +57,10 @@ export function ModalPage(props: ModalPageProps): JSX.Element {
         zIndex="1"
         width="42.125rem"
         margin="0 auto"
-        padding={TYPOGRAPHY.lineHeight16}
+        padding={'1rem'}
         position={POSITION_RELATIVE}
-        boxShadow={TYPOGRAPHY.boxShadowSM}
-        border={`${SPACING.spacingXXS} solid ${COLORS.medGrey}`}
+        boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.3)'}
+        border={`1px solid ${COLORS.medGrey}`}
         backgroundColor={COLORS.white}
         maxHeight="100%"
         overflowY="auto"
