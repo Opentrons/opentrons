@@ -154,7 +154,7 @@
           "type": "boolean"
         },
         "magneticModuleEngageHeight": {
-          "description": "Distance to move magnetic module magnets to engage",
+          "description": "Millimeters above the labware base plane to move Magnetic Module magnets to engage, if the protocol does not specify a height. Beware: some Opentrons standard labware definitions accidentally specify this in units of half-millimeters (\"short mm\").",
           "$ref": "#/definitions/positiveNumber"
         }
       }
