@@ -14,7 +14,7 @@ import {
 } from '@opentrons/components'
 
 import heaterShaker from '@opentrons/app/src/assets/images/Heater_Shaker_HERO_EMPTY_LIGHT_OFF.svg'
-import screwdriver from '@opentrons/app/src/assets/images/t10_torx_screwdriver.svg'
+import screwdriver from '@opentrons/app/src/assets/images/screwdriver.svg'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
@@ -26,6 +26,8 @@ interface introContainerProps {
 
 const IntroItem = (props: introContainerProps): JSX.Element => {
   let multiText: JSX.Element = <div></div>
+  const leftPadding = props.image != null ? SPACING.spacingL : SPACING.spacing3
+
   if (props.subtext != null) {
     multiText = (
       <Flex
@@ -34,7 +36,7 @@ const IntroItem = (props: introContainerProps): JSX.Element => {
       >
         <Flex
           fontSize={TYPOGRAPHY.fontSizeLabel}
-          paddingLeft={SPACING.spacing3}
+          paddingLeft={leftPadding}
           paddingTop={SPACING.spacing3}
           alignItems={ALIGN_CENTER}
         >
@@ -42,7 +44,7 @@ const IntroItem = (props: introContainerProps): JSX.Element => {
         </Flex>
         <Flex
           fontSize={TYPOGRAPHY.fontSizeH6}
-          paddingLeft={SPACING.spacing3}
+          paddingLeft={leftPadding}
           paddingTop={SPACING.spacing1}
           alignItems={ALIGN_CENTER}
         >
@@ -54,7 +56,7 @@ const IntroItem = (props: introContainerProps): JSX.Element => {
     multiText = (
       <Flex
         fontSize={TYPOGRAPHY.fontSizeLabel}
-        paddingLeft={SPACING.spacing3}
+        paddingLeft={leftPadding}
         paddingTop={SPACING.spacing3}
         alignItems={ALIGN_CENTER}
       >
