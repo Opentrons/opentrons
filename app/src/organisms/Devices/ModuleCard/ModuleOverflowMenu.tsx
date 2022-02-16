@@ -1,10 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  Flex,
-  DIRECTION_COLUMN,
-  POSITION_RELATIVE,
-} from '@opentrons/components'
+import { Flex, POSITION_RELATIVE } from '@opentrons/components'
 import {
   THERMOCYCLER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
@@ -95,13 +91,23 @@ export const ModuleOverflowMenu = (
     setShowSlideout(true)
   }
 
+  const AboutModuleBtn = (
+    <MenuItem
+      data-testid={`about_module_${module.model}`}
+      //  TODO immediately - add actual module overflow menu
+      onClick={() => console.log('about module overflow menu')}
+    >
+      {t('overflow_menu_about')}
+    </MenuItem>
+  )
+
   return (
     <React.Fragment>
       {showSlideout && renderSlideOut(hasSecondary)}
       <Flex position={POSITION_RELATIVE}>
-        <MenuList>
-          <Flex flexDirection={DIRECTION_COLUMN}>
-            {menuItems[module.type].map((item, index) => {
+        <MenuList
+          buttons={[
+            menuItems[module.type].map((item, index) => {
               return (
                 <MenuItem
                   key={index}
@@ -112,16 +118,11 @@ export const ModuleOverflowMenu = (
                   {item.setSetting}
                 </MenuItem>
               )
-            })}
-            <MenuItem
-              data-testid={`about_module_${module.model}`}
-              //  TODO immediately - add actual module overflow menu
-              onClick={() => console.log('about module overflow menu')}
-            >
-              {t('overflow_menu_about')}
-            </MenuItem>
-          </Flex>
-        </MenuList>
+            }),
+            AboutModuleBtn,
+          ]}
+        />
+        {/* </MenuList> */}
       </Flex>
     </React.Fragment>
   )

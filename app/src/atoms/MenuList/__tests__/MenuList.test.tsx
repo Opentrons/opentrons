@@ -6,16 +6,18 @@ const render = (props: React.ComponentProps<typeof MenuList>) => {
   return renderWithProviders(<MenuList {...props} />)[0]
 }
 
+const mockBtn = <div>mockBtn</div>
+
 describe(' MenuList', () => {
   let props: React.ComponentProps<typeof MenuList>
   beforeEach(() => {
     props = {
-      children: <div>child</div>,
+      buttons: [mockBtn],
     }
   })
 
   it('renders a child', () => {
     const { getByText } = render(props)
-    getByText('child')
+    getByText('mockBtn')
   })
 })
