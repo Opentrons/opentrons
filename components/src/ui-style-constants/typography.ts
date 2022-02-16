@@ -57,7 +57,7 @@ export const bannerButtonTopMargin = '2.75rem'
 export const introMarginLeft = '6.063rem' //  97px
 export const introImageWidth = '6.25rem' // 100px
 export const introImageHeight = '4.313rem' // 69px
-export const introBoxWidth = '344px'
+export const introBoxWidth = '21.5rem' // 344px
 
 // Default font styles, color agnositic for first pass
 export const h1Default = css`

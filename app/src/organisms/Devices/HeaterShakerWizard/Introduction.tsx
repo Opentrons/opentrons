@@ -10,6 +10,7 @@ import {
   DIRECTION_ROW,
   LabwareRender,
   SPACING,
+  ALIGN_CENTER,
 } from '@opentrons/components'
 
 import heaterShaker from '@opentrons/app/src/assets/images/Heater_Shaker_HERO_EMPTY_LIGHT_OFF.svg'
@@ -18,75 +19,46 @@ import screwdriver from '@opentrons/app/src/assets/images/t10_torx_screwdriver.s
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 interface introContainerProps {
-  image?: JSX.Element
   text: string
+  image?: JSX.Element
   subtext?: string
 }
 
-const IntroContainer = (props: introContainerProps): JSX.Element => {
-  let body: JSX.Element = <div></div>
-  if (props.subtext === undefined && props.image !== undefined) {
-    body = (
-      <Flex
-        fontSize={TYPOGRAPHY.fontSizeLabel}
-        paddingTop={SPACING.spacingXL}
-        paddingLeft={SPACING.spacingL}
-      >
-        {props.text}
-      </Flex>
-    )
-  } else if (props.subtext !== undefined && props.image !== undefined) {
-    body = (
+const IntroItem = (props: introContainerProps): JSX.Element => {
+  let multiText: JSX.Element = <div></div>
+  if (props.subtext != null) {
+    multiText = (
       <Flex
         flexDirection={DIRECTION_COLUMN}
         paddingRight={TYPOGRAPHY.lineHeight20}
       >
         <Flex
           fontSize={TYPOGRAPHY.fontSizeLabel}
-          paddingLeft={SPACING.spacingL}
+          paddingLeft={SPACING.spacing3}
           paddingTop={SPACING.spacing3}
+          alignItems={ALIGN_CENTER}
         >
           {props.text}
         </Flex>
         <Flex
           fontSize={TYPOGRAPHY.fontSizeH6}
-          paddingLeft={SPACING.spacingL}
+          paddingLeft={SPACING.spacing3}
           paddingTop={SPACING.spacing1}
+          alignItems={ALIGN_CENTER}
         >
           {props.subtext}
         </Flex>
       </Flex>
     )
-  } else if (props.subtext === undefined && props.image === undefined) {
-    body = (
+  } else {
+    multiText = (
       <Flex
         fontSize={TYPOGRAPHY.fontSizeLabel}
         paddingLeft={SPACING.spacing3}
         paddingTop={SPACING.spacing3}
+        alignItems={ALIGN_CENTER}
       >
         {props.text}
-      </Flex>
-    )
-  } else if (props.subtext !== undefined && props.image === undefined) {
-    body = (
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        paddingRight={TYPOGRAPHY.lineHeight20}
-      >
-        <Flex
-          fontSize={TYPOGRAPHY.fontSizeLabel}
-          paddingLeft={SPACING.spacing3}
-          paddingTop={SPACING.spacing3}
-        >
-          {props.text}
-        </Flex>
-        <Flex
-          fontSize={TYPOGRAPHY.fontSizeH6}
-          paddingLeft={SPACING.spacing3}
-          paddingTop={SPACING.spacing1}
-        >
-          {props.subtext}
-        </Flex>
       </Flex>
     )
   }
@@ -98,10 +70,19 @@ const IntroContainer = (props: introContainerProps): JSX.Element => {
       width={TYPOGRAPHY.introBoxWidth}
       paddingBottom={TYPOGRAPHY.fontSizeH6}
     >
-      <Flex paddingLeft={SPACING.spacingXS} paddingTop={TYPOGRAPHY.fontSizeH6}>
-        {props.image}
-      </Flex>
-      {body}
+      {props.image != null ? (
+        <>
+          <Flex
+            paddingLeft={SPACING.spacingXS}
+            paddingTop={TYPOGRAPHY.fontSizeH6}
+          >
+            {props.image}
+          </Flex>
+          <Flex>{multiText}</Flex>
+        </>
+      ) : (
+        <Flex>{multiText}</Flex>
+      )}
     </Flex>
   )
 }
@@ -115,100 +96,97 @@ export function Introduction(props: IntroductionProps): JSX.Element {
   const { t } = useTranslation('heater_shaker')
 
   return (
-    <>
-      <Flex
-        padding={TYPOGRAPHY.lineHeight20}
-        flexDirection={DIRECTION_COLUMN}
-        color={COLORS.darkBlack}
-        fontWeight={TYPOGRAPHY.fontWeightRegular}
-        marginBottom={
-          labwareDefinition === undefined
-            ? '9.375rem'
-            : TYPOGRAPHY.introImageHeight
-        }
+    <Flex
+      padding={TYPOGRAPHY.lineHeight20}
+      flexDirection={DIRECTION_COLUMN}
+      color={COLORS.darkBlack}
+      fontWeight={TYPOGRAPHY.fontWeightRegular}
+      marginBottom={
+        labwareDefinition != null ? TYPOGRAPHY.introImageHeight : '9.375rem'
+      }
+    >
+      <Text
+        fontSize={TYPOGRAPHY.lineHeight16}
+        width="39.625rem"
+        data-testid={`heater_shaker_wizard_intro_title`}
       >
+        {t('intro_title')}
+      </Text>
+      <Flex flexDirection={DIRECTION_COLUMN}>
         <Text
-          fontSize={TYPOGRAPHY.lineHeight16}
-          width="39.625rem"
-          data-testid={`heater_shaker_wizard_intro_title`}
+          paddingTop={TYPOGRAPHY.fontSizeH6}
+          fontSize={TYPOGRAPHY.fontSizeH4}
+          paddingLeft={'8rem'}
+          data-testid={`heater_shaker_wizard_intro_subtitle`}
         >
-          {t('intro_title')}
+          {t('intro_subtitle')}
         </Text>
-        <Flex flexDirection={DIRECTION_COLUMN}>
-          <Text
-            paddingTop={TYPOGRAPHY.fontSizeH6}
-            fontSize={TYPOGRAPHY.fontSizeH4}
-            paddingLeft={'8rem'}
-            data-testid={`heater_shaker_wizard_intro_subtitle`}
-          >
-            {t('intro_subtitle')}
-          </Text>
-          <Flex
-            justifyContent={JUSTIFY_CENTER}
-            data-testid={`heater_shaker_wizard_intro_container_adapter`}
-          >
-            <IntroContainer
-              text={
-                thermalAdapterName != null
-                  ? t('intro_adapter_known', { adapter: thermalAdapterName })
-                  : t('intro_adapter_unknown')
-              }
-              subtext={t('intro_adapter_body')}
-              image={
-                thermalAdapterName != null ? (
-                  <Flex
-                    width={TYPOGRAPHY.introImageWidth}
-                    height={TYPOGRAPHY.introImageHeight}
-                  >
-                    <div>{'thermal adapter image'}</div>
-                  </Flex>
-                ) : undefined
-              }
-            />
-          </Flex>
-          <Flex
-            justifyContent={JUSTIFY_CENTER}
-            data-testid={`heater_shaker_wizard_intro_container_labware`}
-          >
-            <IntroContainer
-              text={
-                labwareDefinition != null
-                  ? labwareDefinition.metadata.displayName
-                  : t('intro_labware')
-              }
-              image={
-                labwareDefinition != null ? (
-                  <Flex
-                    width={TYPOGRAPHY.introImageWidth}
-                    height={TYPOGRAPHY.introImageHeight}
-                  >
-                    <LabwareRender definition={labwareDefinition} />
-                  </Flex>
-                ) : undefined
-              }
-            />
-          </Flex>
-          <Flex
-            justifyContent={JUSTIFY_CENTER}
-            data-testid={`heater_shaker_wizard_intro_container_heater_shaker`}
-          >
-            <IntroContainer
-              image={<img src={heaterShaker} alt={'heater_shaker_image'} />}
-              text={t('intro_heater_shaker_mod')}
-            />
-          </Flex>
-          <Flex
-            justifyContent={JUSTIFY_CENTER}
-            data-testid={`heater_shaker_wizard_intro_container_screwdriver`}
-          >
-            <IntroContainer
-              image={<img src={screwdriver} alt={'screwdriver_image'} />}
-              text={t('intro_screwdriver')}
-              subtext={t('intro_screwdriver_body')}
-            />
-          </Flex>
+        <Flex
+          justifyContent={JUSTIFY_CENTER}
+          data-testid={`heater_shaker_wizard_intro_item_adapter`}
+        >
+          <IntroItem
+            text={
+              thermalAdapterName != null
+                ? t('intro_adapter_known', { adapter: thermalAdapterName })
+                : t('intro_adapter_unknown')
+            }
+            subtext={t('intro_adapter_body')}
+            image={
+              thermalAdapterName != null ? (
+                <Flex
+                  width={TYPOGRAPHY.introImageWidth}
+                  height={TYPOGRAPHY.introImageHeight}
+                >
+                  {/* TODO immediately: add thermal adapter image */}
+                  <div>{'thermal adapter image'}</div>
+                </Flex>
+              ) : undefined
+            }
+          />
+        </Flex>
+        <Flex
+          justifyContent={JUSTIFY_CENTER}
+          data-testid={`heater_shaker_wizard_intro_item_labware`}
+        >
+          <IntroItem
+            text={
+              labwareDefinition != null
+                ? labwareDefinition.metadata.displayName
+                : t('intro_labware')
+            }
+            image={
+              labwareDefinition != null ? (
+                <Flex
+                  width={TYPOGRAPHY.introImageWidth}
+                  height={TYPOGRAPHY.introImageHeight}
+                >
+                  <LabwareRender definition={labwareDefinition} />
+                </Flex>
+              ) : undefined
+            }
+          />
+        </Flex>
+        <Flex
+          justifyContent={JUSTIFY_CENTER}
+          data-testid={`heater_shaker_wizard_intro_item_heater_shaker`}
+        >
+          <IntroItem
+            image={<img src={heaterShaker} alt={'heater_shaker_image'} />}
+            text={t('intro_heater_shaker_mod')}
+          />
+        </Flex>
+        <Flex
+          justifyContent={JUSTIFY_CENTER}
+          data-testid={`heater_shaker_wizard_intro_item_screwdriver`}
+        >
+          <IntroItem
+            image={<img src={screwdriver} alt={'screwdriver_image'} />}
+            text={t('intro_screwdriver')}
+            subtext={t('intro_screwdriver_body')}
+          />
         </Flex>
       </Flex>
-    </>
+    </Flex>
   )
 }
