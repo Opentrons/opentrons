@@ -1,13 +1,13 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
-import { OverflowMenu } from '..'
+import { MenuList } from '..'
 
-const render = (props: React.ComponentProps<typeof OverflowMenu>) => {
-  return renderWithProviders(<OverflowMenu {...props} />)[0]
+const render = (props: React.ComponentProps<typeof MenuList>) => {
+  return renderWithProviders(<MenuList {...props} />)[0]
 }
 
-describe('OverflowMenu', () => {
-  let props: React.ComponentProps<typeof OverflowMenu>
+describe(' MenuList', () => {
+  let props: React.ComponentProps<typeof MenuList>
   beforeEach(() => {
     props = {
       children: <div>child</div>,

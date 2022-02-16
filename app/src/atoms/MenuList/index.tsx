@@ -7,11 +7,11 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-interface OverflowMenuProps {
+interface MenuListProps {
   children: React.ReactNode
 }
 
-export const OverflowMenu = (props: OverflowMenuProps): JSX.Element | null => {
+export const MenuList = (props: MenuListProps): JSX.Element | null => {
   return (
     <Box
       borderRadius={TYPOGRAPHY.borderRadiusS}

@@ -9,8 +9,8 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { OverflowMenu } from '../../../atoms/OverflowMenu'
-import { OverflowMenuBtn } from '../../../atoms/OverflowMenu/OverflowMenuBtn'
+import { MenuList } from '../../../atoms/MenuList'
+import { MenuItem } from '../../../atoms/MenuList/MenuItem'
 import { MagneticModuleSlideout } from './MagneticModuleSlideout'
 import { TemperatureModuleSlideout } from './TemperatureModuleSlideout'
 import { ThermocyclerModuleSlideout } from './ThermocyclerModuleSlideout'
@@ -99,29 +99,29 @@ export const ModuleOverflowMenu = (
     <React.Fragment>
       {showSlideout && renderSlideOut(hasSecondary)}
       <Flex position={POSITION_RELATIVE}>
-        <OverflowMenu>
+        <MenuList>
           <Flex flexDirection={DIRECTION_COLUMN}>
             {menuItems[module.type].map((item, index) => {
               return (
-                <OverflowMenuBtn
+                <MenuItem
                   key={index}
                   onClick={() => handleClick(item.isSecondary)}
                   data-testid={`module_setting_${module.model}`}
                 >
                   {/* TODO(sh, 2022-02-11): conditionally render deactivate setting based on module status and pass the required commands. */}
                   {item.setSetting}
-                </OverflowMenuBtn>
+                </MenuItem>
               )
             })}
-            <OverflowMenuBtn
+            <MenuItem
               data-testid={`about_module_${module.model}`}
               //  TODO immediately - add actual module overflow menu
               onClick={() => console.log('about module overflow menu')}
             >
               {t('overflow_menu_about')}
-            </OverflowMenuBtn>
+            </MenuItem>
           </Flex>
-        </OverflowMenu>
+        </MenuList>
       </Flex>
     </React.Fragment>
   )
