@@ -3,114 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [5.0.0-beta.11](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.10...v5.0.0-beta.11) (2022-02-14)
-
-**Note:** Version bump only for package @opentrons/react-api-client
-
-
-
-
-
-# [5.0.0-beta.10](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.9...v5.0.0-beta.10) (2022-02-11)
-
-**Note:** Version bump only for package @opentrons/react-api-client
-
-
-
-
-
-# [5.0.0-beta.9](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.8...v5.0.0-beta.9) (2022-02-10)
-
-
-### Bug Fixes
-
-* **app:** shore up edge cases of current command tracking, use new commands endpoint link metadata ([#9418](https://github.com/Opentrons/opentrons/issues/9418)) ([3c27050](https://github.com/Opentrons/opentrons/commit/3c270503244ee6250d0fff3f902d9356b79892d3)), closes [#9379](https://github.com/Opentrons/opentrons/issues/9379)
-
-
-### Features
-
-* **robot-server,api,app:** When adding a jog command over HTTP, wait for it to complete before returning ([#9410](https://github.com/Opentrons/opentrons/issues/9410)) ([4d811d5](https://github.com/Opentrons/opentrons/commit/4d811d5485754b45795a275424e0b267edc88270))
-
-
-
-
-
-# [5.0.0-beta.8](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.7...v5.0.0-beta.8) (2022-02-03)
-
-
-### Performance Improvements
-
-* **robot-server, app:** remove commands from GET /runs/:run_id ([#9337](https://github.com/Opentrons/opentrons/issues/9337)) ([56f291a](https://github.com/Opentrons/opentrons/commit/56f291a1a4179322d440621e745186269e2dc4ee))
-
-
-
-
-
-# [5.0.0-beta.7](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.6...v5.0.0-beta.7) (2022-01-28)
-
-
-### Performance Improvements
-
-* **robot-server, api-client:** return run summaries from GET /runs rather than full run models ([#9332](https://github.com/Opentrons/opentrons/issues/9332)) ([66b1d7c](https://github.com/Opentrons/opentrons/commit/66b1d7c0082970c53306eb99006309914ad33b22))
-
-
-
-
-
-# [5.0.0-beta.6](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.5...v5.0.0-beta.6) (2022-01-07)
-
-**Note:** Version bump only for package @opentrons/react-api-client
-
-
-
-
-
-# [5.0.0-beta.5](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.4...v5.0.0-beta.5) (2021-12-23)
-
-**Note:** Version bump only for package @opentrons/react-api-client
-
-
-
-
-
-# [5.0.0-beta.4](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.3...v5.0.0-beta.4) (2021-12-14)
-
-**Note:** Version bump only for package @opentrons/react-api-client
-
-
-
-
-
-# [5.0.0-beta.3](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.2...v5.0.0-beta.3) (2021-12-10)
-
-**Note:** Version bump only for package @opentrons/react-api-client
-
-
-
-
-
-# [5.0.0-beta.2](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.1...v5.0.0-beta.2) (2021-12-08)
-
-**Note:** Version bump only for package @opentrons/react-api-client
-
-
-
-
-
-# [5.0.0-beta.1](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.0...v5.0.0-beta.1) (2021-12-07)
-
-**Note:** Version bump only for package @opentrons/react-api-client
-
-
-
-
-
-# [5.0.0-beta.0](https://github.com/Opentrons/opentrons/compare/v4.7.0...v5.0.0-beta.0) (2021-11-30)
+# [5.0.0](https://github.com/Opentrons/opentrons/compare/v4.7.0...v5.0.0) (2022-02-16)
 
 
 ### Bug Fixes
 
 * **app:** fix up labware offset matching logic for labware setup overlays ([#8932](https://github.com/Opentrons/opentrons/issues/8932)) ([91eb5e3](https://github.com/Opentrons/opentrons/commit/91eb5e3c1e62038d3cbb59067903658c62ee2bd3))
+* **app:** shore up edge cases of current command tracking, use new commands endpoint link metadata ([#9418](https://github.com/Opentrons/opentrons/issues/9418)) ([3c27050](https://github.com/Opentrons/opentrons/commit/3c270503244ee6250d0fff3f902d9356b79892d3)), closes [#9379](https://github.com/Opentrons/opentrons/issues/9379)
 
 
 ### Features
@@ -118,6 +17,14 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **app:** clear previous labware offsets on LPC start ([#8895](https://github.com/Opentrons/opentrons/issues/8895)) ([be31e2f](https://github.com/Opentrons/opentrons/commit/be31e2ff0553774a687296930c53e87058fa9f6f))
 * **app:** Run Details Command List ([#8682](https://github.com/Opentrons/opentrons/issues/8682)) ([9ddf133](https://github.com/Opentrons/opentrons/commit/9ddf133f724389444b1ab269238e6aeb862768fe)), closes [#8368](https://github.com/Opentrons/opentrons/issues/8368) [#8481](https://github.com/Opentrons/opentrons/issues/8481)
 * **app:** wire up labware position check ([#8774](https://github.com/Opentrons/opentrons/issues/8774)) ([6b2c3f1](https://github.com/Opentrons/opentrons/commit/6b2c3f1cfcfcc98b200919ad34544a661641c2cb))
+* **robot-server,api,app:** When adding a jog command over HTTP, wait for it to complete before returning ([#9410](https://github.com/Opentrons/opentrons/issues/9410)) ([4d811d5](https://github.com/Opentrons/opentrons/commit/4d811d5485754b45795a275424e0b267edc88270))
+
+
+### Performance Improvements
+
+* **app, robot-server:** paginate /runs/:run_id/commands response ([#9348](https://github.com/Opentrons/opentrons/issues/9348)) ([b9eb7b4](https://github.com/Opentrons/opentrons/commit/b9eb7b4d98532480705d3c32fd2485508315bea9))
+* **robot-server, api-client:** return run summaries from GET /runs rather than full run models ([#9332](https://github.com/Opentrons/opentrons/issues/9332)) ([66b1d7c](https://github.com/Opentrons/opentrons/commit/66b1d7c0082970c53306eb99006309914ad33b22))
+* **robot-server, app:** remove commands from GET /runs/:run_id ([#9337](https://github.com/Opentrons/opentrons/issues/9337)) ([56f291a](https://github.com/Opentrons/opentrons/commit/56f291a1a4179322d440621e745186269e2dc4ee))
 
 
 
