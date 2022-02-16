@@ -174,8 +174,8 @@ def test_load_labware_explicit_namespace_and_version(
     decoy.when(
         engine_client.load_labware(
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
-            load_name="some_explicit_namespace",
-            namespace="opentrons",
+            load_name="some_labware",
+            namespace="some_explicit_namespace",
             version=9001,
         )
     ).then_return(
