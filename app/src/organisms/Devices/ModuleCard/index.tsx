@@ -19,7 +19,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
-import { OverflowBtn } from '../../../atoms/OverflowMenu/OverflowBtn'
+import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { ModuleIcon } from '../ModuleIcon'
 import { MagneticModuleData } from './MagneticModuleData'
 import { TemperatureModuleData } from './TemperatureModuleData'

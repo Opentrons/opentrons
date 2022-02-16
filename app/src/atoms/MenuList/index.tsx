@@ -5,13 +5,15 @@ import {
   POSITION_ABSOLUTE,
   SPACING_1,
   TYPOGRAPHY,
+  ButtonProps,
+  DIRECTION_COLUMN,
 } from '@opentrons/components'
 
-interface OverflowMenuProps {
-  children: React.ReactNode
+interface MenuListProps {
+  buttons: Array<ButtonProps | null | undefined>
 }
 
-export const OverflowMenu = (props: OverflowMenuProps): JSX.Element | null => {
+export const MenuList = (props: MenuListProps): JSX.Element | null => {
   return (
     <Box
       borderRadius={TYPOGRAPHY.borderRadiusS}
@@ -20,8 +22,10 @@ export const OverflowMenu = (props: OverflowMenuProps): JSX.Element | null => {
       backgroundColor={COLORS.white}
       top="2.6rem"
       right={`calc(50% + ${SPACING_1})`}
+      flexDirection={DIRECTION_COLUMN}
+      key={`key_${props.buttons}`}
     >
-      {props.children}
+      {props.buttons}
     </Box>
   )
 }
