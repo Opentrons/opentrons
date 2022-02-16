@@ -14,7 +14,7 @@ import {
 } from '@opentrons/components'
 
 import heaterShaker from '@opentrons/app/src/assets/images/heater_shaker_empty.png'
-import screwdriver from '@opentrons/app/src/assets/images/change-pip/t10_torx_screwdriver.png'
+import screwdriver from '@opentrons/app/src/assets/images/t10_torx_screwdriver.png'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
