@@ -19,11 +19,14 @@
   "unknown_adapter_and_screw": "Thermal Adapter + Screw",
   "screw_may_be_in_module": "Screw may already be in the center of the module.",
   "labware": "Labware",
-  "adapter_title": "Step 2 of 4: Attach Thermal Adapter",
-  "adapter_num_2a": "2a",
-  "adapter_num_2b": "2b",
-  "adapter_num_2c": "2c",
-  "adapter_attach_title": "Attach your adapter to the module.",
-  "adapter_attach_subtitle": "Please use T10 Torx Screwdriver and provided screw ",
-  "adapter_attach_body": "Using a different screwdriver can strip the screws. Using a different screw than the one provided can damage the module"
+  "step_2_of_4_attach_adapter": "Step 2 of 4: Attach Thermal Adapter",
+  "2a": "2a",
+  "2b": "2b",
+  "2c": "2c",
+  "attach_adapter_to_module": "Attach your adapter to the module.",
+  "attach_screwdriver_and_screw": "Please use T10 Torx Screwdriver and provided screw ",
+  "attach_screwdriver_and_screw_explanation": "Using a different screwdriver can strip the screws. Using a different screw than the one provided can damage the module",
+  "check_alignment": "Check alignment.",
+  "a_properly_attached_adapter": "A properly attached adapter will sit evenly on the module.",
+  "check_alignment_instructions": "Check attachment by rocking the adapter back and forth."
 }
