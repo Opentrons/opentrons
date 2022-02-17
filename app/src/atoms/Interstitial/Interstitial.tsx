@@ -59,7 +59,7 @@ export function Interstitial(props: InterstitialProps): JSX.Element {
       <InterstitialTitleBar {...titleBar} />
       <Box
         zIndex="1"
-        width="42.125rem"
+        width="auto"
         margin="0 auto"
         padding={SPACING.spacing4}
         position={POSITION_RELATIVE}
