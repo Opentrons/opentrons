@@ -30,7 +30,8 @@ class HeaterShakerModuleContext:
         for the heater-shaker to reach the target.
         Use :py:meth:`await_temperature` to wait for the temperature set here.
 
-        raises: `InvalidTargetTemperatureError` if temperature out of limits
+        Raises:
+            InvalidTargetTemperatureError: target temperature out of limits.
         """
         if not TEMPERATURE_LOWER_LIMIT <= temperature <= TEMPERATURE_UPPER_LIMIT:
             raise InvalidTargetTemperatureError(
