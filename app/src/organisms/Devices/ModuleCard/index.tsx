@@ -30,15 +30,15 @@ import { MagneticModuleData } from './MagneticModuleData'
 import { TemperatureModuleData } from './TemperatureModuleData'
 import { ThermocyclerModuleData } from './ThermocyclerModuleData'
 import { ModuleOverflowMenu } from './ModuleOverflowMenu'
+import { ThermocyclerModuleSlideout } from './ThermocyclerModuleSlideout'
+import { MagneticModuleSlideout } from './MagneticModuleSlideout'
+import { TemperatureModuleSlideout } from './TemperatureModuleSlideout'
 
 import magneticModule from '../../../assets/images/magnetic_module_gen_2_transparent.svg'
 import temperatureModule from '../../../assets/images/temp_deck_gen_2_transparent.svg'
 import thermoModule from '../../../assets/images/thermocycler_open_transparent.svg'
 
 import type { AttachedModule } from '../../../redux/modules/types'
-import { ThermocyclerModuleSlideout } from './ThermocyclerModuleSlideout'
-import { MagneticModuleSlideout } from './MagneticModuleSlideout'
-import { TemperatureModuleSlideout } from './TemperatureModuleSlideout'
 
 interface ModuleCardProps {
   module: AttachedModule
@@ -51,7 +51,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [showSlideout, setShowSlideout] = React.useState(false)
   const [hasSecondary, setHasSecondary] = React.useState(false)
 
-  const node = useOnClickOutside({
+  const moduleOverflowWrapperRef = useOnClickOutside({
     onClickOutside: () => setShowOverflowMenu(false),
   }) as React.RefObject<HTMLDivElement>
 
@@ -97,39 +97,11 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     }
   }
 
-  const renderSlideOut = (isSecondary: boolean = false): JSX.Element => {
-    if (module.type === THERMOCYCLER_MODULE_TYPE) {
-      return (
-        <ThermocyclerModuleSlideout
-          module={module}
-          onCloseClick={() => setShowSlideout(false)}
-          isExpanded={showSlideout}
-          isSecondaryTemp={isSecondary}
-        />
-      )
-    } else if (module.type === MAGNETIC_MODULE_TYPE) {
-      return (
-        <MagneticModuleSlideout
-          module={module}
-          onCloseClick={() => setShowSlideout(false)}
-          isExpanded={showSlideout}
-        />
-      )
-    } else {
-      return (
-        <TemperatureModuleSlideout
-          model={module.model}
-          serial={module.serial}
-          onCloseClick={() => setShowSlideout(false)}
-          isExpanded={showSlideout}
-        />
-      )
-    }
-  }
-
   const handleMenuItemClick = (isSecondary: boolean = false): void => {
     if (isSecondary) {
       setHasSecondary(true)
+    } else {
+      setHasSecondary(false)
     }
     setShowSlideout(true)
     setShowOverflowMenu(false)
@@ -144,7 +116,14 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         marginLeft={SPACING_2}
         width={'20rem'}
       >
-        {showSlideout && renderSlideOut(hasSecondary)}
+        {showSlideout && (
+          <ModuleSlideout
+            module={module}
+            isSecondary={hasSecondary}
+            showSlideout={showSlideout}
+            onCloseClick={() => setShowSlideout(false)}
+          />
+        )}
         <Box
           padding={`${SPACING_3} ${SPACING_2} ${SPACING_3} ${SPACING_2}`}
           width="100%"
@@ -183,7 +162,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           />
         </Box>
         {showOverflowMenu && (
-          <div ref={node}>
+          <div ref={moduleOverflowWrapperRef}>
             <ModuleOverflowMenu
               module={module}
               handleClick={handleMenuItemClick}
@@ -193,4 +172,42 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       </Flex>
     </React.Fragment>
   )
+}
+
+interface ModuleSlideoutProps {
+  module: AttachedModule
+  isSecondary: boolean
+  showSlideout: boolean
+  onCloseClick: () => unknown
+}
+
+const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
+  const { module, isSecondary, showSlideout, onCloseClick } = props
+  if (module.type === THERMOCYCLER_MODULE_TYPE) {
+    return (
+      <ThermocyclerModuleSlideout
+        module={module}
+        onCloseClick={onCloseClick}
+        isExpanded={showSlideout}
+        isSecondaryTemp={isSecondary}
+      />
+    )
+  } else if (module.type === MAGNETIC_MODULE_TYPE) {
+    return (
+      <MagneticModuleSlideout
+        module={module}
+        onCloseClick={onCloseClick}
+        isExpanded={showSlideout}
+      />
+    )
+  } else {
+    return (
+      <TemperatureModuleSlideout
+        model={module.model}
+        serial={module.serial}
+        onCloseClick={onCloseClick}
+        isExpanded={showSlideout}
+      />
+    )
+  }
 }
