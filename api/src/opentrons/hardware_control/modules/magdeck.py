@@ -93,12 +93,17 @@ class MagDeck(mod_abc.AbstractModule):
         # return if successful or not?
 
     async def engage(self, height: float) -> None:
-        """Move the magnet to a specific height, in mm from home position."""
+        """Move the magnet to a specific height, measured from home position.
+
+        The units of position depend on the module model.
+        For GEN1, it's half millimeters ("short millimeters").
+        For GEN2, it's millimeters.
+        """
         await self.wait_for_is_running()
         if height > MAX_ENGAGE_HEIGHT[self.model()] or height < 0:
             raise ValueError(
-                f"Invalid engage height for {self.model()}: {height} mm. "
-                f"Must be 0 - {MAX_ENGAGE_HEIGHT[self.model()]} mm"
+                f"Invalid engage height for {self.model()}: {height}. "
+                f"Must be 0 - {MAX_ENGAGE_HEIGHT[self.model()]}."
             )
         await self._driver.move(height)
         self._current_height = await self._driver.get_mag_position()

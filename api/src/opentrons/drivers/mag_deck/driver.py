@@ -139,17 +139,21 @@ class MagDeckDriver(AbstractMagDeckDriver):
         data = utils.parse_key_values(response)
         return utils.parse_number(str(data.get("Z")), GCODE_ROUNDING_PRECISION)
 
-    async def move(self, position_mm: float) -> None:
+    async def move(self, position: float) -> None:
         """
         Move the magnets along Z axis where the home position is 0.0;
-        position_mm-> a point along Z. Does not self-check if the position
+        position-> a point along Z. Does not self-check if the position
         is outside of the deck's linear range
+
+        The units of position depend on the module model.
+        For GEN1, it's half millimeters ("short millimeters").
+        For GEN2, it's millimeters.
         """
         c = (
             CommandBuilder(terminator=MAG_DECK_COMMAND_TERMINATOR)
             .add_gcode(gcode=GCODE.MOVE)
             .add_float(
-                prefix="Z", value=position_mm, precision=GCODE_ROUNDING_PRECISION
+                prefix="Z", value=position, precision=GCODE_ROUNDING_PRECISION
             )
         )
         await self._send_command(c)
