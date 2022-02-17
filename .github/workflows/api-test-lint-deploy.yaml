@@ -52,12 +52,13 @@ jobs:
       - name: Lint
         run: make -C api lint
   test:
-    name: 'opentrons package tests'
+    name: 'opentrons package tests on ${{ matrix.os }}, python ${{ matrix.python }}'
     timeout-minutes: 30
     needs: [lint]
     strategy:
       matrix:
         os: ['windows-latest', 'ubuntu-18.04', 'macos-latest']
+        python: ['3.7', '3.8', '3.9', '3.10']
     runs-on: '${{ matrix.os }}'
     steps:
       - uses: 'actions/checkout@v2'
@@ -66,7 +67,7 @@ jobs:
           node-version: '14'
       - uses: 'actions/setup-python@v2'
         with:
-          python-version: '3.7'
+          python-version: ${{ matrix.python }}
       - name: 'set complex environment variables'
         uses: actions/github-script@v3.1
         with:
