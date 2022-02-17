@@ -1,14 +1,14 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import { TitleBar } from '..'
+import { InterstitialTitleBar } from '../InterstitiallTitleBar'
 
-const render = (props: React.ComponentProps<typeof TitleBar>) => {
-  return renderWithProviders(<TitleBar {...props} />)[0]
+const render = (props: React.ComponentProps<typeof InterstitialTitleBar>) => {
+  return renderWithProviders(<InterstitialTitleBar {...props} />)[0]
 }
 
 describe('TitleBar', () => {
-  let props: React.ComponentProps<typeof TitleBar>
+  let props: React.ComponentProps<typeof InterstitialTitleBar>
   const EXIT = { title: 'EXIT', onClick: jest.fn(), children: 'EXIT' }
   beforeEach(() => {
     props = {

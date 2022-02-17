@@ -8,6 +8,10 @@ import styles from './structure.css'
 
 import type { ButtonProps } from '../buttons'
 
+/**
+ * @deprecated Use `TitleBar` and `TitleBarProps` instead
+ */
+
 export interface DeprecatedTitleBarProps {
   id?: string
   title: React.ReactNode

@@ -30,7 +30,7 @@ const IntroItem = (props: IntroContainerProps): JSX.Element => {
 
   if (props.subtext != null) {
     multiText = (
-      <Flex flexDirection={DIRECTION_COLUMN} paddingRight={'1.25rem'}>
+      <Flex flexDirection={DIRECTION_COLUMN} paddingRight={SPACING.spacingM}>
         <Flex
           fontSize={TYPOGRAPHY.fontSizeLabel}
           paddingLeft={leftPadding}
@@ -63,15 +63,15 @@ const IntroItem = (props: IntroContainerProps): JSX.Element => {
   }
   return (
     <Flex
-      marginTop={'0.625rem'}
+      marginTop={SPACING.spacing3}
       border={`1px solid ${COLORS.medGrey}`}
       flexDirection={DIRECTION_ROW}
       width={'21.5rem'}
-      paddingBottom={'0.625rem'}
+      paddingBottom={SPACING.spacing3}
     >
       {props.image != null ? (
         <>
-          <Flex paddingLeft={SPACING.spacingXS} paddingTop={'0.625rem'}>
+          <Flex paddingLeft={SPACING.spacingXS} paddingTop={SPACING.spacing3}>
             {props.image}
           </Flex>
           {multiText}
@@ -104,7 +104,7 @@ export function Introduction(props: IntroductionProps): JSX.Element {
         width="39.625rem"
         data-testid={`heater_shaker_wizard_intro_title`}
       >
-        {t('intro_title')}
+        {t('use_this_heater_shaker_guide')}
       </Text>
       <Flex flexDirection={DIRECTION_COLUMN}>
         <Text
@@ -113,7 +113,7 @@ export function Introduction(props: IntroductionProps): JSX.Element {
           paddingLeft={'8rem'}
           data-testid={`heater_shaker_wizard_intro_subtitle`}
         >
-          {t('intro_subtitle')}
+          {t('you_will_need')}
         </Text>
         <Flex
           justifyContent={JUSTIFY_CENTER}
@@ -122,10 +122,10 @@ export function Introduction(props: IntroductionProps): JSX.Element {
           <IntroItem
             text={
               thermalAdapterName != null
-                ? t('intro_adapter_known', { adapter: thermalAdapterName })
-                : t('intro_adapter_unknown')
+                ? t('adapter_name_and_screw', { adapter: thermalAdapterName })
+                : t('unknown_adapter_and_screw')
             }
-            subtext={t('intro_adapter_body')}
+            subtext={t('screw_may_be_in_module')}
             //  TODO(jr, 2022-02-16): plus in thermal adapter image
             image={
               thermalAdapterName != null ? (
@@ -144,7 +144,7 @@ export function Introduction(props: IntroductionProps): JSX.Element {
             text={
               labwareDefinition != null
                 ? labwareDefinition.metadata.displayName
-                : t('intro_labware')
+                : t('labware')
             }
             image={
               labwareDefinition != null ? (
@@ -161,7 +161,7 @@ export function Introduction(props: IntroductionProps): JSX.Element {
         >
           <IntroItem
             image={<img src={heaterShaker} alt={'heater_shaker_image'} />}
-            text={t('intro_heater_shaker_mod')}
+            text={t('heater_shaker_mod')}
           />
         </Flex>
         <Flex
@@ -170,8 +170,8 @@ export function Introduction(props: IntroductionProps): JSX.Element {
         >
           <IntroItem
             image={<img src={screwdriver} alt={'screwdriver_image'} />}
-            text={t('intro_screwdriver')}
-            subtext={t('intro_screwdriver_body')}
+            text={t('t10_torx_screwdriver')}
+            subtext={t('about_screwdriver')}
           />
         </Flex>
       </Flex>

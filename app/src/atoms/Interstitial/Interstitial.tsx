@@ -9,8 +9,12 @@ import {
   COLORS,
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
+  SPACING,
 } from '@opentrons/components'
-import { TitleBar, TitleBarProps } from '../TitleBar'
+import {
+  InterstitialTitleBar,
+  InterstitialTitleBarProps,
+} from './InterstitiallTitleBar'
 
 function Overlay(): JSX.Element {
   return (
@@ -25,8 +29,8 @@ function Overlay(): JSX.Element {
   )
 }
 
-export interface ModalPageProps {
-  titleBar: TitleBarProps
+export interface InterstitialProps {
+  titleBar: InterstitialTitleBarProps
   contentsClassName?: string
   heading?: React.ReactNode
   children?: React.ReactNode
@@ -34,7 +38,7 @@ export interface ModalPageProps {
   outerProps?: React.ComponentProps<typeof Box>
 }
 
-export function ModalPage(props: ModalPageProps): JSX.Element {
+export function Interstitial(props: InterstitialProps): JSX.Element {
   const { titleBar, heading, innerProps = {}, outerProps = {} } = props
 
   return (
@@ -47,17 +51,17 @@ export function ModalPage(props: ModalPageProps): JSX.Element {
       bottom="0"
       justifyContent={JUSTIFY_FLEX_START}
       padding={`2.5rem 3rem 1rem 3rem`}
-      data-testid={`modal_page`}
+      data-testid={`interstitial`}
       {...outerProps}
     >
       <Overlay />
 
-      <TitleBar {...titleBar} />
+      <InterstitialTitleBar {...titleBar} />
       <Box
         zIndex="1"
         width="42.125rem"
         margin="0 auto"
-        padding={'1rem'}
+        padding={SPACING.spacing4}
         position={POSITION_RELATIVE}
         boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.3)'}
         border={`1px solid ${COLORS.medGrey}`}
