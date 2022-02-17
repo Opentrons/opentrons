@@ -13,10 +13,13 @@ from . import update, mod_abc, types
 log = logging.getLogger(__name__)
 
 MAX_ENGAGE_HEIGHT = {
-    # mm from home position
+    # Distance from home position.
+    # Measured in model-specific units (half-mm for GEN1, mm for GEN2).
     "magneticModuleV1": 45,
     "magneticModuleV2": 25,
 }
+
+# Measured in model-specific units (half-mm for GEN1, mm for GEN2).
 OFFSET_TO_LABWARE_BOTTOM = {"magneticModuleV1": 5, "magneticModuleV2": 2.5}
 
 
