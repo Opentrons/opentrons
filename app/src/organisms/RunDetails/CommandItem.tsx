@@ -46,9 +46,9 @@ export interface CommandItemProps {
   analysisCommand: RunTimeCommand | null
   runCommandSummary: RunCommandSummary | null
   runStatus: RunStatus
-  hasBeenRun: boolean
   stepNumber: number
   runStartedAt: string | null
+  isMostRecentCommand: boolean
 }
 
 const WRAPPER_STYLE_BY_STATUS: {
@@ -76,16 +76,22 @@ export function CommandItemComponent(
     analysisCommand,
     runCommandSummary,
     runStatus,
-    hasBeenRun,
     stepNumber,
     runStartedAt,
+    isMostRecentCommand,
   } = props
   const { t } = useTranslation('run_details')
 
-  const commandStatus =
-    runStatus !== RUN_STATUS_IDLE && runCommandSummary?.status != null
-      ? runCommandSummary.status
-      : 'queued'
+  let commandStatus: RunCommandSummary['status'] = 'queued' as const
+  if (runStatus !== RUN_STATUS_IDLE && runCommandSummary?.status != null) {
+    commandStatus = runCommandSummary.status
+  }
+  if (
+    isMostRecentCommand &&
+    (commandStatus === 'queued' || commandStatus === 'succeeded')
+  ) {
+    commandStatus = 'running' as const
+  }
 
   let isComment = false
   if (
@@ -105,14 +111,10 @@ export function CommandItemComponent(
   const isPause =
     analysisCommand?.commandType === 'pause' ||
     runCommandSummary?.commandType === 'pause'
-  const backgroundColor =
-    commandStatus === 'queued' && hasBeenRun
-      ? C_AQUAMARINE
-      : WRAPPER_STYLE_BY_STATUS[commandStatus].backgroundColor
 
   const WRAPPER_STYLE = css`
     font-size: ${FONT_SIZE_BODY_1};
-    background-color: ${backgroundColor};
+    background-color: ${WRAPPER_STYLE_BY_STATUS[commandStatus].backgroundColor};
     border: ${WRAPPER_STYLE_BY_STATUS[commandStatus].border};
     padding: ${SPACING_2};
     color: ${C_DARK_GRAY};
@@ -188,6 +190,7 @@ export const CommandItem = React.memo(
     const shouldRerender =
       !isEqual(prevProps.analysisCommand, nextProps.analysisCommand) ||
       !isEqual(prevProps.runCommandSummary, nextProps.runCommandSummary) ||
+      !isEqual(prevProps.isMostRecentCommand, nextProps.isMostRecentCommand) ||
       ((([
         RUN_STATUS_PAUSED,
         RUN_STATUS_PAUSE_REQUESTED,

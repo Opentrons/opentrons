@@ -45,7 +45,7 @@ export const SummaryScreen = (props: {
     )
   const { createLabwareOffset } = useCreateLabwareOffsetMutation()
   const runId = useCurrentRunId()
-  const { setShowLPCSuccessToast } = useLPCSuccessToast()
+  const { setIsShowingLPCSuccessToast } = useLPCSuccessToast()
 
   if (runId == null || introInfo == null || protocolData == null) return null
   const labwareIds = Object.keys(protocolData.labware)
@@ -107,7 +107,7 @@ export const SummaryScreen = (props: {
           id={'Lpc_summaryScreen_applyOffsetButton'}
           onClick={() => {
             applyLabwareOffsets()
-            setShowLPCSuccessToast()
+            setIsShowingLPCSuccessToast(true)
             props.onCloseClick()
           }}
         >

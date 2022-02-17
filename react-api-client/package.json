@@ -1,7 +1,7 @@
 {
   "name": "@opentrons/react-api-client",
   "description": "Opentrons robot HTTP API client for React apps",
-  "version": "5.0.0-beta.8",
+  "version": "5.0.0",
   "license": "Apache-2.0",
   "main": "dist/react-api-client.browser.js",
   "module": "dist/react-api-client.browser.mjs",
@@ -11,8 +11,8 @@
     "react": "17.0.1"
   },
   "dependencies": {
-    "@opentrons/api-client": "5.0.0-beta.8",
-    "@opentrons/shared-data": "5.0.0-beta.8",
+    "@opentrons/api-client": "5.0.0",
+    "@opentrons/shared-data": "5.0.0",
     "react-query": "^3.34.8"
   }
 }

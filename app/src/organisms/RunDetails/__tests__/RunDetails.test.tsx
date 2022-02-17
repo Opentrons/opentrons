@@ -20,6 +20,7 @@ import { RunDetails } from '..'
 import { i18n } from '../../../i18n'
 import { CommandList } from '../CommandList'
 import { useProtocolDetails } from '../hooks'
+import { getConnectedRobotName } from '../../../redux/robot/selectors'
 import { useRunStatus, useRunControls } from '../../RunTimeControl/hooks'
 import { ProtocolLoader } from '../../ProtocolUpload'
 import {
@@ -28,8 +29,18 @@ import {
 } from '../../ProtocolUpload/hooks'
 import type { ProtocolFile } from '@opentrons/shared-data'
 
+const mockPush = jest.fn()
+
 jest.mock('../hooks')
 jest.mock('../CommandList')
+jest.mock('../../../redux/robot/selectors')
+jest.mock('react-router-dom', () => {
+  const reactRouterDom = jest.requireActual('react-router-dom')
+  return {
+    ...reactRouterDom,
+    useHistory: () => ({ push: mockPush } as any),
+  }
+})
 jest.mock('../../RunTimeControl/hooks')
 jest.mock('../../ProtocolUpload/hooks/')
 
@@ -49,6 +60,9 @@ const mockUseCloseCurrentRun = useCloseCurrentRun as jest.MockedFunction<
 >
 const mockUseIsProtocolRunLoaded = useIsProtocolRunLoaded as jest.MockedFunction<
   typeof useIsProtocolRunLoaded
+>
+const mockGetConnectedRobotName = getConnectedRobotName as jest.MockedFunction<
+  typeof getConnectedRobotName
 >
 
 const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolFile<{}>
@@ -89,10 +103,17 @@ describe('RunDetails', () => {
       isStopRunActionLoading: false,
       isResetRunLoading: false,
     })
+    mockGetConnectedRobotName.mockReturnValue('robot_name')
   })
 
   afterEach(() => {
     resetAllWhenMocks()
+  })
+
+  it('pushes the /robots route if we somehow land on this page without a connected robot', () => {
+    mockGetConnectedRobotName.mockReturnValue(null)
+    render()
+    expect(mockPush).toHaveBeenCalledWith('/robots')
   })
 
   it('renders protocol title', () => {

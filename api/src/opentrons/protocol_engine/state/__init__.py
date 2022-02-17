@@ -1,7 +1,7 @@
 """Protocol engine state module."""
 
 from .state import State, StateStore, StateView
-from .commands import CommandState, CommandView, CommandSlice
+from .commands import CommandState, CommandView, CommandSlice, CurrentCommand
 from .labware import LabwareState, LabwareView
 from .pipettes import PipetteState, PipetteView, HardwarePipette, CurrentWell
 from .modules import ModuleState, ModuleView, HardwareModule
@@ -18,6 +18,7 @@ __all__ = [
     "CommandState",
     "CommandView",
     "CommandSlice",
+    "CurrentCommand",
     # labware state and values
     "LabwareState",
     "LabwareView",

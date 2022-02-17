@@ -22,7 +22,7 @@ import {
   useCurrentRunCommands,
 } from '../ProtocolUpload/hooks'
 import { UseQueryOptions } from 'react-query'
-import type { RunAction, RunStatus, Run } from '@opentrons/api-client'
+import type { RunAction, RunStatus, Run, RunData } from '@opentrons/api-client'
 
 interface RunControls {
   play: () => void
@@ -184,4 +184,8 @@ export function useRunTimestamps(): RunTimestamps {
     stoppedAt,
     completedAt,
   }
+}
+
+export function useRunErrors(): RunData['errors'] {
+  return useCurrentRun()?.data?.errors ?? []
 }

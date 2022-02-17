@@ -105,7 +105,7 @@ describe('SummaryScreen', () => {
       } as any)
     when(mockUseLPCSuccessToast)
       .calledWith()
-      .mockReturnValue({ setShowLPCSuccessToast: () => null })
+      .mockReturnValue({ setIsShowingLPCSuccessToast: _isShowing => {} })
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -119,13 +119,13 @@ describe('SummaryScreen', () => {
     getByText('Labware Position Check Complete')
   })
   it('renders apply offset button and clicks it', () => {
-    const mockSetShowLPCSuccessToast = jest.fn()
-    when(mockUseLPCSuccessToast)
-      .calledWith()
-      .mockReturnValue({ setShowLPCSuccessToast: mockSetShowLPCSuccessToast })
+    const mockSetIsShowingLPCSuccessToast = jest.fn()
+    when(mockUseLPCSuccessToast).calledWith().mockReturnValue({
+      setIsShowingLPCSuccessToast: mockSetIsShowingLPCSuccessToast,
+    })
     const { getByRole } = render(props)
     expect(props.onCloseClick).not.toHaveBeenCalled()
-    expect(mockSetShowLPCSuccessToast).not.toHaveBeenCalled()
+    expect(mockSetIsShowingLPCSuccessToast).not.toHaveBeenCalled()
     const button = getByRole('button', {
       name: 'Close and apply labware offset data',
     })
@@ -133,6 +133,6 @@ describe('SummaryScreen', () => {
       fireEvent.click(button)
     })
     expect(props.onCloseClick).toHaveBeenCalled()
-    expect(mockSetShowLPCSuccessToast).toHaveBeenCalled()
+    expect(mockSetIsShowingLPCSuccessToast).toHaveBeenCalled()
   })
 })

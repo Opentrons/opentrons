@@ -1,9 +1,9 @@
 """Protocol engine commands sub-state."""
 from __future__ import annotations
-import itertools
 from collections import OrderedDict
 from enum import Enum
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Dict, List, Mapping, Optional
 from typing_extensions import Literal
 
@@ -65,8 +65,25 @@ class CommandSlice:
 
     commands: List[Command]
     cursor: int
-    length: int
     total_length: int
+
+
+@dataclass(frozen=True)
+class CurrentCommand:
+    """The "current" command's ID and index in the overall commands list."""
+
+    command_id: str
+    command_key: str
+    created_at: datetime
+    index: int
+
+
+@dataclass(frozen=True)
+class CommandEntry:
+    """An command entry in state, including its index in the list."""
+
+    command: Command
+    index: int
 
 
 @dataclass
@@ -96,8 +113,9 @@ class CommandState:
     is_door_blocking: bool
     run_result: Optional[RunResult]
     running_command_id: Optional[str]
+    all_command_ids: List[str]
     queued_command_ids: OrderedDict[str, Literal[True]]
-    commands_by_id: OrderedDict[str, Command]
+    commands_by_id: Dict[str, CommandEntry]
     errors_by_id: Dict[str, ErrorOccurrence]
 
 
@@ -114,6 +132,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             is_door_blocking=is_door_blocking,
             run_result=None,
             running_command_id=None,
+            all_command_ids=[],
             queued_command_ids=OrderedDict(),
             commands_by_id=OrderedDict(),
             errors_by_id={},
@@ -124,6 +143,8 @@ class CommandStore(HasState[CommandState], HandlesActions):
         errors_by_id: Mapping[str, ErrorOccurrence]
 
         if isinstance(action, QueueCommandAction):
+            assert action.command_id not in self._state.commands_by_id
+
             # TODO(mc, 2021-06-22): mypy has trouble with this automatic
             # request > command mapping, figure out how to type precisely
             # (or wait for a future mypy version that can figure it out).
@@ -136,16 +157,34 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 status=CommandStatus.QUEUED,
             )
 
-            self._state.commands_by_id[queued_command.id] = queued_command
+            next_index = len(self._state.all_command_ids)
+            self._state.all_command_ids.append(action.command_id)
             self._state.queued_command_ids[queued_command.id] = True
+            self._state.commands_by_id[queued_command.id] = CommandEntry(
+                index=next_index,
+                command=queued_command,
+            )
 
         # TODO(mc, 2021-12-28): replace "UpdateCommandAction" with explicit
         # state change actions (e.g. RunCommandAction, SucceedCommandAction)
         # to make a command's queue transition logic easier to follow
         elif isinstance(action, UpdateCommandAction):
             command = action.command
+            prev_entry = self._state.commands_by_id.get(command.id)
 
-            self._state.commands_by_id[command.id] = command
+            if prev_entry is None:
+                index = len(self._state.all_command_ids)
+                self._state.all_command_ids.append(command.id)
+                self._state.commands_by_id[command.id] = CommandEntry(
+                    index=index,
+                    command=command,
+                )
+            else:
+                self._state.commands_by_id[command.id] = CommandEntry(
+                    index=prev_entry.index,
+                    command=command,
+                )
+
             self._state.queued_command_ids.pop(command.id, None)
 
             if command.status == CommandStatus.RUNNING:
@@ -167,13 +206,17 @@ class CommandStore(HasState[CommandState], HandlesActions):
             ]
 
             for command_id in command_ids_to_fail:
-                prev_command = self._state.commands_by_id[command_id]
-                self._state.commands_by_id[command_id] = prev_command.copy(
-                    update={
-                        "errorId": action.error_id,
-                        "completedAt": action.failed_at,
-                        "status": CommandStatus.FAILED,
-                    }
+                prev_entry = self._state.commands_by_id[command_id]
+
+                self._state.commands_by_id[command_id] = CommandEntry(
+                    index=prev_entry.index,
+                    command=prev_entry.command.copy(
+                        update={
+                            "errorId": action.error_id,
+                            "completedAt": action.failed_at,
+                            "status": CommandStatus.FAILED,
+                        }
+                    ),
                 )
 
             if self._state.running_command_id == action.command_id:
@@ -251,7 +294,7 @@ class CommandView(HasState[CommandState]):
     def get(self, command_id: str) -> Command:
         """Get a command by its unique identifier."""
         try:
-            return self._state.commands_by_id[command_id]
+            return self._state.commands_by_id[command_id].command
         except KeyError:
             raise CommandDoesNotExistError(f"Command {command_id} does not exist")
 
@@ -262,45 +305,39 @@ class CommandView(HasState[CommandState]):
         Replacing a command (to change its status, for example) keeps its place in the
         ordering.
         """
-        return list(self._state.commands_by_id.values())
+        return [
+            self._state.commands_by_id[cid].command
+            for cid in self._state.all_command_ids
+        ]
 
     def get_slice(
         self,
         cursor: Optional[int],
         length: int,
     ) -> CommandSlice:
-        """Get a subset of commands around a given cursor."""
+        """Get a subset of commands around a given cursor.
+
+        If the cursor is omitted, return the tail of `length` of the collection.
+        """
         # TODO(mc, 2022-01-31): this is not the most performant way to implement
         # this; if this becomes a problem, change or the underlying data structure
         # to something that isn't just an OrderedDict
+        all_command_ids = self._state.all_command_ids
         commands_by_id = self._state.commands_by_id
-        total_length = len(commands_by_id)
+        total_length = len(all_command_ids)
 
         if cursor is None:
-            current_id = self.get_current()
-
-            if current_id is not None:
-                # TODO(mc, 2022-01-31): this risks becoming a performance bottleneck
-                # when runnning JSONv6 protocols and will require data structure
-                # changes (see TODO above). `reversed` will usually prevent O(n)
-                # worst-case in practice for Python + PAPIv2 protocols
-                for index, command_id in enumerate(reversed(commands_by_id.keys())):
-                    if command_id == current_id:
-                        cursor = total_length - index - 1
-
-            if cursor is None:
-                cursor = total_length - length
+            cursor = total_length - length
 
         # start is inclusive, stop is exclusive
         actual_cursor = max(0, min(cursor, total_length - 1))
         stop = min(total_length, actual_cursor + length)
-        actual_length = stop - actual_cursor
-        commands = list(itertools.islice(commands_by_id.values(), actual_cursor, stop))
+        command_ids = all_command_ids[actual_cursor:stop]
+        commands = [commands_by_id[cid].command for cid in command_ids]
 
         return CommandSlice(
             commands=commands,
             cursor=actual_cursor,
-            length=actual_length,
             total_length=total_length,
         )
 
@@ -308,12 +345,34 @@ class CommandView(HasState[CommandState]):
         """Get a list of all errors that have occurred."""
         return list(self._state.errors_by_id.values())
 
-    def get_current(self) -> Optional[str]:
-        """Return the command that is currently running, if any."""
-        if self._state.running_command_id:
-            return self._state.running_command_id
+    def get_current(self) -> Optional[CurrentCommand]:
+        """Return the "current" command, if any.
 
-        return next(iter(self._state.queued_command_ids.keys()), None)
+        The "current" command is the command that is currently executing,
+        or the most recent command to have completed.
+        """
+        if self._state.running_command_id:
+            entry = self._state.commands_by_id[self._state.running_command_id]
+            return CurrentCommand(
+                command_id=entry.command.id,
+                command_key=entry.command.key,
+                created_at=entry.command.createdAt,
+                index=entry.index,
+            )
+
+        # TODO(mc, 2022-02-07): this is O(n) in the worst case for no good reason.
+        # Resolve prior to JSONv6 support, where this will matter.
+        for reverse_index, cid in enumerate(reversed(self._state.all_command_ids)):
+            if self.get_is_complete(cid):
+                entry = self._state.commands_by_id[cid]
+                return CurrentCommand(
+                    command_id=entry.command.id,
+                    command_key=entry.command.key,
+                    created_at=entry.command.createdAt,
+                    index=len(self._state.all_command_ids) - reverse_index - 1,
+                )
+
+        return None
 
     def get_next_queued(self) -> Optional[str]:
         """Return the next command in line to be executed.

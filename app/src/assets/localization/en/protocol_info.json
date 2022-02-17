@@ -56,7 +56,7 @@
   "labware_positon_check_complete_toast_with_offsets": "Labware Position Check complete. {{count}} Labware Offset created.",
   "labware_positon_check_complete_toast_with_offsets_plural": "Labware Position Check complete. {{count}} Labware Offsets created.",
   "protocol_loading": "Opening Protocol On {{robot_name}}",
-  "protocol_finishing": "Closing Protocol On {{robot_name}}",
+  "protocol_finishing": "Finishing Protocol On {{robot_name}}",
   "cancel_run": "Cancel Run",
   "valid_file_types": "Valid file types: Python files (.py), Protocol Designer files (.json), or .zip files"
 }
