@@ -5,7 +5,7 @@ import os
 import pytest
 
 from opentrons.config import CONFIG, robot_configs, defaults_ot2, defaults_ot3
-from opentrons.config.types import CurrentDict
+from opentrons.config.types import CurrentDict, GantryLoad, OT3Config
 from opentrons.hardware_control.types import BoardRevision
 
 legacy_dummy_settings = {
@@ -94,55 +94,57 @@ ot3_dummy_settings = {
     "name": "Marie Curie",
     "model": "OT-3 Standard",
     "version": 1,
-    "acceleration": {
-        "none": {"X": 3, "Y": 2, "Z": 15, "A": 15, "P": 2},
-        "low_throughput": {
-            "X": 3,
-            "Y": 2,
-            "Z": 15,
-            "P": 15,
+    "motion_settings": {
+        "acceleration": {
+            "none": {"X": 3, "Y": 2, "Z": 15, "P": 2},
+            "low_throughput": {
+                "X": 3,
+                "Y": 2,
+                "Z": 15,
+                "P": 15,
+            },
+            "high_throughput": {
+                "X": 3,
+                "Y": 2,
+                "Z": 15,
+                "P": 15,
+            },
+            "two_low_throughput": {"X": 1.1, "Y": 2.2},
+            "gripper": {
+                "Z": 2.8,
+            },
         },
-        "high_throughput": {
-            "X": 3,
-            "Y": 2,
-            "Z": 15,
-            "P": 15,
+        "default_max_speed": {
+            "none": {
+                "X": 1,
+                "Y": 2,
+                "Z": 3,
+                "P": 4,
+            },
+            "low_throughput": {
+                "X": 1,
+                "Y": 2,
+                "Z": 3,
+                "P": 4,
+            },
+            "high_throughput": {"X": 1, "Y": 2, "Z": 3, "P": 4},
+            "two_low_throughput": {"X": 4, "Y": 3, "Z": 2, "P": 1},
+            "gripper": {"Z": 2.8},
         },
-        "two_low_throughput": {"X": 3, "Y": 2},
-        "gripper": {
-            "Z": 15,
+        "max_speed_discontinuity": {
+            "none": {"X": 10, "Y": 20, "Z": 30, "P": 40},
+            "low_throughput": {"X": 1, "Y": 2, "Z": 3, "P": 6},
+            "high_throughput": {"X": 1, "Y": 2, "Z": 3, "P": 6},
+            "two_low_throughput": {"X": 1, "Y": 2, "Z": 3, "P": 6},
+            "gripper": {"Z": 2.8},
         },
-    },
-    "default_max_speed": {
-        "none": {
-            "X": 1,
-            "Y": 2,
-            "Z": 3,
-            "P": 4,
+        "direction_change_speed_discontinuity": {
+            "none": {"X": 5, "Y": 10, "Z": 15, "P": 20},
+            "low_throughput": {"X": 0.8, "Y": 1, "Z": 2, "P": 4},
+            "high_throughput": {"X": 1, "Y": 2, "Z": 3, "P": 6},
+            "two_low_throughput": {"X": 0.5, "Y": 1, "Z": 1.5, "P": 3},
+            "gripper": {"Z": 2.8},
         },
-        "low_throughput": {
-            "X": 1,
-            "Y": 2,
-            "Z": 3,
-            "P": 4,
-        },
-        "high_throughput": {"X": 1, "Y": 2, "Z": 3, "P": 4},
-        "two_low_throughput": {"X": 1, "Y": 2, "Z": 3, "P": 4},
-        "gripper": {"Z": 3},
-    },
-    "max_speed_discontinuity": {
-        "none": {"X": 10, "Y": 20, "Z": 30, "P": 40},
-        "low_throughput": {"X": 1, "Y": 2, "Z": 3, "P": 6},
-        "high_throughput": {"X": 1, "Y": 2, "Z": 3, "P": 6},
-        "two_low_throughput": {"X": 1, "Y": 2, "Z": 3, "P": 6},
-        "gripper": {"Z": 3},
-    },
-    "direction_change_speed_discontinuity": {
-        "none": {"X": 5, "Y": 10, "Z": 15, "P": 20},
-        "low_throughput": {"X": 0.8, "Y": 1, "Z": 2, "P": 4},
-        "high_throughput": {"X": 1, "Y": 2, "Z": 3, "P": 6},
-        "two_low_throughput": {"X": 0.5, "Y": 1, "Z": 1.5, "P": 3},
-        "gripper": {"Z": 2.8},
     },
     "holding_current": {
         "none": {"X": 0.7, "Y": 0.7, "Z": 0.7, "P": 0.8},
@@ -266,19 +268,21 @@ def test_load_per_pipette_vals():
 
     # some dicts not formatted right
     mostly_right = defaults_ot3.serialize(defaults_ot3.build_with_defaults({}))
-    del mostly_right["acceleration"]["low_throughput"]
+    del mostly_right["motion_settings"]["acceleration"]["low_throughput"]
     assert (
         defaults_ot3._build_default_bpk(
-            mostly_right["acceleration"], defaults_ot3.DEFAULT_ACCELERATIONS
+            mostly_right["motion_settings"]["acceleration"],
+            defaults_ot3.DEFAULT_ACCELERATIONS,
         ).low_throughput
         == defaults_ot3.DEFAULT_ACCELERATIONS.low_throughput
     )
 
     # altered values aare preserved
-    mostly_right["acceleration"]["high_throughput"]["X"] -= 2
+    mostly_right["motion_settings"]["acceleration"]["high_throughput"]["X"] -= 2
     assert (
         defaults_ot3._build_default_bpk(
-            mostly_right["acceleration"], defaults_ot3.DEFAULT_ACCELERATIONS
+            mostly_right["motion_settings"]["acceleration"],
+            defaults_ot3.DEFAULT_ACCELERATIONS,
         ).high_throughput["X"]
         == defaults_ot3.DEFAULT_ACCELERATIONS.high_throughput["X"] - 2
     )
@@ -287,10 +291,10 @@ def test_load_per_pipette_vals():
     altered_default = copy.deepcopy(defaults_ot3.DEFAULT_ACCELERATIONS)
     altered_default.two_low_throughput.pop("X", None)
 
-    mostly_right["acceleration"]["two_low_throughput"]["X"] = -72
+    mostly_right["motion_settings"]["acceleration"]["two_low_throughput"]["X"] = -72
     assert (
         defaults_ot3._build_default_bpk(
-            mostly_right["acceleration"], altered_default
+            mostly_right["motion_settings"]["acceleration"], altered_default
         ).two_low_throughput["X"]
         == -72
     )
@@ -368,3 +372,57 @@ def test_load_transform_vals():
     assert defaults_ot3._build_default_transform(
         [[1, 2, 3], [1, 2, 3], [1, 2, 3]], defaults_ot3.DEFAULT_DECK_TRANSFORM
     ) == [[1, 2, 3], [1, 2, 3], [1, 2, 3]]
+
+
+def test_motion_settings_dataclass():
+    built_config = robot_configs.build_config(ot3_dummy_settings)
+    assert isinstance(built_config, OT3Config)
+    motion_settings = built_config.motion_settings
+
+    none_setting = motion_settings.by_gantry_load(GantryLoad.NONE)
+    assert none_setting["acceleration"] == {"X": 3, "Y": 2, "Z": 15, "P": 2}
+    assert none_setting["default_max_speed"] == {"X": 1, "Y": 2, "Z": 3, "P": 4}
+    assert none_setting["max_speed_discontinuity"] == {
+        "X": 10,
+        "Y": 20,
+        "Z": 30,
+        "P": 40,
+    }
+    assert none_setting["direction_change_speed_discontinuity"] == {
+        "X": 5,
+        "Y": 10,
+        "Z": 15,
+        "P": 20,
+    }
+
+    gripper_setting = motion_settings.by_gantry_load(GantryLoad.GRIPPER)
+    assert gripper_setting["acceleration"] == {"X": 3, "Y": 2, "Z": 2.8, "P": 2}
+    assert gripper_setting["default_max_speed"] == {"X": 1, "Y": 2, "Z": 2.8, "P": 4}
+    assert gripper_setting["max_speed_discontinuity"] == {
+        "X": 10,
+        "Y": 20,
+        "Z": 2.8,
+        "P": 40,
+    }
+    assert gripper_setting["direction_change_speed_discontinuity"] == {
+        "X": 5,
+        "Y": 10,
+        "Z": 2.8,
+        "P": 20,
+    }
+
+    two_low_setting = motion_settings.by_gantry_load(GantryLoad.TWO_LOW_THROUGHPUT)
+    assert two_low_setting["acceleration"] == {"X": 1.1, "Y": 2.2, "Z": 15, "P": 2}
+    assert two_low_setting["default_max_speed"] == {"X": 4, "Y": 3, "Z": 2, "P": 1}
+    assert two_low_setting["max_speed_discontinuity"] == {
+        "X": 1,
+        "Y": 2,
+        "Z": 3,
+        "P": 6,
+    }
+    assert two_low_setting["direction_change_speed_discontinuity"] == {
+        "X": 0.5,
+        "Y": 1,
+        "Z": 1.5,
+        "P": 3,
+    }

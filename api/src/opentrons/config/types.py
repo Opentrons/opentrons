@@ -1,5 +1,5 @@
 from enum import Enum
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict, fields
 from typing import Dict, Tuple, TypeVar, Generic, List
 from typing_extensions import TypedDict, Literal
 
@@ -23,7 +23,7 @@ class GeneralizeableAxisDict(TypedDict, total=False):
 Vt = TypeVar("Vt")
 
 
-class PipetteKind(Enum):
+class GantryLoad(Enum):
     HIGH_THROUGHPUT = "high_throughput"
     LOW_THROUGHPUT = "low_throughput"
     TWO_LOW_THROUGHPUT = "two_low_throughput"
@@ -32,15 +32,18 @@ class PipetteKind(Enum):
 
 
 @dataclass
-class ByPipetteKind(Generic[Vt]):
+class ByGantryLoad(Generic[Vt]):
     high_throughput: Vt
     low_throughput: Vt
     two_low_throughput: Vt
     none: Vt
     gripper: Vt
 
+    def __getitem__(self, key: GantryLoad):
+        return asdict(self)[key.value]
 
-PerPipetteAxisSettings = ByPipetteKind[GeneralizeableAxisDict]
+
+PerPipetteAxisSettings = ByGantryLoad[GeneralizeableAxisDict]
 
 
 class CurrentDictDefault(TypedDict):
@@ -82,16 +85,35 @@ class RobotConfig:
 OT3Transform = List[List[float]]
 
 
+@dataclass(frozen=True)
+class OT3MotionSettings:
+    default_max_speed: PerPipetteAxisSettings
+    acceleration: PerPipetteAxisSettings
+    max_speed_discontinuity: PerPipetteAxisSettings
+    direction_change_speed_discontinuity: PerPipetteAxisSettings
+
+    def by_gantry_load(
+        self, gantry_load: GantryLoad
+    ) -> Dict[str, GeneralizeableAxisDict]:
+        # create a shallow copy
+        base = dict(
+            (field.name, getattr(self, field.name)[GantryLoad.NONE])
+            for field in fields(self)
+        )
+        if gantry_load is GantryLoad.NONE:
+            return base
+        for key in base.keys():
+            base[key].update(getattr(self, key)[gantry_load])
+        return base
+
+
 @dataclass
 class OT3Config:
     model: Literal["OT-3 Standard"]
     name: str
     version: int
     log_level: str
-    default_max_speed: PerPipetteAxisSettings
-    acceleration: PerPipetteAxisSettings
-    max_speed_discontinuity: PerPipetteAxisSettings
-    direction_change_speed_discontinuity: PerPipetteAxisSettings
+    motion_settings: OT3MotionSettings
     holding_current: PerPipetteAxisSettings
     normal_motion_current: PerPipetteAxisSettings
     z_retract_distance: float

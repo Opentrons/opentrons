@@ -1,8 +1,7 @@
 """Shared utilities for ot3 hardware control."""
-
 from typing import Dict, Iterable, List, Tuple
 from typing_extensions import Literal
-from opentrons.config.types import OT3Config, PipetteKind
+from opentrons.config.types import OT3MotionSettings, GantryLoad
 
 try:
     from opentrons_ot3_firmware.constants import NodeId
@@ -99,26 +98,19 @@ def _constraint_name_from_axis(ax: "AxisNames") -> Literal["X", "Y", "Z", "P"]:
     return lookup[ax]
 
 
-def default_system_constraints(
-    config: OT3Config,
+def get_system_constraints(
+    config: OT3MotionSettings, gantry_load: GantryLoad
 ) -> Dict["AxisNames", "AxisConstraints"]:
+    conf_by_pip = config.by_gantry_load(gantry_load)
     constraints = {}
     for axis in AXIS_NAMES:
+        constraint_name = _constraint_name_from_axis(axis)
         constraints[axis] = AxisConstraints.build(
-            config.acceleration.none[_constraint_name_from_axis(axis)],
-            config.max_speed_discontinuity.none[_constraint_name_from_axis(axis)],
-            config.direction_change_speed_discontinuity.none[
-                _constraint_name_from_axis(axis)
-            ],
+            conf_by_pip["acceleration"][constraint_name],
+            conf_by_pip["max_speed_discontinuity"][constraint_name],
+            conf_by_pip["direction_change_speed_discontinuity"][constraint_name],
         )
     return constraints
-
-
-def get_system_constraints(
-    config: OT3Config, pipette_kind: PipetteKind
-) -> Dict["AxisNames", "AxisConstraints"]:
-    # TODO: (2022-02-10) get correct system constraints based on pipette kind
-    return default_system_constraints(config)
 
 
 def _convert_to_node_id_dict(axis_pos: "Coordinates") -> "NodeIdMotionValues":

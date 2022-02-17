@@ -19,7 +19,7 @@ from typing import (
 from opentrons_shared_data.pipette import name_config
 from opentrons import types as top_types
 from opentrons.config import robot_configs
-from opentrons.config.types import RobotConfig, OT3Config, PipetteKind
+from opentrons.config.types import RobotConfig, OT3Config, GantryLoad
 from .backends.ot3utils import get_system_constraints
 
 try:
@@ -143,9 +143,11 @@ class OT3API(
         self._door_state = DoorState.CLOSED
         self._pause_manager = PauseManager(self._door_state)
         self._transforms = build_ot3_transforms(self._config)
-        self._pipette_kind = PipetteKind.NONE
+        self._gantry_load = GantryLoad.NONE
         self._move_manager = MoveManager(
-            constraints=get_system_constraints(self._config, self._pipette_kind)
+            constraints=get_system_constraints(
+                self._config.motion_settings, self._gantry_load
+            )
         )
 
         ExecutionManagerProvider.__init__(self, loop, isinstance(backend, OT3Simulator))
@@ -173,14 +175,14 @@ class OT3API(
         self._door_state = door_state
 
     @property
-    def pipette_kind(self) -> PipetteKind:
-        return self._pipette_kind
+    def gantry_load(self) -> GantryLoad:
+        return self._gantry_load
 
-    @pipette_kind.setter
-    def pipette_kind(self, pipette_kind: PipetteKind):
-        self._pipette_kind = pipette_kind
+    @gantry_load.setter
+    def gantry_load(self, gantry_load: GantryLoad):
+        self._gantry_load = gantry_load
         self._move_manager.update_constraints(
-            get_system_constraints(self._config, pipette_kind)
+            get_system_constraints(self._config.motion_settings, gantry_load)
         )
 
     def _update_door_state(self, door_state: DoorState):
@@ -400,7 +402,7 @@ class OT3API(
             await self._backend.configure_mount(mount, hw_config)
         await self._backend.probe_network()
         # TODO: (AA, 2022-02-09) Set correct pipette kind based on attached instr
-        self.pipette_kind = PipetteKind.TWO_LOW_THROUGHPUT
+        self.gantry_load = GantryLoad.TWO_LOW_THROUGHPUT
 
     # Global actions API
     def pause(self, pause_type: PauseType):
@@ -709,7 +711,7 @@ class OT3API(
         # TODO: (2022-02-10) Use actual max speed for MoveTarget
         checked_speed = speed or 500
         self._move_manager.update_constraints(
-            get_system_constraints(self._config, self._pipette_kind)
+            get_system_constraints(self._config.motion_settings, self._gantry_load)
         )
         move_target = MoveTarget.build(
             position=Coordinates(**machine_pos), max_speed=checked_speed
