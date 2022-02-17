@@ -336,7 +336,7 @@ class OT3Controller:
         """Probe."""
         return {}
 
-    def clean_up(self) -> None:
+    async def clean_up(self) -> None:
         """Clean up."""
 
         try:

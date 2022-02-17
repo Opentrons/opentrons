@@ -139,7 +139,7 @@ class OT3API(
         # or home() call is in flight and something else calls
         # current_position(), which will not be updated until the move() or
         # home() call succeeds or fails.
-        self._motion_lock = asyncio.Lock(loop=self._loop)
+        self._motion_lock = asyncio.Lock()
         self._door_state = DoorState.CLOSED
         self._pause_manager = PauseManager(self._door_state)
         self._transforms = build_ot3_transforms(self._config)
@@ -148,7 +148,7 @@ class OT3API(
             constraints=get_system_constraints(self._config, self._pipette_kind)
         )
 
-        ExecutionManagerProvider.__init__(self, loop, isinstance(backend, OT3Simulator))
+        ExecutionManagerProvider.__init__(self, isinstance(backend, OT3Simulator))
         InstrumentHandlerProvider.__init__(self)
 
     def set_robot_calibration(self, robot_calibration: RobotCalibration) -> None:
@@ -267,10 +267,6 @@ class OT3API(
     def loop(self) -> asyncio.AbstractEventLoop:
         """The event loop used by this instance."""
         return self._loop
-
-    def set_loop(self, loop: asyncio.AbstractEventLoop):
-        self._loop = loop
-        self._motion_lock = asyncio.Lock(loop=loop)
 
     @property
     def is_simulator(self):
@@ -1023,9 +1019,9 @@ class OT3API(
         )
         return modules_result
 
-    def clean_up(self) -> None:
+    async def clean_up(self) -> None:
         """Get the API ready to stop cleanly."""
-        self._backend.clean_up()
+        await self._backend.clean_up()
 
     def plunger_position(
         self, instr: Pipette, ul: float, action: "UlPerMmAction"

@@ -72,7 +72,7 @@ async def cleanup_hardware(app_state: AppState) -> None:
         unsubscribe_from_events()
 
     if hardware_api is not None:
-        hardware_api.clean_up()
+        await hardware_api.clean_up()
 
 
 async def get_thread_manager(

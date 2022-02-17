@@ -114,7 +114,7 @@ async def test_module_update_integration(monkeypatch, loop):
         which="tempdeck",
         simulating=True,
         loop=loop,
-        execution_manager=ExecutionManager(loop=loop),
+        execution_manager=ExecutionManager(),
         sim_model="temperatureModuleV2",
     )
 
@@ -144,7 +144,7 @@ async def test_module_update_integration(monkeypatch, loop):
         which="magdeck",
         simulating=True,
         loop=loop,
-        execution_manager=ExecutionManager(loop=loop),
+        execution_manager=ExecutionManager(),
     )
 
     await modules.update_firmware(magdeck, "fake_fw_file_path", loop)
@@ -160,7 +160,7 @@ async def test_module_update_integration(monkeypatch, loop):
         which="thermocycler",
         simulating=True,
         loop=loop,
-        execution_manager=ExecutionManager(loop=loop),
+        execution_manager=ExecutionManager(),
     )
 
     upload_via_bossa_mock = mock.Mock(
