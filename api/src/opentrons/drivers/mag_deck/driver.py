@@ -152,9 +152,7 @@ class MagDeckDriver(AbstractMagDeckDriver):
         c = (
             CommandBuilder(terminator=MAG_DECK_COMMAND_TERMINATOR)
             .add_gcode(gcode=GCODE.MOVE)
-            .add_float(
-                prefix="Z", value=position, precision=GCODE_ROUNDING_PRECISION
-            )
+            .add_float(prefix="Z", value=position, precision=GCODE_ROUNDING_PRECISION)
         )
         await self._send_command(c)
 
