@@ -45,7 +45,8 @@ class HeaterShakerModuleContext:
 
         Use :py:meth:`start_set_temperature` to set the target temperature first.
 
-        raises: `NoTargetTemperatureError` if heater-shaker has no target temperature.
+        Raises:
+            NoTargetTemperatureError: If heater-shaker has no target temperature.
         """
         raise NotImplementedError()
 
