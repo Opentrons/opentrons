@@ -3,7 +3,7 @@ import asyncio
 import logging
 
 from opentrons_ot3_firmware import NodeId
-from opentrons_ot3_firmware.constants import ErrorCode
+from opentrons_ot3_firmware.constants import ErrorCode, ToolType
 from opentrons_ot3_firmware.utils import UInt32Field
 
 from opentrons_hardware.drivers.can_bus.can_messenger import (
