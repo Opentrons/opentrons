@@ -9,7 +9,7 @@
   "btn_test_shake": "Continue to test shake",
   "complete": "Complete",
   "back": "Back",
-  "intro_wizard_modal_page_title": "{{name}} - Attach Heater Shaker Module",
+  "heater_shaker_setup_description": "{{name}} - Attach Heater Shaker Module",
   "use_this_heater_shaker_guide": "Use this guide to attach the Heater Shaker Module to your robot’s deck for secure shaking.",
   "you_will_need": "You will need:",
   "heater_shaker_mod": "Heater Shaker Module",

@@ -71,7 +71,7 @@ export const HeaterShakerWizard = (
     <Portal level="top">
       <Interstitial
         titleBar={{
-          title: t('intro_wizard_modal_page_title', { name: robotName }),
+          title: t('heater_shaker_setup_description', { name: robotName }),
           exit: {
             onClick: () => onCloseClick(),
             title: t('shared:exit'),
