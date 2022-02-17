@@ -23,5 +23,7 @@
   "adapter_num_2a": "2a",
   "adapter_num_2b": "2b",
   "adapter_num_2c": "2c",
-  "adapter_attach_title": "Attach your adaptor to the module."
+  "adapter_attach_title": "Attach your adapter to the module.",
+  "adapter_attach_subtitle": "Please use T10 Torx Screwdriver and provided screw ",
+  "adapter_attach_body": "Using a different screwdriver can strip the screws. Using a different screw than the one provided can damage the module"
 }
