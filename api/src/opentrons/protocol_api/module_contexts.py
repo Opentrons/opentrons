@@ -25,7 +25,9 @@ if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 ENGAGE_HEIGHT_UNIT_CNV = 2
-STANDARD_MAGDECK_LABWARE = [
+MAGDECK_HALF_MM_LABWARE = [
+    # Load names of labware whose definitions accidentally specify an engage height
+    # in units of half-millimeters, instead of millimeters.
     "biorad_96_wellplate_200ul_pcr",
     "nest_96_wellplate_100ul_pcr_full_skirt",
     "usascientific_96_wellplate_2.4ml_deep",
@@ -461,7 +463,7 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
 
         is_api_breakpoint = self._ctx._api_version >= APIVersion(2, 3)
         is_v1_module = self._module.model() == "magneticModuleV1"
-        is_standard_lw = self.labware.load_name in STANDARD_MAGDECK_LABWARE
+        is_standard_lw = self.labware.load_name in MAGDECK_HALF_MM_LABWARE
 
         if is_api_breakpoint and is_v1_module and not is_standard_lw:
             return engage_height * ENGAGE_HEIGHT_UNIT_CNV
