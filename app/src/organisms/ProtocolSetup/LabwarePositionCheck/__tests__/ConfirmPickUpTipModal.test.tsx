@@ -8,7 +8,7 @@ jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
   return {
     ...actualComponents,
-    ModalPage: jest.fn(() => <div></div>),
+    DeprecatedModalPage: jest.fn(() => <div></div>),
   }
 })
 
