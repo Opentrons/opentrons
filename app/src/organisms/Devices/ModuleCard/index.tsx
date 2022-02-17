@@ -17,8 +17,13 @@ import {
   FONT_WEIGHT_REGULAR,
   FONT_SIZE_CAPTION,
   TYPOGRAPHY,
+  useOnClickOutside,
 } from '@opentrons/components'
-import { getModuleDisplayName } from '@opentrons/shared-data'
+import {
+  getModuleDisplayName,
+  MAGNETIC_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { ModuleIcon } from '../ModuleIcon'
 import { MagneticModuleData } from './MagneticModuleData'
@@ -31,6 +36,9 @@ import temperatureModule from '../../../assets/images/temp_deck_gen_2_transparen
 import thermoModule from '../../../assets/images/thermocycler_open_transparent.svg'
 
 import type { AttachedModule } from '../../../redux/modules/types'
+import { ThermocyclerModuleSlideout } from './ThermocyclerModuleSlideout'
+import { MagneticModuleSlideout } from './MagneticModuleSlideout'
+import { TemperatureModuleSlideout } from './TemperatureModuleSlideout'
 
 interface ModuleCardProps {
   module: AttachedModule
@@ -40,6 +48,12 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const { t } = useTranslation('device_details')
   const { module } = props
   const [showOverflowMenu, setShowOverflowMenu] = React.useState(false)
+  const [showSlideout, setShowSlideout] = React.useState(false)
+  const [hasSecondary, setHasSecondary] = React.useState(false)
+
+  const node = useOnClickOutside({
+    onClickOutside: () => setShowOverflowMenu(false),
+  }) as React.RefObject<HTMLDivElement>
 
   let image = ''
   let moduleData: JSX.Element = <div></div>
@@ -83,6 +97,44 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     }
   }
 
+  const renderSlideOut = (isSecondary: boolean = false): JSX.Element => {
+    if (module.type === THERMOCYCLER_MODULE_TYPE) {
+      return (
+        <ThermocyclerModuleSlideout
+          module={module}
+          onCloseClick={() => setShowSlideout(false)}
+          isExpanded={showSlideout}
+          isSecondaryTemp={isSecondary}
+        />
+      )
+    } else if (module.type === MAGNETIC_MODULE_TYPE) {
+      return (
+        <MagneticModuleSlideout
+          module={module}
+          onCloseClick={() => setShowSlideout(false)}
+          isExpanded={showSlideout}
+        />
+      )
+    } else {
+      return (
+        <TemperatureModuleSlideout
+          model={module.model}
+          serial={module.serial}
+          onCloseClick={() => setShowSlideout(false)}
+          isExpanded={showSlideout}
+        />
+      )
+    }
+  }
+
+  const handleMenuItemClick = (isSecondary: boolean = false): void => {
+    if (isSecondary) {
+      setHasSecondary(true)
+    }
+    setShowSlideout(true)
+    setShowOverflowMenu(false)
+  }
+
   return (
     <React.Fragment>
       <Flex
@@ -92,6 +144,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         marginLeft={SPACING_2}
         width={'20rem'}
       >
+        {showSlideout && renderSlideOut(hasSecondary)}
         <Box
           padding={`${SPACING_3} ${SPACING_2} ${SPACING_3} ${SPACING_2}`}
           width="100%"
@@ -129,7 +182,14 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             }}
           />
         </Box>
-        {showOverflowMenu && <ModuleOverflowMenu module={module} />}
+        {showOverflowMenu && (
+          <div ref={node}>
+            <ModuleOverflowMenu
+              module={module}
+              handleClick={handleMenuItemClick}
+            />
+          </div>
+        )}
       </Flex>
     </React.Fragment>
   )
