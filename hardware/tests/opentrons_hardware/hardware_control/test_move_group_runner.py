@@ -170,6 +170,7 @@ async def test_single_send_setup_commands(
                         * interrupts_per_sec
                     )
                 ),
+                request_stop_condition=UInt8Field(int(0)),
             )
         ),
     )
@@ -210,6 +211,7 @@ async def test_multi_send_setup_commands(
                         * interrupts_per_sec
                     )
                 ),
+                request_stop_condition=UInt8Field(int(0)),
             )
         ),
     )
@@ -244,6 +246,7 @@ async def test_multi_send_setup_commands(
                         * interrupts_per_sec
                     )
                 ),
+                request_stop_condition=UInt8Field(int(0)),
             )
         ),
     )
@@ -277,6 +280,7 @@ async def test_multi_send_setup_commands(
                         * interrupts_per_sec
                     )
                 ),
+                request_stop_condition=UInt8Field(int(0)),
             )
         ),
     )
@@ -311,6 +315,7 @@ async def test_multi_send_setup_commands(
                         * interrupts_per_sec
                     )
                 ),
+                request_stop_condition=UInt8Field(int(0)),
             )
         ),
     )
@@ -344,6 +349,7 @@ async def test_multi_send_setup_commands(
                         * interrupts_per_sec
                     )
                 ),
+                request_stop_condition=UInt8Field(int(0)),
             )
         ),
     )
