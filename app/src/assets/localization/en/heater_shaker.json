@@ -18,5 +18,9 @@
   "intro_adapter_known": "{{adapter}} + Screw",
   "intro_adapter_unknown": "Thermal Adapter + Screw",
   "intro_adapter_body": "Screw may already be in the center of the module.",
-  "intro_labware": "Labware"
+  "intro_labware": "Labware",
+  "heater_shaker_key_parts": "Key Heater Shaker parts and terminology",
+  "heater_shaker_orient_module": "Orient the module so its power ports face <bold>away</bold> from you.",
+  "heater_shaker_latch_description": "<block>The <strong>Labware Latch</strong> keeps labware secure while the module is shaking.</block> <block>It can be opened or closed manually and with software but is closed and locked while the module is shaking.</block>",
+  "heater_shaker_anchor_description": "<block>The 2 <strong>Anchors</strong> keep the module attached to the deck while it is shaking.</block> <block>The screw above each anchor is used to extend and retract them. See animation below.</block> <block>Extending the bolts slightly increases the module’s footprint, which allows it to be more firmly attached to the edges of a slot.</block>"
 }
