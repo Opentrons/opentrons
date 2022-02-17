@@ -1,3 +1,4 @@
+import omitBy from 'lodash/omitBy'
 import values from 'lodash/values'
 import { getPrimaryPipetteId } from './utils/getPrimaryPipetteId'
 import { getPipetteWorkflow } from './utils/getPipetteWorkflow'
@@ -13,7 +14,16 @@ export const getLabwarePositionCheckSteps = (
   protocolData: ProtocolFile<{}>
 ): LabwarePositionCheckStep[] => {
   if (protocolData != null && 'pipettes' in protocolData) {
-    const pipettesById: ProtocolFile<{}>['pipettes'] = protocolData.pipettes
+    // filter out any pipettes that are not being used in the protocol
+    const pipettesById: ProtocolFile<{}>['pipettes'] = omitBy(
+      protocolData.pipettes,
+      (_pipette, id) =>
+        protocolData.commands.find(
+          command =>
+            command.commandType === 'pickUpTip' &&
+            command.params.pipetteId === id
+        )
+    )
     const pipettes = values(pipettesById)
     const pipetteNames = pipettes.map(({ name }) => name)
     const labware = protocolData.labware

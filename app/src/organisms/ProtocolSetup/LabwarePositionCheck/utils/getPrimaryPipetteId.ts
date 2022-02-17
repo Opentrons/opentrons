@@ -1,4 +1,3 @@
-import { omitBy } from 'lodash'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import type {
   RunTimeCommand,
@@ -10,12 +9,6 @@ export const getPrimaryPipetteId = (
   pipettesById: ProtocolFile<{}>['pipettes'],
   commands: RunTimeCommand[]
 ): string => {
-  pipettesById = omitBy(pipettesById, (_pipette, id) =>
-    commands.find(
-      command =>
-        command.commandType === 'pickUpTip' && command.params.pipetteId === id
-    )
-  )
   if (Object.keys(pipettesById).length === 1) {
     return Object.keys(pipettesById)[0]
   }
