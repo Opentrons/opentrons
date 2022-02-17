@@ -61,7 +61,8 @@ class HeaterShakerModuleContext:
         shake speed has reached.
         Acceptable shake speed: 200 - 3000 RPM
 
-        raises: `InvalidTargetSpeedError` if target speed out of limits.
+        Raises:
+            InvalidTargetSpeedError: if target speed out of limits.
         """
         if not SPEED_LOWER_LIMIT <= speed <= SPEED_UPPER_LIMIT:
             raise InvalidTargetSpeedError(
