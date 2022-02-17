@@ -57,7 +57,7 @@ def initialize_hardware(app_state: AppState) -> None:
 async def cleanup_hardware(app_state: AppState) -> None:
     """Shutdown the HardwareAPI singleton and remove it from global state."""
     initialize_task = _init_task.get_from(app_state)
-    hardware_api = _hw_api.get_from(app_state)
+    thread_manager = _hw_api.get_from(app_state)
     unsubscribe_from_events = _event_unsubscribe.get_from(app_state)
 
     _init_task.set_on(app_state, None)
@@ -71,8 +71,8 @@ async def cleanup_hardware(app_state: AppState) -> None:
     if unsubscribe_from_events is not None:
         unsubscribe_from_events()
 
-    if hardware_api is not None:
-        await hardware_api.clean_up()
+    if thread_manager is not None:
+        thread_manager.clean_up()
 
 
 async def get_thread_manager(

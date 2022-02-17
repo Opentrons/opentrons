@@ -1,6 +1,6 @@
 from typing import Callable
 
-from opentrons.hardware_control import ThreadedAsyncLock, ThreadManagedHardware
+from opentrons.hardware_control import ThreadedAsyncLock, HardwareControlAPI
 
 from robot_server.service.session.models.common import IdentifierType
 
@@ -11,7 +11,7 @@ class SessionConfiguration:
 
     def __init__(
         self,
-        hardware: ThreadManagedHardware,
+        hardware: HardwareControlAPI,
         is_active: Callable[[IdentifierType], bool],
         motion_lock: ThreadedAsyncLock,
     ):
@@ -20,7 +20,7 @@ class SessionConfiguration:
         self._motion_lock = motion_lock
 
     @property
-    def hardware(self) -> ThreadManagedHardware:
+    def hardware(self) -> HardwareControlAPI:
         """Access to robot hardware"""
         return self._hardware
 
