@@ -18,5 +18,10 @@
   "adapter_name_and_screw": "{{adapter}} + Screw",
   "unknown_adapter_and_screw": "Thermal Adapter + Screw",
   "screw_may_be_in_module": "Screw may already be in the center of the module.",
-  "labware": "Labware"
+  "labware": "Labware",
+  "adapter_title": "Step 2 of 4: Attach Thermal Adapter",
+  "adapter_num_2a": "2a",
+  "adapter_num_2b": "2b",
+  "adapter_num_2c": "2c",
+  "adapter_attach_title": "Attach your adaptor to the module."
 }
