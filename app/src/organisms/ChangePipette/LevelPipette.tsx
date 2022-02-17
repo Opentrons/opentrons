@@ -3,7 +3,7 @@ import cx from 'classnames'
 
 import {
   Icon,
-  ModalPage,
+  DeprecatedModalPage,
   PrimaryBtn,
   SecondaryBtn,
   SPACING_2,
@@ -102,7 +102,7 @@ export function LevelPipette(props: Props): JSX.Element {
   } = props
 
   return (
-    <ModalPage
+    <DeprecatedModalPage
       titleBar={{
         title: title,
         subtitle: subtitle,
@@ -125,6 +125,6 @@ export function LevelPipette(props: Props): JSX.Element {
       <SecondaryBtn marginBottom={SPACING_2} width="100%" onClick={exit}>
         {actualPipetteOffset ? EXIT_BUTTON_MESSAGE : EXIT_WITHOUT_CAL}
       </SecondaryBtn>
-    </ModalPage>
+    </DeprecatedModalPage>
   )
 }

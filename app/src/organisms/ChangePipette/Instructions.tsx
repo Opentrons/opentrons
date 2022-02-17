@@ -1,7 +1,7 @@
 import * as React from 'react'
 import capitalize from 'lodash/capitalize'
 
-import { ModalPage } from '@opentrons/components'
+import { DeprecatedModalPage } from '@opentrons/components'
 import { PipetteSelection } from './PipetteSelection'
 import { InstructionStep } from './InstructionStep'
 import { CheckPipettesButton } from './CheckPipettesButton'
@@ -59,7 +59,7 @@ export function Instructions(props: Props): JSX.Element {
   }
 
   return (
-    <ModalPage
+    <DeprecatedModalPage
       titleBar={titleBar}
       heading={heading}
       contentsClassName={styles.modal_contents}
@@ -76,7 +76,7 @@ export function Instructions(props: Props): JSX.Element {
       >
         {actualPipette ? DETACH_CONFIRM : ATTACH_CONFIRM}
       </CheckPipettesButton>
-    </ModalPage>
+    </DeprecatedModalPage>
   )
 }
 

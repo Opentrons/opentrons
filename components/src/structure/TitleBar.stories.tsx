@@ -1,16 +1,16 @@
 import * as React from 'react'
-import { TitleBar } from './TitleBar'
+import { DeprecatedTitleBar } from './DeprecatedTitleBar'
 import { Text, Icon, SIZE_1 } from '@opentrons/components'
 
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'Library/Molecules/TitleBar',
+  title: 'Library/Molecules/DeprecatedTitleBar',
 } as Meta
 
-const Template: Story<React.ComponentProps<typeof TitleBar>> = args => (
-  <TitleBar {...args} />
-)
+const Template: Story<
+  React.ComponentProps<typeof DeprecatedTitleBar>
+> = args => <DeprecatedTitleBar {...args} />
 export const Basic = Template.bind({})
 Basic.args = {
   title: 'Main Title Goes Here',

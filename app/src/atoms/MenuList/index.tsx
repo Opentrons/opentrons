@@ -23,7 +23,7 @@ export const MenuList = (props: MenuListProps): JSX.Element | null => {
       top="2.6rem"
       right={`calc(50% + ${SPACING_1})`}
       flexDirection={DIRECTION_COLUMN}
-      key={`key_${props.id}`}
+      id={props.id}
     >
       {props.buttons}
     </Box>

@@ -1,7 +1,12 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import { Icon, PrimaryBtn, ModalPage, SPACING_2 } from '@opentrons/components'
+import {
+  Icon,
+  PrimaryBtn,
+  DeprecatedModalPage,
+  SPACING_2,
+} from '@opentrons/components'
 import { getDiagramsSrc } from './InstructionStep'
 import { CheckPipettesButton } from './CheckPipettesButton'
 import styles from './styles.css'
@@ -49,7 +54,7 @@ export function ConfirmPipette(props: Props): JSX.Element {
   } = props
 
   return (
-    <ModalPage
+    <DeprecatedModalPage
       titleBar={{
         title: title,
         subtitle: subtitle,
@@ -64,7 +69,7 @@ export function ConfirmPipette(props: Props): JSX.Element {
         <CalibratePipetteOffsetButton {...props} />
       )}
       <ExitButton {...props} />
-    </ModalPage>
+    </DeprecatedModalPage>
   )
 }
 

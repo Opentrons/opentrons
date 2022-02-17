@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { resetAllWhenMocks } from 'jest-when'
-import { ModalPage, renderWithProviders } from '@opentrons/components'
+import { DeprecatedModalPage, renderWithProviders } from '@opentrons/components'
 import { ConfirmPickUpTipModal } from '../ConfirmPickUpTipModal'
 import { i18n } from '../../../../i18n'
 
@@ -12,17 +12,19 @@ jest.mock('@opentrons/components', () => {
   }
 })
 
-const mockModalPage = ModalPage as jest.MockedFunction<typeof ModalPage>
+const mockModalPage = DeprecatedModalPage as jest.MockedFunction<
+  typeof DeprecatedModalPage
+>
 
 const render = (props: React.ComponentProps<typeof ConfirmPickUpTipModal>) => {
   return renderWithProviders(
-    <ModalPage
+    <DeprecatedModalPage
       titleBar={{
         title: 'modal page title',
       }}
     >
       <ConfirmPickUpTipModal {...props} />
-    </ModalPage>,
+    </DeprecatedModalPage>,
     {
       i18nInstance: i18n,
     }

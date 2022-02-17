@@ -2,7 +2,7 @@ import * as React from 'react'
 import {
   mountWithStore,
   WrapperWithStore,
-  TitleBar,
+  DeprecatedTitleBar,
   Icon,
 } from '@opentrons/components'
 import { ConfirmPipette } from '../ConfirmPipette'
@@ -188,7 +188,7 @@ describe('ConfirmPipette', () => {
         actualPipetteOffset: spec.actualPipetteOffset as PipetteOffsetCalibration,
       })
       it('has the right title bar including back button disabled or not', () => {
-        const titleBarProps = wrapper.find(TitleBar).props()
+        const titleBarProps = wrapper.find(DeprecatedTitleBar).props()
         expect(titleBarProps.title).toEqual('my-title')
         expect(titleBarProps.subtitle).toEqual('my-subtitle')
         expect(titleBarProps.back?.onClick).toBe(mockBack)

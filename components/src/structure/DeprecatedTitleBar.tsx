@@ -8,7 +8,7 @@ import styles from './structure.css'
 
 import type { ButtonProps } from '../buttons'
 
-export interface TitleBarProps {
+export interface DeprecatedTitleBarProps {
   id?: string
   title: React.ReactNode
   subtitle?: React.ReactNode
@@ -22,7 +22,9 @@ export interface TitleBarProps {
   backButtonLabel?: string
 }
 
-export function TitleBar(props: TitleBarProps): JSX.Element {
+export function DeprecatedTitleBar(
+  props: DeprecatedTitleBarProps
+): JSX.Element {
   const {
     title,
     subtitle,
