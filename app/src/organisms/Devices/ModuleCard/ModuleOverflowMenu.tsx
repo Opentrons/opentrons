@@ -112,6 +112,7 @@ export const ModuleOverflowMenu = (
             menuItems[module.type].map((item, index) => {
               return (
                 <MenuItem
+                  width="9.75rem"
                   key={index}
                   onClick={() => handleClick(item.isSecondary)}
                   data-testid={`module_setting_${module.model}`}
