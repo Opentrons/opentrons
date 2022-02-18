@@ -18,7 +18,7 @@ export const getLabwarePositionCheckSteps = (
     const pipettesById: ProtocolFile<{}>['pipettes'] = omitBy(
       protocolData.pipettes,
       (_pipette, id) =>
-        protocolData.commands.find(
+        !protocolData.commands.some(
           command =>
             command.commandType === 'pickUpTip' &&
             command.params.pipetteId === id

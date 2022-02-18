@@ -1,6 +1,5 @@
+import pick from 'lodash/pick'
 import { when, resetAllWhenMocks } from 'jest-when'
-import _uncasted_protocolWithOnePipette from '@opentrons/shared-data/protocol/fixtures/4/simpleV4.json'
-import _uncasted_protocolWithTwoPipettes from '@opentrons/shared-data/protocol/fixtures/4/transferSettings.json'
 import _uncasted_v6ProtocolWithTwoPipettes from '@opentrons/shared-data/protocol/fixtures/6/multipleTipracks.json'
 import { getLabwarePositionCheckSteps } from '../getLabwarePositionCheckSteps'
 import { getPrimaryPipetteId } from '../utils/getPrimaryPipetteId'
@@ -10,10 +9,14 @@ import { getTwoPipettePositionCheckSteps } from '../utils/getTwoPipettePositionC
 
 import type { ProtocolFile } from '@opentrons/shared-data'
 
-// TODO: update these fixtures to be v6 protocols
-const protocolWithOnePipette = (_uncasted_protocolWithOnePipette as unknown) as ProtocolFile<any>
-const protocolWithTwoPipettes = (_uncasted_protocolWithTwoPipettes as unknown) as ProtocolFile<any>
-const v6ProtocolWithTwoPipettes = (_uncasted_v6ProtocolWithTwoPipettes as unknown) as ProtocolFile<any>
+const protocolWithOnePipette = ({
+  ..._uncasted_v6ProtocolWithTwoPipettes,
+  pipettes: pick(
+    _uncasted_v6ProtocolWithTwoPipettes.pipettes,
+    Object.keys(_uncasted_v6ProtocolWithTwoPipettes.pipettes)[0]
+  ),
+} as unknown) as ProtocolFile<any>
+const protocolWithTwoPipettes = (_uncasted_v6ProtocolWithTwoPipettes as unknown) as ProtocolFile<any>
 
 jest.mock('../utils/getPrimaryPipetteId')
 jest.mock('../utils/getPipetteWorkflow')
@@ -26,10 +29,10 @@ const mockGetPrimaryPipetteId = getPrimaryPipetteId as jest.MockedFunction<
 const mockGetPipetteWorkflow = getPipetteWorkflow as jest.MockedFunction<
   typeof getPipetteWorkflow
 >
-const mockgetOnePipettePositionCheckSteps = getOnePipettePositionCheckSteps as jest.MockedFunction<
+const mockGetOnePipettePositionCheckSteps = getOnePipettePositionCheckSteps as jest.MockedFunction<
   typeof getOnePipettePositionCheckSteps
 >
-const mockgetTwoPipettePositionCheckSteps = getTwoPipettePositionCheckSteps as jest.MockedFunction<
+const mockGetTwoPipettePositionCheckSteps = getTwoPipettePositionCheckSteps as jest.MockedFunction<
   typeof getTwoPipettePositionCheckSteps
 >
 
@@ -38,7 +41,10 @@ describe('getLabwarePositionCheckSteps', () => {
     resetAllWhenMocks()
   })
   it('should generate commands with the one pipette workflow when there is only one pipette in the protocol', () => {
-    const mockPipette = protocolWithOnePipette.pipettes.pipetteId
+    const mockPipette =
+      protocolWithOnePipette.pipettes[
+        Object.keys(protocolWithOnePipette.pipettes)[0]
+      ]
     when(mockGetPrimaryPipetteId)
       .calledWith(
         protocolWithOnePipette.pipettes,
@@ -58,7 +64,7 @@ describe('getLabwarePositionCheckSteps', () => {
 
     getLabwarePositionCheckSteps(protocolWithOnePipette)
 
-    expect(mockgetOnePipettePositionCheckSteps).toHaveBeenCalledWith({
+    expect(mockGetOnePipettePositionCheckSteps).toHaveBeenCalledWith({
       primaryPipetteId: 'pipetteId',
       labware: protocolWithOnePipette.labware,
       labwareDefinitions: protocolWithOnePipette.labwareDefinitions,
@@ -69,8 +75,8 @@ describe('getLabwarePositionCheckSteps', () => {
   it('should generate commands with the one pipette workflow when there are two pipettes in the protocol but only one is used', () => {
     const leftPipetteId = '50d23e00-0042-11ec-8258-f7ffdf5ad45a'
     const rightPipetteId = 'c235a5a0-0042-11ec-8258-f7ffdf5ad45a'
-    const leftPipette = v6ProtocolWithTwoPipettes.pipettes[leftPipetteId]
-    const commandsWithoutLeftPipettePickupTipCommand = v6ProtocolWithTwoPipettes.commands.filter(
+    const rightPipette = protocolWithTwoPipettes.pipettes[rightPipetteId]
+    const commandsWithoutLeftPipettePickupTipCommand = protocolWithTwoPipettes.commands.filter(
       command =>
         !(
           command.commandType === 'pickUpTip' &&
@@ -79,12 +85,12 @@ describe('getLabwarePositionCheckSteps', () => {
     )
 
     const protocolWithTwoPipettesWithOnlyOneBeingUsed = {
-      ...v6ProtocolWithTwoPipettes,
+      ...protocolWithTwoPipettes,
       commands: commandsWithoutLeftPipettePickupTipCommand,
     }
 
     const pipettesBeingUsedInProtocol: ProtocolFile<any>['pipettes'] = {
-      '50d23e00-0042-11ec-8258-f7ffdf5ad45a': { name: 'p300_single_gen2' },
+      [rightPipetteId]: rightPipette,
     }
 
     when(mockGetPrimaryPipetteId)
@@ -96,7 +102,7 @@ describe('getLabwarePositionCheckSteps', () => {
 
     when(mockGetPipetteWorkflow)
       .calledWith({
-        pipetteNames: [leftPipette.name],
+        pipetteNames: [rightPipette.name],
         primaryPipetteId: rightPipetteId,
         labware: protocolWithTwoPipettesWithOnlyOneBeingUsed.labware,
         labwareDefinitions:
@@ -107,7 +113,7 @@ describe('getLabwarePositionCheckSteps', () => {
 
     getLabwarePositionCheckSteps(protocolWithTwoPipettesWithOnlyOneBeingUsed)
 
-    expect(mockgetOnePipettePositionCheckSteps).toHaveBeenCalledWith({
+    expect(mockGetOnePipettePositionCheckSteps).toHaveBeenCalledWith({
       primaryPipetteId: rightPipetteId,
       labware: protocolWithTwoPipettesWithOnlyOneBeingUsed.labware,
       labwareDefinitions:
@@ -117,8 +123,8 @@ describe('getLabwarePositionCheckSteps', () => {
     })
   })
   it('should generate commands with the two pipette workflow', () => {
-    const leftPipetteId = '3dff4f90-3412-11eb-ad93-ed232a2337cf'
-    const rightPipetteId = '4da579b0-a9bf-11eb-bce6-9f1d5b9c1a1b'
+    const leftPipetteId = '50d23e00-0042-11ec-8258-f7ffdf5ad45a'
+    const rightPipetteId = 'c235a5a0-0042-11ec-8258-f7ffdf5ad45a'
     const leftPipette = protocolWithTwoPipettes.pipettes[leftPipetteId]
     const rightPipette = protocolWithTwoPipettes.pipettes[rightPipetteId]
 
@@ -141,7 +147,7 @@ describe('getLabwarePositionCheckSteps', () => {
 
     getLabwarePositionCheckSteps(protocolWithTwoPipettes)
 
-    expect(mockgetTwoPipettePositionCheckSteps).toHaveBeenCalledWith({
+    expect(mockGetTwoPipettePositionCheckSteps).toHaveBeenCalledWith({
       primaryPipetteId: leftPipetteId,
       secondaryPipetteId: rightPipetteId,
       labware: protocolWithTwoPipettes.labware,
