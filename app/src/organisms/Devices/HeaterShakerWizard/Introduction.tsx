@@ -170,7 +170,7 @@ export function Introduction(props: IntroductionProps): JSX.Element {
         >
           <IntroItem
             image={<img src={screwdriver} alt={'screwdriver_image'} />}
-            text={t('t10_torx_screwdriver')}
+            text={t('t10_torx_screwdriver', { name: 'T10 Torx' })}
             subtext={t('about_screwdriver')}
           />
         </Flex>

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import {
   AlertModal,
   Box,
-  DeprecatedModalPage,
+  ModalPage,
   SPACING_2,
   Text,
   useConditionalConfirm,
@@ -122,7 +122,7 @@ export const LabwarePositionCheck = (
   let modalContent: JSX.Element
   if (isLoading) {
     modalContent = (
-      <DeprecatedModalPage
+      <ModalPage
         contentsClassName={styles.modal_contents}
         titleBar={{
           title: t('labware_position_check_title'),
@@ -134,7 +134,7 @@ export const LabwarePositionCheck = (
         }}
       >
         <RobotMotionLoadingModal title={titleText} />
-      </DeprecatedModalPage>
+      </ModalPage>
     )
   } else if (showConfirmation) {
     modalContent = (
@@ -145,7 +145,7 @@ export const LabwarePositionCheck = (
     )
   } else if (showPickUpTipConfirmationModal) {
     modalContent = (
-      <DeprecatedModalPage
+      <ModalPage
         contentsClassName={styles.modal_contents}
         titleBar={{
           title: t('labware_position_check_title'),
@@ -161,13 +161,13 @@ export const LabwarePositionCheck = (
           onConfirm={proceed}
           onDeny={onUnsuccessfulPickUpTip}
         />
-      </DeprecatedModalPage>
+      </ModalPage>
     )
   } else if (isComplete) {
     modalContent = (
       // TODO: all of the following cases have the same modal page wrapper, we can DRY
       // this up by creating one wrapper and pass in children
-      <DeprecatedModalPage
+      <ModalPage
         contentsClassName={styles.modal_contents}
         titleBar={{
           title: t('labware_position_check_title'),
@@ -182,11 +182,11 @@ export const LabwarePositionCheck = (
           savePositionCommandData={savePositionCommandData}
           onCloseClick={props.onCloseClick}
         />
-      </DeprecatedModalPage>
+      </ModalPage>
     )
   } else if (currentCommandIndex !== 0) {
     modalContent = (
-      <DeprecatedModalPage
+      <ModalPage
         contentsClassName={styles.modal_contents}
         titleBar={{
           title: t('labware_position_check_title'),
@@ -204,11 +204,11 @@ export const LabwarePositionCheck = (
           title={titleText}
           jog={jog}
         />
-      </DeprecatedModalPage>
+      </ModalPage>
     )
   } else {
     modalContent = (
-      <DeprecatedModalPage
+      <ModalPage
         contentsClassName={styles.modal_contents}
         titleBar={{
           title: t('labware_position_check_title'),
@@ -220,7 +220,7 @@ export const LabwarePositionCheck = (
         }}
       >
         <IntroScreen beginLPC={beginLPC} />
-      </DeprecatedModalPage>
+      </ModalPage>
     )
   }
   return <Portal level="top">{modalContent}</Portal>

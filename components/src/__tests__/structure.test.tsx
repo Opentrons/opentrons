@@ -3,20 +3,13 @@ import React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import Renderer from 'react-test-renderer'
 
-import {
-  PageTabs,
-  DeprecatedTitleBar,
-  Card,
-  LabeledValue,
-  Splash,
-  Pill,
-} from '..'
+import { PageTabs, TitleBar, Card, LabeledValue, Splash, Pill } from '..'
 
-describe('DeprecatedTitleBar', () => {
+describe('TitleBar', () => {
   it('adds an h1 with the title', () => {
-    const heading = Renderer.create(
-      <DeprecatedTitleBar title="hello" />
-    ).root.findByType('h1')
+    const heading = Renderer.create(<TitleBar title="hello" />).root.findByType(
+      'h1'
+    )
 
     expect(heading).toBeDefined()
     expect(heading.children).toEqual(['hello'])
@@ -24,7 +17,7 @@ describe('DeprecatedTitleBar', () => {
 
   it('adds an optional h2 with the subtitle', () => {
     const heading = Renderer.create(
-      <DeprecatedTitleBar title="hello" subtitle="world" />
+      <TitleBar title="hello" subtitle="world" />
     ).root.findByType('h2')
 
     expect(heading).toBeDefined()
@@ -34,7 +27,7 @@ describe('DeprecatedTitleBar', () => {
   it('add optional back button', () => {
     const onBackClick = jest.fn()
     const button = Renderer.create(
-      <DeprecatedTitleBar title="hello" onBackClick={onBackClick} />
+      <TitleBar title="hello" onBackClick={onBackClick} />
     ).root.findByType('button')
 
     button.props.onClick()
@@ -42,14 +35,14 @@ describe('DeprecatedTitleBar', () => {
   })
 
   it('renders TitleBar without subtitle correctly', () => {
-    const tree = Renderer.create(<DeprecatedTitleBar title="foo" />).toJSON()
+    const tree = Renderer.create(<TitleBar title="foo" />).toJSON()
 
     expect(tree).toMatchSnapshot()
   })
 
   it('renders TitleBar with subtitle correctly', () => {
     const tree = Renderer.create(
-      <DeprecatedTitleBar title="foo" subtitle="bar" />
+      <TitleBar title="foo" subtitle="bar" />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
@@ -57,7 +50,7 @@ describe('DeprecatedTitleBar', () => {
 
   it('renders TitleBar with back button correctly', () => {
     const tree = Renderer.create(
-      <DeprecatedTitleBar title="foo" subtitle="bar" onBackClick={() => {}} />
+      <TitleBar title="foo" subtitle="bar" onBackClick={() => {}} />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
@@ -65,9 +58,7 @@ describe('DeprecatedTitleBar', () => {
 
   it('renders TitleBar with rightNode and its ReactNode as a string', () => {
     const rightNode = 'foo bar'
-    const tree = Renderer.create(
-      <DeprecatedTitleBar title="foo" rightNode={rightNode} />
-    )
+    const tree = Renderer.create(<TitleBar title="foo" rightNode={rightNode} />)
 
     expect(tree).toMatchSnapshot()
   })

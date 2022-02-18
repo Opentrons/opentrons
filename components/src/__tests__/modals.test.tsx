@@ -6,7 +6,7 @@ import {
   Modal,
   AlertModal,
   ContinueModal,
-  DeprecatedModalPage,
+  ModalPage,
   SpinnerModalPage,
   Overlay,
 } from '..'
@@ -124,7 +124,7 @@ describe('modals', () => {
 
   it('ModalPage renders correctly', () => {
     const tree = Renderer.create(
-      <DeprecatedModalPage
+      <ModalPage
         titleBar={{
           title: 'Title',
           subtitle: 'Subtitle',
@@ -135,7 +135,7 @@ describe('modals', () => {
         }}
       >
         children
-      </DeprecatedModalPage>
+      </ModalPage>
     ).toJSON()
 
     expect(tree).toMatchSnapshot()

@@ -3,19 +3,19 @@ import * as React from 'react'
 import cx from 'classnames'
 
 import { Box } from '../primitives'
-import { DeprecatedTitleBar } from '../structure'
+import { TitleBar } from '../structure'
 import { Overlay } from './Overlay'
 import styles from './modals.css'
 
-import type { DeprecatedTitleBarProps } from '../structure'
+import type { TitleBarProps } from '../structure'
 
 /**
- * @deprecated Use `ModalPage` and `ModalPageProps` instead
+ * @deprecated Use `InterstitialProps` instead
  */
 
-export interface DeprecatedModalPageProps {
+export interface ModalPageProps {
   /** Props for title bar at top of modal page */
-  titleBar: DeprecatedTitleBarProps
+  titleBar: TitleBarProps
   contentsClassName?: string
   heading?: React.ReactNode
   children?: React.ReactNode
@@ -23,15 +23,17 @@ export interface DeprecatedModalPageProps {
   outerProps?: React.ComponentProps<typeof Box>
 }
 
-export function DeprecatedModalPage(
-  props: DeprecatedModalPageProps
-): JSX.Element {
+/**
+ * @deprecated Use `Interstitial` instead
+ */
+
+export function ModalPage(props: ModalPageProps): JSX.Element {
   const { titleBar, heading, innerProps = {}, outerProps = {} } = props
 
   return (
     <Box className={styles.modal_page} {...outerProps}>
       <Overlay />
-      <DeprecatedTitleBar {...titleBar} className={styles.title_bar} />
+      <TitleBar {...titleBar} className={styles.title_bar} />
       <Box
         className={cx(styles.modal_page_contents, props.contentsClassName)}
         {...innerProps}

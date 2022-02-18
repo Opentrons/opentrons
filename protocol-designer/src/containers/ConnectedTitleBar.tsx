@@ -2,12 +2,7 @@ import * as React from 'react'
 import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
 
-import {
-  DeprecatedTitleBar,
-  Icon,
-  IconName,
-  DeprecatedTitleBarProps,
-} from '@opentrons/components'
+import { TitleBar, Icon, IconName, TitleBarProps } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import styles from './TitleBar.css'
 import { i18n } from '../localization'
@@ -29,7 +24,7 @@ import { selectors, Page } from '../navigation'
 
 import { BaseState } from '../types'
 
-type Props = React.ComponentProps<typeof DeprecatedTitleBar>
+type Props = React.ComponentProps<typeof TitleBar>
 
 interface DP {
   onBackClick: Props['onBackClick']
@@ -209,12 +204,8 @@ function mergeProps(
   }
 }
 
-const StickyTitleBar = (props: DeprecatedTitleBarProps): JSX.Element => (
-  <DeprecatedTitleBar
-    id="TitleBar_main"
-    {...props}
-    className={styles.sticky_bar}
-  />
+const StickyTitleBar = (props: TitleBarProps): JSX.Element => (
+  <TitleBar id="TitleBar_main" {...props} className={styles.sticky_bar} />
 )
 
 export const ConnectedTitleBar = connect(

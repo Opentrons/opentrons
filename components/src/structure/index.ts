@@ -1,7 +1,7 @@
 // structure components
 
 export * from './PageTabs'
-export * from './DeprecatedTitleBar'
+export * from './TitleBar'
 export * from './Card'
 export * from './Splash'
 export * from './LabeledValue'

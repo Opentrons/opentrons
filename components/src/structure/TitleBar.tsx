@@ -9,10 +9,10 @@ import styles from './structure.css'
 import type { ButtonProps } from '../buttons'
 
 /**
- * @deprecated Use `TitleBar` and `TitleBarProps` instead
+ * @deprecated Use `InterstitialTitleBarProps` instead
  */
 
-export interface DeprecatedTitleBarProps {
+export interface TitleBarProps {
   id?: string
   title: React.ReactNode
   subtitle?: React.ReactNode
@@ -26,9 +26,11 @@ export interface DeprecatedTitleBarProps {
   backButtonLabel?: string
 }
 
-export function DeprecatedTitleBar(
-  props: DeprecatedTitleBarProps
-): JSX.Element {
+/**
+ * @deprecated Use `InterstitialTitleBar` instead
+ */
+
+export function TitleBar(props: TitleBarProps): JSX.Element {
   const {
     title,
     subtitle,

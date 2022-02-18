@@ -3,7 +3,7 @@ import * as React from 'react'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import {
-  DeprecatedModalPage,
+  ModalPage,
   SpinnerModalPage,
   useConditionalConfirm,
   DISPLAY_FLEX,
@@ -157,7 +157,7 @@ export function CalibrateTipLength(
 
   return Panel ? (
     <>
-      <DeprecatedModalPage
+      <ModalPage
         titleBar={titleBarProps}
         // @ts-expect-error(sa, 2021-05-26): cannot index undefined, leaving to avoid src code change
         innerProps={PANEL_STYLE_PROPS_BY_STEP[currentStep]}
@@ -173,7 +173,7 @@ export function CalibrateTipLength(
           sessionType={session.sessionType}
           intent={INTENT_TIP_LENGTH_IN_PROTOCOL}
         />
-      </DeprecatedModalPage>
+      </ModalPage>
       {showConfirmExit && (
         // @ts-expect-error TODO: ConfirmExitModal expects sessionType
         <ConfirmExitModal exit={confirmExit} back={cancelExit} />

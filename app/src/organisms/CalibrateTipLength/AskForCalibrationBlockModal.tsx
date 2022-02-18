@@ -4,7 +4,7 @@ import {
   CheckboxField,
   Flex,
   Link,
-  DeprecatedModalPage,
+  ModalPage,
   PrimaryBtn,
   SecondaryBtn,
   Text,
@@ -61,7 +61,7 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
   }
 
   return (
-    <DeprecatedModalPage
+    <ModalPage
       titleBar={{
         title: props.titleBarTitle,
         back: { onClick: props.closePrompt, title: EXIT, children: EXIT },
@@ -123,6 +123,6 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
           </Flex>
         </Box>
       </Flex>
-    </DeprecatedModalPage>
+    </ModalPage>
   )
 }

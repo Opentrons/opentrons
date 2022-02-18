@@ -10,7 +10,6 @@ import {
 
 interface MenuListProps {
   buttons: Array<ButtonProps | null | undefined>
-  id?: string
 }
 
 export const MenuList = (props: MenuListProps): JSX.Element | null => {
@@ -23,7 +22,6 @@ export const MenuList = (props: MenuListProps): JSX.Element | null => {
       top="2.6rem"
       right={`calc(50% + ${SPACING_1})`}
       flexDirection={DIRECTION_COLUMN}
-      id={props.id}
     >
       {props.buttons}
     </Box>

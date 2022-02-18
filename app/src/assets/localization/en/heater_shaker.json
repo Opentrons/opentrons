@@ -13,7 +13,7 @@
   "use_this_heater_shaker_guide": "Use this guide to attach the Heater Shaker Module to your robot’s deck for secure shaking.",
   "you_will_need": "You will need:",
   "heater_shaker_mod": "Heater Shaker Module",
-  "t10_torx_screwdriver": "T10 Torx Screwdriver",
+  "t10_torx_screwdriver": "{{name}} Screwdriver",
   "about_screwdriver": "Provided with module. Note: using another screwdriver size can strip the module’s screws.",
   "adapter_name_and_screw": "{{adapter}} + Screw",
   "unknown_adapter_and_screw": "Thermal Adapter + Screw",

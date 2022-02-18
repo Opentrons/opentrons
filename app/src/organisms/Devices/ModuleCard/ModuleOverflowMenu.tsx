@@ -107,7 +107,6 @@ export const ModuleOverflowMenu = (
       {showSlideout && renderSlideOut(hasSecondary)}
       <Flex position={POSITION_RELATIVE}>
         <MenuList
-          id={`module_overflow_menu`}
           buttons={[
             menuItems[module.type].map((item, index) => {
               return (

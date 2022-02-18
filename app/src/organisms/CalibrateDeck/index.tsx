@@ -3,7 +3,7 @@ import * as React from 'react'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import {
-  DeprecatedModalPage,
+  ModalPage,
   SpinnerModalPage,
   useConditionalConfirm,
   DISPLAY_FLEX,
@@ -156,7 +156,7 @@ export function CalibrateDeck(
   const Panel = PANEL_BY_STEP[currentStep]
   return Panel ? (
     <>
-      <DeprecatedModalPage
+      <ModalPage
         titleBar={titleBarProps}
         innerProps={currentStep ? PANEL_STYLE_PROPS_BY_STEP[currentStep] : {}}
       >
@@ -172,7 +172,7 @@ export function CalibrateDeck(
           supportedCommands={supportedCommands}
           defaultTipracks={instrument?.defaultTipracks}
         />
-      </DeprecatedModalPage>
+      </ModalPage>
       {showConfirmExit && (
         // @ts-expect-error TODO: ConfirmExitModal expects sessionType
         <ConfirmExitModal exit={confirmExit} back={cancelExit} />
