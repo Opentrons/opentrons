@@ -8,7 +8,7 @@ from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons_hardware.drivers.can_bus.build import build_driver
 from .can_args import add_can_args, build_settings
 from opentrons_hardware.hardware_control.tools.detector import ToolDetector
-from opentrons_hardware.hardware_control.tools.types import Mount
+from opentrons_hardware.hardware_control.tools.types import Carrier
 from opentrons_ot3_firmware.constants import ToolType
 
 logger = logging.getLogger(__name__)
@@ -46,8 +46,8 @@ async def run(args: argparse.Namespace) -> None:
     messenger.start()
 
     tool_dict = {
-        Mount.LEFT: ToolType(0),
-        Mount.RIGHT: ToolType(0),
+        Carrier.LEFT: ToolType(0),
+        Carrier.RIGHT: ToolType(0),
     }
     detector = ToolDetector(messenger, tool_dict)
 
