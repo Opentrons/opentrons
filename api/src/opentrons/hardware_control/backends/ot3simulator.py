@@ -23,14 +23,11 @@ from opentrons.config import pipette_config
 from opentrons_shared_data.pipette import dummy_model_for_name
 from . import ot3utils
 
-try:
-    from opentrons_hardware.firmware_bindings.constants import NodeId
-    from opentrons_hardware.hardware_control.motion_planning import (
-        Move,
-        Coordinates,
-    )
-except ModuleNotFoundError:
-    pass
+from opentrons_hardware.firmware_bindings.constants import NodeId
+from opentrons_hardware.hardware_control.motion_planning import (
+    Move,
+    Coordinates,
+)
 
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control import modules

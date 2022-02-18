@@ -27,25 +27,22 @@ try:
 except (OSError, ModuleNotFoundError):
     aionotify = None
 
-try:
-    from opentrons_hardware.drivers.can_bus import CanMessenger, DriverSettings
-    from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
-    from opentrons_hardware.drivers.can_bus.build import build_driver
-    from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
-    from opentrons_hardware.hardware_control.motion_planning import (
-        Move,
-        Coordinates,
-    )
+from opentrons_hardware.drivers.can_bus import CanMessenger, DriverSettings
+from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
+from opentrons_hardware.drivers.can_bus.build import build_driver
+from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
+from opentrons_hardware.hardware_control.motion_planning import (
+    Move,
+    Coordinates,
+)
 
-    from opentrons_hardware.hardware_control.network import probe
-    from opentrons_hardware.firmware_bindings.constants import NodeId
-    from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-        SetupRequest,
-        EnableMotorRequest,
-    )
-    from opentrons_hardware.firmware_bindings.messages.payloads import EmptyPayload
-except ModuleNotFoundError:
-    pass
+from opentrons_hardware.hardware_control.network import probe
+from opentrons_hardware.firmware_bindings.constants import NodeId
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    SetupRequest,
+    EnableMotorRequest,
+)
+from opentrons_hardware.firmware_bindings.messages.payloads import EmptyPayload
 
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control.types import BoardRevision, Axis, AionotifyEvent
