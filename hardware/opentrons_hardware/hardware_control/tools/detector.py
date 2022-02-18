@@ -16,11 +16,6 @@ log = logging.getLogger(__name__)
 class ToolDetector:
     """Class that detects tools on head."""
 
-    attached_tools = {
-        Mount.LEFT: ToolType(0),
-        Mount.RIGHT: ToolType(0),
-    }
-
     def __init__(
         self, messenger: CanMessenger, attached_tools: Dict[Mount, ToolType]
     ) -> None:
