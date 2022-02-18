@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Interstitial } from './index'
+import { Interstitial } from './Interstitial'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
