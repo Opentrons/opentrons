@@ -24,7 +24,7 @@ from opentrons_shared_data.pipette import dummy_model_for_name
 from . import ot3utils
 
 try:
-    from opentrons_ot3_firmware.constants import NodeId
+    from opentrons_hardware.firmware_bindings.constants import NodeId
     from opentrons_hardware.hardware_control.motion_planning import (
         Move,
         Coordinates,

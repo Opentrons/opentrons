@@ -38,12 +38,12 @@ try:
     )
 
     from opentrons_hardware.hardware_control.network import probe
-    from opentrons_ot3_firmware.constants import NodeId
-    from opentrons_ot3_firmware.messages.message_definitions import (
+    from opentrons_hardware.firmware_bindings.constants import NodeId
+    from opentrons_hardware.firmware_bindings.messages.message_definitions import (
         SetupRequest,
         EnableMotorRequest,
     )
-    from opentrons_ot3_firmware.messages.payloads import EmptyPayload
+    from opentrons_hardware.firmware_bindings.messages.payloads import EmptyPayload
 except ModuleNotFoundError:
     pass
 

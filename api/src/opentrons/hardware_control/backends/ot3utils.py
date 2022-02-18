@@ -4,7 +4,7 @@ from typing_extensions import Literal
 from opentrons.config.types import OT3MotionSettings, GantryLoad
 
 try:
-    from opentrons_ot3_firmware.constants import NodeId
+    from opentrons_hardware.firmware_bindings.constants import NodeId
     from opentrons_hardware.hardware_control.motion_planning import (
         AxisConstraints,
         AxisNames,

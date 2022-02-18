@@ -3,24 +3,28 @@ import asyncio
 import logging
 from typing import List, Set, Tuple
 
-from opentrons_ot3_firmware import ArbitrationId
-from opentrons_ot3_firmware.constants import NodeId
+from opentrons_hardware.firmware_bindings import ArbitrationId
+from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
-from opentrons_ot3_firmware.messages import MessageDefinition
-from opentrons_ot3_firmware.messages.message_definitions import (
+from opentrons_hardware.firmware_bindings.messages import MessageDefinition
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     ClearAllMoveGroupsRequest,
     AddLinearMoveRequest,
     MoveCompleted,
     ExecuteMoveGroupRequest,
 )
-from opentrons_ot3_firmware.messages.payloads import (
+from opentrons_hardware.firmware_bindings.messages.payloads import (
     AddLinearMoveRequestPayload,
     ExecuteMoveGroupRequestPayload,
     EmptyPayload,
 )
 from .constants import interrupts_per_sec
 from opentrons_hardware.hardware_control.motion import MoveGroups
-from opentrons_ot3_firmware.utils import UInt8Field, UInt32Field, Int32Field
+from opentrons_hardware.firmware_bindings.utils import (
+    UInt8Field,
+    UInt32Field,
+    Int32Field,
+)
 
 
 log = logging.getLogger(__name__)
@@ -67,6 +71,7 @@ class MoveGroupRunner:
                         node_id=node,
                         message=AddLinearMoveRequest(
                             payload=AddLinearMoveRequestPayload(
+                                request_stop_condition=UInt8Field(0),
                                 group_id=UInt8Field(group_i),
                                 seq_id=UInt8Field(seq_i),
                                 duration=UInt32Field(
