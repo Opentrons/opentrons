@@ -3,25 +3,22 @@ from typing import Dict, Iterable, List, Tuple
 from typing_extensions import Literal
 from opentrons.config.types import OT3MotionSettings, GantryLoad
 
-try:
-    from opentrons_ot3_firmware.constants import NodeId
-    from opentrons_hardware.hardware_control.motion_planning import (
-        AxisConstraints,
-        AxisNames,
-        AXIS_NAMES,
-        Coordinates,
-        Move,
-    )
-    from opentrons_hardware.hardware_control.motion_planning.move_utils import (
-        unit_vector_multiplication,
-    )
-    from opentrons_hardware.hardware_control.motion import (
-        create_step,
-        NodeIdMotionValues,
-        MoveGroup,
-    )
-except ImportError:
-    pass
+from opentrons_hardware.firmware_bindings.constants import NodeId
+from opentrons_hardware.hardware_control.motion_planning import (
+    AxisConstraints,
+    AxisNames,
+    AXIS_NAMES,
+    Coordinates,
+    Move,
+)
+from opentrons_hardware.hardware_control.motion_planning.move_utils import (
+    unit_vector_multiplication,
+)
+from opentrons_hardware.hardware_control.motion import (
+    create_step,
+    NodeIdMotionValues,
+    MoveGroup,
+)
 
 
 # TODO: These methods exist to defer uses of NodeId to inside

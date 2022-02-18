@@ -1,6 +1,6 @@
 from opentrons_hardware.hardware_control.motion_planning import Coordinates, Move
 from opentrons.hardware_control.backends import ot3utils
-from opentrons_ot3_firmware.constants import NodeId
+from opentrons_hardware.firmware_bindings.constants import NodeId
 
 
 def test_create_step():
