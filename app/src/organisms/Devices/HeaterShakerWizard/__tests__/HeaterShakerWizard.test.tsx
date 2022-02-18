@@ -1,8 +1,10 @@
 import * as React from 'react'
+import { when } from 'jest-when'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { getConnectedRobotName } from '../../../../redux/robot/selectors'
+import { getAttachedModules } from '../../../../redux/modules'
 import { HeaterShakerWizard } from '..'
 import { Introduction } from '../Introduction'
 import { KeyParts } from '../KeyParts'
@@ -11,6 +13,8 @@ import { AttachAdapter } from '../AttachAdapter'
 import { PowerOn } from '../PowerOn'
 import { TestShake } from '../TestShake'
 
+import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
+
 jest.mock('../../../../redux/robot/selectors')
 jest.mock('../Introduction')
 jest.mock('../KeyParts')
@@ -18,6 +22,7 @@ jest.mock('../AttachModule')
 jest.mock('../AttachAdapter')
 jest.mock('../PowerOn')
 jest.mock('../TestShake')
+jest.mock('../../../../redux/modules')
 
 const mockGetConnectedRobotName = getConnectedRobotName as jest.MockedFunction<
   typeof getConnectedRobotName
@@ -34,6 +39,9 @@ const mockAttachAdapter = AttachAdapter as jest.MockedFunction<
 >
 const mockPowerOn = PowerOn as jest.MockedFunction<typeof PowerOn>
 const mockTestShake = TestShake as jest.MockedFunction<typeof TestShake>
+const mockGetAttachedModules = getAttachedModules as jest.MockedFunction<
+  typeof getAttachedModules
+>
 
 const render = (props: React.ComponentProps<typeof HeaterShakerWizard>) => {
   return renderWithProviders(<HeaterShakerWizard {...props} />, {
@@ -53,6 +61,10 @@ describe('HeaterShakerWizard', () => {
     mockAttachAdapter.mockReturnValue(<div>Mock Attach Adapter</div>)
     mockPowerOn.mockReturnValue(<div>Mock Power On</div>)
     mockTestShake.mockReturnValue(<div>Mock Test Shake</div>)
+
+    when(mockGetAttachedModules)
+      .calledWith(undefined as any, mockConnectedRobot.name)
+      .mockReturnValue([])
   })
 
   it('renders the main modal component of the wizard', () => {
@@ -86,4 +98,6 @@ describe('HeaterShakerWizard', () => {
 
     getByRole('button', { name: 'Complete' })
   })
+  //  TODO(jr, 2022-02-18): get attached modules has an attached heater shaker
+  it.todo('renders power on component and the button is disabled')
 })

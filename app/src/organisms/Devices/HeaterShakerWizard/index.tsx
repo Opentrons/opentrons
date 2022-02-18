@@ -4,6 +4,7 @@ import { Portal } from '../../../App/portal'
 import { useSelector } from 'react-redux'
 import { getConnectedRobotName } from '../../../redux/robot/selectors'
 import { Interstitial } from '../../../atoms/Interstitial/Interstitial'
+import { getAttachedModules } from '../../../redux/modules'
 import { Introduction } from './Introduction'
 import { KeyParts } from './KeyParts'
 import { AttachModule } from './AttachModule'
@@ -31,12 +32,24 @@ interface HeaterShakerWizardProps {
 
 export const HeaterShakerWizard = (
   props: HeaterShakerWizardProps
-): JSX.Element => {
+): JSX.Element | null => {
   const { onCloseClick } = props
   const { t } = useTranslation(['heater_shaker', 'shared'])
   const [currentPage, setCurrentPage] = React.useState(0)
   const robotName = useSelector((state: State) => getConnectedRobotName(state))
+  const attachedModules = useSelector((state: State) =>
+    getAttachedModules(state, robotName)
+  )
+
+  if (robotName === null) return null
+
+  const heaterShakerAttached = attachedModules.findIndex(
+    //  TODO(jr, 2022-02-18): get heaterShaker module when model exists
+    module => module.model === 'magneticModuleV2'
+  )
+
   let buttonContent = null
+  let isDisabled: boolean = false
   const getWizardDisplayPage = (): JSX.Element | null => {
     switch (currentPage) {
       case 0:
@@ -58,7 +71,8 @@ export const HeaterShakerWizard = (
         return <AttachAdapter />
       case 4:
         buttonContent = t('btn_test_shake')
-        return <PowerOn status={'on'} />
+        isDisabled = heaterShakerAttached === -1
+        return <PowerOn robotName={robotName} />
       case 5:
         buttonContent = t('complete')
         return <TestShake />
@@ -101,6 +115,7 @@ export const HeaterShakerWizard = (
           {currentPage <= 5 ? (
             <PrimaryBtn
               alignItems={ALIGN_CENTER}
+              disabled={isDisabled}
               backgroundColor={COLORS.blue}
               borderRadius={SPACING.spacingS}
               textTransform={TEXT_TRANSFORM_NONE}

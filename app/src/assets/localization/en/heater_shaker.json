@@ -49,5 +49,6 @@
   "place_the_module_slot": "<block>Place the module in a Slot.</block>",
   "place_the_module_slot_number": "<block>Place the module in <bold>Slot {{slot}}</bold>.</block>",
   "attach_module_extend_anchors": "<block>Hold the module flat against the deck and turn screws <icon></icon> clockwise to <bold>extend the anchors</bold>.",
-  "attach_module_check_attachment": "Check attachment by gently pulling up and rocking the module."
+  "attach_module_check_attachment": "Check attachment by gently pulling up and rocking the module.",
+  "step_3_power_on": "<block><strong>Step 3 of 4: Power on the module</strong></block><block>Connect your module to the robot and and power it on.</block>"
 }
