@@ -33,7 +33,12 @@ from opentrons_hardware.hardware_control.motion_planning import (
 
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control import modules
-from opentrons.hardware_control.types import BoardRevision, OT3Axis, OT3Mount
+from opentrons.hardware_control.types import (
+    BoardRevision,
+    OT3Axis,
+    OT3Mount,
+    OT3AxisMap,
+)
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
@@ -46,8 +51,6 @@ if TYPE_CHECKING:
 
 log = logging.getLogger(__name__)
 
-
-AxisValueMap = Dict[OT3Axis, float]
 
 _FIXED_PIPETTE_ID: str = "P1KSV3120211118A01"
 _FIXED_PIPETTE_NAME: PipetteName = "p1000_single_gen3"
@@ -159,7 +162,7 @@ class OT3Simulator:
     def is_homed(self, axes: Sequence[OT3Axis]) -> bool:
         return True
 
-    async def update_position(self) -> AxisValueMap:
+    async def update_position(self) -> OT3AxisMap[float]:
         """Get the current position."""
         return axis_convert(self._position, 0.0)
 
@@ -182,7 +185,7 @@ class OT3Simulator:
         _, final_positions = create_move_group(origin, moves, self._present_nodes)
         self._position.update(final_positions)
 
-    async def home(self, axes: Optional[List[OT3Axis]] = None) -> AxisValueMap:
+    async def home(self, axes: Optional[List[OT3Axis]] = None) -> OT3AxisMap[float]:
         """Home axes.
 
         Args:
@@ -193,7 +196,9 @@ class OT3Simulator:
         """
         return axis_convert(self._position, 0.0)
 
-    async def fast_home(self, axes: Sequence[OT3Axis], margin: float) -> AxisValueMap:
+    async def fast_home(
+        self, axes: Sequence[OT3Axis], margin: float
+    ) -> OT3AxisMap[float]:
         """Fast home axes.
 
         Args:
@@ -272,7 +277,7 @@ class OT3Simulator:
             for mount in OT3Mount
         }
 
-    def set_active_current(self, axis_currents: Dict[OT3Axis, float]) -> None:
+    def set_active_current(self, axis_currents: OT3AxisMap[float]) -> None:
         """Set the active current.
 
         Args:
@@ -296,7 +301,7 @@ class OT3Simulator:
         await self.module_controls.register_modules(new_mods_at_ports=new_mods_at_ports)
 
     @property
-    def axis_bounds(self) -> Dict[OT3Axis, Tuple[float, float]]:
+    def axis_bounds(self) -> OT3AxisMap[Tuple[float, float]]:
         """Get the axis bounds."""
         # TODO (AL, 2021-11-18): The bounds need to be defined
         phony_bounds = (0, 10000)
@@ -320,7 +325,7 @@ class OT3Simulator:
         """Update the firmware."""
         return "Done"
 
-    def engaged_axes(self) -> Dict[OT3Axis, bool]:
+    def engaged_axes(self) -> OT3AxisMap[bool]:
         """Get engaged axes."""
         return {}
 
@@ -352,7 +357,7 @@ class OT3Simulator:
         """Halt the motors."""
         return None
 
-    async def probe(self, axis: OT3Axis, distance: float) -> AxisValueMap:
+    async def probe(self, axis: OT3Axis, distance: float) -> OT3AxisMap[float]:
         """Probe."""
         return {}
 

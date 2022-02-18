@@ -54,6 +54,7 @@ from .types import (
     PauseType,
     OT3Axis,
     OT3Mount,
+    OT3AxisMap,
 )
 from . import modules
 from .robot_calibration import (
@@ -130,7 +131,7 @@ class OT3API(
 
         self._callbacks: Set[HardwareEventHandler] = set()
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
-        self._current_position: Dict[OT3Axis, float] = {}
+        self._current_position: OT3AxisMap[float] = {}
 
         self._last_moved_mount: Optional[OT3Mount] = None
         # The motion lock synchronizes calls to long-running physical tasks
@@ -626,7 +627,7 @@ class OT3API(
         abs_position: top_types.Point,
         speed: Optional[float] = None,
         critical_point: Optional[CriticalPoint] = None,
-        max_speeds: Union[None, Dict[Axis, float], Dict[OT3Axis, float]] = None,
+        max_speeds: Union[None, Dict[Axis, float], OT3AxisMap[float]] = None,
     ):
         """Move the critical point of the specified mount to a location
         relative to the deck, at the specified speed."""
@@ -642,7 +643,7 @@ class OT3API(
             top_types.Point(*self._config.right_mount_offset),
         )
         if max_speeds:
-            checked_max: Optional[Dict[OT3Axis, float]] = {
+            checked_max: Optional[OT3AxisMap[float]] = {
                 OT3Axis.from_axis(k): v for k, v in max_speeds.items()
             }
         else:
@@ -656,7 +657,7 @@ class OT3API(
         mount: Union[top_types.Mount, OT3Mount],
         delta: top_types.Point,
         speed: Optional[float] = None,
-        max_speeds: Union[None, Dict[Axis, float], Dict[OT3Axis, float]] = None,
+        max_speeds: Union[None, Dict[Axis, float], OT3AxisMap[float]] = None,
         check_bounds: MotionChecks = MotionChecks.NONE,
         fail_on_not_homed: bool = False,
     ):
@@ -685,7 +686,7 @@ class OT3API(
         ):
             raise mhe
         if max_speeds:
-            checked_max: Optional[Dict[OT3Axis, float]] = {
+            checked_max: Optional[OT3AxisMap[float]] = {
                 OT3Axis.from_axis(k): v for k, v in max_speeds.items()
             }
         else:
@@ -716,7 +717,7 @@ class OT3API(
         target_position: "OrderedDict[OT3Axis, float]",
         speed: float = None,
         home_flagged_axes: bool = True,
-        max_speeds: Dict[OT3Axis, float] = None,
+        max_speeds: OT3AxisMap[float] = None,
         acquire_lock: bool = True,
         check_bounds: MotionChecks = MotionChecks.NONE,
     ):
@@ -775,7 +776,7 @@ class OT3API(
 
     async def _fast_home(
         self, axes: Sequence[OT3Axis], margin: float
-    ) -> Dict[OT3Axis, float]:
+    ) -> OT3AxisMap[float]:
         return await self._backend.fast_home(axes, margin)
 
     @ExecutionManagerProvider.wait_for_running

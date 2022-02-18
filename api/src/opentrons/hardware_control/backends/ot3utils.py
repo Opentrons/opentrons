@@ -1,7 +1,7 @@
 """Shared utilities for ot3 hardware control."""
 from typing import Dict, Iterable, List, Tuple, TypeVar
 from opentrons.config.types import OT3MotionSettings, GantryLoad
-from opentrons.hardware_control.types import OT3Axis, OT3AxisKind
+from opentrons.hardware_control.types import OT3Axis, OT3AxisKind, OT3AxisMap
 import numpy as np
 
 
@@ -142,8 +142,8 @@ AxisMapPayload = TypeVar("AxisMapPayload")
 
 def axis_convert(
     axis_map: Dict["NodeId", AxisMapPayload], default_value: AxisMapPayload
-) -> Dict[OT3Axis, AxisMapPayload]:
-    ret: Dict[OT3Axis, AxisMapPayload] = {k: default_value for k in node_axes()}
+) -> OT3AxisMap[AxisMapPayload]:
+    ret: OT3AxisMap[AxisMapPayload] = {k: default_value for k in node_axes()}
     for node, value in axis_map.items():
         if node_is_axis(node):
             ret[node_to_axis(node)] = value

@@ -1,7 +1,7 @@
 import enum
 import logging
 from dataclasses import dataclass
-from typing import cast, Tuple, Union, List, Callable, Dict
+from typing import cast, Tuple, Union, List, Callable, Dict, TypeVar
 from typing_extensions import Literal
 from opentrons import types as top_types
 
@@ -226,6 +226,8 @@ class OT3Axis(enum.Enum):
 
 
 BCAxes = Union[Axis, OT3Axis]
+AxisMapValue = TypeVar("AxisMapValue")
+OT3AxisMap = Dict[OT3Axis, AxisMapValue]
 
 
 class DoorState(enum.Enum):
