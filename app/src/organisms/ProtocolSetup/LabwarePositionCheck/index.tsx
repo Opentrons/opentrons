@@ -228,6 +228,10 @@ const LabwarePositionCheckComponent = (
   return <Portal level="top">{modalContent}</Portal>
 }
 
+// We explicitly wrap LabwarePositionCheckComponent in an ErrorBoundary because an error might occur while pulling in
+// the component's dependencies (like useLabwarePositionCheck). If we wrapped the contents of LabwarePositionCheckComponent
+// in an ErrorBoundary as part of its return value (render), an error could occur before this point, meaning the error boundary
+// would never get invoked
 export const LabwarePositionCheck = (
   props: LabwarePositionCheckModalProps
 ): JSX.Element => {
