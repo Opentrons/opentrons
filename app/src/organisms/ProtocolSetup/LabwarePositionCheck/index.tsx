@@ -9,6 +9,7 @@ import {
   useConditionalConfirm,
 } from '@opentrons/components'
 import { Portal } from '../../../App/portal'
+import { useLogger } from '../../../logger'
 import { useTrackEvent } from '../../../redux/analytics'
 import { useRestartRun } from '../../ProtocolUpload/hooks/useRestartRun'
 import { useLabwarePositionCheck } from './hooks'
@@ -24,7 +25,8 @@ import styles from '../styles.css'
 interface LabwarePositionCheckModalProps {
   onCloseClick: () => unknown
 }
-export const LabwarePositionCheck = (
+
+const LabwarePositionCheckComponent = (
   props: LabwarePositionCheckModalProps
 ): JSX.Element | null => {
   const { t } = useTranslation(['labware_position_check', 'shared'])
@@ -224,4 +226,48 @@ export const LabwarePositionCheck = (
     )
   }
   return <Portal level="top">{modalContent}</Portal>
+}
+
+export const LabwarePositionCheck = (
+  props: LabwarePositionCheckModalProps
+): JSX.Element => {
+  const logger = useLogger(__filename)
+  return (
+    <ErrorBoundary logger={logger}>
+      <LabwarePositionCheckComponent {...props} />
+    </ErrorBoundary>
+  )
+}
+
+interface ErrorBoundaryProps {
+  children: React.ReactNode
+  logger: ReturnType<typeof useLogger>
+}
+class ErrorBoundary extends React.Component<
+  ErrorBoundaryProps,
+  { error: Error | null; errorInfo: React.ErrorInfo | null }
+> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props)
+    this.state = { error: null, errorInfo: null }
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
+    this.setState({
+      error: error,
+      errorInfo: errorInfo,
+    })
+  }
+
+  render(): ErrorBoundaryProps['children'] | null {
+    if (this.state.errorInfo != null || this.state.error != null) {
+      this.props.logger.error(`LPC error message: ${this.state.error?.message}`)
+      this.props.logger.error(
+        `LPC error component stack: ${this.state.errorInfo?.componentStack}`
+      )
+      return null
+    }
+    // Normally, just render children
+    return this.props.children
+  }
 }
