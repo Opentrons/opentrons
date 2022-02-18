@@ -56,7 +56,7 @@ export function ModalPage(props: ModalPageProps): JSX.Element {
       <TitleBar {...titleBar} />
       <Box
         zIndex="1"
-        width="42.125rem"
+        width="auto"
         margin="0 auto"
         padding={TYPOGRAPHY.lineHeight16}
         position={POSITION_RELATIVE}

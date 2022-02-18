@@ -18,5 +18,16 @@
   "intro_adapter_known": "{{adapter}} + Screw",
   "intro_adapter_unknown": "Thermal Adapter + Screw",
   "intro_adapter_body": "Screw may already be in the center of the module.",
-  "intro_labware": "Labware"
+  "intro_labware": "Labware",
+  "step_1_of_4_attach_module": "Step 1 of 4: Attach module to deck",
+  "1a": "1a",
+  "1b": "1b",
+  "1c": "1c",
+  "attach_module_anchor_not_extended": "<block>Before placing the module on the deck, make sure the anchors are <bold>not extended</bold>.</block>",
+  "attach_module_turn_screws": "<block>Turn screws <icon></icon> counter clockwise to retract the anchors. The screws should <bold>not</bold> come out of the module.</block>",
+  "orient_heater_shaker_module": "<block>Orient your module such that the plugs for power and USB connection are <bold>outward</bold>.</block>",
+  "place_the_module_slot": "<block>Place the module in a Slot.</block>",
+  "place_the_module_slot_number": "<block>Place the module in <bold>Slot {{slot}}</bold>.</block>",
+  "attach_module_extend_anchors": "<block>Hold the module flat against the deck and turn screws <icon></icon> clockwise to <bold>extend the anchors</bold>.",
+  "attach_module_check_attachment": "Check attachment by gently pulling up and rocking the module."
 }
