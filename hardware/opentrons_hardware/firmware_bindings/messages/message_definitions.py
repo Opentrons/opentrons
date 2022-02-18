@@ -350,3 +350,21 @@ class ReadFromSensorResponse:  # noqa: D101
     payload: payloads.ReadFromSensorResponse
     payload_type: Type[BinarySerializable] = payloads.ReadFromSensorResponse
     message_id: Literal[MessageId.read_sensor_response] = MessageId.read_sensor_response
+
+
+@dataclass
+class SetSensorThresholdRequest:  # noqa: D101
+    payload: payloads.SetSensorThresholdRequest
+    payload_type: Type[BinarySerializable] = payloads.SetSensorThresholdRequest
+    message_id: Literal[
+        MessageId.set_sensor_threshold_request
+    ] = MessageId.set_sensor_threshold_request
+
+
+@dataclass
+class SensorThresholdResponse:  # noqa: D101
+    payload: payloads.SensorThresholdResponse
+    payload_type: Type[BinarySerializable] = payloads.SensorThresholdResponse
+    message_id: Literal[
+        MessageId.set_sensor_threshold_response
+    ] = MessageId.set_sensor_threshold_response

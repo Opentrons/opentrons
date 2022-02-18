@@ -5,7 +5,6 @@
 from dataclasses import dataclass
 
 from .. import utils
-from opentrons_hardware.firmware_bindings import constants
 
 
 @dataclass
@@ -276,5 +275,21 @@ class BaselineSensorRequest(utils.BinarySerializable):
 class ReadFromSensorResponse(utils.BinarySerializable):
     """A response for either a single reading or an averaged reading of a sensor."""
 
-    sensor: constants.SensorType
+    sensor: utils.UInt8Field
     sensor_data: utils.UInt32Field
+
+
+@dataclass
+class SetSensorThresholdRequest(utils.BinarySerializable):
+    """A request to set the threshold value of a sensor."""
+
+    sensor: utils.UInt8Field
+    threshold: utils.UInt32Field
+
+
+@dataclass
+class SensorThresholdResponse(utils.BinarySerializable):
+    """A response that sends back the current threshold value of the sensor."""
+
+    sensor: utils.UInt8Field
+    threshold: utils.UInt32Field

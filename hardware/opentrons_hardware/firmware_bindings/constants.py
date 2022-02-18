@@ -103,6 +103,8 @@ class MessageId(int, Enum):
     write_sensor_request = 0x83
     baseline_sensor_request = 0x84
     read_sensor_response = 0x85
+    set_sensor_threshold_request = 0x86
+    set_sensor_threshold_response = 0x87
 
 
 @unique
