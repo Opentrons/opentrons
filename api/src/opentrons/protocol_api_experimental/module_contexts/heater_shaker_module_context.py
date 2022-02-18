@@ -55,11 +55,11 @@ class HeaterShakerModuleContext:
         raise NotImplementedError()
 
     def set_shake(self, speed: int) -> None:
-        """Set shake speed in RPM and start shaking.
+        f"""Set shake speed in RPM and start shaking.
 
         Latches the labware, starts shaking the plate and returns once the target
         shake speed has reached.
-        Acceptable shake speed: 200 - 3000 RPM
+        Acceptable shake speed: {SPEED_LOWER_LIMIT} - {SPEED_UPPER_LIMIT} RPM
 
         Raises:
             InvalidTargetSpeedError: if target speed out of limits.
