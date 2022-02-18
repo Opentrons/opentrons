@@ -105,7 +105,6 @@ export function TempNavBar({ routes }: { routes: RouteProps[] }): JSX.Element {
  * route params type definition for the next gen app
  */
 export interface NextGenRouteParams {
-  appSettingsTab: string
   robotName: string
   protocolName: string
   labwareId: string
@@ -196,19 +195,19 @@ export const nextGenRoutes: RouteProps[] = [
     path: '/devices/:robotName/protocol-runs/:runId/:runDetailsTab',
   },
   {
-    component: () => <GeneralSettings />,
+    component: GeneralSettings,
     exact: true,
     name: 'App Settings',
     path: '/app-settings/general',
   },
   {
-    component: () => <PrivacySettings />,
+    component: PrivacySettings,
     exact: true,
     name: 'Privacy',
     path: '/app-settings/privacy',
   },
   {
-    component: () => <AdvancedSettings />,
+    component: AdvancedSettings,
     exact: true,
     name: 'Advanced',
     path: '/app-settings/advanced',
@@ -216,7 +215,7 @@ export const nextGenRoutes: RouteProps[] = [
 ]
 
 const devToolsRoute = {
-  component: () => <FeatureFlags />,
+  component: FeatureFlags,
   exact: true,
   name: 'Feature Flags',
   path: '/app-settings/feature-flags',

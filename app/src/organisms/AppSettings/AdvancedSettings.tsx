@@ -111,7 +111,7 @@ export function AdvancedSettings(): JSX.Element {
             >
               {t('additional_folder_location')}
             </Text>
-            {labwarePath != null ? (
+            {labwarePath !== '' ? (
               <Link
                 css={TYPOGRAPHY.pRegular}
                 external
@@ -139,7 +139,7 @@ export function AdvancedSettings(): JSX.Element {
                 dispatch(CustomLabware.changeCustomLabwareDirectory())
               }
             >
-              {labwarePath != null
+              {labwarePath !== ''
                 ? t('change_folder_button')
                 : t('add_folder_button')}
             </TertiaryButton>
@@ -223,7 +223,7 @@ export function AdvancedSettings(): JSX.Element {
           <ToggleButton
             label="enable_dev_tools"
             toggledOn={devToolsOn}
-            onClick={() => toggleDevtools}
+            onClick={toggleDevtools}
           />
         </Flex>
       </Box>
