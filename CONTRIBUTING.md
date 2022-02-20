@@ -153,7 +153,14 @@ Your computer will need the following tools installed to be able to develop with
   ```shell
   pyenv install 3.7.10
   ```
-
+  **MacOS M1 Chip Note** please install xcode tools as well as [rosetta 2](https://support.apple.com/en-us/HT211861) in order to properly access the functions. 
+  ```shell
+  xcode-select --install
+  ```
+  **Windows Note**  nvm doesn't support windows. You'd have to go download [node.js](https://nodejs.org/en/download/) and then install it using [chocolatey](https://classic.yarnpkg.com/en/docs/install#windows-stable).
+  ```shell
+  choco install yarn
+  ```
 - Node v14 - [nvm][] is optional, but recommended
 
   ```shell
