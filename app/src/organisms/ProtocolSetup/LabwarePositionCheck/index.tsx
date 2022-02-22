@@ -24,6 +24,7 @@ import styles from '../styles.css'
 
 interface LabwarePositionCheckModalProps {
   onCloseClick: () => unknown
+  caughtError?: Error
 }
 
 const LabwarePositionCheckComponent = (
@@ -237,7 +238,7 @@ export const LabwarePositionCheck = (
 ): JSX.Element => {
   const logger = useLogger(__filename)
   return (
-    <ErrorBoundary logger={logger}>
+    <ErrorBoundary logger={logger} ErrorComponent={CrashingErrorModal}>
       <LabwarePositionCheckComponent {...props} />
     </ErrorBoundary>
   )
@@ -246,32 +247,53 @@ export const LabwarePositionCheck = (
 interface ErrorBoundaryProps {
   children: React.ReactNode
   logger: ReturnType<typeof useLogger>
+  ErrorComponent: (props: { errorMessage: string }) => JSX.Element
 }
 class ErrorBoundary extends React.Component<
   ErrorBoundaryProps,
-  { error: Error | null; errorInfo: React.ErrorInfo | null }
+  { error: Error | null }
 > {
   constructor(props: ErrorBoundaryProps) {
     super(props)
-    this.state = { error: null, errorInfo: null }
+    this.state = { error: null }
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
+    this.props.logger.error(`LPC error message: ${error.message}`)
+    this.props.logger.error(
+      `LPC error component stack: ${errorInfo.componentStack}`
+    )
     this.setState({
-      error: error,
-      errorInfo: errorInfo,
+      error,
     })
   }
 
-  render(): ErrorBoundaryProps['children'] | null {
-    if (this.state.errorInfo != null || this.state.error != null) {
-      this.props.logger.error(`LPC error message: ${this.state.error?.message}`)
-      this.props.logger.error(
-        `LPC error component stack: ${this.state.errorInfo?.componentStack}`
-      )
-      return null
-    }
+  render(): ErrorBoundaryProps['children'] | JSX.Element {
+    const { ErrorComponent, children } = this.props
+    const { error } = this.state
+    if (error != null) return <ErrorComponent errorMessage={error.message} />
     // Normally, just render children
-    return this.props.children
+    return children
   }
+}
+
+interface CrashingErrorModalProps {
+  errorMessage: string
+}
+function CrashingErrorModal(props: CrashingErrorModalProps): JSX.Element {
+  const { t } = useTranslation(['labware_position_check', 'shared'])
+  return (
+    <Portal level="top">
+      <AlertModal
+        heading={t('error_modal_header')}
+        iconName={null}
+        alertOverlay
+      >
+        <Box>
+          <Text>{t('error_modal_problem_in_app')}</Text>
+          <Text marginTop={SPACING_2}>Error: {props.errorMessage}</Text>
+        </Box>
+      </AlertModal>
+    </Portal>
+  )
 }
