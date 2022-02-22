@@ -3,8 +3,8 @@
 import asyncio
 import logging
 from opentrons_hardware.hardware_control.tools.errors import ToolDetectionFailiure
-from opentrons_ot3_firmware.messages import message_definitions, payloads
-from opentrons_ot3_firmware.constants import ToolType, NodeId
+from opentrons_hardware.firmware_bindings.messages import message_definitions, payloads
+from opentrons_hardware.firmware_bindings.constants import ToolType, NodeId
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons_hardware.drivers.can_bus.can_messenger import WaitableCallback
 from opentrons_hardware.hardware_control.tools.types import Carrier
