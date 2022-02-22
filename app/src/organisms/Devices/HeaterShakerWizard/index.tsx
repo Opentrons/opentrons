@@ -22,6 +22,8 @@ import {
   SPACING,
   TEXT_TRANSFORM_NONE,
   JUSTIFY_FLEX_END,
+  Tooltip,
+  useHoverTooltip,
 } from '@opentrons/components'
 
 import type { State } from '../../../redux/types'
@@ -40,12 +42,13 @@ export const HeaterShakerWizard = (
   const attachedModules = useSelector((state: State) =>
     getAttachedModules(state, robotName === null ? null : robotName)
   )
+  const [targetProps, tooltipProps] = useHoverTooltip({})
 
   const isHeaterShakerAttached =
     attachedModules != null &&
     attachedModules.some(
       //  TODO(jr, 2022-02-18): get heaterShaker module when model exists
-      module => module.model === 'magneticModuleV2'
+      module => module.model === 'magneticModuleV1'
     )
 
   let buttonContent = null
@@ -116,6 +119,7 @@ export const HeaterShakerWizard = (
             <PrimaryBtn
               alignItems={ALIGN_CENTER}
               disabled={isDisabled}
+              {...targetProps}
               backgroundColor={COLORS.blue}
               borderRadius={SPACING.spacingS}
               textTransform={TEXT_TRANSFORM_NONE}
@@ -127,6 +131,11 @@ export const HeaterShakerWizard = (
               }
             >
               {buttonContent}
+              {isDisabled !== false ? (
+                <Tooltip {...tooltipProps}>
+                  {t('module_is_not_connected')}
+                </Tooltip>
+              ) : null}
             </PrimaryBtn>
           ) : null}
         </Flex>
