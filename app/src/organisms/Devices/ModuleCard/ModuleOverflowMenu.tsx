@@ -48,8 +48,9 @@ export const ModuleOverflowMenu = (
 
   const AboutModuleBtn = (
     <MenuItem
+      key={`about_module_${module.model}`}
       data-testid={`about_module_${module.model}`}
-      //  TODO immediately - add actual module overflow menu
+      //  TODO(jr, 2022-02-17): add about module slideout component when it is created
       onClick={() => console.log('about module overflow menu')}
     >
       {t('overflow_menu_about')}
@@ -64,6 +65,7 @@ export const ModuleOverflowMenu = (
             menuItems[module.type].map((item, index) => {
               return (
                 <MenuItem
+                  minWidth="10rem"
                   key={index}
                   onClick={() => handleClick(item.isSecondary)}
                   data-testid={`module_setting_${module.model}`}
@@ -76,7 +78,6 @@ export const ModuleOverflowMenu = (
             AboutModuleBtn,
           ]}
         />
-        {/* </MenuList> */}
       </Flex>
     </React.Fragment>
   )
