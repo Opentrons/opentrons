@@ -7,8 +7,8 @@ from opentrons_ot3_firmware.messages import message_definitions, payloads
 from opentrons_ot3_firmware.constants import ToolType, NodeId
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons_hardware.drivers.can_bus.can_messenger import WaitableCallback
-from opentrons_hardware.hardware_control.tools.types import Mount
-from typing import Callable, Dict
+from opentrons_hardware.hardware_control.tools.types import Carrier
+from typing import AsyncGenerator, Dict
 
 log = logging.getLogger(__name__)
 
@@ -17,33 +17,24 @@ class ToolDetector:
     """Class that detects tools on head."""
 
     def __init__(
-        self, messenger: CanMessenger, attached_tools: Dict[Mount, ToolType]
+        self, messenger: CanMessenger, attached_tools: Dict[Carrier, ToolType]
     ) -> None:
         """Constructor."""
         self._messenger = messenger
         self.attached_tools = attached_tools
 
-    # Please use "Callable[[<parameters>], <return type>]" or "Callable"
-    async def detect(self, callback: Callable[[Dict[Mount, ToolType]], None]) -> None:
-        """Detect tool changes to run callback from other classes."""
-        with WaitableCallback(self._messenger) as reader:
-            # Poll to get attached tools response
-            async for response, arbitration_id in reader:
-                if (
-                    isinstance(
-                        response, message_definitions.PushToolsDetectedNotification
-                    )
-                    and arbitration_id.parts.originating_node_id == NodeId.head
-                ):
-                    tmp_dic = {
-                        Mount.LEFT: ToolType(int(response.payload.a_motor.value)),
-                        Mount.RIGHT: ToolType(int(response.payload.z_motor.value)),
-                    }
-                    if self.attached_tools != tmp_dic:
-                        self.attached_tools = tmp_dic
-                        log.info("Tools detected %s:", {self.attached_tools})
-                        callback(self.attached_tools)
-                    break
+    async def detect(self) -> AsyncGenerator[Dict[Carrier, ToolType], None]:
+        """Detect tool changes."""
+        async for message in self._messenger._drive:
+            if isinstance(message, message_definitions.PushToolsDetectedNotification):
+                tmp_dic = {
+                    Carrier.LEFT: ToolType(int(message.payload.a_motor.value)),
+                    Carrier.RIGHT: ToolType(int(message.payload.z_motor.value)),
+                }
+                if self.attached_tools != tmp_dic:
+                    self.attached_tools = tmp_dic
+                    log.info("Tools detected %s:", {self.attached_tools})
+                    yield tmp_dic
 
     async def run(self, retry_count: int, ready_wait_time_sec: float) -> None:
         """Continuously identify tool changes on head."""
@@ -88,8 +79,8 @@ class ToolDetector:
                 and arbitration_id.parts.originating_node_id == NodeId.head
             ):
                 tmp_dic = {
-                    Mount.LEFT: ToolType(int(response.payload.a_motor.value)),
-                    Mount.RIGHT: ToolType(int(response.payload.z_motor.value)),
+                    Carrier.LEFT: ToolType(int(response.payload.a_motor.value)),
+                    Carrier.RIGHT: ToolType(int(response.payload.z_motor.value)),
                 }
                 if self.attached_tools != tmp_dic:
                     self.attached_tools = tmp_dic
