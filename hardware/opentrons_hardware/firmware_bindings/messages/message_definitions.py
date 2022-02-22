@@ -316,13 +316,6 @@ class HomeRequest:  # noqa: D101
 
 
 @dataclass
-class HomeResponse:  # noqa: D101
-    payload: payloads.HomeResponse
-    payload_type: Type[BinarySerializable] = payloads.HomeResponse
-    message_id: Literal[MessageId.home_response] = MessageId.home_response
-
-
-@dataclass
 class ReadLimitSwitchRequest:  # noqa: D101
     payload: payloads.EmptyPayload
     payload_type: Type[BinarySerializable] = payloads.EmptyPayload

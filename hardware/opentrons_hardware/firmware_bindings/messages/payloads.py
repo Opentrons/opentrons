@@ -96,13 +96,6 @@ class HomeRequest(AddToMoveGroupRequestPayload):
 
 
 @dataclass
-class HomeResponse(MoveGroupResponsePayload):
-    """Response to requets to home."""
-
-    homed: utils.UInt8Field
-
-
-@dataclass
 class GetMoveGroupResponsePayload(MoveGroupResponsePayload):
     """Response to request to get a move group."""
 
