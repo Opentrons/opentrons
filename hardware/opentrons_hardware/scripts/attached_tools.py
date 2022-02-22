@@ -9,7 +9,7 @@ from opentrons_hardware.drivers.can_bus.build import build_driver
 from .can_args import add_can_args, build_settings
 from opentrons_hardware.hardware_control.tools.detector import ToolDetector
 from opentrons_hardware.hardware_control.tools.types import Carrier
-from opentrons_ot3_firmware.constants import ToolType
+from opentrons_hardware.firmware_bindings.constants import ToolType
 
 logger = logging.getLogger(__name__)
 
