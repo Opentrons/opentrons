@@ -414,15 +414,15 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
              A positive number moves the magnets higher and
              a negative number moves the magnets lower.
 
-        The units of ``height``, ``offset``, and ``height_from_base``
+        The units of ``height_from_base``, ``height``, and ``offset``
         depend on which generation of Magnetic Module you're using:
 
            - For GEN1 Magnetic Modules, they're in *half-millimeters,*
              for historical reasons.
            - For GEN2 Magnetic Modules, they're in true millimeters.
 
-        You may not specify more than one of ``height``, ``offset``,
-        or ``height_from_base``.
+        You may not specify more than one of
+        ``height_from_base``, ``height``, and ``offset``.
 
         .. versionadded:: 2.2
             The *height_from_base* parameter.
