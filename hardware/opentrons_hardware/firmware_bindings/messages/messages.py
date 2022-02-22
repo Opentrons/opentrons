@@ -53,6 +53,8 @@ MessageDefinition = Union[
     defs.SetSensorThresholdRequest,
     defs.ReadFromSensorResponse,
     defs.SensorThresholdResponse,
+    defs.HomeRequest,
+    defs.HomeResponse,
 ]
 
 
