@@ -6,39 +6,48 @@ import type {
   UseMutationOptions,
   UseMutateAsyncFunction,
 } from 'react-query'
-import type { CommandData, HostConfig } from '@opentrons/api-client'
+import type {
+  CommandData,
+  HostConfig,
+  CreateCommandParams,
+} from '@opentrons/api-client'
 import type { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 
-interface CreateCommandParams {
+interface CreateCommandMutateParams extends CreateCommandParams {
   runId: string
   command: CreateCommand
+  waitUntilComplete?: boolean
+  timeout?: number
 }
 
 export type UseCreateCommandMutationResult = UseMutationResult<
   CommandData,
   unknown,
-  CreateCommandParams
+  CreateCommandMutateParams
 > & {
   createCommand: UseMutateAsyncFunction<
     CommandData,
     unknown,
-    CreateCommandParams
+    CreateCommandMutateParams
   >
 }
 
 export type UseCreateCommandMutationOptions = UseMutationOptions<
   CommandData,
   unknown,
-  CreateCommandParams
+  CreateCommandMutateParams
 >
 
 export function useCreateCommandMutation(): UseCreateCommandMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
 
-  const mutation = useMutation<CommandData, unknown, CreateCommandParams>(
-    ({ runId, command }) =>
-      createCommand(host as HostConfig, runId, command).then(response => {
+  const mutation = useMutation<CommandData, unknown, CreateCommandMutateParams>(
+    ({ runId, command, waitUntilComplete, timeout }) =>
+      createCommand(host as HostConfig, runId, command, {
+        waitUntilComplete,
+        timeout,
+      }).then(response => {
         queryClient
           .invalidateQueries([host, 'runs'])
           .catch((e: Error) =>

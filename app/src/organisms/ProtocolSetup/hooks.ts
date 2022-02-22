@@ -109,12 +109,12 @@ export function usePipetteMount(
 
 // this context is used to trigger an LPC success toast render from an LPC component lower in the tree
 export const LPCSuccessToastContext = createContext<{
-  setShowLPCSuccessToast: () => void
-}>({ setShowLPCSuccessToast: () => null })
+  setIsShowingLPCSuccessToast: (isShowing: boolean) => void
+}>({ setIsShowingLPCSuccessToast: () => null })
 
 export function useLPCSuccessToast(): {
-  setShowLPCSuccessToast: () => void
+  setIsShowingLPCSuccessToast: (isShowing: boolean) => void
 } {
-  const { setShowLPCSuccessToast } = useContext(LPCSuccessToastContext)
-  return { setShowLPCSuccessToast }
+  const { setIsShowingLPCSuccessToast } = useContext(LPCSuccessToastContext)
+  return { setIsShowingLPCSuccessToast }
 }

@@ -7,13 +7,13 @@ from typing import Optional
 
 from opentrons_hardware.drivers.can_bus import CanDriver
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
-from opentrons_ot3_firmware.constants import NodeId
+from opentrons_hardware.firmware_bindings.constants import NodeId
 
-from opentrons_ot3_firmware.messages.message_definitions import (
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     SetupRequest,
     EnableMotorRequest,
 )
-from opentrons_ot3_firmware.messages.payloads import EmptyPayload
+from opentrons_hardware.firmware_bindings.messages.payloads import EmptyPayload
 from opentrons_hardware.hardware_control.motion import MoveGroupSingleAxisStep
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
 from opentrons_hardware.scripts.can_args import add_can_args

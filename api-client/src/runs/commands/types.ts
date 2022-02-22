@@ -29,6 +29,8 @@ export interface CommandsLinks {
     meta: {
       runId: string
       commandId: string
+      key: string
+      createdAt: string
       index: number
     }
   }
@@ -38,4 +40,9 @@ export interface CommandsData {
   data: RunCommandSummary[]
   meta: GetCommandsParams & { totalLength: number }
   links: CommandsLinks
+}
+
+export interface CreateCommandParams {
+  waitUntilComplete?: boolean
+  timeout?: number
 }

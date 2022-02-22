@@ -3,21 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [5.0.0-beta.8](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.7...v5.0.0-beta.8) (2022-02-03)
-
-**Note:** Version bump only for package @opentrons/api-server
-
-
-
-
-
-# [5.0.0-beta.7](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.6...v5.0.0-beta.7) (2022-01-28)
+# [5.0.0](https://github.com/Opentrons/opentrons/compare/v4.7.0...v5.0.0) (2022-02-16)
 
 
 ### Bug Fixes
 
 * **api:**  Fix simulator home and is_homed ([#9279](https://github.com/Opentrons/opentrons/issues/9279)) ([e5db3b7](https://github.com/Opentrons/opentrons/commit/e5db3b7447fbb8624d63345bab661463c936d1a4)), closes [#8969](https://github.com/Opentrons/opentrons/issues/8969)
+* **api:** add missing f-string to thermocycler profile command text ([#9407](https://github.com/Opentrons/opentrons/issues/9407)) ([5a37197](https://github.com/Opentrons/opentrons/commit/5a37197a3ab44072067fe57f85d20a88ddd0daf5)), closes [#9380](https://github.com/Opentrons/opentrons/issues/9380)
+* **api:** check home status in move_rel ([#8724](https://github.com/Opentrons/opentrons/issues/8724)) ([7347847](https://github.com/Opentrons/opentrons/commit/734784718188f10e4b36ac0a0b043a4b3ca8b3b8))
+* **api:** check pipette names in simulator ([#9181](https://github.com/Opentrons/opentrons/issues/9181)) ([a81ebd9](https://github.com/Opentrons/opentrons/commit/a81ebd96cf3079bb518a2cb89ee6763149177a5c))
+* **api:** don't show exception on module server disconnect. ([#8778](https://github.com/Opentrons/opentrons/issues/8778)) ([1bfaabe](https://github.com/Opentrons/opentrons/commit/1bfaabe233afe4d370313417a3423aa540a2a685))
 * **api:** filter higher order commands out of legacy command response ([#9294](https://github.com/Opentrons/opentrons/issues/9294)) ([21e5bf5](https://github.com/Opentrons/opentrons/commit/21e5bf590f5523f90adff5ad447baa9c2db7bf6c)), closes [#9102](https://github.com/Opentrons/opentrons/issues/9102)
+* **api:** Prioritize mc alarms over errors ([#9230](https://github.com/Opentrons/opentrons/issues/9230)) ([c44fed3](https://github.com/Opentrons/opentrons/commit/c44fed3aae222e7712937d77f9a2720fb9be1651))
+* **api:** set serial timeouts for transactions ([#9190](https://github.com/Opentrons/opentrons/issues/9190)) ([03e3c55](https://github.com/Opentrons/opentrons/commit/03e3c559b134502bc411e8d97c5b33e16c6d9b2a))
+* **engine:** take calibrated tip length into account during tip pickup ([#9246](https://github.com/Opentrons/opentrons/issues/9246)) ([7866767](https://github.com/Opentrons/opentrons/commit/7866767ee6057197edf253f8b31272a734a71afd)), closes [#9220](https://github.com/Opentrons/opentrons/issues/9220)
+* **protocol-engine:** move HW API cleanup to engine.finish ([#9233](https://github.com/Opentrons/opentrons/issues/9233)) ([1994405](https://github.com/Opentrons/opentrons/commit/19944058762d889a6ab5b22e7a6ccc16f7367dda))
+* **protocol-engine:** Preserve distinction between APIv2 protocols' requested vs. connected modules ([#9364](https://github.com/Opentrons/opentrons/issues/9364)) ([042907b](https://github.com/Opentrons/opentrons/commit/042907b3fa69cf30935dfa381eafa72b2b9f42fe))
+* **robot-server:** add current command metadata to /commands response ([#9400](https://github.com/Opentrons/opentrons/issues/9400)) ([7da0420](https://github.com/Opentrons/opentrons/commit/7da0420bd07810095312e07eb22fb2d31ee29215))
 
 
 ### Code Refactoring
@@ -28,104 +30,27 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 ### Features
 
 * **api:** remove Calibrate to Bottom from Robot Settings ([#9111](https://github.com/Opentrons/opentrons/issues/9111)) ([06a92ee](https://github.com/Opentrons/opentrons/commit/06a92eecd9fba67c596d91e7c0096b5144b32ab6))
+* **api:** Remove legacy LC reset from robot settings ([#9093](https://github.com/Opentrons/opentrons/issues/9093)) ([9b78815](https://github.com/Opentrons/opentrons/commit/9b788154fffc405152f6f5f165a4d646dd47b4b5)), closes [#8283](https://github.com/Opentrons/opentrons/issues/8283)
 * **engine:** allow compatible module loads and reloads ([#9273](https://github.com/Opentrons/opentrons/issues/9273)) ([1c7e00d](https://github.com/Opentrons/opentrons/commit/1c7e00d8da77273eca1a8d0bb5e7bed544e3c168))
+* **ot3:** introduce independent head l and r motion. ([#8966](https://github.com/Opentrons/opentrons/issues/8966)) ([30cb899](https://github.com/Opentrons/opentrons/commit/30cb899fe1769b996fb0ea6f0bae391c6dbec635))
+* **ot3:** ot3 hardware controller move ([#8738](https://github.com/Opentrons/opentrons/issues/8738)) ([883db3a](https://github.com/Opentrons/opentrons/commit/883db3a96ca9c6a48bd4ccee16e221fe03154361)), closes [#8946](https://github.com/Opentrons/opentrons/issues/8946)
 * **papi:** add labware.set_offset for jupyter/cli, bump papi to 2.12 ([#9242](https://github.com/Opentrons/opentrons/issues/9242)) ([17d03cd](https://github.com/Opentrons/opentrons/commit/17d03cdfbf1b41be17dd41d6b064f75d2184938a))
+* **robot-server:** enable /runs and /protocols endpoints by default ([#8913](https://github.com/Opentrons/opentrons/issues/8913)) ([aa3549f](https://github.com/Opentrons/opentrons/commit/aa3549fad49383243f9ad2ccc291d15e8fd50725)), closes [#8155](https://github.com/Opentrons/opentrons/issues/8155)
+* **robot-server,api,app:** When adding a jog command over HTTP, wait for it to complete before returning ([#9410](https://github.com/Opentrons/opentrons/issues/9410)) ([4d811d5](https://github.com/Opentrons/opentrons/commit/4d811d5485754b45795a275424e0b267edc88270))
 
 
 ### Performance Improvements
 
+* **api:** bring back the ThreadManager ([#9199](https://github.com/Opentrons/opentrons/issues/9199)) ([ba931f7](https://github.com/Opentrons/opentrons/commit/ba931f750cf67ce68a6dc9e2ae9ac8682ce43d3a))
 * **api:** Do not wait for the event loop to be free when reporting APIv2 commands ([#9238](https://github.com/Opentrons/opentrons/issues/9238)) ([6ab9b10](https://github.com/Opentrons/opentrons/commit/6ab9b10425eec5c63db93abdd3e68a1c33e0a3ac))
+* **app, robot-server:** paginate /runs/:run_id/commands response ([#9348](https://github.com/Opentrons/opentrons/issues/9348)) ([b9eb7b4](https://github.com/Opentrons/opentrons/commit/b9eb7b4d98532480705d3c32fd2485508315bea9))
+* **protocol-engine:** avoid iterating all commands for every state update ([#9170](https://github.com/Opentrons/opentrons/issues/9170)) ([b12bffc](https://github.com/Opentrons/opentrons/commit/b12bffcee1edaba848c43b4af8c95a7bba367dde)), closes [#9109](https://github.com/Opentrons/opentrons/issues/9109) [#8739](https://github.com/Opentrons/opentrons/issues/8739)
 
 
 ### BREAKING CHANGES
 
 * **robot-server:** This removes endpoints used during the 2021 HTTP protocol upload beta.
 Users should transition to the new `/protocols` and `/runs` endpoints, instead.
-
-
-
-
-
-# [5.0.0-beta.6](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.5...v5.0.0-beta.6) (2022-01-07)
-
-
-### Bug Fixes
-
-* **api:** check pipette names in simulator ([#9181](https://github.com/Opentrons/opentrons/issues/9181)) ([a81ebd9](https://github.com/Opentrons/opentrons/commit/a81ebd96cf3079bb518a2cb89ee6763149177a5c))
-
-
-### Performance Improvements
-
-* **api:** bring back the ThreadManager ([#9199](https://github.com/Opentrons/opentrons/issues/9199)) ([ba931f7](https://github.com/Opentrons/opentrons/commit/ba931f750cf67ce68a6dc9e2ae9ac8682ce43d3a))
-* **protocol-engine:** avoid iterating all commands for every state update ([#9170](https://github.com/Opentrons/opentrons/issues/9170)) ([b12bffc](https://github.com/Opentrons/opentrons/commit/b12bffcee1edaba848c43b4af8c95a7bba367dde)), closes [#9109](https://github.com/Opentrons/opentrons/issues/9109) [#8739](https://github.com/Opentrons/opentrons/issues/8739)
-
-
-
-
-
-# [5.0.0-beta.5](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.4...v5.0.0-beta.5) (2021-12-23)
-
-**Note:** Version bump only for package @opentrons/api-server
-
-
-
-
-
-# [5.0.0-beta.4](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.3...v5.0.0-beta.4) (2021-12-14)
-
-
-### Features
-
-* **api:** Remove legacy LC reset from robot settings ([#9093](https://github.com/Opentrons/opentrons/issues/9093)) ([9b78815](https://github.com/Opentrons/opentrons/commit/9b788154fffc405152f6f5f165a4d646dd47b4b5)), closes [#8283](https://github.com/Opentrons/opentrons/issues/8283)
-
-
-
-
-
-# [5.0.0-beta.3](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.2...v5.0.0-beta.3) (2021-12-10)
-
-**Note:** Version bump only for package @opentrons/api-server
-
-
-
-
-
-# [5.0.0-beta.2](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.1...v5.0.0-beta.2) (2021-12-08)
-
-**Note:** Version bump only for package @opentrons/api-server
-
-
-
-
-
-# [5.0.0-beta.1](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.0...v5.0.0-beta.1) (2021-12-07)
-
-
-### Features
-
-* **ot3:** introduce independent head l and r motion. ([#8966](https://github.com/Opentrons/opentrons/issues/8966)) ([30cb899](https://github.com/Opentrons/opentrons/commit/30cb899fe1769b996fb0ea6f0bae391c6dbec635))
-* **ot3:** ot3 hardware controller move ([#8738](https://github.com/Opentrons/opentrons/issues/8738)) ([883db3a](https://github.com/Opentrons/opentrons/commit/883db3a96ca9c6a48bd4ccee16e221fe03154361)), closes [#8946](https://github.com/Opentrons/opentrons/issues/8946)
-
-
-
-
-
-# [5.0.0-beta.0](https://github.com/Opentrons/opentrons/compare/v4.7.0...v5.0.0-beta.0) (2021-11-30)
-
-
-### Bug Fixes
-
-* **api:** check home status in move_rel ([#8724](https://github.com/Opentrons/opentrons/issues/8724)) ([7347847](https://github.com/Opentrons/opentrons/commit/734784718188f10e4b36ac0a0b043a4b3ca8b3b8))
-* **api:** don't show exception on module server disconnect. ([#8778](https://github.com/Opentrons/opentrons/issues/8778)) ([1bfaabe](https://github.com/Opentrons/opentrons/commit/1bfaabe233afe4d370313417a3423aa540a2a685))
-
-
-### Features
-
-* **robot-server:** enable /runs and /protocols endpoints by default ([#8913](https://github.com/Opentrons/opentrons/issues/8913)) ([aa3549f](https://github.com/Opentrons/opentrons/commit/aa3549fad49383243f9ad2ccc291d15e8fd50725)), closes [#8155](https://github.com/Opentrons/opentrons/issues/8155)
-
-
-### BREAKING CHANGES
-
 * **robot-server:** The RPC WebSocket endpoint has been removed. The /protocols endpoints have been
 heavily reworked.
 

@@ -13,7 +13,7 @@ from opentrons.calibration_storage.types import PipetteOffsetByPipetteMount
 from opentrons.config import pipette_config, robot_configs
 from opentrons.config.types import RobotConfig, OT3Config
 from opentrons.drivers.types import MoveSplit
-from .types import CriticalPoint, BoardRevision
+from .types import CriticalPoint, BoardRevision, OT3AxisKind
 
 
 if TYPE_CHECKING:
@@ -461,6 +461,6 @@ def generate_hardware_configs_ot3(
             "steps_per_mm": 0,
             "home_pos": 0,
             "max_travel": 0,
-            "idle_current": robot_config.holding_current.none["P"],
+            "idle_current": robot_config.holding_current.none[OT3AxisKind.P],
             "splits": None,
         }
