@@ -76,7 +76,6 @@ class MoveGroupRunner:
                                 duration=UInt32Field(
                                     int(step.duration_sec * interrupts_per_sec)
                                 ),
-                                request_stop_condition=UInt8Field(int(0)),
                                 acceleration=Int32Field(
                                     int(
                                         (
