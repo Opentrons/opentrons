@@ -38,15 +38,15 @@ export const HeaterShakerWizard = (
   const [currentPage, setCurrentPage] = React.useState(0)
   const robotName = useSelector((state: State) => getConnectedRobotName(state))
   const attachedModules = useSelector((state: State) =>
-    getAttachedModules(state, robotName)
+    getAttachedModules(state, robotName === null ? null : robotName)
   )
 
-  if (robotName === null) return null
-
-  const heaterShakerAttached = attachedModules.findIndex(
-    //  TODO(jr, 2022-02-18): get heaterShaker module when model exists
-    module => module.model === 'magneticModuleV2'
-  )
+  const isHeaterShakerAttached =
+    attachedModules != null &&
+    attachedModules.some(
+      //  TODO(jr, 2022-02-18): get heaterShaker module when model exists
+      module => module.model === 'magneticModuleV2'
+    )
 
   let buttonContent = null
   let isDisabled: boolean = false
@@ -71,8 +71,8 @@ export const HeaterShakerWizard = (
         return <AttachAdapter />
       case 4:
         buttonContent = t('btn_test_shake')
-        isDisabled = heaterShakerAttached === -1
-        return <PowerOn robotName={robotName} />
+        isDisabled = !isHeaterShakerAttached
+        return <PowerOn robotName={robotName === null ? '' : robotName} />
       case 5:
         buttonContent = t('complete')
         return <TestShake />
