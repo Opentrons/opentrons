@@ -92,8 +92,6 @@ class AddLinearMoveRequestPayload(AddToMoveGroupRequestPayload):
 class HomeRequest(AddToMoveGroupRequestPayload):
     """Request to home."""
 
-    request_stop_condition: utils.UInt8Field
-    acceleration: utils.Int32Field
     velocity: utils.Int32Field
 
 
