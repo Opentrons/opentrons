@@ -1,5 +1,5 @@
 """Tool detection exceptions."""
-from opentrons_ot3_firmware.messages import MessageDefinition
+from opentrons_hardware.firmware_bindings.messages import MessageDefinition
 
 
 class ToolDetectionException(Exception):
