@@ -188,7 +188,7 @@ class ModuleView(HasState[ModuleState]):
         ):
             return definition.dimensions.lidHeight
         else:
-            raise errors.ModuleIsNotThermocyclerError(
+            raise errors.WrongModuleTypeError(
                 f"Cannot get lid height of {definition.moduleType}"
             )
 
