@@ -1,14 +1,14 @@
 """Tests for the move scheduler."""
 import pytest
 from mock import AsyncMock, call, MagicMock
-from opentrons_ot3_firmware import ArbitrationId, ArbitrationIdParts
+from opentrons_hardware.firmware_bindings import ArbitrationId, ArbitrationIdParts
 
-from opentrons_ot3_firmware.constants import NodeId
+from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.drivers.can_bus.can_messenger import MessageListenerCallback
-from opentrons_ot3_firmware.messages.message_definitions import (
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     AddLinearMoveRequest,
 )
-from opentrons_ot3_firmware.messages.payloads import (
+from opentrons_hardware.firmware_bindings.messages.payloads import (
     AddLinearMoveRequestPayload,
     MoveCompletedPayload,
     EmptyPayload,
@@ -25,11 +25,15 @@ from opentrons_hardware.hardware_control.move_group_runner import (
     MoveGroupRunner,
     MoveScheduler,
 )
-from opentrons_ot3_firmware.messages import (
+from opentrons_hardware.firmware_bindings.messages import (
     message_definitions as md,
     MessageDefinition,
 )
-from opentrons_ot3_firmware.utils import UInt8Field, Int32Field, UInt32Field
+from opentrons_hardware.firmware_bindings.utils import (
+    UInt8Field,
+    Int32Field,
+    UInt32Field,
+)
 
 
 @pytest.fixture
@@ -149,6 +153,7 @@ async def test_single_send_setup_commands(
             payload=AddLinearMoveRequestPayload(
                 group_id=UInt8Field(0),
                 seq_id=UInt8Field(0),
+                request_stop_condition=UInt8Field(0),
                 velocity=Int32Field(
                     int(
                         move_group_single[0][0][NodeId.head].velocity_mm_sec
@@ -189,6 +194,7 @@ async def test_multi_send_setup_commands(
             payload=AddLinearMoveRequestPayload(
                 group_id=UInt8Field(0),
                 seq_id=UInt8Field(0),
+                request_stop_condition=UInt8Field(0),
                 velocity=Int32Field(
                     int(
                         move_group_multiple[0][0][NodeId.head].velocity_mm_sec
@@ -221,6 +227,7 @@ async def test_multi_send_setup_commands(
             payload=AddLinearMoveRequestPayload(
                 group_id=UInt8Field(1),
                 seq_id=UInt8Field(0),
+                request_stop_condition=UInt8Field(0),
                 velocity=Int32Field(
                     int(
                         move_group_multiple[1][0][NodeId.gantry_x].velocity_mm_sec
@@ -254,6 +261,7 @@ async def test_multi_send_setup_commands(
             payload=AddLinearMoveRequestPayload(
                 group_id=UInt8Field(1),
                 seq_id=UInt8Field(0),
+                request_stop_condition=UInt8Field(0),
                 velocity=Int32Field(
                     int(
                         move_group_multiple[1][0][NodeId.gantry_y].velocity_mm_sec
@@ -288,6 +296,7 @@ async def test_multi_send_setup_commands(
             payload=AddLinearMoveRequestPayload(
                 group_id=UInt8Field(2),
                 seq_id=UInt8Field(0),
+                request_stop_condition=UInt8Field(0),
                 velocity=Int32Field(
                     int(
                         move_group_multiple[2][0][NodeId.pipette_left].velocity_mm_sec
@@ -321,6 +330,7 @@ async def test_multi_send_setup_commands(
             payload=AddLinearMoveRequestPayload(
                 group_id=UInt8Field(2),
                 seq_id=UInt8Field(1),
+                request_stop_condition=UInt8Field(0),
                 velocity=Int32Field(
                     int(
                         move_group_multiple[2][1][NodeId.pipette_left].velocity_mm_sec

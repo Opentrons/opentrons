@@ -2,7 +2,7 @@ from functools import lru_cache
 import logging
 import numpy as np
 from dataclasses import dataclass
-from typing import Optional, List
+from typing import Optional, List, Union
 
 from opentrons import config
 
@@ -15,6 +15,7 @@ from opentrons.config.types import OT3Config
 from opentrons.calibration_storage import modify, types, get
 from opentrons.types import Mount, Point
 from opentrons.util import linal
+from .types import OT3Mount
 
 from .util import DeckTransformState
 
@@ -176,7 +177,7 @@ def load_attitude_matrix() -> types.DeckCalibration:
 
 
 def load_pipette_offset(
-    pip_id: Optional[str], mount: Mount
+    pip_id: Optional[str], mount: Union[Mount, OT3Mount]
 ) -> types.PipetteOffsetByPipetteMount:
     # load default if pipette offset data do not exist
     pip_cal_obj = types.PipetteOffsetByPipetteMount(
@@ -184,8 +185,12 @@ def load_pipette_offset(
         source=types.SourceType.default,
         status=types.CalibrationStatus(),
     )
+    if isinstance(mount, OT3Mount):
+        checked_mount = mount.to_mount()
+    else:
+        checked_mount = mount
     if pip_id:
-        pip_offset_data = get.get_pipette_offset(pip_id, mount)
+        pip_offset_data = get.get_pipette_offset(pip_id, checked_mount)
         if pip_offset_data:
             return pip_offset_data
     return pip_cal_obj

@@ -8,6 +8,7 @@ opentrons = {editable = true, path = "./../api"}
 notify-server = {editable = true, path = "./../notify-server"}
 robot-server = {editable = true, path = "./../robot-server"}
 opentrons-shared-data = {editable = true, path = "../shared-data/python"}
+opentrons_hardware = {editable = true, path = "../hardware"}
 g-code-testing = {editable = true, path = "."}
 anyio = "==3.3.0"
 pydantic = "==1.8.2"

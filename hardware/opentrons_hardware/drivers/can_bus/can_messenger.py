@@ -6,18 +6,18 @@ from typing import List, Optional, Callable, Tuple
 import logging
 
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
-from opentrons_ot3_firmware.arbitration_id import (
+from opentrons_hardware.firmware_bindings.arbitration_id import (
     ArbitrationId,
     ArbitrationIdParts,
 )
-from opentrons_ot3_firmware.message import CanMessage
-from opentrons_ot3_firmware.constants import NodeId, MessageId
+from opentrons_hardware.firmware_bindings.message import CanMessage
+from opentrons_hardware.firmware_bindings.constants import NodeId, MessageId
 
-from opentrons_ot3_firmware.messages.messages import (
+from opentrons_hardware.firmware_bindings.messages.messages import (
     MessageDefinition,
     get_definition,
 )
-from opentrons_ot3_firmware.utils import BinarySerializableException
+from opentrons_hardware.firmware_bindings.utils import BinarySerializableException
 
 log = logging.getLogger(__name__)
 

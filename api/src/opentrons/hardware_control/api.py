@@ -59,7 +59,7 @@ mod_log = logging.getLogger(__name__)
 class API(
     ExecutionManagerProvider,
     RobotCalibrationProvider,
-    InstrumentHandlerProvider,
+    InstrumentHandlerProvider[top_types.Mount],
     # This MUST be kept last in the inheritance list so that it is
     # deprioritized in the method resolution order; otherwise, invocations
     # of methods that are present in the protocol will call the (empty,
@@ -116,7 +116,9 @@ class API(
         self._pause_manager = PauseManager(self._door_state)
         ExecutionManagerProvider.__init__(self, isinstance(backend, Simulator))
         RobotCalibrationProvider.__init__(self)
-        InstrumentHandlerProvider.__init__(self)
+        InstrumentHandlerProvider.__init__(
+            self, {top_types.Mount.LEFT: None, top_types.Mount.RIGHT: None}
+        )
 
     @property
     def door_state(self) -> DoorState:
@@ -553,6 +555,7 @@ class API(
                     smoothie_pos,
                     self._robot_calibration.deck_calibration.attitude,
                     top_types.Point(0, 0, 0),
+                    Axis,
                 )
             for plunger in plungers:
                 await self._do_plunger_home(axis=plunger, acquire_lock=False)
@@ -589,6 +592,7 @@ class API(
                     await self._backend.update_position(),
                     self._robot_calibration.deck_calibration.attitude,
                     top_types.Point(0, 0, 0),
+                    Axis,
                 )
             if mount == top_types.Mount.RIGHT:
                 offset = top_types.Point(0, 0, 0)
@@ -785,6 +789,7 @@ class API(
                 smoothie_pos,
                 self._robot_calibration.deck_calibration.attitude,
                 top_types.Point(0, 0, 0),
+                Axis,
             )
 
     # Gantry/frame (i.e. not pipette) config API
@@ -1016,6 +1021,7 @@ class API(
                     smoothie_pos,
                     self._robot_calibration.deck_calibration.attitude,
                     top_types.Point(0, 0, 0),
+                    Axis,
                 )
 
         for shake in spec.shake_moves:

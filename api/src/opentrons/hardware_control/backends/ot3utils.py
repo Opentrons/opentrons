@@ -1,28 +1,25 @@
 """Shared utilities for ot3 hardware control."""
+from typing import Dict, Iterable, List, Tuple, TypeVar
+from opentrons.config.types import OT3MotionSettings, GantryLoad
+from opentrons.hardware_control.types import OT3Axis, OT3AxisKind, OT3AxisMap
+import numpy as np
 
-from typing import Dict, Iterable, List, Tuple
-from typing_extensions import Literal
-from opentrons.config.types import OT3Config, PipetteKind
 
-try:
-    from opentrons_ot3_firmware.constants import NodeId
-    from opentrons_hardware.hardware_control.motion_planning import (
-        AxisConstraints,
-        AxisNames,
-        AXIS_NAMES,
-        Coordinates,
-        Move,
-    )
-    from opentrons_hardware.hardware_control.motion_planning.move_utils import (
-        unit_vector_multiplication,
-    )
-    from opentrons_hardware.hardware_control.motion import (
-        create_step,
-        NodeIdMotionValues,
-        MoveGroup,
-    )
-except ImportError:
-    pass
+from opentrons_hardware.firmware_bindings.constants import NodeId
+from opentrons_hardware.hardware_control.motion_planning import (
+    AxisConstraints,
+    SystemConstraints,
+    Coordinates,
+    Move,
+)
+from opentrons_hardware.hardware_control.motion_planning.move_utils import (
+    unit_vector_multiplication,
+)
+from opentrons_hardware.hardware_control.motion import (
+    create_step,
+    NodeIdMotionValues,
+    MoveGroup,
+)
 
 
 # TODO: These methods exist to defer uses of NodeId to inside
@@ -43,30 +40,30 @@ def axis_nodes() -> List["NodeId"]:
     ]
 
 
-def node_axes() -> List[str]:
-    return ["X", "Y", "Z", "A", "B"]
+def node_axes() -> List[OT3Axis]:
+    return [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.P_L, OT3Axis.P_R]
 
 
-def axis_to_node(axis: str) -> "NodeId":
+def axis_to_node(axis: OT3Axis) -> "NodeId":
     anm = {
-        "X": NodeId.gantry_x,
-        "Y": NodeId.gantry_y,
-        "Z": NodeId.head_l,
-        "A": NodeId.head_r,
-        "B": NodeId.pipette_left,
-        "C": NodeId.pipette_right,
+        OT3Axis.X: NodeId.gantry_x,
+        OT3Axis.Y: NodeId.gantry_y,
+        OT3Axis.Z_L: NodeId.head_l,
+        OT3Axis.Z_R: NodeId.head_r,
+        OT3Axis.P_L: NodeId.pipette_left,
+        OT3Axis.P_R: NodeId.pipette_right,
     }
     return anm[axis]
 
 
-def node_to_axis(node: "NodeId") -> str:
+def node_to_axis(node: "NodeId") -> OT3Axis:
     nam = {
-        NodeId.gantry_x: "X",
-        NodeId.gantry_y: "Y",
-        NodeId.head_l: "Z",
-        NodeId.head_r: "A",
-        NodeId.pipette_left: "B",
-        NodeId.pipette_right: "C",
+        NodeId.gantry_x: OT3Axis.X,
+        NodeId.gantry_y: OT3Axis.Y,
+        NodeId.head_l: OT3Axis.Z_L,
+        NodeId.head_r: OT3Axis.Z_R,
+        NodeId.pipette_left: OT3Axis.P_L,
+        NodeId.pipette_right: OT3Axis.P_R,
     }
     return nam[node]
 
@@ -79,7 +76,7 @@ def node_is_axis(node: "NodeId") -> bool:
         return False
 
 
-def axis_is_node(axis: str) -> bool:
+def axis_is_node(axis: OT3Axis) -> bool:
     try:
         axis_to_node(axis)
         return True
@@ -87,51 +84,35 @@ def axis_is_node(axis: str) -> bool:
         return False
 
 
-def _constraint_name_from_axis(ax: "AxisNames") -> Literal["X", "Y", "Z", "P"]:
-    lookup: Dict[AxisNames, Literal["X", "Y", "Z", "P"]] = {
-        "X": "X",
-        "Y": "Y",
-        "Z": "Z",
-        "A": "Z",
-        "B": "P",
-        "C": "P",
-    }
-    return lookup[ax]
-
-
-def default_system_constraints(
-    config: OT3Config,
-) -> Dict["AxisNames", "AxisConstraints"]:
+def get_system_constraints(
+    config: OT3MotionSettings,
+    gantry_load: GantryLoad,
+) -> "SystemConstraints[OT3Axis]":
+    conf_by_pip = config.by_gantry_load(gantry_load)
     constraints = {}
-    for axis in AXIS_NAMES:
-        constraints[axis] = AxisConstraints.build(
-            config.acceleration.none[_constraint_name_from_axis(axis)],
-            config.max_speed_discontinuity.none[_constraint_name_from_axis(axis)],
-            config.direction_change_speed_discontinuity.none[
-                _constraint_name_from_axis(axis)
-            ],
-        )
+    for axis_kind in [OT3AxisKind.P, OT3AxisKind.X, OT3AxisKind.Y, OT3AxisKind.Z]:
+        for axis in OT3Axis.of_kind(axis_kind):
+            constraints[axis] = AxisConstraints.build(
+                conf_by_pip["acceleration"][axis_kind],
+                conf_by_pip["max_speed_discontinuity"][axis_kind],
+                conf_by_pip["direction_change_speed_discontinuity"][axis_kind],
+            )
     return constraints
 
 
-def get_system_constraints(
-    config: OT3Config, pipette_kind: PipetteKind
-) -> Dict["AxisNames", "AxisConstraints"]:
-    # TODO: (2022-02-10) get correct system constraints based on pipette kind
-    return default_system_constraints(config)
-
-
-def _convert_to_node_id_dict(axis_pos: "Coordinates") -> "NodeIdMotionValues":
+def _convert_to_node_id_dict(
+    axis_pos: "Coordinates[OT3Axis, np.float64]",
+) -> "NodeIdMotionValues":
     target: NodeIdMotionValues = {}
-    for axis, pos in axis_pos.to_dict().items():
+    for axis, pos in axis_pos.items():
         if axis_is_node(axis):
             target[axis_to_node(axis)] = pos
     return target
 
 
 def create_move_group(
-    origin: "Coordinates",
-    moves: List["Move"],
+    origin: "Coordinates[OT3Axis, np.float64]",
+    moves: List["Move[OT3Axis]"],
     present_nodes: Iterable["NodeId"],
 ) -> Tuple["MoveGroup", Dict["NodeId", float]]:
     pos = _convert_to_node_id_dict(origin)
@@ -151,6 +132,19 @@ def create_move_group(
                 present_nodes=present_nodes,
             )
             for ax in pos.keys():
-                pos[ax] += node_id_distances[ax]
+                pos[ax] += node_id_distances.get(ax, 0)
             move_group.append(step)
     return move_group, {k: float(v) for k, v in pos.items()}
+
+
+AxisMapPayload = TypeVar("AxisMapPayload")
+
+
+def axis_convert(
+    axis_map: Dict["NodeId", AxisMapPayload], default_value: AxisMapPayload
+) -> OT3AxisMap[AxisMapPayload]:
+    ret: OT3AxisMap[AxisMapPayload] = {k: default_value for k in node_axes()}
+    for node, value in axis_map.items():
+        if node_is_axis(node):
+            ret[node_to_axis(node)] = value
+    return ret

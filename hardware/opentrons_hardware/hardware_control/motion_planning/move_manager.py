@@ -1,31 +1,32 @@
 """Move manager."""
 import logging
-from typing import List, Tuple
-
+from typing import List, Tuple, Generic
 from opentrons_hardware.hardware_control.motion_planning import move_utils
 from opentrons_hardware.hardware_control.motion_planning.types import (
     Coordinates,
     Move,
     MoveTarget,
     SystemConstraints,
+    AxisKey,
+    CoordinateValue,
 )
 
 log = logging.getLogger(__name__)
 
 
-class MoveManager:
+class MoveManager(Generic[AxisKey]):
     """A manager that handles a list of moves for the hardware control system."""
 
-    def __init__(self, constraints: SystemConstraints) -> None:
+    def __init__(self, constraints: SystemConstraints[AxisKey]) -> None:
         """Constructor.
 
         Args:
             constraints: system contraints
         """
         self._constraints = constraints
-        self._blend_log: List[List[Move]] = []
+        self._blend_log: List[List[Move[AxisKey]]] = []
 
-    def update_constraints(self, constraints: SystemConstraints) -> None:
+    def update_constraints(self, constraints: SystemConstraints[AxisKey]) -> None:
         """Update system constraints when instruments are changed."""
         self._constraints = constraints
 
@@ -34,24 +35,28 @@ class MoveManager:
         self._blend_log = []
 
     def _get_initial_moves_from_targets(
-        self, origin: Coordinates, target_list: List[MoveTarget]
-    ) -> List[Move]:
+        self,
+        origin: Coordinates[AxisKey, CoordinateValue],
+        target_list: List[MoveTarget[AxisKey]],
+    ) -> List[Move[AxisKey]]:
         """Create a list of moves from the target list for blending."""
         initial_moves = list(move_utils.targets_to_moves(origin, target_list))
         return self._add_dummy_start_end_to_moves(initial_moves)
 
-    def _add_dummy_start_end_to_moves(self, move_list: List[Move]) -> List[Move]:
+    def _add_dummy_start_end_to_moves(
+        self, move_list: List[Move[AxisKey]]
+    ) -> List[Move[AxisKey]]:
         """Append dummy moves to the start and the end of the move list."""
-        start_move = Move.build_dummy_move()
-        end_move = Move.build_dummy_move()
+        start_move = Move.build_dummy(move_list[0].unit_vector.keys())
+        end_move = Move.build_dummy(move_list[0].unit_vector.keys())
         return [start_move] + move_list + [end_move]
 
     def plan_motion(
         self,
-        origin: Coordinates,
-        target_list: List[MoveTarget],
+        origin: Coordinates[AxisKey, CoordinateValue],
+        target_list: List[MoveTarget[AxisKey]],
         iteration_limit: int = 10,
-    ) -> Tuple[bool, List[List[Move]]]:
+    ) -> Tuple[bool, List[List[Move[AxisKey]]]]:
         """Create and blend moves from targets."""
         self._clear_blend_log()
         to_blend = self._get_initial_moves_from_targets(origin, target_list)
