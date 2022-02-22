@@ -54,9 +54,6 @@ class AbstractModule(abc.ABC):
     def loop(self) -> asyncio.AbstractEventLoop:
         return self._loop
 
-    def set_loop(self, loop: asyncio.AbstractEventLoop) -> None:
-        self._loop = loop
-
     def get_bundled_fw(self) -> Optional[BundledFirmware]:
         """Get absolute path to bundled version of module fw if available."""
         if not IS_ROBOT:
@@ -90,7 +87,7 @@ class AbstractModule(abc.ABC):
             await self._execution_manager.wait_for_is_running()
 
     async def make_cancellable(self, task: asyncio.Task):
-        self._execution_manager.register_cancellable_task(task)
+        await self._execution_manager.register_cancellable_task(task)
 
     @abc.abstractmethod
     def deactivate(self):
