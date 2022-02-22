@@ -23,10 +23,16 @@ def engine_client(decoy: Decoy) -> SyncClient:
 
 
 @pytest.fixture
-def subject(engine_client: SyncClient) -> MagneticModuleContext:
+def subject_module_id() -> str:
+    """Return the Protocol Engine module ID of the subject."""
+    return "subject-module-id"
+
+
+@pytest.fixture
+def subject(engine_client: SyncClient, subject_module_id: str) -> MagneticModuleContext:
     """Return a MagneticModuleContext with mocked dependencies."""
     return MagneticModuleContext(
-        engine_client=engine_client, module_id="subject-module-id"
+        engine_client=engine_client, module_id=subject_module_id
     )
 
 
@@ -39,12 +45,13 @@ def test_load_labware_default_namespace_and_version(
     decoy: Decoy,
     minimal_labware_def: LabwareDefinition,
     engine_client: SyncClient,
+    subject_module_id: str,
     subject: MagneticModuleContext,
 ) -> None:
     """It should default namespace to "opentrons" and version to 1."""
     decoy.when(
         engine_client.load_labware(
-            location=ModuleLocation(moduleId="subject-module-id"),
+            location=ModuleLocation(moduleId=subject_module_id),
             load_name="some_labware",
             namespace="opentrons",
             version=1,
@@ -65,12 +72,13 @@ def test_load_labware_explicit_namespace_and_version(
     decoy: Decoy,
     minimal_labware_def: LabwareDefinition,
     engine_client: SyncClient,
+    subject_module_id: str,
     subject: MagneticModuleContext,
 ) -> None:
     """It should pass along the namespace, version, and load name."""
     decoy.when(
         engine_client.load_labware(
-            location=ModuleLocation(moduleId="subject-module-id"),
+            location=ModuleLocation(moduleId=subject_module_id),
             load_name="some_labware",
             namespace="some_explicit_namespace",
             version=9001,
