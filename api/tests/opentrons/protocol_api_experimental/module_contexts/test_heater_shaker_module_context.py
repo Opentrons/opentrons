@@ -43,7 +43,7 @@ def test_stop_heating(subject: HeaterShakerModuleContext) -> None:
 
 
 @pytest.mark.xfail(strict=True, raises=NotImplementedError)
-def test_set_speed(subject: HeaterShakerModuleContext) -> None:
+def test_set_shake_speed(subject: HeaterShakerModuleContext) -> None:
     """It should set heater shaker speed."""
     subject.set_shake_speed(500)
 
@@ -57,9 +57,9 @@ def test_set_invalid_speed(subject: HeaterShakerModuleContext) -> None:
 
 
 @pytest.mark.xfail(strict=True, raises=NotImplementedError)
-def test_stop_shake(subject: HeaterShakerModuleContext) -> None:
+def test_stop_shaking(subject: HeaterShakerModuleContext) -> None:
     """It should stop shake."""
-    subject.stop_shake()
+    subject.stop_shaking()
 
 
 def test_max_and_min_properties(subject: HeaterShakerModuleContext) -> None:

@@ -96,7 +96,7 @@ class HeaterShakerModuleContext:
             )
         raise NotImplementedError()
 
-    def stop_shake(self) -> None:
+    def stop_shaking(self) -> None:
         """Stop shaking."""
         raise NotImplementedError()
 
