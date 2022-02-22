@@ -60,3 +60,11 @@ def test_set_invalid_speed(subject: HeaterShakerModuleContext) -> None:
 def test_stop_shake(subject: HeaterShakerModuleContext) -> None:
     """It should stop shake."""
     subject.stop_shake()
+
+
+def test_max_and_min_properties(subject: HeaterShakerModuleContext) -> None:
+    """It should respond with correct max & min temperature & speed values."""
+    assert subject.max_shake_speed == 2000
+    assert subject.min_shake_speed == 200
+    assert subject.max_temperature == 95
+    assert subject.min_temperature == 37

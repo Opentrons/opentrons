@@ -5,12 +5,12 @@ from ..errors import (
     InvalidTargetSpeedError,
 )
 
-TEMPERATURE_LOWER_LIMIT = 37
-TEMPERATURE_UPPER_LIMIT = 95
-SPEED_LOWER_LIMIT = 200
+MIN_ALLOWED_TEMPERATURE = 37
+MAX_ALLOWED_TEMPERATURE = 95
+MIN_ALLOWED_SPEED: int = 200
 # TODO (spp, 2022-2-22): User requirements doc states 2000rpm as limit but
-#  the module is capable of going up to 3000rpm. Do we limit the API to 2000rpm?
-SPEED_UPPER_LIMIT = 3000
+#  the module is capable of going up to 3000rpm. Which one to use for limit?
+MAX_ALLOWED_SPEED: int = 2000
 
 
 class HeaterShakerModuleContext:
@@ -27,22 +27,22 @@ class HeaterShakerModuleContext:
     @property
     def max_shake_speed(self) -> int:
         """Maximum allowed shake speed of the module."""
-        return SPEED_UPPER_LIMIT
+        return MAX_ALLOWED_SPEED
 
     @property
     def min_shake_speed(self) -> int:
         """Minimum allowed shake speed of the module."""
-        return SPEED_LOWER_LIMIT
+        return MIN_ALLOWED_SPEED
 
     @property
     def max_temperature(self) -> float:
         """Maximum allowed temperature of the module."""
-        return TEMPERATURE_UPPER_LIMIT
+        return MAX_ALLOWED_TEMPERATURE
 
     @property
     def min_temperature(self) -> float:
         """Minimum allowed temperature of the module."""
-        return TEMPERATURE_LOWER_LIMIT
+        return MIN_ALLOWED_TEMPERATURE
 
     def start_set_temperature(self, celsius: float) -> None:
         """Set the target temperature of heater-shaker and return immediately.
@@ -55,10 +55,10 @@ class HeaterShakerModuleContext:
         Raises:
             InvalidTargetTemperatureError: target temperature out of limits.
         """
-        if not TEMPERATURE_LOWER_LIMIT <= celsius <= TEMPERATURE_UPPER_LIMIT:
+        if not MIN_ALLOWED_TEMPERATURE <= celsius <= MAX_ALLOWED_TEMPERATURE:
             raise InvalidTargetTemperatureError(
-                f"Temperature should be in range {TEMPERATURE_LOWER_LIMIT} to "
-                f"{TEMPERATURE_UPPER_LIMIT} degree celsius."
+                f"Temperature should be in range {MIN_ALLOWED_TEMPERATURE} to "
+                f"{MAX_ALLOWED_TEMPERATURE} degree celsius."
             )
         raise NotImplementedError()
 
@@ -80,18 +80,18 @@ class HeaterShakerModuleContext:
         raise NotImplementedError()
 
     def set_shake_speed(self, rpm: int) -> None:
-        f"""Set shake speed in RPM and start shaking.
+        """Set shake speed in RPM and start shaking.
 
         Latches the labware, starts shaking the plate and returns once the target
         shake speed has reached.
-        Acceptable shake speed: {SPEED_LOWER_LIMIT} - {SPEED_UPPER_LIMIT} RPM
+        Acceptable shake speed: 200 - 2000 RPM
 
         Raises:
             InvalidTargetSpeedError: if target speed out of limits.
         """
-        if not SPEED_LOWER_LIMIT <= rpm <= SPEED_UPPER_LIMIT:
+        if not MIN_ALLOWED_SPEED <= rpm <= MAX_ALLOWED_SPEED:
             raise InvalidTargetSpeedError(
-                f"Speed should be in range {SPEED_LOWER_LIMIT} - {SPEED_UPPER_LIMIT}"
+                f"Speed should be in range {MIN_ALLOWED_SPEED} - {MAX_ALLOWED_SPEED}"
                 f"RPM."
             )
         raise NotImplementedError()
