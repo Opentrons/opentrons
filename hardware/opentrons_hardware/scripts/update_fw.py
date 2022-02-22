@@ -123,7 +123,7 @@ def main() -> None:
         default=3,
     )
     parser.add_argument(
-        "--timeout-seconds", help="Number of seconds to wait.", type=float, default=2
+        "--timeout-seconds", help="Number of seconds to wait.", type=float, default=10
     )
 
     args = parser.parse_args()
