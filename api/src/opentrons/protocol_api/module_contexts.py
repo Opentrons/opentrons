@@ -387,31 +387,42 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
     ) -> None:
         """Raise the Magnetic Module's magnets.
 
-        The destination of the magnets can be specified in several different
-        ways, based on internally stored default heights for labware:
+        You can specify how high the magnets should go in several different ways:
 
-           - If neither ``height``, ``height_from_base`` nor ``offset`` is
-             specified, the magnets will raise to a reasonable default height
-             based on the specified labware.
-           - The recommended way to adjust the height of the magnets is to
-             specify ``height_from_base``, which should be a distance in mm
-             relative to the base of the labware that is on the magnetic module
-           - If ``height`` is specified, it should be a distance in mm from the
-             home position of the magnets.
-           - If ``offset`` is specified, it should be an offset in mm from the
-             default position. A positive number moves the magnets higher and
+           - If you specify ``height_from_base``, it's measured relative to the bottom
+             of the labware.
+
+             This is the recommended way to adjust the magnets' height.
+
+           - If you specify ``height``, it's measured relative to the magnets'
+             home position.
+
+             You should normally use ``height_from_base`` instead.
+
+           - If you specify nothing,
+             the magnets will rise to a reasonable default height
+             based on what labware you've loaded on this Magnetic Module.
+
+             Only certain labware have a defined engage height.
+             If you've loaded a labware that doesn't,
+             or if you haven't loaded any labware, then you'll need to specify
+             a height yourself with ``height`` or ``height_from_base``.
+             Otherwise, an exception will be raised.
+
+           - If you specify ``offset``,
+             it's measured relative to the default height, as described above.
+             A positive number moves the magnets higher and
              a negative number moves the magnets lower.
 
-        Only certain labwares have defined engage heights for the Magnetic
-        Module. If a labware that does not have a defined engage height is
-        loaded on the Magnetic Module (or if no labware is loaded), then
-        ``height`` or ``height_from_labware`` must be specified.
+        The units of ``height``, ``offset``, and ``height_from_base``
+        depend on which generation of Magnetic Module you're using:
 
-        :param height_from_base: The height to raise the magnets to, in mm from
-                                 the base of the labware
-        :param height: The height to raise the magnets to, in mm from home.
-        :param offset: An offset relative to the default height for the labware
-                       in mm
+           - For GEN1 Magnetic Modules, they're in *half-millimeters,*
+             for historical reasons.
+           - For GEN2 Magnetic Modules, they're in true millimeters.
+
+        You may not specify more than one of ``height``, ``offset``,
+        or ``height_from_base``.
 
         .. versionadded:: 2.2
             The *height_from_base* parameter.
