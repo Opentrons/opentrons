@@ -309,6 +309,13 @@ class FirmwareUpdateStatusResponse:  # noqa: D101
 
 
 @dataclass
+class FirmwareUpdateStartApp:  # noqa: D101
+    payload: payloads.EmptyPayload
+    payload_type: Type[BinarySerializable] = payloads.EmptyPayload
+    message_id: Literal[MessageId.fw_update_start_app] = MessageId.fw_update_start_app
+
+
+@dataclass
 class ReadLimitSwitchRequest:  # noqa: D101
     payload: payloads.EmptyPayload
     payload_type: Type[BinarySerializable] = payloads.EmptyPayload

@@ -5,13 +5,14 @@ import logging
 from logging.config import dictConfig
 from pathlib import Path
 
-from opentrons_ot3_firmware.messages.message_definitions import \
-    FirmwareUpdateStartApp
-from opentrons_ot3_firmware.messages.payloads import EmptyPayload
 from typing_extensions import Final
 
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons_hardware.drivers.can_bus.build import build_driver
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    FirmwareUpdateStartApp,
+)
+from opentrons_hardware.firmware_bindings.messages.payloads import EmptyPayload
 from .can_args import add_can_args, build_settings
 from opentrons_hardware.firmware_update import (
     FirmwareUpdateDownloader,
@@ -85,8 +86,10 @@ async def run(args: argparse.Namespace) -> None:
     )
 
     logger.info(f"Restarting FW on {target.system_node}.")
-    await messenger.send(node_id=target.bootloader_node,
-                         message=FirmwareUpdateStartApp(payload=EmptyPayload()))
+    await messenger.send(
+        node_id=target.bootloader_node,
+        message=FirmwareUpdateStartApp(payload=EmptyPayload()),
+    )
 
     await messenger.stop()
 
