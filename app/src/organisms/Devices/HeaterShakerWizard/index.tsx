@@ -42,13 +42,13 @@ export const HeaterShakerWizard = (
   const attachedModules = useSelector((state: State) =>
     getAttachedModules(state, robotName === null ? null : robotName)
   )
-  const [targetProps, tooltipProps] = useHoverTooltip({})
+  const [targetProps, tooltipProps] = useHoverTooltip()
 
   const isHeaterShakerAttached =
     attachedModules != null &&
     attachedModules.some(
       //  TODO(jr, 2022-02-18): get heaterShaker module when model exists
-      module => module.model === 'magneticModuleV1'
+      module => module.model === 'magneticModuleV2'
     )
 
   let buttonContent = null
