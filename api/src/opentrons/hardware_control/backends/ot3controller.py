@@ -229,7 +229,10 @@ class OT3Controller:
         Returns:
             None
         """
-        return None
+        # await set_current(
+        #     self._messenger,
+        #     {ot3utils.axis_to_node(k): v for k, v in axis_currents.items()}
+        # )
 
     @contextmanager
     def save_current(self) -> Generator[None, None, None]:
