@@ -51,11 +51,6 @@
             "index": "pypi",
             "version": "==1.17.4"
         },
-        "opentrons-ot3-firmware": {
-            "git": "https://github.com/Opentrons/ot3-firmware.git",
-            "ref": "60e7c80316931916c62f824fcf6cdbc8081e6b88",
-            "subdirectory": "python"
-        },
         "pydantic": {
             "hashes": [
                 "sha256:021ea0e4133e8c824775a0cfe098677acf6fa5a3cbf9206a376eed3fc09302cd",
