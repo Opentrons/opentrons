@@ -21,7 +21,7 @@ class ToolDetector:
     ) -> None:
         """Constructor."""
         self._messenger = messenger
-        self.attached_tools = attached_tools
+        self._attached_tools = attached_tools
 
     async def detect(self) -> AsyncGenerator[Dict[Carrier, ToolType], None]:
         """Detect tool changes."""
@@ -31,9 +31,9 @@ class ToolDetector:
                     Carrier.LEFT: ToolType(int(message.payload.a_motor.value)),
                     Carrier.RIGHT: ToolType(int(message.payload.z_motor.value)),
                 }
-                if self.attached_tools != tmp_dic:
-                    self.attached_tools = tmp_dic
-                    log.info("Tools detected %s:", {self.attached_tools})
+                if self._attached_tools != tmp_dic:
+                    self._attached_tools = tmp_dic
+                    log.info("Tools detected %s:", {self._attached_tools})
                     yield tmp_dic
 
     async def run(self, retry_count: int, ready_wait_time_sec: float) -> None:
@@ -82,7 +82,7 @@ class ToolDetector:
                     Carrier.LEFT: ToolType(int(response.payload.a_motor.value)),
                     Carrier.RIGHT: ToolType(int(response.payload.z_motor.value)),
                 }
-                if self.attached_tools != tmp_dic:
-                    self.attached_tools = tmp_dic
-                    log.info("Tools detected %s:", {self.attached_tools})
+                if self._attached_tools != tmp_dic:
+                    self._attached_tools = tmp_dic
+                    log.info("Tools detected %s:", {self._attached_tools})
                 break
