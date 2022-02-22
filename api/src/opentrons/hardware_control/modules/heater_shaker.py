@@ -166,7 +166,9 @@ class HeaterShaker(mod_abc.AbstractModule):
         return {
             "temperatureStatus": self.temperature_status,
             "speedStatus": self.speed_status,
-            "status": self.status,
+            "labwareLatchStatus": self.labware_latch_status,
+            # TODO (spp, 2022-2-22): Revise what status includes or remove it
+            # "status": self.status,
             "data": {
                 "currentTemp": self.temperature,
                 "targetTemp": self.target_temperature,
@@ -200,7 +202,16 @@ class HeaterShaker(mod_abc.AbstractModule):
         return self._get_speed_status(self._listener.state.rpm).value
 
     @property
+    def labware_latch_status(self) -> HeaterShakerLabwareLatchStatus:
+        return self._listener.state.labware_latch
+
+    @property
     def status(self) -> str:
+        """Module status or error state details."""
+        # TODO (spp, 2022-2-22): Do we need this when we have the 3 separate statuses?
+        #  Or maybe consolidate the above 3 statuses into this one.
+        #  Additionally, if we want to keep parity with thermocycler, then this property
+        #  should return an Error if the module is in error state.
         return f"temperature {self.temperature_status}, speed {self.speed_status}"
 
     @property
@@ -355,6 +366,7 @@ class HeaterShaker(mod_abc.AbstractModule):
         )
 
     async def _wait_for_labware_latch(self, status: HeaterShakerLabwareLatchStatus):
+        # TODO (spp, 2022-02-22): use the labware_latch_status property to get ll status
         current_status = await self._driver.get_labware_latch_status()
         while status != current_status:
             current_status = await self._driver.get_labware_latch_status()
@@ -383,6 +395,7 @@ class HeaterShaker(mod_abc.AbstractModule):
 class PollResult:
     temperature: Temperature
     rpm: RPM
+    labware_latch: HeaterShakerLabwareLatchStatus
 
 
 class PollerReader(Reader[PollResult]):
@@ -398,6 +411,7 @@ class PollerReader(Reader[PollResult]):
         return PollResult(
             temperature=await self._driver.get_temperature(),
             rpm=await self._driver.get_rpm(),
+            labware_latch=await self._driver.get_labware_latch_status(),
         )
 
 
@@ -415,6 +429,7 @@ class HeaterShakerListener(WaitableListener[PollResult]):
         self._polled_data = PollResult(
             temperature=Temperature(current=25, target=None),
             rpm=RPM(current=0, target=None),
+            labware_latch=HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN
         )
 
     @property
