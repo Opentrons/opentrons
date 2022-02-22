@@ -9,10 +9,6 @@ import styles from './modals.css'
 
 import type { TitleBarProps } from '../structure'
 
-/**
- * @deprecated Use `InterstitialProps` instead
- */
-
 export interface ModalPageProps {
   /** Props for title bar at top of modal page */
   titleBar: TitleBarProps
