@@ -463,11 +463,11 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
 
         is_api_breakpoint = self._ctx._api_version >= APIVersion(2, 3)
         is_v1_module = self._module.model() == "magneticModuleV1"
-        engage_height_in_half_mm = self.labware.load_name in MAGDECK_HALF_MM_LABWARE
+        engage_height_is_in_half_mm = self.labware.load_name in MAGDECK_HALF_MM_LABWARE
 
-        if is_api_breakpoint and is_v1_module and not engage_height_in_half_mm:
+        if is_api_breakpoint and is_v1_module and not engage_height_is_in_half_mm:
             return engage_height * ENGAGE_HEIGHT_UNIT_CNV
-        elif is_api_breakpoint and not is_v1_module and engage_height_in_half_mm:
+        elif is_api_breakpoint and not is_v1_module and engage_height_is_in_half_mm:
             return engage_height / ENGAGE_HEIGHT_UNIT_CNV
         else:
             return engage_height
