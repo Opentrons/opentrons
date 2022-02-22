@@ -45,15 +45,15 @@ def test_stop_heating(subject: HeaterShakerModuleContext) -> None:
 @pytest.mark.xfail(strict=True, raises=NotImplementedError)
 def test_set_speed(subject: HeaterShakerModuleContext) -> None:
     """It should set heater shaker speed."""
-    subject.set_shake(500)
+    subject.set_shake_speed(500)
 
 
 def test_set_invalid_speed(subject: HeaterShakerModuleContext) -> None:
     """It should raise error when given invalid speed."""
     with pytest.raises(InvalidTargetSpeedError):
-        subject.set_shake(10)
+        subject.set_shake_speed(10)
     with pytest.raises(InvalidTargetSpeedError):
-        subject.set_shake(10000)
+        subject.set_shake_speed(10000)
 
 
 @pytest.mark.xfail(strict=True, raises=NotImplementedError)
