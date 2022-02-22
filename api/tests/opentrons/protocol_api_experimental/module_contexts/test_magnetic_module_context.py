@@ -1,6 +1,8 @@
 """Tests for `magnetic_module_context`."""
 
 
+from typing import cast
+
 from decoy import Decoy
 import pytest
 
@@ -117,14 +119,6 @@ def test_labware_property(subject: MagneticModuleContext) -> None:  # noqa: D103
     _ = subject.labware
 
 
-@pytest.mark.xfail(strict=True, raises=NotImplementedError)
-def test_engage(subject: MagneticModuleContext) -> None:  # noqa: D103
-    subject.engage(10)
-    subject.engage(height=10)
-    subject.engage(height_from_base=10)
-    subject.engage(offset=10)
-
-
 def test_engage_only_one_height_allowed(subject: MagneticModuleContext) -> None:
     """It should raise if you provide conflicting height arguments."""
     # The type-checker wants to stop us from miscalling this function, but
@@ -137,6 +131,46 @@ def test_engage_only_one_height_allowed(subject: MagneticModuleContext) -> None:
         subject.engage(height=1, offset=3)  # type: ignore[call-overload]
     with pytest.raises(InvalidMagnetEngageHeightError):
         subject.engage(height_from_base=2, offset=3)  # type: ignore[call-overload]
+
+
+def test_engage_height_from_home(
+    decoy: Decoy,
+    engine_client: SyncClient,
+    subject_module_id: str,
+    subject: MagneticModuleContext,
+) -> None:
+    """It should pass the correct height to the Protocol Engine command."""
+    decoy.when(
+        engine_client.state.modules.get_magnet_offset_to_labware_bottom(
+            module_id=subject_module_id
+        )
+    ).then_return(1.1)
+    subject.engage(height=3.3)
+    decoy.verify(
+        engine_client.magnetic_module_engage(
+            module_id=subject_module_id, engage_height=cast(float, pytest.approx(2.2))
+        ),
+    )
+
+
+def test_engage_height_from_base(
+    decoy: Decoy,
+    engine_client: SyncClient,
+    subject_module_id: str,
+    subject: MagneticModuleContext,
+) -> None:
+    """It should pass the correct height to the Protocol Engine command."""
+    subject.engage(height_from_base=12.34)
+    decoy.verify(
+        engine_client.magnetic_module_engage(
+            module_id=subject_module_id, engage_height=12.34
+        )
+    )
+
+
+@pytest.mark.xfail(strict=True, raises=NotImplementedError)
+def test_engage_offset(subject: MagneticModuleContext) -> None:  # noqa: D103
+    subject.engage(offset=10)
 
 
 @pytest.mark.xfail(strict=True, raises=NotImplementedError)
