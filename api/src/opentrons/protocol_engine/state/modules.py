@@ -3,7 +3,11 @@ from dataclasses import dataclass
 from typing import Dict, List, NamedTuple, Sequence
 from numpy import array, dot
 
+from opentrons.hardware_control.modules.magdeck import (
+    OFFSET_TO_LABWARE_BOTTOM as MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM,
+)
 from opentrons.types import DeckSlotName
+
 from ..types import (
     LoadedModule,
     ModuleModel,
@@ -191,6 +195,27 @@ class ModuleView(HasState[ModuleState]):
             raise errors.WrongModuleTypeError(
                 f"Cannot get lid height of {definition.moduleType}"
             )
+
+    def get_magnet_offset_to_labware_bottom(self, module_id: str) -> float:
+        """Return a Magnetic Module's home offset.
+
+        This is how far a Magnetic Module's magnets have to rise above their
+        home position for their tops to be level with the bottom of the labware.
+
+        This function always returns the offset in of true millimeters,
+        even though GEN1 Magnetic Modules are sometimes controlled in units of
+        half-millimeters ("short mm").
+        """
+        model = self.get_model(module_id)
+        if model == ModuleModel.MAGNETIC_MODULE_V1:
+            offset_in_half_mm = MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM[
+                "magneticModuleV1"
+            ]
+            return offset_in_half_mm / 2
+        elif model == ModuleModel.MAGNETIC_MODULE_V2:
+            return MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM["magneticModuleV2"]
+        else:
+            raise errors.WrongModuleTypeError(f"Can't get magnet offset of {model}.")
 
     def should_dodge_thermocycler(
         self,

@@ -110,7 +110,39 @@ class MagneticModuleContext:  # noqa: D101
                 " `height`, `height_from_base`, and `offset`."
             )
 
-        raise NotImplementedError()
+        height_above_base_true_mm: float
+
+        if height is not None:
+            module_state = self._engine_client.state.modules
+            offset_home_to_base = module_state.get_magnet_offset_to_labware_bottom(
+                module_id=self._module_id
+            )
+
+            # FIXME(mm, 2022-02-22): In APIv2, GEN1 Magnetic Modules have their
+            # height argument in units of half-millimeters,
+            # which makes this arithmetic wrong.
+            height_above_base_true_mm = height - offset_home_to_base
+
+        elif height_from_base is not None:
+            # FIXME(mm, 2022-02-22): In APIv2, GEN1 Magnetic Modules have their
+            # height_from_base argument in units of half-millimeters,
+            # which makes this wrong.
+            height_above_base_true_mm = height_from_base
+
+        else:
+            # TODO(mm, 2021-02-22): Get the default height from the loaded labware.
+            # Take care to account for labware-specific differences in units and origin.
+            raise NotImplementedError()
+
+            if offset is not None:
+                # TODO(mm, 2021-02-22): Add offset to the default height.
+                # Take care to account for model-specific differences in units.
+                raise NotImplementedError()
+
+        self._engine_client.magnetic_module_engage(
+            module_id=self._module_id,
+            engage_height=height_above_base_true_mm,
+        )
 
     def disengage(self) -> None:  # noqa: D102
         raise NotImplementedError()
