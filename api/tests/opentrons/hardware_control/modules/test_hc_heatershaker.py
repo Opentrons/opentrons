@@ -96,13 +96,15 @@ async def test_labware_latch(simulating_module):
 async def test_initial_live_data(simulating_module):
     """Should return the simulating module's initial live data."""
     assert simulating_module.live_data == {
-        'data': {'currentSpeed': 0,
-                 'currentTemp': 23,
-                 'targetSpeed': None,
-                 'targetTemp': None},
-        'labwareLatchStatus': HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN,
-        'speedStatus': 'idle',
-        'temperatureStatus': 'idle'
+        "data": {
+            "currentSpeed": 0,
+            "currentTemp": 23,
+            "targetSpeed": None,
+            "targetTemp": None,
+        },
+        "labwareLatchStatus": HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN,
+        "speedStatus": "idle",
+        "temperatureStatus": "idle",
     }
 
 
@@ -113,12 +115,13 @@ async def test_updated_live_data(simulating_module):
     await simulating_module.start_set_speed(100)
     await simulating_module.wait_next_poll()
     assert simulating_module.live_data == {
-        'data': {'currentSpeed': 100,
-                 'currentTemp': 50,
-                 'targetSpeed': 100,
-                 'targetTemp': 50},
-        'labwareLatchStatus': HeaterShakerLabwareLatchStatus.IDLE_CLOSED,
-        'speedStatus': 'holding at target',
-        'temperatureStatus': 'holding at target'
+        "data": {
+            "currentSpeed": 100,
+            "currentTemp": 50,
+            "targetSpeed": 100,
+            "targetTemp": 50,
+        },
+        "labwareLatchStatus": HeaterShakerLabwareLatchStatus.IDLE_CLOSED,
+        "speedStatus": "holding at target",
+        "temperatureStatus": "holding at target",
     }
-

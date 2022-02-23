@@ -429,7 +429,7 @@ class HeaterShakerListener(WaitableListener[PollResult]):
         self._polled_data = PollResult(
             temperature=Temperature(current=25, target=None),
             rpm=RPM(current=0, target=None),
-            labware_latch=HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN
+            labware_latch=HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN,
         )
 
     @property
