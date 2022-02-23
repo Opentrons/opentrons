@@ -244,7 +244,7 @@ def test_LPC_flow(
         labware_position_check.click_right_jog_button()
         labware_position_check.click_forward_jog_button()
         labware_position_check.click_confirm_position_button_pickup_tip()
-        labware_position_check.click_confirm_position_moveto_slot()
+        labware_position_check.click_confirm_position_moveto_slot_5()
         assert (
             labware_position_check.get_how_to_tell_pipette_is_centered_link().is_displayed()
         )
@@ -253,7 +253,7 @@ def test_LPC_flow(
         labware_position_check.click_down_jog_button()
         labware_position_check.click_right_jog_button()
         labware_position_check.click_forward_jog_button()
-        labware_position_check.click_confirm_position_moveto_slot()
+        labware_position_check.click_confirm_position_moveto_slot_6()
         assert (
             labware_position_check.get_how_to_tell_pipette_is_centered_link().is_displayed()
         )
