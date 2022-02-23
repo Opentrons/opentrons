@@ -1,7 +1,7 @@
 # Uncomment to enable logging during tests
 # import logging
 # from logging.config import dictConfig
-from typing import AsyncGenerator
+from typing import AsyncIterator
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
@@ -169,7 +169,7 @@ async def machine_variant_ffs(request, loop):
     )
 
 
-async def _build_ot2_hw() -> AsyncGenerator[HardwareControlAPI, None]:
+async def _build_ot2_hw() -> AsyncIterator[ThreadManager[HardwareControlAPI]]:
     hw_sim = ThreadManager(API.build_hardware_simulator)
     old_config = config.robot_configs.load()
     try:
@@ -186,7 +186,7 @@ async def ot2_hardware(request, loop, virtual_smoothie_env):
         yield hw
 
 
-async def _build_ot3_hw() -> AsyncGenerator[HardwareControlAPI, None]:
+async def _build_ot3_hw() -> AsyncIterator[ThreadManager[HardwareControlAPI]]:
     hw_sim = ThreadManager(OT3API.build_hardware_simulator)
     old_config = config.robot_configs.load()
     try:

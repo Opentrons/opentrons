@@ -83,7 +83,6 @@ class HeaterShaker(mod_abc.AbstractModule):
             reader=PollerReader(driver=self._driver),
             interval_seconds=poll_time_s,
             listener=self._listener,
-            loop=loop,
         )
 
     async def cleanup(self) -> None:

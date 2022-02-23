@@ -7,22 +7,25 @@ from enum import Enum
 from logging.config import dictConfig
 from typing import Type, Sequence, Callable, cast
 
-from opentrons_ot3_firmware.constants import (
+from opentrons_hardware.firmware_bindings.constants import (
     MessageId,
     NodeId,
     FunctionCode,
 )
-from opentrons_ot3_firmware.message import CanMessage
-from opentrons_ot3_firmware.arbitration_id import (
+from opentrons_hardware.firmware_bindings.message import CanMessage
+from opentrons_hardware.firmware_bindings.arbitration_id import (
     ArbitrationId,
     ArbitrationIdParts,
 )
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
-from opentrons_ot3_firmware.messages.messages import get_definition
+from opentrons_hardware.firmware_bindings.messages.messages import get_definition
 
 from opentrons_hardware.drivers.can_bus.build import build_driver
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
-from opentrons_ot3_firmware.utils import BinarySerializable, BinarySerializableException
+from opentrons_hardware.firmware_bindings.utils import (
+    BinarySerializable,
+    BinarySerializableException,
+)
 
 log = logging.getLogger(__name__)
 

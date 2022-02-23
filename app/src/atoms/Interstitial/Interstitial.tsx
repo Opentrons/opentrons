@@ -11,7 +11,10 @@ import {
   TYPOGRAPHY,
   SPACING,
 } from '@opentrons/components'
-import { TitleBar, TitleBarProps } from '../TitleBar'
+import {
+  InterstitialTitleBar,
+  InterstitialTitleBarProps,
+} from './InterstitiallTitleBar'
 
 function Overlay(): JSX.Element {
   return (
@@ -26,8 +29,8 @@ function Overlay(): JSX.Element {
   )
 }
 
-export interface ModalPageProps {
-  titleBar: TitleBarProps
+export interface InterstitialProps {
+  titleBar: InterstitialTitleBarProps
   contentsClassName?: string
   heading?: React.ReactNode
   children?: React.ReactNode
@@ -35,7 +38,7 @@ export interface ModalPageProps {
   outerProps?: React.ComponentProps<typeof Box>
 }
 
-export function ModalPage(props: ModalPageProps): JSX.Element {
+export function Interstitial(props: InterstitialProps): JSX.Element {
   const { titleBar, heading, innerProps = {}, outerProps = {} } = props
 
   return (
@@ -47,21 +50,21 @@ export function ModalPage(props: ModalPageProps): JSX.Element {
       top="0"
       bottom="0"
       justifyContent={JUSTIFY_FLEX_START}
-      padding={`2.5rem 3rem ${TYPOGRAPHY.lineHeight16} 3rem`}
-      data-testid={`modal_page`}
+      padding={`2.5rem 3rem 1rem 3rem`}
+      data-testid={`interstitial`}
       {...outerProps}
     >
       <Overlay />
 
-      <TitleBar {...titleBar} />
+      <InterstitialTitleBar {...titleBar} />
       <Box
         zIndex="1"
         width="auto"
         margin="0 auto"
-        padding={TYPOGRAPHY.lineHeight16}
+        padding={SPACING.spacing4}
         position={POSITION_RELATIVE}
-        boxShadow={TYPOGRAPHY.boxShadowSM}
-        border={`${SPACING.spacingXXS} solid ${COLORS.medGrey}`}
+        boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.3)'}
+        border={`1px solid ${COLORS.medGrey}`}
         backgroundColor={COLORS.white}
         maxHeight="100%"
         overflowY="auto"

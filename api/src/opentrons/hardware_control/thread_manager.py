@@ -26,7 +26,7 @@ async def call_coroutine_threadsafe(
     return await wrapped
 
 
-WrappedObj = TypeVar("WrappedObj", bound=AsyncioConfigurable)
+WrappedObj = TypeVar("WrappedObj", bound=AsyncioConfigurable, covariant=True)
 
 
 class CallBridger(Generic[WrappedObj]):
@@ -242,7 +242,7 @@ class ThreadManager(Generic[WrappedObj]):
                 # in the current thread, _after_ the wrapped cleanup is done
                 # so cancelled tasks can have a chance to complete.
                 async def clean_and_notify():
-                    wrapped_cleanup()
+                    await wrapped_cleanup()
                     # this sleep allows the wrapped loop to spin a couple
                     # times to clean up the tasks we just cancelled. My kingdom
                     # for an asyncio.spin_once()

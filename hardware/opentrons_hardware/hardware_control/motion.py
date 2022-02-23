@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import numpy as np  # type: ignore[import]
 from logging import getLogger
 
-from opentrons_ot3_firmware.constants import NodeId
+from opentrons_hardware.firmware_bindings.constants import NodeId
 
 LOG = getLogger(__name__)
 

@@ -9,7 +9,3 @@ class AsyncioConfigurable(Protocol):
     def loop(self) -> AbstractEventLoop:
         """The event loop used by this instance."""
         ...
-
-    def set_loop(self, loop: AbstractEventLoop) -> None:
-        """Override the loop used by this instance."""
-        ...

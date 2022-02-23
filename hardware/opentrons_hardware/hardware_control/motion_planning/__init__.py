@@ -7,10 +7,10 @@ from .types import (
     Move,
     MoveTarget,
     AxisConstraints,
-    AxisNames,
-    AXIS_NAMES,
     ZeroLengthMoveError,
+    SystemConstraints,
 )
+from .move_utils import unit_vector_multiplication
 
 __all__ = [
     "MoveManager",
@@ -21,7 +21,5 @@ __all__ = [
     "AxisConstraints",
     "SystemConstraints",
     "unit_vector_multiplication",
-    "AxisNames",
-    "AXIS_NAMES",
     "ZeroLengthMoveError",
 ]
