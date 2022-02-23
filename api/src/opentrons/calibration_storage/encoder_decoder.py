@@ -3,25 +3,26 @@ allow you to customize serialization to/from json.
 """
 import json
 import datetime
+from typing import Any
 
 
 class DateTimeEncoder(json.JSONEncoder):
-    def default(self, obj):
+    def default(self, obj: Any) -> Any:
         if isinstance(obj, datetime.datetime):
             return obj.isoformat()
         return json.JSONEncoder.default(self, obj)
 
 
 class DateTimeDecoder(json.JSONDecoder):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(object_hook=self.dict_to_obj)
 
-    def dict_to_obj(self, d):
+    def dict_to_obj(self, d: Any) -> Any:
         if isinstance(d, dict):
             d = {k: self._decode_datetime(v) for k, v in d.items()}
         return d
 
-    def _decode_datetime(self, obj):
+    def _decode_datetime(self, obj: Any) -> Any:
         try:
             return datetime.datetime.fromisoformat(obj)
         except ValueError:

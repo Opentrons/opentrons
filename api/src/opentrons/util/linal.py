@@ -1,8 +1,9 @@
+from __future__ import annotations
 import logging
 import numpy as np
 from numpy import insert, dot
 from numpy.linalg import inv
-from typing import List, Tuple, Union
+from typing import Any, List, Tuple, Union
 
 from opentrons.calibration_storage.types import AttitudeMatrix
 
@@ -17,7 +18,7 @@ SolvePoints = Tuple[
 ]
 
 
-def identity_deck_transform() -> np.ndarray:
+def identity_deck_transform() -> np.ndarray[Any, Any]:
     """The default deck transform"""
     return np.identity(3)
 
@@ -36,12 +37,12 @@ def solve_attitude(expected: SolvePoints, actual: SolvePoints) -> AttitudeMatrix
     np.put(no_z_component, [8, 8], 1)
 
     transform = masked_array.filled(0) + no_z_component  # type: ignore[no-untyped-call]
-    return transform.round(4).tolist()
+    return transform.round(4).tolist()  # type: ignore[no-any-return]
 
 
 def solve(
     expected: List[Tuple[float, float]], actual: List[Tuple[float, float]]
-) -> np.ndarray:
+) -> np.ndarray[Any, np.dtype[np.double]]:
     """
     Takes two lists of 3 x-y points each, and calculates the matrix
     representing the transformation from one space to the other.
@@ -71,7 +72,7 @@ def solve(
             [ 0  1  2.1 ]
             [ 0  0  1   ]
 
-        The B*T will yeild the "actual" point:
+        The B*T will yield the "actual" point:
             [ 1  0  1 ]
             [ 0  1  2 ]
             [ 0  0  1 ]
@@ -101,10 +102,13 @@ def solve(
     # dimensional arrays, the return type is the result of performing matrix
     # multiplication, rather than the dot-product (so the return here will be
     # a 4x4 matrix)
-    return transform
+    return transform  # type: ignore[no-any-return]
 
 
-def add_z(xy: np.ndarray, z: float) -> np.ndarray:
+def add_z(
+    xy: np.ndarray[Any, np.dtype[np.double]],
+    z: float,
+) -> np.ndarray[Any, np.dtype[np.double]]:
     """
     Turn a 2-D transform matrix into a 3-D transform matrix (scale/shift only,
     no rotation).
@@ -137,7 +141,7 @@ def add_z(xy: np.ndarray, z: float) -> np.ndarray:
     # [ 0  0  1  z ]
     # [ 0  0  0  1 ]
 
-    return xyz.round(11)
+    return xyz.round(11)  # type: ignore[no-any-return]
 
 
 def add_matrices(
@@ -150,7 +154,8 @@ def add_matrices(
 
 
 def apply_transform(
-    t: Union[List[List[float]], np.ndarray], pos: AxisPosition
+    t: Union[List[List[float]], np.ndarray[Any, np.dtype[np.double]]],
+    pos: AxisPosition,
 ) -> Tuple[float, float, float]:
     """
     Change of base using a transform matrix. Primarily used to render a point
@@ -164,7 +169,8 @@ def apply_transform(
 
 
 def apply_reverse(
-    t: Union[List[List[float]], np.ndarray], pos: AxisPosition
+    t: Union[List[List[float]], np.ndarray[Any, np.dtype[np.double]]],
+    pos: AxisPosition,
 ) -> Tuple[float, float, float]:
     """Like apply_transform but inverts the transform first"""
     return apply_transform(inv(t), pos)  # type: ignore[no-untyped-call]

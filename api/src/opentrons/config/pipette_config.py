@@ -3,7 +3,18 @@ from dataclasses import dataclass
 import logging
 import json
 import numbers
-from typing import Any, Dict, List, Mapping, Union, Tuple, Sequence, TYPE_CHECKING
+from typing import (
+    Any,
+    Dict,
+    List,
+    Mapping,
+    Optional,
+    Union,
+    Tuple,
+    Sequence,
+    TYPE_CHECKING,
+    cast,
+)
 
 from opentrons import config
 from opentrons.config import feature_flags as ff
@@ -13,6 +24,7 @@ if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import (
         PipetteName,
         PipetteModel,
+        PipetteModelSpec,
         UlPerMm,
         Quirk,
         PipetteFusedSpec,
@@ -99,7 +111,9 @@ VALID_QUIRKS = model_config()["validQuirks"]
 #: A list of valid quirks for pipettes
 
 
-def load(pipette_model: PipetteModel, pipette_id: str = None) -> PipetteConfig:
+def load(
+    pipette_model: PipetteModel, pipette_id: Optional[str] = None
+) -> PipetteConfig:
     """
     Load pipette config data
 
@@ -248,7 +262,7 @@ def piecewise_volume_conversion(ul: float, sequence: List[List[float]]) -> float
 TypeOverrides = Mapping[str, Union[float, bool, None]]
 
 
-def validate_overrides(data: TypeOverrides, config_model: Dict) -> None:
+def validate_overrides(data: TypeOverrides, config_model: Dict[str, Any]) -> None:
     """
     Check that override fields are valid.
 
@@ -275,7 +289,7 @@ def validate_overrides(data: TypeOverrides, config_model: Dict) -> None:
                 raise ValueError(f"{key} out of range with {value}")
 
 
-def override(pipette_id: str, fields: TypeOverrides):
+def override(pipette_id: str, fields: TypeOverrides) -> None:
     """
     Override configuration for pipette. Validate then save.
 
@@ -288,7 +302,9 @@ def override(pipette_id: str, fields: TypeOverrides):
     save_overrides(pipette_id, fields, model)
 
 
-def save_overrides(pipette_id: str, overrides: TypeOverrides, model: PipetteModel):
+def save_overrides(
+    pipette_id: str, overrides: TypeOverrides, model: PipetteModel
+) -> None:
     """
     Save overrides for the pipette.
 
@@ -316,7 +332,9 @@ def save_overrides(pipette_id: str, overrides: TypeOverrides, model: PipetteMode
                 del existing[key]
         elif isinstance(value, bool):
             existing, model_configs = change_quirks(
-                {key: value}, existing, model_configs
+                {key: value},
+                existing,
+                model_configs,
             )
         else:
             # type ignores are here because mypy needs typed dict accesses to
@@ -332,7 +350,11 @@ def save_overrides(pipette_id: str, overrides: TypeOverrides, model: PipetteMode
         json.dump(existing, file)
 
 
-def change_quirks(override_quirks, existing, model_configs):
+def change_quirks(
+    override_quirks: Dict[str, Any],
+    existing: Dict[str, Any],
+    model_configs: PipetteModelSpec,
+) -> Tuple[Dict[str, Any], PipetteModelSpec]:
     if not existing.get("quirks"):
         # ensure quirk key exists
         existing["quirks"] = override_quirks
@@ -342,9 +364,9 @@ def change_quirks(override_quirks, existing, model_configs):
         # for one setting
         existing["quirks"][quirk] = setting
         if setting not in model_configs["quirks"]:
-            model_configs["quirks"].append(quirk)
+            model_configs["quirks"].append(quirk)  # type: ignore[arg-type]
         elif not setting:
-            model_configs["quirks"].remove(quirk)
+            model_configs["quirks"].remove(quirk)  # type: ignore[arg-type]
     return existing, model_configs
 
 
@@ -352,28 +374,28 @@ def load_overrides(pipette_id: str) -> Dict[str, Any]:
     overrides = config.CONFIG["pipette_config_overrides_dir"]
     try:
         with (overrides / f"{pipette_id}.json").open() as fi:
-            return json.load(fi)
+            return cast(Dict[str, Any], json.load(fi))
     except json.JSONDecodeError as e:
         log.warning(f"pipette override for {pipette_id} is corrupt: {e}")
         (overrides / f"{pipette_id}.json").unlink()
         raise FileNotFoundError(str(overrides / f"{pipette_id}.json"))
 
 
-def validate_quirks(quirks: List[str]):
+def validate_quirks(quirks: List[str]) -> List[Quirk]:
     valid_quirks = []
     for quirk in quirks:
         if quirk in VALID_QUIRKS:
             valid_quirks.append(quirk)
         else:
             log.warning(f"{quirk} is not a valid quirk")
-    return valid_quirks
+    return cast(List["Quirk"], valid_quirks)
 
 
 def ensure_value(
     config: PipetteFusedSpec,
     name: Union[str, Tuple[str, ...]],
     mutable_config_list: List[str],
-):
+) -> Any:
     """
     Pull value of config data from file. Shape can either be a dictionary with
     a value key -- indicating that it can be changed -- or another
@@ -401,7 +423,7 @@ def known_pipettes() -> Sequence[str]:
     ]
 
 
-def add_default(cfg):
+def add_default(cfg: Any) -> None:
     if isinstance(cfg, dict):
         if "value" in cfg.keys():
             cfg["default"] = cfg["value"]

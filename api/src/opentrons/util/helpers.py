@@ -1,12 +1,15 @@
-import typing
 from datetime import datetime, timezone
+from typing import Mapping, Optional, Sequence, Union, TypeVar
+
+ReturnT = TypeVar("ReturnT")
 
 
+# TODO(mc, 2022-02-22): this utility isn't used; is it needed?
 def deep_get(
-    obj: typing.Union[typing.Mapping, typing.Sequence],
-    key: typing.Sequence[typing.Union[str, int]],
-    default=None,
-):
+    obj: Union[Mapping[str, ReturnT], Sequence[ReturnT]],
+    key: Sequence[Union[str, int]],
+    default: Optional[ReturnT] = None,
+) -> Optional[ReturnT]:
     """
     Utility to get deeply nested element in a list, tuple or dict without
      resorting to some_dict.get('k1', {}).get('k2', {}).get('k3', {})....etc.
@@ -25,7 +28,7 @@ def deep_get(
         except (KeyError, TypeError, IndexError):
             return default
 
-    return obj
+    return obj  # type: ignore[return-value]
 
 
 def utc_now() -> datetime:

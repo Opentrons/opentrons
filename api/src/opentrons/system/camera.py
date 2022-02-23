@@ -8,7 +8,7 @@ class CameraException(Exception):
     pass
 
 
-async def take_picture(filename: Path):
+async def take_picture(filename: Path) -> None:
     """Take a picture and save it to filename
 
     :param filename: Name of file to save picture to

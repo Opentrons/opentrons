@@ -19,7 +19,7 @@ EncoderType = typing.Type[json.JSONEncoder]
 
 def read_cal_file(
     filepath: StrPath, decoder: DecoderType = DateTimeDecoder
-) -> typing.Dict:
+) -> typing.Dict[str, typing.Any]:
     """
     Function used to read data from a file
 
@@ -44,12 +44,14 @@ def read_cal_file(
                     f"{type(value['lastModified']).__name__},"
                     "expected datetime"
                 )
-    return calibration_data
+    return calibration_data  # type: ignore[no-any-return]
 
 
 def save_to_file(
-    filepath: StrPath, data: typing.Mapping, encoder: EncoderType = DateTimeEncoder
-):
+    filepath: StrPath,
+    data: typing.Mapping[str, typing.Any],
+    encoder: EncoderType = DateTimeEncoder,
+) -> None:
     """
     Function used to save data to a file
 
