@@ -91,7 +91,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
       borderRadius={`0 0 0.4rem 0.4rem`}
       fontSize={FONT_SIZE_CAPTION}
       color={C_WHITE}
-      id="LabwareInfoOverlay_offset_box"
+      id="LabwareInfoOverlay_offsetBox"
     >
       <Text
         margin={SPACING_1}
@@ -115,7 +115,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
               as={'span'}
               fontWeight={FONT_WEIGHT_SEMIBOLD}
               marginRight={'0.15rem'}
-              id="LabwareInfoOverlay_X"
+              id="LabwareInfoOverlay_x"
             >
               X
             </Text>
@@ -123,7 +123,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
               as={'span'}
               fontWeight={FONT_WEIGHT_REGULAR}
               marginRight={'0.35rem'}
-              id="LabwareInfoOverlay_X_value"
+              id="LabwareInfoOverlay_xValue"
             >
               {vector.x.toFixed(1)}
             </Text>
@@ -131,7 +131,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
               as={'span'}
               fontWeight={FONT_WEIGHT_SEMIBOLD}
               marginRight={'0.15rem'}
-              id="LabwareInfoOverlay_Y"
+              id="LabwareInfoOverlay_y"
             >
               Y
             </Text>
@@ -139,7 +139,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
               as={'span'}
               fontWeight={FONT_WEIGHT_REGULAR}
               marginRight={'0.35rem'}
-              id="LabwareInfoOverlay_Y_value"
+              id="LabwareInfoOverlay_yValue"
             >
               {vector.y.toFixed(1)}
             </Text>
@@ -147,7 +147,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
               as={'span'}
               fontWeight={FONT_WEIGHT_SEMIBOLD}
               marginRight={'0.15rem'}
-              id="LabwareInfoOverlay_Z"
+              id="LabwareInfoOverlay_z"
             >
               Z
             </Text>
@@ -155,7 +155,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
               as={'span'}
               fontWeight={FONT_WEIGHT_REGULAR}
               marginRight={'0.35rem'}
-              id="LabwareInfoOverlay_Z_value"
+              id="LabwareInfoOverlay_zValue"
             >
               {vector.z.toFixed(1)}
             </Text>
