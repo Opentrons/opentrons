@@ -3,20 +3,15 @@ import {
   Box,
   Flex,
   Text,
-  C_BRIGHT_GRAY,
-  SPACING_1,
-  SPACING_2,
   Icon,
   SIZE_1,
-  C_HARBOR_GRAY,
   TYPOGRAPHY,
   TEXT_TRANSFORM_UPPERCASE,
   DIRECTION_ROW,
   DIRECTION_COLUMN,
-  FONT_WEIGHT_REGULAR,
-  FONT_SIZE_CAPTION,
   SPACING,
   ALIGN_FLEX_START,
+  COLORS,
 } from '@opentrons/components'
 import heaterShakerModule from '../../../assets/images/heatershaker_module_transparent.svg'
 import { HeaterShakerModuleData } from '../ModuleCard/HeaterShakerModuleData'
@@ -24,10 +19,10 @@ import { HeaterShakerModuleData } from '../ModuleCard/HeaterShakerModuleData'
 export const HeaterShakerModuleCard = (): JSX.Element | null => {
   return (
     <Flex
-      backgroundColor={C_BRIGHT_GRAY}
-      borderRadius={SPACING_1}
-      marginBottom={SPACING_2}
-      marginLeft={SPACING_2}
+      backgroundColor={COLORS.background}
+      borderRadius={SPACING.spacing2}
+      marginBottom={SPACING.spacing3}
+      marginLeft={SPACING.spacing3}
       width={'20rem'}
     >
       <Box
@@ -36,16 +31,16 @@ export const HeaterShakerModuleCard = (): JSX.Element | null => {
       >
         <Flex
           flexDirection={DIRECTION_ROW}
-          paddingRight={SPACING_2}
+          paddingRight={SPACING.spacing3}
           alignItems={ALIGN_FLEX_START}
         >
           <img src={heaterShakerModule} alt={'Heater Shaker'} />
-          <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING_2}>
+          <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING.spacing3}>
             <Text
               textTransform={TEXT_TRANSFORM_UPPERCASE}
-              color={C_HARBOR_GRAY}
-              fontWeight={FONT_WEIGHT_REGULAR}
-              fontSize={FONT_SIZE_CAPTION}
+              color={COLORS.darkGreyEnabled}
+              fontWeight={TYPOGRAPHY.fontWeightRegular}
+              fontSize={TYPOGRAPHY.fontSizeCaption}
               paddingBottom={SPACING.spacing2}
             >
               {'USB Port'}
@@ -54,8 +49,8 @@ export const HeaterShakerModuleCard = (): JSX.Element | null => {
               <Icon
                 name={'heater-shaker'}
                 size={SIZE_1}
-                marginRight={SPACING_1}
-                color={C_HARBOR_GRAY}
+                marginRight={SPACING.spacing2}
+                color={COLORS.darkGreyEnabled}
               />
               <Text fontSize={TYPOGRAPHY.fontSizeP}>
                 {'Heater/Shaker GENX'}
