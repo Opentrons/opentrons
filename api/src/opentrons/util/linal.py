@@ -44,7 +44,8 @@ def solve_attitude(expected: SolvePoints, actual: SolvePoints) -> AttitudeMatrix
 
 
 def solve(
-    expected: List[Tuple[float, float]], actual: List[Tuple[float, float]]
+    expected: List[Tuple[float, float]],
+    actual: List[Tuple[float, float]],
 ) -> DoubleArray:
     """
     Takes two lists of 3 x-y points each, and calculates the matrix
@@ -108,10 +109,7 @@ def solve(
     return transform  # type: ignore[no-any-return]
 
 
-def add_z(
-    xy: DoubleArray,
-    z: float,
-) -> DoubleArray:
+def add_z(xy: DoubleArray, z: float) -> DoubleArray:
     """
     Turn a 2-D transform matrix into a 3-D transform matrix (scale/shift only,
     no rotation).
