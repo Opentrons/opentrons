@@ -1,10 +1,9 @@
 from __future__ import annotations
 import logging
 import numpy as np
-import numpy.typing as npt
 from numpy import insert, dot
 from numpy.linalg import inv
-from typing import List, Tuple, Union
+from typing import TYPE_CHECKING, List, Tuple, Union
 
 from opentrons.calibration_storage.types import AttitudeMatrix
 
@@ -18,7 +17,12 @@ SolvePoints = Tuple[
     Tuple[float, float, float], Tuple[float, float, float], Tuple[float, float, float]
 ]
 
-DoubleArray = npt.NDArray[np.double]
+# TODO(mc, 2022-02-23): numpy.typing is not available on the version
+# of numpy we ship on the OT-2. We should update that numpy version.
+if TYPE_CHECKING:
+    import numpy.typing as npt
+
+    DoubleArray = npt.NDArray[np.double]
 
 
 def identity_deck_transform() -> DoubleArray:
