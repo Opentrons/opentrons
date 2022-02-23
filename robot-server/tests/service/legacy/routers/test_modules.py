@@ -4,7 +4,12 @@ from mock import patch, PropertyMock, MagicMock
 import pytest
 import asyncio
 from opentrons.hardware_control import ExecutionManager
-from opentrons.hardware_control.modules import MagDeck, Thermocycler, TempDeck
+from opentrons.hardware_control.modules import (
+    MagDeck,
+    Thermocycler,
+    TempDeck,
+    HeaterShaker,
+)
 from opentrons.hardware_control.modules import utils, UpdateError, BundledFirmware
 from opentrons.drivers.rpi_drivers.types import USBPort
 
@@ -89,6 +94,44 @@ def thermocycler():
     Thermocycler.current_step_index = PropertyMock(return_value=5)
     Thermocycler.total_step_count = PropertyMock(return_value=2)
     return t
+
+
+@pytest.fixture
+def heater_shaker():
+    """Get a mocked out heater-shaker hardware control object."""
+    usb_port = USBPort(
+        name="",
+        sub_names=[],
+        hub=None,
+        port_number=None,
+        device_path="/dev/ot_module_heatershaker1",
+    )
+    heatershaker = asyncio.get_event_loop().run_until_complete(
+        utils.build(
+            port="/dev/ot_module_heatershaker1",
+            usb_port=usb_port,
+            which="heatershaker",
+            simulating=True,
+            execution_manager=ExecutionManager(loop=asyncio.get_event_loop()),
+            loop=asyncio.get_event_loop(),
+        )
+    )
+    HeaterShaker.live_data = PropertyMock(
+        return_value={
+            "status": "RUNNING",
+            "data": {
+                "temperatureStatus": "heating",
+                "speedStatus": "holding at target",
+                "labwareLatchStatus": "CLOSED",
+                "currentTemp": 25.5,
+                "targetTemp": 500,
+                "currentSpeed": 10,
+                "targetSpeed": 4321,
+                "errorDetails": "uh oh",
+            },
+        }
+    )
+    return heatershaker
 
 
 def test_get_modules_magdeck(api_client, hardware, magdeck):
@@ -183,6 +226,42 @@ def test_get_modules_thermocycler(api_client, hardware, thermocycler):
                     "totalCycleCount": 3,
                     "currentStepIndex": 5,
                     "totalStepCount": 2,
+                },
+            }
+        ]
+    }
+
+
+def test_get_module_heater_shaker(api_client, hardware, heater_shaker) -> None:
+    """It should get heater shaker module data in response."""
+    hardware.attached_modules = [heater_shaker]
+
+    resp = api_client.get("/modules")
+    body = resp.json()
+    assert resp.status_code == 200
+    assert body == {
+        "modules": [
+            {
+                "displayName": "heatershaker",
+                "fwVersion": "dummyVersionHS",
+                "hasAvailableUpdate": False,
+                "model": "dummyModelHS",
+                "moduleModel": "heaterShakerV1",
+                "name": "heatershaker",
+                "port": "/dev/ot_module_heatershaker1",
+                "usbPort": {"hub": None, "port": None},
+                "revision": "dummyModelHS",
+                "serial": "dummySerialHS",
+                "status": "RUNNING",
+                "data": {
+                    "temperatureStatus": "heating",
+                    "speedStatus": "holding at target",
+                    "labwareLatchStatus": "CLOSED",
+                    "currentTemp": 25.5,
+                    "targetTemp": 500,
+                    "currentSpeed": 10,
+                    "targetSpeed": 4321,
+                    "errorDetails": "uh oh",
                 },
             }
         ]

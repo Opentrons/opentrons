@@ -177,12 +177,12 @@ class HeaterShaker(mod_abc.AbstractModule):
     @property
     def live_data(self) -> LiveData:
         return {
-            "temperatureStatus": self.temperature_status.value,
-            "speedStatus": self.speed_status.value,
-            "labwareLatchStatus": self.labware_latch_status.value,
             # TODO (spp, 2022-2-22): Revise what status includes
             "status": self.status.value,
             "data": {
+                "temperatureStatus": self.temperature_status.value,
+                "speedStatus": self.speed_status.value,
+                "labwareLatchStatus": self.labware_latch_status.value,
                 "currentTemp": self.temperature,
                 "targetTemp": self.target_temperature,
                 "currentSpeed": self.speed,
