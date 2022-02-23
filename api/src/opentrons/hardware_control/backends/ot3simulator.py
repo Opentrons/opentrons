@@ -361,7 +361,7 @@ class OT3Simulator:
         """Probe."""
         return {}
 
-    def clean_up(self) -> None:
+    async def clean_up(self) -> None:
         """Clean up."""
         pass
 

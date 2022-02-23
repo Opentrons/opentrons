@@ -308,7 +308,7 @@ class Controller:
         """Run a probe and return the new position dict"""
         return await self._smoothie_driver.probe_axis(axis, distance)
 
-    def clean_up(self):
+    async def clean_up(self):
         try:
             loop = asyncio.get_event_loop()
         except RuntimeError:
@@ -344,6 +344,3 @@ class Controller:
         ms = config["splits"]
         if ms:
             self._smoothie_driver.configure_splits_for({plunger_axis.name: ms})
-
-    def __del__(self):
-        self.clean_up()

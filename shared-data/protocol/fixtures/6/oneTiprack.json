@@ -1292,10 +1292,7 @@
         "wellName": "A1",
         "volume": 5,
         "flowRate": 3,
-        "offsetFromBottomMm": 2,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "offsetFromBottomMm": 2
       }
     },
     {
@@ -1327,10 +1324,7 @@
         "pipetteId": "pipetteId",
         "labwareId": "destPlateId",
         "wellName": "B1",
-        "offsetFromBottomMm": 11,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "offsetFromBottomMm": 11
       }
     },
     {

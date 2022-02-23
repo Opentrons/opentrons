@@ -40,6 +40,18 @@ class InvalidMagnetEngageHeightError(ValueError):
     """Error raised if a Magnetic Module engage height is invalid."""
 
 
+class InvalidTargetTemperatureError(ValueError):
+    """Error raised if a module with heating abilities gets an invalid target temp."""
+
+
+class NoTargetTemperatureError(ValueError):
+    """Error raised if awaiting temperature without setting a target temperature."""
+
+
+class InvalidTargetSpeedError(ValueError):
+    """Error raised if a heater-shaker target speed is invalid."""
+
+
 __all__ = [
     # re-exports from opentrons.protocol_engine
     "LabwareIsNotTipRackError",
@@ -48,4 +60,6 @@ __all__ = [
     "InvalidMountError",
     "InvalidModuleLocationError",
     "InvalidMagnetEngageHeightError",
+    "InvalidTargetTemperatureError",
+    "InvalidTargetSpeedError",
 ]

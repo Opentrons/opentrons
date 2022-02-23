@@ -12,10 +12,9 @@ class ExecutionManager:
     It also handles loop clean up through its cancel method.
     """
 
-    def __init__(self, loop: asyncio.AbstractEventLoop):
+    def __init__(self):
         self._state: ExecutionState = ExecutionState.RUNNING
-        self._condition = asyncio.Condition(loop=loop)
-        self._loop = loop
+        self._condition = asyncio.Condition()
         self._cancellable_tasks: Set[asyncio.Task] = set()
 
     async def pause(self):
@@ -37,7 +36,7 @@ class ExecutionManager:
         async with self._condition:
             self._state = ExecutionState.CANCELLED
             self._condition.notify_all()
-            running_task = asyncio.current_task(self._loop)
+            running_task = asyncio.current_task()
             for t in self._cancellable_tasks:
                 if t is not running_task:
                     t.cancel()
@@ -51,7 +50,7 @@ class ExecutionManager:
         async with self._condition:
             return self._state
 
-    def register_cancellable_task(self, task: asyncio.Task):
+    async def register_cancellable_task(self, task: asyncio.Task):
         self._cancellable_tasks.add(task)
         task.add_done_callback(lambda t: self._cancellable_tasks.discard(t))
         return task
@@ -79,9 +78,9 @@ class ExecutionManagerProvider:
     execution manager and implemented methods that provide access to it.
     """
 
-    def __init__(self, loop: asyncio.AbstractEventLoop, simulator: bool) -> None:
+    def __init__(self, simulator: bool) -> None:
         self._em_simulate = simulator
-        self._execution_manager = ExecutionManager(loop=loop)
+        self._execution_manager = ExecutionManager()
 
     @property
     def execution_manager(self) -> ExecutionManager:
@@ -105,7 +104,5 @@ class ExecutionManagerProvider:
             async def sleep_for_seconds(seconds: float):
                 await asyncio.sleep(seconds)
 
-            delay_task = self._execution_manager._loop.create_task(
-                sleep_for_seconds(duration_s)
-            )
+            delay_task = asyncio.create_task(sleep_for_seconds(duration_s))
             await self._execution_manager.register_cancellable_task(delay_task)

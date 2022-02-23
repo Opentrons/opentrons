@@ -349,7 +349,7 @@ class Simulator:
         self._position[axis.upper()] = self._position[axis.upper()] + distance
         return self._position
 
-    def clean_up(self):
+    async def clean_up(self):
         pass
 
     async def configure_mount(
