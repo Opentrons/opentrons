@@ -104,7 +104,9 @@ class MagneticModuleContext:  # noqa: D101
             You must now specify ``height_from_base`` and ``offset`` as keyword
             arguments.
         """  # noqa: D205,D212,D415
-        if len([a for a in [height, height_from_base, offset] if a is not None]) > 1:
+        all_height_arguments = [height, height_from_base, offset]
+        num_height_arguments_provided = len([a for a in all_height_arguments if a is not None])
+        if num_height_arguments_provided > 1:
             raise InvalidMagnetEngageHeightError(
                 "You may only specify one of"
                 " `height`, `height_from_base`, and `offset`."
