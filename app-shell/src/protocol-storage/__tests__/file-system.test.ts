@@ -4,18 +4,25 @@ import path from 'path'
 import fs from 'fs-extra'
 import tempy from 'tempy'
 import Electron from 'electron'
+import uuid from 'uuid/v4'
 import { when } from 'jest-when'
 
 import {
   readProtocolsDirectory,
   parseProtocolDirs,
   addProtocolFile,
-  removeProtocolFile,
+  removeProtocolById,
   PROTOCOL_DIRECTORY_NAME,
   PROTOCOL_DIRECTORY_PATH,
 } from '../file-system'
 
+jest.mock('uuid/v4')
 jest.mock('electron')
+
+const trashItem = Electron.shell.trashItem as jest.MockedFunction<
+  typeof Electron.shell.trashItem
+>
+const mockUuid = uuid as jest.MockedFunction<typeof uuid>
 
 describe('protocol storage directory utilities', () => {
   let protocolsDir: string
@@ -101,78 +108,64 @@ describe('protocol storage directory utilities', () => {
   })
 
   describe('addProtocolFile', () => {
-    it('writes a labware file to the directory', () => {
+    it('writes a protocol file to a new directory', () => {
+      let count = 0
+      when(mockUuid)
+        .calledWith()
+        .mockImplementation(() => {
+          const nextId = `${count}abc123`
+          count = count + 1
+          return nextId
+        })
       const sourceDir = makeEmptyDir()
       const destDir = makeEmptyDir()
-      const sourceName = path.join(sourceDir, 'source.json')
-      const expectedName = path.join(destDir, 'source.json')
+      const sourceName = path.join(sourceDir, 'source.py')
+      const expectedName = path.join(destDir, '0abc123')
 
       return fs
-        .writeJson(sourceName, { name: 'a' })
+        .writeFile(sourceName, 'file contents')
         .then(() => addProtocolFile(sourceName, destDir))
         .then(() => readProtocolsDirectory(destDir))
-        .then(parseProtocolDirs)
-        .then(files => {
-          expect(files).toEqual([
+        .then(dirPaths => parseProtocolDirs(dirPaths))
+        .then(dirs => {
+          expect(dirs).toEqual([
             {
-              filename: expectedName,
-              data: { name: 'a' },
+              dirPath: expectedName,
+              data: [path.join(expectedName, 'source.py')],
               modified: expect.any(Number),
             },
           ])
         })
     })
-
-    it('increments filename to avoid collisions', () => {
-      const sourceDir = makeEmptyDir()
-      const destDir = makeEmptyDir()
-      const sourceName = path.join(sourceDir, 'source.json')
-      const collision1 = path.join(destDir, 'source.json')
-      const collision2 = path.join(destDir, 'source1.json')
-      const expectedName = path.join(destDir, 'source2.json')
-
-      const setup = Promise.all([
-        fs.writeJson(sourceName, { name: 'a' }),
-        fs.writeJson(collision1, { name: 'b' }),
-        fs.writeJson(collision2, { name: 'c' }),
-      ])
-
-      return setup
-        .then(() => addProtocolFile(sourceName, destDir))
-        .then(() => readProtocolsDirectory(destDir))
-        .then(parseProtocolDirs)
-        .then(files => {
-          expect(files).toContainEqual({
-            filename: expectedName,
-            data: { name: 'a' },
-            modified: expect.any(Number),
-          })
-        })
-    })
   })
 
-  describe('remove labware file', () => {
+  describe('remove protocol dir', () => {
     it('calls Electron.shell.trashItem', () => {
-      const dir = makeEmptyDir()
-      const filename = path.join(dir, 'foo.json')
+      const protocolsDir = makeEmptyDir()
+      const protocolId = 'def456'
+      const setup = fs.mkdir(path.join(protocolsDir, protocolId))
 
       trashItem.mockResolvedValue()
 
-      return removeProtocolFile(filename).then(() => {
-        expect(Electron.shell.trashItem).toHaveBeenCalledWith(filename)
-      })
+      return setup
+        .then(() => removeProtocolById('def456', protocolsDir))
+        .then(() => {
+          expect(Electron.shell.trashItem).toHaveBeenCalledWith(
+            path.join(protocolsDir, 'def456')
+          )
+        })
     })
 
     it('deletes the file if Electron fails to trash it', () => {
-      const dir = makeEmptyDir()
-      const filename = path.join(dir, 'foo.json')
-      const setup = fs.writeJson(filename, { name: 'a' })
+      const protocolsDir = makeEmptyDir()
+      const protocolId = 'def456'
+      const setup = fs.mkdir(path.join(protocolsDir, protocolId))
 
       trashItem.mockRejectedValue(Error('something went wrong'))
 
       return setup
-        .then(() => removeProtocolFile(filename))
-        .then(() => readProtocolsDirectory(dir))
+        .then(() => removeProtocolById('def456', protocolsDir))
+        .then(() => readProtocolsDirectory(protocolsDir))
         .then(files => expect(files).toEqual([]))
     })
   })

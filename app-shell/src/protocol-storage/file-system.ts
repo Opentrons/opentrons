@@ -1,5 +1,6 @@
 import path from 'path'
 import fs from 'fs-extra'
+import uuid from 'uuid/v4'
 
 import { app, shell } from 'electron'
 
@@ -12,17 +13,15 @@ export const PROTOCOL_DIRECTORY_PATH = path.join(
   PROTOCOL_DIRECTORY_NAME
 )
 
-const RE_JSON_EXT = /\.json$/i
-
 export function readProtocolsDirectory(dir: string): Promise<string[]> {
   const getAbsolutePath = (e: Dirent): string => path.join(dir, e.name)
 
   return fs.readdir(dir, { withFileTypes: true }).then((entries: Dirent[]) => {
-    const protocolFiles = entries
+    const protocolDirPaths = entries
       .filter(e => e.isDirectory())
       .map(getAbsolutePath)
 
-    return protocolFiles
+    return protocolDirPaths
   })
 }
 
@@ -62,15 +61,35 @@ const getFileName = (base: string, ext: string, count = 0): Promise<string> => {
     )
 }
 
-export function addProtocolFile(file: string): Promise<void> {
+export function addProtocolFile(
+  file: string,
+  protocolsDirPath: string
+): Promise<void> {
+  const protocolId = uuid()
+  const dirPath = path.join(protocolsDirPath, protocolId)
+
   const extname = path.extname(file)
   const basename = path.basename(file, extname)
-
-  return getFileName(basename, extname).then(destName =>
-    fs.readJson(file).then(data => fs.outputJson(destName, data))
-  )
+  return fs.mkdir(dirPath).then(() => {
+    return fs.copy(file, path.join(dirPath, `${basename}${extname}`))
+  })
 }
 
-export function removeProtocolFile(file: string): Promise<void> {
-  return shell.trashItem(file).catch(() => fs.unlink(file))
+export function removeProtocolById(
+  protocolId: string,
+  protocolsDirPath: string
+): Promise<void> {
+  const targetDirPath = path.join(protocolsDirPath, protocolId)
+  return shell.trashItem(targetDirPath).catch(() =>
+    fs
+      .readdir(targetDirPath)
+      .then(files => {
+        return Promise.all(
+          files.map(element => {
+            fs.unlink(path.join(targetDirPath, element))
+          })
+        )
+      })
+      .then(() => fs.rmdir(targetDirPath))
+  )
 }
