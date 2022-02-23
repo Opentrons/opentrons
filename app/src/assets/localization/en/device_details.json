@@ -39,5 +39,10 @@
   "set_temp_slideout_btn": "Set Temperature",
   "tc_set_temperature": "Set {{part}} Temperature for {{name}}",
   "tc_set_temperature_body": "Pre heat or cool your Thermocycler {{part}}. Enter a whole number between {{min}} °C and {{max}} °C.",
-  "set_tc_temp_slideout_btn": "Set {{part}} Temperature"
+  "set_tc_temp_slideout_btn": "Set {{part}} Temperature",
+  "heater": "Heater",
+  "shaker": "Shaker",
+  "target_speed": "Target: {{speed}} RPM",
+  "current_speed": "Current: {{speed}} RPM",
+  "na_speed": "Target: N/A RPM"
 }

@@ -97,3 +97,7 @@ export const MAGNETIC_MODULE_V1_DISNEGAGED_HEIGHT = -5
 export const MAGNETIC_MODULE_TYPE_LABWARE_BOTTOM_HEIGHT = 0
 
 export const CELSIUS: '°C' = '°C'
+
+// Heater shaker module info
+
+export const RPM: 'RPM' = 'RPM'
