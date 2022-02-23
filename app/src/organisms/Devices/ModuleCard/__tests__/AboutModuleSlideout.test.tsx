@@ -1,8 +1,14 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/react'
+import {
+  RUN_STATUS_IDLE,
+  RUN_STATUS_RUNNING,
+  RUN_STATUS_FINISHING,
+} from '@opentrons/api-client'
 import { i18n } from '../../../../i18n'
 import { getConnectedRobotName } from '../../../../redux/robot/selectors'
+import { useRunStatus } from '../../../RunTimeControl/hooks'
 import {
   mockMagneticModule,
   mockMagneticModuleGen2,
@@ -13,9 +19,13 @@ import {
 import { AboutModuleSlideout } from '../AboutModuleSlideout'
 
 jest.mock('../../../../redux/robot/selectors')
+jest.mock('../../../RunTimeControl/hooks')
 
 const mockGetConnectedRobotName = getConnectedRobotName as jest.MockedFunction<
   typeof getConnectedRobotName
+>
+const mockUseRunStatus = useRunStatus as jest.MockedFunction<
+  typeof useRunStatus
 >
 
 const render = (props: React.ComponentProps<typeof AboutModuleSlideout>) => {
@@ -33,6 +43,7 @@ describe('AboutModuleSlideout', () => {
       onCloseClick: jest.fn(),
     }
     mockGetConnectedRobotName.mockReturnValue('Mock Robot Name')
+    mockUseRunStatus.mockReturnValue(RUN_STATUS_IDLE)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -49,6 +60,20 @@ describe('AboutModuleSlideout', () => {
     const button = getByRole('button', { name: /exit/i })
     fireEvent.click(button)
     expect(props.onCloseClick).toHaveBeenCalled()
+  })
+
+  it('renders firmware button disabled when run is running', () => {
+    mockUseRunStatus.mockReturnValue(RUN_STATUS_RUNNING)
+    const { getByRole } = render(props)
+    const button = getByRole('button', { name: 'View Firmware Update' })
+    expect(button).toBeDisabled()
+  })
+
+  it('renders firmware button disabled when run is finishing', () => {
+    mockUseRunStatus.mockReturnValue(RUN_STATUS_FINISHING)
+    const { getByRole } = render(props)
+    const button = getByRole('button', { name: 'View Firmware Update' })
+    expect(button).toBeDisabled()
   })
 
   it('renders correct info when module is a magnetic module GEN2', () => {
@@ -110,7 +135,7 @@ describe('AboutModuleSlideout', () => {
     getByText('Current Version')
     getByText('Version v2.0.0')
     getByText('Firmware update available.')
-    const button = getByRole('button', { name: 'Link firmware update' })
+    const button = getByRole('button', { name: 'View Firmware Update' })
     fireEvent.click(button)
     expect(button).toBeEnabled()
     const viewUpdate = getByRole('button', { name: 'View Update' })

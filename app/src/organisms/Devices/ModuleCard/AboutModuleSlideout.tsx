@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
+import { RUN_STATUS_RUNNING, RUN_STATUS_FINISHING } from '@opentrons/api-client'
 import {
   Flex,
   Text,
@@ -22,6 +23,7 @@ import { getModuleDisplayName } from '@opentrons/shared-data'
 import { Slideout } from '../../../atoms/Slideout'
 import { updateModule } from '../../../redux/modules'
 import { getConnectedRobotName } from '../../../redux/robot/selectors'
+import { useRunStatus } from '../../RunTimeControl/hooks'
 
 import type { State } from '../../../redux/types'
 import type { AttachedModule } from '../../../redux/modules/types'
@@ -44,6 +46,9 @@ export const AboutModuleSlideout = (
   const { t } = useTranslation('device_details')
   const moduleName = getModuleDisplayName(module.model)
   const robotName = useSelector((state: State) => getConnectedRobotName(state))
+  const runStatus = useRunStatus()
+  const isDisabled =
+    runStatus === RUN_STATUS_RUNNING || runStatus === RUN_STATUS_FINISHING
 
   const handleClick = (): void => {
     robotName && updateModule(robotName, module.serial)
@@ -56,24 +61,26 @@ export const AboutModuleSlideout = (
       isExpanded={isExpanded}
     >
       {/* TODO(jr, 2/22/22): update AlertItem to match new designs and wire up the link */}
-      <AlertItem
-        data-testid={`alert_item_firmware_update_${module.model}`}
-        css={ALERT_ITEM_STYLE}
-        type="warning"
-        title={
-          <>
-            {t('firmware_update_available')}
-            <Btn
-              paddingLeft={SPACING.spacing2}
-              fontSize={TYPOGRAPHY.fontSizeP}
-              textDecoration={TEXT_DECORATION_UNDERLINE}
-              onClick={() => console.log('firmware update!')}
-            >
-              {t('view_update')}
-            </Btn>
-          </>
-        }
-      />
+      {module.hasAvailableUpdate ? (
+        <AlertItem
+          data-testid={`alert_item_firmware_update_${module.model}`}
+          css={ALERT_ITEM_STYLE}
+          type="warning"
+          title={
+            <>
+              {t('firmware_update_available')}
+              <Btn
+                paddingLeft={SPACING.spacing2}
+                fontSize={TYPOGRAPHY.fontSizeP}
+                textDecoration={TEXT_DECORATION_UNDERLINE}
+                onClick={() => console.log('firmware update!')}
+              >
+                {t('view_update')}
+              </Btn>
+            </>
+          }
+        />
+      ) : null}
       <Flex flexDirection={DIRECTION_COLUMN}>
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Flex
@@ -90,19 +97,22 @@ export const AboutModuleSlideout = (
               {t('version', { version: module.fwVersion })}
             </Text>
           </Flex>
-          <PrimaryBtn
-            data-testid={`firmware_update_btn_${module.model}`}
-            padding="6px 12px 6px 12px"
-            backgroundColor={COLORS.blue}
-            borderRadius={SPACING.spacingM}
-            textTransform={TEXT_TRANSFORM_NONE}
-            css={TYPOGRAPHY.labelRegular}
-            alignItems={ALIGN_CENTER}
-            marginRight={SPACING.spacing3}
-            onClick={handleClick}
-          >
-            {t('link_firmware_update')}
-          </PrimaryBtn>
+          {module.hasAvailableUpdate ? (
+            <PrimaryBtn
+              data-testid={`firmware_update_btn_${module.model}`}
+              padding="6px 12px 6px 12px"
+              backgroundColor={COLORS.blue}
+              borderRadius={SPACING.spacingM}
+              textTransform={TEXT_TRANSFORM_NONE}
+              css={TYPOGRAPHY.labelRegular}
+              alignItems={ALIGN_CENTER}
+              marginRight={SPACING.spacing3}
+              onClick={handleClick}
+              disabled={isDisabled}
+            >
+              {t('link_firmware_update')}
+            </PrimaryBtn>
+          ) : null}
         </Flex>
         <Text
           paddingTop={SPACING.spacing4}

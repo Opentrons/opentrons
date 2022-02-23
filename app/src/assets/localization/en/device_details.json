@@ -44,7 +44,7 @@
   "current_version": "Current Version",
   "version": "Version {{version}}",
   "serial_number": "Serial Number",
-  "link_firmware_update": "Link firmware update",
+  "link_firmware_update": "View Firmware Update",
   "firmware_update_available": "Firmware update available.",
   "view_update": "View Update"
 }
