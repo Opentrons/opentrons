@@ -5,6 +5,7 @@ import { MenuList } from '../../../atoms/MenuList'
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
 
 import type { AttachedModule } from '../../../redux/modules/types'
+import { AboutModuleSlideout } from './AboutModuleSlideout'
 
 interface ModuleOverflowMenuProps {
   module: AttachedModule
@@ -16,6 +17,7 @@ export const ModuleOverflowMenu = (
 ): JSX.Element | null => {
   const { t } = useTranslation('device_details')
   const { module, handleClick } = props
+  const [showAboutModule, setShowAboutModule] = React.useState(false)
 
   const menuItems = {
     thermocyclerModuleType: [
@@ -48,10 +50,10 @@ export const ModuleOverflowMenu = (
 
   const AboutModuleBtn = (
     <MenuItem
+      minWidth="10rem"
       key={`about_module_${module.model}`}
       data-testid={`about_module_${module.model}`}
-      //  TODO(jr, 2022-02-17): add about module slideout component when it is created
-      onClick={() => console.log('about module overflow menu')}
+      onClick={() => setShowAboutModule(true)}
     >
       {t('overflow_menu_about')}
     </MenuItem>
@@ -59,6 +61,13 @@ export const ModuleOverflowMenu = (
 
   return (
     <React.Fragment>
+      {showAboutModule && (
+        <AboutModuleSlideout
+          module={module}
+          isExpanded={showAboutModule}
+          onCloseClick={() => setShowAboutModule(false)}
+        />
+      )}
       <Flex position={POSITION_RELATIVE}>
         <MenuList
           buttons={[
