@@ -53,6 +53,7 @@ class ToolDetector:
                     await asyncio.wait_for(
                         self._wait_tool_detection(reader), ready_wait_time_sec
                     )
+                    break
                 except asyncio.TimeoutError:
                     log.warning(
                         f"Try {i}: Tool detection not ready "
