@@ -50,7 +50,7 @@ export const HeaterShakerWizard = (
   )
 
   let buttonContent = null
-  let isDisabled: boolean = false
+  let isPrimaryCTADisabled: boolean = false
   const getWizardDisplayPage = (): JSX.Element | null => {
     switch (currentPage) {
       case 0:
@@ -72,12 +72,14 @@ export const HeaterShakerWizard = (
         return <AttachAdapter />
       case 4:
         buttonContent = t('btn_test_shake')
-        isDisabled = heaterShakerAttachedIndex === -1
+        isPrimaryCTADisabled = heaterShakerAttachedIndex === -1
         return (
           <PowerOn
-            isAttached={!isDisabled}
+            isAttached={!isPrimaryCTADisabled}
             attachedModule={
-              !isDisabled ? attachedModules[heaterShakerAttachedIndex] : null
+              !isPrimaryCTADisabled
+                ? attachedModules[heaterShakerAttachedIndex]
+                : null
             }
           />
         )
@@ -123,7 +125,7 @@ export const HeaterShakerWizard = (
           {currentPage <= 5 ? (
             <PrimaryBtn
               alignItems={ALIGN_CENTER}
-              disabled={isDisabled}
+              disabled={isPrimaryCTADisabled}
               {...targetProps}
               backgroundColor={COLORS.blue}
               borderRadius={SPACING.spacingS}
@@ -136,7 +138,7 @@ export const HeaterShakerWizard = (
               }
             >
               {buttonContent}
-              {isDisabled !== false ? (
+              {isPrimaryCTADisabled !== false ? (
                 <Tooltip {...tooltipProps}>
                   {t('module_is_not_connected')}
                 </Tooltip>

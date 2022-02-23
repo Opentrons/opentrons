@@ -31,7 +31,7 @@ describe('PowerOn', () => {
     getByText('Connect your module to the robot and and power it on.')
   })
 
-  it('renders heater shaker SVG with info with module not connected', () => {
+  it('renders heater shaker SVG with info with module connected', () => {
     const { getByText } = render(props)
     getByText('Connected')
     getByText('Magnetic Module GEN2')
