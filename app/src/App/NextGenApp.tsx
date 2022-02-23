@@ -23,12 +23,15 @@ import * as Config from '../redux/config'
 import { Breadcrumbs } from '../molecules/Breadcrumbs'
 import { DeviceDetails } from '../pages/Devices/DeviceDetails'
 import { DevicesLanding } from '../pages/Devices/DevicesLanding'
+import { RobotSettings } from '../pages/Devices/RobotSettings'
 import { usePathCrumbs } from './hooks'
 import { ProtocolsLanding } from '../pages/Protocols/ProtocolsLanding'
 import { GeneralSettings } from '../organisms/AppSettings/GeneralSettings'
 import { PrivacySettings } from '../organisms/AppSettings/PrivacySettings'
 import { AdvancedSettings } from '../organisms/AppSettings/AdvancedSettings'
 import { FeatureFlags } from '../organisms/AppSettings/FeatureFlags'
+import { TopPortalRoot } from './portal'
+
 export interface RouteProps {
   /**
    * the component rendered by a route match
@@ -101,6 +104,8 @@ export function TempNavBar({ routes }: { routes: RouteProps[] }): JSX.Element {
   )
 }
 
+export type RobotSettingsTab = 'calibration' | 'networking' | 'advanced'
+
 /**
  * route params type definition for the next gen app
  */
@@ -108,7 +113,7 @@ export interface NextGenRouteParams {
   robotName: string
   protocolName: string
   labwareId: string
-  robotSettingsTab: string
+  robotSettingsTab: RobotSettingsTab
   runId: string
   runDetailsTab: string
 }
@@ -176,10 +181,9 @@ export const nextGenRoutes: RouteProps[] = [
     path: '/devices/:robotName',
   },
   {
-    component: () => <div>robot settings</div>,
+    component: RobotSettings,
     exact: true,
     name: 'Robot Settings',
-    // robot settings tabs params: 'calibration' | 'networking' | 'advanced'
     path: '/devices/:robotName/robot-settings/:robotSettingsTab',
   },
   {
@@ -234,6 +238,7 @@ export function NextGenApp(): JSX.Element {
 
   return (
     <>
+      <TopPortalRoot />
       <TempNavBar routes={nextGenRoutes} />
       <Box width="100%">
         <Breadcrumbs pathCrumbs={pathCrumbs} />
