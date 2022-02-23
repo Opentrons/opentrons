@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
@@ -14,11 +15,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { RPM } from '@opentrons/shared-data'
+import { HeaterShakerModuleCard } from './HeaterShakerModuleCard'
 import { TertiaryButton } from '../../../atoms/Buttons'
 import { CollapsibleStep } from '../../ProtocolSetup/RunSetupCard/CollapsibleStep'
 import { Divider } from '../../../atoms/structure'
-import { useTranslation } from 'react-i18next'
-import { HeaterShakerModuleCard } from './HeaterShakerModuleCard'
 
 interface TestShakeProps {
   onStepClick: React.Dispatch<React.SetStateAction<number>>
@@ -85,6 +85,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
             <Text fontSize={TYPOGRAPHY.fontSizeCaption}>
               {t('set_shake_speed')}
             </Text>
+            {/* TODO(sh, 2022-02-22): Wire up input when end points are updated */}
             <InputField units={RPM} value={'1000'} readOnly />
             <Text fontSize={TYPOGRAPHY.fontSizeCaption}>
               {'{min} - {max} RPM'}
@@ -116,7 +117,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
             marginLeft={SIZE_AUTO}
             onClick={() => onStepClick(2)}
           >
-            {t('go_to_step1')}
+            {t('go_to_step_1')}
           </TertiaryButton>
         </Flex>
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_FLEX_START}>
@@ -126,7 +127,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
             marginLeft={SIZE_AUTO}
             onClick={() => onStepClick(3)}
           >
-            {t('go_to_step2')}
+            {t('go_to_step_2')}
           </TertiaryButton>
         </Flex>
       </CollapsibleStep>
