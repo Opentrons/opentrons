@@ -167,6 +167,10 @@ def test_engage_height_from_base(
         )
     )
 
+# To do before merge: Test error if no labware loaded and use offset or none
+# To do before merge: Test error if labware loaded does not have intrinsic heigh
+# Check error strings for specificity
+
 
 @pytest.mark.xfail(strict=True, raises=NotImplementedError)
 def test_engage_offset(subject: MagneticModuleContext) -> None:  # noqa: D103
