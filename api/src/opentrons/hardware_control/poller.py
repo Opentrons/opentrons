@@ -107,7 +107,6 @@ class Poller(Generic[DataT]):
         interval_seconds: float,
         reader: Reader[DataT],
         listener: Listener[DataT],
-        loop: Optional[asyncio.AbstractEventLoop] = None,
     ) -> None:
         """
         Constructor.
@@ -116,14 +115,12 @@ class Poller(Generic[DataT]):
             interval_seconds: time in between polls.
             reader: The data reader.
             listener: event listener.
-            loop: Optional event loop to use
         """
-        loop = loop or asyncio.get_running_loop()
-        self._shutdown_event = asyncio.Event(loop=loop)
+        self._shutdown_event = asyncio.Event()
         self._interval = interval_seconds
         self._listener = listener
         self._reader = reader
-        self._task = loop.create_task(self._poller())
+        self._task = asyncio.create_task(self._poller())
 
     def stop(self) -> None:
         """Signal poller to stop."""

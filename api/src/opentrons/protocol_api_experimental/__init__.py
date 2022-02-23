@@ -24,6 +24,7 @@ from .module_contexts import (
     MagneticModuleContext,
     TemperatureModuleContext,
     ThermocyclerModuleContext,
+    HeaterShakerModuleContext,
 )
 from .labware import Labware
 from .well import Well
@@ -51,6 +52,7 @@ __all__ = [
     "MagneticModuleStatus",
     "TemperatureModuleContext",
     "ThermocyclerModuleContext",
+    "HeaterShakerModuleContext",
     "Labware",
     "Well",
     # Protocol API errors

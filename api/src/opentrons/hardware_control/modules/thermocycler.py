@@ -117,7 +117,6 @@ class Thermocycler(mod_abc.AbstractModule):
             interval_seconds=polling_interval_sec,
             listener=self._listener,
             reader=PollerReader(driver=self._driver),
-            loop=loop,
         )
         self._hold_time_fuzzy_seconds = polling_interval_sec * 5
 

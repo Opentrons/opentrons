@@ -10,6 +10,8 @@ on:
       - 'Makefile'
       - 'notify-server/**'
       - '.github/workflows/notify-server-lint-test.yaml'
+      - 'api/**'
+      - 'hardware/**'
       - '.github/actions/python/**'
     tags-ignore:
       - '*'
@@ -17,6 +19,8 @@ on:
     paths:
       - 'Makefile'
       - 'notify-server/**'
+      - 'api/**'
+      - 'hardware/**'
   workflow_dispatch:
 
 defaults:

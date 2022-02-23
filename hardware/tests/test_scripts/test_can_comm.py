@@ -5,18 +5,18 @@ from mock import MagicMock
 
 import pytest
 
-from opentrons_ot3_firmware.message import (
+from opentrons_hardware.firmware_bindings.message import (
     CanMessage,
 )
-from opentrons_ot3_firmware.arbitration_id import (
+from opentrons_hardware.firmware_bindings.arbitration_id import (
     ArbitrationId,
     ArbitrationIdParts,
 )
-from opentrons_ot3_firmware.messages.payloads import (
+from opentrons_hardware.firmware_bindings.messages.payloads import (
     GetStatusResponsePayload,
 )
 from opentrons_hardware.scripts import can_comm
-from opentrons_ot3_firmware.constants import MessageId, NodeId
+from opentrons_hardware.firmware_bindings.constants import MessageId, NodeId
 
 
 @pytest.fixture

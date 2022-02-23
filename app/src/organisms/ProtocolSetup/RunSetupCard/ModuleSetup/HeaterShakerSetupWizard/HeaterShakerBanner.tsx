@@ -20,9 +20,9 @@ export function HeaterShakerBanner(
         <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
       )}
       <Banner
-        title={t('banner_title', { name: displayName })}
-        body={t('banner_body')}
-        btnText={t('banner_wizard_button')}
+        title={t('attach_heater_shaker_to_deck', { name: displayName })}
+        body={t('attach_to_deck_to_prevent_shaking')}
+        btnText={t('how_to_attach_module')}
         onClick={() => setShowWizard(true)}
       />
     </>

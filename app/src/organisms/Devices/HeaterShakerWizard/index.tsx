@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Portal } from '../../../App/portal'
 import { useSelector } from 'react-redux'
 import { getConnectedRobotName } from '../../../redux/robot/selectors'
-import { ModalPage } from '../../../atoms/ModalPage'
+import { Interstitial } from '../../../atoms/Interstitial/Interstitial'
 import { Introduction } from './Introduction'
 import { KeyParts } from './KeyParts'
 import { AttachModule } from './AttachModule'
@@ -69,9 +69,9 @@ export const HeaterShakerWizard = (
 
   return (
     <Portal level="top">
-      <ModalPage
+      <Interstitial
         titleBar={{
-          title: t('modal_title', { name: robotName }),
+          title: t('heater_shaker_setup_description', { name: robotName }),
           exit: {
             onClick: () => onCloseClick(),
             title: t('shared:exit'),
@@ -115,7 +115,7 @@ export const HeaterShakerWizard = (
             </PrimaryBtn>
           ) : null}
         </Flex>
-      </ModalPage>
+      </Interstitial>
     </Portal>
   )
 }

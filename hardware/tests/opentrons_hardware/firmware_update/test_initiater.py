@@ -1,10 +1,14 @@
 """Tests for FirmwareUpdateInitiator."""
 import pytest
 from mock import AsyncMock, call
-from opentrons_ot3_firmware import NodeId, ArbitrationId, ArbitrationIdParts
-from opentrons_ot3_firmware.messages import MessageDefinition
-from opentrons_ot3_firmware.messages import message_definitions, payloads
-from opentrons_ot3_firmware.utils import UInt32Field
+from opentrons_hardware.firmware_bindings import (
+    NodeId,
+    ArbitrationId,
+    ArbitrationIdParts,
+)
+from opentrons_hardware.firmware_bindings.messages import MessageDefinition
+from opentrons_hardware.firmware_bindings.messages import message_definitions, payloads
+from opentrons_hardware.firmware_bindings.utils import UInt32Field
 
 from opentrons_hardware.firmware_update import initiator
 from opentrons_hardware.firmware_update.errors import BootloaderNotReady

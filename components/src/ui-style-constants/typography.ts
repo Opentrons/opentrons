@@ -40,25 +40,6 @@ export const textAlignRight = 'right'
 export const textAlignCenter = 'center'
 export const textAlignJustify = 'justify'
 
-//  Overflow menu constants
-export const borderRadiusS = '4px 4px 0px 0px'
-export const boxShadowS = '0px 1px 3px rgba(0, 0, 0, 0.2)'
-
-//  Slideout constants
-export const boxShadowM = '0px 3px 6px rgba(0, 0, 0, 0.23)'
-export const boxShadowSM = '0px 1px 3px rgba(0, 0, 0, 0.3)'
-//  Overflow menu btn width
-export const overflowMenuWidth = '9.562rem'
-
-//  Banner component styling
-export const bannerButtonTopMargin = '2.75rem'
-
-//  Heater Shaker Wizard styling
-export const introMarginLeft = '6.063rem' //  97px
-export const introImageWidth = '6.25rem' // 100px
-export const introImageHeight = '4.313rem' // 69px
-export const introBoxWidth = '21.5rem' // 344px
-
 // Default font styles, color agnositic for first pass
 export const h1Default = css`
   font-size: ${fontSizeH1};

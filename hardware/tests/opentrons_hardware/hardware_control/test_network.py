@@ -5,13 +5,17 @@ import datetime
 from typing import List, Callable
 from mock import AsyncMock
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
-from opentrons_ot3_firmware import ArbitrationId, ArbitrationIdParts, utils
-from opentrons_ot3_firmware.messages import (
+from opentrons_hardware.firmware_bindings import (
+    ArbitrationId,
+    ArbitrationIdParts,
+    utils,
+)
+from opentrons_hardware.firmware_bindings.messages import (
     MessageDefinition,
     message_definitions,
     payloads,
 )
-from opentrons_ot3_firmware.constants import NodeId
+from opentrons_hardware.firmware_bindings.constants import NodeId
 
 from opentrons_hardware.hardware_control.network import probe
 

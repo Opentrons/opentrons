@@ -97,7 +97,6 @@ class TempDeck(mod_abc.AbstractModule):
             reader=PollerReader(driver=self._driver),
             interval_seconds=polling_frequency,
             listener=self._listener,
-            loop=loop,
         )
 
     async def cleanup(self) -> None:

@@ -12,3 +12,4 @@ export const spacingXL = '1.875rem' // 30px
 export const spacingSS = '0.438rem' //  7px
 export const spacingXS = '0.313rem' //  5px
 export const spacingXXS = '1px' // 1px
+export const spacingSM = '0.625rem' //  10px
