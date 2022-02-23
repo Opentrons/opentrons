@@ -3,34 +3,20 @@ from dataclasses import dataclass
 import logging
 import json
 import numbers
-from typing import (
-    Any,
-    Dict,
-    List,
-    Mapping,
-    Optional,
-    Union,
-    Tuple,
-    Sequence,
-    TYPE_CHECKING,
-    cast,
-)
+from typing import Any, Dict, List, Mapping, Optional, Union, Tuple, Sequence, cast
 
 from opentrons import config
 from opentrons.config import feature_flags as ff
 from opentrons_shared_data.pipette import model_config, name_config, fuse_specs
-
-if TYPE_CHECKING:
-    from opentrons_shared_data.pipette.dev_types import (
-        PipetteName,
-        PipetteModel,
-        PipetteModelSpec,
-        UlPerMm,
-        Quirk,
-        PipetteFusedSpec,
-        LabwareUri,
-    )
-
+from opentrons_shared_data.pipette.dev_types import (
+    PipetteName,
+    PipetteModel,
+    PipetteModelSpec,
+    UlPerMm,
+    Quirk,
+    PipetteFusedSpec,
+    LabwareUri,
+)
 
 log = logging.getLogger(__name__)
 
@@ -382,13 +368,13 @@ def load_overrides(pipette_id: str) -> Dict[str, Any]:
 
 
 def validate_quirks(quirks: List[str]) -> List[Quirk]:
-    valid_quirks = []
+    valid_quirks: List[Quirk] = []
     for quirk in quirks:
         if quirk in VALID_QUIRKS:
-            valid_quirks.append(quirk)
+            valid_quirks.append(Quirk(quirk))
         else:
             log.warning(f"{quirk} is not a valid quirk")
-    return cast(List["Quirk"], valid_quirks)
+    return valid_quirks
 
 
 def ensure_value(

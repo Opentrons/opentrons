@@ -3,7 +3,7 @@ allow you to customize serialization to/from json.
 """
 import json
 import datetime
-from typing import Any
+from typing import Any, cast
 
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -24,7 +24,7 @@ class DateTimeDecoder(json.JSONDecoder):
 
     def _decode_datetime(self, obj: object) -> Any:
         try:
-            return datetime.datetime.fromisoformat(obj)
+            return datetime.datetime.fromisoformat(cast(str, obj))
         except ValueError:
             return obj
         except TypeError:

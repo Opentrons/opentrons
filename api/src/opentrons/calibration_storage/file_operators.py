@@ -35,7 +35,10 @@ def read_cal_file(
     # are refactored to grab tip length calibration
     # from the correct locations.
     with open(filepath, "r") as f:
-        calibration_data = json.load(f, cls=decoder)
+        calibration_data = typing.cast(
+            typing.Dict[str, typing.Any],
+            json.load(f, cls=decoder),
+        )
     if isinstance(calibration_data.values(), dict):
         for value in calibration_data.values():
             if value.get("lastModified"):
@@ -44,7 +47,7 @@ def read_cal_file(
                     f"{type(value['lastModified']).__name__},"
                     "expected datetime"
                 )
-    return calibration_data  # type: ignore[no-any-return]
+    return calibration_data
 
 
 def save_to_file(
