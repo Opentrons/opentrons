@@ -41,6 +41,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
       </Text>
       <Flex
         marginTop={SPACING.spacing3}
+        marginBottom={SPACING.spacing4}
         backgroundColor={COLORS.background}
         paddingTop={SPACING.spacing4}
         paddingLeft={SPACING.spacing4}
