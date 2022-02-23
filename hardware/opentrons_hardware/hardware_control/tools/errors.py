@@ -30,7 +30,7 @@ class TimeoutResponse(ToolDetectionException):
         super().__init__(f"Timed out waiting for response to {message}")
 
 
-class ToolDetectionFailiure(ToolDetectionException):
+class ToolDetectionFailure(ToolDetectionException):
     """Tool detection failed."""
 
     pass

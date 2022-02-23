@@ -8,8 +8,9 @@ from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons_hardware.drivers.can_bus.build import build_driver
 from .can_args import add_can_args, build_settings
 from opentrons_hardware.hardware_control.tools.detector import ToolDetector
-from opentrons_hardware.hardware_control.tools.types import Carrier
-from opentrons_hardware.firmware_bindings.constants import ToolType
+from opentrons_hardware.hardware_control.tools.errors import ToolDetectionFailure
+from opentrons_hardware.drivers.can_bus.can_messenger import WaitableCallback
+
 
 logger = logging.getLogger(__name__)
 
@@ -38,23 +39,41 @@ LOG_CONFIG = {
 }
 
 
+async def run_detector(
+    retry_count: int, ready_wait_time_sec: float, detector: ToolDetector
+) -> None:
+    """Detect tool changes."""
+    i = 1
+    tool_generator = detector.detect()
+    while True:
+        try:
+            await asyncio.wait_for(tool_generator.__anext__(), ready_wait_time_sec)
+            break
+        except asyncio.TimeoutError:
+            logger.warning(
+                f"Try {i}: Tool detection not ready "
+                f"after {ready_wait_time_sec} seconds."
+            )
+            if i < retry_count:
+                i += 1
+            else:
+                raise ToolDetectionFailure()
+
+
 async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
     driver = await build_driver(build_settings(args))
 
     messenger = CanMessenger(driver)
     messenger.start()
-
-    tool_dict = {
-        Carrier.LEFT: ToolType(0),
-        Carrier.RIGHT: ToolType(0),
-    }
-    detector = ToolDetector(messenger, tool_dict)
+    cb = WaitableCallback(messenger)
+    detector = ToolDetector(messenger, cb)
 
     logger.info("Initiating head tool detector.")
-    await detector.run(
+    await run_detector(
         retry_count=args.retry_count,
         ready_wait_time_sec=args.timeout_seconds,
+        detector=detector,
     )
 
     await messenger.stop()
