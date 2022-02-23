@@ -5,7 +5,7 @@ This module has functions that you can import to save robot or
 labware calibration to its designated file location.
 """
 import json
-from typing import Union, List, Dict, TYPE_CHECKING, cast
+from typing import Any, Union, List, Dict, TYPE_CHECKING, cast
 from dataclasses import is_dataclass, asdict
 
 
@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 DictionaryFactoryType = Union[List, Dict]
 
 
-def dict_filter_none(data: DictionaryFactoryType) -> Dict:
+def dict_filter_none(data: DictionaryFactoryType) -> Dict[str, Any]:
     """
     Helper function to filter out None keys from a dataclass
     before saving to file.
@@ -29,7 +29,7 @@ def dict_filter_none(data: DictionaryFactoryType) -> Dict:
     return dict(item for item in data if item[1] is not None)
 
 
-def convert_to_dict(obj) -> Dict:
+def convert_to_dict(obj: Any) -> Dict[str, Any]:
     # The correct way to type this is described here:
     # https://github.com/python/mypy/issues/6568
     # Unfortnately, since it's not currently supported I have an
@@ -60,7 +60,7 @@ def hash_labware_def(labware_def: "LabwareDefinition") -> str:
     return sha256(sorted_def_str.encode("utf-8")).hexdigest()
 
 
-def details_from_uri(uri: str, delimiter="/") -> local_types.UriDetails:
+def details_from_uri(uri: str, delimiter: str = "/") -> local_types.UriDetails:
     """
     Unpack a labware URI to get the namespace, loadname and version
     """
@@ -76,7 +76,7 @@ def details_from_uri(uri: str, delimiter="/") -> local_types.UriDetails:
 
 
 def uri_from_details(
-    namespace: str, load_name: str, version: Union[str, int], delimiter="/"
+    namespace: str, load_name: str, version: Union[str, int], delimiter: str = "/"
 ) -> "LabwareUri":
     """Build a labware URI from its details.
 
@@ -87,7 +87,9 @@ def uri_from_details(
     return cast("LabwareUri", f"{namespace}{delimiter}{load_name}{delimiter}{version}")
 
 
-def uri_from_definition(definition: "LabwareDefinition", delimiter="/") -> "LabwareUri":
+def uri_from_definition(
+    definition: "LabwareDefinition", delimiter: str = "/"
+) -> "LabwareUri":
     """Build a labware URI from its definition.
 
     A labware URI is a string that uniquely specifies a labware definition.

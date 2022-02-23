@@ -1,6 +1,6 @@
 from enum import Enum
 from dataclasses import dataclass, asdict, fields
-from typing import Dict, Tuple, TypeVar, Generic, List
+from typing import Dict, Tuple, TypeVar, Generic, List, cast
 from typing_extensions import TypedDict, Literal
 from opentrons.hardware_control.types import OT3AxisKind
 
@@ -33,8 +33,8 @@ class ByGantryLoad(Generic[Vt]):
     none: Vt
     gripper: Vt
 
-    def __getitem__(self, key: GantryLoad):
-        return asdict(self)[key.value]
+    def __getitem__(self, key: GantryLoad) -> Vt:
+        return cast(Vt, asdict(self)[key.value])
 
 
 PerPipetteAxisSettings = ByGantryLoad[Dict[OT3AxisKind, float]]

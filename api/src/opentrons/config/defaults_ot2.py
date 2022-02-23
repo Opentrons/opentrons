@@ -147,7 +147,7 @@ DEFAULT_PIPETTE_OFFSET = [0.0, 0.0, 0.0]
 SERIAL_SPEED = 115200
 DEFAULT_LOG_LEVEL = "INFO"
 
-DictType = TypeVar("DictType", bound=Dict)
+DictType = TypeVar("DictType", bound=Dict[str, Any])
 
 
 def _build_dict_with_default(

@@ -3,7 +3,7 @@ import logging
 import os
 from pathlib import Path
 
-from typing import Any, Dict, List, Union, Optional
+from typing import Any, Dict, List, Union, Optional, cast
 from typing_extensions import Literal
 
 from . import CONFIG, defaults_ot3, defaults_ot2
@@ -70,8 +70,10 @@ def load_ot3() -> OT3Config:
 
 
 def save_robot_settings(
-    config: Union[RobotConfig, OT3Config], rs_filename: str = None, tag: str = None
-):
+    config: Union[RobotConfig, OT3Config],
+    rs_filename: Optional[str] = None,
+    tag: Optional[str] = None,
+) -> Dict[str, Any]:
     config_dict = config_to_save(config)
 
     # Save everything else in a different file
@@ -85,7 +87,7 @@ def save_robot_settings(
 
 
 def backup_configuration(
-    config: Union[RobotConfig, OT3Config], tag: str = None
+    config: Union[RobotConfig, OT3Config], tag: Optional[str] = None
 ) -> None:
     import time
 
@@ -103,7 +105,7 @@ def get_legacy_gantry_calibration() -> Optional[List[List[float]]]:
     """
     gantry_cal = _load_json(CONFIG["deck_calibration_file"])
     if "gantry_calibration" in gantry_cal:
-        return gantry_cal["gantry_calibration"]
+        return gantry_cal["gantry_calibration"]  # type: ignore[no-any-return]
     else:
         return None
 
@@ -129,7 +131,7 @@ def _load_json(filename: Union[str, Path]) -> Dict[str, Any]:
     except json.decoder.JSONDecodeError:
         log.warning("{0} is corrupt. Loading defaults".format(filename))
         res = {}
-    return res
+    return cast(Dict[str, Any], res)
 
 
 def _save_json(data: Dict[str, Any], filename: Union[str, Path]) -> None:
