@@ -1,8 +1,9 @@
 import React from 'react'
-import map from 'lodash/map'
-import { useDispatch } from 'react-redux'
 import { Trans, useTranslation } from 'react-i18next'
-import { inferModuleOrientationFromXCoordinate } from '@opentrons/shared-data'
+import {
+  getModuleDef2,
+  inferModuleOrientationFromXCoordinate,
+} from '@opentrons/shared-data'
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -11,30 +12,21 @@ import {
   RobotWorkSpace,
   SPACING,
   Text,
-  useInterval,
 } from '@opentrons/components'
-import { fetchModules } from '../../../redux/modules'
-import { Dispatch } from '../../../redux/types'
 import { ModuleInfo } from '../../ProtocolSetup/RunSetupCard/ModuleSetup/ModuleInfo'
-import { useModuleRenderInfoById } from '../../ProtocolSetup/hooks'
 
-const POLL_MODULE_INTERVAL_MS = 5000
+import type { AttachedModule } from '../../../redux/modules/types'
+
 const VIEW_BOX = '-150 -40 440 128'
-
 interface PowerOnProps {
-  robotName: string
+  isAttached: boolean
+  attachedModule: AttachedModule | null
 }
-export function PowerOn(props: PowerOnProps): JSX.Element {
-  const { robotName } = props
-  const { t } = useTranslation('heater_shaker')
-  const dispatch = useDispatch<Dispatch>()
-  const moduleRenderInfoById = useModuleRenderInfoById()
 
-  useInterval(
-    () => dispatch(fetchModules(robotName)),
-    robotName === null ? POLL_MODULE_INTERVAL_MS : null,
-    true
-  )
+export function PowerOn(props: PowerOnProps): JSX.Element {
+  const { t } = useTranslation('heater_shaker')
+  //  TODO(jr, 2022-02-18): change this to heater shaker model when it exists
+  const moduleDef = getModuleDef2('magneticModuleV2')
 
   return (
     <React.Fragment>
@@ -58,31 +50,21 @@ export function PowerOn(props: PowerOnProps): JSX.Element {
         data-testid={`heater_shaker_svg_and_info`}
       >
         {() => (
-          <>
-            {map(moduleRenderInfoById, ({ moduleDef, attachedModuleMatch }) => {
-              const { model } = moduleDef
-              return (
-                <React.Fragment key={`Power_on_${model}`}>
-                  {/* TODO(jr, 2022-02-18): change this to heater shaker model when it exists */}
-                  {model === 'magneticModuleV2' && (
-                    <Module
-                      x={0}
-                      y={0}
-                      orientation={inferModuleOrientationFromXCoordinate(0)}
-                      def={moduleDef}
-                    >
-                      <ModuleInfo
-                        moduleModel={model}
-                        isAttached={attachedModuleMatch != null}
-                        usbPort={attachedModuleMatch?.usbPort.port ?? null}
-                        hubPort={attachedModuleMatch?.usbPort.hub ?? null}
-                      />
-                    </Module>
-                  )}
-                </React.Fragment>
-              )
-            })}
-          </>
+          <React.Fragment key={`Power_on_${moduleDef.model}`}>
+            <Module
+              x={0}
+              y={0}
+              orientation={inferModuleOrientationFromXCoordinate(0)}
+              def={moduleDef}
+            >
+              <ModuleInfo
+                moduleModel={moduleDef.model}
+                isAttached={props.isAttached}
+                usbPort={props.attachedModule?.usbPort.port ?? null}
+                hubPort={props.attachedModule?.usbPort.hub ?? null}
+              />
+            </Module>
+          </React.Fragment>
         )}
       </RobotWorkSpace>
     </React.Fragment>

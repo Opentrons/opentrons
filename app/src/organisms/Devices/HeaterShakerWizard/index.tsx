@@ -44,12 +44,10 @@ export const HeaterShakerWizard = (
   )
   const [targetProps, tooltipProps] = useHoverTooltip()
 
-  const isHeaterShakerAttached =
-    attachedModules != null &&
-    attachedModules.some(
-      //  TODO(jr, 2022-02-18): get heaterShaker module when model exists
-      module => module.model === 'magneticModuleV2'
-    )
+  const heaterShakerAttachedIndex = attachedModules.findIndex(
+    //  TODO(jr, 2022-02-18): get heaterShaker module when model exists
+    module => module.model === 'magneticModuleV2'
+  )
 
   let buttonContent = null
   let isDisabled: boolean = false
@@ -74,8 +72,15 @@ export const HeaterShakerWizard = (
         return <AttachAdapter />
       case 4:
         buttonContent = t('btn_test_shake')
-        isDisabled = !isHeaterShakerAttached
-        return <PowerOn robotName={robotName === null ? '' : robotName} />
+        isDisabled = heaterShakerAttachedIndex === -1
+        return (
+          <PowerOn
+            isAttached={!isDisabled}
+            attachedModule={
+              !isDisabled ? attachedModules[heaterShakerAttachedIndex] : null
+            }
+          />
+        )
       case 5:
         buttonContent = t('complete')
         return <TestShake />

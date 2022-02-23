@@ -1,15 +1,8 @@
 import * as React from 'react'
-import { when } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
-import { useModuleRenderInfoById } from '../../../ProtocolSetup/hooks'
 import { PowerOn } from '../PowerOn'
-
-jest.mock('../../../ProtocolSetup/hooks')
-
-const mockUseModuleRenderInfoById = useModuleRenderInfoById as jest.MockedFunction<
-  typeof useModuleRenderInfoById
->
+import { mockMagneticModuleGen2 } from '../../../../redux/modules/__fixtures__'
 
 const render = (props: React.ComponentProps<typeof PowerOn>) => {
   return renderWithProviders(<PowerOn {...props} />, {
@@ -20,12 +13,12 @@ const render = (props: React.ComponentProps<typeof PowerOn>) => {
 describe('PowerOn', () => {
   let props: React.ComponentProps<typeof PowerOn>
 
+  // TODO(jr, 2022-02-18): fix module model to heater shaker when it exists
   beforeEach(() => {
     props = {
-      robotName: 'Name',
+      isAttached: true,
+      attachedModule: mockMagneticModuleGen2,
     }
-
-    when(mockUseModuleRenderInfoById).calledWith().mockReturnValue({})
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -38,8 +31,21 @@ describe('PowerOn', () => {
     getByText('Connect your module to the robot and and power it on.')
   })
 
-  // TODO(jr, 2022-02-18): add test when heaterShaker moduleDef and SVG exist
-  it.todo('renders heater shaker SVG with info with module not connected')
+  it('renders heater shaker SVG with info with module not connected', () => {
+    const { getByText } = render(props)
+    getByText('Connected')
+    getByText('Magnetic Module GEN2')
+    getByText('USB Port 1 via hub')
+  })
 
-  it.todo('renders heater shaker SVG with info with module connected')
+  it('renders heater shaker SVG with info with module not connected', () => {
+    props = {
+      isAttached: false,
+      attachedModule: null,
+    }
+    const { getByText } = render(props)
+    getByText('Not connected')
+    getByText('Magnetic Module GEN2')
+    getByText('No USB Port Yet')
+  })
 })
