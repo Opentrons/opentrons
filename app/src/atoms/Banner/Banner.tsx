@@ -73,7 +73,7 @@ export function Banner(props: BannerProps): JSX.Element | null {
 
         {/* TODO immediately: use NewPrimaryBtn when sarah's pr is merged */}
         <PrimaryBtn
-          marginTop={TYPOGRAPHY.bannerButtonTopMargin}
+          marginTop={'2.75rem'}
           backgroundColor={COLORS.blue}
           borderRadius={SPACING.spacingM}
           textTransform={TEXT_TRANSFORM_NONE}

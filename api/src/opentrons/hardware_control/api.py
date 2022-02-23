@@ -111,10 +111,10 @@ class API(
         # or home() call is in flight and something else calls
         # current_position(), which will not be updated until the move() or
         # home() call succeeds or fails.
-        self._motion_lock = asyncio.Lock(loop=self._loop)
+        self._motion_lock = asyncio.Lock()
         self._door_state = DoorState.CLOSED
         self._pause_manager = PauseManager(self._door_state)
-        ExecutionManagerProvider.__init__(self, loop, isinstance(backend, Simulator))
+        ExecutionManagerProvider.__init__(self, isinstance(backend, Simulator))
         RobotCalibrationProvider.__init__(self)
         InstrumentHandlerProvider.__init__(
             self, {top_types.Mount.LEFT: None, top_types.Mount.RIGHT: None}
@@ -269,10 +269,6 @@ class API(
     def loop(self) -> asyncio.AbstractEventLoop:
         """The event loop used by this instance."""
         return self._loop
-
-    def set_loop(self, loop: asyncio.AbstractEventLoop):
-        self._loop = loop
-        self._motion_lock = asyncio.Lock(loop=loop)
 
     @property
     def is_simulator(self):
@@ -1051,6 +1047,6 @@ class API(
             self, mount, self._config.z_retract_distance, critical_point
         )
 
-    def clean_up(self) -> None:
+    async def clean_up(self) -> None:
         """Get the API ready to stop cleanly."""
-        self._backend.clean_up()
+        await self._backend.clean_up()
