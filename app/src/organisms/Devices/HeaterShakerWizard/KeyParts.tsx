@@ -1,18 +1,19 @@
 import React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 import {
+  ALIGN_FLEX_START,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  SPACING_3,
   Text,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import HeaterShakerKeyParts from '../../../assets/images/heater-shaker-key-parts.svg'
-import HeaterShakerDeckLock from '../../../assets/images/HS_Deck_Lock_Anim 1.png'
+import HeaterShakerDeckLock from '../../../assets/videos/heater-shaker-setup/HS_Deck_Lock_Anim.webm'
 
 export function KeyParts(): JSX.Element {
   const { t } = useTranslation('heater_shaker')
@@ -22,7 +23,7 @@ export function KeyParts(): JSX.Element {
         color={COLORS.darkBlack}
         paddingTop={SPACING.spacing3}
         fontWeight={TYPOGRAPHY.fontWeightBold}
-        data-testId={`heater_shaker_wizard_keyparts_title`}
+        data-testid={'heater_shaker_wizard_keyparts_title'}
       >
         {t('heater_shaker_key_parts')}
       </Text>
@@ -30,7 +31,7 @@ export function KeyParts(): JSX.Element {
         color={COLORS.darkBlack}
         paddingTop={SPACING.spacing3}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
-        data-testId={`heater_shaker_wizard_keyparts_subtitle`}
+        data-testid={'heater_shaker_wizard_keyparts_subtitle'}
       >
         <Trans
           t={t}
@@ -40,7 +41,11 @@ export function KeyParts(): JSX.Element {
           }}
         />
       </Text>
-      <Flex flexDirection={DIRECTION_ROW} margin={SPACING.spacing6}>
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        marginY={SPACING.spacing6}
+        alignItems={ALIGN_FLEX_START}
+      >
         <Flex>
           <img src={HeaterShakerKeyParts} alt="Heater Shaker Key Parts" />
         </Flex>
@@ -48,7 +53,8 @@ export function KeyParts(): JSX.Element {
         <Flex
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
-          marginLeft={SPACING.spacing6}
+          marginTop={'10rem'}
+          marginRight={SPACING.spacing6}
         >
           <Trans
             t={t}
@@ -58,7 +64,7 @@ export function KeyParts(): JSX.Element {
               block: (
                 <Text
                   fontSize={TYPOGRAPHY.fontSizeP}
-                  marginBottom={SPACING_3}
+                  marginBottom={SPACING.spacing4}
                 />
               ),
             }}
@@ -71,12 +77,24 @@ export function KeyParts(): JSX.Element {
               block: (
                 <Text
                   fontSize={TYPOGRAPHY.fontSizeP}
-                  marginBottom={SPACING_3}
+                  marginBottom={SPACING.spacing4}
                 />
               ),
             }}
           />
-          <img src={HeaterShakerDeckLock} alt="Heater Shaker Deck Lock" />
+          <video
+            key={HeaterShakerDeckLock}
+            css={css`
+              max-width: 100%;
+              max-height: 10rem;
+            `}
+            autoPlay={true}
+            loop={true}
+            controls={false}
+            data-testid={'heater_shaker_deck_lock'}
+          >
+            <source src={HeaterShakerDeckLock} />
+          </video>
         </Flex>
       </Flex>
     </>

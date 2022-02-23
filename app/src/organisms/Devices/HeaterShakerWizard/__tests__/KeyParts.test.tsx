@@ -11,7 +11,7 @@ const render = () => {
 
 describe('KeyParts', () => {
   it('renders correct title, image and body', () => {
-    const { getByText, getByAltText } = render()
+    const { getByText, getByAltText, getByTestId } = render()
 
     getByText('Key Heater Shaker parts and terminology')
     getByText(
@@ -39,5 +39,7 @@ describe('KeyParts', () => {
       'Extending the bolts slightly increases the module’s footprint, which allows it to be more firmly attached to the edges of a slot.'
     )
     getByAltText('Heater Shaker Key Parts')
+
+    getByTestId('heater_shaker_deck_lock')
   })
 })
