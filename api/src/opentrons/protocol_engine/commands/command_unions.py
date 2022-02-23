@@ -5,6 +5,14 @@ from typing import Union
 from . import heater_shaker
 from . import magnetic_module
 
+from .set_rail_lights import (
+    SetRailLights,
+    SetRailLightsCommandType,
+    SetRailLightsCreate,
+    SetRailLightsParams,
+    SetRailLightsResult,
+)
+
 from .aspirate import (
     Aspirate,
     AspirateParams,
@@ -130,6 +138,7 @@ Command = Union[
     heater_shaker.OpenLatch,
     heater_shaker.CloseLatch,
     magnetic_module.Engage,
+    SetRailLights,
 ]
 
 CommandParams = Union[
@@ -154,6 +163,7 @@ CommandParams = Union[
     heater_shaker.OpenLatchParams,
     heater_shaker.CloseLatchParams,
     magnetic_module.EngageParams,
+    SetRailLightsParams,
 ]
 
 CommandType = Union[
@@ -178,6 +188,7 @@ CommandType = Union[
     heater_shaker.OpenLatchCommandType,
     heater_shaker.CloseLatchCommandType,
     magnetic_module.EngageCommandType,
+    SetRailLightsCommandType,
 ]
 
 CommandCreate = Union[
@@ -201,6 +212,7 @@ CommandCreate = Union[
     heater_shaker.OpenLatchCreate,
     heater_shaker.CloseLatchCreate,
     magnetic_module.EngageCreate,
+    SetRailLightsCreate,
 ]
 
 CommandResult = Union[
@@ -225,4 +237,5 @@ CommandResult = Union[
     heater_shaker.OpenLatchResult,
     heater_shaker.CloseLatchResult,
     magnetic_module.EngageResult,
+    SetRailLightsResult,
 ]
