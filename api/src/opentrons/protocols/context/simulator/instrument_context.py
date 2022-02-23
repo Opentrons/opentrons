@@ -140,7 +140,7 @@ class InstrumentContextSimulation(AbstractInstrument):
         return self._pipette_dict["current_volume"]
 
     def get_available_volume(self) -> float:
-        return self._pipette_dict["available_volume"]
+        return self._pipette_dict["working_volume"] - self.get_current_volume()
 
     def get_pipette(self) -> PipetteDict:
         return self._pipette_dict
