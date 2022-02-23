@@ -73,7 +73,7 @@ export const Slideout = (props: Props): JSX.Element | null => {
         right="0"
         top="0"
         backgroundColor={COLORS.white}
-        boxShadow={TYPOGRAPHY.boxShadowM}
+        boxShadow={'0px 3px 6px rgba(0, 0, 0, 0.23)'}
         borderRadius={SPACING_1}
       >
         <Flex padding={SPACING_3} flexDirection={DIRECTION_COLUMN}>

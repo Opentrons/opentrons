@@ -8,7 +8,7 @@ class CameraException(Exception):
     pass
 
 
-async def take_picture(filename: Path, loop: asyncio.AbstractEventLoop = None):
+async def take_picture(filename: Path):
     """Take a picture and save it to filename
 
     :param filename: Name of file to save picture to
@@ -30,7 +30,6 @@ async def take_picture(filename: Path, loop: asyncio.AbstractEventLoop = None):
     proc = await asyncio.create_subprocess_shell(
         f"{cmd} {filename}",
         stderr=asyncio.subprocess.PIPE,
-        loop=loop or asyncio.get_event_loop(),
     )
 
     res = await proc.stderr.read()  # type: ignore

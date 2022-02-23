@@ -19,6 +19,10 @@ export interface ModalPageProps {
   outerProps?: React.ComponentProps<typeof Box>
 }
 
+/**
+ * @deprecated Use `Interstitial` instead
+ */
+
 export function ModalPage(props: ModalPageProps): JSX.Element {
   const { titleBar, heading, innerProps = {}, outerProps = {} } = props
 
