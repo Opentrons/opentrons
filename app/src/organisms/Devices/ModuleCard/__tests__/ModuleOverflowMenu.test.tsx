@@ -8,6 +8,13 @@ import {
   mockThermocycler,
 } from '../../../../redux/modules/__fixtures__'
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
+import { AboutModuleSlideout } from '../AboutModuleSlideout'
+
+jest.mock('../AboutModuleSlideout')
+
+const mockAboutModuleSlideout = AboutModuleSlideout as jest.MockedFunction<
+  typeof AboutModuleSlideout
+>
 
 const render = (props: React.ComponentProps<typeof ModuleOverflowMenu>) => {
   return renderWithProviders(<ModuleOverflowMenu {...props} />, {
@@ -22,6 +29,7 @@ describe('ModuleOverflowMenu', () => {
       module: mockMagneticModule,
       handleClick: jest.fn(),
     }
+    mockAboutModuleSlideout.mockReturnValue(<div>mock about module</div>)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -39,6 +47,7 @@ describe('ModuleOverflowMenu', () => {
     fireEvent.click(buttonAbout)
     expect(buttonAbout).toBeEnabled()
     expect(getByText('About module')).toHaveStyle('color: #16212D')
+    getByText('mock about module')
   })
   it('renders hover state color correctly', () => {
     const { getByRole } = render(props)
@@ -51,20 +60,19 @@ describe('ModuleOverflowMenu', () => {
       }
     )
   })
-  //  todo imemdiately: add on to following 2 tests when their slideout component is made
   it('renders the correct temperature module menu', () => {
     props = {
       module: mockTemperatureModuleGen2,
       handleClick: jest.fn(),
     }
-    const { getByRole } = render(props)
+    const { getByRole, getByText } = render(props)
     const buttonSetting = getByRole('button', {
       name: 'Set module temperature',
     })
     fireEvent.click(buttonSetting)
     const buttonAbout = getByRole('button', { name: 'About module' })
     fireEvent.click(buttonAbout)
-    expect(buttonAbout).toBeEnabled()
+    getByText('mock about module')
     expect(buttonSetting).toBeEnabled()
   })
   it('renders the correct TC module menu', () => {
@@ -72,7 +80,7 @@ describe('ModuleOverflowMenu', () => {
       module: mockThermocycler,
       handleClick: jest.fn(),
     }
-    const { getByRole } = render(props)
+    const { getByRole, getByText } = render(props)
     const buttonSettingLid = getByRole('button', {
       name: 'Set lid temperature',
     })
@@ -83,7 +91,7 @@ describe('ModuleOverflowMenu', () => {
       name: 'Set block temperature',
     })
     fireEvent.click(buttonSettingBlock)
-    expect(buttonAbout).toBeEnabled()
+    getByText('mock about module')
     expect(buttonSettingLid).toBeEnabled()
     expect(buttonSettingBlock).toBeEnabled()
   })
