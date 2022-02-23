@@ -184,7 +184,7 @@ export const nextGenRoutes: RouteProps[] = [
     component: RobotSettings,
     exact: true,
     name: 'Robot Settings',
-    path: '/devices/:robotName/robot-settings/:robotSettingsTab',
+    path: '/devices/:robotName/robot-settings/:robotSettingsTab?',
   },
   {
     component: () => <div>protocol runs landing</div>,

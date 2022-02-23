@@ -57,4 +57,12 @@ describe('RobotSettings', () => {
     calibrationTab.click()
     getByText('Mock RobotSettingsCalibration')
   })
+
+  it('defaults to calibration content when given an unspecified tab', () => {
+    const [{ getByText }] = render(
+      '/devices/otie/robot-settings/this-is-not-a-real-tab'
+    )
+
+    getByText('Mock RobotSettingsCalibration')
+  })
 })

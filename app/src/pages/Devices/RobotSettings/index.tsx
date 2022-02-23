@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { NavLink, useParams } from 'react-router-dom'
+import { NavLink, Redirect, useParams } from 'react-router-dom'
 import styled from 'styled-components'
 
 import {
@@ -36,7 +36,10 @@ export function RobotSettings(): JSX.Element | null {
     advanced: () => <div>advanced</div>,
   }
 
-  const RobotSettingsContent = robotSettingsContentByTab[robotSettingsTab]
+  const RobotSettingsContent =
+    robotSettingsContentByTab[robotSettingsTab] ??
+    // default to the calibration tab if no tab or nonexistent tab is passed as a param
+    (() => <Redirect to={`/devices/${robotName}/robot-settings/calibration`} />)
 
   interface NavTabProps {
     to: string
