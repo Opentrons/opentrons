@@ -1,5 +1,5 @@
 import * as Yup from 'yup'
-import { getAllLoadNames, getAllDisplayNames } from '../definitions'
+import { getAllLoadNames, getAllDisplayNames } from '@opentrons/shared-data'
 import { getDefaultLoadName, getDefaultDisplayName } from './formSelectors'
 import {
   labwareTypeOptions,

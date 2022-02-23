@@ -4,12 +4,12 @@ import { shallow } from 'enzyme'
 
 import { LabwareList } from '..'
 import { LabwareCard } from '../LabwareCard'
-import * as definitions from '../../../definitions'
+import { getAllDefinitions } from '@opentrons/shared-data'
+// how do I mock this properly??
+jest.mock('@opentrons/shared-data')
 
-jest.mock('../../../definitions')
-
-const getAllDefinitions = definitions.getAllDefinitions as jest.MockedFunction<
-  typeof definitions.getAllDefinitions
+const mockGetAllDefinitions = getAllDefinitions as jest.MockedFunction<
+  typeof getAllDefinitions
 >
 
 const filtersOff = { category: 'all', manufacturer: 'all' }
@@ -34,6 +34,6 @@ describe('LabwareList', () => {
   it('renders a LabwareCard per labware definition', () => {
     const tree = shallow(<LabwareList filters={filtersOff} />)
 
-    expect(tree.find(LabwareCard)).toHaveLength(getAllDefinitions().length)
+    expect(tree.find(LabwareCard)).toHaveLength(mockGetAllDefinitions().length)
   })
 })
