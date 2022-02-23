@@ -89,7 +89,7 @@ class AddLinearMoveRequestPayload(AddToMoveGroupRequestPayload):
 
 
 @dataclass
-class HomeRequest(AddToMoveGroupRequestPayload):
+class HomeRequestPayload(AddToMoveGroupRequestPayload):
     """Request to home."""
 
     velocity: utils.Int32Field

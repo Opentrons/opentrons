@@ -310,8 +310,8 @@ class FirmwareUpdateStatusResponse:  # noqa: D101
 
 @dataclass
 class HomeRequest:  # noqa: D101
-    payload: payloads.HomeRequest
-    payload_type: Type[BinarySerializable] = payloads.HomeRequest
+    payload: payloads.HomeRequestPayload
+    payload_type: Type[BinarySerializable] = payloads.HomeRequestPayload
     message_id: Literal[MessageId.home_request] = MessageId.home_request
 
 
