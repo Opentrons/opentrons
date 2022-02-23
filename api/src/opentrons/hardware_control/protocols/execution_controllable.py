@@ -28,6 +28,6 @@ class ExecutionControllable(Protocol):
         """
         ...
 
-    async def delay(self, duration_s: float):
+    async def delay(self, duration_s: float) -> None:
         """Delay execution by pausing and sleeping."""
         ...

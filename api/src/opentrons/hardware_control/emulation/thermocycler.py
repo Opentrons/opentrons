@@ -37,7 +37,7 @@ class ThermocyclerEmulator(AbstractEmulator):
         joined = " ".join(r for r in results if r)
         return None if not joined else joined
 
-    def reset(self):
+    def reset(self) -> None:
         self._lid_temperature = Temperature(
             per_tick=self._settings.lid_temperature.degrees_per_tick,
             current=self._settings.lid_temperature.starting,

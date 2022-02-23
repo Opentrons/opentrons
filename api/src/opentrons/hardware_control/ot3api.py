@@ -13,6 +13,8 @@ from typing import (
     Tuple,
     Sequence,
     Set,
+    Mapping,
+    Any,
 )
 
 
@@ -22,14 +24,12 @@ from opentrons.config import robot_configs
 from opentrons.config.types import RobotConfig, OT3Config, GantryLoad
 from .backends.ot3utils import get_system_constraints
 
-try:
-    from opentrons_hardware.hardware_control.motion_planning import (
-        MoveManager,
-        MoveTarget,
-        ZeroLengthMoveError,
-    )
-except ModuleNotFoundError:
-    pass
+from opentrons_hardware.hardware_control.motion_planning import (
+    MoveManager,
+    MoveTarget,
+    ZeroLengthMoveError,
+)
+
 
 from .util import use_or_initialize_loop, check_motion_bounds
 from .pipette import (
@@ -171,7 +171,7 @@ class OT3API(
         return self._door_state
 
     @door_state.setter
-    def door_state(self, door_state: DoorState):
+    def door_state(self, door_state: DoorState) -> None:
         self._door_state = door_state
 
     @property
@@ -179,13 +179,13 @@ class OT3API(
         return self._gantry_load
 
     @gantry_load.setter
-    def gantry_load(self, gantry_load: GantryLoad):
+    def gantry_load(self, gantry_load: GantryLoad) -> None:
         self._gantry_load = gantry_load
         self._move_manager.update_constraints(
             get_system_constraints(self._config.motion_settings, gantry_load)
         )
 
-    def _update_door_state(self, door_state: DoorState):
+    def _update_door_state(self, door_state: DoorState) -> None:
         mod_log.info(f"Updating the window switch status: {door_state}")
         self.door_state = door_state
         self._pause_manager.set_door(self.door_state)
@@ -198,18 +198,18 @@ class OT3API(
             except Exception:
                 mod_log.exception("Errored during door state event callback")
 
-    def _reset_last_mount(self):
+    def _reset_last_mount(self) -> None:
         self._last_moved_mount = None
 
     @classmethod
     async def build_hardware_controller(
         cls,
-        attached_instruments: Dict[
-            Union[top_types.Mount, OT3Mount], Dict[str, Optional[str]]
+        attached_instruments: Optional[
+            Dict[Union[top_types.Mount, OT3Mount], Dict[str, Optional[str]]]
         ] = None,
-        attached_modules: List[str] = None,
-        config: Union[OT3Config, RobotConfig] = None,
-        loop: asyncio.AbstractEventLoop = None,
+        attached_modules: Optional[List[str]] = None,
+        config: Union[OT3Config, RobotConfig, None] = None,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
         strict_attached_instruments: bool = True,
     ) -> "OT3API":
         """Build an ot3 hardware controller."""
@@ -225,12 +225,12 @@ class OT3API(
     @classmethod
     async def build_hardware_simulator(
         cls,
-        attached_instruments: Dict[
-            Union[top_types.Mount, OT3Mount], Dict[str, Optional[str]]
+        attached_instruments: Optional[
+            Dict[Union[top_types.Mount, OT3Mount], Dict[str, Optional[str]]]
         ] = None,
-        attached_modules: List[str] = None,
-        config: Union[RobotConfig, OT3Config] = None,
-        loop: asyncio.AbstractEventLoop = None,
+        attached_modules: Optional[List[str]] = None,
+        config: Union[RobotConfig, OT3Config, None] = None,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
         strict_attached_instruments: bool = True,
     ) -> "OT3API":
         """Build a simulating hardware controller.
@@ -263,7 +263,7 @@ class OT3API(
         await backend.watch(api_instance.loop)
         return api_instance
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<{} using backend {}>".format(type(self), type(self._backend))
 
     @property
@@ -272,7 +272,7 @@ class OT3API(
         return self._loop
 
     @property
-    def is_simulator(self):
+    def is_simulator(self) -> bool:
         """`True` if this is a simulator; `False` otherwise."""
         return isinstance(self._backend, OT3Simulator)
 
@@ -282,7 +282,7 @@ class OT3API(
         """
         self._callbacks.add(cb)
 
-        def unregister():
+        def unregister() -> None:
             self._callbacks.remove(cb)
 
         return unregister
@@ -317,7 +317,7 @@ class OT3API(
         """Return the current status of the robot lights."""
         return self._backend.get_lights()
 
-    async def identify(self, duration_s: int = 5):
+    async def identify(self, duration_s: int = 5) -> None:
         """Blink the button light to identify the robot."""
         count = duration_s * 4
         on = False
@@ -330,7 +330,7 @@ class OT3API(
         await self.set_lights(button=True)
 
     @ExecutionManagerProvider.wait_for_running
-    async def delay(self, duration_s: float):
+    async def delay(self, duration_s: float) -> None:
         """Delay execution by pausing and sleeping."""
         self.pause(PauseType.DELAY)
         try:
@@ -345,7 +345,7 @@ class OT3API(
     async def update_firmware(
         self,
         firmware_file: str,
-        loop: asyncio.AbstractEventLoop = None,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
         explicit_modeset: bool = True,
     ) -> str:
         """Update the firmware on the hardware."""
@@ -406,25 +406,25 @@ class OT3API(
         self.gantry_load = GantryLoad.TWO_LOW_THROUGHPUT
 
     # Global actions API
-    def pause(self, pause_type: PauseType):
+    def pause(self, pause_type: PauseType) -> None:
         """
         Pause motion of the robot after a current motion concludes."""
         self._pause_manager.pause(pause_type)
 
-        async def _chained_calls():
+        async def _chained_calls() -> None:
             await self._execution_manager.pause()
             self._backend.pause()
 
         asyncio.run_coroutine_threadsafe(_chained_calls(), self._loop)
 
-    def pause_with_message(self, message: str):
+    def pause_with_message(self, message: str) -> None:
         self._log.warning(f"Pause with message: {message}")
         notification = ErrorMessageNotification(message=message)
         for cb in self._callbacks:
             cb(notification)
         self.pause(PauseType.PAUSE)
 
-    def resume(self, pause_type: PauseType):
+    def resume(self, pause_type: PauseType) -> None:
         """
         Resume motion after a call to :py:meth:`pause`.
         """
@@ -437,7 +437,7 @@ class OT3API(
         #  methods (ThreadManager)
         self._backend.resume()
 
-        async def _chained_calls():
+        async def _chained_calls() -> None:
             # mirror what happens API.pause.
             await self._execution_manager.resume()
             self._backend.resume()
@@ -449,7 +449,7 @@ class OT3API(
         await self._backend.hard_halt()
         asyncio.run_coroutine_threadsafe(self._execution_manager.cancel(), self._loop)
 
-    async def stop(self, home_after: bool = True):
+    async def stop(self, home_after: bool = True) -> None:
         """Stop motion as soon as possible, reset, and optionally home."""
         await self._backend.halt()
         self._log.info("Recovering from halt")
@@ -458,7 +458,7 @@ class OT3API(
         if home_after:
             await self.home()
 
-    async def reset(self):
+    async def reset(self) -> None:
         """Reset the stored state of the system."""
         self._pause_manager.reset()
         await self._execution_manager.reset()
@@ -466,7 +466,9 @@ class OT3API(
         await self.cache_instruments()
 
     # Gantry/frame (i.e. not pipette) action API
-    async def home_z(self, mount: Optional[Union[top_types.Mount, OT3Mount]] = None):
+    async def home_z(
+        self, mount: Optional[Union[top_types.Mount, OT3Mount]] = None
+    ) -> None:
         """Home the two z-axes"""
         self._reset_last_mount()
         if isinstance(mount, (top_types.Mount, OT3Mount)):
@@ -477,10 +479,10 @@ class OT3API(
 
     async def _do_plunger_home(
         self,
-        axis: OT3Axis = None,
-        mount: OT3Mount = None,
+        axis: Optional[OT3Axis] = None,
+        mount: Optional[OT3Mount] = None,
         acquire_lock: bool = True,
-    ):
+    ) -> None:
         assert (axis is not None) ^ (mount is not None), "specify either axis or mount"
         if axis:
             checked_axis = axis
@@ -511,7 +513,7 @@ class OT3API(
                     home_flagged_axes=False,
                 )
 
-    async def home_plunger(self, mount: Union[top_types.Mount, OT3Mount]):
+    async def home_plunger(self, mount: Union[top_types.Mount, OT3Mount]) -> None:
         """
         Home the plunger motor for a mount, and then return it to the 'bottom'
         position.
@@ -521,7 +523,9 @@ class OT3API(
         await self._do_plunger_home(mount=checked_mount, acquire_lock=True)
 
     @ExecutionManagerProvider.wait_for_running
-    async def home(self, axes: Optional[Union[List[Axis], List[OT3Axis]]] = None):
+    async def home(
+        self, axes: Optional[Union[List[Axis], List[OT3Axis]]] = None
+    ) -> None:
         """Home the entire robot and initialize current position."""
         self._reset_last_mount()
         # Initialize/update current_position
@@ -624,7 +628,7 @@ class OT3API(
         speed: Optional[float] = None,
         critical_point: Optional[CriticalPoint] = None,
         max_speeds: Union[None, Dict[Axis, float], OT3AxisMap[float]] = None,
-    ):
+    ) -> None:
         """Move the critical point of the specified mount to a location
         relative to the deck, at the specified speed."""
         if not self._current_position:
@@ -656,7 +660,7 @@ class OT3API(
         max_speeds: Union[None, Dict[Axis, float], OT3AxisMap[float]] = None,
         check_bounds: MotionChecks = MotionChecks.NONE,
         fail_on_not_homed: bool = False,
-    ):
+    ) -> None:
         """Move the critical point of the specified mount by a specified
         displacement in a specified direction, at the specified speed."""
 
@@ -711,12 +715,12 @@ class OT3API(
     async def _move(
         self,
         target_position: "OrderedDict[OT3Axis, float]",
-        speed: float = None,
+        speed: Optional[float] = None,
         home_flagged_axes: bool = True,
-        max_speeds: OT3AxisMap[float] = None,
+        max_speeds: Optional[OT3AxisMap[float]] = None,
         acquire_lock: bool = True,
         check_bounds: MotionChecks = MotionChecks.NONE,
-    ):
+    ) -> None:
         """Worker function to apply robot motion."""
         machine_pos = machine_from_deck(
             target_position,
@@ -766,7 +770,7 @@ class OT3API(
     def engaged_axes(self) -> Dict[Axis, bool]:
         return self.get_engaged_axes()
 
-    async def disengage_axes(self, which: Union[List[Axis], List[OT3Axis]]):
+    async def disengage_axes(self, which: Union[List[Axis], List[OT3Axis]]) -> None:
         axes = [OT3Axis.from_axis(ax) for ax in which]
         await self._backend.disengage_axes(axes)
 
@@ -826,17 +830,17 @@ class OT3API(
         else:
             self._log.error("Tried to specify an OT2 config object")
 
-    async def update_config(self, **kwargs):
+    async def update_config(self, **kwargs: Mapping[str, Any]) -> None:
         """Update values of the robot's configuration."""
         self._config = replace(self._config, **kwargs)
 
-    async def update_deck_calibration(self, new_transform):
+    async def update_deck_calibration(self, new_transform: RobotCalibration) -> None:
         pass
 
     # Pipette action API
     async def prepare_for_aspirate(
         self, mount: Union[top_types.Mount, OT3Mount], rate: float = 1.0
-    ):
+    ) -> None:
         """Prepare the pipette for aspiration."""
         checked_mount = OT3Mount.from_mount(mount)
         instrument = self._instrument_handler.get_pipette(checked_mount)
@@ -865,7 +869,7 @@ class OT3API(
         mount: Union[top_types.Mount, OT3Mount],
         volume: Optional[float] = None,
         rate: float = 1.0,
-    ):
+    ) -> None:
         """
         Aspirate a volume of liquid (in microliters/uL) using this pipette."""
         realmount = OT3Mount.from_mount(mount)
@@ -902,7 +906,7 @@ class OT3API(
         mount: Union[top_types.Mount, OT3Mount],
         volume: Optional[float] = None,
         rate: float = 1.0,
-    ):
+    ) -> None:
         """
         Dispense a volume of liquid in microliters(uL) using this pipette."""
         realmount = OT3Mount.from_mount(mount)
@@ -1029,7 +1033,7 @@ class OT3API(
         instrument.working_volume = tip_volume
 
     async def drop_tip(
-        self, mount: Union[top_types.Mount, OT3Mount], home_after=True
+        self, mount: Union[top_types.Mount, OT3Mount], home_after: bool = True
     ) -> None:
         """Drop tip at the current location."""
         realmount = OT3Mount.from_mount(mount)
@@ -1098,7 +1102,9 @@ class OT3API(
         )
 
     def critical_point_for(
-        self, mount: Union[top_types.Mount, OT3Mount], cp_override: CriticalPoint = None
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        cp_override: Optional[CriticalPoint] = None,
     ) -> top_types.Point:
         return self._instrument_handler.critical_point_for(
             OT3Mount.from_mount(mount), cp_override

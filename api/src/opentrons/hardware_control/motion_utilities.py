@@ -34,7 +34,7 @@ def _x_for_mount(mount: OT3Mount) -> OT3Axis:
     ...
 
 
-def _x_for_mount(mount):
+def _x_for_mount(mount: Union[Mount, OT3Mount]) -> Union[Axis, OT3Axis]:
     if isinstance(mount, Mount):
         return Axis.X
     else:
@@ -51,7 +51,7 @@ def _y_for_mount(mount: OT3Mount) -> OT3Axis:
     ...
 
 
-def _y_for_mount(mount):
+def _y_for_mount(mount: Union[Mount, OT3Mount]) -> Union[Axis, OT3Axis]:
     if isinstance(mount, Mount):
         return Axis.Y
     else:
@@ -68,7 +68,7 @@ def _z_for_mount(mount: OT3Mount) -> OT3Axis:
     ...
 
 
-def _z_for_mount(mount):
+def _z_for_mount(mount: Union[Mount, OT3Mount]) -> Union[Axis, OT3Axis]:
     if isinstance(mount, Mount):
         return Axis.by_mount(mount)
     else:
@@ -85,7 +85,7 @@ def _plunger_for_mount(mount: OT3Mount) -> OT3Axis:
     ...
 
 
-def _plunger_for_mount(mount):
+def _plunger_for_mount(mount: Union[Mount, OT3Mount]) -> Union[Axis, OT3Axis]:
     if isinstance(mount, Mount):
         return Axis.of_plunger(mount)
     else:
@@ -102,7 +102,7 @@ def _axis_name(ax: OT3Axis) -> OT3Axis:
     ...
 
 
-def _axis_name(ax):
+def _axis_name(ax: Union[Axis, OT3Axis]) -> Union[str, OT3Axis]:
     if isinstance(ax, Axis):
         return ax.name
     else:
@@ -119,7 +119,7 @@ def _axis_enum(ax: OT3Axis) -> OT3Axis:
     ...
 
 
-def _axis_enum(ax):
+def _axis_enum(ax: Union[str, OT3Axis]) -> Union[Axis, OT3Axis]:
     if isinstance(ax, OT3Axis):
         return ax
     else:
@@ -148,7 +148,29 @@ def target_position_from_absolute(
     ...
 
 
-def target_position_from_absolute(
+# a note on the type ignoring of this and other overload implementation
+# functions: These functions are overloads in the first place because
+# that's the only way to create a semantic link between syntactically
+# unrelated types - the types of different arguments and return types
+# that can't really be related to each other in the type system. for
+# instance,
+# def do_something(a: Union[str, int], b: Union[str, int])
+# implies that all of the four cases of (a: int, b: str), (a: str, b: str),
+# (a: int, b: int, a: str, b: int) are semantically valid. typing
+# @overload
+# def do_something(a: int, b: int)
+# @overload
+# def do_something(a: str, b: str)
+# narrows that to 2.
+#
+# It's needed here because OT3Mount and OT3Axis can't really be
+# related, neither can Mount and Axis and str, etc.
+# The problem is that this is for _external callers_. When typechecking
+# the implementation of the overload, mypy doesn't consider the overload
+# type signatures (see e.g. https://github.com/python/mypy/issues/9503).
+# And as discussed above, there's no way to write the type signature without
+# them. So, ignored.
+def target_position_from_absolute(  # type: ignore
     mount,
     abs_position,
     get_critical_point,
@@ -182,7 +204,7 @@ def target_position_from_relative(
     ...
 
 
-def target_position_from_relative(
+def target_position_from_relative(  # type: ignore
     mount,
     delta,
     current_position,
@@ -215,7 +237,7 @@ def target_position_from_plunger(
     ...
 
 
-def target_position_from_plunger(
+def target_position_from_plunger(  # type: ignore
     mount,
     delta,
     current_position,
@@ -273,7 +295,7 @@ def machine_from_deck(
     ...
 
 
-def machine_from_deck(
+def machine_from_deck(  # type: ignore
     deck_pos,
     attitude,
     offset,
@@ -329,7 +351,12 @@ def deck_from_machine(
     ...
 
 
-def deck_from_machine(machine_pos, attitude, offset, axis_enum):
+def deck_from_machine(  # type: ignore
+    machine_pos,
+    attitude,
+    offset,
+    axis_enum,
+):
     """Build a deck-abs position store from the machine's position"""
     with_enum = {_axis_enum(k): v for k, v in machine_pos.items()}
     plunger_axes = {k: v for k, v in with_enum.items() if k not in k.gantry_axes()}

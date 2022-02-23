@@ -2,7 +2,7 @@
 
 import json
 from unittest import mock
-from typing import Any, Dict
+from typing import Any, Dict, cast
 
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.pipette.dev_types import LabwareUri
@@ -17,6 +17,8 @@ from opentrons.types import Mount, Point, Location, TransferTipPolicy
 from opentrons.hardware_control import API, NoTipAttachedError
 from opentrons.hardware_control.pipette import Pipette
 from opentrons.hardware_control.types import Axis
+from opentrons.hardware_control.protocols import HardwareControlAPI
+from opentrons.hardware_control.adapters import SynchronousAdapter
 from opentrons.protocols.advanced_control import transfers as tf
 from opentrons.config.pipette_config import config_names
 from opentrons.protocols.api_support.types import APIVersion
@@ -266,7 +268,7 @@ def test_return_tip_old_version(loop, hardware, get_labware_def):
     ctx = papi.ProtocolContext(
         implementation=ProtocolContextImplementation(
             api_version=api_version,
-            sync_hardware=hardware.sync,
+            sync_hardware=cast(SynchronousAdapter[HardwareControlAPI], hardware.sync),
         ),
         loop=loop,
         api_version=api_version,
@@ -627,7 +629,7 @@ def test_touch_tip_default_args(loop, monkeypatch, hardware):
     ctx = papi.ProtocolContext(
         implementation=ProtocolContextImplementation(
             api_version=api_version,
-            sync_hardware=hardware.sync,
+            sync_hardware=cast(SynchronousAdapter[HardwareControlAPI], hardware.sync),
         ),
         loop=loop,
         api_version=api_version,
@@ -930,7 +932,7 @@ def test_order_of_module_load(loop):
     thread_manager = hardware_control.ThreadManager(
         hardware_control.API.build_hardware_simulator, attached_modules=mods
     )
-    fake_hardware = thread_manager.sync
+    fake_hardware = cast(SynchronousAdapter[HardwareControlAPI], thread_manager.sync)
 
     attached_modules = fake_hardware.attached_modules
     hw_temp1 = attached_modules[0]

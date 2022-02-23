@@ -2,11 +2,13 @@
 """
 import asyncio
 import functools
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, Callable, Sequence, Mapping, Any, cast
 from .protocols import AsyncioConfigurable
 
 
-WrappedObj = TypeVar("WrappedObj", bound=AsyncioConfigurable, covariant=True)
+WrappedObj = TypeVar("WrappedObj", bound=AsyncioConfigurable)
+WrappedReturn = TypeVar("WrappedReturn")
+WrappedFunc = TypeVar("WrappedFunc", bound=Callable[..., WrappedReturn])
 
 
 # TODO: BC 2020-02-25 instead of overwriting __get_attribute__ in this class
@@ -46,15 +48,23 @@ class SynchronousAdapter(Generic[WrappedObj]):
         """
         self._obj_to_adapt = asynchronous_instance
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<SynchronousAdapter>"
 
     @staticmethod
-    def call_coroutine_sync(loop, to_call, *args, **kwargs):
-        fut = asyncio.run_coroutine_threadsafe(to_call(*args, **kwargs), loop)
+    def call_coroutine_sync(
+        loop: asyncio.AbstractEventLoop,
+        to_call: WrappedFunc,
+        *args: Sequence[Any],
+        **kwargs: Mapping[str, Any]
+    ) -> WrappedReturn:
+        fut = cast(
+            "asyncio.Future[WrappedReturn]",
+            asyncio.run_coroutine_threadsafe(to_call(*args, **kwargs), loop),
+        )
         return fut.result()
 
-    def __getattribute__(self, attr_name):
+    def __getattribute__(self, attr_name: str) -> Any:
         """Retrieve attributes from our API and wrap coroutines"""
         # Almost every attribute retrieved from us will be for people actually
         # looking for an attribute of the hardware API, so check there first.
