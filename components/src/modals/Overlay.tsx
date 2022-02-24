@@ -10,10 +10,6 @@ export interface OverlayProps {
   opacity?: number
 }
 
-const CLICKABLE = css`
-  @apply --clickable;
-`
-
 export function Overlay(props: OverlayProps): JSX.Element {
   const { alertOverlay, onClick } = props
 
@@ -26,7 +22,6 @@ export function Overlay(props: OverlayProps): JSX.Element {
 
   return (
     <Flex
-      css={onClick != null ? CLICKABLE : ''}
       position={POSITION_ABSOLUTE}
       left="0"
       right="0"
