@@ -178,6 +178,7 @@ class LabwareView(HasState[LabwareState]):
             ) from e
 
     def get_id_by_module(self, module_id: str) -> Optional[str]:
+        """Return the ID of the labware loaded on the given module."""
         raise NotImplementedError()
 
     def get_definition(self, labware_id: str) -> LabwareDefinition:
@@ -334,6 +335,12 @@ class LabwareView(HasState[LabwareState]):
     def get_magnet_engage_height_above_base_true_mm(
         self, labware_id: str
     ) -> Optional[float]:
+        """Return a labware's default Magnetic Module engage height.
+
+        For historical reasons, certain labware that set this property
+        use different units or a different origin point.
+        This function normalizes it to true millimeters above the labware base plane.
+        """
         raise NotImplementedError()
 
     def get_labware_offset_vector(self, labware_id: str) -> LabwareOffsetVector:
