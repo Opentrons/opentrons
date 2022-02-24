@@ -56,20 +56,3 @@ async def test_messaging(
     mock_messenger.send.side_effect = responder
 
     await subject.run(1, 1)
-
-    assert mock_messenger.send.mock_calls == [
-        call(
-            # change node id
-            node_id=NodeId.head,
-            message=message_definitions.AttachedToolsRequest(
-                payload=payloads.EmptyPayload()
-            ),
-        ),
-        call(
-            # change node id
-            node_id=NodeId.head,
-            message=message_definitions.AttachedToolsRequest(
-                payload=payloads.EmptyPayload()
-            ),
-        ),
-    ]
