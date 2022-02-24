@@ -177,7 +177,7 @@ class LabwareView(HasState[LabwareState]):
                 f"Labware {labware_id} not found."
             ) from e
 
-    def get_id_by_module(self, module_id: str) -> str:
+    def get_id_by_module(self, module_id: str) -> Optional[str]:
         raise NotImplementedError()
 
     def get_definition(self, labware_id: str) -> LabwareDefinition:
@@ -331,7 +331,9 @@ class LabwareView(HasState[LabwareState]):
             z=dims.zDimension,
         )
 
-    def get_magnet_engage_height_above_base_true_mm(self, labware_id: str) -> float:
+    def get_magnet_engage_height_above_base_true_mm(
+        self, labware_id: str
+    ) -> Optional[float]:
         raise NotImplementedError()
 
     def get_labware_offset_vector(self, labware_id: str) -> LabwareOffsetVector:

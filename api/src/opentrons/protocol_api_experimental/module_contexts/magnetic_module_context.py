@@ -120,7 +120,7 @@ class MagneticModuleContext:  # noqa: D101
 
         if height is not None:
             true_mm_above_base = state.modules.calculate_magnet_true_mm_above_base(
-                module_id=self._module_id,
+                module_id=self._module_id,  # TODO: Change to module model?
                 hardware_units_above_home=height,
             )
 
@@ -139,12 +139,12 @@ class MagneticModuleContext:  # noqa: D101
                     " with the `height` or `height_from_base` parameter."
                 )
 
-            default_height_above_base_true_mm = (
+            labware_default_true_mm_above_base = (
                 state.labware.get_magnet_engage_height_above_base_true_mm(
                     labware_id=labware_id
                 )
             )
-            if default_height_above_base_true_mm is None:
+            if labware_default_true_mm_above_base is None:
                 raise InvalidMagnetEngageHeightError(
                     "The labware loaded on this Magnetic Module"
                     " does not have a default engage height,"
@@ -152,13 +152,11 @@ class MagneticModuleContext:  # noqa: D101
                     " with the `height` or `height_from_base` parameter."
                 )
 
-            if offset is None:
-                true_mm_above_base = default_height_above_base_true_mm
-            else:
-                # FIXME(mm, 2022-02-22): In APIv2, GEN1 Magnetic Modules have their
-                # offset argument in units of half-millimeters,
-                # which makes this arithmetic wrong.
-                true_mm_above_base = default_height_above_base_true_mm + offset
+            true_mm_above_base = state.modules.calculate_magnet_true_mm_above_base(
+                module_id=self._module_id,
+                labware_default_true_mm_above_base=labware_default_true_mm_above_base,
+                hardware_units_above_labware_default=(0 if offset is None else offset),
+            )
 
         self._engine_client.magnetic_module_engage(
             module_id=self._module_id,

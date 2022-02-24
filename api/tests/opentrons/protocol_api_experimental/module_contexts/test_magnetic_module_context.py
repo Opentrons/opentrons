@@ -121,9 +121,9 @@ def test_labware_property(subject: MagneticModuleContext) -> None:  # noqa: D103
 
 def test_engage_only_one_height_allowed(subject: MagneticModuleContext) -> None:
     """It should raise if you provide conflicting height arguments."""
-    # The type: ignore[call-overloads] are because
-    # the type-checker wants to stop us from miscalling this function, but
-    # we need to test that the function protects itself when there is no type-checker.
+    # These [call-overload] ignores are because the type-checker wants to stop us
+    # from miscalling this function, but we need to test that the function protects
+    # itself when there is no type-checker.
 
     with pytest.raises(InvalidMagnetEngageHeightError):
         subject.engage(height=1, height_from_base=2, offset=3)  # type: ignore[call-overload]  # noqa: E501
@@ -142,7 +142,7 @@ def test_engage_only_one_height_allowed(subject: MagneticModuleContext) -> None:
         subject.engage(height_from_base=123, offset=0)  # type: ignore[call-overload]
 
 
-def test_engage_height_from_home(
+def test_engage_with_height_from_home(
     decoy: Decoy,
     engine_client: SyncClient,
     subject_module_id: str,
@@ -163,7 +163,7 @@ def test_engage_height_from_home(
     )
 
 
-def test_engage_height_from_base(
+def test_engage_with_height_from_base(
     decoy: Decoy,
     engine_client: SyncClient,
     subject_module_id: str,
@@ -184,15 +184,101 @@ def test_engage_height_from_base(
     )
 
 
+def test_engage_with_offset(
+    decoy: Decoy,
+    engine_client: SyncClient,
+    subject_module_id: str,
+    subject: MagneticModuleContext,
+) -> None:
+    """It should use the offset combined with the labware's default engage height."""
+    decoy.when(
+        engine_client.state.labware.get_id_by_module(module_id=subject_module_id)
+    ).then_return("labware-id")
+    decoy.when(
+        engine_client.state.labware.get_magnet_engage_height_above_base_true_mm(
+            labware_id="labware-id"
+        )
+    ).then_return(1.23)
+    decoy.when(
+        engine_client.state.modules.calculate_magnet_true_mm_above_base(
+            module_id=subject_module_id,
+            labware_default_true_mm_above_base=1.23,
+            hardware_units_above_labware_default=4.56,
+        )
+    ).then_return(7.89)
+    subject.engage(offset=4.56)
+    decoy.verify(
+        engine_client.magnetic_module_engage(
+            module_id=subject_module_id, engage_height=7.89
+        )
+    )
 
-# To do before merge: Test error if no labware loaded and use offset or none
-# To do before merge: Test error if labware loaded does not have intrinsic heigh
-# Check error strings for specificity
+
+def test_engage_with_no_arguments(
+    decoy: Decoy,
+    engine_client: SyncClient,
+    subject_module_id: str,
+    subject: MagneticModuleContext,
+) -> None:
+    """It should use the default engage height from the labware."""
+    decoy.when(
+        engine_client.state.labware.get_id_by_module(module_id=subject_module_id)
+    ).then_return("labware-id")
+    decoy.when(
+        engine_client.state.labware.get_magnet_engage_height_above_base_true_mm(
+            labware_id="labware-id"
+        )
+    ).then_return(1.23)
+    decoy.when(
+        engine_client.state.modules.calculate_magnet_true_mm_above_base(
+            module_id=subject_module_id,
+            labware_default_true_mm_above_base=1.23,
+            hardware_units_above_labware_default=0,
+        )
+    ).then_return(7.89)
+    subject.engage()
+    decoy.verify(
+        engine_client.magnetic_module_engage(
+            module_id=subject_module_id, engage_height=7.89
+        )
+    )
 
 
-@pytest.mark.xfail(strict=True, raises=NotImplementedError)
-def test_engage_offset(subject: MagneticModuleContext) -> None:  # noqa: D103
-    subject.engage(offset=10)
+def test_engage_based_on_labware_errors_when_no_labware_loaded(
+    decoy: Decoy,
+    engine_client: SyncClient,
+    subject_module_id: str,
+    subject: MagneticModuleContext,
+) -> None:
+    """It should raise when there is no labware loaded on the module."""
+    decoy.when(
+        engine_client.state.labware.get_id_by_module(module_id=subject_module_id)
+    ).then_return(None)
+    with pytest.raises(InvalidMagnetEngageHeightError, match="no labware loaded"):
+        subject.engage(offset=1.23)
+    with pytest.raises(InvalidMagnetEngageHeightError, match="no labware loaded"):
+        subject.engage()
+
+
+def test_engage_based_on_labware_errors_when_labware_has_no_default_height(
+    decoy: Decoy,
+    engine_client: SyncClient,
+    subject_module_id: str,
+    subject: MagneticModuleContext,
+) -> None:
+    """It should raise when there is a labware, but it has no default magnet height."""
+    decoy.when(
+        engine_client.state.labware.get_id_by_module(module_id=subject_module_id)
+    ).then_return("labware-id")
+    decoy.when(
+        engine_client.state.labware.get_magnet_engage_height_above_base_true_mm(
+            labware_id="labware-id"
+        )
+    ).then_return(None)
+    with pytest.raises(InvalidMagnetEngageHeightError, match="does not have a default"):
+        subject.engage(offset=1.23)
+    with pytest.raises(InvalidMagnetEngageHeightError, match="does not have a default"):
+        subject.engage()
 
 
 @pytest.mark.xfail(strict=True, raises=NotImplementedError)

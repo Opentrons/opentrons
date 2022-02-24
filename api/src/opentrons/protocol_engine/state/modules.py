@@ -235,12 +235,24 @@ class ModuleView(HasState[ModuleState]):
     ) -> float:
         pass
 
+    @overload
+    def calculate_magnet_true_mm_above_base(
+        self,
+        *,
+        module_id: str,
+        labware_default_true_mm_above_base: float,
+        hardware_units_above_labware_default: float,
+    ) -> float:
+        pass
+
     def calculate_magnet_true_mm_above_base(
         self,
         *,
         module_id: str,
         hardware_units_above_home: Optional[float] = None,
         hardware_units_above_base: Optional[float] = None,
+        labware_default_true_mm_above_base: Optional[float] = None,
+        hardware_units_above_labware_default: Optional[float] = None,
     ) -> float:
         """Normalize a Magnetic Module engage height to standard units.
 
@@ -262,12 +274,23 @@ class ModuleView(HasState[ModuleState]):
                 module_id=module_id
             )
             return hardware_units_above_home - true_mm_home_to_base
+
+        elif hardware_units_above_base is not None:
+            # FIXME(mm, 2022-02-24): This is wrong for GEN1 modules
+            # because hardware units are not true millimeters.
+            return hardware_units_above_base
+
         else:
             # Guaranteed statically by overload.
-            assert hardware_units_above_base is not None
-            # FIXME(mm, 2022-02-24): This is wrong for GEN1 modules
-            # because hardeware units are not true millimeters.
-            return hardware_units_above_base
+            assert labware_default_true_mm_above_base is not None
+            assert hardware_units_above_labware_default is not None
+
+            # FIXME(mm, 2022-02-24): This arithmetic is wrong for GEN1 modules
+            # because it mixes units.
+            return (
+                labware_default_true_mm_above_base
+                + hardware_units_above_labware_default
+            )
 
     def should_dodge_thermocycler(
         self,
