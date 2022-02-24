@@ -121,8 +121,10 @@ def test_labware_property(subject: MagneticModuleContext) -> None:  # noqa: D103
 
 def test_engage_only_one_height_allowed(subject: MagneticModuleContext) -> None:
     """It should raise if you provide conflicting height arguments."""
-    # The type-checker wants to stop us from miscalling this function, but
+    # The type: ignore[call-overloads] are because
+    # the type-checker wants to stop us from miscalling this function, but
     # we need to test that the function protects itself when there is no type-checker.
+
     with pytest.raises(InvalidMagnetEngageHeightError):
         subject.engage(height=1, height_from_base=2, offset=3)  # type: ignore[call-overload]  # noqa: E501
     with pytest.raises(InvalidMagnetEngageHeightError):
@@ -131,6 +133,13 @@ def test_engage_only_one_height_allowed(subject: MagneticModuleContext) -> None:
         subject.engage(height=1, offset=3)  # type: ignore[call-overload]
     with pytest.raises(InvalidMagnetEngageHeightError):
         subject.engage(height_from_base=2, offset=3)  # type: ignore[call-overload]
+
+    # Explicitly providing an offset value of 0 is intuitively equivalent to not
+    # providing any offset, but it should still be mutually exclusive with other args.
+    with pytest.raises(InvalidMagnetEngageHeightError):
+        subject.engage(height=123, offset=0)  # type: ignore[call-overload]
+    with pytest.raises(InvalidMagnetEngageHeightError):
+        subject.engage(height_from_base=123, offset=0)  # type: ignore[call-overload]
 
 
 def test_engage_height_from_home(
@@ -173,6 +182,7 @@ def test_engage_height_from_base(
             module_id=subject_module_id, engage_height=56.78
         )
     )
+
 
 
 # To do before merge: Test error if no labware loaded and use offset or none
