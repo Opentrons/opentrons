@@ -7,14 +7,14 @@ from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.drivers.can_bus.can_messenger import MessageListenerCallback
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     AddLinearMoveRequest,
-    HomeRequest
+    HomeRequest,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     AddLinearMoveRequestPayload,
     MoveCompletedPayload,
     EmptyPayload,
     ExecuteMoveGroupRequestPayload,
-    HomeRequestPayload
+    HomeRequestPayload,
 )
 from opentrons_hardware.hardware_control.constants import (
     interrupts_per_sec,
@@ -23,7 +23,7 @@ from opentrons_hardware.hardware_control.motion import (
     MoveGroups,
     MoveGroupSingleAxisStep,
     MoveType,
-    MoveStopCondition
+    MoveStopCondition,
 )
 from opentrons_hardware.hardware_control.move_group_runner import (
     MoveGroupRunner,
@@ -59,6 +59,7 @@ def move_group_single() -> MoveGroups:
         ]
     ]
 
+
 @pytest.fixture
 def move_group_home_single() -> MoveGroups:
     return [
@@ -71,7 +72,7 @@ def move_group_home_single() -> MoveGroups:
                     duration_sec=2142,
                     acceleration_mm_sec_sq=1000,
                     stop_condition=MoveStopCondition.limit_switch,
-                    move_type=MoveType.home
+                    move_type=MoveType.home,
                 ),
             }
         ]
@@ -164,7 +165,8 @@ async def test_multi_group_clear(
 
 
 async def test_home(
-    mock_can_messenger: AsyncMock, move_group_home_single: MoveGroups) -> None:
+    mock_can_messenger: AsyncMock, move_group_home_single: MoveGroups
+) -> None:
     subject = MoveGroupRunner(move_groups=move_group_home_single)
     await subject._send_groups(can_messenger=mock_can_messenger)
     mock_can_messenger.send.assert_any_call(
@@ -177,7 +179,7 @@ async def test_home(
                     int(
                         move_group_home_single[0][0][NodeId.head].velocity_mm_sec
                         / interrupts_per_sec
-                        * (2 ** 31)
+                        * (2**31)
                     )
                 ),
                 duration=UInt32Field(
