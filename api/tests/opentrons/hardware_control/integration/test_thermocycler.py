@@ -14,7 +14,7 @@ async def thermocycler(
     emulator_settings: Settings,
 ) -> Thermocycler:
     """Thermocycler fixture."""
-    execution_manager = ExecutionManager(loop)
+    execution_manager = ExecutionManager()
     module = await Thermocycler.build(
         port=f"socket://127.0.0.1:{emulator_settings.thermocycler_proxy.driver_port}",
         execution_manager=execution_manager,

@@ -9,6 +9,10 @@ from typing_extensions import Final
 
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons_hardware.drivers.can_bus.build import build_driver
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    FirmwareUpdateStartApp,
+)
+from opentrons_hardware.firmware_bindings.messages.payloads import EmptyPayload
 from .can_args import add_can_args, build_settings
 from opentrons_hardware.firmware_update import (
     FirmwareUpdateDownloader,
@@ -81,6 +85,12 @@ async def run(args: argparse.Namespace) -> None:
         ack_wait_seconds=args.timeout_seconds,
     )
 
+    logger.info(f"Restarting FW on {target.system_node}.")
+    await messenger.send(
+        node_id=target.bootloader_node,
+        message=FirmwareUpdateStartApp(payload=EmptyPayload()),
+    )
+
     await messenger.stop()
 
     logger.info("Done")
@@ -113,7 +123,7 @@ def main() -> None:
         default=3,
     )
     parser.add_argument(
-        "--timeout-seconds", help="Number of seconds to wait.", type=float, default=2
+        "--timeout-seconds", help="Number of seconds to wait.", type=float, default=10
     )
 
     args = parser.parse_args()

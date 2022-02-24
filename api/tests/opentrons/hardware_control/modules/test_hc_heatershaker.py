@@ -28,7 +28,7 @@ async def simulating_module(usb_port, loop):
         which="heatershaker",
         simulating=True,
         loop=loop,
-        execution_manager=ExecutionManager(loop=loop),
+        execution_manager=ExecutionManager(),
     )
     assert isinstance(module, modules.AbstractModule)
     try:

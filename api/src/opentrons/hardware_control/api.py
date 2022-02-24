@@ -14,6 +14,7 @@ from typing import (
     Tuple,
     Sequence,
     Set,
+    Any,
 )
 
 from opentrons_shared_data.pipette import name_config
@@ -41,7 +42,11 @@ from .types import (
     PauseType,
 )
 from . import modules
-from .robot_calibration import RobotCalibrationProvider, load_pipette_offset
+from .robot_calibration import (
+    RobotCalibrationProvider,
+    load_pipette_offset,
+    RobotCalibration,
+)
 from .protocols import HardwareControlAPI
 from .instrument_handler import InstrumentHandlerProvider
 from .motion_utilities import (
@@ -111,10 +116,10 @@ class API(
         # or home() call is in flight and something else calls
         # current_position(), which will not be updated until the move() or
         # home() call succeeds or fails.
-        self._motion_lock = asyncio.Lock(loop=self._loop)
+        self._motion_lock = asyncio.Lock()
         self._door_state = DoorState.CLOSED
         self._pause_manager = PauseManager(self._door_state)
-        ExecutionManagerProvider.__init__(self, loop, isinstance(backend, Simulator))
+        ExecutionManagerProvider.__init__(self, isinstance(backend, Simulator))
         RobotCalibrationProvider.__init__(self)
         InstrumentHandlerProvider.__init__(
             self, {top_types.Mount.LEFT: None, top_types.Mount.RIGHT: None}
@@ -125,10 +130,10 @@ class API(
         return self._door_state
 
     @door_state.setter
-    def door_state(self, door_state: DoorState):
+    def door_state(self, door_state: DoorState) -> None:
         self._door_state = door_state
 
-    def _update_door_state(self, door_state: DoorState):
+    def _update_door_state(self, door_state: DoorState) -> None:
         mod_log.info(f"Updating the window switch status: {door_state}")
         self.door_state = door_state
         self._pause_manager.set_door(self.door_state)
@@ -141,16 +146,16 @@ class API(
             except Exception:
                 mod_log.exception("Errored during door state event callback")
 
-    def _reset_last_mount(self):
+    def _reset_last_mount(self) -> None:
         self._last_moved_mount = None
 
     @classmethod  # noqa: C901
     async def build_hardware_controller(
         cls,
-        config: Union[RobotConfig, OT3Config] = None,
-        port: str = None,
-        loop: asyncio.AbstractEventLoop = None,
-        firmware: Tuple[pathlib.Path, str] = None,
+        config: Union[RobotConfig, OT3Config, None] = None,
+        port: Optional[str] = None,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
+        firmware: Optional[Tuple[pathlib.Path, str]] = None,
     ) -> "API":
         """Build a hardware controller that will actually talk to hardware.
 
@@ -172,7 +177,7 @@ class API(
         backend = await Controller.build(checked_config)
         backend.set_lights(button=None, rails=False)
 
-        async def blink():
+        async def blink() -> None:
             while True:
                 backend.set_lights(button=True, rails=None)
                 await asyncio.sleep(0.5)
@@ -223,10 +228,12 @@ class API(
     @classmethod
     async def build_hardware_simulator(
         cls,
-        attached_instruments: Dict[top_types.Mount, Dict[str, Optional[str]]] = None,
-        attached_modules: List[str] = None,
-        config: Union[RobotConfig, OT3Config] = None,
-        loop: asyncio.AbstractEventLoop = None,
+        attached_instruments: Optional[
+            Dict[top_types.Mount, Dict[str, Optional[str]]]
+        ] = None,
+        attached_modules: Optional[List[str]] = None,
+        config: Optional[Union[RobotConfig, OT3Config]] = None,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
         strict_attached_instruments: bool = True,
     ) -> "API":
         """Build a simulating hardware controller.
@@ -262,7 +269,7 @@ class API(
         await backend.watch()
         return api_instance
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<{} using backend {}>".format(type(self), type(self._backend))
 
     @property
@@ -270,12 +277,8 @@ class API(
         """The event loop used by this instance."""
         return self._loop
 
-    def set_loop(self, loop: asyncio.AbstractEventLoop):
-        self._loop = loop
-        self._motion_lock = asyncio.Lock(loop=loop)
-
     @property
-    def is_simulator(self):
+    def is_simulator(self) -> bool:
         """`True` if this is a simulator; `False` otherwise."""
         return isinstance(self._backend, Simulator)
 
@@ -285,7 +288,7 @@ class API(
         """
         self._callbacks.add(cb)
 
-        def unregister():
+        def unregister() -> None:
             self._callbacks.remove(cb)
 
         return unregister
@@ -326,7 +329,7 @@ class API(
         """
         return self._backend.get_lights()
 
-    async def identify(self, duration_s: int = 5):
+    async def identify(self, duration_s: int = 5) -> None:
         """Blink the button light to identify the robot."""
         count = duration_s * 4
         on = False
@@ -339,7 +342,7 @@ class API(
         await self.set_lights(button=True)
 
     @ExecutionManagerProvider.wait_for_running
-    async def delay(self, duration_s: float):
+    async def delay(self, duration_s: float) -> None:
         """Delay execution by pausing and sleeping."""
         self.pause(PauseType.DELAY)
         try:
@@ -354,7 +357,7 @@ class API(
     async def update_firmware(
         self,
         firmware_file: str,
-        loop: asyncio.AbstractEventLoop = None,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
         explicit_modeset: bool = True,
     ) -> str:
         """Update the firmware on the motor controller board.
@@ -418,19 +421,19 @@ class API(
         self._log.info("Instruments found: {}".format(self._attached_instruments))
 
     # Global actions API
-    def pause(self, pause_type: PauseType):
+    def pause(self, pause_type: PauseType) -> None:
         """
         Pause motion of the robot after a current motion concludes.
         """
         self._pause_manager.pause(pause_type)
 
-        async def _chained_calls():
+        async def _chained_calls() -> None:
             await self._execution_manager.pause()
             self._backend.pause()
 
         asyncio.run_coroutine_threadsafe(_chained_calls(), self._loop)
 
-    def pause_with_message(self, message: str):
+    def pause_with_message(self, message: str) -> None:
         """As pause, but providing a message to registered callbacks."""
         self._log.warning(f"Pause with message: {message}")
         notification = ErrorMessageNotification(message=message)
@@ -438,7 +441,7 @@ class API(
             cb(notification)
         self.pause(PauseType.PAUSE)
 
-    def resume(self, pause_type: PauseType):
+    def resume(self, pause_type: PauseType) -> None:
         """Resume motion after a call to pause."""
         self._pause_manager.resume(pause_type)
 
@@ -449,7 +452,7 @@ class API(
         #  methods (ThreadManager)
         self._backend.resume()
 
-        async def _chained_calls():
+        async def _chained_calls() -> None:
             # mirror what happens API.pause.
             await self._execution_manager.resume()
             self._backend.resume()
@@ -465,7 +468,7 @@ class API(
         await self._backend.hard_halt()
         asyncio.run_coroutine_threadsafe(self._execution_manager.cancel(), self._loop)
 
-    async def stop(self, home_after: bool = True):
+    async def stop(self, home_after: bool = True) -> None:
         """
         Stop motion as soon as possible, reset, and optionally home.
 
@@ -488,7 +491,7 @@ class API(
         await InstrumentHandlerProvider.reset(self)
 
     # Gantry/frame (i.e. not pipette) action API
-    async def home_z(self, mount: Optional[top_types.Mount] = None):
+    async def home_z(self, mount: Optional[top_types.Mount] = None) -> None:
         """Home the two z-axes"""
         self._reset_last_mount()
         if not mount:
@@ -499,10 +502,10 @@ class API(
 
     async def _do_plunger_home(
         self,
-        axis: Axis = None,
-        mount: top_types.Mount = None,
+        axis: Optional[Axis] = None,
+        mount: Optional[top_types.Mount] = None,
         acquire_lock: bool = True,
-    ):
+    ) -> None:
         assert (axis is not None) ^ (mount is not None), "specify either axis or mount"
         if axis:
             checked_axis = axis
@@ -533,7 +536,7 @@ class API(
                     home_flagged_axes=False,
                 )
 
-    async def home_plunger(self, mount: top_types.Mount):
+    async def home_plunger(self, mount: top_types.Mount) -> None:
         """
         Home the plunger motor for a mount, and then return it to the 'bottom'
         position.
@@ -542,7 +545,7 @@ class API(
         await self._do_plunger_home(mount=mount, acquire_lock=True)
 
     @ExecutionManagerProvider.wait_for_running
-    async def home(self, axes: Optional[List[Axis]] = None):
+    async def home(self, axes: Optional[List[Axis]] = None) -> None:
         """Home the entire robot and initialize current position."""
         self._reset_last_mount()
         # Initialize/update current_position
@@ -638,7 +641,7 @@ class API(
         speed: Optional[float] = None,
         critical_point: Optional[CriticalPoint] = None,
         max_speeds: Optional[Dict[Axis, float]] = None,
-    ):
+    ) -> None:
         """
         Move the critical point of the specified mount to a location
         relative to the deck, at the specified speed.
@@ -665,7 +668,7 @@ class API(
         max_speeds: Optional[Dict[Axis, float]] = None,
         check_bounds: MotionChecks = MotionChecks.NONE,
         fail_on_not_homed: bool = False,
-    ):
+    ) -> None:
         """Move the critical point of the specified mount by a specified
         displacement in a specified direction, at the specified speed.
         """
@@ -698,7 +701,7 @@ class API(
             check_bounds=check_bounds,
         )
 
-    async def _cache_and_maybe_retract_mount(self, mount: top_types.Mount):
+    async def _cache_and_maybe_retract_mount(self, mount: top_types.Mount) -> None:
         """Retract the 'other' mount if necessary
 
         If `mount` does not match the value in :py:attr:`_last_moved_mount`
@@ -714,9 +717,9 @@ class API(
     async def _move(
         self,
         target_position: "OrderedDict[Axis, float]",
-        speed: float = None,
+        speed: Optional[float] = None,
         home_flagged_axes: bool = True,
-        max_speeds: Dict[Axis, float] = None,
+        max_speeds: Optional[Dict[Axis, float]] = None,
         acquire_lock: bool = True,
         check_bounds: MotionChecks = MotionChecks.NONE,
     ) -> None:
@@ -769,10 +772,10 @@ class API(
         return {Axis[ax]: eng for ax, eng in self._backend.engaged_axes().items()}
 
     @property
-    def engaged_axes(self):
+    def engaged_axes(self) -> Dict[Axis, bool]:
         return self.get_engaged_axes()
 
-    async def disengage_axes(self, which: List[Axis]):
+    async def disengage_axes(self, which: List[Axis]) -> None:
         await self._backend.disengage_axes([ax.name for ax in which])
 
     async def _fast_home(self, axes: Sequence[str], margin: float) -> Dict[str, float]:
@@ -780,7 +783,7 @@ class API(
         return await self._backend.fast_home(converted_axes, margin)
 
     @ExecutionManagerProvider.wait_for_running
-    async def retract(self, mount: top_types.Mount, margin: float = 10):
+    async def retract(self, mount: top_types.Mount, margin: float = 10) -> None:
         """Pull the specified mount up to its home position.
 
         Works regardless of critical point or home status.
@@ -828,7 +831,7 @@ class API(
         else:
             self._log.error("Cannot use an OT-3 config on an OT-2")
 
-    async def update_config(self, **kwargs):
+    async def update_config(self, **kwargs: Any) -> None:
         """Update values of the robot's configuration.
 
         `kwargs` should contain keys of the robot's configuration. For
@@ -840,11 +843,13 @@ class API(
         """
         self._config = replace(self._config, **kwargs)
 
-    async def update_deck_calibration(self, new_transform):
+    async def update_deck_calibration(self, new_transform: RobotCalibration) -> None:
         pass
 
     # Pipette action API
-    async def prepare_for_aspirate(self, mount: top_types.Mount, rate: float = 1.0):
+    async def prepare_for_aspirate(
+        self, mount: top_types.Mount, rate: float = 1.0
+    ) -> None:
         """
         Prepare the pipette for aspiration.
         """
@@ -1001,7 +1006,7 @@ class API(
 
         await self.retract(mount, spec.retract_target)
 
-    async def drop_tip(self, mount: top_types.Mount, home_after=True) -> None:
+    async def drop_tip(self, mount: top_types.Mount, home_after: bool = True) -> None:
         """Drop tip at the current location."""
 
         spec, _remove = self.plan_check_drop_tip(mount, home_after)
@@ -1051,6 +1056,6 @@ class API(
             self, mount, self._config.z_retract_distance, critical_point
         )
 
-    def clean_up(self) -> None:
+    async def clean_up(self) -> None:
         """Get the API ready to stop cleanly."""
-        self._backend.clean_up()
+        await self._backend.clean_up()

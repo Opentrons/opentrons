@@ -11,6 +11,7 @@ from opentrons_hardware.hardware_control.motion_planning import (
     SystemConstraints,
     Coordinates,
     Move,
+    CoordinateValue,
 )
 from opentrons_hardware.hardware_control.motion_planning.move_utils import (
     unit_vector_multiplication,
@@ -101,20 +102,20 @@ def get_system_constraints(
 
 
 def _convert_to_node_id_dict(
-    axis_pos: "Coordinates[OT3Axis, np.float64]",
-) -> "NodeIdMotionValues":
+    axis_pos: Coordinates[OT3Axis, CoordinateValue],
+) -> NodeIdMotionValues:
     target: NodeIdMotionValues = {}
     for axis, pos in axis_pos.items():
         if axis_is_node(axis):
-            target[axis_to_node(axis)] = pos
+            target[axis_to_node(axis)] = np.float64(pos)
     return target
 
 
 def create_move_group(
-    origin: "Coordinates[OT3Axis, np.float64]",
-    moves: List["Move[OT3Axis]"],
-    present_nodes: Iterable["NodeId"],
-) -> Tuple["MoveGroup", Dict["NodeId", float]]:
+    origin: Coordinates[OT3Axis, CoordinateValue],
+    moves: List[Move[OT3Axis]],
+    present_nodes: Iterable[NodeId],
+) -> Tuple[MoveGroup, Dict[NodeId, float]]:
     pos = _convert_to_node_id_dict(origin)
     move_group: MoveGroup = []
     for move in moves:

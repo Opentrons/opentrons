@@ -14,7 +14,7 @@ async def tempdeck(
     emulator_settings: Settings,
     emulation_app: Iterator[None],
 ) -> TempDeck:
-    execution_manager = ExecutionManager(loop)
+    execution_manager = ExecutionManager()
     module = await TempDeck.build(
         port=f"socket://127.0.0.1:{emulator_settings.temperature_proxy.driver_port}",
         execution_manager=execution_manager,

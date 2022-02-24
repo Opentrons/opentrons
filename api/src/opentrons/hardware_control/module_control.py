@@ -2,7 +2,7 @@ from __future__ import annotations
 import logging
 import asyncio
 import re
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Union, Awaitable, cast, TYPE_CHECKING
 from glob import glob
 
 from opentrons.config import IS_ROBOT, IS_LINUX
@@ -12,6 +12,10 @@ from opentrons.hardware_control.emulation.module_server.helpers import (
 )
 from .types import AionotifyEvent, BoardRevision
 from . import modules
+
+if TYPE_CHECKING:
+    from .api import API
+    from .ot3api import OT3API
 
 
 log = logging.getLogger(__name__)
@@ -25,7 +29,9 @@ class AttachedModulesControl:
     USB port information and finally building a module object.
     """
 
-    def __init__(self, api, board_revision: BoardRevision) -> None:
+    def __init__(
+        self, api: Union["API", "OT3API"], board_revision: BoardRevision
+    ) -> None:
         self._available_modules: List[modules.AbstractModule] = []
         self._api = api
         self._usb = (
@@ -36,7 +42,7 @@ class AttachedModulesControl:
 
     @classmethod
     async def build(
-        cls, api_instance, board_revision: BoardRevision
+        cls, api_instance: Union["API", "OT3API"], board_revision: BoardRevision
     ) -> AttachedModulesControl:
         mc_instance = cls(api_instance, board_revision)
         if not api_instance.is_simulator:
@@ -60,7 +66,7 @@ class AttachedModulesControl:
         usb_port: types.USBPort,
         model: str,
         loop: asyncio.AbstractEventLoop,
-        sim_model: str = None,
+        sim_model: Optional[str] = None,
     ) -> modules.AbstractModule:
         return await modules.build(
             port=port,
@@ -100,8 +106,8 @@ class AttachedModulesControl:
 
     async def register_modules(
         self,
-        new_mods_at_ports: List[modules.ModuleAtPort] = None,
-        removed_mods_at_ports: List[modules.ModuleAtPort] = None,
+        new_mods_at_ports: Optional[List[modules.ModuleAtPort]] = None,
+        removed_mods_at_ports: Optional[List[modules.ModuleAtPort]] = None,
     ) -> None:
         """
         Register Modules.
@@ -163,13 +169,19 @@ class AttachedModulesControl:
                 "thermocycler": modules.Thermocycler.build,
             }[mod_type]
             if module_builder:
-                simulating_module = await module_builder(
-                    port="",
-                    usb_port=self._usb.find_port(""),
-                    simulating=True,
-                    loop=self._api.loop,
-                    execution_manager=self._api._execution_manager,
-                    sim_model=by_model.value,
+                # The dict stuff above somehow erases specifically the return type
+                # of the module builders instead of upcasting it so an explicit
+                # upcast here works without erasing the argument types
+                simulating_module = await cast(
+                    Awaitable[modules.AbstractModule],
+                    module_builder(
+                        port="",
+                        usb_port=self._usb.find_port(""),
+                        simulating=True,
+                        loop=self._api.loop,
+                        execution_manager=self._api._execution_manager,
+                        sim_model=by_model.value,
+                    ),
                 )
                 simulated_module = simulating_module
         return matching_modules, simulated_module

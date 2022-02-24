@@ -9,7 +9,6 @@ from typing import (
     List,
     Optional,
     Tuple,
-    TYPE_CHECKING,
     Sequence,
     Generator,
     cast,
@@ -40,14 +39,13 @@ from opentrons.hardware_control.types import (
     OT3AxisMap,
 )
 
-if TYPE_CHECKING:
-    from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
-    from opentrons.hardware_control.dev_types import (
-        InstrumentHardwareConfigs,
-        InstrumentSpec,
-        AttachedInstrument,
-    )
-    from opentrons.drivers.rpi_drivers.dev_types import GPIODriverLike
+from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
+from opentrons.hardware_control.dev_types import (
+    InstrumentHardwareConfigs,
+    InstrumentSpec,
+    AttachedInstrument,
+)
+from opentrons.drivers.rpi_drivers.dev_types import GPIODriverLike
 
 log = logging.getLogger(__name__)
 
@@ -112,7 +110,7 @@ class OT3Simulator:
         self._stubbed_attached_modules = attached_modules
 
         def _sanitize_attached_instrument(
-            passed_ai: Dict[str, Optional[str]] = None
+            passed_ai: Optional[Dict[str, Optional[str]]] = None
         ) -> InstrumentSpec:
             if not passed_ai or not passed_ai.get("model"):
                 return {"model": None, "id": None}
@@ -168,8 +166,8 @@ class OT3Simulator:
 
     async def move(
         self,
-        origin: "Coordinates",
-        moves: List[Move],
+        origin: Coordinates[OT3Axis, float],
+        moves: List[Move[OT3Axis]],
     ) -> None:
         """Move to a position.
 
@@ -293,7 +291,7 @@ class OT3Simulator:
         """Save the current."""
         yield
 
-    async def watch(self, loop: asyncio.AbstractEventLoop):
+    async def watch(self, loop: asyncio.AbstractEventLoop) -> None:
         new_mods_at_ports = [
             modules.ModuleAtPort(port=f"/dev/ot_module_sim_{mod}{str(idx)}", name=mod)
             for idx, mod in enumerate(self._stubbed_attached_modules)
@@ -361,7 +359,7 @@ class OT3Simulator:
         """Probe."""
         return {}
 
-    def clean_up(self) -> None:
+    async def clean_up(self) -> None:
         """Clean up."""
         pass
 

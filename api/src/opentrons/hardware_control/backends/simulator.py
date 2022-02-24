@@ -3,7 +3,7 @@ import asyncio
 import copy
 import logging
 from threading import Event
-from typing import Dict, Optional, List, Tuple, TYPE_CHECKING, Sequence
+from typing import Dict, Optional, List, Tuple, TYPE_CHECKING, Sequence, Iterator
 from contextlib import contextmanager
 
 from opentrons_shared_data.pipette import dummy_model_for_name
@@ -118,7 +118,7 @@ class Simulator:
         self._gpio_chardev = gpio_chardev
 
         def _sanitize_attached_instrument(
-            passed_ai: Dict[str, Optional[str]] = None
+            passed_ai: Optional[Dict[str, Optional[str]]] = None
         ) -> InstrumentSpec:
             if not passed_ai or not passed_ai.get("model"):
                 return {"model": None, "id": None}
@@ -169,7 +169,7 @@ class Simulator:
         return self._module_controls
 
     @module_controls.setter
-    def module_controls(self, module_controls: AttachedModulesControl):
+    def module_controls(self, module_controls: AttachedModulesControl) -> None:
         self._module_controls = module_controls
 
     async def update_position(self) -> Dict[str, float]:
@@ -185,13 +185,13 @@ class Simulator:
         self,
         target_position: Dict[str, float],
         home_flagged_axes: bool = True,
-        speed: float = None,
-        axis_max_speeds: Dict[str, float] = None,
-    ):
+        speed: Optional[float] = None,
+        axis_max_speeds: Optional[Dict[str, float]] = None,
+    ) -> None:
         self._position.update(target_position)
         self._engaged_axes.update({ax: True for ax in target_position})
 
-    async def home(self, axes: List[str] = None) -> Dict[str, float]:
+    async def home(self, axes: Optional[List[str]] = None) -> Dict[str, float]:
         # driver_3_0-> HOMED_POSITION
         checked_axes = "".join(axes) if axes else "XYZABC"
         self._position.update(
@@ -281,10 +281,10 @@ class Simulator:
             for mount in types.Mount
         }
 
-    def set_active_current(self, axis_currents: Dict[Axis, float]):
+    def set_active_current(self, axis_currents: Dict[Axis, float]) -> None:
         pass
 
-    async def watch(self):
+    async def watch(self) -> None:
         new_mods_at_ports = [
             modules.ModuleAtPort(port=f"/dev/ot_module_sim_{mod}{str(idx)}", name=mod)
             for idx, mod in enumerate(self._stubbed_attached_modules)
@@ -292,7 +292,7 @@ class Simulator:
         await self.module_controls.register_modules(new_mods_at_ports=new_mods_at_ports)
 
     @contextmanager
-    def save_current(self):
+    def save_current(self) -> Iterator[None]:
         yield
 
     @property
@@ -308,23 +308,25 @@ class Simulator:
     def fw_version(self) -> Optional[str]:
         return "Virtual Smoothie"
 
-    async def update_fw_version(self):
+    async def update_fw_version(self) -> None:
         pass
 
     @property
     def board_revision(self) -> BoardRevision:
         return self._board_revision
 
-    async def update_firmware(self, filename, loop, modeset) -> str:
+    async def update_firmware(
+        self, filename: str, loop: asyncio.AbstractEventLoop, modeset: bool
+    ) -> str:
         return "Did nothing (simulating)"
 
-    def engaged_axes(self):
+    def engaged_axes(self) -> Dict[str, bool]:
         return self._engaged_axes
 
-    async def disengage_axes(self, axes: List[str]):
+    async def disengage_axes(self, axes: List[str]) -> None:
         self._engaged_axes.update({ax: False for ax in axes})
 
-    def set_lights(self, button: Optional[bool], rails: Optional[bool]):
+    def set_lights(self, button: Optional[bool], rails: Optional[bool]) -> None:
         if button is not None:
             self._lights["button"] = button
         if rails is not None:
@@ -333,28 +335,28 @@ class Simulator:
     def get_lights(self) -> Dict[str, bool]:
         return self._lights
 
-    def pause(self):
+    def pause(self) -> None:
         self._run_flag.clear()
 
-    def resume(self):
+    def resume(self) -> None:
         self._run_flag.set()
 
-    async def halt(self):
+    async def halt(self) -> None:
         self._run_flag.set()
 
-    async def hard_halt(self):
+    async def hard_halt(self) -> None:
         self._run_flag.set()
 
     async def probe(self, axis: str, distance: float) -> Dict[str, float]:
         self._position[axis.upper()] = self._position[axis.upper()] + distance
         return self._position
 
-    def clean_up(self):
+    async def clean_up(self) -> None:
         pass
 
     async def configure_mount(
         self, mount: types.Mount, config: InstrumentHardwareConfigs
-    ):
+    ) -> None:
         mount_axis = Axis.by_mount(mount)
         plunger_axis = Axis.of_plunger(mount)
 
