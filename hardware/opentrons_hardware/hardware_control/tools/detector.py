@@ -41,6 +41,7 @@ class ToolDetector:
     async def run_detect(self) -> None:
         """Detect tool changes continuoulsy."""
         # FW sends PushToolsDetectedNotification every .1sec
+        # sleep is to assure infinite iteration of detect generator
         await asyncio.sleep(0.2)
         async for tool in self.detect():
             log.info(f"Detection, Tool: {tool}")
