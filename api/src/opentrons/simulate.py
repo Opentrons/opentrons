@@ -19,7 +19,6 @@ from typing import (
     BinaryIO,
     Optional,
     Union,
-    cast,
 )
 
 import opentrons
@@ -27,10 +26,8 @@ from opentrons.hardware_control import (
     API as HardwareAPI,
     ThreadManager,
     SyncHardwareAPI,
-    HardwareControlAPI,
 )
 from opentrons.hardware_control.simulator_setup import load_simulator
-from opentrons.hardware_control.adapters import SynchronousAdapter
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocols.duration import DurationEstimator
 from opentrons.protocols.execution import execute
@@ -196,13 +193,8 @@ def get_protocol_api(
     ):
         extra_labware = labware_from_paths([str(JUPYTER_NOTEBOOK_LABWARE_DIR)])
 
-    # it's unclear why we need the cast here. without it, we have a conflict between
-    # SynchronousAdapter[HardwareControlAPI] and SynchronousAdapter[API], which is weird
-    # because the protocol is fulfilled or at least it doesn't tell us why it's not. I
-    # suspect something weird around covariance.
-    checked_hardware = hardware_simulator or cast(
-        SynchronousAdapter[HardwareControlAPI],
-        ThreadManager(HardwareAPI.build_hardware_simulator).sync,
+    checked_hardware = (
+        hardware_simulator or ThreadManager(HardwareAPI.build_hardware_simulator).sync
     )
 
     return _build_protocol_context(

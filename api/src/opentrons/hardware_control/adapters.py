@@ -6,7 +6,7 @@ from typing import Generic, TypeVar, Callable, Sequence, Mapping, Any, cast
 from .protocols import AsyncioConfigurable
 
 
-WrappedObj = TypeVar("WrappedObj", bound=AsyncioConfigurable)
+WrappedObj = TypeVar("WrappedObj", bound=AsyncioConfigurable, covariant=True)
 WrappedReturn = TypeVar("WrappedReturn")
 WrappedFunc = TypeVar("WrappedFunc", bound=Callable[..., WrappedReturn])
 
