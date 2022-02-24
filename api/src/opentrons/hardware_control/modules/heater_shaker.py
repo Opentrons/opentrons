@@ -387,7 +387,7 @@ class HeaterShaker(mod_abc.AbstractModule):
         )
 
     async def _wait_for_labware_latch(
-            self, status: HeaterShakerLabwareLatchStatus
+        self, status: HeaterShakerLabwareLatchStatus
     ) -> None:
         # TODO (spp, 2022-02-22): use the labware_latch_status property to get ll status
         current_status = await self._driver.get_labware_latch_status()

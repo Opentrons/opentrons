@@ -112,7 +112,7 @@ def heater_shaker():
             usb_port=usb_port,
             which="heatershaker",
             simulating=True,
-            execution_manager=ExecutionManager(loop=asyncio.get_event_loop()),
+            execution_manager=ExecutionManager(),
             loop=asyncio.get_event_loop(),
         )
     )
