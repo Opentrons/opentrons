@@ -164,6 +164,53 @@ def test_get_magnet_true_mm_home_to_base() -> None:
     )
 
 
+@pytest.mark.xfail(strict=True)
+def test_calculate_magnet_true_mm_above_base_gen1() -> None:
+    """It should use half-millimeters as hardware units."""
+    subject = make_module_view()
+
+    assert (
+        subject.calculate_magnet_true_mm_above_base(
+            module_model=ModuleModel.MAGNETIC_MODULE_V1,
+            hardware_units_above_base=100,
+        )
+        == 50
+    )
+
+    # TODO: Test hardware_units_above_home, etc. when we better understand
+    # the APIv2 behavior that we need to preserve.
+
+
+def test_calculate_magnet_true_mm_above_base_gen2() -> None:
+    """It should use true millimeters as hardware units."""
+    subject = make_module_view()
+
+    assert (
+        subject.calculate_magnet_true_mm_above_base(
+            module_model=ModuleModel.MAGNETIC_MODULE_V2,
+            hardware_units_above_base=100,
+        )
+        == 100
+    )
+
+    assert (
+        subject.calculate_magnet_true_mm_above_base(
+            module_model=ModuleModel.MAGNETIC_MODULE_V2,
+            hardware_units_above_home=100,
+        )
+        == 97.5
+    )
+
+    assert (
+        subject.calculate_magnet_true_mm_above_base(
+            module_model=ModuleModel.MAGNETIC_MODULE_V2,
+            labware_default_true_mm_above_base=100,
+            hardware_units_above_labware_default=10.0,
+        )
+        == 110
+    )
+
+
 @pytest.mark.parametrize(
     argnames=["from_slot", "to_slot", "should_dodge"],
     argvalues=[
