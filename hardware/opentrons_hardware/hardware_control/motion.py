@@ -3,13 +3,30 @@ from typing import List, Dict, Iterable
 from dataclasses import dataclass
 import numpy as np  # type: ignore[import]
 from logging import getLogger
-
+from enum import Enum, unique
 from opentrons_hardware.firmware_bindings.constants import NodeId
 
 LOG = getLogger(__name__)
 
 
 NodeIdMotionValues = Dict[NodeId, np.float64]
+
+
+@unique
+class MoveStopCondition(int, Enum):
+    """Move Stop Condition."""
+
+    none = 0x0
+    limit_switch = 0x1
+    cap_sensor = 0x2
+
+
+@unique
+class MoveType(int, Enum):
+    """Move Type."""
+
+    linear = 0x0
+    home = 0x1
 
 
 @dataclass(frozen=True)
@@ -20,6 +37,8 @@ class MoveGroupSingleAxisStep:
     velocity_mm_sec: float
     duration_sec: float
     acceleration_mm_sec_sq: float = 0
+    stop_condition: MoveStopCondition = MoveStopCondition.none
+    move_type: MoveType = MoveType.linear
 
 
 MoveGroupStep = Dict[

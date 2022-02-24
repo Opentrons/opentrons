@@ -7,12 +7,14 @@ from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.drivers.can_bus.can_messenger import MessageListenerCallback
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     AddLinearMoveRequest,
+    HomeRequest
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     AddLinearMoveRequestPayload,
     MoveCompletedPayload,
     EmptyPayload,
     ExecuteMoveGroupRequestPayload,
+    HomeRequestPayload
 )
 from opentrons_hardware.hardware_control.constants import (
     interrupts_per_sec,
@@ -20,6 +22,8 @@ from opentrons_hardware.hardware_control.constants import (
 from opentrons_hardware.hardware_control.motion import (
     MoveGroups,
     MoveGroupSingleAxisStep,
+    MoveType,
+    MoveStopCondition
 )
 from opentrons_hardware.hardware_control.move_group_runner import (
     MoveGroupRunner,
@@ -51,6 +55,24 @@ def move_group_single() -> MoveGroups:
                 NodeId.head: MoveGroupSingleAxisStep(
                     distance_mm=0, velocity_mm_sec=2, duration_sec=123
                 )
+            }
+        ]
+    ]
+
+@pytest.fixture
+def move_group_home_single() -> MoveGroups:
+    return [
+        # Group 0
+        [
+            {
+                NodeId.head: MoveGroupSingleAxisStep(
+                    distance_mm=0,
+                    velocity_mm_sec=235,
+                    duration_sec=2142,
+                    acceleration_mm_sec_sq=1000,
+                    stop_condition=MoveStopCondition.limit_switch,
+                    move_type=MoveType.home
+                ),
             }
         ]
     ]
@@ -138,6 +160,34 @@ async def test_multi_group_clear(
     mock_can_messenger.send.assert_called_once_with(
         node_id=NodeId.broadcast,
         message=md.ClearAllMoveGroupsRequest(payload=EmptyPayload()),
+    )
+
+
+async def test_home(
+    mock_can_messenger: AsyncMock, move_group_home_single: MoveGroups) -> None:
+    subject = MoveGroupRunner(move_groups=move_group_home_single)
+    await subject._send_groups(can_messenger=mock_can_messenger)
+    mock_can_messenger.send.assert_any_call(
+        node_id=NodeId.head,
+        message=HomeRequest(
+            payload=HomeRequestPayload(
+                group_id=UInt8Field(0),
+                seq_id=UInt8Field(0),
+                velocity=Int32Field(
+                    int(
+                        move_group_home_single[0][0][NodeId.head].velocity_mm_sec
+                        / interrupts_per_sec
+                        * (2 ** 31)
+                    )
+                ),
+                duration=UInt32Field(
+                    int(
+                        move_group_home_single[0][0][NodeId.head].duration_sec
+                        * interrupts_per_sec
+                    )
+                ),
+            )
+        ),
     )
 
 
