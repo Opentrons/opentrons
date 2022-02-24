@@ -115,18 +115,19 @@ class MagneticModuleContext:  # noqa: D101
             )
 
         state = self._engine_client.state
+        model = state.modules.get_model(module_id=self._module_id)
 
         true_mm_above_base: float
 
         if height is not None:
             true_mm_above_base = state.modules.calculate_magnet_true_mm_above_base(
-                module_id=self._module_id,  # TODO: Change to module model?
+                module_model=model,
                 hardware_units_above_home=height,
             )
 
         elif height_from_base is not None:
             true_mm_above_base = state.modules.calculate_magnet_true_mm_above_base(
-                module_id=self._module_id,
+                module_model=model,
                 hardware_units_above_base=height_from_base,
             )
 
@@ -153,7 +154,7 @@ class MagneticModuleContext:  # noqa: D101
                 )
 
             true_mm_above_base = state.modules.calculate_magnet_true_mm_above_base(
-                module_id=self._module_id,
+                module_model=model,
                 labware_default_true_mm_above_base=labware_default_true_mm_above_base,
                 hardware_units_above_labware_default=(0 if offset is None else offset),
             )

@@ -196,7 +196,8 @@ class ModuleView(HasState[ModuleState]):
                 f"Cannot get lid height of {definition.moduleType}"
             )
 
-    def get_magnet_true_mm_home_to_base(self, module_id: str) -> float:
+    @staticmethod
+    def get_magnet_true_mm_home_to_base(module_model: ModuleModel) -> float:
         """Return a Magnetic Module's home offset.
 
         This is how far a Magnetic Module's magnets have to rise above their
@@ -206,49 +207,54 @@ class ModuleView(HasState[ModuleState]):
         even though GEN1 Magnetic Modules are sometimes controlled in units of
         half-millimeters ("short mm").
         """
-        model = self.get_model(module_id)
-        if model == ModuleModel.MAGNETIC_MODULE_V1:
+        if module_model == ModuleModel.MAGNETIC_MODULE_V1:
             offset_in_half_mm = MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM[
                 "magneticModuleV1"
             ]
             return offset_in_half_mm / 2
-        elif model == ModuleModel.MAGNETIC_MODULE_V2:
+        elif module_model == ModuleModel.MAGNETIC_MODULE_V2:
             return MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM["magneticModuleV2"]
         else:
-            raise errors.WrongModuleTypeError(f"Can't get magnet offset of {model}.")
+            raise errors.WrongModuleTypeError(
+                f"Can't get magnet offset of {module_model}."
+            )
 
     @overload
+    @classmethod
     def calculate_magnet_true_mm_above_base(
-        self,
+        cls,
         *,
-        module_id: str,
+        module_model: ModuleModel,
         hardware_units_above_home: float,
     ) -> float:
         pass
 
     @overload
+    @classmethod
     def calculate_magnet_true_mm_above_base(
-        self,
+        cls,
         *,
-        module_id: str,
+        module_model: ModuleModel,
         hardware_units_above_base: float,
     ) -> float:
         pass
 
     @overload
+    @classmethod
     def calculate_magnet_true_mm_above_base(
-        self,
+        cls,
         *,
-        module_id: str,
+        module_model: ModuleModel,
         labware_default_true_mm_above_base: float,
         hardware_units_above_labware_default: float,
     ) -> float:
         pass
 
+    @classmethod
     def calculate_magnet_true_mm_above_base(
-        self,
+        cls,
         *,
-        module_id: str,
+        module_model: ModuleModel,
         hardware_units_above_home: Optional[float] = None,
         hardware_units_above_base: Optional[float] = None,
         labware_default_true_mm_above_base: Optional[float] = None,
@@ -257,11 +263,19 @@ class ModuleView(HasState[ModuleState]):
         """Normalize a Magnetic Module engage height to standard units.
 
         Args:
-            hardware_units_above_home: A distance above the magnets' home position.
-                The units are whatever is used by the module's underlying hardware
-                controller, which depends on the generation of Magnetic Module.
-            hardware_units_above_base: A distance above the labware base plane.
-                See above for the meaning of "hardware units."
+            module_model: What kind of Magnetic Module to calculate the height for.
+                If GEN1, "hardware units" in other arguments are half-millimeters.
+                Otherwise, they're true millimeters.
+            hardware_units_above_home: A distance above the magnets' home position,
+                in hardware units.
+            hardware_units_above_base: A distance above the labware base plane,
+                in hardware units.
+            labware_default_true_mm_above_base: A distance above the labware base plane,
+                in true millimeters, from a labware definition.
+            hardware_units_above_labware_default: A distance above the
+                ``labware_default_true_mm_above_base`` argument, in hardware units.
+
+        Negative values are allowed for all arguments, to move down instead of up.
 
         Returns:
             The same distance, measured in true physical millimeters above the
@@ -270,8 +284,8 @@ class ModuleView(HasState[ModuleState]):
         if hardware_units_above_home is not None:
             # FIXME(mm, 2022-02-22): This arithmetic is wrong for GEN1 modules
             # because it mixes units.
-            true_mm_home_to_base = self.get_magnet_true_mm_home_to_base(
-                module_id=module_id
+            true_mm_home_to_base = cls.get_magnet_true_mm_home_to_base(
+                module_model=module_model
             )
             return hardware_units_above_home - true_mm_home_to_base
 

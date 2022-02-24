@@ -147,30 +147,21 @@ def test_get_properties_by_id(
     )
 
 
-def test_get_magnet_true_mm_home_to_base(
-    magdeck_v1_def: ModuleDefinition,
-    magdeck_v2_def: ModuleDefinition,
-) -> None:
+def test_get_magnet_true_mm_home_to_base() -> None:
     """It should return the model-specific offset to bottom."""
-    subject = make_module_view(
-        slot_by_module_id={
-            "magdeck-v1-id": DeckSlotName.SLOT_1,
-            "magdeck-v2-id": DeckSlotName.SLOT_2,
-        },
-        hardware_module_by_slot={
-            DeckSlotName.SLOT_1: HardwareModule(
-                serial_number="magdeck-v1-serial",
-                definition=magdeck_v1_def,
-            ),
-            DeckSlotName.SLOT_2: HardwareModule(
-                serial_number="magdeck-v2-serial",
-                definition=magdeck_v2_def,
-            ),
-        },
+    subject = make_module_view()
+    assert (
+        subject.get_magnet_true_mm_home_to_base(
+            module_model=ModuleModel.MAGNETIC_MODULE_V1
+        )
+        == 2.5
     )
-
-    assert subject.get_magnet_true_mm_home_to_base(module_id="magdeck-v1-id") == 2.5
-    assert subject.get_magnet_true_mm_home_to_base(module_id="magdeck-v2-id") == 2.5
+    assert (
+        subject.get_magnet_true_mm_home_to_base(
+            module_model=ModuleModel.MAGNETIC_MODULE_V2
+        )
+        == 2.5
+    )
 
 
 @pytest.mark.parametrize(

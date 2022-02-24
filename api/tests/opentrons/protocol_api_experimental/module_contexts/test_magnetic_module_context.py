@@ -8,7 +8,11 @@ import pytest
 
 from opentrons.protocols.models import LabwareDefinition
 
-from opentrons.protocol_engine import ModuleLocation, commands as pe_commands
+from opentrons.protocol_engine import (
+    ModuleLocation,
+    ModuleModel,
+    commands as pe_commands,
+)
 from opentrons.protocol_engine.clients import SyncClient
 
 from opentrons.protocol_api_experimental import (
@@ -150,8 +154,11 @@ def test_engage_with_height_from_home(
 ) -> None:
     """It should pass the correct height to the Protocol Engine command."""
     decoy.when(
+        engine_client.state.modules.get_model(module_id=subject_module_id)
+    ).then_return(ModuleModel.MAGNETIC_MODULE_V1)
+    decoy.when(
         engine_client.state.modules.calculate_magnet_true_mm_above_base(
-            module_id=subject_module_id,
+            module_model=ModuleModel.MAGNETIC_MODULE_V1,
             hardware_units_above_home=12.34,
         )
     ).then_return(56.78)
@@ -171,8 +178,11 @@ def test_engage_with_height_from_base(
 ) -> None:
     """It should pass the correct height to the Protocol Engine command."""
     decoy.when(
+        engine_client.state.modules.get_model(module_id=subject_module_id)
+    ).then_return(ModuleModel.MAGNETIC_MODULE_V1)
+    decoy.when(
         engine_client.state.modules.calculate_magnet_true_mm_above_base(
-            module_id=subject_module_id,
+            module_model=ModuleModel.MAGNETIC_MODULE_V1,
             hardware_units_above_base=12.34,
         )
     ).then_return(56.78)
@@ -192,6 +202,9 @@ def test_engage_with_offset(
 ) -> None:
     """It should use the offset combined with the labware's default engage height."""
     decoy.when(
+        engine_client.state.modules.get_model(module_id=subject_module_id)
+    ).then_return(ModuleModel.MAGNETIC_MODULE_V1)
+    decoy.when(
         engine_client.state.labware.get_id_by_module(module_id=subject_module_id)
     ).then_return("labware-id")
     decoy.when(
@@ -201,7 +214,7 @@ def test_engage_with_offset(
     ).then_return(1.23)
     decoy.when(
         engine_client.state.modules.calculate_magnet_true_mm_above_base(
-            module_id=subject_module_id,
+            module_model=ModuleModel.MAGNETIC_MODULE_V1,
             labware_default_true_mm_above_base=1.23,
             hardware_units_above_labware_default=4.56,
         )
@@ -222,6 +235,9 @@ def test_engage_with_no_arguments(
 ) -> None:
     """It should use the default engage height from the labware."""
     decoy.when(
+        engine_client.state.modules.get_model(module_id=subject_module_id)
+    ).then_return(ModuleModel.MAGNETIC_MODULE_V1)
+    decoy.when(
         engine_client.state.labware.get_id_by_module(module_id=subject_module_id)
     ).then_return("labware-id")
     decoy.when(
@@ -231,7 +247,7 @@ def test_engage_with_no_arguments(
     ).then_return(1.23)
     decoy.when(
         engine_client.state.modules.calculate_magnet_true_mm_above_base(
-            module_id=subject_module_id,
+            module_model=ModuleModel.MAGNETIC_MODULE_V1,
             labware_default_true_mm_above_base=1.23,
             hardware_units_above_labware_default=0,
         )
