@@ -1,4 +1,4 @@
-from typing import Optional, Generic, TypeVar, Any
+from typing import Optional, Generic, TypeVar
 
 TEMPERATURE_ROOM = 23
 
@@ -31,7 +31,7 @@ class OptionalValue(Generic[ValueType]):
     def __repr__(self) -> str:
         return "none" if self._value is None else str(self._value)
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, OptionalValue):
             return False
 

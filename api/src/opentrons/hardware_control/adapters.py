@@ -2,7 +2,7 @@
 """
 import asyncio
 import functools
-from typing import Generic, TypeVar, Callable, Sequence, Mapping, Any, cast
+from typing import Generic, TypeVar, Callable, Any, cast
 from .protocols import AsyncioConfigurable
 
 
@@ -55,8 +55,8 @@ class SynchronousAdapter(Generic[WrappedObj]):
     def call_coroutine_sync(
         loop: asyncio.AbstractEventLoop,
         to_call: WrappedFunc,
-        *args: Sequence[Any],
-        **kwargs: Mapping[str, Any]
+        *args: Any,
+        **kwargs: Any,
     ) -> WrappedReturn:
         fut = cast(
             "asyncio.Future[WrappedReturn]",

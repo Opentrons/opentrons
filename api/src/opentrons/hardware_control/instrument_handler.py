@@ -425,7 +425,7 @@ class InstrumentHandlerProvider(Generic[MountType]):
         ...
 
     # note on this type ignore: see motion_utilities
-    def plan_check_aspirate(  # type: ignore
+    def plan_check_aspirate(  # type: ignore[no-untyped-def]
         self,
         mount,
         volume,
@@ -501,7 +501,7 @@ class InstrumentHandlerProvider(Generic[MountType]):
     ) -> Optional[LiquidActionSpec[OT3Axis]]:
         ...
 
-    def plan_check_dispense(  # type: ignore
+    def plan_check_dispense(  # type: ignore[no-untyped-def]
         self,
         mount,
         volume,
@@ -574,7 +574,7 @@ class InstrumentHandlerProvider(Generic[MountType]):
     def plan_check_blow_out(self, mount: OT3Mount) -> LiquidActionSpec[OT3Axis]:
         ...
 
-    def plan_check_blow_out(self, mount):  # type: ignore
+    def plan_check_blow_out(self, mount):  # type: ignore[no-untyped-def]
         """Check preconditions and calculate values for blowout."""
         instrument = self.get_pipette(mount)
         self.ready_for_tip_action(instrument, HardwareAction.BLOWOUT)
@@ -642,7 +642,7 @@ class InstrumentHandlerProvider(Generic[MountType]):
     ) -> Tuple[PickUpTipSpec[OT3Axis], Callable[[], None]]:
         ...
 
-    def plan_check_pick_up_tip(  # type: ignore
+    def plan_check_pick_up_tip(  # type: ignore[no-untyped-def]
         self,
         mount,
         tip_length,
@@ -805,7 +805,7 @@ class InstrumentHandlerProvider(Generic[MountType]):
     ) -> Tuple[DropTipSpec[OT3Axis], Callable[[], None]]:
         ...
 
-    def plan_check_drop_tip(  # type: ignore
+    def plan_check_drop_tip(  # type: ignore[no-untyped-def]
         self,
         mount,
         home_after,

@@ -14,7 +14,6 @@ from typing import (
     Tuple,
     Sequence,
     Set,
-    Mapping,
     Any,
 )
 
@@ -832,7 +831,7 @@ class API(
         else:
             self._log.error("Cannot use an OT-3 config on an OT-2")
 
-    async def update_config(self, **kwargs: Mapping[str, Any]) -> None:
+    async def update_config(self, **kwargs: Any) -> None:
         """Update values of the robot's configuration.
 
         `kwargs` should contain keys of the robot's configuration. For

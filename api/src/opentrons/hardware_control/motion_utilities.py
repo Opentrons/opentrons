@@ -170,7 +170,7 @@ def target_position_from_absolute(
 # type signatures (see e.g. https://github.com/python/mypy/issues/9503).
 # And as discussed above, there's no way to write the type signature without
 # them. So, ignored.
-def target_position_from_absolute(  # type: ignore
+def target_position_from_absolute(  # type: ignore[no-untyped-def]
     mount,
     abs_position,
     get_critical_point,
@@ -204,7 +204,7 @@ def target_position_from_relative(
     ...
 
 
-def target_position_from_relative(  # type: ignore
+def target_position_from_relative(  # type: ignore[no-untyped-def]
     mount,
     delta,
     current_position,
@@ -237,7 +237,7 @@ def target_position_from_plunger(
     ...
 
 
-def target_position_from_plunger(  # type: ignore
+def target_position_from_plunger(  # type: ignore[no-untyped-def]
     mount,
     delta,
     current_position,
@@ -295,7 +295,7 @@ def machine_from_deck(
     ...
 
 
-def machine_from_deck(  # type: ignore
+def machine_from_deck(  # type: ignore[no-untyped-def]
     deck_pos,
     attitude,
     offset,
@@ -351,7 +351,7 @@ def deck_from_machine(
     ...
 
 
-def deck_from_machine(  # type: ignore
+def deck_from_machine(  # type: ignore[no-untyped-def]
     machine_pos,
     attitude,
     offset,

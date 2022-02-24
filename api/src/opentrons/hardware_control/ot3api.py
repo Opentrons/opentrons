@@ -13,7 +13,6 @@ from typing import (
     Tuple,
     Sequence,
     Set,
-    Mapping,
     Any,
 )
 
@@ -830,7 +829,7 @@ class OT3API(
         else:
             self._log.error("Tried to specify an OT2 config object")
 
-    async def update_config(self, **kwargs: Mapping[str, Any]) -> None:
+    async def update_config(self, **kwargs: Any) -> None:
         """Update values of the robot's configuration."""
         self._config = replace(self._config, **kwargs)
 
