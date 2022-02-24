@@ -1,5 +1,6 @@
 """Head tool detector."""
 
+import asyncio
 import logging
 import queue
 from opentrons_hardware.firmware_bindings.messages import message_definitions
@@ -37,12 +38,24 @@ class ToolDetector:
                     log.info("Tools detected %s:", {self._attached_tools})
                     yield tmp_dic
 
-    async def run(self, retry_count: int, ready_wait_time_sec: float) -> None:
+    async def run_detect(self) -> None:
         """Detect tool changes continuoulsy."""
         async for tool in self.detect():
-            i = 1
+            log.info(f"Detection, Tool: {tool}")
+
+    async def run(self, retry_count: int, ready_wait_time_sec: float) -> None:
+        """Detect tool changes continuoulsy."""
+        i = 1
+        while True:
             try:
-                log.info(f"Detection {i}, Tool: {tool}")
-                i += 1
-            except StopIteration:
-                raise ToolDetectionFailiure
+                await asyncio.wait_for(self.run_detect(), ready_wait_time_sec)
+                break
+            except asyncio.TimeoutError:
+                log.warning(
+                    f"Try {i}: Bootloader not ready "
+                    f"after {ready_wait_time_sec} seconds."
+                )
+                if i < retry_count:
+                    i += 1
+                else:
+                    raise ToolDetectionFailiure()
