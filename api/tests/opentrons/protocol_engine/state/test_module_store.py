@@ -28,7 +28,7 @@ def test_initial_state() -> None:
 def test_load_module(tempdeck_v2_def: ModuleDefinition) -> None:
     """It should handle a successful LoadModule command."""
     action = actions.UpdateCommandAction(
-        command=commands.LoadModule(  # type: ignore[call-arg]
+        command=commands.LoadModule.construct(  # type: ignore[call-arg]
             params=commands.LoadModuleParams(
                 model=ModuleModel.TEMPERATURE_MODULE_V1,
                 location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),

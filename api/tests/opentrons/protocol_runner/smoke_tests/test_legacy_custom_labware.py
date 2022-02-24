@@ -57,7 +57,7 @@ async def test_legacy_custom_labware(
     subject = await create_simulating_runner()
     result = await subject.run(protocol_source)
 
-    expected_labware = LoadedLabware(
+    expected_labware = LoadedLabware.construct(
         id=matchers.Anything(),
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         loadName="fixture_96_plate",

@@ -25,7 +25,7 @@ async def test_reads_file(
     subject = JsonFileReader()
     result = subject.read(protocol_source)
 
-    assert result == json_protocol.Model(
+    assert result == json_protocol.Model.construct(
         schemaVersion=3,
         metadata=json_protocol.Metadata(),
         robot=json_protocol.Robot(model="OT-2 Standard"),

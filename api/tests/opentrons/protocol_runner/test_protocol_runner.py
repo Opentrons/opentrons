@@ -219,7 +219,7 @@ def test_load_json(
         labware_definitions=[],
     )
 
-    json_protocol = JsonProtocol()  # type: ignore[call-arg]
+    json_protocol = JsonProtocol.construct()  # type: ignore[call-arg]
 
     commands: List[pe_commands.CommandCreate] = [
         pe_commands.PauseCreate(params=pe_commands.PauseParams(message="hello")),
@@ -296,7 +296,7 @@ def test_load_legacy_python(
     subject: ProtocolRunner,
 ) -> None:
     """It should load a legacy context-based Python protocol."""
-    labware_definition = LabwareDefinition()  # type: ignore[call-arg]
+    labware_definition = LabwareDefinition.construct()  # type: ignore[call-arg]
 
     legacy_protocol_source = ProtocolSource(
         directory=Path("/dev/null"),
@@ -353,7 +353,7 @@ def test_load_legacy_json(
     subject: ProtocolRunner,
 ) -> None:
     """It should load a legacy context-based JSON protocol."""
-    labware_definition = LabwareDefinition()  # type: ignore[call-arg]
+    labware_definition = LabwareDefinition.construct()  # type: ignore[call-arg]
 
     legacy_protocol_source = ProtocolSource(
         directory=Path("/dev/null"),
