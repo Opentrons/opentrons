@@ -254,9 +254,12 @@ def test_engage_based_on_labware_errors_when_no_labware_loaded(
     decoy.when(
         engine_client.state.labware.get_id_by_module(module_id=subject_module_id)
     ).then_return(None)
-    with pytest.raises(InvalidMagnetEngageHeightError, match="no labware loaded"):
+    expected_exception_text = "no labware loaded"
+    with pytest.raises(InvalidMagnetEngageHeightError, match=expected_exception_text):
         subject.engage(offset=1.23)
-    with pytest.raises(InvalidMagnetEngageHeightError, match="no labware loaded"):
+    with pytest.raises(InvalidMagnetEngageHeightError, match=expected_exception_text):
+        subject.engage(offset=0)
+    with pytest.raises(InvalidMagnetEngageHeightError, match=expected_exception_text):
         subject.engage()
 
 
@@ -275,9 +278,12 @@ def test_engage_based_on_labware_errors_when_labware_has_no_default_height(
             labware_id="labware-id"
         )
     ).then_return(None)
-    with pytest.raises(InvalidMagnetEngageHeightError, match="does not have a default"):
+    expected_exception_text = "does not have a default"
+    with pytest.raises(InvalidMagnetEngageHeightError, match=expected_exception_text):
         subject.engage(offset=1.23)
-    with pytest.raises(InvalidMagnetEngageHeightError, match="does not have a default"):
+    with pytest.raises(InvalidMagnetEngageHeightError, match=expected_exception_text):
+        subject.engage(offset=0)
+    with pytest.raises(InvalidMagnetEngageHeightError, match=expected_exception_text):
         subject.engage()
 
 
