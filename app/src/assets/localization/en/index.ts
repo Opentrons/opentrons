@@ -14,6 +14,8 @@ import robot_controls from './robot_controls.json'
 import robot_info from './robot_info.json'
 import run_details from './run_details.json'
 import top_navigation from './top_navigation.json'
+import heater_shaker from './heater_shaker.json'
+import app_settings from './app_settings.json'
 
 export const en = {
   shared,
@@ -32,4 +34,6 @@ export const en = {
   robot_info,
   run_details,
   top_navigation,
+  heater_shaker,
+  app_settings,
 }

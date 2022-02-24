@@ -5,13 +5,17 @@ import datetime
 from typing import List, Callable
 from mock import AsyncMock
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
-from opentrons_ot3_firmware import ArbitrationId, ArbitrationIdParts, utils
-from opentrons_ot3_firmware.messages import (
+from opentrons_hardware.firmware_bindings import (
+    ArbitrationId,
+    ArbitrationIdParts,
+    utils,
+)
+from opentrons_hardware.firmware_bindings.messages import (
     MessageDefinition,
     message_definitions,
     payloads,
 )
-from opentrons_ot3_firmware.constants import NodeId
+from opentrons_hardware.firmware_bindings.constants import NodeId
 
 from opentrons_hardware.hardware_control.network import probe
 
@@ -46,9 +50,9 @@ class MockStatusResponder:
         assert self._callbacks
         for callback in self._callbacks:
             for node in self._respond_with_nodes:
-                response = message_definitions.GetStatusResponse(
-                    payload=payloads.GetStatusResponsePayload(
-                        status=utils.UInt8Field(0), data=utils.UInt32Field(0)
+                response = message_definitions.DeviceInfoResponse(
+                    payload=payloads.DeviceInfoResponsePayload(
+                        version=utils.UInt32Field(0),
                     )
                 )
                 asyncio.get_running_loop().call_soon(
@@ -83,7 +87,7 @@ async def test_timeout_fires(mock_can_messenger: AsyncMock) -> None:
     # We should have sent a request
     mock_can_messenger.send.assert_called_once_with(
         node_id=NodeId.broadcast,
-        message=message_definitions.GetStatusRequest(payload=payloads.EmptyPayload()),
+        message=message_definitions.DeviceInfoRequest(payload=payloads.EmptyPayload()),
     )
     # we should have added a listener
     mock_can_messenger.add_listener.assert_called_once()

@@ -1,10 +1,10 @@
 import pytest
-from mock import AsyncMock, patch, ANY
+from mock import AsyncMock, patch
 from opentrons.hardware_control.backends import OT3Controller
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons.config.types import OT3Config
 from opentrons.config.robot_configs import build_config_ot3
-from opentrons_ot3_firmware.constants import NodeId
+from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 
 
@@ -36,7 +36,7 @@ def controller(mock_config: OT3Config, mock_driver: AbstractCanDriver) -> OT3Con
 async def test_probing(controller: OT3Controller) -> None:
     assert controller._present_nodes == set()
     call_count = 0
-    fake_nodes = set((NodeId.gantry_x, NodeId.head_l))
+    fake_nodes = set((NodeId.gantry_x, NodeId.head))
     passed_expected = None
 
     async def fake_probe(can_messenger, expected, timeout):
@@ -54,30 +54,10 @@ async def test_probing(controller: OT3Controller) -> None:
             (
                 NodeId.gantry_x,
                 NodeId.gantry_y,
-                NodeId.head_l,
-                NodeId.head_r,
+                NodeId.head,
                 NodeId.pipette_left,
             )
         )
-    assert controller._present_nodes == fake_nodes
-
-
-async def test_move_limiting(controller: OT3Controller) -> None:
-    controller._present_nodes = set((NodeId.gantry_x, NodeId.head_l))
-    with patch(
-        "opentrons.hardware_control.backends.ot3controller.MoveGroupRunner", AsyncMock
-    ) as mgr, patch(
-        "opentrons.hardware_control.backends.ot3controller.create"
-    ) as mock_create:
-
-        async def fake_run(*args, **kwargs):
-            return
-
-        mgr.runner = fake_run
-        await controller.move({"X": 0})
-        mock_create.assert_called_once_with(
-            origin=ANY,
-            target=ANY,
-            speed=ANY,
-            present_nodes=set((NodeId.gantry_x, NodeId.head_l)),
-        )
+    assert controller._present_nodes == set(
+        (NodeId.gantry_x, NodeId.head_l, NodeId.head_r)
+    )

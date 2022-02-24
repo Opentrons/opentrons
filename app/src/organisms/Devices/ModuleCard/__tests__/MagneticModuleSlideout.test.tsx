@@ -30,6 +30,7 @@ describe('MagneticModuleSlideout', () => {
     props = {
       module: mockMagneticModule,
       isExpanded: true,
+      onCloseClick: jest.fn(),
     }
     mockInputField.mockReturnValue(<div></div>)
     mockUseSendModuleCommand.mockReturnValue(jest.fn())
@@ -60,6 +61,7 @@ describe('MagneticModuleSlideout', () => {
     props = {
       module: mockMagneticModuleGen2,
       isExpanded: true,
+      onCloseClick: jest.fn(),
     }
     const { getByText } = render(props)
 

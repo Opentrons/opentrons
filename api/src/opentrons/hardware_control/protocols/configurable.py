@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Dict, Any
 from typing_extensions import Protocol
 
 from opentrons.config.types import RobotConfig, OT3Config
@@ -14,7 +14,7 @@ class Configurable(Protocol):
         """
         ...
 
-    def set_config(self, config: Union[RobotConfig, OT3Config]):
+    def set_config(self, config: Union[RobotConfig, OT3Config]) -> None:
         """Replace the currently-loaded config"""
         ...
 
@@ -26,7 +26,7 @@ class Configurable(Protocol):
     def config(self, config: Union[RobotConfig, OT3Config]) -> None:
         ...
 
-    async def update_config(self, **kwargs) -> None:
+    async def update_config(self, **kwargs: Dict[str, Any]) -> None:
         """Update values of the robot's configuration.
 
         `kwargs` should contain keys of the robot's configuration. For

@@ -2,7 +2,7 @@ from functools import lru_cache
 import logging
 import numpy as np
 from dataclasses import dataclass
-from typing import Optional, List
+from typing import Optional, List, Union, Any, cast
 
 from opentrons import config
 
@@ -15,6 +15,7 @@ from opentrons.config.types import OT3Config
 from opentrons.calibration_storage import modify, types, get
 from opentrons.types import Mount, Point
 from opentrons.util import linal
+from .types import OT3Mount
 
 from .util import DeckTransformState
 
@@ -74,7 +75,7 @@ def validate_attitude_deck_calibration(
     """
     curr_cal = np.array(deck_cal.attitude)
     row, _ = curr_cal.shape
-    rank = np.linalg.matrix_rank(curr_cal)
+    rank: int = np.linalg.matrix_rank(curr_cal)  # type: ignore
     if row != rank:
         # Check that the matrix is non-singular
         return DeckTransformState.SINGULARITY
@@ -86,7 +87,7 @@ def validate_attitude_deck_calibration(
         return DeckTransformState.OK
 
 
-def validate_gantry_calibration(gantry_cal: List[List[float]]):
+def validate_gantry_calibration(gantry_cal: List[List[float]]) -> DeckTransformState:
     """
     This function determines whether the gantry calibration is valid
     or not based on the following use-cases:
@@ -94,7 +95,7 @@ def validate_gantry_calibration(gantry_cal: List[List[float]]):
     curr_cal = np.array(gantry_cal)
     row, _ = curr_cal.shape
 
-    rank = np.linalg.matrix_rank(curr_cal)
+    rank: int = np.linalg.matrix_rank(curr_cal)  # type: ignore
 
     id_matrix = linal.identity_deck_transform()
 
@@ -126,12 +127,16 @@ def migrate_affine_xy_to_attitude(
             [False, False, False, False],
         ]
     )
-    masked_array: np.ma.MaskedArray = np.ma.masked_array(gantry_cal, ~masked_transform)
+    masked_array: np.ma.MaskedArray[
+        Any, np.dtype[np.float64]
+    ] = np.ma.masked_array(  # type: ignore
+        gantry_cal, ~masked_transform
+    )
     attitude_array = np.zeros((3, 3))
     np.put(attitude_array, [0, 1, 2], masked_array[0].compressed())
     np.put(attitude_array, [3, 4, 5], masked_array[1].compressed())
     np.put(attitude_array, 8, 1)
-    return attitude_array.tolist()
+    return cast(List[List[float]], attitude_array.tolist())
 
 
 def save_attitude_matrix(
@@ -139,7 +144,7 @@ def save_attitude_matrix(
     actual: linal.SolvePoints,
     pipette_id: str,
     tiprack_hash: str,
-):
+) -> None:
     attitude = linal.solve_attitude(expected, actual)
     modify.save_robot_deck_attitude(attitude, pipette_id, tiprack_hash)
 
@@ -176,7 +181,7 @@ def load_attitude_matrix() -> types.DeckCalibration:
 
 
 def load_pipette_offset(
-    pip_id: Optional[str], mount: Mount
+    pip_id: Optional[str], mount: Union[Mount, OT3Mount]
 ) -> types.PipetteOffsetByPipetteMount:
     # load default if pipette offset data do not exist
     pip_cal_obj = types.PipetteOffsetByPipetteMount(
@@ -184,8 +189,12 @@ def load_pipette_offset(
         source=types.SourceType.default,
         status=types.CalibrationStatus(),
     )
+    if isinstance(mount, OT3Mount):
+        checked_mount = mount.to_mount()
+    else:
+        checked_mount = mount
     if pip_id:
-        pip_offset_data = get.get_pipette_offset(pip_id, mount)
+        pip_offset_data = get.get_pipette_offset(pip_id, checked_mount)
         if pip_offset_data:
             return pip_offset_data
     return pip_cal_obj
@@ -196,7 +205,7 @@ def load() -> RobotCalibration:
 
 
 class RobotCalibrationProvider:
-    def __init__(self):
+    def __init__(self) -> None:
         self._robot_calibration = load()
 
     @lru_cache(1)
@@ -209,11 +218,11 @@ class RobotCalibrationProvider:
     def robot_calibration(self) -> RobotCalibration:
         return self._robot_calibration
 
-    def reset_robot_calibration(self):
+    def reset_robot_calibration(self) -> None:
         self._validate.cache_clear()
         self._robot_calibration = load()
 
-    def set_robot_calibration(self, robot_calibration: RobotCalibration):
+    def set_robot_calibration(self, robot_calibration: RobotCalibration) -> None:
         self._validate.cache_clear()
         self._robot_calibration = robot_calibration
 

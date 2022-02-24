@@ -32,7 +32,7 @@ import shutil
 import subprocess
 import sys
 from enum import Enum, auto
-from typing import Dict, NamedTuple, Optional, Union
+from typing import Dict, NamedTuple, Optional, cast
 
 _CONFIG_FILENAME = "config.json"
 _LEGACY_INDICES = (
@@ -306,7 +306,7 @@ def load_and_migrate() -> Dict[str, Path]:
     return _ensure_paths_and_types(index)
 
 
-def _load_with_overrides(base) -> Dict[str, str]:
+def _load_with_overrides(base: Path) -> Dict[str, str]:
     """Load an config or write its defaults"""
     should_write = False
     overrides = _get_environ_overrides()
@@ -335,7 +335,7 @@ def _load_with_overrides(base) -> Dict[str, str]:
                 )
             )
     index.update(overrides)
-    return index
+    return cast(Dict[str, str], index)
 
 
 def _ensure_paths_and_types(index: Dict[str, str]) -> Dict[str, Path]:
@@ -375,7 +375,7 @@ def _get_environ_overrides() -> Dict[str, str]:
     }
 
 
-def _legacy_index() -> Union[None, Dict[str, str]]:
+def _legacy_index() -> Optional[Dict[str, str]]:
     """Try and load an index file from the various places it might exist.
 
     If the legacy file cannot be found or cannot be parsed, return None.
@@ -386,13 +386,13 @@ def _legacy_index() -> Union[None, Dict[str, str]]:
         if index.exists():
             try:
                 with open(index) as file:
-                    return json.load(file)
+                    return cast(Dict[str, str], json.load(file))
             except (OSError, json.JSONDecodeError):
                 return None
     return None
 
 
-def _erase_old_indices():
+def _erase_old_indices() -> None:
     """Remove old index files so they don't pollute future loads.
 
     This method should only be called on a robot.
@@ -428,7 +428,7 @@ def _find_most_recent_backup(normal_path: Optional[str]) -> Optional[str]:
     ]
     ts_re = re.compile(r".*-([0-9]+)" + ext + "$")
 
-    def ts_compare(filename):
+    def ts_compare(filename: str) -> int:
         match = ts_re.match(filename)
         if not match:
             return -1
@@ -441,7 +441,7 @@ def _find_most_recent_backup(normal_path: Optional[str]) -> Optional[str]:
     return os.path.join(dirname, backups_sorted[-1])
 
 
-def _do_migrate(index: Dict[str, str]):
+def _do_migrate(index: Dict[str, str]) -> None:
     base = infer_config_base_dir()
     new_index = generate_config_index(_get_environ_overrides(), base)
     moves = (
@@ -475,14 +475,16 @@ def _do_migrate(index: Dict[str, str]):
     write_config(new_index, base)
 
 
-def _migrate_robot():
+def _migrate_robot() -> None:
     old_index = _legacy_index()
     if old_index:
         _do_migrate(old_index)
         _erase_old_indices()
 
 
-def generate_config_index(defaults: Dict[str, str], base_dir=None) -> Dict[str, Path]:
+def generate_config_index(
+    defaults: Dict[str, str], base_dir: Optional[Path] = None
+) -> Dict[str, Path]:
     """
     Determines where existing info can be found in the system, and creates a
     corresponding data dict that can be written to index.json in the
@@ -516,7 +518,7 @@ def generate_config_index(defaults: Dict[str, str], base_dir=None) -> Dict[str, 
     }
 
 
-def write_config(config_data: Dict[str, Path], path: Path = None):
+def write_config(config_data: Dict[str, Path], path: Optional[Path] = None) -> None:
     """Save the config file.
 
     :param config_data: The index to save

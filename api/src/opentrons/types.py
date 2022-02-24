@@ -1,7 +1,7 @@
 from __future__ import annotations
 import enum
 from math import sqrt, isclose
-from typing import Any, NamedTuple, TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Any, NamedTuple, Iterable, Union
 
 from .protocols.api_support.labware_like import LabwareLike
 
@@ -50,7 +50,7 @@ class Point(NamedTuple):
     def __abs__(self) -> Point:
         return Point(abs(self.x), abs(self.y), abs(self.z))
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "({}, {}, {})".format(self.x, self.y, self.z)
 
     def magnitude_to(self, other: Any) -> float:
@@ -106,7 +106,7 @@ class Location:
     def labware(self) -> LabwareLike:
         return self._labware
 
-    def __iter__(self):
+    def __iter__(self) -> Iterable[Union[Point, LabwareLike]]:
         """Iterable interface to support unpacking. Like a tuple."""
         return iter(
             (
@@ -115,7 +115,7 @@ class Location:
             )
         )
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         return (
             isinstance(other, Location)
             and other._point == self._point
@@ -152,7 +152,7 @@ class Mount(enum.Enum):
     LEFT = enum.auto()
     RIGHT = enum.auto()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
     @classmethod
@@ -198,7 +198,7 @@ class DeckSlotName(str, enum.Enum):
         str_val = str(value)
         return cls(str_val)
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Stringify to a simple integer string."""
         return str(self.value)
 

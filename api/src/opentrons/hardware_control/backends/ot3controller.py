@@ -18,46 +18,49 @@ from typing import (
 
 from opentrons.config.types import OT3Config
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
-from opentrons.types import Mount
 from opentrons.config import pipette_config
+from .ot3utils import axis_convert, create_move_group
 
 try:
     import aionotify  # type: ignore[import]
 except (OSError, ModuleNotFoundError):
     aionotify = None
 
-try:
-    from opentrons_hardware.drivers.can_bus import CanMessenger, DriverSettings
-    from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
-    from opentrons_hardware.drivers.can_bus.build import build_driver
-    from opentrons_hardware.hardware_control.motion import create
-    from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
-    from opentrons_hardware.hardware_control.network import probe
-    from opentrons_ot3_firmware.constants import NodeId
-    from opentrons_ot3_firmware.messages.message_definitions import (
-        SetupRequest,
-        EnableMotorRequest,
-    )
-    from opentrons_ot3_firmware.messages.payloads import EmptyPayload
-except ModuleNotFoundError:
-    pass
+from opentrons_hardware.drivers.can_bus import CanMessenger, DriverSettings
+from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
+from opentrons_hardware.drivers.can_bus.build import build_driver
+from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
+from opentrons_hardware.hardware_control.motion_planning import (
+    Move,
+    Coordinates,
+)
+
+from opentrons_hardware.hardware_control.network import probe
+from opentrons_hardware.firmware_bindings.constants import NodeId
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    SetupRequest,
+    EnableMotorRequest,
+)
+from opentrons_hardware.firmware_bindings.messages.payloads import EmptyPayload
 
 from opentrons.hardware_control.module_control import AttachedModulesControl
-from opentrons.hardware_control.types import BoardRevision, Axis, AionotifyEvent
+from opentrons.hardware_control.types import (
+    BoardRevision,
+    OT3Axis,
+    AionotifyEvent,
+    OT3Mount,
+    OT3AxisMap,
+)
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
     from ..dev_types import (
-        AttachedInstruments,
         AttachedInstrument,
         InstrumentHardwareConfigs,
     )
     from opentrons.drivers.rpi_drivers.dev_types import GPIODriverLike
 
 log = logging.getLogger(__name__)
-
-
-AxisValueMap = Dict[str, float]
 
 _FIXED_PIPETTE_ID: str = "P1KSV3120211118A01"
 _FIXED_PIPETTE_NAME: PipetteName = "p1000_single_gen3"
@@ -105,68 +108,6 @@ class OT3Controller:
             )
         self._present_nodes: Set[NodeId] = set()
 
-    # TODO: These staticmethods exist to defer uses of NodeId to inside
-    # method bodies, which won't be evaluated until called. This is needed
-    # because the robot server doesn't have opentrons_ot3_firmware as a dep
-    # which is where they're defined, and therefore you can't have references
-    # to NodeId that are interpreted at import time because then the robot
-    # server tests fail when importing hardware controller. This is obviously
-    # terrible and needs to be fixed.
-    @staticmethod
-    def _axis_nodes() -> List["NodeId"]:
-        return [
-            NodeId.gantry_x,
-            NodeId.gantry_y,
-            NodeId.head_l,
-            NodeId.head_r,
-            NodeId.pipette_left,
-            NodeId.pipette_right,
-        ]
-
-    @staticmethod
-    def _node_axes() -> List[str]:
-        return ["X", "Y", "Z", "A", "B"]
-
-    @staticmethod
-    def _axis_to_node(axis: str) -> "NodeId":
-        anm = {
-            "X": NodeId.gantry_x,
-            "Y": NodeId.gantry_y,
-            "Z": NodeId.head_l,
-            "A": NodeId.head_r,
-            "B": NodeId.pipette_left,
-            "C": NodeId.pipette_right,
-        }
-        return anm[axis]
-
-    @staticmethod
-    def _node_to_axis(node: "NodeId") -> str:
-        nam = {
-            NodeId.gantry_x: "X",
-            NodeId.gantry_y: "Y",
-            NodeId.head_l: "Z",
-            NodeId.head_r: "A",
-            NodeId.pipette_left: "B",
-            NodeId.pipette_right: "C",
-        }
-        return nam[node]
-
-    @staticmethod
-    def _node_is_axis(node: "NodeId") -> bool:
-        try:
-            OT3Controller._node_to_axis(node)
-            return True
-        except KeyError:
-            return False
-
-    @staticmethod
-    def _axis_is_node(axis: str) -> bool:
-        try:
-            OT3Controller._axis_to_node(axis)
-            return True
-        except KeyError:
-            return False
-
     async def setup_motors(self) -> None:
         """Set up the motors."""
         await self._messenger.send(
@@ -200,30 +141,17 @@ class OT3Controller:
         """Set the module controls"""
         self._module_controls = module_controls
 
-    def is_homed(self, axes: Sequence[str]) -> bool:
+    def is_homed(self, axes: Sequence[OT3Axis]) -> bool:
         return True
 
-    async def update_position(self) -> AxisValueMap:
+    async def update_position(self) -> OT3AxisMap[float]:
         """Get the current position."""
-        return self._axis_convert(self._position)
-
-    @staticmethod
-    def _axis_convert(position: Dict[NodeId, float]) -> AxisValueMap:
-        ret: AxisValueMap = {"A": 0, "B": 0, "C": 0, "X": 0, "Y": 0, "Z": 0}
-        for node, pos in position.items():
-            # we need to make robot config apply to z or in some other way
-            # reflect the sense of the axis direction
-            if OT3Controller._node_is_axis(node):
-                ret[OT3Controller._node_to_axis(node)] = pos
-        log.info(f"update_position: {ret}")
-        return ret
+        return axis_convert(self._position, 0.0)
 
     async def move(
         self,
-        target_position: AxisValueMap,
-        home_flagged_axes: bool = True,
-        speed: Optional[float] = None,
-        axis_max_speeds: Optional[AxisValueMap] = None,
+        origin: Coordinates[OT3Axis, float],
+        moves: List[Move[OT3Axis]],
     ) -> None:
         """Move to a position.
 
@@ -236,24 +164,14 @@ class OT3Controller:
         Returns:
             None
         """
-        log.info(f"move: {target_position}")
-        target: Dict[NodeId, float] = {}
-        for axis, pos in target_position.items():
-            if self._axis_is_node(axis):
-                target[self._axis_to_node(axis)] = pos
-
-        log.info(f"move targets: {target}")
-        move_group = create(
-            origin=self._position,
-            target=target,
-            speed=speed or 5000.0,
-            present_nodes=self._present_nodes,
+        move_group, final_positions = create_move_group(
+            origin, moves, self._present_nodes
         )
-        runner = MoveGroupRunner(move_groups=move_group)
+        runner = MoveGroupRunner(move_groups=[move_group])
         await runner.run(can_messenger=self._messenger)
-        self._position.update(target)
+        self._position.update(final_positions)
 
-    async def home(self, axes: Optional[List[str]] = None) -> AxisValueMap:
+    async def home(self, axes: Optional[List[OT3Axis]] = None) -> OT3AxisMap[float]:
         """Home axes.
 
         Args:
@@ -262,13 +180,11 @@ class OT3Controller:
         Returns:
             Homed position.
         """
-        checked_axes = axes or self._node_axes()
-        home_pos = self._get_home_position()
-        target_pos = {ax: home_pos[self._axis_to_node(ax)] for ax in checked_axes}
-        await self.move(target_pos)
-        return self._axis_convert(self._position)
+        return axis_convert(self._position, 0.0)
 
-    async def fast_home(self, axes: Sequence[str], margin: float) -> AxisValueMap:
+    async def fast_home(
+        self, axes: Sequence[OT3Axis], margin: float
+    ) -> OT3AxisMap[float]:
         """Fast home axes.
 
         Args:
@@ -278,16 +194,11 @@ class OT3Controller:
         Returns:
             New position.
         """
-        home_pos = self._get_home_position()
-        target_pos = {ax: home_pos[self._axis_to_node(ax)] for ax in axes}
-        if not target_pos:
-            return self._axis_convert(self._position)
-        await self.move(target_pos)
-        return self._axis_convert(self._position)
+        return axis_convert(self._position, 0.0)
 
     async def get_attached_instruments(
-        self, expected: Dict[Mount, PipetteName]
-    ) -> AttachedInstruments:
+        self, expected: Dict[OT3Mount, PipetteName]
+    ) -> Dict[OT3Mount, AttachedInstrument]:
         """Get attached instruments.
 
         Args:
@@ -296,17 +207,20 @@ class OT3Controller:
         Returns:
             A map of mount to pipette name.
         """
-        if expected.get(Mount.LEFT) and expected.get(Mount.LEFT) != _FIXED_PIPETTE_NAME:
+        if (
+            expected.get(OT3Mount.LEFT)
+            and expected.get(OT3Mount.LEFT) != _FIXED_PIPETTE_NAME
+        ):
             raise RuntimeError(f"only support {_FIXED_PIPETTE_NAME}  right now")
 
         return {
-            Mount.LEFT: {
+            OT3Mount.LEFT: {
                 "config": pipette_config.load(_FIXED_PIPETTE_MODEL, _FIXED_PIPETTE_ID),
                 "id": _FIXED_PIPETTE_ID,
             }
         }
 
-    def set_active_current(self, axis_currents: Dict[Axis, float]) -> None:
+    def set_active_current(self, axis_currents: OT3AxisMap[float]) -> None:
         """Set the active current.
 
         Args:
@@ -323,7 +237,7 @@ class OT3Controller:
         yield
 
     @staticmethod
-    def _build_event_watcher():
+    def _build_event_watcher() -> aionotify.Watcher:
         watcher = aionotify.Watcher()
         watcher.watch(
             alias="modules",
@@ -332,7 +246,7 @@ class OT3Controller:
         )
         return watcher
 
-    async def _handle_watch_event(self):
+    async def _handle_watch_event(self) -> None:
         try:
             event = await self._event_watcher.get_event()
         except asyncio.IncompleteReadError:
@@ -345,7 +259,7 @@ class OT3Controller:
                 event_description = AionotifyEvent.build(event_name, flags)
                 await self.module_controls.handle_module_appearance(event_description)
 
-    async def watch(self, loop: asyncio.AbstractEventLoop):
+    async def watch(self, loop: asyncio.AbstractEventLoop) -> None:
         can_watch = aionotify is not None
         if can_watch:
             await self._event_watcher.setup(loop)
@@ -354,17 +268,17 @@ class OT3Controller:
             await self._handle_watch_event()
 
     @property
-    def axis_bounds(self) -> Dict[Axis, Tuple[float, float]]:
+    def axis_bounds(self) -> OT3AxisMap[Tuple[float, float]]:
         """Get the axis bounds."""
         # TODO (AL, 2021-11-18): The bounds need to be defined
         phony_bounds = (0, 10000)
         return {
-            Axis.A: phony_bounds,
-            Axis.B: phony_bounds,
-            Axis.C: phony_bounds,
-            Axis.X: phony_bounds,
-            Axis.Y: phony_bounds,
-            Axis.Z: phony_bounds,
+            OT3Axis.Z_L: phony_bounds,
+            OT3Axis.Z_R: phony_bounds,
+            OT3Axis.P_L: phony_bounds,
+            OT3Axis.P_R: phony_bounds,
+            OT3Axis.X: phony_bounds,
+            OT3Axis.Y: phony_bounds,
         }
 
     @property
@@ -378,11 +292,11 @@ class OT3Controller:
         """Update the firmware."""
         return "Done"
 
-    def engaged_axes(self) -> Dict[str, bool]:
+    def engaged_axes(self) -> OT3AxisMap[bool]:
         """Get engaged axes."""
         return {}
 
-    async def disengage_axes(self, axes: List[str]) -> None:
+    async def disengage_axes(self, axes: List[OT3Axis]) -> None:
         """Disengage axes."""
         return None
 
@@ -410,11 +324,11 @@ class OT3Controller:
         """Halt the motors."""
         return None
 
-    async def probe(self, axis: str, distance: float) -> AxisValueMap:
+    async def probe(self, axis: OT3Axis, distance: float) -> OT3AxisMap[float]:
         """Probe."""
         return {}
 
-    def clean_up(self) -> None:
+    async def clean_up(self) -> None:
         """Clean up."""
 
         try:
@@ -428,7 +342,7 @@ class OT3Controller:
         return None
 
     async def configure_mount(
-        self, mount: Mount, config: InstrumentHardwareConfigs
+        self, mount: OT3Mount, config: InstrumentHardwareConfigs
     ) -> None:
         """Configure a mount."""
         return None
@@ -455,13 +369,18 @@ class OT3Controller:
         # see if we should expect instruments to be present, which should be removed
         # when that method actually does canbus stuff
         instrs = await self.get_attached_instruments({})
-        expected = set(self._get_home_position().keys())
-        if not instrs.get(Mount.LEFT, cast("AttachedInstrument", {})).get(
+        expected = set((NodeId.gantry_x, NodeId.gantry_y, NodeId.head))
+        if instrs.get(OT3Mount.LEFT, cast("AttachedInstrument", {})).get(
             "config", None
         ):
-            expected.remove(NodeId.pipette_left)
-        if not instrs.get(Mount.RIGHT, cast("AttachedInstrument", {})).get(
+            expected.add(NodeId.pipette_left)
+        if instrs.get(OT3Mount.RIGHT, cast("AttachedInstrument", {})).get(
             "config", None
         ):
-            expected.remove(NodeId.pipette_right)
-        self._present_nodes = await probe(self._messenger, expected, timeout)
+            expected.add(NodeId.pipette_right)
+        present = await probe(self._messenger, expected, timeout)
+        if NodeId.head in present:
+            present.remove(NodeId.head)
+            present.add(NodeId.head_r)
+            present.add(NodeId.head_l)
+        self._present_nodes = present

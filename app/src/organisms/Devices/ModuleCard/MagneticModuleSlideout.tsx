@@ -68,13 +68,14 @@ const getInfoByModel = (model: ModuleModel): ModelContents => {
 
 interface MagneticModuleSlideoutProps {
   module: AttachedModule
+  onCloseClick: () => unknown
   isExpanded: boolean
 }
 
 export const MagneticModuleSlideout = (
   props: MagneticModuleSlideoutProps
 ): JSX.Element | null => {
-  const { module, isExpanded } = props
+  const { module, isExpanded, onCloseClick } = props
   const { t } = useTranslation('device_details')
   const sendModuleCommand = useSendModuleCommand()
   const [engageHeightValue, setEngageHeightValue] = React.useState<
@@ -110,6 +111,7 @@ export const MagneticModuleSlideout = (
   return (
     <Slideout
       title={t('set_engage_height_slideout', { name: moduleName })}
+      onCloseClick={onCloseClick}
       isExpanded={isExpanded}
     >
       <React.Fragment>
@@ -172,7 +174,6 @@ export const MagneticModuleSlideout = (
           <Text
             fontWeight={FONT_WEIGHT_REGULAR}
             fontSize={TYPOGRAPHY.fontSizeH6}
-            //  TODO immediately: change to typography standard color when its made
             color={COLORS.darkGrey}
           >
             {t('engage_height_slideout')}

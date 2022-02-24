@@ -21,11 +21,12 @@ import {
 import { inferModuleOrientationFromXCoordinate } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 import { useModuleMatchResults } from '../hooks'
+import { useModuleRenderInfoById } from '../../hooks'
 import { fetchModules } from '../../../../redux/modules'
 import { ModuleInfo } from './ModuleInfo'
 import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
 import { MultipleModulesModal } from './MultipleModulesModal'
-import { useModuleRenderInfoById } from '../../hooks'
+import { HeaterShakerBanner } from './HeaterShakerSetupWizard/HeaterShakerBanner'
 import styles from '../../styles.css'
 
 import type { Dispatch } from '../../../../redux/types'
@@ -79,12 +80,27 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
       : null
 
   return (
-    <Flex flex="1" maxHeight="80vh" flexDirection={DIRECTION_COLUMN}>
+    <Flex flex="1" maxHeight="100vh" flexDirection={DIRECTION_COLUMN}>
       {showMultipleModulesModal && (
         <MultipleModulesModal
           onCloseClick={() => setShowMultipleModulesModal(false)}
         />
       )}
+
+      {map(moduleRenderInfoById, ({ moduleDef }, index) => {
+        const { model } = moduleDef
+        return (
+          <React.Fragment key={index}>
+            {/* @ts-expect-error: this is always false until heater shaker is added to model */}
+            {model === 'heatershakermoduleV1' && (
+              <Flex key="heater_shaker_banner">
+                <HeaterShakerBanner displayName={moduleDef.displayName} />
+              </Flex>
+            )}
+          </React.Fragment>
+        )
+      })}
+
       {hasADuplicateModule ? (
         <Btn
           as={Link}

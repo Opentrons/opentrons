@@ -1,18 +1,27 @@
-import styled from 'styled-components'
+import * as React from 'react'
+import { css } from 'styled-components'
 import {
-  SPACING,
-  Btn,
+  Flex,
+  TYPOGRAPHY,
   COLORS,
   TEXT_ALIGN_LEFT,
-  TYPOGRAPHY,
+  SPACING,
 } from '@opentrons/components'
+import { MenuList } from './index'
 
-import type { PrimitiveComponent } from '@opentrons/components'
+import type { Story, Meta } from '@storybook/react'
 
-type BtnComponent = PrimitiveComponent<'button'>
+export default {
+  title: 'App/Atoms/MenuList',
+  component: MenuList,
+} as Meta
 
-export const OverflowMenuBtn: BtnComponent = styled(Btn)`
-  width: ${TYPOGRAPHY.overflowMenuWidth};
+const Template: Story<React.ComponentProps<typeof MenuList>> = args => (
+  <MenuList {...args} />
+)
+
+const style = css`
+  width: auto;
   text-align: ${TEXT_ALIGN_LEFT};
   font-size: ${TYPOGRAPHY.fontSizeP};
   padding-bottom: ${TYPOGRAPHY.fontSizeH6};
@@ -36,3 +45,9 @@ export const OverflowMenuBtn: BtnComponent = styled(Btn)`
     color: ${COLORS.greyDisabled};
   }
 `
+const btn = <Flex css={style}>{'Example menu btn'}</Flex>
+
+export const Primary = Template.bind({})
+Primary.args = {
+  buttons: [btn, btn],
+}

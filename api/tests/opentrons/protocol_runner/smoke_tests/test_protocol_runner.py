@@ -17,7 +17,10 @@ from opentrons.types import MountType, DeckSlotName
 from opentrons.protocol_engine import (
     DeckSlotLocation,
     LoadedLabware,
+    LoadedModule,
     LoadedPipette,
+    ModuleDefinition,
+    ModuleModel,
     PipetteName,
     commands,
 )
@@ -32,6 +35,7 @@ from opentrons.protocol_runner import create_simulating_runner
 async def test_runner_with_python(
     protocol_reader: ProtocolReader,
     python_protocol_file: InputFile,
+    tempdeck_v1_def: ModuleDefinition,
 ) -> None:
     """It should run a Python protocol on the ProtocolRunner."""
     protocol_source = await protocol_reader.read(
@@ -44,6 +48,7 @@ async def test_runner_with_python(
     commands_result = result.commands
     pipettes_result = result.pipettes
     labware_result = result.labware
+    modules_result = result.modules
 
     pipette_id_captor = matchers.Captor()
     labware_id_captor = matchers.Captor()
@@ -65,8 +70,17 @@ async def test_runner_with_python(
         offsetId=None,
     )
 
+    expected_module = LoadedModule.construct(
+        id=matchers.IsA(str),
+        model=ModuleModel.TEMPERATURE_MODULE_V1,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+        definition=tempdeck_v1_def,
+        serialNumber=matchers.IsA(str),
+    )
+
     assert expected_pipette in pipettes_result
     assert expected_labware in labware_result
+    assert expected_module in modules_result
 
     expected_command = commands.PickUpTip(
         id=matchers.IsA(str),

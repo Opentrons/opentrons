@@ -140,6 +140,20 @@ class ModuleModel(str, Enum):
     MAGNETIC_MODULE_V2 = "magneticModuleV2"
     THERMOCYCLER_MODULE_V1 = "thermocyclerModuleV1"
 
+    def as_type(self) -> ModuleType:
+        """Get the ModuleType of this model."""
+        if self in [
+            ModuleModel.TEMPERATURE_MODULE_V1,
+            ModuleModel.TEMPERATURE_MODULE_V2,
+        ]:
+            return ModuleType.TEMPERATURE
+        elif self in [ModuleModel.MAGNETIC_MODULE_V1, ModuleModel.MAGNETIC_MODULE_V2]:
+            return ModuleType.MAGNETIC
+        elif self == ModuleModel.THERMOCYCLER_MODULE_V1:
+            return ModuleType.THERMOCYCLER
+
+        assert False, f"Invalid ModuleModel {self}"
+
 
 class ModuleDimensions(BaseModel):
     """Dimension type for modules."""
