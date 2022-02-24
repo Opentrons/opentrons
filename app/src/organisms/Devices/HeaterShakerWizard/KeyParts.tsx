@@ -12,7 +12,7 @@ import {
   Text,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import HeaterShakerKeyParts from '../../../assets/images/heater-shaker-key-parts.svg'
+import HeaterShakerKeyParts from '../../../assets/images/heater-shaker-key-parts.png'
 import HeaterShakerDeckLock from '../../../assets/videos/heater-shaker-setup/HS_Deck_Lock_Anim.webm'
 
 export function KeyParts(): JSX.Element {
@@ -83,7 +83,6 @@ export function KeyParts(): JSX.Element {
             }}
           />
           <video
-            key={HeaterShakerDeckLock}
             css={css`
               max-width: 100%;
               max-height: 10rem;
