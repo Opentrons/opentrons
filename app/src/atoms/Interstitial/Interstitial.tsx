@@ -41,7 +41,7 @@ export function Interstitial(props: InterstitialProps): JSX.Element {
       data-testid={`interstitial`}
       {...outerProps}
     >
-      <Overlay backgroundColor={COLORS.white} />
+      <Overlay backgroundColor={COLORS.white} opacity={1} />
 
       <InterstitialTitleBar {...titleBar} />
       <Box

@@ -68,7 +68,7 @@ const COLLAPSED_STYLE = css`
 export const Slideout = (props: Props): JSX.Element | null => {
   return (
     <>
-      <Overlay opacity={0.2} />
+      <Overlay />
       <Box
         css={props.isExpanded ? EXPANDED_STYLE : COLLAPSED_STYLE}
         position={POSITION_ABSOLUTE}

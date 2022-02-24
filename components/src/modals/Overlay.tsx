@@ -27,7 +27,7 @@ export function Overlay(props: OverlayProps): JSX.Element {
       top="0"
       bottom="0"
       backgroundColor={backgroundColor}
-      opacity={props.opacity ?? 1}
+      opacity={props.opacity ?? 0.2}
       onClick={onClick}
     />
   )
