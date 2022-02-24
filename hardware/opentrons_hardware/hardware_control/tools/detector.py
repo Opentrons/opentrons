@@ -26,8 +26,7 @@ class ToolDetector:
     async def detect(self) -> AsyncGenerator[Dict[Carrier, ToolType], None]:
         """Detect tool changes."""
         async for message in self._messenger._drive:
-            # await self.read() in abstract_driver __anext__ never
-            # allows generator exhaustion
+
             if isinstance(message, message_definitions.PushToolsDetectedNotification):
                 tmp_dic = {
                     Carrier.LEFT: ToolType(int(message.payload.a_motor.value)),
@@ -37,6 +36,9 @@ class ToolDetector:
                     self._attached_tools = tmp_dic
                     log.info("Tools detected %s:", {self._attached_tools})
                     yield tmp_dic
+            # never allow this generator to get exhausted?
+            else:
+                yield self._attached_tools
 
     async def run_detect(self) -> None:
         """Detect tool changes continuoulsy."""
