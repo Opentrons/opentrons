@@ -21,11 +21,11 @@ import { CollapsibleStep } from '../../ProtocolSetup/RunSetupCard/CollapsibleSte
 import { Divider } from '../../../atoms/structure'
 
 interface TestShakeProps {
-  onStepClick: React.Dispatch<React.SetStateAction<number>>
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>
 }
 
 export function TestShake(props: TestShakeProps): JSX.Element {
-  const { onStepClick } = props
+  const { setCurrentPage } = props
   const { t } = useTranslation('heater_shaker')
 
   const [isExpanded, setExpanded] = React.useState(false)
@@ -115,7 +115,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
           <TertiaryButton
             fontSize={TYPOGRAPHY.fontSizeCaption}
             marginLeft={SIZE_AUTO}
-            onClick={() => onStepClick(2)}
+            onClick={() => setCurrentPage(2)}
           >
             {t('go_to_step_1')}
           </TertiaryButton>
@@ -125,7 +125,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
           <TertiaryButton
             fontSize={TYPOGRAPHY.fontSizeCaption}
             marginLeft={SIZE_AUTO}
-            onClick={() => onStepClick(3)}
+            onClick={() => setCurrentPage(3)}
           >
             {t('go_to_step_2')}
           </TertiaryButton>

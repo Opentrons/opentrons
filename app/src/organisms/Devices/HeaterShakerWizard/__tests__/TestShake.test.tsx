@@ -21,7 +21,7 @@ describe('TestShake', () => {
   let props: React.ComponentProps<typeof TestShake>
   beforeEach(() => {
     props = {
-      onStepClick: jest.fn(),
+      setCurrentPage: jest.fn(),
     }
     mockHeaterShakerModuleCard.mockReturnValue(
       <div>Mock Heater Shaker Module Card</div>

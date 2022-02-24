@@ -1,6 +1,5 @@
 import * as React from 'react'
 import {
-  Box,
   Flex,
   Text,
   Icon,
@@ -23,53 +22,47 @@ export const HeaterShakerModuleCard = (): JSX.Element | null => {
       borderRadius={SPACING.spacing2}
       marginBottom={SPACING.spacing3}
       marginLeft={SPACING.spacing3}
+      padding={`${SPACING.spacing4} ${SPACING.spacing3} ${SPACING.spacing4} ${SPACING.spacing3}`}
       width={'20rem'}
     >
-      <Box
-        padding={`${SPACING.spacing4} ${SPACING.spacing3} ${SPACING.spacing4} ${SPACING.spacing3}`}
-        width="100%"
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        paddingRight={SPACING.spacing3}
+        alignItems={ALIGN_FLEX_START}
       >
-        <Flex
-          flexDirection={DIRECTION_ROW}
-          paddingRight={SPACING.spacing3}
-          alignItems={ALIGN_FLEX_START}
-        >
-          <img src={heaterShakerModule} alt={'Heater Shaker'} />
-          <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING.spacing3}>
-            <Text
-              textTransform={TEXT_TRANSFORM_UPPERCASE}
+        <img src={heaterShakerModule} alt={'Heater Shaker'} />
+        <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING.spacing3}>
+          <Text
+            textTransform={TEXT_TRANSFORM_UPPERCASE}
+            color={COLORS.darkGreyEnabled}
+            fontWeight={TYPOGRAPHY.fontWeightRegular}
+            fontSize={TYPOGRAPHY.fontSizeCaption}
+            paddingBottom={SPACING.spacing2}
+          >
+            {'USB Port'}
+          </Text>
+          <Flex paddingBottom={SPACING.spacing2}>
+            <Icon
+              name={'heater-shaker'}
+              size={SIZE_1}
+              marginRight={SPACING.spacing2}
               color={COLORS.darkGreyEnabled}
-              fontWeight={TYPOGRAPHY.fontWeightRegular}
-              fontSize={TYPOGRAPHY.fontSizeCaption}
-              paddingBottom={SPACING.spacing2}
-            >
-              {'USB Port'}
-            </Text>
-            <Flex paddingBottom={SPACING.spacing2}>
-              <Icon
-                name={'heater-shaker'}
-                size={SIZE_1}
-                marginRight={SPACING.spacing2}
-                color={COLORS.darkGreyEnabled}
-              />
-              <Text fontSize={TYPOGRAPHY.fontSizeP}>
-                {'Heater/Shaker GENX'}
-              </Text>
-            </Flex>
-            <HeaterShakerModuleData
-              // TODO(sh, 2022-02-22): replace stubbed out props with actual module values
-              heaterStatus={'idle'}
-              shakerStatus={'shaking'}
-              latchStatus={'Closed and locked'}
-              targetTemp={0}
-              currentTemp={0}
-              targetSpeed={0}
-              currentSpeed={0}
-              isModuleCard={false}
             />
+            <Text fontSize={TYPOGRAPHY.fontSizeP}>{'Heater/Shaker GENX'}</Text>
           </Flex>
+          <HeaterShakerModuleData
+            // TODO(sh, 2022-02-22): replace stubbed out props with actual module values
+            heaterStatus={'idle'}
+            shakerStatus={'shaking'}
+            latchStatus={'Closed and locked'}
+            targetTemp={0}
+            currentTemp={0}
+            targetSpeed={0}
+            currentSpeed={0}
+            isModuleCard={false}
+          />
         </Flex>
-      </Box>
+      </Flex>
     </Flex>
   )
 }

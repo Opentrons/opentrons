@@ -61,7 +61,7 @@ export const HeaterShakerWizard = (
         return <PowerOn status={'on'} />
       case 5:
         buttonContent = t('complete')
-        return <TestShake onStepClick={setCurrentPage} />
+        return <TestShake setCurrentPage={setCurrentPage} />
       default:
         return null
     }
