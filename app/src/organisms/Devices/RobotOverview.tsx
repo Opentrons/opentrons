@@ -95,7 +95,10 @@ export function RobotOverview({
         </Flex>
       </Box>
       <Box alignSelf={ALIGN_START}>
-        <Icon name="dots-vertical" color={C_MED_DARK_GRAY} size={SIZE_2} />
+        {/* temp link to robot settings until overflow menu implemented */}
+        <Link to={`/devices/${robotName}/robot-settings/calibration`}>
+          <Icon name="dots-vertical" color={C_MED_DARK_GRAY} size={SIZE_2} />
+        </Link>
       </Box>
     </Flex>
   ) : null

@@ -8,6 +8,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { Breadcrumbs } from '../../molecules/Breadcrumbs'
 import { DeviceDetails } from '../../pages/Devices/DeviceDetails'
 import { DevicesLanding } from '../../pages/Devices/DevicesLanding'
+import { RobotSettings } from '../../pages/Devices/RobotSettings'
 import { GeneralSettings } from '../../organisms/AppSettings/GeneralSettings'
 import { usePathCrumbs } from '../hooks'
 import { NextGenApp } from '../NextGenApp'
@@ -16,6 +17,7 @@ jest.mock('../../molecules/Breadcrumbs')
 jest.mock('../../organisms/Devices/hooks')
 jest.mock('../../pages/Devices/DeviceDetails')
 jest.mock('../../pages/Devices/DevicesLanding')
+jest.mock('../../pages/Devices/RobotSettings')
 jest.mock('../../organisms/AppSettings/GeneralSettings')
 jest.mock('../../redux/config')
 jest.mock('../hooks')
@@ -28,6 +30,10 @@ const mockDevicesLanding = DevicesLanding as jest.MockedFunction<
   typeof DevicesLanding
 >
 mockDevicesLanding.mockReturnValue(<div>Mock DevicesLanding</div>)
+const mockRobotSettings = RobotSettings as jest.MockedFunction<
+  typeof RobotSettings
+>
+mockRobotSettings.mockReturnValue(<div>Mock RobotSettings</div>)
 const mockAppSettings = GeneralSettings as jest.MockedFunction<
   typeof GeneralSettings
 >
@@ -72,5 +78,10 @@ describe('NextGenApp', () => {
   it('renders a DeviceDetails component from /robots/:robotName', () => {
     const [{ getByText }] = render('/devices/otie')
     getByText('Mock DeviceDetails')
+  })
+
+  it('renders a RobotSettings component from /robots/:robotName/robot-settings/:robotSettingsTab', () => {
+    const [{ getByText }] = render('/devices/otie/robot-settings/calibration')
+    getByText('Mock RobotSettings')
   })
 })
