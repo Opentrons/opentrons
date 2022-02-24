@@ -15,6 +15,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import { Line } from '../../../atoms/structure'
 import { RobotSettingsCalibration } from '../../../organisms/Devices/RobotSettings/RobotSettingsCalibration'
 
 import type {
@@ -76,16 +77,13 @@ export function RobotSettings(): JSX.Element | null {
     >
       <Flex
         backgroundColor={COLORS.white}
-        border={`${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.medGrey}`}
+        border={BORDERS.lineBorder}
         borderRadius={BORDERS.radiusSoftCorners}
         flexDirection={DIRECTION_COLUMN}
         marginBottom={SPACING.spacing4}
         width="100%"
       >
-        <Box
-          borderBottom={`${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.medGrey}`}
-          padding={`0 ${SPACING.spacing4}`}
-        >
+        <Box padding={`0 ${SPACING.spacing4}`}>
           <Box
             color={COLORS.black}
             css={TYPOGRAPHY.h1Default}
@@ -108,6 +106,7 @@ export function RobotSettings(): JSX.Element | null {
             />
           </Flex>
         </Box>
+        <Line />
         <Box padding={`${SPACING.spacing5} ${SPACING.spacing4}`}>
           <RobotSettingsContent />
         </Box>

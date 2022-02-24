@@ -7,13 +7,13 @@ import {
   Flex,
   Link,
   ALIGN_CENTER,
-  BORDERS,
   COLORS,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { TertiaryButton } from '../../../atoms/Buttons'
+import { Line } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
 import { DeckCalibrationModal } from '../../../organisms/ProtocolSetup/RunSetupCard/RobotCalibration/DeckCalibrationModal'
 import { useTrackEvent } from '../../../redux/analytics'
@@ -66,43 +66,44 @@ export function RobotSettingsCalibration({
   }
 
   return (
-    <Box
-      paddingBottom={SPACING.spacing5}
-      borderBottom={`${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.medGrey}`}
-    >
-      <Flex alignItems={ALIGN_CENTER}>
-        <Box marginRight={SPACING.spacing6}>
-          <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
-            {t('about_calibration_title')}
+    <>
+      <Box paddingBottom={SPACING.spacing5}>
+        <Flex alignItems={ALIGN_CENTER}>
+          <Box marginRight={SPACING.spacing6}>
+            <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
+              {t('about_calibration_title')}
+            </Box>
+            <StyledText as="p" marginBottom={SPACING.spacing3}>
+              {t('about_calibration_description')}
+            </StyledText>
+            {showDeckCalibrationModal ? (
+              <DeckCalibrationModal
+                onCloseClick={() => setShowDeckCalibrationModal(false)}
+              />
+            ) : null}
+            <Link
+              color={COLORS.blue}
+              css={TYPOGRAPHY.pRegular}
+              onClick={() => setShowDeckCalibrationModal(true)}
+            >
+              {t('see_how_robot_calibration_works')}
+            </Link>
           </Box>
-          <StyledText as="p" marginBottom={SPACING.spacing3}>
-            {t('about_calibration_description')}
-          </StyledText>
-          {showDeckCalibrationModal ? (
-            <DeckCalibrationModal
-              onCloseClick={() => setShowDeckCalibrationModal(false)}
-            />
-          ) : null}
-          <Link
-            color={COLORS.blue}
-            css={TYPOGRAPHY.pRegular}
-            onClick={() => setShowDeckCalibrationModal(true)}
+          <TertiaryButton
+            boxShadow="none"
+            color={COLORS.background}
+            css={TYPOGRAPHY.h6SemiBold}
+            padding="0.375rem 0.75rem"
+            textTransform={TYPOGRAPHY.textTransformNone}
+            whiteSpace="nowrap"
+            onClick={onClickSaveAs}
           >
-            {t('see_how_robot_calibration_works')}
-          </Link>
-        </Box>
-        <TertiaryButton
-          boxShadow="none"
-          color={COLORS.background}
-          css={TYPOGRAPHY.h6SemiBold}
-          padding="0.375rem 0.75rem"
-          textTransform={TYPOGRAPHY.textTransformNone}
-          whiteSpace="nowrap"
-          onClick={onClickSaveAs}
-        >
-          {t('download_calibration_data')}
-        </TertiaryButton>
-      </Flex>
-    </Box>
+            {t('download_calibration_data')}
+          </TertiaryButton>
+        </Flex>
+      </Box>
+      <Line />
+      {/* TODO: additional calibration content here */}
+    </>
   )
 }
