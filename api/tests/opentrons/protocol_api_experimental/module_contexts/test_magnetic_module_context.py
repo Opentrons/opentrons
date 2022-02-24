@@ -141,14 +141,15 @@ def test_engage_height_from_home(
 ) -> None:
     """It should pass the correct height to the Protocol Engine command."""
     decoy.when(
-        engine_client.state.modules.get_magnet_offset_to_labware_bottom(
-            module_id=subject_module_id
+        engine_client.state.modules.calculate_magnet_true_mm_above_base(
+            module_id=subject_module_id,
+            hardware_units_above_home=12.34,
         )
-    ).then_return(1.1)
-    subject.engage(height=3.3)
+    ).then_return(56.78)
+    subject.engage(height=12.34)
     decoy.verify(
         engine_client.magnetic_module_engage(
-            module_id=subject_module_id, engage_height=cast(float, pytest.approx(2.2))
+            module_id=subject_module_id, engage_height=56.78
         ),
     )
 
@@ -160,12 +161,19 @@ def test_engage_height_from_base(
     subject: MagneticModuleContext,
 ) -> None:
     """It should pass the correct height to the Protocol Engine command."""
+    decoy.when(
+        engine_client.state.modules.calculate_magnet_true_mm_above_base(
+            module_id=subject_module_id,
+            hardware_units_above_base=12.34,
+        )
+    ).then_return(56.78)
     subject.engage(height_from_base=12.34)
     decoy.verify(
         engine_client.magnetic_module_engage(
-            module_id=subject_module_id, engage_height=12.34
+            module_id=subject_module_id, engage_height=56.78
         )
     )
+
 
 # To do before merge: Test error if no labware loaded and use offset or none
 # To do before merge: Test error if labware loaded does not have intrinsic heigh

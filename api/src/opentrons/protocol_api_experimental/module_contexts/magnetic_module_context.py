@@ -105,7 +105,9 @@ class MagneticModuleContext:  # noqa: D101
             arguments.
         """  # noqa: D205,D212,D415
         all_height_arguments = [height, height_from_base, offset]
-        num_height_arguments_provided = len([a for a in all_height_arguments if a is not None])
+        num_height_arguments_provided = len(
+            [a for a in all_height_arguments if a is not None]
+        )
         if num_height_arguments_provided > 1:
             raise InvalidMagnetEngageHeightError(
                 "You may only specify one of"
@@ -114,23 +116,19 @@ class MagneticModuleContext:  # noqa: D101
 
         state = self._engine_client.state
 
-        height_above_base_true_mm: float
+        true_mm_above_base: float
 
         if height is not None:
-            offset_home_to_base = state.modules.get_magnet_offset_to_labware_bottom(
-                module_id=self._module_id
+            true_mm_above_base = state.modules.calculate_magnet_true_mm_above_base(
+                module_id=self._module_id,
+                hardware_units_above_home=height,
             )
 
-            # FIXME(mm, 2022-02-22): In APIv2, GEN1 Magnetic Modules have their
-            # height argument in units of half-millimeters,
-            # which makes this arithmetic wrong.
-            height_above_base_true_mm = height - offset_home_to_base
-
         elif height_from_base is not None:
-            # FIXME(mm, 2022-02-22): In APIv2, GEN1 Magnetic Modules have their
-            # height_from_base argument in units of half-millimeters,
-            # which makes this wrong.
-            height_above_base_true_mm = height_from_base
+            true_mm_above_base = state.modules.calculate_magnet_true_mm_above_base(
+                module_id=self._module_id,
+                hardware_units_above_base=height_from_base,
+            )
 
         else:
             labware_id = state.labware.get_id_by_module(module_id=self._module_id)
@@ -141,7 +139,11 @@ class MagneticModuleContext:  # noqa: D101
                     " with the `height` or `height_from_base` parameter."
                 )
 
-            default_height_above_base_true_mm = state.labware.get_magnet_engage_height_above_base_true_mm(labware_id=labware_id)
+            default_height_above_base_true_mm = (
+                state.labware.get_magnet_engage_height_above_base_true_mm(
+                    labware_id=labware_id
+                )
+            )
             if default_height_above_base_true_mm is None:
                 raise InvalidMagnetEngageHeightError(
                     "The labware loaded on this Magnetic Module"
@@ -151,16 +153,16 @@ class MagneticModuleContext:  # noqa: D101
                 )
 
             if offset is None:
-                height_above_base_true_mm = default_height_above_base_true_mm
+                true_mm_above_base = default_height_above_base_true_mm
             else:
                 # FIXME(mm, 2022-02-22): In APIv2, GEN1 Magnetic Modules have their
                 # offset argument in units of half-millimeters,
                 # which makes this arithmetic wrong.
-                height_above_base_true_mm = default_height_above_base_true_mm + offset
+                true_mm_above_base = default_height_above_base_true_mm + offset
 
         self._engine_client.magnetic_module_engage(
             module_id=self._module_id,
-            engage_height=height_above_base_true_mm,
+            engage_height=true_mm_above_base,
         )
 
     def disengage(self) -> None:  # noqa: D102

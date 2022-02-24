@@ -147,7 +147,7 @@ def test_get_properties_by_id(
     )
 
 
-def test_get_magnet_offset_to_labware_bottom(
+def test_get_magnet_true_mm_home_to_base(
     magdeck_v1_def: ModuleDefinition,
     magdeck_v2_def: ModuleDefinition,
 ) -> None:
@@ -169,8 +169,8 @@ def test_get_magnet_offset_to_labware_bottom(
         },
     )
 
-    assert subject.get_magnet_offset_to_labware_bottom(module_id="magdeck-v1-id") == 2.5
-    assert subject.get_magnet_offset_to_labware_bottom(module_id="magdeck-v2-id") == 2.5
+    assert subject.get_magnet_true_mm_home_to_base(module_id="magdeck-v1-id") == 2.5
+    assert subject.get_magnet_true_mm_home_to_base(module_id="magdeck-v2-id") == 2.5
 
 
 @pytest.mark.parametrize(
