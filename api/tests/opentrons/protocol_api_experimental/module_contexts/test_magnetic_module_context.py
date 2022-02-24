@@ -1,8 +1,6 @@
 """Tests for `magnetic_module_context`."""
 
 
-from typing import cast
-
 from decoy import Decoy
 import pytest
 
