@@ -24,7 +24,10 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
     WriteToSensorRequestPayload,
     BaselineSensorRequestPayload,
 )
+<<<<<<< HEAD
 from opentrons_hardware.firmware_bindings.messages.fields import SensorTypeField
+=======
+>>>>>>> feat(ot3): add drivers for sensors on the OT3
 
 from opentrons_hardware.sensors.utils import (
     ReadSensorInformation,
@@ -55,7 +58,11 @@ class SensorScheduler:
                 node_id=sensor.node_id,
                 message=BaselineSensorRequest(
                     payload=BaselineSensorRequestPayload(
+<<<<<<< HEAD
                         sensor=SensorTypeField(sensor.sensor_type),
+=======
+                        sensor=UInt8Field(sensor.sensor_type),
+>>>>>>> feat(ot3): add drivers for sensors on the OT3
                         sample_rate=UInt16Field(sensor.poll_for),
                         offset_update=UInt8Field(sensor.offset),
                     )
