@@ -30,11 +30,11 @@ class MagDeck(mod_abc.AbstractModule):
         port: str,
         usb_port: USBPort,
         execution_manager: ExecutionManager,
-        simulating=False,
-        loop: asyncio.AbstractEventLoop = None,
-        sim_model: str = None,
-        **kwargs,
-    ):
+        simulating: bool = False,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
+        sim_model: Optional[str] = None,
+        **kwargs: float,
+    ) -> "MagDeck":
         """Factory function."""
         driver: AbstractMagDeckDriver
         if not simulating:
@@ -59,7 +59,7 @@ class MagDeck(mod_abc.AbstractModule):
         execution_manager: ExecutionManager,
         driver: AbstractMagDeckDriver,
         device_info: Mapping[str, str],
-        loop: asyncio.AbstractEventLoop = None,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
     ) -> None:
         """Constructor"""
         super().__init__(

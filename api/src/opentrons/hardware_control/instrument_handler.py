@@ -102,7 +102,7 @@ class InstrumentHandlerProvider(Generic[MountType]):
         self._attached_instruments: InstrumentsByMount[MountType] = attached_instruments
         self._ihp_log = InstrumentHandlerProvider.IHP_LOG.getChild(str(id(self)))
 
-    def reset_instrument(self, mount: Optional[MountType] = None):
+    def reset_instrument(self, mount: Optional[MountType] = None) -> None:
         """
         Reset the internal state of a pipette by its mount, without doing
         any lower level reconfiguration. This is useful to make sure that no
@@ -112,7 +112,7 @@ class InstrumentHandlerProvider(Generic[MountType]):
                       reset both
         """
 
-        def _reset(m: MountType):
+        def _reset(m: MountType) -> None:
             self._ihp_log.info(f"Resetting configuration for {m}")
             p = self._attached_instruments[m]
             if not p:
@@ -220,7 +220,9 @@ class InstrumentHandlerProvider(Generic[MountType]):
         """Do not write new code that uses this."""
         return self._attached_instruments
 
-    def set_current_tiprack_diameter(self, mount: MountType, tiprack_diameter: float):
+    def set_current_tiprack_diameter(
+        self, mount: MountType, tiprack_diameter: float
+    ) -> None:
         instr = self.get_pipette(mount)
         self._ihp_log.info(
             "Updating tip rack diameter on pipette mount: "
@@ -260,7 +262,7 @@ class InstrumentHandlerProvider(Generic[MountType]):
         pipette
         """
         instr = self.get_pipette(mount)
-        pos_dict: Dict = {
+        pos_dict: Dict[str, float] = {
             "top": instr.config.top,
             "bottom": instr.config.bottom,
             "blow_out": instr.config.blow_out,
@@ -272,7 +274,7 @@ class InstrumentHandlerProvider(Generic[MountType]):
             pos_dict["bottom"] = bottom
         if blow_out is not None:
             pos_dict["blow_out"] = blow_out
-        if bottom is not None:
+        if drop_tip is not None:
             pos_dict["drop_tip"] = drop_tip
         for key in pos_dict.keys():
             instr.update_config_item(key, pos_dict[key])
@@ -361,7 +363,7 @@ class InstrumentHandlerProvider(Generic[MountType]):
             self._ihp_log.warning("detach tip called with no tip")
 
     def critical_point_for(
-        self, mount: MountType, cp_override: CriticalPoint = None
+        self, mount: MountType, cp_override: Optional[CriticalPoint] = None
     ) -> top_types.Point:
         """Return the current critical point of the specified mount.
 
@@ -380,7 +382,7 @@ class InstrumentHandlerProvider(Generic[MountType]):
             # configured such that the end of a p300 single gen1's tip is 0.
             return top_types.Point(0, 0, 30)
 
-    def ready_for_tip_action(self, target: Pipette, action: HardwareAction):
+    def ready_for_tip_action(self, target: Pipette, action: HardwareAction) -> None:
         if not target.has_tip:
             raise NoTipAttachedError(f"Cannot perform {action} without a tip attached")
         if (
@@ -422,7 +424,8 @@ class InstrumentHandlerProvider(Generic[MountType]):
     ) -> Optional[LiquidActionSpec[OT3Axis]]:
         ...
 
-    def plan_check_aspirate(
+    # note on this type ignore: see motion_utilities
+    def plan_check_aspirate(  # type: ignore[no-untyped-def]
         self,
         mount,
         volume,
@@ -498,7 +501,7 @@ class InstrumentHandlerProvider(Generic[MountType]):
     ) -> Optional[LiquidActionSpec[OT3Axis]]:
         ...
 
-    def plan_check_dispense(
+    def plan_check_dispense(  # type: ignore[no-untyped-def]
         self,
         mount,
         volume,
@@ -571,7 +574,7 @@ class InstrumentHandlerProvider(Generic[MountType]):
     def plan_check_blow_out(self, mount: OT3Mount) -> LiquidActionSpec[OT3Axis]:
         ...
 
-    def plan_check_blow_out(self, mount):
+    def plan_check_blow_out(self, mount):  # type: ignore[no-untyped-def]
         """Check preconditions and calculate values for blowout."""
         instrument = self.get_pipette(mount)
         self.ready_for_tip_action(instrument, HardwareAction.BLOWOUT)
@@ -639,7 +642,7 @@ class InstrumentHandlerProvider(Generic[MountType]):
     ) -> Tuple[PickUpTipSpec[OT3Axis], Callable[[], None]]:
         ...
 
-    def plan_check_pick_up_tip(
+    def plan_check_pick_up_tip(  # type: ignore[no-untyped-def]
         self,
         mount,
         tip_length,
@@ -802,7 +805,7 @@ class InstrumentHandlerProvider(Generic[MountType]):
     ) -> Tuple[DropTipSpec[OT3Axis], Callable[[], None]]:
         ...
 
-    def plan_check_drop_tip(
+    def plan_check_drop_tip(  # type: ignore[no-untyped-def]
         self,
         mount,
         home_after,

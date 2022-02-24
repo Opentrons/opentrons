@@ -9,6 +9,7 @@ from .types import (
     AxisConstraints,
     ZeroLengthMoveError,
     SystemConstraints,
+    CoordinateValue,
 )
 from .move_utils import unit_vector_multiplication
 
@@ -22,4 +23,5 @@ __all__ = [
     "SystemConstraints",
     "unit_vector_multiplication",
     "ZeroLengthMoveError",
+    "CoordinateValue",
 ]
