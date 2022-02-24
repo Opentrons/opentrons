@@ -252,11 +252,11 @@ class Modules(BaseModel):
                                 "usbPort": {"hub": None, "port": None},
                                 "revision": "heater-shaker_v10",
                                 "serial": "HSnnnnnn",
-                                "status": "RUNNING",
+                                "status": "running",
                                 "data": {
                                     "temperatureStatus": "heating",
                                     "speedStatus": "holding at target",
-                                    "labwareLatchStatus": "CLOSED",
+                                    "labwareLatchStatus": "closed",
                                     "currentTemp": 25.5,
                                     "targetTemp": 50,
                                     "currentSpeed": 10,

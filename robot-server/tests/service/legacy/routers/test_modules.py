@@ -118,11 +118,11 @@ def heater_shaker():
     )
     HeaterShaker.live_data = PropertyMock(
         return_value={
-            "status": "RUNNING",
+            "status": "running",
             "data": {
                 "temperatureStatus": "heating",
                 "speedStatus": "holding at target",
-                "labwareLatchStatus": "CLOSED",
+                "labwareLatchStatus": "closed",
                 "currentTemp": 25.5,
                 "targetTemp": 500,
                 "currentSpeed": 10,
@@ -252,11 +252,11 @@ def test_get_module_heater_shaker(api_client, hardware, heater_shaker) -> None:
                 "usbPort": {"hub": None, "port": None},
                 "revision": "dummyModelHS",
                 "serial": "dummySerialHS",
-                "status": "RUNNING",
+                "status": "running",
                 "data": {
                     "temperatureStatus": "heating",
                     "speedStatus": "holding at target",
-                    "labwareLatchStatus": "CLOSED",
+                    "labwareLatchStatus": "closed",
                     "currentTemp": 25.5,
                     "targetTemp": 500,
                     "currentSpeed": 10,

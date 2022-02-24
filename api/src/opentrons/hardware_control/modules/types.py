@@ -122,6 +122,6 @@ class SpeedStatus(str, Enum):
 
 
 class HeaterShakerStatus(str, Enum):
-    IDLE = "IDLE"
-    RUNNING = "RUNNING"
-    ERROR = "ERROR"
+    IDLE = "idle"
+    RUNNING = "running"
+    ERROR = "error"
