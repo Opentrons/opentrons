@@ -44,13 +44,17 @@ export const HeaterShakerWizard = (
   )
   const [targetProps, tooltipProps] = useHoverTooltip()
 
-  const heaterShakerAttachedIndex = attachedModules.findIndex(
+  const heaterShaker = attachedModules.find(
     //  TODO(jr, 2022-02-18): get heaterShaker module when model exists
     module => module.model === 'magneticModuleV2'
   )
+  let isPrimaryCTAEnabled: boolean = true
+
+  if (currentPage === 4) {
+    isPrimaryCTAEnabled = Boolean(heaterShaker)
+  }
 
   let buttonContent = null
-  let isPrimaryCTADisabled: boolean = false
   const getWizardDisplayPage = (): JSX.Element | null => {
     switch (currentPage) {
       case 0:
@@ -72,17 +76,7 @@ export const HeaterShakerWizard = (
         return <AttachAdapter />
       case 4:
         buttonContent = t('btn_test_shake')
-        isPrimaryCTADisabled = heaterShakerAttachedIndex === -1
-        return (
-          <PowerOn
-            isAttached={!isPrimaryCTADisabled}
-            attachedModule={
-              !isPrimaryCTADisabled
-                ? attachedModules[heaterShakerAttachedIndex]
-                : null
-            }
-          />
-        )
+        return <PowerOn attachedModule={heaterShaker ?? null} />
       case 5:
         buttonContent = t('complete')
         return <TestShake />
@@ -125,7 +119,7 @@ export const HeaterShakerWizard = (
           {currentPage <= 5 ? (
             <PrimaryBtn
               alignItems={ALIGN_CENTER}
-              disabled={isPrimaryCTADisabled}
+              disabled={!isPrimaryCTAEnabled}
               {...targetProps}
               backgroundColor={COLORS.blue}
               borderRadius={SPACING.spacingS}
@@ -138,7 +132,7 @@ export const HeaterShakerWizard = (
               }
             >
               {buttonContent}
-              {isPrimaryCTADisabled !== false ? (
+              {!isPrimaryCTAEnabled ? (
                 <Tooltip {...tooltipProps}>
                   {t('module_is_not_connected')}
                 </Tooltip>

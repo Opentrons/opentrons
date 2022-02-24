@@ -19,7 +19,6 @@ import type { AttachedModule } from '../../../redux/modules/types'
 
 const VIEW_BOX = '-150 -40 440 128'
 interface PowerOnProps {
-  isAttached: boolean
   attachedModule: AttachedModule | null
 }
 
@@ -59,7 +58,7 @@ export function PowerOn(props: PowerOnProps): JSX.Element {
             >
               <ModuleInfo
                 moduleModel={moduleDef.model}
-                isAttached={props.isAttached}
+                isAttached={props.attachedModule !== null}
                 usbPort={props.attachedModule?.usbPort.port ?? null}
                 hubPort={props.attachedModule?.usbPort.hub ?? null}
               />

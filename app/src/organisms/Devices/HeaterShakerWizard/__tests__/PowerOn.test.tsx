@@ -16,7 +16,6 @@ describe('PowerOn', () => {
   // TODO(jr, 2022-02-18): fix module model to heater shaker when it exists
   beforeEach(() => {
     props = {
-      isAttached: true,
       attachedModule: mockMagneticModuleGen2,
     }
   })
@@ -40,7 +39,6 @@ describe('PowerOn', () => {
 
   it('renders heater shaker SVG with info with module not connected', () => {
     props = {
-      isAttached: false,
       attachedModule: null,
     }
     const { getByText } = render(props)
