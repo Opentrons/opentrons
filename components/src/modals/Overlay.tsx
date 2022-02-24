@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { css } from 'styled-components'
 import { COLORS, Flex, POSITION_ABSOLUTE } from '..'
 
 export interface OverlayProps {
