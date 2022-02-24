@@ -19,6 +19,7 @@ import {
 } from '@opentrons/components'
 
 import { Divider } from '../structure'
+import { Veil } from '../Veil'
 
 interface Props {
   title: string
@@ -67,6 +68,7 @@ const COLLAPSED_STYLE = css`
 export const Slideout = (props: Props): JSX.Element | null => {
   return (
     <>
+      <Veil />
       <Box
         css={props.isExpanded ? EXPANDED_STYLE : COLLAPSED_STYLE}
         position={POSITION_ABSOLUTE}

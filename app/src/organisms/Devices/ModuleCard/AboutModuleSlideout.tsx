@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
 import { RUN_STATUS_RUNNING, RUN_STATUS_FINISHING } from '@opentrons/api-client'
 import {
@@ -25,7 +25,7 @@ import { updateModule } from '../../../redux/modules'
 import { getConnectedRobotName } from '../../../redux/robot/selectors'
 import { useRunStatus } from '../../RunTimeControl/hooks'
 
-import type { State } from '../../../redux/types'
+import type { State, Dispatch } from '../../../redux/types'
 import type { AttachedModule } from '../../../redux/modules/types'
 
 interface AboutModuleSlideoutProps {
@@ -47,11 +47,12 @@ export const AboutModuleSlideout = (
   const moduleName = getModuleDisplayName(module.model)
   const robotName = useSelector((state: State) => getConnectedRobotName(state))
   const runStatus = useRunStatus()
+  const dispatch = useDispatch<Dispatch>()
   const isDisabled =
     runStatus === RUN_STATUS_RUNNING || runStatus === RUN_STATUS_FINISHING
 
   const handleClick = (): void => {
-    robotName && updateModule(robotName, module.serial)
+    robotName && dispatch(updateModule(robotName, module.serial))
   }
 
   return (
@@ -59,6 +60,9 @@ export const AboutModuleSlideout = (
       title={t('about_module', { name: moduleName })}
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
+      css={css`
+        width: 19.5rem;
+      `}
     >
       {/* TODO(jr, 2/22/22): update AlertItem to match new designs and wire up the link */}
       {module.hasAvailableUpdate ? (
