@@ -10,7 +10,9 @@ from opentrons.types import Point
 mod_log = logging.getLogger(__name__)
 
 
-def _handle_loop_exception(loop: asyncio.AbstractEventLoop, context: Dict[str, Any]):
+def _handle_loop_exception(
+    loop: asyncio.AbstractEventLoop, context: Dict[str, Any]
+) -> None:
     mod_log.error(f"Caught exception: {context}")
 
 
@@ -46,7 +48,7 @@ class DeckTransformState(Enum):
     BAD_CALIBRATION = "BAD_CALIBRATION"
     SINGULARITY = "SINGULARITY"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 

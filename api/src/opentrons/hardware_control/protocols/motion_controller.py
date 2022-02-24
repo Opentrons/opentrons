@@ -114,7 +114,7 @@ class MotionController(Protocol):
         speed: Optional[float] = None,
         critical_point: Optional[CriticalPoint] = None,
         max_speeds: Optional[Dict[Axis, float]] = None,
-    ):
+    ) -> None:
         """Move the critical point of the specified mount to a location
         relative to the deck, at the specified speed. 'speed' sets the speed
         of all robot axes to the given value. So, if multiple axes are to be
@@ -162,7 +162,7 @@ class MotionController(Protocol):
         max_speeds: Optional[Dict[Axis, float]] = None,
         check_bounds: MotionChecks = MotionChecks.NONE,
         fail_on_not_homed: bool = False,
-    ):
+    ) -> None:
         """Move the critical point of the specified mount by a specified
         displacement in a specified direction, at the specified speed.
         'speed' sets the speed of all axes to the given value. So, if multiple

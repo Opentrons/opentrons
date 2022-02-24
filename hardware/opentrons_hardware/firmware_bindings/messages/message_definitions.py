@@ -309,6 +309,20 @@ class FirmwareUpdateStatusResponse:  # noqa: D101
 
 
 @dataclass
+class HomeRequest:  # noqa: D101
+    payload: payloads.HomeRequestPayload
+    payload_type: Type[BinarySerializable] = payloads.HomeRequestPayload
+    message_id: Literal[MessageId.home_request] = MessageId.home_request
+
+
+@dataclass
+class FirmwareUpdateStartApp:  # noqa: D101
+    payload: payloads.EmptyPayload
+    payload_type: Type[BinarySerializable] = payloads.EmptyPayload
+    message_id: Literal[MessageId.fw_update_start_app] = MessageId.fw_update_start_app
+
+
+@dataclass
 class ReadLimitSwitchRequest:  # noqa: D101
     payload: payloads.EmptyPayload
     payload_type: Type[BinarySerializable] = payloads.EmptyPayload
@@ -324,22 +338,22 @@ class ReadLimitSwitchResponse:  # noqa: D101
 
 @dataclass
 class ReadFromSensorRequest:  # noqa: D101
-    payload: payloads.ReadFromSensorRequest
-    payload_type: Type[BinarySerializable] = payloads.ReadFromSensorRequest
+    payload: payloads.ReadFromSensorRequestPayload
+    payload_type: Type[BinarySerializable] = payloads.ReadFromSensorRequestPayload
     message_id: Literal[MessageId.read_sensor_request] = MessageId.read_sensor_request
 
 
 @dataclass
 class WriteToSensorRequest:  # noqa: D101
-    payload: payloads.WriteToSensorRequest
-    payload_type: Type[BinarySerializable] = payloads.WriteToSensorRequest
+    payload: payloads.WriteToSensorRequestPayload
+    payload_type: Type[BinarySerializable] = payloads.WriteToSensorRequestPayload
     message_id: Literal[MessageId.write_sensor_request] = MessageId.write_sensor_request
 
 
 @dataclass
 class BaselineSensorRequest:  # noqa: D101
-    payload: payloads.BaselineSensorRequest
-    payload_type: Type[BinarySerializable] = payloads.BaselineSensorRequest
+    payload: payloads.BaselineSensorRequestPayload
+    payload_type: Type[BinarySerializable] = payloads.BaselineSensorRequestPayload
     message_id: Literal[
         MessageId.baseline_sensor_request
     ] = MessageId.baseline_sensor_request
@@ -347,15 +361,15 @@ class BaselineSensorRequest:  # noqa: D101
 
 @dataclass
 class ReadFromSensorResponse:  # noqa: D101
-    payload: payloads.ReadFromSensorResponse
-    payload_type: Type[BinarySerializable] = payloads.ReadFromSensorResponse
+    payload: payloads.ReadFromSensorResponsePayload
+    payload_type: Type[BinarySerializable] = payloads.ReadFromSensorResponsePayload
     message_id: Literal[MessageId.read_sensor_response] = MessageId.read_sensor_response
 
 
 @dataclass
 class SetSensorThresholdRequest:  # noqa: D101
-    payload: payloads.SetSensorThresholdRequest
-    payload_type: Type[BinarySerializable] = payloads.SetSensorThresholdRequest
+    payload: payloads.SetSensorThresholdRequestPayload
+    payload_type: Type[BinarySerializable] = payloads.SetSensorThresholdRequestPayload
     message_id: Literal[
         MessageId.set_sensor_threshold_request
     ] = MessageId.set_sensor_threshold_request
@@ -363,8 +377,8 @@ class SetSensorThresholdRequest:  # noqa: D101
 
 @dataclass
 class SensorThresholdResponse:  # noqa: D101
-    payload: payloads.SensorThresholdResponse
-    payload_type: Type[BinarySerializable] = payloads.SensorThresholdResponse
+    payload: payloads.SensorThresholdResponsePayload
+    payload_type: Type[BinarySerializable] = payloads.SensorThresholdResponsePayload
     message_id: Literal[
         MessageId.set_sensor_threshold_response
     ] = MessageId.set_sensor_threshold_response

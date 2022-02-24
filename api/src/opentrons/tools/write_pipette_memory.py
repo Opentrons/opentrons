@@ -96,7 +96,7 @@ async def check_previous_data(mount: str, driver: SmoothieDriver) -> None:
         print("No old data on this pipette")
 
 
-def _assert_the_same(a, b):
+def _assert_the_same(a: object, b: object) -> None:
     if a != b:
         raise Exception(WRITE_FAIL_MESSAGE)
 

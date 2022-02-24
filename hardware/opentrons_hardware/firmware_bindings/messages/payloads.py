@@ -89,6 +89,13 @@ class AddLinearMoveRequestPayload(AddToMoveGroupRequestPayload):
 
 
 @dataclass
+class HomeRequestPayload(AddToMoveGroupRequestPayload):
+    """Request to home."""
+
+    velocity: utils.Int32Field
+
+
+@dataclass
 class GetMoveGroupResponsePayload(MoveGroupResponsePayload):
     """Response to request to get a move group."""
 
@@ -249,14 +256,15 @@ class GetLimitSwitchResponse(utils.BinarySerializable):
 
 
 @dataclass
-class ReadFromSensorRequest(utils.BinarySerializable):
+class ReadFromSensorRequestPayload(utils.BinarySerializable):
     """Take a single reading from a sensor request payload."""
 
     sensor: utils.UInt8Field
+    offset_reading: utils.UInt8Field
 
 
 @dataclass
-class WriteToSensorRequest(utils.BinarySerializable):
+class WriteToSensorRequestPayload(utils.BinarySerializable):
     """Write a piece of data to a sensor request payload."""
 
     sensor: utils.UInt8Field
@@ -264,15 +272,16 @@ class WriteToSensorRequest(utils.BinarySerializable):
 
 
 @dataclass
-class BaselineSensorRequest(utils.BinarySerializable):
+class BaselineSensorRequestPayload(utils.BinarySerializable):
     """Take a specified amount of readings from a sensor request payload."""
 
     sensor: utils.UInt8Field
     sample_rate: utils.UInt8Field
+    offset_update: utils.UInt8Field
 
 
 @dataclass
-class ReadFromSensorResponse(utils.BinarySerializable):
+class ReadFromSensorResponsePayload(utils.BinarySerializable):
     """A response for either a single reading or an averaged reading of a sensor."""
 
     sensor: utils.UInt8Field
@@ -280,7 +289,7 @@ class ReadFromSensorResponse(utils.BinarySerializable):
 
 
 @dataclass
-class SetSensorThresholdRequest(utils.BinarySerializable):
+class SetSensorThresholdRequestPayload(utils.BinarySerializable):
     """A request to set the threshold value of a sensor."""
 
     sensor: utils.UInt8Field
@@ -288,7 +297,7 @@ class SetSensorThresholdRequest(utils.BinarySerializable):
 
 
 @dataclass
-class SensorThresholdResponse(utils.BinarySerializable):
+class SensorThresholdResponsePayload(utils.BinarySerializable):
     """A response that sends back the current threshold value of the sensor."""
 
     sensor: utils.UInt8Field

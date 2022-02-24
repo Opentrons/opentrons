@@ -45,6 +45,7 @@ MessageDefinition = Union[
     defs.FirmwareUpdateCompleteAcknowledge,
     defs.FirmwareUpdateStatusRequest,
     defs.FirmwareUpdateStatusResponse,
+    defs.FirmwareUpdateStartApp,
     defs.ReadLimitSwitchRequest,
     defs.ReadLimitSwitchResponse,
     defs.ReadFromSensorRequest,
@@ -53,6 +54,7 @@ MessageDefinition = Union[
     defs.SetSensorThresholdRequest,
     defs.ReadFromSensorResponse,
     defs.SensorThresholdResponse,
+    defs.HomeRequest,
 ]
 
 

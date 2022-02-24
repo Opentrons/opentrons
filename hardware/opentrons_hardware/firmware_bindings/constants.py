@@ -72,6 +72,7 @@ class MessageId(int, Enum):
     get_move_group_response = 0x17
     execute_move_group_request = 0x18
     clear_all_move_groups_request = 0x19
+    home_request = 0x20
     move_completed = 0x13
 
     set_motion_constraints = 0x101
@@ -95,6 +96,7 @@ class MessageId(int, Enum):
     fw_update_complete_ack = 0x64
     fw_update_status_request = 0x65
     fw_update_status_response = 0x66
+    fw_update_start_app = 0x67
 
     limit_sw_request = 0x08
     limit_sw_response = 0x09

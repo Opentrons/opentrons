@@ -2,7 +2,18 @@ from __future__ import annotations
 import asyncio
 from contextlib import contextmanager, AsyncExitStack
 import logging
-from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING, Union, Sequence
+from typing import (
+    Callable,
+    Iterator,
+    Any,
+    Dict,
+    List,
+    Optional,
+    Tuple,
+    TYPE_CHECKING,
+    Union,
+    Sequence,
+)
 from typing_extensions import Final
 
 try:
@@ -18,7 +29,7 @@ from opentrons.config.types import RobotConfig
 from opentrons.types import Mount
 
 from ..module_control import AttachedModulesControl
-from ..types import AionotifyEvent, BoardRevision, Axis
+from ..types import AionotifyEvent, BoardRevision, Axis, DoorState
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import PipetteModel, PipetteName
@@ -87,7 +98,7 @@ class Controller:
             )
 
     @staticmethod
-    def _build_event_watcher():
+    def _build_event_watcher() -> aionotify.Watcher:
         watcher = aionotify.Watcher()
         watcher.watch(
             alias="modules",
@@ -111,11 +122,17 @@ class Controller:
         return self._module_controls
 
     @module_controls.setter
-    def module_controls(self, module_controls: AttachedModulesControl):
+    def module_controls(self, module_controls: AttachedModulesControl) -> None:
         self._module_controls = module_controls
 
-    def start_gpio_door_watcher(self, **kargs):
-        self.gpio_chardev.start_door_switch_watcher(**kargs)
+    def start_gpio_door_watcher(
+        self,
+        loop: asyncio.AbstractEventLoop,
+        update_door_state: Callable[[DoorState], None],
+    ) -> None:
+        self.gpio_chardev.start_door_switch_watcher(
+            loop=loop, update_door_state=update_door_state
+        )
 
     async def update_position(self) -> Dict[str, float]:
         await self._smoothie_driver.update_position()
@@ -131,9 +148,9 @@ class Controller:
         self,
         target_position: Dict[str, float],
         home_flagged_axes: bool = True,
-        speed: float = None,
-        axis_max_speeds: Dict[str, float] = None,
-    ):
+        speed: Optional[float] = None,
+        axis_max_speeds: Optional[Dict[str, float]] = None,
+    ) -> None:
         async with AsyncExitStack() as cmstack:
             if axis_max_speeds:
                 await cmstack.enter_async_context(
@@ -143,7 +160,7 @@ class Controller:
                 target_position, home_flagged_axes=home_flagged_axes, speed=speed
             )
 
-    async def home(self, axes: List[str] = None) -> Dict[str, float]:
+    async def home(self, axes: Optional[List[str]] = None) -> Dict[str, float]:
         if axes:
             args: Tuple[Any, ...] = ("".join(axes),)
         else:
@@ -207,7 +224,7 @@ class Controller:
             for mount in Mount
         }
 
-    def set_active_current(self, axis_currents: Dict[Axis, float]):
+    def set_active_current(self, axis_currents: Dict[Axis, float]) -> None:
         """
         This method sets only the 'active' current, i.e., the current for an
         axis' movement. Smoothie driver automatically resets the current for
@@ -218,14 +235,14 @@ class Controller:
         )
 
     @contextmanager
-    def save_current(self):
+    def save_current(self) -> Iterator[None]:
         self._smoothie_driver.push_active_current()
         try:
             yield
         finally:
             self._smoothie_driver.pop_active_current()
 
-    async def _handle_watch_event(self):
+    async def _handle_watch_event(self) -> None:
         try:
             event = await self._event_watcher.get_event()
         except asyncio.IncompleteReadError:
@@ -238,7 +255,7 @@ class Controller:
                 event_description = AionotifyEvent.build(event_name, flags)
                 await self.module_controls.handle_module_appearance(event_description)
 
-    async def watch(self, loop: asyncio.AbstractEventLoop):
+    async def watch(self, loop: asyncio.AbstractEventLoop) -> None:
         can_watch = aionotify is not None
         if can_watch:
             await self._event_watcher.setup(loop)
@@ -246,7 +263,7 @@ class Controller:
         while can_watch and (not self._event_watcher.closed):
             await self._handle_watch_event()
 
-    async def connect(self, port: str = None) -> None:
+    async def connect(self, port: Optional[str] = None) -> None:
         """Build driver and connect to it."""
         await self._smoothie_driver.connect(port)
         await self.update_fw_version()
@@ -264,7 +281,7 @@ class Controller:
     def fw_version(self) -> Optional[str]:
         return self._cached_fw_version
 
-    async def update_fw_version(self):
+    async def update_fw_version(self) -> None:
         self._cached_fw_version = await self._smoothie_driver.get_fw_version()
 
     async def update_firmware(
@@ -280,7 +297,7 @@ class Controller:
     async def disengage_axes(self, axes: List[str]) -> None:
         await self._smoothie_driver.disengage_axis("".join(axes))
 
-    def set_lights(self, button: Optional[bool], rails: Optional[bool]):
+    def set_lights(self, button: Optional[bool], rails: Optional[bool]) -> None:
         if button is not None:
             self.gpio_chardev.set_button_light(blue=button)
         if rails is not None:
@@ -292,23 +309,23 @@ class Controller:
             "rails": self.gpio_chardev.get_rail_lights(),
         }
 
-    def pause(self):
+    def pause(self) -> None:
         self._smoothie_driver.pause()
 
-    def resume(self):
+    def resume(self) -> None:
         self._smoothie_driver.resume()
 
-    async def halt(self):
+    async def halt(self) -> None:
         await self._smoothie_driver.kill()
 
-    async def hard_halt(self):
+    async def hard_halt(self) -> None:
         await self._smoothie_driver.hard_halt()
 
     async def probe(self, axis: str, distance: float) -> Dict[str, float]:
         """Run a probe and return the new position dict"""
         return await self._smoothie_driver.probe_axis(axis, distance)
 
-    async def clean_up(self):
+    async def clean_up(self) -> None:
         try:
             loop = asyncio.get_event_loop()
         except RuntimeError:
