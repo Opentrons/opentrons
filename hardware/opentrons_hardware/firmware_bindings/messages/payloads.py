@@ -268,7 +268,7 @@ class WriteToSensorRequestPayload(utils.BinarySerializable):
     """Write a piece of data to a sensor request payload."""
 
     sensor: utils.UInt8Field
-    data: utils.UInt16Field
+    data: utils.UInt32Field
 
 
 @dataclass
@@ -276,7 +276,7 @@ class BaselineSensorRequestPayload(utils.BinarySerializable):
     """Take a specified amount of readings from a sensor request payload."""
 
     sensor: utils.UInt8Field
-    sample_rate: utils.UInt8Field
+    sample_rate: utils.UInt16Field
     offset_update: utils.UInt8Field
 
 
