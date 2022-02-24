@@ -60,9 +60,6 @@ export const AboutModuleSlideout = (
       title={t('about_module', { name: moduleName })}
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
-      css={css`
-        width: 19.5rem;
-      `}
     >
       {/* TODO(jr, 2/22/22): update AlertItem to match new designs and wire up the link */}
       {module.hasAvailableUpdate ? (
