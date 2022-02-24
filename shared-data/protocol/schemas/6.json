@@ -77,7 +77,6 @@
     },
 
     "wellLocation": {
-      "required": ["origin"],
       "properties": {
         "origin": {
           "type": "string",

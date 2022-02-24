@@ -4,6 +4,7 @@ import logging
 from typing import (
     Callable,
     Dict,
+    Generic,
     Optional,
     Tuple,
     Any,
@@ -11,6 +12,8 @@ from typing import (
     List,
     Sequence,
     Iterator,
+    TypeVar,
+    overload,
 )
 
 from opentrons_shared_data.pipette.dev_types import UlPerMmAction
@@ -22,6 +25,8 @@ from .types import (
     TipAttachedError,
     NoTipAttachedError,
     Axis,
+    OT3Axis,
+    OT3Mount,
 )
 from .constants import (
     SHAKE_OFF_TIPS_SPEED,
@@ -34,23 +39,70 @@ from .robot_calibration import load_pipette_offset
 from .dev_types import PipetteDict
 from .pipette import Pipette
 
-InstrumentsByMount = Dict[top_types.Mount, Optional[Pipette]]
-PipetteHandlingData = Tuple[Pipette, top_types.Mount]
+
+MountType = TypeVar("MountType", top_types.Mount, OT3Mount)
+
+InstrumentsByMount = Dict[MountType, Optional[Pipette]]
+PipetteHandlingData = Tuple[Pipette, MountType]
 
 MOD_LOG = logging.getLogger(__name__)
 
+AxisType = TypeVar("AxisType", Axis, OT3Axis)
 
-class InstrumentHandlerProvider:
+
+@dataclass(frozen=True)
+class LiquidActionSpec(Generic[AxisType]):
+    axis: AxisType
+    volume: float
+    plunger_distance: float
+    speed: float
+    instr: Pipette
+    current: float
+
+
+@dataclass(frozen=True)
+class PickUpTipPressSpec(Generic[AxisType]):
+    relative_down: top_types.Point
+    relative_up: top_types.Point
+    current: Dict[AxisType, float]
+    speed: float
+
+
+@dataclass(frozen=True)
+class PickUpTipSpec(Generic[AxisType]):
+    plunger_prep_pos: float
+    plunger_currents: Dict[AxisType, float]
+    presses: List[PickUpTipPressSpec[AxisType]]
+    shake_off_list: List[Tuple[top_types.Point, Optional[float]]]
+    retract_target: float
+
+
+@dataclass(frozen=True)
+class DropTipMove(Generic[AxisType]):
+    target_position: float
+    current: Dict[AxisType, float]
+    speed: Optional[float]
+    home_after: bool = False
+    home_after_safety_margin: float = 0
+    home_axes: Sequence[AxisType] = tuple()
+
+
+@dataclass(frozen=True)
+class DropTipSpec(Generic[AxisType]):
+    drop_moves: List[DropTipMove[AxisType]]
+    shake_moves: List[Tuple[top_types.Point, Optional[float]]]
+    ending_current: Dict[AxisType, float]
+
+
+class InstrumentHandlerProvider(Generic[MountType]):
     IHP_LOG = MOD_LOG.getChild("InstrumentHandler")
 
-    def __init__(self):
-        self._attached_instruments: InstrumentsByMount = {
-            top_types.Mount.LEFT: None,
-            top_types.Mount.RIGHT: None,
-        }
+    def __init__(self, attached_instruments: InstrumentsByMount[MountType]):
+        assert attached_instruments
+        self._attached_instruments: InstrumentsByMount[MountType] = attached_instruments
         self._ihp_log = InstrumentHandlerProvider.IHP_LOG.getChild(str(id(self)))
 
-    def reset_instrument(self, mount: Optional[top_types.Mount] = None):
+    def reset_instrument(self, mount: Optional[MountType] = None) -> None:
         """
         Reset the internal state of a pipette by its mount, without doing
         any lower level reconfiguration. This is useful to make sure that no
@@ -60,7 +112,7 @@ class InstrumentHandlerProvider:
                       reset both
         """
 
-        def _reset(m: top_types.Mount):
+        def _reset(m: MountType) -> None:
             self._ihp_log.info(f"Resetting configuration for {m}")
             p = self._attached_instruments[m]
             if not p:
@@ -72,14 +124,14 @@ class InstrumentHandlerProvider:
             self._attached_instruments[m] = new_p
 
         if not mount:
-            for m in top_types.Mount:
+            for m in type(list(self._attached_instruments.keys())[0]):
                 _reset(m)
         else:
             _reset(mount)
 
     # TODO(mc, 2022-01-11): change returned map value type to `Optional[PipetteDict]`
     # instead of potentially returning an empty dict
-    def get_attached_instruments(self) -> Dict[top_types.Mount, PipetteDict]:
+    def get_attached_instruments(self) -> Dict[MountType, PipetteDict]:
         """Get the status dicts of the cached attached instruments.
 
         Also available as :py:meth:`get_attached_instruments`.
@@ -96,12 +148,12 @@ class InstrumentHandlerProvider:
         """
         return {
             m: self.get_attached_instrument(m)
-            for m in (top_types.Mount.LEFT, top_types.Mount.RIGHT)
+            for m in self._attached_instruments.keys()
         }
 
     # TODO(mc, 2022-01-11): change return type to `Optional[PipetteDict]` instead
     # of potentially returning an empty dict
-    def get_attached_instrument(self, mount: top_types.Mount) -> PipetteDict:
+    def get_attached_instrument(self, mount: MountType) -> PipetteDict:
         instr = self._attached_instruments[mount]
         result: Dict[str, Any] = {}
         if instr:
@@ -160,17 +212,17 @@ class InstrumentHandlerProvider:
         return cast(PipetteDict, result)
 
     @property
-    def attached_instruments(self) -> Dict[top_types.Mount, PipetteDict]:
+    def attached_instruments(self) -> Dict[MountType, PipetteDict]:
         return self.get_attached_instruments()
 
     @property
-    def hardware_instruments(self) -> InstrumentsByMount:
+    def hardware_instruments(self) -> InstrumentsByMount[MountType]:
         """Do not write new code that uses this."""
         return self._attached_instruments
 
     def set_current_tiprack_diameter(
-        self, mount: top_types.Mount, tiprack_diameter: float
-    ):
+        self, mount: MountType, tiprack_diameter: float
+    ) -> None:
         instr = self.get_pipette(mount)
         self._ihp_log.info(
             "Updating tip rack diameter on pipette mount: "
@@ -178,7 +230,7 @@ class InstrumentHandlerProvider:
         )
         instr.current_tiprack_diameter = tiprack_diameter
 
-    def set_working_volume(self, mount: top_types.Mount, tip_volume: int):
+    def set_working_volume(self, mount: MountType, tip_volume: int) -> None:
         instr = self.get_pipette(mount)
         if not instr:
             raise top_types.PipetteNotAttachedError(
@@ -192,12 +244,12 @@ class InstrumentHandlerProvider:
 
     def calibrate_plunger(
         self,
-        mount: top_types.Mount,
+        mount: MountType,
         top: Optional[float] = None,
         bottom: Optional[float] = None,
         blow_out: Optional[float] = None,
         drop_tip: Optional[float] = None,
-    ):
+    ) -> None:
         """
         Set calibration values for the pipette plunger.
         This can be called multiple times as the user sets each value,
@@ -210,7 +262,7 @@ class InstrumentHandlerProvider:
         pipette
         """
         instr = self.get_pipette(mount)
-        pos_dict: Dict = {
+        pos_dict: Dict[str, float] = {
             "top": instr.config.top,
             "bottom": instr.config.bottom,
             "blow_out": instr.config.blow_out,
@@ -222,14 +274,14 @@ class InstrumentHandlerProvider:
             pos_dict["bottom"] = bottom
         if blow_out is not None:
             pos_dict["blow_out"] = blow_out
-        if bottom is not None:
+        if drop_tip is not None:
             pos_dict["drop_tip"] = drop_tip
         for key in pos_dict.keys():
             instr.update_config_item(key, pos_dict[key])
 
     def set_flow_rate(
         self,
-        mount: top_types.Mount,
+        mount: MountType,
         aspirate: Optional[float] = None,
         dispense: Optional[float] = None,
         blow_out: Optional[float] = None,
@@ -244,7 +296,7 @@ class InstrumentHandlerProvider:
 
     def set_pipette_speed(
         self,
-        mount: top_types.Mount,
+        mount: MountType,
         aspirate: Optional[float] = None,
         dispense: Optional[float] = None,
         blow_out: Optional[float] = None,
@@ -265,7 +317,7 @@ class InstrumentHandlerProvider:
 
     def instrument_max_height(
         self,
-        mount: top_types.Mount,
+        mount: MountType,
         retract_distance: float,
         critical_point: Optional[CriticalPoint],
     ) -> float:
@@ -284,7 +336,7 @@ class InstrumentHandlerProvider:
             k: None for k in self._attached_instruments.keys()
         }
 
-    async def add_tip(self, mount: top_types.Mount, tip_length: float):
+    async def add_tip(self, mount: MountType, tip_length: float) -> None:
         instr = self._attached_instruments[mount]
         attached = self.attached_instruments
         instr_dict = attached[mount]
@@ -297,7 +349,7 @@ class InstrumentHandlerProvider:
         else:
             self._ihp_log.warning("attach tip called while tip already attached")
 
-    async def remove_tip(self, mount: top_types.Mount):
+    async def remove_tip(self, mount: MountType) -> None:
         instr = self._attached_instruments[mount]
         attached = self.attached_instruments
         instr_dict = attached[mount]
@@ -311,7 +363,7 @@ class InstrumentHandlerProvider:
             self._ihp_log.warning("detach tip called with no tip")
 
     def critical_point_for(
-        self, mount: top_types.Mount, cp_override: CriticalPoint = None
+        self, mount: MountType, cp_override: Optional[CriticalPoint] = None
     ) -> top_types.Point:
         """Return the current critical point of the specified mount.
 
@@ -330,7 +382,7 @@ class InstrumentHandlerProvider:
             # configured such that the end of a p300 single gen1's tip is 0.
             return top_types.Point(0, 0, 30)
 
-    def ready_for_tip_action(self, target: Pipette, action: HardwareAction):
+    def ready_for_tip_action(self, target: Pipette, action: HardwareAction) -> None:
         if not target.has_tip:
             raise NoTipAttachedError(f"Cannot perform {action} without a tip attached")
         if (
@@ -360,21 +412,25 @@ class InstrumentHandlerProvider:
         ul_per_s = mm_per_s * instr.ul_per_mm(instr.config.max_volume, action)
         return round(ul_per_s, 6)
 
-    @dataclass(frozen=True)
-    class LiquidActionSpec:
-        axis: Axis
-        volume: float
-        plunger_distance: float
-        speed: float
-        instr: Pipette
-        current: float
-
+    @overload
     def plan_check_aspirate(
+        self, mount: top_types.Mount, volume: Optional[float], rate: float
+    ) -> Optional[LiquidActionSpec[Axis]]:
+        ...
+
+    @overload
+    def plan_check_aspirate(
+        self, mount: OT3Mount, volume: Optional[float], rate: float
+    ) -> Optional[LiquidActionSpec[OT3Axis]]:
+        ...
+
+    # note on this type ignore: see motion_utilities
+    def plan_check_aspirate(  # type: ignore[no-untyped-def]
         self,
-        mount: top_types.Mount,
-        volume: Optional[float],
-        rate: float,
-    ) -> Optional["InstrumentHandlerProvider.LiquidActionSpec"]:
+        mount,
+        volume,
+        rate,
+    ):
         """Check preconditions for aspirate, parse args, and calculate positions.
 
         While the mechanics of issuing an aspirate move itself are left to child
@@ -414,21 +470,43 @@ class InstrumentHandlerProvider:
         speed = self.plunger_speed(
             instrument, instrument.aspirate_flow_rate * rate, "aspirate"
         )
-        return self.LiquidActionSpec(
-            axis=Axis.of_plunger(mount),
-            volume=asp_vol,
-            plunger_distance=dist,
-            speed=speed,
-            instr=instrument,
-            current=instrument.config.plunger_current,
-        )
+        if isinstance(mount, OT3Mount):
+            return LiquidActionSpec(
+                axis=OT3Axis.of_main_tool_actuator(mount),
+                volume=asp_vol,
+                plunger_distance=dist,
+                speed=speed,
+                instr=instrument,
+                current=instrument.config.plunger_current,
+            )
+        else:
+            return LiquidActionSpec(
+                axis=Axis.of_plunger(mount),
+                volume=asp_vol,
+                plunger_distance=dist,
+                speed=speed,
+                instr=instrument,
+                current=instrument.config.plunger_current,
+            )
 
+    @overload
     def plan_check_dispense(
+        self, mount: top_types.Mount, volume: Optional[float], rate: float
+    ) -> Optional[LiquidActionSpec[Axis]]:
+        ...
+
+    @overload
+    def plan_check_dispense(
+        self, mount: OT3Mount, volume: Optional[float], rate: float
+    ) -> Optional[LiquidActionSpec[OT3Axis]]:
+        ...
+
+    def plan_check_dispense(  # type: ignore[no-untyped-def]
         self,
-        mount: top_types.Mount,
-        volume: Optional[float],
-        rate: float,
-    ) -> Optional["InstrumentHandlerProvider.LiquidActionSpec"]:
+        mount,
+        volume,
+        rate,
+    ):
         """Check preconditions for dispense, parse args, and calculate positions.
 
         While the mechanics of issuing a dispense move itself are left to child
@@ -469,47 +547,58 @@ class InstrumentHandlerProvider:
         speed = self.plunger_speed(
             instrument, instrument.dispense_flow_rate * rate, "dispense"
         )
-        return self.LiquidActionSpec(
-            axis=Axis.of_plunger(mount),
-            volume=disp_vol,
-            plunger_distance=dist,
-            speed=speed,
-            instr=instrument,
-            current=instrument.config.plunger_current,
-        )
+        if isinstance(mount, top_types.Mount):
+            return LiquidActionSpec(
+                axis=Axis.of_plunger(mount),
+                volume=disp_vol,
+                plunger_distance=dist,
+                speed=speed,
+                instr=instrument,
+                current=instrument.config.plunger_current,
+            )
+        else:
+            return LiquidActionSpec(
+                axis=OT3Axis.of_main_tool_actuator(mount),
+                volume=disp_vol,
+                plunger_distance=dist,
+                speed=speed,
+                instr=instrument,
+                current=instrument.config.plunger_current,
+            )
 
-    def plan_check_blow_out(
-        self, mount: top_types.Mount
-    ) -> "InstrumentHandlerProvider.LiquidActionSpec":
+    @overload
+    def plan_check_blow_out(self, mount: top_types.Mount) -> LiquidActionSpec[Axis]:
+        ...
+
+    @overload
+    def plan_check_blow_out(self, mount: OT3Mount) -> LiquidActionSpec[OT3Axis]:
+        ...
+
+    def plan_check_blow_out(self, mount):  # type: ignore[no-untyped-def]
         """Check preconditions and calculate values for blowout."""
         instrument = self.get_pipette(mount)
         self.ready_for_tip_action(instrument, HardwareAction.BLOWOUT)
         speed = self.plunger_speed(
             instrument, instrument.blow_out_flow_rate, "dispense"
         )
-        return self.LiquidActionSpec(
-            axis=Axis.of_plunger(mount),
-            volume=0,
-            plunger_distance=instrument.config.blow_out,
-            speed=speed,
-            instr=instrument,
-            current=instrument.config.plunger_current,
-        )
-
-    @dataclass(frozen=True)
-    class PickUpTipPressSpec:
-        relative_down: top_types.Point
-        relative_up: top_types.Point
-        current: Dict[Axis, float]
-        speed: float
-
-    @dataclass(frozen=True)
-    class PickUpTipSpec:
-        plunger_prep_pos: float
-        plunger_currents: Dict[Axis, float]
-        presses: List["InstrumentHandlerProvider.PickUpTipPressSpec"]
-        shake_off_list: List[Tuple[top_types.Point, Optional[float]]]
-        retract_target: float
+        if isinstance(mount, top_types.Mount):
+            return LiquidActionSpec(
+                axis=Axis.of_plunger(mount),
+                volume=0,
+                plunger_distance=instrument.config.blow_out,
+                speed=speed,
+                instr=instrument,
+                current=instrument.config.plunger_current,
+            )
+        else:
+            return LiquidActionSpec(
+                axis=OT3Axis.of_main_tool_actuator(mount),
+                volume=0,
+                plunger_distance=instrument.config.blow_out,
+                speed=speed,
+                instr=instrument,
+                current=instrument.config.plunger_current,
+            )
 
     @staticmethod
     def _build_pickup_shakes(
@@ -533,13 +622,33 @@ class InstrumentHandlerProvider:
         else:
             return []
 
+    @overload
     def plan_check_pick_up_tip(
         self,
         mount: top_types.Mount,
         tip_length: float,
         presses: Optional[int],
         increment: Optional[float],
-    ) -> Tuple["InstrumentHandlerProvider.PickUpTipSpec", Callable[[], None]]:
+    ) -> Tuple[PickUpTipSpec[Axis], Callable[[], None]]:
+        ...
+
+    @overload
+    def plan_check_pick_up_tip(
+        self,
+        mount: OT3Mount,
+        tip_length: float,
+        presses: Optional[int],
+        increment: Optional[float],
+    ) -> Tuple[PickUpTipSpec[OT3Axis], Callable[[], None]]:
+        ...
+
+    def plan_check_pick_up_tip(  # type: ignore[no-untyped-def]
+        self,
+        mount,
+        tip_length,
+        presses,
+        increment,
+    ):
 
         # Prechecks: ready for pickup tip and press/increment are valid
         instrument = self.get_pipette(mount)
@@ -557,7 +666,6 @@ class InstrumentHandlerProvider:
         else:
             check_incr = increment
 
-        z_axis_currents = {Axis.by_mount(mount): instrument.config.pick_up_current}
         pick_up_speed = instrument.config.pick_up_speed
 
         def build_presses() -> Iterator[Tuple[float, float]]:
@@ -576,43 +684,60 @@ class InstrumentHandlerProvider:
             instrument.add_tip(tip_length=tip_length)
             instrument.set_current_volume(0)
 
-        return (
-            InstrumentHandlerProvider.PickUpTipSpec(
-                plunger_prep_pos=instrument.config.bottom,
-                plunger_currents={
-                    Axis.of_plunger(mount): instrument.config.plunger_current
-                },
-                presses=[
-                    InstrumentHandlerProvider.PickUpTipPressSpec(
-                        current=z_axis_currents,
-                        speed=pick_up_speed,
-                        relative_down=top_types.Point(0, 0, press_dist),
-                        relative_up=top_types.Point(0, 0, backup_dist),
-                    )
-                    for press_dist, backup_dist in build_presses()
-                ],
-                shake_off_list=self._build_pickup_shakes(instrument),
-                retract_target=instrument.config.pick_up_distance
-                + check_incr * checked_presses
-                + 2,
-            ),
-            add_tip_to_instr,
-        )
-
-    @dataclass(frozen=True)
-    class DropTipMove:
-        target_position: float
-        current: Dict[Axis, float]
-        speed: Optional[float]
-        home_after: bool = False
-        home_after_safety_margin: float = 0
-        home_axes: Sequence[Axis] = tuple()
-
-    @dataclass(frozen=True)
-    class DropTipSpec:
-        drop_moves: List["InstrumentHandlerProvider.DropTipMove"]
-        shake_moves: List[Tuple[top_types.Point, Optional[float]]]
-        ending_current: Dict[Axis, float]
+        if isinstance(mount, top_types.Mount):
+            return (
+                PickUpTipSpec(
+                    plunger_prep_pos=instrument.config.bottom,
+                    plunger_currents={
+                        Axis.of_plunger(mount): instrument.config.plunger_current
+                    },
+                    presses=[
+                        PickUpTipPressSpec(
+                            current={
+                                Axis.by_mount(mount): instrument.config.pick_up_current
+                            },
+                            speed=pick_up_speed,
+                            relative_down=top_types.Point(0, 0, press_dist),
+                            relative_up=top_types.Point(0, 0, backup_dist),
+                        )
+                        for press_dist, backup_dist in build_presses()
+                    ],
+                    shake_off_list=self._build_pickup_shakes(instrument),
+                    retract_target=instrument.config.pick_up_distance
+                    + check_incr * checked_presses
+                    + 2,
+                ),
+                add_tip_to_instr,
+            )
+        else:
+            return (
+                PickUpTipSpec(
+                    plunger_prep_pos=instrument.config.bottom,
+                    plunger_currents={
+                        OT3Axis.of_main_tool_actuator(
+                            mount
+                        ): instrument.config.plunger_current
+                    },
+                    presses=[
+                        PickUpTipPressSpec(
+                            current={
+                                OT3Axis.by_mount(
+                                    mount
+                                ): instrument.config.pick_up_current
+                            },
+                            speed=pick_up_speed,
+                            relative_down=top_types.Point(0, 0, press_dist),
+                            relative_up=top_types.Point(0, 0, backup_dist),
+                        )
+                        for press_dist, backup_dist in build_presses()
+                    ],
+                    shake_off_list=self._build_pickup_shakes(instrument),
+                    retract_target=instrument.config.pick_up_distance
+                    + check_incr * checked_presses
+                    + 2,
+                ),
+                add_tip_to_instr,
+            )
 
     @staticmethod
     def _shake_off_tips_drop(
@@ -634,47 +759,63 @@ class InstrumentHandlerProvider:
             (top_types.Point(0, 0, DROP_TIP_RELEASE_DISTANCE), None),  # top
         ]
 
-    def plan_check_drop_tip(
+    def _droptip_sequence_builder(
         self,
-        mount: top_types.Mount,
+        bottom_pos: float,
+        droptip_pos: float,
+        plunger_currents: Dict[AxisType, float],
+        drop_tip_currents: Dict[AxisType, float],
+        speed: float,
         home_after: bool,
-    ) -> Tuple["InstrumentHandlerProvider.DropTipSpec", Callable[[], None]]:
-        instrument = self.get_pipette(mount)
-        self.ready_for_tip_action(instrument, HardwareAction.DROPTIP)
-        plunger_currents = {Axis.of_plunger(mount): instrument.config.plunger_current}
-        drop_tip_currents = {Axis.of_plunger(mount): instrument.config.drop_tip_current}
-        plunger_axes = (Axis.of_plunger(mount),)
-
-        bottom = instrument.config.bottom
-        droptip = instrument.config.drop_tip
-        speed = instrument.config.drop_tip_speed
-
-        def _build_single_sequence() -> List[InstrumentHandlerProvider.DropTipMove]:
+        home_axes: Sequence[AxisType],
+    ) -> Callable[[], List[DropTipMove[AxisType]]]:
+        def build() -> List[DropTipMove[AxisType]]:
             base = [
-                self.DropTipMove(
-                    target_position=bottom, current=plunger_currents, speed=None
+                DropTipMove(
+                    target_position=bottom_pos, current=plunger_currents, speed=None
                 ),
-                self.DropTipMove(
-                    target_position=droptip,
+                DropTipMove(
+                    target_position=droptip_pos,
                     current=drop_tip_currents,
                     speed=speed,
                     home_after=home_after,
-                    home_after_safety_margin=abs(bottom - droptip),
-                    home_axes=plunger_axes,
+                    home_after_safety_margin=abs(bottom_pos - droptip_pos),
+                    home_axes=home_axes,
                 ),
             ]
             if home_after:
                 base.append(
-                    self.DropTipMove(
-                        target_position=bottom, current=plunger_currents, speed=None
+                    DropTipMove(
+                        target_position=bottom_pos, current=plunger_currents, speed=None
                     )
                 )
             return base
 
-        seq = _build_single_sequence()
-        if "doubleDropTip" in instrument.config.quirks:
-            seq += seq
+        return build
 
+    @overload
+    def plan_check_drop_tip(
+        self, mount: top_types.Mount, home_after: bool
+    ) -> Tuple[DropTipSpec[Axis], Callable[[], None]]:
+        ...
+
+    @overload
+    def plan_check_drop_tip(
+        self, mount: OT3Mount, home_after: bool
+    ) -> Tuple[DropTipSpec[OT3Axis], Callable[[], None]]:
+        ...
+
+    def plan_check_drop_tip(  # type: ignore[no-untyped-def]
+        self,
+        mount,
+        home_after,
+    ):
+        instrument = self.get_pipette(mount)
+        self.ready_for_tip_action(instrument, HardwareAction.DROPTIP)
+
+        bottom = instrument.config.bottom
+        droptip = instrument.config.drop_tip
+        speed = instrument.config.drop_tip_speed
         shakes: List[Tuple[top_types.Point, Optional[float]]] = []
         if "dropTipShake" in instrument.config.quirks:
             diameter = instrument.current_tiprack_diameter
@@ -685,17 +826,79 @@ class InstrumentHandlerProvider:
             instrument.current_tiprack_diameter = 0.0
             instrument.remove_tip()
 
-        return (
-            self.DropTipSpec(
-                drop_moves=seq, shake_moves=shakes, ending_current=plunger_currents
-            ),
-            _remove_tips,
-        )
+        if isinstance(mount, top_types.Mount):
+            seq_builder_ot2 = self._droptip_sequence_builder(
+                bottom,
+                droptip,
+                {Axis.of_plunger(mount): instrument.config.plunger_current},
+                {Axis.of_plunger(mount): instrument.config.drop_tip_current},
+                speed,
+                home_after,
+                (Axis.of_plunger(mount),),
+            )
+            seq_ot2 = seq_builder_ot2()
+            if "doubleDropTip" in instrument.config.quirks:
+                seq_ot2 = seq_ot2 + seq_builder_ot2()
+            return (
+                DropTipSpec(
+                    drop_moves=seq_ot2,
+                    shake_moves=shakes,
+                    ending_current={
+                        Axis.of_plunger(mount): instrument.config.plunger_current
+                    },
+                ),
+                _remove_tips,
+            )
+        else:
+            seq_builder_ot3 = self._droptip_sequence_builder(
+                bottom,
+                droptip,
+                {
+                    OT3Axis.of_main_tool_actuator(
+                        mount
+                    ): instrument.config.plunger_current
+                },
+                {
+                    OT3Axis.of_main_tool_actuator(
+                        mount
+                    ): instrument.config.drop_tip_current
+                },
+                speed,
+                home_after,
+                (OT3Axis.of_main_tool_actuator(mount),),
+            )
 
-    def get_pipette(self, mount: top_types.Mount) -> Pipette:
+            seq_ot3 = seq_builder_ot3()
+            if "doubleDropTip" in instrument.config.quirks:
+                seq_ot3 = seq_ot3 + seq_builder_ot3()
+            return (
+                DropTipSpec(
+                    drop_moves=seq_ot3,
+                    shake_moves=shakes,
+                    ending_current={
+                        OT3Axis.of_main_tool_actuator(
+                            mount
+                        ): instrument.config.plunger_current
+                    },
+                ),
+                _remove_tips,
+            )
+
+    def get_pipette(self, mount: MountType) -> Pipette:
         pip = self._attached_instruments[mount]
         if not pip:
             raise top_types.PipetteNotAttachedError(
                 f"No pipette attached to {mount.name} mount"
             )
         return pip
+
+
+class OT3InstrumentHandler(InstrumentHandlerProvider[OT3Mount]):
+    """Override for correct plunger_position."""
+
+    def plunger_position(
+        self, instr: Pipette, ul: float, action: "UlPerMmAction"
+    ) -> float:
+        mm = ul / instr.ul_per_mm(ul, action)
+        position = instr.config.bottom - mm
+        return round(position, 6)

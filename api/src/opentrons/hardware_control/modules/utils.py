@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from typing import Optional
 
 from opentrons.drivers.rpi_drivers.types import USBPort
 
@@ -23,7 +24,7 @@ async def build(
     usb_port: USBPort,
     loop: asyncio.AbstractEventLoop,
     execution_manager: ExecutionManager,
-    sim_model: str = None,
+    sim_model: Optional[str] = None,
 ) -> AbstractModule:
     return await MODULE_HW_BY_NAME[which].build(
         port,

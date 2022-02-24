@@ -12,7 +12,6 @@ import type { PrimitiveComponent } from '@opentrons/components'
 type BtnComponent = PrimitiveComponent<'button'>
 
 export const MenuItem: BtnComponent = styled(Btn)`
-  width: ${TYPOGRAPHY.overflowMenuWidth};
   text-align: ${TEXT_ALIGN_LEFT};
   font-size: ${TYPOGRAPHY.fontSizeP};
   padding-bottom: ${TYPOGRAPHY.fontSizeH6};

@@ -4,17 +4,28 @@ from dataclasses import dataclass
 from typing import Optional, Mapping, Callable
 from typing_extensions import Final
 from opentrons.drivers.rpi_drivers.types import USBPort
-from opentrons.hardware_control.execution_manager import ExecutionManager
-from opentrons.hardware_control.poller import Reader, WaitableListener, Poller
-from opentrons.hardware_control.modules import mod_abc, types, update
 from opentrons.drivers.heater_shaker.driver import HeaterShakerDriver
 from opentrons.drivers.heater_shaker.abstract import AbstractHeaterShakerDriver
 from opentrons.drivers.heater_shaker.simulator import SimulatingDriver
 from opentrons.drivers.types import Temperature, RPM, HeaterShakerLabwareLatchStatus
+from opentrons.hardware_control.execution_manager import ExecutionManager
+from opentrons.hardware_control.poller import Reader, WaitableListener, Poller
+from opentrons.hardware_control.modules import mod_abc, update
+from opentrons.hardware_control.modules.types import (
+    TemperatureStatus,
+    SpeedStatus,
+    HeaterShakerStatus,
+    UploadFunction,
+    LiveData,
+)
 
 log = logging.getLogger(__name__)
 
 POLL_PERIOD = 1
+
+
+class HeaterShakerError(RuntimeError):
+    """An error propagated from the heater-shaker module."""
 
 
 class HeaterShaker(mod_abc.AbstractModule):
@@ -25,10 +36,10 @@ class HeaterShaker(mod_abc.AbstractModule):
         usb_port: USBPort,
         execution_manager: ExecutionManager,
         simulating: bool = False,
-        loop: asyncio.AbstractEventLoop = None,
-        sim_model: str = None,
-        **kwargs,
-    ):
+        loop: Optional[asyncio.AbstractEventLoop] = None,
+        sim_model: Optional[str] = None,
+        **kwargs: float,
+    ) -> "HeaterShaker":
         """
         Build a HeaterShaker
 
@@ -69,8 +80,8 @@ class HeaterShaker(mod_abc.AbstractModule):
         execution_manager: ExecutionManager,
         driver: AbstractHeaterShakerDriver,
         device_info: Mapping[str, str],
-        loop: asyncio.AbstractEventLoop = None,
-        polling_period: float = None,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
+        polling_period: Optional[float] = None,
     ):
         super().__init__(
             port=port, usb_port=usb_port, loop=loop, execution_manager=execution_manager
@@ -83,8 +94,9 @@ class HeaterShaker(mod_abc.AbstractModule):
             reader=PollerReader(driver=self._driver),
             interval_seconds=poll_time_s,
             listener=self._listener,
-            loop=loop,
         )
+        # TODO (spp, 2022-02-23): refine this to include user-facing error message.
+        self._error_status: Optional[str] = None
 
     async def cleanup(self) -> None:
         """Stop the poller task"""
@@ -101,7 +113,7 @@ class HeaterShaker(mod_abc.AbstractModule):
         return "heaterShakerV1"
 
     @staticmethod
-    def _get_temperature_status(temperature: Temperature) -> types.TemperatureStatus:
+    def _get_temperature_status(temperature: Temperature) -> TemperatureStatus:
         """
         Determine the status from the temperature.
 
@@ -112,19 +124,19 @@ class HeaterShaker(mod_abc.AbstractModule):
             The status
         """
         DELTA: Final = 0.7
-        status = types.TemperatureStatus.IDLE
+        status = TemperatureStatus.IDLE
         if temperature.target is not None:
             diff = temperature.target - temperature.current
             if abs(diff) < DELTA:  # To avoid status fluctuation near target
-                status = types.TemperatureStatus.HOLDING
+                status = TemperatureStatus.HOLDING
             elif diff < 0:
-                status = types.TemperatureStatus.COOLING
+                status = TemperatureStatus.COOLING
             else:
-                status = types.TemperatureStatus.HEATING
+                status = TemperatureStatus.HEATING
         return status
 
     @staticmethod
-    def _get_speed_status(speed: RPM) -> types.SpeedStatus:
+    def _get_speed_status(speed: RPM) -> SpeedStatus:
         """
         Determine the status from the speed.
 
@@ -135,22 +147,22 @@ class HeaterShaker(mod_abc.AbstractModule):
             The status
         """
         DELTA: Final = 100
-        status = types.SpeedStatus.IDLE
+        status = SpeedStatus.IDLE
         if speed.target is not None:
             diff = speed.target - speed.current
             if abs(diff) < DELTA:  # To avoid status fluctuation near target
-                status = types.SpeedStatus.HOLDING
+                status = SpeedStatus.HOLDING
             elif diff < 0:
-                status = types.SpeedStatus.DECELERATING
+                status = SpeedStatus.DECELERATING
             else:
-                status = types.SpeedStatus.ACCELERATING
+                status = SpeedStatus.ACCELERATING
         return status
 
     def model(self) -> str:
         return self._model_from_revision(self._device_info.get("model"))
 
     @classmethod
-    def bootloader(cls) -> types.UploadFunction:
+    def bootloader(cls) -> UploadFunction:
         return update.upload_via_dfu
 
     async def wait_next_poll(self) -> None:
@@ -162,16 +174,19 @@ class HeaterShaker(mod_abc.AbstractModule):
         return self._device_info
 
     @property
-    def live_data(self) -> types.LiveData:
+    def live_data(self) -> LiveData:
         return {
-            "temperatureStatus": self.temperature_status,
-            "speedStatus": self.speed_status,
-            "status": self.status,
+            # TODO (spp, 2022-2-22): Revise what status includes
+            "status": self.status.value,
             "data": {
+                "temperatureStatus": self.temperature_status.value,
+                "speedStatus": self.speed_status.value,
+                "labwareLatchStatus": self.labware_latch_status.value,
                 "currentTemp": self.temperature,
                 "targetTemp": self.target_temperature,
                 "currentSpeed": self.speed,
                 "targetSpeed": self.target_speed,
+                "errorDetails": self._error_status,
             },
         }
 
@@ -192,16 +207,32 @@ class HeaterShaker(mod_abc.AbstractModule):
         return self._listener.state.rpm.target
 
     @property
-    def temperature_status(self) -> str:
-        return self._get_temperature_status(self._listener.state.temperature).value
+    def temperature_status(self) -> TemperatureStatus:
+        return self._get_temperature_status(self._listener.state.temperature)
 
     @property
-    def speed_status(self) -> str:
-        return self._get_speed_status(self._listener.state.rpm).value
+    def speed_status(self) -> SpeedStatus:
+        return self._get_speed_status(self._listener.state.rpm)
 
     @property
-    def status(self) -> str:
-        return f"temperature {self.temperature_status}, speed {self.speed_status}"
+    def labware_latch_status(self) -> HeaterShakerLabwareLatchStatus:
+        return self._listener.state.labware_latch
+
+    @property
+    def status(self) -> HeaterShakerStatus:
+        """Module status or error state details."""
+        # TODO (spp, 2022-2-22): Does this make sense as the overarching 'status'?
+        #  Or maybe consolidate the above 3 statuses into this one?
+        if (
+            self.temperature_status == TemperatureStatus.IDLE
+            and self.speed_status == SpeedStatus.IDLE
+        ):
+            return HeaterShakerStatus.IDLE
+        elif self._error_status:
+            # TODO (spp, 2022-02-23): actually implement error checking
+            return HeaterShakerStatus.ERROR
+        else:
+            return HeaterShakerStatus.RUNNING
 
     @property
     def is_simulated(self) -> bool:
@@ -226,9 +257,9 @@ class HeaterShaker(mod_abc.AbstractModule):
         await self._driver.set_temperature(temperature=celsius)
         await self.wait_next_poll()
 
-        async def _wait():
+        async def _wait() -> None:
             # Wait until we reach the target temperature.
-            while self.temperature_status != types.TemperatureStatus.HOLDING:
+            while self.temperature_status != TemperatureStatus.HOLDING:
                 await self.wait_next_poll()
 
         task = self._loop.create_task(_wait())
@@ -268,11 +299,11 @@ class HeaterShaker(mod_abc.AbstractModule):
         await self.wait_for_is_running()
         await self.wait_next_poll()
 
-        async def _await_temperature():
-            if self.temperature_status == types.TemperatureStatus.HEATING:
+        async def _await_temperature() -> None:
+            if self.temperature_status == TemperatureStatus.HEATING:
                 while self.temperature < awaiting_temperature:
                     await self.wait_next_poll()
-            elif self.status == types.TemperatureStatus.COOLING:
+            elif self.temperature_status == TemperatureStatus.COOLING:
                 while self.temperature > awaiting_temperature:
                     await self.wait_next_poll()
 
@@ -295,9 +326,9 @@ class HeaterShaker(mod_abc.AbstractModule):
         await self._driver.set_rpm(rpm)
         await self.wait_next_poll()
 
-        async def _wait():
+        async def _wait() -> None:
             # Wait until we reach the target speed.
-            while self.speed_status != types.SpeedStatus.HOLDING:
+            while self.speed_status != SpeedStatus.HOLDING:
                 await self.wait_next_poll()
 
         task = self._loop.create_task(_wait())
@@ -332,11 +363,12 @@ class HeaterShaker(mod_abc.AbstractModule):
         await self.wait_for_is_running()
         await self.wait_next_poll()
 
-        async def _await_speed():
-            if self.speed_status == types.SpeedStatus.ACCELERATING:
+        async def _await_speed() -> None:
+            if self.speed_status == SpeedStatus.ACCELERATING:
+
                 while self.speed < awaiting_speed:
                     await self.wait_next_poll()
-            elif self.speed_status == types.SpeedStatus.DECELERATING:
+            elif self.speed_status == SpeedStatus.DECELERATING:
                 while self.speed > awaiting_speed:
                     await self.wait_next_poll()
 
@@ -354,23 +386,26 @@ class HeaterShaker(mod_abc.AbstractModule):
             self.await_speed(speed), self.await_temperature(temperature)
         )
 
-    async def _wait_for_labware_latch(self, status: HeaterShakerLabwareLatchStatus):
+    async def _wait_for_labware_latch(
+        self, status: HeaterShakerLabwareLatchStatus
+    ) -> None:
+        # TODO (spp, 2022-02-22): use the labware_latch_status property to get ll status
         current_status = await self._driver.get_labware_latch_status()
         while status != current_status:
             current_status = await self._driver.get_labware_latch_status()
 
-    async def deactivate(self):
+    async def deactivate(self) -> None:
         """Stop heating/cooling; stop shaking and home the plate"""
         await self.wait_for_is_running()
         await self._driver.set_temperature(0)
         await self._driver.home()
 
-    async def open_labware_latch(self):
+    async def open_labware_latch(self) -> None:
         await self.wait_for_is_running()
         await self._driver.open_labware_latch()
         await self._wait_for_labware_latch(HeaterShakerLabwareLatchStatus.IDLE_OPEN)
 
-    async def close_labware_latch(self):
+    async def close_labware_latch(self) -> None:
         await self.wait_for_is_running()
         await self._driver.close_labware_latch()
         await self._wait_for_labware_latch(HeaterShakerLabwareLatchStatus.IDLE_CLOSED)
@@ -383,6 +418,7 @@ class HeaterShaker(mod_abc.AbstractModule):
 class PollResult:
     temperature: Temperature
     rpm: RPM
+    labware_latch: HeaterShakerLabwareLatchStatus
 
 
 class PollerReader(Reader[PollResult]):
@@ -398,6 +434,7 @@ class PollerReader(Reader[PollResult]):
         return PollResult(
             temperature=await self._driver.get_temperature(),
             rpm=await self._driver.get_rpm(),
+            labware_latch=await self._driver.get_labware_latch_status(),
         )
 
 
@@ -407,7 +444,7 @@ class HeaterShakerListener(WaitableListener[PollResult]):
     def __init__(
         self,
         loop: Optional[asyncio.AbstractEventLoop] = None,
-        interrupt_callback: Callable[[Exception], None] = None,
+        interrupt_callback: Optional[Callable[[Exception], None]] = None,
     ) -> None:
         """Constructor."""
         super().__init__(loop=loop)
@@ -415,6 +452,7 @@ class HeaterShakerListener(WaitableListener[PollResult]):
         self._polled_data = PollResult(
             temperature=Temperature(current=25, target=None),
             rpm=RPM(current=0, target=None),
+            labware_latch=HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN,
         )
 
     @property

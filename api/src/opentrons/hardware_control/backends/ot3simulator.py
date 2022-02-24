@@ -9,7 +9,6 @@ from typing import (
     List,
     Optional,
     Tuple,
-    TYPE_CHECKING,
     Sequence,
     Generator,
     cast,
@@ -18,38 +17,38 @@ from typing import (
 
 from opentrons.config.types import OT3Config
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
-from opentrons.types import Mount
 from opentrons.config import pipette_config
 from opentrons_shared_data.pipette import dummy_model_for_name
-from . import ot3utils
+from .ot3utils import (
+    axis_convert,
+    create_move_group,
+)
 
-try:
-    from opentrons_ot3_firmware.constants import NodeId
-    from opentrons_hardware.hardware_control.motion_planning import (
-        Move,
-        Coordinates,
-    )
-except ModuleNotFoundError:
-    pass
+from opentrons_hardware.firmware_bindings.constants import NodeId
+from opentrons_hardware.hardware_control.motion_planning import (
+    Move,
+    Coordinates,
+)
 
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control import modules
-from opentrons.hardware_control.types import BoardRevision, Axis
+from opentrons.hardware_control.types import (
+    BoardRevision,
+    OT3Axis,
+    OT3Mount,
+    OT3AxisMap,
+)
 
-if TYPE_CHECKING:
-    from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
-    from opentrons.hardware_control.dev_types import (
-        AttachedInstruments,
-        InstrumentHardwareConfigs,
-        InstrumentSpec,
-        AttachedInstrument,
-    )
-    from opentrons.drivers.rpi_drivers.dev_types import GPIODriverLike
+from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
+from opentrons.hardware_control.dev_types import (
+    InstrumentHardwareConfigs,
+    InstrumentSpec,
+    AttachedInstrument,
+)
+from opentrons.drivers.rpi_drivers.dev_types import GPIODriverLike
 
 log = logging.getLogger(__name__)
 
-
-AxisValueMap = Dict[str, float]
 
 _FIXED_PIPETTE_ID: str = "P1KSV3120211118A01"
 _FIXED_PIPETTE_NAME: PipetteName = "p1000_single_gen3"
@@ -64,7 +63,7 @@ class OT3Simulator:
     @classmethod
     async def build(
         cls,
-        attached_instruments: Dict[Mount, Dict[str, Optional[str]]],
+        attached_instruments: Dict[OT3Mount, Dict[str, Optional[str]]],
         attached_modules: List[str],
         config: OT3Config,
         loop: asyncio.AbstractEventLoop,
@@ -91,7 +90,7 @@ class OT3Simulator:
 
     def __init__(
         self,
-        attached_instruments: Dict[Mount, Dict[str, Optional[str]]],
+        attached_instruments: Dict[OT3Mount, Dict[str, Optional[str]]],
         attached_modules: List[str],
         config: OT3Config,
         loop: asyncio.AbstractEventLoop,
@@ -111,7 +110,7 @@ class OT3Simulator:
         self._stubbed_attached_modules = attached_modules
 
         def _sanitize_attached_instrument(
-            passed_ai: Dict[str, Optional[str]] = None
+            passed_ai: Optional[Dict[str, Optional[str]]] = None
         ) -> InstrumentSpec:
             if not passed_ai or not passed_ai.get("model"):
                 return {"model": None, "id": None}
@@ -129,63 +128,12 @@ class OT3Simulator:
             )
 
         self._attached_instruments = {
-            m: _sanitize_attached_instrument(attached_instruments.get(m)) for m in Mount
+            m: _sanitize_attached_instrument(attached_instruments.get(m))
+            for m in OT3Mount
         }
         self._module_controls: Optional[AttachedModulesControl] = None
         self._position = self._get_home_position()
         self._present_nodes: Set[NodeId] = set()
-
-    # TODO: These staticmethods exist to defer uses of NodeId to inside
-    # method bodies, which won't be evaluated until called. This is needed
-    # because the robot server doesn't have opentrons_ot3_firmware as a dep
-    # which is where they're defined, and therefore you can't have references
-    # to NodeId that are interpreted at import time because then the robot
-    # server tests fail when importing hardware controller. This is obviously
-    # terrible and needs to be fixed.
-
-    @staticmethod
-    def _node_axes() -> List[str]:
-        return ["X", "Y", "Z", "A", "B", "C"]
-
-    @staticmethod
-    def _axis_to_node(axis: str) -> "NodeId":
-        anm: Dict[str, "NodeId"] = {
-            "X": NodeId.gantry_x,
-            "Y": NodeId.gantry_y,
-            "Z": NodeId.head_l,
-            "A": NodeId.head_r,
-            "B": NodeId.pipette_left,
-            "C": NodeId.pipette_right,
-        }
-        return anm[axis]
-
-    @staticmethod
-    def _node_to_axis(node: "NodeId") -> str:
-        nam = {
-            NodeId.gantry_x: "X",
-            NodeId.gantry_y: "Y",
-            NodeId.head_l: "Z",
-            NodeId.head_r: "A",
-            NodeId.pipette_left: "B",
-            NodeId.pipette_right: "C",
-        }
-        return nam[node]
-
-    @staticmethod
-    def _node_is_axis(node: "NodeId") -> bool:
-        try:
-            OT3Simulator._node_to_axis(node)
-            return True
-        except KeyError:
-            return False
-
-    @staticmethod
-    def _axis_is_node(axis: str) -> bool:
-        try:
-            OT3Simulator._axis_to_node(axis)
-            return True
-        except KeyError:
-            return False
 
     @property
     def gpio_chardev(self) -> GPIODriverLike:
@@ -209,28 +157,17 @@ class OT3Simulator:
         """Set the module controls"""
         self._module_controls = module_controls
 
-    def is_homed(self, axes: Sequence[str]) -> bool:
+    def is_homed(self, axes: Sequence[OT3Axis]) -> bool:
         return True
 
-    async def update_position(self) -> AxisValueMap:
+    async def update_position(self) -> OT3AxisMap[float]:
         """Get the current position."""
-        return self._axis_convert(self._position)
-
-    @staticmethod
-    def _axis_convert(position: Dict[NodeId, float]) -> AxisValueMap:
-        ret: AxisValueMap = {"A": 0, "B": 0, "C": 0, "X": 0, "Y": 0, "Z": 0}
-        for node, pos in position.items():
-            # we need to make robot config apply to z or in some other way
-            # reflect the sense of the axis direction
-            if OT3Simulator._node_is_axis(node):
-                ret[OT3Simulator._node_to_axis(node)] = pos
-        log.info(f"update_position: {ret}")
-        return ret
+        return axis_convert(self._position, 0.0)
 
     async def move(
         self,
-        origin: "Coordinates",
-        moves: List[Move],
+        origin: Coordinates[OT3Axis, float],
+        moves: List[Move[OT3Axis]],
     ) -> None:
         """Move to a position.
 
@@ -243,12 +180,10 @@ class OT3Simulator:
         Returns:
             None
         """
-        move_group, final_positions = ot3utils.create_move_group(
-            origin, moves, self._present_nodes
-        )
+        _, final_positions = create_move_group(origin, moves, self._present_nodes)
         self._position.update(final_positions)
 
-    async def home(self, axes: Optional[List[str]] = None) -> AxisValueMap:
+    async def home(self, axes: Optional[List[OT3Axis]] = None) -> OT3AxisMap[float]:
         """Home axes.
 
         Args:
@@ -257,9 +192,11 @@ class OT3Simulator:
         Returns:
             Homed position.
         """
-        return self._axis_convert(self._position)
+        return axis_convert(self._position, 0.0)
 
-    async def fast_home(self, axes: Sequence[str], margin: float) -> AxisValueMap:
+    async def fast_home(
+        self, axes: Sequence[OT3Axis], margin: float
+    ) -> OT3AxisMap[float]:
         """Fast home axes.
 
         Args:
@@ -269,10 +206,10 @@ class OT3Simulator:
         Returns:
             New position.
         """
-        return self._axis_convert(self._position)
+        return axis_convert(self._position, 0.0)
 
     def _attached_to_mount(
-        self, mount: Mount, expected_instr: Optional[PipetteName]
+        self, mount: OT3Mount, expected_instr: Optional[PipetteName]
     ) -> AttachedInstrument:
         init_instr = self._attached_instruments.get(mount, {"model": None, "id": None})
         found_model = init_instr["model"]
@@ -323,8 +260,8 @@ class OT3Simulator:
             return {"config": None, "id": None}
 
     async def get_attached_instruments(
-        self, expected: Dict[Mount, PipetteName]
-    ) -> AttachedInstruments:
+        self, expected: Dict[OT3Mount, PipetteName]
+    ) -> Dict[OT3Mount, AttachedInstrument]:
         """Get attached instruments.
 
         Args:
@@ -335,10 +272,10 @@ class OT3Simulator:
         """
         return {
             mount: self._attached_to_mount(mount, expected.get(mount))
-            for mount in Mount
+            for mount in OT3Mount
         }
 
-    def set_active_current(self, axis_currents: Dict[Axis, float]) -> None:
+    def set_active_current(self, axis_currents: OT3AxisMap[float]) -> None:
         """Set the active current.
 
         Args:
@@ -354,7 +291,7 @@ class OT3Simulator:
         """Save the current."""
         yield
 
-    async def watch(self, loop: asyncio.AbstractEventLoop):
+    async def watch(self, loop: asyncio.AbstractEventLoop) -> None:
         new_mods_at_ports = [
             modules.ModuleAtPort(port=f"/dev/ot_module_sim_{mod}{str(idx)}", name=mod)
             for idx, mod in enumerate(self._stubbed_attached_modules)
@@ -362,17 +299,17 @@ class OT3Simulator:
         await self.module_controls.register_modules(new_mods_at_ports=new_mods_at_ports)
 
     @property
-    def axis_bounds(self) -> Dict[Axis, Tuple[float, float]]:
+    def axis_bounds(self) -> OT3AxisMap[Tuple[float, float]]:
         """Get the axis bounds."""
         # TODO (AL, 2021-11-18): The bounds need to be defined
         phony_bounds = (0, 10000)
         return {
-            Axis.A: phony_bounds,
-            Axis.B: phony_bounds,
-            Axis.C: phony_bounds,
-            Axis.X: phony_bounds,
-            Axis.Y: phony_bounds,
-            Axis.Z: phony_bounds,
+            OT3Axis.Z_R: phony_bounds,
+            OT3Axis.Z_L: phony_bounds,
+            OT3Axis.P_L: phony_bounds,
+            OT3Axis.P_R: phony_bounds,
+            OT3Axis.Y: phony_bounds,
+            OT3Axis.X: phony_bounds,
         }
 
     @property
@@ -386,11 +323,11 @@ class OT3Simulator:
         """Update the firmware."""
         return "Done"
 
-    def engaged_axes(self) -> Dict[str, bool]:
+    def engaged_axes(self) -> OT3AxisMap[bool]:
         """Get engaged axes."""
         return {}
 
-    async def disengage_axes(self, axes: List[str]) -> None:
+    async def disengage_axes(self, axes: List[OT3Axis]) -> None:
         """Disengage axes."""
         return None
 
@@ -418,16 +355,16 @@ class OT3Simulator:
         """Halt the motors."""
         return None
 
-    async def probe(self, axis: str, distance: float) -> AxisValueMap:
+    async def probe(self, axis: OT3Axis, distance: float) -> OT3AxisMap[float]:
         """Probe."""
         return {}
 
-    def clean_up(self) -> None:
+    async def clean_up(self) -> None:
         """Clean up."""
         pass
 
     async def configure_mount(
-        self, mount: Mount, config: InstrumentHardwareConfigs
+        self, mount: OT3Mount, config: InstrumentHardwareConfigs
     ) -> None:
         """Configure a mount."""
         return None
@@ -445,8 +382,8 @@ class OT3Simulator:
 
     async def probe_network(self) -> None:
         nodes = set((NodeId.head_l, NodeId.head_r, NodeId.gantry_x, NodeId.gantry_y))
-        if self._attached_instruments[Mount.LEFT].get("model", None):
+        if self._attached_instruments[OT3Mount.LEFT].get("model", None):
             nodes.add(NodeId.pipette_left)
-        if self._attached_instruments[Mount.RIGHT].get("model", None):
+        if self._attached_instruments[OT3Mount.RIGHT].get("model", None):
             nodes.add(NodeId.pipette_right)
         self._present_nodes = nodes

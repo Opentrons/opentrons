@@ -3,16 +3,21 @@ from typing import List
 
 import pytest
 from mock import AsyncMock, MagicMock, call
-from opentrons_ot3_firmware import NodeId, utils, ArbitrationId, ArbitrationIdParts
-from opentrons_ot3_firmware.constants import ErrorCode
-from opentrons_ot3_firmware.messages import MessageDefinition
-from opentrons_ot3_firmware.messages.message_definitions import (
+from opentrons_hardware.firmware_bindings import (
+    NodeId,
+    utils,
+    ArbitrationId,
+    ArbitrationIdParts,
+)
+from opentrons_hardware.firmware_bindings.constants import ErrorCode
+from opentrons_hardware.firmware_bindings.messages import MessageDefinition
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     FirmwareUpdateData,
     FirmwareUpdateComplete,
     FirmwareUpdateDataAcknowledge,
     FirmwareUpdateCompleteAcknowledge,
 )
-from opentrons_ot3_firmware.messages import payloads
+from opentrons_hardware.firmware_bindings.messages import payloads
 
 from opentrons_hardware.firmware_update import downloader
 from opentrons_hardware.firmware_update.errors import ErrorResponse, TimeoutResponse

@@ -6,7 +6,7 @@ import struct
 import asyncio
 
 from . import ArbitrationId
-from opentrons_ot3_firmware import CanMessage
+from opentrons_hardware.firmware_bindings import CanMessage
 from .abstract_driver import AbstractCanDriver
 
 

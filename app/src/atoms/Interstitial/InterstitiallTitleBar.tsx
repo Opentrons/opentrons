@@ -15,7 +15,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 
-export interface TitleBarProps {
+export interface InterstitialTitleBarProps {
   title: React.ReactNode
   exit?: ButtonProps
 }
@@ -29,13 +29,14 @@ const TITLE_BAR = css`
   z-index: 3;
 `
 
-export function TitleBar(props: TitleBarProps): JSX.Element {
+export function InterstitialTitleBar(
+  props: InterstitialTitleBarProps
+): JSX.Element {
   const { title, exit } = props
 
   return (
     <Flex
       width="100%"
-      height={SPACING.spacingXL}
       backgroundColor={COLORS.darkBlack}
       color={COLORS.white}
       flexDirection={DIRECTION_ROW}

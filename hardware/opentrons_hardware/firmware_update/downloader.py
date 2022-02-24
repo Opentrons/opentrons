@@ -2,9 +2,9 @@
 import asyncio
 import logging
 
-from opentrons_ot3_firmware import NodeId
-from opentrons_ot3_firmware.constants import ErrorCode
-from opentrons_ot3_firmware.utils import UInt32Field
+from opentrons_hardware.firmware_bindings import NodeId
+from opentrons_hardware.firmware_bindings.constants import ErrorCode
+from opentrons_hardware.firmware_bindings.utils import UInt32Field
 
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
@@ -12,7 +12,7 @@ from opentrons_hardware.drivers.can_bus.can_messenger import (
 )
 from opentrons_hardware.firmware_update.errors import ErrorResponse, TimeoutResponse
 from opentrons_hardware.firmware_update.hex_file import HexRecordProcessor
-from opentrons_ot3_firmware.messages import message_definitions, payloads
+from opentrons_hardware.firmware_bindings.messages import message_definitions, payloads
 
 
 logger = logging.getLogger(__name__)

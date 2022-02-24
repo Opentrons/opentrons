@@ -1,7 +1,7 @@
 """Utils for motion planning."""
 import numpy as np  # type: ignore[import]
 import logging
-from typing import Iterator, List, Tuple
+from typing import Iterator, List, Tuple, Set
 
 from opentrons_hardware.hardware_control.motion_planning.types import (
     Block,
@@ -9,9 +9,11 @@ from opentrons_hardware.hardware_control.motion_planning.types import (
     Move,
     MoveTarget,
     AxisConstraints,
+    CoordinateValue,
+    AxisKey,
     SystemConstraints,
-    AXIS_NAMES,
     ZeroLengthMoveError,
+    vectorize,
 )
 
 log = logging.getLogger(__name__)
@@ -31,23 +33,33 @@ def check_less_or_close(constraint: np.float64, input: np.float64) -> bool:
 
 
 def get_unit_vector(
-    initial: Coordinates, target: Coordinates
-) -> Tuple[Coordinates, np.float64]:
+    initial: Coordinates[AxisKey, CoordinateValue],
+    target: Coordinates[AxisKey, CoordinateValue],
+) -> Tuple[Coordinates[AxisKey, np.float64], np.float64]:
     """Get the unit vector and the distance the two coordinates."""
-    initial_vectorized = initial.vectorize()
-    target_vectorized = target.vectorize()
+    initial_vectorized = vectorize({k: np.float64(v) for k, v in initial.items()})
+    target_vectorized = vectorize({k: np.float64(v) for k, v in target.items()})
     displacement: np.ndarray = target_vectorized - initial_vectorized
     distance = np.linalg.norm(displacement)
     if not distance or np.array_equal(initial_vectorized, target_vectorized):
         raise ZeroLengthMoveError(initial, target)
-    unit_vector = Coordinates.from_iter(displacement / distance)
+    unit_vector_ndarray = displacement / distance
+    unit_vector = {k: v for k, v in zip(initial.keys(), unit_vector_ndarray)}
     return unit_vector, distance
 
 
-def targets_to_moves(initial: Coordinates, targets: List[MoveTarget]) -> Iterator[Move]:
+def targets_to_moves(
+    initial: Coordinates[AxisKey, CoordinateValue], targets: List[MoveTarget[AxisKey]]
+) -> Iterator[Move[AxisKey]]:
     """Transform a list of MoveTargets into a list of Moves."""
+    all_axes: Set[AxisKey] = set()
     for target in targets:
-        unit_vector, distance = get_unit_vector(initial, target.position)
+        all_axes.update(set(target.position.keys()))
+
+    initial_checked = {k: initial.get(k, 0) for k in all_axes}
+    for target in targets:
+        position = {k: target.position.get(k, 0) for k in all_axes}
+        unit_vector, distance = get_unit_vector(initial_checked, position)
         m = Move(
             unit_vector=unit_vector,
             distance=distance,
@@ -72,7 +84,7 @@ def targets_to_moves(initial: Coordinates, targets: List[MoveTarget]) -> Iterato
         )
         log.debug(f"Built move from {initial} to {target} as {m}")
         yield m
-        initial = target.position
+        initial_checked = position
 
 
 def initial_speed_limit_from_axis(
@@ -114,13 +126,15 @@ def initial_speed_limit_from_axis(
 
 
 def find_initial_speed(
-    constraints: SystemConstraints, move: Move, prev_move: Move
+    constraints: SystemConstraints[AxisKey],
+    move: Move[AxisKey],
+    prev_move: Move[AxisKey],
 ) -> np.float64:
     """Get a move's initial speed."""
     log = logging.getLogger("find_initial_speed")
     # Figure out how fast we can be going when we start
     initial_speed = move.initial_speed
-    for axis in AXIS_NAMES:
+    for axis in move.unit_vector.keys():
         axis_component = move.unit_vector[axis]
 
         if abs(axis_component * initial_speed) < FLOAT_THRESHOLD:
@@ -188,16 +202,16 @@ def final_speed_limit_from_axis(
 
 
 def find_final_speed(
-    constraints: SystemConstraints,
-    move: Move,
-    next_move: Move,
+    constraints: SystemConstraints[AxisKey],
+    move: Move[AxisKey],
+    next_move: Move[AxisKey],
 ) -> np.float64:
     """Get a move's final speed."""
     log = logging.getLogger("find_final_speed")
     # Figure out how fast we can be going when we stop
     final_speed: np.float64 = move.final_speed
 
-    for axis in AXIS_NAMES:
+    for axis in move.unit_vector.keys():
         axis_component = move.unit_vector[axis]
         if abs(axis_component * final_speed) < FLOAT_THRESHOLD:
             log.debug(f"Skip {axis} because it is not moving")
@@ -225,8 +239,8 @@ def find_final_speed(
 
 
 def achievable_final(
-    constraints: SystemConstraints,
-    move: Move,
+    constraints: SystemConstraints[AxisKey],
+    move: Move[AxisKey],
     initial_speed: np.float64,
     final_speed: np.float64,
 ) -> np.float64:
@@ -234,7 +248,7 @@ def achievable_final(
     log = logging.getLogger("achievable_final")
     # Figure out whether this final speed is in fact achievable from the initial speed
     # in the distance allowed
-    for axis in AXIS_NAMES:
+    for axis in move.unit_vector.keys():
         axis_component = move.unit_vector[axis]
         if axis_component:
             axis_max_acc = constraints[axis].max_acceleration
@@ -262,12 +276,12 @@ def achievable_final(
 
 
 def build_blocks(
-    unit_vector: Coordinates,
+    unit_vector: Coordinates[AxisKey, np.float64],
     initial_speed: np.float64,
     final_speed: np.float64,
     distance: np.float64,
     max_speed: np.float64,
-    constraints: SystemConstraints,
+    constraints: SystemConstraints[AxisKey],
 ) -> Tuple[Block, Block, Block]:
     """Build blocks for a move.
 
@@ -289,11 +303,11 @@ def build_blocks(
     max_acc = np.array(
         [
             constraints[axis].max_acceleration if unit_vector[axis] else 0.0
-            for axis in AXIS_NAMES
+            for axis in unit_vector.keys()
         ]
     )
     max_acc_magnitude = np.linalg.norm(max_acc)
-    acc_v = max_acc_magnitude * unit_vector.vectorize()
+    acc_v = max_acc_magnitude * vectorize(unit_vector)
 
     for a_i, max_acc_i in zip(acc_v, max_acc):
         if abs(a_i) > max_acc_i:
@@ -351,15 +365,15 @@ def build_blocks(
         return first, coast, final
     else:
         # no coast phase for us
-        return first, Block(0, 0, 0), final
+        return first, Block(np.float64(0), np.float64(0), np.float64(0)), final
 
 
 def build_move(
-    move: Move,
-    prev_move: Move,
-    next_move: Move,
-    constraints: SystemConstraints,
-) -> Move:
+    move: Move[AxisKey],
+    prev_move: Move[AxisKey],
+    next_move: Move[AxisKey],
+    constraints: SystemConstraints[AxisKey],
+) -> Move[AxisKey]:
     """Build a move."""
     log = logging.getLogger("build_move")
 
@@ -384,7 +398,9 @@ def build_move(
     return m
 
 
-def blended(constraints: SystemConstraints, first: Move, second: Move) -> bool:
+def blended(
+    constraints: SystemConstraints[AxisKey], first: Move[AxisKey], second: Move[AxisKey]
+) -> bool:
     """Check if the moves are blended."""
     log = logging.getLogger("blended")
     # have these actually had their blocks built?
@@ -408,7 +424,7 @@ def blended(constraints: SystemConstraints, first: Move, second: Move) -> bool:
         return False
 
     # do their junction velocities match constraints?
-    for axis in AXIS_NAMES:
+    for axis in first.unit_vector.keys():
         final_speed = first.blocks[-1].final_speed * first.unit_vector[axis]
         log.debug(f"{axis} final_speed: {final_speed}")
         initial_speed = second.blocks[0].initial_speed * second.unit_vector[axis]
@@ -444,7 +460,9 @@ def blended(constraints: SystemConstraints, first: Move, second: Move) -> bool:
     return True
 
 
-def all_blended(constraints: SystemConstraints, moves: List[Move]) -> bool:
+def all_blended(
+    constraints: SystemConstraints[AxisKey], moves: List[Move[AxisKey]]
+) -> bool:
     """Check if the moves in the list are all blended."""
     moveiter = iter(moves)
     prev = next(moveiter)
@@ -459,8 +477,8 @@ def all_blended(constraints: SystemConstraints, moves: List[Move]) -> bool:
 
 
 def unit_vector_multiplication(
-    unit_vector: Coordinates, value: np.float64
-) -> Coordinates:
+    unit_vector: Coordinates[AxisKey, np.float64], value: np.float64
+) -> Coordinates[AxisKey, np.float64]:
     """Multiply coordinates type by a float value."""
-    targets: np.ndarray = unit_vector.vectorize() * value
-    return Coordinates.from_iter(targets)
+    targets: np.ndarray = vectorize(unit_vector) * value
+    return {k: v for k, v in zip(unit_vector.keys(), targets)}
