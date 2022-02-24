@@ -2,7 +2,6 @@
 
 import asyncio
 import logging
-import queue
 from opentrons_hardware.firmware_bindings.messages import message_definitions
 from opentrons_hardware.firmware_bindings.constants import ToolType
 from opentrons_hardware.drivers.can_bus import CanMessenger
@@ -23,7 +22,6 @@ class ToolDetector:
         """Constructor."""
         self._messenger = messenger
         self._attached_tools = attached_tools
-        self._queue = queue
 
     async def detect(self) -> AsyncGenerator[Dict[Carrier, ToolType], None]:
         """Detect tool changes."""
