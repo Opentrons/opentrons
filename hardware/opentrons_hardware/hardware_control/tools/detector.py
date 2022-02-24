@@ -52,7 +52,7 @@ class ToolDetector:
                 break
             except asyncio.TimeoutError:
                 log.warning(
-                    f"Try {i}: Bootloader not ready "
+                    f"Try {i}: Tool detection not ready "
                     f"after {ready_wait_time_sec} seconds."
                 )
                 if i < retry_count:
