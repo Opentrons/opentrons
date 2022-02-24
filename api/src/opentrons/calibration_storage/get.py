@@ -203,21 +203,27 @@ def get_all_tip_length_calibrations() -> typing.List[local_types.TipLengthCalibr
     return all_calibrations
 
 
-def _get_calibration_source(data: typing.Dict) -> local_types.SourceType:
+def _get_calibration_source(
+    data: typing.Dict[str, typing.Any]
+) -> local_types.SourceType:
     if "source" not in data.keys():
         return local_types.SourceType.unknown
     else:
         return local_types.SourceType[data["source"]]
 
 
-def _get_calibration_status(data: typing.Dict) -> local_types.CalibrationStatus:
+def _get_calibration_status(
+    data: typing.Dict[str, typing.Any]
+) -> local_types.CalibrationStatus:
     if "status" not in data.keys():
         return local_types.CalibrationStatus()
     else:
         return local_types.CalibrationStatus(**data["status"])
 
 
-def _get_tip_rack_uri(data: typing.Dict) -> typing.Union["LabwareUri", Literal[""]]:
+def _get_tip_rack_uri(
+    data: typing.Dict[str, typing.Any]
+) -> typing.Union["LabwareUri", Literal[""]]:
     if "uri" not in data.keys():
         # We cannot reverse look-up a labware definition using a hash
         # so we must return an empty string if no uri is found.
@@ -338,7 +344,10 @@ def get_custom_tiprack_definition_for_tlc(labware_uri: str) -> "LabwareDefinitio
     custom_tiprack_path = custom_tiprack_dir / f"{labware_uri}.json"
     try:
         with open(custom_tiprack_path, "rb") as f:
-            return json.loads(f.read().decode("utf-8"))
+            return typing.cast(
+                "LabwareDefinition",
+                json.loads(f.read().decode("utf-8")),
+            )
     except FileNotFoundError:
         raise FileNotFoundError(
             f"Custom tiprack {labware_uri} not found in the custom tiprack"

@@ -2,6 +2,7 @@ import asyncio
 import logging
 import threading
 import time
+from typing import Any
 
 
 log = logging.getLogger(__name__)
@@ -42,13 +43,14 @@ class ThreadedAsyncForbidden(Exception):
 
     def __init__(
         self,
-        msg="Robot is currently moving. Please wait and try " "this command again.",
-    ):
+        msg: str = "Robot is currently moving. Please wait and try "
+        "this command again.",
+    ) -> None:
         super().__init__(msg)
 
 
 class _Internal:
-    def __init__(self, lock: threading.Lock, forbid: bool):
+    def __init__(self, lock: threading.Lock, forbid: bool) -> None:
         """
         The private context manager that interacts with the lock. It can
         behave in normal locking mode or in `forbid` mode. When `forbid` is
@@ -62,7 +64,7 @@ class _Internal:
         self._thread_lock = lock
         self._forbid = forbid
 
-    async def __aenter__(self):
+    async def __aenter__(self) -> None:
         pref = (
             f"[ThreadedAsyncLock tid {threading.get_ident()} "
             f"task {asyncio.current_task()}] "
@@ -77,19 +79,19 @@ class _Internal:
         now = time.perf_counter()
         log.debug(pref + f"acquired in {now-then}s")
 
-    async def __aexit__(self, exc_type, exc, tb):
+    async def __aexit__(self, exc_type: Any, exc: Any, tb: Any) -> None:
         log.debug(
             f"[ThreadedAsyncLock tid {threading.get_ident()} "
             f"task {asyncio.current_task()}] will release"
         )
         self._thread_lock.release()
 
-    def __enter__(self):
+    def __enter__(self) -> None:
         if not self._forbid:
             self._thread_lock.acquire()
         elif not self._thread_lock.acquire(blocking=False):
             # Lock is already acquired and blocking is forbidden
             raise ThreadedAsyncForbidden()
 
-    def __exit__(self, exc_type, exc, tb):
+    def __exit__(self, exc_type: Any, exc: Any, tb: Any) -> None:
         self._thread_lock.release()
