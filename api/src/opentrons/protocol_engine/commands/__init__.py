@@ -13,6 +13,8 @@ they are part of the public input / output of the engine, and need validation
 and/or schema generation.
 """
 
+from . import heater_shaker
+
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, CommandStatus
 
 from .command_unions import (
@@ -230,4 +232,6 @@ __all__ = [
     "SavePositionCreate",
     "SavePositionResult",
     "SavePositionCommandType",
+    # module command bundles
+    "heater_shaker",
 ]
