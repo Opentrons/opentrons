@@ -1147,7 +1147,13 @@ class InstrumentContext(CommandPublisher):
 
     @requires_version(2, 0)
     def delay(self) -> None:
-        return self._implementation.delay()
+        """
+        .. deprecated:: 2.0
+           Use :py:obj:`ProtocolContext.delay` instead.
+           This method does nothing.
+           It will be removed from a future version of the Python Protocol API.
+        """
+        pass
 
     @requires_version(2, 0)
     def move_to(
