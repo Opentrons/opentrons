@@ -55,6 +55,7 @@ async def run(args: argparse.Namespace) -> None:
     await detector.run(
         retry_count=args.retry_count,
         ready_wait_time_sec=args.timeout_seconds,
+        driver=None,
     )
 
     await messenger.stop()
@@ -80,6 +81,7 @@ def main() -> None:
     )
 
     args = parser.parse_args()
+    args.driver = None
 
     asyncio.run(run(args))
 

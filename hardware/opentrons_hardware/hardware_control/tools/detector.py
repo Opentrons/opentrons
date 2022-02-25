@@ -8,7 +8,7 @@ from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons_hardware.hardware_control.tools.errors import ToolDetectionFailiure
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_hardware.hardware_control.tools.types import Carrier
-from typing import AsyncGenerator, Dict
+from typing import AsyncGenerator, Dict, Optional
 
 log = logging.getLogger(__name__)
 
@@ -22,8 +22,10 @@ class ToolDetector:
         """Constructor."""
         self._messenger = messenger
         self._attached_tools = attached_tools
-        
-    async def detect(self, driver: AbstractCanDriver) -> AsyncGenerator[Dict[Carrier, ToolType], None]:
+
+    async def detect(
+        self, driver: AbstractCanDriver
+    ) -> AsyncGenerator[Dict[Carrier, ToolType], None]:
         """Detect tool changes."""
         async for message in driver:
             if isinstance(message, message_definitions.PushToolsDetectedNotification):
@@ -45,7 +47,12 @@ class ToolDetector:
         tool = await tool_generator.__anext__()
         log.info(f"Detection, Tool: {tool}")
 
-    async def run(self, retry_count: int, ready_wait_time_sec: float, driver: AbstractCanDriver = None) -> None:
+    async def run(
+        self,
+        retry_count: int,
+        ready_wait_time_sec: float,
+        driver: Optional[AbstractCanDriver],
+    ) -> None:
         """Detect tool changes continuously."""
         if driver is None:
             driver = self._messenger._drive

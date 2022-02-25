@@ -1,6 +1,6 @@
 """Tests for Tool Detector."""
 import pytest
-from mock import AsyncMock, call
+from mock import AsyncMock
 from opentrons_hardware.firmware_bindings import (
     NodeId,
     ArbitrationId,
@@ -15,9 +15,6 @@ from opentrons_hardware.hardware_control.tools.types import Carrier
 from opentrons_hardware.firmware_bindings.constants import ToolType
 from tests.conftest import MockCanMessageNotifier
 from tests.conftest import MockCanDriver
-
-from typing import Dict
-
 
 
 @pytest.fixture
@@ -57,10 +54,9 @@ async def test_messaging(
                     )
                 ),
             )
-    
 
     mock_messenger.send.side_effect = responder
-    await subject.run(1, 1,mock_driver)
+    await subject.run(1, 1, mock_driver)
     tool_dict = {
         Carrier.LEFT: ToolType(0),
         Carrier.RIGHT: ToolType(0),
