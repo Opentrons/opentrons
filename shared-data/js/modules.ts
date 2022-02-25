@@ -3,6 +3,7 @@ import magneticModuleV2 from '../module/definitions/3/magneticModuleV2.json'
 import temperatureModuleV1 from '../module/definitions/3/temperatureModuleV1.json'
 import temperatureModuleV2 from '../module/definitions/3/temperatureModuleV2.json'
 import thermocyclerModuleV1 from '../module/definitions/3/thermocyclerModuleV1.json'
+import heaterShakerModuleV1 from '../module/definitions/3/heaterShakerModuleV1.json'
 
 import {
   MAGDECK,
@@ -13,6 +14,7 @@ import {
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER,
   THERMOCYCLER_MODULE_V1,
+  HEATERSHAKER_MODULE_V1,
 } from './constants'
 
 import type {
@@ -40,6 +42,10 @@ export const getModuleDef2 = (moduleModel: ModuleModel): ModuleDefinition => {
 
     case THERMOCYCLER_MODULE_V1:
       return thermocyclerModuleV1 as ModuleDefinition
+
+    case HEATERSHAKER_MODULE_V1:
+      // @ts-expect-error: remove this once 2D render key is added to heatershaker module definition
+      return heaterShakerModuleV1 as ModuleDefinition
 
     default:
       throw new Error(`Invalid module model ${moduleModel as string}`)
