@@ -63,4 +63,5 @@ async def test_load_labware_implementation(
         labwareId="labware-id",
         definition=well_plate_def,
         offsetId="labware-offset-id",
+        displayName="Corning 96 Well Plate 360 µL Flat",
     )

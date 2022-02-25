@@ -208,6 +208,7 @@ class LegacyCommandMapper:
                     labware_load_info.labware_definition
                 ),
                 offsetId=labware_load_info.offset_id,
+                displayName=labware_load_info.labware_display_name,
             ),
         )
 

@@ -49,6 +49,10 @@ class LoadLabwareResult(BaseModel):
         ...,
         description="The full definition data for this labware.",
     )
+    displayName: str = Field(
+        None,
+        description="A name for this labware if no user-specified label present, falls back to definition display name.",
+    )
     offsetId: Optional[str] = Field(
         None,
         description=(
@@ -58,6 +62,7 @@ class LoadLabwareResult(BaseModel):
             " so the default of (0, 0, 0) will be used."
         ),
     )
+
 
 
 class LoadLabwareImplementation(
@@ -75,10 +80,13 @@ class LoadLabwareImplementation(
             labware_id=params.labwareId,
         )
 
+        # TODO: BC&SP(2022-02-25): when load labware command accepts label param, pass
+        #  that to displayName in result, falling back to definition's displayName
         return LoadLabwareResult(
             labwareId=loaded_labware.labware_id,
             definition=loaded_labware.definition,
             offsetId=loaded_labware.offsetId,
+            displayName=loaded_labware.definition.metadata.displayName
         )
 
 
