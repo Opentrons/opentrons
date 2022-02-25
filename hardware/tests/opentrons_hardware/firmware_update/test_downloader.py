@@ -63,7 +63,7 @@ async def test_messaging(
     mock_hex_processor: MagicMock,
     mock_messenger: AsyncMock,
     can_message_notifier: MockCanMessageNotifier,
-    crc32: int
+    crc32: int,
 ) -> None:
     """It should send all the chunks as CAN messages."""
     # TODO (amit, 2022-1-27): Replace this test with integration test.
@@ -127,7 +127,7 @@ async def test_messaging(
                 message=FirmwareUpdateComplete(
                     payload=payloads.FirmwareUpdateComplete(
                         num_messages=utils.UInt32Field(len(chunks)),
-                        crc32=utils.UInt32Field(crc32)
+                        crc32=utils.UInt32Field(crc32),
                     )
                 ),
             )

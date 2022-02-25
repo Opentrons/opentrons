@@ -73,8 +73,7 @@ class FirmwareUpdateDownloader:
             # Create and send firmware update complete message.
             complete_message = message_definitions.FirmwareUpdateComplete(
                 payload=payloads.FirmwareUpdateComplete(
-                    num_messages=UInt32Field(num_messages),
-                    crc32=UInt32Field(crc32)
+                    num_messages=UInt32Field(num_messages), crc32=UInt32Field(crc32)
                 )
             )
             await self._messenger.send(node_id=node_id, message=complete_message)
