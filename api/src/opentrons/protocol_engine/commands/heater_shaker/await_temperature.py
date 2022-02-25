@@ -25,6 +25,9 @@ class AwaitTemperatureImpl(
 ):
     """Execution implementation of a Heater-Shaker's await temperature command."""
 
+    def __init__(self, **kwargs: object) -> None:
+        pass
+
     async def execute(self, params: AwaitTemperatureParams) -> AwaitTemperatureResult:
         """Wait for a Heater-Shaker's target temperature to be reached."""
         raise NotImplementedError(

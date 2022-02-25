@@ -2,12 +2,7 @@
 from decoy import Decoy
 
 from opentrons.protocol_engine import WellLocation, WellOffset
-from opentrons.protocol_engine.execution import (
-    EquipmentHandler,
-    MovementHandler,
-    PipettingHandler,
-    RunControlHandler,
-)
+from opentrons.protocol_engine.execution import PipettingHandler
 
 from opentrons.protocol_engine.commands.pick_up_tip import (
     PickUpTipParams,
@@ -18,18 +13,10 @@ from opentrons.protocol_engine.commands.pick_up_tip import (
 
 async def test_pick_up_tip_implementation(
     decoy: Decoy,
-    equipment: EquipmentHandler,
-    movement: MovementHandler,
     pipetting: PipettingHandler,
-    run_control: RunControlHandler,
 ) -> None:
     """A PickUpTip command should have an execution implementation."""
-    subject = PickUpTipImplementation(
-        equipment=equipment,
-        movement=movement,
-        pipetting=pipetting,
-        run_control=run_control,
-    )
+    subject = PickUpTipImplementation(pipetting=pipetting)
 
     data = PickUpTipParams(
         pipetteId="abc",

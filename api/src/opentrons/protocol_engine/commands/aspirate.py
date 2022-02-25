@@ -1,11 +1,14 @@
 """Aspirate command request, result, and implementation models."""
 from __future__ import annotations
-from typing import Optional, Type
+from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
-
 
 from .pipetting_common import BaseLiquidHandlingParams, BaseLiquidHandlingResult
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+
+if TYPE_CHECKING:
+    from ..execution import PipettingHandler
+
 
 AspirateCommandType = Literal["aspirate"]
 
@@ -24,6 +27,9 @@ class AspirateResult(BaseLiquidHandlingResult):
 
 class AspirateImplementation(AbstractCommandImpl[AspirateParams, AspirateResult]):
     """Aspirate command implementation."""
+
+    def __init__(self, pipetting: PipettingHandler, **kwargs: object) -> None:
+        self._pipetting = pipetting
 
     async def execute(self, params: AspirateParams) -> AspirateResult:
         """Move to and aspirate from the requested well."""

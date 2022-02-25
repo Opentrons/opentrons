@@ -2,7 +2,6 @@
 import pytest
 from decoy import Decoy
 
-from opentrons.protocol_engine import execution
 from opentrons.protocol_engine.commands import heater_shaker
 from opentrons.protocol_engine.commands.heater_shaker.start_set_target_temperature import (  # noqa: E501
     StartSetTargetTemperatureImpl,
@@ -10,19 +9,9 @@ from opentrons.protocol_engine.commands.heater_shaker.start_set_target_temperatu
 
 
 @pytest.fixture()
-def subject(
-    equipment: execution.EquipmentHandler,
-    movement: execution.MovementHandler,
-    pipetting: execution.PipettingHandler,
-    run_control: execution.RunControlHandler,
-) -> StartSetTargetTemperatureImpl:
+def subject() -> StartSetTargetTemperatureImpl:
     """Get the command implementation with mocked out dependencies."""
-    return StartSetTargetTemperatureImpl(
-        equipment=equipment,
-        movement=movement,
-        pipetting=pipetting,
-        run_control=run_control,
-    )
+    return StartSetTargetTemperatureImpl()
 
 
 # TODO(mc, 2022-02-25): verify hardware interaction

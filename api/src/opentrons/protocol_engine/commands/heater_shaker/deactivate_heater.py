@@ -25,6 +25,9 @@ class DeactivateHeaterImpl(
 ):
     """Execution implementation of a Heater-Shaker's deactivate heater command."""
 
+    def __init__(self, **kwargs: object) -> None:
+        pass
+
     async def execute(self, params: DeactivateHeaterParams) -> DeactivateHeaterResult:
         """Unset a Heater-Shaker's target temperature."""
         raise NotImplementedError(
