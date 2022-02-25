@@ -33,7 +33,7 @@ async def test_messaging(
     mock_driver: MockCanDriver,
     can_message_notifier: MockCanMessageNotifier,
 ) -> None:
-    """It should initiate detector and prepare for tool change detection."""
+    """Test that the _attached_tools changes to values rcvd in notification."""
 
     def responder(node_id: NodeId, message: MessageDefinition) -> None:
         """Mock send method."""
