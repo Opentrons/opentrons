@@ -7,11 +7,11 @@ from mock.mock import AsyncMock
 from opentrons_hardware.firmware_bindings import ArbitrationId
 from opentrons_hardware.firmware_bindings.message import CanMessage
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition
+from opentrons_hardware.firmware_bindings.messages import message_definitions, payloads
+from opentrons_hardware.firmware_bindings.utils import UInt8Field
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons_hardware.drivers.can_bus.can_messenger import MessageListenerCallback
-from opentrons_hardware.hardware_control.tools.types import Carrier
-from opentrons_hardware.firmware_bindings.constants import ToolType
 
 
 class MockCanMessageNotifier:
@@ -88,9 +88,10 @@ def mock_messenger(can_message_notifier: MockCanMessageNotifier) -> AsyncMock:
 def mock_driver(can_driver: MockCanDriver) -> AsyncMock:
     """Mock can messenger."""
     mock = AsyncMock(spec=AbstractCanDriver)
-    tmp = {
-        Carrier.LEFT: ToolType(0),
-        Carrier.RIGHT: ToolType(0),
-    }
-    mock.__aiter__.return_value = [tmp, tmp, tmp]
+    response = message_definitions.PushToolsDetectedNotification(
+        payload=payloads.ToolsDetectedNotificationPayload(
+            z_motor=UInt8Field(1), a_motor=UInt8Field(1), gripper=UInt8Field(1)
+        )
+    )
+    mock.__aiter__.return_value = [response, response, response]
     return mock

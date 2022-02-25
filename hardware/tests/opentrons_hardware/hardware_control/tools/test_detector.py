@@ -40,7 +40,7 @@ async def test_messaging(
         if isinstance(message, message_definitions.AttachedToolsRequest):
             response = message_definitions.PushToolsDetectedNotification(
                 payload=payloads.ToolsDetectedNotificationPayload(
-                    z_motor=UInt8Field(0), a_motor=UInt8Field(0), gripper=UInt8Field(0)
+                    z_motor=UInt8Field(1), a_motor=UInt8Field(1), gripper=UInt8Field(1)
                 )
             )
             can_message_notifier.notify(
@@ -58,7 +58,7 @@ async def test_messaging(
     mock_messenger.send.side_effect = responder
     await subject.run(1, 1, mock_driver)
     tool_dict = {
-        Carrier.LEFT: ToolType(0),
-        Carrier.RIGHT: ToolType(0),
+        Carrier.LEFT: ToolType(1),
+        Carrier.RIGHT: ToolType(1),
     }
     assert subject._attached_tools == tool_dict
