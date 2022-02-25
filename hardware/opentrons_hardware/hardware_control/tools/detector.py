@@ -26,7 +26,6 @@ class ToolDetector:
     async def detect(self) -> AsyncGenerator[Dict[Carrier, ToolType], None]:
         """Detect tool changes."""
         async for message in self._messenger._drive:
-
             if isinstance(message, message_definitions.PushToolsDetectedNotification):
                 tmp_dic = {
                     Carrier.LEFT: ToolType(int(message.payload.a_motor.value)),
@@ -43,8 +42,8 @@ class ToolDetector:
     async def run_detect(self) -> None:
         """Detect tool changes continuoulsy."""
         tool_generator = self.detect()
-        async for tool in tool_generator:
-            log.info(f"Detection, Tool: {tool}")
+        tool = await tool_generator.__anext__()
+        log.info(f"Detection, Tool: {tool}")
 
     async def run(self, retry_count: int, ready_wait_time_sec: float) -> None:
         """Detect tool changes continuously."""
