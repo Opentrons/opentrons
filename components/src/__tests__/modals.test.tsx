@@ -19,7 +19,7 @@ describe('modals', () => {
     ).root
 
     const overlay = root.findByProps({
-      backgroundColor: 'rgba(22, 33, 45, 0.2)',
+      backgroundColor: 'rgba(22, 33, 45, 0.35)',
     })
     overlay.props.onClick()
 
@@ -61,7 +61,7 @@ describe('modals', () => {
     ).root
 
     const overlay = root.findByProps({
-      backgroundColor: 'rgba(22, 33, 45, 0.2)',
+      backgroundColor: 'rgba(22, 33, 45, 0.35)',
     })
 
     overlay.props.onClick()
