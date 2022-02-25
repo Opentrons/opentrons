@@ -1,4 +1,4 @@
-"""Command models to open the Heater Shaker Module's latch."""
+"""Command models to open the Heater-Shaker Module's latch."""
 from typing import Optional
 from typing_extensions import Literal, Type
 
@@ -11,25 +11,25 @@ OpenLatchCommandType = Literal["heaterShakerModule/openLatch"]
 
 
 class OpenLatchParams(BaseModel):
-    """Input parameters to open a Heater Shaker Module's latch."""
+    """Input parameters to open a Heater-Shaker Module's latch."""
 
-    moduleId: str = Field(..., description="Unique ID of the Heater Shaker Module.")
+    moduleId: str = Field(..., description="Unique ID of the Heater-Shaker Module.")
 
 
 class OpenLatchResult(BaseModel):
-    """Result data from opening a Heater Shaker's latch."""
+    """Result data from opening a Heater-Shaker's latch."""
 
 
 class OpenLatchImpl(AbstractCommandImpl[OpenLatchParams, OpenLatchResult]):
-    """Execution implementation of a Heater Shaker's open latch command."""
+    """Execution implementation of a Heater-Shaker's open latch command."""
 
     async def execute(self, params: OpenLatchParams) -> OpenLatchResult:
-        """Open a Heater Shaker's latch."""
-        raise NotImplementedError("Heater Shaker open latch not yet implemented.")
+        """Open a Heater-Shaker's latch."""
+        raise NotImplementedError("Heater-Shaker open latch not yet implemented.")
 
 
 class OpenLatch(BaseCommand[OpenLatchParams, OpenLatchResult]):
-    """A command to open a Heater Shaker's latch."""
+    """A command to open a Heater-Shaker's latch."""
 
     commandType: OpenLatchCommandType = "heaterShakerModule/openLatch"
     params: OpenLatchParams
@@ -39,7 +39,7 @@ class OpenLatch(BaseCommand[OpenLatchParams, OpenLatchResult]):
 
 
 class OpenLatchCreate(BaseCommandCreate[OpenLatchParams]):
-    """A request to create a Heater Shaker's open latch command."""
+    """A request to create a Heater-Shaker's open latch command."""
 
     commandType: OpenLatchCommandType
     params: OpenLatchParams

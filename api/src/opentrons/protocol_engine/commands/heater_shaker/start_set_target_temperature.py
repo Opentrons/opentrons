@@ -1,4 +1,4 @@
-"""Command models to start heating a Heater Shaker Module."""
+"""Command models to start heating a Heater-Shaker Module."""
 from typing import Optional
 from typing_extensions import Literal, Type
 
@@ -13,14 +13,14 @@ StartSetTargetTemperatureCommandType = Literal[
 
 
 class StartSetTargetTemperatureParams(BaseModel):
-    """Input parameters to set a Heater Shaker's target temperature."""
+    """Input parameters to set a Heater-Shaker's target temperature."""
 
-    moduleId: str = Field(..., description="Unique ID of the Heater Shaker Module.")
+    moduleId: str = Field(..., description="Unique ID of the Heater-Shaker Module.")
     temperature: float = Field(..., description="Target temperature in °C.")
 
 
 class StartSetTargetTemperatureResult(BaseModel):
-    """Result data from setting a Heater Shaker's target temperature."""
+    """Result data from setting a Heater-Shaker's target temperature."""
 
 
 class StartSetTargetTemperatureImpl(
@@ -28,22 +28,22 @@ class StartSetTargetTemperatureImpl(
         StartSetTargetTemperatureParams, StartSetTargetTemperatureResult
     ]
 ):
-    """Execution implementation of a Heater Shaker's set temperature command."""
+    """Execution implementation of a Heater-Shaker's set temperature command."""
 
     async def execute(
         self,
         params: StartSetTargetTemperatureParams,
     ) -> StartSetTargetTemperatureResult:
-        """Set a Heater Shaker's target temperature."""
+        """Set a Heater-Shaker's target temperature."""
         raise NotImplementedError(
-            "Heater Shaker start set target temperature not yet implemented."
+            "Heater-Shaker start set target temperature not yet implemented."
         )
 
 
 class StartSetTargetTemperature(
     BaseCommand[StartSetTargetTemperatureParams, StartSetTargetTemperatureResult]
 ):
-    """A command to set a Heater Shaker's target temperature."""
+    """A command to set a Heater-Shaker's target temperature."""
 
     commandType: StartSetTargetTemperatureCommandType = (
         "heaterShakerModule/startSetTargetTemperature"
@@ -59,7 +59,7 @@ class StartSetTargetTemperature(
 class StartSetTargetTemperatureCreate(
     BaseCommandCreate[StartSetTargetTemperatureParams]
 ):
-    """A request to create a Heater Shaker's set temperature command."""
+    """A request to create a Heater-Shaker's set temperature command."""
 
     commandType: StartSetTargetTemperatureCommandType
     params: StartSetTargetTemperatureParams

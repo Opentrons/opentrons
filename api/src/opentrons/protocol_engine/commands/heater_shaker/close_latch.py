@@ -1,4 +1,4 @@
-"""Command models to close the Heater Shaker Module's latch."""
+"""Command models to close the Heater-Shaker Module's latch."""
 from typing import Optional
 from typing_extensions import Literal, Type
 
@@ -11,25 +11,25 @@ CloseLatchCommandType = Literal["heaterShakerModule/closeLatch"]
 
 
 class CloseLatchParams(BaseModel):
-    """Input parameters to close a Heater Shaker Module's latch."""
+    """Input parameters to close a Heater-Shaker Module's latch."""
 
-    moduleId: str = Field(..., description="Unique ID of the Heater Shaker Module.")
+    moduleId: str = Field(..., description="Unique ID of the Heater-Shaker Module.")
 
 
 class CloseLatchResult(BaseModel):
-    """Result data from closing a Heater Shaker's latch."""
+    """Result data from closing a Heater-Shaker's latch."""
 
 
 class CloseLatchImpl(AbstractCommandImpl[CloseLatchParams, CloseLatchResult]):
-    """Execution implementation of a Heater Shaker's close latch command."""
+    """Execution implementation of a Heater-Shaker's close latch command."""
 
     async def execute(self, params: CloseLatchParams) -> CloseLatchResult:
-        """Close a Heater Shaker's latch."""
-        raise NotImplementedError("Heater Shaker close latch not yet implemented.")
+        """Close a Heater-Shaker's latch."""
+        raise NotImplementedError("Heater-Shaker close latch not yet implemented.")
 
 
 class CloseLatch(BaseCommand[CloseLatchParams, CloseLatchResult]):
-    """A command to close a Heater Shaker's latch."""
+    """A command to close a Heater-Shaker's latch."""
 
     commandType: CloseLatchCommandType = "heaterShakerModule/closeLatch"
     params: CloseLatchParams
@@ -39,7 +39,7 @@ class CloseLatch(BaseCommand[CloseLatchParams, CloseLatchResult]):
 
 
 class CloseLatchCreate(BaseCommandCreate[CloseLatchParams]):
-    """A request to create a Heater Shaker's close latch command."""
+    """A request to create a Heater-Shaker's close latch command."""
 
     commandType: CloseLatchCommandType
     params: CloseLatchParams

@@ -1,4 +1,4 @@
-"""Command models to stop shaking the Heater Shaker Module."""
+"""Command models to stop shaking the Heater-Shaker Module."""
 from typing import Optional
 from typing_extensions import Literal, Type
 
@@ -11,25 +11,25 @@ StopShakeCommandType = Literal["heaterShakerModule/stopShake"]
 
 
 class StopShakeParams(BaseModel):
-    """Input parameters to stop shaking a Heater Shaker Module."""
+    """Input parameters to stop shaking a Heater-Shaker Module."""
 
-    moduleId: str = Field(..., description="Unique ID of the Heater Shaker Module.")
+    moduleId: str = Field(..., description="Unique ID of the Heater-Shaker Module.")
 
 
 class StopShakeResult(BaseModel):
-    """Result data from stopping a Heater Shaker's shake."""
+    """Result data from stopping a Heater-Shaker's shake."""
 
 
 class StopShakeImpl(AbstractCommandImpl[StopShakeParams, StopShakeResult]):
-    """Execution implementation of a Heater Shaker's stop shake command."""
+    """Execution implementation of a Heater-Shaker's stop shake command."""
 
     async def execute(self, params: StopShakeParams) -> StopShakeResult:
-        """Stop a Heater Shaker's shake."""
-        raise NotImplementedError("Heater Shaker stop shake not yet implemented.")
+        """Stop a Heater-Shaker's shake."""
+        raise NotImplementedError("Heater-Shaker stop shake not yet implemented.")
 
 
 class StopShake(BaseCommand[StopShakeParams, StopShakeResult]):
-    """A command to stop a Heater Shaker's shake."""
+    """A command to stop a Heater-Shaker's shake."""
 
     commandType: StopShakeCommandType = "heaterShakerModule/stopShake"
     params: StopShakeParams
@@ -39,7 +39,7 @@ class StopShake(BaseCommand[StopShakeParams, StopShakeResult]):
 
 
 class StopShakeCreate(BaseCommandCreate[StopShakeParams]):
-    """A request to create a Heater Shaker's stop shake command."""
+    """A request to create a Heater-Shaker's stop shake command."""
 
     commandType: StopShakeCommandType
     params: StopShakeParams

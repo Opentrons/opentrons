@@ -1,4 +1,4 @@
-"""Heater Shaker Module protocol commands."""
+"""Heater-Shaker Module protocol commands."""
 
 from .await_temperature import (
     AwaitTemperature,
