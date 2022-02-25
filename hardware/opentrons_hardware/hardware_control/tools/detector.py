@@ -6,7 +6,7 @@ from opentrons_hardware.firmware_bindings.messages import message_definitions
 from opentrons_hardware.firmware_bindings.constants import ToolType
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons_hardware.hardware_control.tools.errors import ToolDetectionFailiure
-
+from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_hardware.hardware_control.tools.types import Carrier
 from typing import AsyncGenerator, Dict
 
@@ -22,10 +22,10 @@ class ToolDetector:
         """Constructor."""
         self._messenger = messenger
         self._attached_tools = attached_tools
-
-    async def detect(self) -> AsyncGenerator[Dict[Carrier, ToolType], None]:
+        
+    async def detect(self, driver: AbstractCanDriver) -> AsyncGenerator[Dict[Carrier, ToolType], None]:
         """Detect tool changes."""
-        async for message in self._messenger._drive:
+        async for message in driver:
             if isinstance(message, message_definitions.PushToolsDetectedNotification):
                 tmp_dic = {
                     Carrier.LEFT: ToolType(int(message.payload.a_motor.value)),
@@ -39,18 +39,20 @@ class ToolDetector:
             else:
                 yield self._attached_tools
 
-    async def run_detect(self) -> None:
+    async def run_detect(self, driver: AbstractCanDriver) -> None:
         """Detect tool changes continuoulsy."""
-        tool_generator = self.detect()
+        tool_generator = self.detect(driver)
         tool = await tool_generator.__anext__()
         log.info(f"Detection, Tool: {tool}")
 
-    async def run(self, retry_count: int, ready_wait_time_sec: float) -> None:
+    async def run(self, retry_count: int, ready_wait_time_sec: float, driver: AbstractCanDriver = None) -> None:
         """Detect tool changes continuously."""
+        if driver is None:
+            driver = self._messenger._drive
         i = 1
         while True:
             try:
-                await asyncio.wait_for(self.run_detect(), ready_wait_time_sec)
+                await asyncio.wait_for(self.run_detect(driver), ready_wait_time_sec)
                 break
             except asyncio.TimeoutError:
                 log.warning(
