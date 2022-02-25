@@ -1,5 +1,6 @@
 """Firmware download."""
 import asyncio
+import binascii
 import logging
 
 from opentrons_hardware.firmware_bindings import NodeId
@@ -43,16 +44,18 @@ class FirmwareUpdateDownloader:
         """
         with WaitableCallback(self._messenger) as reader:
             num_messages = 0
+            crc32 = 0
             for chunk in hex_processor.process(
                 payloads.FirmwareUpdateDataField.NUM_BYTES
             ):
                 logger.debug(
-                    f"Sending chunk {num_messages} to address {chunk.address}."
+                    f"Sending chunk {num_messages} to address {chunk.address:x}."
                 )
                 # Create and send message from this chunk
+                data = bytes(chunk.data)
                 data_message = message_definitions.FirmwareUpdateData(
                     payload=payloads.FirmwareUpdateData.create(
-                        address=chunk.address, data=bytes(chunk.data)
+                        address=chunk.address, data=data
                     )
                 )
                 await self._messenger.send(node_id=node_id, message=data_message)
@@ -64,12 +67,14 @@ class FirmwareUpdateDownloader:
                 except asyncio.TimeoutError:
                     raise TimeoutResponse(data_message)
 
+                crc32 = binascii.crc32(data, crc32)
                 num_messages += 1
 
             # Create and send firmware update complete message.
             complete_message = message_definitions.FirmwareUpdateComplete(
                 payload=payloads.FirmwareUpdateComplete(
-                    num_messages=UInt32Field(num_messages)
+                    num_messages=UInt32Field(num_messages),
+                    crc32=UInt32Field(crc32)
                 )
             )
             await self._messenger.send(node_id=node_id, message=complete_message)
