@@ -33,7 +33,7 @@ class DeactivateHeaterImpl(
 
 
 class DeactivateHeater(BaseCommand[DeactivateHeaterParams, DeactivateHeaterResult]):
-    """A command to set a Heater Shaker's target temperature."""
+    """A command to unset a Heater Shaker's target temperature."""
 
     commandType: DeactivateHeaterCommandType = "heaterShakerModule/deactivateHeater"
     params: DeactivateHeaterParams

@@ -17,7 +17,7 @@ class CloseLatchParams(BaseModel):
 
 
 class CloseLatchResult(BaseModel):
-    """Result data from closeing a Heater Shaker's latch."""
+    """Result data from closing a Heater Shaker's latch."""
 
 
 class CloseLatchImpl(AbstractCommandImpl[CloseLatchParams, CloseLatchResult]):

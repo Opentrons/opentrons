@@ -27,7 +27,7 @@ def subject(
 
 # TODO(mc, 2022-02-25): verify hardware interaction
 @pytest.mark.xfail(raises=NotImplementedError, strict=True)
-async def test_set_target_shake_speed(
+async def test_start_set_target_temperature(
     decoy: Decoy,
     subject: StartSetTargetTemperatureImpl,
 ) -> None:
