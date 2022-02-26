@@ -86,7 +86,7 @@ def mock_messenger(can_message_notifier: MockCanMessageNotifier) -> AsyncMock:
 
 @pytest.fixture
 def mock_driver(can_driver: MockCanDriver) -> AsyncMock:
-    """Mock can messenger."""
+    """Mock can driver."""
     mock = AsyncMock(spec=AbstractCanDriver)
     response = message_definitions.PushToolsDetectedNotification(
         payload=payloads.ToolsDetectedNotificationPayload(
