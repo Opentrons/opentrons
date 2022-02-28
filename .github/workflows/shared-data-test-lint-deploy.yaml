@@ -21,7 +21,6 @@ on:
       - 'shared-data/*/**'
   workflow_dispatch:
 
-
 defaults:
   run:
     shell: bash
@@ -45,14 +44,14 @@ jobs:
           project: 'shared-data/python'
       - name: Lint
         run: make -C shared-data/python lint
-  
+
   python-test:
     name: 'shared-data package python tests'
     timeout-minutes: 20
     needs: [python-lint]
     strategy:
       matrix:
-        os: ['windows-latest', 'ubuntu-18.04', 'macos-latest']
+        os: ['windows-2019', 'ubuntu-18.04', 'macos-latest']
     runs-on: '${{ matrix.os }}'
     steps:
       - uses: 'actions/checkout@v2'
