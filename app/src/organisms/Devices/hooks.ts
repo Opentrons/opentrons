@@ -5,6 +5,14 @@ import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 
 import { useRunStatus } from '../../organisms/RunTimeControl/hooks'
 import {
+  fetchCalibrationStatus,
+  fetchPipetteOffsetCalibrations,
+  fetchTipLengthCalibrations,
+  getDeckCalibrationData,
+  getPipetteOffsetCalibrations,
+  getTipLengthCalibrations,
+} from '../../redux/calibration'
+import {
   getDiscoverableRobotByName,
   CONNECTABLE,
   REACHABLE,
@@ -18,6 +26,11 @@ import {
   getLightsOn,
 } from '../../redux/robot-controls'
 
+import type {
+  DeckCalibrationData,
+  PipetteOffsetCalibration,
+  TipLengthCalibration,
+} from '../../redux/calibration/types'
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 import type { AttachedModule } from '../../redux/modules/types'
 import type { AttachedPipettesByMount } from '../../redux/pipettes/types'
@@ -98,4 +111,58 @@ export function useIsRobotViewable(robotName: string): boolean {
   const robot = useRobot(robotName)
 
   return robot?.status === CONNECTABLE || robot?.status === REACHABLE
+}
+
+export function useDeckCalibrationData(
+  robotName: string | null = null
+): DeckCalibrationData | null {
+  const [dispatchRequest] = useDispatchApiRequest()
+
+  const deckCalibrationData = useSelector((state: State) =>
+    getDeckCalibrationData(state, robotName)
+  )
+
+  React.useEffect(() => {
+    if (robotName != null) {
+      dispatchRequest(fetchCalibrationStatus(robotName))
+    }
+  }, [dispatchRequest, robotName])
+
+  return deckCalibrationData
+}
+
+export function usePipetteOffsetCalibrations(
+  robotName: string | null = null
+): PipetteOffsetCalibration[] | null {
+  const [dispatchRequest] = useDispatchApiRequest()
+
+  const pipetteOffsetCalibrations = useSelector((state: State) =>
+    getPipetteOffsetCalibrations(state, robotName)
+  )
+
+  React.useEffect(() => {
+    if (robotName != null) {
+      dispatchRequest(fetchPipetteOffsetCalibrations(robotName))
+    }
+  }, [dispatchRequest, robotName])
+
+  return pipetteOffsetCalibrations
+}
+
+export function useTipLengthCalibrations(
+  robotName: string | null = null
+): TipLengthCalibration[] | null {
+  const [dispatchRequest] = useDispatchApiRequest()
+
+  const tipLengthCalibrations = useSelector((state: State) =>
+    getTipLengthCalibrations(state, robotName)
+  )
+
+  React.useEffect(() => {
+    if (robotName != null) {
+      dispatchRequest(fetchTipLengthCalibrations(robotName))
+    }
+  }, [dispatchRequest, robotName])
+
+  return tipLengthCalibrations
 }

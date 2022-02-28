@@ -62,7 +62,7 @@ class WaitableListener(Listener[DataT]):
     def __init__(self, loop: Optional[asyncio.AbstractEventLoop] = None) -> None:
         """Constructor."""
         self._loop = loop or asyncio.get_running_loop()
-        self._futures: Deque[asyncio.Future] = deque()
+        self._futures: Deque["asyncio.Future[DataT]"] = deque()
 
     async def wait_next_poll(self) -> DataT:
         """
@@ -70,7 +70,7 @@ class WaitableListener(Listener[DataT]):
 
         Returns: The next poll result.
         """
-        f = self._loop.create_future()
+        f: "asyncio.Future[DataT]" = self._loop.create_future()
         self._futures.append(f)
         return await f
 

@@ -42,10 +42,10 @@ class Thermocycler(mod_abc.AbstractModule):
         usb_port: USBPort,
         execution_manager: ExecutionManager,
         simulating: bool = False,
-        loop: asyncio.AbstractEventLoop = None,
-        sim_model: str = None,
-        **kwargs,
-    ):
+        loop: Optional[asyncio.AbstractEventLoop] = None,
+        sim_model: Optional[str] = None,
+        **kwargs: float,
+    ) -> "Thermocycler":
         """
         Build and connect to a Thermocycler
 
@@ -90,7 +90,7 @@ class Thermocycler(mod_abc.AbstractModule):
         execution_manager: ExecutionManager,
         driver: AbstractThermocyclerDriver,
         device_info: Dict[str, str],
-        loop: asyncio.AbstractEventLoop = None,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
         polling_interval_sec: float = POLLING_FREQUENCY_SEC,
     ) -> None:
         """
@@ -152,19 +152,19 @@ class Thermocycler(mod_abc.AbstractModule):
     async def deactivate_lid(self) -> None:
         """Deactivate the lid heating pad"""
         await self.wait_for_is_running()
-        return await self._driver.deactivate_lid()
+        await self._driver.deactivate_lid()
 
     async def deactivate_block(self) -> None:
         """Deactivate the block peltiers"""
         await self.wait_for_is_running()
         self._clear_cycle_counters()
-        return await self._driver.deactivate_block()
+        await self._driver.deactivate_block()
 
     async def deactivate(self) -> None:
         """Deactivate the block peltiers and lid heating pad"""
         await self.wait_for_is_running()
         self._clear_cycle_counters()
-        return await self._driver.deactivate_all()
+        await self._driver.deactivate_all()
 
     async def open(self) -> str:
         """Open the lid if it is closed"""
@@ -258,7 +258,7 @@ class Thermocycler(mod_abc.AbstractModule):
         self,
         steps: List[types.ThermocyclerStep],
         repetitions: int,
-        volume: float = None,
+        volume: Optional[float] = None,
     ) -> None:
         """
         Begin a set temperature cycle.
@@ -431,7 +431,7 @@ class Thermocycler(mod_abc.AbstractModule):
         return self._current_step_index
 
     @property
-    def live_data(self):
+    def live_data(self) -> types.LiveData:
         return {
             "status": self.status,
             "data": {
@@ -450,10 +450,10 @@ class Thermocycler(mod_abc.AbstractModule):
         }
 
     @property
-    def is_simulated(self):
+    def is_simulated(self) -> bool:
         return isinstance(self._driver, SimulatingDriver)
 
-    async def prep_for_update(self):
+    async def prep_for_update(self) -> str:
         await self._driver.enter_programming_mode()
 
         new_port = await update.find_bootloader_port()

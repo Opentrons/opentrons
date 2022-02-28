@@ -119,3 +119,9 @@ class SpeedStatus(str, Enum):
     DECELERATING = "slowing down"
     IDLE = "idle"
     ERROR = "error"
+
+
+class HeaterShakerStatus(str, Enum):
+    IDLE = "idle"
+    RUNNING = "running"
+    ERROR = "error"

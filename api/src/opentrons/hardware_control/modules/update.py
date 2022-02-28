@@ -3,7 +3,7 @@ import logging
 import os
 from pathlib import Path
 from glob import glob
-from typing import Any, Dict, Tuple, Optional
+from typing import Any, Dict, Tuple, Optional, Union
 from .types import UpdateError
 from .mod_abc import AbstractModule
 
@@ -12,9 +12,9 @@ log = logging.getLogger(__name__)
 
 async def update_firmware(
     module: AbstractModule,
-    firmware_file: str,
+    firmware_file: Union[str, Path],
     loop: Optional[asyncio.AbstractEventLoop],
-):
+) -> None:
     """Apply update of given firmware file to given module.
 
     raises an UpdateError with the reason for the failure.
@@ -25,13 +25,13 @@ async def update_firmware(
         "stderr": asyncio.subprocess.PIPE,
         "loop": loop,
     }
-    successful, res = await module.bootloader()(flash_port, firmware_file, kwargs)
+    successful, res = await module.bootloader()(flash_port, str(firmware_file), kwargs)
     if not successful:
         log.info(f"Bootloader reponse: {res}")
         raise UpdateError(res)
 
 
-async def find_bootloader_port():
+async def find_bootloader_port() -> str:
     """
     Finds the port of an Opentrons Module that has entered its bootloader.
     The bootloader port shows up as 'ot_module_(avrdude|samba)_bootloader'
