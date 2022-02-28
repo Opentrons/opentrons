@@ -3,9 +3,6 @@ url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
-[requires]
-python_version = "3.7"
-
 [dev-packages]
 opentrons-shared-data = {editable = true, path = "."}
 mypy = "==0.800"
@@ -15,10 +12,12 @@ flake8-docstrings = "~=1.6.0"
 flake8-noqa = "~=1.1.0"
 twine = "==2.0.0"
 wheel = "==0.30.0"
-pytest = "==6.1.0"
+pytest = "==7.0.1"
 pytest-cov = "==2.10.1"
 pytest-xdist = "~=2.2.1 "
 typeguard = "==2.7.1"
+# specify typing-extensions explicitly to force lockfile inclusion on Python >= 3.8
+typing-extensions = "==3.10.0.0"
 # pytest dependencies on windows, spec'd here to force lockfile inclusion
 # https://github.com/pypa/pipenv/issues/4408#issuecomment-668324177
 atomicwrites = {version="==1.4.0", sys_platform="== 'win32'"}
