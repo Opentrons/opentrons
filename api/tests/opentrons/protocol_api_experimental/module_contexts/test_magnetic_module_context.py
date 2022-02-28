@@ -155,9 +155,9 @@ def test_engage_with_height_from_home(
         engine_client.state.modules.get_model(module_id=subject_module_id)
     ).then_return(ModuleModel.MAGNETIC_MODULE_V1)
     decoy.when(
-        engine_client.state.modules.calculate_magnet_true_mm_above_base(
+        engine_client.state.modules.calculate_magnet_height(
             module_model=ModuleModel.MAGNETIC_MODULE_V1,
-            hardware_units_above_home=12.34,
+            height_from_home=12.34,
         )
     ).then_return(56.78)
     subject.engage(height=12.34)
@@ -179,9 +179,9 @@ def test_engage_with_height_from_base(
         engine_client.state.modules.get_model(module_id=subject_module_id)
     ).then_return(ModuleModel.MAGNETIC_MODULE_V1)
     decoy.when(
-        engine_client.state.modules.calculate_magnet_true_mm_above_base(
+        engine_client.state.modules.calculate_magnet_height(
             module_model=ModuleModel.MAGNETIC_MODULE_V1,
-            hardware_units_above_base=12.34,
+            height_from_base=12.34,
         )
     ).then_return(56.78)
     subject.engage(height_from_base=12.34)
@@ -206,15 +206,15 @@ def test_engage_with_offset(
         engine_client.state.labware.get_id_by_module(module_id=subject_module_id)
     ).then_return("labware-id")
     decoy.when(
-        engine_client.state.labware.get_magnet_engage_height_above_base_true_mm(
+        engine_client.state.labware.get_default_magnet_height(
             labware_id="labware-id"
         )
     ).then_return(1.23)
     decoy.when(
-        engine_client.state.modules.calculate_magnet_true_mm_above_base(
+        engine_client.state.modules.calculate_magnet_height(
             module_model=ModuleModel.MAGNETIC_MODULE_V1,
-            labware_default_true_mm_above_base=1.23,
-            hardware_units_above_labware_default=4.56,
+            labware_default_height=1.23,
+            offset_from_labware_default=4.56,
         )
     ).then_return(7.89)
     subject.engage(offset=4.56)
@@ -239,15 +239,15 @@ def test_engage_with_no_arguments(
         engine_client.state.labware.get_id_by_module(module_id=subject_module_id)
     ).then_return("labware-id")
     decoy.when(
-        engine_client.state.labware.get_magnet_engage_height_above_base_true_mm(
+        engine_client.state.labware.get_default_magnet_height(
             labware_id="labware-id"
         )
     ).then_return(1.23)
     decoy.when(
-        engine_client.state.modules.calculate_magnet_true_mm_above_base(
+        engine_client.state.modules.calculate_magnet_height(
             module_model=ModuleModel.MAGNETIC_MODULE_V1,
-            labware_default_true_mm_above_base=1.23,
-            hardware_units_above_labware_default=0,
+            labware_default_height=1.23,
+            offset_from_labware_default=0,
         )
     ).then_return(7.89)
     subject.engage()
@@ -288,7 +288,7 @@ def test_engage_based_on_labware_errors_when_labware_has_no_default_height(
         engine_client.state.labware.get_id_by_module(module_id=subject_module_id)
     ).then_return("labware-id")
     decoy.when(
-        engine_client.state.labware.get_magnet_engage_height_above_base_true_mm(
+        engine_client.state.labware.get_default_magnet_height(
             labware_id="labware-id"
         )
     ).then_return(None)

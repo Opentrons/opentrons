@@ -332,14 +332,12 @@ class LabwareView(HasState[LabwareState]):
             z=dims.zDimension,
         )
 
-    def get_magnet_engage_height_above_base_true_mm(
+    def get_default_magnet_height(
         self, labware_id: str
     ) -> Optional[float]:
         """Return a labware's default Magnetic Module engage height.
 
-        For historical reasons, certain labware that set this property
-        use different units or a different origin point.
-        This function normalizes it to true millimeters above the labware base plane.
+        The returned value is measured in millimeters above the labware base plane.
         """
         raise NotImplementedError()
 

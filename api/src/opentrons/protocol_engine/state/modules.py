@@ -197,13 +197,13 @@ class ModuleView(HasState[ModuleState]):
             )
 
     @staticmethod
-    def get_magnet_true_mm_home_to_base(module_model: ModuleModel) -> float:
+    def get_magnet_home_to_base_offset(module_model: ModuleModel) -> float:
         """Return a Magnetic Module's home offset.
 
         This is how far a Magnetic Module's magnets have to rise above their
         home position for their tops to be level with the bottom of the labware.
 
-        This function always returns the offset in of true millimeters,
+        The offset is returned in true millimeters,
         even though GEN1 Magnetic Modules are sometimes controlled in units of
         half-millimeters ("short mm").
         """
@@ -221,90 +221,81 @@ class ModuleView(HasState[ModuleState]):
 
     @overload
     @classmethod
-    def calculate_magnet_true_mm_above_base(
+    def calculate_magnet_height(
         cls,
         *,
         module_model: ModuleModel,
-        hardware_units_above_home: float,
+        height_from_home: float,
     ) -> float:
         pass
 
     @overload
     @classmethod
-    def calculate_magnet_true_mm_above_base(
+    def calculate_magnet_height(
         cls,
         *,
         module_model: ModuleModel,
-        hardware_units_above_base: float,
+        height_from_base: float,
     ) -> float:
         pass
 
     @overload
     @classmethod
-    def calculate_magnet_true_mm_above_base(
+    def calculate_magnet_height(
         cls,
         *,
         module_model: ModuleModel,
-        labware_default_true_mm_above_base: float,
-        hardware_units_above_labware_default: float,
+        labware_default_height: float,
+        offset_from_labware_default: float,
     ) -> float:
         pass
 
     @classmethod
-    def calculate_magnet_true_mm_above_base(
+    def calculate_magnet_height(
         cls,
         *,
         module_model: ModuleModel,
-        hardware_units_above_home: Optional[float] = None,
-        hardware_units_above_base: Optional[float] = None,
-        labware_default_true_mm_above_base: Optional[float] = None,
-        hardware_units_above_labware_default: Optional[float] = None,
+        height_from_home: Optional[float] = None,
+        height_from_base: Optional[float] = None,
+        labware_default_height: Optional[float] = None,
+        offset_from_labware_default: Optional[float] = None,
     ) -> float:
         """Normalize a Magnetic Module engage height to standard units.
 
         Args:
             module_model: What kind of Magnetic Module to calculate the height for.
-                If GEN1, "hardware units" in other arguments are half-millimeters.
-                Otherwise, they're true millimeters.
-            hardware_units_above_home: A distance above the magnets' home position,
-                in hardware units.
-            hardware_units_above_base: A distance above the labware base plane,
-                in hardware units.
-            labware_default_true_mm_above_base: A distance above the labware base plane,
-                in true millimeters, from a labware definition.
-            hardware_units_above_labware_default: A distance above the
-                ``labware_default_true_mm_above_base`` argument, in hardware units.
+            height_from_home: A distance above the magnets' home position,
+                in millimeters.
+            heght_from_base: A distance above the labware base plane,
+                in millimeters.
+            labware_default_height: A distance above the labware base plane,
+                in millimeters, from a labware definition.
+            offset_from_labware_default: A distance from the
+                ``labware_default_height`` argument, in hardware units.
 
         Negative values are allowed for all arguments, to move down instead of up.
 
+        See the overload signatures for which combinations of parameters are allowed.
+
         Returns:
-            The same distance, measured in true physical millimeters above the
-            module's base labware plane.
+            The same height passed in, converted to be measured in
+            millimeters above the module's labware base plane,
+            suitable as input to a Magnetic Module engage Protocol Engine command.
         """
-        if hardware_units_above_home is not None:
-            # FIXME(mm, 2022-02-22): This arithmetic is wrong for GEN1 modules
-            # because it mixes units.
-            true_mm_home_to_base = cls.get_magnet_true_mm_home_to_base(
+        if height_from_home is not None:
+            home_to_base = cls.get_magnet_home_to_base_offset(
                 module_model=module_model
             )
-            return hardware_units_above_home - true_mm_home_to_base
+            return height_from_home - home_to_base
 
-        elif hardware_units_above_base is not None:
-            # FIXME(mm, 2022-02-24): This is wrong for GEN1 modules
-            # because hardware units are not true millimeters.
-            return hardware_units_above_base
+        elif height_from_base is not None:
+            return height_from_base
 
         else:
             # Guaranteed statically by overload.
-            assert labware_default_true_mm_above_base is not None
-            assert hardware_units_above_labware_default is not None
-
-            # FIXME(mm, 2022-02-24): This arithmetic is wrong for GEN1 modules
-            # because it mixes units.
-            return (
-                labware_default_true_mm_above_base
-                + hardware_units_above_labware_default
-            )
+            assert labware_default_height is not None
+            assert offset_from_labware_default is not None
+            return labware_default_height + offset_from_labware_default
 
     def should_dodge_thermocycler(
         self,

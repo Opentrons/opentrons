@@ -147,65 +147,59 @@ def test_get_properties_by_id(
     )
 
 
-def test_get_magnet_true_mm_home_to_base() -> None:
+def test_get_magnet_home_to_base_offset() -> None:
     """It should return the model-specific offset to bottom."""
     subject = make_module_view()
     assert (
-        subject.get_magnet_true_mm_home_to_base(
+        subject.get_magnet_home_to_base_offset(
             module_model=ModuleModel.MAGNETIC_MODULE_V1
         )
         == 2.5
     )
     assert (
-        subject.get_magnet_true_mm_home_to_base(
+        subject.get_magnet_home_to_base_offset(
             module_model=ModuleModel.MAGNETIC_MODULE_V2
         )
         == 2.5
     )
 
 
-@pytest.mark.xfail(strict=True)
-def test_calculate_magnet_true_mm_above_base_gen1() -> None:
-    """It should use half-millimeters as hardware units."""
-    subject = make_module_view()
-
-    assert (
-        subject.calculate_magnet_true_mm_above_base(
-            module_model=ModuleModel.MAGNETIC_MODULE_V1,
-            hardware_units_above_base=100,
-        )
-        == 50
-    )
-
-    # TODO: Test hardware_units_above_home, etc. when we better understand
-    # the APIv2 behavior that we need to preserve.
-
-
-def test_calculate_magnet_true_mm_above_base_gen2() -> None:
+@pytest.mark.parametrize(
+    "module_model",
+    [ModuleModel.MAGNETIC_MODULE_V1, ModuleModel.MAGNETIC_MODULE_V2]
+)
+def test_calculate_magnet_height_gen2(module_model: ModuleModel) -> None:
     """It should use true millimeters as hardware units."""
     subject = make_module_view()
 
     assert (
-        subject.calculate_magnet_true_mm_above_base(
-            module_model=ModuleModel.MAGNETIC_MODULE_V2,
-            hardware_units_above_base=100,
+        subject.calculate_magnet_height(
+            module_model=module_model,
+            height_from_base=100,
         )
         == 100
     )
 
+    # todo(mm, 2022-02-28):
+    # It's unclear whether this expected result should actually be the same
+    # between GEN1 and GEN2.
+    # The GEN1 homing backoff distance looks accidentally halved, for the same reason
+    # that its heights are halved. If the limit switch hardware is the same for both
+    # modules, we'd expect the backoff difference to cause a difference in the
+    # height_from_home test, even though we're measuring everything in true mm.
     assert (
-        subject.calculate_magnet_true_mm_above_base(
-            module_model=ModuleModel.MAGNETIC_MODULE_V2,
-            hardware_units_above_home=100,
+        subject.calculate_magnet_height(
+            module_model=module_model,
+            height_from_home=100,
         )
         == 97.5
     )
 
     assert (
-        subject.calculate_magnet_true_mm_above_base(
-            module_model=ModuleModel.MAGNETIC_MODULE_V2,
-            labware_default_true_mm_above_base=100,
-            hardware_units_above_labware_default=10.0,
+        subject.calculate_magnet_height(
+            module_model=module_model,
+            labware_default_height=100,
+            offset_from_labware_default=10.0,
         )
         == 110
     )

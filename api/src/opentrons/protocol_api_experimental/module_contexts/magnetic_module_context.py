@@ -104,6 +104,13 @@ class MagneticModuleContext:  # noqa: D101
             You must now specify ``height_from_base`` and ``offset`` as keyword
             arguments.
         """  # noqa: D205,D212,D415
+        # TODO(mm, 2022-02-25) This code assumes:
+        #   * Args are in units of true mm.
+        #   * Default heights in labware definitions are measured in true mm from base.
+        # Both of which are different from what APIv2 sometimes does.
+        # Before the APIv3 release, We need to decide whether this difference is okay.
+        # https://github.com/Opentrons/opentrons/issues/9580
+
         all_height_arguments = [height, height_from_base, offset]
         num_height_arguments_provided = len(
             [a for a in all_height_arguments if a is not None]
@@ -117,18 +124,18 @@ class MagneticModuleContext:  # noqa: D101
         state = self._engine_client.state
         model = state.modules.get_model(module_id=self._module_id)
 
-        true_mm_above_base: float
+        calculated_height: float
 
         if height is not None:
-            true_mm_above_base = state.modules.calculate_magnet_true_mm_above_base(
+            calculated_height = state.modules.calculate_magnet_height(
                 module_model=model,
-                hardware_units_above_home=height,
+                height_from_home=height,
             )
 
         elif height_from_base is not None:
-            true_mm_above_base = state.modules.calculate_magnet_true_mm_above_base(
+            calculated_height = state.modules.calculate_magnet_height(
                 module_model=model,
-                hardware_units_above_base=height_from_base,
+                height_from_base=height_from_base,
             )
 
         else:
@@ -140,12 +147,12 @@ class MagneticModuleContext:  # noqa: D101
                     " with the `height` or `height_from_base` parameter."
                 )
 
-            labware_default_true_mm_above_base = (
-                state.labware.get_magnet_engage_height_above_base_true_mm(
+            default_height = (
+                state.labware.get_default_magnet_height(
                     labware_id=labware_id
                 )
             )
-            if labware_default_true_mm_above_base is None:
+            if default_height is None:
                 raise InvalidMagnetEngageHeightError(
                     "The labware loaded on this Magnetic Module"
                     " does not have a default engage height,"
@@ -153,15 +160,15 @@ class MagneticModuleContext:  # noqa: D101
                     " with the `height` or `height_from_base` parameter."
                 )
 
-            true_mm_above_base = state.modules.calculate_magnet_true_mm_above_base(
+            calculated_height = state.modules.calculate_magnet_height(
                 module_model=model,
-                labware_default_true_mm_above_base=labware_default_true_mm_above_base,
-                hardware_units_above_labware_default=(0 if offset is None else offset),
+                labware_default_height=default_height,
+                offset_from_labware_default=(0 if offset is None else offset),
             )
 
         self._engine_client.magnetic_module_engage(
             module_id=self._module_id,
-            engage_height=true_mm_above_base,
+            engage_height=calculated_height,
         )
 
     def disengage(self) -> None:  # noqa: D102
