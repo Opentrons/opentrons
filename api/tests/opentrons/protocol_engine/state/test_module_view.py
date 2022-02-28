@@ -167,7 +167,7 @@ def test_get_magnet_home_to_base_offset() -> None:
 @pytest.mark.parametrize(
     "module_model", [ModuleModel.MAGNETIC_MODULE_V1, ModuleModel.MAGNETIC_MODULE_V2]
 )
-def test_calculate_magnet_height_gen2(module_model: ModuleModel) -> None:
+def test_calculate_magnet_height(module_model: ModuleModel) -> None:
     """It should use true millimeters as hardware units."""
     subject = make_module_view()
 
