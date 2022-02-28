@@ -159,3 +159,15 @@ class SyncClient:
         request = commands.PauseCreate(params=commands.PauseParams(message=message))
         result = self._transport.execute_command(request=request)
         return cast(commands.PauseResult, result)
+
+    def magnetic_module_engage(
+        self, module_id: str, engage_height: float
+    ) -> commands.MagneticModuleEngageResult:
+        """Execute a ``MagneticModuleEngage`` command and return the result."""
+        request = commands.MagneticModuleEngageCreate(
+            params=commands.MagneticModuleEngageParams(
+                moduleId=module_id, engageHeight=engage_height
+            )
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.MagneticModuleEngageResult, result)
