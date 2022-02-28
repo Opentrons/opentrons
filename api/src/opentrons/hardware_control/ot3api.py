@@ -84,7 +84,6 @@ from .dev_types import PipetteDict
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 
 
-
 mod_log = logging.getLogger(__name__)
 
 
@@ -500,18 +499,12 @@ class OT3API(
                 self._backend.set_active_current(
                     {checked_axis: instr.config.plunger_current}
                 )
-                await self._backend.home([checked_axis])
+                await self.home([checked_axis])
                 # either we were passed False for our acquire_lock and we
                 # should pass it on, or we acquired the lock above and
                 # shouldn't do it again
-                target_pos = target_position_from_plunger(
-                    checked_mount, instr.config.bottom, self._current_position
-                )
-                await self._move(
-                    target_pos,
-                    acquire_lock=False,
-                    home_flagged_axes=False,
-                )
+                # TODO(cm, 2/28/22): confirm that we don't need to move plunger
+                #  to bottom during a home
 
     async def home_plunger(self, mount: Union[top_types.Mount, OT3Mount]):
         """
@@ -521,31 +514,6 @@ class OT3API(
         checked_mount = OT3Mount.from_mount(mount)
         await self.current_position(mount=checked_mount, refresh=True)
         await self._do_plunger_home(mount=checked_mount, acquire_lock=True)
-
-    @ExecutionManagerProvider.wait_for_running
-    async def home(self, axes: Optional[Union[List[Axis], List[OT3Axis]]] = None):
-        """Home the entire robot and initialize current position."""
-        self._reset_last_mount()
-        # Initialize/update current_position
-        if axes:
-            checked_axes = [OT3Axis.from_axis(ax) for ax in axes]
-        else:
-            checked_axes = [ax for ax in OT3Axis]
-        gantry = [ax for ax in checked_axes if ax in OT3Axis.gantry_axes()]
-        machine_pos = {}
-        plungers = [ax for ax in checked_axes if ax in OT3Axis.pipette_axes()]
-
-        async with self._motion_lock:
-            if gantry:
-                machine_pos.update(await self._backend.home(gantry))
-                self._current_position = deck_from_machine(
-                    machine_pos,
-                    self._transforms.deck_calibration.attitude,
-                    self._transforms.carriage_offset,
-                    OT3Axis,
-                )
-            for plunger in plungers:
-                await self._do_plunger_home(axis=plunger, acquire_lock=False)
 
     @lru_cache(1)
     def _carriage_offset(self) -> top_types.Point:
@@ -728,7 +696,7 @@ class OT3API(
         bounds = self._backend.axis_bounds
         to_check = {
             ax: machine_pos[ax]
-            for ax in target_positgit diffion.keys()
+            for ax in target_position.keys()
             if ax in OT3Axis.gantry_axes()
         }
         check_motion_bounds(to_check, target_position, bounds, check_bounds)
@@ -761,55 +729,71 @@ class OT3API(
                 self._current_position.update(target_position)
 
     @ExecutionManagerProvider.wait_for_running
-    async def home(
-            self,
-            target_position: "OrderedDict[OT3Axis, float]", # target position will be current position - max move for given axis
-            speed: float = None,
-            home_flagged_axes: bool = True,
-            max_speeds: OT3AxisMap[float] = None,
-            acquire_lock: bool = True,
-            check_bounds: MotionChecks = MotionChecks.NONE,
-            axes_to_home: List[OT3Axis] = [OT3Axis.Z_R, OT3Axis.Z_L, OT3Axis.P_L,
-                                           OT3Axis.P_R, OT3Axis.Y, OT3Axis.X]
-    ):
+    async def home(self, axes: Optional[Union[List[Axis], List[OT3Axis]]] = None):
         """Worker function to apply robot motion."""
-        machine_pos = machine_from_deck(
-            await self._backend.update_position(),
-            self._transforms.deck_calibration.attitude,
-            self._transforms.carriage_offset,
-        )
-        target_position = {
-            ax: 0
-            for ax in axes_to_home
+        self._reset_last_mount()
+        if axes:
+            checked_axes = [OT3Axis.from_axis(ax) for ax in axes]
+        else:
+            checked_axes = [ax for ax in OT3Axis]
+        home_positions = OT3Axis.home_position()
+        target_position = {ax: home_positions[ax] for ax in checked_axes}
+        target_position_mount = {
+            ax: target_position[ax]
+            for ax in target_position.keys()
+            if ax in OT3Axis.mount_axes()
+        }
+        target_position_gantry = {
+            ax: target_position[ax]
+            for ax in target_position.keys()
+            if ax in OT3Axis.gantry_axes()
+        }
+        target_position_plunger = {
+            ax: target_position[ax]
+            for ax in target_position.keys()
+            if ax in OT3Axis.pipette_axes()
         }
 
         # TODO: (2022-02-10) Use actual max speed for MoveTarget
-        checked_speed = speed or 500
+        checked_speed = 500
         self._move_manager.update_constraints(
             get_system_constraints(self._config.motion_settings, self._gantry_load)
         )
-        move_target = MoveTarget.build(position=target_position, max_speed=checked_speed)
-        origin = self._backend.axis_bounds
+        move_target_mount = MoveTarget.build(
+            position=target_position_mount, max_speed=checked_speed
+        )
+        move_target_gantry = MoveTarget.build(
+            position=target_position_gantry, max_speed=checked_speed
+        )
+        move_target_plunger = MoveTarget.build(
+            position=target_position_plunger, max_speed=checked_speed
+        )
+
+        origin = self._backend.single_boundary(1)
         try:
             blended, moves = self._move_manager.plan_motion(
-                origin=origin, target_list=[move_target]
+                origin=origin,
+                target_list=[
+                    move_target_mount,
+                    move_target_gantry,
+                    move_target_plunger,
+                ],
             )
         except ZeroLengthMoveError as zero_length_error:
             self._log.info(f"{str(zero_length_error)}, ignoring")
             return
 
-        async with contextlib.AsyncExitStack() as stack:
-            if acquire_lock:
-                await stack.enter_async_context(self._motion_lock)
+        async with self._motion_lock:
             try:
-                await self._backend.move(origin, moves[0], MoveStopCondition.limit_switch)
+                await self._backend.move(
+                    origin, moves[0], MoveStopCondition.limit_switch
+                )
             except Exception:
                 self._log.exception("Move failed")
                 self._current_position.clear()
                 raise
             else:
                 self._current_position.update(target_position)
-
 
     def get_engaged_axes(self) -> Dict[Axis, bool]:
         """Which axes are engaged and holding."""

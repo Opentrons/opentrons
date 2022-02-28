@@ -153,7 +153,7 @@ class OT3Controller:
         self,
         origin: "Coordinates",
         moves: List["Move"],
-        stop_condition: MoveStopCondition = MoveStopCondition.none
+        stop_condition: MoveStopCondition = MoveStopCondition.none,
     ) -> None:
         """Move to a position.
 
@@ -281,6 +281,9 @@ class OT3Controller:
             OT3Axis.X: phony_bounds,
             OT3Axis.Y: phony_bounds,
         }
+
+    def single_boundary(self, boundary: int) -> OT3AxisMap[float]:
+        return {ax: bound[boundary] for ax, bound in self.axis_bounds.items()}
 
     @property
     def fw_version(self) -> Optional[str]:

@@ -19,7 +19,7 @@ from opentrons_hardware.hardware_control.motion import (
     create_step,
     NodeIdMotionValues,
     MoveGroup,
-    MoveStopCondition
+    MoveStopCondition,
 )
 
 
@@ -115,7 +115,7 @@ def create_move_group(
     origin: "Coordinates[OT3Axis, np.float64]",
     moves: List["Move[OT3Axis]"],
     present_nodes: Iterable["NodeId"],
-    stop_condition: MoveStopCondition = MoveStopCondition.none
+    stop_condition: MoveStopCondition = MoveStopCondition.none,
 ) -> Tuple["MoveGroup", Dict["NodeId", float]]:
     pos = _convert_to_node_id_dict(origin)
     move_group: MoveGroup = []
@@ -132,7 +132,7 @@ def create_move_group(
                 acceleration=_convert_to_node_id_dict(accelerations),
                 duration=block.time,
                 present_nodes=present_nodes,
-                stop_condition=stop_condition
+                stop_condition=stop_condition,
             )
             for ax in pos.keys():
                 pos[ax] += node_id_distances.get(ax, 0)

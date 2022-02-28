@@ -39,6 +39,7 @@ from opentrons.hardware_control.types import (
     OT3Mount,
     OT3AxisMap,
 )
+from opentrons_hardware.hardware_control.motion import MoveStopCondition
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
@@ -170,6 +171,7 @@ class OT3Simulator:
         self,
         origin: "Coordinates",
         moves: List[Move],
+        stop_condition: MoveStopCondition = MoveStopCondition.none,
     ) -> None:
         """Move to a position.
 
@@ -313,6 +315,9 @@ class OT3Simulator:
             OT3Axis.Y: phony_bounds,
             OT3Axis.X: phony_bounds,
         }
+
+    def single_boundary(self, boundary: int) -> OT3AxisMap[float]:
+        return {ax: bound[boundary] for ax, bound in self.axis_bounds.items()}
 
     @property
     def fw_version(self) -> Optional[str]:

@@ -158,11 +158,12 @@ class OT3Axis(enum.Enum):
 
     @classmethod
     def pipette_axes(cls) -> Tuple["OT3Axis", "OT3Axis"]:
-        """The axes which are used for moving pipettes up and down."""
-        return cls.Z_L, cls.Z_R
+        """The axes which are used for moving plunger motors."""
+        return cls.P_L, cls.P_R
 
     @classmethod
     def mount_axes(cls) -> Tuple["OT3Axis", "OT3Axis"]:
+        """The axes which are used for moving pipettes up and down."""
         return cls.Z_L, cls.Z_R
 
     @classmethod
@@ -220,6 +221,20 @@ class OT3Axis(enum.Enum):
             cls.Z_G: OT3Mount.GRIPPER,
             cls.G: OT3Mount.GRIPPER,
         }[inst]
+
+    @classmethod
+    def home_position(cls) -> Dict["OT3Axis", int]:
+        return {
+            OT3Axis.P_L: 0,
+            OT3Axis.P_R: 0,
+            OT3Axis.X: 0,
+            OT3Axis.Y: 0,
+            OT3Axis.Z_L: 0,
+            OT3Axis.Z_R: 0,
+            OT3Axis.Z_G: 0,
+            OT3Axis.Q: 0,
+            OT3Axis.G: 0,
+        }
 
     def __str__(self) -> str:
         return self.name
