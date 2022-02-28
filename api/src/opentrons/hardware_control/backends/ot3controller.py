@@ -151,9 +151,9 @@ class OT3Controller:
 
     async def move(
         self,
-        origin: "Coordinates",
-        moves: List["Move"],
-        stop_condition: MoveStopCondition = MoveStopCondition.none,
+        origin: Coordinates[OT3Axis, float],
+        moves: List[Move[OT3Axis]],
+    stop_condition: MoveStopCondition = MoveStopCondition.none
     ) -> None:
         """Move to a position.
 
@@ -238,7 +238,7 @@ class OT3Controller:
         yield
 
     @staticmethod
-    def _build_event_watcher():
+    def _build_event_watcher() -> aionotify.Watcher:
         watcher = aionotify.Watcher()
         watcher.watch(
             alias="modules",
@@ -247,7 +247,7 @@ class OT3Controller:
         )
         return watcher
 
-    async def _handle_watch_event(self):
+    async def _handle_watch_event(self) -> None:
         try:
             event = await self._event_watcher.get_event()
         except asyncio.IncompleteReadError:
@@ -260,7 +260,7 @@ class OT3Controller:
                 event_description = AionotifyEvent.build(event_name, flags)
                 await self.module_controls.handle_module_appearance(event_description)
 
-    async def watch(self, loop: asyncio.AbstractEventLoop):
+    async def watch(self, loop: asyncio.AbstractEventLoop) -> None:
         can_watch = aionotify is not None
         if can_watch:
             await self._event_watcher.setup(loop)

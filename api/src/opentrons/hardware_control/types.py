@@ -249,7 +249,7 @@ class DoorState(enum.Enum):
     OPEN = False
     CLOSED = True
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name.lower()
 
 
@@ -357,7 +357,7 @@ class ExecutionState(enum.Enum):
     PAUSED = enum.auto()
     CANCELLED = enum.auto()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -368,7 +368,7 @@ class HardwareAction(enum.Enum):
     BLOWOUT = enum.auto()
     PREPARE_ASPIRATE = enum.auto()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 

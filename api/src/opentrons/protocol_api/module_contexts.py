@@ -25,7 +25,9 @@ if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 ENGAGE_HEIGHT_UNIT_CNV = 2
-STANDARD_MAGDECK_LABWARE = [
+MAGDECK_HALF_MM_LABWARE = [
+    # Load names of labware whose definitions accidentally specify an engage height
+    # in units of half-millimeters, instead of millimeters.
     "biorad_96_wellplate_200ul_pcr",
     "nest_96_wellplate_100ul_pcr_full_skirt",
     "usascientific_96_wellplate_2.4ml_deep",
@@ -385,37 +387,55 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
     ) -> None:
         """Raise the Magnetic Module's magnets.
 
-        The destination of the magnets can be specified in several different
-        ways, based on internally stored default heights for labware:
+        You can specify how high the magnets should go in several different ways:
 
-           - If neither ``height``, ``height_from_base`` nor ``offset`` is
-             specified, the magnets will raise to a reasonable default height
-             based on the specified labware.
-           - The recommended way to adjust the height of the magnets is to
-             specify ``height_from_base``, which should be a distance in mm
-             relative to the base of the labware that is on the magnetic module
-           - If ``height`` is specified, it should be a distance in mm from the
-             home position of the magnets.
-           - If ``offset`` is specified, it should be an offset in mm from the
-             default position. A positive number moves the magnets higher and
+           - If you specify ``height_from_base``, it's measured relative to the bottom
+             of the labware.
+
+             This is the recommended way to adjust the magnets' height.
+
+           - If you specify ``height``, it's measured relative to the magnets'
+             home position.
+
+             You should normally use ``height_from_base`` instead.
+
+           - If you specify nothing,
+             the magnets will rise to a reasonable default height
+             based on what labware you've loaded on this Magnetic Module.
+
+             Only certain labware have a defined engage height.
+             If you've loaded a labware that doesn't,
+             or if you haven't loaded any labware, then you'll need to specify
+             a height yourself with ``height`` or ``height_from_base``.
+             Otherwise, an exception will be raised.
+
+           - If you specify ``offset``,
+             it's measured relative to the default height, as described above.
+             A positive number moves the magnets higher and
              a negative number moves the magnets lower.
 
-        Only certain labwares have defined engage heights for the Magnetic
-        Module. If a labware that does not have a defined engage height is
-        loaded on the Magnetic Module (or if no labware is loaded), then
-        ``height`` or ``height_from_labware`` must be specified.
+        The units of ``height_from_base``, ``height``, and ``offset``
+        depend on which generation of Magnetic Module you're using:
 
-        :param height_from_base: The height to raise the magnets to, in mm from
-                                 the base of the labware
-        :param height: The height to raise the magnets to, in mm from home.
-        :param offset: An offset relative to the default height for the labware
-                       in mm
+           - For GEN1 Magnetic Modules, they're in *half-millimeters,*
+             for historical reasons. This will not be the case in future
+             releases of the Python Protocol API.
+           - For GEN2 Magnetic Modules, they're in true millimeters.
 
-        .. versionadded:: 2.1
+        You may not specify more than one of
+        ``height_from_base``, ``height``, and ``offset``.
+
+        .. versionadded:: 2.2
             The *height_from_base* parameter.
         """
         if height is not None:
             dist = height
+
+        # This version check has a bug:
+        # if the caller sets height_from_base in an API version that's too low,
+        # we will silently ignore it instead of raising APIVersionError.
+        # Leaving this unfixed because we haven't thought through
+        # how to do backwards-compatible fixes to our version checking itself.
         elif height_from_base is not None and self._ctx._api_version >= APIVersion(
             2, 2
         ):
@@ -423,10 +443,12 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
                 height_from_base
                 + modules.magdeck.OFFSET_TO_LABWARE_BOTTOM[self._module.model()]
             )
+
         elif self.labware and self.labware.magdeck_engage_height is not None:
             dist = self._determine_lw_engage_height()
             if offset:
                 dist += offset
+
         else:
             raise ValueError(
                 "Currently loaded labware {} does not have a known engage "
@@ -434,6 +456,7 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
                     self.labware
                 )
             )
+
         self._module.engage(dist)
 
     def _determine_lw_engage_height(self) -> float:
@@ -452,11 +475,11 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
 
         is_api_breakpoint = self._ctx._api_version >= APIVersion(2, 3)
         is_v1_module = self._module.model() == "magneticModuleV1"
-        is_standard_lw = self.labware.load_name in STANDARD_MAGDECK_LABWARE
+        engage_height_is_in_half_mm = self.labware.load_name in MAGDECK_HALF_MM_LABWARE
 
-        if is_api_breakpoint and is_v1_module and not is_standard_lw:
+        if is_api_breakpoint and is_v1_module and not engage_height_is_in_half_mm:
             return engage_height * ENGAGE_HEIGHT_UNIT_CNV
-        elif is_api_breakpoint and not is_v1_module and is_standard_lw:
+        elif is_api_breakpoint and not is_v1_module and engage_height_is_in_half_mm:
             return engage_height / ENGAGE_HEIGHT_UNIT_CNV
         else:
             return engage_height
