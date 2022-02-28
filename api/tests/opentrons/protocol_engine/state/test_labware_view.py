@@ -302,6 +302,13 @@ def test_get_labware_uri_from_definition(tip_rack_def: LabwareDefinition) -> Non
     assert result == "some-tip-rack-uri"
 
 
+def test_get_labware_uri_from_full_definition(tip_rack_def: LabwareDefinition) -> None:
+    """It should be able to construct a URI given a full definition."""
+    subject = get_labware_view()
+    result = subject.get_uri_from_definition(tip_rack_def)
+    assert result == "opentrons/opentrons_96_tiprack_300ul/1"
+
+
 def test_is_tiprack(
     tip_rack_def: LabwareDefinition, reservoir_def: LabwareDefinition
 ) -> None:
