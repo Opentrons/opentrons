@@ -230,6 +230,12 @@ AxisMapValue = TypeVar("AxisMapValue")
 OT3AxisMap = Dict[OT3Axis, AxisMapValue]
 
 
+@dataclass
+class OT3CurrentSettings:
+    standstill_current: float
+    motor_run_current: float
+
+
 class DoorState(enum.Enum):
     OPEN = False
     CLOSED = True

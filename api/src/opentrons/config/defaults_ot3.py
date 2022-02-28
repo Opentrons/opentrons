@@ -6,6 +6,7 @@ from opentrons.hardware_control.types import OT3AxisKind
 from .types import (
     OT3Config,
     ByGantryLoad,
+    OT3CurrentSettings,
     OT3MotionSettings,
     OT3Transform,
     Offset,
@@ -143,7 +144,7 @@ DEFAULT_DIRECTION_CHANGE_SPEED_DISCONTINUITY: Final[
     },
 )
 
-DEFAULT_HOLDING_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
+DEFAULT_STANDSTILL_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
     none={
         OT3AxisKind.X: 0.1,
         OT3AxisKind.Y: 0.1,
@@ -171,7 +172,7 @@ DEFAULT_HOLDING_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantr
     },
 )
 
-DEFAULT_NORMAL_MOTION_CURRENT: Final[
+DEFAULT_MOTOR_RUN_CURRENT: Final[
     ByGantryLoad[Dict[OT3AxisKind, float]]
 ] = ByGantryLoad(
     none={
@@ -296,12 +297,14 @@ def build_with_defaults(robot_settings: Dict[str, Any]) -> OT3Config:
                 DEFAULT_DIRECTION_CHANGE_SPEED_DISCONTINUITY,
             ),
         ),
-        holding_current=_build_default_bpk(
-            robot_settings.get("holding_current", {}), DEFAULT_HOLDING_CURRENT
-        ),
-        normal_motion_current=_build_default_bpk(
-            robot_settings.get("normal_motion_current", {}),
-            DEFAULT_NORMAL_MOTION_CURRENT,
+        current_settings=OT3CurrentSettings(
+            standstill_current=_build_default_bpk(
+                robot_settings.get("standstill_current", {}), DEFAULT_STANDSTILL_CURRENT
+            ),
+            motor_run_current=_build_default_bpk(
+                robot_settings.get("motor_run_current", {}),
+                DEFAULT_MOTOR_RUN_CURRENT,
+            ),
         ),
         z_retract_distance=robot_settings.get(
             "z_retract_distance", DEFAULT_Z_RETRACT_DISTANCE

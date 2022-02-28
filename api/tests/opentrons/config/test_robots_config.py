@@ -202,58 +202,60 @@ ot3_dummy_settings = {
             "gripper": {OT3AxisKind.Z: 2.8},
         },
     },
-    "holding_current": {
-        "none": {
-            OT3AxisKind.X: 0.7,
-            OT3AxisKind.Y: 0.7,
-            OT3AxisKind.Z: 0.7,
-            OT3AxisKind.P: 0.8,
+    "current_settings": {
+        "standstill_current": {
+            "none": {
+                OT3AxisKind.X: 0.7,
+                OT3AxisKind.Y: 0.7,
+                OT3AxisKind.Z: 0.7,
+                OT3AxisKind.P: 0.8,
+            },
+            "low_throughput": {
+                OT3AxisKind.X: 0.7,
+                OT3AxisKind.Y: 0.7,
+                OT3AxisKind.Z: 0.7,
+                OT3AxisKind.P: 0.8,
+            },
+            "high_throughput": {
+                OT3AxisKind.X: 0.7,
+                OT3AxisKind.Y: 0.7,
+                OT3AxisKind.Z: 0.7,
+                OT3AxisKind.P: 0.8,
+            },
+            "two_low_throughput": {
+                OT3AxisKind.X: 0.7,
+                OT3AxisKind.Y: 0.7,
+            },
+            "gripper": {
+                OT3AxisKind.Z: 0.7,
+            },
         },
-        "low_throughput": {
-            OT3AxisKind.X: 0.7,
-            OT3AxisKind.Y: 0.7,
-            OT3AxisKind.Z: 0.7,
-            OT3AxisKind.P: 0.8,
-        },
-        "high_throughput": {
-            OT3AxisKind.X: 0.7,
-            OT3AxisKind.Y: 0.7,
-            OT3AxisKind.Z: 0.7,
-            OT3AxisKind.P: 0.8,
-        },
-        "two_low_throughput": {
-            OT3AxisKind.X: 0.7,
-            OT3AxisKind.Y: 0.7,
-        },
-        "gripper": {
-            OT3AxisKind.Z: 0.7,
-        },
-    },
-    "normal_motion_current": {
-        "none": {
-            OT3AxisKind.X: 7.0,
-            OT3AxisKind.Y: 7.0,
-            OT3AxisKind.Z: 7.0,
-            OT3AxisKind.P: 5.0,
-        },
-        "low_throughput": {
-            OT3AxisKind.X: 1,
-            OT3AxisKind.Y: 2,
-            OT3AxisKind.Z: 3,
-            OT3AxisKind.P: 4.0,
-        },
-        "high_throughput": {
-            OT3AxisKind.X: 0.2,
-            OT3AxisKind.Y: 0.5,
-            OT3AxisKind.Z: 0.4,
-            OT3AxisKind.P: 2.0,
-        },
-        "two_low_throughput": {
-            OT3AxisKind.X: 9,
-            OT3AxisKind.Y: 0.1,
-        },
-        "gripper": {
-            OT3AxisKind.Z: 10,
+        "motor_run_current": {
+            "none": {
+                OT3AxisKind.X: 7.0,
+                OT3AxisKind.Y: 7.0,
+                OT3AxisKind.Z: 7.0,
+                OT3AxisKind.P: 5.0,
+            },
+            "low_throughput": {
+                OT3AxisKind.X: 1,
+                OT3AxisKind.Y: 2,
+                OT3AxisKind.Z: 3,
+                OT3AxisKind.P: 4.0,
+            },
+            "high_throughput": {
+                OT3AxisKind.X: 0.2,
+                OT3AxisKind.Y: 0.5,
+                OT3AxisKind.Z: 0.4,
+                OT3AxisKind.P: 2.0,
+            },
+            "two_low_throughput": {
+                OT3AxisKind.X: 9,
+                OT3AxisKind.Y: 0.1,
+            },
+            "gripper": {
+                OT3AxisKind.Z: 10,
+            },
         },
     },
     "log_level": "NADA",
@@ -348,8 +350,8 @@ def test_current_for_revision(current_dict, board_rev, result):
 def test_load_per_pipette_vals():
     # nothing provided
     assert (
-        defaults_ot3._build_default_bpk({}, defaults_ot3.DEFAULT_HOLDING_CURRENT)
-        == defaults_ot3.DEFAULT_HOLDING_CURRENT
+        defaults_ot3._build_default_bpk({}, defaults_ot3.DEFAULT_STANDSTILL_CURRENT)
+        == defaults_ot3.DEFAULT_STANDSTILL_CURRENT
     )
 
     # some dicts not formatted right

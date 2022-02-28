@@ -3,6 +3,7 @@
 from __future__ import annotations
 import asyncio
 from contextlib import contextmanager
+from dataclasses import astuple
 import logging
 from typing import (
     Dict,
@@ -16,10 +17,10 @@ from typing import (
     Set,
 )
 
-from opentrons.config.types import OT3Config
+from opentrons.config.types import OT3Config, GantryLoad
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.config import pipette_config
-from .ot3utils import axis_convert, create_move_group
+from .ot3utils import axis_convert, create_move_group, axis_to_node, get_current_settings
 
 try:
     import aionotify  # type: ignore[import]
@@ -36,6 +37,11 @@ from opentrons_hardware.hardware_control.motion_planning import (
 )
 
 from opentrons_hardware.hardware_control.network import probe
+from opentrons_hardware.hardware_control.current_settings import (
+    set_run_current,
+    set_hold_current,
+    set_currents
+)
 from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     SetupRequest,
@@ -50,6 +56,7 @@ from opentrons.hardware_control.types import (
     AionotifyEvent,
     OT3Mount,
     OT3AxisMap,
+    OT3CurrentSettings
 )
 
 if TYPE_CHECKING:
@@ -107,6 +114,29 @@ class OT3Controller:
                 "or door, likely because not running on linux"
             )
         self._present_nodes: Set[NodeId] = set()
+        self._current_settings: Optional[OT3CurrentSettings] = None
+
+    async def update_to_default_current_settings(self, gantry_load: GantryLoad):
+        self._current_settings = get_current_settings(
+            self._configuration.current_settings, gantry_load)
+        await self.set_all_default_currents(
+            self._messenger, self._current_settings)
+    
+    @property
+    def motor_run_currents(self) -> OT3Axis[float]:
+        assert self._current_settings
+        run_currents: OT3Axis[float] = {}
+        for axis, settings in self._current_settings.items():
+            run_currents[axis] = settings.motor_run_current
+        return run_currents
+
+    @property
+    def standstill_currents(self) -> OT3Axis[float]:
+        assert self._current_settings
+        standstill_currents: OT3Axis[float] = {}
+        for axis, settings in self._current_settings.items():
+            standstill_currents[axis] = settings.standstill_current
+        return standstill_currents
 
     async def setup_motors(self) -> None:
         """Set up the motors."""
@@ -220,7 +250,14 @@ class OT3Controller:
             }
         }
 
-    def set_active_current(self, axis_currents: OT3AxisMap[float]) -> None:
+    async def set_all_default_currents(self):
+        """Set all currents from """
+        await set_currents(
+            self._messenger,
+            {axis_to_node(k): astuple(v) for k, v in self._current_settings.items()}
+        )
+
+    async def set_active_current(self, axis_currents: OT3AxisMap[float]) -> None:
         """Set the active current.
 
         Args:
@@ -229,10 +266,28 @@ class OT3Controller:
         Returns:
             None
         """
-        # await set_current(
-        #     self._messenger,
-        #     {ot3utils.axis_to_node(k): v for k, v in axis_currents.items()}
-        # )
+        await set_run_current(
+            self._messenger,
+            {axis_to_node(k): v for k, v in axis_currents.items()}
+        )
+        for axis, current in axis_currents.items():
+            self._current_settings[axis].motor_run_current = current
+
+    async def set_standstill_current(self, axis_currents: OT3AxisMap[float]) -> None:
+        """Set the standstill current.
+
+        Args:
+            axis_currents: Axes' currents
+
+        Returns:
+            None
+        """
+        await set_hold_current(
+            self._messenger,
+            {axis_to_node(k): v for k, v in axis_currents.items()}
+        )
+        for axis, current in axis_currents.items():
+            self._current_settings[axis].standstill_current = current
 
     @contextmanager
     def save_current(self) -> Generator[None, None, None]:
