@@ -4,7 +4,17 @@ import logging
 import asyncio
 import functools
 import weakref
-from typing import Any, Awaitable, Callable, Generic, Optional, TypeVar, cast
+from typing import (
+    Any,
+    Awaitable,
+    Callable,
+    Generic,
+    Optional,
+    TypeVar,
+    cast,
+    Sequence,
+    Mapping,
+)
 from .adapters import SynchronousAdapter
 from .modules.mod_abc import AbstractModule
 from .protocols import (
@@ -18,15 +28,25 @@ class ThreadManagerException(Exception):
     pass
 
 
+WrappedReturn = TypeVar("WrappedReturn", contravariant=True)
+WrappedCoro = TypeVar("WrappedCoro", bound=Callable[..., Awaitable[WrappedReturn]])
+
+
 async def call_coroutine_threadsafe(
-    loop: asyncio.AbstractEventLoop, coro, *args, **kwargs
-) -> asyncio.Future:
-    fut = asyncio.run_coroutine_threadsafe(coro(*args, **kwargs), loop)
+    loop: asyncio.AbstractEventLoop,
+    coro: WrappedCoro,
+    *args: Sequence[Any],
+    **kwargs: Mapping[str, Any],
+) -> WrappedReturn:
+    fut = cast(
+        "asyncio.Future[WrappedReturn]",
+        asyncio.run_coroutine_threadsafe(coro(*args, **kwargs), loop),
+    )
     wrapped = asyncio.wrap_future(fut)
     return await wrapped
 
 
-WrappedObj = TypeVar("WrappedObj", bound=AsyncioConfigurable)
+WrappedObj = TypeVar("WrappedObj", bound=AsyncioConfigurable, covariant=True)
 
 
 class CallBridger(Generic[WrappedObj]):
@@ -52,7 +72,9 @@ class CallBridger(Generic[WrappedObj]):
             # executed in managed thread to calling thread
 
             @functools.wraps(attr)
-            async def wrapper(*args, **kwargs):
+            async def wrapper(
+                *args: Sequence[Any], **kwargs: Mapping[str, Any]
+            ) -> WrappedReturn:
                 return await call_coroutine_threadsafe(loop, attr, *args, **kwargs)
 
             return wrapper
@@ -111,7 +133,7 @@ class ThreadManager(Generic[WrappedObj]):
         self._loop: Optional[asyncio.AbstractEventLoop] = None
         self.managed_obj: Optional[WrappedObj] = None
         self.bridged_obj: Optional[CallBridger[WrappedObj]] = None
-        self._sync_managed_obj: Optional[SynchronousAdapter] = None
+        self._sync_managed_obj: Optional[SynchronousAdapter[WrappedObj]] = None
         is_running = threading.Event()
         self._is_running = is_running
         self._cached_modules: weakref.WeakKeyDictionary[
@@ -139,7 +161,7 @@ class ThreadManager(Generic[WrappedObj]):
         if blocking:
             object.__getattribute__(self, "managed_thread_ready_blocking")()
 
-    def managed_thread_ready_blocking(self):
+    def managed_thread_ready_blocking(self) -> None:
         object.__getattribute__(self, "_is_running").wait()
         if not object.__getattribute__(self, "managed_obj"):
             raise ThreadManagerException("Failed to create Managed Object")
@@ -153,8 +175,11 @@ class ThreadManager(Generic[WrappedObj]):
             raise ThreadManagerException("Failed to create Managed Object")
 
     def _build_and_start_loop(
-        self, builder: Callable[..., Awaitable[WrappedObj]], *args, **kwargs
-    ):
+        self,
+        builder: Callable[..., Awaitable[WrappedObj]],
+        *args: Sequence[Any],
+        **kwargs: Mapping[str, Any],
+    ) -> None:
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         self._loop = loop
@@ -178,7 +203,7 @@ class ThreadManager(Generic[WrappedObj]):
         # All callers of this property assume it to be valid.
         return self._sync_managed_obj  # type: ignore
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<ThreadManager>"
 
     def clean_up(self) -> None:
@@ -208,9 +233,9 @@ class ThreadManager(Generic[WrappedObj]):
             )
             wrapper_cache.update({module: this_module_wrapper})
 
-        return this_module_wrapper
+        return this_module_wrapper  # type: ignore
 
-    def __getattribute__(self, attr_name):
+    def __getattribute__(self, attr_name: str) -> Any:
         # hardware_control.api.API.attached_modules is the only hardware
         # API method that returns something other than data. The module
         # objects it returns have associated methods that can be called.
@@ -236,13 +261,13 @@ class ThreadManager(Generic[WrappedObj]):
             )
             our_cleanup = object.__getattribute__(self, "clean_up")
 
-            def call_both():
+            def call_both() -> None:
                 # the wrapped cleanup wants to happen in the managed thread,
                 # started from the managed loop. our cleanup wants to happen
                 # in the current thread, _after_ the wrapped cleanup is done
                 # so cancelled tasks can have a chance to complete.
-                async def clean_and_notify():
-                    wrapped_cleanup()
+                async def clean_and_notify() -> None:
+                    await wrapped_cleanup()
                     # this sleep allows the wrapped loop to spin a couple
                     # times to clean up the tasks we just cancelled. My kingdom
                     # for an asyncio.spin_once()

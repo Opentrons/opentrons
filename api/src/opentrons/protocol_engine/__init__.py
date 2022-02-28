@@ -9,7 +9,7 @@ from .create_protocol_engine import create_protocol_engine
 from .protocol_engine import ProtocolEngine
 from .errors import ProtocolEngineError, ErrorOccurrence
 from .commands import Command, CommandParams, CommandCreate, CommandStatus, CommandType
-from .state import State, StateView, CommandSlice
+from .state import State, StateView, CommandSlice, CurrentCommand, EngineConfigs
 from .plugins import AbstractPlugin
 
 from .types import (
@@ -23,6 +23,7 @@ from .types import (
     EngineStatus,
     LabwareLocation,
     LoadedLabware,
+    LoadedModule,
     LoadedPipette,
     PipetteName,
     WellLocation,
@@ -36,6 +37,7 @@ __all__ = [
     # main factory and interface exports
     "create_protocol_engine",
     "ProtocolEngine",
+    "EngineConfigs",
     # error types
     "ProtocolEngineError",
     "ErrorOccurrence",
@@ -49,6 +51,7 @@ __all__ = [
     "State",
     "StateView",
     "CommandSlice",
+    "CurrentCommand",
     # public value interfaces and models
     "LabwareOffset",
     "LabwareOffsetCreate",
@@ -60,6 +63,7 @@ __all__ = [
     "EngineStatus",
     "LabwareLocation",
     "LoadedLabware",
+    "LoadedModule",
     "LoadedPipette",
     "PipetteName",
     "WellLocation",

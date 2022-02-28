@@ -85,6 +85,8 @@ type LPCPrepCommand =
   | SetupRunTimeCommand
   | TCOpenLidCreateCommand
 
+const JOG_COMMAND_TIMEOUT = 10000 // 10 seconds
+
 const useLpcCtaText = (command: LabwarePositionCheckCreateCommand): string => {
   const { protocolData } = useProtocolDetails()
   const { t } = useTranslation('labware_position_check')
@@ -223,10 +225,7 @@ export function useLabwarePositionCheck(
     commandId: string
   } | null>(null)
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
-  const isJogging = React.useRef(false)
-  const [pendingJogCommandId, setPendingJogCommandId] = React.useState<
-    string | null
-  >(null)
+  const isJogging = React.useRef<boolean>(false)
   const [error, setError] = React.useState<Error | null>(null)
   const [
     showPickUpTipConfirmationModal,
@@ -351,22 +350,9 @@ export function useLabwarePositionCheck(
     setIsLoading(false)
     setPendingMovementCommandData(null)
   }
-  if (pendingJogCommandId != null) {
-    const isJogCommandComplete = Boolean(
-      robotCommands?.find(
-        (command: RunCommandSummary) =>
-          command.id === pendingJogCommandId &&
-          commandIsComplete(command.status)
-      )
-    )
-    if (isJogCommandComplete) {
-      isJogging.current = false
-    }
-  }
+
   // (sa 11-18-2021): refactor this function after beta release
   const proceed = (): void => {
-    // if a jog command is in flight, ignore this call to proceed
-    if (isJogging.current) return
     setIsLoading(true)
     setCurrentCommandIndex(currentCommandIndex + 1)
     setShowPickUpTipConfirmationModal(false)
@@ -681,10 +667,11 @@ export function useLabwarePositionCheck(
     createCommand({
       runId: currentRunId,
       command: moveRelCommand,
+      waitUntilComplete: true,
+      timeout: JOG_COMMAND_TIMEOUT,
     })
-      .then(response => {
-        const jogCommandId = response.data.id
-        setPendingJogCommandId(jogCommandId)
+      .then(() => {
+        isJogging.current = false
       })
       .catch((e: Error) => {
         isJogging.current = false

@@ -194,21 +194,33 @@ class EquipmentHandler:
             ModuleAlreadyPresentError: A module of a different type is already
                 assigned to the requested location.
         """
-        attached_modules = [
-            HardwareModule(
-                serial_number=hw_mod.device_info["serial"],
-                definition=self._module_data_provider.get_definition(
-                    ModuleModel(hw_mod.model())
-                ),
-            )
-            for hw_mod in self._hardware_api.attached_modules
-        ]
+        # TODO(mc, 2022-02-09): validate module location given deck definition
+        use_virtual_modules = self._state_store.get_configs().use_virtual_modules
 
-        attached_module = self._state_store.modules.find_attached_module(
-            model=model,
-            location=location,
-            attached_modules=attached_modules,
-        )
+        if not use_virtual_modules:
+            attached_modules = [
+                HardwareModule(
+                    serial_number=hw_mod.device_info["serial"],
+                    definition=self._module_data_provider.get_definition(
+                        ModuleModel(hw_mod.model())
+                    ),
+                )
+                for hw_mod in self._hardware_api.attached_modules
+            ]
+
+            attached_module = self._state_store.modules.find_attached_module(
+                model=model,
+                location=location,
+                attached_modules=attached_modules,
+            )
+
+        else:
+            attached_module = HardwareModule(
+                # TODO(mc, 2022-02-14): use something a little more obvious
+                # than an opaque UUID for the virtual serial number
+                serial_number=self._model_utils.generate_id(),
+                definition=self._module_data_provider.get_definition(model),
+            )
 
         return LoadedModuleData(
             module_id=self._model_utils.ensure_id(module_id),

@@ -34,6 +34,7 @@ describe('TemperatureModuleSlideout', () => {
       model: TEMPERATURE_MODULE_V1,
       isExpanded: true,
       serial: SERIAL,
+      onCloseClick: jest.fn(),
     }
     mockInputField.mockReturnValue(<div></div>)
     mockUseSendModuleCommand.mockReturnValue(jest.fn())
@@ -57,6 +58,7 @@ describe('TemperatureModuleSlideout', () => {
       model: TEMPERATURE_MODULE_V2,
       serial: SERIAL,
       isExpanded: true,
+      onCloseClick: jest.fn(),
     }
     const { getByText } = render(props)
 

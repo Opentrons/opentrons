@@ -6,31 +6,26 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# OT-2 Software Changes in 5.0.0-beta.8
+# OT-2 Software Changes in 5.0.1
 
-Welcome to the beta release of v5.0.0 release of the OT-2 software!
+Welcome to the v5.0.1 release of the Opentrons OT-2 software!
 
-In conjunction with changes on the app-side, the 5.0.0 release reshapes the way your OT-2 ingests and run protocols. We're very excited for you to try this new experience out, and we appreciate your feedback (and patience) as you use this new software.
+This release is a complete refactor of how the OT-2 communicates with the Opentrons app, and features a number of changes to how protocols are loaded and stored on the robot.
 
-This is beta software! You may experience unexpected crashes or missing features not detailed here. Please see the [beta forum][] for more details and to leave feedback.
+## New Features
 
-[beta forum]: https://community.opentrons.com/c/beta/pe-beta/9
+ - A modern, http-based interface has replaced the RPC endpoints for communicating with the Opentrons App
+ - More thorough information about a protocol is returned to the Opentrons App to enable the display of live protocol status
+ - The most recent protocol analysis and run are stored on the robot to enable easy, quick re-running via the Opentrons App
+ - A new way to use labware offsets in Jupyter notebook and SSH sessions
 
-### New Features
+## 5.0.0 to 5.0.1
 
-- The OT-2 software has a completely new API for uploading protocol files and reporting run results
-
-## Bug Fixes
-
-Keep an eye on this space as we release new versions of the beta.
-
-- We have addressed various performance issues and you should no longer encounter freezes with longer protocols.
+The 5.0.1 hotfix release does not contain any changes to the robot software
 
 ## Known Issues
 
-This beta is a work in progress! We'll be addressing the following features and issues in upcoming releases of 5.0.0.
-
-- Your last run protocol will not be saved through robot reboots
+Your last run protocol will not be saved through robot reboots
 
 ---
 

@@ -146,20 +146,47 @@ class StateStore(StateView, ActionHandler):
     ) -> ReturnT:
         """Wait for a condition to become true, checking whenever state changes.
 
+        If the condition is already true, return immediately.
+
         !!! Warning:
-            In general, callers should not trigger a state change via
-            `handle_action` directly after a `wait_for`, as it may interfere
-            with other subscribers. If you _must_ trigger a state change, ensure
-            the change cannot affect the `condition`'s of other `wait_for`'s.
+            This will only return when `condition` is true right now.
+            If you're not careful, this can cause you to miss updates,
+            and potentially wait forever.
+
+            For example, suppose:
+
+            1. Things start out in state A.
+            2. You start waiting specifically for state B.
+            3. State transitions A -> B.
+               Your task could theoretically run now,
+               but the event loop decides not to do that.
+            4. State transitions B -> C.
+            5. The event loop decides to run your task now.
+               But this method will only return when the state is B,
+               which it isn't now, so your task will stay waiting indefinitely.
+
+            To fix this, design your `condition` to look for something that,
+            after it first becomes true, remains true forever. For example,
+            suppose you want to wait for the engine to reach a specific command.
+            Don't use a `condition` that checks if that command is running now.
+            Instead, use a `condition` that checks if it ever has been running.
+
+            If this isn't possible, then you need other means to ensure that
+            no other task can transition the state out of the condition that you
+            care about until after you've had a chance to operate on the state
+            while it's in that condition.
 
         Arguments:
             condition: A function that returns a truthy value when the `await`
-                should resolve
-            *args: Positional arguments to pass to `condition`
-            **kwargs: Named arguments to pass to `condition`
+                should resolve.
+            *args: Positional arguments to pass to `condition`.
+            **kwargs: Named arguments to pass to `condition`.
 
         Returns:
             The truthy value returned by the `condition` function.
+
+        Raises:
+            The exception raised by the `condition` function, if any.
         """
         predicate = partial(condition, *args, **kwargs)
         is_done = predicate()

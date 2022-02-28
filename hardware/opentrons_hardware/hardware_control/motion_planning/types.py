@@ -1,85 +1,27 @@
 """Motion planning types."""
 from __future__ import annotations
 import logging
-import enum
 import dataclasses
 import numpy as np  # type: ignore[import]
+
 from typing import (
     cast,
     Any,
-    SupportsFloat,
     Dict,
-    Iterator,
-    List,
-    OrderedDict,
     Tuple,
+    TypeVar,
+    Mapping,
+    Generic,
+    Iterable,
+    Generator,
     Union,
 )
 
 log = logging.getLogger(__name__)
 
-AcceptableType = Union[SupportsFloat, np.float64]
-
-
-class Axis(enum.Enum):
-    """Robot axis."""
-
-    X = 0
-    Y = 1
-    Z = 2
-    A = 3
-
-    @classmethod
-    def get_all_axes(cls) -> List[Axis]:
-        """Return all system axes of the robot."""
-        return [cls.X, cls.Y, cls.Z, cls.A]
-
-
-@dataclasses.dataclass(frozen=False)
-class Coordinates:
-    """Coordinates for all axes."""
-
-    X: np.float64
-    Y: np.float64
-    Z: np.float64
-    A: np.float64
-
-    def __init__(
-        self, X: AcceptableType, Y: AcceptableType, Z: AcceptableType, A: AcceptableType
-    ) -> None:
-        """Constructor."""
-        self.X = np.float64(X)
-        self.Y = np.float64(Y)
-        self.Z = np.float64(Z)
-        self.A = np.float64(A)
-
-    def __iter__(self) -> Coordinates:
-        """Return an iterator."""
-        return self
-
-    def __getitem__(self, key: Axis) -> np.float64:
-        """Access axis coordinate value."""
-        return self.to_dict()[key]
-
-    def to_dict(self) -> OrderedDict[Axis, np.float64]:
-        """Return Coordaintes as a dictionary."""
-        vectorized = self.vectorize()
-        return OrderedDict(zip(Axis.get_all_axes(), vectorized))
-
-    @classmethod
-    def from_iter(cls, iter: Iterator[AcceptableType]) -> Coordinates:
-        """Create coordinates from an iterator of floats."""
-        return cls(*(np.float64(i) for i in iter))
-
-    def vectorize(self) -> np.ndarray:
-        """Represent coordinates as a Numpy array."""
-        return np.array(dataclasses.astuple(self))
-
-    def is_unit_vector(self) -> bool:
-        """Return true if this is a unit vector."""
-        vectorized = self.vectorize()
-        magnitude = np.linalg.norm(vectorized)
-        return cast(bool, np.isclose(magnitude, 1.0))
+CoordinateValue = TypeVar("CoordinateValue", Union[int, float], np.float64)
+AxisKey = TypeVar("AxisKey")
+Coordinates = Mapping[AxisKey, CoordinateValue]
 
 
 @dataclasses.dataclass
@@ -94,9 +36,9 @@ class Block:
 
     def __init__(
         self,
-        distance: AcceptableType,
-        initial_speed: AcceptableType,
-        acceleration: AcceptableType,
+        distance: CoordinateValue,
+        initial_speed: CoordinateValue,
+        acceleration: CoordinateValue,
     ) -> None:
         """Constructor."""
         self.distance = np.float64(distance)
@@ -126,11 +68,11 @@ class Block:
         self.time = _time()
 
 
-@dataclasses.dataclass(frozen=False)
-class Move:
+@dataclasses.dataclass
+class Move(Generic[AxisKey]):
     """A trajectory between two coordinates."""
 
-    unit_vector: Coordinates
+    unit_vector: Coordinates[AxisKey, np.float64]
     distance: np.float64
     max_speed: np.float64
     blocks: Tuple[Block, Block, Block]
@@ -140,14 +82,14 @@ class Move:
 
     def __init__(
         self,
-        unit_vector: Coordinates,
+        unit_vector: Coordinates[AxisKey, np.float64],
         distance: np.float64,
         max_speed: np.float64,
         blocks: Tuple[Block, Block, Block],
     ) -> None:
         """Constructor."""
         # verify unit vector before creating Move
-        if not unit_vector.is_unit_vector():
+        if not is_unit_vector(unit_vector):
             raise ValueError(f"{unit_vector} is not a valid unit vector.")
         self.unit_vector = unit_vector
         self.distance = distance
@@ -179,30 +121,53 @@ class Move:
         self.nonzero_blocks = len([b for b in self.blocks if b.time])
 
     @classmethod
-    def build_dummy_move(cls) -> Move:
+    def build_dummy(cls, for_axes: Iterable[AxisKey]) -> Move[AxisKey]:
         """Return a Move with dummy values."""
-        return cls(
-            unit_vector=Coordinates(1, 0, 0, 0),
+
+        def _dummy_unit_vector() -> Generator[np.float64, None, None]:
+            yield np.float64(1.0)
+            while True:
+                yield np.float64(0.0)
+
+        dummy_iterator = _dummy_unit_vector()
+
+        def dummy_value() -> np.float64:
+            return next(dummy_iterator)
+
+        return Move(
+            unit_vector={k: dummy_value() for k in for_axes},
             distance=np.float64(0),
             max_speed=np.float64(0),
             blocks=(
-                Block(distance=0.0, initial_speed=0, acceleration=0),
-                Block(distance=0, initial_speed=0, acceleration=0),
-                Block(distance=0, initial_speed=0, acceleration=0),
+                Block(
+                    distance=np.float64(0),
+                    initial_speed=np.float64(0),
+                    acceleration=np.float64(0),
+                ),
+                Block(
+                    distance=np.float64(0),
+                    initial_speed=np.float64(0),
+                    acceleration=np.float64(0),
+                ),
+                Block(
+                    distance=np.float64(0),
+                    initial_speed=np.float64(0),
+                    acceleration=np.float64(0),
+                ),
             ),
         )
 
     @classmethod
     def build(
         cls,
-        unit_vector: Coordinates,
-        distance: AcceptableType,
-        max_speed: AcceptableType,
+        unit_vector: Coordinates[AxisKey, CoordinateValue],
+        distance: CoordinateValue,
+        max_speed: CoordinateValue,
         blocks: Tuple[Block, Block, Block],
-    ) -> Move:
+    ) -> Move[AxisKey]:
         """Build function for Move."""
         return cls(
-            unit_vector=unit_vector,
+            unit_vector={k: np.float64(v) for k, v in unit_vector.items()},
             distance=np.float64(distance),
             max_speed=np.float64(max_speed),
             blocks=blocks,
@@ -214,19 +179,24 @@ class Move:
 
 
 @dataclasses.dataclass(frozen=True)
-class MoveTarget:
+class MoveTarget(Generic[AxisKey]):
     """Target coordinates and extrinsic constraint for the move."""
 
-    position: Coordinates
+    position: Coordinates[AxisKey, np.float64]
     max_speed: np.float64
 
     @classmethod
-    def build(cls, position: Coordinates, max_speed: AcceptableType) -> MoveTarget:
+    def build(
+        cls, position: Coordinates[AxisKey, CoordinateValue], max_speed: CoordinateValue
+    ) -> MoveTarget[AxisKey]:
         """Build MoveTarget."""
-        return cls(position=position, max_speed=np.float64(max_speed))
+        return cls(
+            position={k: np.float64(v) for k, v in position.items()},
+            max_speed=np.float64(max_speed),
+        )
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclasses.dataclass
 class AxisConstraints:
     """Axis intrinsic constraints."""
 
@@ -237,9 +207,9 @@ class AxisConstraints:
     @classmethod
     def build(
         cls,
-        max_acceleration: AcceptableType,
-        max_speed_discont: AcceptableType,
-        max_direction_change_speed_discont: AcceptableType,
+        max_acceleration: CoordinateValue,
+        max_speed_discont: CoordinateValue,
+        max_direction_change_speed_discont: CoordinateValue,
     ) -> AxisConstraints:
         """Build AxisConstraints."""
         return cls(
@@ -251,4 +221,56 @@ class AxisConstraints:
         )
 
 
-SystemConstraints = Dict[Axis, AxisConstraints]
+SystemConstraints = Dict[AxisKey, AxisConstraints]
+
+
+class ZeroLengthMoveError(ValueError, Generic[AxisKey, CoordinateValue]):
+    """Error that handles trying to make a unit vector from a 0-length input.
+
+    A unit vector would be undefined in this scenario, so this is the only safe way to
+    handle it; but it's not usually a systemic error, sometimes something wants you to
+    move to somewhere you already are. By using a special exception, we can specially
+    catch it.
+    """
+
+    def __init__(
+        self,
+        origin: Coordinates[AxisKey, CoordinateValue],
+        destination: Coordinates[AxisKey, CoordinateValue],
+    ) -> None:
+        """Build the exception with the data that caused it."""
+        self._origin: Coordinates[AxisKey, CoordinateValue] = origin
+        self._destination: Coordinates[AxisKey, CoordinateValue] = destination
+        super().__init__()
+
+    def __repr__(self) -> str:
+        """Stringify."""
+        return f"<{str(self)}>"
+
+    def __str__(self) -> str:
+        """Stringify."""
+        return (
+            f"{type(self)}: No distance between {self._origin} and {self._destination}"
+        )
+
+    @property
+    def origin(self) -> Coordinates[AxisKey, CoordinateValue]:
+        """Get the origin."""
+        return self._origin
+
+    @property
+    def destination(self) -> Coordinates[AxisKey, CoordinateValue]:
+        """Get the destination."""
+        return self._destination
+
+
+def vectorize(position: Coordinates[AxisKey, np.float64]) -> np.ndarray:
+    """Turn a coordinates map into a vector for math."""
+    return np.array(list(position.values()))
+
+
+def is_unit_vector(position: Coordinates[AxisKey, np.float64]) -> bool:
+    """Check whether a coordinate vector has unit magnitude."""
+    vectorized = vectorize(position)
+    magnitude = np.linalg.norm(vectorized)
+    return cast(bool, np.isclose(magnitude, 1.0))

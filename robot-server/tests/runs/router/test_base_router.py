@@ -100,7 +100,7 @@ async def test_create_run(
         actions=[],
         is_current=True,
     )
-    expected_response = Run.construct(
+    expected_response = Run(
         id=run_id,
         protocolId=None,
         createdAt=run_created_at,
@@ -177,7 +177,7 @@ async def test_create_protocol_run(
             labware_definitions=[],
         ),
     )
-    expected_response = Run.construct(
+    expected_response = Run(
         id="run-id",
         protocolId="protocol-id",
         createdAt=run_created_at,
@@ -295,7 +295,7 @@ async def test_get_run_data_from_url(
         mount=MountType.LEFT,
     )
 
-    expected_response = Run.construct(
+    expected_response = Run(
         id="run-id",
         protocolId=None,
         createdAt=created_at,
@@ -360,7 +360,7 @@ async def test_get_run_with_errors(
         detail="oh no no",
     )
 
-    expected_response = Run.construct(
+    expected_response = Run(
         id="run-id",
         protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
@@ -437,7 +437,7 @@ async def test_get_runs_empty(decoy: Decoy, run_store: RunStore) -> None:
 
     assert result.content.data == []
     assert result.content.links == AllRunsLinks(current=None)
-    assert result.content.meta == MultiBodyMeta(cursor=0, pageLength=0, totalLength=0)
+    assert result.content.meta == MultiBodyMeta(cursor=0, totalLength=0)
     assert result.status_code == 200
 
 
@@ -466,7 +466,7 @@ async def test_get_runs_not_empty(
         is_current=True,
     )
 
-    response_1 = RunSummary.construct(
+    response_1 = RunSummary(
         id="unique-id-1",
         protocolId=None,
         createdAt=created_at_1,
@@ -474,7 +474,7 @@ async def test_get_runs_not_empty(
         current=False,
     )
 
-    response_2 = RunSummary.construct(
+    response_2 = RunSummary(
         id="unique-id-2",
         protocolId=None,
         createdAt=created_at_2,
@@ -504,7 +504,7 @@ async def test_get_runs_not_empty(
     assert result.content.links == AllRunsLinks(
         current=ResourceLink(href="/runs/unique-id-2")
     )
-    assert result.content.meta == MultiBodyMeta(cursor=0, pageLength=2, totalLength=2)
+    assert result.content.meta == MultiBodyMeta(cursor=0, totalLength=2)
     assert result.status_code == 200
 
 
@@ -600,7 +600,7 @@ async def test_add_labware_offset(
         is_current=True,
     )
 
-    expected_response = Run.construct(
+    expected_response = Run(
         id="run-id",
         protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
@@ -674,7 +674,7 @@ async def test_update_run_to_not_current(
         is_current=False,
     )
 
-    expected_response = Run.construct(
+    expected_response = Run(
         id="run-id",
         protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),
@@ -738,7 +738,7 @@ async def test_update_current_to_current_noop(
         is_current=True,
     )
 
-    expected_response = Run.construct(
+    expected_response = Run(
         id="run-id",
         protocolId=None,
         createdAt=datetime(year=2021, month=1, day=1),

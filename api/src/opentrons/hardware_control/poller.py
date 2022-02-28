@@ -62,7 +62,7 @@ class WaitableListener(Listener[DataT]):
     def __init__(self, loop: Optional[asyncio.AbstractEventLoop] = None) -> None:
         """Constructor."""
         self._loop = loop or asyncio.get_running_loop()
-        self._futures: Deque[asyncio.Future] = deque()
+        self._futures: Deque["asyncio.Future[DataT]"] = deque()
 
     async def wait_next_poll(self) -> DataT:
         """
@@ -70,7 +70,7 @@ class WaitableListener(Listener[DataT]):
 
         Returns: The next poll result.
         """
-        f = self._loop.create_future()
+        f: "asyncio.Future[DataT]" = self._loop.create_future()
         self._futures.append(f)
         return await f
 
@@ -107,7 +107,6 @@ class Poller(Generic[DataT]):
         interval_seconds: float,
         reader: Reader[DataT],
         listener: Listener[DataT],
-        loop: Optional[asyncio.AbstractEventLoop] = None,
     ) -> None:
         """
         Constructor.
@@ -116,14 +115,12 @@ class Poller(Generic[DataT]):
             interval_seconds: time in between polls.
             reader: The data reader.
             listener: event listener.
-            loop: Optional event loop to use
         """
-        loop = loop or asyncio.get_running_loop()
-        self._shutdown_event = asyncio.Event(loop=loop)
+        self._shutdown_event = asyncio.Event()
         self._interval = interval_seconds
         self._listener = listener
         self._reader = reader
-        self._task = loop.create_task(self._poller())
+        self._task = asyncio.create_task(self._poller())
 
     def stop(self) -> None:
         """Signal poller to stop."""

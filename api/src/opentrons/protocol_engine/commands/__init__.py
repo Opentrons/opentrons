@@ -13,6 +13,8 @@ they are part of the public input / output of the engine, and need validation
 and/or schema generation.
 """
 
+from . import heater_shaker
+
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, CommandStatus
 
 from .command_unions import (
@@ -31,6 +33,13 @@ from .aspirate import (
     AspirateCommandType,
 )
 
+from .custom import (
+    Custom,
+    CustomParams,
+    CustomResult,
+    CustomCommandType,
+)
+
 from .dispense import (
     Dispense,
     DispenseParams,
@@ -47,20 +56,20 @@ from .drop_tip import (
     DropTipCommandType,
 )
 
+from .home import (
+    Home,
+    HomeParams,
+    HomeCreate,
+    HomeResult,
+    HomeCommandType,
+)
+
 from .load_labware import (
     LoadLabware,
     LoadLabwareParams,
     LoadLabwareCreate,
     LoadLabwareResult,
     LoadLabwareCommandType,
-)
-
-from .load_pipette import (
-    LoadPipette,
-    LoadPipetteParams,
-    LoadPipetteCreate,
-    LoadPipetteResult,
-    LoadPipetteCommandType,
 )
 
 from .load_module import (
@@ -71,12 +80,20 @@ from .load_module import (
     LoadModuleCommandType,
 )
 
-from .home import (
-    Home,
-    HomeParams,
-    HomeCreate,
-    HomeResult,
-    HomeCommandType,
+from .load_pipette import (
+    LoadPipette,
+    LoadPipetteParams,
+    LoadPipetteCreate,
+    LoadPipetteResult,
+    LoadPipetteCommandType,
+)
+
+from .magnetic_module_engage import (
+    MagneticModuleEngage,
+    MagneticModuleEngageParams,
+    MagneticModuleEngageCreate,
+    MagneticModuleEngageResult,
+    MagneticModuleEngageCommandType,
 )
 
 from .move_relative import (
@@ -86,20 +103,13 @@ from .move_relative import (
     MoveRelativeResult,
     MoveRelativeCommandType,
 )
+
 from .move_to_well import (
     MoveToWell,
     MoveToWellParams,
     MoveToWellCreate,
     MoveToWellResult,
     MoveToWellCommandType,
-)
-
-from .pick_up_tip import (
-    PickUpTip,
-    PickUpTipParams,
-    PickUpTipCreate,
-    PickUpTipResult,
-    PickUpTipCommandType,
 )
 
 from .pause import (
@@ -110,19 +120,20 @@ from .pause import (
     PauseCommandType,
 )
 
+from .pick_up_tip import (
+    PickUpTip,
+    PickUpTipParams,
+    PickUpTipCreate,
+    PickUpTipResult,
+    PickUpTipCommandType,
+)
+
 from .save_position import (
     SavePosition,
     SavePositionParams,
     SavePositionCreate,
     SavePositionResult,
     SavePositionCommandType,
-)
-
-from .custom import (
-    Custom,
-    CustomParams,
-    CustomResult,
-    CustomCommandType,
 )
 
 
@@ -138,30 +149,59 @@ __all__ = [
     "BaseCommand",
     "BaseCommandCreate",
     "CommandStatus",
-    # load labware command models
-    "LoadLabware",
-    "LoadLabwareCreate",
-    "LoadLabwareParams",
-    "LoadLabwareResult",
-    "LoadLabwareCommandType",
-    # load pipette command models
-    "LoadPipette",
-    "LoadPipetteCreate",
-    "LoadPipetteParams",
-    "LoadPipetteResult",
-    "LoadPipetteCommandType",
-    # load module command models
-    "LoadModule",
-    "LoadModuleCreate",
-    "LoadModuleParams",
-    "LoadModuleResult",
-    "LoadModuleCommandType",
+    # aspirate command models
+    "Aspirate",
+    "AspirateCreate",
+    "AspirateParams",
+    "AspirateResult",
+    "AspirateCommandType",
+    # custom command models
+    "Custom",
+    "CustomParams",
+    "CustomResult",
+    "CustomCommandType",
+    # dispense command models
+    "Dispense",
+    "DispenseCreate",
+    "DispenseParams",
+    "DispenseResult",
+    "DispenseCommandType",
+    # drop tip command models
+    "DropTip",
+    "DropTipCreate",
+    "DropTipParams",
+    "DropTipResult",
+    "DropTipCommandType",
     # home command models
     "Home",
     "HomeParams",
     "HomeCreate",
     "HomeResult",
     "HomeCommandType",
+    # load labware command models
+    "LoadLabware",
+    "LoadLabwareCreate",
+    "LoadLabwareParams",
+    "LoadLabwareResult",
+    "LoadLabwareCommandType",
+    # load module command models
+    "LoadModule",
+    "LoadModuleCreate",
+    "LoadModuleParams",
+    "LoadModuleResult",
+    "LoadModuleCommandType",
+    # load pipette command models
+    "LoadPipette",
+    "LoadPipetteCreate",
+    "LoadPipetteParams",
+    "LoadPipetteResult",
+    "LoadPipetteCommandType",
+    # magnetic module engage command models
+    "MagneticModuleEngage",
+    "MagneticModuleEngageCreate",
+    "MagneticModuleEngageParams",
+    "MagneticModuleEngageResult",
+    "MagneticModuleEngageCommandType",
     # move relative command models
     "MoveRelative",
     "MoveRelativeParams",
@@ -174,45 +214,24 @@ __all__ = [
     "MoveToWellParams",
     "MoveToWellResult",
     "MoveToWellCommandType",
-    # pick up tip command models
-    "PickUpTip",
-    "PickUpTipCreate",
-    "PickUpTipParams",
-    "PickUpTipResult",
-    "PickUpTipCommandType",
-    # drop tip command models
-    "DropTip",
-    "DropTipCreate",
-    "DropTipParams",
-    "DropTipResult",
-    "DropTipCommandType",
-    # aspirate command models
-    "Aspirate",
-    "AspirateCreate",
-    "AspirateParams",
-    "AspirateResult",
-    "AspirateCommandType",
-    # dispense command models
-    "Dispense",
-    "DispenseCreate",
-    "DispenseParams",
-    "DispenseResult",
-    "DispenseCommandType",
     # pause command models
     "Pause",
     "PauseParams",
     "PauseCreate",
     "PauseResult",
     "PauseCommandType",
+    # pick up tip command models
+    "PickUpTip",
+    "PickUpTipCreate",
+    "PickUpTipParams",
+    "PickUpTipResult",
+    "PickUpTipCommandType",
     # save position command models
     "SavePosition",
     "SavePositionParams",
     "SavePositionCreate",
     "SavePositionResult",
     "SavePositionCommandType",
-    # custom command models
-    "Custom",
-    "CustomParams",
-    "CustomResult",
-    "CustomCommandType",
+    # module command bundles
+    "heater_shaker",
 ]

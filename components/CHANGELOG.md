@@ -3,84 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [5.0.0-beta.8](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.7...v5.0.0-beta.8) (2022-02-03)
+## [5.0.1](https://github.com/Opentrons/opentrons/compare/v5.0.0...v5.0.1) (2022-02-24)
 
-
-### Features
-
-* **components:** add overflow icon ([#9346](https://github.com/Opentrons/opentrons/issues/9346)) ([5845b3f](https://github.com/Opentrons/opentrons/commit/5845b3f71dde54759fa66e0b27c2ff367f10be9d))
+**Note:** Version bump only for package @opentrons/components
 
 
 
 
 
-# [5.0.0-beta.7](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.6...v5.0.0-beta.7) (2022-01-28)
+# [5.0.0](https://github.com/Opentrons/opentrons/compare/v4.7.0...v5.0.0) (2022-02-16)
+
+
+### Bug Fixes
+
+* **app:** fix wifi connection result overlay z index ([#9482](https://github.com/Opentrons/opentrons/issues/9482)) ([a8c0daf](https://github.com/Opentrons/opentrons/commit/a8c0daf676ac2e236cedd41f54c9a62c05097c7c)), closes [#9474](https://github.com/Opentrons/opentrons/issues/9474)
 
 
 ### Features
 
 * **app:** add X icon to close out of exta attention warning labels ([#9258](https://github.com/Opentrons/opentrons/issues/9258)) ([9406ff6](https://github.com/Opentrons/opentrons/commit/9406ff6937173aafd86403335293d049b197decc)), closes [#8487](https://github.com/Opentrons/opentrons/issues/8487)
-
-
-
-
-
-# [5.0.0-beta.6](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.5...v5.0.0-beta.6) (2022-01-07)
-
-**Note:** Version bump only for package @opentrons/components
-
-
-
-
-
-# [5.0.0-beta.5](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.4...v5.0.0-beta.5) (2021-12-23)
-
-**Note:** Version bump only for package @opentrons/components
-
-
-
-
-
-# [5.0.0-beta.4](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.3...v5.0.0-beta.4) (2021-12-14)
-
-**Note:** Version bump only for package @opentrons/components
-
-
-
-
-
-# [5.0.0-beta.3](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.2...v5.0.0-beta.3) (2021-12-10)
-
-**Note:** Version bump only for package @opentrons/components
-
-
-
-
-
-# [5.0.0-beta.2](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.1...v5.0.0-beta.2) (2021-12-08)
-
-**Note:** Version bump only for package @opentrons/components
-
-
-
-
-
-# [5.0.0-beta.1](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.0...v5.0.0-beta.1) (2021-12-07)
-
-**Note:** Version bump only for package @opentrons/components
-
-
-
-
-
-# [5.0.0-beta.0](https://github.com/Opentrons/opentrons/compare/v4.7.0...v5.0.0-beta.0) (2021-11-30)
-
-
-### Features
-
 * **app:** added thermocycler error state status ([#8643](https://github.com/Opentrons/opentrons/issues/8643)) ([02544ae](https://github.com/Opentrons/opentrons/commit/02544ae2502335658e36e903450809416ee2e68b))
 * **app:** wire up cancel run ([#8721](https://github.com/Opentrons/opentrons/issues/8721)) ([6450edb](https://github.com/Opentrons/opentrons/commit/6450edb0421f1c2484c292f8583602d8f6fd13b8)), closes [#8543](https://github.com/Opentrons/opentrons/issues/8543)
 * **app:** wire up protocol resource + LPC ([#8722](https://github.com/Opentrons/opentrons/issues/8722)) ([c463e0a](https://github.com/Opentrons/opentrons/commit/c463e0a22ebccf410d67c6b18fe3c50b8a4a8d03)), closes [#8553](https://github.com/Opentrons/opentrons/issues/8553)
+* **components:** add overflow icon ([#9346](https://github.com/Opentrons/opentrons/issues/9346)) ([5845b3f](https://github.com/Opentrons/opentrons/commit/5845b3f71dde54759fa66e0b27c2ff367f10be9d))
 
 
 

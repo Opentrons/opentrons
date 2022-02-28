@@ -13,6 +13,7 @@ from opentrons.protocol_engine import (
     Command,
     ErrorOccurrence,
     LoadedLabware,
+    LoadedModule,
     LoadedPipette,
 )
 
@@ -41,6 +42,7 @@ class ProtocolRunData:
     errors: List[ErrorOccurrence]
     labware: List[LoadedLabware]
     pipettes: List[LoadedPipette]
+    modules: List[LoadedModule]
 
 
 # TODO(mc, 2022-01-11): this class has become bloated. Split into an abstract
@@ -167,6 +169,7 @@ class ProtocolRunner:
             errors=self._protocol_engine.state_view.commands.get_all_errors(),
             labware=self._protocol_engine.state_view.labware.get_all(),
             pipettes=self._protocol_engine.state_view.pipettes.get_all(),
+            modules=self._protocol_engine.state_view.modules.get_all(),
         )
 
     def _load_json(self, protocol_source: ProtocolSource) -> None:

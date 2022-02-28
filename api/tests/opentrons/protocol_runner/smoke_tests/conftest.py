@@ -9,14 +9,23 @@ import json
 import textwrap
 from pathlib import Path
 
+from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.labware import load_definition
 from opentrons.protocol_reader import ProtocolReader, InputFile
+from opentrons.protocol_engine import ModuleDefinition
 
 
 @pytest.fixture
 def protocol_reader(tmp_path: Path) -> ProtocolReader:
     """Get a ProtocolReader configured to write to a temporary directory."""
     return ProtocolReader(directory=tmp_path)
+
+
+@pytest.fixture(scope="session")
+def tempdeck_v1_def() -> ModuleDefinition:
+    """Get the definition of a V1 tempdeck."""
+    definition = load_shared_data("module/definitions/2/temperatureModuleV1.json")
+    return ModuleDefinition.parse_raw(definition)
 
 
 # TODO(mc, 2021-09-13): update to schema v6
@@ -80,6 +89,10 @@ def python_protocol_file() -> InputFile:
                 tip_rack = ctx.load_labware(
                     load_name="opentrons_96_tiprack_300ul",
                     location="1",
+                )
+                temp_module = ctx.load_module(
+                    module_name="temperature module",
+                    location="3"
                 )
                 pipette.pick_up_tip(
                     location=tip_rack.wells_by_name()["A1"],

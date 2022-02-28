@@ -4,6 +4,6 @@ from typing_extensions import Protocol
 class Stoppable(Protocol):
     """Protocol specifying controllability of teardown"""
 
-    def clean_up(self) -> None:
+    async def clean_up(self) -> None:
         """Get the API ready to stop cleanly."""
         ...

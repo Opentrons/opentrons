@@ -6,7 +6,7 @@ log = logging.getLogger(__name__)
 lock_file_path = "/tmp/resin/resin-updates.lock"
 
 
-def lock_updates():
+def lock_updates() -> None:
     if config.IS_ROBOT:
         import fcntl
 
@@ -19,6 +19,6 @@ def lock_updates():
             log.warning("Unable to create resin-update lock file")
 
 
-def unlock_updates():
+def unlock_updates() -> None:
     if config.IS_ROBOT and os.path.exists(lock_file_path):
         os.remove(lock_file_path)
