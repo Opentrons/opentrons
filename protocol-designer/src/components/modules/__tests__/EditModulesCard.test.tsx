@@ -184,7 +184,7 @@ describe('EditModulesCard', () => {
   it('displays module row with module to add when no moduleData', () => {
     const wrapper = render(props)
 
-    expect(wrapper.find(ModuleRow)).toHaveLength(3)
+    expect(wrapper.find(ModuleRow)).toHaveLength(4)
     SUPPORTED_MODULE_TYPES.forEach(moduleType => {
       expect(
         wrapper.find(ModuleRow).filter({ type: moduleType }).props()

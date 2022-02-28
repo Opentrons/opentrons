@@ -5,6 +5,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
+  HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { CheckboxField } from '@opentrons/components'
 import { DEFAULT_MODEL_FOR_MODULE_TYPE } from '../../../../constants'
@@ -14,7 +15,8 @@ import { ModuleFields, ModuleFieldsProps } from '../ModuleFields'
 describe('ModuleFields', () => {
   let magnetModuleOnDeck,
     temperatureModuleNotOnDeck,
-    thermocyclerModuleNotOnDeck
+    thermocyclerModuleNotOnDeck,
+    heaterShakerModuleNotOnDeck
   let props: ModuleFieldsProps
   beforeEach(() => {
     magnetModuleOnDeck = {
@@ -32,12 +34,18 @@ describe('ModuleFields', () => {
       slot: '9',
       model: null,
     }
+    heaterShakerModuleNotOnDeck = {
+      onDeck: false,
+      slot: '6',
+      model: null,
+    }
 
     props = {
       values: {
         [MAGNETIC_MODULE_TYPE]: magnetModuleOnDeck,
         [TEMPERATURE_MODULE_TYPE]: temperatureModuleNotOnDeck,
         [THERMOCYCLER_MODULE_TYPE]: thermocyclerModuleNotOnDeck,
+        [HEATERSHAKER_MODULE_TYPE]: heaterShakerModuleNotOnDeck,
       },
       onFieldChange: jest.fn(),
       onSetFieldValue: jest.fn(),
@@ -50,7 +58,7 @@ describe('ModuleFields', () => {
   it('renders a module selection element for every module', () => {
     const wrapper = shallow(<ModuleFields {...props} />)
 
-    expect(wrapper.find(CheckboxField)).toHaveLength(3)
+    expect(wrapper.find(CheckboxField)).toHaveLength(4)
   })
 
   it('adds module to protocol when checkbox is selected and resets the model field', () => {

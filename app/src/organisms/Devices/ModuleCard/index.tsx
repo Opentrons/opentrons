@@ -22,6 +22,7 @@ import {
 import {
   getModuleDisplayName,
   MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
@@ -200,7 +201,7 @@ const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
         isExpanded={showSlideout}
       />
     )
-  } else {
+  } else if (module.type === TEMPERATURE_MODULE_TYPE) {
     return (
       <TemperatureModuleSlideout
         model={module.model}
@@ -209,5 +210,8 @@ const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
         isExpanded={showSlideout}
       />
     )
+  } else {
+    // TODO(sh, 2022-02-28): render heater shaker slideout
+    return <div>Heater Shaker Slide</div>
   }
 }

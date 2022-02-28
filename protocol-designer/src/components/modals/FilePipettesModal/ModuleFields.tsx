@@ -27,6 +27,9 @@ export interface ModuleFieldsProps {
         thermocyclerModuleType?: {
           model: string
         }
+        heaterShakerModuleType?: {
+          model: string
+        }
       }
   touched:
     | null
@@ -39,6 +42,9 @@ export interface ModuleFieldsProps {
           model: boolean
         }
         thermocyclerModuleType?: {
+          model: boolean
+        }
+        heaterShakerModuleType?: {
           model: boolean
         }
       }
