@@ -570,8 +570,9 @@ export function useLabwarePositionCheck(
       protocolType === 'python' && protocolData != null
         ? protocolData?.commands
             .filter(isLoadLabwareCommand)
-            .filter(loadLabwareCommand =>
-              getLabwareDefIsStandard(loadLabwareCommand.result.definition)
+            .filter(
+              loadLabwareCommand =>
+                !getLabwareDefIsStandard(loadLabwareCommand.result.definition)
             )
             .map(loadLabwareCommand => loadLabwareCommand.result.definition)
         : []
