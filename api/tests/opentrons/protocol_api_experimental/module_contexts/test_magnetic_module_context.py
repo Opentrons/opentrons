@@ -206,9 +206,7 @@ def test_engage_with_offset(
         engine_client.state.labware.get_id_by_module(module_id=subject_module_id)
     ).then_return("labware-id")
     decoy.when(
-        engine_client.state.labware.get_default_magnet_height(
-            labware_id="labware-id"
-        )
+        engine_client.state.labware.get_default_magnet_height(labware_id="labware-id")
     ).then_return(1.23)
     decoy.when(
         engine_client.state.modules.calculate_magnet_height(
@@ -239,9 +237,7 @@ def test_engage_with_no_arguments(
         engine_client.state.labware.get_id_by_module(module_id=subject_module_id)
     ).then_return("labware-id")
     decoy.when(
-        engine_client.state.labware.get_default_magnet_height(
-            labware_id="labware-id"
-        )
+        engine_client.state.labware.get_default_magnet_height(labware_id="labware-id")
     ).then_return(1.23)
     decoy.when(
         engine_client.state.modules.calculate_magnet_height(
@@ -288,9 +284,7 @@ def test_engage_based_on_labware_errors_when_labware_has_no_default_height(
         engine_client.state.labware.get_id_by_module(module_id=subject_module_id)
     ).then_return("labware-id")
     decoy.when(
-        engine_client.state.labware.get_default_magnet_height(
-            labware_id="labware-id"
-        )
+        engine_client.state.labware.get_default_magnet_height(labware_id="labware-id")
     ).then_return(None)
     expected_exception_text = "does not have a default"
     with pytest.raises(InvalidMagnetEngageHeightError, match=expected_exception_text):

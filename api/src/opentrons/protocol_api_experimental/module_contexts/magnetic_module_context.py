@@ -147,10 +147,8 @@ class MagneticModuleContext:  # noqa: D101
                     " with the `height` or `height_from_base` parameter."
                 )
 
-            default_height = (
-                state.labware.get_default_magnet_height(
-                    labware_id=labware_id
-                )
+            default_height = state.labware.get_default_magnet_height(
+                labware_id=labware_id
             )
             if default_height is None:
                 raise InvalidMagnetEngageHeightError(

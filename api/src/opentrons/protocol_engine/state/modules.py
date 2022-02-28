@@ -283,9 +283,7 @@ class ModuleView(HasState[ModuleState]):
             suitable as input to a Magnetic Module engage Protocol Engine command.
         """
         if height_from_home is not None:
-            home_to_base = cls.get_magnet_home_to_base_offset(
-                module_model=module_model
-            )
+            home_to_base = cls.get_magnet_home_to_base_offset(module_model=module_model)
             return height_from_home - home_to_base
 
         elif height_from_base is not None:
