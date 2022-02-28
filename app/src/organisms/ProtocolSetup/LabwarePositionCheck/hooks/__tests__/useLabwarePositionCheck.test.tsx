@@ -102,10 +102,12 @@ describe('useLabwarePositionCheck', () => {
     when(mockUseCreateLabwareOffsetMutation)
       .calledWith()
       .mockReturnValue({ createLabwareOffset: mockCreateLabwareOffset } as any)
-      mockCreateLabwareDefinition = jest.fn()
+    mockCreateLabwareDefinition = jest.fn()
     when(mockUseCreateLabwareDefinitionMutation)
       .calledWith()
-      .mockReturnValue({ createLabwareOffset: mockCreateLabwareDefinition } as any)
+      .mockReturnValue({
+        createLabwareOffset: mockCreateLabwareDefinition,
+      } as any)
     when(mockGetConnectedRobotName)
       .calledWith(expect.anything())
       .mockReturnValue('mock robot!')
