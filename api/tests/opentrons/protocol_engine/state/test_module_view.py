@@ -18,7 +18,7 @@ from opentrons.protocol_engine.state.modules import (
 )
 
 
-def get_module_view(
+def make_module_view(
     slot_by_module_id: Optional[Dict[str, DeckSlotName]] = None,
     hardware_module_by_slot: Optional[Dict[DeckSlotName, HardwareModule]] = None,
 ) -> ModuleView:
@@ -33,7 +33,7 @@ def get_module_view(
 
 def test_initial_module_data_by_id() -> None:
     """It should raise if module ID doesn't exist."""
-    subject = get_module_view()
+    subject = make_module_view()
 
     with pytest.raises(errors.ModuleDoesNotExistError):
         subject.get("helloWorld")
@@ -41,7 +41,7 @@ def test_initial_module_data_by_id() -> None:
 
 def test_get_missing_hardware() -> None:
     """It should raise if no loaded hardware."""
-    subject = get_module_view(slot_by_module_id={"module-id": DeckSlotName.SLOT_1})
+    subject = make_module_view(slot_by_module_id={"module-id": DeckSlotName.SLOT_1})
 
     with pytest.raises(errors.ModuleDoesNotExistError):
         subject.get("module-id")
@@ -49,7 +49,7 @@ def test_get_missing_hardware() -> None:
 
 def test_get_module_data(tempdeck_v1_def: ModuleDefinition) -> None:
     """It should get module data from state by ID."""
-    subject = get_module_view(
+    subject = make_module_view(
         slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
         hardware_module_by_slot={
             DeckSlotName.SLOT_1: HardwareModule(
@@ -73,7 +73,7 @@ def test_get_all_modules(
     tempdeck_v2_def: ModuleDefinition,
 ) -> None:
     """It should return all modules in state."""
-    subject = get_module_view(
+    subject = make_module_view(
         slot_by_module_id={
             "module-1": DeckSlotName.SLOT_1,
             "module-2": DeckSlotName.SLOT_2,
@@ -113,7 +113,7 @@ def test_get_properties_by_id(
     tempdeck_v2_def: ModuleDefinition,
 ) -> None:
     """It should return a loaded module's properties by ID."""
-    subject = get_module_view(
+    subject = make_module_view(
         slot_by_module_id={
             "module-1": DeckSlotName.SLOT_1,
             "module-2": DeckSlotName.SLOT_2,
@@ -144,6 +144,63 @@ def test_get_properties_by_id(
     assert subject.get_serial_number("module-2") == "serial-2"
     assert subject.get_location("module-2") == DeckSlotLocation(
         slotName=DeckSlotName.SLOT_2
+    )
+
+
+def test_get_magnet_home_to_base_offset() -> None:
+    """It should return the model-specific offset to bottom."""
+    subject = make_module_view()
+    assert (
+        subject.get_magnet_home_to_base_offset(
+            module_model=ModuleModel.MAGNETIC_MODULE_V1
+        )
+        == 2.5
+    )
+    assert (
+        subject.get_magnet_home_to_base_offset(
+            module_model=ModuleModel.MAGNETIC_MODULE_V2
+        )
+        == 2.5
+    )
+
+
+@pytest.mark.parametrize(
+    "module_model", [ModuleModel.MAGNETIC_MODULE_V1, ModuleModel.MAGNETIC_MODULE_V2]
+)
+def test_calculate_magnet_height(module_model: ModuleModel) -> None:
+    """It should use true millimeters as hardware units."""
+    subject = make_module_view()
+
+    assert (
+        subject.calculate_magnet_height(
+            module_model=module_model,
+            height_from_base=100,
+        )
+        == 100
+    )
+
+    # todo(mm, 2022-02-28):
+    # It's unclear whether this expected result should actually be the same
+    # between GEN1 and GEN2.
+    # The GEN1 homing backoff distance looks accidentally halved, for the same reason
+    # that its heights are halved. If the limit switch hardware is the same for both
+    # modules, we'd expect the backoff difference to cause a difference in the
+    # height_from_home test, even though we're measuring everything in true mm.
+    assert (
+        subject.calculate_magnet_height(
+            module_model=module_model,
+            height_from_home=100,
+        )
+        == 97.5
+    )
+
+    assert (
+        subject.calculate_magnet_height(
+            module_model=module_model,
+            labware_default_height=100,
+            offset_from_labware_default=10.0,
+        )
+        == 110
     )
 
 
@@ -178,7 +235,7 @@ def test_thermocycler_dodging(
     It should return True if thermocycler exists and movement is between bad pairs of
     slot locations.
     """
-    subject = get_module_view(
+    subject = make_module_view(
         slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
         hardware_module_by_slot={
             DeckSlotName.SLOT_1: HardwareModule(
@@ -196,7 +253,7 @@ def test_thermocycler_dodging(
 
 def test_find_attached_module_rejects_missing() -> None:
     """It should raise if the correct module isn't attached."""
-    subject = get_module_view()
+    subject = make_module_view()
 
     with pytest.raises(errors.ModuleNotAttachedError):
         subject.find_attached_module(
@@ -223,7 +280,7 @@ def test_find_attached_module(
     attached_definition: ModuleDefinition,
 ) -> None:
     """It should return the first attached module that matches."""
-    subject = get_module_view()
+    subject = make_module_view()
 
     attached_modules = [
         HardwareModule(serial_number="serial-1", definition=attached_definition),
@@ -244,7 +301,7 @@ def test_find_attached_module_skips_non_matching(
     magdeck_v2_def: ModuleDefinition,
 ) -> None:
     """It should skip over non-matching modules."""
-    subject = get_module_view()
+    subject = make_module_view()
 
     attached_modules = [
         HardwareModule(serial_number="serial-1", definition=magdeck_v1_def),
@@ -264,7 +321,7 @@ def test_find_attached_module_skips_already_loaded(
     magdeck_v1_def: ModuleDefinition,
 ) -> None:
     """It should skip over already assigned modules."""
-    subject = get_module_view(
+    subject = make_module_view(
         hardware_module_by_slot={
             DeckSlotName.SLOT_1: HardwareModule(
                 serial_number="serial-1",
@@ -291,7 +348,7 @@ def test_find_attached_module_reuses_already_loaded(
     magdeck_v1_def: ModuleDefinition,
 ) -> None:
     """It should reuse over already assigned modules in the same location."""
-    subject = get_module_view(
+    subject = make_module_view(
         hardware_module_by_slot={
             DeckSlotName.SLOT_1: HardwareModule(
                 serial_number="serial-1",
@@ -319,7 +376,7 @@ def test_find_attached_module_rejects_location_reassignment(
     tempdeck_v1_def: ModuleDefinition,
 ) -> None:
     """It should raise if a non-matching module is already present in the slot."""
-    subject = get_module_view(
+    subject = make_module_view(
         hardware_module_by_slot={
             DeckSlotName.SLOT_1: HardwareModule(
                 serial_number="serial-1",

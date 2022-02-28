@@ -1,9 +1,13 @@
 """Basic modules data state and store."""
 from dataclasses import dataclass
-from typing import Dict, List, NamedTuple, Sequence
+from typing import Dict, List, NamedTuple, Optional, Sequence, overload
 from numpy import array, dot
 
+from opentrons.hardware_control.modules.magdeck import (
+    OFFSET_TO_LABWARE_BOTTOM as MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM,
+)
 from opentrons.types import DeckSlotName
+
 from ..types import (
     LoadedModule,
     ModuleModel,
@@ -188,9 +192,108 @@ class ModuleView(HasState[ModuleState]):
         ):
             return definition.dimensions.lidHeight
         else:
-            raise errors.ModuleIsNotThermocyclerError(
+            raise errors.WrongModuleTypeError(
                 f"Cannot get lid height of {definition.moduleType}"
             )
+
+    @staticmethod
+    def get_magnet_home_to_base_offset(module_model: ModuleModel) -> float:
+        """Return a Magnetic Module's home offset.
+
+        This is how far a Magnetic Module's magnets have to rise above their
+        home position for their tops to be level with the bottom of the labware.
+
+        The offset is returned in true millimeters,
+        even though GEN1 Magnetic Modules are sometimes controlled in units of
+        half-millimeters ("short mm").
+        """
+        if module_model == ModuleModel.MAGNETIC_MODULE_V1:
+            offset_in_half_mm = MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM[
+                "magneticModuleV1"
+            ]
+            return offset_in_half_mm / 2
+        elif module_model == ModuleModel.MAGNETIC_MODULE_V2:
+            return MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM["magneticModuleV2"]
+        else:
+            raise errors.WrongModuleTypeError(
+                f"Can't get magnet offset of {module_model}."
+            )
+
+    @overload
+    @classmethod
+    def calculate_magnet_height(
+        cls,
+        *,
+        module_model: ModuleModel,
+        height_from_home: float,
+    ) -> float:
+        pass
+
+    @overload
+    @classmethod
+    def calculate_magnet_height(
+        cls,
+        *,
+        module_model: ModuleModel,
+        height_from_base: float,
+    ) -> float:
+        pass
+
+    @overload
+    @classmethod
+    def calculate_magnet_height(
+        cls,
+        *,
+        module_model: ModuleModel,
+        labware_default_height: float,
+        offset_from_labware_default: float,
+    ) -> float:
+        pass
+
+    @classmethod
+    def calculate_magnet_height(
+        cls,
+        *,
+        module_model: ModuleModel,
+        height_from_home: Optional[float] = None,
+        height_from_base: Optional[float] = None,
+        labware_default_height: Optional[float] = None,
+        offset_from_labware_default: Optional[float] = None,
+    ) -> float:
+        """Normalize a Magnetic Module engage height to standard units.
+
+        Args:
+            module_model: What kind of Magnetic Module to calculate the height for.
+            height_from_home: A distance above the magnets' home position,
+                in millimeters.
+            heght_from_base: A distance above the labware base plane,
+                in millimeters.
+            labware_default_height: A distance above the labware base plane,
+                in millimeters, from a labware definition.
+            offset_from_labware_default: A distance from the
+                ``labware_default_height`` argument, in hardware units.
+
+        Negative values are allowed for all arguments, to move down instead of up.
+
+        See the overload signatures for which combinations of parameters are allowed.
+
+        Returns:
+            The same height passed in, converted to be measured in
+            millimeters above the module's labware base plane,
+            suitable as input to a Magnetic Module engage Protocol Engine command.
+        """
+        if height_from_home is not None:
+            home_to_base = cls.get_magnet_home_to_base_offset(module_model=module_model)
+            return height_from_home - home_to_base
+
+        elif height_from_base is not None:
+            return height_from_base
+
+        else:
+            # Guaranteed statically by overload.
+            assert labware_default_height is not None
+            assert offset_from_labware_default is not None
+            return labware_default_height + offset_from_labware_default
 
     def should_dodge_thermocycler(
         self,
