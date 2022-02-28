@@ -62,6 +62,7 @@ def move_group_single() -> MoveGroups:
 
 @pytest.fixture
 def move_group_home_single() -> MoveGroups:
+    """Home Request."""
     return [
         # Group 0
         [
@@ -167,6 +168,7 @@ async def test_multi_group_clear(
 async def test_home(
     mock_can_messenger: AsyncMock, move_group_home_single: MoveGroups
 ) -> None:
+    """Test Home Request Functionality."""
     subject = MoveGroupRunner(move_groups=move_group_home_single)
     await subject._send_groups(can_messenger=mock_can_messenger)
     mock_can_messenger.send.assert_any_call(

@@ -62,15 +62,30 @@ class MoveGroupRunner:
         await self._move(can_messenger)
 
     async def _clear_groups(self, can_messenger: CanMessenger) -> None:
-        """Send commands to clear the message groups."""
+        """Send commands to clear the message groups.
+
+        Args:
+            can_messenger: a can messenger
+        """
         await can_messenger.send(
             node_id=NodeId.broadcast,
             message=ClearAllMoveGroupsRequest(payload=EmptyPayload()),
         )
 
+    async def _send_groups(self, can_messenger: CanMessenger) -> None:
+        """Send commands to set up the message groups."""
+        for group_i, group in enumerate(self._move_groups):
+            for seq_i, sequence in enumerate(group):
+                for node, step in sequence.items():
+                    await can_messenger.send(
+                        node_id=node,
+                        message=self._get_message_type(step, group_i, seq_i),
+                    )
+
     def _get_message_type(
         self, step: MoveGroupSingleAxisStep, group: int, seq: int
     ) -> MessageDefinition:
+        """Return the correct payload type."""
         if step.move_type == MoveType.home:
             home_payload = HomeRequestPayload(
                 group_id=UInt8Field(group),
@@ -103,16 +118,6 @@ class MoveGroupRunner:
                 ),
             )
             return AddLinearMoveRequest(payload=linear_payload)
-
-    async def _send_groups(self, can_messenger: CanMessenger) -> None:
-        """Send commands to set up the message groups."""
-        for group_i, group in enumerate(self._move_groups):
-            for seq_i, sequence in enumerate(group):
-                for node, step in sequence.items():
-                    await can_messenger.send(
-                        node_id=node,
-                        message=self._get_message_type(step, group_i, seq_i),
-                    )
 
     async def _move(self, can_messenger: CanMessenger) -> None:
         """Run all the move groups."""

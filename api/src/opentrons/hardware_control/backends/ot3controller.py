@@ -51,6 +51,7 @@ from opentrons.hardware_control.types import (
     OT3Mount,
     OT3AxisMap,
 )
+from opentrons_hardware.hardware_control.motion import MoveStopCondition
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
@@ -152,6 +153,7 @@ class OT3Controller:
         self,
         origin: "Coordinates",
         moves: List["Move"],
+        stop_condition: MoveStopCondition = MoveStopCondition.none
     ) -> None:
         """Move to a position.
 
@@ -164,9 +166,8 @@ class OT3Controller:
         Returns:
             None
         """
-        move_group, final_positions = create_move_group(
-            origin, moves, self._present_nodes
-        )
+        group = create_move_group(origin, moves, self._present_nodes, stop_condition)
+        move_group, final_positions = group
         runner = MoveGroupRunner(move_groups=[move_group])
         await runner.run(can_messenger=self._messenger)
         self._position.update(final_positions)

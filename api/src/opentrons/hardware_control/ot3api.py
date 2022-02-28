@@ -81,6 +81,8 @@ from opentrons_shared_data.pipette.dev_types import (
 )
 
 from .dev_types import PipetteDict
+from opentrons_hardware.hardware_control.motion import MoveStopCondition
+
 
 
 mod_log = logging.getLogger(__name__)
@@ -726,7 +728,7 @@ class OT3API(
         bounds = self._backend.axis_bounds
         to_check = {
             ax: machine_pos[ax]
-            for ax in target_position.keys()
+            for ax in target_positgit diffion.keys()
             if ax in OT3Axis.gantry_axes()
         }
         check_motion_bounds(to_check, target_position, bounds, check_bounds)
@@ -757,6 +759,57 @@ class OT3API(
                 raise
             else:
                 self._current_position.update(target_position)
+
+    @ExecutionManagerProvider.wait_for_running
+    async def home(
+            self,
+            target_position: "OrderedDict[OT3Axis, float]", # target position will be current position - max move for given axis
+            speed: float = None,
+            home_flagged_axes: bool = True,
+            max_speeds: OT3AxisMap[float] = None,
+            acquire_lock: bool = True,
+            check_bounds: MotionChecks = MotionChecks.NONE,
+            axes_to_home: List[OT3Axis] = [OT3Axis.Z_R, OT3Axis.Z_L, OT3Axis.P_L,
+                                           OT3Axis.P_R, OT3Axis.Y, OT3Axis.X]
+    ):
+        """Worker function to apply robot motion."""
+        machine_pos = machine_from_deck(
+            await self._backend.update_position(),
+            self._transforms.deck_calibration.attitude,
+            self._transforms.carriage_offset,
+        )
+        target_position = {
+            ax: 0
+            for ax in axes_to_home
+        }
+
+        # TODO: (2022-02-10) Use actual max speed for MoveTarget
+        checked_speed = speed or 500
+        self._move_manager.update_constraints(
+            get_system_constraints(self._config.motion_settings, self._gantry_load)
+        )
+        move_target = MoveTarget.build(position=target_position, max_speed=checked_speed)
+        origin = self._backend.axis_bounds
+        try:
+            blended, moves = self._move_manager.plan_motion(
+                origin=origin, target_list=[move_target]
+            )
+        except ZeroLengthMoveError as zero_length_error:
+            self._log.info(f"{str(zero_length_error)}, ignoring")
+            return
+
+        async with contextlib.AsyncExitStack() as stack:
+            if acquire_lock:
+                await stack.enter_async_context(self._motion_lock)
+            try:
+                await self._backend.move(origin, moves[0], MoveStopCondition.limit_switch)
+            except Exception:
+                self._log.exception("Move failed")
+                self._current_position.clear()
+                raise
+            else:
+                self._current_position.update(target_position)
+
 
     def get_engaged_axes(self) -> Dict[Axis, bool]:
         """Which axes are engaged and holding."""

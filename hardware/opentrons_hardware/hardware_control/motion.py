@@ -27,6 +27,17 @@ class MoveType(int, Enum):
 
     linear = 0x0
     home = 0x1
+    calibration = 0x2
+
+    @classmethod
+    def get_move_type(cls, condition: MoveStopCondition) -> "MoveType":
+        """Return the Move Type for the given Stop Condition."""
+        mapping = {
+            MoveStopCondition.none: cls.linear,
+            MoveStopCondition.limit_switch: cls.home,
+            MoveStopCondition.cap_sensor: cls.calibration,
+        }
+        return mapping[condition]
 
 
 @dataclass(frozen=True)
@@ -66,6 +77,7 @@ def create_step(
     acceleration: Dict[NodeId, np.float64],
     duration: np.float64,
     present_nodes: Iterable[NodeId],
+    stop_condition: MoveStopCondition = MoveStopCondition.none,
 ) -> MoveGroupStep:
     """Create a move from a block.
 
@@ -85,5 +97,7 @@ def create_step(
             acceleration_mm_sec_sq=acceleration.get(axis_node, 0),
             velocity_mm_sec=velocity.get(axis_node, 0),
             duration_sec=duration,
+            stop_condition=stop_condition,
+            move_type=MoveType.get_move_type(stop_condition),
         )
     return step
