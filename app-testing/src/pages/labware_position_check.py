@@ -220,6 +220,7 @@ class LabwarePositionCheck:
 
     @highlight
     def get_how_to_tell_pipette_is_centered_link(self) -> WebElement:
+        """Locator for how to tell pipette is centered link."""
         return WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(
                 LabwarePositionCheck.how_to_tell_pipette_is_centered_link
@@ -231,6 +232,7 @@ class LabwarePositionCheck:
 
     @highlight
     def get_reveal_all_jog_controls(self) -> WebElement:
+        """Locator for reveal all jog controls."""
         return WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(LabwarePositionCheck.reveal_all_jog_controls)
         )
@@ -240,6 +242,7 @@ class LabwarePositionCheck:
 
     @highlight
     def get_back_jog_button(self) -> WebElement:
+        """Locator for back jog button."""
         return WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(LabwarePositionCheck.back_jog_button)
         )
@@ -249,6 +252,7 @@ class LabwarePositionCheck:
 
     @highlight
     def get_left_jog_button(self) -> WebElement:
+        """Locator for left jog button."""
         return WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(LabwarePositionCheck.left_jog_button)
         )
@@ -258,6 +262,7 @@ class LabwarePositionCheck:
 
     @highlight
     def get_right_jog_button(self) -> WebElement:
+        """Locator for right jog button."""
         return WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(LabwarePositionCheck.right_jog_button)
         )
@@ -267,6 +272,7 @@ class LabwarePositionCheck:
 
     @highlight
     def get_forward_jog_button(self) -> WebElement:
+        """Locator for forward jog button."""
         return WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(LabwarePositionCheck.forward_jog_button)
         )
@@ -276,6 +282,7 @@ class LabwarePositionCheck:
 
     @highlight
     def get_up_jog_button(self) -> WebElement:
+        """Locator for up jog button."""
         return WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(LabwarePositionCheck.up_jog_button)
         )
@@ -285,6 +292,7 @@ class LabwarePositionCheck:
 
     @highlight
     def get_down_jog_button(self) -> WebElement:
+        """Locator for down jog button."""
         return WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(LabwarePositionCheck.down_jog_button)
         )
@@ -294,6 +302,7 @@ class LabwarePositionCheck:
 
     @highlight
     def get_confirm_position_button_pickup_tip(self) -> WebElement:
+        """Locator for confirm position button pickup."""
         return WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(
                 LabwarePositionCheck.confirm_position_button_pickup_tip
@@ -305,6 +314,7 @@ class LabwarePositionCheck:
 
     @highlight
     def get_confirm_position_moveto_slot_5(self) -> WebElement:
+        """Locator for confirm positin moveto slot."""
         toggle: WebElement = WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(
                 LabwarePositionCheck.confirm_position_moveto_slot_5
@@ -319,6 +329,7 @@ class LabwarePositionCheck:
 
     @highlight
     def get_confirm_position_moveto_slot_6(self) -> WebElement:
+        """Locator for confirm positin moveto slot."""
         toggle: WebElement = WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(
                 LabwarePositionCheck.confirm_position_moveto_slot_6
@@ -333,6 +344,7 @@ class LabwarePositionCheck:
 
     @highlight
     def get_confirm_position_returntip_slot_home(self) -> WebElement:
+        """Locator for confirm positin return tip ."""
         return WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(
                 LabwarePositionCheck.confirm_position_returntip_slot_home
