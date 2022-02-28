@@ -1146,14 +1146,29 @@ class InstrumentContext(CommandPublisher):
             getattr(self, cmd["method"])(*cmd["args"], **cmd["kwargs"])
 
     @requires_version(2, 0)
-    def delay(self) -> None:
+    def delay(self, *args, **kwargs) -> None:
         """
         .. deprecated:: 2.0
            Use :py:obj:`ProtocolContext.delay` instead.
            This method does nothing.
            It will be removed from a future version of the Python Protocol API.
         """
-        pass
+        if (args or kwargs):
+            # Former implementations of this method did not take any args, so users
+            # would get a TypeError if they tried to call it like delay(minutes=10).
+            # Without changing the ultimate behavior that such a call fails the
+            # protocol, we can provide a more descriptive message as a courtesy.
+            raise NotImplementedError(
+                "InstrumentContext.delay() is not supported in Python Protocol API v2."
+                " Use ProtocolContext.delay() instead."
+            )
+        else:
+            # Former implementations of this method, when called without any args,
+            # called ProtocolContext.delay() with a duration of 0, which was
+            # approximately a no-op.
+            # Preserve that allowed way to call this method for the very remote chance
+            # that a protocol out in the wild does it, for some reason.
+            pass
 
     @requires_version(2, 0)
     def move_to(
