@@ -1146,7 +1146,7 @@ class InstrumentContext(CommandPublisher):
             getattr(self, cmd["method"])(*cmd["args"], **cmd["kwargs"])
 
     @requires_version(2, 0)
-    def delay(self, *args, **kwargs) -> None:
+    def delay(self, *args: Any, **kwargs: Any) -> None:
         """
         .. deprecated:: 2.0
            Use :py:obj:`ProtocolContext.delay` instead.
