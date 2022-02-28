@@ -80,8 +80,6 @@ class LoadLabwareImplementation(
             labware_id=params.labwareId,
         )
 
-        # TODO: BC&SP(2022-02-25): when load labware command accepts label param, pass
-        #  that to displayName in result, falling back to definition's displayName
         return LoadLabwareResult(
             labwareId=loaded_labware.labware_id,
             definition=loaded_labware.definition,
