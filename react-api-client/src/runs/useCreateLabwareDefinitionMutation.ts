@@ -1,36 +1,34 @@
 import { useMutation, useQueryClient } from 'react-query'
-import {
-  createLabwareOffset,
-  LabwareOffsetCreateData,
-} from '@opentrons/api-client'
+import { createLabwareDefinition } from '@opentrons/api-client'
 import { useHost } from '../api'
-import type { HostConfig, Run } from '@opentrons/api-client'
 import type { UseMutationResult, UseMutateAsyncFunction } from 'react-query'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { HostConfig, Run } from '@opentrons/api-client'
 
-interface CreateLabwareOffsetParams {
+interface CreateLabwareDefinitionParams {
   runId: string
-  data: LabwareOffsetCreateData
+  data: LabwareDefinition2
 }
 
-export type UseCreateLabwareOffsetMutationResult = UseMutationResult<
+export type UseCreateLabwareDefinitionMutationResult = UseMutationResult<
   Run,
   unknown,
-  CreateLabwareOffsetParams
+  CreateLabwareDefinitionParams
 > & {
-  createLabwareOffset: UseMutateAsyncFunction<
+  createLabwareDefinition: UseMutateAsyncFunction<
     Run,
     unknown,
-    CreateLabwareOffsetParams
+    CreateLabwareDefinitionParams
   >
 }
 
-export function useCreateLabwareOffsetMutation(): UseCreateLabwareOffsetMutationResult {
+export function useCreateLabwareDefinitionMutation(): UseCreateLabwareDefinitionMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
 
-  const mutation = useMutation<Run, unknown, CreateLabwareOffsetParams>(
+  const mutation = useMutation<Run, unknown, CreateLabwareDefinitionParams>(
     ({ runId, data }) =>
-      createLabwareOffset(host as HostConfig, runId, data)
+      createLabwareDefinition(host as HostConfig, runId, data)
         .then(response => {
           queryClient
             .invalidateQueries([host, 'runs'])
@@ -47,6 +45,6 @@ export function useCreateLabwareOffsetMutation(): UseCreateLabwareOffsetMutation
 
   return {
     ...mutation,
-    createLabwareOffset: mutation.mutateAsync,
+    createLabwareDefinition: mutation.mutateAsync,
   }
 }
