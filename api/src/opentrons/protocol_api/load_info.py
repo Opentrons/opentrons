@@ -31,9 +31,6 @@ class LabwareLoadInfo:
     labware_load_name: str
     labware_version: int
 
-    # user-specified label if present, falls back to definition's displayName
-    labware_display_name: str
-
     # If on_module is True, deck_slot is the slot occupied by the module that the
     # labware is on.
     deck_slot: DeckSlotName
@@ -42,6 +39,9 @@ class LabwareLoadInfo:
     # The ID of the labware offset resource that applied to this labware load,
     # if there was one.
     offset_id: Optional[str]
+
+    # user-specified label if present
+    labware_display_name: Optional[str]
 
 
 @dataclass(frozen=True)

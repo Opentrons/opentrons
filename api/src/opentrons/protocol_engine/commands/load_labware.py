@@ -36,6 +36,11 @@ class LoadLabwareParams(BaseModel):
         description="An optional ID to assign to this labware. If None, an ID "
         "will be generated.",
     )
+    displayName: Optional[str] = Field(
+        None,
+        description="An optional user-specified display name "
+        "or label for this labware.",
+    )
 
 
 class LoadLabwareResult(BaseModel):
@@ -49,10 +54,6 @@ class LoadLabwareResult(BaseModel):
         ...,
         description="The full definition data for this labware.",
     )
-    displayName: str = Field(
-        None,
-        description="A name for this labware if no user-specified label present, falls back to definition display name.",
-    )
     offsetId: Optional[str] = Field(
         None,
         description=(
@@ -62,7 +63,6 @@ class LoadLabwareResult(BaseModel):
             " so the default of (0, 0, 0) will be used."
         ),
     )
-
 
 
 class LoadLabwareImplementation(
@@ -86,7 +86,6 @@ class LoadLabwareImplementation(
             labwareId=loaded_labware.labware_id,
             definition=loaded_labware.definition,
             offsetId=loaded_labware.offsetId,
-            displayName=loaded_labware.definition.metadata.displayName
         )
 
 

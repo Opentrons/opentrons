@@ -255,6 +255,7 @@ def test_map_labware_load(minimal_labware_def: LabwareDefinition) -> None:
             namespace="some_namespace",
             loadName="some_load_name",
             version=123,
+            displayName="My special labware",
             labwareId=None,
         ),
         result=pe_commands.LoadLabwareResult.construct(
@@ -263,7 +264,6 @@ def test_map_labware_load(minimal_labware_def: LabwareDefinition) -> None:
             # get passed through correctly.
             definition=matchers.Anything(),
             offsetId="labware-offset-id-123",
-            displayName="My special labware",
         ),
     )
     output = LegacyCommandMapper().map_labware_load(input)
@@ -361,13 +361,13 @@ def test_map_module_labware_load(minimal_labware_def: LabwareDefinition) -> None
             namespace="some_namespace",
             loadName="some_load_name",
             version=123,
+            displayName="My very special module labware",
             labwareId=None,
         ),
         result=pe_commands.LoadLabwareResult.construct(
             labwareId=matchers.IsA(str),
             definition=matchers.Anything(),
             offsetId="labware-offset-id-123",
-            displayName="My very special module labware",
         ),
     )
     subject = LegacyCommandMapper()

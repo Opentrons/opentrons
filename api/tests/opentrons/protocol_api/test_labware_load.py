@@ -30,6 +30,7 @@ def test_get_mixed_case_labware_def():
 def test_load_label(ctx):
     labware = ctx.load_labware(labware_name, "1", "my cool labware")
     assert "my cool labware" in str(labware)
+    assert labware.label == "my cool labware"
 
 
 def test_deprecated_load(ctx):

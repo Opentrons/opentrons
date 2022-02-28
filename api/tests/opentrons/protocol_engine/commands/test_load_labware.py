@@ -39,6 +39,7 @@ async def test_load_labware_implementation(
         loadName="some-load-name",
         namespace="opentrons-test",
         version=1,
+        displayName="My custom display name",
     )
 
     decoy.when(
@@ -63,5 +64,4 @@ async def test_load_labware_implementation(
         labwareId="labware-id",
         definition=well_plate_def,
         offsetId="labware-offset-id",
-        displayName="Corning 96 Well Plate 360 µL Flat",
     )

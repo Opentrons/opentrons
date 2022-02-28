@@ -305,6 +305,12 @@ class Labware(DeckItem):
         self._implementation.set_name(new_name)
 
     @property  # type: ignore
+    @requires_version(2, 13)
+    def label(self) -> Optional[str]:
+        """Get the labware label."""
+        return self._implementation.get_label()
+
+    @property  # type: ignore
     @requires_version(2, 0)
     def load_name(self) -> str:
         """The API load name of the labware definition"""

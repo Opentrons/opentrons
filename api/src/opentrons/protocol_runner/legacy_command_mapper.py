@@ -201,6 +201,7 @@ class LegacyCommandMapper:
                 loadName=labware_load_info.labware_load_name,
                 namespace=labware_load_info.labware_namespace,
                 version=labware_load_info.labware_version,
+                displayName=labware_load_info.labware_display_name,
             ),
             result=pe_commands.LoadLabwareResult.construct(
                 labwareId=labware_id,
@@ -208,7 +209,6 @@ class LegacyCommandMapper:
                     labware_load_info.labware_definition
                 ),
                 offsetId=labware_load_info.offset_id,
-                displayName=labware_load_info.labware_display_name,
             ),
         )
 
