@@ -8,6 +8,7 @@ import { migrateFile as migrateFileFour } from './4_0_0'
 import { migrateFile as migrateFileFive } from './5_0_0'
 import { migrateFile as migrateFileFiveOne } from './5_1_0'
 import { migrateFile as migrateFileFiveTwo } from './5_2_0'
+import { migrateFile as migrateFileSix } from './6_0_0'
 export const OLDEST_MIGRATEABLE_VERSION = '1.0.0'
 type Version = string
 type MigrationsByVersion = Record<
@@ -23,6 +24,7 @@ const allMigrationsByVersion: MigrationsByVersion = {
   '5.0.0': migrateFileFive,
   '5.1.0': migrateFileFiveOne,
   '5.2.0': migrateFileFiveTwo,
+  '6.0.0': migrateFileSix,
 }
 // get all versions to migrate newer than the file's applicationVersion
 export const getMigrationVersionsToRunFromVersion = (
