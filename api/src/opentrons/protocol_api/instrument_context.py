@@ -1153,7 +1153,7 @@ class InstrumentContext(CommandPublisher):
            This method does nothing.
            It will be removed from a future version of the Python Protocol API.
         """
-        if (args or kwargs):
+        if args or kwargs:
             # Former implementations of this method did not take any args, so users
             # would get a TypeError if they tried to call it like delay(minutes=10).
             # Without changing the ultimate behavior that such a call fails the
