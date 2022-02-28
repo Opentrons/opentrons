@@ -7,6 +7,7 @@ import { renderHook } from '@testing-library/react-hooks'
 import {
   useCreateCommandMutation,
   useCreateLabwareOffsetMutation,
+  useCreateLabwareDefinitionMutation,
 } from '@opentrons/react-api-client'
 import { useTrackEvent } from '../../../../../redux/analytics'
 import { getConnectedRobotName } from '../../../../../redux/robot/selectors'
@@ -43,6 +44,9 @@ const mockUseSteps = useSteps as jest.MockedFunction<typeof useSteps>
 const mockUseCreateCommandMutation = useCreateCommandMutation as jest.MockedFunction<
   typeof useCreateCommandMutation
 >
+const mockUseCreateLabwareDefinitionMutation = useCreateLabwareDefinitionMutation as jest.MockedFunction<
+  typeof useCreateLabwareDefinitionMutation
+>
 const mockUseCreateLabwareOffsetMutation = useCreateLabwareOffsetMutation as jest.MockedFunction<
   typeof useCreateLabwareOffsetMutation
 >
@@ -67,6 +71,7 @@ describe('useLabwarePositionCheck', () => {
   const MOCK_SLOT = '1'
   let mockCreateCommand: jest.Mock
   let mockCreateLabwareOffset: jest.Mock
+  let mockCreateLabwareDefinition: jest.Mock
   beforeEach(() => {
     when(mockUseCurrentRunId).calledWith().mockReturnValue(MOCK_RUN_ID)
     when(mockUseCurrentRunCommands).calledWith().mockReturnValue([])
@@ -97,6 +102,10 @@ describe('useLabwarePositionCheck', () => {
     when(mockUseCreateLabwareOffsetMutation)
       .calledWith()
       .mockReturnValue({ createLabwareOffset: mockCreateLabwareOffset } as any)
+      mockCreateLabwareDefinition = jest.fn()
+    when(mockUseCreateLabwareDefinitionMutation)
+      .calledWith()
+      .mockReturnValue({ createLabwareOffset: mockCreateLabwareDefinition } as any)
     when(mockGetConnectedRobotName)
       .calledWith(expect.anything())
       .mockReturnValue('mock robot!')
