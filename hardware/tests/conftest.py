@@ -32,7 +32,12 @@ class MockCanMessageNotifier:
 
 
 class MockCanDriver(AbstractCanDriver):
-    """A can driver mock."""
+    """A can driver mock.
+
+    These definitions don't really do much
+    other than taking care of giving abstract functions
+    some form of definition.
+    """
 
     def shutdown(self) -> None:
         """Stop the driver."""
@@ -59,8 +64,8 @@ class MockCanDriver(AbstractCanDriver):
             ErrorFrameCanError
         """
         return CanMessage(
-            arbitration_id=ArbitrationId(id=bytes("v", "utf-8")),
-            data=bytes("v", "utf-8"),
+            arbitration_id=ArbitrationId(id=bytes("mock_id", "utf-8")),
+            data=bytes("mock_data", "utf-8"),
         )
 
 
@@ -85,7 +90,7 @@ def mock_messenger(can_message_notifier: MockCanMessageNotifier) -> AsyncMock:
 
 
 @pytest.fixture
-def mock_driver(can_driver: MockCanDriver) -> AsyncMock:
+def mock_driver() -> AsyncMock:
     """Mock can driver."""
     mock = AsyncMock(spec=AbstractCanDriver)
     response = message_definitions.PushToolsDetectedNotification(
@@ -93,5 +98,5 @@ def mock_driver(can_driver: MockCanDriver) -> AsyncMock:
             z_motor=UInt8Field(1), a_motor=UInt8Field(1), gripper=UInt8Field(1)
         )
     )
-    mock.__aiter__.return_value = [response, response, response]
+    mock.__aiter__.return_value = [response]
     return mock
