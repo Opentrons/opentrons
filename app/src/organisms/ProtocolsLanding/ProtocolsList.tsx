@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   Box,
   Flex,
@@ -12,8 +13,10 @@ import { Slideout } from '../../atoms/Slideout'
 import { UploadInput } from './UploadInput'
 import { ProtocolCard } from './ProtocolCard'
 import { EmptyStateLinks } from './EmptyStateLinks'
+
 export function ProtocolsList(): JSX.Element | null {
   const [showSlideout, setShowSlideout] = React.useState(false)
+  const { t } = useTranslation('protocol_info')
   return (
     <Box padding={SPACING.spacing4}>
       <Flex
@@ -21,24 +24,24 @@ export function ProtocolsList(): JSX.Element | null {
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         marginBottom={SPACING.spacing5}
       >
-        <StyledText as="h1">Protocols</StyledText>
+        <StyledText as="h1">{t('protocols')}</StyledText>
         <SecondaryButton
           onClick={() => {
             setShowSlideout(true)
           }}
         >
-          Import
+          {t('import')}
         </SecondaryButton>
       </Flex>
       <StyledText as="p" paddingBottom={SPACING.spacing4}>
-        All Protocols
+        {t('all_protocols')}
       </StyledText>
       <Flex flexDirection="column">
         <ProtocolCard />
       </Flex>
-      <EmptyStateLinks title="Create or download a new protocol" />
+      <EmptyStateLinks title={t('create_or_download')} />
       <Slideout
-        title="Import a Protocol"
+        title={t('import_new_protocol')}
         isExpanded={showSlideout}
         onCloseClick={() => setShowSlideout(false)}
       >
