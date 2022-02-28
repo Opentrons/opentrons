@@ -516,33 +516,6 @@ class OT3API(
         await self.current_position(mount=checked_mount, refresh=True)
         await self._do_plunger_home(mount=checked_mount, acquire_lock=True)
 
-    @ExecutionManagerProvider.wait_for_running
-    async def home(
-        self, axes: Optional[Union[List[Axis], List[OT3Axis]]] = None
-    ) -> None:
-        """Home the entire robot and initialize current position."""
-        self._reset_last_mount()
-        # Initialize/update current_position
-        if axes:
-            checked_axes = [OT3Axis.from_axis(ax) for ax in axes]
-        else:
-            checked_axes = [ax for ax in OT3Axis]
-        gantry = [ax for ax in checked_axes if ax in OT3Axis.gantry_axes()]
-        machine_pos = {}
-        plungers = [ax for ax in checked_axes if ax in OT3Axis.pipette_axes()]
-
-        async with self._motion_lock:
-            if gantry:
-                machine_pos.update(await self._backend.home(gantry))
-                self._current_position = deck_from_machine(
-                    machine_pos,
-                    self._transforms.deck_calibration.attitude,
-                    self._transforms.carriage_offset,
-                    OT3Axis,
-                )
-            for plunger in plungers:
-                await self._do_plunger_home(axis=plunger, acquire_lock=False)
-
     @lru_cache(1)
     def _carriage_offset(self) -> top_types.Point:
         return top_types.Point(*self._config.carriage_offset)
@@ -757,7 +730,9 @@ class OT3API(
                 self._current_position.update(target_position)
 
     @ExecutionManagerProvider.wait_for_running
-    async def home(self, axes: Optional[Union[List[Axis], List[OT3Axis]]] = None):
+    async def home(
+        self, axes: Optional[Union[List[Axis], List[OT3Axis]]] = None
+    ) -> None:
         """Worker function to apply robot motion."""
         self._reset_last_mount()
         if axes:

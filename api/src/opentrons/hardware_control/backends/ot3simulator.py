@@ -169,7 +169,7 @@ class OT3Simulator:
         self,
         origin: Coordinates[OT3Axis, float],
         moves: List[Move[OT3Axis]],
-        stop_condition: MoveStopCondition = MoveStopCondition.none
+        stop_condition: MoveStopCondition = MoveStopCondition.none,
     ) -> None:
         """Move to a position.
 
