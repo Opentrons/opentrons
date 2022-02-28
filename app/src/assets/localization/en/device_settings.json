@@ -1,0 +1,10 @@
+{
+  "about_calibration_description": "For the robot to move accurately and precisely, you need to calibrate it. Positional calibration happens in three parts: deck calibration, pipette offset calibration and tip length calibration.",
+  "about_calibration_title": "About Calibration",
+  "advanced": "Advanced",
+  "calibration": "Calibration",
+  "download_calibration_data": "Download calibration data",
+  "networking": "Networking",
+  "robot_settings": "Robot Settings",
+  "see_how_robot_calibration_works": "See how robot calibration works"
+}

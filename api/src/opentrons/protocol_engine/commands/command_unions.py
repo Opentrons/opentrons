@@ -2,6 +2,8 @@
 
 from typing import Union
 
+from . import heater_shaker
+
 from .aspirate import (
     Aspirate,
     AspirateParams,
@@ -33,7 +35,13 @@ from .drop_tip import (
     DropTipCommandType,
 )
 
-from .home import Home, HomeParams, HomeCreate, HomeResult, HomeCommandType
+from .home import (
+    Home,
+    HomeParams,
+    HomeCreate,
+    HomeResult,
+    HomeCommandType,
+)
 
 from .load_labware import (
     LoadLabware,
@@ -122,6 +130,13 @@ Command = Union[
     Pause,
     PickUpTip,
     SavePosition,
+    heater_shaker.AwaitTemperature,
+    heater_shaker.StartSetTargetTemperature,
+    heater_shaker.DeactivateHeater,
+    heater_shaker.SetTargetShakeSpeed,
+    heater_shaker.StopShake,
+    heater_shaker.OpenLatch,
+    heater_shaker.CloseLatch,
 ]
 
 CommandParams = Union[
@@ -139,6 +154,13 @@ CommandParams = Union[
     PauseParams,
     PickUpTipParams,
     SavePositionParams,
+    heater_shaker.AwaitTemperatureParams,
+    heater_shaker.StartSetTargetTemperatureParams,
+    heater_shaker.DeactivateHeaterParams,
+    heater_shaker.SetTargetShakeSpeedParams,
+    heater_shaker.StopShakeParams,
+    heater_shaker.OpenLatchParams,
+    heater_shaker.CloseLatchParams,
 ]
 
 CommandType = Union[
@@ -156,6 +178,13 @@ CommandType = Union[
     PauseCommandType,
     PickUpTipCommandType,
     SavePositionCommandType,
+    heater_shaker.AwaitTemperatureCommandType,
+    heater_shaker.StartSetTargetTemperatureCommandType,
+    heater_shaker.DeactivateHeaterCommandType,
+    heater_shaker.SetTargetShakeSpeedCommandType,
+    heater_shaker.StopShakeCommandType,
+    heater_shaker.OpenLatchCommandType,
+    heater_shaker.CloseLatchCommandType,
 ]
 
 CommandCreate = Union[
@@ -172,6 +201,13 @@ CommandCreate = Union[
     PauseCreate,
     PickUpTipCreate,
     SavePositionCreate,
+    heater_shaker.AwaitTemperatureCreate,
+    heater_shaker.StartSetTargetTemperatureCreate,
+    heater_shaker.DeactivateHeaterCreate,
+    heater_shaker.SetTargetShakeSpeedCreate,
+    heater_shaker.StopShakeCreate,
+    heater_shaker.OpenLatchCreate,
+    heater_shaker.CloseLatchCreate,
 ]
 
 CommandResult = Union[
@@ -189,4 +225,11 @@ CommandResult = Union[
     PauseResult,
     PickUpTipResult,
     SavePositionResult,
+    heater_shaker.AwaitTemperatureResult,
+    heater_shaker.StartSetTargetTemperatureResult,
+    heater_shaker.DeactivateHeaterResult,
+    heater_shaker.SetTargetShakeSpeedResult,
+    heater_shaker.StopShakeResult,
+    heater_shaker.OpenLatchResult,
+    heater_shaker.CloseLatchResult,
 ]
