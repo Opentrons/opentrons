@@ -21,7 +21,10 @@ This release is a complete refactor of how the OT-2 communicates with the Opentr
 
 ## 5.0.1 to 5.0.2
 
-The 5.0.2 hotfix release contains two changes. The first allows clients to POST individual labware definitions to an run resource. This fix is necessary for a front end fix that allows python protocols that load custom labware inline to still take advantage of the new Labware Position check flow. The Second fix passes user defined labware labels through via load labware command parameters. This second fix is necessary to allow users to inspect these custom labels while viewing the Labware Setup step in the Opentrons App.
+The 5.0.2 hotfix release contains two fixes in the robot software:
+
+1. The robot now understands how to use labware loaded via `load_labware_from_definition` during Labware Position Check.
+2. User-defined labware labels are now returned to the Opentrons App from protocol analyses and runs.
 
 
 ## 5.0.0 to 5.0.1
