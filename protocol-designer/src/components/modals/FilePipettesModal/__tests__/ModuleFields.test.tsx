@@ -1,5 +1,6 @@
 import React from 'react'
-import { shallow } from 'enzyme'
+import { Provider } from 'react-redux'
+import { mount } from 'enzyme'
 import {
   MAGNETIC_MODULE_V2,
   THERMOCYCLER_MODULE_TYPE,
@@ -11,6 +12,13 @@ import { CheckboxField } from '@opentrons/components'
 import { DEFAULT_MODEL_FOR_MODULE_TYPE } from '../../../../constants'
 import { ModuleDiagram } from '../../../modules'
 import { ModuleFields, ModuleFieldsProps } from '../ModuleFields'
+import { selectors as featureFlagSelectors } from '../../../../feature-flags'
+
+jest.mock('../../../../feature-flags')
+
+const getEnabledHeaterShakerMock = featureFlagSelectors.getEnabledHeaterShaker as jest.MockedFunction<
+  typeof featureFlagSelectors.getEnabledHeaterShaker
+>
 
 describe('ModuleFields', () => {
   let magnetModuleOnDeck,
@@ -18,7 +26,14 @@ describe('ModuleFields', () => {
     thermocyclerModuleNotOnDeck,
     heaterShakerModuleNotOnDeck
   let props: ModuleFieldsProps
+  let store: any
   beforeEach(() => {
+    store = {
+      dispatch: jest.fn(),
+      subscribe: jest.fn(),
+      getState: () => ({}),
+    }
+
     magnetModuleOnDeck = {
       onDeck: true,
       slot: '1',
@@ -54,11 +69,22 @@ describe('ModuleFields', () => {
       touched: null,
       errors: null,
     }
-  })
-  it('renders a module selection element for every module', () => {
-    const wrapper = shallow(<ModuleFields {...props} />)
 
-    expect(wrapper.find(CheckboxField)).toHaveLength(4)
+    getEnabledHeaterShakerMock.mockReturnValue(false)
+  })
+
+  function render(props: ModuleFieldsProps) {
+    return mount(
+      <Provider store={store}>
+        <ModuleFields {...props} />
+      </Provider>
+    )
+  }
+
+  it('renders a module selection element for every module', () => {
+    const wrapper = render(props)
+
+    expect(wrapper.find(CheckboxField)).toHaveLength(3)
   })
 
   it('adds module to protocol when checkbox is selected and resets the model field', () => {
@@ -71,9 +97,10 @@ describe('ModuleFields', () => {
       },
     }
 
-    const wrapper = shallow(<ModuleFields {...props} />)
+    const wrapper = render(props)
     const temperatureSelectChange = wrapper
       .find({ name: checkboxTargetName })
+      .first()
       .prop('onChange')
     temperatureSelectChange(expectedEvent)
 
@@ -91,10 +118,12 @@ describe('ModuleFields', () => {
       },
     }
 
-    const wrapper = shallow(<ModuleFields {...props} />)
-    const magnetModelSelect = wrapper.find({
-      name: magnetModelName,
-    })
+    const wrapper = render(props)
+    const magnetModelSelect = wrapper
+      .find({
+        name: magnetModelName,
+      })
+      .first()
     magnetModelSelect.prop('onChange')(expectedEvent)
 
     expect(magnetModelSelect).toHaveLength(1)
@@ -117,14 +146,16 @@ describe('ModuleFields', () => {
     }
     const magnetModelSelectName = `modulesByType.${MAGNETIC_MODULE_TYPE}.model`
 
-    const wrapper = shallow(<ModuleFields {...propsWithErrors} />)
-    const magnetModelSelect = wrapper.find({ name: magnetModelSelectName })
+    const wrapper = render(propsWithErrors)
+    const magnetModelSelect = wrapper
+      .find({ name: magnetModelSelectName })
+      .first()
 
     expect(magnetModelSelect.prop('error')).toEqual('required')
   })
 
   it('displays a default module img when no model has been selected', () => {
-    const wrapper = shallow(<ModuleFields {...props} />)
+    const wrapper = render(props)
     const temperatureModuleDiagramProps = wrapper
       .find(ModuleDiagram)
       .filter({ type: TEMPERATURE_MODULE_TYPE })
@@ -139,7 +170,7 @@ describe('ModuleFields', () => {
   it('displays specific module img when model has been selected', () => {
     props.values[MAGNETIC_MODULE_TYPE].model = MAGNETIC_MODULE_V2
 
-    const wrapper = shallow(<ModuleFields {...props} />)
+    const wrapper = render(props)
     const magnetModuleDiagramProps = wrapper
       .find(ModuleDiagram)
       .filter({ type: MAGNETIC_MODULE_TYPE })
