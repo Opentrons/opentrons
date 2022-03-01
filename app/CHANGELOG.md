@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.2-alpha.0](https://github.com/Opentrons/opentrons/compare/v5.0.1...v5.0.2-alpha.0) (2022-03-01)
+
+
+### Bug Fixes
+
+* **api, app:** display labware label ([#9587](https://github.com/Opentrons/opentrons/issues/9587)) ([7680d92](https://github.com/Opentrons/opentrons/commit/7680d92d4a966d641e8da558514a153e06946bce)), closes [#9105](https://github.com/Opentrons/opentrons/issues/9105) [#9088](https://github.com/Opentrons/opentrons/issues/9088)
+* **app:** surface run record creation errors to users on upload page ([#9597](https://github.com/Opentrons/opentrons/issues/9597)) ([983306c](https://github.com/Opentrons/opentrons/commit/983306c70893fb19f593c9732b566e7b6cfe7a21))
+* send custom labware definitions to the server during LPC setup ([#9588](https://github.com/Opentrons/opentrons/issues/9588)) ([7cf3233](https://github.com/Opentrons/opentrons/commit/7cf323370aefb952b0640d04738c64a0f4a2e5c9))
+
+
+
+
+
 ## [5.0.1](https://github.com/Opentrons/opentrons/compare/v5.0.0...v5.0.1) (2022-02-24)
 
 
