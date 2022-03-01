@@ -60,7 +60,7 @@ describe('HeaterShakerWizard', () => {
     mockPowerOn.mockReturnValue(<div>Mock Power On</div>)
     mockTestShake.mockReturnValue(<div>Mock Test Shake</div>)
     mockGetAttachedModules
-      //  TODO(jr, 2022-02-18): fit get attached modules to have an attached heater shaker and can click through whole flow
+      //  TODO(jr, 2022-02-18): change to heater shaker when getAttachedModules supports it
       .mockReturnValue([mockMagneticModuleGen2])
   })
 
