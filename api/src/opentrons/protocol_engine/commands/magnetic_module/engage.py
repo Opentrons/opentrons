@@ -6,13 +6,13 @@ from typing_extensions import Literal, Type
 
 from pydantic import BaseModel, Field
 
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 
-MagneticModuleEngageCommandType = Literal["magneticModule/engageMagnet"]
+EngageCommandType = Literal["magneticModule/engageMagnet"]
 
 
-class MagneticModuleEngageParams(BaseModel):
+class EngageParams(BaseModel):
     """Input data to engage a Magnetic Module."""
 
     moduleId: str = Field(
@@ -42,44 +42,36 @@ class MagneticModuleEngageParams(BaseModel):
     )
 
 
-class MagneticModuleEngageResult(BaseModel):
+class EngageResult(BaseModel):
     """The result of a Magnetic Module engage command."""
 
     pass
 
 
-class MagneticModuleEngageImplementation(
-    AbstractCommandImpl[MagneticModuleEngageParams, MagneticModuleEngageResult]
-):
+class EngageImplementation(AbstractCommandImpl[EngageParams, EngageResult]):
     """The implementation of a Magnetic Module engage command."""
 
-    async def execute(
-        self, params: MagneticModuleEngageParams
-    ) -> MagneticModuleEngageResult:
+    async def execute(self, params: EngageParams) -> EngageResult:
         """Execute a Magnetic Module engage command."""
         raise NotImplementedError(
             "Protocol Engine does not yet support engaging magnets."
         )
 
 
-class MagneticModuleEngage(
-    BaseCommand[MagneticModuleEngageParams, MagneticModuleEngageResult]
-):
+class Engage(BaseCommand[EngageParams, EngageResult]):
     """A command to engage a Magnetic Module's magnets."""
 
-    commandType: MagneticModuleEngageCommandType = "magneticModule/engageMagnet"
-    params: MagneticModuleEngageParams
-    result: Optional[MagneticModuleEngageResult]
+    commandType: EngageCommandType = "magneticModule/engageMagnet"
+    params: EngageParams
+    result: Optional[EngageResult]
 
-    _ImplementationCls: Type[
-        MagneticModuleEngageImplementation
-    ] = MagneticModuleEngageImplementation
+    _ImplementationCls: Type[EngageImplementation] = EngageImplementation
 
 
-class MagneticModuleEngageCreate(BaseCommandCreate[MagneticModuleEngageParams]):
+class EngageCreate(BaseCommandCreate[EngageParams]):
     """A request to create a Magnetic Module engage command."""
 
-    commandType: MagneticModuleEngageCommandType = "magneticModule/engageMagnet"
-    params: MagneticModuleEngageParams
+    commandType: EngageCommandType = "magneticModule/engageMagnet"
+    params: EngageParams
 
-    _CommandCls: Type[MagneticModuleEngage] = MagneticModuleEngage
+    _CommandCls: Type[Engage] = Engage

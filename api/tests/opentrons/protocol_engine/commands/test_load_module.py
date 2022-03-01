@@ -7,13 +7,7 @@ from opentrons.protocol_engine.types import (
     ModuleModel,
     ModuleDefinition,
 )
-from opentrons.protocol_engine.execution import (
-    EquipmentHandler,
-    MovementHandler,
-    PipettingHandler,
-    RunControlHandler,
-    LoadedModuleData,
-)
+from opentrons.protocol_engine.execution import EquipmentHandler, LoadedModuleData
 
 from opentrons.protocol_engine.commands.load_module import (
     LoadModuleParams,
@@ -25,18 +19,10 @@ from opentrons.protocol_engine.commands.load_module import (
 async def test_load_module_implementation(
     decoy: Decoy,
     equipment: EquipmentHandler,
-    movement: MovementHandler,
-    pipetting: PipettingHandler,
-    run_control: RunControlHandler,
     tempdeck_v2_def: ModuleDefinition,
 ) -> None:
     """A loadModule command should have an execution implementation."""
-    subject = LoadModuleImplementation(
-        equipment=equipment,
-        movement=movement,
-        pipetting=pipetting,
-        run_control=run_control,
-    )
+    subject = LoadModuleImplementation(equipment=equipment)
 
     data = LoadModuleParams(
         model=ModuleModel.TEMPERATURE_MODULE_V1,

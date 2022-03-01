@@ -9,9 +9,9 @@ from opentrons.protocol_engine.execution import (
     PipettingHandler,
     RunControlHandler,
 )
-from opentrons.protocol_engine.commands.magnetic_module_engage import (
-    MagneticModuleEngageParams,
-    MagneticModuleEngageImplementation,
+from opentrons.protocol_engine.commands.magnetic_module import EngageParams
+from opentrons.protocol_engine.commands.magnetic_module.engage import (
+    EngageImplementation,
 )
 
 
@@ -24,13 +24,13 @@ async def test_magnetic_module_engage_implementation(
     run_control: RunControlHandler,
 ) -> None:
     """It should engage the magnets."""
-    subject = MagneticModuleEngageImplementation(
+    subject = EngageImplementation(
         equipment=equipment,
         movement=movement,
         pipetting=pipetting,
         run_control=run_control,
     )
-    params = MagneticModuleEngageParams(
+    params = EngageParams(
         moduleId="module-id",
         engageHeight=3.14159,
     )

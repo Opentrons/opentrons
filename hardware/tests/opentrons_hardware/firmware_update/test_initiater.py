@@ -61,6 +61,12 @@ async def test_messaging(
         ),
         call(
             node_id=target.bootloader_node,
+            message=message_definitions.FirmwareUpdateInitiate(
+                payload=payloads.EmptyPayload()
+            ),
+        ),
+        call(
+            node_id=target.bootloader_node,
             message=message_definitions.DeviceInfoRequest(
                 payload=payloads.EmptyPayload()
             ),
@@ -115,6 +121,12 @@ async def test_retry(
                     payload=payloads.EmptyPayload()
                 ),
             ),
+            call(
+                node_id=target.bootloader_node,
+                message=message_definitions.FirmwareUpdateInitiate(
+                    payload=payloads.EmptyPayload()
+                ),
+            ),
         ]
         + [
             call(
@@ -144,6 +156,12 @@ async def test_bootloader_not_ready(
         == [
             call(
                 node_id=target.system_node,
+                message=message_definitions.FirmwareUpdateInitiate(
+                    payload=payloads.EmptyPayload()
+                ),
+            ),
+            call(
+                node_id=target.bootloader_node,
                 message=message_definitions.FirmwareUpdateInitiate(
                     payload=payloads.EmptyPayload()
                 ),

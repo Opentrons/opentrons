@@ -274,6 +274,12 @@ describe('LabwareSetup', () => {
               mount: 'left',
             },
           },
+          commands: [
+            {
+              commandType: 'pickUpTip',
+              params: { pipetteId: PRIMARY_PIPETTE_ID },
+            } as any,
+          ],
         },
       } as any)
     mockGetIsLabwareOffsetCodeSnippetsOn.mockReturnValue(false)
@@ -522,6 +528,36 @@ describe('LabwareSetup', () => {
         },
       },
     } as any)
+    const { getByRole } = render()
+    const button = getByRole('button', {
+      name: 'run labware position check',
+    })
+    expect(button).toBeDisabled()
+  })
+  it('should render a disabled button when a protocol does not include a pickUpTip', () => {
+    when(mockUseProtocolDetails)
+      .calledWith()
+      .mockReturnValue({
+        protocolData: {
+          labware: {
+            [mockLabwarePositionCheckStepTipRack.labwareId]: {
+              slot: '1',
+              displayName: 'someDisplayName',
+              definitionId: LABWARE_DEF_ID,
+            },
+          },
+          labwareDefinitions: {
+            [LABWARE_DEF_ID]: LABWARE_DEF,
+          },
+          pipettes: {
+            [PRIMARY_PIPETTE_ID]: {
+              name: PRIMARY_PIPETTE_NAME,
+              mount: 'left',
+            },
+          },
+          commands: [],
+        },
+      } as any)
     const { getByRole } = render()
     const button = getByRole('button', {
       name: 'run labware position check',

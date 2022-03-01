@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.1](https://github.com/Opentrons/opentrons/compare/v5.0.0...v5.0.1) (2022-02-24)
+
+
+### Bug Fixes
+
+* **app:** add error boundary to LPC component ([#9508](https://github.com/Opentrons/opentrons/issues/9508)) ([6634454](https://github.com/Opentrons/opentrons/commit/66344543053709886a1f5213dff4dea3c9ddbba9))
+* **app:** make sure pipette is being used during LPC flow ([#9501](https://github.com/Opentrons/opentrons/issues/9501)) ([459be85](https://github.com/Opentrons/opentrons/commit/459be854c3e34dc19abf7aa8d79cef3e542be2b3))
+
+
+
+
+
 # [5.0.0](https://github.com/Opentrons/opentrons/compare/v4.7.0...v5.0.0) (2022-02-16)
 
 
