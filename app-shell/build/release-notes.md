@@ -21,7 +21,11 @@ The 5.0.2 release reshapes the way you upload and set up protocols to run on you
 
 ## 5.0.1 to 5.0.2
 
-The 5.0.2 hotfix release addresses a few bugs. The first fix allows python protocols that load custom labware inline to still take advantage of the new Labware Position check flow. The Second allows users to inspect their custom labware labels within the Labware Setup step in the Opentrons App. Lastly, if run record creation fails on protocol upload to a robot, the error will be surfaced to users as opposed to failing silently.
+The 5.0.2 hotfix release fixes three issues:
+
+1. If you use `load_labware_from_definition` in your Python protocol, you are now able to use Labware Position Check.
+2. User-defined labware labels, if present, are now displayed in "Labware Setup"
+3. Certain types of protocol upload failures will now show an error message instead of silently failing.
 
 ## 5.0.0 to 5.0.1
 
