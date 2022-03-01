@@ -360,3 +360,18 @@ class ModuleView(HasState[ModuleState]):
                     return m
 
         raise errors.ModuleNotAttachedError(f"No available {model.value} found.")
+
+    @staticmethod
+    def calculate_magnet_hardware_height(
+        magnetic_module_model: ModuleModel, mm_above_labware_base: float
+    ) -> float:
+        hardware_units_above_base = (
+            mm_above_labware_base * 2
+            if magnetic_module_model == ModuleModel.MAGNETIC_MODULE_V1
+            else mm_above_labware_base
+        )
+        home_to_base_offset = MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM[
+            magnetic_module_model
+        ]
+        hardware_units_above_home = home_to_base_offset + hardware_units_above_base
+        return hardware_units_above_home

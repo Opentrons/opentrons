@@ -6,8 +6,14 @@ from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import MountType
 from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.modules import AbstractModule, MagDeck
 
-from ..errors import FailedToLoadPipetteError, LabwareDefinitionDoesNotExistError
+from ..errors import (
+    FailedToLoadPipetteError,
+    LabwareDefinitionDoesNotExistError,
+    ModuleNotAttachedError,
+    WrongModuleTypeError,
+)
 from ..resources import LabwareDataProvider, ModuleDataProvider, ModelUtils
 from ..state import StateStore, HardwareModule
 from ..types import (
@@ -227,3 +233,50 @@ class EquipmentHandler:
             serial_number=attached_module.serial_number,
             definition=attached_module.definition,
         )
+
+    # To do: Move these to ModuleView?
+    def _get_attached_module(self, serial_number: str) -> AbstractModule:
+        for attached_hardware_module in self._hardware_api.attached_modules:
+            if attached_hardware_module.device_info["serial"] == serial_number:
+                return attached_hardware_module
+        raise ModuleNotAttachedError(
+            f'No module attached with serial number "{serial_number}".'
+        )
+
+    def _get_attached_magnetic_module(self, serial_number: str) -> MagDeck:
+        attached_module = self._get_attached_module(serial_number=serial_number)
+        if not isinstance(attached_module, MagDeck):
+            raise WrongModuleTypeError(
+                f"Module {serial_number} is a {type(attached_module)},"
+                f" not a Magnetic Module."
+            )
+        return attached_module
+
+    async def engage_magnets(
+        self,
+        magnetic_module_id: str,
+        mm_above_labware_base: float,
+    ) -> None:
+        serial_number_to_match = self._state_store.modules.get_serial_number(
+            module_id=magnetic_module_id
+        )
+        hardware_module = self._get_attached_magnetic_module(
+            serial_number=serial_number_to_match
+        )
+        model = ModuleModel(hardware_module.model())
+
+        hardware_height = self._state_store.modules.calculate_magnet_hardware_height(
+            magnetic_module_model=model,
+            mm_above_labware_base=mm_above_labware_base,
+        )
+
+        await hardware_module.engage(height=hardware_height)
+
+        # To do: verify that the engage height is within range
+
+        # To do: How to do virtualized modules?
+        # Maybe this method assumes you're working with a real module,
+        # and if you want instead to work with a virtualized module, you just don't
+        # call it?
+        # Remember we need to verify that the engage height is within range,
+        # with virtualized modules
