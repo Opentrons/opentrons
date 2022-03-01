@@ -1,103 +1,70 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { Link } from 'react-router-dom'
-
+import { Redirect, useParams } from 'react-router-dom'
 import {
   Text,
   Box,
   Flex,
   ALIGN_START,
   DIRECTION_ROW,
-  BORDERS,
   SPACING,
-  TYPOGRAPHY,
   COLORS,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import * as Config from '../../redux/config'
+import { GeneralSettings } from './GeneralSettings'
+import { PrivacySettings } from './PrivacySettings'
+import { AdvancedSettings } from './AdvancedSettings'
+import { FeatureFlags } from './FeatureFlags'
 
-import { Divider } from '../../atoms/structure'
+import { NavTab } from '../../atoms/NavTab'
+import { Line } from '../../atoms/structure'
+import type { NextGenRouteParams, AppSettingsTab } from '../../App/NextGenApp'
 
-interface AppSettingsHeaderProps {
-  page: 'general' | 'privacy' | 'advanced' | 'featureFlags'
-}
-
-export function AppSettingsHeader(props: AppSettingsHeaderProps): JSX.Element {
+export function AppSettingsHeader(): JSX.Element {
   const { t } = useTranslation('app_settings')
   const devToolsOn = useSelector(Config.getDevtoolsEnabled)
+  const { appSettingsTab } = useParams<NextGenRouteParams>()
+
+  const appSettingsContentByTab: {
+    [K in AppSettingsTab]: () => JSX.Element
+  } = {
+    general: () => <GeneralSettings />,
+    privacy: () => <PrivacySettings />,
+    advanced: () => <AdvancedSettings />,
+    featureFlags: () => <FeatureFlags />,
+  }
+
+  const AppSettingsContent =
+    appSettingsContentByTab[appSettingsTab] ??
+    // default to the general tab if no tab or nonexistent tab is passed as a param
+    (() => <Redirect to={`/app-settings/general`} />)
 
   return (
-    <>
+    <Box backgroundColor={COLORS.white} height="100%">
       <Box padding={SPACING.spacing4} paddingBottom="0">
         <Text css={TYPOGRAPHY.h1Default} paddingBottom={SPACING.spacing5}>
           {t('app_settings')}
         </Text>
-        <Flex alignItems={ALIGN_START} flexDirection={DIRECTION_ROW}>
-          <Link to="/app-settings/general">
-            <Box
-              marginRight={SPACING.spacing4}
-              css={props.page === 'general' ? BORDERS.tabBorder : ''}
-            >
-              <Text
-                css={TYPOGRAPHY.labelSemiBold}
-                color={COLORS.darkBlack}
-                paddingBottom={SPACING.spacing3}
-                marginX={SPACING.spacing2}
-              >
-                {t('general')}
-              </Text>
-            </Box>
-          </Link>
-          <Link to="/app-settings/privacy">
-            <Box
-              marginRight={SPACING.spacing4}
-              css={props.page === 'privacy' ? BORDERS.tabBorder : ''}
-            >
-              <Text
-                css={TYPOGRAPHY.labelSemiBold}
-                color={COLORS.darkBlack}
-                paddingBottom={SPACING.spacing3}
-                marginX={SPACING.spacing2}
-              >
-                {t('privacy')}
-              </Text>
-            </Box>
-          </Link>
-          <Link to="/app-settings/advanced">
-            <Box
-              marginRight={SPACING.spacing4}
-              css={props.page === 'advanced' ? BORDERS.tabBorder : ''}
-            >
-              <Text
-                css={TYPOGRAPHY.labelSemiBold}
-                color={COLORS.darkBlack}
-                paddingBottom={SPACING.spacing3}
-                marginX={SPACING.spacing2}
-              >
-                {t('advanced')}
-              </Text>
-            </Box>
-          </Link>
+        <Flex
+          alignItems={ALIGN_START}
+          flexDirection={DIRECTION_ROW}
+          gridGap={SPACING.spacingM}
+        >
+          <NavTab to="/app-settings/general" tabName={t('general')} />
+          <NavTab to="/app-settings/privacy" tabName={t('privacy')} />
+          <NavTab to="/app-settings/advanced" tabName={t('advanced')} />
           {devToolsOn && (
-            <Link to="/app-settings/feature-flags">
-              <Box
-                marginRight={SPACING.spacing4}
-                css={props.page === 'featureFlags' ? BORDERS.tabBorder : ''}
-              >
-                <Text
-                  css={TYPOGRAPHY.labelSemiBold}
-                  color={COLORS.darkBlack}
-                  paddingBottom={SPACING.spacing3}
-                  marginX={SPACING.spacing2}
-                >
-                  {t('feature_flags')}
-                </Text>
-              </Box>
-            </Link>
+            <NavTab
+              to="/app-settings/featureFlags"
+              tabName={t('feature_flags')}
+            />
           )}
         </Flex>
       </Box>
-      <Divider marginTop="0" />
-    </>
+      <Line />
+      <AppSettingsContent />
+    </Box>
   )
 }

@@ -5,7 +5,6 @@ import {
   Flex,
   Box,
   Text,
-  COLORS,
   ALIGN_CENTER,
   SIZE_2,
   TYPOGRAPHY,
@@ -19,7 +18,6 @@ import {
 } from '../../redux/analytics'
 
 import { ToggleButton } from '../../atoms/Buttons'
-import { AppSettingsHeader } from './AppSettingsHeader'
 
 export function PrivacySettings(): JSX.Element {
   const { t } = useTranslation('app_settings')
@@ -27,30 +25,27 @@ export function PrivacySettings(): JSX.Element {
   const analyticsOptedIn = useSelector((s: State) => getAnalyticsOptedIn(s))
 
   return (
-    <Box backgroundColor={COLORS.white} height="100%">
-      <AppSettingsHeader page="privacy" />
-      <Flex
-        alignItems={ALIGN_CENTER}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        paddingX={SPACING.spacing4}
-        paddingY={SPACING.spacing5}
-        gridGap={SPACING.spacing4}
-      >
-        <Box width="70%">
-          <Text css={TYPOGRAPHY.h3SemiBold} paddingBottom={SPACING.spacing3}>
-            {t('share_analytics')}
-          </Text>
-          <Text css={TYPOGRAPHY.pRegular} paddingBottom={SPACING.spacing3}>
-            {t('analytics_description')}
-          </Text>
-        </Box>
-        <ToggleButton
-          label="analytics_opt_in"
-          size={SIZE_2}
-          toggledOn={analyticsOptedIn}
-          onClick={() => dispatch(toggleAnalyticsOptedIn())}
-        />
-      </Flex>
-    </Box>
+    <Flex
+      alignItems={ALIGN_CENTER}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      paddingX={SPACING.spacing4}
+      paddingY={SPACING.spacing5}
+      gridGap={SPACING.spacing4}
+    >
+      <Box width="70%">
+        <Text css={TYPOGRAPHY.h3SemiBold} paddingBottom={SPACING.spacing3}>
+          {t('share_analytics')}
+        </Text>
+        <Text css={TYPOGRAPHY.pRegular} paddingBottom={SPACING.spacing3}>
+          {t('analytics_description')}
+        </Text>
+      </Box>
+      <ToggleButton
+        label="analytics_opt_in"
+        size={SIZE_2}
+        toggledOn={analyticsOptedIn}
+        onClick={() => dispatch(toggleAnalyticsOptedIn())}
+      />
+    </Flex>
   )
 }
