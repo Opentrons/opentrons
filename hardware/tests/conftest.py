@@ -1,5 +1,4 @@
 """Pytest shared fixtures."""
-from ast import Pass
 from typing import List
 
 import pytest
@@ -41,7 +40,7 @@ class MockCanDriver(AbstractCanDriver):
 
     def shutdown(self) -> None:
         """Stop the driver."""
-        Pass
+        pass
 
     async def send(self, message: CanMessage) -> None:
         """Send a can message.
@@ -52,7 +51,7 @@ class MockCanDriver(AbstractCanDriver):
         Returns:
             None
         """
-        Pass
+        pass
 
     async def read(self) -> CanMessage:
         """Read a message.
