@@ -9,6 +9,11 @@ from typing import Optional, Union, List, Dict, Any
 from opentrons.types import MountType, DeckSlotName
 from opentrons.hardware_control.modules import ModuleType as ModuleType
 
+# convenience re-export of LabwareUri type
+from opentrons_shared_data.pipette.dev_types import (  # noqa: F401
+    LabwareUri as LabwareUri,
+)
+
 
 class EngineStatus(str, Enum):
     """Current execution status of a ProtocolEngine."""
