@@ -484,7 +484,9 @@ async def test_load_module_using_virtual(
     """It should load a virtual module."""
     decoy.when(model_utils.ensure_id("input-module-id")).then_return("module-id")
 
-    decoy.when(model_utils.generate_id()).then_return("fake-serial-number")
+    decoy.when(model_utils.generate_fake_serial_number()).then_return(
+        "fake-serial-number"
+    )
 
     decoy.when(
         module_data_provider.get_definition(ModuleModel.TEMPERATURE_MODULE_V1)

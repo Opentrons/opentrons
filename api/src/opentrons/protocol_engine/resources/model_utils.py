@@ -8,6 +8,16 @@ class ModelUtils:
     """Common resource model utilities provider."""
 
     @staticmethod
+    def generate_fake_serial_number() -> str:
+        """Generate a unique stand-in for a serial number.
+
+        This is meant to be used for protocol analysis (simulation),
+        where commands like module loads are supposed to report a serial number,
+        but there is no actual physical hardware to provide that serial number.
+        """
+        return f"fake-serial-number-{uuid4()}"
+
+    @staticmethod
     def generate_id() -> str:
         """Generate a unique identifier.
 

@@ -8,15 +8,30 @@ RE_UUID = re.compile(
 )
 
 
-def test_model_utils_generates_uuid() -> None:
+def test_model_utils_generates_fake_serial() -> None:
+    """It should generate a string that's visibly a fake serial number."""
+    result = ModelUtils().generate_fake_serial_number()
+    assert "fake-serial-number" in result
+    assert result != "fake-serial-number"
+
+
+def test_model_utils_generates_unique_fake_serial() -> None:
+    """Generated serial numbers should be unique."""
+    results = [ModelUtils().generate_id() for i in range(1000)]
+    unique_results = set(results)
+
+    assert len(results) == len(unique_results)
+
+
+def test_model_utils_generates_id() -> None:
     """It should generate a string matching a UUID."""
     result = ModelUtils().generate_id()
 
     assert RE_UUID.match(result)
 
 
-def test_model_utils_generates_unique() -> None:
-    """It should generate unique IDs."""
+def test_model_utils_generates_unique_id() -> None:
+    """Generated IDs should be unique."""
     results = [ModelUtils().generate_id() for i in range(1000)]
     unique_results = set(results)
 
