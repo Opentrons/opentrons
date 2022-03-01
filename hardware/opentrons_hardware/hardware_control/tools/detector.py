@@ -35,7 +35,6 @@ class ToolDetector:
                 }
                 if self._attached_tools != tmp_dic:
                     self._attached_tools = tmp_dic
-                    # test_messaging - TypeError: unhashable type: 'dict'
                     log.info("Tools detected %s:", {str(self._attached_tools)})
                     yield tmp_dic
             # never allow this generator to get exhausted?
