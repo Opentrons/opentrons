@@ -446,7 +446,7 @@ async def test_load_module(
     )
 
     decoy.when(
-        state_store.modules.find_attached_module(
+        state_store.modules.select_hardware_module_to_load(
             model=ModuleModel.TEMPERATURE_MODULE_V1,
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             attached_modules=[

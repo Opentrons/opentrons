@@ -313,7 +313,7 @@ class ModuleView(HasState[ModuleState]):
                 return True
         return False
 
-    def find_attached_module(
+    def select_hardware_module_to_load(
         self,
         model: ModuleModel,
         location: DeckSlotLocation,

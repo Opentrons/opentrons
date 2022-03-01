@@ -251,12 +251,12 @@ def test_thermocycler_dodging(
     )
 
 
-def test_find_attached_module_rejects_missing() -> None:
+def test_select_hardware_module_to_load_rejects_missing() -> None:
     """It should raise if the correct module isn't attached."""
     subject = make_module_view()
 
     with pytest.raises(errors.ModuleNotAttachedError):
-        subject.find_attached_module(
+        subject.select_hardware_module_to_load(
             model=ModuleModel.TEMPERATURE_MODULE_V1,
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             attached_modules=[],
@@ -275,7 +275,7 @@ def test_find_attached_module_rejects_missing() -> None:
         (ModuleModel.THERMOCYCLER_MODULE_V1, lazy_fixture("thermocycler_v1_def")),
     ],
 )
-def test_find_attached_module(
+def test_select_hardware_module_to_load(
     requested_model: ModuleModel,
     attached_definition: ModuleDefinition,
 ) -> None:
@@ -287,7 +287,7 @@ def test_find_attached_module(
         HardwareModule(serial_number="serial-2", definition=attached_definition),
     ]
 
-    result = subject.find_attached_module(
+    result = subject.select_hardware_module_to_load(
         model=requested_model,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         attached_modules=attached_modules,
@@ -296,7 +296,7 @@ def test_find_attached_module(
     assert result == attached_modules[0]
 
 
-def test_find_attached_module_skips_non_matching(
+def test_select_hardware_module_to_load_skips_non_matching(
     magdeck_v1_def: ModuleDefinition,
     magdeck_v2_def: ModuleDefinition,
 ) -> None:
@@ -308,7 +308,7 @@ def test_find_attached_module_skips_non_matching(
         HardwareModule(serial_number="serial-2", definition=magdeck_v2_def),
     ]
 
-    result = subject.find_attached_module(
+    result = subject.select_hardware_module_to_load(
         model=ModuleModel.MAGNETIC_MODULE_V2,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         attached_modules=attached_modules,
@@ -317,7 +317,7 @@ def test_find_attached_module_skips_non_matching(
     assert result == attached_modules[1]
 
 
-def test_find_attached_module_skips_already_loaded(
+def test_select_hardware_module_to_load_skips_already_loaded(
     magdeck_v1_def: ModuleDefinition,
 ) -> None:
     """It should skip over already assigned modules."""
@@ -335,7 +335,7 @@ def test_find_attached_module_skips_already_loaded(
         HardwareModule(serial_number="serial-2", definition=magdeck_v1_def),
     ]
 
-    result = subject.find_attached_module(
+    result = subject.select_hardware_module_to_load(
         model=ModuleModel.MAGNETIC_MODULE_V1,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
         attached_modules=attached_modules,
@@ -344,7 +344,7 @@ def test_find_attached_module_skips_already_loaded(
     assert result == attached_modules[1]
 
 
-def test_find_attached_module_reuses_already_loaded(
+def test_select_hardware_module_to_load_reuses_already_loaded(
     magdeck_v1_def: ModuleDefinition,
 ) -> None:
     """It should reuse over already assigned modules in the same location."""
@@ -362,7 +362,7 @@ def test_find_attached_module_reuses_already_loaded(
         HardwareModule(serial_number="serial-2", definition=magdeck_v1_def),
     ]
 
-    result = subject.find_attached_module(
+    result = subject.select_hardware_module_to_load(
         model=ModuleModel.MAGNETIC_MODULE_V1,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         attached_modules=attached_modules,
@@ -371,7 +371,7 @@ def test_find_attached_module_reuses_already_loaded(
     assert result == attached_modules[0]
 
 
-def test_find_attached_module_rejects_location_reassignment(
+def test_select_hardware_module_to_load_rejects_location_reassignment(
     magdeck_v1_def: ModuleDefinition,
     tempdeck_v1_def: ModuleDefinition,
 ) -> None:
@@ -391,7 +391,7 @@ def test_find_attached_module_rejects_location_reassignment(
     ]
 
     with pytest.raises(errors.ModuleAlreadyPresentError):
-        subject.find_attached_module(
+        subject.select_hardware_module_to_load(
             model=ModuleModel.TEMPERATURE_MODULE_V1,
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             attached_modules=attached_modules,
