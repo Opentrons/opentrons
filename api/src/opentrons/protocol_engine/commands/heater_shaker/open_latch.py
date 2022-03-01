@@ -23,6 +23,9 @@ class OpenLatchResult(BaseModel):
 class OpenLatchImpl(AbstractCommandImpl[OpenLatchParams, OpenLatchResult]):
     """Execution implementation of a Heater-Shaker's open latch command."""
 
+    def __init__(self, **kwargs: object) -> None:
+        pass
+
     async def execute(self, params: OpenLatchParams) -> OpenLatchResult:
         """Open a Heater-Shaker's latch."""
         raise NotImplementedError("Heater-Shaker open latch not yet implemented.")

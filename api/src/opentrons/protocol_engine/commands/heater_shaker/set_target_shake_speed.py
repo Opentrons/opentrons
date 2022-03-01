@@ -28,6 +28,9 @@ class SetTargetShakeSpeedImpl(
 ):
     """Execution implementation of a Heater-Shaker's shake command."""
 
+    def __init__(self, **kwargs: object) -> None:
+        pass
+
     async def execute(
         self,
         params: SetTargetShakeSpeedParams,
