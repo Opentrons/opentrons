@@ -1,4 +1,3 @@
-import { getLabwareDisplayName } from '.'
 import type {
   LoadLabwareRunTimeCommand,
   LoadModuleRunTimeCommand,
@@ -39,17 +38,19 @@ export const schemaV6Adapter = (
       if (labwareId === TRASH_ID) {
         return { ...acc }
       }
-      const labwareDef: LabwareDefinition2 = protocolAnalyses.commands.find(
-        (command: RunTimeCommand) =>
-          command.commandType === 'loadLabware' &&
-          command.result?.labwareId === labwareId
-      )?.result.definition
+      const loadCommand: LoadLabwareRunTimeCommand | null =
+        protocolAnalyses.commands.find(
+          (command: RunTimeCommand): command is LoadLabwareRunTimeCommand =>
+            command.commandType === 'loadLabware' &&
+            command.result?.labwareId === labwareId
+        ) ?? null
+      const displayName: string | null = loadCommand?.params.displayName ?? null
 
       return {
         ...acc,
         [labwareId]: {
           definitionId: `${labware.definitionUri}_id`,
-          displayName: getLabwareDisplayName(labwareDef),
+          displayName: displayName,
         },
       }
     }, {})

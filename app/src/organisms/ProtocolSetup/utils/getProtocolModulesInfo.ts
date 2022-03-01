@@ -17,6 +17,7 @@ export interface ProtocolModuleInfo {
   z: number
   moduleDef: ModuleDefinition
   nestedLabwareDef: LabwareDefinition2 | null
+  nestedLabwareDisplayName: string | null
   nestedLabwareId: string | null
   protocolLoadOrder: number
   slotName: string
@@ -52,6 +53,7 @@ export const getProtocolModulesInfo = (
           nestedLabware != null
             ? protocolData.labwareDefinitions[nestedLabware.definitionId]
             : null
+        const nestedLabwareDisplayName = nestedLabware?.displayName ?? null
         const moduleInitialLoadInfo = getModuleInitialLoadInfo(
           moduleId,
           protocolData.commands
@@ -79,6 +81,7 @@ export const getProtocolModulesInfo = (
             z: slotPosition[2] ?? 0,
             moduleDef,
             nestedLabwareDef,
+            nestedLabwareDisplayName,
             nestedLabwareId,
             protocolLoadOrder,
             slotName,

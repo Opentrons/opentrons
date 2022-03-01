@@ -36,6 +36,14 @@ class LoadLabwareParams(BaseModel):
         description="An optional ID to assign to this labware. If None, an ID "
         "will be generated.",
     )
+    displayName: Optional[str] = Field(
+        None,
+        description="An optional user-specified display name "
+        "or label for this labware.",
+        # NOTE: v4/5 JSON protocols will always have a displayName which will be the
+        #  user-specified label OR the displayName property of the labware's definition.
+        # TODO: Make sure v6 JSON protocols don't do that.
+    )
 
 
 class LoadLabwareResult(BaseModel):

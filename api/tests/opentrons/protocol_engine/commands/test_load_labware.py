@@ -39,6 +39,7 @@ async def test_load_labware_implementation(
         loadName="some-load-name",
         namespace="opentrons-test",
         version=1,
+        displayName="My custom display name",
     )
 
     decoy.when(
