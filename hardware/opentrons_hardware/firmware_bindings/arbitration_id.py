@@ -8,6 +8,12 @@ from __future__ import annotations
 import ctypes
 from typing import TYPE_CHECKING
 
+from opentrons_hardware.firmware_bindings.constants import (
+    FunctionCode,
+    NodeId,
+    MessageId,
+)
+
 if TYPE_CHECKING:
     from typing_extensions import Final
 
@@ -41,10 +47,10 @@ class ArbitrationIdParts(ctypes.Structure):
     def __repr__(self) -> str:
         """Return string representation of class."""
         return (
-            f"function_code: 0x{self.function_code:x}, "
-            f"node_id: 0x{self.node_id:x}, "
-            f"originating_node_id: 0x{self.originating_node_id:x}, "
-            f"message_id: 0x{self.message_id:x}"
+            f"function_code: {FunctionCode(self.function_code).name}, "
+            f"node_id: {NodeId(self.node_id).name}, "
+            f"originating_node_id: {NodeId(self.originating_node_id).name}, "
+            f"message_id: {MessageId(self.message_id).name}"
         )
 
 
