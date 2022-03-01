@@ -6,7 +6,8 @@ library.
 """
 from __future__ import annotations
 import ctypes
-from typing import TYPE_CHECKING
+from enum import Enum
+from typing import TYPE_CHECKING, Type
 
 from opentrons_hardware.firmware_bindings.constants import (
     FunctionCode,
@@ -46,11 +47,19 @@ class ArbitrationIdParts(ctypes.Structure):
 
     def __repr__(self) -> str:
         """Return string representation of class."""
+
+        def _safe_to_str(enum_type: Type[Enum], val: int) -> str:
+            """Safely convert enum to string."""
+            try:
+                return enum_type(val).name
+            except ValueError:
+                return f"0x{val:x}"
+
         return (
-            f"function_code: {FunctionCode(self.function_code).name}, "
-            f"node_id: {NodeId(self.node_id).name}, "
-            f"originating_node_id: {NodeId(self.originating_node_id).name}, "
-            f"message_id: {MessageId(self.message_id).name}"
+            f"function_code: {_safe_to_str(FunctionCode, self.function_code)}, "
+            f"node_id: {_safe_to_str(NodeId, self.node_id)}, "
+            f"originating_node_id: {_safe_to_str(NodeId, self.originating_node_id)}, "
+            f"message_id: {_safe_to_str(MessageId, self.message_id)}"
         )
 
 
