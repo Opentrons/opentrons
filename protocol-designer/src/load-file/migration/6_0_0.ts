@@ -1,6 +1,4 @@
-import { ProtocolFileV5 } from '@opentrons/shared-data'
-import { ProtocolFile } from '@opentrons/shared-data/protocol/types/schemaV6'
-import { map, result } from 'lodash'
+import { map } from 'lodash'
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
 import { uuid } from '../../utils'
@@ -11,7 +9,7 @@ import { uuid } from '../../utils'
 export const PD_VERSION = '6.0.0'
 export const SCHEMA_VERSION = 6
 
-const migrateRobot = (appData: Record<string, any>): Record<string, any> => {
+const migrateRobot = (appData: any): any => {
   return mapValues(appData, robot => {
     return {
       ...robot,
@@ -41,7 +39,7 @@ const migrateModules = (appData: Record<string, any>): Record<string, any> => {
   })
 }
 
-export const migrateFile = (appData: ProtocolFileV5<{}>): ProtocolFile<{}> => {
+export const migrateFile = (appData: any): any => {
   const pipettes = appData.pipettes
   const loadPipetteCommands = map(pipettes, (pipette, pipetteId) => {
     const loadPipetteCommand = {
@@ -51,7 +49,6 @@ export const migrateFile = (appData: ProtocolFileV5<{}>): ProtocolFile<{}> => {
         pipetteId: pipetteId,
         mount: pipette.mount,
       },
-      result: { pipetteId: pipetteId },
     }
     return loadPipetteCommand
   })
@@ -65,7 +62,6 @@ export const migrateFile = (appData: ProtocolFileV5<{}>): ProtocolFile<{}> => {
         moduleId: moduleId,
         loaction: { slotName: module.slot },
       },
-      result: { moduleId: moduleId },
     }
     return loadModuleCommand
   })
@@ -79,7 +75,6 @@ export const migrateFile = (appData: ProtocolFileV5<{}>): ProtocolFile<{}> => {
         labwawreId: labwareId,
         location: { slotName: labware.slot },
       },
-      result: {},
     }
     return loadLabwareCommand
   })
@@ -87,10 +82,9 @@ export const migrateFile = (appData: ProtocolFileV5<{}>): ProtocolFile<{}> => {
   const commands = appData.commands
   const migrateV5Commands = map(commands, command => {
     const migrateV5Commands = {
-      commandType: command.command,
+      commandType: command.command === 'airGap' ? 'aspirate' : command.command,
       id: uuid(),
       params: command.params,
-      result: {},
     }
     return migrateV5Commands
   })
@@ -98,10 +92,7 @@ export const migrateFile = (appData: ProtocolFileV5<{}>): ProtocolFile<{}> => {
     designerApplication: {
       name: 'opentrons/protocol-designer',
       version: PD_VERSION,
-      data:
-        appData.designerApplication != null
-          ? appData.designerApplication
-          : undefined,
+      data: appData.designerApplication.data ?? undefined,
     },
     schemaVersion: SCHEMA_VERSION,
     $otSharedSchema: '#/protocol/schemas/6',
