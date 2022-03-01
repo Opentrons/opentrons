@@ -34,7 +34,7 @@ The 5.0.1 hotfix release does not contain any changes to the robot software
 ## Known Issues
 
 - Your last run protocol will not be saved through robot reboots.
-- The expected mapping of protocol load order to usb port info, in the case of multiple instances of a single module type in a protocol, is inconsistent.
+- When you load multiple instances of the same module type in a protocol, the USB port numbers shown in "Module Setup" are incorrect.
 
 ---
 
