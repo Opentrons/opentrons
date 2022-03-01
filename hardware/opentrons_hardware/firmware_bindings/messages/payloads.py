@@ -232,6 +232,7 @@ class FirmwareUpdateComplete(utils.BinarySerializable):
     """All data messages have been transmitted."""
 
     num_messages: utils.UInt32Field
+    crc32: utils.UInt32Field
 
 
 @dataclass
