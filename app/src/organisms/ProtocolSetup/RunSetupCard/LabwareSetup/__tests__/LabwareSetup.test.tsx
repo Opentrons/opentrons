@@ -325,6 +325,7 @@ describe('LabwareSetup', () => {
       .mockReturnValue({
         '300_ul_tiprack_id': {
           labwareDef: fixture_tiprack_300_ul as LabwareDefinition2,
+          displayName: 'fresh tips',
           x: MOCK_300_UL_TIPRACK_COORDS[0],
           y: MOCK_300_UL_TIPRACK_COORDS[1],
           z: MOCK_300_UL_TIPRACK_COORDS[2],
@@ -347,6 +348,7 @@ describe('LabwareSetup', () => {
       .mockReturnValue({
         [MOCK_300_UL_TIPRACK_ID]: {
           labwareDef: fixture_tiprack_300_ul as LabwareDefinition2,
+          displayName: 'fresh tips',
           x: MOCK_300_UL_TIPRACK_COORDS[0],
           y: MOCK_300_UL_TIPRACK_COORDS[1],
           z: MOCK_300_UL_TIPRACK_COORDS[2],

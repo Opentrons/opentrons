@@ -164,7 +164,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
 interface LabwareInfoOverlayProps {
   definition: LabwareDefinition2
   labwareId: string
-  displayName: string
+  displayName: string | null
 }
 export const LabwareInfoOverlay = (
   props: LabwareInfoOverlayProps
