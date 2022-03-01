@@ -6,6 +6,7 @@ from typing_extensions import Literal, Type
 
 from pydantic import BaseModel, Field
 
+from opentrons.protocol_engine.execution import EquipmentHandler
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 
@@ -51,11 +52,16 @@ class EngageResult(BaseModel):
 class EngageImplementation(AbstractCommandImpl[EngageParams, EngageResult]):
     """The implementation of a Magnetic Module engage command."""
 
+    def __init__(self, equipment: EquipmentHandler, **unused_handlers: object) -> None:
+        self._equipment = equipment
+
     async def execute(self, params: EngageParams) -> EngageResult:
         """Execute a Magnetic Module engage command."""
-        raise NotImplementedError(
-            "Protocol Engine does not yet support engaging magnets."
+        await self._equipment.engage_magnets(
+            magnetic_module_id=params.moduleId,
+            mm_above_labware_base=params.engageHeight,
         )
+        return EngageResult()
 
 
 class Engage(BaseCommand[EngageParams, EngageResult]):
