@@ -5,6 +5,7 @@ import { uuid } from '../../utils'
 // NOTE: this migration bump adds load commands (loadLiquid, loadModule, loadPipette, loadLabware), modifies both pipette
 //  and labware access parameters, renames AirGap to aspirate, and removes all temporal properties from labware, pipettes,
 //  and module keys such as slot, mount
+//  and renames well to wellName
 
 export const PD_VERSION = '6.0.0'
 export const SCHEMA_VERSION = 6
@@ -81,6 +82,8 @@ export const migrateFile = (appData: any): any => {
 
   const commands = appData.commands
   const migrateV5Commands = map(commands, command => {
+    command.params.wellName = command.params.well
+    delete command.params.well
     const migrateV5Commands = {
       commandType: command.command === 'airGap' ? 'aspirate' : command.command,
       id: uuid(),
