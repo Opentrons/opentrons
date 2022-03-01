@@ -105,7 +105,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
                 deck_slot=deck_slot,
                 on_module=True,
                 offset_id=provided_offset.offset_id,
-                labware_display_name=labware.label,
+                labware_display_name=labware._implementation.get_label(),
             )
         )
         return mod_labware
