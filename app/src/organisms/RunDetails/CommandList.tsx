@@ -32,9 +32,9 @@ import {
 } from '@opentrons/api-client'
 import { useAllCommandsQuery } from '@opentrons/react-api-client'
 import {
-  useRunStatus,
+  useCurrentRunStatus,
   useRunStartTime,
-  useRunErrors,
+  useCurrentRunErrors,
 } from '../RunTimeControl/hooks'
 import { useProtocolDetails } from './hooks'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
@@ -63,8 +63,8 @@ export function CommandList(): JSX.Element | null {
   const protocolData: ProtocolFile<{}> | null = useProtocolDetails()
     .protocolData
   const runStartTime = useRunStartTime()
-  const runStatus = useRunStatus()
-  const runErrors = useRunErrors()
+  const runStatus = useCurrentRunStatus()
+  const runErrors = useCurrentRunErrors()
   const listInnerRef = React.useRef<HTMLDivElement>(null)
   const currentItemRef = React.useRef<HTMLDivElement>(null)
   const firstPostInitialPlayRunCommandIndex = React.useRef<number | null>(null)
