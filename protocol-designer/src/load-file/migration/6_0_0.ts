@@ -1,14 +1,17 @@
+import { ProtocolFileV5 } from '@opentrons/shared-data'
+import { ProtocolFile } from '@opentrons/shared-data/protocol/types/schemaV6'
+import { map, result } from 'lodash'
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
+import { uuid } from '../../utils'
 // NOTE: this migration bump adds load commands (loadLiquid, loadModule, loadPipette, loadLabware), modifies both pipette
 //  and labware access parameters, renames AirGap to aspirate, and removes all temporal properties from labware, pipettes,
 //  and module keys such as slot, mount
 
 export const PD_VERSION = '6.0.0'
-export const SCHEMA_VERSION = '6.0.0'
+export const SCHEMA_VERSION = 6
 
 const migrateRobot = (appData: Record<string, any>): Record<string, any> => {
-  // update robot to return model and deck
   return mapValues(appData, robot => {
     return {
       ...robot,
@@ -38,77 +41,81 @@ const migrateModules = (appData: Record<string, any>): Record<string, any> => {
   })
 }
 
-// export const migrateCommands = (
-//   appData: Record<string, any>
-// ): Record<string, any> => {
-//   // Pause form key name and value enum changed
-//   return mapValues(appData, commands => {
-//     if (commands.commandType === 'home') {
-//       return {
-//         id: commands.id,
-//         params: commands.params.axes,
-//       }
-//     } else if (commands.commandType === 'loadPipette') {
-//       return {
-//         id: commands.id,
-//         params: {
-//           pipetteId: commands.params.pipetteId,
-//           mount: commands.params.mount,
-//         },
-//       }
-//     } else if (commands.commandType === 'loadModule') {
-//       return {
-//         id: commands.id,
-//         params: {
-//           moduleId: commands.params.moduleId,
-//           location: { slotName: commands.params.location.slotName },
-//         },
-//       }
-//     } else if (commands.commandType === 'loadLabware') {
-//       return {
-//         id: commands.id,
-//         params: {
-//           labwareId: commands.params.labwareId,
-//           location: { slotName: commands.params.location.slotName },
-//         },
-//       }
-//     } else if (commands.commandType === 'loadLiquid') {
-//       return {
-//         id: commands.id,
-//         params: {
-//           labwareId: commands.params.labwareId,
-//           location: { slotName: commands.params.location.slotName },
-//         },
-//       }
-//     }
-//     return commands
-//   })
-// }
+export const migrateFile = (appData: ProtocolFileV5<{}>): ProtocolFile<{}> => {
+  const pipettes = appData.pipettes
+  const loadPipetteCommands = map(pipettes, (pipette, pipetteId) => {
+    const loadPipetteCommand = {
+      id: uuid(),
+      commandType: 'loadPipette',
+      params: {
+        pipetteId: pipetteId,
+        mount: pipette.mount,
+      },
+      result: { pipetteId: pipetteId },
+    }
+    return loadPipetteCommand
+  })
 
-const migrateCommands = (appData: Record<string, any>): Record<string, any> => {
-    return mapValues(appData, commands => {
-        return {
-          ...commands,
-          id: commands.id,
-        }
-      })
-  }
+  const modules = appData.modules
+  const loadModuleCommands = map(modules, (module, moduleId) => {
+    const loadModuleCommand = {
+      id: uuid(),
+      commandType: 'loadModule',
+      params: {
+        moduleId: moduleId,
+        loaction: { slotName: module.slot },
+      },
+      result: { moduleId: moduleId },
+    }
+    return loadModuleCommand
+  })
 
-export const migrateFile = (fileData: any): any => {
+  const labware = appData.labware
+  const loadLabwareCommands = map(labware, (labware, labwareId) => {
+    const loadLabwareCommand = {
+      id: uuid(),
+      commandType: 'loadLabware',
+      params: {
+        labwawreId: labwareId,
+        location: { slotName: labware.slot },
+      },
+      result: {},
+    }
+    return loadLabwareCommand
+  })
+
+  const commands = appData.commands
+  const migrateV5Commands = map(commands, command => {
+    const migrateV5Commands = {
+      commandType: command.command,
+      id: uuid(),
+      params: command.params,
+      result: {},
+    }
+    return migrateV5Commands
+  })
   return {
     designerApplication: {
       name: 'opentrons/protocol-designer',
       version: PD_VERSION,
-      ...fileData.designerApplication.data,
+      data:
+        appData.designerApplication != null
+          ? appData.designerApplication
+          : undefined,
     },
     schemaVersion: SCHEMA_VERSION,
     $otSharedSchema: '#/protocol/schemas/6',
-    metadata: fileData.metadata,
-    robot: migrateRobot(fileData.robot),
-    pipettes: migratePipettes(fileData.pipettes),
-    labware: migrateLabware(fileData.labware),
-    labwareDefinitions: fileData.labwareDefinitions,
-    modules: migrateModules(fileData.modules),
-    commands: migrateCommands(fileData.commands),
+    metadata: appData.metadata,
+    robot: migrateRobot(appData.robot),
+    pipettes: migratePipettes(appData.pipettes),
+    labware: migrateLabware(appData.labware),
+    labwareDefinitions: appData.labwareDefinitions,
+    modules: migrateModules(appData.modules),
+    commands: [
+      ...loadModuleCommands,
+      ...loadPipetteCommands,
+      ...loadLabwareCommands,
+      ...migrateV5Commands,
+    ],
   }
 }
