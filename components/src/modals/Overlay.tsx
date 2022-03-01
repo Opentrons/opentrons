@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Flex, POSITION_ABSOLUTE } from '..'
+import { COLORS, Flex, POSITION_ABSOLUTE } from '..'
 
 export interface OverlayProps {
   /** optional onClick handler */
@@ -11,7 +11,7 @@ export interface OverlayProps {
 export function Overlay(props: OverlayProps): JSX.Element {
   const { alertOverlay, onClick } = props
 
-  let backgroundColor: string = 'rgba(22, 33, 45, 0.35)'
+  let backgroundColor: string = COLORS.darkBlack + '59'
   if (alertOverlay === true) {
     backgroundColor = 'rgba(115, 115, 115, 0.9)'
   } else if (props.backgroundColor != null) {

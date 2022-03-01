@@ -9,6 +9,7 @@ import {
   ModalPage,
   SpinnerModalPage,
   Overlay,
+  COLORS,
 } from '..'
 
 describe('modals', () => {
@@ -19,7 +20,7 @@ describe('modals', () => {
     ).root
 
     const overlay = root.findByProps({
-      backgroundColor: 'rgba(22, 33, 45, 0.35)',
+      backgroundColor: COLORS.darkBlack + '59',
     })
     overlay.props.onClick()
 
@@ -61,7 +62,7 @@ describe('modals', () => {
     ).root
 
     const overlay = root.findByProps({
-      backgroundColor: 'rgba(22, 33, 45, 0.35)',
+      backgroundColor: COLORS.darkBlack + '59',
     })
 
     overlay.props.onClick()

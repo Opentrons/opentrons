@@ -180,7 +180,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         {showOverflowMenu && (
           <div ref={moduleOverflowWrapperRef}>
             <ModuleOverflowMenu
-              aboutModuleClick={handleAboutClick}
+              handleAboutClick={handleAboutClick}
               module={module}
               handleClick={handleMenuItemClick}
             />

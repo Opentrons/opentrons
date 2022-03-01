@@ -9,14 +9,14 @@ import type { AttachedModule } from '../../../redux/modules/types'
 interface ModuleOverflowMenuProps {
   module: AttachedModule
   handleClick: (isSecondary: boolean) => void
-  aboutModuleClick: () => void
+  handleAboutClick: () => void
 }
 
 export const ModuleOverflowMenu = (
   props: ModuleOverflowMenuProps
 ): JSX.Element | null => {
   const { t } = useTranslation('device_details')
-  const { module, handleClick, aboutModuleClick } = props
+  const { module, handleClick, handleAboutClick } = props
 
   const menuItems = {
     thermocyclerModuleType: [
@@ -52,7 +52,7 @@ export const ModuleOverflowMenu = (
       minWidth="10rem"
       key={`about_module_${module.model}`}
       data-testid={`about_module_${module.model}`}
-      onClick={() => aboutModuleClick()}
+      onClick={() => handleAboutClick()}
     >
       {t('overflow_menu_about')}
     </MenuItem>

@@ -21,7 +21,7 @@ describe('ModuleOverflowMenu', () => {
     props = {
       module: mockMagneticModule,
       handleClick: jest.fn(),
-      aboutModuleClick: jest.fn(),
+      handleAboutClick: jest.fn(),
     }
   })
   afterEach(() => {
@@ -39,7 +39,7 @@ describe('ModuleOverflowMenu', () => {
     expect(props.handleClick).toHaveBeenCalled()
     const buttonAbout = getByRole('button', { name: 'About module' })
     fireEvent.click(buttonAbout)
-    expect(props.aboutModuleClick).toHaveBeenCalled()
+    expect(props.handleAboutClick).toHaveBeenCalled()
     expect(getByText('About module')).toHaveStyle('color: #16212D')
   })
   it('renders hover state color correctly', () => {
@@ -57,7 +57,7 @@ describe('ModuleOverflowMenu', () => {
     props = {
       module: mockTemperatureModuleGen2,
       handleClick: jest.fn(),
-      aboutModuleClick: jest.fn(),
+      handleAboutClick: jest.fn(),
     }
     const { getByRole } = render(props)
     const buttonSetting = getByRole('button', {
@@ -67,13 +67,13 @@ describe('ModuleOverflowMenu', () => {
     expect(props.handleClick).toHaveBeenCalled()
     const buttonAbout = getByRole('button', { name: 'About module' })
     fireEvent.click(buttonAbout)
-    expect(props.aboutModuleClick).toHaveBeenCalled()
+    expect(props.handleAboutClick).toHaveBeenCalled()
   })
   it('renders the correct TC module menu', () => {
     props = {
       module: mockThermocycler,
       handleClick: jest.fn(),
-      aboutModuleClick: jest.fn(),
+      handleAboutClick: jest.fn(),
     }
     const { getByRole } = render(props)
     const buttonSettingLid = getByRole('button', {
@@ -83,7 +83,7 @@ describe('ModuleOverflowMenu', () => {
     expect(props.handleClick).toHaveBeenCalled()
     const buttonAbout = getByRole('button', { name: 'About module' })
     fireEvent.click(buttonAbout)
-    expect(props.aboutModuleClick).toHaveBeenCalled()
+    expect(props.handleAboutClick).toHaveBeenCalled()
     const buttonSettingBlock = getByRole('button', {
       name: 'Set block temperature',
     })
