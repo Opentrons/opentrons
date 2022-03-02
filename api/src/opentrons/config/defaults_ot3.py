@@ -276,7 +276,7 @@ def _build_default_transform(
 
 def build_with_defaults(robot_settings: Dict[str, Any]) -> OT3Config:
     motion_settings = robot_settings.get("motion_settings", {})
-    current_settings = robot_settings.get('current_settings', {})
+    current_settings = robot_settings.get("current_settings", {})
     return OT3Config(
         model="OT-3 Standard",
         version=ROBOT_CONFIG_VERSION,
@@ -300,7 +300,8 @@ def build_with_defaults(robot_settings: Dict[str, Any]) -> OT3Config:
         ),
         current_settings=OT3CurrentSettings(
             standstill_current=_build_default_bpk(
-                current_settings.get("standstill_current", {}), DEFAULT_STANDSTILL_CURRENT
+                current_settings.get("standstill_current", {}),
+                DEFAULT_STANDSTILL_CURRENT,
             ),
             motor_run_current=_build_default_bpk(
                 current_settings.get("motor_run_current", {}),
