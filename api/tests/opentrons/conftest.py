@@ -187,6 +187,7 @@ async def ot2_hardware(request, loop, virtual_smoothie_env):
 
 async def _build_ot3_hw() -> AsyncIterator[ThreadManager[HardwareControlAPI]]:
     from opentrons.hardware_control.ot3api import OT3API
+
     hw_sim = ThreadManager(OT3API.build_hardware_simulator)
     old_config = config.robot_configs.load()
     try:
