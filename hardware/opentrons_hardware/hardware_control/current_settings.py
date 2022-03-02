@@ -21,8 +21,8 @@ async def set_currents(
             node_id=node,
             message=WriteMotorCurrentRequest(
                 payload=payloads.MotorCurrentPayload(
-                    hold_current=UInt32Field(currents[0]),
-                    run_current=UInt32Field(currents[1]),
+                    hold_current=UInt32Field(int(currents[0] * (2**16))),
+                    run_current=UInt32Field(int(currents[1] * (2**16))),
                 )
             )
         )
@@ -37,7 +37,7 @@ async def set_run_current(
             message=WriteMotorCurrentRequest(
                 payload=payloads.MotorCurrentPayload(
                     hold_current=UInt32Field(0),
-                    run_current=UInt32Field(current),
+                    run_current=UInt32Field(int(current * (2**16))),
                 )
             )
         )
@@ -51,7 +51,7 @@ async def set_hold_current(
             node_id=node,
             message=WriteMotorCurrentRequest(
                 payload=payloads.MotorCurrentPayload(
-                    hold_current=UInt32Field(current),
+                    hold_current=UInt32Field(int(current * (2**16))),
                     run_current=UInt32Field(0),
                 )
             )
