@@ -31,12 +31,12 @@ class TaskNameDataField(utils.BinaryFieldBase[bytes]):
 @dataclass
 class TaskInfoResponsePayload(utils.BinarySerializable):
     """Task info response payload."""
+
     name: TaskNameDataField
     runtime_counter: utils.UInt32Field
     stack_high_water_mark: utils.UInt32Field
     state: utils.UInt16Field
     priority: utils.UInt16Field
-
 
 
 @dataclass
