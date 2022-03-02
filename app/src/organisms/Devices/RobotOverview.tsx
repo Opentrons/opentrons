@@ -59,7 +59,11 @@ export function RobotOverview({
       padding={SPACING_2}
       width="100%"
     >
-      <img src={OT2_PNG} style={{ width: '6rem' }} />
+      <img
+        src={OT2_PNG}
+        style={{ width: '6rem' }}
+        id="RobotOverview_robotImage"
+      />
       <Box padding={SPACING_2} width="100%">
         <RobotStatusBanner name={robot.name} local={robot.local} />
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -75,7 +79,7 @@ export function RobotOverview({
                 onClick={toggleLights}
                 size={SIZE_2}
                 marginRight={SPACING_2}
-                data-testid={`RobotOverview_${robot.name}_lights_toggle`}
+                id={`RobotOverview_lightsToggle`}
               />
               <Text as="span">{t('lights')}</Text>
             </Flex>
@@ -83,7 +87,7 @@ export function RobotOverview({
           {/* this link will change once protocol selection designs are finalized and functionality built out */}
           <Link
             to={`/devices/${robot.name}/protocol-runs/run`}
-            data-testid={`RobotOverview_${robot.name}_protocol_run_link`}
+            id={`RobotOverview_runAProtocol`}
           >
             <NewPrimaryBtn
               textTransform={TEXT_TRANSFORM_NONE}
@@ -95,8 +99,11 @@ export function RobotOverview({
         </Flex>
       </Box>
       <Box alignSelf={ALIGN_START}>
-        {/* temp link to robot settings until overflow menu implemented */}
-        <Link to={`/devices/${robotName}/robot-settings/calibration`}>
+        {/* temp link to robot settings until overflow menu implemented. selector may change */}
+        <Link
+          to={`/devices/${robotName}/robot-settings/calibration`}
+          id="RobotOverview_overflowMenu"
+        >
           <Icon name="dots-vertical" color={C_MED_DARK_GRAY} size={SIZE_2} />
         </Link>
       </Box>
