@@ -88,7 +88,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
             {/* TODO(sh, 2022-02-22): Wire up input when end points are updated */}
             <InputField units={RPM} value={'1000'} readOnly />
             <Text fontSize={TYPOGRAPHY.fontSizeCaption}>
-              {'{min} - {max} RPM'}
+              {t('min_max_rpm', { min: '200', max: '1800' })}
             </Text>
           </Flex>
           <TertiaryButton

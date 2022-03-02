@@ -59,7 +59,7 @@ export const HeaterShakerModuleCard = (): JSX.Element | null => {
             currentTemp={0}
             targetSpeed={0}
             currentSpeed={0}
-            isModuleCard={false}
+            showTemperatureData={false}
           />
         </Flex>
       </Flex>

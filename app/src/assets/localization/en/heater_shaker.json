@@ -65,5 +65,6 @@
   "troubleshoot_step1_description": "Return to Step 1 to see instructions for securing the module to the deck.",
   "troubleshoot_step2_description": "Return to Step 2 to see instructions for securing the thermal adapter to the module.",
   "go_to_step_1": "Go to Step 1",
-  "go_to_step_2": "Go to Step 2"
+  "go_to_step_2": "Go to Step 2",
+  "min_max_rpm": "{{min}} - {{max}} RPM"
 }

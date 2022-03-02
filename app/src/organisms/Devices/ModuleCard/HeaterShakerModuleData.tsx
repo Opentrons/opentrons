@@ -23,7 +23,7 @@ interface HeaterShakerModuleDataProps {
   currentTemp: number
   targetSpeed: number
   currentSpeed: number
-  isModuleCard?: boolean
+  showTemperatureData?: boolean
 }
 
 export const HeaterShakerModuleData = (
@@ -37,7 +37,7 @@ export const HeaterShakerModuleData = (
     currentTemp,
     targetSpeed,
     currentSpeed,
-    isModuleCard,
+    showTemperatureData,
   } = props
   const { t } = useTranslation('device_details')
 
@@ -71,7 +71,7 @@ export const HeaterShakerModuleData = (
   return (
     <>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-        {isModuleCard && (
+        {showTemperatureData && (
           <Flex flexDirection={DIRECTION_COLUMN} marginRight={SPACING.spacing6}>
             <Text
               textTransform={TEXT_TRANSFORM_UPPERCASE}
