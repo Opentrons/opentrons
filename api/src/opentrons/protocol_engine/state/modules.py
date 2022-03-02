@@ -1,8 +1,9 @@
 """Basic modules data state and store."""
 from dataclasses import dataclass
-from typing import Dict, List, NamedTuple, Optional, Sequence, overload
+from typing import Dict, List, NamedTuple, Optional, Sequence, Type, TypeVar, overload
 from numpy import array, dot
 
+from opentrons.hardware_control.modules import AbstractModule
 from opentrons.hardware_control.modules.magdeck import (
     engage_height_is_in_range,
     OFFSET_TO_LABWARE_BOTTOM as MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM,
@@ -314,6 +315,55 @@ class ModuleView(HasState[ModuleState]):
             if transit in _THERMOCYCLER_SLOT_TRANSITS_TO_DODGE:
                 return True
         return False
+
+    _ModuleT = TypeVar("_ModuleT", bound=AbstractModule)
+
+    def find_loaded_hardware_module(
+        self,
+        module_id: str,
+        attached_modules: List[AbstractModule],
+        expected_type: Type[_ModuleT],
+    ) -> _ModuleT:
+        """Return the hardware module that corresponds to a Protocol Engine module ID.
+
+        Should not be called when the ``use_virtual_modules`` engine config is True,
+        since loaded modules will have no associated hardware modules.
+
+        Args:
+            module_id: The Protocol Engine ID of a loaded module to search for.
+            attached_modules: The list of currently attached hardware modules,
+                as returned by the hardware API.
+            expected_type: The Python type (class) that you expect the matching
+                hardware module to have.
+
+        Returns:
+            The element of ``attached_hardware_modules`` that corresponds to
+            the given ``module_id`.
+
+        Raises:
+            ModuleDoesNotExistError: If module_id has not been loaded.
+            ModuleNotAttachedError: If module_id has been loaded, but none of the
+                attached hardware modules match it.
+            WrongModuleTypeError: If a matching hardware module was found,
+                but it isn't an instance of ``expected_type``.
+        """
+        # May raise ModuleDoesNotExistError.
+        serial_number = self.get_serial_number(module_id=module_id)
+
+        for candidate in attached_modules:
+            if candidate.device_info["serial"] == serial_number:
+                if isinstance(candidate, expected_type):
+                    return candidate
+                else:
+                    raise errors.WrongModuleTypeError(
+                        f'Module with serial number "{serial_number}"'
+                        f' and Protocol Engine ID "{module_id}"'
+                        f' is type "{type(candidate)}", but expected "{expected_type}".'
+                    )
+        raise errors.ModuleNotAttachedError(
+            f'No module attached with serial number "{serial_number}'
+            f' for Protocol Engine module ID "{module_id}".'
+        )
 
     def select_hardware_module_to_load(
         self,

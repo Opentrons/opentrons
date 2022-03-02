@@ -234,24 +234,6 @@ class EquipmentHandler:
             definition=attached_module.definition,
         )
 
-    # To do: Move these 3 to ModuleView.
-    def _get_attached_module(self, serial_number: str) -> AbstractModule:
-        for attached_hardware_module in self._hardware_api.attached_modules:
-            if attached_hardware_module.device_info["serial"] == serial_number:
-                return attached_hardware_module
-        raise ModuleNotAttachedError(
-            f'No module attached with serial number "{serial_number}".'
-        )
-
-    def _get_attached_magnetic_module(self, serial_number: str) -> MagDeck:
-        attached_module = self._get_attached_module(serial_number=serial_number)
-        if not isinstance(attached_module, MagDeck):
-            raise WrongModuleTypeError(
-                f"Module {serial_number} is a {type(attached_module)},"
-                f" not a Magnetic Module."
-            )
-        return attached_module
-
     async def engage_magnets(
         self,
         magnetic_module_id: str,
@@ -270,10 +252,9 @@ class EquipmentHandler:
         )
 
         if not self._state_store.get_configs().use_virtual_modules:
-            serial_number = self._state_store.modules.get_serial_number(
-                module_id=magnetic_module_id
-            )
-            hardware_module = self._get_attached_magnetic_module(
-                serial_number=serial_number
+            hardware_module = self._state_store.modules.find_loaded_hardware_module(
+                module_id=magnetic_module_id,
+                attached_modules=self._hardware_api.attached_modules,
+                expected_type=MagDeck,
             )
             await hardware_module.engage(height=hardware_height)
