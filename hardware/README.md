@@ -50,7 +50,6 @@ Example: `opentrons_sim_can_bus --port 12345`
 
 The `opentrons-hardware` package includes some utility scripts.
 
-
 ### opentrons_can_comm
 
 This is a tool for sending messages to firmware (or simulator) over CAN bus. The CAN bus can either be a [python-can](https://python-can.readthedocs.io/en/master/interfaces.html) defined interface or `opentrons`.
