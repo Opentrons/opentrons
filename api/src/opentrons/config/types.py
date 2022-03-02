@@ -2,8 +2,7 @@ from enum import Enum
 from dataclasses import dataclass, asdict, fields
 from typing import Dict, Tuple, TypeVar, Generic, List, cast
 from typing_extensions import TypedDict, Literal
-from api.src.opentrons.hardware_control.types import OT3Axis
-from opentrons.hardware_control.types import OT3AxisKind, OT3CurrentSettings
+from opentrons.hardware_control.types import OT3AxisKind
 
 
 class AxisDict(TypedDict):
@@ -102,6 +101,7 @@ class OT3MotionSettings:
         return base
 
 
+@dataclass(frozen=True)
 class OT3CurrentSettings:
     standstill_current: PerPipetteAxisSettings
     motor_run_current: PerPipetteAxisSettings

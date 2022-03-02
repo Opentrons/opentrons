@@ -183,7 +183,7 @@ class OT3API(
         self._move_manager.update_constraints(
             get_system_constraints(self._config.motion_settings, gantry_load)
         )
-        self._backend.update_default_current_settings(gantry_load)
+        self._backend.update_to_default_current_settings(gantry_load)
 
     def _update_door_state(self, door_state: DoorState) -> None:
         mod_log.info(f"Updating the window switch status: {door_state}")

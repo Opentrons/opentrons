@@ -231,9 +231,12 @@ OT3AxisMap = Dict[OT3Axis, AxisMapValue]
 
 
 @dataclass
-class OT3CurrentSettings:
+class CurrentConfig:
     standstill_current: float
     motor_run_current: float
+
+    def as_tuple(self) -> Tuple[float, float]:
+        return (self.standstill_current, self.motor_run_current)
 
 
 class DoorState(enum.Enum):

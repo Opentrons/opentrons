@@ -3,7 +3,6 @@
 from __future__ import annotations
 import asyncio
 from contextlib import contextmanager
-from dataclasses import astuple
 import logging
 from typing import (
     Dict,
@@ -20,7 +19,12 @@ from typing import (
 from opentrons.config.types import OT3Config, GantryLoad
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.config import pipette_config
-from .ot3utils import axis_convert, create_move_group, axis_to_node, get_current_settings
+from .ot3utils import (
+    axis_convert,
+    create_move_group,
+    axis_to_node,
+    get_current_settings,
+)
 
 try:
     import aionotify  # type: ignore[import]
@@ -40,7 +44,7 @@ from opentrons_hardware.hardware_control.network import probe
 from opentrons_hardware.hardware_control.current_settings import (
     set_run_current,
     set_hold_current,
-    set_currents
+    set_currents,
 )
 from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
@@ -56,7 +60,7 @@ from opentrons.hardware_control.types import (
     AionotifyEvent,
     OT3Mount,
     OT3AxisMap,
-    OT3CurrentSettings
+    CurrentConfig,
 )
 
 if TYPE_CHECKING:
@@ -114,26 +118,26 @@ class OT3Controller:
                 "or door, likely because not running on linux"
             )
         self._present_nodes: Set[NodeId] = set()
-        self._current_settings: Optional[OT3CurrentSettings] = None
+        self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
 
     async def update_to_default_current_settings(self, gantry_load: GantryLoad):
         self._current_settings = get_current_settings(
-            self._configuration.current_settings, gantry_load)
-        await self.set_all_default_currents(
-            self._messenger, self._current_settings)
-    
+            self._configuration.current_settings, gantry_load
+        )
+        await self.set_default_currents()
+
     @property
-    def motor_run_currents(self) -> OT3Axis[float]:
+    def motor_run_currents(self) -> OT3AxisMap[float]:
         assert self._current_settings
-        run_currents: OT3Axis[float] = {}
+        run_currents: OT3AxisMap[float] = {}
         for axis, settings in self._current_settings.items():
             run_currents[axis] = settings.motor_run_current
         return run_currents
 
     @property
-    def standstill_currents(self) -> OT3Axis[float]:
+    def standstill_currents(self) -> OT3AxisMap[float]:
         assert self._current_settings
-        standstill_currents: OT3Axis[float] = {}
+        standstill_currents: OT3AxisMap[float] = {}
         for axis, settings in self._current_settings.items():
             standstill_currents[axis] = settings.standstill_current
         return standstill_currents
@@ -250,11 +254,12 @@ class OT3Controller:
             }
         }
 
-    async def set_all_default_currents(self):
-        """Set all currents from """
+    async def set_default_currents(self):
+        """Set both run and hold currents from robot config to each node."""
+        assert self._current_settings, "Invalid current settings"
         await set_currents(
             self._messenger,
-            {axis_to_node(k): astuple(v) for k, v in self._current_settings.items()}
+            {axis_to_node(k): v.as_tuple() for k, v in self._current_settings.items()},
         )
 
     async def set_active_current(self, axis_currents: OT3AxisMap[float]) -> None:
@@ -266,9 +271,9 @@ class OT3Controller:
         Returns:
             None
         """
+        assert self._current_settings, "Invalid current settings"
         await set_run_current(
-            self._messenger,
-            {axis_to_node(k): v for k, v in axis_currents.items()}
+            self._messenger, {axis_to_node(k): v for k, v in axis_currents.items()}
         )
         for axis, current in axis_currents.items():
             self._current_settings[axis].motor_run_current = current
@@ -282,9 +287,9 @@ class OT3Controller:
         Returns:
             None
         """
+        assert self._current_settings, "Invalid current settings"
         await set_hold_current(
-            self._messenger,
-            {axis_to_node(k): v for k, v in axis_currents.items()}
+            self._messenger, {axis_to_node(k): v for k, v in axis_currents.items()}
         )
         for axis, current in axis_currents.items():
             self._current_settings[axis].standstill_current = current

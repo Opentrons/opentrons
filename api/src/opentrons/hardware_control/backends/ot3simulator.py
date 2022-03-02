@@ -15,13 +15,14 @@ from typing import (
     Set,
 )
 
-from opentrons.config.types import OT3Config
+from opentrons.config.types import OT3Config, GantryLoad
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.config import pipette_config
 from opentrons_shared_data.pipette import dummy_model_for_name
 from .ot3utils import (
     axis_convert,
     create_move_group,
+    get_current_settings,
 )
 
 from opentrons_hardware.firmware_bindings.constants import NodeId
@@ -37,6 +38,7 @@ from opentrons.hardware_control.types import (
     OT3Axis,
     OT3Mount,
     OT3AxisMap,
+    CurrentConfig,
 )
 
 from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
@@ -134,6 +136,7 @@ class OT3Simulator:
         self._module_controls: Optional[AttachedModulesControl] = None
         self._position = self._get_home_position()
         self._present_nodes: Set[NodeId] = set()
+        self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
 
     @property
     def gpio_chardev(self) -> GPIODriverLike:
@@ -156,6 +159,11 @@ class OT3Simulator:
     def module_controls(self, module_controls: AttachedModulesControl) -> None:
         """Set the module controls"""
         self._module_controls = module_controls
+
+    def update_to_default_current_settings(self, gantry_load: GantryLoad) -> None:
+        self._current_settings = get_current_settings(
+            self._configuration.current_settings, gantry_load
+        )
 
     def is_homed(self, axes: Sequence[OT3Axis]) -> bool:
         return True
