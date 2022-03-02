@@ -27,6 +27,7 @@ export const ModuleIcon = (props: ModuleIconProps): JSX.Element => {
       size={SIZE_1}
       marginRight={SPACING_1}
       color={C_HARBOR_GRAY}
+      id={`ModuleIcon_${moduleType}`}
     />
   )
 }

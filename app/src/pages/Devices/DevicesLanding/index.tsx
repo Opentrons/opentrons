@@ -48,7 +48,11 @@ export function DevicesLanding(): JSX.Element {
   return (
     <Box minWidth={SIZE_6} padding={`${SPACING_2} ${SPACING_3}`}>
       <Flex>
-        <Text as="h3" fontWeight={FONT_WEIGHT_SEMIBOLD}>
+        <Text
+          as="h3"
+          fontWeight={FONT_WEIGHT_SEMIBOLD}
+          id="DevicesLanding_title"
+        >
           {t('devices')}
         </Text>
       </Flex>

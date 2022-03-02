@@ -17,10 +17,11 @@ export interface ToggleBtnProps extends StyleProps {
   toggledOn: boolean
   disabled?: boolean | null
   onClick?: (e: React.MouseEvent) => unknown
+  id?: string
 }
 
 export function ToggleBtn(props: ToggleBtnProps): JSX.Element {
-  const { label, toggledOn, disabled, ...buttonProps } = props
+  const { label, toggledOn, disabled, id, ...buttonProps } = props
   const iconName = toggledOn ? 'ot-toggle-switch-on' : 'ot-toggle-switch-off'
   let color = C_DARK_GRAY
 
@@ -32,12 +33,12 @@ export function ToggleBtn(props: ToggleBtnProps): JSX.Element {
 
   return (
     <Btn
-      // @ts-expect-error TODO: cast disabled to Boolean as Btn expects it
-      disabled={disabled}
+      disabled={disabled ?? false}
       role="switch"
       aria-label={label}
       aria-checked={toggledOn}
       color={color}
+      id={id}
       {...buttonProps}
     >
       <Icon name={iconName} />
