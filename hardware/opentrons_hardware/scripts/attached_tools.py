@@ -46,8 +46,9 @@ async def run(args: argparse.Namespace) -> None:
     messenger.start()
 
     tool_dict = {
-        Carrier.LEFT: ToolType(0),
-        Carrier.RIGHT: ToolType(0),
+        Carrier.Z_CARRIER: ToolType(0),
+        Carrier.A_CARRIER: ToolType(0),
+        Carrier.GRIPPER_CARRIER: ToolType(0),
     }
     detector = ToolDetector(messenger, tool_dict)
 
@@ -55,7 +56,6 @@ async def run(args: argparse.Namespace) -> None:
     await detector.run(
         retry_count=args.retry_count,
         ready_wait_time_sec=args.timeout_seconds,
-        driver=None,
     )
 
     await messenger.stop()
@@ -81,7 +81,6 @@ def main() -> None:
     )
 
     args = parser.parse_args()
-    args.driver = None
 
     asyncio.run(run(args))
 

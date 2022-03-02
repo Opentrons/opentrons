@@ -40,7 +40,7 @@ class CanMessenger:
         Args:
             driver: The can bus driver to use.
         """
-        self._drive = driver
+        self._driver = driver
         self._listeners: List[MessageListenerCallback] = []
         self._task: Optional[asyncio.Task[None]] = None
 
@@ -60,7 +60,7 @@ class CanMessenger:
             f"Sending -->\n\tarbitration_id: {arbitration_id},\n\t"
             f"payload: {message.payload}"
         )
-        await self._drive.send(
+        await self._driver.send(
             message=CanMessage(arbitration_id=arbitration_id, data=data)
         )
 
@@ -99,7 +99,7 @@ class CanMessenger:
 
     async def _read_task(self) -> None:
         """Read task."""
-        async for message in self._drive:
+        async for message in self._driver:
             message_definition = get_definition(
                 MessageId(message.arbitration_id.parts.message_id)
             )
