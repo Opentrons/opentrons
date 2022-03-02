@@ -37,9 +37,6 @@ jobs:
     name: 'opentrons package linting'
     timeout-minutes: 10
     runs-on: 'ubuntu-18.04'
-    strategy:
-      matrix:
-        with-ot-hardware: ['true', 'false']
     steps:
       - uses: 'actions/checkout@v2'
       - uses: 'actions/setup-node@v1'
@@ -52,13 +49,7 @@ jobs:
       - uses: './.github/actions/python/setup'
         with:
           project: 'api'
-      - if: ${{ matrix.with-ot-hardware == 'false' }}
-        name: Lint without opentrons_hardware
-        run: |
-          make -C api setup-ot2
-          make -C api lint
-      - if: ${{ matrix.with-ot-hardware == 'true' }}
-        name: Lint with opentrons_hardware
+      - name: Lint with opentrons_hardware
         run: make -C api lint
   test:
     name: 'opentrons package tests on ${{ matrix.os }}, python ${{ matrix.python }}'
