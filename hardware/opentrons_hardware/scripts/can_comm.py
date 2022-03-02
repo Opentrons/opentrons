@@ -42,6 +42,7 @@ class InvalidInput(Exception):
 
 async def listen_task(can_driver: AbstractCanDriver) -> None:
     """A task that listens for can messages.
+
     Args:
         can_driver: Driver
     Returns: Nothing.
