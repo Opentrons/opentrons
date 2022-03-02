@@ -10,30 +10,27 @@ import { uuid } from '../../utils'
 export const PD_VERSION = '6.0.0'
 export const SCHEMA_VERSION = 6
 
-const migrateRobot = (appData: any): any => {
-  return mapValues(appData, robot => {
-    return {
-      ...robot,
-      deckId: 'ot2_standard',
-    }
-  })
-}
-
-const migratePipettes = (appData: Record<string, any>): Record<string, any> => {
+export const migratePipettes = (
+  appData: Record<string, any>
+): Record<string, any> => {
   return mapValues(appData, pipettes => {
     const removeMount = omit(pipettes, 'mount')
     return removeMount
   })
 }
 
-const migrateLabware = (appData: Record<string, any>): Record<string, any> => {
+export const migrateLabware = (
+  appData: Record<string, any>
+): Record<string, any> => {
   return mapValues(appData, labware => {
     const removeSlot = omit(labware, 'slot')
     return removeSlot
   })
 }
 
-const migrateModules = (appData: Record<string, any>): Record<string, any> => {
+export const migrateModules = (
+  appData: Record<string, any>
+): Record<string, any> => {
   return mapValues(appData, modules => {
     const removeSlot = omit(modules, 'slot')
     return removeSlot
@@ -61,7 +58,7 @@ export const migrateFile = (appData: any): any => {
       commandType: 'loadModule',
       params: {
         moduleId: moduleId,
-        loaction: { slotName: module.slot },
+        location: { slotName: module.slot },
       },
     }
     return loadModuleCommand
@@ -73,7 +70,7 @@ export const migrateFile = (appData: any): any => {
       id: uuid(),
       commandType: 'loadLabware',
       params: {
-        labwawreId: labwareId,
+        labwareId: labwareId,
         location: { slotName: labware.slot },
       },
     }
@@ -100,14 +97,17 @@ export const migrateFile = (appData: any): any => {
     schemaVersion: SCHEMA_VERSION,
     $otSharedSchema: '#/protocol/schemas/6',
     metadata: appData.metadata,
-    robot: migrateRobot(appData.robot),
+    robot: {
+      model: 'OT-2 Standard',
+      deckId: 'ot2_standard',
+    },
     pipettes: migratePipettes(appData.pipettes),
     labware: migrateLabware(appData.labware),
     labwareDefinitions: appData.labwareDefinitions,
     modules: migrateModules(appData.modules),
     commands: [
-      ...loadModuleCommands,
       ...loadPipetteCommands,
+      ...loadModuleCommands,
       ...loadLabwareCommands,
       ...migrateV5Commands,
     ],
