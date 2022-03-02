@@ -234,7 +234,7 @@ class EquipmentHandler:
             definition=attached_module.definition,
         )
 
-    # To do: Move these to ModuleView?
+    # To do: Move these 3 to ModuleView.
     def _get_attached_module(self, serial_number: str) -> AbstractModule:
         for attached_hardware_module in self._hardware_api.attached_modules:
             if attached_hardware_module.device_info["serial"] == serial_number:
@@ -257,6 +257,7 @@ class EquipmentHandler:
         magnetic_module_id: str,
         mm_above_labware_base: float,
     ) -> None:
+        """Engage a loaded Magnetic Module's magnets."""
         serial_number_to_match = self._state_store.modules.get_serial_number(
             module_id=magnetic_module_id
         )
@@ -271,8 +272,6 @@ class EquipmentHandler:
         )
 
         await hardware_module.engage(height=hardware_height)
-
-        # To do: verify that the engage height is within range
 
         # To do: How to do virtualized modules?
         # Maybe this method assumes you're working with a real module,

@@ -1,6 +1,5 @@
 """Test magnetic module engage commands."""
 
-import pytest
 from decoy import Decoy
 
 from opentrons.protocol_engine.execution import EquipmentHandler
@@ -17,7 +16,7 @@ async def test_magnetic_module_engage_implementation(
     decoy: Decoy,
     equipment: EquipmentHandler,
 ) -> None:
-    """It should engage the magnets."""
+    """It should delegate to the equipment handler."""
     subject = EngageImplementation(equipment=equipment)
     params = EngageParams(
         moduleId="module-id",

@@ -4,7 +4,9 @@ from typing import Dict, List, NamedTuple, Optional, Sequence, overload
 from numpy import array, dot
 
 from opentrons.hardware_control.modules.magdeck import (
+    engage_height_is_in_range,
     OFFSET_TO_LABWARE_BOTTOM as MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM,
+    MAX_ENGAGE_HEIGHT as MAGNETIC_MODULE_MAX_ENGAGE_HEIGHT,
 )
 from opentrons.types import DeckSlotName
 
@@ -365,6 +367,22 @@ class ModuleView(HasState[ModuleState]):
     def calculate_magnet_hardware_height(
         magnetic_module_model: ModuleModel, mm_above_labware_base: float
     ) -> float:
+        """Convert a human-friendly magnet height to be hardware-friendly.
+
+        Args:
+            magnetic_module_model: The model of Magnetic Module to calculate
+                a height for.
+            mm_above_labware_base: The height to convert. Measured in how far the tops
+                of the magnets are above the labware base plane.
+
+        Returns:
+            The same height, with its units and origin point converted
+            so that it's suitable to pass to `MagDeck.engage()`.
+
+        Raises:
+            RuntimeError: If modules of the given model are physically incapable
+                of reaching the requested height.
+        """
         hardware_units_above_base = (
             mm_above_labware_base * 2
             if magnetic_module_model == ModuleModel.MAGNETIC_MODULE_V1
@@ -374,4 +392,18 @@ class ModuleView(HasState[ModuleState]):
             magnetic_module_model
         ]
         hardware_units_above_home = home_to_base_offset + hardware_units_above_base
+        if not engage_height_is_in_range(
+            model=magnetic_module_model,
+            height=hardware_units_above_home
+        ):
+            # To do: Raise a more specific error.
+            # TODO(mm, 2022-03-02): This error message probably will not match how
+            # the user specified the height. (Hardware units versus mm,
+            # home as origin versus labware base as origin.) This may be confusing
+            # depending on how it propagates up.
+            raise RuntimeError(
+                f"Invalid engage height for"
+                f" {magnetic_module_model}: {hardware_units_above_home}. Must be"
+                f" 0 - {MAGNETIC_MODULE_MAX_ENGAGE_HEIGHT[magnetic_module_model]}."
+            )
         return hardware_units_above_home
