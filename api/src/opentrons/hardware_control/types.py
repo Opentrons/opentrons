@@ -223,17 +223,17 @@ class OT3Axis(enum.Enum):
         }[inst]
 
     @classmethod
-    def home_position(cls) -> Dict["OT3Axis", int]:
+    def home_position(cls) -> Dict["OT3Axis", float]:
         return {
-            OT3Axis.P_L: 0,
-            OT3Axis.P_R: 0,
-            OT3Axis.X: 0,
-            OT3Axis.Y: 0,
-            OT3Axis.Z_L: 0,
-            OT3Axis.Z_R: 0,
-            OT3Axis.Z_G: 0,
-            OT3Axis.Q: 0,
-            OT3Axis.G: 0,
+            OT3Axis.P_L: 0.0,
+            OT3Axis.P_R: 0.0,
+            OT3Axis.X: 0.0,
+            OT3Axis.Y: 0.0,
+            OT3Axis.Z_L: 0.0,
+            OT3Axis.Z_R: 0.0,
+            OT3Axis.Z_G: 0.0,
+            OT3Axis.Q: 0.0,
+            OT3Axis.G: 0.0,
         }
 
     def __str__(self) -> str:

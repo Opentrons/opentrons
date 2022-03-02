@@ -19,7 +19,7 @@ from typing import (
 from opentrons.config.types import OT3Config
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.config import pipette_config
-from .ot3utils import axis_convert, create_move_group
+from .ot3utils import axis_convert, create_move_group, create_home_group, axis_to_node
 
 try:
     import aionotify  # type: ignore[import]
@@ -172,16 +172,33 @@ class OT3Controller:
         await runner.run(can_messenger=self._messenger)
         self._position.update(final_positions)
 
-    async def home(self, axes: Optional[List[OT3Axis]] = None) -> OT3AxisMap[float]:
-        """Home axes.
+    async def home(self, axes: List[OT3Axis]) -> Dict[OT3Axis, float]:
+        """Move to a position.
 
         Args:
-            axes: Optional list of axes.
+            target_position: Map of axis to position.
+            home_flagged_axes: Whether to home afterwords.
+            speed: Optional speed
+            axis_max_speeds: Optional map of axis to speed.
 
         Returns:
-            Homed position.
+            None
         """
-        return axis_convert(self._position, 0.0)
+        distances = {
+            ax: self.axis_bounds[ax][1] - self.axis_bounds[ax][0] for ax in axes
+        }
+        speed_settings = (
+            self._configuration.motion_settings.max_speed_discontinuity.none
+        )
+        velocities = {ax: speed_settings[ax.to_kind()] for ax in axes}
+        group = create_home_group(distances, velocities)
+        runner = MoveGroupRunner(move_groups=[group])
+        await runner.run(can_messenger=self._messenger)
+        for ax in axes:
+            self._position[axis_to_node(ax)] = 0
+        axis_positions = {ax: 0.0 for ax in axes}
+
+        return axis_positions
 
     async def fast_home(
         self, axes: Sequence[OT3Axis], margin: float

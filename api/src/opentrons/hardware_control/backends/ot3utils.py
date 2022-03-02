@@ -19,6 +19,7 @@ from opentrons_hardware.hardware_control.motion_planning.move_utils import (
 from opentrons_hardware.hardware_control.motion import (
     create_step,
     NodeIdMotionValues,
+    create_home_step,
     MoveGroup,
     MoveStopCondition,
 )
@@ -139,6 +140,20 @@ def create_move_group(
                 pos[ax] += node_id_distances.get(ax, 0)
             move_group.append(step)
     return move_group, {k: float(v) for k, v in pos.items()}
+
+
+def create_home_group(
+    distance: Dict[OT3Axis, float], velocity: Dict[OT3Axis, float]
+) -> MoveGroup:
+    move_group: MoveGroup = []
+    node_id_distances = _convert_to_node_id_dict(distance)
+    node_id_velocities = _convert_to_node_id_dict(velocity)
+    step = create_home_step(
+        distance=node_id_distances,
+        velocity=node_id_velocities,
+    )
+    move_group.append(step)
+    return move_group
 
 
 AxisMapPayload = TypeVar("AxisMapPayload")

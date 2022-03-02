@@ -41,6 +41,7 @@ def get_unit_vector(
     target_vectorized = vectorize({k: np.float64(v) for k, v in target.items()})
     displacement: np.ndarray = target_vectorized - initial_vectorized
     distance = np.linalg.norm(displacement)
+    # breakpoint()
     if not distance or np.array_equal(initial_vectorized, target_vectorized):
         raise ZeroLengthMoveError(initial, target)
     unit_vector_ndarray = displacement / distance
@@ -52,6 +53,7 @@ def targets_to_moves(
     initial: Coordinates[AxisKey, CoordinateValue], targets: List[MoveTarget[AxisKey]]
 ) -> Iterator[Move[AxisKey]]:
     """Transform a list of MoveTargets into a list of Moves."""
+    # breakpoint()
     all_axes: Set[AxisKey] = set()
     for target in targets:
         all_axes.update(set(target.position.keys()))

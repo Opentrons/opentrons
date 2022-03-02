@@ -101,3 +101,20 @@ def create_step(
             move_type=MoveType.get_move_type(stop_condition),
         )
     return step
+
+
+def create_home_step(
+    distance: Dict[NodeId, np.float64], velocity: Dict[NodeId, np.float64]
+) -> MoveGroupStep:
+    """Creates a step for each axis to be homed."""
+    step: MoveGroupStep = {}
+    for axis in distance.keys():
+        step[axis] = MoveGroupSingleAxisStep(
+            distance_mm=distance[axis],
+            acceleration_mm_sec_sq=0,
+            velocity_mm_sec=velocity[axis],
+            duration_sec=distance[axis] / velocity[axis],
+            stop_condition=MoveStopCondition.limit_switch,
+            move_type=MoveType.home,
+        )
+    return step

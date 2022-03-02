@@ -80,7 +80,6 @@ from opentrons_shared_data.pipette.dev_types import (
 )
 
 from .dev_types import PipetteDict
-from opentrons_hardware.hardware_control.motion import MoveStopCondition
 
 
 mod_log = logging.getLogger(__name__)
@@ -734,69 +733,28 @@ class OT3API(
         self, axes: Optional[Union[List[Axis], List[OT3Axis]]] = None
     ) -> None:
         """Worker function to apply robot motion."""
+        # breakpoint()
         self._reset_last_mount()
         if axes:
             checked_axes = [OT3Axis.from_axis(ax) for ax in axes]
         else:
             checked_axes = [ax for ax in OT3Axis]
-        home_positions = OT3Axis.home_position()
-        target_position = {ax: home_positions[ax] for ax in checked_axes}
-        target_position_mount = {
-            ax: target_position[ax]
-            for ax in target_position.keys()
-            if ax in OT3Axis.mount_axes()
-        }
-        target_position_gantry = {
-            ax: target_position[ax]
-            for ax in target_position.keys()
-            if ax in OT3Axis.gantry_axes()
-        }
-        target_position_plunger = {
-            ax: target_position[ax]
-            for ax in target_position.keys()
-            if ax in OT3Axis.pipette_axes()
-        }
-
-        # TODO: (2022-02-10) Use actual max speed for MoveTarget
-        checked_speed = 500
-        self._move_manager.update_constraints(
-            get_system_constraints(self._config.motion_settings, self._gantry_load)
-        )
-        move_target_mount = MoveTarget.build(
-            position=target_position_mount, max_speed=checked_speed
-        )
-        move_target_gantry = MoveTarget.build(
-            position=target_position_gantry, max_speed=checked_speed
-        )
-        move_target_plunger = MoveTarget.build(
-            position=target_position_plunger, max_speed=checked_speed
-        )
-
-        origin = self._backend.single_boundary(1)
-        try:
-            blended, moves = self._move_manager.plan_motion(
-                origin=origin,
-                target_list=[
-                    move_target_mount,
-                    move_target_gantry,
-                    move_target_plunger,
-                ],
-            )
-        except ZeroLengthMoveError as zero_length_error:
-            self._log.info(f"{str(zero_length_error)}, ignoring")
-            return
-
-        async with self._motion_lock:
-            try:
-                await self._backend.move(
-                    origin, moves[0], MoveStopCondition.limit_switch
-                )
-            except Exception:
-                self._log.exception("Move failed")
-                self._current_position.clear()
-                raise
-            else:
-                self._current_position.update(target_position)
+        for ax in checked_axes:
+            async with self._motion_lock:
+                try:
+                    target_position = await self._backend.home([ax])
+                except Exception:
+                    self._log.exception("Homing failed")
+                    self._current_position.clear()
+                    raise
+                else:
+                    position = deck_from_machine(
+                        target_position,
+                        self._transforms.deck_calibration.attitude,
+                        self._transforms.carriage_offset,
+                        OT3Axis,
+                    )
+                    self._current_position.update(position)
 
     def get_engaged_axes(self) -> Dict[Axis, bool]:
         """Which axes are engaged and holding."""
