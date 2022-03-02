@@ -24,7 +24,7 @@ import { DevicesLanding } from '../pages/Devices/DevicesLanding'
 import { RobotSettings } from '../pages/Devices/RobotSettings'
 import { usePathCrumbs } from './hooks'
 import { ProtocolsLanding } from '../pages/Protocols/ProtocolsLanding'
-import { AppSettingsHeader } from '../organisms/AppSettings/AppSettingsHeader'
+import { AppSettings } from '../organisms/AppSettings'
 import { TopPortalRoot } from './portal'
 
 export interface RouteProps {
@@ -196,7 +196,7 @@ export const nextGenRoutes: RouteProps[] = [
     path: '/devices/:robotName/protocol-runs/:runId/:runDetailsTab',
   },
   {
-    component: AppSettingsHeader,
+    component: AppSettings,
     exact: true,
     name: 'App Settings',
     path: '/app-settings/:appSettingsTab?',

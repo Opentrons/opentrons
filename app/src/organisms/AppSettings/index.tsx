@@ -22,7 +22,7 @@ import { NavTab } from '../../atoms/NavTab'
 import { Line } from '../../atoms/structure'
 import type { NextGenRouteParams, AppSettingsTab } from '../../App/NextGenApp'
 
-export function AppSettingsHeader(): JSX.Element {
+export function AppSettings(): JSX.Element {
   const { t } = useTranslation('app_settings')
   const devToolsOn = useSelector(Config.getDevtoolsEnabled)
   const { appSettingsTab } = useParams<NextGenRouteParams>()
@@ -30,10 +30,10 @@ export function AppSettingsHeader(): JSX.Element {
   const appSettingsContentByTab: {
     [K in AppSettingsTab]: () => JSX.Element
   } = {
-    general: () => <GeneralSettings />,
-    privacy: () => <PrivacySettings />,
-    advanced: () => <AdvancedSettings />,
-    featureFlags: () => <FeatureFlags />,
+    general: GeneralSettings,
+    privacy: PrivacySettings,
+    advanced: AdvancedSettings,
+    featureFlags: FeatureFlags,
   }
 
   const AppSettingsContent =
