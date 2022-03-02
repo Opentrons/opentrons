@@ -194,7 +194,7 @@ export const MagneticModuleSlideout = (
           data-testid={`Mag_Slideout_set_height_btn_${module.model}`}
         >
           <Text fontWeight={FONT_WEIGHT_REGULAR} fontSize="0.6875rem">
-            {t('set_engage_height_slideout_btn')}
+            {t('set_engage_height')}
           </Text>
         </PrimaryBtn>
       </React.Fragment>

@@ -55,5 +55,16 @@
   "heater_shaker_key_parts": "Key Heater Shaker parts and terminology",
   "heater_shaker_orient_module": "Orient the module so its power ports face <bold>away</bold> from you.",
   "heater_shaker_latch_description": "<block>The <strong>Labware Latch</strong> keeps labware secure while the module is shaking.</block> <block>It can be opened or closed manually and with software but is closed and locked while the module is shaking.</block>",
-  "heater_shaker_anchor_description": "<block>The 2 <strong>Anchors</strong> keep the module attached to the deck while it is shaking.</block> <block>The screw above each anchor is used to extend and retract them. See animation below.</block> <block>Extending the bolts slightly increases the module’s footprint, which allows it to be more firmly attached to the edges of a slot.</block>"
+  "heater_shaker_anchor_description": "<block>The 2 <strong>Anchors</strong> keep the module attached to the deck while it is shaking.</block> <block>The screw above each anchor is used to extend and retract them. See animation below.</block> <block>Extending the bolts slightly increases the module’s footprint, which allows it to be more firmly attached to the edges of a slot.</block>",
+  "step_4_of_4": "Step 4 of 4: Test shake",
+  "test_shake_banner_information": "If you want to add labware to the module before doing a test shake, you can use the labware latch controls to hold the latches open.",
+  "open_labware_latch": "Open Labware Latch",
+  "set_shake_speed": "Set shake speed",
+  "start_shaking": "Start Shaking",
+  "troubleshooting": "Troubleshooting",
+  "troubleshoot_step1_description": "Return to Step 1 to see instructions for securing the module to the deck.",
+  "troubleshoot_step2_description": "Return to Step 2 to see instructions for securing the thermal adapter to the module.",
+  "go_to_step_1": "Go to Step 1",
+  "go_to_step_2": "Go to Step 2",
+  "min_max_rpm": "{{min}} - {{max}} RPM"
 }
