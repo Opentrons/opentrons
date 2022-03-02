@@ -383,6 +383,14 @@ class ModuleView(HasState[ModuleState]):
             RuntimeError: If modules of the given model are physically incapable
                 of reaching the requested height.
         """
+        if magnetic_module_model not in [
+            ModuleModel.MAGNETIC_MODULE_V1,
+            ModuleModel.MAGNETIC_MODULE_V2,
+        ]:
+            raise errors.WrongModuleTypeError(
+                f"{magnetic_module_model} is not a Magnetic Module."
+            )
+
         hardware_units_above_base = (
             mm_above_labware_base * 2
             if magnetic_module_model == ModuleModel.MAGNETIC_MODULE_V1
@@ -393,15 +401,13 @@ class ModuleView(HasState[ModuleState]):
         ]
         hardware_units_above_home = home_to_base_offset + hardware_units_above_base
         if not engage_height_is_in_range(
-            model=magnetic_module_model,
-            height=hardware_units_above_home
+            model=magnetic_module_model, height=hardware_units_above_home
         ):
-            # To do: Raise a more specific error.
             # TODO(mm, 2022-03-02): This error message probably will not match how
             # the user specified the height. (Hardware units versus mm,
             # home as origin versus labware base as origin.) This may be confusing
             # depending on how it propagates up.
-            raise RuntimeError(
+            raise errors.EngageHeightOutOfRangeError(
                 f"Invalid engage height for"
                 f" {magnetic_module_model}: {hardware_units_above_home}. Must be"
                 f" 0 - {MAGNETIC_MODULE_MAX_ENGAGE_HEIGHT[magnetic_module_model]}."

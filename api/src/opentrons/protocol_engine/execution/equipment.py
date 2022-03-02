@@ -258,24 +258,22 @@ class EquipmentHandler:
         mm_above_labware_base: float,
     ) -> None:
         """Engage a loaded Magnetic Module's magnets."""
-        serial_number_to_match = self._state_store.modules.get_serial_number(
-            module_id=magnetic_module_id
-        )
-        hardware_module = self._get_attached_magnetic_module(
-            serial_number=serial_number_to_match
-        )
-        model = ModuleModel(hardware_module.model())
+        # Will raise if the given module ID hasn't been loaded.
+        model = self._state_store.modules.get_model(module_id=magnetic_module_id)
 
+        # Will raise if either:
+        #   * The given module ID points to a module that's not a Magnetic Module.
+        #   * The given height is invalid.
         hardware_height = self._state_store.modules.calculate_magnet_hardware_height(
             magnetic_module_model=model,
             mm_above_labware_base=mm_above_labware_base,
         )
 
-        await hardware_module.engage(height=hardware_height)
-
-        # To do: How to do virtualized modules?
-        # Maybe this method assumes you're working with a real module,
-        # and if you want instead to work with a virtualized module, you just don't
-        # call it?
-        # Remember we need to verify that the engage height is within range,
-        # with virtualized modules
+        if not self._state_store.get_configs().use_virtual_modules:
+            serial_number = self._state_store.modules.get_serial_number(
+                module_id=magnetic_module_id
+            )
+            hardware_module = self._get_attached_magnetic_module(
+                serial_number=serial_number
+            )
+            await hardware_module.engage(height=hardware_height)
