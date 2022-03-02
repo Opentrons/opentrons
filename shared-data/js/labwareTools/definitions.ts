@@ -2,15 +2,7 @@ import groupBy from 'lodash/groupBy'
 import uniq from 'lodash/uniq'
 import { LABWAREV2_DO_NOT_LIST } from '../getLabware'
 import type { LabwareDefinition2 } from '../types'
-
-// require all definitions in the labware/definitions/2 directory
-// require.context is webpack-specific method
-const definitionsContext = require.context(
-  '@opentrons/shared-data/labware/definitions/2',
-  true, // traverse subdirectories
-  /\.json$/, // import filter
-  'sync' // load every definition into one synchronous chunk
-)
+import { getAllDefs } from './getAllDefs'
 
 const getOnlyLatestDefs = (
   labwareList: LabwareDefinition2[]
@@ -32,15 +24,11 @@ const getOnlyLatestDefs = (
   })
 }
 
-function _getAllDefs(): LabwareDefinition2[] {
-  return definitionsContext.keys().map(name => definitionsContext(name))
-}
-
 let allLoadNames: string[] | null = null
 // ALL unique load names, not just the allowed ones
 export function getAllLoadNames(): string[] {
   if (!allLoadNames) {
-    allLoadNames = uniq(_getAllDefs().map(def => def.parameters.loadName))
+    allLoadNames = uniq(getAllDefs().map(def => def.parameters.loadName))
   }
   return allLoadNames
 }
@@ -49,7 +37,7 @@ let allDisplayNames: string[] | null = null
 // ALL unique display names, not just the allowed ones
 export function getAllDisplayNames(): string[] {
   if (!allDisplayNames) {
-    allDisplayNames = uniq(_getAllDefs().map(def => def.metadata.displayName))
+    allDisplayNames = uniq(getAllDefs().map(def => def.metadata.displayName))
   }
   return allDisplayNames
 }
@@ -58,7 +46,7 @@ let definitions: LabwareDefinition2[] | null = null
 
 export function getAllDefinitions(): LabwareDefinition2[] {
   if (!definitions) {
-    const allDefs = _getAllDefs().filter(
+    const allDefs = getAllDefs().filter(
       (d: LabwareDefinition2) =>
         // eslint-disable-next-line @typescript-eslint/prefer-includes
         LABWAREV2_DO_NOT_LIST.indexOf(d.parameters.loadName) === -1

@@ -7,6 +7,7 @@ import {
   Text,
   Flex,
   Icon,
+  Link,
   LabwareRender,
   RobotWorkSpace,
   SPACING,
@@ -26,9 +27,7 @@ export interface LabwareCardProps {
 
 export function LabwareCard(props: LabwareCardProps): JSX.Element {
   const { t } = useTranslation('labware_landing')
-  const { labware } = props
-  const { definition, modified } = labware
-
+  const { definition, modified } = props.labware
   const apiName = definition.parameters.loadName
   const displayName = definition?.metadata.displayName
   const displayCategory = startCase(definition.metadata.displayCategory)
@@ -85,12 +84,13 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
               >
                 {t('api_name')}
               </Text>
-              <Text
+              <Link
                 css={TYPOGRAPHY.pRegular}
                 onClick={() => navigator.clipboard.writeText(apiName)}
+                role="button"
               >
-                {apiName} <Icon height=".7rem" name="ot-copy-text"></Icon>
-              </Text>
+                {apiName} <Icon height=".7rem" name="ot-copy-text" />
+              </Link>
             </Box>
           </Flex>
         </Flex>

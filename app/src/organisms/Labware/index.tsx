@@ -28,7 +28,10 @@ export function Labware(): JSX.Element {
       </Text>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
         {labware.map(labware => (
-          <LabwareCard key={labware.definition.version} labware={labware} />
+          <LabwareCard
+            key={labware.definition.metadata.displayName}
+            labware={labware}
+          />
         ))}
       </Flex>
     </Box>
