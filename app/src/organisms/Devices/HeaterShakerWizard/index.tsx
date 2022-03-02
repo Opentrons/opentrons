@@ -4,6 +4,7 @@ import { Portal } from '../../../App/portal'
 import { useSelector } from 'react-redux'
 import { getConnectedRobotName } from '../../../redux/robot/selectors'
 import { Interstitial } from '../../../atoms/Interstitial/Interstitial'
+import { getAttachedModules } from '../../../redux/modules'
 import { Introduction } from './Introduction'
 import { KeyParts } from './KeyParts'
 import { AttachModule } from './AttachModule'
@@ -21,6 +22,8 @@ import {
   SPACING,
   TEXT_TRANSFORM_NONE,
   JUSTIFY_FLEX_END,
+  Tooltip,
+  useHoverTooltip,
 } from '@opentrons/components'
 
 import type { State } from '../../../redux/types'
@@ -31,11 +34,26 @@ interface HeaterShakerWizardProps {
 
 export const HeaterShakerWizard = (
   props: HeaterShakerWizardProps
-): JSX.Element => {
+): JSX.Element | null => {
   const { onCloseClick } = props
   const { t } = useTranslation(['heater_shaker', 'shared'])
   const [currentPage, setCurrentPage] = React.useState(0)
   const robotName = useSelector((state: State) => getConnectedRobotName(state))
+  const attachedModules = useSelector((state: State) =>
+    getAttachedModules(state, robotName === null ? null : robotName)
+  )
+  const [targetProps, tooltipProps] = useHoverTooltip()
+
+  const heaterShaker = attachedModules.find(
+    //  TODO(jr, 2022-02-18): get heaterShaker module when model exists
+    module => module.model === 'magneticModuleV2'
+  )
+  let isPrimaryCTAEnabled: boolean = true
+
+  if (currentPage === 4) {
+    isPrimaryCTAEnabled = Boolean(heaterShaker)
+  }
+
   let buttonContent = null
   const getWizardDisplayPage = (): JSX.Element | null => {
     switch (currentPage) {
@@ -58,7 +76,7 @@ export const HeaterShakerWizard = (
         return <AttachAdapter />
       case 4:
         buttonContent = t('btn_test_shake')
-        return <PowerOn status={'on'} />
+        return <PowerOn attachedModule={heaterShaker ?? null} />
       case 5:
         buttonContent = t('complete')
         return <TestShake />
@@ -101,6 +119,8 @@ export const HeaterShakerWizard = (
           {currentPage <= 5 ? (
             <PrimaryBtn
               alignItems={ALIGN_CENTER}
+              disabled={!isPrimaryCTAEnabled}
+              {...targetProps}
               backgroundColor={COLORS.blue}
               borderRadius={SPACING.spacingS}
               textTransform={TEXT_TRANSFORM_NONE}
@@ -112,6 +132,11 @@ export const HeaterShakerWizard = (
               }
             >
               {buttonContent}
+              {!isPrimaryCTAEnabled ? (
+                <Tooltip {...tooltipProps}>
+                  {t('module_is_not_connected')}
+                </Tooltip>
+              ) : null}
             </PrimaryBtn>
           ) : null}
         </Flex>
