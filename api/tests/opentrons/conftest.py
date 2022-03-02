@@ -35,6 +35,7 @@ from opentrons_shared_data.module.dev_types import ModuleDefinitionV2
 
 Protocol = namedtuple("Protocol", ["text", "filename", "filelike"])
 
+
 @pytest.fixture(autouse=True)
 def asyncio_loop_exception_handler(loop):
     def exception_handler(loop, context):

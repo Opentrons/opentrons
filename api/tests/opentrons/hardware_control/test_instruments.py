@@ -16,6 +16,7 @@ LEFT_PIPETTE_PREFIX = "p10_single"
 LEFT_PIPETTE_MODEL = "{}_v1".format(LEFT_PIPETTE_PREFIX)
 LEFT_PIPETTE_ID = "testy"
 
+
 def dummy_instruments_attached():
     return {
         types.Mount.LEFT: {
@@ -51,16 +52,21 @@ def dummy_instruments_attached_ot3():
 def dummy_instruments_ot3():
     return dummy_instruments_attached_ot3()
 
+
 def wrap_build_ot3_sim():
     from opentrons.hardware_control.ot3api import OT3API
+
     return OT3API.build_hardware_simulator
+
 
 @pytest.fixture
 def ot3_api_obj(request):
     if request.config.getoption("--ot2-only"):
         pytest.skip("testing ot2 only")
     from opentrons.hardware_control.ot3api import OT3API
+
     return OT3API.build_hardware_simulator
+
 
 @pytest.fixture(
     params=[
@@ -80,7 +86,9 @@ def sim_and_instr(request):
         and request.param[0] == API.build_hardware_simulator
     ):
         pytest.skip()
-    if request.param[0] == wrap_build_ot3_sim and request.config.getoption("--ot2-only"):
+    if request.param[0] == wrap_build_ot3_sim and request.config.getoption(
+        "--ot2-only"
+    ):
         pytest.skip("testing ot2 only")
 
     yield (request.param[0](), request.param[1]())
@@ -340,9 +348,7 @@ async def test_aspirate_old(dummy_instruments, loop, old_aspiration):
 
 
 async def test_aspirate_ot3(dummy_instruments_ot3, ot3_api_obj, loop):
-    hw_api = await ot3_api_obj(
-        attached_instruments=dummy_instruments_ot3, loop=loop
-    )
+    hw_api = await ot3_api_obj(attached_instruments=dummy_instruments_ot3, loop=loop)
     await hw_api.home()
     await hw_api.cache_instruments()
 
@@ -385,9 +391,7 @@ async def test_dispense_ot2(dummy_instruments, loop):
 
 
 async def test_dispense_ot3(dummy_instruments_ot3, ot3_api_obj, loop):
-    hw_api = await ot3_api_obj(
-        attached_instruments=dummy_instruments_ot3, loop=loop
-    )
+    hw_api = await ot3_api_obj(attached_instruments=dummy_instruments_ot3, loop=loop)
     await hw_api.home()
 
     await hw_api.cache_instruments()
