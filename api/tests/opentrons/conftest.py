@@ -35,7 +35,6 @@ from opentrons_shared_data.module.dev_types import ModuleDefinitionV2
 
 Protocol = namedtuple("Protocol", ["text", "filename", "filelike"])
 
-
 @pytest.fixture(autouse=True)
 def asyncio_loop_exception_handler(loop):
     def exception_handler(loop, context):
@@ -111,7 +110,11 @@ async def enable_door_safety_switch():
 
 
 @pytest.fixture
-async def enable_ot3_hardware_controller():
+async def enable_ot3_hardware_controller(request):
+    # this is from the command line parameters added in root conftest
+    if request.config.getoption("--ot2-only"):
+        pytest.skip("testing only ot2")
+
     await config.advanced_settings.set_adv_setting("enableOT3HardwareController", True)
     yield
     await config.advanced_settings.set_adv_setting("enableOT3HardwareController", False)
@@ -150,9 +153,9 @@ def virtual_smoothie_env(monkeypatch):
     params=["ot2", "ot3"],
 )
 async def machine_variant_ffs(request, loop):
-    if request.node.get_closest_marker("ot2_only") and request.param == "ot2":
+    if request.node.get_closest_marker("ot3_only") and request.param == "ot2":
         pytest.skip()
-    if request.node.get_closest_marker("ot3_only") and request.param == "ot3":
+    if request.node.get_closest_marker("ot2_only") and request.param == "ot3":
         pytest.skip()
 
     old = config.advanced_settings.get_adv_setting("enableOT3HardwareController")
@@ -200,6 +203,9 @@ async def _build_ot3_hw() -> AsyncIterator[ThreadManager[HardwareControlAPI]]:
 
 @pytest.fixture
 async def ot3_hardware(request, loop, enable_ot3_hardware_controller):
+    # this is from the command line parameters added in root conftest
+    if request.config.getoption("--ot2-only"):
+        pytest.skip("testing only ot2")
     async for hw in _build_ot3_hw():
         yield hw
 
@@ -215,6 +221,8 @@ async def hardware(request, loop, virtual_smoothie_env):
         pytest.skip()
     if request.node.get_closest_marker("ot3_only") and request.param() == _build_ot2_hw:
         pytest.skip()
+    if request.param() == _build_ot3_hw and request.config.getoption("--ot2-only"):
+        pytest.skip("testing only ot2")
 
     # param() return a function we have to call
     async for hw in request.param()():

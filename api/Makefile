@@ -107,6 +107,10 @@ sdist: $(sdist_file)
 test:
 	$(pytest) $(tests) $(test_opts)
 
+.PHONY: test-ot2
+test-ot2:
+	$(pytest) $(tests) $(test_opts) --ot2-only --ignore-glob="**/*ot3*"
+
 .PHONY: lint
 lint:
 	$(python) -m mypy src tests
