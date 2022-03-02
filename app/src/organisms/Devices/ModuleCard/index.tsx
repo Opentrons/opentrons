@@ -33,6 +33,7 @@ import { ModuleOverflowMenu } from './ModuleOverflowMenu'
 import { ThermocyclerModuleSlideout } from './ThermocyclerModuleSlideout'
 import { MagneticModuleSlideout } from './MagneticModuleSlideout'
 import { TemperatureModuleSlideout } from './TemperatureModuleSlideout'
+import { AboutModuleSlideout } from './AboutModuleSlideout'
 
 import magneticModule from '../../../assets/images/magnetic_module_gen_2_transparent.svg'
 import temperatureModule from '../../../assets/images/temp_deck_gen_2_transparent.svg'
@@ -50,6 +51,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [showOverflowMenu, setShowOverflowMenu] = React.useState(false)
   const [showSlideout, setShowSlideout] = React.useState(false)
   const [hasSecondary, setHasSecondary] = React.useState(false)
+  const [showAboutModule, setShowAboutModule] = React.useState(false)
 
   const moduleOverflowWrapperRef = useOnClickOutside({
     onClickOutside: () => setShowOverflowMenu(false),
@@ -105,6 +107,13 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     }
     setShowSlideout(true)
     setShowOverflowMenu(false)
+    setShowAboutModule(false)
+  }
+
+  const handleAboutClick = (): void => {
+    setShowAboutModule(true)
+    setShowOverflowMenu(false)
+    setShowSlideout(false)
   }
 
   return (
@@ -122,6 +131,13 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             isSecondary={hasSecondary}
             showSlideout={showSlideout}
             onCloseClick={() => setShowSlideout(false)}
+          />
+        )}
+        {showAboutModule && (
+          <AboutModuleSlideout
+            module={module}
+            isExpanded={showAboutModule}
+            onCloseClick={() => setShowAboutModule(false)}
           />
         )}
         <Box
@@ -164,6 +180,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         {showOverflowMenu && (
           <div ref={moduleOverflowWrapperRef}>
             <ModuleOverflowMenu
+              handleAboutClick={handleAboutClick}
               module={module}
               handleClick={handleMenuItemClick}
             />

@@ -100,8 +100,8 @@ class ModuleAlreadyPresentError(ProtocolEngineError):
     """An error raised when a module is already present in a requested location."""
 
 
-class ModuleIsNotThermocyclerError(ProtocolEngineError):
-    """An error raised when performing thermocycler actions with a non-thermocycler."""
+class WrongModuleTypeError(ProtocolEngineError):
+    """An error raised when performing a module action on the wrong kind of module."""
 
 
 class ThermocyclerNotOpenError(ProtocolEngineError):

@@ -93,6 +93,8 @@ class CanMessenger:
     async def _read_task_shield(self) -> None:
         try:
             await self._read_task()
+        except asyncio.CancelledError:
+            pass
         except Exception:
             log.exception("Exception in read")
             raise

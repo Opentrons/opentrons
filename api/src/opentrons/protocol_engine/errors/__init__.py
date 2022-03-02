@@ -21,7 +21,7 @@ from .exceptions import (
     WellOriginNotAllowedError,
     ModuleNotAttachedError,
     ModuleAlreadyPresentError,
-    ModuleIsNotThermocyclerError,
+    WrongModuleTypeError,
     ThermocyclerNotOpenError,
     RobotDoorOpenError,
 )
@@ -50,7 +50,7 @@ __all__ = [
     "WellOriginNotAllowedError",
     "ModuleNotAttachedError",
     "ModuleAlreadyPresentError",
-    "ModuleIsNotThermocyclerError",
+    "WrongModuleTypeError",
     "ThermocyclerNotOpenError",
     "RobotDoorOpenError",
     # error occurrence models

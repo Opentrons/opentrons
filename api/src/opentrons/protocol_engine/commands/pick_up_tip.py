@@ -1,11 +1,14 @@
 """Pick up tip command request, result, and implementation models."""
 from __future__ import annotations
 from pydantic import BaseModel
-from typing import Optional, Type
+from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
 from .pipetting_common import BasePipettingParams
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+
+if TYPE_CHECKING:
+    from ..execution import PipettingHandler
 
 
 PickUpTipCommandType = Literal["pickUpTip"]
@@ -25,6 +28,9 @@ class PickUpTipResult(BaseModel):
 
 class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, PickUpTipResult]):
     """Pick up tip command implementation."""
+
+    def __init__(self, pipetting: PipettingHandler, **kwargs: object) -> None:
+        self._pipetting = pipetting
 
     async def execute(self, params: PickUpTipParams) -> PickUpTipResult:
         """Move to and pick up a tip using the requested pipette."""

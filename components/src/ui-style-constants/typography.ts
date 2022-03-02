@@ -76,6 +76,12 @@ export const h6Default = css`
   line-height: ${lineHeight12};
 `
 
+export const h6SemiBold = css`
+  font-size: ${fontSizeH6};
+  font-weight: ${fontWeightSemiBold};
+  line-height: ${lineHeight12};
+`
+
 export const pRegular = css`
   font-size: ${fontSizeP};
   font-weight: ${fontWeightRegular};

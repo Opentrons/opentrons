@@ -1,5 +1,6 @@
 import shared from './shared.json'
 import device_details from './device_details.json'
+import device_settings from './device_settings.json'
 import devices_landing from './devices_landing.json'
 import labware_position_check from './labware_position_check.json'
 import more_network_and_system from './more_network_and_system.json'
@@ -20,6 +21,7 @@ import app_settings from './app_settings.json'
 export const en = {
   shared,
   device_details,
+  device_settings,
   devices_landing,
   labware_position_check,
   more_network_and_system,

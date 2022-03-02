@@ -1,6 +1,6 @@
 import { css } from 'styled-components'
-import { spacing1 } from './spacing'
-import { blue } from './colors'
+import { spacing1, spacingXXS } from './spacing'
+import { blue, medGrey } from './colors'
 
 export const radiusSoftCorners = '3px'
 export const radiusRoundEdge = '20px'
@@ -11,3 +11,5 @@ export const tabBorder = css`
   border-bottom-width: ${spacing1};
   border-bottom-color: ${blue};
 `
+
+export const lineBorder = `${spacingXXS} ${styleSolid} ${medGrey}`

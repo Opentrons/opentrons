@@ -50,6 +50,8 @@
   "place_the_module_slot_number": "<block>Place the module in <bold>Slot {{slot}}</bold>.</block>",
   "attach_module_extend_anchors": "<block>Hold the module flat against the deck and turn screws <icon></icon> clockwise to <bold>extend the anchors</bold>.",
   "attach_module_check_attachment": "Check attachment by gently pulling up and rocking the module.",
+  "step_3_power_on": "<block><strong>Step 3 of 4: Power on the module</strong></block><block>Connect your module to the robot and and power it on.</block>",
+  "module_is_not_connected": "Module is not connected",
   "heater_shaker_key_parts": "Key Heater Shaker parts and terminology",
   "heater_shaker_orient_module": "Orient the module so its power ports face <bold>away</bold> from you.",
   "heater_shaker_latch_description": "<block>The <strong>Labware Latch</strong> keeps labware secure while the module is shaking.</block> <block>It can be opened or closed manually and with software but is closed and locked while the module is shaking.</block>",
