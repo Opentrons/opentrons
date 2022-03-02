@@ -194,9 +194,7 @@ export const LabwareSetup = (): JSX.Element | null => {
                           : {}
                       }
                     >
-                      {nestedLabwareDef != null &&
-                      nestedLabwareId != null &&
-                      nestedLabwareDisplayName ? (
+                      {nestedLabwareDef != null && nestedLabwareId != null ? (
                         <React.Fragment
                           key={`LabwareSetup_Labware_${nestedLabwareDef.metadata.displayName}_${x}${y}`}
                         >
