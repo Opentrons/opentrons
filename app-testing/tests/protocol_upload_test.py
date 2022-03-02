@@ -74,7 +74,6 @@ def test_protocol_upload(
             robot_page.start_calibration()
             calibrate.calibrate_deck()
             assert robot_page.wait_for_deck_to_show_calibrated()
-        left_menu = LeftMenu(driver)
         left_menu.click_protocol_upload_button()
         labware_setup = LabwareSetup(driver)
         protocol_file = ProtocolFile(driver)
@@ -163,7 +162,6 @@ def test_moam_pur(
         # toggle the DEV robot
         if not robots_list.is_robot_toggle_active(RobotsList.DEV):
             robots_list.get_robot_toggle(RobotsList.DEV).click()
-        left_menu = LeftMenu(driver)
         left_menu.click_protocol_upload_button()
         protocol_file = ProtocolFile(driver)
         logger.info(f"uploading protocol: {test_protocols['moamjson'].resolve()}")
@@ -216,7 +214,6 @@ def test_LPC_flow(
         # toggle the DEV robot
         if not robots_list.is_robot_toggle_active(RobotsList.DEV):
             robots_list.get_robot_toggle(RobotsList.DEV).click()
-        left_menu = LeftMenu(driver)
         left_menu.click_protocol_upload_button()
         protocol_file = ProtocolFile(driver)
         logger.info(
@@ -317,7 +314,6 @@ def test_gen1_pipette(
         # toggle the DEV robot
         if not robots_list.is_robot_toggle_active(RobotsList.DEV):
             robots_list.get_robot_toggle(RobotsList.DEV).click()
-        left_menu = LeftMenu(driver)
         left_menu.click_protocol_upload_button()
         protocol_file = ProtocolFile(driver)
         logger.info(f"uploading protocol: {test_protocols['gen1pipette'].resolve()}")
