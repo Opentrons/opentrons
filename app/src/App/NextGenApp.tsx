@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { NavLink, Redirect, Route, Switch, Link } from 'react-router-dom'
-import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 
 import {
@@ -18,7 +17,6 @@ import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
 } from '@opentrons/components'
-import * as Config from '../redux/config'
 
 import { Breadcrumbs } from '../molecules/Breadcrumbs'
 import { DeviceDetails } from '../pages/Devices/DeviceDetails'
@@ -26,10 +24,7 @@ import { DevicesLanding } from '../pages/Devices/DevicesLanding'
 import { RobotSettings } from '../pages/Devices/RobotSettings'
 import { usePathCrumbs } from './hooks'
 import { ProtocolsLanding } from '../pages/Protocols/ProtocolsLanding'
-import { GeneralSettings } from '../organisms/AppSettings/GeneralSettings'
-import { PrivacySettings } from '../organisms/AppSettings/PrivacySettings'
-import { AdvancedSettings } from '../organisms/AppSettings/AdvancedSettings'
-import { FeatureFlags } from '../organisms/AppSettings/FeatureFlags'
+import { AppSettings } from '../organisms/AppSettings'
 import { TopPortalRoot } from './portal'
 
 export interface RouteProps {
@@ -105,11 +100,17 @@ export function TempNavBar({ routes }: { routes: RouteProps[] }): JSX.Element {
 }
 
 export type RobotSettingsTab = 'calibration' | 'networking' | 'advanced'
+export type AppSettingsTab =
+  | 'general'
+  | 'privacy'
+  | 'advanced'
+  | 'feature-flags'
 
 /**
  * route params type definition for the next gen app
  */
 export interface NextGenRouteParams {
+  appSettingsTab: AppSettingsTab
   robotName: string
   protocolName: string
   labwareId: string
@@ -199,31 +200,12 @@ export const nextGenRoutes: RouteProps[] = [
     path: '/devices/:robotName/protocol-runs/:runId/:runDetailsTab',
   },
   {
-    component: GeneralSettings,
+    component: AppSettings,
     exact: true,
     name: 'App Settings',
-    path: '/app-settings/general',
-  },
-  {
-    component: PrivacySettings,
-    exact: true,
-    name: 'Privacy',
-    path: '/app-settings/privacy',
-  },
-  {
-    component: AdvancedSettings,
-    exact: true,
-    name: 'Advanced',
-    path: '/app-settings/advanced',
+    path: '/app-settings/:appSettingsTab?',
   },
 ]
-
-const devToolsRoute = {
-  component: FeatureFlags,
-  exact: true,
-  name: 'Feature Flags',
-  path: '/app-settings/feature-flags',
-}
 
 /**
  * Component for the next gen app routes and navigation
@@ -231,10 +213,6 @@ const devToolsRoute = {
  */
 export function NextGenApp(): JSX.Element {
   const pathCrumbs = usePathCrumbs()
-  const devToolsOn = useSelector(Config.getDevtoolsEnabled)
-  if (devToolsOn) {
-    nextGenRoutes.push(devToolsRoute)
-  }
 
   return (
     <>
