@@ -17,7 +17,9 @@ def mock_socket() -> MagicMock:
 async def test_create_subscriber(mock_socket: MagicMock) -> None:
     """Test that a subscriber is created correctly."""
     # Why two patch calls? `create` is the name of an arg to `patch.multiple`.
-    with patch('robot_server.service.notifications.handle_subscriber.create') as mock_create:
+    with patch(
+        "robot_server.service.notifications.handle_subscriber.create"
+    ) as mock_create:
         with patch.multiple(
             handle_subscriber, route_events=DEFAULT, receive=DEFAULT
         ) as values:
