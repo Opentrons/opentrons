@@ -4,7 +4,6 @@ import startCase from 'lodash/startCase'
 import { format } from 'date-fns'
 import {
   Box,
-  Text,
   Flex,
   Icon,
   Link,
@@ -19,6 +18,7 @@ import {
   DIRECTION_COLUMN,
   ALIGN_FLEX_END,
 } from '@opentrons/components'
+import { StyledText } from '../../atoms/text'
 import type { LabwareDefAndDate } from './hooks'
 
 export interface LabwareCardProps {
@@ -49,41 +49,41 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
               {() => <LabwareRender definition={definition} />}
             </RobotWorkSpace>
           </Box>
-          <Text css={TYPOGRAPHY.pSemiBold} width="5.75rem">
+          <StyledText css={TYPOGRAPHY.pSemiBold} width="5.75rem">
             {displayCategory}
-          </Text>
+          </StyledText>
           <Flex
             flexDirection={DIRECTION_COLUMN}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
             <Box>
-              <Text css={TYPOGRAPHY.h3Regular}>{displayName}</Text>
+              <StyledText as="h3">{displayName}</StyledText>
               {definition.brand.brand === 'Opentrons' && (
                 <>
-                  <Text css={TYPOGRAPHY.h6Default}>
+                  <StyledText as="h6">
                     <Icon
                       color={COLORS.blue}
                       name="check-decagram"
                       height=".7rem"
                     />{' '}
                     {t('opentrons_def')}
-                  </Text>
+                  </StyledText>
                 </>
               )}
               {isCustomDefinition && (
-                <Text css={TYPOGRAPHY.h6Default} color={COLORS.darkGreyEnabled}>
+                <StyledText as="h6" color={COLORS.darkGreyEnabled}>
                   {t('custom_def')}
-                </Text>
+                </StyledText>
               )}
             </Box>
             <Box paddingTop={SPACING.spacing4}>
-              <Text
+              <StyledText
+                as="h6"
                 textTransform={TYPOGRAPHY.textTransformUppercase}
-                css={TYPOGRAPHY.h6Default}
                 color={COLORS.darkGreyEnabled}
               >
                 {t('api_name')}
-              </Text>
+              </StyledText>
               <Link
                 css={TYPOGRAPHY.pRegular}
                 onClick={() => navigator.clipboard.writeText(apiName)}
@@ -101,9 +101,9 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
         >
           <Icon name="dots-vertical" height="1rem" />
           {modified != null && (
-            <Text css={TYPOGRAPHY.h6Default} color={COLORS.darkGreyEnabled}>
+            <StyledText as="h6" color={COLORS.darkGreyEnabled}>
               {t('date_added')} {format(new Date(modified), 'MM/dd/yyyy')}
-            </Text>
+            </StyledText>
           )}
         </Flex>
       </Flex>
