@@ -26,7 +26,6 @@ import pytest
 from opentrons import config
 from opentrons import hardware_control as hc
 from opentrons.hardware_control import HardwareControlAPI, API, ThreadManager
-from opentrons.hardware_control.ot3api import OT3API
 from opentrons.protocol_api import ProtocolContext
 from opentrons.types import Location, Point
 
@@ -187,6 +186,7 @@ async def ot2_hardware(request, loop, virtual_smoothie_env):
 
 
 async def _build_ot3_hw() -> AsyncIterator[ThreadManager[HardwareControlAPI]]:
+    from opentrons.hardware_control.ot3api import OT3API
     hw_sim = ThreadManager(OT3API.build_hardware_simulator)
     old_config = config.robot_configs.load()
     try:
