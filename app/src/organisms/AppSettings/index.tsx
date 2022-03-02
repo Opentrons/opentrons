@@ -33,7 +33,7 @@ export function AppSettings(): JSX.Element {
     general: GeneralSettings,
     privacy: PrivacySettings,
     advanced: AdvancedSettings,
-    featureFlags: FeatureFlags,
+    'feature-flags': FeatureFlags,
   }
 
   const AppSettingsContent =
@@ -57,7 +57,7 @@ export function AppSettings(): JSX.Element {
           <NavTab to="/app-settings/advanced" tabName={t('advanced')} />
           {devToolsOn && (
             <NavTab
-              to="/app-settings/featureFlags"
+              to="/app-settings/feature-flags"
               tabName={t('feature_flags')}
             />
           )}

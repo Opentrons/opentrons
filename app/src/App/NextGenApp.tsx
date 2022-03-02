@@ -100,7 +100,11 @@ export function TempNavBar({ routes }: { routes: RouteProps[] }): JSX.Element {
 }
 
 export type RobotSettingsTab = 'calibration' | 'networking' | 'advanced'
-export type AppSettingsTab = 'general' | 'privacy' | 'advanced' | 'featureFlags'
+export type AppSettingsTab =
+  | 'general'
+  | 'privacy'
+  | 'advanced'
+  | 'feature-flags'
 
 /**
  * route params type definition for the next gen app
