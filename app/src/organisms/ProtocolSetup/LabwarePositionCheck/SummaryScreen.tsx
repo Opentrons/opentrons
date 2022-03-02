@@ -41,7 +41,7 @@ export const SummaryScreen = (props: {
       labwareOffsets.length === 0 && setLabwareOffsets(offsets)
     })
     .catch((e: Error) =>
-      console.error(`error getting labware offsetsL ${e.message}`)
+      console.error(`error getting labware offsets: ${e.message}`)
     )
   const { createLabwareOffset } = useCreateLabwareOffsetMutation()
   const runId = useCurrentRunId()
