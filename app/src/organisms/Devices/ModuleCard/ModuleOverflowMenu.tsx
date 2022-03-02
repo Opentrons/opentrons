@@ -9,13 +9,14 @@ import type { AttachedModule } from '../../../redux/modules/types'
 interface ModuleOverflowMenuProps {
   module: AttachedModule
   handleClick: (isSecondary: boolean) => void
+  handleAboutClick: () => void
 }
 
 export const ModuleOverflowMenu = (
   props: ModuleOverflowMenuProps
 ): JSX.Element | null => {
   const { t } = useTranslation('device_details')
-  const { module, handleClick } = props
+  const { module, handleClick, handleAboutClick } = props
 
   const menuItems = {
     thermocyclerModuleType: [
@@ -48,10 +49,10 @@ export const ModuleOverflowMenu = (
 
   const AboutModuleBtn = (
     <MenuItem
+      minWidth="10rem"
       key={`about_module_${module.model}`}
       data-testid={`about_module_${module.model}`}
-      //  TODO(jr, 2022-02-17): add about module slideout component when it is created
-      onClick={() => console.log('about module overflow menu')}
+      onClick={() => handleAboutClick()}
     >
       {t('overflow_menu_about')}
     </MenuItem>

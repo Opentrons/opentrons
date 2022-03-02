@@ -16,6 +16,7 @@ import {
   COLORS,
   POSITION_ABSOLUTE,
   TYPOGRAPHY,
+  Overlay,
 } from '@opentrons/components'
 
 import { Divider } from '../structure'
@@ -32,16 +33,14 @@ const EXPANDED_STYLE = css`
   animation-duration: 300ms;
   animation-name: slidein;
   overflow: hidden;
-  max-width: 19.5rem;
+  width: 19.5rem;
 
   @keyframes slidein {
     from {
-      margin-left: 100%;
-      width: 300%;
+      width: 0;
     }
     to {
-      margin-left: 0%;
-      width: 100%;
+      width: 19.5rem;
     }
   }
 `
@@ -54,12 +53,10 @@ const COLLAPSED_STYLE = css`
 
   @keyframes slideout {
     from {
-      margin-left: 0%;
-      width: 100%;
+      width: 19.5rem;
     }
     to {
-      margin-left: 100%;
-      width: 300%;
+      width: 0;
     }
   }
 `
@@ -67,6 +64,7 @@ const COLLAPSED_STYLE = css`
 export const Slideout = (props: Props): JSX.Element | null => {
   return (
     <>
+      <Overlay />
       <Box
         css={props.isExpanded ? EXPANDED_STYLE : COLLAPSED_STYLE}
         position={POSITION_ABSOLUTE}
