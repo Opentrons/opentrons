@@ -40,6 +40,26 @@ class InvalidInput(Exception):
     pass
 
 
+async def listen_task(can_driver: AbstractCanDriver) -> None:
+    """A task that listens for can messages.
+    Args:
+        can_driver: Driver
+    Returns: Nothing.
+    """
+    async for message in can_driver:
+        message_definition = get_definition(
+            MessageId(message.arbitration_id.parts.message_id)
+        )
+        if message_definition:
+            try:
+                build = message_definition.payload_type.build(message.data)
+                log.info(f"Received <-- \n\traw: {message}, " f"\n\tparsed: {build}")
+            except BinarySerializableException:
+                log.exception(f"Failed to build from {message}")
+        else:
+            log.info(f"Received <-- \traw: {message}")
+
+
 def create_choices(enum_type: Type[Enum]) -> Sequence[str]:
     """Create choice strings.
 
@@ -166,7 +186,9 @@ async def run(args: argparse.Namespace) -> None:
     driver = await build_driver(build_settings(args))
 
     loop = asyncio.get_event_loop()
-    fut = loop.create_task(ui_task(driver))
+    fut = asyncio.gather(
+        loop.create_task(listen_task(driver)), loop.create_task(ui_task(driver))
+    )
     try:
         await fut
     except KeyboardInterrupt:
