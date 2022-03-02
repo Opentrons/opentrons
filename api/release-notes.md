@@ -25,7 +25,7 @@ The 5.0.2 hotfix release contains two fixes in the robot software:
 
 1. The robot now understands how to use labware loaded via `load_labware_from_definition` during Labware Position Check.
 2. User-defined labware labels are now returned to the Opentrons App from protocol analyses and runs.
-
+3. Protocol file uploads now permit uppercase .json and .py extensions.
 
 ## 5.0.0 to 5.0.1
 
