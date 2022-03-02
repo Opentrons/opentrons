@@ -37,7 +37,9 @@ jobs:
     name: 'opentrons package linting'
     timeout-minutes: 10
     runs-on: 'ubuntu-18.04'
-    with-ot-hardware: ['true', 'false']
+    strategy:
+      matrix:
+        with-ot-hardware: ['true', 'false']
     steps:
       - uses: 'actions/checkout@v2'
       - uses: 'actions/setup-node@v1'
