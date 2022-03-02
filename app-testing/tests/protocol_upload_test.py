@@ -277,6 +277,16 @@ def test_LPC_flow(
         )
         labware_position_check.click_get_close_and_apply_labware_offset_data_button()
         assert labware_position_check.get_labware_success_toast().is_displayed()
+        assert (
+            labware_position_check.get_labwareName_on_deckmap().text
+            == "Opentrons 96 Tip Rack 10 µL"
+        )
+        assert labware_position_check.get_x_offset_text_on_deckmap().is_displayed()
+        assert labware_position_check.get_x_offset_value_on_deckmap().text == "1.0"
+        assert labware_position_check.get_y_offset_text_on_deckmap().is_displayed()
+        assert labware_position_check.get_y_offset_value_on_deckmap().text == "1.0"
+        assert labware_position_check.get_z_offset_text_on_deckmap().is_displayed()
+        assert labware_position_check.get_z_offset_value_on_deckmap().text == "1.0"
 
 
 def test_gen1_pipette(

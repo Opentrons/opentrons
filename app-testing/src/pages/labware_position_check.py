@@ -1,6 +1,6 @@
 """Model for the screen of Labware Position Check."""
 import logging
-from typing import Tuple
+from typing import Optional, Tuple
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
@@ -356,3 +356,80 @@ class LabwarePositionCheck:
 
     def click_get_close_and_apply_labware_offset_data_button(self) -> None:
         self.get_close_and_apply_labware_offset_data_button().click()
+
+    @highlight
+    def get_labwareName_on_deckmap(self) -> Optional[WebElement]:
+        """locator for Labware name on deckmap."""
+        elements = self.driver.find_elements(
+            By.ID,
+            "LabwareInfoOverlay_displayName",
+        )
+        if len(elements) == 4:
+            return elements[0]
+        return None
+
+    @highlight
+    def get_x_offset_text_on_deckmap(self) -> Optional[WebElement]:
+        """locator for x offset text on deck map."""
+        elements = self.driver.find_elements(
+            By.ID,
+            "LabwareInfoOverlay_x",
+        )
+        if len(elements) == 4:
+            return elements[0]
+        return None
+
+    @highlight
+    def get_x_offset_value_on_deckmap(self) -> Optional[WebElement]:
+        """locator for x offset value on deck map."""
+        elements = self.driver.find_elements(
+            By.ID,
+            "LabwareInfoOverlay_xValue",
+        )
+        if len(elements) == 4:
+            return elements[0]
+        return None
+
+    @highlight
+    def get_y_offset_text_on_deckmap(self) -> Optional[WebElement]:
+        """locator for y offset text on deck map."""
+        elements = self.driver.find_elements(
+            By.ID,
+            "LabwareInfoOverlay_y",
+        )
+        if len(elements) == 4:
+            return elements[0]
+        return None
+
+    @highlight
+    def get_y_offset_value_on_deckmap(self) -> Optional[WebElement]:
+        """locator for y offset value on deck map."""
+        elements = self.driver.find_elements(
+            By.ID,
+            "LabwareInfoOverlay_yValue",
+        )
+        if len(elements) == 4:
+            return elements[0]
+        return None
+
+    @highlight
+    def get_z_offset_text_on_deckmap(self) -> Optional[WebElement]:
+        """locator for z offset text on deck map."""
+        elements = self.driver.find_elements(
+            By.ID,
+            "LabwareInfoOverlay_z",
+        )
+        if len(elements) == 4:
+            return elements[0]
+        return None
+
+    @highlight
+    def get_z_offset_value_on_deckmap(self) -> Optional[WebElement]:
+        """locator for z offset text on deck map."""
+        elements = self.driver.find_elements(
+            By.ID,
+            "LabwareInfoOverlay_zValue",
+        )
+        if len(elements) == 4:
+            return elements[0]
+        return None

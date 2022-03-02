@@ -49,14 +49,14 @@ def test_protocols() -> Dict[str, Path]:
         ),
         "protocoluploadjson": Path(
             Path(__file__).resolve().parent,
-            "files/protocol/python1/upload_protocol.json",
+            "files/protocol/json/upload_protocol.json",
         ),
         "moamjson": Path(
             Path(__file__).resolve().parent,
-            "files/protocol/python1/moam_pur.json",
+            "files/protocol/json/moam_pur.json",
         ),
         "gen1pipette": Path(
             Path(__file__).resolve().parent,
-            "files/protocol/python1/gen1_pipette.json",
+            "files/protocol/json/gen1_pipette.json",
         ),
     }
