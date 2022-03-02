@@ -50,6 +50,7 @@ Example: `opentrons_sim_can_bus --port 12345`
 
 The `opentrons-hardware` package includes some utility scripts.
 
+
 ### opentrons_can_comm
 
 This is a tool for sending messages to firmware (or simulator) over CAN bus. The CAN bus can either be a [python-can](https://python-can.readthedocs.io/en/master/interfaces.html) defined interface or `opentrons`.
@@ -68,6 +69,14 @@ On Linux using socketcan: `opentrons_can_comm --interface socketcan --channel vc
 On Mac using pcan: `opentrons_can_comm --interface pcan --channel PCAN_USBBUS1 --bitrate 250000`
 
 Example using opentrons' CAN over socket: `opentrons_can_comm --interface opentrons_sock`
+
+### opentrons_can_mon
+
+A monitor on the CAN bus. It prints out the contents of messages received on the CAN bus.
+
+#### Usage
+
+The usage is the same as `opentrons_can_comm`.
 
 ### opentrons_update_fw
 
