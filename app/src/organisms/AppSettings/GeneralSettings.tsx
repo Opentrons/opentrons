@@ -37,7 +37,6 @@ import {
 import { useTrackEvent } from '../../redux/analytics'
 import { UpdateAppModal } from '../UpdateAppModal'
 import { PreviousVersionModal } from './PreviousVersionModal'
-import { AppSettingsHeader } from './AppSettingsHeader'
 
 import type { Dispatch, State } from '../../redux/types'
 
@@ -89,8 +88,7 @@ export function GeneralSettings(): JSX.Element {
     dispatch(checkShellUpdate())
   })
   return (
-    <Box backgroundColor={COLORS.white} height="100%">
-      <AppSettingsHeader page="general" />
+    <>
       <Box paddingX={SPACING.spacing4} paddingY={SPACING.spacing5}>
         {showUpdateBanner && (
           <Box marginBottom={SPACING.spacing4}>
@@ -197,6 +195,6 @@ export function GeneralSettings(): JSX.Element {
           closeModal={() => setShowPreviousVersionModal(false)}
         />
       ) : null}
-    </Box>
+    </>
   )
 }

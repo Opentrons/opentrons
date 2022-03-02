@@ -38,6 +38,20 @@ class DeviceInfoResponse:  # noqa: D101
 
 
 @dataclass
+class TaskInfoRequest:  # noqa: D101
+    payload: payloads.EmptyPayload
+    payload_type: Type[BinarySerializable] = payloads.EmptyPayload
+    message_id: Literal[MessageId.task_info_request] = MessageId.task_info_request
+
+
+@dataclass
+class TaskInfoResponse:  # noqa: D101
+    payload: payloads.TaskInfoResponsePayload
+    payload_type: Type[BinarySerializable] = payloads.TaskInfoResponsePayload
+    message_id: Literal[MessageId.task_info_response] = MessageId.task_info_response
+
+
+@dataclass
 class StopRequest:  # noqa: D101
     payload: payloads.EmptyPayload
     payload_type: Type[BinarySerializable] = payloads.EmptyPayload

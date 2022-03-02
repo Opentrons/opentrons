@@ -12,6 +12,8 @@ MessageDefinition = Union[
     defs.HeartbeatResponse,
     defs.DeviceInfoRequest,
     defs.DeviceInfoResponse,
+    defs.TaskInfoRequest,
+    defs.TaskInfoResponse,
     defs.StopRequest,
     defs.GetStatusRequest,
     defs.GetStatusResponse,

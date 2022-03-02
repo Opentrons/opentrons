@@ -67,3 +67,15 @@ def test_arbitration_id_integer(expected: int, parts: ArbitrationIdParts) -> Non
     """It should convert parts to an arbitration id."""
     c = ArbitrationId(parts=parts)
     assert c.id == expected
+
+
+def test_arbitration_id_parts_repr_invalid() -> None:
+    """It should tolerate invalid ids."""
+    # These are not valid enum values. They should display as hex numbers.
+    c = ArbitrationIdParts(
+        function_code=1, node_id=2, originating_node_id=3, message_id=1000
+    )
+    assert (
+        str(c) == "function_code: sync, node_id: 0x2,"
+        " originating_node_id: 0x3, message_id: 0x3e8"
+    )

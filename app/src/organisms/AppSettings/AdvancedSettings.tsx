@@ -22,7 +22,6 @@ import * as CustomLabware from '../../redux/custom-labware'
 import { clearDiscoveryCache } from '../../redux/discovery'
 import { Divider } from '../../atoms/structure'
 import { TertiaryButton, ToggleButton } from '../../atoms/Buttons'
-import { AppSettingsHeader } from './AppSettingsHeader'
 
 import type { Dispatch, State } from '../../redux/types'
 import type { DropdownOption } from '@opentrons/components'
@@ -70,8 +69,7 @@ export function AdvancedSettings(): JSX.Element {
   })
 
   return (
-    <Box backgroundColor={COLORS.white} height="100%">
-      <AppSettingsHeader page="advanced" />
+    <>
       <Box paddingX={SPACING.spacing4} paddingY={SPACING.spacing5}>
         <Flex
           alignItems={ALIGN_CENTER}
@@ -227,6 +225,6 @@ export function AdvancedSettings(): JSX.Element {
           />
         </Flex>
       </Box>
-    </Box>
+    </>
   )
 }

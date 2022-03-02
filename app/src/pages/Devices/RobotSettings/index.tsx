@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { NavLink, Redirect, useParams } from 'react-router-dom'
-import styled from 'styled-components'
+import { Redirect, useParams } from 'react-router-dom'
 
 import {
   Box,
@@ -16,6 +15,7 @@ import {
 } from '@opentrons/components'
 
 import { Line } from '../../../atoms/structure'
+import { NavTab } from '../../../atoms/NavTab'
 import { RobotSettingsCalibration } from '../../../organisms/Devices/RobotSettings/RobotSettingsCalibration'
 
 import type {
@@ -41,32 +41,6 @@ export function RobotSettings(): JSX.Element | null {
     robotSettingsContentByTab[robotSettingsTab] ??
     // default to the calibration tab if no tab or nonexistent tab is passed as a param
     (() => <Redirect to={`/devices/${robotName}/robot-settings/calibration`} />)
-
-  interface NavTabProps {
-    to: string
-    tabName: string
-  }
-
-  const StyledNavLink = styled(NavLink)`
-    color: ${COLORS.darkGreyEnabled};
-    &.active {
-      color: ${COLORS.darkBlack};
-      ${BORDERS.tabBorder}
-    }
-  `
-
-  function NavTab({ to, tabName }: NavTabProps): JSX.Element {
-    return (
-      <StyledNavLink to={to} replace>
-        <Box
-          css={TYPOGRAPHY.h6SemiBold}
-          padding={`0 ${SPACING.spacing2} ${SPACING.spacing3} ${SPACING.spacing2}`}
-        >
-          {tabName}
-        </Box>
-      </StyledNavLink>
-    )
-  }
 
   return (
     <Box

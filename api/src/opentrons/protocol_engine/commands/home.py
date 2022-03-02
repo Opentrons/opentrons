@@ -1,11 +1,14 @@
 """Home command payload, result, and implementation models."""
 from __future__ import annotations
 from pydantic import BaseModel, Field
-from typing import Optional, Sequence, Type
+from typing import TYPE_CHECKING, Optional, Sequence, Type
 from typing_extensions import Literal
 
 from ..types import MotorAxis
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+
+if TYPE_CHECKING:
+    from ..execution import MovementHandler
 
 
 HomeCommandType = Literal["home"]
@@ -30,6 +33,9 @@ class HomeResult(BaseModel):
 
 class HomeImplementation(AbstractCommandImpl[HomeParams, HomeResult]):
     """Home command implementation."""
+
+    def __init__(self, movement: MovementHandler, **kwargs: object) -> None:
+        self._movement = movement
 
     async def execute(self, params: HomeParams) -> HomeResult:
         """Home some or all motors to establish positional accuracy."""
