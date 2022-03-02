@@ -11,6 +11,7 @@ Development Environment
 -----------------------------------
 - `pipenv <https://github.com/pypa/pipenv>`_ is the package manager.
 - ``make setup`` will setup the project.
+- ``make setup-ot2`` will setup the project as it is on the OT2.
 - ``make test`` will run the unit tests.
 - ``make lint`` will run type checking and linting.
 - ``make dev`` will run the server application locally in dev mode.

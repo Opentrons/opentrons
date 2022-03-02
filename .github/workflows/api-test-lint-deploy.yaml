@@ -37,6 +37,7 @@ jobs:
     name: 'opentrons package linting'
     timeout-minutes: 10
     runs-on: 'ubuntu-18.04'
+    with-ot-hardware: ['true', 'false']
     steps:
       - uses: 'actions/checkout@v2'
       - uses: 'actions/setup-node@v1'
@@ -49,7 +50,13 @@ jobs:
       - uses: './.github/actions/python/setup'
         with:
           project: 'api'
-      - name: Lint
+      - if: ${{ matrix.with-ot-hardware == 'false' }}
+        name: Lint without opentrons_hardware
+        run: |
+          make -C api setup-ot2
+          make -C api lint
+      - if: ${{ matrix.with-ot-hardware == 'true' }}
+        name: Lint with opentrons_hardware
         run: make -C api lint
   test:
     name: 'opentrons package tests on ${{ matrix.os }}, python ${{ matrix.python }}'
@@ -61,6 +68,7 @@ jobs:
         # TODO(mc, 2022-02-24): expand this matrix to 3.8 and 3.9,
         # preferably in a nightly cronjob on edge or something
         python: ['3.7', '3.10']
+        with-ot-hardware: ['true', 'false']
     runs-on: '${{ matrix.os }}'
     steps:
       - uses: 'actions/checkout@v2'
@@ -79,9 +87,16 @@ jobs:
       - uses: './.github/actions/python/setup'
         with:
           project: 'api'
-      - name: Test
+      - if: ${{ matrix.with-ot-hardware == 'false' }}
+        name: Test without opentrons_hardware
+        run: |
+          make -C api setup-ot2
+          make -C api test-ot2
+      - if: ${{ matrix.with-ot-hardware == 'true' }}
+        name: Test with opentrons_hardware
         run: make -C api test
-      - uses: 'codecov/codecov-action@v2'
+      - if: ${{ matrix.with-ot-hardware == 'true' }}
+        uses: 'codecov/codecov-action@v2'
         with:
           files: ./api/coverage.xml
           flags: api

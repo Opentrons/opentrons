@@ -41,6 +41,9 @@ jobs:
     name: 'robot server package linting and tests'
     timeout-minutes: 20
     runs-on: 'ubuntu-18.04'
+    strategy:
+      matrix:
+        with-ot-hardware: ['true', 'false']
     steps:
       - uses: 'actions/checkout@v2'
       - uses: 'actions/setup-node@v1'
@@ -53,11 +56,25 @@ jobs:
       - uses: './.github/actions/python/setup'
         with:
           project: 'robot-server'
-      - name: Lint
-        run: make -C robot-server lint
-      - name: Test
+      - if: ${{ matrix.with-ot-hardware == 'false' }}
+        name: Lint without opentrons_hardware
+        run: |
+          make -C robot-server setup-ot2
+          make -C robot-server lint
+      - if: ${{ matrix.with-ot-hardware == 'true' }}
+        name: Lint with opentrons_hardware
+        run: |
+          make -C robot-server lint
+      - if: ${{ matrix.with-ot-hardware == 'false' }}
+        name: Test without opentrons_hardware
+        run: |
+          make -C robot-server setup-ot2
+          make -C robot-server test
+      - if: ${{ matrix.with-ot-hardware == 'true' }}
+        name: Test with opentrons_hardware
         run: make -C robot-server test
-      - uses: 'codecov/codecov-action@v2'
+      - if: ${{ matrix.with-ot-hardware == 'true' }}
+        uses: 'codecov/codecov-action@v2'
         with:
           files: ./robot-server/coverage.xml
           flags: robot-server
