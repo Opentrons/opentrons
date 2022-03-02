@@ -69,12 +69,6 @@ jobs:
             with-ot-hardware: 'true'
           - python: '3.10'
             with-ot-hardware: 'true'
-          - python: '3.7'
-            with-ot-hardware: 'true'
-        include:
-          - os: 'ubuntu-18.04'
-            with-ot-hardware: 'true'
-            python: '3.8'
     runs-on: '${{ matrix.os }}'
     steps:
       - uses: 'actions/checkout@v2'
