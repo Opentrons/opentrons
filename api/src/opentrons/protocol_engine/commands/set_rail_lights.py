@@ -16,7 +16,7 @@ class SetRailLightsParams(BaseModel):
     """Payload required to set the rail lights on or off."""
 
     on: bool = Field(
-        True,
+        ...,
         description="The field that determines if the light is turned off or on.",
     )
 
