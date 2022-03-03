@@ -13,6 +13,7 @@ import {
   TEMPERATURE_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  HEATERSHAKER_MODULE_TYPE,
   LabwareDefinition2,
   ModuleType,
 } from '@opentrons/shared-data'
@@ -71,6 +72,8 @@ const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
   ],
   [MAGNETIC_MODULE_TYPE]: ['nest_96_wellplate_100ul_pcr_full_skirt'],
   [THERMOCYCLER_MODULE_TYPE]: ['nest_96_wellplate_100ul_pcr_full_skirt'],
+  // TODO(sh, 2022-02-28): add list of recommended labware for the heater shaker
+  [HEATERSHAKER_MODULE_TYPE]: [],
 }
 
 export const getLabwareIsRecommended = (

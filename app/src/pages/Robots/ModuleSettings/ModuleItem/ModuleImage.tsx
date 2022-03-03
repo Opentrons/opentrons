@@ -34,4 +34,5 @@ const MODULE_IMGS: { [m in ModuleModel]: string } = {
   magneticModuleV1: require('../../../../assets/images/modules/magneticModuleV1@3x.png'),
   magneticModuleV2: require('../../../../assets/images/modules/magneticModuleV2@3x.png'),
   thermocyclerModuleV1: require('../../../../assets/images/modules/thermocyclerModuleV1@3x.png'),
+  heaterShakerModuleV1: require('../../../../assets/images/modules/heaterShakerModuleV1@3x.png'),
 }

@@ -246,7 +246,7 @@ def test_get_module_heater_shaker(api_client, hardware, heater_shaker) -> None:
                 "fwVersion": "dummyVersionHS",
                 "hasAvailableUpdate": False,
                 "model": "dummyModelHS",
-                "moduleModel": "heaterShakerV1",
+                "moduleModel": "heaterShakerModuleV1",
                 "name": "heatershaker",
                 "port": "/dev/ot_module_heatershaker1",
                 "usbPort": {"hub": None, "port": None},
