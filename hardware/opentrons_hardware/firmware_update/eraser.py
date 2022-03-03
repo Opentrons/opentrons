@@ -4,10 +4,11 @@ import asyncio
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons_hardware.drivers.can_bus.can_messenger import WaitableCallback
 from opentrons_hardware.firmware_bindings import NodeId, ErrorCode
-from opentrons_hardware.firmware_bindings.messages.message_definitions import \
-    FirmwareUpdateEraseAppRequest, FirmwareUpdateEraseAppResponse
-from opentrons_hardware.firmware_update.errors import ErrorResponse, \
-    TimeoutResponse
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    FirmwareUpdateEraseAppRequest,
+    FirmwareUpdateEraseAppResponse,
+)
+from opentrons_hardware.firmware_update.errors import ErrorResponse, TimeoutResponse
 
 
 class FirmwareUpdateEraser:
@@ -47,8 +48,8 @@ class FirmwareUpdateEraser:
         # Poll for device info response.
         async for response, arbitration_id in reader:
             if (
-                    isinstance(response, FirmwareUpdateEraseAppResponse)
-                    and arbitration_id.parts.originating_node_id == node_id
+                isinstance(response, FirmwareUpdateEraseAppResponse)
+                and arbitration_id.parts.originating_node_id == node_id
             ):
                 if response.payload.error_code.value != ErrorCode.ok:
                     raise ErrorResponse(response)

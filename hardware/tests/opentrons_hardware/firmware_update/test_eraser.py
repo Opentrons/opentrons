@@ -2,14 +2,20 @@
 import pytest
 from mock import AsyncMock
 
-from opentrons_hardware.firmware_bindings import NodeId, ErrorCode, \
-    ArbitrationId, ArbitrationIdParts
-from opentrons_hardware.firmware_bindings.messages import MessageDefinition, \
-    message_definitions, payloads
+from opentrons_hardware.firmware_bindings import (
+    NodeId,
+    ErrorCode,
+    ArbitrationId,
+    ArbitrationIdParts,
+)
+from opentrons_hardware.firmware_bindings.messages import (
+    MessageDefinition,
+    message_definitions,
+    payloads,
+)
 from opentrons_hardware.firmware_bindings.utils import UInt16Field
 from opentrons_hardware.firmware_update import FirmwareUpdateEraser
-from opentrons_hardware.firmware_update.errors import ErrorResponse, \
-    TimeoutResponse
+from opentrons_hardware.firmware_update.errors import ErrorResponse, TimeoutResponse
 from tests.conftest import MockCanMessageNotifier
 
 
@@ -19,13 +25,20 @@ def subject(mock_messenger: AsyncMock) -> FirmwareUpdateEraser:
     return FirmwareUpdateEraser(mock_messenger)
 
 
-async def test_messaging(subject: FirmwareUpdateEraser, mock_messenger: AsyncMock, can_message_notifier: MockCanMessageNotifier) -> None:
+async def test_messaging(
+    subject: FirmwareUpdateEraser,
+    mock_messenger: AsyncMock,
+    can_message_notifier: MockCanMessageNotifier,
+) -> None:
     """It should send erase message."""
+
     def responder(node_id: NodeId, message: MessageDefinition) -> None:
         """Mock send method."""
         if isinstance(message, message_definitions.FirmwareUpdateEraseAppRequest):
             response = message_definitions.FirmwareUpdateEraseAppResponse(
-                payload=payloads.FirmwareUpdateAcknowledge(error_code=UInt16Field(ErrorCode.ok))
+                payload=payloads.FirmwareUpdateAcknowledge(
+                    error_code=UInt16Field(ErrorCode.ok)
+                )
             )
             can_message_notifier.notify(
                 message=response,
@@ -46,20 +59,27 @@ async def test_messaging(subject: FirmwareUpdateEraser, mock_messenger: AsyncMoc
     await subject.run(target_id, 1)
 
     mock_messenger.send.assert_called_once_with(
-            node_id=target_id,
-            message=message_definitions.FirmwareUpdateEraseAppRequest(
-                payload=payloads.EmptyPayload()
-            )
-        )
+        node_id=target_id,
+        message=message_definitions.FirmwareUpdateEraseAppRequest(
+            payload=payloads.EmptyPayload()
+        ),
+    )
 
 
-async def test_error_message(subject: FirmwareUpdateEraser, mock_messenger: AsyncMock, can_message_notifier: MockCanMessageNotifier) -> None:
+async def test_error_message(
+    subject: FirmwareUpdateEraser,
+    mock_messenger: AsyncMock,
+    can_message_notifier: MockCanMessageNotifier,
+) -> None:
     """It should raise on error response."""
+
     def responder(node_id: NodeId, message: MessageDefinition) -> None:
         """Mock send method."""
         if isinstance(message, message_definitions.FirmwareUpdateEraseAppRequest):
             response = message_definitions.FirmwareUpdateEraseAppResponse(
-                payload=payloads.FirmwareUpdateAcknowledge(error_code=UInt16Field(ErrorCode.hardware))
+                payload=payloads.FirmwareUpdateAcknowledge(
+                    error_code=UInt16Field(ErrorCode.hardware)
+                )
             )
             can_message_notifier.notify(
                 message=response,
@@ -79,7 +99,9 @@ async def test_error_message(subject: FirmwareUpdateEraser, mock_messenger: Asyn
         await subject.run(NodeId.host, 1)
 
 
-async def test_timeout(subject: FirmwareUpdateEraser, mock_messenger: AsyncMock) -> None:
+async def test_timeout(
+    subject: FirmwareUpdateEraser, mock_messenger: AsyncMock
+) -> None:
     """It should raise on timeout."""
     with pytest.raises(TimeoutResponse):
         await subject.run(NodeId.host, 0.05)

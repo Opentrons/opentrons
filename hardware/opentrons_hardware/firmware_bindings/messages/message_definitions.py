@@ -326,9 +326,7 @@ class FirmwareUpdateStatusResponse:  # noqa: D101
 class FirmwareUpdateEraseAppRequest:  # noqa: D101
     payload: payloads.EmptyPayload = payloads.EmptyPayload()
     payload_type: Type[BinarySerializable] = payloads.EmptyPayload
-    message_id: Literal[
-        MessageId.fw_update_erase_app
-    ] = MessageId.fw_update_erase_app
+    message_id: Literal[MessageId.fw_update_erase_app] = MessageId.fw_update_erase_app
 
 
 @dataclass
