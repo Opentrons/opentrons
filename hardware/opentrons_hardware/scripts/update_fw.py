@@ -22,7 +22,7 @@ from opentrons_hardware.firmware_update import (
     gantry_y,
     pipette_left,
     pipette_right,
-    HexRecordProcessor,
+    HexRecordProcessor, FirmwareUpdateEraser,
 )
 
 logger = logging.getLogger(__name__)
@@ -78,6 +78,16 @@ async def run(args: argparse.Namespace) -> None:
         ready_wait_time_sec=args.timeout_seconds,
     )
 
+    if args.no_erase:
+        eraser = FirmwareUpdateEraser(messenger)
+        logger.info(f"Erasing existing FW Update on {target}.")
+        await eraser.run(
+            node_id=target.bootloader_node,
+            timeout_sec=args.timeout_seconds,
+        )
+    else:
+        logger.info("Skipping erase step.")
+
     logger.info(f"Downloading FW to {target.bootloader_node}.")
     await downloader.run(
         node_id=target.bootloader_node,
@@ -124,6 +134,12 @@ def main() -> None:
     )
     parser.add_argument(
         "--timeout-seconds", help="Number of seconds to wait.", type=float, default=10
+    )
+    parser.add_argument(
+        "--no-erase",
+        help="Don't erase existing application from flash.",
+        action="store_true",
+        default=False,
     )
 
     args = parser.parse_args()
