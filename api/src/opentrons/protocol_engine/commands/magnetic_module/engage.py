@@ -1,13 +1,17 @@
 """Magnetic Module engage command request, result, and implementation models."""
 
 
-from typing import Optional
+from __future__ import annotations
+
+from typing import Optional, TYPE_CHECKING
 from typing_extensions import Literal, Type
 
 from pydantic import BaseModel, Field
 
-from opentrons.protocol_engine.execution import EquipmentHandler
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+
+if TYPE_CHECKING:
+    from opentrons.protocol_engine.execution import EquipmentHandler
 
 
 EngageCommandType = Literal["magneticModule/engageMagnet"]
