@@ -47,7 +47,7 @@ class AttachedModulesControl:
         usb_instance = (
             usb.USBBus(board_revision)
             if not api_instance.is_simulator and IS_ROBOT
-            else usb_simulator.USBBusSimulator(board_revision)
+            else usb_simulator.USBBusSimulator()
         )
         mc_instance = cls(api=api_instance, usb=usb_instance)
 
