@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.2-alpha.1](https://github.com/Opentrons/opentrons/compare/v5.0.2-alpha.0...v5.0.2-alpha.1) (2022-03-02)
+
+
+### Bug Fixes
+
+* **app:** do not pass `directionControlButtonColor` into DOM ([#9615](https://github.com/Opentrons/opentrons/issues/9615)) ([0651d91](https://github.com/Opentrons/opentrons/commit/0651d914685f21ef9ca0f11e0339b147df745090))
+* **app:** show labware def display name in lpc summary screen, fix nested lw render condition ([#9614](https://github.com/Opentrons/opentrons/issues/9614)) ([fa33c33](https://github.com/Opentrons/opentrons/commit/fa33c33cd586b2694ec6f87642d5019b4cf49c51))
+
+
+
+
+
 ## [5.0.2-alpha.0](https://github.com/Opentrons/opentrons/compare/v5.0.1...v5.0.2-alpha.0) (2022-03-01)
 
 
