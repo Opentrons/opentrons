@@ -22,7 +22,8 @@ from opentrons_hardware.firmware_update import (
     gantry_y,
     pipette_left,
     pipette_right,
-    HexRecordProcessor, FirmwareUpdateEraser,
+    HexRecordProcessor,
+    FirmwareUpdateEraser,
 )
 
 logger = logging.getLogger(__name__)
