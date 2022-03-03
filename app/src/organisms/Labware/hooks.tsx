@@ -1,11 +1,8 @@
 import { useSelector } from 'react-redux'
-import { getAllDefinitions } from '@opentrons/shared-data'
-import {
-  getCustomLabware,
-} from '../../redux/custom-labware'
+import { getCustomLabware } from '../../redux/custom-labware'
+import { getAllDefinitions } from './helpers/definitions'
 
 import type { LabwareDefinition2 as LabwareDefiniton } from '@opentrons/shared-data'
-
 
 export interface LabwareDefAndDate {
   definition: LabwareDefiniton

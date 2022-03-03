@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 import { renderHook } from '@testing-library/react-hooks'
-import { getAllDefs } from '@opentrons/shared-data/js/labwareTools/getAllDefs'
+import { getAllDefs } from '../helpers/getAllDefs'
 
 import { getCustomLabware } from '../../../redux/custom-labware'
 import {
@@ -16,7 +16,7 @@ import type { Store } from 'redux'
 import type { State } from '../../../redux/types'
 
 jest.mock('../../../redux/custom-labware')
-jest.mock('@opentrons/shared-data/js/labwareTools/getAllDefs')
+jest.mock('../helpers/getAllDefs')
 
 const mockGetCustomLabware = getCustomLabware as jest.MockedFunction<
   typeof getCustomLabware
