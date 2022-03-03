@@ -1,8 +1,11 @@
 """Tests for module state accessors in the protocol engine state store."""
 import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
+from decoy import Decoy
+
 from typing import Optional, Dict
 
+from opentrons.hardware_control.modules import AbstractModule
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
@@ -250,6 +253,58 @@ def test_thermocycler_dodging(
         is should_dodge
     )
 
+
+def test_find_loaded_hardware_module(
+    decoy: Decoy,
+    magdeck_v1_def: ModuleDefinition
+) -> None:
+    """It should return the matching hardware module."""
+
+    matching = decoy.mock(cls=AbstractModule)
+    matching.device_info = {"serial": "serial-matching"}
+
+    non_matching = decoy.mock(cls=AbstractModule)
+    non_matching.device_info = {"serial": "serial-non-matching"}
+
+    another_non_matching = decoy.mock(cls=AbstractModule)
+    another_non_matching.device_info = {"serial": "serial-another-non-matching"}
+
+    attached = [non_matching, matching, another_non_matching]
+
+    subject = make_module_view(
+        hardware_module_by_slot={
+            DeckSlotName.SLOT_1: HardwareModule(
+                serial_number="serial-non-maching",
+                definition=magdeck_v1_def,
+            ),
+            DeckSlotName.SLOT_2: HardwareModule(
+                serial_number="serial-matching",
+                definition=magdeck_v1_def,
+            ),
+            DeckSlotName.SLOT_3: HardwareModule(
+                serial_number="serial-another-non-matching",
+                definition=magdeck_v1_def,
+            )
+        },
+        slot_by_module_id={
+            "id-non-matching": DeckSlotName.SLOT_1,
+            "id-matching": DeckSlotName.SLOT_2,
+            "id-another-non-matching": DeckSlotName.SLOT_3,
+        }
+    )
+
+    result = subject.find_loaded_hardware_module(
+        module_id="id-matching",
+        attached_modules=attached,
+        expected_type=AbstractModule,
+    )
+
+    assert result == matching
+
+# To do:
+# Raises if module does not exist
+# Raises if exists, but no attached
+# Raises if wrong type
 
 def test_select_hardware_module_to_load_rejects_missing() -> None:
     """It should raise if the correct module isn't attached."""
