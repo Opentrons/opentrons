@@ -228,7 +228,8 @@ class ProtocolContext:
     def set_rail_lights(self, on: bool) -> None:
         """Controls the robot rail lights.
 
-        :param bool on: If true, turn on rail lights; otherwise, turn off.
+        Args:
+            on: If true, turn on rail lights; otherwise, turn off.
         """
         self._engine_client.set_rail_lights(on=on)
 
