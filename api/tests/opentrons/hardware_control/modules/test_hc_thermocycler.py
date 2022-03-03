@@ -10,7 +10,6 @@ from opentrons.drivers.rpi_drivers.types import USBPort
 def usb_port() -> USBPort:
     return USBPort(
         name="",
-        sub_names=[],
         hub=None,
         port_number=None,
         device_path="/dev/ot_module_sim_thermocycler0",

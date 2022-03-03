@@ -4,7 +4,6 @@ from itertools import groupby
 from dataclasses import dataclass
 from typing import List, Optional, Tuple
 from opentrons.hardware_control.types import BoardRevision
-from opentrons.algorithms.types import GenericNode
 
 
 class PinDir(enum.Enum):
@@ -18,7 +17,8 @@ REV_A_USB_HUB = 3
 
 
 @dataclass(frozen=True)
-class USBPort(GenericNode[str]):
+class USBPort:
+    name: str
     port_number: Optional[int] = None
     device_path: str = ""
     hub: Optional[int] = None
@@ -48,9 +48,7 @@ class USBPort(GenericNode[str]):
                 port,
             ),
         )
-        return cls(
-            name=name, port_number=port, sub_names=[], device_path=device_path, hub=hub
-        )
+        return cls(name=name, port_number=port, device_path=device_path, hub=hub)
 
     @staticmethod
     def find_hub(port_nodes: List[str]) -> Tuple[Optional[int], int, str]:
@@ -127,7 +125,7 @@ class USBPort(GenericNode[str]):
         hashable which is why we need to unpack
         the list here.
         """
-        return hash((self.name, *self.sub_names))
+        return hash(self.name)
 
 
 class GPIOPin:

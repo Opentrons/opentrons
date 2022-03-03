@@ -18,7 +18,6 @@ from opentrons.drivers.rpi_drivers.types import USBPort
 def magdeck():
     usb_port = USBPort(
         name="",
-        sub_names=[],
         hub=None,
         port_number=None,
         device_path="/dev/ot_module_magdeck1",
@@ -42,7 +41,6 @@ def magdeck():
 def tempdeck():
     usb_port = USBPort(
         name="",
-        sub_names=[],
         hub=None,
         port_number=None,
         device_path="/dev/ot_module_tempdeck1",
@@ -67,7 +65,6 @@ def tempdeck():
 def thermocycler():
     usb_port = USBPort(
         name="",
-        sub_names=[],
         hub=None,
         port_number=None,
         device_path="/dev/ot_module_thermocycler1",
@@ -101,7 +98,6 @@ def heater_shaker():
     """Get a mocked out heater-shaker hardware control object."""
     usb_port = USBPort(
         name="",
-        sub_names=[],
         hub=None,
         port_number=None,
         device_path="/dev/ot_module_heatershaker1",

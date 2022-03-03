@@ -96,7 +96,7 @@ class USBBusSimulator(USBDriverInterface):
         generally contains tty/tty* in its name.
         :returns: The matching port, or an empty port dataclass
         """
-        return USBPort(name="", sub_names=[], device_path=device_path)
+        return USBPort(name="", device_path=device_path)
 
     def sort_ports(self) -> None:
         pass

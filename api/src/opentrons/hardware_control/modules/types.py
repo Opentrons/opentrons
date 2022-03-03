@@ -75,7 +75,7 @@ class ThermocyclerModuleModel(_ProvideLookup):
 class ModuleAtPort:
     port: str
     name: str
-    usb_port: USBPort = USBPort(name="", sub_names=[])
+    usb_port: USBPort = USBPort(name="")
 
 
 class BundledFirmware(NamedTuple):
