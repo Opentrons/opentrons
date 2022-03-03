@@ -35,7 +35,8 @@ from .pipette import (
     generate_hardware_configs_ot3,
     load_from_config_and_check_skip,
 )
-from .backends import OT3Controller, OT3Simulator
+from .backends.ot3controller import OT3Controller
+from .backends.ot3simulator import OT3Simulator
 from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
