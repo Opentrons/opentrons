@@ -43,7 +43,7 @@ export const HeaterShakerModuleCard = (): JSX.Element | null => {
           </Text>
           <Flex paddingBottom={SPACING.spacing2}>
             <Icon
-              name={'heater-shaker'}
+              name={'ot-heater-shaker'}
               size={SIZE_1}
               marginRight={SPACING.spacing2}
               color={COLORS.darkGreyEnabled}
