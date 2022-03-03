@@ -120,7 +120,7 @@ class OT3Controller:
         self._present_nodes: Set[NodeId] = set()
         self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
 
-    async def update_to_default_current_settings(self, gantry_load: GantryLoad):
+    async def update_to_default_current_settings(self, gantry_load: GantryLoad) -> None:
         self._current_settings = get_current_settings(
             self._configuration.current_settings, gantry_load
         )
@@ -131,16 +131,16 @@ class OT3Controller:
         assert self._current_settings
         run_currents: OT3AxisMap[float] = {}
         for axis, settings in self._current_settings.items():
-            run_currents[axis] = settings.motor_run_current
+            run_currents[axis] = settings.run_current
         return run_currents
 
     @property
-    def standstill_currents(self) -> OT3AxisMap[float]:
+    def motor_hold_currents(self) -> OT3AxisMap[float]:
         assert self._current_settings
-        standstill_currents: OT3AxisMap[float] = {}
+        hold_currents: OT3AxisMap[float] = {}
         for axis, settings in self._current_settings.items():
-            standstill_currents[axis] = settings.standstill_current
-        return standstill_currents
+            hold_currents[axis] = settings.hold_current
+        return hold_currents
 
     async def setup_motors(self) -> None:
         """Set up the motors."""
@@ -254,7 +254,7 @@ class OT3Controller:
             }
         }
 
-    async def set_default_currents(self):
+    async def set_default_currents(self) -> None:
         """Set both run and hold currents from robot config to each node."""
         assert self._current_settings, "Invalid current settings"
         await set_currents(
@@ -276,10 +276,10 @@ class OT3Controller:
             self._messenger, {axis_to_node(k): v for k, v in axis_currents.items()}
         )
         for axis, current in axis_currents.items():
-            self._current_settings[axis].motor_run_current = current
+            self._current_settings[axis].run_current = current
 
-    async def set_standstill_current(self, axis_currents: OT3AxisMap[float]) -> None:
-        """Set the standstill current.
+    async def set_hold_current(self, axis_currents: OT3AxisMap[float]) -> None:
+        """Set the hold current for motor.
 
         Args:
             axis_currents: Axes' currents
@@ -292,7 +292,7 @@ class OT3Controller:
             self._messenger, {axis_to_node(k): v for k, v in axis_currents.items()}
         )
         for axis, current in axis_currents.items():
-            self._current_settings[axis].standstill_current = current
+            self._current_settings[axis].hold_current = current
 
     @contextmanager
     def save_current(self) -> Generator[None, None, None]:

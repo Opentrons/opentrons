@@ -99,8 +99,8 @@ def get_current_settings(
     for axis_kind in [OT3AxisKind.P, OT3AxisKind.X, OT3AxisKind.Y, OT3AxisKind.Z]:
         for axis in OT3Axis.of_kind(axis_kind):
             currents[axis] = CurrentConfig(
-                conf_by_pip["standstill_current"][axis_kind],
-                conf_by_pip["motor_run_current"][axis_kind],
+                conf_by_pip["hold_current"][axis_kind],
+                conf_by_pip["run_current"][axis_kind],
             )
     return currents
 

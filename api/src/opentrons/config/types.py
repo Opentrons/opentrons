@@ -103,8 +103,8 @@ class OT3MotionSettings:
 
 @dataclass(frozen=True)
 class OT3CurrentSettings:
-    standstill_current: PerPipetteAxisSettings
-    motor_run_current: PerPipetteAxisSettings
+    hold_current: PerPipetteAxisSettings
+    run_current: PerPipetteAxisSettings
 
     def by_gantry_load(
         self, gantry_load: GantryLoad

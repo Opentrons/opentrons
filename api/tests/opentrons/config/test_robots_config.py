@@ -203,7 +203,7 @@ ot3_dummy_settings = {
         },
     },
     "current_settings": {
-        "standstill_current": {
+        "hold_current": {
             "none": {
                 OT3AxisKind.X: 0.7,
                 OT3AxisKind.Y: 0.7,
@@ -230,7 +230,7 @@ ot3_dummy_settings = {
                 OT3AxisKind.Z: 0.7,
             },
         },
-        "motor_run_current": {
+        "run_current": {
             "none": {
                 OT3AxisKind.X: 7.0,
                 OT3AxisKind.Y: 7.0,
@@ -350,8 +350,8 @@ def test_current_for_revision(current_dict, board_rev, result):
 def test_load_per_pipette_vals():
     # nothing provided
     assert (
-        defaults_ot3._build_default_bpk({}, defaults_ot3.DEFAULT_STANDSTILL_CURRENT)
-        == defaults_ot3.DEFAULT_STANDSTILL_CURRENT
+        defaults_ot3._build_default_bpk({}, defaults_ot3.DEFAULT_HOLD_CURRENT)
+        == defaults_ot3.DEFAULT_HOLD_CURRENT
     )
 
     # some dicts not formatted right
