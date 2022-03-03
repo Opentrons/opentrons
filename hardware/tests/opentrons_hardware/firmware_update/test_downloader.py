@@ -89,7 +89,7 @@ async def test_messaging(
         elif isinstance(message, FirmwareUpdateComplete):
             can_message_notifier.notify(
                 FirmwareUpdateCompleteAcknowledge(
-                    payload=payloads.FirmwareUpdateCompleteAcknowledge(
+                    payload=payloads.FirmwareUpdateAcknowledge(
                         error_code=utils.UInt16Field(ErrorCode.ok)
                     )
                 ),
@@ -203,7 +203,7 @@ async def test_messaging_complete_error_response(
         elif isinstance(message, FirmwareUpdateComplete):
             can_message_notifier.notify(
                 FirmwareUpdateCompleteAcknowledge(
-                    payload=payloads.FirmwareUpdateCompleteAcknowledge(
+                    payload=payloads.FirmwareUpdateAcknowledge(
                         error_code=utils.UInt16Field(ErrorCode.invalid_size)
                     )
                 ),
