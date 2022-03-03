@@ -51,7 +51,9 @@ async def run(args: argparse.Namespace) -> None:
     with open(args.params_file_path, "r") as f:
         current_params = json.load(f)
 
-    currents = {NodeId[k]: tuple(v) for k, v in current_params.items()}
+    currents = {}
+    for k, v in current_params.items():
+        currents[NodeId[k]] = (v["hold_current"], v["run_current"])
 
     try:
         await set_currents(messenger, currents)
