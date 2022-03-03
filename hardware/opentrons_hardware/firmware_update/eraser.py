@@ -1,4 +1,4 @@
-"""Firmware eraser"""
+"""Firmware eraser."""
 import asyncio
 
 from opentrons_hardware.drivers.can_bus import CanMessenger
