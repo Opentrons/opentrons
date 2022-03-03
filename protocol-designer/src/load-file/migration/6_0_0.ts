@@ -41,7 +41,7 @@ export const migrateFile = (appData: any): any => {
   const pipettes = appData.pipettes
   const loadPipetteCommands = map(pipettes, (pipette, pipetteId) => {
     const loadPipetteCommand = {
-      id: uuid(),
+      key: uuid(),
       commandType: 'loadPipette',
       params: {
         pipetteId: pipetteId,
@@ -54,7 +54,7 @@ export const migrateFile = (appData: any): any => {
   const modules = appData.modules
   const loadModuleCommands = map(modules, (module, moduleId) => {
     const loadModuleCommand = {
-      id: uuid(),
+      key: uuid(),
       commandType: 'loadModule',
       params: {
         moduleId: moduleId,
@@ -67,7 +67,7 @@ export const migrateFile = (appData: any): any => {
   const labware = appData.labware
   const loadLabwareCommands = map(labware, (labware, labwareId) => {
     const loadLabwareCommand = {
-      id: uuid(),
+      key: uuid(),
       commandType: 'loadLabware',
       params: {
         labwareId: labwareId,
@@ -83,7 +83,7 @@ export const migrateFile = (appData: any): any => {
     delete command.params.well
     const migrateV5Commands = {
       commandType: command.command === 'airGap' ? 'aspirate' : command.command,
-      id: uuid(),
+      key: uuid(),
       params: command.params,
     }
     return migrateV5Commands
