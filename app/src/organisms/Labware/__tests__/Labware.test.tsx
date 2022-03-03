@@ -9,7 +9,7 @@ import { mockDefinition } from '../../../redux/custom-labware/__fixtures__'
 
 jest.mock('../LabwareCard')
 jest.mock('../hooks')
-jest.mock('@opentrons/shared-data/js/labwareTools/getAllDefs')
+jest.mock('../helpers/getAllDefs')
 
 const mockLabwareCard = LabwareCard as jest.MockedFunction<typeof LabwareCard>
 const mockUseGetAllLabware = useGetAllLabware as jest.MockedFunction<

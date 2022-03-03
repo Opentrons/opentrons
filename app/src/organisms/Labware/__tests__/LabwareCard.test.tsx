@@ -6,7 +6,7 @@ import { useGetAllLabware } from '../hooks'
 import { mockDefinition } from '../../../redux/custom-labware/__fixtures__'
 
 jest.mock('../hooks')
-jest.mock('@opentrons/shared-data/js/labwareTools/getAllDefs')
+jest.mock('../helpers/getAllDefs')
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
   return {
