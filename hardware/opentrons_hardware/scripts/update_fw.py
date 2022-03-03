@@ -79,7 +79,7 @@ async def run(args: argparse.Namespace) -> None:
         ready_wait_time_sec=args.timeout_seconds,
     )
 
-    if args.no_erase:
+    if not args.no_erase:
         eraser = FirmwareUpdateEraser(messenger)
         logger.info(f"Erasing existing FW Update on {target}.")
         await eraser.run(
