@@ -1,6 +1,6 @@
 {
   "name": "@opentrons/app",
-  "version": "5.0.2-alpha.1",
+  "version": "5.0.2",
   "description": "Opentrons desktop application UI",
   "source": "src/index.tsx",
   "types": "lib/index.d.ts",
@@ -19,10 +19,10 @@
   "homepage": "https://github.com/Opentrons/opentrons",
   "dependencies": {
     "@hot-loader/react-dom": "17.0.1",
-    "@opentrons/api-client": "5.0.2-alpha.1",
-    "@opentrons/components": "5.0.2-alpha.1",
-    "@opentrons/react-api-client": "5.0.2-alpha.1",
-    "@opentrons/shared-data": "5.0.2-alpha.1",
+    "@opentrons/api-client": "5.0.2",
+    "@opentrons/components": "5.0.2",
+    "@opentrons/react-api-client": "5.0.2",
+    "@opentrons/shared-data": "5.0.2",
     "@thi.ng/paths": "1.6.5",
     "classnames": "2.2.5",
     "connected-react-router": "6.8.0",
