@@ -33,11 +33,12 @@ export function FeatureFlags(): JSX.Element {
             justifyContent={JUSTIFY_SPACE_BETWEEN}
             key={flag}
           >
-            <Text css={TYPOGRAPHY.h3SemiBold}>{startCase(flag)}</Text>
+            <Text css={TYPOGRAPHY.h3SemiBold} id={`FeatureFlags_${flag}_text`} >{startCase(flag)}</Text>
             <ToggleButton
               label={`${flag}-toggle`}
               toggledOn={Boolean(devInternalFlags?.[flag])}
               onClick={() => dispatch(() => toggleDevInternalFlag(flag))}
+              id={`FeatureFlags_${flag}_button`}
             />
           </Flex>
           {index !== Config.DEV_INTERNAL_FLAGS.length - 1 && (
