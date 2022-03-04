@@ -3,10 +3,7 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
-import {
-  actions as RobotActions,
-  selectors as RobotSelectors,
-} from '../../../redux/robot'
+import { connect, disconnect } from '../../../redux/robot'
 import { getBuildrootUpdateAvailable, UPGRADE } from '../../../redux/buildroot'
 import { CONNECTABLE } from '../../../redux/discovery'
 import { RobotListItem } from './RobotListItem'
@@ -30,19 +27,12 @@ export function RobotItemComponent(props: RobotItemProps): JSX.Element {
   const isConnectable = status === CONNECTABLE
   const isConnected = robot.connected
   const isSelected = robot.name === match.params.name
-  const connectInProgress = useSelector(
-    (state: State) => RobotSelectors.getConnectRequest(state).inProgress
-  )
   const dispatch = useDispatch<Dispatch>()
 
   const handleToggleConnect = (): void => {
-    if (!connectInProgress) {
-      const action = isConnected
-        ? RobotActions.disconnect()
-        : RobotActions.connect(name)
+    const action = isConnected ? disconnect() : connect(name)
 
-      dispatch(action)
-    }
+    dispatch(action)
   }
 
   return (

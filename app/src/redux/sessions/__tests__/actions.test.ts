@@ -186,21 +186,12 @@ describe('robot session check actions', () => {
         meta: {} as any,
       },
     },
-    {
-      name: 'sessions:CLEAR_ALL_SESSIONS',
-      creator: Actions.clearAllSessions,
-      args: ['robot-name'],
-      expected: {
-        type: 'sessions:CLEAR_ALL_SESSIONS',
-        payload: {
-          robotName: 'robot-name',
-        },
-      },
-    },
   ]
 
   SPECS.forEach(spec => {
     const { name, creator, args, expected } = spec
-    it(name, () => expect(creator(...args)).toEqual(expected))
+    it(`should handle ${name}`, () => {
+      expect(creator(...args)).toEqual(expected)
+    })
   })
 })
