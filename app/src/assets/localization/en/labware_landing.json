@@ -5,5 +5,9 @@
   "api_name": "API Name",
   "date_added": "Date added",
   "go_to_def": "Go to labware definition",
-  "delete": "Delete"
+  "delete": "Delete",
+  "import_custom_def": "Import a Custom Labware Definition",
+  "import": "Import",
+  "choose_file_to_upload": "Or choose a file from your computer to upload.",
+  "choose_file": "Choose file"
 }
