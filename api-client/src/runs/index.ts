@@ -8,6 +8,7 @@ export { getCommand } from './commands/getCommand'
 export { getCommands } from './commands/getCommands'
 export { createRunAction } from './createRunAction'
 export * from './createLabwareOffset'
+export * from './createLabwareDefinition'
 
 export * from './types'
 export type { CreateRunData } from './createRun'

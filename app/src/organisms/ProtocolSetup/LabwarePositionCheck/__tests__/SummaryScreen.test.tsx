@@ -88,7 +88,7 @@ describe('SummaryScreen', () => {
           labware: {
             '1d57fc10-67ad-11ea-9f8b-3b50068bd62d:opentrons/opentrons_96_filtertiprack_200ul/1': {
               slot: '1',
-              displayName: 'someDislpayName',
+              displayName: 'someDisplayName',
               definitionId: LABWARE_DEF_ID,
             },
           },

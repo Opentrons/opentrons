@@ -6,9 +6,9 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# OT-2 Software Changes in 5.0.1
+# OT-2 Software Changes in 5.0.2
 
-Welcome to the v5.0.1 release of the Opentrons OT-2 software!
+Welcome to the v5.0.2 release of the Opentrons OT-2 software!
 
 This release is a complete refactor of how the OT-2 communicates with the Opentrons app, and features a number of changes to how protocols are loaded and stored on the robot.
 
@@ -19,13 +19,22 @@ This release is a complete refactor of how the OT-2 communicates with the Opentr
  - The most recent protocol analysis and run are stored on the robot to enable easy, quick re-running via the Opentrons App
  - A new way to use labware offsets in Jupyter notebook and SSH sessions
 
+## 5.0.1 to 5.0.2
+
+The 5.0.2 hotfix release contains two fixes in the robot software:
+
+1. The robot now understands how to use labware loaded via `load_labware_from_definition` during Labware Position Check.
+2. User-defined labware labels are now returned to the Opentrons App from protocol analyses and runs.
+3. Protocol file uploads now permit uppercase .json and .py extensions.
+
 ## 5.0.0 to 5.0.1
 
 The 5.0.1 hotfix release does not contain any changes to the robot software
 
 ## Known Issues
 
-Your last run protocol will not be saved through robot reboots
+- Your last run protocol will not be saved through robot reboots.
+- When you load multiple instances of the same module type in a protocol, the USB port numbers shown in "Module Setup" are incorrect.
 
 ---
 

@@ -245,6 +245,7 @@ async def test_equipment_broker_messages(
         labware_definition=minimal_labware_def,
         labware_namespace="some_namespace",
         labware_load_name="some_load_name",
+        labware_display_name=None,
         labware_version=123,
         deck_slot=DeckSlotName.SLOT_1,
         on_module=False,

@@ -122,6 +122,16 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
             ],
         ),
     ),
+    RoleAnalyzerSpec(
+        files=[
+            BufferedFile(name="PROTOCOL.PY", contents=b"", data=None),
+        ],
+        expected=RoleAnalysis(
+            main_file=MainFile(name="PROTOCOL.PY", contents=b""),
+            labware_files=[],
+            labware_definitions=[],
+        ),
+    ),
 ]
 
 
