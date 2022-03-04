@@ -42,7 +42,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
     >
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} height="100%">
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing4}>
-          <Box width="5rem">
+          <Box width="5rem" id="LabwareCard_labwareImage">
             <RobotWorkSpace
               viewBox={`0 0 ${definition.dimensions.xDimension} ${definition.dimensions.yDimension}`}
             >
@@ -57,10 +57,12 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
             <Box>
-              <StyledText as="h3">{displayName}</StyledText>
+              <StyledText as="h3" id="LabwareCard_labwareName">
+                {displayName}
+              </StyledText>
               {definition.brand.brand === 'Opentrons' && (
                 <>
-                  <StyledText as="h6">
+                  <StyledText as="h6" id="LabwareCard_opentronsDef">
                     <Icon
                       color={COLORS.blue}
                       name="check-decagram"
@@ -71,7 +73,11 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
                 </>
               )}
               {isCustomDefinition && (
-                <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                <StyledText
+                  as="h6"
+                  color={COLORS.darkGreyEnabled}
+                  id="LabwareCard_customDef"
+                >
                   {t('custom_def')}
                 </StyledText>
               )}
@@ -81,6 +87,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
                 as="h6"
                 textTransform={TYPOGRAPHY.textTransformUppercase}
                 color={COLORS.darkGreyEnabled}
+                id="LabwareCard_apiName"
               >
                 {t('api_name')}
               </StyledText>
@@ -99,9 +106,17 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           alignItems={ALIGN_FLEX_END}
         >
-          <Icon name="dots-vertical" height="1rem" />
+          <Icon
+            name="dots-vertical"
+            height="1rem"
+            id="LabwareCard_overflowMenu"
+          />
           {modified != null && (
-            <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+            <StyledText
+              as="h6"
+              color={COLORS.darkGreyEnabled}
+              id="LabwareCard_dateAdded"
+            >
               {t('date_added')} {format(new Date(modified), 'MM/dd/yyyy')}
             </StyledText>
           )}
