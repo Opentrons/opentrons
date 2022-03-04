@@ -93,7 +93,6 @@ module.exports = {
         'jest/no-deprecated-functions': 'warn',
         'jest/valid-title': 'warn',
         'jest/no-conditional-expect': 'warn',
-        'jest/no-done-callback': 'warn',
       },
     },
     {
