@@ -35,7 +35,7 @@ async def test_read() -> None:
 async def test_read_opentrons_json() -> None:
     """It should read and parse Opentrons JSON protocol/labware file-likes."""
     file_1 = InputFile(filename="hello.json", file=io.BytesIO(SIMPLE_V5_JSON_PROTOCOL))
-    file_2 = InputFile(filename="world.json", file=io.BytesIO(SIMPLE_LABWARE_DEF))
+    file_2 = InputFile(filename="world.JSON", file=io.BytesIO(SIMPLE_LABWARE_DEF))
 
     subject = FileReaderWriter()
     result = await subject.read([file_1, file_2])
@@ -47,7 +47,7 @@ async def test_read_opentrons_json() -> None:
             data=matchers.Anything(),
         ),
         BufferedFile(
-            name="world.json",
+            name="world.JSON",
             contents=SIMPLE_LABWARE_DEF,
             data=matchers.Anything(),
         ),

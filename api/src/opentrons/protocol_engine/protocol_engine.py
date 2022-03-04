@@ -9,7 +9,7 @@ from .commands import (
     Command,
     CommandCreate,
 )
-from .types import LabwareOffset, LabwareOffsetCreate
+from .types import LabwareOffset, LabwareOffsetCreate, LabwareUri
 from .execution import (
     QueueWorker,
     create_queue_worker,
@@ -258,8 +258,9 @@ class ProtocolEngine:
             labware_offset_id=labware_offset_id
         )
 
-    def add_labware_definition(self, definition: LabwareDefinition) -> None:
+    def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
         """Add a labware definition to the state for subsequent labware loads."""
         self._action_dispatcher.dispatch(
             AddLabwareDefinitionAction(definition=definition)
         )
+        return self._state_store.labware.get_uri_from_definition(definition)

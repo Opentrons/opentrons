@@ -1,6 +1,7 @@
 from .controller import Controller
 from .simulator import Simulator
-from .ot3controller import OT3Controller
-from .ot3simulator import OT3Simulator
 
-__all__ = ["Controller", "Simulator", "OT3Controller", "OT3Simulator", "ot3utils"]
+# only expose the ot2 interfaces in __init__ so everything works if opentrons_hardware
+# is not present
+
+__all__ = ["Controller", "Simulator"]

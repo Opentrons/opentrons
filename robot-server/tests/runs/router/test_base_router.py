@@ -18,7 +18,6 @@ from robot_server.service.json_api import (
     ResourceLink,
 )
 
-
 from robot_server.protocols import (
     ProtocolStore,
     ProtocolResource,
@@ -47,7 +46,6 @@ from robot_server.runs.router.base_router import (
     get_run,
     get_runs,
     remove_run,
-    add_labware_offset,
     update_run,
 )
 
@@ -582,73 +580,6 @@ async def test_delete_active_run_no_engine(
         run_store=run_store,
         engine_store=engine_store,
     )
-
-
-async def test_add_labware_offset(
-    decoy: Decoy,
-    engine_store: EngineStore,
-    run_store: RunStore,
-) -> None:
-    """It should add the labware offset to the engine, assuming the run is current."""
-    labware_offset_request = LABWARE_OFFSET_REQUESTS[0]
-
-    run_resource = RunResource(
-        run_id="run-id",
-        protocol_id=None,
-        created_at=datetime(year=2021, month=1, day=1),
-        actions=[],
-        is_current=True,
-    )
-
-    expected_response = Run(
-        id="run-id",
-        protocolId=None,
-        createdAt=datetime(year=2021, month=1, day=1),
-        status=pe_types.EngineStatus.SUCCEEDED,
-        current=True,
-        actions=[],
-        errors=[],
-        pipettes=[],
-        labware=[],
-        labwareOffsets=[],
-    )
-
-    decoy.when(run_store.get(run_id="run-id")).then_return(run_resource)
-
-    engine_state = decoy.mock(cls=StateView)
-    decoy.when(engine_store.get_state("run-id")).then_return(engine_state)
-
-    decoy.when(engine_state.commands.get_all()).then_return([])
-    decoy.when(engine_state.commands.get_all_errors()).then_return([])
-    decoy.when(engine_state.pipettes.get_all()).then_return([])
-    decoy.when(engine_state.labware.get_all()).then_return([])
-    decoy.when(
-        engine_store.engine.add_labware_offset(labware_offset_request)
-    ).then_return(
-        pe_types.LabwareOffset(
-            id="labware-offset-id",
-            createdAt=datetime(year=2021, month=1, day=1),
-            definitionUri="labware-definition-uri",
-            location=pe_types.LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
-            vector=pe_types.LabwareOffsetVector(x=0, y=0, z=0),
-        )
-    )
-    # Tests for run POST and GET should already cover passing the engine's labware
-    # offsets to the client when .get_labware_offsets() returns a non-empty list.
-    decoy.when(engine_state.labware.get_labware_offsets()).then_return([])
-    decoy.when(engine_state.commands.get_status()).then_return(
-        pe_types.EngineStatus.SUCCEEDED
-    )
-
-    result = await add_labware_offset(
-        runId="run-id",
-        request_body=RequestModel(data=labware_offset_request),
-        engine_store=engine_store,
-        run_store=run_store,
-    )
-
-    assert result.content == SimpleBody(data=expected_response)
-    assert result.status_code == 201
 
 
 async def test_update_run_to_not_current(
