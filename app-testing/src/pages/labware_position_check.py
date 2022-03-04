@@ -32,7 +32,7 @@ class LabwarePositionCheck:
 
     begin_labware_position_text_locator: Tuple[str, str] = (
         By.XPATH,
-        "//button[text()='begin labware position check, move to Slot 2']",
+        "//button[text()='begin labware position check, move to Slot 4']",
     )
 
     how_to_tell_pipette_is_centered_link: Tuple[str, str] = (
@@ -77,7 +77,7 @@ class LabwarePositionCheck:
 
     confirm_position_moveto_slot_5: Tuple[str, str] = (
         By.XPATH,
-        "//button[text()='Confirm position, move to slot 5']",
+        "//button[text()='Confirm position, move to slot 2']",
     )
 
     confirm_position_moveto_slot_6: Tuple[str, str] = (
