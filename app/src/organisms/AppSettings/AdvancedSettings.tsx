@@ -77,7 +77,11 @@ export function AdvancedSettings(): JSX.Element {
           gridGap={SPACING.spacing4}
         >
           <Box width="70%">
-            <Text css={TYPOGRAPHY.h3SemiBold} paddingBottom={SPACING.spacing3} id="AdvancedSettings_updatedChannel">
+            <Text
+              css={TYPOGRAPHY.h3SemiBold}
+              paddingBottom={SPACING.spacing3}
+              id="AdvancedSettings_updatedChannel"
+            >
               {t('update_channel')}
             </Text>
             <Text css={TYPOGRAPHY.pRegular} paddingBottom={SPACING.spacing3}>
@@ -96,7 +100,11 @@ export function AdvancedSettings(): JSX.Element {
         <Divider marginY={SPACING.spacing5} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box width="70%">
-            <Text css={TYPOGRAPHY.h3SemiBold} paddingBottom={SPACING.spacing3} id="AdvancedSettings_customLabware">
+            <Text
+              css={TYPOGRAPHY.h3SemiBold}
+              paddingBottom={SPACING.spacing3}
+              id="AdvancedSettings_customLabware"
+            >
               {t('additional_labware_folder_title')}
             </Text>
             <Text css={TYPOGRAPHY.pRegular} paddingBottom={SPACING.spacing3}>
@@ -148,7 +156,11 @@ export function AdvancedSettings(): JSX.Element {
         </Flex>
         <Divider marginY={SPACING.spacing5} />
         <Box>
-          <Text css={TYPOGRAPHY.h3SemiBold} paddingBottom={SPACING.spacing3} id="AdvancedSettings_tipLengthCalibration">
+          <Text
+            css={TYPOGRAPHY.h3SemiBold}
+            paddingBottom={SPACING.spacing3}
+            id="AdvancedSettings_tipLengthCalibration"
+          >
             {t('tip_length_cal_methold')}
           </Text>
           <RadioGroup
@@ -179,7 +191,11 @@ export function AdvancedSettings(): JSX.Element {
         <Divider marginY={SPACING.spacing5} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box width="70%">
-            <Text css={TYPOGRAPHY.h3SemiBold} paddingBottom={SPACING.spacing3} id="AdvancedSettings_unavailableRobots">
+            <Text
+              css={TYPOGRAPHY.h3SemiBold}
+              paddingBottom={SPACING.spacing3}
+              id="AdvancedSettings_unavailableRobots"
+            >
               {t('display_unavail_robots')}
             </Text>
             <Text css={TYPOGRAPHY.pRegular}>
@@ -198,7 +214,11 @@ export function AdvancedSettings(): JSX.Element {
         <Divider marginY={SPACING.spacing5} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box width="70%">
-            <Text css={TYPOGRAPHY.h3SemiBold} paddingBottom={SPACING.spacing3} id="AdvancedSettings_clearRobots">
+            <Text
+              css={TYPOGRAPHY.h3SemiBold}
+              paddingBottom={SPACING.spacing3}
+              id="AdvancedSettings_clearRobots"
+            >
               {t('clear_unavail_robots')}
             </Text>
             <Text css={TYPOGRAPHY.pRegular}>
@@ -216,7 +236,11 @@ export function AdvancedSettings(): JSX.Element {
         <Divider marginY={SPACING.spacing5} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box width="70%">
-            <Text css={TYPOGRAPHY.h3SemiBold} paddingBottom={SPACING.spacing3} id="AdvancedSettings_devTools">
+            <Text
+              css={TYPOGRAPHY.h3SemiBold}
+              paddingBottom={SPACING.spacing3}
+              id="AdvancedSettings_devTools"
+            >
               {t('enable_dev_tools')}
             </Text>
             <Text css={TYPOGRAPHY.pRegular}>

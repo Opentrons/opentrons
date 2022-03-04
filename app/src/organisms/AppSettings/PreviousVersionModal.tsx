@@ -44,12 +44,20 @@ export function PreviousVersionModal(
           {t('learn_uninstalling')}
         </ExternalLink>
         <br />
-        <ExternalLink href={PREVIOUS_RELEASES_URL} css={TYPOGRAPHY.pSemiBold} id="PreviousVersionModal_previousReleases">
+        <ExternalLink
+          href={PREVIOUS_RELEASES_URL}
+          css={TYPOGRAPHY.pSemiBold}
+          id="PreviousVersionModal_previousReleases"
+        >
           {t('previous_releases')}
         </ExternalLink>
       </Box>
       <Flex justifyContent={JUSTIFY_FLEX_END}>
-        <PrimaryButton marginTop={SPACING.spacing5} onClick={props.closeModal} id="PreviousVersionModal_closeButton">
+        <PrimaryButton
+          marginTop={SPACING.spacing5}
+          onClick={props.closeModal}
+          id="PreviousVersionModal_closeButton"
+        >
           {t('close')}
         </PrimaryButton>
       </Flex>
