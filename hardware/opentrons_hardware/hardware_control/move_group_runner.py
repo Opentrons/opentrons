@@ -16,7 +16,6 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     AddLinearMoveRequestPayload,
     ExecuteMoveGroupRequestPayload,
-    EmptyPayload,
 )
 from .constants import interrupts_per_sec
 from opentrons_hardware.hardware_control.motion import MoveGroups

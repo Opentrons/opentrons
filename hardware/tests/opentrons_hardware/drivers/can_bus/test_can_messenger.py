@@ -28,7 +28,6 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     GetMoveGroupRequest,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
-    EmptyPayload,
     MoveCompletedPayload,
     MoveGroupRequestPayload,
 )

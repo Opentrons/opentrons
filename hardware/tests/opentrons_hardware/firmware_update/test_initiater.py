@@ -154,9 +154,7 @@ async def test_bootloader_not_ready(
         + [
             call(
                 node_id=target.bootloader_node,
-                message=message_definitions.DeviceInfoRequest(
-                    payload=payloads.EmptyPayload()
-                ),
+                message=message_definitions.DeviceInfoRequest(),
             ),
         ]
         * retry_count

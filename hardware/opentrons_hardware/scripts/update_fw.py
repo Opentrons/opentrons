@@ -12,7 +12,6 @@ from opentrons_hardware.drivers.can_bus.build import build_driver
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     FirmwareUpdateStartApp,
 )
-from opentrons_hardware.firmware_bindings.messages.payloads import EmptyPayload
 from .can_args import add_can_args, build_settings
 from opentrons_hardware.firmware_update import (
     FirmwareUpdateDownloader,

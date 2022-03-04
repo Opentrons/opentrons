@@ -11,7 +11,6 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     AddLinearMoveRequestPayload,
     MoveCompletedPayload,
-    EmptyPayload,
     ExecuteMoveGroupRequestPayload,
 )
 from opentrons_hardware.hardware_control.constants import (

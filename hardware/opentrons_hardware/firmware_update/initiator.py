@@ -6,7 +6,7 @@ from typing_extensions import Final
 from dataclasses import dataclass
 
 from opentrons_hardware.firmware_bindings import NodeId
-from opentrons_hardware.firmware_bindings.messages import message_definitions, payloads
+from opentrons_hardware.firmware_bindings.messages import message_definitions
 
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons_hardware.drivers.can_bus.can_messenger import WaitableCallback

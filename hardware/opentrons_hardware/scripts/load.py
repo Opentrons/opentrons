@@ -18,7 +18,6 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
 )
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition
-from opentrons_hardware.firmware_bindings.messages.payloads import EmptyPayload
 from opentrons_hardware.scripts.can_args import add_can_args
 
 
