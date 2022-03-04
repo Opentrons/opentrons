@@ -11,7 +11,7 @@ from . import payloads
 
 @dataclass
 class HeartbeatRequest:  # noqa: D101
-    payload: payloads.EmptyPayload
+    payload: payloads.EmptyPayload = payloads.EmptyPayload()
     payload_type: Type[BinarySerializable] = payloads.EmptyPayload
     message_id: Literal[MessageId.heartbeat_request] = MessageId.heartbeat_request
 
@@ -297,8 +297,8 @@ class FirmwareUpdateComplete:  # noqa: D101
 
 @dataclass
 class FirmwareUpdateCompleteAcknowledge:  # noqa: D101
-    payload: payloads.FirmwareUpdateCompleteAcknowledge
-    payload_type: Type[BinarySerializable] = payloads.FirmwareUpdateCompleteAcknowledge
+    payload: payloads.FirmwareUpdateAcknowledge
+    payload_type: Type[BinarySerializable] = payloads.FirmwareUpdateAcknowledge
     message_id: Literal[
         MessageId.fw_update_complete_ack
     ] = MessageId.fw_update_complete_ack
@@ -320,6 +320,22 @@ class FirmwareUpdateStatusResponse:  # noqa: D101
     message_id: Literal[
         MessageId.fw_update_status_response
     ] = MessageId.fw_update_status_response
+
+
+@dataclass
+class FirmwareUpdateEraseAppRequest:  # noqa: D101
+    payload: payloads.EmptyPayload = payloads.EmptyPayload()
+    payload_type: Type[BinarySerializable] = payloads.EmptyPayload
+    message_id: Literal[MessageId.fw_update_erase_app] = MessageId.fw_update_erase_app
+
+
+@dataclass
+class FirmwareUpdateEraseAppResponse:  # noqa: D101
+    payload: payloads.FirmwareUpdateAcknowledge
+    payload_type: Type[BinarySerializable] = payloads.FirmwareUpdateAcknowledge
+    message_id: Literal[
+        MessageId.fw_update_erase_app_ack
+    ] = MessageId.fw_update_erase_app_ack
 
 
 @dataclass
