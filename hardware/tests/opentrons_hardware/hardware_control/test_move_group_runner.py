@@ -125,7 +125,7 @@ async def test_single_group_clear(
     await subject._clear_groups(can_messenger=mock_can_messenger)
     mock_can_messenger.send.assert_called_once_with(
         node_id=NodeId.broadcast,
-        message=md.ClearAllMoveGroupsRequest(payload=EmptyPayload()),
+        message=md.ClearAllMoveGroupsRequest(),
     )
 
 
@@ -137,7 +137,7 @@ async def test_multi_group_clear(
     await subject._clear_groups(can_messenger=mock_can_messenger)
     mock_can_messenger.send.assert_called_once_with(
         node_id=NodeId.broadcast,
-        message=md.ClearAllMoveGroupsRequest(payload=EmptyPayload()),
+        message=md.ClearAllMoveGroupsRequest(),
     )
 
 

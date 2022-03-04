@@ -59,7 +59,7 @@ def subject(mock_driver: AsyncMock) -> CanMessenger:
 @pytest.mark.parametrize(
     "node_id,message",
     [
-        [NodeId.head, HeartbeatRequest(payload=EmptyPayload())],
+        [NodeId.head, HeartbeatRequest()],
         [
             NodeId.gantry_x,
             MoveCompleted(

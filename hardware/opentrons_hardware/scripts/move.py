@@ -52,12 +52,8 @@ async def run(interface: str, bitrate: int, channel: Optional[str] = None) -> No
     messenger = CanMessenger(driver=driver)
     messenger.start()
 
-    await messenger.send(
-        node_id=NodeId.broadcast, message=SetupRequest(payload=EmptyPayload())
-    )
-    await messenger.send(
-        node_id=NodeId.broadcast, message=EnableMotorRequest(payload=EmptyPayload())
-    )
+    await messenger.send(node_id=NodeId.broadcast, message=SetupRequest())
+    await messenger.send(node_id=NodeId.broadcast, message=EnableMotorRequest())
 
     # TODO (al, 2021-11-11): Allow creating groups from command line or config file.
     move_groups = [

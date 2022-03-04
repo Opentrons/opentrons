@@ -99,7 +99,7 @@ async def run(args: argparse.Namespace) -> None:
     logger.info(f"Restarting FW on {target.system_node}.")
     await messenger.send(
         node_id=target.bootloader_node,
-        message=FirmwareUpdateStartApp(payload=EmptyPayload()),
+        message=FirmwareUpdateStartApp(),
     )
 
     await messenger.stop()

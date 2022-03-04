@@ -82,9 +82,7 @@ class BusProber:
 
     async def _stimulate(self, messenger: CanMessenger) -> None:
         self._done.clear()
-        await messenger.send(
-            node_id=NodeId.broadcast, message=DeviceInfoRequest(payload=EmptyPayload())
-        )
+        await messenger.send(node_id=NodeId.broadcast, message=DeviceInfoRequest())
         await self._done.wait()
 
     def __call__(
@@ -171,9 +169,7 @@ class BusLoader:
         then = time.time()
         while True:
             for node in self._targets:
-                await self._messenger.send(
-                    node_id=node, message=DeviceInfoRequest(payload=EmptyPayload())
-                )
+                await self._messenger.send(node_id=node, message=DeviceInfoRequest())
                 self._stats.messages_sent[node] += 1
             now = time.time()
             if now - then > self._period:

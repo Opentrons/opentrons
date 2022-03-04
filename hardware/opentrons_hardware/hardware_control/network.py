@@ -49,7 +49,7 @@ async def probe(
     can_messenger.add_listener(listener)
     await can_messenger.send(
         node_id=NodeId.broadcast,
-        message=DeviceInfoRequest(payload=payloads.EmptyPayload()),
+        message=DeviceInfoRequest(),
     )
     try:
         await asyncio.wait_for(event.wait(), timeout)

@@ -60,9 +60,7 @@ class FirmwareUpdateInitiator:
         """
         with WaitableCallback(self._messenger) as reader:
             # Create initiate message
-            initiate_message = message_definitions.FirmwareUpdateInitiate(
-                payload=payloads.EmptyPayload()
-            )
+            initiate_message = message_definitions.FirmwareUpdateInitiate()
             # Send it to system node
             await self._messenger.send(
                 node_id=target.system_node, message=initiate_message
@@ -92,9 +90,7 @@ class FirmwareUpdateInitiator:
     async def _wait_bootloader(self, reader: WaitableCallback, target: Target) -> None:
         """Wait for bootloader to be ready."""
         # Send device info request
-        device_info_request_message = message_definitions.DeviceInfoRequest(
-            payload=payloads.EmptyPayload()
-        )
+        device_info_request_message = message_definitions.DeviceInfoRequest()
         await self._messenger.send(
             node_id=target.bootloader_node, message=device_info_request_message
         )

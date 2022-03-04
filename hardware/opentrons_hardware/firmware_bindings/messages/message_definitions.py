@@ -18,14 +18,14 @@ class HeartbeatRequest:  # noqa: D101
 
 @dataclass
 class HeartbeatResponse:  # noqa: D101
-    payload: payloads.EmptyPayload
+    payload: payloads.EmptyPayload = payloads.EmptyPayload()
     payload_type: Type[BinarySerializable] = payloads.EmptyPayload
     message_id: Literal[MessageId.heartbeat_response] = MessageId.heartbeat_response
 
 
 @dataclass
 class DeviceInfoRequest:  # noqa: D101
-    payload: payloads.EmptyPayload
+    payload: payloads.EmptyPayload = payloads.EmptyPayload()
     payload_type: Type[BinarySerializable] = payloads.EmptyPayload
     message_id: Literal[MessageId.device_info_request] = MessageId.device_info_request
 
@@ -39,7 +39,7 @@ class DeviceInfoResponse:  # noqa: D101
 
 @dataclass
 class TaskInfoRequest:  # noqa: D101
-    payload: payloads.EmptyPayload
+    payload: payloads.EmptyPayload = payloads.EmptyPayload()
     payload_type: Type[BinarySerializable] = payloads.EmptyPayload
     message_id: Literal[MessageId.task_info_request] = MessageId.task_info_request
 
@@ -53,28 +53,28 @@ class TaskInfoResponse:  # noqa: D101
 
 @dataclass
 class StopRequest:  # noqa: D101
-    payload: payloads.EmptyPayload
+    payload: payloads.EmptyPayload = payloads.EmptyPayload()
     payload_type: Type[BinarySerializable] = payloads.EmptyPayload
     message_id: Literal[MessageId.stop_request] = MessageId.stop_request
 
 
 @dataclass
 class GetStatusRequest:  # noqa: D101
-    payload: payloads.EmptyPayload
+    payload: payloads.EmptyPayload = payloads.EmptyPayload()
     payload_type: Type[BinarySerializable] = payloads.EmptyPayload
     message_id: Literal[MessageId.get_status_request] = MessageId.get_status_request
 
 
 @dataclass
 class EnableMotorRequest:  # noqa: D101
-    payload: payloads.EmptyPayload
+    payload: payloads.EmptyPayload = payloads.EmptyPayload()
     payload_type: Type[BinarySerializable] = payloads.EmptyPayload
     message_id: Literal[MessageId.enable_motor_request] = MessageId.enable_motor_request
 
 
 @dataclass
 class DisableMotorRequest:  # noqa: D101
-    payload: payloads.EmptyPayload
+    payload: payloads.EmptyPayload = payloads.EmptyPayload()
     payload_type: Type[BinarySerializable] = payloads.EmptyPayload
     message_id: Literal[
         MessageId.disable_motor_request
@@ -97,7 +97,7 @@ class MoveRequest:  # noqa: D101
 
 @dataclass
 class SetupRequest:  # noqa: D101
-    payload: payloads.EmptyPayload
+    payload: payloads.EmptyPayload = payloads.EmptyPayload()
     payload_type: Type[BinarySerializable] = payloads.EmptyPayload
     message_id: Literal[MessageId.setup_request] = MessageId.setup_request
 
@@ -111,7 +111,7 @@ class WriteToEEPromRequest:  # noqa: D101
 
 @dataclass
 class ReadFromEEPromRequest:  # noqa: D101
-    payload: payloads.EmptyPayload
+    payload: payloads.EmptyPayload = payloads.EmptyPayload()
     payload_type: Type[BinarySerializable] = payloads.EmptyPayload
     message_id: Literal[MessageId.read_eeprom_request] = MessageId.read_eeprom_request
 
@@ -159,7 +159,7 @@ class ExecuteMoveGroupRequest:  # noqa: D101
 
 @dataclass
 class ClearAllMoveGroupsRequest:  # noqa: D101
-    payload: payloads.EmptyPayload
+    payload: payloads.EmptyPayload = payloads.EmptyPayload()
     payload_type: Type[BinarySerializable] = payloads.EmptyPayload
     message_id: Literal[
         MessageId.clear_all_move_groups_request
@@ -184,7 +184,7 @@ class SetMotionConstraints:  # noqa: D101
 
 @dataclass
 class GetMotionConstraintsRequest:  # noqa: D101
-    payload: payloads.EmptyPayload
+    payload: payloads.EmptyPayload = payloads.EmptyPayload()
     payload_type: Type[BinarySerializable] = payloads.EmptyPayload
     message_id: Literal[
         MessageId.get_motion_constraints_request
@@ -231,7 +231,7 @@ class ReadMotorDriverResponse:  # noqa: D101
 
 @dataclass
 class ReadPresenceSensingVoltageRequest:  # noqa: D101
-    payload: payloads.EmptyPayload
+    payload: payloads.EmptyPayload = payloads.EmptyPayload()
     payload_type: Type[BinarySerializable] = payloads.EmptyPayload
     message_id: Literal[
         MessageId.read_presence_sensing_voltage_request
@@ -260,7 +260,7 @@ class PushToolsDetectedNotification:  # noqa: D101
 
 @dataclass
 class AttachedToolsRequest:  # noqa: D101
-    payload: payloads.EmptyPayload
+    payload: payloads.EmptyPayload = payloads.EmptyPayload()
     payload_type: Type[BinarySerializable] = payloads.EmptyPayload
     message_id: Literal[
         MessageId.attached_tools_request
@@ -269,7 +269,7 @@ class AttachedToolsRequest:  # noqa: D101
 
 @dataclass
 class FirmwareUpdateInitiate:  # noqa: D101
-    payload: payloads.EmptyPayload
+    payload: payloads.EmptyPayload = payloads.EmptyPayload()
     payload_type: Type[BinarySerializable] = payloads.EmptyPayload
     message_id: Literal[MessageId.fw_update_initiate] = MessageId.fw_update_initiate
 
@@ -306,7 +306,7 @@ class FirmwareUpdateCompleteAcknowledge:  # noqa: D101
 
 @dataclass
 class FirmwareUpdateStatusRequest:  # noqa: D101
-    payload: payloads.EmptyPayload
+    payload: payloads.EmptyPayload = payloads.EmptyPayload()
     payload_type: Type[BinarySerializable] = payloads.EmptyPayload
     message_id: Literal[
         MessageId.fw_update_status_request
@@ -347,14 +347,14 @@ class HomeRequest:  # noqa: D101
 
 @dataclass
 class FirmwareUpdateStartApp:  # noqa: D101
-    payload: payloads.EmptyPayload
+    payload: payloads.EmptyPayload = payloads.EmptyPayload()
     payload_type: Type[BinarySerializable] = payloads.EmptyPayload
     message_id: Literal[MessageId.fw_update_start_app] = MessageId.fw_update_start_app
 
 
 @dataclass
 class ReadLimitSwitchRequest:  # noqa: D101
-    payload: payloads.EmptyPayload
+    payload: payloads.EmptyPayload = payloads.EmptyPayload()
     payload_type: Type[BinarySerializable] = payloads.EmptyPayload
     message_id: Literal[MessageId.limit_sw_request] = MessageId.limit_sw_request
 
