@@ -11,6 +11,7 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  HEATERSHAKER_MODULE_TYPE,
   PipetteName,
 } from '@opentrons/shared-data'
 import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
@@ -63,6 +64,7 @@ import {
   FormPipettesByMount,
   TemperatureModuleState,
   ThermocyclerModuleState,
+  HeaterShakerModuleState,
 } from '../types'
 import {
   PresavedStepFormState,
@@ -171,6 +173,12 @@ const THERMOCYCLER_MODULE_INITIAL_STATE: ThermocyclerModuleState = {
   lidTargetTemp: null,
   lidOpen: null,
 }
+const HEATERSHAKER_MODULE_INITIAL_STATE: HeaterShakerModuleState = {
+  type: HEATERSHAKER_MODULE_TYPE,
+  targetTemp: null,
+  targetSpeed: null,
+  latchOpen: null,
+}
 
 const _getInitialDeckSetup = (
   initialSetupStep: FormData,
@@ -203,30 +211,39 @@ const _getInitialDeckSetup = (
       (slot: DeckSlot, moduleId: string): ModuleOnDeck => {
         const moduleEntity = moduleEntities[moduleId]
 
-        if (moduleEntity.type === MAGNETIC_MODULE_TYPE) {
-          return {
-            id: moduleEntity.id,
-            model: moduleEntity.model,
-            type: MAGNETIC_MODULE_TYPE,
-            slot,
-            moduleState: MAGNETIC_MODULE_INITIAL_STATE,
-          }
-        } else if (moduleEntity.type === TEMPERATURE_MODULE_TYPE) {
-          return {
-            id: moduleEntity.id,
-            model: moduleEntity.model,
-            type: TEMPERATURE_MODULE_TYPE,
-            slot,
-            moduleState: TEMPERATURE_MODULE_INITIAL_STATE,
-          }
-        } else {
-          return {
-            id: moduleEntity.id,
-            model: moduleEntity.model,
-            type: THERMOCYCLER_MODULE_TYPE,
-            slot,
-            moduleState: THERMOCYCLER_MODULE_INITIAL_STATE,
-          }
+        switch (moduleEntity.type) {
+          case MAGNETIC_MODULE_TYPE:
+            return {
+              id: moduleEntity.id,
+              model: moduleEntity.model,
+              type: MAGNETIC_MODULE_TYPE,
+              slot,
+              moduleState: MAGNETIC_MODULE_INITIAL_STATE,
+            }
+          case TEMPERATURE_MODULE_TYPE:
+            return {
+              id: moduleEntity.id,
+              model: moduleEntity.model,
+              type: TEMPERATURE_MODULE_TYPE,
+              slot,
+              moduleState: TEMPERATURE_MODULE_INITIAL_STATE,
+            }
+          case THERMOCYCLER_MODULE_TYPE:
+            return {
+              id: moduleEntity.id,
+              model: moduleEntity.model,
+              type: THERMOCYCLER_MODULE_TYPE,
+              slot,
+              moduleState: THERMOCYCLER_MODULE_INITIAL_STATE,
+            }
+          case HEATERSHAKER_MODULE_TYPE:
+            return {
+              id: moduleEntity.id,
+              model: moduleEntity.model,
+              type: HEATERSHAKER_MODULE_TYPE,
+              slot,
+              moduleState: HEATERSHAKER_MODULE_INITIAL_STATE,
+            }
         }
       }
     ),
@@ -384,6 +401,7 @@ export const getModulesForEditModulesCard: Selector<
       [MAGNETIC_MODULE_TYPE]: null,
       [TEMPERATURE_MODULE_TYPE]: null,
       [THERMOCYCLER_MODULE_TYPE]: null,
+      [HEATERSHAKER_MODULE_TYPE]: null,
     }
   )
 )
