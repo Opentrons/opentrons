@@ -5,9 +5,8 @@ import asyncio
 import json
 import logging
 from logging.config import dictConfig
-from typing import Optional
+from typing import Dict, Tuple
 
-from opentrons_hardware.drivers.can_bus import CanDriver
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.constants import NodeId
 
@@ -46,14 +45,12 @@ async def run(args: argparse.Namespace) -> None:
     messenger = CanMessenger(driver=driver)
     messenger.start()
 
-    currents = {NodeId.gantry_y: 0.8}
-
     with open(args.params_file_path, "r") as f:
         current_params = json.load(f)
 
-    currents = {}
+    currents: Dict[NodeId, Tuple[float, float]] = {}
     for k, v in current_params.items():
-        currents[NodeId[k]] = (v["hold_current"], v["run_current"])
+        currents[NodeId[k]] = (float(v["hold_current"]), float(v["run_current"]))
 
     try:
         await set_currents(messenger, currents)
@@ -69,9 +66,9 @@ def main() -> None:
     dictConfig(LOG_CONFIG)
 
     parser = argparse.ArgumentParser(description="CAN bus set currents.")
-    
+
     add_can_args(parser)
-    
+
     parser.add_argument(
         "--params-file-path",
         "-p",
