@@ -208,7 +208,7 @@ export function AdvancedSettings(): JSX.Element {
             onClick={() =>
               dispatch(Config.toggleConfigValue('discovery.disableCache'))
             }
-            id="AdvancedSettings_unavailableRobots"
+            id="AdvancedSettings_unavailableRobotsToggleButton"
           />
         </Flex>
         <Divider marginY={SPACING.spacing5} />
