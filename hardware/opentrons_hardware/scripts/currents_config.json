@@ -1,0 +1,18 @@
+{
+  "gantry_x": {
+    "hold_current": 0,
+    "run_current": 1.0
+  },
+  "gantry_y": {
+    "hold_current": 0,
+    "run_current": 1.0
+  },
+  "head_l": {
+    "hold_current": 0,
+    "run_current": 1.0
+  },
+  "head_r": {
+    "hold_current": 0,
+    "run_current": 1.0
+  }
+}
