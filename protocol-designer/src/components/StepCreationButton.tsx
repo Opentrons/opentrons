@@ -39,7 +39,15 @@ interface StepButtonComponentProps {
 // TODO: Ian 2019-01-17 move out to centralized step info file - see #2926
 const getSupportedSteps = (): Array<
   Exclude<StepType, 'manualIntervention'>
-> => ['moveLiquid', 'mix', 'pause', 'magnet', 'temperature', 'thermocycler', 'heaterShaker']
+> => [
+  'moveLiquid',
+  'mix',
+  'pause',
+  'magnet',
+  'temperature',
+  'thermocycler',
+  'heaterShaker',
+]
 
 export const StepCreationButtonComponent = (
   props: StepButtonComponentProps
@@ -124,7 +132,7 @@ export const StepCreationButton = (): JSX.Element => {
     magnet: getIsModuleOnDeck(modules, MAGNETIC_MODULE_TYPE),
     temperature: getIsModuleOnDeck(modules, TEMPERATURE_MODULE_TYPE),
     thermocycler: getIsModuleOnDeck(modules, THERMOCYCLER_MODULE_TYPE),
-    heaterShaker: getIsModuleOnDeck(modules, HEATERSHAKER_MODULE_TYPE)
+    heaterShaker: getIsModuleOnDeck(modules, HEATERSHAKER_MODULE_TYPE),
   }
 
   const [expanded, setExpanded] = React.useState<boolean>(false)
