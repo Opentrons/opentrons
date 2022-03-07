@@ -65,17 +65,17 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
             <StyledText as="h6">modules</StyledText>
             <Flex>
               <Icon
-                name="heater-shaker"
+                name="ot-heater-shaker"
                 height="1rem"
                 marginRight={SPACING.spacing3}
               />
               <Icon
-                name="heater-shaker"
+                name="ot-heater-shaker"
                 height="1rem"
                 marginRight={SPACING.spacing3}
               />
               <Icon
-                name="heater-shaker"
+                name="ot-heater-shaker"
                 height="1rem"
                 marginRight={SPACING.spacing3}
               />
