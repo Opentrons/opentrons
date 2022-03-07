@@ -281,3 +281,19 @@ def test_magnetic_module_engage(
     result = subject.magnetic_module_engage(module_id="module-id", engage_height=12.34)
 
     assert result == response
+
+
+def test_set_rail_lights(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a setRailLights command."""
+    request = commands.SetRailLightsCreate(params=commands.SetRailLightsParams(on=True))
+    response = commands.SetRailLightsResult()
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.set_rail_lights(on=True)
+
+    assert result == response

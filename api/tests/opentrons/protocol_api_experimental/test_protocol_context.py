@@ -418,3 +418,16 @@ def test_invalid_load_module_location(
     """It should require locations for non-thermocycler modules."""
     with pytest.raises(errors.InvalidModuleLocationError):
         subject.load_module(module_name=module_name, location=None)
+
+
+def test_set_rail_lights(
+    decoy: Decoy,
+    engine_client: SyncClient,
+    subject: ProtocolContext,
+) -> None:
+    """It should be able to issue a setRaillights command through the client."""
+    subject.set_rail_lights(on=True)
+    decoy.verify(engine_client.set_rail_lights(True), times=1)
+
+    subject.set_rail_lights(on=False)
+    decoy.verify(engine_client.set_rail_lights(False), times=1)
