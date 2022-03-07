@@ -247,7 +247,7 @@ class Modules(BaseModel):
                                 "fwVersion": "0.0.1",
                                 "hasAvailableUpdate": True,
                                 "model": "heater-shaker_v10",
-                                "moduleModel": "heaterShakerV1",
+                                "moduleModel": "heaterShakerModuleV1",
                                 "port": "/dev/ot_module_heatershaker1",
                                 "usbPort": {"hub": None, "port": None},
                                 "revision": "heater-shaker_v10",

@@ -35,8 +35,9 @@ class LabwareImplementation(AbstractLabware):
         :param label: An optional label to use instead of the displayName
                       from the definition's metadata element
         """
+        self._label: Optional[str] = None
         if label:
-            dn = label
+            dn = self._label = label
             self._name = dn
         else:
             dn = definition["metadata"]["displayName"]
@@ -64,6 +65,9 @@ class LabwareImplementation(AbstractLabware):
 
     def get_display_name(self) -> str:
         return self._display_name
+
+    def get_label(self) -> Optional[str]:
+        return self._label
 
     def get_name(self) -> str:
         return self._name

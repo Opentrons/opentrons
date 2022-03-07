@@ -8,6 +8,7 @@ export {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 // http paths

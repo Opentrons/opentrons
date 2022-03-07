@@ -117,6 +117,25 @@ CONFIG_ANALYZER_SPECS: List[ConfigAnalyzerSpec] = [
             config=JsonProtocolConfig(schema_version=3),
         ),
     ),
+    ConfigAnalyzerSpec(
+        main_file=RoleAnalysisFile(
+            name="protocol.PY",
+            data=None,
+            role=ProtocolFileRole.MAIN,
+            contents=textwrap.dedent(
+                """
+                metadata = {
+                    "author": "Dr. Sy. N. Tist",
+                    "apiLevel": "123.456",
+                }
+                """
+            ).encode(),
+        ),
+        expected=ConfigAnalysis(
+            metadata={"author": "Dr. Sy. N. Tist", "apiLevel": "123.456"},
+            config=PythonProtocolConfig(api_version=APIVersion(123, 456)),
+        ),
+    ),
 ]
 
 

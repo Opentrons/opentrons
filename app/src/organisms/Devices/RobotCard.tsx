@@ -47,7 +47,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
       padding={SPACING_2}
       width="100%"
     >
-      <img src={OT2_PNG} style={{ width: '6rem' }} />
+      <img src={OT2_PNG} style={{ width: '6rem' }} id="RobotCard_robotImage" />
       <Box padding={SPACING_2} width="100%">
         <RobotStatusBanner name={name} local={local} />
         <Flex>
@@ -55,7 +55,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
             <Text textTransform={TEXT_TRANSFORM_UPPERCASE}>
               {t('left_mount')}
             </Text>
-            <Text>
+            <Text id="RobotCard_leftMountPipette">
               {attachedPipettes?.left?.modelSpecs.displayName ?? t('empty')}
             </Text>
           </Flex>
@@ -63,7 +63,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
             <Text textTransform={TEXT_TRANSFORM_UPPERCASE}>
               {t('right_mount')}
             </Text>
-            <Text>
+            <Text id="RobotCard_rightMountPipette">
               {attachedPipettes?.right?.modelSpecs.displayName ?? t('empty')}
             </Text>
           </Flex>
@@ -78,7 +78,8 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
         </Flex>
       </Box>
       {/* temp link from three dot menu to device detail page. Robot actions menu covered in ticket #8673 */}
-      <Box alignSelf={ALIGN_START}>
+      {/* attachment of RobotCard_overflowMenu selector may change */}
+      <Box alignSelf={ALIGN_START} id="RobotCard_overflowMenu">
         <Link to={`/devices/${name}`}>
           <Icon name="dots-horizontal" color={C_BLUE} size={SIZE_2} />
         </Link>

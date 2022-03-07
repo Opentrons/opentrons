@@ -311,6 +311,17 @@ class LabwareView(HasState[LabwareState]):
         """Get a labware's definition URI."""
         return self.get(labware_id).definitionUri
 
+    def get_uri_from_definition(
+        self,
+        labware_definition: LabwareDefinition,
+    ) -> LabwareUri:
+        """Get a definition URI from a full labware definition."""
+        return uri_from_details(
+            load_name=labware_definition.parameters.loadName,
+            namespace=labware_definition.namespace,
+            version=labware_definition.version,
+        )
+
     def is_tiprack(self, labware_id: str) -> bool:
         """Get whether labware is a tiprack."""
         definition = self.get_definition(labware_id)

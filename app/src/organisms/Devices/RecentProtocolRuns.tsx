@@ -46,7 +46,7 @@ export function RecentProtocolRuns({
         borderBottom={`1px solid ${C_MED_LIGHT_GRAY}`}
         padding={SPACING_3}
         width="100%"
-        data-testid="RecentProtocolRuns_title"
+        id="RecentProtocolRuns_title"
       >
         {t('recent_protocol_runs')}
       </Text>
@@ -61,10 +61,7 @@ export function RecentProtocolRuns({
           // TODO: recent protocol runs section (ticket #8696)
           <div>recent protocol runs here</div>
         ) : (
-          <Text
-            fontSize={FONT_SIZE_BODY_1}
-            data-testid="RecentProtocolRuns_offline"
-          >
+          <Text fontSize={FONT_SIZE_BODY_1} id="RecentProtocolRuns_offline">
             {t('offline_recent_protocol_runs')}
           </Text>
         )}

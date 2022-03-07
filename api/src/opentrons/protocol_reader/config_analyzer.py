@@ -41,7 +41,7 @@ class ConfigAnalyzer:
 
 # todo(mm, 2021-09-13): Deduplicate with opentrons.protocols.parse.
 def _analyze_python(main_file: RoleAnalysisFile) -> ConfigAnalysis:  # noqa: C901
-    assert main_file.name.endswith(".py"), "Expected main_file to be Python"
+    assert main_file.name.lower().endswith(".py"), "Expected main_file to be Python"
 
     try:
         # todo(mm, 2021-09-13): Investigate whether it's really appropriate to leave

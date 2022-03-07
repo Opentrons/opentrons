@@ -1,4 +1,4 @@
-"""A script for sending and monitoring CAN messages."""
+"""A script for sending CAN messages."""
 import asyncio
 import dataclasses
 import logging
@@ -45,9 +45,7 @@ async def listen_task(can_driver: AbstractCanDriver) -> None:
 
     Args:
         can_driver: Driver
-
     Returns: Nothing.
-
     """
     async for message in can_driver:
         message_definition = get_definition(

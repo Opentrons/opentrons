@@ -27,6 +27,7 @@ from opentrons.protocol_engine.execution import (
     MovementHandler,
     PipettingHandler,
     RunControlHandler,
+    RailLightsHandler,
 )
 
 
@@ -73,6 +74,12 @@ def model_utils(decoy: Decoy) -> ModelUtils:
 
 
 @pytest.fixture
+def rail_lights(decoy: Decoy) -> RailLightsHandler:
+    """Get a mocked out RunControlHandler."""
+    return decoy.mock(cls=RailLightsHandler)
+
+
+@pytest.fixture
 def subject(
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
@@ -80,6 +87,7 @@ def subject(
     movement: MovementHandler,
     pipetting: PipettingHandler,
     run_control: RunControlHandler,
+    rail_lights: RailLightsHandler,
     model_utils: ModelUtils,
 ) -> CommandExecutor:
     """Get a CommandExecutor test subject with its dependencies mocked out."""
@@ -91,6 +99,7 @@ def subject(
         pipetting=pipetting,
         run_control=run_control,
         model_utils=model_utils,
+        rail_lights=rail_lights,
     )
 
 
@@ -115,6 +124,7 @@ async def test_execute(
     movement: MovementHandler,
     pipetting: PipettingHandler,
     run_control: RunControlHandler,
+    rail_lights: RailLightsHandler,
     model_utils: ModelUtils,
     subject: CommandExecutor,
 ) -> None:
@@ -181,6 +191,7 @@ async def test_execute(
             movement=movement,
             pipetting=pipetting,
             run_control=run_control,
+            rail_lights=rail_lights,
         )
     ).then_return(
         command_impl  # type: ignore[arg-type]
@@ -222,6 +233,7 @@ async def test_execute_raises_protocol_engine_error(
     movement: MovementHandler,
     pipetting: PipettingHandler,
     run_control: RunControlHandler,
+    rail_lights: RailLightsHandler,
     model_utils: ModelUtils,
     subject: CommandExecutor,
     command_error: Exception,
@@ -275,6 +287,7 @@ async def test_execute_raises_protocol_engine_error(
             movement=movement,
             pipetting=pipetting,
             run_control=run_control,
+            rail_lights=rail_lights,
         )
     ).then_return(
         command_impl  # type: ignore[arg-type]

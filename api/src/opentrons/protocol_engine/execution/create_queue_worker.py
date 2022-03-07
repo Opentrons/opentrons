@@ -1,5 +1,6 @@
 """QueueWorker and dependency factory."""
 from opentrons.hardware_control import HardwareControlAPI
+from opentrons.protocol_engine.execution.rail_lights import RailLightsHandler
 
 from ..state import StateStore
 from ..actions import ActionDispatcher
@@ -43,6 +44,9 @@ def create_queue_worker(
         state_store=state_store,
         action_dispatcher=action_dispatcher,
     )
+    rail_lights_handler = RailLightsHandler(
+        hardware_api=hardware_api,
+    )
 
     command_executor = CommandExecutor(
         state_store=state_store,
@@ -51,6 +55,7 @@ def create_queue_worker(
         movement=movement_handler,
         pipetting=pipetting_handler,
         run_control=run_control_handler,
+        rail_lights=rail_lights_handler,
     )
 
     return QueueWorker(

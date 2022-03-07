@@ -11,6 +11,7 @@ from .equipment import EquipmentHandler
 from .movement import MovementHandler
 from .pipetting import PipettingHandler
 from .run_control import RunControlHandler
+from .rail_lights import RailLightsHandler
 
 log = getLogger(__name__)
 
@@ -30,6 +31,7 @@ class CommandExecutor:
         movement: MovementHandler,
         pipetting: PipettingHandler,
         run_control: RunControlHandler,
+        rail_lights: RailLightsHandler,
         model_utils: Optional[ModelUtils] = None,
     ) -> None:
         """Initialize the CommandExecutor with access to its dependencies."""
@@ -39,6 +41,7 @@ class CommandExecutor:
         self._movement = movement
         self._pipetting = pipetting
         self._run_control = run_control
+        self._rail_lights = rail_lights
         self._model_utils = model_utils or ModelUtils()
 
     async def execute(self, command_id: str) -> None:
@@ -54,6 +57,7 @@ class CommandExecutor:
             movement=self._movement,
             pipetting=self._pipetting,
             run_control=self._run_control,
+            rail_lights=self._rail_lights,
         )
 
         started_at = self._model_utils.get_timestamp()

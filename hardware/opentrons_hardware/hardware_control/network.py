@@ -5,7 +5,7 @@ from typing import Set, Optional
 from opentrons_hardware.firmware_bindings import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
-from opentrons_hardware.firmware_bindings.messages import payloads, MessageDefinition
+from opentrons_hardware.firmware_bindings.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     DeviceInfoRequest,
 )
@@ -49,7 +49,7 @@ async def probe(
     can_messenger.add_listener(listener)
     await can_messenger.send(
         node_id=NodeId.broadcast,
-        message=DeviceInfoRequest(payload=payloads.EmptyPayload()),
+        message=DeviceInfoRequest(),
     )
     try:
         await asyncio.wait_for(event.wait(), timeout)

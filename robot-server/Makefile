@@ -66,6 +66,12 @@ setup:
 	$(pipenv) sync $(pipenv_opts)
 	$(pipenv) run pip freeze
 
+.PHONY: setup-ot2
+setup-ot2:
+	$(pipenv) sync $(pipenv_opts)
+	$(pipenv) run pip uninstall -y opentrons_hardware
+	$(pipenv) run pip freeze
+
 .PHONY: clean
 clean:
 	$(clean_cmd)

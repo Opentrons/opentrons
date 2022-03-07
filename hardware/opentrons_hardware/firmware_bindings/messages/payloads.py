@@ -21,6 +21,24 @@ class DeviceInfoResponsePayload(utils.BinarySerializable):
     version: utils.UInt32Field
 
 
+class TaskNameDataField(utils.BinaryFieldBase[bytes]):
+    """The name field of TaskInfoResponsePayload."""
+
+    NUM_BYTES = 12
+    FORMAT = f"{NUM_BYTES}s"
+
+
+@dataclass
+class TaskInfoResponsePayload(utils.BinarySerializable):
+    """Task info response payload."""
+
+    name: TaskNameDataField
+    runtime_counter: utils.UInt32Field
+    stack_high_water_mark: utils.UInt32Field
+    state: utils.UInt16Field
+    priority: utils.UInt16Field
+
+
 @dataclass
 class GetStatusResponsePayload(utils.BinarySerializable):
     """Get status response."""
@@ -236,8 +254,8 @@ class FirmwareUpdateComplete(utils.BinarySerializable):
 
 
 @dataclass
-class FirmwareUpdateCompleteAcknowledge(utils.BinarySerializable):
-    """A response to the FirmwareUpdateComplete message."""
+class FirmwareUpdateAcknowledge(utils.BinarySerializable):
+    """A response to a firmware update message with an error code."""
 
     error_code: utils.UInt16Field
 
