@@ -43,9 +43,14 @@ export function StatusCard(props: Props): JSX.Element {
   } else if (!connected) {
     status = t('connection_status', { context: 'disconnected' })
   } else if (sessionStatus !== '') {
+    // TODO(mc, 2022-03-07): this block is unreachable in v5.
+    // The value of robotSelectors.getSessionStatus will always
+    // be the initial value of an empty string
     status = sessionStatus
   }
 
+  // TODO(mc, 2022-03-07): consolidate into a `useToggleConnect` hook;
+  // see app/src/pages/Robots/ConnectPanel/RobotItem.tsx
   const handleClick: React.MouseEventHandler = () => {
     if (connected) {
       dispatch(disconnect())

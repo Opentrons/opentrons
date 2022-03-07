@@ -29,6 +29,8 @@ export function RobotItemComponent(props: RobotItemProps): JSX.Element {
   const isSelected = robot.name === match.params.name
   const dispatch = useDispatch<Dispatch>()
 
+  // TODO(mc, 2022-03-07): consolidate into a `useToggleConnect` hook;
+  // see app/src/pages/Robots/RobotSettings/StatusCard.tsx
   const handleToggleConnect = (): void => {
     const action = isConnected ? disconnect() : connect(name)
 
