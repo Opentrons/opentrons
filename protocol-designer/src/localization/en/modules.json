@@ -38,5 +38,8 @@
   "lid_label": "Lid ({{lidStatus}})",
   "lid_closed": "closed",
   "lid_open": "open",
-  "lid_undefined": "undefined"
+  "lid_undefined": "undefined",
+  "latch_label": "Latch",
+  "heater_label": "Heater",
+  "shaker_label": "Shaker"
 }
