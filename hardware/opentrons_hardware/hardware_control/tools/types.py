@@ -1,10 +1,13 @@
 """tool types."""
-import enum
+
+from dataclasses import dataclass
+from opentrons_hardware.firmware_bindings.constants import ToolType
 
 
-class Carrier(enum.Enum):
-    """Carrier type to associate tool with."""
+@dataclass(frozen=True)
+class ToolDetectionResult:
+    """Model a tool detection result."""
 
-    A_CARRIER = enum.auto()
-    Z_CARRIER = enum.auto()
-    GRIPPER_CARRIER = enum.auto()
+    left: ToolType
+    right: ToolType
+    gripper: ToolType
