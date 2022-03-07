@@ -171,3 +171,11 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
         return cast(commands.magnetic_module.EngageResult, result)
+
+    def set_rail_lights(self, on: bool) -> commands.SetRailLightsResult:
+        """Execute a ``setRailLights`` command and return the result."""
+        request = commands.SetRailLightsCreate(
+            params=commands.SetRailLightsParams(on=on)
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.SetRailLightsResult, result)

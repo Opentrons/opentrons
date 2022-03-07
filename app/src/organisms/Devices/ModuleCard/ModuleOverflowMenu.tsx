@@ -45,6 +45,14 @@ export const ModuleOverflowMenu = (
         isSecondary: false,
       },
     ],
+    // TODO(sh, 2022-02-28): add heater shaker menu items
+    heaterShakerModuleType: [
+      {
+        setSetting: 'Start',
+        turnOffSetting: 'Deactivate',
+        isSecondary: true,
+      },
+    ],
   }
 
   const AboutModuleBtn = (

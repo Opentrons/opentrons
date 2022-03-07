@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { CheckboxField, DropdownField, FormGroup } from '@opentrons/components'
 import { i18n } from '../../../localization'
 import {
@@ -6,6 +7,7 @@ import {
   MODELS_FOR_MODULE_TYPE,
 } from '../../../constants'
 import { ModuleDiagram } from '../../modules'
+import { selectors as featureFlagSelectors } from '../../../feature-flags'
 
 import styles from './FilePipettesModal.css'
 
@@ -27,6 +29,9 @@ export interface ModuleFieldsProps {
         thermocyclerModuleType?: {
           model: string
         }
+        heaterShakerModuleType?: {
+          model: string
+        }
       }
   touched:
     | null
@@ -39,6 +44,9 @@ export interface ModuleFieldsProps {
           model: boolean
         }
         thermocyclerModuleType?: {
+          model: boolean
+        }
+        heaterShakerModuleType?: {
           model: boolean
         }
       }
@@ -59,8 +67,13 @@ export function ModuleFields(props: ModuleFieldsProps): JSX.Element {
     errors,
     touched,
   } = props
+  const enableHeaterShaker = useSelector(
+    featureFlagSelectors.getEnabledHeaterShaker
+  )
   // @ts-expect-error(sa, 2021-6-21): Object.keys not smart enough to take the keys of FormModulesByType
-  const modules: ModuleType[] = Object.keys(values)
+  const modules: ModuleType[] = enableHeaterShaker
+    ? Object.keys(values)
+    : Object.keys(values).filter(module => module !== 'heaterShakerModuleType')
   const handleOnDeckChange = (type: ModuleType) => (e: React.ChangeEvent) => {
     const targetToClear = `modulesByType.${type}.model`
 

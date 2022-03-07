@@ -58,7 +58,7 @@ class RoleAnalyzer:
         labware_files = []
 
         for f in files:
-            if f.name.endswith(".py") or isinstance(f.data, JsonProtocol):
+            if f.name.lower().endswith(".py") or isinstance(f.data, JsonProtocol):
                 data = f.data if isinstance(f.data, JsonProtocol) else None
                 main_file_candidates.append(
                     MainFile(name=f.name, contents=f.contents, data=data)

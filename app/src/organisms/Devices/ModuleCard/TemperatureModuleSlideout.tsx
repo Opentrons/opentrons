@@ -95,7 +95,7 @@ export const TemperatureModuleSlideout = (
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSizeP}
           >
-            {t('set_temp_slideout_btn')}
+            {t('set_temp_slideout')}
           </Text>
         </PrimaryBtn>
       </React.Fragment>
