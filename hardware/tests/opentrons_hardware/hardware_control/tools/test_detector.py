@@ -4,7 +4,7 @@ from opentrons_hardware.firmware_bindings.messages import (
     MessageDefinition,
 )
 import pytest
-from mock import AsyncMock, call, MagicMock
+from mock import AsyncMock, call
 from opentrons_hardware.hardware_control.tools import detector
 from opentrons_hardware.firmware_bindings.utils import UInt8Field
 from opentrons_hardware.firmware_bindings.messages import message_definitions, payloads
@@ -25,10 +25,37 @@ def subject(
     return detector.ToolDetector(messenger=mock_messenger)
 
 
+@pytest.mark.parametrize(
+    argnames=["payload", "expected"],
+    argvalues=[
+        [
+            payloads.ToolsDetectedNotificationPayload(
+                z_motor=UInt8Field(1), a_motor=UInt8Field(2), gripper=UInt8Field(5)
+            ),
+            ToolDetectionResult(
+                left=ToolType.pipette_96_chan,
+                right=ToolType.pipette_384_chan,
+                gripper=ToolType.gripper,
+            ),
+        ],
+        [
+            payloads.ToolsDetectedNotificationPayload(
+                z_motor=UInt8Field(221), a_motor=UInt8Field(2), gripper=UInt8Field(5)
+            ),
+            ToolDetectionResult(
+                left=ToolType.undefined_tool,
+                right=ToolType.pipette_384_chan,
+                gripper=ToolType.gripper,
+            ),
+        ],
+    ],
+)
 async def test_messaging(
     subject: detector.ToolDetector,
     mock_messenger: AsyncMock,
     can_message_notifier: MockCanMessageNotifier,
+    payload: payloads.ToolsDetectedNotificationPayload,
+    expected: ToolDetectionResult,
 ) -> None:
     """It should start the tool detection process.
 
@@ -40,9 +67,7 @@ async def test_messaging(
         """Mock send method."""
         if isinstance(message, message_definitions.AttachedToolsRequest):
             response = message_definitions.PushToolsDetectedNotification(
-                payload=payloads.ToolsDetectedNotificationPayload(
-                    z_motor=UInt8Field(1), a_motor=UInt8Field(2), gripper=UInt8Field(5)
-                )
+                payload=payload
             )
             can_message_notifier.notify(
                 message=response,
@@ -60,11 +85,7 @@ async def test_messaging(
 
     tool = await subject.detect().__anext__()
 
-    assert tool == ToolDetectionResult(
-        left=ToolType.pipette_96_chan,
-        right=ToolType.pipette_384_chan,
-        gripper=ToolType.gripper,
-    )
+    assert tool == expected
 
     assert mock_messenger.send.mock_calls == [
         call(

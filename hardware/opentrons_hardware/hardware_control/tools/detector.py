@@ -1,11 +1,11 @@
 """Head tool detector."""
 
 import logging
-from typing import Callable, AsyncGenerator, AsyncIterator
+from typing import AsyncIterator
 
 from opentrons_hardware.drivers.can_bus.can_messenger import WaitableCallback
 from opentrons_hardware.firmware_bindings.constants import ToolType
-from opentrons_hardware.firmware_bindings.messages import message_definitions, payloads
+from opentrons_hardware.firmware_bindings.messages import message_definitions
 from opentrons_hardware.firmware_bindings import NodeId
 from opentrons_hardware.drivers.can_bus import CanMessenger
 
@@ -39,8 +39,16 @@ class ToolDetector:
                 if isinstance(
                     response, message_definitions.PushToolsDetectedNotification
                 ):
+
+                    def _check_tool(i: int) -> ToolType:
+                        """Either return a valid tool or "undefined" on error."""
+                        try:
+                            return ToolType(i)
+                        except ValueError:
+                            return ToolType.undefined_tool
+
                     yield ToolDetectionResult(
-                        left=ToolType(response.payload.z_motor.value),
-                        right=ToolType(response.payload.a_motor.value),
-                        gripper=ToolType(response.payload.gripper.value),
+                        left=_check_tool(response.payload.z_motor.value),
+                        right=_check_tool(response.payload.a_motor.value),
+                        gripper=_check_tool(response.payload.gripper.value),
                     )
