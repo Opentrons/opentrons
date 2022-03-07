@@ -18,25 +18,17 @@ from tests.conftest import MockCanMessageNotifier
 
 
 @pytest.fixture
-def mock_callback() -> MagicMock:
-    """Mock callback for notifications."""
-    return MagicMock()
-
-
-@pytest.fixture
 def subject(
     mock_messenger: AsyncMock,
-    mock_callback: MagicMock,
 ) -> detector.ToolDetector:
     """The test subject."""
-    return detector.ToolDetector(messenger=mock_messenger, callback=mock_callback)
+    return detector.ToolDetector(messenger=mock_messenger)
 
 
 async def test_messaging(
     subject: detector.ToolDetector,
     mock_messenger: AsyncMock,
     can_message_notifier: MockCanMessageNotifier,
-    mock_callback: MagicMock,
 ) -> None:
     """It should start the tool detection process.
 
@@ -66,19 +58,12 @@ async def test_messaging(
 
     mock_messenger.send.side_effect = responder
 
-    # Make our callback raise and an error to terminate the loop.
-    mock_callback.side_effect = RuntimeError()
-    try:
-        await subject.detect()
-    except RuntimeError:
-        pass
+    tool = await subject.detect().__anext__()
 
-    mock_callback.assert_called_once_with(
-        ToolDetectionResult(
-            left=ToolType.pipette_96_chan,
-            right=ToolType.pipette_384_chan,
-            gripper=ToolType.gripper,
-        )
+    assert tool == ToolDetectionResult(
+        left=ToolType.pipette_96_chan,
+        right=ToolType.pipette_384_chan,
+        gripper=ToolType.gripper,
     )
 
     assert mock_messenger.send.mock_calls == [
