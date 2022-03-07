@@ -19,7 +19,7 @@ REV_A_USB_HUB = 3
 @dataclass(frozen=True)
 class USBPort:
     name: str
-    port_number: Optional[int] = None
+    port_number: int
     device_path: str = ""
     hub: Optional[int] = None
 

@@ -103,7 +103,7 @@ async def test_module_update_integration(monkeypatch, loop):
     usb_port = USBPort(
         name="",
         hub=None,
-        port_number=None,
+        port_number=0,
         device_path="/dev/ot_module_sim_tempdeck0",
     )
 

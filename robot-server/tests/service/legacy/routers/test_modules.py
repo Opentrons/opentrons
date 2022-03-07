@@ -19,7 +19,7 @@ def magdeck():
     usb_port = USBPort(
         name="",
         hub=None,
-        port_number=None,
+        port_number=0,
         device_path="/dev/ot_module_magdeck1",
     )
     m = asyncio.get_event_loop().run_until_complete(
@@ -42,7 +42,7 @@ def tempdeck():
     usb_port = USBPort(
         name="",
         hub=None,
-        port_number=None,
+        port_number=1,
         device_path="/dev/ot_module_tempdeck1",
     )
     t = asyncio.get_event_loop().run_until_complete(
@@ -66,7 +66,7 @@ def thermocycler():
     usb_port = USBPort(
         name="",
         hub=None,
-        port_number=None,
+        port_number=2,
         device_path="/dev/ot_module_thermocycler1",
     )
     t = asyncio.get_event_loop().run_until_complete(
@@ -99,7 +99,7 @@ def heater_shaker():
     usb_port = USBPort(
         name="",
         hub=None,
-        port_number=None,
+        port_number=3,
         device_path="/dev/ot_module_heatershaker1",
     )
     heatershaker = asyncio.get_event_loop().run_until_complete(

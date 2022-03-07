@@ -188,12 +188,7 @@ class AttachedModulesControl:
                     Awaitable[modules.AbstractModule],
                     module_builder(
                         port="",
-                        usb_port=types.USBPort(
-                            name="",
-                            hub=None,
-                            port_number=None,
-                            device_path="",
-                        ),
+                        usb_port=types.USBPort(name="", port_number=0),
                         simulating=True,
                         loop=self._api.loop,
                         execution_manager=self._api._execution_manager,

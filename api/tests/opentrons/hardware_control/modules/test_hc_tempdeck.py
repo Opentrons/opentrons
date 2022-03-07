@@ -12,7 +12,7 @@ def usb_port():
     return USBPort(
         name="",
         hub=None,
-        port_number=None,
+        port_number=0,
         device_path="/dev/ot_module_sim_tempdeck0",
     )
 

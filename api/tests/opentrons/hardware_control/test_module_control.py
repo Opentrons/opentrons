@@ -63,17 +63,19 @@ async def test_register_modules(
     """It should register attached modules."""
     new_mods_at_ports = [ModuleAtPort(port="/dev/foo", name="bar")]
     actual_ports = [
-        ModuleAtPort(port="/dev/foo", name="bar", usb_port=USBPort(name="baz"))
+        ModuleAtPort(
+            port="/dev/foo", name="bar", usb_port=USBPort(name="baz", port_number=0)
+        )
     ]
 
     module = decoy.mock(cls=AbstractModule)
-    module.usb_port = USBPort(name="baz")  # type: ignore[misc]
+    module.usb_port = USBPort(name="baz", port_number=0)  # type: ignore[misc]
 
     decoy.when(usb_bus.match_virtual_ports(new_mods_at_ports)).then_return(actual_ports)
     decoy.when(
         await build_module(
             port="/dev/foo",
-            usb_port=USBPort(name="baz"),
+            usb_port=USBPort(name="baz", port_number=0),
             model="bar",
             loop=hardware_api.loop,
         )
@@ -94,16 +96,16 @@ async def test_register_modules_sort(
 ) -> None:
     """It should sort modules by port and hub, in ascending order."""
     module_1 = decoy.mock(cls=AbstractModule)
-    module_1.usb_port = USBPort(name="a", port_number=1, hub=1)  # type: ignore[misc]
+    module_1.usb_port = USBPort(name="a", port_number=5, hub=1)  # type: ignore[misc]
 
     module_2 = decoy.mock(cls=AbstractModule)
-    module_2.usb_port = USBPort(name="b", port_number=0, hub=1)  # type: ignore[misc]
+    module_2.usb_port = USBPort(name="b", port_number=4, hub=1)  # type: ignore[misc]
 
     module_3 = decoy.mock(cls=AbstractModule)
-    module_3.usb_port = USBPort(name="c", port_number=1)  # type: ignore[misc]
+    module_3.usb_port = USBPort(name="c", port_number=3)  # type: ignore[misc]
 
     module_4 = decoy.mock(cls=AbstractModule)
-    module_4.usb_port = USBPort(name="x", port_number=0)  # type: ignore[misc]
+    module_4.usb_port = USBPort(name="x", port_number=2)  # type: ignore[misc]
 
     new_mods_at_ports = [ModuleAtPort(port="/dev/foo", name="bar")]
     actual_ports = [
@@ -128,4 +130,4 @@ async def test_register_modules_sort(
     await subject.register_modules(new_mods_at_ports=new_mods_at_ports)
     result = subject.available_modules
 
-    assert result == [module_4, module_2, module_3, module_1]
+    assert result == [module_2, module_1, module_4, module_3]

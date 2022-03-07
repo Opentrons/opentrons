@@ -54,7 +54,16 @@ class AbstractModule(abc.ABC):
 
     @staticmethod
     def sort_key(inst: "AbstractModule") -> int:
-        return (inst.usb_port.port_number or 0) * 1000 + (inst.usb_port.hub or 0)
+        usb_port = inst.usb_port
+
+        if usb_port.hub is not None:
+            primary_port = usb_port.hub
+            secondary_port = usb_port.port_number
+        else:
+            primary_port = usb_port.port_number
+            secondary_port = 0
+
+        return primary_port * 1000 + secondary_port
 
     @property
     def loop(self) -> asyncio.AbstractEventLoop:
