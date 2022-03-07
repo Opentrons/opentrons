@@ -6,11 +6,11 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# Opentrons App Changes in 5.0.0
+# Opentrons App Changes in 5.0.2
 
-Welcome to the v5.0.0 release of the Opentrons App!
+Welcome to the v5.0.2 release of the Opentrons App!
 
-The 5.0.0 release reshapes the way you upload and set up protocols to run on your OT-2. Read below to find out about the new features in 5.0.0.
+The 5.0.2 release reshapes the way you upload and set up protocols to run on your OT-2. Read below to find out about the new features in 5.0.0.
 
 ## New Features
 
@@ -19,13 +19,22 @@ The 5.0.0 release reshapes the way you upload and set up protocols to run on you
 - More visibility into the progress of protocol execution on the robot
 - Quick and easy re-running of your last used protocol
 
+## 5.0.1 to 5.0.2
+
+The 5.0.2 hotfix release fixes three issues:
+
+1. If you use `load_labware_from_definition` in your Python protocol, you are now able to use Labware Position Check.
+2. User-defined labware labels, if present, are now displayed in "Labware Setup"
+3. Certain types of protocol upload failures will now show an error message instead of silently failing.
+
 ## 5.0.0 to 5.0.1
 
 The 5.0.1 hotfix release contains a small fix to the Labware Position Check to appropriately handle protocols that load pipettes, but never pick up tips with that pipette.
 
 ## Known Issues
 
-Your last run protocol will not be saved through robot reboots
+- Your last run protocol will not be saved through robot reboots
+- When you load multiple instances of the same module type in a protocol, the USB port numbers shown in "Module Setup" are incorrect.
 
 ---
 

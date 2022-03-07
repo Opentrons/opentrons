@@ -1,6 +1,6 @@
 {
   "name": "@opentrons/shared-data",
-  "version": "5.0.1",
+  "version": "5.0.2",
   "description": "Default labware definitions for Opentrons robots",
   "repository": {
     "type": "git",
