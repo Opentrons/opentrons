@@ -5,6 +5,7 @@
     "pause": "pause",
     "magnet": "magnet",
     "temperature": "temperature",
+    "heaterShaker": "heater-shaker",
     "thermocycler": "thermocycler",
     "profile_settings": "profile settings",
     "profile_steps": "profile steps",

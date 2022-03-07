@@ -80,6 +80,7 @@ export type StepType =
   | 'magnet'
   | 'temperature'
   | 'thermocycler'
+  | 'heaterShaker'
 export const stepIconsByType: Record<StepType, IconName> = {
   moveLiquid: 'ot-transfer',
   mix: 'ot-mix',
@@ -89,6 +90,7 @@ export const stepIconsByType: Record<StepType, IconName> = {
   magnet: 'ot-magnet',
   temperature: 'ot-temperature',
   thermocycler: 'ot-thermocycler',
+  heaterShaker: 'ot-heater-shaker'
 }
 // ===== Unprocessed form types =====
 export interface AnnotationFields {
