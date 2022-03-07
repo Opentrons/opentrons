@@ -28,7 +28,6 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     GetMoveGroupRequest,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
-    EmptyPayload,
     MoveCompletedPayload,
     MoveGroupRequestPayload,
 )
@@ -59,7 +58,7 @@ def subject(mock_driver: AsyncMock) -> CanMessenger:
 @pytest.mark.parametrize(
     "node_id,message",
     [
-        [NodeId.head, HeartbeatRequest(payload=EmptyPayload())],
+        [NodeId.head, HeartbeatRequest()],
         [
             NodeId.gantry_x,
             MoveCompleted(

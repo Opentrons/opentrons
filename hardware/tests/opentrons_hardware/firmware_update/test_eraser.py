@@ -60,9 +60,7 @@ async def test_messaging(
 
     mock_messenger.send.assert_called_once_with(
         node_id=target_id,
-        message=message_definitions.FirmwareUpdateEraseAppRequest(
-            payload=payloads.EmptyPayload()
-        ),
+        message=message_definitions.FirmwareUpdateEraseAppRequest(),
     )
 
 
