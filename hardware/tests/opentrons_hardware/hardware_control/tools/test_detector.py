@@ -60,7 +60,7 @@ async def test_messaging(
     """It should start the tool detection process.
 
     First a request is sent to establish initial state
-    then messages are read asyncronously.
+    then messages are read asynchronously.
     """
 
     def responder(node_id: NodeId, message: MessageDefinition) -> None:
