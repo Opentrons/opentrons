@@ -8,12 +8,13 @@ import uuid from 'uuid/v4'
 import { when } from 'jest-when'
 
 import {
-  readProtocolsDirectory,
+  readDirectoriesWithinDirectory,
+  readFilesWithinDirectory,
   parseProtocolDirs,
   addProtocolFile,
   removeProtocolById,
-  PROTOCOL_DIRECTORY_NAME,
-  PROTOCOL_DIRECTORY_PATH,
+  PROTOCOLS_DIRECTORY_NAME,
+  PROTOCOLS_DIRECTORY_PATH,
 } from '../file-system'
 
 jest.mock('uuid/v4')
@@ -42,34 +43,64 @@ describe('protocol storage directory utilities', () => {
   })
 
   describe('PROTOCOL DIRECTORY', () => {
-    it('constructs PROTOCOL_DIRECTORY_PATH', () => {
-      return expect(PROTOCOL_DIRECTORY_PATH).toEqual(
-        `__mock-app-path__/${PROTOCOL_DIRECTORY_NAME}`
+    it('constructs PROTOCOLS_DIRECTORY_PATH', () => {
+      return expect(PROTOCOLS_DIRECTORY_PATH).toEqual(
+        `__mock-app-path__/${PROTOCOLS_DIRECTORY_NAME}`
       )
     })
   })
 
-  describe('readProtocolsDirectory', () => {
+  describe('readDirectoriesWithinDirectory', () => {
     it('resolves empty array for empty directory', () => {
-      return expect(readProtocolsDirectory(protocolsDir)).resolves.toEqual([])
+      return expect(
+        readDirectoriesWithinDirectory(protocolsDir)
+      ).resolves.toEqual([])
     })
 
     it('rejects if directory is not found', () => {
       return expect(
-        readProtocolsDirectory('__not_a_directory__')
+        readDirectoriesWithinDirectory('__not_a_directory__')
       ).rejects.toThrow(/no such file/)
     })
 
-    it('returns paths to *.json files in directory', () => {
+    it('returns paths to all directories in directory', () => {
       const firstProtocolDirName = 'protocol_item_1'
       const secondProtocolDirName = 'protocol_item_2'
       return Promise.all([
         fs.emptyDir(path.join(protocolsDir, firstProtocolDirName)),
         fs.emptyDir(path.join(protocolsDir, secondProtocolDirName)),
       ]).then(() => {
-        return expect(readProtocolsDirectory(protocolsDir)).resolves.toEqual([
+        return expect(
+          readDirectoriesWithinDirectory(protocolsDir)
+        ).resolves.toEqual([
           path.join(protocolsDir, firstProtocolDirName),
           path.join(protocolsDir, secondProtocolDirName),
+        ])
+      })
+    })
+  })
+
+  describe('readFilesWithinDirectory', () => {
+    it('resolves empty array for empty directory', () => {
+      return expect(readFilesWithinDirectory(protocolsDir)).resolves.toEqual([])
+    })
+
+    it('rejects if directory is not found', () => {
+      return expect(
+        readFilesWithinDirectory('__not_a_directory__')
+      ).rejects.toThrow(/no such file/)
+    })
+
+    it('returns paths to all files in directory', () => {
+      const firstFileName = 'protocol_item_1.py'
+      const secondFileName = 'protocol_item_2.py'
+      return Promise.all([
+        fs.createFile(path.join(protocolsDir, firstFileName)),
+        fs.createFile(path.join(protocolsDir, secondFileName)),
+      ]).then(() => {
+        return expect(readFilesWithinDirectory(protocolsDir)).resolves.toEqual([
+          path.join(protocolsDir, firstFileName),
+          path.join(protocolsDir, secondFileName),
         ])
       })
     })
@@ -87,20 +118,52 @@ describe('protocol storage directory utilities', () => {
 
       return Promise.all([
         fs.emptyDir(path.join(protocolsDir, firstProtocolDirName)),
+        fs.emptyDir(path.join(protocolsDir, firstProtocolDirName, 'src')),
+        fs.createFile(
+          path.join(protocolsDir, firstProtocolDirName, 'src', 'main.py')
+        ),
+        fs.emptyDir(path.join(protocolsDir, firstProtocolDirName, 'analysis')),
+        fs.createFile(
+          path.join(
+            protocolsDir,
+            firstProtocolDirName,
+            'analysis',
+            'fake_timestamp0.json'
+          )
+        ),
         fs.emptyDir(path.join(protocolsDir, secondProtocolDirName)),
+        fs.emptyDir(path.join(protocolsDir, secondProtocolDirName, 'src')),
+        fs.createFile(
+          path.join(protocolsDir, secondProtocolDirName, 'src', 'main.json')
+        ),
+        fs.emptyDir(path.join(protocolsDir, secondProtocolDirName, 'analysis')),
+        fs.createFile(
+          path.join(
+            protocolsDir,
+            secondProtocolDirName,
+            'analysis',
+            'fake_timestamp1.json'
+          )
+        ),
       ]).then(() => {
         return expect(
           parseProtocolDirs([firstDirPath, secondDirPath])
         ).resolves.toEqual([
           {
             dirPath: firstDirPath,
-            data: [],
             modified: expect.any(Number),
+            srcFilePaths: [path.join(firstDirPath, 'src', 'main.py')],
+            analysisFilePaths: [
+              path.join(firstDirPath, 'analysis', 'fake_timestamp0.json'),
+            ],
           },
           {
             dirPath: secondDirPath,
-            data: [],
             modified: expect.any(Number),
+            srcFilePaths: [path.join(secondDirPath, 'src', 'main.json')],
+            analysisFilePaths: [
+              path.join(secondDirPath, 'analysis', 'fake_timestamp1.json'),
+            ],
           },
         ])
       })
@@ -120,18 +183,21 @@ describe('protocol storage directory utilities', () => {
       const sourceDir = makeEmptyDir()
       const destDir = makeEmptyDir()
       const sourceName = path.join(sourceDir, 'source.py')
-      const expectedName = path.join(destDir, '0abc123')
+      const expectedProtocolDirPath = path.join(destDir, '0abc123')
 
       return fs
         .writeFile(sourceName, 'file contents')
         .then(() => addProtocolFile(sourceName, destDir))
-        .then(() => readProtocolsDirectory(destDir))
+        .then(() => readDirectoriesWithinDirectory(destDir))
         .then(dirPaths => parseProtocolDirs(dirPaths))
         .then(dirs => {
           expect(dirs).toEqual([
             {
-              dirPath: expectedName,
-              data: [path.join(expectedName, 'source.py')],
+              dirPath: expectedProtocolDirPath,
+              srcFilePaths: [
+                path.join(expectedProtocolDirPath, 'src', 'source.py'),
+              ],
+              analysisFilePaths: [],
               modified: expect.any(Number),
             },
           ])
@@ -165,7 +231,7 @@ describe('protocol storage directory utilities', () => {
 
       return setup
         .then(() => removeProtocolById('def456', protocolsDir))
-        .then(() => readProtocolsDirectory(protocolsDir))
+        .then(() => readDirectoriesWithinDirectory(protocolsDir))
         .then(files => expect(files).toEqual([]))
     })
   })

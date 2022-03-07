@@ -1,51 +1,18 @@
 // common types
 
-interface ProtocolFileProps {
-  filename: string
+export interface StoredProtocolDir {
+  dirPath: string
   modified: number
+  srcFilePaths: string[]
+  analysisFilePaths: string[]
 }
-
-interface ValidatedProtocolProps extends ProtocolFileProps {
-  file: string // TODO: type file properly
-}
-
-export interface UncheckedProtocolFile extends ProtocolFileProps {
-  data: { [key: string]: unknown } | null
-}
-
-export interface InvalidProtocolFile extends ProtocolFileProps {
-  type: 'INVALID_LABWARE_FILE'
-}
-
-export interface DuplicateProtocolFile extends ValidatedProtocolProps {
-  type: 'DUPLICATE_LABWARE_FILE'
-}
-
-export interface OpentronsProtocolFile extends ValidatedProtocolProps {
-  type: 'OPENTRONS_LABWARE_FILE'
-}
-
-export interface ValidProtocolFile extends ValidatedProtocolProps {
-  type: 'VALID_LABWARE_FILE'
-}
-
-export type CheckedProtocolFile =
-  | InvalidProtocolFile
-  | DuplicateProtocolFile
-  | OpentronsProtocolFile
-  | ValidProtocolFile
-
-export type FailedProtocolFile =
-  | InvalidProtocolFile
-  | DuplicateProtocolFile
-  | OpentronsProtocolFile
 
 // state types
 
 export interface ProtocolStorageState {
   readonly filenames: string[]
-  readonly filesByName: Partial<{ [filename: string]: CheckedProtocolFile }>
-  readonly addFailureFile: FailedProtocolFile | null
+  readonly filesByName: Partial<{ [filename: string]: StoredProtocolDir }>
+  readonly addFailureFile: StoredProtocolDir | null
   readonly addFailureMessage: string | null
   readonly listFailureMessage: string | null
 }
@@ -58,32 +25,32 @@ export type ProtocolListActionSource =
   | 'protocolAddition'
   | 'overwriteProtocol'
 
-export interface FetchProtocolAction {
-  type: 'protocolStorage:FETCH_PROTOCOL'
+export interface FetchProtocolsAction {
+  type: 'protocolStorage:FETCH_PROTOCOLS'
   meta: { shell: true }
 }
 
-export interface ProtocolListAction {
-  type: 'protocolStorage:PROTOCOL_LIST'
-  payload: CheckedProtocolFile[]
+export interface UpdateProtocolListAction {
+  type: 'protocolStorage:UPDATE_PROTOCOL_LIST'
+  payload: StoredProtocolDir[]
   meta: { source: ProtocolListActionSource }
 }
 
-export interface ProtocolListFailureAction {
-  type: 'protocolStorage:PROTOCOL_LIST_FAILURE'
+export interface UpdateProtocolListFailureAction {
+  type: 'protocolStorage:UPDATE_PROTOCOL_LIST_FAILURE'
   payload: { message: string }
   meta: { source: ProtocolListActionSource }
 }
 
 export interface AddProtocolAction {
   type: 'protocolStorage:ADD_PROTOCOL'
-  payload: { overwrite: DuplicateProtocolFile | null }
+  payload: { protocolFile: File }
   meta: { shell: true }
 }
 
 export interface AddProtocolFailureAction {
   type: 'protocolStorage:ADD_PROTOCOL_FAILURE'
-  payload: { protocol: FailedProtocolFile | null; message: string | null }
+  payload: { protocol: StoredProtocolDir | null; message: string | null }
 }
 
 export interface ClearAddProtocolFailureAction {
@@ -96,9 +63,9 @@ export interface OpenProtocolDirectoryAction {
 }
 
 export type ProtocolStorageAction =
-  | FetchProtocolAction
-  | ProtocolListAction
-  | ProtocolListFailureAction
+  | FetchProtocolsAction
+  | UpdateProtocolListAction
+  | UpdateProtocolListFailureAction
   | AddProtocolAction
   | AddProtocolFailureAction
   | ClearAddProtocolFailureAction
