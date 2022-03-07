@@ -57,12 +57,12 @@ export interface State {
   readonly networking: NetworkingState
   readonly labware: CustomLabwareState
   readonly protocol: ProtocolState
-  readonly protocolStorage: ProtocolStorageState
   readonly shell: ShellState
   readonly systemInfo: SystemInfoState
   readonly alerts: AlertsState
   readonly sessions: SessionState
   readonly calibration: CalibrationState
+  readonly protocolStorage: ProtocolStorageState
   readonly router: RouterState
 }
 

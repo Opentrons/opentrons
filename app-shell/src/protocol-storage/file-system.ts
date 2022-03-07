@@ -4,16 +4,35 @@ import uuid from 'uuid/v4'
 
 import { app, shell } from 'electron'
 
+import type { StoredProtocolDir } from '@opentrons/app/src/redux/protocol-storage'
 import type { Dirent } from 'fs'
-import type { UncheckedLabwareFile } from '@opentrons/app/src/redux/custom-labware/types'
 
-export const PROTOCOL_DIRECTORY_NAME = 'protocols'
-export const PROTOCOL_DIRECTORY_PATH = path.join(
+/**
+ * Module for managing local protocol files on the host filesystem
+ *
+ * example directory structure:
+ * protocols/
+ *  ├─ abc123-uuid/
+ *  │  ├─ src/
+ *  │  │  ├─ serialDilution.py
+ *  │  ├─ analysis/
+ *  │  │  ├─ 1646303907.json
+ *  ├─ def456-uuid/
+ *  │  ├─ src/
+ *  │  │  ├─ swiftTurbo.json
+ *  │  ├─ analysis/
+ *  │  │  ├─ 1646303906.json
+ */
+
+export const PROTOCOLS_DIRECTORY_NAME = 'protocols'
+export const PROTOCOLS_DIRECTORY_PATH = path.join(
   app.getPath('appData'),
-  PROTOCOL_DIRECTORY_NAME
+  PROTOCOLS_DIRECTORY_NAME
 )
+export const PROTOCOL_SRC_DIRECTORY_NAME = 'src'
+export const PROTOCOL_ANALYSIS_DIRECTORY_NAME = 'analysis'
 
-export function readProtocolsDirectory(dir: string): Promise<string[]> {
+export function readDirectoriesWithinDirectory(dir: string): Promise<string[]> {
   const getAbsolutePath = (e: Dirent): string => path.join(dir, e.name)
 
   return fs.readdir(dir, { withFileTypes: true }).then((entries: Dirent[]) => {
@@ -25,24 +44,53 @@ export function readProtocolsDirectory(dir: string): Promise<string[]> {
   })
 }
 
-interface UncheckedProtocolDir {
-  dirPath: string
-  modified: number
-  data: string[]
+export function readFilesWithinDirectory(dir: string): Promise<string[]> {
+  const getAbsolutePath = (e: Dirent): string => path.join(dir, e.name)
+
+  return fs.readdir(dir, { withFileTypes: true }).then((entries: Dirent[]) => {
+    const protocolDirPaths = entries
+      .filter(e => e.isFile())
+      .map(getAbsolutePath)
+
+    return protocolDirPaths
+  })
 }
+
 export function parseProtocolDirs(
   dirPaths: string[]
-): Promise<UncheckedProtocolDir[]> {
+): Promise<StoredProtocolDir[]> {
   const tasks = dirPaths.map(dirPath => {
     const getAbsolutePath = (e: Dirent): string => path.join(dirPath, e.name)
     const readTask = fs.readdir(dirPath, { withFileTypes: true })
     const statTask = fs.stat(dirPath)
 
-    return Promise.all([readTask, statTask]).then(([data, stats]) => ({
-      dirPath,
-      modified: stats.mtimeMs,
-      data: data.map((dirent: Dirent) => getAbsolutePath(dirent)),
-    }))
+    return Promise.all([readTask, statTask]).then(([data, stats]) => {
+      const protocolSrcDirent = data.find(
+        (dirent: Dirent) =>
+          dirent.isDirectory() && dirent.name === PROTOCOL_SRC_DIRECTORY_NAME
+      )
+      const protocolAnalysisDirent = data.find(
+        (dirent: Dirent) =>
+          dirent.isDirectory() &&
+          dirent.name === PROTOCOL_ANALYSIS_DIRECTORY_NAME
+      )
+      const srcFilePathsProm =
+        protocolSrcDirent != null
+          ? readFilesWithinDirectory(getAbsolutePath(protocolSrcDirent))
+          : Promise.resolve([])
+      const analysisFilePathsProm =
+        protocolAnalysisDirent != null
+          ? readFilesWithinDirectory(getAbsolutePath(protocolAnalysisDirent))
+          : Promise.resolve([])
+      return Promise.all([srcFilePathsProm, analysisFilePathsProm]).then(
+        ([srcFilePaths, analysisFilePaths]) => ({
+          dirPath,
+          modified: stats.mtimeMs,
+          srcFilePaths,
+          analysisFilePaths,
+        })
+      )
+    })
   })
 
   return Promise.all(tasks)
@@ -52,7 +100,7 @@ const getFileName = (base: string, ext: string, count = 0): Promise<string> => {
   // TODO: appropriately grab python file name with fallback, also assign uuid
   // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   const basename = `${base}${count || ''}${ext}`
-  const name = path.join(PROTOCOL_DIRECTORY_PATH, basename)
+  const name = path.join(PROTOCOLS_DIRECTORY_PATH, basename)
 
   return fs
     .pathExists(name)
@@ -62,17 +110,27 @@ const getFileName = (base: string, ext: string, count = 0): Promise<string> => {
 }
 
 export function addProtocolFile(
-  file: string,
+  mainFileSourcePath: string,
   protocolsDirPath: string
 ): Promise<void> {
   const protocolId = uuid()
-  const dirPath = path.join(protocolsDirPath, protocolId)
+  const protocolDirPath = path.join(protocolsDirPath, protocolId)
 
-  const extname = path.extname(file)
-  const basename = path.basename(file, extname)
-  return fs.mkdir(dirPath).then(() => {
-    return fs.copy(file, path.join(dirPath, `${basename}${extname}`))
-  })
+  const srcDirPath = path.join(protocolDirPath, PROTOCOL_SRC_DIRECTORY_NAME)
+  const analysisDirPath = path.join(
+    protocolDirPath,
+    PROTOCOL_ANALYSIS_DIRECTORY_NAME
+  )
+
+  const extname = path.extname(mainFileSourcePath)
+  const basename = path.basename(mainFileSourcePath, extname)
+  const mainFileDestPath = path.join(srcDirPath, `${basename}${extname}`)
+
+  return fs
+    .mkdir(protocolDirPath)
+    .then(() => fs.mkdir(srcDirPath))
+    .then(() => fs.mkdir(analysisDirPath))
+    .then(() => fs.copy(mainFileSourcePath, mainFileDestPath))
 }
 
 export function removeProtocolById(
