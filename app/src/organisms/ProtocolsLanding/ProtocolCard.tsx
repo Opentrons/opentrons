@@ -1,7 +1,9 @@
 import * as React from 'react'
+import { css } from 'styled-components'
 // import { useTranslation } from 'react-i18next'
 
 import { StyledText } from '../../atoms/text'
+import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 
 import {
   Box,
@@ -32,6 +34,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
       marginBottom={SPACING.spacing3}
       padding={SPACING.spacing4}
       width="100%"
+      position="relative"
     >
       <Box
         flex="0 0 96px"
@@ -61,13 +64,36 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
           <Flex flexDirection="column" marginRight={SPACING.spacing4}>
             <StyledText as="h6">modules</StyledText>
             <Flex>
-              <Icon name="heater-shaker" height="1rem" />
-              <Icon name="heater-shaker" height="1rem" />
-              <Icon name="heater-shaker" height="1rem" />
+              <Icon
+                name="heater-shaker"
+                height="1rem"
+                marginRight={SPACING.spacing3}
+              />
+              <Icon
+                name="heater-shaker"
+                height="1rem"
+                marginRight={SPACING.spacing3}
+              />
+              <Icon
+                name="heater-shaker"
+                height="1rem"
+                marginRight={SPACING.spacing3}
+              />
             </Flex>
           </Flex>
         </Flex>
+
+        <OverflowBtn
+          css={css`
+            position: absolute;
+            top: 2px;
+            right: 2px;
+          `}
+        />
       </Box>
+      <StyledText as="label" position="absolute" bottom="1rem" right="1rem">
+        Last updated DD MM YYYY
+      </StyledText>
     </Flex>
   )
 }

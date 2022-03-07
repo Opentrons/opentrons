@@ -25,6 +25,7 @@ export function ProtocolsList(): JSX.Element | null {
         marginBottom={SPACING.spacing5}
       >
         <StyledText as="h1">{t('protocols')}</StyledText>
+        {/* TODO - Add text filter dropdown overflow menu component */}
         <SecondaryButton
           onClick={() => {
             setShowSlideout(true)
