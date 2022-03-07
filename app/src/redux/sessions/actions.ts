@@ -170,10 +170,3 @@ export const ensureSession = (
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   meta: {} as RobotApiRequestMeta,
 })
-
-export const clearAllSessions = (
-  robotName: string
-): Types.ClearAllSessionsAction => ({
-  type: Constants.CLEAR_ALL_SESSIONS,
-  payload: { robotName },
-})

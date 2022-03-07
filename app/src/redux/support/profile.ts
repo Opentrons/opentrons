@@ -41,7 +41,7 @@ export function makeProfileUpdate(
   switch (action.type) {
     // TODO(mc, 2020-04-21): this code is not covered by unit tests and sets
     // too much data in one go. Refactor to handle each action individually
-    case 'robot:CONNECT_RESPONSE':
+    case 'robot:CONNECT':
     case RobotSettings.FETCH_SETTINGS_SUCCESS:
     case RobotSettings.UPDATE_SETTING_SUCCESS:
     case Pipettes.FETCH_PIPETTES_SUCCESS: {
@@ -54,7 +54,7 @@ export function makeProfileUpdate(
       if (
         !robot ||
         !robotData ||
-        (action.type !== 'robot:CONNECT_RESPONSE' &&
+        (action.type !== 'robot:CONNECT' &&
           action.payload.robotName !== robot.name)
       ) {
         return null
