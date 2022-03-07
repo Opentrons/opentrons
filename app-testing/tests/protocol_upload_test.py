@@ -240,8 +240,17 @@ def test_LPC_flow(
         labware_position_check.click_down_jog_button()
         labware_position_check.click_right_jog_button()
         labware_position_check.click_forward_jog_button()
-        labware_position_check.click_confirm_position_moveto_slot_5()
+        labware_position_check.click_confirm_position_moveto_slot_2()
+        assert (
+            labware_position_check.get_how_to_tell_pipette_is_centered_link().is_displayed()
+        )
+        labware_position_check.click_reveal_all_jog_controls()
+        labware_position_check.click_back_jog_button()
+        labware_position_check.click_down_jog_button()
+        labware_position_check.click_right_jog_button()
+        labware_position_check.click_forward_jog_button()
         labware_position_check.click_confirm_position_button_pickup_tip()
+        labware_position_check.click_confirm_position_moveto_slot_5()
         assert (
             labware_position_check.get_how_to_tell_pipette_is_centered_link().is_displayed()
         )
@@ -251,14 +260,6 @@ def test_LPC_flow(
         labware_position_check.click_right_jog_button()
         labware_position_check.click_forward_jog_button()
         labware_position_check.click_confirm_position_moveto_slot_6()
-        assert (
-            labware_position_check.get_how_to_tell_pipette_is_centered_link().is_displayed()
-        )
-        labware_position_check.click_reveal_all_jog_controls()
-        labware_position_check.click_back_jog_button()
-        labware_position_check.click_down_jog_button()
-        labware_position_check.click_right_jog_button()
-        labware_position_check.click_forward_jog_button()
         labware_position_check.click_confirm_position_returntip_slot_home()
         assert (
             labware_position_check.get_labware_position_check_complete().is_displayed()
@@ -279,11 +280,11 @@ def test_LPC_flow(
             == "Opentrons 96 Tip Rack 10 µL"
         )
         assert labware_position_check.get_x_offset_text_on_deckmap().is_displayed()
-        assert labware_position_check.get_x_offset_value_on_deckmap().text == "1.0"
+        assert labware_position_check.get_x_offset_value_on_deckmap().text == "0.10"
         assert labware_position_check.get_y_offset_text_on_deckmap().is_displayed()
-        assert labware_position_check.get_y_offset_value_on_deckmap().text == "1.0"
+        assert labware_position_check.get_y_offset_value_on_deckmap().text == "0.00"
         assert labware_position_check.get_z_offset_text_on_deckmap().is_displayed()
-        assert labware_position_check.get_z_offset_value_on_deckmap().text == "1.0"
+        assert labware_position_check.get_z_offset_value_on_deckmap().text == "-0.10"
 
 
 def test_gen1_pipette(

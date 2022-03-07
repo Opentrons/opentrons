@@ -75,9 +75,14 @@ class LabwarePositionCheck:
         "//button[text()='Confirm position, pick up tip']",
     )
 
-    confirm_position_moveto_slot_5: Tuple[str, str] = (
+    confirm_position_moveto_slot_2: Tuple[str, str] = (
         By.XPATH,
         "//button[text()='Confirm position, move to slot 2']",
+    )
+
+    confirm_position_moveto_slot_5: Tuple[str, str] = (
+        By.XPATH,
+        "//button[text()='Confirm position, move to slot 5']",
     )
 
     confirm_position_moveto_slot_6: Tuple[str, str] = (
@@ -141,9 +146,7 @@ class LabwarePositionCheck:
     def get_labware_success_toast(self) -> WebElement:
         """Element to locate the success toast of LPC"""
         return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(
-                LabwarePositionCheck.labware_setup_position_check_button
-            )
+            EC.element_to_be_clickable(LabwarePositionCheck.labware_success_toast)
         )
 
     @highlight
@@ -303,19 +306,37 @@ class LabwarePositionCheck:
     @highlight
     def get_confirm_position_button_pickup_tip(self) -> WebElement:
         """Locator for confirm position button pickup."""
-        return WebDriverWait(self.driver, 2).until(
+        toggle: WebElement = WebDriverWait(self.driver, 5).until(
             EC.element_to_be_clickable(
                 LabwarePositionCheck.confirm_position_button_pickup_tip
             )
         )
+        actions = ActionChains(self.driver)
+        actions.move_to_element(toggle).perform()
+        return toggle
 
     def click_confirm_position_button_pickup_tip(self) -> None:
         self.get_confirm_position_button_pickup_tip().click()
 
     @highlight
-    def get_confirm_position_moveto_slot_5(self) -> WebElement:
+    def get_confirm_position_moveto_slot_2(self) -> WebElement:
         """Locator for confirm positin moveto slot."""
         toggle: WebElement = WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(
+                LabwarePositionCheck.confirm_position_moveto_slot_2
+            )
+        )
+        actions = ActionChains(self.driver)
+        actions.move_to_element(toggle).perform()
+        return toggle
+
+    def click_confirm_position_moveto_slot_2(self) -> None:
+        self.get_confirm_position_moveto_slot_2().click()
+
+    @highlight
+    def get_confirm_position_moveto_slot_5(self) -> WebElement:
+        """Locator for confirm positin moveto slot."""
+        toggle: WebElement = WebDriverWait(self.driver, 5).until(
             EC.element_to_be_clickable(
                 LabwarePositionCheck.confirm_position_moveto_slot_5
             )
@@ -365,6 +386,7 @@ class LabwarePositionCheck:
             "LabwareInfoOverlay_displayName",
         )
         if len(elements) == 4:
+            logger.info(f"Display Name of first element: {elements[0].text}")
             return elements[0]
         return None
 
