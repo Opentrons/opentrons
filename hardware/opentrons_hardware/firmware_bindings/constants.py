@@ -102,6 +102,8 @@ class MessageId(int, Enum):
     fw_update_status_request = 0x65
     fw_update_status_response = 0x66
     fw_update_start_app = 0x67
+    fw_update_erase_app = 0x68
+    fw_update_erase_app_ack = 0x69
 
     limit_sw_request = 0x08
     limit_sw_response = 0x09

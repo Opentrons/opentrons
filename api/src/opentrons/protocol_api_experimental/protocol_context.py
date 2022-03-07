@@ -225,5 +225,13 @@ class ProtocolContext:
         """
         self._engine_client.pause(message=msg)
 
+    def set_rail_lights(self, on: bool) -> None:
+        """Controls the robot rail lights.
+
+        Args:
+            on: If true, turn on rail lights; otherwise, turn off.
+        """
+        self._engine_client.set_rail_lights(on=on)
+
     # todo(mm, 2021-04-09): Add all other public methods from the APIv2
     # ProtocolContext.

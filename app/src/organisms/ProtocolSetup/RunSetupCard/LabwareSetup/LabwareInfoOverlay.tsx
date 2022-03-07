@@ -26,7 +26,8 @@ import { getLabwareDefinitionUri } from '../../utils/getLabwareDefinitionUri'
 import type { LabwareOffset } from '@opentrons/api-client'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 interface LabwareInfoProps {
-  displayName: string
+  displayName: string | null
+  definitionDisplayName: string
   labwareId: string
 }
 
@@ -39,10 +40,11 @@ const labwareDisplayNameStyle = css`
   -webkit-box-orient: vertical;
 `
 const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
-  const { displayName, labwareId } = props
+  const { displayName, definitionDisplayName, labwareId } = props
   const { t } = useTranslation('protocol_setup')
   const { protocolData } = useProtocolDetails()
   const runRecord = useCurrentRun()
+
   // protocolData should never be null as we don't render the `ProtocolSetup` unless we have an analysis
   // but we're experiencing a zombie children issue, see https://github.com/Opentrons/opentrons/pull/9091
   if (protocolData == null) {
@@ -97,8 +99,9 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
         margin={SPACING_1}
         css={labwareDisplayNameStyle}
         id="LabwareInfoOverlay_displayName"
+        title={definitionDisplayName}
       >
-        {displayName}
+        {displayName ?? definitionDisplayName}
       </Text>
       {vector != null && (
         <>
@@ -169,11 +172,12 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
 interface LabwareInfoOverlayProps {
   definition: LabwareDefinition2
   labwareId: string
+  displayName: string | null
 }
 export const LabwareInfoOverlay = (
   props: LabwareInfoOverlayProps
 ): JSX.Element => {
-  const { definition, labwareId } = props
+  const { definition, labwareId, displayName } = props
   const width = definition.dimensions.xDimension
   const height = definition.dimensions.yDimension
   return (
@@ -188,7 +192,8 @@ export const LabwareInfoOverlay = (
       }}
     >
       <LabwareInfo
-        displayName={getLabwareDisplayName(definition)}
+        displayName={displayName}
+        definitionDisplayName={getLabwareDisplayName(definition)}
         labwareId={labwareId}
       />
     </RobotCoordsForeignDiv>

@@ -1,5 +1,6 @@
 import * as React from 'react'
 import {
+  HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -11,6 +12,7 @@ interface ModuleIconProps {
     | typeof MAGNETIC_MODULE_TYPE
     | typeof TEMPERATURE_MODULE_TYPE
     | typeof THERMOCYCLER_MODULE_TYPE
+    | typeof HEATERSHAKER_MODULE_TYPE
 }
 
 export const ModuleIcon = (props: ModuleIconProps): JSX.Element => {
@@ -19,6 +21,7 @@ export const ModuleIcon = (props: ModuleIconProps): JSX.Element => {
     [MAGNETIC_MODULE_TYPE]: 'ot-magnet-v2',
     [TEMPERATURE_MODULE_TYPE]: 'ot-temperature-v2',
     [THERMOCYCLER_MODULE_TYPE]: 'ot-thermocycler',
+    [HEATERSHAKER_MODULE_TYPE]: 'ot-heater-shaker',
   } as const
 
   return (

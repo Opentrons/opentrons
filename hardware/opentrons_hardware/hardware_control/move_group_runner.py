@@ -16,7 +16,6 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     AddLinearMoveRequestPayload,
     ExecuteMoveGroupRequestPayload,
-    EmptyPayload,
 )
 from .constants import interrupts_per_sec
 from opentrons_hardware.hardware_control.motion import MoveGroups
@@ -59,7 +58,7 @@ class MoveGroupRunner:
         """Send commands to clear the message groups."""
         await can_messenger.send(
             node_id=NodeId.broadcast,
-            message=ClearAllMoveGroupsRequest(payload=EmptyPayload()),
+            message=ClearAllMoveGroupsRequest(),
         )
 
     async def _send_groups(self, can_messenger: CanMessenger) -> None:

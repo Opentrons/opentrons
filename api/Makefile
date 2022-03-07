@@ -73,6 +73,12 @@ setup:
 	$(pipenv) sync $(pipenv_opts)
 	$(pipenv) run pip freeze
 
+.PHONY: setup-ot2
+setup-ot2:
+	$(pipenv) sync $(pipenv_opts)
+	$(pipenv) run pip uninstall -y opentrons_hardware
+	$(pipenv) run pip freeze
+
 .PHONY: clean
 clean: docs-clean
 	$(clean_cmd)
@@ -100,6 +106,10 @@ sdist: $(sdist_file)
 .PHONY: test
 test:
 	$(pytest) $(tests) $(test_opts)
+
+.PHONY: test-ot2
+test-ot2:
+	$(pytest) $(tests) $(test_opts) --ot2-only --ignore-glob="**/*ot3*"
 
 .PHONY: lint
 lint:

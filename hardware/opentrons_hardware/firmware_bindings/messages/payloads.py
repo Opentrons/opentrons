@@ -263,8 +263,8 @@ class FirmwareUpdateComplete(utils.BinarySerializable):
 
 
 @dataclass
-class FirmwareUpdateCompleteAcknowledge(utils.BinarySerializable):
-    """A response to the FirmwareUpdateComplete message."""
+class FirmwareUpdateAcknowledge(utils.BinarySerializable):
+    """A response to a firmware update message with an error code."""
 
     error_code: utils.UInt16Field
 

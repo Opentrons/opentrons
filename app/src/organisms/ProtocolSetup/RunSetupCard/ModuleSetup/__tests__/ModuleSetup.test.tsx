@@ -333,6 +333,7 @@ describe('ModuleSetup', () => {
           moduleDef: mockMagneticModule as any,
           nestedLabwareDef: null,
           nestedLabwareId: null,
+          nestedLabwareDisplayName: null,
           protocolLoadOrder: 1,
           attachedModuleMatch: {
             ...mockMagneticModuleFixture,
@@ -348,6 +349,7 @@ describe('ModuleSetup', () => {
           moduleDef: mockTCModule,
           nestedLabwareDef: null,
           nestedLabwareId: null,
+          nestedLabwareDisplayName: null,
           protocolLoadOrder: 0,
           attachedModuleMatch: {
             ...mockThermocyclerFixture,
@@ -404,6 +406,7 @@ describe('ModuleSetup', () => {
           moduleDef: mockMagneticModule as any,
           nestedLabwareDef: null,
           nestedLabwareId: null,
+          nestedLabwareDisplayName: null,
           protocolLoadOrder: 1,
           attachedModuleMatch: {
             ...mockMagneticModuleFixture,
@@ -419,6 +422,7 @@ describe('ModuleSetup', () => {
           moduleDef: mockMagneticModule as any,
           nestedLabwareDef: null,
           nestedLabwareId: null,
+          nestedLabwareDisplayName: null,
           protocolLoadOrder: 0,
           attachedModuleMatch: {
             ...mockMagneticModuleFixture,
