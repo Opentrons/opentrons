@@ -15,9 +15,6 @@ from opentrons.hardware_control.types import (
     MustHomeError,
 )
 from opentrons.hardware_control.robot_calibration import RobotCalibration
-from hardware.opentrons_hardware.hardware_control.motion_planning.move_utils import (
-    MoveConditionNotMet,
-)
 from opentrons.hardware_control.types import OT3Axis
 
 
@@ -90,6 +87,10 @@ async def test_home(ot3_hardware, mock_home):
 
 
 async def test_home_unmet(ot3_hardware, mock_home):
+    from opentrons_hardware.hardware_control.motion_planning.move_utils import (
+        MoveConditionNotMet,
+    )
+
     mock_home.side_effect = MoveConditionNotMet()
     with pytest.raises(MoveConditionNotMet):
         await ot3_hardware.home()
