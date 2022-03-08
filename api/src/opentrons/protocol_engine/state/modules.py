@@ -415,14 +415,14 @@ class ModuleView(HasState[ModuleState]):
 
     @staticmethod
     def calculate_magnet_hardware_height(
-        magnetic_module_model: ModuleModel, mm_above_labware_base: float
+        magnetic_module_model: ModuleModel, mm_from_base: float
     ) -> float:
         """Convert a human-friendly magnet height to be hardware-friendly.
 
         Args:
             magnetic_module_model: The model of Magnetic Module to calculate
                 a height for.
-            mm_above_labware_base: The height to convert. Measured in how far the tops
+            mm_from_base: The height to convert. Measured in how far the tops
                 of the magnets are above the labware base plane.
 
         Returns:
@@ -441,17 +441,17 @@ class ModuleView(HasState[ModuleState]):
                 f"{magnetic_module_model} is not a Magnetic Module."
             )
 
-        hardware_units_above_base = (
-            mm_above_labware_base * 2
+        hardware_units_from_base = (
+            mm_from_base * 2
             if magnetic_module_model == ModuleModel.MAGNETIC_MODULE_V1
-            else mm_above_labware_base
+            else mm_from_base
         )
         home_to_base_offset = MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM[
             magnetic_module_model
         ]
-        hardware_units_above_home = home_to_base_offset + hardware_units_above_base
+        hardware_units_from_home = home_to_base_offset + hardware_units_from_base
         if not engage_height_is_in_range(
-            model=magnetic_module_model, height=hardware_units_above_home
+            model=magnetic_module_model, height=hardware_units_from_home
         ):
             # TODO(mm, 2022-03-02): This error message probably will not match how
             # the user specified the height. (Hardware units versus mm,
@@ -459,7 +459,7 @@ class ModuleView(HasState[ModuleState]):
             # depending on how it propagates up.
             raise errors.EngageHeightOutOfRangeError(
                 f"Invalid engage height for"
-                f" {magnetic_module_model}: {hardware_units_above_home}. Must be"
+                f" {magnetic_module_model}: {hardware_units_from_home}. Must be"
                 f" 0 - {MAGNETIC_MODULE_MAX_ENGAGE_HEIGHT[magnetic_module_model]}."
             )
-        return hardware_units_above_home
+        return hardware_units_from_home

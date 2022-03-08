@@ -72,14 +72,14 @@ class EngageImplementation(AbstractCommandImpl[EngageParams, EngageResult]):
         """Execute a Magnetic Module engage command."""
         await self._engage_magnets(
             magnetic_module_id=params.moduleId,
-            mm_above_labware_base=params.engageHeight,
+            mm_from_base=params.engageHeight,
         )
         return EngageResult()
 
     async def _engage_magnets(
         self,
         magnetic_module_id: str,
-        mm_above_labware_base: float,
+        mm_from_base: float,
     ) -> None:
         """Engage a loaded Magnetic Module's magnets.
 
@@ -98,7 +98,7 @@ class EngageImplementation(AbstractCommandImpl[EngageParams, EngageResult]):
         # Allow propagation of WrongModuleTypeError and EngageHeightOutOfRangeError.
         hardware_height = self._state_store.modules.calculate_magnet_hardware_height(
             magnetic_module_model=model,
-            mm_above_labware_base=mm_above_labware_base,
+            mm_from_base=mm_from_base,
         )
 
         if not self._state_store.get_configs().use_virtual_modules:

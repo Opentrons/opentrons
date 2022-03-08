@@ -26,7 +26,7 @@ async def test_magnetic_module_engage_implementation(
     decoy.verify(
         await equipment.engage_magnets(
             magnetic_module_id="module-id",
-            mm_above_labware_base=3.14159,
+            mm_from_base=3.14159,
         )
     )
     assert result == EngageResult()
