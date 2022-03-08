@@ -8,6 +8,14 @@ from .engage import (
     EngageCommandType,
 )
 
+from .disengage import (
+    Disengage,
+    DisengageCreate,
+    DisengageParams,
+    DisengageResult,
+    DisengageCommandType,
+)
+
 __all__ = [
     # magneticModule/engageMagnet
     "Engage",
@@ -15,4 +23,10 @@ __all__ = [
     "EngageParams",
     "EngageResult",
     "EngageCommandType",
+    # magneticModule/disengageMagnet
+    "Disengage",
+    "DisengageCreate",
+    "DisengageParams",
+    "DisengageResult",
+    "DisengageCommandType",
 ]
