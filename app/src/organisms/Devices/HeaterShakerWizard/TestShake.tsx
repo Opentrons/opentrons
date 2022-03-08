@@ -20,12 +20,15 @@ import { TertiaryButton } from '../../../atoms/Buttons'
 import { CollapsibleStep } from '../../ProtocolSetup/RunSetupCard/CollapsibleStep'
 import { Divider } from '../../../atoms/structure'
 
+import type { AttachedModule } from '../../../redux/modules/types'
+
 interface TestShakeProps {
+  module: AttachedModule | null
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>
 }
 
 export function TestShake(props: TestShakeProps): JSX.Element {
-  const { setCurrentPage } = props
+  const { module, setCurrentPage } = props
   const { t } = useTranslation('heater_shaker')
 
   const [isExpanded, setExpanded] = React.useState(false)
@@ -72,7 +75,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
         flexDirection={DIRECTION_COLUMN}
         fontSize={TYPOGRAPHY.fontSizeCaption}
       >
-        <HeaterShakerModuleCard />
+        <HeaterShakerModuleCard module={module} />
         <TertiaryButton marginLeft={SIZE_AUTO} marginTop={SPACING.spacing4}>
           {t('open_labware_latch')}
         </TertiaryButton>

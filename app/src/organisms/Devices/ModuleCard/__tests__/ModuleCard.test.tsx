@@ -6,12 +6,14 @@ import { i18n } from '../../../../i18n'
 import { MagneticModuleData } from '../MagneticModuleData'
 import { TemperatureModuleData } from '../TemperatureModuleData'
 import { ThermocyclerModuleData } from '../ThermocyclerModuleData'
+import { HeaterShakerModuleData } from '../HeaterShakerModuleData'
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 import { ModuleCard } from '..'
 import {
   mockMagneticModule,
   mockTemperatureModuleGen2,
   mockThermocycler,
+  mockHeaterShaker,
 } from '../../../../redux/modules/__fixtures__'
 
 import type { MagneticModule } from '../../../../redux/modules/types'
@@ -19,6 +21,7 @@ import type { MagneticModule } from '../../../../redux/modules/types'
 jest.mock('../MagneticModuleData')
 jest.mock('../TemperatureModuleData')
 jest.mock('../ThermocyclerModuleData')
+jest.mock('../HeaterShakerModuleData')
 jest.mock('../ModuleOverflowMenu')
 
 const mockMagneticModuleData = MagneticModuleData as jest.MockedFunction<
@@ -30,9 +33,11 @@ const mockTemperatureModuleData = TemperatureModuleData as jest.MockedFunction<
 const mockModuleOverflowMenu = ModuleOverflowMenu as jest.MockedFunction<
   typeof ModuleOverflowMenu
 >
-
 const mockThermocyclerModuleData = ThermocyclerModuleData as jest.MockedFunction<
   typeof ThermocyclerModuleData
+>
+const mockHeaterShakerModuleData = HeaterShakerModuleData as jest.MockedFunction<
+  typeof HeaterShakerModuleData
 >
 
 const mockMagneticModuleHub = {
@@ -62,6 +67,9 @@ describe('ModuleCard', () => {
     mockMagneticModuleData.mockReturnValue(<div>Mock Magnetic Module Data</div>)
     mockThermocyclerModuleData.mockReturnValue(
       <div>Mock Thermocycler Module Data</div>
+    )
+    mockHeaterShakerModuleData.mockReturnValue(
+      <div>Mock Heater Shaker Module Data</div>
     )
     mockModuleOverflowMenu.mockReturnValue(<div>mock module overflow menu</div>)
   })
@@ -115,6 +123,17 @@ describe('ModuleCard', () => {
     getByText('Mock Thermocycler Module Data')
     getByText('usb port 1')
     getByAltText('thermocyclerModuleV1')
+  })
+
+  it('renders information for a heater shaker module with mocked status', () => {
+    const { getByText, getByAltText } = render({
+      module: mockHeaterShaker,
+    })
+
+    getByText('Heater Shaker Module GEN1')
+    getByText('Mock Heater Shaker Module Data')
+    getByText('usb port 1')
+    getByAltText('heaterShakerModuleV1')
   })
 
   it('renders kebab icon and is clickable', () => {

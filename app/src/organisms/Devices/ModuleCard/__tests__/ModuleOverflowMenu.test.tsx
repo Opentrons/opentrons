@@ -6,6 +6,7 @@ import {
   mockMagneticModule,
   mockTemperatureModuleGen2,
   mockThermocycler,
+  mockHeaterShaker,
 } from '../../../../redux/modules/__fixtures__'
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 
@@ -89,5 +90,26 @@ describe('ModuleOverflowMenu', () => {
     })
     fireEvent.click(buttonSettingBlock)
     expect(props.handleClick).toHaveBeenCalled()
+  })
+  it('renders the correct Heater Shaker module menu', () => {
+    props = {
+      module: mockHeaterShaker,
+      handleClick: jest.fn(),
+      handleAboutClick: jest.fn(),
+    }
+    // TODO(sh, 2022-03-08): extend tests when menu component is wired up
+    const { getByRole } = render(props)
+    getByRole('button', {
+      name: 'Set temperature',
+    })
+    getByRole('button', {
+      name: 'Set shake speed',
+    })
+    getByRole('button', {
+      name: 'Open Labware Latch',
+    })
+    getByRole('button', { name: 'About module' })
+    getByRole('button', { name: 'See how to attach to deck' })
+    getByRole('button', { name: 'Test shake' })
   })
 })

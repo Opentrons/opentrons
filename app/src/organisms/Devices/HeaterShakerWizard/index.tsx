@@ -45,8 +45,7 @@ export const HeaterShakerWizard = (
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   const heaterShaker = attachedModules.find(
-    //  TODO(jr, 2022-02-18): get heaterShaker module when model exists
-    module => module.model === 'magneticModuleV2'
+    module => module.type === 'heaterShakerModuleType'
   )
   let isPrimaryCTAEnabled: boolean = true
 
@@ -79,7 +78,12 @@ export const HeaterShakerWizard = (
         return <PowerOn attachedModule={heaterShaker ?? null} />
       case 5:
         buttonContent = t('complete')
-        return <TestShake setCurrentPage={setCurrentPage} />
+        return (
+          <TestShake
+            module={heaterShaker ?? null}
+            setCurrentPage={setCurrentPage}
+          />
+        )
       default:
         return null
     }

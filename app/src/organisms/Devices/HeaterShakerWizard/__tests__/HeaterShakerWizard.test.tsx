@@ -4,7 +4,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { getAttachedModules } from '../../../../redux/modules'
 import { getConnectedRobotName } from '../../../../redux/robot/selectors'
-import { mockMagneticModuleGen2 } from '../../../../redux/modules/__fixtures__'
+import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 import { HeaterShakerWizard } from '..'
 import { Introduction } from '../Introduction'
 import { KeyParts } from '../KeyParts'
@@ -59,9 +59,7 @@ describe('HeaterShakerWizard', () => {
     mockAttachAdapter.mockReturnValue(<div>Mock Attach Adapter</div>)
     mockPowerOn.mockReturnValue(<div>Mock Power On</div>)
     mockTestShake.mockReturnValue(<div>Mock Test Shake</div>)
-    mockGetAttachedModules
-      //  TODO(jr, 2022-02-18): change to heater shaker when getAttachedModules supports it
-      .mockReturnValue([mockMagneticModuleGen2])
+    mockGetAttachedModules.mockReturnValue([mockHeaterShaker])
   })
 
   it('renders the main modal component of the wizard', () => {
