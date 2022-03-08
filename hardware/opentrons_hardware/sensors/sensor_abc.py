@@ -81,7 +81,7 @@ class AbstractAdvancedSensor(AbstractBasicSensor):
         self,
         can_messenger: CanMessenger,
         node_id: NodeId,
-        poll_for: int,
+        poll_for_ms: int,
         timeout: int = 1,
     ) -> Optional[SensorDataType]:
         """Poll the sensor for data."""
