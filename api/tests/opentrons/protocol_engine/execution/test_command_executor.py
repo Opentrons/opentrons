@@ -5,6 +5,8 @@ from decoy import Decoy, matchers
 from pydantic import BaseModel
 from typing import Any, Optional, Type, cast
 
+from opentrons.hardware_control import HardwareControlAPI
+
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.state import StateStore
@@ -29,6 +31,12 @@ from opentrons.protocol_engine.execution import (
     RunControlHandler,
     RailLightsHandler,
 )
+
+
+@pytest.fixture
+def hardware_api(decoy: Decoy) -> HardwareControlAPI:
+    """Get a mocked out StateStore."""
+    return decoy.mock(cls=HardwareControlAPI)
 
 
 @pytest.fixture
@@ -81,6 +89,7 @@ def rail_lights(decoy: Decoy) -> RailLightsHandler:
 
 @pytest.fixture
 def subject(
+    hardware_api: HardwareControlAPI,
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
     equipment: EquipmentHandler,
@@ -92,6 +101,7 @@ def subject(
 ) -> CommandExecutor:
     """Get a CommandExecutor test subject with its dependencies mocked out."""
     return CommandExecutor(
+        hardware_api=hardware_api,
         state_store=state_store,
         action_dispatcher=action_dispatcher,
         equipment=equipment,
@@ -118,6 +128,7 @@ class _TestCommandImpl(AbstractCommandImpl[_TestCommandParams, _TestCommandResul
 
 async def test_execute(
     decoy: Decoy,
+    hardware_api: HardwareControlAPI,
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
     equipment: EquipmentHandler,
@@ -187,6 +198,8 @@ async def test_execute(
 
     decoy.when(
         queued_command._ImplementationCls(
+            state_view=state_store,
+            hardware_api=hardware_api,
             equipment=equipment,
             movement=movement,
             pipetting=pipetting,
@@ -227,6 +240,7 @@ async def test_execute(
 )
 async def test_execute_raises_protocol_engine_error(
     decoy: Decoy,
+    hardware_api: HardwareControlAPI,
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
     equipment: EquipmentHandler,
@@ -283,6 +297,8 @@ async def test_execute_raises_protocol_engine_error(
 
     decoy.when(
         queued_command._ImplementationCls(
+            state_view=state_store,
+            hardware_api=hardware_api,
             equipment=equipment,
             movement=movement,
             pipetting=pipetting,
