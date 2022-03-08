@@ -45,6 +45,9 @@ CLASSIFIERS = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
     "Topic :: Scientific/Engineering",
 ]
 KEYWORDS = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
@@ -58,10 +61,6 @@ INSTALL_REQUIRES = [
     "aionotify==0.2.0",
     "anyio==3.3.0",
     "jsonschema==3.0.2",
-    # TODO(mc, 2021-09-28): this spec does not match the Pipfile, and is
-    # intentionally loose to avoid installation problems for end-users.
-    # This discrepency should be resolved:
-    # https://github.com/Opentrons/opentrons/issues/8416
     "numpy>=1.15.1,<2",
     "pydantic==1.8.2",
     "pyserial==3.5",

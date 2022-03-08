@@ -2,7 +2,6 @@
 import pytest
 from decoy import Decoy
 
-from opentrons.protocol_engine import execution
 from opentrons.protocol_engine.commands import heater_shaker
 from opentrons.protocol_engine.commands.heater_shaker.close_latch import (
     CloseLatchImpl,
@@ -10,19 +9,9 @@ from opentrons.protocol_engine.commands.heater_shaker.close_latch import (
 
 
 @pytest.fixture()
-def subject(
-    equipment: execution.EquipmentHandler,
-    movement: execution.MovementHandler,
-    pipetting: execution.PipettingHandler,
-    run_control: execution.RunControlHandler,
-) -> CloseLatchImpl:
+def subject() -> CloseLatchImpl:
     """Get the command implementation with mocked out dependencies."""
-    return CloseLatchImpl(
-        equipment=equipment,
-        movement=movement,
-        pipetting=pipetting,
-        run_control=run_control,
-    )
+    return CloseLatchImpl()
 
 
 # TODO(mc, 2022-02-25): verify hardware interaction

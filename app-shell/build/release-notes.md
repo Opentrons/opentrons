@@ -19,6 +19,10 @@ The 5.0.0 release reshapes the way you upload and set up protocols to run on you
 - More visibility into the progress of protocol execution on the robot
 - Quick and easy re-running of your last used protocol
 
+## 5.0.0 to 5.0.1
+
+The 5.0.1 hotfix release contains a small fix to the Labware Position Check to appropriately handle protocols that load pipettes, but never pick up tips with that pipette.
+
 ## Known Issues
 
 Your last run protocol will not be saved through robot reboots

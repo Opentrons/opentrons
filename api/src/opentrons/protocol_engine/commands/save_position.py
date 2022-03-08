@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 from pydantic import BaseModel, Field
-from typing import Optional, Type
+from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
 from ..types import DeckPoint
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+
+if TYPE_CHECKING:
+    from ..execution import MovementHandler
 
 SavePositionCommandType = Literal["savePosition"]
 
@@ -41,6 +44,9 @@ class SavePositionImplementation(
     AbstractCommandImpl[SavePositionParams, SavePositionResult]
 ):
     """Save position command implementation."""
+
+    def __init__(self, movement: MovementHandler, **kwargs: object) -> None:
+        self._movement = movement
 
     async def execute(self, params: SavePositionParams) -> SavePositionResult:
         """Check the requested pipette's current position."""

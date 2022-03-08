@@ -23,6 +23,9 @@ class StopShakeResult(BaseModel):
 class StopShakeImpl(AbstractCommandImpl[StopShakeParams, StopShakeResult]):
     """Execution implementation of a Heater-Shaker's stop shake command."""
 
+    def __init__(self, **kwargs: object) -> None:
+        pass
+
     async def execute(self, params: StopShakeParams) -> StopShakeResult:
         """Stop a Heater-Shaker's shake."""
         raise NotImplementedError("Heater-Shaker stop shake not yet implemented.")

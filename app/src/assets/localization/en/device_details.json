@@ -39,5 +39,12 @@
   "set_temp_slideout_btn": "Set Temperature",
   "tc_set_temperature": "Set {{part}} Temperature for {{name}}",
   "tc_set_temperature_body": "Pre heat or cool your Thermocycler {{part}}. Enter a whole number between {{min}} °C and {{max}} °C.",
-  "set_tc_temp_slideout_btn": "Set {{part}} Temperature"
+  "set_tc_temp_slideout": "Set {{part}} Temperature",
+  "about_module": "About {{name}}",
+  "current_version": "Current Version",
+  "version": "Version {{version}}",
+  "serial_number": "Serial Number",
+  "link_firmware_update": "View Firmware Update",
+  "firmware_update_available": "Firmware update available.",
+  "view_update": "View Update"
 }

@@ -14,6 +14,7 @@ and/or schema generation.
 """
 
 from . import heater_shaker
+from . import magnetic_module
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, CommandStatus
 
@@ -86,14 +87,6 @@ from .load_pipette import (
     LoadPipetteCreate,
     LoadPipetteResult,
     LoadPipetteCommandType,
-)
-
-from .magnetic_module_engage import (
-    MagneticModuleEngage,
-    MagneticModuleEngageParams,
-    MagneticModuleEngageCreate,
-    MagneticModuleEngageResult,
-    MagneticModuleEngageCommandType,
 )
 
 from .move_relative import (
@@ -234,4 +227,5 @@ __all__ = [
     "SavePositionCommandType",
     # module command bundles
     "heater_shaker",
+    "magnetic_module",
 ]

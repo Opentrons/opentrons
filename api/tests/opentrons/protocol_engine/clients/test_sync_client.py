@@ -261,3 +261,23 @@ def test_pause(
     result = subject.pause(message="hello world")
 
     assert result == response
+
+
+def test_magnetic_module_engage(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a Magnetic Module engage command."""
+    request = commands.magnetic_module.EngageCreate(
+        params=commands.magnetic_module.EngageParams(
+            moduleId="module-id", engageHeight=12.34
+        )
+    )
+    response = commands.magnetic_module.EngageResult()
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.magnetic_module_engage(module_id="module-id", engage_height=12.34)
+
+    assert result == response

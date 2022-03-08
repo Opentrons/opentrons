@@ -2,7 +2,6 @@
 import pytest
 from decoy import Decoy
 
-from opentrons.protocol_engine import execution
 from opentrons.protocol_engine.commands import heater_shaker
 from opentrons.protocol_engine.commands.heater_shaker.deactivate_heater import (
     DeactivateHeaterImpl,
@@ -10,19 +9,9 @@ from opentrons.protocol_engine.commands.heater_shaker.deactivate_heater import (
 
 
 @pytest.fixture()
-def subject(
-    equipment: execution.EquipmentHandler,
-    movement: execution.MovementHandler,
-    pipetting: execution.PipettingHandler,
-    run_control: execution.RunControlHandler,
-) -> DeactivateHeaterImpl:
+def subject() -> DeactivateHeaterImpl:
     """Get the command implementation with mocked out dependencies."""
-    return DeactivateHeaterImpl(
-        equipment=equipment,
-        movement=movement,
-        pipetting=pipetting,
-        run_control=run_control,
-    )
+    return DeactivateHeaterImpl()
 
 
 # TODO(mc, 2022-02-25): verify hardware interaction

@@ -87,6 +87,12 @@ def test_get_labware_data_by_id() -> None:
     assert subject.get("plate-id") == plate
 
 
+@pytest.mark.xfail(strict=True, raises=NotImplementedError)
+def test_get_id_by_module() -> None:  # noqa: D103
+    subject = get_labware_view()
+    _ = subject.get_id_by_module(module_id="module-id")
+
+
 def test_get_labware_definition(well_plate_def: LabwareDefinition) -> None:
     """It should get a labware's definition from the state."""
     subject = get_labware_view(
@@ -347,6 +353,12 @@ def test_get_dimensions(well_plate_def: LabwareDefinition) -> None:
         y=well_plate_def.dimensions.yDimension,
         z=well_plate_def.dimensions.zDimension,
     )
+
+
+@pytest.mark.xfail(strict=True, raises=NotImplementedError)
+def test_get_default_magnet_height() -> None:  # noqa: D103
+    subject = get_labware_view()
+    _ = subject.get_default_magnet_height("labware-id")
 
 
 def test_get_deck_definition(standard_deck_def: DeckDefinitionV2) -> None:

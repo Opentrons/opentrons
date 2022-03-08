@@ -59,12 +59,17 @@ class FirmwareUpdateInitiator:
             None
         """
         with WaitableCallback(self._messenger) as reader:
-            # send initiate
+            # Create initiate message
             initiate_message = message_definitions.FirmwareUpdateInitiate(
                 payload=payloads.EmptyPayload()
             )
+            # Send it to system node
             await self._messenger.send(
                 node_id=target.system_node, message=initiate_message
+            )
+            # and to bootloader node. Just in case we're already in bootloader mode.
+            await self._messenger.send(
+                node_id=target.bootloader_node, message=initiate_message
             )
 
             i = 1

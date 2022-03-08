@@ -1,13 +1,17 @@
 """Load pipette command request, result, and implementation models."""
 from __future__ import annotations
 from pydantic import BaseModel, Field
-from typing import Optional, Type
+from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
 from opentrons.types import MountType
 
 from ..types import PipetteName
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+
+if TYPE_CHECKING:
+    from ..execution import EquipmentHandler
+
 
 LoadPipetteCommandType = Literal["loadPipette"]
 
@@ -43,6 +47,9 @@ class LoadPipetteImplementation(
     AbstractCommandImpl[LoadPipetteParams, LoadPipetteResult]
 ):
     """Load pipette command implementation."""
+
+    def __init__(self, equipment: EquipmentHandler, **kwargs: object) -> None:
+        self._equipment = equipment
 
     async def execute(self, params: LoadPipetteParams) -> LoadPipetteResult:
         """Check that requested pipette is attached and assign its identifier."""

@@ -102,7 +102,7 @@ export const ThermocyclerModuleSlideout = (
             fontWeight={FONT_WEIGHT_REGULAR}
             fontSize={TYPOGRAPHY.fontSizeP}
           >
-            {t('set_tc_temp_slideout_btn', { part: modulePart })}
+            {t('set_tc_temp_slideout', { part: modulePart })}
           </Text>
         </PrimaryBtn>
       </React.Fragment>

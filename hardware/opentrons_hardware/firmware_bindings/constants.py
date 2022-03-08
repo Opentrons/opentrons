@@ -50,6 +50,8 @@ class MessageId(int, Enum):
 
     device_info_request = 0x302
     device_info_response = 0x303
+    task_info_request = 0x304
+    task_info_response = 0x305
 
     stop_request = 0x00
 
