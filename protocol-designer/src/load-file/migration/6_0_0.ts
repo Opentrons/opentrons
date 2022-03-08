@@ -1,13 +1,25 @@
 import { map } from 'lodash'
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
-import { OT2_STANDARD_DECKID, OT2_STANDARD_MODEL } from '@opentrons/shared-data'
-import { ProtocolFile } from '@opentrons/shared-data/protocol/types/schemaV6'
+import {
+  OT2_STANDARD_DECKID,
+  OT2_STANDARD_MODEL,
+  ProtocolFileV5,
+} from '@opentrons/shared-data'
 import { uuid } from '../../utils'
 // NOTE: this migration bump adds load commands (loadLiquid, loadModule, loadPipette, loadLabware), modifies both pipette
 //  and labware access parameters, renames AirGap to aspirate, and removes all temporal properties from labware, pipettes,
 //  and module keys such as slot, mount
 //  and renames well to wellName
+import type {
+  LoadPipetteCreateCommand,
+  LoadModuleCreateCommand,
+  LoadLabwareCreateCommand,
+} from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import {
+  CreateCommand,
+  ProtocolFile,
+} from '@opentrons/shared-data/protocol/types/schemaV6'
 
 const PD_VERSION = '6.0.0'
 const SCHEMA_VERSION = 6
@@ -21,58 +33,73 @@ const migrateLabware = (appData: Record<string, any>): Record<string, any> =>
 const migrateModules = (appData: Record<string, any>): Record<string, any> =>
   mapValues(appData, modules => omit(modules, 'slot'))
 
-export const migrateFile = (appData: any): ProtocolFile<{}> => {
+export const migrateFile = (appData: ProtocolFileV5<{}>): ProtocolFile<{}> => {
   const pipettes = appData.pipettes
-  const loadPipetteCommands = map(pipettes, (pipette, pipetteId) => {
-    const loadPipetteCommand = {
-      key: uuid(),
-      commandType: 'loadPipette',
-      params: {
-        pipetteId: pipetteId,
-        mount: pipette.mount,
-      },
+  const loadPipetteCommands: LoadPipetteCreateCommand[] = map(
+    pipettes,
+    (pipette, pipetteId) => {
+      const loadPipetteCommand = {
+        key: uuid(),
+        commandType: 'loadPipette' as const,
+        params: {
+          pipetteId: pipetteId,
+          mount: pipette.mount,
+        },
+      }
+      return loadPipetteCommand
     }
-    return loadPipetteCommand
-  })
+  )
 
   const modules = appData.modules
-  const loadModuleCommands = map(modules, (module, moduleId) => {
-    const loadModuleCommand = {
-      key: uuid(),
-      commandType: 'loadModule',
-      params: {
-        moduleId: moduleId,
-        location: { slotName: module.slot },
-      },
+  const loadModuleCommands: LoadModuleCreateCommand[] = map(
+    modules,
+    (module, moduleId) => {
+      const loadModuleCommand = {
+        key: uuid(),
+        commandType: 'loadModule' as const,
+        params: {
+          moduleId: moduleId,
+          location: { slotName: module.slot },
+        },
+      }
+      return loadModuleCommand
     }
-    return loadModuleCommand
-  })
+  )
 
   const labware = appData.labware
-  const loadLabwareCommands = map(labware, (labware, labwareId) => {
-    const loadLabwareCommand = {
-      key: uuid(),
-      commandType: 'loadLabware',
-      params: {
-        labwareId: labwareId,
-        location: { slotName: labware.slot },
-      },
+  const loadLabwareCommands: LoadLabwareCreateCommand[] = map(
+    labware,
+    (labware, labwareId) => {
+      const loadLabwareCommand = {
+        key: uuid(),
+        commandType: 'loadLabware' as const,
+        params: {
+          labwareId: labwareId,
+          location: { slotName: labware.slot },
+        },
+      }
+      return loadLabwareCommand
     }
-    return loadLabwareCommand
-  })
+  )
 
   const commands = appData.commands
-  const migrateV5Commands = map(commands, command => {
-    command.params.well = command.params.wellName
-    delete command.params.well
+  const migratedV5Commands = map(commands, command => {
+    if ('well' in command.params) {
+      // @ts-expect-error: we are modifying a v5 command (no wellName exists on a v5 command)
+      command.params.wellName = command.params.well
+      // @ts-expect-error: we are modifying a v5 command (well is required, but we are replacing it with wellName)
+      delete command.params.well
+    }
 
-    const migrateV5Commands = {
+    const migratedV5Command: CreateCommand = {
       commandType: command.command === 'airGap' ? 'aspirate' : command.command,
+      // @ts-expect-error: make "key" an optional param on CreateCommand types
       key: uuid(),
       params: command.params,
     }
-    return migrateV5Commands
+    return migratedV5Command
   })
+
   return {
     designerApplication: {
       name: 'opentrons/protocol-designer',
@@ -93,11 +120,12 @@ export const migrateFile = (appData: any): ProtocolFile<{}> => {
     labware: migrateLabware(appData.labware),
     labwareDefinitions: appData.labwareDefinitions,
     modules: migrateModules(appData.modules),
+    liquids: {},
     commands: [
       ...loadPipetteCommands,
       ...loadModuleCommands,
       ...loadLabwareCommands,
-      ...migrateV5Commands,
+      ...migratedV5Commands,
     ],
   }
 }
