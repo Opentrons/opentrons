@@ -39,6 +39,7 @@ def hex_file_path() -> Path:
     return path / Path("bootloader-head.hex")
 
 
+@pytest.mark.requires_emulator
 async def test_download(
     downloader_subject: firmware_update.FirmwareUpdateDownloader,
     hex_file_path: Path,
