@@ -1,43 +1,27 @@
 import { map } from 'lodash'
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
+import { OT2_STANDARD_DECKID, OT2_STANDARD_MODEL } from '@opentrons/shared-data'
+import { ProtocolFile } from '@opentrons/shared-data/protocol/types/schemaV6'
 import { uuid } from '../../utils'
 // NOTE: this migration bump adds load commands (loadLiquid, loadModule, loadPipette, loadLabware), modifies both pipette
 //  and labware access parameters, renames AirGap to aspirate, and removes all temporal properties from labware, pipettes,
 //  and module keys such as slot, mount
 //  and renames well to wellName
 
-export const PD_VERSION = '6.0.0'
-export const SCHEMA_VERSION = 6
+const PD_VERSION = '6.0.0'
+const SCHEMA_VERSION = 6
 
-export const migratePipettes = (
-  appData: Record<string, any>
-): Record<string, any> => {
-  return mapValues(appData, pipettes => {
-    const removeMount = omit(pipettes, 'mount')
-    return removeMount
-  })
-}
+const migratePipettes = (appData: Record<string, any>): Record<string, any> =>
+  mapValues(appData, pipettes => omit(pipettes, 'mount'))
 
-export const migrateLabware = (
-  appData: Record<string, any>
-): Record<string, any> => {
-  return mapValues(appData, labware => {
-    const removeSlot = omit(labware, 'slot')
-    return removeSlot
-  })
-}
+const migrateLabware = (appData: Record<string, any>): Record<string, any> =>
+  mapValues(appData, labware => omit(labware, 'slot'))
 
-export const migrateModules = (
-  appData: Record<string, any>
-): Record<string, any> => {
-  return mapValues(appData, modules => {
-    const removeSlot = omit(modules, 'slot')
-    return removeSlot
-  })
-}
+const migrateModules = (appData: Record<string, any>): Record<string, any> =>
+  mapValues(appData, modules => omit(modules, 'slot'))
 
-export const migrateFile = (appData: any): any => {
+export const migrateFile = (appData: any): ProtocolFile<{}> => {
   const pipettes = appData.pipettes
   const loadPipetteCommands = map(pipettes, (pipette, pipetteId) => {
     const loadPipetteCommand = {
@@ -79,8 +63,9 @@ export const migrateFile = (appData: any): any => {
 
   const commands = appData.commands
   const migrateV5Commands = map(commands, command => {
-    command.params.wellName = command.params.well
+    command.params.well = command.params.wellName
     delete command.params.well
+
     const migrateV5Commands = {
       commandType: command.command === 'airGap' ? 'aspirate' : command.command,
       key: uuid(),
@@ -92,14 +77,17 @@ export const migrateFile = (appData: any): any => {
     designerApplication: {
       name: 'opentrons/protocol-designer',
       version: PD_VERSION,
-      data: appData.designerApplication.data ?? undefined,
+      data:
+        appData.designerApplication === undefined
+          ? undefined
+          : appData.designerApplication.data,
     },
     schemaVersion: SCHEMA_VERSION,
     $otSharedSchema: '#/protocol/schemas/6',
     metadata: appData.metadata,
     robot: {
-      model: 'OT-2 Standard',
-      deckId: 'ot2_standard',
+      model: OT2_STANDARD_MODEL,
+      deckId: OT2_STANDARD_DECKID,
     },
     pipettes: migratePipettes(appData.pipettes),
     labware: migrateLabware(appData.labware),
