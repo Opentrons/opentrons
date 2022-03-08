@@ -20,11 +20,13 @@ class NodeId(int, Enum):
     head = 0x50
     head_l = 0x51
     head_r = 0x52
+    gripper = 0x20
     pipette_left_bootloader = pipette_left | 0xF
     pipette_right_bootloader = pipette_right | 0xF
     gantry_x_bootloader = gantry_x | 0xF
     gantry_y_bootloader = gantry_y | 0xF
     head_bootloader = head | 0xF
+    gripper_bootloader = gripper | 0xF
 
 
 @unique
