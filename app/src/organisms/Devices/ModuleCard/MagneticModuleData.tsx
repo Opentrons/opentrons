@@ -33,7 +33,7 @@ export const MagneticModuleData = (
         iconColor={C_BLUE}
         pulse={moduleStatus === 'engaged'}
       />
-      <Text fontSize={FONT_SIZE_CAPTION}>
+      <Text fontSize={FONT_SIZE_CAPTION} data-testid={`mag_module_data`}>
         {t(
           moduleModel === MAGNETIC_MODULE_V2
             ? 'magdeck_gen2_height'
