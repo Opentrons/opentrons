@@ -268,12 +268,13 @@ def test_thermocycler_dodging(
 
 
 def test_find_loaded_hardware_module(
-    decoy: Decoy,
-    magdeck_v1_def: ModuleDefinition
+    decoy: Decoy, magdeck_v1_def: ModuleDefinition
 ) -> None:
     """It should return the matching hardware module."""
     matching = make_hardware_module(decoy=decoy, serial_number="serial-matching")
-    non_matching = make_hardware_module(decoy=decoy, serial_number="serial-non-matching")
+    non_matching = make_hardware_module(
+        decoy=decoy, serial_number="serial-non-matching"
+    )
     another_non_matching = make_hardware_module(
         decoy=decoy, serial_number="serial-another-non-matching"
     )
@@ -293,13 +294,13 @@ def test_find_loaded_hardware_module(
             DeckSlotName.SLOT_3: HardwareModule(
                 serial_number="serial-another-non-matching",
                 definition=magdeck_v1_def,
-            )
+            ),
         },
         slot_by_module_id={
             "id-non-matching": DeckSlotName.SLOT_1,
             "id-matching": DeckSlotName.SLOT_2,
             "id-another-non-matching": DeckSlotName.SLOT_3,
-        }
+        },
     )
 
     result = subject.find_loaded_hardware_module(
@@ -312,11 +313,50 @@ def test_find_loaded_hardware_module(
     assert result == matching
 
 
+def test_find_loaded_hardware_module_raises_if_no_match_loaded(
+    decoy: Decoy,
+) -> None:
+    """It should raise if the ID doesn't point to a loaded module."""
+    subject = make_module_view(
+        hardware_module_by_slot={},
+        slot_by_module_id={},
+    )
+    with pytest.raises(ModuleNotFoundError):
+        result = subject.find_loaded_hardware_module(
+            module_id="module-id",
+            attached_modules=[],
+            # https://github.com/python/mypy/issues/4717
+            expected_type=AbstractModule,  # type: ignore[misc]
+        )
+
+
+def test_find_loaded_hardware_module_raises_if_match_not_attached(
+    decoy: Decoy, magdeck_v1_def: ModuleDefinition
+) -> None:
+    """It should raise if a match was loaded but is not found in the attached list."""
+    matching = make_hardware_module(decoy=decoy, serial_number="serial-matching")
+    subject = make_module_view(
+        hardware_module_by_slot={
+            DeckSlotName.SLOT_1: HardwareModule(
+                serial_number="serial-matching",
+                definition=magdeck_v1_def,
+            ),
+        },
+        slot_by_module_id={
+            "id-matching": DeckSlotName.SLOT_1,
+        },
+    )
+    with pytest.raises(errors.ModuleNotAttachedError):
+        result = subject.find_loaded_hardware_module(
+            module_id="id-matching",
+            attached_modules=[],
+            # https://github.com/python/mypy/issues/4717
+            expected_type=AbstractModule,  # type: ignore[misc]
+        )
+
+
 # To do:
-# Raises if module does not exist
-# Raises if exists, but no attached
 # Raises if wrong type
-# Raises if out of range
 
 
 def test_select_hardware_module_to_load_rejects_missing() -> None:
