@@ -38,7 +38,11 @@ import {
   useModuleMatchResults,
   useProtocolCalibrationStatus,
 } from '../ProtocolSetup/RunSetupCard/hooks'
-import { useRunControls, useRunStartTime, useRunStatus } from './hooks'
+import {
+  useCurrentRunControls,
+  useRunStartTime,
+  useCurrentRunStatus,
+} from './hooks'
 import { Timer } from './Timer'
 
 export function RunTimeControl(): JSX.Element | null {
@@ -46,7 +50,7 @@ export function RunTimeControl(): JSX.Element | null {
   const missingModuleIds = useModuleMatchResults().missingModuleIds
   const isEverythingCalibrated = useProtocolCalibrationStatus().complete
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const runStatus = useRunStatus()
+  const runStatus = useCurrentRunStatus()
   const startTime = useRunStartTime()
 
   const {
@@ -56,7 +60,7 @@ export function RunTimeControl(): JSX.Element | null {
     isPlayRunActionLoading,
     isPauseRunActionLoading,
     isResetRunLoading,
-  } = useRunControls()
+  } = useCurrentRunControls()
 
   const isMutationLoading =
     isPlayRunActionLoading || isPauseRunActionLoading || isResetRunLoading

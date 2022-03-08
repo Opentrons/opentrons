@@ -21,10 +21,10 @@ import {
   useProtocolCalibrationStatus,
 } from '../../ProtocolSetup/RunSetupCard/hooks'
 import {
-  useRunTimestamps,
-  useRunControls,
+  useCurrentRunTimestamps,
+  useCurrentRunControls,
   useRunStartTime,
-  useRunStatus,
+  useCurrentRunStatus,
 } from '../hooks'
 import { Timer } from '../Timer'
 import { RunTimeControl } from '..'
@@ -40,17 +40,17 @@ jest.mock('../hooks')
 jest.mock('../Timer')
 jest.mock('../../ProtocolSetup/RunSetupCard/hooks')
 
-const mockUseRunTimestamps = useRunTimestamps as jest.MockedFunction<
-  typeof useRunTimestamps
+const mockUseCurrentRunTimestamps = useCurrentRunTimestamps as jest.MockedFunction<
+  typeof useCurrentRunTimestamps
 >
-const mockUseRunControls = useRunControls as jest.MockedFunction<
-  typeof useRunControls
+const mockUseCurrentRunControls = useCurrentRunControls as jest.MockedFunction<
+  typeof useCurrentRunControls
 >
 const mockUseRunStartTime = useRunStartTime as jest.MockedFunction<
   typeof useRunStartTime
 >
-const mockUseRunStatus = useRunStatus as jest.MockedFunction<
-  typeof useRunStatus
+const mockUseCurrentRunStatus = useCurrentRunStatus as jest.MockedFunction<
+  typeof useCurrentRunStatus
 >
 const mockTimer = Timer as jest.MockedFunction<typeof Timer>
 
@@ -67,7 +67,7 @@ const render = () => {
 
 describe('RunTimeControl', () => {
   beforeEach(() => {
-    when(mockUseRunControls)
+    when(mockUseCurrentRunControls)
       .calledWith()
       .mockReturnValue({
         play: () => {},
@@ -79,9 +79,9 @@ describe('RunTimeControl', () => {
         isStopRunActionLoading: false,
         isResetRunLoading: false,
       })
-    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_IDLE)
+    when(mockUseCurrentRunStatus).calledWith().mockReturnValue(RUN_STATUS_IDLE)
     mockTimer.mockReturnValue(<div>Mock Timer</div>)
-    when(mockUseRunTimestamps).calledWith().mockReturnValue({
+    when(mockUseCurrentRunTimestamps).calledWith().mockReturnValue({
       startedAt: 'fake_start_timestamp',
       pausedAt: null,
       stoppedAt: null,
@@ -132,7 +132,7 @@ describe('RunTimeControl', () => {
     getByText('Complete required steps on Protocol tab before starting the run')
   })
   it('should render disabled button if play run action is loading', () => {
-    when(mockUseRunControls)
+    when(mockUseCurrentRunControls)
       .calledWith()
       .mockReturnValue({
         play: () => {},
@@ -149,7 +149,7 @@ describe('RunTimeControl', () => {
     expect(button).toBeDisabled()
   })
   it('should render disabled button if pause run action is loading', () => {
-    when(mockUseRunControls)
+    when(mockUseCurrentRunControls)
       .calledWith()
       .mockReturnValue({
         play: () => {},
@@ -161,13 +161,15 @@ describe('RunTimeControl', () => {
         isStopRunActionLoading: false,
         isResetRunLoading: false,
       })
-    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_RUNNING)
+    when(mockUseCurrentRunStatus)
+      .calledWith()
+      .mockReturnValue(RUN_STATUS_RUNNING)
     const [{ getByRole }] = render()
     const button = getByRole('button', { name: 'Pause Run' })
     expect(button).toBeDisabled()
   })
   it('should render disabled button if reset run action is loading', () => {
-    when(mockUseRunControls)
+    when(mockUseCurrentRunControls)
       .calledWith()
       .mockReturnValue({
         play: () => {},
@@ -179,14 +181,16 @@ describe('RunTimeControl', () => {
         isStopRunActionLoading: false,
         isResetRunLoading: true,
       })
-    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_SUCCEEDED)
+    when(mockUseCurrentRunStatus)
+      .calledWith()
+      .mockReturnValue(RUN_STATUS_SUCCEEDED)
     const [{ getByRole }] = render()
     const button = getByRole('button', { name: 'Run Again' })
     expect(button).toBeDisabled()
   })
 
   it('should render a disabled Run Again button if run status is stop requested', () => {
-    when(mockUseRunControls)
+    when(mockUseCurrentRunControls)
       .calledWith()
       .mockReturnValue({
         play: () => {},
@@ -198,7 +202,7 @@ describe('RunTimeControl', () => {
         isStopRunActionLoading: false,
         isResetRunLoading: false,
       })
-    when(mockUseRunStatus)
+    when(mockUseCurrentRunStatus)
       .calledWith()
       .mockReturnValue(RUN_STATUS_STOP_REQUESTED)
     const [{ getByRole }] = render()
@@ -207,7 +211,7 @@ describe('RunTimeControl', () => {
   })
 
   it('should render an enabled Run Again button if run is completed', () => {
-    when(mockUseRunControls)
+    when(mockUseCurrentRunControls)
       .calledWith()
       .mockReturnValue({
         play: () => {},
@@ -219,14 +223,16 @@ describe('RunTimeControl', () => {
         isStopRunActionLoading: false,
         isResetRunLoading: false,
       })
-    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_SUCCEEDED)
+    when(mockUseCurrentRunStatus)
+      .calledWith()
+      .mockReturnValue(RUN_STATUS_SUCCEEDED)
     const [{ getByRole }] = render()
     const button = getByRole('button', { name: 'Run Again' })
     expect(button).toBeEnabled()
   })
 
   it('should render an enabled Run Again button if run is canceled', () => {
-    when(mockUseRunControls)
+    when(mockUseCurrentRunControls)
       .calledWith()
       .mockReturnValue({
         play: () => {},
@@ -238,14 +244,18 @@ describe('RunTimeControl', () => {
         isStopRunActionLoading: false,
         isResetRunLoading: false,
       })
-    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_STOPPED)
+    when(mockUseCurrentRunStatus)
+      .calledWith()
+      .mockReturnValue(RUN_STATUS_STOPPED)
     const [{ getByRole }] = render()
     const button = getByRole('button', { name: 'Run Again' })
     expect(button).toBeEnabled()
   })
 
   it('renders a run status and timer if running', () => {
-    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_RUNNING)
+    when(mockUseCurrentRunStatus)
+      .calledWith()
+      .mockReturnValue(RUN_STATUS_RUNNING)
     when(mockUseRunStartTime).calledWith().mockReturnValue('noon')
 
     const [{ getByRole, getByText }] = render()
@@ -256,7 +266,9 @@ describe('RunTimeControl', () => {
   })
 
   it('renders a run status and timer if paused', () => {
-    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_PAUSED)
+    when(mockUseCurrentRunStatus)
+      .calledWith()
+      .mockReturnValue(RUN_STATUS_PAUSED)
     when(mockUseRunStartTime).calledWith().mockReturnValue('noon')
 
     const [{ getByRole, getByText }] = render()
@@ -267,7 +279,7 @@ describe('RunTimeControl', () => {
   })
 
   it('renders a run status and timer if pause-requested', () => {
-    when(mockUseRunStatus)
+    when(mockUseCurrentRunStatus)
       .calledWith()
       .mockReturnValue(RUN_STATUS_PAUSE_REQUESTED)
     when(mockUseRunStartTime).calledWith().mockReturnValue('noon')
@@ -280,7 +292,7 @@ describe('RunTimeControl', () => {
   })
 
   it('renders a run status, timer, and disabled resume run button if paused by door open', () => {
-    when(mockUseRunStatus)
+    when(mockUseCurrentRunStatus)
       .calledWith()
       .mockReturnValue(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
     when(mockUseRunStartTime).calledWith().mockReturnValue('noon')
@@ -293,7 +305,7 @@ describe('RunTimeControl', () => {
   })
 
   it('renders a run status and timer if stop-requested', () => {
-    when(mockUseRunStatus)
+    when(mockUseCurrentRunStatus)
       .calledWith()
       .mockReturnValue(RUN_STATUS_STOP_REQUESTED)
     when(mockUseRunStartTime).calledWith().mockReturnValue('noon')
@@ -305,9 +317,11 @@ describe('RunTimeControl', () => {
   })
 
   it('renders a run status and timer if stopped', () => {
-    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_STOPPED)
+    when(mockUseCurrentRunStatus)
+      .calledWith()
+      .mockReturnValue(RUN_STATUS_STOPPED)
     when(mockUseRunStartTime).calledWith().mockReturnValue('noon')
-    when(mockUseRunTimestamps).calledWith().mockReturnValue({
+    when(mockUseCurrentRunTimestamps).calledWith().mockReturnValue({
       startedAt: 'noon',
       pausedAt: null,
       stoppedAt: null,
@@ -322,9 +336,11 @@ describe('RunTimeControl', () => {
   })
 
   it('renders a run status and timer if failed', () => {
-    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_FAILED)
+    when(mockUseCurrentRunStatus)
+      .calledWith()
+      .mockReturnValue(RUN_STATUS_FAILED)
     when(mockUseRunStartTime).calledWith().mockReturnValue('noon')
-    when(mockUseRunTimestamps).calledWith().mockReturnValue({
+    when(mockUseCurrentRunTimestamps).calledWith().mockReturnValue({
       startedAt: 'noon',
       pausedAt: null,
       stoppedAt: null,
@@ -339,9 +355,11 @@ describe('RunTimeControl', () => {
   })
 
   it('renders a run status and timer if succeeded', () => {
-    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_SUCCEEDED)
+    when(mockUseCurrentRunStatus)
+      .calledWith()
+      .mockReturnValue(RUN_STATUS_SUCCEEDED)
     when(mockUseRunStartTime).calledWith().mockReturnValue('noon')
-    when(mockUseRunTimestamps).calledWith().mockReturnValue({
+    when(mockUseCurrentRunTimestamps).calledWith().mockReturnValue({
       startedAt: 'noon',
       pausedAt: null,
       stoppedAt: null,
@@ -356,7 +374,7 @@ describe('RunTimeControl', () => {
   })
 
   it('renders an alert when run status is paused by opened door', () => {
-    when(mockUseRunStatus)
+    when(mockUseCurrentRunStatus)
       .calledWith()
       .mockReturnValue(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
 

@@ -23,7 +23,7 @@ import { getModuleDisplayName } from '@opentrons/shared-data'
 import { Slideout } from '../../../atoms/Slideout'
 import { updateModule } from '../../../redux/modules'
 import { getConnectedRobotName } from '../../../redux/robot/selectors'
-import { useRunStatus } from '../../RunTimeControl/hooks'
+import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
 
 import type { State, Dispatch } from '../../../redux/types'
 import type { AttachedModule } from '../../../redux/modules/types'
@@ -46,7 +46,7 @@ export const AboutModuleSlideout = (
   const { t } = useTranslation('device_details')
   const moduleName = getModuleDisplayName(module.model)
   const robotName = useSelector((state: State) => getConnectedRobotName(state))
-  const runStatus = useRunStatus()
+  const runStatus = useCurrentRunStatus()
   const dispatch = useDispatch<Dispatch>()
   const isDisabled =
     runStatus === RUN_STATUS_RUNNING || runStatus === RUN_STATUS_FINISHING
