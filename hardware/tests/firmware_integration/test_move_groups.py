@@ -4,17 +4,21 @@ from typing import Iterator
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from opentrons_ot3_firmware import NodeId
-from opentrons_ot3_firmware.messages.message_definitions import (
+from opentrons_hardware.firmware_bindings import NodeId
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     AddLinearMoveRequest,
     GetMoveGroupRequest,
     GetMoveGroupResponse,
 )
-from opentrons_ot3_firmware.messages.payloads import (
+from opentrons_hardware.firmware_bindings.messages.payloads import (
     AddLinearMoveRequestPayload,
     MoveGroupRequestPayload,
 )
-from opentrons_ot3_firmware.utils import UInt8Field, Int32Field, UInt32Field
+from opentrons_hardware.firmware_bindings.utils import (
+    UInt8Field,
+    Int32Field,
+    UInt32Field,
+)
 
 from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
 
@@ -45,6 +49,7 @@ async def test_add_moves(
                 group_id=UInt8Field(group_id),
                 seq_id=UInt8Field(i),
                 duration=UInt32Field(duration),
+                request_stop_condition=UInt8Field(0),
                 acceleration=Int32Field(0),
                 velocity=Int32Field(0),
             )

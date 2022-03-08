@@ -2,11 +2,11 @@
 import asyncio
 
 import pytest
-from opentrons_ot3_firmware.messages.message_definitions import DeviceInfoRequest
-from opentrons_ot3_firmware.messages.payloads import EmptyPayload
-
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    DeviceInfoRequest,
+)
 from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
-from opentrons_ot3_firmware.constants import NodeId, MessageId
+from opentrons_hardware.firmware_bindings.constants import NodeId, MessageId
 
 
 @pytest.mark.requires_emulator
@@ -16,9 +16,7 @@ async def test_broadcast(
     can_messenger_queue: WaitableCallback,
 ) -> None:
     """It should receive responses from all nodes."""
-    await can_messenger.send(
-        node_id=NodeId.broadcast, message=DeviceInfoRequest(payload=EmptyPayload())
-    )
+    await can_messenger.send(node_id=NodeId.broadcast, message=DeviceInfoRequest())
 
     async def _check() -> None:
         """Loop until all nodes respond."""
@@ -46,9 +44,7 @@ async def test_each_node(
     subsystem_node_id: NodeId,
 ) -> None:
     """It should receive responses from each node."""
-    await can_messenger.send(
-        node_id=subsystem_node_id, message=DeviceInfoRequest(payload=EmptyPayload())
-    )
+    await can_messenger.send(node_id=subsystem_node_id, message=DeviceInfoRequest())
 
     message, arbitration_id = await asyncio.wait_for(can_messenger_queue.read(), 1)
     assert arbitration_id.parts.message_id == MessageId.device_info_response

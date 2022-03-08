@@ -10,7 +10,7 @@ from opentrons_hardware.drivers.can_bus.settings import DriverSettings
 from opentrons_hardware.drivers.can_bus.build import build_driver
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
-from opentrons_ot3_firmware import constants
+from opentrons_hardware.firmware_bindings import constants
 
 
 @pytest.fixture
