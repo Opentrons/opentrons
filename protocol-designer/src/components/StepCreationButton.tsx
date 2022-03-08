@@ -38,17 +38,6 @@ interface StepButtonComponentProps {
 }
 
 // TODO: Ian 2019-01-17 move out to centralized step info file - see #2926
-const getSupportedSteps = (): Array<
-  Exclude<StepType, 'manualIntervention'>
-> => [
-  'moveLiquid',
-  'mix',
-  'pause',
-  'magnet',
-  'temperature',
-  'thermocycler',
-  'heaterShaker',
-]
 
 export const StepCreationButtonComponent = (
   props: StepButtonComponentProps
@@ -115,6 +104,34 @@ export function StepButtonItem(props: StepButtonItemProps): JSX.Element {
 }
 
 export const StepCreationButton = (): JSX.Element => {
+  const enableHeaterShaker = useSelector(
+    featureFlagSelectors.getEnabledHeaterShaker
+  )
+
+  const getSupportedSteps = (): Array<
+    Exclude<StepType, 'manualIntervention'>
+  > => {
+    if (enableHeaterShaker) {
+      return [
+        'moveLiquid',
+        'mix',
+        'pause',
+        'magnet',
+        'temperature',
+        'thermocycler',
+        'heaterShaker',
+      ]
+    } else {
+      return [
+        'moveLiquid',
+        'mix',
+        'pause',
+        'magnet',
+        'temperature',
+        'thermocycler',
+      ]
+    }
+  }
   const currentFormIsPresaved = useSelector(
     stepFormSelectors.getCurrentFormIsPresaved
   )
@@ -148,45 +165,22 @@ export const StepCreationButton = (): JSX.Element => {
   ): ReturnType<typeof stepsActions.addAndSelectStepWithHints> =>
     dispatch(stepsActions.addAndSelectStepWithHints({ stepType }))
 
-  const enableHeaterShaker = useSelector(
-    featureFlagSelectors.getEnabledHeaterShaker
-  )
+  const items = getSupportedSteps().map(stepType => (
+    <StepButtonItem
+      key={stepType}
+      stepType={stepType}
+      disabled={!isStepTypeEnabled[stepType]}
+      onClick={() => {
+        setExpanded(false)
 
-  const items = enableHeaterShaker
-    ? getSupportedSteps().map(stepType => (
-        <StepButtonItem
-          key={stepType}
-          stepType={stepType}
-          disabled={!isStepTypeEnabled[stepType]}
-          onClick={() => {
-            setExpanded(false)
-
-            if (currentFormIsPresaved || formHasChanges) {
-              setEnqueuedStepType(stepType)
-            } else {
-              addStep(stepType)
-            }
-          }}
-        />
-      ))
-    : getSupportedSteps().map(stepType =>
-        stepType === 'heaterShaker' ? null : (
-          <StepButtonItem
-            key={stepType}
-            stepType={stepType}
-            disabled={!isStepTypeEnabled[stepType]}
-            onClick={() => {
-              setExpanded(false)
-
-              if (currentFormIsPresaved || formHasChanges) {
-                setEnqueuedStepType(stepType)
-              } else {
-                addStep(stepType)
-              }
-            }}
-          />
-        )
-      )
+        if (currentFormIsPresaved || formHasChanges) {
+          setEnqueuedStepType(stepType)
+        } else {
+          addStep(stepType)
+        }
+      }}
+    />
+  ))
 
   return (
     <>
