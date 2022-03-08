@@ -3,8 +3,9 @@ import os
 from pathlib import Path
 
 import pytest
-from opentrons_ot3_firmware.messages.message_definitions import FirmwareUpdateInitiate
-from opentrons_ot3_firmware.messages.payloads import EmptyPayload
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    FirmwareUpdateInitiate,
+)
 
 from opentrons_hardware import firmware_update
 from opentrons_hardware.drivers.can_bus import CanMessenger
@@ -25,7 +26,7 @@ async def downloader_subject(
     # Send initiate to the bootloader to start with a clean slate
     await can_messenger.send(
         node_id=target.bootloader_node,
-        message=FirmwareUpdateInitiate(payload=EmptyPayload()),
+        message=FirmwareUpdateInitiate(),
     )
     return firmware_update.FirmwareUpdateDownloader(messenger=can_messenger)
 

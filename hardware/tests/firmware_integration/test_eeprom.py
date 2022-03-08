@@ -2,17 +2,16 @@
 import asyncio
 
 import pytest
-from opentrons_ot3_firmware import NodeId
-from opentrons_ot3_firmware.messages.message_definitions import (
+from opentrons_hardware.firmware_bindings import NodeId
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     ReadFromEEPromRequest,
     ReadFromEEPromResponse,
     WriteToEEPromRequest,
 )
-from opentrons_ot3_firmware.messages.payloads import (
-    EmptyPayload,
+from opentrons_hardware.firmware_bindings.messages.payloads import (
     WriteToEEPromRequestPayload,
 )
-from opentrons_ot3_firmware.utils import UInt8Field
+from opentrons_hardware.firmware_bindings.utils import UInt16Field
 
 from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
 
@@ -24,7 +23,7 @@ async def test_read_write(
     can_messenger_queue: WaitableCallback,
 ) -> None:
     """It should be able to read and write eeprom values."""
-    read_message = ReadFromEEPromRequest(payload=EmptyPayload())
+    read_message = ReadFromEEPromRequest()
     await can_messenger.send(node_id=NodeId.pipette_left, message=read_message)
 
     response, arbitration_id = await asyncio.wait_for(can_messenger_queue.read(), 1)
@@ -36,7 +35,9 @@ async def test_read_write(
     await can_messenger.send(
         node_id=NodeId.pipette_left,
         message=WriteToEEPromRequest(
-            payload=WriteToEEPromRequestPayload(serial_number=UInt8Field(expected_data))
+            payload=WriteToEEPromRequestPayload(
+                serial_number=UInt16Field(expected_data)
+            )
         ),
     )
 

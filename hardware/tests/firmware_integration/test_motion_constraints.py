@@ -1,18 +1,17 @@
 """Test device info."""
 import asyncio
 import pytest
-from opentrons_ot3_firmware.messages.message_definitions import (
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     SetMotionConstraints,
     GetMotionConstraintsRequest,
     GetMotionConstraintsResponse,
 )
 
-from opentrons_ot3_firmware import NodeId
-from opentrons_ot3_firmware.messages.payloads import (
+from opentrons_hardware.firmware_bindings import NodeId
+from opentrons_hardware.firmware_bindings.messages.payloads import (
     MotionConstraintsPayload,
-    EmptyPayload,
 )
-from opentrons_ot3_firmware.utils import Int32Field
+from opentrons_hardware.firmware_bindings.utils import Int32Field
 
 from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
 
@@ -37,7 +36,7 @@ async def test_each_node(
     )
     await can_messenger.send(
         node_id=motor_node_id,
-        message=GetMotionConstraintsRequest(payload=EmptyPayload()),
+        message=GetMotionConstraintsRequest(),
     )
 
     response, arbitration_id = await asyncio.wait_for(can_messenger_queue.read(), 1)

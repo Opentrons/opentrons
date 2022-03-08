@@ -2,17 +2,17 @@
 import asyncio
 
 import pytest
-from opentrons_ot3_firmware import NodeId
-from opentrons_ot3_firmware.messages.message_definitions import (
+from opentrons_hardware.firmware_bindings import NodeId
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     ReadMotorDriverRequest,
     ReadMotorDriverResponse,
     WriteMotorDriverRegister,
 )
-from opentrons_ot3_firmware.messages.payloads import (
+from opentrons_hardware.firmware_bindings.messages.payloads import (
     MotorDriverRegisterPayload,
     MotorDriverRegisterDataPayload,
 )
-from opentrons_ot3_firmware.utils import UInt8Field, UInt32Field
+from opentrons_hardware.firmware_bindings.utils import UInt8Field, UInt32Field
 
 from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
 
