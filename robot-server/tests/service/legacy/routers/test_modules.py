@@ -36,6 +36,8 @@ def magdeck():
 
     yield m
 
+    m.cleanup()
+
 
 @pytest.fixture
 def tempdeck():
@@ -59,6 +61,8 @@ def tempdeck():
     TempDeck.target = PropertyMock(return_value=321.0)
 
     yield t
+
+    t.cleanup()
 
 
 @pytest.fixture
@@ -90,7 +94,10 @@ def thermocycler():
     Thermocycler.total_cycle_count = PropertyMock(return_value=3)
     Thermocycler.current_step_index = PropertyMock(return_value=5)
     Thermocycler.total_step_count = PropertyMock(return_value=2)
-    return t
+    yield t
+
+    t.cleanup()
+
 
 
 @pytest.fixture
@@ -127,7 +134,8 @@ def heater_shaker():
             },
         }
     )
-    return heatershaker
+    yield heatershaker
+    heatershaker.cleanup()
 
 
 def test_get_modules_magdeck(api_client, hardware, magdeck):
