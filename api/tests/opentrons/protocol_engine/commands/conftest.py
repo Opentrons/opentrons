@@ -7,6 +7,7 @@ from opentrons.protocol_engine.execution import (
     MovementHandler,
     PipettingHandler,
     RunControlHandler,
+    RailLightsHandler,
 )
 
 
@@ -32,3 +33,9 @@ def pipetting(decoy: Decoy) -> PipettingHandler:
 def run_control(decoy: Decoy) -> RunControlHandler:
     """Get a mocked out RunControlHandler."""
     return decoy.mock(cls=RunControlHandler)
+
+
+@pytest.fixture
+def rail_lights(decoy: Decoy) -> RailLightsHandler:
+    """Get a mocked out RailLightsHandler."""
+    return decoy.mock(cls=RailLightsHandler)

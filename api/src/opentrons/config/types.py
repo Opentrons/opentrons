@@ -101,6 +101,26 @@ class OT3MotionSettings:
         return base
 
 
+@dataclass(frozen=True)
+class OT3CurrentSettings:
+    hold_current: PerPipetteAxisSettings
+    run_current: PerPipetteAxisSettings
+
+    def by_gantry_load(
+        self, gantry_load: GantryLoad
+    ) -> Dict[str, Dict[OT3AxisKind, float]]:
+        # create a shallow copy
+        base = dict(
+            (field.name, getattr(self, field.name)[GantryLoad.NONE])
+            for field in fields(self)
+        )
+        if gantry_load is GantryLoad.NONE:
+            return base
+        for key in base.keys():
+            base[key].update(getattr(self, key)[gantry_load])
+        return base
+
+
 @dataclass
 class OT3Config:
     model: Literal["OT-3 Standard"]
@@ -108,8 +128,7 @@ class OT3Config:
     version: int
     log_level: str
     motion_settings: OT3MotionSettings
-    holding_current: PerPipetteAxisSettings
-    normal_motion_current: PerPipetteAxisSettings
+    current_settings: OT3CurrentSettings
     z_retract_distance: float
     deck_transform: OT3Transform
     carriage_offset: Offset

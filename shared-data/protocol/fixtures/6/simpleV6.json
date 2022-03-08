@@ -42,7 +42,7 @@
       "definitionId": "example/plate/1"
     },
     "destPlateId": {
-      "displayName": "Dest Plate",
+      "displayName": "Sample Collection Plate",
       "definitionId": "example/plate/1"
     }
   },
@@ -1292,7 +1292,8 @@
         "labwareId": "destPlateId",
         "location": {
           "moduleId": "magneticModuleId"
-        }
+        },
+        "displayName": "Sample Collection Plate"
       }
     },
     {

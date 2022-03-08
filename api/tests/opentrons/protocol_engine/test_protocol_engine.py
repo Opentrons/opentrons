@@ -1,8 +1,9 @@
 """Tests for the ProtocolEngine class."""
+import pytest
+
 from datetime import datetime
 from decoy import Decoy
-
-import pytest
+from typing import Any
 
 from opentrons.types import DeckSlotName, MountType
 from opentrons.hardware_control import API as HardwareAPI
@@ -14,6 +15,7 @@ from opentrons.protocol_engine.types import (
     LabwareOffsetCreate,
     LabwareOffsetVector,
     LabwareOffsetLocation,
+    LabwareUri,
     PipetteName,
 )
 from opentrons.protocol_engine.execution import (
@@ -446,14 +448,23 @@ def test_add_labware_offset(
 def test_add_labware_definition(
     decoy: Decoy,
     action_dispatcher: ActionDispatcher,
+    state_store: StateStore,
     subject: ProtocolEngine,
     well_plate_def: LabwareDefinition,
 ) -> None:
     """It should dispatch an AddLabwareDefinition action."""
-    subject.add_labware_definition(well_plate_def)
 
-    decoy.verify(
+    def _stub_get_definition_uri(*args: Any, **kwargs: Any) -> None:
+        decoy.when(
+            state_store.labware.get_uri_from_definition(well_plate_def)
+        ).then_return(LabwareUri("some/definition/uri"))
+
+    decoy.when(
         action_dispatcher.dispatch(
             AddLabwareDefinitionAction(definition=well_plate_def)
         )
-    )
+    ).then_do(_stub_get_definition_uri)
+
+    result = subject.add_labware_definition(well_plate_def)
+
+    assert result == "some/definition/uri"

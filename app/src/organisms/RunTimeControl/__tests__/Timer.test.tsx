@@ -3,7 +3,7 @@ import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
 import { Timer } from '../Timer'
-import { useRunTimestamps } from '../hooks'
+import { useCurrentRunTimestamps } from '../hooks'
 import {
   RUN_STATUS_RUNNING,
   RUN_STATUS_STOP_REQUESTED,
@@ -16,8 +16,8 @@ const PAUSED_TIME = '2021-10-07T18:47:55.366581+00:00'
 const COMPLETED_TIME = '2021-10-07T18:58:59.366581+00:00'
 const STOPPED_TIME = '2021-10-07T18:45:49.366581+00:00'
 
-const mockUseRunTimestamps = useRunTimestamps as jest.MockedFunction<
-  typeof useRunTimestamps
+const mockUseCurrentRunTimestamps = useCurrentRunTimestamps as jest.MockedFunction<
+  typeof useCurrentRunTimestamps
 >
 
 describe('Timer', () => {
@@ -26,7 +26,7 @@ describe('Timer', () => {
   ) => ReturnType<typeof renderWithProviders>
 
   beforeEach(() => {
-    mockUseRunTimestamps.mockReturnValue({
+    mockUseCurrentRunTimestamps.mockReturnValue({
       startedAt: null,
       pausedAt: null,
       stoppedAt: null,
@@ -66,7 +66,7 @@ describe('Timer', () => {
   })
 
   it('renders a paused time and a run time when paused', () => {
-    mockUseRunTimestamps.mockReturnValue({
+    mockUseCurrentRunTimestamps.mockReturnValue({
       startedAt: null,
       pausedAt: PAUSED_TIME,
       stoppedAt: null,
@@ -80,7 +80,7 @@ describe('Timer', () => {
   })
 
   it('renders a completed time when completed', async () => {
-    mockUseRunTimestamps.mockReturnValue({
+    mockUseCurrentRunTimestamps.mockReturnValue({
       startedAt: null,
       pausedAt: null,
       stoppedAt: null,
@@ -93,7 +93,7 @@ describe('Timer', () => {
   })
 
   it('renders a stopped time when run is canceled', () => {
-    mockUseRunTimestamps.mockReturnValue({
+    mockUseCurrentRunTimestamps.mockReturnValue({
       startedAt: null,
       pausedAt: null,
       stoppedAt: STOPPED_TIME,

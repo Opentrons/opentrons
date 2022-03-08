@@ -37,7 +37,7 @@ import {
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
 
-import { useRunStatus } from '../../../RunTimeControl/hooks'
+import { useCurrentRunStatus } from '../../../RunTimeControl/hooks'
 import { LabwarePositionCheck } from '../../LabwarePositionCheck'
 import styles from '../../styles.css'
 import { useProtocolDetails } from '../../../RunDetails/hooks'
@@ -73,7 +73,7 @@ export const LabwareSetup = (): JSX.Element | null => {
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_LEFT,
   })
-  const runStatus = useRunStatus()
+  const runStatus = useCurrentRunStatus()
   const { protocolData } = useProtocolDetails()
   const { t } = useTranslation('protocol_setup')
   const [
@@ -174,7 +174,14 @@ export const LabwareSetup = (): JSX.Element | null => {
               <React.Fragment>
                 {map(
                   moduleRenderInfoById,
-                  ({ x, y, moduleDef, nestedLabwareDef, nestedLabwareId }) => (
+                  ({
+                    x,
+                    y,
+                    moduleDef,
+                    nestedLabwareDef,
+                    nestedLabwareId,
+                    nestedLabwareDisplayName,
+                  }) => (
                     <Module
                       key={`LabwareSetup_Module_${moduleDef.model}_${x}${y}`}
                       x={x}
@@ -195,6 +202,7 @@ export const LabwareSetup = (): JSX.Element | null => {
                           <LabwareInfoOverlay
                             definition={nestedLabwareDef}
                             labwareId={nestedLabwareId}
+                            displayName={nestedLabwareDisplayName}
                           />
                         </React.Fragment>
                       ) : null}
@@ -203,7 +211,7 @@ export const LabwareSetup = (): JSX.Element | null => {
                 )}
                 {map(
                   labwareRenderInfoById,
-                  ({ x, y, labwareDef }, labwareId) => {
+                  ({ x, y, labwareDef, displayName }, labwareId) => {
                     return (
                       <React.Fragment
                         key={`LabwareSetup_Labware_${labwareDef.metadata.displayName}_${x}${y}`}
@@ -213,6 +221,7 @@ export const LabwareSetup = (): JSX.Element | null => {
                           <LabwareInfoOverlay
                             definition={labwareDef}
                             labwareId={labwareId}
+                            displayName={displayName}
                           />
                         </g>
                       </React.Fragment>
