@@ -34,6 +34,19 @@ def make_module_view(
     return ModuleView(state=state)
 
 
+def make_hardware_module(decoy: Decoy, serial_number: str) -> AbstractModule:
+    """Return a mock hardware module with the specified serial number.
+
+    Ideally, we wouldn't use mocks for this, since our subject uses these objects
+    as pure input data, and doesn't call anything behavioral on them.
+    But it's prohibitively difficult to instantiate these objects in tests otherwise.
+    """
+    hardware_module = decoy.mock(cls=AbstractModule)
+    # "type: ignore" to override what's normally a read-only property.
+    hardware_module.device_info = {"serial": "serial-matching"}  # type: ignore[misc]
+    return hardware_module
+
+
 def test_initial_module_data_by_id() -> None:
     """It should raise if module ID doesn't exist."""
     subject = make_module_view()
@@ -259,15 +272,11 @@ def test_find_loaded_hardware_module(
     magdeck_v1_def: ModuleDefinition
 ) -> None:
     """It should return the matching hardware module."""
-
-    matching = decoy.mock(cls=AbstractModule)
-    matching.device_info = {"serial": "serial-matching"}
-
-    non_matching = decoy.mock(cls=AbstractModule)
-    non_matching.device_info = {"serial": "serial-non-matching"}
-
-    another_non_matching = decoy.mock(cls=AbstractModule)
-    another_non_matching.device_info = {"serial": "serial-another-non-matching"}
+    matching = make_hardware_module(decoy=decoy, serial_number="serial-matching")
+    non_matching = make_hardware_module(decoy=decoy, serial_number="serial-non-matching")
+    another_non_matching = make_hardware_module(
+        decoy=decoy, serial_number="serial-another-non-matching"
+    )
 
     attached = [non_matching, matching, another_non_matching]
 
@@ -296,15 +305,19 @@ def test_find_loaded_hardware_module(
     result = subject.find_loaded_hardware_module(
         module_id="id-matching",
         attached_modules=attached,
-        expected_type=AbstractModule,
+        # https://github.com/python/mypy/issues/4717
+        expected_type=AbstractModule,  # type: ignore[misc]
     )
 
     assert result == matching
+
 
 # To do:
 # Raises if module does not exist
 # Raises if exists, but no attached
 # Raises if wrong type
+# Raises if out of range
+
 
 def test_select_hardware_module_to_load_rejects_missing() -> None:
     """It should raise if the correct module isn't attached."""
