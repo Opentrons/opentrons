@@ -6,14 +6,8 @@ from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import MountType
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.modules import AbstractModule, MagDeck
 
-from ..errors import (
-    FailedToLoadPipetteError,
-    LabwareDefinitionDoesNotExistError,
-    ModuleNotAttachedError,
-    WrongModuleTypeError,
-)
+from ..errors import FailedToLoadPipetteError, LabwareDefinitionDoesNotExistError
 from ..resources import LabwareDataProvider, ModuleDataProvider, ModelUtils
 from ..state import StateStore, HardwareModule
 from ..types import (
@@ -233,28 +227,3 @@ class EquipmentHandler:
             serial_number=attached_module.serial_number,
             definition=attached_module.definition,
         )
-
-    async def engage_magnets(
-        self,
-        magnetic_module_id: str,
-        mm_above_labware_base: float,
-    ) -> None:
-        """Engage a loaded Magnetic Module's magnets."""
-        # Will raise if the given module ID hasn't been loaded.
-        model = self._state_store.modules.get_model(module_id=magnetic_module_id)
-
-        # Will raise if either:
-        #   * The given module ID points to a module that's not a Magnetic Module.
-        #   * The given height is invalid.
-        hardware_height = self._state_store.modules.calculate_magnet_hardware_height(
-            magnetic_module_model=model,
-            mm_above_labware_base=mm_above_labware_base,
-        )
-
-        if not self._state_store.get_configs().use_virtual_modules:
-            hardware_module = self._state_store.modules.find_loaded_hardware_module(
-                module_id=magnetic_module_id,
-                attached_modules=self._hardware_api.attached_modules,
-                expected_type=MagDeck,
-            )
-            await hardware_module.engage(height=hardware_height)
