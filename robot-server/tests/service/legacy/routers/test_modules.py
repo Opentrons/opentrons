@@ -99,7 +99,6 @@ def thermocycler():
     t.cleanup()
 
 
-
 @pytest.fixture
 def heater_shaker():
     """Get a mocked out heater-shaker hardware control object."""
