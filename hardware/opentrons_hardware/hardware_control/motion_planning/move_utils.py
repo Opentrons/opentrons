@@ -22,6 +22,10 @@ log = logging.getLogger(__name__)
 FLOAT_THRESHOLD = 0.001  # TODO: re-evaluate this value based on system limitations
 
 
+class MoveConditionNotMet(ValueError):
+    """Error raised if a move does not meet its stop condition before finishing."""
+
+
 def apply_constraint(constraint: np.float64, input: np.float64) -> np.float64:
     """Keep the sign of the input but cap the numeric value at the constraint value."""
     return np.copysign(np.minimum(abs(constraint), abs(input)), input)
@@ -41,7 +45,6 @@ def get_unit_vector(
     target_vectorized = vectorize({k: np.float64(v) for k, v in target.items()})
     displacement: np.ndarray = target_vectorized - initial_vectorized
     distance = np.linalg.norm(displacement)
-    # breakpoint()
     if not distance or np.array_equal(initial_vectorized, target_vectorized):
         raise ZeroLengthMoveError(initial, target)
     unit_vector_ndarray = displacement / distance
@@ -53,7 +56,6 @@ def targets_to_moves(
     initial: Coordinates[AxisKey, CoordinateValue], targets: List[MoveTarget[AxisKey]]
 ) -> Iterator[Move[AxisKey]]:
     """Transform a list of MoveTargets into a list of Moves."""
-    # breakpoint()
     all_axes: Set[AxisKey] = set()
     for target in targets:
         all_axes.update(set(target.position.keys()))

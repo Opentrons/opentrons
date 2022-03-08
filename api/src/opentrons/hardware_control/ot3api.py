@@ -80,7 +80,9 @@ from opentrons_shared_data.pipette.dev_types import (
 )
 
 from .dev_types import PipetteDict
-
+from opentrons_hardware.hardware_control.motion_planning.move_utils import (
+    MoveConditionNotMet,
+)
 
 mod_log = logging.getLogger(__name__)
 
@@ -733,7 +735,6 @@ class OT3API(
         self, axes: Optional[Union[List[Axis], List[OT3Axis]]] = None
     ) -> None:
         """Worker function to apply robot motion."""
-        # breakpoint()
         self._reset_last_mount()
         if axes:
             checked_axes = [OT3Axis.from_axis(ax) for ax in axes]
@@ -743,7 +744,7 @@ class OT3API(
             async with self._motion_lock:
                 try:
                     target_position = await self._backend.home([ax])
-                except Exception:
+                except MoveConditionNotMet:
                     self._log.exception("Homing failed")
                     self._current_position.clear()
                     raise

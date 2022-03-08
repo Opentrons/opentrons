@@ -15,7 +15,6 @@ from typing import (
     cast,
     Set,
 )
-
 from opentrons.config.types import OT3Config
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.config import pipette_config
@@ -190,10 +189,11 @@ class OT3Controller:
         speed_settings = (
             self._configuration.motion_settings.max_speed_discontinuity.none
         )
-        velocities = {ax: speed_settings[ax.to_kind()] for ax in axes}
+        velocities = {ax: speed_settings[OT3Axis.to_kind(ax)] for ax in axes}
         group = create_home_group(distances, velocities)
         runner = MoveGroupRunner(move_groups=[group])
         await runner.run(can_messenger=self._messenger)
+
         for ax in axes:
             self._position[axis_to_node(ax)] = 0
         axis_positions = {ax: 0.0 for ax in axes}

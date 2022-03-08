@@ -449,7 +449,7 @@ class MockSendMoveCompleter:
                         group_id=message.payload.group_id,
                         seq_id=UInt8Field(seq_id),
                         current_position=UInt32Field(0),
-                        ack_id=UInt8Field(0),
+                        ack_id=UInt8Field(1),
                     )
                     arbitration_id = ArbitrationId(
                         parts=ArbitrationIdParts(originating_node_id=node)

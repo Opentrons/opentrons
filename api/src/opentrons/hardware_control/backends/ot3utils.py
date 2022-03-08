@@ -4,7 +4,6 @@ from opentrons.config.types import OT3MotionSettings, GantryLoad
 from opentrons.hardware_control.types import OT3Axis, OT3AxisKind, OT3AxisMap
 import numpy as np
 
-
 from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.hardware_control.motion_planning import (
     AxisConstraints,

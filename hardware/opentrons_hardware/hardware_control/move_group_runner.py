@@ -31,7 +31,10 @@ from opentrons_hardware.firmware_bindings.utils import (
     UInt32Field,
     Int32Field,
 )
-
+from opentrons_hardware.hardware_control.motion_planning.move_utils import (
+    MoveConditionNotMet,
+)
+from opentrons_hardware.hardware_control.motion import MoveStopCondition
 
 log = logging.getLogger(__name__)
 
@@ -137,12 +140,16 @@ class MoveScheduler:
         # For each move group create a set identifying the node and seq id.
         self._moves: List[Set[Tuple[int, int]]] = []
         self._durations: List[float] = []
+        self._stop_condition: List[MoveStopCondition] = []
         for move_group in move_groups:
             move_set = set()
             duration = 0.0
             for seq_id, move in enumerate(move_group):
                 move_set.update(set((k.value, seq_id) for k in move.keys()))
                 duration += list(move.values())[0].duration_sec
+                for step in move_group[seq_id]:
+                    self._stop_condition.append(move_group[seq_id][step].stop_condition)
+
             self._moves.append(move_set)
             self._durations.append(duration)
         log.info(f"Move scheduler running for groups {move_groups}")
@@ -156,6 +163,7 @@ class MoveScheduler:
         if isinstance(message, MoveCompleted):
             seq_id = message.payload.seq_id.value
             group_id = message.payload.group_id.value
+            ack_id = message.payload.ack_id.value
             node_id = arbitration_id.parts.originating_node_id
             log.info(
                 f"Received completion for {node_id} group {group_id} seq {seq_id}"
@@ -167,6 +175,13 @@ class MoveScheduler:
             if not self._moves[group_id]:
                 log.info(f"Move group {group_id} has completed.")
                 self._event.set()
+            if self._stop_condition[
+                group_id
+            ] == MoveStopCondition.limit_switch and ack_id != UInt8Field(2):
+                raise MoveConditionNotMet()
+                if ack_id == UInt8Field(1):
+                    condition = "Homing timed out."
+                log.warning(f"Homing failed. Condition: {condition}")
 
     async def run(self, can_messenger: CanMessenger) -> None:
         """Start each move group after the prior has completed."""

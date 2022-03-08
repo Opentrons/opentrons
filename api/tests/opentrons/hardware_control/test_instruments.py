@@ -270,7 +270,6 @@ async def test_cache_instruments_sim(loop, sim_and_instr):
 
 
 async def test_prep_aspirate(loop, sim_and_instr):
-    # breakpoint()
     sim_builder, dummy_instruments = sim_and_instr
     hw_api = await sim_builder(attached_instruments=dummy_instruments, loop=loop)
     await hw_api.home()
