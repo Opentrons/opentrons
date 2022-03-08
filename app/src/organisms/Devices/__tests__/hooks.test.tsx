@@ -45,7 +45,7 @@ import {
   updateLights,
   getLightsOn,
 } from '../../../redux/robot-controls'
-import { useRunStatus } from '../../RunTimeControl/hooks'
+import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
 
 import type { DispatchApiRequestType } from '../../../redux/robot-api'
 
@@ -92,8 +92,8 @@ const mockGetLightsOn = getLightsOn as jest.MockedFunction<typeof getLightsOn>
 const mockUpdateLights = updateLights as jest.MockedFunction<
   typeof updateLights
 >
-const mockUseRunStatus = useRunStatus as jest.MockedFunction<
-  typeof useRunStatus
+const mockUseCurrentRunStatus = useCurrentRunStatus as jest.MockedFunction<
+  typeof useCurrentRunStatus
 >
 const mockGetDiscoverableRobotByName = getDiscoverableRobotByName as jest.MockedFunction<
   typeof getDiscoverableRobotByName
@@ -319,7 +319,7 @@ describe('useIsProtocolRunning hook', () => {
   })
 
   it('returns false when current run record does not exist', () => {
-    when(mockUseRunStatus).calledWith().mockReturnValue(null)
+    when(mockUseCurrentRunStatus).calledWith().mockReturnValue(null)
 
     const { result } = renderHook(() => useIsProtocolRunning(), { wrapper })
 
@@ -327,7 +327,7 @@ describe('useIsProtocolRunning hook', () => {
   })
 
   it('returns false when current run record is idle', () => {
-    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_IDLE)
+    when(mockUseCurrentRunStatus).calledWith().mockReturnValue(RUN_STATUS_IDLE)
 
     const { result } = renderHook(() => useIsProtocolRunning(), { wrapper })
 
@@ -335,7 +335,9 @@ describe('useIsProtocolRunning hook', () => {
   })
 
   it('returns true when current run record is not idle', () => {
-    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_RUNNING)
+    when(mockUseCurrentRunStatus)
+      .calledWith()
+      .mockReturnValue(RUN_STATUS_RUNNING)
 
     const { result } = renderHook(() => useIsProtocolRunning(), {
       wrapper,

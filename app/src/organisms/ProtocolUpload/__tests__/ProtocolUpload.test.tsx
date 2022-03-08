@@ -31,7 +31,10 @@ import { ConfirmCancelModal } from '../../RunDetails/ConfirmCancelModal'
 import { useProtocolDetails } from '../../RunDetails/hooks'
 import { ConfirmExitProtocolUploadModal } from '../ConfirmExitProtocolUploadModal'
 import { mockCalibrationStatus } from '../../../redux/calibration/__fixtures__'
-import { useRunStatus, useRunControls } from '../../RunTimeControl/hooks'
+import {
+  useCurrentRunStatus,
+  useCurrentRunControls,
+} from '../../RunTimeControl/hooks'
 import {
   useCreateRun,
   useCurrentProtocol,
@@ -70,11 +73,11 @@ const getCalibrationStatus = calibrationSelectors.getCalibrationStatus as jest.M
 const mockConfirmExitProtocolUploadModal = ConfirmExitProtocolUploadModal as jest.MockedFunction<
   typeof ConfirmExitProtocolUploadModal
 >
-const mockUseRunStatus = useRunStatus as jest.MockedFunction<
-  typeof useRunStatus
+const mockUseCurrentRunStatus = useCurrentRunStatus as jest.MockedFunction<
+  typeof useCurrentRunStatus
 >
-const mockUseRunControls = useRunControls as jest.MockedFunction<
-  typeof useRunControls
+const mockUseCurrentRunControls = useCurrentRunControls as jest.MockedFunction<
+  typeof useCurrentRunControls
 >
 const mockUseCurrentProtocol = useCurrentProtocol as jest.MockedFunction<
   typeof useCurrentProtocol
@@ -152,8 +155,8 @@ describe('ProtocolUpload', () => {
       isClosingCurrentRun: false,
     })
     when(mockUseIsProtocolRunLoaded).calledWith().mockReturnValue(true)
-    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_IDLE)
-    when(mockUseRunControls)
+    when(mockUseCurrentRunStatus).calledWith().mockReturnValue(RUN_STATUS_IDLE)
+    when(mockUseCurrentRunControls)
       .calledWith()
       .mockReturnValue({ pause: jest.fn() } as any)
     mockTrackEvent = jest.fn()
@@ -243,7 +246,9 @@ describe('ProtocolUpload', () => {
     when(mockUseCurrentProtocol)
       .calledWith()
       .mockReturnValue({ data: { analyses: [] } } as any)
-    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_RUNNING)
+    when(mockUseCurrentRunStatus)
+      .calledWith()
+      .mockReturnValue(RUN_STATUS_RUNNING)
     when(mockConfirmCancelModal).mockReturnValue(
       <div>mock confirm cancel modal</div>
     )
@@ -257,7 +262,9 @@ describe('ProtocolUpload', () => {
     when(mockUseCurrentProtocol)
       .calledWith()
       .mockReturnValue({ data: { analyses: [] } } as any)
-    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_PAUSED)
+    when(mockUseCurrentRunStatus)
+      .calledWith()
+      .mockReturnValue(RUN_STATUS_PAUSED)
     when(mockConfirmCancelModal).mockReturnValue(
       <div>mock confirm cancel modal</div>
     )
@@ -271,7 +278,7 @@ describe('ProtocolUpload', () => {
     when(mockUseCurrentProtocol)
       .calledWith()
       .mockReturnValue({ data: { analyses: [] } } as any)
-    when(mockUseRunStatus)
+    when(mockUseCurrentRunStatus)
       .calledWith()
       .mockReturnValue(RUN_STATUS_PAUSE_REQUESTED)
     when(mockConfirmCancelModal).mockReturnValue(
@@ -287,7 +294,7 @@ describe('ProtocolUpload', () => {
     when(mockUseCurrentProtocol)
       .calledWith()
       .mockReturnValue({ data: { analyses: [] } } as any)
-    when(mockUseRunStatus)
+    when(mockUseCurrentRunStatus)
       .calledWith()
       .mockReturnValue(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
     when(mockConfirmCancelModal).mockReturnValue(
@@ -303,7 +310,9 @@ describe('ProtocolUpload', () => {
     when(mockUseCurrentProtocol)
       .calledWith()
       .mockReturnValue({ data: { analyses: [] } } as any)
-    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_FINISHING)
+    when(mockUseCurrentRunStatus)
+      .calledWith()
+      .mockReturnValue(RUN_STATUS_FINISHING)
     when(mockConfirmCancelModal).mockReturnValue(
       <div>mock confirm cancel modal</div>
     )
@@ -327,7 +336,7 @@ describe('ProtocolUpload', () => {
     when(mockUseCurrentProtocol)
       .calledWith()
       .mockReturnValue({ data: { analyses: [] } } as any)
-    when(mockUseRunStatus)
+    when(mockUseCurrentRunStatus)
       .calledWith()
       .mockReturnValue(RUN_STATUS_STOP_REQUESTED)
     when(mockConfirmCancelModal).mockReturnValue(

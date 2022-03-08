@@ -129,6 +129,14 @@ from .save_position import (
     SavePositionCommandType,
 )
 
+from .set_rail_lights import (
+    SetRailLights,
+    SetRailLightsParams,
+    SetRailLightsCreate,
+    SetRailLightsResult,
+    SetRailLightsCommandType,
+)
+
 
 __all__ = [
     # command type unions
@@ -225,6 +233,12 @@ __all__ = [
     "SavePositionCreate",
     "SavePositionResult",
     "SavePositionCommandType",
+    # set rail lights command models
+    "SetRailLights",
+    "SetRailLightsParams",
+    "SetRailLightsCreate",
+    "SetRailLightsResult",
+    "SetRailLightsCommandType",
     # module command bundles
     "heater_shaker",
     "magnetic_module",

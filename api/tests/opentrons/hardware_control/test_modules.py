@@ -102,9 +102,8 @@ async def test_module_update_integration(monkeypatch, loop):
     # test temperature module update with avrdude bootloader
     usb_port = USBPort(
         name="",
-        sub_names=[],
         hub=None,
-        port_number=None,
+        port_number=0,
         device_path="/dev/ot_module_sim_tempdeck0",
     )
 

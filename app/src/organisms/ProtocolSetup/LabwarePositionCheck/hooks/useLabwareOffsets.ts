@@ -2,6 +2,7 @@ import reduce from 'lodash/reduce'
 import { useTranslation, TFunction } from 'react-i18next'
 import {
   getModuleDisplayName,
+  getLabwareDisplayName,
   getModuleType,
   ProtocolFile,
   THERMOCYCLER_MODULE_TYPE,
@@ -79,7 +80,10 @@ export const useLabwareOffsets = (
         protocolData.labware,
         protocolData.labwareDefinitions
       )
-      const displayName = protocolData.labware[labwareId].displayName ?? ''
+      const { definitionId } = protocolData.labware[labwareId]
+      const displayName = getLabwareDisplayName(
+        protocolData.labwareDefinitions[definitionId]
+      )
       const vectorPromise = offsetDataByLabwareId.then(result => ({
         ...result[labwareId],
       }))

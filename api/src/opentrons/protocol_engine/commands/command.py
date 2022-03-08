@@ -110,6 +110,7 @@ class AbstractCommandImpl(
         movement: execution.MovementHandler,
         pipetting: execution.PipettingHandler,
         run_control: execution.RunControlHandler,
+        rail_lights: execution.RailLightsHandler,
     ) -> None:
         """Initialize the command implementation with execution handlers."""
         pass

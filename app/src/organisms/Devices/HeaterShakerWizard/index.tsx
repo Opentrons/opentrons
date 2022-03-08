@@ -79,7 +79,7 @@ export const HeaterShakerWizard = (
         return <PowerOn attachedModule={heaterShaker ?? null} />
       case 5:
         buttonContent = t('complete')
-        return <TestShake />
+        return <TestShake setCurrentPage={setCurrentPage} />
       default:
         return null
     }

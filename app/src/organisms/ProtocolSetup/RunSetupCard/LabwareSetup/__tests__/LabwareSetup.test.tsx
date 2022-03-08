@@ -21,7 +21,7 @@ import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_stand
 import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '../../../../../i18n'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../../redux/config'
-import { useRunStatus } from '../../../../RunTimeControl/hooks'
+import { useCurrentRunStatus } from '../../../../RunTimeControl/hooks'
 import { useProtocolDetails } from '../../../../RunDetails/hooks'
 import { LabwarePositionCheck } from '../../../LabwarePositionCheck'
 import {
@@ -98,8 +98,8 @@ const mockUseModuleRenderInfoById = useModuleRenderInfoById as jest.MockedFuncti
 const mockLabwarePostionCheck = LabwarePositionCheck as jest.MockedFunction<
   typeof LabwarePositionCheck
 >
-const mockUseRunStatus = useRunStatus as jest.MockedFunction<
-  typeof useRunStatus
+const mockUseCurrentRunStatus = useCurrentRunStatus as jest.MockedFunction<
+  typeof useCurrentRunStatus
 >
 const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
   typeof useProtocolDetails
@@ -253,7 +253,7 @@ describe('LabwareSetup', () => {
     mockUseProtocolCalibrationStatus.mockReturnValue({
       complete: true,
     })
-    mockUseRunStatus.mockReturnValue(RUN_STATUS_IDLE)
+    mockUseCurrentRunStatus.mockReturnValue(RUN_STATUS_IDLE)
     when(mockUseProtocolDetails)
       .calledWith()
       .mockReturnValue({
@@ -325,6 +325,7 @@ describe('LabwareSetup', () => {
       .mockReturnValue({
         '300_ul_tiprack_id': {
           labwareDef: fixture_tiprack_300_ul as LabwareDefinition2,
+          displayName: 'fresh tips',
           x: MOCK_300_UL_TIPRACK_COORDS[0],
           y: MOCK_300_UL_TIPRACK_COORDS[1],
           z: MOCK_300_UL_TIPRACK_COORDS[2],
@@ -347,6 +348,7 @@ describe('LabwareSetup', () => {
       .mockReturnValue({
         [MOCK_300_UL_TIPRACK_ID]: {
           labwareDef: fixture_tiprack_300_ul as LabwareDefinition2,
+          displayName: 'fresh tips',
           x: MOCK_300_UL_TIPRACK_COORDS[0],
           y: MOCK_300_UL_TIPRACK_COORDS[1],
           z: MOCK_300_UL_TIPRACK_COORDS[2],
@@ -423,7 +425,7 @@ describe('LabwareSetup', () => {
     getByText('mock Labware Position Check')
   })
   it('should render a disabled button when a run has been started', () => {
-    mockUseRunStatus.mockReturnValue(RUN_STATUS_RUNNING)
+    mockUseCurrentRunStatus.mockReturnValue(RUN_STATUS_RUNNING)
     const { getByRole, queryByText } = render()
     const button = getByRole('button', {
       name: 'run labware position check',

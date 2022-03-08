@@ -461,6 +461,8 @@ def generate_hardware_configs_ot3(
             "steps_per_mm": 0,
             "home_pos": 0,
             "max_travel": 0,
-            "idle_current": robot_config.holding_current.none[OT3AxisKind.P],
+            "idle_current": robot_config.current_settings.hold_current.none[
+                OT3AxisKind.P
+            ],
             "splits": None,
         }

@@ -15,10 +15,15 @@ from typing import (
     cast,
     Set,
 )
-from opentrons.config.types import OT3Config
+from opentrons.config.types import OT3Config, GantryLoad
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.config import pipette_config
-from .ot3utils import axis_convert, create_move_group, create_home_group, axis_to_node
+from .ot3utils import (
+    axis_convert,
+    create_move_group,
+    axis_to_node,
+    get_current_settings,
+)
 
 try:
     import aionotify  # type: ignore[import]
@@ -35,6 +40,11 @@ from opentrons_hardware.hardware_control.motion_planning import (
 )
 
 from opentrons_hardware.hardware_control.network import probe
+from opentrons_hardware.hardware_control.current_settings import (
+    set_run_current,
+    set_hold_current,
+    set_currents,
+)
 from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     SetupRequest,
@@ -49,6 +59,7 @@ from opentrons.hardware_control.types import (
     AionotifyEvent,
     OT3Mount,
     OT3AxisMap,
+    CurrentConfig,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 
@@ -107,6 +118,29 @@ class OT3Controller:
                 "or door, likely because not running on linux"
             )
         self._present_nodes: Set[NodeId] = set()
+        self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
+
+    async def update_to_default_current_settings(self, gantry_load: GantryLoad) -> None:
+        self._current_settings = get_current_settings(
+            self._configuration.current_settings, gantry_load
+        )
+        await self.set_default_currents()
+
+    @property
+    def motor_run_currents(self) -> OT3AxisMap[float]:
+        assert self._current_settings
+        run_currents: OT3AxisMap[float] = {}
+        for axis, settings in self._current_settings.items():
+            run_currents[axis] = settings.run_current
+        return run_currents
+
+    @property
+    def motor_hold_currents(self) -> OT3AxisMap[float]:
+        assert self._current_settings
+        hold_currents: OT3AxisMap[float] = {}
+        for axis, settings in self._current_settings.items():
+            hold_currents[axis] = settings.hold_current
+        return hold_currents
 
     async def setup_motors(self) -> None:
         """Set up the motors."""
@@ -238,7 +272,15 @@ class OT3Controller:
             }
         }
 
-    def set_active_current(self, axis_currents: OT3AxisMap[float]) -> None:
+    async def set_default_currents(self) -> None:
+        """Set both run and hold currents from robot config to each node."""
+        assert self._current_settings, "Invalid current settings"
+        await set_currents(
+            self._messenger,
+            {axis_to_node(k): v.as_tuple() for k, v in self._current_settings.items()},
+        )
+
+    async def set_active_current(self, axis_currents: OT3AxisMap[float]) -> None:
         """Set the active current.
 
         Args:
@@ -247,7 +289,28 @@ class OT3Controller:
         Returns:
             None
         """
-        return None
+        assert self._current_settings, "Invalid current settings"
+        await set_run_current(
+            self._messenger, {axis_to_node(k): v for k, v in axis_currents.items()}
+        )
+        for axis, current in axis_currents.items():
+            self._current_settings[axis].run_current = current
+
+    async def set_hold_current(self, axis_currents: OT3AxisMap[float]) -> None:
+        """Set the hold current for motor.
+
+        Args:
+            axis_currents: Axes' currents
+
+        Returns:
+            None
+        """
+        assert self._current_settings, "Invalid current settings"
+        await set_hold_current(
+            self._messenger, {axis_to_node(k): v for k, v in axis_currents.items()}
+        )
+        for axis, current in axis_currents.items():
+            self._current_settings[axis].hold_current = current
 
     @contextmanager
     def save_current(self) -> Generator[None, None, None]:

@@ -72,7 +72,7 @@ class MoveGroupRunner:
         """
         await can_messenger.send(
             node_id=NodeId.broadcast,
-            message=ClearAllMoveGroupsRequest(payload=EmptyPayload()),
+            message=ClearAllMoveGroupsRequest(),
         )
 
     async def _send_groups(self, can_messenger: CanMessenger) -> None:

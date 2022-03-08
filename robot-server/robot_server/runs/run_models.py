@@ -137,3 +137,12 @@ class RunUpdate(BaseModel):
             " Setting `current` to `false` will deactivate the run."
         ),
     )
+
+
+class LabwareDefinitionSummary(BaseModel):
+    """Summary of data about a created labware definition."""
+
+    definitionUri: str = Field(
+        ...,
+        description="The definition's unique resource identifier in the run.",
+    )

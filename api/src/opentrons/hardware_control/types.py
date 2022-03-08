@@ -245,6 +245,15 @@ AxisMapValue = TypeVar("AxisMapValue")
 OT3AxisMap = Dict[OT3Axis, AxisMapValue]
 
 
+@dataclass
+class CurrentConfig:
+    hold_current: float
+    run_current: float
+
+    def as_tuple(self) -> Tuple[float, float]:
+        return (self.hold_current, self.run_current)
+
+
 class DoorState(enum.Enum):
     OPEN = False
     CLOSED = True

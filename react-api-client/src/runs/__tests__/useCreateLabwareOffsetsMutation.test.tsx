@@ -23,7 +23,7 @@ const DEFINITION_URI = 'definition_uri'
 const LABWARE_LOCATION = { slotName: '4' }
 const OFFSET = { x: 1, y: 2, z: 3 }
 
-describe('useCreateCommandMutation hook', () => {
+describe('useCreateLabwareOffsetMutation hook', () => {
   let wrapper: React.FunctionComponent<{}>
   let labwareOffset: LabwareOffsetCreateData
 

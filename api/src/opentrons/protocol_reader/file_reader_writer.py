@@ -47,7 +47,7 @@ class FileReaderWriter:
                 contents = await f.read()
                 data: Optional[BufferedJsonFileData] = None
 
-                if input_file.filename.endswith(".json"):
+                if input_file.filename.lower().endswith(".json"):
                     try:
                         data = parse_raw_as(BufferedJsonFileData, contents)  # type: ignore[arg-type]  # noqa: E501
 

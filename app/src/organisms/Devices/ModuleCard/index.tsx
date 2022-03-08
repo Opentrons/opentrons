@@ -22,6 +22,7 @@ import {
 import {
   getModuleDisplayName,
   MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
@@ -124,6 +125,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         marginBottom={SPACING_2}
         marginLeft={SPACING_2}
         width={'20rem'}
+        data-testid={`module_card_${module.serial}`}
       >
         {showSlideout && (
           <ModuleSlideout
@@ -153,12 +155,16 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 fontWeight={FONT_WEIGHT_REGULAR}
                 fontSize={FONT_SIZE_CAPTION}
                 paddingBottom={SPACING.spacing2}
+                data-testid={`module_card_usb_port_${module.serial}`}
               >
                 {t(module.usbPort.port === null ? 'usb_hub' : 'usb_port', {
                   port: module.usbPort.hub ?? module.usbPort.port,
                 })}
               </Text>
-              <Flex paddingBottom={SPACING.spacing2}>
+              <Flex
+                paddingBottom={SPACING.spacing2}
+                data-testid={`module_card_display_name_${module.serial}`}
+              >
                 <ModuleIcon moduleType={module.type} />
                 <Text fontSize={TYPOGRAPHY.fontSizeP}>
                   {getModuleDisplayName(module.model)}
@@ -169,7 +175,11 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           </Flex>
         </Box>
 
-        <Box alignSelf={ALIGN_START} padding={SPACING.spacing2}>
+        <Box
+          alignSelf={ALIGN_START}
+          padding={SPACING.spacing2}
+          data-testid={`module_card_overflow_btn_${module.serial}`}
+        >
           <OverflowBtn
             aria-label="overflow"
             onClick={() => {
@@ -178,7 +188,10 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           />
         </Box>
         {showOverflowMenu && (
-          <div ref={moduleOverflowWrapperRef}>
+          <div
+            ref={moduleOverflowWrapperRef}
+            data-testid={`module_card_overflow_menu_${module.serial}`}
+          >
             <ModuleOverflowMenu
               handleAboutClick={handleAboutClick}
               module={module}
@@ -217,7 +230,7 @@ const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
         isExpanded={showSlideout}
       />
     )
-  } else {
+  } else if (module.type === TEMPERATURE_MODULE_TYPE) {
     return (
       <TemperatureModuleSlideout
         model={module.model}
@@ -226,5 +239,8 @@ const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
         isExpanded={showSlideout}
       />
     )
+  } else {
+    // TODO(sh, 2022-02-28): render heater shaker slideout
+    return <div>Heater Shaker Slide</div>
   }
 }

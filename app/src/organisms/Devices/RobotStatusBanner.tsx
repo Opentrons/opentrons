@@ -39,7 +39,7 @@ export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
       {/* TODO: link to specific run page when built out */}
       <Link
         to={`/devices/${name}/protocol-runs/run`}
-        data-testid={`RobotStatusBanner_${name}_active_run_link`}
+        id="RobotStatusBanner_goToRun"
       >
         {t('go_to_run')}
       </Link>
@@ -50,13 +50,13 @@ export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
     <Flex flexDirection={DIRECTION_COLUMN}>
       {/* robot_model can be seen in the health response, but only for "connectable" robots.
   Probably best to leave as "OT-2" for now */}
-      <Text data-testid={`RobotStatusBanner_${name}_model`}>OT-2</Text>
+      <Text id="RobotStatusBanner_robotModel">OT-2</Text>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
         <Flex paddingBottom={SPACING_3}>
           <Text
             as="span"
             marginRight={SPACING_3}
-            data-testid={`RobotStatusBanner_${name}_name`}
+            id="RobotStatusBanner_robotName"
           >
             {name}
           </Text>

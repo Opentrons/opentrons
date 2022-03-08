@@ -1,7 +1,12 @@
 """Shared utilities for ot3 hardware control."""
 from typing import Dict, Iterable, List, Tuple, TypeVar
-from opentrons.config.types import OT3MotionSettings, GantryLoad
-from opentrons.hardware_control.types import OT3Axis, OT3AxisKind, OT3AxisMap
+from opentrons.config.types import OT3MotionSettings, OT3CurrentSettings, GantryLoad
+from opentrons.hardware_control.types import (
+    OT3Axis,
+    OT3AxisKind,
+    OT3AxisMap,
+    CurrentConfig,
+)
 import numpy as np
 
 from opentrons_hardware.firmware_bindings.constants import NodeId
@@ -84,6 +89,21 @@ def axis_is_node(axis: OT3Axis) -> bool:
         return True
     except KeyError:
         return False
+
+
+def get_current_settings(
+    config: OT3CurrentSettings,
+    gantry_load: GantryLoad,
+) -> OT3AxisMap[CurrentConfig]:
+    conf_by_pip = config.by_gantry_load(gantry_load)
+    currents = {}
+    for axis_kind in [OT3AxisKind.P, OT3AxisKind.X, OT3AxisKind.Y, OT3AxisKind.Z]:
+        for axis in OT3Axis.of_kind(axis_kind):
+            currents[axis] = CurrentConfig(
+                conf_by_pip["hold_current"][axis_kind],
+                conf_by_pip["run_current"][axis_kind],
+            )
+    return currents
 
 
 def get_system_constraints(
