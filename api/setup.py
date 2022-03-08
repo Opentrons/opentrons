@@ -65,6 +65,7 @@ INSTALL_REQUIRES = [
     "pydantic==1.8.2",
     "pyserial==3.5",
     "typing-extensions==3.10.0.0",
+    "click>=8.0.0,<9",
 ]
 
 
@@ -101,6 +102,7 @@ if __name__ == "__main__":
             "console_scripts": [
                 "opentrons_simulate = opentrons.simulate:main",
                 "opentrons_execute = opentrons.execute:main",
+                "opentrons = opentrons.cli:main",
             ]
         },
         project_urls={
