@@ -93,7 +93,6 @@ export const migrateFile = (appData: ProtocolFileV5<{}>): ProtocolFile<{}> => {
 
     const migratedV5Command: CreateCommand = {
       commandType: command.command === 'airGap' ? 'aspirate' : command.command,
-      // @ts-expect-error: make "key" an optional param on CreateCommand types
       key: uuid(),
       params: command.params,
     }
