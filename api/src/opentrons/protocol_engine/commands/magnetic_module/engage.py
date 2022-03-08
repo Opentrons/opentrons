@@ -93,17 +93,17 @@ class EngageImplementation(AbstractCommandImpl[EngageParams, EngageResult]):
             EngageHeightOutOfRangeError: If the given height is unreachable.
         """
         # Allow propagation of ModuleDoesNotExistError.
-        model = self._state_store.modules.get_model(module_id=magnetic_module_id)
+        model = self._state_view.modules.get_model(module_id=magnetic_module_id)
 
         # Allow propagation of WrongModuleTypeError and EngageHeightOutOfRangeError.
-        hardware_height = self._state_store.modules.calculate_magnet_hardware_height(
+        hardware_height = self._state_view.modules.calculate_magnet_hardware_height(
             magnetic_module_model=model,
             mm_from_base=mm_from_base,
         )
 
-        if not self._state_store.get_configs().use_virtual_modules:
+        if not self._state_view.get_configs().use_virtual_modules:
             # Allow propagation of ModuleNotAttachedError.
-            hardware_module = self._state_store.modules.find_loaded_hardware_module(
+            hardware_module = self._state_view.modules.find_loaded_hardware_module(
                 module_id=magnetic_module_id,
                 attached_modules=self._hardware_api.attached_modules,
                 expected_type=MagDeck,
