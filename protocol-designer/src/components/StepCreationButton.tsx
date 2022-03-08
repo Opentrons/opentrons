@@ -27,6 +27,7 @@ import {
 } from './modals/ConfirmDeleteModal'
 import { Portal } from './portals/MainPageModalPortal'
 import { stepIconsByType, StepType } from '../form-types'
+import { selectors as featureFlagSelectors } from '../feature-flags'
 import styles from './listButtons.css'
 
 interface StepButtonComponentProps {
@@ -147,22 +148,45 @@ export const StepCreationButton = (): JSX.Element => {
   ): ReturnType<typeof stepsActions.addAndSelectStepWithHints> =>
     dispatch(stepsActions.addAndSelectStepWithHints({ stepType }))
 
-  const items = getSupportedSteps().map(stepType => (
-    <StepButtonItem
-      key={stepType}
-      stepType={stepType}
-      disabled={!isStepTypeEnabled[stepType]}
-      onClick={() => {
-        setExpanded(false)
+  const enableHeaterShaker = useSelector(
+    featureFlagSelectors.getEnabledHeaterShaker
+  )
 
-        if (currentFormIsPresaved || formHasChanges) {
-          setEnqueuedStepType(stepType)
-        } else {
-          addStep(stepType)
-        }
-      }}
-    />
-  ))
+  const items = enableHeaterShaker
+    ? getSupportedSteps().map(stepType => (
+        <StepButtonItem
+          key={stepType}
+          stepType={stepType}
+          disabled={!isStepTypeEnabled[stepType]}
+          onClick={() => {
+            setExpanded(false)
+
+            if (currentFormIsPresaved || formHasChanges) {
+              setEnqueuedStepType(stepType)
+            } else {
+              addStep(stepType)
+            }
+          }}
+        />
+      ))
+    : getSupportedSteps().map(stepType =>
+        stepType === 'heaterShaker' ? null : (
+          <StepButtonItem
+            key={stepType}
+            stepType={stepType}
+            disabled={!isStepTypeEnabled[stepType]}
+            onClick={() => {
+              setExpanded(false)
+
+              if (currentFormIsPresaved || formHasChanges) {
+                setEnqueuedStepType(stepType)
+              } else {
+                addStep(stepType)
+              }
+            }}
+          />
+        )
+      )
 
   return (
     <>
