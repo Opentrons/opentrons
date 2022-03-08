@@ -15,7 +15,7 @@ from opentrons.hardware_control.types import (
     MustHomeError,
 )
 from opentrons.hardware_control.robot_calibration import RobotCalibration
-from opentrons_hardware.hardware_control.motion_planning.move_utils import (
+from hardware.opentrons_hardware.hardware_control.motion_planning.move_utils import (
     MoveConditionNotMet,
 )
 from opentrons.hardware_control.types import OT3Axis
