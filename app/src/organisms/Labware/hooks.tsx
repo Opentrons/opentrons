@@ -1,6 +1,7 @@
-import { useSelector } from 'react-redux'
-import { getCustomLabware } from '../../redux/custom-labware'
+import { useSelector, useDispatch } from 'react-redux'
+import { getCustomLabware, addCustomLabware } from '../../redux/custom-labware'
 import { getAllDefinitions } from './helpers/definitions'
+import type { Dispatch } from '../../redux/types'
 
 import type { LabwareDefinition2 as LabwareDefiniton } from '@opentrons/shared-data'
 
@@ -25,4 +26,10 @@ export function useGetAllLabware(): LabwareDefAndDate[] {
   )
 
   return fullLabwareList
+}
+
+export function useAddLabware(): () => void {
+  const dispatch = useDispatch<Dispatch>()
+  const handleAddLabware = (): unknown => dispatch(addCustomLabware())
+  return handleAddLabware
 }

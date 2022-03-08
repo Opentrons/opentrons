@@ -9,6 +9,7 @@ import {
 import { StyledText } from '../../atoms/text'
 import { Slideout } from '../../atoms/Slideout'
 import { PrimaryButton } from '../../atoms/Buttons'
+import { useAddLabware } from './hooks'
 
 export interface AddCustomLabwareProps {
   isExpanded: boolean
@@ -30,7 +31,9 @@ export function AddCustomLabware(props: AddCustomLabwareProps): JSX.Element {
         gridGap={SPACING.spacing4}
       >
         <StyledText as="p">{t('choose_file_to_upload')}</StyledText>
-        <PrimaryButton>{t('choose_file')}</PrimaryButton>
+        <PrimaryButton onClick={useAddLabware()}>
+          {t('choose_file')}
+        </PrimaryButton>
       </Flex>
     </Slideout>
   )
