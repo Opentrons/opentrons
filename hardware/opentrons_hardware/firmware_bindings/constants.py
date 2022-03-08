@@ -84,6 +84,9 @@ class MessageId(int, Enum):
     write_motor_driver_register_request = 0x30
     read_motor_driver_register_request = 0x31
     read_motor_driver_register_response = 0x32
+    write_motor_current_request = 0x33
+    read_motor_current_request = 0x34
+    read_motor_current_response = 0x35
 
     read_presence_sensing_voltage_request = 0x600
     read_presence_sensing_voltage_response = 0x601

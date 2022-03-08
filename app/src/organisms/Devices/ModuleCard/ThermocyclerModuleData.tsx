@@ -77,7 +77,10 @@ export const ThermocyclerModuleData = (
 
   return (
     <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-      <Flex flexDirection={DIRECTION_COLUMN}>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        data-testid={`thermocycler_module_data_lid`}
+      >
         <Text
           textTransform={TEXT_TRANSFORM_UPPERCASE}
           color={C_HARBOR_GRAY}
@@ -101,7 +104,11 @@ export const ThermocyclerModuleData = (
           {t('current_temp', { temp: lidTemp })}
         </Text>
       </Flex>
-      <Flex flexDirection={DIRECTION_COLUMN} marginLeft={SPACING_4}>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        marginLeft={SPACING_4}
+        data-testid={`thermocycler_module_data_block`}
+      >
         <Text
           textTransform={TEXT_TRANSFORM_UPPERCASE}
           color={C_HARBOR_GRAY}

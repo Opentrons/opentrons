@@ -3,6 +3,7 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import type {
   LabwareDefinition2,
@@ -59,12 +60,19 @@ export interface ThermocyclerModuleState {
   lidOpen: boolean | null // if false, closed. If null, unknown
 }
 
+export interface HeaterShakerModuleState {
+  type: typeof HEATERSHAKER_MODULE_TYPE
+  targetTemp: number | null
+  targetSpeed: number | null
+  latchOpen: boolean | null
+}
 export interface ModuleTemporalProperties {
   slot: DeckSlot
   moduleState:
     | MagneticModuleState
     | TemperatureModuleState
     | ThermocyclerModuleState
+    | HeaterShakerModuleState
 }
 
 export interface LabwareEntity {

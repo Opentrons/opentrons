@@ -46,36 +46,6 @@ describe('robot selectors', () => {
       state = setIn(state, 'robot.connection.connectedTo', 'foo')
       expect(selectors.getConnectedRobotName(state)).toEqual('foo')
     })
-
-    it('getConnectionStatus', () => {
-      state = setIn(state, 'robot.connection', {
-        connectedTo: '',
-        connectRequest: { inProgress: false },
-        disconnectRequest: { inProgress: false },
-      })
-      expect(selectors.getConnectionStatus(state)).toBe(constants.DISCONNECTED)
-
-      state = setIn(state, 'robot.connection', {
-        connectedTo: '',
-        connectRequest: { inProgress: true },
-        disconnectRequest: { inProgress: false },
-      })
-      expect(selectors.getConnectionStatus(state)).toBe(constants.CONNECTING)
-
-      state = setIn(state, 'robot.connection', {
-        connectedTo: 'foo',
-        connectRequest: { inProgress: false },
-        disconnectRequest: { inProgress: false },
-      })
-      expect(selectors.getConnectionStatus(state)).toBe(constants.CONNECTED)
-
-      state = setIn(state, 'robot.connection', {
-        connectedTo: 'foo',
-        connectRequest: { inProgress: false },
-        disconnectRequest: { inProgress: true },
-      })
-      expect(selectors.getConnectionStatus(state)).toBe(constants.DISCONNECTING)
-    })
   })
 
   it('getSessionCapabilities', () => {

@@ -577,12 +577,13 @@ export function useLabwarePositionCheck(
             .map(loadLabwareCommand => loadLabwareCommand.result.definition)
         : []
 
-    customLabwareDefinitions.forEach(labwareDef =>
+    // TODO(mc, 2022-03-04): https://github.com/Opentrons/opentrons/issues/9624
+    customLabwareDefinitions.forEach(labwareDef => {
       createLabwareDefinition({
         runId: currentRunId,
         data: labwareDef,
       })
-    )
+    })
 
     // execute prep commands
     prepCommands.forEach(prepCommand => {

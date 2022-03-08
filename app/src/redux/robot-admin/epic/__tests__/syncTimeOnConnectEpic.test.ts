@@ -3,7 +3,7 @@ import { subSeconds, differenceInSeconds, parseISO } from 'date-fns'
 
 import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 import { GET, PUT } from '../../../robot-api'
-import { actions as RobotActions } from '../../../robot'
+import * as Robot from '../../../robot'
 import {
   mockFetchSystemTimeSuccess,
   mockFetchSystemTimeFailure,
@@ -13,7 +13,7 @@ import { syncTimeOnConnectEpic } from '../syncTimeOnConnectEpic'
 import type { Action } from '../../../types'
 
 const createConnectAction = (robotName: string): Action =>
-  RobotActions.legacyConnect(robotName) as any
+  Robot.connect(robotName)
 
 const createTimeSuccessResponse = (
   time: Date

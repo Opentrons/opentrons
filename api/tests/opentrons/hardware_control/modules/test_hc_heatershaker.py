@@ -13,9 +13,8 @@ from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
 def usb_port():
     return USBPort(
         name="",
-        sub_names=[],
         hub=None,
-        port_number=None,
+        port_number=0,
         device_path="/dev/ot_module_sim_heatershaker0",
     )
 

@@ -171,6 +171,15 @@ class ReadMotorDriverRegisterResponsePayload(utils.BinarySerializable):
 
 
 @dataclass
+class MotorCurrentPayload(utils.BinarySerializable):
+    """Read motor current register payload."""
+
+    # All values in milliAmps
+    hold_current: utils.UInt32Field
+    run_current: utils.UInt32Field
+
+
+@dataclass
 class ReadPresenceSensingVoltageResponsePayload(utils.BinarySerializable):
     """Read head presence sensing voltage response payload."""
 
