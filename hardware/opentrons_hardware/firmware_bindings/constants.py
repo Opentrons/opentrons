@@ -151,3 +151,4 @@ class SensorType(int, Enum):
     capacitive = 0x01
     humidity = 0x02
     temperature = 0x03
+    pressure = 0x04
