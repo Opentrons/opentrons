@@ -354,8 +354,28 @@ def test_find_loaded_hardware_module_raises_if_match_not_attached(
         )
 
 
-# To do:
-# Raises if wrong type
+def test_find_loaded_hardware_module_raises_if_match_is_wrong_type(
+    decoy: Decoy, magdeck_v1_def: ModuleDefinition
+) -> None:
+    """It should raise if a match was found but is of an unexpected type."""
+    matching = make_hardware_module(decoy=decoy, serial_number="serial-matching")
+    subject = make_module_view(
+        hardware_module_by_slot={
+            DeckSlotName.SLOT_1: HardwareModule(
+                serial_number="serial-matching",
+                definition=magdeck_v1_def,
+            ),
+        },
+        slot_by_module_id={
+            "id-matching": DeckSlotName.SLOT_1,
+        },
+    )
+    with pytest.raises(errors.WrongModuleTypeError):
+        result = subject.find_loaded_hardware_module(
+            module_id="id-matching",
+            attached_modules=[matching],
+            expected_type=int,  # type: ignore[type-var]
+        )
 
 
 def test_select_hardware_module_to_load_rejects_missing() -> None:
