@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "01109b763ec8d12df22344e89daf93ccb78f67e0f6d01ad1f361264eaa5e4fce"
+            "sha256": "e06a12561a1d494251b13648bf51b69854a8c1e0ef7a1308156b464c3bc43d74"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -478,11 +478,11 @@
         },
         "importlib-metadata": {
             "hashes": [
-                "sha256:175f4ee440a0317f6e8d81b7f8d4869f93316170a65ad2b007d2929186c8052c",
-                "sha256:e0bc84ff355328a4adfc5240c4f211e0ab386f80aa640d1b11f0618a1d282094"
+                "sha256:b36ffa925fe3139b2f6ff11d6925ffd4fa7bc47870165e3ac260ac7b4f91e6ac",
+                "sha256:d16e8c1deb60de41b8e8ed21c1a7b947b0bc62fab7e1d470bcdf331cea2e6735"
             ],
             "markers": "python_version < '3.8'",
-            "version": "==4.11.1"
+            "version": "==4.11.2"
         },
         "iniconfig": {
             "hashes": [
@@ -701,6 +701,14 @@
             ],
             "index": "pypi",
             "version": "==2.10.1"
+        },
+        "pytest-lazy-fixture": {
+            "hashes": [
+                "sha256:0e7d0c7f74ba33e6e80905e9bfd81f9d15ef9a790de97993e34213deb5ad10ac",
+                "sha256:e0b379f38299ff27a653f03eaa69b08a6fd4484e46fd1c9907d984b9f9daeda6"
+            ],
+            "index": "pypi",
+            "version": "==0.6.3"
         },
         "snowballstemmer": {
             "hashes": [
