@@ -3,7 +3,8 @@ import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 from decoy import Decoy
 
-from typing import Optional, Dict
+from contextlib import nullcontext
+from typing import ContextManager, Dict, NamedTuple, Optional, Type, Union
 
 from opentrons.hardware_control.modules import AbstractModule, TempDeck
 from opentrons.types import DeckSlotName
@@ -219,6 +220,85 @@ def test_calculate_magnet_height(module_model: ModuleModel) -> None:
         )
         == 110
     )
+
+
+class CalculateMagnetHardwareHeightTestParams(NamedTuple):
+    model: ModuleModel
+    mm_from_base: float
+    expected_result: Optional[float]
+    expected_exception_type: Union[Type[Exception], None]
+
+
+@pytest.mark.parametrize(
+    "model, mm_from_base, expected_result, expected_exception_type",
+    [
+        # Happy case:
+        CalculateMagnetHardwareHeightTestParams(
+            model=ModuleModel.MAGNETIC_MODULE_V1,
+            mm_from_base=10,
+            # TODO(mm, 2022-03-09): It's unclear if this expected result is correct.
+            # https://github.com/Opentrons/opentrons/issues/9585
+            expected_result=25,
+            expected_exception_type=None,
+        ),
+        CalculateMagnetHardwareHeightTestParams(
+            model=ModuleModel.MAGNETIC_MODULE_V2,
+            mm_from_base=10,
+            expected_result=12.5,
+            expected_exception_type=None,
+        ),
+        # Bad model:
+        CalculateMagnetHardwareHeightTestParams(
+            model=ModuleModel.TEMPERATURE_MODULE_V1,
+            mm_from_base=0,
+            expected_result=None,
+            expected_exception_type=errors.WrongModuleTypeError,
+        ),
+        # Height very far rout of bounds:
+        CalculateMagnetHardwareHeightTestParams(
+            model=ModuleModel.MAGNETIC_MODULE_V1,
+            mm_from_base=9999999,
+            expected_result=None,
+            expected_exception_type=errors.EngageHeightOutOfRangeError,
+        ),
+        CalculateMagnetHardwareHeightTestParams(
+            model=ModuleModel.MAGNETIC_MODULE_V1,
+            mm_from_base=-9999999,
+            expected_result=None,
+            expected_exception_type=errors.EngageHeightOutOfRangeError,
+        ),
+        CalculateMagnetHardwareHeightTestParams(
+            model=ModuleModel.MAGNETIC_MODULE_V2,
+            mm_from_base=9999999,
+            expected_result=None,
+            expected_exception_type=errors.EngageHeightOutOfRangeError,
+        ),
+        CalculateMagnetHardwareHeightTestParams(
+            model=ModuleModel.MAGNETIC_MODULE_V2,
+            mm_from_base=-9999999,
+            expected_result=None,
+            expected_exception_type=errors.EngageHeightOutOfRangeError,
+        ),
+    ],
+)
+def test_calculate_magnet_hardware_height(
+    model: ModuleModel,
+    mm_from_base: float,
+    expected_result: float,
+    expected_exception_type: Union[Type[Exception], None],
+) -> None:
+    subject = make_module_view()
+    context: ContextManager[None] = (
+        # Not sure why mypy has trouble with this.
+        nullcontext()  # type: ignore[assignment]
+        if expected_exception_type is None
+        else pytest.raises(expected_exception_type)
+    )
+    with context:
+        result = subject.calculate_magnet_hardware_height(
+            magnetic_module_model=model, mm_from_base=mm_from_base
+        )
+        assert result == expected_result
 
 
 @pytest.mark.parametrize(
