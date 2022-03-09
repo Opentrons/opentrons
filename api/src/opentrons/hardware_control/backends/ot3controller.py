@@ -4,6 +4,7 @@ from __future__ import annotations
 import asyncio
 from contextlib import contextmanager
 import logging
+import numpy as np
 from typing import (
     Dict,
     List,
@@ -224,7 +225,7 @@ class OT3Controller:
         speed_settings = (
             self._configuration.motion_settings.max_speed_discontinuity.none
         )
-        velocities = {ax: speed_settings[OT3Axis.to_kind(ax)] for ax in axes}
+        velocities = {ax: np.float64(-1 * speed_settings[OT3Axis.to_kind(ax)]) for ax in axes}
         group = create_home_group(distances, velocities)
         runner = MoveGroupRunner(move_groups=[group])
         await runner.run(can_messenger=self._messenger)

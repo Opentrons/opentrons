@@ -113,7 +113,7 @@ def create_home_step(
             distance_mm=distance[axis],
             acceleration_mm_sec_sq=0,
             velocity_mm_sec=velocity[axis],
-            duration_sec=distance[axis] / velocity[axis],
+            duration_sec=abs(distance[axis] / velocity[axis]),
             stop_condition=MoveStopCondition.limit_switch,
             move_type=MoveType.home,
         )
