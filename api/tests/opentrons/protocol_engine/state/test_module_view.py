@@ -222,7 +222,7 @@ def test_calculate_magnet_height(module_model: ModuleModel) -> None:
     )
 
 
-class CalculateMagnetHardwareHeightTestParams(NamedTuple):
+class _CalculateMagnetHardwareHeightTestParams(NamedTuple):
     model: ModuleModel
     mm_from_base: float
     expected_result: Optional[float]
@@ -233,7 +233,7 @@ class CalculateMagnetHardwareHeightTestParams(NamedTuple):
     "model, mm_from_base, expected_result, expected_exception_type",
     [
         # Happy case:
-        CalculateMagnetHardwareHeightTestParams(
+        _CalculateMagnetHardwareHeightTestParams(
             model=ModuleModel.MAGNETIC_MODULE_V1,
             mm_from_base=10,
             # TODO(mm, 2022-03-09): It's unclear if this expected result is correct.
@@ -241,39 +241,39 @@ class CalculateMagnetHardwareHeightTestParams(NamedTuple):
             expected_result=25,
             expected_exception_type=None,
         ),
-        CalculateMagnetHardwareHeightTestParams(
+        _CalculateMagnetHardwareHeightTestParams(
             model=ModuleModel.MAGNETIC_MODULE_V2,
             mm_from_base=10,
             expected_result=12.5,
             expected_exception_type=None,
         ),
         # Bad model:
-        CalculateMagnetHardwareHeightTestParams(
+        _CalculateMagnetHardwareHeightTestParams(
             model=ModuleModel.TEMPERATURE_MODULE_V1,
             mm_from_base=0,
             expected_result=None,
             expected_exception_type=errors.WrongModuleTypeError,
         ),
         # Height very far rout of bounds:
-        CalculateMagnetHardwareHeightTestParams(
+        _CalculateMagnetHardwareHeightTestParams(
             model=ModuleModel.MAGNETIC_MODULE_V1,
             mm_from_base=9999999,
             expected_result=None,
             expected_exception_type=errors.EngageHeightOutOfRangeError,
         ),
-        CalculateMagnetHardwareHeightTestParams(
+        _CalculateMagnetHardwareHeightTestParams(
             model=ModuleModel.MAGNETIC_MODULE_V1,
             mm_from_base=-9999999,
             expected_result=None,
             expected_exception_type=errors.EngageHeightOutOfRangeError,
         ),
-        CalculateMagnetHardwareHeightTestParams(
+        _CalculateMagnetHardwareHeightTestParams(
             model=ModuleModel.MAGNETIC_MODULE_V2,
             mm_from_base=9999999,
             expected_result=None,
             expected_exception_type=errors.EngageHeightOutOfRangeError,
         ),
-        CalculateMagnetHardwareHeightTestParams(
+        _CalculateMagnetHardwareHeightTestParams(
             model=ModuleModel.MAGNETIC_MODULE_V2,
             mm_from_base=-9999999,
             expected_result=None,
@@ -287,6 +287,7 @@ def test_calculate_magnet_hardware_height(
     expected_result: float,
     expected_exception_type: Union[Type[Exception], None],
 ) -> None:
+    """It should return the expected height or raise the expected exception."""
     subject = make_module_view()
     context: ContextManager[None] = (
         # Not sure why mypy has trouble with this.
@@ -452,7 +453,7 @@ def test_find_loaded_hardware_module_raises_if_match_is_wrong_type(
         },
     )
     with pytest.raises(errors.WrongModuleTypeError):
-        result = subject.find_loaded_hardware_module(
+        subject.find_loaded_hardware_module(
             module_id="id-matching",
             attached_modules=[matching],
             expected_type=TempDeck,  # Will definitely not match.
