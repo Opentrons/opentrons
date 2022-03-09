@@ -4,7 +4,7 @@ import json
 import logging
 from logging.config import dictConfig
 import argparse
-import numpy as np
+import numpy as np  # type: ignore[import]
 
 from opentrons_hardware.hardware_control.motion_planning import move_manager
 from opentrons_hardware.hardware_control.motion_planning.types import (
@@ -112,11 +112,12 @@ def main() -> None:
         "origin": list(vectorize(origin)),
     }
 
-    def myconverter(obj):
+    def myconverter(obj: Any) -> Any:
         if isinstance(obj, np.integer):
             return int(obj)
         elif isinstance(obj, np.floating):
             return float(obj)
+        return obj
 
     with open(args.output, "w") as f:
         json.dump(output, f, indent=2, default=myconverter)
