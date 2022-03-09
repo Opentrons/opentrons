@@ -237,7 +237,7 @@ class _CalculateMagnetHardwareHeightTestParams(NamedTuple):
 @pytest.mark.parametrize(
     "model, mm_from_base, expected_result, expected_exception_type",
     [
-        # Happy case:
+        # Happy cases:
         _CalculateMagnetHardwareHeightTestParams(
             model=ModuleModel.MAGNETIC_MODULE_V1,
             mm_from_base=10,
@@ -252,37 +252,68 @@ class _CalculateMagnetHardwareHeightTestParams(NamedTuple):
             expected_result=12.5,
             expected_exception_type=None,
         ),
+        # Boundary conditions:
+        #
+        # TODO(mm, 2022-03-09):
+        # In Python >=3.9, improve precision with math.nextafter().
+        # Also consider relying on shared constants instead of hard-coding bounds.
+        #
+        # TODO(mm, 2022-03-09): It's unclear if the bounds used for V1 modules
+        # are physically correct. https://github.com/Opentrons/opentrons/issues/9585
+        _CalculateMagnetHardwareHeightTestParams(  # V1 barely too low.
+            model=ModuleModel.MAGNETIC_MODULE_V1,
+            mm_from_base=-2.51,
+            expected_result=None,
+            expected_exception_type=errors.EngageHeightOutOfRangeError,
+        ),
+        _CalculateMagnetHardwareHeightTestParams(  # V1 lowest allowed.
+            model=ModuleModel.MAGNETIC_MODULE_V1,
+            mm_from_base=-2.5,
+            expected_result=0,
+            expected_exception_type=None,
+        ),
+        _CalculateMagnetHardwareHeightTestParams(  # V1 highest allowed.
+            model=ModuleModel.MAGNETIC_MODULE_V1,
+            mm_from_base=20,
+            expected_result=45,
+            expected_exception_type=None,
+        ),
+        _CalculateMagnetHardwareHeightTestParams(  # V1 barely too high.
+            model=ModuleModel.MAGNETIC_MODULE_V1,
+            mm_from_base=20.01,
+            expected_result=None,
+            expected_exception_type=errors.EngageHeightOutOfRangeError,
+        ),
+        _CalculateMagnetHardwareHeightTestParams(  # V2 barely too low.
+            model=ModuleModel.MAGNETIC_MODULE_V2,
+            mm_from_base=-2.51,
+            expected_result=None,
+            expected_exception_type=errors.EngageHeightOutOfRangeError,
+        ),
+        _CalculateMagnetHardwareHeightTestParams(  # V2 lowest allowed.
+            model=ModuleModel.MAGNETIC_MODULE_V2,
+            mm_from_base=-2.5,
+            expected_result=0,
+            expected_exception_type=None,
+        ),
+        _CalculateMagnetHardwareHeightTestParams(  # V2 highest allowed.
+            model=ModuleModel.MAGNETIC_MODULE_V2,
+            mm_from_base=22.5,
+            expected_result=25,
+            expected_exception_type=None,
+        ),
+        _CalculateMagnetHardwareHeightTestParams(  # V2 barely too high.
+            model=ModuleModel.MAGNETIC_MODULE_V2,
+            mm_from_base=22.51,
+            expected_result=None,
+            expected_exception_type=errors.EngageHeightOutOfRangeError,
+        ),
         # Bad model:
         _CalculateMagnetHardwareHeightTestParams(
             model=ModuleModel.TEMPERATURE_MODULE_V1,
             mm_from_base=0,
             expected_result=None,
             expected_exception_type=errors.WrongModuleTypeError,
-        ),
-        # Height very far rout of bounds:
-        _CalculateMagnetHardwareHeightTestParams(
-            model=ModuleModel.MAGNETIC_MODULE_V1,
-            mm_from_base=9999999,
-            expected_result=None,
-            expected_exception_type=errors.EngageHeightOutOfRangeError,
-        ),
-        _CalculateMagnetHardwareHeightTestParams(
-            model=ModuleModel.MAGNETIC_MODULE_V1,
-            mm_from_base=-9999999,
-            expected_result=None,
-            expected_exception_type=errors.EngageHeightOutOfRangeError,
-        ),
-        _CalculateMagnetHardwareHeightTestParams(
-            model=ModuleModel.MAGNETIC_MODULE_V2,
-            mm_from_base=9999999,
-            expected_result=None,
-            expected_exception_type=errors.EngageHeightOutOfRangeError,
-        ),
-        _CalculateMagnetHardwareHeightTestParams(
-            model=ModuleModel.MAGNETIC_MODULE_V2,
-            mm_from_base=-9999999,
-            expected_result=None,
-            expected_exception_type=errors.EngageHeightOutOfRangeError,
         ),
     ],
 )
