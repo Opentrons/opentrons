@@ -7,6 +7,13 @@ export interface StoredProtocolDir {
   analysisFilePaths: string[]
 }
 
+export interface StoredProtocolData {
+  protocolId: string
+  modified: number
+  srcFileNames: string[]
+  analysisFiles: string[]
+}
+
 // state types
 
 export interface ProtocolStorageState {
@@ -32,7 +39,7 @@ export interface FetchProtocolsAction {
 
 export interface UpdateProtocolListAction {
   type: 'protocolStorage:UPDATE_PROTOCOL_LIST'
-  payload: StoredProtocolDir[]
+  payload: StoredProtocolData[]
   meta: { source: ProtocolListActionSource }
 }
 
