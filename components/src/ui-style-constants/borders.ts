@@ -13,3 +13,9 @@ export const tabBorder = css`
 `
 
 export const lineBorder = `${spacingXXS} ${styleSolid} ${medGrey}`
+export const cardOutlineBorder = css`
+  border-style: ${styleSolid};
+  border-width: ${spacingXXS};
+  border-color: ${medGrey};
+  border-radius: ${radiusSoftCorners};
+`
