@@ -34,7 +34,7 @@ describe('useCreateLiveCommandMutation hook', () => {
     resetAllWhenMocks()
   })
 
-  it('should issue the given command to the given run when callback is called', async () => {
+  it('should issue the given live command when callback is called', async () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockCreateLiveCommand)
       .calledWith(HOST_CONFIG, mockAnonLoadCommand, {})
