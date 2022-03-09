@@ -2,18 +2,15 @@ import fse from 'fs-extra'
 import { shell } from 'electron'
 
 import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
-import * as ProtocolStorage from '@opentrons/app/src/redux/protocol-storage'
+import * as ProtocolStorageActions from '@opentrons/app/src/redux/protocol-storage/actions'
 
 import * as FileSystem from './file-system'
 
 import type { ProtocolListActionSource as ListSource } from '@opentrons/app/src/redux/protocol-storage/types'
 
 import type { Action, Dispatch } from '../types'
-import { createLogger } from '@opentrons/app/src/logger'
 
 const ensureDir: (dir: string) => Promise<void> = fse.ensureDir
-
-const log = createLogger('discovery')
 
 const fetchProtocols = (
   dispatch: Dispatch,
@@ -27,29 +24,37 @@ const fetchProtocols = (
     )
     .then(FileSystem.parseProtocolDirs)
     .then(storedProtocols => {
-      log.info('\n\n PROTOCOL: ', FileSystem.PROTOCOLS_DIRECTORY_PATH)
-      log.info('\n\n files: ', storedProtocols)
-      dispatch(ProtocolStorage.updateProtocolList(storedProtocols, source))
+      const storedProtocolsData = storedProtocols.map(storedProtocolDir => ({
+        protocolId: storedProtocolDir.dirPath,
+        modified: storedProtocolDir.modified,
+        srcFileNames: storedProtocolDir.srcFilePaths,
+        analysisFiles: storedProtocolDir.analysisFilePaths,
+      }))
+      dispatch(
+        ProtocolStorageActions.updateProtocolList(storedProtocolsData, source)
+      )
     })
     .catch((error: Error) => {
-      dispatch(ProtocolStorage.updateProtocolListFailure(error.message, source))
+      dispatch(
+        ProtocolStorageActions.updateProtocolListFailure(error.message, source)
+      )
     })
 }
 
 export function registerProtocolStorage(dispatch: Dispatch): Dispatch {
   return function handleActionForProtocolStorage(action: Action) {
     switch (action.type) {
-      case ProtocolStorage.FETCH_PROTOCOLS:
+      case ProtocolStorageActions.FETCH_PROTOCOLS:
       case UI_INITIALIZED: {
         const source =
-          action.type === ProtocolStorage.FETCH_PROTOCOLS
-            ? ProtocolStorage.POLL
-            : ProtocolStorage.INITIAL
+          action.type === ProtocolStorageActions.FETCH_PROTOCOLS
+            ? ProtocolStorageActions.POLL
+            : ProtocolStorageActions.INITIAL
         fetchProtocols(dispatch, source)
         break
       }
 
-      case ProtocolStorage.ADD_PROTOCOL: {
+      case ProtocolStorageActions.ADD_PROTOCOL: {
         FileSystem.addProtocolFile(
           action.payload.protocolFile.path,
           FileSystem.PROTOCOLS_DIRECTORY_PATH
@@ -58,7 +63,7 @@ export function registerProtocolStorage(dispatch: Dispatch): Dispatch {
         break
       }
 
-      case ProtocolStorage.OPEN_PROTOCOL_DIRECTORY: {
+      case ProtocolStorageActions.OPEN_PROTOCOL_DIRECTORY: {
         shell.openPath(FileSystem.PROTOCOLS_DIRECTORY_PATH)
         break
       }

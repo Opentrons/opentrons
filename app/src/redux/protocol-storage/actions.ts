@@ -38,7 +38,7 @@ export const fetchProtocols = (): Types.FetchProtocolsAction => ({
 })
 
 export const updateProtocolList = (
-  payload: Types.StoredProtocolDir[],
+  payload: Types.StoredProtocolData[],
   source: Types.ProtocolListActionSource = POLL
 ): Types.UpdateProtocolListAction => ({
   type: UPDATE_PROTOCOL_LIST,
