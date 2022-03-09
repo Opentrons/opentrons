@@ -43,7 +43,7 @@ def make_hardware_module(decoy: Decoy, serial_number: str) -> AbstractModule:
     """
     hardware_module = decoy.mock(cls=AbstractModule)
     # "type: ignore" to override what's normally a read-only property.
-    hardware_module.device_info = {"serial": "serial-matching"}  # type: ignore[misc]
+    hardware_module.device_info = {"serial": serial_number}  # type: ignore[misc]
     return hardware_module
 
 
@@ -284,7 +284,7 @@ def test_find_loaded_hardware_module(
     subject = make_module_view(
         hardware_module_by_slot={
             DeckSlotName.SLOT_1: HardwareModule(
-                serial_number="serial-non-maching",
+                serial_number="serial-non-matching",
                 definition=magdeck_v1_def,
             ),
             DeckSlotName.SLOT_2: HardwareModule(
@@ -321,8 +321,8 @@ def test_find_loaded_hardware_module_raises_if_no_match_loaded(
         hardware_module_by_slot={},
         slot_by_module_id={},
     )
-    with pytest.raises(ModuleNotFoundError):
-        result = subject.find_loaded_hardware_module(
+    with pytest.raises(errors.ModuleDoesNotExistError):
+        subject.find_loaded_hardware_module(
             module_id="module-id",
             attached_modules=[],
             # https://github.com/python/mypy/issues/4717
@@ -334,7 +334,6 @@ def test_find_loaded_hardware_module_raises_if_match_not_attached(
     decoy: Decoy, magdeck_v1_def: ModuleDefinition
 ) -> None:
     """It should raise if a match was loaded but is not found in the attached list."""
-    matching = make_hardware_module(decoy=decoy, serial_number="serial-matching")
     subject = make_module_view(
         hardware_module_by_slot={
             DeckSlotName.SLOT_1: HardwareModule(
@@ -347,7 +346,7 @@ def test_find_loaded_hardware_module_raises_if_match_not_attached(
         },
     )
     with pytest.raises(errors.ModuleNotAttachedError):
-        result = subject.find_loaded_hardware_module(
+        subject.find_loaded_hardware_module(
             module_id="id-matching",
             attached_modules=[],
             # https://github.com/python/mypy/issues/4717
