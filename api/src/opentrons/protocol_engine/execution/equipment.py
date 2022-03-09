@@ -216,9 +216,9 @@ class EquipmentHandler:
 
         else:
             attached_module = HardwareModule(
-                # TODO(mc, 2022-02-14): use something a little more obvious
-                # than an opaque UUID for the virtual serial number
-                serial_number=self._model_utils.generate_id(),
+                serial_number=self._model_utils.generate_id(
+                    prefix="fake-serial-number-"
+                ),
                 definition=self._module_data_provider.get_definition(model),
             )
 
