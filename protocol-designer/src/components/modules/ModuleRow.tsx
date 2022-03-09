@@ -15,6 +15,7 @@ import {
   DEFAULT_MODEL_FOR_MODULE_TYPE,
 } from '../../constants'
 import { ModuleDiagram } from './ModuleDiagram'
+import { ModuleIcon } from './ModuleIcon'
 import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.css'
 
@@ -103,6 +104,7 @@ export function ModuleRow(props: Props): JSX.Element {
   return (
     <div>
       <h4 className={styles.row_title}>
+        <ModuleIcon moduleType={type} />
         {i18n.t(`modules.module_display_names.${type}`)}
       </h4>
       <div className={styles.module_row}>
