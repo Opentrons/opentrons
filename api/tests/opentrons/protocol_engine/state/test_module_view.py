@@ -5,7 +5,7 @@ from decoy import Decoy
 
 from typing import Optional, Dict
 
-from opentrons.hardware_control.modules import AbstractModule
+from opentrons.hardware_control.modules import AbstractModule, TempDeck
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
@@ -202,6 +202,7 @@ def test_calculate_magnet_height(module_model: ModuleModel) -> None:
     # that its heights are halved. If the limit switch hardware is the same for both
     # modules, we'd expect the backoff difference to cause a difference in the
     # height_from_home test, even though we're measuring everything in true mm.
+    # https://github.com/Opentrons/opentrons/issues/9585
     assert (
         subject.calculate_magnet_height(
             module_model=module_model,
@@ -374,7 +375,7 @@ def test_find_loaded_hardware_module_raises_if_match_is_wrong_type(
         result = subject.find_loaded_hardware_module(
             module_id="id-matching",
             attached_modules=[matching],
-            expected_type=int,  # type: ignore[type-var]
+            expected_type=TempDeck  # Will definitely not match.
         )
 
 
