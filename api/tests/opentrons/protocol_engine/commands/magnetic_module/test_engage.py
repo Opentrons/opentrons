@@ -1,5 +1,6 @@
 """Test magnetic module engage commands."""
 
+import pytest
 from decoy import Decoy
 
 from opentrons.hardware_control import HardwareControlAPI
@@ -15,10 +16,12 @@ from opentrons.protocol_engine.commands.magnetic_module.engage import (
 )
 
 
+@pytest.mark.parametrize("use_virtual_modules", [True, False])
 async def test_magnetic_module_engage_implementation(
     decoy: Decoy,
     state_view: StateView,
     hardware_api: HardwareControlAPI,
+    use_virtual_modules: bool,
 ) -> None:
     """It should calculate the proper hardware height and engage."""
     subject = EngageImplementation(state_view=state_view, hardware_api=hardware_api)
@@ -52,10 +55,12 @@ async def test_magnetic_module_engage_implementation(
     decoy.when(state_view.get_configs()).then_return(
         EngineConfigs(
             ignore_pause=False,
-            use_virtual_modules=False,
+            use_virtual_modules=use_virtual_modules,
         )
     )
 
     result = await subject.execute(params=params)
-    decoy.verify(await match.engage(9001))
+
+    decoy.verify(await match.engage(9001), times=(0 if use_virtual_modules else 1))
+
     assert result == EngageResult()
