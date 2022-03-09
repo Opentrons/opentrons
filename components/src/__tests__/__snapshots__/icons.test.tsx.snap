@@ -1517,30 +1517,6 @@ exports[`icons ot-thermocycler renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons ot-thermocycler-v2 renders correctly 1`] = `
-.c0.spin {
-  -webkit-animation: GLFYz 0.8s steps(8) infinite;
-  animation: GLFYz 0.8s steps(8) infinite;
-  -webkit-transform-origin: center;
-  -ms-transform-origin: center;
-  transform-origin: center;
-}
-
-<svg
-  aria-hidden="true"
-  className="sc-fznyAO c0 foo"
-  fill="currentColor"
-  version="1.1"
-  viewBox="0 0 16 22"
-  xmlns="http://www.w3.org/2000/svg"
->
-  <path
-    d="M8 5V8L12 4L8 0V3C3.58172 3 0 6.58172 0 11C0 12.57 0.459998 14.03 1.24 15.26L2.7 13.8C2.25 12.97 2 12 2 11C2 7.68629 4.68629 5 8 5ZM14.76 6.73999L13.3 8.20001C13.74 9.04001 14 10 14 11C14 14.3137 11.3137 17 8 17V14L4 18L8 22V19C12.4183 19 16 15.4183 16 11C16 9.43 15.54 7.96999 14.76 6.73999Z"
-    fillRule="evenodd"
-  />
-</svg>
-`;
-
 exports[`icons ot-toggle-field-off renders correctly 1`] = `
 .c0.spin {
   -webkit-animation: GLFYz 0.8s steps(8) infinite;
