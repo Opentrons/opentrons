@@ -87,9 +87,9 @@ export const stepIconsByType: Record<StepType, IconName> = {
   pause: 'pause',
   manualIntervention: 'pause',
   // TODO Ian 2018-12-13 pause icon for this is a placeholder
-  magnet: 'ot-magnet',
-  temperature: 'ot-temperature',
-  thermocycler: 'ot-thermocycler',
+  magnet: 'ot-magnet-v2',
+  temperature: 'ot-temperature-v2',
+  thermocycler: 'ot-thermocycler-v2',
   heaterShaker: 'ot-heater-shaker',
 }
 // ===== Unprocessed form types =====
