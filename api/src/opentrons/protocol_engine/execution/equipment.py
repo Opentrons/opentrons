@@ -216,7 +216,9 @@ class EquipmentHandler:
 
         else:
             attached_module = HardwareModule(
-                serial_number=self._model_utils.generate_fake_serial_number(),
+                serial_number=self._model_utils.generate_id(
+                    prefix="fake-serial-number-"
+                ),
                 definition=self._module_data_provider.get_definition(model),
             )
 
