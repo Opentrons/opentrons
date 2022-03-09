@@ -455,7 +455,7 @@ def test_find_loaded_hardware_module_raises_if_match_is_wrong_type(
         result = subject.find_loaded_hardware_module(
             module_id="id-matching",
             attached_modules=[matching],
-            expected_type=TempDeck  # Will definitely not match.
+            expected_type=TempDeck,  # Will definitely not match.
         )
 
 
