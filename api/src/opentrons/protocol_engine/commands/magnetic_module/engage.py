@@ -1,12 +1,20 @@
 """Magnetic Module engage command request, result, and implementation models."""
 
 
-from typing import Optional
+from __future__ import annotations
+
+from typing import Optional, TYPE_CHECKING
 from typing_extensions import Literal, Type
 
 from pydantic import BaseModel, Field
 
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.modules import MagDeck
+
+if TYPE_CHECKING:
+    from opentrons.protocol_engine.state import StateView
 
 
 EngageCommandType = Literal["magneticModule/engageMagnet"]
@@ -51,11 +59,56 @@ class EngageResult(BaseModel):
 class EngageImplementation(AbstractCommandImpl[EngageParams, EngageResult]):
     """The implementation of a Magnetic Module engage command."""
 
+    def __init__(
+        self,
+        state_view: StateView,
+        hardware_api: HardwareControlAPI,
+        **unused_dependencies: object,
+    ) -> None:
+        self._state_view = state_view
+        self._hardware_api = hardware_api
+
     async def execute(self, params: EngageParams) -> EngageResult:
         """Execute a Magnetic Module engage command."""
-        raise NotImplementedError(
-            "Protocol Engine does not yet support engaging magnets."
+        await self._engage_magnets(
+            magnetic_module_id=params.moduleId,
+            mm_from_base=params.engageHeight,
         )
+        return EngageResult()
+
+    async def _engage_magnets(
+        self,
+        magnetic_module_id: str,
+        mm_from_base: float,
+    ) -> None:
+        """Engage a loaded Magnetic Module's magnets.
+
+        Raises:
+            ModuleDoesNotExistError: If the given module ID doesn't point to a
+                module that's already been loaded.
+            WrongModuleTypeError: If the given module ID points to a non-Magnetic
+                module.
+            ModuleNotAttachedError: If the given module ID points to a valid loaded
+                Magnetic Module, but that module's hardware wasn't found attached.
+            EngageHeightOutOfRangeError: If the given height is unreachable.
+        """
+        # Allow propagation of ModuleDoesNotExistError.
+        model = self._state_view.modules.get_model(module_id=magnetic_module_id)
+
+        # Allow propagation of WrongModuleTypeError and EngageHeightOutOfRangeError.
+        hardware_height = self._state_view.modules.calculate_magnet_hardware_height(
+            magnetic_module_model=model,
+            mm_from_base=mm_from_base,
+        )
+
+        if not self._state_view.get_configs().use_virtual_modules:
+            # Allow propagation of ModuleNotAttachedError.
+            hardware_module = self._state_view.modules.find_loaded_hardware_module(
+                module_id=magnetic_module_id,
+                attached_modules=self._hardware_api.attached_modules,
+                expected_type=MagDeck,
+            )
+            await hardware_module.engage(height=hardware_height)
 
 
 class Engage(BaseCommand[EngageParams, EngageResult]):

@@ -1,15 +1,23 @@
 """Base command data model and type definitions."""
+
+
 from __future__ import annotations
+
 from abc import ABC, abstractmethod
-from enum import Enum
 from datetime import datetime
-from pydantic import BaseModel, Field
-from pydantic.generics import GenericModel
+from enum import Enum
 from typing import TYPE_CHECKING, Generic, Optional, TypeVar
 
-# convenience type alias to work around type-only circular dependency
+from pydantic import BaseModel, Field
+from pydantic.generics import GenericModel
+
+from opentrons.hardware_control import HardwareControlAPI
+
+# Work around type-only circular dependencies.
 if TYPE_CHECKING:
     from opentrons.protocol_engine import execution
+    from opentrons.protocol_engine.state import StateView
+
 
 CommandParamsT = TypeVar("CommandParamsT", bound=BaseModel)
 
@@ -106,6 +114,8 @@ class AbstractCommandImpl(
 
     def __init__(
         self,
+        state_view: StateView,
+        hardware_api: HardwareControlAPI,
         equipment: execution.EquipmentHandler,
         movement: execution.MovementHandler,
         pipetting: execution.PipettingHandler,

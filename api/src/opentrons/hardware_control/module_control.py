@@ -6,7 +6,7 @@ from typing import List, Tuple, Optional, Union, Awaitable, cast, TYPE_CHECKING
 from glob import glob
 
 from opentrons.config import IS_ROBOT, IS_LINUX
-from opentrons.drivers.rpi_drivers import types, usb, usb_simulator
+from opentrons.drivers.rpi_drivers import types, interfaces, usb, usb_simulator
 from opentrons.hardware_control.emulation.module_server.helpers import (
     listen_module_connection,
 )
@@ -30,21 +30,27 @@ class AttachedModulesControl:
     """
 
     def __init__(
-        self, api: Union["API", "OT3API"], board_revision: BoardRevision
+        self,
+        api: Union["API", "OT3API"],
+        usb: interfaces.USBDriverInterface,
     ) -> None:
         self._available_modules: List[modules.AbstractModule] = []
         self._api = api
-        self._usb = (
-            usb.USBBus(board_revision)
-            if not api.is_simulator and IS_ROBOT
-            else usb_simulator.USBBusSimulator(board_revision)
-        )
+        self._usb = usb
 
     @classmethod
     async def build(
-        cls, api_instance: Union["API", "OT3API"], board_revision: BoardRevision
+        cls,
+        api_instance: Union["API", "OT3API"],
+        board_revision: BoardRevision,
     ) -> AttachedModulesControl:
-        mc_instance = cls(api_instance, board_revision)
+        usb_instance = (
+            usb.USBBus(board_revision)
+            if not api_instance.is_simulator and IS_ROBOT
+            else usb_simulator.USBBusSimulator()
+        )
+        mc_instance = cls(api=api_instance, usb=usb_instance)
+
         if not api_instance.is_simulator:
             # Do an initial scan of modules.
             await mc_instance.register_modules(mc_instance.scan())
@@ -103,6 +109,9 @@ class AttachedModulesControl:
                 f"Module {removed_mod.name()} detached" f" from port {removed_mod.port}"
             )
             await removed_mod.cleanup()
+        self._available_modules = sorted(
+            self._available_modules, key=modules.AbstractModule.sort_key
+        )
 
     async def register_modules(
         self,
@@ -123,10 +132,10 @@ class AttachedModulesControl:
 
         # destroy removed mods
         await self.unregister_modules(removed_mods_at_ports)
-        sorted_mods_at_port = self._usb.match_virtual_ports(new_mods_at_ports)
+        unsorted_mods_at_port = self._usb.match_virtual_ports(new_mods_at_ports)
 
         # build new mods
-        for mod in sorted_mods_at_port:
+        for mod in unsorted_mods_at_port:
             new_instance = await self.build_module(
                 port=mod.port,
                 usb_port=mod.usb_port,
@@ -138,6 +147,9 @@ class AttachedModulesControl:
                 f"Module {mod.name} discovered and attached"
                 f" at port {mod.port}, new_instance: {new_instance}"
             )
+        self._available_modules = sorted(
+            self._available_modules, key=modules.AbstractModule.sort_key
+        )
 
     async def parse_modules(
         self,
@@ -176,7 +188,7 @@ class AttachedModulesControl:
                     Awaitable[modules.AbstractModule],
                     module_builder(
                         port="",
-                        usb_port=self._usb.find_port(""),
+                        usb_port=types.USBPort(name="", port_number=0),
                         simulating=True,
                         loop=self._api.loop,
                         execution_manager=self._api._execution_manager,

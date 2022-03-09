@@ -1,10 +1,13 @@
 """Basic modules data state and store."""
 from dataclasses import dataclass
-from typing import Dict, List, NamedTuple, Optional, Sequence, overload
+from typing import Dict, List, NamedTuple, Optional, Sequence, Type, TypeVar, overload
 from numpy import array, dot
 
+from opentrons.hardware_control.modules import AbstractModule
 from opentrons.hardware_control.modules.magdeck import (
+    engage_height_is_in_range,
     OFFSET_TO_LABWARE_BOTTOM as MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM,
+    MAX_ENGAGE_HEIGHT as MAGNETIC_MODULE_MAX_ENGAGE_HEIGHT,
 )
 from opentrons.types import DeckSlotName
 
@@ -107,8 +110,10 @@ class ModuleView(HasState[ModuleState]):
             slot_name = self._state.slot_by_module_id[module_id]
             attached_module = self._state.hardware_module_by_slot[slot_name]
 
-        except KeyError:
-            raise errors.ModuleDoesNotExistError(f"Module {module_id} not found.")
+        except KeyError as e:
+            raise errors.ModuleDoesNotExistError(
+                f"Module {module_id} not found."
+            ) from e
 
         return LoadedModule.construct(
             id=module_id,
@@ -295,6 +300,58 @@ class ModuleView(HasState[ModuleState]):
             assert offset_from_labware_default is not None
             return labware_default_height + offset_from_labware_default
 
+    @staticmethod
+    def calculate_magnet_hardware_height(
+        magnetic_module_model: ModuleModel, mm_from_base: float
+    ) -> float:
+        """Convert a human-friendly magnet height to be hardware-friendly.
+
+        Args:
+            magnetic_module_model: The model of Magnetic Module to calculate
+                a height for.
+            mm_from_base: The height to convert. Measured in how far the tops
+                of the magnets are above the labware base plane.
+
+        Returns:
+            The same height, with its units and origin point converted
+            so that it's suitable to pass to `MagDeck.engage()`.
+
+        Raises:
+            WrongModuleTypeError: If the given model is not a Magnetic Module.
+            EngageHeightOutOfRangeError: If modules of the given model are
+                physically incapable of reaching the requested height.
+        """
+        if magnetic_module_model not in [
+            ModuleModel.MAGNETIC_MODULE_V1,
+            ModuleModel.MAGNETIC_MODULE_V2,
+        ]:
+            raise errors.WrongModuleTypeError(
+                f"{magnetic_module_model} is not a Magnetic Module."
+            )
+
+        hardware_units_from_base = (
+            mm_from_base * 2
+            if magnetic_module_model == ModuleModel.MAGNETIC_MODULE_V1
+            else mm_from_base
+        )
+        home_to_base_offset = MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM[
+            magnetic_module_model
+        ]
+        hardware_units_from_home = home_to_base_offset + hardware_units_from_base
+        if not engage_height_is_in_range(
+            model=magnetic_module_model, height=hardware_units_from_home
+        ):
+            # TODO(mm, 2022-03-02): This error message probably will not match how
+            # the user specified the height. (Hardware units versus mm,
+            # home as origin versus labware base as origin.) This may be confusing
+            # depending on how it propagates up.
+            raise errors.EngageHeightOutOfRangeError(
+                f"Invalid engage height for"
+                f" {magnetic_module_model}: {hardware_units_from_home}. Must be"
+                f" 0 - {MAGNETIC_MODULE_MAX_ENGAGE_HEIGHT[magnetic_module_model]}."
+            )
+        return hardware_units_from_home
+
     def should_dodge_thermocycler(
         self,
         from_slot: DeckSlotName,
@@ -313,7 +370,56 @@ class ModuleView(HasState[ModuleState]):
                 return True
         return False
 
-    def find_attached_module(
+    _ModuleT = TypeVar("_ModuleT", bound=AbstractModule)
+
+    def find_loaded_hardware_module(
+        self,
+        module_id: str,
+        attached_modules: List[AbstractModule],
+        expected_type: Type[_ModuleT],
+    ) -> _ModuleT:
+        """Return the hardware module that corresponds to a Protocol Engine module ID.
+
+        Should not be called when the ``use_virtual_modules`` engine config is True,
+        since loaded modules will have no associated hardware modules.
+
+        Args:
+            module_id: The Protocol Engine ID of a loaded module to search for.
+            attached_modules: The list of currently attached hardware modules,
+                as returned by the hardware API.
+            expected_type: The Python type (class) that you expect the matching
+                hardware module to have.
+
+        Returns:
+            The element of ``attached_hardware_modules`` that corresponds to
+            the given ``module_id`.
+
+        Raises:
+            ModuleDoesNotExistError: If module_id has not been loaded.
+            ModuleNotAttachedError: If module_id has been loaded, but none of the
+                attached hardware modules match it.
+            WrongModuleTypeError: If a matching hardware module was found,
+                but it isn't an instance of ``expected_type``.
+        """
+        # May raise ModuleDoesNotExistError.
+        serial_number = self.get_serial_number(module_id=module_id)
+
+        for candidate in attached_modules:
+            if candidate.device_info["serial"] == serial_number:
+                if isinstance(candidate, expected_type):
+                    return candidate
+                else:
+                    raise errors.WrongModuleTypeError(
+                        f'Module with serial number "{serial_number}"'
+                        f' and Protocol Engine ID "{module_id}"'
+                        f' is type "{type(candidate)}", but expected "{expected_type}".'
+                    )
+        raise errors.ModuleNotAttachedError(
+            f'No module attached with serial number "{serial_number}'
+            f' for Protocol Engine module ID "{module_id}".'
+        )
+
+    def select_hardware_module_to_load(
         self,
         model: ModuleModel,
         location: DeckSlotLocation,

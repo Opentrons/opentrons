@@ -2,3 +2,4 @@
 *.json
 # ...unless specifically allowed.
 !motion_params.json
+!currents_config.json

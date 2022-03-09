@@ -1,5 +1,12 @@
 """Magnetic Module protocol commands."""
 
+from .disengage import (
+    Disengage,
+    DisengageCreate,
+    DisengageParams,
+    DisengageResult,
+    DisengageCommandType,
+)
 from .engage import (
     Engage,
     EngageCreate,
@@ -8,7 +15,14 @@ from .engage import (
     EngageCommandType,
 )
 
+
 __all__ = [
+    # magneticModule/disengageMagnet
+    "Disengage",
+    "DisengageCreate",
+    "DisengageParams",
+    "DisengageResult",
+    "DisengageCommandType",
     # magneticModule/engageMagnet
     "Engage",
     "EngageCreate",

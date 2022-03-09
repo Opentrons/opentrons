@@ -45,6 +45,7 @@ export function PrivacySettings(): JSX.Element {
         size={SIZE_2}
         toggledOn={analyticsOptedIn}
         onClick={() => dispatch(toggleAnalyticsOptedIn())}
+        id="PrivacySettings_analytics"
       />
     </Flex>
   )

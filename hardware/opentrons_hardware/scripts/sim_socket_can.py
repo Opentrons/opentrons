@@ -7,6 +7,8 @@ import asyncio
 from logging.config import dictConfig
 from typing import List
 
+from opentrons_hardware.drivers.can_bus.errors import CanError
+from opentrons_hardware.drivers.can_bus.socket_driver import SocketDriver
 
 log = logging.getLogger(__name__)
 
@@ -14,13 +16,11 @@ log = logging.getLogger(__name__)
 class ConnectionHandler:
     """The class that manages client connections."""
 
-    _writers: List[asyncio.StreamWriter]
-
-    BYTES_TO_READ = 64 + 4 + 4  # Max data size + arbitration id + total size
+    _connections: List[SocketDriver]
 
     def __init__(self) -> None:
         """Constructor."""
-        self._writers = []
+        self._connections = []
 
     async def __call__(
         self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter
@@ -28,22 +28,26 @@ class ConnectionHandler:
         """Server accept connection callback."""
         log.info("Handling new connection")
 
-        self._writers.append(writer)
+        driver = SocketDriver(reader, writer)
 
-        while True:
-            data = await reader.read(self.BYTES_TO_READ)
-            if not data:
-                log.warning("client disconnected.")
+        self._connections.append(driver)
+
+        while not reader.at_eof():
+            try:
+                data = await driver.read()
+            except CanError as e:
+                log.error(f"Read error: {e}.")
                 break
 
-            log.info("Read %d bytes", len(data))
+            log.info(f"Read message: {data}")
 
-            for w in self._writers:
-                if w != writer:
-                    w.write(data)
+            for d in self._connections:
+                # Send to everyone else.
+                if d != driver:
+                    await d.send(data)
 
-        self._writers.remove(writer)
-        writer.close()
+        self._connections.remove(driver)
+        driver.shutdown()
 
 
 async def run(port: int) -> None:

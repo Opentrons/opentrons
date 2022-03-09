@@ -72,7 +72,11 @@ export const HeaterShakerModuleData = (
     <>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
         {showTemperatureData && (
-          <Flex flexDirection={DIRECTION_COLUMN} marginRight={SPACING.spacing6}>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            marginRight={SPACING.spacing6}
+            data-testid={`heater_shaker_module_data_temp`}
+          >
             <Text
               textTransform={TEXT_TRANSFORM_UPPERCASE}
               color={COLORS.darkGreyEnabled}
@@ -100,7 +104,10 @@ export const HeaterShakerModuleData = (
             </Text>
           </Flex>
         )}
-        <Flex flexDirection={DIRECTION_COLUMN}>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          data-testid={`heater_shaker_module_data_shaker`}
+        >
           <Text
             textTransform={TEXT_TRANSFORM_UPPERCASE}
             color={COLORS.darkGreyEnabled}
@@ -128,7 +135,10 @@ export const HeaterShakerModuleData = (
           </Text>
         </Flex>
       </Flex>
-      <Flex flexDirection={DIRECTION_ROW}>
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        data-testid={`heater_shaker_module_data_latch`}
+      >
         <Flex flexDirection={DIRECTION_COLUMN}>
           <Text
             textTransform={TEXT_TRANSFORM_UPPERCASE}
