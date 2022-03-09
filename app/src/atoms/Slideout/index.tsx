@@ -66,7 +66,7 @@ const COLLAPSED_STYLE = css`
 export const Slideout = (props: Props): JSX.Element | null => {
   return (
     <>
-      <Overlay />
+      {props.isExpanded ? <Overlay /> : null}
       <Box
         css={props.isExpanded ? EXPANDED_STYLE : COLLAPSED_STYLE}
         position={POSITION_ABSOLUTE}
@@ -76,10 +76,17 @@ export const Slideout = (props: Props): JSX.Element | null => {
         boxShadow={'0px 3px 6px rgba(0, 0, 0, 0.23)'}
         borderRadius={SPACING_1}
       >
-        <Flex padding={SPACING_3} flexDirection={DIRECTION_COLUMN}>
+        <Flex
+          paddingY={SPACING_3}
+          width="19.5rem"
+          flexDirection={DIRECTION_COLUMN}
+        >
           <Flex
             flexDirection={DIRECTION_ROW}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
+            alignItems={ALIGN_CENTER}
+            paddingX={SPACING_3}
+            marginBottom={SPACING_3}
           >
             <Text
               fontSize={TYPOGRAPHY.fontSizeH2}
@@ -99,14 +106,14 @@ export const Slideout = (props: Props): JSX.Element | null => {
               </Btn>
             </Flex>
           </Flex>
-        </Flex>
-        <Divider margin={SPACING_1} color={COLORS.medGrey} />
-        <Flex
-          padding={SPACING_3}
-          flexDirection={DIRECTION_COLUMN}
-          data-testid={`Slideout_body_${props.title}`}
-        >
-          {props.children}
+          <Divider marginY={0} color={COLORS.medGrey} />
+          <Flex
+            paddingX={SPACING_3}
+            flexDirection={DIRECTION_COLUMN}
+            data-testid={`Slideout_body_${props.title}`}
+          >
+            {props.children}
+          </Flex>
         </Flex>
       </Box>
     </>
