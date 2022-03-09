@@ -208,7 +208,7 @@ class EquipmentHandler:
                 for hw_mod in self._hardware_api.attached_modules
             ]
 
-            attached_module = self._state_store.modules.find_attached_module(
+            attached_module = self._state_store.modules.select_hardware_module_to_load(
                 model=model,
                 location=location,
                 attached_modules=attached_modules,
