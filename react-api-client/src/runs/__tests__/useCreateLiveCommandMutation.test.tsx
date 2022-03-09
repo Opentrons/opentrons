@@ -13,7 +13,7 @@ import type { HostConfig } from '@opentrons/api-client'
 jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')
 
-const mockCreateCommand = createLiveCommand as jest.MockedFunction<
+const mockCreateLiveCommand = createLiveCommand as jest.MockedFunction<
   typeof createLiveCommand
 >
 const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
@@ -36,7 +36,7 @@ describe('useCreateLiveCommandMutation hook', () => {
 
   it('should issue the given command to the given run when callback is called', async () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockCreateCommand)
+    when(mockCreateLiveCommand)
       .calledWith(HOST_CONFIG, mockAnonLoadCommand, {})
       .mockResolvedValue({ data: 'something' } as any)
 
@@ -62,7 +62,7 @@ describe('useCreateLiveCommandMutation hook', () => {
     const waitUntilComplete = true
     const timeout = 2000
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockCreateCommand)
+    when(mockCreateLiveCommand)
       .calledWith(HOST_CONFIG, mockAnonLoadCommand, {
         waitUntilComplete,
         timeout,
