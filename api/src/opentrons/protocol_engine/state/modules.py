@@ -110,8 +110,10 @@ class ModuleView(HasState[ModuleState]):
             slot_name = self._state.slot_by_module_id[module_id]
             attached_module = self._state.hardware_module_by_slot[slot_name]
 
-        except KeyError:
-            raise errors.ModuleDoesNotExistError(f"Module {module_id} not found.")
+        except KeyError as e:
+            raise errors.ModuleDoesNotExistError(
+                f"Module {module_id} not found."
+            ) from e
 
         return LoadedModule.construct(
             id=module_id,
