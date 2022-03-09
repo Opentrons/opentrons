@@ -5,7 +5,7 @@ import {
   Text,
   DIRECTION_COLUMN,
   ALIGN_CENTER,
-  SPACING_6,
+  SPACING,
 } from '@opentrons/components'
 
 import { UploadInput } from './UploadInput'
@@ -17,7 +17,8 @@ export function ProtocolsEmptyState(): JSX.Element | null {
       flexDirection={DIRECTION_COLUMN}
       alignItems={ALIGN_CENTER}
       width="100%"
-      paddingTop={SPACING_6}
+      padding={SPACING.spacing4}
+      paddingTop={SPACING.spacing6}
     >
       <Text role="complementary" as="h4">
         {t('import_a_file')}
@@ -27,7 +28,7 @@ export function ProtocolsEmptyState(): JSX.Element | null {
           console.log('todo')
         }}
       />
-      <EmptyStateLinks />
+      <EmptyStateLinks title={t('no_protocol_yet')} />
     </Flex>
   )
 }

@@ -12,7 +12,7 @@ describe('EmptyStateLinks', () => {
     render = () => {
       return renderWithProviders(
         <BrowserRouter>
-          <EmptyStateLinks />
+          <EmptyStateLinks title="Don't have a protocol yet?" />
         </BrowserRouter>,
         {
           i18nInstance: i18n,
