@@ -45,12 +45,15 @@ export function ProtocolsList(): JSX.Element | null {
         title={t('import_new_protocol')}
         isExpanded={showSlideout}
         onCloseClick={() => setShowSlideout(false)}
+        height="100%"
       >
-        <UploadInput
-          onUpload={() => {
-            console.log('todo')
-          }}
-        />
+        <Box height="26rem">
+          <UploadInput
+            onUpload={() => {
+              console.log('todo')
+            }}
+          />
+        </Box>
       </Slideout>
     </Box>
   )
