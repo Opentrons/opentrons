@@ -156,7 +156,7 @@
   height: 1.55rem;
   margin-right: 0.25rem;
   border-radius: 2px;
-  border: 1px solid var(--c-med-gray);
+  border: 1.5px solid #000000;
   cursor: pointer;
 }
 
