@@ -317,7 +317,7 @@ class ModuleView(HasState[ModuleState]):
             so that it's suitable to pass to `MagDeck.engage()`.
 
         Raises:
-            WrongModuleTypeErrror: If the given model is not a Magnetic Module.
+            WrongModuleTypeError: If the given model is not a Magnetic Module.
             EngageHeightOutOfRangeError: If modules of the given model are
                 physically incapable of reaching the requested height.
         """
