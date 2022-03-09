@@ -40,7 +40,7 @@ describe('LabwareCard', () => {
     getByText('mock RobotWorkSpace')
     getByText('Well Plate')
     getByText('Mock Definition')
-    getByText(`Opentron's Definition`)
+    getByText(`Opentrons Definition`)
     getByText('API Name')
     getByRole('button', { name: 'mock_definition' })
   })
