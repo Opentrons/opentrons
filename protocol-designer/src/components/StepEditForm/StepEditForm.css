@@ -163,7 +163,7 @@
 .path_option.selected {
   background-color: var(--c-light-gray);
   border-radius: 2px;
-  border: 1.5px solid #000000;
+  border: 1.5px solid #000;
 }
 
 .path_option.disabled {
