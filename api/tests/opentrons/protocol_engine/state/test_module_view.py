@@ -4,9 +4,9 @@ from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 from decoy import Decoy
 
 from contextlib import nullcontext
-from typing import ContextManager, Dict, NamedTuple, Optional, Type, Union
+from typing import ContextManager, Dict, NamedTuple, Optional, Type, TypeVar, Union
 
-from opentrons.hardware_control.modules import AbstractModule, TempDeck
+from opentrons.hardware_control.modules import AbstractModule, MagDeck, TempDeck
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
@@ -35,14 +35,19 @@ def make_module_view(
     return ModuleView(state=state)
 
 
-def make_hardware_module(decoy: Decoy, serial_number: str) -> AbstractModule:
-    """Return a mock hardware module with the specified serial number.
+HardwareModuleT = TypeVar("HardwareModuleT", bound=AbstractModule)
+
+
+def make_hardware_module(
+    decoy: Decoy, type: Type[HardwareModuleT], serial_number: str
+) -> HardwareModuleT:
+    """Return a mock hardware module with the specified type and serial number.
 
     Ideally, we wouldn't use mocks for this, since our subject uses these objects
     as pure input data, and doesn't call anything behavioral on them.
     But it's prohibitively difficult to instantiate these objects in tests otherwise.
     """
-    hardware_module = decoy.mock(cls=AbstractModule)
+    hardware_module = decoy.mock(cls=type)
     # "type: ignore" to override what's normally a read-only property.
     hardware_module.device_info = {"serial": serial_number}  # type: ignore[misc]
     return hardware_module
@@ -353,12 +358,14 @@ def test_find_loaded_hardware_module(
     decoy: Decoy, magdeck_v1_def: ModuleDefinition
 ) -> None:
     """It should return the matching hardware module."""
-    matching = make_hardware_module(decoy=decoy, serial_number="serial-matching")
+    matching = make_hardware_module(
+        decoy=decoy, type=MagDeck, serial_number="serial-matching"
+    )
     non_matching = make_hardware_module(
-        decoy=decoy, serial_number="serial-non-matching"
+        decoy=decoy, type=MagDeck, serial_number="serial-non-matching"
     )
     another_non_matching = make_hardware_module(
-        decoy=decoy, serial_number="serial-another-non-matching"
+        decoy=decoy, type=TempDeck, serial_number="serial-another-non-matching"
     )
 
     attached = [non_matching, matching, another_non_matching]
@@ -388,8 +395,7 @@ def test_find_loaded_hardware_module(
     result = subject.find_loaded_hardware_module(
         module_id="id-matching",
         attached_modules=attached,
-        # https://github.com/python/mypy/issues/4717
-        expected_type=AbstractModule,  # type: ignore[misc]
+        expected_type=MagDeck,
     )
 
     assert result == matching
@@ -407,8 +413,7 @@ def test_find_loaded_hardware_module_raises_if_no_match_loaded(
         subject.find_loaded_hardware_module(
             module_id="module-id",
             attached_modules=[],
-            # https://github.com/python/mypy/issues/4717
-            expected_type=AbstractModule,  # type: ignore[misc]
+            expected_type=MagDeck,
         )
 
 
@@ -431,8 +436,7 @@ def test_find_loaded_hardware_module_raises_if_match_not_attached(
         subject.find_loaded_hardware_module(
             module_id="id-matching",
             attached_modules=[],
-            # https://github.com/python/mypy/issues/4717
-            expected_type=AbstractModule,  # type: ignore[misc]
+            expected_type=MagDeck,
         )
 
 
@@ -440,7 +444,9 @@ def test_find_loaded_hardware_module_raises_if_match_is_wrong_type(
     decoy: Decoy, magdeck_v1_def: ModuleDefinition
 ) -> None:
     """It should raise if a match was found but is of an unexpected type."""
-    matching = make_hardware_module(decoy=decoy, serial_number="serial-matching")
+    matching = make_hardware_module(
+        decoy=decoy, type=MagDeck, serial_number="serial-matching"
+    )
     subject = make_module_view(
         hardware_module_by_slot={
             DeckSlotName.SLOT_1: HardwareModule(
