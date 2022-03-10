@@ -13,12 +13,24 @@ class EmptyPayload(utils.BinarySerializable):
 
     pass
 
+class FirmwareShortSHADataField(utils.BinaryFieldBase[bytes]):
+    """The short hash in a device info.
+
+    This is sized to hold the default size of an abbreviated Git hash,
+    what you get when you do git rev-parse --short HEAD. If we ever
+    need to increase the size of that abbreviated ID, we'll need to
+    increase this too.
+    """
+
+    NUM_BYTES = 7
+    FORMAT = f"{NUM_BYTES}s"
 
 @dataclass
 class DeviceInfoResponsePayload(utils.BinarySerializable):
     """Device info response."""
 
     version: utils.UInt32Field
+    shortsha: FirmwareShortSHADataField
 
 
 class TaskNameDataField(utils.BinaryFieldBase[bytes]):
