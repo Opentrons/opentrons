@@ -62,12 +62,12 @@ class WellDoesNotExistError(ProtocolEngineError):
     """An error raised when referencing a well that does not exist."""
 
 
-class PipetteDoesNotExistError(ProtocolEngineError):
-    """An error raised when referencing a pipette that does not exist."""
+class PipetteNotLoadedError(ProtocolEngineError):
+    """An error raised when referencing a pipette that has not been loaded."""
 
 
 class ModuleNotLoadedError(ProtocolEngineError):
-    """And error raised when referencing a module that does not exist."""
+    """And error raised when referencing a module that has not been loaded."""
 
 
 class SlotDoesNotExistError(ProtocolEngineError):
