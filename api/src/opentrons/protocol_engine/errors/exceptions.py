@@ -66,7 +66,7 @@ class PipetteDoesNotExistError(ProtocolEngineError):
     """An error raised when referencing a pipette that does not exist."""
 
 
-class ModuleDoesNotExistError(ProtocolEngineError):
+class ModuleNotLoadedError(ProtocolEngineError):
     """And error raised when referencing a module that does not exist."""
 
 

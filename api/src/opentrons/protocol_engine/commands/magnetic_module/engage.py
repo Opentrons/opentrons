@@ -84,7 +84,7 @@ class EngageImplementation(AbstractCommandImpl[EngageParams, EngageResult]):
         """Engage a loaded Magnetic Module's magnets.
 
         Raises:
-            ModuleDoesNotExistError: If the given module ID doesn't point to a
+            ModuleNotLoadedError: If the given module ID doesn't point to a
                 module that's already been loaded.
             WrongModuleTypeError: If the given module ID points to a non-Magnetic
                 module.
@@ -92,7 +92,7 @@ class EngageImplementation(AbstractCommandImpl[EngageParams, EngageResult]):
                 Magnetic Module, but that module's hardware wasn't found attached.
             EngageHeightOutOfRangeError: If the given height is unreachable.
         """
-        # Allow propagation of ModuleDoesNotExistError.
+        # Allow propagation of ModuleNotLoadedError.
         model = self._state_view.modules.get_model(module_id=magnetic_module_id)
 
         # Allow propagation of WrongModuleTypeError and EngageHeightOutOfRangeError.

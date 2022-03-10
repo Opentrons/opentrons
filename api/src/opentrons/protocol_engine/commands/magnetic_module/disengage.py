@@ -54,13 +54,13 @@ class DisengageImplementation(AbstractCommandImpl[DisengageParams, DisengageResu
         """Execute a Magnetic Module disengage command.
 
         Raises:
-            ModuleDoesNotExistError: If the given module ID has not been loaded.
+            ModuleNotLoadedError: If the given module ID has not been loaded.
             WrongModuleTypeError: If the given module ID has been loaded,
                 but it's not a Magnetic Module.
             ModuleNotAttachedError: If the given module ID points to a valid loaded
                 Magnetic Module, but that module's hardware wasn't found attached.
         """
-        # Allow propagation of ModuleDoesNotExistError and WrongModuleTypeError.
+        # Allow propagation of ModuleNotLoadedError and WrongModuleTypeError.
         # Do this check even when using virtual modules,
         # to fully validate module IDs during analysis.
         self._state_view.modules.assert_is_magnetic_module(module_id=params.moduleId)

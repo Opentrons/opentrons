@@ -57,7 +57,7 @@ def test_initial_module_data_by_id() -> None:
     """It should raise if module ID doesn't exist."""
     subject = make_module_view()
 
-    with pytest.raises(errors.ModuleDoesNotExistError):
+    with pytest.raises(errors.ModuleNotLoadedError):
         subject.get("helloWorld")
 
 
@@ -65,7 +65,7 @@ def test_get_missing_hardware() -> None:
     """It should raise if no loaded hardware."""
     subject = make_module_view(slot_by_module_id={"module-id": DeckSlotName.SLOT_1})
 
-    with pytest.raises(errors.ModuleDoesNotExistError):
+    with pytest.raises(errors.ModuleNotLoadedError):
         subject.get("module-id")
 
 
@@ -201,7 +201,7 @@ def test_assert_is_magnetic_module(
     subject.assert_is_magnetic_module(module_id="id-module-1-magneticv1")
     subject.assert_is_magnetic_module(module_id="id-module-2-magneticv2")
 
-    with pytest.raises(errors.ModuleDoesNotExistError):
+    with pytest.raises(errors.ModuleNotLoadedError):
         subject.assert_is_magnetic_module(module_id="nonexistent-module-id")
 
     with pytest.raises(errors.WrongModuleTypeError):
@@ -479,7 +479,7 @@ def test_find_loaded_hardware_module_raises_if_no_match_loaded(
         hardware_module_by_slot={},
         slot_by_module_id={},
     )
-    with pytest.raises(errors.ModuleDoesNotExistError):
+    with pytest.raises(errors.ModuleNotLoadedError):
         subject.find_loaded_hardware_module(
             module_id="module-id",
             attached_modules=[],
