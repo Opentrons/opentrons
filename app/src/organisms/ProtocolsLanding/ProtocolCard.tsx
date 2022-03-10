@@ -1,7 +1,12 @@
 import * as React from 'react'
+import path from 'path'
 import { css } from 'styled-components'
 import { format } from 'date-fns'
 import { useTranslation } from 'react-i18next'
+import first from 'lodash/first'
+import map from 'lodash/map'
+import { getModuleType, schemaV6Adapter } from '@opentrons/shared-data'
+import { readJson } from 'fsextra'
 
 import {
   Box,
@@ -16,29 +21,61 @@ import { StyledText } from '../../atoms/text'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { ModuleIcon } from '../../molecules/ModuleIcon'
 
-import type { PipetteName } from '@opentrons/shared-data'
+import { StoredProtocolData } from '../../redux/protocol-storage'
+import type { ProtocolFile } from '@opentrons/shared-data'
 
-interface ProtocolCardProps {
-  protocolName: string
-  protocolKey: string
-  robotModel: string
-  leftMountPipetteName: PipetteName | null
-  rightMountPipetteName: PipetteName | null
-  requiredModuleTypes: string[]
-  lastUpdated: number
-}
+type ProtocolCardProps = StoredProtocolData
 
 export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   const { t } = useTranslation('protocol_list')
-  const {
-    protocolName,
-    protocolKey,
-    robotModel,
-    leftMountPipetteName,
-    rightMountPipetteName,
-    requiredModuleTypes,
-    lastUpdated,
-  } = props
+  const { protocolKey, srcFileNames, mostRecentAnalysis, modified } = props
+
+  const [
+    protocolData,
+    setProtocolData,
+  ] = React.useState<ProtocolFile<{}> | null>(null)
+
+  React.useEffect(() => {
+    if (mostRecentAnalysis != null) {
+      setProtocolData(schemaV6Adapter(JSON.parse(mostRecentAnalysis)?.analyses[0]))
+    }
+  }, [modified])
+
+  const { metadata, robot, pipettes, commands, modules } = protocolData ?? {}
+
+  const robotModel = robot?.model
+  const leftMountPipetteName =
+    pipettes != null
+      ? pipettes[
+          Object.keys(pipettes ?? {}).find(pipetteId => {
+            return commands?.find(
+              command =>
+                command.commandType === 'loadPipette' &&
+                command.result.pipetteId === pipetteId &&
+                command.params.mount === 'left'
+            )
+          }) ?? ''
+        ]?.name ?? ''
+      : ''
+  const rightMountPipetteName =
+    pipettes != null
+      ? pipettes[
+          Object.keys(pipettes ?? {}).find(pipetteId => {
+            commands?.find(
+              command =>
+                command.commandType === 'loadPipette' &&
+                command.params.pipetteId === pipetteId &&
+                command.params.mount === 'right'
+            )
+          }) ?? ''
+        ]?.name ?? ''
+      : ''
+  const requiredModuleTypes = map(modules, ({ model }, moduleId) =>
+    getModuleType(model)
+  )
+
+  const protocolName =
+    metadata?.protocolName ?? first(srcFileNames) ?? protocolKey
 
   return (
     <Link to={`/protocols/${protocolKey}`}>
@@ -102,7 +139,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
         </Box>
         <StyledText as="label" position="absolute" bottom="1rem" right="1rem">
           {t('last_updated_at', {
-            date: format(new Date(lastUpdated), 'M/d/yyyy'),
+            date: format(new Date(modified), 'M/d/yyyy'),
           })}
         </StyledText>
       </Flex>

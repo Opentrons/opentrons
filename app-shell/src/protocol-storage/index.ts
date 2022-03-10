@@ -14,6 +14,9 @@ import { createLogger } from '../log'
 
 const ensureDir: (dir: string) => Promise<void> = fse.ensureDir
 
+const getDateFromAnalysisPath = (analysisPath: string): Date =>
+  new Date(path.basename(analysisPath, path.extname(analysisPath)))
+
 const log = createLogger('protocol storage')
 
 const fetchProtocols = (
@@ -28,14 +31,33 @@ const fetchProtocols = (
     )
     .then(FileSystem.parseProtocolDirs)
     .then(storedProtocols => {
-      const storedProtocolsData = storedProtocols.map(storedProtocolDir => ({
-        protocolKey: path.parse(storedProtocolDir.dirPath).base,
-        modified: storedProtocolDir.modified,
-        srcFileNames: storedProtocolDir.srcFilePaths.map(
-          filePath => path.parse(filePath).base
-        ),
-        analysisFiles: storedProtocolDir.analysisFilePaths,
-      }))
+      const storedProtocolsData = storedProtocols.map(storedProtocolDir => {
+        const mostRecentAnalysisFilePath = storedProtocolDir.analysisFilePaths.reduce<
+          string | null
+        >((acc, analysisFilePath) => {
+          if (acc !== null) {
+            if (
+              getDateFromAnalysisPath(analysisFilePath) >
+              getDateFromAnalysisPath(acc)
+            ) {
+              return analysisFilePath
+            }
+            return acc
+          }
+          return analysisFilePath
+        }, null)
+        return {
+          protocolKey: path.parse(storedProtocolDir.dirPath).base,
+          modified: storedProtocolDir.modified,
+          srcFileNames: storedProtocolDir.srcFilePaths.map(
+            filePath => path.parse(filePath).base
+          ),
+          mostRecentAnalysis:
+            mostRecentAnalysisFilePath != null
+              ? fse.readJsonSync(mostRecentAnalysisFilePath)
+              : null,
+        }
+      })
       dispatch(
         ProtocolStorageActions.updateProtocolList(storedProtocolsData, source)
       )
