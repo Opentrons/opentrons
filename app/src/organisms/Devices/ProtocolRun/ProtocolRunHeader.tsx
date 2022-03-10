@@ -60,6 +60,35 @@ export function formatTimestamp(timestamp: string): string {
     : timestamp
 }
 
+function RunTimer({
+  runStatus,
+  startedAt,
+  stoppedAt,
+  completedAt,
+}: {
+  runStatus: string | null
+  startedAt: string | null
+  stoppedAt: string | null
+  completedAt: string | null
+}): JSX.Element {
+  const [now, setNow] = React.useState(Date())
+  useInterval(() => setNow(Date()), 500, true)
+
+  const endTime =
+    runStatus === RUN_STATUS_STOP_REQUESTED && stoppedAt != null
+      ? stoppedAt
+      : completedAt ?? now
+
+  const runTime =
+    startedAt != null ? formatInterval(startedAt, endTime) : '--:--:--'
+
+  return (
+    <StyledText css={TYPOGRAPHY.pRegular} color={COLORS.darkBlack}>
+      {runTime}
+    </StyledText>
+  )
+}
+
 export function ProtocolRunHeader({
   robotName,
   runId,
@@ -86,19 +115,6 @@ export function ProtocolRunHeader({
 
   const completedAtTimestamp =
     completedAt != null ? formatTimestamp(completedAt) : '--:--:--'
-
-  const [now, setNow] = React.useState(Date())
-  useInterval(() => setNow(Date()), 500, true)
-
-  const endTime = completedAt ?? now
-
-  // TODO: unnest the ternary, write helper
-  const runTime =
-    startedAt != null
-      ? runStatus === RUN_STATUS_STOP_REQUESTED && stoppedAt != null
-        ? formatInterval(startedAt, stoppedAt)
-        : formatInterval(startedAt, endTime)
-      : '--:--:--'
 
   // redirect to new run after successful reset
   const onResetSuccess = (createRunResponse: Run): void =>
@@ -243,12 +259,6 @@ export function ProtocolRunHeader({
             {t('cancel_run')}
           </SecondaryButton>
         ) : null}
-        {showConfirmCancelModal ? (
-          <ConfirmCancelModal
-            onClose={() => setShowConfirmCancelModal(false)}
-            runId={runId}
-          />
-        ) : null}
       </Flex>
     ) : null
 
@@ -318,9 +328,12 @@ export function ProtocolRunHeader({
             >
               {t('run_time')}
             </StyledText>
-            <StyledText css={TYPOGRAPHY.pRegular} color={COLORS.darkBlack}>
-              {runTime}
-            </StyledText>
+            <RunTimer
+              runStatus={runStatus}
+              startedAt={startedAt}
+              stoppedAt={stoppedAt}
+              completedAt={completedAt}
+            />
           </Box>
           <PrimaryButton
             justifyContent={JUSTIFY_CENTER}
@@ -337,6 +350,12 @@ export function ProtocolRunHeader({
         </Flex>
       </Flex>
       <ProtocolRunningContent />
+      {showConfirmCancelModal ? (
+        <ConfirmCancelModal
+          onClose={() => setShowConfirmCancelModal(false)}
+          runId={runId}
+        />
+      ) : null}
     </Flex>
   )
 }
