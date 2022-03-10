@@ -6,9 +6,10 @@ and expose it to a python commandline.
 
 import os
 
-if not os.environ.get("RUNNING_ON_PI") and not os.environ.get("RUNNING_ON_VERDIN"):
-    print("You should run this through the script alias: ot3repl")
-    exit()
+has_robot_server = True
+if os.environ.get("OPENTRONS_SIMULATION"):
+    print("Running with simulators")
+    has_robot_server = False
 if os.environ.get("OT2", None):
     print(
         '"OT2" env var detected, running with OT2 HC. '
@@ -64,7 +65,8 @@ def do_interact(api: ThreadManager[HardwareControlAPI]) -> None:
 
 
 if __name__ == "__main__":
-    stop_server()
+    if has_robot_server:
+        stop_server()
     api_tm = build_api()
     api_tm.sync.cache_instruments()
     do_interact(api_tm)
