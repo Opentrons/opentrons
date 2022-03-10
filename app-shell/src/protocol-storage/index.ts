@@ -9,8 +9,11 @@ import * as FileSystem from './file-system'
 import type { ProtocolListActionSource as ListSource } from '@opentrons/app/src/redux/protocol-storage/types'
 
 import type { Action, Dispatch } from '../types'
+import { createLogger } from '../log'
 
 const ensureDir: (dir: string) => Promise<void> = fse.ensureDir
+
+const log = createLogger('protocol storage')
 
 const fetchProtocols = (
   dispatch: Dispatch,
@@ -56,8 +59,10 @@ export function registerProtocolStorage(dispatch: Dispatch): Dispatch {
 
       case ProtocolStorageActions.ADD_PROTOCOL: {
         FileSystem.addProtocolFile(
-          action.payload.protocolFile.path,
+          action.payload.protocolFilePath,
           FileSystem.PROTOCOLS_DIRECTORY_PATH
+        ).then(() =>
+          fetchProtocols(dispatch, ProtocolStorageActions.PROTOCOL_ADDITION)
         )
 
         break
