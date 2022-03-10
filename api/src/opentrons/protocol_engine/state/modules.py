@@ -210,9 +210,7 @@ class ModuleView(HasState[ModuleState]):
                 but it's not a Magnetic Module.
         """
         # Propagate ModuleDoesNotExistError.
-        model = self.get_model(
-            module_id=module_id
-        )
+        model = self.get_model(module_id=module_id)
         if model not in [
             ModuleModel.MAGNETIC_MODULE_V1,
             ModuleModel.MAGNETIC_MODULE_V2,
