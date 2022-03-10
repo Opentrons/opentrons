@@ -19,7 +19,8 @@ class UnexpectedProtocolError(ProtocolEngineError):
         self.original_error: Exception = original_error
 
 
-# TODO(mc, 2020-10-18): differentiate between pipette missing vs incorrect
+# TODO(mc, 2020-10-18): differentiate between pipette missing vs incorrect.
+# By comparison, loadModule uses ModuleAlreadyPresentError and ModuleNotAttachedError.
 class FailedToLoadPipetteError(ProtocolEngineError):
     """An error raised when executing a LoadPipette command fails.
 
