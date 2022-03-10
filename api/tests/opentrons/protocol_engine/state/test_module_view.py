@@ -169,6 +169,45 @@ def test_get_properties_by_id(
     )
 
 
+def test_assert_is_magnetic_module(
+    magdeck_v1_def: ModuleDefinition,
+    magdeck_v2_def: ModuleDefinition,
+    tempdeck_v1_def: ModuleDefinition,
+) -> None:
+    """It should raise iff the given ID points to a non-Magnetic module."""
+    subject = make_module_view(
+        slot_by_module_id={
+            "id-module-1-magneticv1": DeckSlotName.SLOT_1,
+            "id-module-2-magneticv2": DeckSlotName.SLOT_2,
+            "id-module-3-temperaturev1": DeckSlotName.SLOT_3,
+        },
+        hardware_module_by_slot={
+            DeckSlotName.SLOT_1: HardwareModule(
+                serial_number="serial-module-1-magneticv1",
+                definition=magdeck_v1_def,
+            ),
+            DeckSlotName.SLOT_2: HardwareModule(
+                serial_number="serial-module-2-magneticv2",
+                definition=magdeck_v2_def,
+            ),
+            DeckSlotName.SLOT_3: HardwareModule(
+                serial_number="serial-module-3-temperaturev1",
+                definition=tempdeck_v1_def,
+            ),
+        },
+    )
+
+    # Should not raise:
+    subject.assert_is_magnetic_module(module_id="id-module-1-magneticv1")
+    subject.assert_is_magnetic_module(module_id="id-module-2-magneticv2")
+
+    with pytest.raises(errors.ModuleDoesNotExistError):
+        subject.assert_is_magnetic_module(module_id="nonexistent-module-id")
+
+    with pytest.raises(errors.WrongModuleTypeError):
+        subject.assert_is_magnetic_module(module_id="id-module-3-temperaturev1")
+
+
 def test_get_magnet_home_to_base_offset() -> None:
     """It should return the model-specific offset to bottom."""
     subject = make_module_view()
