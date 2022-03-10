@@ -20,10 +20,10 @@ import { TertiaryButton } from '../../../atoms/Buttons'
 import { CollapsibleStep } from '../../ProtocolSetup/RunSetupCard/CollapsibleStep'
 import { Divider } from '../../../atoms/structure'
 
-import type { AttachedModule } from '../../../redux/modules/types'
+import type { HeaterShakerModule } from '../../../redux/modules/types'
 
 interface TestShakeProps {
-  module: AttachedModule | null
+  module: HeaterShakerModule
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>
 }
 

@@ -16,10 +16,10 @@ import {
 import heaterShakerModule from '../../../assets/images/heatershaker_module_transparent.svg'
 import { HeaterShakerModuleData } from '../ModuleCard/HeaterShakerModuleData'
 
-import type { AttachedModule } from '../../../redux/modules/types'
+import type { HeaterShakerModule } from '../../../redux/modules/types'
 
 interface HeaterShakerModuleCardProps {
-  module: AttachedModule | null
+  module: HeaterShakerModule
 }
 
 export const HeaterShakerModuleCard = (
@@ -64,18 +64,16 @@ export const HeaterShakerModuleCard = (
             />
             <Text fontSize={TYPOGRAPHY.fontSizeP}>{'Heater/Shaker GENX'}</Text>
           </Flex>
-          {module?.type === 'heaterShakerModuleType' ? (
-            <HeaterShakerModuleData
-              heaterStatus={module.data.temperatureStatus}
-              shakerStatus={module.data.speedStatus}
-              latchStatus={module.data.labwareLatchStatus}
-              targetTemp={module.data.targetTemp}
-              currentTemp={module.data.currentTemp}
-              targetSpeed={module.data.targetSpeed}
-              currentSpeed={module.data.currentSpeed}
-              showTemperatureData={false}
-            />
-          ) : null}
+          <HeaterShakerModuleData
+            heaterStatus={module.data.temperatureStatus}
+            shakerStatus={module.data.speedStatus}
+            latchStatus={module.data.labwareLatchStatus}
+            targetTemp={module.data.targetTemp}
+            currentTemp={module.data.currentTemp}
+            targetSpeed={module.data.targetSpeed}
+            currentSpeed={module.data.currentSpeed}
+            showTemperatureData={false}
+          />
         </Flex>
       </Flex>
     </Flex>

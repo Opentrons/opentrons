@@ -15,11 +15,11 @@ import {
 } from '@opentrons/components'
 import { ModuleInfo } from '../../ProtocolSetup/RunSetupCard/ModuleSetup/ModuleInfo'
 
-import type { AttachedModule } from '../../../redux/modules/types'
+import type { HeaterShakerModule } from '../../../redux/modules/types'
 
 const VIEW_BOX = '-150 -40 440 128'
 interface PowerOnProps {
-  attachedModule: AttachedModule | null
+  attachedModule: HeaterShakerModule | null
 }
 
 export function PowerOn(props: PowerOnProps): JSX.Element {
