@@ -70,8 +70,11 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
           <Flex flexDirection={DIRECTION_COLUMN} paddingRight={SPACING_3}>
             <Text textTransform={TEXT_TRANSFORM_UPPERCASE}>{t('modules')}</Text>
             <Flex>
-              {attachedModules.map(module => (
-                <ModuleIcon key={module.model} moduleType={module.type} />
+              {attachedModules.map((module, i) => (
+                <ModuleIcon
+                  key={`${name}_${module.model}_${i}`}
+                  moduleType={module.type}
+                />
               ))}
             </Flex>
           </Flex>

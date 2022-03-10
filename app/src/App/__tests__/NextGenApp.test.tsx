@@ -8,6 +8,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { Breadcrumbs } from '../../molecules/Breadcrumbs'
 import { DeviceDetails } from '../../pages/Devices/DeviceDetails'
 import { DevicesLanding } from '../../pages/Devices/DevicesLanding'
+import { ProtocolRunDetails } from '../../pages/Devices/ProtocolRunDetails'
 import { RobotSettings } from '../../pages/Devices/RobotSettings'
 import { GeneralSettings } from '../../organisms/AppSettings/GeneralSettings'
 import { usePathCrumbs } from '../hooks'
@@ -17,6 +18,7 @@ jest.mock('../../molecules/Breadcrumbs')
 jest.mock('../../organisms/Devices/hooks')
 jest.mock('../../pages/Devices/DeviceDetails')
 jest.mock('../../pages/Devices/DevicesLanding')
+jest.mock('../../pages/Devices/ProtocolRunDetails')
 jest.mock('../../pages/Devices/RobotSettings')
 jest.mock('../../organisms/Labware/helpers/getAllDefs')
 jest.mock('../../organisms/AppSettings/GeneralSettings')
@@ -31,6 +33,10 @@ const mockDevicesLanding = DevicesLanding as jest.MockedFunction<
   typeof DevicesLanding
 >
 mockDevicesLanding.mockReturnValue(<div>Mock DevicesLanding</div>)
+const mockProtocolRunDetails = ProtocolRunDetails as jest.MockedFunction<
+  typeof ProtocolRunDetails
+>
+mockProtocolRunDetails.mockReturnValue(<div>Mock ProtocolRunDetails</div>)
 const mockRobotSettings = RobotSettings as jest.MockedFunction<
   typeof RobotSettings
 >
@@ -84,5 +90,12 @@ describe('NextGenApp', () => {
   it('renders a RobotSettings component from /robots/:robotName/robot-settings/:robotSettingsTab', () => {
     const [{ getByText }] = render('/devices/otie/robot-settings/calibration')
     getByText('Mock RobotSettings')
+  })
+
+  it('renders a ProtocolRunDetails component from /robots/:robotName/protocol-runs/:runId/:protocolRunDetailsTab', () => {
+    const [{ getByText }] = render(
+      '/devices/otie/protocol-runs/95e67900-bc9f-4fbf-92c6-cc4d7226a51b/setup'
+    )
+    getByText('Mock ProtocolRunDetails')
   })
 })
