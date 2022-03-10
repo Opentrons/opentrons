@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import first from 'lodash/first'
 import {
   Box,
   Flex,
@@ -21,13 +21,15 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '../../redux/modules'
 
-import { addProtocol } from '../../redux/protocol-storage'
-import type { Dispatch } from '../../redux/types'
+import type { StoredProtocolData } from '../../redux/protocol-storage'
 
-export function ProtocolsList(): JSX.Element | null {
+interface ProtocolListProps {
+  storedProtocols: StoredProtocolData[]
+}
+export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
   const [showSlideout, setShowSlideout] = React.useState(false)
   const { t } = useTranslation('protocol_info')
-  const dispatch = useDispatch<Dispatch>()
+  const {storedProtocols} =props
 
   return (
     <Box padding={SPACING.spacing4}>
@@ -50,19 +52,25 @@ export function ProtocolsList(): JSX.Element | null {
         {t('all_protocols')}
       </StyledText>
       <Flex flexDirection="column">
-        <ProtocolCard
-          protocolName="QIAseq Targeted RNAscan Panel"
-          robotModel="OT-2"
-          leftMountPipetteName="p300_single_gen2"
-          rightMountPipetteName="p20_multi_gen2"
-          requiredModuleTypes={[
-            THERMOCYCLER_MODULE_TYPE,
-            MAGNETIC_MODULE_TYPE,
-            TEMPERATURE_MODULE_TYPE,
-            HEATERSHAKER_MODULE_TYPE,
-          ]}
-          lastUpdated={1646871619084}
-        />
+        {storedProtocols.map(storedProtocol => {
+          const protocolName = first(storedProtocol.srcFileNames) ?? storedProtocol.protocolKey
+          return (
+            <ProtocolCard
+              key={storedProtocol.protocolKey}
+              protocolName={protocolName}
+              robotModel="OT-2"
+              leftMountPipetteName="p300_single_gen2"
+              rightMountPipetteName="p20_multi_gen2"
+              requiredModuleTypes={[
+                THERMOCYCLER_MODULE_TYPE,
+                MAGNETIC_MODULE_TYPE,
+                TEMPERATURE_MODULE_TYPE,
+                HEATERSHAKER_MODULE_TYPE,
+              ]}
+              lastUpdated={storedProtocol.modified}
+            />
+          )
+        })}
       </Flex>
       <EmptyStateLinks title={t('create_or_download')} />
       <Slideout
@@ -72,11 +80,7 @@ export function ProtocolsList(): JSX.Element | null {
         height="100%"
       >
         <Box height="26rem">
-          <UploadInput
-            onUpload={(file: File) => {
-              dispatch(addProtocol(file.path))
-            }}
-          />
+          <UploadInput onUpload={() => setShowSlideout(false)}/>
         </Box>
       </Slideout>
     </Box>

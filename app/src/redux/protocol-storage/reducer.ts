@@ -7,8 +7,8 @@ import type { ProtocolStorageState } from './types'
 import { Reducer } from 'redux'
 
 export const INITIAL_STATE: ProtocolStorageState = {
-  filenames: [],
-  filesByName: {},
+  protocolKeys: [],
+  filesByProtocolKey: {},
   addFailureFile: null,
   addFailureMessage: null,
   listFailureMessage: null,
@@ -23,8 +23,8 @@ export const protocolStorageReducer: Reducer<ProtocolStorageState, Action> = (
       return {
         ...state,
         listFailureMessage: null,
-        filenames: action.payload.map(f => f.protocolId),
-        filesByName: keyBy(action.payload, 'protocolId'),
+        protocolKeys: action.payload.map(f => f.protocolKey),
+        filesByProtocolKey: keyBy(action.payload, 'protocolKey'),
       }
     }
 
