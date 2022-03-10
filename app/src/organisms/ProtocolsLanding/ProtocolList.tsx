@@ -57,6 +57,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
           return (
             <ProtocolCard
               key={storedProtocol.protocolKey}
+              protocolKey={storedProtocol.protocolKey}
               protocolName={protocolName}
               robotModel="OT-2"
               leftMountPipetteName="p300_single_gen2"
