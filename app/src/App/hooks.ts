@@ -58,6 +58,8 @@ export function usePathCrumbs(): PathCrumb[] {
   const { t } = useTranslation('top_navigation')
   const location = useLocation()
 
+  // TODO(bh, 2022-02-24): map runId to run timestamp
+  // will need to use robot name param, useRobot, instantiate an ApiHostProvider, useRunQuery with runId
   const subPathname = location.pathname.substring(1)
 
   const pathCrumbs = subPathname

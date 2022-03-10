@@ -1,18 +1,23 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { Protocol } from '@opentrons/api-client'
+
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
-import { useCurrentProtocol } from '../../ProtocolUpload/hooks'
+import { useCurrentProtocol, useCurrentRun } from '../../ProtocolUpload/hooks'
 import { useIsProtocolRunning } from '../hooks'
 import { RobotStatusBanner } from '../RobotStatusBanner'
+
+import type { Protocol, Run } from '@opentrons/api-client'
 
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../hooks')
 
 const mockUseCurrentProtocol = useCurrentProtocol as jest.MockedFunction<
   typeof useCurrentProtocol
+>
+const mockUseCurrentRun = useCurrentRun as jest.MockedFunction<
+  typeof useCurrentRun
 >
 const mockUseIsProtocolRunning = useIsProtocolRunning as jest.MockedFunction<
   typeof useIsProtocolRunning
@@ -32,6 +37,7 @@ const render = () => {
 describe('RobotStatusBanner', () => {
   beforeEach(() => {
     mockUseCurrentProtocol.mockReturnValue({} as any)
+    mockUseCurrentRun.mockReturnValue({} as any)
     mockUseIsProtocolRunning.mockReturnValue(false)
   })
   afterEach(() => {
@@ -67,15 +73,18 @@ describe('RobotStatusBanner', () => {
     mockUseCurrentProtocol.mockReturnValue({
       data: { metadata: { protocolName: 'Testosaur' } },
     } as Protocol)
+    mockUseCurrentRun.mockReturnValue({
+      data: { id: 'oties-run' },
+    } as Run)
     mockUseIsProtocolRunning.mockReturnValue(true)
 
-    const [{ getByText }] = render()
+    const [{ getByRole, getByText }] = render()
 
-    getByText('Running Testosaur')
+    getByText('Testosaur; running')
 
-    const runLink = getByText('Go to Run')
+    const runLink = getByRole('link', { name: 'Go to Run' })
     expect(runLink.getAttribute('href')).toEqual(
-      '/devices/otie/protocol-runs/run'
+      '/devices/otie/protocol-runs/oties-run/run-log'
     )
   })
 })
