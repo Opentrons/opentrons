@@ -249,6 +249,51 @@ export const mockThermocycler: Types.ThermocyclerModule = {
   usbPort: { hub: 1, port: 1 },
 }
 
+export const mockApiHeaterShaker: ApiTypes.ApiHeaterShakerModule = {
+  displayName: 'heatershaker',
+  port: '/dev/ot_module_heatershaker0',
+  serial: 'jkl123',
+  model: 'heatershaker_v4.0',
+  moduleModel: 'heaterShakerModuleV1',
+  revision: 'heatershaker_v4.0',
+  fwVersion: 'v2.0.0',
+  status: 'idle',
+  hasAvailableUpdate: true,
+  data: {
+    labwareLatchStatus: 'idle_unknown',
+    speedStatus: 'idle',
+    temperatureStatus: 'idle',
+    currentSpeed: null,
+    currentTemp: null,
+    targetSpeed: null,
+    targetTemp: null,
+    errorDetails: null,
+  },
+  usbPort: { hub: 1, port: 1 },
+}
+
+export const mockHeaterShaker: Types.HeaterShakerModule = {
+  model: 'heaterShakerModuleV1',
+  type: 'heaterShakerModuleType',
+  port: '/dev/ot_module_thermocycler0',
+  serial: 'jkl123',
+  revision: 'heatershaker_v4.0',
+  fwVersion: 'v2.0.0',
+  status: 'idle',
+  hasAvailableUpdate: true,
+  data: {
+    labwareLatchStatus: 'idle_unknown',
+    speedStatus: 'idle',
+    temperatureStatus: 'idle',
+    currentSpeed: null,
+    currentTemp: null,
+    targetSpeed: null,
+    targetTemp: null,
+    errorDetails: null,
+  },
+  usbPort: { hub: 1, port: 1 },
+}
+
 // fetch modules fixtures
 
 export const mockFetchModulesSuccessMeta: RobotApiResponseMeta = {
