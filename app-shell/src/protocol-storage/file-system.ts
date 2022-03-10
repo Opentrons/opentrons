@@ -3,6 +3,7 @@ import fs from 'fs-extra'
 import uuid from 'uuid/v4'
 
 import { app, shell } from 'electron'
+import stubbedAnalysis from './__fixtures__/analysisResult.json'
 
 import type { StoredProtocolDir } from '@opentrons/app/src/redux/protocol-storage'
 import type { Dirent } from 'fs'
@@ -131,6 +132,14 @@ export function addProtocolFile(
     .then(() => fs.mkdir(srcDirPath))
     .then(() => fs.mkdir(analysisDirPath))
     .then(() => fs.copy(mainFileSourcePath, mainFileDestPath))
+    .then(() =>
+      // TODO: dispatch a new action to capture running analysis on the src
+      // file and commiting the actual analysis output to the analysis dir
+      fs.writeJSON(
+        path.join(analysisDirPath, `${new Date().getTime()}.json`),
+        JSON.stringify(stubbedAnalysis)
+      )
+    )
 }
 
 export function removeProtocolById(

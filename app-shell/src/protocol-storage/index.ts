@@ -1,4 +1,5 @@
 import fse from 'fs-extra'
+import path from 'path'
 import { shell } from 'electron'
 
 import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
@@ -28,9 +29,11 @@ const fetchProtocols = (
     .then(FileSystem.parseProtocolDirs)
     .then(storedProtocols => {
       const storedProtocolsData = storedProtocols.map(storedProtocolDir => ({
-        protocolId: storedProtocolDir.dirPath,
+        protocolKey: path.parse(storedProtocolDir.dirPath).base,
         modified: storedProtocolDir.modified,
-        srcFileNames: storedProtocolDir.srcFilePaths,
+        srcFileNames: storedProtocolDir.srcFilePaths.map(
+          filePath => path.parse(filePath).base
+        ),
         analysisFiles: storedProtocolDir.analysisFilePaths,
       }))
       dispatch(

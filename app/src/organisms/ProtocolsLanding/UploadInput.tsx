@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 import {
   Icon,
   Text,
@@ -22,6 +23,11 @@ import {
   C_BLUE,
   TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
+
+import { addProtocol } from '../../redux/protocol-storage'
+
+import type { Dispatch } from '../../redux/types'
+import { useLogger } from '../../logger'
 
 const DROP_ZONE_STYLES = css`
   display: flex;
@@ -49,21 +55,31 @@ const INPUT_STYLES = css`
 `
 
 export interface UploadInputProps {
-  onUpload: (file: File) => unknown
+  onUpload?: () => unknown
 }
 
 export function UploadInput(props: UploadInputProps): JSX.Element | null {
   const { t } = useTranslation('protocol_info')
+  const dispatch = useDispatch<Dispatch>()
+  const logger = useLogger(__filename)
 
   const fileInput = React.useRef<HTMLInputElement>(null)
   const [isFileOverDropZone, setIsFileOverDropZone] = React.useState<boolean>(
     false
   )
+
+  const handleUpload = (path: string | null): void => {
+    if (path === null) logger.warn('Failed to upload file, path not found')
+    else {
+      dispatch(addProtocol(path))
+      props.onUpload && props.onUpload()
+    }
+  }
   const handleDrop: React.DragEventHandler<HTMLLabelElement> = e => {
     e.preventDefault()
     e.stopPropagation()
     const { files = [] } = 'dataTransfer' in e ? e.dataTransfer : {}
-    props.onUpload(files[0])
+    handleUpload(files[0]?.path ?? null)
     setIsFileOverDropZone(false)
   }
   const handleDragEnter: React.DragEventHandler<HTMLLabelElement> = e => {
@@ -87,7 +103,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
 
   const onChange: React.ChangeEventHandler<HTMLInputElement> = event => {
     const { files = [] } = event.target ?? {}
-    files?.[0] && props.onUpload(files?.[0])
+    handleUpload(files?.[0]?.path ?? null)
     if ('value' in event.currentTarget) event.currentTarget.value = ''
   }
 

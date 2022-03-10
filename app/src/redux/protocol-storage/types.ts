@@ -8,7 +8,7 @@ export interface StoredProtocolDir {
 }
 
 export interface StoredProtocolData {
-  protocolId: string
+  protocolKey: string
   modified: number
   srcFileNames: string[]
   analysisFiles: string[]
@@ -17,8 +17,10 @@ export interface StoredProtocolData {
 // state types
 
 export interface ProtocolStorageState {
-  readonly filenames: string[]
-  readonly filesByName: Partial<{ [filename: string]: StoredProtocolDir }>
+  readonly protocolKeys: string[]
+  readonly filesByProtocolKey: {
+    [protocolKey: string]: StoredProtocolData
+  }
   readonly addFailureFile: StoredProtocolDir | null
   readonly addFailureMessage: string | null
   readonly listFailureMessage: string | null
