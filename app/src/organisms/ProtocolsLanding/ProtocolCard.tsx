@@ -1,30 +1,41 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-// import { useTranslation } from 'react-i18next'
-
-import { StyledText } from '../../atoms/text'
-import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
+import { format } from 'date-fns'
+import { useTranslation } from 'react-i18next'
 
 import {
   Box,
   Flex,
-  Icon,
   DIRECTION_ROW,
   COLORS,
   SPACING,
 } from '@opentrons/components'
 
-// TODO (ka 2/11/22) this is a temp wrokaround until we get actual protocol data
+import { StyledText } from '../../atoms/text'
+import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
+import { ModuleIcon } from '../../molecules/ModuleIcon'
+
+import type { PipetteName } from '@opentrons/shared-data'
+
 interface ProtocolCardProps {
-  protocolName?: string | null
-  robotModel?: string | null
-  leftMount?: string | null
-  rightMount?: string | null
-  modules?: string[] | null
-  lastUpdated?: number | null
+  protocolName: string
+  robotModel: string
+  leftMountPipetteName: PipetteName | null
+  rightMountPipetteName: PipetteName | null
+  requiredModuleTypes: string[]
+  lastUpdated: number
 }
 
 export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
+  const { t } = useTranslation('protocol_list')
+  const {
+    protocolName,
+    robotModel,
+    leftMountPipetteName,
+    rightMountPipetteName,
+    requiredModuleTypes,
+    lastUpdated,
+  } = props
   return (
     <Flex
       backgroundColor={COLORS.white}
@@ -46,39 +57,32 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
       </Box>
       <Box>
         <StyledText as="h3" marginBottom={SPACING.spacing4} height="2.75rem">
-          QIAseq Targeted RNAscan Panel
+          {protocolName}
         </StyledText>
         <Flex>
           <Flex flexDirection="column" marginRight={SPACING.spacing4}>
             <StyledText as="h6">robot</StyledText>
-            <StyledText as="p">OT-2</StyledText>
+            <StyledText as="p">{robotModel}</StyledText>
           </Flex>
           <Flex flexDirection="column" marginRight={SPACING.spacing4}>
             <StyledText as="h6">left mount</StyledText>
-            <StyledText as="p">P300 8-Channel GEN 2</StyledText>
+            <StyledText as="p">{leftMountPipetteName}</StyledText>
           </Flex>
           <Flex flexDirection="column" marginRight={SPACING.spacing4}>
             <StyledText as="h6">right mount</StyledText>
-            <StyledText as="p">P300 8-Channel GEN 2</StyledText>
+            <StyledText as="p">{rightMountPipetteName}</StyledText>
           </Flex>
           <Flex flexDirection="column" marginRight={SPACING.spacing4}>
             <StyledText as="h6">modules</StyledText>
             <Flex>
-              <Icon
-                name="ot-heater-shaker"
-                height="1rem"
-                marginRight={SPACING.spacing3}
-              />
-              <Icon
-                name="ot-heater-shaker"
-                height="1rem"
-                marginRight={SPACING.spacing3}
-              />
-              <Icon
-                name="ot-heater-shaker"
-                height="1rem"
-                marginRight={SPACING.spacing3}
-              />
+              {requiredModuleTypes.map((moduleType, index) => (
+                <ModuleIcon
+                  key={index}
+                  moduleType={moduleType}
+                  height="1rem"
+                  marginRight={SPACING.spacing3}
+                />
+              ))}
             </Flex>
           </Flex>
         </Flex>
@@ -92,7 +96,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
         />
       </Box>
       <StyledText as="label" position="absolute" bottom="1rem" right="1rem">
-        Last updated DD MM YYYY
+        {t('last_updated_at', {date: format(new Date(lastUpdated), 'M/d/yyyy')})}
       </StyledText>
     </Flex>
   )

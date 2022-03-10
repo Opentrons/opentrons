@@ -13,6 +13,12 @@ import { Slideout } from '../../atoms/Slideout'
 import { UploadInput } from './UploadInput'
 import { ProtocolCard } from './ProtocolCard'
 import { EmptyStateLinks } from './EmptyStateLinks'
+import {
+  HEATERSHAKER_MODULE_TYPE,
+  MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+} from '../../redux/modules'
 
 export function ProtocolsList(): JSX.Element | null {
   const [showSlideout, setShowSlideout] = React.useState(false)
@@ -38,7 +44,19 @@ export function ProtocolsList(): JSX.Element | null {
         {t('all_protocols')}
       </StyledText>
       <Flex flexDirection="column">
-        <ProtocolCard />
+        <ProtocolCard
+          protocolName="QIAseq Targeted RNAscan Panel"
+          robotModel="OT-2"
+          leftMountPipetteName="p300_single_gen2"
+          rightMountPipetteName="p20_multi_gen2"
+          requiredModuleTypes={[
+            THERMOCYCLER_MODULE_TYPE,
+            MAGNETIC_MODULE_TYPE,
+            TEMPERATURE_MODULE_TYPE,
+            HEATERSHAKER_MODULE_TYPE,
+          ]}
+          lastUpdated={1646871619084}
+        />
       </Flex>
       <EmptyStateLinks title={t('create_or_download')} />
       <Slideout
