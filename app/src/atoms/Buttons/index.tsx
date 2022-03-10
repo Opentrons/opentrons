@@ -13,8 +13,11 @@ export const TertiaryButton = (props: any): JSX.Element => (
   <NewPrimaryBtn
     backgroundColor={COLORS.blue}
     borderRadius={BORDERS.radiusRoundEdge}
+    boxShadow="none"
     overflow="no-wrap"
+    padding="0.375rem 0.75rem"
     textTransform={TYPOGRAPHY.textTransformNone}
+    whiteSpace="nowrap"
     css={TYPOGRAPHY.labelSemiBold}
     {...props}
   />
