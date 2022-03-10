@@ -11,7 +11,7 @@ export interface StoredProtocolData {
   protocolKey: string
   modified: number
   srcFileNames: string[]
-  analysisFiles: string[]
+  mostRecentAnalysis: string | null
 }
 
 // state types

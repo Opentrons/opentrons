@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import first from 'lodash/first'
 import {
   Box,
   Flex,
@@ -52,26 +51,10 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
         {t('all_protocols')}
       </StyledText>
       <Flex flexDirection="column">
-        {storedProtocols.map(storedProtocol => {
-          const protocolName = first(storedProtocol.srcFileNames) ?? storedProtocol.protocolKey
-          return (
-            <ProtocolCard
-              key={storedProtocol.protocolKey}
-              protocolKey={storedProtocol.protocolKey}
-              protocolName={protocolName}
-              robotModel="OT-2"
-              leftMountPipetteName="p300_single_gen2"
-              rightMountPipetteName="p20_multi_gen2"
-              requiredModuleTypes={[
-                THERMOCYCLER_MODULE_TYPE,
-                MAGNETIC_MODULE_TYPE,
-                TEMPERATURE_MODULE_TYPE,
-                HEATERSHAKER_MODULE_TYPE,
-              ]}
-              lastUpdated={storedProtocol.modified}
-            />
+        {storedProtocols.map(storedProtocol => (
+            <ProtocolCard key={storedProtocol.protocolKey} {...storedProtocol} />
           )
-        })}
+        )}
       </Flex>
       <EmptyStateLinks title={t('create_or_download')} />
       <Slideout
