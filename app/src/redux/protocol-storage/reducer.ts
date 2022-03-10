@@ -23,8 +23,8 @@ export const protocolStorageReducer: Reducer<ProtocolStorageState, Action> = (
       return {
         ...state,
         listFailureMessage: null,
-        filenames: action.payload.map(f => f.dirPath),
-        filesByName: keyBy(action.payload, 'filename'),
+        filenames: action.payload.map(f => f.protocolId),
+        filesByName: keyBy(action.payload, 'protocolId'),
       }
     }
 

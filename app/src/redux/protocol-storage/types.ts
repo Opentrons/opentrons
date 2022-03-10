@@ -51,7 +51,7 @@ export interface UpdateProtocolListFailureAction {
 
 export interface AddProtocolAction {
   type: 'protocolStorage:ADD_PROTOCOL'
-  payload: { protocolFile: File }
+  payload: { protocolFilePath: string }
   meta: { shell: true }
 }
 

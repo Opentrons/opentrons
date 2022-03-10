@@ -55,9 +55,11 @@ export const updateProtocolListFailure = (
   meta: { source },
 })
 
-export const addProtocol = (protocolFile: File): Types.AddProtocolAction => ({
+export const addProtocol = (
+  protocolFilePath: string
+): Types.AddProtocolAction => ({
   type: ADD_PROTOCOL,
-  payload: { protocolFile },
+  payload: { protocolFilePath },
   meta: { shell: true },
 })
 

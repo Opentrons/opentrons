@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   Box,
@@ -20,9 +21,14 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '../../redux/modules'
 
+import { addProtocol } from '../../redux/protocol-storage'
+import type { Dispatch } from '../../redux/types'
+
 export function ProtocolsList(): JSX.Element | null {
   const [showSlideout, setShowSlideout] = React.useState(false)
   const { t } = useTranslation('protocol_info')
+  const dispatch = useDispatch<Dispatch>()
+
   return (
     <Box padding={SPACING.spacing4}>
       <Flex
@@ -67,8 +73,8 @@ export function ProtocolsList(): JSX.Element | null {
       >
         <Box height="26rem">
           <UploadInput
-            onUpload={() => {
-              console.log('todo')
+            onUpload={(file: File) => {
+              dispatch(addProtocol(file.path))
             }}
           />
         </Box>
