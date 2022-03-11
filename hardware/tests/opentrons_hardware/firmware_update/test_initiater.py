@@ -32,7 +32,11 @@ async def test_messaging(
         """Mock send method."""
         if isinstance(message, message_definitions.DeviceInfoRequest):
             response = message_definitions.DeviceInfoResponse(
-                payload=payloads.DeviceInfoResponsePayload(version=UInt32Field(0))
+                payload=payloads.DeviceInfoResponsePayload(
+                    version=UInt32Field(0),
+                    flags=payloads.VersionFlagsField(0),
+                    shortsha=payloads.FirmwareShortSHADataField(b"abcdef0"),
+                )
             )
             can_message_notifier.notify(
                 message=response,
@@ -76,7 +80,11 @@ async def test_retry(
     """It should retry device info request."""
     responses = [
         message_definitions.DeviceInfoResponse(
-            payload=payloads.DeviceInfoResponsePayload(version=UInt32Field(0))
+            payload=payloads.DeviceInfoResponsePayload(
+                version=UInt32Field(0),
+                flags=payloads.VersionFlagsField(0),
+                shortsha=payloads.FirmwareShortSHADataField(b"abcdef0"),
+            )
         ),
         None,
         None,

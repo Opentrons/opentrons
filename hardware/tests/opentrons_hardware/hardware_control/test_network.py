@@ -53,6 +53,8 @@ class MockStatusResponder:
                 response = message_definitions.DeviceInfoResponse(
                     payload=payloads.DeviceInfoResponsePayload(
                         version=utils.UInt32Field(0),
+                        flags=payloads.VersionFlagsField(0),
+                        shortsha=payloads.FirmwareShortSHADataField(b"abcdef0"),
                     )
                 )
                 asyncio.get_running_loop().call_soon(
