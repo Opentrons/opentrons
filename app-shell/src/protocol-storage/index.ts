@@ -10,6 +10,7 @@ import * as FileSystem from './file-system'
 import type { ProtocolListActionSource as ListSource } from '@opentrons/app/src/redux/protocol-storage/types'
 
 import type { Action, Dispatch } from '../types'
+import { runFileWithPython } from '../python'
 
 const ensureDir: (dir: string) => Promise<void> = fse.ensureDir
 
@@ -55,6 +56,9 @@ const fetchProtocols = (
               : null,
         }
       })
+      runFileWithPython(
+        path.join(FileSystem.PROTOCOLS_DIRECTORY_PATH, 'hello.py')
+      )
       dispatch(
         ProtocolStorageActions.updateProtocolList(storedProtocolsData, source)
       )
