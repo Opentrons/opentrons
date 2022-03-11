@@ -1,11 +1,18 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Flex, POSITION_RELATIVE } from '@opentrons/components'
+import {
+  Flex,
+  POSITION_RELATIVE,
+  Tooltip,
+  useHoverTooltip,
+} from '@opentrons/components'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import { CreateCommand, HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 import { MenuList } from '../../../atoms/MenuList'
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
+import { HeaterShakerWizard } from '../HeaterShakerWizard'
 
 import type { AttachedModule } from '../../../redux/modules/types'
-import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 
 interface ModuleOverflowMenuProps {
   module: AttachedModule
@@ -18,6 +25,27 @@ export const ModuleOverflowMenu = (
 ): JSX.Element | null => {
   const { t } = useTranslation(['device_details', 'heater_shaker'])
   const { module, handleClick, handleAboutClick } = props
+  const [showWizard, setShowWizard] = React.useState<boolean>(false)
+  const [isLatchClosed, setIsLatchClosed] = React.useState<boolean>(true)
+  const { createLiveCommand } = useCreateLiveCommandMutation()
+  const [targetProps, tooltipProps] = useHoverTooltip()
+
+  const latchCommand: CreateCommand = {
+    commandType: isLatchClosed
+      ? 'heaterShakerModule/openLatch'
+      : 'heaterShakerModule/closeLatch',
+    //  TODO replace serial with id
+    params: { moduleId: module.serial },
+  }
+
+  const handleLatch = (): void => {
+    createLiveCommand({
+      command: latchCommand,
+    })
+    latchCommand.commandType === 'heaterShakerModule/openLatch'
+      ? setIsLatchClosed(false)
+      : setIsLatchClosed(true)
+  }
 
   const menuItemsByModuleType = {
     thermocyclerModuleType: [
@@ -55,15 +83,14 @@ export const ModuleOverflowMenu = (
       {
         setSetting: t('set_shake_speed', { ns: 'heater_shaker' }),
         turnOffSetting: t('stop_shaking', { ns: 'heater_shaker' }),
-        isSecondary: false,
-      },
-      {
-        setSetting: t('open_labware_latch', { ns: 'heater_shaker' }),
-        turnOffSetting: t('close_labware_latch', { ns: 'heater_shaker' }),
-        isSecondary: false,
+        isSecondary: true,
       },
     ],
   }
+
+  const latchDisabledReason =
+    module.type === HEATERSHAKER_MODULE_TYPE &&
+    module.data.speedStatus !== 'idle'
 
   const AboutModuleBtn = (
     <MenuItem
@@ -75,12 +102,29 @@ export const ModuleOverflowMenu = (
       {t('overflow_menu_about')}
     </MenuItem>
   )
+  const LabwareLatchBtn = (
+    <>
+      <MenuItem
+        minWidth="10rem"
+        onClick={handleLatch}
+        disabled={latchDisabledReason}
+        {...targetProps}
+      >
+        {t(isLatchClosed ? 'open_labware_latch' : 'close_labware_latch', {
+          ns: 'heater_shaker',
+        })}
+      </MenuItem>
+      {/* TODO:(jr, 3/11/22): update Tooltip to new design */}
+      {latchDisabledReason ? (
+        <Tooltip {...tooltipProps}>
+          {t('cannot_open_latch', { ns: 'heater_shaker' })}
+        </Tooltip>
+      ) : null}
+    </>
+  )
 
   const AttachToDeckBtn = (
-    <MenuItem
-      minWidth="10rem"
-      onClick={() => console.log('how to attach to deck')}
-    >
+    <MenuItem minWidth="10rem" onClick={() => setShowWizard(true)}>
       {t('how_to_attach_to_deck', { ns: 'heater_shaker' })}
     </MenuItem>
   )
@@ -92,6 +136,9 @@ export const ModuleOverflowMenu = (
 
   return (
     <React.Fragment>
+      {showWizard && (
+        <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
+      )}
       <Flex position={POSITION_RELATIVE}>
         <MenuList
           buttons={[
@@ -108,6 +155,7 @@ export const ModuleOverflowMenu = (
                 </MenuItem>
               )
             }),
+            module.type === HEATERSHAKER_MODULE_TYPE ? LabwareLatchBtn : null,
             AboutModuleBtn,
             module.type === HEATERSHAKER_MODULE_TYPE ? AttachToDeckBtn : null,
             module.type === HEATERSHAKER_MODULE_TYPE ? TestShakeBtn : null,

@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { COLORS, renderWithProviders } from '@opentrons/components'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../../i18n'
 import {
@@ -8,13 +9,49 @@ import {
   mockThermocycler,
   mockHeaterShaker,
 } from '../../../../redux/modules/__fixtures__'
+import { HeaterShakerWizard } from '../../HeaterShakerWizard'
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
+
+jest.mock('../../HeaterShakerWizard')
+jest.mock('@opentrons/react-api-client')
+
+const mocUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
+  typeof useCreateLiveCommandMutation
+>
+
+const mockHeaterShakerWizard = HeaterShakerWizard as jest.MockedFunction<
+  typeof HeaterShakerWizard
+>
 
 const render = (props: React.ComponentProps<typeof ModuleOverflowMenu>) => {
   return renderWithProviders(<ModuleOverflowMenu {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
+
+let mockCreateCommand: jest.Mock
+
+const mockMovingHeaterShaker = {
+  model: 'heaterShakerModuleV1',
+  type: 'heaterShakerModuleType',
+  port: '/dev/ot_module_thermocycler0',
+  serial: 'jkl123',
+  revision: 'heatershaker_v4.0',
+  fwVersion: 'v2.0.0',
+  status: 'idle',
+  hasAvailableUpdate: true,
+  data: {
+    labwareLatchStatus: 'idle_unknown',
+    speedStatus: 'speeding up',
+    temperatureStatus: 'idle',
+    currentSpeed: null,
+    currentTemp: null,
+    targetSpeed: null,
+    targetTemp: null,
+    errorDetails: null,
+  },
+  usbPort: { hub: 1, port: 1 },
+} as any
 
 describe('ModuleOverflowMenu', () => {
   let props: React.ComponentProps<typeof ModuleOverflowMenu>
@@ -24,6 +61,10 @@ describe('ModuleOverflowMenu', () => {
       handleClick: jest.fn(),
       handleAboutClick: jest.fn(),
     }
+    mockHeaterShakerWizard.mockReturnValue(<div>Mock Heater Shaker Wizard</div>)
+    mocUseLiveCommandMutation.mockReturnValue({
+      createCommand: mockCreateCommand,
+    } as any)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -111,5 +152,48 @@ describe('ModuleOverflowMenu', () => {
     getByRole('button', { name: 'About module' })
     getByRole('button', { name: 'See how to attach to deck' })
     getByRole('button', { name: 'Test shake' })
+  })
+  it('renders heater shaker see how to attach to deck button and when clicked, launches hs wizard', () => {
+    props = {
+      module: mockHeaterShaker,
+      handleClick: jest.fn(),
+      handleAboutClick: jest.fn(),
+    }
+    const { getByRole, getByText } = render(props)
+    const btn = getByRole('button', { name: 'See how to attach to deck' })
+    fireEvent.click(btn)
+    getByText('Mock Heater Shaker Wizard')
+  })
+  it('renders heater shaker labware latch button and when clicked, moves labware latch', () => {
+    props = {
+      module: mockHeaterShaker,
+      handleClick: jest.fn(),
+      handleAboutClick: jest.fn(),
+    }
+    mocUseLiveCommandMutation.mockReturnValue({
+      commandType: 'heaterShakerModule/openLatch',
+      //  TODO replace serial with id
+      params: { moduleId: props.module.serial },
+    } as any)
+    const { getByRole } = render(props)
+    const btn = getByRole('button', {
+      name: 'Open Labware Latch',
+    })
+    //  TODO finish test when you can get moduleId
+    fireEvent.click(btn)
+    // getByText('Close Labware Latch')
+  })
+  it('renders heater shaker labware latch button and is disabled when status is not idle', () => {
+    props = {
+      module: mockMovingHeaterShaker,
+      handleClick: jest.fn(),
+      handleAboutClick: jest.fn(),
+    }
+    const { getByRole } = render(props)
+    expect(
+      getByRole('button', {
+        name: 'Open Labware Latch',
+      })
+    ).toBeDisabled()
   })
 })
