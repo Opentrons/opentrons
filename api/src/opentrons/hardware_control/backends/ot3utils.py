@@ -59,6 +59,7 @@ def axis_to_node(axis: OT3Axis) -> "NodeId":
         OT3Axis.Z_R: NodeId.head_r,
         OT3Axis.P_L: NodeId.pipette_left,
         OT3Axis.P_R: NodeId.pipette_right,
+        OT3Axis.Z_G: NodeId.gripper,
     }
     return anm[axis]
 
@@ -71,6 +72,7 @@ def node_to_axis(node: "NodeId") -> OT3Axis:
         NodeId.head_r: OT3Axis.Z_R,
         NodeId.pipette_left: OT3Axis.P_L,
         NodeId.pipette_right: OT3Axis.P_R,
+        NodeId.gripper: OT3Axis.Z_G,
     }
     return nam[node]
 

@@ -174,13 +174,13 @@ class MoveScheduler:
             if not self._moves[group_id]:
                 log.info(f"Move group {group_id} has completed.")
                 self._event.set()
-            if self._stop_condition[
-                group_id
-            ] == MoveStopCondition.limit_switch and ack_id != UInt8Field(2):
-                raise MoveConditionNotMet()
-                if ack_id == UInt8Field(1):
-                    condition = "Homing timed out."
-                log.warning(f"Homing failed. Condition: {condition}")
+            # if self._stop_condition[
+            #     group_id
+            # ] == MoveStopCondition.limit_switch and ack_id != UInt8Field(2):
+            #     raise MoveConditionNotMet()
+            #     if ack_id == UInt8Field(1):
+            #         condition = "Homing timed out."
+            #     log.warning(f"Homing failed. Condition: {condition}")
 
     async def run(self, can_messenger: CanMessenger) -> None:
         """Start each move group after the prior has completed."""
