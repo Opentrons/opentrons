@@ -5,7 +5,10 @@ import { MenuList } from '../../../atoms/MenuList'
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
 
 import type { AttachedModule } from '../../../redux/modules/types'
-import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
+import {
+  HEATERSHAKER_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 
 interface ModuleOverflowMenuProps {
   module: AttachedModule
@@ -19,50 +22,75 @@ export const ModuleOverflowMenu = (
   const { t } = useTranslation(['device_details', 'heater_shaker'])
   const { module, handleClick, handleAboutClick } = props
 
+  const getOnClickCommand = (isSecondary: boolean = false): void => {
+    if (module.type === THERMOCYCLER_MODULE_TYPE) {
+      if (isSecondary) {
+        if (module.data.lidTarget !== null) {
+          // replace with deactivate lid command
+          return console.log('Deactivate Lid')
+        } else {
+          return handleClick(isSecondary)
+        }
+      } else {
+        if (module.status !== 'idle') {
+          // replace with deactivate block command
+          return console.log('Deactivate Block')
+        } else {
+          return handleClick(isSecondary)
+        }
+      }
+    }
+  }
+
   const menuItemsByModuleType = {
     thermocyclerModuleType: [
       {
-        setSetting: t('overflow_menu_lid_temp'),
-        turnOffSetting: t('overflow_menu_deactivate_block'),
+        setSetting:
+          module.type === THERMOCYCLER_MODULE_TYPE &&
+          module.data.lidTarget !== null
+            ? t('overflow_menu_deactivate_lid')
+            : t('overflow_menu_lid_temp'),
         isSecondary: true,
       },
       {
-        setSetting: t('overflow_menu_set_block_temp'),
-        turnOffSetting: t('overflow_menu_deactivate_block'),
+        setSetting:
+          module.type === THERMOCYCLER_MODULE_TYPE && module.status !== 'idle'
+            ? t('overflow_menu_deactivate_block')
+            : t('overflow_menu_set_block_temp'),
         isSecondary: false,
       },
     ],
-    temperatureModuleType: [
-      {
-        setSetting: t('overflow_menu_mod_temp'),
-        turnOffSetting: t('overflow_menu_deactivate_temp'),
-        isSecondary: false,
-      },
-    ],
-    magneticModuleType: [
-      {
-        setSetting: t('overflow_menu_engage'),
-        turnOffSetting: t('overflow_menu_deactivate_temp'),
-        isSecondary: false,
-      },
-    ],
-    heaterShakerModuleType: [
-      {
-        setSetting: t('set_temperature', { ns: 'heater_shaker' }),
-        turnOffSetting: t('deactivate', { ns: 'heater_shaker' }),
-        isSecondary: false,
-      },
-      {
-        setSetting: t('set_shake_speed', { ns: 'heater_shaker' }),
-        turnOffSetting: t('stop_shaking', { ns: 'heater_shaker' }),
-        isSecondary: false,
-      },
-      {
-        setSetting: t('open_labware_latch', { ns: 'heater_shaker' }),
-        turnOffSetting: t('close_labware_latch', { ns: 'heater_shaker' }),
-        isSecondary: false,
-      },
-    ],
+    // temperatureModuleType: [
+    //   {
+    //     setSetting: t('overflow_menu_mod_temp'),
+    //     turnOffSetting: t('overflow_menu_deactivate_temp'),
+    //     isSecondary: false,
+    //   },
+    // ],
+    // magneticModuleType: [
+    //   {
+    //     setSetting: t('overflow_menu_engage'),
+    //     turnOffSetting: t('overflow_menu_deactivate_temp'),
+    //     isSecondary: false,
+    //   },
+    // ],
+    // heaterShakerModuleType: [
+    //   {
+    //     setSetting: t('set_temperature', { ns: 'heater_shaker' }),
+    //     turnOffSetting: t('deactivate', { ns: 'heater_shaker' }),
+    //     isSecondary: false,
+    //   },
+    //   {
+    //     setSetting: t('set_shake_speed', { ns: 'heater_shaker' }),
+    //     turnOffSetting: t('stop_shaking', { ns: 'heater_shaker' }),
+    //     isSecondary: false,
+    //   },
+    //   {
+    //     setSetting: t('open_labware_latch', { ns: 'heater_shaker' }),
+    //     turnOffSetting: t('close_labware_latch', { ns: 'heater_shaker' }),
+    //     isSecondary: false,
+    //   },
+    // ],
   }
 
   const AboutModuleBtn = (
@@ -100,7 +128,7 @@ export const ModuleOverflowMenu = (
                 <MenuItem
                   minWidth="10rem"
                   key={index}
-                  onClick={() => handleClick(item.isSecondary)}
+                  onClick={() => getOnClickCommand(item.isSecondary)}
                   data-testid={`module_setting_${module.model}`}
                 >
                   {/* TODO(sh, 2022-02-11): conditionally render deactivate setting based on module status and pass the required commands. */}
