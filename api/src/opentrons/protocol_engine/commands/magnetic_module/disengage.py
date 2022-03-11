@@ -63,13 +63,15 @@ class DisengageImplementation(AbstractCommandImpl[DisengageParams, DisengageResu
         # Allow propagation of ModuleDoesNotExistError and WrongModuleTypeError.
         # Do this check even when using virtual modules,
         # to fully validate module IDs during analysis.
-        self._state_view.modules.assert_is_magnetic_module(module_id=params.moduleId)
+        magnetic_module_id = self._state_view.modules.assert_is_magnetic_module(
+            module_id=params.moduleId
+        )
 
         if not self._state_view.get_configs().use_virtual_modules:
             all_attached_modules = self._hardware_api.attached_modules
             # Allow propagation of ModuleNotAttachedError.
             target_module = self._state_view.modules.find_loaded_hardware_module(
-                module_id=params.moduleId,
+                module_id=magnetic_module_id,
                 attached_modules=all_attached_modules,
                 expected_type=MagDeck,
             )

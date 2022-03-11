@@ -201,13 +201,16 @@ class ModuleView(HasState[ModuleState]):
                 f"Cannot get lid height of {definition.moduleType}"
             )
 
-    def assert_is_magnetic_module(self, module_id: str) -> None:
+    def assert_is_magnetic_module(self, module_id: str) -> str:
         """Make sure the given module ID points to a Magnetic Module.
 
         Raises:
-            ModuleDoesNotExistError: If module_id has not been loaded.
-            WrongModuleTypeError: If module_id has been loaded,
+            ModuleDoesNotExistError: If ``module_id`` has not been loaded.
+            WrongModuleTypeError: If ``module_id`` has been loaded,
                 but it's not a Magnetic Module.
+
+        Returns:
+            The same ``module_id`` passed in.
         """
         # Propagate ModuleDoesNotExistError.
         model = self.get_model(module_id=module_id)
@@ -218,6 +221,7 @@ class ModuleView(HasState[ModuleState]):
             raise errors.WrongModuleTypeError(
                 f"{module_id} is a {model}, not a Magnetic Module."
             )
+        return module_id
 
     @staticmethod
     def get_magnet_home_to_base_offset(module_model: ModuleModel) -> float:
