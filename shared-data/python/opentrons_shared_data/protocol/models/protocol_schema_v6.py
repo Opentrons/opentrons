@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 from typing import List, Optional, Any, Dict
 from typing_extensions import Literal
 from enum import Enum
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 
 class CommandAnnotation(BaseModel):
@@ -20,24 +21,20 @@ class Location(BaseModel):
     moduleId: Optional[str] = None
 
 
-class PipetteIDEnum(Enum):
-    pipetteId = "pipetteId"
-
-
 class VolumeByWell(BaseModel):
     A1: int
     B1: int
 
 
 class WellLocation(BaseModel):
-    origin: str
-    offset: CornerOffsetFromSlot
+    origin: Optional[str] = None
+    offset: Optional[CornerOffsetFromSlot] = None
 
 
 class Params(BaseModel):
     slotName: Optional[int] = None
     axes: Optional[List[str]] = None
-    pipetteId: Optional[PipetteIDEnum] = None
+    pipetteId: Optional[str] = None
     mount: Optional[str] = None
     moduleId: Optional[str] = None
     location: Optional[Location] = None
@@ -65,21 +62,9 @@ class Command(BaseModel):
     params: Params
 
 
-class ID(BaseModel):
-    displayName: str
-    definitionId: str
-
-
 class Labware(BaseModel):
-    trashId: ID
-    tipRackId: ID
-    sourcePlateId: ID
-    destPlateId: ID
-
-
-class ExamplePlate1_Brand(BaseModel):
-    brand: str
-    brandId: List[Any]
+    displayName: Optional[str] = None
+    definitionId: str
 
 
 class Dimensions(BaseModel):
@@ -95,21 +80,6 @@ class GroupMetadata(BaseModel):
 class Group(BaseModel):
     metadata: GroupMetadata
     wells: List[str]
-
-
-class ExamplePlate1_Metadata(BaseModel):
-    displayName: str
-    displayCategory: str
-    displayVolumeUnits: str
-    tags: Optional[List[Any]] = None
-
-
-class ExamplePlate1_Parameters(BaseModel):
-    format: str
-    quirks: List[str]
-    isTiprack: bool
-    isMagneticModuleCompatible: bool
-    loadName: str
 
 
 class Shape(Enum):
@@ -129,124 +99,28 @@ class A1(BaseModel):
     xDimension: Optional[float] = None
 
 
-class ExamplePlate1_Wells(BaseModel):
-    A1: A1
-    B1: A1
-    C1: A1
-    D1: A1
-    A2: A1
-    B2: A1
-    C2: A1
-    D2: A1
-
-
-class ExamplePlate1(BaseModel):
-    ordering: List[List[str]]
-    brand: ExamplePlate1_Brand
-    metadata: ExamplePlate1_Metadata
-    dimensions: Dimensions
-    wells: ExamplePlate1_Wells
-    groups: List[Group]
-    parameters: ExamplePlate1_Parameters
-    namespace: str
-    version: int
-    schemaVersion: int
-    cornerOffsetFromSlot: CornerOffsetFromSlot
-
-
-class OpentronsOpentrons1_Trash1100MlFixed1_Brand(BaseModel):
-    brand: str
-
-
-class OpentronsOpentrons1_Trash1100MlFixed1_Wells(BaseModel):
-    A1: A1
-
-
-class OpentronsOpentrons1_Trash1100MlFixed1(BaseModel):
-    ordering: List[List[str]]
-    metadata: ExamplePlate1_Metadata
-    schemaVersion: int
-    version: int
-    namespace: str
-    dimensions: Dimensions
-    parameters: ExamplePlate1_Parameters
-    wells: OpentronsOpentrons1_Trash1100MlFixed1_Wells
-    brand: OpentronsOpentrons1_Trash1100MlFixed1_Brand
-    groups: List[Group]
-    cornerOffsetFromSlot: CornerOffsetFromSlot
-
-
-class OpentronsOpentrons96_Tiprack10UL1_Brand(BaseModel):
-    brand: str
-    brandId: List[Any]
-    links: List[str]
-
-
-class OpentronsOpentrons96_Tiprack10UL1_Parameters(BaseModel):
-    format: str
-    isTiprack: bool
-    tipLength: float
-    tipOverlap: float
-    isMagneticModuleCompatible: bool
-    loadName: str
-
-
-class OpentronsOpentrons96_Tiprack10UL1(BaseModel):
-    ordering: List[List[str]]
-    brand: OpentronsOpentrons96_Tiprack10UL1_Brand
-    metadata: ExamplePlate1_Metadata
-    dimensions: Dimensions
-    wells: Dict[str, A1]
-    groups: List[Group]
-    parameters: OpentronsOpentrons96_Tiprack10UL1_Parameters
-    namespace: str
-    version: int
-    schemaVersion: int
-    cornerOffsetFromSlot: CornerOffsetFromSlot
-
-
-class LabwareDefinitions(BaseModel):
-    opentronsopentrons1_trash1100mlfixed1: OpentronsOpentrons1_Trash1100MlFixed1
-    opentronsopentrons96_tiprack10ul1: OpentronsOpentrons96_Tiprack10UL1
-    exampleplate1: ExamplePlate1
-
-
-class WaterID(BaseModel):
+class Liquids(BaseModel):
     displayName: str
     description: str
 
 
-class Liquids(BaseModel):
-    waterId: WaterID
-
-
 class Metadata(BaseModel):
-    protocolName: str
-    author: str
-    description: str
-    created: int
-    lastModified: None
-    category: None
-    subcategory: None
-    tags: List[str]
+    protocolName: Optional[str]
+    author: Optional[str]
+    description: Optional[str]
+    created: Optional[int]
+    lastModified: Optional[int]
+    category: Optional[str]
+    subcategory: Optional[str]
+    tags: Optional[List[str]]
 
 
-class ModuleID(BaseModel):
+class Module(BaseModel):
     model: str
 
 
-class Modules(BaseModel):
-    magneticModuleId: ModuleID
-    temperatureModuleId: ModuleID
-
-
-class PipetteIDClass(BaseModel):
+class Pipette(BaseModel):
     name: str
-
-
-class Pipettes(BaseModel):
-    pipetteId: PipetteIDClass
-
 
 class Robot(BaseModel):
     model: str
@@ -255,7 +129,7 @@ class Robot(BaseModel):
 
 class ProtocolSchemaV6(BaseModel):
     otSharedSchema: Literal["#/protocol/schemas/6"] = Field(
-        None,
+        ...,
         alias="$otSharedSchema",
         description="The path to a valid Opentrons shared schema relative to "
         "the shared-data directory, without its extension.",
@@ -263,10 +137,14 @@ class ProtocolSchemaV6(BaseModel):
     schemaVersion: Literal[6]
     metadata: Metadata
     robot: Robot
-    pipettes: Pipettes
-    modules: Modules
-    labware: Labware
-    liquids: Liquids
-    labwareDefinitions: Any
+    pipettes: Dict[str, Pipette]
+    modules: Optional[Dict[str, Module]] = None
+    labware: Dict[str, Labware]
+    liquids: Optional[Dict[str, Liquids]] = None
+    labwareDefinitions: Dict[str, LabwareDefinition] = Field(
+        ...,
+        description="All labware definitions used by labware in this protocol, "
+        "keyed by UUID",
+    )
     commands: List[Command]
-    commandAnnotations: List[CommandAnnotation]
+    commandAnnotations: Optional[List[CommandAnnotation]] = None
