@@ -3,6 +3,7 @@
 #  dataclass fields interpretation.
 #  from __future__ import annotations
 from dataclasses import dataclass
+import enum
 
 from .. import utils
 
@@ -14,11 +15,45 @@ class EmptyPayload(utils.BinarySerializable):
     pass
 
 
+class FirmwareShortSHADataField(utils.BinaryFieldBase[bytes]):
+    """The short hash in a device info.
+
+    This is sized to hold the default size of an abbreviated Git hash,
+    what you get when you do git rev-parse --short HEAD. If we ever
+    need to increase the size of that abbreviated ID, we'll need to
+    increase this too.
+    """
+
+    NUM_BYTES = 7
+    FORMAT = f"{NUM_BYTES}s"
+
+
+class VersionFlags(enum.Enum):
+    """Flags in the version field."""
+
+    BUILD_IS_EXACT_COMMIT = 0x1
+    BUILD_IS_EXACT_VERSION = 0x2
+    BUILD_IS_FROM_CI = 0x4
+
+
+class VersionFlagsField(utils.UInt32Field):
+    """A field for version flags."""
+
+    def __repr__(self) -> str:
+        """Print version flags."""
+        flags_list = [
+            flag.name for flag in VersionFlags if bool(self.value & flag.value)
+        ]
+        return f"{self.__class__.__name__}(value={','.join(flags_list)})"
+
+
 @dataclass
 class DeviceInfoResponsePayload(utils.BinarySerializable):
     """Device info response."""
 
     version: utils.UInt32Field
+    flags: VersionFlagsField
+    shortsha: FirmwareShortSHADataField
 
 
 class TaskNameDataField(utils.BinaryFieldBase[bytes]):
