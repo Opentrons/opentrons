@@ -130,6 +130,111 @@ class LabwarePositionCheck:
         "//span[text()='Labware Position Check complete. 3 Labware Offsets created.']",
     )
 
+    labware_offsetbox_slot_4: Tuple[str, str] = (
+        By.ID,
+        "LabwareInfoOverlay_slot_4_offsetBox",
+    )
+
+    labware_display_name_slot_4: Tuple[str, str] = (
+        By.ID,
+        "LabwareInfoOverlay_slot_4_displayName",
+    )
+
+    labware_slot_4_offset_x_text: Tuple[str, str] = (
+        By.ID,
+        "LabwareInfoOverlay_4_x",
+    )
+
+    labware_slot_4_offset_x_value: Tuple[str, str] = (
+        By.ID,
+        "LabwareInfoOverlay_4_xValue",
+    )
+
+    labware_slot_4_offset_y_text: Tuple[str, str] = (
+        By.ID,
+        "LabwareInfoOverlay_4_y",
+    )
+
+    labware_slot_4_offset_y_value: Tuple[str, str] = (
+        By.ID,
+        "LabwareInfoOverlay_4_yValue",
+    )
+    labware_slot_4_offset_z_text: Tuple[str, str] = (
+        By.ID,
+        "LabwareInfoOverlay_4_z",
+    )
+
+    labware_slot_4_offset_z_value: Tuple[str, str] = (
+        By.ID,
+        "LabwareInfoOverlay_4_zValue",
+    )
+    labware_display_name_slot_5: Tuple[str, str] = (
+        By.ID,
+        "LabwareInfoOverlay_slot_5_displayName",
+    )
+
+    labware_slot_5_offset_x_text: Tuple[str, str] = (
+        By.ID,
+        "LabwareInfoOverlay_5_x",
+    )
+
+    labware_slot_5_offset_x_value: Tuple[str, str] = (
+        By.ID,
+        "LabwareInfoOverlay_5_xValue",
+    )
+
+    labware_slot_5_offset_y_text: Tuple[str, str] = (
+        By.ID,
+        "LabwareInfoOverlay_5_y",
+    )
+
+    labware_slot_5_offset_y_value: Tuple[str, str] = (
+        By.ID,
+        "LabwareInfoOverlay_5_yValue",
+    )
+    labware_slot_5_offset_z_text: Tuple[str, str] = (
+        By.ID,
+        "LabwareInfoOverlay_5_z",
+    )
+
+    labware_slot_5_offset_z_value: Tuple[str, str] = (
+        By.ID,
+        "LabwareInfoOverlay_5_zValue",
+    )
+    labware_display_name_slot_2: Tuple[str, str] = (
+        By.ID,
+        "LabwareInfoOverlay_slot_2_displayName",
+    )
+
+    labware_slot_2_offset_x_text: Tuple[str, str] = (
+        By.ID,
+        "LabwareInfoOverlay_2_x",
+    )
+
+    labware_slot_2_offset_x_value: Tuple[str, str] = (
+        By.ID,
+        "LabwareInfoOverlay_2_xValue",
+    )
+
+    labware_slot_2_offset_y_text: Tuple[str, str] = (
+        By.ID,
+        "LabwareInfoOverlay_2_y",
+    )
+
+    labware_slot_2_offset_y_value: Tuple[str, str] = (
+        By.ID,
+        "LabwareInfoOverlay_2_yValue",
+    )
+    labware_slot_2_offset_z_text: Tuple[str, str] = (
+        By.ID,
+        "LabwareInfoOverlay_2_z",
+    )
+
+    labware_slot_2_offset_z_value: Tuple[str, str] = (
+        By.ID,
+        "LabwareInfoOverlay_2_zValue",
+    )
+
     @highlight
     def get_labware_position_check_button(self) -> WebElement:
         """Button to locate LPC button."""
@@ -379,79 +484,205 @@ class LabwarePositionCheck:
         self.get_close_and_apply_labware_offset_data_button().click()
 
     @highlight
-    def get_labwareName_on_deckmap(self) -> Optional[WebElement]:
+    def get_labware_display_name_slot_4(self) -> Optional[WebElement]:
         """locator for Labware name on deckmap."""
-        elements = self.driver.find_elements(
-            By.ID,
-            "LabwareInfoOverlay_displayName",
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(LabwarePositionCheck.labware_display_name_slot_4)
         )
-        if len(elements) == 4:
-            logger.info(f"Display Name of first element: {elements[0].text}")
-            return elements[0]
-        return None
 
     @highlight
-    def get_x_offset_text_on_deckmap(self) -> Optional[WebElement]:
-        """locator for x offset text on deck map."""
-        elements = self.driver.find_elements(
-            By.ID,
-            "LabwareInfoOverlay_x",
+    def get_labware_offsetbox_slot_4(self) -> Optional[WebElement]:
+        """locator for Labware offset box on deckmap."""
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(LabwarePositionCheck.labware_offsetbox_slot_4)
         )
-        if len(elements) == 4:
-            return elements[0]
-        return None
 
     @highlight
-    def get_x_offset_value_on_deckmap(self) -> Optional[WebElement]:
-        """locator for x offset value on deck map."""
-        elements = self.driver.find_elements(
-            By.ID,
-            "LabwareInfoOverlay_xValue",
+    def get_labware_slot_4_offset_x_text(self) -> Optional[WebElement]:
+        """locator for Labware x text on slot 4 on deckmap."""
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(
+                LabwarePositionCheck.labware_slot_4_offset_x_text
+            )
         )
-        if len(elements) == 4:
-            return elements[0]
-        return None
 
     @highlight
-    def get_y_offset_text_on_deckmap(self) -> Optional[WebElement]:
-        """locator for y offset text on deck map."""
-        elements = self.driver.find_elements(
-            By.ID,
-            "LabwareInfoOverlay_y",
+    def get_labware_slot_4_offset_x_value(self) -> Optional[WebElement]:
+        """locator for Labware x offset value on slot 4 on deckmap."""
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(
+                LabwarePositionCheck.labware_slot_4_offset_x_value
+            )
         )
-        if len(elements) == 4:
-            return elements[0]
-        return None
 
     @highlight
-    def get_y_offset_value_on_deckmap(self) -> Optional[WebElement]:
-        """locator for y offset value on deck map."""
-        elements = self.driver.find_elements(
-            By.ID,
-            "LabwareInfoOverlay_yValue",
+    def get_labware_slot_4_offset_y_text(self) -> Optional[WebElement]:
+        """locator for Labware y osset value on deckmap."""
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(
+                LabwarePositionCheck.labware_slot_4_offset_y_text
+            )
         )
-        if len(elements) == 4:
-            return elements[0]
-        return None
 
     @highlight
-    def get_z_offset_text_on_deckmap(self) -> Optional[WebElement]:
-        """locator for z offset text on deck map."""
-        elements = self.driver.find_elements(
-            By.ID,
-            "LabwareInfoOverlay_z",
+    def get_labware_slot_4_offset_y_value(self) -> Optional[WebElement]:
+        """locator for Labware y offset value on deckmap."""
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(
+                LabwarePositionCheck.labware_slot_4_offset_y_value
+            )
         )
-        if len(elements) == 4:
-            return elements[0]
-        return None
 
     @highlight
-    def get_z_offset_value_on_deckmap(self) -> Optional[WebElement]:
-        """locator for z offset text on deck map."""
-        elements = self.driver.find_elements(
-            By.ID,
-            "LabwareInfoOverlay_zValue",
+    def get_labware_slot_4_offset_z_text(self) -> Optional[WebElement]:
+        """locator for Labware y osset value on deckmap."""
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(
+                LabwarePositionCheck.labware_slot_4_offset_z_text
+            )
         )
-        if len(elements) == 4:
-            return elements[0]
-        return None
+
+    @highlight
+    def get_labware_slot_4_offset_z_value(self) -> Optional[WebElement]:
+        """locator for Labware y offset value on deckmap."""
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(
+                LabwarePositionCheck.labware_slot_4_offset_z_value
+            )
+        )
+
+    @highlight
+    def get_labware_display_name_slot_5(self) -> Optional[WebElement]:
+        """locator for Labware name on deckmap."""
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(LabwarePositionCheck.labware_display_name_slot_5)
+        )
+
+    @highlight
+    def get_labware_offsetbox_slot_5(self) -> Optional[WebElement]:
+        """locator for Labware offset box on deckmap."""
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(LabwarePositionCheck.labware_offsetbox_slot_5)
+        )
+
+    @highlight
+    def get_labware_slot_5_offset_x_text(self) -> Optional[WebElement]:
+        """locator for Labware x text on slot 4 on deckmap."""
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(
+                LabwarePositionCheck.labware_slot_5_offset_x_text
+            )
+        )
+
+    @highlight
+    def get_labware_slot_5_offset_x_value(self) -> Optional[WebElement]:
+        """locator for Labware x offset value on slot 4 on deckmap."""
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(
+                LabwarePositionCheck.labware_slot_5_offset_x_value
+            )
+        )
+
+    @highlight
+    def get_labware_slot_5_offset_y_text(self) -> Optional[WebElement]:
+        """locator for Labware y osset value on deckmap."""
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(
+                LabwarePositionCheck.labware_slot_5_offset_y_text
+            )
+        )
+
+    @highlight
+    def get_labware_slot_5_offset_y_value(self) -> Optional[WebElement]:
+        """locator for Labware y offset value on deckmap."""
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(
+                LabwarePositionCheck.labware_slot_5_offset_y_value
+            )
+        )
+
+    @highlight
+    def get_labware_slot_5_offset_z_text(self) -> Optional[WebElement]:
+        """locator for Labware y osset value on deckmap."""
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(
+                LabwarePositionCheck.labware_slot_5_offset_z_text
+            )
+        )
+
+    @highlight
+    def get_labware_slot_5_offset_z_value(self) -> Optional[WebElement]:
+        """locator for Labware y offset value on deckmap."""
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(
+                LabwarePositionCheck.labware_slot_5_offset_z_value
+            )
+        )
+
+    @highlight
+    def get_labware_display_name_slot_2(self) -> Optional[WebElement]:
+        """locator for Labware name on deckmap."""
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(LabwarePositionCheck.labware_display_name_slot_4)
+        )
+
+    @highlight
+    def get_labware_offsetbox_slot_2(self) -> Optional[WebElement]:
+        """locator for Labware offset box on deckmap."""
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(LabwarePositionCheck.labware_offsetbox_slot_4)
+        )
+
+    @highlight
+    def get_labware_slot_2_offset_x_text(self) -> Optional[WebElement]:
+        """locator for Labware x text on slot 4 on deckmap."""
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(
+                LabwarePositionCheck.labware_slot_4_offset_x_text
+            )
+        )
+
+    @highlight
+    def get_labware_slot_2_offset_x_value(self) -> Optional[WebElement]:
+        """locator for Labware x offset value on slot 4 on deckmap."""
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(
+                LabwarePositionCheck.labware_slot_4_offset_x_value
+            )
+        )
+
+    @highlight
+    def get_labware_slot_2_offset_y_text(self) -> Optional[WebElement]:
+        """locator for Labware y osset value on deckmap."""
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(
+                LabwarePositionCheck.labware_slot_4_offset_y_text
+            )
+        )
+
+    @highlight
+    def get_labware_slot_2_offset_y_value(self) -> Optional[WebElement]:
+        """locator for Labware y offset value on deckmap."""
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(
+                LabwarePositionCheck.labware_slot_4_offset_y_value
+            )
+        )
+
+    @highlight
+    def get_labware_slot_2_offset_z_text(self) -> Optional[WebElement]:
+        """locator for Labware y osset value on deckmap."""
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(
+                LabwarePositionCheck.labware_slot_4_offset_z_text
+            )
+        )
+
+    @highlight
+    def get_labware_slot_2_offset_z_value(self) -> Optional[WebElement]:
+        """locator for Labware y offset value on deckmap."""
+        return WebDriverWait(self.driver, 2).until(
+            EC.element_to_be_clickable(
+                LabwarePositionCheck.labware_slot_4_offset_z_value
+            )
+        )

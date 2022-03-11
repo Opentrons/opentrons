@@ -276,15 +276,44 @@ def test_LPC_flow(
         labware_position_check.click_get_close_and_apply_labware_offset_data_button()
         assert labware_position_check.get_labware_success_toast().is_displayed()
         assert (
-            labware_position_check.get_labwareName_on_deckmap().text
+            labware_position_check.get_labware_display_name_slot_4().text
             == "Opentrons 96 Tip Rack 10 µL"
         )
-        assert labware_position_check.get_x_offset_text_on_deckmap().is_displayed()
-        assert labware_position_check.get_x_offset_value_on_deckmap().text == "0.10"
-        assert labware_position_check.get_y_offset_text_on_deckmap().is_displayed()
-        assert labware_position_check.get_y_offset_value_on_deckmap().text == "0.00"
-        assert labware_position_check.get_z_offset_text_on_deckmap().is_displayed()
-        assert labware_position_check.get_z_offset_value_on_deckmap().text == "-0.10"
+        assert labware_position_check.get_labware_offsetbox_slot_4().is_displayed()
+        assert labware_position_check.get_labware_slot_4_offset_x_text().is_displayed()
+        assert labware_position_check.get_labware_slot_4_offset_x_value().text == "0.10"
+        assert labware_position_check.get_labware_slot_4_offset_y_text().is_displayed()
+        assert labware_position_check.get_labware_slot_4_offset_y_value().text == "0.00"
+        assert labware_position_check.get_labware_slot_4_offset_z_text().is_displayed()
+        assert (
+            labware_position_check.get_labware_slot_4_offset_z_value().text == "-0.10"
+        )
+        assert (
+            labware_position_check.get_labware_display_name_slot_5().text
+            == "Opentrons 96 Tip Rack 10 µL"
+        )
+        assert labware_position_check.get_labware_offsetbox_slot_5().is_displayed()
+        assert labware_position_check.get_labware_slot_5_offset_x_text().is_displayed()
+        assert labware_position_check.get_labware_slot_5_offset_x_value().text == "0.10"
+        assert labware_position_check.get_labware_slot_5_offset_y_text().is_displayed()
+        assert labware_position_check.get_labware_slot_5_offset_y_value().text == "0.00"
+        assert labware_position_check.get_labware_slot_5_offset_z_text().is_displayed()
+        assert (
+            labware_position_check.get_labware_slot_5_offset_z_value().text == "-0.10"
+        )
+        assert (
+            labware_position_check.get_labware_display_name_slot_2().text
+            == "Opentrons 96 Tip Rack 10 µL"
+        )
+        assert labware_position_check.get_labware_offsetbox_slot_2().is_displayed()
+        assert labware_position_check.get_labware_slot_2_offset_x_text().is_displayed()
+        assert labware_position_check.get_labware_slot_2_offset_x_value().text == "0.10"
+        assert labware_position_check.get_labware_slot_2_offset_y_text().is_displayed()
+        assert labware_position_check.get_labware_slot_2_offset_y_value().text == "0.00"
+        assert labware_position_check.get_labware_slot_2_offset_z_text().is_displayed()
+        assert (
+            labware_position_check.get_labware_slot_2_offset_z_value().text == "-0.10"
+        )
 
 
 def test_gen1_pipette(
