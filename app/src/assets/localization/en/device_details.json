@@ -51,5 +51,6 @@
   "shaker": "Shaker",
   "target_speed": "Target: {{speed}} RPM",
   "current_speed": "Current: {{speed}} RPM",
-  "na_speed": "Target: N/A RPM"
+  "na_speed": "Target: N/A RPM",
+  "module_controls": "Module Controls"
 }

@@ -12,7 +12,9 @@
   "ok": "ok",
   "open": "open",
   "refresh_list": "refresh list",
+  "start": "start",
   "starting": "starting",
+  "stop": "stop",
   "try_again": "try again",
   "unknown": "unknown"
 }

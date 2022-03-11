@@ -11,13 +11,14 @@ interface ModuleOverflowMenuProps {
   module: AttachedModule
   handleClick: (isSecondary: boolean) => void
   handleAboutClick: () => void
+  handleTestShakeClick: () => void
 }
 
 export const ModuleOverflowMenu = (
   props: ModuleOverflowMenuProps
 ): JSX.Element | null => {
   const { t } = useTranslation(['device_details', 'heater_shaker'])
-  const { module, handleClick, handleAboutClick } = props
+  const { module, handleClick, handleAboutClick, handleTestShakeClick } = props
 
   const menuItemsByModuleType = {
     thermocyclerModuleType: [
@@ -79,13 +80,20 @@ export const ModuleOverflowMenu = (
   const AttachToDeckBtn = (
     <MenuItem
       minWidth="10rem"
+      key="attach_button_to_deck"
+      data-testid="attach_button_to_deck"
       onClick={() => console.log('how to attach to deck')}
     >
       {t('how_to_attach_to_deck', { ns: 'heater_shaker' })}
     </MenuItem>
   )
   const TestShakeBtn = (
-    <MenuItem minWidth="10rem" onClick={() => console.log('test shake')}>
+    <MenuItem
+      minWidth="10rem"
+      key="test_shake"
+      data-testid="test_shake"
+      onClick={() => handleTestShakeClick()}
+    >
       {t('test_shake', { ns: 'heater_shaker' })}
     </MenuItem>
   )

@@ -33,7 +33,6 @@ export const HeaterShakerModuleCard = (
       backgroundColor={COLORS.background}
       borderRadius={SPACING.spacing2}
       marginBottom={SPACING.spacing3}
-      marginLeft={SPACING.spacing3}
       padding={`${SPACING.spacing4} ${SPACING.spacing3} ${SPACING.spacing4} ${SPACING.spacing3}`}
       width={'20rem'}
     >

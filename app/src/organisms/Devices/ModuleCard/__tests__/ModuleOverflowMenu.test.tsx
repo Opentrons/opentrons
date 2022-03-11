@@ -23,6 +23,7 @@ describe('ModuleOverflowMenu', () => {
       module: mockMagneticModule,
       handleClick: jest.fn(),
       handleAboutClick: jest.fn(),
+      handleTestShakeClick: jest.fn(),
     }
   })
   afterEach(() => {
@@ -59,6 +60,7 @@ describe('ModuleOverflowMenu', () => {
       module: mockTemperatureModuleGen2,
       handleClick: jest.fn(),
       handleAboutClick: jest.fn(),
+      handleTestShakeClick: jest.fn(),
     }
     const { getByRole } = render(props)
     const buttonSetting = getByRole('button', {
@@ -75,6 +77,7 @@ describe('ModuleOverflowMenu', () => {
       module: mockThermocycler,
       handleClick: jest.fn(),
       handleAboutClick: jest.fn(),
+      handleTestShakeClick: jest.fn(),
     }
     const { getByRole } = render(props)
     const buttonSettingLid = getByRole('button', {
@@ -96,6 +99,7 @@ describe('ModuleOverflowMenu', () => {
       module: mockHeaterShaker,
       handleClick: jest.fn(),
       handleAboutClick: jest.fn(),
+      handleTestShakeClick: jest.fn(),
     }
     // TODO(sh, 2022-03-08): extend tests when menu component is wired up
     const { getByRole } = render(props)

@@ -41,8 +41,12 @@ import temperatureModule from '../../../assets/images/temp_deck_gen_2_transparen
 import thermoModule from '../../../assets/images/thermocycler_open_transparent.svg'
 import heaterShakerModule from '../../../assets/images/heatershaker_module_transparent.svg'
 
-import type { AttachedModule } from '../../../redux/modules/types'
+import type {
+  AttachedModule,
+  HeaterShakerModule,
+} from '../../../redux/modules/types'
 import { HeaterShakerModuleData } from './HeaterShakerModuleData'
+import { TestShakeSlideout } from './TestShakeSlideout'
 
 interface ModuleCardProps {
   module: AttachedModule
@@ -55,6 +59,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [showSlideout, setShowSlideout] = React.useState(false)
   const [hasSecondary, setHasSecondary] = React.useState(false)
   const [showAboutModule, setShowAboutModule] = React.useState(false)
+  const [showTestShake, setShowTestShake] = React.useState(false)
 
   const moduleOverflowWrapperRef = useOnClickOutside({
     onClickOutside: () => setShowOverflowMenu(false),
@@ -135,6 +140,12 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     setShowSlideout(false)
   }
 
+  const handleTestShakeClick = (): void => {
+    setShowTestShake(true)
+    setShowOverflowMenu(false)
+    setShowSlideout(false)
+  }
+
   return (
     <React.Fragment>
       <Flex
@@ -158,6 +169,13 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             module={module}
             isExpanded={showAboutModule}
             onCloseClick={() => setShowAboutModule(false)}
+          />
+        )}
+        {showTestShake && (
+          <TestShakeSlideout
+            module={module as HeaterShakerModule}
+            isExpanded={showTestShake}
+            onCloseClick={() => setShowTestShake(false)}
           />
         )}
         <Box
@@ -214,6 +232,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               handleAboutClick={handleAboutClick}
               module={module}
               handleClick={handleMenuItemClick}
+              handleTestShakeClick={handleTestShakeClick}
             />
           </div>
         )}
