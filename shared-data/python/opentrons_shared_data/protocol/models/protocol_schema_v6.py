@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional, Any, Dict
+from typing import List, Optional, Dict
 from typing_extensions import Literal
 from enum import Enum
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
@@ -121,6 +121,7 @@ class Module(BaseModel):
 
 class Pipette(BaseModel):
     name: str
+
 
 class Robot(BaseModel):
     model: str
