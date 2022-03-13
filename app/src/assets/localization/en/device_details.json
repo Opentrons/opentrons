@@ -58,5 +58,7 @@
   "set_shake_of_hs": "Set RPM for this module.",
   "set_shake_speed": "Set shake speed",
   "set_block_temp": "Set temperature",
-  "shake_speed": "Shake Speed"
+  "shake_speed": "Shake Speed",
+  "between_4_to_99": "Between 4 °C – 99 °C",
+  "between_200_to_1800": "Between 200 - 1800 RPM"
 }

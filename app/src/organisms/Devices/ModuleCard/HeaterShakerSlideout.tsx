@@ -113,6 +113,9 @@ export const HeaterShakerSlideout = (
           value={hsValue}
           onChange={e => setHsValue(e.target.value)}
         />
+        <Text color={COLORS.darkGreyEnabled} fontSize="10px" paddingTop="4px">
+          {isSetShake ? t('between_200_to_1800') : t('between_4_to_99')}
+        </Text>
       </Flex>
     </Slideout>
   )

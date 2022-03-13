@@ -88,7 +88,7 @@ export const ModuleOverflowMenu = (
       }
     } else if (module.type === HEATERSHAKER_MODULE_TYPE) {
       if (isSecondary) {
-        if (module.data.currentSpeed !== 0) {
+        if (module.status === 'running') {
           //  TODO(jr, 3/11/22): plug in command here, how do we deactivate the shaking?
           return console.log('Deactivate shake')
         } else {
@@ -142,6 +142,7 @@ export const ModuleOverflowMenu = (
             ? t('overflow_menu_deactivate_lid')
             : t('overflow_menu_lid_temp'),
         isSecondary: true,
+        disabledReason: false,
       },
       {
         setSetting:
@@ -149,6 +150,7 @@ export const ModuleOverflowMenu = (
             ? t('overflow_menu_deactivate_block')
             : t('overflow_menu_set_block_temp'),
         isSecondary: false,
+        disabledReason: false,
       },
     ],
     temperatureModuleType: [
@@ -158,6 +160,7 @@ export const ModuleOverflowMenu = (
             ? t('overflow_menu_deactivate_temp')
             : t('overflow_menu_mod_temp'),
         isSecondary: false,
+        disabledReason: false,
       },
     ],
     magneticModuleType: [
@@ -168,6 +171,7 @@ export const ModuleOverflowMenu = (
             : t('overflow_menu_engage'),
 
         isSecondary: false,
+        disabledReason: false,
       },
     ],
     heaterShakerModuleType: [
@@ -176,16 +180,19 @@ export const ModuleOverflowMenu = (
           module.type === HEATERSHAKER_MODULE_TYPE && module.status !== 'idle'
             ? t('deactivate', { ns: 'heater_shaker' })
             : t('set_temperature', { ns: 'heater_shaker' }),
-
         isSecondary: false,
+        disabledReason: false,
       },
       {
         setSetting:
-          module.type === HEATERSHAKER_MODULE_TYPE &&
-          module.data.currentSpeed === 0
+          module.type === HEATERSHAKER_MODULE_TYPE && module.status === 'idle'
             ? t('set_shake_speed', { ns: 'heater_shaker' })
             : t('stop_shaking', { ns: 'heater_shaker' }),
         isSecondary: true,
+        disabledReason:
+          module.type === HEATERSHAKER_MODULE_TYPE &&
+          (module.data.labwareLatchStatus === 'idle_open' ||
+            module.data.labwareLatchStatus === 'opening'),
       },
     ],
   }
@@ -252,21 +259,29 @@ export const ModuleOverflowMenu = (
           buttons={[
             menuItemsByModuleType[module.type].map((item, index) => {
               return (
-                <MenuItem
-                  minWidth="10rem"
-                  key={index}
-                  onClick={() => getOnClickCommand(item.isSecondary)}
-                  data-testid={`module_setting_${module.model}`}
-                >
-                  {/* TODO(sh, 2022-02-11): conditionally render deactivate setting based on module status and pass the required commands. */}
-                  {item.setSetting}
-                </MenuItem>
+                <>
+                  <MenuItem
+                    minWidth="10rem"
+                    key={index}
+                    onClick={() => getOnClickCommand(item.isSecondary)}
+                    data-testid={`module_setting_${module.model}`}
+                    disabled={item.disabledReason}
+                    {...targetProps}
+                  >
+                    {/* TODO(sh, 2022-02-11): conditionally render deactivate setting based on module status and pass the required commands. */}
+                    {item.setSetting}
+                  </MenuItem>
+                  {item.disabledReason && (
+                    <Tooltip {...tooltipProps}>
+                      {t('cannot_shake', { ns: 'heater_shaker' })}
+                    </Tooltip>
+                  )}
+                </>
               )
             }),
-            module.type === HEATERSHAKER_MODULE_TYPE ? LabwareLatchBtn : null,
-            AboutModuleBtn,
-            module.type === HEATERSHAKER_MODULE_TYPE ? AttachToDeckBtn : null,
-            module.type === HEATERSHAKER_MODULE_TYPE ? TestShakeBtn : null,
+            module.type === HEATERSHAKER_MODULE_TYPE
+              ? [LabwareLatchBtn, AboutModuleBtn, AttachToDeckBtn, TestShakeBtn]
+              : AboutModuleBtn,
           ]}
         />
       </Flex>

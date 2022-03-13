@@ -47,6 +47,7 @@ describe('HeaterShakerSlideout', () => {
     getByText('Set Shake Speed for Heater Shaker Module GEN1')
     getByText('Set RPM for this module.')
     getByText('Set shake speed')
+    getByText('Between 200 - 1800 RPM')
   })
 
   it('renders correct title and body for heater shaker set temperature', () => {
@@ -63,6 +64,7 @@ describe('HeaterShakerSlideout', () => {
       'Set target temperature. This module actively heats but cools passively to room temperature.'
     )
     getByText('Set temperature')
+    getByText('Between 4 °C – 99 °C')
   })
 
   it('renders the button and it is not clickable until there is something in form field for set shake', () => {

@@ -73,5 +73,6 @@
   "test_shake": "Test shake",
   "deactivate": "Deactivate",
   "stop_shaking": "Stop Shaking",
-  "cannot_open_latch": "Cannot open labware latch while module is shaking."
+  "cannot_open_latch": "Cannot open labware latch while module is shaking.",
+  "cannot_shake": "Cannot shake when labware latch is open"
 }
