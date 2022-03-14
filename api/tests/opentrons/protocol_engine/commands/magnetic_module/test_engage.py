@@ -46,6 +46,7 @@ async def test_magnetic_module_engage_implementation(
 
     match = decoy.mock(cls=MagDeck)
 
+    # This won't be called when use_virtual_modules=True
     decoy.when(
         state_view.modules.find_loaded_hardware_module(
             module_id="module-id", attached_modules=attached, expected_type=MagDeck

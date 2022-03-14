@@ -1,11 +1,16 @@
 """Command models to start heating a Heater-Shaker Module."""
-from typing import Optional
+from __future__ import annotations
+from typing import Optional, TYPE_CHECKING
 from typing_extensions import Literal, Type
 
 from pydantic import BaseModel, Field
 
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from opentrons.hardware_control.modules import HeaterShaker
+from opentrons.hardware_control import HardwareControlAPI
 
+if TYPE_CHECKING:
+    from opentrons.protocol_engine.state import StateView
 
 StartSetTargetTemperatureCommandType = Literal[
     "heaterShakerModule/startSetTargetTemperature"
@@ -30,17 +35,39 @@ class StartSetTargetTemperatureImpl(
 ):
     """Execution implementation of a Heater-Shaker's set temperature command."""
 
-    def __init__(self, **kwargs: object) -> None:
-        pass
+    def __init__(
+            self,
+            state_view: StateView,
+            hardware_api: HardwareControlAPI,
+            **unused_dependencies: object
+    ) -> None:
+        self._state_view = state_view
+        self._hardware_api = hardware_api
 
     async def execute(
         self,
         params: StartSetTargetTemperatureParams,
     ) -> StartSetTargetTemperatureResult:
         """Set a Heater-Shaker's target temperature."""
-        raise NotImplementedError(
-            "Heater-Shaker start set target temperature not yet implemented."
+        await self._set_target_temperature(
+            module_id=params.moduleId,
+            celsius=params.temperature,
         )
+        return StartSetTargetTemperatureResult()
+
+    async def _set_target_temperature(self, module_id: str, celsius: float) -> None:
+        """Set target temperature and return immediately."""
+        model = self._state_view.modules.get_model(module_id)
+        assert self._state_view.modules.is_target_temperature_valid(
+            heating_module_model=model,
+            celsius=celsius
+        )
+        hardware_module = self._state_view.modules.find_loaded_hardware_module(
+            module_id=module_id,
+            attached_modules=self._hardware_api.attached_modules,
+            expected_type=HeaterShaker,
+        )
+        await hardware_module.start_set_temperature(celsius)
 
 
 class StartSetTargetTemperature(

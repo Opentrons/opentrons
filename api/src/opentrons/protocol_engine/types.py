@@ -144,6 +144,7 @@ class ModuleModel(str, Enum):
     MAGNETIC_MODULE_V1 = "magneticModuleV1"
     MAGNETIC_MODULE_V2 = "magneticModuleV2"
     THERMOCYCLER_MODULE_V1 = "thermocyclerModuleV1"
+    HEATER_SHAKER_MODULE_V1 = "heaterShakerModuleV1"
 
     def as_type(self) -> ModuleType:
         """Get the ModuleType of this model."""

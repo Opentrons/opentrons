@@ -23,6 +23,13 @@ log = logging.getLogger(__name__)
 
 POLL_PERIOD = 1
 
+MIN_ALLOWED_TEMPERATURE = 37
+MAX_ALLOWED_TEMPERATURE = 95
+MIN_ALLOWED_SPEED: int = 200
+# TODO (spp, 2022-2-22): User requirements doc states 2000rpm as limit but
+#  the module is capable of going up to 3000rpm. Which one to use for limit?
+MAX_ALLOWED_SPEED: int = 2000
+
 
 class HeaterShakerError(RuntimeError):
     """An error propagated from the heater-shaker module."""

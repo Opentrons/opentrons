@@ -51,6 +51,22 @@ _THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = [
 ]
 
 
+class SpeedRange(NamedTuple):
+    """Class defining minimum and maximum allowed speeds for a shaking module."""
+    min: int
+    max: int
+
+
+class TemperatureRange(NamedTuple):
+    """Class defining minimum and maximum allowed temperatures for a heating module."""
+    min: float
+    max: float
+
+
+HEATER_SHAKER_TEMPERATURE_RANGE = TemperatureRange(min=37, max=95)
+HEATER_SHAKER_SPEED_RANGE = SpeedRange(min=200, max=3000)
+
+
 @dataclass(frozen=True)
 class HardwareModule:
     """Data describing an actually connected module."""
@@ -352,6 +368,26 @@ class ModuleView(HasState[ModuleState]):
             )
         return hardware_units_from_home
 
+    @staticmethod
+    def is_target_temperature_valid(
+            heating_module_model: ModuleModel, celsius: float
+    ) -> bool:
+        """Verify that the target temperature being set is valid for the module type."""
+        if heating_module_model == ModuleModel.HEATER_SHAKER_MODULE_V1:
+            return (HEATER_SHAKER_TEMPERATURE_RANGE.min
+                    <= celsius <= HEATER_SHAKER_TEMPERATURE_RANGE.max)
+        elif heating_module_model == ModuleModel.THERMOCYCLER_MODULE_V1:
+            raise NotImplementedError("Temperature validation for Thermocycler "
+                                      "not implemented yet")
+        elif heating_module_model in [ModuleModel.TEMPERATURE_MODULE_V1,
+                                      ModuleModel.TEMPERATURE_MODULE_V2]:
+            raise NotImplementedError("Temperature validation for Temperature Module"
+                                      "not implemented yet.")
+        else:
+            raise errors.WrongModuleTypeError(
+                f"{heating_module_model} is not a heating module."
+            )
+
     def should_dodge_thermocycler(
         self,
         from_slot: DeckSlotName,
@@ -377,7 +413,7 @@ class ModuleView(HasState[ModuleState]):
         module_id: str,
         attached_modules: List[AbstractModule],
         expected_type: Type[_ModuleT],
-    ) -> _ModuleT:
+    ) -> Optional[_ModuleT]:
         """Return the hardware module that corresponds to a Protocol Engine module ID.
 
         Should not be called when the ``use_virtual_modules`` engine config is True,
