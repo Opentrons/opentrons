@@ -514,8 +514,30 @@ def test_magnetic_module_view_find_hardware(
     assert result == matching
 
 
-def test_magnetic_module_view_find_hardware_raises_if_match_not_attached(
-    decoy: Decoy, magdeck_v1_def: ModuleDefinition
+def test_magnetic_module_view_find_hardware_returns_none_if_virtualizing(
+    magdeck_v1_def: ModuleDefinition,
+) -> None:
+    parent = make_module_view(
+        hardware_module_by_slot={
+            DeckSlotName.SLOT_1: HardwareModule(
+                serial_number="serial-to-match",
+                definition=magdeck_v1_def,
+            ),
+        },
+        slot_by_module_id={
+            "id-to-match": DeckSlotName.SLOT_1,
+        },
+        virtualize_modules=True,
+    )
+    subject = parent.get_magnetic_module_view(module_id="id-to-match")
+
+    # Should return None,
+    # rather than raising because attached_modules contains no match.
+    assert subject.find_hardware(attached_modules=[]) is None
+
+
+def test_magnetic_module_view_find_hardware_raises_if_no_match_attached(
+    magdeck_v1_def: ModuleDefinition,
 ) -> None:
     """It should raise if nothing with a matching serial is in the attached list."""
     parent = make_module_view(
