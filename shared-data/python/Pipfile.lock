@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "485e1fd98d041ad2b4128b33dd158219be55d33936df0f4a7a0d336f705ac20f"
+            "sha256": "4718bc1a37163cce21f78549327d97e7e7e5d08852de2a48fa5ed696d29df910"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -191,6 +191,13 @@
             "markers": "sys_platform == 'win32'",
             "version": "==0.4.4"
         },
+        "commonmark": {
+            "hashes": [
+                "sha256:452f9dc859be7f06631ddcb328b6919c67984aca654e5fefb3914d54691aed60",
+                "sha256:da2f38c92590f83de410ba1a3cbceafbc74fee9def35f9251ba9a971d6d66fd9"
+            ],
+            "version": "==0.9.1"
+        },
         "coverage": {
             "hashes": [
                 "sha256:03e2a7826086b91ef345ff18742ee9fc47a6839ccd517061ef8fa1976e652ce9",
@@ -293,14 +300,6 @@
             "markers": "python_version >= '3'",
             "version": "==3.3"
         },
-        "importlib-metadata": {
-            "hashes": [
-                "sha256:b36ffa925fe3139b2f6ff11d6925ffd4fa7bc47870165e3ac260ac7b4f91e6ac",
-                "sha256:d16e8c1deb60de41b8e8ed21c1a7b947b0bc62fab7e1d470bcdf331cea2e6735"
-            ],
-            "markers": "python_version < '3.8'",
-            "version": "==4.11.2"
-        },
         "iniconfig": {
             "hashes": [
                 "sha256:011e24c64b7f47f6ebd835bb12a743f2fbe9a26d4cecaa7f53bc4f35ee9da8b3",
@@ -388,6 +387,13 @@
             "markers": "python_version >= '3.6'",
             "version": "==1.0.0"
         },
+        "pprintpp": {
+            "hashes": [
+                "sha256:b6b4dcdd0c0c0d75e4d7b2f21a9e933e5b2ce62b26e1a54537f9651ae5a5c01d",
+                "sha256:ea826108e2c7f49dc6d66c752973c3fc9749142a798d6b254e1e301cfdbc6403"
+            ],
+            "version": "==0.4.0"
+        },
         "py": {
             "hashes": [
                 "sha256:51c75c4126074b472f746a24399ad32f6053d1b34b68d2fa41e558e6f4a98719",
@@ -444,6 +450,13 @@
             "index": "pypi",
             "version": "==7.0.1"
         },
+        "pytest-clarity": {
+            "hashes": [
+                "sha256:505fe345fad4fe11c6a4187fe683f2c7c52c077caa1e135f3e483fe112db7772"
+            ],
+            "index": "pypi",
+            "version": "==1.0.1"
+        },
         "pytest-cov": {
             "hashes": [
                 "sha256:45ec2d5182f89a81fc3eb29e3d1ed3113b9e9a873bcddb2a71faaab066110191",
@@ -470,11 +483,11 @@
         },
         "readme-renderer": {
             "hashes": [
-                "sha256:e3b53bc84bd6af054e4cc1fe3567dc1ae19f554134221043a3f8c674e22209db",
-                "sha256:f02cee0c4de9636b5a62b6be50c9742427ba1b956aad1d938bfb087d0d72ccdf"
+                "sha256:262510fe6aae81ed4e94d8b169077f325614c0b1a45916a80442c6576264a9c2",
+                "sha256:dfb4d17f21706d145f7473e0b61ca245ba58e810cf9b2209a48239677f82e5b0"
             ],
             "markers": "python_version >= '3.6'",
-            "version": "==33.0"
+            "version": "==34.0"
         },
         "requests": {
             "hashes": [
@@ -490,6 +503,14 @@
                 "sha256:968089d4584ad4ad7c171454f0a5c6dac23971e9472521ea3b6d49d610aa6fc0"
             ],
             "version": "==0.9.1"
+        },
+        "rich": {
+            "hashes": [
+                "sha256:14bfd0507edc633e021b02c45cbf7ca22e33b513817627b8de3412f047a3e798",
+                "sha256:fdcd2f8d416e152bcf35c659987038d1ae5a7bd336e821ca7551858a4c7e38a9"
+            ],
+            "markers": "python_full_version >= '3.6.2' and python_full_version < '4.0.0'",
+            "version": "==12.0.0"
         },
         "six": {
             "hashes": [
@@ -605,14 +626,6 @@
             ],
             "index": "pypi",
             "version": "==0.30.0"
-        },
-        "zipp": {
-            "hashes": [
-                "sha256:9f50f446828eb9d45b267433fd3e9da8d801f614129124863f9c51ebceafb87d",
-                "sha256:b47250dd24f92b7dd6a0a8fc5244da14608f3ca90a5efcd37a3b1642fac9a375"
-            ],
-            "markers": "python_version >= '3.7'",
-            "version": "==3.7.0"
         }
     }
 }

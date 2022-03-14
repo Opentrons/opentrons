@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional, Dict
+from typing import Any, List, Optional, Dict
 from typing_extensions import Literal
 from enum import Enum
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
@@ -11,14 +11,14 @@ class CommandAnnotation(BaseModel):
 
 
 class CornerOffsetFromSlot(BaseModel):
-    x: int
-    y: int
-    z: int
+    x: float
+    y: float
+    z: float
 
 
 class Location(BaseModel):
-    slotName: Optional[int] = None
-    moduleId: Optional[str] = None
+    slotName: Optional[str]
+    moduleId: Optional[str]
 
 
 class VolumeByWell(BaseModel):
@@ -27,33 +27,37 @@ class VolumeByWell(BaseModel):
 
 
 class WellLocation(BaseModel):
-    origin: Optional[str] = None
-    offset: Optional[CornerOffsetFromSlot] = None
+    origin: Optional[str]
+    offset: Optional[CornerOffsetFromSlot]
 
 
 class Params(BaseModel):
-    slotName: Optional[int] = None
-    axes: Optional[List[str]] = None
-    pipetteId: Optional[str] = None
-    mount: Optional[str] = None
-    moduleId: Optional[str] = None
-    location: Optional[Location] = None
-    labwareId: Optional[str] = None
-    displayName: Optional[str] = None
-    liquidId: Optional[str] = None
-    volumeByWell: Optional[VolumeByWell] = None
-    wellName: Optional[str] = None
-    volume: Optional[float] = None
-    flowRate: Optional[float] = None
-    wellLocation: Optional[WellLocation] = None
-    wait: Optional[int] = None
-    minimumZHeight: Optional[int] = None
-    forceDirect: Optional[bool] = None
-    message: Optional[str] = None
-    coordinates: Optional[CornerOffsetFromSlot] = None
-    axis: Optional[str] = None
-    distance: Optional[float] = None
-    positionId: Optional[str] = None
+    slotName: Optional[str]
+    axes: Optional[List[str]]
+    pipetteId: Optional[str]
+    mount: Optional[str]
+    moduleId: Optional[str]
+    location: Optional[Location]
+    labwareId: Optional[str]
+    displayName: Optional[str]
+    liquidId: Optional[str]
+    volumeByWell: Optional[VolumeByWell]
+    wellName: Optional[str]
+    volume: Optional[float]
+    flowRate: Optional[float]
+    wellLocation: Optional[WellLocation]
+    wait: Optional[int]
+    minimumZHeight: Optional[int]
+    forceDirect: Optional[bool]
+    message: Optional[str]
+    coordinates: Optional[CornerOffsetFromSlot]
+    axis: Optional[str]
+    distance: Optional[float]
+    positionId: Optional[str]
+    temperature: Optional[float]
+    rpm: Optional[float]
+    engageHeight: Optional[float]
+    offset: Optional[CornerOffsetFromSlot]
 
 
 class Command(BaseModel):
@@ -63,7 +67,7 @@ class Command(BaseModel):
 
 
 class Labware(BaseModel):
-    displayName: Optional[str] = None
+    displayName: Optional[str]
     definitionId: str
 
 
@@ -94,9 +98,9 @@ class A1(BaseModel):
     x: float
     y: float
     z: float
-    diameter: Optional[float] = None
-    yDimension: Optional[float] = None
-    xDimension: Optional[float] = None
+    diameter: Optional[float]
+    yDimension: Optional[float]
+    xDimension: Optional[float]
 
 
 class Liquids(BaseModel):
@@ -128,6 +132,12 @@ class Robot(BaseModel):
     deckId: str
 
 
+class DesignerApplication(BaseModel):
+    name: Optional[str]
+    version: Optional[str]
+    data: Optional[Dict[str, Any]]
+
+
 class ProtocolSchemaV6(BaseModel):
     otSharedSchema: Literal["#/protocol/schemas/6"] = Field(
         ...,
@@ -139,13 +149,10 @@ class ProtocolSchemaV6(BaseModel):
     metadata: Metadata
     robot: Robot
     pipettes: Dict[str, Pipette]
-    modules: Optional[Dict[str, Module]] = None
     labware: Dict[str, Labware]
-    liquids: Optional[Dict[str, Liquids]] = None
-    labwareDefinitions: Dict[str, LabwareDefinition] = Field(
-        ...,
-        description="All labware definitions used by labware in this protocol, "
-        "keyed by UUID",
-    )
+    labwareDefinitions: Dict[str, LabwareDefinition]
     commands: List[Command]
-    commandAnnotations: Optional[List[CommandAnnotation]] = None
+    modules: Optional[Dict[str, Module]]
+    liquids: Optional[Dict[str, Liquids]]
+    commandAnnotations: Optional[List[CommandAnnotation]]
+    designerApplication: Optional[DesignerApplication]
