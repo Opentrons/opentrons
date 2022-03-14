@@ -70,7 +70,7 @@ class ErrorCodeField(utils.UInt16Field):
         """Print error code."""
         try:
             error = ErrorCode(self.value).name
-        except ValueError as e:
+        except ValueError:
             error = str(self.value)
         return f"{self.__class__.__name__}(value={error})"
 

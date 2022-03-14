@@ -8,7 +8,6 @@ from mock import AsyncMock, call
 
 from opentrons_hardware.firmware_bindings.messages.fields import ToolField
 from opentrons_hardware.hardware_control.tools import detector
-from opentrons_hardware.firmware_bindings.utils import UInt8Field
 from opentrons_hardware.firmware_bindings.messages import message_definitions, payloads
 from opentrons_hardware.firmware_bindings import (
     NodeId,

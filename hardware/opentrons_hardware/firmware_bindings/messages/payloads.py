@@ -4,9 +4,15 @@
 #  from __future__ import annotations
 from dataclasses import dataclass
 
-from .fields import FirmwareShortSHADataField, VersionFlagsField, \
-    TaskNameDataField, ToolField, FirmwareUpdateDataField, ErrorCodeField, \
-    SensorTypeField
+from .fields import (
+    FirmwareShortSHADataField,
+    VersionFlagsField,
+    TaskNameDataField,
+    ToolField,
+    FirmwareUpdateDataField,
+    ErrorCodeField,
+    SensorTypeField,
+)
 from .. import utils
 
 

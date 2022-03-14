@@ -14,7 +14,6 @@ from opentrons_hardware.firmware_bindings.messages import (
     payloads,
 )
 from opentrons_hardware.firmware_bindings.messages.fields import ErrorCodeField
-from opentrons_hardware.firmware_bindings.utils import UInt16Field
 from opentrons_hardware.firmware_update import FirmwareUpdateEraser
 from opentrons_hardware.firmware_update.errors import ErrorResponse, TimeoutResponse
 from tests.conftest import MockCanMessageNotifier

@@ -2,13 +2,12 @@
 import pytest
 from mock import AsyncMock, call
 
-import opentrons_hardware.firmware_bindings.messages.fields
 from opentrons_hardware.firmware_bindings import (
     NodeId,
     ArbitrationId,
     ArbitrationIdParts,
 )
-from opentrons_hardware.firmware_bindings.messages import MessageDefinition
+from opentrons_hardware.firmware_bindings.messages import MessageDefinition, fields
 from opentrons_hardware.firmware_bindings.messages import message_definitions, payloads
 from opentrons_hardware.firmware_bindings.utils import UInt32Field
 
@@ -36,8 +35,8 @@ async def test_messaging(
             response = message_definitions.DeviceInfoResponse(
                 payload=payloads.DeviceInfoResponsePayload(
                     version=UInt32Field(0),
-                    flags=opentrons_hardware.firmware_bindings.messages.fields.VersionFlagsField(0),
-                    shortsha=opentrons_hardware.firmware_bindings.messages.fields.FirmwareShortSHADataField(b"abcdef0"),
+                    flags=fields.VersionFlagsField(0),
+                    shortsha=fields.FirmwareShortSHADataField(b"abcdef0"),
                 )
             )
             can_message_notifier.notify(
@@ -84,8 +83,8 @@ async def test_retry(
         message_definitions.DeviceInfoResponse(
             payload=payloads.DeviceInfoResponsePayload(
                 version=UInt32Field(0),
-                flags=opentrons_hardware.firmware_bindings.messages.fields.VersionFlagsField(0),
-                shortsha=opentrons_hardware.firmware_bindings.messages.fields.FirmwareShortSHADataField(b"abcdef0"),
+                flags=fields.VersionFlagsField(0),
+                shortsha=fields.FirmwareShortSHADataField(b"abcdef0"),
             )
         ),
         None,
