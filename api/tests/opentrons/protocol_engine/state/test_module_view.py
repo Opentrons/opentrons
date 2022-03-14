@@ -521,15 +521,15 @@ def test_magnetic_module_view_find_hardware_raises_if_match_not_attached(
     parent = make_module_view(
         hardware_module_by_slot={
             DeckSlotName.SLOT_1: HardwareModule(
-                serial_number="serial-matching",
+                serial_number="serial-to-match",
                 definition=magdeck_v1_def,
             ),
         },
         slot_by_module_id={
-            "id-matching": DeckSlotName.SLOT_1,
+            "id-to-match": DeckSlotName.SLOT_1,
         },
     )
-    subject = parent.get_magnetic_module_view(module_id="id-matching")
+    subject = parent.get_magnetic_module_view(module_id="id-to-match")
 
     with pytest.raises(errors.ModuleNotAttachedError):
         subject.find_hardware(
@@ -544,20 +544,20 @@ def test_magnetic_module_view_find_hardware_raises_if_match_is_wrong_type(
     matching = make_hardware_module(
         decoy=decoy,
         type=TempDeck,  # Not a Magnetic Module.
-        serial_number="serial-matching",
+        serial_number="serial-to-match",
     )
     parent = make_module_view(
         hardware_module_by_slot={
             DeckSlotName.SLOT_1: HardwareModule(
-                serial_number="serial-matching",
+                serial_number="serial-to-match",
                 definition=magdeck_v1_def,
             ),
         },
         slot_by_module_id={
-            "id-matching": DeckSlotName.SLOT_1,
+            "id-to-match": DeckSlotName.SLOT_1,
         },
     )
-    subject = parent.get_magnetic_module_view(module_id="id-matching")
+    subject = parent.get_magnetic_module_view(module_id="id-to-match")
     with pytest.raises(errors.ModuleNotAttachedError):
         subject.find_hardware(
             attached_modules=[matching],
