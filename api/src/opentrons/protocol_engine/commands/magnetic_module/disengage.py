@@ -9,7 +9,6 @@ from typing_extensions import Literal, Type
 from pydantic import BaseModel, Field
 
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.modules import MagDeck
 
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 

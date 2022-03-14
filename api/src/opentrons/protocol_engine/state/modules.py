@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, NamedTuple, Optional, Sequence, Type, TypeVar, overload
+from typing import Dict, List, NamedTuple, Optional, Sequence, overload
 from typing_extensions import Final
 from numpy import array, dot
 

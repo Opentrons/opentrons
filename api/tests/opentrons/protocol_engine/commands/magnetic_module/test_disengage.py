@@ -5,7 +5,7 @@ from decoy import Decoy
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import AbstractModule, MagDeck
-from opentrons.protocol_engine.state import StateView, MagneticModuleView, EngineConfigs
+from opentrons.protocol_engine.state import StateView, MagneticModuleView
 from opentrons.protocol_engine.commands.magnetic_module import (
     DisengageParams,
     DisengageResult,

@@ -17,7 +17,6 @@ from opentrons.protocol_engine.types import (
 )
 from opentrons.protocol_engine.state.modules import (
     ModuleView,
-    MagneticModuleView,
     ModuleState,
     HardwareModule,
 )
@@ -137,6 +136,7 @@ def test_get_magnetic_module_view(
     magdeck_v2_def: ModuleDefinition,
     tempdeck_v1_def: ModuleDefinition,
 ) -> None:
+    """It should return a view for the given Magnetic Module, if valid."""
     subject = make_module_view(
         slot_by_module_id={
             "magnetic-module-gen1-id": DeckSlotName.SLOT_1,
