@@ -198,14 +198,8 @@ def test_assert_is_magnetic_module(
     )
 
     # Should not raise:
-    assert (
-        subject.assert_is_magnetic_module(module_id="id-module-1-magneticv1")
-        == "id-module-1-magneticv1"
-    )
-    assert (
-        subject.assert_is_magnetic_module(module_id="id-module-2-magneticv2")
-        == "id-module-2-magneticv2"
-    )
+    subject.assert_is_magnetic_module(module_id="id-module-1-magneticv1")
+    subject.assert_is_magnetic_module(module_id="id-module-2-magneticv2")
 
     with pytest.raises(errors.ModuleDoesNotExistError):
         subject.assert_is_magnetic_module(module_id="nonexistent-module-id")
