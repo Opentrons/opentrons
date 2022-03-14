@@ -3,13 +3,13 @@ import { renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../../i18n'
 import { useSendModuleCommand } from '../../../../redux/modules'
+import { InputField } from '../../../../atoms/InputField'
 import { ThermocyclerModuleSlideout } from '../ThermocyclerModuleSlideout'
-import { InputField } from '@opentrons/components/src/forms/InputField'
 
 import { mockThermocycler } from '../../../../redux/modules/__fixtures__'
 
 jest.mock('../../../../redux/modules')
-jest.mock('@opentrons/components/src/forms/InputField')
+jest.mock('../../../../atoms/InputField')
 
 const mockUseSendModuleCommand = useSendModuleCommand as jest.MockedFunction<
   typeof useSendModuleCommand

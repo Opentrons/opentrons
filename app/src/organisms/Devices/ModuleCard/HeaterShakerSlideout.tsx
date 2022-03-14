@@ -8,14 +8,12 @@ import {
   DIRECTION_COLUMN,
   Flex,
   FONT_WEIGHT_REGULAR,
-  InputField,
   SPACING,
-  SPACING_1,
-  SPACING_3,
   Text,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { PrimaryButton } from '../../../atoms/Buttons'
+import { InputField } from '../../../atoms/InputField'
 import {
   getModuleDisplayName,
   RPM,
@@ -52,8 +50,8 @@ export const HeaterShakerSlideout = (
     commandType: 'heaterShakerModule/setTargetShakeSpeed',
     params: {
       moduleId: module.serial,
-      //  the empty string will never be reached because the button will be disabled if the field is left empty
-      rpm: parseInt(hsValue !== null ? hsValue : ''),
+      //  the 0 int will never be reached because the button will be disabled if the field is left empty
+      rpm: hsValue != null ? parseInt(hsValue) : 0,
     },
   }
 
@@ -66,6 +64,19 @@ export const HeaterShakerSlideout = (
     setHsValue(null)
   }
 
+  let errorMessage
+  if (isSetShake) {
+    errorMessage =
+      hsValue != null && (parseInt(hsValue) < 200 || parseInt(hsValue) > 1800)
+        ? t('input_out_of_range')
+        : null
+  } else {
+    errorMessage =
+      hsValue != null && (parseInt(hsValue) < 4 || parseInt(hsValue) > 99)
+        ? t('input_out_of_range')
+        : null
+  }
+
   return (
     <Slideout
       title={t('set_status_heater_shaker', {
@@ -74,13 +85,13 @@ export const HeaterShakerSlideout = (
       })}
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
-      height={`calc(100vh - ${SPACING_3})`}
+      height={`calc(100vh - ${SPACING.spacing4})`}
       footer={
         <PrimaryButton
           onClick={handleSubmitTemp}
-          disabled={hsValue === null}
+          disabled={hsValue === null || errorMessage !== null}
           width="100%"
-          data-testid={`HS_set_value_${module.model}`}
+          data-testid={`Hs_set_value_${module.model}`}
         >
           {t('set_temp_or_shake', { part: modulePart })}
         </PrimaryButton>
@@ -89,13 +100,13 @@ export const HeaterShakerSlideout = (
       <Text
         fontWeight={FONT_WEIGHT_REGULAR}
         fontSize={TYPOGRAPHY.fontSizeP}
-        paddingTop={SPACING_1}
-        data-testid={`HS_slideout_body_text_${module.model}`}
+        paddingTop={SPACING.spacing2}
+        data-testid={`Hs_slideout_body_text_${module.model}`}
       >
         {isSetShake ? t('set_shake_of_hs') : t('set_target_temp_of_hs')}
       </Text>
       <Flex
-        marginTop={SPACING_3}
+        marginTop={SPACING.spacing4}
         flexDirection={DIRECTION_COLUMN}
         data-testid={`HS_Slideout_input_field_${module.model}`}
       >
@@ -107,15 +118,17 @@ export const HeaterShakerSlideout = (
         >
           {isSetShake ? t('set_shake_speed') : t('set_block_temp')}
         </Text>
-        {/* TODO Immediately: make sure input field matches final designs */}
         <InputField
+          id={module.model + isSetShake}
           units={isSetShake ? RPM : CELSIUS}
           value={hsValue}
           onChange={e => setHsValue(e.target.value)}
+          type="number"
+          max={isSetShake ? 1800 : 99}
+          min={isSetShake ? 200 : 4}
+          caption={isSetShake ? t('between_200_to_1800') : t('between_4_to_99')}
+          error={errorMessage}
         />
-        <Text color={COLORS.darkGreyEnabled} fontSize="10px" paddingTop="4px">
-          {isSetShake ? t('between_200_to_1800') : t('between_4_to_99')}
-        </Text>
       </Flex>
     </Slideout>
   )

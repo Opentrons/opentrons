@@ -2,14 +2,11 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
-  SPACING_1,
-  SPACING_3,
   Text,
   FONT_WEIGHT_REGULAR,
   TYPOGRAPHY,
   SPACING,
   COLORS,
-  InputField,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
 import {
@@ -21,6 +18,7 @@ import {
 import { useSendModuleCommand } from '../../../redux/modules'
 import { Slideout } from '../../../atoms/Slideout'
 import { PrimaryButton } from '../../../atoms/Buttons'
+import { InputField } from '../../../atoms/InputField'
 
 interface TemperatureModuleSlideoutProps {
   model: typeof TEMPERATURE_MODULE_V1 | typeof TEMPERATURE_MODULE_V2
@@ -47,17 +45,21 @@ export const TemperatureModuleSlideout = (
     setTemperatureValue(null)
   }
 
+  const valueOutOfRange =
+    temperatureValue != null &&
+    (parseInt(temperatureValue) < 4 || parseInt(temperatureValue) > 99)
+
   return (
     <Slideout
       title={t('tempdeck_slideout_title', { name: name })}
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
-      height={`calc(100vh - ${SPACING_3})`} // subtract breadcrumb strip
+      height={`calc(100vh - ${SPACING.spacing4})`} // subtract breadcrumb strip
       footer={
         <PrimaryButton
           width="100%"
           onClick={handleSubmitTemperature}
-          disabled={temperatureValue == null}
+          disabled={temperatureValue === null || valueOutOfRange}
           data-testid={`Temp_Slideout_set_temp_btn_${name}`}
         >
           {t('set_temp_slideout')}
@@ -67,7 +69,7 @@ export const TemperatureModuleSlideout = (
       <Text
         fontWeight={FONT_WEIGHT_REGULAR}
         fontSize={TYPOGRAPHY.fontSizeP}
-        paddingTop={SPACING_1}
+        paddingTop={SPACING.spacing2}
         data-testid={`Temp_Slideout_body_text_${name}`}
       >
         {t('tempdeck_slideout_body', {
@@ -83,14 +85,24 @@ export const TemperatureModuleSlideout = (
           fontWeight={FONT_WEIGHT_REGULAR}
           fontSize={TYPOGRAPHY.fontSizeH6}
           color={COLORS.black}
+          paddingBottom={SPACING.spacing3}
         >
           {t('temperature')}
         </Text>
-        {/* TODO Immediately: make sure input field matches final designs */}
         <InputField
           units={CELSIUS}
           value={temperatureValue}
           onChange={e => setTemperatureValue(e.target.value)}
+          max={99}
+          min={4}
+          type="number"
+          caption={t('between_4_to_99')}
+          error={
+            temperatureValue != null &&
+            (parseInt(temperatureValue) < 4 || parseInt(temperatureValue) > 99)
+              ? t('input_out_of_range')
+              : null
+          }
         />
       </Flex>
     </Slideout>

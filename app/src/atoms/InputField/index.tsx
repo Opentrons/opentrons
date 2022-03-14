@@ -1,8 +1,17 @@
 import * as React from 'react'
-import cx from 'classnames'
-import { Icon } from '../icons'
-import styles from './forms.css'
+import {
+  Flex,
+  ALIGN_CENTER,
+  COLORS,
+  DIRECTION_COLUMN,
+  TEXT_ALIGN_RIGHT,
+  DISPLAY_INLINE_BLOCK,
+  SPACING,
+  TYPOGRAPHY,
+} from '@opentrons/components'
+import { css } from 'styled-components'
 
+export const INPUT_TYPE_NUMBER: 'number' = 'number'
 export const INPUT_TYPE_TEXT: 'text' = 'text'
 export const INPUT_TYPE_PASSWORD: 'password' = 'password'
 
@@ -13,12 +22,6 @@ export interface InputFieldProps {
   disabled?: boolean
   /** change handler */
   onChange?: React.ChangeEventHandler<HTMLInputElement>
-  /** classes to apply to outer element */
-  className?: string
-  /** inline label text. DEPRECATED */
-  label?: string
-  /** classes to apply to inner label text div */
-  labelTextClassName?: string | null | undefined
   /** name of field in form */
   name?: string
   /** optional ID of <input> element */
@@ -36,7 +39,10 @@ export interface InputFieldProps {
   /** appears to the right of the caption. Used for character limits, eg '0/45' */
   secondaryCaption?: string | null | undefined
   /** optional input type (default "text") */
-  type?: typeof INPUT_TYPE_TEXT | typeof INPUT_TYPE_PASSWORD
+  type?:
+    | typeof INPUT_TYPE_TEXT
+    | typeof INPUT_TYPE_PASSWORD
+    | typeof INPUT_TYPE_NUMBER
   /** mouse click handler */
   onClick?: (event: React.MouseEvent<HTMLInputElement>) => unknown
   /** focus handler */
@@ -51,73 +57,109 @@ export interface InputFieldProps {
   autoFocus?: boolean
   /** if true, clear out value and add '-' placeholder */
   isIndeterminate?: boolean
+  /** if input type is number, these are the min and max values */
+  max?: number
+  min?: number
 }
 
-/**
- * @deprecated Use `InputField` in App/atoms instead
- */
+const INPUT_FIELD = css`
+  display: flex;
+  flex: 1 1;
+  background-color: ${COLORS.white};
+  border-radius: ${SPACING.spacing2};
+  padding: ${SPACING.spacing3};
+  border: 1px solid ${COLORS.medGrey};
+  font-size: 11px;
 
-export function InputField(props: InputFieldProps): JSX.Element {
-  const error = props.error != null
-  const labelClass = cx(styles.form_field, props.className, {
-    [styles.error]: error,
-    [styles.disabled]: props.disabled,
-  })
-
-  if (!props.label) {
-    return (
-      <div className={labelClass}>
-        <Input {...props} />
-      </div>
-    )
+  & input {
+    border-radius: inherit;
+    color: ${COLORS.darkBlack};
+    border: none;
+    flex: 1 1 auto;
+    width: 100%;
+    height: ${SPACING.spacing4};
+  }
+  & input:focus {
+    outline: none;
   }
 
+  &:hover {
+    border: 1px solid #b8b8b8;
+  }
+  &:focus {
+    border: 1px solid ${COLORS.blue};
+  }
+  &:disabled {
+    border: 1px solid ${COLORS.greyDisabled};
+  }
+
+  & input[error='string'],
+  textarea {
+    border: 1px solid #bf0000;
+  }
+`
+
+export function InputField(props: InputFieldProps): JSX.Element {
   return (
-    <label className={labelClass}>
-      <div className={cx(props.labelTextClassName, styles.label_text)}>
-        {props.label && error && (
-          <div className={styles.error_icon}>
-            <Icon name="alert" />
-          </div>
-        )}
-        {props.label}
-      </div>
+    <Flex
+      alignItems={ALIGN_CENTER}
+      lineHeight={1}
+      fontSize="11px"
+      fontWeight={400}
+      color={props.error ? '#9e5e00' : COLORS.darkBlack}
+      opacity={props.disabled ? 0.5 : ''}
+    >
       <Input {...props} />
-    </label>
+    </Flex>
   )
 }
 
-// TODO(mc, 2018-02-21): maybe simplify further and split out?
 function Input(props: InputFieldProps): JSX.Element {
   const error = props.error != null
   const value = props.isIndeterminate ? '' : props.value ?? ''
   const placeHolder = props.isIndeterminate ? '-' : props.placeholder
 
   return (
-    <div className={styles.input_field_container}>
-      <div className={styles.input_field}>
+    <Flex width="100%" flexDirection={DIRECTION_COLUMN}>
+      <Flex css={INPUT_FIELD}>
         <input
           disabled={props.disabled}
-          id={props.id}
-          type={props.type ?? INPUT_TYPE_TEXT}
+          data-testid={props.id}
+          type={props.type}
           value={value}
           name={props.name}
           placeholder={placeHolder}
-          onChange={props.disabled ? undefined : props.onChange}
           onFocus={props.disabled ? undefined : props.onFocus}
           onBlur={props.onBlur}
           onClick={props.disabled ? undefined : props.onClick}
           readOnly={props.readOnly}
           tabIndex={props.tabIndex}
+          onChange={props.disabled ? undefined : props.onChange}
           autoFocus={props.autoFocus}
+          min={props.min ?? undefined}
+          max={props.max ?? undefined}
         />
-        {props.units && <div className={styles.suffix}>{props.units}</div>}
-      </div>
-      {/* TODO(mc, 2018-10-20): do not render if no caption */}
-      <div className={styles.input_caption}>
+        {props.units && (
+          <Flex
+            display={DISPLAY_INLINE_BLOCK}
+            flex="1 0"
+            textAlign={TEXT_ALIGN_RIGHT}
+            alignSelf={ALIGN_CENTER}
+            color={COLORS.darkGreyEnabled}
+            fontSize={TYPOGRAPHY.fontSizeH6}
+          >
+            {props.units}
+          </Flex>
+        )}
+      </Flex>
+      <Flex
+        color={error ? COLORS.error : COLORS.darkGreyEnabled}
+        fontSize={SPACING.spacingSM}
+        paddingTop={SPACING.spacing2}
+      >
         <span>{error ? props.error : props.caption}</span>
-        <span className={styles.right}>{props.secondaryCaption}</span>
-      </div>
-    </div>
+        <span>{props.secondaryCaption}</span>
+      </Flex>
+    </Flex>
   )
 }

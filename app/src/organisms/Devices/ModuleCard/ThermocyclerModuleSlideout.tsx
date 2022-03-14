@@ -1,23 +1,21 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { getModuleDisplayName } from '@opentrons/shared-data'
 import { useSendModuleCommand } from '../../../redux/modules'
 import { Slideout } from '../../../atoms/Slideout'
+import { InputField } from '../../../atoms/InputField'
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
   FONT_WEIGHT_REGULAR,
-  InputField,
   SPACING,
-  SPACING_1,
-  SPACING_3,
   Text,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { PrimaryButton } from '../../../atoms/Buttons'
 
 import type { AttachedModule } from '../../../redux/modules/types'
-import { getModuleDisplayName } from '@opentrons/shared-data'
 
 interface ThermocyclerModuleSlideoutProps {
   module: AttachedModule
@@ -49,16 +47,30 @@ export const ThermocyclerModuleSlideout = (
     setTempValue(null)
   }
 
+  let errorMessage
+  if (isSecondaryTemp) {
+    errorMessage =
+      tempValue != null &&
+      (parseInt(tempValue) < 37 || parseInt(tempValue) > 110)
+        ? t('input_out_of_range')
+        : null
+  } else {
+    errorMessage =
+      tempValue != null && (parseInt(tempValue) < 4 || parseInt(tempValue) > 99)
+        ? t('input_out_of_range')
+        : null
+  }
+
   return (
     <Slideout
       title={t('tc_set_temperature', { part: modulePart, name: moduleName })}
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
-      height={`calc(100vh - ${SPACING_3})`} // subtract breadcrumb strip
+      height={`calc(100vh - ${SPACING.spacing4})`} // subtract breadcrumb strip
       footer={
         <PrimaryButton
           onClick={handleSubmitTemp}
-          disabled={tempValue === null}
+          disabled={tempValue === null || errorMessage !== null}
           width="100%"
           data-testid={`TC_Slideout_set_height_btn_${module.model}`}
         >
@@ -69,7 +81,7 @@ export const ThermocyclerModuleSlideout = (
       <Text
         fontWeight={FONT_WEIGHT_REGULAR}
         fontSize={TYPOGRAPHY.fontSizeP}
-        paddingTop={SPACING_1}
+        paddingTop={SPACING.spacing2}
         data-testid={`TC_Slideout_body_text_${module.model}`}
       >
         {t('tc_set_temperature_body', {
@@ -79,7 +91,7 @@ export const ThermocyclerModuleSlideout = (
         })}
       </Text>
       <Flex
-        marginTop={SPACING_3}
+        marginTop={SPACING.spacing4}
         flexDirection={DIRECTION_COLUMN}
         data-testid={`TC_Slideout_input_field_${module.model}`}
       >
@@ -91,11 +103,17 @@ export const ThermocyclerModuleSlideout = (
         >
           {t('temperature')}
         </Text>
-        {/* TODO Immediately: make sure input field matches final designs */}
         <InputField
           units={'°C'}
           value={tempValue}
           onChange={e => setTempValue(e.target.value)}
+          type="number"
+          min={tempRanges.min}
+          max={tempRanges.max}
+          caption={
+            isSecondaryTemp ? t('between_37_to_110') : t('between_4_to_99')
+          }
+          error={errorMessage}
         />
       </Flex>
     </Slideout>

@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
-import { InputField } from '@opentrons/components/src/forms/InputField'
 import { i18n } from '../../../../i18n'
 import { useSendModuleCommand } from '../../../../redux/modules'
+import { InputField } from '../../../../atoms/InputField'
 import { MagneticModuleSlideout } from '../MagneticModuleSlideout'
 
 import {
@@ -11,7 +11,7 @@ import {
 } from '../../../../redux/modules/__fixtures__'
 
 jest.mock('../../../../redux/modules')
-jest.mock('@opentrons/components/src/forms/InputField')
+jest.mock('../../../../atoms/InputField')
 
 const mockUseSendModuleCommand = useSendModuleCommand as jest.MockedFunction<
   typeof useSendModuleCommand

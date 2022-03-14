@@ -2,16 +2,16 @@ import * as React from 'react'
 import { i18n } from '../../../../i18n'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import { InputField } from '@opentrons/components/src/forms/InputField'
 import {
   TEMPERATURE_MODULE_V1,
   TEMPERATURE_MODULE_V2,
 } from '@opentrons/shared-data'
 import { useSendModuleCommand } from '../../../../redux/modules'
+import { InputField } from '../../../../atoms/InputField'
 import { TemperatureModuleSlideout } from '../TemperatureModuleSlideout'
 
 jest.mock('../../../../redux/modules')
-jest.mock('@opentrons/components/src/forms/InputField')
+jest.mock('../../../../atoms/InputField')
 
 const mockUseSendModuleCommand = useSendModuleCommand as jest.MockedFunction<
   typeof useSendModuleCommand
