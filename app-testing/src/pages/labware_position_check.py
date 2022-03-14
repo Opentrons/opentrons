@@ -623,14 +623,14 @@ class LabwarePositionCheck:
     def get_labware_display_name_slot_2(self) -> Optional[WebElement]:
         """locator for Labware name on deckmap."""
         return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(LabwarePositionCheck.labware_display_name_slot_4)
+            EC.element_to_be_clickable(LabwarePositionCheck.labware_display_name_slot_2)
         )
 
     @highlight
     def get_labware_offsetbox_slot_2(self) -> Optional[WebElement]:
         """locator for Labware offset box on deckmap."""
         return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(LabwarePositionCheck.labware_offsetbox_slot_4)
+            EC.element_to_be_clickable(LabwarePositionCheck.labware_offsetbox_slot_2)
         )
 
     @highlight
@@ -638,7 +638,7 @@ class LabwarePositionCheck:
         """locator for Labware x text on slot 4 on deckmap."""
         return WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(
-                LabwarePositionCheck.labware_slot_4_offset_x_text
+                LabwarePositionCheck.labware_slot_2_offset_x_text
             )
         )
 
@@ -647,7 +647,7 @@ class LabwarePositionCheck:
         """locator for Labware x offset value on slot 4 on deckmap."""
         return WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(
-                LabwarePositionCheck.labware_slot_4_offset_x_value
+                LabwarePositionCheck.labware_slot_2_offset_x_value
             )
         )
 
@@ -656,7 +656,7 @@ class LabwarePositionCheck:
         """locator for Labware y osset value on deckmap."""
         return WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(
-                LabwarePositionCheck.labware_slot_4_offset_y_text
+                LabwarePositionCheck.labware_slot_2_offset_y_text
             )
         )
 
@@ -665,7 +665,7 @@ class LabwarePositionCheck:
         """locator for Labware y offset value on deckmap."""
         return WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(
-                LabwarePositionCheck.labware_slot_4_offset_y_value
+                LabwarePositionCheck.labware_slot_2_offset_y_value
             )
         )
 
@@ -674,7 +674,7 @@ class LabwarePositionCheck:
         """locator for Labware y osset value on deckmap."""
         return WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(
-                LabwarePositionCheck.labware_slot_4_offset_z_text
+                LabwarePositionCheck.labware_slot_2_offset_z_text
             )
         )
 
@@ -683,6 +683,6 @@ class LabwarePositionCheck:
         """locator for Labware y offset value on deckmap."""
         return WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(
-                LabwarePositionCheck.labware_slot_4_offset_z_value
+                LabwarePositionCheck.labware_slot_2_offset_z_value
             )
         )
