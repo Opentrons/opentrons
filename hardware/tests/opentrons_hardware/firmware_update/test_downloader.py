@@ -19,6 +19,7 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     FirmwareUpdateCompleteAcknowledge,
 )
 from opentrons_hardware.firmware_bindings.messages import payloads
+from opentrons_hardware.firmware_bindings.messages.payloads import ErrorCodeField
 
 from opentrons_hardware.firmware_update import downloader
 from opentrons_hardware.firmware_update.errors import ErrorResponse, TimeoutResponse
@@ -74,7 +75,7 @@ async def test_messaging(
                 FirmwareUpdateDataAcknowledge(
                     payload=payloads.FirmwareUpdateDataAcknowledge(
                         address=message.payload.address,
-                        error_code=utils.UInt16Field(ErrorCode.ok),
+                        error_code=ErrorCodeField(ErrorCode.ok),
                     )
                 ),
                 ArbitrationId(
@@ -90,7 +91,7 @@ async def test_messaging(
             can_message_notifier.notify(
                 FirmwareUpdateCompleteAcknowledge(
                     payload=payloads.FirmwareUpdateAcknowledge(
-                        error_code=utils.UInt16Field(ErrorCode.ok)
+                        error_code=ErrorCodeField(ErrorCode.ok)
                     )
                 ),
                 ArbitrationId(
@@ -151,7 +152,7 @@ async def test_messaging_data_error_response(
                 FirmwareUpdateDataAcknowledge(
                     payload=payloads.FirmwareUpdateDataAcknowledge(
                         address=message.payload.address,
-                        error_code=utils.UInt16Field(ErrorCode.bad_checksum),
+                        error_code=ErrorCodeField(ErrorCode.bad_checksum),
                     )
                 ),
                 ArbitrationId(
@@ -188,7 +189,7 @@ async def test_messaging_complete_error_response(
                 FirmwareUpdateDataAcknowledge(
                     payload=payloads.FirmwareUpdateDataAcknowledge(
                         address=message.payload.address,
-                        error_code=utils.UInt16Field(ErrorCode.ok),
+                        error_code=ErrorCodeField(ErrorCode.ok),
                     )
                 ),
                 ArbitrationId(
@@ -204,7 +205,7 @@ async def test_messaging_complete_error_response(
             can_message_notifier.notify(
                 FirmwareUpdateCompleteAcknowledge(
                     payload=payloads.FirmwareUpdateAcknowledge(
-                        error_code=utils.UInt16Field(ErrorCode.invalid_size)
+                        error_code=ErrorCodeField(ErrorCode.invalid_size)
                     )
                 ),
                 ArbitrationId(
@@ -255,7 +256,7 @@ async def test_messaging_complete_no_response(
                 FirmwareUpdateDataAcknowledge(
                     payload=payloads.FirmwareUpdateDataAcknowledge(
                         address=message.payload.address,
-                        error_code=utils.UInt16Field(ErrorCode.ok),
+                        error_code=ErrorCodeField(ErrorCode.ok),
                     )
                 ),
                 ArbitrationId(

@@ -13,6 +13,7 @@ from opentrons_hardware.firmware_bindings.messages import (
     message_definitions,
     payloads,
 )
+from opentrons_hardware.firmware_bindings.messages.payloads import ErrorCodeField
 from opentrons_hardware.firmware_bindings.utils import UInt16Field
 from opentrons_hardware.firmware_update import FirmwareUpdateEraser
 from opentrons_hardware.firmware_update.errors import ErrorResponse, TimeoutResponse
@@ -37,7 +38,7 @@ async def test_messaging(
         if isinstance(message, message_definitions.FirmwareUpdateEraseAppRequest):
             response = message_definitions.FirmwareUpdateEraseAppResponse(
                 payload=payloads.FirmwareUpdateAcknowledge(
-                    error_code=UInt16Field(ErrorCode.ok)
+                    error_code=ErrorCodeField(ErrorCode.ok)
                 )
             )
             can_message_notifier.notify(
@@ -76,7 +77,7 @@ async def test_error_message(
         if isinstance(message, message_definitions.FirmwareUpdateEraseAppRequest):
             response = message_definitions.FirmwareUpdateEraseAppResponse(
                 payload=payloads.FirmwareUpdateAcknowledge(
-                    error_code=UInt16Field(ErrorCode.hardware)
+                    error_code=ErrorCodeField(ErrorCode.hardware)
                 )
             )
             can_message_notifier.notify(
