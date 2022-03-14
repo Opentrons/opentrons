@@ -9,7 +9,10 @@ import {
   useCurrentRunCommands,
   useCurrentRunId,
 } from '../../ProtocolUpload/hooks'
-import { useRunStatus, useRunErrors } from '../../RunTimeControl/hooks'
+import {
+  useCurrentRunStatus,
+  useCurrentRunErrors,
+} from '../../RunTimeControl/hooks'
 import { ProtocolSetupInfo } from '../ProtocolSetupInfo'
 import { CommandList } from '../CommandList'
 import fixtureAnalysis from '../__fixtures__/analysis.json'
@@ -33,11 +36,11 @@ const mockUseCurrentRunCommands = useCurrentRunCommands as jest.MockedFunction<
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
 >
-const mockUseRunStatus = useRunStatus as jest.MockedFunction<
-  typeof useRunStatus
+const mockUseCurrentRunStatus = useCurrentRunStatus as jest.MockedFunction<
+  typeof useCurrentRunStatus
 >
-const mockUseRunErrors = useRunErrors as jest.MockedFunction<
-  typeof useRunErrors
+const mockUseCurrentRunErrors = useCurrentRunErrors as jest.MockedFunction<
+  typeof useCurrentRunErrors
 >
 const mockProtocolSetupInfo = ProtocolSetupInfo as jest.MockedFunction<
   typeof ProtocolSetupInfo
@@ -61,9 +64,9 @@ describe('CommandList', () => {
       displayName: 'mock display name',
     })
     mockUseCurrentRunCommands.mockReturnValue([])
-    mockUseRunErrors.mockReturnValue([])
+    mockUseCurrentRunErrors.mockReturnValue([])
     mockUseCurrentRunId.mockReturnValue('fakeRunId')
-    mockUseRunStatus.mockReturnValue('idle')
+    mockUseCurrentRunStatus.mockReturnValue('idle')
     mockProtocolSetupInfo.mockReturnValue(<div>Mock ProtocolSetup Info</div>)
 
     when(mockCommandItem).mockReturnValue(
@@ -123,8 +126,8 @@ describe('CommandList', () => {
           "ErrorResponse [line 40]: /dev/ot_module_thermocycler0: 'Received error response 'Error:Plate temperature is not uniform. T1: 35.1097\tT2: 35.8139\tT3: 35.6139\tT4: 35.9809\tT5: 35.4347\tT6: 35.5264\tT.Lid: 20.2052\tT.sink: 19.8993\tT_error: 0.0000\t\r\nLid:open'",
       },
     ]
-    mockUseRunStatus.mockReturnValue('failed')
-    mockUseRunErrors.mockReturnValue(fixtureErrors)
+    mockUseCurrentRunStatus.mockReturnValue('failed')
+    mockUseCurrentRunErrors.mockReturnValue(fixtureErrors)
     mockAlertItem.mockImplementation(({ children }) => (
       <div>
         Protocol Run Failed{' '}
@@ -154,8 +157,8 @@ describe('CommandList', () => {
       createdAt: '2022-02-11T14:58:20.688699+00:00',
       detail: 'fakeErrorDetail',
     }
-    mockUseRunStatus.mockReturnValue('stop-requested')
-    mockUseRunErrors.mockReturnValue([fixtureError])
+    mockUseCurrentRunStatus.mockReturnValue('stop-requested')
+    mockUseCurrentRunErrors.mockReturnValue([fixtureError])
     mockAlertItem.mockReturnValue(<div>Protocol Run Canceled</div>)
     const { getByText, queryByTestId } = render()
     expect(getByText('Protocol Run Canceled')).toHaveStyle(
@@ -165,7 +168,7 @@ describe('CommandList', () => {
     expect(queryByTestId('test_failed_errors')).toBeNull()
   })
   it('renders the protocol canceled banner when the status is stopped', () => {
-    mockUseRunStatus.mockReturnValue('stopped')
+    mockUseCurrentRunStatus.mockReturnValue('stopped')
     mockAlertItem.mockReturnValue(<div>Protocol Run Canceled</div>)
     const { getByText } = render()
     expect(getByText('Protocol Run Canceled')).toHaveStyle(
@@ -174,7 +177,7 @@ describe('CommandList', () => {
     expect(getByText('Protocol Run Canceled')).toHaveStyle('color: Error_dark')
   })
   it('renders the protocol completed banner', () => {
-    mockUseRunStatus.mockReturnValue('succeeded')
+    mockUseCurrentRunStatus.mockReturnValue('succeeded')
     mockAlertItem.mockReturnValue(<div>Protocol Run Completed</div>)
     const { getByText } = render()
     expect(getByText('Protocol Run Completed')).toHaveStyle(

@@ -38,7 +38,7 @@ import {
   tipLengthCalibrationStarted,
   pipetteOffsetCalibrationStarted,
 } from '../../../../redux/analytics'
-import { useRunStatus } from '../../../RunTimeControl/hooks'
+import { useCurrentRunStatus } from '../../../RunTimeControl/hooks'
 
 import type { State } from '../../../../redux/types'
 import type {
@@ -198,7 +198,7 @@ export function TipLengthCalibration({
     hasCalibrated
   )
 
-  const runStatus = useRunStatus()
+  const runStatus = useCurrentRunStatus()
   const disableRecalibrate = runStatus != null && runStatus !== RUN_STATUS_IDLE
 
   const [targetProps, tooltipProps] = useHoverTooltip({

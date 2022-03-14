@@ -1,4 +1,5 @@
 """Tests for the firmware downloader."""
+import binascii
 from typing import List
 
 import pytest
@@ -42,6 +43,15 @@ def chunks() -> List[Chunk]:
 
 
 @pytest.fixture
+def crc32(chunks: List[Chunk]) -> int:
+    """crc32 of data chunks."""
+    val = 0
+    for c in chunks:
+        val = binascii.crc32(bytes(c.data), val)
+    return val
+
+
+@pytest.fixture
 def subject(mock_messenger: AsyncMock) -> downloader.FirmwareUpdateDownloader:
     """Test subject."""
     return downloader.FirmwareUpdateDownloader(mock_messenger)
@@ -53,6 +63,7 @@ async def test_messaging(
     mock_hex_processor: MagicMock,
     mock_messenger: AsyncMock,
     can_message_notifier: MockCanMessageNotifier,
+    crc32: int,
 ) -> None:
     """It should send all the chunks as CAN messages."""
     # TODO (amit, 2022-1-27): Replace this test with integration test.
@@ -78,7 +89,7 @@ async def test_messaging(
         elif isinstance(message, FirmwareUpdateComplete):
             can_message_notifier.notify(
                 FirmwareUpdateCompleteAcknowledge(
-                    payload=payloads.FirmwareUpdateCompleteAcknowledge(
+                    payload=payloads.FirmwareUpdateAcknowledge(
                         error_code=utils.UInt16Field(ErrorCode.ok)
                     )
                 ),
@@ -115,7 +126,8 @@ async def test_messaging(
                 node_id=NodeId.gantry_y_bootloader,
                 message=FirmwareUpdateComplete(
                     payload=payloads.FirmwareUpdateComplete(
-                        num_messages=utils.UInt32Field(len(chunks))
+                        num_messages=utils.UInt32Field(len(chunks)),
+                        crc32=utils.UInt32Field(crc32),
                     )
                 ),
             )
@@ -191,7 +203,7 @@ async def test_messaging_complete_error_response(
         elif isinstance(message, FirmwareUpdateComplete):
             can_message_notifier.notify(
                 FirmwareUpdateCompleteAcknowledge(
-                    payload=payloads.FirmwareUpdateCompleteAcknowledge(
+                    payload=payloads.FirmwareUpdateAcknowledge(
                         error_code=utils.UInt16Field(ErrorCode.invalid_size)
                     )
                 ),

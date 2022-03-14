@@ -52,6 +52,19 @@ class AbstractModule(abc.ABC):
         self._execution_manager = execution_manager
         self._bundled_fw: Optional[BundledFirmware] = self.get_bundled_fw()
 
+    @staticmethod
+    def sort_key(inst: "AbstractModule") -> int:
+        usb_port = inst.usb_port
+
+        if usb_port.hub is not None:
+            primary_port = usb_port.hub
+            secondary_port = usb_port.port_number
+        else:
+            primary_port = usb_port.port_number
+            secondary_port = 0
+
+        return primary_port * 1000 + secondary_port
+
     @property
     def loop(self) -> asyncio.AbstractEventLoop:
         return self._loop

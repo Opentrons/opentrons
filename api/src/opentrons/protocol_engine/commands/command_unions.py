@@ -3,6 +3,15 @@
 from typing import Union
 
 from . import heater_shaker
+from . import magnetic_module
+
+from .set_rail_lights import (
+    SetRailLights,
+    SetRailLightsCommandType,
+    SetRailLightsCreate,
+    SetRailLightsParams,
+    SetRailLightsResult,
+)
 
 from .aspirate import (
     Aspirate,
@@ -67,14 +76,6 @@ from .load_pipette import (
     LoadPipetteCommandType,
 )
 
-from .magnetic_module_engage import (
-    MagneticModuleEngage,
-    MagneticModuleEngageParams,
-    MagneticModuleEngageCreate,
-    MagneticModuleEngageResult,
-    MagneticModuleEngageCommandType,
-)
-
 from .move_relative import (
     MoveRelative,
     MoveRelativeParams,
@@ -124,7 +125,6 @@ Command = Union[
     LoadLabware,
     LoadModule,
     LoadPipette,
-    MagneticModuleEngage,
     MoveRelative,
     MoveToWell,
     Pause,
@@ -137,6 +137,9 @@ Command = Union[
     heater_shaker.StopShake,
     heater_shaker.OpenLatch,
     heater_shaker.CloseLatch,
+    magnetic_module.Disengage,
+    magnetic_module.Engage,
+    SetRailLights,
 ]
 
 CommandParams = Union[
@@ -148,7 +151,6 @@ CommandParams = Union[
     LoadLabwareParams,
     LoadModuleParams,
     LoadPipetteParams,
-    MagneticModuleEngageParams,
     MoveRelativeParams,
     MoveToWellParams,
     PauseParams,
@@ -161,6 +163,9 @@ CommandParams = Union[
     heater_shaker.StopShakeParams,
     heater_shaker.OpenLatchParams,
     heater_shaker.CloseLatchParams,
+    magnetic_module.DisengageParams,
+    magnetic_module.EngageParams,
+    SetRailLightsParams,
 ]
 
 CommandType = Union[
@@ -172,7 +177,6 @@ CommandType = Union[
     LoadLabwareCommandType,
     LoadModuleCommandType,
     LoadPipetteCommandType,
-    MagneticModuleEngageCommandType,
     MoveRelativeCommandType,
     MoveToWellCommandType,
     PauseCommandType,
@@ -185,6 +189,9 @@ CommandType = Union[
     heater_shaker.StopShakeCommandType,
     heater_shaker.OpenLatchCommandType,
     heater_shaker.CloseLatchCommandType,
+    magnetic_module.DisengageCommandType,
+    magnetic_module.EngageCommandType,
+    SetRailLightsCommandType,
 ]
 
 CommandCreate = Union[
@@ -195,7 +202,6 @@ CommandCreate = Union[
     LoadLabwareCreate,
     LoadModuleCreate,
     LoadPipetteCreate,
-    MagneticModuleEngageCreate,
     MoveRelativeCreate,
     MoveToWellCreate,
     PauseCreate,
@@ -208,6 +214,9 @@ CommandCreate = Union[
     heater_shaker.StopShakeCreate,
     heater_shaker.OpenLatchCreate,
     heater_shaker.CloseLatchCreate,
+    magnetic_module.DisengageCreate,
+    magnetic_module.EngageCreate,
+    SetRailLightsCreate,
 ]
 
 CommandResult = Union[
@@ -219,7 +228,6 @@ CommandResult = Union[
     LoadLabwareResult,
     LoadModuleResult,
     LoadPipetteResult,
-    MagneticModuleEngageResult,
     MoveRelativeResult,
     MoveToWellResult,
     PauseResult,
@@ -232,4 +240,7 @@ CommandResult = Union[
     heater_shaker.StopShakeResult,
     heater_shaker.OpenLatchResult,
     heater_shaker.CloseLatchResult,
+    magnetic_module.DisengageResult,
+    magnetic_module.EngageResult,
+    SetRailLightsResult,
 ]

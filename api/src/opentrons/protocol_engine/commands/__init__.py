@@ -14,6 +14,7 @@ and/or schema generation.
 """
 
 from . import heater_shaker
+from . import magnetic_module
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, CommandStatus
 
@@ -88,14 +89,6 @@ from .load_pipette import (
     LoadPipetteCommandType,
 )
 
-from .magnetic_module_engage import (
-    MagneticModuleEngage,
-    MagneticModuleEngageParams,
-    MagneticModuleEngageCreate,
-    MagneticModuleEngageResult,
-    MagneticModuleEngageCommandType,
-)
-
 from .move_relative import (
     MoveRelative,
     MoveRelativeParams,
@@ -134,6 +127,14 @@ from .save_position import (
     SavePositionCreate,
     SavePositionResult,
     SavePositionCommandType,
+)
+
+from .set_rail_lights import (
+    SetRailLights,
+    SetRailLightsParams,
+    SetRailLightsCreate,
+    SetRailLightsResult,
+    SetRailLightsCommandType,
 )
 
 
@@ -232,6 +233,13 @@ __all__ = [
     "SavePositionCreate",
     "SavePositionResult",
     "SavePositionCommandType",
+    # set rail lights command models
+    "SetRailLights",
+    "SetRailLightsParams",
+    "SetRailLightsCreate",
+    "SetRailLightsResult",
+    "SetRailLightsCommandType",
     # module command bundles
     "heater_shaker",
+    "magnetic_module",
 ]

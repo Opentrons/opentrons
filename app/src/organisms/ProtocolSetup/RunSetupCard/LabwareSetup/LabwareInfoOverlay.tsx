@@ -26,7 +26,8 @@ import { getLabwareDefinitionUri } from '../../utils/getLabwareDefinitionUri'
 import type { LabwareOffset } from '@opentrons/api-client'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 interface LabwareInfoProps {
-  displayName: string
+  displayName: string | null
+  definitionDisplayName: string
   labwareId: string
 }
 
@@ -39,10 +40,11 @@ const labwareDisplayNameStyle = css`
   -webkit-box-orient: vertical;
 `
 const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
-  const { displayName, labwareId } = props
+  const { displayName, definitionDisplayName, labwareId } = props
   const { t } = useTranslation('protocol_setup')
   const { protocolData } = useProtocolDetails()
   const runRecord = useCurrentRun()
+
   // protocolData should never be null as we don't render the `ProtocolSetup` unless we have an analysis
   // but we're experiencing a zombie children issue, see https://github.com/Opentrons/opentrons/pull/9091
   if (protocolData == null) {
@@ -91,14 +93,15 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
       borderRadius={`0 0 0.4rem 0.4rem`}
       fontSize={FONT_SIZE_CAPTION}
       color={C_WHITE}
-      id="LabwareInfoOverlay_offsetBox"
+      id={`LabwareInfoOverlay_slot_${labwareLocation.slotName}_offsetBox`}
     >
       <Text
         margin={SPACING_1}
         css={labwareDisplayNameStyle}
-        id="LabwareInfoOverlay_displayName"
+        id={`LabwareInfoOverlay_slot_${labwareLocation.slotName}_displayName`}
+        title={definitionDisplayName}
       >
-        {displayName}
+        {displayName ?? definitionDisplayName}
       </Text>
       {vector != null && (
         <>
@@ -115,7 +118,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
               as={'span'}
               fontWeight={FONT_WEIGHT_SEMIBOLD}
               marginRight={'0.15rem'}
-              id="LabwareInfoOverlay_x"
+              id={`LabwareInfoOverlay_${labwareLocation.slotName}_x`}
             >
               X
             </Text>
@@ -123,7 +126,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
               as={'span'}
               fontWeight={FONT_WEIGHT_REGULAR}
               marginRight={'0.35rem'}
-              id="LabwareInfoOverlay_xValue"
+              id={`LabwareInfoOverlay_${labwareLocation.slotName}_xValue`}
             >
               {vector.x.toFixed(1)}
             </Text>
@@ -131,7 +134,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
               as={'span'}
               fontWeight={FONT_WEIGHT_SEMIBOLD}
               marginRight={'0.15rem'}
-              id="LabwareInfoOverlay_y"
+              id={`LabwareInfoOverlay_${labwareLocation.slotName}_y`}
             >
               Y
             </Text>
@@ -139,7 +142,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
               as={'span'}
               fontWeight={FONT_WEIGHT_REGULAR}
               marginRight={'0.35rem'}
-              id="LabwareInfoOverlay_yValue"
+              id={`LabwareInfoOverlay_${labwareLocation.slotName}_yValue`}
             >
               {vector.y.toFixed(1)}
             </Text>
@@ -147,7 +150,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
               as={'span'}
               fontWeight={FONT_WEIGHT_SEMIBOLD}
               marginRight={'0.15rem'}
-              id="LabwareInfoOverlay_z"
+              id={`LabwareInfoOverlay_${labwareLocation.slotName}_z`}
             >
               Z
             </Text>
@@ -155,7 +158,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
               as={'span'}
               fontWeight={FONT_WEIGHT_REGULAR}
               marginRight={'0.35rem'}
-              id="LabwareInfoOverlay_zValue"
+              id={`LabwareInfoOverlay_${labwareLocation.slotName}_zValue`}
             >
               {vector.z.toFixed(1)}
             </Text>
@@ -169,11 +172,12 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
 interface LabwareInfoOverlayProps {
   definition: LabwareDefinition2
   labwareId: string
+  displayName: string | null
 }
 export const LabwareInfoOverlay = (
   props: LabwareInfoOverlayProps
 ): JSX.Element => {
-  const { definition, labwareId } = props
+  const { definition, labwareId, displayName } = props
   const width = definition.dimensions.xDimension
   const height = definition.dimensions.yDimension
   return (
@@ -188,7 +192,8 @@ export const LabwareInfoOverlay = (
       }}
     >
       <LabwareInfo
-        displayName={getLabwareDisplayName(definition)}
+        displayName={displayName}
+        definitionDisplayName={getLabwareDisplayName(definition)}
         labwareId={labwareId}
       />
     </RobotCoordsForeignDiv>

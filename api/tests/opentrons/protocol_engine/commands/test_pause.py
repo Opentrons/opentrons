@@ -1,12 +1,7 @@
 """Test pause command."""
 from decoy import Decoy
 
-from opentrons.protocol_engine.execution import (
-    EquipmentHandler,
-    MovementHandler,
-    PipettingHandler,
-    RunControlHandler,
-)
+from opentrons.protocol_engine.execution import RunControlHandler
 
 from opentrons.protocol_engine.commands.pause import (
     PauseParams,
@@ -16,19 +11,10 @@ from opentrons.protocol_engine.commands.pause import (
 
 
 async def test_pause_implementation(
-    decoy: Decoy,
-    equipment: EquipmentHandler,
-    movement: MovementHandler,
-    pipetting: PipettingHandler,
-    run_control: RunControlHandler,
+    decoy: Decoy, run_control: RunControlHandler
 ) -> None:
     """It should dispatch a PauseAction to the store and await resume."""
-    subject = PauseImplementation(
-        equipment=equipment,
-        movement=movement,
-        pipetting=pipetting,
-        run_control=run_control,
-    )
+    subject = PauseImplementation(run_control=run_control)
 
     data = PauseParams(message="hello world")
 

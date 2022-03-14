@@ -11,6 +11,7 @@ import {
 
 export interface ExternalLinkProps extends LinkProps {
   href: string
+  id?: string
   children: JSX.Element
 }
 

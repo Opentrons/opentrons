@@ -24,9 +24,9 @@ import { Page } from '../../atoms/Page'
 import { Portal } from '../../App/portal'
 import { useProtocolDetails } from './hooks'
 import {
-  useRunStatus,
+  useCurrentRunStatus,
   useRunStartTime,
-  useRunControls,
+  useCurrentRunControls,
 } from '../RunTimeControl/hooks'
 import { ConfirmExitProtocolUploadModal } from '../ProtocolUpload/ConfirmExitProtocolUploadModal'
 import { useCloseCurrentRun } from '../ProtocolUpload/hooks/useCloseCurrentRun'
@@ -43,7 +43,7 @@ export function RunDetails(): JSX.Element | null {
   const robotName = useSelector<State>(getConnectedRobotName)
   const { displayName } = useProtocolDetails()
   const history = useHistory()
-  const runStatus = useRunStatus({
+  const runStatus = useCurrentRunStatus({
     onSettled: data => {
       if (data == null) {
         history.push('/upload')
@@ -60,7 +60,7 @@ export function RunDetails(): JSX.Element | null {
       ? RUN_STATUS_RUNNING
       : runStatus
 
-  const { pause } = useRunControls()
+  const { pause } = useCurrentRunControls()
   const [
     showConfirmCancelModal,
     setShowConfirmCancelModal,

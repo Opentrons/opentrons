@@ -37,7 +37,6 @@ import {
 import { useTrackEvent } from '../../redux/analytics'
 import { UpdateAppModal } from '../UpdateAppModal'
 import { PreviousVersionModal } from './PreviousVersionModal'
-import { AppSettingsHeader } from './AppSettingsHeader'
 
 import type { Dispatch, State } from '../../redux/types'
 
@@ -89,11 +88,13 @@ export function GeneralSettings(): JSX.Element {
     dispatch(checkShellUpdate())
   })
   return (
-    <Box backgroundColor={COLORS.white} height="100%">
-      <AppSettingsHeader page="general" />
+    <>
       <Box paddingX={SPACING.spacing4} paddingY={SPACING.spacing5}>
         {showUpdateBanner && (
-          <Box marginBottom={SPACING.spacing4}>
+          <Box
+            marginBottom={SPACING.spacing4}
+            id="GeneralSettings_updatebanner"
+          >
             <AlertItem
               type="warning"
               title={
@@ -121,7 +122,11 @@ export function GeneralSettings(): JSX.Element {
             <Text css={TYPOGRAPHY.h3SemiBold} paddingBottom={SPACING.spacing3}>
               {t('software_version')}
             </Text>
-            <Text css={TYPOGRAPHY.pRegular} paddingBottom={SPACING.spacing3}>
+            <Text
+              css={TYPOGRAPHY.pRegular}
+              paddingBottom={SPACING.spacing3}
+              id="GeneralSettings_currentVersion"
+            >
               {CURRENT_VERSION}
             </Text>
             <Link
@@ -129,13 +134,18 @@ export function GeneralSettings(): JSX.Element {
               css={TYPOGRAPHY.pSemiBold}
               color={COLORS.blue}
               onClick={() => setShowPreviousVersionModal(true)}
+              id="GeneralSettings_previousVersionLink"
             >
               {t('restore_previous')}
             </Link>
             <Text css={TYPOGRAPHY.pRegular} paddingY={SPACING.spacing3}>
               {t('manage_versions')}
             </Text>
-            <ExternalLink css={TYPOGRAPHY.pSemiBold} href={SOFTWARE_SYNC_URL}>
+            <ExternalLink
+              css={TYPOGRAPHY.pSemiBold}
+              href={SOFTWARE_SYNC_URL}
+              id="GeneralSettings_appAndRobotSync"
+            >
               {t('versions_sync')}
             </ExternalLink>
           </Box>
@@ -144,6 +154,7 @@ export function GeneralSettings(): JSX.Element {
               disabled={!updateAvailable}
               marginLeft={SPACING_AUTO}
               onClick={() => setShowUpdateModal(true)}
+              id="GeneralSettings_softwareUpdate"
             >
               {t('view_software_update')}
             </TertiaryButton>
@@ -174,6 +185,7 @@ export function GeneralSettings(): JSX.Element {
             disabled={enabled === null}
             toggledOn={enabled === true}
             onClick={handleToggle}
+            id="GeneralSettings_softwareUpdateAlerts"
           />
         </Flex>
         <Divider marginY={SPACING.spacing5} />
@@ -184,7 +196,10 @@ export function GeneralSettings(): JSX.Element {
           <Text css={TYPOGRAPHY.h3SemiBold} paddingBottom={SPACING.spacing3}>
             {t('connect_ip')}
           </Text>
-          <TertiaryButton marginLeft={SPACING_AUTO}>
+          <TertiaryButton
+            marginLeft={SPACING_AUTO}
+            id="GeneralSettings_setUpConnection"
+          >
             {t('setup_connection')}
           </TertiaryButton>
         </Flex>
@@ -197,6 +212,6 @@ export function GeneralSettings(): JSX.Element {
           closeModal={() => setShowPreviousVersionModal(false)}
         />
       ) : null}
-    </Box>
+    </>
   )
 }

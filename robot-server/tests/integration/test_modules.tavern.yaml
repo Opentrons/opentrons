@@ -37,7 +37,7 @@ stages:
               totalStepCount: Null
           - name: heatershaker
             displayName: heatershaker
-            moduleModel: heaterShakerV1
+            moduleModel: heaterShakerModuleV1
             port: !anystr
             usbPort: !anydict
             serial: !anystr

@@ -128,10 +128,6 @@ class InstrumentContextImplementation(AbstractInstrument):
         """Home the plunger associated with this mount."""
         self._protocol_interface.get_hardware().home_plunger(self._mount)
 
-    def delay(self) -> None:
-        """Delay protocol execution."""
-        self._protocol_interface.delay(seconds=0, msg=None)
-
     def move_to(
         self,
         location: types.Location,

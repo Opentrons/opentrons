@@ -6,6 +6,7 @@ import {
   mockMagneticModule,
   mockTemperatureModuleGen2,
   mockThermocycler,
+  mockHeaterShaker,
 } from '../../../../redux/modules/__fixtures__'
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 
@@ -21,6 +22,7 @@ describe('ModuleOverflowMenu', () => {
     props = {
       module: mockMagneticModule,
       handleClick: jest.fn(),
+      handleAboutClick: jest.fn(),
     }
   })
   afterEach(() => {
@@ -35,9 +37,10 @@ describe('ModuleOverflowMenu', () => {
       background-color: transparent;
     `)
     fireEvent.click(buttonSetting)
+    expect(props.handleClick).toHaveBeenCalled()
     const buttonAbout = getByRole('button', { name: 'About module' })
     fireEvent.click(buttonAbout)
-    expect(buttonAbout).toBeEnabled()
+    expect(props.handleAboutClick).toHaveBeenCalled()
     expect(getByText('About module')).toHaveStyle('color: #16212D')
   })
   it('renders hover state color correctly', () => {
@@ -51,40 +54,62 @@ describe('ModuleOverflowMenu', () => {
       }
     )
   })
-  //  todo imemdiately: add on to following 2 tests when their slideout component is made
   it('renders the correct temperature module menu', () => {
     props = {
       module: mockTemperatureModuleGen2,
       handleClick: jest.fn(),
+      handleAboutClick: jest.fn(),
     }
     const { getByRole } = render(props)
     const buttonSetting = getByRole('button', {
       name: 'Set module temperature',
     })
     fireEvent.click(buttonSetting)
+    expect(props.handleClick).toHaveBeenCalled()
     const buttonAbout = getByRole('button', { name: 'About module' })
     fireEvent.click(buttonAbout)
-    expect(buttonAbout).toBeEnabled()
-    expect(buttonSetting).toBeEnabled()
+    expect(props.handleAboutClick).toHaveBeenCalled()
   })
   it('renders the correct TC module menu', () => {
     props = {
       module: mockThermocycler,
       handleClick: jest.fn(),
+      handleAboutClick: jest.fn(),
     }
     const { getByRole } = render(props)
     const buttonSettingLid = getByRole('button', {
       name: 'Set lid temperature',
     })
     fireEvent.click(buttonSettingLid)
+    expect(props.handleClick).toHaveBeenCalled()
     const buttonAbout = getByRole('button', { name: 'About module' })
     fireEvent.click(buttonAbout)
+    expect(props.handleAboutClick).toHaveBeenCalled()
     const buttonSettingBlock = getByRole('button', {
       name: 'Set block temperature',
     })
     fireEvent.click(buttonSettingBlock)
-    expect(buttonAbout).toBeEnabled()
-    expect(buttonSettingLid).toBeEnabled()
-    expect(buttonSettingBlock).toBeEnabled()
+    expect(props.handleClick).toHaveBeenCalled()
+  })
+  it('renders the correct Heater Shaker module menu', () => {
+    props = {
+      module: mockHeaterShaker,
+      handleClick: jest.fn(),
+      handleAboutClick: jest.fn(),
+    }
+    // TODO(sh, 2022-03-08): extend tests when menu component is wired up
+    const { getByRole } = render(props)
+    getByRole('button', {
+      name: 'Set temperature',
+    })
+    getByRole('button', {
+      name: 'Set shake speed',
+    })
+    getByRole('button', {
+      name: 'Open Labware Latch',
+    })
+    getByRole('button', { name: 'About module' })
+    getByRole('button', { name: 'See how to attach to deck' })
+    getByRole('button', { name: 'Test shake' })
   })
 })

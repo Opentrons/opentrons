@@ -36,6 +36,7 @@ export interface LabwareRenderInfoById {
     y: number
     z: number
     labwareDef: LabwareDefinition2
+    displayName: string | null
   }
 }
 
@@ -51,6 +52,7 @@ export const getLabwareRenderInfo = (
     .reduce((acc, command) => {
       const labwareId = command.result?.labwareId
       const location = command.params.location
+      const displayName = command.params.displayName ?? null
       const labwareDef = command.result?.definition
       if ('moduleId' in location) {
         return { ...acc }
@@ -79,6 +81,7 @@ export const getLabwareRenderInfo = (
               y: slotPosition[1],
               z: slotPosition[2],
               labwareDef,
+              displayName,
             },
           }
         : { ...acc }

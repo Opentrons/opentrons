@@ -2,19 +2,22 @@
   "module_display_names": {
     "temperatureModuleType": "Temperature",
     "magneticModuleType": "Magnetic",
-    "thermocyclerModuleType": "Thermocycler"
+    "thermocyclerModuleType": "Thermocycler",
+    "heaterShakerModuleType": "Heater Shaker"
   },
   "module_long_names": {
     "temperatureModuleType": "Temperature module",
     "magneticModuleType": "Magnetic module",
-    "thermocyclerModuleType": "Thermocycler module"
+    "thermocyclerModuleType": "Thermocycler module",
+    "heaterShakerModuleType": "Heater Shaker module"
   },
   "model_display_name": {
     "temperatureModuleV1": "GEN1",
     "temperatureModuleV2": "GEN2",
     "magneticModuleV1": "GEN1",
     "magneticModuleV2": "GEN2",
-    "thermocyclerModuleV1": "GEN1"
+    "thermocyclerModuleV1": "GEN1",
+    "heaterShakerModuleV1": "GEN1"
   },
   "status": {
     "engaged": "engaged",
@@ -35,5 +38,8 @@
   "lid_label": "Lid ({{lidStatus}})",
   "lid_closed": "closed",
   "lid_open": "open",
-  "lid_undefined": "undefined"
+  "lid_undefined": "undefined",
+  "latch_label": "Latch",
+  "heater_label": "Heater",
+  "shaker_label": "Shaker"
 }

@@ -35,7 +35,8 @@ from .pipette import (
     generate_hardware_configs_ot3,
     load_from_config_and_check_skip,
 )
-from .backends import OT3Controller, OT3Simulator
+from .backends.ot3controller import OT3Controller
+from .backends.ot3simulator import OT3Simulator
 from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
@@ -183,6 +184,7 @@ class OT3API(
         self._move_manager.update_constraints(
             get_system_constraints(self._config.motion_settings, gantry_load)
         )
+        self._backend.update_to_default_current_settings(gantry_load)
 
     def _update_door_state(self, door_state: DoorState) -> None:
         mod_log.info(f"Updating the window switch status: {door_state}")

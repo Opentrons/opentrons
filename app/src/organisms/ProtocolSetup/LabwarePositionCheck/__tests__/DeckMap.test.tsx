@@ -119,6 +119,7 @@ describe('LPC DeckMap', () => {
       .mockReturnValue({
         [LABWARE_ID_TO_HIGHLIGHT]: {
           labwareDef: fixture_tiprack_300_ul as LabwareDefinition2,
+          displayName: 'dirty tips',
           x: MOCK_300_UL_TIPRACK_COORDS[0],
           y: MOCK_300_UL_TIPRACK_COORDS[1],
           z: MOCK_300_UL_TIPRACK_COORDS[2],
@@ -136,6 +137,7 @@ describe('LPC DeckMap', () => {
           moduleDef: mockMagneticModule as any,
           nestedLabwareDef: fixture_tiprack_300_ul as LabwareDefinition2,
           nestedLabwareId: ANOTHER_LABWARE_ID_TO_HIGHLIGHT,
+          nestedLabwareDisplayName: 'fresh tips',
           protocolLoadOrder: 1,
           attachedModuleMatch: {
             ...mockMagneticModuleFixture,

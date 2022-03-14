@@ -39,16 +39,25 @@ export function PreviousVersionModal(
           href={UNINSTALL_APP_URL}
           paddingBottom={SPACING.spacing3}
           css={TYPOGRAPHY.pSemiBold}
+          id="PreviousVersionModal_uninstallingAppLink"
         >
           {t('learn_uninstalling')}
         </ExternalLink>
         <br />
-        <ExternalLink href={PREVIOUS_RELEASES_URL} css={TYPOGRAPHY.pSemiBold}>
+        <ExternalLink
+          href={PREVIOUS_RELEASES_URL}
+          css={TYPOGRAPHY.pSemiBold}
+          id="PreviousVersionModal_previousReleases"
+        >
           {t('previous_releases')}
         </ExternalLink>
       </Box>
       <Flex justifyContent={JUSTIFY_FLEX_END}>
-        <PrimaryButton marginTop={SPACING.spacing5} onClick={props.closeModal}>
+        <PrimaryButton
+          marginTop={SPACING.spacing5}
+          onClick={props.closeModal}
+          id="PreviousVersionModal_closeButton"
+        >
           {t('close')}
         </PrimaryButton>
       </Flex>

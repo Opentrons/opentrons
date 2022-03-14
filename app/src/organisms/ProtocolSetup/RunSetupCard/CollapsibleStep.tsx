@@ -20,12 +20,12 @@ import {
 interface CollapsibleStepProps {
   expanded: boolean
   title: string
-  description: string
-  label: string
+  description?: string
+  label?: string
   id?: string
   toggleExpanded: () => void
   children: React.ReactNode
-  rightAlignedNode: React.ReactNode
+  rightAlignedNode?: React.ReactNode
 }
 
 const EXPANDED_STYLE = css`

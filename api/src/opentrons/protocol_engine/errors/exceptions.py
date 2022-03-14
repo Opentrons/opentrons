@@ -110,3 +110,7 @@ class ThermocyclerNotOpenError(ProtocolEngineError):
 
 class RobotDoorOpenError(ProtocolEngineError):
     """An error raised when executing a protocol command when a robot door is open."""
+
+
+class EngageHeightOutOfRangeError(ProtocolEngineError):
+    """An error raised when a Magnetic Module engage height is out of bounds."""

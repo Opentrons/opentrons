@@ -110,7 +110,7 @@ class HeaterShaker(mod_abc.AbstractModule):
     @staticmethod
     def _model_from_revision(revision: Optional[str]) -> str:
         """Defines the revision -> model mapping"""
-        return "heaterShakerV1"
+        return "heaterShakerModuleV1"
 
     @staticmethod
     def _get_temperature_status(temperature: Temperature) -> TemperatureStatus:

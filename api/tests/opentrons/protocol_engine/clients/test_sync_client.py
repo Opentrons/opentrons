@@ -269,15 +269,31 @@ def test_magnetic_module_engage(
     subject: SyncClient,
 ) -> None:
     """It should execute a Magnetic Module engage command."""
-    request = commands.MagneticModuleEngageCreate(
-        params=commands.MagneticModuleEngageParams(
+    request = commands.magnetic_module.EngageCreate(
+        params=commands.magnetic_module.EngageParams(
             moduleId="module-id", engageHeight=12.34
         )
     )
-    response = commands.MagneticModuleEngageResult()
+    response = commands.magnetic_module.EngageResult()
 
     decoy.when(transport.execute_command(request=request)).then_return(response)
 
     result = subject.magnetic_module_engage(module_id="module-id", engage_height=12.34)
+
+    assert result == response
+
+
+def test_set_rail_lights(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a setRailLights command."""
+    request = commands.SetRailLightsCreate(params=commands.SetRailLightsParams(on=True))
+    response = commands.SetRailLightsResult()
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.set_rail_lights(on=True)
 
     assert result == response

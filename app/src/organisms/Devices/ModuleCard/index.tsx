@@ -22,6 +22,7 @@ import {
 import {
   getModuleDisplayName,
   MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
@@ -33,12 +34,15 @@ import { ModuleOverflowMenu } from './ModuleOverflowMenu'
 import { ThermocyclerModuleSlideout } from './ThermocyclerModuleSlideout'
 import { MagneticModuleSlideout } from './MagneticModuleSlideout'
 import { TemperatureModuleSlideout } from './TemperatureModuleSlideout'
+import { AboutModuleSlideout } from './AboutModuleSlideout'
 
 import magneticModule from '../../../assets/images/magnetic_module_gen_2_transparent.svg'
 import temperatureModule from '../../../assets/images/temp_deck_gen_2_transparent.svg'
 import thermoModule from '../../../assets/images/thermocycler_open_transparent.svg'
+import heaterShakerModule from '../../../assets/images/heatershaker_module_transparent.svg'
 
 import type { AttachedModule } from '../../../redux/modules/types'
+import { HeaterShakerModuleData } from './HeaterShakerModuleData'
 
 interface ModuleCardProps {
   module: AttachedModule
@@ -50,6 +54,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [showOverflowMenu, setShowOverflowMenu] = React.useState(false)
   const [showSlideout, setShowSlideout] = React.useState(false)
   const [hasSecondary, setHasSecondary] = React.useState(false)
+  const [showAboutModule, setShowAboutModule] = React.useState(false)
 
   const moduleOverflowWrapperRef = useOnClickOutside({
     onClickOutside: () => setShowOverflowMenu(false),
@@ -95,6 +100,22 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       )
       break
     }
+
+    case 'heaterShakerModuleType': {
+      image = heaterShakerModule
+      moduleData = (
+        <HeaterShakerModuleData
+          heaterStatus={module.data.temperatureStatus}
+          shakerStatus={module.data.speedStatus}
+          latchStatus={module.data.labwareLatchStatus}
+          targetTemp={module.data.targetTemp}
+          currentTemp={module.data.currentTemp}
+          targetSpeed={module.data.targetSpeed}
+          currentSpeed={module.data.currentSpeed}
+          showTemperatureData={true}
+        />
+      )
+    }
   }
 
   const handleMenuItemClick = (isSecondary: boolean = false): void => {
@@ -105,6 +126,13 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     }
     setShowSlideout(true)
     setShowOverflowMenu(false)
+    setShowAboutModule(false)
+  }
+
+  const handleAboutClick = (): void => {
+    setShowAboutModule(true)
+    setShowOverflowMenu(false)
+    setShowSlideout(false)
   }
 
   return (
@@ -115,6 +143,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         marginBottom={SPACING_2}
         marginLeft={SPACING_2}
         width={'20rem'}
+        data-testid={`module_card_${module.serial}`}
       >
         {showSlideout && (
           <ModuleSlideout
@@ -122,6 +151,13 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             isSecondary={hasSecondary}
             showSlideout={showSlideout}
             onCloseClick={() => setShowSlideout(false)}
+          />
+        )}
+        {showAboutModule && (
+          <AboutModuleSlideout
+            module={module}
+            isExpanded={showAboutModule}
+            onCloseClick={() => setShowAboutModule(false)}
           />
         )}
         <Box
@@ -137,12 +173,16 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 fontWeight={FONT_WEIGHT_REGULAR}
                 fontSize={FONT_SIZE_CAPTION}
                 paddingBottom={SPACING.spacing2}
+                data-testid={`module_card_usb_port_${module.serial}`}
               >
                 {t(module.usbPort.port === null ? 'usb_hub' : 'usb_port', {
                   port: module.usbPort.hub ?? module.usbPort.port,
                 })}
               </Text>
-              <Flex paddingBottom={SPACING.spacing2}>
+              <Flex
+                paddingBottom={SPACING.spacing2}
+                data-testid={`module_card_display_name_${module.serial}`}
+              >
                 <ModuleIcon moduleType={module.type} />
                 <Text fontSize={TYPOGRAPHY.fontSizeP}>
                   {getModuleDisplayName(module.model)}
@@ -153,7 +193,11 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           </Flex>
         </Box>
 
-        <Box alignSelf={ALIGN_START} padding={SPACING.spacing2}>
+        <Box
+          alignSelf={ALIGN_START}
+          padding={SPACING.spacing2}
+          data-testid={`module_card_overflow_btn_${module.serial}`}
+        >
           <OverflowBtn
             aria-label="overflow"
             onClick={() => {
@@ -162,8 +206,12 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           />
         </Box>
         {showOverflowMenu && (
-          <div ref={moduleOverflowWrapperRef}>
+          <div
+            ref={moduleOverflowWrapperRef}
+            data-testid={`module_card_overflow_menu_${module.serial}`}
+          >
             <ModuleOverflowMenu
+              handleAboutClick={handleAboutClick}
               module={module}
               handleClick={handleMenuItemClick}
             />
@@ -200,7 +248,7 @@ const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
         isExpanded={showSlideout}
       />
     )
-  } else {
+  } else if (module.type === TEMPERATURE_MODULE_TYPE) {
     return (
       <TemperatureModuleSlideout
         model={module.model}
@@ -209,5 +257,8 @@ const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
         isExpanded={showSlideout}
       />
     )
+  } else {
+    // TODO(sh, 2022-02-28): render heater shaker slideout
+    return <div></div>
   }
 }

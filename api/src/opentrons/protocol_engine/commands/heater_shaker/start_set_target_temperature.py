@@ -30,6 +30,9 @@ class StartSetTargetTemperatureImpl(
 ):
     """Execution implementation of a Heater-Shaker's set temperature command."""
 
+    def __init__(self, **kwargs: object) -> None:
+        pass
+
     async def execute(
         self,
         params: StartSetTargetTemperatureParams,

@@ -1044,7 +1044,11 @@
                           }
                         }
                       }
-                    ]
+                    ],
+                    "displayName": {
+                      "type": "string",
+                      "description": "Optional user-defined nickname for this labware instance within the protocol"
+                    }
                   }
                 }
               }

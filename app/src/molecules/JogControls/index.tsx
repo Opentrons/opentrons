@@ -34,10 +34,11 @@ export { HORIZONTAL_PLANE, VERTICAL_PLANE }
 
 export function JogControls(props: JogControlsProps): JSX.Element {
   const {
+    jog,
     isLPC,
+    directionControlButtonColor,
     stepSizes = DEFAULT_STEP_SIZES,
     planes = [HORIZONTAL_PLANE, VERTICAL_PLANE],
-    jog,
     auxiliaryControl = null,
     ...styleProps
   } = props
@@ -62,7 +63,7 @@ export function JogControls(props: JogControlsProps): JSX.Element {
           plane={plane}
           jog={jog}
           stepSize={currentStepSize}
-          buttonColor={props.directionControlButtonColor}
+          buttonColor={directionControlButtonColor}
         />
       ))}
       {auxiliaryControl}

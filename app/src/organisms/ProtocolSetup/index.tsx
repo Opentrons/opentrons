@@ -25,7 +25,7 @@ import {
   C_NEAR_WHITE,
 } from '@opentrons/components'
 
-import { useRunStatus } from '../RunTimeControl/hooks'
+import { useCurrentRunStatus } from '../RunTimeControl/hooks'
 import { RunSetupCard } from './RunSetupCard'
 import { MetadataCard } from './MetadataCard'
 import { LPCSuccessToastContext } from './hooks'
@@ -40,7 +40,7 @@ export function ProtocolSetup(): JSX.Element {
   )
   const { t } = useTranslation(['protocol_setup'])
 
-  const runStatus = useRunStatus()
+  const runStatus = useCurrentRunStatus()
 
   let alertType: AlertType | null = null
   let alertTitle: string = ''

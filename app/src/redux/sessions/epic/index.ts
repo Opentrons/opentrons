@@ -6,7 +6,6 @@ import { fetchAllSessionsEpic } from './fetchAllSessionsEpic'
 import { fetchAllSessionsOnConnectEpic } from './fetchAllSessionsOnConnectEpic'
 import { createSessionCommandEpic } from './createSessionCommandEpic'
 import { deleteSessionEpic } from './deleteSessionEpic'
-import { clearAllSessionsOnDisconnectEpic } from './clearAllSessionsOnDisconnectEpic'
 
 import type { Epic } from '../../types'
 
@@ -17,6 +16,5 @@ export const sessionsEpic: Epic = combineEpics<Epic>(
   fetchAllSessionsEpic,
   fetchAllSessionsOnConnectEpic,
   createSessionCommandEpic,
-  deleteSessionEpic,
-  clearAllSessionsOnDisconnectEpic
+  deleteSessionEpic
 )

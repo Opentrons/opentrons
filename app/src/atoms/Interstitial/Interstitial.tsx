@@ -10,25 +10,12 @@ import {
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
   SPACING,
+  Overlay,
 } from '@opentrons/components'
 import {
   InterstitialTitleBar,
   InterstitialTitleBarProps,
 } from './InterstitiallTitleBar'
-
-function Overlay(): JSX.Element {
-  return (
-    <Flex
-      position={POSITION_ABSOLUTE}
-      left="0"
-      right="0"
-      top="0"
-      bottom="0"
-      backgroundColor={COLORS.white}
-    />
-  )
-}
-
 export interface InterstitialProps {
   titleBar: InterstitialTitleBarProps
   contentsClassName?: string
@@ -54,7 +41,7 @@ export function Interstitial(props: InterstitialProps): JSX.Element {
       data-testid={`interstitial`}
       {...outerProps}
     >
-      <Overlay />
+      <Overlay backgroundColor={COLORS.white} />
 
       <InterstitialTitleBar {...titleBar} />
       <Box

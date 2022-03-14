@@ -68,6 +68,7 @@ interface LoadPipetteResult {
 interface LoadLabwareParams {
   labwareId: string
   location: LabwareLocation
+  displayName?: string
 }
 
 interface LoadLabwareResult {
