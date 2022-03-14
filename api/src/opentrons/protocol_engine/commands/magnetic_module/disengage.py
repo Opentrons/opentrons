@@ -61,20 +61,15 @@ class DisengageImplementation(AbstractCommandImpl[DisengageParams, DisengageResu
                 Magnetic Module, but that module's hardware wasn't found attached.
         """
         # Allow propagation of ModuleDoesNotExistError and WrongModuleTypeError.
-        # Do this check even when using virtual modules,
-        # to fully validate module IDs during analysis.
-        self._state_view.modules.assert_is_magnetic_module(module_id=params.moduleId)
-
-        if not self._state_view.get_configs().use_virtual_modules:
-            all_attached_modules = self._hardware_api.attached_modules
-            # Allow propagation of ModuleNotAttachedError.
-            target_module = self._state_view.modules.find_loaded_hardware_module(
-                module_id=params.moduleId,
-                attached_modules=all_attached_modules,
-                expected_type=MagDeck,
-            )
-            await target_module.deactivate()
-
+        magnetic_module_view = self._state_view.modules.get_magnetic_module_view(
+            module_id=params.moduleId
+        )
+        # Allow propagation of ModuleNotAttachedError.
+        hardware_module = magnetic_module_view.find_hardware(
+            self._hardware_api.attached_modules
+        )
+        if hardware_module is not None:  # Not virtualizing modules.
+            await hardware_module.deactivate()
         return DisengageResult()
 
 
