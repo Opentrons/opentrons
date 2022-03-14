@@ -25,6 +25,7 @@ from opentrons.protocol_engine.state.modules import (
 def make_module_view(
     slot_by_module_id: Optional[Dict[str, DeckSlotName]] = None,
     hardware_module_by_slot: Optional[Dict[DeckSlotName, HardwareModule]] = None,
+    virtualize_modules: bool = False,
 ) -> ModuleView:
     """Get a module view test subject with the specified state."""
     state = ModuleState(
@@ -32,7 +33,7 @@ def make_module_view(
         hardware_module_by_slot=hardware_module_by_slot or {},
     )
 
-    return ModuleView(state=state)
+    return ModuleView(state=state, virtualize_modules=virtualize_modules)
 
 
 HardwareModuleT = TypeVar("HardwareModuleT", bound=AbstractModule)

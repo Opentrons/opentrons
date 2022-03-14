@@ -100,9 +100,13 @@ class ModuleView(HasState[ModuleState]):
 
     _state: ModuleState
 
-    def __init__(self, state: ModuleState) -> None:
+    # TODO(mm, 2022-03-14): Fix this duplication between here and EngineConfigs.
+    _virtualize_modules: bool
+
+    def __init__(self, state: ModuleState, virtualize_modules: bool) -> None:
         """Initialize the view with its backing state value."""
         self._state = state
+        self._virtualize_modules = virtualize_modules
 
     def get(self, module_id: str) -> LoadedModule:
         """Get module data by the module's unique identifier."""
@@ -122,6 +126,10 @@ class ModuleView(HasState[ModuleState]):
             location=DeckSlotLocation(slotName=slot_name),
             definition=attached_module.definition,
         )
+
+    def is_virtualizing_modules(self) -> bool:
+        """Return whether this Protocol Engine is using virtual modules."""
+        return self._virtualize_modules
 
     def get_all(self) -> List[LoadedModule]:
         """Get a list of all module entries in state."""
