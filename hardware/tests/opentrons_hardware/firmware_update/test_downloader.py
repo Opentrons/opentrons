@@ -19,7 +19,7 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     FirmwareUpdateCompleteAcknowledge,
 )
 from opentrons_hardware.firmware_bindings.messages import payloads
-from opentrons_hardware.firmware_bindings.messages.payloads import ErrorCodeField
+from opentrons_hardware.firmware_bindings.messages.fields import ErrorCodeField
 
 from opentrons_hardware.firmware_update import downloader
 from opentrons_hardware.firmware_update.errors import ErrorResponse, TimeoutResponse

@@ -30,8 +30,8 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
     WriteToSensorRequestPayload,
     ReadFromSensorResponsePayload,
     SensorThresholdResponsePayload,
-    SensorTypeField,
 )
+from opentrons_hardware.firmware_bindings.messages.fields import SensorTypeField
 from opentrons_hardware.sensors.utils import SensorDataType
 
 

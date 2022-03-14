@@ -4,6 +4,8 @@ import asyncio
 import datetime
 from typing import List, Callable
 from mock import AsyncMock
+
+import opentrons_hardware.firmware_bindings.messages.fields
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings import (
     ArbitrationId,
@@ -53,8 +55,8 @@ class MockStatusResponder:
                 response = message_definitions.DeviceInfoResponse(
                     payload=payloads.DeviceInfoResponsePayload(
                         version=utils.UInt32Field(0),
-                        flags=payloads.VersionFlagsField(0),
-                        shortsha=payloads.FirmwareShortSHADataField(b"abcdef0"),
+                        flags=opentrons_hardware.firmware_bindings.messages.fields.VersionFlagsField(0),
+                        shortsha=opentrons_hardware.firmware_bindings.messages.fields.FirmwareShortSHADataField(b"abcdef0"),
                     )
                 )
                 asyncio.get_running_loop().call_soon(

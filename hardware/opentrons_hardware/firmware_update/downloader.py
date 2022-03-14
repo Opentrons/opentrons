@@ -3,6 +3,7 @@ import asyncio
 import binascii
 import logging
 
+import opentrons_hardware.firmware_bindings.messages.fields
 from opentrons_hardware.firmware_bindings import NodeId
 from opentrons_hardware.firmware_bindings.constants import ErrorCode
 from opentrons_hardware.firmware_bindings.utils import UInt32Field
@@ -46,7 +47,7 @@ class FirmwareUpdateDownloader:
             num_messages = 0
             crc32 = 0
             for chunk in hex_processor.process(
-                payloads.FirmwareUpdateDataField.NUM_BYTES
+                opentrons_hardware.firmware_bindings.messages.fields.FirmwareUpdateDataField.NUM_BYTES
             ):
                 logger.debug(
                     f"Sending chunk {num_messages} to address {chunk.address:x}."
