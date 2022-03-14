@@ -5,7 +5,8 @@
 from dataclasses import dataclass
 import enum
 
-from .. import utils
+from .. import utils, ErrorCode
+from ..constants import SensorType, ToolType
 
 
 @dataclass
@@ -224,14 +225,26 @@ class ReadPresenceSensingVoltageResponsePayload(utils.BinarySerializable):
     gripper: utils.UInt16Field
 
 
+class ToolField(utils.UInt8Field):
+    """A tool field."""
+
+    def __repr__(self) -> str:
+        """Print out a tool string."""
+        try:
+            tool_val = ToolType(self.value).name
+        except ValueError:
+            tool_val = str(self.value)
+        return f"{self.__class__.__name__}(value={tool_val})"
+
+
 @dataclass
 class ToolsDetectedNotificationPayload(utils.BinarySerializable):
     """Tool detection notification."""
 
     # Tools are mapped to an enum
-    z_motor: utils.UInt8Field
-    a_motor: utils.UInt8Field
-    gripper: utils.UInt8Field
+    z_motor: ToolField
+    a_motor: ToolField
+    gripper: ToolField
 
 
 @dataclass
@@ -282,11 +295,23 @@ class FirmwareUpdateData(FirmwareUpdateWithAddress):
         return obj
 
 
+class ErrorCodeField(utils.UInt16Field):
+    """Error code field."""
+
+    def __repr__(self) -> str:
+        """Print error code."""
+        try:
+            error = ErrorCode(self.value).name
+        except ValueError as e:
+            error = str(self.value)
+        return f"{self.__class__.__name__}(value={error})"
+
+
 @dataclass
 class FirmwareUpdateDataAcknowledge(FirmwareUpdateWithAddress):
     """A FW update data acknowledge payload."""
 
-    error_code: utils.UInt16Field
+    error_code: ErrorCodeField
 
 
 @dataclass
@@ -301,7 +326,7 @@ class FirmwareUpdateComplete(utils.BinarySerializable):
 class FirmwareUpdateAcknowledge(utils.BinarySerializable):
     """A response to a firmware update message with an error code."""
 
-    error_code: utils.UInt16Field
+    error_code: ErrorCodeField
 
 
 @dataclass
@@ -318,11 +343,23 @@ class GetLimitSwitchResponse(utils.BinarySerializable):
     switch_status: utils.UInt8Field
 
 
+class SensorTypeField(utils.UInt8Field):
+    """sensor type."""
+
+    def __repr__(self) -> str:
+        """Print sensor."""
+        try:
+            sensor_val = SensorType(self.value).name
+        except ValueError:
+            sensor_val = str(self.value)
+        return f"{self.__class__.__name__}(value={sensor_val})"
+
+
 @dataclass
 class ReadFromSensorRequestPayload(utils.BinarySerializable):
     """Take a single reading from a sensor request payload."""
 
-    sensor: utils.UInt8Field
+    sensor: SensorTypeField
     offset_reading: utils.UInt8Field
 
 
@@ -330,7 +367,7 @@ class ReadFromSensorRequestPayload(utils.BinarySerializable):
 class WriteToSensorRequestPayload(utils.BinarySerializable):
     """Write a piece of data to a sensor request payload."""
 
-    sensor: utils.UInt8Field
+    sensor: SensorTypeField
     data: utils.UInt32Field
 
 
@@ -338,7 +375,7 @@ class WriteToSensorRequestPayload(utils.BinarySerializable):
 class BaselineSensorRequestPayload(utils.BinarySerializable):
     """Take a specified amount of readings from a sensor request payload."""
 
-    sensor: utils.UInt8Field
+    sensor: SensorTypeField
     sample_rate: utils.UInt16Field
     offset_update: utils.UInt8Field
 
@@ -347,7 +384,7 @@ class BaselineSensorRequestPayload(utils.BinarySerializable):
 class ReadFromSensorResponsePayload(utils.BinarySerializable):
     """A response for either a single reading or an averaged reading of a sensor."""
 
-    sensor: utils.UInt8Field
+    sensor: SensorTypeField
     sensor_data: utils.UInt32Field
 
 
@@ -355,7 +392,7 @@ class ReadFromSensorResponsePayload(utils.BinarySerializable):
 class SetSensorThresholdRequestPayload(utils.BinarySerializable):
     """A request to set the threshold value of a sensor."""
 
-    sensor: utils.UInt8Field
+    sensor: SensorTypeField
     threshold: utils.UInt32Field
 
 
@@ -363,5 +400,5 @@ class SetSensorThresholdRequestPayload(utils.BinarySerializable):
 class SensorThresholdResponsePayload(utils.BinarySerializable):
     """A response that sends back the current threshold value of the sensor."""
 
-    sensor: utils.UInt8Field
+    sensor: SensorTypeField
     threshold: utils.UInt32Field
