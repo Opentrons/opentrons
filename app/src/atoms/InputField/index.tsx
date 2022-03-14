@@ -62,43 +62,6 @@ export interface InputFieldProps {
   min?: number
 }
 
-const INPUT_FIELD = css`
-  display: flex;
-  flex: 1 1;
-  background-color: ${COLORS.white};
-  border-radius: ${SPACING.spacing2};
-  padding: ${SPACING.spacing3};
-  border: 1px solid ${COLORS.medGrey};
-  font-size: 11px;
-
-  & input {
-    border-radius: inherit;
-    color: ${COLORS.darkBlack};
-    border: none;
-    flex: 1 1 auto;
-    width: 100%;
-    height: ${SPACING.spacing4};
-  }
-  & input:focus {
-    outline: none;
-  }
-
-  &:hover {
-    border: 1px solid #b8b8b8;
-  }
-  &:focus {
-    border: 1px solid ${COLORS.blue};
-  }
-  &:disabled {
-    border: 1px solid ${COLORS.greyDisabled};
-  }
-
-  & input[error='string'],
-  textarea {
-    border: 1px solid #bf0000;
-  }
-`
-
 export function InputField(props: InputFieldProps): JSX.Element {
   return (
     <Flex
@@ -118,6 +81,38 @@ function Input(props: InputFieldProps): JSX.Element {
   const error = props.error != null
   const value = props.isIndeterminate ? '' : props.value ?? ''
   const placeHolder = props.isIndeterminate ? '-' : props.placeholder
+
+  const INPUT_FIELD = css`
+    display: flex;
+    flex: 1 1;
+    background-color: ${COLORS.white};
+    border-radius: ${SPACING.spacing2};
+    padding: ${SPACING.spacing3};
+    border: 1px solid ${error ? COLORS.error : COLORS.medGrey};
+    font-size: 11px;
+
+    & input {
+      border-radius: inherit;
+      color: ${COLORS.darkBlack};
+      border: none;
+      flex: 1 1 auto;
+      width: 100%;
+      height: ${SPACING.spacing4};
+    }
+    & input:focus {
+      outline: none;
+    }
+
+    &:hover {
+      border: 1px solid ${error ? COLORS.error : '#b8b8b8'};
+    }
+    &:focus {
+      border: 1px solid ${COLORS.blue};
+    }
+    &:disabled {
+      border: 1px solid ${COLORS.greyDisabled};
+    }
+  `
 
   return (
     <Flex width="100%" flexDirection={DIRECTION_COLUMN}>
