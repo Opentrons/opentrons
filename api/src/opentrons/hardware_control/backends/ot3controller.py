@@ -361,6 +361,7 @@ class OT3Controller:
             OT3Axis.P_R: phony_bounds,
             OT3Axis.X: phony_bounds,
             OT3Axis.Y: phony_bounds,
+            OT3Axis.Z_G: phony_bounds,
         }
 
     def single_boundary(self, boundary: int) -> OT3AxisMap[float]:

@@ -166,14 +166,13 @@ def create_move_group(
 def create_home_group(
     distance: Dict[OT3Axis, float], velocity: Dict[OT3Axis, float]
 ) -> MoveGroup:
-    move_group: MoveGroup = []
     node_id_distances = _convert_to_node_id_dict(distance)
     node_id_velocities = _convert_to_node_id_dict(velocity)
     step = create_home_step(
         distance=node_id_distances,
         velocity=node_id_velocities,
     )
-    move_group.append(step)
+    move_group: MoveGroup = [step]
     return move_group
 
 

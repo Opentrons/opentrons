@@ -601,7 +601,10 @@ class OT3API(
         """Move the critical point of the specified mount to a location
         relative to the deck, at the specified speed."""
         if not self._current_position:
-            await self.home()
+            raise MustHomeError(
+                "Cannot make a relative move because absolute position is unknown"
+            )
+            # TODO raise error
 
         realmount = OT3Mount.from_mount(mount)
         target_position = target_position_from_absolute(
@@ -741,23 +744,22 @@ class OT3API(
             checked_axes = [OT3Axis.from_axis(ax) for ax in axes]
         else:
             checked_axes = [ax for ax in OT3Axis]
-        for ax in checked_axes:
-            async with self._motion_lock:
-                try:
-                    await self._backend.home([ax])
-                except MoveConditionNotMet:
-                    self._log.exception("Homing failed")
-                    self._current_position.clear()
-                    raise
-                else:
-                    machine_pos = await self._backend.update_position()
-                    position = deck_from_machine(
-                        machine_pos,
-                        self._transforms.deck_calibration.attitude,
-                        self._transforms.carriage_offset,
-                        OT3Axis,
-                    )
-                    self._current_position.update(position)
+        async with self._motion_lock:
+            try:
+                await self._backend.home(checked_axes)
+            except MoveConditionNotMet:
+                self._log.exception("Homing failed")
+                self._current_position.clear()
+                raise
+            else:
+                machine_pos = await self._backend.update_position()
+                position = deck_from_machine(
+                    machine_pos,
+                    self._transforms.deck_calibration.attitude,
+                    self._transforms.carriage_offset,
+                    OT3Axis,
+                )
+                self._current_position.update(position)
 
     def get_engaged_axes(self) -> Dict[Axis, bool]:
         """Which axes are engaged and holding."""
