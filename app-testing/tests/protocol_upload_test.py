@@ -277,7 +277,7 @@ def test_LPC_flow(
         assert labware_position_check.get_labware_success_toast().is_displayed()
         assert (
             labware_position_check.get_labware_display_name_slot_4().text
-            == "Opentrons 96 Tip Rack 10 µL"
+            == "Opentrons 96 Tip Rack 300 µL"
         )
         assert labware_position_check.get_labware_offsetbox_slot_4().is_displayed()
         assert labware_position_check.get_labware_slot_4_offset_x_text().is_displayed()
@@ -290,7 +290,7 @@ def test_LPC_flow(
         )
         assert (
             labware_position_check.get_labware_display_name_slot_5().text
-            == "Opentrons 96 Tip Rack 10 µL"
+            == "Agilent 1 Well Reservoir 290 mL"
         )
         assert labware_position_check.get_labware_offsetbox_slot_5().is_displayed()
         assert labware_position_check.get_labware_slot_5_offset_x_text().is_displayed()
