@@ -27,7 +27,7 @@ import type { Dirent } from 'fs'
 
 export const PROTOCOLS_DIRECTORY_NAME = 'protocols'
 export const PROTOCOLS_DIRECTORY_PATH = path.join(
-  app.getPath('appData'),
+  app.getPath('userData'),
   PROTOCOLS_DIRECTORY_NAME
 )
 export const PROTOCOL_SRC_DIRECTORY_NAME = 'src'
