@@ -36,6 +36,7 @@ async def test_read() -> None:
 
 
 @pytest.mark.parametrize(
+    ids=["JSON v5 protocol", "JSON v6 protocol", "labware definition"],
     argnames=("input_file_contents", "expected_type"),
     argvalues=[
         (SIMPLE_V5_JSON_PROTOCOL, JsonProtocol),
