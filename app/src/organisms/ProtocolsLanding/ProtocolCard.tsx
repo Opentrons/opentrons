@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next'
 import first from 'lodash/first'
 import map from 'lodash/map'
 import { getModuleType, schemaV6Adapter } from '@opentrons/shared-data'
-import { readJson } from 'fsextra'
 
 import {
   Box,
@@ -14,21 +13,27 @@ import {
   DIRECTION_ROW,
   COLORS,
   SPACING,
+  JUSTIFY_SPACE_BETWEEN,
+  DIRECTION_COLUMN,
 } from '@opentrons/components'
 import { Link } from 'react-router-dom'
 
 import { StyledText } from '../../atoms/text'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
+import { MenuList } from '../../atoms/MenuList'
+import { MenuItem } from '../../atoms/MenuItem'
 import { ModuleIcon } from '../../molecules/ModuleIcon'
 
 import { StoredProtocolData } from '../../redux/protocol-storage'
 import type { ProtocolFile } from '@opentrons/shared-data'
+import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
 
 type ProtocolCardProps = StoredProtocolData
 
 export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   const { t } = useTranslation('protocol_list')
   const { protocolKey, srcFileNames, mostRecentAnalysis, modified } = props
+  const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
 
   const [
     protocolData,
@@ -37,7 +42,9 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
 
   React.useEffect(() => {
     if (mostRecentAnalysis != null) {
-      setProtocolData(schemaV6Adapter(JSON.parse(mostRecentAnalysis)?.analyses[0]))
+      setProtocolData(
+        schemaV6Adapter(JSON.parse(mostRecentAnalysis)?.analyses[0])
+      )
     }
   }, [modified])
 
@@ -86,18 +93,19 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
         flexDirection={DIRECTION_ROW}
         marginBottom={SPACING.spacing3}
         padding={SPACING.spacing4}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
         width="100%"
         position="relative"
       >
-        <Box
-          flex="0 0 96px"
-          height="86px"
-          backgroundColor={COLORS.medGrey}
-          marginRight={SPACING.spacing4}
-        >
-          DECKMAP TODO
-        </Box>
-        <Box>
+        <Flex>
+          <Box
+            flex="0 0 96px"
+            height="86px"
+            backgroundColor={COLORS.medGrey}
+            marginRight={SPACING.spacing4}
+          >
+            DECKMAP TODO
+          </Box>
           <StyledText as="h3" marginBottom={SPACING.spacing4} height="2.75rem">
             {protocolName}
           </StyledText>
@@ -128,20 +136,16 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
               </Flex>
             </Flex>
           </Flex>
+        </Flex>
 
-          <OverflowBtn
-            css={css`
-              position: absolute;
-              top: 2px;
-              right: 2px;
-            `}
-          />
-        </Box>
-        <StyledText as="label" position="absolute" bottom="1rem" right="1rem">
-          {t('last_updated_at', {
-            date: format(new Date(modified), 'M/d/yyyy'),
-          })}
-        </StyledText>
+        <Flex flexDirection={DIRECTION_COLUMN}>
+          <ProtocolOverflowMenu handleRunProtocol={() => console.log('TODO: handle run protocol')}/>
+          <StyledText as="label" position="absolute" bottom="1rem" right="1rem">
+            {t('last_updated_at', {
+              date: format(new Date(modified), 'M/d/yyyy'),
+            })}
+          </StyledText>
+        </Flex>
       </Flex>
     </Link>
   )

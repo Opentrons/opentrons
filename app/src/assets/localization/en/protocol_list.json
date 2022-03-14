@@ -1,3 +1,5 @@
 {
-  "last_updated_at": "Last Updated: {{date}}"
+  "delete_protocol": "Delete protocol",
+  "last_updated_at": "Last Updated: {{date}}",
+  "run": "Run"
 }
