@@ -83,4 +83,4 @@ export const CUSTOM_LABWARE_SUPPORT_BTN =
   'Learn more about creating custom definitions'
 export const LABWARE_CREATOR_BTN = 'Go to the labware creator'
 export const NEW_LABWARE_MESSAGE =
-  'Note: This labware definition requires Opentrons software v5.0.0 or newer.'
+  'Note: This labware definition requires Opentrons software v5.0 or later.'
