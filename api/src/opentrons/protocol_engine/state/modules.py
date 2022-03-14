@@ -96,7 +96,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
 
 
 class ModuleView(HasState[ModuleState]):
-    """Read-only view of computet modules state."""
+    """Read-only view of computed module state."""
 
     _state: ModuleState
 
