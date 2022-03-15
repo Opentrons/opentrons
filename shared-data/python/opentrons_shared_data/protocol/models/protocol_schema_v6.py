@@ -103,7 +103,7 @@ class A1(BaseModel):
     xDimension: Optional[float]
 
 
-class Liquids(BaseModel):
+class Liquid(BaseModel):
     displayName: str
     description: str
 
