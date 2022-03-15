@@ -5,7 +5,7 @@ from typing import Union
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.parse import extract_metadata as extract_python_metadata
-from opentrons.protocols.models import JsonProtocol
+from opentrons.protocols.models import JsonProtocol as ProtocolSchemaV5
 from opentrons_shared_data.protocol.models import ProtocolSchemaV6
 
 from .protocol_source import Metadata, PythonProtocolConfig, JsonProtocolConfig
