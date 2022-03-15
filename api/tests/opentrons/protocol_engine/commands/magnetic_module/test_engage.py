@@ -42,9 +42,7 @@ async def test_magnetic_module_engage_implementation(
 
     attached = [decoy.mock(cls=AbstractModule), decoy.mock(cls=AbstractModule)]
 
-    decoy.when(
-        hardware_api.attached_modules
-    ).then_return(attached)
+    decoy.when(hardware_api.attached_modules).then_return(attached)
 
     match = decoy.mock(cls=MagDeck)
 

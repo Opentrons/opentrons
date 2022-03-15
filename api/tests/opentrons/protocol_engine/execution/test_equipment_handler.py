@@ -90,11 +90,11 @@ async def temp_module_v2(decoy: Decoy) -> TempDeck:
 
 @pytest.fixture
 def subject(
-        hardware_api: HardwareAPI,
-        state_store: StateStore,
-        labware_data_provider: LabwareDataProvider,
-        module_data_provider: ModuleDataProvider,
-        model_utils: ModelUtils,
+    hardware_api: HardwareAPI,
+    state_store: StateStore,
+    labware_data_provider: LabwareDataProvider,
+    module_data_provider: ModuleDataProvider,
+    model_utils: ModelUtils,
 ) -> EquipmentHandler:
     """Get an EquipmentHandler test subject with its dependencies mocked out."""
     return EquipmentHandler(
@@ -107,12 +107,12 @@ def subject(
 
 
 async def test_load_labware(
-        decoy: Decoy,
-        model_utils: ModelUtils,
-        state_store: StateStore,
-        labware_data_provider: LabwareDataProvider,
-        minimal_labware_def: LabwareDefinition,
-        subject: EquipmentHandler,
+    decoy: Decoy,
+    model_utils: ModelUtils,
+    state_store: StateStore,
+    labware_data_provider: LabwareDataProvider,
+    minimal_labware_def: LabwareDefinition,
+    subject: EquipmentHandler,
 ) -> None:
     """It should load labware definition and offset data and generate an ID."""
     decoy.when(model_utils.generate_id()).then_return("unique-id")
@@ -160,12 +160,12 @@ async def test_load_labware(
 
 
 async def test_load_labware_uses_provided_id(
-        decoy: Decoy,
-        model_utils: ModelUtils,
-        state_store: StateStore,
-        labware_data_provider: LabwareDataProvider,
-        minimal_labware_def: LabwareDefinition,
-        subject: EquipmentHandler,
+    decoy: Decoy,
+    model_utils: ModelUtils,
+    state_store: StateStore,
+    labware_data_provider: LabwareDataProvider,
+    minimal_labware_def: LabwareDefinition,
+    subject: EquipmentHandler,
 ) -> None:
     """It should use the provided ID rather than generating an ID for the labware."""
     decoy.when(state_store.labware.get_definition_by_uri(matchers.IsA(str))).then_raise(
@@ -201,12 +201,12 @@ async def test_load_labware_uses_provided_id(
 
 
 async def test_load_labware_uses_loaded_labware_def(
-        decoy: Decoy,
-        model_utils: ModelUtils,
-        state_store: StateStore,
-        labware_data_provider: LabwareDataProvider,
-        minimal_labware_def: LabwareDefinition,
-        subject: EquipmentHandler,
+    decoy: Decoy,
+    model_utils: ModelUtils,
+    state_store: StateStore,
+    labware_data_provider: LabwareDataProvider,
+    minimal_labware_def: LabwareDefinition,
+    subject: EquipmentHandler,
 ) -> None:
     """Loading labware should use the labware definition already in state."""
     expected_uri = uri_from_details(
@@ -253,13 +253,13 @@ async def test_load_labware_uses_loaded_labware_def(
 
 
 async def test_load_labware_on_module(
-        decoy: Decoy,
-        model_utils: ModelUtils,
-        state_store: StateStore,
-        labware_data_provider: LabwareDataProvider,
-        minimal_labware_def: LabwareDefinition,
-        tempdeck_v1_def: ModuleDefinition,
-        subject: EquipmentHandler,
+    decoy: Decoy,
+    model_utils: ModelUtils,
+    state_store: StateStore,
+    labware_data_provider: LabwareDataProvider,
+    minimal_labware_def: LabwareDefinition,
+    tempdeck_v1_def: ModuleDefinition,
+    subject: EquipmentHandler,
 ) -> None:
     """It should load labware definition and offset data and generate an ID."""
     decoy.when(model_utils.generate_id()).then_return("unique-id")
@@ -315,10 +315,10 @@ async def test_load_labware_on_module(
 
 
 async def test_load_pipette(
-        decoy: Decoy,
-        model_utils: ModelUtils,
-        hardware_api: HardwareAPI,
-        subject: EquipmentHandler,
+    decoy: Decoy,
+    model_utils: ModelUtils,
+    hardware_api: HardwareAPI,
+    subject: EquipmentHandler,
 ) -> None:
     """It should load pipette data, check attachment, and generate an ID."""
     decoy.when(model_utils.generate_id()).then_return("unique-id")
@@ -349,11 +349,11 @@ async def test_load_pipette_uses_provided_id(subject: EquipmentHandler) -> None:
 
 
 async def test_load_pipette_checks_existence_with_already_loaded(
-        decoy: Decoy,
-        model_utils: ModelUtils,
-        state_store: StateStore,
-        hardware_api: HardwareAPI,
-        subject: EquipmentHandler,
+    decoy: Decoy,
+    model_utils: ModelUtils,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    subject: EquipmentHandler,
 ) -> None:
     """Loading a pipette should cache with pipettes already attached."""
     decoy.when(model_utils.generate_id()).then_return("unique-id")
@@ -384,10 +384,10 @@ async def test_load_pipette_checks_existence_with_already_loaded(
 
 
 async def test_load_pipette_raises_if_pipette_not_attached(
-        decoy: Decoy,
-        model_utils: ModelUtils,
-        hardware_api: HardwareAPI,
-        subject: EquipmentHandler,
+    decoy: Decoy,
+    model_utils: ModelUtils,
+    hardware_api: HardwareAPI,
+    subject: EquipmentHandler,
 ) -> None:
     """Loading a pipette should should raise if unable to cache instruments."""
     decoy.when(model_utils.generate_id()).then_return("unique-id")
@@ -404,7 +404,7 @@ async def test_load_pipette_raises_if_pipette_not_attached(
     )
 
     with pytest.raises(
-            errors.FailedToLoadPipetteError, match=".+p300_single was requested"
+        errors.FailedToLoadPipetteError, match=".+p300_single was requested"
     ):
         await subject.load_pipette(
             pipette_name=PipetteName.P300_SINGLE,
@@ -414,16 +414,16 @@ async def test_load_pipette_raises_if_pipette_not_attached(
 
 
 async def test_load_module(
-        decoy: Decoy,
-        model_utils: ModelUtils,
-        state_store: StateStore,
-        module_data_provider: ModuleDataProvider,
-        hardware_api: HardwareAPI,
-        tempdeck_v1_def: ModuleDefinition,
-        tempdeck_v2_def: ModuleDefinition,
-        temp_module_v1: AbstractModule,
-        temp_module_v2: AbstractModule,
-        subject: EquipmentHandler,
+    decoy: Decoy,
+    model_utils: ModelUtils,
+    state_store: StateStore,
+    module_data_provider: ModuleDataProvider,
+    hardware_api: HardwareAPI,
+    tempdeck_v1_def: ModuleDefinition,
+    tempdeck_v2_def: ModuleDefinition,
+    temp_module_v1: AbstractModule,
+    temp_module_v2: AbstractModule,
+    subject: EquipmentHandler,
 ) -> None:
     """It should load a module, returning its ID, serial & definition in result."""
     decoy.when(model_utils.ensure_id("input-module-id")).then_return("module-id")
@@ -472,16 +472,16 @@ async def test_load_module(
 
 
 async def test_load_module_using_virtual(
-        decoy: Decoy,
-        model_utils: ModelUtils,
-        state_store: StateStore,
-        module_data_provider: ModuleDataProvider,
-        hardware_api: HardwareAPI,
-        tempdeck_v1_def: ModuleDefinition,
-        tempdeck_v2_def: ModuleDefinition,
-        temp_module_v1: AbstractModule,
-        temp_module_v2: AbstractModule,
-        subject: EquipmentHandler,
+    decoy: Decoy,
+    model_utils: ModelUtils,
+    state_store: StateStore,
+    module_data_provider: ModuleDataProvider,
+    hardware_api: HardwareAPI,
+    tempdeck_v1_def: ModuleDefinition,
+    tempdeck_v2_def: ModuleDefinition,
+    temp_module_v1: AbstractModule,
+    temp_module_v2: AbstractModule,
+    subject: EquipmentHandler,
 ) -> None:
     """It should load a virtual module."""
     decoy.when(model_utils.ensure_id("input-module-id")).then_return("module-id")

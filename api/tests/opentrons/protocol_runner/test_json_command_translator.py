@@ -271,7 +271,7 @@ def test_pick_up_tip(subject: JsonCommandTranslator) -> None:
 
 def test_pause(subject: JsonCommandTranslator) -> None:
     """It should translate delay with wait=True to a PauseCreate."""
-    # TODO (mc, 3-14-22): Pydantic casts this True to a float in Python 3.8 specifically for some unknown reason
+    # TODO (mc, 3-14-22): Pydantic casts this True to a float in Python 3.8
     input_command = models.json_protocol.DelayCommand(
         command="delay",
         params=models.json_protocol.DelayCommandParams(
