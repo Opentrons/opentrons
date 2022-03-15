@@ -225,7 +225,7 @@ class OT3Controller:
         speed_settings = (
             self._configuration.motion_settings.max_speed_discontinuity.none
         )
-        velocities = {ax: np.float64(-1 * speed_settings[OT3Axis.to_kind(ax)]) for ax in axes}
+        velocities = {ax: -1 * speed_settings[OT3Axis.to_kind(ax)] for ax in axes}
         group = create_home_group(distances, velocities)
         runner = MoveGroupRunner(move_groups=[group])
         await runner.run(can_messenger=self._messenger)
@@ -362,6 +362,7 @@ class OT3Controller:
             OT3Axis.P_R: phony_bounds,
             OT3Axis.X: phony_bounds,
             OT3Axis.Y: phony_bounds,
+            OT3Axis.Z_G: phony_bounds,
         }
 
     def single_boundary(self, boundary: int) -> OT3AxisMap[float]:
