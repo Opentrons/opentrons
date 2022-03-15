@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
-import { useSendModuleCommand } from '../../../../redux/modules'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { InputField } from '../../../../atoms/InputField'
 import { MagneticModuleSlideout } from '../MagneticModuleSlideout'
 
@@ -10,12 +10,13 @@ import {
   mockMagneticModuleGen2,
 } from '../../../../redux/modules/__fixtures__'
 
-jest.mock('../../../../redux/modules')
+jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../atoms/InputField')
 
-const mockUseSendModuleCommand = useSendModuleCommand as jest.MockedFunction<
-  typeof useSendModuleCommand
+const mocUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
+  typeof useCreateLiveCommandMutation
 >
+
 const mockInputField = InputField as jest.MockedFunction<typeof InputField>
 
 const render = (props: React.ComponentProps<typeof MagneticModuleSlideout>) => {
@@ -23,9 +24,9 @@ const render = (props: React.ComponentProps<typeof MagneticModuleSlideout>) => {
     i18nInstance: i18n,
   })[0]
 }
-
 describe('MagneticModuleSlideout', () => {
   let props: React.ComponentProps<typeof MagneticModuleSlideout>
+  const mockCreateCommand = jest.fn()
   beforeEach(() => {
     props = {
       module: mockMagneticModule,
@@ -33,7 +34,9 @@ describe('MagneticModuleSlideout', () => {
       onCloseClick: jest.fn(),
     }
     mockInputField.mockReturnValue(<div></div>)
-    mockUseSendModuleCommand.mockReturnValue(jest.fn())
+    mocUseLiveCommandMutation.mockReturnValue({
+      createCommand: mockCreateCommand,
+    } as any)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -84,5 +87,6 @@ describe('MagneticModuleSlideout', () => {
     const { getByRole } = render(props)
     const button = getByRole('button', { name: 'Set Engage Height' })
     expect(button).not.toBeEnabled()
+    mockInputField.mockReturnValue(<div>10</div>)
   })
 })

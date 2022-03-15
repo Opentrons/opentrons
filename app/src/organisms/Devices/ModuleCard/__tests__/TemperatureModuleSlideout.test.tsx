@@ -1,20 +1,20 @@
 import * as React from 'react'
 import { i18n } from '../../../../i18n'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import {
   TEMPERATURE_MODULE_V1,
   TEMPERATURE_MODULE_V2,
 } from '@opentrons/shared-data'
-import { useSendModuleCommand } from '../../../../redux/modules'
 import { InputField } from '../../../../atoms/InputField'
 import { TemperatureModuleSlideout } from '../TemperatureModuleSlideout'
 
-jest.mock('../../../../redux/modules')
+jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../atoms/InputField')
 
-const mockUseSendModuleCommand = useSendModuleCommand as jest.MockedFunction<
-  typeof useSendModuleCommand
+const mocUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
+  typeof useCreateLiveCommandMutation
 >
 const mockInputField = InputField as jest.MockedFunction<typeof InputField>
 
@@ -26,18 +26,19 @@ const render = (
   })[0]
 }
 
-const SERIAL = 'SERIAL'
 describe('TemperatureModuleSlideout', () => {
   let props: React.ComponentProps<typeof TemperatureModuleSlideout>
+  const mockCreateCommand = jest.fn()
   beforeEach(() => {
     props = {
       model: TEMPERATURE_MODULE_V1,
       isExpanded: true,
-      serial: SERIAL,
       onCloseClick: jest.fn(),
     }
     mockInputField.mockReturnValue(<div></div>)
-    mockUseSendModuleCommand.mockReturnValue(jest.fn())
+    mocUseLiveCommandMutation.mockReturnValue({
+      createCommand: mockCreateCommand,
+    } as any)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -56,7 +57,6 @@ describe('TemperatureModuleSlideout', () => {
   it('renders correct title and body for a gen2 temperature module', () => {
     props = {
       model: TEMPERATURE_MODULE_V2,
-      serial: SERIAL,
       isExpanded: true,
       onCloseClick: jest.fn(),
     }
@@ -74,11 +74,6 @@ describe('TemperatureModuleSlideout', () => {
     const button = getByRole('button', { name: 'Set Temperature' })
     expect(button).not.toBeEnabled()
     mockInputField.mockReturnValue(<div>6 C</div>)
-    mockUseSendModuleCommand.mockReturnValue({
-      moduleId: SERIAL,
-      command: 'set_temperature',
-      args: 6,
-    } as any)
     fireEvent.click(button)
     expect(button).not.toBeEnabled()
   })

@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   Flex,
   Text,
@@ -15,14 +16,13 @@ import {
   TEMPERATURE_MODULE_V1,
   TEMPERATURE_MODULE_V2,
 } from '@opentrons/shared-data'
-import { useSendModuleCommand } from '../../../redux/modules'
 import { Slideout } from '../../../atoms/Slideout'
 import { PrimaryButton } from '../../../atoms/Buttons'
 import { InputField } from '../../../atoms/InputField'
+import { TemperatureModuleSetTargetTemperatureCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 interface TemperatureModuleSlideoutProps {
   model: typeof TEMPERATURE_MODULE_V1 | typeof TEMPERATURE_MODULE_V2
-  serial: string
   onCloseClick: () => unknown
   isExpanded: boolean
 }
@@ -30,17 +30,27 @@ interface TemperatureModuleSlideoutProps {
 export const TemperatureModuleSlideout = (
   props: TemperatureModuleSlideoutProps
 ): JSX.Element | null => {
-  const { model, onCloseClick, isExpanded, serial } = props
+  const { model, onCloseClick, isExpanded } = props
   const { t } = useTranslation('device_details')
-  const sendModuleCommand = useSendModuleCommand()
+  const { createLiveCommand } = useCreateLiveCommandMutation()
   const name = getModuleDisplayName(model)
   const [temperatureValue, setTemperatureValue] = React.useState<string | null>(
     null
   )
 
+  const saveTempCommand: TemperatureModuleSetTargetTemperatureCreateCommand = {
+    commandType: 'temperatureModule/setTargetTemperature',
+    params: {
+      moduleId: module.id,
+      temperature: temperatureValue != null ? parseInt(temperatureValue) : 0,
+    },
+  }
+
   const handleSubmitTemperature = (): void => {
     if (temperatureValue != null) {
-      sendModuleCommand(serial, 'set_temperature', [Number(temperatureValue)])
+      createLiveCommand({
+        command: saveTempCommand,
+      })
     }
     setTemperatureValue(null)
   }
@@ -90,6 +100,7 @@ export const TemperatureModuleSlideout = (
           {t('temperature')}
         </Text>
         <InputField
+          autoFocus
           units={CELSIUS}
           value={temperatureValue}
           onChange={e => setTemperatureValue(e.target.value)}

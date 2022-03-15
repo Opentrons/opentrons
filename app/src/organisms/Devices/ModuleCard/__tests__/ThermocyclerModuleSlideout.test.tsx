@@ -1,18 +1,18 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/react'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { i18n } from '../../../../i18n'
-import { useSendModuleCommand } from '../../../../redux/modules'
 import { InputField } from '../../../../atoms/InputField'
 import { ThermocyclerModuleSlideout } from '../ThermocyclerModuleSlideout'
 
 import { mockThermocycler } from '../../../../redux/modules/__fixtures__'
 
-jest.mock('../../../../redux/modules')
+jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../atoms/InputField')
 
-const mockUseSendModuleCommand = useSendModuleCommand as jest.MockedFunction<
-  typeof useSendModuleCommand
+const mocUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
+  typeof useCreateLiveCommandMutation
 >
 const mockInputField = InputField as jest.MockedFunction<typeof InputField>
 
@@ -26,9 +26,12 @@ const render = (
 
 describe('ThermocyclerModuleSlideout', () => {
   let props: React.ComponentProps<typeof ThermocyclerModuleSlideout>
+  const mockCreateCommand = jest.fn()
   beforeEach(() => {
     mockInputField.mockReturnValue(<div></div>)
-    mockUseSendModuleCommand.mockReturnValue(jest.fn())
+    mocUseLiveCommandMutation.mockReturnValue({
+      createCommand: mockCreateCommand,
+    } as any)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -79,11 +82,6 @@ describe('ThermocyclerModuleSlideout', () => {
     const button = getByRole('button', { name: 'Set Block Temperature' })
     expect(button).not.toBeEnabled()
     mockInputField.mockReturnValue(<div>12 C</div>)
-    mockUseSendModuleCommand.mockReturnValue({
-      moduleId: props.module.serial,
-      command: 'set_temperature',
-      args: 12,
-    } as any)
     fireEvent.click(button)
     expect(button).not.toBeEnabled()
   })
@@ -99,11 +97,6 @@ describe('ThermocyclerModuleSlideout', () => {
     const button = getByRole('button', { name: 'Set Lid Temperature' })
     expect(button).not.toBeEnabled()
     mockInputField.mockReturnValue(<div>40 C</div>)
-    mockUseSendModuleCommand.mockReturnValue({
-      moduleId: props.module.serial,
-      command: 'set_lid_temperature',
-      args: 40,
-    } as any)
     fireEvent.click(button)
     expect(button).not.toBeEnabled()
   })

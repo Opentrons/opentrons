@@ -14,14 +14,13 @@ import {
 } from '@opentrons/components'
 import { PrimaryButton } from '../../../atoms/Buttons'
 import { InputField } from '../../../atoms/InputField'
-import {
-  getModuleDisplayName,
-  RPM,
-  CELSIUS,
-  CreateCommand,
-} from '@opentrons/shared-data'
+import { getModuleDisplayName, RPM, CELSIUS } from '@opentrons/shared-data'
 
 import type { AttachedModule } from '../../../redux/modules/types'
+import type {
+  HeaterShakerAwaitTemperatureCreateCommand,
+  HeaterShakerSetTargetShakeSpeedCreateCommand,
+} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 interface HeaterShakerSlideoutProps {
   module: AttachedModule
@@ -40,22 +39,20 @@ export const HeaterShakerSlideout = (
   const moduleName = getModuleDisplayName(module.model)
   const modulePart = isSetShake ? t('shake_speed') : t('temperature')
 
-  //   TODO replace all serial with id
-
-  const saveTempCommand: CreateCommand = {
+  const saveTempCommand: HeaterShakerAwaitTemperatureCreateCommand = {
     commandType: 'heaterShakerModule/awaitTemperature',
-    params: { moduleId: module.serial },
+    params: { moduleId: module.id },
   }
-  const saveShakeCommand: CreateCommand = {
+  const saveShakeCommand: HeaterShakerSetTargetShakeSpeedCreateCommand = {
     commandType: 'heaterShakerModule/setTargetShakeSpeed',
     params: {
-      moduleId: module.serial,
-      //  the 0 int will never be reached because the button will be disabled if the field is left empty
+      moduleId: module.id,
+      //  the 0 will never be reached because the button will be disabled if the field is left empty
       rpm: hsValue != null ? parseInt(hsValue) : 0,
     },
   }
 
-  const handleSubmitTemp = (): void => {
+  const handleSubmitCommand = (): void => {
     if (hsValue != null) {
       createLiveCommand({
         command: isSetShake ? saveShakeCommand : saveTempCommand,
@@ -88,7 +85,7 @@ export const HeaterShakerSlideout = (
       height={`calc(100vh - ${SPACING.spacing4})`}
       footer={
         <PrimaryButton
-          onClick={handleSubmitTemp}
+          onClick={handleSubmitCommand}
           disabled={hsValue === null || errorMessage !== null}
           width="100%"
           data-testid={`Hs_set_value_${module.model}`}
@@ -119,7 +116,8 @@ export const HeaterShakerSlideout = (
           {isSetShake ? t('set_shake_speed') : t('set_block_temp')}
         </Text>
         <InputField
-          id={module.model + isSetShake}
+          id={`${module.model}_${isSetShake}`}
+          autoFocus
           units={isSetShake ? RPM : CELSIUS}
           value={hsValue}
           onChange={e => setHsValue(e.target.value)}

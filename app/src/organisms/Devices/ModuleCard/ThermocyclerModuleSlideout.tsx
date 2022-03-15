@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { getModuleDisplayName } from '@opentrons/shared-data'
-import { useSendModuleCommand } from '../../../redux/modules'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { Slideout } from '../../../atoms/Slideout'
 import { InputField } from '../../../atoms/InputField'
 import {
@@ -16,6 +16,10 @@ import {
 import { PrimaryButton } from '../../../atoms/Buttons'
 
 import type { AttachedModule } from '../../../redux/modules/types'
+import type {
+  TCSetTargetBlockTemperatureCreateCommand,
+  TCSetTargetLidTemperatureCreateCommand,
+} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 interface ThermocyclerModuleSlideoutProps {
   module: AttachedModule
@@ -30,22 +34,10 @@ export const ThermocyclerModuleSlideout = (
   const { module, onCloseClick, isExpanded, isSecondaryTemp } = props
   const { t } = useTranslation('device_details')
   const [tempValue, setTempValue] = React.useState<string | null>(null)
-  const sendModuleCommand = useSendModuleCommand()
-
+  const { createLiveCommand } = useCreateLiveCommandMutation()
   const moduleName = getModuleDisplayName(module.model)
   const modulePart = isSecondaryTemp ? 'Lid' : 'Block'
   const tempRanges = getTCTempRange(isSecondaryTemp)
-
-  const handleSubmitTemp = (): void => {
-    if (tempValue != null) {
-      sendModuleCommand(
-        module.serial,
-        isSecondaryTemp ? 'set_lid_temperature' : 'set_temperature',
-        [Number(tempValue)]
-      )
-    }
-    setTempValue(null)
-  }
 
   let errorMessage
   if (isSecondaryTemp) {
@@ -59,6 +51,33 @@ export const ThermocyclerModuleSlideout = (
       tempValue != null && (parseInt(tempValue) < 4 || parseInt(tempValue) > 99)
         ? t('input_out_of_range')
         : null
+  }
+
+  const saveLidCommand: TCSetTargetLidTemperatureCreateCommand = {
+    commandType: 'thermocycler/setTargetLidTemperature',
+    params: {
+      moduleId: module.id,
+      //  the 0 int will never be reached because the button will be disabled if the field is left empty
+      temperature: tempValue != null ? parseInt(tempValue) : 0,
+    },
+  }
+  const saveBlockCommand: TCSetTargetBlockTemperatureCreateCommand = {
+    commandType: 'thermocycler/setTargetBlockTemperature',
+    params: {
+      moduleId: module.id,
+      //  the 0 int will never be reached because the button will be disabled if the field is left empty
+      temperature: tempValue != null ? parseInt(tempValue) : 0,
+      //  how do we get volume?
+    },
+  }
+
+  const handleSubmitTemp = (): void => {
+    if (tempValue != null) {
+      createLiveCommand({
+        command: isSecondaryTemp ? saveLidCommand : saveBlockCommand,
+      })
+    }
+    setTempValue(null)
   }
 
   return (
@@ -104,6 +123,7 @@ export const ThermocyclerModuleSlideout = (
           {t('temperature')}
         </Text>
         <InputField
+          autoFocus
           units={'°C'}
           value={tempValue}
           onChange={e => setTempValue(e.target.value)}

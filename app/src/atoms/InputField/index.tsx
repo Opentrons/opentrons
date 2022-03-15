@@ -15,8 +15,6 @@ export const INPUT_TYPE_NUMBER: 'number' = 'number'
 export const INPUT_TYPE_TEXT: 'text' = 'text'
 export const INPUT_TYPE_PASSWORD: 'password' = 'password'
 
-// TODO: Ian 2018-09-14 remove 'label' prop when IngredientPropertiesForm gets updated
-
 export interface InputFieldProps {
   /** field is disabled if value is true */
   disabled?: boolean
@@ -104,7 +102,7 @@ function Input(props: InputFieldProps): JSX.Element {
     }
 
     &:hover {
-      border: 1px solid ${error ? COLORS.error : '#b8b8b8'};
+      border: 1px solid ${error ? COLORS.error : COLORS.medGreyHover};
     }
     &:focus {
       border: 1px solid ${COLORS.blue};
@@ -118,6 +116,7 @@ function Input(props: InputFieldProps): JSX.Element {
     <Flex width="100%" flexDirection={DIRECTION_COLUMN}>
       <Flex css={INPUT_FIELD}>
         <input
+          id={props.id}
           disabled={props.disabled}
           data-testid={props.id}
           type={props.type}

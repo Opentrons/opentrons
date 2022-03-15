@@ -254,7 +254,6 @@ const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
     return (
       <TemperatureModuleSlideout
         model={module.model}
-        serial={module.serial}
         onCloseClick={onCloseClick}
         isExpanded={showSlideout}
       />

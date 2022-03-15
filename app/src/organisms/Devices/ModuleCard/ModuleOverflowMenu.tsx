@@ -19,6 +19,15 @@ import { MenuItem } from '../../../atoms/MenuList/MenuItem'
 import { HeaterShakerWizard } from '../HeaterShakerWizard'
 
 import type { AttachedModule } from '../../../redux/modules/types'
+import type {
+  HeaterShakerCloseLatchCreateCommand,
+  HeaterShakerDeactivateHeaterCreateCommand,
+  HeaterShakerOpenLatchCreateCommand,
+  MagneticModuleDisengageMagnetCreateCommand,
+  TCDeactivateBlockCreateCommand,
+  TCDeactivateLidCreateCommand,
+  TemperatureModuleDeactivateCreateCommand,
+} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 interface ModuleOverflowMenuProps {
   module: AttachedModule
@@ -59,10 +68,14 @@ export const ModuleOverflowMenu = (
     }
   }
 
-  const deactivateCommand: CreateCommand = {
+  const deactivateCommand:
+    | TemperatureModuleDeactivateCreateCommand
+    | MagneticModuleDisengageMagnetCreateCommand
+    | HeaterShakerDeactivateHeaterCreateCommand
+    | TCDeactivateLidCreateCommand
+    | TCDeactivateBlockCreateCommand = {
     commandType: typeOfCommand,
-    //  TODO replace serial with id
-    params: { moduleId: module.serial },
+    params: { moduleId: module.id },
   }
 
   const handleDeactivation = (): void => {
@@ -116,12 +129,13 @@ export const ModuleOverflowMenu = (
     }
   }
 
-  const latchCommand: CreateCommand = {
+  const latchCommand:
+    | HeaterShakerOpenLatchCreateCommand
+    | HeaterShakerCloseLatchCreateCommand = {
     commandType: isLatchClosed
       ? 'heaterShakerModule/openLatch'
       : 'heaterShakerModule/closeLatch',
-    //  TODO replace serial with id
-    params: { moduleId: module.serial },
+    params: { moduleId: module.id },
   }
 
   const handleLatch = (): void => {
@@ -244,7 +258,11 @@ export const ModuleOverflowMenu = (
     </MenuItem>
   )
   const TestShakeBtn = (
-    <MenuItem minWidth="10rem" onClick={() => console.log('test shake')}>
+    <MenuItem
+      minWidth="10rem"
+      onClick={() => console.log('test shake')}
+      key={`hs_test_shake_btn_${module.model}`}
+    >
       {t('test_shake', { ns: 'heater_shaker' })}
     </MenuItem>
   )
@@ -262,13 +280,12 @@ export const ModuleOverflowMenu = (
                 <>
                   <MenuItem
                     minWidth="10rem"
-                    key={index}
+                    key={`${index}_${module.model}`}
                     onClick={() => getOnClickCommand(item.isSecondary)}
                     data-testid={`module_setting_${module.model}`}
                     disabled={item.disabledReason}
                     {...targetProps}
                   >
-                    {/* TODO(sh, 2022-02-11): conditionally render deactivate setting based on module status and pass the required commands. */}
                     {item.setSetting}
                   </MenuItem>
                   {item.disabledReason && (

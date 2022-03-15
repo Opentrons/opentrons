@@ -29,8 +29,6 @@ const render = (props: React.ComponentProps<typeof ModuleOverflowMenu>) => {
   })[0]
 }
 
-let mockCreateCommand: jest.Mock
-
 const mockMovingHeaterShaker = {
   model: 'heaterShakerModuleV1',
   type: 'heaterShakerModuleType',
@@ -77,6 +75,7 @@ const mockOpenLatchHeaterShaker = {
 
 describe('ModuleOverflowMenu', () => {
   let props: React.ComponentProps<typeof ModuleOverflowMenu>
+  const mockCreateCommand = jest.fn()
   beforeEach(() => {
     props = {
       module: mockMagneticModule,
@@ -163,7 +162,7 @@ describe('ModuleOverflowMenu', () => {
     // TODO(sh, 2022-03-08): extend tests when menu component is wired up
     const { getByRole } = render(props)
     getByRole('button', {
-      name: 'Set temperature',
+      name: 'Set module temperature',
     })
     getByRole('button', {
       name: 'Set shake speed',
@@ -186,24 +185,7 @@ describe('ModuleOverflowMenu', () => {
     fireEvent.click(btn)
     getByText('Mock Heater Shaker Wizard')
   })
-  it('renders heater shaker labware latch button and when clicked, moves labware latch', () => {
-    props = {
-      module: mockHeaterShaker,
-      handleClick: jest.fn(),
-      handleAboutClick: jest.fn(),
-    }
-    //  TODO finish test when you can get moduleId
-    //  mocUseLiveCommandMutation.mockReturnValue({
-    //  commandType: 'heaterShakerModule/openLatch',
-    //  params: { moduleId: props.module.serial },
-    //  } as any)
-    //  const { getByRole } = render(props)
-    //  const btn = getByRole('button', {
-    //  name: 'Open Labware Latch',
-    //  })
-    //  fireEvent.click(btn)
-    //  getByText('Close Labware Latch')
-  })
+
   it('renders heater shaker labware latch button and is disabled when status is not idle', () => {
     props = {
       module: mockMovingHeaterShaker,
@@ -217,6 +199,7 @@ describe('ModuleOverflowMenu', () => {
       })
     ).toBeDisabled()
   })
+
   it('renders heater shaker shake button and is disabled when latch is opened', () => {
     props = {
       module: mockOpenLatchHeaterShaker,
@@ -229,5 +212,23 @@ describe('ModuleOverflowMenu', () => {
         name: 'Set shake speed',
       })
     ).toBeDisabled()
+  })
+
+  it('renders heater shaker labware latch button and when clicked, moves labware latch', () => {
+    props = {
+      module: mockHeaterShaker,
+      handleClick: jest.fn(),
+      handleAboutClick: jest.fn(),
+    }
+
+    const { getByRole } = render(props)
+
+    const btn = getByRole('button', {
+      name: 'Open Labware Latch',
+    })
+    expect(btn).not.toBeDisabled()
+
+    // TODO(jr, 3/15/22): finish test when command is fully wired up
+    // getByText('Close Labware Latch')
   })
 })
