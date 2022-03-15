@@ -1253,7 +1253,10 @@
       "id": "0abc123",
       "params": {
         "pipetteId": "pipetteId",
-        "mount": "leftMount"
+        "mount": "left"
+      },
+      "result": {
+        "pipetteId": "pipetteId"
       }
     },
     {
