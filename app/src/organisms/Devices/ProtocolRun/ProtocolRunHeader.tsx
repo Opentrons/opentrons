@@ -46,6 +46,11 @@ import {
 } from '../../../organisms/RunTimeControl/hooks'
 import { formatInterval } from '../../../organisms/RunTimeControl/utils'
 
+import {
+  useAttachedModuleMatchesForProtocol,
+  useRunCalibrationStatus,
+} from '../hooks'
+
 import type { Run } from '@opentrons/api-client'
 
 interface ProtocolRunHeaderProps {
@@ -134,7 +139,18 @@ export function ProtocolRunHeader({
   const isMutationLoading =
     isPlayRunActionLoading || isPauseRunActionLoading || isResetRunLoading
 
-  const isButtonDisabled =
+  const { missingModuleIds } = useAttachedModuleMatchesForProtocol(
+    robotName,
+    runId
+  )
+  const { complete: isCalibrationComplete } = useRunCalibrationStatus(
+    robotName,
+    runId
+  )
+  const isSetupComplete = isCalibrationComplete && missingModuleIds.length === 0
+
+  const isRunControlButtonDisabled =
+    !isSetupComplete ||
     isMutationLoading ||
     runStatus === RUN_STATUS_FINISHING ||
     runStatus === RUN_STATUS_PAUSE_REQUESTED ||
@@ -341,7 +357,7 @@ export function ProtocolRunHeader({
             boxShadow="none"
             display={DISPLAY_FLEX}
             padding={`${SPACING.spacingSM} ${SPACING.spacing4}`}
-            disabled={isButtonDisabled}
+            disabled={isRunControlButtonDisabled}
             onClick={handleButtonClick}
           >
             {buttonIcon}
