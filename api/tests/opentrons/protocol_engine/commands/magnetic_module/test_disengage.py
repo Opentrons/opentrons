@@ -1,6 +1,5 @@
 """Test magnetic module disengage commands."""
 
-import pytest
 from decoy import Decoy
 
 from opentrons.hardware_control import HardwareControlAPI
@@ -15,12 +14,10 @@ from opentrons.protocol_engine.commands.magnetic_module.disengage import (
 )
 
 
-@pytest.mark.parametrize("use_virtual_modules", [True, False])
 async def test_magnetic_module_disengage_implementation(
     decoy: Decoy,
     state_view: StateView,
     hardware_api: HardwareControlAPI,
-    use_virtual_modules: bool,
 ) -> None:
     """It should validate, find hardware module if not virtualized, and disengage."""
     subject = DisengageImplementation(state_view=state_view, hardware_api=hardware_api)
@@ -42,5 +39,5 @@ async def test_magnetic_module_disengage_implementation(
 
     result = await subject.execute(params=params)
 
-    decoy.verify(await match.deactivate(), times=(0 if use_virtual_modules else 1))
+    decoy.verify(await match.deactivate(), times=1)
     assert result == DisengageResult()
