@@ -517,6 +517,10 @@ def test_magnetic_module_view_find_hardware(
 def test_magnetic_module_view_find_hardware_returns_none_if_virtualizing(
     magdeck_v1_def: ModuleDefinition,
 ) -> None:
+    """It should handle the case where the Protocol Engine is virtualizing modules.
+
+    This means ignoreing attached_modules and returning None.
+    """
     parent = make_module_view(
         hardware_module_by_slot={
             DeckSlotName.SLOT_1: HardwareModule(
