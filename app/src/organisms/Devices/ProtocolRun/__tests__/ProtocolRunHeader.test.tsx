@@ -28,6 +28,10 @@ import {
   mockRunningRun,
   mockIdleUnstartedRun,
 } from '../../../../organisms/RunTimeControl/__fixtures__'
+import {
+  useAttachedModuleMatchesForProtocol,
+  useRunCalibrationStatus,
+} from '../../hooks'
 import { formatTimestamp, ProtocolRunHeader } from '../ProtocolRunHeader'
 
 import type { UseQueryResult } from 'react-query'
@@ -35,14 +39,6 @@ import type { Protocol, Run } from '@opentrons/api-client'
 
 const mockPush = jest.fn()
 
-jest.mock('@opentrons/components', () => {
-  const actualComponents = jest.requireActual('@opentrons/components')
-  return {
-    ...actualComponents,
-    Tooltip: jest.fn(({ children }) => <div>{children}</div>),
-  }
-})
-jest.mock('../../../../organisms/RunTimeControl/hooks')
 jest.mock('react-router-dom', () => {
   const reactRouterDom = jest.requireActual('react-router-dom')
   return {
@@ -50,7 +46,16 @@ jest.mock('react-router-dom', () => {
     useHistory: () => ({ push: mockPush } as any),
   }
 })
+jest.mock('@opentrons/components', () => {
+  const actualComponents = jest.requireActual('@opentrons/components')
+  return {
+    ...actualComponents,
+    Tooltip: jest.fn(({ children }) => <div>{children}</div>),
+  }
+})
 jest.mock('@opentrons/react-api-client')
+jest.mock('../../../../organisms/RunTimeControl/hooks')
+jest.mock('../../hooks')
 
 const mockUseRunTimestamps = useRunTimestamps as jest.MockedFunction<
   typeof useRunTimestamps
@@ -65,6 +70,12 @@ const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
   typeof useProtocolQuery
 >
 const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
+const mockUseAttachedModuleMatchesForProtocol = useAttachedModuleMatchesForProtocol as jest.MockedFunction<
+  typeof useAttachedModuleMatchesForProtocol
+>
+const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
+  typeof useRunCalibrationStatus
+>
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '95e67900-bc9f-4fbf-92c6-cc4d7226a51b'
@@ -117,6 +128,12 @@ describe('ProtocolRunHeader', () => {
           },
         },
       } as UseQueryResult<Protocol>)
+    when(mockUseAttachedModuleMatchesForProtocol)
+      .calledWith(ROBOT_NAME, RUN_ID)
+      .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })
+    when(mockUseRunCalibrationStatus)
+      .calledWith(ROBOT_NAME, RUN_ID)
+      .mockReturnValue({ complete: true })
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -134,14 +151,20 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('renders a start run button when run is ready to start', () => {
-    when(mockUseRunQuery)
-      .calledWith(RUN_ID)
-      .mockReturnValue({
-        data: { data: mockIdleUnstartedRun },
-      } as UseQueryResult<Run>)
     const [{ getByRole, queryByText }] = render()
 
     getByRole('button', { name: 'Start Run' })
+    expect(queryByText(formatTimestamp(STARTED_AT))).toBeFalsy()
+  })
+
+  it('disables the start run button when run is not ready to start', () => {
+    when(mockUseRunCalibrationStatus)
+      .calledWith(ROBOT_NAME, RUN_ID)
+      .mockReturnValue({ complete: false })
+    const [{ getByRole, queryByText }] = render()
+
+    const button = getByRole('button', { name: 'Start Run' })
+    expect(button).toHaveAttribute('disabled')
     expect(queryByText(formatTimestamp(STARTED_AT))).toBeFalsy()
   })
 
