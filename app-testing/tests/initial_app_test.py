@@ -2,6 +2,7 @@
 import logging
 import os
 from pathlib import Path
+import pytest
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -17,6 +18,7 @@ from src.resources.ot_application import OtApplication
 logger = logging.getLogger(__name__)
 
 
+@pytest.mark.v5dot0
 def test_initial_load_robot_available(chrome_options: Options) -> None:
     """Test the initial load of the app with a docker or dev mode emulated robot."""
     robot = OtRobot()
@@ -49,13 +51,14 @@ def test_initial_load_robot_available(chrome_options: Options) -> None:
         robot_page.header(robots_list.DEV)
         # Find the experimental protocol engine toggle.
         # It is at the bottom of the options.
-        robot_page.experimental_protocol_engine_toggle()
+        robot_page.get_experimental_ot3_hardware_toggle()
         # Click on the pipettes link.
         robots_list.get_robot_pipettes_link(RobotsList.DEV).click()
         # Click on the modules link.
         robots_list.get_robot_modules_link(RobotsList.DEV).click()
 
 
+@pytest.mark.v5dot0
 def test_initial_load_no_robot(chrome_options: Options) -> None:
     """Test the initial load of the app with NO robot.
 
@@ -85,6 +88,7 @@ def test_initial_load_no_robot(chrome_options: Options) -> None:
         robots_list.get_try_again_button()
 
 
+@pytest.mark.v5dot0
 def test_more_menu(chrome_options: Options) -> None:
     """Test the more menu."""
     # use variable to prevent the popup
