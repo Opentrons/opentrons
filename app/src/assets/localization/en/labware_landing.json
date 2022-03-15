@@ -9,5 +9,10 @@
   "import_custom_def": "Import a Custom Labware Definition",
   "import": "Import",
   "choose_file_to_upload": "Or choose a file from your computer to upload.",
-  "choose_file": "Choose file"
+  "choose_file": "Choose file",
+  "unable_to_upload": "Unable to upload file",
+  "invalid_labware_def": "Invalid labware definition",
+  "duplicate_labware_def": "Duplicate labware definition",
+  "opentrons_labware_def": "Opentrons labware definition",
+  "error_importing_file": "Error importing {{filename}}."
 }

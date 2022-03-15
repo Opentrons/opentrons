@@ -12,6 +12,7 @@ export const INITIAL_STATE: CustomLabwareState = {
   addFailureFile: null,
   addFailureMessage: null,
   listFailureMessage: null,
+  newLabwareName: null,
 }
 
 export const customLabwareReducer: Reducer<CustomLabwareState, Action> = (
@@ -42,6 +43,18 @@ export const customLabwareReducer: Reducer<CustomLabwareState, Action> = (
         ...state,
         addFailureFile: action.payload.labware,
         addFailureMessage: action.payload.message,
+      }
+    }
+    case Actions.ADD_NEW_LABWARE_NAME: {
+      return {
+        ...state,
+        newLabwareName: action.payload.filename,
+      }
+    }
+    case Actions.CLEAR_NEW_LABWARE_NAME: {
+      return {
+        ...state,
+        newLabwareName: null,
       }
     }
   }

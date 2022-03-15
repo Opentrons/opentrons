@@ -13,7 +13,9 @@ import { useAddLabware } from './hooks'
 
 export interface AddCustomLabwareProps {
   isExpanded: boolean
-  onCloseClick: () => unknown
+  onCloseClick: () => void
+  onSuccess: () => void
+  onFailure: () => void
 }
 
 export function AddCustomLabware(props: AddCustomLabwareProps): JSX.Element {

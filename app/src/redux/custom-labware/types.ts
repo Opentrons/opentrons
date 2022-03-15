@@ -50,6 +50,7 @@ export interface CustomLabwareState {
   readonly addFailureFile: FailedLabwareFile | null
   readonly addFailureMessage: string | null
   readonly listFailureMessage: string | null
+  readonly newLabwareName: string | null
 }
 
 // action types
@@ -98,6 +99,15 @@ export interface ClearAddCustomLabwareFailureAction {
   type: 'labware:CLEAR_ADD_CUSTOM_LABWARE_FAILURE'
 }
 
+export interface AddNewLabwareNameAction {
+  type: 'labware:ADD_NEW_LABWARE_NAME'
+  payload: { filename: string }
+}
+
+export interface ClearNewLabwareNameAction {
+  type: 'labware.CLEAR_NEW_LABWARE_NAME'
+}
+
 export interface OpenCustomLabwareDirectoryAction {
   type: 'labware:OPEN_CUSTOM_LABWARE_DIRECTORY'
   meta: { shell: true }
@@ -111,4 +121,6 @@ export type CustomLabwareAction =
   | AddCustomLabwareAction
   | AddCustomLabwareFailureAction
   | ClearAddCustomLabwareFailureAction
+  | AddNewLabwareNameAction
+  | ClearNewLabwareNameAction
   | OpenCustomLabwareDirectoryAction
