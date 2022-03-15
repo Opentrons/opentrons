@@ -10,7 +10,7 @@ class CommandAnnotation(BaseModel):
     annotationType: str
 
 
-class CornerOffsetFromSlot(BaseModel):
+class OffsetVector(BaseModel):
     x: float
     y: float
     z: float
@@ -21,14 +21,10 @@ class Location(BaseModel):
     moduleId: Optional[str]
 
 
-class VolumeByWell(BaseModel):
-    A1: int
-    B1: int
-
-
+# TODO (tamar 3/15/22): split apart all the command payloads when we tackle #9583
 class WellLocation(BaseModel):
     origin: Optional[str]
-    offset: Optional[CornerOffsetFromSlot]
+    offset: Optional[OffsetVector]
 
 
 class Params(BaseModel):
@@ -41,7 +37,7 @@ class Params(BaseModel):
     labwareId: Optional[str]
     displayName: Optional[str]
     liquidId: Optional[str]
-    volumeByWell: Optional[VolumeByWell]
+    volumeByWell: Optional[Dict[str, Any]]
     wellName: Optional[str]
     volume: Optional[float]
     flowRate: Optional[float]
@@ -50,19 +46,19 @@ class Params(BaseModel):
     minimumZHeight: Optional[int]
     forceDirect: Optional[bool]
     message: Optional[str]
-    coordinates: Optional[CornerOffsetFromSlot]
+    coordinates: Optional[OffsetVector]
     axis: Optional[str]
     distance: Optional[float]
     positionId: Optional[str]
     temperature: Optional[float]
     rpm: Optional[float]
     engageHeight: Optional[float]
-    offset: Optional[CornerOffsetFromSlot]
+    offset: Optional[OffsetVector]
 
 
 class Command(BaseModel):
-    commandType: str
     id: str
+    commandType: str
     params: Params
 
 
@@ -91,7 +87,7 @@ class Shape(Enum):
     rectangular = "rectangular"
 
 
-class A1(BaseModel):
+class WellDefinition(BaseModel):
     depth: float
     totalLiquidVolume: int
     shape: Shape
@@ -143,7 +139,7 @@ class ProtocolSchemaV6(BaseModel):
         ...,
         alias="$otSharedSchema",
         description="The path to a valid Opentrons shared schema relative to "
-        "the shared-data directory, without its extension.",
+                    "the shared-data directory, without its extension.",
     )
     schemaVersion: Literal[6]
     metadata: Metadata
@@ -153,6 +149,6 @@ class ProtocolSchemaV6(BaseModel):
     labwareDefinitions: Dict[str, LabwareDefinition]
     commands: List[Command]
     modules: Optional[Dict[str, Module]]
-    liquids: Optional[Dict[str, Liquids]]
+    liquids: Optional[Dict[str, Liquid]]
     commandAnnotations: Optional[List[CommandAnnotation]]
     designerApplication: Optional[DesignerApplication]
