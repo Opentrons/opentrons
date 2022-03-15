@@ -1,5 +1,5 @@
 """Router for /runs commands endpoints."""
-from asyncio import wait_for, TimeoutError as AsyncioTimeoutError
+from anyio import move_on_after
 from datetime import datetime
 from typing import Optional, Union
 from typing_extensions import Final, Literal
@@ -26,6 +26,7 @@ from .base_router import RunNotFound, RunStopped, get_run_data_from_url
 
 _DEFAULT_COMMANDS_BEFORE: Final = 20
 _DEFAULT_COMMANDS_AFTER: Final = 30
+_DEFAULT_COMMAND_WAIT_MS: Final = 30_000
 
 commands_router = APIRouter()
 
@@ -92,7 +93,7 @@ async def create_run_command(
         ),
     ),
     timeout: int = Query(
-        default=30_000,
+        default=_DEFAULT_COMMAND_WAIT_MS,
         gt=0,
         description=(
             "If `waitUntilComplete` is `true`,"
@@ -134,30 +135,17 @@ async def create_run_command(
             status.HTTP_400_BAD_REQUEST
         )
 
-    added_command = engine_store.engine.add_command(request_body.data)
-
-    command_to_return: pe_commands.Command
+    engine = engine_store.engine
+    command = engine.add_command(request_body.data)
 
     if waitUntilComplete:
-        try:
-            await wait_for(
-                engine_store.engine.wait_for_command(command_id=added_command.id),
-                timeout=timeout / 1000,
-            )
-            completed_command = engine_store.get_state(run.id).commands.get(
-                command_id=added_command.id
-            )
-            command_to_return = completed_command
-        except AsyncioTimeoutError:
-            timed_out_command = engine_store.get_state(run.id).commands.get(
-                command_id=added_command.id
-            )
-            command_to_return = timed_out_command
-    else:
-        command_to_return = added_command
+        with move_on_after(timeout / 1000.0):
+            await engine.wait_for_command(command.id),
+
+    response_data = engine.state_view.commands.get(command.id)
 
     return await PydanticResponse.create(
-        content=SimpleBody.construct(data=command_to_return),
+        content=SimpleBody.construct(data=response_data),
         status_code=status.HTTP_201_CREATED,
     )
 
