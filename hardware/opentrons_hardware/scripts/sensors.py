@@ -175,13 +175,11 @@ async def run(args: argparse.Namespace) -> None:
     driver = await build_driver(build_settings(args))
 
     loop = asyncio.get_event_loop()
-    fut = asyncio.gather(
-        loop.create_task(loop.create_task(ui_task(driver))
-    ))
+    task = loop.create_task(ui_task(driver))
     try:
-        await fut
+        await task
     except KeyboardInterrupt:
-        fut.cancel()
+        task.cancel()
     except asyncio.CancelledError:
         pass
     finally:
