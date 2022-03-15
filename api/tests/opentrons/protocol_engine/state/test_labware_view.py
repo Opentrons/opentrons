@@ -76,7 +76,7 @@ def test_get_labware_data_bad_id() -> None:
     """get_labware_data_by_id should raise if labware ID doesn't exist."""
     subject = get_labware_view()
 
-    with pytest.raises(errors.LabwareDoesNotExistError):
+    with pytest.raises(errors.LabwareNotLoadedError):
         subject.get("asdfghjkl")
 
 
@@ -457,7 +457,7 @@ def test_get_labware_offset_vector() -> None:
         labware_without_offset.id
     ) == LabwareOffsetVector(x=0, y=0, z=0)
 
-    with pytest.raises(errors.LabwareDoesNotExistError):
+    with pytest.raises(errors.LabwareNotLoadedError):
         subject.get_labware_offset_vector("wrong-labware-id")
 
 

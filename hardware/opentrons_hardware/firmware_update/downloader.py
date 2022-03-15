@@ -13,8 +13,11 @@ from opentrons_hardware.drivers.can_bus.can_messenger import (
 )
 from opentrons_hardware.firmware_update.errors import ErrorResponse, TimeoutResponse
 from opentrons_hardware.firmware_update.hex_file import HexRecordProcessor
-from opentrons_hardware.firmware_bindings.messages import message_definitions, payloads
-
+from opentrons_hardware.firmware_bindings.messages import (
+    message_definitions,
+    payloads,
+    fields,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +49,7 @@ class FirmwareUpdateDownloader:
             num_messages = 0
             crc32 = 0
             for chunk in hex_processor.process(
-                payloads.FirmwareUpdateDataField.NUM_BYTES
+                fields.FirmwareUpdateDataField.NUM_BYTES
             ):
                 logger.debug(
                     f"Sending chunk {num_messages} to address {chunk.address:x}."

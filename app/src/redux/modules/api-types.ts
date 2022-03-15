@@ -14,6 +14,7 @@ interface PhysicalPort {
 }
 
 export interface ApiBaseModule {
+  id: string
   displayName: string
   serial: string
   revision: string

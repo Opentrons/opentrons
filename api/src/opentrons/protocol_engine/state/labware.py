@@ -173,7 +173,7 @@ class LabwareView(HasState[LabwareState]):
         try:
             return self._state.labware_by_id[labware_id]
         except KeyError as e:
-            raise errors.LabwareDoesNotExistError(
+            raise errors.LabwareNotLoadedError(
                 f"Labware {labware_id} not found."
             ) from e
 

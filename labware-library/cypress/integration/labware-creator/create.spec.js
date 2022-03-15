@@ -30,7 +30,7 @@ context('The Labware Creator Landing Page', () => {
     it('contains a link to the request form', () => {
       cy.contains('request form')
         .should('have.prop', 'href')
-        .and('equal', 'https://opentrons-ux.typeform.com/to/xi8h0W')
+        .and('equal', 'https://lqilf9ng.paperform.co/')
     })
 
     it('contains a second link to the labware guide', () => {

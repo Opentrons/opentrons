@@ -5,6 +5,7 @@ import { MenuList } from '../../../atoms/MenuList'
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
 
 import type { AttachedModule } from '../../../redux/modules/types'
+import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 
 interface ModuleOverflowMenuProps {
   module: AttachedModule
@@ -15,10 +16,10 @@ interface ModuleOverflowMenuProps {
 export const ModuleOverflowMenu = (
   props: ModuleOverflowMenuProps
 ): JSX.Element | null => {
-  const { t } = useTranslation('device_details')
+  const { t } = useTranslation(['device_details', 'heater_shaker'])
   const { module, handleClick, handleAboutClick } = props
 
-  const menuItems = {
+  const menuItemsByModuleType = {
     thermocyclerModuleType: [
       {
         setSetting: t('overflow_menu_lid_temp'),
@@ -45,12 +46,21 @@ export const ModuleOverflowMenu = (
         isSecondary: false,
       },
     ],
-    // TODO(sh, 2022-02-28): add heater shaker menu items
     heaterShakerModuleType: [
       {
-        setSetting: 'Start',
-        turnOffSetting: 'Deactivate',
-        isSecondary: true,
+        setSetting: t('set_temperature', { ns: 'heater_shaker' }),
+        turnOffSetting: t('deactivate', { ns: 'heater_shaker' }),
+        isSecondary: false,
+      },
+      {
+        setSetting: t('set_shake_speed', { ns: 'heater_shaker' }),
+        turnOffSetting: t('stop_shaking', { ns: 'heater_shaker' }),
+        isSecondary: false,
+      },
+      {
+        setSetting: t('open_labware_latch', { ns: 'heater_shaker' }),
+        turnOffSetting: t('close_labware_latch', { ns: 'heater_shaker' }),
+        isSecondary: false,
       },
     ],
   }
@@ -66,12 +76,26 @@ export const ModuleOverflowMenu = (
     </MenuItem>
   )
 
+  const AttachToDeckBtn = (
+    <MenuItem
+      minWidth="10rem"
+      onClick={() => console.log('how to attach to deck')}
+    >
+      {t('how_to_attach_to_deck', { ns: 'heater_shaker' })}
+    </MenuItem>
+  )
+  const TestShakeBtn = (
+    <MenuItem minWidth="10rem" onClick={() => console.log('test shake')}>
+      {t('test_shake', { ns: 'heater_shaker' })}
+    </MenuItem>
+  )
+
   return (
     <React.Fragment>
       <Flex position={POSITION_RELATIVE}>
         <MenuList
           buttons={[
-            menuItems[module.type].map((item, index) => {
+            menuItemsByModuleType[module.type].map((item, index) => {
               return (
                 <MenuItem
                   minWidth="10rem"
@@ -85,6 +109,8 @@ export const ModuleOverflowMenu = (
               )
             }),
             AboutModuleBtn,
+            module.type === HEATERSHAKER_MODULE_TYPE ? AttachToDeckBtn : null,
+            module.type === HEATERSHAKER_MODULE_TYPE ? TestShakeBtn : null,
           ]}
         />
       </Flex>

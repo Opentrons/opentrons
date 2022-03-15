@@ -2,7 +2,7 @@ import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { PowerOn } from '../PowerOn'
-import { mockMagneticModuleGen2 } from '../../../../redux/modules/__fixtures__'
+import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 
 const render = (props: React.ComponentProps<typeof PowerOn>) => {
   return renderWithProviders(<PowerOn {...props} />, {
@@ -16,7 +16,7 @@ describe('PowerOn', () => {
   // TODO(jr, 2022-02-18): fix module model to heater shaker when it exists
   beforeEach(() => {
     props = {
-      attachedModule: mockMagneticModuleGen2,
+      attachedModule: mockHeaterShaker,
     }
   })
   afterEach(() => {

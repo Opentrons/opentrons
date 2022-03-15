@@ -6,9 +6,10 @@ and expose it to a python commandline.
 
 import os
 
-if not os.environ.get("RUNNING_ON_PI") and not os.environ.get("RUNNING_ON_VERDIN"):
-    print("You should run this through the script alias: ot3repl")
-    exit()
+has_robot_server = True
+if os.environ.get("OPENTRONS_SIMULATION"):
+    print("Running with simulators")
+    has_robot_server = False
 if os.environ.get("OT2", None):
     print(
         '"OT2" env var detected, running with OT2 HC. '
@@ -19,14 +20,14 @@ else:
     print("Running with OT3 HC. If you dont want this, set an " 'env var named "OT2".')
     os.environ["OT_API_FF_enableOT3HardwareController"] = "true"
 
-from code import interact
-from subprocess import run
-from typing import Union, Type
-import logging
+from code import interact  # noqa: E402
+from subprocess import run  # noqa: E402
+from typing import Union, Type  # noqa: E402
+import logging  # noqa: E402
 
-from opentrons.types import Mount, Point
-from opentrons.hardware_control.types import Axis
-from opentrons.config.feature_flags import enable_ot3_hardware_controller
+from opentrons.types import Mount, Point  # noqa: E402
+from opentrons.hardware_control.types import Axis  # noqa: E402
+from opentrons.config.feature_flags import enable_ot3_hardware_controller  # noqa: E402
 
 if enable_ot3_hardware_controller():
     from opentrons.hardware_control.ot3api import OT3API
@@ -37,8 +38,8 @@ else:
 
     HCApi = API
 
-from opentrons.hardware_control.protocols import HardwareControlAPI
-from opentrons.hardware_control.thread_manager import ThreadManager
+from opentrons.hardware_control.protocols import HardwareControlAPI  # noqa: E402
+from opentrons.hardware_control.thread_manager import ThreadManager  # noqa: E402
 
 logging.basicConfig(level=logging.INFO)
 
@@ -64,7 +65,8 @@ def do_interact(api: ThreadManager[HardwareControlAPI]) -> None:
 
 
 if __name__ == "__main__":
-    stop_server()
+    if has_robot_server:
+        stop_server()
     api_tm = build_api()
     api_tm.sync.cache_instruments()
     do_interact(api_tm)

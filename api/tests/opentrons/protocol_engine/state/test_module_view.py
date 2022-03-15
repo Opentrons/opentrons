@@ -25,6 +25,7 @@ from opentrons.protocol_engine.state.modules import (
 def make_module_view(
     slot_by_module_id: Optional[Dict[str, DeckSlotName]] = None,
     hardware_module_by_slot: Optional[Dict[DeckSlotName, HardwareModule]] = None,
+    virtualize_modules: bool = False,
 ) -> ModuleView:
     """Get a module view test subject with the specified state."""
     state = ModuleState(
@@ -32,7 +33,7 @@ def make_module_view(
         hardware_module_by_slot=hardware_module_by_slot or {},
     )
 
-    return ModuleView(state=state)
+    return ModuleView(state=state, virtualize_modules=virtualize_modules)
 
 
 HardwareModuleT = TypeVar("HardwareModuleT", bound=AbstractModule)
@@ -57,7 +58,7 @@ def test_initial_module_data_by_id() -> None:
     """It should raise if module ID doesn't exist."""
     subject = make_module_view()
 
-    with pytest.raises(errors.ModuleDoesNotExistError):
+    with pytest.raises(errors.ModuleNotLoadedError):
         subject.get("helloWorld")
 
 
@@ -65,7 +66,7 @@ def test_get_missing_hardware() -> None:
     """It should raise if no loaded hardware."""
     subject = make_module_view(slot_by_module_id={"module-id": DeckSlotName.SLOT_1})
 
-    with pytest.raises(errors.ModuleDoesNotExistError):
+    with pytest.raises(errors.ModuleNotLoadedError):
         subject.get("module-id")
 
 
@@ -128,6 +129,53 @@ def test_get_all_modules(
             definition=tempdeck_v2_def,
         ),
     ]
+
+
+def test_get_magnetic_module_view(
+    magdeck_v1_def: ModuleDefinition,
+    magdeck_v2_def: ModuleDefinition,
+    tempdeck_v1_def: ModuleDefinition,
+) -> None:
+    """It should return a view for the given Magnetic Module, if valid."""
+    subject = make_module_view(
+        slot_by_module_id={
+            "magnetic-module-gen1-id": DeckSlotName.SLOT_1,
+            "magnetic-module-gen2-id": DeckSlotName.SLOT_2,
+            "temperature-module-id": DeckSlotName.SLOT_3,
+        },
+        hardware_module_by_slot={
+            DeckSlotName.SLOT_1: HardwareModule(
+                serial_number="magnetic-module-gen1-serial",
+                definition=magdeck_v1_def,
+            ),
+            DeckSlotName.SLOT_2: HardwareModule(
+                serial_number="magnetic-module-gen2-serial",
+                definition=magdeck_v2_def,
+            ),
+            DeckSlotName.SLOT_3: HardwareModule(
+                serial_number="temperature-module-serial",
+                definition=tempdeck_v1_def,
+            ),
+        },
+    )
+
+    module_1_view = subject.get_magnetic_module_view(
+        module_id="magnetic-module-gen1-id"
+    )
+    assert module_1_view.parent_module_view is subject
+    assert module_1_view.module_id == "magnetic-module-gen1-id"
+
+    module_2_view = subject.get_magnetic_module_view(
+        module_id="magnetic-module-gen2-id"
+    )
+    assert module_2_view.parent_module_view is subject
+    assert module_2_view.module_id == "magnetic-module-gen2-id"
+
+    with pytest.raises(errors.WrongModuleTypeError):
+        subject.get_magnetic_module_view(module_id="temperature-module-id")
+
+    with pytest.raises(errors.ModuleNotLoadedError):
+        subject.get_magnetic_module_view(module_id="nonexistent-module-id")
 
 
 def test_get_properties_by_id(
@@ -227,117 +275,6 @@ def test_calculate_magnet_height(module_model: ModuleModel) -> None:
     )
 
 
-class _CalculateMagnetHardwareHeightTestParams(NamedTuple):
-    model: ModuleModel
-    mm_from_base: float
-    expected_result: Optional[float]
-    expected_exception_type: Union[Type[Exception], None]
-
-
-@pytest.mark.parametrize(
-    "model, mm_from_base, expected_result, expected_exception_type",
-    [
-        # Happy cases:
-        _CalculateMagnetHardwareHeightTestParams(
-            model=ModuleModel.MAGNETIC_MODULE_V1,
-            mm_from_base=10,
-            # TODO(mm, 2022-03-09): It's unclear if this expected result is correct.
-            # https://github.com/Opentrons/opentrons/issues/9585
-            expected_result=25,
-            expected_exception_type=None,
-        ),
-        _CalculateMagnetHardwareHeightTestParams(
-            model=ModuleModel.MAGNETIC_MODULE_V2,
-            mm_from_base=10,
-            expected_result=12.5,
-            expected_exception_type=None,
-        ),
-        # Boundary conditions:
-        #
-        # TODO(mm, 2022-03-09):
-        # In Python >=3.9, improve precision with math.nextafter().
-        # Also consider relying on shared constants instead of hard-coding bounds.
-        #
-        # TODO(mm, 2022-03-09): It's unclear if the bounds used for V1 modules
-        # are physically correct. https://github.com/Opentrons/opentrons/issues/9585
-        _CalculateMagnetHardwareHeightTestParams(  # V1 barely too low.
-            model=ModuleModel.MAGNETIC_MODULE_V1,
-            mm_from_base=-2.51,
-            expected_result=None,
-            expected_exception_type=errors.EngageHeightOutOfRangeError,
-        ),
-        _CalculateMagnetHardwareHeightTestParams(  # V1 lowest allowed.
-            model=ModuleModel.MAGNETIC_MODULE_V1,
-            mm_from_base=-2.5,
-            expected_result=0,
-            expected_exception_type=None,
-        ),
-        _CalculateMagnetHardwareHeightTestParams(  # V1 highest allowed.
-            model=ModuleModel.MAGNETIC_MODULE_V1,
-            mm_from_base=20,
-            expected_result=45,
-            expected_exception_type=None,
-        ),
-        _CalculateMagnetHardwareHeightTestParams(  # V1 barely too high.
-            model=ModuleModel.MAGNETIC_MODULE_V1,
-            mm_from_base=20.01,
-            expected_result=None,
-            expected_exception_type=errors.EngageHeightOutOfRangeError,
-        ),
-        _CalculateMagnetHardwareHeightTestParams(  # V2 barely too low.
-            model=ModuleModel.MAGNETIC_MODULE_V2,
-            mm_from_base=-2.51,
-            expected_result=None,
-            expected_exception_type=errors.EngageHeightOutOfRangeError,
-        ),
-        _CalculateMagnetHardwareHeightTestParams(  # V2 lowest allowed.
-            model=ModuleModel.MAGNETIC_MODULE_V2,
-            mm_from_base=-2.5,
-            expected_result=0,
-            expected_exception_type=None,
-        ),
-        _CalculateMagnetHardwareHeightTestParams(  # V2 highest allowed.
-            model=ModuleModel.MAGNETIC_MODULE_V2,
-            mm_from_base=22.5,
-            expected_result=25,
-            expected_exception_type=None,
-        ),
-        _CalculateMagnetHardwareHeightTestParams(  # V2 barely too high.
-            model=ModuleModel.MAGNETIC_MODULE_V2,
-            mm_from_base=22.51,
-            expected_result=None,
-            expected_exception_type=errors.EngageHeightOutOfRangeError,
-        ),
-        # Bad model:
-        _CalculateMagnetHardwareHeightTestParams(
-            model=ModuleModel.TEMPERATURE_MODULE_V1,
-            mm_from_base=0,
-            expected_result=None,
-            expected_exception_type=errors.WrongModuleTypeError,
-        ),
-    ],
-)
-def test_calculate_magnet_hardware_height(
-    model: ModuleModel,
-    mm_from_base: float,
-    expected_result: float,
-    expected_exception_type: Union[Type[Exception], None],
-) -> None:
-    """It should return the expected height or raise the expected exception."""
-    subject = make_module_view()
-    context: ContextManager[None] = (
-        # Not sure why mypy has trouble with this.
-        nullcontext()  # type: ignore[assignment]
-        if expected_exception_type is None
-        else pytest.raises(expected_exception_type)
-    )
-    with context:
-        result = subject.calculate_magnet_hardware_height(
-            magnetic_module_model=model, mm_from_base=mm_from_base
-        )
-        assert result == expected_result
-
-
 @pytest.mark.parametrize(
     argnames=["from_slot", "to_slot", "should_dodge"],
     argvalues=[
@@ -383,118 +320,6 @@ def test_thermocycler_dodging(
         subject.should_dodge_thermocycler(from_slot=from_slot, to_slot=to_slot)
         is should_dodge
     )
-
-
-def test_find_loaded_hardware_module(
-    decoy: Decoy, magdeck_v1_def: ModuleDefinition
-) -> None:
-    """It should return the matching hardware module."""
-    matching = make_hardware_module(
-        decoy=decoy, type=MagDeck, serial_number="serial-matching"
-    )
-    non_matching = make_hardware_module(
-        decoy=decoy, type=MagDeck, serial_number="serial-non-matching"
-    )
-    another_non_matching = make_hardware_module(
-        decoy=decoy, type=TempDeck, serial_number="serial-another-non-matching"
-    )
-
-    attached = [non_matching, matching, another_non_matching]
-
-    subject = make_module_view(
-        hardware_module_by_slot={
-            DeckSlotName.SLOT_1: HardwareModule(
-                serial_number="serial-non-matching",
-                definition=magdeck_v1_def,
-            ),
-            DeckSlotName.SLOT_2: HardwareModule(
-                serial_number="serial-matching",
-                definition=magdeck_v1_def,
-            ),
-            DeckSlotName.SLOT_3: HardwareModule(
-                serial_number="serial-another-non-matching",
-                definition=magdeck_v1_def,
-            ),
-        },
-        slot_by_module_id={
-            "id-non-matching": DeckSlotName.SLOT_1,
-            "id-matching": DeckSlotName.SLOT_2,
-            "id-another-non-matching": DeckSlotName.SLOT_3,
-        },
-    )
-
-    result = subject.find_loaded_hardware_module(
-        module_id="id-matching",
-        attached_modules=attached,
-        expected_type=MagDeck,
-    )
-
-    assert result == matching
-
-
-def test_find_loaded_hardware_module_raises_if_no_match_loaded(
-    decoy: Decoy,
-) -> None:
-    """It should raise if the ID doesn't point to a loaded module."""
-    subject = make_module_view(
-        hardware_module_by_slot={},
-        slot_by_module_id={},
-    )
-    with pytest.raises(errors.ModuleDoesNotExistError):
-        subject.find_loaded_hardware_module(
-            module_id="module-id",
-            attached_modules=[],
-            expected_type=MagDeck,
-        )
-
-
-def test_find_loaded_hardware_module_raises_if_match_not_attached(
-    decoy: Decoy, magdeck_v1_def: ModuleDefinition
-) -> None:
-    """It should raise if a match was loaded but is not found in the attached list."""
-    subject = make_module_view(
-        hardware_module_by_slot={
-            DeckSlotName.SLOT_1: HardwareModule(
-                serial_number="serial-matching",
-                definition=magdeck_v1_def,
-            ),
-        },
-        slot_by_module_id={
-            "id-matching": DeckSlotName.SLOT_1,
-        },
-    )
-    with pytest.raises(errors.ModuleNotAttachedError):
-        subject.find_loaded_hardware_module(
-            module_id="id-matching",
-            attached_modules=[],
-            expected_type=MagDeck,
-        )
-
-
-def test_find_loaded_hardware_module_raises_if_match_is_wrong_type(
-    decoy: Decoy, magdeck_v1_def: ModuleDefinition
-) -> None:
-    """It should raise if a match was found but is of an unexpected type."""
-    matching = make_hardware_module(
-        decoy=decoy, type=MagDeck, serial_number="serial-matching"
-    )
-    subject = make_module_view(
-        hardware_module_by_slot={
-            DeckSlotName.SLOT_1: HardwareModule(
-                serial_number="serial-matching",
-                definition=magdeck_v1_def,
-            ),
-        },
-        slot_by_module_id={
-            "id-matching": DeckSlotName.SLOT_1,
-        },
-    )
-    with pytest.raises(errors.WrongModuleTypeError):
-        subject.find_loaded_hardware_module(
-            module_id="id-matching",
-            attached_modules=[matching],
-            expected_type=TempDeck,  # Will definitely not match.
-        )
 
 
 def test_select_hardware_module_to_load_rejects_missing() -> None:
@@ -642,3 +467,235 @@ def test_select_hardware_module_to_load_rejects_location_reassignment(
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             attached_modules=attached_modules,
         )
+
+
+def test_magnetic_module_view_find_hardware(
+    decoy: Decoy, magdeck_v1_def: ModuleDefinition
+) -> None:
+    """It should return the matching hardware module."""
+    matching = make_hardware_module(
+        decoy=decoy, type=MagDeck, serial_number="serial-matching"
+    )
+    non_matching = make_hardware_module(
+        decoy=decoy, type=MagDeck, serial_number="serial-non-matching"
+    )
+    another_non_matching = make_hardware_module(
+        decoy=decoy, type=TempDeck, serial_number="serial-another-non-matching"
+    )
+
+    attached = [non_matching, matching, another_non_matching]
+
+    parent = make_module_view(
+        hardware_module_by_slot={
+            DeckSlotName.SLOT_1: HardwareModule(
+                serial_number="serial-non-matching",
+                definition=magdeck_v1_def,
+            ),
+            DeckSlotName.SLOT_2: HardwareModule(
+                serial_number="serial-matching",
+                definition=magdeck_v1_def,
+            ),
+            DeckSlotName.SLOT_3: HardwareModule(
+                serial_number="serial-another-non-matching",
+                definition=magdeck_v1_def,
+            ),
+        },
+        slot_by_module_id={
+            "id-non-matching": DeckSlotName.SLOT_1,
+            "id-matching": DeckSlotName.SLOT_2,
+            "id-another-non-matching": DeckSlotName.SLOT_3,
+        },
+    )
+    subject = parent.get_magnetic_module_view(module_id="id-matching")
+
+    result = subject.find_hardware(
+        attached_modules=attached,
+    )
+    assert result == matching
+
+
+def test_magnetic_module_view_find_hardware_returns_none_if_virtualizing(
+    magdeck_v1_def: ModuleDefinition,
+) -> None:
+    """It should handle the case where the Protocol Engine is virtualizing modules.
+
+    This means ignoreing attached_modules and returning None.
+    """
+    parent = make_module_view(
+        hardware_module_by_slot={
+            DeckSlotName.SLOT_1: HardwareModule(
+                serial_number="serial-to-match",
+                definition=magdeck_v1_def,
+            ),
+        },
+        slot_by_module_id={
+            "id-to-match": DeckSlotName.SLOT_1,
+        },
+        virtualize_modules=True,
+    )
+    subject = parent.get_magnetic_module_view(module_id="id-to-match")
+
+    # Should return None,
+    # rather than raising because attached_modules contains no match.
+    assert subject.find_hardware(attached_modules=[]) is None
+
+
+def test_magnetic_module_view_find_hardware_raises_if_no_match_attached(
+    magdeck_v1_def: ModuleDefinition,
+) -> None:
+    """It should raise if nothing with a matching serial is in the attached list."""
+    parent = make_module_view(
+        hardware_module_by_slot={
+            DeckSlotName.SLOT_1: HardwareModule(
+                serial_number="serial-to-match",
+                definition=magdeck_v1_def,
+            ),
+        },
+        slot_by_module_id={
+            "id-to-match": DeckSlotName.SLOT_1,
+        },
+    )
+    subject = parent.get_magnetic_module_view(module_id="id-to-match")
+
+    with pytest.raises(errors.ModuleNotAttachedError):
+        subject.find_hardware(
+            attached_modules=[],
+        )
+
+
+def test_magnetic_module_view_find_hardware_raises_if_match_is_wrong_type(
+    decoy: Decoy, magdeck_v1_def: ModuleDefinition
+) -> None:
+    """It should raise if a match was found but is of an unexpected type."""
+    matching = make_hardware_module(
+        decoy=decoy,
+        type=TempDeck,  # Not a Magnetic Module.
+        serial_number="serial-to-match",
+    )
+    parent = make_module_view(
+        hardware_module_by_slot={
+            DeckSlotName.SLOT_1: HardwareModule(
+                serial_number="serial-to-match",
+                definition=magdeck_v1_def,
+            ),
+        },
+        slot_by_module_id={
+            "id-to-match": DeckSlotName.SLOT_1,
+        },
+    )
+    subject = parent.get_magnetic_module_view(module_id="id-to-match")
+    with pytest.raises(errors.ModuleNotAttachedError):
+        subject.find_hardware(
+            attached_modules=[matching],
+        )
+
+
+class _CalculateMagnetHardwareHeightTestParams(NamedTuple):
+    definition: ModuleDefinition
+    mm_from_base: float
+    expected_result: Optional[float]
+    expected_exception_type: Union[Type[Exception], None]
+
+
+@pytest.mark.parametrize(
+    "definition, mm_from_base, expected_result, expected_exception_type",
+    [
+        # Happy cases:
+        _CalculateMagnetHardwareHeightTestParams(
+            definition=lazy_fixture("magdeck_v1_def"),
+            mm_from_base=10,
+            # TODO(mm, 2022-03-09): It's unclear if this expected result is correct.
+            # https://github.com/Opentrons/opentrons/issues/9585
+            expected_result=25,
+            expected_exception_type=None,
+        ),
+        _CalculateMagnetHardwareHeightTestParams(
+            definition=lazy_fixture("magdeck_v2_def"),
+            mm_from_base=10,
+            expected_result=12.5,
+            expected_exception_type=None,
+        ),
+        # Boundary conditions:
+        #
+        # TODO(mm, 2022-03-09):
+        # In Python >=3.9, improve precision with math.nextafter().
+        # Also consider relying on shared constants instead of hard-coding bounds.
+        #
+        # TODO(mm, 2022-03-09): It's unclear if the bounds used for V1 modules
+        # are physically correct. https://github.com/Opentrons/opentrons/issues/9585
+        _CalculateMagnetHardwareHeightTestParams(  # V1 barely too low.
+            definition=lazy_fixture("magdeck_v1_def"),
+            mm_from_base=-2.51,
+            expected_result=None,
+            expected_exception_type=errors.EngageHeightOutOfRangeError,
+        ),
+        _CalculateMagnetHardwareHeightTestParams(  # V1 lowest allowed.
+            definition=lazy_fixture("magdeck_v1_def"),
+            mm_from_base=-2.5,
+            expected_result=0,
+            expected_exception_type=None,
+        ),
+        _CalculateMagnetHardwareHeightTestParams(  # V1 highest allowed.
+            definition=lazy_fixture("magdeck_v1_def"),
+            mm_from_base=20,
+            expected_result=45,
+            expected_exception_type=None,
+        ),
+        _CalculateMagnetHardwareHeightTestParams(  # V1 barely too high.
+            definition=lazy_fixture("magdeck_v1_def"),
+            mm_from_base=20.01,
+            expected_result=None,
+            expected_exception_type=errors.EngageHeightOutOfRangeError,
+        ),
+        _CalculateMagnetHardwareHeightTestParams(  # V2 barely too low.
+            definition=lazy_fixture("magdeck_v2_def"),
+            mm_from_base=-2.51,
+            expected_result=None,
+            expected_exception_type=errors.EngageHeightOutOfRangeError,
+        ),
+        _CalculateMagnetHardwareHeightTestParams(  # V2 lowest allowed.
+            definition=lazy_fixture("magdeck_v2_def"),
+            mm_from_base=-2.5,
+            expected_result=0,
+            expected_exception_type=None,
+        ),
+        _CalculateMagnetHardwareHeightTestParams(  # V2 highest allowed.
+            definition=lazy_fixture("magdeck_v2_def"),
+            mm_from_base=22.5,
+            expected_result=25,
+            expected_exception_type=None,
+        ),
+        _CalculateMagnetHardwareHeightTestParams(  # V2 barely too high.
+            definition=lazy_fixture("magdeck_v2_def"),
+            mm_from_base=22.51,
+            expected_result=None,
+            expected_exception_type=errors.EngageHeightOutOfRangeError,
+        ),
+    ],
+)
+def test_magnetic_module_view_calculate_magnet_hardware_height(
+    definition: ModuleDefinition,
+    mm_from_base: float,
+    expected_result: float,
+    expected_exception_type: Union[Type[Exception], None],
+) -> None:
+    """It should return the expected height or raise the expected exception."""
+    parent = make_module_view(
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
+        hardware_module_by_slot={
+            DeckSlotName.SLOT_1: HardwareModule(
+                serial_number="serial-number",
+                definition=definition,
+            )
+        },
+    )
+    subject = parent.get_magnetic_module_view("module-id")
+    expected_raise: ContextManager[None] = (
+        # Not sure why mypy has trouble with this.
+        nullcontext()  # type: ignore[assignment]
+        if expected_exception_type is None
+        else pytest.raises(expected_exception_type)
+    )
+    with expected_raise:
+        result = subject.calculate_magnet_hardware_height(mm_from_base=mm_from_base)
+        assert result == expected_result

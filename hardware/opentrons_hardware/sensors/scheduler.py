@@ -24,6 +24,7 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
     WriteToSensorRequestPayload,
     BaselineSensorRequestPayload,
 )
+from opentrons_hardware.firmware_bindings.messages.fields import SensorTypeField
 
 from opentrons_hardware.sensors.utils import (
     ReadSensorInformation,
@@ -54,7 +55,7 @@ class SensorScheduler:
                 node_id=sensor.node_id,
                 message=BaselineSensorRequest(
                     payload=BaselineSensorRequestPayload(
-                        sensor=UInt8Field(sensor.sensor_type),
+                        sensor=SensorTypeField(sensor.sensor_type),
                         sample_rate=UInt16Field(sensor.poll_for),
                         offset_update=UInt8Field(sensor.offset),
                     )
@@ -77,7 +78,7 @@ class SensorScheduler:
             node_id=sensor.node_id,
             message=WriteToSensorRequest(
                 payload=WriteToSensorRequestPayload(
-                    sensor=UInt8Field(sensor.sensor_type),
+                    sensor=SensorTypeField(sensor.sensor_type),
                     data=UInt32Field(sensor.data.to_int),
                 )
             ),
@@ -93,7 +94,7 @@ class SensorScheduler:
                 node_id=sensor.node_id,
                 message=ReadFromSensorRequest(
                     payload=ReadFromSensorRequestPayload(
-                        sensor=UInt8Field(sensor.sensor_type),
+                        sensor=SensorTypeField(sensor.sensor_type),
                         offset_reading=UInt8Field(sensor.offset),
                     )
                 ),
@@ -117,7 +118,7 @@ class SensorScheduler:
                 node_id=sensor.node_id,
                 message=SetSensorThresholdRequest(
                     payload=SetSensorThresholdRequestPayload(
-                        sensor=UInt8Field(sensor.sensor_type),
+                        sensor=SensorTypeField(sensor.sensor_type),
                         threshold=UInt32Field(sensor.data.to_int),
                     )
                 ),
