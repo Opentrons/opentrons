@@ -15,9 +15,8 @@ class SensorRun:
     device_id: str
     auto_zero: bool
     minutes: int
-    sample_number: int
     pipette_mount: str
-    positions: Optional[Dict[int, Any]]
+    positions: Optional[Dict[str, Any]]
 
 
 @dataclass
@@ -28,6 +27,9 @@ class CSVMetaData:
     auto_zero: bool
     start_time: str
 
+    def to_dict(self) -> Dict[str, Any]:
+        return self.__dict__
+
 
 class CSVFormatter:
     def __init__(self, csv_name: str):
@@ -36,16 +38,16 @@ class CSVFormatter:
     @classmethod
     def build(cls, metadata: CSVMetaData, header: List[str]) -> "CSVFormatter":
         date = datetime.now().date()
-        csv_name = f"{metadata.sensor}_test_{date}"
+        csv_name = f"{metadata.sensor}_test_{date}.csv"
         with open(csv_name, 'w') as cv:
             writer = csv.DictWriter(cv, fieldnames=header)
             writer.writeheader()
-            writer.writerow(metadata)
+            writer.writerow(metadata.to_dict())
         return cls(csv_name)
     
-    def write_dict(self, data: Dict) -> None:
+    def write_dict(self, data: Dict[str, Any]) -> None:
         with open(self._csv_name, 'a') as cv:
-            writer = csv.DictWriter(cv, fieldnames=data.keys())
+            writer = csv.DictWriter(cv, fieldnames=list(data.keys()))
             writer.writerow(data)
 
     def write(self, data: str) -> None:
@@ -53,65 +55,71 @@ class CSVFormatter:
             writer = csv.writer(cv, delimiter=' ')
             writer.writerow(data)
 
-
-def write_to_csv(metadata: CSVMetaData, data_to_write: Dict):
-    csv = CSVFormatter.build(metadata, data_to_write.keys())
-    csv.write_dict(data_to_write)
-    end_time = datetime.now().strftime("%H:%M:%S")
-    csv.write(end_time)
-
-
 async def handle_pressure_sensor(
-        command: SensorRun, driver: AbstractCanDriver, pipette_mount: NodeId, include_csv: bool):
+        command: SensorRun, driver: AbstractCanDriver, pipette_mount: NodeId, include_csv: bool, log) -> None:
     start_time = datetime.now()
     pressure = mmr920C04.PressureSensor()
-    # mv_manager = MoveManager(
-    #         constraints=get_system_constraints(
-    #             self._config.motion_settings, GantryLoad.NONE
-    #         )
-    #     )
+    if include_csv:
+        metadata = CSVMetaData(
+            command.device_id, command.sensor_type,
+            command.minutes, command.auto_zero, start_time.strftime("%H:%M:%S"))
+        csv = CSVFormatter.build(metadata, list(metadata.to_dict().keys()))
     delta = timedelta(minutes=command.minutes)
     while datetime.now() - start_time < delta:
         messenger = CanMessenger(driver=driver)
         messenger.start()
-        data = pressure.read(messenger, pipette_mount, timeout=3)
+        data = await pressure.read(messenger, pipette_mount, offset=False, timeout=3)
 
-        if include_csv:
-            metadata = CSVMetaData(
-                command.device_id, command.sensor_type,
-                command.repeats, command.auto_zero, start_time.strftime("%H:%M:%S"))
-            write_to_csv(metadata, data)
-
+        curr_time = datetime.now().strftime("%H:%M:%S")
+        log.info(f"Pressure data: {data} at: {curr_time}")
+        if csv:
+            csv.write_dict(data.__dict__)
+    end_time = datetime.now().strftime("%H:%M:%S")
+    log.info(f"Test ended at: {end_time}")
+    if csv:
+        csv.write(end_time)
 
 async def handle_capacitive_sensor(
-        command: SensorRun, driver: AbstractCanDriver, pipette_mount: NodeId, include_csv: bool):
+        command: SensorRun, driver: AbstractCanDriver, pipette_mount: NodeId, include_csv: bool, log) -> None:
     start_time = datetime.now()
     capacitive = fdc1004.CapacitiveSensor()
     messenger = CanMessenger(driver=driver)
     messenger.start()
+    if include_csv:
+        metadata = CSVMetaData(
+            command.device_id, command.sensor_type,
+            command.minutes, command.auto_zero, start_time.strftime("%H:%M:%S"))
+        csv = CSVFormatter.build(metadata, list(metadata.to_dict().keys()))
     # autozero
     capacitive.poll(messenger, pipette_mount, 10, timeout=10)
     delta = timedelta(minutes=command.minutes)
     while datetime.now() - start_time < delta:
-        data = capacitive.read(messenger, pipette_mount, timeout=3)
-        if include_csv:
-            metadata = CSVMetaData(
-                command.device_id, command.sensor_type,
-                command.repeats, command.auto_zero, start_time.strftime("%H:%M:%S"))
-            write_to_csv(metadata, data)
+        data = await capacitive.read(messenger, pipette_mount, offset=False, timeout=3)
+        if csv:
+            csv.write_dict(data.__dict__)
+    end_time = datetime.now().strftime("%H:%M:%S")
+    log.info(f"Test ended at: {end_time}")
+    if csv:
+        csv.write(end_time)
 
 
 async def handle_environment_sensor(
-        command: SensorRun, driver: AbstractCanDriver, pipette_mount: NodeId, include_csv: bool):
+        command: SensorRun, driver: AbstractCanDriver, pipette_mount: NodeId, include_csv: bool, log) -> None:
     start_time = datetime.now()
     environment = hdc2080.EnvironmentSensor(command.sensor_type)
     messenger = CanMessenger(driver=driver)
     messenger.start()
+    if include_csv:
+        metadata = CSVMetaData(
+            command.device_id, command.sensor_type,
+            command.minutes, command.auto_zero, start_time.strftime("%H:%M:%S"))
+        csv = CSVFormatter.build(metadata, list(metadata.to_dict().keys()))
     delta = timedelta(minutes=command.minutes)
     while datetime.now() - start_time < delta:
-        data = environment.read(messenger, pipette_mount, timeout=3)
-        if include_csv:
-            metadata = CSVMetaData(
-                command.device_id, command.sensor_type,
-                command.repeats, command.auto_zero, start_time.strftime("%H:%M:%S"))
-            write_to_csv(metadata, data)
+        data = await environment.read(messenger, pipette_mount, timeout=3)
+        if csv:
+            csv.write_dict(data.__dict__)
+    end_time = datetime.now().strftime("%H:%M:%S")
+    log.info(f"Test ended at: {end_time}")
+    if csv:
+        csv.write(end_time)
