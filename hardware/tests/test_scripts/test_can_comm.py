@@ -56,12 +56,13 @@ def test_prompt_message_with_payload(
     mock_get_input: MagicMock, mock_output: MagicMock
 ) -> None:
     """It should send a message with payload."""
-    message_id = MessageId.device_info_response
+    message_id = MessageId.write_motor_current_request
     node_id = NodeId.pipette_left
     mock_get_input.side_effect = [
         str(list(MessageId).index(message_id)),
         str(list(NodeId).index(node_id)),
         str(0xFF00FF00),
+        str(0xAA00BB00),
     ]
     r = can_comm.prompt_message(mock_get_input, mock_output)
     assert r == CanMessage(
@@ -70,7 +71,7 @@ def test_prompt_message_with_payload(
                 message_id=message_id, node_id=node_id, originating_node_id=NodeId.host
             )
         ),
-        data=b"\xff\x00\xff\x00",
+        data=b"\xff\x00\xff\x00\xAA\00\xBB\x00",
     )
 
 

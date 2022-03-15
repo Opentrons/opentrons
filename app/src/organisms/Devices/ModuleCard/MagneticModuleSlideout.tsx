@@ -14,9 +14,6 @@ import {
   TEXT_TRANSFORM_UPPERCASE,
   C_BRIGHT_GRAY,
   InputField,
-  PrimaryBtn,
-  C_BLUE,
-  TEXT_TRANSFORM_NONE,
   JUSTIFY_FLEX_END,
   COLORS,
   TYPOGRAPHY,
@@ -33,6 +30,7 @@ import {
 } from '@opentrons/shared-data'
 import { useSendModuleCommand } from '../../../redux/modules'
 import { Slideout } from '../../../atoms/Slideout'
+import { PrimaryButton } from '../../../atoms/Buttons'
 
 import type { TFunctionResult } from 'i18next'
 import type { AttachedModule } from '../../../redux/modules/types'
@@ -113,91 +111,86 @@ export const MagneticModuleSlideout = (
       title={t('set_engage_height_slideout', { name: moduleName })}
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
-    >
-      <React.Fragment>
-        <Text
-          fontWeight={FONT_WEIGHT_REGULAR}
-          fontSize={TYPOGRAPHY.fontSizeP}
-          paddingTop={SPACING_1}
-          data-testid={`Mag_Slideout_body_text_${module.model}`}
-        >
-          {t('set_engage_height_slideout_body', {
-            lower: module.model === MAGNETIC_MODULE_V1 ? 5 : 4,
-            higher: module.model === MAGNETIC_MODULE_V1 ? 40 : 16,
-          })}
-        </Text>
-        <Text
-          fontSize={TYPOGRAPHY.fontSizeH6}
-          fontWeight={FONT_WEIGHT_SEMIBOLD}
-          paddingTop={SPACING_3}
-          textTransform={TEXT_TRANSFORM_UPPERCASE}
-          paddingBottom={SPACING_2}
-          data-testid={`Mag_Slideout_body_subtitle_${module.model}`}
-        >
-          {t('set_engage_height_slideout_subtitle', { gen: info.version })}
-        </Text>
-        <Flex
-          backgroundColor={C_BRIGHT_GRAY}
-          flexDirection={DIRECTION_ROW}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-          fontWeight={FONT_WEIGHT_REGULAR}
-          fontSize={TYPOGRAPHY.fontSizeP}
-          padding={SPACING_3}
-        >
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            data-testid={`Mag_Slideout_body_data_text_${module.model}`}
-          >
-            <Text paddingBottom={SPACING_2}>
-              {t('max_engage_height_slideout')}
-            </Text>
-            <Text paddingBottom={SPACING_2}>
-              {t('labware_bottom_slideout')}
-            </Text>
-            <Text paddingBottom={SPACING_2}>{t('disengage_slideout')}</Text>
-          </Flex>
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            justifyContent={JUSTIFY_FLEX_END}
-            data-testid={`Mag_Slideout_body_data_num_${module.model}`}
-          >
-            <Text paddingBottom={SPACING_2}>{max}</Text>
-            <Text paddingBottom={SPACING_2}>{labwareBottom}</Text>
-            <Text paddingBottom={SPACING_2}>{disengageHeight}</Text>
-          </Flex>
-        </Flex>
-        <Flex
-          marginTop={SPACING_3}
-          flexDirection={DIRECTION_COLUMN}
-          data-testid={`Mag_Slideout_input_field_${module.model}`}
-        >
-          <Text
-            fontWeight={FONT_WEIGHT_REGULAR}
-            fontSize={TYPOGRAPHY.fontSizeH6}
-            color={COLORS.darkGrey}
-          >
-            {t('engage_height_slideout')}
-          </Text>
-          {/* TODO Immediately: make sure input field matches final designs */}
-          <InputField
-            units={info.units}
-            value={engageHeightValue}
-            onChange={e => setEngageHeightValue(e.target.value)}
-          />
-        </Flex>
-        <PrimaryBtn
-          backgroundColor={C_BLUE}
-          marginTop={'25rem'}
-          textTransform={TEXT_TRANSFORM_NONE}
+      height={`calc(100vh - ${SPACING_3})`}
+      footer={
+        <PrimaryButton
+          width="100%"
           onClick={handleSubmitHeight}
           disabled={engageHeightValue == null}
           data-testid={`Mag_Slideout_set_height_btn_${module.model}`}
         >
-          <Text fontWeight={FONT_WEIGHT_REGULAR} fontSize="0.6875rem">
-            {t('set_engage_height')}
+          {t('set_engage_height')}
+        </PrimaryButton>
+      }
+    >
+      <Text
+        fontWeight={FONT_WEIGHT_REGULAR}
+        fontSize={TYPOGRAPHY.fontSizeP}
+        paddingTop={SPACING_1}
+        data-testid={`Mag_Slideout_body_text_${module.model}`}
+      >
+        {t('set_engage_height_slideout_body', {
+          lower: module.model === MAGNETIC_MODULE_V1 ? 5 : 4,
+          higher: module.model === MAGNETIC_MODULE_V1 ? 40 : 16,
+        })}
+      </Text>
+      <Text
+        fontSize={TYPOGRAPHY.fontSizeH6}
+        fontWeight={FONT_WEIGHT_SEMIBOLD}
+        paddingTop={SPACING_3}
+        textTransform={TEXT_TRANSFORM_UPPERCASE}
+        paddingBottom={SPACING_2}
+        data-testid={`Mag_Slideout_body_subtitle_${module.model}`}
+      >
+        {t('set_engage_height_slideout_subtitle', { gen: info.version })}
+      </Text>
+      <Flex
+        backgroundColor={C_BRIGHT_GRAY}
+        flexDirection={DIRECTION_ROW}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        fontWeight={FONT_WEIGHT_REGULAR}
+        fontSize={TYPOGRAPHY.fontSizeP}
+        padding={SPACING_3}
+      >
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          data-testid={`Mag_Slideout_body_data_text_${module.model}`}
+        >
+          <Text paddingBottom={SPACING_2}>
+            {t('max_engage_height_slideout')}
           </Text>
-        </PrimaryBtn>
-      </React.Fragment>
+          <Text paddingBottom={SPACING_2}>{t('labware_bottom_slideout')}</Text>
+          <Text paddingBottom={SPACING_2}>{t('disengage_slideout')}</Text>
+        </Flex>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          justifyContent={JUSTIFY_FLEX_END}
+          data-testid={`Mag_Slideout_body_data_num_${module.model}`}
+        >
+          <Text paddingBottom={SPACING_2}>{max}</Text>
+          <Text paddingBottom={SPACING_2}>{labwareBottom}</Text>
+          <Text paddingBottom={SPACING_2}>{disengageHeight}</Text>
+        </Flex>
+      </Flex>
+      <Flex
+        marginTop={SPACING_3}
+        flexDirection={DIRECTION_COLUMN}
+        data-testid={`Mag_Slideout_input_field_${module.model}`}
+      >
+        <Text
+          fontWeight={FONT_WEIGHT_REGULAR}
+          fontSize={TYPOGRAPHY.fontSizeH6}
+          color={COLORS.darkGrey}
+        >
+          {t('engage_height_slideout')}
+        </Text>
+        {/* TODO Immediately: make sure input field matches final designs */}
+        <InputField
+          units={info.units}
+          value={engageHeightValue}
+          onChange={e => setEngageHeightValue(e.target.value)}
+        />
+      </Flex>
     </Slideout>
   )
 }

@@ -97,6 +97,7 @@ class RobotCalibration:
 
     @highlight
     def get_calibration_ready_locator(self) -> WebElement:
+        """Locator for calibration helper icon text"""
         return WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(
                 RobotCalibration.calibration_helper_icon_text_locator
@@ -105,6 +106,7 @@ class RobotCalibration:
 
     @highlight
     def get_robot_calibration_help_locator(self) -> WebElement:
+        """Locator for robot calibration help link"""
         return WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(
                 RobotCalibration.robot_calibration_help_link_locator
@@ -113,6 +115,7 @@ class RobotCalibration:
 
     @highlight
     def get_robot_calibration_help_modal_text(self) -> WebElement:
+        """Locator for robot calibration help modal"""
         return WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(
                 RobotCalibration.robot_calibration_help_model_text

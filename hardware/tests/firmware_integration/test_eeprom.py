@@ -16,6 +16,7 @@ from opentrons_hardware.firmware_bindings.utils import UInt16Field
 from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
 
 
+@pytest.mark.skip("eeprom simulator is broken")
 @pytest.mark.requires_emulator
 async def test_read_write(
     loop: asyncio.BaseEventLoop,

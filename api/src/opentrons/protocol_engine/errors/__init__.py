@@ -24,6 +24,7 @@ from .exceptions import (
     WrongModuleTypeError,
     ThermocyclerNotOpenError,
     RobotDoorOpenError,
+    EngageHeightOutOfRangeError,
 )
 
 from .error_occurrence import ErrorOccurrence
@@ -53,6 +54,7 @@ __all__ = [
     "WrongModuleTypeError",
     "ThermocyclerNotOpenError",
     "RobotDoorOpenError",
+    "EngageHeightOutOfRangeError",
     # error occurrence models
     "ErrorOccurrence",
 ]

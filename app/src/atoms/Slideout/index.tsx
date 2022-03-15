@@ -3,7 +3,6 @@ import { css } from 'styled-components'
 import {
   Box,
   Flex,
-  SPACING_1,
   Text,
   DIRECTION_ROW,
   DIRECTION_COLUMN,
@@ -17,16 +16,18 @@ import {
   POSITION_ABSOLUTE,
   TYPOGRAPHY,
   Overlay,
+  StyleProps,
 } from '@opentrons/components'
 
 import { Divider } from '../structure'
 
-interface Props {
+interface Props extends StyleProps {
   title: string
   children: React.ReactNode
   onCloseClick: () => unknown
   //  isExpanded is for collapse and expand animation
   isExpanded?: boolean
+  footer?: React.ReactNode
 }
 
 const EXPANDED_STYLE = css`
@@ -34,6 +35,7 @@ const EXPANDED_STYLE = css`
   animation-name: slidein;
   overflow: hidden;
   width: 19.5rem;
+  max-width: 19.5rem;
 
   @keyframes slidein {
     from {
@@ -62,49 +64,73 @@ const COLLAPSED_STYLE = css`
 `
 
 export const Slideout = (props: Props): JSX.Element | null => {
+  const {
+    isExpanded,
+    title,
+    onCloseClick,
+    children,
+    footer,
+    ...styleProps
+  } = props
   return (
     <>
-      <Overlay />
+      {isExpanded ? <Overlay /> : null}
       <Box
-        css={props.isExpanded ? EXPANDED_STYLE : COLLAPSED_STYLE}
+        css={isExpanded ? EXPANDED_STYLE : COLLAPSED_STYLE}
         position={POSITION_ABSOLUTE}
         right="0"
         top="0"
         backgroundColor={COLORS.white}
         boxShadow={'0px 3px 6px rgba(0, 0, 0, 0.23)'}
-        borderRadius={SPACING_1}
+        {...styleProps}
       >
-        <Flex padding={SPACING_3} flexDirection={DIRECTION_COLUMN}>
-          <Flex
-            flexDirection={DIRECTION_ROW}
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
-          >
-            <Text
-              fontSize={TYPOGRAPHY.fontSizeH2}
-              fontWeight={FONT_WEIGHT_SEMIBOLD}
-              data-testid={`Slideout_title_${props.title}`}
-            >
-              {props.title}
-            </Text>
-            <Flex alignItems={ALIGN_CENTER}>
-              <Btn
-                size={TYPOGRAPHY.lineHeight24}
-                onClick={props.onCloseClick}
-                aria-label="exit"
-                data-testid={`Slideout_icon_close_${props.title}`}
-              >
-                <Icon name={'close'} />
-              </Btn>
-            </Flex>
-          </Flex>
-        </Flex>
-        <Divider margin={SPACING_1} color={COLORS.medGrey} />
         <Flex
-          padding={SPACING_3}
+          paddingY={SPACING_3}
+          width="19.5rem"
+          height="100%"
           flexDirection={DIRECTION_COLUMN}
-          data-testid={`Slideout_body_${props.title}`}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
-          {props.children}
+          <Flex flex="1 1 auto" flexDirection={DIRECTION_COLUMN}>
+            <Flex
+              flexDirection={DIRECTION_ROW}
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
+              alignItems={ALIGN_CENTER}
+              paddingX={SPACING_3}
+              marginBottom={SPACING_3}
+            >
+              <Text
+                fontSize={TYPOGRAPHY.fontSizeH2}
+                fontWeight={FONT_WEIGHT_SEMIBOLD}
+                data-testid={`Slideout_title_${title}`}
+              >
+                {title}
+              </Text>
+              <Flex alignItems={ALIGN_CENTER}>
+                <Btn
+                  size={TYPOGRAPHY.lineHeight24}
+                  onClick={onCloseClick}
+                  aria-label="exit"
+                  data-testid={`Slideout_icon_close_${title}`}
+                >
+                  <Icon name={'close'} />
+                </Btn>
+              </Flex>
+            </Flex>
+            <Divider marginY={0} color={COLORS.medGrey} />
+            <Box
+              padding={SPACING_3}
+              flex="1 1 auto"
+              data-testid={`Slideout_body_${title}`}
+            >
+              {children}
+            </Box>
+          </Flex>
+          {footer != null ? (
+            <Box paddingX={SPACING_3} flex="0 0 auto">
+              {footer}
+            </Box>
+          ) : null}
         </Flex>
       </Box>
     </>

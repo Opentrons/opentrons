@@ -25,6 +25,7 @@ import { RobotSettings } from '../pages/Devices/RobotSettings'
 import { usePathCrumbs } from './hooks'
 import { ProtocolsLanding } from '../pages/Protocols/ProtocolsLanding'
 import { AppSettings } from '../organisms/AppSettings'
+import { Labware } from '../organisms/Labware'
 import { TopPortalRoot } from './portal'
 
 export interface RouteProps {
@@ -162,7 +163,7 @@ export const nextGenRoutes: RouteProps[] = [
     path: '/protocols/:protocolName/deck-setup',
   },
   {
-    component: () => <div>labware landing</div>,
+    component: Labware,
     name: 'Labware',
     navLinkTo: '/labware',
     // labwareId param is for details slideout
