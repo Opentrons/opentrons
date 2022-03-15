@@ -120,9 +120,7 @@ class ModuleView(HasState[ModuleState]):
             attached_module = self._state.hardware_module_by_slot[slot_name]
 
         except KeyError as e:
-            raise errors.ModuleDoesNotExistError(
-                f"Module {module_id} not found."
-            ) from e
+            raise errors.ModuleNotLoadedError(f"Module {module_id} not found.") from e
 
         return LoadedModule.construct(
             id=module_id,
@@ -144,11 +142,11 @@ class ModuleView(HasState[ModuleState]):
         """Return a `MagneticModuleView` for the given Magnetic Module.
 
         Raises:
-            ModuleDoesNotExistError: If module_id has not been loaded.
+            ModuleNotLoadedError: If module_id has not been loaded.
             WrongModuleTypeError: If module_id has been loaded,
                 but it's not a Magnetic Module.
         """
-        model = self.get_model(module_id=module_id)  # Propagate ModuleDoesNotExistError
+        model = self.get_model(module_id=module_id)  # Propagate ModuleNotLoadedError
         if model in [
             ModuleModel.MAGNETIC_MODULE_V1,
             ModuleModel.MAGNETIC_MODULE_V2,
