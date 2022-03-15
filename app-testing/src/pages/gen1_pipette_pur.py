@@ -39,24 +39,28 @@ class Gen1PipettePur:
 
     @highlight
     def get_gen1_pipette_mismatch_text(self) -> WebElement:
+        """Locator for gen 1 pipette mismatch text."""
         return WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(Gen1PipettePur.gen1_pipette_mismatch_text)
         )
 
     @highlight
     def get_link_pipette_compatibility(self) -> WebElement:
+        """Locator for pipette compatibility link."""
         return WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(Gen1PipettePur.link_pipette_compatibility)
         )
 
     @highlight
     def get_tip_length_calibrate_now(self) -> WebElement:
+        """Locator for tip length calibrate now button."""
         return WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(Gen1PipettePur.tip_length_calibrate_now)
         )
 
     @highlight
     def get_step2_text_locator(self) -> WebElement:
+        """Locator for step 2 text."""
         return WebDriverWait(self.driver, 2).until(
             EC.element_to_be_clickable(Gen1PipettePur.step2_text_locator)
         )

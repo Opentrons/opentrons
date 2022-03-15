@@ -4,7 +4,10 @@ import { Portal } from '../../../App/portal'
 import { useSelector } from 'react-redux'
 import { getConnectedRobotName } from '../../../redux/robot/selectors'
 import { Interstitial } from '../../../atoms/Interstitial/Interstitial'
-import { getAttachedModules } from '../../../redux/modules'
+import {
+  getAttachedModules,
+  HEATERSHAKER_MODULE_TYPE,
+} from '../../../redux/modules'
 import { Introduction } from './Introduction'
 import { KeyParts } from './KeyParts'
 import { AttachModule } from './AttachModule'
@@ -27,6 +30,7 @@ import {
 } from '@opentrons/components'
 
 import type { State } from '../../../redux/types'
+import type { HeaterShakerModule } from '../../../redux/modules/types'
 
 interface HeaterShakerWizardProps {
   onCloseClick: () => unknown
@@ -44,10 +48,9 @@ export const HeaterShakerWizard = (
   )
   const [targetProps, tooltipProps] = useHoverTooltip()
 
-  const heaterShaker = attachedModules.find(
-    //  TODO(jr, 2022-02-18): get heaterShaker module when model exists
-    module => module.model === 'magneticModuleV2'
-  )
+  const heaterShaker = (attachedModules.find(
+    module => module.type === HEATERSHAKER_MODULE_TYPE
+  ) as unknown) as HeaterShakerModule
   let isPrimaryCTAEnabled: boolean = true
 
   if (currentPage === 4) {
@@ -76,10 +79,12 @@ export const HeaterShakerWizard = (
         return <AttachAdapter />
       case 4:
         buttonContent = t('btn_test_shake')
-        return <PowerOn attachedModule={heaterShaker ?? null} />
+        return <PowerOn attachedModule={heaterShaker} />
       case 5:
         buttonContent = t('complete')
-        return <TestShake setCurrentPage={setCurrentPage} />
+        return (
+          <TestShake module={heaterShaker} setCurrentPage={setCurrentPage} />
+        )
       default:
         return null
     }

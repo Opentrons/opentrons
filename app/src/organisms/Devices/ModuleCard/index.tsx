@@ -39,8 +39,10 @@ import { AboutModuleSlideout } from './AboutModuleSlideout'
 import magneticModule from '../../../assets/images/magnetic_module_gen_2_transparent.svg'
 import temperatureModule from '../../../assets/images/temp_deck_gen_2_transparent.svg'
 import thermoModule from '../../../assets/images/thermocycler_open_transparent.svg'
+import heaterShakerModule from '../../../assets/images/heatershaker_module_transparent.svg'
 
 import type { AttachedModule } from '../../../redux/modules/types'
+import { HeaterShakerModuleData } from './HeaterShakerModuleData'
 
 interface ModuleCardProps {
   module: AttachedModule
@@ -97,6 +99,22 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         />
       )
       break
+    }
+
+    case 'heaterShakerModuleType': {
+      image = heaterShakerModule
+      moduleData = (
+        <HeaterShakerModuleData
+          heaterStatus={module.data.temperatureStatus}
+          shakerStatus={module.data.speedStatus}
+          latchStatus={module.data.labwareLatchStatus}
+          targetTemp={module.data.targetTemp}
+          currentTemp={module.data.currentTemp}
+          targetSpeed={module.data.targetSpeed}
+          currentSpeed={module.data.currentSpeed}
+          showTemperatureData={true}
+        />
+      )
     }
   }
 
@@ -241,6 +259,6 @@ const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
     )
   } else {
     // TODO(sh, 2022-02-28): render heater shaker slideout
-    return <div>Heater Shaker Slide</div>
+    return <div></div>
   }
 }

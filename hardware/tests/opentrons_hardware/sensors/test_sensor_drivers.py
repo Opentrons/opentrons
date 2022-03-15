@@ -31,6 +31,7 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
     ReadFromSensorResponsePayload,
     SensorThresholdResponsePayload,
 )
+from opentrons_hardware.firmware_bindings.messages.fields import SensorTypeField
 from opentrons_hardware.sensors.utils import SensorDataType
 
 
@@ -66,7 +67,7 @@ def humidity_sensor() -> hdc2080.EnvironmentSensor:
             NodeId.pipette_left,
             BaselineSensorRequest(
                 payload=BaselineSensorRequestPayload(
-                    sensor=UInt8Field(SensorType.pressure),
+                    sensor=SensorTypeField(SensorType.pressure),
                     sample_rate=UInt16Field(10),
                     offset_update=UInt8Field(False),
                 )
@@ -77,7 +78,7 @@ def humidity_sensor() -> hdc2080.EnvironmentSensor:
             NodeId.pipette_left,
             BaselineSensorRequest(
                 payload=BaselineSensorRequestPayload(
-                    sensor=UInt8Field(SensorType.capacitive),
+                    sensor=SensorTypeField(SensorType.capacitive),
                     sample_rate=UInt16Field(10),
                     offset_update=UInt8Field(False),
                 )
@@ -114,7 +115,7 @@ async def test_receive_data_polling(
             ReadFromSensorResponse(
                 payload=ReadFromSensorResponsePayload(
                     sensor_data=UInt32Field(0x100),
-                    sensor=UInt8Field(sensor._sensor_type),
+                    sensor=SensorTypeField(sensor._sensor_type),
                 )
             ),
             ArbitrationId(
@@ -140,7 +141,7 @@ async def test_receive_data_polling(
             NodeId.pipette_left,
             WriteToSensorRequest(
                 payload=WriteToSensorRequestPayload(
-                    sensor=UInt8Field(SensorType.pressure),
+                    sensor=SensorTypeField(SensorType.pressure),
                     data=UInt32Field(SensorDataType.build([0x2, 0x2, 0x0, 0x0]).to_int),
                 )
             ),
@@ -150,7 +151,7 @@ async def test_receive_data_polling(
             NodeId.pipette_left,
             WriteToSensorRequest(
                 payload=WriteToSensorRequestPayload(
-                    sensor=UInt8Field(SensorType.capacitive),
+                    sensor=SensorTypeField(SensorType.capacitive),
                     data=UInt32Field(SensorDataType.build([0x2, 0x2, 0x0, 0x0]).to_int),
                 )
             ),
@@ -160,7 +161,7 @@ async def test_receive_data_polling(
             NodeId.pipette_left,
             WriteToSensorRequest(
                 payload=WriteToSensorRequestPayload(
-                    sensor=UInt8Field(SensorType.temperature),
+                    sensor=SensorTypeField(SensorType.temperature),
                     data=UInt32Field(SensorDataType.build([0x2, 0x2, 0x0, 0x0]).to_int),
                 )
             ),
@@ -170,7 +171,7 @@ async def test_receive_data_polling(
             NodeId.pipette_left,
             WriteToSensorRequest(
                 payload=WriteToSensorRequestPayload(
-                    sensor=UInt8Field(SensorType.humidity),
+                    sensor=SensorTypeField(SensorType.humidity),
                     data=UInt32Field(SensorDataType.build([0x2, 0x2, 0x0, 0x0]).to_int),
                 )
             ),
@@ -195,7 +196,7 @@ async def test_write(
             NodeId.pipette_left,
             ReadFromSensorRequest(
                 payload=ReadFromSensorRequestPayload(
-                    sensor=UInt8Field(SensorType.pressure),
+                    sensor=SensorTypeField(SensorType.pressure),
                     offset_reading=UInt8Field(False),
                 )
             ),
@@ -205,7 +206,7 @@ async def test_write(
             NodeId.pipette_left,
             ReadFromSensorRequest(
                 payload=ReadFromSensorRequestPayload(
-                    sensor=UInt8Field(SensorType.capacitive),
+                    sensor=SensorTypeField(SensorType.capacitive),
                     offset_reading=UInt8Field(False),
                 )
             ),
@@ -215,7 +216,7 @@ async def test_write(
             NodeId.pipette_left,
             ReadFromSensorRequest(
                 payload=ReadFromSensorRequestPayload(
-                    sensor=UInt8Field(SensorType.temperature),
+                    sensor=SensorTypeField(SensorType.temperature),
                     offset_reading=UInt8Field(False),
                 )
             ),
@@ -225,7 +226,7 @@ async def test_write(
             NodeId.pipette_left,
             ReadFromSensorRequest(
                 payload=ReadFromSensorRequestPayload(
-                    sensor=UInt8Field(SensorType.humidity),
+                    sensor=SensorTypeField(SensorType.humidity),
                     offset_reading=UInt8Field(False),
                 )
             ),
@@ -263,7 +264,7 @@ async def test_receive_data_read(
             ReadFromSensorResponse(
                 payload=ReadFromSensorResponsePayload(
                     sensor_data=UInt32Field(0x100),
-                    sensor=UInt8Field(sensor._sensor_type),
+                    sensor=SensorTypeField(sensor._sensor_type),
                 )
             ),
             ArbitrationId(
@@ -297,7 +298,8 @@ async def test_threshold(
         can_message_notifier.notify(
             SensorThresholdResponse(
                 payload=SensorThresholdResponsePayload(
-                    threshold=UInt32Field(0x5), sensor=UInt8Field(sensor._sensor_type)
+                    threshold=UInt32Field(0x5),
+                    sensor=SensorTypeField(sensor._sensor_type),
                 )
             ),
             ArbitrationId(
