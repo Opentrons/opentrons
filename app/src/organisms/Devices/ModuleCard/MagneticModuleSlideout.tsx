@@ -208,6 +208,8 @@ export const MagneticModuleSlideout = (
           {t('engage_height_slideout')}
         </Text>
         <InputField
+          data-testid={`${module.model}`}
+          id={`${module.model}`}
           autoFocus
           units={info.units}
           value={engageHeightValue}

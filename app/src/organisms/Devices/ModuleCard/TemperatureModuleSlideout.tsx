@@ -10,19 +10,16 @@ import {
   COLORS,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
-import {
-  CELSIUS,
-  getModuleDisplayName,
-  TEMPERATURE_MODULE_V1,
-  TEMPERATURE_MODULE_V2,
-} from '@opentrons/shared-data'
+import { CELSIUS, getModuleDisplayName } from '@opentrons/shared-data'
 import { Slideout } from '../../../atoms/Slideout'
 import { PrimaryButton } from '../../../atoms/Buttons'
 import { InputField } from '../../../atoms/InputField'
 import { TemperatureModuleSetTargetTemperatureCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
+import type { AttachedModule } from '../../../redux/modules/types'
+
 interface TemperatureModuleSlideoutProps {
-  model: typeof TEMPERATURE_MODULE_V1 | typeof TEMPERATURE_MODULE_V2
+  module: AttachedModule
   onCloseClick: () => unknown
   isExpanded: boolean
 }
@@ -30,10 +27,10 @@ interface TemperatureModuleSlideoutProps {
 export const TemperatureModuleSlideout = (
   props: TemperatureModuleSlideoutProps
 ): JSX.Element | null => {
-  const { model, onCloseClick, isExpanded } = props
+  const { module, onCloseClick, isExpanded } = props
   const { t } = useTranslation('device_details')
   const { createLiveCommand } = useCreateLiveCommandMutation()
-  const name = getModuleDisplayName(model)
+  const name = getModuleDisplayName(module.model)
   const [temperatureValue, setTemperatureValue] = React.useState<string | null>(
     null
   )
@@ -100,6 +97,8 @@ export const TemperatureModuleSlideout = (
           {t('temperature')}
         </Text>
         <InputField
+          id={`${module.model}`}
+          data-testid={`${module.model}`}
           autoFocus
           units={CELSIUS}
           value={temperatureValue}

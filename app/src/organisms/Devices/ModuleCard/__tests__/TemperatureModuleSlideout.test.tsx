@@ -3,20 +3,17 @@ import { i18n } from '../../../../i18n'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import {
-  TEMPERATURE_MODULE_V1,
-  TEMPERATURE_MODULE_V2,
-} from '@opentrons/shared-data'
-import { InputField } from '../../../../atoms/InputField'
 import { TemperatureModuleSlideout } from '../TemperatureModuleSlideout'
+import {
+  mockTemperatureModule,
+  mockTemperatureModuleGen2,
+} from '../../../../redux/modules/__fixtures__'
 
 jest.mock('@opentrons/react-api-client')
-jest.mock('../../../../atoms/InputField')
 
 const mocUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
 >
-const mockInputField = InputField as jest.MockedFunction<typeof InputField>
 
 const render = (
   props: React.ComponentProps<typeof TemperatureModuleSlideout>
@@ -28,16 +25,17 @@ const render = (
 
 describe('TemperatureModuleSlideout', () => {
   let props: React.ComponentProps<typeof TemperatureModuleSlideout>
-  const mockCreateCommand = jest.fn()
+  let mockCreateLiveCommand = jest.fn()
+
   beforeEach(() => {
+    mockCreateLiveCommand = jest.fn()
     props = {
-      model: TEMPERATURE_MODULE_V1,
+      module: mockTemperatureModule,
       isExpanded: true,
       onCloseClick: jest.fn(),
     }
-    mockInputField.mockReturnValue(<div></div>)
     mocUseLiveCommandMutation.mockReturnValue({
-      createCommand: mockCreateCommand,
+      createLiveCommand: mockCreateLiveCommand,
     } as any)
   })
   afterEach(() => {
@@ -56,7 +54,7 @@ describe('TemperatureModuleSlideout', () => {
 
   it('renders correct title and body for a gen2 temperature module', () => {
     props = {
-      model: TEMPERATURE_MODULE_V2,
+      module: mockTemperatureModuleGen2,
       isExpanded: true,
       onCloseClick: jest.fn(),
     }
@@ -70,11 +68,22 @@ describe('TemperatureModuleSlideout', () => {
   })
 
   it('renders the button and it is not clickable until there is something in form field', () => {
-    const { getByRole } = render(props)
+    const { getByRole, getByTestId } = render(props)
     const button = getByRole('button', { name: 'Set Temperature' })
-    expect(button).not.toBeEnabled()
-    mockInputField.mockReturnValue(<div>6 C</div>)
+    const input = getByTestId('temperatureModuleV1')
+    fireEvent.change(input, { target: { value: '20' } })
+    expect(button).toBeEnabled()
     fireEvent.click(button)
+
+    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
+      command: {
+        commandType: 'temperatureModule/setTargetTemperature',
+        params: {
+          moduleId: mockTemperatureModule.id,
+          temperature: 20,
+        },
+      },
+    })
     expect(button).not.toBeEnabled()
   })
 })

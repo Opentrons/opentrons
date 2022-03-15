@@ -123,6 +123,8 @@ export const ThermocyclerModuleSlideout = (
           {t('temperature')}
         </Text>
         <InputField
+          data-testid={`${module.model}_${isSecondaryTemp}`}
+          id={`${module.model}_${isSecondaryTemp}`}
           autoFocus
           units={'°C'}
           value={tempValue}

@@ -3,18 +3,15 @@ import { renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/react'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { i18n } from '../../../../i18n'
-import { InputField } from '../../../../atoms/InputField'
 import { ThermocyclerModuleSlideout } from '../ThermocyclerModuleSlideout'
 
 import { mockThermocycler } from '../../../../redux/modules/__fixtures__'
 
 jest.mock('@opentrons/react-api-client')
-jest.mock('../../../../atoms/InputField')
 
-const mocUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
+const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
 >
-const mockInputField = InputField as jest.MockedFunction<typeof InputField>
 
 const render = (
   props: React.ComponentProps<typeof ThermocyclerModuleSlideout>
@@ -26,11 +23,11 @@ const render = (
 
 describe('ThermocyclerModuleSlideout', () => {
   let props: React.ComponentProps<typeof ThermocyclerModuleSlideout>
-  const mockCreateCommand = jest.fn()
+  let mockCreateLiveCommand = jest.fn()
   beforeEach(() => {
-    mockInputField.mockReturnValue(<div></div>)
-    mocUseLiveCommandMutation.mockReturnValue({
-      createCommand: mockCreateCommand,
+    mockCreateLiveCommand = jest.fn()
+    mockUseLiveCommandMutation.mockReturnValue({
+      createLiveCommand: mockCreateLiveCommand,
     } as any)
   })
   afterEach(() => {
@@ -78,11 +75,22 @@ describe('ThermocyclerModuleSlideout', () => {
       isExpanded: true,
       onCloseClick: jest.fn(),
     }
-    const { getByRole } = render(props)
+    const { getByRole, getByTestId } = render(props)
     const button = getByRole('button', { name: 'Set Block Temperature' })
-    expect(button).not.toBeEnabled()
-    mockInputField.mockReturnValue(<div>12 C</div>)
+    const input = getByTestId('thermocyclerModuleV1_false')
+    fireEvent.change(input, { target: { value: '45' } })
+    expect(button).toBeEnabled()
     fireEvent.click(button)
+
+    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
+      command: {
+        commandType: 'thermocycler/setTargetBlockTemperature',
+        params: {
+          moduleId: mockThermocycler.id,
+          temperature: 45,
+        },
+      },
+    })
     expect(button).not.toBeEnabled()
   })
 
@@ -93,11 +101,22 @@ describe('ThermocyclerModuleSlideout', () => {
       isExpanded: true,
       onCloseClick: jest.fn(),
     }
-    const { getByRole } = render(props)
+    const { getByRole, getByTestId } = render(props)
     const button = getByRole('button', { name: 'Set Lid Temperature' })
-    expect(button).not.toBeEnabled()
-    mockInputField.mockReturnValue(<div>40 C</div>)
+    const input = getByTestId('thermocyclerModuleV1_true')
+    fireEvent.change(input, { target: { value: '45' } })
+    expect(button).toBeEnabled()
     fireEvent.click(button)
+
+    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
+      command: {
+        commandType: 'thermocycler/setTargetLidTemperature',
+        params: {
+          moduleId: mockThermocycler.id,
+          temperature: 45,
+        },
+      },
+    })
     expect(button).not.toBeEnabled()
   })
 })

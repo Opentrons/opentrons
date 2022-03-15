@@ -1,23 +1,16 @@
 import * as React from 'react'
-import {
-  partialComponentPropsMatcher,
-  renderWithProviders,
-} from '@opentrons/components'
+import { renderWithProviders } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../../i18n'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
-import { InputField } from '../../../../atoms/InputField'
 import { HeaterShakerSlideout } from '../HeaterShakerSlideout'
-import { when } from 'jest-when'
 
 jest.mock('@opentrons/react-api-client')
-jest.mock('../../../../atoms/InputField')
 
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
 >
-const mockInputField = InputField as jest.MockedFunction<typeof InputField>
 
 const render = (props: React.ComponentProps<typeof HeaterShakerSlideout>) => {
   return renderWithProviders(<HeaterShakerSlideout {...props} />, {
@@ -27,15 +20,15 @@ const render = (props: React.ComponentProps<typeof HeaterShakerSlideout>) => {
 
 describe('HeaterShakerSlideout', () => {
   let props: React.ComponentProps<typeof HeaterShakerSlideout>
-  let mockCreateCommand = jest.fn()
+  let mockCreateLiveCommand = jest.fn()
 
   beforeEach(() => {
-    mockCreateCommand = jest.fn()
-    mockInputField.mockReturnValue(<div></div>)
+    mockCreateLiveCommand = jest.fn()
     mockUseLiveCommandMutation.mockReturnValue({
-      createCommand: mockCreateCommand,
+      createLiveCommand: mockCreateLiveCommand,
     } as any)
   })
+
   afterEach(() => {
     jest.resetAllMocks()
   })
@@ -77,25 +70,23 @@ describe('HeaterShakerSlideout', () => {
       isExpanded: true,
       onCloseClick: jest.fn(),
     }
-    const { getByRole } = render(props)
+
+    const { getByRole, getByTestId } = render(props)
     const button = getByRole('button', { name: 'Set Shake Speed' })
-    expect(button).not.toBeEnabled()
-    when(mockInputField)
-      .calledWith(partialComponentPropsMatcher({ id: 'input' }))
-      .mockReturnValue(<div>300 RPM</div>)
-    // const input = getByTestId('input')
-    // fireEvent.change(input, { target: { value: ' 300 RPM' } })
-    // expect(button).toBeEnabled()
+    const input = getByTestId('heaterShakerModuleV1_true')
+    fireEvent.change(input, { target: { value: '300' } })
+    expect(button).toBeEnabled()
     fireEvent.click(button)
-    // expect(mockCreateCommand).toHaveBeenCalledWith({
-    //   command: {
-    //     commandType: 'heaterShakerModule/setTargetShakeSpeed',
-    //     params: {
-    //       moduleId: 'heatershaker_id',
-    //       rpm: 300,
-    //     },
-    //   },
-    // })
+
+    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
+      command: {
+        commandType: 'heaterShakerModule/setTargetShakeSpeed',
+        params: {
+          moduleId: 'heatershaker_id',
+          rpm: 300,
+        },
+      },
+    })
     expect(button).not.toBeEnabled()
   })
 
@@ -106,11 +97,21 @@ describe('HeaterShakerSlideout', () => {
       isExpanded: true,
       onCloseClick: jest.fn(),
     }
-    const { getByRole } = render(props)
+    const { getByRole, getByTestId } = render(props)
     const button = getByRole('button', { name: 'Set Temperature' })
-    expect(button).not.toBeEnabled()
-    mockInputField.mockReturnValue(<div>40 C</div>)
+    const input = getByTestId('heaterShakerModuleV1_false')
+    fireEvent.change(input, { target: { value: '20' } })
+    expect(button).toBeEnabled()
     fireEvent.click(button)
+
+    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
+      command: {
+        commandType: 'heaterShakerModule/awaitTemperature',
+        params: {
+          moduleId: 'heatershaker_id',
+        },
+      },
+    })
     expect(button).not.toBeEnabled()
   })
 })

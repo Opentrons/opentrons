@@ -253,7 +253,7 @@ const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
   } else if (module.type === TEMPERATURE_MODULE_TYPE) {
     return (
       <TemperatureModuleSlideout
-        model={module.model}
+        module={module}
         onCloseClick={onCloseClick}
         isExpanded={showSlideout}
       />
