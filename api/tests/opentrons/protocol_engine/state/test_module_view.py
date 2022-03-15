@@ -58,7 +58,7 @@ def test_initial_module_data_by_id() -> None:
     """It should raise if module ID doesn't exist."""
     subject = make_module_view()
 
-    with pytest.raises(errors.ModuleDoesNotExistError):
+    with pytest.raises(errors.ModuleNotLoadedError):
         subject.get("helloWorld")
 
 
@@ -66,7 +66,7 @@ def test_get_missing_hardware() -> None:
     """It should raise if no loaded hardware."""
     subject = make_module_view(slot_by_module_id={"module-id": DeckSlotName.SLOT_1})
 
-    with pytest.raises(errors.ModuleDoesNotExistError):
+    with pytest.raises(errors.ModuleNotLoadedError):
         subject.get("module-id")
 
 
@@ -174,7 +174,7 @@ def test_get_magnetic_module_view(
     with pytest.raises(errors.WrongModuleTypeError):
         subject.get_magnetic_module_view(module_id="temperature-module-id")
 
-    with pytest.raises(errors.ModuleDoesNotExistError):
+    with pytest.raises(errors.ModuleNotLoadedError):
         subject.get_magnetic_module_view(module_id="nonexistent-module-id")
 
 
