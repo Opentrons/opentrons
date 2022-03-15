@@ -30,7 +30,7 @@ class ConfigAnalyzer:
     @staticmethod
     def analyze(main_file: RoleAnalysisFile) -> ConfigAnalysis:
         """Analyze the main file of a protocol to identify its config and metadata."""
-        if isinstance(main_file.data, (JsonProtocol, ProtocolSchemaV6)):
+        if isinstance(main_file.data, (ProtocolSchemaV5, ProtocolSchemaV6)):
             return ConfigAnalysis(
                 metadata=main_file.data.metadata.dict(exclude_none=True),
                 config=JsonProtocolConfig(schema_version=main_file.data.schemaVersion),
