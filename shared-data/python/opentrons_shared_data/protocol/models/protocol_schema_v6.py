@@ -139,7 +139,7 @@ class ProtocolSchemaV6(BaseModel):
         ...,
         alias="$otSharedSchema",
         description="The path to a valid Opentrons shared schema relative to "
-                    "the shared-data directory, without its extension.",
+        "the shared-data directory, without its extension.",
     )
     schemaVersion: Literal[6]
     metadata: Metadata
