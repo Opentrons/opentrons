@@ -40,22 +40,28 @@ async def input_task(
 
     def prompt_with_io(promptstr: str) -> str:
         output_file.write(promptstr)
-        return input_file.readline()
+        userinput =  input_file.readline()
+        if userinput.lower().strip() in ['exit', 'quit']:
+            raise SystemExit()
+        return userinput
+
+    def write_with_newline(outstr: str) -> None:
+        output_file.write(outstr + "\n")
 
     async with output_lock:
         can_message = await asyncio.get_event_loop().run_in_executor(
-            None, prompt_message, prompt_with_io, output_file.write
+            None, prompt_message, prompt_with_io, write_with_newline
         )
     await can_driver.send(can_message)
     while True:
         try:
             # Run sync prompt message in threadpool executor.
             can_message = await asyncio.get_event_loop().run_in_executor(
-                None, prompt_message, prompt_with_io, output_file.write
+                None, prompt_message, prompt_with_io, write_with_newline, True
             )
             await can_driver.send(can_message)
         except InvalidInput as e:
-            output_file.write(str(e))
+            output_file.write(str(e) + '\n')
 
 
 async def run(args: argparse.Namespace) -> None:
