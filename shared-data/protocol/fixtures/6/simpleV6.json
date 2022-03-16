@@ -1257,9 +1257,6 @@
       "params": {
         "pipetteId": "pipetteId",
         "mount": "left"
-      },
-      "result": {
-        "pipetteId": "pipetteId"
       }
     },
     {

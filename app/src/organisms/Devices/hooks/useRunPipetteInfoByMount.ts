@@ -59,7 +59,7 @@ export function useRunPipetteInfoByMount(
 
   return Object.entries(pipettes).reduce((acc, [pipetteId, pipette]) => {
     const loadCommand = loadPipetteCommands.find(
-      command => command.result?.pipetteId === pipetteId
+      command => command.params?.pipetteId === pipetteId
     )
 
     if (loadCommand != null) {
