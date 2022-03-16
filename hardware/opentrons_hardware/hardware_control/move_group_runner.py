@@ -30,9 +30,6 @@ from opentrons_hardware.firmware_bindings.utils import (
     UInt32Field,
     Int32Field,
 )
-from opentrons_hardware.hardware_control.motion_planning.move_utils import (
-    MoveConditionNotMet,
-)
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 
 log = logging.getLogger(__name__)
@@ -165,7 +162,6 @@ class MoveScheduler:
         if isinstance(message, MoveCompleted):
             seq_id = message.payload.seq_id.value
             group_id = message.payload.group_id.value
-            ack_id = message.payload.ack_id.value
             node_id = arbitration_id.parts.originating_node_id
             log.info(
                 f"Received completion for {node_id} group {group_id} seq {seq_id}"
