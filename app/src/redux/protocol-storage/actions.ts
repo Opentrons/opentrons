@@ -14,6 +14,9 @@ export const UPDATE_PROTOCOL_LIST_FAILURE: 'protocolStorage:UPDATE_PROTOCOL_LIST
 export const ADD_PROTOCOL: 'protocolStorage:ADD_PROTOCOL' =
   'protocolStorage:ADD_PROTOCOL'
 
+export const REMOVE_PROTOCOL: 'protocolStorage:REMOVE_PROTOCOL' =
+  'protocolStorage:REMOVE_PROTOCOL'
+
 export const ADD_PROTOCOL_FAILURE: 'protocolStorage:ADD_PROTOCOL_FAILURE' =
   'protocolStorage:ADD_PROTOCOL_FAILURE'
 
@@ -60,6 +63,14 @@ export const addProtocol = (
 ): Types.AddProtocolAction => ({
   type: ADD_PROTOCOL,
   payload: { protocolFilePath },
+  meta: { shell: true },
+})
+
+export const removeProtocol = (
+  protocolKey: string
+): Types.RemoveProtocolAction => ({
+  type: REMOVE_PROTOCOL,
+  payload: { protocolKey },
   meta: { shell: true },
 })
 

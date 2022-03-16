@@ -19,9 +19,6 @@ import {
 import { Link } from 'react-router-dom'
 
 import { StyledText } from '../../atoms/text'
-import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
-import { MenuList } from '../../atoms/MenuList'
-import { MenuItem } from '../../atoms/MenuItem'
 import { ModuleIcon } from '../../molecules/ModuleIcon'
 
 import { StoredProtocolData } from '../../redux/protocol-storage'
@@ -33,7 +30,6 @@ type ProtocolCardProps = StoredProtocolData
 export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   const { t } = useTranslation('protocol_list')
   const { protocolKey, srcFileNames, mostRecentAnalysis, modified } = props
-  const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
 
   const [
     protocolData,
@@ -77,7 +73,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
           }) ?? ''
         ]?.name ?? ''
       : ''
-  const requiredModuleTypes = map(modules, ({ model }, moduleId) =>
+  const requiredModuleTypes = map(modules, ({ model }, _moduleId) =>
     getModuleType(model)
   )
 
@@ -106,40 +102,58 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
           >
             DECKMAP TODO
           </Box>
-          <StyledText as="h3" marginBottom={SPACING.spacing4} height="2.75rem">
-            {protocolName}
-          </StyledText>
-          <Flex>
-            <Flex flexDirection="column" marginRight={SPACING.spacing4}>
-              <StyledText as="h6">robot</StyledText>
-              <StyledText as="p">{robotModel}</StyledText>
-            </Flex>
-            <Flex flexDirection="column" marginRight={SPACING.spacing4}>
-              <StyledText as="h6">left mount</StyledText>
-              <StyledText as="p">{leftMountPipetteName}</StyledText>
-            </Flex>
-            <Flex flexDirection="column" marginRight={SPACING.spacing4}>
-              <StyledText as="h6">right mount</StyledText>
-              <StyledText as="p">{rightMountPipetteName}</StyledText>
-            </Flex>
-            <Flex flexDirection="column" marginRight={SPACING.spacing4}>
-              <StyledText as="h6">modules</StyledText>
-              <Flex>
-                {requiredModuleTypes.map((moduleType, index) => (
-                  <ModuleIcon
-                    key={index}
-                    moduleType={moduleType}
-                    height="1rem"
-                    marginRight={SPACING.spacing3}
-                  />
-                ))}
+          <Flex flexDirection={DIRECTION_COLUMN} marginRight={SPACING.spacing4}>
+            <StyledText
+              as="h3"
+              marginBottom={SPACING.spacing4}
+              height="2.75rem"
+            >
+              {protocolName}
+            </StyledText>
+            <Flex>
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                marginRight={SPACING.spacing4}
+              >
+                <StyledText as="h6">robot</StyledText>
+                <StyledText as="p">{robotModel}</StyledText>
+              </Flex>
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                marginRight={SPACING.spacing4}
+              >
+                <StyledText as="h6">left mount</StyledText>
+                <StyledText as="p">{leftMountPipetteName}</StyledText>
+              </Flex>
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                marginRight={SPACING.spacing4}
+              >
+                <StyledText as="h6">right mount</StyledText>
+                <StyledText as="p">{rightMountPipetteName}</StyledText>
+              </Flex>
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                marginRight={SPACING.spacing4}
+              >
+                <StyledText as="h6">modules</StyledText>
+                <Flex>
+                  {requiredModuleTypes.map((moduleType, index) => (
+                    <ModuleIcon
+                      key={index}
+                      moduleType={moduleType}
+                      height="1rem"
+                      marginRight={SPACING.spacing3}
+                    />
+                  ))}
+                </Flex>
               </Flex>
             </Flex>
           </Flex>
         </Flex>
 
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <ProtocolOverflowMenu handleRunProtocol={() => console.log('TODO: handle run protocol')}/>
+          <ProtocolOverflowMenu protocolKey={protocolKey} />
           <StyledText as="label" position="absolute" bottom="1rem" right="1rem">
             {t('last_updated_at', {
               date: format(new Date(modified), 'M/d/yyyy'),
