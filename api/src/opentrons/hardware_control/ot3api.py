@@ -479,36 +479,6 @@ class OT3API(
             axes = [OT3Axis.Z_R, OT3Axis.Z_L]
         await self.home(axes)
 
-    async def _do_plunger_home(
-        self,
-        axis: Optional[OT3Axis] = None,
-        mount: Optional[OT3Mount] = None,
-        acquire_lock: bool = True,
-    ) -> None:
-        assert (axis is not None) ^ (mount is not None), "specify either axis or mount"
-        if axis:
-            checked_axis = axis
-            checked_mount = OT3Axis.to_mount(checked_axis)
-        if mount:
-            checked_mount = mount
-            checked_axis = OT3Axis.of_main_tool_actuator(checked_mount)
-        instr = self._instrument_handler.hardware_instruments[checked_mount]
-        if not instr:
-            return
-        async with contextlib.AsyncExitStack() as stack:
-            if acquire_lock:
-                await stack.enter_async_context(self._motion_lock)
-            with self._backend.save_current():
-                self._backend.set_active_current(
-                    {checked_axis: instr.config.plunger_current}
-                )
-                await self.home([checked_axis])
-                # either we were passed False for our acquire_lock and we
-                # should pass it on, or we acquired the lock above and
-                # shouldn't do it again
-                # TODO(cm, 2/28/22): confirm that we don't need to move plunger
-                #  to bottom during a home
-
     async def home_plunger(self, mount: Union[top_types.Mount, OT3Mount]) -> None:
         """
         Home the plunger motor for a mount, and then return it to the 'bottom'
@@ -525,7 +495,6 @@ class OT3API(
             await self._move(target_pos, acquire_lock=False, home_flagged_axes=False)
 
             await self.current_position(mount=checked_mount, refresh=True)
-        # await self._do_plunger_home(mount=checked_mount, acquire_lock=True)
 
     @lru_cache(1)
     def _carriage_offset(self) -> top_types.Point:

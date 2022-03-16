@@ -117,17 +117,17 @@ async def test_move(hardware_api):
     # relative moves; if you change this to move_to, the offset will be
     # applied again
     abs_position = types.Point(30, 20, 0)
-    # mount2 = types.Mount.LEFT
-    # target_position2 = {
-    #     Axis.X: 60,
-    #     Axis.Y: 40,
-    #     Axis.Z: 208,
-    #     Axis.A: 218,  # The other instrument is retracted
-    #     Axis.B: 19,
-    #     Axis.C: 19,
-    # }
-    await hardware_api.move_to(mount, abs_position)
-    # assert hardware_api._current_position == target_position2
+    mount2 = types.Mount.LEFT
+    target_position2 = {
+        Axis.X: 60,
+        Axis.Y: 40,
+        Axis.Z: 208,
+        Axis.A: 218,  # The other instrument is retracted
+        Axis.B: 19,
+        Axis.C: 19,
+    }
+    await hardware_api.move_to(mount2, abs_position)
+    assert hardware_api._current_position == target_position2
 
 
 async def test_move_extras_passed_through(hardware_api, monkeypatch):

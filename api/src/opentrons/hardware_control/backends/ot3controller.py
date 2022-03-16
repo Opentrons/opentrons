@@ -218,14 +218,6 @@ class OT3Controller:
         Returns:
             None
         """
-        # breakpoint()
-        # for ax in axes:
-        #     breakpoint()
-        #     upper = self.axis_bounds[ax[0]][1]
-        #     lower = self.axis_bounds[ax[0]][0]        # for ax in axes:
-        #     breakpoint()
-        #     upper = self.axis_bounds[ax[0]][1]
-        #     lower = self.axis_bounds[ax[0]][0]
         distances = {
             ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0] for ax in axes
         }
