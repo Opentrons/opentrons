@@ -210,13 +210,10 @@ class OT3Controller:
         """Home each axis passed in, and reset the positions to 0.
 
         Args:
-            target_position: Map of axis to position.
-            home_flagged_axes: Whether to home afterwords.
-            speed: Optional speed
-            axis_max_speeds: Optional map of axis to speed.
+            axes: List[OT3Axis]
 
         Returns:
-            None
+            A dictionary containing the new positions of each axis
         """
         distances = {
             ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0] for ax in axes

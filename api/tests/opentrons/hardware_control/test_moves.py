@@ -116,7 +116,7 @@ async def test_move(hardware_api):
     # This assert implicitly checks that the mount offset is not applied to
     # relative moves; if you change this to move_to, the offset will be
     # applied again
-    abs_position = types.Point(30, 20, 0)
+    rel_position = types.Point(30, 20, -10)
     mount2 = types.Mount.LEFT
     target_position2 = {
         Axis.X: 60,
@@ -126,7 +126,7 @@ async def test_move(hardware_api):
         Axis.B: 19,
         Axis.C: 19,
     }
-    await hardware_api.move_to(mount2, abs_position)
+    await hardware_api.move_rel(mount2, rel_position)
     assert hardware_api._current_position == target_position2
 
 

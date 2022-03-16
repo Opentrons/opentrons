@@ -69,7 +69,6 @@ async def test_home(controller: OT3Controller, mock_move_group_run, axes):
     assert home_move.acceleration_mm_sec_sq == 0
     assert home_move.move_type == MoveType.home
     assert home_move.stop_condition == MoveStopCondition.limit_switch
-    # assert home_pos[OT3Axis.X] == 0
     mock_move_group_run.assert_called_once()
 
 
