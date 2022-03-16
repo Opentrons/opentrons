@@ -10547,7 +10547,10 @@
         "volume": 100,
         "labwareId": "60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1",
         "wellName": "A1",
-        "wellLocation": {"origin": "bottom", "offset": { "x": 0, "y": 0, "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 1 }
+        },
         "flowRate": 137.35
       }
     },
@@ -10559,7 +10562,10 @@
         "volume": 100,
         "labwareId": "60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1",
         "wellName": "A1",
-        "wellLocation": {"origin": "bottom", "offset": { "x": 0, "y": 0, "z": 0.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 0.5 }
+        },
         "flowRate": 137.35
       }
     },
@@ -10589,7 +10595,10 @@
         "volume": 100,
         "labwareId": "60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1",
         "wellName": "B1",
-        "wellLocation": {"origin": "bottom", "offset": { "x": 0, "y": 0, "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 1 }
+        },
         "flowRate": 137.35
       }
     },
@@ -10601,7 +10610,10 @@
         "volume": 100,
         "labwareId": "60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1",
         "wellName": "A1",
-        "wellLocation": {"origin": "bottom", "offset": { "x": 0, "y": 0, "z": 0.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 0.5 }
+        },
         "flowRate": 137.35
       }
     },
@@ -10631,7 +10643,10 @@
         "volume": 100,
         "labwareId": "60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1",
         "wellName": "A2",
-        "wellLocation": {"origin": "bottom", "offset": { "x": 0, "y": 0, "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 1 }
+        },
         "flowRate": 137.35
       }
     },
@@ -10643,7 +10658,10 @@
         "volume": 100,
         "labwareId": "60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1",
         "wellName": "A1",
-        "wellLocation": {"origin": "bottom", "offset": { "x": 0, "y": 0, "z": 0.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 0.5 }
+        },
         "flowRate": 137.35
       }
     },
@@ -10673,7 +10691,10 @@
         "volume": 100,
         "labwareId": "60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1",
         "wellName": "B2",
-        "wellLocation": {"origin": "bottom", "offset": { "x": 0, "y": 0, "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 1 }
+        },
         "flowRate": 137.35
       }
     },
@@ -10685,7 +10706,10 @@
         "volume": 100,
         "labwareId": "60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1",
         "wellName": "A1",
-        "wellLocation": {"origin": "bottom", "offset": { "x": 0, "y": 0, "z": 0.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 0.5 }
+        },
         "flowRate": 137.35
       }
     },
@@ -10715,7 +10739,10 @@
         "volume": 100,
         "labwareId": "60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1",
         "wellName": "A3",
-        "wellLocation": {"origin": "bottom", "offset": { "x": 0, "y": 0, "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 1 }
+        },
         "flowRate": 137.35
       }
     },
@@ -10727,7 +10754,10 @@
         "volume": 100,
         "labwareId": "60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1",
         "wellName": "A1",
-        "wellLocation": {"origin": "bottom", "offset": { "x": 0, "y": 0, "z": 0.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 0.5 }
+        },
         "flowRate": 137.35
       }
     },
@@ -10757,7 +10787,10 @@
         "volume": 100,
         "labwareId": "60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1",
         "wellName": "B3",
-        "wellLocation": {"origin": "bottom", "offset": { "x": 0, "y": 0, "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 1 }
+        },
         "flowRate": 137.35
       }
     },
@@ -10769,7 +10802,10 @@
         "volume": 100,
         "labwareId": "60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1",
         "wellName": "A1",
-        "wellLocation": {"origin": "bottom", "offset": { "x": 0, "y": 0, "z": 0.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 0.5 }
+        },
         "flowRate": 137.35
       }
     },
@@ -10799,7 +10835,10 @@
         "volume": 100,
         "labwareId": "5ae317e0-3412-11eb-ad93-ed232a2337cf:opentrons/nest_1_reservoir_195ml/1",
         "wellName": "A1",
-        "wellLocation": {"origin": "bottom", "offset": { "x": 0, "y": 0, "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 1 }
+        },
         "flowRate": 137.35
       }
     },
@@ -10811,7 +10850,10 @@
         "volume": 100,
         "labwareId": "60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1",
         "wellName": "A1",
-        "wellLocation": {"origin": "bottom", "offset": { "x": 0, "y": 0, "z": 0.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 0.5 }
+        },
         "flowRate": 137.35
       }
     },
@@ -10841,7 +10883,10 @@
         "volume": 100,
         "labwareId": "5ae317e0-3412-11eb-ad93-ed232a2337cf:opentrons/nest_1_reservoir_195ml/1",
         "wellName": "A1",
-        "wellLocation": {"origin": "bottom", "offset": { "x": 0, "y": 0, "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 1 }
+        },
         "flowRate": 137.35
       }
     },
@@ -10853,7 +10898,10 @@
         "volume": 100,
         "labwareId": "60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1",
         "wellName": "A1",
-        "wellLocation": {"origin": "bottom", "offset": { "x": 0, "y": 0, "z": 0.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 0.5 }
+        },
         "flowRate": 137.35
       }
     },
@@ -10883,7 +10931,10 @@
         "volume": 100,
         "labwareId": "5ae317e0-3412-11eb-ad93-ed232a2337cf:opentrons/nest_1_reservoir_195ml/1",
         "wellName": "A1",
-        "wellLocation": {"origin": "bottom", "offset": { "x": 0, "y": 0, "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 1 }
+        },
         "flowRate": 137.35
       }
     },
@@ -10895,7 +10946,10 @@
         "volume": 100,
         "labwareId": "60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1",
         "wellName": "A1",
-        "wellLocation": {"origin": "bottom", "offset": { "x": 0, "y": 0, "z": 0.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 0.5 }
+        },
         "flowRate": 137.35
       }
     },
@@ -10925,7 +10979,10 @@
         "volume": 100,
         "labwareId": "5ae317e0-3412-11eb-ad93-ed232a2337cf:opentrons/nest_1_reservoir_195ml/1",
         "wellName": "A1",
-        "wellLocation": {"origin": "bottom", "offset": { "x": 0, "y": 0, "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 1 }
+        },
         "flowRate": 137.35
       }
     },
@@ -10937,7 +10994,10 @@
         "volume": 100,
         "labwareId": "60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1",
         "wellName": "A1",
-        "wellLocation": {"origin": "bottom", "offset": { "x": 0, "y": 0, "z": 0.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 0.5 }
+        },
         "flowRate": 137.35
       }
     },
@@ -10967,7 +11027,10 @@
         "volume": 20,
         "labwareId": "5ae317e0-3412-11eb-ad93-ed232a2337cf:opentrons/nest_1_reservoir_195ml/1",
         "wellName": "A1",
-        "wellLocation": {"origin": "bottom", "offset": { "x": 0, "y": 0, "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 1 }
+        },
         "flowRate": 7.6
       }
     },
@@ -10979,7 +11042,10 @@
         "volume": 20,
         "labwareId": "trashId",
         "wellName": "A1",
-        "wellLocation": {"origin": "bottom", "offset": { "x": 0, "y": 0, "z": 0.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 0.5 }
+        },
         "flowRate": 7.6
       }
     },
