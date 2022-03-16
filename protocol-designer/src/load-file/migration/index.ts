@@ -24,6 +24,7 @@ const allMigrationsByVersion: MigrationsByVersion = {
   '5.0.0': migrateFileFive,
   '5.1.0': migrateFileFiveOne,
   '5.2.0': migrateFileFiveTwo,
+  // @ts-expect-error fix MigrationsByVersion type (and the function signatures of the older migration functions above)
   '6.0.0': migrateFileSix,
 }
 // get all versions to migrate newer than the file's applicationVersion

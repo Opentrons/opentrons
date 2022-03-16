@@ -33,7 +33,45 @@ const migrateLabware = (appData: Record<string, any>): Record<string, any> =>
 const migrateModules = (appData: Record<string, any>): Record<string, any> =>
   mapValues(appData, modules => omit(modules, 'slot'))
 
-export const migrateFile = (appData: ProtocolFileV5<{}>): ProtocolFile<{}> => {
+const migrateCommands = (
+  v5Commands: ProtocolFileV5<{}>['commands']
+): ProtocolFile<{}, CreateCommand>['commands'] => {
+  return v5Commands.map(v5Command => {
+    // replace airGap with aspirate and rename "command" to "commandType"
+    const commandType =
+      v5Command.command === 'airGap' ? 'aspirate' : v5Command.command
+    if ('well' in v5Command.params) {
+      // @ts-expect-error: we are modifying a v5 command (no wellName exists on a v5 command)
+      v5Command.params.wellName = v5Command.params.well
+      // @ts-expect-error: we are modifying a v5 command (well is required, but we are replacing it with wellName)
+      delete v5Command.params.well
+    }
+    if ('pipette' in v5Command.params) {
+      // @ts-expect-error: we are modifying a v5 command (no pipetteId exists on a v5 command)
+      v5Command.params.pipetteId = v5Command.params.pipette
+      // @ts-expect-error: we are modifying a v5 command (pipette is required, but we are replacing it with pipetteId)
+      delete v5Command.params.pipette
+    }
+    if ('labware' in v5Command.params) {
+      // @ts-expect-error: we are modifying a v5 command (no labwareId exists on a v5 command)
+      v5Command.params.labwareId = v5Command.params.labware
+      // @ts-expect-error: we are modifying a v5 command (labware is required, but we are replacing it with labwareId)
+      delete v5Command.params.labware
+    }
+
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    const v6Command = {
+      commandType,
+      key: uuid(),
+      params: v5Command.params,
+    } as CreateCommand
+    return v6Command
+  })
+}
+
+export const migrateFile = (
+  appData: ProtocolFileV5<{}>
+): ProtocolFile<{}, CreateCommand> => {
   const pipettes = appData.pipettes
   const loadPipetteCommands: LoadPipetteCreateCommand[] = map(
     pipettes,
@@ -83,21 +121,7 @@ export const migrateFile = (appData: ProtocolFileV5<{}>): ProtocolFile<{}> => {
   )
 
   const commands = appData.commands
-  const migratedV5Commands = map(commands, command => {
-    if ('well' in command.params) {
-      // @ts-expect-error: we are modifying a v5 command (no wellName exists on a v5 command)
-      command.params.wellName = command.params.well
-      // @ts-expect-error: we are modifying a v5 command (well is required, but we are replacing it with wellName)
-      delete command.params.well
-    }
-
-    const migratedV5Command: CreateCommand = {
-      commandType: command.command === 'airGap' ? 'aspirate' : command.command,
-      key: uuid(),
-      params: command.params,
-    }
-    return migratedV5Command
-  })
+  const migratedV5Commands = migrateCommands(commands)
 
   return {
     designerApplication: {
