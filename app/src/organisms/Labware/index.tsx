@@ -26,23 +26,6 @@ import { useGetAllLabware } from './hooks'
 import type { Dispatch } from '../../redux/types'
 import type { FailedLabwareFile } from '../../redux/custom-labware/types'
 
-// add to i18next
-function getMessageFromLabwareFailure(
-  failedFile: FailedLabwareFile | null
-): string {
-  let errorMessage = 'Unable to upload file'
-  if (failedFile?.type === 'INVALID_LABWARE_FILE') {
-    errorMessage = 'Invalid labware definition'
-  } else if (failedFile?.type === 'DUPLICATE_LABWARE_FILE') {
-    errorMessage = 'Duplicate labware definition'
-  } else if (failedFile?.type === 'OPENTRONS_LABWARE_FILE') {
-    errorMessage = 'Opentrons labware definition'
-  }
-  return failedFile != null
-    ? `Error importing ${failedFile.filename}. ${errorMessage}`
-    : errorMessage
-}
-
 export function Labware(): JSX.Element {
   const { t } = useTranslation('labware_landing')
   const dispatch = useDispatch<Dispatch>()
@@ -64,6 +47,24 @@ export function Labware(): JSX.Element {
       setShowSuccessToast(true)
     }
   }, [labwareFailure, labwareSuccess])
+
+  const getMessageFromLabwareFailure = (
+    failedFile: FailedLabwareFile | null
+  ): string => {
+    let errorMessage = t('unable_to_upload')
+    if (failedFile?.type === 'INVALID_LABWARE_FILE') {
+      errorMessage = t('invalid_labware_def')
+    } else if (failedFile?.type === 'DUPLICATE_LABWARE_FILE') {
+      errorMessage = t('duplicate_labware_def')
+    } else if (failedFile?.type === 'OPENTRONS_LABWARE_FILE') {
+      errorMessage = t('opentrons_labware_def')
+    }
+    return failedFile != null
+      ? `${t('error_importing_file', {
+          filename: failedFile.filename,
+        })} ${errorMessage}`
+      : errorMessage
+  }
 
   return (
     <>
@@ -103,8 +104,9 @@ export function Labware(): JSX.Element {
       )}
       {showSuccessToast && labwareSuccess != null && (
         <Toast
-          message={labwareSuccess}
+          message={t('imported', { filename: labwareSuccess })}
           type="success"
+          closeButton
           onClose={() => {
             setShowSuccessToast(false)
             dispatch(clearNewLabwareName())
@@ -115,6 +117,7 @@ export function Labware(): JSX.Element {
         <Toast
           message={getMessageFromLabwareFailure(labwareFailure.file)}
           type="error"
+          closeButton
           onClose={() => {
             setShowFailureToast(false)
             dispatch(clearAddCustomLabwareFailure())

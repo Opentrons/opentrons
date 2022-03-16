@@ -10,6 +10,7 @@ import {
   IconName,
   JUSTIFY_SPACE_BETWEEN,
   BORDER_STYLE_SOLID,
+  ALIGN_CENTER,
 } from '@opentrons/components'
 import { StyledText } from '../text'
 
@@ -57,12 +58,14 @@ export function Toast(props: ToastProps): JSX.Element {
     <Flex
       css={EXPANDED_STYLE}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
+      alignItems={ALIGN_CENTER}
       borderRadius={BORDERS.radiusSoftCorners}
       borderColor={color}
       borderWidth={SPACING.spacingXXS}
       border={BORDER_STYLE_SOLID}
       backgroundColor={backgroundColor}
-      padding={SPACING.spacing3}
+      paddingX={SPACING.spacing3}
+      paddingY={SPACING.spacing2}
       right={SPACING.spacing4}
       bottom={SPACING.spacing4}
       position="fixed"
@@ -77,8 +80,12 @@ export function Toast(props: ToastProps): JSX.Element {
         <StyledText as="p">{message}</StyledText>
       </Flex>
       {closeButton === true && (
-        <Link onClick={() => onClose()}>
-          <Icon name="close" width={SPACING.spacing4}></Icon>
+        <Link onClick={() => onClose()} height={SPACING.spacing5}>
+          <Icon
+            name="close"
+            width={SPACING.spacing5}
+            marginLeft={SPACING.spacing3}
+          />
         </Link>
       )}
     </Flex>

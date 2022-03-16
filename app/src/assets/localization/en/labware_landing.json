@@ -14,5 +14,6 @@
   "invalid_labware_def": "Invalid labware definition",
   "duplicate_labware_def": "Duplicate labware definition",
   "opentrons_labware_def": "Opentrons labware definition",
-  "error_importing_file": "Error importing {{filename}}."
+  "error_importing_file": "Error importing {{filename}}.",
+  "imported": "{{filename}} imported."
 }
