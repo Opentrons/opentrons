@@ -21,6 +21,11 @@ def test_v6_types(defpath):
     assert def_dict_from_model == expected_def_dict
 
 
+# TODO (Tamar and Max 3/16/22):
+# Some of our v6 fixtures accidentally contain command "result" data,
+# which is not part of the schema, and which we don't parse into our models.
+# Here, we delete the extra junk from the fixtures.
+# Remove this when the fixtures are corrected.
 def delete_unexpected_results(protocol_fixture: Dict[str, Any]) -> None:
     for command_object_dict in protocol_fixture["commands"]:
         try:
