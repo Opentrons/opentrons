@@ -17,7 +17,7 @@ if os.environ.get("OT2", None):
     )
     os.environ["OT_API_FF_enableOT3HardwareController"] = "false"
 else:
-    print("Running wth OT3 HC. If you dont want this, " 'set an env var named "OT2"')
+    print("Running with OT3 HC. If you dont want this, set an env var named 'OT2'")
     os.environ["OT_API_FF_enableOT3HardwareController"] = "true"
 
 from code import interact  # noqa: E402
