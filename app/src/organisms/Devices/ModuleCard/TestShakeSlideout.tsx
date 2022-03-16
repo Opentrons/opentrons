@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   Flex,
   SPACING_3,
@@ -15,6 +16,8 @@ import {
   SIZE_AUTO,
   ALIGN_FLEX_START,
   Link,
+  Tooltip,
+  useHoverTooltip,
 } from '@opentrons/components'
 import { getModuleDisplayName, RPM } from '@opentrons/shared-data'
 import { Slideout } from '../../../atoms/Slideout'
@@ -24,6 +27,12 @@ import { Divider } from '../../../atoms/structure'
 import { CollapsibleStep } from '../../ProtocolSetup/RunSetupCard/CollapsibleStep'
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'
+import type {
+  HeaterShakerSetTargetShakeSpeedCreateCommand,
+  HeaterShakerStopShakeCreateCommand,
+  HeaterShakerOpenLatchCreateCommand,
+  HeaterShakerCloseLatchCreateCommand,
+} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 interface TestShakeSlideoutProps {
   module: HeaterShakerModule
@@ -36,9 +45,62 @@ export const TestShakeSlideout = (
 ): JSX.Element | null => {
   const { module, onCloseClick, isExpanded } = props
   const { t } = useTranslation(['device_details', 'shared', 'heater_shaker'])
+  const { createLiveCommand } = useCreateLiveCommandMutation()
   const name = getModuleDisplayName(module.model)
+  const [targetProps, tooltipProps] = useHoverTooltip()
 
   const [showCollapsed, setShowCollapsed] = React.useState(false)
+  const [shakeValue, setShakeValue] = React.useState<string | null>(null)
+  const isShaking =
+    module.data.speedStatus === 'speeding up' ||
+    module.data.speedStatus === 'holding at target'
+  const isLatchOpen =
+    module.data.labwareLatchStatus === 'idle_open' ||
+    module.data.labwareLatchStatus === 'opening'
+
+  const openLatchCommand: HeaterShakerOpenLatchCreateCommand = {
+    commandType: 'heaterShakerModule/openLatch',
+    params: {
+      moduleId: module.id,
+    },
+  }
+
+  const closeLatchCommand: HeaterShakerCloseLatchCreateCommand = {
+    commandType: 'heaterShakerModule/closeLatch',
+    params: {
+      moduleId: module.id,
+    },
+  }
+
+  const setShakeCommand: HeaterShakerSetTargetShakeSpeedCreateCommand = {
+    commandType: 'heaterShakerModule/setTargetShakeSpeed',
+    params: {
+      moduleId: module.id,
+      rpm: shakeValue !== null ? parseInt(shakeValue) : 0,
+    },
+  }
+
+  const stopShakeCommand: HeaterShakerStopShakeCreateCommand = {
+    commandType: 'heaterShakerModule/stopShake',
+    params: {
+      moduleId: module.id,
+    },
+  }
+
+  const handleLatchCommand = (): void => {
+    createLiveCommand({
+      command: isLatchOpen ? closeLatchCommand : openLatchCommand,
+    })
+  }
+
+  const handleShakeCommand = (): void => {
+    if (shakeValue !== null) {
+      createLiveCommand({
+        command: isShaking ? stopShakeCommand : setShakeCommand,
+      })
+    }
+    setShakeValue(null)
+  }
 
   return (
     <Slideout
@@ -118,9 +180,19 @@ export const TestShakeSlideout = (
             fontSize={TYPOGRAPHY.fontSizeCaption}
             marginLeft={SIZE_AUTO}
             paddingX={SPACING.spacing4}
+            onClick={handleLatchCommand}
+            disabled={isShaking}
+            {...targetProps}
           >
-            {t('open', { ns: 'shared' })}
+            {isLatchOpen
+              ? t('close', { ns: 'shared' })
+              : t('open', { ns: 'shared' })}
           </TertiaryButton>
+          {isShaking ? (
+            <Tooltip {...tooltipProps}>
+              {t('cannot_open_latch', { ns: 'heater_shaker' })}
+            </Tooltip>
+          ) : null}
         </Flex>
         <Divider color={COLORS.medGrey} />
         <Text
@@ -155,9 +227,19 @@ export const TestShakeSlideout = (
             marginLeft={SIZE_AUTO}
             marginTop={SPACING.spacing3}
             paddingX={SPACING.spacing4}
+            onClick={handleShakeCommand}
+            disabled={isLatchOpen}
+            {...targetProps}
           >
-            {t('start', { ns: 'shared' })}
+            {isShaking
+              ? t('stop', { ns: 'shared' })
+              : t('start', { ns: 'shared' })}
           </TertiaryButton>
+          {isLatchOpen ? (
+            <Tooltip {...tooltipProps}>
+              {t('cannot_shake', { ns: 'heater_shaker' })}
+            </Tooltip>
+          ) : null}
         </Flex>
       </Flex>
       <Flex
