@@ -10,7 +10,8 @@
   "source": "src/index.ts",
   "scripts": {
     "test": "jest --coverage",
-    "test:watch": "jest --watch"},
+    "test:watch": "jest --watch",
+    "test:updateSnapshot": "jest --updateSnapshot"},
   "browser": {
     "./dist/api-client.js": "./dist/api-client.browser.js",
     "./dist/api-client.mjs": "./dist/api-client.browser.mjs"

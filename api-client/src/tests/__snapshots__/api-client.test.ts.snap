@@ -1,0 +1,32 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`health tests getHealth matches the snapshot 1`] = `
+Object {
+  "api_version": "5.0.2",
+  "board_revision": "2.1",
+  "fw_version": "Virtual Smoothie",
+  "links": Object {
+    "apiLog": "/logs/api.log",
+    "apiSpec": "/openapi.json",
+    "serialLog": "/logs/serial.log",
+    "serverLog": "/logs/server.log",
+    "systemTime": "/system/time",
+  },
+  "logs": Array [
+    "/logs/serial.log",
+    "/logs/api.log",
+    "/logs/server.log",
+  ],
+  "maximum_protocol_api_version": Array [
+    2,
+    12,
+  ],
+  "minimum_protocol_api_version": Array [
+    2,
+    0,
+  ],
+  "name": "opentrons-dev",
+  "robot_model": "OT-2 Standard",
+  "system_version": "0.0.0",
+}
+`;
