@@ -72,5 +72,7 @@
   "run_log": "Run Log",
   "run_record_id": "Run Record ID",
   "setup": "Setup",
-  "status": "Status"
+  "status": "Status",
+  "setup_incomplete": "Complete required steps in Setup tab",
+  "robot_is_busy": "Robot is busy"
 }

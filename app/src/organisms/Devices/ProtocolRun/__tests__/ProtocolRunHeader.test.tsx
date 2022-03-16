@@ -17,6 +17,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../../i18n'
+import { useCurrentRunId } from '../../../../organisms/ProtocolUpload/hooks'
 import { ConfirmCancelModal } from '../../../../organisms/RunDetails/ConfirmCancelModal'
 import {
   useRunTimestamps,
@@ -60,10 +61,14 @@ jest.mock('@opentrons/components', () => {
   }
 })
 jest.mock('@opentrons/react-api-client')
+jest.mock('../../../../organisms/ProtocolUpload/hooks')
 jest.mock('../../../../organisms/RunDetails/ConfirmCancelModal')
 jest.mock('../../../../organisms/RunTimeControl/hooks')
 jest.mock('../../hooks')
 
+const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
+  typeof useCurrentRunId
+>
 const mockUseRunTimestamps = useRunTimestamps as jest.MockedFunction<
   typeof useRunTimestamps
 >
@@ -105,6 +110,7 @@ const render = () => {
 describe('ProtocolRunHeader', () => {
   beforeEach(() => {
     mockConfirmCancelModal.mockReturnValue(<div>Mock ConfirmCancelModal</div>)
+    when(mockUseCurrentRunId).calledWith().mockReturnValue(RUN_ID)
     when(mockUseRunControls)
       .calledWith(RUN_ID, expect.anything())
       .mockReturnValue({
@@ -180,14 +186,30 @@ describe('ProtocolRunHeader', () => {
     expect(queryByText('Protocol end')).toBeFalsy()
   })
 
-  it('disables the start run button when run is not ready to start', () => {
+  it('disables the Start Run button with tooltip if calibration is incomplete', () => {
     when(mockUseRunCalibrationStatus)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({ complete: false })
-    const [{ getByRole }] = render()
+
+    const [{ getByRole, getByText }] = render()
 
     const button = getByRole('button', { name: 'Start Run' })
     expect(button).toBeDisabled()
+    getByText('Complete required steps in Setup tab')
+  })
+
+  it('disables the Start Run button with tooltip if a module is missing', () => {
+    when(mockUseAttachedModuleMatchesForProtocol)
+      .calledWith(ROBOT_NAME, RUN_ID)
+      .mockReturnValue({
+        missingModuleIds: ['temperatureModuleV1'],
+        remainingAttachedModules: [],
+      })
+
+    const [{ getByRole, getByText }] = render()
+    const button = getByRole('button', { name: 'Start Run' })
+    expect(button).toBeDisabled()
+    getByText('Complete required steps in Setup tab')
   })
 
   it('renders a pause run button, start time, and end time when run is running', () => {
@@ -339,6 +361,30 @@ describe('ProtocolRunHeader', () => {
     getByText('Run Again')
     getByText('Completed')
     getByText(formatTimestamp(COMPLETED_AT))
+  })
+
+  it('disables the Run Again button with tooltip for a completed run if the robot is busy', () => {
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        data: { data: mockSucceededRun },
+      } as UseQueryResult<Run>)
+    when(mockUseRunStatus)
+      .calledWith(RUN_ID)
+      .mockReturnValue(RUN_STATUS_SUCCEEDED)
+    when(mockUseRunTimestamps).calledWith(RUN_ID).mockReturnValue({
+      startedAt: STARTED_AT,
+      pausedAt: null,
+      stoppedAt: null,
+      completedAt: COMPLETED_AT,
+    })
+    when(mockUseCurrentRunId).calledWith().mockReturnValue('some other run id')
+
+    const [{ getByRole, getByText }] = render()
+
+    const button = getByRole('button', { name: 'Run Again' })
+    expect(button).toBeDisabled()
+    getByText('Robot is busy')
   })
 
   it('renders an alert when the robot door is open', () => {

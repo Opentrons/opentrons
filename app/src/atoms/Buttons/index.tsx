@@ -1,4 +1,5 @@
 import * as React from 'react'
+import styled from 'styled-components'
 import {
   TYPOGRAPHY,
   COLORS,
@@ -9,39 +10,30 @@ import {
 } from '@opentrons/components'
 import { ToggleBtn, ToggleBtnProps } from '../ToggleBtn'
 
-export const TertiaryButton = (props: any): JSX.Element => (
-  <NewPrimaryBtn
-    backgroundColor={COLORS.blue}
-    borderRadius={BORDERS.radiusRoundEdge}
-    boxShadow="none"
-    overflow="no-wrap"
-    padding="0.375rem 0.75rem"
-    textTransform={TYPOGRAPHY.textTransformNone}
-    whiteSpace="nowrap"
-    css={TYPOGRAPHY.labelSemiBold}
-    {...props}
-  />
-)
+export const TertiaryButton = styled(NewPrimaryBtn)`
+  background-color: ${COLORS.blue};
+  border-radius: ${BORDERS.radiusRoundEdge};
+  box-shadow: none;
+  overflow: no-wrap;
+  padding: 0.375rem 0.75rem;
+  text-transform: ${TYPOGRAPHY.textTransformNone};
+  white-space: nowrap;
+  ${TYPOGRAPHY.labelSemiBold}
+`
 
-export const PrimaryButton = (props: any): JSX.Element => (
-  <NewPrimaryBtn
-    backgroundColor={COLORS.blue}
-    borderRadius={BORDERS.radiusSoftCorners}
-    textTransform={TYPOGRAPHY.textTransformNone}
-    css={TYPOGRAPHY.pSemiBold}
-    {...props}
-  />
-)
+export const PrimaryButton = styled(NewPrimaryBtn)`
+  background-color: ${COLORS.blue};
+  border-radius: ${BORDERS.radiusSoftCorners};
+  text-transform: ${TYPOGRAPHY.textTransformNone};
+  ${TYPOGRAPHY.pSemiBold}
+`
 
-export const SecondaryButton = (props: any): JSX.Element => (
-  <NewSecondaryBtn
-    color={COLORS.blue}
-    borderRadius={BORDERS.radiusSoftCorners}
-    textTransform={TYPOGRAPHY.textTransformNone}
-    css={TYPOGRAPHY.pSemiBold}
-    {...props}
-  />
-)
+export const SecondaryButton = styled(NewSecondaryBtn)`
+  background-color: ${COLORS.blue};
+  border-radius: ${BORDERS.radiusSoftCorners};
+  text-transform: ${TYPOGRAPHY.textTransformNone};
+  ${TYPOGRAPHY.pSemiBold}
+`
 
 export const ToggleButton = (props: ToggleBtnProps): JSX.Element => {
   const color = props.toggledOn ? COLORS.blue : COLORS.darkGrey

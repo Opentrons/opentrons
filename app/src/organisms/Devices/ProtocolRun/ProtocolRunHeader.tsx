@@ -21,6 +21,8 @@ import {
   Flex,
   Icon,
   IconName,
+  Tooltip,
+  useHoverTooltip,
   useInterval,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
@@ -38,6 +40,7 @@ import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 
 import { PrimaryButton, SecondaryButton } from '../../../atoms/Buttons'
 import { StyledText } from '../../../atoms/text'
+import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
 import { ConfirmCancelModal } from '../../../organisms/RunDetails/ConfirmCancelModal'
 import {
   useRunControls,
@@ -100,6 +103,7 @@ export function ProtocolRunHeader({
 }: ProtocolRunHeaderProps): JSX.Element | null {
   const { t } = useTranslation('run_details')
   const history = useHistory()
+  const [targetProps, tooltipProps] = useHoverTooltip()
 
   const runRecord = useRunQuery(runId)
   const protocolRecord = useProtocolQuery(
@@ -149,9 +153,13 @@ export function ProtocolRunHeader({
   )
   const isSetupComplete = isCalibrationComplete && missingModuleIds.length === 0
 
+  const currentRunId = useCurrentRunId()
+  const isRobotBusy = currentRunId !== runId
+
   const isRunControlButtonDisabled =
     !isSetupComplete ||
     isMutationLoading ||
+    isRobotBusy ||
     runStatus === RUN_STATUS_FINISHING ||
     runStatus === RUN_STATUS_PAUSE_REQUESTED ||
     runStatus === RUN_STATUS_STOP_REQUESTED ||
@@ -189,6 +197,13 @@ export function ProtocolRunHeader({
       buttonText = t('run_again')
       handleButtonClick = reset
       break
+  }
+
+  let disableReason = null
+  if (!isSetupComplete) {
+    disableReason = t('setup_incomplete')
+  } else if (isRobotBusy) {
+    disableReason = t('robot_is_busy')
   }
 
   const buttonIcon =
@@ -360,10 +375,14 @@ export function ProtocolRunHeader({
             padding={`${SPACING.spacingSM} ${SPACING.spacing4}`}
             disabled={isRunControlButtonDisabled}
             onClick={handleButtonClick}
+            {...targetProps}
           >
             {buttonIcon}
             <StyledText css={TYPOGRAPHY.pSemiBold}>{buttonText}</StyledText>
           </PrimaryButton>
+          {disableReason != null && (
+            <Tooltip {...tooltipProps}>{disableReason}</Tooltip>
+          )}
         </Flex>
       </Flex>
       <ProtocolRunningContent />
