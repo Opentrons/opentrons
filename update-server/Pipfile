@@ -8,22 +8,23 @@ bmap-tools = {editable = true, ref = "7925ab87d7f4a0bd7a3936eebb4238297c007a0b",
 aiohttp = "==3.4.4"
 
 [dev-packages]
+otupdate = {path = ".", editable = true}
 flake8 = "~=3.9.0"
 flake8-annotations = "~=2.6.2"
 flake8-docstrings = "~=1.6.0"
 flake8-noqa = "~=1.1.0"
 pytest = "==6.1.0"
 pytest-watch = "~=4.2.0"
-pytest-cov = "<2.11.0"
+pytest-cov = "==2.10.1"
 pytest-aiohttp = "==0.3.0"
 coverage = "==5.1"
-mypy = "==0.910"
 typing-extensions = "==3.10.0.0"
-black = "==22.1.0"
 # pytest dependencies on windows, spec'd here to force lockfile inclusion
 # https://github.com/pypa/pipenv/issues/4408#issuecomment-668324177
 atomicwrites = {version="==1.4.0", sys_platform="== 'win32'"}
 colorama = {version="==0.4.4", sys_platform="== 'win32'"}
+mypy = "==0.910"
+black = "==22.1.0"
 
 [requires]
 python_version = "3.7"
