@@ -14,10 +14,10 @@ import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
 } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
-import { AlertItem } from '@opentrons/components/src/alerts'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../../i18n'
+import { ConfirmCancelModal } from '../../../../organisms/RunDetails/ConfirmCancelModal'
 import {
   useRunTimestamps,
   useRunControls,
@@ -25,8 +25,14 @@ import {
 } from '../../../../organisms/RunTimeControl/hooks'
 import {
   PROTOCOL_ID,
-  mockRunningRun,
+  mockFailedRun,
   mockIdleUnstartedRun,
+  mockPausedRun,
+  mockPauseRequestedRun,
+  mockRunningRun,
+  mockStoppedRun,
+  mockStopRequestedRun,
+  mockSucceededRun,
 } from '../../../../organisms/RunTimeControl/__fixtures__'
 import {
   useAttachedModuleMatchesForProtocol,
@@ -54,6 +60,7 @@ jest.mock('@opentrons/components', () => {
   }
 })
 jest.mock('@opentrons/react-api-client')
+jest.mock('../../../../organisms/RunDetails/ConfirmCancelModal')
 jest.mock('../../../../organisms/RunTimeControl/hooks')
 jest.mock('../../hooks')
 
@@ -76,6 +83,9 @@ const mockUseAttachedModuleMatchesForProtocol = useAttachedModuleMatchesForProto
 const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
   typeof useRunCalibrationStatus
 >
+const mockConfirmCancelModal = ConfirmCancelModal as jest.MockedFunction<
+  typeof ConfirmCancelModal
+>
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '95e67900-bc9f-4fbf-92c6-cc4d7226a51b'
@@ -94,6 +104,7 @@ const render = () => {
 
 describe('ProtocolRunHeader', () => {
   beforeEach(() => {
+    mockConfirmCancelModal.mockReturnValue(<div>Mock ConfirmCancelModal</div>)
     when(mockUseRunControls)
       .calledWith(RUN_ID, expect.anything())
       .mockReturnValue({
@@ -137,6 +148,7 @@ describe('ProtocolRunHeader', () => {
   })
   afterEach(() => {
     resetAllWhenMocks()
+    jest.restoreAllMocks()
   })
 
   it('renders a protocol name, run record id, status, and run time', () => {
@@ -150,25 +162,35 @@ describe('ProtocolRunHeader', () => {
     getByText('Run Time')
   })
 
-  it('renders a start run button when run is ready to start', () => {
+  it('links to a protocol details page', () => {
+    const [{ getByRole }] = render()
+
+    const protocolNameLink = getByRole('link', { name: 'A Protocol for Otie' })
+    expect(protocolNameLink.getAttribute('href')).toBe(
+      `/protocols/${PROTOCOL_ID}`
+    )
+  })
+
+  it('renders a start run button when run is ready to start and not protocol start/end', () => {
     const [{ getByRole, queryByText }] = render()
 
     getByRole('button', { name: 'Start Run' })
     expect(queryByText(formatTimestamp(STARTED_AT))).toBeFalsy()
+    expect(queryByText('Protocol start')).toBeFalsy()
+    expect(queryByText('Protocol end')).toBeFalsy()
   })
 
   it('disables the start run button when run is not ready to start', () => {
     when(mockUseRunCalibrationStatus)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({ complete: false })
-    const [{ getByRole, queryByText }] = render()
+    const [{ getByRole }] = render()
 
     const button = getByRole('button', { name: 'Start Run' })
-    expect(button).toHaveAttribute('disabled')
-    expect(queryByText(formatTimestamp(STARTED_AT))).toBeFalsy()
+    expect(button).toBeDisabled()
   })
 
-  it('renders a pause run button and protocol start time when run is running', () => {
+  it('renders a pause run button, start time, and end time when run is running', () => {
     when(mockUseRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
@@ -181,5 +203,157 @@ describe('ProtocolRunHeader', () => {
 
     getByRole('button', { name: 'Pause Run' })
     getByText(formatTimestamp(STARTED_AT))
+    getByText('Protocol start')
+    getByText('Protocol end')
+  })
+
+  it('renders a cancel run button when running and shows a confirm cancel modal when clicked', () => {
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        data: { data: mockRunningRun },
+      } as UseQueryResult<Run>)
+    when(mockUseRunStatus)
+      .calledWith(RUN_ID)
+      .mockReturnValue(RUN_STATUS_RUNNING)
+    const [{ getByText, queryByText }] = render()
+
+    expect(queryByText('Mock ConfirmCancelModal')).toBeFalsy()
+    const cancelButton = getByText('Cancel Run')
+    cancelButton.click()
+    getByText('Mock ConfirmCancelModal')
+  })
+
+  it('renders a Resume Run button and Cancel Run button when paused', () => {
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        data: { data: mockPausedRun },
+      } as UseQueryResult<Run>)
+    when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_PAUSED)
+
+    const [{ getByRole, getByText }] = render()
+
+    getByRole('button', { name: 'Resume Run' })
+    getByRole('button', { name: 'Cancel Run' })
+    getByText('Paused')
+  })
+
+  it('renders a disabled Resume Run button and when pause requested', () => {
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        data: { data: mockPauseRequestedRun },
+      } as UseQueryResult<Run>)
+    when(mockUseRunStatus)
+      .calledWith(RUN_ID)
+      .mockReturnValue(RUN_STATUS_PAUSE_REQUESTED)
+
+    const [{ getByRole, getByText }] = render()
+
+    const button = getByRole('button', { name: 'Resume Run' })
+    expect(button).toBeDisabled()
+    getByRole('button', { name: 'Cancel Run' })
+    getByText('Pause requested')
+  })
+
+  it('renders a disabled Canceling Run button and when stop requested', () => {
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        data: { data: mockStopRequestedRun },
+      } as UseQueryResult<Run>)
+    when(mockUseRunStatus)
+      .calledWith(RUN_ID)
+      .mockReturnValue(RUN_STATUS_STOP_REQUESTED)
+
+    const [{ getByRole, getByText }] = render()
+
+    const button = getByRole('button', { name: 'Canceling Run' })
+    expect(button).toBeDisabled()
+    getByText('Stop requested')
+  })
+
+  it('renders a Run Again button and end time when run has stopped', () => {
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        data: { data: mockStoppedRun },
+      } as UseQueryResult<Run>)
+    when(mockUseRunStatus)
+      .calledWith(RUN_ID)
+      .mockReturnValue(RUN_STATUS_STOPPED)
+    when(mockUseRunTimestamps).calledWith(RUN_ID).mockReturnValue({
+      startedAt: STARTED_AT,
+      pausedAt: null,
+      stoppedAt: null,
+      completedAt: COMPLETED_AT,
+    })
+
+    const [{ getByText }] = render()
+
+    getByText('Run Again')
+    getByText('Canceled')
+    getByText(formatTimestamp(COMPLETED_AT))
+  })
+
+  it('renders a Run Again button and end time when run has failed', () => {
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        data: { data: mockFailedRun },
+      } as UseQueryResult<Run>)
+    when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_FAILED)
+    when(mockUseRunTimestamps).calledWith(RUN_ID).mockReturnValue({
+      startedAt: STARTED_AT,
+      pausedAt: null,
+      stoppedAt: null,
+      completedAt: COMPLETED_AT,
+    })
+
+    const [{ getByText }] = render()
+
+    getByText('Run Again')
+    getByText('Completed')
+    getByText(formatTimestamp(COMPLETED_AT))
+  })
+
+  it('renders a Run Again button and end time when run has succeeded', () => {
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        data: { data: mockSucceededRun },
+      } as UseQueryResult<Run>)
+    when(mockUseRunStatus)
+      .calledWith(RUN_ID)
+      .mockReturnValue(RUN_STATUS_SUCCEEDED)
+    when(mockUseRunTimestamps).calledWith(RUN_ID).mockReturnValue({
+      startedAt: STARTED_AT,
+      pausedAt: null,
+      stoppedAt: null,
+      completedAt: COMPLETED_AT,
+    })
+
+    const [{ getByText }] = render()
+
+    getByText('Run Again')
+    getByText('Completed')
+    getByText(formatTimestamp(COMPLETED_AT))
+  })
+
+  it('renders an alert when the robot door is open', () => {
+    when(mockUseRunStatus)
+      .calledWith(RUN_ID)
+      .mockReturnValue(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
+    const [{ getByText }] = render()
+
+    getByText('Close robot door to resume run')
+  })
+
+  it('renders an alert when run has failed', () => {
+    when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_FAILED)
+    const [{ getByText }] = render()
+
+    getByText('Protocol run failed')
   })
 })
