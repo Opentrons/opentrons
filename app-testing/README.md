@@ -7,7 +7,6 @@ Slices of the tests will be selected as candidates for automation and then perfo
 ## Notes
 
 - This folder is not plugged into the global Make ecosystem of the Opentrons mono repository. This is intentional, the tools in this folder are independent and will likely be used by only a few and are in no way a dependency of any other part of this repository.
-- Tests may be run against the linux github runner. Linux is by far the fastest and can use docker-compose to run the robot emulator.
 
 ## Steps
 
@@ -50,7 +49,7 @@ Slices of the tests will be selected as candidates for automation and then perfo
 - Define steps for a VM locally for windows runs?
 - Better injection of dependencies to relieve import bloat?
 - Test case objects describing setup, "test data", test case meta data for tracking?
-- Test execution tracking, analysis, links to Zephyr?
+- Test execution history into DataDog
 
 ## commands
 
@@ -62,5 +61,17 @@ run black, mypy, and flake8
 
 ## Tools
 
-python 3.7 - it is a good idea to manage python with [pyenv](https://realpython.com/intro-to-pyenv)
+python 3.10.2 - manage python with [pyenv](https://realpython.com/intro-to-pyenv)
 [pipenv](https://pipenv.pypa.io/en/latest/)
+
+## Locator Tool
+
+Using the python REPL we can launch the app and in real time compose element locator strategies.
+Then we can execute them, proving they work.
+This alleviates having to run tests over and over to validate element locator strategies.
+
+From the app-testing directory
+
+```bash
+pipenv run python -i locators.py
+```

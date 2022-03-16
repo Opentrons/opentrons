@@ -4,6 +4,7 @@ import asyncio
 import datetime
 from typing import List, Callable
 from mock import AsyncMock
+
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings import (
     ArbitrationId,
@@ -14,6 +15,7 @@ from opentrons_hardware.firmware_bindings.messages import (
     MessageDefinition,
     message_definitions,
     payloads,
+    fields,
 )
 from opentrons_hardware.firmware_bindings.constants import NodeId
 
@@ -53,8 +55,8 @@ class MockStatusResponder:
                 response = message_definitions.DeviceInfoResponse(
                     payload=payloads.DeviceInfoResponsePayload(
                         version=utils.UInt32Field(0),
-                        flags=payloads.VersionFlagsField(0),
-                        shortsha=payloads.FirmwareShortSHADataField(b"abcdef0"),
+                        flags=fields.VersionFlagsField(0),
+                        shortsha=fields.FirmwareShortSHADataField(b"abcdef0"),
                     )
                 )
                 asyncio.get_running_loop().call_soon(
@@ -78,7 +80,7 @@ async def test_timeout_fires(mock_can_messenger: AsyncMock) -> None:
     # if it didn't work, so wrap it in a wait_for of our own with a bigger timeout
     # that will raise if it fails
     nodes = await asyncio.wait_for(
-        probe(mock_can_messenger, set((NodeId.gantry_x, NodeId.gantry_y)), 0.5), 1.0
+        probe(mock_can_messenger, {NodeId.gantry_x, NodeId.gantry_y}, 0.5), 1.0
     )
     now = datetime.datetime.utcnow()
     # we should have taken the full time allotted
@@ -107,9 +109,9 @@ async def test_completes_exact_equality(mock_can_messenger: AsyncMock) -> None:
     # doesn't raise, so wrap it in a smaller timeout so it will raise (it should
     # complete basically instantly)
     probed = await asyncio.wait_for(
-        probe(mock_can_messenger, set((NodeId.gantry_x,)), None), 2.0
+        probe(mock_can_messenger, {NodeId.gantry_x}, None), 2.0
     )
-    assert probed == set((NodeId.gantry_x,))
+    assert probed == {NodeId.gantry_x}
 
 
 async def test_completes_more_than_expected(mock_can_messenger: AsyncMock) -> None:
@@ -119,10 +121,10 @@ async def test_completes_more_than_expected(mock_can_messenger: AsyncMock) -> No
     )
     # same deal with the timeout
     probed = await asyncio.wait_for(
-        probe(mock_can_messenger, set((NodeId.gantry_x,)), None), 2.0
+        probe(mock_can_messenger, {NodeId.gantry_x}, None), 2.0
     )
     # we should get everything we prepped the network with
-    assert probed == set((NodeId.gantry_x, NodeId.gantry_y))
+    assert probed == {NodeId.gantry_x, NodeId.gantry_y}
 
 
 async def test_handles_bad_node_ids(mock_can_messenger: AsyncMock) -> None:
@@ -130,7 +132,7 @@ async def test_handles_bad_node_ids(mock_can_messenger: AsyncMock) -> None:
     _ = MockStatusResponder(mock_can_messenger, [0x01, NodeId.gantry_x.value])
     # same deal with the timeout
     probed = await asyncio.wait_for(
-        probe(mock_can_messenger, set((NodeId.gantry_x,)), None), 2.0
+        probe(mock_can_messenger, {NodeId.gantry_x}, None), 2.0
     )
     # we should get everything we prepped the network with and ignore the bad values
-    assert probed == set((NodeId.gantry_x,))
+    assert probed == {NodeId.gantry_x}
