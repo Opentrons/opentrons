@@ -74,5 +74,6 @@
   "setup": "Setup",
   "status": "Status",
   "setup_incomplete": "Complete required steps in Setup tab",
-  "robot_is_busy": "Robot is busy"
+  "robot_is_busy": "Robot is busy",
+  "close_run": "Close Run"
 }
