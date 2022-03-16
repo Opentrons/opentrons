@@ -224,7 +224,7 @@ class OT3Controller:
         speed_settings = (
             self._configuration.motion_settings.max_speed_discontinuity.none
         )
-        velocities = {ax: -0.1 * speed_settings[OT3Axis.to_kind(ax)] for ax in axes}
+        velocities = {ax: -1 * speed_settings[OT3Axis.to_kind(ax)] for ax in axes}
         group = create_home_group(distances, velocities)
         runner = MoveGroupRunner(move_groups=[group])
         await runner.run(can_messenger=self._messenger)

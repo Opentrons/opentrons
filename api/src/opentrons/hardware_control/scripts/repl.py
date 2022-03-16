@@ -27,6 +27,7 @@ import logging
 from opentrons.types import Mount, Point
 from opentrons.hardware_control.types import Axis
 from opentrons.config.feature_flags import enable_ot3_hardware_controller
+from opentrons.hardware_control.types import OT3Axis, OT3Mount
 
 if enable_ot3_hardware_controller():
     from opentrons.hardware_control.ot3api import OT3API

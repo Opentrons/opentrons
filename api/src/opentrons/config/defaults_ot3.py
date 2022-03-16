@@ -91,19 +91,19 @@ DEFAULT_MAX_SPEED_DISCONTINUITY: Final[
         OT3AxisKind.X: 40,
         OT3AxisKind.Y: 40,
         OT3AxisKind.Z: 40,
-        OT3AxisKind.P: 40,
+        OT3AxisKind.P: 10,
     },
     high_throughput={
         OT3AxisKind.X: 40,
         OT3AxisKind.Y: 40,
         OT3AxisKind.Z: 40,
-        OT3AxisKind.P: 40,
+        OT3AxisKind.P: 10,
     },
     low_throughput={
         OT3AxisKind.X: 40,
         OT3AxisKind.Y: 40,
         OT3AxisKind.Z: 40,
-        OT3AxisKind.P: 40,
+        OT3AxisKind.P: 10,
     },
     two_low_throughput={
         OT3AxisKind.X: 40,
