@@ -1,5 +1,8 @@
 {
   "delete_protocol": "Delete protocol",
+  "should_delete_this_protocol": "Delete this protocol?",
+  "yes_delete_this_protocol": "Yes, delete protocol",
   "last_updated_at": "Last Updated: {{date}}",
-  "run": "Run"
+  "run": "Run",
+  "this_protocol_will_be_trashed": "This protocol will be moved to this computer’s trash and may be unrecoverable."
 }

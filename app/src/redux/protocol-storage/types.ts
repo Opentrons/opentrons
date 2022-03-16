@@ -57,6 +57,12 @@ export interface AddProtocolAction {
   meta: { shell: true }
 }
 
+export interface RemoveProtocolAction {
+  type: 'protocolStorage:REMOVE_PROTOCOL'
+  payload: { protocolKey: string }
+  meta: { shell: true }
+}
+
 export interface AddProtocolFailureAction {
   type: 'protocolStorage:ADD_PROTOCOL_FAILURE'
   payload: { protocol: StoredProtocolDir | null; message: string | null }
@@ -76,6 +82,7 @@ export type ProtocolStorageAction =
   | UpdateProtocolListAction
   | UpdateProtocolListFailureAction
   | AddProtocolAction
+  | RemoveProtocolAction
   | AddProtocolFailureAction
   | ClearAddProtocolFailureAction
   | OpenProtocolDirectoryAction

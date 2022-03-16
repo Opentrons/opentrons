@@ -12,7 +12,7 @@ import {
   readFilesWithinDirectory,
   parseProtocolDirs,
   addProtocolFile,
-  removeProtocolById,
+  removeProtocolByKey,
   PROTOCOLS_DIRECTORY_NAME,
   PROTOCOLS_DIRECTORY_PATH,
 } from '../file-system'
@@ -214,7 +214,7 @@ describe('protocol storage directory utilities', () => {
       trashItem.mockResolvedValue()
 
       return setup
-        .then(() => removeProtocolById('def456', protocolsDir))
+        .then(() => removeProtocolByKey('def456', protocolsDir))
         .then(() => {
           expect(Electron.shell.trashItem).toHaveBeenCalledWith(
             path.join(protocolsDir, 'def456')
@@ -230,7 +230,7 @@ describe('protocol storage directory utilities', () => {
       trashItem.mockRejectedValue(Error('something went wrong'))
 
       return setup
-        .then(() => removeProtocolById('def456', protocolsDir))
+        .then(() => removeProtocolByKey('def456', protocolsDir))
         .then(() => readDirectoriesWithinDirectory(protocolsDir))
         .then(files => expect(files).toEqual([]))
     })

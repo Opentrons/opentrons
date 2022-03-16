@@ -114,8 +114,8 @@ export function addProtocolFile(
   mainFileSourcePath: string,
   protocolsDirPath: string
 ): Promise<void> {
-  const protocolId = uuid()
-  const protocolDirPath = path.join(protocolsDirPath, protocolId)
+  const protocolKey = uuid()
+  const protocolDirPath = path.join(protocolsDirPath, protocolKey)
 
   const srcDirPath = path.join(protocolDirPath, PROTOCOL_SRC_DIRECTORY_NAME)
   const analysisDirPath = path.join(
@@ -142,11 +142,11 @@ export function addProtocolFile(
     )
 }
 
-export function removeProtocolById(
-  protocolId: string,
+export function removeProtocolByKey(
+  protocolKey: string,
   protocolsDirPath: string
 ): Promise<void> {
-  const targetDirPath = path.join(protocolsDirPath, protocolId)
+  const targetDirPath = path.join(protocolsDirPath, protocolKey)
   return shell.trashItem(targetDirPath).catch(() =>
     fs
       .readdir(targetDirPath)

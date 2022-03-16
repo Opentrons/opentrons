@@ -89,7 +89,16 @@ export function registerProtocolStorage(dispatch: Dispatch): Dispatch {
         ).then(() =>
           fetchProtocols(dispatch, ProtocolStorageActions.PROTOCOL_ADDITION)
         )
+        break
+      }
 
+      case ProtocolStorageActions.REMOVE_PROTOCOL: {
+        FileSystem.removeProtocolByKey(
+          action.payload.protocolKey,
+          FileSystem.PROTOCOLS_DIRECTORY_PATH
+        ).then(() =>
+          fetchProtocols(dispatch, ProtocolStorageActions.PROTOCOL_ADDITION)
+        )
         break
       }
 
