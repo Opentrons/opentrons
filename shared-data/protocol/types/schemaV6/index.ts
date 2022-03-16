@@ -59,10 +59,10 @@ export interface ProtocolFile<DesignerApplicationData = {}> {
 }
 
 /**
- * This type should not be used, any time you need want a function/hook/component to take in
+ * This type should not be used, any time you want a function/hook/component to take in
  * a protocol file with run time commands, split your function signature to take in each param
  * separately, and import the RunTimeCommand type separately. RunTimeCommand is a server concept
- * and should not be mixed with our Protocol
+ * and should not be mixed with our Protocol types
  * @deprecated Use {@link ProtocolFile}
  */
 export interface ProtocolAnalysisFile<DesignerApplicationData = {}>
