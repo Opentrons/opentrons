@@ -8,6 +8,9 @@
   "module": "dist/api-client.mjs",
   "types": "lib/index.d.ts",
   "source": "src/index.ts",
+  "scripts": {
+    "test": "jest --coverage",
+    "test:watch": "jest --watch"},
   "browser": {
     "./dist/api-client.js": "./dist/api-client.browser.js",
     "./dist/api-client.mjs": "./dist/api-client.browser.mjs"
@@ -15,5 +18,10 @@
   "dependencies": {
     "@opentrons/shared-data": "5.0.2",
     "axios": "^0.21.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.4.1",
+    "jest": "^27.5.1",
+    "ts-jest": "^27.1.3"
   }
 }
