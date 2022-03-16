@@ -70,7 +70,7 @@ const migrateCommands = (
 }
 
 export const migrateFile = (appData: ProtocolFileV5<{}>): ProtocolFile => {
-  const pipettes = appData.pipettes
+  const { pipettes, labware, modules, commands } = appData
   const loadPipetteCommands: LoadPipetteCreateCommand[] = map(
     pipettes,
     (pipette, pipetteId) => {
@@ -86,7 +86,6 @@ export const migrateFile = (appData: ProtocolFileV5<{}>): ProtocolFile => {
     }
   )
 
-  const modules = appData.modules
   const loadModuleCommands: LoadModuleCreateCommand[] = map(
     modules,
     (module, moduleId) => {
@@ -102,7 +101,6 @@ export const migrateFile = (appData: ProtocolFileV5<{}>): ProtocolFile => {
     }
   )
 
-  const labware = appData.labware
   const loadLabwareCommands: LoadLabwareCreateCommand[] = map(
     labware,
     (labware, labwareId) => {
@@ -118,7 +116,6 @@ export const migrateFile = (appData: ProtocolFileV5<{}>): ProtocolFile => {
     }
   )
 
-  const commands = appData.commands
   const migratedV5Commands = migrateCommands(commands)
 
   return {
