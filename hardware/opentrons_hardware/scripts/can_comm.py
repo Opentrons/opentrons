@@ -76,7 +76,10 @@ def create_choices(enum_type: Type[Enum]) -> Sequence[str]:
 
 
 def prompt_enum(
-    enum_type: Type[Enum], get_user_input: GetInputFunc, output_func: OutputFunc
+    enum_type: Type[Enum],
+    get_user_input: GetInputFunc,
+    output_func: OutputFunc,
+    only_prompt_on_request: bool = False,
 ) -> Type[Enum]:
     """Prompt to choose a member of the enum.
 
@@ -89,14 +92,28 @@ def prompt_enum(
         The choice.
 
     """
-    output_func(f"choose {enum_type.__name__}:")
-    for row in create_choices(enum_type):
-        output_func(f"\t{row}")
 
-    try:
-        return list(enum_type)[int(get_user_input("enter choice: "))]
-    except (ValueError, IndexError) as e:
-        raise InvalidInput(str(e))
+    def write_choices() -> None:
+        output_func(f"choose {enum_type.__name__}:")
+        for row in create_choices(enum_type):
+            output_func(f"\t{row}")
+
+    def parse_input(userstr: str) -> Type[Enum]:
+        try:
+            return list(enum_type)[int(userstr)]
+        except (ValueError, IndexError) as e:
+            raise InvalidInput(str(e))
+
+    if only_prompt_on_request:
+        user = get_user_input(f"choose {enum_type.__name__} (? for list): ")
+        if "?" in user:
+            write_choices()
+            return parse_input(get_user_input("enter choice: "))
+        else:
+            return parse_input(user)
+    else:
+        write_choices()
+        return parse_input(get_user_input("enter choice: "))
 
 
 def prompt_payload(
@@ -127,16 +144,23 @@ def prompt_payload(
     return payload_type(**i)  # type: ignore[call-arg]
 
 
-def prompt_message(get_user_input: GetInputFunc, output_func: OutputFunc) -> CanMessage:
+def prompt_message(
+    get_user_input: GetInputFunc,
+    output_func: OutputFunc,
+    only_prompt_on_request: bool = False,
+) -> CanMessage:
     """Prompt user to create a message.
 
     Args:
         get_user_input: Function to get user input.
         output_func: Function to output text to user.
+        only_prompt_on_request: True to only write prompts if the user enters ?
 
     Returns: a CanMessage
     """
-    message_id = prompt_enum(MessageId, get_user_input, output_func)
+    message_id = prompt_enum(
+        MessageId, get_user_input, output_func, only_prompt_on_request
+    )
     node_id = prompt_enum(NodeId, get_user_input, output_func)
     # TODO (amit, 2021-10-01): Get function code when the time comes.
     function_code = FunctionCode.network_management
