@@ -1,4 +1,3 @@
-import { format, parseISO } from 'date-fns'
 import { useSelector } from 'react-redux'
 import { useLocation } from 'react-router'
 import { useTranslation } from 'react-i18next'
@@ -9,6 +8,7 @@ import {
   getDeckCalibrationOk,
 } from '../redux/nav'
 import { getConnectedRobot } from '../redux/discovery'
+import { formatTimestamp } from '../organisms/Devices/utils'
 import { useIsProtocolRunLoaded } from '../organisms/ProtocolUpload/hooks'
 import { translationKeyByPathSegment } from './NextGenApp'
 
@@ -70,14 +70,10 @@ export function usePathCrumbs(): PathCrumb[] {
       const crumbDisplayNameValue = translationKeyByPathSegment[crumb]
 
       /**
-       * Check if the crumb is a date and parse. may want to pull out as a helper
+       * Check if the crumb is a date and parse
        * Necessary because 'Run Record ID' is planned to be rendered as a date timestamp
        */
-      const crumbDateNameValue =
-        // eslint-disable-next-line eqeqeq
-        (new Date(crumb) as Date | string) != 'Invalid Date'
-          ? format(parseISO(crumb), 'MM/dd/yyyy HH:mm:ss')
-          : crumb
+      const crumbDateNameValue = formatTimestamp(crumb)
 
       return {
         pathSegment: crumb,

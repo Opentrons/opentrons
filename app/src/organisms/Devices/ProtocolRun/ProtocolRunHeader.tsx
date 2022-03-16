@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useHistory } from 'react-router-dom'
-import { format, parseISO } from 'date-fns'
 
 import {
   RUN_STATUS_IDLE,
@@ -53,19 +52,13 @@ import {
   useAttachedModuleMatchesForProtocol,
   useRunCalibrationStatus,
 } from '../hooks'
+import { formatTimestamp } from '../utils'
 
 import type { Run } from '@opentrons/api-client'
 
 interface ProtocolRunHeaderProps {
   robotName: string
   runId: string
-}
-
-export function formatTimestamp(timestamp: string): string {
-  // eslint-disable-next-line eqeqeq
-  return (new Date(timestamp) as Date | string) != 'Invalid Date'
-    ? format(parseISO(timestamp), 'MM/dd/yyyy HH:mm:ss')
-    : timestamp
 }
 
 function RunTimer({
