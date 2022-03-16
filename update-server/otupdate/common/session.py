@@ -58,7 +58,7 @@ class UpdateSession:
         LOG.info(f"Update session: removed {getattr(self, '_token', '<unknown>')}")
 
     def set_stage(self, stage: Stages):
-        """Covinience method to set the stage and lookup message"""
+        """Convenience method to set the stage and lookup message"""
         assert stage in Stages
         LOG.info(f"Update session: stage {self._stage.name}->{stage.name}")
         self._stage = stage
