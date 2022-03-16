@@ -49,6 +49,10 @@ describe('v6 migration', () => {
       deckId: 'ot2_standard',
     })
   })
+  it('adds a liquids key', () => {
+    const expectedLiquids = { '0': { displayName: 'Water', description: null } }
+    expect(migratedFile.liquids).toEqual(expectedLiquids)
+  })
   it('creates loadModule commands', () => {
     const expectedLoadModuleCommands = [
       {

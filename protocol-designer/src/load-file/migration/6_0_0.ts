@@ -1,6 +1,7 @@
-import { map } from 'lodash'
+import map from 'lodash/map'
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
+import reduce from 'lodash/reduce'
 import {
   OT2_STANDARD_DECKID,
   OT2_STANDARD_MODEL,
@@ -20,6 +21,18 @@ import type {
   CreateCommand,
   ProtocolFile,
 } from '@opentrons/shared-data/protocol/types/schemaV6'
+
+interface DesignerApplicationData {
+  ingredients: Record<
+    string,
+    {
+      name: string
+      description: string | null
+      serialize: boolean
+      liquidGroupId: string
+    }
+  >
+}
 
 const PD_VERSION = '6.0.0'
 const SCHEMA_VERSION = 6
@@ -69,7 +82,9 @@ const migrateCommands = (
   })
 }
 
-export const migrateFile = (appData: ProtocolFileV5<{}>): ProtocolFile => {
+export const migrateFile = (
+  appData: ProtocolFileV5<DesignerApplicationData>
+): ProtocolFile => {
   const { pipettes, labware, modules, commands } = appData
   const loadPipetteCommands: LoadPipetteCreateCommand[] = map(
     pipettes,
@@ -118,6 +133,24 @@ export const migrateFile = (appData: ProtocolFileV5<{}>): ProtocolFile => {
 
   const migratedV5Commands = migrateCommands(commands)
 
+  const liquids: ProtocolFile['liquids'] =
+    appData.designerApplication?.data?.ingredients != null
+      ? reduce(
+          appData.designerApplication?.data?.ingredients,
+          (acc, liquidData, liquidId) => {
+            return {
+              ...acc,
+              [liquidId]: {
+                displayName: liquidData.name,
+                description: liquidData.description,
+              },
+            }
+          },
+          {}
+        )
+      : // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        ({} as ProtocolFile['liquids'])
+
   return {
     ...appData,
     designerApplication: {
@@ -133,7 +166,7 @@ export const migrateFile = (appData: ProtocolFileV5<{}>): ProtocolFile => {
     pipettes: migratePipettes(appData.pipettes),
     labware: migrateLabware(appData.labware),
     modules: migrateModules(appData.modules),
-    liquids: {}, // TODO: generate liquid key https://github.com/Opentrons/opentrons/issues/9702
+    liquids,
     commands: [
       // TODO: generate load liquid commands https://github.com/Opentrons/opentrons/issues/9702
       ...loadPipetteCommands,
