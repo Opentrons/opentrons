@@ -7,6 +7,7 @@ import {
   SIZE_2,
   NewPrimaryBtn,
   NewSecondaryBtn,
+  styleProps,
 } from '@opentrons/components'
 import { ToggleBtn, ToggleBtnProps } from '../ToggleBtn'
 
@@ -20,6 +21,8 @@ export const TertiaryButton = styled(NewPrimaryBtn)`
   text-transform: ${TYPOGRAPHY.textTransformNone};
   white-space: nowrap;
   ${TYPOGRAPHY.labelSemiBold}
+
+  ${styleProps}
 `
 
 export const PrimaryButton = styled(NewPrimaryBtn)`
@@ -27,13 +30,17 @@ export const PrimaryButton = styled(NewPrimaryBtn)`
   border-radius: ${BORDERS.radiusSoftCorners};
   text-transform: ${TYPOGRAPHY.textTransformNone};
   ${TYPOGRAPHY.pSemiBold}
+
+  ${styleProps}
 `
 
 export const SecondaryButton = styled(NewSecondaryBtn)`
-  background-color: ${COLORS.blue};
+  color: ${COLORS.blue};
   border-radius: ${BORDERS.radiusSoftCorners};
   text-transform: ${TYPOGRAPHY.textTransformNone};
   ${TYPOGRAPHY.pSemiBold}
+
+  ${styleProps}
 `
 
 export const ToggleButton = (props: ToggleBtnProps): JSX.Element => {
