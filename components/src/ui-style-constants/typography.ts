@@ -74,6 +74,7 @@ export const h6Default = css`
   font-size: ${fontSizeH6};
   font-weight: ${fontWeightRegular};
   line-height: ${lineHeight12};
+  text-transform: ${textTransformUppercase};
 `
 
 export const h6SemiBold = css`

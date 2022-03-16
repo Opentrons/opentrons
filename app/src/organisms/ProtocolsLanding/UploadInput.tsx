@@ -20,13 +20,14 @@ import {
   C_WHITE,
   JUSTIFY_CENTER,
   C_BLUE,
+  TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 
 const DROP_ZONE_STYLES = css`
   display: flex;
   flex-direction: ${DIRECTION_COLUMN};
   align-items: ${ALIGN_CENTER};
-  width: 90%;
+  width: 100%;
   font-size: ${FONT_SIZE_BODY_2};
   font-weight: ${FONT_WEIGHT_REGULAR};
   padding: ${SPACING_5};
@@ -103,7 +104,11 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
       justifyContent={JUSTIFY_CENTER}
       alignItems={ALIGN_CENTER}
     >
-      <Text fontSize={FONT_SIZE_BODY_1} margin="1.5rem">
+      <Text
+        fontSize={FONT_SIZE_BODY_1}
+        textAlign={TEXT_ALIGN_CENTER}
+        marginY="1.5rem"
+      >
         {t('valid_file_types')}
       </Text>
       <NewPrimaryBtn

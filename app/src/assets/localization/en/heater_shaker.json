@@ -59,6 +59,7 @@
   "step_4_of_4": "Step 4 of 4: Test shake",
   "test_shake_banner_information": "If you want to add labware to the module before doing a test shake, you can use the labware latch controls to hold the latches open.",
   "open_labware_latch": "Open Labware Latch",
+  "close_labware_latch": "Close Labware Latch",
   "set_shake_speed": "Set shake speed",
   "start_shaking": "Start Shaking",
   "troubleshooting": "Troubleshooting",
@@ -66,5 +67,10 @@
   "troubleshoot_step2_description": "Return to Step 2 to see instructions for securing the thermal adapter to the module.",
   "go_to_step_1": "Go to Step 1",
   "go_to_step_2": "Go to Step 2",
-  "min_max_rpm": "{{min}} - {{max}} RPM"
+  "min_max_rpm": "{{min}} - {{max}} RPM",
+  "set_temperature": "Set temperature",
+  "how_to_attach_to_deck": "See how to attach to deck",
+  "test_shake": "Test shake",
+  "deactivate": "Deactivate",
+  "stop_shaking": "Stop Shaking"
 }
