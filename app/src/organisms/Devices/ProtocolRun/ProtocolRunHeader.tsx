@@ -290,6 +290,7 @@ export function ProtocolRunHeader({
       padding={SPACING.spacing4}
     >
       <Flex>
+        {/* TODO(bh, 2022-03-15) will update link to a protocol key stored locally when built */}
         <Link to={`/protocols/${protocolRecord?.data?.data.id}`}>
           <StyledText color={COLORS.blue} css={TYPOGRAPHY.h2SemiBold}>
             {protocolRecord?.data?.data.metadata.protocolName}
