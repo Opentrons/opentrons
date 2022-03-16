@@ -16,9 +16,8 @@ if find_dotenv():
     load_dotenv(find_dotenv())
 
 
-@pytest.fixture(scope="function")
-def chrome_options() -> Options:
-    """Pass standard Chrome options to a test."""
+def _chrome_options() -> Options:
+    """Standard Chrome options."""
     options = Options()
     executable_path = os.getenv("EXECUTABLE_PATH")
     assert (
@@ -26,16 +25,22 @@ def chrome_options() -> Options:
     ), "EXECUTABLE_PATH environment variable must be set"
     logger.info(f"EXECUTABLE_PATH is {executable_path}")
     options.binary_location = executable_path
-    options.add_argument("whitelisted-ips=''")
-    options.add_argument("disable-xss-auditor")
-    options.add_argument("disable-web-security")
-    options.add_argument("allow-running-insecure-content")
-    options.add_argument("no-sandbox")
-    options.add_argument("disable-setuid-sandbox")
-    options.add_argument("disable-popup-blocking")
-    options.add_argument("allow-elevated-browser")
-    options.add_argument("verbose")
+    options.add_argument("whitelisted-ips=''")  # type: ignore
+    options.add_argument("disable-xss-auditor")  # type: ignore
+    options.add_argument("disable-web-security")  # type: ignore
+    options.add_argument("allow-running-insecure-content")  # type: ignore
+    options.add_argument("no-sandbox")  # type: ignore
+    options.add_argument("disable-setuid-sandbox")  # type: ignore
+    options.add_argument("disable-popup-blocking")  # type: ignore
+    options.add_argument("allow-elevated-browser")  # type: ignore
+    options.add_argument("verbose")  # type: ignore
     return options
+
+
+@pytest.fixture(scope="function")
+def chrome_options() -> Options:
+    """Pass standard Chrome options to a test."""
+    return _chrome_options()
 
 
 @pytest.fixture(scope="session")

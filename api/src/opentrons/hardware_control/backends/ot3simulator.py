@@ -160,7 +160,7 @@ class OT3Simulator:
         """Set the module controls"""
         self._module_controls = module_controls
 
-    def update_to_default_current_settings(self, gantry_load: GantryLoad) -> None:
+    async def update_to_default_current_settings(self, gantry_load: GantryLoad) -> None:
         self._current_settings = get_current_settings(
             self._configuration.current_settings, gantry_load
         )

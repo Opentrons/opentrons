@@ -21,4 +21,5 @@ docstring-convention = google
 noqa-require-code = true
 
 per-file-ignores =
-    src/driver/drag_drop.py:E501
+    src/driver/drag_drop.py:E501,
+    locators.py:F401

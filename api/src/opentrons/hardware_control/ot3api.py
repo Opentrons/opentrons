@@ -178,13 +178,12 @@ class OT3API(
     def gantry_load(self) -> GantryLoad:
         return self._gantry_load
 
-    @gantry_load.setter
-    def gantry_load(self, gantry_load: GantryLoad) -> None:
+    async def set_gantry_load(self, gantry_load: GantryLoad) -> None:
         self._gantry_load = gantry_load
         self._move_manager.update_constraints(
             get_system_constraints(self._config.motion_settings, gantry_load)
         )
-        self._backend.update_to_default_current_settings(gantry_load)
+        await self._backend.update_to_default_current_settings(gantry_load)
 
     def _update_door_state(self, door_state: DoorState) -> None:
         mod_log.info(f"Updating the window switch status: {door_state}")
@@ -404,7 +403,7 @@ class OT3API(
             await self._backend.configure_mount(mount, hw_config)
         await self._backend.probe_network()
         # TODO: (AA, 2022-02-09) Set correct pipette kind based on attached instr
-        self.gantry_load = GantryLoad.TWO_LOW_THROUGHPUT
+        await self.set_gantry_load(GantryLoad.TWO_LOW_THROUGHPUT)
 
     # Global actions API
     def pause(self, pause_type: PauseType) -> None:
