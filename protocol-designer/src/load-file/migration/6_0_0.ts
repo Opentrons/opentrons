@@ -16,7 +16,7 @@ import type {
   LoadModuleCreateCommand,
   LoadLabwareCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-import {
+import type {
   CreateCommand,
   ProtocolFile,
 } from '@opentrons/shared-data/protocol/types/schemaV6'
@@ -119,31 +119,29 @@ export const migrateFile = (appData: ProtocolFileV5<{}>): ProtocolFile => {
   const migratedV5Commands = migrateCommands(commands)
 
   return {
+    ...appData,
     designerApplication: {
-      name: 'opentrons/protocol-designer',
+      ...appData.designerApplication,
       version: PD_VERSION,
-      data:
-        appData.designerApplication === undefined
-          ? undefined
-          : appData.designerApplication.data,
     },
     schemaVersion: SCHEMA_VERSION,
     $otSharedSchema: '#/protocol/schemas/6',
-    metadata: appData.metadata,
     robot: {
       model: OT2_STANDARD_MODEL,
       deckId: OT2_STANDARD_DECKID,
     },
     pipettes: migratePipettes(appData.pipettes),
     labware: migrateLabware(appData.labware),
-    labwareDefinitions: appData.labwareDefinitions,
     modules: migrateModules(appData.modules),
-    liquids: {},
+    liquids: {}, // TODO: generate liquid key https://github.com/Opentrons/opentrons/issues/9702
     commands: [
+      // TODO: generate load liquid commands https://github.com/Opentrons/opentrons/issues/9702
       ...loadPipetteCommands,
       ...loadModuleCommands,
       ...loadLabwareCommands,
       ...migratedV5Commands,
     ],
+    // any casting command annotations to make TS happy, they were never used by older PD versions, but schema v3 types them differently
+    commandAnnotations: appData.commandAnnotations as any,
   }
 }
