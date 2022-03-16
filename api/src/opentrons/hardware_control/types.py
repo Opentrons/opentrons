@@ -187,8 +187,8 @@ class OT3Axis(enum.Enum):
         return pm[checked_mount]
 
     @classmethod
-    def to_kind(cls, inst: "OT3Axis") -> OT3AxisKind:
-        return {
+    def to_kind(cls, axis: "OT3Axis") -> OT3AxisKind:
+        kind_map: Dict[OT3Axis, OT3AxisKind] = {
             cls.P_L: OT3AxisKind.P,
             cls.P_R: OT3AxisKind.P,
             cls.X: OT3AxisKind.X,
@@ -198,7 +198,8 @@ class OT3Axis(enum.Enum):
             cls.Z_G: OT3AxisKind.Z,
             cls.Q: OT3AxisKind.OTHER,
             cls.G: OT3AxisKind.OTHER,
-        }[inst]
+        }
+        return kind_map[axis]
 
     @classmethod
     def of_kind(cls, kind: OT3AxisKind) -> List["OT3Axis"]:
@@ -221,20 +222,6 @@ class OT3Axis(enum.Enum):
             cls.Z_G: OT3Mount.GRIPPER,
             cls.G: OT3Mount.GRIPPER,
         }[inst]
-
-    @classmethod
-    def home_position(cls) -> Dict["OT3Axis", float]:
-        return {
-            OT3Axis.P_L: 0.0,
-            OT3Axis.P_R: 0.0,
-            OT3Axis.X: 0.0,
-            OT3Axis.Y: 0.0,
-            OT3Axis.Z_L: 0.0,
-            OT3Axis.Z_R: 0.0,
-            OT3Axis.Z_G: 0.0,
-            OT3Axis.Q: 0.0,
-            OT3Axis.G: 0.0,
-        }
 
     def __str__(self) -> str:
         return self.name

@@ -84,6 +84,9 @@ class MoveGroupRunner:
                         message=self._get_message_type(step, group_i, seq_i),
                     )
 
+    def _convert_velocity(self, velocity: float, interrupts: int) -> Int32Field:
+        return Int32Field(int((velocity / interrupts) * (2**31)))
+
     def _get_message_type(
         self, step: MoveGroupSingleAxisStep, group: int, seq: int
     ) -> MessageDefinition:
@@ -93,8 +96,8 @@ class MoveGroupRunner:
                 group_id=UInt8Field(group),
                 seq_id=UInt8Field(seq),
                 duration=UInt32Field(int(step.duration_sec * interrupts_per_sec)),
-                velocity=Int32Field(
-                    int((step.velocity_mm_sec / interrupts_per_sec) * (2**31))
+                velocity=self._convert_velocity(
+                    step.velocity_mm_sec, interrupts_per_sec
                 ),
             )
             return HomeRequest(payload=home_payload)
@@ -174,13 +177,6 @@ class MoveScheduler:
             if not self._moves[group_id]:
                 log.info(f"Move group {group_id} has completed.")
                 self._event.set()
-            # if self._stop_condition[
-            #     group_id
-            # ] == MoveStopCondition.limit_switch and ack_id != UInt8Field(2):
-            #     raise MoveConditionNotMet()
-            #     if ack_id == UInt8Field(1):
-            #         condition = "Homing timed out."
-            #     log.warning(f"Homing failed. Condition: {condition}")
 
     async def run(self, can_messenger: CanMessenger) -> None:
         """Start each move group after the prior has completed."""

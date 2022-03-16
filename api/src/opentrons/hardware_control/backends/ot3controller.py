@@ -4,7 +4,6 @@ from __future__ import annotations
 import asyncio
 from contextlib import contextmanager
 import logging
-import numpy as np
 from typing import (
     Dict,
     List,
@@ -207,8 +206,8 @@ class OT3Controller:
         await runner.run(can_messenger=self._messenger)
         self._position.update(final_positions)
 
-    async def home(self, axes: List[OT3Axis]) -> Dict[OT3Axis, float]:
-        """Move to a position.
+    async def home(self, axes: List[OT3Axis]) -> OT3AxisMap[float]:
+        """Home each axis passed in, and reset the positions to 0.
 
         Args:
             target_position: Map of axis to position.
@@ -219,13 +218,21 @@ class OT3Controller:
         Returns:
             None
         """
+        # breakpoint()
+        # for ax in axes:
+        #     breakpoint()
+        #     upper = self.axis_bounds[ax[0]][1]
+        #     lower = self.axis_bounds[ax[0]][0]        # for ax in axes:
+        #     breakpoint()
+        #     upper = self.axis_bounds[ax[0]][1]
+        #     lower = self.axis_bounds[ax[0]][0]
         distances = {
-            ax: self.axis_bounds[ax][1] - self.axis_bounds[ax][0] for ax in axes
+            ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0] for ax in axes
         }
         speed_settings = (
             self._configuration.motion_settings.max_speed_discontinuity.none
         )
-        velocities = {ax: -1 * speed_settings[OT3Axis.to_kind(ax)] for ax in axes}
+        velocities = {ax: -0.1 * speed_settings[OT3Axis.to_kind(ax)] for ax in axes}
         group = create_home_group(distances, velocities)
         runner = MoveGroupRunner(move_groups=[group])
         await runner.run(can_messenger=self._messenger)

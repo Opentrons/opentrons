@@ -4,20 +4,21 @@ Running this script will create and spin up a hardware controller
 and expose it to a python commandline.
 """
 
-import os
+# import os
 
-if not os.environ.get("RUNNING_ON_PI") and not os.environ.get("RUNNING_ON_VERDIN"):
-    print("You should run this through the script alias: ot3repl")
-    exit()
-if os.environ.get("OT2", None):
-    print(
-        '"OT2" env var detected, running with OT2 HC. '
-        "If you dont want this, remove the OT2 env var"
-    )
-    os.environ["OT_API_FF_enableOT3HardwareController"] = "false"
-else:
-    print("Running with OT3 HC. If you dont want this, set an " 'env var named "OT2".')
-    os.environ["OT_API_FF_enableOT3HardwareController"] = "true"
+# if not os.environ.get("RUNNING_ON_PI") and not os.environ.get("RUNNING_ON_VERDIN"):
+#     print("You should run this through the script alias: ot3repl")
+#     exit()
+# if os.environ.get("OT2", None):
+#     print(
+#         '"OT2" env var detected, running with OT2 HC. '
+#         "If you dont want this, remove the OT2 env var"
+#     )
+#     os.environ["OT_API_FF_enableOT3HardwareController"] = "false"
+# else:
+#     print("Running with OT3 HC. If you dont want this,
+#     set an " 'env var named "OT2".')
+#     os.environ["OT_API_FF_enableOT3HardwareController"] = "true"
 
 from code import interact
 from subprocess import run
@@ -64,7 +65,7 @@ def do_interact(api: ThreadManager[HardwareControlAPI]) -> None:
 
 
 if __name__ == "__main__":
-    stop_server()
+    # stop_server()
     api_tm = build_api()
     api_tm.sync.cache_instruments()
     do_interact(api_tm)

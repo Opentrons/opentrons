@@ -1,6 +1,7 @@
 import pytest
 from mock import AsyncMock, patch
 from opentrons.hardware_control.backends.ot3controller import OT3Controller
+from opentrons.hardware_control.backends.ot3utils import axis_to_node
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons.config.types import OT3Config
 from opentrons.config.robot_configs import build_config_ot3
@@ -48,16 +49,26 @@ def mock_move_group_run():
         yield mock_mgr_run
 
 
-async def test_home(controller: OT3Controller, mock_move_group_run):
-    home_pos = await controller.home([OT3Axis.X])
+@pytest.mark.parametrize(
+    "axes",
+    [
+        [OT3Axis.X],
+        [OT3Axis.Y],
+        [OT3Axis.Z_L],
+        [OT3Axis.Z_R],
+        [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_R],
+    ],
+)
+async def test_home(controller: OT3Controller, mock_move_group_run, axes):
+    await controller.home(axes)
     home_move = (mock_move_group_run.call_args_list[0][0][0]._move_groups)[0][0][
-        NodeId.gantry_x
+        axis_to_node(axes[0])
     ]
     assert home_move.distance_mm == home_move.velocity_mm_sec * home_move.duration_sec
     assert home_move.acceleration_mm_sec_sq == 0
     assert home_move.move_type == MoveType.home
     assert home_move.stop_condition == MoveStopCondition.limit_switch
-    assert home_pos[OT3Axis.X] == 0
+    # assert home_pos[OT3Axis.X] == 0
     mock_move_group_run.assert_called_once()
 
 

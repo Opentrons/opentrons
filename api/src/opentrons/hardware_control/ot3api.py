@@ -514,9 +514,18 @@ class OT3API(
         Home the plunger motor for a mount, and then return it to the 'bottom'
         position.
         """
+
         checked_mount = OT3Mount.from_mount(mount)
-        await self.current_position(mount=checked_mount, refresh=True)
-        await self._do_plunger_home(mount=checked_mount, acquire_lock=True)
+        await self.home([OT3Axis.of_main_tool_actuator(checked_mount)])
+        instr = self._instrument_handler.hardware_instruments[checked_mount]
+        if instr:
+            target_pos = target_position_from_plunger(
+                checked_mount, instr.config.bottom, self._current_position
+            )
+            await self._move(target_pos, acquire_lock=False, home_flagged_axes=False)
+
+            await self.current_position(mount=checked_mount, refresh=True)
+        # await self._do_plunger_home(mount=checked_mount, acquire_lock=True)
 
     @lru_cache(1)
     def _carriage_offset(self) -> top_types.Point:
@@ -601,10 +610,7 @@ class OT3API(
         """Move the critical point of the specified mount to a location
         relative to the deck, at the specified speed."""
         if not self._current_position:
-            raise MustHomeError(
-                "Cannot make a relative move because absolute position is unknown"
-            )
-            # TODO raise error
+            await self.home()
 
         realmount = OT3Mount.from_mount(mount)
         target_position = target_position_from_absolute(
