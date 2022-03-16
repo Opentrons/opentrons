@@ -5,15 +5,18 @@ from functools import partial
 from pydantic import BaseModel, Field
 
 from robot_server.service.json_api import (
-    ResponseModel,
-    ResponseDataModel,
-    MultiResponseModel,
+    DeprecatedResponseModel,
+    DeprecatedResponseDataModel,
+    DeprecatedMultiResponseModel,
 )
 
-OffsetVector = typing.Tuple[float, float, float]
+# NOTE: this would be more accurately typed as
+# a typing.Tuple[float, float, float], but tuple is
+# not able to be expressed in OpenAPI Spec
+OffsetVector = typing.Sequence[float]
 
 OffsetVectorField = partial(
-    Field, ..., description="A labware offset vector in deck " "coordinates (x, y, z)"
+    Field, ..., description="A labware offset vector in deck coordinates (x, y, z)"
 )
 
 
@@ -48,7 +51,7 @@ class CalibrationData(BaseModel):
     )
 
 
-class LabwareCalibration(ResponseDataModel):
+class LabwareCalibration(DeprecatedResponseDataModel):
     """
     A model describing labware calibrations (tiplength and offset)
     """
@@ -111,6 +114,6 @@ class LabwareCalibration(ResponseDataModel):
         }
 
 
-MultipleCalibrationsResponse = MultiResponseModel[LabwareCalibration]
+MultipleCalibrationsResponse = DeprecatedMultiResponseModel[LabwareCalibration]
 
-SingleCalibrationResponse = ResponseModel[LabwareCalibration]
+SingleCalibrationResponse = DeprecatedResponseModel[LabwareCalibration]

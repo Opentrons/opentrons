@@ -1,5 +1,6 @@
 from starlette import status
 from fastapi import APIRouter
+from typing import Optional
 
 from opentrons.calibration_storage import (
     types as cal_types,
@@ -8,7 +9,7 @@ from opentrons.calibration_storage import (
     delete,
 )
 
-from robot_server.errors import ErrorResponse
+from robot_server.errors import ErrorBody
 from robot_server.service.tip_length import models as tl_models
 from robot_server.service.errors import RobotServerError, CommonErrorDef
 from robot_server.service.shared_models import calibration as cal_model
@@ -42,13 +43,16 @@ def _format_calibration(
     response_model=tl_models.MultipleCalibrationsResponse,
 )
 async def get_all_tip_length_calibrations(
-    tiprack_hash: str = None, pipette_id: str = None, tiprack_uri: str = None
+    tiprack_hash: Optional[str] = None,
+    pipette_id: Optional[str] = None,
+    tiprack_uri: Optional[str] = None,
 ) -> tl_models.MultipleCalibrationsResponse:
     all_calibrations = get_cal.get_all_tip_length_calibrations()
 
     if not all_calibrations:
         return tl_models.MultipleCalibrationsResponse(
-            data=[_format_calibration(cal) for cal in all_calibrations]
+            data=[_format_calibration(cal) for cal in all_calibrations],
+            links=None,
         )
 
     if tiprack_hash:
@@ -65,14 +69,14 @@ async def get_all_tip_length_calibrations(
         )
 
     calibrations = [_format_calibration(cal) for cal in all_calibrations]
-    return tl_models.MultipleCalibrationsResponse(data=calibrations)
+    return tl_models.MultipleCalibrationsResponse(data=calibrations, links=None)
 
 
 @router.delete(
     "/calibration/tip_length",
     description="Delete one specific tip length calibration by pipette "
     "serial and tiprack hash",
-    responses={status.HTTP_404_NOT_FOUND: {"model": ErrorResponse}},
+    responses={status.HTTP_404_NOT_FOUND: {"model": ErrorBody}},
 )
 async def delete_specific_tip_length_calibration(tiprack_hash: str, pipette_id: str):
     try:

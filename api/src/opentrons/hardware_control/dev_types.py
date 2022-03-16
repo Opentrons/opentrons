@@ -1,30 +1,21 @@
 from __future__ import annotations
+
 # this file defines types that require dev dependencies
 # and are only relevant for static typechecking. this file should only
 # be imported if typing.TYPE_CHECKING is True
-import asyncio
-from typing import Optional, Dict, Union
+from typing import Optional, Dict, List, Union
 
-from typing_extensions import Protocol, TypedDict, Literal
+from typing_extensions import TypedDict, Literal
 
 from opentrons_shared_data.pipette.dev_types import (
-    PipetteModel, PipetteName, ChannelCount
+    PipetteModel,
+    PipetteName,
+    ChannelCount,
 )
 
 from opentrons.drivers.types import MoveSplit
-from .types import HardwareEventType
-
 from opentrons.types import Mount
 from opentrons.config.pipette_config import PipetteConfig
-
-
-class HasLoop(Protocol):
-    @property
-    def loop(self) -> asyncio.AbstractEventLoop:
-        ...
-
-
-DoorStateNotificationType = Literal[HardwareEventType.DOOR_SWITCH_CHANGE]
 
 
 class InstrumentSpec(TypedDict):
@@ -47,6 +38,7 @@ ONE_CHANNEL = Literal[1]
 class PipetteDict(TypedDict):
     name: PipetteName
     model: PipetteModel
+    back_compat_names: List[PipetteName]
     pipette_id: str
     display_name: str
     min_volume: float
@@ -66,7 +58,7 @@ class PipetteDict(TypedDict):
     return_tip_height: float
     default_aspirate_flow_rates: Dict[str, float]
     default_dispense_flow_rates: Dict[str, float]
-    default_blow_out_flow_rates: Dict[str,  float]
+    default_blow_out_flow_rates: Dict[str, float]
     default_aspirate_speeds: Dict[str, float]
     default_dispense_speeds: Dict[str, float]
     default_blow_out_speeds: Dict[str, float]

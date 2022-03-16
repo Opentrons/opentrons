@@ -23,6 +23,7 @@ export const mockApiTemperatureModuleLegacy: ApiTypes.ApiTemperatureModuleLegacy
 }
 
 export const mockApiTemperatureModule: ApiTypes.ApiTemperatureModule = {
+  id: 'tempdeck_id',
   name: 'tempdeck',
   displayName: 'tempdeck',
   port: '/dev/ot_module_tempdeck0',
@@ -41,6 +42,7 @@ export const mockApiTemperatureModule: ApiTypes.ApiTemperatureModule = {
 }
 
 export const mockApiTemperatureModuleGen2: ApiTypes.ApiTemperatureModule = {
+  id: 'tempdeck_id',
   name: 'tempdeck',
   displayName: 'tempdeck',
   model: 'temp_deck_v20',
@@ -59,6 +61,7 @@ export const mockApiTemperatureModuleGen2: ApiTypes.ApiTemperatureModule = {
 }
 
 export const mockTemperatureModule: Types.TemperatureModule = {
+  id: 'tempdeck_id',
   model: 'temperatureModuleV1',
   type: 'temperatureModuleType',
   port: '/dev/ot_module_tempdeck0',
@@ -75,6 +78,7 @@ export const mockTemperatureModule: Types.TemperatureModule = {
 }
 
 export const mockTemperatureModuleGen2: Types.TemperatureModule = {
+  id: 'tempdeck_id',
   model: 'temperatureModuleV2',
   type: 'temperatureModuleType',
   port: '/dev/ot_module_tempdeck0',
@@ -106,6 +110,7 @@ export const mockApiMagneticModuleLegacy: ApiTypes.ApiMagneticModuleLegacy = {
 }
 
 export const mockApiMagneticModule: ApiTypes.ApiMagneticModule = {
+  id: 'magdeck_id',
   name: 'magdeck',
   displayName: 'magdeck',
   model: 'mag_deck_v4.0',
@@ -124,6 +129,7 @@ export const mockApiMagneticModule: ApiTypes.ApiMagneticModule = {
 }
 
 export const mockApiMagneticModuleGen2: ApiTypes.ApiMagneticModule = {
+  id: 'magdeck_id',
   name: 'magdeck',
   displayName: 'magdeck',
   model: 'mag_deck_v20',
@@ -142,7 +148,25 @@ export const mockApiMagneticModuleGen2: ApiTypes.ApiMagneticModule = {
 }
 
 export const mockMagneticModule: Types.MagneticModule = {
+  id: 'magdeck_id',
   model: 'magneticModuleV1',
+  type: 'magneticModuleType',
+  port: '/dev/ot_module_magdeck0',
+  serial: 'def456',
+  revision: 'mag_deck_v4.0',
+  fwVersion: 'v2.0.0',
+  status: 'disengaged',
+  hasAvailableUpdate: true,
+  data: {
+    engaged: false,
+    height: 42,
+  },
+  usbPort: { hub: 1, port: 1 },
+}
+
+export const mockMagneticModuleGen2: Types.MagneticModule = {
+  id: 'magdeck_id',
+  model: 'magneticModuleV2',
   type: 'magneticModuleType',
   port: '/dev/ot_module_magdeck0',
   serial: 'def456',
@@ -182,6 +206,7 @@ export const mockApiThermocyclerLegacy: ApiTypes.ApiThermocyclerModuleLegacy = {
 }
 
 export const mockApiThermocycler: ApiTypes.ApiThermocyclerModule = {
+  id: 'thermocycler_id',
   name: 'thermocycler',
   displayName: 'thermocycler',
   port: '/dev/ot_module_thermocycler0',
@@ -209,6 +234,7 @@ export const mockApiThermocycler: ApiTypes.ApiThermocyclerModule = {
 }
 
 export const mockThermocycler: Types.ThermocyclerModule = {
+  id: 'thermocycler_id',
   model: 'thermocyclerModuleV1',
   type: 'thermocyclerModuleType',
   port: '/dev/ot_module_thermocycler0',
@@ -229,6 +255,53 @@ export const mockThermocycler: Types.ThermocyclerModule = {
     totalCycleCount: null,
     currentStepIndex: null,
     totalStepCount: null,
+  },
+  usbPort: { hub: 1, port: 1 },
+}
+
+export const mockApiHeaterShaker: ApiTypes.ApiHeaterShakerModule = {
+  id: 'heatershaker_id',
+  displayName: 'heatershaker',
+  port: '/dev/ot_module_heatershaker0',
+  serial: 'jkl123',
+  model: 'heatershaker_v4.0',
+  moduleModel: 'heaterShakerModuleV1',
+  revision: 'heatershaker_v4.0',
+  fwVersion: 'v2.0.0',
+  status: 'idle',
+  hasAvailableUpdate: true,
+  data: {
+    labwareLatchStatus: 'idle_unknown',
+    speedStatus: 'idle',
+    temperatureStatus: 'idle',
+    currentSpeed: null,
+    currentTemp: null,
+    targetSpeed: null,
+    targetTemp: null,
+    errorDetails: null,
+  },
+  usbPort: { hub: 1, port: 1 },
+}
+
+export const mockHeaterShaker: Types.HeaterShakerModule = {
+  id: 'heatershaker_id',
+  model: 'heaterShakerModuleV1',
+  type: 'heaterShakerModuleType',
+  port: '/dev/ot_module_thermocycler0',
+  serial: 'jkl123',
+  revision: 'heatershaker_v4.0',
+  fwVersion: 'v2.0.0',
+  status: 'idle',
+  hasAvailableUpdate: true,
+  data: {
+    labwareLatchStatus: 'idle_unknown',
+    speedStatus: 'idle',
+    temperatureStatus: 'idle',
+    currentSpeed: null,
+    currentTemp: null,
+    targetSpeed: null,
+    targetTemp: null,
+    errorDetails: null,
   },
   usbPort: { hub: 1, port: 1 },
 }

@@ -1,21 +1,19 @@
 import argparse
-from typing import Tuple
+from typing import Optional, Tuple, cast
 
-from opentrons.hardware_control import ThreadManager, API, adapters
-from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0
+from opentrons.hardware_control import API, Controller
+from opentrons.drivers.smoothie_drivers import SmoothieDriver
 
 
-def root_argparser(description: str = None):
+def root_argparser(description: Optional[str] = None) -> argparse.ArgumentParser:
     parse = argparse.ArgumentParser(description=description)
-    parse.add_argument('-p', '--port',
-                       help='serial port of the smoothie',
-                       default='', type=str)
+    parse.add_argument(
+        "-p", "--port", help="serial port of the smoothie", default="", type=str
+    )
     return parse
 
 
-def build_driver(
-        port: str = None)\
-        -> Tuple[adapters.SynchronousAdapter, SmoothieDriver_3_0_0]:
-    hardware = ThreadManager(API.build_hardware_controller, None, port).sync
-    driver = hardware._backend._smoothie_driver
-    return hardware, driver
+async def build_driver(port: Optional[str] = None) -> Tuple[API, SmoothieDriver]:
+    hardware = await API.build_hardware_controller(port=port)
+    backend: Controller = cast(Controller, hardware._backend)
+    return hardware, backend._smoothie_driver

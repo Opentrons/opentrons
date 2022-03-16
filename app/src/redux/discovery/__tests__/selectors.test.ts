@@ -476,6 +476,28 @@ describe('discovery selectors', () => {
       expected: null,
     },
     {
+      name: 'getDiscoverableRobotByName returns connectable robot by name',
+      selector: discovery.getDiscoverableRobotByName,
+      state: MOCK_STATE,
+      args: ['foo'],
+      expected: EXPECTED_FOO,
+    },
+    {
+      name: 'getDiscoverableRobotByName returns reachable robot by name',
+      selector: discovery.getDiscoverableRobotByName,
+      state: MOCK_STATE,
+      args: ['baz'],
+      expected: EXPECTED_BAZ,
+    },
+    {
+      name:
+        'getDiscoverableRobotByName returns discoverable robot by name if robot is not connectable',
+      selector: discovery.getDiscoverableRobotByName,
+      state: MOCK_STATE,
+      args: ['fizz'],
+      expected: EXPECTED_FIZZ,
+    },
+    {
       name: 'getRobotApiVersionByName returns API version of connectable robot',
       selector: discovery.getRobotApiVersionByName,
       state: MOCK_STATE,

@@ -1,6 +1,6 @@
 {
   "name": "@opentrons/shared-data",
-  "version": "4.4.0",
+  "version": "5.0.2",
   "description": "Default labware definitions for Opentrons robots",
   "repository": {
     "type": "git",
@@ -13,6 +13,8 @@
   "flow:main": "flow-types/js/index.js.flow",
   "dependencies": {
     "ajv": "6.10.2",
-    "lodash": "4.17.15"
+    "html-react-parser": "^1.2.8",
+    "lodash": "4.17.15",
+    "svgson": "^5.2.1"
   }
 }

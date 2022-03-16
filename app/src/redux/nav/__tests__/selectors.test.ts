@@ -4,6 +4,7 @@ import * as ConfigSelectors from '../../config/selectors'
 import * as CalibrationSelectors from '../../calibration/selectors'
 import * as DiscoverySelectors from '../../discovery/selectors'
 import * as PipetteSelectors from '../../pipettes/selectors'
+import * as ProtocolSelectors from '../../protocol/selectors'
 import * as RobotSelectors from '../../robot/selectors'
 import * as BuildrootSelectors from '../../buildroot/selectors'
 import * as ShellSelectors from '../../shell'
@@ -28,6 +29,7 @@ jest.mock('../../config/selectors')
 jest.mock('../../calibration/selectors')
 jest.mock('../../discovery/selectors')
 jest.mock('../../pipettes/selectors')
+jest.mock('../../protocol/selectors')
 jest.mock('../../buildroot/selectors')
 jest.mock('../../system-info/selectors')
 jest.mock('../../shell')
@@ -38,6 +40,9 @@ const mockGetFeatureFlags = ConfigSelectors.getFeatureFlags as jest.MockedFuncti
 >
 const mockGetConnectedRobot = DiscoverySelectors.getConnectedRobot as jest.MockedFunction<
   typeof DiscoverySelectors.getConnectedRobot
+>
+const mockGetProtocolData = ProtocolSelectors.getProtocolData as jest.MockedFunction<
+  typeof ProtocolSelectors.getProtocolData
 >
 const mockGetProtocolPipettesMatching = PipetteSelectors.getProtocolPipettesMatching as jest.MockedFunction<
   typeof PipetteSelectors.getProtocolPipettesMatching
@@ -92,22 +97,6 @@ const EXPECTED_UPLOAD = {
   disabledReason: expect.any(String),
 }
 
-const EXPECTED_CALIBRATE = {
-  id: 'calibrate',
-  path: '/calibrate',
-  title: 'Calibrate',
-  iconName: 'ot-calibrate',
-  disabledReason: expect.any(String),
-}
-
-const EXPECTED_RUN = {
-  id: 'run',
-  path: '/run',
-  title: 'Run',
-  iconName: 'ot-run',
-  disabledReason: expect.any(String),
-}
-
 const EXPECTED_MORE = {
   id: 'more',
   path: '/more',
@@ -115,6 +104,8 @@ const EXPECTED_MORE = {
   iconName: 'dots-horizontal',
   notificationReason: null,
 }
+
+// TODO(sb, 2020-11-23) rip out unneccessary tests during PUR cleanup
 
 describe('nav selectors', () => {
   const mockState: State = { mockState: true } as any
@@ -124,9 +115,9 @@ describe('nav selectors', () => {
     mockGetFeatureFlags.mockReturnValue({
       allPipetteConfig: false,
       enableBundleUpload: false,
-      preProtocolFlowWithoutRPC: false,
     })
     mockGetConnectedRobot.mockReturnValue(null)
+    mockGetProtocolData.mockReturnValue(null)
     mockGetProtocolPipettesMatching.mockReturnValue(false)
     mockGetProtocolPipettesCalibrated.mockReturnValue(false)
     mockGetAvailableShellUpdate.mockReturnValue(null)
@@ -153,14 +144,6 @@ describe('nav selectors', () => {
           ...EXPECTED_UPLOAD,
           disabledReason: expect.stringMatching(/connect to a robot/),
         },
-        {
-          ...EXPECTED_CALIBRATE,
-          disabledReason: expect.stringMatching(/connect to a robot/),
-        },
-        {
-          ...EXPECTED_RUN,
-          disabledReason: expect.stringMatching(/connect to a robot/),
-        },
         EXPECTED_MORE,
       ],
     },
@@ -173,14 +156,6 @@ describe('nav selectors', () => {
       expected: [
         EXPECTED_ROBOTS,
         { ...EXPECTED_UPLOAD, disabledReason: null },
-        {
-          ...EXPECTED_CALIBRATE,
-          disabledReason: expect.stringMatching(/load a protocol/),
-        },
-        {
-          ...EXPECTED_RUN,
-          disabledReason: expect.stringMatching(/load a protocol/),
-        },
         EXPECTED_MORE,
       ],
     },
@@ -197,11 +172,6 @@ describe('nav selectors', () => {
           ...EXPECTED_UPLOAD,
           disabledReason: expect.stringMatching(/while a run is in progress/),
         },
-        {
-          ...EXPECTED_CALIBRATE,
-          disabledReason: expect.stringMatching(/while a run is in progress/),
-        },
-        EXPECTED_RUN,
         EXPECTED_MORE,
       ],
     },
@@ -215,14 +185,6 @@ describe('nav selectors', () => {
       expected: [
         EXPECTED_ROBOTS,
         { ...EXPECTED_UPLOAD, disabledReason: null },
-        {
-          ...EXPECTED_CALIBRATE,
-          disabledReason: expect.stringMatching(/with runnable steps/),
-        },
-        {
-          ...EXPECTED_RUN,
-          disabledReason: expect.stringMatching(/with runnable steps/),
-        },
         EXPECTED_MORE,
       ],
     },
@@ -240,14 +202,6 @@ describe('nav selectors', () => {
       expected: [
         EXPECTED_ROBOTS,
         { ...EXPECTED_UPLOAD, disabledReason: null },
-        {
-          ...EXPECTED_CALIBRATE,
-          disabledReason: expect.stringMatching(/pipettes do not match/),
-        },
-        {
-          ...EXPECTED_RUN,
-          disabledReason: expect.stringMatching(/pipettes do not match/),
-        },
         EXPECTED_MORE,
       ],
     },
@@ -266,14 +220,6 @@ describe('nav selectors', () => {
       expected: [
         EXPECTED_ROBOTS,
         { ...EXPECTED_UPLOAD, disabledReason: null },
-        {
-          ...EXPECTED_CALIBRATE,
-          disabledReason: expect.stringMatching(/calibrate all pipettes/),
-        },
-        {
-          ...EXPECTED_RUN,
-          disabledReason: expect.stringMatching(/calibrate all pipettes/),
-        },
         EXPECTED_MORE,
       ],
     },
@@ -293,14 +239,6 @@ describe('nav selectors', () => {
           ...EXPECTED_UPLOAD,
           disabledReason: expect.stringMatching(/calibrate your deck/i),
         },
-        {
-          ...EXPECTED_CALIBRATE,
-          disabledReason: expect.stringMatching(/load a protocol/i),
-        },
-        {
-          ...EXPECTED_RUN,
-          disabledReason: expect.stringMatching(/load a protocol/i),
-        },
         EXPECTED_MORE,
       ],
     },
@@ -314,24 +252,10 @@ describe('nav selectors', () => {
         mockGetCommands.mockReturnValue([
           { id: 0, description: 'Foo', handledAt: null, children: [] },
         ] as any)
-        mockGetProtocolPipettesMatching.mockReturnValue(true)
-        mockGetProtocolPipettesCalibrated.mockReturnValue(true)
-      },
-      after: () => {
-        expect(mockGetProtocolPipettesMatching).toHaveBeenCalledWith(
-          mockState,
-          mockRobot.name
-        )
-        expect(mockGetProtocolPipettesCalibrated).toHaveBeenCalledWith(
-          mockState,
-          mockRobot.name
-        )
       },
       expected: [
         EXPECTED_ROBOTS,
         { ...EXPECTED_UPLOAD, disabledReason: null },
-        { ...EXPECTED_CALIBRATE, disabledReason: null },
-        { ...EXPECTED_RUN, disabledReason: null },
         EXPECTED_MORE,
       ],
     },
@@ -345,11 +269,6 @@ describe('nav selectors', () => {
       expected: [
         EXPECTED_ROBOTS,
         { ...EXPECTED_UPLOAD, disabledReason: null },
-        {
-          ...EXPECTED_CALIBRATE,
-          disabledReason: expect.stringMatching(/reset your protocol/),
-        },
-        EXPECTED_RUN,
         EXPECTED_MORE,
       ],
     },
@@ -362,8 +281,6 @@ describe('nav selectors', () => {
       expected: [
         EXPECTED_ROBOTS,
         EXPECTED_UPLOAD,
-        EXPECTED_CALIBRATE,
-        EXPECTED_RUN,
         {
           ...EXPECTED_MORE,
           notificationReason: expect.stringMatching(/app update is available/),
@@ -379,8 +296,6 @@ describe('nav selectors', () => {
       expected: [
         EXPECTED_ROBOTS,
         EXPECTED_UPLOAD,
-        EXPECTED_CALIBRATE,
-        EXPECTED_RUN,
         {
           ...EXPECTED_MORE,
           notificationReason: expect.stringMatching(
@@ -408,8 +323,6 @@ describe('nav selectors', () => {
           notificationReason: expect.stringMatching(/update is available/),
         },
         { ...EXPECTED_UPLOAD, disabledReason: null },
-        EXPECTED_CALIBRATE,
-        EXPECTED_RUN,
         EXPECTED_MORE,
       ],
     },
@@ -424,27 +337,6 @@ describe('nav selectors', () => {
       expected: [
         EXPECTED_ROBOTS,
         { ...EXPECTED_UPLOAD, disabledReason: null },
-        EXPECTED_CALIBRATE,
-        EXPECTED_RUN,
-        EXPECTED_MORE,
-      ],
-    },
-    {
-      name:
-        'getNavbarLocations with feature flag for HTTP based pre-protocol flow',
-      selector: Selectors.getNavbarLocations,
-      before: () => {
-        mockGetFeatureFlags.mockReturnValue({
-          allPipetteConfig: false,
-          enableBundleUpload: false,
-          preProtocolFlowWithoutRPC: true,
-        })
-        mockGetConnectedRobot.mockReturnValue(mockRobot)
-      },
-      expected: [
-        EXPECTED_ROBOTS,
-        { ...EXPECTED_UPLOAD, disabledReason: null },
-        EXPECTED_RUN,
         EXPECTED_MORE,
       ],
     },

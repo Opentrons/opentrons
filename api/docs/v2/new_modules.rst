@@ -103,7 +103,8 @@ Recommended Magnetic Module GEN2 bead attraction time:
 Loading Labware Onto Your Module
 ================================
 
-Like specifying labware that will be present on the deck of the OT-2, you must specify labware that will be present on the module you have just loaded. You do this using :py:meth:`.ModuleContext.load_labware`. For instance, to load a Temperature Module and specify an `aluminum block for 2 mL tubes <https://labware.opentrons.com/opentrons_24_aluminumblock_generic_2ml_screwcap?category=aluminumBlock>`_, you would do:
+Like specifying labware that will be present on the deck of the OT-2, you must specify labware that will be present on the module you have just loaded.
+You do this using ``module.load_labware()``. For instance, to load a Temperature Module and specify an `aluminum block for 2 mL tubes <https://labware.opentrons.com/opentrons_24_aluminumblock_generic_2ml_screwcap?category=aluminumBlock>`_, you would do:
 
 .. code-block:: python
     :substitutions:
@@ -116,6 +117,11 @@ Like specifying labware that will be present on the deck of the OT-2, you must s
          module = protocol.load_module('Temperature Module', slot)
          my_labware = module.load_labware('opentrons_24_aluminumblock_generic_2ml_screwcap',
                                           label='Temperature-Controlled Tubes')
+
+See
+:py:meth:`.MagneticModuleContext.load_labware`,
+:py:meth:`.TemperatureModuleContext.load_labware`,
+or :py:meth:`.ThermocyclerContext.load_labware`.
 
 Notice that when you load labware on a module, you don't specify the labware's deck slot.  The labware is loaded on the module, on whichever deck slot the module occupies.
 
@@ -139,7 +145,7 @@ Any custom labware added to your Opentrons App (see :ref:`v2-custom-labware`) is
 
 .. note::
 
-    In API version 2.0, :py:meth:`.ModuleContext.load_labware` only took a ``load_name`` argument. In API version 2.1 (introduced in Robot Software version 3.15.2) or higher you can now specify a label, version, and namespace (though most of the time you won't have to).
+    In API version 2.0, ``module.load_labware()`` only took a ``load_name`` argument. In API version 2.1 (introduced in Robot Software version 3.15.2) or higher you can now specify a label, version, and namespace (though most of the time you won't have to).
 
 
 **************************
@@ -286,9 +292,9 @@ The :py:meth:`.MagneticModuleContext.engage` function raises the magnets to indu
   .. versionadded:: 2.2
 
 .. note::
-    There is a +/- 1 mmm variance across magnetic module units, using ``height_from_base=0`` might not be able to get the magnets to completely flush with base of the labware. Please test before carrying out your experiment to ensure the desired engage height for your labware.
+    There is a +/- 1 mm variance across magnetic module units, using ``height_from_base=0`` might not be able to get the magnets to completely flush with base of the labware. Please test before carrying out your experiment to ensure the desired engage height for your labware.
 
-- You can also specify ``height``, which should be a distance in mm from the home position of the magnets.
+- You can also specify ``height``, which should be a distance from the home position of the magnets.
 
   .. code-block:: python
 
@@ -516,7 +522,10 @@ a few methods that allow you to do that.
 Basic Status
 ------------
 
-The :py:obj:`.ThermocyclerContext.status` property is one of the strings ``‘holding at target’``, ``‘cooling’``, ``‘heating’``, or ``‘idle’``.
+..
+    TODO(mm, 2021-09-30): We should be able to cross-reference to ThermocyclerContext.status, but it appears to not actually exist?
+
+The ``ThermocyclerContext.status`` property is one of the strings ``‘holding at target’``, ``‘cooling’``, ``‘heating’``, or ``‘idle’``.
 
 .. code-block:: python
 

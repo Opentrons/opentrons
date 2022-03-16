@@ -7,45 +7,46 @@ import os.path
 from setuptools import setup, find_packages
 
 HERE = os.path.abspath(os.path.dirname(__file__))
-sys.path.append(os.path.join(HERE, '..', 'scripts'))
+sys.path.append(os.path.join(HERE, "..", "scripts"))
 
 from python_build_utils import normalize_version
 
 
 def get_version():
-    buildno = os.getenv('BUILD_NUMBER')
+    buildno = os.getenv("BUILD_NUMBER")
     if buildno:
-        normalize_opts = {'extra_tag': buildno}
+        normalize_opts = {"extra_tag": buildno}
     else:
         normalize_opts = {}
-    return normalize_version('notify-server', **normalize_opts)
+    return normalize_version("notify-server", **normalize_opts)
 
 
 VERSION = get_version()
 
-DISTNAME = 'notify_server'
-LICENSE = 'Apache 2.0'
+DISTNAME = "notify_server"
+LICENSE = "Apache 2.0"
 AUTHOR = "Opentrons"
 EMAIL = "engineering@opentrons.com"
 URL = "https://github.com/Opentrons/opentrons"
-DOWNLOAD_URL = ''
+DOWNLOAD_URL = ""
 CLASSIFIERS = [
-    'Development Status :: 5 - Production/Stable',
-    'Environment :: Console',
-    'Operating System :: OS Independent',
-    'Intended Audience :: Science/Research',
-    'Programming Language :: Python',
-    'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.7',
-    'Topic :: Scientific/Engineering',
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Topic :: Scientific/Engineering",
 ]
 KEYWORDS = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
-DESCRIPTION = (
-    "A pub sub system for the Opentrons OT2")
-PACKAGES = find_packages(where='.', exclude=["tests.*", "tests"])
+DESCRIPTION = "A pub sub system for the Opentrons OT2"
+PACKAGES = find_packages(where=".", exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
-    'pyzmq==19.0.2',
-    'pydantic==1.4'
+    f"opentrons=={VERSION}",
+    f"opentrons-shared-data=={VERSION}",
+    "pyzmq==19.0.2",
+    "pydantic==1.8.2",
 ]
 
 
@@ -60,7 +61,7 @@ def read(*parts):
 
 if __name__ == "__main__":
     setup(
-        python_requires='>=3.7',
+        python_requires=">=3.7",
         name=DISTNAME,
         description=DESCRIPTION,
         license=LICENSE,
@@ -76,5 +77,5 @@ if __name__ == "__main__":
         zip_safe=False,
         classifiers=CLASSIFIERS,
         install_requires=INSTALL_REQUIRES,
-        include_package_data=True
+        include_package_data=True,
     )

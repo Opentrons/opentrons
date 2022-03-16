@@ -13,11 +13,11 @@ const moduleModelDropdown =
 const slotOne = 'foreignObject[x="0"][y="0"]'
 const slotThree = 'foreignObject[x="265"][y="0"]'
 const slotFive = 'foreignObject[x="132.5"][y="90.5"]'
+const tempDeckBlockWithExtraSpace = 'Temp Deck Block '
+// Note: reason this is needed is because of a cypress race condition. see `https://stackoverflow.com/questions/66257661/how-to-resolve-missing-characters-bug-in-cypress-type-command`
+const magenticDeckWellWithExtraSpace = 'Mag Deck Well '
 
 describe('Protocols with Modules', () => {
-  beforeEach(() => {
-    cy.viewport('macbook-15')
-  })
   before(() => {
     cy.visit('/')
     cy.closeAnnouncementModal()
@@ -167,7 +167,7 @@ describe('Protocols with Modules', () => {
         })
       })
       cy.get('input[class*="LabwareOverlays__name_input"]').type(
-        'Mag Deck Well'
+        magenticDeckWellWithExtraSpace
       )
 
       // Add labware to Temp Deck
@@ -193,7 +193,7 @@ describe('Protocols with Modules', () => {
       })
       cy.contains(aluminumWellBlock, { matchCase: false })
       cy.get('input[class*="LabwareOverlays__name_input"]').type(
-        'Temp Deck Block'
+        tempDeckBlockWithExtraSpace
       )
 
       // Add first liquid

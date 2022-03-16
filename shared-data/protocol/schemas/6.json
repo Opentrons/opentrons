@@ -1,0 +1,1190 @@
+{
+  "$id": "opentronsProtocolSchemaV6",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+
+  "definitions": {
+    "pipetteName": {
+      "description": "Name of a pipette. Does not contain info about specific model/version. Should match keys in pipetteNameSpecs.json file",
+      "type": "string",
+      "enum": [
+        "p10_single",
+        "p10_multi",
+        "p20_single_gen2",
+        "p20_multi_gen2",
+        "p50_single",
+        "p50_multi",
+        "p300_single",
+        "p300_multi",
+        "p300_single_gen2",
+        "p300_multi_gen2",
+        "p1000_single",
+        "p1000_single_gen2"
+      ]
+    },
+
+    "moduleOnlyParams": {
+      "required": ["moduleId"],
+      "additionalProperties": false,
+      "properties": {
+        "moduleId": {
+          "type": "string",
+          "description": "Unique identifier of module to target. Must be a key from the top level 'modules' object"
+        }
+      }
+    },
+
+    "offset": {
+      "description": "x, y, and z component of offset vector in mm",
+      "required": ["x", "y", "z"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "z": { "type": "number" }
+      }
+    },
+
+    "pipetteAccessParams": {
+      "required": ["pipetteId", "labwareId", "wellName"],
+      "properties": {
+        "pipetteId": {
+          "type": "string"
+        },
+        "labwareId": {
+          "type": "string"
+        },
+        "wellName": {
+          "type": "string"
+        }
+      }
+    },
+
+    "volumeParams": {
+      "required": ["volume"],
+      "volume": {
+        "type": "number"
+      }
+    },
+
+    "flowRate": {
+      "required": ["flowRate"],
+      "properties": {
+        "flowRate": {
+          "description": "flow rate in ul/sec",
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+
+    "wellLocation": {
+      "properties": {
+        "origin": {
+          "type": "string",
+          "description": "reference location with respect to a well from which to apply an offset if given (e.g. 'bottom' || 'top')"
+        },
+        "offset": {
+          "$ref": "#/definitions/offset",
+          "description": "X, Y, Z offset from the specified origin with respect to well"
+        }
+      }
+    }
+  },
+
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$otSharedSchema",
+    "schemaVersion",
+    "metadata",
+    "robot",
+    "pipettes",
+    "labware",
+    "labwareDefinitions",
+    "commands"
+  ],
+  "properties": {
+    "$otSharedSchema": {
+      "description": "The path to a valid Opentrons shared schema relative to the shared-data directory, without its extension.",
+      "enum": ["#/protocol/schemas/6"]
+    },
+
+    "schemaVersion": {
+      "description": "Schema version of a protocol is a single integer",
+      "enum": [6]
+    },
+
+    "metadata": {
+      "description": "Optional metadata about the protocol",
+      "type": "object",
+
+      "properties": {
+        "protocolName": {
+          "description": "A short, human-readable name for the protocol",
+          "type": "string"
+        },
+        "author": {
+          "description": "The author or organization who created the protocol",
+          "type": "string"
+        },
+        "description": {
+          "description": "A text description of the protocol.",
+          "type": ["string", "null"]
+        },
+
+        "created": {
+          "description": "UNIX timestamp when this file was created",
+          "type": "number"
+        },
+        "lastModified": {
+          "description": "UNIX timestamp when this file was last modified",
+          "type": ["number", "null"]
+        },
+
+        "category": {
+          "description": "Category of protocol (eg, \"Basic Pipetting\")",
+          "type": ["string", "null"]
+        },
+        "subcategory": {
+          "description": "Subcategory of protocol (eg, \"Cell Plating\")",
+          "type": ["string", "null"]
+        },
+        "tags": {
+          "description": "Tags to be used in searching for this protocol",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+
+    "designerApplication": {
+      "description": "Optional data & metadata not required to execute the protocol, used by the application that created this protocol",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Name of the application that created the protocol. Should be namespaced under the organization or individual who owns the organization, eg \"opentrons/protocol-designer\"",
+          "type": "string"
+        },
+        "version": {
+          "description": "Version of the application that created the protocol",
+          "type": "string"
+        },
+        "data": {
+          "description": "Any data used by the application that created this protocol",
+          "type": "object"
+        }
+      }
+    },
+
+    "robot": {
+      "required": ["model", "deckId"],
+      "properties": {
+        "model": {
+          "description": "Model of the robot this protocol is written for",
+          "type": "string",
+          "enum": ["OT-2 Standard", "OT-3 Standard"]
+        },
+        "deckId": {
+          "description": "Identifier of physical deck this protocol is written for. This should match a top-level key in shared-data/deck/definitions/2.json",
+          "type": "string"
+        }
+      }
+    },
+
+    "pipettes": {
+      "description": "The pipettes used in this protocol, keyed by a unique identifier (pipetteId)",
+      "additionalProperties": false,
+      "patternProperties": {
+        ".+": {
+          "description": "Fields describing an individual pipette",
+          "type": "object",
+          "required": ["name"],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "$ref": "#/definitions/pipetteName"
+            }
+          }
+        }
+      }
+    },
+
+    "labwareDefinitions": {
+      "description": "All labware definitions used by labware in this protocol, keyed by a unique identifier (definitionId)",
+      "patternProperties": {
+        ".+": {
+          "$ref": "opentronsLabwareSchemaV2"
+        }
+      }
+    },
+
+    "labware": {
+      "description": "All instances of labware used in this protocol, and references to their definitionslabwareId, keyed by a unique identifier (labwareId)",
+      "patternProperties": {
+        ".+": {
+          "description": "Fields describing a single labware",
+          "type": "object",
+          "required": ["definitionId"],
+          "additionalProperties": false,
+          "properties": {
+            "definitionId": {
+              "description": "reference to this labware's ID in \"labwareDefinitions\"",
+              "type": "string"
+            },
+            "displayName": {
+              "description": "An optional human-readable nickname for this labware instance within this protocol. Eg \"Buffer Trough\"",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+
+    "liquids": {
+      "description": "All instances of liquid used in this protocol, keyed by a unique identifier (liquidId)",
+      "patternProperties": {
+        ".+": {
+          "description": "Fields describing a single liquid",
+          "type": "object",
+          "required": ["displayName", "description"],
+          "properties": {
+            "displayName": {
+              "description": "An human-readable name for this liquid.",
+              "type": "string"
+            },
+            "description": {
+              "description": "A description of this liquid.",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+
+    "modules": {
+      "description": "All modules used in this protocol keyed by a unique identifier (moduleId)",
+      "patternProperties": {
+        ".+": {
+          "description": "Fields describing a single module on the deck",
+          "type": "object",
+          "required": ["model"],
+          "additionalProperties": false,
+          "properties": {
+            "model": {
+              "description": "model of module. Eg 'magneticModuleV1' or 'magneticModuleV2'. This should match a top-level key in shared-data/module/definitions/2.json",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+
+    "commands": {
+      "description": "An array of command objects representing steps to be executed on the robot",
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "description": "Aspirate Liquid / Dispense Liquid / Aspirate Air Gap / Dispense Air Aap",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": {
+                "enum": [
+                  "aspirate",
+                  "dispense",
+                  "aspirateAirGap",
+                  "dispenseAirGap"
+                ]
+              },
+              "params": {
+                "allOf": [
+                  { "$ref": "#/definitions/flowRate" },
+                  { "$ref": "#/definitions/pipetteAccessParams" },
+                  { "$ref": "#/definitions/volumeParams" },
+                  {
+                    "wellLocation": { "$ref": "#/definitions/wellLocation" }
+                  }
+                ]
+              }
+            }
+          },
+
+          {
+            "description": "Blowout",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": {
+                "enum": ["blowout"]
+              },
+              "params": {
+                "allOf": [
+                  { "$ref": "#/definitions/flowRate" },
+                  { "$ref": "#/definitions/pipetteAccessParams" },
+                  {
+                    "wellLocation": { "$ref": "#/definitions/wellLocation" }
+                  }
+                ]
+              }
+            }
+          },
+
+          {
+            "description": "Touch Tip",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": {
+                "enum": ["touchTip"]
+              },
+              "params": {
+                "allOf": [
+                  { "$ref": "#/definitions/pipetteAccessParams" },
+                  {
+                    "wellLocation": { "$ref": "#/definitions/wellLocation" }
+                  }
+                ]
+              }
+            }
+          },
+
+          {
+            "description": "Pick Up Tip / Drop Tip",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": {
+                "enum": ["pickUpTip", "dropTip"]
+              },
+              "params": {
+                "allOf": [{ "$ref": "#/definitions/pipetteAccessParams" }]
+              }
+            }
+          },
+
+          {
+            "description": "Move To Slot. NOTE: this is an EXPERIMENTAL command, its behavior is subject to change in future releases.",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": { "enum": ["moveToSlot"] },
+              "params": {
+                "type": "object",
+                "required": ["pipetteId", "slotName"],
+                "properties": {
+                  "pipetteId": { "type": "string" },
+                  "slotName": {
+                    "type": "string",
+                    "description": "Unique string identifier that corresponds to a slot in the referenced deck definition's locations"
+                  },
+                  "offset": {
+                    "$ref": "#/definitions/offset",
+                    "description": "Optional offset from slot bottom left corner, in mm"
+                  },
+                  "minimumZHeight": {
+                    "description": "Optional minimal Z margin in mm. If this is larger than the API's default safe Z margin, it will make the arc higher. If it's smaller, it will have no effect. Specifying this for movements that would not arc (moving within the same well in the same labware) will cause an arc movement instead.",
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "forceDirect": {
+                    "description": "Default is false. If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the 'minimumZHeight' param to be ignored. A 'direct' movement is in X/Y/Z simultaneously",
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Move To Coordinates",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": { "enum": ["moveToCoordinates"] },
+              "params": {
+                "type": "object",
+                "required": ["pipetteId", "coordinates"],
+                "properties": {
+                  "pipetteId": { "type": "string" },
+                  "coordinates": {
+                    "$ref": "#/definitions/offset",
+                    "description": "X, Y and Z coordinates in mm from deck's origin location (left-front-bottom corner of work space)"
+                  },
+                  "minimumZHeight": {
+                    "description": "Optional minimal Z margin in mm. If this is larger than the API's default safe Z margin, it will make the arc higher. If it's smaller, it will have no effect. Specifying this for movements that would not arc (moving within the same well in the same labware) will cause an arc movement instead.",
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "forceDirect": {
+                    "description": "Default is false. If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the 'minimumZHeight' param to be ignored. A 'direct' movement is in X/Y/Z simultaneously",
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Move Relative",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": { "enum": ["moveRelative"] },
+              "params": {
+                "type": "object",
+                "required": ["pipetteId", "axis", "distance"],
+                "properties": {
+                  "pipetteId": { "type": "string" },
+                  "axis": {
+                    "description": "Axis to move the gantry",
+                    "enum": ["x", "y", "z"]
+                  },
+                  "distance": {
+                    "description": "Distance in mm to move the gantry (negative numbers are allowed)",
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Save Position",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": { "enum": ["savePosition"] },
+              "params": {
+                "type": "object",
+                "required": ["pipetteId"],
+                "properties": {
+                  "pipetteId": { "type": "string" },
+                  "positionId": {
+                    "description": "Optional position ID, auto-assigned if left blank",
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Home",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": { "enum": ["home"] },
+              "params": {
+                "type": "object",
+                "properties": {
+                  "axes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "x",
+                        "y",
+                        "leftZ",
+                        "rightZ",
+                        "leftPlunger",
+                        "rightPlunger"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Delay Protocol Execution",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": {
+                "enum": ["delay"]
+              },
+              "params": {
+                "type": "object",
+                "required": ["wait"],
+                "properties": {
+                  "wait": {
+                    "description": "either a number of seconds to wait (fractional values OK), or `true` to wait indefinitely until the user manually resumes the protocol",
+                    "anyOf": [{ "type": "number" }, { "enum": [true] }]
+                  },
+                  "message": {
+                    "description": "optional message describing the delay"
+                  }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Magnetic Module Engage: Engage magnet to specified height.",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": {
+                "enum": ["magneticModule/engageMagnet"]
+              },
+              "params": {
+                "required": ["moduleId", "engageHeight"],
+                "properties": {
+                  "engageHeight": {
+                    "description": "Height in mm(*) from bottom plane of labware (above if positive, below if negative). *NOTE: for magneticModuleV1 (aka GEN1), these are not true mm but an arbitrary unit equal to 0.5mm. So `engageHeight: 2` means 1mm above the labware plane if the command is for a GEN1 magnetic module, but would mean 2mm above the labware plane for GEN2 module",
+                    "type": "number"
+                  },
+                  "moduleId": {
+                    "description": "Unique identifier of Magnetic Module to target. Must be a key from the top level 'modules' object.",
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Magnetic Module Disengage: Retract magnet to disengaged (home) position",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": {
+                "enum": ["magneticModule/disengageMagnet"]
+              },
+              "params": {
+                "$ref": "#/definitions/moduleOnlyParams"
+              }
+            }
+          },
+
+          {
+            "description": "Temperature Module Set Target Temperature: Module will begin moving to the target temperature. This command is non-blocking, it does not delay protocol execution while approaching the target temperature.",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": {
+                "enum": ["temperatureModule/setTargetTemperature"]
+              },
+              "params": {
+                "required": ["moduleId", "temperature"],
+                "properties": {
+                  "moduleId": {
+                    "type": "string",
+                    "description": "Unique identifier of Temperature Module to target. Must be a key from the top level 'modules' object"
+                  },
+                  "temperature": { "type": "number" }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Temperature Module Await Temperature: Delay protocol execution until the specified temperature is reached.",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": { "enum": ["temperatureModule/awaitTemperature"] },
+              "params": {
+                "required": ["moduleId", "temperature"],
+                "properties": {
+                  "moduleId": {
+                    "type": "string",
+                    "description": "Unique identifier of Temperature Module to target. Must be a key from the top level 'modules' object"
+                  },
+                  "temperature": { "type": "number" }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Temperature Module Deactivate: Module will stop actively controlling its temperature and drift to ambient temperature.",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": { "enum": ["temperatureModule/deactivate"] },
+              "params": {
+                "$ref": "#/definitions/moduleOnlyParams"
+              }
+            }
+          },
+
+          {
+            "description": "Thermocycler Set Target Block Temperature: Well block will begin moving to the target temperature. This command is blocking, it delays protocol execution while approaching the target temperature.",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": {
+                "enum": ["thermocycler/setTargetBlockTemperature"]
+              },
+              "params": {
+                "required": ["moduleId", "temperature"],
+                "properties": {
+                  "moduleId": {
+                    "type": "string",
+                    "description": "Unique identifier of Thermocycler Module to target. Must be a key from the top level 'modules' object"
+                  },
+                  "temperature": { "type": "number" },
+                  "volume": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Thermocycler Set Target Lid Temperature: Lid will begin moving to the target temperature. This command is non-blocking, it does not delay protocol execution while approaching the target temperature.",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": {
+                "enum": ["thermocycler/setTargetLidTemperature"]
+              },
+              "params": {
+                "required": ["moduleId", "temperature"],
+                "properties": {
+                  "moduleId": {
+                    "type": "string",
+                    "description": "Unique identifier of Thermocycler Module to target. Must be a key from the top level 'modules' object"
+                  },
+                  "temperature": { "type": "number" }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Thermocycler Await Block Temperature: Delay protocol execution until the specified well block target temperature is reached.",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": { "enum": ["thermocycler/awaitBlockTemperature"] },
+              "params": {
+                "required": ["moduleId", "temperature"],
+                "properties": {
+                  "moduleId": {
+                    "type": "string",
+                    "description": "Unique identifier of Thermocycler Module to target. Must be a key from the top level 'modules' object"
+                  },
+                  "temperature": { "type": "number" }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Thermocycler Await Lid Temperature: Delay protocol execution until the specified lid target temperature is reached.",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": { "enum": ["thermocycler/awaitLidTemperature"] },
+              "params": {
+                "required": ["moduleId", "temperature"],
+                "properties": {
+                  "moduleId": {
+                    "type": "string",
+                    "description": "Unique identifier of Thermocycler Module to target. Must be a key from the top level 'modules' object"
+                  },
+                  "temperature": { "type": "number" }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Thermocycler Deactivate Block: Module will stop actively controlling its well block temperature.",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": { "enum": ["thermocycler/deactivateBlock"] },
+              "params": {
+                "$ref": "#/definitions/moduleOnlyParams"
+              }
+            }
+          },
+
+          {
+            "description": "Thermocycler Deactivate Lid: Module will stop actively controlling its lid temperature.",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": { "enum": ["thermocycler/deactivateLid"] },
+              "params": {
+                "$ref": "#/definitions/moduleOnlyParams"
+              }
+            }
+          },
+
+          {
+            "description": "Thermocycler Open Lid: Open lid of the module. This command will delay protocol execution until the lid is fully open.",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": { "enum": ["thermocycler/openLid"] },
+              "params": {
+                "$ref": "#/definitions/moduleOnlyParams"
+              }
+            }
+          },
+
+          {
+            "description": "Thermocycler Close Lid: Close the lid of the module. This command will delay protocol execution until the lid is fully closed.",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": { "enum": ["thermocycler/closeLid"] },
+              "params": {
+                "$ref": "#/definitions/moduleOnlyParams"
+              }
+            }
+          },
+
+          {
+            "description": "Thermocycler Run Profile: Begin running the specified profile steps on the Thermocycler. This command is non-blocking, it does not delay protocol execution outside of thermocycler steps. No more thermocycler commands should be given until a 'thermocycler/awaitProfileComplete' command is executed.",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": { "enum": ["thermocycler/runProfile"] },
+              "params": {
+                "type": "object",
+                "required": ["moduleId", "profile", "volume"],
+                "properties": {
+                  "moduleId": {
+                    "type": "string",
+                    "description": "Unique identifier of Thermocycler Module to target. Must be a key from the top level 'modules' object"
+                  },
+                  "profile": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": ["temperature", "holdTime"],
+                      "properties": {
+                        "temperature": {
+                          "description": "Target temperature of profile step",
+                          "type": "number"
+                        },
+                        "holdTime": {
+                          "description": "Time (in seconds) to hold once temperature is reached",
+                          "type": "number"
+                        }
+                      }
+                    }
+                  },
+                  "volume": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Thermocycler Await Profile Complete: Delay protocol execution until profile execution is complete.",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": { "enum": ["thermocycler/awaitProfileComplete"] },
+              "params": {
+                "$ref": "#/definitions/moduleOnlyParams"
+              }
+            }
+          },
+
+          {
+            "description": "Heater Shaker Module Start Set Target Temperature: Module will begin moving to the target temperature. This command is non-blocking, it does not delay protocol execution while approaching the target temperature.",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": {
+                "enum": ["heaterShakerModule/startSetTargetTemperature"]
+              },
+              "params": {
+                "required": ["moduleId", "temperature"],
+                "properties": {
+                  "moduleId": {
+                    "type": "string",
+                    "description": "Unique identifier of Heater Shaker Module to target. Must be a key from the top level 'modules' object"
+                  },
+                  "temperature": {
+                    "type": "number",
+                    "description": "target temperature to heat to in °C"
+                  }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Heater Shaker Module Set Target Shake Speed: Start the module's shake procedure. The protocol will proceed once the target shake speed is reached.",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": {
+                "enum": ["heaterShakerModule/setTargetShakeSpeed"]
+              },
+              "params": {
+                "required": ["moduleId", "rpm"],
+                "properties": {
+                  "moduleId": {
+                    "type": "string",
+                    "description": "Unique identifier of Heater Shaker Module to target. Must be a key from the top level 'modules' object"
+                  },
+                  "rpm": {
+                    "type": "number",
+                    "description": "target orbital rotations per minute"
+                  }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Heater Shaker Module Await Temperature: Delay protocol execution until the previously supplied startSetTargetTemperature command's temperature parameter has been reached. Errors if no target temperature was set previously.",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": {
+                "enum": ["heaterShakerModule/awaitTemperature"]
+              },
+              "params": {
+                "$ref": "#/definitions/moduleOnlyParams"
+              }
+            }
+          },
+
+          {
+            "description": "Heater Shaker Module Deactivate Heater: Module will stop actively heating and drift to ambient temperature.",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": {
+                "enum": ["heaterShakerModule/deactivateHeater"]
+              },
+              "params": {
+                "$ref": "#/definitions/moduleOnlyParams"
+              }
+            }
+          },
+
+          {
+            "description": "Heater Shaker Module Stop Shake: Module will stop actively shaking and ramp down to a still state",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": {
+                "enum": ["heaterShakerModule/stopShake"]
+              },
+              "params": {
+                "$ref": "#/definitions/moduleOnlyParams"
+              }
+            }
+          },
+
+          {
+            "description": "Heater Shaker Module Open Latch: Open the module's labware latch.",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": {
+                "enum": ["heaterShakerModule/openLatch"]
+              },
+              "params": {
+                "$ref": "#/definitions/moduleOnlyParams"
+              }
+            }
+          },
+
+          {
+            "description": "Heater Shaker Module Close Latch: Close the module's labware latch.",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": {
+                "enum": ["heaterShakerModule/closeLatch"]
+              },
+              "params": {
+                "$ref": "#/definitions/moduleOnlyParams"
+              }
+            }
+          },
+
+          {
+            "description": "Move To Well: Move the pipette's critical point to the specified well in a labware, with an optional offset. The pipette's critical point is a reference point on the pipette. The critical point can be one of the following: (1) Single-channel pipette with no tip: end of nozzle. (2) Multi-channel pipette with no tip: end of backmost nozzle. (3) Single-channel pipette with a tip: end of tip. (4) Multi-channel pipette with tip: end of tip on backmost nozzle.",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": { "enum": ["moveToWell"] },
+              "params": {
+                "type": "object",
+                "required": ["pipetteId", "labwareId", "wellName"],
+                "properties": {
+                  "pipetteId": { "type": "string" },
+                  "labwareId": { "type": "string" },
+                  "wellName": { "type": "string" },
+                  "wellLocation": { "$ref": "#/definitions/wellLocation" },
+                  "minimumZHeight": {
+                    "description": "Optional minimal Z margin in mm. If this is larger than the API's default safe Z margin, it will make the arc higher. If it's smaller, it will have no effect. Specifying this for movements that would not arc (moving within the same well in the same labware) will cause an arc movement instead.",
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "forceDirect": {
+                    "description": "Default is false. If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the 'minimumZHeight' param to be ignored. A 'direct' movement is in X/Y/Z simultaneously",
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Load Pipette: This command is only meant to make the Opentrons system aware of a pipette's location. It does not instruct any specific hardware to carry out the physical action of moving the pipette to the location.",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": {
+                "enum": ["loadPipette"]
+              },
+              "params": {
+                "required": ["pipetteId", "mount"],
+                "properties": {
+                  "pipetteId": {
+                    "type": "string",
+                    "description": "Unique identifier of pipette to load"
+                  },
+                  "mount": {
+                    "type": "string",
+                    "description": "Unique identifier of physical destination location to load pipette into (e.g. 'left')"
+                  }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Load Labware: This command is only meant to make the Opentrons system aware of a labware instance's location. It does not instruct any specific hardware to carry out the physical action of moving the labware instance to the location.",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": {
+                "enum": ["loadLabware"]
+              },
+              "params": {
+                "required": ["labwareId", "location"],
+                "properties": {
+                  "labwareId": {
+                    "type": "string",
+                    "description": "Unique identifier of labware to load"
+                  },
+                  "location": {
+                    "description": "Physical destination location to load labware into (e.g. '1' || 'someModuleId')",
+                    "oneOf": [
+                      {
+                        "required": ["slotName"],
+                        "properties": {
+                          "slotName": {
+                            "description": "Unique string identifier that corresponds to a slot in the referenced deck definition's locations",
+                            "type": "string"
+                          }
+                        }
+                      },
+                      {
+                        "required": ["moduleId"],
+                        "properties": {
+                          "moduleId": {
+                            "description": "Unique identifier of destination module. Must be a key from the top level 'modules' object.",
+                            "type": "string"
+                          }
+                        }
+                      },
+                      {
+                        "required": ["labwareId"],
+                        "properties": {
+                          "labwareId": {
+                            "description": "Unique identifier of destination labware. Must be a key from the top level 'labware' object.",
+                            "type": "string"
+                          }
+                        }
+                      }
+                    ],
+                    "displayName": {
+                      "type": "string",
+                      "description": "Optional user-defined nickname for this labware instance within the protocol"
+                    }
+                  }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Load Module: This command is only meant to make the Opentrons system aware of a module instance's location. It does not instruct any specific hardware to carry out the physical action of moving the module instance to the location.",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": {
+                "enum": ["loadModule"]
+              },
+              "params": {
+                "required": ["moduleId", "location"],
+                "properties": {
+                  "moduleId": {
+                    "type": "string",
+                    "description": "Unique identifier of module to load"
+                  },
+                  "location": {
+                    "description": "Physical destination location to load module into (e.g. '1')",
+                    "oneOf": [
+                      {
+                        "required": ["slotName"],
+                        "properties": {
+                          "slotName": {
+                            "description": "Unique string identifier that corresponds to a slot in the referenced deck definition's locations",
+                            "type": "string"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Load Liquid: This command is only meant to make the Opentrons system aware of a liquid's location. It does not instruct any specific hardware to carry out the physical action of moving the liquid to the location.",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": {
+                "enum": ["loadLiquid"]
+              },
+              "params": {
+                "required": ["liquidId", "labwareId", "volumeByWell"],
+                "properties": {
+                  "liquidId": {
+                    "type": "string",
+                    "description": "Unique identifier of instance of liquid to load. Must be a key from the top level 'liquids' object"
+                  },
+                  "labwareId": {
+                    "type": "string",
+                    "description": "Unique identifier of labware to load liquid into. Must be a key from the top level 'labware' object"
+                  },
+                  "volumeByWell": {
+                    "type": "object",
+                    "patternProperties": {
+                      ".+": {
+                        "description": "Volume in µL keyed by wellName from the specified labware",
+                        "type": "number"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "description": "Pause: This command pauses the run.",
+            "type": "object",
+            "required": ["id", "commandType"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": {
+                "enum": ["pause"]
+              },
+              "params": {
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "description": "Optional message the user can set for their pause command"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "description": "Custom: This command is meant to allow non-canonical commands to be included in the commands list.",
+            "type": "object",
+            "required": ["id", "commandType", "params"],
+            "properties": {
+              "id": { "type": "string" },
+              "commandType": {
+                "enum": ["custom"]
+              },
+              "params": {
+                "type": "object",
+                "description": "all of the parameters required to identify and execute this command"
+              }
+            }
+          }
+        ]
+      }
+    },
+
+    "commandAnnotations": {
+      "type": "array",
+      "items": {
+        "description": "An optional object of annotations associated with commands.",
+        "type": "object",
+        "required": ["commandIds", "annotationType"],
+        "properties": {
+          "commandIds": {
+            "description": "An array of command ids that correspond to the targeted grouping of this annotation",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "annotationType": {
+            "description": "The type of annotation (e.g. 'transfer', 'initialSetup')",
+            "type": "string"
+          },
+          "params": {
+            "description": "The parameters used to create this grouping of atomic commands",
+            "type": "object"
+          }
+        }
+      }
+    }
+  }
+}

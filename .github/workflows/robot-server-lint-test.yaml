@@ -7,11 +7,13 @@ on:
   # Most of the time, we run on pull requests, which lets us handle external PRs
   push:
     paths:
-      - 'api/**'
+      - 'api/**/*'
+      - 'hardware/**/*'
       - 'Makefile'
-      - 'shared-data/*/**'
-      - '!shared-data/js/**'
-      - 'robot-server/**'
+      - 'shared-data/**/*'
+      - '!shared-data/js/**/*'
+      - 'robot-server/**/*'
+      - 'notify-server/**/*'
       - '.github/workflows/robot-server-test-lint.yaml'
       - '.github/actions/python/**'
     branches-ignore: # ignore any release-related thing (handled elsewhere)
@@ -21,11 +23,13 @@ on:
       - '*'
   pull_request:
     paths:
-      - 'api/**'
+      - 'api/**/*'
+      - 'hardware/**/*'
       - 'Makefile'
-      - 'shared-data/*/**'
-      - '!shared-data/js/**'
-      - 'robot-server/**'
+      - 'shared-data/**/*'
+      - '!shared-data/js/**/*'
+      - 'robot-server/**/*'
+      - 'notify-server/**/*'
   workflow_dispatch:
 
 defaults:
@@ -37,11 +41,14 @@ jobs:
     name: 'robot server package linting and tests'
     timeout-minutes: 20
     runs-on: 'ubuntu-18.04'
+    strategy:
+      matrix:
+        with-ot-hardware: ['true', 'false']
     steps:
       - uses: 'actions/checkout@v2'
       - uses: 'actions/setup-node@v1'
         with:
-          node-version: '12'
+          node-version: '14'
       - uses: 'actions/setup-python@v2'
         with:
           python-version: '3.7'
@@ -49,10 +56,25 @@ jobs:
       - uses: './.github/actions/python/setup'
         with:
           project: 'robot-server'
-      - name: Lint
-        run: make -C robot-server lint
-      - name: Test
+      - if: ${{ matrix.with-ot-hardware == 'false' }}
+        name: Lint without opentrons_hardware
+        run: |
+          make -C robot-server setup-ot2
+          make -C robot-server lint
+      - if: ${{ matrix.with-ot-hardware == 'true' }}
+        name: Lint with opentrons_hardware
+        run: |
+          make -C robot-server lint
+      - if: ${{ matrix.with-ot-hardware == 'false' }}
+        name: Test without opentrons_hardware
+        run: |
+          make -C robot-server setup-ot2
+          make -C robot-server test
+      - if: ${{ matrix.with-ot-hardware == 'true' }}
+        name: Test with opentrons_hardware
         run: make -C robot-server test
-      - uses: 'codecov/codecov-action@v1'
+      - if: ${{ matrix.with-ot-hardware == 'true' }}
+        uses: 'codecov/codecov-action@v2'
         with:
-          file: ./robot-server/coverage.xml
+          files: ./robot-server/coverage.xml
+          flags: robot-server

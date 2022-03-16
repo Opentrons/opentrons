@@ -31,7 +31,7 @@ import {
   FileLabware,
   FileModule,
 } from '@opentrons/shared-data/protocol/types/schemaV4'
-import { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
+import { Command } from '@opentrons/shared-data/protocol/types/schemaV5Addendum'
 import { Selector } from '../../types'
 import { PDProtocolFile } from '../../file-types'
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures

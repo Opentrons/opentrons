@@ -10,20 +10,20 @@ from typing import (
     Optional,
     Tuple,
     Union,
-    TYPE_CHECKING,
 )
 
 from opentrons.calibration_storage import get, delete
 from opentrons.calibration_storage.types import TipLengthCalNotFound
 from opentrons.calibration_storage import helpers
-from opentrons.config import feature_flags as ff
 from opentrons.hardware_control import robot_calibration as robot_cal
-from opentrons.hardware_control import ThreadManager, CriticalPoint
+from opentrons.hardware_control import HardwareControlAPI, CriticalPoint
 from opentrons.hardware_control.pipette import Pipette
 from opentrons.protocol_api import labware
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.types import Mount, Point, Location
 from opentrons.util import linal
+
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from robot_server.robot.calibration.constants import TIP_RACK_LOOKUP_BY_MAX_VOL
 from robot_server.service.errors import RobotServerError
@@ -33,8 +33,6 @@ from robot_server.service.session.models.command_definitions import (
     DeckCalibrationCommand,
 )
 from robot_server.robot.calibration.constants import (
-    SHORT_TRASH_DECK,
-    STANDARD_DECK,
     MOVE_TO_DECK_SAFETY_BUFFER,
     MOVE_TO_TIP_RACK_SAFETY_BUFFER,
     POINT_ONE_ID,
@@ -50,12 +48,9 @@ from .constants import (
     SAVE_POINT_STATE_MAP,
 )
 from .state_machine import DeckCalibrationStateMachine
+from .dev_types import SavedPoints, ExpectedPoints
 from ..errors import CalibrationError
 from ..helper_classes import RequiredLabware, AttachedPipette, SupportedCommands
-
-if TYPE_CHECKING:
-    from .dev_types import SavedPoints, ExpectedPoints
-    from opentrons_shared_data.labware import LabwareDefinition
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -83,13 +78,12 @@ def tuplefy_cal_point_dicts(
 
 
 class DeckCalibrationUserFlow:
-    def __init__(self, hardware: ThreadManager):
+    def __init__(self, hardware: HardwareControlAPI):
         self._hardware = hardware
         self._hw_pipette, self._mount = self._select_target_pipette()
         self._default_tipracks = self._get_default_tipracks()
 
-        deck_load_name = SHORT_TRASH_DECK if ff.short_fixed_trash() else STANDARD_DECK
-        self._deck = Deck(load_name=deck_load_name)
+        self._deck = Deck()
         self._tip_rack = self._get_tip_rack_lw()
         self._deck[TIP_RACK_SLOT] = self._tip_rack
 
@@ -129,7 +123,7 @@ class DeckCalibrationUserFlow:
         return self._deck
 
     @property
-    def hardware(self) -> ThreadManager:
+    def hardware(self) -> HardwareControlAPI:
         return self._hardware
 
     @property
@@ -157,7 +151,7 @@ class DeckCalibrationUserFlow:
         self._tip_origin_pt = None
 
     @property
-    def supported_commands(self) -> List:
+    def supported_commands(self) -> List[str]:
         return self._supported_commands.supported()
 
     @property
@@ -190,11 +184,11 @@ class DeckCalibrationUserFlow:
         2: single-channel over multi
         3: right mount over left
         """
-        if not any(self._hardware._attached_instruments.values()):
+        if not any(self._hardware.hardware_instruments.values()):
             raise RobotServerError(
                 definition=CalibrationError.NO_PIPETTE_ATTACHED, flow="Deck Calibration"
             )
-        pips = {m: p for m, p in self._hardware._attached_instruments.items() if p}
+        pips = {m: p for m, p in self._hardware.hardware_instruments.items() if p}
         if len(pips) == 1:
             for mount, pip in pips.items():
                 return pip, mount
@@ -216,7 +210,7 @@ class DeckCalibrationUserFlow:
             )[0]
 
     def _get_tip_rack_lw(
-        self, tiprack_definition: Optional["LabwareDefinition"] = None
+        self, tiprack_definition: Optional[LabwareDefinition] = None
     ) -> labware.Labware:
         if tiprack_definition:
             return labware.load_from_definition(
@@ -267,10 +261,13 @@ class DeckCalibrationUserFlow:
             else None
         )
 
-    async def get_current_point(self, critical_point: CriticalPoint = None) -> Point:
+    async def get_current_point(
+        self,
+        critical_point: Optional[CriticalPoint] = None,
+    ) -> Point:
         return await self._hardware.gantry_position(self._mount, critical_point)
 
-    async def load_labware(self, tiprackDefinition: dict):
+    async def load_labware(self, tiprackDefinition: LabwareDefinition):
         self._supported_commands.loadLabware = False
         if tiprackDefinition:
             verified_definition = labware.verify_definition(tiprackDefinition)

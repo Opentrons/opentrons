@@ -1,36 +1,41 @@
 import * as React from 'react'
 import '@testing-library/jest-dom'
 import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components/__utils__'
-
+import { BrowserRouter } from 'react-router-dom'
+import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { UploadInput } from '../UploadInput'
+import { LastRun } from '../LastRun'
+
+jest.mock('../LastRun')
+
+const mockLastRun = LastRun as jest.MockedFunction<typeof LastRun>
 
 describe('UploadInput', () => {
-  let render: () => ReturnType<typeof renderWithProviders>
-  let handleUpload: jest.MockedFunction<
-    React.ComponentProps<typeof UploadInput>['onUpload']
-  >
+  let onUpload: jest.MockedFunction<() => {}>
+  let render: () => ReturnType<typeof renderWithProviders>[0]
 
   beforeEach(() => {
-    handleUpload = jest.fn()
+    mockLastRun.mockReturnValue(<div>MOCK LAST RUN</div>)
+    onUpload = jest.fn()
     render = () => {
-      return renderWithProviders(<UploadInput onUpload={handleUpload} />, {
-        i18nInstance: i18n,
-      })
+      return renderWithProviders(
+        <BrowserRouter>
+          <UploadInput onUpload={onUpload} />
+        </BrowserRouter>,
+        {
+          i18nInstance: i18n,
+        }
+      )[0]
     }
   })
-
   afterEach(() => {
     jest.resetAllMocks()
   })
 
   it('renders correct contents for empty state', () => {
-    const { getByRole } = render()
+    const { getByRole, getByText } = render()
 
-    expect(getByRole('heading')).toHaveTextContent(
-      /Open a protocol to get started/i
-    )
     expect(getByRole('button', { name: 'Choose File...' })).toBeTruthy()
     expect(
       getByRole('button', { name: 'Drag and drop protocol file here' })
@@ -38,10 +43,13 @@ describe('UploadInput', () => {
     expect(getByRole('complementary')).toHaveTextContent(
       /Don't have a protocol yet\?/i
     )
+    getByText('MOCK LAST RUN')
     expect(
-      getByRole('link', { name: 'Browse Our Protocol Library' })
+      getByRole('link', { name: 'Launch Opentrons Protocol Library' })
     ).toBeTruthy()
-    expect(getByRole('link', { name: 'Launch Protocol Designer' })).toBeTruthy()
+    expect(
+      getByRole('link', { name: 'Launch Opentrons Protocol Designer' })
+    ).toBeTruthy()
   })
 
   it('opens file select on button click', () => {
@@ -56,6 +64,6 @@ describe('UploadInput', () => {
     const { getByTestId } = render()
     const input = getByTestId('file_input')
     fireEvent.change(input, { target: { files: ['dummyFile'] } })
-    expect(handleUpload).toHaveBeenCalledWith('dummyFile')
+    expect(onUpload).toHaveBeenCalledWith('dummyFile')
   })
 })

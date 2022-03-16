@@ -13,6 +13,8 @@ extend-ignore =
     # do not require type annotations for self nor cls
     ANN101,
     ANN102
+    # do not require docstring for __init__, put them on the class
+    D107,
 
 # configure flake8-docstrings
 # https://pypi.org/project/flake8-docstrings/
@@ -29,50 +31,31 @@ per-file-ignores =
     src/opentrons/execute.py:ANN,D
     src/opentrons/simulate.py:ANN,D
     src/opentrons/types.py:ANN,D
-    src/opentrons/api/*:D
     src/opentrons/calibration_storage/*:ANN,D
-    src/opentrons/cli/*:ANN,D
     src/opentrons/commands/*:D
-    src/opentrons/commands/util.py:ANN,D
     src/opentrons/config/*:ANN,D
-    src/opentrons/data_storage/*:ANN,D
-    src/opentrons/deck_calibration/*:ANN,D
     src/opentrons/drivers/*:ANN,D
     src/opentrons/hardware_control/*:ANN,D
-    src/opentrons/helpers/*:ANN,D
     src/opentrons/protocol_api/*:ANN,D
     src/opentrons/protocols/*:ANN,D
     src/opentrons/resources/*:ANN,D
     src/opentrons/system/*:ANN,D
     src/opentrons/tools/*:ANN,D
-    src/opentrons/trackers/*:ANN,D
     src/opentrons/util/*:ANN,D
-    tests/__init__.py:ANN,D
-    tests/opentrons/__init__.py:ANN,D
     tests/opentrons/test_execute.py:ANN,D
     tests/opentrons/test_init.py:ANN,D
     tests/opentrons/test_simulate.py:ANN,D
     tests/opentrons/test_types.py:ANN,D
     tests/opentrons/conftest.py:ANN,D
-    tests/opentrons/api/*:ANN,D
     tests/opentrons/broker/*:ANN,D
     tests/opentrons/calibration_storage/*:ANN,D
-    tests/opentrons/cli/*:ANN,D
     tests/opentrons/commands/*:ANN,D
     tests/opentrons/config/*:ANN,D
-    tests/opentrons/containers/*:ANN,D
     tests/opentrons/data/*:ANN,D
-    tests/opentrons/database/*:ANN,D
     tests/opentrons/drivers/*:ANN,D
     tests/opentrons/hardware_control/*:ANN,D
-    tests/opentrons/helpers/*:ANN,D
-    tests/opentrons/integration/*:ANN,D
-    tests/opentrons/labware/*:ANN,D
-    tests/opentrons/performance/*:ANN,D
     tests/opentrons/protocol_api/*:ANN,D
     tests/opentrons/protocols/*:ANN,D
-    tests/opentrons/robot/*:ANN,D
     tests/opentrons/system/*:ANN,D
     tests/opentrons/tools/*:ANN,D
-    tests/opentrons/trackers/*:ANN,D
     tests/opentrons/util/*:ANN,D

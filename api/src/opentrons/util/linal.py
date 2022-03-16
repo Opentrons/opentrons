@@ -1,8 +1,9 @@
+from __future__ import annotations
 import logging
-import numpy as np  # type: ignore
-from numpy import insert, dot  # type: ignore
-from numpy.linalg import inv  # type: ignore
-from typing import List, Tuple, Union
+import numpy as np
+from numpy import insert, dot
+from numpy.linalg import inv
+from typing import TYPE_CHECKING, List, Tuple, Union
 
 from opentrons.calibration_storage.types import AttitudeMatrix
 
@@ -10,49 +11,46 @@ mod_log = logging.getLogger(__name__)
 
 # (TODO(lc, 8/11/2020): temporary type until
 # old calibration data is removed.
-AxisPosition = Union[
-    Tuple[float, float, float], Tuple[float, float]]
+AxisPosition = Union[Tuple[float, float, float], Tuple[float, float]]
 
 SolvePoints = Tuple[
-    Tuple[float, float, float],
-    Tuple[float, float, float],
-    Tuple[float, float, float]]
+    Tuple[float, float, float], Tuple[float, float, float], Tuple[float, float, float]
+]
+
+# TODO(mc, 2022-02-23): numpy.typing is not available on the version
+# of numpy we ship on the OT-2. We should update that numpy version.
+if TYPE_CHECKING:
+    import numpy.typing as npt
+
+    DoubleArray = npt.NDArray[np.double]
 
 
-def identity_deck_transform() -> np.ndarray:
-    """ The default deck transform """
+def identity_deck_transform() -> DoubleArray:
+    """The default deck transform"""
     return np.identity(3)
 
 
-def solve_attitude(
-        expected: SolvePoints,
-        actual: SolvePoints
-        ) -> AttitudeMatrix:
-    ex = np.array([
-        list(point)
-        for point in expected
-    ]).transpose()
-    ac = np.array([
-            list(point)
-            for point in actual
-        ]).transpose()
-    t = np.dot(ac, inv(ex))
+def solve_attitude(expected: SolvePoints, actual: SolvePoints) -> AttitudeMatrix:
+    ex = np.array([list(point) for point in expected]).transpose()
+    ac = np.array([list(point) for point in actual]).transpose()
+    t = np.dot(ac, inv(ex))  # type: ignore[no-untyped-call]
 
-    mask_transform = np.array([
-        [True, True, False],
-        [True, True, False],
-        [False, False, False]])
-    masked_array = np.ma.masked_array(t, ~mask_transform)
+    mask_transform = np.array(
+        [[True, True, False], [True, True, False], [False, False, False]]
+    )
+    masked_array = np.ma.masked_array(t, ~mask_transform)  # type: ignore[var-annotated, no-untyped-call]  # noqa: E501
 
     no_z_component = np.zeros((3, 3))
     np.put(no_z_component, [8, 8], 1)
 
-    transform = masked_array.filled(0) + no_z_component
-    return transform.round(4).tolist()
+    transform = masked_array.filled(0) + no_z_component  # type: ignore[no-untyped-call]
+    return transform.round(4).tolist()  # type: ignore[no-any-return]
 
 
-def solve(expected: List[Tuple[float, float]],
-          actual: List[Tuple[float, float]]) -> np.ndarray:
+def solve(
+    expected: List[Tuple[float, float]],
+    actual: List[Tuple[float, float]],
+) -> DoubleArray:
     """
     Takes two lists of 3 x-y points each, and calculates the matrix
     representing the transformation from one space to the other.
@@ -82,7 +80,7 @@ def solve(expected: List[Tuple[float, float]],
             [ 0  1  2.1 ]
             [ 0  0  1   ]
 
-        The B*T will yeild the "actual" point:
+        The B*T will yield the "actual" point:
             [ 1  0  1 ]
             [ 0  1  2 ]
             [ 0  0  1 ]
@@ -99,29 +97,23 @@ def solve(expected: List[Tuple[float, float]],
     # [ (x1, y1),
     #   (x2, y2),
     #   (x3, y3) ]
-    ex = np.array([
-            list(point) + [1]
-            for point in expected
-        ]).transpose()
+    ex = np.array([list(point) + [1] for point in expected]).transpose()
 
-    ac = np.array([
-            list(point) + [1]
-            for point in actual
-        ]).transpose()
+    ac = np.array([list(point) + [1] for point in actual]).transpose()
     # Shape of `ex` and `ac`:
     # [ x1 x2 x3 ]
     # [ y1 y2 y3 ]
     # [  1  1  1 ]
 
-    transform = np.dot(ac, inv(ex))
+    transform = np.dot(ac, inv(ex))  # type: ignore[no-untyped-call]
     # `dot` in numpy is a misnomer. When both arguments are square, N-
     # dimensional arrays, the return type is the result of performing matrix
     # multiplication, rather than the dot-product (so the return here will be
     # a 4x4 matrix)
-    return transform
+    return transform  # type: ignore[no-any-return]
 
 
-def add_z(xy: np.ndarray, z: float) -> np.ndarray:
+def add_z(xy: DoubleArray, z: float) -> DoubleArray:
     """
     Turn a 2-D transform matrix into a 3-D transform matrix (scale/shift only,
     no rotation).
@@ -140,30 +132,26 @@ def add_z(xy: np.ndarray, z: float) -> np.ndarray:
             [ 0  0  0  1 ]
     """
     # First, insert a column of zeros as into the input matrix
-    interm = insert(xy, 2, [0, 0, 0], axis=1)
+    interm = insert(xy, 2, [0, 0, 0], axis=1)  # type: ignore[no-untyped-call]
     # Result:
     # [ 1  0  0  x ]
     # [ 0  1  0  y ]
     # [ 0  0  0  1 ]
 
     # Then, insert the z row to create a properly formed 3-D transform matrix:
-    xyz = insert(
-        interm,
-        2,
-        [0, 0, 1, z],
-        axis=0)
+    xyz = insert(interm, 2, [0, 0, 1, z], axis=0)  # type: ignore[no-untyped-call]
     # Result:
     # [ 1  0  0  x ]
     # [ 0  1  0  y ]
     # [ 0  0  1  z ]
     # [ 0  0  0  1 ]
 
-    return xyz.round(11)
+    return xyz.round(11)  # type: ignore[no-any-return]
 
 
 def add_matrices(
-        t1: Tuple[float, float, float],
-        t2: Tuple[float, float, float]) -> Tuple[float, float, float]:
+    t1: Tuple[float, float, float], t2: Tuple[float, float, float]
+) -> Tuple[float, float, float]:
     """
     Simple method to convert tuples to numpy arrays and add them.
     """
@@ -171,8 +159,9 @@ def add_matrices(
 
 
 def apply_transform(
-        t: Union[List[List[float]], np.ndarray],
-        pos: AxisPosition) -> Tuple[float, float, float]:
+    t: Union[List[List[float]], DoubleArray],
+    pos: AxisPosition,
+) -> Tuple[float, float, float]:
     """
     Change of base using a transform matrix. Primarily used to render a point
     in space in a way that is more readable for the user.
@@ -185,8 +174,8 @@ def apply_transform(
 
 
 def apply_reverse(
-        t: Union[List[List[float]], np.ndarray],
-        pos: AxisPosition) -> Tuple[float, float, float]:
-    """ Like apply_transform but inverts the transform first
-    """
-    return apply_transform(inv(t), pos)
+    t: Union[List[List[float]], DoubleArray],
+    pos: AxisPosition,
+) -> Tuple[float, float, float]:
+    """Like apply_transform but inverts the transform first"""
+    return apply_transform(inv(t), pos)  # type: ignore[no-untyped-call]

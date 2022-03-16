@@ -155,6 +155,13 @@ export const getRobotByName = (
   return getViewableRobots(state).find(r => r.name === robotName) || null
 }
 
+export const getDiscoverableRobotByName = (
+  state: State,
+  robotName: string
+): DiscoveredRobot | null => {
+  return getAllRobots(state).find(r => r.name === robotName) || null
+}
+
 export const getRobotApiVersion = (robot: DiscoveredRobot): string | null =>
   (robot.health && semver.valid(robot.health.api_version)) ??
   (robot.serverHealth && semver.valid(robot.serverHealth.apiServerVersion)) ??

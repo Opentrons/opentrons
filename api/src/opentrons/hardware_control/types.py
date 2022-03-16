@@ -1,14 +1,10 @@
-import abc
-import asyncio
 import enum
 import logging
 from dataclasses import dataclass
-from typing import cast, Tuple, Union, List, TYPE_CHECKING
+from typing import cast, Tuple, Union, List, Callable, Dict, TypeVar
 from typing_extensions import Literal
 from opentrons import types as top_types
 
-if TYPE_CHECKING:
-    from .dev_types import DoorStateNotificationType
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -19,10 +15,10 @@ class OutOfBoundsMove(RuntimeError):
         super().__init__()
 
     def __str__(self) -> str:
-        return f'OutOfBoundsMove: {self.message}'
+        return f"OutOfBoundsMove: {self.message}"
 
     def __repr__(self) -> str:
-        return f'<{str(self.__class__)}: {self.message}>'
+        return f"<{str(self.__class__)}: {self.message}>"
 
 
 class MotionChecks(enum.Enum):
@@ -41,86 +37,244 @@ class Axis(enum.Enum):
     C = 5
 
     @classmethod
-    def by_mount(cls, mount: top_types.Mount):
-        bm = {top_types.Mount.LEFT: cls.Z,
-              top_types.Mount.RIGHT: cls.A}
+    def by_mount(cls, mount: top_types.Mount) -> "Axis":
+        bm = {top_types.Mount.LEFT: cls.Z, top_types.Mount.RIGHT: cls.A}
         return bm[mount]
 
     @classmethod
-    def gantry_axes(cls) -> Tuple['Axis', 'Axis', 'Axis', 'Axis']:
-        """ The axes which are tied to the gantry and require the deck
-        calibration transform
-        """
-        return (cls.X, cls.Y, cls.Z, cls.A)
+    def mount_axes(cls) -> Tuple["Axis", "Axis"]:
+        """The axes which are used for moving pipettes up and down."""
+        return cls.Z, cls.A
 
     @classmethod
-    def of_plunger(cls, mount: top_types.Mount):
-        pm = {top_types.Mount.LEFT: cls.B,
-              top_types.Mount.RIGHT: cls.C}
+    def gantry_axes(cls) -> Tuple["Axis", "Axis", "Axis", "Axis"]:
+        """The axes which are tied to the gantry and require the deck
+        calibration transform
+        """
+        return cls.X, cls.Y, cls.Z, cls.A
+
+    @classmethod
+    def of_plunger(cls, mount: top_types.Mount) -> "Axis":
+        pm = {top_types.Mount.LEFT: cls.B, top_types.Mount.RIGHT: cls.C}
         return pm[mount]
 
     @classmethod
-    def to_mount(cls, inst: 'Axis'):
+    def to_mount(cls, inst: "Axis") -> top_types.Mount:
         return {
             cls.Z: top_types.Mount.LEFT,
             cls.A: top_types.Mount.RIGHT,
             cls.B: top_types.Mount.LEFT,
-            cls.C: top_types.Mount.RIGHT
+            cls.C: top_types.Mount.RIGHT,
         }[inst]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
+
+
+class OT3Mount(enum.Enum):
+    LEFT = top_types.Mount.LEFT.value
+    RIGHT = top_types.Mount.RIGHT.value
+    GRIPPER = enum.auto()
+
+    @classmethod
+    def from_mount(cls, mount: Union[top_types.Mount, "OT3Mount"]) -> "OT3Mount":
+        return cls[mount.name]
+
+    def to_mount(self) -> top_types.Mount:
+        if self.value == self.GRIPPER.value:
+            raise KeyError("Gripper mount is not representable")
+        return top_types.Mount[self.name]
+
+
+class OT3AxisKind(enum.Enum):
+    """An enum of the different kinds of axis we have.
+
+    The machine may have different numbers of specific axes implementing
+    each axis kind.
+    """
+
+    X = 0
+    #: Gantry X axis
+    Y = 1
+    #: Gantry Y axis
+    Z = 2
+    #: Z axis (of the left and right and gripper mounts)
+    P = 3
+    #: Plunger axis (of the left and right pipettes)
+    OTHER = 4
+    #: The internal axes of high throughput pipettes, for instance
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class OT3Axis(enum.Enum):
+    X = 0  # gantry
+    Y = 1
+    Z_L = 2  # left pipette mount Z
+    Z_R = 3  # right pipette mount Z
+    Z_G = 4  # gripper mount Z
+    P_L = 5  # left pipette plunger
+    P_R = 6  # right pipette plunger
+    Q = 7  # hi-thruput pipette tiprack grab
+    G = 8  # gripper grab
+
+    @classmethod
+    def by_mount(cls, mount: Union[top_types.Mount, OT3Mount]) -> "OT3Axis":
+        bm = {
+            top_types.Mount.LEFT: cls.Z_L,
+            top_types.Mount.RIGHT: cls.Z_R,
+            OT3Mount.LEFT: cls.Z_L,
+            OT3Mount.RIGHT: cls.Z_R,
+            OT3Mount.GRIPPER: cls.Z_G,
+        }
+        return bm[mount]
+
+    @classmethod
+    def from_axis(cls, axis: Union[Axis, "OT3Axis"]) -> "OT3Axis":
+        am = {
+            Axis.X: cls.X,
+            Axis.Y: cls.Y,
+            Axis.Z: cls.Z_L,
+            Axis.A: cls.Z_R,
+            Axis.B: cls.P_L,
+            Axis.C: cls.P_R,
+        }
+        try:
+            return am[axis]  # type: ignore
+        except KeyError:
+            return axis  # type: ignore
+
+    def to_axis(self) -> Axis:
+        am = {
+            OT3Axis.X: Axis.X,
+            OT3Axis.Y: Axis.Y,
+            OT3Axis.Z_L: Axis.Z,
+            OT3Axis.Z_R: Axis.A,
+            OT3Axis.P_L: Axis.B,
+            OT3Axis.P_R: Axis.C,
+        }
+        return am[self]
+
+    @classmethod
+    def pipette_axes(cls) -> Tuple["OT3Axis", "OT3Axis"]:
+        """The axes which are used for moving pipettes up and down."""
+        return cls.Z_L, cls.Z_R
+
+    @classmethod
+    def mount_axes(cls) -> Tuple["OT3Axis", "OT3Axis"]:
+        return cls.Z_L, cls.Z_R
+
+    @classmethod
+    def gantry_axes(
+        cls,
+    ) -> Tuple["OT3Axis", "OT3Axis", "OT3Axis", "OT3Axis"]:
+        """The axes which are tied to the gantry and require the deck
+        calibration transform
+        """
+        return cls.X, cls.Y, cls.Z_L, cls.Z_R
+
+    @classmethod
+    def of_main_tool_actuator(
+        cls, mount: Union[top_types.Mount, OT3Mount]
+    ) -> "OT3Axis":
+        if isinstance(mount, top_types.Mount):
+            checked_mount = OT3Mount.from_mount(mount)
+        else:
+            checked_mount = mount
+        pm = {OT3Mount.LEFT: cls.P_L, OT3Mount.RIGHT: cls.P_R, OT3Mount.GRIPPER: cls.G}
+        return pm[checked_mount]
+
+    def to_kind(self) -> OT3AxisKind:
+        kind_map: Dict[int, OT3AxisKind] = {
+            self.P_L: OT3AxisKind.P,
+            self.P_R: OT3AxisKind.P,
+            self.X: OT3AxisKind.X,
+            self.Y: OT3AxisKind.Y,
+            self.Z_L: OT3AxisKind.Z,
+            self.Z_R: OT3AxisKind.Z,
+            self.Z_G: OT3AxisKind.Z,
+            self.Q: OT3AxisKind.OTHER,
+            self.G: OT3AxisKind.OTHER,
+        }
+        return kind_map[self.value]
+
+    @classmethod
+    def of_kind(cls, kind: OT3AxisKind) -> List["OT3Axis"]:
+        kind_map: Dict[OT3AxisKind, List[OT3Axis]] = {
+            OT3AxisKind.P: [cls.P_R, cls.P_L],
+            OT3AxisKind.X: [cls.X],
+            OT3AxisKind.Y: [cls.Y],
+            OT3AxisKind.Z: [cls.Z_G, cls.Z_L, cls.Z_R],
+            OT3AxisKind.OTHER: [cls.Q, cls.G],
+        }
+        return kind_map[kind]
+
+    @classmethod
+    def to_mount(cls, inst: "OT3Axis") -> OT3Mount:
+        return {
+            cls.Z_R: OT3Mount.RIGHT,
+            cls.Z_L: OT3Mount.LEFT,
+            cls.P_L: OT3Mount.LEFT,
+            cls.P_R: OT3Mount.RIGHT,
+            cls.Z_G: OT3Mount.GRIPPER,
+            cls.G: OT3Mount.GRIPPER,
+        }[inst]
+
+    def __str__(self) -> str:
+        return self.name
+
+
+BCAxes = Union[Axis, OT3Axis]
+AxisMapValue = TypeVar("AxisMapValue")
+OT3AxisMap = Dict[OT3Axis, AxisMapValue]
+
+
+@dataclass
+class CurrentConfig:
+    hold_current: float
+    run_current: float
+
+    def as_tuple(self) -> Tuple[float, float]:
+        return (self.hold_current, self.run_current)
 
 
 class DoorState(enum.Enum):
     OPEN = False
     CLOSED = True
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name.lower()
 
 
 class HardwareEventType(enum.Enum):
     DOOR_SWITCH_CHANGE = enum.auto()
+    ERROR_MESSAGE = enum.auto()
 
 
 @dataclass
 class DoorStateNotification:
-    event: 'DoorStateNotificationType' = \
+    event: Literal[
         HardwareEventType.DOOR_SWITCH_CHANGE
+    ] = HardwareEventType.DOOR_SWITCH_CHANGE
     new_state: DoorState = DoorState.CLOSED
     blocking: bool = False
 
 
+@dataclass
+class ErrorMessageNotification:
+    message: str
+    event: Literal[HardwareEventType.ERROR_MESSAGE] = HardwareEventType.ERROR_MESSAGE
+
+
 # new event types get new dataclasses
 # when we add more event types we add them here
-HardwareEvent = Union[DoorStateNotification]
+HardwareEvent = Union[DoorStateNotification, ErrorMessageNotification]
+
+HardwareEventHandler = Callable[[HardwareEvent], None]
 
 
-class HardwareAPILike(abc.ABC):
-    """ A dummy class useful in isinstance checks to accept an API or adapter
-    """
-    @property
-    def loop(self) -> asyncio.AbstractEventLoop:
-        ...
-
-    @property
-    def board_revision(self) -> str:
-        ...
-
-    @property
-    def door_state(self) -> DoorState:
-        ...
-
-    @door_state.setter
-    def door_state(self, door_state: DoorState) -> DoorState:
-        ...
-
-    def validate_calibration(self):
-        ...
-
-
-RevisionLiteral = Literal['2.1', 'A', 'B', 'C', 'UNKNOWN']
+RevisionLiteral = Literal["2.1", "A", "B", "C", "UNKNOWN"]
 
 
 class BoardRevision(enum.Enum):
@@ -131,29 +285,30 @@ class BoardRevision(enum.Enum):
     C = enum.auto()
 
     @classmethod
-    def by_bits(cls, rev_bits: Tuple[bool, bool]):
+    def by_bits(cls, rev_bits: Tuple[bool, bool]) -> "BoardRevision":
         br = {
             (True, True): cls.OG,
             (False, True): cls.A,
             (True, False): cls.B,
-            (False, False): cls.C
+            (False, False): cls.C,
         }
         return br[rev_bits]
 
-    def real_name(self) -> Union[RevisionLiteral, Literal['UNKNOWN']]:
-        rn = '2.1' if self.name == 'OG' else self.name
-        return cast(Union[RevisionLiteral, Literal['UNKNOWN']], rn)
+    def real_name(self) -> Union[RevisionLiteral, Literal["UNKNOWN"]]:
+        rn = "2.1" if self.name == "OG" else self.name
+        return cast(Union[RevisionLiteral, Literal["UNKNOWN"]], rn)
 
     def __str__(self) -> str:
         return self.real_name()
 
 
 class CriticalPoint(enum.Enum):
-    """ Possibilities for the point to move in a move call.
+    """Possibilities for the point to move in a move call.
 
     The active critical point determines the offsets that are added to the
     gantry position when moving a pipette around.
     """
+
     MOUNT = enum.auto()
     """
     For legacy reasons, the position of the end of a P300 single. The default
@@ -196,33 +351,8 @@ class ExecutionState(enum.Enum):
     PAUSED = enum.auto()
     CANCELLED = enum.auto()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
-
-
-class PipettePair(enum.Enum):
-    PRIMARY_LEFT = enum.auto()
-    PRIMARY_RIGHT = enum.auto()
-
-    @property
-    def primary(self) -> top_types.Mount:
-        if self.name == 'PRIMARY_RIGHT':
-            return top_types.Mount.RIGHT
-        else:
-            return top_types.Mount.LEFT
-
-    @property
-    def secondary(self) -> top_types.Mount:
-        if self.name == 'PRIMARY_RIGHT':
-            return top_types.Mount.LEFT
-        else:
-            return top_types.Mount.RIGHT
-
-    @classmethod
-    def of_mount(cls, mount: top_types.Mount) -> 'PipettePair':
-        pair = {top_types.Mount.LEFT: cls.PRIMARY_LEFT,
-                top_types.Mount.RIGHT: cls.PRIMARY_RIGHT}
-        return pair[mount]
 
 
 class HardwareAction(enum.Enum):
@@ -232,7 +362,7 @@ class HardwareAction(enum.Enum):
     BLOWOUT = enum.auto()
     PREPARE_ASPIRATE = enum.auto()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -247,15 +377,14 @@ class AionotifyEvent:
     name: str
 
     @classmethod
-    def build(cls, name: str, flags: List[enum.Enum]) -> 'AionotifyEvent':
+    def build(cls, name: str, flags: List[enum.Enum]) -> "AionotifyEvent":
         # See https://github.com/python/mypy/issues/5317
         # as to why mypy cannot detect that list
         # comprehension or variables cannot be dynamically
         # determined to meet the argument criteria for
         # enums. Hence, the type ignore below.
         flag_list = [f.name for f in flags]
-        Flag = enum.Enum('Flag',  # type: ignore
-                         flag_list)
+        Flag = enum.Enum("Flag", flag_list)  # type: ignore
         return cls(flags=Flag, name=name)
 
 
@@ -276,8 +405,4 @@ class NoTipAttachedError(RuntimeError):
 
 
 class TipAttachedError(RuntimeError):
-    pass
-
-
-class PairedPipetteConfigValueError(RuntimeError):
     pass

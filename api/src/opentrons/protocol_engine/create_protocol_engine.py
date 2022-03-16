@@ -1,70 +1,40 @@
 """Main ProtocolEngine factory."""
-from opentrons.hardware_control.api import API as HardwareAPI
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.types import DoorState
+from opentrons.config import feature_flags
 
 from .protocol_engine import ProtocolEngine
-from .resources import ResourceProviders
-from .state import StateStore
-from .commands import CommandMapper
-from .execution import (
-    CommandExecutor,
-    EquipmentHandler,
-    MovementHandler,
-    PipettingHandler,
-    RunControlHandler,
-    QueueWorker,
-)
+from .resources import DeckDataProvider
+from .state import StateStore, EngineConfigs
 
 
-async def create_protocol_engine(hardware: HardwareAPI) -> ProtocolEngine:
-    """Create a ProtocolEngine instance."""
-    resources = ResourceProviders()
-    command_mapper = CommandMapper()
+async def create_protocol_engine(
+    hardware_api: HardwareControlAPI,
+    configs: EngineConfigs = EngineConfigs(),
+) -> ProtocolEngine:
+    """Create a ProtocolEngine instance.
 
+    Arguments:
+        hardware_api: Hardware control API to pass down to dependencies.
+        configs: Protocol Engine configurations.
+    """
     # TODO(mc, 2020-11-18): check short trash FF
-    # TODO(mc, 2020-11-18): consider moving into a StateStore.create factory
-    deck_def = await resources.deck_data.get_deck_definition()
-    fixed_labware = await resources.deck_data.get_deck_fixed_labware(deck_def)
+    deck_data = DeckDataProvider()
+    deck_definition = await deck_data.get_deck_definition()
+    deck_fixed_labware = await deck_data.get_deck_fixed_labware(deck_definition)
+    # TODO(mc, 2021-09-22): figure out a better way to load deck data that
+    # can more consistently handle Python vs JSON vs legacy differences
+
+    is_door_blocking = (
+        feature_flags.enable_door_safety_switch()
+        and hardware_api.door_state is DoorState.OPEN
+    )
 
     state_store = StateStore(
-        deck_definition=deck_def,
-        deck_fixed_labware=fixed_labware,
+        deck_definition=deck_definition,
+        deck_fixed_labware=deck_fixed_labware,
+        configs=configs,
+        is_door_blocking=is_door_blocking,
     )
 
-    equipment_handler = EquipmentHandler(
-        hardware=hardware,
-        state_store=state_store,
-        resources=resources,
-    )
-
-    movement_handler = MovementHandler(hardware=hardware, state_store=state_store)
-
-    pipetting_handler = PipettingHandler(
-        hardware=hardware,
-        state_store=state_store,
-        movement_handler=movement_handler,
-    )
-
-    run_control_handler = RunControlHandler(state_store=state_store)
-
-    command_executor = CommandExecutor(
-        state_store=state_store,
-        equipment=equipment_handler,
-        movement=movement_handler,
-        pipetting=pipetting_handler,
-        run_control=run_control_handler,
-        resources=resources,
-        command_mapper=command_mapper,
-    )
-
-    queue_worker = QueueWorker(
-        command_executor=command_executor,
-        state_store=state_store,
-    )
-
-    return ProtocolEngine(
-        state_store=state_store,
-        command_mapper=command_mapper,
-        resources=resources,
-        queue_worker=queue_worker,
-        hardware_api=hardware,
-    )
+    return ProtocolEngine(state_store=state_store, hardware_api=hardware_api)

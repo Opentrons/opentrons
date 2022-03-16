@@ -25,7 +25,7 @@ from robot_server.robot.calibration.constants import (
 
 
 PIP_OFFSET = CSTypes.PipetteOffsetByPipetteMount(
-    offset=robot_configs.DEFAULT_PIPETTE_OFFSET,
+    offset=robot_configs.defaults_ot2.DEFAULT_PIPETTE_OFFSET,
     source=CSTypes.SourceType.user,
     status=CSTypes.CalibrationStatus(),
 )
@@ -34,7 +34,7 @@ PIP_OFFSET = CSTypes.PipetteOffsetByPipetteMount(
 @pytest.fixture
 def mock_hw(hardware):
     pip = pipette.Pipette(load("p300_single_v2.1", "testiId"), PIP_OFFSET, "testId")
-    hardware._attached_instruments = {Mount.RIGHT: pip, Mount.LEFT: pip}
+    hardware.hardware_instruments = {Mount.RIGHT: pip, Mount.LEFT: pip}
     hardware._current_pos = Point(0, 0, 0)
 
     async def async_mock_move_rel(*args, **kwargs):
@@ -72,7 +72,7 @@ def test_user_flow_select_pipette(pipettes, target_mount, hardware):
         pip = pipette.Pipette(load(pipettes[0], "testId"), PIP_OFFSET, "testId")
     if pipettes[1]:
         pip2 = pipette.Pipette(load(pipettes[1], "testId"), PIP_OFFSET, "testId2")
-    hardware._attached_instruments = {Mount.LEFT: pip, Mount.RIGHT: pip2}
+    hardware.hardware_instruments = {Mount.LEFT: pip, Mount.RIGHT: pip2}
     # load a labware with calibrations
     with patch.object(
         get, "get_robot_deck_attitude", new=build_mock_deck_calibration()
@@ -82,7 +82,7 @@ def test_user_flow_select_pipette(pipettes, target_mount, hardware):
         get, "get_pipette_offset", new=build_mock_stored_pipette_offset()
     ):
         uf = CheckCalibrationUserFlow(hardware=hardware)
-        assert uf.hw_pipette == hardware._attached_instruments[target_mount]
+        assert uf.hw_pipette == hardware.hardware_instruments[target_mount]
 
 
 @pytest.mark.parametrize("pipettes,target_mount", pipette_combos)
@@ -92,7 +92,7 @@ async def test_switching_to_second_pipette(pipettes, target_mount, hardware):
         pip = pipette.Pipette(load(pipettes[0], "testId"), PIP_OFFSET, "testId")
     if pipettes[1]:
         pip2 = pipette.Pipette(load(pipettes[1], "testId"), PIP_OFFSET, "testId2")
-    hardware._attached_instruments = {Mount.LEFT: pip, Mount.RIGHT: pip2}
+    hardware.hardware_instruments = {Mount.LEFT: pip, Mount.RIGHT: pip2}
     # load a labware with calibrations
     with patch.object(
         get, "get_robot_deck_attitude", new=build_mock_deck_calibration()
@@ -177,7 +177,7 @@ def build_mock_deck_calibration(kind="normal"):
     elif kind == "identity":
         return MagicMock(
             return_value=CSTypes.DeckCalibration(
-                attitude=robot_configs.DEFAULT_DECK_CALIBRATION_V2,
+                attitude=robot_configs.defaults_ot2.DEFAULT_DECK_CALIBRATION_V2,
                 source=CSTypes.SourceType.user,
                 status=CSTypes.CalibrationStatus(markedBad=False),
             )

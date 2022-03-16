@@ -11,7 +11,7 @@ export const getTipLengthCalibrations: (
     return []
   }
   const calibrations =
-    state.calibration[robotName]?.tipLengthCalibrations?.data || []
+    state?.calibration[robotName]?.tipLengthCalibrations?.data || []
   return calibrations
 }
 

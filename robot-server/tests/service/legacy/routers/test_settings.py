@@ -209,18 +209,14 @@ def test_available_resets(api_client):
     body = resp.json()
     options_list = body.get("options")
     assert resp.status_code == 200
-    assert (
-        sorted(
-            [
-                "deckCalibration",
-                "pipetteOffsetCalibrations",
-                "labwareCalibration",
-                "bootScripts",
-                "tipLengthCalibrations",
-            ]
-        )
-        == sorted([item["id"] for item in options_list])
-    )
+    assert sorted(
+        [
+            "deckCalibration",
+            "pipetteOffsetCalibrations",
+            "bootScripts",
+            "tipLengthCalibrations",
+        ]
+    ) == sorted([item["id"] for item in options_list])
 
 
 @pytest.fixture
@@ -237,7 +233,6 @@ def mock_reset():
         # None true
         [
             {
-                "labwareCalibration": False,
                 "deckCalibration": False,
                 "bootScripts": False,
                 "pipetteOffsetCalibrations": False,
@@ -248,21 +243,18 @@ def mock_reset():
         # All set
         [
             {
-                "labwareCalibration": True,
                 "bootScripts": True,
                 "pipetteOffsetCalibrations": True,
                 "tipLengthCalibrations": True,
                 "deckCalibration": True,
             },
             {
-                ResetOptionId.labware_calibration,
                 ResetOptionId.boot_scripts,
                 ResetOptionId.deck_calibration,
                 ResetOptionId.pipette_offset,
                 ResetOptionId.tip_length_calibrations,
             },
         ],
-        [{"labwareCalibration": True}, {ResetOptionId.labware_calibration}],
         [{"bootScripts": True}, {ResetOptionId.boot_scripts}],
         [{"pipetteOffsetCalibrations": True}, {ResetOptionId.pipette_offset}],
         [{"tipLengthCalibrations": True}, {ResetOptionId.tip_length_calibrations}],

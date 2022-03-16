@@ -6,28 +6,137 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# OT-2 Software Changes in 4.4.0
+# OT-2 Software Changes in 5.0.2
+
+Welcome to the v5.0.2 release of the Opentrons OT-2 software!
+
+This release is a complete refactor of how the OT-2 communicates with the Opentrons app, and features a number of changes to how protocols are loaded and stored on the robot.
 
 ## New Features
+
+ - A modern, http-based interface has replaced the RPC endpoints for communicating with the Opentrons App
+ - More thorough information about a protocol is returned to the Opentrons App to enable the display of live protocol status
+ - The most recent protocol analysis and run are stored on the robot to enable easy, quick re-running via the Opentrons App
+ - A new way to use labware offsets in Jupyter notebook and SSH sessions
+
+## 5.0.1 to 5.0.2
+
+The 5.0.2 hotfix release contains two fixes in the robot software:
+
+1. The robot now understands how to use labware loaded via `load_labware_from_definition` during Labware Position Check.
+2. User-defined labware labels are now returned to the Opentrons App from protocol analyses and runs.
+3. Protocol file uploads now permit uppercase .json and .py extensions.
+
+## 5.0.0 to 5.0.1
+
+The 5.0.1 hotfix release does not contain any changes to the robot software
+
+## Known Issues
+
+- Your last run protocol will not be saved through robot reboots.
+- When you load multiple instances of the same module type in a protocol, the USB port numbers shown in "Module Setup" are incorrect.
+
+---
+
+## OT-2 Software Changes in 4.7.0
+
+The 4.7.0 release of the OT-2 Software fixes a handful of regressions and bugs.
+
+### New Features
+
+- This is primarily a bug fix release.
+
+### Bug Fixes
+
+- Fixed an issue where pipette offset and tip length calibration would sometimes not be saved correctly.
+- Fixed issues around attach pipette behavior.
+- Fixed error reporting from the Thermocycler in the instance that the module goes into an unrecoverable state.
+
+---
+
+## OT-2 Software Changes in 4.6.2
+
+### New Features
+
+- The `opentrons_simulate` command-line application can now estimate protocol duration using the `-e` option. This feature is experimental, but very cool!
+
+### Bug Fixes
+
+- If a protocol is canceled mid-run while there is a tip on a pipette, the tip will be dropped prior to resetting the plunger to avoid contaminating the pipette internals with liquids.
+- Fixed a movement planning issue that could cause multi-channel pipettes to collide with the deck when changing pipettes.
+- Fixed an issue that could cause the protocol to proceed before an awaited temperature module target was actually hit.
+- Fixed a few issues with the faster protocol analysis method added in the 4.5.0 release.
+- Fixed type annotations of the `ProtocolContext` classes.
+
+#### 4.6.1 to 4.6.2
+
+The 4.6.2 hotfix release contains a small bug fix for an issue where the OT-2's max speed settings within a protocol will be ignored.
+
+#### 4.6.0 to 4.6.1
+
+The 4.6.1 hotfix release contains a small configuration change to fix an issue with installing the `opentrons` PyPI package on computers running Python 3.8 and later. It does not affect the software running on your OT-2.
+
+## Known Issues
+
+In 4.6.0 and previous releases, the OT-2 will only use TLS 1.0 for WPA2 Enterprise association. Some RADIUS servers have disabled this version of TLS; it must be enabled to connect the OT-2 to a RADIUS-secured network.
+
+Since version 4.5.0, if a thermocycler encounters an error, the robot will be unable to recognize the error state. If your thermocycler starts blinking its yellow LED, you should cancel your protocol. See issue [8393][] for more details.
+
+[8393]: https://github.com/Opentrons/opentrons/issues/8393
+
+---
+
+## OT-2 Software Changes in 4.5.0
+
+The 4.5.0 release of the OT-2 Software improves the speed of protocol uploads and fixes a handful of regressions and bugs.
+
+### New Features
+
+- The OT-2 now uses a faster analysis method on protocol upload
+  - Thanks to everyone who beta tested this feature over the last few months!
+  - You may revert to the old analysis method with the **Use Older Protocol Analysis Method** in your OT-2's advanced settings
+  - If you encounter any issues (e.g. protocol run errors not caught during upload) please reach out to Opentrons Support or [open an issue][] in GitHub so we can continue to improve this feature
+
+### Bug Fixes
+
+- Fixed a regression that prevented use of OT-2 Modules in Jupyter notebook ([#8009][])
+- Fixed an uncaught import error on macOS and Windows ([#8154][], thanks to [Maksim Rakitin][] for the fix!)
+- Fixed a crash caused by invalid calibration data ([#7962][])
+
+### Known Issues
+
+In 4.5.0 and previous releases, the OT-2 will only use TLS 1.0 for WPA2 Enterprise association. Some RADIUS servers have disabled this version of TLS; it must be enabled to connect the OT-2 to a RADIUS-secured network.
+
+[#7962]: https://github.com/Opentrons/opentrons/issues/7962
+[#8009]: https://github.com/Opentrons/opentrons/issues/8009
+[#8154]: https://github.com/Opentrons/opentrons/issues/8154
+[maksim rakitin]: https://github.com/mrakitin
+[open an issue]: https://github.com/Opentrons/opentrons/issues
+
+---
+
+## OT-2 Software Changes in 4.4.0
+
+### New Features
 
 - Triggering a `move_to` to a labware will now count the labware as "used" in the protocol, allowing it to show up in the calibration list ([#7812][])
 - Various documentation and error message improvements
 
-## Bug Fixes
+### Bug Fixes
 
 - A new Protocol API version was added - `2.11` - to ensure that liquid handling commands like `aspirate` and `dispense` will reject if the source or destination labware is a tip rack (thanks to [@andeecode] for reporting [#7552][]!)
 - The robot's built-in HTTP server now sends the correct headers for CORS (thanks to [Benedict Diederich][] for reporting [#7599]!)
 - Added guards to prevent resumptions from a delay overriding higher priority pauses ([#7773][])
 - Fixed several memory leaks in module handling that could lead to spurious error logs and other issues ([#7641][] and [#7690][])
 
-## Known Issues
+### Known Issues
 
 In 4.4.0 and previous releases, the OT-2 will only use TLS 1.0 for WPA2 Enterprise association. Some RADIUS servers have disabled this version of TLS; it must be enabled to connect the OT-2 to a RADIUS-secured network.
 
 [@andeecode]: https://github.com/andeecode
 [benedict diederich]: https://github.com/beniroquai
 [#7552]: https://github.com/Opentrons/opentrons/issues/7552
-[#7552]: https://github.com/Opentrons/opentrons/issues/7599
+[#7599]: https://github.com/Opentrons/opentrons/issues/7599
 [#7641]: https://github.com/Opentrons/opentrons/issues/7641
 [#7690]: https://github.com/Opentrons/opentrons/issues/7690
 [#7773]: https://github.com/Opentrons/opentrons/issues/7773

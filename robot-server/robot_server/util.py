@@ -1,21 +1,29 @@
+from __future__ import annotations
 import hashlib
 from dataclasses import dataclass
+from fastapi import UploadFile
 from functools import wraps
 from pathlib import Path
-
-from fastapi import UploadFile
-from opentrons.util.helpers import utc_now
+from types import TracebackType
+from typing import cast, Any, Awaitable, Callable, Optional, Type, TypeVar
 from typing_extensions import Final
+
+from opentrons.util.helpers import utc_now
 
 
 class duration:
     """Context manager to mark start and end times of a block"""
 
-    def __enter__(self):
+    def __enter__(self) -> duration:
         self.start = utc_now()
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None:
         self.end = utc_now()
 
 
@@ -41,8 +49,10 @@ def save_upload(directory: Path, upload_file: UploadFile) -> FileMeta:
 
 CALL_ONCE_RESULT_ATTR: Final = "_call_once_result"
 
+AsyncFuncT = TypeVar("AsyncFuncT", bound=Callable[..., Awaitable[Any]])
 
-def call_once(fn):
+
+def call_once(fn: AsyncFuncT) -> AsyncFuncT:
     """
     Decorator used to ensure an async function is called only once. Subsequent
      calls will return the result of ths initial call regardless of arguments.
@@ -53,11 +63,11 @@ def call_once(fn):
     """
 
     @wraps(fn)
-    async def wrapped(*args, **kwargs):
+    async def wrapped(*args: Any, **kwargs: Any) -> Any:
         if not hasattr(wrapped, CALL_ONCE_RESULT_ATTR):
             result = await fn(*args, **kwargs)
             setattr(wrapped, CALL_ONCE_RESULT_ATTR, result)
 
         return getattr(wrapped, CALL_ONCE_RESULT_ATTR)
 
-    return wrapped
+    return cast(AsyncFuncT, wrapped)

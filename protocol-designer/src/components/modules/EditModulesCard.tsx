@@ -4,7 +4,7 @@ import { Card } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
-  ModuleRealType,
+  ModuleType,
 } from '@opentrons/shared-data'
 import {
   selectors as stepFormSelectors,
@@ -20,14 +20,15 @@ import styles from './styles.css'
 
 export interface Props {
   modules: ModulesForEditModulesCard
-  openEditModuleModal: (
-    moduleType: ModuleRealType,
-    moduleId?: string
-  ) => unknown
+  openEditModuleModal: (moduleType: ModuleType, moduleId?: string) => unknown
 }
 
 export function EditModulesCard(props: Props): JSX.Element {
   const { modules, openEditModuleModal } = props
+
+  const enableHeaterShaker = useSelector(
+    featureFlagSelectors.getEnabledHeaterShaker
+  )
 
   const pipettesByMount = useSelector(
     stepFormSelectors.getPipettesForEditPipetteForm
@@ -55,6 +56,12 @@ export function EditModulesCard(props: Props): JSX.Element {
   const showCrashInfoBox =
     warningsEnabled && (hasCrashableMagneticModule || hasCrashableTempModule)
 
+  const SUPPORTED_MODULE_TYPES_FILTERED = enableHeaterShaker
+    ? SUPPORTED_MODULE_TYPES
+    : SUPPORTED_MODULE_TYPES.filter(
+        moduleType => moduleType !== 'heaterShakerModuleType'
+      )
+
   return (
     <Card title="Modules">
       <div className={styles.modules_card_content}>
@@ -64,7 +71,7 @@ export function EditModulesCard(props: Props): JSX.Element {
             temperatureOnDeck={hasCrashableTempModule}
           />
         )}
-        {SUPPORTED_MODULE_TYPES.map((moduleType, i) => {
+        {SUPPORTED_MODULE_TYPES_FILTERED.map((moduleType, i) => {
           const moduleData = modules[moduleType]
           if (moduleData) {
             return (

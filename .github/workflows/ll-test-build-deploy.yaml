@@ -41,7 +41,9 @@ jobs:
       - uses: 'actions/checkout@v2'
       - uses: 'actions/setup-node@v1'
         with:
-          node-version: '12'
+          node-version: '14'
+      - name: 'install libudev for usb-detection'
+        run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
         uses: actions/cache@v2
         with:
@@ -58,7 +60,13 @@ jobs:
           make setup-js
       - name: 'run labware library unit tests'
         run: |
-          yarn jest --coverage=true --ci=true labware-library/
+          yarn jest --coverage=true --ci=true --collectCoverageFrom="labware-library/src/**/*.(js|ts|tsx)" labware-library/src
+      - name: 'Upload coverage report'
+        uses: codecov/codecov-action@v2
+        with:
+          files: ./coverage/lcov.info
+          flags: labware-library
+
   e2e-test:
     name: 'labware library e2e tests on ${{ matrix.os }}'
     timeout-minutes: 30
@@ -70,7 +78,10 @@ jobs:
       - uses: 'actions/checkout@v2'
       - uses: 'actions/setup-node@v1'
         with:
-          node-version: '12'
+          node-version: '14'
+      - name: 'install libudev for usb-detection'
+        if: startsWith(matrix.os, 'ubuntu')
+        run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
         uses: actions/cache@v2
         with:
@@ -98,7 +109,9 @@ jobs:
       - uses: 'actions/checkout@v2'
       - uses: 'actions/setup-node@v1'
         with:
-          node-version: '12'
+          node-version: '14'
+      - name: 'install libudev for usb-detection'
+        run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
         uses: actions/cache@v2
         with:
@@ -133,7 +146,9 @@ jobs:
       - uses: 'actions/checkout@v2'
       - uses: 'actions/setup-node@v1'
         with:
-          node-version: '12'
+          node-version: '14'
+      - name: 'install udev for usb-detection'
+        run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'set complex environment variables'
         id: 'set-vars'
         uses: actions/github-script@v3.1

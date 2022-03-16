@@ -6,9 +6,9 @@ from pydantic import Field
 
 from opentrons.calibration_storage.types import SourceType
 from robot_server.service.json_api import (
-    ResponseModel,
-    MultiResponseModel,
-    ResponseDataModel,
+    DeprecatedResponseModel,
+    DeprecatedMultiResponseModel,
+    DeprecatedResponseDataModel,
 )
 from robot_server.service.shared_models import calibration as cal_model
 
@@ -22,7 +22,7 @@ class MountType(str, Enum):
     right = "right"
 
 
-class PipetteOffsetCalibration(ResponseDataModel):
+class PipetteOffsetCalibration(DeprecatedResponseDataModel):
     """
     A model describing pipette calibration based on the mount and
     the pipette's serial number
@@ -50,7 +50,6 @@ class PipetteOffsetCalibration(ResponseDataModel):
     )
 
 
-MultipleCalibrationsResponse = MultiResponseModel[PipetteOffsetCalibration]
+MultipleCalibrationsResponse = DeprecatedMultiResponseModel[PipetteOffsetCalibration]
 
-
-SingleCalibrationResponse = ResponseModel[PipetteOffsetCalibration]
+SingleCalibrationResponse = DeprecatedResponseModel[PipetteOffsetCalibration]

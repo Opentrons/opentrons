@@ -1,17 +1,25 @@
 """Base command data model and type definitions."""
+
+
 from __future__ import annotations
+
 from abc import ABC, abstractmethod
-from enum import Enum
 from datetime import datetime
-from pydantic import BaseModel, Field
-from pydantic.generics import GenericModel
+from enum import Enum
 from typing import TYPE_CHECKING, Generic, Optional, TypeVar
 
-# convenience type alias to work around type-only circular dependency
+from pydantic import BaseModel, Field
+from pydantic.generics import GenericModel
+
+from opentrons.hardware_control import HardwareControlAPI
+
+# Work around type-only circular dependencies.
 if TYPE_CHECKING:
     from opentrons.protocol_engine import execution
+    from opentrons.protocol_engine.state import StateView
 
-CommandDataT = TypeVar("CommandDataT", bound=BaseModel)
+
+CommandParamsT = TypeVar("CommandParamsT", bound=BaseModel)
 
 CommandResultT = TypeVar("CommandResultT", bound=BaseModel)
 
@@ -25,7 +33,7 @@ class CommandStatus(str, Enum):
     FAILED = "failed"
 
 
-class BaseCommandRequest(GenericModel, Generic[CommandDataT]):
+class BaseCommandCreate(GenericModel, Generic[CommandParamsT]):
     """Base class for command creation requests.
 
     You shouldn't use this class directly; instead, use or define
@@ -39,17 +47,20 @@ class BaseCommandRequest(GenericModel, Generic[CommandDataT]):
             "execution behavior"
         ),
     )
-    data: CommandDataT = Field(..., description="Command execution data payload")
+    params: CommandParamsT = Field(..., description="Command execution data payload")
 
 
-class BaseCommand(GenericModel, Generic[CommandDataT, CommandResultT]):
+class BaseCommand(GenericModel, Generic[CommandParamsT, CommandResultT]):
     """Base command model.
 
     You shouldn't use this class directly; instead, use or define
     your own subclass per specific command type.
     """
 
-    id: str = Field(..., description="Unique identifier for a particular command")
+    id: str = Field(
+        ...,
+        description="Unique identifier of this particular command instance",
+    )
     createdAt: datetime = Field(..., description="Command creation timestamp")
     commandType: str = Field(
         ...,
@@ -58,16 +69,25 @@ class BaseCommand(GenericModel, Generic[CommandDataT, CommandResultT]):
             "execution behavior"
         ),
     )
+    key: str = Field(
+        ...,
+        description=(
+            "An identifier representing this command as a step in a protocol."
+            " A command's `key` will be unique within a given run, but stable"
+            " across all runs that perform the same exact procedure. Thus,"
+            " `key` be used to compare/match commands across multiple runs"
+            " of the same protocol."
+        ),
+    )
     status: CommandStatus = Field(..., description="Command execution status")
-    data: CommandDataT = Field(..., description="Command execution data payload")
+    params: CommandParamsT = Field(..., description="Command execution data payload")
     result: Optional[CommandResultT] = Field(
         None,
         description="Command execution result data, if succeeded",
     )
-    # TODO(mc, 2021-06-08): model ProtocolEngine errors
-    error: Optional[str] = Field(
+    errorId: Optional[str] = Field(
         None,
-        description="Command execution failure, if failed",
+        description="Reference to error occurrence, if execution failed",
     )
     startedAt: Optional[datetime] = Field(
         None,
@@ -81,7 +101,7 @@ class BaseCommand(GenericModel, Generic[CommandDataT, CommandResultT]):
 
 class AbstractCommandImpl(
     ABC,
-    Generic[CommandDataT, CommandResultT],
+    Generic[CommandParamsT, CommandResultT],
 ):
     """Abstract command creation and execution implementation.
 
@@ -94,18 +114,18 @@ class AbstractCommandImpl(
 
     def __init__(
         self,
+        state_view: StateView,
+        hardware_api: HardwareControlAPI,
         equipment: execution.EquipmentHandler,
         movement: execution.MovementHandler,
         pipetting: execution.PipettingHandler,
         run_control: execution.RunControlHandler,
+        rail_lights: execution.RailLightsHandler,
     ) -> None:
         """Initialize the command implementation with execution handlers."""
-        self._equipment = equipment
-        self._movement = movement
-        self._pipetting = pipetting
-        self._run_control = run_control
+        pass
 
     @abstractmethod
-    async def execute(self, data: CommandDataT) -> CommandResultT:
+    async def execute(self, params: CommandParamsT) -> CommandResultT:
         """Execute the command, mapping data from execution into a response model."""
         ...

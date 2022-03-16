@@ -1,9 +1,13 @@
 import * as React from 'react'
 import { StaticRouter } from 'react-router-dom'
-import { mountWithProviders } from '@opentrons/components/__utils__'
-
+import {
+  mountWithProviders,
+  Box,
+  Flex,
+  ListItem,
+  Tooltip,
+} from '@opentrons/components'
 import { i18n } from '../../../i18n'
-import { Box, Flex, ListItem, Tooltip } from '@opentrons/components'
 import { mockMagneticModule } from '../../../redux/modules/__fixtures__'
 import * as robotSelectors from '../../../redux/robot/selectors'
 import * as moduleSelectors from '../../../redux/modules/selectors'

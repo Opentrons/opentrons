@@ -3,15 +3,16 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  THERMOCYCLER,
+  HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
   TEMPERATURE_MODULE_V1,
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_V1,
+  HEATERSHAKER_MODULE_V1,
   LabwareDefinition2,
   DeckSlot as DeckDefSlot,
-  ModuleRealType,
+  ModuleType,
   ModuleModel,
 } from '@opentrons/shared-data'
 import { i18n } from './localization'
@@ -45,7 +46,7 @@ export const PSEUDO_DECK_SLOTS: Record<DeckSlot, DeckDefSlot> = {
       yDimension: STD_SLOT_Y_DIM * 2 + STD_SLOT_DIVIDER_WIDTH,
       zDimension: 0,
     },
-    compatibleModules: [THERMOCYCLER],
+    compatibleModules: [THERMOCYCLER_MODULE_TYPE],
   },
 }
 export const START_TERMINAL_TITLE = 'STARTING DECK STATE'
@@ -75,7 +76,7 @@ export const MAX_TC_LID_TEMP = 110
 export const MIN_TC_DURATION_SECONDS = 0
 export const MAX_TC_DURATION_SECONDS = 60
 export const MODELS_FOR_MODULE_TYPE: Record<
-  ModuleRealType,
+  ModuleType,
   Array<{
     name: string
     value: string
@@ -111,14 +112,18 @@ export const MODELS_FOR_MODULE_TYPE: Record<
       value: THERMOCYCLER_MODULE_V1 as string,
     },
   ],
+  [HEATERSHAKER_MODULE_TYPE]: [
+    {
+      name: i18n.t(`modules.model_display_name.${HEATERSHAKER_MODULE_V1}`),
+      value: HEATERSHAKER_MODULE_V1 as string,
+    },
+  ],
 }
-export const DEFAULT_MODEL_FOR_MODULE_TYPE: Record<
-  ModuleRealType,
-  ModuleModel
-> = {
+export const DEFAULT_MODEL_FOR_MODULE_TYPE: Record<ModuleType, ModuleModel> = {
   [MAGNETIC_MODULE_TYPE]: MAGNETIC_MODULE_V1,
   [TEMPERATURE_MODULE_TYPE]: TEMPERATURE_MODULE_V1,
   [THERMOCYCLER_MODULE_TYPE]: THERMOCYCLER_MODULE_V1,
+  [HEATERSHAKER_MODULE_TYPE]: HEATERSHAKER_MODULE_V1,
 }
 // Values for pauseAction field
 export const PAUSE_UNTIL_RESUME: 'untilResume' = 'untilResume'

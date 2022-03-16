@@ -2,23 +2,38 @@
 from dataclasses import dataclass
 from typing import Optional
 
-
-from opentrons.types import Point
+from opentrons.types import Point, DeckSlotName
 from opentrons.hardware_control.dev_types import PipetteDict
 
 from .. import errors
-from ..types import WellLocation, WellOrigin
-from .labware import LabwareView, LabwareData
+from ..types import (
+    LoadedLabware,
+    WellLocation,
+    WellOrigin,
+    WellOffset,
+    DeckSlotLocation,
+    ModuleLocation,
+)
+from .labware import LabwareView
+from .modules import ModuleView
 
 
 DEFAULT_TIP_DROP_HEIGHT_FACTOR = 0.5
 
-# TODO(mc, 2020-11-12): reconcile this data structure with WellGeometry
-
 
 @dataclass(frozen=True)
 class TipGeometry:
-    """Tip geometry data."""
+    """Nominal tip geometry data.
+
+    This data is loaded from definitions and configurations, and does
+    not take calibration values into account.
+
+    Props:
+        effective_length: The nominal working length (total length minus overlap)
+            of a tip, according to a tip rack and pipette's definitions.
+        diameter: Nominal tip diameter.
+        volume: Nominal volume capacity.
+    """
 
     effective_length: float
     diameter: float
@@ -30,15 +45,14 @@ class TipGeometry:
 class GeometryView:
     """Geometry computed state getters."""
 
-    _labware: LabwareView
-
-    def __init__(self, labware_view: LabwareView) -> None:
+    def __init__(self, labware_view: LabwareView, module_view: ModuleView) -> None:
         """Initialize a GeometryView instance."""
         self._labware = labware_view
+        self._modules = module_view
 
     def get_labware_highest_z(self, labware_id: str) -> float:
         """Get the highest Z-point of a labware."""
-        labware_data = self._labware.get_labware_data_by_id(labware_id)
+        labware_data = self._labware.get(labware_id)
 
         return self._get_highest_z_from_labware_data(labware_data)
 
@@ -47,24 +61,37 @@ class GeometryView:
         return max(
             [
                 self._get_highest_z_from_labware_data(lw_data)
-                for uid, lw_data in self._labware.get_all_labware()
+                for lw_data in self._labware.get_all()
             ]
         )
 
     def get_labware_parent_position(self, labware_id: str) -> Point:
         """Get the position of the labware's parent slot (deck or module)."""
-        labware_data = self._labware.get_labware_data_by_id(labware_id)
-        slot_pos = self._labware.get_slot_position(labware_data.location.slot)
+        labware_data = self._labware.get(labware_id)
+        module_id: Optional[str] = None
 
-        return slot_pos
+        if isinstance(labware_data.location, DeckSlotLocation):
+            slot_name = labware_data.location.slotName
+        else:
+            module_id = labware_data.location.moduleId
+            slot_name = self._modules.get_location(module_id).slotName
+
+        slot_pos = self._labware.get_slot_position(slot_name)
+
+        if module_id is None:
+            return slot_pos
+        else:
+            module_offset = self._modules.get_module_offset(module_id)
+            return Point(
+                x=slot_pos.x + module_offset.x,
+                y=slot_pos.y + module_offset.y,
+                z=slot_pos.z + module_offset.z,
+            )
 
     def get_labware_origin_position(self, labware_id: str) -> Point:
         """Get the position of the labware's origin, without calibration."""
-        labware_data = self._labware.get_labware_data_by_id(labware_id)
-        slot_pos = self._labware.get_slot_position(labware_data.location.slot)
-        origin_offset = self._labware.get_definition_by_uri(
-            labware_data.uri
-        ).cornerOffsetFromSlot
+        slot_pos = self.get_labware_parent_position(labware_id)
+        origin_offset = self._labware.get_definition(labware_id).cornerOffsetFromSlot
 
         return Point(
             x=slot_pos.x + origin_offset.x,
@@ -74,14 +101,13 @@ class GeometryView:
 
     def get_labware_position(self, labware_id: str) -> Point:
         """Get the calibrated origin of the labware."""
-        labware_data = self._labware.get_labware_data_by_id(labware_id)
-        origin_pos = self.get_labware_origin_position(labware_id=labware_id)
-        cal_offset = labware_data.calibration
+        origin_pos = self.get_labware_origin_position(labware_id)
+        cal_offset = self._labware.get_labware_offset_vector(labware_id)
 
         return Point(
-            x=origin_pos.x + cal_offset[0],
-            y=origin_pos.y + cal_offset[1],
-            z=origin_pos.z + cal_offset[2],
+            x=origin_pos.x + cal_offset.x,
+            y=origin_pos.y + cal_offset.y,
+            z=origin_pos.z + cal_offset.z,
         )
 
     def get_well_position(
@@ -99,26 +125,28 @@ class GeometryView:
             offset = well_location.offset
 
             if well_location.origin == WellOrigin.TOP:
-                offset = (offset[0], offset[1], offset[2] + well_depth)
+                offset = offset.copy(update={"z": offset.z + well_depth})
 
         else:
-            offset = (0, 0, well_depth)
+            offset = WellOffset(x=0, y=0, z=well_depth)
 
         return Point(
-            x=labware_pos.x + offset[0] + well_def.x,
-            y=labware_pos.y + offset[1] + well_def.y,
-            z=labware_pos.z + offset[2] + well_def.z,
+            x=labware_pos.x + offset.x + well_def.x,
+            y=labware_pos.y + offset.y + well_def.y,
+            z=labware_pos.z + offset.z + well_def.z,
         )
 
-    def _get_highest_z_from_labware_data(self, lw_data: LabwareData) -> float:
-        z_dim = self._labware.get_definition_by_uri(lw_data.uri).dimensions.zDimension
-        slot_pos = self._labware.get_slot_position(lw_data.location.slot)
+    def _get_highest_z_from_labware_data(self, lw_data: LoadedLabware) -> float:
+        labware_pos = self.get_labware_position(lw_data.id)
+        definition = self._labware.get_definition(lw_data.id)
+        z_dim = definition.dimensions.zDimension
+        height_over_labware: float = 0
+        if isinstance(lw_data.location, ModuleLocation):
+            module_id = lw_data.location.moduleId
+            height_over_labware = self._modules.get_height_over_labware(module_id)
+        return labware_pos.z + z_dim + height_over_labware
 
-        return z_dim + slot_pos[2] + lw_data.calibration[2]
-
-    # TODO(mc, 2020-11-12): reconcile with existing protocol logic and include
-    # data from tip-length calibration once v4.0.0 is in `edge`
-    def get_effective_tip_length(
+    def get_nominal_effective_tip_length(
         self,
         labware_id: str,
         pipette_config: PipetteDict,
@@ -126,7 +154,9 @@ class GeometryView:
         """Given a labware and a pipette's config, get the effective tip length.
 
         Effective tip length is the nominal tip length less the distance the
-        tip overlaps with the pipette nozzle.
+        tip overlaps with the pipette nozzle. This does not take calibrated
+        tip lengths into account. For calibrated data,
+        see `LabwareDataProvider.get_calibrated_tip_length`.
         """
         labware_uri = self._labware.get_definition_uri(labware_id)
         nominal_length = self._labware.get_tip_length(labware_id)
@@ -136,19 +166,24 @@ class GeometryView:
 
         return nominal_length - overlap
 
-    # TODO(mc, 2020-11-12): reconcile with existing geometry logic
-    def get_tip_geometry(
+    def get_nominal_tip_geometry(
         self,
         labware_id: str,
-        well_name: str,
         pipette_config: PipetteDict,
+        well_name: Optional[str] = None,
     ) -> TipGeometry:
         """Given a labware, well, and hardware pipette config, get the tip geometry.
 
         Tip geometry includes effective tip length, tip diameter, and tip volume,
         which is all data required by the hardware controller for proper tip handling.
+
+        This geometry data is based solely on labware and pipette definitions and
+        does not take calibrated tip lengths into account.
         """
-        effective_length = self.get_effective_tip_length(labware_id, pipette_config)
+        effective_length = self.get_nominal_effective_tip_length(
+            labware_id=labware_id,
+            pipette_config=pipette_config,
+        )
         well_def = self._labware.get_well_definition(labware_id, well_name)
 
         if well_def.shape != "circular":
@@ -168,20 +203,40 @@ class GeometryView:
     # 10mm above well bottom
     def get_tip_drop_location(
         self,
-        labware_id: str,
         pipette_config: PipetteDict,
+        labware_id: str,
+        well_location: WellLocation,
     ) -> WellLocation:
         """Get tip drop location given labware and hardware pipette."""
-        # return to top if labware is fixed trash
-        is_fixed_trash = self._labware.get_labware_has_quirk(
-            labware_id=labware_id,
-            quirk="fixedTrash",
-        )
+        if well_location.origin != WellOrigin.TOP:
+            raise errors.WellOriginNotAllowedError(
+                'Drop tip location must be relative to "top"'
+            )
 
-        if is_fixed_trash:
-            return WellLocation()
+        # return to top if labware is fixed trash
+        if self._labware.get_has_quirk(labware_id=labware_id, quirk="fixedTrash"):
+            return well_location
 
         nominal_length = self._labware.get_tip_length(labware_id)
         offset_factor = pipette_config["return_tip_height"]
+        tip_z_offset = nominal_length * offset_factor
 
-        return WellLocation(offset=(0, 0, -nominal_length * offset_factor))
+        return WellLocation(
+            offset=WellOffset(
+                x=well_location.offset.x,
+                y=well_location.offset.y,
+                z=well_location.offset.z - tip_z_offset,
+            )
+        )
+
+    def get_ancestor_slot_name(self, labware_id: str) -> DeckSlotName:
+        """Get the slot name of the labware or the module that the labware is on."""
+        labware = self._labware.get(labware_id)
+        slot_name: DeckSlotName
+
+        if isinstance(labware.location, DeckSlotLocation):
+            slot_name = labware.location.slotName
+        else:
+            module_id = labware.location.moduleId
+            slot_name = self._modules.get_location(module_id).slotName
+        return slot_name

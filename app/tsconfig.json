@@ -11,7 +11,16 @@
       "path": "../discovery-client"
     },
     {
+      "path": "../react-api-client"
+    },
+    {
       "path": "../shared-data"
+    },
+    {
+      "path": "../api-client"
+    },
+    {
+      "path": "../react-api-client"
     }
   ],
   "compilerOptions": {
@@ -19,5 +28,6 @@
     "rootDir": "src",
     "outDir": "lib"
   },
-  "include": ["typings", "src"]
+  "include": ["typings", "src"],
+  "exclude": ["**/*.stories.tsx"]
 }

@@ -1,7 +1,20 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`modals AlertModal renders correctly 1`] = `
-.c0.spin {
+.c0 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  background-color: #16212D59;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.c1.spin {
   -webkit-animation: GLFYz 0.8s steps(8) infinite;
   animation: GLFYz 0.8s steps(8) infinite;
   -webkit-transform-origin: center;
@@ -18,7 +31,7 @@ exports[`modals AlertModal renders correctly 1`] = `
     className="modal style"
   >
     <div
-      className="overlay clickable"
+      className="c0"
       onClick={[Function]}
     />
     <div
@@ -29,7 +42,7 @@ exports[`modals AlertModal renders correctly 1`] = `
       >
         <svg
           aria-hidden="true"
-          className="sc-AxmLO c0 alert_modal_icon"
+          className="sc-fznyAO c1 alert_modal_icon"
           fill="currentColor"
           version="1.1"
           viewBox="0 0 24 24"
@@ -71,11 +84,24 @@ exports[`modals AlertModal renders correctly 1`] = `
 `;
 
 exports[`modals ContinueModal renders correctly 1`] = `
+.c0 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  background-color: #16212D59;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
 <div
   className="modal"
 >
   <div
-    className="overlay clickable"
+    className="c0"
     onClick={[Function]}
   />
   <div
@@ -111,6 +137,19 @@ exports[`modals ContinueModal renders correctly 1`] = `
 `;
 
 exports[`modals Modal renders correctly 1`] = `
+.c0 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  background-color: #16212D59;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
 <div
   onScrollCapture={[Function]}
   onTouchMoveCapture={[Function]}
@@ -120,7 +159,7 @@ exports[`modals Modal renders correctly 1`] = `
     className="modal foo"
   >
     <div
-      className="overlay clickable"
+      className="c0"
       onClick={[Function]}
     />
     <div
@@ -133,6 +172,19 @@ exports[`modals Modal renders correctly 1`] = `
 `;
 
 exports[`modals Modal renders correctly with optional heading 1`] = `
+.c0 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  background-color: #16212D59;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
 <div
   onScrollCapture={[Function]}
   onTouchMoveCapture={[Function]}
@@ -142,7 +194,7 @@ exports[`modals Modal renders correctly with optional heading 1`] = `
     className="modal foo"
   >
     <div
-      className="overlay clickable"
+      className="c0"
       onClick={[Function]}
     />
     <div
@@ -164,7 +216,20 @@ exports[`modals ModalPage renders correctly 1`] = `
   min-width: 0;
 }
 
-.c1.spin {
+.c1 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  background-color: #16212D59;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.c2.spin {
   -webkit-animation: GLFYz 0.8s steps(8) infinite;
   animation: GLFYz 0.8s steps(8) infinite;
   -webkit-transform-origin: center;
@@ -176,7 +241,7 @@ exports[`modals ModalPage renders correctly 1`] = `
   className="c0 modal_page"
 >
   <div
-    className="overlay"
+    className="c1"
   />
   <header
     className="title_bar title_bar"
@@ -189,7 +254,7 @@ exports[`modals ModalPage renders correctly 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="sc-AxmLO c1 icon"
+        className="sc-fznyAO c2 icon"
         fill="currentColor"
         version="1.1"
         viewBox="0 0 24 24"
@@ -227,13 +292,39 @@ exports[`modals ModalPage renders correctly 1`] = `
 `;
 
 exports[`modals Overlay renders correctly 1`] = `
+.c0 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  background-color: #16212D59;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
 <div
-  className="overlay clickable"
+  className="c0"
   onClick={[Function]}
 />
 `;
 
 exports[`modals SpinnerModalPage renders correctly 1`] = `
+.c1 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  background-color: #16212D59;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
 .c0.spin {
   -webkit-animation: GLFYz 0.8s steps(8) infinite;
   animation: GLFYz 0.8s steps(8) infinite;
@@ -256,7 +347,7 @@ exports[`modals SpinnerModalPage renders correctly 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="sc-AxmLO c0 icon"
+        className="sc-fznyAO c0 icon"
         fill="currentColor"
         version="1.1"
         viewBox="0 0 24 24"
@@ -289,14 +380,14 @@ exports[`modals SpinnerModalPage renders correctly 1`] = `
     className="modal"
   >
     <div
-      className="overlay"
+      className="c1"
     />
     <div
       className="spinner_modal_contents"
     >
       <svg
         aria-hidden="true"
-        className="sc-AxmLO c0 spinner_modal_icon spin"
+        className="sc-fznyAO c0 spinner_modal_icon spin"
         fill="currentColor"
         version="1.1"
         viewBox="0 0 512 512"

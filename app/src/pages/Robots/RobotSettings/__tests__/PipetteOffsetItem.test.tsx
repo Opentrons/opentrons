@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { mountWithProviders } from '@opentrons/components/__utils__'
+import { mountWithProviders } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { i18n } from '../../../../i18n'
 import { PipetteOffsetItem } from '../PipetteOffsetItem'
@@ -7,7 +7,7 @@ import { findLabwareDefWithCustom } from '../../../../assets/labware/findLabware
 
 import type { ReactWrapper } from 'enzyme'
 import type { State, Action } from '../../../../redux/types'
-import type { WrapperWithStore } from '@opentrons/components/__utils__'
+import type { WrapperWithStore } from '@opentrons/components'
 import type {
   AttachedPipette,
   PipetteCalibrations,

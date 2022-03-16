@@ -1,4 +1,4 @@
-from typing import cast, Awaitable
+from typing import cast, Awaitable, Optional
 from opentrons.types import Mount
 from robot_server.robot.calibration.tip_length.user_flow import TipCalibrationUserFlow
 from robot_server.robot.calibration.models import SessionCreateParams
@@ -36,7 +36,7 @@ class TipLengthCalibration(BaseSession):
         configuration: SessionConfiguration,
         instance_meta: SessionMetaData,
         tip_cal_user_flow: TipCalibrationUserFlow,
-        shutdown_handler: Awaitable[None] = None,
+        shutdown_handler: Optional[Awaitable[None]] = None,
     ):
         super().__init__(configuration, instance_meta)
         self._tip_cal_user_flow = tip_cal_user_flow
@@ -75,7 +75,9 @@ class TipLengthCalibration(BaseSession):
 
         if session_controls_lights:
             await configuration.hardware.set_lights(rails=True)
-            shutdown_handler = configuration.hardware.set_lights(rails=False)
+            shutdown_handler: Optional[
+                Awaitable[None]
+            ] = configuration.hardware.set_lights(rails=False)
         else:
             shutdown_handler = None
 

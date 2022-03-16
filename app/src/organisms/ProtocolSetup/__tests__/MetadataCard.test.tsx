@@ -1,6 +1,6 @@
 import * as React from 'react'
 import '@testing-library/jest-dom'
-import { renderWithProviders } from '@opentrons/components/__utils__'
+import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
 import { MetadataCard } from '../MetadataCard'
@@ -14,14 +14,14 @@ const useProtocolMetadata = hooks.useProtocolMetadata as jest.MockedFunction<
 
 describe('MetadataCard', () => {
   const render = () => {
-    return renderWithProviders(<MetadataCard />, { i18nInstance: i18n })
+    return renderWithProviders(<MetadataCard />, { i18nInstance: i18n })[0]
   }
 
   beforeEach(() => {
     useProtocolMetadata.mockReturnValue({
       author: 'Anne McLaren',
       lastUpdated: 1624916984418, // epoch time for UTC-4 "Jun 28, 2021, 5:49:44 PM"
-      method: 'custom protocol creator application',
+      creationMethod: 'json',
       description: 'this describes the protocol',
     })
   })
@@ -39,13 +39,14 @@ describe('MetadataCard', () => {
       /Jun 2[89], 2021, [1-9]?[1-9]:[1-9]9:44 PM/i
     ) // loose check to compensate for different TZ's
     expect(getByText('Creation Method').nextElementSibling).toHaveTextContent(
-      /custom protocol creator application/i
+      /json/i
     )
     expect(getByText('Description').nextElementSibling).toHaveTextContent(
       /this describes the protocol/i
     )
-    expect(
-      getByText('Estimated Run Time').nextElementSibling
-    ).toHaveTextContent(/-/i)
+    // TODO: add estimated run time back in when ready
+    // expect(
+    //   getByText('Estimated Run Time').nextElementSibling
+    // ).toHaveTextContent(/-/i)
   })
 })

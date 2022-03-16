@@ -13,7 +13,10 @@ from ..module.dev_types import ModuleType
 DeckSchemaVersion2 = Literal[2]
 DeckSchemaVersion1 = Literal[1]
 
-DeckSchema = NewType('DeckSchema', Dict[str, Any])
+DeckSchema = NewType("DeckSchema", Dict[str, Any])
+
+
+RobotModel = Union[Literal["OT-2 Standard"], Literal["OT-3 Standard"]]
 
 
 class Metadata(TypedDict, total=False):
@@ -22,7 +25,7 @@ class Metadata(TypedDict, total=False):
 
 
 class Robot(TypedDict):
-    model: Literal['OT-2 Standard']
+    model: RobotModel
 
 
 class BoundingBox(TypedDict):
@@ -35,8 +38,9 @@ class SlotDefV1(TypedDict, total=False):
     id: str
     position: List[float]
     boundingBox: BoundingBox
-    compatibleModules: List[Union[
-        Literal['magdeck'], Literal['tempdeck'], Literal['thermocycler']]]
+    compatibleModules: List[
+        Union[Literal["magdeck"], Literal["tempdeck"], Literal["thermocycler"]]
+    ]
     matingSurfaceUnitVector: List[Union[Literal[1], Literal[-1]]]
     displayName: str
 
@@ -84,8 +88,9 @@ class FixedVolumeByPosition(TypedDict):
     position: List[float]
 
 
-Fixture = Union[FixedLabwareBySlot, FixedLabwareByPosition,
-                FixedVolumeBySlot, FixedVolumeByPosition]
+Fixture = Union[
+    FixedLabwareBySlot, FixedLabwareByPosition, FixedVolumeBySlot, FixedVolumeByPosition
+]
 
 
 class LocationsV1(TypedDict):

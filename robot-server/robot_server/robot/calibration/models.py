@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, Dict, Optional
 from pydantic import BaseModel, Field
 
 
@@ -20,7 +20,7 @@ class SessionCreateParams(BaseModel):
         "is performed, this is ignored, but it should always be "
         "specified.",
     )
-    tipRackDefinition: Optional[dict] = Field(
+    tipRackDefinition: Optional[Dict[str, Any]] = Field(
         None,
         description="The full labware definition of the tip rack to "
         "calibrate. If not specified, then a default will be "

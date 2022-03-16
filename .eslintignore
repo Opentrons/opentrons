@@ -1,13 +1,9 @@
-api/**
-update-server/**
-robot-server/**
-notify-server/**
-shared-data/python/**
 **/node_modules/**
 **/coverage/**
 **/dist/**
 **/build/**
 **/venv/**
+.opentrons_config
 
 # typescript
 app-shell/lib/**
@@ -25,7 +21,14 @@ lerna.json
 # components library
 storybook-static
 
-# mypy
-# todo(mm, 2021-07-01): Is this necessary, given that we already ignore whole
-# Python project directories?
+# python projects and tools
 **/.mypy_cache/**
+**/.pytest_cache/**
+
+# todo(mc, 2022-01-28): make these ignore rules more specific so we
+# format data files like markdown and JSON inside python projects
+api/**
+update-server/**
+robot-server/**
+notify-server/**
+shared-data/python/**

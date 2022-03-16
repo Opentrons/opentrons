@@ -18,7 +18,7 @@ import {
   SPACING_2,
   SPACING_3,
 } from '@opentrons/components'
-import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
+import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
 import * as Sessions from '../../redux/sessions'
@@ -97,7 +97,7 @@ function HealthCheckText({
 }
 
 export function DeckSetup(props: CalibrationPanelProps): JSX.Element {
-  const deckDef = React.useMemo(() => getDeckDefinitions()['ot2_standard'], [])
+  const deckDef = React.useMemo(() => getDeckDefinitions().ot2_standard, [])
 
   const {
     tipRack,

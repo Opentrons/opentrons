@@ -3,14 +3,14 @@ import styles from './URLDeck.css'
 
 import {
   RobotWorkSpace,
-  Labware as LegacyLabwareRender,
+  LegacyLabware,
   LabwareNameOverlay,
   LabwareRender,
-  Module,
+  ModuleItem,
   RobotCoordsForeignDiv,
 } from '@opentrons/components'
 import { getLatestLabwareDef, getLegacyLabwareDef } from './getLabware'
-import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
+import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
 import type { ModuleModel, DeckSlotId } from '@opentrons/shared-data'
 
 // URI-encoded JSON expected as URL param "data" (eg `?data=...`)
@@ -26,7 +26,7 @@ interface UrlData {
   modules: Record<DeckSlotId, ModuleModel>
 }
 
-const DECK_DEF = getDeckDefinitions()['ot2_standard']
+const DECK_DEF = getDeckDefinitions().ot2_standard
 
 const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
@@ -102,7 +102,11 @@ export class URLDeck extends React.Component<{}> {
                   <g
                     transform={`translate(${slot.position[0]}, ${slot.position[1]})`}
                   >
-                    <Module model={moduleModel} mode={'default'} slot={slot} />
+                    <ModuleItem
+                      model={moduleModel}
+                      mode={'default'}
+                      slot={slot}
+                    />
                   </g>
                 )}
                 {labware && (
@@ -112,8 +116,8 @@ export class URLDeck extends React.Component<{}> {
                     {labwareDefV2 ? (
                       <LabwareRender definition={labwareDefV2} />
                     ) : (
-                      <LegacyLabwareRender
-                        /* @ts-expect-error(mc, 2021-03-18): LegacyLabwareRender does not take x and y props */
+                      <LegacyLabware
+                        /* @ts-expect-error(mc, 2021-03-18): LegacyLabware does not take x and y props */
                         x={0}
                         y={0}
                         definition={labwareDefV1}

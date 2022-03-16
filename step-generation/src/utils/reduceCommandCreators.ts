@@ -1,5 +1,5 @@
 import { getNextRobotStateAndWarnings } from '../getNextRobotStateAndWarnings'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
+import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5Addendum'
 import type {
   InvariantContext,
   RobotState,

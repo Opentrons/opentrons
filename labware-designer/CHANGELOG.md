@@ -3,6 +3,84 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.2](https://github.com/Opentrons/opentrons/compare/v5.0.1...v5.0.2) (2022-03-03)
+
+**Note:** Version bump only for package labware-designer
+
+
+
+
+
+## [5.0.1](https://github.com/Opentrons/opentrons/compare/v5.0.0...v5.0.1) (2022-02-24)
+
+**Note:** Version bump only for package labware-designer
+
+
+
+
+
+# [5.0.0](https://github.com/Opentrons/opentrons/compare/v4.7.0...v5.0.0) (2022-02-16)
+
+**Note:** Version bump only for package labware-designer
+
+
+
+
+
+# [4.7.0](https://github.com/Opentrons/opentrons/compare/v4.6.2...v4.7.0) (2021-11-18)
+
+
+### Features
+
+* **app:** Add Labware Detail with Well Row/Column Highlighting ([#8499](https://github.com/Opentrons/opentrons/issues/8499)) ([158c0bb](https://github.com/Opentrons/opentrons/commit/158c0bbcfa9dc0a0af0acd9e5b24d76853ad913d)), closes [#8380](https://github.com/Opentrons/opentrons/issues/8380)
+
+
+
+
+
+
+
+**Note:** Version bump only for package labware-designer
+
+
+
+
+
+## [4.6.2](https://github.com/Opentrons/opentrons/compare/v4.6.1...v4.6.2) (2021-09-30)
+
+**Note:** Version bump only for package labware-designer
+
+
+
+
+
+## [4.6.1](https://github.com/Opentrons/opentrons/compare/v4.6.0...v4.6.1) (2021-09-28)
+
+**Note:** Version bump only for package labware-designer
+
+
+
+
+
+# [4.6.0](https://github.com/Opentrons/opentrons/compare/v4.5.0...v4.6.0) (2021-09-27)
+
+**Note:** Version bump only for package labware-designer
+
+
+
+
+
+# [4.5.0](https://github.com/Opentrons/opentrons/compare/v4.4.0...v4.5.0) (2021-08-03)
+
+
+### Features
+
+* **labware-designer:** add prototype react-based sandbox-style live labware editor ([#8010](https://github.com/Opentrons/opentrons/issues/8010)) ([e56aea5](https://github.com/Opentrons/opentrons/commit/e56aea54a0b44b99c4914bf05fc39bc2e08cef0f))
+
+
+
+
+
 # [4.4.0](https://github.com/Opentrons/opentrons/compare/v4.3.1...v4.4.0) (2021-06-16)
 
 **Note:** Version bump only for package labware-designer

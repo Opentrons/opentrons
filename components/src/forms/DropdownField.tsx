@@ -16,9 +16,9 @@ export interface DropdownFieldProps {
   /** change handler */
   onChange: React.ChangeEventHandler<HTMLSelectElement>
   /** focus handler */
-  onFocus?: React.FocusEventHandler
+  onFocus?: React.FocusEventHandler<HTMLSelectElement>
   /** blur handler */
-  onBlur?: React.FocusEventHandler
+  onBlur?: React.FocusEventHandler<HTMLSelectElement>
   /** value that is selected */
   value?: string | null | undefined
   /** optional id for the <select> element */

@@ -116,8 +116,6 @@ def test_move_mount(api_client, hardware_move):
         "message": "Move complete. New position: (100.0, 200.0, 50.0)"
     }
 
-    hardware_move.cache_instruments.assert_called_once()
-
     hardware_move.gantry_position.assert_has_calls(
         [
             call(Mount.RIGHT, critical_point=CriticalPoint.MOUNT),

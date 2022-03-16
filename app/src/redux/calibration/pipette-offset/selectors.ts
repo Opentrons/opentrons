@@ -11,7 +11,7 @@ export const getPipetteOffsetCalibrations: (
     return []
   }
   const calibrations =
-    state.calibration[robotName]?.pipetteOffsetCalibrations?.data || []
+    state?.calibration[robotName]?.pipetteOffsetCalibrations?.data || []
   return calibrations
 }
 

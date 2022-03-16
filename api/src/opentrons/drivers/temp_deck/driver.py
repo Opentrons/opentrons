@@ -15,10 +15,10 @@ from typing import Dict, Optional
 from enum import Enum
 
 from opentrons.drivers import utils
+from opentrons.drivers.types import Temperature
 from opentrons.drivers.command_builder import CommandBuilder
 from opentrons.drivers.asyncio.communication import SerialConnection
-from opentrons.drivers.temp_deck.abstract import AbstractTempDeckDriver, \
-    Temperature
+from opentrons.drivers.temp_deck.abstract import AbstractTempDeckDriver
 
 log = logging.getLogger(__name__)
 
@@ -37,8 +37,8 @@ class GCODE(str, Enum):
 
 TEMP_DECK_BAUDRATE = 115200
 
-TEMP_DECK_COMMAND_TERMINATOR = '\r\n\r\n'
-TEMP_DECK_ACK = 'ok\r\nok\r\n'
+TEMP_DECK_COMMAND_TERMINATOR = "\r\n\r\n"
+TEMP_DECK_ACK = "ok\r\nok\r\n"
 
 
 class TempDeckError(Exception):
@@ -46,10 +46,9 @@ class TempDeckError(Exception):
 
 
 class TempDeckDriver(AbstractTempDeckDriver):
-
     @classmethod
     async def create(
-            cls, port: str, loop: Optional[asyncio.AbstractEventLoop] = None
+        cls, port: str, loop: Optional[asyncio.AbstractEventLoop] = None
     ) -> TempDeckDriver:
         """
         Create a temp deck driver.
@@ -61,9 +60,12 @@ class TempDeckDriver(AbstractTempDeckDriver):
         Returns: driver
         """
         connection = await SerialConnection.create(
-            port=port, baud_rate=TEMP_DECK_BAUDRATE,
-            timeout=DEFAULT_TEMP_DECK_TIMEOUT, ack=TEMP_DECK_ACK,
-            loop=loop
+            port=port,
+            baud_rate=TEMP_DECK_BAUDRATE,
+            timeout=DEFAULT_TEMP_DECK_TIMEOUT,
+            ack=TEMP_DECK_ACK,
+            loop=loop,
+            reset_buffer_before_write=False,
         )
         return cls(connection=connection)
 
@@ -94,9 +96,7 @@ class TempDeckDriver(AbstractTempDeckDriver):
 
         Returns: None
         """
-        c = CommandBuilder(
-            terminator=TEMP_DECK_COMMAND_TERMINATOR
-        ).add_gcode(
+        c = CommandBuilder(terminator=TEMP_DECK_COMMAND_TERMINATOR).add_gcode(
             gcode=GCODE.DISENGAGE
         )
         await self._send_command(command=c)
@@ -110,13 +110,15 @@ class TempDeckDriver(AbstractTempDeckDriver):
 
         Returns: None
         """
-        c = CommandBuilder(
-            terminator=TEMP_DECK_COMMAND_TERMINATOR
-        ).add_gcode(
-            gcode=GCODE.SET_TEMP
-        ).add_float(prefix="S",
-                    value=celsius,
-                    precision=utils.TEMPDECK_GCODE_ROUNDING_PRECISION)
+        c = (
+            CommandBuilder(terminator=TEMP_DECK_COMMAND_TERMINATOR)
+            .add_gcode(gcode=GCODE.SET_TEMP)
+            .add_float(
+                prefix="S",
+                value=celsius,
+                precision=utils.TEMPDECK_GCODE_ROUNDING_PRECISION,
+            )
+        )
         await self._send_command(command=c)
 
     async def get_temperature(self) -> Temperature:
@@ -126,15 +128,13 @@ class TempDeckDriver(AbstractTempDeckDriver):
         Returns: Temperature object
 
         """
-        c = CommandBuilder(
-            terminator=TEMP_DECK_COMMAND_TERMINATOR
-        ).add_gcode(
+        c = CommandBuilder(terminator=TEMP_DECK_COMMAND_TERMINATOR).add_gcode(
             gcode=GCODE.GET_TEMP
         )
         response = await self._send_command(command=c)
         return utils.parse_temperature_response(
             temperature_string=response,
-            rounding_val=utils.TEMPDECK_GCODE_ROUNDING_PRECISION
+            rounding_val=utils.TEMPDECK_GCODE_ROUNDING_PRECISION,
         )
 
     async def get_device_info(self) -> Dict[str, str]:
@@ -154,15 +154,11 @@ class TempDeckDriver(AbstractTempDeckDriver):
         Example input from Temp-Deck's serial response:
             "serial:aa11bb22 model:aa11bb22 version:aa11bb22"
         """
-        c = CommandBuilder(
-            terminator=TEMP_DECK_COMMAND_TERMINATOR
-        ).add_gcode(
+        c = CommandBuilder(terminator=TEMP_DECK_COMMAND_TERMINATOR).add_gcode(
             gcode=GCODE.DEVICE_INFO
         )
         response = await self._send_command(command=c)
-        return utils.parse_device_information(
-            device_info_string=response
-        )
+        return utils.parse_device_information(device_info_string=response)
 
     async def enter_programming_mode(self) -> None:
         """
@@ -170,9 +166,7 @@ class TempDeckDriver(AbstractTempDeckDriver):
 
         Returns: None
         """
-        c = CommandBuilder(
-            terminator=TEMP_DECK_COMMAND_TERMINATOR
-        ).add_gcode(
+        c = CommandBuilder(terminator=TEMP_DECK_COMMAND_TERMINATOR).add_gcode(
             gcode=GCODE.PROGRAMMING_MODE
         )
         await self._send_command(command=c)
@@ -188,7 +182,6 @@ class TempDeckDriver(AbstractTempDeckDriver):
             command response
         """
         response = await self._connection.send_command(
-            command=command,
-            retries=DEFAULT_COMMAND_RETRIES
+            command=command, retries=DEFAULT_COMMAND_RETRIES
         )
         return response

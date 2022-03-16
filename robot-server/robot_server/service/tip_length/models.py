@@ -4,14 +4,14 @@ from pydantic import Field
 
 from opentrons.calibration_storage.types import SourceType
 from robot_server.service.json_api import (
-    ResponseModel,
-    MultiResponseModel,
-    ResponseDataModel,
+    DeprecatedResponseModel,
+    DeprecatedMultiResponseModel,
+    DeprecatedResponseDataModel,
 )
 from robot_server.service.shared_models import calibration as cal_model
 
 
-class TipLengthCalibration(ResponseDataModel):
+class TipLengthCalibration(DeprecatedResponseDataModel):
     """
     A model describing tip length calibration
     """
@@ -29,6 +29,6 @@ class TipLengthCalibration(ResponseDataModel):
     uri: str = Field(..., description="The uri of the tiprack")
 
 
-MultipleCalibrationsResponse = MultiResponseModel[TipLengthCalibration]
+MultipleCalibrationsResponse = DeprecatedMultiResponseModel[TipLengthCalibration]
 
-SingleCalibrationResponse = ResponseModel[TipLengthCalibration]
+SingleCalibrationResponse = DeprecatedResponseModel[TipLengthCalibration]

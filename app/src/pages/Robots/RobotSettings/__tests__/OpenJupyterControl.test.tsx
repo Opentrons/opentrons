@@ -1,7 +1,5 @@
 import * as React from 'react'
-import { mountWithProviders } from '@opentrons/components/__utils__'
-import { SecondaryBtn } from '@opentrons/components'
-
+import { SecondaryBtn, mountWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import * as Analytics from '../../../../redux/analytics'
 import { OpenJupyterControl } from '../OpenJupyterControl'

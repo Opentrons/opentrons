@@ -40,12 +40,20 @@ sys.path.insert(0, os.path.abspath('../sphinxext'))
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
-    'sphinx.ext.doctest',
     'sphinx.ext.coverage',
+    'sphinx.ext.doctest',
     'sphinx.ext.imgmath',
+    'sphinx.ext.intersphinx',
     'sphinx.ext.napoleon',
+    # todo(mm, 2021-09-30): Remove numpydoc when we're done transitioning to
+    # Google-style docstrings. github.com/Opentrons/opentrons/issues/7051
     'numpydoc'
+
 ]
+
+
+intersphinx_mapping = {'python': ('https://docs.python.org/3', None)}
+
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['../templates', '../templates/v2']
@@ -71,6 +79,9 @@ author = _package_json['author']['name']
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
+#
+# todo(mm, 2021-09-30): Depending on where these show up, would it be more correct
+# to use the latest-supported *apiLevel* instead of the *Python package version*?
 #
 # The short X.Y version.
 version = '.'.join(_package_json['version'].split('.')[:2])

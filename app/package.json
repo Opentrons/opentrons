@@ -1,6 +1,6 @@
 {
   "name": "@opentrons/app",
-  "version": "4.4.0",
+  "version": "5.0.2",
   "description": "Opentrons desktop application UI",
   "source": "src/index.tsx",
   "types": "lib/index.d.ts",
@@ -18,14 +18,16 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons",
   "dependencies": {
-    "@hot-loader/react-dom": "16.8.6",
-    "@opentrons/components": "4.4.0",
-    "@opentrons/shared-data": "4.4.0",
+    "@hot-loader/react-dom": "17.0.1",
+    "@opentrons/api-client": "5.0.2",
+    "@opentrons/components": "5.0.2",
+    "@opentrons/react-api-client": "5.0.2",
+    "@opentrons/shared-data": "5.0.2",
     "@thi.ng/paths": "1.6.5",
     "classnames": "2.2.5",
     "connected-react-router": "6.8.0",
     "core-js": "3.2.1",
-    "date-fns": "2.10.0",
+    "date-fns": "2.25.0",
     "events": "3.0.0",
     "file-saver": "2.0.1",
     "formik": "2.1.4",
@@ -36,10 +38,11 @@
     "mixpanel-browser": "2.22.1",
     "netmask": "1.0.6",
     "path-to-regexp": "3.0.0",
-    "react": "16.8.6",
-    "react-dom": "16.8.6",
-    "react-hot-loader": "4.12.19",
+    "react": "17.0.1",
+    "react-dom": "17.0.1",
+    "react-hot-loader": "4.13.0",
     "react-i18next": "^11.7.3",
+    "react-intersection-observer": "^8.33.1",
     "react-redux": "7.2.1",
     "react-router-dom": "5.1.1",
     "redux": "4.0.5",
@@ -51,6 +54,7 @@
     "rxjs": "^6.5.1",
     "semver": "5.5.0",
     "styled-components": "5.1.1",
-    "typeface-open-sans": "0.0.75"
+    "typeface-open-sans": "0.0.75",
+    "uuid": "8.3.2"
   }
 }

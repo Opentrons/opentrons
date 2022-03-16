@@ -1,13 +1,13 @@
 """Deck data resource provider."""
 from dataclasses import dataclass
-from typing import List
+from typing import List, Optional, cast
 from typing_extensions import final
 
 from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName
-from opentrons.protocols.api_support.constants import STANDARD_DECK, SHORT_TRASH_DECK
+from opentrons.protocols.api_support.constants import deck_type
 
 from ..types import DeckSlotLocation
 from .labware_data_provider import LabwareDataProvider
@@ -28,20 +28,16 @@ class DeckDataProvider:
 
     _labware_data: LabwareDataProvider
 
-    def __init__(self, labware_data: LabwareDataProvider) -> None:
+    def __init__(self, labware_data: Optional[LabwareDataProvider] = None) -> None:
         """Initialize a DeckDataProvider."""
-        self._labware_data = labware_data
+        self._labware_data = labware_data or LabwareDataProvider()
 
     # NOTE(mc, 2020-11-18): async to allow file reading and parsing to be
     # async on a worker thread in the future
-    async def get_deck_definition(
-        self,
-        *,
-        short_fixed_trash: bool = False,
-    ) -> DeckDefinitionV2:
+    @staticmethod
+    async def get_deck_definition() -> DeckDefinitionV2:
         """Get a labware definition given the labware's identification."""
-        deck_load_name = SHORT_TRASH_DECK if short_fixed_trash else STANDARD_DECK
-        return load_deck(deck_load_name, 2)
+        return load_deck(deck_type(), 2)
 
     async def get_deck_fixed_labware(
         self,
@@ -52,11 +48,11 @@ class DeckDataProvider:
 
         for fixture in deck_definition["locations"]["fixtures"]:
             labware_id = fixture["id"]
-            load_name = fixture.get("labware")  # type: ignore[misc]
-            slot = fixture.get("slot")  # type: ignore[misc]
+            load_name = cast(Optional[str], fixture.get("labware"))
+            slot = cast(Optional[str], fixture.get("slot"))
 
             if load_name is not None and slot is not None:
-                location = DeckSlotLocation(slot=DeckSlotName.from_primitive(slot))
+                location = DeckSlotLocation(slotName=DeckSlotName.from_primitive(slot))
                 definition = await self._labware_data.get_labware_definition(
                     load_name=load_name,
                     namespace="opentrons",

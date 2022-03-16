@@ -11,8 +11,12 @@ SRC_PATH = robot_server
 # Find the version of the wheel from package.json using a helper script. We
 # use python here so we can use the same version normalization that will be
 # used to create the wheel.
-wheel_file = dist/$(call python_get_wheelname,robot-server,robotserver,$(BUILD_NUMBER))
+wheel_file = dist/$(call python_get_wheelname,robot-server,robot_server,$(BUILD_NUMBER))
 
+# Find the version of the sdist from package.json using a helper script. We
+# use python here so we can use the same version normalization that will be
+# used to create the sdist.
+sdist_file = dist/$(call python_get_sdistname,robot-server,robot_server)
 
 # These variables can be overriden when make is invoked to customize the
 # behavior of pytest. For instance,
@@ -62,6 +66,12 @@ setup:
 	$(pipenv) sync $(pipenv_opts)
 	$(pipenv) run pip freeze
 
+.PHONY: setup-ot2
+setup-ot2:
+	$(pipenv) sync $(pipenv_opts)
+	$(pipenv) run pip uninstall -y opentrons_hardware
+	$(pipenv) run pip freeze
+
 .PHONY: clean
 clean:
 	$(clean_cmd)
@@ -70,13 +80,21 @@ clean:
 teardown:
 	$(pipenv) --rm
 
-dist/robotserver-%-py2.py3-none-any.whl: setup.py $(ot_sources)
+$(wheel_file): setup.py $(ot_sources)
 	$(clean_cmd)
 	$(python) setup.py $(wheel_opts) bdist_wheel
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
 wheel: $(wheel_file)
+
+$(sdist_file): setup.py $(ot_sources)
+	$(clean_cmd)
+	$(python) setup.py sdist
+	$(SHX) rm -rf build
+	$(SHX) ls dist
+
+sdist: $(sdist_file)
 
 .PHONY: test
 test:
@@ -111,6 +129,10 @@ push: wheel
 	$(call push-python-package,$(host),$(br_ssh_key),$(ssh_opts),$(wheel_file))
 	$(call push-systemd-unit,$(host),$(br_ssh_key),$(ssh_opts),./opentrons-robot-server.service)
 	$(call restart-service,$(host),$(br_ssh_key),$(ssh_opts),opentrons-robot-server)
+
+.PHONY: push-ot3
+push-ot3: sdist
+	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),"/opt/opentrons-robot-server","robot_server")
 
 .PHONY: install-key
 install-key:

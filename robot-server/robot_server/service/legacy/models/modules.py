@@ -1,5 +1,4 @@
 import typing
-
 from pydantic import BaseModel, Field
 
 
@@ -63,9 +62,31 @@ class ThermocyclerModuleLiveData(BaseModel):
     )
 
 
+class HeaterShakerModuleLiveData(BaseModel):
+    """Heater-Shaker live data"""
+
+    labwareLatchStatus: str = Field(
+        ..., description="The current state of the Labware Latch"
+    )
+    speedStatus: str = Field(..., description="The current shake speed status")
+    temperatureStatus: str = Field(..., description="The current temperature status")
+    currentSpeed: int = Field(..., description="Current shake speed of plate in RPM")
+    currentTemp: float = Field(..., description="Current plate temperature in Celsius")
+    targetSpeed: typing.Optional[int] = Field(
+        ..., description="Target shake speed in RPM"
+    )
+    targetTemp: typing.Optional[float] = Field(
+        ..., description="Target temperature in Celsius"
+    )
+    errorDetails: typing.Optional[str] = Field(
+        ..., description="Module error, if present"
+    )
+
+
 # ThermocyclerModuleLiveData must be first. The ordering in a Union has to go
-# in order of specicifity.
+# in order of specificity.
 ModuleLiveData = typing.Union[
+    HeaterShakerModuleLiveData,
     ThermocyclerModuleLiveData,
     TemperatureModuleLiveData,
     MagneticModuleLiveData,
@@ -211,6 +232,36 @@ class Modules(BaseModel):
                                     "totalCycleCount": None,
                                     "currentStepIndex": None,
                                     "totalStepCount": None,
+                                },
+                            }
+                        ]
+                    },
+                },
+                "heaterShakerAttached": {
+                    "description": "With a Heater-Shaker attached",
+                    "value": {
+                        "modules": [
+                            {
+                                "name": "heatershaker",
+                                "displayName": "heatershaker",
+                                "fwVersion": "0.0.1",
+                                "hasAvailableUpdate": True,
+                                "model": "heater-shaker_v10",
+                                "moduleModel": "heaterShakerModuleV1",
+                                "port": "/dev/ot_module_heatershaker1",
+                                "usbPort": {"hub": None, "port": None},
+                                "revision": "heater-shaker_v10",
+                                "serial": "HSnnnnnn",
+                                "status": "running",
+                                "data": {
+                                    "temperatureStatus": "heating",
+                                    "speedStatus": "holding at target",
+                                    "labwareLatchStatus": "closed",
+                                    "currentTemp": 25.5,
+                                    "targetTemp": 50,
+                                    "currentSpeed": 10,
+                                    "targetSpeed": 300,
+                                    "errorDetails": None,
                                 },
                             }
                         ]

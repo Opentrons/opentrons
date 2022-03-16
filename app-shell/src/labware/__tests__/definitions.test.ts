@@ -14,8 +14,8 @@ import {
 
 jest.mock('electron')
 
-const moveItemToTrash = Electron.shell.moveItemToTrash as jest.MockedFunction<
-  typeof Electron.shell.moveItemToTrash
+const trashItem = Electron.shell.trashItem as jest.MockedFunction<
+  typeof Electron.shell.trashItem
 >
 
 describe('labware directory utilities', () => {
@@ -213,14 +213,14 @@ describe('labware directory utilities', () => {
   })
 
   describe('remove labware file', () => {
-    it('calls Electron.shell.moveItemToTrash', () => {
+    it('calls Electron.shell.trashItem', () => {
       const dir = makeEmptyDir()
       const filename = path.join(dir, 'foo.json')
 
-      moveItemToTrash.mockReturnValue(true)
+      trashItem.mockResolvedValue()
 
       return removeLabwareFile(filename).then(() => {
-        expect(Electron.shell.moveItemToTrash).toHaveBeenCalledWith(filename)
+        expect(Electron.shell.trashItem).toHaveBeenCalledWith(filename)
       })
     })
 
@@ -229,7 +229,7 @@ describe('labware directory utilities', () => {
       const filename = path.join(dir, 'foo.json')
       const setup = fs.writeJson(filename, { name: 'a' })
 
-      moveItemToTrash.mockReturnValue(false)
+      trashItem.mockRejectedValue(Error('something went wrong'))
 
       return setup
         .then(() => removeLabwareFile(filename))

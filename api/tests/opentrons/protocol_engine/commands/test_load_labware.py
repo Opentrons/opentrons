@@ -4,15 +4,10 @@ from decoy import Decoy
 from opentrons.types import DeckSlotName
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine.types import DeckSlotLocation
-from opentrons.protocol_engine.execution import (
-    LoadedLabware,
-    EquipmentHandler,
-    MovementHandler,
-    PipettingHandler,
-    RunControlHandler,
-)
+from opentrons.protocol_engine.execution import LoadedLabwareData, EquipmentHandler
+
 from opentrons.protocol_engine.commands.load_labware import (
-    LoadLabwareData,
+    LoadLabwareParams,
     LoadLabwareResult,
     LoadLabwareImplementation,
 )
@@ -22,38 +17,31 @@ async def test_load_labware_implementation(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
     equipment: EquipmentHandler,
-    movement: MovementHandler,
-    pipetting: PipettingHandler,
-    run_control: RunControlHandler,
 ) -> None:
     """A LoadLabware command should have an execution implementation."""
-    subject = LoadLabwareImplementation(
-        equipment=equipment,
-        movement=movement,
-        pipetting=pipetting,
-        run_control=run_control,
-    )
+    subject = LoadLabwareImplementation(equipment=equipment)
 
-    data = LoadLabwareData(
-        location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
+    data = LoadLabwareParams(
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
         loadName="some-load-name",
         namespace="opentrons-test",
         version=1,
+        displayName="My custom display name",
     )
 
     decoy.when(
         await equipment.load_labware(
-            location=DeckSlotLocation(slot=DeckSlotName.SLOT_3),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
             load_name="some-load-name",
             namespace="opentrons-test",
             version=1,
             labware_id=None,
         )
     ).then_return(
-        LoadedLabware(
+        LoadedLabwareData(
             labware_id="labware-id",
             definition=well_plate_def,
-            calibration=(1, 2, 3),
+            offsetId="labware-offset-id",
         )
     )
 
@@ -62,5 +50,5 @@ async def test_load_labware_implementation(
     assert result == LoadLabwareResult(
         labwareId="labware-id",
         definition=well_plate_def,
-        calibration=(1, 2, 3),
+        offsetId="labware-offset-id",
     )

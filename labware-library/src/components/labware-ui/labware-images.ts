@@ -55,6 +55,9 @@ export const labwareImages: Record<string, string[]> = {
   nest_96_wellplate_200ul_flat: [
     require('../../images/nest_96_wellplate_200ul_flat_three_quarters.jpg'),
   ],
+  nest_96_wellplate_2ml_deep: [
+    require('../../images/nest_96_wellplate_2ml_deep.jpg'),
+  ],
   opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical: [
     require('../../images/opentrons_10_tuberack_4_6_side_view.jpg'),
     require('../../images/falcon_50ml_15ml_conical_tubes.jpg'),
@@ -193,5 +196,17 @@ export const labwareImages: Record<string, string[]> = {
   ],
   'usascientific_96_wellplate_2.4ml_deep': [
     require('../../images/usascientific_96_wellplate_2.4ml_deep_side_view.jpg'),
+  ],
+  thermoscientificnunc_96_wellplate_1300ul: [
+    require('../../images/thermoscientificnunc_96_wellplate_1300ul.jpg'),
+  ],
+  thermoscientificnunc_96_wellplate_2000ul: [
+    require('../../images/thermoscientificnunc_96_wellplate_2000ul.jpg'),
+  ],
+  appliedbiosystemsmicroamp_384_wellplate_40ul: [
+    require('../../images/appliedbiosystemsmicroamp_384_wellplate_40ul.jpg'),
+  ],
+  biorad_384_wellplate_50ul: [
+    require('../../images/biorad_384_wellplate_50ul.jpg'),
   ],
 }

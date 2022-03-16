@@ -1,14 +1,18 @@
-"""Resources used by command execution handlers."""
-from .resource_providers import ResourceProviders
+"""Interfaces to provide data and other external system resources.
+
+Classes in this module do not maintain state and can be instantiated
+as needed. Some classes may contain solely static methods.
+"""
 from .model_utils import ModelUtils
 from .deck_data_provider import DeckDataProvider, DeckFixedLabware
 from .labware_data_provider import LabwareDataProvider
+from .module_data_provider import ModuleDataProvider
 
 
 __all__ = [
-    "ResourceProviders",
     "ModelUtils",
     "LabwareDataProvider",
     "DeckDataProvider",
     "DeckFixedLabware",
+    "ModuleDataProvider",
 ]

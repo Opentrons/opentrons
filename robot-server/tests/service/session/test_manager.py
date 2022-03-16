@@ -88,6 +88,10 @@ def test_get_by_id_not_found(session_manager):
     assert session_manager.get_by_id(create_identifier()) is None
 
 
+# fixme(mm, 2022-01-14): This looks like a flaky test
+# because the session_manager.add() tasks will run and return
+# in a nondeterministic order.
+@pytest.mark.xfail(strict=False)
 async def test_get_by_type(session_manager):
     sessions = await asyncio.gather(
         *[

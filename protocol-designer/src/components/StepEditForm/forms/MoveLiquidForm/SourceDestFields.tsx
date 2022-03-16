@@ -101,7 +101,7 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
         {prefix === 'aspirate' && (
           <React.Fragment>
             <CheckboxRowField
-              {...propsForFields['preWetTip']}
+              {...propsForFields.preWetTip}
               label={i18n.t('form.step_edit_form.field.preWetTip.label')}
               className={styles.small_field}
             />
@@ -134,12 +134,12 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
 
         {prefix === 'dispense' && (
           <CheckboxRowField
-            {...propsForFields['blowout_checkbox']}
+            {...propsForFields.blowout_checkbox}
             label={i18n.t('form.step_edit_form.field.blowout.label')}
             className={styles.small_field}
           >
             <BlowoutLocationField
-              {...propsForFields['blowout_location']}
+              {...propsForFields.blowout_location}
               className={styles.full_width}
               options={getBlowoutLocationOptionsForForm({
                 path: formData.path,

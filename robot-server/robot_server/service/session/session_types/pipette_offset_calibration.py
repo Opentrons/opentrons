@@ -1,8 +1,8 @@
 import logging
-from typing import Awaitable, cast, TYPE_CHECKING
+from typing import Awaitable, Optional, cast
 from opentrons.types import Mount
 from opentrons.protocol_api import labware
-
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from robot_server.robot.calibration.pipette_offset.user_flow import (
     PipetteOffsetCalibrationUserFlow,
 )
@@ -27,8 +27,6 @@ from ..configuration import SessionConfiguration
 from ..models.session import SessionType, PipetteOffsetCalibrationResponseAttributes
 from ..errors import UnsupportedFeature
 
-if TYPE_CHECKING:
-    from opentrons_shared_data.labware import LabwareDefinition
 
 log = logging.getLogger(__name__)
 
@@ -47,7 +45,7 @@ class PipetteOffsetCalibrationSession(BaseSession):
         configuration: SessionConfiguration,
         instance_meta: SessionMetaData,
         pip_offset_cal_user_flow: PipetteOffsetCalibrationUserFlow,
-        shutdown_handler: Awaitable[None] = None,
+        shutdown_handler: Optional[Awaitable[None]] = None,
     ):
         super().__init__(configuration, instance_meta)
         self._pip_offset_cal_user_flow = pip_offset_cal_user_flow
@@ -80,14 +78,16 @@ class PipetteOffsetCalibrationSession(BaseSession):
                 mount=Mount[mount.upper()],
                 recalibrate_tip_length=recalibrate_tip_length,
                 has_calibration_block=has_cal_block,
-                tip_rack_def=cast("LabwareDefinition", tip_rack_def),
+                tip_rack_def=cast(LabwareDefinition, tip_rack_def),
             )
         except AssertionError as e:
             raise SessionCreationException(str(e))
 
         if session_controls_lights:
             await configuration.hardware.set_lights(rails=True)
-            shutdown_handler = configuration.hardware.set_lights(rails=False)
+            shutdown_handler: Optional[
+                Awaitable[None]
+            ] = configuration.hardware.set_lights(rails=False)
         else:
             shutdown_handler = None
 

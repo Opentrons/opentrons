@@ -1,13 +1,20 @@
 """Command side-effect execution logic container."""
 from logging import getLogger
+from typing import Optional
 
-from ..state import StateStore, UpdateCommandAction
-from ..resources import ResourceProviders
-from ..commands import CommandStatus, CommandMapper
+from opentrons.hardware_control import HardwareControlAPI
+
+from ..state import StateStore
+from ..resources import ModelUtils
+from ..commands import CommandStatus
+from ..actions import ActionDispatcher, UpdateCommandAction, FailCommandAction
+from ..errors import ProtocolEngineError, UnexpectedProtocolError
 from .equipment import EquipmentHandler
 from .movement import MovementHandler
 from .pipetting import PipettingHandler
 from .run_control import RunControlHandler
+from .rail_lights import RailLightsHandler
+
 
 log = getLogger(__name__)
 
@@ -21,22 +28,26 @@ class CommandExecutor:
 
     def __init__(
         self,
+        hardware_api: HardwareControlAPI,
         state_store: StateStore,
+        action_dispatcher: ActionDispatcher,
         equipment: EquipmentHandler,
         movement: MovementHandler,
         pipetting: PipettingHandler,
         run_control: RunControlHandler,
-        command_mapper: CommandMapper,
-        resources: ResourceProviders,
+        rail_lights: RailLightsHandler,
+        model_utils: Optional[ModelUtils] = None,
     ) -> None:
         """Initialize the CommandExecutor with access to its dependencies."""
+        self._hardware_api = hardware_api
         self._state_store = state_store
+        self._action_dispatcher = action_dispatcher
         self._equipment = equipment
         self._movement = movement
         self._pipetting = pipetting
         self._run_control = run_control
-        self._command_mapper = command_mapper
-        self._resources = resources
+        self._rail_lights = rail_lights
+        self._model_utils = model_utils or ModelUtils()
 
     async def execute(self, command_id: str) -> None:
         """Run a given command's execution procedure.
@@ -47,45 +58,54 @@ class CommandExecutor:
         """
         command = self._state_store.commands.get(command_id=command_id)
         command_impl = command._ImplementationCls(
+            state_view=self._state_store,
+            hardware_api=self._hardware_api,
             equipment=self._equipment,
             movement=self._movement,
             pipetting=self._pipetting,
             run_control=self._run_control,
+            rail_lights=self._rail_lights,
         )
 
-        started_at = self._resources.model_utils.get_timestamp()
-        running_command = self._command_mapper.update_command(
-            command=command,
-            status=CommandStatus.RUNNING,
-            startedAt=started_at,
+        started_at = self._model_utils.get_timestamp()
+        running_command = command.copy(
+            update={
+                "status": CommandStatus.RUNNING,
+                "startedAt": started_at,
+            }
         )
 
-        self._state_store.handle_action(UpdateCommandAction(command=running_command))
+        self._action_dispatcher.dispatch(UpdateCommandAction(command=running_command))
 
-        result = None
-        error = None
         try:
-            log.debug(f"Executing {command.id}, {command.commandType}, {command.data}")
-            result = await command_impl.execute(command.data)  # type: ignore[arg-type]
-            completed_status = CommandStatus.SUCCEEDED
-        except Exception as e:
-            log.warn(
-                f"Execution of {command.id} failed",
-                exc_info=e,
+            log.debug(
+                f"Executing {command.id}, {command.commandType}, {command.params}"
             )
-            # TODO(mc, 2021-06-22): differentiate between `ProtocolEngineError`s
-            # and unexpected errors when the Command model is ready to accept
-            # structured error details
-            error = str(e)
-            completed_status = CommandStatus.FAILED
+            result = await command_impl.execute(command.params)  # type: ignore[arg-type]  # noqa: E501
 
-        completed_at = self._resources.model_utils.get_timestamp()
-        completed_command = self._command_mapper.update_command(
-            command=running_command,
-            result=result,
-            error=error,
-            status=completed_status,
-            completedAt=completed_at,
-        )
+        except Exception as error:
+            log.warning(f"Execution of {command.id} failed", exc_info=error)
 
-        self._state_store.handle_action(UpdateCommandAction(command=completed_command))
+            if not isinstance(error, ProtocolEngineError):
+                error = UnexpectedProtocolError(error)
+
+            self._action_dispatcher.dispatch(
+                FailCommandAction(
+                    error=error,
+                    command_id=command_id,
+                    error_id=self._model_utils.generate_id(),
+                    failed_at=self._model_utils.get_timestamp(),
+                )
+            )
+
+        else:
+            completed_command = running_command.copy(
+                update={
+                    "result": result,
+                    "status": CommandStatus.SUCCEEDED,
+                    "completedAt": self._model_utils.get_timestamp(),
+                }
+            )
+            self._action_dispatcher.dispatch(
+                UpdateCommandAction(command=completed_command)
+            )

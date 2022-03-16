@@ -1,0 +1,70 @@
+---
+test_name: Version headers
+
+marks:
+  - usefixtures:
+      - run_server
+
+stages:
+  - name: Successful request contains version headers
+    request:
+      url: '{host:s}:{port:d}/health'
+      method: GET
+    response:
+      status_code: 200
+      headers:
+        Opentrons-Version: '2'
+        Opentrons-Min-Version: '2'
+
+  - name: Version too high request contains version headers
+    request:
+      url: '{host:s}:{port:d}/health'
+      method: GET
+      headers:
+        Opentrons-Version: '1337'
+    response:
+      status_code: 200
+      headers:
+        Opentrons-Version: '2'
+        Opentrons-Min-Version: '2'
+
+  - name: Latest version request contains version headers
+    request:
+      url: '{host:s}:{port:d}/health'
+      method: GET
+      headers:
+        Opentrons-Version: '*'
+    response:
+      status_code: 200
+      headers:
+        Opentrons-Version: '2'
+        Opentrons-Min-Version: '2'
+
+  - name: Version too low request contains version headers
+    request:
+      url: '{host:s}:{port:d}/health'
+      method: GET
+      headers:
+        Opentrons-Version: '1'
+    response:
+      status_code: 400
+      json:
+        errors:
+          - id: 'OutdatedAPIVersion'
+            title: 'Requested HTTP API version no longer supported'
+            detail: The requested API version '1' is not supported. 'Opentrons-Version' must be at least '2'. Please upgrade your Opentrons App or other HTTP API client.
+      headers:
+        Opentrons-Version: '2'
+        Opentrons-Min-Version: '2'
+
+  - name: Version missing request contains version headers
+    request:
+      url: '{host:s}:{port:d}/health'
+      method: GET
+      headers:
+        Opentrons-Version: ''
+    response:
+      status_code: 422
+      headers:
+        Opentrons-Version: '2'
+        Opentrons-Min-Version: '2'

@@ -2,10 +2,10 @@
 # robot_server/errors/error_responses.py and robot_server/errors/global_errors.py
 from dataclasses import dataclass, asdict
 from enum import Enum
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 from starlette import status as status_codes
 
-from robot_server.errors import ApiError, ErrorSource, ErrorDetails, ErrorResponse
+from robot_server.errors import ApiError, ErrorSource, ErrorDetails, ErrorBody
 from robot_server.service.json_api import ResourceLinks
 
 
@@ -37,7 +37,7 @@ class RobotServerError(ApiError):
         error_id: str = "UncategorizedError",
         links: Optional[ResourceLinks] = None,
         source: Optional[ErrorSource] = None,
-        meta: Optional[Dict] = None,
+        meta: Optional[Dict[str, Any]] = None,
         *fmt_args,
         **fmt_kw_args
     ):
@@ -51,7 +51,7 @@ class RobotServerError(ApiError):
         :param fmt_args: format_string args
         :param fmt_kw_args: format_string kw_args
         """
-        content = ErrorResponse(
+        content = ErrorBody(
             errors=(
                 ErrorDetails(
                     id=error_id,

@@ -8,7 +8,8 @@ export * from './utils'
 export * from './alerts'
 export * from './buttons'
 export * from './controls'
-export * from './deck'
+export * from './hardware-sim'
+export * from './legacy-hardware-sim'
 export * from './forms'
 export * from './icons'
 export * from './instrument'
@@ -24,6 +25,11 @@ export * from './tooltips'
 
 // styles
 export * from './styles'
+// new ui-overhaul style vars
+export * from './ui-style-constants'
 
 // Pure Types
 export * from './robot-types'
+
+// testing utilities
+export * from './testing/utils'

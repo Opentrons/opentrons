@@ -3,14 +3,14 @@ from pydantic import BaseModel, Field
 from pydantic.generics import GenericModel
 from typing import Any, Dict, Generic, Optional, Sequence, Tuple, TypeVar
 
-from robot_server.service.json_api import ResourceLinks
+from robot_server.service.json_api import BaseResponseBody, ResourceLinks
 
 
 class ApiError(Exception):
     """An exception to throw when an endpoint should respond with an error."""
 
     def __init__(self, status_code: int, content: Dict[str, Any]) -> None:
-        """Intialize the exception.
+        """Initialize the exception.
 
         Arguments:
             status_code: The status code of the response
@@ -20,14 +20,14 @@ class ApiError(Exception):
         self.content = content
 
 
-class BaseErrorResponse(BaseModel):
+class BaseErrorBody(BaseResponseBody):
     """Base class for error response bodies."""
 
     def as_error(self, status_code: int) -> ApiError:
         """Serialize the response as an API error to raise in a handler."""
         return ApiError(
             status_code=status_code,
-            content=self.dict(exclude_none=True),
+            content=self.dict(),
         )
 
 
@@ -50,8 +50,8 @@ class ErrorSource(BaseModel):
     )
 
 
-class ErrorDetails(BaseErrorResponse):
-    """An error response with error type and occurance details.
+class ErrorDetails(BaseErrorBody):
+    """An error response with error type and occurrence details.
 
     Extend this class to create specific error responses, and use it in your
     route handlers.
@@ -90,7 +90,7 @@ class ErrorDetails(BaseErrorResponse):
     detail: str = Field(
         ...,
         description=(
-            "A human-readable message describing this specific occurance "
+            "A human-readable message describing this specific occurrence "
             "of the error."
         ),
     )
@@ -102,19 +102,19 @@ class ErrorDetails(BaseErrorResponse):
         None,
         description=(
             "An object containing non-standard information about this "
-            "occurance of the error"
+            "occurrence of the error"
         ),
     )
 
     def as_error(self, status_code: int) -> ApiError:
         """Serial this ErrorDetails as an ApiError from an ErrorResponse."""
-        return ErrorResponse(errors=(self,)).as_error(status_code)
+        return ErrorBody(errors=(self,)).as_error(status_code)
 
 
 ErrorDetailsT = TypeVar("ErrorDetailsT", bound=ErrorDetails)
 
 
-class LegacyErrorResponse(BaseErrorResponse):
+class LegacyErrorResponse(BaseErrorBody):
     """An error response with a human readable message."""
 
     message: str = Field(
@@ -123,7 +123,7 @@ class LegacyErrorResponse(BaseErrorResponse):
     )
 
 
-class ErrorResponse(BaseErrorResponse, GenericModel, Generic[ErrorDetailsT]):
+class ErrorBody(BaseErrorBody, GenericModel, Generic[ErrorDetailsT]):
     """A response body for a single error."""
 
     errors: Tuple[ErrorDetailsT] = Field(..., description="Error details.")
@@ -136,7 +136,7 @@ class ErrorResponse(BaseErrorResponse, GenericModel, Generic[ErrorDetailsT]):
     )
 
 
-class MultiErrorResponse(BaseErrorResponse, GenericModel, Generic[ErrorDetailsT]):
+class MultiErrorResponse(BaseErrorBody, GenericModel, Generic[ErrorDetailsT]):
     """An response body for multiple errors."""
 
     errors: Sequence[ErrorDetailsT] = Field(..., description="Error details.")

@@ -7,16 +7,18 @@ on:
   # Most of the time, we run on pull requests, which lets us handle external PRs
   pull_request:
     paths:
-      - 'api/**'
+      - 'api/**/*'
       - 'Makefile'
-      - 'shared-data/*/**'
+      - 'shared-data/**/*'
       - '!shared-data/js/**'
+      - 'hardware/**/*'
   push:
     paths:
       - 'api/**'
       - 'Makefile'
-      - 'shared-data/*/**'
-      - '!shared-data/js/**'
+      - 'shared-data/**/*'
+      - '!shared-data/js/**/*'
+      - 'hardware/**/*'
       - '.github/workflows/api-test-lint-deploy.yaml'
       - '.github/actions/python/**/*'
       - '.github/workflows/utils.js'
@@ -39,7 +41,7 @@ jobs:
       - uses: 'actions/checkout@v2'
       - uses: 'actions/setup-node@v1'
         with:
-          node-version: '12'
+          node-version: '14'
       - uses: 'actions/setup-python@v2'
         with:
           python-version: '3.7'
@@ -47,24 +49,35 @@ jobs:
       - uses: './.github/actions/python/setup'
         with:
           project: 'api'
-      - name: Lint
+      - name: Lint with opentrons_hardware
         run: make -C api lint
   test:
-    name: 'opentrons package tests'
+    name: 'opentrons package tests on ${{ matrix.os }}, python ${{ matrix.python }}'
     timeout-minutes: 30
     needs: [lint]
     strategy:
       matrix:
-        os: ['windows-latest', 'ubuntu-18.04', 'macos-latest']
+        os: ['windows-2019', 'ubuntu-18.04', 'macos-latest']
+        # TODO(mc, 2022-02-24): expand this matrix to 3.8 and 3.9,
+        # preferably in a nightly cronjob on edge or something
+        python: ['3.7', '3.10']
+        with-ot-hardware: ['true', 'false']
+        exclude:
+          - os: 'windows-2019'
+            with-ot-hardware: 'true'
+          - os: 'macos-latest'
+            with-ot-hardware: 'true'
+          - python: '3.10'
+            with-ot-hardware: 'true'
     runs-on: '${{ matrix.os }}'
     steps:
       - uses: 'actions/checkout@v2'
       - uses: 'actions/setup-node@v1'
         with:
-          node-version: '12'
+          node-version: '14'
       - uses: 'actions/setup-python@v2'
         with:
-          python-version: '3.7'
+          python-version: ${{ matrix.python }}
       - name: 'set complex environment variables'
         uses: actions/github-script@v3.1
         with:
@@ -74,11 +87,19 @@ jobs:
       - uses: './.github/actions/python/setup'
         with:
           project: 'api'
-      - name: Test
+      - if: ${{ matrix.with-ot-hardware == 'false' }}
+        name: Test without opentrons_hardware
+        run: |
+          make -C api setup-ot2
+          make -C api test-ot2
+      - if: ${{ matrix.with-ot-hardware == 'true' }}
+        name: Test with opentrons_hardware
         run: make -C api test
-      - uses: 'codecov/codecov-action@v1'
+      - if: ${{ matrix.with-ot-hardware == 'true' }}
+        uses: 'codecov/codecov-action@v2'
         with:
-          file: ./api/coverage.xml
+          files: ./api/coverage.xml
+          flags: api
 
   deploy:
     name: 'deploy opentrons package'
@@ -89,7 +110,7 @@ jobs:
       - uses: 'actions/checkout@v2'
       - uses: 'actions/setup-node@v1'
         with:
-          node-version: '12'
+          node-version: '14'
       - uses: 'actions/setup-python@v2'
         with:
           python-version: '3.7'

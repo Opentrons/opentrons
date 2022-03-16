@@ -2,23 +2,17 @@ import abc
 
 
 class DeckItem(abc.ABC):
-
-    @property  # type: ignore
+    @property
     @abc.abstractmethod
-    def highest_z(self):
-        pass
+    def highest_z(self) -> float:
+        ...
 
-    @highest_z.setter  # type: ignore
-    @abc.abstractmethod
-    def highest_z(self, new_z: float):
-        pass
-
-    @property  # type: ignore
+    @property
     @abc.abstractmethod
     def separate_calibration(self) -> bool:
-        pass
+        ...
 
-    @property  # type: ignore
+    @property
     @abc.abstractmethod
     def load_name(self) -> str:
-        pass
+        ...

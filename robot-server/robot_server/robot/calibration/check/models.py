@@ -1,14 +1,21 @@
-from typing import Optional, List, Tuple
+from typing import Any, Dict, Optional, List
 from typing_extensions import Literal
 from functools import partial
 from pydantic import BaseModel, Field
 
 from ..helper_classes import RequiredLabware, AttachedPipette
 
-OffsetVector = Tuple[float, float, float]
+# NOTE: this would be more accurately typed as
+# a typing.Tuple[float, float, float], but tuple is
+# not able to be expressed in OpenAPI Spec
+OffsetVector = List[float]
 
 OffsetVectorField = partial(
-    Field, ..., description="An offset vector in deck " "coordinates (x, y, z)"
+    Field,
+    ...,
+    description="An offset vector in deck coordinates (x, y, z)",
+    min_items=3,
+    max_items=3,
 )
 
 
@@ -97,7 +104,7 @@ class SessionCreateParams(BaseModel):
         description="Whether to use a calibration block in the"
         "calibration health check flow.",
     )
-    tipRacks: List[dict] = Field(
+    tipRacks: List[Dict[str, Any]] = Field(
         [],
         description="A list of labware definitions to use in"
         "calibration health check",
@@ -113,7 +120,7 @@ class CalibrationCheckSessionStatus(BaseModel):
     comparisonsByPipette: ComparisonStatePerPipette
     labware: List[RequiredLabware]
     activeTipRack: RequiredLabware
-    supportedCommands: List[Optional[str]] = Field(
+    supportedCommands: List[str] = Field(
         ..., description="A list of supported commands for this user flow"
     )
 

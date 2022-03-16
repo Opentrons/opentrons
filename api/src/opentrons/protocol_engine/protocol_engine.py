@@ -1,17 +1,35 @@
 """ProtocolEngine class definition."""
-from opentrons.hardware_control import API as HardwareAPI
+from typing import Optional
 
-from .resources import ResourceProviders
-from .commands import Command, CommandRequest, CommandMapper
-from .execution import QueueWorker
+from opentrons.protocols.models import LabwareDefinition
+from opentrons.hardware_control import HardwareControlAPI
 
-from .state import (
-    StateStore,
-    StateView,
+from .resources import ModelUtils
+from .commands import (
+    Command,
+    CommandCreate,
+)
+from .types import LabwareOffset, LabwareOffsetCreate, LabwareUri
+from .execution import (
+    QueueWorker,
+    create_queue_worker,
+    HardwareEventForwarder,
+    HardwareStopper,
+)
+from .state import StateStore, StateView
+from .plugins import AbstractPlugin, PluginStarter
+from .actions import (
+    ActionDispatcher,
     PlayAction,
     PauseAction,
+    PauseSource,
     StopAction,
-    UpdateCommandAction,
+    FinishAction,
+    FinishErrorDetails,
+    QueueCommandAction,
+    AddLabwareOffsetAction,
+    AddLabwareDefinitionAction,
+    HardwareStoppedAction,
 )
 
 
@@ -23,50 +41,79 @@ class ProtocolEngine:
     of the commands themselves.
     """
 
-    _state_store: StateStore
-    _command_mapper: CommandMapper
-    _resources: ResourceProviders
-    _queue_worker: QueueWorker
-    _hardware_api: HardwareAPI
-
     def __init__(
         self,
+        hardware_api: HardwareControlAPI,
         state_store: StateStore,
-        command_mapper: CommandMapper,
-        resources: ResourceProviders,
-        queue_worker: QueueWorker,
-        hardware_api: HardwareAPI,
+        action_dispatcher: Optional[ActionDispatcher] = None,
+        plugin_starter: Optional[PluginStarter] = None,
+        queue_worker: Optional[QueueWorker] = None,
+        model_utils: Optional[ModelUtils] = None,
+        hardware_stopper: Optional[HardwareStopper] = None,
+        hardware_event_forwarder: Optional[HardwareEventForwarder] = None,
     ) -> None:
         """Initialize a ProtocolEngine instance.
 
-        This constructor does not inject provider implementations. Prefer the
-        ProtocolEngine.create factory classmethod.
+        Must be called while an event loop is active.
+
+        This constructor does not inject provider implementations.
+        Prefer the `create_protocol_engine()` factory function.
         """
         self._state_store = state_store
-        self._command_mapper = command_mapper
-        self._resources = resources
-        self._queue_worker = queue_worker
-        self._hardware_api = hardware_api
+        self._model_utils = model_utils or ModelUtils()
+
+        self._action_dispatcher = action_dispatcher or ActionDispatcher(
+            sink=self._state_store
+        )
+        self._plugin_starter = plugin_starter or PluginStarter(
+            state=self._state_store,
+            action_dispatcher=self._action_dispatcher,
+        )
+        self._queue_worker = queue_worker or create_queue_worker(
+            hardware_api=hardware_api,
+            state_store=self._state_store,
+            action_dispatcher=self._action_dispatcher,
+        )
+        self._hardware_stopper = hardware_stopper or HardwareStopper(
+            hardware_api=hardware_api, state_store=state_store
+        )
+        self._hardware_event_forwarder = (
+            hardware_event_forwarder
+            or HardwareEventForwarder(
+                hardware_api=hardware_api,
+                action_dispatcher=self._action_dispatcher,
+            )
+        )
+
+        self._queue_worker.start()
+        self._hardware_event_forwarder.start()
 
     @property
     def state_view(self) -> StateView:
         """Get an interface to retrieve calculated state values."""
         return self._state_store
 
+    def add_plugin(self, plugin: AbstractPlugin) -> None:
+        """Add a plugin to the engine to customize behavior."""
+        self._plugin_starter.start(plugin)
+
     def play(self) -> None:
         """Start or resume executing commands in the queue."""
+        # TODO(mc, 2021-08-05): if starting, ensure plungers motors are
+        # homed if necessary
         action = PlayAction()
-        self._state_store.commands.validate_action_allowed(action)
-        self._state_store.handle_action(action)
+        self._state_store.commands.raise_if_paused_by_blocking_door()
+        self._state_store.commands.raise_if_stop_requested()
+        self._action_dispatcher.dispatch(action)
         self._queue_worker.start()
 
     def pause(self) -> None:
         """Pause executing commands in the queue."""
-        action = PauseAction()
-        self._state_store.commands.validate_action_allowed(action)
-        self._state_store.handle_action(action)
+        action = PauseAction(source=PauseSource.CLIENT)
+        self._state_store.commands.raise_if_stop_requested()
+        self._action_dispatcher.dispatch(action)
 
-    def add_command(self, request: CommandRequest) -> Command:
+    def add_command(self, request: CommandCreate) -> Command:
         """Add a command to the `ProtocolEngine`'s queue.
 
         Arguments:
@@ -76,16 +123,32 @@ class ProtocolEngine:
         Returns:
             The full, newly queued command.
         """
-        command = self._command_mapper.map_request_to_command(
+        command_id = self._model_utils.generate_id()
+        action = QueueCommandAction(
             request=request,
-            command_id=self._resources.model_utils.generate_id(),
-            created_at=self._resources.model_utils.get_timestamp(),
+            command_id=command_id,
+            # TODO(mc, 2021-12-13): generate a command key from params and state
+            # https://github.com/Opentrons/opentrons/issues/8986
+            command_key=command_id,
+            created_at=self._model_utils.get_timestamp(),
         )
-        self._state_store.handle_action(UpdateCommandAction(command=command))
+        self._action_dispatcher.dispatch(action)
+        return self._state_store.commands.get(command_id)
 
-        return command
+    async def wait_for_command(self, command_id: str) -> None:
+        """Wait for a command to be completed."""
+        is_already_complete = self._state_store.commands.get_is_complete(
+            command_id=command_id
+        )
+        # If the command is already complete, don't wait,
+        # because we'd only wake up on a subsequent state update,
+        # and we don't know that there would ever be one.
+        if not is_already_complete:
+            await self._state_store.wait_for(
+                self._state_store.commands.get_is_complete, command_id=command_id
+            )
 
-    async def add_and_execute_command(self, request: CommandRequest) -> Command:
+    async def add_and_execute_command(self, request: CommandCreate) -> Command:
         """Add a command to the queue and wait for it to complete.
 
         The engine must be started by calling `play` before the command will
@@ -99,30 +162,44 @@ class ProtocolEngine:
             The completed command, whether it succeeded or failed.
         """
         command = self.add_command(request)
-
         await self._state_store.wait_for(
             condition=self._state_store.commands.get_is_complete,
             command_id=command.id,
         )
+        return self._state_store.commands.get(command.id)
 
-        return self._state_store.commands.get(command_id=command.id)
+    async def stop(self) -> None:
+        """Stop execution immediately, halting all motion and cancelling future commands.
 
-    def halt(self) -> None:
-        """Halt execution, stopping all motion and cancelling future commands.
+        After an engine has been `stop`'ed, it cannot be restarted.
 
-        This method is synchronous to allow the halt to reach hardware
-        immediately. You should call `stop` after calling `halt` for cleanup
-        and to allow the engine to settle and recover.
+        After a `stop`, you must still call `finish` to give the engine a chance
+        to clean up resources and propagate errors.
         """
-        self._state_store.handle_action(StopAction())
+        self._state_store.commands.raise_if_stop_requested()
+        self._action_dispatcher.dispatch(StopAction())
         self._queue_worker.cancel()
-        self._hardware_api.halt()
+        await self._hardware_stopper.do_halt()
 
-    async def stop(self, wait_until_complete: bool = False) -> None:
-        """Gracefully stop the ProtocolEngine, waiting for it to become idle.
+    # TODO(mc, 2021-12-27): commands.get_all_complete not yet implemented
+    async def wait_until_complete(self) -> None:
+        """Wait until there are no more commands to execute.
+
+        This will happen if all commands are executed or if one command fails.
+        """
+        await self._state_store.wait_for(
+            condition=self._state_store.commands.get_all_complete
+        )
+
+    async def finish(
+        self,
+        error: Optional[Exception] = None,
+        drop_tips_and_home: bool = True,
+    ) -> None:
+        """Gracefully finish using the ProtocolEngine, waiting for it to become idle.
 
         The engine will finish executing its current command (if any),
-        and then shut down. After an engine has been `stop`'ed, it cannot
+        and then shut down. After an engine has been `finished`'ed, it cannot
         be restarted.
 
         This method should not raise, but if any exceptions happen during
@@ -130,17 +207,60 @@ class ProtocolEngine:
         will be raised here.
 
         Arguments:
-            wait_until_complete: Wait until _all_ commands have completed
-                before stopping the engine.
+            error: An error that caused the stop, if applicable.
+            drop_tips_and_home: Whether to home and drop tips as part of cleanup.
         """
-        if wait_until_complete:
-            await self._state_store.wait_for(
-                condition=self._state_store.commands.get_all_complete
+        if error:
+            error_details: Optional[FinishErrorDetails] = FinishErrorDetails(
+                error_id=self._model_utils.generate_id(),
+                created_at=self._model_utils.get_timestamp(),
+                error=error,
             )
+        else:
+            error_details = None
 
-        self._state_store.handle_action(StopAction())
+        self._action_dispatcher.dispatch(FinishAction(error_details=error_details))
 
         try:
             await self._queue_worker.join()
+
+        # todo(mm, 2022-01-31): We should use something like contextlib.AsyncExitStack
+        # to robustly clean up all these resources
+        # instead of try/finally, which can't scale without making indentation silly.
         finally:
-            await self._hardware_api.stop(home_after=False)
+            # Note: After we stop listening, straggling events might be processed
+            # concurrently to the below lines in this .finish() call,
+            # or even after this .finish() call completes.
+            self._hardware_event_forwarder.stop_soon()
+
+            await self._hardware_stopper.do_stop_and_recover(drop_tips_and_home)
+
+            self._action_dispatcher.dispatch(HardwareStoppedAction())
+            await self._plugin_starter.stop()
+
+    def add_labware_offset(self, request: LabwareOffsetCreate) -> LabwareOffset:
+        """Add a new labware offset and return it.
+
+        The added offset will apply to subsequent `LoadLabwareCommand`s.
+
+        To retrieve offsets later, see `.state_view.labware`.
+        """
+        labware_offset_id = self._model_utils.generate_id()
+        created_at = self._model_utils.get_timestamp()
+        self._action_dispatcher.dispatch(
+            AddLabwareOffsetAction(
+                labware_offset_id=labware_offset_id,
+                created_at=created_at,
+                request=request,
+            )
+        )
+        return self.state_view.labware.get_labware_offset(
+            labware_offset_id=labware_offset_id
+        )
+
+    def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
+        """Add a labware definition to the state for subsequent labware loads."""
+        self._action_dispatcher.dispatch(
+            AddLabwareDefinitionAction(definition=definition)
+        )
+        return self._state_store.labware.get_uri_from_definition(definition)

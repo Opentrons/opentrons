@@ -37,11 +37,15 @@ from robot_server.service.session.models.command_definitions import (
     CommandDefinitionType,
 )
 from robot_server.service.session.models.common import EmptyModel, JogPosition
-from robot_server.service.json_api import ResponseModel, RequestModel, ResponseDataModel
+from robot_server.service.json_api import (
+    DeprecatedResponseModel,
+    RequestModel,
+    DeprecatedResponseDataModel,
+)
 
 
 class LoadLabwareByDefinitionRequestData(BaseModel):
-    tiprackDefinition: typing.Optional[dict] = Field(
+    tiprackDefinition: typing.Optional[typing.Dict[str, typing.Any]] = Field(
         None, description="The tiprack definition to load into a user flow"
     )
 
@@ -96,7 +100,7 @@ class SessionCommandRequest(
 
 
 class SessionCommandResponse(
-    ResponseDataModel,
+    DeprecatedResponseDataModel,
     GenericModel,
     typing.Generic[CommandT, RequestDataT, ResponseDataT],
 ):
@@ -105,7 +109,7 @@ class SessionCommandResponse(
     command: CommandT
     data: RequestDataT
     status: CommandStatus
-    createdAt: datetime = Field(..., default_factory=utc_now)
+    createdAt: datetime = Field(default_factory=utc_now)
     startedAt: typing.Optional[datetime]
     completedAt: typing.Optional[datetime]
     result: typing.Optional[ResponseDataT] = None
@@ -147,75 +151,75 @@ SimpleCommandResponse = SessionCommandResponse[
 """Response to :class:`~SimpleCommandRequest`"""
 
 
-LoadLabwareRequest = SessionCommandRequest[
+LoadLabwareCreate = SessionCommandRequest[
     Literal[EquipmentCommand.load_labware],
-    commands.LoadLabwareRequest,
+    commands.LoadLabwareCreate,
     commands.LoadLabwareResult,
 ]
 
 
 LoadLabwareResponse = SessionCommandResponse[
     Literal[EquipmentCommand.load_labware],
-    commands.LoadLabwareRequest,
+    commands.LoadLabwareCreate,
     commands.LoadLabwareResult,
 ]
 
 
 LoadInstrumentRequest = SessionCommandRequest[
     Literal[EquipmentCommand.load_pipette],
-    commands.LoadPipetteRequest,
+    commands.LoadPipetteCreate,
     commands.LoadPipetteResult,
 ]
 
 
 LoadInstrumentResponse = SessionCommandResponse[
     Literal[EquipmentCommand.load_pipette],
-    commands.LoadPipetteRequest,
+    commands.LoadPipetteCreate,
     commands.LoadPipetteResult,
 ]
 
 
-AspirateRequest = SessionCommandRequest[
-    Literal[PipetteCommand.aspirate], commands.AspirateRequest, commands.AspirateResult
+AspirateCreate = SessionCommandRequest[
+    Literal[PipetteCommand.aspirate], commands.AspirateCreate, commands.AspirateResult
 ]
 
 
 AspirateResponse = SessionCommandResponse[
-    Literal[PipetteCommand.aspirate], commands.AspirateRequest, commands.AspirateResult
+    Literal[PipetteCommand.aspirate], commands.AspirateCreate, commands.AspirateResult
 ]
 
 
-DispenseRequest = SessionCommandRequest[
-    Literal[PipetteCommand.dispense], commands.DispenseRequest, commands.DispenseResult
+DispenseCreate = SessionCommandRequest[
+    Literal[PipetteCommand.dispense], commands.DispenseCreate, commands.DispenseResult
 ]
 
 
 DispenseResponse = SessionCommandResponse[
-    Literal[PipetteCommand.dispense], commands.DispenseRequest, commands.DispenseResult
+    Literal[PipetteCommand.dispense], commands.DispenseCreate, commands.DispenseResult
 ]
 
 
-PickUpTipRequest = SessionCommandRequest[
+PickUpTipCreate = SessionCommandRequest[
     Literal[PipetteCommand.pick_up_tip],
-    commands.PickUpTipRequest,
+    commands.PickUpTipCreate,
     commands.PickUpTipResult,
 ]
 
 
 PickUpTipResponse = SessionCommandResponse[
     Literal[PipetteCommand.pick_up_tip],
-    commands.PickUpTipRequest,
+    commands.PickUpTipCreate,
     commands.PickUpTipResult,
 ]
 
 
-DropTipRequest = SessionCommandRequest[
-    Literal[PipetteCommand.drop_tip], commands.DropTipRequest, commands.DropTipResult
+DropTipCreate = SessionCommandRequest[
+    Literal[PipetteCommand.drop_tip], commands.DropTipCreate, commands.DropTipResult
 ]
 
 
 DropTipResponse = SessionCommandResponse[
-    Literal[PipetteCommand.drop_tip], commands.DropTipRequest, commands.DropTipResult
+    Literal[PipetteCommand.drop_tip], commands.DropTipCreate, commands.DropTipResult
 ]
 
 
@@ -259,12 +263,12 @@ SetHasCalibrationBlockResponse = SessionCommandResponse[
 
 RequestTypes = typing.Union[
     SimpleCommandRequest,
-    LoadLabwareRequest,
+    LoadLabwareCreate,
     LoadInstrumentRequest,
-    AspirateRequest,
-    DispenseRequest,
-    PickUpTipRequest,
-    DropTipRequest,
+    AspirateCreate,
+    DispenseCreate,
+    PickUpTipCreate,
+    DropTipCreate,
     JogRequest,
     SetHasCalibrationBlockRequest,
     LabwareByDefinitionRequest,
@@ -289,5 +293,5 @@ ResponseTypes = typing.Union[
 CommandRequest = RequestModel[RequestTypes]
 """The command request model."""
 
-CommandResponse = ResponseModel[ResponseTypes]
+CommandResponse = DeprecatedResponseModel[ResponseTypes]
 """The command response model."""

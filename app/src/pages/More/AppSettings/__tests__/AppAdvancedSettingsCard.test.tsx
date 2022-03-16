@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { mountWithStore } from '@opentrons/components/__utils__'
+import { mountWithStore } from '@opentrons/components'
 import * as Config from '../../../../redux/config'
 import { AppAdvancedSettingsCard } from '../AppAdvancedSettingsCard'
 
@@ -197,5 +197,12 @@ describe('AppAdvancedSettingsCard', () => {
     expect(store.dispatch).toHaveBeenCalledWith(
       Config.updateConfigValue('update.channel', 'alpha')
     )
+  })
+
+  it('renders download labware offset data setting', () => {
+    const { wrapper } = render()
+    expect(
+      wrapper.text().includes('Display a link to download Labware Offset Data')
+    ).toBe(true)
   })
 })

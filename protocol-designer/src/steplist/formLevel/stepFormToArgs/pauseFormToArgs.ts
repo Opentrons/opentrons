@@ -8,12 +8,12 @@ import { AwaitTemperatureArgs, PauseArgs } from '@opentrons/step-generation'
 export const pauseFormToArgs = (
   formData: FormData
 ): PauseArgs | AwaitTemperatureArgs | null => {
-  const hours = parseFloat(formData['pauseHour']) || 0
-  const minutes = parseFloat(formData['pauseMinute']) || 0
-  const seconds = parseFloat(formData['pauseSecond']) || 0
+  const hours = parseFloat(formData.pauseHour) || 0
+  const minutes = parseFloat(formData.pauseMinute) || 0
+  const seconds = parseFloat(formData.pauseSecond) || 0
   const totalSeconds = hours * 3600 + minutes * 60 + seconds
-  const temperature = parseFloat(formData['pauseTemperature'])
-  const message = formData['pauseMessage'] || ''
+  const temperature = parseFloat(formData.pauseTemperature)
+  const message = formData.pauseMessage || ''
 
   switch (formData.pauseAction) {
     case PAUSE_UNTIL_TEMP:

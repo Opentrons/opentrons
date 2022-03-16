@@ -56,6 +56,10 @@ teardown-py:
 lint-py:
 	$(MAKE) -C python lint
 
+.PHONY: format-py
+format-py:
+	$(MAKE) -C python format
+
 .PHONY: push-no-restart
 push-no-restart:
 	$(MAKE) -C python push-no-restart
@@ -63,6 +67,14 @@ push-no-restart:
 .PHONY: push
 push:
 	$(MAKE) -C python push
+
+.PHONY: push-no-restart-ot3
+push-no-restart-ot3:
+	$(MAKE) -C python push-no-restart-ot3
+
+.PHONY: push-ot3
+push-ot3:
+	$(MAKE) -C python push-ot3
 
 .PHONY: deploy-py
 deploy-py:

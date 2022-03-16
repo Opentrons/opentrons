@@ -13,6 +13,7 @@ export interface TitleBarProps {
   title: React.ReactNode
   subtitle?: React.ReactNode
   back?: ButtonProps
+  rightNode?: React.ReactNode
   className?: string
 
   // TODO(mc, 2018-04-13): deprecate these props
@@ -20,6 +21,10 @@ export interface TitleBarProps {
   backClickDisabled?: boolean
   backButtonLabel?: string
 }
+
+/**
+ * @deprecated Use `InterstitialTitleBar` instead
+ */
 
 export function TitleBar(props: TitleBarProps): JSX.Element {
   const {
@@ -31,11 +36,15 @@ export function TitleBar(props: TitleBarProps): JSX.Element {
     backButtonLabel,
     id,
   } = props
-  let { back } = props
+  let { back, rightNode } = props
 
   const separator = subtitle && <span className={styles.separator}>|</span>
 
   const subheading = subtitle && <h2 className={styles.subtitle}>{subtitle}</h2>
+
+  const rightNodeContainer = rightNode && (
+    <div className={styles.right_node}>{rightNode}</div>
+  )
 
   // TODO(mc, 2018-04-13): deprecate these props
   if (!back && onBackClick) {
@@ -66,6 +75,7 @@ export function TitleBar(props: TitleBarProps): JSX.Element {
       <h1 className={cx(styles.title, { [styles.right]: back })}>{title}</h1>
       {separator}
       {subheading}
+      {rightNodeContainer}
     </header>
   )
 }

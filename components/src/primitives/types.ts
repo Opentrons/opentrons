@@ -44,6 +44,7 @@ export interface BorderProps {
   borderRadius?: string | number
   borderWidth?: string | number
   borderColor?: string
+  boxShadow?: string
 }
 
 export interface FlexboxProps {

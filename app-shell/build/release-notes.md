@@ -6,7 +6,91 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# Opentrons App Changes in 4.4.0
+# Opentrons App Changes in 5.0.2
+
+Welcome to the v5.0.2 release of the Opentrons App!
+
+The 5.0.2 release reshapes the way you upload and set up protocols to run on your OT-2. Read below to find out about the new features in 5.0.0.
+
+## New Features
+
+- A completely revamped protocol upload experience that will walk you through setting up your OT-2 for the run
+- A new way to check the positioning of your labware prior to a run, where you can apply offsets to each labware individually
+- More visibility into the progress of protocol execution on the robot
+- Quick and easy re-running of your last used protocol
+
+## 5.0.1 to 5.0.2
+
+The 5.0.2 hotfix release fixes three issues:
+
+1. If you use `load_labware_from_definition` in your Python protocol, you are now able to use Labware Position Check.
+2. User-defined labware labels, if present, are now displayed in "Labware Setup"
+3. Certain types of protocol upload failures will now show an error message instead of silently failing.
+
+## 5.0.0 to 5.0.1
+
+The 5.0.1 hotfix release contains a small fix to the Labware Position Check to appropriately handle protocols that load pipettes, but never pick up tips with that pipette.
+
+## Known Issues
+
+- Your last run protocol will not be saved through robot reboots
+- When you load multiple instances of the same module type in a protocol, the USB port numbers shown in "Module Setup" are incorrect.
+
+---
+
+## Opentrons App Changes in 4.7.0
+
+The 4.7.0 release is primarily focused on bug fixes on the robot software side. You shouldn't notice any big changes with this upgrade.
+
+### New Features
+
+None in the Opentrons App.
+
+### Bug Fixes
+
+None in the Opentrons App.
+
+---
+
+## Opentrons App Changes in 4.6.2
+
+The 4.6.2 release is primarily focused on bug fixes on the robot software side and behind the scenes changes in the app for future work. You shouldn't notice any big changes with this upgrade.
+
+### New Features
+
+None in the Opentrons App.
+
+### Bug Fixes
+
+None in the Opentrons App.
+
+#### 4.6.1 to 4.6.2
+
+The 4.6.2 hotfix release contains a small bug fix for an issue where the OT-2's max speed settings within a protocol will be ignored. It does not affect the software running in the Opentrons App.
+
+#### 4.6.0 to 4.6.1
+
+The 4.6.1 hotfix release contains a small configuration change to fix an issue with installing the `opentrons` PyPI package on computers running Python 3.8 and later. It does not affect the software running in the Opentrons App.
+
+---
+
+## Opentrons App Changes in 4.5.0
+
+This release of the app is focused on quality of life improvements as we continue large behind-the-scenes improvements.
+
+### New Features
+
+- Protocol uploads have been made substantially faster! (See OT-2 release notes for more details.)
+
+### Bug Fixes
+
+- Fixed issues with the run timer reading `00:00` in the middle of a paused protocol ([#7740][])
+
+[#7740]: https://github.com/Opentrons/opentrons/issues/7740
+
+---
+
+## Opentrons App Changes in 4.4.0
 
 This is a quiet release on the app front as we make some behind-the-scenes improvements to how the app is built, so we don't have any changes to report here. There are changes to the OT-2 software, though, so make sure you update your app so it can get your robot fully up to date!
 

@@ -2,11 +2,11 @@ import * as React from 'react'
 import {
   mountWithStore,
   WrapperWithStore,
-} from '@opentrons/components/__utils__'
-
+  TitleBar,
+  Icon,
+} from '@opentrons/components'
 import { ConfirmPipette } from '../ConfirmPipette'
 import { CheckPipettesButton } from '../CheckPipettesButton'
-import { TitleBar, Icon } from '@opentrons/components'
 
 import type { Action, State } from '../../../redux/types'
 import type { PipetteOffsetCalibration } from '../../../redux/calibration/types'

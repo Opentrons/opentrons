@@ -2,8 +2,11 @@
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 
-import { mountWithProviders } from '@opentrons/components/__utils__'
-import { SecondaryBtn, Tooltip } from '@opentrons/components'
+import {
+  SecondaryBtn,
+  Tooltip,
+  mountWithProviders,
+} from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 
 import * as Buildroot from '../../../../redux/buildroot'

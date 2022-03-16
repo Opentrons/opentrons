@@ -7,13 +7,11 @@ import typing
 
 from opentrons import types
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.protocols.api_support.util import Clearances, PlungerSpeeds, \
-    FlowRates
+from opentrons.protocols.api_support.util import Clearances, PlungerSpeeds, FlowRates
 from opentrons.protocols.context.well import WellImplementation
 
 
 class AbstractInstrument(ABC):
-
     @abstractmethod
     def get_default_speed(self) -> float:
         ...
@@ -23,15 +21,11 @@ class AbstractInstrument(ABC):
         ...
 
     @abstractmethod
-    def aspirate(self,
-                 volume: float,
-                 rate: float) -> None:
+    def aspirate(self, volume: float, rate: float) -> None:
         ...
 
     @abstractmethod
-    def dispense(self,
-                 volume: float,
-                 rate: float) -> None:
+    def dispense(self, volume: float, rate: float) -> None:
         ...
 
     @abstractmethod
@@ -39,19 +33,19 @@ class AbstractInstrument(ABC):
         ...
 
     @abstractmethod
-    def touch_tip(self,
-                  location: WellImplementation,
-                  radius: float,
-                  v_offset: float,
-                  speed: float) -> None:
+    def touch_tip(
+        self, location: WellImplementation, radius: float, v_offset: float, speed: float
+    ) -> None:
         ...
 
     @abstractmethod
-    def pick_up_tip(self,
-                    well: WellImplementation,
-                    tip_length: float,
-                    presses: typing.Optional[int],
-                    increment: typing.Optional[float]) -> None:
+    def pick_up_tip(
+        self,
+        well: WellImplementation,
+        tip_length: float,
+        presses: typing.Optional[int],
+        increment: typing.Optional[float],
+    ) -> None:
         ...
 
     @abstractmethod
@@ -67,15 +61,13 @@ class AbstractInstrument(ABC):
         ...
 
     @abstractmethod
-    def delay(self) -> None:
-        ...
-
-    @abstractmethod
-    def move_to(self,
-                location: types.Location,
-                force_direct: bool,
-                minimum_z_height: typing.Optional[float],
-                speed: typing.Optional[float]) -> None:
+    def move_to(
+        self,
+        location: types.Location,
+        force_direct: bool,
+        minimum_z_height: typing.Optional[float],
+        speed: typing.Optional[float],
+    ) -> None:
         ...
 
     @abstractmethod
@@ -148,16 +140,18 @@ class AbstractInstrument(ABC):
 
     @abstractmethod
     def set_flow_rate(
-            self,
-            aspirate: typing.Optional[float] = None,
-            dispense: typing.Optional[float] = None,
-            blow_out: typing.Optional[float] = None) -> None:
+        self,
+        aspirate: typing.Optional[float] = None,
+        dispense: typing.Optional[float] = None,
+        blow_out: typing.Optional[float] = None,
+    ) -> None:
         ...
 
     @abstractmethod
     def set_pipette_speed(
-            self,
-            aspirate: typing.Optional[float] = None,
-            dispense: typing.Optional[float] = None,
-            blow_out: typing.Optional[float] = None) -> None:
+        self,
+        aspirate: typing.Optional[float] = None,
+        dispense: typing.Optional[float] = None,
+        blow_out: typing.Optional[float] = None,
+    ) -> None:
         ...

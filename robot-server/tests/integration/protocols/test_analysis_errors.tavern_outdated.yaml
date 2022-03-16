@@ -1,0 +1,133 @@
+---
+test_name: Upload invalid json protocol
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Upload and check for JSONDecodeError in response
+    request:
+      url: '{host:s}:{port:d}/protocols'
+      method: POST
+      files:
+        protocolFile: 'tests/integration/protocols/invalid_json.json'
+    response:
+      save:
+        json:
+          protocol_id: data.id
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          protocolFile: !anydict
+          supportFiles: !anylist
+          lastModifiedAt: !anystr
+          createdAt: !anystr
+          metadata: !anydict
+          requiredEquipment: !anydict
+          errors:
+            - type: JSONDecodeError
+              description: !anystr
+              lineNumber: 1
+              fileName: invalid_json.json
+        links: !anydict
+  - name: Delete the protocol
+    request:
+      url: '{host:s}:{port:d}/protocols/{protocol_id}'
+      method: DELETE
+    response:
+      status_code: 200
+      json:
+        data: !anydict
+        links:
+          self:
+            href: '/protocols'
+          protocolById:
+            href: '/protocols/{{protocolId}}'
+---
+test_name: Upload python protocol with invalid module
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Upload protocol and check for exception
+    request:
+      url: '{host:s}:{port:d}/protocols'
+      method: POST
+      files:
+        protocolFile: 'tests/integration/protocols/load_unknown_module.py'
+    response:
+      save:
+        json:
+          protocol_id: data.id
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          protocolFile: !anydict
+          supportFiles: !anylist
+          lastModifiedAt: !anystr
+          createdAt: !anystr
+          metadata: !anydict
+          requiredEquipment: !anydict
+          errors:
+            - type: ExceptionInProtocolError
+              description: !anystr
+              lineNumber: 11
+        links: !anydict
+  - name: Delete the protocol
+    request:
+      url: '{host:s}:{port:d}/protocols/{protocol_id}'
+      method: DELETE
+    response:
+      status_code: 200
+      json:
+        data: !anydict
+        links:
+          self:
+            href: '/protocols'
+          protocolById:
+            href: '/protocols/{{protocolId}}'
+---
+test_name: Upload python protocol with run time error
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Upload protocol and check for error
+    request:
+      url: '{host:s}:{port:d}/protocols'
+      method: POST
+      files:
+        protocolFile: 'tests/integration/protocols/runtime_error.py'
+    response:
+      save:
+        json:
+          protocol_id: data.id
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          protocolFile: !anydict
+          supportFiles: !anylist
+          lastModifiedAt: !anystr
+          createdAt: !anystr
+          metadata: !anydict
+          requiredEquipment: !anydict
+          errors:
+            - type: ExceptionInProtocolError
+              description: !anystr
+              lineNumber: 7
+        links: !anydict
+  - name: Delete the protocol
+    request:
+      url: '{host:s}:{port:d}/protocols/{protocol_id}'
+      method: DELETE
+    response:
+      status_code: 200
+      json:
+        data: !anydict
+        links:
+          self:
+            href: '/protocols'
+          protocolById:
+            href: '/protocols/{{protocolId}}'

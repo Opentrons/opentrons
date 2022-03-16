@@ -39,7 +39,7 @@ jobs:
       - uses: 'actions/checkout@v2'
       - uses: 'actions/setup-node@v1'
         with:
-          node-version: '12'
+          node-version: '14'
       - uses: 'actions/setup-python@v2'
         with:
           python-version: '3.7'
@@ -58,7 +58,7 @@ jobs:
       - uses: 'actions/checkout@v2'
       - uses: 'actions/setup-node@v1'
         with:
-          node-version: '12'
+          node-version: '14'
       - uses: 'actions/setup-python@v2'
         with:
           python-version: '3.7'
@@ -67,6 +67,7 @@ jobs:
           project: 'update-server'
       - name: Test
         run: make -C update-server test
-      - uses: 'codecov/codecov-action@v1'
+      - uses: 'codecov/codecov-action@v2'
         with:
-          file: ./update-server/coverage.xml
+          files: ./update-server/coverage.xml
+          flags: update-server

@@ -7,7 +7,11 @@ import {
   OutlineButton,
   Mount,
 } from '@opentrons/components'
-import { getLabwareDefURI, getLabwareDisplayName } from '@opentrons/shared-data'
+import {
+  getLabwareDefURI,
+  getLabwareDisplayName,
+  OT3_PIPETTES,
+} from '@opentrons/shared-data'
 import isEmpty from 'lodash/isEmpty'
 import reduce from 'lodash/reduce'
 import { i18n } from '../../../localization'
@@ -111,6 +115,7 @@ export function PipetteFields(props: Props): JSX.Element {
           onSetFieldValue(targetToClear, null)
           onSetFieldTouched(targetToClear, false)
         }}
+        nameBlocklist={OT3_PIPETTES}
         id={`PipetteSelect_${mount}`}
       />
     )

@@ -22,7 +22,8 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
-  ModuleRealType,
+  HEATERSHAKER_MODULE_TYPE,
+  ModuleType,
   ModuleModel,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
@@ -43,7 +44,7 @@ export type PipetteFieldsData = Omit<
 >
 
 export interface ModuleCreationArgs {
-  type: ModuleRealType
+  type: ModuleType
   model: ModuleModel
   slot: DeckSlot
 }
@@ -94,6 +95,11 @@ const initialFormState: FormState = {
       onDeck: false,
       model: THERMOCYCLER_MODULE_V1, // Default to GEN1 for TC only
       slot: SPAN7_8_10_11_SLOT,
+    },
+    [HEATERSHAKER_MODULE_TYPE]: {
+      onDeck: false,
+      model: null,
+      slot: '6',
     },
   },
 }
@@ -158,7 +164,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
 
   getCrashableModuleSelected: (
     modules: FormModulesByType,
-    moduleType: ModuleRealType
+    moduleType: ModuleType
   ) => boolean = (modules, moduleType) => {
     const formModule = modules[moduleType]
     const crashableModuleOnDeck =
@@ -201,9 +207,9 @@ export class FilePipettesModal extends React.Component<Props, State> {
     )
 
     // NOTE: this is extra-explicit for flow. Reduce fns won't cooperate
-    // with enum-typed key like `{[ModuleRealType]: ___}`
+    // with enum-typed key like `{[ModuleType]: ___}`
     // @ts-expect-error(sa, 2021-6-21): TS not smart enough to take real type from Object.keys
-    const moduleTypes: ModuleRealType[] = Object.keys(values.modulesByType)
+    const moduleTypes: ModuleType[] = Object.keys(values.modulesByType)
     const modules: ModuleCreationArgs[] = moduleTypes.reduce<
       ModuleCreationArgs[]
     >((acc, moduleType) => {

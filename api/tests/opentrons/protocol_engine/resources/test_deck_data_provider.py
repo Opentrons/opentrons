@@ -1,6 +1,6 @@
 """Test deck data provider."""
 import pytest
-from mock import AsyncMock  # type: ignore[attr-defined]
+from decoy import Decoy
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV2
 from opentrons.protocols.models import LabwareDefinition
@@ -15,80 +15,85 @@ from opentrons.protocol_engine.resources import (
 
 
 @pytest.fixture
-def mock_labware_data(minimal_labware_def: LabwareDefinition) -> AsyncMock:
+def labware_data_provider(decoy: Decoy) -> LabwareDataProvider:
     """Get a mock in the shape of the LabwareDataProvider."""
-    return AsyncMock(spec=LabwareDataProvider)
+    return decoy.mock(cls=LabwareDataProvider)
 
 
 @pytest.fixture
-def deck_data(mock_labware_data: AsyncMock) -> DeckDataProvider:
-    """Create a DeckDataProvider with mocked out dependencies."""
-    return DeckDataProvider(labware_data=mock_labware_data)
+def subject(labware_data_provider: LabwareDataProvider) -> DeckDataProvider:
+    """Create a DeckDataProvider test subject with mocked out dependencies."""
+    return DeckDataProvider(labware_data=labware_data_provider)
 
 
 async def test_get_deck_definition(
     standard_deck_def: DeckDefinitionV2,
-    deck_data: DeckDataProvider,
+    subject: DeckDataProvider,
 ) -> None:
     """It should be able to load the deck definition."""
-    result = await deck_data.get_deck_definition()
+    result = await subject.get_deck_definition()
     assert result == standard_deck_def
 
 
 async def test_get_deck_definition_short_trash(
     short_trash_deck_def: DeckDefinitionV2,
-    deck_data: DeckDataProvider,
+    subject: DeckDataProvider,
+    short_trash_flag: None,
 ) -> None:
     """It should be able to load the short-trash deck definition."""
-    result = await deck_data.get_deck_definition(short_fixed_trash=True)
+    result = await subject.get_deck_definition()
     assert result == short_trash_deck_def
 
 
 async def test_get_deck_labware_fixtures(
+    decoy: Decoy,
     standard_deck_def: DeckDefinitionV2,
     fixed_trash_def: LabwareDefinition,
-    mock_labware_data: AsyncMock,
-    deck_data: DeckDataProvider,
+    labware_data_provider: LabwareDataProvider,
+    subject: DeckDataProvider,
 ) -> None:
     """It should be able to get a list of prepopulated labware on the deck."""
-    mock_labware_data.get_labware_definition.return_value = fixed_trash_def
+    decoy.when(
+        await labware_data_provider.get_labware_definition(
+            load_name="opentrons_1_trash_1100ml_fixed",
+            namespace="opentrons",
+            version=1,
+        )
+    ).then_return(fixed_trash_def)
 
-    result = await deck_data.get_deck_fixed_labware(standard_deck_def)
+    result = await subject.get_deck_fixed_labware(standard_deck_def)
 
     assert result == [
         DeckFixedLabware(
             labware_id="fixedTrash",
-            location=DeckSlotLocation(slot=DeckSlotName.FIXED_TRASH),
+            location=DeckSlotLocation(slotName=DeckSlotName.FIXED_TRASH),
             definition=fixed_trash_def,
         )
     ]
-    mock_labware_data.get_labware_definition.assert_called_with(
-        load_name="opentrons_1_trash_1100ml_fixed",
-        namespace="opentrons",
-        version=1,
-    )
 
 
 async def test_get_deck_labware_fixtures_short_trash(
+    decoy: Decoy,
     short_trash_deck_def: DeckDefinitionV2,
     short_fixed_trash_def: LabwareDefinition,
-    mock_labware_data: AsyncMock,
-    deck_data: DeckDataProvider,
+    labware_data_provider: LabwareDataProvider,
+    subject: DeckDataProvider,
 ) -> None:
     """It should be able to get a list of prepopulated labware on the deck."""
-    mock_labware_data.get_labware_definition.return_value = short_fixed_trash_def
+    decoy.when(
+        await labware_data_provider.get_labware_definition(
+            load_name="opentrons_1_trash_850ml_fixed",
+            namespace="opentrons",
+            version=1,
+        )
+    ).then_return(short_fixed_trash_def)
 
-    result = await deck_data.get_deck_fixed_labware(short_trash_deck_def)
+    result = await subject.get_deck_fixed_labware(short_trash_deck_def)
 
     assert result == [
         DeckFixedLabware(
             labware_id="fixedTrash",
-            location=DeckSlotLocation(slot=DeckSlotName.FIXED_TRASH),
+            location=DeckSlotLocation(slotName=DeckSlotName.FIXED_TRASH),
             definition=short_fixed_trash_def,
         )
     ]
-    mock_labware_data.get_labware_definition.assert_called_with(
-        load_name="opentrons_1_trash_850ml_fixed",
-        namespace="opentrons",
-        version=1,
-    )

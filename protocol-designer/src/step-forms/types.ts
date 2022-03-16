@@ -1,10 +1,11 @@
 import { Mount } from '@opentrons/components'
 import {
-  ModuleRealType,
+  ModuleType,
   ModuleModel,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { DeckSlot } from '../types'
 
@@ -32,6 +33,7 @@ export interface FormModulesByType {
   magneticModuleType: FormModule
   temperatureModuleType: FormModule
   thermocyclerModuleType: FormModule
+  heaterShakerModuleType: FormModule
 }
 export type ModuleEntities = Record<string, ModuleEntity>
 // NOTE: semi-redundant 'type' key in FooModuleState types is required for Flow to disambiguate 'moduleState'
@@ -52,16 +54,23 @@ export interface ThermocyclerModuleState {
   // null means lid is deactivated
   lidOpen: boolean | null // if false, closed. If null, unknown
 }
+export interface HeaterShakerModuleState {
+  type: typeof HEATERSHAKER_MODULE_TYPE
+  targetTemp: number | null
+  targetSpeed: number | null
+  latchOpen: boolean | null
+}
 export interface ModuleTemporalProperties {
   slot: DeckSlot
   moduleState:
     | MagneticModuleState
     | TemperatureModuleState
     | ThermocyclerModuleState
+    | HeaterShakerModuleState
 }
 export type ModuleOnDeck = ModuleEntity & ModuleTemporalProperties
 export type ModulesForEditModulesCard = Partial<
-  Record<ModuleRealType, ModuleOnDeck | null | undefined>
+  Record<ModuleType, ModuleOnDeck | null | undefined>
 >
 // =========== LABWARE ========
 export type NormalizedLabwareById = Record<

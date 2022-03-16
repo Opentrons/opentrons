@@ -46,7 +46,7 @@ def mock_hw_pipette_all_combos(request):
 @pytest.fixture(params=[Mount.RIGHT, Mount.LEFT])
 def mock_hw_all_combos(hardware, mock_hw_pipette_all_combos, request):
     mount = request.param
-    hardware._attached_instruments = {mount: mock_hw_pipette_all_combos}
+    hardware.hardware_instruments = {mount: mock_hw_pipette_all_combos}
     hardware._current_pos = Point(0, 0, 0)
 
     async def async_mock_move_to(*args, **kwargs):
@@ -65,7 +65,7 @@ def mock_hw_all_combos(hardware, mock_hw_pipette_all_combos, request):
 @pytest.fixture
 def mock_hw(hardware):
     pip = pipette.Pipette(load("p300_single_v2.1", "testId"), PIP_CAL, "testId")
-    hardware._attached_instruments = {Mount.RIGHT: pip}
+    hardware.hardware_instruments = {Mount.RIGHT: pip}
     hardware._current_pos = Point(0, 0, 0)
 
     async def async_mock_move_rel(*args, **kwargs):
@@ -93,8 +93,8 @@ def mock_hw(hardware):
 @pytest.fixture(params=[True, False])
 def mock_user_flow(mock_hw, request):
     has_calibration_block = request.param
-    mount = next(k for k, v in mock_hw._attached_instruments.items() if v)
-    pip_model = mock_hw._attached_instruments[mount].model
+    mount = next(k for k, v in mock_hw.hardware_instruments.items() if v)
+    pip_model = mock_hw.hardware_instruments[mount].model
     tip_rack = get_labware_definition(pipette_map[pip_model], "opentrons", "1")
     m = TipCalibrationUserFlow(
         hardware=mock_hw,
@@ -109,7 +109,7 @@ def mock_user_flow(mock_hw, request):
 @pytest.fixture(params=[True, False])
 def mock_user_flow_with_custom_tiprack(mock_hw, custom_tiprack_def, request):
     has_calibration_block = request.param
-    mount = next(k for k, v in mock_hw._attached_instruments.items() if v)
+    mount = next(k for k, v in mock_hw.hardware_instruments.items() if v)
     m = TipCalibrationUserFlow(
         hardware=mock_hw,
         mount=mount,
@@ -124,8 +124,8 @@ def mock_user_flow_with_custom_tiprack(mock_hw, custom_tiprack_def, request):
 def mock_user_flow_all_combos(mock_hw_all_combos, request):
     has_calibration_block = request.param
     hw = mock_hw_all_combos
-    mount = next(k for k, v in hw._attached_instruments.items() if v)
-    pip_model = hw._attached_instruments[mount].model
+    mount = next(k for k, v in hw.hardware_instruments.items() if v)
+    pip_model = hw.hardware_instruments[mount].model
     tip_rack = get_labware_definition(pipette_map[pip_model], "opentrons", "1")
     m = TipCalibrationUserFlow(
         hardware=hw,
@@ -330,7 +330,7 @@ async def test_save_custom_tiprack_def(
 
 @pytest.mark.parametrize(argnames="mount", argvalues=[Mount.RIGHT, Mount.LEFT])
 def test_no_pipette(hardware, mount):
-    hardware._attached_instruments = {mount: None}
+    hardware.hardware_instruments = {mount: None}
     with pytest.raises(RobotServerError) as error:
         TipCalibrationUserFlow(
             hardware=hardware, mount=mount, has_calibration_block=None, tip_rack=None

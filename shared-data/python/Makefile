@@ -29,6 +29,7 @@ BUILD_DIR := dist
 
 
 wheel_file = $(BUILD_DIR)/$(call python_get_wheelname,shared-data,opentrons_shared_data,$(BUILD_NUMBER),../../scripts/python_build_utils.py)
+sdist_file = $(BUILD_DIR)/$(call python_get_sdistname,shared-data,opentrons_shared_data,,../../scripts/python_build_utils.py)
 
 py_sources = $(filter %.py,$(shell $(SHX) find opentrons_shared_data)) opentrons_shared_data/py.typed
 deck_sources = $(wildcard ../deck/definitions/*/*.json) $(wildcard ../deck/schemas/*.json)
@@ -71,16 +72,31 @@ clean:
 wheel: $(wheel_file)
 
 
-$(BUILD_DIR)/opentrons_shared_data-%-py2.py3-none-any.whl: setup.py $(py_sources) $(json_sources)
+.PHONY: sdist
+sdist: $(sdist_file)
+
+
+$(wheel_file): setup.py $(py_sources) $(json_sources)
 	$(SHX) mkdir -p build
 	$(python) setup.py $(wheel_opts) bdist_wheel
 	$(SHX) ls $(BUILD_DIR)
 
 
+$(sdist_file): setup.py $(py_sources)
+	$(SHX) mkdir -p build
+	$(python) setup.py sdist
+	$(SHX) ls $(BUILD_DIR)
+
+
 .PHONY: lint
 lint: $(py_sources)
-	$(python) -m mypy opentrons_shared_data
+	$(python) -m mypy opentrons_shared_data tests
+	$(python) -m black --check opentrons_shared_data tests setup.py
 	$(python) -m flake8 opentrons_shared_data tests setup.py
+
+.PHONY: format
+format:
+	$(python) -m black opentrons_shared_data tests setup.py
 
 .PHONY: push-no-restart
 push-no-restart: $(wheel_file)
@@ -90,10 +106,18 @@ push-no-restart: $(wheel_file)
 push: push-no-restart
 	$(call restart-service,$(host),$(br_ssh_key),$(ssh_opts),opentrons-robot-server)
 
+.PHONY: push-no-restart-ot3
+push-no-restart-ot3: $(sdist_file)
+	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,opentrons_shared_data)
+
+.PHONY: push-ot3
+push-ot3: push-no-restart-ot3
+	$(call restart-server,$(host),,$(ssh_opts),opentrons-robot-server)
+
 .PHONY: deploy
 deploy: wheel
 	$(call python_upload_package,$(twine_auth_args),$(twine_repository_url),$(wheel_file))
 
 .PHONY: test
 test:
-	$(python) -m pytest tests
+	$(python) -m pytest --cov=opentrons_shared_data --cov-report xml:coverage.xml tests

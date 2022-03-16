@@ -1,0 +1,54 @@
+{
+  "constraints": {
+    "X": {
+      "max_acceleration": 10000,
+      "max_speed_discont": 40,
+      "max_direction_change_speed_discont": 30
+    },
+    "Y": {
+      "max_acceleration": 10000,
+      "max_speed_discont": 40,
+      "max_direction_change_speed_discont": 30
+    },
+    "Z": {
+      "max_acceleration": 10000,
+      "max_speed_discont": 40,
+      "max_direction_change_speed_discont": 30
+    },
+    "A": {
+      "max_acceleration": 1000,
+      "max_speed_discont": 100,
+      "max_direction_change_speed_discont": 30
+    },
+    "B": {
+      "max_acceleration": 1000,
+      "max_speed_discont": 100,
+      "max_direction_change_speed_discont": 30
+    },
+    "C": {
+      "max_acceleration": 1000,
+      "max_speed_discont": 100,
+      "max_direction_change_speed_discont": 30
+    }
+  },
+  "origin": [200, 200, 200, 0, 0, 0],
+  "target_list": [
+    {
+      "coordinates": [100, 0, 0, 0, 0, 0],
+      "max_speed": 30
+    },
+    {
+      "coordinates": [200, 100, 0, 0, 0, 0],
+      "max_speed": 20
+    },
+    {
+      "coordinates": [400, 200, 0, 0, 0, 0],
+      "max_speed": 500
+    },
+    {
+      "coordinates": [300, 300, 150, 0, 0, 0],
+      "max_speed": 500
+    }
+  ],
+  "iteration_limit": 10
+}

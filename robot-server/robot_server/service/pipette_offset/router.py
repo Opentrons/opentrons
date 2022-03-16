@@ -1,5 +1,6 @@
 from starlette import status
 from fastapi import APIRouter
+from typing import Optional
 
 from opentrons import types as ot_types
 from opentrons.calibration_storage import (
@@ -9,7 +10,7 @@ from opentrons.calibration_storage import (
     delete,
 )
 
-from robot_server.errors import ErrorResponse
+from robot_server.errors import ErrorBody
 from robot_server.service.pipette_offset import models as pip_models
 from robot_server.service.errors import RobotServerError, CommonErrorDef
 from robot_server.service.shared_models import calibration as cal_model
@@ -43,13 +44,14 @@ def _format_calibration(
     response_model=pip_models.MultipleCalibrationsResponse,
 )
 async def get_all_pipette_offset_calibrations(
-    pipette_id: str = None, mount: pip_models.MountType = None
+    pipette_id: Optional[str] = None, mount: Optional[pip_models.MountType] = None
 ) -> pip_models.MultipleCalibrationsResponse:
     all_calibrations = get_cal.get_all_pipette_offset_calibrations()
 
     if not all_calibrations:
         return pip_models.MultipleCalibrationsResponse(
-            data=[_format_calibration(cal) for cal in all_calibrations]
+            data=[_format_calibration(cal) for cal in all_calibrations],
+            links=None,
         )
 
     if pipette_id:
@@ -62,14 +64,14 @@ async def get_all_pipette_offset_calibrations(
         )
 
     calibrations = [_format_calibration(cal) for cal in all_calibrations]
-    return pip_models.MultipleCalibrationsResponse(data=calibrations)
+    return pip_models.MultipleCalibrationsResponse(data=calibrations, links=None)
 
 
 @router.delete(
     "/calibration/pipette_offset",
     description="Delete one specific pipette calibration "
     "by pipette serial and mount",
-    responses={status.HTTP_404_NOT_FOUND: {"model": ErrorResponse}},
+    responses={status.HTTP_404_NOT_FOUND: {"model": ErrorBody}},
 )
 async def get_specific_pipette_offset_calibration(
     pipette_id: str, mount: pip_models.MountType

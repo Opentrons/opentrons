@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from robot_server.service.json_api import ResponseDataModel
+from robot_server.service.json_api import DeprecatedResponseDataModel
 from robot_server.service.json_api.request import RequestModel
 
 
@@ -10,7 +10,7 @@ class ItemModel(BaseModel):
     price: float
 
 
-class ItemResponseModel(ResponseDataModel, ItemModel):
+class ItemResponseModel(DeprecatedResponseDataModel, ItemModel):
     pass
 
 

@@ -4,13 +4,10 @@ from opentrons.types import Mount
 from enum import Enum
 from dataclasses import dataclass, fields
 from pydantic import BaseModel, Field
+
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons.protocol_api import labware
 from opentrons.types import DeckLocation
-
-
-if typing.TYPE_CHECKING:
-    from opentrons.protocol_api.labware import Labware
-    from opentrons_shared_data.labware import LabwareDefinition
 
 
 class RobotHealthCheck(Enum):
@@ -64,8 +61,8 @@ class PipetteInfo:
     mount: Mount
     max_volume: int
     channels: int
-    tip_rack: "Labware"
-    default_tipracks: typing.List["LabwareDefinition"]
+    tip_rack: labware.Labware
+    default_tipracks: typing.List[LabwareDefinition]
 
 
 @dataclass
@@ -111,7 +108,7 @@ class AttachedPipette(BaseModel):
     )
     mount: str = Field(None, description="The mount this pipette attached to")
     serial: str = Field(None, description="The serial number of the attached pipette")
-    defaultTipracks: typing.List[dict] = Field(
+    defaultTipracks: typing.List[typing.Dict[str, typing.Any]] = Field(
         None, description="A list of default tipracks for this pipette"
     )
 
@@ -127,11 +124,12 @@ class RequiredLabware(BaseModel):
     namespace: str
     version: str
     isTiprack: bool
-    definition: dict
+    definition: typing.Dict[str, typing.Any]
 
     @classmethod
     def from_lw(cls, lw: labware.Labware, slot: typing.Optional[DeckLocation] = None):
         if not slot:
+            # TODO(mc, 2021-09-08): lw.parent is not necessarily a slot
             slot = lw.parent  # type: ignore[assignment]
         lw_def = lw._implementation.get_definition()
         return cls(
@@ -142,9 +140,7 @@ class RequiredLabware(BaseModel):
             namespace=lw_def["namespace"],
             version=str(lw_def["version"]),
             isTiprack=lw.is_tiprack,
-            # TODO(mc, 2020-09-17): LabwareDefinition does not match
-            # Dict[any,any] expected by cls
-            definition=lw_def,  # type: ignore[arg-type]
+            definition=typing.cast(typing.Dict[str, typing.Any], lw_def),
         )
 
 

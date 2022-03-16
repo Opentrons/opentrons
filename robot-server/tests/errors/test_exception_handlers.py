@@ -224,8 +224,8 @@ def test_handles_legacy_validation_error(app: FastAPI, client: TestClient) -> No
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert response.json() == {
         "message": (
-            "body.item.string_field: none is not an allowed value; "
-            "body.item.int_field: value is not a valid integer; "
-            "body.item.array_field.0: value could not be parsed to a boolean"
+            "body.string_field: none is not an allowed value; "
+            "body.int_field: value is not a valid integer; "
+            "body.array_field.0: value could not be parsed to a boolean"
         )
     }

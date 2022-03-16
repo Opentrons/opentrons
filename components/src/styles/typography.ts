@@ -6,6 +6,7 @@ import type { FlattenSimpleInterpolation } from 'styled-components'
 
 // font size values
 export const FONT_SIZE_HUGE = '3rem'
+export const FONT_SIZE_BIG = '1.5rem'
 export const FONT_SIZE_HEADER = '1.125rem'
 export const FONT_SIZE_DEFAULT = '1rem'
 export const FONT_SIZE_BODY_2 = '0.875rem'
@@ -52,6 +53,12 @@ export const FONT_HEADER_DARK: FlattenSimpleInterpolation = css`
   color: ${C_DARK_GRAY};
 `
 
+export const FONT_HEADER_THIN: FlattenSimpleInterpolation = css`
+  font-size: ${FONT_SIZE_HEADER};
+  font-weight: ${FONT_WEIGHT_REGULAR};
+  color: ${C_DARK_GRAY};
+`
+
 export const FONT_BODY_1_DARK: FlattenSimpleInterpolation = css`
   font-size: ${FONT_SIZE_BODY_1};
   font-weight: ${FONT_WEIGHT_REGULAR};
@@ -67,5 +74,17 @@ export const FONT_BODY_1_LIGHT: FlattenSimpleInterpolation = css`
 export const FONT_BODY_2_DARK: FlattenSimpleInterpolation = css`
   font-size: ${FONT_SIZE_BODY_2};
   font-weight: ${FONT_WEIGHT_REGULAR};
+  color: ${C_DARK_GRAY};
+`
+
+export const FONT_BODY_1_DARK_SEMIBOLD: FlattenSimpleInterpolation = css`
+  font-size: ${FONT_SIZE_BODY_1};
+  font-weight: ${FONT_WEIGHT_SEMIBOLD};
+  color: ${C_DARK_GRAY};
+`
+
+export const FONT_HUGE_DARK_SEMIBOLD: FlattenSimpleInterpolation = css`
+  font-size: ${FONT_SIZE_HUGE};
+  font-weight: ${FONT_WEIGHT_SEMIBOLD};
   color: ${C_DARK_GRAY};
 `

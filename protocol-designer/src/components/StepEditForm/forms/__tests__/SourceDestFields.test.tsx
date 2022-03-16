@@ -218,9 +218,9 @@ describe('SourceDestFields', () => {
         firstValue: 'r2l',
         secondValue: 'b2t',
         updateFirstWellOrder:
-          props.propsForFields['aspirate_wellOrder_first'].updateValue,
+          props.propsForFields.aspirate_wellOrder_first.updateValue,
         updateSecondWellOrder:
-          props.propsForFields['aspirate_wellOrder_second'].updateValue,
+          props.propsForFields.aspirate_wellOrder_second.updateValue,
       })
     })
   })
@@ -253,9 +253,9 @@ describe('SourceDestFields', () => {
         firstValue: 'l2r',
         secondValue: 't2b',
         updateFirstWellOrder:
-          props.propsForFields['dispense_wellOrder_first'].updateValue,
+          props.propsForFields.dispense_wellOrder_first.updateValue,
         updateSecondWellOrder:
-          props.propsForFields['dispense_wellOrder_second'].updateValue,
+          props.propsForFields.dispense_wellOrder_second.updateValue,
       })
     })
   })

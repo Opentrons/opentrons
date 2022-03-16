@@ -18,21 +18,43 @@ MoveSplits = Dict[str, MoveSplit]
 
 @dataclass
 class Temperature:
-    """Tempdeck temperature and thermocycler plate temperature."""
+    """Tempdeck, thermocycler plate, and heater-shaker temperatures"""
+
     current: float
     target: Optional[float]
 
 
 @dataclass
+class RPM:
+    """Heater-shaker plate RPM"""
+
+    current: int
+    target: Optional[int]
+
+
+class HeaterShakerLabwareLatchStatus(str, Enum):
+    """Heater-shaker labware latch status"""
+
+    OPENING = "opening"
+    IDLE_OPEN = "idle_open"
+    CLOSING = "closing"
+    IDLE_CLOSED = "idle_closed"
+    IDLE_UNKNOWN = "idle_unknown"
+    UNKNOWN = "unknown"
+
+
+@dataclass
 class PlateTemperature(Temperature):
     """Thermocycler lid temperature"""
+
     hold: Optional[float]
 
 
 class ThermocyclerLidStatus(str, Enum):
     """Thermocycler lid status."""
-    UNKNOWN = 'unknown'
-    CLOSED = 'closed'
-    IN_BETWEEN = 'in_between'
-    OPEN = 'open'
-    MAX = 'max'
+
+    UNKNOWN = "unknown"
+    CLOSED = "closed"
+    IN_BETWEEN = "in_between"
+    OPEN = "open"
+    MAX = "max"

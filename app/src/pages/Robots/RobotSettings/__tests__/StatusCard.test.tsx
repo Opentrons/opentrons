@@ -1,13 +1,13 @@
 import * as React from 'react'
-import { mountWithProviders } from '@opentrons/components/__utils__'
+import { SecondaryBtn, mountWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 
 import * as Fixtures from '../../../../redux/discovery/__fixtures__'
 import {
-  actions as RobotActions,
+  connect,
+  disconnect,
   selectors as RobotSelectors,
 } from '../../../../redux/robot'
-import { SecondaryBtn, Icon } from '@opentrons/components'
 import { StatusCard } from '../StatusCard'
 
 import type { ViewableRobot } from '../../../../redux/discovery/types'
@@ -16,10 +16,6 @@ jest.mock('../../../../redux/robot/selectors')
 
 const getSessionStatus = RobotSelectors.getSessionStatus as jest.MockedFunction<
   typeof RobotSelectors.getSessionStatus
->
-
-const getConnectRequest = RobotSelectors.getConnectRequest as jest.MockedFunction<
-  typeof RobotSelectors.getConnectRequest
 >
 
 describe('RobotSettings StatusCard', () => {
@@ -33,11 +29,6 @@ describe('RobotSettings StatusCard', () => {
 
   beforeEach(() => {
     getSessionStatus.mockReturnValue('')
-    getConnectRequest.mockReturnValue({
-      inProgress: false,
-      name: '',
-      error: null,
-    })
   })
 
   afterEach(() => {
@@ -57,7 +48,7 @@ describe('RobotSettings StatusCard', () => {
 
     button.invoke('onClick')?.({} as React.MouseEvent)
     expect(store.dispatch).toHaveBeenCalledWith(
-      RobotActions.connect(Fixtures.mockConnectableRobot.name)
+      connect(Fixtures.mockConnectableRobot.name)
     )
   })
 
@@ -73,7 +64,7 @@ describe('RobotSettings StatusCard', () => {
     const button = wrapper.find(SecondaryBtn)
 
     button.invoke('onClick')?.({} as React.MouseEvent)
-    expect(store.dispatch).toHaveBeenCalledWith(RobotActions.disconnect())
+    expect(store.dispatch).toHaveBeenCalledWith(disconnect())
   })
 
   // TODO(mc, 2020-03-30): add tooltip to button
@@ -82,35 +73,6 @@ describe('RobotSettings StatusCard', () => {
     const button = wrapper.find(SecondaryBtn)
 
     expect(button.prop('disabled')).toBe(true)
-  })
-
-  // TODO(mc, 2020-03-30): add tooltip to button
-  it('connect button should be disabled with if connect in progress', () => {
-    getConnectRequest.mockReturnValue({
-      inProgress: true,
-      name: 'foobar',
-      error: null,
-    })
-
-    const { wrapper } = render()
-    const button = wrapper.find(SecondaryBtn)
-
-    expect(button.prop('disabled')).toBe(true)
-  })
-
-  it('connect button should have spinner if connect in progress to same robot', () => {
-    getConnectRequest.mockReturnValue({
-      inProgress: true,
-      name: Fixtures.mockConnectableRobot.name,
-      error: null,
-    })
-
-    const { wrapper } = render()
-    const button = wrapper.find(SecondaryBtn)
-    const icon = button.find(Icon)
-    expect(button.prop('disabled')).toBe(true)
-    expect(icon.prop('name')).toBe('ot-spinner')
-    expect(icon.prop('spin')).toBe(true)
   })
 
   it('displays unknown session status if not connected', () => {

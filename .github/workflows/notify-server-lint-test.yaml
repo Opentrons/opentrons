@@ -10,6 +10,8 @@ on:
       - 'Makefile'
       - 'notify-server/**'
       - '.github/workflows/notify-server-lint-test.yaml'
+      - 'api/**'
+      - 'hardware/**'
       - '.github/actions/python/**'
     tags-ignore:
       - '*'
@@ -17,6 +19,8 @@ on:
     paths:
       - 'Makefile'
       - 'notify-server/**'
+      - 'api/**'
+      - 'hardware/**'
   workflow_dispatch:
 
 defaults:
@@ -32,7 +36,7 @@ jobs:
       - uses: 'actions/checkout@v2'
       - uses: 'actions/setup-node@v1'
         with:
-          node-version: '12'
+          node-version: '14'
       - uses: 'actions/setup-python@v2'
         with:
           python-version: '3.7'
@@ -44,6 +48,8 @@ jobs:
         run: make -C notify-server lint
       - name: Test
         run: make -C notify-server test
-      - uses: 'codecov/codecov-action@v1'
+      - name: 'Upload coverage report'
+        uses: 'codecov/codecov-action@v2'
         with:
-          file: ./notify-server/coverage.xml
+          files: ./notify-server/coverage.xml
+          flags: notify-server

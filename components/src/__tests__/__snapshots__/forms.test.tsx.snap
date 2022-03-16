@@ -21,7 +21,7 @@ exports[`CheckboxField renders correctly when checked 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="sc-AxmLO c0"
+      className="sc-fznyAO c0"
       fill="currentColor"
       version="1.1"
       viewBox="0 0 24 24"
@@ -68,7 +68,7 @@ exports[`CheckboxField renders correctly when unchecked 1`] = `
   >
     <svg
       aria-hidden="true"
-      className="sc-AxmLO c0"
+      className="sc-fznyAO c0"
       fill="currentColor"
       version="1.1"
       viewBox="0 0 24 24"
@@ -148,7 +148,7 @@ exports[`DropdownField renders correctly with a falsey value 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="sc-AxmLO c0"
+        className="sc-fznyAO c0"
         fill="currentColor"
         version="1.1"
         viewBox="0 0 24 24"
@@ -217,7 +217,7 @@ exports[`DropdownField renders correctly with a value 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="sc-AxmLO c0"
+        className="sc-fznyAO c0"
         fill="currentColor"
         version="1.1"
         viewBox="0 0 24 24"
@@ -318,7 +318,7 @@ exports[`RadioGroup renders correctly inline 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="sc-AxmLO c0"
+        className="sc-fznyAO c0"
         fill="currentColor"
         version="1.1"
         viewBox="0 0 24 24"
@@ -351,7 +351,7 @@ exports[`RadioGroup renders correctly inline 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="sc-AxmLO c0"
+        className="sc-fznyAO c0"
         fill="currentColor"
         version="1.1"
         viewBox="0 0 24 24"
@@ -384,7 +384,7 @@ exports[`RadioGroup renders correctly inline 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="sc-AxmLO c0"
+        className="sc-fznyAO c0"
         fill="currentColor"
         version="1.1"
         viewBox="0 0 24 24"
@@ -436,7 +436,7 @@ exports[`RadioGroup renders correctly with checked value 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="sc-AxmLO c0"
+        className="sc-fznyAO c0"
         fill="currentColor"
         version="1.1"
         viewBox="0 0 24 24"
@@ -469,7 +469,7 @@ exports[`RadioGroup renders correctly with checked value 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="sc-AxmLO c0"
+        className="sc-fznyAO c0"
         fill="currentColor"
         version="1.1"
         viewBox="0 0 24 24"
@@ -502,7 +502,7 @@ exports[`RadioGroup renders correctly with checked value 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="sc-AxmLO c0"
+        className="sc-fznyAO c0"
         fill="currentColor"
         version="1.1"
         viewBox="0 0 24 24"
@@ -554,7 +554,7 @@ exports[`RadioGroup renders correctly with no checked value 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="sc-AxmLO c0"
+        className="sc-fznyAO c0"
         fill="currentColor"
         version="1.1"
         viewBox="0 0 24 24"
@@ -587,7 +587,7 @@ exports[`RadioGroup renders correctly with no checked value 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="sc-AxmLO c0"
+        className="sc-fznyAO c0"
         fill="currentColor"
         version="1.1"
         viewBox="0 0 24 24"
@@ -620,7 +620,7 @@ exports[`RadioGroup renders correctly with no checked value 1`] = `
     >
       <svg
         aria-hidden="true"
-        className="sc-AxmLO c0"
+        className="sc-fznyAO c0"
         fill="currentColor"
         version="1.1"
         viewBox="0 0 24 24"

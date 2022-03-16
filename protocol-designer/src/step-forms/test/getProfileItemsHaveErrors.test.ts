@@ -28,7 +28,7 @@ describe('getProfileItemsHaveErrors', () => {
           },
         }
         mockGetProfileFieldErrors.mockImplementation((name, value) => {
-          expect(profileItems['itemA']).toHaveProperty(name, value)
+          expect(profileItems.itemA).toHaveProperty(name, value)
           return mockGetProfileFieldErrorsReturn
         })
         const result = getProfileItemsHaveErrors(profileItems)

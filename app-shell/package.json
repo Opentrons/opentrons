@@ -2,7 +2,7 @@
   "name": "@opentrons/app-shell",
   "private": true,
   "productName": "Opentrons",
-  "version": "4.4.0",
+  "version": "5.0.2",
   "description": "Opentrons desktop application",
   "main": "lib/main.js",
   "types": "lib/main.d.ts",
@@ -28,9 +28,9 @@
     ]
   },
   "devDependencies": {
-    "@opentrons/app": "4.4.0",
-    "@opentrons/discovery-client": "4.4.0",
-    "@opentrons/shared-data": "4.4.0"
+    "@opentrons/app": "5.0.2",
+    "@opentrons/discovery-client": "5.0.2",
+    "@opentrons/shared-data": "5.0.2"
   },
   "dependencies": {
     "@thi.ng/paths": "1.6.5",
@@ -57,7 +57,7 @@
     "pump": "3.0.0",
     "semver": "5.5.0",
     "tempy": "0.3.0",
-    "usb-detection": "4.9.0",
+    "usb-detection": "4.10.0",
     "uuid": "3.2.1",
     "winston": "3.1.0",
     "yargs-parser": "10.0.0"

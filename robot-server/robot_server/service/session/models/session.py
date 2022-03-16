@@ -18,15 +18,11 @@ from robot_server.robot.calibration.pipette_offset.models import (
 from robot_server.robot.calibration.tip_length.models import TipCalibrationSessionStatus
 from robot_server.service.json_api import (
     RequestModel,
-    ResponseModel,
-    ResponseDataModel,
-    MultiResponseModel,
+    DeprecatedResponseModel,
+    DeprecatedResponseDataModel,
+    DeprecatedMultiResponseModel,
 )
 from robot_server.service.session.models.common import EmptyModel
-from robot_server.service.session.session_types.protocol.models import (
-    ProtocolCreateParams,
-    ProtocolSessionDetails,
-)
 
 
 class SessionType(str, Enum):
@@ -45,7 +41,6 @@ A Union of all the create param types.
 """
 SessionCreateParamType = typing.Union[
     SessionCreateParams,
-    ProtocolCreateParams,
     BaseModel,
     None,
 ]
@@ -58,7 +53,6 @@ SessionDetails = typing.Union[
     PipetteOffsetCalibrationSessionStatus,
     TipCalibrationSessionStatus,
     DeckCalibrationSessionStatus,
-    ProtocolSessionDetails,
     EmptyModel,
 ]
 
@@ -106,20 +100,13 @@ class PipetteOffsetCalibrationCreateAttributes(SessionCreateAttributes):
     createParams: SessionCreateParams
 
 
-class ProtocolCreateAttributes(SessionCreateAttributes):
-    """Protocol session create request."""
-
-    sessionType: Literal[SessionType.protocol] = SessionType.protocol
-    createParams: ProtocolCreateParams
-
-
 class LiveProtocolCreateAttributes(SessionCreateAttributesNoParams):
     """Live protocol session create request."""
 
     sessionType: Literal[SessionType.live_protocol] = SessionType.live_protocol
 
 
-class SessionResponseAttributes(ResponseDataModel):
+class SessionResponseAttributes(DeprecatedResponseDataModel):
     """Common session response attributes."""
 
     createdAt: datetime = Field(
@@ -160,12 +147,6 @@ class PipetteOffsetCalibrationResponseAttributes(
     details: PipetteOffsetCalibrationSessionStatus
 
 
-class ProtocolResponseAttributes(ProtocolCreateAttributes, SessionResponseAttributes):
-    """Response attributes of protocol session."""
-
-    details: ProtocolSessionDetails
-
-
 class LiveProtocolResponseAttributes(
     LiveProtocolCreateAttributes, SessionResponseAttributes
 ):
@@ -179,7 +160,6 @@ RequestTypes = typing.Union[
     TipLengthCalibrationCreateAttributes,
     DeckCalibrationCreateAttributes,
     PipetteOffsetCalibrationCreateAttributes,
-    ProtocolCreateAttributes,
     LiveProtocolCreateAttributes,
 ]
 
@@ -189,12 +169,11 @@ ResponseTypes = typing.Union[
     TipLengthCalibrationResponseAttributes,
     DeckCalibrationResponseAttributes,
     PipetteOffsetCalibrationResponseAttributes,
-    ProtocolResponseAttributes,
     LiveProtocolResponseAttributes,
 ]
 
 
 # Session create and query requests/responses
 SessionCreateRequest = RequestModel[RequestTypes]
-SessionResponse = ResponseModel[ResponseTypes]
-MultiSessionResponse = MultiResponseModel[ResponseTypes]
+SessionResponse = DeprecatedResponseModel[ResponseTypes]
+MultiSessionResponse = DeprecatedMultiResponseModel[ResponseTypes]

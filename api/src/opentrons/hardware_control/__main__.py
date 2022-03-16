@@ -11,33 +11,35 @@ _should_ only be run on an OT-2.
 import argparse
 import asyncio
 import logging
+from typing import Optional, Dict, Any
 
 from . import API
 from opentrons.config import robot_configs as rc
 from opentrons.config.types import RobotConfig
 
-LOG = logging.getLogger('opentrons.hardware_control.__main__')
+LOG = logging.getLogger("opentrons.hardware_control.__main__")
 
 
-def exception_handler(loop, context):
-    message = ''
-    if 'exception' in context:
+def exception_handler(loop: asyncio.AbstractEventLoop, context: Dict[str, Any]) -> None:
+    message = ""
+    if "exception" in context:
         message += f'exception: {repr(context["exception"])}'
-    if 'future' in context:
+    if "future" in context:
         message += f' while running future {repr(context["future"])}'
-    if 'protocol' in context:
+    if "protocol" in context:
         message += f' from protocol {repr(context["protocol"])}'
-    if 'transport' in context:
+    if "transport" in context:
         message += f' from transport {repr(context["transport"])}'
-    if 'socket' in context:
+    if "socket" in context:
         message += f' from socket {repr(context["socket"])}'
     LOG.error(f"Unhandled exception in event loop: {message}")
     loop.default_exception_handler(context)
 
 
-async def arun(config: RobotConfig = None,
-               port: str = None):
-    """ Asynchronous entrypoint for the server
+async def arun(
+    config: Optional[RobotConfig] = None, port: Optional[str] = None
+) -> None:
+    """Asynchronous entrypoint for the server
 
     :param config: Optional config override
     :param port: Optional smoothie port override
@@ -46,9 +48,8 @@ async def arun(config: RobotConfig = None,
     hc = await API.build_hardware_controller(rconf, port)  # noqa: F841
 
 
-def run(config: RobotConfig = None,
-        port: str = None):
-    """ Synchronous entrypoint for the server.
+def run(config: Optional[RobotConfig] = None, port: Optional[str] = None) -> None:
+    """Synchronous entrypoint for the server.
 
     Mostly builds a loop and calls arun.
 
@@ -61,12 +62,13 @@ def run(config: RobotConfig = None,
     loop.run_forever()
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(
-        description='Opentrons hardware control server')
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Opentrons hardware control server")
     parser.add_argument(
-        '-s', '--smoothie-port',
-        help='Port on which to talk to smoothie, autodetected by default',
-        default=None)
+        "-s",
+        "--smoothie-port",
+        help="Port on which to talk to smoothie, autodetected by default",
+        default=None,
+    )
     args = parser.parse_args()
     run(port=args.port)

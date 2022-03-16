@@ -8,31 +8,21 @@ from opentrons.protocols.api_support.well_grid import WellGrid
 
 @pytest.fixture()
 def names_96_well() -> List[str]:
-    names = (
-        (
-            f'{c}{r}' for c in (chr(65 + i) for i in range(8))
-        ) for r in range(1, 13)
-    )
+    names = ((f"{c}{r}" for c in (chr(65 + i) for i in range(8))) for r in range(1, 13))
     return [name for column in names for name in column]
 
 
 @pytest.fixture()
 def wells(names_96_well) -> List[WellImplementation]:
     return [
-        WellImplementation(
-            well_geometry=None,
-            display_name=n,
-            has_tip=True,
-            name=n
-        ) for n in names_96_well
+        WellImplementation(well_geometry=None, display_name=n, has_tip=True, name=n)
+        for n in names_96_well
     ]
 
 
 @pytest.fixture()
 def well_grid(names_96_well, wells) -> WellGrid:
-    return WellGrid(
-        wells
-    )
+    return WellGrid(wells)
 
 
 @pytest.fixture

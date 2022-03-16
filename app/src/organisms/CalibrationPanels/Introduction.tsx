@@ -590,7 +590,7 @@ function RequiredLabwareCard(props: RequiredLabwareCardProps): JSX.Element {
   const imageSrc =
     loadName in labwareImages
       ? labwareImages[loadName as keyof typeof labwareImages]
-      : labwareImages['generic_custom_tiprack']
+      : labwareImages.generic_custom_tiprack
 
   return (
     <Flex

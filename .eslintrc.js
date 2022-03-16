@@ -21,10 +21,9 @@ module.exports = {
     'no-extra-boolean-cast': 'off',
     'import/no-default-export': 'error',
     '@typescript-eslint/promise-function-async': 'off',
+    '@typescript-eslint/default-param-last': 'off',
 
     // TODO(mc, 2021-01-29): fix these and remove warning overrides
-    '@typescript-eslint/default-param-last': 'warn',
-    'dot-notation': 'warn',
     'lines-between-class-members': 'warn',
     'array-callback-return': 'warn',
     'no-prototype-builtins': 'warn',
@@ -44,7 +43,7 @@ module.exports = {
 
   settings: {
     react: {
-      version: '16.8',
+      version: '17.0.1',
     },
   },
 
@@ -52,13 +51,11 @@ module.exports = {
     {
       files: ['**/*.js'],
       parser: '@babel/eslint-parser',
-      extends: ['prettier'],
     },
     {
       // TODO(mc, 2021-03-18): remove to default these rules back to errors
       files: ['**/*.@(ts|tsx)'],
       rules: {
-        '@typescript-eslint/dot-notation': 'warn',
         '@typescript-eslint/strict-boolean-expressions': 'warn',
         '@typescript-eslint/prefer-nullish-coalescing': 'warn',
         '@typescript-eslint/prefer-optional-chain': 'warn',
@@ -96,7 +93,6 @@ module.exports = {
         'jest/no-deprecated-functions': 'warn',
         'jest/valid-title': 'warn',
         'jest/no-conditional-expect': 'warn',
-        'jest/no-done-callback': 'warn',
       },
     },
     {

@@ -1,5 +1,5 @@
 import logging
-from typing import List, Optional, Tuple, Awaitable, Callable, Dict, Any, TYPE_CHECKING
+from typing import List, Optional, Tuple, Awaitable, Callable, Dict, Any, cast
 from typing_extensions import Literal
 
 from opentrons.calibration_storage import get, helpers, modify, types as cal_types
@@ -10,7 +10,7 @@ from opentrons.calibration_storage.types import (
 )
 from opentrons.types import Mount, Point, Location
 from opentrons.hardware_control import (
-    ThreadManager,
+    HardwareControlAPI,
     CriticalPoint,
     Pipette,
     robot_calibration,
@@ -18,12 +18,11 @@ from opentrons.hardware_control import (
 )
 from opentrons.protocol_api import labware
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
-from opentrons.config import feature_flags as ff
 from opentrons.protocols.geometry.deck import Deck
 
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
+
 from robot_server.robot.calibration.constants import (
-    SHORT_TRASH_DECK,
-    STANDARD_DECK,
     MOVE_TO_DECK_SAFETY_BUFFER,
     MOVE_TO_TIP_RACK_SAFETY_BUFFER,
     JOG_TO_DECK_SLOT,
@@ -68,9 +67,6 @@ from .constants import (
 )
 from ..errors import CalibrationError
 
-if TYPE_CHECKING:
-    from opentrons_shared_data.labware import LabwareDefinition
-
 MODULE_LOG = logging.getLogger(__name__)
 
 """
@@ -87,9 +83,9 @@ COMMAND_MAP = Dict[str, COMMAND_HANDLER]
 class CheckCalibrationUserFlow:
     def __init__(
         self,
-        hardware: "ThreadManager",
+        hardware: HardwareControlAPI,
         has_calibration_block: bool = False,
-        tip_rack_defs: Optional[List["LabwareDefinition"]] = None,
+        tip_rack_defs: Optional[List[LabwareDefinition]] = None,
     ):
         self._hardware = hardware
         self._state_machine = CalibrationCheckStateMachine()
@@ -105,8 +101,7 @@ class CheckCalibrationUserFlow:
             first=ComparisonStatePerCalibration(),
             second=ComparisonStatePerCalibration(),
         )
-        deck_load_name = SHORT_TRASH_DECK if ff.short_fixed_trash() else STANDARD_DECK
-        self._deck = Deck(load_name=deck_load_name)
+        self._deck = Deck()
         self._filtered_hw_pips = self._filter_hw_pips()
         (
             self._deck_calibration,
@@ -115,7 +110,7 @@ class CheckCalibrationUserFlow:
         ) = self._get_current_calibrations()
         self._check_valid_calibrations()
 
-        self._tip_racks: Optional[List["LabwareDefinition"]] = tip_rack_defs
+        self._tip_racks: Optional[List[LabwareDefinition]] = tip_rack_defs
         self._active_pipette, self._pip_info = self._select_starting_pipette()
 
         self._has_calibration_block = has_calibration_block
@@ -151,7 +146,7 @@ class CheckCalibrationUserFlow:
         return self._deck
 
     @property
-    def hardware(self) -> ThreadManager:
+    def hardware(self) -> HardwareControlAPI:
         return self._hardware
 
     @property
@@ -196,10 +191,10 @@ class CheckCalibrationUserFlow:
         return self._get_hw_pipettes()[0]
 
     @property
-    def supported_commands(self) -> List:
+    def supported_commands(self) -> List[str]:
         return self._supported_commands.supported()
 
-    async def transition(self, tiprackDefinition: Optional[dict] = None):
+    async def transition(self, tiprackDefinition: Optional[LabwareDefinition] = None):
         pass
 
     async def change_active_pipette(self):
@@ -256,7 +251,7 @@ class CheckCalibrationUserFlow:
         return RequiredLabware.from_lw(self.active_tiprack)
 
     def _filter_hw_pips(self):
-        hw_instr = self._hardware._attached_instruments
+        hw_instr = self._hardware.hardware_instruments
         return {m: p for m, p in hw_instr.items() if p}
 
     def _select_starting_pipette(self) -> Tuple[PipetteInfo, List[PipetteInfo]]:
@@ -266,7 +261,7 @@ class CheckCalibrationUserFlow:
         2: single-channel over multi
         3: right mount over left
         """
-        if not any(self._hardware._attached_instruments.values()):
+        if not any(self._hardware.hardware_instruments.values()):
             raise RobotServerError(
                 definition=CalibrationError.NO_PIPETTE_ATTACHED,
                 flow="Calibration Health Check",
@@ -375,7 +370,10 @@ class CheckCalibrationUserFlow:
                 flow="Calibration Health Check",
             )
 
-    async def get_current_point(self, critical_point: CriticalPoint = None) -> Point:
+    async def get_current_point(
+        self,
+        critical_point: Optional[CriticalPoint] = None,
+    ) -> Point:
         return await self._hardware.gantry_position(self.mount, critical_point)
 
     def _get_pipette_by_rank(self, rank: PipetteRank) -> Optional[PipetteInfo]:
@@ -387,7 +385,7 @@ class CheckCalibrationUserFlow:
     def _is_checking_both_mounts(self):
         return len(self._pip_info) == 2
 
-    def _get_volume_from_tiprack_def(self, tip_rack_def: "LabwareDefinition") -> float:
+    def _get_volume_from_tiprack_def(self, tip_rack_def: LabwareDefinition) -> float:
         first_well = tip_rack_def["wells"]["A1"]
         return float(first_well["totalLiquidVolume"])
 
@@ -399,7 +397,9 @@ class CheckCalibrationUserFlow:
             )
 
     def _get_stored_pipette_offset_cal(
-        self, pipette: Pipette = None, mount: Mount = None
+        self,
+        pipette: Optional[Pipette] = None,
+        mount: Optional[Mount] = None,
     ) -> PipetteOffsetByPipetteMount:
         if not pipette or not mount:
             pip_offset = get.get_pipette_offset(
@@ -414,7 +414,7 @@ class CheckCalibrationUserFlow:
 
     @staticmethod
     def _get_tr_lw(
-        tip_rack_def: Optional["LabwareDefinition"],
+        tip_rack_def: Optional[LabwareDefinition],
         existing_calibration: PipetteOffsetByPipetteMount,
         volume: float,
         position: Location,
@@ -487,15 +487,18 @@ class CheckCalibrationUserFlow:
     def _get_hw_pipettes(self) -> List[Pipette]:
         # Return a list of instruments, ordered with the active pipette first
         active_mount = self.active_pipette.mount
-        hw_instruments = self._hardware._attached_instruments
+        hw_instruments = self._hardware.hardware_instruments
         if active_mount == Mount.RIGHT:
             other_mount = Mount.LEFT
         else:
             other_mount = Mount.RIGHT
         if self._is_checking_both_mounts():
-            return [hw_instruments[active_mount], hw_instruments[other_mount]]
+            return [
+                cast(Pipette, hw_instruments[active_mount]),
+                cast(Pipette, hw_instruments[other_mount]),
+            ]
         else:
-            return [hw_instruments[active_mount]]
+            return [cast(Pipette, hw_instruments[active_mount])]
 
     def _get_ordered_info_pipettes(self) -> List[PipetteInfo]:
         active_rank = self.active_pipette.rank
@@ -555,7 +558,9 @@ class CheckCalibrationUserFlow:
             rank=self.active_pipette.rank.value,
             mount=str(self.mount),
             serial=self.hw_pipette.pipette_id,  # type: ignore[arg-type]
-            defaultTipracks=self.active_pipette.default_tipracks,  # type: ignore[arg-type]  # noqa: E501
+            defaultTipracks=(
+                self.active_pipette.default_tipracks  # type: ignore[arg-type]
+            ),
         )
 
     def _determine_threshold(self) -> Point:
@@ -749,7 +754,7 @@ class CheckCalibrationUserFlow:
 
             info = ComparisonStatus(
                 differenceVector=(jogged_pt - ref_pt),
-                thresholdVector=threshold_vector,
+                thresholdVector=list(threshold_vector),
                 exceedsThreshold=exceeds,
             )
             intermediate_map = self._update_compare_status_by_state(rank, info, status)
@@ -862,12 +867,12 @@ class CheckCalibrationUserFlow:
         return loc.move(point=Point(0, 0, self._z_height_reference))
 
     async def move_to_reference_point(self):
+        cal_block_target_well: Optional[labware.Well] = None
         if self._has_calibration_block:
             cb_setup = CAL_BLOCK_SETUP_CAL_CHECK
             calblock: labware.Labware = self._deck[cb_setup.slot]  # type: ignore
             cal_block_target_well = calblock.wells_by_name()[cb_setup.well]
-        else:
-            cal_block_target_well = None
+
         ref_loc = uf.get_reference_location(
             deck=self._deck, cal_block_target_well=cal_block_target_well
         )

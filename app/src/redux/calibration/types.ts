@@ -5,12 +5,10 @@ import type {
 
 import type {
   CalibrationStatus,
-  AllLabwareCalibrations,
   AllPipetteOffsetCalibrations,
   AllTipLengthCalibrations,
 } from './api-types'
 
-import type { LabwareCalibrationAction } from './labware/types'
 import type { PipetteOffsetCalibrationsAction } from './pipette-offset/types'
 import type { TipLengthCalibrationsAction } from './tip-length/types'
 
@@ -21,7 +19,6 @@ import {
 } from './constants'
 
 export * from './api-types'
-export * from './labware/types'
 export * from './pipette-offset/types'
 export * from './tip-length/types'
 
@@ -50,13 +47,11 @@ export type CalibrationAction =
   | FetchCalibrationStatusAction
   | FetchCalibrationStatusSuccessAction
   | FetchCalibrationStatusFailureAction
-  | LabwareCalibrationAction
   | PipetteOffsetCalibrationsAction
   | TipLengthCalibrationsAction
 
 export type PerRobotCalibrationState = Readonly<{
   calibrationStatus: CalibrationStatus | null
-  labwareCalibrations: AllLabwareCalibrations | null
   pipetteOffsetCalibrations: AllPipetteOffsetCalibrations | null
   tipLengthCalibrations: AllTipLengthCalibrations | null
 }>
@@ -66,3 +61,12 @@ export type CalibrationState = Readonly<
     [robotName: string]: PerRobotCalibrationState
   }>
 >
+
+export interface ProtocolCalibrationStatus {
+  complete: boolean
+  reason?:
+    | 'calibrate_deck_failure_reason'
+    | 'calibrate_tiprack_failure_reason'
+    | 'calibrate_pipette_failure_reason'
+    | 'attach_pipette_failure_reason'
+}

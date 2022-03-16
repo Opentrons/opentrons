@@ -35,6 +35,26 @@ stages:
               totalCycleCount: Null
               currentStepIndex: Null
               totalStepCount: Null
+          - name: heatershaker
+            displayName: heatershaker
+            moduleModel: heaterShakerModuleV1
+            port: !anystr
+            usbPort: !anydict
+            serial: !anystr
+            model: !anystr
+            revision: !anystr
+            fwVersion: !anystr
+            hasAvailableUpdate: !anybool
+            status: !anystr
+            data:
+              labwareLatchStatus: !anystr
+              speedStatus: !anystr
+              temperatureStatus: !anystr
+              currentSpeed: !anyint
+              currentTemp: !anyfloat
+              targetSpeed: Null
+              targetTemp: Null
+              errorDetails: Null
           - name: tempdeck
             displayName: tempdeck
             moduleModel: temperatureModuleV1

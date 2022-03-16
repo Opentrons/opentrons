@@ -3,6 +3,410 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.2](https://github.com/Opentrons/opentrons/compare/v5.0.1...v5.0.2) (2022-03-03)
+
+
+### Bug Fixes
+
+* **api:** lowercase filename before checking extension in ProtocolReader ([#9609](https://github.com/Opentrons/opentrons/issues/9609)) ([474c448](https://github.com/Opentrons/opentrons/commit/474c44860ac8b29c621b3a704e826688aa57ca59))
+* **api, app:** display labware label ([#9587](https://github.com/Opentrons/opentrons/issues/9587)) ([7680d92](https://github.com/Opentrons/opentrons/commit/7680d92d4a966d641e8da558514a153e06946bce)), closes [#9105](https://github.com/Opentrons/opentrons/issues/9105) [#9088](https://github.com/Opentrons/opentrons/issues/9088)
+* **app:** do not pass `directionControlButtonColor` into DOM ([#9615](https://github.com/Opentrons/opentrons/issues/9615)) ([0651d91](https://github.com/Opentrons/opentrons/commit/0651d914685f21ef9ca0f11e0339b147df745090))
+* **app:** show labware def display name in lpc summary screen, fix nested lw render condition ([#9614](https://github.com/Opentrons/opentrons/issues/9614)) ([fa33c33](https://github.com/Opentrons/opentrons/commit/fa33c33cd586b2694ec6f87642d5019b4cf49c51))
+* **app:** surface run record creation errors to users on upload page ([#9597](https://github.com/Opentrons/opentrons/issues/9597)) ([983306c](https://github.com/Opentrons/opentrons/commit/983306c70893fb19f593c9732b566e7b6cfe7a21))
+* send custom labware definitions to the server during LPC setup ([#9588](https://github.com/Opentrons/opentrons/issues/9588)) ([7cf3233](https://github.com/Opentrons/opentrons/commit/7cf323370aefb952b0640d04738c64a0f4a2e5c9))
+
+
+
+
+
+## [5.0.1](https://github.com/Opentrons/opentrons/compare/v5.0.0...v5.0.1) (2022-02-24)
+
+
+### Bug Fixes
+
+* **app:** add error boundary to LPC component ([#9508](https://github.com/Opentrons/opentrons/issues/9508)) ([6634454](https://github.com/Opentrons/opentrons/commit/66344543053709886a1f5213dff4dea3c9ddbba9))
+* **app:** make sure pipette is being used during LPC flow ([#9501](https://github.com/Opentrons/opentrons/issues/9501)) ([459be85](https://github.com/Opentrons/opentrons/commit/459be854c3e34dc19abf7aa8d79cef3e542be2b3))
+
+
+
+
+
+# [5.0.0](https://github.com/Opentrons/opentrons/compare/v4.7.0...v5.0.0) (2022-02-16)
+
+
+### Bug Fixes
+
+* **api:**  Fix simulator home and is_homed ([#9279](https://github.com/Opentrons/opentrons/issues/9279)) ([e5db3b7](https://github.com/Opentrons/opentrons/commit/e5db3b7447fbb8624d63345bab661463c936d1a4)), closes [#8969](https://github.com/Opentrons/opentrons/issues/8969)
+* **api:** add missing f-string to thermocycler profile command text ([#9407](https://github.com/Opentrons/opentrons/issues/9407)) ([5a37197](https://github.com/Opentrons/opentrons/commit/5a37197a3ab44072067fe57f85d20a88ddd0daf5)), closes [#9380](https://github.com/Opentrons/opentrons/issues/9380)
+* **api:** check home status in move_rel ([#8724](https://github.com/Opentrons/opentrons/issues/8724)) ([7347847](https://github.com/Opentrons/opentrons/commit/734784718188f10e4b36ac0a0b043a4b3ca8b3b8))
+* **api:** check pipette names in simulator ([#9181](https://github.com/Opentrons/opentrons/issues/9181)) ([a81ebd9](https://github.com/Opentrons/opentrons/commit/a81ebd96cf3079bb518a2cb89ee6763149177a5c))
+* **api:** don't show exception on module server disconnect. ([#8778](https://github.com/Opentrons/opentrons/issues/8778)) ([1bfaabe](https://github.com/Opentrons/opentrons/commit/1bfaabe233afe4d370313417a3423aa540a2a685))
+* **api:** filter higher order commands out of legacy command response ([#9294](https://github.com/Opentrons/opentrons/issues/9294)) ([21e5bf5](https://github.com/Opentrons/opentrons/commit/21e5bf590f5523f90adff5ad447baa9c2db7bf6c)), closes [#9102](https://github.com/Opentrons/opentrons/issues/9102)
+* **api:** Prioritize mc alarms over errors ([#9230](https://github.com/Opentrons/opentrons/issues/9230)) ([c44fed3](https://github.com/Opentrons/opentrons/commit/c44fed3aae222e7712937d77f9a2720fb9be1651))
+* **api:** set serial timeouts for transactions ([#9190](https://github.com/Opentrons/opentrons/issues/9190)) ([03e3c55](https://github.com/Opentrons/opentrons/commit/03e3c559b134502bc411e8d97c5b33e16c6d9b2a))
+* **app:** add fileName to title bar if protocolName is undefined ([#9307](https://github.com/Opentrons/opentrons/issues/9307)) ([18cc3ac](https://github.com/Opentrons/opentrons/commit/18cc3acd78924f84e23384599133547ec6732d71)), closes [#9163](https://github.com/Opentrons/opentrons/issues/9163)
+* **app:** add missing URL to RerunningProtocolModal ([#8806](https://github.com/Opentrons/opentrons/issues/8806)) ([ce4c2c9](https://github.com/Opentrons/opentrons/commit/ce4c2c985a8e821963b7feaa077d4497ac8b074e)), closes [#8801](https://github.com/Opentrons/opentrons/issues/8801)
+* **app:** add null protection for empty file array on protocol upload ([#8809](https://github.com/Opentrons/opentrons/issues/8809)) ([24cc5af](https://github.com/Opentrons/opentrons/commit/24cc5afa3f7839b4da15d0a133133a61ffc188c1))
+* **app:** adjust deck map and module warning sizes ([#9184](https://github.com/Opentrons/opentrons/issues/9184)) ([cb682f1](https://github.com/Opentrons/opentrons/commit/cb682f10dd2dd0891d96798610eba69cf59e9e89)), closes [#9158](https://github.com/Opentrons/opentrons/issues/9158)
+* **app:** app ([#9165](https://github.com/Opentrons/opentrons/issues/9165)) ([b001ae7](https://github.com/Opentrons/opentrons/commit/b001ae79e6bb06f39ed2cd255a4693adfc4c293a)), closes [#9051](https://github.com/Opentrons/opentrons/issues/9051)
+* **app:** block LPC when a protocol does not have a tip rack loaded ([#9145](https://github.com/Opentrons/opentrons/issues/9145)) ([feefc8b](https://github.com/Opentrons/opentrons/commit/feefc8b3dfd0a67bd3a4401c9ac2a12ab43fe080)), closes [#9090](https://github.com/Opentrons/opentrons/issues/9090)
+* **app:** calibrate pipette cta goes to robotName/instruments ([#9310](https://github.com/Opentrons/opentrons/issues/9310)) ([0717d4f](https://github.com/Opentrons/opentrons/commit/0717d4f8724966a187e41d6acc877b653c41fac3)), closes [#9267](https://github.com/Opentrons/opentrons/issues/9267)
+* **app:** close LPC success toast if relaunched ([#9385](https://github.com/Opentrons/opentrons/issues/9385)) ([4999f71](https://github.com/Opentrons/opentrons/commit/4999f71bba06902db08ce2f36c8210500b4e67cb)), closes [#9377](https://github.com/Opentrons/opentrons/issues/9377)
+* **app:** continue to clone run even after receiving a conflict when run is stopped ([#8933](https://github.com/Opentrons/opentrons/issues/8933)) ([6f09043](https://github.com/Opentrons/opentrons/commit/6f0904316ce005dfae592ac521d7eaad17a67617))
+* **app:** copy changes in LPC for consistency ([#9178](https://github.com/Opentrons/opentrons/issues/9178)) ([e7013e2](https://github.com/Opentrons/opentrons/commit/e7013e2fe2e72495920b46acc5deb2e77ce7b269)), closes [#9156](https://github.com/Opentrons/opentrons/issues/9156)
+* **app:** display error and close run if protocol analysis is not-ok ([#9007](https://github.com/Opentrons/opentrons/issues/9007)) ([a4bf3b5](https://github.com/Opentrons/opentrons/commit/a4bf3b5458949cc8abed2f32de0f54b635d28ee1)), closes [#8984](https://github.com/Opentrons/opentrons/issues/8984)
+* **app:** display runtime errors in run detail header ([#9435](https://github.com/Opentrons/opentrons/issues/9435)) ([7e5e1e7](https://github.com/Opentrons/opentrons/commit/7e5e1e77562847e3957d54eec2469d40f1389771))
+* **app:** fix borken tooltip translation for LPC CTA when modules not detected ([#9189](https://github.com/Opentrons/opentrons/issues/9189)) ([fe92615](https://github.com/Opentrons/opentrons/commit/fe92615a941bb17becfef799a70cfcabe327ef41))
+* **app:** fix bug in which runs and protocols were being queried with empty string params ([#8810](https://github.com/Opentrons/opentrons/issues/8810)) ([ee07fec](https://github.com/Opentrons/opentrons/commit/ee07feced5f92f5f3c824f416f8caa1d629ad7f4))
+* **app:** fix loading and disabling of run cta button to avoid infinite spinner ([#9333](https://github.com/Opentrons/opentrons/issues/9333)) ([bce5334](https://github.com/Opentrons/opentrons/commit/bce533450ba6da489f4d4a38aee3a6b3d691fb29))
+* **app:** fix missing null checks in protocol setup ([#9114](https://github.com/Opentrons/opentrons/issues/9114)) ([9fe24a4](https://github.com/Opentrons/opentrons/commit/9fe24a4e56ba23edd417957f92e973958d32b1c3))
+* **app:** fix module status card error on run page ([#8938](https://github.com/Opentrons/opentrons/issues/8938)) ([1f7aca5](https://github.com/Opentrons/opentrons/commit/1f7aca547b893816346512daaeb4968189f6ddce))
+* **app:** fix up labware offset matching logic for labware setup overlays ([#8932](https://github.com/Opentrons/opentrons/issues/8932)) ([91eb5e3](https://github.com/Opentrons/opentrons/commit/91eb5e3c1e62038d3cbb59067903658c62ee2bd3))
+* **app:** fix wifi connection result overlay z index ([#9482](https://github.com/Opentrons/opentrons/issues/9482)) ([a8c0daf](https://github.com/Opentrons/opentrons/commit/a8c0daf676ac2e236cedd41f54c9a62c05097c7c)), closes [#9474](https://github.com/Opentrons/opentrons/issues/9474)
+* **app:** flip run details redirect check for loaded run ([#9023](https://github.com/Opentrons/opentrons/issues/9023)) ([ba5b901](https://github.com/Opentrons/opentrons/commit/ba5b901454c8c8bb5678edd8cc1af52d5a9f48b3))
+* **app:** ignore lpc commands when reconciling run and analysis for run log ([#8940](https://github.com/Opentrons/opentrons/issues/8940)) ([9541236](https://github.com/Opentrons/opentrons/commit/9541236c99bb7c9f903a9023e6e9c7933c9a5f22))
+* **app:** initially expand correct setup step with modules and cal complete ([#9185](https://github.com/Opentrons/opentrons/issues/9185)) ([7e93404](https://github.com/Opentrons/opentrons/commit/7e9340441735d628d8d37f4c8a79675e3f78c2c7)), closes [#9127](https://github.com/Opentrons/opentrons/issues/9127)
+* **app:** Load pipette centering images and fix styling ([#9148](https://github.com/Opentrons/opentrons/issues/9148)) ([3b3092b](https://github.com/Opentrons/opentrons/commit/3b3092b0a512b77e70e7739f1a7a8529132328fe))
+* **app:** prevent run canceled banner from disappearing ([#9179](https://github.com/Opentrons/opentrons/issues/9179)) ([2bf57d9](https://github.com/Opentrons/opentrons/commit/2bf57d9795864c4fab8b5e54db57d34cd2b0d748)), closes [#9108](https://github.com/Opentrons/opentrons/issues/9108)
+* **app:** prevent white screen when restarting and closing protocols ([#9091](https://github.com/Opentrons/opentrons/issues/9091)) ([391f606](https://github.com/Opentrons/opentrons/commit/391f606a740ad19ff3962bd7e9709b321f4d5def)), closes [#9082](https://github.com/Opentrons/opentrons/issues/9082) [#9083](https://github.com/Opentrons/opentrons/issues/9083)
+* **app:** redirect to run page when run is cloned ([#9297](https://github.com/Opentrons/opentrons/issues/9297)) ([df85a2b](https://github.com/Opentrons/opentrons/commit/df85a2bae4fc0da110f7762fd41b7c70159c1539)), closes [#9106](https://github.com/Opentrons/opentrons/issues/9106)
+* **app:** set run again button loading state for completed and stopped runs ([#9229](https://github.com/Opentrons/opentrons/issues/9229)) ([c74b241](https://github.com/Opentrons/opentrons/commit/c74b2417702ca65108d38b8c01774e4678710bf7)), closes [#9161](https://github.com/Opentrons/opentrons/issues/9161)
+* **app:** shore up edge cases of current command tracking, use new commands endpoint link metadata ([#9418](https://github.com/Opentrons/opentrons/issues/9418)) ([3c27050](https://github.com/Opentrons/opentrons/commit/3c270503244ee6250d0fff3f902d9356b79892d3)), closes [#9379](https://github.com/Opentrons/opentrons/issues/9379)
+* **app:** show cancel run when paused ([#8943](https://github.com/Opentrons/opentrons/issues/8943)) ([526892d](https://github.com/Opentrons/opentrons/commit/526892dfd4d1b7f5fe4694344ce82212f8dda512))
+* **app:** show empty protocol upload page if current run is being dimissed ([#8983](https://github.com/Opentrons/opentrons/issues/8983)) ([b50f414](https://github.com/Opentrons/opentrons/commit/b50f4147ab049123ef6f9bc72ffc558772960993)), closes [#8953](https://github.com/Opentrons/opentrons/issues/8953)
+* **app:** show protocol setup loading state after protocol record creation ([#8982](https://github.com/Opentrons/opentrons/issues/8982)) ([be485fe](https://github.com/Opentrons/opentrons/commit/be485fed08bc3ef6abf6bb0048d2822ac55455ae))
+* **app:** show run errors in banner if run fails, hide errors if canceled ([#9464](https://github.com/Opentrons/opentrons/issues/9464)) ([008c116](https://github.com/Opentrons/opentrons/commit/008c1168a8e46ae35cec00505ca16c3cb6d571d5))
+* **app:** titlebar cancel run button behavior and styling ([#9192](https://github.com/Opentrons/opentrons/issues/9192)) ([46c1428](https://github.com/Opentrons/opentrons/commit/46c14284a752d1a76558bf64e8a70e5cad4dcae5))
+* **app:** update labware for drop_tip case to prevent whitescreen ([#9228](https://github.com/Opentrons/opentrons/issues/9228)) ([6402246](https://github.com/Opentrons/opentrons/commit/64022465b2321020b9c87fc0e8fe8b91c2a9703a))
+* **app:** update protocol upload failed banner style ([#9180](https://github.com/Opentrons/opentrons/issues/9180)) ([d9e3cef](https://github.com/Opentrons/opentrons/commit/d9e3cef40965188125263c926634faa7d957c2c9)), closes [#9097](https://github.com/Opentrons/opentrons/issues/9097)
+* **app:** while closing a protocol run, place loading spinner over whole app ([#9353](https://github.com/Opentrons/opentrons/issues/9353)) ([9d0775f](https://github.com/Opentrons/opentrons/commit/9d0775f4e9991cf2d13708cba93eb3b1fc7d91d9))
+* **app, shared-data:** splice out first set of setup commands from run log only ([#9086](https://github.com/Opentrons/opentrons/issues/9086)) ([a86d9f7](https://github.com/Opentrons/opentrons/commit/a86d9f7d1b607aef3436a2ddcaa45042dfaf28b5)), closes [#9011](https://github.com/Opentrons/opentrons/issues/9011)
+* **can:**  binary serializable build will ignore extra bytes. ([#8776](https://github.com/Opentrons/opentrons/issues/8776)) ([a9c644a](https://github.com/Opentrons/opentrons/commit/a9c644ad958ded970521c57e7d1905940a270c18))
+* **engine:** take calibrated tip length into account during tip pickup ([#9246](https://github.com/Opentrons/opentrons/issues/9246)) ([7866767](https://github.com/Opentrons/opentrons/commit/7866767ee6057197edf253f8b31272a734a71afd)), closes [#9220](https://github.com/Opentrons/opentrons/issues/9220)
+* **hardware:** Revert [#8995](https://github.com/Opentrons/opentrons/issues/8995) ([#9014](https://github.com/Opentrons/opentrons/issues/9014)) ([224f4c2](https://github.com/Opentrons/opentrons/commit/224f4c22b1a3a333bd35edc06ae8f2e22272a2c5))
+* **hardware:** use correct payload for execute move group request. ([#8937](https://github.com/Opentrons/opentrons/issues/8937)) ([69928cc](https://github.com/Opentrons/opentrons/commit/69928ccad86208ed3901f0b2eae103ecefab0cb7))
+* **labware-library:** Default opentrons tuberack inserts to brand opentrons ([#8644](https://github.com/Opentrons/opentrons/issues/8644)) ([1f0d8c0](https://github.com/Opentrons/opentrons/commit/1f0d8c0537e4b72d3313e2de5bc5bbbe897574a3)), closes [#8248](https://github.com/Opentrons/opentrons/issues/8248)
+* **protocol-engine:** move HW API cleanup to engine.finish ([#9233](https://github.com/Opentrons/opentrons/issues/9233)) ([1994405](https://github.com/Opentrons/opentrons/commit/19944058762d889a6ab5b22e7a6ccc16f7367dda))
+* **protocol-engine:** Preserve distinction between APIv2 protocols' requested vs. connected modules ([#9364](https://github.com/Opentrons/opentrons/issues/9364)) ([042907b](https://github.com/Opentrons/opentrons/commit/042907b3fa69cf30935dfa381eafa72b2b9f42fe))
+* **robot-server:** add current command metadata to /commands response ([#9400](https://github.com/Opentrons/opentrons/issues/9400)) ([7da0420](https://github.com/Opentrons/opentrons/commit/7da0420bd07810095312e07eb22fb2d31ee29215))
+* Change links to networks ([#9182](https://github.com/Opentrons/opentrons/issues/9182)) ([5fce550](https://github.com/Opentrons/opentrons/commit/5fce5504879121bfe294e0e4d6a09d09b1761c03))
+* Fix poetry errors ([#9176](https://github.com/Opentrons/opentrons/issues/9176)) ([6080065](https://github.com/Opentrons/opentrons/commit/6080065579a94fb99d31d27b19073e153fc53ea3))
+
+
+### Code Refactoring
+
+* **robot-server:** remove deprecated protocols endpoints and FF ([#9261](https://github.com/Opentrons/opentrons/issues/9261)) ([802d858](https://github.com/Opentrons/opentrons/commit/802d8582dbc09566b8de9eca3672254ef271164b))
+* **robot-server:** remove unused experimental /protocols code ([#9296](https://github.com/Opentrons/opentrons/issues/9296)) ([e462d17](https://github.com/Opentrons/opentrons/commit/e462d17dff12ce42a038ad221eb4ec52564e37e5))
+
+
+### Features
+
+* **api:** remove Calibrate to Bottom from Robot Settings ([#9111](https://github.com/Opentrons/opentrons/issues/9111)) ([06a92ee](https://github.com/Opentrons/opentrons/commit/06a92eecd9fba67c596d91e7c0096b5144b32ab6))
+* **api:** Remove legacy LC reset from robot settings ([#9093](https://github.com/Opentrons/opentrons/issues/9093)) ([9b78815](https://github.com/Opentrons/opentrons/commit/9b788154fffc405152f6f5f165a4d646dd47b4b5)), closes [#8283](https://github.com/Opentrons/opentrons/issues/8283)
+* **app:** add Comment text above comment commands in run details ([#9054](https://github.com/Opentrons/opentrons/issues/9054)) ([8c5d71f](https://github.com/Opentrons/opentrons/commit/8c5d71f2eb3c8262c556748424e1c390c06f4668)), closes [#9040](https://github.com/Opentrons/opentrons/issues/9040)
+* **app:** add feedback link to protocol upload page ([#8854](https://github.com/Opentrons/opentrons/issues/8854)) ([03a61aa](https://github.com/Opentrons/opentrons/commit/03a61aaddb0b44d2fadc1ba3f26a4eb9242b1ce0)), closes [#8727](https://github.com/Opentrons/opentrons/issues/8727)
+* **app:** add jupyter advanced setting to download offset data ([#9284](https://github.com/Opentrons/opentrons/issues/9284)) ([a15601b](https://github.com/Opentrons/opentrons/commit/a15601bd95bc775a9f203c02ee5681c1d67b4932))
+* **app:** add Labware Offset Link in LPC ([#8967](https://github.com/Opentrons/opentrons/issues/8967)) ([ba6a9a1](https://github.com/Opentrons/opentrons/commit/ba6a9a14443cf543ecbae063eda285a191b6fee5)), closes [#8963](https://github.com/Opentrons/opentrons/issues/8963)
+* **app:** add loader to LPC summary screen ([#9006](https://github.com/Opentrons/opentrons/issues/9006)) ([e9c1312](https://github.com/Opentrons/opentrons/commit/e9c13124f5e7d1950228547566ff63f0d9c6a180)), closes [#9001](https://github.com/Opentrons/opentrons/issues/9001)
+* **app:** add loading text to LPC hook ([#8700](https://github.com/Opentrons/opentrons/issues/8700)) ([0372a76](https://github.com/Opentrons/opentrons/commit/0372a7645fe5cc51a7869f2e675f46e2d946b2f0)), closes [#8679](https://github.com/Opentrons/opentrons/issues/8679)
+* **app:** add LPC Success Toast ([#8830](https://github.com/Opentrons/opentrons/issues/8830)) ([276afb1](https://github.com/Opentrons/opentrons/commit/276afb1525b95de3d39eacfc3eaeba18aa9cd726)), closes [#8486](https://github.com/Opentrons/opentrons/issues/8486)
+* **app:** add module mismatch warning label to Module Setup ([#9250](https://github.com/Opentrons/opentrons/issues/9250)) ([af472e6](https://github.com/Opentrons/opentrons/commit/af472e6910c4726c876b025d23fe0c720c36e95a)), closes [#9160](https://github.com/Opentrons/opentrons/issues/9160)
+* **app:** add tooltips if module connection or robot calibration is incomplete ([#9110](https://github.com/Opentrons/opentrons/issues/9110)) ([8e2a5a4](https://github.com/Opentrons/opentrons/commit/8e2a5a4bd024da47f066ad15fcd5e3e6bc2193f6)), closes [#9094](https://github.com/Opentrons/opentrons/issues/9094)
+* **app:** add X icon to close out of exta attention warning labels ([#9258](https://github.com/Opentrons/opentrons/issues/9258)) ([9406ff6](https://github.com/Opentrons/opentrons/commit/9406ff6937173aafd86403335293d049b197decc)), closes [#8487](https://github.com/Opentrons/opentrons/issues/8487)
+* **app:** added thermocycler error state status ([#8643](https://github.com/Opentrons/opentrons/issues/8643)) ([02544ae](https://github.com/Opentrons/opentrons/commit/02544ae2502335658e36e903450809416ee2e68b))
+* **app:** apply in flight offsets to pick up tip and drop tip commands ([#8812](https://github.com/Opentrons/opentrons/issues/8812)) ([71b279d](https://github.com/Opentrons/opentrons/commit/71b279d38aa8f9549bbc0cdbbca757f17932f4ff))
+* **app:** apply labware offsets to run record after LPC completes ([#8900](https://github.com/Opentrons/opentrons/issues/8900)) ([a961730](https://github.com/Opentrons/opentrons/commit/a961730ed9f21fbf0f8f226d7be9a5be3f432ab4))
+* **app:** clear previous labware offsets on LPC start ([#8895](https://github.com/Opentrons/opentrons/issues/8895)) ([be31e2f](https://github.com/Opentrons/opentrons/commit/be31e2ff0553774a687296930c53e87058fa9f6f))
+* **app:** confirm pick up tip button style ([#8968](https://github.com/Opentrons/opentrons/issues/8968)) ([b61ef1d](https://github.com/Opentrons/opentrons/commit/b61ef1d0822496dfb052a34c39df342e87899110)), closes [#8961](https://github.com/Opentrons/opentrons/issues/8961)
+* **app:** delete v6 adapter pick up tip shim ([#8742](https://github.com/Opentrons/opentrons/issues/8742)) ([38d87eb](https://github.com/Opentrons/opentrons/commit/38d87ebbeb220b1cf99880acd7e1a2fa94b8a8a1))
+* **app:** disable start run until robot is ready ([#8924](https://github.com/Opentrons/opentrons/issues/8924)) ([79f0f0a](https://github.com/Opentrons/opentrons/commit/79f0f0a22011fb8c5178773191f349eb6fd57d96)), closes [#8915](https://github.com/Opentrons/opentrons/issues/8915)
+* **app:** Display banners when stopped, failed, or succeeded ([#8800](https://github.com/Opentrons/opentrons/issues/8800)) ([700f5a2](https://github.com/Opentrons/opentrons/commit/700f5a22669b89154b26c5d715225c65ea229820)), closes [#8573](https://github.com/Opentrons/opentrons/issues/8573)
+* **app:** explain no TLC data if pipette not attached ([#8848](https://github.com/Opentrons/opentrons/issues/8848)) ([2d11fc5](https://github.com/Opentrons/opentrons/commit/2d11fc50507c4ca6be868771e281171d1de28e52)), closes [#8585](https://github.com/Opentrons/opentrons/issues/8585)
+* **app:** LPC add pick up tip confirmation  ([#8849](https://github.com/Opentrons/opentrons/issues/8849)) ([f560f3b](https://github.com/Opentrons/opentrons/commit/f560f3babca84d2464050f57c947606fb25832c6))
+* **app:** LPC robot is moving modal ([#8657](https://github.com/Opentrons/opentrons/issues/8657)) ([8d7d47d](https://github.com/Opentrons/opentrons/commit/8d7d47d3d2e7d7f9bc289ef4aa46a7172288625b)), closes [#8216](https://github.com/Opentrons/opentrons/issues/8216)
+* **app:** LPC: warn about offset destruction ([#8840](https://github.com/Opentrons/opentrons/issues/8840)) ([dd0e0d4](https://github.com/Opentrons/opentrons/commit/dd0e0d4e8d45d8b2576f77e80a288b5c70fc41e7)), closes [#8684](https://github.com/Opentrons/opentrons/issues/8684)
+* **app:** pass through python file and run tab disabled reason hook up to run presence ([#8729](https://github.com/Opentrons/opentrons/issues/8729)) ([9f827e2](https://github.com/Opentrons/opentrons/commit/9f827e2a110e86fdedf6e38c9da7901230d748ce))
+* **app:** place LPC success modal above metadata card ([#8917](https://github.com/Opentrons/opentrons/issues/8917)) ([8dfbf0c](https://github.com/Opentrons/opentrons/commit/8dfbf0cc7d00ede53652680a26f10b80ce72c5e1))
+* **app:** PUR MoaM support ([#8838](https://github.com/Opentrons/opentrons/issues/8838)) ([3ed5be7](https://github.com/Opentrons/opentrons/commit/3ed5be7af0762a669ad1b92c1b1cf07d5200574d)), closes [#8713](https://github.com/Opentrons/opentrons/issues/8713)
+* **app:** Run Details Command List ([#8682](https://github.com/Opentrons/opentrons/issues/8682)) ([9ddf133](https://github.com/Opentrons/opentrons/commit/9ddf133f724389444b1ab269238e6aeb862768fe)), closes [#8368](https://github.com/Opentrons/opentrons/issues/8368) [#8481](https://github.com/Opentrons/opentrons/issues/8481)
+* **app:** save position right after executing movement command ([#8923](https://github.com/Opentrons/opentrons/issues/8923)) ([ee709ef](https://github.com/Opentrons/opentrons/commit/ee709ef1524dd137f1a7198a3bfa231c01f6b804))
+* **app:** show correct number of offsets in rerun protocol section ([#8934](https://github.com/Opentrons/opentrons/issues/8934)) ([f38e78e](https://github.com/Opentrons/opentrons/commit/f38e78ede79d430d50e63fdc0006c15b774f16d0))
+* **app:** show loader when setup for runs steps are still loading ([#8857](https://github.com/Opentrons/opentrons/issues/8857)) ([1f3191e](https://github.com/Opentrons/opentrons/commit/1f3191eb3d420a69b88b74cc12f54e763802d467)), closes [#8777](https://github.com/Opentrons/opentrons/issues/8777)
+* **app:** show offset deletion warning if previous offsets exist ([#8919](https://github.com/Opentrons/opentrons/issues/8919)) ([98f9696](https://github.com/Opentrons/opentrons/commit/98f96961a66312fcb633f5ce4d3fcfec1506a3e0)), closes [#8841](https://github.com/Opentrons/opentrons/issues/8841)
+* **app:** use module model when applying labware offsets ([#8992](https://github.com/Opentrons/opentrons/issues/8992)) ([eaea065](https://github.com/Opentrons/opentrons/commit/eaea0656710d8734168cd4ad84b08043783f50c0))
+* **app:** wire up calibration status to protocol details ([#8853](https://github.com/Opentrons/opentrons/issues/8853)) ([1ffeb68](https://github.com/Opentrons/opentrons/commit/1ffeb68fe8b4fc47f606cc79ce2e963298f9739e)), closes [#8846](https://github.com/Opentrons/opentrons/issues/8846)
+* **app:** wire up cancel run ([#8721](https://github.com/Opentrons/opentrons/issues/8721)) ([6450edb](https://github.com/Opentrons/opentrons/commit/6450edb0421f1c2484c292f8583602d8f6fd13b8)), closes [#8543](https://github.com/Opentrons/opentrons/issues/8543)
+* **app:** wire up labware position check ([#8774](https://github.com/Opentrons/opentrons/issues/8774)) ([6b2c3f1](https://github.com/Opentrons/opentrons/commit/6b2c3f1cfcfcc98b200919ad34544a661641c2cb))
+* **app:** wire up labware setup accordion step labware offsets ([#8887](https://github.com/Opentrons/opentrons/issues/8887)) ([8672854](https://github.com/Opentrons/opentrons/commit/8672854b28e5cfbec90f1cd9705ee91998355e63)), closes [#8859](https://github.com/Opentrons/opentrons/issues/8859)
+* **app:** wire up protocol resource + LPC ([#8722](https://github.com/Opentrons/opentrons/issues/8722)) ([c463e0a](https://github.com/Opentrons/opentrons/commit/c463e0a22ebccf410d67c6b18fe3c50b8a4a8d03)), closes [#8553](https://github.com/Opentrons/opentrons/issues/8553)
+* **app, api-client:** add custom labware support ([#9044](https://github.com/Opentrons/opentrons/issues/9044)) ([9cbff27](https://github.com/Opentrons/opentrons/commit/9cbff274e5989ae6434032052a9875606ab249b3)), closes [#9026](https://github.com/Opentrons/opentrons/issues/9026)
+* **can:** create clear all move groups request. ([#8718](https://github.com/Opentrons/opentrons/issues/8718)) ([bd1e56b](https://github.com/Opentrons/opentrons/commit/bd1e56bb70fa5b5347fbd3f2a54ba21c38d0117a))
+* **can:** very basic script to run a move group. ([#8723](https://github.com/Opentrons/opentrons/issues/8723)) ([cc0981e](https://github.com/Opentrons/opentrons/commit/cc0981e6aa57f795a07dfa670e069b16dbe5b196))
+* **components:** add overflow icon ([#9346](https://github.com/Opentrons/opentrons/issues/9346)) ([5845b3f](https://github.com/Opentrons/opentrons/commit/5845b3f71dde54759fa66e0b27c2ff367f10be9d))
+* **engine:** allow compatible module loads and reloads ([#9273](https://github.com/Opentrons/opentrons/issues/9273)) ([1c7e00d](https://github.com/Opentrons/opentrons/commit/1c7e00d8da77273eca1a8d0bb5e7bed544e3c168))
+* **hardware:** add messages to read and write to motor driver registers ([#8855](https://github.com/Opentrons/opentrons/issues/8855)) ([3142446](https://github.com/Opentrons/opentrons/commit/3142446d3246545a7fbab2b0af23ce66035bb987))
+* **hardware:** add move manager ([#9022](https://github.com/Opentrons/opentrons/issues/9022)) ([93cc6fb](https://github.com/Opentrons/opentrons/commit/93cc6fb66627427abbe64bc77784da5995721ef6))
+* **hardware:** CAN over plain old socket ([#9005](https://github.com/Opentrons/opentrons/issues/9005)) ([0ecc6bf](https://github.com/Opentrons/opentrons/commit/0ecc6bfe22d011a197b4de28fc71cb677a320396))
+* **hardware:** ot3 push for hardware package. ([#8726](https://github.com/Opentrons/opentrons/issues/8726)) ([b0175bd](https://github.com/Opentrons/opentrons/commit/b0175bdb2a2d7d451447e8cf5bf0780c1189ba7d))
+* **labware-library:** Add 4 new labware definitions to shared-data/library ([#9218](https://github.com/Opentrons/opentrons/issues/9218)) ([a7a51b2](https://github.com/Opentrons/opentrons/commit/a7a51b273b1450943221a64f140a30ec1eb0c042)), closes [#8649](https://github.com/Opentrons/opentrons/issues/8649)
+* **ot3:** create over the wire format from hex file ([#9266](https://github.com/Opentrons/opentrons/issues/9266)) ([b43ee0d](https://github.com/Opentrons/opentrons/commit/b43ee0dfee0823c3c14d69f4ef61762921050031))
+* **ot3:** introduce independent head l and r motion. ([#8966](https://github.com/Opentrons/opentrons/issues/8966)) ([30cb899](https://github.com/Opentrons/opentrons/commit/30cb899fe1769b996fb0ea6f0bae391c6dbec635))
+* **ot3:** ot3 hardware controller move ([#8738](https://github.com/Opentrons/opentrons/issues/8738)) ([883db3a](https://github.com/Opentrons/opentrons/commit/883db3a96ca9c6a48bd4ccee16e221fe03154361)), closes [#8946](https://github.com/Opentrons/opentrons/issues/8946)
+* **papi:** add labware.set_offset for jupyter/cli, bump papi to 2.12 ([#9242](https://github.com/Opentrons/opentrons/issues/9242)) ([17d03cd](https://github.com/Opentrons/opentrons/commit/17d03cdfbf1b41be17dd41d6b064f75d2184938a))
+* **protocol-designer:** add feature flag for heater shaker in PD ([#9345](https://github.com/Opentrons/opentrons/issues/9345)) ([d36fac0](https://github.com/Opentrons/opentrons/commit/d36fac0cb0247f09b0e6fa61a10eff4a852fc3e0))
+* **robot-server:** Add the `key` field to command HTTP summaries ([#9257](https://github.com/Opentrons/opentrons/issues/9257)) ([0be9e94](https://github.com/Opentrons/opentrons/commit/0be9e941a3ecc635550fbfef5926623c39876b43))
+* **robot-server:** enable /runs and /protocols endpoints by default ([#8913](https://github.com/Opentrons/opentrons/issues/8913)) ([aa3549f](https://github.com/Opentrons/opentrons/commit/aa3549fad49383243f9ad2ccc291d15e8fd50725)), closes [#8155](https://github.com/Opentrons/opentrons/issues/8155)
+* **robot-server:** Expose robot model in health ([#9072](https://github.com/Opentrons/opentrons/issues/9072)) ([8e052fc](https://github.com/Opentrons/opentrons/commit/8e052fcbb11c7338df4725ac7257c37fc5dd77fb))
+* **robot-server,api,app:** When adding a jog command over HTTP, wait for it to complete before returning ([#9410](https://github.com/Opentrons/opentrons/issues/9410)) ([4d811d5](https://github.com/Opentrons/opentrons/commit/4d811d5485754b45795a275424e0b267edc88270))
+* **shared-data:** add home command to proocol schema ([#8947](https://github.com/Opentrons/opentrons/issues/8947)) ([79e0ab9](https://github.com/Opentrons/opentrons/commit/79e0ab936dff72b221fd428039e110695d801212)), closes [#8892](https://github.com/Opentrons/opentrons/issues/8892)
+
+
+### Performance Improvements
+
+* **api:** bring back the ThreadManager ([#9199](https://github.com/Opentrons/opentrons/issues/9199)) ([ba931f7](https://github.com/Opentrons/opentrons/commit/ba931f750cf67ce68a6dc9e2ae9ac8682ce43d3a))
+* **api:** Do not wait for the event loop to be free when reporting APIv2 commands ([#9238](https://github.com/Opentrons/opentrons/issues/9238)) ([6ab9b10](https://github.com/Opentrons/opentrons/commit/6ab9b10425eec5c63db93abdd3e68a1c33e0a3ac))
+* **app:** memoize command items to reduce rerender on run poll ([#9247](https://github.com/Opentrons/opentrons/issues/9247)) ([411c8db](https://github.com/Opentrons/opentrons/commit/411c8db05ac8b64f9a3d809685b82cbff40e4090))
+* **app:** virtualize command list on run detail page ([#9275](https://github.com/Opentrons/opentrons/issues/9275)) ([028e85f](https://github.com/Opentrons/opentrons/commit/028e85f89a9e12da98824e009e822d2dbb0022ea)), closes [#9217](https://github.com/Opentrons/opentrons/issues/9217)
+* **app, robot-server:** paginate /runs/:run_id/commands response ([#9348](https://github.com/Opentrons/opentrons/issues/9348)) ([b9eb7b4](https://github.com/Opentrons/opentrons/commit/b9eb7b4d98532480705d3c32fd2485508315bea9))
+* **protocol-engine:** avoid iterating all commands for every state update ([#9170](https://github.com/Opentrons/opentrons/issues/9170)) ([b12bffc](https://github.com/Opentrons/opentrons/commit/b12bffcee1edaba848c43b4af8c95a7bba367dde)), closes [#9109](https://github.com/Opentrons/opentrons/issues/9109) [#8739](https://github.com/Opentrons/opentrons/issues/8739)
+* **robot-server:** move large response serialization to worker thread ([#9197](https://github.com/Opentrons/opentrons/issues/9197)) ([21c044d](https://github.com/Opentrons/opentrons/commit/21c044d4010bd1441950150acf4275b0b72a0d52))
+* **robot-server:** Return some HTTP results slightly more efficiently ([#9336](https://github.com/Opentrons/opentrons/issues/9336)) ([0573ba6](https://github.com/Opentrons/opentrons/commit/0573ba62e914f1ab8d0fe7d984890b44ea2fd706))
+* **robot-server:** serialize /protocols, /runs responses with Pydantic ([#9188](https://github.com/Opentrons/opentrons/issues/9188)) ([85b7ebb](https://github.com/Opentrons/opentrons/commit/85b7ebbe6dd728583c4f341803f9d756a5a6c685))
+* **robot-server, api-client:** return run summaries from GET /runs rather than full run models ([#9332](https://github.com/Opentrons/opentrons/issues/9332)) ([66b1d7c](https://github.com/Opentrons/opentrons/commit/66b1d7c0082970c53306eb99006309914ad33b22))
+* **robot-server, app:** remove commands from GET /runs/:run_id ([#9337](https://github.com/Opentrons/opentrons/issues/9337)) ([56f291a](https://github.com/Opentrons/opentrons/commit/56f291a1a4179322d440621e745186269e2dc4ee))
+
+
+### Reverts
+
+* Revert "feat(can): add getMoveStatus request & response (#8688)" (#8710) ([bfbab43](https://github.com/Opentrons/opentrons/commit/bfbab43a4af30c5a8ec75d227e91276cb2039cba)), closes [#8688](https://github.com/Opentrons/opentrons/issues/8688) [#8710](https://github.com/Opentrons/opentrons/issues/8710)
+
+
+### BREAKING CHANGES
+
+* **robot-server:** Removes experimental `protocol` session type
+in favor of v5 `/protocols` and `/runs` endpoints
+* **robot-server:** This removes endpoints used during the 2021 HTTP protocol upload beta.
+Users should transition to the new `/protocols` and `/runs` endpoints, instead.
+* **robot-server:** The RPC WebSocket endpoint has been removed. The /protocols endpoints have been
+heavily reworked.
+
+
+
+
+
+# [4.7.0](https://github.com/opentrons/opentrons/compare/v4.6.2...v4.7.0) (2021-11-18)
+
+
+### Bug Fixes
+
+* **api:** 4.6.x set max speed fails ([#8437](https://github.com/opentrons/opentrons/issues/8437)) ([5989af0](https://github.com/opentrons/opentrons/commit/5989af08e19d78c8cfff65e6bb2bb415ed7e174b)), closes [#8436](https://github.com/opentrons/opentrons/issues/8436)
+* **api:** fix flaky emulator proxy tests ([#8704](https://github.com/opentrons/opentrons/issues/8704)) ([a1d5b04](https://github.com/opentrons/opentrons/commit/a1d5b045b34675f96d2cd5ceb92346992c50f0b0))
+* **api:** Improve metadata parse error messages and fix metadata typechecking ([#8378](https://github.com/opentrons/opentrons/issues/8378)) ([1015b14](https://github.com/opentrons/opentrons/commit/1015b1459cd5da834f88925ce3f6b5eece4018ef)), closes [#8352](https://github.com/opentrons/opentrons/issues/8352)
+* **api:** thermocycler error handling ([#8439](https://github.com/opentrons/opentrons/issues/8439)) ([7dcff2f](https://github.com/opentrons/opentrons/commit/7dcff2f7e0f5427c83738fca14c8d2dde7476740)), closes [#8393](https://github.com/opentrons/opentrons/issues/8393)
+* **can:** show parsed messages in log. ([#8564](https://github.com/opentrons/opentrons/issues/8564)) ([f419193](https://github.com/opentrons/opentrons/commit/f419193ac93ef77f2975308487570297e2f89c0e))
+* **components:** fix deck story in storybook ([#8446](https://github.com/opentrons/opentrons/issues/8446)) ([fe5d6d6](https://github.com/opentrons/opentrons/commit/fe5d6d64ad97f36c2bf80eb154f99323988cd488)), closes [#8445](https://github.com/opentrons/opentrons/issues/8445)
+* **hardware:** add setup.cfg in order to conform to wheel naming standard. ([#8363](https://github.com/opentrons/opentrons/issues/8363)) ([b5a09c3](https://github.com/opentrons/opentrons/commit/b5a09c3bc9f985cd2f5886c23a7a482dace62d5f))
+* **hardware:** fix another issue related to pcan. ([#8428](https://github.com/opentrons/opentrons/issues/8428)) ([5d28e3e](https://github.com/opentrons/opentrons/commit/5d28e3e8d7fa4fafc8b2a624598212fd74f97bdc))
+* **opentrons-hardware:** setup.py in opentrons-hardware ([#8420](https://github.com/opentrons/opentrons/issues/8420)) ([6943bbd](https://github.com/opentrons/opentrons/commit/6943bbde791f06cf6333a00032106057783ed84d))
+* **react-api-client:** add missing protocols export ([#8618](https://github.com/opentrons/opentrons/issues/8618)) ([d15de3d](https://github.com/opentrons/opentrons/commit/d15de3d774f8ebca2418f174a211a4738a3c8823))
+* **robot-server:** avoid LabwareDefinition type in cal models ([#8698](https://github.com/opentrons/opentrons/issues/8698)) ([c3bf7ab](https://github.com/opentrons/opentrons/commit/c3bf7ab51074e8b5e160ce5755be6e80296f1963)), closes [#8654](https://github.com/opentrons/opentrons/issues/8654)
+* **robot-server:** ensure background tasks do not affect requests ([#8362](https://github.com/opentrons/opentrons/issues/8362)) ([3e4bc2f](https://github.com/opentrons/opentrons/commit/3e4bc2f504282c51622682001780f35d5f3e5312))
+* **tests:** robot server edge fix ([#8540](https://github.com/opentrons/opentrons/issues/8540)) ([5906edd](https://github.com/opentrons/opentrons/commit/5906edd0289bf25cbf88ae780c8752dbf4ff9ee5))
+
+
+### Features
+
+* **api:** Add hardware control for heater shaker ([#8435](https://github.com/opentrons/opentrons/issues/8435)) ([1a68d66](https://github.com/opentrons/opentrons/commit/1a68d66e9638206c2a4700ed0348f3137bc13789))
+* **api-client:** add protocol resource to api-client and react-api-client ([#8577](https://github.com/opentrons/opentrons/issues/8577)) ([bcd50e7](https://github.com/opentrons/opentrons/commit/bcd50e79bf94ad5fa2d5d7288a1fbb587752567f)), closes [#8460](https://github.com/opentrons/opentrons/issues/8460)
+* **api,robot-server:** upgrade fastapi and pydantic deps ([#8345](https://github.com/opentrons/opentrons/issues/8345)) ([9cf416a](https://github.com/opentrons/opentrons/commit/9cf416a498e77b2127a6e3e71298f9368f818d35)), closes [#8134](https://github.com/opentrons/opentrons/issues/8134)
+* **app:** Add dependency on react-api-client and wrap app/ in QueryClientProvider ([#8614](https://github.com/opentrons/opentrons/issues/8614)) ([63d4039](https://github.com/opentrons/opentrons/commit/63d4039410da6ac3c45c5b6e7aaf57bcabce0361))
+* **app:** add dynamic section + labware highlighting to LPC intro screen ([#8506](https://github.com/opentrons/opentrons/issues/8506)) ([6da1eca](https://github.com/opentrons/opentrons/commit/6da1ecaf7977341b7b290a1a2efee51175b1ceee)), closes [#8467](https://github.com/opentrons/opentrons/issues/8467)
+* **app:** add Generic Step Screen dynamic image ([#8519](https://github.com/opentrons/opentrons/issues/8519)) ([9f25a91](https://github.com/opentrons/opentrons/commit/9f25a914dedf396c1617e8e8b891c5eeb43b1ca3)), closes [#8510](https://github.com/opentrons/opentrons/issues/8510)
+* **app:** add ids to elements labware setup section ([#8461](https://github.com/opentrons/opentrons/issues/8461)) ([c1e877f](https://github.com/opentrons/opentrons/commit/c1e877f3f2f92fecd0609dcbbae706ece715615c)), closes [#8447](https://github.com/opentrons/opentrons/issues/8447)
+* **app:** add js api client utils and wire up generic step screen ([#8638](https://github.com/opentrons/opentrons/issues/8638)) ([d790a0b](https://github.com/opentrons/opentrons/commit/d790a0bd04e35b78d93526850d90cf4d46db91cc)), closes [#8552](https://github.com/opentrons/opentrons/issues/8552)
+* **app:** Add Labware Detail with Well Row/Column Highlighting ([#8499](https://github.com/opentrons/opentrons/issues/8499)) ([158c0bb](https://github.com/opentrons/opentrons/commit/158c0bbcfa9dc0a0af0acd9e5b24d76853ad913d)), closes [#8380](https://github.com/opentrons/opentrons/issues/8380)
+* **app:** add PE analysis schema v6 adapter ([31fcc98](https://github.com/opentrons/opentrons/commit/31fcc9885c6be2b077f2b865f96fe99e981529c1)), closes [#8661](https://github.com/opentrons/opentrons/issues/8661)
+* **app:** create blank labware position check generic step screen and break out intro screen ([#8433](https://github.com/opentrons/opentrons/issues/8433)) ([be5a764](https://github.com/opentrons/opentrons/commit/be5a764b93807c29d36c74beb39cc00742c7ecf2))
+* **app:** extend DeckMap component in Generic Step Screen ([#8541](https://github.com/opentrons/opentrons/issues/8541)) ([3e15135](https://github.com/opentrons/opentrons/commit/3e15135a66bdf28b3b72c9d9cec1919396f282fe)), closes [#8501](https://github.com/opentrons/opentrons/issues/8501)
+* **app:** extend SectionList component for Generic Step Screen ([#8513](https://github.com/opentrons/opentrons/issues/8513)) ([bb5fab0](https://github.com/opentrons/opentrons/commit/bb5fab030dbab11cf1c6d40bb0441cec1ca0e7fd)), closes [#8500](https://github.com/opentrons/opentrons/issues/8500)
+* **app:** labware position check generic screen dynamic text ([#8451](https://github.com/opentrons/opentrons/issues/8451)) ([7f141dd](https://github.com/opentrons/opentrons/commit/7f141ddadba79b464395abd6c04e85b46ac2811e))
+* **app:** LPC final summary screen scaffolding ([#8575](https://github.com/opentrons/opentrons/issues/8575)) ([d60e9fe](https://github.com/opentrons/opentrons/commit/d60e9fe9cce7205498b5541d119b235363e0f09f)), closes [#8219](https://github.com/opentrons/opentrons/issues/8219)
+* **app:** protocol upload revamp confirm close protocol ([#8383](https://github.com/opentrons/opentrons/issues/8383)) ([511c003](https://github.com/opentrons/opentrons/commit/511c0037cf639a304510982c33d8f651a57c8aeb))
+* **app:** PUR accordion steps copy updates ([#8465](https://github.com/opentrons/opentrons/issues/8465)) ([ee22043](https://github.com/opentrons/opentrons/commit/ee22043a27307a9b23b3170684031c83daf65a83)), closes [#8430](https://github.com/opentrons/opentrons/issues/8430)
+* **app:** reveal jog controls ([#8528](https://github.com/opentrons/opentrons/issues/8528)) ([6750168](https://github.com/opentrons/opentrons/commit/675016811cf3dc95255b42a686cc3aaf2b2b1b06)), closes [#8382](https://github.com/opentrons/opentrons/issues/8382)
+* **app:** rewire connect to robot ([#8567](https://github.com/opentrons/opentrons/issues/8567)) ([913040e](https://github.com/opentrons/opentrons/commit/913040e7fdb06f78ffe7adcb1b09f61a2b5a83f7)), closes [#8552](https://github.com/opentrons/opentrons/issues/8552)
+* **app:** Robot Cal Accordion Step ([#8333](https://github.com/opentrons/opentrons/issues/8333)) ([78e413a](https://github.com/opentrons/opentrons/commit/78e413a47da32004dee32ddf8b05835cd19b9268))
+* **app:** Run Details Individual command styling ([#8612](https://github.com/opentrons/opentrons/issues/8612)) ([bb0715b](https://github.com/opentrons/opentrons/commit/bb0715b4040834ee8b21e4eaf3b6c420ae88d079)), closes [#8480](https://github.com/opentrons/opentrons/issues/8480)
+* **app:** wire up protocol upload ([#8663](https://github.com/opentrons/opentrons/issues/8663)) ([3b8d754](https://github.com/opentrons/opentrons/commit/3b8d7541f110279ce0955ded13bbc3af714bb0de))
+* **can:**  add separate gantry ids ([#8529](https://github.com/opentrons/opentrons/issues/8529)) ([ffb61ef](https://github.com/opentrons/opentrons/commit/ffb61ef859017ce5b61586c0bbd3119b5b9bbbb3))
+* **can:**  can move group messages ([#8554](https://github.com/opentrons/opentrons/issues/8554)) ([283df4a](https://github.com/opentrons/opentrons/commit/283df4acc7841827c885b9beb0b5ae7a43a6bbac))
+* **can:** add can messenger. ([#8647](https://github.com/opentrons/opentrons/issues/8647)) ([5abc00e](https://github.com/opentrons/opentrons/commit/5abc00ed04e863b765474df963ac235821b5a55b))
+* **can:** add getMoveStatus request & response ([#8688](https://github.com/opentrons/opentrons/issues/8688)) ([4f50044](https://github.com/opentrons/opentrons/commit/4f500440b5d785c9f7cc1698b15b758df9ced507))
+* **can:** add head id ([#8532](https://github.com/opentrons/opentrons/issues/8532)) ([f69e315](https://github.com/opentrons/opentrons/commit/f69e3153a7fed176b351aeebb0d928774f7e50c0))
+* **can:** add messages for enabling and disabling motors ([#8531](https://github.com/opentrons/opentrons/issues/8531)) ([db67a13](https://github.com/opentrons/opentrons/commit/db67a13bf255f5f153e3fe9346955900fd735404))
+* **can:** Add MoveCompleted Response ([#8581](https://github.com/opentrons/opentrons/issues/8581)) ([32c03eb](https://github.com/opentrons/opentrons/commit/32c03ebff24e721c377072dad297212d846b54aa))
+* **can:** allow 64 bit fields in payloads. ([#8664](https://github.com/opentrons/opentrons/issues/8664)) ([23ff933](https://github.com/opentrons/opentrons/commit/23ff9331f474af8d630fe4cca96b879e8a479312))
+* **can:** Api hardware can id script ([#8344](https://github.com/opentrons/opentrons/issues/8344)) ([6697e39](https://github.com/opentrons/opentrons/commit/6697e394458dfebf7974f7ff0edfd99f8a2e944b))
+* **can:** api hardware sub project ([#8343](https://github.com/opentrons/opentrons/issues/8343)) ([822e419](https://github.com/opentrons/opentrons/commit/822e41911e7064783048b3a3605b30d57fb25d8d))
+* **can:** generate can constants header file ([#8350](https://github.com/opentrons/opentrons/issues/8350)) ([623f820](https://github.com/opentrons/opentrons/commit/623f820dbe13c6eb789f0e7d5945616d7d40826d))
+* **can:** Hardware move group schedule ([#8656](https://github.com/opentrons/opentrons/issues/8656)) ([bed6a2b](https://github.com/opentrons/opentrons/commit/bed6a2b15e7ef0ddbf324648d8349ec771c50111))
+* **can:** PCAN does FD. ([#8597](https://github.com/opentrons/opentrons/issues/8597)) ([51df13c](https://github.com/opentrons/opentrons/commit/51df13c1e0d8228f8de1b2aa14556d728402cf25))
+* **can:** raise error when an error frame is detected. [#8458](https://github.com/opentrons/opentrons/issues/8458) ([c038929](https://github.com/opentrons/opentrons/commit/c0389293c9ca78dd021edccc9847f2e4ef94e7e9))
+* **can:** replace uart script ([#8450](https://github.com/opentrons/opentrons/issues/8450)) ([63eb764](https://github.com/opentrons/opentrons/commit/63eb7641b2690fdd559dd38b8d0ecd8242d30bd5))
+* **can:** The most rudimentary move group builder. ([#8653](https://github.com/opentrons/opentrons/issues/8653)) ([90fce3c](https://github.com/opentrons/opentrons/commit/90fce3c0a7bc8d57d0d5493fd1c586a5c0289df7))
+* **components:** add pipette render component ([#8414](https://github.com/opentrons/opentrons/issues/8414)) ([8c008c4](https://github.com/opentrons/opentrons/commit/8c008c41ce4dc093770343f8edac18cc69ca4c51)), closes [#8379](https://github.com/opentrons/opentrons/issues/8379)
+* **g-code-testing:** HTTP G-Code GitHub Action (RET-174) ([#8338](https://github.com/opentrons/opentrons/issues/8338)) ([b45e05b](https://github.com/opentrons/opentrons/commit/b45e05b55b1976f09e29a1adc79d1734115bb568))
+* **hardware:** Connect integration tests to OT-3 Emulator (RET-183, RET-187) ([#8381](https://github.com/opentrons/opentrons/issues/8381)) ([7dfa85e](https://github.com/opentrons/opentrons/commit/7dfa85e1647bdf5c68a594b1e932d4803c1ca5bc))
+* **hardware:** serializing dataclasses for can message contents ([#8400](https://github.com/opentrons/opentrons/issues/8400)) ([0487896](https://github.com/opentrons/opentrons/commit/0487896d16613c161563eca85dee8edaa6db3a8d))
+* **ot3:** OT3Controller backend for hardware controller ([#8492](https://github.com/opentrons/opentrons/issues/8492)) ([5600948](https://github.com/opentrons/opentrons/commit/56009482a376b712384441f429c2e0d78192bdbd))
+* **robot-server:** allow a run and a legacy session to exist simultaneously ([#8615](https://github.com/opentrons/opentrons/issues/8615)) ([b470946](https://github.com/opentrons/opentrons/commit/b4709462df09479a2c4f8160561046e5cd588e3b))
+
+
+### Reverts
+
+* **robot-server:** revert attach pipette code back to using the mount ([#8699](https://github.com/opentrons/opentrons/issues/8699)) ([dc9f9a8](https://github.com/opentrons/opentrons/commit/dc9f9a8df5cd92b8efe0dceae0415dc7240682a3))
+
+
+
+
+
+
+
+**Note:** Version bump only for package opentrons
+
+
+
+
+
+## [4.6.2](https://github.com/Opentrons/opentrons/compare/v4.6.1...v4.6.2) (2021-09-30)
+
+
+### Bug Fixes
+
+* **api:** 4.6.x set max speed fails ([#8437](https://github.com/Opentrons/opentrons/issues/8437)) ([cb9a4f0](https://github.com/Opentrons/opentrons/commit/cb9a4f03df857b3e688651be4abd3ff9f9baa586)), closes [#8436](https://github.com/Opentrons/opentrons/issues/8436)
+
+
+
+
+
+## [4.6.1](https://github.com/Opentrons/opentrons/compare/v4.6.0...v4.6.1) (2021-09-28)
+
+
+### Bug Fixes
+
+* **api:** loosen numpy spec in setup.py ([#8418](https://github.com/Opentrons/opentrons/issues/8418)) ([105cf3a](https://github.com/Opentrons/opentrons/commit/105cf3ab8bd404da07e457b145f6339358390a37))
+
+
+
+
+
+# [4.6.0](https://github.com/Opentrons/opentrons/compare/v4.5.0...v4.6.0) (2021-09-27)
+
+
+### Bug Fixes
+
+* **api:** drop tip after cancel ([#8229](https://github.com/Opentrons/opentrons/issues/8229)) ([bb44718](https://github.com/Opentrons/opentrons/commit/bb447184b97f7607604eb79a4cdad942a9366bc1))
+* **api:** ensure decorators do not erase ProtocolContext types ([#8323](https://github.com/Opentrons/opentrons/issues/8323)) ([2a8a370](https://github.com/Opentrons/opentrons/commit/2a8a37025e8894230cdeb0376a7bf832b4e9f12f))
+* **api:** Make tip pickup error say "pick up tip," not "drop tip" ([#8251](https://github.com/Opentrons/opentrons/issues/8251)) ([430fbeb](https://github.com/Opentrons/opentrons/commit/430fbeb9b59cbbcb8a9288a5afc9445030711b34))
+* **api:** wait for poll before awaiting tempdeck temperature ([#8340](https://github.com/Opentrons/opentrons/issues/8340)) ([acb394d](https://github.com/Opentrons/opentrons/commit/acb394d72260f3660df9e2086a8e44e0b349b632))
+* **components, protocol-designer:** fix TitledList alignment ([#8186](https://github.com/Opentrons/opentrons/issues/8186)) ([557e583](https://github.com/Opentrons/opentrons/commit/557e58301fb9391ae68334561ff0a478ce5d4c37)), closes [#8008](https://github.com/Opentrons/opentrons/issues/8008) [#7543](https://github.com/Opentrons/opentrons/issues/7543)
+* **fastsim:** fast sim fails when using InstrumentContext.pair_with function ([#8290](https://github.com/Opentrons/opentrons/issues/8290)) ([02b78de](https://github.com/Opentrons/opentrons/commit/02b78de18ba03bfceafb98374f04ef41431f8d51)), closes [#8222](https://github.com/Opentrons/opentrons/issues/8222)
+* **fastsim:** set_defaults for FlowRates in InstrumentContextSimulation ([165dd5d](https://github.com/Opentrons/opentrons/commit/165dd5d45a3fef4a4af9756fbfcc774e674e102c)), closes [#8272](https://github.com/Opentrons/opentrons/issues/8272)
+* **labware-creator:** fix bad syntax in tip rack protocol ([#8171](https://github.com/Opentrons/opentrons/issues/8171)) ([9468633](https://github.com/Opentrons/opentrons/commit/9468633a2eb5c3ee8388f4f83427635b5f32199b))
+* **labware-creator:** fix readonly option type error ([#8306](https://github.com/Opentrons/opentrons/issues/8306)) ([463fb70](https://github.com/Opentrons/opentrons/commit/463fb70a65f3fbb0968b7056c5323dd19ea11238)), closes [#7972](https://github.com/Opentrons/opentrons/issues/7972)
+* **protocol-designer:** fix whitescreen when adding addtl temp steps ([#8181](https://github.com/Opentrons/opentrons/issues/8181)) ([34dbc35](https://github.com/Opentrons/opentrons/commit/34dbc351f4e1d8039878e9485685f2b508a88f17)), closes [#7819](https://github.com/Opentrons/opentrons/issues/7819)
+* **robot-server:** use the current critical point when moving pipettes ([#8331](https://github.com/Opentrons/opentrons/issues/8331)) ([09efb81](https://github.com/Opentrons/opentrons/commit/09efb818822cbfa5169377884240c6e494024226))
+* **simulation:** NoTipAttachedError in fast simulation only ([#8280](https://github.com/Opentrons/opentrons/issues/8280)) ([b7e93f1](https://github.com/Opentrons/opentrons/commit/b7e93f1e2e47a70c61f40432ac60010163d2fb5b)), closes [#8273](https://github.com/Opentrons/opentrons/issues/8273)
+* **tempdeck:** make tempdeck waiting functions cancelable ([#8327](https://github.com/Opentrons/opentrons/issues/8327)) ([70b956f](https://github.com/Opentrons/opentrons/commit/70b956f4aa8bb344385787ea07f1d4f5ccef28da))
+
+
+### Features
+
+* **api:** Add filtering of polling messages to G-Code Parser ([#8198](https://github.com/Opentrons/opentrons/issues/8198)) ([5719c62](https://github.com/Opentrons/opentrons/commit/5719c62bd6daee7e557cfb5c23ef56fe62c65e3c))
+* **api:** Add G-Code Parser CI Integration ([#8203](https://github.com/Opentrons/opentrons/issues/8203)) ([0f3f066](https://github.com/Opentrons/opentrons/commit/0f3f066deae94b6e31b2258d1a2f0fd2360c7f19))
+* **api:** Add G-Code Parser Makefile S3 Interface ([#8194](https://github.com/Opentrons/opentrons/issues/8194)) ([c4191e0](https://github.com/Opentrons/opentrons/commit/c4191e058ec773ded13ece228b8e4f1ffb20fa16))
+* **api:** Add G-Code parsing for Thermocycler ([#8173](https://github.com/Opentrons/opentrons/issues/8173)) ([f162300](https://github.com/Opentrons/opentrons/commit/f162300cab76ae7a77608458af6e66f726864a30))
+* **api:** opentrons_simulate gets duration estimation ([#8321](https://github.com/Opentrons/opentrons/issues/8321)) ([5c59fc7](https://github.com/Opentrons/opentrons/commit/5c59fc7fa5e7c2a0b318f64b2aca7149747eb550)), closes [#8279](https://github.com/Opentrons/opentrons/issues/8279) [#8300](https://github.com/Opentrons/opentrons/issues/8300) [#8311](https://github.com/Opentrons/opentrons/issues/8311)
+* **app:** add id attributes for e2e testing ([#8262](https://github.com/Opentrons/opentrons/issues/8262)) ([9d4274c](https://github.com/Opentrons/opentrons/commit/9d4274c565a43ddaeb748752ea17afa8c90a6fe0))
+* **app:** add labware setup step to protocol setup flow ([#8172](https://github.com/Opentrons/opentrons/issues/8172)) ([e33deb7](https://github.com/Opentrons/opentrons/commit/e33deb7ca641900196dbc6c8edff0bea7e14343e)), closes [#7665](https://github.com/Opentrons/opentrons/issues/7665)
+* **app:** add module attention warning to labware setup  ([#8230](https://github.com/Opentrons/opentrons/issues/8230)) ([618161c](https://github.com/Opentrons/opentrons/commit/618161c74e582845d5907e9368c199396486ed6f))
+* **app:** add module setup step to protocol setup ([#8224](https://github.com/Opentrons/opentrons/issues/8224)) ([2b9e77c](https://github.com/Opentrons/opentrons/commit/2b9e77cc0644b8582ceb84764f073f260bdc8c2c))
+* **app:** establish logic for labware position check ([#8246](https://github.com/Opentrons/opentrons/issues/8246)) ([9bf7f61](https://github.com/Opentrons/opentrons/commit/9bf7f615660d5949d47b7c410580cf5394011c29))
+* **app:** gather all protocol and calibration data  ([#8182](https://github.com/Opentrons/opentrons/issues/8182)) ([31b8df5](https://github.com/Opentrons/opentrons/commit/31b8df583f23f79829e2e046b6db11c123acf4dc)), closes [#8097](https://github.com/Opentrons/opentrons/issues/8097)
+* **app:** usb connection and moam modal functionality in module setup ([#8257](https://github.com/Opentrons/opentrons/issues/8257)) ([da516da](https://github.com/Opentrons/opentrons/commit/da516da0cfc6d8a88372f9282d9899d632a5eba4))
+* **g-code-testing:** Add functionality to run HTTP requests through G-Code Parser (RET-148, RET-149, RET-151) ([#8316](https://github.com/Opentrons/opentrons/issues/8316)) ([08c049b](https://github.com/Opentrons/opentrons/commit/08c049b625c318d6a1d143cfe555545b6b6a2e6a))
+* **protocol-engine:** implement well & labware's well accessor methods ([#8151](https://github.com/Opentrons/opentrons/issues/8151)) ([bff281a](https://github.com/Opentrons/opentrons/commit/bff281a273ae2dce99e770f76b823ec503217d3f))
+
+
+
+
+
+# [4.5.0](https://github.com/Opentrons/opentrons/compare/v4.4.0...v4.5.0) (2021-08-03)
+
+
+### Bug Fixes
+
+* **api:** fix module path for jupyter notebook ([#8009](https://github.com/Opentrons/opentrons/issues/8009)) ([f8bdf5c](https://github.com/Opentrons/opentrons/commit/f8bdf5c096c444320e9b70d5f88f6eec38a2dc01))
+* **api:** ignore missing aionotify more properly ([#8154](https://github.com/Opentrons/opentrons/issues/8154)) ([bb0e3a0](https://github.com/Opentrons/opentrons/commit/bb0e3a02720b4e7f9c3e0678ea6f8d4d9b5145a4))
+* **api:** reduce the severity of retry message from warning to info. ([#8192](https://github.com/Opentrons/opentrons/issues/8192)) ([47bc77a](https://github.com/Opentrons/opentrons/commit/47bc77a1a0b89becf9e43ac2f32b53f2b6efa048))
+* **api:** tolerate bad json in calibration defs ([#7962](https://github.com/Opentrons/opentrons/issues/7962)) ([588668a](https://github.com/Opentrons/opentrons/commit/588668a8500297ce52bb36d67a93b14790c4d91b))
+* **app:** Run timer stays at 00:00:00 if you reconnect in the middle of a delay ([#7937](https://github.com/Opentrons/opentrons/issues/7937)) ([6415c90](https://github.com/Opentrons/opentrons/commit/6415c9036e5f0368a9862cb11d6608702c0815a3))
+* **labware-creator:** add margin to bottom of LC ([#8034](https://github.com/Opentrons/opentrons/issues/8034)) ([eeace5b](https://github.com/Opentrons/opentrons/commit/eeace5b3f3f953e10c2052e645a7f1551d99a24f)), closes [#8027](https://github.com/Opentrons/opentrons/issues/8027)
+* **labware-creator:** reduce spacing btw tube brand + rack brand ([#8144](https://github.com/Opentrons/opentrons/issues/8144)) ([d67f0f9](https://github.com/Opentrons/opentrons/commit/d67f0f9f3e7adb49aaf450c6368ed99ecda72a20)), closes [#8140](https://github.com/Opentrons/opentrons/issues/8140)
+* **labware-creator:** remove extra margin btw p's of "Custom Tip Racks Are Not Recommended" section ([#8047](https://github.com/Opentrons/opentrons/issues/8047)) ([4be5bc0](https://github.com/Opentrons/opentrons/commit/4be5bc00b7db5958238e53ad7738af31a046fca0))
+* **labware-creator:** simplify autofill and fix bugs ([#8143](https://github.com/Opentrons/opentrons/issues/8143)) ([e6e3d9c](https://github.com/Opentrons/opentrons/commit/e6e3d9c95cfcb4577472d82bb896f92885e2f92a))
+* **robot-server:** Don't hide exceptions in startup/shutdown handlers ([#8080](https://github.com/Opentrons/opentrons/issues/8080)) ([3f25b5d](https://github.com/Opentrons/opentrons/commit/3f25b5d022b3e89b971ff6b84726681578848181))
+
+
+### Features
+
+* **api:** Add G-Code parsing ([#8043](https://github.com/Opentrons/opentrons/issues/8043)) ([c2ccb10](https://github.com/Opentrons/opentrons/commit/c2ccb109b1d680f885bc13608cf35d131440ec07))
+* **api:** Add G-Code response handling to G-Code Parser ([#8096](https://github.com/Opentrons/opentrons/issues/8096)) ([a417735](https://github.com/Opentrons/opentrons/commit/a417735874e8550b3d48d6372b3996d37ab0106f))
+* **api:** Add G-Code to human-readable text parsing ([#8086](https://github.com/Opentrons/opentrons/issues/8086)) ([bedaeeb](https://github.com/Opentrons/opentrons/commit/bedaeeba9b5d2a30560442728aebc87493458e80))
+* **api:** Add Magdeck G-Code Parsing ([#8159](https://github.com/Opentrons/opentrons/issues/8159)) ([3185656](https://github.com/Opentrons/opentrons/commit/31856567f5753f1927a6c0328e8ab3699b88a3a9))
+* **api:** Create framework for running protocols against emulation ([#8149](https://github.com/Opentrons/opentrons/issues/8149)) ([1d046ea](https://github.com/Opentrons/opentrons/commit/1d046eabb1f7065cb603b3aae309c495c2fda017))
+* **api:** G-Code CLI ([#8156](https://github.com/Opentrons/opentrons/issues/8156)) ([73bd30c](https://github.com/Opentrons/opentrons/commit/73bd30c0e12ae6894e5dff5a5f6d4926e89744c8))
+* **api:** G-Code Diffing ([#8135](https://github.com/Opentrons/opentrons/issues/8135)) ([33e3ee3](https://github.com/Opentrons/opentrons/commit/33e3ee3b0c80e0897816ee0ad4e787d0249e6fe4))
+* **api:** promote fast protocol analysis to default behavior ([#8022](https://github.com/Opentrons/opentrons/issues/8022)) ([8d9a707](https://github.com/Opentrons/opentrons/commit/8d9a707064b6d471419a8ddf4ba33d6d0d6f2a02)), closes [#7835](https://github.com/Opentrons/opentrons/issues/7835)
+* **api:** Tempdeck G-Code Parsing ([#8160](https://github.com/Opentrons/opentrons/issues/8160)) ([79778e7](https://github.com/Opentrons/opentrons/commit/79778e7125bb496f0c6659464d976afae5ea754f))
+* **labware-creator:** add custom copy for tip rack volume section ([#7899](https://github.com/Opentrons/opentrons/issues/7899)) ([d7bf804](https://github.com/Opentrons/opentrons/commit/d7bf80428befb71e1b468145437914e98d4409d6)), closes [#7717](https://github.com/Opentrons/opentrons/issues/7717)
+* **labware-creator:** add dynamic height copy for tip racks ([#7869](https://github.com/Opentrons/opentrons/issues/7869)) ([781cc8b](https://github.com/Opentrons/opentrons/commit/781cc8bf8a961166a9cafd76b7d31bb674f7e7f0)), closes [#7716](https://github.com/Opentrons/opentrons/issues/7716)
+* **labware-creator:** add python labware test protocols ([#7998](https://github.com/Opentrons/opentrons/issues/7998)) ([50d78bc](https://github.com/Opentrons/opentrons/commit/50d78bca2e9426fd153f8a7f77f66fee24cb2218))
+* **labware-creator:** add tiprack test file to export section ([#8018](https://github.com/Opentrons/opentrons/issues/8018)) ([311e1b2](https://github.com/Opentrons/opentrons/commit/311e1b26bbb781645cfa4793562ad0a0890a884f)), closes [#7166](https://github.com/Opentrons/opentrons/issues/7166)
+* **labware-creator:** added multichannel compatibility to protocol ([#8093](https://github.com/Opentrons/opentrons/issues/8093)) ([645e633](https://github.com/Opentrons/opentrons/commit/645e633d9e47819733d536442d18030071f9ba21))
+* **labware-creator:** added tube brand and rack brand ([#8082](https://github.com/Opentrons/opentrons/issues/8082)) ([22ee36f](https://github.com/Opentrons/opentrons/commit/22ee36f79129b04d2588ae72a173ea1eb1253a12)), closes [#7986](https://github.com/Opentrons/opentrons/issues/7986)
+* **labware-creator:** allow dynamic field labels via getLabel ([#8062](https://github.com/Opentrons/opentrons/issues/8062)) ([4960d97](https://github.com/Opentrons/opentrons/commit/4960d9779005d5274a1dbb2d07e9349d5340e4f6)), closes [#7974](https://github.com/Opentrons/opentrons/issues/7974)
+* **labware-creator:** change preview text to reflect labware type ([#8031](https://github.com/Opentrons/opentrons/issues/8031)) ([94a5395](https://github.com/Opentrons/opentrons/commit/94a539597855f31a10f82fbf2200b4fe6f406152))
+* **labware-creator:** change tube rack inserts for custom tubes ([#8060](https://github.com/Opentrons/opentrons/issues/8060)) ([f51ec8d](https://github.com/Opentrons/opentrons/commit/f51ec8da9c853b3fd9d7a8e76b708f3909459ab2)), closes [#7969](https://github.com/Opentrons/opentrons/issues/7969)
+* **labware-creator:** export and import tiprack defs ([#7947](https://github.com/Opentrons/opentrons/issues/7947)) ([a90e66d](https://github.com/Opentrons/opentrons/commit/a90e66d191a47d2a92a839e9554b8610aac27603)), closes [#7696](https://github.com/Opentrons/opentrons/issues/7696) [#7697](https://github.com/Opentrons/opentrons/issues/7697)
+* **labware-creator:** grid offset update for tube racks ([#8071](https://github.com/Opentrons/opentrons/issues/8071)) ([f332849](https://github.com/Opentrons/opentrons/commit/f332849cdaaceb174c7aae0d0365c8276e4afde8)), closes [#7984](https://github.com/Opentrons/opentrons/issues/7984)
+* **labware-creator:** implement and test saving custom tube racks ([#8089](https://github.com/Opentrons/opentrons/issues/8089)) ([2f6f7e0](https://github.com/Opentrons/opentrons/commit/2f6f7e0c313a9ef9a0d04da67aa8e05e579ca916)), closes [#7964](https://github.com/Opentrons/opentrons/issues/7964)
+* **labware-creator:** make dynamic wells/tips copy in Grid section ([#8019](https://github.com/Opentrons/opentrons/issues/8019)) ([9738d9c](https://github.com/Opentrons/opentrons/commit/9738d9c95d1f75a9596ce01b04359af9bdc7dc56))
+* **labware-creator:** make error copy "is required" not "must be a number" ([#8038](https://github.com/Opentrons/opentrons/issues/8038)) ([9afc2dd](https://github.com/Opentrons/opentrons/commit/9afc2dd4ffb382e18fd770845430dda1b6562399)), closes [#8026](https://github.com/Opentrons/opentrons/issues/8026)
+* **labware-creator:** refactored paused before tip pick up ([#8029](https://github.com/Opentrons/opentrons/issues/8029)) ([40cd5a3](https://github.com/Opentrons/opentrons/commit/40cd5a32acf0a44c9c9ff561f5450d1edc2f5a97))
+* **labware-creator:** remove text saying tipracks not supported in LC ([#7971](https://github.com/Opentrons/opentrons/issues/7971)) ([64011e0](https://github.com/Opentrons/opentrons/commit/64011e000c9f4ab972075ac3a0d06ea43ce42d8f))
+* **labware-creator:** show Grid section for custom tube racks ([#8068](https://github.com/Opentrons/opentrons/issues/8068)) ([8c5bff3](https://github.com/Opentrons/opentrons/commit/8c5bff3d3f2e59d0100c8b5d3374c619337bcc0b)), closes [#7979](https://github.com/Opentrons/opentrons/issues/7979)
+* **labware-creator:** show whole labware in preview svg ([#8013](https://github.com/Opentrons/opentrons/issues/8013)) ([9b2fc17](https://github.com/Opentrons/opentrons/commit/9b2fc17843187d36746c10f4ba1ac6e551483ef9)), closes [#7164](https://github.com/Opentrons/opentrons/issues/7164)
+* **labware-creator:** support multi-channel pipettes ([#8099](https://github.com/Opentrons/opentrons/issues/8099)) ([992f579](https://github.com/Opentrons/opentrons/commit/992f579b0287a572f71683fa744fbf97f8012f1b)), closes [#7965](https://github.com/Opentrons/opentrons/issues/7965)
+* **labware-creator:** update bottom & depth section for tubes ([#8066](https://github.com/Opentrons/opentrons/issues/8066)) ([ccdb7d8](https://github.com/Opentrons/opentrons/commit/ccdb7d8ea4bf4fce53a451b707e9f717841054b2)), closes [#7982](https://github.com/Opentrons/opentrons/issues/7982)
+* **labware-creator:** Update grid spacing when tiprack is selected ([#7932](https://github.com/Opentrons/opentrons/issues/7932)) ([6123de9](https://github.com/Opentrons/opentrons/commit/6123de96c67aba27fe94c3b6fba64ef3771d47dd)), closes [#7725](https://github.com/Opentrons/opentrons/issues/7725)
+* **labware-creator:** Update gridd offset instructions/img when tiprack selected ([#7914](https://github.com/Opentrons/opentrons/issues/7914)) ([c314ad7](https://github.com/Opentrons/opentrons/commit/c314ad7e3eaa5c2484483c944d62d836a090d581)), closes [#7726](https://github.com/Opentrons/opentrons/issues/7726)
+* **labware-creator:** update shape+size section for tube rack ([#8074](https://github.com/Opentrons/opentrons/issues/8074)) ([9b89ad9](https://github.com/Opentrons/opentrons/commit/9b89ad99535439d9f758b130383fcdaa3f1b5923)), closes [#7981](https://github.com/Opentrons/opentrons/issues/7981)
+* **labware-creator:** update spacing section for custom tube racks ([#8063](https://github.com/Opentrons/opentrons/issues/8063)) ([03db137](https://github.com/Opentrons/opentrons/commit/03db13771a5f94fe37764b4def01680397631de7)), closes [#7983](https://github.com/Opentrons/opentrons/issues/7983)
+* **labware-creator:** update tiprack recommendation text ([#8036](https://github.com/Opentrons/opentrons/issues/8036)) ([d051e08](https://github.com/Opentrons/opentrons/commit/d051e0813ccf88374794fb24078b33105047d569)), closes [#8035](https://github.com/Opentrons/opentrons/issues/8035)
+* **labware-creator:** Update Well Depth Section to show Tip Length ([#7949](https://github.com/Opentrons/opentrons/issues/7949)) ([fe4d6db](https://github.com/Opentrons/opentrons/commit/fe4d6db248b2444506e839005e54bf4475d1bdc8)), closes [#7724](https://github.com/Opentrons/opentrons/issues/7724)
+* **labware-creator:** use "tube" not "well" for x/y errors ([#8150](https://github.com/Opentrons/opentrons/issues/8150)) ([d9c7ed2](https://github.com/Opentrons/opentrons/commit/d9c7ed23d13cdb62bd1bc397dc2871d4bd5b77e9)), closes [#8142](https://github.com/Opentrons/opentrons/issues/8142)
+* **labware-designer:** add prototype react-based sandbox-style live labware editor ([#8010](https://github.com/Opentrons/opentrons/issues/8010)) ([e56aea5](https://github.com/Opentrons/opentrons/commit/e56aea54a0b44b99c4914bf05fc39bc2e08cef0f))
+* **labware-library:** add tip rack test .py protocol ([#8020](https://github.com/Opentrons/opentrons/issues/8020)) ([174dad9](https://github.com/Opentrons/opentrons/commit/174dad99a92c21218416c1381feb40f0abc856a1)), closes [#7884](https://github.com/Opentrons/opentrons/issues/7884)
+* **labware-library:** change default display name for tube racks ([#8130](https://github.com/Opentrons/opentrons/issues/8130)) ([1a485aa](https://github.com/Opentrons/opentrons/commit/1a485aa6ff666407cc3caac9be3b2b270b3bd8e9)), closes [#7987](https://github.com/Opentrons/opentrons/issues/7987)
+* **protocol-engine:** Add a command queue worker class ([#7817](https://github.com/Opentrons/opentrons/issues/7817)) ([8bdd223](https://github.com/Opentrons/opentrons/commit/8bdd2236cb09fc497f1884441605117521378478))
+* **protocol-engine:** Implement `CommandState.get_next_request()` ([#7936](https://github.com/Opentrons/opentrons/issues/7936)) ([61136a1](https://github.com/Opentrons/opentrons/commit/61136a128795bd6e3ee896e79e06455f782cbf01))
+* **protocol-engine:** Support loading pipettes and labware from JSON protocols ([#7950](https://github.com/Opentrons/opentrons/issues/7950)) ([e43c80f](https://github.com/Opentrons/opentrons/commit/e43c80f8f00a0146558345483993bc0c66fdce99))
+
+
+
+
+
 # [4.4.0](https://github.com/Opentrons/opentrons/compare/v4.3.1...v4.4.0) (2021-06-16)
 
 

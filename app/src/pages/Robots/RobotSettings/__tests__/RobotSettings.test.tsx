@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { StaticRouter, Route, Redirect } from 'react-router-dom'
 
-import { mountWithProviders } from '@opentrons/components/__utils__'
+import { SpinnerModalPage, mountWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import {
   mockConnectableRobot,
@@ -12,18 +12,12 @@ import * as Buildroot from '../../../../redux/buildroot'
 import * as Admin from '../../../../redux/robot-admin'
 import * as Controls from '../../../../redux/robot-controls'
 import * as Settings from '../../../../redux/robot-settings'
-import {
-  actions as RobotActions,
-  selectors as RobotSelectors,
-} from '../../../../redux/robot'
 
-import { SpinnerModalPage } from '@opentrons/components'
 import { Page } from '../../../../atoms/Page'
 import { ErrorModal } from '../../../../molecules/modals'
 import { ReachableRobotBanner } from '../ReachableRobotBanner'
 import { ConnectBanner } from '../ConnectBanner'
 import { RestartRequiredBanner } from '../RestartRequiredBanner'
-import { ConnectAlertModal } from '../ConnectAlertModal'
 import { UpdateBuildroot } from '../UpdateBuildroot'
 import { ResetRobotModal } from '../ResetRobotModal'
 import { RobotSettings } from '..'
@@ -38,10 +32,6 @@ jest.mock('../../../../redux/robot-settings/selectors')
 jest.mock('../../../../redux/robot/selectors')
 
 // emulate shallow render
-jest.mock('../ConnectAlertModal', () => ({
-  ConnectAlertModal: () => <></>,
-}))
-
 jest.mock('../UpdateBuildroot', () => ({
   UpdateBuildroot: () => <></>,
 }))
@@ -71,10 +61,6 @@ jest.mock('../AdvancedSettingsCard', () => ({
 
 const MOCK_STATE: State = { mockState: true } as any
 const ROBOT_URL = `/robots/${mockConnectableRobot.name}`
-
-const getConnectRequest = RobotSelectors.getConnectRequest as jest.MockedFunction<
-  typeof RobotSelectors.getConnectRequest
->
 
 const getBuildrootUpdateSeen = Buildroot.getBuildrootUpdateSeen as jest.MockedFunction<
   typeof Buildroot.getBuildrootUpdateSeen
@@ -128,11 +114,6 @@ describe('/robots/:robotName page component', () => {
   }
 
   beforeEach(() => {
-    getConnectRequest.mockReturnValue({
-      name: '',
-      inProgress: false,
-      error: null,
-    })
     getBuildrootUpdateSeen.mockReturnValue(false)
     getBuildrootUpdateDisplayInfo.mockReturnValue({
       autoUpdateAction: 'reinstall',
@@ -288,7 +269,7 @@ describe('/robots/:robotName page component', () => {
     )
   })
 
-  it('should not redirect if an upgrade has been seen ', () => {
+  it('should not redirect if an upgrade has been seen', () => {
     getBuildrootUpdateInProgress.mockReturnValue(false)
     getBuildrootUpdateSeen.mockReturnValue(true)
     getBuildrootUpdateAvailable.mockReturnValue(Buildroot.UPGRADE)
@@ -327,25 +308,6 @@ describe('/robots/:robotName page component', () => {
     expect(getBuildrootUpdateDisplayInfo).toHaveBeenCalledWith(
       MOCK_STATE,
       mockConnectableRobot.name
-    )
-  })
-
-  it('should show a ConnectAlertModal if a RPC connect fails', () => {
-    getConnectRequest.mockReturnValue({
-      name: mockConnectableRobot.name,
-      inProgress: false,
-      error: { message: 'oh no!' },
-    })
-
-    const { wrapper, store } = render()
-    const errorModal = wrapper.find(ConnectAlertModal)
-
-    expect(errorModal.exists()).toBe(true)
-
-    errorModal.invoke('onCloseClick')?.()
-
-    expect(store.dispatch).toHaveBeenCalledWith(
-      RobotActions.clearConnectResponse()
     )
   })
 })

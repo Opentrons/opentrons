@@ -20,7 +20,7 @@ import { EditModules } from './EditModules'
 import styles from './FilePage.css'
 import modalStyles from '../components/modals/modal.css'
 import formStyles from '../components/forms/forms.css'
-import { ModuleRealType } from '@opentrons/shared-data'
+import { ModuleType } from '@opentrons/shared-data'
 import { FileMetadataFields } from '../file-data'
 import { ModulesForEditModulesCard } from '../step-forms'
 
@@ -36,7 +36,7 @@ export interface Props {
 interface State {
   isEditPipetteModalOpen: boolean
   moduleToEdit: {
-    moduleType: ModuleRealType
+    moduleType: ModuleType
     moduleId?: string | null
   } | null
 }
@@ -60,7 +60,7 @@ export class FilePage extends React.Component<Props, State> {
   closeEditPipetteModal: () => void = () =>
     this.setState({ isEditPipetteModalOpen: false })
 
-  handleEditModule: (moduleType: ModuleRealType, moduleId?: string) => void = (
+  handleEditModule: (moduleType: ModuleType, moduleId?: string) => void = (
     moduleType,
     moduleId
   ) => {
@@ -135,7 +135,7 @@ export class FilePage extends React.Component<Props, State> {
                       placeholder="Untitled"
                       name="protocolName"
                       onChange={handleChange}
-                      value={values['protocolName']}
+                      value={values.protocolName}
                     />
                   </FormGroup>
 

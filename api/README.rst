@@ -30,7 +30,7 @@ The Opentrons library has two purposes:
 Setting Up For Development
 --------------------------
 
-First, read the `top-level contributing guide section on setup <https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md#environment-and-repository>`_. As that document states, once you have installed the prerequisites you can simply run ``make setup`` in this subdirectory.
+First, read the `top-level contributing guide section on setup <https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md#environment-and-repository>`_. As that document states, once you have installed the prerequisites you can simply run ``make setup`` in this subdirectory. If you want to make the environment as it will be on an OT-2 specifically, run ``make setup-ot2``
 
 The only additional prerequisite concerns building documentation. If you want to build the PDF version of the documentation, you will need an installation of `LaTeX <https://www.latex-project.org/get/>`_ that includes the ``pdflatex`` tool. Note that if you don’t install this, everything will still work - you just won’t get the PDF documentation.
 
@@ -82,29 +82,7 @@ Configuration
 
 The module has a lot of configuration, some of which is only relevant when running on an actual robot, but some of which could be useful during simulation. When the module is first imported, it will try and write configuration files in ``~/.opentrons/config.json`` (``C:\Users\%USERNAME%\.opentrons\config.json`` on Windows). This contains mostly paths to other configuration files and directories, most of which will be in that folder. The location can be changed by setting the environment variable ``OT_API_CONFIG_DIR`` to another path. Inividual settings in the config file can be overridden by setting environment variables named like ``OT_API_${UPPERCASED_VAR_NAME}`` (for instance, to override the ``serial_log_file`` config element you could set the environment variable ``OT_API_SERIAL_LOG_FILE`` to a different path).
 
+Dealing With Robot Versions
+---------------------------
 
-Using the Deck Calibration Tool
--------------------------------
-
-You can run this tool from the command line of the robot by using ``ssh`` to access the terminal.
-To run the tool either type ``calibrate`` or ``python -m opentrons.deck_calibration.dc_main``
-
-Instructions:
-    - Robot must be set up with two ``300ul`` or ``50ul`` single-channel pipettes
-      installed on the right-hand and left-hand mount.
-    - Put a GEB ``300ul`` tip onto the pipette.
-    - Use the arrow keys to jog the robot over slot ``5`` in an open space that
-      is not an engraving or a hole.
-    - Use the ``q`` and ``a`` keys to jog the pipette up and down respectively
-      until the tip is just touching the deck surface, then press ``z``. This
-      will save the ``Z`` height.
-    - Press ``1`` to automatically go to the expected location of the first
-      calibration point. Jog the robot until the tip is actually at
-      the point, then press ``enter``.
-    - Repeat with ``2`` and ``3``.
-    - After calibrating all three points, press the space bar to save the
-      configuration.
-    - Optionally, press ``4``, ``5``, ``6`` or ``7`` to validate the new configuration.
-    - Press ``p`` to perform tip probe. Press the space bar to save again.
-    - Press ``m`` to perform mount calibration. Press the space bar to save again.
-    - Press ``esc`` to exit the program.
+The OT2 does not use the ``hardware`` subdirectory or the ``opentrons_hardware`` package. This can be a problem to work around. Please keep imports of ``opentrons_hardware`` to limited places inside the hardware_control submodule and tests of that submodule, and ensure that anything outside these safe areas conditionally imports ``opentrons_hardware`` or imports it inside a non-file scope in a place used only outside an OT2. In tests, any test that uses the OT3 hardware controller will be skipped in the ``test-ot2`` Makefile recipe.

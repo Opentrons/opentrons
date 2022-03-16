@@ -1,6 +1,6 @@
 {
   "name": "@opentrons/update-server",
-  "version": "4.4.0",
+  "version": "5.0.2",
   "description": "Update server for Opentrons robots",
   "repository": {
     "type": "git",

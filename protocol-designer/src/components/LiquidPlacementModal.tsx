@@ -3,7 +3,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import cx from 'classnames'
 import isEmpty from 'lodash/isEmpty'
-
+import { WellGroup, WELL_LABEL_OPTIONS } from '@opentrons/components'
 import {
   wellFillFromWellContents,
   SelectableLabware,
@@ -20,7 +20,6 @@ import { selectWells, deselectWells } from '../well-selection/actions'
 import styles from './LiquidPlacementModal.css'
 
 import { Dispatch } from 'redux'
-import { WellGroup } from '@opentrons/components'
 import { LabwareDefinition2 } from '@opentrons/shared-data'
 import { BaseState } from '../types'
 import { ContentsByWell } from '../labware-ingred/types'
@@ -70,7 +69,7 @@ class LiquidPlacementModalComponent extends React.Component<Props, State> {
           <div className={styles.labware}>
             <SelectableLabware
               labwareProps={{
-                showLabels: true,
+                wellLabelOption: WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE,
                 definition: labwareDef,
                 highlightedWells: this.state.highlightedWells,
                 wellFill: wellFillFromWellContents(this.props.wellContents),

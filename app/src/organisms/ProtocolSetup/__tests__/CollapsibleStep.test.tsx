@@ -1,9 +1,9 @@
 import * as React from 'react'
 import '@testing-library/jest-dom'
-import { renderWithProviders } from '@opentrons/components/__utils__'
+import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
-import { CollapsibleStep } from '../CollapsibleStep'
+import { CollapsibleStep } from '../RunSetupCard/CollapsibleStep'
 import { fireEvent } from '@testing-library/react'
 
 describe('CollapsibleStep', () => {
@@ -12,15 +12,24 @@ describe('CollapsibleStep', () => {
     title = 'stub title',
     description = 'stub description',
     label = 'stub label',
+    rightAlignedNode = null,
     toggleExpanded = toggleExpandedMock,
     children = <button>stub children</button>,
   }: Partial<React.ComponentProps<typeof CollapsibleStep>> = {}) => {
     return renderWithProviders(
       <CollapsibleStep
-        {...{ expanded, title, description, label, toggleExpanded, children }}
+        {...{
+          expanded,
+          title,
+          description,
+          label,
+          toggleExpanded,
+          children,
+          rightAlignedNode,
+        }}
       />,
       { i18nInstance: i18n }
-    )
+    )[0]
   }
   let toggleExpandedMock: jest.MockedFunction<() => void>
 
@@ -32,13 +41,9 @@ describe('CollapsibleStep', () => {
     jest.resetAllMocks()
   })
 
-  it('renders children if expanded is true', () => {
+  it('renders children', () => {
     const { getByRole } = render()
     expect(getByRole('button', { name: 'stub children' })).toBeTruthy()
-  })
-  it('does not render children if expanded is false', () => {
-    const { queryByRole } = render({ expanded: false })
-    expect(queryByRole('button')).toBeNull()
   })
   it('calls toggle expanded on click', () => {
     const { getByRole } = render({ expanded: false })

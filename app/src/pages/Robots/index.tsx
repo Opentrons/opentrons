@@ -2,6 +2,7 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useRouteMatch, Redirect, useLocation } from 'react-router-dom'
+import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import {
   CONNECTABLE,
@@ -47,20 +48,24 @@ export function Robots(): JSX.Element {
     )
   }
 
-  return robot.status === CONNECTABLE && instrumentsMatch ? (
-    <InstrumentSettings
-      robotName={robot.name}
-      robotDisplayName={robot.displayName}
-      url={instrumentsMatch.url}
-      path={instrumentsMatch.path}
-      pathname={location && location.pathname}
-    />
-  ) : robot.status === CONNECTABLE && modulesMatch ? (
-    <ModuleSettings
-      robotName={robot.name}
-      robotDisplayName={robot.displayName}
-    />
-  ) : (
-    <RobotSettings robot={robot} />
+  return (
+    <ApiHostProvider hostname={robot.ip}>
+      {robot.status === CONNECTABLE && instrumentsMatch ? (
+        <InstrumentSettings
+          robotName={robot.name}
+          robotDisplayName={robot.displayName}
+          url={instrumentsMatch.url}
+          path={instrumentsMatch.path}
+          pathname={location && location.pathname}
+        />
+      ) : robot.status === CONNECTABLE && modulesMatch ? (
+        <ModuleSettings
+          robotName={robot.name}
+          robotDisplayName={robot.displayName}
+        />
+      ) : (
+        <RobotSettings robot={robot} />
+      )}
+    </ApiHostProvider>
   )
 }

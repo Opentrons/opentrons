@@ -4,27 +4,64 @@ services:
     build: .
     command: python3 -m opentrons.hardware_control.emulation.app
     ports:
-      - '9996:9996'
+      - '8888:8888'
+      - '9000:9000'
+      - '9002:9002'
+      - '9003:9003'
+      - '9004:9004'
+      - '9995:9995'
       - '9997:9997'
       - '9998:9998'
       - '9999:9999'
+    networks:
+      - container-network
+  smoothie:
+    build: .
+    command: python3 -m opentrons.hardware_control.emulation.scripts.run_smoothie
+    ports:
+      - '9996:9996'
     # Uncomment lines below to override the pipette(s) loaded by emulator
     #environment:
     #  OT_EMULATOR_smoothie: '{"right": {"model": "p300_multi"}, "left": {"model": "p20_single_v2.0"}}'
+    networks:
+      - container-network
   robot-server:
     build: .
     command: uvicorn "robot_server:app" --host 0.0.0.0 --port 31950 --ws wsproto --reload
     ports:
       - '31950:31950'
     environment:
-      - OT_API_CONFIG_DIR=/config
-      - OT_SMOOTHIE_EMULATOR_URI=socket://emulator:9996
-      - OT_THERMOCYCLER_EMULATOR_URI=socket://emulator:9997
-      - OT_TEMPERATURE_EMULATOR_URI=socket://emulator:9998
-      - OT_MAGNETIC_EMULATOR_URI=socket://emulator:9999
-    links:
-      - 'emulator'
+      OT_API_CONFIG_DIR: /config
+      OT_SMOOTHIE_EMULATOR_URI: socket://smoothie:9996
+      OT_EMULATOR_module_server: '{"host": "emulator"}'
+    networks:
+      - container-network
     depends_on:
       - 'emulator'
+      - 'smoothie'
     volumes:
       - .opentrons_config:/config:rw
+  tempdeck:
+    build: .
+    command: python3 -m opentrons.hardware_control.emulation.scripts.run_module_emulator tempdeck emulator
+    networks:
+      - container-network
+    depends_on:
+      - 'emulator'
+  thermocycler:
+    build: .
+    command: python3 -m opentrons.hardware_control.emulation.scripts.run_module_emulator thermocycler emulator
+    networks:
+      - container-network
+    depends_on:
+      - 'emulator'
+  magdeck:
+    build: .
+    command: python3 -m opentrons.hardware_control.emulation.scripts.run_module_emulator magdeck emulator
+    networks:
+      - container-network
+    depends_on:
+      - 'emulator'
+
+networks:
+  container-network:

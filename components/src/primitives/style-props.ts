@@ -45,6 +45,7 @@ const BORDER_PROPS = [
   'borderRadius',
   'borderWidth',
   'borderColor',
+  'boxShadow',
 ] as const
 
 const FLEXBOX_PROPS = [
@@ -76,6 +77,7 @@ const LAYOUT_PROPS = [
   'overflow',
   'overflowX',
   'overflowY',
+  'whiteSpace',
   'wordSpacing',
 ] as const
 

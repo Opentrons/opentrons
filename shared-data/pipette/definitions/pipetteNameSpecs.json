@@ -455,5 +455,138 @@
       "opentrons/opentrons_96_filtertiprack_1000ul/1",
       "opentrons/geb_96_tiprack_1000ul/1"
     ]
+  },
+  "p20_single_gen3": {
+    "displayName": "P20 Single-Channel GEN3",
+    "displayCategory": "GEN2",
+    "defaultAspirateFlowRate": {
+      "value": 3.78,
+      "min": 0.08,
+      "max": 24,
+      "valuesByApiLevel": {
+        "2.0": 3.78,
+        "2.6": 7.56
+      }
+    },
+    "defaultDispenseFlowRate": {
+      "value": 3.78,
+      "min": 0.08,
+      "max": 24,
+      "valuesByApiLevel": {
+        "2.0": 3.78,
+        "2.6": 7.56
+      }
+    },
+    "defaultBlowOutFlowRate": {
+      "value": 3.78,
+      "min": 0.08,
+      "max": 24,
+      "valuesByApiLevel": {
+        "2.0": 3.78,
+        "2.6": 7.56
+      }
+    },
+    "minVolume": 1,
+    "maxVolume": 20,
+    "channels": 1,
+    "smoothieConfigs": {
+      "stepsPerMM": 2133.33,
+      "homePosition": 220,
+      "travelDistance": 80
+    },
+    "defaultTipracks": [
+      "opentrons/opentrons_96_tiprack_20ul/1",
+      "opentrons/opentrons_96_filtertiprack_20ul/1",
+      "opentrons/opentrons_96_tiprack_10ul/1",
+      "opentrons/opentrons_96_filtertiprack_10ul/1",
+      "opentrons/geb_96_tiprack_10ul/1"
+    ]
+  },
+  "p300_single_gen3": {
+    "displayName": "P300 Single-Channel GEN3",
+    "displayCategory": "GEN2",
+    "defaultAspirateFlowRate": {
+      "value": 46.43,
+      "min": 1,
+      "max": 275,
+      "valuesByApiLevel": {
+        "2.0": 46.43,
+        "2.6": 92.86
+      }
+    },
+    "defaultDispenseFlowRate": {
+      "value": 46.43,
+      "min": 1,
+      "max": 275.31,
+      "valuesByApiLevel": {
+        "2.0": 46.43,
+        "2.6": 92.86
+      }
+    },
+    "defaultBlowOutFlowRate": {
+      "value": 46.43,
+      "min": 1,
+      "max": 275,
+      "valuesByApiLevel": {
+        "2.0": 46.43,
+        "2.6": 92.86
+      }
+    },
+    "channels": 1,
+    "minVolume": 20,
+    "maxVolume": 300,
+    "smoothieConfigs": {
+      "stepsPerMM": 2133.33,
+      "homePosition": 220,
+      "travelDistance": 80
+    },
+    "defaultTipracks": [
+      "opentrons/opentrons_96_tiprack_300ul/1",
+      "opentrons/opentrons_96_filtertiprack_200ul/1"
+    ]
+  },
+  "p1000_single_gen3": {
+    "displayName": "P1000 Single-Channel GEN3",
+    "displayCategory": "GEN2",
+    "defaultAspirateFlowRate": {
+      "value": 137.35,
+      "min": 3,
+      "max": 812,
+      "valuesByApiLevel": {
+        "2.0": 137.35,
+        "2.6": 274.7
+      }
+    },
+    "defaultDispenseFlowRate": {
+      "value": 137.35,
+      "min": 3,
+      "max": 812,
+      "valuesByApiLevel": {
+        "2.0": 137.35,
+        "2.6": 274.7
+      }
+    },
+    "defaultBlowOutFlowRate": {
+      "value": 137.35,
+      "min": 3,
+      "max": 812,
+      "valuesByApiLevel": {
+        "2.0": 137.35,
+        "2.6": 274.7
+      }
+    },
+    "channels": 1,
+    "minVolume": 100,
+    "maxVolume": 1000,
+    "smoothieConfigs": {
+      "stepsPerMM": 2133.33,
+      "homePosition": 220,
+      "travelDistance": 80
+    },
+    "defaultTipracks": [
+      "opentrons/opentrons_96_tiprack_1000ul/1",
+      "opentrons/opentrons_96_filtertiprack_1000ul/1",
+      "opentrons/geb_96_tiprack_1000ul/1"
+    ]
   }
 }

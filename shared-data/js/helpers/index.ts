@@ -2,15 +2,17 @@ import assert from 'assert'
 import uniq from 'lodash/uniq'
 
 import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
-import type { LabwareDefinition2 } from '../types'
+import type { DeckDefinition, LabwareDefinition2 } from '../types'
 
 export { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 export { getWellTotalVolume } from './getWellTotalVolume'
 export { wellIsRect } from './wellIsRect'
+export { schemaV6Adapter } from './schemaV6Adapter'
 
 export * from './parseProtocolData'
 export * from './volume'
 export * from './wellSets'
+export * from './getModuleVizDims'
 
 export const getLabwareDefIsStandard = (def: LabwareDefinition2): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE
@@ -58,7 +60,7 @@ export const getTiprackVolume = (labwareDef: LabwareDefinition2): number => {
     )}, but 'isTiprack' isn't true`
   )
   // NOTE: Ian 2019-04-16 assuming all tips are the same volume across the rack
-  const volume = labwareDef.wells['A1'].totalLiquidVolume
+  const volume = labwareDef.wells.A1.totalLiquidVolume
   assert(
     volume >= 0,
     `getTiprackVolume expected tip volume to be at least 0, got ${volume}`
@@ -168,4 +170,15 @@ export const getWellsDepth = (
   }
 
   return offsets[0]
+}
+
+export const getSlotHasMatingSurfaceUnitVector = (
+  deckDef: DeckDefinition,
+  slotNumber: string
+): boolean => {
+  const matingSurfaceUnitVector = deckDef.locations.orderedSlots.find(
+    orderedSlot => orderedSlot.id === slotNumber
+  )?.matingSurfaceUnitVector
+
+  return Boolean(matingSurfaceUnitVector)
 }

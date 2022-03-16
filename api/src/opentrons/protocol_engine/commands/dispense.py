@@ -1,57 +1,63 @@
 """Dispense command request, result, and implementation models."""
 from __future__ import annotations
-from typing import Optional, Type
+from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from .pipetting_common import BaseLiquidHandlingData, BaseLiquidHandlingResult
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandRequest
+from .pipetting_common import BaseLiquidHandlingParams, BaseLiquidHandlingResult
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+
+if TYPE_CHECKING:
+    from ..execution import PipettingHandler
 
 
 DispenseCommandType = Literal["dispense"]
 
 
-class DispenseData(BaseLiquidHandlingData):
-    """Data required to dispense to a specific well."""
+class DispenseParams(BaseLiquidHandlingParams):
+    """Payload required to dispense to a specific well."""
 
     pass
 
 
 class DispenseResult(BaseLiquidHandlingResult):
-    """Result data from the execution of a DispenseRequest."""
+    """Result data from the execution of a Dispense command."""
 
     pass
 
 
-class DispenseImplementation(AbstractCommandImpl[DispenseData, DispenseResult]):
+class DispenseImplementation(AbstractCommandImpl[DispenseParams, DispenseResult]):
     """Dispense command implementation."""
 
-    async def execute(self, data: DispenseData) -> DispenseResult:
+    def __init__(self, pipetting: PipettingHandler, **kwargs: object) -> None:
+        self._pipetting = pipetting
+
+    async def execute(self, params: DispenseParams) -> DispenseResult:
         """Move to and dispense to the requested well."""
         volume = await self._pipetting.dispense(
-            pipette_id=data.pipetteId,
-            labware_id=data.labwareId,
-            well_name=data.wellName,
-            well_location=data.wellLocation,
-            volume=data.volume,
+            pipette_id=params.pipetteId,
+            labware_id=params.labwareId,
+            well_name=params.wellName,
+            well_location=params.wellLocation,
+            volume=params.volume,
         )
 
         return DispenseResult(volume=volume)
 
 
-class Dispense(BaseCommand[DispenseData, DispenseResult]):
+class Dispense(BaseCommand[DispenseParams, DispenseResult]):
     """Dispense command model."""
 
     commandType: DispenseCommandType = "dispense"
-    data: DispenseData
+    params: DispenseParams
     result: Optional[DispenseResult]
 
     _ImplementationCls: Type[DispenseImplementation] = DispenseImplementation
 
 
-class DispenseRequest(BaseCommandRequest[DispenseData]):
+class DispenseCreate(BaseCommandCreate[DispenseParams]):
     """Create dispense command request model."""
 
     commandType: DispenseCommandType = "dispense"
-    data: DispenseData
+    params: DispenseParams
 
     _CommandCls: Type[Dispense] = Dispense

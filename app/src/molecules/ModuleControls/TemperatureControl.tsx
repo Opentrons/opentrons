@@ -107,7 +107,7 @@ export const TemperatureControl = ({
                 onClick: handleCancel,
               },
               {
-                children: 'Set temp',
+                children: 'Set temperature',
                 disabled: tempValue == null,
                 onClick: handleSubmitTemp,
               },
@@ -135,16 +135,18 @@ export const TemperatureControl = ({
           </AlertModal>
         </Portal>
       )}
+
       <SecondaryBtn
         paddingX={SPACING_2}
         width={'11rem'}
         onClick={handleClick}
         disabled={disabledReason != null}
         {...targetProps}
+        fontSize={FONT_SIZE_BODY_1}
       >
         {hasTarget === true
           ? `Deactivate${modulePartName}`
-          : `Set${modulePartName} Temp`}
+          : `Set${modulePartName} Temperature`}
       </SecondaryBtn>
       {disabledReason && <Tooltip {...tooltipProps}>{disabledReason}</Tooltip>}
     </Flex>

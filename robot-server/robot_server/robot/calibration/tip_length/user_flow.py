@@ -1,10 +1,12 @@
 import logging
-from typing import Dict, Awaitable, Callable, Any, Set, List, Optional, TYPE_CHECKING
+from typing import Dict, Awaitable, Callable, Any, Set, List, Optional
+
 from opentrons.types import Mount, Point, Location
-from opentrons.config import feature_flags as ff
-from opentrons.hardware_control import ThreadManager, CriticalPoint, Pipette
+from opentrons.hardware_control import HardwareControlAPI, CriticalPoint, Pipette
 from opentrons.protocol_api import labware
 from opentrons.protocols.geometry.deck import Deck
+
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from robot_server.robot.calibration import util
 from robot_server.service.errors import RobotServerError
@@ -14,17 +16,11 @@ from ..errors import CalibrationError
 from ..helper_classes import RequiredLabware, AttachedPipette, SupportedCommands
 from ..constants import (
     TIP_RACK_LOOKUP_BY_MAX_VOL,
-    SHORT_TRASH_DECK,
-    STANDARD_DECK,
     CAL_BLOCK_SETUP_BY_MOUNT,
     MOVE_TO_TIP_RACK_SAFETY_BUFFER,
 )
 from .constants import TipCalibrationState as State, TIP_RACK_SLOT
 from .state_machine import TipCalibrationStateMachine
-
-if TYPE_CHECKING:
-    from opentrons_shared_data.labware import LabwareDefinition
-
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -43,24 +39,24 @@ COMMAND_MAP = Dict[str, COMMAND_HANDLER]
 class TipCalibrationUserFlow:
     def __init__(
         self,
-        hardware: ThreadManager,
+        hardware: HardwareControlAPI,
         mount: Mount,
         has_calibration_block: bool,
-        tip_rack: "LabwareDefinition",
+        tip_rack: LabwareDefinition,
     ):
         self._hardware = hardware
         self._mount = mount
         self._has_calibration_block = has_calibration_block
-        self._hw_pipette = self._hardware._attached_instruments[mount]
-        if not self._hw_pipette:
+        pip = self._hardware.hardware_instruments[mount]
+        if not pip:
             raise RobotServerError(
                 definition=CalibrationError.NO_PIPETTE_ON_MOUNT, mount=mount
             )
+        self._hw_pipette = pip
         self._tip_origin_pt: Optional[Point] = None
         self._nozzle_height_at_reference: Optional[float] = None
 
-        deck_load_name = SHORT_TRASH_DECK if ff.short_fixed_trash() else STANDARD_DECK
-        self._deck = Deck(load_name=deck_load_name)
+        self._deck = Deck()
         self._tip_rack = self._get_tip_rack_lw(tip_rack)
         self._initialize_deck()
 
@@ -87,7 +83,7 @@ class TipCalibrationUserFlow:
         self._current_state = to_state
 
     @property
-    def hardware(self) -> ThreadManager:
+    def hardware(self) -> HardwareControlAPI:
         return self._hardware
 
     @property
@@ -119,7 +115,7 @@ class TipCalibrationUserFlow:
         self._tip_origin_pt = None
 
     @property
-    def supported_commands(self) -> List:
+    def supported_commands(self) -> List[str]:
         return self._supported_commands.supported()
 
     @property
@@ -133,7 +129,7 @@ class TipCalibrationUserFlow:
             name=self._hw_pipette.name,
             tipLength=self._hw_pipette.config.tip_length,
             mount=str(self._mount),
-            serial=self._hw_pipette.pipette_id,
+            serial=self._hw_pipette.pipette_id,  # type: ignore[arg-type]
             defaultTipracks=self._default_tipracks,  # type: ignore[arg-type]
         )
 
@@ -164,7 +160,10 @@ class TipCalibrationUserFlow:
             f"from {self._current_state} to {next_state}"
         )
 
-    async def load_labware(self, tiprackDefinition: Optional[dict] = None):
+    async def load_labware(
+        self,
+        tiprackDefinition: Optional[LabwareDefinition] = None,
+    ):
         pass
 
     async def move_to_tip_rack(self):
@@ -182,7 +181,7 @@ class TipCalibrationUserFlow:
             cur_pt = await self.get_current_point(critical_point=CriticalPoint.NOZZLE)
 
             util.save_tip_length_calibration(
-                pipette_id=self._hw_pipette.pipette_id,
+                pipette_id=self._hw_pipette.pipette_id,  # type: ignore[arg-type]
                 tip_length_offset=cur_pt.z - self._nozzle_height_at_reference,
                 tip_rack=self._tip_rack,
             )
@@ -190,7 +189,7 @@ class TipCalibrationUserFlow:
     def _get_default_tip_length(self) -> float:
         tiprack: labware.Labware = self._deck[TIP_RACK_SLOT]  # type: ignore
         full_length = tiprack.tip_length
-        overlap_dict: Dict = self._hw_pipette.config.tip_overlap
+        overlap_dict: Dict[str, float] = self._hw_pipette.config.tip_overlap
         overlap = overlap_dict.get(tiprack.uri, 0)
         return full_length - overlap
 
@@ -202,19 +201,23 @@ class TipCalibrationUserFlow:
             else None
         )
 
-    async def get_current_point(self, critical_point: CriticalPoint = None) -> Point:
+    async def get_current_point(
+        self,
+        critical_point: Optional[CriticalPoint] = None,
+    ) -> Point:
         return await self._hardware.gantry_position(self._mount, critical_point)
 
     async def jog(self, vector):
         await self._hardware.move_rel(mount=self._mount, delta=Point(*vector))
 
     async def move_to_reference_point(self):
+        cal_block_target_well: Optional[labware.Well] = None
+
         if self._has_calibration_block:
             cb_setup = CAL_BLOCK_SETUP_BY_MOUNT[self._mount]
             calblock: labware.Labware = self._deck[cb_setup.slot]  # type: ignore
             cal_block_target_well = calblock.wells_by_name()[cb_setup.well]
-        else:
-            cal_block_target_well = None
+
         ref_loc = util.get_reference_location(
             deck=self._deck, cal_block_target_well=cal_block_target_well
         )
@@ -232,7 +235,7 @@ class TipCalibrationUserFlow:
             await self.return_tip()
         await self._hardware.home()
 
-    def _get_tip_rack_lw(self, tip_rack_def: "LabwareDefinition") -> labware.Labware:
+    def _get_tip_rack_lw(self, tip_rack_def: LabwareDefinition) -> labware.Labware:
         try:
             return labware.load_from_definition(
                 tip_rack_def, self._deck.position_for(TIP_RACK_SLOT)

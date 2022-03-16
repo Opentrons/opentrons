@@ -17,7 +17,9 @@ class PlateTemperatureStatus:
 
     def __init__(self) -> None:
         """Construct."""
-        self._temp_history: Deque = deque(maxlen=self.MIN_SAMPLES_UNDER_THRESHOLD)
+        self._temp_history: Deque[float] = deque(
+            maxlen=self.MIN_SAMPLES_UNDER_THRESHOLD
+        )
         self._status = TemperatureStatus.ERROR
 
     @property
@@ -44,7 +46,7 @@ class PlateTemperatureStatus:
         return self._status
 
     @staticmethod
-    def _is_holding_at_target(target: float, history: deque) -> bool:
+    def _is_holding_at_target(target: float, history: Deque[float]) -> bool:
         """
         Checks block temp history to determine if block temp has stabilized at
         the target temperature. Returns true only if all values in history are
@@ -55,6 +57,5 @@ class PlateTemperatureStatus:
             return False
         else:
             return all(
-                abs(target - t) < PlateTemperatureStatus.TEMP_THRESHOLD
-                for t in history
+                abs(target - t) < PlateTemperatureStatus.TEMP_THRESHOLD for t in history
             )

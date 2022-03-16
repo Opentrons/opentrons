@@ -1,12 +1,11 @@
 import * as React from 'react'
-
+import { css } from 'styled-components'
+import { useTranslation } from 'react-i18next'
 import {
   Icon,
   Text,
   Flex,
-  PrimaryBtn,
-  SecondaryBtn,
-  FONT_HEADER_DARK,
+  NewPrimaryBtn,
   FONT_SIZE_BODY_2,
   FONT_WEIGHT_REGULAR,
   SPACING_3,
@@ -18,12 +17,13 @@ import {
   Link,
   DIRECTION_COLUMN,
   ALIGN_CENTER,
-  C_SELECTED_DARK,
   C_WHITE,
   JUSTIFY_CENTER,
+  C_BLUE,
+  SPACING_1,
+  JUSTIFY_START,
 } from '@opentrons/components'
-import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
+import { LastRun } from './LastRun'
 
 const PROTOCOL_LIBRARY_URL = 'https://protocols.opentrons.com'
 const PROTOCOL_DESIGNER_URL = 'https://designer.opentrons.com'
@@ -41,9 +41,10 @@ const DROP_ZONE_STYLES = css`
   color: ${C_MED_GRAY};
   text-align: center;
   margin-bottom: ${SPACING_4};
+  background-color: ${C_WHITE};
 `
 const DRAG_OVER_STYLES = css`
-  background-color: ${C_SELECTED_DARK};
+  background-color: ${C_BLUE};
   color: ${C_WHITE};
 `
 
@@ -56,13 +57,13 @@ export interface UploadInputProps {
   onUpload: (file: File) => unknown
 }
 
-export function UploadInput(props: UploadInputProps): JSX.Element {
+export function UploadInput(props: UploadInputProps): JSX.Element | null {
   const { t } = useTranslation('protocol_info')
+
   const fileInput = React.useRef<HTMLInputElement>(null)
   const [isFileOverDropZone, setIsFileOverDropZone] = React.useState<boolean>(
     false
   )
-
   const handleDrop: React.DragEventHandler<HTMLLabelElement> = e => {
     e.preventDefault()
     e.stopPropagation()
@@ -108,12 +109,14 @@ export function UploadInput(props: UploadInputProps): JSX.Element {
       justifyContent={JUSTIFY_CENTER}
       alignItems={ALIGN_CENTER}
     >
-      <Text as="h1" css={FONT_HEADER_DARK} marginBottom={SPACING_3}>
-        {t('open_a_protocol')}
-      </Text>
-      <PrimaryBtn onClick={handleClick} marginBottom={SPACING_4}>
+      <NewPrimaryBtn
+        onClick={handleClick}
+        marginBottom={SPACING_4}
+        id={'UploadInput_protocolUploadButton'}
+      >
         {t('choose_file')}
-      </PrimaryBtn>
+      </NewPrimaryBtn>
+
       <label
         data-testid="file_drop_zone"
         onDrop={handleDrop}
@@ -123,9 +126,15 @@ export function UploadInput(props: UploadInputProps): JSX.Element {
         css={dropZoneStyles}
       >
         <Icon width={SIZE_3} name="upload" marginBottom={SPACING_4} />
-        <span aria-controls="file_input" role="button">
+
+        <span
+          aria-controls="file_input"
+          role="button"
+          id={'UploadInput_fileUploadLabel'}
+        >
           {t('drag_file_here')}
         </span>
+
         <input
           id="file_input"
           data-testid="file_input"
@@ -135,30 +144,38 @@ export function UploadInput(props: UploadInputProps): JSX.Element {
           onChange={onChange}
         />
       </label>
+      <LastRun />
       <Text
         role="complementary"
-        css={FONT_HEADER_DARK}
-        marginBottom={SPACING_4}
+        as="h4"
+        marginBottom={SPACING_3}
+        marginTop={SPACING_3}
       >
         {t('no_protocol_yet')}
       </Text>
-      <SecondaryBtn
-        as={Link}
-        external
-        href={PROTOCOL_LIBRARY_URL}
-        width="19rem"
-        marginBottom={SPACING_3}
-      >
-        {t('browse_protocol_library')}
-      </SecondaryBtn>
-      <SecondaryBtn
-        as={Link}
-        external
-        href={PROTOCOL_DESIGNER_URL}
-        width="19rem"
-      >
-        {t('launch_protocol_designer')}
-      </SecondaryBtn>
+      <Flex justifyContent={JUSTIFY_START} flexDirection={DIRECTION_COLUMN}>
+        <Link
+          fontSize={FONT_SIZE_BODY_2}
+          color={C_BLUE}
+          href={PROTOCOL_LIBRARY_URL}
+          id={'UploadInput_protocolLibraryButton'}
+          marginBottom={SPACING_1}
+          external
+        >
+          {t('browse_protocol_library')}
+          <Icon name={'open-in-new'} marginLeft={SPACING_1} size="10px" />
+        </Link>
+        <Link
+          fontSize={FONT_SIZE_BODY_2}
+          color={C_BLUE}
+          href={PROTOCOL_DESIGNER_URL}
+          id={'UploadInput_protocolDesignerButton'}
+          external
+        >
+          {t('launch_protocol_designer')}
+          <Icon name={'open-in-new'} marginLeft={SPACING_1} size="10px" />
+        </Link>
+      </Flex>
     </Flex>
   )
 }

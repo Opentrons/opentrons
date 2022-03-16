@@ -1,148 +1,123 @@
-from pytest import raises
-from pydantic import ValidationError
+import pytest
+from pydantic import BaseModel
+from typing import Any, Dict, NamedTuple, Optional
 
+from robot_server.service.json_api.resource_links import ResourceLink
 from robot_server.service.json_api.response import (
-    ResponseDataModel,
-    ResponseModel,
-    MultiResponseModel,
+    ResourceModel,
+    SimpleBody,
+    Body,
+    SimpleEmptyBody,
+    EmptyBody,
+    SimpleMultiBody,
+    MultiBody,
+    MultiBodyMeta,
+    DeprecatedResponseModel,
+    DeprecatedMultiResponseModel,
 )
-from tests.service.helpers import ItemResponseModel
 
 
-def test_attributes_as_dict():
-    MyResponse = ResponseModel[ResponseDataModel]
-    obj_to_validate = {
-        "data": {"id": "123"},
-    }
-    my_response_object = MyResponse(**obj_to_validate)
-    assert my_response_object.dict() == {
-        "links": None,
-        "data": {
-            "id": "123",
+class _Resource(ResourceModel):
+    id: str
+    val: Optional[int] = None
+
+
+class _Links(BaseModel):
+
+    sibling: ResourceLink
+
+
+class ResponseSpec(NamedTuple):
+    """Spec data to test response > dict serialization."""
+
+    subject: BaseModel
+    expected: Dict[str, Any]
+
+
+RESPONSE_SPECS = [
+    ResponseSpec(
+        subject=SimpleBody(data=_Resource(id="hello")),
+        expected={"data": {"id": "hello"}},
+    ),
+    ResponseSpec(
+        subject=Body(
+            data=_Resource(id="hello"),
+            links=_Links(sibling=ResourceLink(href="/bar")),
+        ),
+        expected={
+            "data": {"id": "hello"},
+            "links": {"sibling": {"href": "/bar"}},
         },
-    }
-
-
-def test_attributes_as_item_model():
-    ItemResponse = ResponseModel[ItemResponseModel]
-    obj_to_validate = {
-        "links": None,
-        "data": {"id": "123", "name": "apple", "quantity": 10, "price": 1.20},
-    }
-    my_response_obj = ItemResponse(**obj_to_validate)
-    assert my_response_obj.dict() == {
-        "links": None,
-        "data": {
-            "id": "123",
-            "name": "apple",
-            "quantity": 10,
-            "price": 1.20,
+    ),
+    ResponseSpec(
+        subject=SimpleEmptyBody(),
+        expected={},
+    ),
+    ResponseSpec(
+        subject=EmptyBody(links=_Links(sibling=ResourceLink(href="/bar"))),
+        expected={"links": {"sibling": {"href": "/bar"}}},
+    ),
+    ResponseSpec(
+        subject=SimpleMultiBody(
+            data=[_Resource(id="hello"), _Resource(id="goodbye")],
+            meta=MultiBodyMeta(cursor=1, totalLength=3),
+        ),
+        expected={
+            "data": [{"id": "hello"}, {"id": "goodbye"}],
+            "meta": {"cursor": 1, "totalLength": 3},
         },
-    }
-
-
-def test_list_item_model():
-    ItemResponse = MultiResponseModel[ItemResponseModel]
-    obj_to_validate = {
-        "links": None,
-        "data": [
-            {"id": "123", "name": "apple", "quantity": 10, "price": 1.20},
-            {"id": "321", "name": "banana", "quantity": 20, "price": 2.34},
-        ],
-    }
-    my_response_obj = ItemResponse(**obj_to_validate)
-    assert my_response_obj.dict() == {
-        "links": None,
-        "data": [
-            {
-                "id": "123",
-                "name": "apple",
-                "quantity": 10,
-                "price": 1.20,
-            },
-            {
-                "id": "321",
-                "name": "banana",
-                "quantity": 20,
-                "price": 2.34,
-            },
-        ],
-    }
-
-
-def test_attributes_as_item_model_empty_dict():
-    ItemResponse = ResponseModel[ItemResponseModel]
-    obj_to_validate = {
-        "data": {
-            "id": "123",
-        }
-    }
-    with raises(ValidationError) as e:
-        ItemResponse(**obj_to_validate)
-
-    assert e.value.errors() == [
-        {
-            "loc": ("data", "name"),
-            "msg": "field required",
-            "type": "value_error.missing",
+    ),
+    ResponseSpec(
+        subject=MultiBody(
+            data=[_Resource(id="hello"), _Resource(id="goodbye")],
+            links=_Links(sibling=ResourceLink(href="/bar")),
+            meta=MultiBodyMeta(cursor=1, totalLength=3),
+        ),
+        expected={
+            "data": [{"id": "hello"}, {"id": "goodbye"}],
+            "links": {"sibling": {"href": "/bar"}},
+            "meta": {"cursor": 1, "totalLength": 3},
         },
-        {
-            "loc": ("data", "quantity"),
-            "msg": "field required",
-            "type": "value_error.missing",
+    ),
+    ResponseSpec(
+        subject=DeprecatedResponseModel(data=_Resource(id="hello")),
+        expected={
+            "data": {"id": "hello", "val": None},
+            "links": None,
         },
-        {
-            "loc": ("data", "price"),
-            "msg": "field required",
-            "type": "value_error.missing",
+    ),
+    ResponseSpec(
+        subject=DeprecatedResponseModel(
+            data=_Resource(id="hello"),
+            links={"sibling": ResourceLink(href="/bar")},
+        ),
+        expected={
+            "data": {"id": "hello", "val": None},
+            "links": {"sibling": {"href": "/bar", "meta": None}},
         },
-    ]
-
-
-def test_response_constructed_with_resource_object():
-    ItemResponse = ResponseModel[ItemResponseModel]
-    item = ItemResponseModel(id="abc123", name="pear", price=1.2, quantity=10)
-    data = item.dict()
-
-    assert ItemResponse(data=data).dict() == {
-        "links": None,
-        "data": {
-            "id": "abc123",
-            "name": "pear",
-            "price": 1.2,
-            "quantity": 10,
+    ),
+    ResponseSpec(
+        subject=DeprecatedMultiResponseModel(
+            data=[_Resource(id="hello"), _Resource(id="goodbye")],
+        ),
+        expected={
+            "data": [{"id": "hello", "val": None}, {"id": "goodbye", "val": None}],
+            "links": None,
         },
-    }
+    ),
+    ResponseSpec(
+        subject=DeprecatedMultiResponseModel(
+            data=[_Resource(id="hello"), _Resource(id="goodbye")],
+            links={"sibling": ResourceLink(href="/bar")},
+        ),
+        expected={
+            "data": [{"id": "hello", "val": None}, {"id": "goodbye", "val": None}],
+            "links": {"sibling": {"href": "/bar", "meta": None}},
+        },
+    ),
+]
 
 
-def test_response_constructed_with_resource_object_list():
-    ItemResponse = MultiResponseModel[ItemResponseModel]
-    items = [
-        ItemResponseModel(id="1", name="apple", price=1.5, quantity=3),
-        ItemResponseModel(id="2", name="pear", price=1.2, quantity=10),
-        ItemResponseModel(id="3", name="orange", price=2.2, quantity=5),
-    ]
-    response = ItemResponse(data=items)
-    assert response.dict() == {
-        "links": None,
-        "data": [
-            {
-                "id": "1",
-                "name": "apple",
-                "price": 1.5,
-                "quantity": 3,
-            },
-            {
-                "id": "2",
-                "name": "pear",
-                "price": 1.2,
-                "quantity": 10,
-            },
-            {
-                "id": "3",
-                "name": "orange",
-                "price": 2.2,
-                "quantity": 5,
-            },
-        ],
-    }
+@pytest.mark.parametrize(ResponseSpec._fields, RESPONSE_SPECS)
+def test_response_to_dict(subject: BaseModel, expected: Dict[str, Any]) -> None:
+    assert subject.dict() == expected

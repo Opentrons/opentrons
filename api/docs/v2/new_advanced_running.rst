@@ -54,13 +54,13 @@ If you have a protocol that you have already written you can run it directly in 
 .. code-block:: python
     :substitutions:
 
-   import opentrons.execute
-   from opentrons import protocol_api
-   def run(protocol: protocol_api.ProtocolContext):
-       # the contents of your protocol are here...
+    import opentrons.execute
+    from opentrons import protocol_api
+    def run(protocol: protocol_api.ProtocolContext):
+        # the contents of your protocol are here...
 
-   protocol = opentrons.execute.get_protocol_api('|apiLevel|')
-   run(protocol)  # your protocol will now run
+    protocol = opentrons.execute.get_protocol_api('|apiLevel|')
+    run(protocol)  # your protocol will now run
 
 
 Custom Labware

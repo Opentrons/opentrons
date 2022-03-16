@@ -3,22 +3,21 @@ from typing import List, Dict, Optional
 from opentrons.calibration_storage import helpers
 from opentrons.protocols.geometry.labware_geometry import LabwareGeometry
 from opentrons.protocols.geometry.well_geometry import WellGeometry
-from opentrons.protocols.context.labware import \
-    AbstractLabware
+from opentrons.protocols.context.labware import AbstractLabware
 from opentrons.protocols.api_support.tip_tracker import TipTracker
 from opentrons.protocols.context.well import WellImplementation
 from opentrons.protocols.api_support.well_grid import WellGrid
 from opentrons.types import Point, Location
-from opentrons_shared_data.labware.dev_types import LabwareParameters, \
-    LabwareDefinition
+from opentrons_shared_data.labware.dev_types import LabwareParameters, LabwareDefinition
 
 
 class LabwareImplementation(AbstractLabware):
-
-    def __init__(self,
-                 definition: LabwareDefinition,
-                 parent: Location,
-                 label: Optional[str] = None):
+    def __init__(
+        self,
+        definition: LabwareDefinition,
+        parent: Location,
+        label: Optional[str] = None,
+    ):
         """
         Construct an implementation of a labware object.
 
@@ -36,29 +35,26 @@ class LabwareImplementation(AbstractLabware):
         :param label: An optional label to use instead of the displayName
                       from the definition's metadata element
         """
+        self._label: Optional[str] = None
         if label:
-            dn = label
+            dn = self._label = label
             self._name = dn
         else:
-            dn = definition['metadata']['displayName']
-            self._name = definition['parameters']['loadName']
+            dn = definition["metadata"]["displayName"]
+            self._name = definition["parameters"]["loadName"]
 
         self._display_name = f"{dn} on {str(parent.labware)}"
         # Directly from definition
-        self._well_definition = definition['wells']
-        self._parameters = definition['parameters']
+        self._well_definition = definition["wells"]
+        self._parameters = definition["parameters"]
         self._definition = definition
 
         self._geometry = LabwareGeometry(definition, parent)
         # flatten list of list of well names.
-        self._ordering = [
-            well for col in definition['ordering'] for well in col
-        ]
+        self._ordering = [well for col in definition["ordering"] for well in col]
         self._wells: List[WellImplementation] = []
         self._well_name_grid = WellGrid(wells=self._wells)
-        self._tip_tracker = TipTracker(
-            columns=self._well_name_grid.get_columns()
-        )
+        self._tip_tracker = TipTracker(columns=self._well_name_grid.get_columns())
 
         self._calibrated_offset = Point(0, 0, 0)
         # Will cause building of the wells
@@ -69,6 +65,9 @@ class LabwareImplementation(AbstractLabware):
 
     def get_display_name(self) -> str:
         return self._display_name
+
+    def get_label(self) -> Optional[str]:
+        return self._label
 
     def get_name(self) -> str:
         return self._name
@@ -83,32 +82,30 @@ class LabwareImplementation(AbstractLabware):
         return self._parameters
 
     def get_quirks(self) -> List[str]:
-        return self._parameters.get('quirks', [])
+        return self._parameters.get("quirks", [])
 
     def set_calibration(self, delta: Point) -> None:
         self._calibrated_offset = Point(
             x=self._geometry.offset.x + delta.x,
             y=self._geometry.offset.y + delta.y,
-            z=self._geometry.offset.z + delta.z
+            z=self._geometry.offset.z + delta.z,
         )
         # The wells must be rebuilt
         self._wells = self._build_wells()
         self._well_name_grid = WellGrid(wells=self._wells)
-        self._tip_tracker = TipTracker(
-            columns=self._well_name_grid.get_columns()
-        )
+        self._tip_tracker = TipTracker(columns=self._well_name_grid.get_columns())
 
     def get_calibrated_offset(self) -> Point:
         return self._calibrated_offset
 
     def is_tiprack(self) -> bool:
-        return self._parameters['isTiprack']
+        return self._parameters["isTiprack"]
 
     def get_tip_length(self) -> float:
-        return self._parameters['tipLength']
+        return self._parameters["tipLength"]
 
     def set_tip_length(self, length: float):
-        self._parameters['tipLength'] = length
+        self._parameters["tipLength"] = length
 
     def reset_tips(self) -> None:
         if self.is_tiprack():
@@ -125,9 +122,7 @@ class LabwareImplementation(AbstractLabware):
         return self._wells
 
     def get_wells_by_name(self) -> Dict[str, WellImplementation]:
-        return {
-            well.get_name(): well for well in self._wells
-        }
+        return {well.get_name(): well for well in self._wells}
 
     def get_geometry(self) -> LabwareGeometry:
         return self._geometry
@@ -142,7 +137,7 @@ class LabwareImplementation(AbstractLabware):
 
     @property
     def load_name(self) -> str:
-        return self._parameters['loadName']
+        return self._parameters["loadName"]
 
     def _build_wells(self) -> List[WellImplementation]:
         return [
@@ -150,11 +145,11 @@ class LabwareImplementation(AbstractLabware):
                 well_geometry=WellGeometry(
                     well_props=self._well_definition[well],
                     parent_point=self._calibrated_offset,
-                    parent_object=self
+                    parent_object=self,
                 ),
                 display_name="{} of {}".format(well, self._display_name),
                 has_tip=self.is_tiprack(),
-                name=well
+                name=well,
             )
             for well in self._ordering
         ]

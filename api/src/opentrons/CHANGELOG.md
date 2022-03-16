@@ -3,6 +3,189 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.2](https://github.com/Opentrons/opentrons/compare/v5.0.1...v5.0.2) (2022-03-03)
+
+
+### Bug Fixes
+
+* **api:** lowercase filename before checking extension in ProtocolReader ([#9609](https://github.com/Opentrons/opentrons/issues/9609)) ([474c448](https://github.com/Opentrons/opentrons/commit/474c44860ac8b29c621b3a704e826688aa57ca59))
+* **api, app:** display labware label ([#9587](https://github.com/Opentrons/opentrons/issues/9587)) ([7680d92](https://github.com/Opentrons/opentrons/commit/7680d92d4a966d641e8da558514a153e06946bce)), closes [#9105](https://github.com/Opentrons/opentrons/issues/9105) [#9088](https://github.com/Opentrons/opentrons/issues/9088)
+* send custom labware definitions to the server during LPC setup ([#9588](https://github.com/Opentrons/opentrons/issues/9588)) ([7cf3233](https://github.com/Opentrons/opentrons/commit/7cf323370aefb952b0640d04738c64a0f4a2e5c9))
+
+
+
+
+
+## [5.0.1](https://github.com/Opentrons/opentrons/compare/v5.0.0...v5.0.1) (2022-02-24)
+
+**Note:** Version bump only for package @opentrons/api-server
+
+
+
+
+
+# [5.0.0](https://github.com/Opentrons/opentrons/compare/v4.7.0...v5.0.0) (2022-02-16)
+
+
+### Bug Fixes
+
+* **api:**  Fix simulator home and is_homed ([#9279](https://github.com/Opentrons/opentrons/issues/9279)) ([e5db3b7](https://github.com/Opentrons/opentrons/commit/e5db3b7447fbb8624d63345bab661463c936d1a4)), closes [#8969](https://github.com/Opentrons/opentrons/issues/8969)
+* **api:** add missing f-string to thermocycler profile command text ([#9407](https://github.com/Opentrons/opentrons/issues/9407)) ([5a37197](https://github.com/Opentrons/opentrons/commit/5a37197a3ab44072067fe57f85d20a88ddd0daf5)), closes [#9380](https://github.com/Opentrons/opentrons/issues/9380)
+* **api:** check home status in move_rel ([#8724](https://github.com/Opentrons/opentrons/issues/8724)) ([7347847](https://github.com/Opentrons/opentrons/commit/734784718188f10e4b36ac0a0b043a4b3ca8b3b8))
+* **api:** check pipette names in simulator ([#9181](https://github.com/Opentrons/opentrons/issues/9181)) ([a81ebd9](https://github.com/Opentrons/opentrons/commit/a81ebd96cf3079bb518a2cb89ee6763149177a5c))
+* **api:** don't show exception on module server disconnect. ([#8778](https://github.com/Opentrons/opentrons/issues/8778)) ([1bfaabe](https://github.com/Opentrons/opentrons/commit/1bfaabe233afe4d370313417a3423aa540a2a685))
+* **api:** filter higher order commands out of legacy command response ([#9294](https://github.com/Opentrons/opentrons/issues/9294)) ([21e5bf5](https://github.com/Opentrons/opentrons/commit/21e5bf590f5523f90adff5ad447baa9c2db7bf6c)), closes [#9102](https://github.com/Opentrons/opentrons/issues/9102)
+* **api:** Prioritize mc alarms over errors ([#9230](https://github.com/Opentrons/opentrons/issues/9230)) ([c44fed3](https://github.com/Opentrons/opentrons/commit/c44fed3aae222e7712937d77f9a2720fb9be1651))
+* **api:** set serial timeouts for transactions ([#9190](https://github.com/Opentrons/opentrons/issues/9190)) ([03e3c55](https://github.com/Opentrons/opentrons/commit/03e3c559b134502bc411e8d97c5b33e16c6d9b2a))
+* **engine:** take calibrated tip length into account during tip pickup ([#9246](https://github.com/Opentrons/opentrons/issues/9246)) ([7866767](https://github.com/Opentrons/opentrons/commit/7866767ee6057197edf253f8b31272a734a71afd)), closes [#9220](https://github.com/Opentrons/opentrons/issues/9220)
+* **protocol-engine:** move HW API cleanup to engine.finish ([#9233](https://github.com/Opentrons/opentrons/issues/9233)) ([1994405](https://github.com/Opentrons/opentrons/commit/19944058762d889a6ab5b22e7a6ccc16f7367dda))
+* **protocol-engine:** Preserve distinction between APIv2 protocols' requested vs. connected modules ([#9364](https://github.com/Opentrons/opentrons/issues/9364)) ([042907b](https://github.com/Opentrons/opentrons/commit/042907b3fa69cf30935dfa381eafa72b2b9f42fe))
+* **robot-server:** add current command metadata to /commands response ([#9400](https://github.com/Opentrons/opentrons/issues/9400)) ([7da0420](https://github.com/Opentrons/opentrons/commit/7da0420bd07810095312e07eb22fb2d31ee29215))
+
+
+### Code Refactoring
+
+* **robot-server:** remove deprecated protocols endpoints and FF ([#9261](https://github.com/Opentrons/opentrons/issues/9261)) ([802d858](https://github.com/Opentrons/opentrons/commit/802d8582dbc09566b8de9eca3672254ef271164b))
+
+
+### Features
+
+* **api:** remove Calibrate to Bottom from Robot Settings ([#9111](https://github.com/Opentrons/opentrons/issues/9111)) ([06a92ee](https://github.com/Opentrons/opentrons/commit/06a92eecd9fba67c596d91e7c0096b5144b32ab6))
+* **api:** Remove legacy LC reset from robot settings ([#9093](https://github.com/Opentrons/opentrons/issues/9093)) ([9b78815](https://github.com/Opentrons/opentrons/commit/9b788154fffc405152f6f5f165a4d646dd47b4b5)), closes [#8283](https://github.com/Opentrons/opentrons/issues/8283)
+* **engine:** allow compatible module loads and reloads ([#9273](https://github.com/Opentrons/opentrons/issues/9273)) ([1c7e00d](https://github.com/Opentrons/opentrons/commit/1c7e00d8da77273eca1a8d0bb5e7bed544e3c168))
+* **ot3:** introduce independent head l and r motion. ([#8966](https://github.com/Opentrons/opentrons/issues/8966)) ([30cb899](https://github.com/Opentrons/opentrons/commit/30cb899fe1769b996fb0ea6f0bae391c6dbec635))
+* **ot3:** ot3 hardware controller move ([#8738](https://github.com/Opentrons/opentrons/issues/8738)) ([883db3a](https://github.com/Opentrons/opentrons/commit/883db3a96ca9c6a48bd4ccee16e221fe03154361)), closes [#8946](https://github.com/Opentrons/opentrons/issues/8946)
+* **papi:** add labware.set_offset for jupyter/cli, bump papi to 2.12 ([#9242](https://github.com/Opentrons/opentrons/issues/9242)) ([17d03cd](https://github.com/Opentrons/opentrons/commit/17d03cdfbf1b41be17dd41d6b064f75d2184938a))
+* **robot-server:** enable /runs and /protocols endpoints by default ([#8913](https://github.com/Opentrons/opentrons/issues/8913)) ([aa3549f](https://github.com/Opentrons/opentrons/commit/aa3549fad49383243f9ad2ccc291d15e8fd50725)), closes [#8155](https://github.com/Opentrons/opentrons/issues/8155)
+* **robot-server,api,app:** When adding a jog command over HTTP, wait for it to complete before returning ([#9410](https://github.com/Opentrons/opentrons/issues/9410)) ([4d811d5](https://github.com/Opentrons/opentrons/commit/4d811d5485754b45795a275424e0b267edc88270))
+
+
+### Performance Improvements
+
+* **api:** bring back the ThreadManager ([#9199](https://github.com/Opentrons/opentrons/issues/9199)) ([ba931f7](https://github.com/Opentrons/opentrons/commit/ba931f750cf67ce68a6dc9e2ae9ac8682ce43d3a))
+* **api:** Do not wait for the event loop to be free when reporting APIv2 commands ([#9238](https://github.com/Opentrons/opentrons/issues/9238)) ([6ab9b10](https://github.com/Opentrons/opentrons/commit/6ab9b10425eec5c63db93abdd3e68a1c33e0a3ac))
+* **app, robot-server:** paginate /runs/:run_id/commands response ([#9348](https://github.com/Opentrons/opentrons/issues/9348)) ([b9eb7b4](https://github.com/Opentrons/opentrons/commit/b9eb7b4d98532480705d3c32fd2485508315bea9))
+* **protocol-engine:** avoid iterating all commands for every state update ([#9170](https://github.com/Opentrons/opentrons/issues/9170)) ([b12bffc](https://github.com/Opentrons/opentrons/commit/b12bffcee1edaba848c43b4af8c95a7bba367dde)), closes [#9109](https://github.com/Opentrons/opentrons/issues/9109) [#8739](https://github.com/Opentrons/opentrons/issues/8739)
+
+
+### BREAKING CHANGES
+
+* **robot-server:** This removes endpoints used during the 2021 HTTP protocol upload beta.
+Users should transition to the new `/protocols` and `/runs` endpoints, instead.
+* **robot-server:** The RPC WebSocket endpoint has been removed. The /protocols endpoints have been
+heavily reworked.
+
+
+
+
+
+# [4.7.0](https://github.com/Opentrons/opentrons/compare/v4.6.2...v4.7.0) (2021-11-18)
+
+
+### Bug Fixes
+
+* **api:** 4.6.x set max speed fails ([#8437](https://github.com/Opentrons/opentrons/issues/8437)) ([5989af0](https://github.com/Opentrons/opentrons/commit/5989af08e19d78c8cfff65e6bb2bb415ed7e174b)), closes [#8436](https://github.com/Opentrons/opentrons/issues/8436)
+* **api:** Improve metadata parse error messages and fix metadata typechecking ([#8378](https://github.com/Opentrons/opentrons/issues/8378)) ([1015b14](https://github.com/Opentrons/opentrons/commit/1015b1459cd5da834f88925ce3f6b5eece4018ef)), closes [#8352](https://github.com/Opentrons/opentrons/issues/8352)
+* **api:** thermocycler error handling ([#8439](https://github.com/Opentrons/opentrons/issues/8439)) ([7dcff2f](https://github.com/Opentrons/opentrons/commit/7dcff2f7e0f5427c83738fca14c8d2dde7476740)), closes [#8393](https://github.com/Opentrons/opentrons/issues/8393)
+* **api:** lock reads to pipettes in the hardware controller ([d78939c] https://github.com/Opentrons/opentrons/commit/d78939c6a791b8e260f598bee916d5fb8799a7d3), closes [#8576](https://github.com/Opentrons/opentrons/issues/8576)
+* **robot-server:** avoid LabwareDefinition type in cal models ([#8698](https://github.com/Opentrons/opentrons/issues/8698)) ([c3bf7ab](https://github.com/Opentrons/opentrons/commit/c3bf7ab51074e8b5e160ce5755be6e80296f1963)), closes [#8654](https://github.com/Opentrons/opentrons/issues/8654)
+* **robot-server:** ensure background tasks do not affect requests ([#8362](https://github.com/Opentrons/opentrons/issues/8362)) ([3e4bc2f](https://github.com/Opentrons/opentrons/commit/3e4bc2f504282c51622682001780f35d5f3e5312))
+
+
+### Features
+
+* **api:** Add hardware control for heater shaker ([#8435](https://github.com/Opentrons/opentrons/issues/8435)) ([1a68d66](https://github.com/Opentrons/opentrons/commit/1a68d66e9638206c2a4700ed0348f3137bc13789))
+* **api,robot-server:** upgrade fastapi and pydantic deps ([#8345](https://github.com/Opentrons/opentrons/issues/8345)) ([9cf416a](https://github.com/Opentrons/opentrons/commit/9cf416a498e77b2127a6e3e71298f9368f818d35)), closes [#8134](https://github.com/Opentrons/opentrons/issues/8134)
+* **ot3:** OT3Controller backend for hardware controller ([#8492](https://github.com/Opentrons/opentrons/issues/8492)) ([5600948](https://github.com/Opentrons/opentrons/commit/56009482a376b712384441f429c2e0d78192bdbd))
+
+
+
+
+
+
+
+**Note:** Version bump only for package @opentrons/api-server
+
+
+
+
+
+## [4.6.2](https://github.com/Opentrons/opentrons/compare/v4.6.1...v4.6.2) (2021-09-30)
+
+
+### Bug Fixes
+
+* **api:** 4.6.x set max speed fails ([#8437](https://github.com/Opentrons/opentrons/issues/8437)) ([cb9a4f0](https://github.com/Opentrons/opentrons/commit/cb9a4f03df857b3e688651be4abd3ff9f9baa586)), closes [#8436](https://github.com/Opentrons/opentrons/issues/8436)
+
+
+
+
+
+## [4.6.1](https://github.com/Opentrons/opentrons/compare/v4.6.0...v4.6.1) (2021-09-28)
+
+**Note:** Version bump only for package @opentrons/api-server
+
+
+
+
+
+# [4.6.0](https://github.com/Opentrons/opentrons/compare/v4.5.0...v4.6.0) (2021-09-27)
+
+
+### Bug Fixes
+
+* **api:** drop tip after cancel ([#8229](https://github.com/Opentrons/opentrons/issues/8229)) ([bb44718](https://github.com/Opentrons/opentrons/commit/bb447184b97f7607604eb79a4cdad942a9366bc1))
+* **api:** ensure decorators do not erase ProtocolContext types ([#8323](https://github.com/Opentrons/opentrons/issues/8323)) ([2a8a370](https://github.com/Opentrons/opentrons/commit/2a8a37025e8894230cdeb0376a7bf832b4e9f12f))
+* **api:** Make tip pickup error say "pick up tip," not "drop tip" ([#8251](https://github.com/Opentrons/opentrons/issues/8251)) ([430fbeb](https://github.com/Opentrons/opentrons/commit/430fbeb9b59cbbcb8a9288a5afc9445030711b34))
+* **api:** wait for poll before awaiting tempdeck temperature ([#8340](https://github.com/Opentrons/opentrons/issues/8340)) ([acb394d](https://github.com/Opentrons/opentrons/commit/acb394d72260f3660df9e2086a8e44e0b349b632))
+* **fastsim:** fast sim fails when using InstrumentContext.pair_with function ([#8290](https://github.com/Opentrons/opentrons/issues/8290)) ([02b78de](https://github.com/Opentrons/opentrons/commit/02b78de18ba03bfceafb98374f04ef41431f8d51)), closes [#8222](https://github.com/Opentrons/opentrons/issues/8222)
+* **fastsim:** set_defaults for FlowRates in InstrumentContextSimulation ([165dd5d](https://github.com/Opentrons/opentrons/commit/165dd5d45a3fef4a4af9756fbfcc774e674e102c)), closes [#8272](https://github.com/Opentrons/opentrons/issues/8272)
+* **simulation:** NoTipAttachedError in fast simulation only ([#8280](https://github.com/Opentrons/opentrons/issues/8280)) ([b7e93f1](https://github.com/Opentrons/opentrons/commit/b7e93f1e2e47a70c61f40432ac60010163d2fb5b)), closes [#8273](https://github.com/Opentrons/opentrons/issues/8273)
+* **tempdeck:** make tempdeck waiting functions cancelable ([#8327](https://github.com/Opentrons/opentrons/issues/8327)) ([70b956f](https://github.com/Opentrons/opentrons/commit/70b956f4aa8bb344385787ea07f1d4f5ccef28da))
+
+
+### Features
+
+* **api:** Add filtering of polling messages to G-Code Parser ([#8198](https://github.com/Opentrons/opentrons/issues/8198)) ([5719c62](https://github.com/Opentrons/opentrons/commit/5719c62bd6daee7e557cfb5c23ef56fe62c65e3c))
+* **api:** Add G-Code Parser CI Integration ([#8203](https://github.com/Opentrons/opentrons/issues/8203)) ([0f3f066](https://github.com/Opentrons/opentrons/commit/0f3f066deae94b6e31b2258d1a2f0fd2360c7f19))
+* **api:** Add G-Code parsing for Thermocycler ([#8173](https://github.com/Opentrons/opentrons/issues/8173)) ([f162300](https://github.com/Opentrons/opentrons/commit/f162300cab76ae7a77608458af6e66f726864a30))
+* **api:** opentrons_simulate gets duration estimation ([#8321](https://github.com/Opentrons/opentrons/issues/8321)) ([5c59fc7](https://github.com/Opentrons/opentrons/commit/5c59fc7fa5e7c2a0b318f64b2aca7149747eb550)), closes [#8279](https://github.com/Opentrons/opentrons/issues/8279) [#8300](https://github.com/Opentrons/opentrons/issues/8300) [#8311](https://github.com/Opentrons/opentrons/issues/8311)
+* **protocol-engine:** implement well & labware's well accessor methods ([#8151](https://github.com/Opentrons/opentrons/issues/8151)) ([bff281a](https://github.com/Opentrons/opentrons/commit/bff281a273ae2dce99e770f76b823ec503217d3f))
+
+
+
+
+
+# [4.5.0](https://github.com/Opentrons/opentrons/compare/v4.4.0...v4.5.0) (2021-08-03)
+
+
+### Bug Fixes
+
+* **api:** fix module path for jupyter notebook ([#8009](https://github.com/Opentrons/opentrons/issues/8009)) ([f8bdf5c](https://github.com/Opentrons/opentrons/commit/f8bdf5c096c444320e9b70d5f88f6eec38a2dc01))
+* **api:** ignore missing aionotify more properly ([#8154](https://github.com/Opentrons/opentrons/issues/8154)) ([bb0e3a0](https://github.com/Opentrons/opentrons/commit/bb0e3a02720b4e7f9c3e0678ea6f8d4d9b5145a4))
+* **api:** reduce the severity of retry message from warning to info. ([#8192](https://github.com/Opentrons/opentrons/issues/8192)) ([47bc77a](https://github.com/Opentrons/opentrons/commit/47bc77a1a0b89becf9e43ac2f32b53f2b6efa048))
+* **api:** tolerate bad json in calibration defs ([#7962](https://github.com/Opentrons/opentrons/issues/7962)) ([588668a](https://github.com/Opentrons/opentrons/commit/588668a8500297ce52bb36d67a93b14790c4d91b))
+
+
+### Features
+
+* **api:** Add G-Code parsing ([#8043](https://github.com/Opentrons/opentrons/issues/8043)) ([c2ccb10](https://github.com/Opentrons/opentrons/commit/c2ccb109b1d680f885bc13608cf35d131440ec07))
+* **api:** Add G-Code response handling to G-Code Parser ([#8096](https://github.com/Opentrons/opentrons/issues/8096)) ([a417735](https://github.com/Opentrons/opentrons/commit/a417735874e8550b3d48d6372b3996d37ab0106f))
+* **api:** Add G-Code to human-readable text parsing ([#8086](https://github.com/Opentrons/opentrons/issues/8086)) ([bedaeeb](https://github.com/Opentrons/opentrons/commit/bedaeeba9b5d2a30560442728aebc87493458e80))
+* **api:** Add Magdeck G-Code Parsing ([#8159](https://github.com/Opentrons/opentrons/issues/8159)) ([3185656](https://github.com/Opentrons/opentrons/commit/31856567f5753f1927a6c0328e8ab3699b88a3a9))
+* **api:** Create framework for running protocols against emulation ([#8149](https://github.com/Opentrons/opentrons/issues/8149)) ([1d046ea](https://github.com/Opentrons/opentrons/commit/1d046eabb1f7065cb603b3aae309c495c2fda017))
+* **api:** G-Code CLI ([#8156](https://github.com/Opentrons/opentrons/issues/8156)) ([73bd30c](https://github.com/Opentrons/opentrons/commit/73bd30c0e12ae6894e5dff5a5f6d4926e89744c8))
+* **api:** G-Code Diffing ([#8135](https://github.com/Opentrons/opentrons/issues/8135)) ([33e3ee3](https://github.com/Opentrons/opentrons/commit/33e3ee3b0c80e0897816ee0ad4e787d0249e6fe4))
+* **api:** promote fast protocol analysis to default behavior ([#8022](https://github.com/Opentrons/opentrons/issues/8022)) ([8d9a707](https://github.com/Opentrons/opentrons/commit/8d9a707064b6d471419a8ddf4ba33d6d0d6f2a02)), closes [#7835](https://github.com/Opentrons/opentrons/issues/7835)
+* **api:** Tempdeck G-Code Parsing ([#8160](https://github.com/Opentrons/opentrons/issues/8160)) ([79778e7](https://github.com/Opentrons/opentrons/commit/79778e7125bb496f0c6659464d976afae5ea754f))
+* **protocol-engine:** Add a command queue worker class ([#7817](https://github.com/Opentrons/opentrons/issues/7817)) ([8bdd223](https://github.com/Opentrons/opentrons/commit/8bdd2236cb09fc497f1884441605117521378478))
+* **protocol-engine:** Implement `CommandState.get_next_request()` ([#7936](https://github.com/Opentrons/opentrons/issues/7936)) ([61136a1](https://github.com/Opentrons/opentrons/commit/61136a128795bd6e3ee896e79e06455f782cbf01))
+* **protocol-engine:** Support loading pipettes and labware from JSON protocols ([#7950](https://github.com/Opentrons/opentrons/issues/7950)) ([e43c80f](https://github.com/Opentrons/opentrons/commit/e43c80f8f00a0146558345483993bc0c66fdce99))
+
+
+
+
+
 # [4.4.0](https://github.com/Opentrons/opentrons/compare/v4.3.1...v4.4.0) (2021-06-16)
 
 

@@ -2,6 +2,7 @@ import * as React from 'react'
 
 import { PipetteSelect } from '@opentrons/components'
 import styles from './styles.css'
+import { OT3_PIPETTES } from '@opentrons/shared-data'
 
 const LABEL = 'Select the pipette you wish to attach:'
 
@@ -14,6 +15,7 @@ export function PipetteSelection(props: PipetteSelectionProps): JSX.Element {
       <PipetteSelect
         pipetteName={props.pipetteName}
         onPipetteChange={props.onPipetteChange}
+        nameBlocklist={OT3_PIPETTES}
       />
     </label>
   )

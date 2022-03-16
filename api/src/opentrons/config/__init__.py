@@ -32,70 +32,83 @@ import shutil
 import subprocess
 import sys
 from enum import Enum, auto
-from typing import Dict, NamedTuple, Optional, Union
+from typing import Dict, NamedTuple, Optional, cast
 
-_CONFIG_FILENAME = 'config.json'
-_LEGACY_INDICES = (Path('/mnt') / 'usbdrive' / 'config' / 'index.json',
-                   Path('/data') / 'index.json')
+_CONFIG_FILENAME = "config.json"
+_LEGACY_INDICES = (
+    Path("/mnt") / "usbdrive" / "config" / "index.json",
+    Path("/data") / "index.json",
+)
 
 log = logging.getLogger(__file__)
 
-IS_WIN = sys.platform.startswith('win')
-IS_OSX = sys.platform == 'darwin'
-IS_LINUX = sys.platform.startswith('linux')
-IS_ROBOT = bool(IS_LINUX and os.environ.get('RUNNING_ON_PI'))
+IS_WIN = sys.platform.startswith("win")
+IS_OSX = sys.platform == "darwin"
+IS_LINUX = sys.platform.startswith("linux")
+IS_ROBOT = bool(
+    IS_LINUX
+    and (os.environ.get("RUNNING_ON_PI") or os.environ.get("RUNNING_ON_VERDIN"))
+)
 #: This is the correct thing to check to see if we’re running on a robot
-IS_VIRTUAL = bool(os.environ.get('ENABLE_VIRTUAL_SMOOTHIE'))
+IS_VIRTUAL = bool(os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"))
 
 
 class SystemArchitecture(Enum):
     HOST = auto()
-    BALENA = auto()
     BUILDROOT = auto()
+    YOCTO = auto()
 
+
+ROBOT_FIRMWARE_DIR: Optional[Path] = None
+#: The path to firmware files for modules
 
 ARCHITECTURE: SystemArchitecture = SystemArchitecture.HOST
 #: The system architecture running
 
-OT_SYSTEM_VERSION = '0.0.0'
+JUPYTER_NOTEBOOK_ROOT_DIR: Optional[Path] = None
+#: The path to the root dir for Jupyter
+
+JUPYTER_NOTEBOOK_LABWARE_DIR: Optional[Path] = None
+#: The path to labware installs for jupyter
+
+OT_SYSTEM_VERSION = "0.0.0"
 #: The semver string of the system
 
 
 if IS_ROBOT:
-    if 'OT_SYSTEM_VERSION' in os.environ:
-        OT_SYSTEM_VERSION = os.environ['OT_SYSTEM_VERSION']
-        ARCHITECTURE = SystemArchitecture.BALENA
+    if "OT_SYSTEM_VERSION" in os.environ:
+        OT_SYSTEM_VERSION = os.environ["OT_SYSTEM_VERSION"]
+        ARCHITECTURE = SystemArchitecture.YOCTO
+        ROBOT_FIRMWARE_DIR = Path("/lib/firmware/")
     else:
         try:
-            with open('/etc/VERSION.json') as vj:
+            with open("/etc/VERSION.json") as vj:
                 contents = json.load(vj)
-            OT_SYSTEM_VERSION = contents['buildroot_version']
+            OT_SYSTEM_VERSION = contents["buildroot_version"]
             ARCHITECTURE = SystemArchitecture.BUILDROOT
         except Exception:
             log.exception("Could not find version file in /etc/VERSION.json")
-    JUPYTER_NOTEBOOK_ROOT_DIR: Optional[Path]\
-        = Path('/var/lib/jupyter/notebooks/')
-    JUPYTER_NOTEBOOK_LABWARE_DIR: Optional[Path]\
-        = JUPYTER_NOTEBOOK_ROOT_DIR / 'labware'  # type: ignore
-    ROBOT_FIRMWARE_DIR: Optional[Path] = Path('/usr/lib/firmware/')
-else:
-    JUPYTER_NOTEBOOK_ROOT_DIR = None
-    JUPYTER_NOTEBOOK_LABWARE_DIR = None
-    ROBOT_FIRMWARE_DIR = None
+        ROBOT_FIRMWARE_DIR = Path("/usr/lib/firmware/")
+    JUPYTER_NOTEBOOK_ROOT_DIR = Path("/var/lib/jupyter/notebooks/")
+    JUPYTER_NOTEBOOK_LABWARE_DIR = JUPYTER_NOTEBOOK_ROOT_DIR / "labware"
 
 
 def name() -> str:
-    if IS_ROBOT and ARCHITECTURE == SystemArchitecture.BALENA:
-        return 'opentrons-{}'.format(
-            os.environ.get('RESIN_DEVICE_NAME_AT_INIT', 'dev'))
-    if IS_ROBOT and ARCHITECTURE == SystemArchitecture.BUILDROOT:
+    if IS_ROBOT and ARCHITECTURE in (
+        SystemArchitecture.BUILDROOT,
+        SystemArchitecture.YOCTO,
+    ):
         try:
-            return subprocess.check_output(
-                ['hostnamectl', '--pretty', 'status']).strip().decode()
+            return (
+                subprocess.check_output(["hostnamectl", "--pretty", "status"])
+                .strip()
+                .decode()
+            )
         except Exception:
             log.exception(
-                "Couldn't load name from /etc/machine-info, defaulting to dev")
-    return 'opentrons-dev'
+                "Couldn't load name from /etc/machine-info, defaulting to dev"
+            )
+    return "opentrons-dev"
 
 
 class ConfigElementType(enum.Enum):
@@ -112,102 +125,132 @@ class ConfigElement(NamedTuple):
 
 
 CONFIG_ELEMENTS = (
-    ConfigElement('labware_database_file',
-                  'API V1 Labware Database',
-                  Path('opentrons.db'),
-                  ConfigElementType.FILE,
-                  'The SQLite database where labware definitions and offsets'
-                  ' are stored'),
-    ConfigElement('labware_calibration_offsets_dir_v2',
-                  'API V2 Calibration Offsets Directory',
-                  Path('labware') / 'v2' / 'offsets',
-                  ConfigElementType.DIR,
-                  'The location where APIV2 labware calibration is stored'),
-    ConfigElement('labware_user_definitions_dir_v2',
-                  'API V2 Custom Labware Directory',
-                  Path('labware') / 'v2' / 'custom_definitions',
-                  ConfigElementType.DIR,
-                  'The location where APIV2 labware definitions are stored'),
-    ConfigElement('feature_flags_file',
-                  'Feature Flags',
-                  Path('feature_flags.json'),
-                  ConfigElementType.FILE,
-                  'The file storing the feature flags accessible via '
-                  'Opentrons app'),
-    ConfigElement('robot_settings_file',
-                  'Robot Settings',
-                  Path('robot_settings.json'),
-                  ConfigElementType.FILE,
-                  'The file storing settings relevant to motion'),
-    ConfigElement('deck_calibration_file',
-                  'Deck Calibration',
-                  Path('deck_calibration.json'),
-                  ConfigElementType.FILE,
-                  'The file storing the deck calibration'),
-    ConfigElement('log_dir',
-                  'Log Directory',
-                  Path('logs'),
-                  ConfigElementType.FILE,
-                  'The location for saving log files'),
-    ConfigElement('api_log_file',
-                  'API Log File',
-                  Path('logs') / 'api.log',
-                  ConfigElementType.FILE,
-                  'The location of the file to save API logs to. If this is an'
-                  ' absolute path, it will be used directly. If it is a '
-                  'relative path it will be relative to log_dir'),
-    ConfigElement('serial_log_file',
-                  'Serial Log File',
-                  Path('logs') / 'serial.log',
-                  ConfigElementType.FILE,
-                  'The location of the file to save serial logs to. If this is'
-                  ' an absolute path, it will be used directly. If it is a '
-                  'relative path it will be relative to log_dir'
-                  'The location of the file to save serial logs to'),
+    ConfigElement(
+        "labware_database_file",
+        "API V1 Labware Database",
+        Path("opentrons.db"),
+        ConfigElementType.FILE,
+        "The SQLite database where labware definitions and offsets" " are stored",
+    ),
+    ConfigElement(
+        "labware_calibration_offsets_dir_v2",
+        "API V2 Calibration Offsets Directory",
+        Path("labware") / "v2" / "offsets",
+        ConfigElementType.DIR,
+        "The location where APIV2 labware calibration is stored",
+    ),
+    ConfigElement(
+        "labware_user_definitions_dir_v2",
+        "API V2 Custom Labware Directory",
+        Path("labware") / "v2" / "custom_definitions",
+        ConfigElementType.DIR,
+        "The location where APIV2 labware definitions are stored",
+    ),
+    ConfigElement(
+        "feature_flags_file",
+        "Feature Flags",
+        Path("feature_flags.json"),
+        ConfigElementType.FILE,
+        "The file storing the feature flags accessible via " "Opentrons app",
+    ),
+    ConfigElement(
+        "robot_settings_file",
+        "Robot Settings",
+        Path("robot_settings.json"),
+        ConfigElementType.FILE,
+        "The file storing settings relevant to motion",
+    ),
+    ConfigElement(
+        "deck_calibration_file",
+        "Deck Calibration",
+        Path("deck_calibration.json"),
+        ConfigElementType.FILE,
+        "The file storing the deck calibration",
+    ),
+    ConfigElement(
+        "log_dir",
+        "Log Directory",
+        Path("logs"),
+        ConfigElementType.FILE,
+        "The location for saving log files",
+    ),
+    ConfigElement(
+        "api_log_file",
+        "API Log File",
+        Path("logs") / "api.log",
+        ConfigElementType.FILE,
+        "The location of the file to save API logs to. If this is an"
+        " absolute path, it will be used directly. If it is a "
+        "relative path it will be relative to log_dir",
+    ),
+    ConfigElement(
+        "serial_log_file",
+        "Serial Log File",
+        Path("logs") / "serial.log",
+        ConfigElementType.FILE,
+        "The location of the file to save serial logs to. If this is"
+        " an absolute path, it will be used directly. If it is a "
+        "relative path it will be relative to log_dir"
+        "The location of the file to save serial logs to",
+    ),
     # Unlike other config elements, the wifi keys dir is still in
     # /data/user_storage/opentrons_data because these paths are fed directly to
     # NetworkManager and stored in connections files there. To change this
     # directory, we would have to modify those connections files, presumably on
     # boot, which is a level of complexity that makes it worth having an
     # annoying path.
-    ConfigElement('wifi_keys_dir',
-                  'Wifi Keys Dir',
-                  Path('user_storage/opentrons_data/network_keys'),
-                  ConfigElementType.DIR,
-                  'The directory in which to save any key material for wifi'
-                  ' auth. Not relevant outside of a robot.'),
-    ConfigElement('hardware_controller_lockfile',
-                  'Hardware Controller Lockfile',
-                  Path('hardware.lock'),
-                  ConfigElementType.FILE,
-                  'The file to use for a hardware controller lockfile.'),
-    ConfigElement('pipette_config_overrides_dir',
-                  'Pipette Config User Overrides',
-                  Path('pipettes'),
-                  ConfigElementType.DIR,
-                  'The dir where settings overrides for pipettes are stored'),
-    ConfigElement('tip_length_calibration_dir',
-                  'Tip Length Calibration Directory',
-                  Path('tip_lengths'),
-                  ConfigElementType.DIR,
-                  'The dir where tip length calibration of each tiprack for '
-                  'each unique pipette is stored'),
-    ConfigElement('robot_calibration_dir',
-                  'Robot Calibration Directory',
-                  Path('robot'),
-                  ConfigElementType.DIR,
-                  'The dir where robot calibration is stored'),
-    ConfigElement('pipette_calibration_dir',
-                  'Pipette Calibration Directory',
-                  Path('robot') / 'pipettes',
-                  ConfigElementType.DIR,
-                  'The dir where pipette calibration is stored'),
-    ConfigElement('custom_tiprack_dir',
-                  'Custom Tiprack Directory',
-                  Path('tip_lengths') / 'custom_tiprack_definitions',
-                  ConfigElementType.DIR,
-                  'The dir where custom tiprack definitions for tip length '
-                  'calibration are stored')
+    ConfigElement(
+        "wifi_keys_dir",
+        "Wifi Keys Dir",
+        Path("user_storage/opentrons_data/network_keys"),
+        ConfigElementType.DIR,
+        "The directory in which to save any key material for wifi"
+        " auth. Not relevant outside of a robot.",
+    ),
+    ConfigElement(
+        "hardware_controller_lockfile",
+        "Hardware Controller Lockfile",
+        Path("hardware.lock"),
+        ConfigElementType.FILE,
+        "The file to use for a hardware controller lockfile.",
+    ),
+    ConfigElement(
+        "pipette_config_overrides_dir",
+        "Pipette Config User Overrides",
+        Path("pipettes"),
+        ConfigElementType.DIR,
+        "The dir where settings overrides for pipettes are stored",
+    ),
+    ConfigElement(
+        "tip_length_calibration_dir",
+        "Tip Length Calibration Directory",
+        Path("tip_lengths"),
+        ConfigElementType.DIR,
+        "The dir where tip length calibration of each tiprack for "
+        "each unique pipette is stored",
+    ),
+    ConfigElement(
+        "robot_calibration_dir",
+        "Robot Calibration Directory",
+        Path("robot"),
+        ConfigElementType.DIR,
+        "The dir where robot calibration is stored",
+    ),
+    ConfigElement(
+        "pipette_calibration_dir",
+        "Pipette Calibration Directory",
+        Path("robot") / "pipettes",
+        ConfigElementType.DIR,
+        "The dir where pipette calibration is stored",
+    ),
+    ConfigElement(
+        "custom_tiprack_dir",
+        "Custom Tiprack Directory",
+        Path("tip_lengths") / "custom_tiprack_definitions",
+        ConfigElementType.DIR,
+        "The dir where custom tiprack definitions for tip length "
+        "calibration are stored",
+    ),
 )
 #: The available configuration file elements to modify. All of these can be
 #: changed by editing opentrons.json, where the keys are the name elements,
@@ -219,7 +262,7 @@ CONFIG_ELEMENTS = (
 
 
 def infer_config_base_dir() -> Path:
-    """ Return the directory to store data in.
+    """Return the directory to store data in.
 
     Defaults are ~/.opentrons if not on a pi; OT_API_CONFIG_DIR is
     respected here.
@@ -233,13 +276,12 @@ def infer_config_base_dir() -> Path:
 
     :return pathlib.Path: The path to the desired root settings dir.
     """
-    if 'OT_API_CONFIG_DIR' in os.environ:
-        return Path(os.environ['OT_API_CONFIG_DIR'])
+    if "OT_API_CONFIG_DIR" in os.environ:
+        return Path(os.environ["OT_API_CONFIG_DIR"])
     elif IS_ROBOT:
-        return Path('/data')
+        return Path("/data")
     else:
-        search = (Path.cwd(),
-                  Path.home() / '.opentrons')
+        search = (Path.cwd(), Path.home() / ".opentrons")
         for path in search:
             if (path / _CONFIG_FILENAME).exists():
                 return path
@@ -248,7 +290,7 @@ def infer_config_base_dir() -> Path:
 
 
 def load_and_migrate() -> Dict[str, Path]:
-    """ Ensure the settings directory tree is properly configured.
+    """Ensure the settings directory tree is properly configured.
 
     This function does most of its work on the actual robot. It will move
     all settings files from wherever they happen to be to the proper
@@ -256,7 +298,7 @@ def load_and_migrate() -> Dict[str, Path]:
     a default config and makes sure all directories required exist (though
     the files in them may not).
     """
-    if IS_ROBOT:
+    if IS_ROBOT and ARCHITECTURE != SystemArchitecture.YOCTO:
         _migrate_robot()
     base = infer_config_base_dir()
     base.mkdir(parents=True, exist_ok=True)
@@ -264,8 +306,8 @@ def load_and_migrate() -> Dict[str, Path]:
     return _ensure_paths_and_types(index)
 
 
-def _load_with_overrides(base) -> Dict[str, str]:
-    """ Load an config or write its defaults """
+def _load_with_overrides(base: Path) -> Dict[str, str]:
+    """Load an config or write its defaults"""
     should_write = False
     overrides = _get_environ_overrides()
     try:
@@ -288,14 +330,16 @@ def _load_with_overrides(base) -> Dict[str, str]:
             write_config(index, path=base)
         except Exception as e:
             sys.stderr.write(
-                "Error writing config to {}: {}\nProceeding memory-only\n"
-                .format(str(base), e))
+                "Error writing config to {}: {}\nProceeding memory-only\n".format(
+                    str(base), e
+                )
+            )
     index.update(overrides)
-    return index
+    return cast(Dict[str, str], index)
 
 
 def _ensure_paths_and_types(index: Dict[str, str]) -> Dict[str, Path]:
-    """ Take the direct results of loading the config and make sure
+    """Take the direct results of loading the config and make sure
     the filesystem reflects them.
     """
     configs_by_name = {ce.name: ce for ce in CONFIG_ELEMENTS}
@@ -314,23 +358,25 @@ def _ensure_paths_and_types(index: Dict[str, str]) -> Dict[str, Path]:
         else:
             raise RuntimeError(
                 f"unhandled kind in ConfigElements: {key}: "
-                f"{configs_by_name[key].kind}")
+                f"{configs_by_name[key].kind}"
+            )
     return correct_types
 
 
 def _get_environ_overrides() -> Dict[str, str]:
-    """ Pull any overrides for the config elements from the environ and return
+    """Pull any overrides for the config elements from the environ and return
     a mapping from the names to the values (as strings). Config elements that
     are not overridden will not be in the mapping.
     """
     return {
-        ce.name: os.environ['OT_API_' + ce.name.upper()]
+        ce.name: os.environ["OT_API_" + ce.name.upper()]
         for ce in CONFIG_ELEMENTS
-        if 'OT_API_' + ce.name.upper() in os.environ}
+        if "OT_API_" + ce.name.upper() in os.environ
+    }
 
 
-def _legacy_index() -> Union[None, Dict[str, str]]:
-    """ Try and load an index file from the various places it might exist.
+def _legacy_index() -> Optional[Dict[str, str]]:
+    """Try and load an index file from the various places it might exist.
 
     If the legacy file cannot be found or cannot be parsed, return None.
 
@@ -340,14 +386,14 @@ def _legacy_index() -> Union[None, Dict[str, str]]:
         if index.exists():
             try:
                 with open(index) as file:
-                    return json.load(file)
+                    return cast(Dict[str, str], json.load(file))
             except (OSError, json.JSONDecodeError):
                 return None
     return None
 
 
-def _erase_old_indices():
-    """ Remove old index files so they don't pollute future loads.
+def _erase_old_indices() -> None:
+    """Remove old index files so they don't pollute future loads.
 
     This method should only be called on a robot.
     """
@@ -357,7 +403,7 @@ def _erase_old_indices():
 
 
 def _find_most_recent_backup(normal_path: Optional[str]) -> Optional[str]:
-    """ Find the most recent old settings to migrate.
+    """Find the most recent old settings to migrate.
 
     The input is the path to an unqualified settings file - e.g.
     /mnt/usbdrive/config/robotSettings.json
@@ -377,11 +423,12 @@ def _find_most_recent_backup(normal_path: Optional[str]) -> Optional[str]:
 
     dirname, basename = os.path.split(normal_path)
     root, ext = os.path.splitext(basename)
-    backups = [fi for fi in os.listdir(dirname)
-               if fi.startswith(root) and fi.endswith(ext)]
-    ts_re = re.compile(r'.*-([0-9]+)' + ext + '$')
+    backups = [
+        fi for fi in os.listdir(dirname) if fi.startswith(root) and fi.endswith(ext)
+    ]
+    ts_re = re.compile(r".*-([0-9]+)" + ext + "$")
 
-    def ts_compare(filename):
+    def ts_compare(filename: str) -> int:
         match = ts_re.match(filename)
         if not match:
             return -1
@@ -394,17 +441,21 @@ def _find_most_recent_backup(normal_path: Optional[str]) -> Optional[str]:
     return os.path.join(dirname, backups_sorted[-1])
 
 
-def _do_migrate(index: Dict[str, str]):
+def _do_migrate(index: Dict[str, str]) -> None:
     base = infer_config_base_dir()
     new_index = generate_config_index(_get_environ_overrides(), base)
-    moves = (('/data/user_storage/opentrons_data/opentrons.db',
-              new_index['labware_database_file']),
-             (_find_most_recent_backup(index.get('robotSettingsFile')),
-              new_index['robot_settings_file']),
-             (index.get('deckCalibrationFile'),
-              new_index['deck_calibration_file']),
-             (index.get('featureFlagFile'),
-              new_index['feature_flags_file']))
+    moves = (
+        (
+            "/data/user_storage/opentrons_data/opentrons.db",
+            new_index["labware_database_file"],
+        ),
+        (
+            _find_most_recent_backup(index.get("robotSettingsFile")),
+            new_index["robot_settings_file"],
+        ),
+        (index.get("deckCalibrationFile"), new_index["deck_calibration_file"]),
+        (index.get("featureFlagFile"), new_index["feature_flags_file"]),
+    )
     sys.stdout.write(f"config migration: new base {base}\n")
     for old, new in moves:
         if not old:
@@ -424,15 +475,16 @@ def _do_migrate(index: Dict[str, str]):
     write_config(new_index, base)
 
 
-def _migrate_robot():
+def _migrate_robot() -> None:
     old_index = _legacy_index()
     if old_index:
         _do_migrate(old_index)
         _erase_old_indices()
 
 
-def generate_config_index(defaults: Dict[str, str],
-                          base_dir=None) -> Dict[str, Path]:
+def generate_config_index(
+    defaults: Dict[str, str], base_dir: Optional[Path] = None
+) -> Dict[str, Path]:
     """
     Determines where existing info can be found in the system, and creates a
     corresponding data dict that can be written to index.json in the
@@ -455,23 +507,19 @@ def generate_config_index(defaults: Dict[str, str],
     """
     base = Path(base_dir) if base_dir else infer_config_base_dir()
 
-    def parse_or_default(
-            ce: ConfigElement, val: Optional[str]) -> Path:
+    def parse_or_default(ce: ConfigElement, val: Optional[str]) -> Path:
         if not val:
             return base / ce.default
         else:
             return Path(val)
 
     return {
-        ce.name: parse_or_default(ce,
-                                  defaults.get(ce.name))
-        for ce in CONFIG_ELEMENTS
+        ce.name: parse_or_default(ce, defaults.get(ce.name)) for ce in CONFIG_ELEMENTS
     }
 
 
-def write_config(config_data: Dict[str, Path],
-                 path: Path = None):
-    """ Save the config file.
+def write_config(config_data: Dict[str, Path], path: Optional[Path] = None) -> None:
+    """Save the config file.
 
     :param config_data: The index to save
     :param base_dir: The place to save the file. If ``None``,
@@ -483,16 +531,19 @@ def write_config(config_data: Dict[str, Path],
     valid_names = [ce.name for ce in CONFIG_ELEMENTS]
     try:
         os.makedirs(path, exist_ok=True)
-        with (path / _CONFIG_FILENAME).open('w') as base_f:
-            json.dump({k: str(v) for k, v in config_data.items()
-                       if k in valid_names},
-                      base_f, indent=2)
+        with (path / _CONFIG_FILENAME).open("w") as base_f:
+            json.dump(
+                {k: str(v) for k, v in config_data.items() if k in valid_names},
+                base_f,
+                indent=2,
+            )
     except OSError as e:
-        sys.stderr.write("Config index write to {} failed: {}\n"
-                         .format(path / _CONFIG_FILENAME, e))
+        sys.stderr.write(
+            "Config index write to {} failed: {}\n".format(path / _CONFIG_FILENAME, e)
+        )
 
 
-def reload():
+def reload() -> None:
     global CONFIG
     CONFIG.clear()
     CONFIG.update(load_and_migrate())
@@ -512,9 +563,9 @@ CONFIG = load_and_migrate()
 #: are config element names
 
 
-def get_tip_length_cal_path():
-    return get_opentrons_path('tip_length_calibration_dir')
+def get_tip_length_cal_path() -> Path:
+    return get_opentrons_path("tip_length_calibration_dir")
 
 
-def get_custom_tiprack_def_path():
-    return get_opentrons_path('custom_tiprack_dir')
+def get_custom_tiprack_def_path() -> Path:
+    return get_opentrons_path("custom_tiprack_dir")

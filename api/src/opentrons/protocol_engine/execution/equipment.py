@@ -1,55 +1,73 @@
 """Equipment command side-effect logic."""
 from dataclasses import dataclass
-from typing import Tuple, Optional
+from typing import Optional
 
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import MountType
-from opentrons.hardware_control.api import API as HardwareAPI
+from opentrons.hardware_control import HardwareControlAPI
 
 from ..errors import FailedToLoadPipetteError, LabwareDefinitionDoesNotExistError
-from ..resources import ResourceProviders
-from ..state import StateStore, StateView
-from ..types import LabwareLocation, PipetteName
+from ..resources import LabwareDataProvider, ModuleDataProvider, ModelUtils
+from ..state import StateStore, HardwareModule
+from ..types import (
+    LabwareLocation,
+    PipetteName,
+    DeckSlotLocation,
+    LabwareOffsetLocation,
+    ModuleModel,
+    ModuleDefinition,
+)
 
 
 @dataclass(frozen=True)
-class LoadedLabware:
+class LoadedLabwareData:
     """The result of a load labware procedure."""
 
     labware_id: str
     definition: LabwareDefinition
-    calibration: Tuple[float, float, float]
+    offsetId: Optional[str]
 
 
 @dataclass(frozen=True)
-class LoadedPipette:
+class LoadedPipetteData:
     """The result of a load pipette procedure."""
 
     pipette_id: str
 
 
+@dataclass(frozen=True)
+class LoadedModuleData:
+    """The result of a load module procedure."""
+
+    module_id: str
+    serial_number: str
+    definition: ModuleDefinition
+
+
 class EquipmentHandler:
     """Implementation logic for labware, pipette, and module loading."""
 
-    _hardware: HardwareAPI
+    _hardware_api: HardwareControlAPI
     _state_store: StateStore
-    _resources: ResourceProviders
+    _labware_data_provider: LabwareDataProvider
+    _module_data_provider: ModuleDataProvider
+    _model_utils: ModelUtils
 
     def __init__(
         self,
-        hardware: HardwareAPI,
+        hardware_api: HardwareControlAPI,
         state_store: StateStore,
-        resources: ResourceProviders,
+        labware_data_provider: Optional[LabwareDataProvider] = None,
+        module_data_provider: Optional[ModuleDataProvider] = None,
+        model_utils: Optional[ModelUtils] = None,
     ) -> None:
         """Initialize an EquipmentHandler instance."""
-        self._hardware = hardware
+        self._hardware_api = hardware_api
         self._state_store = state_store
-        self._resources = resources
-
-    @property
-    def _state(self) -> StateView:
-        return self._state_store
+        self._labware_data_provider = labware_data_provider or LabwareDataProvider()
+        self._module_data_provider = module_data_provider or ModuleDataProvider()
+        self._model_utils = model_utils or ModelUtils()
 
     async def load_labware(
         self,
@@ -58,7 +76,7 @@ class EquipmentHandler:
         version: int,
         location: LabwareLocation,
         labware_id: Optional[str],
-    ) -> LoadedLabware:
+    ) -> LoadedLabwareData:
         """Load labware by assigning an identifier and pulling required data.
 
         Args:
@@ -70,37 +88,48 @@ class EquipmentHandler:
                 identifier will be generated.
 
         Returns:
-            A LoadedLabware object.
+            A LoadedLabwareData object.
         """
         labware_id = (
-            labware_id if labware_id else self._resources.model_utils.generate_id()
+            labware_id if labware_id is not None else self._model_utils.generate_id()
+        )
+
+        definition_uri = uri_from_details(
+            load_name=load_name,
+            namespace=namespace,
+            version=version,
         )
 
         try:
             # Try to use existing definition in state.
-            definition = self._state.labware.get_definition_by_uri(
-                uri_from_details(
-                    load_name=load_name,
-                    namespace=namespace,
-                    version=version,
-                )
-            )
+            definition = self._state_store.labware.get_definition_by_uri(definition_uri)
         except LabwareDefinitionDoesNotExistError:
-            definition = await self._resources.labware_data.get_labware_definition(
+            definition = await self._labware_data_provider.get_labware_definition(
                 load_name=load_name,
                 namespace=namespace,
                 version=version,
             )
 
-        calibration = await self._resources.labware_data.get_labware_calibration(
-            definition=definition,
-            location=location,
+        if isinstance(location, DeckSlotLocation):
+            slot_name = location.slotName
+            module_model = None
+        else:
+            module = self._state_store.modules.get(location.moduleId)
+            slot_name = module.location.slotName
+            module_model = module.model
+
+        offset = self._state_store.labware.find_applicable_labware_offset(
+            definition_uri=definition_uri,
+            location=LabwareOffsetLocation(
+                slotName=slot_name,
+                moduleModel=module_model,
+            ),
         )
 
-        return LoadedLabware(
+        return LoadedLabwareData(
             labware_id=labware_id,
             definition=definition,
-            calibration=calibration,
+            offsetId=(None if offset is None else offset.id),
         )
 
     async def load_pipette(
@@ -108,7 +137,7 @@ class EquipmentHandler:
         pipette_name: PipetteName,
         mount: MountType,
         pipette_id: Optional[str],
-    ) -> LoadedPipette:
+    ) -> LoadedPipetteData:
         """Ensure the requested pipette is attached.
 
         Args:
@@ -118,30 +147,83 @@ class EquipmentHandler:
                 identifier will be generated.
 
         Returns:
-            A LoadedPipette object.
+            A LoadedPipetteData object.
         """
         other_mount = mount.other_mount()
-        other_pipette = self._state.pipettes.get_pipette_data_by_mount(
-            other_mount,
-        )
+        other_pipette = self._state_store.pipettes.get_by_mount(other_mount)
 
         cache_request = {mount.to_hw_mount(): pipette_name}
         if other_pipette is not None:
-            cache_request[other_mount.to_hw_mount()] = other_pipette.pipette_name
+            cache_request[other_mount.to_hw_mount()] = other_pipette.pipetteName
 
         # TODO(mc, 2020-10-18): calling `cache_instruments` mirrors the
         # behavior of protocol_context.load_instrument, and is used here as a
         # pipette existence check
         # TODO(mc, 2021-04-16): reconcile PipetteName enum with PipetteName union
         try:
-            await self._hardware.cache_instruments(cache_request)  # type: ignore[arg-type]  # noqa: E501
+            await self._hardware_api.cache_instruments(
+                cache_request  # type: ignore[arg-type]
+            )
         except RuntimeError as e:
             raise FailedToLoadPipetteError(str(e)) from e
 
-        pipette_id = (
-            pipette_id
-            if pipette_id is not None
-            else self._resources.model_utils.generate_id()
-        )
+        pipette_id = pipette_id or self._model_utils.generate_id()
 
-        return LoadedPipette(pipette_id=pipette_id)
+        return LoadedPipetteData(pipette_id=pipette_id)
+
+    async def load_module(
+        self,
+        model: ModuleModel,
+        location: DeckSlotLocation,
+        module_id: Optional[str],
+    ) -> LoadedModuleData:
+        """Ensure the required module is attached.
+
+        Args:
+            model: The model name of the module.
+            location: The deck location of the module
+            module_id: Optional ID assigned to the module.
+                       If None, an ID will be generated.
+
+        Returns:
+            A LoadedModuleData object.
+
+        Raises:
+            ModuleNotAttachedError: A not-yet-assigned module matching the requested
+                parameters could not be found in the attached modules list.
+            ModuleAlreadyPresentError: A module of a different type is already
+                assigned to the requested location.
+        """
+        # TODO(mc, 2022-02-09): validate module location given deck definition
+        use_virtual_modules = self._state_store.get_configs().use_virtual_modules
+
+        if not use_virtual_modules:
+            attached_modules = [
+                HardwareModule(
+                    serial_number=hw_mod.device_info["serial"],
+                    definition=self._module_data_provider.get_definition(
+                        ModuleModel(hw_mod.model())
+                    ),
+                )
+                for hw_mod in self._hardware_api.attached_modules
+            ]
+
+            attached_module = self._state_store.modules.select_hardware_module_to_load(
+                model=model,
+                location=location,
+                attached_modules=attached_modules,
+            )
+
+        else:
+            attached_module = HardwareModule(
+                serial_number=self._model_utils.generate_id(
+                    prefix="fake-serial-number-"
+                ),
+                definition=self._module_data_provider.get_definition(model),
+            )
+
+        return LoadedModuleData(
+            module_id=self._model_utils.ensure_id(module_id),
+            serial_number=attached_module.serial_number,
+            definition=attached_module.definition,
+        )

@@ -9,7 +9,13 @@ SHX := npx shx
 firmware = $(wildcard smoothie/*.hex)
 
 # python and pipenv config
-sphinx_build := $(pipenv) run sphinx-build
+sphinx_build := $(pipenv) run sphinx-build -W --keep-going
+# todo(mm, 2021-10-04):
+# 1. Resolve all Sphinx warnings.
+# 2. Convert all recipes to use $(sphinx_build).
+# 3. Delete $(sphinx_build_allow_warnings).
+# github.com/Opentrons/opentrons/issues/6135
+sphinx_build_allow_warnings := $(pipenv) run sphinx-build
 
 
 # Find the version of the wheel from package.json using a helper script. We
@@ -17,13 +23,16 @@ sphinx_build := $(pipenv) run sphinx-build
 # used to create the wheel.
 wheel_file = dist/$(call python_get_wheelname,api,opentrons,$(BUILD_NUMBER))
 
+# Find the version of the sdist file from package.json using a helper script.
+sdist_file = dist/$(call python_get_sdistname,api,opentrons)
+
 # These variables are for simulating python protocols
 sim_log_level ?= info
 simfile ?=
 
 # These variables can be overriden when make is invoked to customize the
 # behavior of pytest. For instance,
-# make test tests=tests/opentrons/tools/test_qc_scripts.py would run only the
+# make test tests=tests/opentrons/tools/test_pipette_memory.py would run only the
 # specified test
 tests ?= tests
 test_opts ?=  --cov=src/opentrons --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
@@ -50,26 +59,6 @@ ot_shared_data_sources := $(filter %.json,$(shell $(SHX) find ../shared-data/))
 ot_resources := $(filter %,$(shell $(SHX) find src/opentrons/resources))
 ot_sources := $(ot_py_sources) $(ot_shared_data_sources) $(ot_resources)
 
-# test modules to typecheck
-# TODO(mc, 2021-07-23): expand this to all tests
-ot_tests_to_typecheck := \
-	tests/opentrons/protocol_api_experimental \
-	tests/opentrons/protocol_engine \
-	tests/opentrons/motion_planning \
-	tests/opentrons/file_runner
-
-# files and modules to format
-# TODO(mc, 2021-07-23): expand this to all files until we can format `.`
-ot_files_to_format := \
-	src/opentrons/file_runner \
-	src/opentrons/motion_planning \
-	src/opentrons/protocol_api_experimental \
-	src/opentrons/protocol_engine \
-	tests/opentrons/file_runner \
-	tests/opentrons/motion_planning  \
-	tests/opentrons/protocol_api_experimental \
-	tests/opentrons/protocol_engine
-
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
 clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc' 'src/**/.mypy_cache'
@@ -84,6 +73,12 @@ setup:
 	$(pipenv) sync $(pipenv_opts)
 	$(pipenv) run pip freeze
 
+.PHONY: setup-ot2
+setup-ot2:
+	$(pipenv) sync $(pipenv_opts)
+	$(pipenv) run pip uninstall -y opentrons_hardware
+	$(pipenv) run pip freeze
+
 .PHONY: clean
 clean: docs-clean
 	$(clean_cmd)
@@ -92,7 +87,7 @@ clean: docs-clean
 teardown:
 	$(pipenv) --rm
 
-dist/opentrons-%-py2.py3-none-any.whl: setup.py $(ot_sources)
+$(wheel_file): setup.py $(ot_sources)
 	$(clean_cmd)
 	$(python) setup.py $(wheel_opts) bdist_wheel
 	$(SHX) rm -rf build
@@ -100,36 +95,49 @@ dist/opentrons-%-py2.py3-none-any.whl: setup.py $(ot_sources)
 
 wheel: $(wheel_file)
 
+$(sdist_file): setup.py $(ot_sources)
+	$(clean_cmd)
+	$(python) setup.py sdist
+	$(SHX) rm -rf build
+	$(SHX) ls dist
+
+sdist: $(sdist_file)
+
 .PHONY: test
 test:
 	$(pytest) $(tests) $(test_opts)
 
+.PHONY: test-ot2
+test-ot2:
+	$(pytest) $(tests) $(test_opts) --ot2-only --ignore-glob="**/*ot3*"
+
 .PHONY: lint
 lint:
-	$(python) -m mypy src/opentrons $(ot_tests_to_typecheck)
-	$(python) -m black --check $(ot_files_to_format)
-	$(python) -m flake8 setup.py src/opentrons tests
+	$(python) -m mypy src tests
+	$(python) -m black --check src tests setup.py
+	$(python) -m flake8 src tests setup.py
 
 .PHONY: format
 format:
-	$(python) -m black $(ot_files_to_format)
+	$(python) -m black src tests setup.py
 
 docs/build/html/v%: docs/v%
-	$(sphinx_build) -b html -d docs/build/doctrees -n $< $@
-	$(SHX) cp docs/img/lightbulb.jpg $@/_images/ # sphinx wont automatically do this because it's only in a template
+	$(sphinx_build_allow_warnings) -b html -d docs/build/doctrees -n $< $@
+# sphinx wont automatically do this because it's only in a template
+	$(SHX) cp docs/img/lightbulb.jpg $@/_images/
 
 docs/build/html/hardware: docs/hardware src/opentrons/hardware_control
-	$(sphinx_build) -b html -d docs/build/doctrees -n $< $@
+	$(sphinx_build_allow_warnings) -b html -d docs/build/doctrees -n $< $@
 	$(SHX) mkdir $@/_images/
 	$(SHX) cp docs/img/lightbulb.jpg $@/_images/
 
 docs/build/pdf/OpentronsPythonAPIV%.pdf: docs/v%
-	$(sphinx_build) -b latex -d docs/build/doctrees $< $(@D)
+	$(sphinx_build_allow_warnings) -b latex -d docs/build/doctrees $< $(@D)
 	$(MAKE) -C $(@D) all-pdf $(if $(CI),>/dev/null,|| $(SHX) echo "latex build failed (pdflatex not installed?)")
 	$(SHX) ls $(@D)/*.pdf $(if $(CI),,|| $(SHX) echo "no pdf produced")
 
 docs/build/pdf/OT2HardwareControl.pdf: docs/hardware
-	$(sphinx_build) -b latex -d docs/build/doctrees $< $(@D)
+	$(sphinx_build_allow_warnings) -b latex -d docs/build/doctrees $< $(@D)
 	$(MAKE) -C $(@D) all-pdf $(if $(CI),>/dev/null,|| $(SHX) echo "latex build failed (pdflatex not installed)")
 
 docs/dist/v%: docs/build/html/v% docs/build/pdf/OpentronsPythonAPIV%.pdf
@@ -171,6 +179,17 @@ push-no-restart: wheel
 .PHONY: push
 push: push-no-restart
 	$(call restart-service,$(host),$(br_ssh_key),$(ssh_opts),"jupyter-notebook opentrons-robot-server")
+
+.PHONY: push-no-restart-ot3
+push-no-restart-ot3: $(sdist_file)
+	echo $(sdist_file)
+	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,opentrons,src)
+	ssh $(ssh_opts) root@$(host) "mkdir -p /usr/local/bin"
+	scp $(ssh_opts) ./src/opentrons/hardware_control/scripts/ot3repl root@$(host):/usr/local/bin/ot3repl
+
+.PHONY: push-ot3
+push-ot3: push-no-restart-ot3
+	$(call restart-server,$(host),,$(ssh_opts),"opentrons-robot-server")
 
 .PHONY: simulate
 simulate:

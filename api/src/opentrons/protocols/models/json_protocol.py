@@ -15,47 +15,61 @@ from typing_extensions import Literal
 from .labware_definition import LabwareDefinition as LabwareDefinition
 from opentrons_shared_data.protocol import dev_types
 
-CommandAspirate: dev_types.AspirateCommandId = 'aspirate'
-CommandDispense: dev_types.DispenseCommandId = 'dispense'
-CommandAirGap: dev_types.AirGapCommandId = 'airGap'
-CommandBlowout: dev_types.BlowoutCommandId = 'blowout'
-CommandTouchTip: dev_types.TouchTipCommandId = 'touchTip'
-CommandPickUpTip: dev_types.PickUpTipCommandId = 'pickUpTip'
-CommandDropTip: dev_types.DropTipCommandId = 'dropTip'
-CommandMoveToSlot: dev_types.MoveToSlotCommandId = 'moveToSlot'
-CommandMoveToWell: dev_types.MoveToWellCommandId = 'moveToWell'
-CommandDelay: dev_types.DelayCommandId = 'delay'
-CommandMagneticModuleEngage: \
-    dev_types.MagneticModuleEngageCommandId = 'magneticModule/engageMagnet'
-CommandMagneticModuleDisengage:\
-    dev_types.MagneticModuleDisengageCommandId = 'magneticModule/disengageMagnet'
-CommandTemperatureModuleSetTarget: \
-    dev_types.TemperatureModuleSetTargetCommandId = \
-    'temperatureModule/setTargetTemperature'
-CommandTemperatureModuleAwait: \
-    dev_types.TemperatureModuleAwaitCommandId = 'temperatureModule/awaitTemperature'
-CommandTemperatureModuleDeactivate: \
-    dev_types.TemperatureModuleDeactivateCommandId = 'temperatureModule/deactivate'
-CommandThermocyclerSetTargetBlock: \
-    dev_types.ThermocyclerSetTargetBlockCommandId = 'thermocycler/setTargetBlockTemperature'  # noqa: E501
-CommandThermocyclerSetTargetLid: \
-    dev_types.ThermocyclerSetTargetLidCommandId = 'thermocycler/setTargetLidTemperature'  # noqa: E501
-CommandThermocyclerAwaitLidTemperature:\
-    dev_types.ThermocyclerAwaitLidTemperatureCommandId = 'thermocycler/awaitLidTemperature'  # noqa: E501
-CommandThermocyclerAwaitBlockTemperature:\
-    dev_types.ThermocyclerAwaitBlockTemperatureCommandId = 'thermocycler/awaitBlockTemperature'  # noqa: E501
-CommandThermocyclerDeactivateBlock:\
-    dev_types.ThermocyclerDeactivateBlockCommandId = 'thermocycler/deactivateBlock'
-CommandThermocyclerDeactivateLid:\
-    dev_types.ThermocyclerDeactivateLidCommandId = 'thermocycler/deactivateLid'
-CommandThermocyclerOpenLid:\
-    dev_types.ThermocyclerOpenLidCommandId = 'thermocycler/openLid'
-CommandThermocyclerCloseLid:\
-    dev_types.ThermocyclerCloseLidCommandId = 'thermocycler/closeLid'
-CommandThermocyclerRunProfile:\
-    dev_types.ThermocyclerRunProfileCommandId = 'thermocycler/runProfile'
-CommandThermocyclerAwaitProfile:\
-    dev_types.ThermocyclerAwaitProfileCommandId = 'thermocycler/awaitProfileComplete'
+CommandAspirate: dev_types.AspirateCommandId = "aspirate"
+CommandDispense: dev_types.DispenseCommandId = "dispense"
+CommandAirGap: dev_types.AirGapCommandId = "airGap"
+CommandBlowout: dev_types.BlowoutCommandId = "blowout"
+CommandTouchTip: dev_types.TouchTipCommandId = "touchTip"
+CommandPickUpTip: dev_types.PickUpTipCommandId = "pickUpTip"
+CommandDropTip: dev_types.DropTipCommandId = "dropTip"
+CommandMoveToSlot: dev_types.MoveToSlotCommandId = "moveToSlot"
+CommandMoveToWell: dev_types.MoveToWellCommandId = "moveToWell"
+CommandDelay: dev_types.DelayCommandId = "delay"
+CommandMagneticModuleEngage: dev_types.MagneticModuleEngageCommandId = (
+    "magneticModule/engageMagnet"
+)
+CommandMagneticModuleDisengage: dev_types.MagneticModuleDisengageCommandId = (
+    "magneticModule/disengageMagnet"
+)
+CommandTemperatureModuleSetTarget: dev_types.TemperatureModuleSetTargetCommandId = (
+    "temperatureModule/setTargetTemperature"
+)
+CommandTemperatureModuleAwait: dev_types.TemperatureModuleAwaitCommandId = (
+    "temperatureModule/awaitTemperature"
+)
+CommandTemperatureModuleDeactivate: dev_types.TemperatureModuleDeactivateCommandId = (
+    "temperatureModule/deactivate"
+)
+CommandThermocyclerSetTargetBlock: dev_types.ThermocyclerSetTargetBlockCommandId = (
+    "thermocycler/setTargetBlockTemperature"
+)
+CommandThermocyclerSetTargetLid: dev_types.ThermocyclerSetTargetLidCommandId = (
+    "thermocycler/setTargetLidTemperature"
+)
+CommandThermocyclerAwaitLidTemperature: dev_types.ThermocyclerAwaitLidTemperatureCommandId = (  # noqa: E501
+    "thermocycler/awaitLidTemperature"
+)
+CommandThermocyclerAwaitBlockTemperature: dev_types.ThermocyclerAwaitBlockTemperatureCommandId = (  # noqa: E501
+    "thermocycler/awaitBlockTemperature"
+)
+CommandThermocyclerDeactivateBlock: dev_types.ThermocyclerDeactivateBlockCommandId = (
+    "thermocycler/deactivateBlock"
+)
+CommandThermocyclerDeactivateLid: dev_types.ThermocyclerDeactivateLidCommandId = (
+    "thermocycler/deactivateLid"
+)
+CommandThermocyclerOpenLid: dev_types.ThermocyclerOpenLidCommandId = (
+    "thermocycler/openLid"
+)
+CommandThermocyclerCloseLid: dev_types.ThermocyclerCloseLidCommandId = (
+    "thermocycler/closeLid"
+)
+CommandThermocyclerRunProfile: dev_types.ThermocyclerRunProfileCommandId = (
+    "thermocycler/runProfile"
+)
+CommandThermocyclerAwaitProfile: dev_types.ThermocyclerAwaitProfileCommandId = (
+    "thermocycler/awaitProfileComplete"
+)
 
 
 class Metadata(BaseModel):
@@ -63,20 +77,23 @@ class Metadata(BaseModel):
     Optional metadata about the protocol
     """
 
+    class Config:
+        extra = Extra.allow
+
     protocolName: Optional[str] = Field(
-        None, description='A short, human-readable name for the protocol'
+        None, description="A short, human-readable name for the protocol"
     )
     author: Optional[str] = Field(
-        None, description='The author or organization who created the protocol'
+        None, description="The author or organization who created the protocol"
     )
     description: Optional[Optional[str]] = Field(
-        None, description='A text description of the protocol.'
+        None, description="A text description of the protocol."
     )
     created: Optional[float] = Field(
-        None, description='UNIX timestamp when this file was created'
+        None, description="UNIX timestamp when this file was created"
     )
     lastModified: Optional[Optional[float]] = Field(
-        None, description='UNIX timestamp when this file was last modified'
+        None, description="UNIX timestamp when this file was last modified"
     )
     category: Optional[Optional[str]] = Field(
         None, description='Category of protocol (eg, "Basic Pipetting")'
@@ -85,7 +102,7 @@ class Metadata(BaseModel):
         None, description='Subcategory of protocol (eg, "Cell Plating")'
     )
     tags: Optional[List[str]] = Field(
-        None, description='Tags to be used in searching for this protocol'
+        None, description="Tags to be used in searching for this protocol"
     )
 
 
@@ -97,24 +114,23 @@ class DesignerApplication(BaseModel):
 
     name: Optional[str] = Field(
         None,
-        description='Name of the application that created the protocol. Should '
-                    'be namespaced under the organization or individual who '
-                    'owns the organization, eg "opentrons/protocol-designer"',
+        description="Name of the application that created the protocol. Should "
+        "be namespaced under the organization or individual who "
+        'owns the organization, eg "opentrons/protocol-designer"',
     )
     version: Optional[str] = Field(
-        None, description='Version of the application that created the protocol'
+        None, description="Version of the application that created the protocol"
     )
     data: Optional[Dict[str, Any]] = Field(
-        None,
-        description='Any data used by the application that created this protocol'
+        None, description="Any data used by the application that created this protocol"
     )
 
 
 class Robot(BaseModel):
-    model: Literal['OT-2 Standard'] = Field(
+    model: Literal["OT-2 Standard"] = Field(
         ...,
-        description='Model of the robot this protocol is written for '
-                    '(currently only OT-2 Standard is supported)',
+        description="Model of the robot this protocol is written for "
+        "(currently only OT-2 Standard is supported)",
     )
 
 
@@ -128,7 +144,8 @@ class OffsetFromBottomMm(BaseModel):
     """
 
     offsetFromBottomMm: float = Field(
-        ..., description='Millimeters for pipette location offsets')
+        ..., description="Millimeters for pipette location offsets"
+    )
 
 
 class PipetteAccessParams(BaseModel):
@@ -143,7 +160,7 @@ class VolumeParams(BaseModel):
 
 class FlowRate(BaseModel):
     flowRate: float = Field(
-        ..., description='Flow rate in uL/sec. Must be greater than 0', ge=0.0
+        ..., description="Flow rate in uL/sec. Must be greater than 0", ge=0.0
     )
 
 
@@ -164,7 +181,7 @@ class LiquidCommand(BaseModel):
     Aspirate / dispense / air gap commands
     """
 
-    command: Literal['aspirate', 'dispense', 'airGap']
+    command: Literal["aspirate", "dispense", "airGap"]
     params: Params
 
 
@@ -173,7 +190,7 @@ class BlowoutCommand(BaseModel):
     Blowout command
     """
 
-    command: Literal['blowout']
+    command: Literal["blowout"]
     params: Params1
 
 
@@ -182,7 +199,7 @@ class TouchTipCommand(BaseModel):
     Touch tip commands
     """
 
-    command: Literal['touchTip']
+    command: Literal["touchTip"]
     params: Params2
 
 
@@ -191,7 +208,7 @@ class PickUpDropTipCommand(BaseModel):
     Pick up tip / drop tip commands
     """
 
-    command: Literal['pickUpTip', 'dropTip']
+    command: Literal["pickUpTip", "dropTip"]
     params: PipetteAccessParams
 
 
@@ -210,29 +227,29 @@ class Params3(BaseModel):
     slot: str = Field(
         ...,
         description="string '1'-'12', or special string 'span7_8_10_11' signify "
-                    "it's a slot on the OT-2 deck. If it's a UUID, it's the "
-                    "slot on the module referenced by that ID.",
+        "it's a slot on the OT-2 deck. If it's a UUID, it's the "
+        "slot on the module referenced by that ID.",
     )
     offset: Optional[Offset] = Field(
-        None, description='Optional offset from slot bottom left corner, in mm'
+        None, description="Optional offset from slot bottom left corner, in mm"
     )
     minimumZHeight: Optional[float] = Field(
         None,
         description="Optional minimal Z margin in mm. If this is larger than "
-                    "the API's default safe Z margin, it will make the arc "
-                    "higher. If it's smaller, it will have no effect. Specifying "
-                    "this for movements that would not arc (moving within the "
-                    "same well in the same labware) will cause an arc movement "
-                    "instead.",
+        "the API's default safe Z margin, it will make the arc "
+        "higher. If it's smaller, it will have no effect. Specifying "
+        "this for movements that would not arc (moving within the "
+        "same well in the same labware) will cause an arc movement "
+        "instead.",
         ge=0.0,
     )
     forceDirect: Optional[bool] = Field(
         None,
         description="Default is false. If true, moving from one labware/well to "
-                    "another will not arc to the default safe z, but instead will "
-                    "move directly to the specified location. This will also force "
-                    "the 'minimumZHeight' param to be ignored. A 'direct' movement "
-                    "is in X/Y/Z simultaneously",
+        "another will not arc to the default safe z, but instead will "
+        "move directly to the specified location. This will also force "
+        "the 'minimumZHeight' param to be ignored. A 'direct' movement "
+        "is in X/Y/Z simultaneously",
     )
 
 
@@ -242,20 +259,19 @@ class MoveToSlotCommand(BaseModel):
     subject to change in future releases.
     """
 
-    command: Literal['moveToSlot']
+    command: Literal["moveToSlot"]
     params: Params3
 
 
 class DelayCommandParams(BaseModel):
     wait: Union[Literal[True], float] = Field(
         ...,
-        description='either a number of seconds to wait (fractional values OK), '
-                    'or `true` to wait indefinitely until the user manually '
-                    'resumes the protocol',
+        description="either a number of seconds to wait (fractional values OK), "
+        "or `true` to wait indefinitely until the user manually "
+        "resumes the protocol",
     )
     message: Optional[str] = Field(
-        None,
-        description='optional message describing the delay'
+        None, description="optional message describing the delay"
     )
 
 
@@ -264,19 +280,19 @@ class DelayCommand(BaseModel):
     Delay command
     """
 
-    command: Literal['delay']
+    command: Literal["delay"]
     params: DelayCommandParams
 
 
 class Params5(BaseModel):
     engageHeight: float = Field(
         ...,
-        description='Height in mm(*) from bottom plane of labware (above if positive, '
-                    'below if negative). *NOTE: for magneticModuleV1 (aka GEN1), these '
-                    'are not true mm but an arbitrary unit equal to 0.5mm. So '
-                    '`engageHeight: 2` means 1mm above the labware plane if the '
-                    'command is for a GEN1 magnetic module, but would mean 2mm '
-                    'above the labware plane for GEN2 module',
+        description="Height in mm(*) from bottom plane of labware (above if positive, "
+        "below if negative). *NOTE: for magneticModuleV1 (aka GEN1), these "
+        "are not true mm but an arbitrary unit equal to 0.5mm. So "
+        "`engageHeight: 2` means 1mm above the labware plane if the "
+        "command is for a GEN1 magnetic module, but would mean 2mm "
+        "above the labware plane for GEN2 module",
     )
     module: str
 
@@ -286,7 +302,7 @@ class MagneticModuleEngageCommand(BaseModel):
     Magnetic module engage command. Engages magnet to specified height
     """
 
-    command: Literal['magneticModule/engageMagnet']
+    command: Literal["magneticModule/engageMagnet"]
     params: Params5
 
 
@@ -295,7 +311,7 @@ class MagneticModuleDisengageCommand(BaseModel):
     Magnetic module disengage command. Moves magnet down to disengaged (home) position
     """
 
-    command: Literal['magneticModule/disengageMagnet']
+    command: Literal["magneticModule/disengageMagnet"]
     params: ModuleOnlyParams
 
 
@@ -311,7 +327,7 @@ class TemperatureModuleSetTargetCommand(BaseModel):
     until the temperature is reached.
     """
 
-    command: Literal['temperatureModule/setTargetTemperature']
+    command: Literal["temperatureModule/setTargetTemperature"]
     params: Params6
 
 
@@ -326,7 +342,7 @@ class TemperatureModuleAwaitTemperatureCommand(BaseModel):
     until the specified temperature is reached.
     """
 
-    command: Literal['temperatureModule/awaitTemperature']
+    command: Literal["temperatureModule/awaitTemperature"]
     params: Params7
 
 
@@ -336,7 +352,7 @@ class TemperatureModuleDeactivateCommand(BaseModel):
     its temperature and drift to ambient temperature.
     """
 
-    command: Literal['temperatureModule/deactivate']
+    command: Literal["temperatureModule/deactivate"]
     params: ModuleOnlyParams
 
 
@@ -353,7 +369,7 @@ class ThermocyclerSetTargetBlockTemperatureCommand(BaseModel):
     the temperature is reached.
     """
 
-    command: Literal['thermocycler/setTargetBlockTemperature']
+    command: Literal["thermocycler/setTargetBlockTemperature"]
     params: Params8
 
 
@@ -369,7 +385,7 @@ class ThermocyclerSetTargetLidTemperatureCommand(BaseModel):
     the temperature is reached.
     """
 
-    command: Literal['thermocycler/setTargetLidTemperature']
+    command: Literal["thermocycler/setTargetLidTemperature"]
     params: Params9
 
 
@@ -384,7 +400,7 @@ class ThermocyclerAwaitBlockTemperatureCommand(BaseModel):
     until the specified temperature is reached.
     """
 
-    command: Literal['thermocycler/awaitBlockTemperature']
+    command: Literal["thermocycler/awaitBlockTemperature"]
     params: Params10
 
 
@@ -399,7 +415,7 @@ class ThermocyclerAwaitLidTemperatureCommand(BaseModel):
     until the specified temperature is reached.
     """
 
-    command: Literal['thermocycler/awaitLidTemperature']
+    command: Literal["thermocycler/awaitLidTemperature"]
     params: Params11
 
 
@@ -409,7 +425,7 @@ class ThermocyclerDeactivateBlockCommand(BaseModel):
     its block temperature.
     """
 
-    command: Literal['thermocycler/deactivateBlock']
+    command: Literal["thermocycler/deactivateBlock"]
     params: ModuleOnlyParams
 
 
@@ -419,7 +435,7 @@ class ThermocyclerDeactivateLidCommand(BaseModel):
     its lid temperature.
     """
 
-    command: Literal['thermocycler/deactivateLid']
+    command: Literal["thermocycler/deactivateLid"]
     params: ModuleOnlyParams
 
 
@@ -429,7 +445,7 @@ class ThermocyclerOpenLidCommand(BaseModel):
     fully open.
     """
 
-    command: Literal['thermocycler/openLid']
+    command: Literal["thermocycler/openLid"]
     params: ModuleOnlyParams
 
 
@@ -439,17 +455,14 @@ class ThermocyclerCloseLidCommand(BaseModel):
     fully closed.
     """
 
-    command: Literal['thermocycler/closeLid']
+    command: Literal["thermocycler/closeLid"]
     params: ModuleOnlyParams
 
 
 class ProfileItem(BaseModel):
-    temperature: float = Field(
-        ...,
-        description='Target temperature of profile step')
+    temperature: float = Field(..., description="Target temperature of profile step")
     holdTime: float = Field(
-        ...,
-        description='Time (in seconds) to hold once temperature is reached'
+        ..., description="Time (in seconds) to hold once temperature is reached"
     )
 
 
@@ -467,7 +480,7 @@ class ThermocyclerRunProfile(BaseModel):
     be given until a 'thermocycler/awaitProfileComplete' command is executed.
     """
 
-    command: Literal['thermocycler/runProfile']
+    command: Literal["thermocycler/runProfile"]
     params: Params12
 
 
@@ -477,7 +490,7 @@ class ThermocyclerAwaitProfileCompleteCommand(BaseModel):
     execution until profile execution is complete.
     """
 
-    command: Literal['thermocycler/awaitProfileComplete']
+    command: Literal["thermocycler/awaitProfileComplete"]
     params: ModuleOnlyParams
 
 
@@ -496,25 +509,24 @@ class Params13(BaseModel):
     labware: str
     well: str
     offset: Optional[Offset1] = Field(
-        None,
-        description='Optional offset from well bottom center, in mm'
+        None, description="Optional offset from well bottom center, in mm"
     )
     minimumZHeight: Optional[float] = Field(
         None,
         description="Optional minimal Z margin in mm. If this is larger than "
-                    "the API's default safe Z margin, it will make the arc higher. "
-                    "If it's smaller, it will have no effect. Specifying this for "
-                    "movements that would not arc (moving within the same well in "
-                    "the same labware) will cause an arc movement instead.",
+        "the API's default safe Z margin, it will make the arc higher. "
+        "If it's smaller, it will have no effect. Specifying this for "
+        "movements that would not arc (moving within the same well in "
+        "the same labware) will cause an arc movement instead.",
         ge=0.0,
     )
     forceDirect: Optional[bool] = Field(
         None,
         description="Default is false. If true, moving from one labware/well "
-                    "to another will not arc to the default safe z, but instead "
-                    "will move directly to the specified location. This will also "
-                    "force the 'minimumZHeight' param to be ignored. A 'direct' "
-                    "movement is in X/Y/Z simultaneously",
+        "to another will not arc to the default safe z, but instead "
+        "will move directly to the specified location. This will also "
+        "force the 'minimumZHeight' param to be ignored. A 'direct' "
+        "movement is in X/Y/Z simultaneously",
     )
 
 
@@ -529,7 +541,7 @@ class MoveToWellCommand(BaseModel):
     nozzle.
     """
 
-    command: Literal['moveToWell']
+    command: Literal["moveToWell"]
     params: Params13
 
 
@@ -567,13 +579,13 @@ class Pipettes(BaseModel):
     class Config:
         extra = Extra.allow
 
-    mount: Literal['left', 'right'] = Field(
-        ..., description='Where the pipette is mounted'
+    mount: Literal["left", "right"] = Field(
+        ..., description="Where the pipette is mounted"
     )
     name: str = Field(
         ...,
-        description='Name of a pipette. Does not contain info about specific '
-                    'model/version. Should match keys in pipetteNameSpecs.json file',
+        description="Name of a pipette. Does not contain info about specific "
+        "model/version. Should match keys in pipetteNameSpecs.json file",
     )
 
 
@@ -588,17 +600,16 @@ class Labware(BaseModel):
     slot: str = Field(
         ...,
         description="string '1'-'12', or special string 'span7_8_10_11' signify "
-                    "it's a slot on the OT-2 deck. If it's a UUID, it's the "
-                    "slot on the module referenced by that ID.",
+        "it's a slot on the OT-2 deck. If it's a UUID, it's the "
+        "slot on the module referenced by that ID.",
     )
     definitionId: str = Field(
-        ...,
-        description='reference to this labware\'s ID in "labwareDefinitions"'
+        ..., description='reference to this labware\'s ID in "labwareDefinitions"'
     )
     displayName: Optional[str] = Field(
         None,
-        description='An optional human-readable nickname for this labware. '
-                    'Eg "Buffer Trough"',
+        description="An optional human-readable nickname for this labware. "
+        'Eg "Buffer Trough"',
     )
 
 
@@ -613,65 +624,62 @@ class Modules(BaseModel):
     slot: str = Field(
         ...,
         description="string '1'-'12', or special string 'span7_8_10_11' signify "
-                    "it's a slot on the OT-2 deck. If it's a UUID, it's the "
-                    "slot on the module referenced by that ID.",
+        "it's a slot on the OT-2 deck. If it's a UUID, it's the "
+        "slot on the module referenced by that ID.",
     )
     model: str = Field(
         ...,
         description="model of module. Eg 'magneticModuleV1' or 'magneticModuleV2'. "
-                    "This should match a top-level key in "
-                    "shared-data/module/definitions/2.json",
+        "This should match a top-level key in "
+        "shared-data/module/definitions/2.json",
     )
 
 
 class Model(BaseModel):
     otSharedSchema: Optional[
-        Literal['#/protocol/schemas/5', '#/protocol/schemas/4']
+        Literal["#/protocol/schemas/5", "#/protocol/schemas/4"]
     ] = Field(
         None,
-        alias='$otSharedSchema',
-        description='The path to a valid Opentrons shared schema relative to '
-                    'the shared-data directory, without its extension.',
+        alias="$otSharedSchema",
+        description="The path to a valid Opentrons shared schema relative to "
+        "the shared-data directory, without its extension.",
     )
     schemaVersion: Literal[1, 2, 3, 4, 5] = Field(
-        ..., description='Schema version of a protocol is a single integer'
+        ..., description="Schema version of a protocol is a single integer"
     )
-    metadata: Metadata = Field(
-        ...,
-        description='Optional metadata about the protocol'
-    )
+    metadata: Metadata = Field(..., description="Optional metadata about the protocol")
     designerApplication: Optional[DesignerApplication] = Field(
         None,
-        description='Optional data & metadata not required to execute the protocol, '
-                    'used by the application that created this protocol',
+        description="Optional data & metadata not required to execute the protocol, "
+        "used by the application that created this protocol",
     )
     robot: Robot
     pipettes: Dict[str, Pipettes] = Field(
         ...,
-        description='The pipettes used in this protocol, keyed by an arbitrary '
-                    'unique ID',
+        description="The pipettes used in this protocol, keyed by an arbitrary "
+        "unique ID",
     )
     labwareDefinitions: Dict[str, LabwareDefinition] = Field(
         ...,
-        description='All labware definitions used by labware in this protocol, '
-                    'keyed by UUID',
+        description="All labware definitions used by labware in this protocol, "
+        "keyed by UUID",
     )
     labware: Dict[str, Labware] = Field(
         ...,
-        description='All types of labware used in this protocol, and references '
-                    'to their definitions',
+        description="All types of labware used in this protocol, and references "
+        "to their definitions",
     )
     modules: Optional[Dict[str, Modules]] = Field(
-        None, description='All modules used in this protocol'
+        None, description="All modules used in this protocol"
     )
     commands: List[AllCommands] = Field(
         None,
         description="An array of command objects representing steps to be executed "
-                    "on the robot"
+        "on the robot",
     )
     commandAnnotations: Optional[Dict[str, Any]] = Field(
         None,
-        description='An optional object of annotations associated with commands. '
-                    'Its usage has not yet been defined, so its shape is not '
-                    'enforced by this schema.',
+        description="An optional object of annotations associated with commands. "
+        "Its usage has not yet been defined, so its shape is not "
+        "enforced by this schema.",
     )

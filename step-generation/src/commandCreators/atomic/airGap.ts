@@ -6,7 +6,7 @@ import {
 } from '../../utils'
 
 import type { AirGapParams } from '@opentrons/shared-data/protocol/types/schemaV3'
-import type { Command } from '@opentrons/shared-data/protocol/types/schemaV6'
+import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5Addendum'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 
 export const airGap: CommandCreator<AirGapParams> = (

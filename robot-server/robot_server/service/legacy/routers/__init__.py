@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 
-from robot_server.service.dependencies import check_version_header
+from robot_server.versioning import check_version_header, set_version_response_headers
 
 from . import (
     networking,
@@ -12,7 +12,6 @@ from . import (
     motors,
     camera,
     logs,
-    rpc,
 )
 
 legacy_routes = APIRouter()
@@ -69,12 +68,7 @@ legacy_routes.include_router(
 legacy_routes.include_router(
     router=logs.router,
     tags=["Logs"],
-)
-
-# RPC websocket route is exempt from version header requirements
-legacy_routes.include_router(
-    router=rpc.router,
-    tags=["RPC"],
+    dependencies=[Depends(set_version_response_headers)],
 )
 
 __all__ = ["legacy_routes"]

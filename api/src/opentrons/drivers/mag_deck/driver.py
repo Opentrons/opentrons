@@ -38,8 +38,8 @@ class GCODE(str, Enum):
 
 MAG_DECK_BAUDRATE = 115200
 
-MAG_DECK_COMMAND_TERMINATOR = '\r\n\r\n'
-MAG_DECK_ACK = 'ok\r\nok\r\n'
+MAG_DECK_COMMAND_TERMINATOR = "\r\n\r\n"
+MAG_DECK_ACK = "ok\r\nok\r\n"
 
 
 # Number of digits after the decimal point for millimeter values
@@ -52,10 +52,9 @@ class MagDeckError(Exception):
 
 
 class MagDeckDriver(AbstractMagDeckDriver):
-
     @classmethod
     async def create(
-            cls, port: str, loop: Optional[asyncio.AbstractEventLoop] = None
+        cls, port: str, loop: Optional[asyncio.AbstractEventLoop] = None
     ) -> MagDeckDriver:
         """
         Create a mag deck driver.
@@ -67,9 +66,12 @@ class MagDeckDriver(AbstractMagDeckDriver):
         Returns: driver
         """
         connection = await SerialConnection.create(
-            port=port, baud_rate=MAG_DECK_BAUDRATE,
-            timeout=DEFAULT_MAG_DECK_TIMEOUT, ack=MAG_DECK_ACK,
-            loop=loop
+            port=port,
+            baud_rate=MAG_DECK_BAUDRATE,
+            timeout=DEFAULT_MAG_DECK_TIMEOUT,
+            ack=MAG_DECK_ACK,
+            loop=loop,
+            reset_buffer_before_write=False,
         )
         return cls(connection=connection)
 
@@ -96,9 +98,7 @@ class MagDeckDriver(AbstractMagDeckDriver):
 
     async def home(self) -> None:
         """Homes the magnet"""
-        c = CommandBuilder(
-            terminator=MAG_DECK_COMMAND_TERMINATOR
-        ).add_gcode(
+        c = CommandBuilder(terminator=MAG_DECK_COMMAND_TERMINATOR).add_gcode(
             gcode=GCODE.HOME
         )
         await self._send_command(c)
@@ -109,9 +109,7 @@ class MagDeckDriver(AbstractMagDeckDriver):
         from home.
         To be used for calibrating MagDeck
         """
-        c = CommandBuilder(
-            terminator=MAG_DECK_COMMAND_TERMINATOR
-        ).add_gcode(
+        c = CommandBuilder(terminator=MAG_DECK_COMMAND_TERMINATOR).add_gcode(
             gcode=GCODE.PROBE_PLATE
         )
         await self._send_command(c)
@@ -121,44 +119,40 @@ class MagDeckDriver(AbstractMagDeckDriver):
         Default plate_height for the device is 30;
         calculated as MAX_TRAVEL_DISTANCE(45mm) - 15mm
         """
-        c = CommandBuilder(
-            terminator=MAG_DECK_COMMAND_TERMINATOR
-        ).add_gcode(
+        c = CommandBuilder(terminator=MAG_DECK_COMMAND_TERMINATOR).add_gcode(
             gcode=GCODE.GET_PLATE_HEIGHT
         )
         response = await self._send_command(c)
         data = utils.parse_key_values(response)
-        return utils.parse_number(str(data.get('height')),
-                                  GCODE_ROUNDING_PRECISION)
+        return utils.parse_number(str(data.get("height")), GCODE_ROUNDING_PRECISION)
 
     async def get_mag_position(self) -> float:
         """
         Default mag_position for the device is 0.0
         i.e. it boots with the current position as 0.0
         """
-        c = CommandBuilder(
-            terminator=MAG_DECK_COMMAND_TERMINATOR
-        ).add_gcode(
+        c = CommandBuilder(terminator=MAG_DECK_COMMAND_TERMINATOR).add_gcode(
             gcode=GCODE.GET_CURRENT_POSITION
         )
 
         response = await self._send_command(c)
         data = utils.parse_key_values(response)
-        return utils.parse_number(str(data.get('Z')),
-                                  GCODE_ROUNDING_PRECISION)
+        return utils.parse_number(str(data.get("Z")), GCODE_ROUNDING_PRECISION)
 
-    async def move(self, position_mm: float) -> None:
+    async def move(self, position: float) -> None:
         """
         Move the magnets along Z axis where the home position is 0.0;
-        position_mm-> a point along Z. Does not self-check if the position
+        position-> a point along Z. Does not self-check if the position
         is outside of the deck's linear range
+
+        The units of position depend on the module model.
+        For GEN1, it's half millimeters ("short millimeters").
+        For GEN2, it's millimeters.
         """
-        c = CommandBuilder(
-            terminator=MAG_DECK_COMMAND_TERMINATOR
-        ).add_gcode(
-            gcode=GCODE.MOVE
-        ).add_float(
-            prefix="Z", value=position_mm, precision=GCODE_ROUNDING_PRECISION
+        c = (
+            CommandBuilder(terminator=MAG_DECK_COMMAND_TERMINATOR)
+            .add_gcode(gcode=GCODE.MOVE)
+            .add_float(prefix="Z", value=position, precision=GCODE_ROUNDING_PRECISION)
         )
         await self._send_command(c)
 
@@ -179,9 +173,7 @@ class MagDeckDriver(AbstractMagDeckDriver):
         Example input from Mag-Deck's serial response:
             "serial:aa11bb22 model:aa11bb22 version:aa11bb22"
         """
-        c = CommandBuilder(
-            terminator=MAG_DECK_COMMAND_TERMINATOR
-        ).add_gcode(
+        c = CommandBuilder(terminator=MAG_DECK_COMMAND_TERMINATOR).add_gcode(
             gcode=GCODE.DEVICE_INFO
         )
         response = await self._send_command(c)
@@ -195,9 +187,7 @@ class MagDeckDriver(AbstractMagDeckDriver):
         The connection can be restored by performing a .disconnect()
         followed by a .connect() to the same symlink node
         """
-        c = CommandBuilder(
-            terminator=MAG_DECK_COMMAND_TERMINATOR
-        ).add_gcode(
+        c = CommandBuilder(terminator=MAG_DECK_COMMAND_TERMINATOR).add_gcode(
             gcode=GCODE.PROGRAMMING_MODE
         )
         await self._send_command(c)
@@ -213,7 +203,6 @@ class MagDeckDriver(AbstractMagDeckDriver):
             command response
         """
         response = await self._connection.send_command(
-            command=command,
-            retries=DEFAULT_COMMAND_RETRIES
+            command=command, retries=DEFAULT_COMMAND_RETRIES
         )
         return response

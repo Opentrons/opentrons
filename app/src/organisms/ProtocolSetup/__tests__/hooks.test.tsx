@@ -1,36 +1,36 @@
 // tests for the HostConfig context and hook
 import * as React from 'react'
+import { when } from 'jest-when'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 import { renderHook } from '@testing-library/react-hooks'
 import { useProtocolMetadata } from '../hooks'
-import * as protocolSelectors from '../../../redux/protocol/selectors'
+import { useCurrentProtocol } from '../../ProtocolUpload/hooks'
 
 import type { Store } from 'redux'
 import type { State } from '../../../redux/types'
 
-jest.mock('../../../redux/protocol/selectors')
+jest.mock('../../ProtocolUpload/hooks')
 
-const getProtocolAuthor = protocolSelectors.getProtocolAuthor as jest.MockedFunction<
-  typeof protocolSelectors.getProtocolAuthor
->
-const getProtocolLastUpdated = protocolSelectors.getProtocolLastUpdated as jest.MockedFunction<
-  typeof protocolSelectors.getProtocolLastUpdated
->
-const getProtocolMethod = protocolSelectors.getProtocolMethod as jest.MockedFunction<
-  typeof protocolSelectors.getProtocolMethod
->
-const getProtocolDescription = protocolSelectors.getProtocolDescription as jest.MockedFunction<
-  typeof protocolSelectors.getProtocolDescription
+const mockUseCurrentProtocol = useCurrentProtocol as jest.MockedFunction<
+  typeof useCurrentProtocol
 >
 
 describe('useProtocolMetadata', () => {
   const store: Store<State> = createStore(jest.fn(), {})
 
-  getProtocolAuthor.mockReturnValue('author name')
-  getProtocolLastUpdated.mockReturnValue(8675309)
-  getProtocolMethod.mockReturnValue('imaginary editor')
-  getProtocolDescription.mockReturnValue('stubbed protocol description')
+  when(mockUseCurrentProtocol)
+    .calledWith()
+    .mockReturnValue({
+      data: {
+        protocolType: 'json',
+        metadata: {
+          author: 'AUTHOR',
+          description: 'DESCRIPTION',
+          lastModified: 123456,
+        },
+      },
+    } as any)
 
   beforeEach(() => {
     store.dispatch = jest.fn()
@@ -45,11 +45,11 @@ describe('useProtocolMetadata', () => {
       <Provider store={store}>{children}</Provider>
     )
     const { result } = renderHook(useProtocolMetadata, { wrapper })
-    const { author, lastUpdated, method, description } = result.current
+    const { author, lastUpdated, creationMethod, description } = result.current
 
-    expect(author).toBe('author name')
-    expect(lastUpdated).toBe(8675309)
-    expect(method).toBe('imaginary editor')
-    expect(description).toBe('stubbed protocol description')
+    expect(author).toBe('AUTHOR')
+    expect(lastUpdated).toBe(123456)
+    expect(creationMethod).toBe('json')
+    expect(description).toBe('DESCRIPTION')
   })
 })

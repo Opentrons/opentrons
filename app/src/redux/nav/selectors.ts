@@ -15,7 +15,6 @@ import { getDeckCalibrationStatus, DECK_CAL_STATUS_OK } from '../calibration'
 
 import type { State } from '../types'
 import type { NavLocation } from './types'
-import { getFeatureFlags } from '../config'
 
 // TODO(mc, 2019-11-26): i18n
 const ROBOT = 'Robot'
@@ -45,7 +44,7 @@ const DRIVER_UPDATE_AVAILABLE = 'A driver update is available'
 const ROBOT_UPDATE_AVAILABLE = 'A robot software update is available'
 const ROBOT_CALIBRATION_RECOMMENDED = 'Robot calibration recommended'
 
-const getConnectedRobotPipettesMatch = (state: State): boolean => {
+export const getConnectedRobotPipettesMatch = (state: State): boolean => {
   const connectedRobot = getConnectedRobot(state)
 
   return connectedRobot
@@ -53,7 +52,7 @@ const getConnectedRobotPipettesMatch = (state: State): boolean => {
     : false
 }
 
-const getConnectedRobotPipettesCalibrated = (state: State): boolean => {
+export const getConnectedRobotPipettesCalibrated = (state: State): boolean => {
   const connectedRobot = getConnectedRobot(state)
 
   return connectedRobot
@@ -70,7 +69,7 @@ const getConnectedRobotUpdateAvailable = (state: State): boolean => {
   return robotUpdateType === UPGRADE
 }
 
-const getDeckCalibrationOk = (state: State): boolean => {
+export const getDeckCalibrationOk = (state: State): boolean => {
   const connectedRobot = getConnectedRobot(state)
   const deckCalStatus = connectedRobot
     ? getDeckCalibrationStatus(state, connectedRobot.name)
@@ -97,7 +96,9 @@ const getRobotCalibrationOk = (state: State): boolean => {
   return deckCalOk
 }
 
-const getRunDisabledReason: (state: State) => string | null = createSelector(
+export const getRunDisabledReason: (
+  state: State
+) => string | null = createSelector(
   getConnectedRobot,
   RobotSelectors.getSessionIsLoaded,
   RobotSelectors.getCommands,
@@ -218,15 +219,8 @@ export const getNavbarLocations: (
 ) => NavLocation[] = createSelector(
   getRobotsLocation,
   getUploadLocation,
-  getCalibrateLocation,
-  getRunLocation,
   getMoreLocation,
-  getFeatureFlags,
-  (robots, upload, calibrate, run, more, ff) => {
-    if (Boolean(ff.preProtocolFlowWithoutRPC)) {
-      return [robots, upload, run, more]
-    } else {
-      return [robots, upload, calibrate, run, more]
-    }
+  (robots, upload, more) => {
+    return [robots, upload, more]
   }
 )

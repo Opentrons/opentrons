@@ -4,22 +4,24 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  ModuleRealType,
+  ModuleType,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
   TEMPERATURE_MODULE_V1,
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_V1,
   ModuleModel,
+  HEATERSHAKER_MODULE_TYPE,
+  HEATERSHAKER_MODULE_V1,
 } from '@opentrons/shared-data'
 
 interface Props {
-  type: ModuleRealType
+  type: ModuleType
   model: ModuleModel
 }
 
 type ModuleImg = {
-  [type in ModuleRealType]: {
+  [type in ModuleType]: {
     [model in ModuleModel]?: string
   }
 }
@@ -35,6 +37,9 @@ const MODULE_IMG_BY_TYPE: ModuleImg = {
   },
   [THERMOCYCLER_MODULE_TYPE]: {
     [THERMOCYCLER_MODULE_V1]: require('../../images/modules/thermocycler.jpg'),
+  },
+  [HEATERSHAKER_MODULE_TYPE]: {
+    [HEATERSHAKER_MODULE_V1]: require('../../images/modules/heatershaker.png'),
   },
 }
 

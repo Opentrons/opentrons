@@ -1,40 +1,45 @@
 from typing import Any, Dict, NamedTuple, Optional, Union, TYPE_CHECKING
 from dataclasses import dataclass
 from .api_support.definitions import MIN_SUPPORTED_VERSION
+from .api_support.types import APIVersion
 
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
     from opentrons_shared_data.protocol.dev_types import (
-        JsonProtocol as JsonProtocolDef, Metadata as JsonProtocolMetadata
+        JsonProtocol as JsonProtocolDef,
+        Metadata as JsonProtocolMetadata,
     )
-    from .api_support.types import APIVersion
 
-Metadata = Dict[str, Union[str, int]]
+
+# This metadata type reflects existing behavior,
+# but there's no reason we couldn't change this to allow types other than strings.
+# Issue for fleshing out metadata spec: github.com/Opentrons/opentrons/issues/8334
+Metadata = Dict[str, str]
 
 
 @dataclass(frozen=True)
 class ProtocolCommon:
     text: str
     filename: Optional[str]
-    api_level: 'APIVersion'
-    metadata: Union[Metadata, 'JsonProtocolMetadata']
+    api_level: "APIVersion"
+    metadata: Union[Metadata, "JsonProtocolMetadata"]
 
 
 @dataclass(frozen=True)
 class JsonProtocol(ProtocolCommon):
     schema_version: int
-    contents: 'JsonProtocolDef'
+    contents: "JsonProtocolDef"
 
 
 @dataclass(frozen=True)
 class PythonProtocol(ProtocolCommon):
     contents: Any  # This is the output of compile() which we can't type
     # these 'bundled_' attrs should only be included when the protocol is a zip
-    bundled_labware: Optional[Dict[str, 'LabwareDefinition']]
+    bundled_labware: Optional[Dict[str, "LabwareDefinition"]]
     bundled_data: Optional[Dict[str, bytes]]
     bundled_python: Optional[Dict[str, str]]
     # this should only be included when the protocol is not a zip
-    extra_labware: Optional[Dict[str, 'LabwareDefinition']]
+    extra_labware: Optional[Dict[str, "LabwareDefinition"]]
 
 
 Protocol = Union[JsonProtocol, PythonProtocol]
@@ -42,7 +47,7 @@ Protocol = Union[JsonProtocol, PythonProtocol]
 
 class BundleContents(NamedTuple):
     protocol: str
-    bundled_labware: Dict[str, 'LabwareDefinition']
+    bundled_labware: Dict[str, "LabwareDefinition"]
     bundled_data: Dict[str, bytes]
     bundled_python: Dict[str, str]
 
@@ -56,7 +61,7 @@ function might look like this:
 def run(ctx):
     ctx.comment('hello, world')
 
-This function is called by the robot when the robot executes the protol.
+This function is called by the robot when the robot executes the protocol.
 This function is not present in the current protocol and must be added.
 """
 
@@ -85,17 +90,16 @@ class MalformedProtocolError(Exception):
         return self.message + PROTOCOL_MALFORMED
 
     def __repr__(self):
-        return '<{}: {}>'.format(self.__class__.__name__, self.message)
+        return "<{}: {}>".format(self.__class__.__name__, self.message)
 
 
 class ApiDeprecationError(Exception):
-    def __init__(self, version):
+    def __init__(self, version: APIVersion) -> None:
         self.version = version
         super().__init__(version)
 
     def __str__(self):
-        return PYTHON_API_VERSION_DEPRECATED.format(
-            self.version, MIN_SUPPORTED_VERSION)
+        return PYTHON_API_VERSION_DEPRECATED.format(self.version, MIN_SUPPORTED_VERSION)
 
     def __repr__(self):
-        return '<{}: {}>'.format(self.__class__.__name__, self.version)
+        return "<{}: {}>".format(self.__class__.__name__, self.version)

@@ -1,4 +1,6 @@
 import pytest
+from mock import AsyncMock
+from opentrons.drivers.temp_deck import AbstractTempDeckDriver
 from opentrons.hardware_control import modules, ExecutionManager
 
 
@@ -8,80 +10,101 @@ from opentrons.drivers.rpi_drivers.types import USBPort
 @pytest.fixture
 def usb_port():
     return USBPort(
-        name='', sub_names=[], hub=None,
-        port_number=None, device_path='/dev/ot_module_sim_tempdeck0')
+        name="",
+        hub=None,
+        port_number=0,
+        device_path="/dev/ot_module_sim_tempdeck0",
+    )
 
 
 async def test_sim_initialization(loop, usb_port):
-    temp = await modules.build(port='/dev/ot_module_sim_tempdeck0',
-                               usb_port=usb_port,
-                               which='tempdeck',
-                               simulating=True,
-                               interrupt_callback=lambda x: None,
-                               loop=loop,
-                               execution_manager=ExecutionManager(loop=loop))
+    temp = await modules.build(
+        port="/dev/ot_module_sim_tempdeck0",
+        usb_port=usb_port,
+        which="tempdeck",
+        simulating=True,
+        loop=loop,
+        execution_manager=ExecutionManager(),
+    )
     assert isinstance(temp, modules.AbstractModule)
 
 
 async def test_sim_state(loop, usb_port):
     temp = await modules.TempDeck.build(
-        port='/dev/ot_module_sim_tempdeck0',
+        port="/dev/ot_module_sim_tempdeck0",
         usb_port=usb_port,
         simulating=True,
         interrupt_callback=lambda x: None,
         loop=loop,
-        execution_manager=ExecutionManager(loop=loop)
+        execution_manager=ExecutionManager(),
     )
     await temp.wait_next_poll()
     assert temp.temperature == 0
     assert temp.target is None
-    assert temp.status == 'idle'
-    assert temp.live_data['status'] == temp.status
-    assert temp.live_data['data']['currentTemp'] == temp.temperature
-    assert temp.live_data['data']['targetTemp'] == temp.target
+    assert temp.status == "idle"
+    assert temp.live_data["status"] == temp.status
+    assert temp.live_data["data"]["currentTemp"] == temp.temperature
+    assert temp.live_data["data"]["targetTemp"] == temp.target
     status = temp.device_info
-    assert status['serial'] == 'dummySerialTD'
+    assert status["serial"] == "dummySerialTD"
     # return v1 if sim_model is not passed
-    assert status['model'] == 'temp_deck_v1.1'
-    assert status['version'] == 'dummyVersionTD'
+    assert status["model"] == "temp_deck_v1.1"
+    assert status["version"] == "dummyVersionTD"
 
 
 async def test_sim_update(loop, usb_port):
     temp = await modules.TempDeck.build(
-        port='/dev/ot_module_sim_tempdeck0',
+        port="/dev/ot_module_sim_tempdeck0",
         usb_port=usb_port,
         simulating=True,
         interrupt_callback=lambda x: None,
         loop=loop,
-        execution_manager=ExecutionManager(loop=loop),
-        polling_frequency=0
+        execution_manager=ExecutionManager(),
+        polling_frequency=0,
     )
     await temp.set_temperature(10)
     assert temp.temperature == 10
     assert temp.target == 10
-    assert temp.status == 'holding at target'
+    assert temp.status == "holding at target"
     await temp.deactivate()
     await temp.wait_next_poll()
     assert temp.temperature == 23
     assert temp.target is None
-    assert temp.status == 'idle'
+    assert temp.status == "idle"
 
 
 async def test_revision_model_parsing(loop, usb_port):
     mag = await modules.TempDeck.build(
-        port='',
+        port="",
         simulating=True,
         usb_port=usb_port,
         interrupt_callback=lambda x: None,
         loop=loop,
-        execution_manager=ExecutionManager(loop=loop),
-        polling_frequency=0
+        execution_manager=ExecutionManager(),
+        polling_frequency=0,
     )
-    mag._device_info['model'] = 'temp_deck_v20'
-    assert mag.model() == 'temperatureModuleV2'
-    mag._device_info['model'] = 'temp_deck_v4.0'
-    assert mag.model() == 'temperatureModuleV1'
-    del mag._device_info['model']
-    assert mag.model() == 'temperatureModuleV1'
-    mag._device_info['model'] = 'temp_deck_v1.1'
-    assert mag.model() == 'temperatureModuleV1'
+    mag._device_info["model"] = "temp_deck_v20"
+    assert mag.model() == "temperatureModuleV2"
+    mag._device_info["model"] = "temp_deck_v4.0"
+    assert mag.model() == "temperatureModuleV1"
+    del mag._device_info["model"]
+    assert mag.model() == "temperatureModuleV1"
+    mag._device_info["model"] = "temp_deck_v1.1"
+    assert mag.model() == "temperatureModuleV1"
+
+
+async def test_poll_error(loop, usb_port) -> None:
+    mock_driver = AsyncMock(spec=AbstractTempDeckDriver)
+    mock_driver.get_temperature.side_effect = ValueError("hello!")
+
+    magdeck = modules.TempDeck(
+        port="",
+        usb_port=usb_port,
+        execution_manager=AsyncMock(spec=ExecutionManager),
+        driver=mock_driver,
+        device_info={},
+        loop=loop,
+        polling_frequency=1,
+    )
+    with pytest.raises(ValueError, match="hello!"):
+        await magdeck.wait_next_poll()

@@ -1,0 +1,20 @@
+/* styles for overriding standard title bar item styles for Protocol page only */
+.reverse_titlebar_items {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row-reverse;
+}
+
+.reverse_titlebar_items > h1 {
+  margin-left: 0 !important;
+}
+
+.reverse_titlebar_items > button > svg {
+  left: auto !important;
+  right: var(--button-pad) !important;
+}
+
+.close_button {
+  margin-right: 0.5rem;
+  width: 7rem;
+}

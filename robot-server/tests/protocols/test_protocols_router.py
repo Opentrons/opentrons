@@ -1,166 +1,207 @@
 """Tests for the /protocols router."""
 import pytest
-from asyncio import AbstractEventLoop
 from datetime import datetime
 from decoy import Decoy, matchers
-from fastapi import FastAPI
-from fastapi.testclient import TestClient
-from starlette.datastructures import UploadFile
-from httpx import AsyncClient
-from typing import AsyncIterator
+from fastapi import UploadFile
+from pathlib import Path
 
-from robot_server.errors import exception_handlers
-from robot_server.protocols.protocol_models import Protocol, ProtocolFileType
-from robot_server.protocols.response_builder import ResponseBuilder
+from opentrons.protocols.api_support.types import APIVersion
+
+from opentrons.protocol_reader import (
+    ProtocolReader,
+    ProtocolSource,
+    ProtocolSourceFile,
+    ProtocolFileRole,
+    JsonProtocolConfig,
+    PythonProtocolConfig,
+    ProtocolFilesInvalidError,
+)
+
+from robot_server.errors import ApiError
+from robot_server.service.json_api import SimpleEmptyBody, MultiBodyMeta
+from robot_server.service.task_runner import TaskRunner
+from robot_server.protocols.analysis_store import AnalysisStore
+from robot_server.protocols.protocol_analyzer import ProtocolAnalyzer
+from robot_server.protocols.analysis_models import PendingAnalysis
+
+from robot_server.protocols.protocol_models import (
+    Metadata,
+    Protocol,
+    ProtocolFile,
+    ProtocolType,
+)
 from robot_server.protocols.protocol_store import (
     ProtocolStore,
     ProtocolResource,
     ProtocolNotFoundError,
-    ProtocolFileInvalidError,
 )
 
 from robot_server.protocols.router import (
-    protocols_router,
-    ProtocolNotFound,
-    ProtocolFileInvalid,
-    get_unique_id,
-    get_current_time,
-    get_protocol_store,
+    create_protocol,
+    get_protocols,
+    get_protocol_by_id,
+    delete_protocol_by_id,
 )
 
-from ..helpers import verify_response
+
+@pytest.fixture
+def protocol_store(decoy: Decoy) -> ProtocolStore:
+    """Get a mocked out ProtocolStore interface."""
+    return decoy.mock(cls=ProtocolStore)
 
 
 @pytest.fixture
-def app(
-    unique_id: str,
-    current_time: datetime,
-    protocol_store: ProtocolStore,
-    response_builder: ResponseBuilder,
-) -> FastAPI:
-    """Get an app instance for /protocols routes with dependencies mocked out."""
-    app = FastAPI(exception_handlers=exception_handlers)
-    app.dependency_overrides[get_unique_id] = lambda: unique_id
-    app.dependency_overrides[get_current_time] = lambda: current_time
-    app.dependency_overrides[get_protocol_store] = lambda: protocol_store
-    app.dependency_overrides[ResponseBuilder] = lambda: response_builder
-    app.include_router(protocols_router)
-
-    return app
+def analysis_store(decoy: Decoy) -> AnalysisStore:
+    """Get a mocked out AnalysisStore interface."""
+    return decoy.mock(cls=AnalysisStore)
 
 
 @pytest.fixture
-def client(app: FastAPI) -> TestClient:
-    """Get an TestClient for /protocols route testing."""
-    return TestClient(app)
+def protocol_reader(decoy: Decoy) -> ProtocolReader:
+    """Get a mocked out ProtocolReader."""
+    return decoy.mock(cls=ProtocolReader)
 
 
 @pytest.fixture
-async def async_client(
-    loop: AbstractEventLoop,
-    app: FastAPI,
-) -> AsyncIterator[AsyncClient]:
-    """Get an asynchronous client for /protocols route testing."""
-    async with AsyncClient(app=app, base_url="http://test") as client:
-        yield client
+def protocol_analyzer(decoy: Decoy) -> ProtocolAnalyzer:
+    """Get a mocked out ProtocolAnalyzer."""
+    return decoy.mock(cls=ProtocolAnalyzer)
 
 
-def test_get_protocols_no_protocols(
+@pytest.fixture
+def task_runner(decoy: Decoy) -> TaskRunner:
+    """Get a mocked out TaskRunner."""
+    return decoy.mock(cls=TaskRunner)
+
+
+async def test_get_protocols_no_protocols(
     decoy: Decoy,
     protocol_store: ProtocolStore,
-    client: TestClient,
 ) -> None:
     """It should return an empty collection response with no protocols loaded."""
     decoy.when(protocol_store.get_all()).then_return([])
 
-    response = client.get("/protocols")
+    result = await get_protocols(protocol_store=protocol_store)
 
-    verify_response(response, expected_status=200, expected_data=[])
+    assert result.content.data == []
+    assert result.content.meta == MultiBodyMeta(cursor=0, totalLength=0)
+    assert result.status_code == 200
 
 
-def test_get_protocols(
+async def test_get_protocols(
     decoy: Decoy,
     protocol_store: ProtocolStore,
-    response_builder: ResponseBuilder,
-    client: TestClient,
+    analysis_store: AnalysisStore,
 ) -> None:
     """It should return stored protocols."""
-    created_at_1 = datetime.now()
-    created_at_2 = datetime.now()
+    created_at_1 = datetime(year=2021, month=1, day=1)
+    created_at_2 = datetime(year=2022, month=2, day=2)
 
-    entry_1 = ProtocolResource(
+    resource_1 = ProtocolResource(
         protocol_id="abc",
-        protocol_type=ProtocolFileType.PYTHON,
         created_at=created_at_1,
-        files=[],
+        source=ProtocolSource(
+            directory=Path("/dev/null"),
+            main_file=Path("/dev/null/abc.py"),
+            config=PythonProtocolConfig(api_version=APIVersion(1234, 5678)),
+            files=[],
+            metadata={},
+            labware_definitions=[],
+        ),
     )
-    entry_2 = ProtocolResource(
+    resource_2 = ProtocolResource(
         protocol_id="123",
-        protocol_type=ProtocolFileType.JSON,
         created_at=created_at_2,
-        files=[],
+        source=ProtocolSource(
+            directory=Path("/dev/null"),
+            main_file=Path("/dev/null/123.json"),
+            config=JsonProtocolConfig(schema_version=1234),
+            files=[],
+            metadata={},
+            labware_definitions=[],
+        ),
     )
 
-    protocol_1 = Protocol(
+    analysis_1 = PendingAnalysis(id="analysis-id-abc")
+    analysis_2 = PendingAnalysis(id="analysis-id-123")
+
+    expected_protocol_1 = Protocol(
         id="abc",
         createdAt=created_at_1,
-        protocolType=ProtocolFileType.PYTHON,
-    )
-    protocol_2 = Protocol(
-        id="123",
-        createdAt=created_at_2,
-        protocolType=ProtocolFileType.JSON,
-    )
-
-    decoy.when(protocol_store.get_all()).then_return([entry_1, entry_2])
-    decoy.when(response_builder.build(entry_1)).then_return(protocol_1)
-    decoy.when(response_builder.build(entry_2)).then_return(protocol_2)
-
-    response = client.get("/protocols")
-
-    verify_response(
-        response,
-        expected_status=200,
-        expected_data=[protocol_1, protocol_2],
-    )
-
-
-def test_get_protocol_by_id(
-    decoy: Decoy,
-    protocol_store: ProtocolStore,
-    response_builder: ResponseBuilder,
-    client: TestClient,
-) -> None:
-    """It should return a single protocol file."""
-    created_at = datetime.now()
-    entry = ProtocolResource(
-        protocol_id="protocol-id",
-        protocol_type=ProtocolFileType.PYTHON,
-        created_at=created_at,
+        protocolType=ProtocolType.PYTHON,
+        metadata=Metadata(),
+        analyses=[analysis_1],
         files=[],
     )
-    protocol = Protocol(
-        id="protocol-id",
-        createdAt=created_at,
-        protocolType=ProtocolFileType.PYTHON,
+    expected_protocol_2 = Protocol(
+        id="123",
+        createdAt=created_at_2,
+        protocolType=ProtocolType.JSON,
+        metadata=Metadata(),
+        analyses=[analysis_2],
+        files=[],
     )
 
-    decoy.when(protocol_store.get(protocol_id="protocol-id")).then_return(entry)
-    decoy.when(response_builder.build(entry)).then_return(protocol)
+    decoy.when(protocol_store.get_all()).then_return([resource_1, resource_2])
+    decoy.when(analysis_store.get_by_protocol("abc")).then_return([analysis_1])
+    decoy.when(analysis_store.get_by_protocol("123")).then_return([analysis_2])
 
-    response = client.get("/protocols/protocol-id")
-
-    verify_response(
-        response,
-        expected_status=200,
-        expected_data=protocol,
+    result = await get_protocols(
+        protocol_store=protocol_store,
+        analysis_store=analysis_store,
     )
 
+    assert result.content.data == [expected_protocol_1, expected_protocol_2]
+    assert result.content.meta == MultiBodyMeta(cursor=0, totalLength=2)
+    assert result.status_code == 200
 
-def test_get_protocol_not_found(
+
+async def test_get_protocol_by_id(
     decoy: Decoy,
     protocol_store: ProtocolStore,
-    client: TestClient,
+    analysis_store: AnalysisStore,
+) -> None:
+    """It should return a single protocol file."""
+    resource = ProtocolResource(
+        protocol_id="protocol-id",
+        created_at=datetime(year=2021, month=1, day=1),
+        source=ProtocolSource(
+            directory=Path("/dev/null"),
+            main_file=Path("/dev/null/protocol.py"),
+            config=PythonProtocolConfig(api_version=APIVersion(1234, 5678)),
+            files=[],
+            metadata={},
+            labware_definitions=[],
+        ),
+    )
+
+    analysis = PendingAnalysis(id="analysis-id")
+
+    decoy.when(protocol_store.get(protocol_id="protocol-id")).then_return(resource)
+    decoy.when(analysis_store.get_by_protocol(protocol_id="protocol-id")).then_return(
+        [analysis]
+    )
+
+    result = await get_protocol_by_id(
+        "protocol-id",
+        protocol_store=protocol_store,
+        analysis_store=analysis_store,
+    )
+
+    assert result.content.data == Protocol(
+        id="protocol-id",
+        createdAt=datetime(year=2021, month=1, day=1),
+        protocolType=ProtocolType.PYTHON,
+        metadata=Metadata(),
+        analyses=[analysis],
+        files=[],
+    )
+    assert result.status_code == 200
+
+
+async def test_get_protocol_not_found(
+    decoy: Decoy,
+    protocol_store: ProtocolStore,
 ) -> None:
     """It should return a 404 error when requesting a non-existent protocol."""
     not_found_error = ProtocolNotFoundError("protocol-id")
@@ -169,177 +210,124 @@ def test_get_protocol_not_found(
         not_found_error
     )
 
-    response = client.get("/protocols/protocol-id")
+    with pytest.raises(ApiError) as exc_info:
+        await get_protocol_by_id(
+            "protocol-id",
+            protocol_store=protocol_store,
+        )
 
-    verify_response(
-        response,
-        expected_status=404,
-        expected_errors=ProtocolNotFound(detail=str(not_found_error)),
-    )
+    assert exc_info.value.status_code == 404
 
 
-async def test_create_json_protocol(
+async def test_create_protocol(
     decoy: Decoy,
     protocol_store: ProtocolStore,
-    response_builder: ResponseBuilder,
-    unique_id: str,
-    current_time: datetime,
-    async_client: AsyncClient,
+    analysis_store: AnalysisStore,
+    protocol_reader: ProtocolReader,
+    protocol_analyzer: ProtocolAnalyzer,
+    task_runner: TaskRunner,
 ) -> None:
-    """It should store a single JSON protocol file."""
-    entry = ProtocolResource(
-        protocol_id=unique_id,
-        protocol_type=ProtocolFileType.JSON,
-        created_at=current_time,
-        files=[],
+    """It should store an uploaded protocol file."""
+    protocol_file = UploadFile(filename="foo.json")
+
+    protocol_source = ProtocolSource(
+        directory=Path("/dev/null"),
+        main_file=Path("/dev/null/foo.json"),
+        files=[ProtocolSourceFile(name="foo.json", role=ProtocolFileRole.MAIN)],
+        metadata={"this_is_fake_metadata": True},
+        config=JsonProtocolConfig(schema_version=123),
+        labware_definitions=[],
     )
-    protocol = Protocol(
-        id=unique_id,
-        createdAt=current_time,
-        protocolType=ProtocolFileType.JSON,
+
+    protocol_resource = ProtocolResource(
+        protocol_id="protocol-id",
+        created_at=datetime(year=2021, month=1, day=1),
+        source=protocol_source,
     )
+
+    analysis = PendingAnalysis(id="analysis-id")
 
     decoy.when(
-        await protocol_store.create(
-            protocol_id=unique_id,
-            created_at=current_time,
-            files=[
-                matchers.IsA(
-                    UploadFile,
-                    {"filename": "foo.json", "content_type": "application/json"},
-                )
-            ],
+        await protocol_reader.read(
+            name="protocol-id",
+            files=[protocol_file],
         )
-    ).then_return(entry)
-
-    decoy.when(response_builder.build(entry)).then_return(protocol)
-
-    files = [("files", ("foo.json", bytes("{}\n", "utf-8"), "application/json"))]
-    response = await async_client.post("/protocols", files=files)
-
-    verify_response(
-        response,
-        expected_status=201,
-        expected_data=protocol,
-    )
-
-
-async def test_create_python_protocol(
-    decoy: Decoy,
-    protocol_store: ProtocolStore,
-    response_builder: ResponseBuilder,
-    unique_id: str,
-    current_time: datetime,
-    async_client: AsyncClient,
-) -> None:
-    """It should store a single Python protocol file."""
-    entry = ProtocolResource(
-        protocol_id=unique_id,
-        protocol_type=ProtocolFileType.PYTHON,
-        created_at=current_time,
-        files=[],
-    )
-    protocol = Protocol(
-        id=unique_id,
-        createdAt=current_time,
-        protocolType=ProtocolFileType.PYTHON,
-    )
+    ).then_return(protocol_source)
 
     decoy.when(
-        await protocol_store.create(
-            protocol_id=unique_id,
-            created_at=current_time,
-            files=[
-                matchers.IsA(
-                    UploadFile,
-                    {"filename": "foo.py", "content_type": "text/x-python"},
-                )
-            ],
-        )
-    ).then_return(entry)
+        analysis_store.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
+    ).then_return([analysis])
 
-    decoy.when(response_builder.build(entry)).then_return(protocol)
+    result = await create_protocol(
+        files=[protocol_file],
+        protocol_store=protocol_store,
+        analysis_store=analysis_store,
+        protocol_reader=protocol_reader,
+        protocol_analyzer=protocol_analyzer,
+        task_runner=task_runner,
+        protocol_id="protocol-id",
+        analysis_id="analysis-id",
+        created_at=datetime(year=2021, month=1, day=1),
+    )
 
-    files = [
-        ("files", ("foo.py", bytes("# my protocol\n", "utf-8"), "text/x-python")),
-    ]
-    response = await async_client.post("/protocols", files=files)
+    assert result.content.data == Protocol(
+        id="protocol-id",
+        createdAt=datetime(year=2021, month=1, day=1),
+        protocolType=ProtocolType.JSON,
+        metadata=Metadata(this_is_fake_metadata=True),  # type: ignore[call-arg]
+        analyses=[analysis],
+        files=[ProtocolFile(name="foo.json", role=ProtocolFileRole.MAIN)],
+    )
+    assert result.status_code == 201
 
-    verify_response(
-        response,
-        expected_status=201,
-        expected_data=protocol,
+    decoy.verify(
+        protocol_store.upsert(protocol_resource),
+        task_runner.run(
+            protocol_analyzer.analyze,
+            analysis_id="analysis-id",
+            protocol_resource=protocol_resource,
+        ),
     )
 
 
-@pytest.mark.xfail(raises=NotImplementedError)
-async def test_create_multifile_protocol(
+async def test_create_protocol_not_readable(
     decoy: Decoy,
-    protocol_store: ProtocolStore,
-    response_builder: ResponseBuilder,
-    unique_id: str,
-    current_time: datetime,
-    async_client: AsyncClient,
+    protocol_reader: ProtocolReader,
 ) -> None:
-    """It should store multiple protocol files."""
-    files = [
-        ("files", ("foo.py", bytes("# my protocol", "utf-8"), "text/x-python")),
-        ("files", ("bar.py", bytes("# support file", "utf-8"), "text/x-python")),
-    ]
-
-    await async_client.post("/protocols", files=files)
-
-
-async def test_create_protocol_invalid_file(
-    decoy: Decoy,
-    protocol_store: ProtocolStore,
-    response_builder: ResponseBuilder,
-    unique_id: str,
-    current_time: datetime,
-    async_client: AsyncClient,
-) -> None:
-    """It should reject a request with an empty file."""
+    """It should 400 if the protocol is rejected by the pre-analyzer."""
     decoy.when(
-        await protocol_store.create(
-            protocol_id=unique_id,
-            created_at=current_time,
-            files=[
-                matchers.IsA(
-                    UploadFile,
-                    {"filename": "foo.json", "content_type": "application/json"},
-                )
-            ],
+        await protocol_reader.read(
+            name=matchers.Anything(),
+            files=matchers.Anything(),
         )
-    ).then_raise(ProtocolFileInvalidError("oh no"))
+    ).then_raise(ProtocolFilesInvalidError("oh no"))
 
-    files = [("files", ("foo.json", bytes("{}\n", "utf-8"), "application/json"))]
-    response = await async_client.post("/protocols", files=files)
+    with pytest.raises(ApiError) as exc_info:
+        await create_protocol(
+            files=[],
+            protocol_reader=protocol_reader,
+        )
 
-    verify_response(
-        response,
-        expected_status=400,
-        expected_errors=ProtocolFileInvalid(detail="oh no"),
-    )
+    assert exc_info.value.status_code == 422
+    assert exc_info.value.content["errors"][0]["detail"] == "oh no"
 
 
-def test_delete_protocol_by_id(
+async def test_delete_protocol_by_id(
     decoy: Decoy,
     protocol_store: ProtocolStore,
-    client: TestClient,
 ) -> None:
     """It should remove a single protocol file."""
-    response = client.delete("/protocols/protocol-id")
+    result = await delete_protocol_by_id("protocol-id", protocol_store=protocol_store)
 
     decoy.verify(protocol_store.remove(protocol_id="protocol-id"))
 
-    assert response.status_code == 200
-    assert response.json()["data"] is None
+    assert result.content == SimpleEmptyBody()
+    assert result.status_code == 200
 
 
-def test_delete_protocol_not_found(
+async def test_delete_protocol_not_found(
     decoy: Decoy,
     protocol_store: ProtocolStore,
-    client: TestClient,
 ) -> None:
     """It should 404 if the protocol to delete is not found."""
     not_found_error = ProtocolNotFoundError("protocol-id")
@@ -348,10 +336,7 @@ def test_delete_protocol_not_found(
         not_found_error
     )
 
-    response = client.delete("/protocols/protocol-id")
+    with pytest.raises(ApiError) as exc_info:
+        await delete_protocol_by_id("protocol-id", protocol_store=protocol_store)
 
-    verify_response(
-        response,
-        expected_status=404,
-        expected_errors=ProtocolNotFound(detail=str(not_found_error)),
-    )
+    assert exc_info.value.status_code == 404

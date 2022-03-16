@@ -1,20 +1,31 @@
-# This workflow builds API docs on branch pushes that touch the parts
-# of the api/ project that are used by the docs; the docs source themselves;
-# or the CI/makefile tooling used to build the docs.
+# This workflow builds API docs when either:
+#
+# * A commit is tagged like "docs@foo".
+#
+# * Someone pushes, to any branch, a commit that touches any of:
+#   * The parts of the api/ project that are used by the docs.
+#   * The docs source themselves;
+#   * The CI/makefile tooling used to build the docs.
+
 
 name: 'API docs build'
 
 on:
   push:
+    tags:
+      - 'docs@*'
+    branches:
+      # We don't want to do any filtering based on branch name.
+      # But because we specified `tags`, we need to specify `branches` too,
+      # or else GitHub will only run this workflow for tag matches
+      # and not for path matches.
+      - '**'
     paths:
-      - 'api/src/opentrons/protocol_api/**'
-      - 'api/docs/**'
+      - 'api/**'
       - '.github/workflows/docs-build.yaml'
       - '.github/actions/python/**'
       - '.github/actions/webstack/deploy-to-sandbox/**'
       - '.github/workflows/utils.js'
-    tags:
-      - 'docs@*'
   workflow_dispatch:
 
 
@@ -30,7 +41,7 @@ jobs:
       - uses: 'actions/checkout@v2'
       - uses: 'actions/setup-node@v1'
         with:
-          node-version: '12'
+          node-version: '14'
       - uses: 'actions/setup-python@v2'
         with:
           python-version: '3.7'

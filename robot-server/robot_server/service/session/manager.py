@@ -1,10 +1,9 @@
 import logging
 from typing import Optional, Tuple, Dict, Type
 
-from opentrons.hardware_control import ThreadManager, ThreadedAsyncLock
+from opentrons.hardware_control import HardwareControlAPI, ThreadedAsyncLock
 
 from robot_server.service.errors import RobotServerError, CommonErrorDef
-from robot_server.service.protocol.manager import ProtocolManager
 from robot_server.service.session.errors import (
     SessionCreationException,
     SessionException,
@@ -23,7 +22,6 @@ from robot_server.service.session.session_types import (
 from robot_server.service.session.session_types.live_protocol.session import (
     LiveProtocolSession,
 )
-from robot_server.service.session.session_types.protocol.session import ProtocolSession
 
 log = logging.getLogger(__name__)
 
@@ -32,7 +30,6 @@ SessionTypeToClass: Dict[SessionType, Type[BaseSession]] = {
     SessionType.tip_length_calibration: TipLengthCalibration,
     SessionType.deck_calibration: DeckCalibrationSession,
     SessionType.pipette_offset_calibration: PipetteOffsetCalibrationSession,
-    SessionType.protocol: ProtocolSession,
     SessionType.live_protocol: LiveProtocolSession,
 }
 
@@ -42,15 +39,13 @@ class SessionManager:
 
     def __init__(
         self,
-        hardware: ThreadManager,
+        hardware: HardwareControlAPI,
         motion_lock: ThreadedAsyncLock,
-        protocol_manager: ProtocolManager,
     ):
         """
         Construct the session manager
 
-        :param hardware: ThreadManager to interact with hardware
-        :param protocol_manager: ProtocolManager for protocol related sessions
+        :param hardware: ThreadManagedHardware to interact with hardware
         """
         self._sessions: Dict[IdentifierType, BaseSession] = {}
         self._active = ActiveSessionId()
@@ -59,7 +54,6 @@ class SessionManager:
             hardware=hardware,
             is_active=self.is_active,
             motion_lock=motion_lock,
-            protocol_manager=protocol_manager,
         )
 
     async def add(
@@ -104,7 +98,10 @@ class SessionManager:
         """Get a session by identifier"""
         return self._sessions.get(identifier, None)
 
-    def get(self, session_type: SessionType = None) -> Tuple[BaseSession, ...]:
+    def get(
+        self,
+        session_type: Optional[SessionType] = None,
+    ) -> Tuple[BaseSession, ...]:
         """
         Get all the sessions with optional filter
 
@@ -139,7 +136,11 @@ class SessionManager:
             self._active.active_id = None
         return self.get_by_id(identifier)
 
-    async def _create_session(self, session_meta_data, session_type):
+    async def _create_session(
+        self,
+        session_meta_data: SessionMetaData,
+        session_type: SessionType,
+    ) -> BaseSession:
         """Create a new session."""
         cls = SessionTypeToClass.get(session_type)
         if not cls:
