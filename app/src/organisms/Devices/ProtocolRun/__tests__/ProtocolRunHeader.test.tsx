@@ -39,7 +39,8 @@ import {
   useAttachedModuleMatchesForProtocol,
   useRunCalibrationStatus,
 } from '../../hooks'
-import { formatTimestamp, ProtocolRunHeader } from '../ProtocolRunHeader'
+import { formatTimestamp } from '../../utils'
+import { ProtocolRunHeader } from '../ProtocolRunHeader'
 
 import type { UseQueryResult } from 'react-query'
 import type { Protocol, Run } from '@opentrons/api-client'
