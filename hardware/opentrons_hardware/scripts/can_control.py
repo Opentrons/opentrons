@@ -65,15 +65,13 @@ async def run(args: argparse.Namespace) -> None:
     messenger = CanMessenger(driver)
     messenger.start()
     write_lock = asyncio.Lock()
-    loop = asyncio.get_event_loop()
 
     try:
-        all_fut = loop.create_task(
-            asyncio.gather(
+        all_fut = asyncio.gather(
                 monitor_task(messenger, args.output, write_lock),
                 input_task(driver, args.input, args.output, write_lock),
             )
-        )
+        await all_fut
     except KeyboardInterrupt:
         all_fut.cancel()
     except asyncio.CancelledError:
