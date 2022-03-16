@@ -14,10 +14,14 @@ import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
 } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
-import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
+import { useRunQuery } from '@opentrons/react-api-client'
+import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
 
 import { i18n } from '../../../../i18n'
-import { useCurrentRunId } from '../../../../organisms/ProtocolUpload/hooks'
+import {
+  useCloseCurrentRun,
+  useCurrentRunId,
+} from '../../../../organisms/ProtocolUpload/hooks'
 import { ConfirmCancelModal } from '../../../../organisms/RunDetails/ConfirmCancelModal'
 import {
   useRunTimestamps,
@@ -37,13 +41,15 @@ import {
 } from '../../../../organisms/RunTimeControl/__fixtures__'
 import {
   useAttachedModuleMatchesForProtocol,
+  useProtocolDetailsForRun,
   useRunCalibrationStatus,
 } from '../../hooks'
 import { formatTimestamp } from '../../utils'
 import { ProtocolRunHeader } from '../ProtocolRunHeader'
 
 import type { UseQueryResult } from 'react-query'
-import type { Protocol, Run } from '@opentrons/api-client'
+import type { Run } from '@opentrons/api-client'
+import type { ProtocolFile } from '@opentrons/shared-data'
 
 const mockPush = jest.fn()
 
@@ -70,6 +76,9 @@ jest.mock('../../hooks')
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
 >
+const mockUseCloseCurrentRun = useCloseCurrentRun as jest.MockedFunction<
+  typeof useCloseCurrentRun
+>
 const mockUseRunTimestamps = useRunTimestamps as jest.MockedFunction<
   typeof useRunTimestamps
 >
@@ -79,8 +88,8 @@ const mockUseRunControls = useRunControls as jest.MockedFunction<
 const mockUseRunStatus = useRunStatus as jest.MockedFunction<
   typeof useRunStatus
 >
-const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
-  typeof useProtocolQuery
+const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
+  typeof useProtocolDetailsForRun
 >
 const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
 const mockUseAttachedModuleMatchesForProtocol = useAttachedModuleMatchesForProtocol as jest.MockedFunction<
@@ -99,6 +108,13 @@ const STARTED_AT = '2022-03-03T19:09:40.620530+00:00'
 const COMPLETED_AT = '2022-03-03T19:39:53.620530+00:00'
 const PROTOCOL_NAME = 'A Protocol for Otie'
 
+const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolFile<{}>
+
+const PROTOCOL_DETAILS = {
+  displayName: PROTOCOL_NAME,
+  protocolData: simpleV6Protocol,
+}
+
 const render = () => {
   return renderWithProviders(
     <BrowserRouter>
@@ -112,6 +128,10 @@ describe('ProtocolRunHeader', () => {
   beforeEach(() => {
     mockConfirmCancelModal.mockReturnValue(<div>Mock ConfirmCancelModal</div>)
     when(mockUseCurrentRunId).calledWith().mockReturnValue(RUN_ID)
+    when(mockUseCloseCurrentRun).calledWith().mockReturnValue({
+      isClosingCurrentRun: false,
+      closeCurrentRun: jest.fn(),
+    })
     when(mockUseRunControls)
       .calledWith(RUN_ID, expect.anything())
       .mockReturnValue({
@@ -136,16 +156,9 @@ describe('ProtocolRunHeader', () => {
       .mockReturnValue({
         data: { data: mockIdleUnstartedRun },
       } as UseQueryResult<Run>)
-    when(mockUseProtocolQuery)
-      .calledWith(PROTOCOL_ID)
-      .mockReturnValue({
-        data: {
-          data: {
-            id: PROTOCOL_ID,
-            metadata: { protocolName: PROTOCOL_NAME },
-          },
-        },
-      } as UseQueryResult<Protocol>)
+    when(mockUseProtocolDetailsForRun)
+      .calledWith(RUN_ID)
+      .mockReturnValue(PROTOCOL_DETAILS)
     when(mockUseAttachedModuleMatchesForProtocol)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })

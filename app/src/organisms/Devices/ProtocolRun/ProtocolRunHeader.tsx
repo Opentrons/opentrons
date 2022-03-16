@@ -35,11 +35,14 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
+import { useRunQuery } from '@opentrons/react-api-client'
 
 import { PrimaryButton, SecondaryButton } from '../../../atoms/Buttons'
 import { StyledText } from '../../../atoms/text'
-import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
+import {
+  useCloseCurrentRun,
+  useCurrentRunId,
+} from '../../../organisms/ProtocolUpload/hooks'
 import { ConfirmCancelModal } from '../../../organisms/RunDetails/ConfirmCancelModal'
 import {
   useRunControls,
@@ -50,6 +53,7 @@ import { formatInterval } from '../../../organisms/RunTimeControl/utils'
 
 import {
   useAttachedModuleMatchesForProtocol,
+  useProtocolDetailsForRun,
   useRunCalibrationStatus,
 } from '../hooks'
 import { formatTimestamp } from '../utils'
@@ -99,9 +103,8 @@ export function ProtocolRunHeader({
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   const runRecord = useRunQuery(runId)
-  const protocolRecord = useProtocolQuery(
-    runRecord?.data?.data.protocolId ?? null
-  )
+  const { displayName } = useProtocolDetailsForRun(runId)
+
   // this duplicates the run query above but has additional run status processing logic
   const runStatus = useRunStatus(runId)
 
@@ -147,7 +150,7 @@ export function ProtocolRunHeader({
   const isSetupComplete = isCalibrationComplete && missingModuleIds.length === 0
 
   const currentRunId = useCurrentRunId()
-  const isRobotBusy = currentRunId !== runId
+  const isRobotBusy = currentRunId != null && currentRunId !== runId
 
   const isRunControlButtonDisabled =
     !isSetupComplete ||
@@ -222,8 +225,19 @@ export function ProtocolRunHeader({
     runStatus === RUN_STATUS_RUNNING ||
     runStatus === RUN_STATUS_PAUSED ||
     runStatus === RUN_STATUS_PAUSE_REQUESTED ||
-    runStatus === RUN_STATUS_FINISHING ||
     runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR
+
+  const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
+
+  const handleCloseClick = (): void => {
+    closeCurrentRun()
+  }
+
+  const showCloseButton =
+    currentRunId === runId &&
+    (runStatus === RUN_STATUS_STOPPED ||
+      runStatus === RUN_STATUS_FAILED ||
+      runStatus === RUN_STATUS_SUCCEEDED)
 
   const ProtocolRunningContent = (): JSX.Element | null =>
     runStatus != null && runStatus !== RUN_STATUS_IDLE ? (
@@ -292,6 +306,16 @@ export function ProtocolRunHeader({
             {t('cancel_run')}
           </SecondaryButton>
         ) : null}
+        {showCloseButton ? (
+          <SecondaryButton
+            padding={`${SPACING.spacingSM} ${SPACING.spacing4}`}
+            onClick={handleCloseClick}
+            disabled={isClosingCurrentRun}
+            id="ProtocolRunHeader_closeRunButton"
+          >
+            {t('close_run')}
+          </SecondaryButton>
+        ) : null}
       </Flex>
     ) : null
 
@@ -308,13 +332,13 @@ export function ProtocolRunHeader({
     >
       <Flex>
         {/* TODO(bh, 2022-03-15) will update link to a protocol key stored locally when built */}
-        <Link to={`/protocols/${protocolRecord?.data?.data.id}`}>
+        <Link to={`/protocols/${runRecord?.data?.data.protocolId}`}>
           <StyledText
             color={COLORS.blue}
             css={TYPOGRAPHY.h2SemiBold}
             id="ProtocolRunHeader_protocolName"
           >
-            {protocolRecord?.data?.data.metadata.protocolName}
+            {displayName}
           </StyledText>
         </Link>
       </Flex>
