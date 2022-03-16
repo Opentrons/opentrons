@@ -72,7 +72,7 @@ def module_data_provider(decoy: Decoy) -> ModuleDataProvider:
 async def temp_module_v1(decoy: Decoy) -> TempDeck:
     """Get a mocked out module fixture."""
     temp_mod = decoy.mock(cls=TempDeck)
-    temp_mod.device_info = {"serial": "serial-1"}  # type: ignore[misc]
+    decoy.when(temp_mod.device_info).then_return({"serial": "serial-1"})
     decoy.when(temp_mod.model()).then_return("temperatureModuleV1")
 
     return temp_mod
@@ -82,7 +82,7 @@ async def temp_module_v1(decoy: Decoy) -> TempDeck:
 async def temp_module_v2(decoy: Decoy) -> TempDeck:
     """Get a mocked out module fixture."""
     temp_mod = decoy.mock(cls=TempDeck)
-    temp_mod.device_info = {"serial": "serial-2"}  # type: ignore[misc]
+    decoy.when(temp_mod.device_info).then_return({"serial": "serial-2"})
     decoy.when(temp_mod.model()).then_return("temperatureModuleV2")
 
     return temp_mod
@@ -436,10 +436,12 @@ async def test_load_module(
         module_data_provider.get_definition(ModuleModel.TEMPERATURE_MODULE_V2)
     ).then_return(tempdeck_v2_def)
 
-    hardware_api.attached_modules = [  # type: ignore[misc]
-        temp_module_v1,
-        temp_module_v2,
-    ]
+    decoy.when(hardware_api.attached_modules).then_return(
+        [
+            temp_module_v1,
+            temp_module_v2,
+        ]
+    )
 
     decoy.when(state_store.get_configs()).then_return(
         EngineConfigs(use_virtual_modules=False)

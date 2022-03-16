@@ -18,6 +18,7 @@ import {
   AlertItem,
   TEXT_DECORATION_UNDERLINE,
   Btn,
+  SPACING_3,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import { Slideout } from '../../../atoms/Slideout'
@@ -60,6 +61,7 @@ export const AboutModuleSlideout = (
       title={t('about_module', { name: moduleName })}
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
+      height={`calc(100vh - ${SPACING_3})`} // subtract breadcrumb strip
     >
       {/* TODO(jr, 2/22/22): update AlertItem to match new designs and wire up the link */}
       {module.hasAvailableUpdate ? (

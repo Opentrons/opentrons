@@ -155,13 +155,15 @@
   width: 2.275rem;
   height: 1.55rem;
   margin-right: 0.25rem;
-  border-radius: 2px;
-  border: 1px solid var(--c-med-gray);
   cursor: pointer;
+  border-radius: 2px;
+  border: 1px solid #c4c4c4;
 }
 
 .path_option.selected {
   background-color: var(--c-light-gray);
+  border-radius: 2px;
+  border: 1.5px solid var(--c-black);
 }
 
 .path_option.disabled {

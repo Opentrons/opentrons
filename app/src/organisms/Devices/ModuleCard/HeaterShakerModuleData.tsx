@@ -19,10 +19,10 @@ interface HeaterShakerModuleDataProps {
   heaterStatus: string
   shakerStatus: string
   latchStatus: string
-  targetTemp: number
-  currentTemp: number
-  targetSpeed: number
-  currentSpeed: number
+  targetTemp: number | null
+  currentTemp: number | null
+  targetSpeed: number | null
+  currentSpeed: number | null
   showTemperatureData?: boolean
 }
 

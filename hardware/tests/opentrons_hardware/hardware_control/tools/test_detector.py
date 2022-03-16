@@ -5,8 +5,9 @@ from opentrons_hardware.firmware_bindings.messages import (
 )
 import pytest
 from mock import AsyncMock, call
+
+from opentrons_hardware.firmware_bindings.messages.fields import ToolField
 from opentrons_hardware.hardware_control.tools import detector
-from opentrons_hardware.firmware_bindings.utils import UInt8Field
 from opentrons_hardware.firmware_bindings.messages import message_definitions, payloads
 from opentrons_hardware.firmware_bindings import (
     NodeId,
@@ -30,7 +31,7 @@ def subject(
     argvalues=[
         [
             payloads.ToolsDetectedNotificationPayload(
-                z_motor=UInt8Field(1), a_motor=UInt8Field(2), gripper=UInt8Field(5)
+                z_motor=ToolField(1), a_motor=ToolField(2), gripper=ToolField(5)
             ),
             ToolDetectionResult(
                 left=ToolType.pipette_96_chan,
@@ -40,7 +41,7 @@ def subject(
         ],
         [
             payloads.ToolsDetectedNotificationPayload(
-                z_motor=UInt8Field(221), a_motor=UInt8Field(2), gripper=UInt8Field(5)
+                z_motor=ToolField(221), a_motor=ToolField(2), gripper=ToolField(5)
             ),
             ToolDetectionResult(
                 left=ToolType.undefined_tool,
