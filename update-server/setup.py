@@ -38,7 +38,8 @@ DESCRIPTION = (
 PACKAGES = find_packages(where='.', exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
     'aiohttp==3.4.4',
-    'bmap-tools==3.6'
+    # TODO (al, 2022-03-16): Is this really in pypy ? (NO)!
+    # 'bmap-tools==3.6'
 ]
 
 
@@ -70,6 +71,7 @@ if __name__ == "__main__":
         classifiers=CLASSIFIERS,
         install_requires=INSTALL_REQUIRES,
         tests_require=['pytest'],
-        extras_require={'openembedded': 'bmap-tools==3.6'},
+        # TODO (al, 2022-03-16): Is this really in pypy ? (NO)!
+        # extras_require={'openembedded': 'bmap-tools==3.6'},
         include_package_data=True
     )
