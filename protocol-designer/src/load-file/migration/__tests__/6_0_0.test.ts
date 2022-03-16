@@ -1,15 +1,11 @@
 import { migrateFile } from '../6_0_0'
 import _oldProtocol from 'protocol-designer/fixtures/protocol/5/doItAllV5.json'
-import type {
-  CreateCommand,
-  ProtocolFile,
-  ProtocolFileV5,
-} from '@opentrons/shared-data'
+import type { ProtocolFile, ProtocolFileV5 } from '@opentrons/shared-data'
 
 const oldProtocol = (_oldProtocol as unknown) as ProtocolFileV5<{}>
 
 describe('v6 migration', () => {
-  let migratedFile = {} as ProtocolFile<{}, CreateCommand>
+  let migratedFile = {} as ProtocolFile
   beforeEach(() => {
     migratedFile = migrateFile(oldProtocol)
   })

@@ -35,7 +35,7 @@ const migrateModules = (appData: Record<string, any>): Record<string, any> =>
 
 const migrateCommands = (
   v5Commands: ProtocolFileV5<{}>['commands']
-): ProtocolFile<{}, CreateCommand>['commands'] => {
+): ProtocolFile['commands'] => {
   return v5Commands.map(v5Command => {
     // replace airGap with aspirate and rename "command" to "commandType"
     const commandType =
@@ -69,9 +69,7 @@ const migrateCommands = (
   })
 }
 
-export const migrateFile = (
-  appData: ProtocolFileV5<{}>
-): ProtocolFile<{}, CreateCommand> => {
+export const migrateFile = (appData: ProtocolFileV5<{}>): ProtocolFile => {
   const pipettes = appData.pipettes
   const loadPipetteCommands: LoadPipetteCreateCommand[] = map(
     pipettes,

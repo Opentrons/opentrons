@@ -25,7 +25,7 @@ import { SectionList } from './SectionList'
 import { LabwareOffsetsSummary } from './LabwareOffsetsSummary'
 import { useIntroInfo, useLabwareOffsets, LabwareOffsets } from './hooks'
 import type { SavePositionCommandData } from './types'
-import type { ProtocolFile } from '@opentrons/shared-data'
+import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 
 export const SummaryScreen = (props: {
   savePositionCommandData: SavePositionCommandData
@@ -36,7 +36,10 @@ export const SummaryScreen = (props: {
   const { t } = useTranslation('labware_position_check')
   const introInfo = useIntroInfo()
   const { protocolData } = useProtocolDetails()
-  useLabwareOffsets(savePositionCommandData, protocolData as ProtocolFile<{}>)
+  useLabwareOffsets(
+    savePositionCommandData,
+    protocolData as ProtocolAnalysisFile
+  )
     .then(offsets => {
       labwareOffsets.length === 0 && setLabwareOffsets(offsets)
     })

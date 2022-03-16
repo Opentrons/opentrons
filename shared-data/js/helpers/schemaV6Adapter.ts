@@ -2,7 +2,7 @@ import type {
   LoadLabwareRunTimeCommand,
   LoadModuleRunTimeCommand,
 } from '../../protocol/types/schemaV6/command/setup'
-import type { RunTimeCommand, ProtocolFile } from '../../protocol'
+import type { RunTimeCommand, ProtocolAnalysisFile } from '../../protocol'
 import type { PipetteName } from '../pipettes'
 import type {
   ProtocolResource,
@@ -15,7 +15,7 @@ import type {
 const TRASH_ID = 'fixedTrash'
 export const schemaV6Adapter = (
   protocolAnalyses: ProtocolResource['analyses'][0]
-): ProtocolFile<{}> => {
+): ProtocolAnalysisFile<{}> => {
   if (protocolAnalyses != null && protocolAnalyses.status === 'completed') {
     const pipettes: {
       [pipetteId: string]: { name: PipetteName }
@@ -104,5 +104,5 @@ export const schemaV6Adapter = (
     }
   }
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  return {} as ProtocolFile<{}>
+  return {} as ProtocolAnalysisFile<{}>
 }

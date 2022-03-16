@@ -42,7 +42,7 @@ import { ProtocolSetupInfo } from './ProtocolSetupInfo'
 import { CommandItem } from './CommandItem'
 import type { RunStatus, RunCommandSummary } from '@opentrons/api-client'
 import type {
-  ProtocolFile,
+  ProtocolAnalysisFile,
   RunTimeCommand,
   CommandStatus,
 } from '@opentrons/shared-data'
@@ -60,7 +60,7 @@ interface CommandRuntimeInfo {
 }
 export function CommandList(): JSX.Element | null {
   const { t } = useTranslation('run_details')
-  const protocolData: ProtocolFile<{}> | null = useProtocolDetails()
+  const protocolData: ProtocolAnalysisFile | null = useProtocolDetails()
     .protocolData
   const runStartTime = useRunStartTime()
   const runStatus = useCurrentRunStatus()
