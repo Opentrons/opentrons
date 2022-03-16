@@ -249,7 +249,11 @@ export function ProtocolRunHeader({
             >
               {t('protocol_start')}
             </StyledText>
-            <StyledText css={TYPOGRAPHY.pRegular} color={COLORS.darkBlack}>
+            <StyledText
+              css={TYPOGRAPHY.pRegular}
+              color={COLORS.darkBlack}
+              id="ProtocolRunHeader_protocolStart"
+            >
               {startedAtTimestamp}
             </StyledText>
           </Box>
@@ -262,7 +266,11 @@ export function ProtocolRunHeader({
             >
               {t('protocol_end')}
             </StyledText>
-            <StyledText css={TYPOGRAPHY.pRegular} color={COLORS.darkBlack}>
+            <StyledText
+              css={TYPOGRAPHY.pRegular}
+              color={COLORS.darkBlack}
+              id="ProtocolRunHeader_protocolEnd"
+            >
               {completedAtTimestamp}
             </StyledText>
           </Box>
@@ -286,6 +294,7 @@ export function ProtocolRunHeader({
             color={COLORS.error}
             padding={`${SPACING.spacingSM} ${SPACING.spacing4}`}
             onClick={handleCancelClick}
+            id="ProtocolRunHeader_cancelRunButton"
           >
             {t('cancel_run')}
           </SecondaryButton>
@@ -307,7 +316,11 @@ export function ProtocolRunHeader({
       <Flex>
         {/* TODO(bh, 2022-03-15) will update link to a protocol key stored locally when built */}
         <Link to={`/protocols/${protocolRecord?.data?.data.id}`}>
-          <StyledText color={COLORS.blue} css={TYPOGRAPHY.h2SemiBold}>
+          <StyledText
+            color={COLORS.blue}
+            css={TYPOGRAPHY.h2SemiBold}
+            id="ProtocolRunHeader_protocolName"
+          >
             {protocolRecord?.data?.data.metadata.protocolName}
           </StyledText>
         </Link>
@@ -333,7 +346,11 @@ export function ProtocolRunHeader({
             {t('run_record_id')}
           </StyledText>
           {/* this is the createdAt timestamp, not the run id */}
-          <StyledText css={TYPOGRAPHY.pRegular} color={COLORS.darkBlack}>
+          <StyledText
+            css={TYPOGRAPHY.pRegular}
+            color={COLORS.darkBlack}
+            id="ProtocolRunHeader_runRecordId"
+          >
             {createdAtTimestamp}
           </StyledText>
         </Box>
@@ -347,7 +364,11 @@ export function ProtocolRunHeader({
             >
               {t('status')}
             </StyledText>
-            <StyledText css={TYPOGRAPHY.pRegular} color={COLORS.darkBlack}>
+            <StyledText
+              css={TYPOGRAPHY.pRegular}
+              color={COLORS.darkBlack}
+              id="ProtocolRunHeader_runStatus"
+            >
               {runStatus != null ? t(`status_${runStatus}`) : ''}
             </StyledText>
           </Box>
@@ -375,6 +396,7 @@ export function ProtocolRunHeader({
             padding={`${SPACING.spacingSM} ${SPACING.spacing4}`}
             disabled={isRunControlButtonDisabled}
             onClick={handleButtonClick}
+            id="ProtocolRunHeader_runControlButton"
             {...targetProps}
           >
             {buttonIcon}
