@@ -110,7 +110,7 @@ async def task(
                     writer.write(
                         [
                             StyledOutput(style=label_style, content=f"\t{name}:"),
-                            StyledOutput(style=data_style, content=str(value)),
+                            StyledOutput(style=data_style, content=str(value) + "\n"),
                         ]
                     )
 
