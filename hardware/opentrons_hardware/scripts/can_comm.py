@@ -105,7 +105,9 @@ def prompt_enum(
             raise InvalidInput(str(e))
 
     if only_prompt_on_request:
-        user = get_user_input(f"choose {enum_type.__name__} (? for list): ")
+        user = ''
+        while user in ('\n', ''):
+            user = get_user_input(f"choose {enum_type.__name__} (? for list): ")
         if "?" in user:
             write_choices()
             return parse_input(get_user_input("enter choice: "))
