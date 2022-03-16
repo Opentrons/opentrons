@@ -16,7 +16,8 @@ def add_can_args(parser: ArgumentParser) -> ArgumentParser:
     parser.add_argument(
         "--interface",
         type=str,
-        required=True,
+        required=False,
+        default=settings.DEFAULT_INTERFACE,
         help=f"the interface to use (ie: {settings.OPENTRONS_INTERFACE}, "
         f"virtual, pcan, socketcan)",
     )
