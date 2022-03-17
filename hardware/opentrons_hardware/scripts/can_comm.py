@@ -109,9 +109,13 @@ def prompt_enum(  # noqa: C901
 
     if not brief_prompt:
         write_choices()
-    user = ''
+    user = ""
     while True:
-        user = get_user_input(f"choose {enum_type.__name__} (? for list): ").lower().strip()
+        user = (
+            get_user_input(f"choose {enum_type.__name__} (? for list): ")
+            .lower()
+            .strip()
+        )
         if not user:
             continue
         if "?" in user:
@@ -120,7 +124,8 @@ def prompt_enum(  # noqa: C901
         try:
             return parse_input(user)
         except InvalidInput as e:
-            output_func(str(e)+'\n')
+            output_func(str(e) + "\n")
+
 
 def prompt_payload(
     payload_type: Type[BinarySerializable], get_user_input: GetInputFunc

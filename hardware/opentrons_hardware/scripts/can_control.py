@@ -23,17 +23,20 @@ from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 from .can_mon import task as monitor_task
 from .can_comm import prompt_message, InvalidInput
 
+
 async def get_input(
-        input_file: TextIO,
-        output_file: TextIO,
-        output_lock: asyncio.Lock,
-        brief_prompt: bool = True
+    input_file: TextIO,
+    output_file: TextIO,
+    output_lock: asyncio.Lock,
+    brief_prompt: bool = True,
 ) -> Optional[CanMessage]:
+    """Get user input with proper locking and buffering."""
+
     def prompt_with_io(promptstr: str) -> str:
         output_file.write(promptstr)
         output_file.flush()
         userinput = input_file.readline()
-        if userinput.lower().strip() in ['exit', 'quit']:
+        if userinput.lower().strip() in ["exit", "quit"]:
             raise SystemExit()
         return userinput
 
@@ -65,7 +68,6 @@ async def input_task(
         output_file: IO buf to write to
         output_lock: Async lock for exclusive writes
     """
-
     can_message = await get_input(input_file, output_file, output_lock, False)
     if can_message:
         await can_driver.send(can_message)
@@ -85,9 +87,9 @@ async def run(args: argparse.Namespace) -> None:
 
     try:
         all_fut = asyncio.gather(
-                monitor_task(messenger, args.output, write_lock),
-                input_task(driver, args.input, args.output, write_lock),
-            )
+            monitor_task(messenger, args.output, write_lock),
+            input_task(driver, args.input, args.output, write_lock),
+        )
         await all_fut
     except KeyboardInterrupt:
         all_fut.cancel()
@@ -149,7 +151,7 @@ def main() -> None:
     try:
         asyncio.run(run(args))
     except KeyboardInterrupt:
-        args.output.write('Quitting...\n')
+        args.output.write("Quitting...\n")
         args.output.flush()
 
 
