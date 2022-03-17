@@ -23,6 +23,7 @@ from .ot3utils import (
     axis_convert,
     create_move_group,
     get_current_settings,
+    node_to_axis,
 )
 
 from opentrons_hardware.firmware_bindings.constants import NodeId
@@ -391,6 +392,12 @@ class OT3Simulator:
             NodeId.gantry_y: 0,
             NodeId.pipette_left: 0,
             NodeId.pipette_right: 0,
+        }
+
+    @staticmethod
+    def home_position() -> OT3AxisMap[float]:
+        return {
+            node_to_axis(k): v for k, v in OT3Simulator._get_home_position().items()
         }
 
     async def probe_network(self) -> None:
