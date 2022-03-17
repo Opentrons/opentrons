@@ -23,6 +23,7 @@ import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerDeactivateHeaterCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
+  HeaterShakerStopShakeCreateCommand,
   MagneticModuleDisengageMagnetCreateCommand,
   TCDeactivateBlockCreateCommand,
   TCDeactivateLidCreateCommand,
@@ -41,9 +42,13 @@ export const ModuleOverflowMenu = (
   const { t } = useTranslation(['device_details', 'heater_shaker'])
   const { module, handleClick, handleAboutClick } = props
   const [showWizard, setShowWizard] = React.useState<boolean>(false)
-  const [isLatchClosed, setIsLatchClosed] = React.useState<boolean>(true)
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const [targetProps, tooltipProps] = useHoverTooltip()
+
+  const isLatchClosed =
+    module.type === 'heaterShakerModuleType' &&
+    (module.data.labwareLatchStatus === 'idle_closed' ||
+      module.data.labwareLatchStatus === 'closing')
 
   let typeOfCommand: CreateCommand['commandType']
   switch (module.type) {
@@ -63,7 +68,10 @@ export const ModuleOverflowMenu = (
       break
     }
     case 'heaterShakerModuleType': {
-      typeOfCommand = 'heaterShakerModule/deactivateHeater'
+      typeOfCommand =
+        module.data.speedStatus !== 'idle'
+          ? 'heaterShakerModule/stopShake'
+          : 'heaterShakerModule/deactivateHeater'
       break
     }
   }
@@ -73,7 +81,8 @@ export const ModuleOverflowMenu = (
     | MagneticModuleDisengageMagnetCreateCommand
     | HeaterShakerDeactivateHeaterCreateCommand
     | TCDeactivateLidCreateCommand
-    | TCDeactivateBlockCreateCommand = {
+    | TCDeactivateBlockCreateCommand
+    | HeaterShakerStopShakeCreateCommand = {
     commandType: typeOfCommand,
     params: { moduleId: module.id },
   }
@@ -101,9 +110,8 @@ export const ModuleOverflowMenu = (
       }
     } else if (module.type === HEATERSHAKER_MODULE_TYPE) {
       if (isSecondary) {
-        if (module.status === 'running') {
-          //  TODO(jr, 3/11/22): plug in command here, how do we deactivate the shaking?
-          return console.log('Deactivate shake')
+        if (module.data.speedStatus !== 'idle') {
+          return handleDeactivation()
         } else {
           return handleClick(isSecondary)
         }
@@ -142,9 +150,6 @@ export const ModuleOverflowMenu = (
     createLiveCommand({
       command: latchCommand,
     })
-    latchCommand.commandType === 'heaterShakerModule/openLatch'
-      ? setIsLatchClosed(false)
-      : setIsLatchClosed(true)
   }
 
   const menuItemsByModuleType = {
@@ -241,7 +246,7 @@ export const ModuleOverflowMenu = (
       </MenuItem>
       {/* TODO:(jr, 3/11/22): update Tooltip to new design */}
       {latchDisabledReason ? (
-        <Tooltip {...tooltipProps}>
+        <Tooltip {...tooltipProps} key={`tooltip_latch_${module.model}`}>
           {t('cannot_open_latch', { ns: 'heater_shaker' })}
         </Tooltip>
       ) : null}
@@ -289,7 +294,10 @@ export const ModuleOverflowMenu = (
                     {item.setSetting}
                   </MenuItem>
                   {item.disabledReason && (
-                    <Tooltip {...tooltipProps}>
+                    <Tooltip
+                      {...tooltipProps}
+                      key={`tooltip_${index}_${module.model}`}
+                    >
                       {t('cannot_shake', { ns: 'heater_shaker' })}
                     </Tooltip>
                   )}

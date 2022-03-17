@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { parseInt } from 'lodash'
 import { useTranslation } from 'react-i18next'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
@@ -39,11 +38,9 @@ interface ModelContents {
   maxHeight: number
   labwareBottomHeight: number
   disengagedHeight: number
-  caption: string
 }
 
-const InfoByModel = (model: ModuleModel): ModelContents => {
-  const { t } = useTranslation('device_details')
+const getInfoByModel = (model: ModuleModel): ModelContents => {
   if (model === MAGNETIC_MODULE_V1) {
     return {
       version: 'GEN 1',
@@ -51,7 +48,6 @@ const InfoByModel = (model: ModuleModel): ModelContents => {
       maxHeight: MAGNETIC_MODULE_V1_MAX_ENGAGE_HEIGHT,
       labwareBottomHeight: MAGNETIC_MODULE_TYPE_LABWARE_BOTTOM_HEIGHT,
       disengagedHeight: MAGNETIC_MODULE_V1_DISNEGAGED_HEIGHT,
-      caption: t('between_5_to_40'),
     }
   } else {
     return {
@@ -60,7 +56,6 @@ const InfoByModel = (model: ModuleModel): ModelContents => {
       maxHeight: MAGNETIC_MODULE_V2_MAX_ENGAGE_HEIGHT,
       labwareBottomHeight: MAGNETIC_MODULE_TYPE_LABWARE_BOTTOM_HEIGHT,
       disengagedHeight: MAGNETIC_MODULE_V2_DISNEGAGED_HEIGHT,
-      caption: t('betwen_4_to_16'),
     }
   }
 }
@@ -82,7 +77,7 @@ export const MagneticModuleSlideout = (
   >(null)
 
   const moduleName = getModuleDisplayName(module.model)
-  const info = InfoByModel(module.model)
+  const info = getInfoByModel(module.model)
 
   let max: number | TFunctionResult = 0
   let labwareBottom: number | TFunctionResult = 0
@@ -215,9 +210,11 @@ export const MagneticModuleSlideout = (
           value={engageHeightValue}
           onChange={e => setEngageHeightValue(e.target.value)}
           type="number"
-          max={info.maxHeight}
-          min={info.disengagedHeight}
-          caption={info.caption}
+          caption={t('module_status_range', {
+            min: info.disengagedHeight,
+            max: info.maxHeight,
+            unit: info.units,
+          })}
           error={errorMessage}
         />
       </Flex>

@@ -24,6 +24,9 @@ interface TemperatureModuleSlideoutProps {
   isExpanded: boolean
 }
 
+const MIN = 4
+const MAX = 99
+
 export const TemperatureModuleSlideout = (
   props: TemperatureModuleSlideoutProps
 ): JSX.Element | null => {
@@ -103,13 +106,16 @@ export const TemperatureModuleSlideout = (
           units={CELSIUS}
           value={temperatureValue}
           onChange={e => setTemperatureValue(e.target.value)}
-          max={99}
-          min={4}
           type="number"
-          caption={t('between_4_to_99')}
+          caption={t('module_status_range', {
+            min: MIN,
+            max: MAX,
+            unit: CELSIUS,
+          })}
           error={
             temperatureValue != null &&
-            (parseInt(temperatureValue) < 4 || parseInt(temperatureValue) > 99)
+            (parseInt(temperatureValue) < MIN ||
+              parseInt(temperatureValue) > MAX)
               ? t('input_out_of_range')
               : null
           }

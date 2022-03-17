@@ -7,6 +7,7 @@ import {
   TEXT_ALIGN_RIGHT,
   DISPLAY_INLINE_BLOCK,
   SPACING,
+  BORDERS,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { css } from 'styled-components'
@@ -65,8 +66,8 @@ export function InputField(props: InputFieldProps): JSX.Element {
     <Flex
       alignItems={ALIGN_CENTER}
       lineHeight={1}
-      fontSize="11px"
-      fontWeight={400}
+      fontSize={TYPOGRAPHY.fontSizeP}
+      fontWeight={TYPOGRAPHY.fontWeightRegular}
       color={props.error ? '#9e5e00' : COLORS.darkBlack}
       opacity={props.disabled ? 0.5 : ''}
     >
@@ -86,8 +87,9 @@ function Input(props: InputFieldProps): JSX.Element {
     background-color: ${COLORS.white};
     border-radius: ${SPACING.spacing2};
     padding: ${SPACING.spacing3};
-    border: 1px solid ${error ? COLORS.error : COLORS.medGrey};
-    font-size: 11px;
+    border: ${SPACING.spacingXXS} ${BORDERS.styleSolid}
+      ${error ? COLORS.error : COLORS.medGrey};
+    font-size: ${TYPOGRAPHY.fontSizeP};
 
     & input {
       border-radius: inherit;
@@ -102,13 +104,14 @@ function Input(props: InputFieldProps): JSX.Element {
     }
 
     &:hover {
-      border: 1px solid ${error ? COLORS.error : COLORS.medGreyHover};
+      border: ${SPACING.spacingXXS} ${BORDERS.styleSolid}
+        ${error ? COLORS.error : COLORS.medGreyHover};
     }
     &:focus {
-      border: 1px solid ${COLORS.blue};
+      border: ${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.blue};
     }
     &:disabled {
-      border: 1px solid ${COLORS.greyDisabled};
+      border: ${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.greyDisabled};
     }
   `
 
@@ -148,7 +151,7 @@ function Input(props: InputFieldProps): JSX.Element {
       </Flex>
       <Flex
         color={error ? COLORS.error : COLORS.darkGreyEnabled}
-        fontSize={SPACING.spacingSM}
+        fontSize={TYPOGRAPHY.fontSizeH6}
         paddingTop={SPACING.spacing2}
       >
         <span>{error ? props.error : props.caption}</span>

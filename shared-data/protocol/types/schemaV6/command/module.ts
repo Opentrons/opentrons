@@ -44,6 +44,7 @@ export type ModuleCreateCommand =
   | HeaterShakerOpenLatchCreateCommand
   | HeaterShakerCloseLatchCreateCommand
   | HeaterShakerDeactivateHeaterCreateCommand
+  | HeaterShakerStopShakeCreateCommand
 
 export interface MagneticModuleEngageMagnetCreateCommand {
   commandType: 'magneticModule/engageMagnet'

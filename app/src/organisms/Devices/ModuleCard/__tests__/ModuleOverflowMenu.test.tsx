@@ -39,7 +39,7 @@ const mockMovingHeaterShaker = {
   status: 'idle',
   hasAvailableUpdate: true,
   data: {
-    labwareLatchStatus: 'idle_unknown',
+    labwareLatchStatus: 'idle_closed',
     speedStatus: 'speeding up',
     temperatureStatus: 'idle',
     currentSpeed: null,
@@ -62,6 +62,28 @@ const mockOpenLatchHeaterShaker = {
   hasAvailableUpdate: true,
   data: {
     labwareLatchStatus: 'idle_open',
+    speedStatus: 'idle',
+    temperatureStatus: 'idle',
+    currentSpeed: null,
+    currentTemp: null,
+    targetSpeed: null,
+    targetTemp: null,
+    errorDetails: null,
+  },
+  usbPort: { hub: 1, port: 1 },
+} as any
+
+const mockCloseLatchHeaterShaker = {
+  model: 'heaterShakerModuleV1',
+  type: 'heaterShakerModuleType',
+  port: '/dev/ot_module_thermocycler0',
+  serial: 'jkl123',
+  revision: 'heatershaker_v4.0',
+  fwVersion: 'v2.0.0',
+  status: 'idle',
+  hasAvailableUpdate: true,
+  data: {
+    labwareLatchStatus: 'idle_closed',
     speedStatus: 'idle',
     temperatureStatus: 'idle',
     currentSpeed: null,
@@ -253,7 +275,7 @@ describe('ModuleOverflowMenu', () => {
       name: 'Set shake speed',
     })
     getByRole('button', {
-      name: 'Open Labware Latch',
+      name: 'Close Labware Latch',
     })
     getByRole('button', { name: 'About module' })
     getByRole('button', { name: 'See how to attach to deck' })
@@ -299,14 +321,14 @@ describe('ModuleOverflowMenu', () => {
     ).toBeDisabled()
   })
 
-  it('renders heater shaker labware latch button and when clicked, moves labware latch', () => {
+  it('renders heater shaker labware latch button and when clicked, moves labware latch open', () => {
     props = {
-      module: mockHeaterShaker,
+      module: mockCloseLatchHeaterShaker,
       handleClick: jest.fn(),
       handleAboutClick: jest.fn(),
     }
 
-    const { getByRole, getByText } = render(props)
+    const { getByRole } = render(props)
 
     const btn = getByRole('button', {
       name: 'Open Labware Latch',
@@ -317,11 +339,24 @@ describe('ModuleOverflowMenu', () => {
       command: {
         commandType: 'heaterShakerModule/openLatch',
         params: {
-          moduleId: 'heatershaker_id',
+          moduleId: mockCloseLatchHeaterShaker.id,
         },
       },
     })
-    getByText('Close Labware Latch')
+  })
+
+  it('renders heater shaker labware latch button and when clicked, moves labware latch close', () => {
+    props = {
+      module: mockHeaterShaker,
+      handleClick: jest.fn(),
+      handleAboutClick: jest.fn(),
+    }
+    const { getByRole } = render(props)
+
+    const btn = getByRole('button', {
+      name: 'Close Labware Latch',
+    })
+
     fireEvent.click(btn)
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
@@ -331,7 +366,6 @@ describe('ModuleOverflowMenu', () => {
         },
       },
     })
-    getByText('Open Labware Latch')
   })
 
   it('renders heater shaker overflow menu and deactivates heater when status changes', () => {

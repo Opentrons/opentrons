@@ -74,6 +74,10 @@ export const HeaterShakerSlideout = (
         : null
   }
 
+  const inputMax = isSetShake ? 1800 : 99
+  const inputMin = isSetShake ? 200 : 4
+  const unit = isSetShake ? RPM : CELSIUS
+
   return (
     <Slideout
       title={t('set_status_heater_shaker', {
@@ -116,15 +120,18 @@ export const HeaterShakerSlideout = (
           {isSetShake ? t('set_shake_speed') : t('set_block_temp')}
         </Text>
         <InputField
+          data-testid={`${module.model}_${isSetShake}`}
           id={`${module.model}_${isSetShake}`}
           autoFocus
-          units={isSetShake ? RPM : CELSIUS}
+          units={unit}
           value={hsValue}
           onChange={e => setHsValue(e.target.value)}
           type="number"
-          max={isSetShake ? 1800 : 99}
-          min={isSetShake ? 200 : 4}
-          caption={isSetShake ? t('between_200_to_1800') : t('between_4_to_99')}
+          caption={t('module_status_range', {
+            min: inputMin,
+            max: inputMax,
+            unit: unit,
+          })}
           error={errorMessage}
         />
       </Flex>

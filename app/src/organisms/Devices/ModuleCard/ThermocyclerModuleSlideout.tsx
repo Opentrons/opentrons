@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { getModuleDisplayName } from '@opentrons/shared-data'
+import { CELSIUS, getModuleDisplayName } from '@opentrons/shared-data'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { Slideout } from '../../../atoms/Slideout'
 import { InputField } from '../../../atoms/InputField'
@@ -126,15 +126,15 @@ export const ThermocyclerModuleSlideout = (
           data-testid={`${module.model}_${isSecondaryTemp}`}
           id={`${module.model}_${isSecondaryTemp}`}
           autoFocus
-          units={'°C'}
+          units={CELSIUS}
           value={tempValue}
           onChange={e => setTempValue(e.target.value)}
           type="number"
-          min={tempRanges.min}
-          max={tempRanges.max}
-          caption={
-            isSecondaryTemp ? t('between_37_to_110') : t('between_4_to_99')
-          }
+          caption={t('module_status_range', {
+            min: tempRanges.min,
+            max: tempRanges.max,
+            unit: CELSIUS,
+          })}
           error={errorMessage}
         />
       </Flex>

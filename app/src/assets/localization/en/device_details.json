@@ -26,8 +26,6 @@
   "tc_block": "Block",
   "overflow_menu_engage": "Set engage height",
   "overflow_menu_disengage": "Disengage module",
-  "between_5_to_40": "Between -5 to 40",
-  "between_4_to_16": "Between -4 - -16 mm",
   "overflow_menu_about": "About module",
   "overflow_menu_lid_temp": "Set lid temperature",
   "overflow_menu_set_block_temp": "Set block temperature",
@@ -61,8 +59,6 @@
   "set_shake_speed": "Set shake speed",
   "set_block_temp": "Set temperature",
   "shake_speed": "Shake Speed",
-  "between_4_to_99": "Between 4 °C – 99 °C",
-  "between_200_to_1800": "Between 200 - 1800 RPM",
   "input_out_of_range": "Input out of range",
-  "between_37_to_110": "Between 37 °C – 110 °C"
+  "module_status_range": "Between {{min}} - {{max}} {{unit}}"
 }

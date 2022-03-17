@@ -11,7 +11,7 @@ import {
 
 jest.mock('@opentrons/react-api-client')
 
-const mocUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
+const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
 >
 
@@ -34,7 +34,7 @@ describe('TemperatureModuleSlideout', () => {
       isExpanded: true,
       onCloseClick: jest.fn(),
     }
-    mocUseLiveCommandMutation.mockReturnValue({
+    mockUseLiveCommandMutation.mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
   })
