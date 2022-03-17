@@ -87,6 +87,7 @@ jobs:
       - uses: './.github/actions/python/setup'
         with:
           project: 'api'
+          python-version: ${{ matrix.python }}
       - if: ${{ matrix.with-ot-hardware == 'false' }}
         name: Test without opentrons_hardware
         run: |

@@ -2,7 +2,7 @@
 # python to run if pyenv is not available. it should always be set to
 # point to a python3.7
 OT_PYTHON ?= python
-
+OT_PYTHON_VERSION ?= 3.7
 
 pipenv_envvars := $(and $(CI),PIPENV_IGNORE_VIRTUALENVS=1)
 pipenv := $(pipenv_envvars) $(OT_PYTHON) -m pipenv
@@ -11,7 +11,7 @@ pip := $(pipenv) run pip
 pytest := $(pipenv) run py.test
 
 
-pipenv_opts := --dev
+pipenv_opts := --dev $(and $(OT_PYTHON_VERSION),--python $(OT_PYTHON_VERSION))
 pipenv_opts += $(and $(CI),--keep-outdated --clear)
 wheel_opts := $(if $(and $(or $(CI),$(V),$(VERBOSE)),$(not $(QUIET))),,-q)
 

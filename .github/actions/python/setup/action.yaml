@@ -4,6 +4,9 @@ inputs:
   project:
     description: 'Which project (by subdirectory) to set up'
     required: true
+  python-version:
+    description: 'What Python version to use to create the project's virtual environment'
+    required: false
 runs:
   using: 'composite'
   steps:
@@ -18,4 +21,4 @@ runs:
         npm install --global shx@0.3.3
         pip install pipenv==2021.5.29
     - shell: bash
-      run: 'make -C ${{ inputs.project }} setup'
+      run: 'make -C ${{ inputs.project }} setup OT_PYTHON_VERSION=${{ inputs.python-version }}'
