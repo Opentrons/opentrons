@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   Flex,
-  SPACING_3,
   Text,
   TYPOGRAPHY,
   SPACING,
@@ -58,15 +57,12 @@ export const TestShakeSlideout = (
     module.data.labwareLatchStatus === 'idle_open' ||
     module.data.labwareLatchStatus === 'opening'
 
-  const openLatchCommand: HeaterShakerOpenLatchCreateCommand = {
-    commandType: 'heaterShakerModule/openLatch',
-    params: {
-      moduleId: module.id,
-    },
-  }
-
-  const closeLatchCommand: HeaterShakerCloseLatchCreateCommand = {
-    commandType: 'heaterShakerModule/closeLatch',
+  const setLatchCommand:
+    | HeaterShakerOpenLatchCreateCommand
+    | HeaterShakerCloseLatchCreateCommand = {
+    commandType: isLatchOpen
+      ? 'heaterShakerModule/closeLatch'
+      : 'heaterShakerModule/openLatch',
     params: {
       moduleId: module.id,
     },
@@ -89,7 +85,7 @@ export const TestShakeSlideout = (
 
   const handleLatchCommand = (): void => {
     createLiveCommand({
-      command: isLatchOpen ? closeLatchCommand : openLatchCommand,
+      command: setLatchCommand,
     })
   }
 
@@ -107,7 +103,7 @@ export const TestShakeSlideout = (
       title={t('test_shake', { ns: 'heater_shaker' })}
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
-      height={`calc(100vh - ${SPACING_3})`} // subtract breadcrumb strip
+      height={`calc(100vh - ${SPACING.spacing4})`} // subtract breadcrumb strip
       footer={
         <PrimaryButton
           textTransform={TEXT_TRANSFORM_CAPITALIZE}
@@ -166,7 +162,7 @@ export const TestShakeSlideout = (
           marginY={SPACING.spacingSM}
           alignItems={ALIGN_FLEX_START}
         >
-          <Flex flexDirection={DIRECTION_ROW} marginTop={'0.5rem'}>
+          <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING.spacing3}>
             <Text
               fontSize={TYPOGRAPHY.fontSizeP}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -256,7 +252,6 @@ export const TestShakeSlideout = (
             <Text
               textTransform={TEXT_TRANSFORM_CAPITALIZE}
               fontSize={TYPOGRAPHY.fontSizeP}
-              marginY={'-0.5rem'}
             >
               {t('troubleshooting', { ns: 'heater_shaker' })}
             </Text>
@@ -272,6 +267,7 @@ export const TestShakeSlideout = (
               ns: 'heater_shaker',
             })}
           </Text>
+          {/* TODO: (sh, 2022-03-17): hook up link to destination */}
           <Link
             fontSize={TYPOGRAPHY.fontSizeP}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
