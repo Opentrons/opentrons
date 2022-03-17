@@ -27,7 +27,7 @@ type ProtocolInfoSelector = (
 }
 
 const log = createLogger(__filename)
-export const stripDirAndExtension = (f: string): string =>
+const stripDirAndExtension = (f: string): string =>
   path.basename(f, path.extname(f))
 
 export const getProtocolFile = (state: State): ProtocolFile | null =>

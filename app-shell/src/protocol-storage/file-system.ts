@@ -97,19 +97,6 @@ export function parseProtocolDirs(
   return Promise.all(tasks)
 }
 
-const getFileName = (base: string, ext: string, count = 0): Promise<string> => {
-  // TODO: appropriately grab python file name with fallback, also assign uuid
-  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-  const basename = `${base}${count || ''}${ext}`
-  const name = path.join(PROTOCOLS_DIRECTORY_PATH, basename)
-
-  return fs
-    .pathExists(name)
-    .then((exists: boolean) =>
-      exists ? getFileName(base, ext, count + 1) : name
-    )
-}
-
 export function addProtocolFile(
   mainFileSourcePath: string,
   protocolsDirPath: string

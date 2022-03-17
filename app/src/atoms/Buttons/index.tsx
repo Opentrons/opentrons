@@ -6,6 +6,7 @@ import {
   SIZE_2,
   NewPrimaryBtn,
   NewSecondaryBtn,
+  NewAlertPrimaryBtn,
 } from '@opentrons/components'
 import { ToggleBtn, ToggleBtnProps } from '../ToggleBtn'
 
@@ -20,15 +21,31 @@ export const TertiaryButton = (props: any): JSX.Element => (
   />
 )
 
-export const PrimaryButton = (props: any): JSX.Element => (
-  <NewPrimaryBtn
-    backgroundColor={COLORS.blue}
-    borderRadius={BORDERS.radiusSoftCorners}
-    textTransform={TYPOGRAPHY.textTransformNone}
-    css={TYPOGRAPHY.pSemiBold}
-    {...props}
-  />
-)
+interface PrimaryButtonProps
+  extends React.ComponentProps<typeof NewPrimaryBtn> {
+  isDestructive?: boolean
+}
+export const PrimaryButton = ({
+  isDestructive = false,
+  ...restProps
+}: PrimaryButtonProps): JSX.Element =>
+  isDestructive ? (
+    <NewAlertPrimaryBtn
+      backgroundColor={COLORS.error}
+      borderRadius={BORDERS.radiusSoftCorners}
+      textTransform={TYPOGRAPHY.textTransformNone}
+      css={TYPOGRAPHY.pSemiBold}
+      {...restProps}
+    />
+  ) : (
+    <NewPrimaryBtn
+      backgroundColor={COLORS.blue}
+      borderRadius={BORDERS.radiusSoftCorners}
+      textTransform={TYPOGRAPHY.textTransformNone}
+      css={TYPOGRAPHY.pSemiBold}
+      {...restProps}
+    />
+  )
 
 export const SecondaryButton = (props: any): JSX.Element => (
   <NewSecondaryBtn

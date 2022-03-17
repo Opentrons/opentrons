@@ -48,6 +48,6 @@ describe('UploadInput', () => {
     const { getByTestId } = render()
     const input = getByTestId('file_input')
     fireEvent.change(input, { target: { files: ['dummyFile'] } })
-    expect(onUpload).toHaveBeenCalledWith('dummyFile')
+    expect(onUpload).toHaveBeenCalled()
   })
 })
