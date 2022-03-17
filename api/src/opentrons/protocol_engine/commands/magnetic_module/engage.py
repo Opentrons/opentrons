@@ -30,15 +30,16 @@ class EngageParams(BaseModel):
         ),
     )
 
-    # todo(mm, 2022-02-17): Using true millimeters differs from the current JSON
-    # protocol schema v6 draft. Ideally, change the v6 draft to match this.
     engageHeight: float = Field(
         ...,
         description=(
             "How high, in millimeters, to raise the magnets."
             "\n\n"
-            "Zero is level with the bottom of the labware."
-            " This will be a few millimeters above the magnets' hardware home position."
+            "Zero means the tops of the magnets are level with the ledge"
+            " that the labware rests on."
+            " This will be slightly above the magnets' minimum height,"
+            " the hardware home position."
+            " Negative values are allowed, to put the magnets below the ledge."
             "\n\n"
             "Units are always true millimeters."
             " This is unlike certain labware definitions,"

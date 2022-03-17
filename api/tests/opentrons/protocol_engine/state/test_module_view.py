@@ -50,7 +50,7 @@ def make_hardware_module(
     """
     hardware_module = decoy.mock(cls=type)
     # "type: ignore" to override what's normally a read-only property.
-    hardware_module.device_info = {"serial": serial_number}  # type: ignore[misc]
+    decoy.when(hardware_module.device_info).then_return({"serial": serial_number})
     return hardware_module
 
 
