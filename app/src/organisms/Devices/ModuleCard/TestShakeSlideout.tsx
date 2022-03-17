@@ -50,9 +50,7 @@ export const TestShakeSlideout = (
 
   const [showCollapsed, setShowCollapsed] = React.useState(false)
   const [shakeValue, setShakeValue] = React.useState<string | null>(null)
-  const isShaking =
-    module.data.speedStatus === 'speeding up' ||
-    module.data.speedStatus === 'holding at target'
+  const isShaking = module.data.speedStatus !== 'idle'
   const isLatchOpen =
     module.data.labwareLatchStatus === 'idle_open' ||
     module.data.labwareLatchStatus === 'opening'

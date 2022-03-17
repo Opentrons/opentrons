@@ -1,13 +1,18 @@
 import * as React from 'react'
 import { i18n } from '../../../../i18n'
 import { fireEvent } from '@testing-library/react'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { renderWithProviders } from '@opentrons/components'
 import { TestShakeSlideout } from '../TestShakeSlideout'
 import { HeaterShakerModuleCard } from '../../HeaterShakerWizard/HeaterShakerModuleCard'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 
+jest.mock('@opentrons/react-api-client')
 jest.mock('../../HeaterShakerWizard/HeaterShakerModuleCard')
 
+const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
+  typeof useCreateLiveCommandMutation
+>
 const mockHeaterShakerModuleCard = HeaterShakerModuleCard as jest.MockedFunction<
   typeof HeaterShakerModuleCard
 >
@@ -18,14 +23,85 @@ const render = (props: React.ComponentProps<typeof TestShakeSlideout>) => {
   })[0]
 }
 
+const mockOpenLatchHeaterShaker = {
+  model: 'heaterShakerModuleV1',
+  type: 'heaterShakerModuleType',
+  port: '/dev/ot_module_heatershaker0',
+  serial: 'jkl123',
+  revision: 'heatershaker_v4.0',
+  fwVersion: 'v2.0.0',
+  status: 'idle',
+  hasAvailableUpdate: true,
+  data: {
+    labwareLatchStatus: 'idle_open',
+    speedStatus: 'idle',
+    temperatureStatus: 'idle',
+    currentSpeed: null,
+    currentTemp: null,
+    targetSpeed: null,
+    targetTemp: null,
+    errorDetails: null,
+  },
+  usbPort: { hub: 1, port: 1 },
+} as any
+
+const mockMovingHeaterShaker = {
+  model: 'heaterShakerModuleV1',
+  type: 'heaterShakerModuleType',
+  port: '/dev/ot_module_heatershaker0',
+  serial: 'jkl123',
+  revision: 'heatershaker_v4.0',
+  fwVersion: 'v2.0.0',
+  status: 'idle',
+  hasAvailableUpdate: true,
+  data: {
+    labwareLatchStatus: 'idle_closed',
+    speedStatus: 'speeding up',
+    temperatureStatus: 'idle',
+    currentSpeed: null,
+    currentTemp: null,
+    targetSpeed: null,
+    targetTemp: null,
+    errorDetails: null,
+  },
+  usbPort: { hub: 1, port: 1 },
+} as any
+
+const mockCloseLatchHeaterShaker = {
+  model: 'heaterShakerModuleV1',
+  type: 'heaterShakerModuleType',
+  port: '/dev/ot_module_heatershaker0',
+  serial: 'jkl123',
+  revision: 'heatershaker_v4.0',
+  fwVersion: 'v2.0.0',
+  status: 'idle',
+  hasAvailableUpdate: true,
+  data: {
+    labwareLatchStatus: 'idle_closed',
+    speedStatus: 'idle',
+    temperatureStatus: 'idle',
+    currentSpeed: null,
+    currentTemp: null,
+    targetSpeed: null,
+    targetTemp: null,
+    errorDetails: null,
+  },
+  usbPort: { hub: 1, port: 1 },
+} as any
+
 describe('TestShakeSlideout', () => {
   let props: React.ComponentProps<typeof TestShakeSlideout>
+  let mockCreateLiveCommand = jest.fn()
   beforeEach(() => {
     props = {
       module: mockHeaterShaker,
       onCloseClick: jest.fn(),
       isExpanded: true,
     }
+    mockCreateLiveCommand = jest.fn()
+    mockUseLiveCommandMutation.mockReturnValue({
+      createLiveCommand: mockCreateLiveCommand,
+    } as any)
     mockHeaterShakerModuleCard.mockReturnValue(
       <div>Mock Heater Shaker Module Card</div>
     )
@@ -77,5 +153,49 @@ describe('TestShakeSlideout', () => {
       'Revisit instructions for attaching the module to the deck as well as attaching the thermal adapter.'
     )
     getByText('Go to attachment instructions')
+  })
+
+  it('start shake button should be disabled if the labware latch is open', () => {
+    props = {
+      module: mockOpenLatchHeaterShaker,
+      onCloseClick: jest.fn(),
+      isExpanded: true,
+    }
+
+    const { getByRole } = render(props)
+    const button = getByRole('button', { name: /Start/i })
+    expect(button).toBeDisabled()
+  })
+
+  it('open latch button should be disabled if the module is shaking', () => {
+    props = {
+      module: mockMovingHeaterShaker,
+      onCloseClick: jest.fn(),
+      isExpanded: true,
+    }
+
+    const { getByRole } = render(props)
+    const button = getByRole('button', { name: /Open/i })
+    expect(button).toBeDisabled()
+  })
+
+  it('renders the open labware latch button and clicking it opens the latch', () => {
+    props = {
+      module: mockCloseLatchHeaterShaker,
+      onCloseClick: jest.fn(),
+      isExpanded: true,
+    }
+
+    const { getByRole } = render(props)
+    const button = getByRole('button', { name: /Open/i })
+    fireEvent.click(button)
+    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
+      command: {
+        commandType: 'heaterShakerModule/openLatch',
+        params: {
+          moduleId: mockCloseLatchHeaterShaker.id,
+        },
+      },
+    })
   })
 })
