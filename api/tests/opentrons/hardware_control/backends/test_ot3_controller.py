@@ -52,7 +52,6 @@ def mock_move_group_run():
 @pytest.mark.parametrize(
     "axes",
     [
-        [],
         [OT3Axis.X],
         [OT3Axis.Y],
         [OT3Axis.Z_L],
