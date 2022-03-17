@@ -111,7 +111,8 @@
       "moduleLabwarePrefix": {
         "magneticModuleType": "MAG",
         "temperatureModuleType": "TEMP",
-        "thermocyclerModuleType": "THERMO"
+        "thermocyclerModuleType": "THERMO",
+        "heaterShakerModuleType": "HS"
       },
       "magnetAction": {
         "label": "Magnet action",
