@@ -722,10 +722,10 @@ class OT3API(
         async with self._motion_lock:
             try:
                 await self._backend.home(checked_axes)
-            except:
+            except MoveConditionNotMet:
                 self._log.exception("Homing failed")
                 self._current_position.clear()
-                raise MoveConditionNotMet
+                raise
             else:
                 machine_pos = await self._backend.update_position()
                 position = deck_from_machine(

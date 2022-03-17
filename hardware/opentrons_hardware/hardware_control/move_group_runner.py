@@ -31,6 +31,9 @@ from opentrons_hardware.firmware_bindings.utils import (
     Int32Field,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
+from opentrons_hardware.hardware_control.motion_planning.move_utils import (
+    MoveConditionNotMet,
+)
 
 log = logging.getLogger(__name__)
 
@@ -162,6 +165,7 @@ class MoveScheduler:
         if isinstance(message, MoveCompleted):
             seq_id = message.payload.seq_id.value
             group_id = message.payload.group_id.value
+            ack_id = message.payload.ack_id.value
             node_id = arbitration_id.parts.originating_node_id
             log.info(
                 f"Received completion for {node_id} group {group_id} seq {seq_id}"
@@ -173,6 +177,13 @@ class MoveScheduler:
             if not self._moves[group_id]:
                 log.info(f"Move group {group_id} has completed.")
                 self._event.set()
+            if self._stop_condition[
+                group_id
+            ] == MoveStopCondition.limit_switch and ack_id != UInt8Field(2):
+                if ack_id == UInt8Field(1):
+                    condition = "Homing timed out."
+                    log.warning(f"Homing failed. Condition: {condition}")
+                    raise MoveConditionNotMet()
 
     async def run(self, can_messenger: CanMessenger) -> None:
         """Start each move group after the prior has completed."""
