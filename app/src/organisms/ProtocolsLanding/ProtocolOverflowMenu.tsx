@@ -13,6 +13,7 @@ import {
   useConditionalConfirm,
   AlertModal,
   SPACING,
+  TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
@@ -22,6 +23,7 @@ import { removeProtocol } from '../../redux/protocol-storage'
 import type { StyleProps } from '@opentrons/components'
 import type { Dispatch } from '../../redux/types'
 import { PrimaryButton, SecondaryButton } from '../../atoms/Buttons'
+import { StyledText } from '../../atoms/text'
 
 interface ProtocolOverflowMenuProps extends StyleProps {
   protocolKey: string
@@ -82,10 +84,11 @@ export function ProtocolOverflowMenu(
               {
                 Component: () => (
                   <SecondaryButton
-                    onClick={e => {
+                    onClick={(e: React.MouseEvent) => {
                       e.preventDefault()
                       cancelDeleteProtocol()
                     }}
+                    textTransform={TEXT_TRANSFORM_CAPITALIZE}
                   >
                     {t('shared:cancel')}
                   </SecondaryButton>
@@ -96,6 +99,8 @@ export function ProtocolOverflowMenu(
                   <PrimaryButton
                     onClick={handleClickDelete}
                     marginLeft={SPACING.spacing3}
+                    backgroundColor={COLORS.error}
+                    isDestructive
                   >
                     {t('yes_delete_this_protocol')}
                   </PrimaryButton>
@@ -104,7 +109,7 @@ export function ProtocolOverflowMenu(
             ]}
             alertOverlay
           >
-            <p>{t('this_protocol_will_be_trashed')}</p>
+            <StyledText as="p">{t('this_protocol_will_be_trashed')}</StyledText>
           </AlertModal>
         </Portal>
       ) : null}

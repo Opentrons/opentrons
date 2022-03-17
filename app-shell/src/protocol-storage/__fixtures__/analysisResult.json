@@ -1,9 +1,7 @@
 {
   "id": "35d82271-c73c-4c98-9082-55bb97772ce1",
   "createdAt": "2022-03-07T22:14:11.532991+00:00",
-  "files": [
-    { "name": "fixtureProtocol.py", "role": "main" }
-  ],
+  "files": [{ "name": "fixtureProtocol.py", "role": "main" }],
   "protocolType": "python",
   "metadata": { "apiLevel": "2.9" },
   "analyses": [

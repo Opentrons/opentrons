@@ -1,7 +1,6 @@
 """Response models for protocol analysis."""
 # TODO(mc, 2021-08-25): add modules to simulation result
 from enum import Enum
-from opentrons.api.src.opentrons.protocols.api_support.constants import STANDARD_OT2_DECK, STANDARD_OT3_DECK, SHORT_TRASH_DECK
 from pydantic import BaseModel, Field
 from typing import List, Union
 from typing_extensions import Literal
@@ -48,11 +47,6 @@ class PendingAnalysis(AnalysisSummary):
 
     status: Literal[AnalysisStatus.PENDING] = AnalysisStatus.PENDING
 
-class RobotDetails(BaseModel):
-    """Base model for the details of a specified robot"""
-
-    model: Union[Literal["OT-2 Standard"], Literal["OT-3 Standard"]]
-    deckId: Union[STANDARD_OT2_DECK, STANDARD_OT3_DECK, SHORT_TRASH_DECK]
 
 class CompletedAnalysis(AnalysisSummary):
     """A completed protocol run analysis.
@@ -80,10 +74,6 @@ class CompletedAnalysis(AnalysisSummary):
         ...,
         description="Whether the protocol is expected to run successfully",
     )
-    robot: RobotDetails = Field(
-        ...,
-        description="Details of the robot targeted by this protocol"
-    ),
     pipettes: List[LoadedPipette] = Field(
         ...,
         description="Pipettes used by the protocol",

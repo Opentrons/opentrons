@@ -1,4 +1,4 @@
-// custom labware reducer
+// protocol storage reducer
 import keyBy from 'lodash/keyBy'
 import * as Actions from './actions'
 

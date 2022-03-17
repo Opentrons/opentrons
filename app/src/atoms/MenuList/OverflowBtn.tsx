@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { Btn, COLORS, SPACING, PrimitiveComponent } from '@opentrons/components'
+import { Btn, COLORS, SPACING } from '@opentrons/components'
 
 const overflowButtonStyles = css`
   border-radius: ${SPACING.spacing2};

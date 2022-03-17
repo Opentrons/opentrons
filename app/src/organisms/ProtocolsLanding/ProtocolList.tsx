@@ -13,12 +13,6 @@ import { Slideout } from '../../atoms/Slideout'
 import { UploadInput } from './UploadInput'
 import { ProtocolCard } from './ProtocolCard'
 import { EmptyStateLinks } from './EmptyStateLinks'
-import {
-  HEATERSHAKER_MODULE_TYPE,
-  MAGNETIC_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
-} from '../../redux/modules'
 
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 
@@ -28,7 +22,7 @@ interface ProtocolListProps {
 export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
   const [showSlideout, setShowSlideout] = React.useState(false)
   const { t } = useTranslation('protocol_info')
-  const {storedProtocols} =props
+  const { storedProtocols } = props
 
   return (
     <Box padding={SPACING.spacing4}>
@@ -52,9 +46,8 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
       </StyledText>
       <Flex flexDirection="column">
         {storedProtocols.map(storedProtocol => (
-            <ProtocolCard key={storedProtocol.protocolKey} {...storedProtocol} />
-          )
-        )}
+          <ProtocolCard key={storedProtocol.protocolKey} {...storedProtocol} />
+        ))}
       </Flex>
       <EmptyStateLinks title={t('create_or_download')} />
       <Slideout
@@ -64,7 +57,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
         height="100%"
       >
         <Box height="26rem">
-          <UploadInput onUpload={() => setShowSlideout(false)}/>
+          <UploadInput onUpload={() => setShowSlideout(false)} />
         </Box>
       </Slideout>
     </Box>
