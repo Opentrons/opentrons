@@ -16,7 +16,6 @@ from opentrons.protocol_engine import (
     LoadedModule,
     LoadedPipette,
 )
-from tests.opentrons.conftest import protocol
 
 from .task_queue import TaskQueue
 from .json_file_reader import JsonFileReader
