@@ -5,7 +5,7 @@ inputs:
     description: 'Which project (by subdirectory) to set up'
     required: true
   python-version:
-    description: 'What Python version to use to create the project's virtual environment'
+    description: "What Python version to use to create the project's virtual environment"
     required: false
 runs:
   using: 'composite'
