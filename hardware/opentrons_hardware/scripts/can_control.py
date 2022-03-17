@@ -9,18 +9,46 @@ import asyncio
 import logging
 import argparse
 from logging.config import dictConfig
-from typing import TextIO
+from typing import TextIO, Optional
 
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
 )
+from opentrons_hardware.firmware_bindings.message import CanMessage
 
 from opentrons_hardware.drivers.can_bus.build import build_driver
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 
 from .can_mon import task as monitor_task
 from .can_comm import prompt_message, InvalidInput
+
+async def get_input(
+        input_file: TextIO,
+        output_file: TextIO,
+        output_lock: asyncio.Lock,
+        brief_prompt: bool = True
+) -> Optional[CanMessage]:
+    def prompt_with_io(promptstr: str) -> str:
+        output_file.write(promptstr)
+        output_file.flush()
+        userinput = input_file.readline()
+        if userinput.lower().strip() in ['exit', 'quit']:
+            raise SystemExit()
+        return userinput
+
+    def write_with_newline(outstr: str) -> None:
+        output_file.write(outstr + "\n")
+        output_file.flush()
+
+    try:
+        async with output_lock:
+            return await asyncio.get_event_loop().run_in_executor(
+                None, prompt_message, prompt_with_io, write_with_newline, brief_prompt
+            )
+    except InvalidInput as e:
+        write_with_newline(str(e))
+    return None
 
 
 async def input_task(
@@ -38,30 +66,13 @@ async def input_task(
         output_lock: Async lock for exclusive writes
     """
 
-    def prompt_with_io(promptstr: str) -> str:
-        output_file.write(promptstr)
-        userinput =  input_file.readline()
-        if userinput.lower().strip() in ['exit', 'quit']:
-            raise SystemExit()
-        return userinput
-
-    def write_with_newline(outstr: str) -> None:
-        output_file.write(outstr + "\n")
-
-    async with output_lock:
-        can_message = await asyncio.get_event_loop().run_in_executor(
-            None, prompt_message, prompt_with_io, write_with_newline
-        )
-    await can_driver.send(can_message)
+    can_message = await get_input(input_file, output_file, output_lock, False)
+    if can_message:
+        await can_driver.send(can_message)
     while True:
-        try:
-            # Run sync prompt message in threadpool executor.
-            can_message = await asyncio.get_event_loop().run_in_executor(
-                None, prompt_message, prompt_with_io, write_with_newline, True
-            )
+        can_message = await get_input(input_file, output_file, output_lock)
+        if can_message:
             await can_driver.send(can_message)
-        except InvalidInput as e:
-            output_file.write(str(e) + '\n')
 
 
 async def run(args: argparse.Namespace) -> None:
@@ -135,7 +146,11 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    asyncio.run(run(args))
+    try:
+        asyncio.run(run(args))
+    except KeyboardInterrupt:
+        args.output.write('Quitting...\n')
+        args.output.flush()
 
 
 if __name__ == "__main__":

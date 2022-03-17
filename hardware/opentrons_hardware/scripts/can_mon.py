@@ -64,9 +64,11 @@ class Writer:
             if self._do_style:
                 self._dest.write(self.RESET_STYLE)
             self._dest.write(" ")
+        self._dest.flush()
 
     def _reset_shell_style(self) -> None:
         self._dest.write(self.RESET_STYLE)
+        self._dest.flush()
 
 
 async def task(

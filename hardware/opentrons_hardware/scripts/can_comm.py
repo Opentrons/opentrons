@@ -79,7 +79,7 @@ def prompt_enum(
     enum_type: Type[Enum],
     get_user_input: GetInputFunc,
     output_func: OutputFunc,
-    only_prompt_on_request: bool = False,
+    brief_prompt: bool = False,
 ) -> Type[Enum]:
     """Prompt to choose a member of the enum.
 
@@ -104,19 +104,20 @@ def prompt_enum(
         except (ValueError, IndexError) as e:
             raise InvalidInput(str(e))
 
-    if only_prompt_on_request:
-        user = ''
-        while user in ('\n', ''):
-            user = get_user_input(f"choose {enum_type.__name__} (? for list): ")
+    if not brief_prompt:
+        write_choices()
+    user = ''
+    while True:
+        user = get_user_input(f"choose {enum_type.__name__} (? for list): ").lower().strip()
+        if not user:
+            continue
         if "?" in user:
             write_choices()
-            return parse_input(get_user_input("enter choice: "))
-        else:
+            continue
+        try:
             return parse_input(user)
-    else:
-        write_choices()
-        return parse_input(get_user_input("enter choice: "))
-
+        except InvalidInput as e:
+            output_func(str(e)+'\n')
 
 def prompt_payload(
     payload_type: Type[BinarySerializable], get_user_input: GetInputFunc
@@ -149,21 +150,21 @@ def prompt_payload(
 def prompt_message(
     get_user_input: GetInputFunc,
     output_func: OutputFunc,
-    only_prompt_on_request: bool = False,
+    brief_prompt: bool = False,
 ) -> CanMessage:
     """Prompt user to create a message.
 
     Args:
         get_user_input: Function to get user input.
         output_func: Function to output text to user.
-        only_prompt_on_request: True to only write prompts if the user enters ?
+        brief_prompt: True to only write prompts if the user enters ?
 
     Returns: a CanMessage
     """
     message_id = prompt_enum(
-        MessageId, get_user_input, output_func, only_prompt_on_request
+        MessageId, get_user_input, output_func, brief_prompt
     )
-    node_id = prompt_enum(NodeId, get_user_input, output_func)
+    node_id = prompt_enum(NodeId, get_user_input, output_func, brief_prompt)
     # TODO (amit, 2021-10-01): Get function code when the time comes.
     function_code = FunctionCode.network_management
     message_def = get_definition(cast(MessageId, message_id))
