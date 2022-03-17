@@ -16,6 +16,7 @@ from opentrons.protocol_engine import (
     LoadedModule,
     LoadedPipette,
 )
+from tests.opentrons.conftest import protocol
 
 from .task_queue import TaskQueue
 from .json_file_reader import JsonFileReader
@@ -173,7 +174,12 @@ class ProtocolRunner:
         )
 
     def _load_json(self, protocol_source: ProtocolSource) -> None:
-        raise NotImplementedError("JSON schema v6 execution not yet implemented.")
+        protocol = self._json_file_reader.read(protocol_source)
+        commands = self._json_command_translator.translate(protocol)
+        for command in commands:
+            self._protocol_engine.add_command(request=command)
+        self._task_queue.set_run_func(func=self._protocol_engine.wait_until_complete)
+
 
     def _load_python(self, protocol_source: ProtocolSource) -> None:
         protocol = self._python_file_reader.read(protocol_source)

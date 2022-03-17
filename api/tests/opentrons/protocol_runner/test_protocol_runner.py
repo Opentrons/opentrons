@@ -4,11 +4,12 @@ from decoy import Decoy, matchers
 from pathlib import Path
 from typing import List, cast
 
-from opentrons_shared_data.protocol.dev_types import JsonProtocol as JsonProtocolDict
+from opentrons_shared_data.protocol.dev_types import JsonProtocol as LegacyJsonProtocolDict
 from opentrons.hardware_control import API as HardwareAPI
 
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.models import JsonProtocol, LabwareDefinition
+from opentrons_shared_data.protocol.models.protocol_schema_v6 import ProtocolSchemaV6
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons.protocol_api_experimental import ProtocolContext
 from opentrons.protocol_engine import ProtocolEngine, commands as pe_commands
 from opentrons.protocol_reader import (
@@ -200,7 +201,6 @@ async def test_run(
     )
 
 
-@pytest.mark.xfail(raises=NotImplementedError, strict=True)
 def test_load_json(
     decoy: Decoy,
     json_file_reader: JsonFileReader,
@@ -219,7 +219,7 @@ def test_load_json(
         labware_definitions=[],
     )
 
-    json_protocol = JsonProtocol.construct()  # type: ignore[call-arg]
+    json_protocol = ProtocolSchemaV6.construct()  # type: ignore[call-arg]
 
     commands: List[pe_commands.CommandCreate] = [
         pe_commands.PauseCreate(params=pe_commands.PauseParams(message="hello")),
@@ -366,7 +366,7 @@ def test_load_legacy_json(
 
     legacy_protocol = LegacyJsonProtocol(
         text="{}",
-        contents=cast(JsonProtocolDict, {}),
+        contents=cast(LegacyJsonProtocolDict, {}),
         filename="protocol.json",
         api_level=APIVersion(2, 11),
         schema_version=5,
