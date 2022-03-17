@@ -216,7 +216,7 @@ class OT3Controller:
             A dictionary containing the new positions of each axis
         """
         if not axes:
-            return
+            return {}
         distances = {
             ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0] for ax in axes
         }
