@@ -121,7 +121,7 @@ async def test_probing(controller: OT3Controller) -> None:
                 NodeId.gantry_x,
                 NodeId.gantry_y,
                 NodeId.head,
-                NodeId.pipette_left,
+                NodeId.pipette_right,
             )
         )
     assert controller._present_nodes == set(

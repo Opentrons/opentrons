@@ -271,13 +271,13 @@ class OT3Controller:
             A map of mount to pipette name.
         """
         if (
-            expected.get(OT3Mount.LEFT)
-            and expected.get(OT3Mount.LEFT) != _FIXED_PIPETTE_NAME
+            expected.get(OT3Mount.RIGHT)
+            and expected.get(OT3Mount.RIGHT) != _FIXED_PIPETTE_NAME
         ):
             raise RuntimeError(f"only support {_FIXED_PIPETTE_NAME}  right now")
 
         return {
-            OT3Mount.LEFT: {
+            OT3Mount.RIGHT: {
                 "config": pipette_config.load(_FIXED_PIPETTE_MODEL, _FIXED_PIPETTE_ID),
                 "id": _FIXED_PIPETTE_ID,
             }
