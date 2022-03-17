@@ -9,7 +9,6 @@ from opentrons.hardware_control.types import (
 )
 import numpy as np
 
-
 from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.hardware_control.motion_planning import (
     AxisConstraints,
@@ -24,7 +23,9 @@ from opentrons_hardware.hardware_control.motion_planning.move_utils import (
 from opentrons_hardware.hardware_control.motion import (
     create_step,
     NodeIdMotionValues,
+    create_home_step,
     MoveGroup,
+    MoveStopCondition,
 )
 
 # TODO: These methods exist to defer uses of NodeId to inside
@@ -71,6 +72,7 @@ def axis_to_node(axis: OT3Axis) -> "NodeId":
         OT3Axis.Z_R: NodeId.head_r,
         OT3Axis.P_L: NodeId.pipette_left,
         OT3Axis.P_R: NodeId.pipette_right,
+        OT3Axis.Z_G: NodeId.gripper,
     }
     return anm[axis]
 
@@ -83,6 +85,7 @@ def node_to_axis(node: "NodeId") -> OT3Axis:
         NodeId.head_r: OT3Axis.Z_R,
         NodeId.pipette_left: OT3Axis.P_L,
         NodeId.pipette_right: OT3Axis.P_R,
+        NodeId.gripper: OT3Axis.Z_G,
     }
     return nam[node]
 
@@ -148,6 +151,7 @@ def create_move_group(
     origin: Coordinates[OT3Axis, CoordinateValue],
     moves: List[Move[OT3Axis]],
     present_nodes: Iterable[NodeId],
+    stop_condition: MoveStopCondition = MoveStopCondition.none,
 ) -> Tuple[MoveGroup, Dict[NodeId, float]]:
     pos = _convert_to_node_id_dict(origin)
     move_group: MoveGroup = []
@@ -164,11 +168,25 @@ def create_move_group(
                 acceleration=_convert_to_node_id_dict(accelerations),
                 duration=block.time,
                 present_nodes=present_nodes,
+                stop_condition=stop_condition,
             )
             for ax in pos.keys():
                 pos[ax] += node_id_distances.get(ax, 0)
             move_group.append(step)
     return move_group, {k: float(v) for k, v in pos.items()}
+
+
+def create_home_group(
+    distance: Dict[OT3Axis, float], velocity: Dict[OT3Axis, float]
+) -> MoveGroup:
+    node_id_distances = _convert_to_node_id_dict(distance)
+    node_id_velocities = _convert_to_node_id_dict(velocity)
+    step = create_home_step(
+        distance=node_id_distances,
+        velocity=node_id_velocities,
+    )
+    move_group: MoveGroup = [step]
+    return move_group
 
 
 AxisMapPayload = TypeVar("AxisMapPayload")

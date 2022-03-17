@@ -83,7 +83,9 @@ from opentrons_shared_data.pipette.dev_types import (
 )
 
 from .dev_types import PipetteDict
-
+from opentrons_hardware.hardware_control.motion_planning.move_utils import (
+    MoveConditionNotMet,
+)
 
 mod_log = logging.getLogger(__name__)
 
@@ -479,77 +481,22 @@ class OT3API(
             axes = [OT3Axis.Z_R, OT3Axis.Z_L]
         await self.home(axes)
 
-    async def _do_plunger_home(
-        self,
-        axis: Optional[OT3Axis] = None,
-        mount: Optional[OT3Mount] = None,
-        acquire_lock: bool = True,
-    ) -> None:
-        assert (axis is not None) ^ (mount is not None), "specify either axis or mount"
-        if axis:
-            checked_axis = axis
-            checked_mount = OT3Axis.to_mount(checked_axis)
-        if mount:
-            checked_mount = mount
-            checked_axis = OT3Axis.of_main_tool_actuator(checked_mount)
-        instr = self._instrument_handler.hardware_instruments[checked_mount]
-        if not instr:
-            return
-        async with contextlib.AsyncExitStack() as stack:
-            if acquire_lock:
-                await stack.enter_async_context(self._motion_lock)
-            with self._backend.save_current():
-                self._backend.set_active_current(
-                    {checked_axis: instr.config.plunger_current}
-                )
-                await self._backend.home([checked_axis])
-                # either we were passed False for our acquire_lock and we
-                # should pass it on, or we acquired the lock above and
-                # shouldn't do it again
-                target_pos = target_position_from_plunger(
-                    checked_mount, instr.config.bottom, self._current_position
-                )
-                await self._move(
-                    target_pos,
-                    acquire_lock=False,
-                    home_flagged_axes=False,
-                )
-
     async def home_plunger(self, mount: Union[top_types.Mount, OT3Mount]) -> None:
         """
         Home the plunger motor for a mount, and then return it to the 'bottom'
         position.
         """
+
         checked_mount = OT3Mount.from_mount(mount)
-        await self.current_position(mount=checked_mount, refresh=True)
-        await self._do_plunger_home(mount=checked_mount, acquire_lock=True)
+        await self.home([OT3Axis.of_main_tool_actuator(checked_mount)])
+        instr = self._instrument_handler.hardware_instruments[checked_mount]
+        if instr:
+            target_pos = target_position_from_plunger(
+                checked_mount, instr.config.bottom, self._current_position
+            )
+            await self._move(target_pos, acquire_lock=False, home_flagged_axes=False)
 
-    @ExecutionManagerProvider.wait_for_running
-    async def home(
-        self, axes: Optional[Union[List[Axis], List[OT3Axis]]] = None
-    ) -> None:
-        """Home the entire robot and initialize current position."""
-        self._reset_last_mount()
-        # Initialize/update current_position
-        if axes:
-            checked_axes = [OT3Axis.from_axis(ax) for ax in axes]
-        else:
-            checked_axes = [ax for ax in OT3Axis]
-        gantry = [ax for ax in checked_axes if ax in OT3Axis.gantry_axes()]
-        machine_pos = {}
-        plungers = [ax for ax in checked_axes if ax in OT3Axis.pipette_axes()]
-
-        async with self._motion_lock:
-            if gantry:
-                machine_pos.update(await self._backend.home(gantry))
-                self._current_position = deck_from_machine(
-                    machine_pos,
-                    self._transforms.deck_calibration.attitude,
-                    self._transforms.carriage_offset,
-                    OT3Axis,
-                )
-            for plunger in plungers:
-                await self._do_plunger_home(axis=plunger, acquire_lock=False)
+            await self.current_position(mount=checked_mount, refresh=True)
 
     @lru_cache(1)
     def _carriage_offset(self) -> top_types.Point:
@@ -776,10 +723,9 @@ class OT3API(
             checked_axes = [OT3Axis.from_axis(ax) for ax in axes]
         else:
             checked_axes = [ax for ax in OT3Axis]
-        ordered_axes = [ax for ax in home_axes() if ax in checked_axes]
         async with self._motion_lock:
             try:
-                await self._backend.home(ordered_axes)
+                await self._backend.home(checked_axes)
             except MoveConditionNotMet:
                 self._log.exception("Homing failed")
                 self._current_position.clear()

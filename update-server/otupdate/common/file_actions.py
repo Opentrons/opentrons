@@ -32,7 +32,7 @@ class SignatureMismatch(ValueError):
         self.message = message
         self.short = "Signature Mismatch"
 
-    def __repr__(self, message):
+    def __repr__(self):
         return f"<{self.__class__.__name__}: {self.message}>"
 
     def __str__(self):
