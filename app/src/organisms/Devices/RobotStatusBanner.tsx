@@ -14,11 +14,9 @@ import {
 
 import { TertiaryButton } from '../../atoms/Buttons'
 import { StyledText } from '../../atoms/text'
-import {
-  useCurrentProtocol,
-  useCurrentRun,
-} from '../../organisms/ProtocolUpload/hooks'
-import { useIsProtocolRunning } from './hooks'
+import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
+import { useCurrentRunStatus } from '../../organisms/RunTimeControl/hooks'
+import { useProtocolDetailsForRun } from './hooks'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 
@@ -26,20 +24,20 @@ type RobotStatusBannerProps = Pick<DiscoveredRobot, 'name' | 'local'>
 
 export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
   const { name, local } = props
-  const { t } = useTranslation('devices_landing')
+  const { t } = useTranslation(['devices_landing', 'run_details'])
 
-  const protocolRecord = useCurrentProtocol()
-  const runRecord = useCurrentRun()
-  const isProtocolRunning = useIsProtocolRunning()
+  const currentRunId = useCurrentRunId()
+  const currentRunStatus = useCurrentRunStatus()
+  const { displayName } = useProtocolDetailsForRun(currentRunId)
 
   const RunningProtocolBanner = (): JSX.Element | null =>
-    isProtocolRunning && runRecord != null ? (
+    currentRunId != null ? (
       <Flex alignItems={ALIGN_CENTER}>
         <StyledText as="label" paddingRight={SPACING.spacing3}>
-          {`${protocolRecord?.data.metadata.protocolName}; ${t('running')}`}
+          {`${displayName}; ${t(`run_details:status_${currentRunStatus}`)}`}
         </StyledText>
         <Link
-          to={`/devices/${name}/protocol-runs/${runRecord.data.id}/run-log`}
+          to={`/devices/${name}/protocol-runs/${currentRunId}/run-log`}
           id="RobotStatusBanner_goToRun"
         >
           <TertiaryButton>{t('go_to_run')}</TertiaryButton>
