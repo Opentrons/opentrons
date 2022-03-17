@@ -52,7 +52,7 @@ export interface InputFieldProps {
   readOnly?: boolean | undefined
   /** html tabindex property */
   tabIndex?: number
-  /** automatically focus field on render */
+  /** automatically focus field on renders */
   autoFocus?: boolean
   /** if true, clear out value and add '-' placeholder */
   isIndeterminate?: boolean
@@ -119,22 +119,14 @@ function Input(props: InputFieldProps): JSX.Element {
     <Flex width="100%" flexDirection={DIRECTION_COLUMN}>
       <Flex css={INPUT_FIELD}>
         <input
-          id={props.id}
-          disabled={props.disabled}
+          {...props}
           data-testid={props.id}
-          type={props.type}
           value={value}
-          name={props.name}
           placeholder={placeHolder}
           onFocus={props.disabled ? undefined : props.onFocus}
           onBlur={props.onBlur}
           onClick={props.disabled ? undefined : props.onClick}
-          readOnly={props.readOnly}
-          tabIndex={props.tabIndex}
           onChange={props.disabled ? undefined : props.onChange}
-          autoFocus={props.autoFocus}
-          min={props.min ?? undefined}
-          max={props.max ?? undefined}
         />
         {props.units && (
           <Flex

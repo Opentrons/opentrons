@@ -65,9 +65,8 @@ export const ThermocyclerModuleSlideout = (
     commandType: 'thermocycler/setTargetBlockTemperature',
     params: {
       moduleId: module.id,
-      //  the 0 int will never be reached because the button will be disabled if the field is left empty
       temperature: tempValue != null ? parseInt(tempValue) : 0,
-      //  how do we get volume?
+      //  TODO(jr, 3/17/22): add volume, which will be provided by PD protocols
     },
   }
 
