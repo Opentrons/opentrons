@@ -27,7 +27,6 @@ from opentrons_hardware.hardware_control.motion import (
     MoveGroup,
 )
 
-
 # TODO: These methods exist to defer uses of NodeId to inside
 # method bodies, which won't be evaluated until called. This is needed
 # because the robot server doesn't have opentrons_ot3_firmware as a dep
@@ -35,6 +34,8 @@ from opentrons_hardware.hardware_control.motion import (
 # to NodeId that are interpreted at import time because then the robot
 # server tests fail when importing hardware controller. This is obviously
 # terrible and needs to be fixed.
+
+
 def axis_nodes() -> List["NodeId"]:
     return [
         NodeId.gantry_x,
@@ -48,6 +49,18 @@ def axis_nodes() -> List["NodeId"]:
 
 def node_axes() -> List[OT3Axis]:
     return [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.P_L, OT3Axis.P_R]
+
+
+def home_axes() -> List[OT3Axis]:
+    return [
+        OT3Axis.P_L,
+        OT3Axis.P_R,
+        OT3Axis.Z_L,
+        OT3Axis.Z_R,
+        OT3Axis.Z_G,
+        OT3Axis.X,
+        OT3Axis.Y,
+    ]
 
 
 def axis_to_node(axis: OT3Axis) -> "NodeId":
