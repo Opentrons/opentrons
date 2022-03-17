@@ -128,8 +128,8 @@ class InstrumentContext(CommandPublisher):
     def default_speed(self, speed: float) -> None:
         self._implementation.set_default_speed(speed)
 
-    @requires_version(2, 0)  # noqa: C901
-    def aspirate(
+    @requires_version(2, 0)
+    def aspirate(  # noqa: C901
         self,
         volume: Optional[float] = None,
         location: Optional[Union[types.Location, Well]] = None,
@@ -946,9 +946,9 @@ class InstrumentContext(CommandPublisher):
 
         return self.transfer(volume, source, dest, **kwargs)
 
-    @publish(command=cmds.transfer)  # noqa: C901
+    @publish(command=cmds.transfer)
     @requires_version(2, 0)
-    def transfer(
+    def transfer(  # noqa: C901
         self,
         volume: Union[float, Sequence[float]],
         source: AdvancedLiquidHandling,
