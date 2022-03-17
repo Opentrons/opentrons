@@ -25,9 +25,9 @@ from subprocess import run  # noqa: E402
 from typing import Union, Type  # noqa: E402
 import logging  # noqa: E402
 
-from opentrons.types import Mount, Point
-from opentrons.hardware_control.types import Axis
-from opentrons.config.feature_flags import enable_ot3_hardware_controller
+from opentrons.types import Mount, Point  # noqa: E402
+from opentrons.hardware_control.types import Axis  # noqa: E402
+from opentrons.config.feature_flags import enable_ot3_hardware_controller  # noqa: E402
 from opentrons.hardware_control.types import OT3Axis, OT3Mount  # noqa: F401
 
 if enable_ot3_hardware_controller():
