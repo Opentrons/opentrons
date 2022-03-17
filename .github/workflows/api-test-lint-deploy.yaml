@@ -93,6 +93,8 @@ jobs:
         run: |
           make -C api setup-ot2
           make -C api test-ot2
+        env:
+          OT_PYTHON_VERSION: ${{ matrix.python }}
       - if: ${{ matrix.with-ot-hardware == 'true' }}
         name: Test with opentrons_hardware
         run: make -C api test
