@@ -20,7 +20,7 @@ class JsonCommandTranslator:
             self,
             protocol: ProtocolSchemaV6,
     ) -> List[pe_commands.CommandCreate]:
-        commands_list : List[pe_commands.CommandCreate] = []
+        commands_list: List[pe_commands.CommandCreate] = []
         for command in protocol.commands:
             dict_command = command.dict()
             commands_list.append(parse_obj_as(pe_commands.CommandCreate, dict_command))
