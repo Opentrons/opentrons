@@ -5,7 +5,7 @@ import logging
 import argparse
 from enum import Enum
 from logging.config import dictConfig
-from typing import Type, Sequence, Callable, cast
+from typing import Type, Sequence, Callable, TypeVar
 
 from opentrons_hardware.firmware_bindings.constants import (
     MessageId,
@@ -75,12 +75,15 @@ def create_choices(enum_type: Type[Enum]) -> Sequence[str]:
     return [f"{i}: {v.name}" for (i, v) in enumerate(enum_type)]  # type: ignore[var-annotated]  # noqa: E501
 
 
-def prompt_enum(
-    enum_type: Type[Enum],
+PromptedEnum = TypeVar("PromptedEnum", bound=Enum, covariant=True)
+
+
+def prompt_enum(  # noqa: C901
+    enum_type: Type[PromptedEnum],
     get_user_input: GetInputFunc,
     output_func: OutputFunc,
     brief_prompt: bool = False,
-) -> Type[Enum]:
+) -> PromptedEnum:
     """Prompt to choose a member of the enum.
 
     Args:
@@ -98,7 +101,7 @@ def prompt_enum(
         for row in create_choices(enum_type):
             output_func(f"\t{row}")
 
-    def parse_input(userstr: str) -> Type[Enum]:
+    def parse_input(userstr: str) -> PromptedEnum:
         try:
             return list(enum_type)[int(userstr)]
         except (ValueError, IndexError) as e:
@@ -161,13 +164,11 @@ def prompt_message(
 
     Returns: a CanMessage
     """
-    message_id = prompt_enum(
-        MessageId, get_user_input, output_func, brief_prompt
-    )
+    message_id = prompt_enum(MessageId, get_user_input, output_func, brief_prompt)
     node_id = prompt_enum(NodeId, get_user_input, output_func, brief_prompt)
     # TODO (amit, 2021-10-01): Get function code when the time comes.
     function_code = FunctionCode.network_management
-    message_def = get_definition(cast(MessageId, message_id))
+    message_def = get_definition(message_id)
     if message_def is None:
         raise InvalidInput(f"No message definition found for {message_id}")
     payload = prompt_payload(message_def.payload_type, get_user_input)
