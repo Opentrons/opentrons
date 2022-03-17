@@ -172,7 +172,8 @@ def test_aspirate(subject: JsonCommandTranslator) -> None:
             pipetteId="pipette-id-abc123",
             labwareId="labware-id-def456",
             volume=1.23,
-            flowRate=4.56,  # todo
+            # todo (Max and Tamar 3/17/22): needs to be added to the aspirate command https://github.com/Opentrons/opentrons/issues/8204
+            flowRate=4.56,
             wellName="A1",
             wellLocation=json_v6_models.WellLocation(origin="bottom", offset=json_v6_models.OffsetVector(x=0, y=0, z=7.89))
         ),
