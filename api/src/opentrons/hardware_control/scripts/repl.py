@@ -17,7 +17,7 @@ if os.environ.get("OT2", None):
     )
     os.environ["OT_API_FF_enableOT3HardwareController"] = "false"
 else:
-    print("Running with OT3 HC. If you dont want this, set an " 'env var named "OT2".')
+    print("Running with OT3 HC. If you dont want this, set an env var named 'OT2'")
     os.environ["OT_API_FF_enableOT3HardwareController"] = "true"
 
 from code import interact  # noqa: E402
@@ -28,6 +28,7 @@ import logging  # noqa: E402
 from opentrons.types import Mount, Point  # noqa: E402
 from opentrons.hardware_control.types import Axis  # noqa: E402
 from opentrons.config.feature_flags import enable_ot3_hardware_controller  # noqa: E402
+from opentrons.hardware_control.types import OT3Axis, OT3Mount  # noqa: E402
 
 if enable_ot3_hardware_controller():
     from opentrons.hardware_control.ot3api import OT3API
@@ -60,7 +61,14 @@ def do_interact(api: ThreadManager[HardwareControlAPI]) -> None:
             "Hardware Control API REPL\nCall methods on api like "
             "api.move_to(Mount.RIGHT, Point(400, 400, 500))"
         ),
-        local={"api": api.sync, "Mount": Mount, "Point": Point, "Axis": Axis},
+        local={
+            "api": api.sync,
+            "Mount": Mount,
+            "Point": Point,
+            "Axis": Axis,
+            "OT3Axis": OT3Axis,
+            "OT3Mount": OT3Mount,
+        },
     )
 
 
