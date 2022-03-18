@@ -2,11 +2,11 @@ import { formatTimestamp } from '../utils'
 
 describe('formatTimestamp', () => {
   it('should format an ISO 8601 date string', () => {
-    const date = '2021-10-07T18:44:49.366581+00:00'
+    const date = '2021-03-07T18:44:49.366581+00:00'
 
-    const expected = '10/07/2021 14:44:49'
-
-    expect(formatTimestamp(date)).toEqual(expected)
+    expect(formatTimestamp(date)).toMatch(
+      /^(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2}):(\d{2})$/
+    )
   })
 
   it('should pass through a non-ISO 8601 date string', () => {
