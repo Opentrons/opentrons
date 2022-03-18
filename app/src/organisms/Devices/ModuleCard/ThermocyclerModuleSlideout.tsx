@@ -102,7 +102,7 @@ export const ThermocyclerModuleSlideout = (
           onClick={handleSubmitTemp}
           disabled={tempValue === null || errorMessage !== null}
           width="100%"
-          data-testid={`ThermocyclerSlideout_btn_${module.model}_${isSecondaryTemp}`}
+          data-testid={`ThermocyclerSlideout_btn_${module.serial}`}
         >
           {t('set_tc_temp_slideout', { part: modulePart })}
         </PrimaryButton>
@@ -112,7 +112,7 @@ export const ThermocyclerModuleSlideout = (
         fontWeight={FONT_WEIGHT_REGULAR}
         fontSize={TYPOGRAPHY.fontSizeP}
         paddingTop={SPACING.spacing2}
-        data-testid={`ThermocyclerSlideout_text_${module.model}_${isSecondaryTemp}`}
+        data-testid={`ThermocyclerSlideout_text_${module.serial}`}
       >
         {t('tc_set_temperature_body', {
           part: modulePart,
@@ -123,7 +123,7 @@ export const ThermocyclerModuleSlideout = (
       <Flex
         marginTop={SPACING.spacing4}
         flexDirection={DIRECTION_COLUMN}
-        data-testid={`ThermocyclerSlideout_input_field_${module.model}_${isSecondaryTemp}`}
+        data-testid={`ThermocyclerSlideout_input_field_${module.serial}`}
       >
         <Text
           fontWeight={FONT_WEIGHT_REGULAR}

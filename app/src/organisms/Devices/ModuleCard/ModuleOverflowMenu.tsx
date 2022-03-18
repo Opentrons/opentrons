@@ -50,25 +50,25 @@ export const ModuleOverflowMenu = (
     (module.data.labwareLatchStatus === 'idle_closed' ||
       module.data.labwareLatchStatus === 'closing')
 
-  let typeOfCommand: CreateCommand['commandType']
+  let commandType: CreateCommand['commandType']
   switch (module.type) {
     case 'temperatureModuleType': {
-      typeOfCommand = 'temperatureModule/deactivate'
+      commandType = 'temperatureModule/deactivate'
       break
     }
     case 'magneticModuleType': {
-      typeOfCommand = 'magneticModule/disengageMagnet'
+      commandType = 'magneticModule/disengageMagnet'
       break
     }
     case 'thermocyclerModuleType': {
-      typeOfCommand =
+      commandType =
         module.status !== 'idle'
           ? 'thermocycler/deactivateBlock'
           : 'thermocycler/deactivateLid'
       break
     }
     case 'heaterShakerModuleType': {
-      typeOfCommand =
+      commandType =
         module.data.speedStatus !== 'idle'
           ? 'heaterShakerModule/stopShake'
           : 'heaterShakerModule/deactivateHeater'
@@ -83,7 +83,7 @@ export const ModuleOverflowMenu = (
     | TCDeactivateLidCreateCommand
     | TCDeactivateBlockCreateCommand
     | HeaterShakerStopShakeCreateCommand = {
-    commandType: typeOfCommand,
+    commandType: commandType,
     params: { moduleId: module.id },
   }
 
@@ -224,7 +224,7 @@ export const ModuleOverflowMenu = (
     ],
   }
 
-  const latchDisabledReason =
+  const isLatchDisabled =
     module.type === HEATERSHAKER_MODULE_TYPE &&
     module.data.speedStatus !== 'idle'
 
@@ -245,7 +245,7 @@ export const ModuleOverflowMenu = (
         key={`hs_labware_latch_${module.model}`}
         data-testid={`hs_labware_latch_${module.model}`}
         onClick={handleLatch}
-        disabled={latchDisabledReason}
+        disabled={isLatchDisabled}
         {...targetProps}
       >
         {t(isLatchClosed ? 'open_labware_latch' : 'close_labware_latch', {
@@ -253,7 +253,7 @@ export const ModuleOverflowMenu = (
         })}
       </MenuItem>
       {/* TODO:(jr, 3/11/22): update Tooltip to new design */}
-      {latchDisabledReason ? (
+      {isLatchDisabled ? (
         <Tooltip {...tooltipProps} key={`tooltip_latch_${module.model}`}>
           {t('cannot_open_latch', { ns: 'heater_shaker' })}
         </Tooltip>

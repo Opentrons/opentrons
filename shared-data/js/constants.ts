@@ -113,5 +113,5 @@ export const TEMP_LID_MAX = 110
 // Heater shaker module info
 
 export const RPM: 'RPM' = 'RPM'
-export const RPM_MIN = 200
-export const RPM_MAX = 1800
+export const HS_RPM_MIN = 200
+export const HS_RPM_MAX = 1800

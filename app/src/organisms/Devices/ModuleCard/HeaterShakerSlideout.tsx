@@ -5,9 +5,9 @@ import {
   getModuleDisplayName,
   RPM,
   CELSIUS,
-  RPM_MAX,
+  HS_RPM_MAX,
   TEMP_MAX,
-  RPM_MIN,
+  HS_RPM_MIN,
   TEMP_MIN,
 } from '@opentrons/shared-data'
 import { Slideout } from '../../../atoms/Slideout'
@@ -79,7 +79,7 @@ export const HeaterShakerSlideout = (
   if (isSetShake) {
     errorMessage =
       hsValue != null &&
-      (parseInt(hsValue) < RPM_MIN || parseInt(hsValue) > RPM_MAX)
+      (parseInt(hsValue) < HS_RPM_MIN || parseInt(hsValue) > HS_RPM_MAX)
         ? t('input_out_of_range')
         : null
   } else {
@@ -90,8 +90,8 @@ export const HeaterShakerSlideout = (
         : null
   }
 
-  const inputMax = isSetShake ? RPM_MAX : TEMP_MAX
-  const inputMin = isSetShake ? RPM_MIN : TEMP_MIN
+  const inputMax = isSetShake ? HS_RPM_MAX : TEMP_MAX
+  const inputMin = isSetShake ? HS_RPM_MIN : TEMP_MIN
   const unit = isSetShake ? RPM : CELSIUS
 
   return (
@@ -108,7 +108,7 @@ export const HeaterShakerSlideout = (
           onClick={handleSubmitCommand}
           disabled={hsValue === null || errorMessage !== null}
           width="100%"
-          data-testid={`HeaterShakerSlideout_btn_${module.model}_${isSetShake}`}
+          data-testid={`HeaterShakerSlideout_btn_${module.serial}`}
         >
           {t('set_temp_or_shake', { part: modulePart })}
         </PrimaryButton>
@@ -118,14 +118,14 @@ export const HeaterShakerSlideout = (
         fontWeight={FONT_WEIGHT_REGULAR}
         fontSize={TYPOGRAPHY.fontSizeP}
         paddingTop={SPACING.spacing2}
-        data-testid={`HeaterShakerSlideout_title_${module.model}_${isSetShake}`}
+        data-testid={`HeaterShakerSlideout_title_${module.serial}`}
       >
         {isSetShake ? t('set_shake_of_hs') : t('set_target_temp_of_hs')}
       </Text>
       <Flex
         marginTop={SPACING.spacing4}
         flexDirection={DIRECTION_COLUMN}
-        data-testid={`HeaterShakerSlideout_input_field_${module.model}_${isSetShake}`}
+        data-testid={`HeaterShakerSlideout_input_field_${module.serial}`}
       >
         <Text
           fontWeight={FONT_WEIGHT_REGULAR}

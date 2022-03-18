@@ -133,7 +133,7 @@ export const MagneticModuleSlideout = (
           width="100%"
           onClick={handleSubmitHeight}
           disabled={engageHeightValue == null || errorMessage !== null}
-          data-testid={`MagneticSlideout_btn_${module.model}`}
+          data-testid={`MagneticModuleSlideout_btn_${module.serial}`}
         >
           {t('set_engage_height')}
         </PrimaryButton>
@@ -143,7 +143,7 @@ export const MagneticModuleSlideout = (
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
         paddingTop={SPACING.spacing2}
-        data-testid={`MagneticSlideout_body_text_${module.model}`}
+        data-testid={`MagneticModuleSlideout_body_text_${module.serial}`}
       >
         {t('set_engage_height_slideout_body', {
           lower:
@@ -162,7 +162,7 @@ export const MagneticModuleSlideout = (
         paddingTop={SPACING.spacing4}
         textTransform={TEXT_TRANSFORM_UPPERCASE}
         paddingBottom={SPACING.spacing3}
-        data-testid={`MagneticSlideout_body_subtitle_${module.model}`}
+        data-testid={`MagneticModuleSlideout_body_subtitle_${module.serial}`}
       >
         {t('set_engage_height_slideout_subtitle', { gen: info.version })}
       </Text>
@@ -176,7 +176,7 @@ export const MagneticModuleSlideout = (
       >
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          data-testid={`MagneticSlideout_body_data_text_${module.model}`}
+          data-testid={`MagneticModuleSlideout_body_data_text_${module.serial}`}
         >
           <Text paddingBottom={SPACING.spacing3}>
             {t('max_engage_height_slideout')}
@@ -191,7 +191,7 @@ export const MagneticModuleSlideout = (
         <Flex
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_FLEX_END}
-          data-testid={`MagneticSlideout_body_data_num_${module.model}`}
+          data-testid={`MagneticModuleSlideout_body_data_num_${module.serial}`}
         >
           <Text paddingBottom={SPACING.spacing3}>{max}</Text>
           <Text paddingBottom={SPACING.spacing3}>{labwareBottom}</Text>
@@ -201,7 +201,7 @@ export const MagneticModuleSlideout = (
       <Flex
         marginTop={SPACING.spacing4}
         flexDirection={DIRECTION_COLUMN}
-        data-testid={`MagneticSlideout_input_field_${module.model}`}
+        data-testid={`MagneticModuleSlideout_input_field_${module.serial}`}
       >
         <Text
           fontWeight={TYPOGRAPHY.fontWeightRegular}
