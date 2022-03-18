@@ -38,7 +38,7 @@ export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
         </StyledText>
         <Link
           to={`/devices/${name}/protocol-runs/${currentRunId}/run-log`}
-          id="RobotStatusBanner_goToRun"
+          id={`RobotStatusBanner_${name}_goToRun`}
         >
           <TertiaryButton>{t('go_to_run')}</TertiaryButton>
         </Link>
@@ -53,7 +53,7 @@ export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
         <StyledText
           as="h6"
           paddingBottom={SPACING.spacing1}
-          id="RobotStatusBanner_robotModel"
+          id={`RobotStatusBanner_${name}_robotModel`}
         >
           OT-2
         </StyledText>
@@ -62,7 +62,7 @@ export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
             <StyledText
               as="h3"
               marginRight={SPACING.spacing4}
-              id="RobotStatusBanner_robotName"
+              id={`RobotStatusBanner_${name}_robotName`}
             >
               {name}
             </StyledText>
