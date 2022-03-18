@@ -22,28 +22,6 @@ def subject() -> JsonCommandTranslator:
     return JsonCommandTranslator()
 
 
-def _assert_appear_in_order(elements: List[Any], source: List[Any]) -> None:
-    """Assert all elements appear in source, in the given order relative to each other.
-
-    Example:
-        _assert_appear_in_order(
-            elements=["a", "c"]
-            source=["a", "b", "c", "d"]
-        )  # Pass.
-
-        _assert_appear_in_order(
-            elements=["c", "a"]
-            source=["a", "b", "c", "d"]
-        )  # Fail.
-    """
-    for element in elements:
-        # .index() will check this, but asserting separately lets PyTest show better
-        # error details.
-        assert element in source
-    element_indexes = [source.index(element) for element in elements]
-    assert sorted(element_indexes) == element_indexes
-
-
 def _make_json_protocol(
         *,
         pipettes: Dict[str, json_v6_models.Pipette] = {},
@@ -67,10 +45,14 @@ def _make_json_protocol(
 
 
 # TODO test a protocol with a list of commands (Tamar and Max)
+def test_command_list(subject: JsonCommandTranslator) -> None:
+    pass
 
-def test_aspirate(subject: JsonCommandTranslator) -> None:
+
+def load_command_list(subject: JsonCommandTranslator) -> None:
     """It should translate a JSON aspirate to a Protocol Engine AspirateCreate."""
-    input_json_command = json_v6_models.Command(
+    command_list: List[json_v6_models.Command] = []
+    aspirate_json_command = json_v6_models.Command(
         commandType="aspirate",
         id="command-id-ddd-666",
         params=json_v6_models.Params(
@@ -84,6 +66,8 @@ def test_aspirate(subject: JsonCommandTranslator) -> None:
                                                      offset=json_v6_models.OffsetVector(x=0, y=0, z=7.89))
         ),
     )
+    command_list.append(aspirate_json_command)
+
     expected_output = [
         pe_commands.AspirateCreate(
             params=pe_commands.AspirateParams(
@@ -100,7 +84,7 @@ def test_aspirate(subject: JsonCommandTranslator) -> None:
         )
     ]
 
-    output = subject.translate(_make_json_protocol(commands=[input_json_command]))
+    output = subject.translate(_make_json_protocol(commands=command_list))
     assert output == expected_output
 
 
