@@ -91,7 +91,8 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
         const { model } = moduleDef
         return (
           <React.Fragment key={index}>
-            {model === 'magneticModuleV2' && (
+            {/* @ts-expect-error: this is always false until heater shaker is added to model */}
+            {model === 'heatershakermoduleV1' && (
               <Flex key="heater_shaker_banner">
                 <HeaterShakerBanner displayName={moduleDef.displayName} />
               </Flex>
