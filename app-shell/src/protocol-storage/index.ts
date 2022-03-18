@@ -56,9 +56,6 @@ const fetchProtocols = (
               : null,
         }
       })
-      runFileWithPython(
-        path.join(FileSystem.PROTOCOLS_DIRECTORY_PATH, 'hello.py')
-      )
       dispatch(
         ProtocolStorageActions.updateProtocolList(storedProtocolsData, source)
       )
@@ -84,12 +81,18 @@ export function registerProtocolStorage(dispatch: Dispatch): Dispatch {
       }
 
       case ProtocolStorageActions.ADD_PROTOCOL: {
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         FileSystem.addProtocolFile(
           action.payload.protocolFilePath,
           FileSystem.PROTOCOLS_DIRECTORY_PATH
-        ).then(() =>
-          fetchProtocols(dispatch, ProtocolStorageActions.PROTOCOL_ADDITION)
         )
+          .then(runFileWithPython)
+          .then(() => {
+            return fetchProtocols(
+              dispatch,
+              ProtocolStorageActions.PROTOCOL_ADDITION
+            )
+          })
         break
       }
 

@@ -19,11 +19,7 @@ module.exports = {
   ],
   extraResources: [
     {
-      from: {
-        darwin: 'python_mac',
-        linux: 'python_linux',
-        win32: 'python_windows',
-      }[process.platform],
+      from: 'python',
       to: 'python',
       filter: ['**/*'],
     },

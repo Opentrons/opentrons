@@ -100,7 +100,7 @@ export function parseProtocolDirs(
 export function addProtocolFile(
   mainFileSourcePath: string,
   protocolsDirPath: string
-): Promise<void> {
+): Promise<string> {
   const protocolKey = uuid()
   const protocolDirPath = path.join(protocolsDirPath, protocolKey)
 
@@ -127,6 +127,7 @@ export function addProtocolFile(
         JSON.stringify(stubbedAnalysis)
       )
     )
+    .then(() => mainFileDestPath)
 }
 
 export function removeProtocolByKey(
