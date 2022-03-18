@@ -12,7 +12,7 @@ from typing import Any, Dict, List, Optional, Union
 from pydantic import BaseModel, Extra, Field
 from typing_extensions import Literal
 
-from .labware_definition import LabwareDefinition as LabwareDefinition
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.protocol import dev_types
 
 CommandAspirate: dev_types.AspirateCommandId = "aspirate"
