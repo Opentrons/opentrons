@@ -183,7 +183,7 @@ describe('ModuleOverflowMenu', () => {
   let mockCreateLiveCommand = jest.fn()
   beforeEach(() => {
     mockCreateLiveCommand = jest.fn()
-
+    mockCreateLiveCommand.mockResolvedValue(null)
     props = {
       module: mockMagneticModule,
       handleClick: jest.fn(),

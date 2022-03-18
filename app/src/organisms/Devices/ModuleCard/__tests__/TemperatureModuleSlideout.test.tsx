@@ -29,6 +29,7 @@ describe('TemperatureModuleSlideout', () => {
 
   beforeEach(() => {
     mockCreateLiveCommand = jest.fn()
+    mockCreateLiveCommand.mockResolvedValue(null)
     props = {
       module: mockTemperatureModule,
       isExpanded: true,

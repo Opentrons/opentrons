@@ -90,6 +90,10 @@ export const ModuleOverflowMenu = (
   const handleDeactivation = (): void => {
     createLiveCommand({
       command: deactivateCommand,
+    }).catch((e: Error) => {
+      console.error(
+        `error setting module status with command type ${deactivateCommand.commandType}: ${e.message}`
+      )
     })
   }
 
@@ -149,6 +153,10 @@ export const ModuleOverflowMenu = (
   const handleLatch = (): void => {
     createLiveCommand({
       command: latchCommand,
+    }).catch((e: Error) => {
+      console.error(
+        `error setting module status with command type ${latchCommand.commandType}: ${e.message}`
+      )
     })
   }
 

@@ -10,7 +10,12 @@ import {
   COLORS,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
-import { CELSIUS, getModuleDisplayName } from '@opentrons/shared-data'
+import {
+  CELSIUS,
+  getModuleDisplayName,
+  TEMP_MAX,
+  TEMP_MIN,
+} from '@opentrons/shared-data'
 import { Slideout } from '../../../atoms/Slideout'
 import { PrimaryButton } from '../../../atoms/Buttons'
 import { InputField } from '../../../atoms/InputField'
@@ -24,9 +29,6 @@ interface TemperatureModuleSlideoutProps {
   isExpanded: boolean
 }
 
-const MIN = 4
-const MAX = 99
-
 export const TemperatureModuleSlideout = (
   props: TemperatureModuleSlideoutProps
 ): JSX.Element | null => {
@@ -38,18 +40,21 @@ export const TemperatureModuleSlideout = (
     null
   )
 
-  const saveTempCommand: TemperatureModuleSetTargetTemperatureCreateCommand = {
-    commandType: 'temperatureModule/setTargetTemperature',
-    params: {
-      moduleId: module.id,
-      temperature: temperatureValue != null ? parseInt(temperatureValue) : 0,
-    },
-  }
-
   const handleSubmitTemperature = (): void => {
     if (temperatureValue != null) {
+      const saveTempCommand: TemperatureModuleSetTargetTemperatureCreateCommand = {
+        commandType: 'temperatureModule/setTargetTemperature',
+        params: {
+          moduleId: module.id,
+          temperature: parseInt(temperatureValue),
+        },
+      }
       createLiveCommand({
         command: saveTempCommand,
+      }).catch((e: Error) => {
+        console.error(
+          `error setting module status with command type ${saveTempCommand.commandType}: ${e.message}`
+        )
       })
     }
     setTemperatureValue(null)
@@ -57,20 +62,21 @@ export const TemperatureModuleSlideout = (
 
   const valueOutOfRange =
     temperatureValue != null &&
-    (parseInt(temperatureValue) < 4 || parseInt(temperatureValue) > 99)
+    (parseInt(temperatureValue) < TEMP_MIN ||
+      parseInt(temperatureValue) > TEMP_MAX)
 
   return (
     <Slideout
       title={t('tempdeck_slideout_title', { name: name })}
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
-      height={`calc(100vh - ${SPACING.spacing4})`} // subtract breadcrumb strip
+      height={`calc(100vh - ${SPACING.spacing4})`}
       footer={
         <PrimaryButton
           width="100%"
           onClick={handleSubmitTemperature}
           disabled={temperatureValue === null || valueOutOfRange}
-          data-testid={`Temp_Slideout_set_temp_btn_${name}`}
+          data-testid={`TemperatureSlideout_btn_${name}`}
         >
           {t('set_temp_slideout')}
         </PrimaryButton>
@@ -80,7 +86,7 @@ export const TemperatureModuleSlideout = (
         fontWeight={FONT_WEIGHT_REGULAR}
         fontSize={TYPOGRAPHY.fontSizeP}
         paddingTop={SPACING.spacing2}
-        data-testid={`Temp_Slideout_body_text_${name}`}
+        data-testid={`TemperatureSlideout_body_text_${name}`}
       >
         {t('tempdeck_slideout_body', {
           model: name,
@@ -89,7 +95,7 @@ export const TemperatureModuleSlideout = (
       <Flex
         marginTop={SPACING.spacing4}
         flexDirection={DIRECTION_COLUMN}
-        data-testid={`Temp_Slideout_input_field_${name}`}
+        data-testid={`TemperatureSlideout_input_field_${name}`}
       >
         <Text
           fontWeight={FONT_WEIGHT_REGULAR}
@@ -108,17 +114,11 @@ export const TemperatureModuleSlideout = (
           onChange={e => setTemperatureValue(e.target.value)}
           type="number"
           caption={t('module_status_range', {
-            min: MIN,
-            max: MAX,
+            min: TEMP_MIN,
+            max: TEMP_MAX,
             unit: CELSIUS,
           })}
-          error={
-            temperatureValue != null &&
-            (parseInt(temperatureValue) < MIN ||
-              parseInt(temperatureValue) > MAX)
-              ? t('input_out_of_range')
-              : null
-          }
+          error={valueOutOfRange ? t('input_out_of_range') : null}
         />
       </Flex>
     </Slideout>

@@ -26,6 +26,7 @@ describe('ThermocyclerModuleSlideout', () => {
   let mockCreateLiveCommand = jest.fn()
   beforeEach(() => {
     mockCreateLiveCommand = jest.fn()
+    mockCreateLiveCommand.mockResolvedValue(null)
     mockUseLiveCommandMutation.mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)

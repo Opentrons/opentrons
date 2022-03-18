@@ -24,6 +24,7 @@ describe('HeaterShakerSlideout', () => {
 
   beforeEach(() => {
     mockCreateLiveCommand = jest.fn()
+    mockCreateLiveCommand.mockResolvedValue(null)
     mockUseLiveCommandMutation.mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
@@ -106,9 +107,10 @@ describe('HeaterShakerSlideout', () => {
 
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
-        commandType: 'heaterShakerModule/awaitTemperature',
+        commandType: 'heaterShakerModule/startSetTargetTemperature',
         params: {
           moduleId: 'heatershaker_id',
+          temperature: 20,
         },
       },
     })

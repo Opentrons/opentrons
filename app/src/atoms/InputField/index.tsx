@@ -9,12 +9,13 @@ import {
   SPACING,
   BORDERS,
   TYPOGRAPHY,
+  COLOR_WARNING_DARK,
 } from '@opentrons/components'
 import { css } from 'styled-components'
 
-export const INPUT_TYPE_NUMBER: 'number' = 'number'
-export const INPUT_TYPE_TEXT: 'text' = 'text'
-export const INPUT_TYPE_PASSWORD: 'password' = 'password'
+export const INPUT_TYPE_NUMBER = 'number' as const
+export const INPUT_TYPE_TEXT = 'text' as const
+export const INPUT_TYPE_PASSWORD = 'password' as const
 
 export interface InputFieldProps {
   /** field is disabled if value is true */
@@ -68,7 +69,7 @@ export function InputField(props: InputFieldProps): JSX.Element {
       lineHeight={1}
       fontSize={TYPOGRAPHY.fontSizeP}
       fontWeight={TYPOGRAPHY.fontWeightRegular}
-      color={props.error ? '#9e5e00' : COLORS.darkBlack}
+      color={props.error ? COLOR_WARNING_DARK : COLORS.darkBlack}
       opacity={props.disabled ? 0.5 : ''}
     >
       <Input {...props} />
@@ -83,7 +84,6 @@ function Input(props: InputFieldProps): JSX.Element {
 
   const INPUT_FIELD = css`
     display: flex;
-    flex: 1 1;
     background-color: ${COLORS.white};
     border-radius: ${SPACING.spacing2};
     padding: ${SPACING.spacing3};
@@ -123,15 +123,10 @@ function Input(props: InputFieldProps): JSX.Element {
           data-testid={props.id}
           value={value}
           placeholder={placeHolder}
-          onFocus={props.disabled ? undefined : props.onFocus}
-          onBlur={props.onBlur}
-          onClick={props.disabled ? undefined : props.onClick}
-          onChange={props.disabled ? undefined : props.onChange}
         />
         {props.units && (
           <Flex
             display={DISPLAY_INLINE_BLOCK}
-            flex="1 0"
             textAlign={TEXT_ALIGN_RIGHT}
             alignSelf={ALIGN_CENTER}
             color={COLORS.darkGreyEnabled}

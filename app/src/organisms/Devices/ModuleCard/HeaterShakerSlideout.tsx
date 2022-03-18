@@ -1,7 +1,15 @@
 import * as React from 'react'
-import { parseInt } from 'lodash'
 import { useTranslation } from 'react-i18next'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import {
+  getModuleDisplayName,
+  RPM,
+  CELSIUS,
+  RPM_MAX,
+  TEMP_MAX,
+  RPM_MIN,
+  TEMP_MIN,
+} from '@opentrons/shared-data'
 import { Slideout } from '../../../atoms/Slideout'
 import {
   COLORS,
@@ -14,11 +22,10 @@ import {
 } from '@opentrons/components'
 import { PrimaryButton } from '../../../atoms/Buttons'
 import { InputField } from '../../../atoms/InputField'
-import { getModuleDisplayName, RPM, CELSIUS } from '@opentrons/shared-data'
 
 import type { AttachedModule } from '../../../redux/modules/types'
 import type {
-  HeaterShakerAwaitTemperatureCreateCommand,
+  HeaterShakerStartSetTargetTemperatureCreateCommand,
   HeaterShakerSetTargetShakeSpeedCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
@@ -39,23 +46,30 @@ export const HeaterShakerSlideout = (
   const moduleName = getModuleDisplayName(module.model)
   const modulePart = isSetShake ? t('shake_speed') : t('temperature')
 
-  const saveTempCommand: HeaterShakerAwaitTemperatureCreateCommand = {
-    commandType: 'heaterShakerModule/awaitTemperature',
-    params: { moduleId: module.id },
-  }
-  const saveShakeCommand: HeaterShakerSetTargetShakeSpeedCreateCommand = {
-    commandType: 'heaterShakerModule/setTargetShakeSpeed',
-    params: {
-      moduleId: module.id,
-      //  the 0 will never be reached because the button will be disabled if the field is left empty
-      rpm: hsValue != null ? parseInt(hsValue) : 0,
-    },
-  }
-
   const handleSubmitCommand = (): void => {
     if (hsValue != null) {
+      const saveTempCommand: HeaterShakerStartSetTargetTemperatureCreateCommand = {
+        commandType: 'heaterShakerModule/startSetTargetTemperature',
+        params: {
+          moduleId: module.id,
+          temperature: parseInt(hsValue),
+        },
+      }
+      const saveShakeCommand: HeaterShakerSetTargetShakeSpeedCreateCommand = {
+        commandType: 'heaterShakerModule/setTargetShakeSpeed',
+        params: {
+          moduleId: module.id,
+          rpm: parseInt(hsValue),
+        },
+      }
       createLiveCommand({
         command: isSetShake ? saveShakeCommand : saveTempCommand,
+      }).catch((e: Error) => {
+        console.error(
+          `error setting module status with command type ${
+            saveShakeCommand.commandType ?? saveTempCommand.commandType
+          }: ${e.message}`
+        )
       })
     }
     setHsValue(null)
@@ -64,18 +78,20 @@ export const HeaterShakerSlideout = (
   let errorMessage
   if (isSetShake) {
     errorMessage =
-      hsValue != null && (parseInt(hsValue) < 200 || parseInt(hsValue) > 1800)
+      hsValue != null &&
+      (parseInt(hsValue) < RPM_MIN || parseInt(hsValue) > RPM_MAX)
         ? t('input_out_of_range')
         : null
   } else {
     errorMessage =
-      hsValue != null && (parseInt(hsValue) < 4 || parseInt(hsValue) > 99)
+      hsValue != null &&
+      (parseInt(hsValue) < TEMP_MIN || parseInt(hsValue) > TEMP_MAX)
         ? t('input_out_of_range')
         : null
   }
 
-  const inputMax = isSetShake ? 1800 : 99
-  const inputMin = isSetShake ? 200 : 4
+  const inputMax = isSetShake ? RPM_MAX : TEMP_MAX
+  const inputMin = isSetShake ? RPM_MIN : TEMP_MIN
   const unit = isSetShake ? RPM : CELSIUS
 
   return (
@@ -92,7 +108,7 @@ export const HeaterShakerSlideout = (
           onClick={handleSubmitCommand}
           disabled={hsValue === null || errorMessage !== null}
           width="100%"
-          data-testid={`Hs_set_value_${module.model}`}
+          data-testid={`HeaterShakerSlideout_btn_${module.model}_${isSetShake}`}
         >
           {t('set_temp_or_shake', { part: modulePart })}
         </PrimaryButton>
@@ -102,14 +118,14 @@ export const HeaterShakerSlideout = (
         fontWeight={FONT_WEIGHT_REGULAR}
         fontSize={TYPOGRAPHY.fontSizeP}
         paddingTop={SPACING.spacing2}
-        data-testid={`Hs_slideout_body_text_${module.model}`}
+        data-testid={`HeaterShakerSlideout_title_${module.model}_${isSetShake}`}
       >
         {isSetShake ? t('set_shake_of_hs') : t('set_target_temp_of_hs')}
       </Text>
       <Flex
         marginTop={SPACING.spacing4}
         flexDirection={DIRECTION_COLUMN}
-        data-testid={`HS_Slideout_input_field_${module.model}`}
+        data-testid={`HeaterShakerSlideout_input_field_${module.model}_${isSetShake}`}
       >
         <Text
           fontWeight={FONT_WEIGHT_REGULAR}

@@ -26,6 +26,7 @@ describe('MagneticModuleSlideout', () => {
   let mockCreateLiveCommand = jest.fn()
   beforeEach(() => {
     mockCreateLiveCommand = jest.fn()
+    mockCreateLiveCommand.mockResolvedValue(null)
     props = {
       module: mockMagneticModule,
       isExpanded: true,

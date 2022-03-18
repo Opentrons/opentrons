@@ -1,6 +1,13 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { CELSIUS, getModuleDisplayName } from '@opentrons/shared-data'
+import {
+  CELSIUS,
+  getModuleDisplayName,
+  TEMP_LID_MAX,
+  TEMP_LID_MIN,
+  TEMP_MAX,
+  TEMP_MIN,
+} from '@opentrons/shared-data'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { Slideout } from '../../../atoms/Slideout'
 import { InputField } from '../../../atoms/InputField'
@@ -43,37 +50,42 @@ export const ThermocyclerModuleSlideout = (
   if (isSecondaryTemp) {
     errorMessage =
       tempValue != null &&
-      (parseInt(tempValue) < 37 || parseInt(tempValue) > 110)
+      (parseInt(tempValue) < TEMP_LID_MIN || parseInt(tempValue) > TEMP_LID_MAX)
         ? t('input_out_of_range')
         : null
   } else {
     errorMessage =
-      tempValue != null && (parseInt(tempValue) < 4 || parseInt(tempValue) > 99)
+      tempValue != null &&
+      (parseInt(tempValue) < TEMP_MIN || parseInt(tempValue) > TEMP_MAX)
         ? t('input_out_of_range')
         : null
   }
 
-  const saveLidCommand: TCSetTargetLidTemperatureCreateCommand = {
-    commandType: 'thermocycler/setTargetLidTemperature',
-    params: {
-      moduleId: module.id,
-      //  the 0 int will never be reached because the button will be disabled if the field is left empty
-      temperature: tempValue != null ? parseInt(tempValue) : 0,
-    },
-  }
-  const saveBlockCommand: TCSetTargetBlockTemperatureCreateCommand = {
-    commandType: 'thermocycler/setTargetBlockTemperature',
-    params: {
-      moduleId: module.id,
-      temperature: tempValue != null ? parseInt(tempValue) : 0,
-      //  TODO(jr, 3/17/22): add volume, which will be provided by PD protocols
-    },
-  }
-
   const handleSubmitTemp = (): void => {
     if (tempValue != null) {
+      const saveLidCommand: TCSetTargetLidTemperatureCreateCommand = {
+        commandType: 'thermocycler/setTargetLidTemperature',
+        params: {
+          moduleId: module.id,
+          temperature: parseInt(tempValue),
+        },
+      }
+      const saveBlockCommand: TCSetTargetBlockTemperatureCreateCommand = {
+        commandType: 'thermocycler/setTargetBlockTemperature',
+        params: {
+          moduleId: module.id,
+          temperature: parseInt(tempValue),
+          //  TODO(jr, 3/17/22): add volume, which will be provided by PD protocols
+        },
+      }
       createLiveCommand({
         command: isSecondaryTemp ? saveLidCommand : saveBlockCommand,
+      }).catch((e: Error) => {
+        console.error(
+          `error setting module status with command type ${
+            saveLidCommand.commandType ?? saveBlockCommand.commandType
+          }: ${e.message}`
+        )
       })
     }
     setTempValue(null)
@@ -90,7 +102,7 @@ export const ThermocyclerModuleSlideout = (
           onClick={handleSubmitTemp}
           disabled={tempValue === null || errorMessage !== null}
           width="100%"
-          data-testid={`TC_Slideout_set_height_btn_${module.model}`}
+          data-testid={`ThermocyclerSlideout_btn_${module.model}_${isSecondaryTemp}`}
         >
           {t('set_tc_temp_slideout', { part: modulePart })}
         </PrimaryButton>
@@ -100,7 +112,7 @@ export const ThermocyclerModuleSlideout = (
         fontWeight={FONT_WEIGHT_REGULAR}
         fontSize={TYPOGRAPHY.fontSizeP}
         paddingTop={SPACING.spacing2}
-        data-testid={`TC_Slideout_body_text_${module.model}`}
+        data-testid={`ThermocyclerSlideout_text_${module.model}_${isSecondaryTemp}`}
       >
         {t('tc_set_temperature_body', {
           part: modulePart,
@@ -111,7 +123,7 @@ export const ThermocyclerModuleSlideout = (
       <Flex
         marginTop={SPACING.spacing4}
         flexDirection={DIRECTION_COLUMN}
-        data-testid={`TC_Slideout_input_field_${module.model}`}
+        data-testid={`ThermocyclerSlideout_input_field_${module.model}_${isSecondaryTemp}`}
       >
         <Text
           fontWeight={FONT_WEIGHT_REGULAR}
@@ -148,8 +160,8 @@ interface TemperatureRanges {
 
 const getTCTempRange = (isSecondaryTemp = false): TemperatureRanges => {
   if (isSecondaryTemp) {
-    return { min: 37, max: 110 }
+    return { min: TEMP_LID_MIN, max: TEMP_LID_MAX }
   } else {
-    return { min: 4, max: 99 }
+    return { min: TEMP_MIN, max: TEMP_MAX }
   }
 }
