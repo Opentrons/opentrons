@@ -181,7 +181,6 @@ class ProtocolEngine:
         self._queue_worker.cancel()
         await self._hardware_stopper.do_halt()
 
-    # TODO(mc, 2021-12-27): commands.get_all_complete not yet implemented
     async def wait_until_complete(self) -> None:
         """Wait until there are no more commands to execute.
 
