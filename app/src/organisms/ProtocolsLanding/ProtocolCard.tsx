@@ -81,10 +81,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
     metadata?.protocolName ?? first(srcFileNames) ?? protocolKey
 
   return (
-    <Link
-      to={`/protocols/${protocolKey}`}
-      style={{ color: 'inherit'}}
-    >
+    <Link to={`/protocols/${protocolKey}`} style={{ color: 'inherit' }}>
       <Flex
         backgroundColor={COLORS.white}
         border={`1px solid ${COLORS.medGrey}`}
