@@ -1,0 +1,69 @@
+test_name: loadModule command success
+
+marks:
+  - usefixtures:
+      - run_server
+  - parametrize:
+      key: model
+      vals:
+        - magneticModuleV1
+        - thermocyclerModuleV1
+        - temperatureModuleV1
+        - temperatureModuleV2 # can map to attached temperatureModuleV1
+        - heaterShakerModuleV1
+
+stages:
+  - name: Get modules
+    request:
+      url: '{host:s}:{port:d}/modules'
+      method: GET
+    response:
+      status_code: 200
+  - name: Create Empty Run
+    request:
+      url: '{host:s}:{port:d}/runs'
+      json:
+        data: {}
+      method: POST
+    response:
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          status: idle
+          current: true
+          actions: []
+          errors: []
+          pipettes: []
+          labware:
+            - id: fixedTrash
+              loadName: opentrons_1_trash_1100ml_fixed
+              definitionUri: opentrons/opentrons_1_trash_1100ml_fixed/1
+              location:
+                slotName: '12'
+          labwareOffsets: []
+      save:
+        json:
+          run_id: data.id
+  - name: Create loadModule Magnetic Module Command
+    request:
+      url: '{host:s}:{port:d}/runs/{run_id}/commands'
+      method: POST
+      params:
+        waitUntilComplete: true
+      json:
+        data:
+          commandType: loadModule
+          params:
+            model: "{model}"
+            location:
+              slotName: '10'
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          status: succeeded
+
