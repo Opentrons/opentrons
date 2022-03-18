@@ -35,7 +35,16 @@ PipetteModel = NewType("PipetteModel", str)
 
 DisplayCategory = Union[Literal["GEN1"], Literal["GEN2"]]
 
-ConfigUnit = Union[Literal["mm"], Literal["amps"], Literal["mm/sec"]]
+# todo(mm, 2022-03-18):
+# The JSON schema defines this as any string, not as an enum of string literals.
+# Check if it's safe to simplify this to just str.
+ConfigUnit = Union[
+    Literal["mm"],
+    Literal["amps"],
+    Literal["mm/sec"],
+    Literal["mm/s"],  # todo(mm, 2022-03-18): Standardize specs to mm/sec or mm/s.
+    Literal["presses"]
+]
 
 Quirk = NewType("Quirk", str)
 
