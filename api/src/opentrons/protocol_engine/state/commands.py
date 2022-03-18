@@ -91,37 +91,42 @@ class CommandEntry:
 class CommandState:
     """State of all protocol engine command resources."""
 
-    # All command IDs, in insertion order.
     all_command_ids: List[str]
+    """All command IDs, in insertion order."""
 
-    # The IDs of queued commands, in FIFO order.
     queued_command_ids: OrderedSet[str]
+    """The IDs of queued commands, in FIFO order"""
 
-    # The ID of the currently running command, if any.
     running_command_id: Optional[str]
+    """The ID of the currently running command, if any"""
 
-    # All command resources, in insertion order, mapped by their unique IDs.
     commands_by_id: Dict[str, CommandEntry]
+    """All command resources, in insertion order, mapped by their unique IDs."""
 
-    # Whether the engine is currently pulling new commands off the queue to execute.
-    # A command may still be executing, and the robot may still be in motion,
-    # even if INACTIVE.
     queue_status: QueueStatus
+    """Whether the engine is currently pulling new commands off the queue to execute.
 
-    # Whether the engine's hardware has ceased motion.
-    # Once set, this flag cannot be unset.
+    A command may still be executing, and the robot may still be in motion,
+    even if INACTIVE.
+    """
+
     is_hardware_stopped: bool
+    """Whether the engine's hardware has ceased motion.
 
-    # Whether the door is open when enable_door_safety_switch
-    # feature flag is ON.
+    Once set, this flag cannot be unset.
+    """
+
     is_door_blocking: bool
+    """Whether the door is open when enable_door_safety_switch feature flag is ON."""
 
-    # Whether the run is done and succeeded, failed, or stopped.
-    # Once set, this status cannot be unset.
     run_result: Optional[RunResult]
+    """Whether the run is done and succeeded, failed, or stopped.
 
-    # All error occurrences, mapped by their unique IDs.
+    Once set, this status cannot be unset.
+    """
+
     errors_by_id: Dict[str, ErrorOccurrence]
+    """All error occurrences, mapped by their unique IDs."""
 
 
 class CommandStore(HasState[CommandState], HandlesActions):
