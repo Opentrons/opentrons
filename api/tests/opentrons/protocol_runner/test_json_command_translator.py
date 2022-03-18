@@ -139,7 +139,6 @@ def test_dispense(subject: JsonCommandTranslator) -> None:
 
 
 def test_drop_tip(subject: JsonCommandTranslator) -> None:
-    """It should translate a JSON drop tip to a ProtocolEngine DropTipCreate."""
     input_json_command = json_v6_models.Command(
         id="dropTip-command-id-666",
         commandType="dropTip",
@@ -150,6 +149,7 @@ def test_drop_tip(subject: JsonCommandTranslator) -> None:
                                                      offset=json_v6_models.OffsetVector(x=0, y=0, z=7.89))
         ),
     )
+    """It should translate a JSON drop tip to a ProtocolEngine DropTipCreate."""
     expected_output = [
         pe_commands.DropTipCreate(
             params=pe_commands.DropTipParams(
@@ -173,7 +173,12 @@ def test_pick_up_tip(subject: JsonCommandTranslator) -> None:
         id="pickUpTip-command-id-666",
         commandType="pickUpTip",
         params=json_v6_models.Params(
-            pipetteId="pipette-id-abc123", labwareId="labware-id-def456", wellName="A1"
+            pipetteId="pipette-id-abc123",
+            labwareId="labware-id-def456",
+            wellName="A1",
+            # added wellLocation - its expected in pe_commands
+            wellLocation=json_v6_models.WellLocation(origin="bottom",
+                                                     offset=json_v6_models.OffsetVector(x=0, y=0, z=7.89))
         ),
     )
     expected_output = [
@@ -182,6 +187,9 @@ def test_pick_up_tip(subject: JsonCommandTranslator) -> None:
                 pipetteId="pipette-id-abc123",
                 labwareId="labware-id-def456",
                 wellName="A1",
+                wellLocation=WellLocation(
+                    origin=WellOrigin.BOTTOM,
+                    offset=WellOffset(x=0, y=0, z=7.89))
             )
         )
     ]
