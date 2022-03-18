@@ -13,4 +13,3 @@ def test_update(mock_root_fs_interface: MagicMock, mock_partition_manager: Magic
     updater.update()
     mock_partition_manager.find_unused_partition.assert_called()
     mock_root_fs_interface.write_update.assert_called()
-
