@@ -186,7 +186,7 @@ def test_pause(subject: JsonCommandTranslator) -> None:
     """It should translate delay with wait=True to a PauseCreate."""
     input_command = json_v6_models.Command(
         id="delay-command-id-666",
-        commandType="delay",
+        commandType="pause", #used to be delay but is expecting pause
         params=json_v6_models.Params(
             wait=True,
             message="hello world",
