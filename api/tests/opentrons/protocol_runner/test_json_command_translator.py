@@ -65,104 +65,8 @@ def _make_json_protocol(
         commands=commands,
     )
 
+#TODO test a protocol with a list of commands (Tamar and Max)
 
-# def test_labware(
-#     subject: JsonCommandTranslator,
-#     minimal_labware_def: LabwareDefinition,
-#     minimal_labware_def2: LabwareDefinition,
-# ) -> None:
-#     """It should emit AddLabwareDefinitionCreate and LoadLabwareCreate objects.
-#
-#     A LoadLabwareCreate should always come after the AddLabwareDefinitionCreate
-#     that it depends on.
-#     """
-#     definition_1 = models.LabwareDefinition.parse_obj(minimal_labware_def)
-#     definition_2 = models.LabwareDefinition.parse_obj(minimal_labware_def2)
-#
-#     definition_map = {
-#         "definition-id-abc123": definition_1,
-#         "definition-id-def456": definition_2,
-#     }
-#
-#     labware_map = {
-#         "labware-id-abc123": models.json_protocol.Labware(
-#             slot="1", definitionId="definition-id-abc123"
-#         ),
-#         "labware-id-def456": models.json_protocol.Labware(
-#             slot="2", definitionId="definition-id-def456"
-#         ),
-#     }
-#
-#     # todo(mm, 2021-06-30): This test pulls internal details out of fixtures, like
-#     # definition_1.parameters.loadName. This makes it hard to read and follow. Instead,
-#     # it should created its own labware definitions with hard-coded values like
-#     # "my-load-name", and then assert that the hard-coded string "my-load-name" is
-#     # what's used in the output Protocol Engine command.
-#
-#     expected_load_request_1 = pe_commands.LoadLabwareCreate(
-#         params=pe_commands.LoadLabwareParams(
-#             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-#             loadName=definition_1.parameters.loadName,
-#             namespace=definition_1.namespace,
-#             version=definition_1.version,
-#             labwareId="labware-id-abc123",
-#         )
-#     )
-#
-#     expected_load_request_2 = pe_commands.LoadLabwareCreate(
-#         params=pe_commands.LoadLabwareParams(
-#             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
-#             loadName=definition_2.parameters.loadName,
-#             namespace=definition_2.namespace,
-#             version=definition_2.version,
-#             labwareId="labware-id-def456",
-#         )
-#     )
-#
-#     result = subject.translate(
-#         _make_json_protocol
-#         (labware_definitions=definition_map, labware=labware_map)
-#     )
-#
-#     _assert_appear_in_order(
-#         elements=[expected_load_request_1, expected_load_request_2],
-#         source=result,
-#     )
-#
-#     assert len(result) == 2
-#
-#
-# def test_pipettes(subject: JsonCommandTranslator) -> None:
-#     """It should translate pipette specs into LoadPipetteCreate objects."""
-#     json_pipettes = {
-#         "abc123": models.json_protocol.Pipettes(mount="left", name="p20_single_gen2"),
-#         "def456": models.json_protocol.Pipettes(mount="right", name="p300_multi"),
-#     }
-#
-#     expected_request_1 = pe_commands.LoadPipetteCreate(
-#         params=pe_commands.LoadPipetteParams(
-#             pipetteId="abc123",
-#             mount=MountType.LEFT,
-#             pipetteName=PipetteName.P20_SINGLE_GEN2,
-#         )
-#     )
-#
-#     expected_request_2 = pe_commands.LoadPipetteCreate(
-#         params=pe_commands.LoadPipetteParams(
-#             pipetteId="def456",
-#             mount=MountType.RIGHT,
-#             pipetteName=PipetteName.P300_MULTI,
-#         )
-#     )
-#
-#     result = subject.translate(_make_json_protocol(pipettes=json_pipettes))
-#
-#     # set() would be a nicer way to write this, but our Pydantic models aren't hashable.
-#     assert expected_request_1 in result
-#     assert expected_request_2 in result
-#     assert len(result) == 2
-#
-#
 def test_aspirate(subject: JsonCommandTranslator) -> None:
     """It should translate a JSON aspirate to a Protocol Engine AspirateCreate."""
     input_json_command = json_v6_models.Command(
@@ -198,95 +102,100 @@ def test_aspirate(subject: JsonCommandTranslator) -> None:
     assert output == expected_output
 
 
-# def test_dispense(subject: JsonCommandTranslator) -> None:
-#     """It should translate a JSON dispense to a ProtocolEngine DispenseCreate."""
-#     input_json_command = models.json_protocol.LiquidCommand(
-#         command="dispense",
-#         params=models.json_protocol.Params(
-#             pipette="pipette-id-abc123",
-#             labware="labware-id-def456",
-#             volume=1.23,
-#             flowRate=4.56,
-#             well="A1",
-#             offsetFromBottomMm=7.89,
-#         ),
-#     )
-#     expected_output = [
-#         pe_commands.DispenseCreate(
-#             params=pe_commands.DispenseParams(
-#                 pipetteId="pipette-id-abc123",
-#                 labwareId="labware-id-def456",
-#                 volume=1.23,
-#                 wellName="A1",
-#                 wellLocation=WellLocation(
-#                     origin=WellOrigin.BOTTOM,
-#                     offset=WellOffset(x=0, y=0, z=7.89),
-#                 ),
-#             )
-#         )
-#     ]
-#
-#     output = subject.translate(_make_json_protocol(commands=[input_json_command]))
-#     assert output == expected_output
-#
-#
-# def test_drop_tip(subject: JsonCommandTranslator) -> None:
-#     """It should translate a JSON drop tip to a ProtocolEngine DropTipCreate."""
-#     input_json_command = models.json_protocol.PickUpDropTipCommand(
-#         command="dropTip",
-#         params=models.json_protocol.PipetteAccessParams(
-#             pipette="pipette-id-abc123", labware="labware-id-def456", well="A1"
-#         ),
-#     )
-#     expected_output = [
-#         pe_commands.DropTipCreate(
-#             params=pe_commands.DropTipParams(
-#                 pipetteId="pipette-id-abc123",
-#                 labwareId="labware-id-def456",
-#                 wellName="A1",
-#             )
-#         )
-#     ]
-#
-#     output = subject.translate(_make_json_protocol(commands=[input_json_command]))
-#     assert output == expected_output
-#
-#
-# def test_pick_up_tip(subject: JsonCommandTranslator) -> None:
-#     """It should translate a JSON pick up tip to a ProtocolEngine PickUpTipCreate."""
-#     input_json_command = models.json_protocol.PickUpDropTipCommand(
-#         command="pickUpTip",
-#         params=models.json_protocol.PipetteAccessParams(
-#             pipette="pipette-id-abc123", labware="labware-id-def456", well="A1"
-#         ),
-#     )
-#     expected_output = [
-#         pe_commands.PickUpTipCreate(
-#             params=pe_commands.PickUpTipParams(
-#                 pipetteId="pipette-id-abc123",
-#                 labwareId="labware-id-def456",
-#                 wellName="A1",
-#             )
-#         )
-#     ]
-#
-#     output = subject.translate(_make_json_protocol(commands=[input_json_command]))
-#     assert output == expected_output
-#
-#
-# def test_pause(subject: JsonCommandTranslator) -> None:
-#     """It should translate delay with wait=True to a PauseCreate."""
-#     input_command = models.json_protocol.DelayCommand(
-#         command="delay",
-#         params=models.json_protocol.DelayCommandParams(
-#             wait=True,
-#             message="hello world",
-#         ),
-#     )
-#     input_protocol = _make_json_protocol(commands=[input_command])
-#
-#     result = subject.translate(input_protocol)
-#
-#     assert result == [
-#         pe_commands.PauseCreate(params=pe_commands.PauseParams(message="hello world"))
-#     ]
+def test_dispense(subject: JsonCommandTranslator) -> None:
+    """It should translate a JSON dispense to a ProtocolEngine DispenseCreate."""
+    input_json_command = json_v6_models.Command(
+        id="dispense-command-id-666",
+        commandType="dispense",
+        params=json_v6_models.Params(
+            pipetteId="pipette-id-abc123",
+            labwareId="labware-id-def456",
+            volume=1.23,
+            flowRate=4.56,
+            wellName="A1",
+            wellLocation=json_v6_models.WellLocation(origin="bottom",
+                                                     offset=json_v6_models.OffsetVector(x=0, y=0, z=7.89))
+        ),
+    )
+    expected_output = [
+        pe_commands.DispenseCreate(
+            params=pe_commands.DispenseParams(
+                pipetteId="pipette-id-abc123",
+                labwareId="labware-id-def456",
+                volume=1.23,
+                wellName="A1",
+                wellLocation=WellLocation(
+                    origin=WellOrigin.BOTTOM,
+                    offset=WellOffset(x=0, y=0, z=7.89),
+                ),
+            )
+        )
+    ]
+
+    output = subject.translate(_make_json_protocol(commands=[input_json_command]))
+    assert output == expected_output
+
+
+def test_drop_tip(subject: JsonCommandTranslator) -> None:
+    """It should translate a JSON drop tip to a ProtocolEngine DropTipCreate."""
+    input_json_command = json_v6_models.Command(
+        id="dropTip-command-id-666",
+        commandType="dropTip",
+        params=json_v6_models.Params(
+            pipetteId="pipette-id-abc123", labwareId="labware-id-def456", wellName="A1"
+        ),
+    )
+    expected_output = [
+        pe_commands.DropTipCreate(
+            params=pe_commands.DropTipParams(
+                pipetteId="pipette-id-abc123",
+                labwareId="labware-id-def456",
+                wellName="A1",
+            )
+        )
+    ]
+
+    output = subject.translate(_make_json_protocol(commands=[input_json_command]))
+    assert output == expected_output
+
+
+def test_pick_up_tip(subject: JsonCommandTranslator) -> None:
+    """It should translate a JSON pick up tip to a ProtocolEngine PickUpTipCreate."""
+    input_json_command = json_v6_models.Command(
+        id="pickUpTip-command-id-666",
+        commandType="pickUpTip",
+        params=json_v6_models.Params(
+            pipetteId="pipette-id-abc123", labwareId="labware-id-def456", wellName="A1"
+        ),
+    )
+    expected_output = [
+        pe_commands.PickUpTipCreate(
+            params=pe_commands.PickUpTipParams(
+                pipetteId="pipette-id-abc123",
+                labwareId="labware-id-def456",
+                wellName="A1",
+            )
+        )
+    ]
+
+    output = subject.translate(_make_json_protocol(commands=[input_json_command]))
+    assert output == expected_output
+
+
+def test_pause(subject: JsonCommandTranslator) -> None:
+    """It should translate delay with wait=True to a PauseCreate."""
+    input_command = json_v6_models.Command(
+        id="delay-command-id-666",
+        commandType="delay",
+        params=json_v6_models.Params(
+            wait=True,
+            message="hello world",
+        ),
+    )
+    input_protocol = _make_json_protocol(commands=[input_command])
+
+    result = subject.translate(input_protocol)
+
+    assert result == [
+        pe_commands.PauseCreate(params=pe_commands.PauseParams(message="hello world"))
+    ]
