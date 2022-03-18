@@ -9,12 +9,6 @@ marks:
         - magneticModuleV2
 
 stages:
-  - name: Get modules
-    request:
-      url: '{host:s}:{port:d}/modules'
-      method: GET
-    response:
-      status_code: 200
   - name: Create Empty Run
     request:
       url: '{host:s}:{port:d}/runs'
@@ -33,7 +27,7 @@ stages:
       save:
         json:
           run_id: data.id
-  - name: Create loadModule Magnetic Module Command
+  - name: Create loadModule Command
     request:
       url: '{host:s}:{port:d}/runs/{run_id}/commands'
       method: POST

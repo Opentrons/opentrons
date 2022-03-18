@@ -30,23 +30,12 @@ stages:
       json:
         data:
           id: !anystr
-          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
           status: idle
           current: true
-          actions: []
-          errors: []
-          pipettes: []
-          labware:
-            - id: fixedTrash
-              loadName: opentrons_1_trash_1100ml_fixed
-              definitionUri: opentrons/opentrons_1_trash_1100ml_fixed/1
-              location:
-                slotName: '12'
-          labwareOffsets: []
       save:
         json:
           run_id: data.id
-  - name: Create loadModule Magnetic Module Command
+  - name: Create loadModule Command
     request:
       url: '{host:s}:{port:d}/runs/{run_id}/commands'
       method: POST
