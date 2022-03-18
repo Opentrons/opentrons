@@ -17,6 +17,17 @@ module.exports = {
     'build/br-premigration-wheels',
     '!Makefile',
   ],
+  extraResources: [
+    {
+      from: {
+        darwin: 'python_mac',
+        linux: 'python_linux',
+        win32: 'python_windows',
+      }[process.platform],
+      to: 'python',
+      filter: ['**/*'],
+    },
+  ],
   /* eslint-disable no-template-curly-in-string */
   artifactName: '${productName}-v${version}-${os}-${env.BUILD_ID}.${ext}',
   /* eslint-enable no-template-curly-in-string */
@@ -25,6 +36,7 @@ module.exports = {
     target: process.platform === 'darwin' ? ['dmg', 'zip'] : ['zip'],
     category: 'public.app-category.productivity',
     type: DEV_MODE ? 'development' : 'distribution',
+    electronLanguages: ['en'],
   },
   dmg: {
     icon: null,
