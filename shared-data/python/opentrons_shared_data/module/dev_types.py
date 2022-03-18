@@ -22,7 +22,7 @@ MagneticModuleModel = Union[Literal["magneticModuleV1"], Literal["magneticModule
 TemperatureModuleModel = Union[
     Literal["temperatureModuleV1"], Literal["temperatureModuleV2"]
 ]
-ThermocyclerModuleModel = Union[Literal["thermocyclerModuleModel"]]
+ThermocyclerModuleModel = Union[Literal["thermocyclerModuleV1"]]
 ModuleModel = Union[
     MagneticModuleModel, TemperatureModuleModel, ThermocyclerModuleModel
 ]
