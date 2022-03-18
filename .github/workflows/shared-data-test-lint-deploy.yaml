@@ -70,6 +70,7 @@ jobs:
       - uses: './.github/actions/python/setup'
         with:
           project: 'shared-data/python'
+          python-version: ${{ matrix.python }}
       - name: 'set complex environment variables'
         uses: actions/github-script@v3.1
         with:
