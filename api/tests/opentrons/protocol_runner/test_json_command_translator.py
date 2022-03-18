@@ -45,11 +45,11 @@ def _assert_appear_in_order(elements: List[Any], source: List[Any]) -> None:
 
 
 def _make_json_protocol(
-    *,
-    pipettes: Dict[str, json_v6_models.Pipette] = {},
-    labware_definitions: Dict[str, LabwareDefinition] = {},
-    labware: Dict[str, json_v6_models.Labware] = {},
-    commands: List[json_v6_models.Command] = [],
+        *,
+        pipettes: Dict[str, json_v6_models.Pipette] = {},
+        labware_definitions: Dict[str, LabwareDefinition] = {},
+        labware: Dict[str, json_v6_models.Labware] = {},
+        commands: List[json_v6_models.Command] = [],
 ) -> json_v6_models.ProtocolSchemaV6:
     """Return a minimal JsonProtocol with the given elements, to use as test input."""
     return json_v6_models.ProtocolSchemaV6(
@@ -65,7 +65,8 @@ def _make_json_protocol(
         commands=commands,
     )
 
-#TODO test a protocol with a list of commands (Tamar and Max)
+
+# TODO test a protocol with a list of commands (Tamar and Max)
 
 def test_aspirate(subject: JsonCommandTranslator) -> None:
     """It should translate a JSON aspirate to a Protocol Engine AspirateCreate."""
@@ -79,7 +80,8 @@ def test_aspirate(subject: JsonCommandTranslator) -> None:
             # todo (Max and Tamar 3/17/22): needs to be added to the aspirate command https://github.com/Opentrons/opentrons/issues/8204
             flowRate=4.56,
             wellName="A1",
-            wellLocation=json_v6_models.WellLocation(origin="bottom", offset=json_v6_models.OffsetVector(x=0, y=0, z=7.89))
+            wellLocation=json_v6_models.WellLocation(origin="bottom",
+                                                     offset=json_v6_models.OffsetVector(x=0, y=0, z=7.89))
         ),
     )
     expected_output = [
@@ -142,7 +144,10 @@ def test_drop_tip(subject: JsonCommandTranslator) -> None:
         id="dropTip-command-id-666",
         commandType="dropTip",
         params=json_v6_models.Params(
-            pipetteId="pipette-id-abc123", labwareId="labware-id-def456", wellName="A1"
+            pipetteId="pipette-id-abc123", labwareId="labware-id-def456", wellName="A1",
+            # added wellLocation - its expected in pe_commands
+            wellLocation=json_v6_models.WellLocation(origin="bottom",
+                                                     offset=json_v6_models.OffsetVector(x=0, y=0, z=7.89))
         ),
     )
     expected_output = [
@@ -151,6 +156,9 @@ def test_drop_tip(subject: JsonCommandTranslator) -> None:
                 pipetteId="pipette-id-abc123",
                 labwareId="labware-id-def456",
                 wellName="A1",
+                wellLocation=WellLocation(
+                    origin=WellOrigin.BOTTOM,
+                    offset=WellOffset(x=0, y=0, z=7.89))
             )
         )
     ]
@@ -186,7 +194,7 @@ def test_pause(subject: JsonCommandTranslator) -> None:
     """It should translate delay with wait=True to a PauseCreate."""
     input_command = json_v6_models.Command(
         id="delay-command-id-666",
-        commandType="pause", #used to be delay but is expecting pause
+        commandType="pause",  # used to be delay but is expecting pause
         params=json_v6_models.Params(
             wait=True,
             message="hello world",
