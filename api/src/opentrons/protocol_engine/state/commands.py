@@ -438,17 +438,17 @@ class CommandView(HasState[CommandState]):
 
         return status == CommandStatus.SUCCEEDED or status == CommandStatus.FAILED
 
-    # TODO(mc, 2021-12-28): the method needs to be re-implemented prior to PAPIv3 prod
-    # Implementation should take care to remain O(1)
     def get_all_complete(self) -> bool:
-        """Get whether all commands have completed.
+        """Get whether all added commands have completed.
 
-        All commands have "completed" if one of the following is true:
-
-        - The hardware has been stopped
-        - There are no queued nor running commands
+        See `get_is_complete()` for what counts as "completed."
         """
-        raise NotImplementedError("CommandView.get_all_complete not yet implemented")
+        # Since every command is either queued, running, failed, or succeeded,
+        # "none running and none queued" == "all succeeded or failed".
+        return (
+            self._state.running_command_id is None
+            and len(self._state.queued_command_ids) == 0
+        )
 
     def get_stop_requested(self) -> bool:
         """Get whether an engine stop has been requested.

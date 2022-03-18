@@ -158,26 +158,23 @@ def test_get_is_complete() -> None:
     assert subject.get_is_complete("command-id-4") is False
 
 
-@pytest.mark.xfail(strict=True, raises=NotImplementedError)
 def test_get_all_complete() -> None:
-    """It should return true if all commands completed or any failed."""
+    """It should return true if no commands queued or running."""
     running_command = create_running_command(command_id="command-id-2")
 
     subject = get_command_view(queued_command_ids=[])
     assert subject.get_all_complete() is True
 
-    subject = get_command_view(queued_command_ids=["command-id-1"])
+    subject = get_command_view(queued_command_ids=["queued-command-id"])
     assert subject.get_all_complete() is False
 
     subject = get_command_view(
-        queued_command_ids=[],
-        commands=[running_command],
+        queued_command_ids=[], running_command_id="running-command-id"
     )
     assert subject.get_all_complete() is False
 
     subject = get_command_view(
         queued_command_ids=[],
-        is_hardware_stopped=True,
         commands=[running_command],
     )
     assert subject.get_all_complete() is True
