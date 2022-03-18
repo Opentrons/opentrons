@@ -105,7 +105,8 @@ class CommandState:
             Implemented as an OrderedDict to behave like an ordered set.
         commands_by_id: All command resources, in insertion order, mapped
             by their unique IDs.
-        errors_by_id: All error occurrences, mapped by their unique IDs.
+        errors_by_id: Error occurences that cause the engine to enter a failed state.
+            Individual command errors are stored on the commands themselves.
     """
 
     queue_status: QueueStatus
@@ -200,19 +201,29 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 detail=str(action.error),
             )
 
-            command_ids_to_fail = [
-                action.command_id,
+            prev_entry = self._state.commands_by_id[action.command_id]
+            self._state.commands_by_id[action.command_id] = CommandEntry(
+                index=prev_entry.index,
+                command=prev_entry.command.copy(
+                    update={
+                        "error": error_occurrence,
+                        "completedAt": action.failed_at,
+                        "status": CommandStatus.FAILED,
+                    }
+                ),
+            )
+
+            other_command_ids_to_fail = [
                 *[i for i in self._state.queued_command_ids.keys()],
             ]
 
-            for command_id in command_ids_to_fail:
+            for command_id in other_command_ids_to_fail:
                 prev_entry = self._state.commands_by_id[command_id]
 
                 self._state.commands_by_id[command_id] = CommandEntry(
                     index=prev_entry.index,
                     command=prev_entry.command.copy(
                         update={
-                            "errorId": action.error_id,
                             "completedAt": action.failed_at,
                             "status": CommandStatus.FAILED,
                         }
@@ -222,7 +233,6 @@ class CommandStore(HasState[CommandState], HandlesActions):
             if self._state.running_command_id == action.command_id:
                 self._state.running_command_id = None
 
-            self._state.errors_by_id[action.error_id] = error_occurrence
             self._state.queued_command_ids.clear()
 
         elif isinstance(action, PlayAction):

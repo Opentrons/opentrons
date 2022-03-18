@@ -189,7 +189,12 @@ async def test_get_run_commands(decoy: Decoy, engine_store: EngineStore) -> None
         startedAt=datetime(year=2022, month=2, day=2),
         completedAt=datetime(year=2023, month=3, day=3),
         params=pe_commands.PauseParams(message="hello world"),
-        errorId="error-id",
+        error=pe_errors.ErrorOccurrence(
+            id="error-id",
+            errorType="PrettyBadError",
+            createdAt=datetime(year=2024, month=4, day=4),
+            detail="Things are not looking good.",
+        ),
     )
 
     engine_state = decoy.mock(cls=StateView)
@@ -223,7 +228,12 @@ async def test_get_run_commands(decoy: Decoy, engine_store: EngineStore) -> None
             completedAt=datetime(year=2023, month=3, day=3),
             status=pe_commands.CommandStatus.FAILED,
             params=pe_commands.PauseParams(message="hello world"),
-            errorId="error-id",
+            error=pe_errors.ErrorOccurrence(
+                id="error-id",
+                errorType="PrettyBadError",
+                createdAt=datetime(year=2024, month=4, day=4),
+                detail="Things are not looking good.",
+            ),
         )
     ]
     assert result.content.meta == MultiBodyMeta(cursor=1, totalLength=3)
