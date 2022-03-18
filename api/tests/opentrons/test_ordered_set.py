@@ -26,6 +26,16 @@ def test_equality() -> None:
     subject_123_also.add(2)
     subject_123_also.add(3)
 
+    subject_123_float = OrderedSet[float]()
+    subject_123_float.add(1.0)
+    subject_123_float.add(2.0)
+    subject_123_float.add(3.0)
+
+    subject_123_str = OrderedSet[str]()
+    subject_123_str.add("1")
+    subject_123_str.add("2")
+    subject_123_str.add("3")
+
     subject_456 = OrderedSet[int]()
     subject_456.add(4)
     subject_456.add(5)
@@ -39,6 +49,8 @@ def test_equality() -> None:
     not_even_an_ordered_set = "💩"
 
     assert subject_123 == subject_123_also
+    assert subject_123 == subject_123_float
+    assert subject_123 != subject_123_str
     assert subject_123 != subject_456
     assert subject_123 != subject_321
     assert subject_123 != not_even_an_ordered_set
