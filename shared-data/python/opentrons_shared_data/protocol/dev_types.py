@@ -431,4 +431,5 @@ class JsonProtocolV3(TypedDict, total=False):
     designerApplication: DesignerApplication
 
 
+# todo(mm, 2022-03-18): Should this include JsonProtocolV5?
 JsonProtocol = Union[JsonProtocolV4, JsonProtocolV3]
