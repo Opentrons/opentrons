@@ -129,7 +129,7 @@ async def send_sensor_command(
     elif command.pipette_mount == "right":
         node = NodeId.pipette_right
     else:
-        node = NodeId.broadcast
+        node = NodeId.pipette_right
     if command.sensor_type == SensorType.pressure:
         await handle_pressure_sensor(command, driver, node, csv, log)
     elif command.sensor_type == SensorType.capacitive:

@@ -32,15 +32,14 @@ class SensorDataType:
     def build(cls, data):  # type: ignore[no-untyped-def]
         """Build function for sensor data type."""
         if isinstance(data, list):
-            cls.backing = Int32Field(cls._convert_to_int(data))
+            backing = Int32Field(cls._convert_to_int(data))
         elif isinstance(data, Int32Field):
-            cls.backing = data
+            backing = data
         else:
-            cls.backing = Int32Field(data)
-        cls.as_int = int(cls.backing.value)
-        return cls
+            backing = Int32Field(data)
+        as_int = int(cls.backing.value)
+        return cls(backing, as_int)
 
-    @property
     def to_float(self) -> float:
         """Convert data to float."""
         return (1.0 * self.as_int) / 2**15

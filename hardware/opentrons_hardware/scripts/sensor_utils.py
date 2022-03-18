@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 
 from typing import Dict, Any, List
 import csv
+from opentrons_hardware.sensors.utils import SensorDataType
 
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
@@ -97,12 +98,14 @@ async def handle_pressure_sensor(
     while datetime.now() - start_time < delta:
         messenger = CanMessenger(driver=driver)
         messenger.start()
-        data = await pressure.read(messenger, pipette_mount, offset=False, timeout=3)
-
+        data = await pressure.read(messenger, pipette_mount, offset=False, timeout=10)
         curr_time = datetime.now().strftime("%H:%M:%S")
-        log.info(f"Pressure data: {data} at: {curr_time}")
-        if csv and data:
-            csv.write_dict({"time": curr_time, "data": data.to_float})
+        if isinstance(data, SensorDataType):
+            log.info(f"Pressure data: {data.to_float()} at: {curr_time}")
+            if csv:
+                csv.write_dict({"time": curr_time, "data": data.to_float()})
+        else:
+            log.info(f"Pressure data not found at: {curr_time}")
 
     end_time = datetime.now().strftime("%H:%M:%S")
     text_end_time = f"Test ended at: {end_time}"
@@ -134,15 +137,19 @@ async def handle_capacitive_sensor(
         )
         csv = CSVFormatter.build(metadata, list(metadata.to_dict().keys()))
     # autozero
-    capacitive.poll(messenger, pipette_mount, 10, timeout=10)
+    await capacitive.poll(messenger, pipette_mount, 10, timeout=10)
     delta = timedelta(minutes=command.minutes)
     while datetime.now() - start_time < delta:
-        data = await capacitive.read(messenger, pipette_mount, offset=False, timeout=3)
+        data = await capacitive.read(messenger, pipette_mount, offset=False, timeout=10)
         curr_time = datetime.now().strftime("%H:%M:%S")
-        log.info(f"Capacitive data: {data} at: {curr_time}")
 
-        if csv and data:
-            csv.write_dict({"time": curr_time, "data": data.to_float})
+        log.info(f"Capacitive data: {data.to_float() if data else 'None'} at: {curr_time}")
+        if isinstance(data, SensorDataType):
+            log.info(f"Capacitive data: {data.to_float()} at: {curr_time}")
+            if csv:
+                csv.write_dict({"time": curr_time, "data": data.to_float()})
+        else:
+            log.info(f"Capacitive data not found at: {curr_time}")
 
     end_time = datetime.now().strftime("%H:%M:%S")
     text_end_time = f"Test ended at: {end_time}"
@@ -175,12 +182,14 @@ async def handle_environment_sensor(
         csv = CSVFormatter.build(metadata, list(metadata.to_dict().keys()))
     delta = timedelta(minutes=command.minutes)
     while datetime.now() - start_time < delta:
-        data = await environment.read(messenger, pipette_mount, timeout=3)
+        data = await environment.read(messenger, pipette_mount, timeout=10)
         curr_time = datetime.now().strftime("%H:%M:%S")
-        log.info(f"Environment data: {data} at: {curr_time}")
-
-        if csv and data:
-            csv.write_dict({"time": curr_time, "data": data.to_float})
+        if isinstance(data, SensorDataType):
+            log.info(f"Capacitive data: {data.to_float()} at: {curr_time}")
+            if csv:
+                csv.write_dict({"time": curr_time, "data": data.to_float()})
+        else:
+            log.info(f"Capacitive data not found at: {curr_time}")
     end_time = datetime.now().strftime("%H:%M:%S")
     text_end_time = f"Test ended at: {end_time}"
     log.info(text_end_time)
