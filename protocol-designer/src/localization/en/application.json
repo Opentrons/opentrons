@@ -20,7 +20,8 @@
     "minutes": "m",
     "hours": "h",
     "degrees": "°C",
-    "cycles": "cycles"
+    "cycles": "cycles",
+    "rpm": "RPM"
   },
   "version": "Protocol Designer Version",
   "beta": "beta",
