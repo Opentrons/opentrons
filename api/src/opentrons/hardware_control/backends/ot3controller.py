@@ -225,10 +225,10 @@ class OT3Controller:
             self._configuration.motion_settings.max_speed_discontinuity.none
         )
         velocities = {ax: -1 * speed_settings[OT3Axis.to_kind(ax)] for ax in axes}
-        if OT3Axis.Z_L in axes or OT3Axis.Z_R in axes:
+        if (OT3Axis.Z_L or OT3Axis.Z_R) in axes:
             distances_z = {ax: distances[ax] for ax in [OT3Axis.Z_L, OT3Axis.Z_R]}
             velocities_z = {ax: velocities[ax] for ax in [OT3Axis.Z_L, OT3Axis.Z_R]}
-            for ax in ([OT3Axis.Z_L, OT3Axis.Z_R and axes)]:
+            for ax in [OT3Axis.Z_L, OT3Axis.Z_R] and axes:
                 del distances[ax]
                 del velocities[ax]
             group_z = create_home_group(distances_z, velocities_z)
