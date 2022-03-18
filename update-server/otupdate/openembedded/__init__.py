@@ -13,7 +13,6 @@ from otupdate.common import (
     name_management,
     update,
 )
-from . import update_actions
 
 LOG = logging.getLogger(__name__)
 
@@ -61,7 +60,6 @@ def get_app(
     app[constants.RESTART_LOCK_NAME] = asyncio.Lock()
     app[constants.DEVICE_BOOT_ID_NAME] = boot_id
     app[constants.DEVICE_NAME_VARNAME] = name
-    update_actions.OT3UpdateActions.build_and_insert(app)
 
     LOG.info(
         "Setup: "
