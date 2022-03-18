@@ -226,8 +226,12 @@ class OT3Controller:
         )
         velocities = {ax: -1 * speed_settings[OT3Axis.to_kind(ax)] for ax in axes}
         if (OT3Axis.Z_L or OT3Axis.Z_R) in axes:
-            distances_z = {ax: distances[ax] for ax in [OT3Axis.Z_L, OT3Axis.Z_R]}
-            velocities_z = {ax: velocities[ax] for ax in [OT3Axis.Z_L, OT3Axis.Z_R]}
+            distances_z = {
+                ax: distances[ax] for ax in ([OT3Axis.Z_L, OT3Axis.Z_R] and axes)
+            }
+            velocities_z = {
+                ax: velocities[ax] for ax in ([OT3Axis.Z_L, OT3Axis.Z_R] and axes)
+            }
             for ax in [OT3Axis.Z_L, OT3Axis.Z_R] and axes:
                 del distances[ax]
                 del velocities[ax]
