@@ -21,10 +21,7 @@ from opentrons_shared_data.pipette import name_config
 from opentrons import types as top_types
 from opentrons.config import robot_configs
 from opentrons.config.types import RobotConfig, OT3Config, GantryLoad
-from .backends.ot3utils import (
-    get_system_constraints,
-    home_axes,
-)
+from .backends.ot3utils import get_system_constraints
 from opentrons_hardware.hardware_control.motion_planning import (
     MoveManager,
     MoveTarget,
@@ -715,7 +712,8 @@ class OT3API(
     async def home(
         self, axes: Optional[Union[List[Axis], List[OT3Axis]]] = None
     ) -> None:
-        """Worker function to home the robot by axis or list of
+        """
+        Worker function to home the robot by axis or list of
         desired axes.
         """
         self._reset_last_mount()
