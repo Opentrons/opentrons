@@ -43,7 +43,7 @@ ConfigUnit = Union[
     Literal["amps"],
     Literal["mm/sec"],
     Literal["mm/s"],  # todo(mm, 2022-03-18): Standardize specs to mm/sec or mm/s.
-    Literal["presses"]
+    Literal["presses"],
 ]
 
 Quirk = NewType("Quirk", str)
