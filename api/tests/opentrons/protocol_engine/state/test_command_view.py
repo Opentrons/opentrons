@@ -1,9 +1,10 @@
 """Labware state store tests."""
 import pytest
-from collections import OrderedDict
 from contextlib import nullcontext as does_not_raise
 from datetime import datetime
 from typing import Dict, List, NamedTuple, Optional, Sequence, Type
+
+from opentrons.ordered_set import OrderedSet
 
 from opentrons.protocol_engine import EngineStatus, commands as cmd, errors
 
@@ -48,7 +49,7 @@ def get_command_view(
         is_door_blocking=is_door_blocking,
         run_result=run_result,
         running_command_id=running_command_id,
-        queued_command_ids=OrderedDict((i, True) for i in queued_command_ids),
+        queued_command_ids=OrderedSet(queued_command_ids),
         errors_by_id=errors_by_id or {},
         all_command_ids=all_command_ids,
         commands_by_id=commands_by_id,

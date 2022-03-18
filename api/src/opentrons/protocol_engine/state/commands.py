@@ -5,7 +5,8 @@ from enum import Enum
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Dict, List, Mapping, Optional
-from typing_extensions import Literal
+
+from opentrons.ordered_set import OrderedSet
 
 from opentrons.hardware_control.types import DoorStateNotification, DoorState
 
@@ -102,20 +103,20 @@ class CommandState:
             Once set, this status cannot be unset.
         running_command_id: The ID of the currently running command, if any.
         queued_command_ids: The IDs of queued commands in FIFO order.
-            Implemented as an OrderedDict to behave like an ordered set.
         commands_by_id: All command resources, in insertion order, mapped
             by their unique IDs.
         errors_by_id: All error occurrences, mapped by their unique IDs.
     """
 
+    all_command_ids: List[str]
+    commands_by_id: Dict[str, CommandEntry]
+    running_command_id: Optional[str]
+    queued_command_ids: OrderedSet[str]
+
     queue_status: QueueStatus
     is_hardware_stopped: bool
     is_door_blocking: bool
     run_result: Optional[RunResult]
-    running_command_id: Optional[str]
-    all_command_ids: List[str]
-    queued_command_ids: OrderedDict[str, Literal[True]]
-    commands_by_id: Dict[str, CommandEntry]
     errors_by_id: Dict[str, ErrorOccurrence]
 
 
@@ -133,7 +134,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             run_result=None,
             running_command_id=None,
             all_command_ids=[],
-            queued_command_ids=OrderedDict(),
+            queued_command_ids=OrderedSet(),
             commands_by_id=OrderedDict(),
             errors_by_id={},
         )
@@ -159,7 +160,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
 
             next_index = len(self._state.all_command_ids)
             self._state.all_command_ids.append(action.command_id)
-            self._state.queued_command_ids[queued_command.id] = True
+            self._state.queued_command_ids.add(queued_command.id)
             self._state.commands_by_id[queued_command.id] = CommandEntry(
                 index=next_index,
                 command=queued_command,
@@ -185,7 +186,10 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     command=command,
                 )
 
-            self._state.queued_command_ids.pop(command.id, None)
+            try:
+                self._state.queued_command_ids.remove(command.id)
+            except KeyError:
+                pass
 
             if command.status == CommandStatus.RUNNING:
                 self._state.running_command_id = command.id
@@ -202,7 +206,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
 
             command_ids_to_fail = [
                 action.command_id,
-                *[i for i in self._state.queued_command_ids.keys()],
+                *[i for i in self._state.queued_command_ids],
             ]
 
             for command_id in command_ids_to_fail:
@@ -390,7 +394,7 @@ class CommandView(HasState[CommandState]):
         if self._state.queue_status == QueueStatus.INACTIVE:
             return None
 
-        return next(iter(self._state.queued_command_ids.keys()), None)
+        return next(iter(self._state.queued_command_ids), None)
 
     def get_is_okay_to_clear(self) -> bool:
         """Get whether the engine is stopped or unplayed so it could be removed."""
