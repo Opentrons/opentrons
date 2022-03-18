@@ -22,6 +22,10 @@ log = logging.getLogger(__name__)
 FLOAT_THRESHOLD = 0.001  # TODO: re-evaluate this value based on system limitations
 
 
+class MoveConditionNotMet(ValueError):
+    """Error raised if a move does not meet its stop condition before finishing."""
+
+
 def apply_constraint(constraint: np.float64, input: np.float64) -> np.float64:
     """Keep the sign of the input but cap the numeric value at the constraint value."""
     return np.copysign(np.minimum(abs(constraint), abs(input)), input)
