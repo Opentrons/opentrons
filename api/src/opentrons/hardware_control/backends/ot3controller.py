@@ -239,11 +239,13 @@ class OT3Controller:
         runner = MoveGroupRunner(move_groups=[group])
         await runner.run(can_messenger=self._messenger)
 
-        for ax in checked_axes:
-            self._position[axis_to_node(ax)] = 0
-        axis_positions = {ax: 0.0 for ax in checked_axes}
+        axis_positions = {
+            axis_to_node(ax): self._get_home_position()[axis_to_node(ax)]
+            for ax in checked_axes
+        }
+        self._position.update(axis_positions)
 
-        return axis_positions
+        return axis_convert(self._position, 0.0)
 
     async def fast_home(
         self, axes: Sequence[OT3Axis], margin: float
