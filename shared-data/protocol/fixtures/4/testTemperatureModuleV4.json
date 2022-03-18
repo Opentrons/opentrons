@@ -1414,7 +1414,7 @@
   "modules": {
     "temperatureModuleId": {
       "slot": "3",
-      "model": "tempdeck"
+      "model": "temperatureModuleV1"
     }
   },
   "commands": [

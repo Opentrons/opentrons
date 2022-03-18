@@ -2150,7 +2150,7 @@
   "modules": {
     "magneticModuleId": {
       "slot": "1",
-      "model": "magdeck"
+      "model": "magneticModuleV1"
     }
   }
 }
