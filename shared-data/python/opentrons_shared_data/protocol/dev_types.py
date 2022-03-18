@@ -228,7 +228,7 @@ class TemperatureModuleDeactivateCommand(TypedDict):
     params: ModuleIDParams
 
 
-class ThermocyclerSetTargetBlockParams(TemperatureParams):
+class ThermocyclerSetTargetBlockParams(TemperatureParams, total=False):
     volume: float
 
 
