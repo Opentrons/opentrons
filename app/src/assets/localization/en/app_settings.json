@@ -16,6 +16,7 @@
   "receive_alert": "Receive an alert when an Opentrons software update is available",
   "connect_ip": "Connect to a Robot via IP Address",
   "connect_ip_description": "Enter an IP address or hostname to connect to a robot. Opentrons recommends working with your network administrator to assign a static IP address to the robot.",
+  "connect_ip_link": "Learn more about connecting a robot manually",
   "set_ip_description": "Manually add IP Address or Hostname",
   "set_ip": "IP Address or Hostname",
   "connect_ip_button": "Done",

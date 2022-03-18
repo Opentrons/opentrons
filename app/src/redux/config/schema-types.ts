@@ -4,7 +4,7 @@ export type UrlProtocol = 'file:' | 'http:'
 
 export type UpdateChannel = 'latest' | 'beta' | 'alpha'
 
-export type DiscoveryCandidates = string | string[]
+export type DiscoveryCandidates = string[]
 
 export type DevInternalFlag =
   | 'allPipetteConfig'
