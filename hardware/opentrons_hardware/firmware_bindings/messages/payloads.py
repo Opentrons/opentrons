@@ -310,7 +310,7 @@ class ReadFromSensorResponsePayload(utils.BinarySerializable):
     """A response for either a single reading or an averaged reading of a sensor."""
 
     sensor: SensorTypeField
-    sensor_data: utils.UInt32Field
+    sensor_data: utils.Int32Field
 
 
 @dataclass
@@ -318,7 +318,7 @@ class SetSensorThresholdRequestPayload(utils.BinarySerializable):
     """A request to set the threshold value of a sensor."""
 
     sensor: SensorTypeField
-    threshold: utils.UInt32Field
+    threshold: utils.Int32Field
 
 
 @dataclass
@@ -326,4 +326,4 @@ class SensorThresholdResponsePayload(utils.BinarySerializable):
     """A response that sends back the current threshold value of the sensor."""
 
     sensor: SensorTypeField
-    threshold: utils.UInt32Field
+    threshold: utils.Int32Field

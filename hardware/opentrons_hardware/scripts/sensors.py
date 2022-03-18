@@ -1,17 +1,21 @@
+"""A script for sending and receiving data from sensors on the OT3."""
 import logging
 import asyncio
 import argparse
-from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, Any, Type, Sequence, Callable, Optional, Tuple, cast
+from typing import Type, Sequence, Callable, Tuple
 from logging.config import dictConfig
-# from opentrons.types import Point
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_hardware.firmware_bindings.constants import NodeId, SensorType
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 from opentrons_hardware.drivers.can_bus.build import build_driver
 
-from .utils import SensorRun, handle_capacitive_sensor, handle_environment_sensor, handle_pressure_sensor
+from .utils import (
+    SensorRun,
+    handle_capacitive_sensor,
+    handle_environment_sensor,
+    handle_pressure_sensor,
+)
 
 GetInputFunc = Callable[[str], str]
 OutputFunc = Callable[[str], None]
@@ -37,9 +41,10 @@ def create_choices(enum_type: Type[Enum]) -> Sequence[str]:
     return [f"{i}: {v.name}" for (i, v) in enumerate(enum_type)]  # type: ignore[var-annotated]  # noqa: E501
 
 
-def prompt_enum(get_user_input: GetInputFunc, output_func: OutputFunc
+def prompt_sensor_type(
+    get_user_input: GetInputFunc, output_func: OutputFunc
 ) -> SensorType:
-    """Prompt to choose a member of the enum.
+    """Prompt to choose a member of the SensorType enum.
 
     Args:
         output_func: Function to output text to user.
@@ -59,8 +64,8 @@ def prompt_enum(get_user_input: GetInputFunc, output_func: OutputFunc
     except (ValueError, IndexError) as e:
         raise InvalidInput(str(e))
 
-def prompt_str_input(
-    prompt_name: str, get_user_input: GetInputFunc) -> str:
+
+def prompt_str_input(prompt_name: str, get_user_input: GetInputFunc) -> str:
     """Prompt to choose a member of the enum.
 
     Args:
@@ -77,8 +82,8 @@ def prompt_str_input(
     except (ValueError, IndexError) as e:
         raise InvalidInput(str(e))
 
-def prompt_int_input(
-    prompt_name: str, get_user_input: GetInputFunc) -> int:
+
+def prompt_int_input(prompt_name: str, get_user_input: GetInputFunc) -> int:
     """Prompt to choose a member of the enum.
 
     Args:
@@ -96,56 +101,38 @@ def prompt_int_input(
         raise InvalidInput(str(e))
 
 
-# def prompt_positions(get_user_input: GetInputFunc, output_func: OutputFunc) -> Optional[Dict[str, Point]]:
-#     """Prompt to choose a member of the enum.
+def prompt_message(
+    get_user_input: GetInputFunc, output_func: OutputFunc
+) -> Tuple[SensorRun, bool]:
+    """A list of all the information required to perform an initial sensor test."""
+    sensor_type = prompt_sensor_type(get_user_input, output_func)
+    pipette_serial_number = prompt_str_input("pipette serial number", get_user_input)
+    pipette_mount = prompt_str_input(
+        'pipette_mount if on robot, "left" or "right"', get_user_input
+    )
+    auto_zero = prompt_int_input("auto zero", get_user_input)
+    minutes = prompt_int_input("script run time in minutes", get_user_input)
+    output_to_csv = bool(prompt_int_input("output to csv?", get_user_input))
 
-#     Args:
-#         output_func: Function to output text to user.
-#         get_user_input: Function to get user input.
-#         enum_type: an enum type
-
-#     Returns:
-#         The choice.
-
-#     """
-#     positions = {'start': Point(0, 0, 0), 'end': Point(0, 0, 0)}
-#     text = """
-#     The capacitive sensor requires two positions for data aquisition. \n
-#     The start position will be the location for the pipette to move to before beginning measurement. \n
-#     The end position is the location for the pipette to move to while taking measurements. \n
-#     """
-
-#     try:
-#         output_func(text)
-#         for key in positions.keys():
-#             get_user_input(f"type in {key}:")
-#         return positions
-#     except (ValueError, IndexError) as e:
-#         raise InvalidInput(str(e))
-
-def prompt_message(get_user_input: GetInputFunc, output_func: OutputFunc) -> Tuple[SensorRun, bool]:
-    sensor_type = prompt_enum(get_user_input, output_func)
-    device_id = prompt_str_input('device id', get_user_input)
-    pipette_mount = prompt_str_input('pipette_mount', get_user_input)
-    auto_zero = prompt_int_input('auto zero', get_user_input)
-    minutes = prompt_int_input('script run time in minutes', get_user_input)
-    output_to_csv = bool(prompt_int_input('output to csv', get_user_input))
-
-    positions: Optional[Dict[str, Any]] = None
-    # if sensor_type == SensorType.capacitive:
-    #     positions = prompt_positions(get_user_input, output_func)
-
-    sensor_run = SensorRun(sensor_type, device_id, bool(auto_zero), minutes, pipette_mount, positions)
+    sensor_run = SensorRun(
+        sensor_type, pipette_serial_number, bool(auto_zero), minutes, pipette_mount
+    )
     return sensor_run, output_to_csv
 
-async def send_sensor_command(driver: AbstractCanDriver, command: SensorRun, csv: bool) -> None:
-    if command.pipette_mount == 'left':
+
+async def send_sensor_command(
+    driver: AbstractCanDriver, command: SensorRun, csv: bool
+) -> None:
+    """Perform the specified sensor test located in utils.py."""
+    if command.pipette_mount == "left":
         node = NodeId.pipette_left
-    else:
+    elif command.pipette_mount == "right":
         node = NodeId.pipette_right
-    if SensorRun.sensor_type == SensorType.pressure:
-        await handle_pressure_sensor(command, driver, node, csv, log)        
-    elif SensorRun.sensor_type == SensorType.capacitive:
+    else:
+        node = NodeId.broadcast
+    if command.sensor_type == SensorType.pressure:
+        await handle_pressure_sensor(command, driver, node, csv, log)
+    elif command.sensor_type == SensorType.capacitive:
         await handle_capacitive_sensor(command, driver, node, csv, log)
     else:
         await handle_environment_sensor(command, driver, node, csv, log)
@@ -211,6 +198,7 @@ LOG_CONFIG = {
         },
     },
 }
+
 
 def main() -> None:
     """Entry point."""

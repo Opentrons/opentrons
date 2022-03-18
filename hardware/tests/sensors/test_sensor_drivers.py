@@ -14,6 +14,7 @@ from opentrons_hardware.firmware_bindings.utils import (
     UInt8Field,
     UInt16Field,
     UInt32Field,
+    Int32Field,
 )
 
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
@@ -113,7 +114,7 @@ async def test_receive_data_polling(
         can_message_notifier.notify(
             ReadFromSensorResponse(
                 payload=ReadFromSensorResponsePayload(
-                    sensor_data=UInt32Field(0x100),
+                    sensor_data=Int32Field(0x100),
                     sensor=UInt8Field(sensor._sensor_type),
                 )
             ),
@@ -262,7 +263,7 @@ async def test_receive_data_read(
         can_message_notifier.notify(
             ReadFromSensorResponse(
                 payload=ReadFromSensorResponsePayload(
-                    sensor_data=UInt32Field(0x100),
+                    sensor_data=Int32Field(0x100),
                     sensor=UInt8Field(sensor._sensor_type),
                 )
             ),
@@ -297,7 +298,7 @@ async def test_threshold(
         can_message_notifier.notify(
             SensorThresholdResponse(
                 payload=SensorThresholdResponsePayload(
-                    threshold=UInt32Field(0x5), sensor=UInt8Field(sensor._sensor_type)
+                    threshold=Int32Field(0x5), sensor=UInt8Field(sensor._sensor_type)
                 )
             ),
             ArbitrationId(

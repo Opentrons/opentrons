@@ -3,14 +3,14 @@ from dataclasses import dataclass
 from typing import List, overload
 
 from opentrons_hardware.firmware_bindings.constants import NodeId, SensorType
-from opentrons_hardware.firmware_bindings.utils.binary_serializable import UInt32Field
+from opentrons_hardware.firmware_bindings.utils.binary_serializable import Int32Field
 
 
 @dataclass
 class SensorDataType:
     """Storage class for sensor data."""
 
-    backing: UInt32Field
+    backing: Int32Field
     as_int: int
 
     @overload
@@ -20,7 +20,7 @@ class SensorDataType:
 
     @overload
     @classmethod
-    def build(cls, data: UInt32Field) -> "SensorDataType":
+    def build(cls, data: Int32Field) -> "SensorDataType":
         ...
 
     @overload
@@ -32,11 +32,11 @@ class SensorDataType:
     def build(cls, data):  # type: ignore[no-untyped-def]
         """Build function for sensor data type."""
         if isinstance(data, list):
-            cls.backing = UInt32Field(cls._convert_to_int(data))
-        elif isinstance(data, UInt32Field):
+            cls.backing = Int32Field(cls._convert_to_int(data))
+        elif isinstance(data, Int32Field):
             cls.backing = data
         else:
-            cls.backing = UInt32Field(data)
+            cls.backing = Int32Field(data)
         cls.as_int = int(cls.backing.value)
         return cls
 
