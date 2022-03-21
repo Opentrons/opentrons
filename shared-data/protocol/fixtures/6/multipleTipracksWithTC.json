@@ -6399,7 +6399,10 @@
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "wellName": "A1",
-        "offsetFromBottomMm": 1,
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 1 }
+        },
         "flowRate": 46.43
       }
     },
@@ -6411,7 +6414,10 @@
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "wellName": "A12",
-        "offsetFromBottomMm": 0.5,
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 0.5 }
+        },
         "flowRate": 46.43
       }
     },
@@ -6441,7 +6447,10 @@
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "wellName": "A3",
-        "offsetFromBottomMm": 1,
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 1 }
+        },
         "flowRate": 150
       }
     },
@@ -6453,7 +6462,10 @@
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "wellName": "A10",
-        "offsetFromBottomMm": 0.5,
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 0.5 }
+        },
         "flowRate": 300
       }
     },
@@ -6483,7 +6495,10 @@
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "wellName": "A4",
-        "offsetFromBottomMm": 1,
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 1 }
+        },
         "flowRate": 150
       }
     },
@@ -6495,7 +6510,10 @@
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "wellName": "A8",
-        "offsetFromBottomMm": 0.5,
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 0.5 }
+        },
         "flowRate": 300
       }
     },
@@ -6525,7 +6543,10 @@
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "wellName": "A4",
-        "offsetFromBottomMm": 1,
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 1 }
+        },
         "flowRate": 150
       }
     },
@@ -6537,7 +6558,10 @@
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "wellName": "A8",
-        "offsetFromBottomMm": 0.5,
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 0.5 }
+        },
         "flowRate": 300
       }
     },
@@ -6567,7 +6591,10 @@
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "wellName": "A4",
-        "offsetFromBottomMm": 1,
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 1 }
+        },
         "flowRate": 150
       }
     },
@@ -6579,7 +6606,10 @@
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "wellName": "A8",
-        "offsetFromBottomMm": 0.5,
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 0.5 }
+        },
         "flowRate": 300
       }
     },
@@ -6609,7 +6639,10 @@
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "wellName": "A4",
-        "offsetFromBottomMm": 1,
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 1 }
+        },
         "flowRate": 150
       }
     },
@@ -6621,7 +6654,10 @@
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "wellName": "A8",
-        "offsetFromBottomMm": 0.5,
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 0.5 }
+        },
         "flowRate": 300
       }
     },
@@ -6651,7 +6687,10 @@
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "wellName": "A4",
-        "offsetFromBottomMm": 1,
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 1 }
+        },
         "flowRate": 150
       }
     },
@@ -6663,7 +6702,10 @@
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "wellName": "A8",
-        "offsetFromBottomMm": 0.5,
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 0.5 }
+        },
         "flowRate": 300
       }
     },
@@ -6693,7 +6735,10 @@
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "wellName": "A4",
-        "offsetFromBottomMm": 1,
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 1 }
+        },
         "flowRate": 150
       }
     },
@@ -6705,7 +6750,10 @@
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "wellName": "A8",
-        "offsetFromBottomMm": 0.5,
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 0.5 }
+        },
         "flowRate": 300
       }
     },
@@ -6735,7 +6783,10 @@
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "wellName": "A4",
-        "offsetFromBottomMm": 1,
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 1 }
+        },
         "flowRate": 150
       }
     },
@@ -6747,7 +6798,10 @@
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "wellName": "A8",
-        "offsetFromBottomMm": 0.5,
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 0.5 }
+        },
         "flowRate": 300
       }
     },
@@ -6777,7 +6831,10 @@
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "wellName": "A4",
-        "offsetFromBottomMm": 1,
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 1 }
+        },
         "flowRate": 150
       }
     },
@@ -6789,7 +6846,10 @@
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "wellName": "A8",
-        "offsetFromBottomMm": 0.5,
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 0.5 }
+        },
         "flowRate": 300
       }
     },
@@ -6819,7 +6879,10 @@
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "wellName": "A4",
-        "offsetFromBottomMm": 1,
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 1 }
+        },
         "flowRate": 150
       }
     },
@@ -6831,7 +6894,10 @@
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "wellName": "A8",
-        "offsetFromBottomMm": 0.5,
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 0.5 }
+        },
         "flowRate": 300
       }
     },
@@ -6861,7 +6927,10 @@
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "wellName": "A4",
-        "offsetFromBottomMm": 1,
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 1 }
+        },
         "flowRate": 150
       }
     },
@@ -6873,7 +6942,10 @@
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "wellName": "A8",
-        "offsetFromBottomMm": 0.5,
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 0.5 }
+        },
         "flowRate": 300
       }
     },
@@ -6903,7 +6975,10 @@
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "wellName": "A4",
-        "offsetFromBottomMm": 1,
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 1 }
+        },
         "flowRate": 150
       }
     },
@@ -6939,7 +7014,10 @@
         "volume": 100,
         "labwareId": "9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1",
         "wellName": "A8",
-        "offsetFromBottomMm": 0.5,
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "x": 0, "y": 0, "z": 0.5 }
+        },
         "flowRate": 300
       }
     },

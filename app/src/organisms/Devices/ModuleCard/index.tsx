@@ -35,6 +35,9 @@ import { ThermocyclerModuleSlideout } from './ThermocyclerModuleSlideout'
 import { MagneticModuleSlideout } from './MagneticModuleSlideout'
 import { TemperatureModuleSlideout } from './TemperatureModuleSlideout'
 import { AboutModuleSlideout } from './AboutModuleSlideout'
+import { HeaterShakerModuleData } from './HeaterShakerModuleData'
+import { HeaterShakerSlideout } from './HeaterShakerSlideout'
+import { TestShakeSlideout } from './TestShakeSlideout'
 
 import magneticModule from '../../../assets/images/magnetic_module_gen_2_transparent.svg'
 import temperatureModule from '../../../assets/images/temp_deck_gen_2_transparent.svg'
@@ -45,8 +48,6 @@ import type {
   AttachedModule,
   HeaterShakerModule,
 } from '../../../redux/modules/types'
-import { HeaterShakerModuleData } from './HeaterShakerModuleData'
-import { TestShakeSlideout } from './TestShakeSlideout'
 
 interface ModuleCardProps {
   module: AttachedModule
@@ -250,6 +251,7 @@ interface ModuleSlideoutProps {
 
 const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
   const { module, isSecondary, showSlideout, onCloseClick } = props
+
   if (module.type === THERMOCYCLER_MODULE_TYPE) {
     return (
       <ThermocyclerModuleSlideout
@@ -270,14 +272,19 @@ const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
   } else if (module.type === TEMPERATURE_MODULE_TYPE) {
     return (
       <TemperatureModuleSlideout
-        model={module.model}
-        serial={module.serial}
+        module={module}
         onCloseClick={onCloseClick}
         isExpanded={showSlideout}
       />
     )
   } else {
-    // TODO(sh, 2022-02-28): render heater shaker slideout
-    return <div></div>
+    return (
+      <HeaterShakerSlideout
+        module={module}
+        onCloseClick={onCloseClick}
+        isExpanded={showSlideout}
+        isSetShake={isSecondary}
+      />
+    )
   }
 }

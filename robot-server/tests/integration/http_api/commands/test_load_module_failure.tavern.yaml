@@ -1,0 +1,50 @@
+test_name: loadModule command failure
+
+marks:
+  - usefixtures:
+      - run_server
+  - parametrize:
+      key: model
+      vals:
+        - magneticModuleV2
+
+stages:
+  - name: Create Empty Run
+    request:
+      url: '{host:s}:{port:d}/runs'
+      json:
+        data: {}
+      method: POST
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          status: idle
+          current: true
+      save:
+        json:
+          run_id: data.id
+  - name: Create loadModule Command
+    request:
+      url: '{host:s}:{port:d}/runs/{run_id}/commands'
+      method: POST
+      params:
+        waitUntilComplete: true
+      json:
+        data:
+          commandType: loadModule
+          params:
+            model: '{model}'
+            location:
+              slotName: '10'
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          status: failed
+    # TODO(jm, 2022-03-18): validate the error in the command and in the run
