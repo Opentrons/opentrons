@@ -540,16 +540,30 @@ class OT3API(
                     self._transforms.carriage_offset,
                     OT3Axis,
                 )
-            offset = offset_for_mount(
-                mount, self._config.left_mount_offset, self._config.right_mount_offset
+            ot3pos = self._effector_pos_from_carriage_pos(
+                OT3Mount.from_mount(mount), self._current_position, critical_point
             )
-            cp = self.critical_point_for(mount, critical_point)
-            return {
-                Axis.X: self._current_position[OT3Axis.X] + offset[0] + cp.x,
-                Axis.Y: self._current_position[OT3Axis.Y] + offset[1] + cp.y,
-                z_ax.to_axis(): self._current_position[z_ax] + offset[2] + cp.z,
-                plunger_ax.to_axis(): self._current_position[plunger_ax],
-            }
+            return {ot3ax.to_axis(): value for ot3ax, value in ot3pos.items()}
+
+    def _effector_pos_from_carriage_pos(
+        self,
+        mount: OT3Mount,
+        carriage_position: OT3AxisMap[float],
+        critical_point: Optional[CriticalPoint],
+    ) -> OT3AxisMap[float]:
+        offset = offset_for_mount(
+            mount, self._config.left_mount_offset, self._config.right_mount_offset
+        )
+        cp = self.critical_point_for(mount, critical_point)
+        z_ax = OT3Axis.by_mount(mount)
+        plunger_ax = OT3Axis.of_main_tool_actuator(mount)
+
+        return {
+            OT3Axis.X: carriage_position[OT3Axis.X] + offset[0] + cp.x,
+            OT3Axis.Y: carriage_position[OT3Axis.Y] + offset[1] + cp.y,
+            z_ax: carriage_position[z_ax] + offset[2] + cp.z,
+            plunger_ax: carriage_position[plunger_ax],
+        }
 
     async def gantry_position(
         self,
@@ -1075,15 +1089,6 @@ class OT3API(
         """Get the API ready to stop cleanly."""
         await self._backend.clean_up()
 
-    def get_instrument_max_height(
-        self,
-        mount: Union[top_types.Mount, OT3Mount],
-        critical_point: Optional[CriticalPoint] = None,
-    ) -> float:
-        return self._instrument_handler.instrument_max_height(
-            OT3Mount.from_mount(mount), self._config.z_retract_distance, critical_point
-        )
-
     def critical_point_for(
         self,
         mount: Union[top_types.Mount, OT3Mount],
@@ -1167,15 +1172,22 @@ class OT3API(
             OT3Mount.from_mount(mount), aspirate, dispense, blow_out
         )
 
-    def instrument_max_height(
+    def get_instrument_max_height(
         self,
         mount: Union[top_types.Mount, OT3Mount],
-        retract_distance: float,
-        critical_point: Optional[CriticalPoint],
+        critical_point: Optional[CriticalPoint] = None,
     ) -> float:
-        return self._instrument_handler.instrument_max_height(
-            OT3Mount.from_mount(mount), retract_distance, critical_point
+        carriage_pos = deck_from_machine(
+            self._backend.home_position(),
+            self._transforms.deck_calibration.attitude,
+            self._transforms.carriage_offset,
+            OT3Axis,
         )
+        pos_at_home = self._effector_pos_from_carriage_pos(
+            OT3Mount.from_mount(mount), carriage_pos, critical_point
+        )
+
+        return pos_at_home[OT3Axis.by_mount(mount)] - self._config.z_retract_distance
 
     async def add_tip(
         self, mount: Union[top_types.Mount, OT3Mount], tip_length: float

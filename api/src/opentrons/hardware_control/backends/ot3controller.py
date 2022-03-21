@@ -26,6 +26,7 @@ from .ot3utils import (
     axis_to_node,
     get_current_settings,
     create_home_group,
+    node_to_axis,
 )
 
 try:
@@ -458,6 +459,12 @@ class OT3Controller:
             NodeId.gantry_y: 0,
             NodeId.pipette_left: 0,
             NodeId.pipette_right: 0,
+        }
+
+    @staticmethod
+    def home_position() -> OT3AxisMap[float]:
+        return {
+            node_to_axis(k): v for k, v in OT3Controller._get_home_position().items()
         }
 
     async def probe_network(self, timeout: float = 5.0) -> None:

@@ -491,7 +491,7 @@
     "channels": 1,
     "smoothieConfigs": {
       "stepsPerMM": 2133.33,
-      "homePosition": 220,
+      "homePosition": 230.15,
       "travelDistance": 80
     },
     "defaultTipracks": [
@@ -537,7 +537,7 @@
     "maxVolume": 300,
     "smoothieConfigs": {
       "stepsPerMM": 2133.33,
-      "homePosition": 220,
+      "homePosition": 230.15,
       "travelDistance": 80
     },
     "defaultTipracks": [
@@ -580,7 +580,7 @@
     "maxVolume": 1000,
     "smoothieConfigs": {
       "stepsPerMM": 2133.33,
-      "homePosition": 220,
+      "homePosition": 230.15,
       "travelDistance": 80
     },
     "defaultTipracks": [
