@@ -3,7 +3,11 @@ import { format } from 'date-fns'
 import { useTranslation } from 'react-i18next'
 import first from 'lodash/first'
 import map from 'lodash/map'
-import { getModuleType, schemaV6Adapter } from '@opentrons/shared-data'
+import {
+  getModuleType,
+  getPipetteNameSpecs,
+  schemaV6Adapter,
+} from '@opentrons/shared-data'
 
 import {
   Box,
@@ -22,6 +26,8 @@ import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
 
 import { StoredProtocolData } from '../../redux/protocol-storage'
 import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
+import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
+import { parseInitialPipetteNamesByMount, parseAllRequiredModuleModels, parseInitialLoadedLabwareBySlot } from '@opentrons/api-client'
 
 type ProtocolCardProps = StoredProtocolData
 
@@ -47,35 +53,11 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   // TODO: IMMEDIATELY clean up and move these protocol data selectors into api_client as
   // pure functions of RunTimeCommand[]
   const robotModel = robot?.model ?? 'OT-2'
-  const leftMountPipetteName =
-    pipettes != null
-      ? pipettes[
-          Object.keys(pipettes ?? {}).find(pipetteId => {
-            return commands?.find(
-              command =>
-                command.commandType === 'loadPipette' &&
-                command.result.pipetteId === pipetteId &&
-                command.params.mount === 'left'
-            )
-          }) ?? ''
-        ]?.name ?? ''
-      : ''
-  const rightMountPipetteName =
-    pipettes != null
-      ? pipettes[
-          Object.keys(pipettes ?? {}).find(pipetteId => {
-            commands?.find(
-              command =>
-                command.commandType === 'loadPipette' &&
-                command.params.pipetteId === pipetteId &&
-                command.params.mount === 'right'
-            )
-          }) ?? ''
-        ]?.name ?? ''
-      : ''
-  const requiredModuleTypes = map(modules, ({ model }, _moduleId) =>
-    getModuleType(model)
-  )
+  const { left: leftMountPipetteName, right: rightMountPipetteName } =
+    protocolData != null ? parseInitialPipetteNamesByMount(protocolData) : {}
+  const requiredModuleTypes = protocolData != null ? parseAllRequiredModuleModels(protocolData).map(getModuleType) : []
+  const initialLoadedLabwareBySlot = protocolData != null ? parseInitialLoadedLabwareBySlot(protocolData) : {}
+  console.log('init ', initialLoadedLabwareBySlot)
 
   const protocolName =
     metadata?.protocolName ?? first(srcFileNames) ?? protocolKey
@@ -123,14 +105,22 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
                 marginRight={SPACING.spacing4}
               >
                 <StyledText as="h6">{t('left_mount')}</StyledText>
-                <StyledText as="p">{leftMountPipetteName}</StyledText>
+                <StyledText as="p">
+                  {leftMountPipetteName != null
+                    ? getPipetteNameSpecs(leftMountPipetteName)?.displayName
+                    : t('empty')}
+                </StyledText>
               </Flex>
               <Flex
                 flexDirection={DIRECTION_COLUMN}
                 marginRight={SPACING.spacing4}
               >
                 <StyledText as="h6">{t('right_mount')}</StyledText>
-                <StyledText as="p">{rightMountPipetteName}</StyledText>
+                <StyledText as="p">
+                  {rightMountPipetteName != null
+                    ? getPipetteNameSpecs(rightMountPipetteName)?.displayName
+                    : t('empty')}
+                </StyledText>
               </Flex>
               {requiredModuleTypes.length > 0 ? (
                 <Flex

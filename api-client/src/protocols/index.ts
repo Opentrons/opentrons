@@ -4,3 +4,4 @@ export { createProtocol } from './createProtocol'
 export { getProtocols } from './getProtocols'
 
 export * from './types'
+export * from './utils'
