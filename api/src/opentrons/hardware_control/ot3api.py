@@ -222,7 +222,14 @@ class OT3API(
             checked_config = config
         backend = await OT3Controller.build(checked_config)
         await backend.setup_motors()
-        return cls(backend, loop=checked_loop, config=checked_config)
+        api_instance = cls(backend, loop=checked_loop, config=checked_config)
+        await api_instance.cache_instruments()
+        module_controls = await AttachedModulesControl.build(
+            api_instance, board_revision=backend.board_revision
+        )
+        backend.module_controls = module_controls
+        checked_loop.create_task(backend.watch(loop=checked_loop))
+        return api_instance
 
     @classmethod
     async def build_hardware_simulator(
