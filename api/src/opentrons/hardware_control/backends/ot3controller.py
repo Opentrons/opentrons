@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 import asyncio
-from contextlib import contextmanager
+from contextlib import asynccontextmanager
 import logging
+from copy import deepcopy
 from typing import (
     Dict,
     List,
@@ -11,7 +12,7 @@ from typing import (
     Tuple,
     TYPE_CHECKING,
     Sequence,
-    Generator,
+    AsyncIterator,
     cast,
     Set,
 )
@@ -312,10 +313,15 @@ class OT3Controller:
         for axis, current in axis_currents.items():
             self._current_settings[axis].hold_current = current
 
-    @contextmanager
-    def save_current(self) -> Generator[None, None, None]:
+    @asynccontextmanager
+    async def restore_current(self) -> AsyncIterator[None]:
         """Save the current."""
-        yield
+        old_current_settings = deepcopy(self._current_settings)
+        try:
+            yield
+        finally:
+            self._current_settings = old_current_settings
+            await self.set_default_currents()
 
     @staticmethod
     def _build_event_watcher() -> aionotify.Watcher:
