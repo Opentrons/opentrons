@@ -34,6 +34,7 @@ export const customLabwareReducer: Reducer<CustomLabwareState, Action> = (
     }
 
     case Actions.ADD_CUSTOM_LABWARE:
+    case Actions.ADD_CUSTOM_LABWARE_FILE:
     case Actions.CLEAR_ADD_CUSTOM_LABWARE_FAILURE: {
       return { ...state, addFailureFile: null, addFailureMessage: null }
     }

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
@@ -6,10 +7,11 @@ import {
   DIRECTION_COLUMN,
   ALIGN_CENTER,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
+import { addCustomLabwareFile } from '../../redux/custom-labware'
 import { Slideout } from '../../atoms/Slideout'
-import { PrimaryButton } from '../../atoms/Buttons'
+import { UploadInput } from '../../molecules/UploadInput'
 import { useAddLabware } from './hooks'
+import type { Dispatch } from '../../redux/types'
 
 export interface AddCustomLabwareProps {
   isExpanded: boolean
@@ -20,6 +22,7 @@ export interface AddCustomLabwareProps {
 
 export function AddCustomLabware(props: AddCustomLabwareProps): JSX.Element {
   const { t } = useTranslation('labware_landing')
+  const dispatch = useDispatch<Dispatch>()
 
   return (
     <Slideout
@@ -32,10 +35,13 @@ export function AddCustomLabware(props: AddCustomLabwareProps): JSX.Element {
         alignItems={ALIGN_CENTER}
         gridGap={SPACING.spacing4}
       >
-        <StyledText as="p">{t('choose_file_to_upload')}</StyledText>
-        <PrimaryButton onClick={useAddLabware()}>
-          {t('choose_file')}
-        </PrimaryButton>
+        <UploadInput
+          onUpload={(file: File) => {
+            dispatch(addCustomLabwareFile(file.path))
+          }}
+          onClick={useAddLabware()}
+          uploadText={t('choose_file_to_upload')}
+        />
       </Flex>
     </Slideout>
   )

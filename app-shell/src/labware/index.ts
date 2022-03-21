@@ -157,6 +157,14 @@ export function registerLabware(
         break
       }
 
+      case CustomLabware.ADD_CUSTOM_LABWARE_FILE: {
+        const filePath = action.payload.filePath
+        copyLabware(dispatch, [filePath]).catch((error: Error) => {
+          dispatch(CustomLabware.addCustomLabwareFailure(null, error.message))
+        })
+        break
+      }
+
       case CustomLabware.OPEN_CUSTOM_LABWARE_DIRECTORY: {
         const dir = getFullConfig().labware.directory
         shell.openPath(dir)

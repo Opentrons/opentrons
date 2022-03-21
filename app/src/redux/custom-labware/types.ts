@@ -90,6 +90,12 @@ export interface AddCustomLabwareAction {
   meta: { shell: true }
 }
 
+export interface AddCustomLabwareFileAction {
+  type: 'labware:ADD_CUSTOM_LABWARE_FILE'
+  payload: { filePath: string }
+  meta: { shell: true }
+}
+
 export interface AddCustomLabwareFailureAction {
   type: 'labware:ADD_CUSTOM_LABWARE_FAILURE'
   payload: { labware: FailedLabwareFile | null; message: string | null }
@@ -119,6 +125,7 @@ export type CustomLabwareAction =
   | CustomLabwareListFailureAction
   | ChangeCustomLabwareDirectoryAction
   | AddCustomLabwareAction
+  | AddCustomLabwareFileAction
   | AddCustomLabwareFailureAction
   | ClearAddCustomLabwareFailureAction
   | AddNewLabwareNameAction

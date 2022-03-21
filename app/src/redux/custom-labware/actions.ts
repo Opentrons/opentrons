@@ -20,6 +20,9 @@ export const CHANGE_CUSTOM_LABWARE_DIRECTORY: 'labware:CHANGE_CUSTOM_LABWARE_DIR
 export const ADD_CUSTOM_LABWARE: 'labware:ADD_CUSTOM_LABWARE' =
   'labware:ADD_CUSTOM_LABWARE'
 
+export const ADD_CUSTOM_LABWARE_FILE: 'labware:ADD_CUSTOM_LABWARE_FILE' =
+  'labware:ADD_CUSTOM_LABWARE_FILE'
+
 export const ADD_CUSTOM_LABWARE_FAILURE: 'labware:ADD_CUSTOM_LABWARE_FAILURE' =
   'labware:ADD_CUSTOM_LABWARE_FAILURE'
 
@@ -85,6 +88,14 @@ export const addCustomLabware = (
   meta: { shell: true },
 })
 
+export const addCustomLabwareFile = (
+  filePath: string
+): Types.AddCustomLabwareFileAction => ({
+  type: ADD_CUSTOM_LABWARE_FILE,
+  payload: { filePath },
+  meta: { shell: true },
+})
+
 export const addCustomLabwareFailure = (
   labware: Types.FailedLabwareFile | null = null,
   message: string | null = null
@@ -96,6 +107,7 @@ export const addCustomLabwareFailure = (
 export const clearAddCustomLabwareFailure = (): Types.ClearAddCustomLabwareFailureAction => ({
   type: CLEAR_ADD_CUSTOM_LABWARE_FAILURE,
 })
+
 export const addNewLabwareName = (
   filename: string
 ): Types.AddNewLabwareNameAction => ({
