@@ -1,9 +1,17 @@
 """OE Updater and dependency injection classes."""
 from otupdate.common.update_actions import UpdateActionsInterface, Partition
 from typing import Callable, Optional
+import enum
+import subprocess
+
 import logging
 
 LOG = logging.getLogger(__name__)
+
+
+class RootPartitions(enum.Enum):
+    TWO: Partition = Partition(2, "/dev/mmcblk0p2")
+    THREE: Partition = Partition(3, "/dev/mmcblk0p3")
 
 
 class PartitionManager:
@@ -12,11 +20,17 @@ class PartitionManager:
     def __init__(self):
         pass
 
-    def find_unused_partition(self) -> Partition:
+    def find_unused_partition(self) -> RootPartitions:
         """Find unused partition"""
-        # fw_printenv -n root_part
-        fake_partition = Partition(3, "mmcblkp0b2")
-        return fake_partition
+        # fw_printenv -n root_part gives the currently
+        # active root_fs partition, find that, and
+        # set other partition as unused partition!
+        which = subprocess.check_output(["fw_printenv -n root_part"]).strip()
+        return {
+            b"2": RootPartitions.THREE,
+            b"3": RootPartitions.TWO,
+            b" ": RootPartitions.TWO,
+        }[which]
 
 
 class RootFSInterface:
@@ -96,7 +110,7 @@ class Updater(UpdateActionsInterface):
         :returns: The root partition that the rootfs image was written to, e.g.
                   ``RootPartitions.TWO`` or ``RootPartitions.THREE``.
         """
-        unused_partition = self.part_mngr.find_unused_partition()
+        unused_partition = self.part_mngr.find_unused_partition().value
         self.root_FS_intf.write_file(
             rootfs_filepath,
             unused_partition.path,
