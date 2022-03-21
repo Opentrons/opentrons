@@ -14,6 +14,8 @@ from otupdate.common import (
     update,
 )
 
+from otupdate.openembedded.updater import RootFSInterface, PartitionManager, Updater
+
 LOG = logging.getLogger(__name__)
 
 
@@ -80,6 +82,9 @@ def get_app(
             ]
         )
     )
+    rfs = RootFSInterface()
+    part_mgr = PartitionManager()
+    updater = Updater(rfs, part_mgr)
     app.router.add_routes(
         [
             web.post("/server/update/begin", update.begin),
