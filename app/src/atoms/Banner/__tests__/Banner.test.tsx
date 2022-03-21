@@ -10,7 +10,7 @@ const render = (props: React.ComponentProps<typeof Banner>) => {
   })[0]
 }
 
-describe('ModuleCard', () => {
+describe('Banner', () => {
   let props: React.ComponentProps<typeof Banner>
 
   beforeEach(() => {

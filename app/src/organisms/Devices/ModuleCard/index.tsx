@@ -196,32 +196,33 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             <img src={image} alt={module.model} />
             <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING_2}>
               {module.hasAvailableUpdate && showBanner ? (
-                <Banner
-                  type="warning"
-                  onCloseClick={() => setShowBanner(false)}
-                  title={
-                    <>
-                      <Flex flexDirection={DIRECTION_COLUMN}>
-                        {t('firmware_update_available')}
-                        <Btn
-                          textAlign={ALIGN_START}
-                          fontSize={TYPOGRAPHY.fontSizeP}
-                          textDecoration={TEXT_DECORATION_UNDERLINE}
-                          // TODO(jr, 3/21/22) wire up button when we know where this should link to
-                          onClick={() => console.log('firmware update!')}
-                        >
-                          {t('view_update')}
-                        </Btn>
-                      </Flex>
-                    </>
-                  }
-                />
+                <Flex paddingBottom={SPACING.spacing2}>
+                  <Banner
+                    type="warning"
+                    onCloseClick={() => setShowBanner(false)}
+                    title={
+                      <>
+                        <Flex flexDirection={DIRECTION_COLUMN}>
+                          {t('firmware_update_available')}
+                          <Btn
+                            textAlign={ALIGN_START}
+                            fontSize={TYPOGRAPHY.fontSizeP}
+                            textDecoration={TEXT_DECORATION_UNDERLINE}
+                            // TODO(jr, 3/21/22) wire up button when we know where this should link to
+                            onClick={() => console.log('firmware update!')}
+                          >
+                            {t('view_update')}
+                          </Btn>
+                        </Flex>
+                      </>
+                    }
+                  />
+                </Flex>
               ) : null}
               {tooHot ? (
                 <Flex
                   paddingRight={SPACING.spacingM}
                   paddingBottom={SPACING.spacing3}
-                  paddingTop={SPACING.spacing2}
                 >
                   <Banner
                     type="warning"
