@@ -45,7 +45,7 @@ describe('protocol storage directory utilities', () => {
   describe('PROTOCOL DIRECTORY', () => {
     it('constructs PROTOCOLS_DIRECTORY_PATH', () => {
       return expect(PROTOCOLS_DIRECTORY_PATH).toEqual(
-        `__mock-app-path__/${PROTOCOLS_DIRECTORY_NAME}`
+        path.join('__mock-app-path__', PROTOCOLS_DIRECTORY_NAME)
       )
     })
   })
