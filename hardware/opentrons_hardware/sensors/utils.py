@@ -37,7 +37,7 @@ class SensorDataType:
             backing = data
         else:
             backing = Int32Field(data)
-        as_int = int(cls.backing.value)
+        as_int = int(backing.value)
         return cls(backing, as_int)
 
     def to_float(self) -> float:
