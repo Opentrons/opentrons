@@ -61,10 +61,18 @@ def mock_move_group_run():
 )
 async def test_home(controller: OT3Controller, mock_move_group_run, axes):
     await controller.home(axes)
-    home_move = (mock_move_group_run.call_args_list[0][0][0]._move_groups)[0][0][
+    if (
         axis_to_node(axes[0])
-    ]
-    assert home_move.distance_mm == home_move.velocity_mm_sec * home_move.duration_sec
+        in (mock_move_group_run.call_args_list[0][0][0]._move_groups)[0][0]
+    ):
+        home_move = (mock_move_group_run.call_args_list[0][0][0]._move_groups)[0][0][
+            axis_to_node(axes[0])
+        ]
+    else:
+        home_move = (mock_move_group_run.call_args_list[0][0][0]._move_groups)[1][0][
+            axis_to_node(axes[0])
+        ]
+
     assert home_move.acceleration_mm_sec_sq == 0
     assert home_move.move_type == MoveType.home
     assert home_move.stop_condition == MoveStopCondition.limit_switch

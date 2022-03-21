@@ -217,30 +217,39 @@ class OT3Controller:
         """
         if not axes:
             return {}
-        distances = {
-            ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0] for ax in axes
-        }
-
         speed_settings = (
             self._configuration.motion_settings.max_speed_discontinuity.none
         )
-        velocities = {ax: -1 * speed_settings[OT3Axis.to_kind(ax)] for ax in axes}
-        group = create_home_group(distances, velocities)
-        move_group = [group]
-        if (OT3Axis.Z_L or OT3Axis.Z_R) in axes:
-            distances_z = {
-                ax: distances[ax] for ax in ([OT3Axis.Z_L, OT3Axis.Z_R] and axes)
-            }
-            velocities_z = {
-                ax: velocities[ax] for ax in ([OT3Axis.Z_L, OT3Axis.Z_R] and axes)
-            }
-            for ax in [OT3Axis.Z_L, OT3Axis.Z_R] and axes:
-                del distances[ax]
-                del velocities[ax]
-            group_z = create_home_group(distances_z, velocities_z)
-            move_group.append(group_z)
+        distances = {
+            ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
+            for ax in axes
+            if ax not in OT3Axis.mount_axes()
+        }
+        velocities = {
+            ax: -1 * speed_settings[OT3Axis.to_kind(ax)]
+            for ax in axes
+            if ax not in OT3Axis.mount_axes()
+        }
 
-        runner = MoveGroupRunner(move_groups=move_group)
+        distances_z = {
+            ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
+            for ax in axes
+            if ax in OT3Axis.mount_axes()
+        }
+        velocities_z = {
+            ax: -1 * speed_settings[OT3Axis.to_kind(ax)]
+            for ax in axes
+            if ax in OT3Axis.mount_axes()
+        }
+        move_groups = []
+        if distances_z and velocities_z:
+            z_group = create_home_group(distances_z, velocities_z)
+            move_groups.append(z_group)
+        if distances and velocities:
+            group = create_home_group(distances, velocities)
+            move_groups.append(group)
+
+        runner = MoveGroupRunner(move_groups=move_groups)
         await runner.run(can_messenger=self._messenger)
 
         for ax in axes:
