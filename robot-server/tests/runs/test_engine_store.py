@@ -102,7 +102,7 @@ async def test_clear_idle_engine(subject: EngineStore) -> None:
 
 
 async def test_get_default_engine(subject: EngineStore) -> None:
-    """It should create a retrieve a default ProtocolEngine."""
+    """It should create and retrieve a default ProtocolEngine."""
     result = await subject.get_default_engine()
     repeated_result = await subject.get_default_engine()
 

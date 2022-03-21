@@ -3,12 +3,18 @@ import pytest
 from datetime import datetime
 from decoy import Decoy
 
-from opentrons.protocol_engine import ProtocolEngine, commands as pe_commands
+from opentrons.protocol_engine import (
+    ProtocolEngine,
+    CommandSlice,
+    CurrentCommand,
+    commands as pe_commands,
+)
+from opentrons.protocol_engine.errors import CommandDoesNotExistError
 
-from robot_server.service.json_api import RequestModel
+from robot_server.service.json_api import RequestModel, MultiBodyMeta
 from robot_server.errors import ApiError
 from robot_server.runs import EngineStore, EngineConflictError
-from robot_server.commands.router import create_command
+from robot_server.commands.router import create_command, get_commands_list, get_command
 
 
 @pytest.fixture()
@@ -120,7 +126,7 @@ async def test_create_command_wait_for_complete(
     assert result.status_code == 201
 
 
-async def test_create_command_conflixt(decoy: Decoy, engine_store: EngineStore) -> None:
+async def test_create_command_conflict(decoy: Decoy, engine_store: EngineStore) -> None:
     """It should raise a conflict if there is an active engine in place."""
     home_create = pe_commands.HomeCreate(params=pe_commands.HomeParams())
 
@@ -138,3 +144,123 @@ async def test_create_command_conflixt(decoy: Decoy, engine_store: EngineStore) 
 
     assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["id"] == "RunActive"
+
+
+async def test_get_commands_list(
+    decoy: Decoy,
+    engine_store: EngineStore,
+    protocol_engine: ProtocolEngine,
+) -> None:
+    """It should get a list of commands."""
+    command_1 = pe_commands.Home(
+        id="abc123",
+        key="command-key-1",
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=pe_commands.CommandStatus.QUEUED,
+        params=pe_commands.HomeParams(),
+    )
+    command_2 = pe_commands.Home(
+        id="def456",
+        key="command-key-2",
+        createdAt=datetime(year=2022, month=2, day=2),
+        status=pe_commands.CommandStatus.QUEUED,
+        params=pe_commands.HomeParams(),
+    )
+
+    decoy.when(await engine_store.get_default_engine()).then_return(protocol_engine)
+    decoy.when(protocol_engine.state_view.commands.get_current()).then_return(
+        CurrentCommand(
+            command_id="abc123",
+            command_key="command-key-1",
+            created_at=datetime(year=2021, month=1, day=1),
+            index=0,
+        )
+    )
+    decoy.when(
+        protocol_engine.state_view.commands.get_slice(cursor=1337, length=42)
+    ).then_return(
+        CommandSlice(commands=[command_1, command_2], cursor=0, total_length=2)
+    )
+
+    result = await get_commands_list(
+        engine_store=engine_store,
+        cursor=1337,
+        pageLength=42,
+    )
+
+    assert result.content.data == [command_1, command_2]
+    assert result.content.meta == MultiBodyMeta(cursor=0, totalLength=2)
+    assert result.status_code == 200
+
+
+async def test_get_commands_list_conflict(
+    decoy: Decoy,
+    engine_store: EngineStore,
+) -> None:
+    """It should raise a conflict if there is an active engine in place."""
+    decoy.when(await engine_store.get_default_engine()).then_raise(
+        EngineConflictError("oh no")
+    )
+
+    with pytest.raises(ApiError) as exc_info:
+        await get_commands_list(engine_store=engine_store)
+
+    assert exc_info.value.status_code == 409
+    assert exc_info.value.content["errors"][0]["id"] == "RunActive"
+
+
+async def test_get_command(
+    decoy: Decoy,
+    engine_store: EngineStore,
+    protocol_engine: ProtocolEngine,
+) -> None:
+    """It should get a single command by ID."""
+    command_1 = pe_commands.Home(
+        id="abc123",
+        key="command-key-1",
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=pe_commands.CommandStatus.QUEUED,
+        params=pe_commands.HomeParams(),
+    )
+
+    decoy.when(await engine_store.get_default_engine()).then_return(protocol_engine)
+    decoy.when(protocol_engine.state_view.commands.get("abc123")).then_return(command_1)
+
+    result = await get_command(commandId="abc123", engine_store=engine_store)
+
+    assert result.content.data == command_1
+    assert result.status_code == 200
+
+
+async def test_get_command_conflict(
+    decoy: Decoy,
+    engine_store: EngineStore,
+) -> None:
+    """It should raise a conflict if there is an active engine in place."""
+    decoy.when(await engine_store.get_default_engine()).then_raise(
+        EngineConflictError("oh no")
+    )
+
+    with pytest.raises(ApiError) as exc_info:
+        await get_command(commandId="abc123", engine_store=engine_store)
+
+    assert exc_info.value.status_code == 409
+    assert exc_info.value.content["errors"][0]["id"] == "RunActive"
+
+
+async def test_get_command_not_found(
+    decoy: Decoy,
+    engine_store: EngineStore,
+    protocol_engine: ProtocolEngine,
+) -> None:
+    """It should raise a 404 if command is not found."""
+    decoy.when(await engine_store.get_default_engine()).then_return(protocol_engine)
+    decoy.when(protocol_engine.state_view.commands.get("abc123")).then_raise(
+        CommandDoesNotExistError("oh no")
+    )
+
+    with pytest.raises(ApiError) as exc_info:
+        await get_command(commandId="abc123", engine_store=engine_store)
+
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.content["errors"][0]["id"] == "StatelessCommandNotFound"

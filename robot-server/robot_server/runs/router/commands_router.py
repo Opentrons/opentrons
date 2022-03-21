@@ -24,8 +24,7 @@ from ..dependencies import get_engine_store
 from .base_router import RunNotFound, RunStopped, get_run_data_from_url
 
 
-_DEFAULT_COMMANDS_BEFORE: Final = 20
-_DEFAULT_COMMANDS_AFTER: Final = 30
+_DEFAULT_COMMAND_LIST_LENGTH: Final = 20
 _DEFAULT_COMMAND_WAIT_MS: Final = 30_000
 
 commands_router = APIRouter()
@@ -169,8 +168,18 @@ async def create_run_command(
 async def get_run_commands(
     engine_store: EngineStore = Depends(get_engine_store),
     run: Run = Depends(get_run_data_from_url),
-    cursor: Optional[int] = None,
-    pageLength: int = _DEFAULT_COMMANDS_BEFORE,
+    cursor: Optional[int] = Query(
+        None,
+        description=(
+            "The starting index of the desired first command in the list."
+            " If unspecicifed, a cursor will be selected automatically"
+            " based on the next queued or more recently executed command."
+        ),
+    ),
+    pageLength: int = Query(
+        _DEFAULT_COMMAND_LIST_LENGTH,
+        description="The maximum number of commands in the list to return.",
+    ),
 ) -> PydanticResponse[MultiBody[RunCommandSummary, CommandCollectionLinks]]:
     """Get a summary of all commands in a run.
 
