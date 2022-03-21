@@ -30,6 +30,14 @@ class PartitionManager:
             b"": RootPartitions.THREE,
         }[which]
 
+    def switch_partition(self):
+        unused_partition = self.find_unused_partition()
+        if unused_partition.value.number == 2:
+            subprocess.check_output("fw_setenv root_part 2")
+        else:
+            subprocess.check_output("fw_setenv root_part 3")
+
+
 
 class RootFSInterface:
     """RootFS interface class."""
