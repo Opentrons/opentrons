@@ -37,6 +37,7 @@ import {
 import { useTrackEvent } from '../../redux/analytics'
 import { UpdateAppModal } from '../UpdateAppModal'
 import { PreviousVersionModal } from './PreviousVersionModal'
+import { ConnectRobotSlideout } from './ConnectRobotSlideout'
 
 import type { Dispatch, State } from '../../redux/types'
 
@@ -59,6 +60,10 @@ export function GeneralSettings(): JSX.Element {
   const [showUpdateBanner, setShowUpdateBanner] = React.useState(
     updateAvailable
   )
+  const [
+    showConnectRobotSlideout,
+    setShowConnectRobotSlideout,
+  ] = React.useState(false)
 
   // may be enabled, disabled, or unknown (because config is loading)
   const enabled = useSelector((s: State) => {
@@ -118,6 +123,12 @@ export function GeneralSettings(): JSX.Element {
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           gridGap={SPACING.spacing4}
         >
+          {showConnectRobotSlideout && (
+            <ConnectRobotSlideout
+              isExpanded={showConnectRobotSlideout}
+              onCloseClick={() => setShowConnectRobotSlideout(false)}
+            />
+          )}
           <Box width="70%">
             <Text css={TYPOGRAPHY.h3SemiBold} paddingBottom={SPACING.spacing3}>
               {t('software_version')}
@@ -199,6 +210,7 @@ export function GeneralSettings(): JSX.Element {
           <TertiaryButton
             marginLeft={SPACING_AUTO}
             id="GeneralSettings_setUpConnection"
+            onClick={() => setShowConnectRobotSlideout(true)}
           >
             {t('setup_connection')}
           </TertiaryButton>

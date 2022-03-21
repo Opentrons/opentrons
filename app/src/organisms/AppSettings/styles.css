@@ -1,0 +1,70 @@
+@import '@opentrons/components';
+
+:root {
+  --ip-item: {
+    flex: 1 0 100%;
+    padding: 0 1rem;
+    border: 0;
+    border-radius: 0;
+    outline: 0;
+    line-height: 2rem;
+  }
+}
+
+.ip_field_group {
+  display: flex;
+  justify-content: flex-start;
+  border: 1px solid var(--c-med-gray);
+  height: 2rem;
+}
+
+.ip_field {
+  @apply --ip-item;
+
+  width: 100%;
+
+  &:focus {
+    box-shadow: 0 0.125rem 0.25rem 0 color-mod(var(--c-black) alpha(0.5));
+  }
+}
+
+.add_ip_button {
+  padding: 0.25rem;
+  flex: 0 0 2rem;
+  border-radius: 0;
+  margin-left: -2rem;
+
+  &:hover,
+  &:active {
+    background-color: color-mod(var(--c-bg-light) shade(10%));
+  }
+
+  &:focus {
+    background-color: transparent;
+  }
+}
+
+.ip_item_group {
+  display: flex;
+  justify-content: flex-start;
+  border: 1px solid var(--c-med-gray);
+  height: 2rem;
+  border-top-width: 0;
+}
+
+.ip_item {
+  @apply --ip-item;
+
+  flex: 1 1 calc(100% - 4rem);
+}
+
+.remove_ip_button {
+  padding: 0.25rem;
+  flex: 0 0 2rem;
+  border-radius: 0;
+}
+
+.discovery_icon {
+  padding: 0.5rem;
+  flex: 0 0 2rem;
+}
