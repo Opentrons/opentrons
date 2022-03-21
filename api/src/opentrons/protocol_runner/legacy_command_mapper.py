@@ -13,7 +13,7 @@ from opentrons.protocol_engine import (
     types as pe_types,
 )
 from opentrons.protocol_engine.resources import ModelUtils, ModuleDataProvider
-from opentrons.protocols.models.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons.protocols.geometry.deck import FIXED_TRASH_ID
 
 from .legacy_wrappers import (

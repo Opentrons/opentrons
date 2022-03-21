@@ -8,7 +8,7 @@ from functools import partial
 
 
 from opentrons.protocol_engine import ProtocolEngine, commands
-from opentrons.protocol_engine.errors import ProtocolEngineError
+from opentrons.protocol_engine.errors import ErrorOccurrence, ProtocolEngineError
 from opentrons.protocol_engine.clients.transports import ChildThreadTransport
 
 
@@ -72,6 +72,12 @@ async def test_execute_command_failure(
         wellName="A1",
     )
     cmd_request = commands.MoveToWellCreate(params=cmd_data)
+    error = ErrorOccurrence(
+        id="error-id",
+        errorType="PrettyBadError",
+        createdAt=datetime(year=2021, month=1, day=1),
+        detail="Things are not looking good.",
+    )
 
     decoy.when(await engine.add_and_execute_command(request=cmd_request)).then_return(
         commands.MoveToWell(
@@ -79,15 +85,12 @@ async def test_execute_command_failure(
             key="cmd-key",
             params=cmd_data,
             status=commands.CommandStatus.FAILED,
-            errorId="error-id",
+            error=error,
             createdAt=datetime.now(),
         )
     )
 
     task = partial(subject.execute_command, request=cmd_request)
 
-    with pytest.raises(
-        ProtocolEngineError,
-        match='Command "cmd-id" failed due to error "error-id"',
-    ):
+    with pytest.raises(ProtocolEngineError, match="Things are not looking good"):
         await loop.run_in_executor(None, task)

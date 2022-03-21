@@ -1,3 +1,4 @@
+from __future__ import annotations
 from enum import Enum
 from dataclasses import dataclass
 from typing import (
@@ -5,8 +6,6 @@ from typing import (
     NamedTuple,
     Callable,
     Any,
-    Type,
-    TypeVar,
     Tuple,
     Awaitable,
     Mapping,
@@ -22,6 +21,7 @@ if TYPE_CHECKING:
         ThermocyclerModuleType,
         MagneticModuleType,
         TemperatureModuleType,
+        HeaterShakerModuleType,
     )
 
 ThermocyclerStep = Dict[str, float]
@@ -31,44 +31,29 @@ UploadFunction = Callable[[str, str, Dict[str, Any]], Awaitable[Tuple[bool, str]
 LiveData = Mapping[str, Union[str, Mapping[str, Union[float, str, None]]]]
 
 
-E = TypeVar("E", bound="_ProvideLookup")
+class ModuleType(str, Enum):
+    THERMOCYCLER: ThermocyclerModuleType = "thermocyclerModuleType"
+    TEMPERATURE: TemperatureModuleType = "temperatureModuleType"
+    MAGNETIC: MagneticModuleType = "magneticModuleType"
+    HEATER_SHAKER: HeaterShakerModuleType = "heaterShakerModuleType"
 
 
-# TODO(mc, 2022-01-18): this mixin is unnecessary; Python enums can
-# use parenthetical notation to access by value
-class _ProvideLookup(Enum):
-    @classmethod
-    def from_str(cls: Type[E], typename: str) -> "E":
-        for m in cls.__members__.values():
-            if m.value == typename:
-                return m
-        raise AttributeError(f"No such type {typename}")
-
-
-class ModuleType(_ProvideLookup):
-    THERMOCYCLER: "ThermocyclerModuleType" = "thermocyclerModuleType"
-    TEMPERATURE: "TemperatureModuleType" = "temperatureModuleType"
-    MAGNETIC: "MagneticModuleType" = "magneticModuleType"
-
-
-class MagneticModuleModel(_ProvideLookup):
+class MagneticModuleModel(str, Enum):
     MAGNETIC_V1: str = "magneticModuleV1"
     MAGNETIC_V2: str = "magneticModuleV2"
 
 
-class TemperatureModuleModel(_ProvideLookup):
+class TemperatureModuleModel(str, Enum):
     TEMPERATURE_V1: str = "temperatureModuleV1"
     TEMPERATURE_V2: str = "temperatureModuleV2"
 
 
-class ThermocyclerModuleModel(_ProvideLookup):
-    @classmethod
-    def from_str(
-        cls: Type["ThermocyclerModuleModel"], typename: str
-    ) -> "ThermocyclerModuleModel":
-        return super().from_str(typename)
-
+class ThermocyclerModuleModel(str, Enum):
     THERMOCYCLER_V1: str = "thermocyclerModuleV1"
+
+
+class HeaterShakerModuleModel(str, Enum):
+    HEATER_SHAKER_V1: str = "heaterShakerModuleV1"
 
 
 @dataclass

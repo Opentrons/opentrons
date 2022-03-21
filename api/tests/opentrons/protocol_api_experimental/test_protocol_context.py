@@ -32,35 +32,35 @@ from opentrons.protocol_api_experimental import (
 @pytest.fixture(scope="session")
 def magdeck_v1_def() -> ModuleDefinition:
     """Get the definition of a V1 magdeck."""
-    definition = load_shared_data("module/definitions/2/magneticModuleV1.json")
+    definition = load_shared_data("module/definitions/3/magneticModuleV1.json")
     return ModuleDefinition.parse_raw(definition)
 
 
 @pytest.fixture(scope="session")
 def magdeck_v2_def() -> ModuleDefinition:
-    """Get the definition of a V1 magdeck."""
-    definition = load_shared_data("module/definitions/2/magneticModuleV2.json")
+    """Get the definition of a V2 magdeck."""
+    definition = load_shared_data("module/definitions/3/magneticModuleV2.json")
     return ModuleDefinition.parse_raw(definition)
 
 
 @pytest.fixture(scope="session")
 def tempdeck_v2_def() -> ModuleDefinition:
-    """Get the definition of a V1 tempdeck."""
-    definition = load_shared_data("module/definitions/2/temperatureModuleV2.json")
+    """Get the definition of a V2 tempdeck."""
+    definition = load_shared_data("module/definitions/3/temperatureModuleV2.json")
     return ModuleDefinition.parse_raw(definition)
 
 
 @pytest.fixture(scope="session")
 def tempdeck_v1_def() -> ModuleDefinition:
     """Get the definition of a V1 tempdeck."""
-    definition = load_shared_data("module/definitions/2/temperatureModuleV1.json")
+    definition = load_shared_data("module/definitions/3/temperatureModuleV1.json")
     return ModuleDefinition.parse_raw(definition)
 
 
 @pytest.fixture(scope="session")
 def thermocycler_v1_def() -> ModuleDefinition:
-    """Get the definition of a V2 thermocycler."""
-    definition = load_shared_data("module/definitions/2/thermocyclerModuleV1.json")
+    """Get the definition of a V1 thermocycler."""
+    definition = load_shared_data("module/definitions/3/thermocyclerModuleV1.json")
     return ModuleDefinition.parse_raw(definition)
 
 
