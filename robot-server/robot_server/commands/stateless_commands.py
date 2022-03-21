@@ -45,6 +45,3 @@ StatelessCommand = Union[
     commands.heater_shaker.OpenLatch,
     commands.heater_shaker.CloseLatch,
 ]
-
-
-StatelessCommand
