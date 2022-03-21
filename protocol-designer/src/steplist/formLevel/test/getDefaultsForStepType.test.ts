@@ -131,6 +131,18 @@ describe('getDefaultsForStepType', () => {
       })
     })
   })
+  describe('heater shaker step', () => {
+    it('should get the correct defaults', () => {
+      expect(getDefaultsForStepType('heaterShaker')).toEqual({
+        moduleId: null,
+        setTemperature: null,
+        targetHeaterShakerTemperature: null,
+        setShake: null,
+        latchOpen: false,
+        setTimer: null,
+      })
+    })
+  })
   describe('thermocycler step', () => {
     it('should get the correct defaults', () => {
       expect(getDefaultsForStepType('thermocycler')).toEqual({

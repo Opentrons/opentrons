@@ -16,14 +16,7 @@ interface Props {
 }
 
 export const StateFields = (props: Props): JSX.Element => {
-  const { isEndingHold, propsForFields, formData } = props
-
-  // Append 'Hold' to field names if component is used for an ending hold in a TC profile
-  const tempActiveName = isEndingHold ? 'tempIsActiveHold' : 'tempIsActive'
-  const tempName = isEndingHold ? 'targetTempHold' : 'targetTemp'
-  const shakeActiveName = isEndingHold ? 'shakeIsActiveHold' : 'shakeIsActive'
-  const shakeName = isEndingHold ? 'targetShakeHold' : 'targetShake'
-  const LatchOpenName = isEndingHold ? 'latchOpenHold' : 'latchOpen'
+  const { propsForFields, formData } = props
 
   return (
     <div className={styles.form_row}>
@@ -35,7 +28,7 @@ export const StateFields = (props: Props): JSX.Element => {
       >
         <div className={styles.toggle_row}>
           <ToggleRowField
-            {...propsForFields[tempActiveName]}
+            {...propsForFields.setTemperature}
             offLabel={i18n.t(
               'form.step_edit_form.field.heaterShakerState.temperature.toggleOff'
             )}
@@ -43,9 +36,9 @@ export const StateFields = (props: Props): JSX.Element => {
               'form.step_edit_form.field.heakerShakerState.temperature.toggleOn'
             )}
           />
-          {formData[tempActiveName] === true && (
+          {formData.setTemperature === true && (
             <TextField
-              {...propsForFields[tempName]}
+              {...propsForFields.targetHeaterShakerTemperature}
               className={cx(
                 styles.small_field,
                 styles.toggle_temperature_field
@@ -58,13 +51,13 @@ export const StateFields = (props: Props): JSX.Element => {
 
       <FormGroup
         label={i18n.t(
-          'form.step_edit_form.field.heaterShakerState.shaker.setShaker'
+          'form.step_edit_form.field.heaterShakerState.shaker.setShake'
         )}
         className={styles.toggle_form_group}
       >
         <div className={styles.toggle_row}>
           <ToggleRowField
-            {...propsForFields[shakeActiveName]}
+            {...propsForFields.setShake}
             offLabel={i18n.t(
               'form.step_edit_form.field.heaterShakerState.shaker.toggleOff'
             )}
@@ -72,9 +65,9 @@ export const StateFields = (props: Props): JSX.Element => {
               'form.step_edit_form.field.heaterShakerState.shaker.toggleOn'
             )}
           />
-          {formData[shakeActiveName] === true && (
+          {formData.setShake === true && (
             <TextField
-              {...propsForFields[shakeName]}
+              {...propsForFields.targetSpeed}
               className={cx(
                 styles.small_field,
                 styles.toggle_temperature_field
@@ -92,7 +85,7 @@ export const StateFields = (props: Props): JSX.Element => {
         className={styles.toggle_form_group}
       >
         <ToggleRowField
-          {...propsForFields[LatchOpenName]}
+          {...propsForFields.latchOpen}
           offLabel={i18n.t(
             'form.step_edit_form.field.heaterShakerState.latch.toggleOff'
           )}
