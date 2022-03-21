@@ -52,10 +52,7 @@ class SensorDataType:
     @staticmethod
     def _convert_to_int(backing: List[int]) -> int:
         """Convert data to int."""
-        store = 0
-        for i in backing:
-            store |= i << 8
-        return int(store)
+        return int.from_bytes(backing, byteorder="little", signed=True)
 
 
 @dataclass

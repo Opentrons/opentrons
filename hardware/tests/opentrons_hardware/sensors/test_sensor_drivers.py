@@ -20,6 +20,7 @@ from opentrons_hardware.firmware_bindings.utils import (
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     BaselineSensorRequest,
     ReadFromSensorRequest,
+    SetSensorThresholdRequest,
     WriteToSensorRequest,
     ReadFromSensorResponse,
     SensorThresholdResponse,
@@ -113,7 +114,7 @@ async def test_receive_data_polling(
         can_message_notifier.notify(
             ReadFromSensorResponse(
                 payload=ReadFromSensorResponsePayload(
-                    sensor_data=Int32Field(0x100),
+                    sensor_data=Int32Field(256),
                     sensor=SensorTypeField(sensor._sensor_type),
                 )
             ),
@@ -129,7 +130,7 @@ async def test_receive_data_polling(
 
     mock_messenger.send.side_effect = responder
     return_data = await sensor.poll(mock_messenger, NodeId.pipette_left, 10)
-    assert return_data == SensorDataType.build([0x100])
+    assert return_data == SensorDataType.build([0x0, 0x1, 0x0])
 
 
 @pytest.mark.parametrize(
@@ -262,7 +263,7 @@ async def test_receive_data_read(
         can_message_notifier.notify(
             ReadFromSensorResponse(
                 payload=ReadFromSensorResponsePayload(
-                    sensor_data=Int32Field(0x100),
+                    sensor_data=Int32Field(256),
                     sensor=SensorTypeField(sensor._sensor_type),
                 )
             ),
@@ -278,7 +279,7 @@ async def test_receive_data_read(
 
     mock_messenger.send.side_effect = responder
     return_data = await sensor.read(mock_messenger, NodeId.pipette_left, False, 10)
-    assert return_data == SensorDataType.build([0x100])
+    assert return_data == SensorDataType.build([0x0, 0x1, 0x0])
 
 
 @pytest.mark.parametrize(
@@ -294,26 +295,27 @@ async def test_threshold(
 
     def responder(node_id: NodeId, message: MessageDefinition) -> None:
         """Message responder."""
-        can_message_notifier.notify(
-            SensorThresholdResponse(
-                payload=SensorThresholdResponsePayload(
-                    threshold=Int32Field(0x5),
-                    sensor=SensorTypeField(sensor._sensor_type),
-                )
-            ),
-            ArbitrationId(
-                parts=ArbitrationIdParts(
-                    message_id=ReadFromSensorResponse.message_id,
-                    node_id=NodeId.host,
-                    function_code=0,
-                    originating_node_id=node_id,
-                )
-            ),
-        )
+        if isinstance(message, SetSensorThresholdRequest):
+            can_message_notifier.notify(
+                SensorThresholdResponse(
+                    payload=SensorThresholdResponsePayload(
+                        threshold=message.payload.threshold,
+                        sensor=SensorTypeField(sensor._sensor_type),
+                    )
+                ),
+                ArbitrationId(
+                    parts=ArbitrationIdParts(
+                        message_id=ReadFromSensorResponse.message_id,
+                        node_id=NodeId.host,
+                        function_code=0,
+                        originating_node_id=node_id,
+                    )
+                ),
+            )
 
-    threshold = SensorDataType.build([0x2, 0x2, 0x0, 0x0])
+    threshold = SensorDataType.build([0x0, 0x5])
     mock_messenger.send.side_effect = responder
     return_data = await sensor.send_zero_threshold(
         mock_messenger, NodeId.pipette_left, threshold, 10
     )
-    assert return_data == SensorDataType.build([0x5])
+    assert return_data == threshold
