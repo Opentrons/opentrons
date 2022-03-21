@@ -29,7 +29,8 @@ class PartitionManager:
         return {
             b"2": RootPartitions.THREE,
             b"3": RootPartitions.TWO,
-            b" ": RootPartitions.TWO,
+            # if output is empty, current part is 2, set unsed to 3!
+            b" ": RootPartitions.THREE,
         }[which]
 
 
