@@ -24,7 +24,7 @@ def subject() -> JsonCommandTranslator:
 
 def _make_json_protocol(
         *,
-        pipettes: Dict[str, json_v6_models.Pipette] = {},
+        pipettes: Dict[str, json_v6_models.Pipette] = {"pipetteId": {"name": "p10_single"}},
         labware_definitions: Dict[str, LabwareDefinition] = {},
         labware: Dict[str, json_v6_models.Labware] = {},
         commands: List[json_v6_models.Command] = [],
@@ -110,7 +110,14 @@ def load_command_list() -> Tuple[List[json_v6_models.Command], List[pe_commands.
                 wait=True,
                 message="hello world",
             ),
-        )]
+        ),
+        json_v6_models.Command(
+            id="load-pipette-command-id-666",
+            commandType="loadPipette",  # used to be delay but is expecting pause
+            params=json_v6_models.Params(
+                pipetteId="pipetteId",
+                mount="left"
+            ))]
 
     expected_output = [
         pe_commands.AspirateCreate(
@@ -158,7 +165,12 @@ def load_command_list() -> Tuple[List[json_v6_models.Command], List[pe_commands.
                     offset=WellOffset(x=0, y=0, z=7.89))
             )
         ),
-        pe_commands.PauseCreate(params=pe_commands.PauseParams(message="hello world"))
+        pe_commands.PauseCreate(params=pe_commands.PauseParams(message="hello world")),
+        pe_commands.LoadPipetteCreate(params=pe_commands.LoadPipetteParams(
+            pipetteId="pipetteId",
+            pipetteName="p10_single",
+            mount="left"
+        ))
     ]
 
     return command_list, expected_output
