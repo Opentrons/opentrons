@@ -138,8 +138,11 @@ describe('getDefaultsForStepType', () => {
         setTemperature: null,
         targetHeaterShakerTemperature: null,
         setShake: null,
+        targetSpeed: null,
         latchOpen: false,
-        setTimer: null,
+        heaterShakerSetTimer: null,
+        heaterShakerTimerMinutes: null,
+        heaterShakerTimerSeconds: null,
       })
     })
   })
