@@ -93,3 +93,18 @@ def test_load_wrong_path(tmpdir):
     loaded = json.load(open(bad_path))
     assert loaded == {k: v for k, v in conf._asdict().items() if k != "path"}
     check_defaults(conf, False)
+
+
+@pytest.mark.parametrize("path", ["conf.txt", "some/path/config.txt", "some/conf.txt"])
+def test_save_to_path(path: str, tmpdir) -> None:
+    """It should save file to any path."""
+    path = os.path.join(tmpdir.dirname, path)
+
+    otupdate_config = config.Config(
+        signature_required=True,
+        download_storage_path="aaaa",
+        path=path,
+        update_cert_path=".",
+    )
+    config.save_to_path(path, otupdate_config)
+    assert config.load_from_path(path) == otupdate_config
