@@ -49,6 +49,25 @@ def mock_move_group_run():
         yield mock_mgr_run
 
 
+@pytest.fixture
+def mock_present_nodes(controller: OT3Controller):
+    old_pn = controller._present_nodes
+    controller._present_nodes = set(
+        (
+            NodeId.pipette_left,
+            NodeId.gantry_x,
+            NodeId.gantry_y,
+            NodeId.head_l,
+            NodeId.head_r,
+            NodeId.pipette_right,
+        )
+    )
+    try:
+        yield controller
+    finally:
+        controller._present_nodes = old_pn
+
+
 @pytest.mark.parametrize(
     "axes",
     [
@@ -59,7 +78,9 @@ def mock_move_group_run():
         [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_R],
     ],
 )
-async def test_home(controller: OT3Controller, mock_move_group_run, axes):
+async def test_home(
+    controller: OT3Controller, mock_move_group_run, axes, mock_present_nodes
+):
     await controller.home(axes)
     home_move = (mock_move_group_run.call_args_list[0][0][0]._move_groups)[0][0][
         axis_to_node(axes[0])
@@ -69,6 +90,13 @@ async def test_home(controller: OT3Controller, mock_move_group_run, axes):
     assert home_move.move_type == MoveType.home
     assert home_move.stop_condition == MoveStopCondition.limit_switch
     mock_move_group_run.assert_called_once()
+
+
+async def test_home_only_present_nodes(controller: OT3Controller, mock_move_group_run):
+    controller._present_nodes = set((NodeId.gantry_x, NodeId.gantry_y))
+    await controller.home([OT3Axis.X, OT3Axis.Z_L])
+    home_move = (mock_move_group_run.call_args_list[0][0][0]._move_groups)[0][0]
+    assert list(home_move.keys()) == [NodeId.gantry_x]
 
 
 async def test_probing(controller: OT3Controller) -> None:
