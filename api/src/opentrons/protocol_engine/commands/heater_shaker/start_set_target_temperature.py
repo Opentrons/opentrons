@@ -49,25 +49,22 @@ class StartSetTargetTemperatureImpl(
         params: StartSetTargetTemperatureParams,
     ) -> StartSetTargetTemperatureResult:
         """Set a Heater-Shaker's target temperature."""
-        await self._set_target_temperature(
-            module_id=params.moduleId,
-            celsius=params.temperature,
+        # Allow propagation of ModuleNotLoadedError and WrongModuleTypeError.
+        hs_module_view = self._state_view.modules.get_heater_shaker_module_view(
+            module_id=params.moduleId
         )
-        return StartSetTargetTemperatureResult()
 
-    async def _set_target_temperature(self, module_id: str, celsius: float) -> None:
-        """Set target temperature and return immediately."""
-        model = self._state_view.modules.get_model(module_id)
-        assert self._state_view.modules.is_target_temperature_valid(
-            heating_module_model=model,
-            celsius=celsius
+        # Verify temperature from hs module view
+        assert hs_module_view.is_target_temperature_valid(params.temperature)
+
+        # Allow propagation of ModuleNotAttachedError.
+        hs_hardware_module = hs_module_view.find_hardware(
+            attached_modules=self._hardware_api.attached_modules
         )
-        hardware_module = self._state_view.modules.find_loaded_hardware_module(
-            module_id=module_id,
-            attached_modules=self._hardware_api.attached_modules,
-            expected_type=HeaterShaker,
-        )
-        await hardware_module.start_set_temperature(celsius)
+
+        if hs_hardware_module is not None:
+            await hs_hardware_module.start_set_temperature(params.temperature)
+        return StartSetTargetTemperatureResult()
 
 
 class StartSetTargetTemperature(

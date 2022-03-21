@@ -8,7 +8,7 @@ from typing import Dict, List, NamedTuple, Optional, Sequence, overload
 from typing_extensions import Final
 from numpy import array, dot
 
-from opentrons.hardware_control.modules import AbstractModule, MagDeck
+from opentrons.hardware_control.modules import AbstractModule, MagDeck, HeaterShaker
 from opentrons.hardware_control.modules.magdeck import (
     engage_height_is_in_range,
     OFFSET_TO_LABWARE_BOTTOM as MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM,
@@ -172,6 +172,16 @@ class ModuleView(HasState[ModuleState]):
             raise errors.WrongModuleTypeError(
                 f"{module_id} is a {model}, not a Magnetic Module."
             )
+
+    def get_heater_shaker_module_view(self, module_id: str) -> HeaterShakerModuleView:
+        """Return a `HeaterShakerModuleView` for the given Heater-Shaker Module.
+
+         Raises:
+            ModuleNotLoadedError: If module_id has not been loaded.
+            WrongModuleTypeError: If module_id has been loaded,
+                but it's not a Heater-Shaker Module.
+         """
+        pass
 
     def get_location(self, module_id: str) -> DeckSlotLocation:
         """Get the slot location of the given module."""
@@ -531,3 +541,66 @@ class MagneticModuleView:
                 f" 0 - {MAGNETIC_MODULE_MAX_ENGAGE_HEIGHT[model]}."
             )
         return hardware_units_from_home
+
+
+class HeaterShakerModuleView:
+    """A Heater-Shaker Module view.
+
+    Provides calculations and read-only state access
+    for an individual loaded Heater-Shaker Module.
+    """
+
+    def __init__(self, parent_module_view: ModuleView, module_id: str) -> None:
+        """Initialize the `HeaterShakerModuleView`.
+
+        Do not use this initializer directly, except in tests.
+        Use `ModuleView.get_heater_shaker_module_view()` instead.
+        """
+        self.parent_module_view: Final = parent_module_view
+        self.module_id: Final = module_id
+
+    def find_hardware(
+        self, attached_modules: List[AbstractModule]
+    ) -> Optional[HeaterShaker]:
+        """Find the matching attached hardware module.
+
+        Params:
+            attached_modules: The list of attached hardware modules,
+                from the `HardwareControlAPI`, to search.
+                If the Protocol Engine is using virtual modules,
+                there are no meaningful "attached hardware modules,"
+                so this list is ignored.
+
+        Returns:
+            If the Protocol Engine is using virtual modules, returns ``None``.
+            If not, returns the element of attached_modules that corresponds to
+            the same individual module as this `HeaterShakerModuleView`.
+
+        Raises:
+            ModuleNotAttachedError: If no match was found in ``attached_modules``,
+                and the Protocol Engine is *not* using virtual modules.
+        """
+        if self.parent_module_view.is_virtualizing_modules():
+            return None
+        else:
+            serial_number = self.parent_module_view.get_serial_number(
+                module_id=self.module_id
+            )
+            for candidate in attached_modules:
+                if candidate.device_info["serial"] == serial_number and isinstance(
+                    candidate, HeaterShaker
+                ):
+                    return candidate
+            # This will report a mismatched module type as ModuleNotAttachedError
+            # instead of WrongModuleTypeError, but that's fine because that
+            # shouldn't be possible anyway. (It should be caught at module load.)
+            raise errors.ModuleNotAttachedError(
+                f'No module attached with serial number "{serial_number}'
+                f' for Protocol Engine module ID "{self.module_id}".'
+            )
+
+    @staticmethod
+    def is_target_temperature_valid(celsius: float) -> bool:
+        """Verify that the target temperature being set is valid for heater-shaker."""
+        return (HEATER_SHAKER_TEMPERATURE_RANGE.min
+                <= celsius <= HEATER_SHAKER_TEMPERATURE_RANGE.max)
