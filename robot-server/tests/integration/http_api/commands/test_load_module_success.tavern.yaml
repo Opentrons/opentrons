@@ -1,0 +1,59 @@
+test_name: loadModule command success
+
+marks:
+  - usefixtures:
+      - run_server
+  - parametrize:
+      key: model
+      vals:
+        - magneticModuleV1
+        - thermocyclerModuleV1
+        - temperatureModuleV1
+        - temperatureModuleV2 # can map to attached temperatureModuleV1
+        - heaterShakerModuleV1
+
+stages:
+  - name: Get modules
+    request:
+      url: '{host:s}:{port:d}/modules'
+      method: GET
+    response:
+      status_code: 200
+  - name: Create Empty Run
+    request:
+      url: '{host:s}:{port:d}/runs'
+      json:
+        data: {}
+      method: POST
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          status: idle
+          current: true
+      save:
+        json:
+          run_id: data.id
+  - name: Create loadModule Command
+    request:
+      url: '{host:s}:{port:d}/runs/{run_id}/commands'
+      method: POST
+      params:
+        waitUntilComplete: true
+      json:
+        data:
+          commandType: loadModule
+          params:
+            model: '{model}'
+            location:
+              slotName: '10'
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          status: succeeded

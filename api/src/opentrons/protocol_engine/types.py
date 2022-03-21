@@ -135,7 +135,9 @@ class MotorAxis(str, Enum):
     RIGHT_PLUNGER = "rightPlunger"
 
 
-# TODO(mc, 2022-01-18): move enum to hardware control module
+# TODO(mc, 2022-01-18): use opentrons_shared_data.module.dev_types.ModuleModel
+
+
 class ModuleModel(str, Enum):
     """All available modules' models."""
 
@@ -144,6 +146,7 @@ class ModuleModel(str, Enum):
     MAGNETIC_MODULE_V1 = "magneticModuleV1"
     MAGNETIC_MODULE_V2 = "magneticModuleV2"
     THERMOCYCLER_MODULE_V1 = "thermocyclerModuleV1"
+    HEATER_SHAKER_MODULE_V1 = "heaterShakerModuleV1"
 
     def as_type(self) -> ModuleType:
         """Get the ModuleType of this model."""
@@ -156,6 +159,8 @@ class ModuleModel(str, Enum):
             return ModuleType.MAGNETIC
         elif self == ModuleModel.THERMOCYCLER_MODULE_V1:
             return ModuleType.THERMOCYCLER
+        elif self == ModuleModel.HEATER_SHAKER_MODULE_V1:
+            return ModuleType.HEATER_SHAKER
 
         assert False, f"Invalid ModuleModel {self}"
 
