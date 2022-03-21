@@ -6,7 +6,7 @@ name: 'Update Server test/lint'
 on:
   push:
     paths:
-      - 'update-server/**'
+      - 'update-server/**/*'
       - 'Makefile'
       - '.github/workflows/update-server-lint-test.yaml'
       - '.github/actions/python/**'
@@ -17,7 +17,7 @@ on:
       - '*'
   pull_request:
     paths:
-      - 'update-server/**'
+      - 'update-server/**/*'
       - 'Makefile'
       - '.github/workflows/update-server-lint-test.yaml'
       - '.github/actions/python/**'

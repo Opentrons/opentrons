@@ -37,10 +37,11 @@ async def test_magnetic_module_engage_implementation(
     ).then_return(9001)
 
     attached = [decoy.mock(cls=AbstractModule), decoy.mock(cls=AbstractModule)]
+
     match = decoy.mock(cls=MagDeck)
     # "type: ignore" to mock out what's normally a read-only property.
-    hardware_api.attached_modules = attached  # type: ignore[misc]
 
+    decoy.when(hardware_api.attached_modules).then_return(attached)
     decoy.when(magnetic_module_view.find_hardware(attached)).then_return(match)
 
     result = await subject.execute(params=params)

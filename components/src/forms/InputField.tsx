@@ -53,6 +53,10 @@ export interface InputFieldProps {
   isIndeterminate?: boolean
 }
 
+/**
+ * @deprecated Use `InputField` in App/atoms instead
+ */
+
 export function InputField(props: InputFieldProps): JSX.Element {
   const error = props.error != null
   const labelClass = cx(styles.form_field, props.className, {
