@@ -27,10 +27,11 @@ class JsonCommandTranslator:
                 dict_command["params"].update({"pipetteName":protocol.pipettes[command.params.pipetteId].name})
             elif command.commandType == "loadModule":
                 dict_command["params"].update({"model":protocol.modules[command.params.moduleId].model})
-            # elif command.commandType == "loadLabware":
-            #     translated_obj.params.displayName = protocol.labware[command.params.labwareId].displayName
-            #     translated_obj.params.version = protocol.labwareDefinitions.version
-            #     translated_obj.params.namespace = protocol.labwareDefinitions.namespace
+            elif command.commandType == "loadLabware":
+                dict_command["params"].update({"displayName": protocol.labware[command.params.labwareId].displayName})
+                dict_command["params"].update({"version": protocol.labwareDefinitions[protocol.labware[command.params.labwareId].definitionId].version})
+                dict_command["params"].update({"namespace": protocol.labwareDefinitions[protocol.labware[command.params.labwareId].definitionId].namespace})
+                print(dict_command)
             translated_obj = parse_obj_as(pe_commands.CommandCreate, dict_command)
             commands_list.append(translated_obj)
         return commands_list
