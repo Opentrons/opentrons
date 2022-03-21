@@ -1,0 +1,12 @@
+[Unit]
+Description=Opentrons update server
+Requires=nginx.service
+After=nginx.service
+
+[Service]
+Type=notify
+ExecStart=python -m otupdate.openembedded -p 34000
+StateDirectory=otupdate
+
+[Install]
+WantedBy=opentrons.target
