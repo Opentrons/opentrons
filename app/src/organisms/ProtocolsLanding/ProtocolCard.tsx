@@ -156,7 +156,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
 
         <Flex flexDirection={DIRECTION_COLUMN}>
           <ProtocolOverflowMenu protocolKey={protocolKey} />
-          <StyledText as="label" position="absolute" bottom="1rem" right="1rem">
+          <StyledText as="label" position="absolute" bottom={SPACING.spacing4} right={SPACING.spacing4}>
             {t('last_updated_at', {
               date: format(new Date(modified), 'MMMM dd, yyyy HH:mm'),
             })}
