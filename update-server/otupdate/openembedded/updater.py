@@ -17,9 +17,6 @@ class RootPartitions(enum.Enum):
 class PartitionManager:
     """Partition manager class."""
 
-    def __init__(self):
-        pass
-
     def find_unused_partition(self) -> RootPartitions:
         """Find unused partition"""
         # fw_printenv -n root_part gives the currently
@@ -29,16 +26,13 @@ class PartitionManager:
         return {
             b"2": RootPartitions.THREE,
             b"3": RootPartitions.TWO,
-            # if output is empty, current part is 2, set unsed to 3!
-            b" ": RootPartitions.THREE,
+            # if output is empty, current part is 2, set unused to 3!
+            b"": RootPartitions.THREE,
         }[which]
 
 
 class RootFSInterface:
     """RootFS interface class."""
-
-    def __init__(self):
-        pass
 
     def write_file(
         self,
