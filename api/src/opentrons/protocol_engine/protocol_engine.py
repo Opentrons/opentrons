@@ -151,8 +151,6 @@ class ProtocolEngine:
         Arguments:
             request: The command type and payload data used to construct
                 the command in state.
-            move_on_after: Maximum time in seconds to wait for the command to complete.
-                If None, will potentially wait forever.
 
         Returns:
             The completed command, whether it succeeded or failed.
