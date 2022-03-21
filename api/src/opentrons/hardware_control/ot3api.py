@@ -859,7 +859,7 @@ class OT3API(
         )
 
         try:
-            self._backend.set_active_current(
+            await self._backend.set_active_current(
                 {OT3Axis.from_axis(aspirate_spec.axis): aspirate_spec.current}
             )
 
@@ -896,7 +896,7 @@ class OT3API(
         )
 
         try:
-            self._backend.set_active_current(
+            await self._backend.set_active_current(
                 {OT3Axis.from_axis(dispense_spec.axis): dispense_spec.current}
             )
             await self._move(
@@ -918,7 +918,9 @@ class OT3API(
         """
         realmount = OT3Mount.from_mount(mount)
         blowout_spec = self._instrument_handler.plan_check_blow_out(realmount)
-        self._backend.set_active_current({blowout_spec.axis: blowout_spec.current})
+        await self._backend.set_active_current(
+            {blowout_spec.axis: blowout_spec.current}
+        )
         target_pos = target_position_from_plunger(
             realmount,
             blowout_spec.plunger_distance,
@@ -950,7 +952,7 @@ class OT3API(
         spec, _add_tip_to_instrs = self._instrument_handler.plan_check_pick_up_tip(
             realmount, tip_length, presses, increment
         )
-        self._backend.set_active_current(
+        await self._backend.set_active_current(
             {axis: current for axis, current in spec.plunger_currents.items()}
         )
         target_absolute = target_position_from_plunger(
@@ -962,18 +964,18 @@ class OT3API(
         )
 
         for press in spec.presses:
-            with self._backend.save_current():
-                self._backend.set_active_current(
+            async with self._backend.restore_current():
+                await self._backend.set_active_current(
                     {axis: current for axis, current in press.current.items()}
                 )
                 target_down = target_position_from_relative(
                     realmount, press.relative_down, self._current_position
                 )
                 await self._move(target_down, speed=press.speed)
-                target_up = target_position_from_relative(
-                    realmount, press.relative_up, self._current_position
-                )
-                await self._move(target_up)
+            target_up = target_position_from_relative(
+                realmount, press.relative_up, self._current_position
+            )
+            await self._move(target_up)
 
         _add_tip_to_instrs()
 
@@ -1015,7 +1017,7 @@ class OT3API(
             realmount, home_after
         )
         for move in spec.drop_moves:
-            self._backend.set_active_current(
+            await self._backend.set_active_current(
                 {
                     OT3Axis.from_axis(axis): current
                     for axis, current in move.current.items()
@@ -1044,7 +1046,7 @@ class OT3API(
         for shake in spec.shake_moves:
             await self.move_rel(mount, shake[0], speed=shake[1])
 
-        self._backend.set_active_current(
+        await self._backend.set_active_current(
             {
                 OT3Axis.from_axis(axis): current
                 for axis, current in spec.ending_current.items()

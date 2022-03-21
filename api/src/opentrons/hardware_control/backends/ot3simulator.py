@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 import asyncio
-from contextlib import contextmanager
+from contextlib import asynccontextmanager
 import logging
 from typing import (
     Dict,
@@ -10,7 +10,7 @@ from typing import (
     Optional,
     Tuple,
     Sequence,
-    Generator,
+    AsyncIterator,
     cast,
     Set,
 )
@@ -285,7 +285,7 @@ class OT3Simulator:
             for mount in OT3Mount
         }
 
-    def set_active_current(self, axis_currents: OT3AxisMap[float]) -> None:
+    async def set_active_current(self, axis_currents: OT3AxisMap[float]) -> None:
         """Set the active current.
 
         Args:
@@ -296,8 +296,8 @@ class OT3Simulator:
         """
         return None
 
-    @contextmanager
-    def save_current(self) -> Generator[None, None, None]:
+    @asynccontextmanager
+    async def restore_current(self) -> AsyncIterator[None]:
         """Save the current."""
         yield
 
