@@ -197,7 +197,7 @@ describe('protocol storage directory utilities', () => {
               srcFilePaths: [
                 path.join(expectedProtocolDirPath, 'src', 'source.py'),
               ],
-              analysisFilePaths: [],
+              analysisFilePaths: [expect.any(String)],
               modified: expect.any(Number),
             },
           ])
