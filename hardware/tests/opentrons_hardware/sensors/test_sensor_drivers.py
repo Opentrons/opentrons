@@ -70,7 +70,6 @@ def humidity_sensor() -> hdc2080.EnvironmentSensor:
                 payload=BaselineSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.pressure),
                     sample_rate=UInt16Field(10),
-                    offset_update=UInt8Field(False),
                 )
             ),
         ],
@@ -81,7 +80,6 @@ def humidity_sensor() -> hdc2080.EnvironmentSensor:
                 payload=BaselineSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.capacitive),
                     sample_rate=UInt16Field(10),
-                    offset_update=UInt8Field(False),
                 )
             ),
         ],

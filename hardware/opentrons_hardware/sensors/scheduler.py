@@ -58,7 +58,6 @@ class SensorScheduler:
                     payload=BaselineSensorRequestPayload(
                         sensor=SensorTypeField(sensor.sensor_type),
                         sample_rate=UInt16Field(sensor.poll_for),
-                        offset_update=UInt8Field(sensor.offset),
                     )
                 ),
             )
@@ -96,7 +95,7 @@ class SensorScheduler:
                 message=ReadFromSensorRequest(
                     payload=ReadFromSensorRequestPayload(
                         sensor=SensorTypeField(sensor.sensor_type),
-                        offset_reading=UInt8Field(sensor.offset),
+                        offset_reading=UInt8Field(int(sensor.offset)),
                     )
                 ),
             )

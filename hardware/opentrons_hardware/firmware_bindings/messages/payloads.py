@@ -302,7 +302,6 @@ class BaselineSensorRequestPayload(utils.BinarySerializable):
 
     sensor: SensorTypeField
     sample_rate: utils.UInt16Field
-    offset_update: utils.UInt8Field
 
 
 @dataclass

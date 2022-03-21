@@ -143,7 +143,9 @@ async def handle_capacitive_sensor(
         data = await capacitive.read(messenger, pipette_mount, offset=False, timeout=10)
         curr_time = datetime.now().strftime("%H:%M:%S")
 
-        log.info(f"Capacitive data: {data.to_float() if data else 'None'} at: {curr_time}")
+        log.info(
+            f"Capacitive data: {data.to_float() if data else 'None'} at: {curr_time}"
+        )
         if isinstance(data, SensorDataType):
             log.info(f"Capacitive data: {data.to_float()} at: {curr_time}")
             if csv:
