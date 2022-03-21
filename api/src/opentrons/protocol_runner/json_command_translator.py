@@ -25,9 +25,8 @@ class JsonCommandTranslator:
             dict_command = command.dict()
             if command.commandType == "loadPipette":
                 dict_command["params"].update({"pipetteName":protocol.pipettes[command.params.pipetteId].name})
-                # translated_obj.params.pipetteName = protocol.pipettes[command.params.pipetteId].name
-            # elif command.commandType == "loadModule":
-            #     translated_obj.params.model = protocol.modules[command.params.moduleId]
+            elif command.commandType == "loadModule":
+                dict_command["params"].update({"model":protocol.modules[command.params.moduleId].model})
             # elif command.commandType == "loadLabware":
             #     translated_obj.params.displayName = protocol.labware[command.params.labwareId].displayName
             #     translated_obj.params.version = protocol.labwareDefinitions.version
