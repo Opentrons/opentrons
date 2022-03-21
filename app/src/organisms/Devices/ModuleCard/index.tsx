@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import {
   Box,
   Flex,
@@ -18,6 +18,8 @@ import {
   FONT_SIZE_CAPTION,
   TYPOGRAPHY,
   useOnClickOutside,
+  Btn,
+  TEXT_DECORATION_UNDERLINE,
 } from '@opentrons/components'
 import {
   getModuleDisplayName,
@@ -26,6 +28,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
+import { Banner } from '../../../atoms/Banner'
 import { ModuleIcon } from '../ModuleIcon'
 import { MagneticModuleData } from './MagneticModuleData'
 import { TemperatureModuleData } from './TemperatureModuleData'
@@ -61,10 +64,16 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [hasSecondary, setHasSecondary] = React.useState(false)
   const [showAboutModule, setShowAboutModule] = React.useState(false)
   const [showTestShake, setShowTestShake] = React.useState(false)
+  const [showBanner, setShowBanner] = React.useState<boolean>(true)
 
   const moduleOverflowWrapperRef = useOnClickOutside({
     onClickOutside: () => setShowOverflowMenu(false),
   }) as React.RefObject<HTMLDivElement>
+
+  const tooHot =
+    module.model === 'heaterShakerModuleV1' &&
+    module.data.currentTemp != null &&
+    module.data.currentTemp > 48.9
 
   let image = ''
   let moduleData: JSX.Element = <div></div>
@@ -186,6 +195,49 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING_2}>
             <img src={image} alt={module.model} />
             <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING_2}>
+              {module.hasAvailableUpdate && showBanner ? (
+                <Banner
+                  type="warning"
+                  onCloseClick={() => setShowBanner(false)}
+                  title={
+                    <>
+                      <Flex flexDirection={DIRECTION_COLUMN}>
+                        {t('firmware_update_available')}
+                        <Btn
+                          textAlign={ALIGN_START}
+                          fontSize={TYPOGRAPHY.fontSizeP}
+                          textDecoration={TEXT_DECORATION_UNDERLINE}
+                          // TODO(jr, 3/21/22) wire up button when we know where this should link to
+                          onClick={() => console.log('firmware update!')}
+                        >
+                          {t('view_update')}
+                        </Btn>
+                      </Flex>
+                    </>
+                  }
+                />
+              ) : null}
+              {tooHot ? (
+                <Flex
+                  paddingRight={SPACING.spacingM}
+                  paddingBottom={SPACING.spacing3}
+                  paddingTop={SPACING.spacing2}
+                >
+                  <Banner
+                    type="warning"
+                    title={
+                      <Trans
+                        t={t}
+                        i18nKey="hot_to_the_touch"
+                        components={{
+                          bold: <strong />,
+                          block: <Text fontSize={TYPOGRAPHY.fontSizeP} />,
+                        }}
+                      />
+                    }
+                  />
+                </Flex>
+              ) : null}
               <Text
                 textTransform={TEXT_TRANSFORM_UPPERCASE}
                 color={C_HARBOR_GRAY}

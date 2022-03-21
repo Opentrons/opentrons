@@ -1,0 +1,119 @@
+import * as React from 'react'
+import {
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  IconProps,
+  Flex,
+  DIRECTION_ROW,
+  ALIGN_CENTER,
+  COLORS,
+  SPACING,
+  TYPOGRAPHY,
+  BORDERS,
+} from '@opentrons/components'
+import { css } from 'styled-components'
+
+export type BannerType = 'success' | 'warning' | 'error' | 'installing' | 'hot'
+
+export interface BannerProps {
+  /** name constant of the icon to display */
+  type: BannerType
+  /** title/main message of colored alert bar */
+  title: React.ReactNode
+  /** Alert message body contents */
+  children?: React.ReactNode
+  /** optional handler to show close button/clear alert  */
+  onCloseClick?: () => unknown
+  /** Override the default Alert Icon */
+  icon?: IconProps
+}
+
+const BANNER_PROPS_BY_TYPE: Record<
+  BannerType,
+  { icon: IconProps; backgroundColor: string; color: string }
+> = {
+  success: {
+    icon: { name: 'check-circle' },
+    backgroundColor: COLORS.successPg,
+    color: COLORS.success,
+  },
+  error: {
+    icon: { name: 'information' },
+    backgroundColor: COLORS.errorBg,
+    color: COLORS.error,
+  },
+  warning: {
+    icon: { name: 'information' },
+    backgroundColor: COLORS.warningBg,
+    color: COLORS.warning,
+  },
+  installing: {
+    icon: { name: 'ot-spinner' },
+    backgroundColor: COLORS.greyDisabled,
+    color: COLORS.darkGreyEnabled,
+  },
+  hot: {
+    icon: { name: 'hot-to-touch' },
+    backgroundColor: COLORS.warningBg,
+    color: COLORS.warning,
+  },
+}
+
+const MESSAGE_STYLING = css`
+  padding: ${SPACING.spacing4} 3rem;
+  background-color: ${COLORS.white};
+
+  & a {
+    text-decoration: underline;
+    color: inherit;
+  }
+
+  &:empty {
+    padding: 0;
+  }
+`
+export function Banner(props: BannerProps): JSX.Element {
+  const toastProps = BANNER_PROPS_BY_TYPE[props.type]
+  const icon = props.icon ? props.icon : toastProps.icon
+
+  const iconProps = {
+    ...icon,
+    width: SPACING.spacing6,
+    marginRight: SPACING.spacing3,
+    color: BANNER_PROPS_BY_TYPE[props.type].color,
+    spin: BANNER_PROPS_BY_TYPE[props.type].icon === 'ot-spinner',
+  }
+  return (
+    <Flex
+      fontSize={TYPOGRAPHY.fontSizeP}
+      fontWeight={TYPOGRAPHY.fontWeightRegular}
+      borderRadius={SPACING.spacing2}
+      backgroundColor={BANNER_PROPS_BY_TYPE[props.type].backgroundColor}
+      border={`${SPACING.spacingXXS} ${BORDERS.styleSolid} ${
+        BANNER_PROPS_BY_TYPE[props.type].color
+      }`}
+    >
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        alignItems={ALIGN_CENTER}
+        padding={`${SPACING.spacing2} ${SPACING.spacing2} ${SPACING.spacing2} ${SPACING.spacing3}`}
+        fontWeight={TYPOGRAPHY.fontWeightRegular}
+        data-testid={`Banner_${props.title}_${props.type}`}
+      >
+        <Icon {...iconProps} aria-label={`icon_${props.type}`} />
+        <Flex width="100%">{props.title}</Flex>
+        {props.onCloseClick && (
+          <Icon
+            width={SPACING.spacing6}
+            name="close"
+            aria-label="close_icon"
+            onClick={props.onCloseClick}
+            color={BANNER_PROPS_BY_TYPE[props.type].color}
+          />
+        )}
+      </Flex>
+      {props.children && <Flex css={MESSAGE_STYLING}>{props.children}</Flex>}
+    </Flex>
+  )
+}

@@ -3,6 +3,7 @@ import { resetAllWhenMocks } from 'jest-when'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
+import { Banner } from '../../../../atoms/Banner'
 import { MagneticModuleData } from '../MagneticModuleData'
 import { TemperatureModuleData } from '../TemperatureModuleData'
 import { ThermocyclerModuleData } from '../ThermocyclerModuleData'
@@ -16,13 +17,17 @@ import {
   mockHeaterShaker,
 } from '../../../../redux/modules/__fixtures__'
 
-import type { MagneticModule } from '../../../../redux/modules/types'
+import type {
+  HeaterShakerModule,
+  MagneticModule,
+} from '../../../../redux/modules/types'
 
 jest.mock('../MagneticModuleData')
 jest.mock('../TemperatureModuleData')
 jest.mock('../ThermocyclerModuleData')
 jest.mock('../HeaterShakerModuleData')
 jest.mock('../ModuleOverflowMenu')
+jest.mock('../../../../atoms/Banner')
 
 const mockMagneticModuleData = MagneticModuleData as jest.MockedFunction<
   typeof MagneticModuleData
@@ -39,6 +44,7 @@ const mockThermocyclerModuleData = ThermocyclerModuleData as jest.MockedFunction
 const mockHeaterShakerModuleData = HeaterShakerModuleData as jest.MockedFunction<
   typeof HeaterShakerModuleData
 >
+const mockBanner = Banner as jest.MockedFunction<typeof Banner>
 
 const mockMagneticModuleHub = {
   model: 'magneticModuleV1',
@@ -56,6 +62,29 @@ const mockMagneticModuleHub = {
   usbPort: { hub: 2, port: null },
 } as MagneticModule
 
+const mockHotHeaterShaker = {
+  id: 'heatershaker_id',
+  model: 'heaterShakerModuleV1',
+  type: 'heaterShakerModuleType',
+  port: '/dev/ot_module_thermocycler0',
+  serial: 'jkl123',
+  revision: 'heatershaker_v4.0',
+  fwVersion: 'v2.0.0',
+  status: 'idle',
+  hasAvailableUpdate: false,
+  data: {
+    labwareLatchStatus: 'idle_unknown',
+    speedStatus: 'idle',
+    temperatureStatus: 'heating',
+    currentSpeed: null,
+    currentTemp: 50,
+    targetSpeed: null,
+    targetTemp: 60,
+    errorDetails: null,
+  },
+  usbPort: { hub: 1, port: 1 },
+} as HeaterShakerModule
+
 const render = (props: React.ComponentProps<typeof ModuleCard>) => {
   return renderWithProviders(<ModuleCard {...props} />, {
     i18nInstance: i18n,
@@ -72,6 +101,7 @@ describe('ModuleCard', () => {
       <div>Mock Heater Shaker Module Data</div>
     )
     mockModuleOverflowMenu.mockReturnValue(<div>mock module overflow menu</div>)
+    mockBanner.mockReturnValue(<div>mock banner</div>)
   })
 
   afterEach(() => {
@@ -147,5 +177,18 @@ describe('ModuleCard', () => {
     fireEvent.click(overflowButton)
     expect(overflowButton).not.toBeDisabled()
     getByText('mock module overflow menu')
+  })
+
+  it('renders information for a heater shaker module when it is hot, showing the too hot banner', () => {
+    const { getByText } = render({
+      module: mockHotHeaterShaker,
+    })
+    getByText('mock banner')
+  })
+  it('renders information for a magnetic module when an update is available so update banner renders', () => {
+    const { getByText } = render({
+      module: mockMagneticModuleHub,
+    })
+    getByText('mock banner')
   })
 })
