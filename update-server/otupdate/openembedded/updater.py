@@ -97,9 +97,12 @@ class Updater(UpdateActionsInterface):
                   ``RootPartitions.TWO`` or ``RootPartitions.THREE``.
         """
         unused_partition = self.part_mngr.find_unused_partition()
-        part_path = "mmc/blkp1"
         self.root_FS_intf.write_file(
-            rootfs_filepath, part_path, progress_callback, chunk_size, file_size
+            rootfs_filepath,
+            unused_partition.path,
+            progress_callback,
+            chunk_size,
+            file_size,
         )
         return unused_partition
 
