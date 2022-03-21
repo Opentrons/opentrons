@@ -1,5 +1,6 @@
 {
   "extends": "../tsconfig-base.json",
+  "files": ["src/protocol-storage/__fixtures__/analysisResult.json"],
   "references": [
     {
       "path": "../discovery-client"
