@@ -58,6 +58,7 @@ export interface UploadInputProps {
   onUpload?: () => unknown
 }
 
+// TODO(bc, 2022-3-21): consider making this generic for any file upload and adding it to molecules/organisms with onUpload taking the files from the event
 export function UploadInput(props: UploadInputProps): JSX.Element | null {
   const { t } = useTranslation('protocol_info')
   const dispatch = useDispatch<Dispatch>()
