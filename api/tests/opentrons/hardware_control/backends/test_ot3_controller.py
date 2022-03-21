@@ -94,6 +94,12 @@ async def test_home(
             axis_to_node(axes[0])
         ]
 
+    if len((mock_move_group_run.call_args_list[0][0][0]._move_groups)) > 1:
+        for node in (mock_move_group_run.call_args_list[0][0][0]._move_groups)[0][0]:
+            assert node in [NodeId.head_l, NodeId.head_r]
+        for node in (mock_move_group_run.call_args_list[0][0][0]._move_groups)[1][0]:
+            assert node not in [NodeId.head_l, NodeId.head_r]
+
     assert home_move.acceleration_mm_sec_sq == 0
     assert home_move.move_type == MoveType.home
     assert home_move.stop_condition == MoveStopCondition.limit_switch
