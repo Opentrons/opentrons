@@ -94,7 +94,7 @@ async def test_home(
 
 async def test_home_only_present_nodes(controller: OT3Controller, mock_move_group_run):
     controller._present_nodes = set((NodeId.gantry_x, NodeId.gantry_y))
-    await controller.home([OT3Axis.X, OT3Axis.Z_L])
+    await controller.home([OT3Axis.X, OT3Axis.Z_L, OT3Axis.Q])
     home_move = (mock_move_group_run.call_args_list[0][0][0]._move_groups)[0][0]
     assert list(home_move.keys()) == [NodeId.gantry_x]
 

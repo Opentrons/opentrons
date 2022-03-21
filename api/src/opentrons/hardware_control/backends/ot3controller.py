@@ -495,7 +495,11 @@ class OT3Controller:
         self._present_nodes = present
 
     def _axis_is_present(self, axis: OT3Axis) -> bool:
-        return axis_to_node(axis) in self._present_nodes
+        try:
+            return axis_to_node(axis) in self._present_nodes
+        except KeyError:
+            # Currently unhandled axis
+            return False
 
     def _axis_map_to_present_nodes(
         self, to_xform: OT3AxisMap[MapPayload]
