@@ -1,5 +1,4 @@
 """Test Heater Shaker set shake speed command implementation."""
-import pytest
 from decoy import Decoy
 
 from opentrons.hardware_control import HardwareControlAPI
@@ -11,12 +10,6 @@ from opentrons.protocol_engine.commands import heater_shaker
 from opentrons.protocol_engine.commands.heater_shaker.set_target_shake_speed import (
     SetTargetShakeSpeedImpl,
 )
-
-
-@pytest.fixture()
-def subject() -> SetTargetShakeSpeedImpl:
-    """Get the command implementation with mocked out dependencies."""
-    return SetTargetShakeSpeedImpl()
 
 
 async def test_set_target_shake_speed(
