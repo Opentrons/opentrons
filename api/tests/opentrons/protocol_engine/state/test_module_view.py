@@ -341,28 +341,6 @@ def test_calculate_magnet_height(module_model: ModuleModel) -> None:
 
 
 @pytest.mark.parametrize(
-    argnames=["module_model", "target_temp", "expected_valid"],
-    argvalues=[
-        (ModuleModel.HEATER_SHAKER_MODULE_V1, 36.8, False),
-        (ModuleModel.HEATER_SHAKER_MODULE_V1, 37, True),
-        (ModuleModel.HEATER_SHAKER_MODULE_V1, 94.8, True),
-        (ModuleModel.HEATER_SHAKER_MODULE_V1, 95.1, False),
-    ],
-)
-def test_is_target_temperature_valid(
-    module_model: ModuleModel,
-    target_temp: float,
-    expected_valid: bool,
-) -> None:
-    """It should verify if a target temperature is valid for the specified module."""
-    subject = make_module_view()
-    result = subject.is_target_temperature_valid(
-        heating_module_model=module_model, celsius=target_temp
-    )
-    assert result == expected_valid
-
-
-@pytest.mark.parametrize(
     argnames=["from_slot", "to_slot", "should_dodge"],
     argvalues=[
         (DeckSlotName.SLOT_1, DeckSlotName.FIXED_TRASH, True),
@@ -771,6 +749,34 @@ def test_magnetic_module_view_calculate_magnet_hardware_height(
     with expected_raise:
         result = subject.calculate_magnet_hardware_height(mm_from_base=mm_from_base)
         assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    argnames=["target_temp", "expected_valid"],
+    argvalues=[
+        (36.8, False),
+        (37, True),
+        (94.8, True),
+        (95.1, False),
+    ],
+)
+def test_is_target_temperature_valid(
+    heater_shaker_v1_def: ModuleDefinition,
+    target_temp: float,
+    expected_valid: bool,
+) -> None:
+    """It should verify if a target temperature is valid for the specified module."""
+    parent = make_module_view(
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
+        hardware_module_by_slot={
+            DeckSlotName.SLOT_1: HardwareModule(
+                serial_number="serial-number",
+                definition=heater_shaker_v1_def,
+            )
+        },
+    )
+    subject = parent.get_heater_shaker_module_view("module-id")
+    assert subject.is_target_temperature_valid(target_temp) == expected_valid
 
 
 @pytest.mark.parametrize(

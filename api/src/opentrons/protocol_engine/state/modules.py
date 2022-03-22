@@ -364,33 +364,6 @@ class ModuleView(HasState[ModuleState]):
             assert offset_from_labware_default is not None
             return labware_default_height + offset_from_labware_default
 
-    @staticmethod
-    def is_target_temperature_valid(
-        heating_module_model: ModuleModel, celsius: float
-    ) -> bool:
-        """Verify that the target temperature being set is valid for the module type."""
-        if heating_module_model == ModuleModel.HEATER_SHAKER_MODULE_V1:
-            return (
-                HEATER_SHAKER_TEMPERATURE_RANGE.min
-                <= celsius
-                <= HEATER_SHAKER_TEMPERATURE_RANGE.max
-            )
-        elif heating_module_model == ModuleModel.THERMOCYCLER_MODULE_V1:
-            raise NotImplementedError(
-                "Temperature validation for Thermocycler " "not implemented yet"
-            )
-        elif heating_module_model in [
-            ModuleModel.TEMPERATURE_MODULE_V1,
-            ModuleModel.TEMPERATURE_MODULE_V2,
-        ]:
-            raise NotImplementedError(
-                "Temperature validation for Temperature Module" "not implemented yet."
-            )
-        else:
-            raise errors.WrongModuleTypeError(
-                f"{heating_module_model} is not a heating module."
-            )
-
     def should_dodge_thermocycler(
         self,
         from_slot: DeckSlotName,
