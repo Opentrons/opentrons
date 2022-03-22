@@ -2,7 +2,6 @@ import * as React from 'react'
 import { format } from 'date-fns'
 import { useTranslation } from 'react-i18next'
 import first from 'lodash/first'
-import map from 'lodash/map'
 import {
   getModuleType,
   getPipetteNameSpecs,
@@ -10,24 +9,28 @@ import {
 } from '@opentrons/shared-data'
 
 import {
-  Box,
   Flex,
   DIRECTION_ROW,
   COLORS,
   SPACING,
   JUSTIFY_SPACE_BETWEEN,
   DIRECTION_COLUMN,
+  JUSTIFY_CENTER,
+  ALIGN_CENTER,
 } from '@opentrons/components'
 import { Link } from 'react-router-dom'
-
-import { StyledText } from '../../atoms/text'
-import { ModuleIcon } from '../../molecules/ModuleIcon'
-import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
+import {
+  parseInitialPipetteNamesByMount,
+  parseAllRequiredModuleModels,
+} from '@opentrons/api-client'
 
 import { StoredProtocolData } from '../../redux/protocol-storage'
-import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
+import { StyledText } from '../../atoms/text'
+import { ModuleIcon } from '../../molecules/ModuleIcon'
+import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
-import { parseInitialPipetteNamesByMount, parseAllRequiredModuleModels, parseInitialLoadedLabwareBySlot } from '@opentrons/api-client'
+
+import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 
 type ProtocolCardProps = StoredProtocolData
 
@@ -48,19 +51,19 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
     }
   }, [modified])
 
-  const { metadata, robot, pipettes, commands, modules } = protocolData ?? {}
 
   // TODO: IMMEDIATELY clean up and move these protocol data selectors into api_client as
   // pure functions of RunTimeCommand[]
-  const robotModel = robot?.model ?? 'OT-2'
+  const robotModel = protocolData?.robot?.model ?? 'OT-2'
   const { left: leftMountPipetteName, right: rightMountPipetteName } =
     protocolData != null ? parseInitialPipetteNamesByMount(protocolData) : {}
-  const requiredModuleTypes = protocolData != null ? parseAllRequiredModuleModels(protocolData).map(getModuleType) : []
-  const initialLoadedLabwareBySlot = protocolData != null ? parseInitialLoadedLabwareBySlot(protocolData) : {}
-  console.log('init ', initialLoadedLabwareBySlot)
+  const requiredModuleTypes =
+    protocolData != null
+      ? parseAllRequiredModuleModels(protocolData).map(getModuleType)
+      : []
 
   const protocolName =
-    metadata?.protocolName ?? first(srcFileNames) ?? protocolKey
+    protocolData?.metadata?.protocolName ?? first(srcFileNames) ?? protocolKey
 
   return (
     <Link to={`/protocols/${protocolKey}`} style={{ color: 'inherit' }}>
@@ -76,14 +79,17 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
         position="relative"
       >
         <Flex>
-          <Box
-            flex="0 0 96px"
-            height="86px"
-            backgroundColor={COLORS.medGrey}
+          <Flex
             marginRight={SPACING.spacing4}
+            height="6rem"
+            width="5.375rem"
+            justifyContent={JUSTIFY_CENTER}
+            alignItems={ALIGN_CENTER}
           >
-            DECKMAP TODO
-          </Box>
+            {protocolData != null ? (
+              <DeckThumbnail analysis={protocolData} />
+            ) : null}
+          </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} marginRight={SPACING.spacing4}>
             <StyledText
               as="h3"

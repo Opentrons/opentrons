@@ -1,6 +1,7 @@
 // set of functions that parse details out of a protocol record and it's internals
 import sortedUniqBy from 'lodash/sortedUniqBy'
 import keyBy from 'lodash/keyBy'
+import reduce from 'lodash/reduce'
 
 import type { PipetteName, ModuleModel } from '@opentrons/shared-data'
 import type {
@@ -41,10 +42,10 @@ export function parseAllRequiredModuleModels(
   return Object.entries(analysis.modules).map(([_moduleId, { model }]) => model)
 }
 
-interface LoadedEquipmentBySlot {
-  [slotId: string]: LoadLabwareRunTimeCommand | LoadModuleRunTimeCommand
+interface LoadedLabwareBySlot {
+  [slotName: string]: LoadLabwareRunTimeCommand
 }
-export function parseInitialLoadedEquipmentBySlot(
+export function parseInitialLoadedLabwareBySlot(
   analysis: ProtocolFile<{}>
 ): LoadedLabwareBySlot {
   const loadLabwareCommandsReversed = analysis.commands
@@ -53,17 +54,55 @@ export function parseInitialLoadedEquipmentBySlot(
         command.commandType === 'loadLabware'
     )
     .reverse()
-  const labwareBySlot = keyBy<LoadLabwareRunTimeCommand>(
-    loadLabwareCommandsReversed
-    command => {
-      const {location} = command.params
-      if ('slotName' in location){
-        return location.slotName
-      }  else {
-        const slotName = analysis.commands.find((command): command is LoadModuleRunTimeCommand => command.commandType === 'loadModule' && command.params.moduleId === location.moduleId)?.params.location.slotName
-        if (slotName == null) console.warn(`could not find module with id ${location.moduleId} for labware id ${command.params.labwareId} to be loaded into`)
-        else return slotName
-      }
+  return reduce<LoadLabwareRunTimeCommand, LoadedLabwareBySlot>(
+    loadLabwareCommandsReversed,
+    (acc, command) =>
+      'slotName' in command.params.location
+        ? { ...acc, [command.params.location.slotName]: command }
+        : acc,
+    {}
   )
+}
 
+interface LoadedLabwareByModuleId {
+  [moduleId: string]: LoadLabwareRunTimeCommand
+}
+export function parseInitialLoadedLabwareByModuleId(
+  analysis: ProtocolFile<{}>
+): LoadedLabwareByModuleId {
+  const loadLabwareCommandsReversed = analysis.commands
+    .filter(
+      (command): command is LoadLabwareRunTimeCommand =>
+        command.commandType === 'loadLabware'
+    )
+    .reverse()
+  return reduce<LoadLabwareRunTimeCommand, LoadedLabwareByModuleId>(
+    loadLabwareCommandsReversed,
+    (acc, command) =>
+      'moduleId' in command.params.location
+        ? { ...acc, [command.params.location.moduleId]: command }
+        : acc,
+    {}
+  )
+}
+interface LoadedModulesBySlot {
+  [slotName: string]: LoadModuleRunTimeCommand
+}
+export function parseInitialLoadedModulesBySlot(
+  analysis: ProtocolFile<{}>
+): LoadedModulesBySlot {
+  const loadLabwareCommandsReversed = analysis.commands
+    .filter(
+      (command): command is LoadModuleRunTimeCommand =>
+        command.commandType === 'loadModule'
+    )
+    .reverse()
+  return reduce<LoadModuleRunTimeCommand, LoadedModulesBySlot>(
+    loadLabwareCommandsReversed,
+    (acc, command) =>
+      'slotName' in command.params.location
+        ? { ...acc, [command.params.location.slotName]: command }
+        : acc,
+    {}
+  )
 }
