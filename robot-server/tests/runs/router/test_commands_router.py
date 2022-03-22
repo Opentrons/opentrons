@@ -46,17 +46,24 @@ async def test_create_run_command(decoy: Decoy, engine_store: EngineStore) -> No
         labwareOffsets=[],
     )
 
-    output_command = pe_commands.Pause(
-        id="abc123",
+    command_once_added = pe_commands.Pause(
+        id="command-id",
         key="command-key",
         createdAt=datetime(year=2021, month=1, day=1),
         status=pe_commands.CommandStatus.QUEUED,
         params=pe_commands.PauseParams(message="Hello"),
-        result=None,
     )
 
-    decoy.when(engine_store.engine.add_command(command_request)).then_return(
-        output_command
+    protocol_engine = engine_store.engine
+
+    def _stub_queued_command_state(*_a: object, **_k: object) -> pe_commands.Command:
+        decoy.when(protocol_engine.state_view.commands.get("command-id")).then_return(
+            command_once_added
+        )
+        return command_once_added
+
+    decoy.when(engine_store.engine.add_command(command_request)).then_do(
+        _stub_queued_command_state
     )
 
     result = await create_run_command(
@@ -66,8 +73,9 @@ async def test_create_run_command(decoy: Decoy, engine_store: EngineStore) -> No
         run=run,
     )
 
-    assert result.content.data == output_command
+    assert result.content.data == command_once_added
     assert result.status_code == 201
+    decoy.verify(await protocol_engine.wait_for_command("command-id"), times=0)
 
 
 async def test_create_run_command_not_current(
@@ -131,7 +139,6 @@ async def test_create_run_command_blocking_completion(
         createdAt=datetime(year=2021, month=1, day=1),
         status=pe_commands.CommandStatus.QUEUED,
         params=pe_commands.PauseParams(message="Hello"),
-        result=None,
     )
 
     command_once_completed = pe_commands.Pause(
@@ -140,16 +147,27 @@ async def test_create_run_command_blocking_completion(
         createdAt=datetime(year=2021, month=1, day=1),
         status=pe_commands.CommandStatus.SUCCEEDED,
         params=pe_commands.PauseParams(message="Hello"),
-        result=pe_commands.PauseResult(),
     )
 
-    engine_state = decoy.mock(cls=StateView)
-    decoy.when(engine_store.get_state("run-id")).then_return(engine_state)
-    decoy.when(engine_store.engine.add_command(command_request)).then_return(
-        command_once_added
+    protocol_engine = engine_store.engine
+
+    def _stub_queued_command_state(*_a: object, **_k: object) -> pe_commands.Command:
+        decoy.when(protocol_engine.state_view.commands.get("command-id")).then_return(
+            command_once_added
+        )
+        return command_once_added
+
+    def _stub_completed_command_state(*_a: object, **_k: object) -> None:
+        decoy.when(protocol_engine.state_view.commands.get("command-id")).then_return(
+            command_once_completed
+        )
+
+    decoy.when(protocol_engine.add_command(command_request)).then_do(
+        _stub_queued_command_state
     )
-    decoy.when(engine_state.commands.get("command-id")).then_return(
-        command_once_completed
+
+    decoy.when(await protocol_engine.wait_for_command("command-id")).then_do(
+        _stub_completed_command_state
     )
 
     result = await create_run_command(
@@ -159,8 +177,6 @@ async def test_create_run_command_blocking_completion(
         engine_store=engine_store,
         run=run,
     )
-
-    decoy.verify(await engine_store.engine.wait_for_command("command-id"))
 
     assert result.content.data == command_once_completed
     assert result.status_code == 201
