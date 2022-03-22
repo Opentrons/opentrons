@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 import asyncio
-from contextlib import contextmanager
+from contextlib import asynccontextmanager
 import logging
+from copy import deepcopy
 from typing import (
     Dict,
     List,
@@ -11,9 +12,10 @@ from typing import (
     Tuple,
     TYPE_CHECKING,
     Sequence,
-    Generator,
+    AsyncIterator,
     cast,
     Set,
+    TypeVar,
 )
 from opentrons.config.types import OT3Config, GantryLoad
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
@@ -24,6 +26,7 @@ from .ot3utils import (
     axis_to_node,
     get_current_settings,
     create_home_group,
+    node_to_axis,
 )
 
 try:
@@ -63,6 +66,7 @@ from opentrons.hardware_control.types import (
     CurrentConfig,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
+from opentrons_hardware.hardware_control.types import NodeMap
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
@@ -77,6 +81,9 @@ log = logging.getLogger(__name__)
 _FIXED_PIPETTE_ID: str = "P1KSV3120211118A01"
 _FIXED_PIPETTE_NAME: PipetteName = "p1000_single_gen3"
 _FIXED_PIPETTE_MODEL: PipetteModel = cast("PipetteModel", "p1000_single_v3.0")
+
+
+MapPayload = TypeVar("MapPayload")
 
 
 class OT3Controller:
@@ -206,7 +213,7 @@ class OT3Controller:
         await runner.run(can_messenger=self._messenger)
         self._position.update(final_positions)
 
-    async def home(self, axes: List[OT3Axis]) -> OT3AxisMap[float]:
+    async def home(self, axes: Sequence[OT3Axis]) -> OT3AxisMap[float]:
         """Home each axis passed in, and reset the positions to 0.
 
         Args:
@@ -215,22 +222,26 @@ class OT3Controller:
         Returns:
             A dictionary containing the new positions of each axis
         """
-        if not axes:
+        checked_axes = [axis for axis in axes if self._axis_is_present(axis)]
+        if not checked_axes:
             return {}
         distances = {
-            ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0] for ax in axes
+            ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
+            for ax in checked_axes
         }
         speed_settings = (
             self._configuration.motion_settings.max_speed_discontinuity.none
         )
-        velocities = {ax: -1 * speed_settings[OT3Axis.to_kind(ax)] for ax in axes}
+        velocities = {
+            ax: -1 * speed_settings[OT3Axis.to_kind(ax)] for ax in checked_axes
+        }
         group = create_home_group(distances, velocities)
         runner = MoveGroupRunner(move_groups=[group])
         await runner.run(can_messenger=self._messenger)
 
-        for ax in axes:
+        for ax in checked_axes:
             self._position[axis_to_node(ax)] = 0
-        axis_positions = {ax: 0.0 for ax in axes}
+        axis_positions = {ax: 0.0 for ax in checked_axes}
 
         return axis_positions
 
@@ -246,7 +257,7 @@ class OT3Controller:
         Returns:
             New position.
         """
-        return axis_convert(self._position, 0.0)
+        return await self.home(axes)
 
     async def get_attached_instruments(
         self, expected: Dict[OT3Mount, PipetteName]
@@ -277,7 +288,9 @@ class OT3Controller:
         assert self._current_settings, "Invalid current settings"
         await set_currents(
             self._messenger,
-            {axis_to_node(k): v.as_tuple() for k, v in self._current_settings.items()},
+            self._axis_map_to_present_nodes(
+                {k: v.as_tuple() for k, v in self._current_settings.items()}
+            ),
         )
 
     async def set_active_current(self, axis_currents: OT3AxisMap[float]) -> None:
@@ -291,7 +304,7 @@ class OT3Controller:
         """
         assert self._current_settings, "Invalid current settings"
         await set_run_current(
-            self._messenger, {axis_to_node(k): v for k, v in axis_currents.items()}
+            self._messenger, self._axis_map_to_present_nodes(axis_currents)
         )
         for axis, current in axis_currents.items():
             self._current_settings[axis].run_current = current
@@ -307,15 +320,20 @@ class OT3Controller:
         """
         assert self._current_settings, "Invalid current settings"
         await set_hold_current(
-            self._messenger, {axis_to_node(k): v for k, v in axis_currents.items()}
+            self._messenger, self._axis_map_to_present_nodes(axis_currents)
         )
         for axis, current in axis_currents.items():
             self._current_settings[axis].hold_current = current
 
-    @contextmanager
-    def save_current(self) -> Generator[None, None, None]:
+    @asynccontextmanager
+    async def restore_current(self) -> AsyncIterator[None]:
         """Save the current."""
-        yield
+        old_current_settings = deepcopy(self._current_settings)
+        try:
+            yield
+        finally:
+            self._current_settings = old_current_settings
+            await self.set_default_currents()
 
     @staticmethod
     def _build_event_watcher() -> aionotify.Watcher:
@@ -443,6 +461,12 @@ class OT3Controller:
             NodeId.pipette_right: 0,
         }
 
+    @staticmethod
+    def home_position() -> OT3AxisMap[float]:
+        return {
+            node_to_axis(k): v for k, v in OT3Controller._get_home_position().items()
+        }
+
     async def probe_network(self, timeout: float = 5.0) -> None:
         """Update the list of nodes present on the network.
 
@@ -469,3 +493,12 @@ class OT3Controller:
             present.add(NodeId.head_r)
             present.add(NodeId.head_l)
         self._present_nodes = present
+
+    def _axis_is_present(self, axis: OT3Axis) -> bool:
+        return axis_to_node(axis) in self._present_nodes
+
+    def _axis_map_to_present_nodes(
+        self, to_xform: OT3AxisMap[MapPayload]
+    ) -> NodeMap[MapPayload]:
+        by_node = {axis_to_node(k): v for k, v in to_xform.items()}
+        return {k: v for k, v in by_node.items() if k in self._present_nodes}
