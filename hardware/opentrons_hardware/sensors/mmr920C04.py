@@ -70,5 +70,5 @@ class PressureSensor(AbstractAdvancedSensor):
         scheduler = SensorScheduler()
         threshold_data = await scheduler.send_threshold(write, can_messenger, timeout)
         if threshold_data:
-            self.zero_threshold = threshold_data.to_float
+            self.zero_threshold = threshold_data.to_float()
         return threshold_data

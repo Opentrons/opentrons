@@ -10,6 +10,7 @@ import more_network_and_system from './more_network_and_system.json'
 import more_panel from './more_panel.json'
 import protocol_calibration from './protocol_calibration.json'
 import protocol_info from './protocol_info.json'
+import protocol_list from './protocol_list.json'
 import protocol_setup from './protocol_setup.json'
 import robot_advanced_settings from './robot_advanced_settings.json'
 import robot_calibration from './robot_calibration.json'
@@ -32,6 +33,7 @@ export const en = {
   more_panel,
   protocol_calibration,
   protocol_info,
+  protocol_list,
   protocol_setup,
   robot_advanced_settings,
   robot_calibration,

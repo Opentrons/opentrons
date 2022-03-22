@@ -1,0 +1,29 @@
+import * as React from 'react'
+import { Icon, IconName } from '@opentrons/components'
+import {
+  HEATERSHAKER_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+  MAGNETIC_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
+
+import type { ModuleType } from '@opentrons/shared-data'
+import type { StyleProps } from '@opentrons/components'
+
+const MODULE_ICON_NAME_BY_TYPE: { [type in ModuleType]: IconName } = {
+  [HEATERSHAKER_MODULE_TYPE]: 'ot-heater-shaker',
+  [TEMPERATURE_MODULE_TYPE]: 'ot-temperature-v2',
+  [MAGNETIC_MODULE_TYPE]: 'ot-magnet-v2',
+  [THERMOCYCLER_MODULE_TYPE]: 'ot-thermocycler',
+}
+
+interface ModuleIconProps extends StyleProps {
+  moduleType: ModuleType
+}
+
+export function ModuleIcon(props: ModuleIconProps): JSX.Element {
+  const { moduleType, ...styleProps } = props
+  const iconName = MODULE_ICON_NAME_BY_TYPE[moduleType]
+
+  return <Icon name={iconName} {...styleProps} />
+}

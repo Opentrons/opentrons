@@ -7,12 +7,12 @@ from aiohttp import web
 
 from otupdate.common import (
     config,
-    control,
     ssh_key_management,
     name_management,
     constants,
     update,
 )
+from . import control
 from . import update_actions
 
 

@@ -9,8 +9,10 @@ from .dev_types import (
     ModuleSchema,
     SchemaV1,
     SchemaV2,
+    SchemaV3,
     ModuleDefinitionV1,
     ModuleDefinitionV2,
+    ModuleDefinitionV3,
     ModuleModel,
 )
 
@@ -51,10 +53,17 @@ def load_definition(
     ...
 
 
+@overload
 def load_definition(
-    version: Union[SchemaV1, SchemaV2],
+    version: SchemaV3, model_or_loadname: ModuleModel
+) -> ModuleDefinitionV3:
+    ...
+
+
+def load_definition(
+    version: SchemaVersions,
     model_or_loadname: Union[str, ModuleModel],
-) -> Union[ModuleDefinitionV1, ModuleDefinitionV2]:
+) -> Union[ModuleDefinitionV1, ModuleDefinitionV2, ModuleDefinitionV3]:
     if version == "1":
         path = Path("module") / "definitions" / "1.json"
         data = json.loads(load_shared_data(path))
@@ -63,7 +72,7 @@ def load_definition(
         except KeyError:
             raise ModuleNotFoundError("1", model_or_loadname)
     else:
-        path = Path(f"module/definitions/2/{model_or_loadname}.json")
+        path = Path(f"module/definitions/{version}/{model_or_loadname}.json")
         try:
             data = load_shared_data(path)
         except FileNotFoundError:

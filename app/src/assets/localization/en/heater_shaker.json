@@ -68,9 +68,11 @@
   "go_to_step_1": "Go to Step 1",
   "go_to_step_2": "Go to Step 2",
   "min_max_rpm": "{{min}} - {{max}} RPM",
-  "set_temperature": "Set temperature",
+  "set_temperature": "Set module temperature",
   "how_to_attach_to_deck": "See how to attach to deck",
   "test_shake": "Test shake",
   "deactivate": "Deactivate",
-  "stop_shaking": "Stop Shaking"
+  "stop_shaking": "Stop Shaking",
+  "cannot_open_latch": "Cannot open labware latch while module is shaking.",
+  "cannot_shake": "Cannot shake when labware latch is open"
 }

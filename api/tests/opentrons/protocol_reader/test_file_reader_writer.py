@@ -3,8 +3,10 @@ import io
 import pytest
 from pathlib import Path
 from decoy import matchers
+from typing import Any, Type
 
 from opentrons_shared_data import load_shared_data
+from opentrons_shared_data.protocol.models import ProtocolSchemaV6
 from opentrons.protocols.models import JsonProtocol, LabwareDefinition
 from opentrons.protocol_reader.input_file import InputFile
 from opentrons.protocol_reader.file_reader_writer import (
@@ -16,6 +18,7 @@ from opentrons.protocol_reader.file_reader_writer import (
 
 SIMPLE_V5_JSON_PROTOCOL = load_shared_data("protocol/fixtures/5/simpleV5.json")
 SIMPLE_LABWARE_DEF = load_shared_data("labware/fixtures/2/fixture_96_plate.json")
+SIMPLE_V6_JSON_PROTOCOL = load_shared_data("protocol/fixtures/6/simpleV6.json")
 
 
 async def test_read() -> None:
@@ -32,29 +35,34 @@ async def test_read() -> None:
     ]
 
 
-async def test_read_opentrons_json() -> None:
+@pytest.mark.parametrize(
+    ids=["JSON v5 protocol", "JSON v6 protocol", "labware definition"],
+    argnames=("input_file_contents", "expected_type"),
+    argvalues=[
+        (SIMPLE_V5_JSON_PROTOCOL, JsonProtocol),
+        (SIMPLE_V6_JSON_PROTOCOL, ProtocolSchemaV6),
+        (SIMPLE_LABWARE_DEF, LabwareDefinition),
+    ],
+)
+async def test_read_opentrons_json(
+    input_file_contents: bytes,
+    expected_type: Type[Any],
+) -> None:
     """It should read and parse Opentrons JSON protocol/labware file-likes."""
-    file_1 = InputFile(filename="hello.json", file=io.BytesIO(SIMPLE_V5_JSON_PROTOCOL))
-    file_2 = InputFile(filename="world.JSON", file=io.BytesIO(SIMPLE_LABWARE_DEF))
+    input_file = InputFile(filename="hello.json", file=io.BytesIO(input_file_contents))
 
     subject = FileReaderWriter()
-    result = await subject.read([file_1, file_2])
+    result = await subject.read([input_file])
 
     assert result == [
         BufferedFile(
             name="hello.json",
-            contents=SIMPLE_V5_JSON_PROTOCOL,
-            data=matchers.Anything(),
-        ),
-        BufferedFile(
-            name="world.JSON",
-            contents=SIMPLE_LABWARE_DEF,
+            contents=input_file_contents,
             data=matchers.Anything(),
         ),
     ]
 
-    assert isinstance(result[0].data, JsonProtocol)
-    assert isinstance(result[1].data, LabwareDefinition)
+    assert isinstance(result[0].data, expected_type)
 
 
 async def test_read_missing_filename() -> None:
