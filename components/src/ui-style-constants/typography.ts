@@ -1,5 +1,5 @@
 import { css } from 'styled-components'
-// import type { FlattenSimpleInterpolation } from 'styled-components'
+import { COLORS } from './'
 
 // Font Sizes
 export const fontSizeH1 = '1.125rem' // 18px
@@ -45,29 +45,34 @@ export const h1Default = css`
   font-size: ${fontSizeH1};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight24};
+  color: ${COLORS.darkBlack};
 `
 
 export const h2Regular = css`
   font-size: ${fontSizeH2};
   font-weight: ${fontWeightRegular};
   line-height: ${lineHeight20};
+  color: ${COLORS.darkBlack};
 `
 
 export const h2SemiBold = css`
   font-size: ${fontSizeH2};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight20};
+  color: ${COLORS.darkBlack};
 `
 export const h3Regular = css`
   font-size: ${fontSizeH3};
   font-weight: ${fontWeightRegular};
   line-height: ${lineHeight20};
+  color: ${COLORS.darkBlack};
 `
 
 export const h3SemiBold = css`
   font-size: ${fontSizeH3};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight20};
+  color: ${COLORS.darkBlack};
 `
 
 export const h6Default = css`
@@ -75,24 +80,28 @@ export const h6Default = css`
   font-weight: ${fontWeightRegular};
   line-height: ${lineHeight12};
   text-transform: ${textTransformUppercase};
+  color: ${COLORS.darkBlack};
 `
 
 export const h6SemiBold = css`
   font-size: ${fontSizeH6};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight12};
+  color: ${COLORS.darkBlack};
 `
 
 export const pRegular = css`
   font-size: ${fontSizeP};
   font-weight: ${fontWeightRegular};
   line-height: ${lineHeight16};
+  color: ${COLORS.darkBlack};
 `
 
 export const pSemiBold = css`
   font-size: ${fontSizeP};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight16};
+  color: ${COLORS.darkBlack};
 `
 
 export const labelRegular = css`
@@ -105,4 +114,15 @@ export const labelSemiBold = css`
   font-size: ${fontSizeLabel};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight12};
+`
+
+export const linkPSemibold = css`
+  font-size: ${fontSizeP};
+  font-weight: ${fontWeightSemiBold};
+  line-height: ${lineHeight16};
+  color: ${COLORS.blue};
+
+  &:hover {
+    opacity: 70%;
+  }
 `

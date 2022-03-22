@@ -10,9 +10,10 @@ interface NavTabProps {
 }
 
 const StyledNavLink = styled(NavLink)`
-  color: ${COLORS.darkGreyEnabled};
   padding: 0 ${SPACING.spacing2} ${SPACING.spacing3};
   ${TYPOGRAPHY.labelSemiBold}
+  color: ${COLORS.darkGreyEnabled};
+
   &.active {
     color: ${COLORS.darkBlack};
     ${BORDERS.tabBorder}

@@ -118,7 +118,7 @@ export function GeneralSettings(): JSX.Element {
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           gridGap={SPACING.spacing4}
         >
-          <Box width="70%">
+          <Box width="65%">
             <Text css={TYPOGRAPHY.h3SemiBold} paddingBottom={SPACING.spacing3}>
               {t('software_version')}
             </Text>
@@ -131,8 +131,7 @@ export function GeneralSettings(): JSX.Element {
             </Text>
             <Link
               role="button"
-              css={TYPOGRAPHY.pSemiBold}
-              color={COLORS.blue}
+              css={TYPOGRAPHY.linkPSemibold}
               onClick={() => setShowPreviousVersionModal(true)}
               id="GeneralSettings_previousVersionLink"
             >
@@ -142,7 +141,7 @@ export function GeneralSettings(): JSX.Element {
               {t('manage_versions')}
             </Text>
             <ExternalLink
-              css={TYPOGRAPHY.pSemiBold}
+              css={TYPOGRAPHY.linkPSemibold}
               href={SOFTWARE_SYNC_URL}
               id="GeneralSettings_appAndRobotSync"
             >
