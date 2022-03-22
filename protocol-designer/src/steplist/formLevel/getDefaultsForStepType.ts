@@ -114,7 +114,18 @@ export function getDefaultsForStepType(
         setTemperature: null,
         targetTemperature: null,
       }
-
+    case 'heaterShaker':
+      return {
+        moduleId: null,
+        setTemperature: null,
+        targetHeaterShakerTemperature: null,
+        targetSpeed: null,
+        setShake: null,
+        latchOpen: false,
+        heaterShakerSetTimer: null,
+        heaterShakerTimerMinutes: null,
+        heaterShakerTimerSeconds: null,
+      }
     case 'thermocycler':
       return {
         thermocyclerFormType: null,

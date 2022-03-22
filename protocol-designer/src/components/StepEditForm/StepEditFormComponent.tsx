@@ -10,6 +10,7 @@ import {
   MagnetForm,
   TemperatureForm,
   ThermocyclerForm,
+  HeaterShakerForm,
 } from './forms'
 import { FormAlerts } from './FormAlerts'
 import { ButtonRow } from './ButtonRow'
@@ -29,6 +30,7 @@ const STEP_FORM_MAP: StepFormMap = {
   magnet: MagnetForm,
   temperature: TemperatureForm,
   thermocycler: ThermocyclerForm,
+  heaterShaker: HeaterShakerForm,
 }
 
 interface Props {
