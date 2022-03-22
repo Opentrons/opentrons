@@ -1,4 +1,6 @@
 """OE Updater and dependency injection classes."""
+import contextlib
+
 from otupdate.common.update_actions import UpdateActionsInterface, Partition
 from typing import Callable, Optional
 import enum
@@ -36,7 +38,6 @@ class PartitionManager:
             subprocess.check_output("fw_setenv root_part 2")
         else:
             subprocess.check_output("fw_setenv root_part 3")
-
 
 
 class RootFSInterface:
@@ -86,6 +87,34 @@ class Updater(UpdateActionsInterface):
     def __init__(self, root_FS_intf: RootFSInterface, part_mngr: PartitionManager):
         self.root_FS_intf = root_FS_intf
         self.part_mngr = part_mngr
+
+    def commit_update(self) -> None:
+        """
+        Command the hardware to boot from the freshly-updated filesystem
+        """
+        pass
+
+    @contextlib.contextmanager
+    def mount_update(self):
+        """
+        Mount the fs to overwrite with the update
+        """
+        pass
+
+    def validate_update(
+        self,
+        filepath: str,
+        progress_callback: Callable[[float], None],
+        cert_path: Optional[str],
+    ):
+        """
+        Validate that the object is correct in some system-dependent way
+        """
+        pass
+
+    def write_machine_id(self, current_root: str, new_root: str) -> None:
+        """Copy the machine id over to the new partition"""
+        pass
 
     def write_update(
         self,

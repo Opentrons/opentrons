@@ -15,6 +15,7 @@ from otupdate.common import (
 )
 
 from otupdate.openembedded.updater import RootFSInterface, PartitionManager, Updater
+from ..common.update_actions import FILE_ACTIONS_VARNAME
 
 LOG = logging.getLogger(__name__)
 
@@ -85,6 +86,7 @@ def get_app(
     rfs = RootFSInterface()
     part_mgr = PartitionManager()
     updater = Updater(rfs, part_mgr)
+    app[FILE_ACTIONS_VARNAME] = updater
     app.router.add_routes(
         [
             web.post("/server/update/begin", update.begin),
