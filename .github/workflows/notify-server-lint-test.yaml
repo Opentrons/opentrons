@@ -8,19 +8,19 @@ on:
   push:
     paths:
       - 'Makefile'
-      - 'notify-server/**'
+      - 'notify-server/**/*'
       - '.github/workflows/notify-server-lint-test.yaml'
-      - 'api/**'
-      - 'hardware/**'
-      - '.github/actions/python/**'
+      - 'api/**/*'
+      - 'hardware/**/*'
+      - '.github/actions/python/**/*'
     tags-ignore:
       - '*'
   pull_request:
     paths:
       - 'Makefile'
-      - 'notify-server/**'
-      - 'api/**'
-      - 'hardware/**'
+      - 'notify-server/**/*'
+      - 'api/**/*'
+      - 'hardware/**/*'
   workflow_dispatch:
 
 defaults:
@@ -47,7 +47,7 @@ jobs:
       - name: Lint
         run: make -C notify-server lint
       - name: Test
-        run: make -C notify-server test
+        run: make -C notify-server test-cov
       - name: 'Upload coverage report'
         uses: 'codecov/codecov-action@v2'
         with:
