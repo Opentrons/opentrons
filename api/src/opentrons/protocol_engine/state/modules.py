@@ -70,6 +70,7 @@ class TemperatureRange(NamedTuple):
     max: float
 
 
+# TODO (spp, 2022-03-22): Move these values to heater-shaker module definition.
 HEATER_SHAKER_TEMPERATURE_RANGE = TemperatureRange(min=37, max=95)
 HEATER_SHAKER_SPEED_RANGE = SpeedRange(min=200, max=3000)
 

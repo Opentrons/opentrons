@@ -23,13 +23,6 @@ log = logging.getLogger(__name__)
 
 POLL_PERIOD = 1
 
-MIN_ALLOWED_TEMPERATURE = 37
-MAX_ALLOWED_TEMPERATURE = 95
-MIN_ALLOWED_SPEED: int = 200
-# TODO (spp, 2022-2-22): User requirements doc states 2000rpm as limit but
-#  the module is capable of going up to 3000rpm. Which one to use for limit?
-MAX_ALLOWED_SPEED: int = 2000
-
 
 class HeaterShakerError(RuntimeError):
     """An error propagated from the heater-shaker module."""
@@ -295,10 +288,10 @@ class HeaterShaker(mod_abc.AbstractModule):
         await self._driver.set_temperature(celsius)
 
     async def await_temperature(self) -> None:
-        """
-        Await temperature in degree Celsius
-        Polls temperature module's temperature until
-        the specified temperature is reached
+        """Wait until target temperature has reached.
+
+        Polls temperature module's current temperature until
+        the target temperature is reached.
         """
         if self.is_simulated:
             return
@@ -361,10 +354,9 @@ class HeaterShaker(mod_abc.AbstractModule):
         await self._driver.set_rpm(rpm)
 
     async def await_speed(self) -> None:
-        """
-        Await speed in RPM
-        Polls heater/shaker module's speed until the specified
-        speed is reached.
+        """Wait until target speed is reached.
+
+        Polls heater/shaker module's current speed until target speed is achieved.
         """
         if self.is_simulated:
             return
@@ -406,7 +398,8 @@ class HeaterShaker(mod_abc.AbstractModule):
     async def deactivate(self) -> None:
         """Stop heating/cooling; stop shaking and home the plate"""
         await self.wait_for_is_running()
-        # TODO (spp): Is this correct?
+        # TODO (spp, 2022-3-22): Talk to embedded about using a separate gcode
+        #  for deactivating heatpad/ stopping heating
         await self._driver.set_temperature(0)
         await self._driver.home()
 
