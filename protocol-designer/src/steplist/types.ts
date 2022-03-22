@@ -115,6 +115,16 @@ export interface AwaitTemperatureSubstepItem {
   labwareNickname: string | null | undefined
   message?: string
 }
+
+export interface HeaterShakerSubstepItem {
+  substepType: 'heaterShaker'
+  labwareNickname: string
+  targetHeaterShakerTemperature: number
+  targetSpeed: number
+  latchOpen: boolean
+  heaterShakerSetTimer: boolean
+}
+
 export interface ThermocyclerProfileSubstepItem {
   substepType: typeof THERMOCYCLER_PROFILE
   blockTargetTempHold: number | null
@@ -143,6 +153,7 @@ export type SubstepItemData =
   | AwaitTemperatureSubstepItem
   | ThermocyclerProfileSubstepItem
   | ThermocyclerStateSubstepItem
+  | HeaterShakerSubstepItem
 export type Substeps = Record<StepIdType, SubstepItemData | null | undefined>
 export type StepFormErrors = FormError[]
 export interface StepArgsAndErrors {

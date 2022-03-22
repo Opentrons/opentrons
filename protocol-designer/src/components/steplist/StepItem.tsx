@@ -3,6 +3,7 @@ import cx from 'classnames'
 import sum from 'lodash/sum'
 import { Icon } from '@opentrons/components'
 import {
+  HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -326,6 +327,21 @@ export const StepItemContents = (
         moduleType={TEMPERATURE_MODULE_TYPE}
         labwareNickname={substeps.labwareNickname}
       />
+    )
+  }
+
+  if (stepType === 'heaterShaker') {
+    return (
+      <ModuleStepItems
+        action={i18n.t(`modules.actions.go_to`)}
+        actionText={'50 C'}
+        moduleType={HEATERSHAKER_MODULE_TYPE}
+        labwareNickname={'Labware Name'}
+      >
+        <ModuleStepItemRow label={'Labware Latch'} value={'Closed'} />
+        <ModuleStepItemRow label={'Shaker'} value={'1800 RPM'} />
+        <ModuleStepItemRow label={'Deactivate after'} value={'10 min timer'} />
+      </ModuleStepItems>
     )
   }
 
