@@ -18,10 +18,10 @@ import { Link } from 'react-router-dom'
 
 import { StyledText } from '../../atoms/text'
 import { ModuleIcon } from '../../molecules/ModuleIcon'
+import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
 
 import { StoredProtocolData } from '../../redux/protocol-storage'
-import type { ProtocolFile } from '@opentrons/shared-data'
-import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
+import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 
 type ProtocolCardProps = StoredProtocolData
 
@@ -32,7 +32,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   const [
     protocolData,
     setProtocolData,
-  ] = React.useState<ProtocolFile<{}> | null>(null)
+  ] = React.useState<ProtocolAnalysisFile<{}> | null>(null)
 
   React.useEffect(() => {
     if (mostRecentAnalysis != null) {
