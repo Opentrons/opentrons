@@ -28,6 +28,7 @@ def _make_json_protocol(
         labware_definitions: Dict[str, LabwareDefinition] = {},
         labware: Dict[str, json_v6_models.Labware] = {},
         commands: List[json_v6_models.Command] = [],
+        modules: Dict[str, json_v6_models.Module] = {"magneticModuleId": {"model": "magneticModuleV2"}}
 ) -> json_v6_models.ProtocolSchemaV6:
     """Return a minimal JsonProtocol with the given elements, to use as test input."""
     return json_v6_models.ProtocolSchemaV6(
@@ -41,6 +42,7 @@ def _make_json_protocol(
         labwareDefinitions=labware_definitions,
         labware=labware,
         commands=commands,
+        modules=modules
     )
 
 
@@ -85,10 +87,7 @@ def load_command_list() -> Tuple[List[json_v6_models.Command], List[pe_commands.
             id="dropTip-command-id-666",
             commandType="dropTip",
             params=json_v6_models.Params(
-                pipetteId="pipette-id-abc123", labwareId="labware-id-def456", wellName="A1",
-                # added wellLocation - its expected in pe_commands
-                wellLocation=json_v6_models.WellLocation(origin="bottom",
-                                                         offset=json_v6_models.OffsetVector(x=0, y=0, z=7.89))
+                pipetteId="pipette-id-abc123", labwareId="labware-id-def456", wellName="A1"
             ),
         ),
         json_v6_models.Command(
@@ -97,10 +96,7 @@ def load_command_list() -> Tuple[List[json_v6_models.Command], List[pe_commands.
             params=json_v6_models.Params(
                 pipetteId="pipette-id-abc123",
                 labwareId="labware-id-def456",
-                wellName="A1",
-                # added wellLocation - its expected in pe_commands
-                wellLocation=json_v6_models.WellLocation(origin="bottom",
-                                                         offset=json_v6_models.OffsetVector(x=0, y=0, z=7.89))
+                wellName="A1"
             ),
         ),
         json_v6_models.Command(
@@ -117,7 +113,15 @@ def load_command_list() -> Tuple[List[json_v6_models.Command], List[pe_commands.
             params=json_v6_models.Params(
                 pipetteId="pipetteId",
                 mount="left"
-            ))]
+            )),
+        # json_v6_models.Command(
+        #     id="load-module-command-id-666",
+        #     commandType="loadModule",  # used to be delay but is expecting pause
+        #     params=json_v6_models.Params(
+        #         moduleId="magneticModuleId",
+        #         location={"slotName": "3"}
+        #     ))
+        ]
 
     expected_output = [
         pe_commands.AspirateCreate(
@@ -150,9 +154,7 @@ def load_command_list() -> Tuple[List[json_v6_models.Command], List[pe_commands.
                 pipetteId="pipette-id-abc123",
                 labwareId="labware-id-def456",
                 wellName="A1",
-                wellLocation=WellLocation(
-                    origin=WellOrigin.BOTTOM,
-                    offset=WellOffset(x=0, y=0, z=7.89))
+                wellLocation=WellLocation()
             )
         ),
         pe_commands.PickUpTipCreate(
@@ -160,9 +162,7 @@ def load_command_list() -> Tuple[List[json_v6_models.Command], List[pe_commands.
                 pipetteId="pipette-id-abc123",
                 labwareId="labware-id-def456",
                 wellName="A1",
-                wellLocation=WellLocation(
-                    origin=WellOrigin.BOTTOM,
-                    offset=WellOffset(x=0, y=0, z=7.89))
+                wellLocation=WellLocation()
             )
         ),
         pe_commands.PauseCreate(params=pe_commands.PauseParams(message="hello world")),
@@ -170,7 +170,10 @@ def load_command_list() -> Tuple[List[json_v6_models.Command], List[pe_commands.
             pipetteId="pipetteId",
             pipetteName="p10_single",
             mount="left"
-        ))
+        )),
+        # pe_commands.LoadModuleCreate(params=pe_commands.LoadModuleParams(
+        #     model=""
+        # ))
     ]
 
     return command_list, expected_output
