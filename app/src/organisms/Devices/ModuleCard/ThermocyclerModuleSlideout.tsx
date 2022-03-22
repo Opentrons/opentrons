@@ -1,23 +1,32 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSendModuleCommand } from '../../../redux/modules'
+import {
+  CELSIUS,
+  getModuleDisplayName,
+  TEMP_LID_MAX,
+  TEMP_LID_MIN,
+  TEMP_MAX,
+  TEMP_MIN,
+} from '@opentrons/shared-data'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { Slideout } from '../../../atoms/Slideout'
+import { InputField } from '../../../atoms/InputField'
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
   FONT_WEIGHT_REGULAR,
-  InputField,
   SPACING,
-  SPACING_1,
-  SPACING_3,
   Text,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { PrimaryButton } from '../../../atoms/Buttons'
 
 import type { AttachedModule } from '../../../redux/modules/types'
-import { getModuleDisplayName } from '@opentrons/shared-data'
+import type {
+  TCSetTargetBlockTemperatureCreateCommand,
+  TCSetTargetLidTemperatureCreateCommand,
+} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 interface ThermocyclerModuleSlideoutProps {
   module: AttachedModule
@@ -32,19 +41,52 @@ export const ThermocyclerModuleSlideout = (
   const { module, onCloseClick, isExpanded, isSecondaryTemp } = props
   const { t } = useTranslation('device_details')
   const [tempValue, setTempValue] = React.useState<string | null>(null)
-  const sendModuleCommand = useSendModuleCommand()
-
+  const { createLiveCommand } = useCreateLiveCommandMutation()
   const moduleName = getModuleDisplayName(module.model)
   const modulePart = isSecondaryTemp ? 'Lid' : 'Block'
   const tempRanges = getTCTempRange(isSecondaryTemp)
 
+  let errorMessage
+  if (isSecondaryTemp) {
+    errorMessage =
+      tempValue != null &&
+      (parseInt(tempValue) < TEMP_LID_MIN || parseInt(tempValue) > TEMP_LID_MAX)
+        ? t('input_out_of_range')
+        : null
+  } else {
+    errorMessage =
+      tempValue != null &&
+      (parseInt(tempValue) < TEMP_MIN || parseInt(tempValue) > TEMP_MAX)
+        ? t('input_out_of_range')
+        : null
+  }
+
   const handleSubmitTemp = (): void => {
     if (tempValue != null) {
-      sendModuleCommand(
-        module.serial,
-        isSecondaryTemp ? 'set_lid_temperature' : 'set_temperature',
-        [Number(tempValue)]
-      )
+      const saveLidCommand: TCSetTargetLidTemperatureCreateCommand = {
+        commandType: 'thermocycler/setTargetLidTemperature',
+        params: {
+          moduleId: module.id,
+          temperature: parseInt(tempValue),
+        },
+      }
+      const saveBlockCommand: TCSetTargetBlockTemperatureCreateCommand = {
+        commandType: 'thermocycler/setTargetBlockTemperature',
+        params: {
+          moduleId: module.id,
+          temperature: parseInt(tempValue),
+          //  TODO(jr, 3/17/22): add volume, which will be provided by PD protocols
+        },
+      }
+      createLiveCommand({
+        command: isSecondaryTemp ? saveLidCommand : saveBlockCommand,
+      }).catch((e: Error) => {
+        console.error(
+          `error setting module status with command type ${
+            saveLidCommand.commandType ?? saveBlockCommand.commandType
+          }: ${e.message}`
+        )
+      })
     }
     setTempValue(null)
   }
@@ -54,13 +96,13 @@ export const ThermocyclerModuleSlideout = (
       title={t('tc_set_temperature', { part: modulePart, name: moduleName })}
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
-      height={`calc(100vh - ${SPACING_3})`} // subtract breadcrumb strip
+      height={`calc(100vh - ${SPACING.spacing4})`} // subtract breadcrumb strip
       footer={
         <PrimaryButton
           onClick={handleSubmitTemp}
-          disabled={tempValue === null}
+          disabled={tempValue === null || errorMessage !== null}
           width="100%"
-          data-testid={`TC_Slideout_set_height_btn_${module.model}`}
+          data-testid={`ThermocyclerSlideout_btn_${module.serial}`}
         >
           {t('set_tc_temp_slideout', { part: modulePart })}
         </PrimaryButton>
@@ -69,8 +111,8 @@ export const ThermocyclerModuleSlideout = (
       <Text
         fontWeight={FONT_WEIGHT_REGULAR}
         fontSize={TYPOGRAPHY.fontSizeP}
-        paddingTop={SPACING_1}
-        data-testid={`TC_Slideout_body_text_${module.model}`}
+        paddingTop={SPACING.spacing2}
+        data-testid={`ThermocyclerSlideout_text_${module.serial}`}
       >
         {t('tc_set_temperature_body', {
           part: modulePart,
@@ -79,9 +121,9 @@ export const ThermocyclerModuleSlideout = (
         })}
       </Text>
       <Flex
-        marginTop={SPACING_3}
+        marginTop={SPACING.spacing4}
         flexDirection={DIRECTION_COLUMN}
-        data-testid={`TC_Slideout_input_field_${module.model}`}
+        data-testid={`ThermocyclerSlideout_input_field_${module.serial}`}
       >
         <Text
           fontWeight={FONT_WEIGHT_REGULAR}
@@ -91,11 +133,20 @@ export const ThermocyclerModuleSlideout = (
         >
           {t('temperature')}
         </Text>
-        {/* TODO Immediately: make sure input field matches final designs */}
         <InputField
-          units={'°C'}
+          data-testid={`${module.model}_${isSecondaryTemp}`}
+          id={`${module.model}_${isSecondaryTemp}`}
+          autoFocus
+          units={CELSIUS}
           value={tempValue}
           onChange={e => setTempValue(e.target.value)}
+          type="number"
+          caption={t('module_status_range', {
+            min: tempRanges.min,
+            max: tempRanges.max,
+            unit: CELSIUS,
+          })}
+          error={errorMessage}
         />
       </Flex>
     </Slideout>
@@ -109,8 +160,8 @@ interface TemperatureRanges {
 
 const getTCTempRange = (isSecondaryTemp = false): TemperatureRanges => {
   if (isSecondaryTemp) {
-    return { min: 37, max: 110 }
+    return { min: TEMP_LID_MIN, max: TEMP_LID_MAX }
   } else {
-    return { min: 4, max: 99 }
+    return { min: TEMP_MIN, max: TEMP_MAX }
   }
 }

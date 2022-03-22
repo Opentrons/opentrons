@@ -12,19 +12,28 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     AddLinearMoveRequest,
     MoveCompleted,
     ExecuteMoveGroupRequest,
+    HomeRequest,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     AddLinearMoveRequestPayload,
     ExecuteMoveGroupRequestPayload,
+    HomeRequestPayload,
 )
 from .constants import interrupts_per_sec
-from opentrons_hardware.hardware_control.motion import MoveGroups
+from opentrons_hardware.hardware_control.motion import (
+    MoveGroups,
+    MoveGroupSingleAxisStep,
+    MoveType,
+)
 from opentrons_hardware.firmware_bindings.utils import (
     UInt8Field,
     UInt32Field,
     Int32Field,
 )
-
+from opentrons_hardware.hardware_control.motion import MoveStopCondition
+from opentrons_hardware.hardware_control.motion_planning.move_utils import (
+    MoveConditionNotMet,
+)
 
 log = logging.getLogger(__name__)
 
@@ -55,7 +64,11 @@ class MoveGroupRunner:
         await self._move(can_messenger)
 
     async def _clear_groups(self, can_messenger: CanMessenger) -> None:
-        """Send commands to clear the message groups."""
+        """Send commands to clear the message groups.
+
+        Args:
+            can_messenger: a can messenger
+        """
         await can_messenger.send(
             node_id=NodeId.broadcast,
             message=ClearAllMoveGroupsRequest(),
@@ -68,33 +81,48 @@ class MoveGroupRunner:
                 for node, step in sequence.items():
                     await can_messenger.send(
                         node_id=node,
-                        message=AddLinearMoveRequest(
-                            payload=AddLinearMoveRequestPayload(
-                                request_stop_condition=UInt8Field(0),
-                                group_id=UInt8Field(group_i),
-                                seq_id=UInt8Field(seq_i),
-                                duration=UInt32Field(
-                                    int(step.duration_sec * interrupts_per_sec)
-                                ),
-                                acceleration=Int32Field(
-                                    int(
-                                        (
-                                            step.acceleration_mm_sec_sq
-                                            / interrupts_per_sec
-                                            / interrupts_per_sec
-                                        )
-                                        * (2**31)
-                                    )
-                                ),
-                                velocity=Int32Field(
-                                    int(
-                                        (step.velocity_mm_sec / interrupts_per_sec)
-                                        * (2**31)
-                                    )
-                                ),
-                            )
-                        ),
+                        message=self._get_message_type(step, group_i, seq_i),
                     )
+
+    def _convert_velocity(self, velocity: float, interrupts: int) -> Int32Field:
+        return Int32Field(int((velocity / interrupts) * (2**31)))
+
+    def _get_message_type(
+        self, step: MoveGroupSingleAxisStep, group: int, seq: int
+    ) -> MessageDefinition:
+        """Return the correct payload type."""
+        if step.move_type == MoveType.home:
+            home_payload = HomeRequestPayload(
+                group_id=UInt8Field(group),
+                seq_id=UInt8Field(seq),
+                duration=UInt32Field(int(step.duration_sec * interrupts_per_sec)),
+                velocity=self._convert_velocity(
+                    step.velocity_mm_sec, interrupts_per_sec
+                ),
+            )
+            return HomeRequest(payload=home_payload)
+
+        else:
+            linear_payload = AddLinearMoveRequestPayload(
+                request_stop_condition=UInt8Field(step.stop_condition),
+                group_id=UInt8Field(group),
+                seq_id=UInt8Field(seq),
+                duration=UInt32Field(int(step.duration_sec * interrupts_per_sec)),
+                acceleration=Int32Field(
+                    int(
+                        (
+                            step.acceleration_mm_sec_sq
+                            / interrupts_per_sec
+                            / interrupts_per_sec
+                        )
+                        * (2**31)
+                    )
+                ),
+                velocity=Int32Field(
+                    int((step.velocity_mm_sec / interrupts_per_sec) * (2**31))
+                ),
+            )
+            return AddLinearMoveRequest(payload=linear_payload)
 
     async def _move(self, can_messenger: CanMessenger) -> None:
         """Run all the move groups."""
@@ -114,12 +142,16 @@ class MoveScheduler:
         # For each move group create a set identifying the node and seq id.
         self._moves: List[Set[Tuple[int, int]]] = []
         self._durations: List[float] = []
+        self._stop_condition: List[MoveStopCondition] = []
         for move_group in move_groups:
             move_set = set()
             duration = 0.0
             for seq_id, move in enumerate(move_group):
                 move_set.update(set((k.value, seq_id) for k in move.keys()))
                 duration += list(move.values())[0].duration_sec
+                for step in move_group[seq_id]:
+                    self._stop_condition.append(move_group[seq_id][step].stop_condition)
+
             self._moves.append(move_set)
             self._durations.append(duration)
         log.info(f"Move scheduler running for groups {move_groups}")
@@ -133,6 +165,7 @@ class MoveScheduler:
         if isinstance(message, MoveCompleted):
             seq_id = message.payload.seq_id.value
             group_id = message.payload.group_id.value
+            ack_id = message.payload.ack_id.value
             node_id = arbitration_id.parts.originating_node_id
             log.info(
                 f"Received completion for {node_id} group {group_id} seq {seq_id}"
@@ -144,6 +177,13 @@ class MoveScheduler:
             if not self._moves[group_id]:
                 log.info(f"Move group {group_id} has completed.")
                 self._event.set()
+            if self._stop_condition[
+                group_id
+            ] == MoveStopCondition.limit_switch and ack_id != UInt8Field(2):
+                if ack_id == UInt8Field(1):
+                    condition = "Homing timed out."
+                    log.warning(f"Homing failed. Condition: {condition}")
+                    raise MoveConditionNotMet()
 
     async def run(self, can_messenger: CanMessenger) -> None:
         """Start each move group after the prior has completed."""

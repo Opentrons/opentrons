@@ -26,6 +26,7 @@ def test_v6_types(defpath):
 # which is not part of the schema, and which we don't parse into our models.
 # Here, we delete the extra junk from the fixtures.
 # Remove this when the fixtures are corrected.
+# https://github.com/Opentrons/opentrons/issues/9701
 def delete_unexpected_results(protocol_fixture: Dict[str, Any]) -> None:
     for command_object_dict in protocol_fixture["commands"]:
         try:

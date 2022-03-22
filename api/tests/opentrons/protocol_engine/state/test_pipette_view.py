@@ -51,7 +51,7 @@ def test_initial_pipette_data_by_id() -> None:
     """It should should raise if pipette ID doesn't exist."""
     subject = get_pipette_view()
 
-    with pytest.raises(errors.PipetteDoesNotExistError):
+    with pytest.raises(errors.PipetteNotLoadedError):
         subject.get("asdfghjkl")
 
 
@@ -183,7 +183,7 @@ def test_pipette_volume_raises_if_bad_id() -> None:
     """get_aspirated_volume should raise if the given pipette doesn't exist."""
     subject = get_pipette_view()
 
-    with pytest.raises(errors.PipetteDoesNotExistError):
+    with pytest.raises(errors.PipetteNotLoadedError):
         subject.get_aspirated_volume("pipette-id")
 
 

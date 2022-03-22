@@ -40,6 +40,7 @@ class EngineStore:
                 construction.
         """
         self._hardware_api = hardware_api
+        self._default_engine: Optional[ProtocolEngine] = None
         self._runner_engine_pair: Optional[RunnerEnginePair] = None
         self._engines_by_run_id: Dict[str, ProtocolEngine] = {}
 
@@ -66,6 +67,26 @@ class EngineStore:
             raise EngineMissingError("Runner not yet created.")
 
         return self._runner_engine_pair.runner
+
+    # TODO(mc, 2022-03-21): this resource locking is insufficient;
+    # come up with something more sophisticated without race condition holes.
+    async def get_default_engine(self) -> ProtocolEngine:
+        """Get a "default" ProtocolEngine to use outside the context of a run.
+
+        Raises:
+            EngineConflictError: if a run-specific engine is active.
+        """
+        if self._runner_engine_pair is not None:
+            raise EngineConflictError("An engine for a run is currently active")
+
+        engine = self._default_engine
+
+        if engine is None:
+            # TODO(mc, 2022-03-21): potential race condition
+            engine = await create_protocol_engine(self._hardware_api)
+            self._default_engine = engine
+
+        return engine
 
     async def create(self, run_id: str) -> StateView:
         """Create and store a ProtocolRunner and ProtocolEngine for a given Run.

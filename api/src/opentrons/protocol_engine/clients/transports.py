@@ -67,10 +67,9 @@ class ChildThreadTransport(AbstractSyncTransport):
             loop=self._loop,
         ).result()
 
-        if command.errorId is not None:
-            raise ProtocolEngineError(
-                f'Command "{command.id}" failed due to error "{command.errorId}"'
-            )
+        if command.error is not None:
+            error = command.error
+            raise ProtocolEngineError(f"{error.errorType}: {error.detail}")
 
         assert command.result is not None, f"Expected Command {command} to have result"
 

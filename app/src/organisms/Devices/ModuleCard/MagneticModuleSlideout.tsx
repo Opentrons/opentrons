@@ -1,22 +1,17 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   Flex,
-  SPACING_1,
   Text,
   DIRECTION_ROW,
   DIRECTION_COLUMN,
-  FONT_WEIGHT_SEMIBOLD,
-  SPACING_3,
-  FONT_WEIGHT_REGULAR,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING_2,
   TEXT_TRANSFORM_UPPERCASE,
-  C_BRIGHT_GRAY,
-  InputField,
   JUSTIFY_FLEX_END,
   COLORS,
   TYPOGRAPHY,
+  SPACING,
 } from '@opentrons/components'
 import {
   getModuleDisplayName,
@@ -28,13 +23,14 @@ import {
   MAGNETIC_MODULE_V2_MAX_ENGAGE_HEIGHT,
   MM,
 } from '@opentrons/shared-data'
-import { useSendModuleCommand } from '../../../redux/modules'
 import { Slideout } from '../../../atoms/Slideout'
+import { InputField } from '../../../atoms/InputField'
 import { PrimaryButton } from '../../../atoms/Buttons'
 
 import type { TFunctionResult } from 'i18next'
 import type { AttachedModule } from '../../../redux/modules/types'
 import type { ModuleModel } from '@opentrons/shared-data'
+import type { MagneticModuleEngageMagnetCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 interface ModelContents {
   version: string
@@ -75,16 +71,11 @@ export const MagneticModuleSlideout = (
 ): JSX.Element | null => {
   const { module, isExpanded, onCloseClick } = props
   const { t } = useTranslation('device_details')
-  const sendModuleCommand = useSendModuleCommand()
+  const { createLiveCommand } = useCreateLiveCommandMutation()
   const [engageHeightValue, setEngageHeightValue] = React.useState<
     string | null
   >(null)
-  const handleSubmitHeight = (): void => {
-    if (engageHeightValue != null) {
-      sendModuleCommand(module.serial, 'engage', [Number(engageHeightValue)])
-    }
-    setEngageHeightValue(null)
-  }
+
   const moduleName = getModuleDisplayName(module.model)
   const info = getInfoByModel(module.model)
 
@@ -106,89 +97,134 @@ export const MagneticModuleSlideout = (
     }
   }
 
+  const errorMessage =
+    engageHeightValue != null &&
+    (parseInt(engageHeightValue) < info.disengagedHeight ||
+      parseInt(engageHeightValue) > info.maxHeight)
+      ? t('input_out_of_range')
+      : null
+
+  const handleSubmitHeight = (): void => {
+    if (engageHeightValue != null) {
+      const setEngageCommand: MagneticModuleEngageMagnetCreateCommand = {
+        commandType: 'magneticModule/engageMagnet',
+        params: {
+          moduleId: module.id,
+          engageHeight: parseInt(engageHeightValue),
+        },
+      }
+      createLiveCommand({ command: setEngageCommand }).catch((e: Error) => {
+        console.error(
+          `error setting module status with command type ${setEngageCommand.commandType}: ${e.message}`
+        )
+      })
+    }
+    setEngageHeightValue(null)
+  }
+
   return (
     <Slideout
       title={t('set_engage_height_slideout', { name: moduleName })}
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
-      height={`calc(100vh - ${SPACING_3})`}
+      height={`calc(100vh - ${SPACING.spacing4})`}
       footer={
         <PrimaryButton
           width="100%"
           onClick={handleSubmitHeight}
-          disabled={engageHeightValue == null}
-          data-testid={`Mag_Slideout_set_height_btn_${module.model}`}
+          disabled={engageHeightValue == null || errorMessage !== null}
+          data-testid={`MagneticModuleSlideout_btn_${module.serial}`}
         >
           {t('set_engage_height')}
         </PrimaryButton>
       }
     >
       <Text
-        fontWeight={FONT_WEIGHT_REGULAR}
+        fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
-        paddingTop={SPACING_1}
-        data-testid={`Mag_Slideout_body_text_${module.model}`}
+        paddingTop={SPACING.spacing2}
+        data-testid={`MagneticModuleSlideout_body_text_${module.serial}`}
       >
         {t('set_engage_height_slideout_body', {
-          lower: module.model === MAGNETIC_MODULE_V1 ? 5 : 4,
-          higher: module.model === MAGNETIC_MODULE_V1 ? 40 : 16,
+          lower:
+            module.model === MAGNETIC_MODULE_V1
+              ? MAGNETIC_MODULE_V1_DISNEGAGED_HEIGHT
+              : MAGNETIC_MODULE_V2_DISNEGAGED_HEIGHT,
+          higher:
+            module.model === MAGNETIC_MODULE_V1
+              ? MAGNETIC_MODULE_V1_MAX_ENGAGE_HEIGHT
+              : MAGNETIC_MODULE_V2_MAX_ENGAGE_HEIGHT,
         })}
       </Text>
       <Text
         fontSize={TYPOGRAPHY.fontSizeH6}
-        fontWeight={FONT_WEIGHT_SEMIBOLD}
-        paddingTop={SPACING_3}
+        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        paddingTop={SPACING.spacing4}
         textTransform={TEXT_TRANSFORM_UPPERCASE}
-        paddingBottom={SPACING_2}
-        data-testid={`Mag_Slideout_body_subtitle_${module.model}`}
+        paddingBottom={SPACING.spacing3}
+        data-testid={`MagneticModuleSlideout_body_subtitle_${module.serial}`}
       >
         {t('set_engage_height_slideout_subtitle', { gen: info.version })}
       </Text>
       <Flex
-        backgroundColor={C_BRIGHT_GRAY}
+        backgroundColor={COLORS.background}
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        fontWeight={FONT_WEIGHT_REGULAR}
+        fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
-        padding={SPACING_3}
+        padding={SPACING.spacing4}
       >
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          data-testid={`Mag_Slideout_body_data_text_${module.model}`}
+          data-testid={`MagneticModuleSlideout_body_data_text_${module.serial}`}
         >
-          <Text paddingBottom={SPACING_2}>
+          <Text paddingBottom={SPACING.spacing3}>
             {t('max_engage_height_slideout')}
           </Text>
-          <Text paddingBottom={SPACING_2}>{t('labware_bottom_slideout')}</Text>
-          <Text paddingBottom={SPACING_2}>{t('disengage_slideout')}</Text>
+          <Text paddingBottom={SPACING.spacing3}>
+            {t('labware_bottom_slideout')}
+          </Text>
+          <Text paddingBottom={SPACING.spacing3}>
+            {t('disengage_slideout')}
+          </Text>
         </Flex>
         <Flex
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_FLEX_END}
-          data-testid={`Mag_Slideout_body_data_num_${module.model}`}
+          data-testid={`MagneticModuleSlideout_body_data_num_${module.serial}`}
         >
-          <Text paddingBottom={SPACING_2}>{max}</Text>
-          <Text paddingBottom={SPACING_2}>{labwareBottom}</Text>
-          <Text paddingBottom={SPACING_2}>{disengageHeight}</Text>
+          <Text paddingBottom={SPACING.spacing3}>{max}</Text>
+          <Text paddingBottom={SPACING.spacing3}>{labwareBottom}</Text>
+          <Text paddingBottom={SPACING.spacing3}>{disengageHeight}</Text>
         </Flex>
       </Flex>
       <Flex
-        marginTop={SPACING_3}
+        marginTop={SPACING.spacing4}
         flexDirection={DIRECTION_COLUMN}
-        data-testid={`Mag_Slideout_input_field_${module.model}`}
+        data-testid={`MagneticModuleSlideout_input_field_${module.serial}`}
       >
         <Text
-          fontWeight={FONT_WEIGHT_REGULAR}
+          fontWeight={TYPOGRAPHY.fontWeightRegular}
           fontSize={TYPOGRAPHY.fontSizeH6}
           color={COLORS.darkGrey}
+          paddingBottom={SPACING.spacing3}
         >
           {t('engage_height_slideout')}
         </Text>
-        {/* TODO Immediately: make sure input field matches final designs */}
         <InputField
+          data-testid={`${module.model}`}
+          id={`${module.model}`}
+          autoFocus
           units={info.units}
           value={engageHeightValue}
           onChange={e => setEngageHeightValue(e.target.value)}
+          type="number"
+          caption={t('module_status_range', {
+            min: info.disengagedHeight,
+            max: info.maxHeight,
+            unit: info.units,
+          })}
+          error={errorMessage}
         />
       </Flex>
     </Slideout>

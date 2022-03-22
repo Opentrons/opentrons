@@ -110,8 +110,8 @@ async def test_raises_depending_on_thermocycler_lid_status(
     # These "type: ignore[misc]" comments let us assign to read-only properties,
     # necessary to work around Decoy not being able to stub properties.
     thermocycler = decoy.mock(cls=HardwareThermocycler)
-    thermocycler.device_info = {"serial": "module-serial"}  # type: ignore[misc]
-    thermocycler.lid_status = lid_status  # type: ignore[misc]
+    decoy.when(thermocycler.device_info).then_return({"serial": "module-serial"})
+    decoy.when(thermocycler.lid_status).then_return(lid_status)
     decoy.when(
         await hardware_api.find_modules(
             by_model=OpentronsThermocyclerModuleModel.THERMOCYCLER_V1,

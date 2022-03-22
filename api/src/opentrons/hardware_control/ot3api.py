@@ -81,7 +81,9 @@ from opentrons_shared_data.pipette.dev_types import (
 )
 
 from .dev_types import PipetteDict
-
+from opentrons_hardware.hardware_control.motion_planning.move_utils import (
+    MoveConditionNotMet,
+)
 
 mod_log = logging.getLogger(__name__)
 
@@ -220,7 +222,14 @@ class OT3API(
             checked_config = config
         backend = await OT3Controller.build(checked_config)
         await backend.setup_motors()
-        return cls(backend, loop=checked_loop, config=checked_config)
+        api_instance = cls(backend, loop=checked_loop, config=checked_config)
+        await api_instance.cache_instruments()
+        module_controls = await AttachedModulesControl.build(
+            api_instance, board_revision=backend.board_revision
+        )
+        backend.module_controls = module_controls
+        checked_loop.create_task(backend.watch(loop=checked_loop))
+        return api_instance
 
     @classmethod
     async def build_hardware_simulator(
@@ -477,77 +486,22 @@ class OT3API(
             axes = [OT3Axis.Z_R, OT3Axis.Z_L]
         await self.home(axes)
 
-    async def _do_plunger_home(
-        self,
-        axis: Optional[OT3Axis] = None,
-        mount: Optional[OT3Mount] = None,
-        acquire_lock: bool = True,
-    ) -> None:
-        assert (axis is not None) ^ (mount is not None), "specify either axis or mount"
-        if axis:
-            checked_axis = axis
-            checked_mount = OT3Axis.to_mount(checked_axis)
-        if mount:
-            checked_mount = mount
-            checked_axis = OT3Axis.of_main_tool_actuator(checked_mount)
-        instr = self._instrument_handler.hardware_instruments[checked_mount]
-        if not instr:
-            return
-        async with contextlib.AsyncExitStack() as stack:
-            if acquire_lock:
-                await stack.enter_async_context(self._motion_lock)
-            with self._backend.save_current():
-                self._backend.set_active_current(
-                    {checked_axis: instr.config.plunger_current}
-                )
-                await self._backend.home([checked_axis])
-                # either we were passed False for our acquire_lock and we
-                # should pass it on, or we acquired the lock above and
-                # shouldn't do it again
-                target_pos = target_position_from_plunger(
-                    checked_mount, instr.config.bottom, self._current_position
-                )
-                await self._move(
-                    target_pos,
-                    acquire_lock=False,
-                    home_flagged_axes=False,
-                )
-
     async def home_plunger(self, mount: Union[top_types.Mount, OT3Mount]) -> None:
         """
         Home the plunger motor for a mount, and then return it to the 'bottom'
         position.
         """
+
         checked_mount = OT3Mount.from_mount(mount)
-        await self.current_position(mount=checked_mount, refresh=True)
-        await self._do_plunger_home(mount=checked_mount, acquire_lock=True)
+        await self.home([OT3Axis.of_main_tool_actuator(checked_mount)])
+        instr = self._instrument_handler.hardware_instruments[checked_mount]
+        if instr:
+            target_pos = target_position_from_plunger(
+                checked_mount, instr.config.bottom, self._current_position
+            )
+            await self._move(target_pos, acquire_lock=False, home_flagged_axes=False)
 
-    @ExecutionManagerProvider.wait_for_running
-    async def home(
-        self, axes: Optional[Union[List[Axis], List[OT3Axis]]] = None
-    ) -> None:
-        """Home the entire robot and initialize current position."""
-        self._reset_last_mount()
-        # Initialize/update current_position
-        if axes:
-            checked_axes = [OT3Axis.from_axis(ax) for ax in axes]
-        else:
-            checked_axes = [ax for ax in OT3Axis]
-        gantry = [ax for ax in checked_axes if ax in OT3Axis.gantry_axes()]
-        machine_pos = {}
-        plungers = [ax for ax in checked_axes if ax in OT3Axis.pipette_axes()]
-
-        async with self._motion_lock:
-            if gantry:
-                machine_pos.update(await self._backend.home(gantry))
-                self._current_position = deck_from_machine(
-                    machine_pos,
-                    self._transforms.deck_calibration.attitude,
-                    self._transforms.carriage_offset,
-                    OT3Axis,
-                )
-            for plunger in plungers:
-                await self._do_plunger_home(axis=plunger, acquire_lock=False)
+            await self.current_position(mount=checked_mount, refresh=True)
 
     @lru_cache(1)
     def _carriage_offset(self) -> top_types.Point:
@@ -586,16 +540,30 @@ class OT3API(
                     self._transforms.carriage_offset,
                     OT3Axis,
                 )
-            offset = offset_for_mount(
-                mount, self._config.left_mount_offset, self._config.right_mount_offset
+            ot3pos = self._effector_pos_from_carriage_pos(
+                OT3Mount.from_mount(mount), self._current_position, critical_point
             )
-            cp = self.critical_point_for(mount, critical_point)
-            return {
-                Axis.X: self._current_position[OT3Axis.X] + offset[0] + cp.x,
-                Axis.Y: self._current_position[OT3Axis.Y] + offset[1] + cp.y,
-                z_ax.to_axis(): self._current_position[z_ax] + offset[2] + cp.z,
-                plunger_ax.to_axis(): self._current_position[plunger_ax],
-            }
+            return {ot3ax.to_axis(): value for ot3ax, value in ot3pos.items()}
+
+    def _effector_pos_from_carriage_pos(
+        self,
+        mount: OT3Mount,
+        carriage_position: OT3AxisMap[float],
+        critical_point: Optional[CriticalPoint],
+    ) -> OT3AxisMap[float]:
+        offset = offset_for_mount(
+            mount, self._config.left_mount_offset, self._config.right_mount_offset
+        )
+        cp = self.critical_point_for(mount, critical_point)
+        z_ax = OT3Axis.by_mount(mount)
+        plunger_ax = OT3Axis.of_main_tool_actuator(mount)
+
+        return {
+            OT3Axis.X: carriage_position[OT3Axis.X] + offset[0] + cp.x,
+            OT3Axis.Y: carriage_position[OT3Axis.Y] + offset[1] + cp.y,
+            z_ax: carriage_position[z_ax] + offset[2] + cp.z,
+            plunger_ax: carriage_position[plunger_ax],
+        }
 
     async def gantry_position(
         self,
@@ -762,6 +730,33 @@ class OT3API(
             else:
                 self._current_position.update(target_position)
 
+    @ExecutionManagerProvider.wait_for_running
+    async def home(
+        self, axes: Optional[Union[List[Axis], List[OT3Axis]]] = None
+    ) -> None:
+        """Worker function to apply robot motion."""
+        self._reset_last_mount()
+        if axes:
+            checked_axes = [OT3Axis.from_axis(ax) for ax in axes]
+        else:
+            checked_axes = [ax for ax in OT3Axis]
+        async with self._motion_lock:
+            try:
+                await self._backend.home(checked_axes)
+            except MoveConditionNotMet:
+                self._log.exception("Homing failed")
+                self._current_position.clear()
+                raise
+            else:
+                machine_pos = await self._backend.update_position()
+                position = deck_from_machine(
+                    machine_pos,
+                    self._transforms.deck_calibration.attitude,
+                    self._transforms.carriage_offset,
+                    OT3Axis,
+                )
+                self._current_position.update(position)
+
     def get_engaged_axes(self) -> Dict[Axis, bool]:
         """Which axes are engaged and holding."""
         return {ax.to_axis(): eng for ax, eng in self._backend.engaged_axes().items()}
@@ -885,7 +880,7 @@ class OT3API(
         )
 
         try:
-            self._backend.set_active_current(
+            await self._backend.set_active_current(
                 {OT3Axis.from_axis(aspirate_spec.axis): aspirate_spec.current}
             )
 
@@ -922,7 +917,7 @@ class OT3API(
         )
 
         try:
-            self._backend.set_active_current(
+            await self._backend.set_active_current(
                 {OT3Axis.from_axis(dispense_spec.axis): dispense_spec.current}
             )
             await self._move(
@@ -944,7 +939,9 @@ class OT3API(
         """
         realmount = OT3Mount.from_mount(mount)
         blowout_spec = self._instrument_handler.plan_check_blow_out(realmount)
-        self._backend.set_active_current({blowout_spec.axis: blowout_spec.current})
+        await self._backend.set_active_current(
+            {blowout_spec.axis: blowout_spec.current}
+        )
         target_pos = target_position_from_plunger(
             realmount,
             blowout_spec.plunger_distance,
@@ -976,7 +973,7 @@ class OT3API(
         spec, _add_tip_to_instrs = self._instrument_handler.plan_check_pick_up_tip(
             realmount, tip_length, presses, increment
         )
-        self._backend.set_active_current(
+        await self._backend.set_active_current(
             {axis: current for axis, current in spec.plunger_currents.items()}
         )
         target_absolute = target_position_from_plunger(
@@ -988,18 +985,18 @@ class OT3API(
         )
 
         for press in spec.presses:
-            with self._backend.save_current():
-                self._backend.set_active_current(
+            async with self._backend.restore_current():
+                await self._backend.set_active_current(
                     {axis: current for axis, current in press.current.items()}
                 )
                 target_down = target_position_from_relative(
                     realmount, press.relative_down, self._current_position
                 )
                 await self._move(target_down, speed=press.speed)
-                target_up = target_position_from_relative(
-                    realmount, press.relative_up, self._current_position
-                )
-                await self._move(target_up)
+            target_up = target_position_from_relative(
+                realmount, press.relative_up, self._current_position
+            )
+            await self._move(target_up)
 
         _add_tip_to_instrs()
 
@@ -1041,7 +1038,7 @@ class OT3API(
             realmount, home_after
         )
         for move in spec.drop_moves:
-            self._backend.set_active_current(
+            await self._backend.set_active_current(
                 {
                     OT3Axis.from_axis(axis): current
                     for axis, current in move.current.items()
@@ -1070,7 +1067,7 @@ class OT3API(
         for shake in spec.shake_moves:
             await self.move_rel(mount, shake[0], speed=shake[1])
 
-        self._backend.set_active_current(
+        await self._backend.set_active_current(
             {
                 OT3Axis.from_axis(axis): current
                 for axis, current in spec.ending_current.items()
@@ -1091,15 +1088,6 @@ class OT3API(
     async def clean_up(self) -> None:
         """Get the API ready to stop cleanly."""
         await self._backend.clean_up()
-
-    def get_instrument_max_height(
-        self,
-        mount: Union[top_types.Mount, OT3Mount],
-        critical_point: Optional[CriticalPoint] = None,
-    ) -> float:
-        return self._instrument_handler.instrument_max_height(
-            OT3Mount.from_mount(mount), self._config.z_retract_distance, critical_point
-        )
 
     def critical_point_for(
         self,
@@ -1184,15 +1172,22 @@ class OT3API(
             OT3Mount.from_mount(mount), aspirate, dispense, blow_out
         )
 
-    def instrument_max_height(
+    def get_instrument_max_height(
         self,
         mount: Union[top_types.Mount, OT3Mount],
-        retract_distance: float,
-        critical_point: Optional[CriticalPoint],
+        critical_point: Optional[CriticalPoint] = None,
     ) -> float:
-        return self._instrument_handler.instrument_max_height(
-            OT3Mount.from_mount(mount), retract_distance, critical_point
+        carriage_pos = deck_from_machine(
+            self._backend.home_position(),
+            self._transforms.deck_calibration.attitude,
+            self._transforms.carriage_offset,
+            OT3Axis,
         )
+        pos_at_home = self._effector_pos_from_carriage_pos(
+            OT3Mount.from_mount(mount), carriage_pos, critical_point
+        )
+
+        return pos_at_home[OT3Axis.by_mount(mount)] - self._config.z_retract_distance
 
     async def add_tip(
         self, mount: Union[top_types.Mount, OT3Mount], tip_length: float

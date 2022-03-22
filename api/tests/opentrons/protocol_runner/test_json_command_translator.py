@@ -24,11 +24,11 @@ def subject() -> JsonCommandTranslator:
 
 def _make_json_protocol(
         *,
-        pipettes: Dict[str, json_v6_models.Pipette] = {"pipetteId": {"name": "p10_single"}},
+        pipettes: Dict[str, json_v6_models.Pipette] = {"pipetteId": json_v6_models.Pipette(name="p10_single")},
         labware_definitions: Dict[str, LabwareDefinition] = {},
         labware: Dict[str, json_v6_models.Labware] = {},
         commands: List[json_v6_models.Command] = [],
-        modules: Dict[str, json_v6_models.Module] = {"magneticModuleId": {"model": "magneticModuleV2"}}
+        modules: Dict[str, json_v6_models.Module] = {"magneticModuleId": json_v6_models.Module(model="magneticModuleV2")}
 ) -> json_v6_models.ProtocolSchemaV6:
     """Return a minimal JsonProtocol with the given elements, to use as test input."""
     return json_v6_models.ProtocolSchemaV6(
@@ -123,7 +123,7 @@ def load_command_list() -> Tuple[List[json_v6_models.Command], List[pe_commands.
         #     ))
         ]
 
-    expected_output = [
+    expected_output: List[pe_commands.CommandCreate] = [
         pe_commands.AspirateCreate(
             params=pe_commands.AspirateParams(
                 # todo: id
@@ -168,8 +168,8 @@ def load_command_list() -> Tuple[List[json_v6_models.Command], List[pe_commands.
         pe_commands.PauseCreate(params=pe_commands.PauseParams(message="hello world")),
         pe_commands.LoadPipetteCreate(params=pe_commands.LoadPipetteParams(
             pipetteId="pipetteId",
-            pipetteName="p10_single",
-            mount="left"
+            pipetteName=PipetteName("p10_single"),
+            mount=MountType("left")
         )),
         # pe_commands.LoadModuleCreate(params=pe_commands.LoadModuleParams(
         #     model=""

@@ -30,57 +30,57 @@ DEFAULT_Z_RETRACT_DISTANCE: Final = 2
 
 DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
     none={
-        OT3AxisKind.X: 500,
-        OT3AxisKind.Y: 500,
-        OT3AxisKind.Z: 500,
-        OT3AxisKind.P: 500,
+        OT3AxisKind.X: 100,
+        OT3AxisKind.Y: 100,
+        OT3AxisKind.Z: 100,
+        OT3AxisKind.P: 100,
     },
     high_throughput={
-        OT3AxisKind.X: 500,
-        OT3AxisKind.Y: 500,
-        OT3AxisKind.Z: 500,
-        OT3AxisKind.P: 500,
+        OT3AxisKind.X: 100,
+        OT3AxisKind.Y: 100,
+        OT3AxisKind.Z: 100,
+        OT3AxisKind.P: 100,
     },
     low_throughput={
-        OT3AxisKind.X: 500,
-        OT3AxisKind.Y: 500,
-        OT3AxisKind.Z: 500,
-        OT3AxisKind.P: 500,
+        OT3AxisKind.X: 100,
+        OT3AxisKind.Y: 100,
+        OT3AxisKind.Z: 100,
+        OT3AxisKind.P: 100,
     },
     two_low_throughput={
-        OT3AxisKind.X: 500,
-        OT3AxisKind.Y: 500,
+        OT3AxisKind.X: 100,
+        OT3AxisKind.Y: 100,
     },
     gripper={
-        OT3AxisKind.Z: 500,
+        OT3AxisKind.Z: 100,
     },
 )
 
 DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
     none={
-        OT3AxisKind.X: 10000,
-        OT3AxisKind.Y: 10000,
-        OT3AxisKind.Z: 10000,
-        OT3AxisKind.P: 10000,
+        OT3AxisKind.X: 100,
+        OT3AxisKind.Y: 100,
+        OT3AxisKind.Z: 100,
+        OT3AxisKind.P: 100,
     },
     high_throughput={
-        OT3AxisKind.X: 10000,
-        OT3AxisKind.Y: 10000,
-        OT3AxisKind.Z: 10000,
-        OT3AxisKind.P: 10000,
+        OT3AxisKind.X: 100,
+        OT3AxisKind.Y: 100,
+        OT3AxisKind.Z: 100,
+        OT3AxisKind.P: 100,
     },
     low_throughput={
-        OT3AxisKind.X: 10000,
-        OT3AxisKind.Y: 10000,
-        OT3AxisKind.Z: 10000,
-        OT3AxisKind.P: 10000,
+        OT3AxisKind.X: 100,
+        OT3AxisKind.Y: 100,
+        OT3AxisKind.Z: 100,
+        OT3AxisKind.P: 100,
     },
     two_low_throughput={
-        OT3AxisKind.X: 10000,
-        OT3AxisKind.Y: 10000,
+        OT3AxisKind.X: 100,
+        OT3AxisKind.Y: 100,
     },
     gripper={
-        OT3AxisKind.Z: 10000,
+        OT3AxisKind.Z: 100,
     },
 )
 
@@ -91,19 +91,19 @@ DEFAULT_MAX_SPEED_DISCONTINUITY: Final[
         OT3AxisKind.X: 40,
         OT3AxisKind.Y: 40,
         OT3AxisKind.Z: 40,
-        OT3AxisKind.P: 40,
+        OT3AxisKind.P: 10,
     },
     high_throughput={
         OT3AxisKind.X: 40,
         OT3AxisKind.Y: 40,
         OT3AxisKind.Z: 40,
-        OT3AxisKind.P: 40,
+        OT3AxisKind.P: 10,
     },
     low_throughput={
         OT3AxisKind.X: 40,
         OT3AxisKind.Y: 40,
         OT3AxisKind.Z: 40,
-        OT3AxisKind.P: 40,
+        OT3AxisKind.P: 10,
     },
     two_low_throughput={
         OT3AxisKind.X: 40,
@@ -174,29 +174,29 @@ DEFAULT_HOLD_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLo
 
 DEFAULT_RUN_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
     none={
-        OT3AxisKind.X: 1.0,
-        OT3AxisKind.Y: 1.0,
-        OT3AxisKind.Z: 1.0,
-        OT3AxisKind.P: 1.0,
+        OT3AxisKind.X: 1.4,
+        OT3AxisKind.Y: 1.4,
+        OT3AxisKind.Z: 1.4,
+        OT3AxisKind.P: 1.4,
     },
     high_throughput={
-        OT3AxisKind.X: 1.0,
-        OT3AxisKind.Y: 1.0,
-        OT3AxisKind.Z: 1.0,
-        OT3AxisKind.P: 1.0,
+        OT3AxisKind.X: 1.4,
+        OT3AxisKind.Y: 1.4,
+        OT3AxisKind.Z: 1.4,
+        OT3AxisKind.P: 1.4,
     },
     low_throughput={
-        OT3AxisKind.X: 1.0,
-        OT3AxisKind.Y: 1.0,
-        OT3AxisKind.Z: 1.0,
-        OT3AxisKind.P: 1.0,
+        OT3AxisKind.X: 1.4,
+        OT3AxisKind.Y: 1.4,
+        OT3AxisKind.Z: 1.4,
+        OT3AxisKind.P: 1.4,
     },
     two_low_throughput={
-        OT3AxisKind.X: 1.0,
-        OT3AxisKind.Y: 1.0,
+        OT3AxisKind.X: 1.4,
+        OT3AxisKind.Y: 1.4,
     },
     gripper={
-        OT3AxisKind.Z: 1.0,
+        OT3AxisKind.Z: 1.4,
     },
 )
 

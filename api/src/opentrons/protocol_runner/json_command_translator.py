@@ -1,5 +1,5 @@
 """Translation of JSON protocol commands into ProtocolEngine commands."""
-from typing import List, Union
+from typing import cast, List, Union
 from pydantic import parse_obj_as
 from opentrons_shared_data.protocol.models import ProtocolSchemaV6, Command
 from opentrons.protocol_engine import (
@@ -20,29 +20,38 @@ class JsonCommandTranslator:
             self,
             protocol: ProtocolSchemaV6,
     ) -> List[pe_commands.CommandCreate]:
-        commands_list: List[Union[pe_commands.CommandCreate, Command]] = []
+        commands_list: List[pe_commands.CommandCreate] = []
         for command in protocol.commands:
             dict_command = command.dict(exclude_none=True)
-            exclude_commands = ["loadLiquid", "delay", "touchTip", "blowout", "moveToSlot", "moveToCoordinates"]
-            # dont not parse loadLiquid, delay to CommandCreate objects
-            if command.commandType in exclude_commands:
-                commands_list.append(command)
-                continue
             if command.commandType == "loadPipette":
-                dict_command["params"].update({"pipetteName":protocol.pipettes[command.params.pipetteId].name})
+                pipette_id = command.params.pipetteId
+                assert pipette_id is not None
+                dict_command["params"].update(dict(pipetteName=protocol.pipettes[pipette_id].name))
             elif command.commandType == "loadModule":
-                dict_command["params"].update({"model":protocol.modules[command.params.moduleId].model})
+                module_id = command.params.moduleId
+                modules = protocol.modules
+                assert module_id is not None
+                assert modules is not None
+                dict_command["params"].update({"model": modules[module_id].model})
             elif command.commandType == "loadLabware":
                 # TODO define a constructor for LoadLabwareParams that accepts these fields
-                print(command.params.location)
-                definition_id = protocol.labware[command.params.labwareId].definitionId
-                dict_command["params"].update({"displayName": protocol.labware[command.params.labwareId].displayName})
+                labware_id = command.params.labwareId
+                assert labware_id is not None
+                definition_id = protocol.labware[labware_id].definitionId
+                assert definition_id is not None
+                dict_command["params"].update({"displayName": protocol.labware[labware_id].displayName})
                 dict_command["params"].update({"version": protocol.labwareDefinitions[definition_id].version})
                 dict_command["params"].update({"namespace": protocol.labwareDefinitions[definition_id].namespace})
-                dict_command["params"].update({"loadName": protocol.labwareDefinitions[definition_id].parameters.loadName})
+                dict_command["params"].update(
+                    {"loadName": protocol.labwareDefinitions[definition_id].parameters.loadName})
                 print(dict_command)
-            translated_obj = parse_obj_as(pe_commands.CommandCreate, dict_command)
+            translated_obj = cast(
+                pe_commands.CommandCreate,
+                parse_obj_as(
+                    # https://github.com/samuelcolvin/pydantic/issues/1847
+                    pe_commands.CommandCreate,  # type: ignore[arg-type]
+                    dict_command,
+                )
+            )
             commands_list.append(translated_obj)
         return commands_list
-
-

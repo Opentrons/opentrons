@@ -139,7 +139,7 @@ class PipetteView(HasState[PipetteState]):
         try:
             return self._state.pipettes_by_id[pipette_id]
         except KeyError:
-            raise errors.PipetteDoesNotExistError(f"Pipette {pipette_id} not found.")
+            raise errors.PipetteNotLoadedError(f"Pipette {pipette_id} not found.")
 
     def get_all(self) -> List[LoadedPipette]:
         """Get a list of all pipette entries in state."""
@@ -190,7 +190,7 @@ class PipetteView(HasState[PipetteState]):
         try:
             return self._state.aspirated_volume_by_id[pipette_id]
         except KeyError:
-            raise errors.PipetteDoesNotExistError(
+            raise errors.PipetteNotLoadedError(
                 f"Pipette {pipette_id} not found; unable to get current volume."
             )
 
