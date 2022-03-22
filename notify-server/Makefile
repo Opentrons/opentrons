@@ -31,7 +31,7 @@ sdist_file = dist/$(call python_get_sdistname,notify-server,notify_server)
 # make test tests=tests/opentrons/tools/test_qc_scripts.py would run only the
 # specified test
 tests ?= tests
-test_opts ?=  --cov=$(SRC_PATH) --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
+test_opts ?= $(and $(CI),--cov=$(SRC_PATH) --cov-report term-missing:skip-covered --cov-report xml:coverage.xml)
 
 # Host key location for buildroot robot
 br_ssh_key ?= $(default_ssh_key)

@@ -22,7 +22,7 @@ sdist_file = dist/$(call python_get_sdistname,hardware,opentrons_hardware)
 # make test tests=tests/opentrons/tools/test_pipette_memory.py would run only the
 # specified test
 tests ?= tests
-test_opts ?=  --cov=opentrons_hardware --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
+test_opts ?=  $(and $(CI),--cov=opentrons_hardware --cov-report term-missing:skip-covered --cov-report xml:coverage.xml)
 
 # These variables must be overridden when make deploy or make deploy-staging is run
 # to set the auth details for pypi
