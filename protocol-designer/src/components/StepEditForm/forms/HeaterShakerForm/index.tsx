@@ -1,7 +1,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { useSelector } from 'react-redux'
-import { FormGroup } from '@opentrons/components'
+import { FormGroup, Flex, SPACING } from '@opentrons/components'
 import { i18n } from '../../../../localization'
 import { getHeaterShakerLabwareOptions } from '../../../../ui/modules/selectors'
 import {
@@ -11,6 +11,7 @@ import {
   StepFormDropdown,
 } from '../../fields'
 import styles from '../../StepEditForm.css'
+
 import type { StepFormProps } from '../../types'
 
 export const HeaterShakerForm = (props: StepFormProps): JSX.Element | null => {
@@ -45,7 +46,7 @@ export const HeaterShakerForm = (props: StepFormProps): JSX.Element | null => {
                 'form.step_edit_form.field.heaterShaker.temperature.toggleOff'
               )}
               onLabel={i18n.t(
-                'form.step_edit_form.field.heakerShakerState.temperature.toggleOn'
+                'form.step_edit_form.field.heaterShaker.temperature.toggleOn'
               )}
             />
             {formData.setTemperature === true && (
@@ -107,24 +108,26 @@ export const HeaterShakerForm = (props: StepFormProps): JSX.Element | null => {
           />
         </FormGroup>
       </div>
-      <CheckboxRowField
-        {...propsForFields.heaterShakerSetTimer}
-        label={i18n.t(
-          'form.step_edit_form.field.heaterShaker.timer.heaterShakerSetTimer'
-        )}
-        className={styles.small_field}
-      >
-        <TextField
-          {...propsForFields.heaterShakerTimerMinutes}
+      <Flex paddingBottom={SPACING.spacing6}>
+        <CheckboxRowField
+          {...propsForFields.heaterShakerSetTimer}
+          label={i18n.t(
+            'form.step_edit_form.field.heaterShaker.timer.heaterShakerSetTimer'
+          )}
           className={styles.small_field}
-          units={i18n.t('application.units.minutes')}
-        />
-        <TextField
-          {...propsForFields.heaterShakerTimerSeconds}
-          className={styles.small_field}
-          units={i18n.t('application.units.seconds')}
-        />
-      </CheckboxRowField>
+        >
+          <TextField
+            {...propsForFields.heaterShakerTimerMinutes}
+            className={styles.small_field}
+            units={i18n.t('application.units.minutes')}
+          />
+          <TextField
+            {...propsForFields.heaterShakerTimerSeconds}
+            className={styles.small_field}
+            units={i18n.t('application.units.seconds')}
+          />
+        </CheckboxRowField>
+      </Flex>
     </div>
   )
 }
