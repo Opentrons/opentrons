@@ -23,8 +23,9 @@ class JsonCommandTranslator:
         commands_list: List[Union[pe_commands.CommandCreate, Command]] = []
         for command in protocol.commands:
             dict_command = command.dict(exclude_none=True)
-            # dont not parse loadLiquid to CommandCreate objects
-            if command.commandType == "loadLiquid":
+            exclude_commands = ["loadLiquid", "delay", "touchTip", "blowout", "moveToSlot", "moveToCoordinates"]
+            # dont not parse loadLiquid, delay to CommandCreate objects
+            if command.commandType in exclude_commands:
                 commands_list.append(command)
                 continue
             if command.commandType == "loadPipette":
