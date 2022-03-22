@@ -22,7 +22,7 @@ export interface ToggleBtnProps extends StyleProps {
 
 export function ToggleBtn(props: ToggleBtnProps): JSX.Element {
   const { label, toggledOn, disabled, ...buttonProps } = props
-  const iconName = toggledOn ? 'ot-toggle-switch-on' : 'ot-toggle-switch-off'
+  const iconName = toggledOn ? 'ot-toggle-input-on' : 'ot-toggle-input-off'
   let color = C_DARK_GRAY
 
   if (disabled) {
@@ -40,7 +40,7 @@ export function ToggleBtn(props: ToggleBtnProps): JSX.Element {
       color={color}
       {...buttonProps}
     >
-      <Icon name={iconName} />
+      <Icon name={iconName} height="13px" />
     </Btn>
   )
 }

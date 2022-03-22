@@ -46,6 +46,9 @@
   width: 1.25rem;
   min-width: 1.25rem;
   color: var(--c-font-dark);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
   &:not(.checkbox_disabled):hover {
     cursor: pointer;
@@ -54,6 +57,10 @@
   &.error {
     color: var(--c-warning-dark);
   }
+}
+
+.checkbox_icon.checked {
+  color: var(--c-blue);
 }
 
 .toggle_icon {

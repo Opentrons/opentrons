@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
+import { css } from 'styled-components'
 import {
   Flex,
   Box,
@@ -190,7 +191,11 @@ export function AdvancedSettings(): JSX.Element {
             {t('tip_length_cal_method')}
           </StyledText>
           <RadioGroup
-            css={TYPOGRAPHY.pRegular}
+            useBlueChecked
+            css={css`
+              ${TYPOGRAPHY.pRegular}
+              line-height: ${TYPOGRAPHY.lineHeight20};
+            `}
             value={
               useTrashSurfaceForTipCal === true
                 ? ALWAYS_TRASH
