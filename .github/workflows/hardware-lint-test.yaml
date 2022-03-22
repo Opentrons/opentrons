@@ -67,7 +67,7 @@ jobs:
         run: make -C hardware lint
 
       - name: Test
-        run: make -C hardware test
+        run: make -C hardware test-cov
 # TODO(amit, 2022-03-08): Enable once ot3 emulation is ready
 #        env:
 #          CAN_CHANNEL: vcan0
