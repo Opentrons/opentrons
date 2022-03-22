@@ -610,3 +610,9 @@ class HeaterShakerModuleView:
         """Verify that the target temperature being set is valid for heater-shaker."""
         return (HEATER_SHAKER_TEMPERATURE_RANGE.min
                 <= celsius <= HEATER_SHAKER_TEMPERATURE_RANGE.max)
+
+    @staticmethod
+    def is_target_speed_valid(rpm: int) -> bool:
+        """Verify that the target speed being set is valid for heater-shaker."""
+        return (HEATER_SHAKER_SPEED_RANGE.min
+                <= rpm <= HEATER_SHAKER_SPEED_RANGE.max)

@@ -765,3 +765,29 @@ def test_magnetic_module_view_calculate_magnet_hardware_height(
     with expected_raise:
         result = subject.calculate_magnet_hardware_height(mm_from_base=mm_from_base)
         assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    argnames=["target_rpm", "expected_valid"],
+    argvalues=[(199, False),
+               (200, True),
+               (3000, True),
+               (3001, False)]
+)
+def test_is_heater_shaker_target_speed_valid(
+        target_rpm: int,
+        expected_valid: bool,
+        heater_shaker_v1_def: ModuleDefinition
+) -> None:
+    """It should validate heater-shaker target rpm."""
+    parent = make_module_view(
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
+        hardware_module_by_slot={
+            DeckSlotName.SLOT_1: HardwareModule(
+                serial_number="serial-number",
+                definition=heater_shaker_v1_def,
+            )
+        },
+    )
+    subject = parent.get_heater_shaker_module_view("module-id")
+    assert subject.is_target_speed_valid(target_rpm) == expected_valid
