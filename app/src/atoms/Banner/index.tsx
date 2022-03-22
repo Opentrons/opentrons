@@ -14,7 +14,7 @@ import {
 } from '@opentrons/components'
 import { css } from 'styled-components'
 
-export type BannerType = 'success' | 'warning' | 'error' | 'updating' | 'hot'
+export type BannerType = 'success' | 'warning' | 'error' | 'updating'
 
 export interface BannerProps {
   /** name constant of the icon to display */
@@ -53,11 +53,6 @@ const BANNER_PROPS_BY_TYPE: Record<
     backgroundColor: COLORS.greyDisabled,
     color: COLORS.darkGreyEnabled,
   },
-  hot: {
-    icon: { name: 'hot-to-touch' },
-    backgroundColor: COLORS.warningBg,
-    color: COLORS.warning,
-  },
 }
 
 const MESSAGE_STYLING = css`
@@ -74,8 +69,8 @@ const MESSAGE_STYLING = css`
   }
 `
 export function Banner(props: BannerProps): JSX.Element {
-  const toastProps = BANNER_PROPS_BY_TYPE[props.type]
-  const icon = props.icon ? props.icon : toastProps.icon
+  const bannerProps = BANNER_PROPS_BY_TYPE[props.type]
+  const icon = props.icon ? props.icon : bannerProps.icon
 
   const iconProps = {
     ...icon,

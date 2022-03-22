@@ -20,6 +20,7 @@ import {
   useOnClickOutside,
   Btn,
   TEXT_DECORATION_UNDERLINE,
+  IconProps,
 } from '@opentrons/components'
 import {
   getModuleDisplayName,
@@ -65,6 +66,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [showAboutModule, setShowAboutModule] = React.useState(false)
   const [showTestShake, setShowTestShake] = React.useState(false)
   const [showBanner, setShowBanner] = React.useState<boolean>(true)
+  const hotToTouch: IconProps = { name: 'hot-to-touch' }
 
   const moduleOverflowWrapperRef = useOnClickOutside({
     onClickOutside: () => setShowOverflowMenu(false),
@@ -227,6 +229,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 >
                   <Banner
                     type="warning"
+                    icon={hotToTouch}
                     title={
                       <Trans
                         t={t}

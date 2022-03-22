@@ -65,11 +65,12 @@ describe('Banner', () => {
   })
   it('renders hot to touch banner', () => {
     props = {
-      type: 'hot',
+      type: 'warning',
       title: 'TITLE',
+      icon: { name: 'hot-to-touch' },
     }
     const { getByText, getByLabelText } = render(props)
-    getByLabelText('icon_hot')
+    getByLabelText('icon_warning')
     getByText('TITLE')
   })
 })

@@ -16,3 +16,9 @@ Primary.args = {
   title: 'title',
   type: 'success',
 }
+export const OverriddenIcon = Template.bind({})
+OverriddenIcon.args = {
+  type: 'warning',
+  title: 'Alert with overridden icon',
+  icon: { name: 'hot-to-touch' },
+}
