@@ -10,9 +10,7 @@ import {
   DIRECTION_ROW,
   SPACING,
   COLORS,
-  BORDERS,
   TYPOGRAPHY,
-  SPACING_3,
 } from '@opentrons/components'
 import * as Config from '../../redux/config'
 import { GeneralSettings } from './GeneralSettings'
@@ -44,13 +42,7 @@ export function AppSettings(): JSX.Element {
     (() => <Redirect to={`/app-settings/general`} />)
 
   return (
-    <Box
-      backgroundColor={COLORS.white}
-      margin={SPACING_3}
-      border={`1px solid ${COLORS.medGrey}`}
-      borderRadius={BORDERS.radiusSoftCorners}
-      minHeight="95%"
-    >
+    <Box backgroundColor={COLORS.white} height="100%">
       <Box padding={SPACING.spacing4} paddingBottom="0">
         <Text css={TYPOGRAPHY.h1Default} paddingBottom={SPACING.spacing5}>
           {t('app_settings')}
