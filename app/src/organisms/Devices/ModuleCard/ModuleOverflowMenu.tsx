@@ -16,7 +16,6 @@ import {
 } from '@opentrons/shared-data'
 import { MenuList } from '../../../atoms/MenuList'
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
-import { HeaterShakerWizard } from '../HeaterShakerWizard'
 
 import type { AttachedModule } from '../../../redux/modules/types'
 import type {
@@ -34,14 +33,14 @@ interface ModuleOverflowMenuProps {
   module: AttachedModule
   handleClick: (isSecondary: boolean) => void
   handleAboutClick: () => void
+  handleWizardClick: () => void
 }
 
 export const ModuleOverflowMenu = (
   props: ModuleOverflowMenuProps
 ): JSX.Element | null => {
   const { t } = useTranslation(['device_details', 'heater_shaker'])
-  const { module, handleClick, handleAboutClick } = props
-  const [showWizard, setShowWizard] = React.useState<boolean>(false)
+  const { module, handleClick, handleAboutClick, handleWizardClick } = props
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const [targetProps, tooltipProps] = useHoverTooltip()
 
@@ -265,7 +264,7 @@ export const ModuleOverflowMenu = (
       minWidth="10rem"
       key={`hs_attach_to_deck_${module.model}`}
       data-testid={`hs_attach_to_deck_${module.model}`}
-      onClick={() => setShowWizard(true)}
+      onClick={handleWizardClick}
     >
       {t('how_to_attach_to_deck', { ns: 'heater_shaker' })}
     </MenuItem>
@@ -282,9 +281,6 @@ export const ModuleOverflowMenu = (
 
   return (
     <React.Fragment>
-      {showWizard && (
-        <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
-      )}
       <Flex position={POSITION_RELATIVE}>
         <MenuList
           buttons={[

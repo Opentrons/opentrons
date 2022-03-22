@@ -27,6 +27,7 @@ import {
 } from '@opentrons/shared-data'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { ModuleIcon } from '../ModuleIcon'
+import { HeaterShakerWizard } from '../HeaterShakerWizard'
 import { MagneticModuleData } from './MagneticModuleData'
 import { TemperatureModuleData } from './TemperatureModuleData'
 import { ThermocyclerModuleData } from './ThermocyclerModuleData'
@@ -56,6 +57,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [showSlideout, setShowSlideout] = React.useState(false)
   const [hasSecondary, setHasSecondary] = React.useState(false)
   const [showAboutModule, setShowAboutModule] = React.useState(false)
+  const [showWizard, setShowWizard] = React.useState<boolean>(false)
 
   const moduleOverflowWrapperRef = useOnClickOutside({
     onClickOutside: () => setShowOverflowMenu(false),
@@ -136,8 +138,12 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     setShowSlideout(false)
   }
 
+  console.log(showWizard)
   return (
     <React.Fragment>
+      {showWizard && (
+        <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
+      )}
       <Flex
         backgroundColor={C_BRIGHT_GRAY}
         borderRadius={SPACING_1}
@@ -215,6 +221,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               handleAboutClick={handleAboutClick}
               module={module}
               handleClick={handleMenuItemClick}
+              handleWizardClick={() => setShowWizard(true)}
             />
           </div>
         )}
