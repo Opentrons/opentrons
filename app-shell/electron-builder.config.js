@@ -33,6 +33,15 @@ module.exports = {
     category: 'public.app-category.productivity',
     type: DEV_MODE ? 'development' : 'distribution',
     electronLanguages: ['en'],
+    hardenedRuntime: true,
+    gatekeeperAssess: false,
+    entitlements: 'build/entitlements.mac.plist',
+    entitlementsInherit: '/build/entitlements.mac.plist',
+    binaries: [
+      './dist/mac/Opentrons.app/Contents/Resources/python/bin/python3.8',
+      './dist/mac/Opentrons.app/Contents/Resources/python/lib/python3.8/lib-dynload/xxlimited.cpython-38-darwin.so',
+      './dist/mac/Opentrons.app/Contents/Resources/python/lib/python3.8/lib-dynload/_testcapi.cpython-38-darwin.so',
+    ],
   },
   dmg: {
     icon: null,
@@ -60,3 +69,9 @@ module.exports = {
   generateUpdatesFilesForAllChannels: true,
   afterSign: path.join(__dirname, './scripts/after-sign.js'),
 }
+
+// TODO: use the hook that does something before building, in that we want to run our own scripts/soanso.js
+// download the standalone python based on the process. platform
+// we should probably hardcode the shasums in there to be safe and check the tarball against the sum
+// extract that tarball into app-shell/python
+// then attempt to run `app-shell/python/pip3 install ./shared-data/python ./api` in order to get opentrons module
