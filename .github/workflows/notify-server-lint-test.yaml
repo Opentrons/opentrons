@@ -8,19 +8,19 @@ on:
   push:
     paths:
       - 'Makefile'
-      - 'notify-server/**'
+      - 'notify-server/**/*'
       - '.github/workflows/notify-server-lint-test.yaml'
-      - 'api/**'
-      - 'hardware/**'
-      - '.github/actions/python/**'
+      - 'api/**/*'
+      - 'hardware/**/*'
+      - '.github/actions/python/**/*'
     tags-ignore:
       - '*'
   pull_request:
     paths:
       - 'Makefile'
-      - 'notify-server/**'
-      - 'api/**'
-      - 'hardware/**'
+      - 'notify-server/**/*'
+      - 'api/**/*'
+      - 'hardware/**/*'
   workflow_dispatch:
 
 defaults:
