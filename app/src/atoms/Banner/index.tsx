@@ -97,6 +97,7 @@ export function Banner(props: BannerProps): JSX.Element {
       <Flex
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
+        flex="auto"
         alignItems={ALIGN_CENTER}
         padding={`${SPACING.spacing2} ${SPACING.spacing2} ${SPACING.spacing2} ${SPACING.spacing3}`}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
@@ -109,12 +110,12 @@ export function Banner(props: BannerProps): JSX.Element {
         />
         <Flex width="100%">{props.title}</Flex>
         {props.onCloseClick && (
-          <Btn onClick={props.onCloseClick} width={SPACING.spacing6}>
-            <Icon
-              name="close"
-              aria-label="close_icon"
-              color={BANNER_PROPS_BY_TYPE[props.type].color}
-            />
+          <Btn
+            onClick={props.onCloseClick}
+            width={SPACING.spacing5}
+            height={SPACING.spacing5}
+          >
+            <Icon name="close" aria-label="close_icon" />
           </Btn>
         )}
       </Flex>
