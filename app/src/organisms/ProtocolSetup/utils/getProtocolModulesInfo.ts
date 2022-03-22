@@ -6,7 +6,7 @@ import type {
   DeckDefinition,
   LabwareDefinition2,
   ModuleDefinition,
-  ProtocolFile,
+  ProtocolAnalysisFile,
   ModuleModel,
 } from '@opentrons/shared-data'
 
@@ -24,7 +24,7 @@ export interface ProtocolModuleInfo {
 }
 
 export const getProtocolModulesInfo = (
-  protocolData: ProtocolFile<{}>,
+  protocolData: ProtocolAnalysisFile<{}>,
   deckDef: DeckDefinition
 ): ProtocolModuleInfo[] => {
   if (protocolData != null && 'modules' in protocolData) {
