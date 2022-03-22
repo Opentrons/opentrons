@@ -94,8 +94,8 @@ sdist: $(sdist_file)
 test:
 	$(pytest) $(tests) $(test_opts)
 
-.PHONY: test
-test:
+.PHONY: test-cov
+test-cov:
 	$(pytest) $(tests) $(test_opts) $(cov_opts)
 
 .PHONY: lint
