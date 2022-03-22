@@ -342,7 +342,7 @@ class Labware(DeckItem):
     def set_offset(self, x: float, y: float, z: float) -> None:
         """Set the labware's position offset.
 
-        The offset is a simple x, y, z vector in deck coordinates
+        The offset is an x, y, z vector in deck coordinates
         (see :ref:`protocol-api-deck-coords`) that the motion system
         will add to any movement targeting this labware instance.
 
@@ -384,7 +384,7 @@ class Labware(DeckItem):
         across `columns` (e.g. 'A1', 'B1', 'C1'...'A2', 'B2', 'C2')
 
         With indexing one can treat it as a typical python
-        list. To access well A1, for example, simply write: labware.wells()[0]
+        list. To access well A1, for example, write: labware.wells()[0]
 
         Note that this method takes args for backward-compatibility, but use
         of args is deprecated and will be removed in future versions. Args
@@ -412,7 +412,7 @@ class Labware(DeckItem):
 
         With indexing one can treat it as a typical python
         dictionary whose keys are well names. To access well A1, for example,
-        simply write: labware.wells_by_name()['A1']
+        write: labware.wells_by_name()['A1']
 
         :return: Dictionary of well objects keyed by well name
         """
@@ -436,7 +436,7 @@ class Labware(DeckItem):
         Accessor function used to navigate through a labware by row.
 
         With indexing one can treat it as a typical python nested list.
-        To access row A for example, simply write: labware.rows()[0]. This
+        To access row A for example, write: labware.rows()[0]. This
         will output ['A1', 'A2', 'A3', 'A4'...]
 
         Note that this method takes args for backward-compatibility, but use
@@ -464,7 +464,7 @@ class Labware(DeckItem):
         Accessor function used to navigate through a labware by row name.
 
         With indexing one can treat it as a typical python dictionary.
-        To access row A for example, simply write: labware.rows_by_name()['A']
+        To access row A for example, write: labware.rows_by_name()['A']
         This will output ['A1', 'A2', 'A3', 'A4'...].
 
         :return: Dictionary of Well lists keyed by row name
@@ -488,7 +488,7 @@ class Labware(DeckItem):
 
         With indexing one can treat it as a typical python nested list.
         To access row A for example,
-        simply write: labware.columns()[0]
+        write: labware.columns()[0]
         This will output ['A1', 'B1', 'C1', 'D1'...].
 
         Note that this method takes args for backward-compatibility, but use
@@ -517,7 +517,7 @@ class Labware(DeckItem):
 
         With indexing one can treat it as a typical python dictionary.
         To access row A for example,
-        simply write: labware.columns_by_name()['1']
+        write: labware.columns_by_name()['1']
         This will output ['A1', 'B1', 'C1', 'D1'...].
 
         :return: Dictionary of Well lists keyed by column name
