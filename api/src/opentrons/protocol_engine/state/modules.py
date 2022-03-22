@@ -181,7 +181,13 @@ class ModuleView(HasState[ModuleState]):
             WrongModuleTypeError: If module_id has been loaded,
                 but it's not a Heater-Shaker Module.
          """
-        pass
+        model = self.get_model(module_id=module_id)  # Propagate ModuleNotLoadedError
+        if model == ModuleModel.HEATER_SHAKER_MODULE_V1:
+            return HeaterShakerModuleView(parent_module_view=self, module_id=module_id)
+        else:
+            raise errors.WrongModuleTypeError(
+                f"{module_id} is a {model}, not a Heater-Shaker Module."
+            )
 
     def get_location(self, module_id: str) -> DeckSlotLocation:
         """Get the slot location of the given module."""
