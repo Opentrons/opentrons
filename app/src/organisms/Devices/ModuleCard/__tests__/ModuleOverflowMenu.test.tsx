@@ -290,6 +290,7 @@ describe('ModuleOverflowMenu', () => {
       module: mockHeaterShaker,
       handleClick: jest.fn(),
       handleAboutClick: jest.fn(),
+      handleTestShakeClick: jest.fn(),
     }
     const { getByRole, getByText } = render(props)
     const btn = getByRole('button', { name: 'See how to attach to deck' })
@@ -302,6 +303,7 @@ describe('ModuleOverflowMenu', () => {
       module: mockMovingHeaterShaker,
       handleClick: jest.fn(),
       handleAboutClick: jest.fn(),
+      handleTestShakeClick: jest.fn(),
     }
     const { getByRole } = render(props)
     expect(
@@ -316,6 +318,7 @@ describe('ModuleOverflowMenu', () => {
       module: mockOpenLatchHeaterShaker,
       handleClick: jest.fn(),
       handleAboutClick: jest.fn(),
+      handleTestShakeClick: jest.fn(),
     }
     const { getByRole } = render(props)
     expect(
@@ -330,6 +333,7 @@ describe('ModuleOverflowMenu', () => {
       module: mockCloseLatchHeaterShaker,
       handleClick: jest.fn(),
       handleAboutClick: jest.fn(),
+      handleTestShakeClick: jest.fn(),
     }
 
     const { getByRole } = render(props)
@@ -354,6 +358,7 @@ describe('ModuleOverflowMenu', () => {
       module: mockHeaterShaker,
       handleClick: jest.fn(),
       handleAboutClick: jest.fn(),
+      handleTestShakeClick: jest.fn(),
     }
     const { getByRole } = render(props)
 
@@ -377,6 +382,7 @@ describe('ModuleOverflowMenu', () => {
       module: mockDeactivateHeatHeaterShaker,
       handleClick: jest.fn(),
       handleAboutClick: jest.fn(),
+      handleTestShakeClick: jest.fn(),
     }
 
     const { getByRole } = render(props)
@@ -402,6 +408,7 @@ describe('ModuleOverflowMenu', () => {
       module: mockTemperatureModuleHeating,
       handleClick: jest.fn(),
       handleAboutClick: jest.fn(),
+      handleTestShakeClick: jest.fn(),
     }
 
     const { getByRole } = render(props)
@@ -427,6 +434,7 @@ describe('ModuleOverflowMenu', () => {
       module: mockMagDeckEngaged,
       handleClick: jest.fn(),
       handleAboutClick: jest.fn(),
+      handleTestShakeClick: jest.fn(),
     }
 
     const { getByRole } = render(props)
@@ -452,6 +460,7 @@ describe('ModuleOverflowMenu', () => {
       module: mockTCBlockHeating,
       handleClick: jest.fn(),
       handleAboutClick: jest.fn(),
+      handleTestShakeClick: jest.fn(),
     }
 
     const { getByRole } = render(props)

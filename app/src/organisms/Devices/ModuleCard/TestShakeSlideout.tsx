@@ -7,7 +7,6 @@ import {
   TYPOGRAPHY,
   SPACING,
   COLORS,
-  InputField,
   DIRECTION_COLUMN,
   Icon,
   DIRECTION_ROW,
@@ -18,12 +17,19 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-import { getModuleDisplayName, RPM } from '@opentrons/shared-data'
+import {
+  getModuleDisplayName,
+  HS_RPM_MAX,
+  HS_RPM_MIN,
+  RPM,
+} from '@opentrons/shared-data'
 import { Slideout } from '../../../atoms/Slideout'
 import { PrimaryButton, TertiaryButton } from '../../../atoms/Buttons'
 import { HeaterShakerModuleCard } from '../HeaterShakerWizard/HeaterShakerModuleCard'
 import { Divider } from '../../../atoms/structure'
 import { CollapsibleStep } from '../../ProtocolSetup/RunSetupCard/CollapsibleStep'
+import { InputField } from '../../../atoms/InputField'
+import { HeaterShakerWizard } from '../HeaterShakerWizard'
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type {
@@ -50,6 +56,7 @@ export const TestShakeSlideout = (
 
   const [showCollapsed, setShowCollapsed] = React.useState(false)
   const [shakeValue, setShakeValue] = React.useState<string | null>(null)
+  const [showWizard, setShowWizard] = React.useState<boolean>(false)
   const isShaking = module.data.speedStatus !== 'idle'
   const isLatchOpen =
     module.data.labwareLatchStatus === 'idle_open' ||
@@ -84,6 +91,10 @@ export const TestShakeSlideout = (
   const handleLatchCommand = (): void => {
     createLiveCommand({
       command: setLatchCommand,
+    }).catch((e: Error) => {
+      console.error(
+        `error setting module status with command type ${setLatchCommand.commandType}: ${e.message}`
+      )
     })
   }
 
@@ -91,10 +102,22 @@ export const TestShakeSlideout = (
     if (shakeValue !== null) {
       createLiveCommand({
         command: isShaking ? stopShakeCommand : setShakeCommand,
+      }).catch((e: Error) => {
+        console.error(
+          `error setting module status with command type ${
+            stopShakeCommand.commandType ?? setShakeCommand.commandType
+          }: ${e.message}`
+        )
       })
     }
     setShakeValue(null)
   }
+
+  const errorMessage =
+    shakeValue != null &&
+    (parseInt(shakeValue) < HS_RPM_MIN || parseInt(shakeValue) > HS_RPM_MAX)
+      ? t('input_out_of_range')
+      : null
 
   return (
     <Slideout
@@ -203,18 +226,23 @@ export const TestShakeSlideout = (
             marginTop={SPACING.spacing3}
             paddingRight={SPACING.spacing4}
           >
-            {/* TODO(sh, 2022-02-22): Wire up input when end points are updated */}
-            <InputField units={RPM} value={'1000'} readOnly />
+            <InputField
+              data-testid={`TestShakeSlideout_shake_input`}
+              units={RPM}
+              value={shakeValue}
+              onChange={e => setShakeValue(e.target.value)}
+              type="number"
+              caption={t('min_max_rpm', {
+                ns: 'heater_shaker',
+                min: HS_RPM_MIN,
+                max: HS_RPM_MAX,
+              })}
+              error={errorMessage}
+            />
             <Text
               color={COLORS.darkGreyEnabled}
               fontSize={TYPOGRAPHY.fontSizeCaption}
-            >
-              {t('min_max_rpm', {
-                ns: 'heater_shaker',
-                min: '200',
-                max: '1800',
-              })}
-            </Text>
+            ></Text>
           </Flex>
           <TertiaryButton
             textTransform={TEXT_TRANSFORM_CAPITALIZE}
@@ -265,12 +293,15 @@ export const TestShakeSlideout = (
               ns: 'heater_shaker',
             })}
           </Text>
-          {/* TODO: (sh, 2022-03-17): hook up link to destination */}
+          {showWizard && (
+            <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
+          )}
           <Link
             fontSize={TYPOGRAPHY.fontSizeP}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             color={COLORS.blue}
             id={'HeaterShaker_Attachment_Instructions'}
+            onClick={() => setShowWizard(true)}
           >
             {t('go_to_attachment_instructions', { ns: 'heater_shaker' })}
           </Link>

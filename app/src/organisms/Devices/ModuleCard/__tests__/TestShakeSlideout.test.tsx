@@ -99,6 +99,7 @@ describe('TestShakeSlideout', () => {
       isExpanded: true,
     }
     mockCreateLiveCommand = jest.fn()
+    mockCreateLiveCommand.mockResolvedValue(null)
     mockUseLiveCommandMutation.mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
@@ -133,11 +134,10 @@ describe('TestShakeSlideout', () => {
     expect(button).toBeEnabled()
   })
 
-  it('renders an input field and start button for speed setting', () => {
+  it('renders a start button for speed setting', () => {
     const { getByText, getByRole } = render(props)
 
     getByText('Shake speed')
-    getByRole('textbox')
 
     const button = getByRole('button', { name: /Start/i })
     expect(button).toBeEnabled()
@@ -194,6 +194,30 @@ describe('TestShakeSlideout', () => {
         commandType: 'heaterShakerModule/openLatch',
         params: {
           moduleId: mockCloseLatchHeaterShaker.id,
+        },
+      },
+    })
+  })
+
+  it('entering an input for shake speed and clicking start should begin shaking', () => {
+    props = {
+      module: mockHeaterShaker,
+      onCloseClick: jest.fn(),
+      isExpanded: true,
+    }
+
+    const { getByRole } = render(props)
+    const button = getByRole('button', { name: /Start/i })
+    const input = getByRole('spinbutton')
+    fireEvent.change(input, { target: { value: '300' } })
+    fireEvent.click(button)
+
+    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
+      command: {
+        commandType: 'heaterShakerModule/setTargetShakeSpeed',
+        params: {
+          moduleId: 'heatershaker_id',
+          rpm: 300,
         },
       },
     })
