@@ -6,7 +6,6 @@ from typing_extensions import Literal, Type
 from pydantic import BaseModel, Field
 
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
-from opentrons.hardware_control.modules import HeaterShaker
 from opentrons.hardware_control import HardwareControlAPI
 
 if TYPE_CHECKING:

@@ -1,5 +1,4 @@
 """Test Heater Shaker start set temperature command implementation."""
-import pytest
 from decoy import Decoy
 
 from opentrons.hardware_control import HardwareControlAPI
@@ -7,40 +6,10 @@ from opentrons.hardware_control.modules import AbstractModule, HeaterShaker
 
 from opentrons.protocol_engine.state import StateView
 from opentrons.protocol_engine.state.modules import HeaterShakerModuleView
-from opentrons.protocol_engine.types import ModuleModel
 from opentrons.protocol_engine.commands import heater_shaker
 from opentrons.protocol_engine.commands.heater_shaker.start_set_target_temperature import (  # noqa: E501
     StartSetTargetTemperatureImpl,
 )
-
-
-# @pytest.fixture
-# def hardware_api(
-#     decoy: Decoy,
-# ) -> HardwareControlAPI:
-#     """Return a mock in the shape of a HardwareControlAPI."""
-#     hw = decoy.mock(cls=HardwareControlAPI)
-#     hw.attached_modules = [decoy.mock(cls=AbstractModule),  # type: ignore[misc]
-#                            decoy.mock(cls=AbstractModule)]
-#     return hw
-#
-#
-# @pytest.fixture
-# def state_view(decoy: Decoy) -> StateView:
-#     """Get a mocked out StateView."""
-#     return decoy.mock(cls=StateView)
-#
-#
-# @pytest.fixture
-# def subject(
-#         hardware_api: HardwareControlAPI,
-#         state_view: StateView,
-# ) -> StartSetTargetTemperatureImpl:
-#     """Get the command implementation with mocked out dependencies."""
-#     return StartSetTargetTemperatureImpl(
-#         state_view=state_view,
-#         hardware_api=hardware_api
-#     )
 
 
 async def test_start_set_target_temperature(

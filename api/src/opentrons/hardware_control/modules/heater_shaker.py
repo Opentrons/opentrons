@@ -294,7 +294,7 @@ class HeaterShaker(mod_abc.AbstractModule):
         await self.wait_for_is_running()
         await self._driver.set_temperature(celsius)
 
-    async def await_temperature(self, awaiting_temperature: float) -> None:
+    async def await_temperature(self) -> None:
         """
         Await temperature in degree Celsius
         Polls temperature module's temperature until
@@ -307,11 +307,13 @@ class HeaterShaker(mod_abc.AbstractModule):
         await self.wait_next_poll()
 
         async def _await_temperature() -> None:
+            if self.target_temperature is None:
+                raise Exception("No target temperature to wait for.")
             if self.temperature_status == TemperatureStatus.HEATING:
-                while self.temperature < awaiting_temperature:
+                while self.temperature < self.target_temperature:
                     await self.wait_next_poll()
             elif self.temperature_status == TemperatureStatus.COOLING:
-                while self.temperature > awaiting_temperature:
+                while self.temperature > self.target_temperature:
                     await self.wait_next_poll()
 
         t = self._loop.create_task(_await_temperature())
