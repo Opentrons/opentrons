@@ -5,6 +5,7 @@ import {
   COLORS,
   BORDERS,
   SIZE_2,
+  NewAlertPrimaryBtn,
   NewPrimaryBtn,
   NewSecondaryBtn,
   styleProps,
@@ -21,6 +22,15 @@ export const TertiaryButton = styled(NewPrimaryBtn)`
   text-transform: ${TYPOGRAPHY.textTransformNone};
   white-space: nowrap;
   ${TYPOGRAPHY.labelSemiBold}
+
+  ${styleProps}
+`
+
+export const AlertPrimaryButton = styled(NewAlertPrimaryBtn)`
+  background-color: ${COLORS.error};
+  border-radius: ${BORDERS.radiusSoftCorners};
+  text-transform: ${TYPOGRAPHY.textTransformNone};
+  ${TYPOGRAPHY.pSemiBold}
 
   ${styleProps}
 `
