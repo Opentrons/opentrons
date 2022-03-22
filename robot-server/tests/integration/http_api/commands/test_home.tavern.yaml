@@ -1,0 +1,141 @@
+test_name: home standalone command
+
+marks:
+  - usefixtures:
+      - run_server
+
+stages:
+  - name: Delete all runs # Ensure there is no active run
+    request:
+      url: '{host:s}:{port:d}/runs'
+      method: GET
+    response:
+      status_code: 200
+      verify_response_with:
+        - function: 'tests.integration.fixtures:delete_all_runs'
+          extra_kwargs:
+            host: '{host:s}'
+            port: '{port:d}'
+  - name: issue home Command params all
+    request:
+      url: '{host:s}:{port:d}/commands'
+      method: POST
+      params:
+        waitUntilComplete: true
+      json:
+        data:
+          commandType: home
+          params:
+            axes:
+              - x
+              - 'y'
+              - leftZ
+              - rightZ
+              - leftPlunger
+              - rightPlunger
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          status: succeeded
+      save:
+        json:
+          command_id_all: data.id
+  - name: issue home Command params empty
+    request:
+      url: '{host:s}:{port:d}/commands'
+      method: POST
+      params:
+        waitUntilComplete: true
+      json:
+        data:
+          commandType: home
+          params: {}
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          status: succeeded
+      save:
+        json:
+          command_id_empty: data.id
+  - name: Get command by id
+    request:
+      url: '{host:s}:{port:d}/commands/{command_id_empty}'
+      method: GET
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          id: '{command_id_empty}'
+          status: succeeded
+  - name: Get commands
+    request:
+      url: '{host:s}:{port:d}/commands'
+      method: GET
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data: # order is enforced on this check!
+            - id: '{command_id_all}'
+            - id: '{command_id_empty}'
+  - name: Create Empty Run # Step 1 of ensuring there is an active run.
+    request:
+      url: '{host:s}:{port:d}/runs'
+      json:
+        data: {}
+      method: POST
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          status: idle
+          current: true
+      save:
+        json:
+          run_id: data.id
+  - name: Create home Command on the run # Step 2 of ensuring there is an active run.
+    request:
+      url: '{host:s}:{port:d}/runs/{run_id}/commands'
+      method: POST
+      json:
+        data:
+          commandType: home
+          params: {}
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          status: queued
+  - name: issue home Command is blocked
+    request:
+      url: '{host:s}:{port:d}/commands'
+      method: POST
+      params:
+        waitUntilComplete: true
+      json:
+        data:
+          commandType: home
+          params: {}
+    response:
+      strict:
+        - json:off
+      status_code: 409
+      json:
+        errors:
+          - id: RunActive
+            title: Run Active
+            detail: There is an active run. Close the current run to issue commands via POST /commands.
