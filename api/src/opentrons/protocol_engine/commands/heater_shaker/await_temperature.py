@@ -31,10 +31,8 @@ class AwaitTemperatureImpl(
     """Execution implementation of a Heater-Shaker's await temperature command."""
 
     def __init__(
-            self,
-            state_view: StateView,
-            hardware_api: HardwareControlAPI,
-            **kwargs: object) -> None:
+        self, state_view: StateView, hardware_api: HardwareControlAPI, **kwargs: object
+    ) -> None:
         self._state_view = state_view
         self._hardware_api = hardware_api
 
@@ -49,7 +47,6 @@ class AwaitTemperatureImpl(
         if hs_hardware_module is not None:
             await hs_hardware_module.await_temperature()
         return AwaitTemperatureResult()
-
 
 
 class AwaitTemperature(BaseCommand[AwaitTemperatureParams, AwaitTemperatureResult]):

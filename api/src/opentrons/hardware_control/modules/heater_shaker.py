@@ -360,7 +360,7 @@ class HeaterShaker(mod_abc.AbstractModule):
         await self.wait_for_is_running()
         await self._driver.set_rpm(rpm)
 
-    async def await_speed(self, awaiting_speed: int) -> None:
+    async def await_speed(self) -> None:
         """
         Await speed in RPM
         Polls heater/shaker module's speed until the specified
@@ -373,27 +373,27 @@ class HeaterShaker(mod_abc.AbstractModule):
         await self.wait_next_poll()
 
         async def _await_speed() -> None:
-            if self.speed_status == SpeedStatus.ACCELERATING:
+            if self.target_speed is None:
+                raise Exception("No target speed to wait for.")
 
-                while self.speed < awaiting_speed:
+            if self.speed_status == SpeedStatus.ACCELERATING:
+                while self.speed < self.target_speed:
                     await self.wait_next_poll()
             elif self.speed_status == SpeedStatus.DECELERATING:
-                while self.speed > awaiting_speed:
+                while self.speed > self.target_speed:
                     await self.wait_next_poll()
 
         t = self._loop.create_task(_await_speed())
         await self.make_cancellable(t)
         await t
 
-    async def await_speed_and_temperature(self, temperature: float, speed: int) -> None:
+    async def await_speed_and_temperature(self) -> None:
         """Wait for previously-started speed and temperature commands to complete.
 
         To set speed, use start_set_speed. To set temperature,
         use start_set_temperature.
         """
-        await asyncio.gather(
-            self.await_speed(speed), self.await_temperature(temperature)
-        )
+        await asyncio.gather(self.await_speed(), self.await_temperature())
 
     async def _wait_for_labware_latch(
         self, status: HeaterShakerLabwareLatchStatus

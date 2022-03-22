@@ -43,9 +43,9 @@ async def test_start_set_target_temperature(
     decoy.when(hardware_api.attached_modules).then_return(attached)
 
     # Get stubbed hardware module from hs module view
-    decoy.when(
-        hs_module_view.find_hardware(attached_modules=attached)
-    ).then_return(match)
+    decoy.when(hs_module_view.find_hardware(attached_modules=attached)).then_return(
+        match
+    )
 
     result = await subject.execute(data)
     decoy.verify(await match.start_set_temperature(celsius=42), times=1)

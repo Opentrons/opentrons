@@ -28,10 +28,10 @@ class OpenLatchImpl(AbstractCommandImpl[OpenLatchParams, OpenLatchResult]):
     """Execution implementation of a Heater-Shaker's open latch command."""
 
     def __init__(
-            self,
-            state_view: StateView,
-            hardware_api: HardwareControlAPI,
-            **unused_dependencies: object
+        self,
+        state_view: StateView,
+        hardware_api: HardwareControlAPI,
+        **unused_dependencies: object,
     ) -> None:
         self._state_view = state_view
         self._hardware_api = hardware_api

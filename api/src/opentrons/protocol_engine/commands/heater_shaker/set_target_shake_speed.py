@@ -33,10 +33,8 @@ class SetTargetShakeSpeedImpl(
     """Execution implementation of a Heater-Shaker's shake command."""
 
     def __init__(
-            self,
-            state_view: StateView,
-            hardware_api: HardwareControlAPI,
-            **kwargs: object) -> None:
+        self, state_view: StateView, hardware_api: HardwareControlAPI, **kwargs: object
+    ) -> None:
         self._state_view = state_view
         self._hardware_api = hardware_api
 

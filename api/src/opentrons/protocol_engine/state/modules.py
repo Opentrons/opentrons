@@ -58,12 +58,14 @@ _THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = [
 
 class SpeedRange(NamedTuple):
     """Class defining minimum and maximum allowed speeds for a shaking module."""
+
     min: int
     max: int
 
 
 class TemperatureRange(NamedTuple):
     """Class defining minimum and maximum allowed temperatures for a heating module."""
+
     min: float
     max: float
 
@@ -176,11 +178,11 @@ class ModuleView(HasState[ModuleState]):
     def get_heater_shaker_module_view(self, module_id: str) -> HeaterShakerModuleView:
         """Return a `HeaterShakerModuleView` for the given Heater-Shaker Module.
 
-         Raises:
-            ModuleNotLoadedError: If module_id has not been loaded.
-            WrongModuleTypeError: If module_id has been loaded,
-                but it's not a Heater-Shaker Module.
-         """
+        Raises:
+           ModuleNotLoadedError: If module_id has not been loaded.
+           WrongModuleTypeError: If module_id has been loaded,
+               but it's not a Heater-Shaker Module.
+        """
         model = self.get_model(module_id=module_id)  # Propagate ModuleNotLoadedError
         if model == ModuleModel.HEATER_SHAKER_MODULE_V1:
             return HeaterShakerModuleView(parent_module_view=self, module_id=module_id)
@@ -364,19 +366,26 @@ class ModuleView(HasState[ModuleState]):
 
     @staticmethod
     def is_target_temperature_valid(
-            heating_module_model: ModuleModel, celsius: float
+        heating_module_model: ModuleModel, celsius: float
     ) -> bool:
         """Verify that the target temperature being set is valid for the module type."""
         if heating_module_model == ModuleModel.HEATER_SHAKER_MODULE_V1:
-            return (HEATER_SHAKER_TEMPERATURE_RANGE.min
-                    <= celsius <= HEATER_SHAKER_TEMPERATURE_RANGE.max)
+            return (
+                HEATER_SHAKER_TEMPERATURE_RANGE.min
+                <= celsius
+                <= HEATER_SHAKER_TEMPERATURE_RANGE.max
+            )
         elif heating_module_model == ModuleModel.THERMOCYCLER_MODULE_V1:
-            raise NotImplementedError("Temperature validation for Thermocycler "
-                                      "not implemented yet")
-        elif heating_module_model in [ModuleModel.TEMPERATURE_MODULE_V1,
-                                      ModuleModel.TEMPERATURE_MODULE_V2]:
-            raise NotImplementedError("Temperature validation for Temperature Module"
-                                      "not implemented yet.")
+            raise NotImplementedError(
+                "Temperature validation for Thermocycler " "not implemented yet"
+            )
+        elif heating_module_model in [
+            ModuleModel.TEMPERATURE_MODULE_V1,
+            ModuleModel.TEMPERATURE_MODULE_V2,
+        ]:
+            raise NotImplementedError(
+                "Temperature validation for Temperature Module" "not implemented yet."
+            )
         else:
             raise errors.WrongModuleTypeError(
                 f"{heating_module_model} is not a heating module."
@@ -608,11 +617,13 @@ class HeaterShakerModuleView:
     @staticmethod
     def is_target_temperature_valid(celsius: float) -> bool:
         """Verify that the target temperature being set is valid for heater-shaker."""
-        return (HEATER_SHAKER_TEMPERATURE_RANGE.min
-                <= celsius <= HEATER_SHAKER_TEMPERATURE_RANGE.max)
+        return (
+            HEATER_SHAKER_TEMPERATURE_RANGE.min
+            <= celsius
+            <= HEATER_SHAKER_TEMPERATURE_RANGE.max
+        )
 
     @staticmethod
     def is_target_speed_valid(rpm: int) -> bool:
         """Verify that the target speed being set is valid for heater-shaker."""
-        return (HEATER_SHAKER_SPEED_RANGE.min
-                <= rpm <= HEATER_SHAKER_SPEED_RANGE.max)
+        return HEATER_SHAKER_SPEED_RANGE.min <= rpm <= HEATER_SHAKER_SPEED_RANGE.max

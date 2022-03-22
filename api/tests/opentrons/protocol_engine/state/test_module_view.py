@@ -12,7 +12,6 @@ from typing import (
     Type,
     TypeVar,
     Union,
-    List,
 )
 
 from opentrons_shared_data import load_shared_data
@@ -20,7 +19,7 @@ from opentrons.hardware_control.modules import (
     AbstractModule,
     MagDeck,
     TempDeck,
-    HeaterShaker
+    HeaterShaker,
 )
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine import errors
@@ -34,8 +33,6 @@ from opentrons.protocol_engine.state.modules import (
     ModuleView,
     ModuleState,
     HardwareModule,
-    MagneticModuleView,
-    HeaterShakerModuleView,
 )
 
 
@@ -70,9 +67,10 @@ def make_hardware_module(
     decoy.when(hardware_module.device_info).then_return({"serial": serial_number})
     return hardware_module
 
+
 def get_sample_parent_module_view(
-        matching_module_def: ModuleDefinition,
-        matching_module_id: str,
+    matching_module_def: ModuleDefinition,
+    matching_module_id: str,
 ) -> ModuleView:
     """Get a ModuleView with attached modules including a requested matching module."""
     definition = load_shared_data("module/definitions/2/magneticModuleV1.json")
@@ -102,8 +100,7 @@ def get_sample_parent_module_view(
 
 
 def get_attached_modules(
-        decoy: Decoy,
-        matching_module_type: Type[HardwareModuleT]
+    decoy: Decoy, matching_module_type: Type[HardwareModuleT]
 ) -> Dict[str, AbstractModule]:
     """Get a list of attached modules, including one "matching" module."""
     matching = make_hardware_module(
@@ -115,9 +112,11 @@ def get_attached_modules(
     another_non_matching = make_hardware_module(
         decoy=decoy, type=TempDeck, serial_number="serial-another-non-matching"
     )
-    return {"non_matching": non_matching,
-            "matching": matching,
-            "another_non_matching": another_non_matching}
+    return {
+        "non_matching": non_matching,
+        "matching": matching,
+        "another_non_matching": another_non_matching,
+    }
 
 
 def test_initial_module_data_by_id() -> None:
@@ -343,20 +342,23 @@ def test_calculate_magnet_height(module_model: ModuleModel) -> None:
 
 @pytest.mark.parametrize(
     argnames=["module_model", "target_temp", "expected_valid"],
-    argvalues=[(ModuleModel.HEATER_SHAKER_MODULE_V1, 36.8, False),
-               (ModuleModel.HEATER_SHAKER_MODULE_V1, 37, True),
-               (ModuleModel.HEATER_SHAKER_MODULE_V1, 94.8, True),
-               (ModuleModel.HEATER_SHAKER_MODULE_V1, 95.1, False)]
+    argvalues=[
+        (ModuleModel.HEATER_SHAKER_MODULE_V1, 36.8, False),
+        (ModuleModel.HEATER_SHAKER_MODULE_V1, 37, True),
+        (ModuleModel.HEATER_SHAKER_MODULE_V1, 94.8, True),
+        (ModuleModel.HEATER_SHAKER_MODULE_V1, 95.1, False),
+    ],
 )
 def test_is_target_temperature_valid(
-        module_model: ModuleModel,
-        target_temp: float,
-        expected_valid: bool,
+    module_model: ModuleModel,
+    target_temp: float,
+    expected_valid: bool,
 ) -> None:
     """It should verify if a target temperature is valid for the specified module."""
     subject = make_module_view()
-    result = subject.is_target_temperature_valid(heating_module_model=module_model,
-                                                 celsius=target_temp)
+    result = subject.is_target_temperature_valid(
+        heating_module_model=module_model, celsius=target_temp
+    )
     assert result == expected_valid
 
 
@@ -555,12 +557,14 @@ def test_select_hardware_module_to_load_rejects_location_reassignment(
 
 
 def test_magnetic_module_view_find_hardware(
-    decoy: Decoy, magdeck_v1_def: ModuleDefinition,
+    decoy: Decoy,
+    magdeck_v1_def: ModuleDefinition,
 ) -> None:
     """It should return the matching hardware magnetic module."""
     attached = get_attached_modules(decoy=decoy, matching_module_type=MagDeck)
-    parent = get_sample_parent_module_view(matching_module_def=magdeck_v1_def,
-                                           matching_module_id="id-matching")
+    parent = get_sample_parent_module_view(
+        matching_module_def=magdeck_v1_def, matching_module_id="id-matching"
+    )
     subject = parent.get_magnetic_module_view(module_id="id-matching")
 
     result = subject.find_hardware(attached_modules=list(attached.values()))
@@ -568,12 +572,14 @@ def test_magnetic_module_view_find_hardware(
 
 
 def test_heater_shaker_module_view_find_hardware(
-        decoy: Decoy, heater_shaker_v1_def: ModuleDefinition,
+    decoy: Decoy,
+    heater_shaker_v1_def: ModuleDefinition,
 ) -> None:
     """It should return the matching hardware heater-shaker module."""
     attached = get_attached_modules(decoy=decoy, matching_module_type=HeaterShaker)
-    parent = get_sample_parent_module_view(matching_module_def=heater_shaker_v1_def,
-                                           matching_module_id="id-matching")
+    parent = get_sample_parent_module_view(
+        matching_module_def=heater_shaker_v1_def, matching_module_id="id-matching"
+    )
     subject = parent.get_heater_shaker_module_view(module_id="id-matching")
 
     result = subject.find_hardware(attached_modules=list(attached.values()))
@@ -769,15 +775,10 @@ def test_magnetic_module_view_calculate_magnet_hardware_height(
 
 @pytest.mark.parametrize(
     argnames=["target_rpm", "expected_valid"],
-    argvalues=[(199, False),
-               (200, True),
-               (3000, True),
-               (3001, False)]
+    argvalues=[(199, False), (200, True), (3000, True), (3001, False)],
 )
 def test_is_heater_shaker_target_speed_valid(
-        target_rpm: int,
-        expected_valid: bool,
-        heater_shaker_v1_def: ModuleDefinition
+    target_rpm: int, expected_valid: bool, heater_shaker_v1_def: ModuleDefinition
 ) -> None:
     """It should validate heater-shaker target rpm."""
     parent = make_module_view(

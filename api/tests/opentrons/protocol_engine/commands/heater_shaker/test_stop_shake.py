@@ -13,14 +13,10 @@ from opentrons.protocol_engine.commands.heater_shaker.stop_shake import (
 
 
 async def test_stop_shake(
-        decoy: Decoy,
-        state_view: StateView,
-        hardware_api: HardwareControlAPI
+    decoy: Decoy, state_view: StateView, hardware_api: HardwareControlAPI
 ) -> None:
     """It should be able to stop the module's shake."""
-    subject = StopShakeImpl(
-        state_view=state_view, hardware_api=hardware_api
-    )
+    subject = StopShakeImpl(state_view=state_view, hardware_api=hardware_api)
     data = heater_shaker.StopShakeParams(moduleId="heater-shaker-id")
 
     # Get module view
@@ -35,9 +31,9 @@ async def test_stop_shake(
     decoy.when(hardware_api.attached_modules).then_return(attached)
 
     # Get stubbed hardware module from hs module view
-    decoy.when(
-        hs_module_view.find_hardware(attached_modules=attached)
-    ).then_return(match)
+    decoy.when(hs_module_view.find_hardware(attached_modules=attached)).then_return(
+        match
+    )
 
     result = await subject.execute(data)
     decoy.verify(await match.set_speed(rpm=0), times=1)
