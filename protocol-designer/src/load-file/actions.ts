@@ -1,4 +1,4 @@
-import { migration } from './migration'
+import { migration, migrationWithV6 } from './migration'
 import { selectors as fileDataSelectors } from '../file-data'
 import { saveFile } from './utils'
 import { PDProtocolFile } from '../file-types'
@@ -9,6 +9,7 @@ import {
   LoadFileAction,
   NewProtocolFields,
 } from './types'
+import { getEnabledSchemaV6 } from '../feature-flags/selectors'
 export interface FileUploadMessageAction {
   type: 'FILE_UPLOAD_MESSAGE'
   payload: FileUploadMessage
@@ -30,6 +31,27 @@ export const loadFileAction = (payload: PDProtocolFile): LoadFileAction => ({
   type: 'LOAD_FILE',
   payload: migration(payload),
 })
+// rename loadFileActionSchemaV6 to loadFileAction and remove other loadFileAction after removing the schema v6 feature flag
+export const loadFileActionSchemaV6 = (
+  payload: PDProtocolFile
+): LoadFileAction => ({
+  type: 'LOAD_FILE',
+  payload: migrationWithV6(payload),
+})
+// this thunk can also be deleted after the schema v6 feature flag is removed
+export const loadFile = (
+  payload: PDProtocolFile
+): ThunkAction<LoadFileAction> => (
+  dispatch: ThunkDispatch<any>,
+  getState: GetState
+) => {
+  const isSchemaV6Enabled = getEnabledSchemaV6(getState())
+  if (isSchemaV6Enabled) {
+    dispatch(loadFileActionSchemaV6(payload))
+  } else {
+    dispatch(loadFileAction(payload))
+  }
+}
 // load file thunk, handles file loading errors
 export const loadProtocolFile = (
   event: React.SyntheticEvent<HTMLInputElement>
@@ -62,8 +84,7 @@ export const loadProtocolFile = (
       try {
         parsedProtocol = JSON.parse((result as any) as string)
         // TODO LATER Ian 2018-05-18 validate file with JSON Schema here
-        // @ts-expect-error need null checking
-        dispatch(loadFileAction(parsedProtocol))
+        parsedProtocol && dispatch(loadFile(parsedProtocol))
       } catch (error) {
         console.error(error)
         fileError('INVALID_JSON_FILE', error.message)

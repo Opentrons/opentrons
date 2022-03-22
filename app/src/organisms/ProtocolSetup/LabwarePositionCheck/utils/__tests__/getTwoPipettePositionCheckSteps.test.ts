@@ -2,12 +2,12 @@ import _uncastedProtocolMultipleTipracks from '@opentrons/shared-data/protocol/f
 import _uncastedProtocolWithTC from '@opentrons/shared-data/protocol/fixtures/6/multipleTipracksWithTC.json'
 import { getTwoPipettePositionCheckSteps } from '../getTwoPipettePositionCheckSteps'
 import { SECTIONS } from '../../constants'
-import type { ProtocolFile } from '@opentrons/shared-data'
+import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 import type { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { LabwarePositionCheckStep } from '../../types'
 
-const protocolMultipleTipracks = (_uncastedProtocolMultipleTipracks as unknown) as ProtocolFile<{}>
-const protocolWithTC = (_uncastedProtocolWithTC as unknown) as ProtocolFile<{}>
+const protocolMultipleTipracks = (_uncastedProtocolMultipleTipracks as unknown) as ProtocolAnalysisFile
+const protocolWithTC = (_uncastedProtocolWithTC as unknown) as ProtocolAnalysisFile
 
 describe('getTwoPipettePositionCheckSteps', () => {
   it('should move to all tipracks that the secondary pipette uses, move to all tipracks with that the primary pipette uses, pick up a tip at the final tiprack that the primary pipette uses, move to all remaining labware, and drop the tip back in the tiprack that the primary pipette uses', () => {

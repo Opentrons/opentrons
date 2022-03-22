@@ -32,7 +32,7 @@ import {
   useCurrentRunId,
   useIsProtocolRunLoaded,
 } from '../../ProtocolUpload/hooks'
-import type { ProtocolFile } from '@opentrons/shared-data'
+import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 
 const mockPush = jest.fn()
 
@@ -76,7 +76,7 @@ const mockGetConnectedRobotName = getConnectedRobotName as jest.MockedFunction<
   typeof getConnectedRobotName
 >
 
-const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolFile<{}>
+const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnalysisFile
 
 const render = () => {
   return renderWithProviders(

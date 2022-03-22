@@ -69,10 +69,10 @@ jobs:
         name: Test without opentrons_hardware
         run: |
           make -C robot-server setup-ot2
-          make -C robot-server test
+          make -C robot-server test-cov
       - if: ${{ matrix.with-ot-hardware == 'true' }}
         name: Test with opentrons_hardware
-        run: make -C robot-server test
+        run: make -C robot-server test-cov
       - if: ${{ matrix.with-ot-hardware == 'true' }}
         uses: 'codecov/codecov-action@v2'
         with:

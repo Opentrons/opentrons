@@ -239,11 +239,13 @@ class OT3Controller:
         runner = MoveGroupRunner(move_groups=[group])
         await runner.run(can_messenger=self._messenger)
 
-        for ax in checked_axes:
-            self._position[axis_to_node(ax)] = 0
-        axis_positions = {ax: 0.0 for ax in checked_axes}
+        axis_positions = {
+            axis_to_node(ax): self._get_home_position()[axis_to_node(ax)]
+            for ax in checked_axes
+        }
+        self._position.update(axis_positions)
 
-        return axis_positions
+        return axis_convert(self._position, 0.0)
 
     async def fast_home(
         self, axes: Sequence[OT3Axis], margin: float
@@ -271,13 +273,13 @@ class OT3Controller:
             A map of mount to pipette name.
         """
         if (
-            expected.get(OT3Mount.LEFT)
-            and expected.get(OT3Mount.LEFT) != _FIXED_PIPETTE_NAME
+            expected.get(OT3Mount.RIGHT)
+            and expected.get(OT3Mount.RIGHT) != _FIXED_PIPETTE_NAME
         ):
             raise RuntimeError(f"only support {_FIXED_PIPETTE_NAME}  right now")
 
         return {
-            OT3Mount.LEFT: {
+            OT3Mount.RIGHT: {
                 "config": pipette_config.load(_FIXED_PIPETTE_MODEL, _FIXED_PIPETTE_ID),
                 "id": _FIXED_PIPETTE_ID,
             }
@@ -495,7 +497,11 @@ class OT3Controller:
         self._present_nodes = present
 
     def _axis_is_present(self, axis: OT3Axis) -> bool:
-        return axis_to_node(axis) in self._present_nodes
+        try:
+            return axis_to_node(axis) in self._present_nodes
+        except KeyError:
+            # Currently unhandled axis
+            return False
 
     def _axis_map_to_present_nodes(
         self, to_xform: OT3AxisMap[MapPayload]

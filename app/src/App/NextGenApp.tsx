@@ -25,6 +25,7 @@ import { ProtocolRunDetails } from '../pages/Devices/ProtocolRunDetails'
 import { RobotSettings } from '../pages/Devices/RobotSettings'
 import { usePathCrumbs } from './hooks'
 import { ProtocolsLanding } from '../pages/Protocols/ProtocolsLanding'
+import { ProtocolDetails } from '../pages/Protocols/ProtocolDetails'
 import { AppSettings } from '../organisms/AppSettings'
 import { Labware } from '../organisms/Labware'
 import { PortalRoot as ModalPortalRoot, TopPortalRoot } from './portal'
@@ -116,7 +117,7 @@ export type ProtocolRunDetailsTab = 'setup' | 'module-controls' | 'run-log'
 export interface NextGenRouteParams {
   appSettingsTab: AppSettingsTab
   robotName: string
-  protocolName: string
+  protocolKey: string
   labwareId: string
   robotSettingsTab: RobotSettingsTab
   runId: string
@@ -156,15 +157,15 @@ export const nextGenRoutes: RouteProps[] = [
     path: '/protocols',
   },
   {
-    component: () => <div>protocol details</div>,
+    component: ProtocolDetails,
     exact: true,
     name: 'Protocol Details',
-    path: '/protocols/:protocolName',
+    path: '/protocols/:protocolKey',
   },
   {
     component: () => <div>deck setup</div>,
     name: 'Deck Setup',
-    path: '/protocols/:protocolName/deck-setup',
+    path: '/protocols/:protocolKey/deck-setup',
   },
   {
     component: Labware,

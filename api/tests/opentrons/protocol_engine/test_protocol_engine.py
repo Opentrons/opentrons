@@ -5,7 +5,7 @@ from datetime import datetime
 from decoy import Decoy
 from typing import Any
 
-from opentrons.types import DeckSlotName, MountType
+from opentrons.types import DeckSlotName
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocols.models import LabwareDefinition
 
@@ -16,7 +16,6 @@ from opentrons.protocol_engine.types import (
     LabwareOffsetVector,
     LabwareOffsetLocation,
     LabwareUri,
-    PipetteName,
 )
 from opentrons.protocol_engine.execution import (
     QueueWorker,
@@ -133,16 +132,10 @@ def test_add_command(
     subject: ProtocolEngine,
 ) -> None:
     """It should add a command to the state from a request."""
-    params = commands.LoadPipetteParams(
-        mount=MountType.LEFT,
-        pipetteName=PipetteName.P300_SINGLE,
-    )
-
-    request = commands.LoadPipetteCreate(params=params)
-
     created_at = datetime(year=2021, month=1, day=1)
-
-    queued_command = commands.LoadPipette(
+    params = commands.HomeParams()
+    request = commands.HomeCreate(params=params)
+    queued = commands.Home(
         id="command-id",
         key="command-key",
         status=commands.CommandStatus.QUEUED,
@@ -152,12 +145,11 @@ def test_add_command(
 
     decoy.when(model_utils.generate_id()).then_return("command-id")
     decoy.when(model_utils.get_timestamp()).then_return(created_at)
-    decoy.when(state_store.commands.get("command-id")).then_return(queued_command)
 
-    result = subject.add_command(request)
+    def _stub_queued(*_a: object, **_k: object) -> None:
+        decoy.when(state_store.commands.get("command-id")).then_return(queued)
 
-    assert result == queued_command
-    decoy.verify(
+    decoy.when(
         action_dispatcher.dispatch(
             QueueCommandAction(
                 command_id="command-id",
@@ -166,10 +158,14 @@ def test_add_command(
                 request=request,
             )
         ),
-    )
+    ).then_do(_stub_queued)
+
+    result = subject.add_command(request)
+
+    assert result == queued
 
 
-async def test_execute_command(
+async def test_add_and_execute_command(
     decoy: Decoy,
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
@@ -179,45 +175,34 @@ async def test_execute_command(
 ) -> None:
     """It should add and execute a command from a request."""
     created_at = datetime(year=2021, month=1, day=1)
-    completed_at = datetime(year=2023, month=3, day=3)
-
-    params = commands.LoadPipetteParams(
-        mount=MountType.LEFT,
-        pipetteName=PipetteName.P300_SINGLE,
-    )
-
-    request = commands.LoadPipetteCreate(params=params)
-
-    queued_command = commands.LoadPipette(
+    params = commands.HomeParams()
+    request = commands.HomeCreate(params=params)
+    queued = commands.Home(
         id="command-id",
         key="command-key",
         status=commands.CommandStatus.QUEUED,
         createdAt=created_at,
         params=params,
     )
-
-    executed_command = commands.LoadPipette(
+    completed = commands.Home(
         id="command-id",
         key="command-key",
         status=commands.CommandStatus.SUCCEEDED,
         createdAt=created_at,
-        startedAt=created_at,
-        completedAt=completed_at,
         params=params,
     )
 
     decoy.when(model_utils.generate_id()).then_return("command-id")
     decoy.when(model_utils.get_timestamp()).then_return(created_at)
-    decoy.when(state_store.commands.get("command-id")).then_return(
-        queued_command,
-        executed_command,
-    )
 
-    result = await subject.add_and_execute_command(request)
+    def _stub_queued(*_a: object, **_k: object) -> None:
+        decoy.when(state_store.commands.get("command-id")).then_return(queued)
 
-    assert result == executed_command
+    def _stub_completed(*_a: object, **_k: object) -> bool:
+        decoy.when(state_store.commands.get("command-id")).then_return(completed)
+        return True
 
-    decoy.verify(
+    decoy.when(
         action_dispatcher.dispatch(
             QueueCommandAction(
                 command_id="command-id",
@@ -225,12 +210,19 @@ async def test_execute_command(
                 created_at=created_at,
                 request=request,
             )
-        ),
+        )
+    ).then_do(_stub_queued)
+
+    decoy.when(
         await state_store.wait_for(
             condition=state_store.commands.get_is_complete,
             command_id="command-id",
         ),
-    )
+    ).then_do(_stub_completed)
+
+    result = await subject.add_and_execute_command(request)
+
+    assert result == completed
 
 
 def test_play(
