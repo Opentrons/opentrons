@@ -4,16 +4,21 @@ import { useTranslation } from 'react-i18next'
 import {
   Box,
   Flex,
+  Text,
+  Link,
   SPACING,
+  COLORS,
   TYPOGRAPHY,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
+  Icon,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { SecondaryButton } from '../../atoms/Buttons'
 import { Toast } from '../../atoms/Toast'
+
 import {
   getAddLabwareFailure,
   clearAddCustomLabwareFailure,
@@ -25,6 +30,8 @@ import { AddCustomLabware } from './AddCustomLabware'
 import { useGetAllLabware } from './hooks'
 import type { Dispatch } from '../../redux/types'
 import type { FailedLabwareFile } from '../../redux/custom-labware/types'
+
+const LABWARE_CREATOR_HREF = 'https://labware.opentrons.com/create/'
 
 export function Labware(): JSX.Element {
   const { t } = useTranslation('labware_landing')
@@ -92,6 +99,22 @@ export function Labware(): JSX.Element {
               labware={labware}
             />
           ))}
+        </Flex>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing3}
+          alignItems={ALIGN_CENTER}
+          marginTop={SPACING.spacing6}
+        >
+          <Text color={COLORS.black} css={TYPOGRAPHY.pSemiBold}>
+            {t('create_new_def')}
+          </Text>
+          <Text css={TYPOGRAPHY.h6SemiBold} color={COLORS.darkGreyEnabled}>
+            <Link href={LABWARE_CREATOR_HREF} color={COLORS.darkGreyEnabled}>
+              {t('open_labware_creator')}{' '}
+              <Icon name="open-in-new" height="10px"></Icon>
+            </Link>
+          </Text>
         </Flex>
       </Box>
       {showAddLabwareSlideout && (
