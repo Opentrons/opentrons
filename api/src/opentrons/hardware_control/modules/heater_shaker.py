@@ -406,6 +406,7 @@ class HeaterShaker(mod_abc.AbstractModule):
     async def deactivate(self) -> None:
         """Stop heating/cooling; stop shaking and home the plate"""
         await self.wait_for_is_running()
+        # TODO (spp): Is this correct?
         await self._driver.set_temperature(0)
         await self._driver.home()
 
