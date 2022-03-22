@@ -42,21 +42,6 @@ function IpHostnameListComponent(props: Props): JSX.Element {
           />
         ))}
     </div>
-
-    // <div>
-    //   {candidateList.map((c, index) => {
-    //     const discovered = robots.some(r => r.ip === c)
-
-    //     return (
-    //       <IpItem
-    //         candidate={c}
-    //         key={index}
-    //         removeIp={removeManualIp}
-    //         discovered={discovered}
-    //       />
-    //     )
-    //   })}
-    // </div>
   )
 }
 

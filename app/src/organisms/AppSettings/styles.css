@@ -58,6 +58,12 @@
   flex: 1 1 calc(100% - 4rem);
 }
 
+.ip_item {
+  p {
+    white-space: nowrap;
+  }
+}
+
 .remove_ip_button {
   padding: 0.25rem;
   flex: 0 0 2rem;
