@@ -196,7 +196,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             <img src={image} alt={module.model} />
             <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING_2}>
               {module.hasAvailableUpdate && showBanner ? (
-                <Flex paddingBottom={SPACING.spacing2}>
+                <Flex paddingBottom={SPACING.spacing2} width="12.4rem">
                   <Banner
                     type="warning"
                     onCloseClick={() => setShowBanner(false)}
@@ -221,6 +221,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               ) : null}
               {tooHot ? (
                 <Flex
+                  width="12.4rem"
                   paddingRight={SPACING.spacingM}
                   paddingBottom={SPACING.spacing3}
                 >

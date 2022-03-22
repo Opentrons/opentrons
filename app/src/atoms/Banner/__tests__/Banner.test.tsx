@@ -54,13 +54,13 @@ describe('Banner', () => {
     getByLabelText('icon_error')
     getByText('TITLE')
   })
-  it('renders installing banner', () => {
+  it('renders updating banner', () => {
     props = {
-      type: 'installing',
+      type: 'updating',
       title: 'TITLE',
     }
     const { getByText, getByLabelText } = render(props)
-    getByLabelText('icon_installing')
+    getByLabelText('icon_updating')
     getByText('TITLE')
   })
   it('renders hot to touch banner', () => {

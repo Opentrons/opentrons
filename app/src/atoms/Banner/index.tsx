@@ -10,10 +10,11 @@ import {
   SPACING,
   TYPOGRAPHY,
   BORDERS,
+  Btn,
 } from '@opentrons/components'
 import { css } from 'styled-components'
 
-export type BannerType = 'success' | 'warning' | 'error' | 'installing' | 'hot'
+export type BannerType = 'success' | 'warning' | 'error' | 'updating' | 'hot'
 
 export interface BannerProps {
   /** name constant of the icon to display */
@@ -34,7 +35,7 @@ const BANNER_PROPS_BY_TYPE: Record<
 > = {
   success: {
     icon: { name: 'check-circle' },
-    backgroundColor: COLORS.successPg,
+    backgroundColor: COLORS.successBg,
     color: COLORS.success,
   },
   error: {
@@ -47,7 +48,7 @@ const BANNER_PROPS_BY_TYPE: Record<
     backgroundColor: COLORS.warningBg,
     color: COLORS.warning,
   },
-  installing: {
+  updating: {
     icon: { name: 'ot-spinner' },
     backgroundColor: COLORS.greyDisabled,
     color: COLORS.darkGreyEnabled,
@@ -78,11 +79,11 @@ export function Banner(props: BannerProps): JSX.Element {
 
   const iconProps = {
     ...icon,
-    width: SPACING.spacing6,
+    size: SPACING.spacing4,
     marginRight: SPACING.spacing3,
     color: BANNER_PROPS_BY_TYPE[props.type].color,
-    spin: BANNER_PROPS_BY_TYPE[props.type].icon === 'ot-spinner',
   }
+
   return (
     <Flex
       fontSize={TYPOGRAPHY.fontSizeP}
@@ -101,16 +102,20 @@ export function Banner(props: BannerProps): JSX.Element {
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         data-testid={`Banner_${props.title}_${props.type}`}
       >
-        <Icon {...iconProps} aria-label={`icon_${props.type}`} />
+        <Icon
+          {...iconProps}
+          aria-label={`icon_${props.type}`}
+          spin={BANNER_PROPS_BY_TYPE[props.type].icon.name === 'ot-spinner'}
+        />
         <Flex width="100%">{props.title}</Flex>
         {props.onCloseClick && (
-          <Icon
-            width={SPACING.spacing6}
-            name="close"
-            aria-label="close_icon"
-            onClick={props.onCloseClick}
-            color={BANNER_PROPS_BY_TYPE[props.type].color}
-          />
+          <Btn onClick={props.onCloseClick} width={SPACING.spacing6}>
+            <Icon
+              name="close"
+              aria-label="close_icon"
+              color={BANNER_PROPS_BY_TYPE[props.type].color}
+            />
+          </Btn>
         )}
       </Flex>
       {props.children && <Flex css={MESSAGE_STYLING}>{props.children}</Flex>}
