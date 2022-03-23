@@ -23,12 +23,16 @@ def subject() -> JsonCommandTranslator:
 
 
 def _make_json_protocol(
-        *,
-        pipettes: Dict[str, json_v6_models.Pipette] = {"pipetteId": json_v6_models.Pipette(name="p10_single")},
-        labware_definitions: Dict[str, LabwareDefinition] = {},
-        labware: Dict[str, json_v6_models.Labware] = {},
-        commands: List[json_v6_models.Command] = [],
-        modules: Dict[str, json_v6_models.Module] = {"magneticModuleId": json_v6_models.Module(model="magneticModuleV2")}
+    *,
+    pipettes: Dict[str, json_v6_models.Pipette] = {
+        "pipetteId": json_v6_models.Pipette(name="p10_single")
+    },
+    labware_definitions: Dict[str, LabwareDefinition] = {},
+    labware: Dict[str, json_v6_models.Labware] = {},
+    commands: List[json_v6_models.Command] = [],
+    modules: Dict[str, json_v6_models.Module] = {
+        "magneticModuleId": json_v6_models.Module(model="magneticModuleV2")
+    }
 ) -> json_v6_models.ProtocolSchemaV6:
     """Return a minimal JsonProtocol with the given elements, to use as test input."""
     return json_v6_models.ProtocolSchemaV6(
@@ -42,7 +46,7 @@ def _make_json_protocol(
         labwareDefinitions=labware_definitions,
         labware=labware,
         commands=commands,
-        modules=modules
+        modules=modules,
     )
 
 
@@ -53,7 +57,9 @@ def test_command_list(subject: JsonCommandTranslator) -> None:
     assert output == command_list_tuple[1]
 
 
-def load_command_list() -> Tuple[List[json_v6_models.Command], List[pe_commands.CommandCreate]]:
+def load_command_list() -> Tuple[
+    List[json_v6_models.Command], List[pe_commands.CommandCreate]
+]:
     """It should translate a JSON aspirate to a Protocol Engine AspirateCreate."""
     command_list = [
         json_v6_models.Command(
@@ -66,8 +72,10 @@ def load_command_list() -> Tuple[List[json_v6_models.Command], List[pe_commands.
                 # todo (Max and Tamar 3/17/22): needs to be added to the aspirate command https://github.com/Opentrons/opentrons/issues/8204
                 flowRate=4.56,
                 wellName="A1",
-                wellLocation=json_v6_models.WellLocation(origin="bottom",
-                                                         offset=json_v6_models.OffsetVector(x=0, y=0, z=7.89))
+                wellLocation=json_v6_models.WellLocation(
+                    origin="bottom",
+                    offset=json_v6_models.OffsetVector(x=0, y=0, z=7.89),
+                ),
             ),
         ),
         json_v6_models.Command(
@@ -79,15 +87,19 @@ def load_command_list() -> Tuple[List[json_v6_models.Command], List[pe_commands.
                 volume=1.23,
                 flowRate=4.56,
                 wellName="A1",
-                wellLocation=json_v6_models.WellLocation(origin="bottom",
-                                                         offset=json_v6_models.OffsetVector(x=0, y=0, z=7.89))
-            )
+                wellLocation=json_v6_models.WellLocation(
+                    origin="bottom",
+                    offset=json_v6_models.OffsetVector(x=0, y=0, z=7.89),
+                ),
+            ),
         ),
         json_v6_models.Command(
             id="dropTip-command-id-666",
             commandType="dropTip",
             params=json_v6_models.Params(
-                pipetteId="pipette-id-abc123", labwareId="labware-id-def456", wellName="A1"
+                pipetteId="pipette-id-abc123",
+                labwareId="labware-id-def456",
+                wellName="A1",
             ),
         ),
         json_v6_models.Command(
@@ -96,7 +108,7 @@ def load_command_list() -> Tuple[List[json_v6_models.Command], List[pe_commands.
             params=json_v6_models.Params(
                 pipetteId="pipette-id-abc123",
                 labwareId="labware-id-def456",
-                wellName="A1"
+                wellName="A1",
             ),
         ),
         json_v6_models.Command(
@@ -110,10 +122,8 @@ def load_command_list() -> Tuple[List[json_v6_models.Command], List[pe_commands.
         json_v6_models.Command(
             id="load-pipette-command-id-666",
             commandType="loadPipette",  # used to be delay but is expecting pause
-            params=json_v6_models.Params(
-                pipetteId="pipetteId",
-                mount="left"
-            )),
+            params=json_v6_models.Params(pipetteId="pipetteId", mount="left"),
+        ),
         # json_v6_models.Command(
         #     id="load-module-command-id-666",
         #     commandType="loadModule",  # used to be delay but is expecting pause
@@ -121,7 +131,7 @@ def load_command_list() -> Tuple[List[json_v6_models.Command], List[pe_commands.
         #         moduleId="magneticModuleId",
         #         location={"slotName": "3"}
         #     ))
-        ]
+    ]
 
     expected_output: List[pe_commands.CommandCreate] = [
         pe_commands.AspirateCreate(
@@ -154,7 +164,7 @@ def load_command_list() -> Tuple[List[json_v6_models.Command], List[pe_commands.
                 pipetteId="pipette-id-abc123",
                 labwareId="labware-id-def456",
                 wellName="A1",
-                wellLocation=WellLocation()
+                wellLocation=WellLocation(),
             )
         ),
         pe_commands.PickUpTipCreate(
@@ -162,15 +172,17 @@ def load_command_list() -> Tuple[List[json_v6_models.Command], List[pe_commands.
                 pipetteId="pipette-id-abc123",
                 labwareId="labware-id-def456",
                 wellName="A1",
-                wellLocation=WellLocation()
+                wellLocation=WellLocation(),
             )
         ),
         pe_commands.PauseCreate(params=pe_commands.PauseParams(message="hello world")),
-        pe_commands.LoadPipetteCreate(params=pe_commands.LoadPipetteParams(
-            pipetteId="pipetteId",
-            pipetteName=PipetteName("p10_single"),
-            mount=MountType("left")
-        )),
+        pe_commands.LoadPipetteCreate(
+            params=pe_commands.LoadPipetteParams(
+                pipetteId="pipetteId",
+                pipetteName=PipetteName("p10_single"),
+                mount=MountType("left"),
+            )
+        ),
         # pe_commands.LoadModuleCreate(params=pe_commands.LoadModuleParams(
         #     model=""
         # ))

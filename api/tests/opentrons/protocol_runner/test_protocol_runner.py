@@ -4,7 +4,9 @@ from decoy import Decoy, matchers
 from pathlib import Path
 from typing import List, cast
 
-from opentrons_shared_data.protocol.dev_types import JsonProtocol as LegacyJsonProtocolDict
+from opentrons_shared_data.protocol.dev_types import (
+    JsonProtocol as LegacyJsonProtocolDict,
+)
 from opentrons.hardware_control import API as HardwareAPI
 
 from opentrons.protocols.api_support.types import APIVersion
