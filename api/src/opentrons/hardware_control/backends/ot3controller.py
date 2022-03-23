@@ -302,10 +302,8 @@ class OT3Controller:
 
         current_tools = dict(_generate_attached_instrs(attached))
         self._present_nodes -= set(
-            (
-                axis_to_node(OT3Axis.of_main_tool_actuator(mount))
-                for mount in (OT3Mount.RIGHT, OT3Mount.LEFT)
-            )
+            axis_to_node(OT3Axis.of_main_tool_actuator(mount))
+            for mount in (OT3Mount.RIGHT, OT3Mount.LEFT)
         )
         for mount in current_tools.keys():
             self._present_nodes.add(axis_to_node(OT3Axis.of_main_tool_actuator(mount)))
@@ -495,6 +493,33 @@ class OT3Controller:
             node_to_axis(k): v for k, v in OT3Controller._get_home_position().items()
         }
 
+    @staticmethod
+    def _replace_head_node(nodes: Set[NodeId]) -> Set[NodeId]:
+        """Replace the head core node with its two sides.
+
+        The node ID for the head central controller is what shows up in a network probe,
+        but what we actually send commands to an overwhelming majority of the time is
+        the head_l and head_r synthetic node IDs, and those are what we want in the
+        network map.
+        """
+        if NodeId.head in nodes:
+            nodes.remove(NodeId.head)
+            nodes.add(NodeId.head_r)
+            nodes.add(NodeId.head_l)
+        return nodes
+
+    @staticmethod
+    def _filter_probed_core_nodes(
+        current_set: Set[NodeId], probed_set: Set[NodeId]
+    ) -> Set[NodeId]:
+        probed_set = OT3Controller._replace_head_node(probed_set)
+        core_replaced: Set[NodeId] = set(
+            [NodeId.gantry_x, NodeId.gantry_y, NodeId.head_l, NodeId.head_r]
+        )
+        current_set -= core_replaced
+        current_set |= probed_set
+        return current_set
+
     async def _probe_core(self, timeout: float = 5.0) -> None:
         """Update the list of core nodes present on the network.
 
@@ -503,17 +528,9 @@ class OT3Controller:
         """
         core_nodes = set([NodeId.gantry_x, NodeId.gantry_y, NodeId.head])
         core_present = await probe(self._messenger, core_nodes, timeout)
-
-        if NodeId.head in core_present:
-            core_present.remove(NodeId.head)
-            core_present.add(NodeId.head_r)
-            core_present.add(NodeId.head_l)
-
-        core_replaced = set(
-            [NodeId.gantry_x, NodeId.gantry_y, NodeId.head_l, NodeId.head_r]
+        self._present_nodes = self._filter_probed_core_nodes(
+            self._present_nodes, core_present
         )
-        self._present_nodes -= core_replaced
-        self._present_nodes |= core_present
 
     async def probe_network(self, timeout: float = 5.0) -> None:
         """Update the list of nodes present on the network.
@@ -536,11 +553,7 @@ class OT3Controller:
         ):
             expected.add(NodeId.pipette_right)
         present = await probe(self._messenger, expected, timeout)
-        if NodeId.head in present:
-            present.remove(NodeId.head)
-            present.add(NodeId.head_r)
-            present.add(NodeId.head_l)
-        self._present_nodes = present
+        self._present_nodes = self._replace_head_node(present)
 
     def _axis_is_present(self, axis: OT3Axis) -> bool:
         try:

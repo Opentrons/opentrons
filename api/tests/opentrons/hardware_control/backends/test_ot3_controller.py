@@ -181,3 +181,21 @@ async def test_get_attached_instruments(
     assert list(detected.keys()) == [OT3Mount.LEFT]
     assert detected[OT3Mount.LEFT]["id"] == "hello"
     assert detected[OT3Mount.LEFT]["config"].name == "p1000_single_gen3"
+
+
+def test_nodeid_replace_head():
+    assert OT3Controller._replace_head_node(set([NodeId.head, NodeId.gantry_x])) == set(
+        [NodeId.head_l, NodeId.head_r, NodeId.gantry_x]
+    )
+    assert OT3Controller._replace_head_node(set([NodeId.gantry_x])) == set(
+        [NodeId.gantry_x]
+    )
+    assert OT3Controller._replace_head_node(set([NodeId.head_l])) == set(
+        [NodeId.head_l]
+    )
+
+
+def test_nodeid_filter_probed_core():
+    assert OT3Controller._filter_probed_core_nodes(
+        set([NodeId.gantry_x, NodeId.pipette_left]), set([NodeId.gantry_y])
+    ) == set([NodeId.gantry_y, NodeId.pipette_left])
