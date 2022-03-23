@@ -13,13 +13,18 @@ class CommandTranslatorError(Exception):
     pass
 
 
-def get_labware_command(protocol: ProtocolSchemaV6, command: Command) -> Tuple[Optional[str], int, str, str]:
-    # TODO define a constructor for LoadLabwareParams that accepts these fields
+def get_labware_command(protocol: ProtocolSchemaV6, command: Command) -> pe_commands.LoadLabwareCreate:
+    dict_command = command.dict()
     labware_id = command.params.labwareId
     assert labware_id is not None
     definition_id = protocol.labware[labware_id].definitionId
     assert definition_id is not None
-    return protocol.labware[labware_id].displayName, protocol.labwareDefinitions[definition_id].version, protocol.labwareDefinitions[definition_id].namespace, protocol.labwareDefinitions[definition_id].parameters.loadName
+    dict_command["params"].update({"displayName": protocol.labware[labware_id].displayName})
+    dict_command["params"].update({"version": protocol.labwareDefinitions[definition_id].version})
+    dict_command["params"].update({"namespace": protocol.labwareDefinitions[definition_id].namespace})
+    dict_command["params"].update({"loadName": protocol.labwareDefinitions[definition_id].parameters.loadName})
+    labware_command = pe_commands.LoadLabwareCreate.parse_raw(dict_command)
+    return labware_command
 
 
 class JsonCommandTranslator:
@@ -43,11 +48,9 @@ class JsonCommandTranslator:
                 assert modules is not None
                 dict_command["params"].update({"model": modules[module_id].model})
             elif command.commandType == "loadLabware":
-                labware_translated_props = get_labware_command(protocol, command)
-                dict_command["params"].update({"displayName":labware_translated_props[0]})
-                dict_command["params"].update({"version":labware_translated_props[1]})
-                dict_command["params"].update({"namespace":labware_translated_props[2]})
-                dict_command["params"].update({"loadName":labware_translated_props[3]})
+                labware_command = get_labware_command(protocol, command)
+                commands_list.append(labware_command)
+                continue
 
                 print(dict_command)
             translated_obj = cast(
