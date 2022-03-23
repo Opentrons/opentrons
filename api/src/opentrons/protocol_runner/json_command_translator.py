@@ -45,7 +45,7 @@ class JsonCommandTranslator:
         ]
         for command in protocol.commands:
             dict_command = command.dict(exclude_none=True)
-            if command.CommandType in exclude_commands:
+            if command.commandType in exclude_commands:
                 continue
             if command.commandType == "loadPipette":
                 pipette_id = command.params.pipetteId
