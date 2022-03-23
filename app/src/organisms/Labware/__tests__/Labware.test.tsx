@@ -5,7 +5,11 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { LabwareCard } from '../LabwareCard'
 import { AddCustomLabware } from '../AddCustomLabware'
-import { useGetAllLabware } from '../hooks'
+import {
+  useGetAllLabware,
+  useLabwareFailure,
+  useNewLabwareName,
+} from '../hooks'
 import { Labware } from '../'
 import { mockDefinition } from '../../../redux/custom-labware/__fixtures__'
 
@@ -20,6 +24,12 @@ const mockAddCustomLabware = AddCustomLabware as jest.MockedFunction<
 >
 const mockUseGetAllLabware = useGetAllLabware as jest.MockedFunction<
   typeof useGetAllLabware
+>
+const mockUseLabwareFailure = useLabwareFailure as jest.MockedFunction<
+  typeof useLabwareFailure
+>
+const mockUseNewLabwareName = useNewLabwareName as jest.MockedFunction<
+  typeof useNewLabwareName
 >
 
 const render = () => {
@@ -38,6 +48,14 @@ describe('Labware', () => {
     mockLabwareCard.mockReturnValue(<div>Mock Labware Card</div>)
     mockAddCustomLabware.mockReturnValue(<div>Mock Add Custom Labware</div>)
     mockUseGetAllLabware.mockReturnValue([{ definition: mockDefinition }])
+    mockUseLabwareFailure.mockReturnValue({
+      labwareFailureMessage: null,
+      clearLabwareFailure: jest.fn(),
+    })
+    mockUseNewLabwareName.mockReturnValue({
+      newLabwareName: null,
+      clearLabwareName: jest.fn(),
+    })
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -55,5 +73,26 @@ describe('Labware', () => {
     const importButton = getByRole('button', { name: 'Import' })
     fireEvent.click(importButton)
     getByText('Mock Add Custom Labware')
+  })
+  it('renders footer with labware creator link', () => {
+    const [{ getByText, getByRole }] = render()
+    getByText('Create a new labware definition')
+    getByRole('link', { name: 'Open Labware Creator' })
+  })
+  it('renders error toast if there is a failure', () => {
+    mockUseLabwareFailure.mockReturnValue({
+      labwareFailureMessage: 'mock failure message',
+      clearLabwareFailure: jest.fn(),
+    })
+    const [{ getByText }] = render()
+    getByText('mock failure message')
+  })
+  it('renders success toast if there is a new labware name', () => {
+    mockUseNewLabwareName.mockReturnValue({
+      newLabwareName: 'mock filename',
+      clearLabwareName: jest.fn(),
+    })
+    const [{ getByText }] = render()
+    getByText('mock filename imported.')
   })
 })

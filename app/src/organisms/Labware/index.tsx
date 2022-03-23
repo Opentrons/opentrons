@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   Box,
@@ -19,59 +18,32 @@ import { StyledText } from '../../atoms/text'
 import { SecondaryButton } from '../../atoms/Buttons'
 import { Toast } from '../../atoms/Toast'
 
-import {
-  getAddLabwareFailure,
-  clearAddCustomLabwareFailure,
-  getAddNewLabwareName,
-  clearNewLabwareName,
-} from '../../redux/custom-labware'
 import { LabwareCard } from './LabwareCard'
 import { AddCustomLabware } from './AddCustomLabware'
-import { useGetAllLabware } from './hooks'
-import type { Dispatch } from '../../redux/types'
-import type { FailedLabwareFile } from '../../redux/custom-labware/types'
+import { useGetAllLabware, useLabwareFailure, useNewLabwareName } from './hooks'
 
 const LABWARE_CREATOR_HREF = 'https://labware.opentrons.com/create/'
 
 export function Labware(): JSX.Element {
   const { t } = useTranslation('labware_landing')
-  const dispatch = useDispatch<Dispatch>()
 
   const labware = useGetAllLabware()
-  const labwareFailure = useSelector(getAddLabwareFailure)
-  const labwareSuccess = useSelector(getAddNewLabwareName).filename
+  const { labwareFailureMessage, clearLabwareFailure } = useLabwareFailure()
+  const { newLabwareName, clearLabwareName } = useNewLabwareName()
   const [showAddLabwareSlideout, setShowAddLabwareSlideout] = React.useState(
     false
   )
   const [showSuccessToast, setShowSuccessToast] = React.useState(false)
   const [showFailureToast, setShowFailureToast] = React.useState(false)
   React.useEffect(() => {
-    if (labwareFailure.file != null || labwareFailure.errorMessage != null) {
+    if (labwareFailureMessage != null) {
       setShowAddLabwareSlideout(false)
       setShowFailureToast(true)
-    } else if (labwareSuccess != null) {
+    } else if (newLabwareName != null) {
       setShowAddLabwareSlideout(false)
       setShowSuccessToast(true)
     }
-  }, [labwareFailure, labwareSuccess])
-
-  const getMessageFromLabwareFailure = (
-    failedFile: FailedLabwareFile | null
-  ): string => {
-    let errorMessage = t('unable_to_upload')
-    if (failedFile?.type === 'INVALID_LABWARE_FILE') {
-      errorMessage = t('invalid_labware_def')
-    } else if (failedFile?.type === 'DUPLICATE_LABWARE_FILE') {
-      errorMessage = t('duplicate_labware_def')
-    } else if (failedFile?.type === 'OPENTRONS_LABWARE_FILE') {
-      errorMessage = t('opentrons_labware_def')
-    }
-    return failedFile != null
-      ? `${t('error_importing_file', {
-          filename: failedFile.filename,
-        })} ${errorMessage}`
-      : errorMessage
-  }
+  }, [labwareFailureMessage, newLabwareName])
 
   return (
     <>
@@ -125,25 +97,25 @@ export function Labware(): JSX.Element {
           onFailure={() => setShowFailureToast(true)}
         />
       )}
-      {showSuccessToast && labwareSuccess != null && (
+      {showSuccessToast && newLabwareName != null && (
         <Toast
-          message={t('imported', { filename: labwareSuccess })}
+          message={t('imported', { filename: newLabwareName })}
           type="success"
           closeButton
           onClose={() => {
             setShowSuccessToast(false)
-            dispatch(clearNewLabwareName())
+            clearLabwareName()
           }}
         />
       )}
-      {showFailureToast && labwareFailure != null && (
+      {showFailureToast && labwareFailureMessage != null && (
         <Toast
-          message={getMessageFromLabwareFailure(labwareFailure.file)}
+          message={labwareFailureMessage}
           type="error"
           closeButton
           onClose={() => {
             setShowFailureToast(false)
-            dispatch(clearAddCustomLabwareFailure())
+            clearLabwareFailure()
           }}
         />
       )}

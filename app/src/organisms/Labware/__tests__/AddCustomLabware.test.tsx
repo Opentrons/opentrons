@@ -28,17 +28,19 @@ describe('AddCustomLabware', () => {
   const props: React.ComponentProps<typeof AddCustomLabware> = {
     isExpanded: true,
     onCloseClick: jest.fn(() => null),
+    onSuccess: jest.fn(() => null),
+    onFailure: jest.fn(() => null),
   }
 
   it('renders correct title and labware cards', () => {
     const [{ getByText, getByRole }] = render(props)
     getByText('Import a Custom Labware Definition')
     getByText('Or choose a file from your computer to upload.')
-    getByRole('button', { name: 'Choose file' })
+    getByRole('button', { name: 'Choose File' })
   })
   it('calls useAddLabware when choose file is pressed', () => {
     const [{ getByRole }] = render(props)
-    const chooseFileButton = getByRole('button', { name: 'Choose file' })
+    const chooseFileButton = getByRole('button', { name: 'Choose File' })
     fireEvent.click(chooseFileButton)
     expect(mockUseAddLabware).toHaveBeenCalled()
   })
