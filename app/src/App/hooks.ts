@@ -50,6 +50,7 @@ export function useNavLocations(): NavLocation[] {
   return navLocations
 }
 
+// TODO(BC, 3-10-2022): handle protocolKey mapping to display name
 /**
  * a hook for the unified app, to generate an array of path crumbs
  * @returns {PathCrumb[]}

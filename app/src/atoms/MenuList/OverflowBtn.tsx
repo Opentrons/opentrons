@@ -1,13 +1,8 @@
 import * as React from 'react'
-import styled from 'styled-components'
-import { Btn, COLORS, SPACING, PrimitiveComponent } from '@opentrons/components'
+import { css } from 'styled-components'
+import { Btn, COLORS, SPACING } from '@opentrons/components'
 
-export interface OverflowBtnProps {
-  children?: React.ReactNode
-}
-
-type BtnComponent = PrimitiveComponent<'button'>
-const StyledOverflowIcon: BtnComponent = styled(Btn)`
+const overflowButtonStyles = css`
   border-radius: ${SPACING.spacing2};
   max-height: ${SPACING.spacing6};
 
@@ -34,40 +29,22 @@ const StyledOverflowIcon: BtnComponent = styled(Btn)`
 `
 
 export const OverflowBtn = (
-  props: React.ButtonHTMLAttributes<HTMLButtonElement> | OverflowBtnProps
+  props: React.ComponentProps<typeof Btn>
 ): JSX.Element | null => {
   return (
-    <StyledOverflowIcon {...props}>
+    <Btn css={overflowButtonStyles} {...props}>
       <svg
         width="19"
         height="31"
         viewBox="0 0 19 31"
-        fill={COLORS.medGrey}
+        fill={COLORS.darkGrey}
         xmlns="http://www.w3.org/2000/svg"
       >
-        <circle
-          cx="9.5"
-          cy="9.5"
-          r="1.5"
-          transform="rotate(90 9.5 9.5)"
-          fill={COLORS.darkGrey}
-        />
-        <circle
-          cx="9.5"
-          cy="15.5"
-          r="1.5"
-          transform="rotate(90 9.5 15.5)"
-          fill={COLORS.darkGrey}
-        />
-        <circle
-          cx="9.5"
-          cy="21.5"
-          r="1.5"
-          transform="rotate(90 9.5 21.5)"
-          fill={COLORS.darkGrey}
-        />
+        <circle cx="9.5" cy="9.5" r="1.5" />
+        <circle cx="9.5" cy="15.5" r="1.5" />
+        <circle cx="9.5" cy="21.5" r="1.5" />
       </svg>
       {props.children}
-    </StyledOverflowIcon>
+    </Btn>
   )
 }

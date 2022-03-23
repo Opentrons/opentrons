@@ -21,6 +21,7 @@ const initialFlags: Flags = {
     process.env.OT_PD_DISABLE_MODULE_RESTRICTIONS === '1' || false,
   OT_PD_ENABLE_HEATER_SHAKER:
     process.env.OT_PD_ENABLE_HEATER_SHAKER === '1' || false,
+  OT_PD_ENABLE_SCHEMA_V6: process.env.OT_PD_ENABLE_SCHEMA_V6 === '1' || false,
 }
 // @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
 // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081

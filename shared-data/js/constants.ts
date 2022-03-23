@@ -106,12 +106,14 @@ export const MAGNETIC_MODULE_TYPE_LABWARE_BOTTOM_HEIGHT = 0
 
 export const CELSIUS: '°C' = '°C'
 export const TEMP_MIN = 4
-export const TEMP_MAX = 99
+export const TEMP_MAX = 95
 export const TEMP_LID_MIN = 37
 export const TEMP_LID_MAX = 110
 
 // Heater shaker module info
-
 export const RPM: 'RPM' = 'RPM'
 export const HS_RPM_MIN = 200
 export const HS_RPM_MAX = 3000
+
+export const OT2_STANDARD_MODEL: 'OT-2 Standard' = 'OT-2 Standard'
+export const OT2_STANDARD_DECKID: 'ot2_standard' = 'ot2_standard'

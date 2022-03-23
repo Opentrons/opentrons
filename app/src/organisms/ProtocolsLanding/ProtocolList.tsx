@@ -14,9 +14,16 @@ import { UploadInput } from './UploadInput'
 import { ProtocolCard } from './ProtocolCard'
 import { EmptyStateLinks } from './EmptyStateLinks'
 
-export function ProtocolsList(): JSX.Element | null {
+import type { StoredProtocolData } from '../../redux/protocol-storage'
+
+interface ProtocolListProps {
+  storedProtocols: StoredProtocolData[]
+}
+export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
   const [showSlideout, setShowSlideout] = React.useState(false)
   const { t } = useTranslation('protocol_info')
+  const { storedProtocols } = props
+
   return (
     <Box padding={SPACING.spacing4}>
       <Flex
@@ -38,7 +45,9 @@ export function ProtocolsList(): JSX.Element | null {
         {t('all_protocols')}
       </StyledText>
       <Flex flexDirection="column">
-        <ProtocolCard />
+        {storedProtocols.map(storedProtocol => (
+          <ProtocolCard key={storedProtocol.protocolKey} {...storedProtocol} />
+        ))}
       </Flex>
       <EmptyStateLinks title={t('create_or_download')} />
       <Slideout
@@ -48,11 +57,7 @@ export function ProtocolsList(): JSX.Element | null {
         height="100%"
       >
         <Box height="26rem">
-          <UploadInput
-            onUpload={() => {
-              console.log('todo')
-            }}
-          />
+          <UploadInput onUpload={() => setShowSlideout(false)} />
         </Box>
       </Slideout>
     </Box>
