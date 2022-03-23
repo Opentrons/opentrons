@@ -34,13 +34,14 @@ interface ModuleOverflowMenuProps {
   module: AttachedModule
   handleClick: (isSecondary: boolean) => void
   handleAboutClick: () => void
+  handleTestShakeClick: () => void
 }
 
 export const ModuleOverflowMenu = (
   props: ModuleOverflowMenuProps
 ): JSX.Element | null => {
   const { t } = useTranslation(['device_details', 'heater_shaker'])
-  const { module, handleClick, handleAboutClick } = props
+  const { module, handleClick, handleAboutClick, handleTestShakeClick } = props
   const [showWizard, setShowWizard] = React.useState<boolean>(false)
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const [targetProps, tooltipProps] = useHoverTooltip()
@@ -273,7 +274,7 @@ export const ModuleOverflowMenu = (
   const TestShakeBtn = (
     <MenuItem
       minWidth="10rem"
-      onClick={() => console.log('test shake')}
+      onClick={() => handleTestShakeClick()}
       key={`hs_test_shake_btn_${module.model}`}
     >
       {t('test_shake', { ns: 'heater_shaker' })}

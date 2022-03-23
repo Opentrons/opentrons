@@ -8,6 +8,7 @@ import {
   getAttachedModules,
   HEATERSHAKER_MODULE_TYPE,
 } from '../../../redux/modules'
+import { PrimaryButton, SecondaryButton } from '../../../atoms/Buttons'
 import { Introduction } from './Introduction'
 import { KeyParts } from './KeyParts'
 import { AttachModule } from './AttachModule'
@@ -15,15 +16,9 @@ import { AttachAdapter } from './AttachAdapter'
 import { PowerOn } from './PowerOn'
 import { TestShake } from './TestShake'
 import {
-  ALIGN_CENTER,
-  COLORS,
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  PrimaryBtn,
-  SecondaryBtn,
-  SPACING,
-  TEXT_TRANSFORM_NONE,
   JUSTIFY_FLEX_END,
   Tooltip,
   useHoverTooltip,
@@ -110,25 +105,17 @@ export const HeaterShakerWizard = (
           }
         >
           {currentPage > 0 ? (
-            <SecondaryBtn
-              alignItems={ALIGN_CENTER}
-              color={COLORS.blue}
-              borderRadius={SPACING.spacingS}
-              textTransform={TEXT_TRANSFORM_NONE}
+            <SecondaryButton
               data-testid={`wizard_back_btn`}
               onClick={() => setCurrentPage(currentPage => currentPage - 1)}
             >
               {t('back')}
-            </SecondaryBtn>
+            </SecondaryButton>
           ) : null}
           {currentPage <= 5 ? (
-            <PrimaryBtn
-              alignItems={ALIGN_CENTER}
+            <PrimaryButton
               disabled={!isPrimaryCTAEnabled}
               {...targetProps}
-              backgroundColor={COLORS.blue}
-              borderRadius={SPACING.spacingS}
-              textTransform={TEXT_TRANSFORM_NONE}
               data-testid={`wizard_next_btn`}
               onClick={
                 currentPage === 5
@@ -142,7 +129,7 @@ export const HeaterShakerWizard = (
                   {t('module_is_not_connected')}
                 </Tooltip>
               ) : null}
-            </PrimaryBtn>
+            </PrimaryButton>
           ) : null}
         </Flex>
       </Interstitial>

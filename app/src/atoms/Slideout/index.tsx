@@ -33,7 +33,7 @@ interface Props extends StyleProps {
 const EXPANDED_STYLE = css`
   animation-duration: 300ms;
   animation-name: slidein;
-  overflow: hidden;
+  overflow-x: hidden;
   width: 19.5rem;
   max-width: 19.5rem;
 
