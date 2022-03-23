@@ -55,6 +55,15 @@ export const PrimaryButton = styled(NewPrimaryBtn)`
   ${styleProps}
 `
 
+export const AlertPrimaryButton = styled(NewAlertPrimaryBtn)`
+  background-color: ${COLORS.error};
+  border-radius: ${BORDERS.radiusSoftCorners};
+  text-transform: ${TYPOGRAPHY.textTransformNone};
+  ${TYPOGRAPHY.pSemiBold}
+
+  ${styleProps}
+`
+
 export const SecondaryButton = styled(NewSecondaryBtn)`
   ${TYPOGRAPHY.pSemiBold}
   color: ${COLORS.blue};
