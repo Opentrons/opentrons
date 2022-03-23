@@ -4,8 +4,9 @@ import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
+import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
-import { useLights, useRobot, useIsProtocolRunning } from '../hooks'
+import { useLights, useRobot } from '../hooks'
 import { RobotStatusBanner } from '../RobotStatusBanner'
 import { RobotOverview } from '../RobotOverview'
 
@@ -17,8 +18,8 @@ const OT2_PNG_FILE_NAME = 'OT2-R_HERO.png'
 
 const mockUseLights = useLights as jest.MockedFunction<typeof useLights>
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
-const mockUseIsProtocolRunning = useIsProtocolRunning as jest.MockedFunction<
-  typeof useIsProtocolRunning
+const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
+  typeof useCurrentRunId
 >
 const mockRobotStatusBanner = RobotStatusBanner as jest.MockedFunction<
   typeof RobotStatusBanner
@@ -45,7 +46,7 @@ describe('RobotOverview', () => {
     })
     mockUseRobot.mockReturnValue(mockConnectableRobot)
     mockRobotStatusBanner.mockReturnValue(<div>Mock RobotStatusBanner</div>)
-    mockUseIsProtocolRunning.mockReturnValue(false)
+    mockUseCurrentRunId.mockReturnValue(null)
   })
   afterEach(() => {
     jest.resetAllMocks()
