@@ -5,13 +5,13 @@ import { useTranslation } from 'react-i18next'
 
 import {
   selectors as robotSelectors,
-  actions as robotActions,
+  connect,
+  disconnect,
 } from '../../../redux/robot'
 
 import {
   Card,
   SecondaryBtn,
-  Icon,
   Flex,
   TEXT_TRANSFORM_CAPITALIZE,
   JUSTIFY_SPACE_BETWEEN,
@@ -33,25 +33,29 @@ export function StatusCard(props: Props): JSX.Element {
   const { t } = useTranslation('robot_connection')
 
   const connectable = robot.status === CONNECTABLE
-  const connected = robot.connected != null && robot.connected === true
+  const connected = robot.connected != null && robot.connected
   const sessionStatus = useSelector(robotSelectors.getSessionStatus)
-  const connectRequest = useSelector(robotSelectors.getConnectRequest)
-  const connectButtonDisabled = !connectable || connectRequest.inProgress
+  const connectButtonDisabled = !connectable
 
   let status = t('connection_status', { context: 'default' })
   if (!connectable) {
     status = t('connection_status', { context: 'not_connectable' })
   } else if (!connected) {
     status = t('connection_status', { context: 'disconnected' })
-  } else if (sessionStatus) {
+  } else if (sessionStatus !== '') {
+    // TODO(mc, 2022-03-07): this block is unreachable in v5.
+    // The value of robotSelectors.getSessionStatus will always
+    // be the initial value of an empty string
     status = sessionStatus
   }
 
+  // TODO(mc, 2022-03-07): consolidate into a `useToggleConnect` hook;
+  // see app/src/pages/Robots/ConnectPanel/RobotItem.tsx
   const handleClick: React.MouseEventHandler = () => {
     if (connected) {
-      dispatch(robotActions.disconnect())
+      dispatch(disconnect())
     } else {
-      dispatch(robotActions.connect(robot.name))
+      dispatch(connect(robot.name))
     }
   }
 
@@ -64,13 +68,7 @@ export function StatusCard(props: Props): JSX.Element {
           valueProps={{ textTransform: TEXT_TRANSFORM_CAPITALIZE }}
         />
         <SecondaryBtn onClick={handleClick} disabled={connectButtonDisabled}>
-          {connected ? (
-            t('disconnect')
-          ) : connectRequest.name === robot.name ? (
-            <Icon name="ot-spinner" height="1em" spin />
-          ) : (
-            t('connect')
-          )}
+          {connected ? t('disconnect') : t('connect')}
         </SecondaryBtn>
       </Flex>
     </Card>

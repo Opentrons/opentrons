@@ -76,7 +76,7 @@ def test_get_labware_data_bad_id() -> None:
     """get_labware_data_by_id should raise if labware ID doesn't exist."""
     subject = get_labware_view()
 
-    with pytest.raises(errors.LabwareDoesNotExistError):
+    with pytest.raises(errors.LabwareNotLoadedError):
         subject.get("asdfghjkl")
 
 
@@ -85,6 +85,12 @@ def test_get_labware_data_by_id() -> None:
     subject = get_labware_view(labware_by_id={"plate-id": plate})
 
     assert subject.get("plate-id") == plate
+
+
+@pytest.mark.xfail(strict=True, raises=NotImplementedError)
+def test_get_id_by_module() -> None:  # noqa: D103
+    subject = get_labware_view()
+    _ = subject.get_id_by_module(module_id="module-id")
 
 
 def test_get_labware_definition(well_plate_def: LabwareDefinition) -> None:
@@ -302,6 +308,13 @@ def test_get_labware_uri_from_definition(tip_rack_def: LabwareDefinition) -> Non
     assert result == "some-tip-rack-uri"
 
 
+def test_get_labware_uri_from_full_definition(tip_rack_def: LabwareDefinition) -> None:
+    """It should be able to construct a URI given a full definition."""
+    subject = get_labware_view()
+    result = subject.get_uri_from_definition(tip_rack_def)
+    assert result == "opentrons/opentrons_96_tiprack_300ul/1"
+
+
 def test_is_tiprack(
     tip_rack_def: LabwareDefinition, reservoir_def: LabwareDefinition
 ) -> None:
@@ -347,6 +360,12 @@ def test_get_dimensions(well_plate_def: LabwareDefinition) -> None:
         y=well_plate_def.dimensions.yDimension,
         z=well_plate_def.dimensions.zDimension,
     )
+
+
+@pytest.mark.xfail(strict=True, raises=NotImplementedError)
+def test_get_default_magnet_height() -> None:  # noqa: D103
+    subject = get_labware_view()
+    _ = subject.get_default_magnet_height("labware-id")
 
 
 def test_get_deck_definition(standard_deck_def: DeckDefinitionV2) -> None:
@@ -438,7 +457,7 @@ def test_get_labware_offset_vector() -> None:
         labware_without_offset.id
     ) == LabwareOffsetVector(x=0, y=0, z=0)
 
-    with pytest.raises(errors.LabwareDoesNotExistError):
+    with pytest.raises(errors.LabwareNotLoadedError):
         subject.get_labware_offset_vector("wrong-labware-id")
 
 

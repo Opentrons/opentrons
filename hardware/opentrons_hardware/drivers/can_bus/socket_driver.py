@@ -6,9 +6,9 @@ import struct
 import asyncio
 
 from . import ArbitrationId
-from opentrons_ot3_firmware import CanMessage
+from opentrons_hardware.firmware_bindings import CanMessage
 from .abstract_driver import AbstractCanDriver
-
+from .errors import CanError
 
 log = logging.getLogger(__name__)
 
@@ -30,7 +30,6 @@ class SocketDriver(AbstractCanDriver):
         """
         self._reader = reader
         self._writer = writer
-        self._buffer = b""
 
     @classmethod
     async def build(cls, host: str, port: int) -> SocketDriver:
@@ -59,22 +58,20 @@ class SocketDriver(AbstractCanDriver):
 
     async def read(self) -> CanMessage:
         """Read a message."""
-        header = await self._read_buff(self.header_length)
-        arbitration_id, length = struct.unpack(">LL", header)
+        try:
+            header = await self._reader.readexactly(self.header_length)
+            arbitration_id, length = struct.unpack(">LL", header)
+        except asyncio.IncompleteReadError as e:
+            raise CanError(str(e))
 
         if length > 0:
-            data = await self._read_buff(length)
+            try:
+                data = await self._reader.readexactly(length)
+            except asyncio.IncompleteReadError as e:
+                raise CanError(str(e))
         else:
             data = b""
         return CanMessage(arbitration_id=ArbitrationId(id=arbitration_id), data=data)
-
-    async def _read_buff(self, min_length: int) -> bytes:
-        """Read a minimum of min_length bytes."""
-        while len(self._buffer) < min_length:
-            self._buffer += await self._reader.read(min_length - len(self._buffer))
-        ret = self._buffer[:min_length]
-        self._buffer = self._buffer[min_length:]
-        return ret
 
     def shutdown(self) -> None:
         """Close the driver."""

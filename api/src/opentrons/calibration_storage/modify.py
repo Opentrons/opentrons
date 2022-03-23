@@ -27,7 +27,7 @@ if typing.TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
-def _add_to_index_offset_file(parent: str, slot: str, uri: str, lw_hash: str):
+def _add_to_index_offset_file(parent: str, slot: str, uri: str, lw_hash: str) -> None:
     """
     A helper method to create or add to an index file so that calibration
     files can be looked up by their hash to reveal the labware uri and
@@ -64,7 +64,7 @@ def _add_to_index_offset_file(parent: str, slot: str, uri: str, lw_hash: str):
 
 def add_existing_labware_to_index_file(
     definition: "LabwareDefinition", parent: str = "", slot: str = ""
-):
+) -> None:
     labware_hash = helpers.hash_labware_def(definition)
     uri = helpers.uri_from_definition(definition)
     _add_to_index_offset_file(parent, slot, uri, labware_hash)
@@ -76,7 +76,7 @@ def save_labware_calibration(
     delta: Point,
     slot: str = "",
     parent: str = "",
-):
+) -> None:
     """
     Function to be used whenever an updated delta is found for the first well
     of a given labware. If an offset file does not exist, create the file
@@ -102,7 +102,7 @@ def save_labware_calibration(
 def create_tip_length_data(
     definition: "LabwareDefinition",
     length: float,
-    cal_status: local_types.CalibrationStatus = None,
+    cal_status: typing.Optional[local_types.CalibrationStatus] = None,
 ) -> "PipTipLengthCalibration":
     """
     Function to correctly format tip length data.
@@ -135,7 +135,10 @@ def create_tip_length_data(
     return data
 
 
-def _save_custom_tiprack_definition(labware_uri: str, definition: "LabwareDefinition"):
+def _save_custom_tiprack_definition(
+    labware_uri: str,
+    definition: "LabwareDefinition",
+) -> None:
     namespace, load_name, version = labware_uri.split("/")
     custom_tr_dir_path = config.get_custom_tiprack_def_path()
     custom_namespace_dir = custom_tr_dir_path / f"{namespace}/{load_name}"
@@ -145,7 +148,10 @@ def _save_custom_tiprack_definition(labware_uri: str, definition: "LabwareDefini
     io.save_to_file(custom_tr_def_path, definition)
 
 
-def _helper_offset_data_format(filepath: str, delta: Point) -> dict:
+def _helper_offset_data_format(
+    filepath: str,
+    delta: Point,
+) -> typing.Dict[str, typing.Any]:
     if not Path(filepath).is_file():
         calibration_data = {
             "default": {
@@ -160,7 +166,7 @@ def _helper_offset_data_format(filepath: str, delta: Point) -> dict:
     return calibration_data
 
 
-def _append_to_index_tip_length_file(pip_id: str, lw_hash: str):
+def _append_to_index_tip_length_file(pip_id: str, lw_hash: str) -> None:
     index_file = config.get_tip_length_cal_path() / "index.json"
     try:
         index_data = io.read_cal_file(str(index_file))
@@ -175,7 +181,9 @@ def _append_to_index_tip_length_file(pip_id: str, lw_hash: str):
     io.save_to_file(index_file, index_data)
 
 
-def save_tip_length_calibration(pip_id: str, tip_length_cal: "PipTipLengthCalibration"):
+def save_tip_length_calibration(
+    pip_id: str, tip_length_cal: "PipTipLengthCalibration"
+) -> None:
     """
     Function used to save tip length calibration to file.
 
@@ -204,9 +212,9 @@ def save_robot_deck_attitude(
     transform: local_types.AttitudeMatrix,
     pip_id: typing.Optional[str],
     lw_hash: typing.Optional[str],
-    source: local_types.SourceType = None,
-    cal_status: local_types.CalibrationStatus = None,
-):
+    source: typing.Optional[local_types.SourceType] = None,
+    cal_status: typing.Optional[local_types.CalibrationStatus] = None,
+) -> None:
     robot_dir = config.get_opentrons_path("robot_calibration_dir")
     robot_dir.mkdir(parents=True, exist_ok=True)
     gantry_path = robot_dir / "deck_calibration.json"
@@ -229,7 +237,7 @@ def save_robot_deck_attitude(
     io.save_to_file(gantry_path, gantry_dict)
 
 
-def _add_to_pipette_offset_index_file(pip_id: str, mount: Mount):
+def _add_to_pipette_offset_index_file(pip_id: str, mount: Mount) -> None:
     index_file = config.get_opentrons_path("pipette_calibration_dir") / "index.json"
     try:
         index_data = index_data = io.read_cal_file(str(index_file))
@@ -251,8 +259,8 @@ def save_pipette_calibration(
     mount: Mount,
     tiprack_hash: str,
     tiprack_uri: str,
-    cal_status: local_types.CalibrationStatus = None,
-):
+    cal_status: typing.Optional[local_types.CalibrationStatus] = None,
+) -> None:
     pip_dir = config.get_opentrons_path("pipette_calibration_dir") / mount.name.lower()
     pip_dir.mkdir(parents=True, exist_ok=True)
     if cal_status:
@@ -298,7 +306,18 @@ def mark_bad(
     ...
 
 
-def mark_bad(calibration, source_marked_bad: local_types.SourceType):
+def mark_bad(
+    calibration: typing.Union[
+        local_types.DeckCalibration,
+        local_types.PipetteOffsetCalibration,
+        local_types.TipLengthCalibration,
+    ],
+    source_marked_bad: local_types.SourceType,
+) -> typing.Union[
+    local_types.DeckCalibration,
+    local_types.PipetteOffsetCalibration,
+    local_types.TipLengthCalibration,
+]:
     caldict = asdict(calibration)
     # remove current status key
     del caldict["status"]

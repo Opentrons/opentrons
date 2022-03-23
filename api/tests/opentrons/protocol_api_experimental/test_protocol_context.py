@@ -32,35 +32,35 @@ from opentrons.protocol_api_experimental import (
 @pytest.fixture(scope="session")
 def magdeck_v1_def() -> ModuleDefinition:
     """Get the definition of a V1 magdeck."""
-    definition = load_shared_data("module/definitions/2/magneticModuleV1.json")
+    definition = load_shared_data("module/definitions/3/magneticModuleV1.json")
     return ModuleDefinition.parse_raw(definition)
 
 
 @pytest.fixture(scope="session")
 def magdeck_v2_def() -> ModuleDefinition:
-    """Get the definition of a V1 magdeck."""
-    definition = load_shared_data("module/definitions/2/magneticModuleV2.json")
+    """Get the definition of a V2 magdeck."""
+    definition = load_shared_data("module/definitions/3/magneticModuleV2.json")
     return ModuleDefinition.parse_raw(definition)
 
 
 @pytest.fixture(scope="session")
 def tempdeck_v2_def() -> ModuleDefinition:
-    """Get the definition of a V1 tempdeck."""
-    definition = load_shared_data("module/definitions/2/temperatureModuleV2.json")
+    """Get the definition of a V2 tempdeck."""
+    definition = load_shared_data("module/definitions/3/temperatureModuleV2.json")
     return ModuleDefinition.parse_raw(definition)
 
 
 @pytest.fixture(scope="session")
 def tempdeck_v1_def() -> ModuleDefinition:
     """Get the definition of a V1 tempdeck."""
-    definition = load_shared_data("module/definitions/2/temperatureModuleV1.json")
+    definition = load_shared_data("module/definitions/3/temperatureModuleV1.json")
     return ModuleDefinition.parse_raw(definition)
 
 
 @pytest.fixture(scope="session")
 def thermocycler_v1_def() -> ModuleDefinition:
-    """Get the definition of a V2 thermocycler."""
-    definition = load_shared_data("module/definitions/2/thermocyclerModuleV1.json")
+    """Get the definition of a V1 thermocycler."""
+    definition = load_shared_data("module/definitions/3/thermocyclerModuleV1.json")
     return ModuleDefinition.parse_raw(definition)
 
 
@@ -164,7 +164,7 @@ def test_load_pipette_with_replace(subject: ProtocolContext) -> None:
     subject.load_pipette(pipette_name="p300_single", mount="left", replace=True)
 
 
-def test_load_labware(
+def test_load_labware_explicit_namespace_and_version(
     decoy: Decoy,
     minimal_labware_def: labware_dict_types.LabwareDefinition,
     engine_client: SyncClient,
@@ -175,8 +175,8 @@ def test_load_labware(
         engine_client.load_labware(
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
             load_name="some_labware",
-            namespace="opentrons",
-            version=1,
+            namespace="some_explicit_namespace",
+            version=9001,
         )
     ).then_return(
         pe_commands.LoadLabwareResult(
@@ -189,8 +189,8 @@ def test_load_labware(
     result = subject.load_labware(
         load_name="some_labware",
         location=5,
-        namespace="opentrons",
-        version=1,
+        namespace="some_explicit_namespace",
+        version=9001,
     )
 
     assert result == Labware(labware_id="abc123", engine_client=engine_client)
@@ -300,7 +300,10 @@ def test_load_magnetic_module(
     )
 
     result = subject.load_module(module_name=module_name, location="3")
-    assert result == module_contexts.MagneticModuleContext(module_id="abc123")
+    assert result == module_contexts.MagneticModuleContext(
+        engine_client=engine_client,
+        module_id="abc123",
+    )
 
 
 @pytest.mark.parametrize(
@@ -415,3 +418,16 @@ def test_invalid_load_module_location(
     """It should require locations for non-thermocycler modules."""
     with pytest.raises(errors.InvalidModuleLocationError):
         subject.load_module(module_name=module_name, location=None)
+
+
+def test_set_rail_lights(
+    decoy: Decoy,
+    engine_client: SyncClient,
+    subject: ProtocolContext,
+) -> None:
+    """It should be able to issue a setRaillights command through the client."""
+    subject.set_rail_lights(on=True)
+    decoy.verify(engine_client.set_rail_lights(True), times=1)
+
+    subject.set_rail_lights(on=False)
+    decoy.verify(engine_client.set_rail_lights(False), times=1)

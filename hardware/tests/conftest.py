@@ -3,8 +3,8 @@ from typing import List
 
 import pytest
 from mock.mock import AsyncMock
-from opentrons_ot3_firmware import ArbitrationId
-from opentrons_ot3_firmware.messages import MessageDefinition
+from opentrons_hardware.firmware_bindings import ArbitrationId
+from opentrons_hardware.firmware_bindings.messages import MessageDefinition
 
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons_hardware.drivers.can_bus.can_messenger import MessageListenerCallback

@@ -3,7 +3,7 @@ import asyncio
 import logging
 import re
 from pkg_resources import parse_version
-from typing import Mapping, Optional
+from typing import Mapping, Optional, cast, TypeVar
 from opentrons.config import IS_ROBOT, ROBOT_FIRMWARE_DIR
 from opentrons.hardware_control.util import use_or_initialize_loop
 from opentrons.drivers.rpi_drivers.types import USBPort
@@ -11,6 +11,8 @@ from ..execution_manager import ExecutionManager
 from .types import BundledFirmware, UploadFunction, LiveData
 
 mod_log = logging.getLogger(__name__)
+
+TaskPayload = TypeVar("TaskPayload")
 
 
 class AbstractModule(abc.ABC):
@@ -24,9 +26,9 @@ class AbstractModule(abc.ABC):
         usb_port: USBPort,
         execution_manager: ExecutionManager,
         simulating: bool = False,
-        loop: asyncio.AbstractEventLoop = None,
-        sim_model: str = None,
-        **kwargs,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
+        sim_model: Optional[str] = None,
+        **kwargs: float,
     ) -> "AbstractModule":
         """Modules should always be created using this factory.
 
@@ -41,8 +43,8 @@ class AbstractModule(abc.ABC):
         usb_port: USBPort,
         execution_manager: ExecutionManager,
         simulating: bool = False,
-        loop: asyncio.AbstractEventLoop = None,
-        sim_model: str = None,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
+        sim_model: Optional[str] = None,
     ) -> None:
         self._port = port
         self._usb_port = usb_port
@@ -50,12 +52,22 @@ class AbstractModule(abc.ABC):
         self._execution_manager = execution_manager
         self._bundled_fw: Optional[BundledFirmware] = self.get_bundled_fw()
 
+    @staticmethod
+    def sort_key(inst: "AbstractModule") -> int:
+        usb_port = inst.usb_port
+
+        if usb_port.hub is not None:
+            primary_port = usb_port.hub
+            secondary_port = usb_port.port_number
+        else:
+            primary_port = usb_port.port_number
+            secondary_port = 0
+
+        return primary_port * 1000 + secondary_port
+
     @property
     def loop(self) -> asyncio.AbstractEventLoop:
         return self._loop
-
-    def set_loop(self, loop: asyncio.AbstractEventLoop) -> None:
-        self._loop = loop
 
     def get_bundled_fw(self) -> Optional[BundledFirmware]:
         """Get absolute path to bundled version of module fw if available."""
@@ -82,18 +94,18 @@ class AbstractModule(abc.ABC):
         if self.device_info and self._bundled_fw:
             device_version = parse_version(self.device_info["version"])
             available_version = parse_version(self._bundled_fw.version)
-            return available_version > device_version
+            return cast(bool, available_version > device_version)
         return False
 
-    async def wait_for_is_running(self):
+    async def wait_for_is_running(self) -> None:
         if not self.is_simulated:
             await self._execution_manager.wait_for_is_running()
 
-    async def make_cancellable(self, task: asyncio.Task):
-        self._execution_manager.register_cancellable_task(task)
+    async def make_cancellable(self, task: "asyncio.Task[TaskPayload]") -> None:
+        await self._execution_manager.register_cancellable_task(task)
 
     @abc.abstractmethod
-    def deactivate(self):
+    async def deactivate(self) -> None:
         """Deactivate the module."""
         pass
 
@@ -145,7 +157,7 @@ class AbstractModule(abc.ABC):
         pass
 
     @property
-    def bundled_fw(self):
+    def bundled_fw(self) -> Optional[BundledFirmware]:
         return self._bundled_fw
 
     @abc.abstractmethod

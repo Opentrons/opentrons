@@ -11,9 +11,8 @@ from opentrons.drivers.rpi_drivers.types import USBPort
 def usb_port():
     return USBPort(
         name="",
-        sub_names=[],
         hub=None,
-        port_number=None,
+        port_number=0,
         device_path="/dev/ot_module_sim_tempdeck0",
     )
 
@@ -25,7 +24,7 @@ async def test_sim_initialization(loop, usb_port):
         which="tempdeck",
         simulating=True,
         loop=loop,
-        execution_manager=ExecutionManager(loop=loop),
+        execution_manager=ExecutionManager(),
     )
     assert isinstance(temp, modules.AbstractModule)
 
@@ -37,7 +36,7 @@ async def test_sim_state(loop, usb_port):
         simulating=True,
         interrupt_callback=lambda x: None,
         loop=loop,
-        execution_manager=ExecutionManager(loop=loop),
+        execution_manager=ExecutionManager(),
     )
     await temp.wait_next_poll()
     assert temp.temperature == 0
@@ -60,7 +59,7 @@ async def test_sim_update(loop, usb_port):
         simulating=True,
         interrupt_callback=lambda x: None,
         loop=loop,
-        execution_manager=ExecutionManager(loop=loop),
+        execution_manager=ExecutionManager(),
         polling_frequency=0,
     )
     await temp.set_temperature(10)
@@ -81,7 +80,7 @@ async def test_revision_model_parsing(loop, usb_port):
         usb_port=usb_port,
         interrupt_callback=lambda x: None,
         loop=loop,
-        execution_manager=ExecutionManager(loop=loop),
+        execution_manager=ExecutionManager(),
         polling_frequency=0,
     )
     mag._device_info["model"] = "temp_deck_v20"

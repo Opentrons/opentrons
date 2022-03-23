@@ -6,13 +6,13 @@ from asyncio import Queue
 import pytest
 from mock import AsyncMock, Mock
 
-from opentrons_ot3_firmware.constants import (
+from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     MessageId,
 )
 
-from opentrons_ot3_firmware.message import CanMessage
-from opentrons_ot3_firmware.arbitration_id import (
+from opentrons_hardware.firmware_bindings.message import CanMessage
+from opentrons_hardware.firmware_bindings.arbitration_id import (
     ArbitrationId,
     ArbitrationIdParts,
 )
@@ -21,18 +21,17 @@ from opentrons_hardware.drivers.can_bus.can_messenger import (
     MessageListenerCallback,
     WaitableCallback,
 )
-from opentrons_ot3_firmware.messages import MessageDefinition
-from opentrons_ot3_firmware.messages.message_definitions import (
+from opentrons_hardware.firmware_bindings.messages import MessageDefinition
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     HeartbeatRequest,
     MoveCompleted,
     GetMoveGroupRequest,
 )
-from opentrons_ot3_firmware.messages.payloads import (
-    EmptyPayload,
+from opentrons_hardware.firmware_bindings.messages.payloads import (
     MoveCompletedPayload,
     MoveGroupRequestPayload,
 )
-from opentrons_ot3_firmware.utils import UInt8Field, UInt32Field
+from opentrons_hardware.firmware_bindings.utils import UInt8Field, UInt32Field
 
 
 @pytest.fixture
@@ -59,7 +58,7 @@ def subject(mock_driver: AsyncMock) -> CanMessenger:
 @pytest.mark.parametrize(
     "node_id,message",
     [
-        [NodeId.head, HeartbeatRequest(payload=EmptyPayload())],
+        [NodeId.head, HeartbeatRequest()],
         [
             NodeId.gantry_x,
             MoveCompleted(

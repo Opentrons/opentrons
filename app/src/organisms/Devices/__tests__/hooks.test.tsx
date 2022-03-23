@@ -7,6 +7,25 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 
 import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
+import {
+  fetchCalibrationStatus,
+  fetchPipetteOffsetCalibrations,
+  fetchTipLengthCalibrations,
+  getDeckCalibrationData,
+  getPipetteOffsetCalibrations,
+  getTipLengthCalibrations,
+} from '../../../redux/calibration'
+import { mockDeckCalData } from '../../../redux/calibration/__fixtures__'
+import {
+  mockPipetteOffsetCalibration1,
+  mockPipetteOffsetCalibration2,
+  mockPipetteOffsetCalibration3,
+} from '../../../redux/calibration/pipette-offset/__fixtures__'
+import {
+  mockTipLengthCalibration1,
+  mockTipLengthCalibration2,
+  mockTipLengthCalibration3,
+} from '../../../redux/calibration/tip-length/__fixtures__'
 import { getDiscoverableRobotByName } from '../../../redux/discovery'
 import {
   mockConnectableRobot,
@@ -26,33 +45,55 @@ import {
   updateLights,
   getLightsOn,
 } from '../../../redux/robot-controls'
-import { useRunStatus } from '../../RunTimeControl/hooks'
+import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
 
 import type { DispatchApiRequestType } from '../../../redux/robot-api'
 
 import {
   useAttachedModules,
   useAttachedPipettes,
+  useDeckCalibrationData,
   useIsProtocolRunning,
   useIsRobotViewable,
   useLights,
+  usePipetteOffsetCalibrations,
   useRobot,
+  useTipLengthCalibrations,
 } from '../hooks'
 
 jest.mock('../../../organisms/RunTimeControl/hooks')
+jest.mock('../../../redux/calibration')
 jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/modules')
 jest.mock('../../../redux/pipettes')
 jest.mock('../../../redux/robot-api')
 jest.mock('../../../redux/robot-controls')
 
+const mockFetchCalibrationStatus = fetchCalibrationStatus as jest.MockedFunction<
+  typeof fetchCalibrationStatus
+>
+const mockFetchPipetteOffsetCalibrations = fetchPipetteOffsetCalibrations as jest.MockedFunction<
+  typeof fetchPipetteOffsetCalibrations
+>
+const mockFetchTipLengthCalibrations = fetchTipLengthCalibrations as jest.MockedFunction<
+  typeof fetchTipLengthCalibrations
+>
+const mockGetDeckCalibrationData = getDeckCalibrationData as jest.MockedFunction<
+  typeof getDeckCalibrationData
+>
+const mockGetPipetteOffsetCalibrations = getPipetteOffsetCalibrations as jest.MockedFunction<
+  typeof getPipetteOffsetCalibrations
+>
+const mockGetTipLengthCalibrations = getTipLengthCalibrations as jest.MockedFunction<
+  typeof getTipLengthCalibrations
+>
 const mockFetchLights = fetchLights as jest.MockedFunction<typeof fetchLights>
 const mockGetLightsOn = getLightsOn as jest.MockedFunction<typeof getLightsOn>
 const mockUpdateLights = updateLights as jest.MockedFunction<
   typeof updateLights
 >
-const mockUseRunStatus = useRunStatus as jest.MockedFunction<
-  typeof useRunStatus
+const mockUseCurrentRunStatus = useCurrentRunStatus as jest.MockedFunction<
+  typeof useCurrentRunStatus
 >
 const mockGetDiscoverableRobotByName = getDiscoverableRobotByName as jest.MockedFunction<
   typeof getDiscoverableRobotByName
@@ -278,7 +319,7 @@ describe('useIsProtocolRunning hook', () => {
   })
 
   it('returns false when current run record does not exist', () => {
-    when(mockUseRunStatus).calledWith().mockReturnValue(null)
+    when(mockUseCurrentRunStatus).calledWith().mockReturnValue(null)
 
     const { result } = renderHook(() => useIsProtocolRunning(), { wrapper })
 
@@ -286,7 +327,7 @@ describe('useIsProtocolRunning hook', () => {
   })
 
   it('returns false when current run record is idle', () => {
-    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_IDLE)
+    when(mockUseCurrentRunStatus).calledWith().mockReturnValue(RUN_STATUS_IDLE)
 
     const { result } = renderHook(() => useIsProtocolRunning(), { wrapper })
 
@@ -294,7 +335,9 @@ describe('useIsProtocolRunning hook', () => {
   })
 
   it('returns true when current run record is not idle', () => {
-    when(mockUseRunStatus).calledWith().mockReturnValue(RUN_STATUS_RUNNING)
+    when(mockUseCurrentRunStatus)
+      .calledWith()
+      .mockReturnValue(RUN_STATUS_RUNNING)
 
     const { result } = renderHook(() => useIsProtocolRunning(), {
       wrapper,
@@ -353,5 +396,168 @@ describe('useIsRobotViewable hook', () => {
     })
 
     expect(result.current).toEqual(true)
+  })
+})
+
+describe('useDeckCalibrationData hook', () => {
+  let dispatchApiRequest: DispatchApiRequestType
+  let wrapper: React.FunctionComponent<{}>
+  beforeEach(() => {
+    dispatchApiRequest = jest.fn()
+    const queryClient = new QueryClient()
+    wrapper = ({ children }) => (
+      <Provider store={store}>
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      </Provider>
+    )
+    mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, []])
+  })
+  afterEach(() => {
+    resetAllWhenMocks()
+    jest.resetAllMocks()
+  })
+
+  it('returns no deck calibration data when given a null robot name', () => {
+    when(mockGetDeckCalibrationData)
+      .calledWith(undefined as any, null)
+      .mockReturnValue(null)
+
+    const { result } = renderHook(() => useDeckCalibrationData(null), {
+      wrapper,
+    })
+
+    expect(result.current).toEqual(null)
+    expect(dispatchApiRequest).not.toBeCalled()
+  })
+
+  it('returns deck calibration data when given a robot name', () => {
+    when(mockGetDeckCalibrationData)
+      .calledWith(undefined as any, 'otie')
+      .mockReturnValue(mockDeckCalData)
+
+    const { result } = renderHook(() => useDeckCalibrationData('otie'), {
+      wrapper,
+    })
+
+    expect(result.current).toEqual(mockDeckCalData)
+    expect(dispatchApiRequest).toBeCalledWith(
+      mockFetchCalibrationStatus('otie')
+    )
+  })
+})
+
+describe('usePipetteOffsetCalibrations hook', () => {
+  let dispatchApiRequest: DispatchApiRequestType
+  let wrapper: React.FunctionComponent<{}>
+  beforeEach(() => {
+    dispatchApiRequest = jest.fn()
+    const queryClient = new QueryClient()
+    wrapper = ({ children }) => (
+      <Provider store={store}>
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      </Provider>
+    )
+    mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, []])
+  })
+  afterEach(() => {
+    resetAllWhenMocks()
+    jest.resetAllMocks()
+  })
+
+  it('returns no pipette offset calibrations when given a null robot name', () => {
+    when(mockGetPipetteOffsetCalibrations)
+      .calledWith(undefined as any, null)
+      .mockReturnValue([])
+
+    const { result } = renderHook(() => usePipetteOffsetCalibrations(null), {
+      wrapper,
+    })
+
+    expect(result.current).toEqual([])
+    expect(dispatchApiRequest).not.toBeCalled()
+  })
+
+  it('returns pipette offset calibrations when given a robot name', () => {
+    when(mockGetPipetteOffsetCalibrations)
+      .calledWith(undefined as any, 'otie')
+      .mockReturnValue([
+        mockPipetteOffsetCalibration1,
+        mockPipetteOffsetCalibration2,
+        mockPipetteOffsetCalibration3,
+      ])
+
+    const { result } = renderHook(() => usePipetteOffsetCalibrations('otie'), {
+      wrapper,
+    })
+
+    expect(result.current).toEqual([
+      mockPipetteOffsetCalibration1,
+      mockPipetteOffsetCalibration2,
+      mockPipetteOffsetCalibration3,
+    ])
+    expect(dispatchApiRequest).toBeCalledWith(
+      mockFetchPipetteOffsetCalibrations('otie')
+    )
+  })
+})
+
+describe('useTipLengthCalibrations hook', () => {
+  let dispatchApiRequest: DispatchApiRequestType
+  let wrapper: React.FunctionComponent<{}>
+  beforeEach(() => {
+    dispatchApiRequest = jest.fn()
+    const queryClient = new QueryClient()
+    wrapper = ({ children }) => (
+      <Provider store={store}>
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      </Provider>
+    )
+    mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, []])
+  })
+  afterEach(() => {
+    resetAllWhenMocks()
+    jest.resetAllMocks()
+  })
+
+  it('returns no tip length calibrations when given a null robot name', () => {
+    when(mockGetTipLengthCalibrations)
+      .calledWith(undefined as any, null)
+      .mockReturnValue([])
+
+    const { result } = renderHook(() => useTipLengthCalibrations(null), {
+      wrapper,
+    })
+
+    expect(result.current).toEqual([])
+    expect(dispatchApiRequest).not.toBeCalled()
+  })
+
+  it('returns tip length calibrations when given a robot name', () => {
+    when(mockGetTipLengthCalibrations)
+      .calledWith(undefined as any, 'otie')
+      .mockReturnValue([
+        mockTipLengthCalibration1,
+        mockTipLengthCalibration2,
+        mockTipLengthCalibration3,
+      ])
+
+    const { result } = renderHook(() => useTipLengthCalibrations('otie'), {
+      wrapper,
+    })
+
+    expect(result.current).toEqual([
+      mockTipLengthCalibration1,
+      mockTipLengthCalibration2,
+      mockTipLengthCalibration3,
+    ])
+    expect(dispatchApiRequest).toBeCalledWith(
+      mockFetchTipLengthCalibrations('otie')
+    )
   })
 })

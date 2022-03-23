@@ -60,29 +60,19 @@ export function Icon(props: IconProps): JSX.Element | null {
     return null
   }
 
-  const {
-    viewBox,
-    path,
-    fill = 'currentColor',
-    stroke,
-  }: {
-    viewBox: string
-    path: string
-    fill?: string
-    stroke?: string
-  } = ICON_DATA_BY_NAME[name]
+  const { viewBox, path } = ICON_DATA_BY_NAME[name]
 
   return (
     <Svg
       aria-hidden="true"
-      fill={fill}
+      fill="currentColor"
       viewBox={viewBox}
       className={cx(className, { spin })}
       css={spinStyle}
       {...svgProps}
       id={id}
     >
-      <path fillRule="evenodd" d={path} stroke={stroke} />
+      <path fillRule="evenodd" d={path} />
       {props.children}
     </Svg>
   )

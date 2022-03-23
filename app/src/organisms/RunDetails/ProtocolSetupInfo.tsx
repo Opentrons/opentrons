@@ -7,11 +7,14 @@ import {
   SPACING_1,
   SPACING_2,
 } from '@opentrons/components'
-import { getModuleDisplayName, ProtocolFile } from '@opentrons/shared-data'
+import { getModuleDisplayName } from '@opentrons/shared-data'
 import { useCurrentRunPipetteInfoByMount } from '../ProtocolSetup/RunSetupCard/hooks'
 import { useProtocolDetails } from './hooks'
-import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
-import { RunCommandSummary } from '@opentrons/api-client'
+import type {
+  RunTimeCommand,
+  ProtocolAnalysisFile,
+} from '@opentrons/shared-data/protocol/types/schemaV6'
+import type { RunCommandSummary } from '@opentrons/api-client'
 
 interface ProtocolSetupInfoProps {
   setupCommand?: RunTimeCommand | RunCommandSummary
@@ -22,7 +25,7 @@ export const ProtocolSetupInfo = (
 ): JSX.Element | null => {
   const { setupCommand } = props
   const { t } = useTranslation('run_details')
-  const protocolData: ProtocolFile<{}> | null = useProtocolDetails()
+  const protocolData: ProtocolAnalysisFile<{}> | null = useProtocolDetails()
     .protocolData
 
   const protocolPipetteData = useCurrentRunPipetteInfoByMount()

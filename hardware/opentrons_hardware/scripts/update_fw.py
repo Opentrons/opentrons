@@ -9,6 +9,9 @@ from typing_extensions import Final
 
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons_hardware.drivers.can_bus.build import build_driver
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    FirmwareUpdateStartApp,
+)
 from .can_args import add_can_args, build_settings
 from opentrons_hardware.firmware_update import (
     FirmwareUpdateDownloader,
@@ -19,6 +22,7 @@ from opentrons_hardware.firmware_update import (
     pipette_left,
     pipette_right,
     HexRecordProcessor,
+    FirmwareUpdateEraser,
 )
 
 logger = logging.getLogger(__name__)
@@ -74,11 +78,27 @@ async def run(args: argparse.Namespace) -> None:
         ready_wait_time_sec=args.timeout_seconds,
     )
 
+    if not args.no_erase:
+        eraser = FirmwareUpdateEraser(messenger)
+        logger.info(f"Erasing existing FW Update on {target}.")
+        await eraser.run(
+            node_id=target.bootloader_node,
+            timeout_sec=args.timeout_seconds,
+        )
+    else:
+        logger.info("Skipping erase step.")
+
     logger.info(f"Downloading FW to {target.bootloader_node}.")
     await downloader.run(
         node_id=target.bootloader_node,
         hex_processor=hex_processor,
         ack_wait_seconds=args.timeout_seconds,
+    )
+
+    logger.info(f"Restarting FW on {target.system_node}.")
+    await messenger.send(
+        node_id=target.bootloader_node,
+        message=FirmwareUpdateStartApp(),
     )
 
     await messenger.stop()
@@ -113,7 +133,13 @@ def main() -> None:
         default=3,
     )
     parser.add_argument(
-        "--timeout-seconds", help="Number of seconds to wait.", type=float, default=2
+        "--timeout-seconds", help="Number of seconds to wait.", type=float, default=10
+    )
+    parser.add_argument(
+        "--no-erase",
+        help="Don't erase existing application from flash.",
+        action="store_true",
+        default=False,
     )
 
     args = parser.parse_args()

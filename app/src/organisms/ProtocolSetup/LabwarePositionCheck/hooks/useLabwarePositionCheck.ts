@@ -5,6 +5,7 @@ import reduce from 'lodash/reduce'
 import isEqual from 'lodash/isEqual'
 import { getCommand } from '@opentrons/api-client'
 import {
+  getLabwareDefIsStandard,
   getLabwareDisplayName,
   IDENTITY_VECTOR,
   THERMOCYCLER_MODULE_TYPE,
@@ -12,6 +13,7 @@ import {
 import {
   useHost,
   useCreateLabwareOffsetMutation,
+  useCreateLabwareDefinitionMutation,
   useCreateCommandMutation,
 } from '@opentrons/react-api-client'
 import { useTrackEvent } from '../../../../redux/analytics'
@@ -19,6 +21,7 @@ import { useProtocolDetails } from '../../../RunDetails/hooks'
 import {
   useCurrentRunId,
   useCurrentRunCommands,
+  useCurrentProtocol,
 } from '../../../ProtocolUpload/hooks'
 import { getLabwareLocation } from '../../utils/getLabwareLocation'
 import {
@@ -36,12 +39,14 @@ import type {
   VectorOffset,
   LabwareOffsetCreateData,
 } from '@opentrons/api-client'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   CreateCommand,
   ProtocolFile,
   RunTimeCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type {
+  LoadLabwareRunTimeCommand,
   SetupCreateCommand,
   SetupRunTimeCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
@@ -84,6 +89,8 @@ type LPCPrepCommand =
   | HomeCreateCommand
   | SetupRunTimeCommand
   | TCOpenLidCreateCommand
+
+const JOG_COMMAND_TIMEOUT = 10000 // 10 seconds
 
 const useLpcCtaText = (command: LabwarePositionCheckCreateCommand): string => {
   const { protocolData } = useProtocolDetails()
@@ -209,6 +216,10 @@ const isTCOpenCommand = (
 ): command is TCOpenLidCreateCommand =>
   command.commandType === 'thermocycler/openLid'
 
+const isLoadLabwareCommand = (
+  command: RunTimeCommand
+): command is LoadLabwareRunTimeCommand => command.commandType === 'loadLabware'
+
 export function useLabwarePositionCheck(
   addSavePositionCommandData: (commandId: string, labwareId: string) => void,
   savePositionCommandData: SavePositionCommandData
@@ -223,10 +234,7 @@ export function useLabwarePositionCheck(
     commandId: string
   } | null>(null)
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
-  const isJogging = React.useRef(false)
-  const [pendingJogCommandId, setPendingJogCommandId] = React.useState<
-    string | null
-  >(null)
+  const isJogging = React.useRef<boolean>(false)
   const [error, setError] = React.useState<Error | null>(null)
   const [
     showPickUpTipConfirmationModal,
@@ -236,6 +244,8 @@ export function useLabwarePositionCheck(
     IDENTITY_VECTOR
   )
   const { protocolData } = useProtocolDetails()
+  const protocolType = useCurrentProtocol()?.data.protocolType
+  const { createLabwareDefinition } = useCreateLabwareDefinitionMutation()
   const { createLabwareOffset } = useCreateLabwareOffsetMutation()
   const { createCommand } = useCreateCommandMutation()
   const host = useHost()
@@ -351,22 +361,9 @@ export function useLabwarePositionCheck(
     setIsLoading(false)
     setPendingMovementCommandData(null)
   }
-  if (pendingJogCommandId != null) {
-    const isJogCommandComplete = Boolean(
-      robotCommands?.find(
-        (command: RunCommandSummary) =>
-          command.id === pendingJogCommandId &&
-          commandIsComplete(command.status)
-      )
-    )
-    if (isJogCommandComplete) {
-      isJogging.current = false
-    }
-  }
+
   // (sa 11-18-2021): refactor this function after beta release
   const proceed = (): void => {
-    // if a jog command is in flight, ignore this call to proceed
-    if (isJogging.current) return
     setIsLoading(true)
     setCurrentCommandIndex(currentCommandIndex + 1)
     setShowPickUpTipConfirmationModal(false)
@@ -568,6 +565,25 @@ export function useLabwarePositionCheck(
         setError(e)
       })
     })
+    // load custom labware definitions that come from python protocols first, so that subsequent load labware commands can reference them
+    const customLabwareDefinitions: LabwareDefinition2[] =
+      protocolType === 'python' && protocolData != null
+        ? protocolData?.commands
+            .filter(isLoadLabwareCommand)
+            .filter(
+              loadLabwareCommand =>
+                !getLabwareDefIsStandard(loadLabwareCommand.result.definition)
+            )
+            .map(loadLabwareCommand => loadLabwareCommand.result.definition)
+        : []
+
+    // TODO(mc, 2022-03-04): https://github.com/Opentrons/opentrons/issues/9624
+    customLabwareDefinitions.forEach(labwareDef => {
+      createLabwareDefinition({
+        runId: currentRunId,
+        data: labwareDef,
+      })
+    })
 
     // execute prep commands
     prepCommands.forEach(prepCommand => {
@@ -681,10 +697,11 @@ export function useLabwarePositionCheck(
     createCommand({
       runId: currentRunId,
       command: moveRelCommand,
+      waitUntilComplete: true,
+      timeout: JOG_COMMAND_TIMEOUT,
     })
-      .then(response => {
-        const jogCommandId = response.data.id
-        setPendingJogCommandId(jogCommandId)
+      .then(() => {
+        isJogging.current = false
       })
       .catch((e: Error) => {
         isJogging.current = false

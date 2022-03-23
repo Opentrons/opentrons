@@ -14,6 +14,7 @@ import type { StyleProps } from '@opentrons/components'
 
 export interface ToggleBtnProps extends StyleProps {
   label: string
+  id?: string
   toggledOn: boolean
   disabled?: boolean | null
   onClick?: (e: React.MouseEvent) => unknown
@@ -32,8 +33,7 @@ export function ToggleBtn(props: ToggleBtnProps): JSX.Element {
 
   return (
     <Btn
-      // @ts-expect-error TODO: cast disabled to Boolean as Btn expects it
-      disabled={disabled}
+      disabled={disabled ?? false}
       role="switch"
       aria-label={label}
       aria-checked={toggledOn}

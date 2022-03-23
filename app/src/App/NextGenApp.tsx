@@ -1,27 +1,35 @@
 import * as React from 'react'
-import { NavLink, Redirect, Route, Switch } from 'react-router-dom'
+import { NavLink, Redirect, Route, Switch, Link } from 'react-router-dom'
 import styled from 'styled-components'
 
 import {
   Box,
   Flex,
   COLORS,
+  Icon,
   DIRECTION_COLUMN,
   FLEX_NONE,
   OVERFLOW_SCROLL,
   POSITION_RELATIVE,
   SPACING,
   TYPOGRAPHY,
+  JUSTIFY_SPACE_BETWEEN,
+  ALIGN_CENTER,
+  ALIGN_FLEX_START,
 } from '@opentrons/components'
 
 import { Breadcrumbs } from '../molecules/Breadcrumbs'
-import { AppSettings } from '../pages/More/AppSettings'
 import { DeviceDetails } from '../pages/Devices/DeviceDetails'
 import { DevicesLanding } from '../pages/Devices/DevicesLanding'
+import { RobotSettings } from '../pages/Devices/RobotSettings'
 import { usePathCrumbs } from './hooks'
 import { ProtocolsLanding } from '../pages/Protocols/ProtocolsLanding'
+import { ProtocolDetails } from '../pages/Protocols/ProtocolDetails'
+import { AppSettings } from '../organisms/AppSettings'
+import { Labware } from '../organisms/Labware'
+import { TopPortalRoot } from './portal'
 
-interface RouteProps {
+export interface RouteProps {
   /**
    * the component rendered by a route match
    * drop developed components into slots held by placeholder div components
@@ -51,7 +59,7 @@ const TempNavBarLink = styled(NavLink)<{ lastRoute: boolean }>`
  * @param routes
  * @returns {JSX.Element}
  */
-function TempNavBar({ routes }: { routes: RouteProps[] }): JSX.Element {
+export function TempNavBar({ routes }: { routes: RouteProps[] }): JSX.Element {
   const navRoutes = routes.filter(
     ({ navLinkTo }: RouteProps) => navLinkTo != null
   )
@@ -63,29 +71,52 @@ function TempNavBar({ routes }: { routes: RouteProps[] }): JSX.Element {
       flex={FLEX_NONE}
       width="6rem"
       padding={SPACING.spacing4}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      alignItems={ALIGN_CENTER}
     >
-      {navRoutes.map(({ name, navLinkTo }: RouteProps, i: number) => (
-        <TempNavBarLink
-          key={name}
-          to={navLinkTo as string}
-          lastRoute={i === navRoutes.length - 1}
-        >
-          {name}
-        </TempNavBarLink>
-      ))}
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        flex={FLEX_NONE}
+        alignItems={ALIGN_FLEX_START}
+      >
+        {navRoutes.map(({ name, navLinkTo }: RouteProps, i: number) => (
+          <TempNavBarLink
+            key={name}
+            to={navLinkTo as string}
+            lastRoute={i === navRoutes.length}
+          >
+            {name}
+          </TempNavBarLink>
+        ))}
+      </Flex>
+      <Link to="/app-settings/general">
+        <Icon
+          width={SPACING.spacing6}
+          name="settings"
+          marginBottom={SPACING.spacing3}
+          color={COLORS.white}
+        ></Icon>
+      </Link>
     </Flex>
   )
 }
+
+export type RobotSettingsTab = 'calibration' | 'networking' | 'advanced'
+export type AppSettingsTab =
+  | 'general'
+  | 'privacy'
+  | 'advanced'
+  | 'feature-flags'
 
 /**
  * route params type definition for the next gen app
  */
 export interface NextGenRouteParams {
-  appSettingsTab: string
+  appSettingsTab: AppSettingsTab
   robotName: string
-  protocolName: string
+  protocolKey: string
   labwareId: string
-  robotSettingsTab: string
+  robotSettingsTab: RobotSettingsTab
   runId: string
   runDetailsTab: string
 }
@@ -122,18 +153,18 @@ export const nextGenRoutes: RouteProps[] = [
     path: '/protocols',
   },
   {
-    component: () => <div>protocol details</div>,
+    component: ProtocolDetails,
     exact: true,
     name: 'Protocol Details',
-    path: '/protocols/:protocolName',
+    path: '/protocols/:protocolKey',
   },
   {
     component: () => <div>deck setup</div>,
     name: 'Deck Setup',
-    path: '/protocols/:protocolName/deck-setup',
+    path: '/protocols/:protocolKey/deck-setup',
   },
   {
-    component: () => <div>labware landing</div>,
+    component: Labware,
     name: 'Labware',
     navLinkTo: '/labware',
     // labwareId param is for details slideout
@@ -153,11 +184,10 @@ export const nextGenRoutes: RouteProps[] = [
     path: '/devices/:robotName',
   },
   {
-    component: () => <div>robot settings</div>,
+    component: RobotSettings,
     exact: true,
     name: 'Robot Settings',
-    // robot settings tabs params: 'calibration' | 'networking' | 'advanced'
-    path: '/devices/:robotName/robot-settings/:robotSettingsTab',
+    path: '/devices/:robotName/robot-settings/:robotSettingsTab?',
   },
   {
     component: () => <div>protocol runs landing</div>,
@@ -173,10 +203,9 @@ export const nextGenRoutes: RouteProps[] = [
   },
   {
     component: AppSettings,
+    exact: true,
     name: 'App Settings',
-    navLinkTo: '/app-settings/feature-flags',
-    // app settings tabs params: 'general' | 'privacy' | 'advanced' | 'feature-flags'
-    path: '/app-settings/:appSettingsTab',
+    path: '/app-settings/:appSettingsTab?',
   },
 ]
 
@@ -189,6 +218,7 @@ export function NextGenApp(): JSX.Element {
 
   return (
     <>
+      <TopPortalRoot />
       <TempNavBar routes={nextGenRoutes} />
       <Box width="100%">
         <Breadcrumbs pathCrumbs={pathCrumbs} />
@@ -212,8 +242,6 @@ export function NextGenApp(): JSX.Element {
             })}
             {/* this redirect from /robots is necessary because the existing app <Redirect /> to /robots renders before feature flags load */}
             <Redirect from="/robots" to="/devices" />
-            {/* this redirects from the existing app settings page on next gen app feature flag toggle */}
-            <Redirect from="/more" to="/app-settings/feature-flags" />
           </Switch>
         </Box>
       </Box>

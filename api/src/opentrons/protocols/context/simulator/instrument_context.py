@@ -90,9 +90,6 @@ class InstrumentContextSimulation(AbstractInstrument):
     def home_plunger(self) -> None:
         pass
 
-    def delay(self) -> None:
-        pass
-
     def move_to(
         self,
         location: types.Location,

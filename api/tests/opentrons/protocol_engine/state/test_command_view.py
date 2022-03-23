@@ -1,9 +1,10 @@
 """Labware state store tests."""
 import pytest
-from collections import OrderedDict
 from contextlib import nullcontext as does_not_raise
 from datetime import datetime
-from typing import Dict, List, NamedTuple, Optional, Sequence, Tuple, Type
+from typing import Dict, List, NamedTuple, Optional, Sequence, Type
+
+from opentrons.ordered_set import OrderedSet
 
 from opentrons.protocol_engine import EngineStatus, commands as cmd, errors
 
@@ -11,6 +12,8 @@ from opentrons.protocol_engine.state.commands import (
     CommandState,
     CommandView,
     CommandSlice,
+    CommandEntry,
+    CurrentCommand,
     RunResult,
     QueueStatus,
 )
@@ -30,19 +33,26 @@ def get_command_view(
     run_result: Optional[RunResult] = None,
     running_command_id: Optional[str] = None,
     queued_command_ids: Sequence[str] = (),
-    commands_by_id: Sequence[Tuple[str, cmd.Command]] = (),
     errors_by_id: Optional[Dict[str, errors.ErrorOccurrence]] = None,
+    commands: Sequence[cmd.Command] = (),
 ) -> CommandView:
     """Get a command view test subject."""
+    all_command_ids = [command.id for command in commands]
+    commands_by_id = {
+        command.id: CommandEntry(index=index, command=command)
+        for index, command in enumerate(commands)
+    }
+
     state = CommandState(
         queue_status=queue_status,
         is_hardware_stopped=is_hardware_stopped,
         is_door_blocking=is_door_blocking,
         run_result=run_result,
         running_command_id=running_command_id,
-        queued_command_ids=OrderedDict((i, True) for i in queued_command_ids),
-        commands_by_id=OrderedDict(commands_by_id),
+        queued_command_ids=OrderedSet(queued_command_ids),
         errors_by_id=errors_by_id or {},
+        all_command_ids=all_command_ids,
+        commands_by_id=commands_by_id,
     )
 
     return CommandView(state=state)
@@ -51,7 +61,7 @@ def get_command_view(
 def test_get_by_id() -> None:
     """It should get a command by ID from state."""
     command = create_succeeded_command(command_id="command-id")
-    subject = get_command_view(commands_by_id=[("command-id", command)])
+    subject = get_command_view(commands=[command])
 
     assert subject.get("command-id") == command
 
@@ -59,7 +69,7 @@ def test_get_by_id() -> None:
 def test_get_command_bad_id() -> None:
     """It should raise if a requested command ID isn't in state."""
     command = create_succeeded_command(command_id="command-id")
-    subject = get_command_view(commands_by_id=[("command-id", command)])
+    subject = get_command_view(commands=[command])
 
     with pytest.raises(errors.CommandDoesNotExistError):
         subject.get("asdfghjkl")
@@ -71,13 +81,7 @@ def test_get_all() -> None:
     command_2 = create_running_command(command_id="command-id-2")
     command_3 = create_queued_command(command_id="command-id-3")
 
-    subject = get_command_view(
-        commands_by_id=[
-            ("command-id-1", command_1),
-            ("command-id-2", command_2),
-            ("command-id-3", command_3),
-        ]
-    )
+    subject = get_command_view(commands=[command_1, command_2, command_3])
 
     assert subject.get_all() == [command_1, command_2, command_3]
 
@@ -145,12 +149,7 @@ def test_get_is_complete() -> None:
     pending_command = create_queued_command(command_id="command-id-4")
 
     subject = get_command_view(
-        commands_by_id=[
-            ("command-id-1", completed_command),
-            ("command-id-2", failed_command),
-            ("command-id-3", running_command),
-            ("command-id-4", pending_command),
-        ]
+        commands=[completed_command, failed_command, running_command, pending_command]
     )
 
     assert subject.get_is_complete("command-id-1") is True
@@ -159,27 +158,24 @@ def test_get_is_complete() -> None:
     assert subject.get_is_complete("command-id-4") is False
 
 
-@pytest.mark.xfail(strict=True, raises=NotImplementedError)
 def test_get_all_complete() -> None:
-    """It should return true if all commands completed or any failed."""
+    """It should return true if no commands queued or running."""
     running_command = create_running_command(command_id="command-id-2")
 
     subject = get_command_view(queued_command_ids=[])
     assert subject.get_all_complete() is True
 
-    subject = get_command_view(queued_command_ids=["command-id-1"])
+    subject = get_command_view(queued_command_ids=["queued-command-id"])
     assert subject.get_all_complete() is False
 
     subject = get_command_view(
-        queued_command_ids=[],
-        commands_by_id=[("command-id-1", running_command)],
+        queued_command_ids=[], running_command_id="running-command-id"
     )
     assert subject.get_all_complete() is False
 
     subject = get_command_view(
         queued_command_ids=[],
-        is_hardware_stopped=True,
-        commands_by_id=[("command-id-1", running_command)],
+        commands=[running_command],
     )
     assert subject.get_all_complete() is True
 
@@ -448,9 +444,7 @@ get_okay_to_clear_specs: List[GetOkayToClearSpec] = [
             queue_status=QueueStatus.IMPLICITLY_ACTIVE,
             running_command_id=None,
             queued_command_ids=["command-id"],
-            commands_by_id=[
-                ("command-id", create_queued_command(command_id="command-id"))
-            ],
+            commands=[create_queued_command(command_id="command-id")],
         ),
         expected_is_okay=False,
     ),
@@ -458,9 +452,7 @@ get_okay_to_clear_specs: List[GetOkayToClearSpec] = [
         subject=get_command_view(
             running_command_id=None,
             queued_command_ids=[],
-            commands_by_id=[
-                ("command-id", create_queued_command(command_id="command-id"))
-            ],
+            commands=[create_queued_command(command_id="command-id")],
         ),
         expected_is_okay=True,
     ),
@@ -487,31 +479,66 @@ def test_get_current() -> None:
     )
     assert subject.get_current() is None
 
+    command = create_running_command(
+        "command-id",
+        command_key="command-key",
+        created_at=datetime(year=2021, month=1, day=1),
+    )
     subject = get_command_view(
         running_command_id="command-id",
         queued_command_ids=[],
+        commands=[command],
     )
-    assert subject.get_current() == "command-id"
+    assert subject.get_current() == CurrentCommand(
+        index=0,
+        command_id="command-id",
+        command_key="command-key",
+        created_at=datetime(year=2021, month=1, day=1),
+    )
 
-    subject = get_command_view(
-        running_command_id=None,
-        queued_command_ids=["command-id", "next-command-id"],
+    command_1 = create_succeeded_command(
+        "command-id-1",
+        command_key="key-1",
+        created_at=datetime(year=2021, month=1, day=1),
     )
-    assert subject.get_current() == "command-id"
+    command_2 = create_succeeded_command(
+        "command-id-2",
+        command_key="key-2",
+        created_at=datetime(year=2022, month=2, day=2),
+    )
+    subject = get_command_view(commands=[command_1, command_2])
+    assert subject.get_current() == CurrentCommand(
+        index=1,
+        command_id="command-id-2",
+        command_key="key-2",
+        created_at=datetime(year=2022, month=2, day=2),
+    )
+
+    command_1 = create_succeeded_command(
+        "command-id-1",
+        command_key="key-1",
+        created_at=datetime(year=2021, month=1, day=1),
+    )
+    command_2 = create_failed_command(
+        "command-id-2",
+        command_key="key-2",
+        created_at=datetime(year=2022, month=2, day=2),
+    )
+    subject = get_command_view(commands=[command_1, command_2])
+    assert subject.get_current() == CurrentCommand(
+        index=1,
+        command_id="command-id-2",
+        command_key="key-2",
+        created_at=datetime(year=2022, month=2, day=2),
+    )
 
 
 def test_get_slice_empty() -> None:
     """It should return a slice from the tail if no current command."""
-    subject = get_command_view(commands_by_id=[])
-
+    subject = get_command_view(commands=[])
     result = subject.get_slice(cursor=None, length=2)
 
-    assert result == CommandSlice(
-        commands=[],
-        cursor=0,
-        length=0,
-        total_length=0,
-    )
+    assert result == CommandSlice(commands=[], cursor=0, total_length=0)
 
 
 def test_get_slice() -> None:
@@ -521,21 +548,13 @@ def test_get_slice() -> None:
     command_3 = create_queued_command(command_id="command-id-3")
     command_4 = create_queued_command(command_id="command-id-4")
 
-    subject = get_command_view(
-        commands_by_id=[
-            ("command-id-1", command_1),
-            ("command-id-2", command_2),
-            ("command-id-3", command_3),
-            ("command-id-4", command_4),
-        ]
-    )
+    subject = get_command_view(commands=[command_1, command_2, command_3, command_4])
 
     result = subject.get_slice(cursor=1, length=3)
 
     assert result == CommandSlice(
         commands=[command_2, command_3, command_4],
         cursor=1,
-        length=3,
         total_length=4,
     )
 
@@ -544,34 +563,26 @@ def test_get_slice() -> None:
     assert result == CommandSlice(
         commands=[command_1, command_2, command_3, command_4],
         cursor=0,
-        length=4,
         total_length=4,
     )
 
 
 def test_get_slice_default_cursor() -> None:
-    """It should use the current command as the default cursor location."""
+    """It should use the tail as the default cursor location."""
     command_1 = create_succeeded_command(command_id="command-id-1")
     command_2 = create_succeeded_command(command_id="command-id-2")
     command_3 = create_running_command(command_id="command-id-3")
     command_4 = create_queued_command(command_id="command-id-4")
 
     subject = get_command_view(
-        running_command_id="command-id-2",
-        commands_by_id=[
-            ("command-id-1", command_1),
-            ("command-id-2", command_2),
-            ("command-id-3", command_3),
-            ("command-id-4", command_4),
-        ],
+        commands=[command_1, command_2, command_3, command_4],
     )
 
     result = subject.get_slice(cursor=None, length=2)
 
     assert result == CommandSlice(
-        commands=[command_2, command_3],
-        cursor=1,
-        length=2,
+        commands=[command_3, command_4],
+        cursor=2,
         total_length=4,
     )
 
@@ -583,20 +594,12 @@ def test_get_slice_default_cursor_no_current() -> None:
     command_3 = create_succeeded_command(command_id="command-id-3")
     command_4 = create_succeeded_command(command_id="command-id-4")
 
-    subject = get_command_view(
-        commands_by_id=[
-            ("command-id-1", command_1),
-            ("command-id-2", command_2),
-            ("command-id-3", command_3),
-            ("command-id-4", command_4),
-        ],
-    )
+    subject = get_command_view(commands=[command_1, command_2, command_3, command_4])
 
     result = subject.get_slice(cursor=None, length=3)
 
     assert result == CommandSlice(
         commands=[command_2, command_3, command_4],
         cursor=1,
-        length=3,
         total_length=4,
     )

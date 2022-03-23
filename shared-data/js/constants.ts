@@ -34,6 +34,8 @@ export const TEMPERATURE_MODULE_V2: 'temperatureModuleV2' =
   'temperatureModuleV2'
 export const THERMOCYCLER_MODULE_V1: 'thermocyclerModuleV1' =
   'thermocyclerModuleV1'
+export const HEATERSHAKER_MODULE_V1: 'heaterShakerModuleV1' =
+  'heaterShakerModuleV1'
 
 // pipette display categories
 export const GEN2: 'GEN2' = 'GEN2'
@@ -52,6 +54,8 @@ export const TEMPERATURE_MODULE_TYPE: 'temperatureModuleType' =
 export const MAGNETIC_MODULE_TYPE: 'magneticModuleType' = 'magneticModuleType'
 export const THERMOCYCLER_MODULE_TYPE: 'thermocyclerModuleType' =
   'thermocyclerModuleType'
+export const HEATERSHAKER_MODULE_TYPE: 'heaterShakerModuleType' =
+  'heaterShakerModuleType'
 
 export const MAGNETIC_MODULE_MODELS = [MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2]
 
@@ -62,16 +66,20 @@ export const TEMPERATURE_MODULE_MODELS = [
 
 export const THERMOCYCLER_MODULE_MODELS = [THERMOCYCLER_MODULE_V1]
 
+export const HEATERSHAKER_MODULE_MODELS = [HEATERSHAKER_MODULE_V1]
+
 export const MODULE_MODELS = [
   ...MAGNETIC_MODULE_MODELS,
   ...TEMPERATURE_MODULE_MODELS,
   ...THERMOCYCLER_MODULE_MODELS,
+  ...HEATERSHAKER_MODULE_MODELS,
 ]
 
 export const MODULE_TYPES = [
   TEMPERATURE_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  HEATERSHAKER_MODULE_TYPE,
 ]
 
 export const GEN_ONE_MULTI_PIPETTES = ['p10_multi', 'p50_multi', 'p300_multi']
@@ -97,3 +105,15 @@ export const MAGNETIC_MODULE_V1_DISNEGAGED_HEIGHT = -5
 export const MAGNETIC_MODULE_TYPE_LABWARE_BOTTOM_HEIGHT = 0
 
 export const CELSIUS: '°C' = '°C'
+export const TEMP_MIN = 4
+export const TEMP_MAX = 99
+export const TEMP_LID_MIN = 37
+export const TEMP_LID_MAX = 110
+
+// Heater shaker module info
+export const RPM: 'RPM' = 'RPM'
+export const HS_RPM_MIN = 200
+export const HS_RPM_MAX = 1800
+
+export const OT2_STANDARD_MODEL: 'OT-2 Standard' = 'OT-2 Standard'
+export const OT2_STANDARD_DECKID: 'ot2_standard' = 'ot2_standard'

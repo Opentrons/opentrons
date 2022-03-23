@@ -2,6 +2,7 @@ import pytest
 from unittest import mock
 from opentrons import types
 from opentrons.hardware_control import ot3api
+from opentrons.hardware_control.types import OT3Axis
 from opentrons_shared_data.pipette import name_for_model
 
 
@@ -46,13 +47,13 @@ async def test_transform_values(pipette_model):
     sim = await ot3api.OT3API.build_hardware_simulator(attached_instruments=attached)
     target = types.Point(20, 30, 40)
     with mock.patch.object(
-        sim._backend,
-        "move",
-        mock.MagicMock(side_effect=sim._backend.move),
-        spec=sim._backend.move,
+        sim._move_manager,
+        "plan_motion",
+        mock.MagicMock(side_effect=sim._move_manager.plan_motion),
+        spec=sim._move_manager.plan_motion,
     ) as mock_move:
         await sim.move_to(types.Mount.RIGHT, target)
-        right_offset = sim._attached_instruments[types.Mount.RIGHT].critical_point()
+        right_offset = sim.hardware_instruments[types.Mount.RIGHT].critical_point()
         point = [
             (target.x - right_offset[0] - sim.config.right_mount_offset[0]) * -1
             + sim.config.carriage_offset[0],
@@ -61,18 +62,20 @@ async def test_transform_values(pipette_model):
             (target.z - right_offset[2] - sim.config.right_mount_offset[2]) * -1
             + sim.config.carriage_offset[2],
         ]
-        assert mock_move.call_args[0][0]["X"] == point[0]
-        assert mock_move.call_args[0][0]["Y"] == point[1]
-        assert mock_move.call_args[0][0]["A"] == point[2]
+        assert mock_move.call_args[1]["target_list"][0].position[OT3Axis.X] == point[0]
+        assert mock_move.call_args[1]["target_list"][0].position[OT3Axis.Y] == point[1]
+        assert (
+            mock_move.call_args[1]["target_list"][0].position[OT3Axis.Z_R] == point[2]
+        )
 
     with mock.patch.object(
-        sim._backend,
-        "move",
-        mock.MagicMock(side_effect=sim._backend.move),
-        spec=sim._backend.move,
+        sim._move_manager,
+        "plan_motion",
+        mock.MagicMock(side_effect=sim._move_manager.plan_motion),
+        spec=sim._move_manager.plan_motion,
     ) as mock_move:
         await sim.move_to(types.Mount.LEFT, target)
-        left_offset = sim._attached_instruments[types.Mount.LEFT].critical_point()
+        left_offset = sim.hardware_instruments[types.Mount.LEFT].critical_point()
         point = [
             (target.x - left_offset[0] - sim.config.left_mount_offset[0]) * -1
             + sim.config.carriage_offset[0],
@@ -81,6 +84,8 @@ async def test_transform_values(pipette_model):
             (target.z - left_offset[2] - sim.config.left_mount_offset[2]) * -1
             + sim.config.carriage_offset[2],
         ]
-        assert mock_move.call_args[0][0]["X"] == point[0]
-        assert mock_move.call_args[0][0]["Y"] == point[1]
-        assert mock_move.call_args[0][0]["Z"] == point[2]
+        assert mock_move.call_args[1]["target_list"][0].position[OT3Axis.X] == point[0]
+        assert mock_move.call_args[1]["target_list"][0].position[OT3Axis.Y] == point[1]
+        assert (
+            mock_move.call_args[1]["target_list"][0].position[OT3Axis.Z_L] == point[2]
+        )

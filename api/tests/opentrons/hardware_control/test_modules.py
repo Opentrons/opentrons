@@ -102,9 +102,8 @@ async def test_module_update_integration(monkeypatch, loop):
     # test temperature module update with avrdude bootloader
     usb_port = USBPort(
         name="",
-        sub_names=[],
         hub=None,
-        port_number=None,
+        port_number=0,
         device_path="/dev/ot_module_sim_tempdeck0",
     )
 
@@ -114,7 +113,7 @@ async def test_module_update_integration(monkeypatch, loop):
         which="tempdeck",
         simulating=True,
         loop=loop,
-        execution_manager=ExecutionManager(loop=loop),
+        execution_manager=ExecutionManager(),
         sim_model="temperatureModuleV2",
     )
 
@@ -144,7 +143,7 @@ async def test_module_update_integration(monkeypatch, loop):
         which="magdeck",
         simulating=True,
         loop=loop,
-        execution_manager=ExecutionManager(loop=loop),
+        execution_manager=ExecutionManager(),
     )
 
     await modules.update_firmware(magdeck, "fake_fw_file_path", loop)
@@ -160,7 +159,7 @@ async def test_module_update_integration(monkeypatch, loop):
         which="thermocycler",
         simulating=True,
         loop=loop,
-        execution_manager=ExecutionManager(loop=loop),
+        execution_manager=ExecutionManager(),
     )
 
     upload_via_bossa_mock = mock.Mock(

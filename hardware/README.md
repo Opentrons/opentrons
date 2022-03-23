@@ -69,6 +69,14 @@ On Mac using pcan: `opentrons_can_comm --interface pcan --channel PCAN_USBBUS1 -
 
 Example using opentrons' CAN over socket: `opentrons_can_comm --interface opentrons_sock`
 
+### opentrons_can_mon
+
+A monitor on the CAN bus. It prints out the contents of messages received on the CAN bus.
+
+#### Usage
+
+The usage is the same as `opentrons_can_comm`.
+
 ### opentrons_update_fw
 
 A script that will update a subsystem's firmware.

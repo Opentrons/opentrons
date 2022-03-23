@@ -41,9 +41,9 @@ class RunCommandSummary(ResourceModel):
         description="Command execution completed timestamp, if completed",
     )
     status: CommandStatus = Field(..., description="Execution status of the command.")
-    errorId: Optional[str] = Field(
+    error: Optional[ErrorOccurrence] = Field(
         None,
-        description="Error occurrence identifier, if status is 'failed'",
+        description="Error occurrence, if status is 'failed'",
     )
     # TODO(mc, 2022-02-01): this does not allow the command summary object to
     # be narrowed based on `commandType`. Will be resolved by TODO above
@@ -136,4 +136,13 @@ class RunUpdate(BaseModel):
             "Whether this run is currently controlling the robot."
             " Setting `current` to `false` will deactivate the run."
         ),
+    )
+
+
+class LabwareDefinitionSummary(BaseModel):
+    """Summary of data about a created labware definition."""
+
+    definitionUri: str = Field(
+        ...,
+        description="The definition's unique resource identifier in the run.",
     )

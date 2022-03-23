@@ -5,7 +5,13 @@ from opentrons.types import MountType
 
 from .. import commands
 from ..state import StateView
-from ..types import DeckSlotLocation, ModuleModel, PipetteName, WellLocation
+from ..types import (
+    DeckSlotLocation,
+    LabwareLocation,
+    ModuleModel,
+    PipetteName,
+    WellLocation,
+)
 from .transports import AbstractSyncTransport
 
 
@@ -23,7 +29,7 @@ class SyncClient:
 
     def load_labware(
         self,
-        location: DeckSlotLocation,
+        location: LabwareLocation,
         load_name: str,
         namespace: str,
         version: int,
@@ -153,3 +159,23 @@ class SyncClient:
         request = commands.PauseCreate(params=commands.PauseParams(message=message))
         result = self._transport.execute_command(request=request)
         return cast(commands.PauseResult, result)
+
+    def magnetic_module_engage(
+        self, module_id: str, engage_height: float
+    ) -> commands.magnetic_module.EngageResult:
+        """Execute a ``MagneticModuleEngage`` command and return the result."""
+        request = commands.magnetic_module.EngageCreate(
+            params=commands.magnetic_module.EngageParams(
+                moduleId=module_id, engageHeight=engage_height
+            )
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.magnetic_module.EngageResult, result)
+
+    def set_rail_lights(self, on: bool) -> commands.SetRailLightsResult:
+        """Execute a ``setRailLights`` command and return the result."""
+        request = commands.SetRailLightsCreate(
+            params=commands.SetRailLightsParams(on=on)
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.SetRailLightsResult, result)

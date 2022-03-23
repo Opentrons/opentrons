@@ -4,6 +4,7 @@ import type {
   MagneticModuleModel,
   TemperatureModuleModel,
   ThermocyclerModuleModel,
+  HeaterShakerModuleModel,
   ModuleModel,
 } from '@opentrons/shared-data'
 
@@ -13,6 +14,7 @@ interface PhysicalPort {
 }
 
 export interface ApiBaseModule {
+  id: string
   displayName: string
   serial: string
   revision: string
@@ -58,6 +60,16 @@ export interface ThermocyclerData {
   totalCycleCount: number | null
   currentCycleIndex: number | null
 }
+export interface HeaterShakerData {
+  labwareLatchStatus: LatchStatus
+  speedStatus: SpeedStatus
+  temperatureStatus: TemperatureStatus
+  currentSpeed: number | null
+  currentTemp: number | null
+  targetSpeed: number | null
+  targetTemp: number | null
+  errorDetails: string | null
+}
 
 export type TemperatureStatus =
   | 'idle'
@@ -73,6 +85,23 @@ export type ThermocyclerStatus =
   | 'error'
 
 export type MagneticStatus = 'engaged' | 'disengaged'
+
+export type HeaterShakerStatus = 'idle' | 'running' | 'error'
+
+export type SpeedStatus =
+  | 'holding at target'
+  | 'speeding up'
+  | 'slowing down'
+  | 'idle'
+  | 'error'
+
+export type LatchStatus =
+  | 'opening'
+  | 'idle_open'
+  | 'closing'
+  | 'idle_closed'
+  | 'idle_unknown'
+  | 'unknown'
 
 export interface ApiTemperatureModule extends ApiBaseModule {
   moduleModel: TemperatureModuleModel
@@ -113,10 +142,17 @@ export interface ApiThermocyclerModuleLegacy extends ApiBaseModuleLegacy {
   status: ThermocyclerStatus
 }
 
+export interface ApiHeaterShakerModule extends ApiBaseModule {
+  moduleModel: HeaterShakerModuleModel
+  data: HeaterShakerData
+  status: HeaterShakerStatus
+}
+
 export type ApiAttachedModule =
   | ApiThermocyclerModule
   | ApiMagneticModule
   | ApiTemperatureModule
+  | ApiHeaterShakerModule
 
 export type ApiAttachedModuleLegacy =
   | ApiThermocyclerModuleLegacy

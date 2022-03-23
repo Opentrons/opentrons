@@ -1,10 +1,15 @@
 """Tests for FirmwareUpdateInitiator."""
 import pytest
 from mock import AsyncMock, call
-from opentrons_ot3_firmware import NodeId, ArbitrationId, ArbitrationIdParts
-from opentrons_ot3_firmware.messages import MessageDefinition
-from opentrons_ot3_firmware.messages import message_definitions, payloads
-from opentrons_ot3_firmware.utils import UInt32Field
+
+from opentrons_hardware.firmware_bindings import (
+    NodeId,
+    ArbitrationId,
+    ArbitrationIdParts,
+)
+from opentrons_hardware.firmware_bindings.messages import MessageDefinition, fields
+from opentrons_hardware.firmware_bindings.messages import message_definitions, payloads
+from opentrons_hardware.firmware_bindings.utils import UInt32Field
 
 from opentrons_hardware.firmware_update import initiator
 from opentrons_hardware.firmware_update.errors import BootloaderNotReady
@@ -28,7 +33,11 @@ async def test_messaging(
         """Mock send method."""
         if isinstance(message, message_definitions.DeviceInfoRequest):
             response = message_definitions.DeviceInfoResponse(
-                payload=payloads.DeviceInfoResponsePayload(version=UInt32Field(0))
+                payload=payloads.DeviceInfoResponsePayload(
+                    version=UInt32Field(0),
+                    flags=fields.VersionFlagsField(0),
+                    shortsha=fields.FirmwareShortSHADataField(b"abcdef0"),
+                )
             )
             can_message_notifier.notify(
                 message=response,
@@ -51,15 +60,15 @@ async def test_messaging(
     assert mock_messenger.send.mock_calls == [
         call(
             node_id=target.system_node,
-            message=message_definitions.FirmwareUpdateInitiate(
-                payload=payloads.EmptyPayload()
-            ),
+            message=message_definitions.FirmwareUpdateInitiate(),
         ),
         call(
             node_id=target.bootloader_node,
-            message=message_definitions.DeviceInfoRequest(
-                payload=payloads.EmptyPayload()
-            ),
+            message=message_definitions.FirmwareUpdateInitiate(),
+        ),
+        call(
+            node_id=target.bootloader_node,
+            message=message_definitions.DeviceInfoRequest(),
         ),
     ]
 
@@ -72,7 +81,11 @@ async def test_retry(
     """It should retry device info request."""
     responses = [
         message_definitions.DeviceInfoResponse(
-            payload=payloads.DeviceInfoResponsePayload(version=UInt32Field(0))
+            payload=payloads.DeviceInfoResponsePayload(
+                version=UInt32Field(0),
+                flags=fields.VersionFlagsField(0),
+                shortsha=fields.FirmwareShortSHADataField(b"abcdef0"),
+            )
         ),
         None,
         None,
@@ -107,17 +120,17 @@ async def test_retry(
         == [
             call(
                 node_id=target.system_node,
-                message=message_definitions.FirmwareUpdateInitiate(
-                    payload=payloads.EmptyPayload()
-                ),
+                message=message_definitions.FirmwareUpdateInitiate(),
+            ),
+            call(
+                node_id=target.bootloader_node,
+                message=message_definitions.FirmwareUpdateInitiate(),
             ),
         ]
         + [
             call(
                 node_id=target.bootloader_node,
-                message=message_definitions.DeviceInfoRequest(
-                    payload=payloads.EmptyPayload()
-                ),
+                message=message_definitions.DeviceInfoRequest(),
             ),
         ]
         * retry_count
@@ -140,17 +153,17 @@ async def test_bootloader_not_ready(
         == [
             call(
                 node_id=target.system_node,
-                message=message_definitions.FirmwareUpdateInitiate(
-                    payload=payloads.EmptyPayload()
-                ),
+                message=message_definitions.FirmwareUpdateInitiate(),
+            ),
+            call(
+                node_id=target.bootloader_node,
+                message=message_definitions.FirmwareUpdateInitiate(),
             ),
         ]
         + [
             call(
                 node_id=target.bootloader_node,
-                message=message_definitions.DeviceInfoRequest(
-                    payload=payloads.EmptyPayload()
-                ),
+                message=message_definitions.DeviceInfoRequest(),
             ),
         ]
         * retry_count

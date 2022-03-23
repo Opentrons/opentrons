@@ -9,17 +9,20 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  HEATERSHAKER_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
   TEMPERATURE_MODULE_V2,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
   THERMOCYCLER_MODULE_V1,
+  HEATERSHAKER_MODULE_V1,
 } from '@opentrons/shared-data'
 
 import type {
   MagneticModuleModel,
   TemperatureModuleModel,
   ThermocyclerModuleModel,
+  HeaterShakerModuleModel,
 } from '@opentrons/shared-data'
 
 import * as Actions from '../actions'
@@ -42,6 +45,8 @@ import type {
   TemperatureStatus,
   MagneticStatus,
   ThermocyclerStatus,
+  HeaterShakerData,
+  HeaterShakerStatus,
 } from '../api-types'
 
 const mapActionToRequest: ActionToRequestMapper<FetchModulesAction> = action => ({
@@ -67,6 +72,12 @@ type IdentifierWithData =
       model: ThermocyclerModuleModel
       data: ThermocyclerData
       status: ThermocyclerStatus
+    }
+  | {
+      type: typeof HEATERSHAKER_MODULE_TYPE
+      model: HeaterShakerModuleModel
+      data: HeaterShakerData
+      status: HeaterShakerStatus
     }
 
 const normalizeModuleInfoLegacy = (
@@ -126,6 +137,13 @@ const normalizeModuleInfoNew = (
         data: response.data,
         status: response.status,
       }
+    case HEATERSHAKER_MODULE_V1:
+      return {
+        model: response.moduleModel,
+        type: HEATERSHAKER_MODULE_TYPE,
+        data: response.data,
+        status: response.status,
+      }
     default:
       throw new Error(`bad module model ${(response as any).moduleModel}`)
   }
@@ -146,6 +164,7 @@ const normalizeModuleResponse = (
 ): AttachedModule => {
   return {
     ...normalizeModuleInfo(response),
+    id: response.id,
     revision: response.revision ? response.revision : response.model,
     port: response.port,
     serial: response.serial,

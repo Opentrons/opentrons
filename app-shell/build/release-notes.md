@@ -6,33 +6,35 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# Opentrons App Changes in 5.0.0-beta.8
+# Opentrons App Changes in 5.0.2
 
-Welcome to the beta release of v5.0.0 release of the Opentrons App! After you update your app, please be sure to update any OT-2's you will be using with this beta.
+Welcome to the v5.0.2 release of the Opentrons App!
 
-The 5.0.0 release reshapes the way you upload and set up protocols to run on your OT-2. We're very excited for you to try this new experience out, and we appreciate your feedback (and patience) as you use this new software.
-
-This is beta software! You may experience unexpected crashes or missing features not detailed here. Please see the [beta forum][] for more details and to leave feedback.
-
-[beta forum]: https://community.opentrons.com/c/beta/pe-beta/9
+The 5.0.2 release reshapes the way you upload and set up protocols to run on your OT-2. Read below to find out about the new features in 5.0.0.
 
 ## New Features
 
 - A completely revamped protocol upload experience that will walk you through setting up your OT-2 for the run
 - A new way to check the positioning of your labware prior to a run, where you can apply offsets to each labware individually
+- More visibility into the progress of protocol execution on the robot
 - Quick and easy re-running of your last used protocol
 
-### Bug Fixes
+## 5.0.1 to 5.0.2
 
-Keep an eye on this space as we release new versions of the beta.
+The 5.0.2 hotfix release fixes three issues:
 
-- We have addressed various performance issues and you should no longer encounter freezes with longer protocols.
+1. If you use `load_labware_from_definition` in your Python protocol, you are now able to use Labware Position Check.
+2. User-defined labware labels, if present, are now displayed in "Labware Setup"
+3. Certain types of protocol upload failures will now show an error message instead of silently failing.
+
+## 5.0.0 to 5.0.1
+
+The 5.0.1 hotfix release contains a small fix to the Labware Position Check to appropriately handle protocols that load pipettes, but never pick up tips with that pipette.
 
 ## Known Issues
 
-This beta is a work in progress! We'll be addressing the following features and issues in upcoming releases of 5.0.0.
-
 - Your last run protocol will not be saved through robot reboots
+- When you load multiple instances of the same module type in a protocol, the USB port numbers shown in "Module Setup" are incorrect.
 
 ---
 

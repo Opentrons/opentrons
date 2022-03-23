@@ -13,7 +13,7 @@ from opentrons.protocol_engine import (
     types as pe_types,
 )
 from opentrons.protocol_engine.resources import ModelUtils, ModuleDataProvider
-from opentrons.protocols.models.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons.protocols.geometry.deck import FIXED_TRASH_ID
 
 from .legacy_wrappers import (
@@ -303,6 +303,7 @@ class LegacyCommandMapper:
                 loadName=labware_load_info.labware_load_name,
                 namespace=labware_load_info.labware_namespace,
                 version=labware_load_info.labware_version,
+                displayName=labware_load_info.labware_display_name,
             ),
             result=pe_commands.LoadLabwareResult.construct(
                 labwareId=labware_id,

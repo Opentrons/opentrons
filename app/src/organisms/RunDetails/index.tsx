@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 import {
@@ -23,9 +24,9 @@ import { Page } from '../../atoms/Page'
 import { Portal } from '../../App/portal'
 import { useProtocolDetails } from './hooks'
 import {
-  useRunStatus,
+  useCurrentRunStatus,
   useRunStartTime,
-  useRunControls,
+  useCurrentRunControls,
 } from '../RunTimeControl/hooks'
 import { ConfirmExitProtocolUploadModal } from '../ProtocolUpload/ConfirmExitProtocolUploadModal'
 import { useCloseCurrentRun } from '../ProtocolUpload/hooks/useCloseCurrentRun'
@@ -34,12 +35,15 @@ import { ConfirmCancelModal } from './ConfirmCancelModal'
 
 import styles from '../ProtocolUpload/styles.css'
 import { useIsProtocolRunLoaded } from '../ProtocolUpload/hooks'
+import { getConnectedRobotName } from '../../redux/robot/selectors'
+import type { State } from '../../redux/types'
 
 export function RunDetails(): JSX.Element | null {
   const { t } = useTranslation(['run_details', 'shared'])
+  const robotName = useSelector<State>(getConnectedRobotName)
   const { displayName } = useProtocolDetails()
   const history = useHistory()
-  const runStatus = useRunStatus({
+  const runStatus = useCurrentRunStatus({
     onSettled: data => {
       if (data == null) {
         history.push('/upload')
@@ -56,7 +60,7 @@ export function RunDetails(): JSX.Element | null {
       ? RUN_STATUS_RUNNING
       : runStatus
 
-  const { pause } = useRunControls()
+  const { pause } = useCurrentRunControls()
   const [
     showConfirmCancelModal,
     setShowConfirmCancelModal,
@@ -75,6 +79,7 @@ export function RunDetails(): JSX.Element | null {
     confirm: confirmCloseExit,
     cancel: cancelCloseExit,
   } = useConditionalConfirm(handleCloseProtocol, true)
+  if (robotName == null) history.push('/robots')
 
   if (!isProtocolRunLoaded || isClosingCurrentRun) {
     let text = t('loading_protocol')

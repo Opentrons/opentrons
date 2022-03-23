@@ -9,7 +9,7 @@ from .commands import (
     Command,
     CommandCreate,
 )
-from .types import LabwareOffset, LabwareOffsetCreate
+from .types import LabwareOffset, LabwareOffsetCreate, LabwareUri
 from .execution import (
     QueueWorker,
     create_queue_worker,
@@ -135,6 +135,13 @@ class ProtocolEngine:
         self._action_dispatcher.dispatch(action)
         return self._state_store.commands.get(command_id)
 
+    async def wait_for_command(self, command_id: str) -> None:
+        """Wait for a command to be completed."""
+        await self._state_store.wait_for(
+            self._state_store.commands.get_is_complete,
+            command_id=command_id,
+        )
+
     async def add_and_execute_command(self, request: CommandCreate) -> Command:
         """Add a command to the queue and wait for it to complete.
 
@@ -149,10 +156,7 @@ class ProtocolEngine:
             The completed command, whether it succeeded or failed.
         """
         command = self.add_command(request)
-        await self._state_store.wait_for(
-            condition=self._state_store.commands.get_is_complete,
-            command_id=command.id,
-        )
+        await self.wait_for_command(command.id)
         return self._state_store.commands.get(command.id)
 
     async def stop(self) -> None:
@@ -168,7 +172,6 @@ class ProtocolEngine:
         self._queue_worker.cancel()
         await self._hardware_stopper.do_halt()
 
-    # TODO(mc, 2021-12-27): commands.get_all_complete not yet implemented
     async def wait_until_complete(self) -> None:
         """Wait until there are no more commands to execute.
 
@@ -245,8 +248,9 @@ class ProtocolEngine:
             labware_offset_id=labware_offset_id
         )
 
-    def add_labware_definition(self, definition: LabwareDefinition) -> None:
+    def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
         """Add a labware definition to the state for subsequent labware loads."""
         self._action_dispatcher.dispatch(
             AddLabwareDefinitionAction(definition=definition)
         )
+        return self._state_store.labware.get_uri_from_definition(definition)

@@ -25,7 +25,7 @@ import { SectionList } from './SectionList'
 import { LabwareOffsetsSummary } from './LabwareOffsetsSummary'
 import { useIntroInfo, useLabwareOffsets, LabwareOffsets } from './hooks'
 import type { SavePositionCommandData } from './types'
-import type { ProtocolFile } from '@opentrons/shared-data'
+import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 
 export const SummaryScreen = (props: {
   savePositionCommandData: SavePositionCommandData
@@ -36,16 +36,19 @@ export const SummaryScreen = (props: {
   const { t } = useTranslation('labware_position_check')
   const introInfo = useIntroInfo()
   const { protocolData } = useProtocolDetails()
-  useLabwareOffsets(savePositionCommandData, protocolData as ProtocolFile<{}>)
+  useLabwareOffsets(
+    savePositionCommandData,
+    protocolData as ProtocolAnalysisFile
+  )
     .then(offsets => {
       labwareOffsets.length === 0 && setLabwareOffsets(offsets)
     })
     .catch((e: Error) =>
-      console.error(`error getting labware offsetsL ${e.message}`)
+      console.error(`error getting labware offsets: ${e.message}`)
     )
   const { createLabwareOffset } = useCreateLabwareOffsetMutation()
   const runId = useCurrentRunId()
-  const { setShowLPCSuccessToast } = useLPCSuccessToast()
+  const { setIsShowingLPCSuccessToast } = useLPCSuccessToast()
 
   if (runId == null || introInfo == null || protocolData == null) return null
   const labwareIds = Object.keys(protocolData.labware)
@@ -107,7 +110,7 @@ export const SummaryScreen = (props: {
           id={'Lpc_summaryScreen_applyOffsetButton'}
           onClick={() => {
             applyLabwareOffsets()
-            setShowLPCSuccessToast()
+            setIsShowingLPCSuccessToast(true)
             props.onCloseClick()
           }}
         >

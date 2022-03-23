@@ -1,8 +1,8 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import { InputField } from '@opentrons/components/src/forms/InputField'
 import { i18n } from '../../../../i18n'
-import { useSendModuleCommand } from '../../../../redux/modules'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { MagneticModuleSlideout } from '../MagneticModuleSlideout'
 
 import {
@@ -10,29 +10,31 @@ import {
   mockMagneticModuleGen2,
 } from '../../../../redux/modules/__fixtures__'
 
-jest.mock('../../../../redux/modules')
-jest.mock('@opentrons/components/src/forms/InputField')
+jest.mock('@opentrons/react-api-client')
 
-const mockUseSendModuleCommand = useSendModuleCommand as jest.MockedFunction<
-  typeof useSendModuleCommand
+const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
+  typeof useCreateLiveCommandMutation
 >
-const mockInputField = InputField as jest.MockedFunction<typeof InputField>
 
 const render = (props: React.ComponentProps<typeof MagneticModuleSlideout>) => {
   return renderWithProviders(<MagneticModuleSlideout {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
-
 describe('MagneticModuleSlideout', () => {
   let props: React.ComponentProps<typeof MagneticModuleSlideout>
+  let mockCreateLiveCommand = jest.fn()
   beforeEach(() => {
+    mockCreateLiveCommand = jest.fn()
+    mockCreateLiveCommand.mockResolvedValue(null)
     props = {
       module: mockMagneticModule,
       isExpanded: true,
+      onCloseClick: jest.fn(),
     }
-    mockInputField.mockReturnValue(<div></div>)
-    mockUseSendModuleCommand.mockReturnValue(jest.fn())
+    mockUseLiveCommandMutation.mockReturnValue({
+      createLiveCommand: mockCreateLiveCommand,
+    } as any)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -60,6 +62,7 @@ describe('MagneticModuleSlideout', () => {
     props = {
       module: mockMagneticModuleGen2,
       isExpanded: true,
+      onCloseClick: jest.fn(),
     }
     const { getByText } = render(props)
 
@@ -79,8 +82,21 @@ describe('MagneticModuleSlideout', () => {
   })
 
   it('renders the button and it is not clickable until there is something in form field', () => {
-    const { getByRole } = render(props)
+    const { getByRole, getByTestId } = render(props)
     const button = getByRole('button', { name: 'Set Engage Height' })
+    const input = getByTestId('magneticModuleV1')
+    fireEvent.change(input, { target: { value: '10' } })
+    expect(button).toBeEnabled()
+    fireEvent.click(button)
+    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
+      command: {
+        commandType: 'magneticModule/engageMagnet',
+        params: {
+          moduleId: 'magdeck_id',
+          engageHeight: 10,
+        },
+      },
+    })
     expect(button).not.toBeEnabled()
   })
 })

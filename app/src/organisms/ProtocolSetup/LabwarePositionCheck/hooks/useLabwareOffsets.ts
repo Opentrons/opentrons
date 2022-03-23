@@ -2,8 +2,9 @@ import reduce from 'lodash/reduce'
 import { useTranslation, TFunction } from 'react-i18next'
 import {
   getModuleDisplayName,
+  getLabwareDisplayName,
   getModuleType,
-  ProtocolFile,
+  ProtocolAnalysisFile,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { getLabwareLocation } from '../../utils/getLabwareLocation'
@@ -16,7 +17,7 @@ import type { SavePositionCommandData } from '../types'
 
 const getDisplayLocation = (
   labwareId: string,
-  protocolData: ProtocolFile<{}>,
+  protocolData: ProtocolAnalysisFile,
   t: TFunction<'labware_position_check'>
 ): string => {
   let location = ''
@@ -59,7 +60,7 @@ export type LabwareOffsets = Array<{
 
 export const useLabwareOffsets = (
   savePositionCommandData: SavePositionCommandData,
-  protocolData: ProtocolFile<{}>
+  protocolData: ProtocolAnalysisFile
 ): Promise<LabwareOffsets> => {
   const offsetDataByLabwareId = useOffsetDataByLabwareId(
     savePositionCommandData
@@ -79,7 +80,10 @@ export const useLabwareOffsets = (
         protocolData.labware,
         protocolData.labwareDefinitions
       )
-      const displayName = protocolData.labware[labwareId].displayName ?? ''
+      const { definitionId } = protocolData.labware[labwareId]
+      const displayName = getLabwareDisplayName(
+        protocolData.labwareDefinitions[definitionId]
+      )
       const vectorPromise = offsetDataByLabwareId.then(result => ({
         ...result[labwareId],
       }))

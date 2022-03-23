@@ -23,7 +23,8 @@ sdist_file = dist/$(call python_get_sdistname,robot-server,robot_server)
 # make test tests=tests/opentrons/tools/test_qc_scripts.py would run only the
 # specified test
 tests ?= tests
-test_opts ?= --cov=$(SRC_PATH) --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
+cov_opts ?= --cov=$(SRC_PATH) --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
+test_opts ?=
 
 # Host key location for buildroot robot
 br_ssh_key ?= $(default_ssh_key)
@@ -66,6 +67,12 @@ setup:
 	$(pipenv) sync $(pipenv_opts)
 	$(pipenv) run pip freeze
 
+.PHONY: setup-ot2
+setup-ot2:
+	$(pipenv) sync $(pipenv_opts)
+	$(pipenv) run pip uninstall -y opentrons_hardware
+	$(pipenv) run pip freeze
+
 .PHONY: clean
 clean:
 	$(clean_cmd)
@@ -93,6 +100,10 @@ sdist: $(sdist_file)
 .PHONY: test
 test:
 	$(pytest) $(tests) $(test_opts)
+
+.PHONY: test-cov
+test-cov:
+	$(pytest) $(tests) $(test_opts) $(cov_opts)
 
 .PHONY: lint
 lint:

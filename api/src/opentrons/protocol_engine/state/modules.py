@@ -1,9 +1,21 @@
 """Basic modules data state and store."""
+
+
+from __future__ import annotations
+
 from dataclasses import dataclass
-from typing import Dict, List, NamedTuple, Sequence
+from typing import Dict, List, NamedTuple, Optional, Sequence, overload
+from typing_extensions import Final
 from numpy import array, dot
 
+from opentrons.hardware_control.modules import AbstractModule, MagDeck
+from opentrons.hardware_control.modules.magdeck import (
+    engage_height_is_in_range,
+    OFFSET_TO_LABWARE_BOTTOM as MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM,
+    MAX_ENGAGE_HEIGHT as MAGNETIC_MODULE_MAX_ENGAGE_HEIGHT,
+)
 from opentrons.types import DeckSlotName
+
 from ..types import (
     LoadedModule,
     ModuleModel,
@@ -89,13 +101,17 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
 
 
 class ModuleView(HasState[ModuleState]):
-    """Read-only view of computet modules state."""
+    """Read-only view of computed module state."""
 
     _state: ModuleState
 
-    def __init__(self, state: ModuleState) -> None:
+    # TODO(mm, 2022-03-14): Fix this duplication between here and EngineConfigs.
+    _virtualize_modules: bool
+
+    def __init__(self, state: ModuleState, virtualize_modules: bool) -> None:
         """Initialize the view with its backing state value."""
         self._state = state
+        self._virtualize_modules = virtualize_modules
 
     def get(self, module_id: str) -> LoadedModule:
         """Get module data by the module's unique identifier."""
@@ -103,8 +119,8 @@ class ModuleView(HasState[ModuleState]):
             slot_name = self._state.slot_by_module_id[module_id]
             attached_module = self._state.hardware_module_by_slot[slot_name]
 
-        except KeyError:
-            raise errors.ModuleDoesNotExistError(f"Module {module_id} not found.")
+        except KeyError as e:
+            raise errors.ModuleNotLoadedError(f"Module {module_id} not found.") from e
 
         return LoadedModule.construct(
             id=module_id,
@@ -114,9 +130,32 @@ class ModuleView(HasState[ModuleState]):
             definition=attached_module.definition,
         )
 
+    def is_virtualizing_modules(self) -> bool:
+        """Return whether this Protocol Engine is using virtual modules."""
+        return self._virtualize_modules
+
     def get_all(self) -> List[LoadedModule]:
         """Get a list of all module entries in state."""
         return [self.get(mod_id) for mod_id in self._state.slot_by_module_id.keys()]
+
+    def get_magnetic_module_view(self, module_id: str) -> MagneticModuleView:
+        """Return a `MagneticModuleView` for the given Magnetic Module.
+
+        Raises:
+            ModuleNotLoadedError: If module_id has not been loaded.
+            WrongModuleTypeError: If module_id has been loaded,
+                but it's not a Magnetic Module.
+        """
+        model = self.get_model(module_id=module_id)  # Propagate ModuleNotLoadedError
+        if model in [
+            ModuleModel.MAGNETIC_MODULE_V1,
+            ModuleModel.MAGNETIC_MODULE_V2,
+        ]:
+            return MagneticModuleView(parent_module_view=self, module_id=module_id)
+        else:
+            raise errors.WrongModuleTypeError(
+                f"{module_id} is a {model}, not a Magnetic Module."
+            )
 
     def get_location(self, module_id: str) -> DeckSlotLocation:
         """Get the slot location of the given module."""
@@ -188,9 +227,108 @@ class ModuleView(HasState[ModuleState]):
         ):
             return definition.dimensions.lidHeight
         else:
-            raise errors.ModuleIsNotThermocyclerError(
+            raise errors.WrongModuleTypeError(
                 f"Cannot get lid height of {definition.moduleType}"
             )
+
+    @staticmethod
+    def get_magnet_home_to_base_offset(module_model: ModuleModel) -> float:
+        """Return a Magnetic Module's home offset.
+
+        This is how far a Magnetic Module's magnets have to rise above their
+        home position for their tops to be level with the bottom of the labware.
+
+        The offset is returned in true millimeters,
+        even though GEN1 Magnetic Modules are sometimes controlled in units of
+        half-millimeters ("short mm").
+        """
+        if module_model == ModuleModel.MAGNETIC_MODULE_V1:
+            offset_in_half_mm = MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM[
+                "magneticModuleV1"
+            ]
+            return offset_in_half_mm / 2
+        elif module_model == ModuleModel.MAGNETIC_MODULE_V2:
+            return MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM["magneticModuleV2"]
+        else:
+            raise errors.WrongModuleTypeError(
+                f"Can't get magnet offset of {module_model}."
+            )
+
+    @overload
+    @classmethod
+    def calculate_magnet_height(
+        cls,
+        *,
+        module_model: ModuleModel,
+        height_from_home: float,
+    ) -> float:
+        pass
+
+    @overload
+    @classmethod
+    def calculate_magnet_height(
+        cls,
+        *,
+        module_model: ModuleModel,
+        height_from_base: float,
+    ) -> float:
+        pass
+
+    @overload
+    @classmethod
+    def calculate_magnet_height(
+        cls,
+        *,
+        module_model: ModuleModel,
+        labware_default_height: float,
+        offset_from_labware_default: float,
+    ) -> float:
+        pass
+
+    @classmethod
+    def calculate_magnet_height(
+        cls,
+        *,
+        module_model: ModuleModel,
+        height_from_home: Optional[float] = None,
+        height_from_base: Optional[float] = None,
+        labware_default_height: Optional[float] = None,
+        offset_from_labware_default: Optional[float] = None,
+    ) -> float:
+        """Normalize a Magnetic Module engage height to standard units.
+
+        Args:
+            module_model: What kind of Magnetic Module to calculate the height for.
+            height_from_home: A distance above the magnets' home position,
+                in millimeters.
+            heght_from_base: A distance above the labware base plane,
+                in millimeters.
+            labware_default_height: A distance above the labware base plane,
+                in millimeters, from a labware definition.
+            offset_from_labware_default: A distance from the
+                ``labware_default_height`` argument, in hardware units.
+
+        Negative values are allowed for all arguments, to move down instead of up.
+
+        See the overload signatures for which combinations of parameters are allowed.
+
+        Returns:
+            The same height passed in, converted to be measured in
+            millimeters above the module's labware base plane,
+            suitable as input to a Magnetic Module engage Protocol Engine command.
+        """
+        if height_from_home is not None:
+            home_to_base = cls.get_magnet_home_to_base_offset(module_model=module_model)
+            return height_from_home - home_to_base
+
+        elif height_from_base is not None:
+            return height_from_base
+
+        else:
+            # Guaranteed statically by overload.
+            assert labware_default_height is not None
+            assert offset_from_labware_default is not None
+            return labware_default_height + offset_from_labware_default
 
     def should_dodge_thermocycler(
         self,
@@ -210,7 +348,7 @@ class ModuleView(HasState[ModuleState]):
                 return True
         return False
 
-    def find_attached_module(
+    def select_hardware_module_to_load(
         self,
         model: ModuleModel,
         location: DeckSlotLocation,
@@ -257,3 +395,103 @@ class ModuleView(HasState[ModuleState]):
                     return m
 
         raise errors.ModuleNotAttachedError(f"No available {model.value} found.")
+
+
+class MagneticModuleView:
+    """A Magnetic Module view.
+
+    Provides calculations and read-only state access
+    for an individual loaded Magnetic Module.
+    """
+
+    def __init__(self, parent_module_view: ModuleView, module_id: str) -> None:
+        """Initialize the `MagneticModuleView`.
+
+        Do not use this initializer directly, except in tests.
+        Use `ModuleView.get_magnetic_module_view()` instead.
+        """
+        self.parent_module_view: Final = parent_module_view
+        self.module_id: Final = module_id
+
+    def find_hardware(
+        self, attached_modules: List[AbstractModule]
+    ) -> Optional[MagDeck]:
+        """Find the matching attached hardware module.
+
+        Params:
+            attached_modules: The list of attached hardware modules,
+                from the `HardwareControlAPI`, to search.
+                If the Protocol Engine is using virtual modules,
+                there are no meaningful "attached hardware modules,"
+                so this list is ignored.
+
+        Returns:
+            If the Protocol Engine is using virtual modules, returns ``None``.
+            If not, returns the element of attached_modules that corresponds to
+            the same individual module as this `MagneticModuleView`.
+
+        Raises:
+            ModuleNotAttachedError: If no match was found in ``attached_modules``,
+                and the Protocol Engine is *not* using virtual modules.
+        """
+        if self.parent_module_view.is_virtualizing_modules():
+            return None
+        else:
+            serial_number = self.parent_module_view.get_serial_number(
+                module_id=self.module_id
+            )
+            for candidate in attached_modules:
+                if candidate.device_info["serial"] == serial_number and isinstance(
+                    candidate, MagDeck
+                ):
+                    return candidate
+            # This will report a mismatched module type as ModuleNotAttachedError
+            # instead of WrongModuleTypeError, but that's fine because that
+            # shouldn't be possible anyway. (It should be caught at module load.)
+            raise errors.ModuleNotAttachedError(
+                f'No module attached with serial number "{serial_number}'
+                f' for Protocol Engine module ID "{self.module_id}".'
+            )
+
+    def calculate_magnet_hardware_height(self, mm_from_base: float) -> float:
+        """Convert a human-friendly magnet height to be hardware-friendly.
+
+        Args:
+            mm_from_base: The height to convert. Measured in how far the tops
+                of the magnets are above the labware base plane.
+
+        Returns:
+            The same height, with its units and origin point converted
+            so that it's suitable to pass to `MagDeck.engage()`.
+
+        Raises:
+            WrongModuleTypeError: If the given model is not a Magnetic Module.
+            EngageHeightOutOfRangeError: If modules of the given model are
+                physically incapable of reaching the requested height.
+        """
+        model = self.parent_module_view.get_model(self.module_id)
+        if model not in [
+            ModuleModel.MAGNETIC_MODULE_V1,
+            ModuleModel.MAGNETIC_MODULE_V2,
+        ]:
+            # Shouldn't be possible; should have been caught during load time.
+            raise errors.WrongModuleTypeError(f"{model} is not a Magnetic Module.")
+
+        hardware_units_from_base = (
+            mm_from_base * 2
+            if model == ModuleModel.MAGNETIC_MODULE_V1
+            else mm_from_base
+        )
+        home_to_base_offset = MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM[model]
+        hardware_units_from_home = home_to_base_offset + hardware_units_from_base
+        if not engage_height_is_in_range(model=model, height=hardware_units_from_home):
+            # TODO(mm, 2022-03-02): This error message probably will not match how
+            # the user specified the height. (Hardware units versus mm,
+            # home as origin versus labware base as origin.) This may be confusing
+            # depending on how it propagates up.
+            raise errors.EngageHeightOutOfRangeError(
+                f"Invalid engage height for {model}:"
+                f" {hardware_units_from_home}. Must be"
+                f" 0 - {MAGNETIC_MODULE_MAX_ENGAGE_HEIGHT[model]}."
+            )
+        return hardware_units_from_home

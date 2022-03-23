@@ -5,7 +5,7 @@ from typing import Optional, cast
 
 from opentrons.types import MountType
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.protocol_engine import commands as cmd
+from opentrons.protocol_engine import ErrorOccurrence, commands as cmd
 from opentrons.protocol_engine.types import (
     PipetteName,
     WellLocation,
@@ -37,6 +37,7 @@ def create_running_command(
     command_id: str = "command-id",
     command_key: str = "command-key",
     command_type: str = "command-type",
+    created_at: datetime = datetime(year=2021, month=1, day=1),
     params: Optional[BaseModel] = None,
 ) -> cmd.Command:
     """Given command data, build a running command model."""
@@ -45,7 +46,7 @@ def create_running_command(
         cmd.BaseCommand(
             id=command_id,
             key=command_key,
-            createdAt=datetime(year=2021, month=1, day=1),
+            createdAt=created_at,
             commandType=command_type,
             status=cmd.CommandStatus.RUNNING,
             params=params or BaseModel(),
@@ -57,10 +58,10 @@ def create_failed_command(
     command_id: str = "command-id",
     command_key: str = "command-key",
     command_type: str = "command-type",
-    error_id: str = "error-id",
     created_at: datetime = datetime(year=2021, month=1, day=1),
     completed_at: datetime = datetime(year=2022, month=2, day=2),
     params: Optional[BaseModel] = None,
+    error: Optional[ErrorOccurrence] = None,
 ) -> cmd.Command:
     """Given command data, build a failed command model."""
     return cast(
@@ -69,11 +70,11 @@ def create_failed_command(
             id=command_id,
             key=command_key,
             createdAt=created_at,
+            completedAt=completed_at,
             commandType=command_type,
             status=cmd.CommandStatus.FAILED,
             params=params or BaseModel(),
-            errorId=error_id,
-            completedAt=completed_at,
+            error=error,
         ),
     )
 
@@ -82,6 +83,7 @@ def create_succeeded_command(
     command_id: str = "command-id",
     command_key: str = "command-key",
     command_type: str = "command-type",
+    created_at: datetime = datetime(year=2021, month=1, day=1),
     params: Optional[BaseModel] = None,
     result: Optional[BaseModel] = None,
 ) -> cmd.Command:
@@ -91,7 +93,7 @@ def create_succeeded_command(
         cmd.BaseCommand(
             id=command_id,
             key=command_key,
-            createdAt=datetime(year=2021, month=1, day=1),
+            createdAt=created_at,
             commandType=command_type,
             status=cmd.CommandStatus.SUCCEEDED,
             params=params or BaseModel(),

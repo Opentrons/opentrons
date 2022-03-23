@@ -102,6 +102,9 @@ CLASSIFIERS = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
     "Topic :: Scientific/Engineering",
 ]
 KEYWORDS = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
@@ -113,6 +116,8 @@ DESCRIPTION = (
 PACKAGES = find_packages(where=".", exclude=["tests"])
 INSTALL_REQUIRES = [
     "jsonschema==3.0.2",
+    "typing-extensions==3.10.0.0",
+    "pydantic==1.8.2",
 ]
 
 

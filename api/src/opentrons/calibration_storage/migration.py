@@ -5,7 +5,7 @@ from . import file_operators as io, types as local_types
 MAX_VERSION = 1
 
 
-def check_index_version(index_path: local_types.StrPath):
+def check_index_version(index_path: local_types.StrPath) -> None:
     try:
         index_file = io.read_cal_file(str(index_path))
         version = index_file.get("version", 0)
@@ -15,7 +15,7 @@ def check_index_version(index_path: local_types.StrPath):
         pass
 
 
-def migrate_index_0_to_1(index_path: local_types.StrPath):
+def migrate_index_0_to_1(index_path: local_types.StrPath) -> None:
     """
     Previously, the index file was keyed as
     ```
@@ -36,7 +36,7 @@ def migrate_index_0_to_1(index_path: local_types.StrPath):
     the correct format so users do not lose their calibrations
     """
     index_file = io.read_cal_file(str(index_path))
-    updated_entries: typing.Dict = {}
+    updated_entries: typing.Dict[str, typing.Any] = {}
     for key, data in index_file.items():
         uri = key
         full_hash = data["slot"]

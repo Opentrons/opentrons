@@ -6,13 +6,15 @@ from pathlib import Path
 from pydantic import ValidationError, parse_raw_as
 from typing import List, Optional, Sequence, Union
 
+from opentrons_shared_data.protocol.models import ProtocolSchemaV6
+
 from opentrons.protocols.models import JsonProtocol, LabwareDefinition
 
 from .input_file import AbstractInputFile
 
 
 # TODO(mc, 2021-12-07): add support for arbitrary JSON data files
-BufferedJsonFileData = Union[JsonProtocol, LabwareDefinition]
+BufferedJsonFileData = Union[JsonProtocol, LabwareDefinition, ProtocolSchemaV6]
 
 
 # TODO(mc, 2021-12-07): re-evaluate if JSON parsing (and this `data` field)
@@ -47,7 +49,7 @@ class FileReaderWriter:
                 contents = await f.read()
                 data: Optional[BufferedJsonFileData] = None
 
-                if input_file.filename.endswith(".json"):
+                if input_file.filename.lower().endswith(".json"):
                     try:
                         data = parse_raw_as(BufferedJsonFileData, contents)  # type: ignore[arg-type]  # noqa: E501
 

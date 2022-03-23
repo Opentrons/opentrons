@@ -3,14 +3,12 @@ from typing import Dict, List, Optional, Set
 from collections import OrderedDict
 
 from opentrons import types
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
 from opentrons.hardware_control.modules import AbstractModule, ModuleModel
 from opentrons.hardware_control.types import DoorState, PauseType
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
-from opentrons.protocols.geometry.deck import Deck
-from opentrons.protocols.geometry import module_geometry
-from opentrons.protocols.geometry.deck_item import DeckItem
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.protocols.context.protocol_api.instrument_context import (
     InstrumentContextImplementation,
 )
@@ -21,8 +19,11 @@ from opentrons.protocols.context.protocol import (
     InstrumentDict,
     LoadModuleResult,
 )
-from opentrons.protocols.api_support.util import AxisMaxSpeeds
+from opentrons.protocols.geometry import module_geometry
+from opentrons.protocols.geometry.deck import Deck
+from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocols.labware import load_from_definition, get_labware_definition
+
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 

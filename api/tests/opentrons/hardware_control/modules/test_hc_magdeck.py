@@ -8,9 +8,8 @@ from opentrons.drivers.rpi_drivers.types import USBPort
 def usb_port():
     return USBPort(
         name="",
-        sub_names=[],
         hub=None,
-        port_number=None,
+        port_number=0,
         device_path="/dev/ot_module_sim_magdeck0",
     )
 
@@ -22,7 +21,7 @@ async def test_sim_initialization(loop, usb_port):
         which="magdeck",
         simulating=True,
         loop=loop,
-        execution_manager=ExecutionManager(loop=loop),
+        execution_manager=ExecutionManager(),
     )
     assert isinstance(mag, modules.AbstractModule)
 
@@ -34,7 +33,7 @@ async def test_sim_data(loop, usb_port):
         which="magdeck",
         simulating=True,
         loop=loop,
-        execution_manager=ExecutionManager(loop=loop),
+        execution_manager=ExecutionManager(),
     )
     assert mag.status == "disengaged"
     assert mag.device_info["serial"] == "dummySerialMD"
@@ -52,7 +51,7 @@ async def test_sim_state_update(loop, usb_port):
         which="magdeck",
         simulating=True,
         loop=loop,
-        execution_manager=ExecutionManager(loop=loop),
+        execution_manager=ExecutionManager(),
     )
     await mag.calibrate()
     assert mag.status == "disengaged"
@@ -69,7 +68,7 @@ async def test_revision_model_parsing(loop, usb_port):
         True,
         usb_port,
         loop=loop,
-        execution_manager=ExecutionManager(loop=loop),
+        execution_manager=ExecutionManager(),
     )
     mag._device_info["model"] = "mag_deck_v1.1"
     assert mag.model() == "magneticModuleV1"

@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [5.0.0-beta.8](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.7...v5.0.0-beta.8) (2022-02-03)
+## [5.0.2](https://github.com/Opentrons/opentrons/compare/v5.0.1...v5.0.2) (2022-03-03)
 
 **Note:** Version bump only for package @opentrons/labware-library
 
@@ -11,7 +11,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-# [5.0.0-beta.7](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.6...v5.0.0-beta.7) (2022-01-28)
+## [5.0.1](https://github.com/Opentrons/opentrons/compare/v5.0.0...v5.0.1) (2022-02-24)
 
 **Note:** Version bump only for package @opentrons/labware-library
 
@@ -19,60 +19,17 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-# [5.0.0-beta.6](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.5...v5.0.0-beta.6) (2022-01-07)
-
-**Note:** Version bump only for package @opentrons/labware-library
-
-
-
-
-
-# [5.0.0-beta.5](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.4...v5.0.0-beta.5) (2021-12-23)
-
-**Note:** Version bump only for package @opentrons/labware-library
-
-
-
-
-
-# [5.0.0-beta.4](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.3...v5.0.0-beta.4) (2021-12-14)
-
-**Note:** Version bump only for package @opentrons/labware-library
-
-
-
-
-
-# [5.0.0-beta.3](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.2...v5.0.0-beta.3) (2021-12-10)
-
-**Note:** Version bump only for package @opentrons/labware-library
-
-
-
-
-
-# [5.0.0-beta.2](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.1...v5.0.0-beta.2) (2021-12-08)
-
-**Note:** Version bump only for package @opentrons/labware-library
-
-
-
-
-
-# [5.0.0-beta.1](https://github.com/Opentrons/opentrons/compare/v5.0.0-beta.0...v5.0.0-beta.1) (2021-12-07)
-
-**Note:** Version bump only for package @opentrons/labware-library
-
-
-
-
-
-# [5.0.0-beta.0](https://github.com/Opentrons/opentrons/compare/v4.7.0...v5.0.0-beta.0) (2021-11-30)
+# [5.0.0](https://github.com/Opentrons/opentrons/compare/v4.7.0...v5.0.0) (2022-02-16)
 
 
 ### Bug Fixes
 
 * **labware-library:** Default opentrons tuberack inserts to brand opentrons ([#8644](https://github.com/Opentrons/opentrons/issues/8644)) ([1f0d8c0](https://github.com/Opentrons/opentrons/commit/1f0d8c0537e4b72d3313e2de5bc5bbbe897574a3)), closes [#8248](https://github.com/Opentrons/opentrons/issues/8248)
+
+
+### Features
+
+* **labware-library:** Add 4 new labware definitions to shared-data/library ([#9218](https://github.com/Opentrons/opentrons/issues/9218)) ([a7a51b2](https://github.com/Opentrons/opentrons/commit/a7a51b273b1450943221a64f140a30ec1eb0c042)), closes [#8649](https://github.com/Opentrons/opentrons/issues/8649)
 
 
 

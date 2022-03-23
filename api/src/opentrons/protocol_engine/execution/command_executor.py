@@ -2,6 +2,8 @@
 from logging import getLogger
 from typing import Optional
 
+from opentrons.hardware_control import HardwareControlAPI
+
 from ..state import StateStore
 from ..resources import ModelUtils
 from ..commands import CommandStatus
@@ -11,6 +13,8 @@ from .equipment import EquipmentHandler
 from .movement import MovementHandler
 from .pipetting import PipettingHandler
 from .run_control import RunControlHandler
+from .rail_lights import RailLightsHandler
+
 
 log = getLogger(__name__)
 
@@ -24,21 +28,25 @@ class CommandExecutor:
 
     def __init__(
         self,
+        hardware_api: HardwareControlAPI,
         state_store: StateStore,
         action_dispatcher: ActionDispatcher,
         equipment: EquipmentHandler,
         movement: MovementHandler,
         pipetting: PipettingHandler,
         run_control: RunControlHandler,
+        rail_lights: RailLightsHandler,
         model_utils: Optional[ModelUtils] = None,
     ) -> None:
         """Initialize the CommandExecutor with access to its dependencies."""
+        self._hardware_api = hardware_api
         self._state_store = state_store
         self._action_dispatcher = action_dispatcher
         self._equipment = equipment
         self._movement = movement
         self._pipetting = pipetting
         self._run_control = run_control
+        self._rail_lights = rail_lights
         self._model_utils = model_utils or ModelUtils()
 
     async def execute(self, command_id: str) -> None:
@@ -50,10 +58,13 @@ class CommandExecutor:
         """
         command = self._state_store.commands.get(command_id=command_id)
         command_impl = command._ImplementationCls(
+            state_view=self._state_store,
+            hardware_api=self._hardware_api,
             equipment=self._equipment,
             movement=self._movement,
             pipetting=self._pipetting,
             run_control=self._run_control,
+            rail_lights=self._rail_lights,
         )
 
         started_at = self._model_utils.get_timestamp()

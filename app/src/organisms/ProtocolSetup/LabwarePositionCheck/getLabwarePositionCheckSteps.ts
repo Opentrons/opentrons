@@ -1,3 +1,4 @@
+import omitBy from 'lodash/omitBy'
 import values from 'lodash/values'
 import { getPrimaryPipetteId } from './utils/getPrimaryPipetteId'
 import { getPipetteWorkflow } from './utils/getPipetteWorkflow'
@@ -5,19 +6,28 @@ import { getOnePipettePositionCheckSteps } from './utils/getOnePipettePositionCh
 import { getTwoPipettePositionCheckSteps } from './utils/getTwoPipettePositionCheckSteps'
 import type {
   RunTimeCommand,
-  ProtocolFile,
+  ProtocolAnalysisFile,
 } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { LabwarePositionCheckStep } from './types'
 
 export const getLabwarePositionCheckSteps = (
-  protocolData: ProtocolFile<{}>
+  protocolData: ProtocolAnalysisFile
 ): LabwarePositionCheckStep[] => {
   if (protocolData != null && 'pipettes' in protocolData) {
-    const pipettesById: ProtocolFile<{}>['pipettes'] = protocolData.pipettes
+    // filter out any pipettes that are not being used in the protocol
+    const pipettesById: ProtocolAnalysisFile['pipettes'] = omitBy(
+      protocolData.pipettes,
+      (_pipette, id) =>
+        !protocolData.commands.some(
+          command =>
+            command.commandType === 'pickUpTip' &&
+            command.params.pipetteId === id
+        )
+    )
     const pipettes = values(pipettesById)
     const pipetteNames = pipettes.map(({ name }) => name)
     const labware = protocolData.labware
-    const modules: ProtocolFile<{}>['modules'] = protocolData.modules
+    const modules: ProtocolAnalysisFile['modules'] = protocolData.modules
     const labwareDefinitions = protocolData.labwareDefinitions
     const commands: RunTimeCommand[] = protocolData.commands
     const primaryPipetteId = getPrimaryPipetteId(pipettesById, commands)

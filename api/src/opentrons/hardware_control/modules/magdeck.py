@@ -13,11 +13,25 @@ from . import update, mod_abc, types
 log = logging.getLogger(__name__)
 
 MAX_ENGAGE_HEIGHT = {
-    # mm from home position
+    # Distance from home position.
+    # Measured in model-specific units (half-mm for GEN1, mm for GEN2).
     "magneticModuleV1": 45,
     "magneticModuleV2": 25,
 }
+
+# Measured in model-specific units (half-mm for GEN1, mm for GEN2).
 OFFSET_TO_LABWARE_BOTTOM = {"magneticModuleV1": 5, "magneticModuleV2": 2.5}
+
+
+def engage_height_is_in_range(model: str, height: float) -> bool:
+    """Return whether or not a height would be valid to pass to `MagDeck.engage()`.
+
+    Args:
+        model: The model of Magnetic Module for which you want to check
+            the engage height.
+        height: A height that you would provide to `MagDeck.engage()`.
+    """
+    return 0 <= height <= MAX_ENGAGE_HEIGHT[model]
 
 
 class MagDeck(mod_abc.AbstractModule):
@@ -30,11 +44,11 @@ class MagDeck(mod_abc.AbstractModule):
         port: str,
         usb_port: USBPort,
         execution_manager: ExecutionManager,
-        simulating=False,
-        loop: asyncio.AbstractEventLoop = None,
-        sim_model: str = None,
-        **kwargs,
-    ):
+        simulating: bool = False,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
+        sim_model: Optional[str] = None,
+        **kwargs: float,
+    ) -> "MagDeck":
         """Factory function."""
         driver: AbstractMagDeckDriver
         if not simulating:
@@ -59,7 +73,7 @@ class MagDeck(mod_abc.AbstractModule):
         execution_manager: ExecutionManager,
         driver: AbstractMagDeckDriver,
         device_info: Mapping[str, str],
-        loop: asyncio.AbstractEventLoop = None,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
     ) -> None:
         """Constructor"""
         super().__init__(
@@ -93,12 +107,17 @@ class MagDeck(mod_abc.AbstractModule):
         # return if successful or not?
 
     async def engage(self, height: float) -> None:
-        """Move the magnet to a specific height, in mm from home position."""
+        """Move the magnet to a specific height, measured from home position.
+
+        The units of position depend on the module model.
+        For GEN1, it's half millimeters ("short millimeters").
+        For GEN2, it's millimeters.
+        """
         await self.wait_for_is_running()
-        if height > MAX_ENGAGE_HEIGHT[self.model()] or height < 0:
+        if not engage_height_is_in_range(self.model(), height):
             raise ValueError(
-                f"Invalid engage height for {self.model()}: {height} mm. "
-                f"Must be 0 - {MAX_ENGAGE_HEIGHT[self.model()]} mm"
+                f"Invalid engage height for {self.model()}: {height}. "
+                f"Must be 0 - {MAX_ENGAGE_HEIGHT[self.model()]}."
             )
         await self._driver.move(height)
         self._current_height = await self._driver.get_mag_position()

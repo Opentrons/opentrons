@@ -19,7 +19,8 @@ class UnexpectedProtocolError(ProtocolEngineError):
         self.original_error: Exception = original_error
 
 
-# TODO(mc, 2020-10-18): differentiate between pipette missing vs incorrect
+# TODO(mc, 2020-10-18): differentiate between pipette missing vs incorrect.
+# By comparison, loadModule uses ModuleAlreadyPresentError and ModuleNotAttachedError.
 class FailedToLoadPipetteError(ProtocolEngineError):
     """An error raised when executing a LoadPipette command fails.
 
@@ -42,8 +43,8 @@ class PipetteTipInfoNotFoundError(ProtocolEngineError):
     """An error raised when fetching information (like tiprack id) of attached tip."""
 
 
-class LabwareDoesNotExistError(ProtocolEngineError):
-    """An error raised when referencing a labware that does not exist."""
+class LabwareNotLoadedError(ProtocolEngineError):
+    """An error raised when referencing a labware that has not been loaded."""
 
 
 class LabwareDefinitionDoesNotExistError(ProtocolEngineError):
@@ -62,12 +63,12 @@ class WellDoesNotExistError(ProtocolEngineError):
     """An error raised when referencing a well that does not exist."""
 
 
-class PipetteDoesNotExistError(ProtocolEngineError):
-    """An error raised when referencing a pipette that does not exist."""
+class PipetteNotLoadedError(ProtocolEngineError):
+    """An error raised when referencing a pipette that has not been loaded."""
 
 
-class ModuleDoesNotExistError(ProtocolEngineError):
-    """And error raised when referencing a module that does not exist."""
+class ModuleNotLoadedError(ProtocolEngineError):
+    """And error raised when referencing a module that has not been loaded."""
 
 
 class SlotDoesNotExistError(ProtocolEngineError):
@@ -100,8 +101,8 @@ class ModuleAlreadyPresentError(ProtocolEngineError):
     """An error raised when a module is already present in a requested location."""
 
 
-class ModuleIsNotThermocyclerError(ProtocolEngineError):
-    """An error raised when performing thermocycler actions with a non-thermocycler."""
+class WrongModuleTypeError(ProtocolEngineError):
+    """An error raised when performing a module action on the wrong kind of module."""
 
 
 class ThermocyclerNotOpenError(ProtocolEngineError):
@@ -110,3 +111,7 @@ class ThermocyclerNotOpenError(ProtocolEngineError):
 
 class RobotDoorOpenError(ProtocolEngineError):
     """An error raised when executing a protocol command when a robot door is open."""
+
+
+class EngageHeightOutOfRangeError(ProtocolEngineError):
+    """An error raised when a Magnetic Module engage height is out of bounds."""

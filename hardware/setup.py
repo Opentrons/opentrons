@@ -76,10 +76,14 @@ if __name__ == "__main__":
         classifiers=CLASSIFIERS,
         install_requires=INSTALL_REQUIRES,
         include_package_data=True,
+        package_data={
+            "opentrons_hardware": ["py.typed", "opentrons_hardware.cmakefind"]
+        },
         entry_points={
             "console_scripts": [
                 "opentrons_update_fw = opentrons_hardware.scripts.update_fw:main",
                 "opentrons_can_comm = opentrons_hardware.scripts.can_comm:main",
+                "opentrons_can_mon = opentrons_hardware.scripts.can_mon:main",
                 "opentrons_sim_can_bus = opentrons_hardware.scripts.sim_socket_can:main",  # noqa: E501
             ]
         },
