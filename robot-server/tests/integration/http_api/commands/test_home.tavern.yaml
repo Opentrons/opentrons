@@ -28,7 +28,7 @@ stages:
           params:
             axes:
               - x
-              - 'y'
+              - y
               - leftZ
               - rightZ
               - leftPlunger
