@@ -11,11 +11,10 @@ from opentrons_hardware.hardware_control.tools import detector
 from opentrons_hardware.firmware_bindings.messages import message_definitions, payloads
 from opentrons_hardware.firmware_bindings import (
     NodeId,
-    ArbitrationId,
-    ArbitrationIdParts,
 )
 from opentrons_hardware.hardware_control.tools.types import ToolDetectionResult
-from tests.conftest import MockCanMessageNotifier
+from tests.conftest import CanLoopback
+from typing import List, Tuple
 
 
 @pytest.fixture
@@ -31,7 +30,9 @@ def subject(
     argvalues=[
         [
             payloads.ToolsDetectedNotificationPayload(
-                z_motor=ToolField(1), a_motor=ToolField(2), gripper=ToolField(5)
+                z_motor=ToolField(ToolType.pipette_96_chan.value),
+                a_motor=ToolField(ToolType.pipette_384_chan.value),
+                gripper=ToolField(ToolType.gripper.value),
             ),
             ToolDetectionResult(
                 left=ToolType.pipette_96_chan,
@@ -41,7 +42,9 @@ def subject(
         ],
         [
             payloads.ToolsDetectedNotificationPayload(
-                z_motor=ToolField(221), a_motor=ToolField(2), gripper=ToolField(5)
+                z_motor=ToolField(221),
+                a_motor=ToolField(ToolType.pipette_384_chan.value),
+                gripper=ToolField(ToolType.gripper.value),
             ),
             ToolDetectionResult(
                 left=ToolType.undefined_tool,
@@ -54,7 +57,7 @@ def subject(
 async def test_messaging(
     subject: detector.ToolDetector,
     mock_messenger: AsyncMock,
-    can_message_notifier: MockCanMessageNotifier,
+    message_send_loopback: CanLoopback,
     payload: payloads.ToolsDetectedNotificationPayload,
     expected: ToolDetectionResult,
 ) -> None:
@@ -64,25 +67,21 @@ async def test_messaging(
     then messages are read asynchronously.
     """
 
-    def responder(node_id: NodeId, message: MessageDefinition) -> None:
+    def responder(
+        node_id: NodeId, message: MessageDefinition
+    ) -> List[Tuple[NodeId, MessageDefinition, NodeId]]:
         """Mock send method."""
         if isinstance(message, message_definitions.AttachedToolsRequest):
-            response = message_definitions.PushToolsDetectedNotification(
-                payload=payload
-            )
-            can_message_notifier.notify(
-                message=response,
-                arbitration_id=ArbitrationId(
-                    parts=ArbitrationIdParts(
-                        message_id=response.message_id,
-                        originating_node_id=node_id,
-                        node_id=NodeId.host,
-                        function_code=0,
-                    )
-                ),
-            )
+            return [
+                (
+                    NodeId.host,
+                    message_definitions.PushToolsDetectedNotification(payload=payload),
+                    NodeId.head,
+                )
+            ]
+        return []
 
-    mock_messenger.send.side_effect = responder
+    message_send_loopback.add_responder(responder)
 
     tool = await subject.detect().__anext__()
 
@@ -90,7 +89,7 @@ async def test_messaging(
 
     assert mock_messenger.send.mock_calls == [
         call(
-            node_id=NodeId.host,
+            node_id=NodeId.head,
             message=message_definitions.AttachedToolsRequest(
                 payload=payloads.EmptyPayload()
             ),

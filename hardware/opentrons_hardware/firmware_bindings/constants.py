@@ -54,6 +54,8 @@ class MessageId(int, Enum):
     device_info_response = 0x303
     task_info_request = 0x304
     task_info_response = 0x305
+    pipette_info_request = 0x306
+    pipette_info_response = 0x307
 
     stop_request = 0x00
 
@@ -152,3 +154,11 @@ class SensorType(int, Enum):
     humidity = 0x02
     temperature = 0x03
     pressure = 0x04
+
+
+@unique
+class PipetteName(int, Enum):
+    """High-level type of pipette."""
+
+    p1000_single = 0x00
+    p1000_multi = 0x01

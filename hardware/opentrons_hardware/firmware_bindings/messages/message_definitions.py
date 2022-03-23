@@ -391,3 +391,17 @@ class SensorThresholdResponse:  # noqa: D101
     message_id: Literal[
         MessageId.set_sensor_threshold_response
     ] = MessageId.set_sensor_threshold_response
+
+
+@dataclass
+class PipetteInfoRequest(EmptyPayloadMessage):  # noqa: D101
+    message_id: Literal[MessageId.pipette_info_request] = MessageId.pipette_info_request
+
+
+@dataclass
+class PipetteInfoResponse:  # noqa: D101
+    payload: payloads.PipetteInfoResponsePayload
+    payload_type: Type[BinarySerializable] = payloads.PipetteInfoResponsePayload
+    message_id: Literal[
+        MessageId.pipette_info_response
+    ] = MessageId.pipette_info_response
