@@ -272,9 +272,16 @@ class OT3Controller:
             move_group_pipette.append(pipette_move)
 
         runner_gantry_z = MoveGroupRunner(move_groups=move_group_gantry_z)
-        await runner_gantry_z.run(can_messenger=self._messenger)
         runner_pipette = MoveGroupRunner(move_groups=move_group_pipette)
-        await runner_pipette.run(can_messenger=self._messenger)
+        if move_group_pipette and move_group_gantry_z:
+            await asyncio.gather(
+                runner_gantry_z.run(can_messenger=self._messenger),
+                runner_pipette.run(can_messenger=self._messenger),
+            )
+        elif not move_group_pipette:
+            await runner_gantry_z.run(can_messenger=self._messenger)
+        elif not move_group_gantry_z:
+            await runner_pipette.run(can_messenger=self._messenger)
 
         axis_positions = {
             axis_to_node(ax): self._get_home_position()[axis_to_node(ax)]
