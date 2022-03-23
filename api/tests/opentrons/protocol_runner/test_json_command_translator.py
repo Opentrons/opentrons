@@ -12,7 +12,7 @@ from opentrons.protocol_engine import (
     PipetteName,
     WellLocation,
     WellOrigin,
-    WellOffset,
+    WellOffset
 )
 
 VALID_TEST_PARAMS = [(json_v6_models.Command(
@@ -118,6 +118,19 @@ VALID_TEST_PARAMS = [(json_v6_models.Command(
             mount=MountType("left"),
         )
     )
+), (
+    json_v6_models.Command(
+        id="load-module-command-id-666",
+        commandType="loadModule",  # used to be delay but is expecting pause
+        params=json_v6_models.Params(
+            moduleId="magneticModuleId",
+            location={"slotName": "3"}
+        )),
+    pe_commands.LoadModuleCreate(params=pe_commands.LoadModuleParams(
+        model="magneticModuleV2",
+        moduleId="magneticModuleId",
+        location=DeckSlotLocation(slotName=(DeckSlotName("3")))
+    ))
 )]
 
 
@@ -287,16 +300,13 @@ def load_command_list() -> Tuple[
                 pipetteName=PipetteName("p10_single"),
                 mount=MountType("left"),
             )
-        ),
-        # pe_commands.LoadModuleCreate(params=pe_commands.LoadModuleParams(
-        #     model=""
-        # ))
+        )
     ]
 
     return command_list, expected_output
 
 
-@pytest.mark.parametrize('test_input, expected_output', )
-def test_load_command(subject: JsonCommandTranslator, input_command, expected_output) -> None:
-    output = subject.translate(_make_json_protocol(commands=[input_command]))
+@pytest.mark.parametrize('test_input, expected_output', VALID_TEST_PARAMS)
+def test_load_command(subject: JsonCommandTranslator, test_input, expected_output) -> None:
+    output = subject.translate(_make_json_protocol(commands=[test_input]))
     assert output == [expected_output]

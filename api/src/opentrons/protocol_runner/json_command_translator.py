@@ -13,14 +13,17 @@ class CommandTranslatorError(Exception):
     pass
 
 
-def get_labware_command(protocol: ProtocolSchemaV6, labware_id : str, dict_command: dict[str, Any]) -> pe_commands.LoadLabwareCreate:
+def get_labware_command(protocol: ProtocolSchemaV6, labware_id : str, command: Command) -> pe_commands.LoadLabwareCreate:
     definition_id = protocol.labware[labware_id].definitionId
     assert definition_id is not None
-    dict_command["params"].update({"displayName": protocol.labware[labware_id].displayName})
-    dict_command["params"].update({"version": protocol.labwareDefinitions[definition_id].version})
-    dict_command["params"].update({"namespace": protocol.labwareDefinitions[definition_id].namespace})
-    dict_command["params"].update({"loadName": protocol.labwareDefinitions[definition_id].parameters.loadName})
-    labware_command = pe_commands.LoadLabwareCreate.parse_obj(dict_command)
+    labware_command = pe_commands.LoadLabwareCreate(params=pe_commands.LoadLabwareParams(
+        labware_id=command.params.labwareId,
+        displayName=protocol.labware[labware_id].displayName,
+        version=protocol.labwareDefinitions[definition_id].version,
+        namespace=protocol.labwareDefinitions[definition_id].namespace,
+        loadName=protocol.labwareDefinitions[definition_id].parameters.loadName),
+        location=pe_commands.LabwareLocation.parse_obj(command.params.location)
+    )
     return labware_command
 
 
@@ -50,7 +53,6 @@ class JsonCommandTranslator:
                 labware_command = get_labware_command(protocol, labware_id, dict_command)
                 commands_list.append(labware_command)
                 continue
-
                 print(dict_command)
             translated_obj = cast(
                 pe_commands.CommandCreate,
