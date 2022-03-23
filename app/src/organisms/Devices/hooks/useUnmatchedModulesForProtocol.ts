@@ -13,8 +13,8 @@ export interface ModuleMatchResults {
   remainingAttachedModules: AttachedModule[]
 }
 
-// get requested protocol moduleId's that do not map to a robot-attached module of the requested model
-export function useAttachedModuleMatchesForProtocol(
+// get requested protocol module ids that do not map to a robot-attached module of the requested model
+export function useUnmatchedModulesForProtocol(
   robotName: string,
   runId: string
 ): ModuleMatchResults {

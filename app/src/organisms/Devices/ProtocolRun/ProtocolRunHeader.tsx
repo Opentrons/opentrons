@@ -52,9 +52,9 @@ import {
 import { formatInterval } from '../../../organisms/RunTimeControl/utils'
 
 import {
-  useAttachedModuleMatchesForProtocol,
   useProtocolDetailsForRun,
   useRunCalibrationStatus,
+  useUnmatchedModulesForProtocol,
 } from '../hooks'
 import { formatTimestamp } from '../utils'
 
@@ -139,10 +139,7 @@ export function ProtocolRunHeader({
   const isMutationLoading =
     isPlayRunActionLoading || isPauseRunActionLoading || isResetRunLoading
 
-  const { missingModuleIds } = useAttachedModuleMatchesForProtocol(
-    robotName,
-    runId
-  )
+  const { missingModuleIds } = useUnmatchedModulesForProtocol(robotName, runId)
   const { complete: isCalibrationComplete } = useRunCalibrationStatus(
     robotName,
     runId

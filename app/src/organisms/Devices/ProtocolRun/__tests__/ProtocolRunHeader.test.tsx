@@ -40,9 +40,9 @@ import {
   mockSucceededRun,
 } from '../../../../organisms/RunTimeControl/__fixtures__'
 import {
-  useAttachedModuleMatchesForProtocol,
   useProtocolDetailsForRun,
   useRunCalibrationStatus,
+  useUnmatchedModulesForProtocol,
 } from '../../hooks'
 import { formatTimestamp } from '../../utils'
 import { ProtocolRunHeader } from '../ProtocolRunHeader'
@@ -92,8 +92,8 @@ const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunc
   typeof useProtocolDetailsForRun
 >
 const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
-const mockUseAttachedModuleMatchesForProtocol = useAttachedModuleMatchesForProtocol as jest.MockedFunction<
-  typeof useAttachedModuleMatchesForProtocol
+const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jest.MockedFunction<
+  typeof useUnmatchedModulesForProtocol
 >
 const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
   typeof useRunCalibrationStatus
@@ -159,7 +159,7 @@ describe('ProtocolRunHeader', () => {
     when(mockUseProtocolDetailsForRun)
       .calledWith(RUN_ID)
       .mockReturnValue(PROTOCOL_DETAILS)
-    when(mockUseAttachedModuleMatchesForProtocol)
+    when(mockUseUnmatchedModulesForProtocol)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })
     when(mockUseRunCalibrationStatus)
@@ -213,7 +213,7 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('disables the Start Run button with tooltip if a module is missing', () => {
-    when(mockUseAttachedModuleMatchesForProtocol)
+    when(mockUseUnmatchedModulesForProtocol)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({
         missingModuleIds: ['temperatureModuleV1'],

@@ -4,10 +4,10 @@ import { renderHook } from '@testing-library/react-hooks'
 import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
 import { mockTemperatureModule } from '../../../../redux/modules/__fixtures__'
 import {
-  useAttachedModuleMatchesForProtocol,
   useAttachedModules,
   useModuleRenderInfoForProtocolById,
   useRobot,
+  useUnmatchedModulesForProtocol,
 } from '..'
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
@@ -62,7 +62,7 @@ describe('useModuleMatchResults', () => {
       .mockReturnValue([])
 
     const { result } = renderHook(() =>
-      useAttachedModuleMatchesForProtocol(mockConnectedRobot.name, '1')
+      useUnmatchedModulesForProtocol(mockConnectedRobot.name, '1')
     )
     const { missingModuleIds, remainingAttachedModules } = result.current
     expect(missingModuleIds).toStrictEqual([])
@@ -92,7 +92,7 @@ describe('useModuleMatchResults', () => {
       .mockReturnValue([])
 
     const { result } = renderHook(() =>
-      useAttachedModuleMatchesForProtocol(mockConnectedRobot.name, '1')
+      useUnmatchedModulesForProtocol(mockConnectedRobot.name, '1')
     )
     const { missingModuleIds } = result.current
     expect(missingModuleIds).toStrictEqual([moduleId])
@@ -118,7 +118,7 @@ describe('useModuleMatchResults', () => {
       })
 
     const { result } = renderHook(() =>
-      useAttachedModuleMatchesForProtocol(mockConnectedRobot.name, '1')
+      useUnmatchedModulesForProtocol(mockConnectedRobot.name, '1')
     )
     const { missingModuleIds } = result.current
     expect(missingModuleIds).toStrictEqual([])
@@ -147,7 +147,7 @@ describe('useModuleMatchResults', () => {
       })
 
     const { result } = renderHook(() =>
-      useAttachedModuleMatchesForProtocol(mockConnectedRobot.name, '1')
+      useUnmatchedModulesForProtocol(mockConnectedRobot.name, '1')
     )
     const { missingModuleIds } = result.current
     expect(missingModuleIds).toStrictEqual([moduleId])
@@ -156,7 +156,7 @@ describe('useModuleMatchResults', () => {
     const remainingModule = mockTemperatureModule
 
     const { result } = renderHook(() =>
-      useAttachedModuleMatchesForProtocol(mockConnectedRobot.name, '1')
+      useUnmatchedModulesForProtocol(mockConnectedRobot.name, '1')
     )
     const { remainingAttachedModules } = result.current
     expect(remainingAttachedModules).toStrictEqual([remainingModule])
