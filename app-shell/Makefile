@@ -40,7 +40,8 @@ electron := electron . \
 	--log.level.console="debug" \
 	--disable_ui.webPreferences.webSecurity \
 	--ui.url.protocol="http:" \
-	--ui.url.path="localhost:$(PORT)"
+	--ui.url.path="localhost:$(PORT)" \
+	--python.path=$(shell cd ../api && pipenv --venv)
 
 # standard targets
 #####################################################################
