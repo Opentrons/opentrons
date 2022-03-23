@@ -60,6 +60,8 @@ MessageDefinition = Union[
     defs.ReadFromSensorResponse,
     defs.SensorThresholdResponse,
     defs.HomeRequest,
+    defs.PipetteInfoRequest,
+    defs.PipetteInfoResponse,
 ]
 
 
