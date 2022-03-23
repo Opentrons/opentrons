@@ -67,7 +67,7 @@ describe('Banner', () => {
     props = {
       type: 'warning',
       title: 'TITLE',
-      icon: { name: 'hot-to-touch' },
+      icon: { name: 'ot-hot-to-touch' },
     }
     const { getByText, getByLabelText } = render(props)
     getByLabelText('icon_warning')
