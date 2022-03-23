@@ -564,8 +564,16 @@ def test_heater_shaker_module_view_find_hardware(
     assert result == attached["matching"]
 
 
+@pytest.mark.parametrize(
+    argnames=["module_definition", "module_view_getter_str"],
+    argvalues=[
+        (lazy_fixture("magdeck_v1_def"), "get_magnetic_module_view"),
+        (lazy_fixture("heater_shaker_v1_def"), "get_heater_shaker_module_view"),
+    ],
+)
 def test_magnetic_module_view_find_hardware_returns_none_if_virtualizing(
-    magdeck_v1_def: ModuleDefinition,
+    module_definition: ModuleDefinition,
+    module_view_getter_str: str,
 ) -> None:
     """It should handle the case where the Protocol Engine is virtualizing modules.
 
@@ -575,7 +583,7 @@ def test_magnetic_module_view_find_hardware_returns_none_if_virtualizing(
         hardware_module_by_slot={
             DeckSlotName.SLOT_1: HardwareModule(
                 serial_number="serial-to-match",
-                definition=magdeck_v1_def,
+                definition=module_definition,
             ),
         },
         slot_by_module_id={
@@ -583,29 +591,39 @@ def test_magnetic_module_view_find_hardware_returns_none_if_virtualizing(
         },
         virtualize_modules=True,
     )
-    subject = parent.get_magnetic_module_view(module_id="id-to-match")
+    module_view_getter = getattr(parent, module_view_getter_str)
+    subject = module_view_getter(module_id="id-to-match")
 
     # Should return None,
     # rather than raising because attached_modules contains no match.
     assert subject.find_hardware(attached_modules=[]) is None
 
 
+@pytest.mark.parametrize(
+    argnames=["module_definition", "module_view_getter_str"],
+    argvalues=[
+        (lazy_fixture("magdeck_v1_def"), "get_magnetic_module_view"),
+        (lazy_fixture("heater_shaker_v1_def"), "get_heater_shaker_module_view"),
+    ],
+)
 def test_magnetic_module_view_find_hardware_raises_if_no_match_attached(
-    magdeck_v1_def: ModuleDefinition,
+    module_definition: ModuleDefinition,
+    module_view_getter_str: str,
 ) -> None:
     """It should raise if nothing with a matching serial is in the attached list."""
     parent = make_module_view(
         hardware_module_by_slot={
             DeckSlotName.SLOT_1: HardwareModule(
                 serial_number="serial-to-match",
-                definition=magdeck_v1_def,
+                definition=module_definition,
             ),
         },
         slot_by_module_id={
             "id-to-match": DeckSlotName.SLOT_1,
         },
     )
-    subject = parent.get_magnetic_module_view(module_id="id-to-match")
+    module_view_getter = getattr(parent, module_view_getter_str)
+    subject = module_view_getter(module_id="id-to-match")
 
     with pytest.raises(errors.ModuleNotAttachedError):
         subject.find_hardware(
@@ -613,27 +631,47 @@ def test_magnetic_module_view_find_hardware_raises_if_no_match_attached(
         )
 
 
+@pytest.mark.parametrize(
+    argnames=[
+        "module_definition",
+        "non_matching_module_type",
+        "module_view_getter_str",
+    ],
+    argvalues=[
+        (lazy_fixture("magdeck_v1_def"), TempDeck, "get_magnetic_module_view"),
+        (
+            lazy_fixture("heater_shaker_v1_def"),
+            MagDeck,
+            "get_heater_shaker_module_view",
+        ),
+    ],
+)
 def test_magnetic_module_view_find_hardware_raises_if_match_is_wrong_type(
-    decoy: Decoy, magdeck_v1_def: ModuleDefinition
+    decoy: Decoy,
+    module_definition: ModuleDefinition,
+    non_matching_module_type: Type[HardwareModuleT],
+    module_view_getter_str: str,
 ) -> None:
     """It should raise if a match was found but is of an unexpected type."""
     matching = make_hardware_module(
         decoy=decoy,
-        type=TempDeck,  # Not a Magnetic Module.
+        type=non_matching_module_type,  # Not a Magnetic Module.
         serial_number="serial-to-match",
     )
     parent = make_module_view(
         hardware_module_by_slot={
             DeckSlotName.SLOT_1: HardwareModule(
                 serial_number="serial-to-match",
-                definition=magdeck_v1_def,
+                definition=module_definition,
             ),
         },
         slot_by_module_id={
             "id-to-match": DeckSlotName.SLOT_1,
         },
     )
-    subject = parent.get_magnetic_module_view(module_id="id-to-match")
+    module_view_getter = getattr(parent, module_view_getter_str)
+    subject = module_view_getter(module_id="id-to-match")
+
     with pytest.raises(errors.ModuleNotAttachedError):
         subject.find_hardware(
             attached_modules=[matching],
