@@ -5,6 +5,7 @@ import { pauseFormToArgs } from './pauseFormToArgs'
 import { magnetFormToArgs } from './magnetFormToArgs'
 import { temperatureFormToArgs } from './temperatureFormToArgs'
 import { thermocyclerFormToArgs } from './thermocyclerFormToArgs'
+import { heaterShakerFormToArgs } from './heaterShakerFormToArgs'
 import { moveLiquidFormToArgs } from './moveLiquidFormToArgs'
 import { FormData } from '../../../form-types'
 import { CommandCreatorArgs } from '@opentrons/step-generation'
@@ -38,6 +39,9 @@ export const stepFormToArgs = (hydratedForm: FormData): StepArgs => {
 
     case 'thermocycler':
       return thermocyclerFormToArgs(castForm)
+
+    case 'heaterShaker':
+      return heaterShakerFormToArgs(castForm)
 
     default:
       console.warn(`stepFormToArgs not implemented for ${castForm.stepType}`)

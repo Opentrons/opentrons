@@ -23,6 +23,7 @@ import type {
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_APPROACHING_TARGET,
 } from './constants'
+import { ShakeSpeedParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 export type { Command }
 
@@ -314,6 +315,12 @@ export interface DeactivateTemperatureArgs {
   message?: string
 }
 
+export type SetShakeSpeedArgs = ShakeSpeedParams & {
+  module: string
+  commandCreatorFnName: 'setShakeSpeed'
+  message?: string
+}
+
 const PROFILE_CYCLE: 'profileCycle' = 'profileCycle'
 const PROFILE_STEP: 'profileStep' = 'profileStep'
 
@@ -373,6 +380,7 @@ export type CommandCreatorArgs =
   | DeactivateTemperatureArgs
   | ThermocyclerProfileStepArgs
   | ThermocyclerStateStepArgs
+  | SetShakeSpeedArgs
 
 export interface LocationLiquidState {
   [ingredGroup: string]: { volume: number }

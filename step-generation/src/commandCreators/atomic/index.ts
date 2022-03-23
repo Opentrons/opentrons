@@ -14,6 +14,7 @@ import { replaceTip } from './replaceTip'
 import { setTemperature } from './setTemperature'
 import { touchTip } from './touchTip'
 import { moveToWell } from './moveToWell'
+import { setShakeSpeed } from './setShakeSpeed'
 export {
   airGap,
   aspirate,
@@ -31,4 +32,5 @@ export {
   setTemperature,
   touchTip,
   moveToWell,
+  setShakeSpeed,
 }

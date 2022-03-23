@@ -118,9 +118,9 @@ export interface AwaitTemperatureSubstepItem {
 
 export interface HeaterShakerSubstepItem {
   substepType: 'heaterShaker'
-  labwareNickname: string
-  targetHeaterShakerTemperature: number
-  targetSpeed: number
+  labwareNickname: string | null | undefined
+  targetHeaterShakerTemperature: number | null
+  targetSpeed: number | null
   latchOpen: boolean
   heaterShakerSetTimer: boolean
 }
