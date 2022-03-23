@@ -19,7 +19,7 @@ export function useAttachedPipetteCalibrations(
 ): PipetteCalibrationsByMount {
   const [dispatchRequest] = useDispatchApiRequest()
 
-  const attachedPipettes = useSelector((state: State) =>
+  const attachedPipetteCalibrations = useSelector((state: State) =>
     getAttachedPipetteCalibrations(state, robotName)
   )
 
@@ -31,5 +31,5 @@ export function useAttachedPipetteCalibrations(
     }
   }, [dispatchRequest, robotName])
 
-  return attachedPipettes
+  return attachedPipetteCalibrations
 }
