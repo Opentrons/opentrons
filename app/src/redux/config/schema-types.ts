@@ -114,4 +114,14 @@ export interface ConfigV4 extends Omit<ConfigV3, 'version' | 'labware'> {
   }
 }
 
-export type Config = ConfigV4
+export interface ConfigV5 extends Omit<ConfigV4, 'version' | 'discovery'> {
+  version: 5
+  discovery: ConfigV4['discovery'] & {
+    hidden: string[]
+  }
+  python: {
+    pathToPythonOverride: string | null
+  }
+}
+
+export type Config = ConfigV5

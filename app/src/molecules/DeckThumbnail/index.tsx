@@ -64,7 +64,27 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
 
           return (
             <React.Fragment key={slotId}>
-              {moduleInSlot != null ? (
+              {['1', '3'].includes(slotId) &&
+              <Module
+                  x={slot.position[0]}
+                  y={slot.position[1]}
+                  orientation={inferModuleOrientationFromXCoordinate(
+                    slot.position[0]
+                  )}
+                  def={getModuleDef2('temperatureModuleV2')}
+                />
+              }
+            {['7'].includes(slotId) &&
+              <Module
+                  x={slot.position[0]}
+                  y={slot.position[1]}
+                  orientation={inferModuleOrientationFromXCoordinate(
+                    slot.position[0]
+                  )}
+                  def={getModuleDef2('thermocyclerModuleV1')}
+                />
+              }
+              {/* {moduleInSlot != null ? (
                 <Module
                   x={slot.position[0]}
                   y={slot.position[1]}
@@ -91,7 +111,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
                     />
                   ) : null}
                 </Module>
-              ) : null}
+              ) : null} */}
               {labwareInSlot != null ? (
                 <LabwareRender
                   definition={

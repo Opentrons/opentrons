@@ -4,6 +4,7 @@ import type {
   ConfigV2,
   ConfigV3,
   ConfigV4,
+  ConfigV5,
 } from '@opentrons/app/src/redux/config/types'
 
 export const MOCK_CONFIG_V0: ConfigV0 = {
@@ -96,5 +97,17 @@ export const MOCK_CONFIG_V4: ConfigV4 = {
   labware: {
     ...MOCK_CONFIG_V3.labware,
     showLabwareOffsetCodeSnippets: false,
+  },
+}
+
+export const MOCK_CONFIG_V5: ConfigV5 = {
+  ...MOCK_CONFIG_V4,
+  version: 5,
+  python: {
+    pathToPythonOverride: null,
+  },
+  discovery: {
+    ...MOCK_CONFIG_V4.discovery,
+    hidden: [],
   },
 }

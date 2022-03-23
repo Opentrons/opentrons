@@ -82,7 +82,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
           <Flex
             marginRight={SPACING.spacing4}
             height="6rem"
-            width="5.375rem"
+            width="6rem"
             justifyContent={JUSTIFY_CENTER}
             alignItems={ALIGN_CENTER}
           >
