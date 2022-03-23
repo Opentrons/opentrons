@@ -7,7 +7,7 @@ import atexit
 import sys
 from datetime import datetime
 from logging.config import dictConfig
-from typing import List, Optional, TextIO
+from typing import List, TextIO
 
 
 from opentrons_hardware.drivers.can_bus.can_messenger import (
@@ -74,14 +74,12 @@ class Writer:
 async def task(
     messenger: CanMessenger,
     write_to: TextIO,
-    write_lock: Optional[asyncio.Lock] = None,
 ) -> None:
     """A task that listens for can messages.
 
     Args:
         messenger: Messenger
         write_to: Destination to write to
-        write_lock: Optionally, a lock for exclusive writes.
 
     Returns: Nothing.
     """
@@ -89,8 +87,6 @@ async def task(
     label_style = "\033[0;37;40m"
     header_style = "\033[0;36;40m"
     data_style = "\033[1;36;40m"
-
-    checked_write_lock = write_lock or asyncio.Lock()
 
     with WaitableCallback(messenger) as cb:
         async for message, arbitration_id in cb:
@@ -101,20 +97,19 @@ async def task(
                 arb_id_str = f"{msg_name} ({from_node}->{to_node})"
             except ValueError:
                 arb_id_str = f"0x{arbitration_id.id:x}"
-            async with checked_write_lock:
+            writer.write(
+                [
+                    StyledOutput(style=header_style, content=str(datetime.now())),
+                    StyledOutput(style=data_style, content=arb_id_str + "\n"),
+                ]
+            )
+            for name, value in dataclasses.asdict(message.payload).items():
                 writer.write(
                     [
-                        StyledOutput(style=header_style, content=str(datetime.now())),
-                        StyledOutput(style=data_style, content=arb_id_str + "\n"),
+                        StyledOutput(style=label_style, content=f"\t{name}:"),
+                        StyledOutput(style=data_style, content=str(value) + "\n"),
                     ]
                 )
-                for name, value in dataclasses.asdict(message.payload).items():
-                    writer.write(
-                        [
-                            StyledOutput(style=label_style, content=f"\t{name}:"),
-                            StyledOutput(style=data_style, content=str(value) + "\n"),
-                        ]
-                    )
 
 
 async def run(args: argparse.Namespace) -> None:

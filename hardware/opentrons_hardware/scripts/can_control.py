@@ -27,10 +27,9 @@ from .can_comm import prompt_message, InvalidInput
 async def get_input(
     input_file: TextIO,
     output_file: TextIO,
-    output_lock: asyncio.Lock,
     brief_prompt: bool = True,
 ) -> Optional[CanMessage]:
-    """Get user input with proper locking and buffering."""
+    """Get user input with proper buffering."""
 
     def prompt_with_io(promptstr: str) -> str:
         output_file.write(promptstr)
@@ -45,10 +44,9 @@ async def get_input(
         output_file.flush()
 
     try:
-        async with output_lock:
-            return await asyncio.get_event_loop().run_in_executor(
-                None, prompt_message, prompt_with_io, write_with_newline, brief_prompt
-            )
+        return await asyncio.get_event_loop().run_in_executor(
+            None, prompt_message, prompt_with_io, write_with_newline, brief_prompt
+        )
     except InvalidInput as e:
         write_with_newline(str(e))
     return None
@@ -58,7 +56,6 @@ async def input_task(
     can_driver: AbstractCanDriver,
     input_file: TextIO,
     output_file: TextIO,
-    output_lock: asyncio.Lock,
 ) -> None:
     """UI task to create and send messages.
 
@@ -66,13 +63,12 @@ async def input_task(
         can_driver: Can driver
         input_file: IO buf to read from
         output_file: IO buf to write to
-        output_lock: Async lock for exclusive writes
     """
-    can_message = await get_input(input_file, output_file, output_lock, False)
+    can_message = await get_input(input_file, output_file, False)
     if can_message:
         await can_driver.send(can_message)
     while True:
-        can_message = await get_input(input_file, output_file, output_lock)
+        can_message = await get_input(input_file, output_file)
         if can_message:
             await can_driver.send(can_message)
 
@@ -83,12 +79,11 @@ async def run(args: argparse.Namespace) -> None:
 
     messenger = CanMessenger(driver)
     messenger.start()
-    write_lock = asyncio.Lock()
 
     try:
         all_fut = asyncio.gather(
-            monitor_task(messenger, args.output, write_lock),
-            input_task(driver, args.input, args.output, write_lock),
+            monitor_task(messenger, args.output),
+            input_task(driver, args.input, args.output),
         )
         await all_fut
     except KeyboardInterrupt:
