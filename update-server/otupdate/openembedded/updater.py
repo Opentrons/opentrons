@@ -24,7 +24,8 @@ class PartitionManager:
         # fw_printenv -n root_part gives the currently
         # active root_fs partition, find that, and
         # set other partition as unused partition!
-        which = subprocess.check_output(["fw_printenv -n root_part"]).strip()
+        sp = subprocess.Popen("fw_printenv -n root_part", shell=True, stdout=subprocess.PIPE)
+        which = sp.stdout.read().strip()
         return {
             b"2": RootPartitions.THREE.value,
             b"3": RootPartitions.TWO.value,
