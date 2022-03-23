@@ -82,7 +82,7 @@ stages:
         data:  # order is enforced on this check!
           - id: '{command_id_on}'
           - id: '{command_id_off}'
-  - name: Create Empty Run # Step 1 of ensuring there is an active run.
+  - name: Create Empty Run
     request:
       url: '{host:s}:{port:d}/runs'
       json:
@@ -100,21 +100,6 @@ stages:
       save:
         json:
           run_id: data.id
-  - name: Create home Command on the run # Step 2 of ensuring there is an active run.
-    request:
-      url: '{host:s}:{port:d}/runs/{run_id}/commands'
-      method: POST
-      json:
-        data:
-          commandType: home
-          params: {}
-    response:
-      strict:
-        - json:off
-      status_code: 201
-      json:
-        data:
-          status: queued
   - name: issue setRailLights Command on = true is blocked
     request:
       url: '{host:s}:{port:d}/commands'
