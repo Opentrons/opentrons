@@ -81,10 +81,12 @@ const copyLabware = (
     if (next.type !== CustomLabware.VALID_LABWARE_FILE) {
       return dispatch(CustomLabware.addCustomLabwareFailure(next))
     }
-    dispatch(CustomLabware.addNewLabwareName(newFile.filename))
-    return Definitions.addLabwareFile(next.filename, dir).then(() =>
-      fetchAndValidateCustomLabware(dispatch, CustomLabware.ADD_LABWARE)
-    )
+    //
+    return Definitions.addLabwareFile(next.filename, dir)
+      .then(() =>
+        fetchAndValidateCustomLabware(dispatch, CustomLabware.ADD_LABWARE)
+      )
+      .then(() => dispatch(CustomLabware.addNewLabwareName(newFile.filename)))
   })
 }
 
