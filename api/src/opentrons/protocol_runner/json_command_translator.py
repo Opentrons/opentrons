@@ -35,8 +35,18 @@ class JsonCommandTranslator:
             protocol: ProtocolSchemaV6,
     ) -> List[pe_commands.CommandCreate]:
         commands_list: List[pe_commands.CommandCreate] = []
+        exclude_commands = [
+            "loadLiquid",
+            "delay",
+            "touchTip",
+            "blowout",
+            "moveToSlot",
+            "moveToCoordinates",
+        ]
         for command in protocol.commands:
             dict_command = command.dict(exclude_none=True)
+            if command.CommandType in exclude_commands:
+                continue
             if command.commandType == "loadPipette":
                 pipette_id = command.params.pipetteId
                 assert pipette_id is not None

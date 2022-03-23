@@ -174,18 +174,6 @@ class ProtocolRunner:
 
     def _load_json(self, protocol_source: ProtocolSource) -> None:
         protocol = self._json_file_reader.read(protocol_source)
-        exclude_commands = [
-            "loadLiquid",
-            "delay",
-            "touchTip",
-            "blowout",
-            "moveToSlot",
-            "moveToCoordinates",
-        ]
-        translate_command_list = [
-            i for i in protocol.commands if i.commandType not in exclude_commands
-        ]  # filter(lambda v: v != protocol.commands, exclude_commands)
-        protocol.commands = translate_command_list
         commands = self._json_command_translator.translate(protocol)
         for command in commands:
             self._protocol_engine.add_command(request=command)
