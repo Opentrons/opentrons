@@ -111,7 +111,7 @@ export interface AddNewLabwareNameAction {
 }
 
 export interface ClearNewLabwareNameAction {
-  type: 'labware.CLEAR_NEW_LABWARE_NAME'
+  type: 'labware:CLEAR_NEW_LABWARE_NAME'
 }
 
 export interface OpenCustomLabwareDirectoryAction {

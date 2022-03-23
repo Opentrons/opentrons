@@ -112,6 +112,16 @@ describe('custom labware actions', () => {
       },
     },
     {
+      name: 'addCustomLabwareFile',
+      creator: actions.addCustomLabwareFile,
+      args: ['mock/file/path'],
+      expected: {
+        type: 'labware:ADD_CUSTOM_LABWARE_FILE',
+        payload: { filePath: 'mock/file/path' },
+        meta: { shell: true },
+      },
+    },
+    {
       name: 'addCustomLabwareFailure with failed labware',
       creator: actions.addCustomLabwareFailure,
       args: [{ type: 'INVALID_LABWARE_FILE', filename: 'a.json', modified: 0 }],
@@ -141,6 +151,21 @@ describe('custom labware actions', () => {
       creator: actions.clearAddCustomLabwareFailure,
       args: [],
       expected: { type: 'labware:CLEAR_ADD_CUSTOM_LABWARE_FAILURE' },
+    },
+    {
+      name: 'addNewLabwareName',
+      creator: actions.addNewLabwareName,
+      args: ['mockLabwareName'],
+      expected: {
+        type: 'labware:ADD_NEW_LABWARE_NAME',
+        payload: { filename: 'mockLabwareName' },
+      },
+    },
+    {
+      name: 'clearNewLabwareName',
+      creator: actions.clearNewLabwareName,
+      args: [],
+      expected: { type: 'labware:CLEAR_NEW_LABWARE_NAME' },
     },
     {
       name: 'openCustomLabwareDirectory',
