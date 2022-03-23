@@ -36,12 +36,6 @@ export function useGetAllLabware(): LabwareDefAndDate[] {
   return fullLabwareList
 }
 
-export function useAddLabware(): () => void {
-  const dispatch = useDispatch<Dispatch>()
-  const handleAddLabware = (): unknown => dispatch(addCustomLabware())
-  return handleAddLabware
-}
-
 export function useLabwareFailure(): {
   labwareFailureMessage: string | null
   clearLabwareFailure: () => unknown

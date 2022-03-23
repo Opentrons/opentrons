@@ -7,10 +7,12 @@ import {
   DIRECTION_COLUMN,
   ALIGN_CENTER,
 } from '@opentrons/components'
-import { addCustomLabwareFile } from '../../redux/custom-labware'
+import {
+  addCustomLabwareFile,
+  addCustomLabware,
+} from '../../redux/custom-labware'
 import { Slideout } from '../../atoms/Slideout'
 import { UploadInput } from '../../molecules/UploadInput'
-import { useAddLabware } from './hooks'
 import type { Dispatch } from '../../redux/types'
 
 export interface AddCustomLabwareProps {
@@ -39,7 +41,7 @@ export function AddCustomLabware(props: AddCustomLabwareProps): JSX.Element {
           onUpload={(file: File) => {
             dispatch(addCustomLabwareFile(file.path))
           }}
-          onClick={useAddLabware()}
+          onClick={() => dispatch(addCustomLabware())}
           uploadText={t('choose_file_to_upload')}
         />
       </Flex>
