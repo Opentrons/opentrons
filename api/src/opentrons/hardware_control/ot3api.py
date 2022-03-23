@@ -181,6 +181,7 @@ class OT3API(
         return self._gantry_load
 
     async def set_gantry_load(self, gantry_load: GantryLoad) -> None:
+        mod_log.info(f"Setting gantry load to {gantry_load}")
         self._gantry_load = gantry_load
         self._move_manager.update_constraints(
             get_system_constraints(self._config.motion_settings, gantry_load)
@@ -366,6 +367,29 @@ class OT3API(
             firmware_file, checked_loop, explicit_modeset
         )
 
+    @staticmethod
+    def _gantry_load_from_instruments(
+        instruments: Dict[OT3Mount, PipetteDict]
+    ) -> GantryLoad:
+        """Compute the gantry load based on attached instruments."""
+        left = instruments.get(OT3Mount.LEFT)
+        right = instruments.get(OT3Mount.RIGHT)
+        if left and right:
+            # Only low-throughputs can have the two-instrument case
+            return GantryLoad.TWO_LOW_THROUGHPUT
+        if left:
+            # only a low-throughput pipette can be on the left mount
+            return GantryLoad.LOW_THROUGHPUT
+        if right:
+            # as good a measure as any to define low vs high throughput, though
+            # we'll want to touch this up as we get pipette definitions for HT
+            # pipettes
+            if right["channels"] <= 8:
+                return GantryLoad.LOW_THROUGHPUT
+            else:
+                return GantryLoad.HIGH_THROUGHPUT
+        return GantryLoad.NONE
+
     async def cache_instruments(
         self, require: Optional[Dict[top_types.Mount, PipetteName]] = None
     ) -> None:
@@ -411,8 +435,11 @@ class OT3API(
             )
             await self._backend.configure_mount(mount, hw_config)
         await self._backend.probe_network()
-        # TODO: (AA, 2022-02-09) Set correct pipette kind based on attached instr
-        await self.set_gantry_load(GantryLoad.TWO_LOW_THROUGHPUT)
+        await self.set_gantry_load(
+            self._gantry_load_from_instruments(
+                self._instrument_handler.attached_instruments
+            )
+        )
 
     # Global actions API
     def pause(self, pause_type: PauseType) -> None:
