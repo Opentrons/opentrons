@@ -2,7 +2,6 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   getCustomLabware,
-  addCustomLabware,
   getAddLabwareFailure,
   clearAddCustomLabwareFailure,
   getAddNewLabwareName,
