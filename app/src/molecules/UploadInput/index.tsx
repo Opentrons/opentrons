@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import {
   Icon,
   Flex,
-  Link,
   SPACING,
   BORDERS,
   COLORS,
@@ -40,7 +39,8 @@ const INPUT_STYLES = css`
 export interface UploadInputProps {
   onUpload: (file: File) => unknown
   onClick?: () => void
-  uploadText?: string
+  uploadText?: string | JSX.Element
+  dragAndDropText?: string | JSX.Element
 }
 
 export function UploadInput(props: UploadInputProps): JSX.Element | null {
@@ -73,7 +73,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
     setIsFileOverDropZone(true)
   }
 
-  const handleClick: React.MouseEventHandler<HTMLAnchorElement> = _event => {
+  const handleClick: React.MouseEventHandler<HTMLButtonElement> = _event => {
     props.onClick != null ? props.onClick() : fileInput.current?.click()
   }
 
@@ -119,13 +119,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
           name="upload"
           marginBottom={SPACING.spacing5}
         />
-        <StyledText as="p">
-          Drag and drop or{' '}
-          <Link color={COLORS.blue} onClick={handleClick} role="button">
-            browse
-          </Link>{' '}
-          your files
-        </StyledText>
+        {props.dragAndDropText}
         <input
           id="file_input"
           data-testid="file_input"

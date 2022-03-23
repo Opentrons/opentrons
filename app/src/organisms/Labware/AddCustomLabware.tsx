@@ -1,8 +1,10 @@
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
-import { useTranslation } from 'react-i18next'
+import { useTranslation, Trans } from 'react-i18next'
 import {
   Flex,
+  Link,
+  COLORS,
   SPACING,
   DIRECTION_COLUMN,
   ALIGN_CENTER,
@@ -12,6 +14,7 @@ import {
   addCustomLabware,
 } from '../../redux/custom-labware'
 import { Slideout } from '../../atoms/Slideout'
+import { StyledText } from '../../atoms/text'
 import { UploadInput } from '../../molecules/UploadInput'
 import type { Dispatch } from '../../redux/types'
 
@@ -43,6 +46,23 @@ export function AddCustomLabware(props: AddCustomLabwareProps): JSX.Element {
           }}
           onClick={() => dispatch(addCustomLabware())}
           uploadText={t('choose_file_to_upload')}
+          dragAndDropText={
+            <StyledText as="p">
+              <Trans
+                t={t}
+                i18nKey="drag_and_drop"
+                components={{
+                  a: (
+                    <Link
+                      color={COLORS.blue}
+                      onClick={() => dispatch(addCustomLabware())}
+                      role="button"
+                    />
+                  ),
+                }}
+              />
+            </StyledText>
+          }
         />
       </Flex>
     </Slideout>

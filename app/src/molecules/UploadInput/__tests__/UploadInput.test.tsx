@@ -3,8 +3,8 @@ import '@testing-library/jest-dom'
 import { fireEvent } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../i18n'
-import { UploadInput } from '../UploadInput'
+import { i18n } from '../../../i18n'
+import { UploadInput } from '..'
 
 describe('UploadInput', () => {
   let onUpload: jest.MockedFunction<() => {}>
@@ -31,7 +31,6 @@ describe('UploadInput', () => {
     const { getByRole } = render()
 
     expect(getByRole('button', { name: 'Choose File' })).toBeTruthy()
-    expect(getByRole('button', { name: 'browse' })).toBeTruthy()
   })
 
   it('opens file select on button click', () => {

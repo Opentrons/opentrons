@@ -17,5 +17,6 @@
   "error_importing_file": "Error importing {{filename}}.",
   "imported": "{{filename}} imported.",
   "create_new_def": "Create a new labware definition",
-  "open_labware_creator": "Open Labware Creator"
+  "open_labware_creator": "Open Labware Creator",
+  "drag_and_drop": "Drag and drop or <a>browse</a> your files"
 }

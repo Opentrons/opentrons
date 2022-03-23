@@ -31,6 +31,10 @@ describe('AddCustomLabware', () => {
     getByText('Import a Custom Labware Definition')
     getByText('Or choose a file from your computer to upload.')
     getByRole('button', { name: 'Choose File' })
+  })
+
+  it('renders drag and drop section', () => {
+    const [{ getByRole }] = render(props)
     getByRole('button', { name: 'browse' })
   })
 })
