@@ -1,10 +1,14 @@
 """Test magnetic module disengage commands."""
-
 from decoy import Decoy
 
-from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.modules import AbstractModule, MagDeck
-from opentrons.protocol_engine.state import StateView, MagneticModuleView
+from opentrons.hardware_control.modules import MagDeck
+
+from opentrons.protocol_engine.execution import EquipmentHandler
+from opentrons.protocol_engine.state import (
+    StateView,
+    MagneticModuleView,
+    MagneticModuleId,
+)
 from opentrons.protocol_engine.commands.magnetic_module import (
     DisengageParams,
     DisengageResult,
@@ -17,27 +21,28 @@ from opentrons.protocol_engine.commands.magnetic_module.disengage import (
 async def test_magnetic_module_disengage_implementation(
     decoy: Decoy,
     state_view: StateView,
-    hardware_api: HardwareControlAPI,
+    equipment: EquipmentHandler,
 ) -> None:
     """It should validate, find hardware module if not virtualized, and disengage."""
-    subject = DisengageImplementation(state_view=state_view, hardware_api=hardware_api)
+    subject = DisengageImplementation(state_view=state_view, equipment=equipment)
 
-    params = DisengageParams(
-        moduleId="module-id",
-    )
+    params = DisengageParams(moduleId="unverified-module-id")
 
+    verified_module_id = MagneticModuleId("module-id")
     magnetic_module_view = decoy.mock(cls=MagneticModuleView)
+    magnetic_module_hw = decoy.mock(cls=MagDeck)
+
     decoy.when(
-        state_view.modules.get_magnetic_module_view(module_id="module-id")
+        state_view.modules.get_magnetic_module_view("unverified-module-id")
     ).then_return(magnetic_module_view)
 
-    attached = [decoy.mock(cls=AbstractModule), decoy.mock(cls=AbstractModule)]
-    match = decoy.mock(cls=MagDeck)
-    # "type: ignore" to mock out what's normally a read-only property.
-    hardware_api.attached_modules = attached  # type: ignore[misc]
-    decoy.when(magnetic_module_view.find_hardware(attached)).then_return(match)
+    decoy.when(magnetic_module_view.module_id).then_return(verified_module_id)
+
+    decoy.when(equipment.get_module_hardware_api(verified_module_id)).then_return(
+        magnetic_module_hw
+    )
 
     result = await subject.execute(params=params)
 
-    decoy.verify(await match.deactivate(), times=1)
+    decoy.verify(await magnetic_module_hw.deactivate(), times=1)
     assert result == DisengageResult()

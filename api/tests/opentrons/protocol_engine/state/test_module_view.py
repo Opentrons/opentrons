@@ -1,18 +1,11 @@
 """Tests for module state accessors in the protocol engine state store."""
 import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
-from decoy import Decoy
 
 from contextlib import nullcontext
-from typing import ContextManager, Dict, NamedTuple, Optional, Type, TypeVar, Union
+from typing import ContextManager, Dict, NamedTuple, Optional, Type, Union
 
 from opentrons_shared_data import load_shared_data
-from opentrons.hardware_control.modules import (
-    AbstractModule,
-    MagDeck,
-    TempDeck,
-    HeaterShaker,
-)
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
@@ -40,24 +33,6 @@ def make_module_view(
     )
 
     return ModuleView(state=state, virtualize_modules=virtualize_modules)
-
-
-HardwareModuleT = TypeVar("HardwareModuleT", bound=AbstractModule)
-
-
-def make_hardware_module(
-    decoy: Decoy, type: Type[HardwareModuleT], serial_number: str
-) -> HardwareModuleT:
-    """Return a mock hardware module with the specified type and serial number.
-
-    Ideally, we wouldn't use mocks for this, since our subject uses these objects
-    as pure input data, and doesn't call anything behavioral on them.
-    But it's prohibitively difficult to instantiate these objects in tests otherwise.
-    """
-    hardware_module = decoy.mock(cls=type)
-    # "type: ignore" to override what's normally a read-only property.
-    decoy.when(hardware_module.device_info).then_return({"serial": serial_number})
-    return hardware_module
 
 
 def get_sample_parent_module_view(
@@ -89,26 +64,6 @@ def get_sample_parent_module_view(
             "id-another-non-matching": DeckSlotName.SLOT_3,
         },
     )
-
-
-def get_attached_modules(
-    decoy: Decoy, matching_module_type: Type[HardwareModuleT]
-) -> Dict[str, AbstractModule]:
-    """Get a list of attached modules, including one "matching" module."""
-    matching = make_hardware_module(
-        decoy=decoy, type=matching_module_type, serial_number="serial-matching"
-    )
-    non_matching = make_hardware_module(
-        decoy=decoy, type=MagDeck, serial_number="serial-non-matching"
-    )
-    another_non_matching = make_hardware_module(
-        decoy=decoy, type=TempDeck, serial_number="serial-another-non-matching"
-    )
-    return {
-        "non_matching": non_matching,
-        "matching": matching,
-        "another_non_matching": another_non_matching,
-    }
 
 
 def test_initial_module_data_by_id() -> None:
@@ -246,14 +201,14 @@ def test_get_magnetic_module_view(
     module_1_view = subject.get_magnetic_module_view(
         module_id="magnetic-module-gen1-id"
     )
-    assert module_1_view.parent_module_view is subject
     assert module_1_view.module_id == "magnetic-module-gen1-id"
+    assert module_1_view.model == ModuleModel.MAGNETIC_MODULE_V1
 
     module_2_view = subject.get_magnetic_module_view(
         module_id="magnetic-module-gen2-id"
     )
-    assert module_2_view.parent_module_view is subject
     assert module_2_view.module_id == "magnetic-module-gen2-id"
+    assert module_2_view.model == ModuleModel.MAGNETIC_MODULE_V2
 
     with pytest.raises(errors.WrongModuleTypeError):
         subject.get_magnetic_module_view(module_id="temperature-module-id")
@@ -574,179 +529,6 @@ def test_select_hardware_module_to_load_rejects_location_reassignment(
             model=ModuleModel.TEMPERATURE_MODULE_V1,
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             attached_modules=attached_modules,
-        )
-
-
-def test_magnetic_module_view_find_hardware(
-    decoy: Decoy,
-    magdeck_v1_def: ModuleDefinition,
-) -> None:
-    """It should return the matching hardware module."""
-    matching = make_hardware_module(
-        decoy=decoy, type=MagDeck, serial_number="serial-matching"
-    )
-    non_matching = make_hardware_module(
-        decoy=decoy, type=MagDeck, serial_number="serial-non-matching"
-    )
-    another_non_matching = make_hardware_module(
-        decoy=decoy, type=TempDeck, serial_number="serial-another-non-matching"
-    )
-
-    attached = [non_matching, matching, another_non_matching]
-
-    parent = make_module_view(
-        hardware_by_module_id={
-            "id-non-matching": HardwareModule(
-                serial_number="serial-non-matching",
-                definition=magdeck_v1_def,
-            ),
-            "id-matching": HardwareModule(
-                serial_number="serial-matching",
-                definition=magdeck_v1_def,
-            ),
-            "id-another-non-matching": HardwareModule(
-                serial_number="serial-another-non-matching",
-                definition=magdeck_v1_def,
-            ),
-        },
-        slot_by_module_id={
-            "id-non-matching": DeckSlotName.SLOT_1,
-            "id-matching": DeckSlotName.SLOT_2,
-            "id-another-non-matching": DeckSlotName.SLOT_3,
-        },
-    )
-    subject = parent.get_magnetic_module_view(module_id="id-matching")
-
-    result = subject.find_hardware(attached_modules=attached)
-    assert result is matching
-
-
-def test_heater_shaker_module_view_find_hardware(
-    decoy: Decoy,
-    heater_shaker_v1_def: ModuleDefinition,
-) -> None:
-    """It should return the matching hardware heater-shaker module."""
-    attached = get_attached_modules(decoy=decoy, matching_module_type=HeaterShaker)
-    parent = get_sample_parent_module_view(
-        matching_module_def=heater_shaker_v1_def, matching_module_id="id-matching"
-    )
-    subject = parent.get_heater_shaker_module_view(module_id="id-matching")
-
-    result = subject.find_hardware(attached_modules=list(attached.values()))
-    assert result == attached["matching"]
-
-
-@pytest.mark.parametrize(
-    argnames=["module_definition", "module_view_getter_str"],
-    argvalues=[
-        (lazy_fixture("magdeck_v1_def"), "get_magnetic_module_view"),
-        (lazy_fixture("heater_shaker_v1_def"), "get_heater_shaker_module_view"),
-    ],
-)
-def test_magnetic_module_view_find_hardware_returns_none_if_virtualizing(
-    module_definition: ModuleDefinition,
-    module_view_getter_str: str,
-) -> None:
-    """It should handle the case where the Protocol Engine is virtualizing modules.
-
-    This means ignoreing attached_modules and returning None.
-    """
-    parent = make_module_view(
-        hardware_by_module_id={
-            "id-to-match": HardwareModule(
-                serial_number="serial-to-match",
-                definition=module_definition,
-            ),
-        },
-        slot_by_module_id={
-            "id-to-match": DeckSlotName.SLOT_1,
-        },
-        virtualize_modules=True,
-    )
-    module_view_getter = getattr(parent, module_view_getter_str)
-    subject = module_view_getter(module_id="id-to-match")
-
-    # Should return None,
-    # rather than raising because attached_modules contains no match.
-    assert subject.find_hardware(attached_modules=[]) is None
-
-
-@pytest.mark.parametrize(
-    argnames=["module_definition", "module_view_getter_str"],
-    argvalues=[
-        (lazy_fixture("magdeck_v1_def"), "get_magnetic_module_view"),
-        (lazy_fixture("heater_shaker_v1_def"), "get_heater_shaker_module_view"),
-    ],
-)
-def test_magnetic_module_view_find_hardware_raises_if_no_match_attached(
-    module_definition: ModuleDefinition,
-    module_view_getter_str: str,
-) -> None:
-    """It should raise if nothing with a matching serial is in the attached list."""
-    parent = make_module_view(
-        hardware_by_module_id={
-            "id-to-match": HardwareModule(
-                serial_number="serial-to-match",
-                definition=module_definition,
-            ),
-        },
-        slot_by_module_id={
-            "id-to-match": DeckSlotName.SLOT_1,
-        },
-    )
-    module_view_getter = getattr(parent, module_view_getter_str)
-    subject = module_view_getter(module_id="id-to-match")
-
-    with pytest.raises(errors.ModuleNotAttachedError):
-        subject.find_hardware(
-            attached_modules=[],
-        )
-
-
-@pytest.mark.parametrize(
-    argnames=[
-        "module_definition",
-        "non_matching_module_type",
-        "module_view_getter_str",
-    ],
-    argvalues=[
-        (lazy_fixture("magdeck_v1_def"), TempDeck, "get_magnetic_module_view"),
-        (
-            lazy_fixture("heater_shaker_v1_def"),
-            MagDeck,
-            "get_heater_shaker_module_view",
-        ),
-    ],
-)
-def test_magnetic_module_view_find_hardware_raises_if_match_is_wrong_type(
-    decoy: Decoy,
-    module_definition: ModuleDefinition,
-    non_matching_module_type: Type[HardwareModuleT],
-    module_view_getter_str: str,
-) -> None:
-    """It should raise if a match was found but is of an unexpected type."""
-    matching = make_hardware_module(
-        decoy=decoy,
-        type=non_matching_module_type,  # Not a Magnetic Module.
-        serial_number="serial-to-match",
-    )
-    parent = make_module_view(
-        hardware_by_module_id={
-            "id-to-match": HardwareModule(
-                serial_number="serial-to-match",
-                definition=module_definition,
-            ),
-        },
-        slot_by_module_id={
-            "id-to-match": DeckSlotName.SLOT_1,
-        },
-    )
-    module_view_getter = getattr(parent, module_view_getter_str)
-    subject = module_view_getter(module_id="id-to-match")
-
-    with pytest.raises(errors.ModuleNotAttachedError):
-        subject.find_hardware(
-            attached_modules=[matching],
         )
 
 

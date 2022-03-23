@@ -1,18 +1,14 @@
 """Magnetic Module engage command request, result, and implementation models."""
-
-
 from __future__ import annotations
-
 from typing import Optional, TYPE_CHECKING
 from typing_extensions import Literal, Type
 
 from pydantic import BaseModel, Field
 
-from opentrons.hardware_control import HardwareControlAPI
-
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
+    from opentrons.protocol_engine.execution import EquipmentHandler
     from opentrons.protocol_engine.state import StateView
 
 
@@ -62,11 +58,11 @@ class EngageImplementation(AbstractCommandImpl[EngageParams, EngageResult]):
     def __init__(
         self,
         state_view: StateView,
-        hardware_api: HardwareControlAPI,
+        equipment: EquipmentHandler,
         **unused_dependencies: object,
     ) -> None:
         self._state_view = state_view
-        self._hardware_api = hardware_api
+        self._equipment = equipment
 
     async def execute(self, params: EngageParams) -> EngageResult:
         """Execute a Magnetic Module engage command.
@@ -89,11 +85,13 @@ class EngageImplementation(AbstractCommandImpl[EngageParams, EngageResult]):
             mm_from_base=params.engageHeight,
         )
         # Allow propagation of ModuleNotAttachedError.
-        hardware_module = magnetic_module_view.find_hardware(
-            attached_modules=self._hardware_api.attached_modules,
+        hardware_module = self._equipment.get_module_hardware_api(
+            magnetic_module_view.module_id
         )
+
         if hardware_module is not None:  # Not virtualizing modules.
             await hardware_module.engage(height=hardware_height)
+
         return EngageResult()
 
 

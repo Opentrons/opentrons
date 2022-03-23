@@ -4,11 +4,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, NamedTuple, Optional, Sequence, overload
+from typing import Dict, List, NamedTuple, NewType, Optional, Sequence, overload
 from typing_extensions import Final
 from numpy import array, dot
 
-from opentrons.hardware_control.modules import AbstractModule, MagDeck, HeaterShaker
 from opentrons.hardware_control.modules.magdeck import (
     engage_height_is_in_range,
     OFFSET_TO_LABWARE_BOTTOM as MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM,
@@ -19,6 +18,7 @@ from opentrons.types import DeckSlotName
 from ..types import (
     LoadedModule,
     ModuleModel,
+    MagneticModuleModel,
     ModuleType,
     ModuleDefinition,
     DeckSlotLocation,
@@ -157,13 +157,9 @@ class ModuleView(HasState[ModuleState]):
 
     _state: ModuleState
 
-    # TODO(mm, 2022-03-14): Fix this duplication between here and EngineConfigs.
-    _virtualize_modules: bool
-
     def __init__(self, state: ModuleState, virtualize_modules: bool) -> None:
         """Initialize the view with its backing state value."""
         self._state = state
-        self._virtualize_modules = virtualize_modules
 
     def get(self, module_id: str) -> LoadedModule:
         """Get module data by the module's unique identifier."""
@@ -186,10 +182,6 @@ class ModuleView(HasState[ModuleState]):
             definition=attached_module.definition,
         )
 
-    def is_virtualizing_modules(self) -> bool:
-        """Return whether this Protocol Engine is using virtual modules."""
-        return self._virtualize_modules
-
     def get_all(self) -> List[LoadedModule]:
         """Get a list of all module entries in state."""
         return [self.get(mod_id) for mod_id in self._state.slot_by_module_id.keys()]
@@ -203,11 +195,8 @@ class ModuleView(HasState[ModuleState]):
                 but it's not a Magnetic Module.
         """
         model = self.get_model(module_id=module_id)  # Propagate ModuleNotLoadedError
-        if model in [
-            ModuleModel.MAGNETIC_MODULE_V1,
-            ModuleModel.MAGNETIC_MODULE_V2,
-        ]:
-            return MagneticModuleView(parent_module_view=self, module_id=module_id)
+        if ModuleModel.is_magnetic_module_model(model):
+            return MagneticModuleView(module_id=module_id, model=model)
         else:
             raise errors.WrongModuleTypeError(
                 f"{module_id} is a {model}, not a Magnetic Module."
@@ -222,8 +211,8 @@ class ModuleView(HasState[ModuleState]):
                but it's not a Heater-Shaker Module.
         """
         model = self.get_model(module_id=module_id)  # Propagate ModuleNotLoadedError
-        if model == ModuleModel.HEATER_SHAKER_MODULE_V1:
-            return HeaterShakerModuleView(parent_module_view=self, module_id=module_id)
+        if ModuleModel.is_heater_shaker_module_model(model):
+            return HeaterShakerModuleView(module_id=module_id)
         else:
             raise errors.WrongModuleTypeError(
                 f"{module_id} is a {model}, not a Heater-Shaker Module."
@@ -483,6 +472,9 @@ class ModuleView(HasState[ModuleState]):
         raise errors.ModuleNotAttachedError(f"No available {model.value} found.")
 
 
+MagneticModuleId = NewType("MagneticModuleId", str)
+
+
 class MagneticModuleView:
     """A Magnetic Module view.
 
@@ -490,54 +482,18 @@ class MagneticModuleView:
     for an individual loaded Magnetic Module.
     """
 
-    def __init__(self, parent_module_view: ModuleView, module_id: str) -> None:
+    def __init__(
+        self,
+        module_id: str,
+        model: MagneticModuleModel,
+    ) -> None:
         """Initialize the `MagneticModuleView`.
 
         Do not use this initializer directly, except in tests.
         Use `ModuleView.get_magnetic_module_view()` instead.
         """
-        self.parent_module_view: Final = parent_module_view
-        self.module_id: Final = module_id
-
-    def find_hardware(
-        self, attached_modules: List[AbstractModule]
-    ) -> Optional[MagDeck]:
-        """Find the matching attached hardware module.
-
-        Params:
-            attached_modules: The list of attached hardware modules,
-                from the `HardwareControlAPI`, to search.
-                If the Protocol Engine is using virtual modules,
-                there are no meaningful "attached hardware modules,"
-                so this list is ignored.
-
-        Returns:
-            If the Protocol Engine is using virtual modules, returns ``None``.
-            If not, returns the element of attached_modules that corresponds to
-            the same individual module as this `MagneticModuleView`.
-
-        Raises:
-            ModuleNotAttachedError: If no match was found in ``attached_modules``,
-                and the Protocol Engine is *not* using virtual modules.
-        """
-        if self.parent_module_view.is_virtualizing_modules():
-            return None
-        else:
-            serial_number = self.parent_module_view.get_serial_number(
-                module_id=self.module_id
-            )
-            for candidate in attached_modules:
-                if candidate.device_info["serial"] == serial_number and isinstance(
-                    candidate, MagDeck
-                ):
-                    return candidate
-            # This will report a mismatched module type as ModuleNotAttachedError
-            # instead of WrongModuleTypeError, but that's fine because that
-            # shouldn't be possible anyway. (It should be caught at module load.)
-            raise errors.ModuleNotAttachedError(
-                f'No module attached with serial number "{serial_number}'
-                f' for Protocol Engine module ID "{self.module_id}".'
-            )
+        self.module_id: Final = MagneticModuleId(module_id)
+        self.model: Final = model
 
     def calculate_magnet_hardware_height(self, mm_from_base: float) -> float:
         """Convert a human-friendly magnet height to be hardware-friendly.
@@ -551,36 +507,35 @@ class MagneticModuleView:
             so that it's suitable to pass to `MagDeck.engage()`.
 
         Raises:
-            WrongModuleTypeError: If the given model is not a Magnetic Module.
             EngageHeightOutOfRangeError: If modules of the given model are
                 physically incapable of reaching the requested height.
         """
-        model = self.parent_module_view.get_model(self.module_id)
-        if model not in [
-            ModuleModel.MAGNETIC_MODULE_V1,
-            ModuleModel.MAGNETIC_MODULE_V2,
-        ]:
-            # Shouldn't be possible; should have been caught during load time.
-            raise errors.WrongModuleTypeError(f"{model} is not a Magnetic Module.")
-
         hardware_units_from_base = (
             mm_from_base * 2
-            if model == ModuleModel.MAGNETIC_MODULE_V1
+            if self.model == ModuleModel.MAGNETIC_MODULE_V1
             else mm_from_base
         )
-        home_to_base_offset = MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM[model]
+        home_to_base_offset = MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM[self.model]
         hardware_units_from_home = home_to_base_offset + hardware_units_from_base
-        if not engage_height_is_in_range(model=model, height=hardware_units_from_home):
+
+        if not engage_height_is_in_range(
+            model=self.model,
+            height=hardware_units_from_home,
+        ):
             # TODO(mm, 2022-03-02): This error message probably will not match how
             # the user specified the height. (Hardware units versus mm,
             # home as origin versus labware base as origin.) This may be confusing
             # depending on how it propagates up.
             raise errors.EngageHeightOutOfRangeError(
-                f"Invalid engage height for {model}:"
+                f"Invalid engage height for {self.model}:"
                 f" {hardware_units_from_home}. Must be"
-                f" 0 - {MAGNETIC_MODULE_MAX_ENGAGE_HEIGHT[model]}."
+                f" 0 - {MAGNETIC_MODULE_MAX_ENGAGE_HEIGHT[self.model]}."
             )
+
         return hardware_units_from_home
+
+
+HeaterShakerModuleId = NewType("HeaterShakerModuleId", str)
 
 
 class HeaterShakerModuleView:
@@ -590,54 +545,13 @@ class HeaterShakerModuleView:
     for an individual loaded Heater-Shaker Module.
     """
 
-    def __init__(self, parent_module_view: ModuleView, module_id: str) -> None:
+    def __init__(self, module_id: str) -> None:
         """Initialize the `HeaterShakerModuleView`.
 
         Do not use this initializer directly, except in tests.
         Use `ModuleView.get_heater_shaker_module_view()` instead.
         """
-        self.parent_module_view: Final = parent_module_view
-        self.module_id: Final = module_id
-
-    def find_hardware(
-        self, attached_modules: List[AbstractModule]
-    ) -> Optional[HeaterShaker]:
-        """Find the matching attached hardware module.
-
-        Params:
-            attached_modules: The list of attached hardware modules,
-                from the `HardwareControlAPI`, to search.
-                If the Protocol Engine is using virtual modules,
-                there are no meaningful "attached hardware modules,"
-                so this list is ignored.
-
-        Returns:
-            If the Protocol Engine is using virtual modules, returns ``None``.
-            If not, returns the element of attached_modules that corresponds to
-            the same individual module as this `HeaterShakerModuleView`.
-
-        Raises:
-            ModuleNotAttachedError: If no match was found in ``attached_modules``,
-                and the Protocol Engine is *not* using virtual modules.
-        """
-        if self.parent_module_view.is_virtualizing_modules():
-            return None
-        else:
-            serial_number = self.parent_module_view.get_serial_number(
-                module_id=self.module_id
-            )
-            for candidate in attached_modules:
-                if candidate.device_info["serial"] == serial_number and isinstance(
-                    candidate, HeaterShaker
-                ):
-                    return candidate
-            # This will report a mismatched module type as ModuleNotAttachedError
-            # instead of WrongModuleTypeError, but that's fine because that
-            # shouldn't be possible anyway. (It should be caught at module load.)
-            raise errors.ModuleNotAttachedError(
-                f'No module attached with serial number "{serial_number}'
-                f' for Protocol Engine module ID "{self.module_id}".'
-            )
+        self.module_id: Final = HeaterShakerModuleId(module_id)
 
     @staticmethod
     def validate_target_temperature(celsius: float) -> float:
