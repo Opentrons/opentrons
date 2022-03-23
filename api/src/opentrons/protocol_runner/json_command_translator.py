@@ -23,7 +23,7 @@ def get_labware_command(protocol: ProtocolSchemaV6, command: Command) -> pe_comm
     dict_command["params"].update({"version": protocol.labwareDefinitions[definition_id].version})
     dict_command["params"].update({"namespace": protocol.labwareDefinitions[definition_id].namespace})
     dict_command["params"].update({"loadName": protocol.labwareDefinitions[definition_id].parameters.loadName})
-    labware_command = pe_commands.LoadLabwareCreate.parse_raw(dict_command)
+    labware_command = pe_commands.LoadLabwareCreate.parse_obj(dict_command)
     return labware_command
 
 
