@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { i18n } from '../../../../../../i18n'
 import { renderWithProviders } from '@opentrons/components'
-import { Banner } from '../../../../../../atoms/Banner/Banner'
+import { Banner } from '../../Banner/Banner'
 import { HeaterShakerBanner } from '../HeaterShakerBanner'
 
-jest.mock('../../../../../../atoms/Banner/Banner')
+jest.mock('../../Banner/Banner')
 
 const mockBanner = Banner as jest.MockedFunction<typeof Banner>
 

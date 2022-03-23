@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Banner } from '../../../../../atoms/Banner/Banner'
 import { HeaterShakerWizard } from '../../../../Devices/HeaterShakerWizard'
+import { Banner } from '../Banner/Banner'
 
 interface HeaterShakerBannerProps {
   displayName: string
