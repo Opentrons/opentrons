@@ -15,6 +15,111 @@ from opentrons.protocol_engine import (
     WellOffset,
 )
 
+VALID_TEST_PARAMS = [(json_v6_models.Command(
+    commandType="aspirate",
+    id="command-id-ddd-666",
+    params=json_v6_models.Params(
+        pipetteId="pipette-id-abc123",
+        labwareId="labware-id-def456",
+        volume=1.23,
+        # todo (Max and Tamar 3/17/22): needs to be added to the aspirate command https://github.com/Opentrons/opentrons/issues/8204
+        flowRate=4.56,
+        wellName="A1",
+        wellLocation=json_v6_models.WellLocation(
+            origin="bottom",
+            offset=json_v6_models.OffsetVector(x=0, y=0, z=7.89),
+        ),
+    ),
+), pe_commands.AspirateCreate(
+    params=pe_commands.AspirateParams(
+        # todo: id
+        pipetteId="pipette-id-abc123",
+        labwareId="labware-id-def456",
+        volume=1.23,
+        wellName="A1",
+        wellLocation=WellLocation(
+            origin=WellOrigin.BOTTOM,
+            offset=WellOffset(x=0, y=0, z=7.89),
+        ),
+    )
+)), (json_v6_models.Command(
+    id="dispense-command-id-666",
+    commandType="dispense",
+    params=json_v6_models.Params(
+        pipetteId="pipette-id-abc123",
+        labwareId="labware-id-def456",
+        volume=1.23,
+        flowRate=4.56,
+        wellName="A1",
+        wellLocation=json_v6_models.WellLocation(
+            origin="bottom",
+            offset=json_v6_models.OffsetVector(x=0, y=0, z=7.89),
+        ),
+    ),
+),
+     pe_commands.DispenseCreate(
+         params=pe_commands.DispenseParams(
+             pipetteId="pipette-id-abc123",
+             labwareId="labware-id-def456",
+             volume=1.23,
+             wellName="A1",
+             wellLocation=WellLocation(
+                 origin=WellOrigin.BOTTOM,
+                 offset=WellOffset(x=0, y=0, z=7.89),
+             ),
+         )
+     )), (json_v6_models.Command(
+    id="dropTip-command-id-666",
+    commandType="dropTip",
+    params=json_v6_models.Params(
+        pipetteId="pipette-id-abc123",
+        labwareId="labware-id-def456",
+        wellName="A1",
+    ),
+), pe_commands.DropTipCreate(
+    params=pe_commands.DropTipParams(
+        pipetteId="pipette-id-abc123",
+        labwareId="labware-id-def456",
+        wellName="A1",
+        wellLocation=WellLocation(),
+    )
+)), (json_v6_models.Command(
+    id="pickUpTip-command-id-666",
+    commandType="pickUpTip",
+    params=json_v6_models.Params(
+        pipetteId="pipette-id-abc123",
+        labwareId="labware-id-def456",
+        wellName="A1",
+    ),
+), pe_commands.PickUpTipCreate(
+    params=pe_commands.PickUpTipParams(
+        pipetteId="pipette-id-abc123",
+        labwareId="labware-id-def456",
+        wellName="A1",
+        wellLocation=WellLocation(),
+    )
+)), (json_v6_models.Command(
+    id="delay-command-id-666",
+    commandType="pause",  # used to be delay but is expecting pause
+    params=json_v6_models.Params(
+        wait=True,
+        message="hello world",
+    ),
+), pe_commands.PauseCreate(params=pe_commands.PauseParams(message="hello world"))), (
+    json_v6_models.Command(
+        id="load-pipette-command-id-666",
+        commandType="loadPipette",  # used to be delay but is expecting pause
+        params=json_v6_models.Params(pipetteId="pipetteId", mount="left"),
+    ),
+    pe_commands.LoadPipetteCreate(
+        params=pe_commands.LoadPipetteParams(
+            pipetteId="pipetteId",
+            pipetteName=PipetteName("p10_single"),
+            mount=MountType("left"),
+        )
+    )
+)]
+
 
 @pytest.fixture
 def subject() -> JsonCommandTranslator:
@@ -23,16 +128,16 @@ def subject() -> JsonCommandTranslator:
 
 
 def _make_json_protocol(
-    *,
-    pipettes: Dict[str, json_v6_models.Pipette] = {
-        "pipetteId": json_v6_models.Pipette(name="p10_single")
-    },
-    labware_definitions: Dict[str, LabwareDefinition] = {},
-    labware: Dict[str, json_v6_models.Labware] = {},
-    commands: List[json_v6_models.Command] = [],
-    modules: Dict[str, json_v6_models.Module] = {
-        "magneticModuleId": json_v6_models.Module(model="magneticModuleV2")
-    }
+        *,
+        pipettes: Dict[str, json_v6_models.Pipette] = {
+            "pipetteId": json_v6_models.Pipette(name="p10_single")
+        },
+        labware_definitions: Dict[str, LabwareDefinition] = {},
+        labware: Dict[str, json_v6_models.Labware] = {},
+        commands: List[json_v6_models.Command] = [],
+        modules: Dict[str, json_v6_models.Module] = {
+            "magneticModuleId": json_v6_models.Module(model="magneticModuleV2")
+        }
 ) -> json_v6_models.ProtocolSchemaV6:
     """Return a minimal JsonProtocol with the given elements, to use as test input."""
     return json_v6_models.ProtocolSchemaV6(
@@ -189,3 +294,9 @@ def load_command_list() -> Tuple[
     ]
 
     return command_list, expected_output
+
+
+@pytest.mark.parametrize('test_input, expected_output', )
+def test_load_command(subject: JsonCommandTranslator, input_command, expected_output) -> None:
+    output = subject.translate(_make_json_protocol(commands=[input_command]))
+    assert output == [expected_output]
