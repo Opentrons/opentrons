@@ -16,7 +16,7 @@ const BASE_STYLE = {
   left: 0,
   width: '100%',
   height: '100%',
-  padding: Styles.SPACING_5,
+  padding: '1rem 1.5rem',
 } as const
 
 const MODAL_STYLE = {

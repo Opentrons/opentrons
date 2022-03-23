@@ -1,11 +1,12 @@
 import * as React from 'react'
-
+import { css } from 'styled-components'
 import {
   Btn,
   Icon,
   BaseModal,
   BaseModalProps,
   TYPOGRAPHY,
+  COLORS,
   Flex,
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
@@ -25,6 +26,23 @@ interface ModalProps extends BaseModalProps {
   children?: React.ReactNode
   icon?: IconProps
 }
+
+const closeIconStyles = css`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 14px;
+  width: 28px;
+  height: 28px;
+
+  &:hover {
+    background-color: rgba(22, 33, 45, 0.15);
+  }
+
+  &:active {
+    background-color: rgba(22, 33, 45, 0.25);
+  }
+`
 
 export const Modal = (props: ModalProps): JSX.Element => {
   const { type = 'info', onClose, title, children } = props
@@ -51,7 +69,7 @@ export const Modal = (props: ModalProps): JSX.Element => {
             </StyledText>
           </Flex>
           {onClose != null && (
-            <Btn onClick={onClose}>
+            <Btn onClick={onClose} css={closeIconStyles}>
               <Icon
                 name={'close'}
                 width={SPACING.spacing5}
@@ -65,7 +83,14 @@ export const Modal = (props: ModalProps): JSX.Element => {
     ) : null
 
   return (
-    <BaseModal width={'31.25rem'} noHeaderStyles header={header}>
+    <BaseModal
+      width={'31.25rem'}
+      noHeaderStyles
+      header={header}
+      css={css`
+        border-radius: 0.25rem;
+      `}
+    >
       {children}
     </BaseModal>
   )

@@ -46,18 +46,21 @@ export const TertiaryButton = styled(Btn)`
 `
 
 export const PrimaryButton = styled(NewPrimaryBtn)`
+  ${TYPOGRAPHY.pSemiBold}
   background-color: ${COLORS.blue};
   border-radius: ${BORDERS.radiusSoftCorners};
   text-transform: ${TYPOGRAPHY.textTransformNone};
-  ${TYPOGRAPHY.pSemiBold}
+  color: ${COLORS.white};
+
   ${styleProps}
 `
 
 export const SecondaryButton = styled(NewSecondaryBtn)`
+  ${TYPOGRAPHY.pSemiBold}
   color: ${COLORS.blue};
   border-radius: ${BORDERS.radiusSoftCorners};
   text-transform: ${TYPOGRAPHY.textTransformNone};
-  ${TYPOGRAPHY.pSemiBold}
+
   ${styleProps}
 `
 
