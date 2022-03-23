@@ -6,7 +6,6 @@ import {
   BaseModal,
   BaseModalProps,
   TYPOGRAPHY,
-  COLORS,
   Flex,
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
@@ -34,7 +33,6 @@ const closeIconStyles = css`
   border-radius: 14px;
   width: 28px;
   height: 28px;
-
   &:hover {
     background-color: rgba(22, 33, 45, 0.15);
   }
@@ -89,6 +87,7 @@ export const Modal = (props: ModalProps): JSX.Element => {
       header={header}
       css={css`
         border-radius: 0.25rem;
+        box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.23);
       `}
     >
       {children}
