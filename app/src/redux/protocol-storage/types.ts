@@ -77,6 +77,12 @@ export interface OpenProtocolDirectoryAction {
   meta: { shell: true }
 }
 
+export interface AnalyzeProtocolAction {
+  type: 'protocolStorage:ANALYZE_PROTOCOL'
+  payload: { protocolKey: string }
+  meta: { shell: true }
+}
+
 export type ProtocolStorageAction =
   | FetchProtocolsAction
   | UpdateProtocolListAction
@@ -86,3 +92,4 @@ export type ProtocolStorageAction =
   | AddProtocolFailureAction
   | ClearAddProtocolFailureAction
   | OpenProtocolDirectoryAction
+  | AnalyzeProtocolAction

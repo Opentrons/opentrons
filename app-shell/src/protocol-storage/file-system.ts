@@ -7,6 +7,7 @@ import stubbedAnalysis from './__fixtures__/analysisResult.json'
 
 import type { StoredProtocolDir } from '@opentrons/app/src/redux/protocol-storage'
 import type { Dirent } from 'fs'
+import { runFileWithPython } from '../python'
 
 /**
  * Module for managing local protocol files on the host filesystem
@@ -32,6 +33,10 @@ export const PROTOCOLS_DIRECTORY_PATH = path.join(
 )
 export const PROTOCOL_SRC_DIRECTORY_NAME = 'src'
 export const PROTOCOL_ANALYSIS_DIRECTORY_NAME = 'analysis'
+
+function makeAnalysisFilePath(analysisDirPath: string) {
+  return path.join(analysisDirPath, `${new Date().getTime()}.json`)
+}
 
 export function readDirectoriesWithinDirectory(dir: string): Promise<string[]> {
   const getAbsolutePath = (e: Dirent): string => path.join(dir, e.name)
@@ -120,12 +125,7 @@ export function addProtocolFile(
     .then(() => fs.mkdir(analysisDirPath))
     .then(() => fs.copy(mainFileSourcePath, mainFileDestPath))
     .then(() =>
-      // TODO: dispatch a new action to capture running analysis on the src
-      // file and commiting the actual analysis output to the analysis dir
-      fs.writeJSON(
-        path.join(analysisDirPath, `${new Date().getTime()}.json`),
-        JSON.stringify(stubbedAnalysis)
-      )
+      runFileWithPython(srcDirPath, makeAnalysisFilePath(analysisDirPath))
     )
     .then(() => mainFileDestPath)
 }
@@ -147,4 +147,18 @@ export function removeProtocolByKey(
       })
       .then(() => fs.rmdir(targetDirPath))
   )
+}
+
+export function analyzeProtocolByKey(
+  protocolKey: string,
+  protocolsDirPath: string
+): Promise<void> {
+  const protocolDirPath = path.join(protocolsDirPath, protocolKey)
+  const srcDirPath = path.join(protocolDirPath, PROTOCOL_SRC_DIRECTORY_NAME)
+  const analysisDirPath = path.join(
+    protocolDirPath,
+    PROTOCOL_ANALYSIS_DIRECTORY_NAME
+  )
+  const destFilePath = makeAnalysisFilePath(analysisDirPath)
+  return runFileWithPython(srcDirPath, destFilePath)
 }

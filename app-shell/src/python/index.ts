@@ -1,17 +1,23 @@
 import path from 'path'
-import fs from 'fs'
+import fs from 'fs-extra'
 import execa from 'execa'
 
 import { createLogger } from '../log'
+import { getConfig } from '../config'
 
 const log = createLogger('python')
 
 function findPython(): string | undefined {
+  const pathToPythonOverride: string | null = getConfig('python')
+    .pathToPythonOverride
   let possiblePythonPaths = [
-    // TODO: read from redux config python paths first
     path.join(process.resourcesPath, 'python'),
     path.join(process.resourcesPath, 'python', 'bin', 'python3'),
   ]
+  log.debug('IN FIND PYTHON', { pathToPythonOverride })
+  if (pathToPythonOverride != null) {
+    possiblePythonPaths = [pathToPythonOverride, ...possiblePythonPaths]
+  }
 
   if (process.env.NODE_ENV !== 'production') {
     possiblePythonPaths = [
@@ -27,20 +33,28 @@ function findPython(): string | undefined {
   }
 }
 
-export function runFileWithPython(filePath: string): void {
+export function runFileWithPython(
+  srcFilePath: string,
+  destFilePath: string
+): Promise<void> {
   const pythonPath = findPython()
 
-  log.debug('SUP', { pythonPath, filePath })
+  log.debug('IN RUN FILE WITH PYTHON', { pythonPath, srcFilePath })
   if (pythonPath != null) {
-    log.debug('HEYYY', pythonPath, filePath)
+    log.debug('BEFORE PYTHON IS EXECUTED', pythonPath, srcFilePath)
     execa(pythonPath, [
       '-m',
       'opentrons.cli.__init__',
       'analyze',
       '--json',
-      filePath,
+      srcFilePath,
     ])
-      .then(output => log.info('python out', output))
+      .then(output => {
+        log.info('python out', output)
+        fs.writeJSON(destFilePath, JSON.stringify(output.stdout))
+      })
       .catch(log.error)
+  } else {
+    return Promise.reject(new Error('Python interpreter could not be found'))
   }
 }

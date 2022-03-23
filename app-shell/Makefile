@@ -41,7 +41,7 @@ electron := electron . \
 	--disable_ui.webPreferences.webSecurity \
 	--ui.url.protocol="http:" \
 	--ui.url.path="localhost:$(PORT)" \
-	--python.path=$(shell cd ../api && pipenv --venv)
+	--python.pathToPythonOverride=$(shell cd ../api && pipenv --venv)
 
 # standard targets
 #####################################################################
