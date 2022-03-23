@@ -143,6 +143,7 @@ describe('AboutModuleSlideout', () => {
     expect(viewUpdate).toBeEnabled()
     const exit = getByLabelText('close_icon')
     fireEvent.click(exit)
+    expect(exit).not.toBeVisible()
     //  TODO(jr, 2/23/22): expect button to open a modal when this is properly wired up
   })
 })

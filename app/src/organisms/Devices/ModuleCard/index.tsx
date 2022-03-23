@@ -24,6 +24,7 @@ import {
 } from '@opentrons/components'
 import {
   getModuleDisplayName,
+  HS_TOO_HOT_TEMP,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -66,16 +67,16 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [showAboutModule, setShowAboutModule] = React.useState(false)
   const [showTestShake, setShowTestShake] = React.useState(false)
   const [showBanner, setShowBanner] = React.useState<boolean>(true)
-  const hotToTouch: IconProps = { name: 'hot-to-touch' }
+  const hotToTouch: IconProps = { name: 'ot-hot-to-touch' }
 
   const moduleOverflowWrapperRef = useOnClickOutside({
     onClickOutside: () => setShowOverflowMenu(false),
   }) as React.RefObject<HTMLDivElement>
 
-  const tooHot =
+  const isTooHot =
     module.model === 'heaterShakerModuleV1' &&
     module.data.currentTemp != null &&
-    module.data.currentTemp > 48.9
+    module.data.currentTemp > HS_TOO_HOT_TEMP
 
   let image = ''
   let moduleData: JSX.Element = <div></div>
@@ -221,7 +222,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   />
                 </Flex>
               ) : null}
-              {tooHot ? (
+              {isTooHot ? (
                 <Flex
                   width="12.4rem"
                   paddingRight={SPACING.spacingM}

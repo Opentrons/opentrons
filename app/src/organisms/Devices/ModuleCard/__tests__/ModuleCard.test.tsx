@@ -1,9 +1,8 @@
 import * as React from 'react'
 import { resetAllWhenMocks } from 'jest-when'
 import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
-import { Banner } from '../../../../atoms/Banner'
 import { MagneticModuleData } from '../MagneticModuleData'
 import { TemperatureModuleData } from '../TemperatureModuleData'
 import { ThermocyclerModuleData } from '../ThermocyclerModuleData'
@@ -27,7 +26,6 @@ jest.mock('../TemperatureModuleData')
 jest.mock('../ThermocyclerModuleData')
 jest.mock('../HeaterShakerModuleData')
 jest.mock('../ModuleOverflowMenu')
-jest.mock('../../../../atoms/Banner')
 
 const mockMagneticModuleData = MagneticModuleData as jest.MockedFunction<
   typeof MagneticModuleData
@@ -44,7 +42,6 @@ const mockThermocyclerModuleData = ThermocyclerModuleData as jest.MockedFunction
 const mockHeaterShakerModuleData = HeaterShakerModuleData as jest.MockedFunction<
   typeof HeaterShakerModuleData
 >
-const mockBanner = Banner as jest.MockedFunction<typeof Banner>
 
 const mockMagneticModuleHub = {
   model: 'magneticModuleV1',
@@ -101,7 +98,6 @@ describe('ModuleCard', () => {
       <div>Mock Heater Shaker Module Data</div>
     )
     mockModuleOverflowMenu.mockReturnValue(<div>mock module overflow menu</div>)
-    mockBanner.mockReturnValue(<div>mock banner</div>)
   })
 
   afterEach(() => {
@@ -183,12 +179,13 @@ describe('ModuleCard', () => {
     const { getByText } = render({
       module: mockHotHeaterShaker,
     })
-    getByText('mock banner')
+    getByText(nestedTextMatcher('Module is hot to the touch'))
   })
   it('renders information for a magnetic module when an update is available so update banner renders', () => {
     const { getByText } = render({
       module: mockMagneticModuleHub,
     })
-    getByText('mock banner')
+    getByText('Firmware update available.')
+    getByText('View Update')
   })
 })
