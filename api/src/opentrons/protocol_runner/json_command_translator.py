@@ -1,5 +1,5 @@
 """Translation of JSON protocol commands into ProtocolEngine commands."""
-from typing import cast, List, Optional, Tuple
+from typing import cast, List, Any
 from pydantic import parse_obj_as
 from opentrons_shared_data.protocol.models import ProtocolSchemaV6, Command
 from opentrons.protocol_engine import (
@@ -13,10 +13,7 @@ class CommandTranslatorError(Exception):
     pass
 
 
-def get_labware_command(protocol: ProtocolSchemaV6, command: Command) -> pe_commands.LoadLabwareCreate:
-    dict_command = command.dict()
-    labware_id = command.params.labwareId
-    assert labware_id is not None
+def get_labware_command(protocol: ProtocolSchemaV6, labware_id : str, dict_command: dict[str, Any]) -> pe_commands.LoadLabwareCreate:
     definition_id = protocol.labware[labware_id].definitionId
     assert definition_id is not None
     dict_command["params"].update({"displayName": protocol.labware[labware_id].displayName})
@@ -48,7 +45,9 @@ class JsonCommandTranslator:
                 assert modules is not None
                 dict_command["params"].update({"model": modules[module_id].model})
             elif command.commandType == "loadLabware":
-                labware_command = get_labware_command(protocol, command)
+                labware_id = command.params.labwareId
+                assert labware_id is not None
+                labware_command = get_labware_command(protocol, labware_id, dict_command)
                 commands_list.append(labware_command)
                 continue
 
