@@ -7,7 +7,7 @@ export const black = '#000000'
 
 // colors with states
 export const blueFocus = '#deecff'
-export const blue = '#006fff'
+export const blue = '#006cfa'
 export const blueHover = '#0061e0'
 export const bluePressed = '#0050b8'
 

@@ -15,11 +15,14 @@ import {
   SIZE_1,
   SPACING_2,
   SPACING_3,
+  IconName,
 } from '@opentrons/components'
 
 interface CollapsibleStepProps {
   expanded: boolean
-  title: string
+  title: React.ReactNode
+  expandedIcon?: IconName
+  collapsedIcon?: IconName
   description?: string
   label?: string
   id?: string
@@ -43,12 +46,16 @@ const COLLAPSED_STYLE = css`
 export function CollapsibleStep({
   expanded,
   title,
+  expandedIcon,
+  collapsedIcon,
   description,
   label,
   toggleExpanded,
   children,
   rightAlignedNode,
 }: CollapsibleStepProps): JSX.Element {
+  const expand = collapsedIcon ?? 'plus'
+  const collapse = expandedIcon ?? 'minus'
   return (
     <Flex flexDirection={DIRECTION_COLUMN} paddingX={SPACING_3}>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} onClick={toggleExpanded}>
@@ -80,7 +87,7 @@ export function CollapsibleStep({
           </Text>
         </Flex>
         {rightAlignedNode != null ? rightAlignedNode : null}
-        <Icon size={SIZE_1} name={expanded ? 'minus' : 'plus'} />
+        <Icon size={SIZE_1} name={expanded ? collapse : expand} />
       </Flex>
       <Box css={expanded ? EXPANDED_STYLE : COLLAPSED_STYLE}>{children}</Box>
     </Flex>

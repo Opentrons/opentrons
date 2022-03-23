@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { resetAllWhenMocks } from 'jest-when'
 import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { MagneticModuleData } from '../MagneticModuleData'
 import { TemperatureModuleData } from '../TemperatureModuleData'
@@ -16,7 +16,10 @@ import {
   mockHeaterShaker,
 } from '../../../../redux/modules/__fixtures__'
 
-import type { MagneticModule } from '../../../../redux/modules/types'
+import type {
+  HeaterShakerModule,
+  MagneticModule,
+} from '../../../../redux/modules/types'
 
 jest.mock('../MagneticModuleData')
 jest.mock('../TemperatureModuleData')
@@ -55,6 +58,29 @@ const mockMagneticModuleHub = {
   },
   usbPort: { hub: 2, port: null },
 } as MagneticModule
+
+const mockHotHeaterShaker = {
+  id: 'heatershaker_id',
+  model: 'heaterShakerModuleV1',
+  type: 'heaterShakerModuleType',
+  port: '/dev/ot_module_thermocycler0',
+  serial: 'jkl123',
+  revision: 'heatershaker_v4.0',
+  fwVersion: 'v2.0.0',
+  status: 'idle',
+  hasAvailableUpdate: false,
+  data: {
+    labwareLatchStatus: 'idle_unknown',
+    speedStatus: 'idle',
+    temperatureStatus: 'heating',
+    currentSpeed: null,
+    currentTemp: 50,
+    targetSpeed: null,
+    targetTemp: 60,
+    errorDetails: null,
+  },
+  usbPort: { hub: 1, port: 1 },
+} as HeaterShakerModule
 
 const render = (props: React.ComponentProps<typeof ModuleCard>) => {
   return renderWithProviders(<ModuleCard {...props} />, {
@@ -147,5 +173,19 @@ describe('ModuleCard', () => {
     fireEvent.click(overflowButton)
     expect(overflowButton).not.toBeDisabled()
     getByText('mock module overflow menu')
+  })
+
+  it('renders information for a heater shaker module when it is hot, showing the too hot banner', () => {
+    const { getByText } = render({
+      module: mockHotHeaterShaker,
+    })
+    getByText(nestedTextMatcher('Module is hot to the touch'))
+  })
+  it('renders information for a magnetic module when an update is available so update banner renders', () => {
+    const { getByText } = render({
+      module: mockMagneticModuleHub,
+    })
+    getByText('Firmware update available.')
+    getByText('View Update')
   })
 })
