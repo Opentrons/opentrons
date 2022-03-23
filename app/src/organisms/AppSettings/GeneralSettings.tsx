@@ -6,7 +6,6 @@ import { useSelector, useDispatch } from 'react-redux'
 import {
   SPACING_AUTO,
   Flex,
-  AlertItem,
   useMountEffect,
   Box,
   Text,
@@ -23,6 +22,7 @@ import {
 import { TertiaryButton, ToggleButton } from '../../atoms/Buttons'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { Divider } from '../../atoms/structure'
+import { Banner } from '../../atoms/Banner'
 import {
   CURRENT_VERSION,
   getAvailableShellUpdate,
@@ -104,7 +104,7 @@ export function GeneralSettings(): JSX.Element {
             marginBottom={SPACING.spacing4}
             id="GeneralSettings_updatebanner"
           >
-            <AlertItem
+            <Banner
               type="warning"
               title={
                 <>

@@ -21,7 +21,7 @@ describe('BaseModal', () => {
       height: '100%',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '4rem',
+      padding: '1rem 1.5rem',
     })
   })
 
