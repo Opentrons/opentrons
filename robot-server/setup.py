@@ -62,6 +62,9 @@ INSTALL_REQUIRES = [
     "uvicorn==0.14.0",
     "wsproto==1.0.0",
     "systemd-python==234; sys_platform=='linux'",
+    # TODO(mc, 2022-03-23): uncomment when buildroot is ready
+    # https://github.com/Opentrons/buildroot/issues/146
+    # "sqlalchemy==1.4.32",
 ]
 
 
