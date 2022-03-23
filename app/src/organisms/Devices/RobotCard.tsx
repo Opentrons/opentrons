@@ -47,7 +47,11 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
       padding={SPACING_2}
       width="100%"
     >
-      <img src={OT2_PNG} style={{ width: '6rem' }} id="RobotCard_robotImage" />
+      <img
+        src={OT2_PNG}
+        style={{ width: '6rem' }}
+        id={`RobotCard_${name}_robotImage`}
+      />
       <Box padding={SPACING_2} width="100%">
         <RobotStatusBanner name={name} local={local} />
         <Flex>
@@ -55,7 +59,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
             <Text textTransform={TEXT_TRANSFORM_UPPERCASE}>
               {t('left_mount')}
             </Text>
-            <Text id="RobotCard_leftMountPipette">
+            <Text id={`RobotCard_${name}_leftMountPipette`}>
               {attachedPipettes?.left?.modelSpecs.displayName ?? t('empty')}
             </Text>
           </Flex>
@@ -63,23 +67,26 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
             <Text textTransform={TEXT_TRANSFORM_UPPERCASE}>
               {t('right_mount')}
             </Text>
-            <Text id="RobotCard_rightMountPipette">
+            <Text id={`RobotCard_${name}_rightMountPipette`}>
               {attachedPipettes?.right?.modelSpecs.displayName ?? t('empty')}
             </Text>
           </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} paddingRight={SPACING_3}>
             <Text textTransform={TEXT_TRANSFORM_UPPERCASE}>{t('modules')}</Text>
             <Flex>
-              {attachedModules.map(module => (
-                <ModuleIcon key={module.model} moduleType={module.type} />
+              {attachedModules.map((module, i) => (
+                <ModuleIcon
+                  key={`${name}_${module.model}_${i}`}
+                  moduleType={module.type}
+                />
               ))}
             </Flex>
           </Flex>
         </Flex>
       </Box>
       {/* temp link from three dot menu to device detail page. Robot actions menu covered in ticket #8673 */}
-      {/* attachment of RobotCard_overflowMenu selector may change */}
-      <Box alignSelf={ALIGN_START} id="RobotCard_overflowMenu">
+      {/* attachment of RobotCard_${name}_overflowMenu selector may change */}
+      <Box alignSelf={ALIGN_START} id={`RobotCard_${name}_overflowMenu`}>
         <Link to={`/devices/${name}`}>
           <Icon name="dots-horizontal" color={C_BLUE} size={SIZE_2} />
         </Link>

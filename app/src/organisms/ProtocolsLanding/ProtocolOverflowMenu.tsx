@@ -22,7 +22,7 @@ import { removeProtocol } from '../../redux/protocol-storage'
 
 import type { StyleProps } from '@opentrons/components'
 import type { Dispatch } from '../../redux/types'
-import { PrimaryButton, SecondaryButton } from '../../atoms/Buttons'
+import { AlertPrimaryButton, SecondaryButton } from '../../atoms/Buttons'
 import { StyledText } from '../../atoms/text'
 
 interface ProtocolOverflowMenuProps extends StyleProps {
@@ -96,14 +96,12 @@ export function ProtocolOverflowMenu(
               },
               {
                 Component: () => (
-                  <PrimaryButton
+                  <AlertPrimaryButton
                     onClick={handleClickDelete}
                     marginLeft={SPACING.spacing3}
-                    backgroundColor={COLORS.error}
-                    isDestructive
                   >
                     {t('yes_delete_this_protocol')}
-                  </PrimaryButton>
+                  </AlertPrimaryButton>
                 ),
               },
             ]}

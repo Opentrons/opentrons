@@ -85,7 +85,7 @@ export const getAttachedPipetteSettings: (
 
 export const getAttachedPipetteCalibrations: (
   state: State,
-  robotName: string
+  robotName: string | null
 ) => Types.PipetteCalibrationsByMount = createSelector(
   getAttachedPipettes,
   getPipetteOffsetCalibrations,
