@@ -21,13 +21,14 @@ import {
 import { Breadcrumbs } from '../molecules/Breadcrumbs'
 import { DeviceDetails } from '../pages/Devices/DeviceDetails'
 import { DevicesLanding } from '../pages/Devices/DevicesLanding'
+import { ProtocolRunDetails } from '../pages/Devices/ProtocolRunDetails'
 import { RobotSettings } from '../pages/Devices/RobotSettings'
 import { usePathCrumbs } from './hooks'
 import { ProtocolsLanding } from '../pages/Protocols/ProtocolsLanding'
 import { ProtocolDetails } from '../pages/Protocols/ProtocolDetails'
 import { AppSettings } from '../organisms/AppSettings'
 import { Labware } from '../organisms/Labware'
-import { TopPortalRoot } from './portal'
+import { PortalRoot as ModalPortalRoot, TopPortalRoot } from './portal'
 
 export interface RouteProps {
   /**
@@ -108,6 +109,8 @@ export type AppSettingsTab =
   | 'advanced'
   | 'feature-flags'
 
+export type ProtocolRunDetailsTab = 'setup' | 'module-controls' | 'run-log'
+
 /**
  * route params type definition for the next gen app
  */
@@ -118,7 +121,7 @@ export interface NextGenRouteParams {
   labwareId: string
   robotSettingsTab: RobotSettingsTab
   runId: string
-  runDetailsTab: string
+  protocolRunDetailsTab: ProtocolRunDetailsTab
 }
 
 /**
@@ -135,12 +138,13 @@ export const translationKeyByPathSegment: { [index: string]: string | null } = {
   'feature-flags': null,
   general: null,
   labware: 'labware',
+  'module-controls': null,
   networking: null,
   privacy: null,
   'protocol-runs': 'protocol_runs',
   protocols: 'protocols',
   'robot-settings': 'robot_settings',
-  run: null,
+  'run-log': null,
   setup: null,
 }
 
@@ -196,10 +200,9 @@ export const nextGenRoutes: RouteProps[] = [
     path: '/devices/:robotName/protocol-runs',
   },
   {
-    component: () => <div>protocol run details page</div>,
+    component: ProtocolRunDetails,
     name: 'Run Details',
-    // run details tabs params: 'setup' | 'run'
-    path: '/devices/:robotName/protocol-runs/:runId/:runDetailsTab',
+    path: '/devices/:robotName/protocol-runs/:runId/:protocolRunDetailsTab?',
   },
   {
     component: AppSettings,
@@ -229,6 +232,7 @@ export function NextGenApp(): JSX.Element {
           backgroundColor={COLORS.background}
           overflow={OVERFLOW_SCROLL}
         >
+          <ModalPortalRoot />
           <Switch>
             {nextGenRoutes.map(({ component, exact, path }: RouteProps) => {
               return (

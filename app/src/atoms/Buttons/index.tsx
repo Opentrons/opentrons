@@ -1,61 +1,57 @@
 import * as React from 'react'
+import styled from 'styled-components'
 import {
   TYPOGRAPHY,
   COLORS,
   BORDERS,
   SIZE_2,
+  NewAlertPrimaryBtn,
   NewPrimaryBtn,
   NewSecondaryBtn,
-  NewAlertPrimaryBtn,
+  styleProps,
 } from '@opentrons/components'
 import { ToggleBtn, ToggleBtnProps } from '../ToggleBtn'
 
-export const TertiaryButton = (props: any): JSX.Element => (
-  <NewPrimaryBtn
-    backgroundColor={COLORS.blue}
-    borderRadius={BORDERS.radiusRoundEdge}
-    overflow="no-wrap"
-    textTransform={TYPOGRAPHY.textTransformNone}
-    css={TYPOGRAPHY.labelSemiBold}
-    {...props}
-  />
-)
+export const TertiaryButton = styled(NewPrimaryBtn)`
+  background-color: ${COLORS.blue};
+  border-radius: ${BORDERS.radiusRoundEdge};
+  box-shadow: none;
+  color: ${COLORS.background};
+  overflow: no-wrap;
+  padding: 0.375rem 0.75rem;
+  text-transform: ${TYPOGRAPHY.textTransformNone};
+  white-space: nowrap;
+  ${TYPOGRAPHY.labelSemiBold}
 
-interface PrimaryButtonProps
-  extends React.ComponentProps<typeof NewPrimaryBtn> {
-  isDestructive?: boolean
-}
-export const PrimaryButton = ({
-  isDestructive = false,
-  ...restProps
-}: PrimaryButtonProps): JSX.Element =>
-  isDestructive ? (
-    <NewAlertPrimaryBtn
-      backgroundColor={COLORS.error}
-      borderRadius={BORDERS.radiusSoftCorners}
-      textTransform={TYPOGRAPHY.textTransformNone}
-      css={TYPOGRAPHY.pSemiBold}
-      {...restProps}
-    />
-  ) : (
-    <NewPrimaryBtn
-      backgroundColor={COLORS.blue}
-      borderRadius={BORDERS.radiusSoftCorners}
-      textTransform={TYPOGRAPHY.textTransformNone}
-      css={TYPOGRAPHY.pSemiBold}
-      {...restProps}
-    />
-  )
+  ${styleProps}
+`
 
-export const SecondaryButton = (props: any): JSX.Element => (
-  <NewSecondaryBtn
-    color={COLORS.blue}
-    borderRadius={BORDERS.radiusSoftCorners}
-    textTransform={TYPOGRAPHY.textTransformNone}
-    css={TYPOGRAPHY.pSemiBold}
-    {...props}
-  />
-)
+export const AlertPrimaryButton = styled(NewAlertPrimaryBtn)`
+  background-color: ${COLORS.error};
+  border-radius: ${BORDERS.radiusSoftCorners};
+  text-transform: ${TYPOGRAPHY.textTransformNone};
+  ${TYPOGRAPHY.pSemiBold}
+
+  ${styleProps}
+`
+
+export const PrimaryButton = styled(NewPrimaryBtn)`
+  background-color: ${COLORS.blue};
+  border-radius: ${BORDERS.radiusSoftCorners};
+  text-transform: ${TYPOGRAPHY.textTransformNone};
+  ${TYPOGRAPHY.pSemiBold}
+
+  ${styleProps}
+`
+
+export const SecondaryButton = styled(NewSecondaryBtn)`
+  color: ${COLORS.blue};
+  border-radius: ${BORDERS.radiusSoftCorners};
+  text-transform: ${TYPOGRAPHY.textTransformNone};
+  ${TYPOGRAPHY.pSemiBold}
+
+  ${styleProps}
+`
 
 export const ToggleButton = (props: ToggleBtnProps): JSX.Element => {
   const color = props.toggledOn ? COLORS.blue : COLORS.darkGrey
