@@ -19,17 +19,17 @@ class RootPartitions(enum.Enum):
 class PartitionManager:
     """Partition manager class."""
 
-    def find_unused_partition(self) -> RootPartitions:
+    def find_unused_partition(self) -> Partition:
         """Find unused partition"""
         # fw_printenv -n root_part gives the currently
         # active root_fs partition, find that, and
         # set other partition as unused partition!
         which = subprocess.check_output(["fw_printenv -n root_part"]).strip()
         return {
-            b"2": RootPartitions.THREE,
-            b"3": RootPartitions.TWO,
+            b"2": RootPartitions.THREE.value,
+            b"3": RootPartitions.TWO.value,
             # if output is empty, current part is 2, set unused to 3!
-            b"": RootPartitions.THREE,
+            b"": RootPartitions.THREE.value,
         }[which]
 
     def switch_partition(self):
@@ -120,8 +120,8 @@ class Updater(UpdateActionsInterface):
         self,
         rootfs_filepath: str,
         progress_callback: Callable[[float], None],
-        chunk_size: int,
-        file_size: Optional[int],
+        chunk_size: int = 1024,
+        file_size: int = None,
     ) -> Partition:
 
         """
@@ -142,7 +142,7 @@ class Updater(UpdateActionsInterface):
         :returns: The root partition that the rootfs image was written to, e.g.
                   ``RootPartitions.TWO`` or ``RootPartitions.THREE``.
         """
-        unused_partition = self.part_mngr.find_unused_partition().value
+        unused_partition = self.part_mngr.find_unused_partition()
         self.root_FS_intf.write_file(
             rootfs_filepath,
             unused_partition.path,
