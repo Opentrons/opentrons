@@ -49,7 +49,7 @@ import { ProtocolRunHeader } from '../ProtocolRunHeader'
 
 import type { UseQueryResult } from 'react-query'
 import type { Run } from '@opentrons/api-client'
-import type { ProtocolFile } from '@opentrons/shared-data'
+import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 
 const mockPush = jest.fn()
 
@@ -108,7 +108,7 @@ const STARTED_AT = '2022-03-03T19:09:40.620530+00:00'
 const COMPLETED_AT = '2022-03-03T19:39:53.620530+00:00'
 const PROTOCOL_NAME = 'A Protocol for Otie'
 
-const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolFile<{}>
+const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnalysisFile<{}>
 
 const PROTOCOL_DETAILS = {
   displayName: PROTOCOL_NAME,

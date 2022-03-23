@@ -1,17 +1,17 @@
 import { schemaV6Adapter } from '@opentrons/shared-data'
 import { useProtocolForRun } from '.'
 
-import type { ProtocolFile } from '@opentrons/shared-data'
+import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 
 export interface ProtocolDetails {
   displayName: string | null
-  protocolData: ProtocolFile<{}> | null
+  protocolData: ProtocolAnalysisFile<{}> | null
 }
 
 export function useProtocolDetailsForRun(
   runId: string | null
 ): ProtocolDetails {
-  let protocolData: ProtocolFile<{}> | null = null
+  let protocolData: ProtocolAnalysisFile<{}> | null = null
   const protocolRecord = useProtocolForRun(runId)
 
   const protocolAnalysis = protocolRecord?.data.analyses

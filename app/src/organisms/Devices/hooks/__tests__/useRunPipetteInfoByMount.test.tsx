@@ -28,7 +28,7 @@ import {
 import type {
   LabwareDefinition2,
   PipetteNameSpecs,
-  ProtocolFile,
+  ProtocolAnalysisFile,
 } from '@opentrons/shared-data'
 import type { PipetteInfo, ProtocolDetails } from '..'
 
@@ -82,7 +82,7 @@ const TIP_LENGTH_CALIBRATIONS = [
 ]
 
 const tiprack10ul = _tiprack10ul as LabwareDefinition2
-const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolFile<{}>
+const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnalysisFile<{}>
 
 const PROTOCOL_DETAILS = {
   displayName: 'fake protocol',

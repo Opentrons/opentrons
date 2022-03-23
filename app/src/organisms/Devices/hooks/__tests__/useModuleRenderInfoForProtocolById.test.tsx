@@ -17,7 +17,10 @@ import {
   useProtocolDetailsForRun,
 } from '..'
 
-import type { ModuleDefinition, ProtocolFile } from '@opentrons/shared-data'
+import type {
+  ModuleDefinition,
+  ProtocolAnalysisFile,
+} from '@opentrons/shared-data'
 import type { ProtocolDetails } from '..'
 
 jest.mock('../../../../organisms/ProtocolSetup/utils/getProtocolModulesInfo')
@@ -34,7 +37,7 @@ const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunc
   typeof useProtocolDetailsForRun
 >
 
-const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolFile<{}>
+const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnalysisFile<{}>
 
 const PROTOCOL_DETAILS = {
   displayName: 'fake protocol',

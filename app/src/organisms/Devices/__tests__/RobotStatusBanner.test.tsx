@@ -12,7 +12,7 @@ import { useCurrentRunStatus } from '../../../organisms/RunTimeControl/hooks'
 import { useProtocolDetailsForRun } from '../hooks'
 import { RobotStatusBanner } from '../RobotStatusBanner'
 
-import type { ProtocolFile } from '@opentrons/shared-data'
+import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 
 jest.mock('../../../organisms/ProtocolUpload/hooks')
 jest.mock('../../../organisms/RunTimeControl/hooks')
@@ -28,7 +28,7 @@ const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunc
   typeof useProtocolDetailsForRun
 >
 
-const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolFile<{}>
+const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnalysisFile<{}>
 
 const PROTOCOL_DETAILS = {
   displayName: 'Testosaur',
@@ -54,7 +54,7 @@ describe('RobotStatusBanner', () => {
       .calledWith(null)
       .mockReturnValue({
         displayName: null,
-        protocolData: {} as ProtocolFile<{}>,
+        protocolData: {} as ProtocolAnalysisFile<{}>,
       })
   })
   afterEach(() => {
