@@ -39,38 +39,42 @@ export class IpHostnameItem extends React.Component<IpHostnameItemProps> {
 
   render(): JSX.Element {
     return (
-      <Flex justifyContent={JUSTIFY_FLEX_START}>
-        <IpItem>
+      <React.Fragment>
+        <Flex justifyContent={JUSTIFY_FLEX_START}>
+          <IpItem>
+            <Text
+              fontSize={TYPOGRAPHY.fontSizeP}
+              fontWeight={TYPOGRAPHY.fontWeightRegular}
+              lineHeight={TYPOGRAPHY.lineHeight16}
+              fontStyle={TYPOGRAPHY.fontStyleNormal}
+              color={
+                this.props.discovered
+                  ? COLORS.darkBlack
+                  : COLORS.successDisabled
+              }
+            >
+              {this.props.candidate}
+            </Text>
+          </IpItem>
           <Text
-            fontSize={TYPOGRAPHY.fontSizeP}
+            fontSize={TYPOGRAPHY.fontSizeH6}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
-            lineHeight={TYPOGRAPHY.lineHeight16}
+            lineHeight={TYPOGRAPHY.lineHeight12}
+            textTransform={TYPOGRAPHY.textTransformNone}
             fontStyle={TYPOGRAPHY.fontStyleNormal}
-            color={
-              this.props.discovered ? COLORS.darkBlack : COLORS.successDisabled
-            }
+            color={COLORS.darkGreyEnabled}
+            css={`
+              white-space: nowrap;
+            `}
           >
-            {this.props.candidate}
+            {this.props.discovered
+              ? app_settings.ip_available
+              : app_settings.ip_not_found}
           </Text>
-        </IpItem>
-        <Text
-          fontSize={TYPOGRAPHY.fontSizeH6}
-          fontWeight={TYPOGRAPHY.fontWeightRegular}
-          lineHeight={TYPOGRAPHY.lineHeight12}
-          textTransform={TYPOGRAPHY.textTransformNone}
-          fontStyle={TYPOGRAPHY.fontStyleNormal}
-          color={COLORS.darkGreyEnabled}
-          css={`
-            white-space: nowrap;
-          `}
-        >
-          {this.props.discovered
-            ? app_settings.ip_available
-            : app_settings.ip_not_found}
-        </Text>
-        <IpTerminateButton name="close" onClick={this.remove} />
-        <Divider />
-      </Flex>
+          <IpTerminateButton name="close" onClick={this.remove} />
+        </Flex>
+        <Divider width="100%" />
+      </React.Fragment>
     )
   }
 }

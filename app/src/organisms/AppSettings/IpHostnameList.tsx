@@ -3,7 +3,6 @@ import { connect, MapDispatchToProps } from 'react-redux'
 import { getConfig, removeManualIp } from '../../redux/config'
 import { getViewableRobots } from '../../redux/discovery'
 import { IpHostnameItem } from './IpHostnameItem'
-import { Flex, SPACING } from '@opentrons/components'
 
 import type { State } from '../../redux/types'
 import type { DiscoveryCandidates } from '../../redux/config/types'
@@ -22,7 +21,7 @@ type Props = SP & DP
 
 function IpHostnameListComponent(props: Props): JSX.Element {
   const { candidates, removeManualIp, robots } = props
-  const candidateList: string[] = [].concat(candidates)
+  const candidateList: string[] = ([] as string[]).concat(candidates)
 
   return (
     <>

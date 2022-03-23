@@ -4,7 +4,8 @@ import { getConfig, addManualIp } from '../../redux/config'
 import { startDiscovery } from '../../redux/discovery'
 import { Formik, Form, Field } from 'formik'
 import { IpHostnameField } from './IpHostnameField'
-import { Flex, SPACING, Icon, SIZE_2 } from '@opentrons/components'
+import { Flex, SPACING, Icon, SIZE_2, Text } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
 
 import type { MapDispatchToProps } from 'react-redux'
 import type { State } from '../../redux/types'
@@ -22,10 +23,19 @@ type Props = SP & DP
 
 export function ManualIpHostnameFormComponent(props: Props): JSX.Element {
   const [showSpinner, setShowSpinner] = React.useState(false)
-  const [showRefreshBtn, setShowRefreshBtn] = React.useState(false)
-  const [showTrybtn, setShowTrybtn] = React.useState(false)
+  // const [showRefreshBtn, setShowRefreshBtn] = React.useState(false)
+  // const [showTrybtn, setShowTrybtn] = React.useState(false)
   // const []
   const inputRef = React.useRef<HTMLInputElement>(null)
+  const { t } = useTranslation('app_settings')
+
+  // const validateInput = (value: string): string | undefined => {
+  //   console.log('value', value)
+  //   if (!value) {
+  //     console.log(t('add_ip_error'))
+  //     return t('add_ip_error')
+  //   }
+  // }
 
   return (
     <>
@@ -33,7 +43,7 @@ export function ManualIpHostnameFormComponent(props: Props): JSX.Element {
         initialValues={{ ip: '' }}
         onSubmit={(values, actions) => {
           const ip = values.ip.trim()
-          if (!ip) return
+          console.log(ip)
           setShowSpinner(true)
           props.addManualIp(ip)
           const $input = inputRef.current
