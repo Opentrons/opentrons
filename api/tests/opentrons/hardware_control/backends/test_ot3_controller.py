@@ -76,6 +76,7 @@ def mock_present_nodes(controller: OT3Controller):
         [OT3Axis.Z_L],
         [OT3Axis.Z_R],
         [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_R],
+        [OT3Axis.X, OT3Axis.Z_R, OT3Axis.P_R, OT3Axis.Y, OT3Axis.Z_L],
     ],
 )
 async def test_home(
@@ -100,10 +101,13 @@ async def test_home(
         for node in (mock_move_group_run.call_args_list[0][0][0]._move_groups)[1][0]:
             assert node not in [NodeId.head_l, NodeId.head_r]
 
+    if (OT3Axis.P_R or OT3Axis.P_L) in axes:
+        for node in (mock_move_group_run.call_args_list[1][0][0]._move_groups)[0][0]:
+            assert node in [NodeId.pipette_left, NodeId.pipette_right]
+
     assert home_move.acceleration_mm_sec_sq == 0
     assert home_move.move_type == MoveType.home
     assert home_move.stop_condition == MoveStopCondition.limit_switch
-    mock_move_group_run.assert_called_once()
 
 
 async def test_home_only_present_nodes(controller: OT3Controller, mock_move_group_run):
