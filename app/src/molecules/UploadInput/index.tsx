@@ -73,7 +73,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
     setIsFileOverDropZone(true)
   }
 
-  const handleClick: React.MouseEventHandler<HTMLButtonElement> = _event => {
+  const handleClick: React.MouseEventHandler<HTMLAnchorElement> = _event => {
     props.onClick != null ? props.onClick() : fileInput.current?.click()
   }
 
