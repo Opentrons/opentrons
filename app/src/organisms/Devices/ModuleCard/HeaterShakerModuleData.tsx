@@ -39,7 +39,7 @@ export const HeaterShakerModuleData = (
     currentSpeed,
     showTemperatureData,
   } = props
-  const { t } = useTranslation('device_details')
+  const { t } = useTranslation(['device_details', 'heater_shaker'])
 
   const getStatusLabelProps = (
     status: string | null
@@ -147,14 +147,14 @@ export const HeaterShakerModuleData = (
             fontSize={TYPOGRAPHY.fontSizeH6}
             marginTop={SPACING.spacing3}
           >
-            {'Labware Latch'}
+            {t('labware_latch', { ns: 'heater_shaker' })}
           </Text>
           <Text
             title="latch_status"
             fontSize={TYPOGRAPHY.fontSizeH6}
             alignItems={ALIGN_FLEX_START}
           >
-            <Flex flexDirection={DIRECTION_ROW}>
+            <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING.spacing2}>
               {/* {TODO(sh, 2022-02-22): Conditionally render icon based on latch status} */}
               <Icon name="closed-locked" size={'1rem'} />
               {latchStatus}
