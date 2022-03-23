@@ -3,6 +3,7 @@ import {
   Flex,
   DIRECTION_ROW,
   DIRECTION_COLUMN,
+  ALIGN_FLEX_START,
   TYPOGRAPHY,
   SPACING,
 } from '@opentrons/components'
@@ -24,11 +25,11 @@ export function IpHostnameField(props: IpHostnameFieldProps): JSX.Element {
   } = props
 
   return (
-    <Flex flexDirection={DIRECTION_ROW}>
+    <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_FLEX_START}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         paddingRight={SPACING.spacing3}
-        width="100%"
+        marginTop={SPACING.spacing2}
       >
         <input
           {...field}
@@ -38,17 +39,21 @@ export function IpHostnameField(props: IpHostnameFieldProps): JSX.Element {
           }}
           type="text"
           ref={inputRef}
+          height="100%"
         />
-        <TertiaryButton
-          fontSize={TYPOGRAPHY.fontSizeH6}
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          lineHeight={TYPOGRAPHY.lineHeight12}
-          paddingX={SPACING.spacing4}
-          onClick={null}
-        >
-          {t('add_ip_button')}
-        </TertiaryButton>
       </Flex>
+      <TertiaryButton
+        fontSize={TYPOGRAPHY.fontSizeH6}
+        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        lineHeight={TYPOGRAPHY.lineHeight12}
+        // marginLeft={SPACING.spacing3}
+        marginTop={SPACING.spacing2}
+        // paddingX={SPACING.spacing4}
+        onClick={null}
+        width="100%"
+      >
+        {t('add_ip_button')}
+      </TertiaryButton>
     </Flex>
   )
 }

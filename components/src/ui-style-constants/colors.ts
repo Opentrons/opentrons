@@ -36,11 +36,14 @@ export const error = '#bf0000'
 export const errorHover = '#a30000'
 export const errorText = '#850000'
 export const errorBg = '#fff3f3'
+// note: errorDisabled = successDisabled
 
 export const success = '#04aa65'
 export const successText = '#00854d'
 export const successBg = '#f3fffa'
+export const successDisabled = '#8f8f8f'
 
 export const warning = '#f09d20'
 export const warningText = '#7b5b09'
 export const warningBg = '#fffcf5'
+// note: warningDisabled = successDisabled

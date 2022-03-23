@@ -4,6 +4,7 @@ import { getConfig, addManualIp } from '../../redux/config'
 import { startDiscovery } from '../../redux/discovery'
 import { Formik, Form, Field } from 'formik'
 import { IpHostnameField } from './IpHostnameField'
+import { Flex, SPACING, Icon, SIZE_2 } from '@opentrons/components'
 
 import type { MapDispatchToProps } from 'react-redux'
 import type { State } from '../../redux/types'
@@ -20,24 +21,37 @@ interface DP {
 type Props = SP & DP
 
 export function ManualIpHostnameFormComponent(props: Props): JSX.Element {
+  const [showSpinner, setShowSpinner] = React.useState(false)
+  const [showRefreshBtn, setShowRefreshBtn] = React.useState(false)
+  const [showTrybtn, setShowTrybtn] = React.useState(false)
+  // const []
   const inputRef = React.useRef<HTMLInputElement>(null)
 
   return (
-    <Formik
-      initialValues={{ ip: '' }}
-      onSubmit={(values, actions) => {
-        const ip = values.ip.trim()
-        if (!ip) return
-        props.addManualIp(ip)
-        const $input = inputRef.current
-        if ($input) $input.blur()
-        actions.resetForm()
-      }}
-    >
-      <Form>
-        <Field name="ip" component={IpHostnameField} />
-      </Form>
-    </Formik>
+    <>
+      <Formik
+        initialValues={{ ip: '' }}
+        onSubmit={(values, actions) => {
+          const ip = values.ip.trim()
+          if (!ip) return
+          setShowSpinner(true)
+          props.addManualIp(ip)
+          const $input = inputRef.current
+          if ($input) $input.blur()
+          actions.resetForm()
+          setShowSpinner(false)
+        }}
+      >
+        <Form>
+          <Field name="ip" component={IpHostnameField} />
+        </Form>
+      </Formik>
+      {showSpinner && (
+        <Flex marginTop={SPACING.spacing5} marginBottom={SPACING.spacing4}>
+          <Icon name="ot-spinner" size={SIZE_2} spin />
+        </Flex>
+      )}
+    </>
   )
 }
 

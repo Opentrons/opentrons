@@ -10,6 +10,8 @@ import {
   // SIZE_AUTO,
   Text,
   TYPOGRAPHY,
+  FlatButton,
+  COLORS,
 } from '@opentrons/components'
 import { PrimaryButton } from '../../atoms/Buttons'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
@@ -52,8 +54,11 @@ export function ConnectRobotSlideout(
       }
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
+        <Text fontSize={TYPOGRAPHY.fontSizeP} marginBottom={SPACING.spacing3}>
+          {t('ip_description_first')}
+        </Text>
         <Text fontSize={TYPOGRAPHY.fontSizeP}>
-          {t('connect_ip_description')}
+          {t('ip_description_second')}
         </Text>
         <ExternalLink
           href={SUPPORT_PAGE_LINK}
@@ -66,15 +71,17 @@ export function ConnectRobotSlideout(
         <Divider marginY={SPACING.spacing5} />
         <Text css={TYPOGRAPHY.pSemiBold}>{t('add_ip_hostname')}</Text>
         {/* <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_FLEX_START}> */}
-        <Flex
+        {/* <Flex
           flexDirection={DIRECTION_COLUMN}
           marginTop={SPACING.spacing3}
           // paddingRight={SPACING.spacing4}
           // paddingLeft={SPACING.spacing4}
-        >
-          <ManualIpHostnameForm />
-          <IpHostnameList />
-        </Flex>
+        > */}
+        <ManualIpHostnameForm />
+        {/* IP/Hostname action buttons */}
+        {/* spinner, refresh, try again, fresh list */}
+        <IpHostnameList />
+        {/* </Flex> */}
         {/* </Flex> */}
       </Flex>
     </Slideout>
