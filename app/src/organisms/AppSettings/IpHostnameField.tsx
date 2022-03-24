@@ -46,10 +46,8 @@ export function IpHostnameField(props: IpHostnameFieldProps): JSX.Element {
         fontSize={TYPOGRAPHY.fontSizeH6}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         lineHeight={TYPOGRAPHY.lineHeight12}
-        // marginLeft={SPACING.spacing3}
         marginTop={SPACING.spacing2}
-        // paddingX={SPACING.spacing4}
-        onClick={null}
+        onClick={null} // call startDiscovery
         width="100%"
       >
         {t('add_ip_button')}

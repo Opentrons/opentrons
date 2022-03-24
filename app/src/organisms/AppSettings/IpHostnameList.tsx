@@ -21,11 +21,10 @@ type Props = SP & DP
 
 function IpHostnameListComponent(props: Props): JSX.Element {
   const { candidates, removeManualIp, robots } = props
-  const candidateList: string[] = ([] as string[]).concat(candidates)
 
   return (
     <>
-      {candidateList
+      {candidates
         .map<[string, boolean]>(candidate => {
           const discovered = robots.some(robot => robot.ip === candidate)
           return [candidate, discovered]
