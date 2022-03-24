@@ -8,10 +8,10 @@ from opentrons.hardware_control.modules import AbstractModule
 
 from robot_server.errors import LegacyErrorResponse
 from robot_server.hardware import get_hardware
+from robot_server.versioning import get_requested_version
 from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.legacy.models.modules import (
     Module,
-    ModuleSerial,
     Modules,
     SerialCommandResponse,
     SerialCommand,
@@ -21,11 +21,7 @@ from robot_server.service.legacy.models.modules import (
 router = APIRouter()
 
 
-@router.get(
-    "/modules",
-    description="Describe the modules attached to the OT-2",
-    response_model=Modules,
-)
+# NOTE(mc, 2022-03-22): replaced by robot_server.modules.router.get_attached_modules
 async def get_modules(
     hardware: HardwareControlAPI = Depends(get_hardware),
 ) -> Modules:
@@ -42,51 +38,15 @@ async def get_modules(
             revision=mod.device_info.get("model"),  # type: ignore
             fwVersion=mod.device_info.get("version"),  # type: ignore
             hasAvailableUpdate=mod.has_available_update(),
-            # TODO: these type ignores are necessary for now because of imprecision in
+            status=mod.live_data["status"],
+            # TODO: this type ignores is necessary for now because of imprecision in
             # the return values on the hardware side now that we're actually chekcing
             # the types
-            status=mod.live_data["status"],  # type: ignore
             data=mod.live_data["data"],  # type: ignore
         )
         for mod in attached_modules
     ]
     return Modules(modules=module_data)
-
-
-@router.get(
-    path="/modules/{serial}/data",
-    summary="Get live data for a specific module",
-    description=(
-        "This is similar to the values in GET /modules, but "
-        "for only a specific currently-attached module"
-    ),
-    response_model=ModuleSerial,
-    responses={
-        status.HTTP_404_NOT_FOUND: {"model": LegacyErrorResponse},
-    },
-)
-async def get_module_serial(
-    serial: str = Path(..., description="Serial number of the module"),
-    hardware: HardwareControlAPI = Depends(get_hardware),
-) -> ModuleSerial:
-    res = None
-
-    attached_modules = hardware.attached_modules
-    matching_module = find_matching_module(serial, attached_modules)
-    if matching_module and hasattr(matching_module, "live_data"):
-        res = matching_module.live_data
-
-    if not res:
-        raise LegacyErrorResponse(message="Module not found").as_error(
-            status.HTTP_404_NOT_FOUND
-        )
-
-    # TODO(mc, 2020-09-17): types of res.get(...) do not match what
-    # ModuleSerial expects
-    return ModuleSerial(
-        status=res.get("status"),  # type: ignore[arg-type]
-        data=res.get("data"),  # type: ignore[arg-type]
-    )
 
 
 @router.post(
@@ -108,8 +68,14 @@ async def post_serial_command(
     command: SerialCommand,
     serial: str = Path(..., description="Serial number of the module"),
     hardware: HardwareControlAPI = Depends(get_hardware),
+    requested_version: int = Depends(get_requested_version),
 ) -> SerialCommandResponse:
     """Send a command on device identified by serial"""
+    if requested_version >= 3:
+        raise LegacyErrorResponse(
+            message=("This endpoint has been removed. Use POST /commands instead.")
+        ).as_error(status.HTTP_410_GONE)
+
     attached_modules = hardware.attached_modules
     if not attached_modules:
         raise LegacyErrorResponse(message="No connected modules").as_error(

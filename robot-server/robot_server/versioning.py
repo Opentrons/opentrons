@@ -5,11 +5,18 @@ from typing_extensions import Literal, Final
 
 from robot_server.errors import ErrorDetails
 
-API_VERSION: Final[int] = 2
+API_VERSION: Final[int] = 3
 """The current version of the HTTP API used by the server.
 
 This value will be incremented any time the schema of a request or response
 is changed. The value is separate from the overall application version.
+
+Version history:
+
+1. Introduced in v3 of the Opentrons software (deprecated and removed in v4)
+2. Introduced in v4 of the Opentrons software
+3. Introduced in v5.1 of the Opentrons software
+    - Reformatted the `GET /modules` response and removed unused endpoints
 """
 
 MIN_API_VERSION: Final[int] = 2
@@ -88,3 +95,15 @@ async def set_version_response_headers(response: Response) -> None:
     """
     response.headers[API_VERSION_HEADER] = f"{API_VERSION}"
     response.headers[MIN_API_VERSION_HEADER] = f"{MIN_API_VERSION}"
+
+
+async def get_requested_version(request: Request) -> int:
+    """Get the requested API version in a route handler.
+
+    The route must depend on the ``check_version_header`` dependency.
+    """
+    assert isinstance(
+        request.state.api_version, int
+    ), "No api_version in request state; is endpoint properly configured?"
+
+    return request.state.api_version

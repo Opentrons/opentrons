@@ -4,10 +4,12 @@ marks:
   - usefixtures:
       - run_server
 stages:
-  - name: Get all the modules
+  - name: Get all the modules (legacy)
     request:
-      url: "{host:s}:{port:d}/modules"
+      url: '{host:s}:{port:d}/modules'
       method: GET
+      headers:
+        Opentrons-Version: '2'
     response:
       status_code: 200
       json:
@@ -81,5 +83,77 @@ stages:
             hasAvailableUpdate: !anybool
             status: !anystr
             data:
+              height: !anyfloat
+              engaged: !anybool
+  - name: Get all the modules
+    request:
+      url: '{host:s}:{port:d}/modules'
+      method: GET
+    response:
+      status_code: 200
+      json:
+        meta: !anydict
+        data:
+          - id: !anystr
+            serialNumber: !anystr
+            firmwareVersion: !anystr
+            hardwareRevision: !anystr
+            hasAvailableUpdate: !anybool
+            moduleType: thermocyclerModuleType
+            moduleModel: thermocyclerModuleV1
+            usbPort:
+              port: !anyint
+              path: !anystr
+            data:
+              status: !anystr
+              lidStatus: !anystr
+              lidTargetTemperature: !anyfloat
+              lidTemperature: !anyfloat
+              currentTemperature: !anyfloat
+              targetTemperature: !anyfloat
+              holdTime: !anyfloat
+          - id: !anystr
+            serialNumber: !anystr
+            firmwareVersion: !anystr
+            hardwareRevision: !anystr
+            hasAvailableUpdate: !anybool
+            moduleType: heaterShakerModuleType
+            moduleModel: heaterShakerModuleV1
+            usbPort:
+              port: !anyint
+              path: !anystr
+            data:
+              status: !anystr
+              labwareLatchStatus: !anystr
+              speedStatus: !anystr
+              temperatureStatus: !anystr
+              currentSpeed: !anyint
+              currentTemperature: !anyfloat
+          - id: !anystr
+            serialNumber: !anystr
+            firmwareVersion: !anystr
+            hardwareRevision: !anystr
+            hasAvailableUpdate: !anybool
+            moduleType: temperatureModuleType
+            moduleModel: temperatureModuleV1
+            usbPort:
+              port: !anyint
+              path: !anystr
+            data:
+              status: !anystr
+              currentTemperature: !anyfloat
+              targetTemperature: !anyfloat
+          - id: !anystr
+            serialNumber: !anystr
+            firmwareVersion: !anystr
+            hardwareRevision: !anystr
+            hasAvailableUpdate: !anybool
+            moduleType: magneticModuleType
+            moduleModel: magneticModuleV1
+            usbPort:
+              port: !anyint
+              path: !anystr
+            data:
+              status: !anystr
               height: !anyfloat
               engaged: !anybool
