@@ -57,9 +57,14 @@ class ProtocolStore:
         """Initialize the ProtocolStore."""
         self._protocols_by_id: Dict[str, ProtocolResource] = {}
 
-    def upsert(self, resource: ProtocolResource) -> None:
-        """Upsert a protocol resource into the store."""
-        self._protocols_by_id[resource.protocol_id] = resource
+    def insert(self, resource: ProtocolResource) -> None:
+        """Insert a protocol resource into the store."""
+        id = resource.protocol_id
+        if id in self._protocols_by_id:
+            # TODO: Add a test for this.
+            raise KeyError(f"A protocol already exists with ID {id}.")
+        else:
+            self._protocols_by_id[id] = resource
 
     def get(self, protocol_id: str) -> ProtocolResource:
         """Get a single protocol by ID."""

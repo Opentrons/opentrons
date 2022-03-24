@@ -25,7 +25,7 @@ def subject() -> ProtocolStore:
     return ProtocolStore()
 
 
-async def test_upsert_and_get_protocol(tmp_path: Path, subject: ProtocolStore) -> None:
+async def test_insert_and_get_protocol(tmp_path: Path, subject: ProtocolStore) -> None:
     """It should store a single protocol."""
     protocol_resource = ProtocolResource(
         protocol_id="protocol-id",
@@ -40,7 +40,7 @@ async def test_upsert_and_get_protocol(tmp_path: Path, subject: ProtocolStore) -
         ),
     )
 
-    subject.upsert(protocol_resource)
+    subject.insert(protocol_resource)
     result = subject.get("protocol-id")
 
     assert result == protocol_resource
@@ -82,8 +82,8 @@ async def test_get_all_protocols(tmp_path: Path, subject: ProtocolStore) -> None
         ),
     )
 
-    subject.upsert(resource_1)
-    subject.upsert(resource_2)
+    subject.insert(resource_1)
+    subject.insert(resource_2)
     result = subject.get_all()
 
     assert result == [resource_1, resource_2]
@@ -109,7 +109,7 @@ async def test_remove_protocol(tmp_path: Path, subject: ProtocolStore) -> None:
         ),
     )
 
-    subject.upsert(protocol_resource)
+    subject.insert(protocol_resource)
     subject.remove("protocol-id")
 
     assert directory.exists() is False
