@@ -114,9 +114,10 @@ class EquipmentHandler:
             slot_name = location.slotName
             module_model = None
         else:
-            module = self._state_store.modules.get(location.moduleId)
-            slot_name = module.location.slotName
-            module_model = module.model
+            module_id = location.moduleId
+            module_model = self._state_store.modules.get_model(module_id)
+            module_location = self._state_store.modules.get_location(module_id)
+            slot_name = module_location.slotName
 
         offset = self._state_store.labware.find_applicable_labware_offset(
             definition_uri=definition_uri,

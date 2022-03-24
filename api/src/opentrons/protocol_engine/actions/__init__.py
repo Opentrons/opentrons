@@ -9,6 +9,7 @@ from .actions import (
     Action,
     PlayAction,
     PauseAction,
+    PauseSource,
     StopAction,
     FinishAction,
     HardwareStoppedAction,
@@ -16,8 +17,8 @@ from .actions import (
     UpdateCommandAction,
     FailCommandAction,
     AddLabwareOffsetAction,
-    PauseSource,
     AddLabwareDefinitionAction,
+    AddModuleAction,
     FinishErrorDetails,
     HardwareEventAction,
 )
@@ -39,6 +40,7 @@ __all__ = [
     "FailCommandAction",
     "AddLabwareOffsetAction",
     "AddLabwareDefinitionAction",
+    "AddModuleAction",
     "HardwareEventAction",
     # action payload values
     "PauseSource",

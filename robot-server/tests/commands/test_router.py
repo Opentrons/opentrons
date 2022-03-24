@@ -13,7 +13,6 @@ from opentrons.protocol_engine.errors import CommandDoesNotExistError
 
 from robot_server.service.json_api import RequestModel, MultiBodyMeta
 from robot_server.errors import ApiError
-from robot_server.runs import EngineStore, EngineConflictError
 from robot_server.commands.router import create_command, get_commands_list, get_command
 
 
@@ -23,15 +22,8 @@ def protocol_engine(decoy: Decoy) -> ProtocolEngine:
     return decoy.mock(cls=ProtocolEngine)
 
 
-@pytest.fixture()
-def engine_store(decoy: Decoy) -> EngineStore:
-    """Get a mocked out EngineStore."""
-    return decoy.mock(cls=EngineStore)
-
-
 async def test_create_command(
     decoy: Decoy,
-    engine_store: EngineStore,
     protocol_engine: ProtocolEngine,
 ) -> None:
     """It should be able to create a command."""
@@ -51,8 +43,6 @@ async def test_create_command(
         )
         return queued_command
 
-    decoy.when(await engine_store.get_default_engine()).then_return(protocol_engine)
-
     decoy.when(protocol_engine.add_command(command_create)).then_do(
         _stub_queued_command_state
     )
@@ -61,7 +51,7 @@ async def test_create_command(
         RequestModel(data=command_create),
         waitUntilComplete=False,
         timeout=42,
-        engine_store=engine_store,
+        engine=protocol_engine,
     )
 
     assert result.content.data == queued_command
@@ -71,7 +61,6 @@ async def test_create_command(
 
 async def test_create_command_wait_for_complete(
     decoy: Decoy,
-    engine_store: EngineStore,
     protocol_engine: ProtocolEngine,
 ) -> None:
     """It should be able to create a command."""
@@ -105,8 +94,6 @@ async def test_create_command_wait_for_complete(
             completed_command
         )
 
-    decoy.when(await engine_store.get_default_engine()).then_return(protocol_engine)
-
     decoy.when(protocol_engine.add_command(command_create)).then_do(
         _stub_queued_command_state
     )
@@ -119,36 +106,15 @@ async def test_create_command_wait_for_complete(
         RequestModel(data=command_create),
         waitUntilComplete=True,
         timeout=42,
-        engine_store=engine_store,
+        engine=protocol_engine,
     )
 
     assert result.content.data == completed_command
     assert result.status_code == 201
 
 
-async def test_create_command_conflict(decoy: Decoy, engine_store: EngineStore) -> None:
-    """It should raise a conflict if there is an active engine in place."""
-    home_create = pe_commands.HomeCreate(params=pe_commands.HomeParams())
-
-    decoy.when(await engine_store.get_default_engine()).then_raise(
-        EngineConflictError("oh no")
-    )
-
-    with pytest.raises(ApiError) as exc_info:
-        await create_command(
-            RequestModel(data=home_create),
-            waitUntilComplete=True,
-            timeout=42,
-            engine_store=engine_store,
-        )
-
-    assert exc_info.value.status_code == 409
-    assert exc_info.value.content["errors"][0]["id"] == "RunActive"
-
-
 async def test_get_commands_list(
     decoy: Decoy,
-    engine_store: EngineStore,
     protocol_engine: ProtocolEngine,
 ) -> None:
     """It should get a list of commands."""
@@ -167,7 +133,6 @@ async def test_get_commands_list(
         params=pe_commands.HomeParams(),
     )
 
-    decoy.when(await engine_store.get_default_engine()).then_return(protocol_engine)
     decoy.when(protocol_engine.state_view.commands.get_current()).then_return(
         CurrentCommand(
             command_id="abc123",
@@ -183,7 +148,7 @@ async def test_get_commands_list(
     )
 
     result = await get_commands_list(
-        engine_store=engine_store,
+        engine=protocol_engine,
         cursor=1337,
         pageLength=42,
     )
@@ -193,25 +158,8 @@ async def test_get_commands_list(
     assert result.status_code == 200
 
 
-async def test_get_commands_list_conflict(
-    decoy: Decoy,
-    engine_store: EngineStore,
-) -> None:
-    """It should raise a conflict if there is an active engine in place."""
-    decoy.when(await engine_store.get_default_engine()).then_raise(
-        EngineConflictError("oh no")
-    )
-
-    with pytest.raises(ApiError) as exc_info:
-        await get_commands_list(engine_store=engine_store)
-
-    assert exc_info.value.status_code == 409
-    assert exc_info.value.content["errors"][0]["id"] == "RunActive"
-
-
 async def test_get_command(
     decoy: Decoy,
-    engine_store: EngineStore,
     protocol_engine: ProtocolEngine,
 ) -> None:
     """It should get a single command by ID."""
@@ -223,44 +171,25 @@ async def test_get_command(
         params=pe_commands.HomeParams(),
     )
 
-    decoy.when(await engine_store.get_default_engine()).then_return(protocol_engine)
     decoy.when(protocol_engine.state_view.commands.get("abc123")).then_return(command_1)
 
-    result = await get_command(commandId="abc123", engine_store=engine_store)
+    result = await get_command(commandId="abc123", engine=protocol_engine)
 
     assert result.content.data == command_1
     assert result.status_code == 200
 
 
-async def test_get_command_conflict(
-    decoy: Decoy,
-    engine_store: EngineStore,
-) -> None:
-    """It should raise a conflict if there is an active engine in place."""
-    decoy.when(await engine_store.get_default_engine()).then_raise(
-        EngineConflictError("oh no")
-    )
-
-    with pytest.raises(ApiError) as exc_info:
-        await get_command(commandId="abc123", engine_store=engine_store)
-
-    assert exc_info.value.status_code == 409
-    assert exc_info.value.content["errors"][0]["id"] == "RunActive"
-
-
 async def test_get_command_not_found(
     decoy: Decoy,
-    engine_store: EngineStore,
     protocol_engine: ProtocolEngine,
 ) -> None:
     """It should raise a 404 if command is not found."""
-    decoy.when(await engine_store.get_default_engine()).then_return(protocol_engine)
     decoy.when(protocol_engine.state_view.commands.get("abc123")).then_raise(
         CommandDoesNotExistError("oh no")
     )
 
     with pytest.raises(ApiError) as exc_info:
-        await get_command(commandId="abc123", engine_store=engine_store)
+        await get_command(commandId="abc123", engine=protocol_engine)
 
     assert exc_info.value.status_code == 404
     assert exc_info.value.content["errors"][0]["id"] == "StatelessCommandNotFound"

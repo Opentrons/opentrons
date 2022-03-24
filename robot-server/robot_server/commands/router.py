@@ -5,10 +5,10 @@ from typing_extensions import Final, Literal
 from anyio import move_on_after
 from fastapi import APIRouter, Depends, Query, status
 
+from opentrons.protocol_engine import ProtocolEngine
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
 
 from robot_server.errors import ErrorDetails, ErrorBody
-from robot_server.runs import EngineStore, EngineConflictError, get_engine_store
 from robot_server.service.json_api import (
     MultiBodyMeta,
     RequestModel,
@@ -17,6 +17,7 @@ from robot_server.service.json_api import (
     PydanticResponse,
 )
 
+from .get_default_engine import get_default_engine, RunActive
 from .stateless_commands import StatelessCommand, StatelessCommandCreate
 
 _DEFAULT_COMMAND_WAIT_MS: Final = 30_000
@@ -24,20 +25,6 @@ _DEFAULT_COMMAND_LIST_LENGTH: Final = 20
 
 
 commands_router = APIRouter()
-
-
-class RunActive(ErrorDetails):
-    """An error returned if there is a run active.
-
-    If there is a run active, you cannot issue stateless commands.
-    """
-
-    id: Literal["RunActive"] = "RunActive"
-    title: str = "Run Active"
-    detail: str = (
-        "There is an active run. Close the current run"
-        " to issue commands via POST /commands."
-    )
 
 
 class CommandNotFound(ErrorDetails):
@@ -81,7 +68,7 @@ async def create_command(
             " the command will be returned with its current status."
         ),
     ),
-    engine_store: EngineStore = Depends(get_engine_store),
+    engine: ProtocolEngine = Depends(get_default_engine),
 ) -> PydanticResponse[SimpleBody[StatelessCommand]]:
     """Enqueue and execute a command.
 
@@ -92,14 +79,8 @@ async def create_command(
             Else, return immediately. Comes from a query parameter in the URL.
         timeout: The maximum time, in seconds, to wait before returning.
             Comes from a query parameter in the URL.
-        engine_store: Used to retrieve the `ProtocolEngine` on which the new
-            command will be enqueued.
+        engine: The `ProtocolEngine` on which the command will be enqueued.
     """
-    try:
-        engine = await engine_store.get_default_engine()
-    except EngineConflictError as e:
-        raise RunActive().as_error(status.HTTP_409_CONFLICT) from e
-
     command = engine.add_command(request_body.data)
 
     if waitUntilComplete:
@@ -127,7 +108,7 @@ async def create_command(
     },
 )
 async def get_commands_list(
-    engine_store: EngineStore = Depends(get_engine_store),
+    engine: ProtocolEngine = Depends(get_default_engine),
     cursor: Optional[int] = Query(
         None,
         description=(
@@ -144,15 +125,10 @@ async def get_commands_list(
     """Get a list of stateless commands.
 
     Arguments:
-        engine_store: Protocol engine and runner storage.
+        engine: Protocol engine with commands.
         cursor: Cursor index for the collection response.
         pageLength: Maximum number of items to return.
     """
-    try:
-        engine = await engine_store.get_default_engine()
-    except EngineConflictError as e:
-        raise RunActive().as_error(status.HTTP_409_CONFLICT) from e
-
     cmd_slice = engine.state_view.commands.get_slice(cursor=cursor, length=pageLength)
     commands = cast(List[StatelessCommand], cmd_slice.commands)
     meta = MultiBodyMeta(cursor=cmd_slice.cursor, totalLength=cmd_slice.total_length)
@@ -178,20 +154,16 @@ async def get_commands_list(
 )
 async def get_command(
     commandId: str,
-    engine_store: EngineStore = Depends(get_engine_store),
+    engine: ProtocolEngine = Depends(get_default_engine),
 ) -> PydanticResponse[SimpleBody[StatelessCommand]]:
     """Get a single stateless command.
 
     Arguments:
         commandId: Command identifier from the URL parameter.
-        engine_store: Protocol engine and runner storage.
+        engine: Protocol engine with commands.
     """
     try:
-        engine = await engine_store.get_default_engine()
         command = engine.state_view.commands.get(commandId)
-
-    except EngineConflictError as e:
-        raise RunActive().as_error(status.HTTP_409_CONFLICT) from e
 
     except CommandDoesNotExistError as e:
         raise CommandNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e

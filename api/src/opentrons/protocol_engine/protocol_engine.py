@@ -1,15 +1,16 @@
 """ProtocolEngine class definition."""
-from typing import Optional
+from typing import Dict, Optional
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
 
-from .resources import ModelUtils
+from .resources import ModelUtils, ModuleDataProvider
 from .commands import (
     Command,
     CommandCreate,
 )
-from .types import LabwareOffset, LabwareOffsetCreate, LabwareUri
+from .types import LabwareOffset, LabwareOffsetCreate, LabwareUri, ModuleModel
 from .execution import (
     QueueWorker,
     create_queue_worker,
@@ -29,6 +30,7 @@ from .actions import (
     QueueCommandAction,
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
+    AddModuleAction,
     HardwareStoppedAction,
 )
 
@@ -51,6 +53,7 @@ class ProtocolEngine:
         model_utils: Optional[ModelUtils] = None,
         hardware_stopper: Optional[HardwareStopper] = None,
         hardware_event_forwarder: Optional[HardwareEventForwarder] = None,
+        module_data_provider: Optional[ModuleDataProvider] = None,
     ) -> None:
         """Initialize a ProtocolEngine instance.
 
@@ -84,6 +87,7 @@ class ProtocolEngine:
                 action_dispatcher=self._action_dispatcher,
             )
         )
+        self._module_data_provider = module_data_provider or ModuleDataProvider()
 
         self._queue_worker.start()
         self._hardware_event_forwarder.start()
@@ -254,3 +258,22 @@ class ProtocolEngine:
             AddLabwareDefinitionAction(definition=definition)
         )
         return self._state_store.labware.get_uri_from_definition(definition)
+
+    async def use_attached_modules(
+        self,
+        modules_by_id: Dict[str, HardwareModuleAPI],
+    ) -> None:
+        """Load attached modules directly into state, without locations."""
+        actions = [
+            AddModuleAction(
+                module_id=module_id,
+                serial_number=mod.device_info["serial"],
+                definition=self._module_data_provider.get_definition(
+                    ModuleModel(mod.model())
+                ),
+            )
+            for module_id, mod in modules_by_id.items()
+        ]
+
+        for a in actions:
+            self._action_dispatcher.dispatch(a)

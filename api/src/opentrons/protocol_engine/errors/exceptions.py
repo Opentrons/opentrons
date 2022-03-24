@@ -71,6 +71,10 @@ class ModuleNotLoadedError(ProtocolEngineError):
     """And error raised when referencing a module that has not been loaded."""
 
 
+class ModuleNotOnDeckError(ProtocolEngineError):
+    """And error raised when trying to use a module that is loaded off the deck."""
+
+
 class SlotDoesNotExistError(ProtocolEngineError):
     """An error raised when referencing a deck slot that does not exist."""
 

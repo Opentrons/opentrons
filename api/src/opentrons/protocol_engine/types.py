@@ -223,7 +223,7 @@ class LoadedModule(BaseModel):
 
     id: str
     model: ModuleModel
-    location: DeckSlotLocation
+    location: Optional[DeckSlotLocation]
     definition: ModuleDefinition
     serialNumber: str
 

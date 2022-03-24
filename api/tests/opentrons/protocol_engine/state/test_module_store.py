@@ -21,7 +21,7 @@ def test_initial_state() -> None:
 
     assert subject.state == ModuleState(
         slot_by_module_id={},
-        hardware_module_by_slot={},
+        hardware_by_module_id={},
     )
 
 
@@ -47,10 +47,32 @@ def test_load_module(tempdeck_v2_def: ModuleDefinition) -> None:
 
     assert subject.state == ModuleState(
         slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
-        hardware_module_by_slot={
-            DeckSlotName.SLOT_1: HardwareModule(
+        hardware_by_module_id={
+            "module-id": HardwareModule(
                 serial_number="serial-number",
                 definition=tempdeck_v2_def,
+            )
+        },
+    )
+
+
+def test_add_module_action(tempdeck_v1_def: ModuleDefinition) -> None:
+    """It should be able to add attached modules directly into state."""
+    action = actions.AddModuleAction(
+        module_id="module-id",
+        serial_number="serial-number",
+        definition=tempdeck_v1_def,
+    )
+
+    subject = ModuleStore()
+    subject.handle_action(action)
+
+    assert subject.state == ModuleState(
+        slot_by_module_id={"module-id": None},
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="serial-number",
+                definition=tempdeck_v1_def,
             )
         },
     )

@@ -27,7 +27,7 @@ from ..types import (
 )
 from .. import errors
 from ..commands import Command, LoadModuleResult
-from ..actions import Action, UpdateCommandAction
+from ..actions import Action, UpdateCommandAction, AddModuleAction
 from .abstract_store import HasState, HandlesActions
 
 
@@ -68,8 +68,8 @@ class HardwareModule:
 class ModuleState:
     """Basic module data state and getter methods."""
 
-    slot_by_module_id: Dict[str, DeckSlotName]
-    hardware_module_by_slot: Dict[DeckSlotName, HardwareModule]
+    slot_by_module_id: Dict[str, Optional[DeckSlotName]]
+    hardware_by_module_id: Dict[str, HardwareModule]
 
 
 class ModuleStore(HasState[ModuleState], HandlesActions):
@@ -79,12 +79,19 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
 
     def __init__(self) -> None:
         """Initialize a ModuleStore and its state."""
-        self._state = ModuleState(slot_by_module_id={}, hardware_module_by_slot={})
+        self._state = ModuleState(slot_by_module_id={}, hardware_by_module_id={})
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
         if isinstance(action, UpdateCommandAction):
             self._handle_command(action.command)
+
+        elif isinstance(action, AddModuleAction):
+            self._state.slot_by_module_id[action.module_id] = None
+            self._state.hardware_by_module_id[action.module_id] = HardwareModule(
+                serial_number=action.serial_number,
+                definition=action.definition,
+            )
 
     def _handle_command(self, command: Command) -> None:
         if isinstance(command.result, LoadModuleResult):
@@ -94,7 +101,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             slot_name = command.params.location.slotName
 
             self._state.slot_by_module_id[module_id] = slot_name
-            self._state.hardware_module_by_slot[slot_name] = HardwareModule(
+            self._state.hardware_by_module_id[module_id] = HardwareModule(
                 serial_number=serial_number,
                 definition=definition,
             )
@@ -117,16 +124,20 @@ class ModuleView(HasState[ModuleState]):
         """Get module data by the module's unique identifier."""
         try:
             slot_name = self._state.slot_by_module_id[module_id]
-            attached_module = self._state.hardware_module_by_slot[slot_name]
+            attached_module = self._state.hardware_by_module_id[module_id]
 
         except KeyError as e:
             raise errors.ModuleNotLoadedError(f"Module {module_id} not found.") from e
 
+        location = (
+            DeckSlotLocation(slotName=slot_name) if slot_name is not None else None
+        )
+
         return LoadedModule.construct(
             id=module_id,
+            location=location,
             model=attached_module.definition.model,
             serialNumber=attached_module.serial_number,
-            location=DeckSlotLocation(slotName=slot_name),
             definition=attached_module.definition,
         )
 
@@ -159,7 +170,12 @@ class ModuleView(HasState[ModuleState]):
 
     def get_location(self, module_id: str) -> DeckSlotLocation:
         """Get the slot location of the given module."""
-        return self.get(module_id).location
+        location = self.get(module_id).location
+        if location is None:
+            raise errors.ModuleNotOnDeckError(
+                f"Module {module_id} is not loaded into a deck slot."
+            )
+        return location
 
     def get_model(self, module_id: str) -> ModuleModel:
         """Get the model name of the given module."""
@@ -375,13 +391,17 @@ class ModuleView(HasState[ModuleState]):
             ModuleAlreadyPresentError: A module of a different type is already
                 assigned to the requested location.
         """
-        existing_mod = self._state.hardware_module_by_slot.get(location.slotName)
+        existing_mod_in_slot = None
 
-        if existing_mod:
-            existing_def = existing_mod.definition
+        for mod_id, slot in self._state.slot_by_module_id.items():
+            if slot == location.slotName:
+                existing_mod_in_slot = self._state.hardware_by_module_id.get(mod_id)
+
+        if existing_mod_in_slot:
+            existing_def = existing_mod_in_slot.definition
 
             if existing_def.model == model or model in existing_def.compatibleWith:
-                return existing_mod
+                return existing_mod_in_slot
 
             else:
                 raise errors.ModuleAlreadyPresentError(
@@ -390,7 +410,7 @@ class ModuleView(HasState[ModuleState]):
                 )
 
         for m in attached_modules:
-            if m not in self._state.hardware_module_by_slot.values():
+            if m not in self._state.hardware_by_module_id.values():
                 if model == m.definition.model or model in m.definition.compatibleWith:
                     return m
 
