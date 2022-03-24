@@ -119,7 +119,3 @@ class EngageHeightOutOfRangeError(ProtocolEngineError):
 
 class NoTargetTemperatureSetError(ProtocolEngineError):
     """An error raised when awaiting temperature when no target was set."""
-
-
-class NoTargetSpeedSetError(ProtocolEngineError):
-    """An error raised when awaiting speed when no target was set."""

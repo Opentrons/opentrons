@@ -88,7 +88,6 @@ class HardwareModule:
     serial_number: str
     definition: ModuleDefinition
     target_temperature_set: Optional[bool] = None
-    target_speed_set: Optional[bool] = None
 
 
 @dataclass
@@ -137,33 +136,17 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         ):
             slot_name = self._state.slot_by_module_id[command.params.moduleId]
             hardware_module = self._state.hardware_module_by_slot[slot_name]
-            if isinstance(command.result, SetTargetShakeSpeedResult):
-                self._state.hardware_module_by_slot[slot_name] = HardwareModule(
-                    serial_number=hardware_module.serial_number,
-                    definition=hardware_module.definition,
-                    target_temperature_set=hardware_module.target_temperature_set,
-                    target_speed_set=True,
-                )
-            elif isinstance(command.result, StopShakeResult):
-                self._state.hardware_module_by_slot[slot_name] = HardwareModule(
-                    serial_number=hardware_module.serial_number,
-                    definition=hardware_module.definition,
-                    target_temperature_set=hardware_module.target_temperature_set,
-                    target_speed_set=False,
-                )
-            elif isinstance(command.result, StartSetTargetTemperatureResult):
+            if isinstance(command.result, StartSetTargetTemperatureResult):
                 self._state.hardware_module_by_slot[slot_name] = HardwareModule(
                     serial_number=hardware_module.serial_number,
                     definition=hardware_module.definition,
                     target_temperature_set=True,
-                    target_speed_set=hardware_module.target_speed_set,
                 )
             elif isinstance(command.result, DeactivateHeaterResult):
                 self._state.hardware_module_by_slot[slot_name] = HardwareModule(
                     serial_number=hardware_module.serial_number,
                     definition=hardware_module.definition,
                     target_temperature_set=False,
-                    target_speed_set=hardware_module.target_speed_set,
                 )
 
 
@@ -244,11 +227,6 @@ class ModuleView(HasState[ModuleState]):
         """Get whether a module has its target temperature set."""
         slot_name = self._state.slot_by_module_id[module_id]
         return self.state.hardware_module_by_slot[slot_name].target_temperature_set
-
-    def is_target_speed_set(self, module_id: str) -> Optional[bool]:
-        """Get whether a module has its target speed set."""
-        slot_name = self._state.slot_by_module_id[module_id]
-        return self.state.hardware_module_by_slot[slot_name].target_speed_set
 
     def get_location(self, module_id: str) -> DeckSlotLocation:
         """Get the slot location of the given module."""
